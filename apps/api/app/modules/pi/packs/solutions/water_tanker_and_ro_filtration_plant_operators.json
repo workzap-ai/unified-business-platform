@@ -2,7 +2,7 @@
   "industry": "water_tanker_and_ro_filtration_plant_operators",
   "name": "Water tanker and RO/filtration plant operators",
   "sector": "7.L Finance-adjacent, energy and utilities",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_orders_lost",
@@ -22,7 +22,17 @@
         "tool_words": []
       },
       "ask_first": "How do most orders reach you today?",
-      "free_stops": "Intake flow and status messages are in the solution document."
+      "free_stops": "Intake flow and status messages are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many orders sit on each phone at closing for one week, so you see where bookings are getting stranded.",
+          "review": false
+        },
+        {
+          "text": "Give one office person the closing handover of every unbooked order into one notebook, so missed tankers stop slipping overnight.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_order_tracking",
@@ -42,7 +52,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "Update triggers and wording are in the solution document."
+      "free_stops": "Update triggers and wording are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note the time gap between promised slot and actual arrival for one busy day, so you see which rounds trigger the most chasing calls.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of updating the day's running order after each driver check in, so callers get one clear answer quickly.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_cash_mismatch",
@@ -62,7 +82,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "Matching rules are in the solution document; pi records the control gap, never names drivers."
+      "free_stops": "Matching rules are in the solution document; pi records the control gap, never names drivers.",
+      "extra_ideas": [
+        {
+          "text": "Compare each driver's claimed trips with that day's written bookings for one week, so the size and timing of cash gaps stand out.",
+          "review": false
+        },
+        {
+          "text": "Make one person collect trip sheets and cash at the same fixed evening time, so missing money is checked while the day is fresh.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_theft_internal",
@@ -82,7 +112,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The check design is in the solution document."
+      "free_stops": "The check design is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note each tanker's opening and closing reading beside that day's booked trips for one week, so extra running outside orders shows.",
+          "review": false
+        },
+        {
+          "text": "Give one supervisor the nightly job of matching tanker movement with the booking list, so private trips are harder to hide.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_margin_unknown",
@@ -103,7 +143,17 @@
         "leads_with_view": true
       },
       "ask_first": "",
-      "free_stops": "Cost allocation is in the solution document; pi gives no pricing advice."
+      "free_stops": "Cost allocation is in the solution document; pi gives no pricing advice.",
+      "extra_ideas": [
+        {
+          "text": "Write one week's fuel, driver and source costs beside trips completed, so costly routes and low earning rounds become easier to spot.",
+          "review": false
+        },
+        {
+          "text": "Give one person a fixed end of day note of trip counts and running costs, so rising trip cost stops being guessed.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_returns_handling",
@@ -123,7 +173,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "Ledger design and deposit tracking are in the solution document."
+      "free_stops": "Ledger design and deposit tracking are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count full bottles sent out and empties brought back for each route on one busy day, so the worst return gaps stand out.",
+          "review": false
+        },
+        {
+          "text": "Give one loader the single job of marking bottle out and bottle back in one notebook, so replacement buying stops drifting upward.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_credit_customers",
@@ -143,7 +203,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "Statement and reminder rules are in the solution document."
+      "free_stops": "Statement and reminder rules are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note each building and office account with the month last paid and compare them, so the oldest outstanding areas stand out.",
+          "review": false
+        },
+        {
+          "text": "Give one person one notebook for every payment promise from credit customers, so follow ups happen on the same day each week.",
+          "review": true
+        }
+      ]
     },
     {
       "id": "p8_maintenance_downtime",
@@ -163,7 +233,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "Maintenance schedule set-up is in the solution document; pi gives no treatment or specification advice."
+      "free_stops": "Maintenance schedule set-up is in the solution document; pi gives no treatment or specification advice.",
+      "extra_ideas": [
+        {
+          "text": "Note every stoppage this month with start time, end time and failed part, so the biggest source of piled up orders becomes clear.",
+          "review": false
+        },
+        {
+          "text": "Give one operator the job of updating a single maintenance notebook after every repair, so repeat failures stop being remembered differently.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_inspection_missing",
@@ -183,7 +263,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "Check items are in the solution document; testing and treatment questions go to a qualified water specialist."
+      "free_stops": "Check items are in the solution document; testing and treatment questions go to a qualified water specialist.",
+      "extra_ideas": [
+        {
+          "text": "Look back at the last complaint and note what plant cleaning or filter change record was missing, so the record gap shows.",
+          "review": false
+        },
+        {
+          "text": "Keep one dated plant notebook for cleaning, filter changes and complaint notes, so you can answer taste questions with the same record.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p10_seasonal_planning",
@@ -204,7 +294,17 @@
         "leads_with_view": true
       },
       "ask_first": "",
-      "free_stops": "Planning method is in the solution document."
+      "free_stops": "Planning method is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many deliveries you refused or delayed in one hot week, so the extra tanker need is sized clearly.",
+          "review": false
+        },
+        {
+          "text": "Give one person a notebook for waiting requests by area each evening, so added trips are grouped faster during the rush.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p11_churn_subscription",
@@ -224,7 +324,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "Schedule and flag rules are in the solution document."
+      "free_stops": "Schedule and flag rules are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note which regular areas had fewer repeat deliveries this week than their usual pattern, so drop off starts showing before silence grows.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member a fixed weekly check of missed regular rounds, so skipped households are noticed while they still remember you.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

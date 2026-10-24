@@ -2,7 +2,7 @@
   "industry": "courier_and_last_mile_delivery_companies",
   "name": "Courier and last-mile delivery companies",
   "sector": "7.E Trade, distribution and logistics",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_cod_remittance",
@@ -22,7 +22,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The settlement steps and checks are designed in the solution document."
+      "free_stops": "The settlement steps and checks are designed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count this week's cash shortages by rider and route, so you see whether the problem sits in collection or end-of-day handover.",
+          "review": false
+        },
+        {
+          "text": "Give one supervisor the job of checking every rider's cash and delivery list at return time, so shortages are owned before anyone leaves.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_complaints",
@@ -43,7 +53,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The statement format and schedule are set in the solution document."
+      "free_stops": "The statement format and schedule are set in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note when each merchant payment was due and when it actually went out this week, so late patterns stop being argued.",
+          "review": true
+        },
+        {
+          "text": "Keep one remittance list in one notebook under one cashier each day, so merchant payments stop slipping between collections and transfers.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_returns_rto",
@@ -64,7 +84,17 @@
         "tool_words": []
       },
       "ask_first": "What reasons do riders record most often on returns?",
-      "free_stops": "The confirmation flow and timing are designed in the solution document."
+      "free_stops": "The confirmation flow and timing are designed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare this week's returned COD parcels by merchant and area, so you see where failed deliveries are piling up fastest.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of logging every return reason in one place at hub return, so merchant follow-up starts from facts.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_accountability",
@@ -86,7 +116,17 @@
         ]
       },
       "ask_first": "",
-      "free_stops": "What counts as a valid attempt is set in the solution document."
+      "free_stops": "What counts as a valid attempt is set in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many failed deliveries carry the same reason each rider uses this week, so weak attempt habits stand out clearly.",
+          "review": false
+        },
+        {
+          "text": "Assign one shift lead to review failed-delivery notes before riders clock off, so unsupported attempt reasons get challenged the same day.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_transfers_lost",
@@ -106,7 +146,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The scan points are designed in the solution document."
+      "free_stops": "The scan points are designed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare the parcel count at hub handover with the rider return sheet each day, so the missing stage narrows quickly.",
+          "review": false
+        },
+        {
+          "text": "Make one hub staff member own one transfer log for every rider handover, so each parcel movement has a clear owner.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_chat_overload",
@@ -127,7 +177,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The message triggers are set in the solution document."
+      "free_stops": "The message triggers are set in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Tally this week's parcel-chasing messages by delivery stage mentioned, so you see which update gap is creating the noise.",
+          "review": false
+        },
+        {
+          "text": "Give one agent a fixed time to post the day's delivery exceptions in one team chat, so repeat status chasing drops inside the office.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_margin_unknown",
@@ -150,7 +210,17 @@
         "leads_with_view": true
       },
       "ask_first": "",
-      "free_stops": "How costs are assigned to zones is set in the solution document."
+      "free_stops": "How costs are assigned to zones is set in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note this week's failed stops, repeat visits and long-wait areas by zone, so the costliest route patterns become visible.",
+          "review": false
+        },
+        {
+          "text": "Assign one dispatcher to keep one zone-issues list through the week, so route changes come from the same record each time.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_commission_disputes",
@@ -170,7 +240,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "How the rules are built into the calculator is in the solution document."
+      "free_stops": "How the rules are built into the calculator is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare each rider's own parcel count with the office count before payday, so dispute patterns show before money conversations start.",
+          "review": false
+        },
+        {
+          "text": "Give one payroll person one shared parcel-count list for the whole week, so pay decisions come from a single record.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_duplicate_entry",
@@ -190,7 +270,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "Which connections are made, and how, is mapped in the solution document."
+      "free_stops": "Which connections are made, and how, is mapped in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count which merchants send order details in the most different layouts this week, so you see where retyping time is really going.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member one notebook page per merchant for missing order details, so repeat entry mistakes stop bouncing around the team.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p10_seasonal_planning",
@@ -210,7 +300,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The planning method is set in the solution document."
+      "free_stops": "The planning method is set in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note this week's delayed parcels by hour and handover point, so you see where peak pressure starts breaking the day.",
+          "review": false
+        },
+        {
+          "text": "Give one dispatcher the job of keeping a single peak-issues notebook all week, so fixes stop getting lost between shifts.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

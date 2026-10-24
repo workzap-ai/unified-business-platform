@@ -2,7 +2,7 @@
   "industry": "sports_goods_manufacturing",
   "name": "Sports goods manufacturing (Sialkot cluster)",
   "sector": "7.D Manufacturing and industry (part 1)",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_lead_followup_slow",
@@ -22,7 +22,17 @@
         "tool_words": []
       },
       "ask_first": "Where do most of your inquiries come from?",
-      "free_stops": "How leads flow in and how follow-ups are timed is set out in the solution document."
+      "free_stops": "How leads flow in and how follow-ups are timed is set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many inquiries sat unanswered since yesterday across your usual channels, so you see where buyers are slipping away.",
+          "review": false
+        },
+        {
+          "text": "Set one fixed time each day for one person to clear new inquiries, so buyers hear back before they move on.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_campaign_roi_unknown",
@@ -45,7 +55,17 @@
         ]
       },
       "ask_first": "",
-      "free_stops": "How sources are tagged and reported is covered in the solution document."
+      "free_stops": "How sources are tagged and reported is covered in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Mark recent inquiries and orders by where each buyer first found you, so paid membership can be judged against actual business.",
+          "review": false
+        },
+        {
+          "text": "Give one person one running list of inquiry source and order outcome, so renewal decisions rely on your own record.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_conversion_low",
@@ -65,7 +85,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "Sample stages and approval flow are set out in the solution document."
+      "free_stops": "Sample stages and approval flow are set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many open samples are waiting on design, material or stitching today, so the slowest hold up gets attention.",
+          "review": false
+        },
+        {
+          "text": "Assign one person to own every live sample from request to dispatch, so orders stop drifting between sales and production.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_order_errors",
@@ -86,7 +116,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "How specs are captured and checked before print is kept for the solution document."
+      "free_stops": "How specs are captured and checked before print is kept for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare the approved mock-up against one item before full cutting on each custom order, so colour and placement mistakes are caught early.",
+          "review": false
+        },
+        {
+          "text": "Keep one paper packet per custom order with approved mock-up, colours and placement notes, so production follows one clear spec.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_no_visibility",
@@ -106,7 +146,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "How issues and returns are recorded and reconciled is covered in the solution document."
+      "free_stops": "How issues and returns are recorded and reconciled is covered in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Walk the floor and note balls sent out, returned and still outside by stitching centre, so late returns can be sized today.",
+          "review": false
+        },
+        {
+          "text": "Make one person update one shared outward and return list each evening, so everyone knows what each stitching centre holds.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_product_defects",
@@ -126,7 +176,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "Check points and how they are tied to centres are set out in the solution document."
+      "free_stops": "Check points and how they are tied to centres are set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note which lots had shape or weight complaints and which stitching centre made them, so trouble clusters can be seen quickly.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of checking a few balls from each lot before packing, so rejects are caught before dispatch.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_receivables_late",
@@ -146,7 +206,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "Reminder timing and how balances are tied to shipments are kept for the solution document."
+      "free_stops": "Reminder timing and how balances are tied to shipments are kept for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare buyers with balances due against shipments already sent, so you see which money is tied to which dispatch.",
+          "review": false
+        },
+        {
+          "text": "Give one person one list of advances, shipped orders and balances due, so follow up happens from one place each week.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_customer_communication",
@@ -166,7 +236,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "Which updates go out and when is set out in the solution document."
+      "free_stops": "Which updates go out and when is set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many tracking messages were answered by hand this week, so the time drain from repeated buyer updates is clear.",
+          "review": false
+        },
+        {
+          "text": "Make dispatch hand over shipment details to one person in one list the same day, so buyer updates go out without chasing.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_repeat_low",
@@ -187,7 +267,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "Timing and content of reorder messages are kept for the solution document."
+      "free_stops": "Timing and content of reorder messages are kept for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count last year's one time buyers and note which had complaints, so lost repeat business can be linked to specific issues.",
+          "review": false
+        },
+        {
+          "text": "Give one person one notebook list of buyers after dispatch with next contact month, so follow up becomes a routine.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p10_margin_unknown",
@@ -212,7 +302,17 @@
         ]
       },
       "ask_first": "",
-      "free_stops": "How freight, samples and currency effects are built in is detailed in the solution document."
+      "free_stops": "How freight, samples and currency effects are built in is detailed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Write the last few orders by product line with price, material and stitching costs, so the strongest line stands out clearly.",
+          "review": true
+        },
+        {
+          "text": "Give one person a single notebook page for order costs by product line, so margin talks use the same numbers.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

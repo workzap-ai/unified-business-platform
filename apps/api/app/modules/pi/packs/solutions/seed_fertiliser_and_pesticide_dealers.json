@@ -2,7 +2,7 @@
   "industry": "seed_fertiliser_and_pesticide_dealers",
   "name": "Seed, fertiliser and pesticide dealers",
   "sector": "7.C Agriculture, livestock and rural (part 2)",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_credit_customers",
@@ -22,7 +22,17 @@
         "tool_words": []
       },
       "ask_first": "Roughly how much of your selling is on udhaar?",
-      "free_stops": "How accounts, limits and the village view are structured goes in the solution document."
+      "free_stops": "How accounts, limits and the village view are structured goes in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many credit accounts have had no payment since the last harvest, so you see how much cash is delayed beyond the season.",
+          "review": true
+        },
+        {
+          "text": "Give one staff member one village wise recovery list for the week, so follow ups happen in an orderly route.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_cash_mismatch",
@@ -42,7 +52,17 @@
         "tool_words": []
       },
       "ask_first": "How often do balance disputes come up?",
-      "free_stops": "How statements are sent and confirmed is part of the solution document."
+      "free_stops": "How statements are sent and confirmed is part of the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare a sample of recent payment entries with the matching khata pages, so the disagreement pattern shows before the next collection round.",
+          "review": true
+        },
+        {
+          "text": "Keep one payment notebook at the counter under one person's care, so every receipt reaches the khata from the same place.",
+          "review": true
+        }
+      ]
     },
     {
       "id": "p3_receivables_late",
@@ -62,7 +82,17 @@
         "tool_words": []
       },
       "ask_first": "Does recovery mostly come after wheat, or spread across crops?",
-      "free_stops": "Reminder timing and the ageing view are kept for the solution document."
+      "free_stops": "Reminder timing and the ageing view are kept for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note how many recovery visits ended without any payment after harvest, so you can see where effort is not turning into cash.",
+          "review": true
+        },
+        {
+          "text": "Give one person one recovery diary with promised dates by village, so missed follow ups stop slipping past the team.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_expiry_wastage",
@@ -82,7 +112,17 @@
         "tool_words": []
       },
       "ask_first": "Are batch and expiry dates recorded when stock arrives?",
-      "free_stops": "Alert timing and the return list are detailed in the solution document."
+      "free_stops": "Alert timing and the return list are detailed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many boxes near expiry are hidden behind newer stock in the godown, so old batches stop being overlooked.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member the weekly walk round for near expiry shelves, so older stock is pulled forward every time.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_stockout",
@@ -102,7 +142,17 @@
         "tool_words": []
       },
       "ask_first": "Which season caused the shortage, Rabi or Kharif?",
-      "free_stops": "How the buying sheet is worked out from your sales goes in the solution document."
+      "free_stops": "How the buying sheet is worked out from your sales goes in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many customers asked for the sold out seed after it finished, so the missed demand is clear this season.",
+          "review": false
+        },
+        {
+          "text": "Give one person one notebook page for refused sales during sowing week, so next buying reflects what people actually asked for.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_credit_terms",
@@ -122,7 +172,17 @@
         "tool_words": []
       },
       "ask_first": "How many companies do you have schemes with?",
-      "free_stops": "The tracker setup and follow-up rules are part of the solution document."
+      "free_stops": "The tracker setup and follow-up rules are part of the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many open company claims are waiting beyond the usual payment month, so the backlog with each company is clear.",
+          "review": true
+        },
+        {
+          "text": "Keep all claim papers in one dated bundle with one owner or clerk, so missing follow up does not scatter across drawers.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_pricing_errors",
@@ -142,7 +202,17 @@
         "tool_words": []
       },
       "ask_first": "How many counters or branches do you have?",
-      "free_stops": "How rates are pushed and controlled is detailed in the solution document."
+      "free_stops": "How rates are pushed and controlled is detailed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare today's sold rates on a few bills with the latest announced rates, so you spot where old prices are still slipping through.",
+          "review": true
+        },
+        {
+          "text": "Make one staff member update and remove old counter rate pages at opening time, so everyone sells from the same current rate.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_theft_internal",
@@ -162,7 +232,17 @@
         "tool_words": []
       },
       "ask_first": "How many people handle cash?",
-      "free_stops": "How the cash close is built for your counters is part of the solution document."
+      "free_stops": "How the cash close is built for your counters is part of the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note how many times cash in hand is short against written entries at closing this week, so the size of the leakage is visible.",
+          "review": false
+        },
+        {
+          "text": "Give one trusted person the closing cash match in one notebook every day, so handover of responsibility is clear.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_orders_lost",
@@ -182,7 +262,17 @@
         "tool_words": []
       },
       "ask_first": "Do you deliver to villages or do farmers collect?",
-      "free_stops": "How messages become tracked orders goes in the solution document."
+      "free_stops": "How messages become tracked orders goes in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many voice note orders were delivered late or missed this week, so the real load of forgotten orders is clear.",
+          "review": false
+        },
+        {
+          "text": "Assign one person one daily order list from incoming voice notes, so packing and dispatch work from a single queue.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p10_branch_comparison",
@@ -204,7 +294,17 @@
         ]
       },
       "ask_first": "Do both shops use the same register?",
-      "free_stops": "What the dashboard measures and how is kept for the solution document."
+      "free_stops": "What the dashboard measures and how is kept for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many cash sales, credit sales and returns each shop records this week, so weaker branch habits stand out quickly.",
+          "review": true
+        },
+        {
+          "text": "Give one person a fixed weekly notebook page for each shop's sales, credit and cash, so both shops are judged the same way.",
+          "review": true
+        }
+      ]
     }
   ],
   "never_say": [

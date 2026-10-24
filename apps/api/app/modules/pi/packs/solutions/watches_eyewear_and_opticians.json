@@ -2,7 +2,7 @@
   "industry": "watches_eyewear_and_opticians",
   "name": "Watches, eyewear and opticians",
   "sector": "7.A Retail and consumer (part 2)",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_delivery_late",
@@ -23,7 +23,17 @@
         "tool_words": []
       },
       "ask_first": "Is that an outside lab or your own?",
-      "free_stops": "job stages, chase rules and customer messages are set out in the solution document."
+      "free_stops": "job stages, chase rules and customer messages are set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note every glasses collection delayed by the lab this week, so you see which promised dates are failing customers most often.",
+          "review": false
+        },
+        {
+          "text": "Make one person update a single lab-out list before closing, so collectors get checked against real status instead of hopeful answers.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_rework",
@@ -44,7 +54,17 @@
         "tool_words": []
       },
       "ask_first": "Who fills the job card today, the same person every time?",
-      "free_stops": "the job-card fields and check steps go in the solution document."
+      "free_stops": "the job-card fields and check steps go in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Mark each remake this week by what was wrong on the outgoing order, so you spot the repeat error costing your shop.",
+          "review": false
+        },
+        {
+          "text": "Give one person the final check on every lens order before it leaves, so remakes stop starting from rushed handovers.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_no_visibility",
@@ -65,7 +85,17 @@
         "tool_words": []
       },
       "ask_first": "Roughly how many frame styles do you carry?",
-      "free_stops": "how stock is labelled, scanned and reordered is kept for the solution document."
+      "free_stops": "how stock is labelled, scanned and reordered is kept for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Walk one frame section and note colour, size and empty hooks together, so the missing picture of what is there becomes visible.",
+          "review": false
+        },
+        {
+          "text": "Assign one staff member one shelf list for frames on each shift, so colours and sizes stop being guessed during selling.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_expiry_wastage",
@@ -85,7 +115,17 @@
         "tool_words": []
       },
       "ask_first": "Do you keep contact lens stock or order per customer?",
-      "free_stops": "alert timing and reorder rules are detailed in the solution document."
+      "free_stops": "alert timing and reorder rules are detailed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Write down each contact lens box expiring soon on the shelf, so you see which powers are turning into dead stock.",
+          "review": false
+        },
+        {
+          "text": "Give one person the weekly front-check of contact lens boxes, so older stock gets noticed before newer boxes sell first.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_after_sales",
@@ -105,7 +145,17 @@
         "tool_words": []
       },
       "ask_first": "Are repairs done in-house or sent to a service centre?",
-      "free_stops": "the intake and handoff process is designed in the solution document."
+      "free_stops": "the intake and handoff process is designed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare watches out for repair with the collection shelf and service book, so you find which pieces have gone out of sight.",
+          "review": false
+        },
+        {
+          "text": "Make one intake person note visible marks in the same repair register, so condition disputes do not rely on memory later.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_receivables_late",
@@ -126,7 +176,17 @@
         "tool_words": []
       },
       "ask_first": "Which part takes longest, filling forms or chasing payment?",
-      "free_stops": "checklists per insurer and the tracking flow go in the solution document."
+      "free_stops": "checklists per insurer and the tracking flow go in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many recent claim forms came back for missing or mismatched fields, so the main cause of delay is clear.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member the full claim file before submission time, so missing papers and repeated errors are caught together.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_repeat_low",
@@ -147,7 +207,17 @@
         "tool_words": []
       },
       "ask_first": "Do you keep any record of customers who'd like to hear from you?",
-      "free_stops": "reminder timing and booking flow are kept for the solution document."
+      "free_stops": "reminder timing and booking flow are kept for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note how many collecting customers mention they delayed their last test, so you see how much repeat business is slipping away.",
+          "review": false
+        },
+        {
+          "text": "Give one person the reminder diary and one weekly review time, so follow-ups actually happen when customers are due.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_booking_appointments",
@@ -167,7 +237,17 @@
         "tool_words": []
       },
       "ask_first": "How do people book today?",
-      "free_stops": "slot design and reminder flow go in the solution document."
+      "free_stops": "slot design and reminder flow go in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Mark every booking clash and overbooked test slot this week, so you see which optometrist days create the most confusion.",
+          "review": false
+        },
+        {
+          "text": "Put one person in charge of the appointment book for optometrist days, so double booking stops at the handover point.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_manual_reports",
@@ -188,7 +268,17 @@
         "tool_words": []
       },
       "ask_first": "What system do you use for billing?",
-      "free_stops": "the report mapping per brand is kept for the solution document."
+      "free_stops": "the report mapping per brand is kept for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Time one monthly sell-out report from start to finish, so you see where the hand compilation is really eating the day.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member one running brand sales notebook through the month, so month-end reporting stops becoming a full-day scramble.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p10_cash_mismatch",
@@ -208,7 +298,17 @@
         "tool_words": []
       },
       "ask_first": "Who handles the repair counter cash?",
-      "free_stops": "the entry and close steps go in the solution document."
+      "free_stops": "the entry and close steps go in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "For one week, tally each battery and strap job against the cash kept from them, so missing entries stop hiding inside the till.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member the small-job notebook at the counter, so every battery and strap payment lands in one place before closing.",
+          "review": true
+        }
+      ]
     }
   ],
   "never_say": [

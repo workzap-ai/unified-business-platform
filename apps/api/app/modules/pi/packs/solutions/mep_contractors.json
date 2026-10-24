@@ -2,7 +2,7 @@
   "industry": "mep_contractors",
   "name": "MEP contractors",
   "sector": "7.F Construction, real estate and facilities",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_approvals_slow",
@@ -22,7 +22,17 @@
         "tool_words": []
       },
       "ask_first": "Roughly how many submittals are open across your projects?",
-      "free_stops": "Status stages and reminder rules are in the solution document."
+      "free_stops": "Status stages and reminder rules are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare each open submittal's sent date with the material need date, so urgent approvals stand out before procurement stalls.",
+          "review": false
+        },
+        {
+          "text": "Give one person one pending-submittal list and a fixed weekly chase time, so consultant follow-up happens without gaps.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_documentation",
@@ -42,7 +52,17 @@
         "tool_words": []
       },
       "ask_first": "Who updates the submittal register now?",
-      "free_stops": "How revisions link to ordering is set out in the solution document."
+      "free_stops": "How revisions link to ordering is set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Check one live project file against the latest approved comments, so you spot where site may still hold an older revision.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of replacing superseded revisions in one agreed place, so site teams pull the current approved issue.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_shrinkage_theft",
@@ -63,7 +83,17 @@
         "tool_words": []
       },
       "ask_first": "How do you know what's in the site store versus the warehouse?",
-      "free_stops": "The stock structure and alert rules are in the solution document."
+      "free_stops": "The stock structure and alert rules are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note which projects request the most extra cable beyond issue records, so loss patterns by site start to show.",
+          "review": false
+        },
+        {
+          "text": "Give one storekeeper one transfer notebook for every warehouse and site material move, so project balances stay traceable.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_import_delays",
@@ -83,7 +113,17 @@
         "tool_words": []
       },
       "ask_first": "Which items do you import?",
-      "free_stops": "Tracking stages and alerts are in the solution document."
+      "free_stops": "Tracking stages and alerts are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare promised arrival notes against the site need dates for imported equipment, so testing risks are clear before crews wait idle.",
+          "review": false
+        },
+        {
+          "text": "Give one buyer one weekly update list for imported items, so everyone works from the same latest shipment picture.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_disputed_deductions",
@@ -103,7 +143,17 @@
         "tool_words": []
       },
       "ask_first": "What deductions or delays hurt most?",
-      "free_stops": "Ledger design and reporting are in the solution document."
+      "free_stops": "Ledger design and reporting are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count recent back-charge notices against matching site diaries, emails and signed work records on one job, so missing support is clear.",
+          "review": false
+        },
+        {
+          "text": "Give one office person one notebook for every deduction notice and reply received this week, so cash-impact records stay together.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_shift_scheduling",
@@ -123,7 +173,17 @@
         "tool_words": []
       },
       "ask_first": "How many technicians and foremen do you have?",
-      "free_stops": "Scheduling rules and the skills matrix are in the solution document."
+      "free_stops": "Scheduling rules and the skills matrix are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare yesterday's planned site allocation with where crews actually worked, so mismatch patterns show before another site sits idle.",
+          "review": false
+        },
+        {
+          "text": "Give one supervisor one evening planning sheet for next-day site allocation, so morning deployment stops changing ad hoc.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_rework",
@@ -145,7 +205,17 @@
         ]
       },
       "ask_first": "What usually causes rework or failed tests?",
-      "free_stops": "Checklist structure per system is in the solution document."
+      "free_stops": "Checklist structure per system is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Look at recent failed test notes beside the latest issued drawing, so you see which work areas repeat drawing misses.",
+          "review": false
+        },
+        {
+          "text": "Give one foreman the job of collecting close-up progress photos in one project chat, so checks happen before finishes hide work.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_handoffs",
@@ -165,7 +235,17 @@
         "tool_words": []
       },
       "ask_first": "What's normally left at the end of a project?",
-      "free_stops": "Document lists and status rules are in the solution document."
+      "free_stops": "Document lists and status rules are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare one nearly finished project's handover papers against what the client still asks for, so final payment blockers are clear now.",
+          "review": true
+        },
+        {
+          "text": "Give one coordinator one running handover file per project, so as-builts and manuals grow during the job not after.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_unbilled_variations",
@@ -185,7 +265,17 @@
         "tool_words": []
       },
       "ask_first": "How are extra works recorded on site today?",
-      "free_stops": "The approval flow and billing link are in the solution document."
+      "free_stops": "The approval flow and billing link are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count current verbal instructions still lacking supporting notes or photos, so you see how much extra work is exposed.",
+          "review": false
+        },
+        {
+          "text": "Give one engineer one variations notebook kept on site, so every verbal instruction is captured the same day.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p10_after_sales",
@@ -207,7 +297,17 @@
         ]
       },
       "ask_first": "Do you hold maintenance contracts after handover?",
-      "free_stops": "Service categories and response rules are in the solution document."
+      "free_stops": "Service categories and response rules are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count maintenance calls from each handed over project this week, so you see which clients create most after handover work.",
+          "review": false
+        },
+        {
+          "text": "Give one office person the job of noting each maintenance call in one notebook, so no client issue gets lost.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

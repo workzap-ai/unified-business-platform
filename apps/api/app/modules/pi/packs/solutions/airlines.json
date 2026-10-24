@@ -2,7 +2,7 @@
   "industry": "airlines",
   "name": "Airlines (regional and low-cost operations)",
   "sector": "7.G Transport, mobility and aviation (part 1)",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_route_load_imbalance",
@@ -23,7 +23,17 @@
         "leads_with_view": true
       },
       "ask_first": "Is it a few routes every midweek, or most domestic sectors?",
-      "free_stops": "How to set load thresholds per route and act on them is worked out in the solution document."
+      "free_stops": "How to set load thresholds per route and act on them is worked out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note last week's booked seats for each domestic midweek sector beside weekend sectors, so the weaker days stand out route by route.",
+          "review": false
+        },
+        {
+          "text": "Give one commercial staff member the job of reviewing midweek domestic loads every Tuesday, so quiet sectors get attention before departure.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_margin_unknown",
@@ -44,7 +54,17 @@
         "leads_with_view": true
       },
       "ask_first": "Which cost hurts most today, fuel, leases or handling?",
-      "free_stops": "How each shared cost is split across routes is set out in the solution document."
+      "free_stops": "How each shared cost is split across routes is set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Write one busy route's income and main route costs on one page for last month, so the biggest margin guesswork shows.",
+          "review": false
+        },
+        {
+          "text": "Make one finance person keep the route cost list in one notebook, so commercial and finance use the same basis each week.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_receivables_late",
@@ -65,7 +85,17 @@
         "tool_words": []
       },
       "ask_first": "Is the bigger problem the delay itself, or the figures not matching?",
-      "free_stops": "The matching rules and reminder schedule are kept for the solution document."
+      "free_stops": "The matching rules and reminder schedule are kept for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare one recent GSA remittance advice with your own sales summary for the same period, so the mismatch point appears quickly.",
+          "review": false
+        },
+        {
+          "text": "Give one finance person one running list of each GSA mismatch and reply date, so follow up stays with one owner.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_refunds",
@@ -86,7 +116,17 @@
         "tool_words": []
       },
       "ask_first": "Where does a refund usually get stuck, approval, accounts or payout?",
-      "free_stops": "The stages, owners and passenger update points are designed in the solution document."
+      "free_stops": "The stages, owners and passenger update points are designed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count open cancellation refunds by where they are waiting right now, so the slowest handover point becomes visible.",
+          "review": false
+        },
+        {
+          "text": "Give one person the daily refund holding list and a fixed review time, so stalled cases are chased without delay.",
+          "review": true
+        }
+      ]
     },
     {
       "id": "p5_slow_response",
@@ -106,7 +146,17 @@
         "tool_words": []
       },
       "ask_first": "Do most bookings carry a mobile number today?",
-      "free_stops": "The message flow and rebooking link setup are part of the solution document."
+      "free_stops": "The message flow and rebooking link setup are part of the solution document.",
+      "extra_ideas": [
+        {
+          "text": "After the next delay, note how many calls and messages arrived before any update went out, so silence costs become clear.",
+          "review": false
+        },
+        {
+          "text": "Assign one duty person to send delay updates at fixed moments, so inbound traffic eases when passengers hear from you early.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_basket_small",
@@ -126,7 +176,17 @@
         "tool_words": []
       },
       "ask_first": "Do most passengers book on your website or through agents?",
-      "free_stops": "Where and when extras are offered in the journey is set out in the solution document."
+      "free_stops": "Where and when extras are offered in the journey is set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Watch today's bookings and note which extras are actually added before payment, so weak ancillary points are easier to spot.",
+          "review": true
+        },
+        {
+          "text": "Give one airport staff member one list of extras passengers ask for most, so sales ideas come from real requests.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_website_slow_broken",
@@ -149,7 +209,17 @@
         ]
       },
       "ask_first": "Does it fail on certain cards or banks, or for everyone?",
-      "free_stops": "The fix itself and the follow-up flow are scoped in the solution document."
+      "free_stops": "The fix itself and the follow-up flow are scoped in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Try bookings from different phones on the same route and note the exact payment break point, so the common failure point is clear.",
+          "review": true
+        },
+        {
+          "text": "Give one person one page for every payment break report this week, so patterns stop being scattered across chats.",
+          "review": true
+        }
+      ]
     },
     {
       "id": "p8_shift_scheduling",
@@ -170,7 +240,17 @@
         "tool_words": []
       },
       "ask_first": "Is the main pain the publishing, or the allowance calculation afterwards?",
-      "free_stops": "The acknowledgement flow and allowance rules are kept for the solution document."
+      "free_stops": "The acknowledgement flow and allowance rules are kept for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare the latest roster change notice with what crew supervisors say is current, so you see how often versions drift apart.",
+          "review": false
+        },
+        {
+          "text": "Name one operations person to post every roster change in one chat thread, so crews stop checking multiple places.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_field_team_visibility",
@@ -191,7 +271,17 @@
         "tool_words": []
       },
       "ask_first": "How many outstations report to you today?",
-      "free_stops": "The form fields and the base view layout are designed in the solution document."
+      "free_stops": "The form fields and the base view layout are designed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Look at yesterday's station reports side by side and note which key operating facts are missing most often, so weak reporting habits show.",
+          "review": false
+        },
+        {
+          "text": "Give one duty manager one shared reporting time for all stations each day, so updates arrive together and comparisons are easier.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p10_invoice_disputes",
@@ -211,7 +301,17 @@
         "tool_words": []
       },
       "ask_first": "Are the differences in rates, or in services you don't recognise?",
-      "free_stops": "The checking rules per station are worked out in the solution document."
+      "free_stops": "The checking rules per station are worked out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare one disputed handling invoice line by line with the agreed station rate card, so overcharges split into rates versus extra services.",
+          "review": true
+        },
+        {
+          "text": "Give one finance person one notebook page for disputed station charges, so every query and supplier reply sits together until cleared.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

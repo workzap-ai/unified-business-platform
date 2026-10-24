@@ -2,7 +2,7 @@
   "industry": "auto_parts_manufacturers_and_vendors_to_oems",
   "name": "Auto parts manufacturers and vendors to OEMs",
   "sector": "7.D Manufacturing and industry (part 2)",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_forecasting",
@@ -23,7 +23,17 @@
         "leads_with_view": true
       },
       "ask_first": "How much notice do you usually get of a change?",
-      "free_stops": "How releases feed production planning is in the solution document."
+      "free_stops": "How releases feed production planning is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare each schedule change with parts already made or bought that week, so excess and shortage by part line up clearly.",
+          "review": false
+        },
+        {
+          "text": "Give one planning role the job of noting every schedule change in one notebook, so purchase and production react from the same update.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_product_defects",
@@ -43,7 +53,17 @@
         "tool_words": []
       },
       "ask_first": "What's the most common rejection reason?",
-      "free_stops": "The traceability fields and reconciliation steps are in the solution document."
+      "free_stops": "The traceability fields and reconciliation steps are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count rejected crates by shift mark for this month's debit notes, so you can see where the rejection pattern is starting.",
+          "review": false
+        },
+        {
+          "text": "Give dispatch one crate marking notebook by machine and shift, so debit note complaints can be tied back without guesswork.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_maintenance_downtime",
@@ -63,7 +83,17 @@
         "tool_words": []
       },
       "ask_first": "Do you have an in-house tool room?",
-      "free_stops": "Maintenance triggers and the tool-room priority rules are in the solution document."
+      "free_stops": "Maintenance triggers and the tool-room priority rules are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note each die breakdown and how long the part stayed stuck, so repeat stoppages and their production hit stand out.",
+          "review": false
+        },
+        {
+          "text": "Give one tool room role one breakdown list kept beside the floor, so repairs and pending dies are handed over cleanly.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_raw_material_shortage",
@@ -83,7 +113,17 @@
         "tool_words": []
       },
       "ask_first": "How far ahead do you order coils?",
-      "free_stops": "The planning logic and alert levels are in the solution document."
+      "free_stops": "The planning logic and alert levels are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare each coil runout with the latest customer schedule on hand, so you can see where purchase missed the change.",
+          "review": false
+        },
+        {
+          "text": "Give one purchase role one fixed time to note schedule changes in one place, so coil buying follows the latest demand.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_cash_flow_tight",
@@ -104,7 +144,17 @@
         "leads_with_view": true
       },
       "ask_first": "What are the customer's payment terms?",
-      "free_stops": "The cash-gap view set-up is in the solution document."
+      "free_stops": "The cash-gap view set-up is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many mornings production paused while purchase staff chased supplier confirmations, so the hardest operating days this week become clear.",
+          "review": false
+        },
+        {
+          "text": "Give one admin role one notebook for supplier follow ups and OEM remittance updates at a fixed afternoon time, so floor interruptions reduce.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_no_visibility",
@@ -126,7 +176,17 @@
         ]
       },
       "ask_first": "How do you count WIP today?",
-      "free_stops": "The count routine and locations set-up are in the solution document."
+      "free_stops": "The count routine and locations set-up are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Walk the floor and count WIP piles by part and location once, so hidden stock and missing counts show up together.",
+          "review": false
+        },
+        {
+          "text": "Give one floor role one fixed board or notebook for WIP counts by area, so everyone checks the same number.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_margin_unknown",
@@ -146,7 +206,17 @@
         "tool_words": []
       },
       "ask_first": "When were part costs last revised?",
-      "free_stops": "The costing model is in the solution document."
+      "free_stops": "The costing model is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare the paperwork bundles and audit documentation effort for your busiest part numbers, so the heaviest office load by part becomes clear.",
+          "review": false
+        },
+        {
+          "text": "Give one costing role one notebook for partwise paperwork changes and rejection notes after each shift, so estimates stay consistent across reviews.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_whatsapp_overload",
@@ -166,7 +236,17 @@
         "tool_words": []
       },
       "ask_first": "Roughly how many shops order from you?",
-      "free_stops": "The order intake flow is in the solution document."
+      "free_stops": "The order intake flow is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many aftermarket orders needed a follow up because details were scattered in chats, so the daily order handling load is clear.",
+          "review": false
+        },
+        {
+          "text": "Give one sales desk role one notebook for all incoming shop orders, so packing and dispatch work from one running list.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_overtime",
@@ -187,7 +267,17 @@
         "leads_with_view": true
       },
       "ask_first": "How is output per shift recorded now?",
-      "free_stops": "The shift log and KPIs are in the solution document."
+      "free_stops": "The shift log and KPIs are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare overtime at month end with unfinished schedule from earlier weeks, so you can see whether delay starts before the rush.",
+          "review": false
+        },
+        {
+          "text": "Give one production role one fixed daily note of pending schedule by machine, so month end overtime gets flagged earlier.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p10_audits",
@@ -207,7 +297,17 @@
         "tool_words": []
       },
       "ask_first": "Which customer audits are coming up?",
-      "free_stops": "The library structure is in the solution document."
+      "free_stops": "The library structure is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many audit documents were pulled from more than one place last time, so the audit documentation effort is clear.",
+          "review": false
+        },
+        {
+          "text": "Give one admin role one notebook for audit document locations, so files and PC copies stop wasting search time.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

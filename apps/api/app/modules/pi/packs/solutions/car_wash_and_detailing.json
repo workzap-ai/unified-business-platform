@@ -2,7 +2,7 @@
   "industry": "car_wash_and_detailing",
   "name": "Car wash and detailing",
   "sector": "7.G Transport, mobility and aviation (part 2)",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_service_errors",
@@ -22,7 +22,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The photo routine and storage are in the solution document."
+      "free_stops": "The photo routine and storage are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many cars leave with pre-work condition notes this week against total cars detailed, so dispute exposure on your own process is clearer.",
+          "review": false
+        },
+        {
+          "text": "Make one person own the walk-round note before keys are taken, so every car starts with the same visible condition record.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_field_team_visibility",
@@ -42,7 +52,17 @@
         "tool_words": []
       },
       "ask_first": "How does a washer show today that a car was done?",
-      "free_stops": "How the job list and proof are set up is in the solution document."
+      "free_stops": "How the job list and proof are set up is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare marked done cars with a same-day walk round of actual finished cars, so false completion is measured on the job itself.",
+          "review": false
+        },
+        {
+          "text": "Give one supervisor the job of checking one written done list before any car is marked complete, so basement updates match washed cars.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_churn_subscription",
@@ -63,7 +83,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "Package tracking and summary timing are in the solution document."
+      "free_stops": "Package tracking and summary timing are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many subscription customers asked about missed washes this month, so you can see how often proof is failing before renewals.",
+          "review": false
+        },
+        {
+          "text": "Keep one running wash log for each package in one notebook, so any customer query can be answered from the same record.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_receivables_late",
@@ -83,7 +113,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "Reminder steps are in the solution document."
+      "free_stops": "Reminder steps are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note which monthly package customers are late at week end compared with who was due, so the collection backlog is visible early.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of updating one due list every afternoon, so unpaid packages are followed from a single place.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_capacity",
@@ -103,7 +143,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "Slot rules per service are in the solution document."
+      "free_stops": "Slot rules per service are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many cars arrive, wait, and leave on the busiest shift, so you can see where queue loss is hurting weekends.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of keeping one waiting list at busy times, so arrivals are handled in order and fewer drivers give up.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_chat_overload",
@@ -124,7 +174,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "Channel set-up and confirmation flow are in the solution document."
+      "free_stops": "Channel set-up and confirmation flow are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare bookings received with cars that actually arrive over a few days, so missed or duplicated entries stop hiding inside mixed channels.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member one paper booking list for every channel, so all incoming jobs land in the same daily queue.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_wastage_cost",
@@ -145,7 +205,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "How usage is measured per service is in the solution document."
+      "free_stops": "How usage is measured per service is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note cloth, shampoo and wax issued at opening and what remains at closing, so rising use is tied to the day's car count.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of handing out consumables from one shelf, so extra usage stops being spread across the whole site.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_cash_leakage",
@@ -165,7 +235,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The cash-up steps are in the solution document."
+      "free_stops": "The cash-up steps are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare the walk-in car tally at closing with cash received the same day, so the size of the cash gap is no longer guessed.",
+          "review": false
+        },
+        {
+          "text": "Give one cashier one closing sheet for car count and cash together, so any mismatch is caught before the next shift starts.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_no_sop",
@@ -185,7 +265,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The checklists themselves are in the solution document."
+      "free_stops": "The checklists themselves are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Watch the same service done by different washers and note where their finish differs, so inconsistency is seen in the actual work.",
+          "review": false
+        },
+        {
+          "text": "Give one lead washer the job of checking every finished car against one written service list, so quality stops changing by person.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p10_repeat_low",
@@ -205,7 +295,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "Reminder timing is in the solution document."
+      "free_stops": "Reminder timing is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note how many coated cars returned for maintenance this week against how many were originally delivered, so the missed follow-up load is clear.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member the job of keeping one notebook page of coating handover dates, so maintenance calls happen when customers still expect them.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

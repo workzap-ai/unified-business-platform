@@ -2,7 +2,7 @@
   "industry": "car_rental_and_chauffeur_services",
   "name": "Car rental and chauffeur services",
   "sector": "7.G Transport, mobility and aviation (part 2)",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_order_errors",
@@ -22,7 +22,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "Calendar rules and handovers are in the solution document."
+      "free_stops": "Calendar rules and handovers are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many bookings sit in messages before reaching the fleet diary, so you see where double booking risk starts.",
+          "review": false
+        },
+        {
+          "text": "Give one dispatcher the handover call before any car is promised, so two customers are not offered the same car.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_checklists_not_done",
@@ -44,7 +54,17 @@
         ]
       },
       "ask_first": "",
-      "free_stops": "The inspection steps are in the solution document; liability is for your lawyer."
+      "free_stops": "The inspection steps are in the solution document; liability is for your lawyer.",
+      "extra_ideas": [
+        {
+          "text": "Compare return notes with pickup notes for each car this week, so disputed scratches are easy to spot early.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member the walk round note at every handover, so every scratch is marked before the car leaves.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_refunds",
@@ -65,7 +85,17 @@
         "tool_words": []
       },
       "ask_first": "How do you find out about fines on your cars today?",
-      "free_stops": "How matching and deposit rules work is in the solution document; contracts are for your lawyer."
+      "free_stops": "How matching and deposit rules work is in the solution document; contracts are for your lawyer.",
+      "extra_ideas": [
+        {
+          "text": "Note which cars bring late fines and tolls most often, so you can see where follow up work keeps returning.",
+          "review": false
+        },
+        {
+          "text": "Keep one notebook page per car for post return charges, so late fines and tolls are matched quickly.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_no_visibility",
@@ -86,7 +116,17 @@
         "leads_with_view": true
       },
       "ask_first": "",
-      "free_stops": "What the fleet view shows is in the solution document."
+      "free_stops": "What the fleet view shows is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Walk the yard and compare each car's actual spot with today's notes, so you see why tomorrow's availability stays unclear.",
+          "review": false
+        },
+        {
+          "text": "Set one fixed evening update for all returns and handovers, so tomorrow's free cars are known without calling everyone.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_maintenance_downtime",
@@ -107,7 +147,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "Service intervals and alerts are in the solution document."
+      "free_stops": "Service intervals and alerts are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare each car's current odometer with its last service note, so overdue cars are spotted before more bookings land.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of writing kilometres at every return in one notebook, so service timing stops being missed.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_attendance_lateness",
@@ -127,7 +177,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "Roster and confirmation rules are in the solution document."
+      "free_stops": "Roster and confirmation rules are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note which airport pickups start late and by how long, so you see whether the issue is certain shifts or routes.",
+          "review": false
+        },
+        {
+          "text": "Give one coordinator the evening handover list for next day's airport runs, so late pickups stop slipping between drivers.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_manual_work",
@@ -148,7 +208,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "Billing and statement set-up are in the solution document."
+      "free_stops": "Billing and statement set-up are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many trip details are missing from chauffeur log sheets this week, so billing delays can be tied to the real source.",
+          "review": false
+        },
+        {
+          "text": "Keep one notebook only for corporate trip details at dispatch, so month end bills are built from one place.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_orders_lost",
@@ -168,7 +238,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "Channel set-up and replies are in the solution document."
+      "free_stops": "Channel set-up and replies are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many booking requests wait in different inboxes before being written down, so the loss point becomes visible.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member one booking notebook for every channel, so requests stop disappearing between calls, messages and agents.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_margin_unknown",
@@ -189,7 +269,17 @@
         "leads_with_view": true
       },
       "ask_first": "",
-      "free_stops": "Which costs are included and how is in the solution document."
+      "free_stops": "Which costs are included and how is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "For one car this week, note every refill and workshop visit beside each booking, so hidden running drains on that car show.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member one notebook page per car for daily spend notes, so missing cost details stop delaying car-by-car reviews.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

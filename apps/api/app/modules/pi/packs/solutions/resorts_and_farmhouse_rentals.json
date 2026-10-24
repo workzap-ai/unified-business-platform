@@ -2,7 +2,7 @@
   "industry": "resorts_and_farmhouse_rentals",
   "name": "Resorts and farmhouse rentals",
   "sector": "7.H Hospitality, events and personal services",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_order_errors",
@@ -22,7 +22,17 @@
         "tool_words": []
       },
       "ask_first": "How many farmhouses or chalets do you run?",
-      "free_stops": "The booking flow and how advances lock dates are in the solution document."
+      "free_stops": "The booking flow and how advances lock dates are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare every booking date written by you and the caretaker for this month, so double promised days come to light now.",
+          "review": false
+        },
+        {
+          "text": "Keep one booking diary in one agreed place and let one person mark dates as taken, so families stop being promised the same stay.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_cash_handling_risk",
@@ -42,7 +52,17 @@
         "tool_words": []
       },
       "ask_first": "Do guests pay advances mostly by transfer or in cash?",
-      "free_stops": "Ledger fields and how payments are matched to bookings stay for the solution document."
+      "free_stops": "Ledger fields and how payments are matched to bookings stay for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note each upcoming stay beside who received its advance, so you can see which bookings have money scattered around.",
+          "review": false
+        },
+        {
+          "text": "Make one person update one advance list every evening from calls and messages, so each booking has a clear money trail.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_theft_internal",
@@ -62,7 +82,17 @@
         "tool_words": []
       },
       "ask_first": "How often are you on site in a week?",
-      "free_stops": "Which signals are matched and how flags are raised is in the solution document."
+      "free_stops": "Which signals are matched and how flags are raised is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Walk the property after each guest checkout and note any signs of use on days with no booking, so side stays stand out.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of checking every arriving family's booking source at the gate, so unofficial guests are harder to wave through.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_cash_leakage",
@@ -82,7 +112,17 @@
         "tool_words": []
       },
       "ask_first": "Does the generator have a working hour meter?",
-      "free_stops": "The fuel-per-hour checks and alert rules are set in the solution document."
+      "free_stops": "The fuel-per-hour checks and alert rules are set in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Write down generator hours at sunset and again after each occupied day, so unusual diesel use gets tied to actual stays.",
+          "review": false
+        },
+        {
+          "text": "Give one caretaker the job of noting every fuel arrival and generator reading in one notebook, so missing diesel has fewer hiding places.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_checklists_not_done",
@@ -102,7 +142,17 @@
         "tool_words": []
       },
       "ask_first": "What has gone wrong most often when guests arrive?",
-      "free_stops": "The checklist items and timings stay for the solution document."
+      "free_stops": "The checklist items and timings stay for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Walk the farmhouse once before the next arrival and note what was still unfinished, so the weak points in preparation show.",
+          "review": false
+        },
+        {
+          "text": "Give one person the pre arrival round at a fixed hour with one notebook list, so guest readiness stops being rushed and missed.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_lead_followup_slow",
@@ -122,7 +172,17 @@
         "tool_words": []
       },
       "ask_first": "Where do most enquiries come from now?",
-      "free_stops": "Follow-up timing and source tracking are designed in the solution document."
+      "free_stops": "Follow-up timing and source tracking are designed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many open enquiries are sitting in calls, chats and notes from this week, so you see the backlog plainly.",
+          "review": false
+        },
+        {
+          "text": "Make one staff member copy every new enquiry into one notebook before closing time, so follow up stops slipping between places.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_after_sales",
@@ -142,7 +202,17 @@
         "tool_words": []
       },
       "ask_first": "Do you take a refundable security deposit now?",
-      "free_stops": "The inspection checklist and how it links to deposits stay for the solution document."
+      "free_stops": "The inspection checklist and how it links to deposits stay for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare the condition of rooms and outdoor areas before and after the next checkout, so damage gets linked to one stay.",
+          "review": false
+        },
+        {
+          "text": "Give one cleaner the job of noting broken or missing items in one checkout notebook, so disputes start from a dated record.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_margin_unknown",
@@ -163,7 +233,17 @@
         "leads_with_view": true
       },
       "ask_first": "Is the land owned or leased?",
-      "free_stops": "How costs are split per booking and per property is in the solution document."
+      "free_stops": "How costs are split per booking and per property is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Write last week's stays on one page with the related diesel, cleaning and staff outgoings, so the earning picture gets clearer.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of noting booking related spending in one notebook each day, so profit is not guessed from memory.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_seasonal_dip",
@@ -183,7 +263,17 @@
         "tool_words": []
       },
       "ask_first": "Which months are your slowest?",
-      "free_stops": "Which groups to target and the messaging plan go in the solution document."
+      "free_stops": "Which groups to target and the messaging plan go in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note which weekday enquiries asked for meetings, school visits or day use this month, so the best fit for empty days stands out.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of calling back weekday enquirers at one fixed time daily, so quiet dates get regular attention.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p10_attendance_lateness",
@@ -203,7 +293,17 @@
         "tool_words": []
       },
       "ask_first": "Which role is hardest to cover on Eid?",
-      "free_stops": "Roster structure and reminder timing stay for the solution document."
+      "free_stops": "Roster structure and reminder timing stay for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count which Eid shifts were left uncovered last time and which roles were hit hardest, so you see where busy hours collapse.",
+          "review": false
+        },
+        {
+          "text": "Give one supervisor the job of marking Eid arrivals in one notebook at opening time, so replacements start sooner.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

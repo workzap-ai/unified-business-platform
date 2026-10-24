@@ -2,7 +2,7 @@
   "industry": "forestry_timber_and_wood_traders",
   "name": "Forestry, timber and wood traders",
   "sector": "7.C Agriculture, livestock and rural (part 2)",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_count_mismatch",
@@ -22,7 +22,17 @@
         "tool_words": []
       },
       "ask_first": "Do you measure in CFT or board feet?",
-      "free_stops": "How the intake register calculates and records volume goes in the solution document."
+      "free_stops": "How the intake register calculates and records volume goes in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "For one week, compare your measured log sizes with the buyer's figures on each disputed load, so the disagreement pattern becomes visible.",
+          "review": false
+        },
+        {
+          "text": "Give one experienced staff member the job of writing every log measurement in one notebook at loading, so your side stays consistent.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_wastage_cost",
@@ -43,7 +53,17 @@
         "leads_with_view": true
       },
       "ask_first": "Do you saw your own logs or buy sawn timber?",
-      "free_stops": "How yield is tracked per lot is kept for the solution document."
+      "free_stops": "How yield is tracked per lot is kept for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "For a few logs this week, note each log's size beside the boards and offcuts from it, so you see which logs waste more.",
+          "review": false
+        },
+        {
+          "text": "Give one sawmill person one notebook for log in and wood out notes each shift, so yield tracking stays regular.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_wrong_location",
@@ -63,7 +83,17 @@
         "tool_words": []
       },
       "ask_first": "How many yards do you run?",
-      "free_stops": "The yard map design is detailed in the solution document."
+      "free_stops": "The yard map design is detailed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Walk the yard once and note which sizes and types staff search for most, so you know where poor placement wastes time.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of updating one yard map in a notebook, so every pile keeps a known place.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_theft_external",
@@ -83,7 +113,17 @@
         "tool_words": []
       },
       "ask_first": "Is there a watchman at night?",
-      "free_stops": "How checks and passes are set up goes in the solution document."
+      "free_stops": "How checks and passes are set up goes in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "For one week, note which timber stacks change between closing and opening, so you narrow losses to specific piles and times.",
+          "review": false
+        },
+        {
+          "text": "Give one person the closing and opening stack check in one notebook, so night loss checks happen the same way daily.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_credit_customers",
@@ -103,7 +143,17 @@
         "tool_words": []
       },
       "ask_first": "Does each yard keep its own register?",
-      "free_stops": "Limits and reminder rules are kept for the solution document."
+      "free_stops": "Limits and reminder rules are kept for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "This week, count how many unpaid wood deliveries are older than your usual payment day, so late credit pressure is clear.",
+          "review": true
+        },
+        {
+          "text": "Give one person one notebook page for all unpaid deliveries and collection follow ups, so chasing dues stops slipping.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_pricing_errors",
@@ -123,7 +173,17 @@
         "tool_words": []
       },
       "ask_first": "How do rate changes reach salesmen now?",
-      "free_stops": "How rates are pushed out is detailed in the solution document."
+      "free_stops": "How rates are pushed out is detailed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "For one week, compare quoted timber rates from staff with the owner's current rate each day, so old price use is easy to spot.",
+          "review": true
+        },
+        {
+          "text": "Give one person the job of writing the current rate list in one place each morning, so everyone quotes from the same source.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_import_delays",
@@ -143,7 +203,17 @@
         "tool_words": []
       },
       "ask_first": "Roughly how many containers do you import in a season?",
-      "free_stops": "The tracker and checklist setup goes in the solution document."
+      "free_stops": "The tracker and checklist setup goes in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "This week, note how long each waiting container has been held and what work is stalled behind it, so customer impact is clearer.",
+          "review": false
+        },
+        {
+          "text": "Give one person one list of all incoming containers and their current stage, so updates to buyers stay consistent.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_order_errors",
@@ -163,7 +233,17 @@
         "tool_words": []
       },
       "ask_first": "Who takes the orders now?",
-      "free_stops": "How orders are confirmed and tracked is part of the solution document."
+      "free_stops": "How orders are confirmed and tracked is part of the solution document.",
+      "extra_ideas": [
+        {
+          "text": "For one week, count which cutting mistakes came from phone orders and which came from chat messages, so the main source is obvious.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member one daily order notebook for every cutting size received, so the cutting team reads from one place.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_documentation",
@@ -183,7 +263,17 @@
         "tool_words": []
       },
       "ask_first": "Which document causes the most delay?",
-      "free_stops": "Register contents and reminder timing go in the solution document."
+      "free_stops": "Register contents and reminder timing go in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "This week, note which paperwork waits longest before dispatch and which jobs it delays, so the slowest point is easier to tackle.",
+          "review": false
+        },
+        {
+          "text": "Give one person one folder and one notebook list for every active permit paper, so document chasing has a clear owner.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p10_branch_comparison",
@@ -203,7 +293,17 @@
         "tool_words": []
       },
       "ask_first": "How do you hear from the other yard now?",
-      "free_stops": "What the read covers is kept for the solution document."
+      "free_stops": "What the read covers is kept for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "For one week, note each yard's closing stock piles and sales notes side by side each evening, so differences stand out quickly.",
+          "review": false
+        },
+        {
+          "text": "Make one staff member send the same end of day yard summary to one chat thread, so updates arrive in one place daily.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

@@ -2,7 +2,7 @@
   "industry": "veterinary_clinics_and_animal_health_suppliers",
   "name": "Veterinary clinics and animal-health suppliers",
   "sector": "7.C Agriculture, livestock and rural (part 1)",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_whatsapp_overload",
@@ -22,7 +22,17 @@
         "tool_words": []
       },
       "ask_first": "How do clients book with you now?",
-      "free_stops": "What the assistant handles and when it hands over stays in the solution document."
+      "free_stops": "What the assistant handles and when it hands over stays in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many booking requests were missed or answered late in one busy day, so the reception bottleneck is clear.",
+          "review": false
+        },
+        {
+          "text": "Give one person each shift the job of writing every booking request in one paper list, so fewer appointments slip away.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_repeat_low",
@@ -42,7 +52,17 @@
         "tool_words": []
       },
       "ask_first": "Where are due dates kept today?",
-      "free_stops": "Reminder timing and wording are set out in the solution document."
+      "free_stops": "Reminder timing and wording are set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many booster due dates passed last week without any reminder sent, so the missed repeat workload is clear.",
+          "review": false
+        },
+        {
+          "text": "Give one receptionist a fixed weekly time to check the due list and send reminders, so boosters stop being overlooked.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_booking_appointments",
@@ -62,7 +82,17 @@
         "tool_words": []
       },
       "ask_first": "How far ahead are surgeries booked?",
-      "free_stops": "The reminder sequence and waiting-list flow go in the solution document."
+      "free_stops": "The reminder sequence and waiting-list flow go in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note how many surgery slots sat unused after no-shows last week, so the cost of empty theatre time is clearer.",
+          "review": false
+        },
+        {
+          "text": "Keep one short-notice standby list in one place at reception, so cancelled surgery time is easier to refill.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_expiry_wastage",
@@ -82,7 +112,17 @@
         "tool_words": []
       },
       "ask_first": "How would you find out today if the fridge failed on a Sunday?",
-      "free_stops": "Sensor connection and alert routing are detailed in the solution document."
+      "free_stops": "Sensor connection and alert routing are detailed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note each weekend fridge interruption and what stock was discarded afterward, so the owner sees which failures are causing real wastage.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member one weekend fridge incident notebook, so every power cut and stock loss is handed over on Monday.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_expiry_wastage",
@@ -102,7 +142,17 @@
         "tool_words": []
       },
       "ask_first": "Who looks after pharmacy stock?",
-      "free_stops": "Alert timing and stock setup stay in the solution document."
+      "free_stops": "Alert timing and stock setup stay in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many medicine packs expire within the next month on one shelf walk, so the scale of avoidable waste is obvious.",
+          "review": true
+        },
+        {
+          "text": "Give one assistant the date-check notebook for all shelves every week, so near-expiry stock gets noticed in time.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_void_refund_abuse",
@@ -122,7 +172,17 @@
         "tool_words": []
       },
       "ask_first": "Is there one dispensing point or several?",
-      "free_stops": "How items link to bills is set out in the solution document."
+      "free_stops": "How items link to bills is set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count one day's medicine packs leaving the dispensary against that day's entries at the counter, so unpaid handouts stand out quickly.",
+          "review": true
+        },
+        {
+          "text": "Give one counter person one daily exceptions list for medicine handouts without entries, so each mismatch is checked before closing.",
+          "review": true
+        }
+      ]
     },
     {
       "id": "p7_credit_customers",
@@ -142,7 +202,17 @@
         "tool_words": []
       },
       "ask_first": "How many farm clients buy on credit?",
-      "free_stops": "Statement layout and reminder rules go in the solution document."
+      "free_stops": "Statement layout and reminder rules go in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many farm accounts have had no payment this season and note which are oldest, so follow-up time goes to the slowest payers.",
+          "review": true
+        },
+        {
+          "text": "Give one staff member one weekly farm dues notebook, so every reminder and reply stays together for the owner to review.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_unbilled_work",
@@ -164,7 +234,17 @@
         ]
       },
       "ask_first": "How many vets go on farm calls?",
-      "free_stops": "The visit log and invoicing flow stay in the solution document."
+      "free_stops": "The visit log and invoicing flow stay in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare one week's field visit notes with the invoices raised from those days, so missed chargeable work is easier to spot.",
+          "review": false
+        },
+        {
+          "text": "Give one clinic staff member one daily field visit list from returning vets, so each visit reaches the billing desk the same day.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_reviews_bad",
@@ -184,7 +264,17 @@
         "tool_words": []
       },
       "ask_first": "What do unhappy clients mention most?",
-      "free_stops": "The timing and flow of review requests go in the solution document."
+      "free_stops": "The timing and flow of review requests go in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note the actual wait from arrival to consultation for several clients in one day, so the longest delay point stands out.",
+          "review": false
+        },
+        {
+          "text": "Give one receptionist the job of updating the waiting list in one place, so clients hear realistic delays before frustration grows.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p10_shift_scheduling",
@@ -204,7 +294,17 @@
         "tool_words": []
       },
       "ask_first": "How many vets share the rota?",
-      "free_stops": "The rota rules and swap process are set out in the solution document."
+      "free_stops": "The rota rules and swap process are set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note who covered each weekend and night over the past month, so the fairness problem stops being argued from memory.",
+          "review": false
+        },
+        {
+          "text": "Give one senior person the rota swap log in one notebook, so weekend cover arguments have a clear handover point.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

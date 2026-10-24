@@ -2,7 +2,7 @@
   "industry": "daycare_nurseries_and_preschools",
   "name": "Daycare, nurseries and preschools",
   "sector": "7.J Education and childcare",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_lead_followup_slow",
@@ -22,7 +22,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The waitlist stages and follow-up timing are kept for the document."
+      "free_stops": "The waitlist stages and follow-up timing are kept for the document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many notebook entries have no recent contact note, so you can see how stale the waitlist really is.",
+          "review": false
+        },
+        {
+          "text": "Give one person the waitlist notebook and a fixed weekly review time, so follow-up stops getting missed between other jobs.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_capacity",
@@ -43,7 +53,17 @@
         "leads_with_view": true
       },
       "ask_first": "",
-      "free_stops": "How room moves are forecast is in the document."
+      "free_stops": "How room moves are forecast is in the document.",
+      "extra_ideas": [
+        {
+          "text": "Compare weekly enquiries for toddler places against empty preschool places this week, so you can judge the mismatch clearly.",
+          "review": false
+        },
+        {
+          "text": "Make one person review room availability with the enquiry notebook every Friday, so empty preschool places get offered sooner.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_shift_scheduling",
@@ -63,7 +83,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The roster rules and cover order are kept for the document."
+      "free_stops": "The roster rules and cover order are kept for the document.",
+      "extra_ideas": [
+        {
+          "text": "Write down which rooms need last-minute cover most often this month, so the pressure points are clear before the next rota.",
+          "review": false
+        },
+        {
+          "text": "Give one supervisor the morning cover call job at a fixed time, so room cover starts earlier on sick days.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_regulatory_reporting",
@@ -83,7 +113,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "How the workbook is built to your province's format is in the document."
+      "free_stops": "How the workbook is built to your province's format is in the document.",
+      "extra_ideas": [
+        {
+          "text": "Compare each room’s daily attendance mark with the final monthly claim line once this week, so the rework hotspot shows.",
+          "review": false
+        },
+        {
+          "text": "Give the closing supervisor one notebook page for room attendance totals each day, so claim figures are ready before month end.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_cash_flow_tight",
@@ -104,7 +144,17 @@
         "leads_with_view": true
       },
       "ask_first": "",
-      "free_stops": "How the cash view is set up is kept for the document."
+      "free_stops": "How the cash view is set up is kept for the document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many staff paydays passed before each subsidy payment reached you lately, so you can see the payroll squeeze length.",
+          "review": true
+        },
+        {
+          "text": "Give one person one notebook page for all expected subsidy dates and wage dates, so missed handovers stop causing payroll stress.",
+          "review": true
+        }
+      ]
     },
     {
       "id": "p6_receivables_late",
@@ -124,7 +174,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The reminder sequence and overdue rules are in the document."
+      "free_stops": "The reminder sequence and overdue rules are in the document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many account references are one month late and how many are longer, so the backlog size is clear.",
+          "review": false
+        },
+        {
+          "text": "Give one person one notebook page for overdue account references and a fixed weekly review, so follow-up stays on track.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_pricing_errors",
@@ -144,7 +204,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "How sign-out feeds billing is kept for the document."
+      "free_stops": "How sign-out feeds billing is kept for the document.",
+      "extra_ideas": [
+        {
+          "text": "Count late sign-outs this week and compare them with fee entries made, so missed charging points are obvious.",
+          "review": false
+        },
+        {
+          "text": "Give the closer one handover note for late sign-outs before leaving, so fee entries stop being missed next day.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_checklists_not_done",
@@ -164,7 +234,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The sign-in setup and authorisation flow are in the document."
+      "free_stops": "The sign-in setup and authorisation flow are in the document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many sign-in sheets have missing times at closing this week, so you know which days are slipping most.",
+          "review": false
+        },
+        {
+          "text": "Give the closing shift one person responsible for checking the door sheet before lock-up, so missing times get caught that day.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_stockout",
@@ -184,7 +264,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The minimum levels and alert setup are kept for the document."
+      "free_stops": "The minimum levels and alert setup are kept for the document.",
+      "extra_ideas": [
+        {
+          "text": "Walk the supplies area once this week and note which items are nearly finished, so surprise runouts stop catching you late.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member one notebook page for low-supply notes and a fixed check time, so reordering starts from one place.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p10_hygiene",
@@ -204,7 +294,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "How the checks are scheduled and verified is in the document."
+      "free_stops": "How the checks are scheduled and verified is in the document.",
+      "extra_ideas": [
+        {
+          "text": "Compare the room checklist ticks with what you can actually see at closing once this week, so weak rooms stand out fast.",
+          "review": false
+        },
+        {
+          "text": "Make the closer in each room hand the finished checklist to one manager before leaving, so missed cleaning gets chased the same day.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p11_whatsapp_overload",
@@ -224,7 +324,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The update templates and reply setup are kept for the document."
+      "free_stops": "The update templates and reply setup are kept for the document.",
+      "extra_ideas": [
+        {
+          "text": "Note which teacher phones get parent messages during teaching hours for one week, so you see where interruptions are heaviest.",
+          "review": false
+        },
+        {
+          "text": "Give one supervisor the job of collecting parent messages from staff at a set time daily, so teachers stop replying all day.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

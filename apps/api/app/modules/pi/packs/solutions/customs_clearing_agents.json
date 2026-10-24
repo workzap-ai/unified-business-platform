@@ -2,7 +2,7 @@
   "industry": "customs_clearing_agents",
   "name": "Customs clearing agents",
   "sector": "7.E Trade, distribution and logistics",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_customer_communication",
@@ -23,7 +23,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The stages and message triggers are set in the solution document."
+      "free_stops": "The stages and message triggers are set in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note which open files trigger the most client follow up calls this week, so you see where silence is creating pressure.",
+          "review": false
+        },
+        {
+          "text": "Assign one person to send the daily file progress round at one fixed time, so incoming status calls reduce during working hours.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_data_scattered",
@@ -43,7 +53,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The tracker's stages and alerts are designed in the solution document."
+      "free_stops": "The tracker's stages and alerts are designed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare the open files shown on the whiteboard with the ones discussed in chat groups, so missing or mismatched statuses surface quickly.",
+          "review": false
+        },
+        {
+          "text": "Make one staff member update one master open file list after lunch daily, so everyone checks the same place for status.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_handoffs",
@@ -63,7 +83,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The checklist per file type comes from your team's own practice and is set in the solution document."
+      "free_stops": "The checklist per file type comes from your team's own practice and is set in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many active files are waiting on missing client papers today, so you can show delays are not starting with your team.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of noting missing papers for each new file in one notebook, so blame is easier to answer with dates.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_field_team_visibility",
@@ -83,7 +113,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "What runners log, and how, is designed in the solution document."
+      "free_stops": "What runners log, and how, is designed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note the time each outside update reaches the office for one week, so you can see where the longest silence happens.",
+          "review": false
+        },
+        {
+          "text": "Set one fixed midday check in time for all field staff with one office contact, so the desk can answer file questions before evening.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_cash_flow_tight",
@@ -103,7 +143,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "Advance rules and alert levels are set in the solution document."
+      "free_stops": "Advance rules and alert levels are set in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count open files where your office paid port or shipping charges before billing the client, so tied-up working cash is clear.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member the job of noting client advance status on one file-opening register, so fewer files start with company money.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_pricing_errors",
@@ -124,7 +174,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "How expenses are captured and billed is designed in the solution document."
+      "free_stops": "How expenses are captured and billed is designed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Review a handful of recently closed files and note unbilled extra visits, waiting days or storage, so missed revenue patterns appear.",
+          "review": false
+        },
+        {
+          "text": "Make one person add every extra trip or waiting day to one running charge list per file, so billing stops relying on memory.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_receivables_late",
@@ -144,7 +204,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "Reminder timing and hold rules are in the solution document."
+      "free_stops": "Reminder timing and hold rules are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count unpaid client files that stayed open after delivery papers were handed over, so you see which handovers are turning into long collections.",
+          "review": false
+        },
+        {
+          "text": "Give one person a fixed weekly slot to review one overdue balances notebook, so old client dues keep getting chased.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_petty_cash",
@@ -164,7 +234,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The settlement steps are laid out in the solution document."
+      "free_stops": "The settlement steps are laid out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare cash given to each runner with receipts and returned balance at closing this week, so the worst shortfalls show up by runner.",
+          "review": false
+        },
+        {
+          "text": "Make one office person close every runner cash handover in one notebook before day end, so missing slips and balances are spotted early.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_no_sop",
@@ -184,7 +264,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "How your own steps become checklists is set in the solution document."
+      "free_stops": "How your own steps become checklists is set in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Watch two staff handle the same common file and note where their steps differ, so the routine variation becomes visible.",
+          "review": false
+        },
+        {
+          "text": "Give one experienced staff member one notebook for the standard order of your most common file, so new staff follow the same flow.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p10_owner_bottleneck",
@@ -205,7 +295,17 @@
         "leads_with_view": true
       },
       "ask_first": "",
-      "free_stops": "What the morning read includes is set in the solution document."
+      "free_stops": "What the morning read includes is set in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many times staff interrupt you about the same open files this week, so the biggest repeat bottlenecks stand out.",
+          "review": false
+        },
+        {
+          "text": "Give one senior staff member the job of keeping a single notebook of file blockers, so routine queries stop waiting for you personally.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

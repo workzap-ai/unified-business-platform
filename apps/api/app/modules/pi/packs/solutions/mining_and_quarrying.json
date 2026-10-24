@@ -2,7 +2,7 @@
   "industry": "mining_and_quarrying",
   "name": "Mining and quarrying",
   "sector": "7.D Manufacturing and industry (part 2)",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_cash_mismatch",
@@ -22,7 +22,17 @@
         "tool_words": []
       },
       "ask_first": "Who makes the parchi now?",
-      "free_stops": "The slip and matching set-up is in the solution document."
+      "free_stops": "The slip and matching set-up is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count dispatched trucks and parchis from one full day side by side, so you see where loads stop matching your paperwork.",
+          "review": false
+        },
+        {
+          "text": "Give one yard person the dispatch notebook at shift end, so parchis and cash checks start from one agreed record.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_owner_blind",
@@ -42,7 +52,17 @@
         "tool_words": []
       },
       "ask_first": "How do updates reach you today?",
-      "free_stops": "The report form and offline set-up are in the solution document."
+      "free_stops": "The report form and offline set-up are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note each day's trucks, dispatched material and cash on one page for a week, so the reporting delay becomes visible.",
+          "review": false
+        },
+        {
+          "text": "Set one fixed evening time for the supervisor to send the day's counts, so you hear about site movement before week end.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_theft_internal",
@@ -62,7 +82,17 @@
         "tool_words": []
       },
       "ask_first": "How many machines and vehicles run on site?",
-      "free_stops": "Benchmarks and alerts are in the solution document."
+      "free_stops": "Benchmarks and alerts are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare diesel issued with each machine's working hours for one week, so heavy users stand out in your own routine.",
+          "review": false
+        },
+        {
+          "text": "Give one foreman the fuel notebook for every issue, so dumper and excavator usage stops shifting between different records.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_maintenance_downtime",
@@ -82,7 +112,17 @@
         "tool_words": []
       },
       "ask_first": "Which machine stops most often?",
-      "free_stops": "The spares list and tracking are in the solution document."
+      "free_stops": "The spares list and tracking are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count which crusher stoppage repeats most this week and how long each pause lasts, so you know what delay hurts output most.",
+          "review": false
+        },
+        {
+          "text": "Give one mechanic one breakdown page kept beside the crusher, so fault details and pending parts stay together.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_credit_customers",
@@ -102,7 +142,17 @@
         "tool_words": []
       },
       "ask_first": "What's the oldest balance?",
-      "free_stops": "Limit and reminder rules are in the solution document."
+      "free_stops": "Limit and reminder rules are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many deliveries each credit buyer has taken without payment this month, so slow accounts stand out before more material leaves.",
+          "review": true
+        },
+        {
+          "text": "Give one office person the only credit list and a fixed review time, so releases follow one clear record.",
+          "review": true
+        }
+      ]
     },
     {
       "id": "p6_supplier_quality",
@@ -122,7 +172,17 @@
         "tool_words": []
       },
       "ask_first": "Are trips or machine hours disputed more?",
-      "free_stops": "The agreement routine is in the solution document."
+      "free_stops": "The agreement routine is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count loaded trips at the gate for one contractor over one day, so billed trips can be compared with site movement.",
+          "review": false
+        },
+        {
+          "text": "Make one gate person keep the contractor trip notebook each shift, so the bill can be checked from one source.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_attendance_lateness",
@@ -142,7 +202,17 @@
         "tool_words": []
       },
       "ask_first": "How many workers come through contractors?",
-      "free_stops": "The attendance set-up is in the solution document."
+      "free_stops": "The attendance set-up is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count workers by role at one set time during each shift this week, so the contractor's bill can be checked against your own numbers.",
+          "review": false
+        },
+        {
+          "text": "Give one supervisor the attendance page at shift start, so role counts come from one routine every day.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_overstock_dead_stock",
@@ -163,7 +233,17 @@
         "leads_with_view": true
       },
       "ask_first": "Which sizes run short most?",
-      "free_stops": "The estimate method is in the solution document."
+      "free_stops": "The estimate method is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Walk the stockyard once and note which sizes are growing and which are thinning, so production can follow what actually moves.",
+          "review": false
+        },
+        {
+          "text": "Give one person the stockyard notebook every evening, so pile changes are noted in one place before loading plans drift.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_margin_unknown",
@@ -184,7 +264,17 @@
         "leads_with_view": true
       },
       "ask_first": "Do you own or hire the machinery?",
-      "free_stops": "The cost model is in the solution document."
+      "free_stops": "The cost model is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note this week's diesel, labour, maintenance and hired machine spending beside dispatched tonnage, so your rough cost per ton stops being a guess.",
+          "review": false
+        },
+        {
+          "text": "Give one office person one weekly cost page for all main operating spending, so tonnage and spending can be reviewed together.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

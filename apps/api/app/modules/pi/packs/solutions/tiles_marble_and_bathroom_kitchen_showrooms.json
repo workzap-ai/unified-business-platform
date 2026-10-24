@@ -2,7 +2,7 @@
   "industry": "tiles_marble_and_bathroom_kitchen_showrooms",
   "name": "Tiles, marble and bathroom/kitchen showrooms",
   "sector": "7.A Retail and consumer (part 2)",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_serial_batch_tracking",
@@ -22,7 +22,17 @@
         "tool_words": []
       },
       "ask_first": "Does your system record batch today, or only the design?",
-      "free_stops": "the batch allocation rules and warehouse flow are kept for the solution document."
+      "free_stops": "the batch allocation rules and warehouse flow are kept for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many open orders include tiles from more than one incoming lot, so shade mismatch risk is clear before dispatch.",
+          "review": false
+        },
+        {
+          "text": "Keep one reserved area for each open tile order in the warehouse, so staff stop mixing lots during picking.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_wrong_location",
@@ -43,7 +53,17 @@
         "tool_words": []
       },
       "ask_first": "What happens to offcuts today?",
-      "free_stops": "the slab register structure is kept for the solution document."
+      "free_stops": "the slab register structure is kept for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare the slabs marked reserved in the yard with the sales notes, so you spot what is blocked or still free.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member the daily job of updating one yard list of free, reserved and sold slabs, so promises match reality.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_shrinkage_theft",
@@ -64,7 +84,17 @@
         "tool_words": []
       },
       "ask_first": "Where do you think most breakage happens?",
-      "free_stops": "the logging process and reporting go in the solution document."
+      "free_stops": "the logging process and reporting go in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count recent breakages by receiving, warehouse, loading and delivery, so you see where losses are actually starting.",
+          "review": false
+        },
+        {
+          "text": "Give one person one breakage notebook kept by the loading area, so every damaged piece is logged the same day.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_manual_work",
@@ -84,7 +114,17 @@
         "tool_words": []
       },
       "ask_first": "How long does a full project quote take today?",
-      "free_stops": "the quote builder design is kept for the solution document."
+      "free_stops": "the quote builder design is kept for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare the quantities on recent villa quotes with what was finally supplied, so the rooms causing mistakes stand out.",
+          "review": false
+        },
+        {
+          "text": "Give one estimator one notebook for repeated room quantities from finished villas, so future full villa quotes start from real figures.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_lead_followup_slow",
@@ -104,7 +144,17 @@
         "tool_words": []
       },
       "ask_first": "Who follows up on quotes now?",
-      "free_stops": "follow-up timings and stages go in the solution document."
+      "free_stops": "follow-up timings and stages go in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many sent quotes have had no follow up since they went out, so missed sales work stops hiding.",
+          "review": false
+        },
+        {
+          "text": "Give one person a fixed daily time to review one open quote list, so follow ups happen before clients move on.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_rework",
@@ -124,7 +174,17 @@
         "tool_words": []
       },
       "ask_first": "Who takes site measurements?",
-      "free_stops": "the measurement-to-workshop process is kept for the solution document."
+      "free_stops": "the measurement-to-workshop process is kept for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count recent re cuts by wrong site measurement or wrong workshop cut, so you see where the costly errors begin.",
+          "review": false
+        },
+        {
+          "text": "Give one person the handover job between measuring and cutting using one written slab note, so the workshop cuts the intended piece.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_delivery_late",
@@ -145,7 +205,17 @@
         "tool_words": []
       },
       "ask_first": "Do you install yourselves or through partners?",
-      "free_stops": "scheduling rules and the sign-off flow go in the solution document."
+      "free_stops": "scheduling rules and the sign-off flow go in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare the agreed installation days with the days teams actually arrived, so you see which delays are repeating most.",
+          "review": false
+        },
+        {
+          "text": "Keep all booked installation dates in one notebook with one coordinator, so team clashes stop causing missed arrival days.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_import_delays",
@@ -166,7 +236,17 @@
         "leads_with_view": true
       },
       "ask_first": "Do you import directly?",
-      "free_stops": "the tracker and landed-cost method are kept for the solution document; duty questions go to your clearing agent."
+      "free_stops": "the tracker and landed-cost method are kept for the solution document; duty questions go to your clearing agent.",
+      "extra_ideas": [
+        {
+          "text": "Count which open projects are waiting on each delayed container, so you know where the hold up hurts most.",
+          "review": false
+        },
+        {
+          "text": "Give one person one list of incoming containers and waiting projects, so updates to sales and site teams stay aligned.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_receivables_late",
@@ -186,7 +266,17 @@
         "tool_words": []
       },
       "ask_first": "How do project clients usually pay?",
-      "free_stops": "the tracking setup goes in the solution document; disputes go to your lawyer."
+      "free_stops": "the tracking setup goes in the solution document; disputes go to your lawyer.",
+      "extra_ideas": [
+        {
+          "text": "Compare each project's delivered value with what has been invoiced and collected, so missing paperwork delaying cash shows up.",
+          "review": false
+        },
+        {
+          "text": "Give one person one file for each project's invoices and delivery papers, so payment chasing starts from complete records.",
+          "review": true
+        }
+      ]
     },
     {
       "id": "p10_commission_disputes",
@@ -207,7 +297,17 @@
         "leads_with_view": true
       },
       "ask_first": "How many architects or designers refer to you?",
-      "free_stops": "ledger setup is kept for the solution document; tax treatment goes to your accountant."
+      "free_stops": "ledger setup is kept for the solution document; tax treatment goes to your accountant.",
+      "extra_ideas": [
+        {
+          "text": "Compare the hand calculated commission on recent referred projects with the original agreed basis, so dispute patterns stand out early.",
+          "review": false
+        },
+        {
+          "text": "Give one person one notebook page for every referred project and its commission basis, so referral calculations stay consistent.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p11_margin_unknown",
@@ -228,7 +328,17 @@
         "leads_with_view": true
       },
       "ask_first": "Can you see the cost of a finished project today?",
-      "free_stops": "the margin model goes in the solution document."
+      "free_stops": "the margin model goes in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note one finished project's selling price against cutting, wastage and installation costs, so you see where that job lost money.",
+          "review": true
+        },
+        {
+          "text": "Give one person the job of writing project extras in one notebook during the work, so true project margin is not guessed later.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

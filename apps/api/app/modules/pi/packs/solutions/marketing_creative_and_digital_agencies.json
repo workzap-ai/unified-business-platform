@@ -2,7 +2,7 @@
   "industry": "marketing_creative_and_digital_agencies",
   "name": "Marketing, creative and digital agencies",
   "sector": "7.K Professional and business services",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_info_lost_in_whatsapp",
@@ -22,7 +22,17 @@
         "tool_words": []
       },
       "ask_first": "Roughly how many active clients is the team handling?",
-      "free_stops": "the intake fields and confirmation flow are set out in the solution document."
+      "free_stops": "the intake fields and confirmation flow are set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many brief details were missing from this week's voice notes, so you see where work gets delayed.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of writing every new brief in one notebook, so designers work from one agreed version.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_approvals_slow",
@@ -42,7 +52,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "reminder timings and escalation are worked out in the solution document."
+      "free_stops": "reminder timings and escalation are worked out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note every job waiting on approval at today's close, so tomorrow's rush requests are easier to challenge with facts.",
+          "review": false
+        },
+        {
+          "text": "Give one account manager the daily handover list of pending approvals, so chasing does not get missed between shifts.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_rework",
@@ -62,7 +82,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "how rounds are counted and flagged is kept for the solution document."
+      "free_stops": "how rounds are counted and flagged is kept for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count which deliverables came back most often this week, so you see where unlimited revisions are draining designers.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of noting every revision round in one list, so repeat rework stops slipping by unnoticed.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_hidden_costs",
@@ -83,7 +113,17 @@
         "leads_with_view": true
       },
       "ask_first": "",
-      "free_stops": "how scope is defined and compared is designed in the solution document."
+      "free_stops": "how scope is defined and compared is designed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare what each retainer promised with what your team actually delivered this week, so scope creep has a clear shape.",
+          "review": false
+        },
+        {
+          "text": "Give one person one notebook for out of scope requests, so extra work on retainers stops getting absorbed quietly.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_margin_unknown",
@@ -104,7 +144,17 @@
         "leads_with_view": true
       },
       "ask_first": "",
-      "free_stops": "how time is logged without slowing the team is worked out in the solution document."
+      "free_stops": "how time is logged without slowing the team is worked out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Write each client's fee beside this week's team time notes, so the weakest client economics stand out quickly.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of collecting daily time notes in one place, so client effort is no longer guessed.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_receivables_late",
@@ -124,7 +174,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "the reimbursement and reminder flow is set out in the solution document."
+      "free_stops": "the reimbursement and reminder flow is set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "List each client with unreimbursed ad spend beside the oldest waiting item, so the cash strain is clear at a glance.",
+          "review": false
+        },
+        {
+          "text": "Give one person one list for reimbursement follow ups, so client chasing happens on time every week.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_manual_reports",
@@ -148,7 +208,17 @@
         ]
       },
       "ask_first": "",
-      "free_stops": "which sources are connected and the report design are kept for the solution document."
+      "free_stops": "which sources are connected and the report design are kept for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Mark which report sections clients actually discuss on calls this month, so the team sees what is worth building.",
+          "review": false
+        },
+        {
+          "text": "Give one person one master report checklist, so monthly reporting stops being rebuilt differently each time.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_tasks_dropped",
@@ -168,7 +238,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "the status stages and alerts are worked out in the solution document."
+      "free_stops": "the status stages and alerts are worked out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare this week's scheduled posts with what actually went live, so missed updates on the calendar show up clearly.",
+          "review": false
+        },
+        {
+          "text": "Give one person the end of day calendar check, so missed posts stop slipping through stale schedules.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_capacity",
@@ -188,7 +268,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "how workload is measured per person is designed in the solution document."
+      "free_stops": "how workload is measured per person is designed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note each designer's waiting work at today's close, so uneven loading across the team is obvious this week.",
+          "review": false
+        },
+        {
+          "text": "Give one person the daily job of balancing incoming design tasks, so busy and idle weeks get smoothed earlier.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p10_churn_subscription",
@@ -209,7 +299,17 @@
         "leads_with_view": true
       },
       "ask_first": "",
-      "free_stops": "the health signals and thresholds are kept for the solution document."
+      "free_stops": "the health signals and thresholds are kept for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note why each client left after three months on one page, so patterns behind churn stop feeling random.",
+          "review": false
+        },
+        {
+          "text": "Give one person a weekly client health check list, so early warning signs get acted on before exits.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

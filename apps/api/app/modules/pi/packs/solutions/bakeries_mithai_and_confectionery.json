@@ -2,7 +2,7 @@
   "industry": "bakeries_mithai_and_confectionery",
   "name": "Bakeries, mithai and confectionery",
   "sector": "7.B Food and beverage",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_expiry_wastage",
@@ -22,7 +22,17 @@
         "tool_words": []
       },
       "ask_first": "Who decides how much to bake each day?",
-      "free_stops": "How the daily production plan is worked out by day and season goes in the solution document."
+      "free_stops": "How the daily production plan is worked out by day and season goes in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "For one week, count leftover bread and buns by item at closing, so the biggest nightly loss stands out.",
+          "review": false
+        },
+        {
+          "text": "Give one person the closing job of writing leftovers in one notebook, so tomorrow's bake is based on yesterday's reality.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_transfers_lost",
@@ -42,7 +52,17 @@
         "tool_words": []
       },
       "ask_first": "Is last year's Eid sale written down by branch anywhere?",
-      "free_stops": "The festival allocation method and transfer rules stay for the solution document."
+      "free_stops": "The festival allocation method and transfer rules stay for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "During Eid week, compare boxes sent and boxes left unsold by branch each night, so uneven allocation is easier to spot.",
+          "review": false
+        },
+        {
+          "text": "Give one person the branch transfer list and evening check call, so extra Eid boxes move before the next rush.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_count_mismatch",
@@ -64,7 +84,17 @@
         ]
       },
       "ask_first": "Who checks the goods when they reach the branch?",
-      "free_stops": "The dispatch-to-receipt flow and variance rules are detailed in the solution document."
+      "free_stops": "The dispatch-to-receipt flow and variance rules are detailed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "For one week, compare each factory paper chit with what branches say arrived, so the mismatch point shows up clearly.",
+          "review": false
+        },
+        {
+          "text": "Give one branch person the arrival count and chit signoff duty, so shortages are raised while the same delivery is still fresh.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_margin_unknown",
@@ -85,7 +115,17 @@
         "leads_with_view": true
       },
       "ask_first": "When did you last update the kilo rate?",
-      "free_stops": "The per-kilo costing method and rate review rules go in the solution document."
+      "free_stops": "The per-kilo costing method and rate review rules go in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Pick a few top sweets and note this week's ingredient spending beside their selling rate, so weak earners stand out sooner.",
+          "review": false
+        },
+        {
+          "text": "Give one person a fixed weekly time to note changing ghee, sugar and khoya costs, so price decisions follow current buying reality.",
+          "review": true
+        }
+      ]
     },
     {
       "id": "p5_pre_orders_custom",
@@ -107,7 +147,17 @@
         ]
       },
       "ask_first": "What usually goes wrong — design, timing or details?",
-      "free_stops": "The order flow from intake to pickup and the confirmation steps are in the solution document."
+      "free_stops": "The order flow from intake to pickup and the confirmation steps are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "For one week, count custom orders that needed name or timing corrections, so the intake mistakes are sized clearly.",
+          "review": false
+        },
+        {
+          "text": "Give one person one notebook for every custom cake order from all channels, so kitchen work follows the same details each time.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_cash_mismatch",
@@ -127,7 +177,17 @@
         "tool_words": []
       },
       "ask_first": "Have advances actually gone missing, or just been hard to trace?",
-      "free_stops": "How advances, balances and daily closing are linked is set out in the solution document."
+      "free_stops": "How advances, balances and daily closing are linked is set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "At closing for one week, compare cake advances noted with open orders still pending, so missing payments are easier to catch.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of keeping all cake advances in one receipt book, so each payment stays tied to its order.",
+          "review": true
+        }
+      ]
     },
     {
       "id": "p7_receivables_late",
@@ -147,7 +207,17 @@
         "tool_words": []
       },
       "ask_first": "How many corporate customers buy on credit?",
-      "free_stops": "The reminder schedule and credit rules per customer stay for the solution document."
+      "free_stops": "The reminder schedule and credit rules per customer stay for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note each corporate Eid order beside when payment actually arrived, so the slowest paying accounts become obvious.",
+          "review": true
+        },
+        {
+          "text": "Give one person one notebook for all corporate dues and follow ups, so collection calls happen from one current list.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_no_sop",
@@ -167,7 +237,17 @@
         "tool_words": []
       },
       "ask_first": "Which festival is your biggest?",
-      "free_stops": "The production plan structure and festival planner are detailed in the solution document."
+      "free_stops": "The production plan structure and festival planner are detailed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Watch one full production day and note which tasks only the head karigar decides, so the risky dependency is clearer.",
+          "review": false
+        },
+        {
+          "text": "Give one senior worker the job of writing daily quantities and sequence in one notebook, so festival production survives sudden absences.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_no_online_ordering",
@@ -187,7 +267,17 @@
         "tool_words": []
       },
       "ask_first": "Do you deliver, or do customers collect?",
-      "free_stops": "The ordering page design and slot rules are covered in the solution document."
+      "free_stops": "The ordering page design and slot rules are covered in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "For one week, count message enquiries that got no reply by closing, so missed online demand is easier to judge.",
+          "review": false
+        },
+        {
+          "text": "Give one person a fixed time to check and answer order messages, so interested buyers are not left waiting.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p10_data_scattered",
@@ -207,7 +297,17 @@
         "tool_words": []
       },
       "ask_first": "How do you see daily sales across branches now?",
-      "free_stops": "How shop and factory numbers are joined up goes in the solution document."
+      "free_stops": "How shop and factory numbers are joined up goes in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "For one week, note daily branch sales beside factory spending in one notebook, so the rough mismatch is visible together.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of collecting both registers every evening into one notebook, so reviews stop waiting for missing pages.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

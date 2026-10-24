@@ -2,7 +2,7 @@
   "industry": "footwear_retail",
   "name": "Footwear retail",
   "sector": "7.A Retail and consumer (part 1)",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_stockout",
@@ -23,7 +23,17 @@
         "tool_words": []
       },
       "ask_first": "How do you decide sizes when you place an order?",
-      "free_stops": "How lost sizes are logged and the size curve is worked out are in the solution document."
+      "free_stops": "How lost sizes are logged and the size curve is worked out are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note each missed size by article in one notebook for a week, so repeat lost sizes stand out clearly.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member the job of checking missing-size notes every evening, so reorders stop being guessed from counter talk.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_overstock_dead_stock",
@@ -44,7 +54,17 @@
         "tool_words": []
       },
       "ask_first": "How many outlets do you have?",
-      "free_stops": "How consolidation is suggested and transfers are tracked is in the solution document."
+      "free_stops": "How consolidation is suggested and transfers are tracked is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many articles are left only in edge sizes across the shop, so you see which lines are stuck hardest.",
+          "review": false
+        },
+        {
+          "text": "Give one person one shelf for broken-size pairs only, so staff stop scattering slow articles around the store.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_wrong_location",
@@ -64,7 +84,17 @@
         "tool_words": []
       },
       "ask_first": "How are boxes arranged today?",
-      "free_stops": "The location coding and lookup setup are in the solution document."
+      "free_stops": "The location coding and lookup setup are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Time how long staff take to find back-room boxes for the busiest articles, so you see which sections waste selling time.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of returning tried pairs to their exact back-room spot each evening, so boxes stay findable during rush hours.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_product_defects",
@@ -85,7 +115,17 @@
         "tool_words": []
       },
       "ask_first": "Is it mostly one supplier or workshop?",
-      "free_stops": "How claims are recorded and supplier totals reported is in the solution document."
+      "free_stops": "How claims are recorded and supplier totals reported is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note each return with article, batch marking and fault in one notebook, so weak lines show up before more customers come back angry.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of checking returned pairs against the defect notebook weekly, so supplier complaints stay consistent and factual.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_transfers_lost",
@@ -105,7 +145,17 @@
         "tool_words": []
       },
       "ask_first": "How are transfers recorded today?",
-      "free_stops": "The transfer flow and alerts are in the solution document."
+      "free_stops": "The transfer flow and alerts are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare pairs sent and pairs received for each outlet transfer this week, so the loss point becomes visible on paper.",
+          "review": false
+        },
+        {
+          "text": "Give one person one transfer notebook kept by the dispatch area, so every outgoing pair is written before leaving the shop.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_conversion_low",
@@ -130,7 +180,17 @@
         ]
       },
       "ask_first": "Do you also sell online?",
-      "free_stops": "How reasons are captured and follow-ups sent is in the solution document."
+      "free_stops": "How reasons are captured and follow-ups sent is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note which tried articles are left behind most often each day, so you spot whether price, fit or look is blocking sales.",
+          "review": true
+        },
+        {
+          "text": "Give one staff member the job of collecting walkaway reasons in one notebook each evening, so the team stops guessing why buyers leave.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_margin_shrinking",
@@ -151,7 +211,17 @@
         "leads_with_view": true
       },
       "ask_first": "Do you know the purchase cost of each article?",
-      "free_stops": "How margin and discount depth are calculated is in the solution document."
+      "free_stops": "How margin and discount depth are calculated is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note which sale shelves need the most size checks and pair-finding during the week, so you spot where discounting is creating the most handling.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member the job of moving any sale pair with a missing mate to one marked spot daily, so half-pairs stop clogging the sale display.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_manual_work",
@@ -171,7 +241,17 @@
         "tool_words": []
       },
       "ask_first": "Roughly how many articles do you carry?",
-      "free_stops": "The count schedule and how it's compared with stock is in the solution document."
+      "free_stops": "The count schedule and how it's compared with stock is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count boxes in one section during normal trading once, so you see which areas can be checked without closing the shop.",
+          "review": false
+        },
+        {
+          "text": "Give one person one section to count on the same quiet shift each week, so stocktake workload stops piling into closure days.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_integration_marketplace",
@@ -191,7 +271,17 @@
         "tool_words": []
       },
       "ask_first": "Which marketplaces do you sell on?",
-      "free_stops": "How stock is synced and how often is in the solution document."
+      "free_stops": "How stock is synced and how often is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare shelf pairs against listed pairs for your fastest-selling articles once this week, so you see where cancellation risk is highest.",
+          "review": false
+        },
+        {
+          "text": "Give one person a fixed end-of-day check of fast-moving sizes in one notebook, so listed stock changes follow the shop floor closely.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

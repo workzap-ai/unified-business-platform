@@ -2,7 +2,7 @@
   "industry": "milk_collection_centres_and_chillers",
   "name": "Milk collection centres and chillers",
   "sector": "7.C Agriculture, livestock and rural (part 1)",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_payment_disputes",
@@ -22,7 +22,17 @@
         "tool_words": []
       },
       "ask_first": "What's tested when milk arrives today?",
-      "free_stops": "The intake entry, slip and statement setup go in the solution document."
+      "free_stops": "The intake entry, slip and statement setup go in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many payday arguments come from each writer's register this week, so you see where handwritten records create the most trouble.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of checking every day's handwritten readings before filing, so payday disputes are easier to settle from the register.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_churn_subscription",
@@ -43,7 +53,17 @@
         "leads_with_view": true
       },
       "ask_first": "Roughly how many suppliers deliver to you?",
-      "free_stops": "When a supplier counts as dropped and the follow-up flow stay in the solution document."
+      "free_stops": "When a supplier counts as dropped and the follow-up flow stay in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note which collection shift each departing supplier last used this week, so you can spot whether trust is breaking at a particular handover.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of marking every supplier who stops delivering on one notebook page, so losses are noticed before routes thin out.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_rejections",
@@ -63,7 +83,17 @@
         "tool_words": []
       },
       "ask_first": "Does the plant give you the rejection reason in writing?",
-      "free_stops": "How loads are traced back to routes is detailed in the solution document."
+      "free_stops": "How loads are traced back to routes is detailed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare tanker rejections with the centres and routes feeding them that day, so you can see where deductions are starting.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of keeping every plant rejection note in one folder, so deduction reasons are easy to trace later.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_count_mismatch",
@@ -83,7 +113,17 @@
         "tool_words": []
       },
       "ask_first": "Where do you think the gap happens?",
-      "free_stops": "The reconciliation rules go in the solution document."
+      "free_stops": "The reconciliation rules go in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Write intake and dispatch totals beside each shift for one week, so you can see whether the mismatch starts before loading or after.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of closing both intake and dispatch counts together daily, so the mismatch is checked before papers scatter.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_credit_customers",
@@ -103,7 +143,17 @@
         "tool_words": []
       },
       "ask_first": "How many suppliers have advances right now?",
-      "free_stops": "The deduction rules and ledger layout stay in the solution document."
+      "free_stops": "The deduction rules and ledger layout stay in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many repayment deductions were missed at payout this week, so you see how much weak tracking is costing.",
+          "review": false
+        },
+        {
+          "text": "Give one cashier the job of updating every advance balance in one register at payout, so unpaid amounts stop drifting between pages.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_cash_flow_tight",
@@ -124,7 +174,17 @@
         "leads_with_view": true
       },
       "ask_first": "Is the plant your only buyer?",
-      "free_stops": "How the cash view is built goes in the solution document."
+      "free_stops": "How the cash view is built goes in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Mark each supplier payout day and each plant receipt day on one wall calendar this month, so your longest squeeze period stands out.",
+          "review": false
+        },
+        {
+          "text": "Give one office person a single notebook page for this week's promised payouts and expected plant receipts, so everyone checks the same place before committing cash.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_cash_handling_risk",
@@ -144,7 +204,17 @@
         "tool_words": []
       },
       "ask_first": "How are most suppliers paid now?",
-      "free_stops": "The payout schedule and checks are set out in the solution document."
+      "free_stops": "The payout schedule and checks are set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many payout slips are handed over in each hour on payment day, so you see when the office and cash table are under most strain.",
+          "review": true
+        },
+        {
+          "text": "Give one senior staff member the job of handing each route's payment bundle to the cashier at a fixed time, so the cash table stays calmer and less exposed.",
+          "review": true
+        }
+      ]
     },
     {
       "id": "p8_maintenance_downtime",
@@ -164,7 +234,17 @@
         "tool_words": []
       },
       "ask_first": "How often does the chiller lose power?",
-      "free_stops": "The log and flag rules stay in the solution document."
+      "free_stops": "The log and flag rules stay in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note every hour the generator was unavailable and whether the chiller was loaded, so you see when breakdowns hurt milk most.",
+          "review": false
+        },
+        {
+          "text": "Give one operator the job of logging generator stoppages in one notebook by date, so repeat downtime patterns are easier to spot.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_theft_internal",
@@ -184,7 +264,17 @@
         "tool_words": []
       },
       "ask_first": "Who drives the tanker, and how do you know when it leaves and arrives?",
-      "free_stops": "The dispatch log and matching rules go in the solution document."
+      "free_stops": "The dispatch log and matching rules go in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare litres loaded, litres received and the same driver's route for each trip this week, so any recurring shortfall ties to a run.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of writing departure and receipt figures on the same page for every trip, so route shortfalls are harder to hide.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p10_branch_comparison",
@@ -204,7 +294,17 @@
         "tool_words": []
       },
       "ask_first": "How do the centres report to you now?",
-      "free_stops": "Which numbers go in and how centres are compared is worked out in the solution document."
+      "free_stops": "Which numbers go in and how centres are compared is worked out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note each centre's intake on one page at closing for one week, so low-volume days and centres stand out clearly.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member the job of collecting every centre's closing numbers before night, so daily intake stops arriving in mixed formats.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

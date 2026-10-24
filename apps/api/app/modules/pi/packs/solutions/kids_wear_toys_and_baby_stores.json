@@ -2,7 +2,7 @@
   "industry": "kids_wear_toys_and_baby_stores",
   "name": "Kids wear, toys and baby stores",
   "sector": "7.A Retail and consumer (part 1)",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_stockout",
@@ -27,7 +27,17 @@
         ]
       },
       "ask_first": "Which ages run out most?",
-      "free_stops": "How age bands are tracked and reorder alerts set is in the solution document."
+      "free_stops": "How age bands are tracked and reorder alerts set is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Mark every missing age size asked for at the counter this week, so buying reflects what parents wanted today.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member the job of updating one notebook of missing sizes daily, so reordering follows a single record.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_expiry_wastage",
@@ -47,7 +57,17 @@
         "tool_words": []
       },
       "ask_first": "Roughly how many consumable items do you carry?",
-      "free_stops": "How batches are captured and alert timings set are in the solution document."
+      "free_stops": "How batches are captured and alert timings set are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Walk the consumables shelf once this week and note which lines are closest to expiry, so staff spot trouble before complaints.",
+          "review": false
+        },
+        {
+          "text": "Give one person a fixed weekly shelf check for dated items, so near expiry stock gets noticed during routine.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_serial_batch_tracking",
@@ -67,7 +87,17 @@
         "tool_words": []
       },
       "ask_first": "Do you sell prams, car seats or battery toys?",
-      "free_stops": "How batches are linked to sales and searched is in the solution document."
+      "free_stops": "How batches are linked to sales and searched is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Check which recalled items still have batch details on shelf or in store records, so you know how far tracing can go.",
+          "review": false
+        },
+        {
+          "text": "Keep one notebook beside the till for batch noted sales of recall prone items, so lookups are possible later.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_slow_response",
@@ -87,7 +117,17 @@
         "tool_words": []
       },
       "ask_first": "How many WhatsApp queries a day?",
-      "free_stops": "How the stock lookup and reply flow work is in the solution document."
+      "free_stops": "How the stock lookup and reply flow work is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare reply times for size questions across one busy day and one quiet day, so you see when chats start slipping.",
+          "review": false
+        },
+        {
+          "text": "Hand one person the phone for stock questions during the busiest shop period, so parents get quicker size answers.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_no_customer_data",
@@ -128,7 +168,17 @@
         "tool_words": []
       },
       "ask_first": "How many hamper orders in a busy week?",
-      "free_stops": "The order stages and confirmation steps are in the solution document."
+      "free_stops": "The order stages and confirmation steps are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare hamper promise dates with actual handover dates from recent orders, so you see where lateness starts.",
+          "review": false
+        },
+        {
+          "text": "Put one staff member in charge of one hamper order list checked each afternoon, so custom orders stop getting mixed up.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_import_delays",
@@ -148,7 +198,17 @@
         "tool_words": []
       },
       "ask_first": "Where do most toys come from?",
-      "free_stops": "How shipments are tracked and flagged is in the solution document."
+      "free_stops": "How shipments are tracked and flagged is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note which seasonal toy lines arrived after the selling rush last time, so ordering can focus on the risky lines.",
+          "review": false
+        },
+        {
+          "text": "Give one person one notebook for shipment arrivals and expected dates, so late consignments are chased from one place.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_capacity",
@@ -169,7 +229,17 @@
         "tool_words": []
       },
       "ask_first": "How many schools do you supply?",
-      "free_stops": "How orders are planned per class and tracked to payment is in the solution document."
+      "free_stops": "How orders are planned per class and tracked to payment is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count uniform orders by size and promised date for one week, so you see which days and sizes create the crush.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of writing every uniform order into one notebook the same day, so cutting follows one queue.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_margin_unknown",
@@ -190,7 +260,17 @@
         "leads_with_view": true
       },
       "ask_first": "Which category do you think earns most?",
-      "free_stops": "How landed cost and margin are calculated is in the solution document."
+      "free_stops": "How landed cost and margin are calculated is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note buying cost beside selling price for a few fast moving lines in each category, so weaker categories stop hiding behind busy sales.",
+          "review": true
+        },
+        {
+          "text": "Give one person one page per category for cost and selling price notes, so price checks use one shared record.",
+          "review": true
+        }
+      ]
     }
   ],
   "never_say": [

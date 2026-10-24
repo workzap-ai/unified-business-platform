@@ -2,7 +2,7 @@
   "industry": "importers_and_trading_houses",
   "name": "Importers and trading houses",
   "sector": "7.E Trade, distribution and logistics",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_margin_unknown",
@@ -22,7 +22,17 @@
         "tool_words": []
       },
       "ask_first": "Who puts the cost together today — you, the accountant or a clerk?",
-      "free_stops": "How charges are spread across items and lines is set out in the solution document."
+      "free_stops": "How charges are spread across items and lines is set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare the last container's buying cost against all arrival related charges noted afterward, so you see how much landed cost appears late.",
+          "review": false
+        },
+        {
+          "text": "Keep one paper file for each incoming container's local charges and receipts, so all cost pieces stay together from arrival week.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_currency_exposure",
@@ -43,7 +53,17 @@
         "leads_with_view": true
       },
       "ask_first": "Do you usually quote parties before or after you've paid the supplier?",
-      "free_stops": "Which quotes to flag and when is worked out in the solution document."
+      "free_stops": "Which quotes to flag and when is worked out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Mark the open customer quotes based on older exchange assumptions, so you can see which pending deals took the hit.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of noting the rate assumption beside every new quote, so squeezed deals are easier to spot later.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_import_delays",
@@ -63,7 +83,17 @@
         "tool_words": []
       },
       "ask_first": "Which document is usually the one that arrives late?",
-      "free_stops": "The stages, alert timings and checklist per shipment type go in the solution document."
+      "free_stops": "The stages, alert timings and checklist per shipment type go in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Look at the last delayed shipments and note which document reached late each time, so the repeated weak handover becomes visible.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member one running list of papers still awaited for each incoming shipment, so late documents get chased from one place.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_receivables_late",
@@ -83,7 +113,17 @@
         "tool_words": []
       },
       "ask_first": "Is the khata kept by you, a munshi or the accountant?",
-      "free_stops": "Limit rules and reminder timing are set out in the solution document."
+      "free_stops": "Limit rules and reminder timing are set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many overdue balances already have fresh goods supplied after the due date, so you see where stretching keeps being rewarded.",
+          "review": false
+        },
+        {
+          "text": "Give one person one daily list of overdue parties to follow up and report back, so collection chasing happens on a set routine.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_cash_flow_tight",
@@ -108,7 +148,17 @@
         ]
       },
       "ask_first": "",
-      "free_stops": "How the view is laid out and refreshed is covered in the solution document."
+      "free_stops": "How the view is laid out and refreshed is covered in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Write this month's expected customer collections beside supplier payment dates, so the weeks with the hardest squeeze show up early.",
+          "review": true
+        },
+        {
+          "text": "Give one person one notebook page for all promised collection dates and supplier due dates, so cash timing stops getting missed.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_stockout",
@@ -128,7 +178,17 @@
         "tool_words": []
       },
       "ask_first": "Do you track stock by item and size, or only by carton?",
-      "free_stops": "The reorder logic per item and supplier is set out in the solution document."
+      "free_stops": "The reorder logic per item and supplier is set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Check which fast sizes sold out before the last shipment landed, so you see exactly which sizes need earlier reorder attention.",
+          "review": false
+        },
+        {
+          "text": "Give one person the weekly job of noting stock left for fast sizes in one place, so reorder timing stops relying on surprise shortages.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_count_mismatch",
@@ -148,7 +208,17 @@
         "tool_words": []
       },
       "ask_first": "Who is allowed to take maal out of the godown today?",
-      "free_stops": "The count routine and slip flow are designed in the solution document."
+      "free_stops": "The count routine and slip flow are designed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare today's godown count with office quantity for the items moved most often, so you see where the mismatch is worst.",
+          "review": false
+        },
+        {
+          "text": "Give one shift supervisor the job of noting every outward and inward carton movement in one register, so quantity changes have a single trail.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_transfers_lost",
@@ -168,7 +238,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The handoff points and proof captured at each are set in the solution document."
+      "free_stops": "The handoff points and proof captured at each are set in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note carton counts at handover, loading and godown receipt for the next transfer, so you see exactly where cartons start disappearing.",
+          "review": false
+        },
+        {
+          "text": "Give one person one transfer sheet that travels with each load from port to godown, so every handover count stays in one place.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_pricing_errors",
@@ -188,7 +268,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "Approval rules and the quote log design are in the solution document."
+      "free_stops": "Approval rules and the quote log design are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare today's quoted rates for the same item across different salesmen, so you see how wide the rate variation really is.",
+          "review": false
+        },
+        {
+          "text": "Give one person the daily job of updating and sharing the current selling rates, so salesmen stop working from mixed versions.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p10_software_not_connected",
@@ -208,7 +298,17 @@
         "tool_words": []
       },
       "ask_first": "Which system does a sale get entered into first?",
-      "free_stops": "What connects, in which direction, is mapped in the solution document."
+      "free_stops": "What connects, in which direction, is mapped in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count the items with the biggest stock differences between office records and physical shelves this week, so you see which lines create most confusion.",
+          "review": false
+        },
+        {
+          "text": "Give one store person one notebook for every stock adjustment found during dispatch or counting, so mismatches stop getting scattered.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p11_owner_blind",
@@ -228,7 +328,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "Which numbers appear and how they are worked out is set in the solution document."
+      "free_stops": "Which numbers appear and how they are worked out is set in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note this month's sales, direct purchase cost and major overheads from your papers in one place, so profit stops waiting for year closing.",
+          "review": false
+        },
+        {
+          "text": "Set one fixed day each month for the accountant to hand you a simple profit note, so you see business performance regularly.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p12_expansion_pains",
@@ -249,7 +359,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The order flow and stock-sharing rules are in the solution document."
+      "free_stops": "The order flow and stock-sharing rules are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "List the items your staff can pack, invoice and dispatch without special handling, so the online range starts with what your routine can support.",
+          "review": true
+        },
+        {
+          "text": "Give one person the daily job of checking online orders, packing status and dispatch handover, so this channel has a clear owner.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

@@ -2,7 +2,7 @@
   "industry": "managed_it_support_and_cybersecurity_firms",
   "name": "Managed IT support and cybersecurity firms",
   "sector": "7.K Professional and business services",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_whatsapp_overload",
@@ -22,7 +22,17 @@
         "tool_words": []
       },
       "ask_first": "Roughly how many AMC clients do you support?",
-      "free_stops": "the intake flow and priority rules are set out in the solution document."
+      "free_stops": "the intake flow and priority rules are set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count this week's client messages that reached engineers before any log entry, so you see how much work starts off the books.",
+          "review": false
+        },
+        {
+          "text": "Give one dispatcher the daily job of checking engineers' direct messages list, so missed client requests reach the work queue.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_slow_response",
@@ -43,7 +53,17 @@
         "leads_with_view": true
       },
       "ask_first": "",
-      "free_stops": "alert thresholds per contract are kept for the solution document."
+      "free_stops": "alert thresholds per contract are kept for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note each complaint this week against when the request first arrived, so the late points in your response routine stand out.",
+          "review": false
+        },
+        {
+          "text": "Give one person a fixed midday review of open requests against promised times, so breaches are spotted before clients chase.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_margin_unknown",
@@ -64,7 +84,17 @@
         "leads_with_view": true
       },
       "ask_first": "",
-      "free_stops": "how effort is measured against each contract is worked out in the solution document."
+      "free_stops": "how effort is measured against each contract is worked out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare one busy client's calls and visits this month with their fixed cover fee, so overused contracts stand out early.",
+          "review": false
+        },
+        {
+          "text": "Give one person the weekly job of noting time spent per contract client, so renewals use workload facts not gut feel.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_field_team_visibility",
@@ -86,7 +116,17 @@
         ]
       },
       "ask_first": "",
-      "free_stops": "the visit flow and sign-off steps are set out in the solution document."
+      "free_stops": "the visit flow and sign-off steps are set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count yesterday's field visits from engineer updates and compare them with planned visits, so missed or extra stops are visible.",
+          "review": false
+        },
+        {
+          "text": "Give one coordinator the afternoon job of writing tomorrow's visit list in one notebook, so engineers and office follow one plan.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_licences_renewals",
@@ -106,7 +146,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "reminder timings and the client approval flow are kept for the solution document."
+      "free_stops": "reminder timings and the client approval flow are kept for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Look through this month's client files for upcoming renewals once, so you see which services could stop without warning.",
+          "review": false
+        },
+        {
+          "text": "Give one person the single renewal notebook and a fixed weekly review time, so follow ups happen before client service is affected.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_cash_flow_tight",
@@ -126,7 +176,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "the invoicing timeline is set out in the solution document."
+      "free_stops": "the invoicing timeline is set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count licence renewals where client approval arrived after your team ordered them, so you can see where timing breaks down.",
+          "review": true
+        },
+        {
+          "text": "Give one person the job of logging client approval and order dates in one notebook, so ordering follows the same handover each time.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_receivables_late",
@@ -146,7 +206,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "how out-of-scope work is identified is worked out in the solution document."
+      "free_stops": "how out-of-scope work is identified is worked out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare completed extra work notes with sent job summaries from this week, so missed admin handoffs around chargeable work show.",
+          "review": false
+        },
+        {
+          "text": "Set one fixed afternoon for one person to gather all extra work notes into one list, so chargeable jobs stop being missed.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_handoffs",
@@ -166,7 +236,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "the vault structure and access rules are kept for the solution document."
+      "free_stops": "the vault structure and access rules are kept for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Watch one senior engineer handle a client issue and note what only they know, so the risky knowledge gaps show.",
+          "review": false
+        },
+        {
+          "text": "Give one backup engineer the job of keeping one shared client overview notebook, so cover is possible when the senior person is away.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_checklists_not_done",
@@ -186,7 +266,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "the checklist contents and schedule are designed in the solution document."
+      "free_stops": "the checklist contents and schedule are designed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count which monthly checks were due versus marked done this month, so the true backlog becomes visible.",
+          "review": false
+        },
+        {
+          "text": "Give one person the same weekly time to review due checks in one notebook, so monthly work stops getting missed.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p10_count_mismatch",
@@ -206,7 +296,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "the issue and return routine is set out in the solution document."
+      "free_stops": "the issue and return routine is set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare one shelf's physical parts with the record once, so you see which items drift most often.",
+          "review": false
+        },
+        {
+          "text": "Give one store person the parts issue notebook at closing time daily, so every movement is captured before stock shifts again.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

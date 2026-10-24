@@ -2,7 +2,7 @@
   "industry": "travel_agencies_and_ticketing",
   "name": "Travel agencies and ticketing",
   "sector": "7.G Transport, mobility and aviation (part 1)",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_conversion_low",
@@ -22,7 +22,17 @@
         "tool_words": []
       },
       "ask_first": "Zyada tar enquiries kahan se aati hain, WhatsApp, walk-in ya calls?",
-      "free_stops": "Follow-up timing and lost-reason categories are set out in the solution document."
+      "free_stops": "Follow-up timing and lost-reason categories are set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count yesterday's quoted chats and mark which went silent after the fare, so you see how big the no-reply pile is.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member a fixed follow-up time for quoted chats, so late replies stop slipping past the team.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_refunds",
@@ -43,7 +53,17 @@
         "tool_words": []
       },
       "ask_first": "Is waqt taqreeban kitne refunds pending honge?",
-      "free_stops": "The refund stages and customer update points are designed in the solution document."
+      "free_stops": "The refund stages and customer update points are designed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many refund cases had no update this week, so you see which pending work is truly stuck.",
+          "review": true
+        },
+        {
+          "text": "Keep one refund pending list in one notebook with one owner, so customers get clearer status when they ask.",
+          "review": true
+        }
+      ]
     },
     {
       "id": "p3_orders_lost",
@@ -63,7 +83,17 @@
         "tool_words": []
       },
       "ask_first": "Roz taqreeban kitni bookings hold pe hoti hain?",
-      "free_stops": "How time limits are pulled in and alerted is set out in the solution document."
+      "free_stops": "How time limits are pulled in and alerted is set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many bookings reached their limit unissued this week, so you see the scale of preventable losses.",
+          "review": false
+        },
+        {
+          "text": "Give one person the noon handover list of bookings nearing ticketing limits, so expiry risk gets checked before the rush.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_hidden_costs",
@@ -84,7 +114,17 @@
         "leads_with_view": true
       },
       "ask_first": "ADMs mahine mein taqreeban kitne aate hain?",
-      "free_stops": "The cause categories and reporting are worked out in the solution document."
+      "free_stops": "The cause categories and reporting are worked out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Mark each ADM by booking type and staff handover point once, so the repeat break in routine shows.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of logging every new ADM in one notebook, so old mistakes stop getting forgotten between shifts.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_credit_customers",
@@ -104,7 +144,17 @@
         "tool_words": []
       },
       "ask_first": "Credit sab se zyada kis ko dete hain, corporates ya sub-agents?",
-      "free_stops": "Credit limits and reminder timing are designed in the solution document."
+      "free_stops": "Credit limits and reminder timing are designed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many follow ups stay open past the promised date this week, so you see where chasing keeps stalling.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of updating one notebook of promised payment dates daily, so overdue follow ups stop getting missed.",
+          "review": true
+        }
+      ]
     },
     {
       "id": "p6_pricing_errors",
@@ -125,7 +175,17 @@
         "tool_words": []
       },
       "ask_first": "Markup ka faisla abhi kaun karta hai?",
-      "free_stops": "The markup rules per route and customer type are set out in the solution document."
+      "free_stops": "The markup rules per route and customer type are set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare today's quotes on the same route by staff member once, so you see where markup differences are widest.",
+          "review": false
+        },
+        {
+          "text": "Give one senior person the job of checking quoted markups at a fixed time, so fare consistency stops drifting across the team.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_commission_disputes",
@@ -145,7 +205,17 @@
         "tool_words": []
       },
       "ask_first": "Commission profit pe hoti hai ya ticket count pe?",
-      "free_stops": "The commission rules are configured in the solution document."
+      "free_stops": "The commission rules are configured in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many pay related arguments start from missing booking notes this month, so the main source of fights becomes visible.",
+          "review": false
+        },
+        {
+          "text": "Give one supervisor the job of keeping one written log of booking changes each day, so pay discussions start from the same record.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_repeat_low",
@@ -165,7 +235,17 @@
         "tool_words": []
       },
       "ask_first": "Purane customers ke numbers kahan saved hain?",
-      "free_stops": "The timing, audience groups and tracking are designed in the solution document."
+      "free_stops": "The timing, audience groups and tracking are designed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many past customers were contacted again this month, so you see how much old business is being left idle.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member a fixed weekly time to review past customer files, so repeat business gets regular attention.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_cash_mismatch",
@@ -185,7 +265,17 @@
         "tool_words": []
       },
       "ask_first": "Kitni branches mein cash counter hai?",
-      "free_stops": "The matching rules and alert levels are set out in the solution document."
+      "free_stops": "The matching rules and alert levels are set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note which days this week issued tickets and counter handovers do not line up, so the trouble period stands out.",
+          "review": false
+        },
+        {
+          "text": "Make one person hand over the counter with one written note at closing, so each shift ends with a clear record.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p10_manual_reports",
@@ -206,7 +296,17 @@
         "tool_words": []
       },
       "ask_first": "Aap kaun sa GDS use karte hain?",
-      "free_stops": "How the GDS data is pulled in is worked out in the solution document."
+      "free_stops": "How the GDS data is pulled in is worked out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note each piece you copy by hand for tomorrow's sales report once, so you see which source creates most rework.",
+          "review": false
+        },
+        {
+          "text": "Give one person a fixed notebook page for the morning sales totals, so handover stays consistent when shifts change.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

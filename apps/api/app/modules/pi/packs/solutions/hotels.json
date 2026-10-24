@@ -2,7 +2,7 @@
   "industry": "hotels",
   "name": "Hotels",
   "sector": "7.H Hospitality, events and personal services",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_software_not_connected",
@@ -22,7 +22,17 @@
         "tool_words": []
       },
       "ask_first": "Do you use a channel manager now, or does someone update each OTA by hand?",
-      "free_stops": "The way the room board and OTA feed connect, and the clash rules, go in the solution document."
+      "free_stops": "The way the room board and OTA feed connect, and the clash rules, go in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many walk-in rooms were sold before online availability was corrected this week, so you see when double-booking risk is highest.",
+          "review": false
+        },
+        {
+          "text": "Keep one handwritten sold-room list at reception for every shift to update immediately after walk-ins, so online closures follow one source.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_cash_mismatch",
@@ -42,7 +52,17 @@
         "tool_words": []
       },
       "ask_first": "How many shifts run at the desk in 24 hours?",
-      "free_stops": "The handover fields, mismatch rules and how card and folio totals are pulled in stay for the solution document."
+      "free_stops": "The handover fields, mismatch rules and how card and folio totals are pulled in stay for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare the cash gap by shift for the next few handovers, so you can see whether the mismatch starts on one desk team.",
+          "review": false
+        },
+        {
+          "text": "Give one person on each shift the job of writing every paid-out and correction in one reception notebook, so the till story stays complete.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_discount_abuse",
@@ -62,7 +82,17 @@
         "tool_words": []
       },
       "ask_first": "Who besides you can approve a lower rate today?",
-      "free_stops": "The approval levels and the daily discount report layout are set out in the solution document."
+      "free_stops": "The approval levels and the daily discount report layout are set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many discounted stays were approved after check-in this week, so you see where friends' rates are slipping through.",
+          "review": false
+        },
+        {
+          "text": "Keep one discount note sheet at the desk and give one supervisor the job of reviewing it each evening, so surprise discounts stop piling up.",
+          "review": true
+        }
+      ]
     },
     {
       "id": "p4_handoffs",
@@ -84,7 +114,17 @@
         ]
       },
       "ask_first": "Roughly how many rooms turn over on a busy day?",
-      "free_stops": "The status flow, who taps what, and the turnaround reporting stay for the solution document."
+      "free_stops": "The status flow, who taps what, and the turnaround reporting stay for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note how many vacated rooms reached housekeeping more than a few minutes after key return this week, so late handovers are easy to spot.",
+          "review": false
+        },
+        {
+          "text": "Give the key-return message to one desk person each shift and keep one vacated-room list by reception, so cleaning starts sooner on departures.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_maintenance_downtime",
@@ -104,7 +144,17 @@
         "tool_words": []
       },
       "ask_first": "Is maintenance in-house or a contractor you call?",
-      "free_stops": "Ticket categories, assignment rules and the downtime report are detailed in the solution document."
+      "free_stops": "Ticket categories, assignment rules and the downtime report are detailed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count which complaint appears most often in rooms this week, so maintenance time goes to the fault guests mention again and again.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member the job of checking the maintenance book at the same time each day, so repeated faults get chased before new complaints pile up.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_receivables_late",
@@ -124,7 +174,17 @@
         "tool_words": []
       },
       "ask_first": "How many corporate accounts are on credit right now?",
-      "free_stops": "Credit limits, reminder timing and statement format go in the solution document."
+      "free_stops": "Credit limits, reminder timing and statement format go in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many checkout files for corporate clients still lack a sent invoice note after departure, so admin delay becomes visible.",
+          "review": true
+        },
+        {
+          "text": "Give one staff member one notebook for all corporate invoice follow ups at a fixed daily time, so missed reminders stop slipping.",
+          "review": true
+        }
+      ]
     },
     {
       "id": "p7_owner_blind",
@@ -144,7 +204,17 @@
         "tool_words": []
       },
       "ask_first": "What do you look at first each morning now?",
-      "free_stops": "Which numbers go in the read and where each is pulled from is in the solution document."
+      "free_stops": "Which numbers go in the read and where each is pulled from is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Read one week of night shift notes together and count repeated issues, so the dark hours stop feeling like guesswork.",
+          "review": false
+        },
+        {
+          "text": "Give one night person the job of leaving one written handover in one notebook before day staff arrive, so mornings start with facts.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_chat_overload",
@@ -165,7 +235,17 @@
         "tool_words": []
       },
       "ask_first": "Do most enquiries come from guests or from travel agents?",
-      "free_stops": "The booking flow, answers and follow-up rules are designed in the solution document."
+      "free_stops": "The booking flow, answers and follow-up rules are designed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many rate enquiries sat unanswered by shift this week, so you can see exactly when chats are being missed.",
+          "review": false
+        },
+        {
+          "text": "Assign one staff member per shift to clear the rate enquiry chat at a fixed check time, so booking chances stop sitting unattended.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_shrinkage_theft",
@@ -185,7 +265,17 @@
         "tool_words": []
       },
       "ask_first": "Is laundry done in-house or by a vendor?",
-      "free_stops": "Par levels and the count routine are set in the solution document."
+      "free_stops": "Par levels and the count routine are set in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare towel and linen counts by floor after checkout rounds this week, so you can see where losses are happening most.",
+          "review": false
+        },
+        {
+          "text": "Give one housekeeping supervisor the job of recording every floor's linen movement in one notebook, so missing items are traced to a location sooner.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p10_forecasting",
@@ -205,7 +295,17 @@
         "tool_words": []
       },
       "ask_first": "Do you take a deposit when you hold a block?",
-      "free_stops": "Release and reminder timing per block type stays for the solution document."
+      "free_stops": "Release and reminder timing per block type stays for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note how many blocked rooms were released after other guests were refused this week, so the revenue missed from late releases is clear.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of reviewing every held block at the same afternoon time daily, so organisers get chased before rooms sit idle.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

@@ -2,7 +2,7 @@
   "industry": "music_art_and_dance_schools",
   "name": "Music, art and dance schools",
   "sector": "7.J Education and childcare",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_manual_work",
@@ -22,7 +22,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "How the rules and booking work is kept for the document."
+      "free_stops": "How the rules and booking work is kept for the document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many make-up requests are still unsettled at this week's end, so you see how big the backlog really is.",
+          "review": false
+        },
+        {
+          "text": "Keep one paper list of make-up lessons owed in the office, so every teacher checks the same place before promising a slot.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_pricing_errors",
@@ -42,7 +52,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The reminder timing is in the document."
+      "free_stops": "The reminder timing is in the document.",
+      "extra_ideas": [
+        {
+          "text": "Note how many active lesson packs are already past expiry but still being used, so missed checks stop slipping by unnoticed.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member a fixed weekly pack expiry check, so renewals are raised before lessons continue by accident.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_conversion_low",
@@ -62,7 +82,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The follow-up timing is kept for the document."
+      "free_stops": "The follow-up timing is kept for the document.",
+      "extra_ideas": [
+        {
+          "text": "Compare trial attendance by discipline against enrolments from those trials this month, so you see which classes sell themselves and which do not.",
+          "review": false
+        },
+        {
+          "text": "Give one teacher the job of recording each trial outcome that day, so follow-up stops getting lost after busy classes.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_churn_subscription",
@@ -82,7 +112,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The retention reports and reminders are in the document."
+      "free_stops": "The retention reports and reminders are in the document.",
+      "extra_ideas": [
+        {
+          "text": "Compare term-to-term returns for music, art and dance separately, so you spot where children are leaving fastest.",
+          "review": false
+        },
+        {
+          "text": "Keep one leaving-reason page at reception, so staff note the main cause each time a family stops classes.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_capacity",
@@ -102,7 +142,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "How slots and pricing for hire are set up is kept for the document."
+      "free_stops": "How slots and pricing for hire are set up is kept for the document.",
+      "extra_ideas": [
+        {
+          "text": "Walk through the school at the same weekday hours and on Saturday, so the empty rooms and crowded periods are easy to compare.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of offering quieter weekday slots when parents ask, so Saturday pressure eases during normal booking chats.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_commission_disputes",
@@ -123,7 +173,17 @@
         "leads_with_view": true
       },
       "ask_first": "",
-      "free_stops": "The pay rules are in the document."
+      "free_stops": "The pay rules are in the document.",
+      "extra_ideas": [
+        {
+          "text": "Compare each teacher's own lesson tally with the office tally before pay time, so mismatches are caught before arguments start.",
+          "review": false
+        },
+        {
+          "text": "Keep one commission record in one notebook with one owner, so monthly pay talks rely on the same figures.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_tasks_dropped",
@@ -143,7 +203,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The planner stages are kept for the document."
+      "free_stops": "The planner stages are kept for the document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many recital jobs were mentioned in chat but never written on a list, so the weak handover point shows.",
+          "review": false
+        },
+        {
+          "text": "Keep one recital task page in the office and update it after each planning chat, so chat messages stop acting like the master list.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_shrinkage_theft",
@@ -163,7 +233,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "How condition and deposits are tracked is in the document."
+      "free_stops": "How condition and deposits are tracked is in the document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many rental instruments are out without a written return date, so you know the scale of loose tracking.",
+          "review": false
+        },
+        {
+          "text": "Make one staff member check returns against one notebook at handover time, so missing or damaged instruments are noticed the same day.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_receivables_late",
@@ -183,7 +263,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The reminder timing and wording are kept for the document."
+      "free_stops": "The reminder timing and wording are kept for the document.",
+      "extra_ideas": [
+        {
+          "text": "Note how many fee reminders go out after lessons have already happened, so you see where chasing is starting too late.",
+          "review": false
+        },
+        {
+          "text": "Set one regular time each week for fee follow-ups from the school side, so reminders feel routine instead of personal.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p10_slow_response",
@@ -203,7 +293,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The reply flow and booking page are in the document."
+      "free_stops": "The reply flow and booking page are in the document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many booking messages arrive after teaching hours this week, so you can see when reply delays really start.",
+          "review": false
+        },
+        {
+          "text": "Keep one notebook by the phone for booking enquiries, so anyone on duty can reply without hunting through old chats.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

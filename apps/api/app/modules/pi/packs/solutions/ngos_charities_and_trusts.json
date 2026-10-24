@@ -2,7 +2,7 @@
   "industry": "ngos_charities_and_trusts",
   "name": "NGOs, charities and trusts",
   "sector": "7.M Digital economy, social and public sector",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_cash_mismatch",
@@ -22,7 +22,17 @@
         "tool_words": []
       },
       "ask_first": "What are the main ways donations come in?",
-      "free_stops": "How each channel feeds the register is set out in the solution document."
+      "free_stops": "How each channel feeds the register is set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare one week's donation notes against what reached your records from each channel, so the hardest matching point stands out.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of noting every donation in one running list each day, so matching stops starting from scattered scraps.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_customer_communication",
@@ -42,7 +52,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The receipt flow goes in the solution document; receipting rules are for your accountant."
+      "free_stops": "The receipt flow goes in the solution document; receipting rules are for your accountant.",
+      "extra_ideas": [
+        {
+          "text": "Count how many receipt requests are still waiting from the past week, so you can see today's true backlog.",
+          "review": false
+        },
+        {
+          "text": "Give one person one daily time to clear receipt requests from one list, so donors stop waiting for scattered follow-ups.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_quality_inconsistent",
@@ -63,7 +83,17 @@
         "leads_with_view": true
       },
       "ask_first": "",
-      "free_stops": "The fund structure in the system is designed in the solution document; rulings stay with your scholars."
+      "free_stops": "The fund structure in the system is designed in the solution document; rulings stay with your scholars.",
+      "extra_ideas": [
+        {
+          "text": "Count how many entries in this week's record do not clearly show fund type, so separation problems are visible before reporting.",
+          "review": false
+        },
+        {
+          "text": "Keep one separate running page for each fund type, so your team can record incoming and outgoing amounts without mixing lines.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_manual_reports",
@@ -83,7 +113,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The report templates and tagging set-up are prepared in the solution document."
+      "free_stops": "The report templates and tagging set-up are prepared in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note which report sections took the longest in the last grant report, so you can see where team time is really going.",
+          "review": false
+        },
+        {
+          "text": "Give one person one place to collect grant notes and spending papers all month, so report writing stops becoming a team chase.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_churn_subscription",
@@ -103,7 +143,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The flagging rules and update plan go in the solution document."
+      "free_stops": "The flagging rules and update plan go in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare this month's regular donor arrivals with last month's pattern, so missed giving is noticed while follow-up still feels timely.",
+          "review": false
+        },
+        {
+          "text": "Give one person one weekly check of regular donor arrivals in one notebook, so drop-offs stop passing unnoticed for too long.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_duplicate_entry",
@@ -123,7 +173,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The case flow and privacy controls are detailed in the solution document."
+      "free_stops": "The case flow and privacy controls are detailed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare this week's approved help lists from both centres for repeated household references, so double support risk is spotted early.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of keeping one shared approval list for both centres, so teams stop approving the same case separately.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_shrinkage_theft",
@@ -144,7 +204,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The count and matching process is set out in the solution document."
+      "free_stops": "The count and matching process is set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count packs at loading and again at handout end during the next distribution, so losses show at the exact stage.",
+          "review": false
+        },
+        {
+          "text": "Give one person one written handover list for packs leaving storage and reaching distribution, so missing stock has a clear checkpoint.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_field_team_visibility",
@@ -164,7 +234,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The form fields and log design go in the solution document."
+      "free_stops": "The form fields and log design go in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many field updates from this week cannot be found without scrolling old chats, so the recording gap feels real.",
+          "review": false
+        },
+        {
+          "text": "Give one person one notebook to log each field update by day, so follow-up facts are findable during donor and manager calls.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_seasonal_planning",
@@ -185,7 +265,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The Ramadan plan and daily read layout are prepared in the solution document."
+      "free_stops": "The Ramadan plan and daily read layout are prepared in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count the tasks that were left late last Ramadan, so you can see which pressure points keep returning.",
+          "review": false
+        },
+        {
+          "text": "Give one person one running Ramadan readiness list reviewed at the same time each week, so preparation stops drifting until the rush.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p10_licences_renewals",
@@ -205,7 +295,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The calendar set-up goes in the solution document; what must be filed is for your lawyer or accountant."
+      "free_stops": "The calendar set-up goes in the solution document; what must be filed is for your lawyer or accountant.",
+      "extra_ideas": [
+        {
+          "text": "Count how many renewals and filings landed late in the past year, so you see which deadlines keep catching the team.",
+          "review": false
+        },
+        {
+          "text": "Keep one notebook for every renewal and filing date, with one staff role owning updates, so deadlines stop slipping quietly.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

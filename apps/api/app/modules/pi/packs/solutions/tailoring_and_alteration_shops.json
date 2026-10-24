@@ -2,7 +2,7 @@
   "industry": "tailoring_and_alteration_shops",
   "name": "Tailoring and alteration shops",
   "sector": "7.H Hospitality, events and personal services",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_capacity",
@@ -22,7 +22,17 @@
         "tool_words": []
       },
       "ask_first": "How many karigars work for you?",
-      "free_stops": "Capacity rules are in the solution document."
+      "free_stops": "Capacity rules are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "This week, count how many promised pieces are still unfinished each evening, so you see your real Eid backlog before accepting more.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of writing every promised delivery date in one notebook, so new bookings match what the team can finish.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_delivery_late",
@@ -43,7 +53,17 @@
         "tool_words": []
       },
       "ask_first": "How do you record orders now?",
-      "free_stops": "Status flow stays for the solution document."
+      "free_stops": "Status flow stays for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Each morning, count how many orders due this week are still at cutting, stitching or finishing, so delays show before collection day.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of checking tomorrow's promised orders before closing, so missing work is chased while there is still time.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_orders_lost",
@@ -63,7 +83,17 @@
         "tool_words": []
       },
       "ask_first": "Do customers bring their own fabric?",
-      "free_stops": "Slip setup is in the solution document."
+      "free_stops": "Slip setup is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "This week, note each time a slip or fabric bundle takes extra time to find, so you see where orders get separated.",
+          "review": false
+        },
+        {
+          "text": "Keep all new order slips in one counter folder until handover to the workshop, so fabric and paperwork travel together.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_rework",
@@ -83,7 +113,17 @@
         "tool_words": []
       },
       "ask_first": "Who takes measurements?",
-      "free_stops": "Log setup stays for the solution document."
+      "free_stops": "Log setup stays for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "For one week, mark each redone suit by reason in a notebook, so you see whether errors start at measuring, cutting or stitching.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of checking the slip against the garment before handover, so avoidable rework is caught before fitting.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_payroll_errors",
@@ -103,7 +143,17 @@
         "tool_words": []
       },
       "ask_first": "How often do you pay karigars?",
-      "free_stops": "Payout rules are in the solution document."
+      "free_stops": "Payout rules are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "For one pay cycle, compare each karigar's finished pieces with what was assigned daily, so disputed totals are easier to trace.",
+          "review": false
+        },
+        {
+          "text": "Keep one notebook for pieces given out and returned, with one person updating it daily, so payday totals come from one record.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_stockout",
@@ -123,7 +173,17 @@
         "tool_words": []
       },
       "ask_first": "Which items run out most?",
-      "free_stops": "Reorder levels stay for the solution document."
+      "free_stops": "Reorder levels stay for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "This week, note every time work pauses for missing buttons, lining or thread, so you see which shortage interrupts stitching most.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of checking the accessories shelf before closing and writing shortages in one place, so replenishment gets noticed earlier.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_receivables_late",
@@ -143,7 +203,17 @@
         "tool_words": []
       },
       "ask_first": "How much advance do you take?",
-      "free_stops": "Reminder timing is in the solution document."
+      "free_stops": "Reminder timing is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "This week, count uncollected finished orders hanging in the shop each evening, so you see how much cash is waiting on collection.",
+          "review": false
+        },
+        {
+          "text": "Keep one notebook of all ready but uncollected orders at the counter, so staff can follow up from one place.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_chat_overload",
@@ -163,7 +233,17 @@
         "tool_words": []
       },
       "ask_first": "How many orders do you deliver a day?",
-      "free_stops": "Message flow stays for the solution document."
+      "free_stops": "Message flow stays for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "For one week, note how many readiness calls come before noon and after noon, so you see when interruptions hit the counter hardest.",
+          "review": false
+        },
+        {
+          "text": "Give one person a fixed time to check which clothes are ready and update the counter list, so every caller gets the same answer quickly.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_branches_not_aligned",
@@ -183,7 +263,17 @@
         "tool_words": []
       },
       "ask_first": "How far is the workshop from the shop?",
-      "free_stops": "Tracking setup is in the solution document."
+      "free_stops": "Tracking setup is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "This week, compare the shop's promised orders with the workshop's received bundles each evening, so missing handovers show the same day.",
+          "review": false
+        },
+        {
+          "text": "Set one fixed handover time for slips and fabric between shop and workshop, so both sides work from the same day's list.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p10_cash_mismatch",
@@ -203,7 +293,17 @@
         "tool_words": []
       },
       "ask_first": "Who handles the drawer?",
-      "free_stops": "Reconciliation rules stay for the solution document."
+      "free_stops": "Reconciliation rules stay for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "For one week, note slip totals and drawer cash at closing on one page, so you see when mismatches usually start.",
+          "review": false
+        },
+        {
+          "text": "Make one person close the drawer and file all slips in one envelope each evening, so checking stops changing by shift.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

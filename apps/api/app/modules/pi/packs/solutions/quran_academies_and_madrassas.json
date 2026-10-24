@@ -2,7 +2,7 @@
   "industry": "quran_academies_and_madrassas",
   "name": "Quran academies and madrassas (administration)",
   "sector": "7.J Education and childcare",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_record_keeping",
@@ -22,7 +22,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The ledger structure and receipt flow are kept for the document."
+      "free_stops": "The ledger structure and receipt flow are kept for the document.",
+      "extra_ideas": [
+        {
+          "text": "Count this week's donations by cash, bank and mobile wallet in one notebook, so unclear donor records can be tied to the right channel.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of noting each donation channel in one register daily, so donor records stay together for receipt checks.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_cash_mismatch",
@@ -42,7 +52,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "How funds are tagged and reported is in the document."
+      "free_stops": "How funds are tagged and reported is in the document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many entries this week do not clearly show zakat or general donation, so the mixing problem has a clear size.",
+          "review": false
+        },
+        {
+          "text": "Keep zakat and general donations on separate pages in one register from today, so reviews stop stumbling over mixed entries.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_receivables_late",
@@ -62,7 +82,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The reminder timing and wording are kept for the document."
+      "free_stops": "The reminder timing and wording are kept for the document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many fee reminders were sent after the due day this week, so you see how often awkward chasing starts late.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member a fixed weekly time to send all fee reminders from the office, so follow-up feels routine rather than personal.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_shift_scheduling",
@@ -82,7 +112,17 @@
         "tool_words": []
       },
       "ask_first": "Are class times kept in one place or by each teacher?",
-      "free_stops": "How time zones and reminders are handled is in the document."
+      "free_stops": "How time zones and reminders are handled is in the document.",
+      "extra_ideas": [
+        {
+          "text": "Compare this week's missed or moved classes with families affected by clock changes, so the scheduling disruption is clear.",
+          "review": false
+        },
+        {
+          "text": "Keep one written schedule update time before each clock change and give one person the handover, so class timings stop shifting unevenly.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_payroll_errors",
@@ -102,7 +142,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "How the rules feed teacher pay is kept for the document."
+      "free_stops": "How the rules feed teacher pay is kept for the document.",
+      "extra_ideas": [
+        {
+          "text": "Note each last minute family cancellation beside the affected teacher this week, so pay disagreements are based on a visible record.",
+          "review": false
+        },
+        {
+          "text": "Give one person the cancellation list and one weekly handover time to accounts, so teacher pay stops changing with scattered messages.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_attendance_lateness",
@@ -122,7 +172,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "How attendance is pulled from meeting logs is in the document."
+      "free_stops": "How attendance is pulled from meeting logs is in the document.",
+      "extra_ideas": [
+        {
+          "text": "Count night messages about missed online classes for one week, so you can see how much owner time lateness is taking.",
+          "review": false
+        },
+        {
+          "text": "Set one evening cutoff for class issues and give one staff member the handover, so families stop messaging you late at night.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_lead_followup_slow",
@@ -142,7 +202,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The follow-up timings are kept for the document."
+      "free_stops": "The follow-up timings are kept for the document.",
+      "extra_ideas": [
+        {
+          "text": "Count trial classes from this week that received no follow-up note by the next day, so missed conversions are easier to spot.",
+          "review": false
+        },
+        {
+          "text": "Give one person the trial follow-up notebook and one daily check time, so every interested family gets a timely response.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_payment_methods",
@@ -162,7 +232,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The payment setup and retry flow are in the document."
+      "free_stops": "The payment setup and retry flow are in the document.",
+      "extra_ideas": [
+        {
+          "text": "Note each failed or reversed international payment in one list this week, so you can see which families need a different collection route.",
+          "review": true
+        },
+        {
+          "text": "Give one person the job of checking failed payments at a fixed time, so unpaid months stop slipping past unnoticed.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_stockout",
@@ -182,7 +262,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The reorder levels are kept for the document."
+      "free_stops": "The reorder levels are kept for the document.",
+      "extra_ideas": [
+        {
+          "text": "Compare ration issued this week with what remains in store, so the kitchen can see how early month-end shortages begin.",
+          "review": false
+        },
+        {
+          "text": "Make one person update one kitchen stock notebook after each issue, so ration use is tracked before shelves run short.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p10_petty_cash",
@@ -202,7 +292,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The approval and reporting flow is in the document."
+      "free_stops": "The approval and reporting flow is in the document.",
+      "extra_ideas": [
+        {
+          "text": "Note each kitchen cash purchase in a notebook with item and reason this week, so missing bills stop hiding where money goes.",
+          "review": false
+        },
+        {
+          "text": "Make one staff member hand over kitchen cash notes to one notebook every evening, so spending is recorded while details are fresh.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p11_manual_reports",
@@ -222,7 +322,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "How the summary is put together is kept for the document."
+      "free_stops": "How the summary is put together is kept for the document.",
+      "extra_ideas": [
+        {
+          "text": "Mark how long hand preparation takes for this month's trustees' accounts, so you can see where administration time is being lost.",
+          "review": false
+        },
+        {
+          "text": "Keep one monthly accounts notebook on your desk and give one person the update job, so trustee reporting stops piling up at month end.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

@@ -2,7 +2,7 @@
   "industry": "pharmaceutical_manufacturing",
   "name": "Pharmaceutical manufacturing",
   "sector": "7.D Manufacturing and industry (part 2)",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_returns_handling",
@@ -22,7 +22,17 @@
         "tool_words": []
       },
       "ask_first": "Who approves returns today?",
-      "free_stops": "The approval rules and checks are in the solution document."
+      "free_stops": "The approval rules and checks are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many near-expiry returns arrived from each distributor this week, so you see where full-credit pressure is heaviest.",
+          "review": true
+        },
+        {
+          "text": "Give one staff member one notebook for all return claims, so disputed credits stop bouncing between sales and warehouse.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_serial_batch_tracking",
@@ -42,7 +52,17 @@
         "tool_words": []
       },
       "ask_first": "How many distributors do you work with?",
-      "free_stops": "The register design is in the solution document."
+      "free_stops": "The register design is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Walk the dispatch area and note which batch details are missing on recent distributor dispatch papers, so the tracking gap shows.",
+          "review": false
+        },
+        {
+          "text": "Make one dispatcher responsible for writing batch details on every distributor dispatch note, so stock location can be traced later.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_expiry_wastage",
@@ -62,7 +82,17 @@
         "tool_words": []
       },
       "ask_first": "Do distributors share stock by batch with you?",
-      "free_stops": "The alert timing is in the solution document."
+      "free_stops": "The alert timing is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count packs in your warehouse expiring soon by product and batch, so year-end write-offs are easier to spot early.",
+          "review": false
+        },
+        {
+          "text": "Give one store person a fixed weekly check of near-expiry shelves, so older batches get attention before they turn into write-offs.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_import_delays",
@@ -82,7 +112,17 @@
         "tool_words": []
       },
       "ask_first": "Which inputs cause the most delays?",
-      "free_stops": "Cover levels and tracked stages are in the solution document."
+      "free_stops": "Cover levels and tracked stages are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "List every open imported input consignment with its current hold point, so you see which product shortage is nearest.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of noting every port follow-up in one place, so production hears delays without chasing around.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_field_team_visibility",
@@ -104,7 +144,17 @@
         ]
       },
       "ask_first": "How many reps are in the field?",
-      "free_stops": "The reporting format and manager views are in the solution document."
+      "free_stops": "The reporting format and manager views are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare each rep's reported doctor area visits with sample issue records for the same towns, so weak reporting stands out quickly.",
+          "review": true
+        },
+        {
+          "text": "Give one manager a fixed weekly review of field visit notes, so rep reporting gets checked the same way every time.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_receivables_late",
@@ -124,7 +174,17 @@
         "tool_words": []
       },
       "ask_first": "Which distributors are slowest to pay?",
-      "free_stops": "The ledger and reminder rules are in the solution document."
+      "free_stops": "The ledger and reminder rules are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note which distributors requested return offsets against unpaid balances this week, so you see who is stretching payment most.",
+          "review": true
+        },
+        {
+          "text": "Keep one page per distributor for payments and return claims together, so arguments over balances stop restarting each call.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_licences_renewals",
@@ -144,7 +204,17 @@
         "tool_words": []
       },
       "ask_first": "Has a renewal ever been missed?",
-      "free_stops": "The reminder and document set-up is in the solution document."
+      "free_stops": "The reminder and document set-up is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Write all upcoming renewal items and their months in one notebook page, so the workload ahead is clear at a glance.",
+          "review": false
+        },
+        {
+          "text": "Give one admin person the job of updating one renewal list every Friday, so dates stop getting missed in scattered files.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_data_scattered",
@@ -165,7 +235,17 @@
         "tool_words": []
       },
       "ask_first": "How often do you get secondary sales now?",
-      "free_stops": "The template and merge logic are in the solution document."
+      "free_stops": "The template and merge logic are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count which distributors sent sales figures late or in mixed layouts this cycle, so the worst reporting delays are obvious.",
+          "review": false
+        },
+        {
+          "text": "Choose one staff member to collect all distributor sales figures into one notebook every cycle, so comparison stops waiting on scattered messages.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_discount_abuse",
@@ -185,7 +265,17 @@
         "tool_words": []
       },
       "ask_first": "How are schemes recorded against orders now?",
-      "free_stops": "The scheme rules set-up is in the solution document."
+      "free_stops": "The scheme rules set-up is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note every live distributor bonus scheme on one page and compare them by product, so inconsistencies are easier to catch.",
+          "review": false
+        },
+        {
+          "text": "Give one sales admin person the job of recording each promised bonus in one place, so distributor claims match what was actually offered.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

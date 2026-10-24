@@ -2,7 +2,7 @@
   "industry": "home_healthcare_and_nursing_agencies",
   "name": "Home healthcare and nursing agencies",
   "sector": "7.I Health and care",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_attendance_lateness",
@@ -22,7 +22,17 @@
         "tool_words": []
       },
       "ask_first": "How long after a shift starts do you usually find out?",
-      "free_stops": "Check-in timing and alert rules are in the solution document."
+      "free_stops": "Check-in timing and alert rules are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note this week's family calls about missing arrivals by shift time and area, so you see where late discovery happens most.",
+          "review": false
+        },
+        {
+          "text": "Give one coordinator the job of checking all shift arrivals at one fixed time, so angry family calls stop being your alert.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_bottleneck",
@@ -42,7 +52,17 @@
         "tool_words": []
       },
       "ask_first": "How many coordinators handle night calls?",
-      "free_stops": "Matching rules are in the solution document."
+      "free_stops": "Matching rules are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many staff are contacted before each night replacement is filled this week, so the scramble size is clear.",
+          "review": false
+        },
+        {
+          "text": "Give one night person the replacement list in one chat thread, so handovers stay orderly when a shift opens suddenly.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_receivables_late",
@@ -62,7 +82,17 @@
         "tool_words": []
       },
       "ask_first": "Do families pay monthly or per week?",
-      "free_stops": "Reminder timing and invoice format are in the solution document."
+      "free_stops": "Reminder timing and invoice format are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note this week's paid and unpaid accounts by whether service has ended or is still running, so post-recovery chasing effort is sized clearly.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member a fixed weekly slot to review ended cases in one notebook, so unpaid balances are chased before files go quiet.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_cash_mismatch",
@@ -82,7 +112,17 @@
         "tool_words": []
       },
       "ask_first": "How are deposits settled when a placement ends?",
-      "free_stops": "Settlement rules are in the solution document."
+      "free_stops": "Settlement rules are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many open advances and deposits have no written entry today, so the exposure is clear at a glance.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member one deposit notebook kept at the desk, so every advance and return lands in the same place.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_payroll_errors",
@@ -103,7 +143,17 @@
         "leads_with_view": true
       },
       "ask_first": "Are staff paid monthly or per shift?",
-      "free_stops": "How rules are encoded is in the solution document."
+      "free_stops": "How rules are encoded is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count this week's pay corrections by error type from shift notes and confirmations, so you see which handoff is creating most rework.",
+          "review": false
+        },
+        {
+          "text": "Give one supervisor the job of writing each worker's final weekly shift total in one notebook, so pay starts from one agreed count.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_serial_batch_tracking",
@@ -123,7 +173,17 @@
         "tool_words": []
       },
       "ask_first": "Roughly how many rental items are out now?",
-      "free_stops": "Register fields and billing link are in the solution document."
+      "free_stops": "Register fields and billing link are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Walk the store and count rental items physically present against items written as available, so missing equipment stands out quickly.",
+          "review": false
+        },
+        {
+          "text": "Give one dispatcher the issue and return log in one notebook, so each rental item has a clear latest location.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_record_keeping",
@@ -143,7 +203,17 @@
         "tool_words": []
       },
       "ask_first": "Who tracks staff documents today?",
-      "free_stops": "Reminder schedule is in the solution document; labour and visa questions go to your adviser."
+      "free_stops": "Reminder schedule is in the solution document; labour and visa questions go to your adviser.",
+      "extra_ideas": [
+        {
+          "text": "Count how many staff document expiries fall within the next few weeks, so the renewal workload is visible now.",
+          "review": false
+        },
+        {
+          "text": "Give one admin worker one expiry list reviewed every week, so renewals stop being noticed only when a shift needs covering.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_lead_followup_slow",
@@ -163,7 +233,17 @@
         "tool_words": []
       },
       "ask_first": "Do most enquiries come from hospitals or families?",
-      "free_stops": "The intake questions are designed in the solution document."
+      "free_stops": "The intake questions are designed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note after-hours enquiries and the time until any reply for one week, so the overnight response delay is concrete.",
+          "review": false
+        },
+        {
+          "text": "Give one night coordinator the on-call handover at a fixed evening time, so midnight enquiries always have a named owner.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_pricing_errors",
@@ -183,7 +263,17 @@
         "tool_words": []
       },
       "ask_first": "How many coordinators quote rates?",
-      "free_stops": "Exception rules are in the solution document."
+      "free_stops": "Exception rules are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare this week's family quotes for the same visit length across coordinators, so you can see exactly where promised rates are drifting.",
+          "review": false
+        },
+        {
+          "text": "Give one coordinator the end-of-day job of noting every promised rate in one notebook, so unusual quotes are caught while conversations are still fresh.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p10_owner_blind",
@@ -203,7 +293,17 @@
         "tool_words": []
       },
       "ask_first": "Do you cover one city or several?",
-      "free_stops": "Which numbers appear is set in the solution document."
+      "free_stops": "Which numbers appear is set in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many active placements are written in three different places today, so you see where reporting is breaking.",
+          "review": false
+        },
+        {
+          "text": "Give one coordinator a same-time daily placement update in one notebook, so you can check live work without chasing everyone.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

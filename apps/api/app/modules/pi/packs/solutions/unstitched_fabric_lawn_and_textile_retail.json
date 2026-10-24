@@ -2,7 +2,7 @@
   "industry": "unstitched_fabric_lawn_and_textile_retail",
   "name": "Unstitched fabric, lawn and textile retail",
   "sector": "7.A Retail and consumer (part 1)",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_no_visibility",
@@ -22,7 +22,17 @@
         "tool_words": []
       },
       "ask_first": "Do you sell mostly pre-cut suits or by the metre?",
-      "free_stops": "How each roll is coded and sales are recorded at the counter is in the solution document."
+      "free_stops": "How each roll is coded and sales are recorded at the counter is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare the opening and closing length of a few busy rolls once, so missing gaz from rough cutting stands out.",
+          "review": false
+        },
+        {
+          "text": "Give one cutter the notebook for roll balance notes, so staff stop guessing what remains on each than.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_wastage_cost",
@@ -43,7 +53,17 @@
         "leads_with_view": true
       },
       "ask_first": "What happens to cut pieces today?",
-      "free_stops": "How cut pieces are captured and reported is in the solution document."
+      "free_stops": "How cut pieces are captured and reported is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many cut pieces have been untouched since last week, so you see how much saleable cloth is lying idle.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member the job of keeping all cut pieces in one marked spot, so usable stock gets shown sooner.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_overstock_dead_stock",
@@ -64,7 +84,17 @@
         "leads_with_view": true
       },
       "ask_first": "How much is left from last season?",
-      "free_stops": "How sell-through is tracked and when designs are flagged is in the solution document."
+      "free_stops": "How sell-through is tracked and when designs are flagged is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Walk the godown and note which old designs appear in repeated piles, so the slowest season leftovers are clear.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of updating a single dead stock notebook, so old season volume stops getting overlooked.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_supplier_late",
@@ -84,7 +114,17 @@
         "tool_words": []
       },
       "ask_first": "How late are they usually?",
-      "free_stops": "The stages and alert points are in the solution document."
+      "free_stops": "The stages and alert points are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note which designs are still waiting at the printing unit this week, so you see what is delaying the season launch.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member the job of keeping all launch due notes in one notebook, so follow-up stays timely.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_receivables_late",
@@ -104,7 +144,17 @@
         "tool_words": []
       },
       "ask_first": "How many buyers take goods on credit?",
-      "free_stops": "How buyers are coded, limits enforced and statements sent is in the solution document."
+      "free_stops": "How buyers are coded, limits enforced and statements sent is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many boutique parcels left on credit this week and how many old dues came back, so cash pressure for fresh stock shows.",
+          "review": true
+        },
+        {
+          "text": "Keep one notebook at the counter for every boutique balance and give one staff member the update duty, so follow-up stays clear at packing time.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_pricing_errors",
@@ -124,7 +174,17 @@
         "tool_words": []
       },
       "ask_first": "Are prices fixed or bargained today?",
-      "free_stops": "How prices are shown and discounts logged is in the solution document."
+      "free_stops": "How prices are shown and discounts logged is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note the rate quoted for the same design by different salesmen once, so the size of rate variation shows.",
+          "review": false
+        },
+        {
+          "text": "Give one senior salesman the job of keeping the daily design rates in one notebook, so every counter starts alike.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_commission_disputes",
@@ -145,7 +205,17 @@
         "leads_with_view": true
       },
       "ask_first": "How is commission worked out now?",
-      "free_stops": "How sales are tied to salesmen and commission calculated is in the solution document."
+      "free_stops": "How sales are tied to salesmen and commission calculated is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare a few sales slips with the commission paper once, so the mismatch causing arguments becomes visible.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of writing the salesman name on every sale record, so commission totals are easier to settle.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_order_errors",
@@ -165,7 +235,17 @@
         "tool_words": []
       },
       "ask_first": "Where do you sell online?",
-      "free_stops": "How shop and online stock are connected is in the solution document."
+      "free_stops": "How shop and online stock are connected is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many launch orders could not be matched with set-aside stock once, so overselling on launch day is clear.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of maintaining one launch stock list, so order taking follows what is actually available.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_branches_not_aligned",
@@ -186,7 +266,17 @@
         "leads_with_view": true
       },
       "ask_first": "How many shops are there?",
-      "free_stops": "Which numbers each shop sees and how they're collected is in the solution document."
+      "free_stops": "Which numbers each shop sees and how they're collected is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare which numbers each shop actually shared this week once, so the missing branch updates are obvious.",
+          "review": false
+        },
+        {
+          "text": "Give one brother the job of writing all shops' weekly numbers in one notebook, so branch discussions stay on the same page.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

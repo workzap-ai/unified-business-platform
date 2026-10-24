@@ -2,7 +2,7 @@
   "industry": "accounting_audit_and_tax_practices",
   "name": "Accounting, audit and tax practices",
   "sector": "7.K Professional and business services",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_capacity",
@@ -23,7 +23,17 @@
         "tool_words": []
       },
       "ask_first": "Roughly how many of your clients are monthly retainers versus one-off filings?",
-      "free_stops": "the exact stages, chaser timing and how the board is split by staff member go into the solution document."
+      "free_stops": "the exact stages, chaser timing and how the board is split by staff member go into the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many return files arrived in the final week last season, so you see how much the rush is driven by timing.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member the job of noting missing papers on one office list daily, so late clients get chased before the pile-up grows.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_info_lost_in_whatsapp",
@@ -43,7 +53,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "how files are matched to clients and jobs, and the acknowledgement flow, are set out in the solution document."
+      "free_stops": "how files are matched to clients and jobs, and the acknowledgement flow, are set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note for one week which client papers arrive as chat photos and where they were saved, so missing items stop being guessed.",
+          "review": false
+        },
+        {
+          "text": "Make one staff member responsible for recording every document received in one notebook, so everyone can check what actually came in.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_no_dashboard",
@@ -64,7 +84,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "which stages to track and when a job counts as stuck are worked out for your practice in the solution document."
+      "free_stops": "which stages to track and when a job counts as stuck are worked out for your practice in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Walk round every open file and note its current stage and holder on one page, so blocked work stops hiding between desks.",
+          "review": false
+        },
+        {
+          "text": "Set one fixed time each day for updating the open jobs list, so everyone works from the same current picture.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_owner_bottleneck",
@@ -84,7 +114,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "the review levels, checklists and escalation timings are kept for the solution document."
+      "free_stops": "the review levels, checklists and escalation timings are kept for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note which files waited for your sign-off this week and what type of work they were, so the biggest review choke points stand out.",
+          "review": false
+        },
+        {
+          "text": "Keep one tray or one list for items needing your sign-off, so staff stop chasing you in scattered moments.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_receivables_late",
@@ -104,7 +144,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "the reminder sequence and how it links to your invoicing are designed in the solution document."
+      "free_stops": "the reminder sequence and how it links to your invoicing are designed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many bookkeeping invoices stay unpaid past each monthly review, so you see whether delay starts after sending or after follow-up.",
+          "review": false
+        },
+        {
+          "text": "Keep all overdue bookkeeping invoices on one paper list with one staff owner, so every caller sees the same next action.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_margin_unknown",
@@ -125,7 +175,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "how time is captured without slowing staff, and how the profitability view is calculated, are left for the solution document."
+      "free_stops": "how time is captured without slowing staff, and how the profitability view is calculated, are left for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Have staff mark start and finish times for flat-fee year-end jobs this week, so the heaviest clients show up fast.",
+          "review": false
+        },
+        {
+          "text": "Give one person one notebook for flat-fee job time notes each day, so fee decisions use fresh work patterns.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_hidden_costs",
@@ -145,7 +205,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "how scope is defined per service and how extras flow into invoices are covered in the solution document."
+      "free_stops": "how scope is defined per service and how extras flow into invoices are covered in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare this week's extra report requests with what each retainer usually covers, so unpaid work outside scope stands out clearly.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member one running list of extra report requests by retainer client, so fee review talks use examples.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_licences_renewals",
@@ -165,7 +235,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "reminder timings and how deadlines are loaded and kept current are set out in the solution document."
+      "free_stops": "reminder timings and how deadlines are loaded and kept current are set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many filing dates sit only in old messages or notebooks today, so you see the real exposure to missed deadlines.",
+          "review": false
+        },
+        {
+          "text": "Keep every upcoming filing date in one office notebook with one owner beside each, so responsibility stays clear all week.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_data_loss",
@@ -185,7 +265,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "the folder structure, access roles and backup routine are designed in the solution document."
+      "free_stops": "the folder structure, access roles and backup routine are designed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "List where client files currently sit across the laptop, the drive and any paper piles, so single points of failure are easier to spot.",
+          "review": false
+        },
+        {
+          "text": "Give one person a weekly check of where the latest client files were placed, so storage stops drifting across places.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

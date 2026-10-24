@@ -2,7 +2,7 @@
   "industry": "solar_epc_and_installers",
   "name": "Solar EPC and installers",
   "sector": "7.F Construction, real estate and facilities",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_price_increases_supplier",
@@ -22,7 +22,17 @@
         "tool_words": []
       },
       "ask_first": "How long is a quote valid for today?",
-      "free_stops": "Pricing logic and validity rules are in the solution document."
+      "free_stops": "Pricing logic and validity rules are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare this week's supplier rates with your still-open quotes, so you spot which pending jobs could wipe out margin.",
+          "review": false
+        },
+        {
+          "text": "Keep one notebook page for open quotes awaiting supplier price checks each morning, so outdated offers get caught before acceptance.",
+          "review": true
+        }
+      ]
     },
     {
       "id": "p2_customer_communication",
@@ -43,7 +53,17 @@
         "tool_words": []
       },
       "ask_first": "Roughly how many files are pending right now?",
-      "free_stops": "Stages, document lists and message triggers are in the solution document."
+      "free_stops": "Stages, document lists and message triggers are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note how many status calls come in before noon about pending net metering files, so the daily interruption load becomes visible.",
+          "review": false
+        },
+        {
+          "text": "Give one office person the midday update round for pending files, so incoming calls reduce and the team keeps working.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_serial_batch_tracking",
@@ -64,7 +84,17 @@
         "tool_words": []
       },
       "ask_first": "Do you hold stock or buy per order?",
-      "free_stops": "How serials link to stock and jobs is in the solution document."
+      "free_stops": "How serials link to stock and jobs is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count recent completed jobs missing panel or inverter label photos, so you see the warranty record backlog clearly.",
+          "review": false
+        },
+        {
+          "text": "Make the site supervisor responsible for sending label photos before leaving each completed job, so warranty proof reaches the office reliably.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_lead_quality",
@@ -84,7 +114,17 @@
         "tool_words": []
       },
       "ask_first": "How do enquiries come in?",
-      "free_stops": "The question set and lead scoring are in the solution document."
+      "free_stops": "The question set and lead scoring are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many fresh enquiries ask only for a price and never discuss a site visit, so weak leads are separated early.",
+          "review": true
+        },
+        {
+          "text": "Give one person the morning callback list and one notebook page for serious enquiries, so survey time goes to stronger prospects.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_manual_work",
@@ -104,7 +144,17 @@
         "tool_words": []
       },
       "ask_first": "Who prepares quotes today?",
-      "free_stops": "Package structure and survey fields are in the solution document; system sizing stays with a qualified engineer."
+      "free_stops": "Package structure and survey fields are in the solution document; system sizing stays with a qualified engineer.",
+      "extra_ideas": [
+        {
+          "text": "Note which quote details staff retype again and again this week, so you see where quoting time is being lost.",
+          "review": false
+        },
+        {
+          "text": "Assign one daily handover time for survey notes to the quoting person, so quotes stop waiting across the whole day.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_shift_scheduling",
@@ -124,7 +174,17 @@
         "tool_words": []
       },
       "ask_first": "How many installation teams do you have?",
-      "free_stops": "Scheduling rules are in the solution document."
+      "free_stops": "Scheduling rules are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many jobs changed crew or timing after the evening plan this week, so the main source of clashes stands out.",
+          "review": false
+        },
+        {
+          "text": "Make one supervisor own the next-day crew board before closing time, so no site waits because two teams were sent elsewhere.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_receivables_late",
@@ -144,7 +204,17 @@
         "tool_words": []
       },
       "ask_first": "How is payment split today?",
-      "free_stops": "Milestone structure and reminder timing are in the solution document."
+      "free_stops": "Milestone structure and reminder timing are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many installed jobs still have balance pending after handover this week, so you see where cash is getting stuck.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member the balance-follow-up notebook and a fixed daily handover time, so delayed collections stop slipping between teams.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_record_keeping",
@@ -164,7 +234,17 @@
         "tool_words": []
       },
       "ask_first": "What gets recorded before handover?",
-      "free_stops": "Checklist content is in the solution document; technical standards stay with your engineer."
+      "free_stops": "Checklist content is in the solution document; technical standards stay with your engineer.",
+      "extra_ideas": [
+        {
+          "text": "Count completed jobs whose commissioning photos or test records are still only on installers' phones, so missing office files are clear.",
+          "review": false
+        },
+        {
+          "text": "Choose one office chat for all commissioning photos and records the same day, so after-sales can find each job quickly.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_repeat_low",
@@ -187,7 +267,17 @@
         ]
       },
       "ask_first": "Do you offer cleaning or maintenance visits?",
-      "free_stops": "Reminder timing and service offers are in the solution document."
+      "free_stops": "Reminder timing and service offers are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many past installations from earlier months have had no service follow-up note, so the missed repeat-work pool is visible.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member a weekly list of older installations to review, so cleaning and check-up work does not get overlooked.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p10_credit_customers",
@@ -207,7 +297,17 @@
         "tool_words": []
       },
       "ask_first": "How many dealers buy on credit?",
-      "free_stops": "Credit rules and reminders are in the solution document."
+      "free_stops": "Credit rules and reminders are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many dealer balances are past the promised date by city, so you see where late cash is piling up.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member the late dealer follow-up list at a fixed afternoon time, so chasing payments stops slipping.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

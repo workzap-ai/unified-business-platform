@@ -2,7 +2,7 @@
   "industry": "duty_free_and_airport_retail",
   "name": "Duty-free and airport retail",
   "sector": "7.A Retail and consumer (part 2)",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_slow_replenishment",
@@ -23,7 +23,17 @@
         "tool_words": []
       },
       "ask_first": "When are you allowed to bring stock through?",
-      "free_stops": "the planning model and pick-list logic are kept for the solution document."
+      "free_stops": "the planning model and pick-list logic are kept for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Walk the shelves after the morning wave and note the same empty lines each day, so the missed refill pattern becomes visible.",
+          "review": false
+        },
+        {
+          "text": "Give one shift one refill notebook kept on the shop floor, so morning gaps are handed over before the next rush.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_count_mismatch",
@@ -44,7 +54,17 @@
         "tool_words": []
       },
       "ask_first": "How often do you do full counts?",
-      "free_stops": "the count rotation and reconciliation method go in the solution document."
+      "free_stops": "the count rotation and reconciliation method go in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare one category's shelf count with its back room count on the same day, so you see where differences start before month end.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of noting every stock move in one notebook, so counts stop drifting between floor and back room.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_shift_scheduling",
@@ -64,7 +84,17 @@
         "tool_words": []
       },
       "ask_first": "How do you plan rosters today?",
-      "free_stops": "rostering rules are kept for the solution document."
+      "free_stops": "rostering rules are kept for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note customer queues and quiet periods by hour for one week, so staffing follows real departure waves instead of habit.",
+          "review": false
+        },
+        {
+          "text": "Give one person the weekly roster adjustments in one notebook review, so busy waves and quiet nights are handled consistently.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_handoffs",
@@ -84,7 +114,17 @@
         "tool_words": []
       },
       "ask_first": "How is handover done now?",
-      "free_stops": "the checklist content goes in the solution document."
+      "free_stops": "the checklist content goes in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note what the night shift leaves unresolved for one week, so the repeat misses in handover are easy to spot.",
+          "review": false
+        },
+        {
+          "text": "Give one person one handover notebook at shift change, so open issues reach the next team every time.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_cash_mismatch",
@@ -105,7 +145,17 @@
         "tool_words": []
       },
       "ask_first": "How many currencies do you accept?",
-      "free_stops": "the close process and rate flow are kept for the solution document."
+      "free_stops": "the close process and rate flow are kept for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count each currency drawer separately at one close and note the difference beside it, so the mismatch is tied to one drawer.",
+          "review": false
+        },
+        {
+          "text": "Give one person one closeout sheet for all currencies each shift, so balancing stops changing from cashier to cashier.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_checklists_not_done",
@@ -125,7 +175,17 @@
         "tool_words": []
       },
       "ask_first": "How do promotions reach the shop today?",
-      "free_stops": "the checklist workflow goes in the solution document."
+      "free_stops": "the checklist workflow goes in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Walk the floor before peak time and note which live promotions are still incomplete, so missed setups are seen before shoppers arrive.",
+          "review": false
+        },
+        {
+          "text": "Give one person one promotions list per outlet each day, so setup ownership is clear before trading starts.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_manual_reports",
@@ -146,7 +206,17 @@
         "tool_words": []
       },
       "ask_first": "Which reports do you send each month?",
-      "free_stops": "report mapping is kept for the solution document; what the airport requires stays with your contract team."
+      "free_stops": "report mapping is kept for the solution document; what the airport requires stays with your contract team.",
+      "extra_ideas": [
+        {
+          "text": "Write every monthly report on one page with the time each takes, so the heaviest reporting drain is clear.",
+          "review": false
+        },
+        {
+          "text": "Give one person one running notebook for sell-out figures during the month, so month end reporting stops becoming a full day task.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_transfers_lost",
@@ -166,7 +236,17 @@
         "tool_words": []
       },
       "ask_first": "How many outlets do you run?",
-      "free_stops": "the transfer process goes in the solution document."
+      "free_stops": "the transfer process goes in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare the transfer notes kept by sending and receiving shops for one week, so the break point in the route stands out.",
+          "review": false
+        },
+        {
+          "text": "Give one person one transfer notebook at each shop, so every handover is recorded in the same place.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_branches_not_aligned",
@@ -186,7 +266,17 @@
         "tool_words": []
       },
       "ask_first": "How do instructions go out now?",
-      "free_stops": "the broadcast setup is kept for the solution document."
+      "free_stops": "the broadcast setup is kept for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note how long shop teams take to act on head office instructions this week, so delays are tied to specific parts of the routine.",
+          "review": false
+        },
+        {
+          "text": "Give one person one instructions-only chat summary at a fixed time daily, so shop teams stop missing updates in the chatter.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p10_rent",
@@ -207,7 +297,17 @@
         "leads_with_view": true
       },
       "ask_first": "How many outlets share the same rent terms?",
-      "free_stops": "the outlet model goes in the solution document."
+      "free_stops": "the outlet model goes in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Write each outlet's weekly sales beside rent and staffing in one notebook line, so weak outlets stop hiding behind busy ones.",
+          "review": false
+        },
+        {
+          "text": "Give one person one weekly margin note for every outlet in one notebook, so rent pressure is reviewed the same way each time.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

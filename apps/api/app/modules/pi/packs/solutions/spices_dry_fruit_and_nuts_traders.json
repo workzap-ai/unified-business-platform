@@ -2,7 +2,7 @@
   "industry": "spices_dry_fruit_and_nuts_traders",
   "name": "Spices, dry fruit and nuts traders",
   "sector": "7.B Food and beverage",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_credit_customers",
@@ -22,7 +22,17 @@
         "tool_words": []
       },
       "ask_first": "Who reminds shopkeepers to pay now?",
-      "free_stops": "The credit rules and reminder schedule are in the solution document."
+      "free_stops": "The credit rules and reminder schedule are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many khata balances are older than your usual collection cycle, so you see how much cash is stuck late.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member the khata follow up list and one daily calling time, so delayed balances get chased regularly.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_count_mismatch",
@@ -42,7 +52,17 @@
         "tool_words": []
       },
       "ask_first": "When was the last full count?",
-      "free_stops": "The counting routine and variance checks stay for the solution document."
+      "free_stops": "The counting routine and variance checks stay for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare one day's register entries with the same day's actual bags and cartons in the godown, so the mismatch point gets narrower.",
+          "review": false
+        },
+        {
+          "text": "Give one person the register pen for all godown movements during each shift, so entries stop changing hands.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_overstock_dead_stock",
@@ -62,7 +82,17 @@
         "tool_words": []
       },
       "ask_first": "How do you decide which lot goes out first?",
-      "free_stops": "The ageing rules and lot rotation plan are detailed in the solution document."
+      "free_stops": "The ageing rules and lot rotation plan are detailed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Walk the back rows and note which lots are still from last season, so you see what space old stock is taking.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of moving oldest lots to the front after each dispatch, so fresher arrivals stop blocking them.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_pricing_errors",
@@ -82,7 +112,17 @@
         "tool_words": []
       },
       "ask_first": "How do buyers get your rates now?",
-      "free_stops": "How the rate list is built and sent is set out in the solution document."
+      "free_stops": "How the rate list is built and sent is set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare today's quoted rates from staff with today's announced rates, so you see where old voice notes still mislead buyers.",
+          "review": false
+        },
+        {
+          "text": "Give one person the daily rate announcement and one fixed sending time, so staff stop quoting from mixed messages.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_currency_exposure",
@@ -103,7 +143,17 @@
         "leads_with_view": true
       },
       "ask_first": "Which items do you import?",
-      "free_stops": "The landed-cost method is detailed in the solution document."
+      "free_stops": "The landed-cost method is detailed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many customer quotes changed between morning and evening on recent winter dry fruit days, so price swings stop surprising your counter staff.",
+          "review": true
+        },
+        {
+          "text": "Give one person the job of writing every supplier rate change in one notebook at a fixed time, so purchase talks use the same latest information.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_import_delays",
@@ -123,7 +173,17 @@
         "tool_words": []
       },
       "ask_first": "What usually causes the delays?",
-      "free_stops": "The shipment tracking and seasonal buying plan stay for the solution document."
+      "free_stops": "The shipment tracking and seasonal buying plan stay for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note planned arrival dates beside actual arrival dates for recent containers, so you see which delays hit seasonal selling windows hardest.",
+          "review": false
+        },
+        {
+          "text": "Give one person one notebook page for all expected arrivals and revisions, so late containers are followed before customers start asking.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_whatsapp_overload",
@@ -143,7 +203,17 @@
         "tool_words": []
       },
       "ask_first": "Roughly how many orders come in a day?",
-      "free_stops": "The order form and dispatch flow are in the solution document."
+      "free_stops": "The order form and dispatch flow are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many retailer orders arrive after dispatch planning each day, so you see when chat traffic starts breaking the routine.",
+          "review": false
+        },
+        {
+          "text": "Give one person one written dispatch list for all retailer chats each day, so packing follows one queue instead of scattered messages.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_integration_marketplace",
@@ -163,7 +233,17 @@
         "tool_words": []
       },
       "ask_first": "Which marketplaces do you sell on?",
-      "free_stops": "How the sync works with each marketplace is detailed in the solution document."
+      "free_stops": "How the sync works with each marketplace is detailed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare marketplace orders with the physical count of your fastest nut and dry fruit lines once, so negative stock risk shows.",
+          "review": false
+        },
+        {
+          "text": "Give one person one fixed stock check before marketplace selling hours, so online availability follows what is actually on hand.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_owner_blind",
@@ -183,7 +263,17 @@
         "tool_words": []
       },
       "ask_first": "Who else in the family knows the numbers?",
-      "free_stops": "What goes into the morning read and who sees what is in the solution document."
+      "free_stops": "What goes into the morning read and who sees what is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Walk the godown and note the main items you expected but could not locate quickly, so blind spots in stock knowledge show.",
+          "review": false
+        },
+        {
+          "text": "Give your son one weekly stock notebook and one walk round with staff, so he learns where goods sit and how they move.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

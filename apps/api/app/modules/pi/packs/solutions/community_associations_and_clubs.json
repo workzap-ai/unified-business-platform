@@ -2,7 +2,7 @@
   "industry": "community_associations_and_clubs",
   "name": "Community associations and clubs",
   "sector": "7.M Digital economy, social and public sector",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_receivables_late",
@@ -22,7 +22,17 @@
         "tool_words": []
       },
       "ask_first": "How do members usually pay their dues at the moment?",
-      "free_stops": "The reminder schedule and ledger set-up are detailed in the solution document."
+      "free_stops": "The reminder schedule and ledger set-up are detailed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many dues reminders go out each week and how many payments follow, so manual chasing effort is easier to judge.",
+          "review": false
+        },
+        {
+          "text": "Give one person a fixed weekly time to update the arrears list in one notebook, so follow-up stays regular and calm.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_cash_mismatch",
@@ -42,7 +52,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The matching rules are set out in the solution document."
+      "free_stops": "The matching rules are set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare each payment note with the same day's cash, cheque and transfer records once this week, so the mismatch point stands out.",
+          "review": true
+        },
+        {
+          "text": "Give one staff member one notebook for every payment received that day, so matching stops being split across different places.",
+          "review": true
+        }
+      ]
     },
     {
       "id": "p3_booking_appointments",
@@ -64,7 +84,17 @@
         ]
       },
       "ask_first": "",
-      "free_stops": "The slot rules and booking flow are designed in the solution document."
+      "free_stops": "The slot rules and booking flow are designed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many court slot requests clash with existing bookings this week, so the busiest times and arguments become clearer.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of confirming every court slot in one written list, so members hear one answer about availability.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_info_lost_in_whatsapp",
@@ -84,7 +114,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The broadcast set-up goes in the solution document."
+      "free_stops": "The broadcast set-up goes in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note how many important notices are repeated because members missed them this week, so the cost of buried messages is clearer.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member a fixed time to post all notices in one place daily, so updates stop getting scattered through chat.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_handoffs",
@@ -104,7 +144,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The handover structure and access roles are prepared in the solution document."
+      "free_stops": "The handover structure and access roles are prepared in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Walk through current committee work and note every record still sitting on personal phones or papers, so handover risks are easier to see.",
+          "review": false
+        },
+        {
+          "text": "Give one committee member the job of keeping one master handover list, so incoming members receive the same records every time.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_manual_reports",
@@ -124,7 +174,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The pack layout and data flow are detailed in the solution document."
+      "free_stops": "The pack layout and data flow are detailed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note which AGM account figures the treasurer has to recalculate or recheck most often, so the slowest parts of preparation stand out.",
+          "review": false
+        },
+        {
+          "text": "Give one person one notebook for monthly income and spending headings, so AGM account work is spread through the year.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_accountability",
@@ -146,7 +206,17 @@
         ]
       },
       "ask_first": "",
-      "free_stops": "Checkpoint placement and reporting are set out in the solution document."
+      "free_stops": "Checkpoint placement and reporting are set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare the guard round times written down with what residents report noticing this week, so missed patrol periods are easier to spot.",
+          "review": false
+        },
+        {
+          "text": "Give one supervisor one written rounds log to collect at shift end, so checking patrols becomes part of the daily handover.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_maintenance_downtime",
@@ -166,7 +236,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The tracker and status updates are designed in the solution document."
+      "free_stops": "The tracker and status updates are designed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many days each open repair has already been waiting, so the oldest breakdowns stop blending into newer ones.",
+          "review": false
+        },
+        {
+          "text": "Give one person one repair list to carry during the site walk, so updates land in the same place after each check.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_cash_leakage",
@@ -187,7 +267,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The ticketing and reconciliation set-up go in the solution document."
+      "free_stops": "The ticketing and reconciliation set-up go in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count cash received and unsold tickets together after the next event, so any shortfall is visible before volunteers leave.",
+          "review": false
+        },
+        {
+          "text": "Give one volunteer the job of keeping one ticket and cash note during the event, so reconciliation has a single source.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p10_margin_unknown",
@@ -208,7 +298,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The tracker and daily read are detailed in the solution document."
+      "free_stops": "The tracker and daily read are detailed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note which canteen items run out early and which sit unsold this week, so waste and missed sales show up clearly.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member a notebook for daily canteen purchases, freebies and spoilage, so losses stop getting mixed into normal sales.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

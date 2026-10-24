@@ -2,7 +2,7 @@
   "industry": "printing_presses_and_print_on_demand",
   "name": "Printing presses and print-on-demand",
   "sector": "7.D Manufacturing and industry (part 2)",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_rework",
@@ -22,7 +22,17 @@
         "tool_words": []
       },
       "ask_first": "Are these reprint demands mostly from corporate jobs or walk-in customers?",
-      "free_stops": "The approval flow, quote terms and how disputes are handled stay in the solution document."
+      "free_stops": "The approval flow, quote terms and how disputes are handled stay in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many reprint disputes followed proof approval this week, so you see whether the issue is rare noise or regular leakage.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member the job of noting every approval and later change on the job card, so free reprint arguments have a clear handover.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_bottleneck",
@@ -42,7 +52,17 @@
         "tool_words": []
       },
       "ask_first": "Is finishing done in-house or sent to outside vendors?",
-      "free_stops": "The stage set-up, who updates what and the late-job rules are in the solution document."
+      "free_stops": "The stage set-up, who updates what and the late-job rules are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Write down every open job waiting at lamination or die-cutting during one floor walk, so delayed orders can be chased by stage.",
+          "review": false
+        },
+        {
+          "text": "Give one person a single board for jobs entering and leaving those finishing stages, so stoppages stop getting lost between teams.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_price_increases_supplier",
@@ -62,7 +82,17 @@
         "tool_words": []
       },
       "ask_first": "How often is your paper dealer changing rates at the moment?",
-      "free_stops": "The costing logic and rate set-up behind the calculator stay in the solution document."
+      "free_stops": "The costing logic and rate set-up behind the calculator stay in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare a few common quoted jobs with this week's paper rates, so you spot which repeat orders now eat margin.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of marking old quotes for review at a fixed daily time, so stale prices stop slipping into new orders.",
+          "review": true
+        }
+      ]
     },
     {
       "id": "p4_wastage_cost",
@@ -82,7 +112,17 @@
         "tool_words": []
       },
       "ask_first": "Is most wastage on offset setting or on digital and large-format?",
-      "free_stops": "How allowances are set and how exceptions are reviewed are in the solution document."
+      "free_stops": "How allowances are set and how exceptions are reviewed are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count make-ready sheets thrown on a few live jobs this week, so you see which work types create the most waste.",
+          "review": false
+        },
+        {
+          "text": "Give one operator the job of writing setup waste on each job card, so allowances can be discussed from real numbers.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_receivables_late",
@@ -102,7 +142,17 @@
         "tool_words": []
       },
       "ask_first": "Is the delay usually paperwork on their side or simply slow payment?",
-      "free_stops": "The reminder schedule and escalation steps are in the solution document."
+      "free_stops": "The reminder schedule and escalation steps are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "List open corporate invoices by month on one page, so you can see which accounts are stretching your cash longest.",
+          "review": false
+        },
+        {
+          "text": "Give one person a fixed weekly time to note follow-ups and promised dates in one notebook, so collection chasing stays consistent.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_count_mismatch",
@@ -122,7 +172,17 @@
         "tool_words": []
       },
       "ask_first": "Who issues paper from the godown today?",
-      "free_stops": "The count routine and reorder levels are worked out in the solution document."
+      "free_stops": "The count routine and reorder levels are worked out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare the register with a physical count of your fastest-moving board this week, so the size of the stock gap shows.",
+          "review": false
+        },
+        {
+          "text": "Give one store person one notebook for every board issue and return, so the register stops drifting during busy days.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_info_lost_in_whatsapp",
@@ -142,7 +202,17 @@
         "tool_words": []
       },
       "ask_first": "Do customers send files straight to operators or to the counter?",
-      "free_stops": "The file-handling set-up for the shop floor is in the solution document."
+      "free_stops": "The file-handling set-up for the shop floor is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many jobs needed a reprint or pause because an old file was used, so file confusion gets measured in missed work.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of passing only the latest customer file with the job card, so operators stop hunting across chats.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_cash_mismatch",
@@ -162,7 +232,17 @@
         "tool_words": []
       },
       "ask_first": "How many people take cash at the counter?",
-      "free_stops": "The daily matching rules and who signs off are in the solution document."
+      "free_stops": "The daily matching rules and who signs off are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare counter advances written down today with what reached the books by closing time, so any leak is pinned to one day.",
+          "review": false
+        },
+        {
+          "text": "Give one cashier one page for every advance taken and handed over each evening, so cash movement has a clean daily trail.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_lead_followup_slow",
@@ -182,7 +262,17 @@
         "tool_words": []
       },
       "ask_first": "Roughly how many enquiries come in each week?",
-      "free_stops": "Reply flows and follow-up timing are in the solution document."
+      "free_stops": "Reply flows and follow-up timing are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note the time night enquiries arrived and the time someone replied next day, so the real response delay is visible.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member the morning job of clearing overnight enquiries from one written list, so hot leads stop waiting half the day.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p10_margin_unknown",
@@ -203,7 +293,17 @@
         "leads_with_view": true
       },
       "ask_first": "Is any costing done today, or only the selling price?",
-      "free_stops": "The cost categories and report layout are in the solution document."
+      "free_stops": "The cost categories and report layout are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note actual paper, finishing and delivery used on a few recent job types, so loss-making work stops hiding inside busy sales.",
+          "review": false
+        },
+        {
+          "text": "Give one person a single notebook for quoted cost beside final cost on finished jobs, so pricing debates stop bouncing around.",
+          "review": true
+        }
+      ]
     }
   ],
   "never_say": [

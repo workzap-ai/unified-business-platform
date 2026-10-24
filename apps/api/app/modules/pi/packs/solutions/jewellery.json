@@ -2,7 +2,7 @@
   "industry": "jewellery",
   "name": "Jewellery (gold, diamond, artificial)",
   "sector": "7.A Retail and consumer (part 2)",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_count_mismatch",
@@ -23,7 +23,17 @@
         "tool_words": []
       },
       "ask_first": "Do you track by piece tag, by total weight, or both?",
-      "free_stops": "the daily check rotation, tolerance limits and how the register is restructured go in the solution document."
+      "free_stops": "the daily check rotation, tolerance limits and how the register is restructured go in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare the heaviest trays with their register weights once this week, so you can see where the month-end mismatch clusters.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of noting every piece moved out of the showcase in one notebook, so outside stock stops muddying the count.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_theft_internal",
@@ -43,7 +53,17 @@
         "tool_words": []
       },
       "ask_first": "Do your karigars work in-house or do you send work outside?",
-      "free_stops": "how the ledger, approval steps and alert limits are set up is kept for the solution document."
+      "free_stops": "how the ledger, approval steps and alert limits are set up is kept for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note the weight sent out and weight returned for each karigar job this week, so the mismatch can be tied to specific work.",
+          "review": false
+        },
+        {
+          "text": "Make one person responsible for writing every karigar handover in one notebook, so each return can be matched to one outgoing entry.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_pre_orders_custom",
@@ -63,7 +83,17 @@
         "tool_words": []
       },
       "ask_first": "Roughly how many custom orders run at once in peak season?",
-      "free_stops": "the stages, buffer rules and customer update flow are designed in the solution document."
+      "free_stops": "the stages, buffer rules and customer update flow are designed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many open bridal and custom orders are already past their workshop stage today, so late jobs stand out early.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member the job of checking the open-order notebook every afternoon, so promised dates get chased before they slip.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_pricing_errors",
@@ -83,7 +113,17 @@
         "tool_words": []
       },
       "ask_first": "How does the rate reach the counter today?",
-      "free_stops": "how the rate flows into billing and tags is kept for the solution document."
+      "free_stops": "how the rate flows into billing and tags is kept for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare today's quoted rates across staff once during trading hours, so you can spot whether yesterday's rate is still being used.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of writing the current rate in one visible place each morning, so staff quote from the same source.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_discount_abuse",
@@ -104,7 +144,17 @@
         "tool_words": []
       },
       "ask_first": "Who decides making charges today, you or each salesman?",
-      "free_stops": "the actual bands, limits and approval routing go in the solution document."
+      "free_stops": "the actual bands, limits and approval routing go in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare bills from different salesmen for similar pieces this week, so uneven making charges show up in real transactions.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of keeping one written list of agreed making charges by category, so everyone starts from the same number.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_transfers_lost",
@@ -124,7 +174,17 @@
         "tool_words": []
       },
       "ask_first": "Do pieces also move between your branches?",
-      "free_stops": "the checkout and check-in process and its controls are kept for the solution document."
+      "free_stops": "the checkout and check-in process and its controls are kept for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare the exhibition return against the outgoing tag list once, so you can see whether the shortfall is tags, pieces or paperwork.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of holding the single exhibition movement list from packing to return, so nothing changes hands without one record.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_credit_customers",
@@ -144,7 +204,17 @@
         "tool_words": []
       },
       "ask_first": "Do you also run instalment or booking schemes?",
-      "free_stops": "how advances link to orders and billing is detailed in the solution document."
+      "free_stops": "how advances link to orders and billing is detailed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many booking advances in the diary have no matching slip or note today, so missing records show up at once.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of keeping all advance entries in one notebook at the counter, so staff stop searching through old diary pages.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_chat_overload",
@@ -165,7 +235,17 @@
         "tool_words": []
       },
       "ask_first": "Who answers messages today?",
-      "free_stops": "reply flows, catalogue links and follow-up timings are kept for the solution document."
+      "free_stops": "reply flows, catalogue links and follow-up timings are kept for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many price enquiries arrive in one busy period and how many get a clear reply, so the missed demand becomes visible.",
+          "review": true
+        },
+        {
+          "text": "Give one person the job of checking all price enquiries at fixed times daily, so replies stop getting lost in shared chat handling.",
+          "review": true
+        }
+      ]
     },
     {
       "id": "p9_after_sales",
@@ -185,7 +265,17 @@
         "tool_words": []
       },
       "ask_first": "Are repairs done in-house or sent out?",
-      "free_stops": "the intake and handover process is designed in the solution document."
+      "free_stops": "the intake and handover process is designed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare every repair and resizing piece in the shop with its slip today, so you can spot which jobs have no matching paper.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of receiving every repair into one notebook before it moves anywhere, so missing pieces can be traced sooner.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p10_commission_disputes",
@@ -210,7 +300,17 @@
         ]
       },
       "ask_first": "How is commission worked out today?",
-      "free_stops": "the commission logic and customer list setup go in the solution document."
+      "free_stops": "the commission logic and customer list setup go in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note for one week how many walk-ins each salesman starts and how many bills follow, so commission arguments can be checked fairly.",
+          "review": false
+        },
+        {
+          "text": "Assign one person to write each new enquiry into one shop notebook before handover, so customer follow-up stays with the shop.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p11_cash_handling_risk",
@@ -230,7 +330,17 @@
         "tool_words": []
       },
       "ask_first": "Is most payment cash, card, transfer or old-gold exchange?",
-      "free_stops": "the close-out steps and reporting are kept for the solution document."
+      "free_stops": "the close-out steps and reporting are kept for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note the latest time cash still sits in the shop across one week, so you can see which evenings feel most exposed.",
+          "review": false
+        },
+        {
+          "text": "Give one person the closing cash checklist in one notebook at the same time each night, so the handover stays consistent.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

@@ -2,7 +2,7 @@
   "industry": "study_abroad_and_education_consultants",
   "name": "Study-abroad and education consultants",
   "sector": "7.J Education and childcare",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_lead_followup_slow",
@@ -22,7 +22,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The capture and assignment setup is kept for the document."
+      "free_stops": "The capture and assignment setup is kept for the document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many fair leads from the last event still lack a call note today, so you see the real backlog.",
+          "review": false
+        },
+        {
+          "text": "Set one daily handover time for new fair leads to one assigned caller list, so fresh enquiries get contacted while interest is high.",
+          "review": true
+        }
+      ]
     },
     {
       "id": "p2_lead_quality",
@@ -42,7 +52,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "How the tags and quality measures are set up is in the document."
+      "free_stops": "How the tags and quality measures are set up is in the document.",
+      "extra_ideas": [
+        {
+          "text": "Note which enquiries asked about destinations or services you do not handle this week, so wasted lead sources become obvious.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member the job of marking each new enquiry source in one office notebook, so weak channels stop flooding counsellors.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_data_scattered",
@@ -62,7 +82,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The pipeline stages and views are kept for the document."
+      "free_stops": "The pipeline stages and views are kept for the document.",
+      "extra_ideas": [
+        {
+          "text": "Count active cases missing from the company list by comparing each counsellor's sheet once, so the transfer gap shows.",
+          "review": false
+        },
+        {
+          "text": "Make one office register the only place for active case stage changes, so files stay with the business when staff leave.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_info_lost_in_whatsapp",
@@ -82,7 +112,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The checklist and access setup are in the document."
+      "free_stops": "The checklist and access setup are in the document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many active cases need staff to search old messages for missing documents this week, so the retrieval problem has a size.",
+          "review": false
+        },
+        {
+          "text": "Give one coordinator the job of logging each received document against the case reference in one office notebook, so nothing disappears between messages.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_tasks_dropped",
@@ -102,7 +142,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The reminder rules are kept for the document."
+      "free_stops": "The reminder rules are kept for the document.",
+      "extra_ideas": [
+        {
+          "text": "Walk through current cases once and note which upcoming intake dates are written nowhere central, so missed deadlines have an obvious cause.",
+          "review": false
+        },
+        {
+          "text": "Assign one person to update one wall list of all upcoming intake dates every afternoon, so the team works from the same view.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_receivables_late",
@@ -122,7 +172,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "How eligibility and ageing are tracked is in the document."
+      "free_stops": "How eligibility and ageing are tracked is in the document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many enrolled case files lack any institution payment note this intake, so missing follow ups stop hiding among active students.",
+          "review": true
+        },
+        {
+          "text": "Give one staff member one notebook page for institution payment notes, so every team handover starts from the same place.",
+          "review": true
+        }
+      ]
     },
     {
       "id": "p7_commission_disputes",
@@ -142,7 +202,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The statement setup is kept for the document."
+      "free_stops": "The statement setup is kept for the document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many sub agent cases have no written share note today, so the source of payout arguments becomes visible.",
+          "review": false
+        },
+        {
+          "text": "Give one manager one register for every sub agent case share note, so discussions start from the same office record.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_credit_customers",
@@ -162,7 +232,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The reminder sequence is in the document."
+      "free_stops": "The reminder sequence is in the document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many active cases have no recent office payment note this week, so stalled follow up stops blending into normal counselling work.",
+          "review": true
+        },
+        {
+          "text": "Give one person one daily slot to update payment follow up notes, so missed reminders stop waiting on each counsellor.",
+          "review": true
+        }
+      ]
     },
     {
       "id": "p9_owner_bottleneck",
@@ -182,7 +262,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The stage messages and triggers are kept for the document."
+      "free_stops": "The stage messages and triggers are kept for the document.",
+      "extra_ideas": [
+        {
+          "text": "Note how many parent calls reached you this week before the counsellor gave any update, so the delay pattern is clear.",
+          "review": false
+        },
+        {
+          "text": "Give each counsellor a fixed daily time to send case updates and note them in one team register, so parents stop bypassing the team.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p10_performance_unknown",
@@ -203,7 +293,17 @@
         "leads_with_view": true
       },
       "ask_first": "",
-      "free_stops": "How performance is measured is in the document."
+      "free_stops": "How performance is measured is in the document.",
+      "extra_ideas": [
+        {
+          "text": "Compare each counsellor's enquiry count with their consultation bookings for the last intake once, so weak handoff points stand out.",
+          "review": false
+        },
+        {
+          "text": "Give one supervisor the job of noting each counsellor's signed clients every Friday in one notebook, so performance stops being argued from memory.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

@@ -2,7 +2,7 @@
   "industry": "cosmetics_and_beauty_retail",
   "name": "Cosmetics and beauty retail",
   "sector": "7.A Retail and consumer (part 2)",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_stockout",
@@ -22,7 +22,17 @@
         "tool_words": []
       },
       "ask_first": "Roughly how many products and shades do you carry?",
-      "free_stops": "minimum levels and reorder rules are worked out in the solution document."
+      "free_stops": "minimum levels and reorder rules are worked out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count empty spaces for your fastest moving shades at closing, so you see which shades are repeatedly missed before customers ask.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member the shade check before lunch and closing, so reordering starts from shelf reality not assumptions.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_expiry_wastage",
@@ -43,7 +53,17 @@
         "tool_words": []
       },
       "ask_first": "Who checks expiry dates now?",
-      "free_stops": "alert timing and clearance planning are kept for the solution document."
+      "free_stops": "alert timing and clearance planning are kept for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note which products near expiry are still untouched after a full week on display, so slow lines stand out early.",
+          "review": false
+        },
+        {
+          "text": "Give one person the expiry shelf walk every Monday, so short dated stock gets noticed in time for normal selling.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_returns_rto",
@@ -64,7 +84,17 @@
         "tool_words": []
       },
       "ask_first": "Is most of your online business COD?",
-      "free_stops": "the confirmation flow and its wording are kept for the solution document."
+      "free_stops": "the confirmation flow and its wording are kept for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note refused parcels by area and order source for one week, so you see where refusals are repeatedly starting.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member the refused parcel notebook and courier handover, so every return is tracked the day it comes back.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_cod_remittance",
@@ -84,7 +114,17 @@
         "tool_words": []
       },
       "ask_first": "How many couriers do you use?",
-      "free_stops": "the reconciliation setup per courier goes in the solution document."
+      "free_stops": "the reconciliation setup per courier goes in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare each courier drop against the matching paid parcels in your order notebook, so delayed or short remittances surface quickly.",
+          "review": false
+        },
+        {
+          "text": "Keep one remittance list with one person updating it on payment days, so courier money stops getting checked from scattered notes.",
+          "review": true
+        }
+      ]
     },
     {
       "id": "p5_chat_overload",
@@ -104,7 +144,17 @@
         "tool_words": []
       },
       "ask_first": "Who replies to messages today?",
-      "free_stops": "reply flows and catalogue links are kept for the solution document."
+      "free_stops": "reply flows and catalogue links are kept for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many price messages become paid orders over one busy day, so you judge the real cost of reply time.",
+          "review": true
+        },
+        {
+          "text": "Assign one person each shift to clear selling messages, so order chats stop sinking under repeated product questions.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_campaign_roi_unknown",
@@ -124,7 +174,17 @@
         "tool_words": []
       },
       "ask_first": "Do you pay influencers or send PR boxes, or both?",
-      "free_stops": "code setup and campaign reporting go in the solution document."
+      "free_stops": "code setup and campaign reporting go in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many order chats mention each influencer this week, so you see whose mentions actually bring buying conversations.",
+          "review": false
+        },
+        {
+          "text": "Keep one notebook page for influencer gifts and orders with one staff owner, so free stock is checked against sales talk.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_multi_channel_orders",
@@ -145,7 +205,17 @@
         "tool_words": []
       },
       "ask_first": "Which marketplaces do you sell on?",
-      "free_stops": "channel connections and stock rules are kept for the solution document."
+      "free_stops": "channel connections and stock rules are kept for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare shelf count with the selling count kept elsewhere for your fastest items, so overselling risk shows before the next rush.",
+          "review": false
+        },
+        {
+          "text": "Make one person update stock after each sale block, so both shop and remote orders follow the same count.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_packing_errors",
@@ -166,7 +236,17 @@
         "tool_words": []
       },
       "ask_first": "Who packs orders today?",
-      "free_stops": "the packing check process goes in the solution document."
+      "free_stops": "the packing check process goes in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note which shades get corrected during packing over one week, so the look alike items causing complaints stand out.",
+          "review": false
+        },
+        {
+          "text": "Give one packer the final shade callout before sealing, so each parcel has a clear handover point for accuracy.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_wastage_cost",
@@ -186,7 +266,17 @@
         "tool_words": []
       },
       "ask_first": "Where do you think most of the loss happens?",
-      "free_stops": "the count rotation and loss reporting are kept for the solution document."
+      "free_stops": "the count rotation and loss reporting are kept for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count testers and easy to pocket items at opening and closing, so loss by time of day becomes visible.",
+          "review": false
+        },
+        {
+          "text": "Give one counter staff member the tester and small item check, so shrinkage gets noticed from the same place daily.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p10_repeat_low",
@@ -207,7 +297,17 @@
         "tool_words": []
       },
       "ask_first": "Do you keep any record of who buys from you?",
-      "free_stops": "the messaging plan and loyalty rules go in the solution document."
+      "free_stops": "the messaging plan and loyalty rules go in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Mark one week of sale bills against later walk in purchases, so you see which sale items fail to bring people back.",
+          "review": false
+        },
+        {
+          "text": "Keep one notebook at the counter for repeat buyer signs, so staff notice return visits without relying on memory.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p11_void_refund_abuse",
@@ -228,7 +328,17 @@
         "tool_words": []
       },
       "ask_first": "Who can give discounts at the till now?",
-      "free_stops": "limits and approval routing are kept for the solution document."
+      "free_stops": "limits and approval routing are kept for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare staff discounts by shift against the same products sold full price, so friendly giveaways stop hiding inside busy hours.",
+          "review": true
+        },
+        {
+          "text": "Give one supervisor the discount notebook each day, so every reduction is tied to a visible check before billing.",
+          "review": true
+        }
+      ]
     }
   ],
   "never_say": [

@@ -2,7 +2,7 @@
   "industry": "motorcycle_and_rickshaw_dealers_and_workshops",
   "name": "Motorcycle and rickshaw dealers and workshops",
   "sector": "7.G Transport, mobility and aviation (part 2)",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_credit_customers",
@@ -22,7 +22,17 @@
         "tool_words": []
       },
       "ask_first": "Do customers pay at the shop, or does your staff collect?",
-      "free_stops": "Ledger and reminder set-up are in the solution document; instalment terms are for your accountant or lawyer."
+      "free_stops": "Ledger and reminder set-up are in the solution document; instalment terms are for your accountant or lawyer.",
+      "extra_ideas": [
+        {
+          "text": "Count how many instalment customer pages have no current balance noted, so you see how much outstanding is unclear.",
+          "review": false
+        },
+        {
+          "text": "Make one staff member update one notebook of customer balances each evening, so collection follow ups start from the same list.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_cash_leakage",
@@ -43,7 +53,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The collection steps are in the solution document."
+      "free_stops": "The collection steps are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare each collector's handwritten cash received slips with the day's handover cash once this week, so short collections show against a person.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of counting and noting every recovery handover before closing, so collected cash stops getting mixed later.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_documentation",
@@ -64,7 +84,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "File stages are in the solution document."
+      "free_stops": "File stages are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note how many number plate files are waiting with no last update written, so you see which enquiries will keep returning.",
+          "review": false
+        },
+        {
+          "text": "Keep all pending number plate files in one marked place with one staff member updating status notes, so answer time gets shorter at the counter.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_supplier_late",
@@ -85,7 +115,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "Tracker set-up is in the solution document."
+      "free_stops": "Tracker set-up is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count booked orders waiting beyond the supplier's last promised time, so you see which models are causing the longest delays.",
+          "review": false
+        },
+        {
+          "text": "Give one person the waiting bookings notebook and a fixed weekly update round, so customers hear progress without chasing the showroom.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_shrinkage_theft",
@@ -106,7 +146,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "Issue rules are in the solution document."
+      "free_stops": "Issue rules are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare parts taken from shelves with open workshop jobs once this week, so missing items stand out against actual work.",
+          "review": false
+        },
+        {
+          "text": "Make one person hand out workshop parts from one shelf list, so every issue links to a live repair job.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_receivables_late",
@@ -127,7 +177,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "Billing set-up is in the solution document."
+      "free_stops": "Billing set-up is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many fleet service bills have no payment date note beside them, so you see which money is least likely soon.",
+          "review": true
+        },
+        {
+          "text": "Give one staff member one notebook for all unpaid fleet bills and a fixed chase hour, so follow up stays regular.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_lead_quality",
@@ -147,7 +207,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "Follow-up timings are in the solution document."
+      "free_stops": "Follow-up timings are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many price enquiries actually visit the dealership this week, so you see the size of the enquiry to showroom gap.",
+          "review": true
+        },
+        {
+          "text": "Give one person the job of noting every price enquiry and visit outcome in one notebook, so weak lead sources become visible.",
+          "review": true
+        }
+      ]
     },
     {
       "id": "p8_margin_unknown",
@@ -168,7 +238,17 @@
         "leads_with_view": true
       },
       "ask_first": "",
-      "free_stops": "Which costs are included is in the solution document."
+      "free_stops": "Which costs are included is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Look at recent bike deals and count how many included discounts or free helmets, so giveaway heavy selling becomes visible.",
+          "review": false
+        },
+        {
+          "text": "Make one person note every discount and free item on one sales page daily, so each bike deal can be reviewed later.",
+          "review": true
+        }
+      ]
     },
     {
       "id": "p9_owner_blind",
@@ -189,7 +269,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "What the daily read includes is in the solution document."
+      "free_stops": "What the daily read includes is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many days this week ended without sales, collections, and cash written together, so you see how often the picture is incomplete.",
+          "review": false
+        },
+        {
+          "text": "Give one closing staff member one page for daily sales, collections, and cash totals, so your evening check stops relying on registers alone.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

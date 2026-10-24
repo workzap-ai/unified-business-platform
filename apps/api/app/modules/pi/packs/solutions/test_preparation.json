@@ -2,7 +2,7 @@
   "industry": "test_preparation",
   "name": "Test preparation (O/A Levels, MDCAT, ECAT, IELTS, SAT)",
   "sector": "7.J Education and childcare",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_lead_followup_slow",
@@ -22,7 +22,17 @@
         "tool_words": []
       },
       "ask_first": "Who answers the messages today — one person or a team?",
-      "free_stops": "The reply flow, hand-off rules and queue timings are kept for the document."
+      "free_stops": "The reply flow, hand-off rules and queue timings are kept for the document.",
+      "extra_ideas": [
+        {
+          "text": "Note how many incoming messages arrive in the hour after a test date announcement, so staffing for that rush stops being guesswork.",
+          "review": false
+        },
+        {
+          "text": "Assign one staff member to sort incoming test date enquiries at a fixed daily time, so urgent prospects are not buried under repeats.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_seasonal_planning",
@@ -43,7 +53,17 @@
         "leads_with_view": true
       },
       "ask_first": "",
-      "free_stops": "How the season plan is modelled from your past cohorts is in the document."
+      "free_stops": "How the season plan is modelled from your past cohorts is in the document.",
+      "extra_ideas": [
+        {
+          "text": "Compare this month's walk-ins and calls with your busy MDCAT months, so you see how much of the year needs a steadier offer.",
+          "review": false
+        },
+        {
+          "text": "Give one person a standing weekly job to note off-season enquiries in one place, so quieter demand is noticed early enough to act on.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_campaign_roi_unknown",
@@ -63,7 +83,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "How the codes are set up and tied to enrolments is kept for the document."
+      "free_stops": "How the codes are set up and tied to enrolments is kept for the document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many new enquiries mention each current campaign this week, so the season's louder messages are separated from the quieter ones.",
+          "review": false
+        },
+        {
+          "text": "Have one person write each enrolment's heard-from source in one register, so seat-filling channels are reviewed from one routine record.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_receivables_late",
@@ -85,7 +115,17 @@
         ]
       },
       "ask_first": "",
-      "free_stops": "The reminder sequence and access rules are set out in the document."
+      "free_stops": "The reminder sequence and access rules are set out in the document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many students stopped attending right after the mock while an installment stayed pending, so the post-mock drop is sized clearly.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member a fixed daily time to note overdue installments in one notebook, so follow-up happens while the student is still engaged.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_refunds",
@@ -105,7 +145,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The request flow and approval steps are kept for the document."
+      "free_stops": "The request flow and approval steps are kept for the document.",
+      "extra_ideas": [
+        {
+          "text": "Count refund and transfer requests still open from earlier messages, so you see the true backlog before newer chats bury them.",
+          "review": true
+        },
+        {
+          "text": "Keep all refund and transfer requests with one assigned staff member and one written list, so duplicate replies and missed cases reduce.",
+          "review": true
+        }
+      ]
     },
     {
       "id": "p6_fraud",
@@ -125,7 +175,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The sharing signals and how access is limited are kept for the document."
+      "free_stops": "The sharing signals and how access is limited are kept for the document.",
+      "extra_ideas": [
+        {
+          "text": "Note which recorded lecture logins seem active from very different places within the same week, so the scale of sharing shows.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member the weekly job of noting unusual lecture login use in one notebook, so shared accounts are reviewed consistently.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_stockout",
@@ -145,7 +205,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The reorder triggers per title and branch are in the document."
+      "free_stops": "The reorder triggers per title and branch are in the document.",
+      "extra_ideas": [
+        {
+          "text": "Walk the store and compare remaining printed books with classes currently running, so mid-course shortages are spotted before students ask.",
+          "review": false
+        },
+        {
+          "text": "Put one staff member in charge of a single written list of books given out each day, so reprint timing stops relying on rough estimates.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_manual_work",
@@ -167,7 +237,17 @@
         ]
       },
       "ask_first": "",
-      "free_stops": "The marking setup and reports are kept for the document."
+      "free_stops": "The marking setup and reports are kept for the document.",
+      "extra_ideas": [
+        {
+          "text": "Count unchecked mock papers at the end of each day this week, so the marking backlog is sized before the next test arrives.",
+          "review": false
+        },
+        {
+          "text": "Assign one instructor to gather all checked sections into one handover pile each evening, so partial marking stops stalling final results.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_accountability",
@@ -187,7 +267,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The matching rules for swaps and cancellations are in the document."
+      "free_stops": "The matching rules for swaps and cancellations are in the document.",
+      "extra_ideas": [
+        {
+          "text": "Compare claimed sessions with rooms actually used this week, so doubtful teaching claims are easier to spot before payouts.",
+          "review": false
+        },
+        {
+          "text": "Keep one front desk notebook for actual session start and finish times, so payment review uses one routine record.",
+          "review": true
+        }
+      ]
     },
     {
       "id": "p10_discount_abuse",
@@ -207,7 +297,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The code limits and reporting are kept for the document."
+      "free_stops": "The code limits and reporting are kept for the document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many enrolments used each influencer code this week, so you see which codes are spreading beyond the intended audience.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member the job of noting every discount exception in one notebook, so repeat misuse is spotted before fees are reduced again.",
+          "review": true
+        }
+      ]
     },
     {
       "id": "p11_no_dashboard",
@@ -227,7 +327,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "How the data is pulled together is set out in the document."
+      "free_stops": "How the data is pulled together is set out in the document.",
+      "extra_ideas": [
+        {
+          "text": "Write each cohort's enrolments, collections and dropouts on one weekly sheet, so weak cohorts stand out before the next intake opens.",
+          "review": false
+        },
+        {
+          "text": "Make one person update the same cohort summary at a fixed time each week, so review meetings stop starting with scattered numbers.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

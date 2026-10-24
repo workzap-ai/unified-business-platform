@@ -2,7 +2,7 @@
   "industry": "guest_houses_b_and_bs_and_holiday_home_hosts",
   "name": "Guest houses, B&Bs and holiday-home hosts",
   "sector": "7.H Hospitality, events and personal services",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_software_not_connected",
@@ -22,7 +22,17 @@
         "tool_words": []
       },
       "ask_first": "How many units, and on how many platforms each?",
-      "free_stops": "How the calendars are connected and the clash rules go in the solution document."
+      "free_stops": "How the calendars are connected and the clash rules go in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many bookings arrived close together this week and needed manual blocking, so you see how often double-booking risk really hits.",
+          "review": false
+        },
+        {
+          "text": "Give one person the checkout task of marking newly sold dates in one paper calendar, so availability stays aligned across your channels.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_handoffs",
@@ -42,7 +52,17 @@
         "tool_words": []
       },
       "ask_first": "Are your cleaners your own staff or freelancers?",
-      "free_stops": "The turnover flow, change alerts and photo checks are detailed in the solution document."
+      "free_stops": "The turnover flow, change alerts and photo checks are detailed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare today's checkouts with the cleaner messages sent this morning, so you spot which units are missed before guests arrive.",
+          "review": false
+        },
+        {
+          "text": "Keep today's checkout list in one shared place by breakfast time, so every cleaner starts with the same unit plan.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_chat_overload",
@@ -62,7 +82,17 @@
         "tool_words": []
       },
       "ask_first": "Which question wakes you up at night most often?",
-      "free_stops": "The fact sheet content and the hand-over rules to you are worked out in the solution document."
+      "free_stops": "The fact sheet content and the hand-over rules to you are worked out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Tally every Wi-Fi, parking and key message for one week, so you see which answer steals the most hosting time.",
+          "review": false
+        },
+        {
+          "text": "Make one staff member update a single guest-info sheet in each unit after every change, so repeated questions drop at the door.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_after_sales",
@@ -82,7 +112,17 @@
         "tool_words": []
       },
       "ask_first": "Do you take a security deposit now?",
-      "free_stops": "The inspection checklist per unit type stays for the solution document."
+      "free_stops": "The inspection checklist per unit type stays for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note which rooms or items are found damaged most often this month, so you see where pre-clean checks need more attention.",
+          "review": false
+        },
+        {
+          "text": "Give one cleaner the handover job of noting visible damage before tidying starts, so missing items are tied to the right stay.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_margin_unknown",
@@ -103,7 +143,17 @@
         "leads_with_view": true
       },
       "ask_first": "Are the units owned, rented or managed for others?",
-      "free_stops": "Which costs are allocated to which unit, and how, is in the solution document."
+      "free_stops": "Which costs are allocated to which unit, and how, is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "List each unit's last payout beside its cleaning and supply costs once, so weak earners stop hiding behind busy ones.",
+          "review": false
+        },
+        {
+          "text": "Give one person a fixed weekly time to note unit income and spending in one notebook, so owner decisions rest on current figures.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_manual_reports",
@@ -123,7 +173,17 @@
         "tool_words": []
       },
       "ask_first": "How many owners do you report to?",
-      "free_stops": "Statement content and data sources are set out in the solution document."
+      "free_stops": "Statement content and data sources are set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many owner statement lines you rewrite each month, so you see where handwork is eating your admin hours.",
+          "review": false
+        },
+        {
+          "text": "Keep one paper checklist for every owner statement in one folder, so nothing gets rebuilt differently each time.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_wrong_location",
@@ -143,7 +203,17 @@
         "tool_words": []
       },
       "ask_first": "Do you have one central store or supplies kept in each unit?",
-      "free_stops": "Par levels per unit size and the restock routine stay for the solution document."
+      "free_stops": "Par levels per unit size and the restock routine stay for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Walk every unit and note towel and toiletry shortages on one page, so you see which homes are draining shared stock.",
+          "review": false
+        },
+        {
+          "text": "Give one person the end-of-clean task of topping up from one central list, so supplies stop piling up unevenly.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_payroll_errors",
@@ -163,7 +233,17 @@
         "tool_words": []
       },
       "ask_first": "Do you pay cleaners per turnover or by the hour?",
-      "free_stops": "Rate rules and settlement cycle go in the solution document."
+      "free_stops": "Rate rules and settlement cycle go in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare this week's cleaner claims with the units actually turned over, so disputed charges stand out before payments are discussed.",
+          "review": false
+        },
+        {
+          "text": "Keep every cleaner's agreed rates on one notebook page with one person updating it, so owed amounts are checked from the same source.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_booking_appointments",
@@ -185,7 +265,17 @@
         ]
       },
       "ask_first": "Are your units in Dubai, Pakistan or Canada?",
-      "free_stops": "The page, deposit flow and calendar connection are designed in the solution document."
+      "free_stops": "The page, deposit flow and calendar connection are designed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many repeat guests asked to book direct this month and what dates they wanted, so missed demand becomes visible.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of writing every direct repeat booking request in one diary, so returning guests stop slipping through chats.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p10_licences_renewals",
@@ -205,7 +295,17 @@
         "tool_words": []
       },
       "ask_first": "How many units need renewals this year?",
-      "free_stops": "Reminder timing and checklist structure stay for the solution document."
+      "free_stops": "Reminder timing and checklist structure stay for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Write each unit's renewal month on one notebook page, so you can see which permits bunch together this year.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member the weekly job of checking that renewal page, so permit dates stop catching you mid-booking.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

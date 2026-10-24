@@ -2,7 +2,7 @@
   "industry": "microfinance_field_operations",
   "name": "Microfinance field operations",
   "sector": "7.L Finance-adjacent, energy and utilities",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_field_team_visibility",
@@ -24,7 +24,17 @@
         ]
       },
       "ask_first": "How many field officers does each branch have?",
-      "free_stops": "Check-in design and reason codes are in the solution document."
+      "free_stops": "Check-in design and reason codes are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare each officer's morning route note with the centres actually reported by day end, so field visibility problems show by officer and area.",
+          "review": false
+        },
+        {
+          "text": "Give one branch person the job of keeping the day's route list in one notebook, so everyone checks the same plan.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_fraud",
@@ -44,7 +54,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "Confirmation steps and matching rules are in the solution document; pi notes the control gap, never names individuals."
+      "free_stops": "Confirmation steps and matching rules are in the solution document; pi notes the control gap, never names individuals.",
+      "extra_ideas": [
+        {
+          "text": "Note each centre where visit claims and collection totals do not line up, so supervisors see which routes need closer checking.",
+          "review": false
+        },
+        {
+          "text": "Give one supervisor the job of logging centre visit proof in one register, so disputed field work has a single branch record.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_cash_handling_risk",
@@ -64,7 +84,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The handover log design is in the solution document; pi records no cash movement routes or times."
+      "free_stops": "The handover log design is in the solution document; pi records no cash movement routes or times.",
+      "extra_ideas": [
+        {
+          "text": "Count how many cash return handovers happen after the branch closing routine starts this week, so risky timing across routes becomes visible.",
+          "review": false
+        },
+        {
+          "text": "Give one branch person the job of noting every cash handover in one notebook before officers leave, so returns stop drifting across desks.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_duplicate_entry",
@@ -84,7 +114,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "What the MIS can accept and how the link works is assessed in the solution document."
+      "free_stops": "What the MIS can accept and how the link works is assessed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare the date in the field register with the date it is typed, so you see the real delay on collections entry.",
+          "review": false
+        },
+        {
+          "text": "Give one person the same day entry list in one notebook, so registers are typed before another day's papers arrive.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_reports_late",
@@ -106,7 +146,17 @@
         ]
       },
       "ask_first": "",
-      "free_stops": "Which figures feed it and from where is in the solution document."
+      "free_stops": "Which figures feed it and from where is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note when each branch sends overdue figures and when head office sees them, so the reporting delay is pinned to a handover point.",
+          "review": false
+        },
+        {
+          "text": "Give one head office person the job of collecting overdue figures into one running list each evening, so chasing stops bouncing between people.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_manual_reports",
@@ -126,7 +176,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "Format mapping is in the solution document."
+      "free_stops": "Format mapping is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count which report lines head office asks for again in different layouts, so repeated rework is clear to both sides.",
+          "review": false
+        },
+        {
+          "text": "Give one branch person one notebook page for every recurring report request, so old formats are found quickly when head office asks again.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_approvals_slow",
@@ -146,7 +206,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "Stages and checklist contents are in the solution document."
+      "free_stops": "Stages and checklist contents are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many files sit at branch, in transit, and at area office today, so the queue location is obvious.",
+          "review": false
+        },
+        {
+          "text": "Give one branch person the handover log for every disbursement file, so waiting files are chased from one place.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_petty_cash",
@@ -166,7 +236,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "Claim rules and approval flow are in the solution document."
+      "free_stops": "Claim rules and approval flow are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare claimed travel days with recorded field visit days this week, so mismatches stand out without discussing any officer personally.",
+          "review": false
+        },
+        {
+          "text": "Give one branch person one weekly claims list to check against visit records, so reimbursement questions are settled while the week is fresh.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_info_lost_in_whatsapp",
@@ -186,7 +266,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "Channel set-up is in the solution document."
+      "free_stops": "Channel set-up is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many head office instructions were repeated to branches this week, so the cost of missed messages is clear.",
+          "review": false
+        },
+        {
+          "text": "Give one branch person the job of copying every head office instruction into one notebook, so staff have one place to check later.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p10_turnover",
@@ -206,7 +296,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "Guide content and tracking are in the solution document."
+      "free_stops": "Guide content and tracking are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count which paperwork mistakes appear most in each new officer's first month, so refresher coaching targets the forms wasting branch time.",
+          "review": false
+        },
+        {
+          "text": "Give one senior clerk the job of checking every new officer's paperwork at day end, so errors are corrected before files pile up.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

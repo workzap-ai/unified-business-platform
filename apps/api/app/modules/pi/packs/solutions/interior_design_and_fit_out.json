@@ -2,7 +2,7 @@
   "industry": "interior_design_and_fit_out",
   "name": "Interior design and fit-out",
   "sector": "7.F Construction, real estate and facilities",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_pre_orders_custom",
@@ -22,7 +22,17 @@
         "tool_words": []
       },
       "ask_first": "How many revisions does a client usually get?",
-      "free_stops": "Stage gates and sign-off flow are in the solution document."
+      "free_stops": "Stage gates and sign-off flow are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note how many projects had design changes after site work began this month, so you can see where rework is starting.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of marking the latest approved drawing in one project file, so site teams work from the same version.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_unbilled_variations",
@@ -42,7 +52,17 @@
         "tool_words": []
       },
       "ask_first": "Who works out the extra cost when a change comes in?",
-      "free_stops": "The approval and billing steps are in the solution document; disputes go to a lawyer."
+      "free_stops": "The approval and billing steps are in the solution document; disputes go to a lawyer.",
+      "extra_ideas": [
+        {
+          "text": "Compare this week's site changes against what was written in each project file, so disputed extras are easier to spot quickly.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of updating one variation list after every client chat, so extra work is not missed later.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_quality_inconsistent",
@@ -62,7 +82,17 @@
         "tool_words": []
       },
       "ask_first": "Who does the site measurements?",
-      "free_stops": "Form fields and the link to pricing are in the solution document."
+      "free_stops": "Form fields and the link to pricing are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare site measurements from the visit against workshop cut sizes on one finished job, so the biggest source of quote error shows.",
+          "review": false
+        },
+        {
+          "text": "Give one measurer the job of keeping all site dimensions in one notebook page per job, so quoting pulls from one record.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_margin_unknown",
@@ -83,7 +113,17 @@
         "leads_with_view": true
       },
       "ask_first": "How do you build a quote today?",
-      "free_stops": "Rate library structure and margin rules are in the solution document."
+      "free_stops": "Rate library structure and margin rules are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Pick one completed job and note quoted materials and labour beside what was actually used, so loss-making parts stand out.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of writing labour and material overruns in one job notebook, so future quotes reflect real usage.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_import_delays",
@@ -103,7 +143,17 @@
         "tool_words": []
       },
       "ask_first": "Which materials take longest to arrive?",
-      "free_stops": "Tracking stages and alerts are in the solution document."
+      "free_stops": "Tracking stages and alerts are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Look at current projects and count how many waiting items are imported finishes or lights, so hold-ups by item type are clear.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of keeping one page of long-wait items by project, so ordering pressure starts earlier.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_handoffs",
@@ -123,7 +173,17 @@
         "tool_words": []
       },
       "ask_first": "Which trades are in-house and which are subcontracted?",
-      "free_stops": "Sequencing rules per project type are in the solution document."
+      "free_stops": "Sequencing rules per project type are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Walk one active site and note which trade is waiting for another trade to finish, so the handoff bottleneck shows.",
+          "review": false
+        },
+        {
+          "text": "Give one supervisor the job of keeping the trade sequence on one site page, so visits and bookings follow the real order.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_capacity",
@@ -143,7 +203,17 @@
         "tool_words": []
       },
       "ask_first": "How do you plan what the workshop makes each week?",
-      "free_stops": "Workshop stages and planning logic are in the solution document."
+      "free_stops": "Workshop stages and planning logic are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count which site jobs are waiting on joinery release this week, so the workshop backlog size is clear to everyone.",
+          "review": false
+        },
+        {
+          "text": "Give one workshop lead the job of keeping one visible list by site need date, so urgent pieces move before less urgent work.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_customer_communication",
@@ -163,7 +233,17 @@
         "tool_words": []
       },
       "ask_first": "How do clients get updates now?",
-      "free_stops": "Update content and timing are in the solution document."
+      "free_stops": "Update content and timing are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note how many client messages this week asked for progress that the site team already knew, so the update gap shows.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of collecting site notes in one place before a fixed update time, so clients hear progress without chasing.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_receivables_late",
@@ -184,7 +264,17 @@
         "tool_words": []
       },
       "ask_first": "Which milestone payment is hardest to collect?",
-      "free_stops": "Snag flow and billing triggers are in the solution document."
+      "free_stops": "Snag flow and billing triggers are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count open snag items on each nearly finished site, so you can see which projects are blocking the final payment longest.",
+          "review": true
+        },
+        {
+          "text": "Give one supervisor the job of keeping one live snag page per site, so the team closes hold-backs in a tighter loop.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p10_lead_quality",
@@ -204,7 +294,17 @@
         "tool_words": []
       },
       "ask_first": "Where do most enquiries come from?",
-      "free_stops": "Question set and scoring are in the solution document."
+      "free_stops": "Question set and scoring are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many Instagram enquiries asked for layouts or mood ideas before asking budget or timeline, so time-wasters stand out early.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of noting each enquiry reason in one notebook, so design time goes toward more serious prospects.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

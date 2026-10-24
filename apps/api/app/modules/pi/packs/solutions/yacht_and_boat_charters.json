@@ -2,7 +2,7 @@
   "industry": "yacht_and_boat_charters",
   "name": "Yacht and boat charters",
   "sector": "7.G Transport, mobility and aviation (part 1)",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_booking_appointments",
@@ -24,7 +24,17 @@
         ]
       },
       "ask_first": "How many boats and booking channels do you run?",
-      "free_stops": "How platforms and staff bookings feed the calendar is set out in the solution document."
+      "free_stops": "How platforms and staff bookings feed the calendar is set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many Friday evening requests mention the same yacht, so you see which vessel keeps causing booking clashes.",
+          "review": false
+        },
+        {
+          "text": "Write every new charter hold for each yacht in one desk notebook, so sales staff stop promising the same slot twice.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_channel_conflict",
@@ -44,7 +54,17 @@
         "tool_words": []
       },
       "ask_first": "How many brokers sell your boats?",
-      "free_stops": "The parity rules and broker sharing are designed in the solution document."
+      "free_stops": "The parity rules and broker sharing are designed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note each broker's advertised charter price for the same boat this week, so undercutting shows boat by boat.",
+          "review": true
+        },
+        {
+          "text": "Give one person the job of telling brokers the current boat rate, so mixed pricing stops across channels.",
+          "review": true
+        }
+      ]
     },
     {
       "id": "p3_utilisation_imbalance",
@@ -69,7 +89,17 @@
         ]
       },
       "ask_first": "Are your weekday guests mostly residents or tourists?",
-      "free_stops": "The offer timing and audience are worked out in the solution document."
+      "free_stops": "The offer timing and audience are worked out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count enquiries asking for weekday charters versus weekend charters this week, so the quieter demand pattern becomes visible.",
+          "review": false
+        },
+        {
+          "text": "Set one fixed midday check for unsold weekday slots, so staff actively offer quieter sailings before weekends fill up.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_refunds",
@@ -90,7 +120,17 @@
         "tool_words": []
       },
       "ask_first": "Do you prefer to reschedule or refund when a trip is called off?",
-      "free_stops": "The reschedule flow and how terms are shown are designed in the solution document; the terms themselves are worth checking with your lawyer."
+      "free_stops": "The reschedule flow and how terms are shown are designed in the solution document; the terms themselves are worth checking with your lawyer.",
+      "extra_ideas": [
+        {
+          "text": "Note how many recent cancellation disputes ended in refund versus rebooking, so you see where arguments usually land.",
+          "review": true
+        },
+        {
+          "text": "Keep one written log of every cancelled charter outcome, so staff give the same operational answer each time.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_margin_unknown",
@@ -111,7 +151,17 @@
         "tool_words": []
       },
       "ask_first": "Who fills up the boats today, crew or the marina?",
-      "free_stops": "The logging and matching rules are set out in the solution document."
+      "free_stops": "The logging and matching rules are set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note each boat's fuel used and trip length after every charter this week, so underpriced hours stand out by vessel.",
+          "review": false
+        },
+        {
+          "text": "Give one crew member the job of writing trip fuel and hours in one notebook, so pricing reviews use the same record.",
+          "review": true
+        }
+      ]
     },
     {
       "id": "p6_lead_followup_slow",
@@ -132,7 +182,17 @@
         "tool_words": []
       },
       "ask_first": "Which channel brings most enquiries?",
-      "free_stops": "The inbox setup and source tagging are designed in the solution document."
+      "free_stops": "The inbox setup and source tagging are designed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Check the last few enquiry chats and note reply gaps by time of day, so slow periods show clearly.",
+          "review": false
+        },
+        {
+          "text": "Assign one staff member to watch incoming charter enquiries during busy hours, so potential guests stop waiting for a first reply.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_shift_scheduling",
@@ -153,7 +213,17 @@
         "tool_words": []
       },
       "ask_first": "Are your crew employed or freelance?",
-      "free_stops": "The run sheet content and pay rules are set out in the solution document."
+      "free_stops": "The run sheet content and pay rules are set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many trip changes reached crew on the same day this week, so the notice problem has a size.",
+          "review": false
+        },
+        {
+          "text": "Choose one daily handover time for next trip assignments, so captains and crew hear the plan earlier.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_service_errors",
@@ -173,7 +243,17 @@
         "tool_words": []
       },
       "ask_first": "Is catering in-house or from outside suppliers?",
-      "free_stops": "The order flow and supplier confirmations are designed in the solution document."
+      "free_stops": "The order flow and supplier confirmations are designed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count which promised add-ons were missed or wrong on recent charters, so the repeat weak spots show by type.",
+          "review": false
+        },
+        {
+          "text": "Put one person in charge of the daily add-on list before each charter, so cakes and decor stop getting overlooked.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_payout_reconciliation",
@@ -195,7 +275,17 @@
         ]
       },
       "ask_first": "How many platforms sell your charters?",
-      "free_stops": "The matching rules per platform are worked out in the solution document."
+      "free_stops": "The matching rules per platform are worked out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note each completed charter and the day its payout message arrives, so you can see which channels are slowest to clear.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member a single notebook page for deduction queries after each charter, so disputes stop getting missed between crews and office.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p10_manual_reports",
@@ -215,7 +305,17 @@
         "tool_words": []
       },
       "ask_first": "How many managed yachts do you run?",
-      "free_stops": "The statement structure and cost allocation are designed in the solution document."
+      "free_stops": "The statement structure and cost allocation are designed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare the last few owner statements side by side, so repeated hand changes and missing items stand out quickly.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member the monthly owner statement notebook, so every boat owner update is gathered in one place.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

@@ -2,7 +2,7 @@
   "industry": "textile_spinning_and_weaving_mills",
   "name": "Textile spinning and weaving mills",
   "sector": "7.D Manufacturing and industry (part 1)",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_bottleneck",
@@ -22,7 +22,17 @@
         "tool_words": []
       },
       "ask_first": "Which part feels slowest — preparation, beams or the looms themselves?",
-      "free_stops": "How beam need is forecast and how preparation is sequenced is set out in the solution document."
+      "free_stops": "How beam need is forecast and how preparation is sequenced is set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "For one week, note each loom waiting for a beam and how long it stands, so beam delay is measured in lost weaving time.",
+          "review": false
+        },
+        {
+          "text": "Give one person the beam readiness list and evening handover to weaving, so loom changeovers stop waiting for verbal chasing.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_branch_comparison",
@@ -43,7 +53,17 @@
         "tool_words": []
       },
       "ask_first": "Is daily output recorded by loom or shed, or just as a total?",
-      "free_stops": "How efficiency is calculated and compared across sheds is kept for the solution document."
+      "free_stops": "How efficiency is calculated and compared across sheds is kept for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "For one day, compare each shed and shift by looms running versus looms stopped, so the weakest shed or shift stands out.",
+          "review": false
+        },
+        {
+          "text": "Give one person in each shift the same stoppage notebook, so shed and shift comparisons come from one consistent record.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_theft_internal",
@@ -63,7 +83,17 @@
         "tool_words": []
       },
       "ask_first": "Who weighs the waste when it goes out of the gate?",
-      "free_stops": "Where weighing points sit and how mismatches are flagged are covered in the solution document."
+      "free_stops": "Where weighing points sit and how mismatches are flagged are covered in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "For one week, note waste weight at the department and again at the gate, so the mismatch is tied to a place.",
+          "review": false
+        },
+        {
+          "text": "Give one store person the waste register and gate handover each day, so outgoing weight is checked from one record.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_maintenance_downtime",
@@ -84,7 +114,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "How downtime is costed and planned around is detailed in the solution document."
+      "free_stops": "How downtime is costed and planned around is detailed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "For one week, note each gas pressure drop with start time, end time and affected looms, so lost production from interruptions is visible.",
+          "review": false
+        },
+        {
+          "text": "Give one shift incharge the interruption notebook at every handover, so each pressure drop is recorded without chasing later.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_serial_batch_tracking",
@@ -104,7 +144,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "How lots are linked through each stage is mapped in the solution document."
+      "free_stops": "How lots are linked through each stage is mapped in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "For the next weaving order, compare yarn lot written at issue with lot used on the beam, so mixing points become visible.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of writing yarn lot on every beam card, so shade complaints can be traced to a single source record.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_inspection_missing",
@@ -124,7 +174,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "Fault categories and how they feed back to jobbers are set out in the solution document."
+      "free_stops": "Fault categories and how they feed back to jobbers are set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "For one day, count rejected rolls with no loom number versus total rejected rolls, so the missing traceability problem has a size.",
+          "review": false
+        },
+        {
+          "text": "Give one folding supervisor the roll log beside the table, so every rejected roll is tied to its loom before it moves on.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_credit_customers",
@@ -144,7 +204,17 @@
         "tool_words": []
       },
       "ask_first": "How do you keep track of what each trader owes now?",
-      "free_stops": "How limits are set and how statements are agreed with each party is kept for the solution document."
+      "free_stops": "How limits are set and how statements are agreed with each party is kept for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many trader part-payments arrived after the cloth was already fully lifted this month, so collection delay by trader type is visible.",
+          "review": false
+        },
+        {
+          "text": "Keep one trader dues notebook with one staff member and a fixed Saturday review, so every instalment follows the same follow-up routine.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_receivables_late",
@@ -165,7 +235,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "How confirmations are captured and balances reconciled is covered in the solution document."
+      "free_stops": "How confirmations are captured and balances reconciled is covered in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "For one disputed conversion party, compare your delivery record with their claimed metres, so the disagreement is narrowed to one number.",
+          "review": false
+        },
+        {
+          "text": "Give one dispatch clerk the delivery notebook and same-day handover to accounts, so woven metres are recorded before disputes grow.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_margin_unknown",
@@ -185,7 +265,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "How overheads and waste are spread across counts is detailed in the solution document."
+      "free_stops": "How overheads and waste are spread across counts is detailed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note one spinning lot's cotton issued, yarn packed and reprocessing returned on the same page, so your rough cost per kilogram reflects actual mill output.",
+          "review": false
+        },
+        {
+          "text": "Give one person one weekly page for cotton issued, yarn packed and cloth delivered, so cost checking uses the same mill figures every time.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p10_owner_bottleneck",
@@ -206,7 +296,17 @@
         "leads_with_view": true
       },
       "ask_first": "",
-      "free_stops": "Which numbers go in and where they come from is set out in the solution document."
+      "free_stops": "Which numbers go in and where they come from is set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "For one morning, note when each production update reaches you and from whom, so delay between sheds and your desk is clear.",
+          "review": false
+        },
+        {
+          "text": "Give one supervisor the daily production roundup at a fixed morning time in one notebook, so your calls stop interrupting weaving work.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

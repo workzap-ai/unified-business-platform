@@ -2,7 +2,7 @@
   "industry": "wholesale_market_traders",
   "name": "Wholesale-market traders (e.g. Jodia Bazaar, Shah Alam Market, Deira souks)",
   "sector": "7.E Trade, distribution and logistics",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_credit_customers",
@@ -22,7 +22,17 @@
         "tool_words": []
       },
       "ask_first": "Roughly how many buyers are on udhaar at any time?",
-      "free_stops": "How the khata moves across and is kept in step is planned in the solution document."
+      "free_stops": "How the khata moves across and is kept in step is planned in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many khata pages have no fresh entry this month, so you see how much old money is simply sitting.",
+          "review": false
+        },
+        {
+          "text": "Set one fixed weekly time for the khata review with one person reading and one noting, so overdue balances stop being skipped.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_receivables_late",
@@ -43,7 +53,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "Reminder timing and hold rules are set in the solution document."
+      "free_stops": "Reminder timing and hold rules are set in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note which upcountry buyers go silent after delivery and how old each unpaid bill feels, so the riskiest credit customers stand out.",
+          "review": true
+        },
+        {
+          "text": "Keep one dispatch notebook with one line per consignment and give one person the follow up job, so unpaid loads are chased from one place.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_cash_mismatch",
@@ -63,7 +83,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The closing steps and checks are laid out in the solution document."
+      "free_stops": "The closing steps and checks are laid out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare the closing cash count with total parchis for one week, so you see whether the mismatch is small drift or repeated leakage.",
+          "review": false
+        },
+        {
+          "text": "Give one person the parchi bundle and one place for all cash notes at closing, so the gaddi handover stays orderly every day.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_accountability",
@@ -86,7 +116,17 @@
         ]
       },
       "ask_first": "",
-      "free_stops": "Which records move first, and how, is planned in the solution document."
+      "free_stops": "Which records move first, and how, is planned in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "List the munshi tasks only he handles during one market day, so you see exactly where the business would stall if he is absent.",
+          "review": false
+        },
+        {
+          "text": "Give one backup person one fixed duty beside the munshi each day, so critical work starts spreading into the routine.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_transfers_lost",
@@ -106,7 +146,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The slip and count flow are designed in the solution document."
+      "free_stops": "The slip and count flow are designed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count bags at godown exit and again at shop arrival for a few market runs, so you learn how often the move changes the total.",
+          "review": false
+        },
+        {
+          "text": "Use one handover slip kept with each load and make one receiver own the arrival count, so every transfer has a clear endpoint.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_pricing_errors",
@@ -126,7 +176,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The rate board and quote log setup are in the solution document."
+      "free_stops": "The rate board and quote log setup are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note each rate dispute by item and when it was quoted, so you see which goods create the most argument.",
+          "review": false
+        },
+        {
+          "text": "Keep one daily rate sheet at the gaddi and make one person update it each morning, so everyone quotes from the same day’s bhaav.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_margin_unknown",
@@ -147,7 +207,17 @@
         "leads_with_view": true
       },
       "ask_first": "",
-      "free_stops": "How lots are matched to sales is set in the solution document."
+      "free_stops": "How lots are matched to sales is set in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare today's selling rate with the latest buying rate on a few fast items, so you spot where margin is thin or missing.",
+          "review": false
+        },
+        {
+          "text": "Keep one notebook section for each new lot's buying rate and give one person that entry job, so later selling decisions have a clear base.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_expiry_wastage",
@@ -167,7 +237,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "Alert rules per item are set in the solution document."
+      "free_stops": "Alert rules per item are set in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Walk the stock once this week and note which dry fruit lots have sat longest, so slow moving bags stand out before more spoilage.",
+          "review": false
+        },
+        {
+          "text": "Give one person the weekly old stock check and keep all arrival notes in one notebook, so older lots get attention before summer damage grows.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_whatsapp_overload",
@@ -187,7 +267,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The intake and confirmation flow are in the solution document."
+      "free_stops": "The intake and confirmation flow are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many phone and chat orders need a second check before packing today, so you see the size of the missed order problem.",
+          "review": false
+        },
+        {
+          "text": "Keep one running order list in one notebook and give one person the job of adding every incoming order, so packing pulls from one place.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p10_payment_methods",
@@ -208,7 +298,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The matching rules are set in the solution document."
+      "free_stops": "The matching rules are set in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count unmatched bank transfers at closing for one week, so you see how often payment arrives without a clear bill link.",
+          "review": true
+        },
+        {
+          "text": "Keep one notebook page for transfers and give one person the matching job each evening, so the khata updates without guesswork.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p11_no_customer_data",
@@ -229,7 +329,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "How the list is built and used is planned in the solution document."
+      "free_stops": "How the list is built and used is planned in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note which buyers return more than once this week and what they take, so your regular trade pattern starts to show.",
+          "review": false
+        },
+        {
+          "text": "Keep one notebook beside the gaddi for repeat buyer notes and give one staff member that job, so regular demand gets remembered at the counter.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

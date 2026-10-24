@@ -2,7 +2,7 @@
   "industry": "wedding_planners_and_event_management",
   "name": "Wedding planners and event management",
   "sector": "7.H Hospitality, events and personal services",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_pre_orders_custom",
@@ -22,7 +22,17 @@
         "tool_words": []
       },
       "ask_first": "How do you agree the original design with clients now?",
-      "free_stops": "The change-order steps and how they tie to the quote are in the solution document."
+      "free_stops": "The change-order steps and how they tie to the quote are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note how many decor changes were asked for after approval on recent weddings, so you see how often extra work goes unpaid.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of logging every client change in one running list, so the team stops acting on loose messages.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_manual_work",
@@ -42,7 +52,17 @@
         "tool_words": []
       },
       "ask_first": "How many quotes do you send in a busy month?",
-      "free_stops": "The item library structure and pricing logic stay for the solution document."
+      "free_stops": "The item library structure and pricing logic stay for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count which quote items repeat across your last few proposals, so you can stop rebuilding the same package each time.",
+          "review": false
+        },
+        {
+          "text": "Keep one master handwritten list of your usual wedding items and rates beside you, so quote writing moves faster.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_receivables_late",
@@ -62,7 +82,17 @@
         "tool_words": []
       },
       "ask_first": "In how many stages do clients pay you now?",
-      "free_stops": "Stage timing and reminder rules are set out in the solution document."
+      "free_stops": "Stage timing and reminder rules are set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare weddings with late final payment against when the couple last heard from you, so weak follow up timing stands out.",
+          "review": true
+        },
+        {
+          "text": "Give one staff member the job of keeping all due balances in one notebook checked at a fixed time, so chasing happens before the wedding passes.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_shift_scheduling",
@@ -82,7 +112,17 @@
         "tool_words": []
       },
       "ask_first": "How many events do you run on a peak weekend?",
-      "free_stops": "How roles and events are mapped and confirmed goes in the solution document."
+      "free_stops": "How roles and events are mapped and confirmed goes in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many team calls came in asking where to report on your last busy night, so the confusion has a size.",
+          "review": false
+        },
+        {
+          "text": "Write every event assignment for the coming night in one visible list with one lead per venue, so staff know where to go.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_owner_bottleneck",
@@ -102,7 +142,17 @@
         "tool_words": []
       },
       "ask_first": "Do you have a senior person who could lead an event?",
-      "free_stops": "The event file structure and day-of checklist are designed in the solution document."
+      "free_stops": "The event file structure and day-of checklist are designed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note how many event questions came only to you during one live setup, so you see which parts nobody else can run.",
+          "review": false
+        },
+        {
+          "text": "Assign one event lead to carry the full paper run sheet on site, so the day can keep moving if you are pulled away.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_supplier_late",
@@ -122,7 +172,17 @@
         "tool_words": []
       },
       "ask_first": "Which vendor type lets you down most?",
-      "free_stops": "The vendor directory and confirmation timing stay for the solution document."
+      "free_stops": "The vendor directory and confirmation timing stay for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note which vendor types arrived after their promised time at recent events, so you see where delays hit your schedule most.",
+          "review": false
+        },
+        {
+          "text": "Give one team member the job of keeping all vendor arrival times in one event note, so late handovers are spotted earlier.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_shrinkage_theft",
@@ -142,7 +202,17 @@
         "tool_words": []
       },
       "ask_first": "Is your decor stored in one godown?",
-      "free_stops": "The register setup and damage notes are in the solution document."
+      "free_stops": "The register setup and damage notes are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count which props went out and which came back after one event, so losses from teardown stop being guessed.",
+          "review": false
+        },
+        {
+          "text": "Make one person responsible for one return list at pack down, so broken or missing props are noted before items scatter.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_lead_quality",
@@ -163,7 +233,17 @@
         "tool_words": []
       },
       "ask_first": "Do you share prices before or after a consultation?",
-      "free_stops": "Source tagging and the follow-up sequence are planned in the solution document."
+      "free_stops": "Source tagging and the follow-up sequence are planned in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many price only enquiries turned into meetings this week, so you see how much time is going to weak leads.",
+          "review": true
+        },
+        {
+          "text": "Give one person the job of noting every enquiry outcome in one notebook, so serious leads are easier to spot quickly.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_margin_unknown",
@@ -184,7 +264,17 @@
         "leads_with_view": true
       },
       "ask_first": "Do you price as a package or itemised?",
-      "free_stops": "How costs are captured per event stays for the solution document."
+      "free_stops": "How costs are captured per event stays for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare what you quoted and what you actually spent on one recent wedding, so the profit leak shows on a real job.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member the job of collecting every event cost into one envelope after each wedding, so review stops slipping.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p10_petty_cash",
@@ -204,7 +294,17 @@
         "tool_words": []
       },
       "ask_first": "How many labourers work a typical event?",
-      "free_stops": "Payout rules and settlement cycle are in the solution document."
+      "free_stops": "Payout rules and settlement cycle are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count cash paid against the names on each event's labour note this week, so missing amounts stop being argued later.",
+          "review": false
+        },
+        {
+          "text": "Give one supervisor the job of writing every cash payout in one notebook at the event, so each payment has a clear trail.",
+          "review": true
+        }
+      ]
     }
   ],
   "never_say": [

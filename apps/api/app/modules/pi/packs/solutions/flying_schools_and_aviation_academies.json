@@ -2,7 +2,7 @@
   "industry": "flying_schools_and_aviation_academies",
   "name": "Flying schools and aviation academies",
   "sector": "7.G Transport, mobility and aviation (part 1)",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_bottleneck",
@@ -23,7 +23,17 @@
         "tool_words": []
       },
       "ask_first": "Zyada tar slots kis wajah se cancel hote hain, aircraft, instructor ya mausam?",
-      "free_stops": "The rebooking rules and priority order are set out in the solution document."
+      "free_stops": "The rebooking rules and priority order are set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare booked slots against flown slots for one recent week, so you see how much training time cancellations are really eating.",
+          "review": false
+        },
+        {
+          "text": "Give one staff role the daily job of filling newly opened slots, so empty time gets reused before students arrive.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_booking_appointments",
@@ -43,7 +53,17 @@
         "tool_words": []
       },
       "ask_first": "Kitne aircraft aur sims ek saath schedule hote hain?",
-      "free_stops": "How resources, rules and student access are set up is designed in the solution document."
+      "free_stops": "How resources, rules and student access are set up is designed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Check this week's board against message confirmations once, so you spot where double bookings are actually entering the routine.",
+          "review": false
+        },
+        {
+          "text": "Keep one master booking list beside the whiteboard under one scheduler role, so aircraft clashes stop at the source.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_maintenance_downtime",
@@ -64,7 +84,17 @@
         "tool_words": []
       },
       "ask_first": "Maintenance wale abhi schedule wale ko kaise batate hain?",
-      "free_stops": "How maintenance status links to the schedule is set out in the solution document."
+      "free_stops": "How maintenance status links to the schedule is set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many arrivals faced unavailable aircraft in one recent week, so the front desk can see the disruption load.",
+          "review": false
+        },
+        {
+          "text": "Set one fixed handover time for downtime updates each day, so students hear about changes before travelling in.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_receivables_late",
@@ -84,7 +114,17 @@
         "tool_words": []
       },
       "ask_first": "Students upfront dete hain, per hour ya instalments mein?",
-      "free_stops": "Reminder timing and the overdue rule are worked out in the solution document."
+      "free_stops": "Reminder timing and the overdue rule are worked out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count overdue instalment cases where the next lesson was still delivered this week, so you see how much revenue is running unsecured.",
+          "review": false
+        },
+        {
+          "text": "Give one admin role the job of marking overdue accounts before the daily schedule is confirmed, so lessons stop slipping through unpaid.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_customer_communication",
@@ -105,7 +145,17 @@
         "tool_words": []
       },
       "ask_first": "Progress ka record abhi kahan rakha jata hai?",
-      "free_stops": "What the progress view shows and how often it's sent is designed in the solution document."
+      "free_stops": "What the progress view shows and how often it's sent is designed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note which progress questions repeat most across one week of calls, so updates can focus on what payers keep asking.",
+          "review": false
+        },
+        {
+          "text": "Give one office role a fixed weekly time to send progress updates, so incoming calls interrupt the team less often.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_lead_followup_slow",
@@ -126,7 +176,17 @@
         "tool_words": []
       },
       "ask_first": "Zyada tar enquiries kahan se aati hain?",
-      "free_stops": "Follow-up timing and source tagging are set out in the solution document."
+      "free_stops": "Follow-up timing and source tagging are set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count open enquiries by source and waiting time once, so you see where slow replies are costing the most interest.",
+          "review": true
+        },
+        {
+          "text": "Keep all fresh enquiries in one notebook with one owner per shift, so reply speed stops slipping between busy moments.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_payroll_errors",
@@ -146,7 +206,17 @@
         "tool_words": []
       },
       "ask_first": "Instructors full-time hain ya per hour?",
-      "free_stops": "The pay rules and session types are configured in the solution document."
+      "free_stops": "The pay rules and session types are configured in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare one recent pay period's handwritten instructor hours with the lesson diary totals, so you pinpoint whether disputes start in recording or adding.",
+          "review": false
+        },
+        {
+          "text": "Keep one shared notebook for instructor hour handovers at a fixed weekly time, so pay preparation uses one agreed source.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_margin_unknown",
@@ -167,7 +237,17 @@
         "leads_with_view": true
       },
       "ask_first": "Is saal kaun si cost sab se zyada barhi hai?",
-      "free_stops": "How fixed costs are spread across hours is worked out in the solution document."
+      "free_stops": "How fixed costs are spread across hours is worked out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note one recent month's aircraft running costs beside its billed flying hours, so you see what each sold hour is carrying.",
+          "review": false
+        },
+        {
+          "text": "Give one admin role a fixed month end slot to write hours and running costs together, so pricing decisions use current figures.",
+          "review": true
+        }
+      ]
     },
     {
       "id": "p9_fuel_leakage",
@@ -188,7 +268,17 @@
         "tool_words": []
       },
       "ask_first": "Fuel ka record abhi kaun rakhta hai?",
-      "free_stops": "The reconciliation logic and alert levels are set out in the solution document."
+      "free_stops": "The reconciliation logic and alert levels are set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count uplift slips for one aircraft beside its lesson hours for this week, so you see whether the mismatch keeps repeating.",
+          "review": false
+        },
+        {
+          "text": "Give one ground role the job of placing every uplift slip in one aircraft file daily, so the weekly fuel check happens without chasing papers.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p10_licences_renewals",
@@ -208,7 +298,17 @@
         "tool_words": []
       },
       "ask_first": "Kitni renewals ka hisaab rakhna padta hai, taqreeban?",
-      "free_stops": "Reminder timing and owners per renewal are designed in the solution document."
+      "free_stops": "Reminder timing and owners per renewal are designed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Walk round and note every document with a renewal month showing, so surprise grounding and insurance scrambling ease this term.",
+          "review": true
+        },
+        {
+          "text": "Keep one renewal notebook at the dispatch desk under one admin role, so expiry chasing stops bouncing between people.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

@@ -2,7 +2,7 @@
   "industry": "perfumes_attar_and_oud",
   "name": "Perfumes, attar and oud",
   "sector": "7.A Retail and consumer (part 2)",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_count_mismatch",
@@ -23,7 +23,17 @@
         "tool_words": []
       },
       "ask_first": "Which grades are sold loose?",
-      "free_stops": "the measuring routine and variance limits go in the solution document."
+      "free_stops": "the measuring routine and variance limits go in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare one busy day's oil poured with the tola sales written that day, so you see how much eye measuring drifts.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of writing every loose oil pour in one notebook, so stock checks match sales better.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_theft_internal",
@@ -43,7 +53,17 @@
         "tool_words": []
       },
       "ask_first": "How many people handle the top grades?",
-      "free_stops": "the control routine and access rules are kept for the solution document."
+      "free_stops": "the control routine and access rules are kept for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note which role handled each top-grade bottle during one full day, so the loss pattern narrows to a part of the routine.",
+          "review": false
+        },
+        {
+          "text": "Keep all top-grade bottle handovers in one notebook at shift change, so missing amounts can be tied to a handover.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_no_sop",
@@ -63,7 +83,17 @@
         "tool_words": []
       },
       "ask_first": "Is any recipe written down today?",
-      "free_stops": "how recipes are recorded, protected and linked to batches is detailed in the solution document."
+      "free_stops": "how recipes are recorded, protected and linked to batches is detailed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Smell the same blend from two recent batches side by side, so you can judge how wide the batch difference really is.",
+          "review": false
+        },
+        {
+          "text": "Give one person the batch notebook for recipe notes and blend labels, so every repeat batch follows the same written record.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_raw_material_shortage",
@@ -83,7 +113,17 @@
         "tool_words": []
       },
       "ask_first": "How far ahead do you order packaging today?",
-      "free_stops": "reorder levels and seasonal timing go in the solution document."
+      "free_stops": "reorder levels and seasonal timing go in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare current bottles, caps and boxes on hand with last Eid's busiest days, so shortages are spotted before packing stalls.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member the packaging count list and one fixed count time, so Eid prep stops relying on rough guesses.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_cash_mismatch",
@@ -104,7 +144,17 @@
         "tool_words": []
       },
       "ask_first": "How many kiosks or shops do you run?",
-      "free_stops": "the close-out fields and checks are kept for the solution document."
+      "free_stops": "the close-out fields and checks are kept for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare each kiosk's closing note against cash on the same evening once, so you see which reporting style hides the mismatch.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of collecting all kiosk closings in one place nightly, so differences are caught before the next day.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_wastage_cost",
@@ -125,7 +175,17 @@
         "tool_words": []
       },
       "ask_first": "Are samples recorded anywhere today?",
-      "free_stops": "allowance rules and reporting go in the solution document."
+      "free_stops": "allowance rules and reporting go in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many samples and decants each kiosk gives in one busy day, so giveaway habits by location become visible.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member the sample notebook at each kiosk, so every free decant is noted in the same place.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_pre_orders_custom",
@@ -145,7 +205,17 @@
         "tool_words": []
       },
       "ask_first": "How do corporate orders reach you?",
-      "free_stops": "the order stages and approval flow are kept for the solution document."
+      "free_stops": "the order stages and approval flow are kept for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many open gift orders are waiting on box details or name approvals, so the real source of deadline slips stands out.",
+          "review": false
+        },
+        {
+          "text": "Give one person the single notebook for all custom gift orders and promised dates, so every handover follows the same list.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_rent",
@@ -166,7 +236,17 @@
         "leads_with_view": true
       },
       "ask_first": "Are your kiosks in the same mall or different ones?",
-      "free_stops": "the comparison model is set up in the solution document."
+      "free_stops": "the comparison model is set up in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare one week's sales notes between kiosks against each kiosk's rent and staff presence, so the weakest location stands out clearly.",
+          "review": false
+        },
+        {
+          "text": "Give one person the weekly kiosk comparison page in one notebook, so rent discussions use the same routine each week.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_customer_communication",
@@ -186,7 +266,17 @@
         "tool_words": []
       },
       "ask_first": "Which scents run out most often?",
-      "free_stops": "the messaging plan is kept for the solution document."
+      "free_stops": "the messaging plan is kept for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many times each scent is requested after it sells out this week, so restock choices match what customers actually ask for.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member one notebook for sold-out scent requests at the counter, so return updates can be managed from one place.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p10_receivables_late",
@@ -206,7 +296,17 @@
         "tool_words": []
       },
       "ask_first": "How many wholesale buyers take credit?",
-      "free_stops": "limits and reminder timing go in the solution document."
+      "free_stops": "limits and reminder timing go in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Mark which wholesale buyers paid later than promised on the last round, so your follow-up starts with the slowest payers.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member the credit notebook and a fixed review time, so overdue buyer follow-up happens every trading week.",
+          "review": true
+        }
+      ]
     }
   ],
   "never_say": [

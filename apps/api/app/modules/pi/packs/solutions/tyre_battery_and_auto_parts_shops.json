@@ -2,7 +2,7 @@
   "industry": "tyre_battery_and_auto_parts_shops",
   "name": "Tyre, battery and auto-parts shops",
   "sector": "7.G Transport, mobility and aviation (part 2)",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_wrong_location",
@@ -23,7 +23,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "How the catalogue and locations are structured is in the solution document."
+      "free_stops": "How the catalogue and locations are structured is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Mark down each time a part shows in stock but cannot be found that moment, so you see which lines waste the most counter time.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of checking misplaced parts back to shelf before lunch, so the register and shelves drift less.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_stockout",
@@ -43,7 +53,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "Reorder levels and how they adjust by season are in the solution document."
+      "free_stops": "Reorder levels and how they adjust by season are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how often customers ask for filters or pads you have just run out of, so the missed demand is clearer.",
+          "review": false
+        },
+        {
+          "text": "Keep one refill list for filters and pads at the counter, so every empty spot gets noted for the next order.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_overstock_dead_stock",
@@ -64,7 +84,17 @@
         "leads_with_view": true
       },
       "ask_first": "",
-      "free_stops": "How age and value are calculated is in the solution document."
+      "free_stops": "How age and value are calculated is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many godown shelves hold parts for models nobody has asked for lately, so the space problem has a visible size.",
+          "review": false
+        },
+        {
+          "text": "Give one person a weekly walk through the godown with one dead stock page, so old parts stop getting mixed into active shelves.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_expiry_wastage",
@@ -84,7 +114,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "Ageing rules per item are in the solution document."
+      "free_stops": "Ageing rules per item are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note how many tyre and battery sales are refused because the stock looks old, so you see where age is hurting turnover.",
+          "review": false
+        },
+        {
+          "text": "Keep one older stock row at the front for tyres and batteries, so staff reach aging pieces before newer ones.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_credit_customers",
@@ -104,7 +144,17 @@
         "tool_words": []
       },
       "ask_first": "Roughly how many workshops buy from you on credit?",
-      "free_stops": "Statement timing and reminder steps are in the solution document; credit terms are for your accountant."
+      "free_stops": "Statement timing and reminder steps are in the solution document; credit terms are for your accountant.",
+      "extra_ideas": [
+        {
+          "text": "Compare the notebook balance with the last settlement claimed by each workshop, so you see which accounts cause the most disputes.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of updating every credit sale on the same page daily, so settlement talks start from one running balance.",
+          "review": true
+        }
+      ]
     },
     {
       "id": "p6_pricing_errors",
@@ -124,7 +174,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "How updates flow to each counter is in the solution document."
+      "free_stops": "How updates flow to each counter is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note each time staff quote an old rate during the week, so you see which parts cause the most price confusion.",
+          "review": true
+        },
+        {
+          "text": "Keep one handwritten current rate sheet at the counter and remove old copies, so staff stop reaching for last month's prices.",
+          "review": true
+        }
+      ]
     },
     {
       "id": "p7_discount_abuse",
@@ -144,7 +204,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "Limits and approval paths are in the solution document."
+      "free_stops": "Limits and approval paths are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many sales close below the usual counter rate in one week, so you see how often discounts are being given away.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of writing down every non standard discount at the counter, so friendly deals no longer pass unnoticed.",
+          "review": true
+        }
+      ]
     },
     {
       "id": "p8_after_sales",
@@ -164,7 +234,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "Claim stages and reminders are in the solution document."
+      "free_stops": "Claim stages and reminders are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many open battery and tyre claims are waiting with no update this week, so you see the queue customers keep asking about.",
+          "review": false
+        },
+        {
+          "text": "Keep all warranty claims in one notebook with one staff member updating it daily, so every pending case has a clear handover point.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_cash_mismatch",
@@ -184,7 +264,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The cash-up steps are in the solution document."
+      "free_stops": "The cash-up steps are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note the cash short or extra amount at each shift close for one week, so you see when mismatches happen most often.",
+          "review": false
+        },
+        {
+          "text": "Give one person the drawer for the whole shift and one place for paid slips, so the handover stays easier to check.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p10_whatsapp_overload",
@@ -204,7 +294,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The enquiry flow and routing are in the solution document."
+      "free_stops": "The enquiry flow and routing are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many part photo enquiries sit unanswered by closing for one week, so you see the real backlog at the counter.",
+          "review": false
+        },
+        {
+          "text": "Keep all part photo enquiries on one notebook page beside the counter, so each reply can be marked before the shift ends.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p11_owner_blind",
@@ -224,7 +324,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "What the daily read includes is in the solution document."
+      "free_stops": "What the daily read includes is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note the cash and card sales total at midday for one week, so you can compare quiet and busy days sooner.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member the job of sending one midday sales total daily, so you spot a slow day before closing.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

@@ -2,7 +2,7 @@
   "industry": "colleges_and_universities",
   "name": "Colleges and universities (admin)",
   "sector": "7.J Education and childcare",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_lead_followup_slow",
@@ -22,7 +22,17 @@
         "tool_words": []
       },
       "ask_first": "Where do most applications start — website, social, walk-in or agents?",
-      "free_stops": "The counsellor assignment rules and funnel stages are kept for the document."
+      "free_stops": "The counsellor assignment rules and funnel stages are kept for the document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many admission enquiries are still waiting at closing each day this week, so you see the callback backlog during peak weeks.",
+          "review": false
+        },
+        {
+          "text": "Give one counsellor each day's leftover callbacks before closing, so missed enquiries are owned before the next rush arrives.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_conversion_low",
@@ -42,7 +52,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The reminder timings and drop-off reasons tracking are in the document."
+      "free_stops": "The reminder timings and drop-off reasons tracking are in the document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many completed forms are still unpaid at the same time each afternoon, so you see the daily drop off before fees.",
+          "review": false
+        },
+        {
+          "text": "Keep one handwritten list of unpaid completed applications at admissions, so follow up stops getting scattered across desks.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_receivables_late",
@@ -62,7 +82,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The reminder sequence and early-warning thresholds are kept for the document."
+      "free_stops": "The reminder sequence and early-warning thresholds are kept for the document.",
+      "extra_ideas": [
+        {
+          "text": "Compare overdue installment counts at midterm and before exams, so you see how long late accounts stay unnoticed.",
+          "review": false
+        },
+        {
+          "text": "Give one finance staff member the weekly overdue review, so late installment accounts are checked before exam season.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_deposit_delays",
@@ -84,7 +114,17 @@
         ]
       },
       "ask_first": "",
-      "free_stops": "How each bank's statement is read and matched is set out in the document."
+      "free_stops": "How each bank's statement is read and matched is set out in the document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many fee receipts are still unmatched at the end of each day, so you see which bank days create the delay.",
+          "review": false
+        },
+        {
+          "text": "Keep one notebook for unmatched fee receipts beside the matching desk, so every unresolved payment stays in one place.",
+          "review": true
+        }
+      ]
     },
     {
       "id": "p5_approvals_slow",
@@ -104,7 +144,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The approval routing and turnaround targets are kept for the document."
+      "free_stops": "The approval routing and turnaround targets are kept for the document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many scholarship and discount files are waiting with each approver today, so the approval bottleneck shows.",
+          "review": true
+        },
+        {
+          "text": "Give one person the job of noting file handovers in one register, so stalled approvals stop disappearing between desks.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_payroll_errors",
@@ -124,7 +174,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The matching rules for swaps, make-up lectures and cancellations are in the document."
+      "free_stops": "The matching rules for swaps, make-up lectures and cancellations are in the document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many visiting faculty claims differ from the timetable this month, so you see the size of the payroll mismatch.",
+          "review": false
+        },
+        {
+          "text": "Keep one register for timetable changes and claim handovers, so payroll checks use the same version everyone saw.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_bottleneck",
@@ -144,7 +204,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The clash rules and room-capacity logic are kept for the document."
+      "free_stops": "The clash rules and room-capacity logic are kept for the document.",
+      "extra_ideas": [
+        {
+          "text": "Walk the rooms against the draft timetable once this week, so you spot clashes before the first teaching day.",
+          "review": false
+        },
+        {
+          "text": "Give one scheduler the job of marking every room change in one timetable copy, so week one clashes stop bouncing around departments.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_handoffs",
@@ -166,7 +236,17 @@
         ]
       },
       "ask_first": "",
-      "free_stops": "Which fields sync and how exceptions are handled is in the document."
+      "free_stops": "Which fields sync and how exceptions are handled is in the document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many add drop changes reached finance after bills were prepared this week, so you see the handoff delay clearly.",
+          "review": false
+        },
+        {
+          "text": "Give one registrar staff member the daily add drop handover to finance, so fee bills follow the latest enrolment changes.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_manual_work",
@@ -186,7 +266,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The request stages and status messages are kept for the document."
+      "free_stops": "The request stages and status messages are kept for the document.",
+      "extra_ideas": [
+        {
+          "text": "Note how many transcript and verification requests arrive and leave each day this week, so you see whether the pile is growing.",
+          "review": false
+        },
+        {
+          "text": "Give one counter staff member the job of keeping all incoming requests in one tray, so work starts from a single queue.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p10_manual_reports",
@@ -206,7 +296,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "How each office's data feeds the screen is set out in the document."
+      "free_stops": "How each office's data feeds the screen is set out in the document.",
+      "extra_ideas": [
+        {
+          "text": "Note how many offices send their numbers after the agreed date this cycle, so you see where board reporting slows down.",
+          "review": false
+        },
+        {
+          "text": "Give one admin office the job of keeping the board numbers list in one notebook, so every office works from the same request.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

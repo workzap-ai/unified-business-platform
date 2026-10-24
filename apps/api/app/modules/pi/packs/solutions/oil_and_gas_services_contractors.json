@@ -2,7 +2,7 @@
   "industry": "oil_and_gas_services_contractors",
   "name": "Oil and gas services contractors",
   "sector": "7.L Finance-adjacent, energy and utilities",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_receivables_late",
@@ -22,7 +22,17 @@
         "tool_words": []
       },
       "ask_first": "How do signed timesheets get from site to your office today?",
-      "free_stops": "Capture and sign-off flow are in the solution document."
+      "free_stops": "Capture and sign-off flow are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note how many days pass between site work and signed timesheet return for each crew, so invoice delays are easier to pinpoint.",
+          "review": true
+        },
+        {
+          "text": "Give one coordinator the job of logging missing signed timesheets in one notebook each afternoon, so invoice chasing starts before month end.",
+          "review": true
+        }
+      ]
     },
     {
       "id": "p2_reports_wrong",
@@ -42,7 +52,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "Matching rules are in the solution document."
+      "free_stops": "Matching rules are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note the mismatch reason on each rejected invoice this week, so you can see which check is failing most often.",
+          "review": true
+        },
+        {
+          "text": "Give one person the job of matching signed job tickets with invoice figures before sending, so client rejections drop from preventable errors.",
+          "review": true
+        }
+      ]
     },
     {
       "id": "p3_cash_flow_tight",
@@ -62,7 +82,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "Ledger structure is in the solution document; pi gives no financing advice."
+      "free_stops": "Ledger structure is in the solution document; pi gives no financing advice.",
+      "extra_ideas": [
+        {
+          "text": "Count how many client files already have retention release paperwork complete versus still missing something, so follow ups start from ready cases.",
+          "review": false
+        },
+        {
+          "text": "Give one person a fixed weekly time to review one notebook of client follow up dates, so release paperwork gets chased consistently.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_licences_renewals",
@@ -82,7 +112,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "Alert timing and matrix design are in the solution document; pi stores no worker IDs or medical records."
+      "free_stops": "Alert timing and matrix design are in the solution document; pi stores no worker IDs or medical records.",
+      "extra_ideas": [
+        {
+          "text": "Count how many workers are due to mobilise soon against certificates expiring soon, so send-backs can be spotted before travel.",
+          "review": false
+        },
+        {
+          "text": "Give one coordinator one notebook for certificate types and expiry months by employee number, so mobilisation checks happen from one place.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_bottleneck",
@@ -102,7 +142,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "Checklist content is in the solution document; permit and HSE questions go to the client's HSE team."
+      "free_stops": "Checklist content is in the solution document; permit and HSE questions go to the client's HSE team.",
+      "extra_ideas": [
+        {
+          "text": "Write down how many calls and message rounds the last shutdown mobilisation needed, so the slow handoffs stand out clearly.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of keeping one mobilisation list for crew status by role, so shutdown calling is shorter and calmer.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_field_team_visibility",
@@ -122,7 +172,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "Planner design is in the solution document."
+      "free_stops": "Planner design is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare where supervisors say workers are with the latest rotation plan, so gaps in today's picture show before cover is arranged.",
+          "review": false
+        },
+        {
+          "text": "Give one dispatcher one notebook for current site and rotation by employee number, so allocation decisions use one current view.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_wrong_location",
@@ -142,7 +202,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "Register fields are in the solution document."
+      "free_stops": "Register fields are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Walk round the yard and note which major items are not where the last record showed, so missing moves stop hiding.",
+          "review": false
+        },
+        {
+          "text": "Give one store person one list for item location and calibration month, so moves and upcoming dates stay together.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_margin_unknown",
@@ -163,7 +233,17 @@
         "leads_with_view": true
       },
       "ask_first": "",
-      "free_stops": "Cost feeds and dashboard design are in the solution document."
+      "free_stops": "Cost feeds and dashboard design are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare this week's crew hours and hired equipment days on one live project against what the supervisor expected, so drift shows before closeout.",
+          "review": false
+        },
+        {
+          "text": "Give one supervisor a fixed weekly slot to note crew hours and hired equipment days in one notebook, so live project reviews use current figures.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_info_lost_in_whatsapp",
@@ -183,7 +263,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "Form and client format mapping are in the solution document."
+      "free_stops": "Form and client format mapping are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many site report photos from this week can be found again by project, so the filing gap shows.",
+          "review": false
+        },
+        {
+          "text": "Give one admin person the job of writing each report photo under one project list the same day, so evidence is findable when clients ask.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p10_documentation",
@@ -203,7 +293,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "Library structure is in the solution document."
+      "free_stops": "Library structure is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count which papers were requested in the last few prequalification packs and how often, so your core file list is obvious.",
+          "review": false
+        },
+        {
+          "text": "Give one office person one notebook for prequalification papers requested by client, so each new pack starts from the same place.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

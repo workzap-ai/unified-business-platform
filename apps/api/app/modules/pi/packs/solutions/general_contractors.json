@@ -2,7 +2,7 @@
   "industry": "general_contractors",
   "name": "General contractors",
   "sector": "7.F Construction, real estate and facilities",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_shrinkage_theft",
@@ -23,7 +23,17 @@
         "tool_words": []
       },
       "ask_first": "Who signs for material when it reaches site?",
-      "free_stops": "The receiving flow and variance checks are in the solution document."
+      "free_stops": "The receiving flow and variance checks are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare this week's cement and steel issues with visible work completed on one site walk, so unusual usage shows early.",
+          "review": false
+        },
+        {
+          "text": "Keep one lockup issue notebook with one store hand responsible for every outflow note, so missing material has a trail.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_transfers_lost",
@@ -43,7 +53,17 @@
         "tool_words": []
       },
       "ask_first": "How many sites are running right now?",
-      "free_stops": "Confirmation rules and alert timing are set out in the solution document."
+      "free_stops": "Confirmation rules and alert timing are set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many lorry trips moved materials between sites this week, so wrong ordering shows up in wasted movement.",
+          "review": false
+        },
+        {
+          "text": "Give one dispatcher one notebook page for all site transfer notes, so sending and receiving stop getting mixed up.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_cost_overruns",
@@ -64,7 +84,17 @@
         "leads_with_view": true
       },
       "ask_first": "Which cost runs over most often: material, labour or machinery?",
-      "free_stops": "How consumption is measured against BOQ items is in the solution document."
+      "free_stops": "How consumption is measured against BOQ items is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare issued quantities for one BOQ item with the area or length completed on site, so heavy consumption stands out.",
+          "review": false
+        },
+        {
+          "text": "Give one site engineer a fixed weekly time to note issue versus work done for key items, so overruns surface sooner.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_unbilled_variations",
@@ -84,7 +114,17 @@
         "tool_words": []
       },
       "ask_first": "Who signs off extra work before it starts?",
-      "free_stops": "The approval steps and link to billing are in the solution document."
+      "free_stops": "The approval steps and link to billing are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count extra tasks done on verbal instruction this week that have no dated site note, so unrecorded variation work is sized clearly.",
+          "review": false
+        },
+        {
+          "text": "Give one supervisor one site notebook for all extra work notes each day, so variation records stop getting missed.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_receivables_late",
@@ -104,7 +144,17 @@
         "tool_words": []
       },
       "ask_first": "How long do bills usually take to get certified and paid?",
-      "free_stops": "Ageing stages and follow-up rules are in the solution document; contract claims need professional advice."
+      "free_stops": "Ageing stages and follow-up rules are in the solution document; contract claims need professional advice.",
+      "extra_ideas": [
+        {
+          "text": "Compare recent running bill submission dates with certification dates by project, so the slowest internal follow-up points are clear.",
+          "review": false
+        },
+        {
+          "text": "Set one fixed weekly review for one person to note pending certifications and retentions, so follow-up stays on a routine.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_attendance_lateness",
@@ -124,7 +174,17 @@
         "tool_words": []
       },
       "ask_first": "Is your labour direct, through thekedars, or both?",
-      "free_stops": "The check-in method and comparison report are in the solution document."
+      "free_stops": "The check-in method and comparison report are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Do one midday headcount by gang and compare it with the attendance sheet, so over-reported labour becomes visible.",
+          "review": false
+        },
+        {
+          "text": "Make the site in-charge keep the only attendance sheet at one fixed spot, so labour counts stop changing later.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_payroll_errors",
@@ -144,7 +204,17 @@
         "tool_words": []
       },
       "ask_first": "How often are wages paid?",
-      "free_stops": "Wage rules and payslip layout are set out in the solution document."
+      "free_stops": "Wage rules and payslip layout are set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare each gang's attendance total with the site attendance record before payday, so mismatches are spotted while the week is fresh.",
+          "review": false
+        },
+        {
+          "text": "Give one supervisor a fixed weekly time to close each gang's attendance totals, so attendance records stop changing late.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_approvals_slow",
@@ -164,7 +234,17 @@
         "tool_words": []
       },
       "ask_first": "Who approves purchases from site today?",
-      "free_stops": "Approval limits and the PO flow are in the solution document."
+      "free_stops": "Approval limits and the PO flow are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note when each site purchase request reached office and when it was cleared this week, so approval waiting time is visible.",
+          "review": false
+        },
+        {
+          "text": "Set one daily time for one approver to clear pending site requests together, so office approvals stop stretching across days.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_field_team_visibility",
@@ -187,7 +267,17 @@
         ]
       },
       "ask_first": "What do you wish you could see without calling site?",
-      "free_stops": "The report fields and dashboard design are in the solution document."
+      "free_stops": "The report fields and dashboard design are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare how many daily voice updates arrived from each site this week, so silent sites and late reporting stand out.",
+          "review": false
+        },
+        {
+          "text": "Give one coordinator a fixed evening time to collect all site progress notes in one place, so follow-up gets simpler.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p10_hidden_costs",
@@ -207,7 +297,17 @@
         "tool_words": []
       },
       "ask_first": "Which machinery do you own and which do you rent?",
-      "free_stops": "How usage is recorded and costed is in the solution document."
+      "free_stops": "How usage is recorded and costed is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note each rented machine that did no work yesterday during your site calls, so paid idle time across projects is clear.",
+          "review": false
+        },
+        {
+          "text": "Make one office person keep a single return list for idle rented machines, so off-hire calls stop getting missed.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p11_margin_unknown",
@@ -227,7 +327,17 @@
         "tool_words": []
       },
       "ask_first": "How do you compare actual spend to plan today?",
-      "free_stops": "Cost allocation rules and module order are in the solution document."
+      "free_stops": "Cost allocation rules and module order are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare one finished project's final bill total with all supplier, labour and rent outflows noted in your file, so margin guesswork drops.",
+          "review": false
+        },
+        {
+          "text": "Give one person one notebook page per project for every cost note during the job, so the closing total is ready.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

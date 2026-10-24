@@ -2,7 +2,7 @@
   "industry": "typing_translation_and_attestation_centres",
   "name": "Typing, translation and attestation centres",
   "sector": "7.K Professional and business services",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_service_quality",
@@ -24,7 +24,17 @@
         ]
       },
       "ask_first": "Roughly how many customers or jobs do you handle in a day?",
-      "free_stops": "the queue setup and staffing view are set out in the solution document."
+      "free_stops": "the queue setup and staffing view are set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many customers leave the queue before reaching the counter each busy period, so lost walk-ins are sized properly.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member the job of watching and moving waiting files before peak hours, so the counter keeps flowing when lines build.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_whatsapp_overload",
@@ -45,7 +55,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "which stages send updates is worked out in the solution document."
+      "free_stops": "which stages send updates is worked out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many readiness calls come before noon and after noon for a few days, so the busiest checking time is clear.",
+          "review": false
+        },
+        {
+          "text": "Give one person a fixed time to review ready jobs and update the list, so callers get fewer mixed answers from staff.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_wrong_location",
@@ -65,7 +85,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "the custody routine is kept for the solution document."
+      "free_stops": "the custody routine is kept for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note where each original was actually found during one office walk round, so the main misplacement spots become obvious.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of returning every original to the same shelf before closing, so papers stop drifting between desks.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_order_errors",
@@ -85,7 +115,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "the handover check is designed in the solution document."
+      "free_stops": "the handover check is designed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note every handover correction or near-miss this week at the counter, so the risky moment in the routine stands out.",
+          "review": false
+        },
+        {
+          "text": "Make one person own the final handover check at every shift, so document releases stay consistent across the counter team.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_delivery_late",
@@ -105,7 +145,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "the return rules and alerts are set out in the solution document."
+      "free_stops": "the return rules and alerts are set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare the sent-out pouch notebook with what has returned once, so missing or slow pouches are spotted earlier.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member the daily pouch follow-up call slot and notebook, so delayed returns are chased by one owner.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_supplier_late",
@@ -125,7 +175,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "assignment and reminder rules are kept for the solution document."
+      "free_stops": "assignment and reminder rules are kept for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare promised return times against actual arrival times for each freelancer this week, so the most reliable translators are clearer.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of logging every outsourced translation due time, so late returns are followed from one list.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_rework",
@@ -145,7 +205,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "the checks per service are worked out in the solution document."
+      "free_stops": "the checks per service are worked out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count which service type causes the most retyping this week, so the error-heavy work is obvious to the team.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member the final spelling check on that service before release, so redo work stops eating counter time.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_pricing_errors",
@@ -167,7 +237,17 @@
         ]
       },
       "ask_first": "",
-      "free_stops": "how prices and receipts are set up is designed in the solution document."
+      "free_stops": "how prices and receipts are set up is designed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare what each staff member quoted today for the same common service, so price drift across the counter is visible.",
+          "review": true
+        },
+        {
+          "text": "Keep one handwritten charge list at one agreed counter spot, so every quote starts from the same source.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_cash_mismatch",
@@ -187,7 +267,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "how fees and cash are matched is kept for the solution document."
+      "free_stops": "how fees and cash are matched is kept for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "For one week, note jobs finished and receipt slips issued at closing, so missed writing or missed handovers stand out.",
+          "review": false
+        },
+        {
+          "text": "Keep one counter notebook for unfinished jobs and receipt-slip issues during each shift, so staff can resolve mismatches before customers return.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p10_credit_customers",
@@ -207,7 +297,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "the reminder sequence is set out in the solution document."
+      "free_stops": "the reminder sequence is set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note each corporate account's oldest unpaid bill beside its balance once, so late payers needing follow-up stand out clearly.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member the weekly collections notebook and callback time, so every corporate reminder is tracked in one place.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

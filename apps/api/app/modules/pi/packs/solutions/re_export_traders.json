@@ -2,7 +2,7 @@
   "industry": "re_export_traders",
   "name": "Re-export traders (Dubai / Jebel Ali)",
   "sector": "7.E Trade, distribution and logistics",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_no_visibility",
@@ -23,7 +23,17 @@
         "tool_words": []
       },
       "ask_first": "How many locations do you keep stock in?",
-      "free_stops": "How movements are captured at each site is designed in the solution document."
+      "free_stops": "How movements are captured at each site is designed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Write the same top items from each location on one notebook page today, so shortages and doubles across sites stand out.",
+          "review": false
+        },
+        {
+          "text": "Give one person a fixed evening time to collect quantity updates from Jebel Ali, Al Ras and Sharjah, so sales hear one stock position.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_count_mismatch",
@@ -43,7 +53,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The hold and release rules are set in the solution document."
+      "free_stops": "The hold and release rules are set in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many buyer pickups this week were promised from stock already sold, so the size of the double-selling problem shows.",
+          "review": false
+        },
+        {
+          "text": "Keep one hold list beside the sales desk and make one person update it, so pickup promises match what is really available.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_overstock_dead_stock",
@@ -63,7 +83,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "Ageing thresholds per category are set in the solution document."
+      "free_stops": "Ageing thresholds per category are set in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Walk the shelves and note which old models have not moved since last month, so slow stock gets named clearly.",
+          "review": false
+        },
+        {
+          "text": "Give one salesman the job of offering old models to regular buyers every morning, so ageing lots get attention before value slips further.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_whatsapp_overload",
@@ -83,7 +113,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The intake and confirmation flow are in the solution document."
+      "free_stops": "The intake and confirmation flow are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many order details had to be clarified after voice notes this week, so you see where language and speed cause misses.",
+          "review": false
+        },
+        {
+          "text": "Give one clerk the job of writing each buyer order into one notebook before packing starts, so picking works from a clear record.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_receivables_late",
@@ -103,7 +143,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "Approval rules and reminder timing are in the solution document."
+      "free_stops": "Approval rules and reminder timing are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note each time an agent payment date was shifted after goods were released, so you see which balances keep slipping furthest.",
+          "review": true
+        },
+        {
+          "text": "Give one staff member one notebook for promised collection dates and updates, so every agent follow-up lands on the same day agreed.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_payment_methods",
@@ -123,7 +173,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The matching rules are set out in the solution document."
+      "free_stops": "The matching rules are set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note which incoming payments this week took the longest to match to a sale, so the worst matching gaps stand out.",
+          "review": false
+        },
+        {
+          "text": "Keep one page for unmatched receipts and give one person the job of clearing it by closing, so fewer payments stay floating.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_cash_handling_risk",
@@ -143,7 +203,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The closing and deposit steps are laid out in the solution document."
+      "free_stops": "The closing and deposit steps are laid out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many times cash is taken from buyers before the drawer is cleared each day, so the busiest buildup period shows.",
+          "review": false
+        },
+        {
+          "text": "Give one cashier one closing sheet for every handover of showroom cash, so notes stop sitting between counters and desks.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_margin_unknown",
@@ -164,7 +234,17 @@
         "leads_with_view": true
       },
       "ask_first": "",
-      "free_stops": "How costs are assigned to markets is worked out in the solution document."
+      "free_stops": "How costs are assigned to markets is worked out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare two recent shipments to different markets including freight and discounts, so you see which route leaves less room.",
+          "review": false
+        },
+        {
+          "text": "Keep one notebook page per market for extra costs that appear after the sale, so pricing talks use real landed experience.",
+          "review": true
+        }
+      ]
     },
     {
       "id": "p9_turnover",
@@ -184,7 +264,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "Who sees what, and how the list is kept current, is in the solution document."
+      "free_stops": "Who sees what, and how the list is kept current, is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many active buyers only one salesman has spoken with this month, so owner risk from single-owner relationships is clear.",
+          "review": false
+        },
+        {
+          "text": "Set a fixed weekly handover where each salesman notes buyer status in one place, so the business keeps continuity when staff change.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p10_manual_work",
@@ -204,7 +294,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "How the catalogue is structured and updated is in the solution document."
+      "free_stops": "How the catalogue is structured and updated is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note which item requests came again this week and how often, so you know what salesmen should keep ready.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member the job of keeping the latest item photos, videos and prices together, so replies go out faster.",
+          "review": true
+        }
+      ]
     },
     {
       "id": "p11_lead_followup_slow",
@@ -224,7 +324,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The follow-up timing and steps are set in the solution document."
+      "free_stops": "The follow-up timing and steps are set in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many showroom visitors left without buying this week, so you see how much missed follow-up is costing attention.",
+          "review": false
+        },
+        {
+          "text": "Set one fixed time each afternoon for one salesperson to call back past visitors, so quiet leads stop getting ignored.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p12_packing_errors",
@@ -244,7 +354,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The checklist and photo steps are designed in the solution document."
+      "free_stops": "The checklist and photo steps are designed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare each order line with the cartons waiting by the loading area, so wrong goods are spotted before the truck leaves.",
+          "review": false
+        },
+        {
+          "text": "Give one loader the job of keeping all loading photos with that day's orders, so disputes can be answered quickly later.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

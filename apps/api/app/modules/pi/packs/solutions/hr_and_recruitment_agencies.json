@@ -2,7 +2,7 @@
   "industry": "hr_and_recruitment_agencies",
   "name": "HR and recruitment agencies",
   "sector": "7.K Professional and business services",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_approvals_slow",
@@ -22,7 +22,17 @@
         "tool_words": []
       },
       "ask_first": "Roughly how many open roles are you working on right now?",
-      "free_stops": "chaser timings and escalation per client are set out in the solution document."
+      "free_stops": "chaser timings and escalation per client are set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note each client's last three feedback delays beside the role, so you see which accounts are losing candidates most often.",
+          "review": false
+        },
+        {
+          "text": "Give one recruiter the job of chasing every waiting shortlist at one set time, so no client silence sits untouched for days.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_service_errors",
@@ -42,7 +52,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "the check-in points and backup rules are worked out in the solution document."
+      "free_stops": "the check-in points and backup rules are worked out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many accepted candidates went silent before joining this month, so you see where day one risk is highest.",
+          "review": false
+        },
+        {
+          "text": "Give one recruiter the handover call for every confirmed starter, so doubts are heard before the joining date.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_duplicate_entry",
@@ -62,7 +82,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "how matches are detected and how credit is recorded is kept for the solution document."
+      "free_stops": "how matches are detected and how credit is recorded is kept for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare candidate records added this week for matching phone endings or email patterns, so you see where duplicate entry starts.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of checking new active records before filing, so duplicate profiles stop spreading across live roles.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_turnover",
@@ -82,7 +112,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "access rights and how the pipeline is structured are designed in the solution document."
+      "free_stops": "access rights and how the pipeline is structured are designed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count active roles where candidate contact sits only with one recruiter, so you see how exposed the pipeline is.",
+          "review": false
+        },
+        {
+          "text": "Give each live role one shared notebook page for candidate stage notes, so handovers still happen when staff leave.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_commission_disputes",
@@ -103,7 +143,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "the credit rules and commission view are set out in the solution document."
+      "free_stops": "the credit rules and commission view are set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note every current placement with who opened the client and who introduced the candidate, so the disputed points are visible early.",
+          "review": false
+        },
+        {
+          "text": "Give one manager the job of marking credit on each live placement list, so arguments stop reopening old deals.",
+          "review": true
+        }
+      ]
     },
     {
       "id": "p6_performance_unknown",
@@ -124,7 +174,17 @@
         "leads_with_view": true
       },
       "ask_first": "",
-      "free_stops": "which activities to measure and how is worked out in the solution document."
+      "free_stops": "which activities to measure and how is worked out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count each recruiter's shortlisted candidates and interviews arranged this week, so you can compare output across the same period.",
+          "review": false
+        },
+        {
+          "text": "Give one team lead one notebook page for weekly recruiter totals, so performance is reviewed from one place.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_receivables_late",
@@ -144,7 +204,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "the invoicing triggers and reminder sequence are kept for the solution document."
+      "free_stops": "the invoicing triggers and reminder sequence are kept for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count placements already working where no invoice has been sent, so missed billing gets spotted before payment is delayed further.",
+          "review": true
+        },
+        {
+          "text": "Give one person the weekly handover list of joined candidates awaiting invoices, so fee chasing starts from the right accounts.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_payroll_errors",
@@ -164,7 +234,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "the approval flow and how it links to payroll are set out in the solution document."
+      "free_stops": "the approval flow and how it links to payroll are set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note which client sites sent corrected hours most often this month, so you see where wrong timesheets keep starting.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member the single list of pending hour confirmations, so payroll stops using scattered messages and guesses.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_campaign_roi_unknown",
@@ -184,7 +264,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "how sources are tagged and reported is designed in the solution document."
+      "free_stops": "how sources are tagged and reported is designed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count recent placements by lead source written on existing role notes, so you see which channels actually convert to hires.",
+          "review": false
+        },
+        {
+          "text": "Give one recruiter the job of writing one source label on every new applicant note, so future comparisons come from one routine.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p10_whatsapp_overload",
@@ -204,7 +294,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "which stages trigger an update is worked out in the solution document."
+      "free_stops": "which stages trigger an update is worked out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count update messages by role for one busy day, so you see which vacancies create most chasing.",
+          "review": false
+        },
+        {
+          "text": "Give one recruiter the update queue at a fixed time daily, so candidate replies stop interrupting everyone else.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

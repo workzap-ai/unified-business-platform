@@ -2,7 +2,7 @@
   "industry": "mental_health_and_therapy_practices",
   "name": "Mental-health and therapy practices (admin)",
   "sector": "7.I Health and care",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_booking_appointments",
@@ -22,7 +22,17 @@
         "tool_words": []
       },
       "ask_first": "How do clients cancel now?",
-      "free_stops": "Reminder timing and policy flow are in the solution document."
+      "free_stops": "Reminder timing and policy flow are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note which appointment hours stayed empty after late cancellations this week, so you can see where practitioner time is being lost.",
+          "review": false
+        },
+        {
+          "text": "Give one admin person the daily job of offering newly empty hours from one written standby list, so fewer cancellations leave gaps.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_capacity",
@@ -42,7 +52,17 @@
         "tool_words": []
       },
       "ask_first": "Who does matching today?",
-      "free_stops": "Matching rules are in the solution document."
+      "free_stops": "Matching rules are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count waitlist requests that match each practitioner's usual hours and service type, so hidden fit problems stand out against the backlog.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member a fixed time each day to match open hours with the waitlist notebook, so gaps get offered sooner.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_data_scattered_intake",
@@ -62,7 +82,17 @@
         "tool_words": []
       },
       "ask_first": "Who checks forms are complete?",
-      "free_stops": "Form set-up and security are in the solution document; record-keeping rules are for your adviser."
+      "free_stops": "Form set-up and security are in the solution document; record-keeping rules are for your adviser.",
+      "extra_ideas": [
+        {
+          "text": "Count how many new intake forms arrived through each route this week, so you can see which channel creates the most chasing.",
+          "review": false
+        },
+        {
+          "text": "Give one staff role the job of logging every new form into one notebook on arrival, so admin stops checking scattered places.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_commission_disputes",
@@ -83,7 +113,17 @@
         "leads_with_view": true
       },
       "ask_first": "Do associates rent rooms or work on a split?",
-      "free_stops": "Statement rules are in the solution document."
+      "free_stops": "Statement rules are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many associate sessions changed, cancelled or moved after booking this week, so fee-split arguments can be traced to admin changes.",
+          "review": false
+        },
+        {
+          "text": "Give one admin role the weekly job of writing each associate's room-use exceptions in one notebook, so charge disputes have one reference point.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_cash_leakage",
@@ -103,7 +143,17 @@
         "tool_words": []
       },
       "ask_first": "Is the fee in your written policy now?",
-      "free_stops": "Fee rules are in the solution document."
+      "free_stops": "Fee rules are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count this week's no-shows by whether a fee decision was marked the same day or left open, so delays behind missed charges stand out.",
+          "review": false
+        },
+        {
+          "text": "Give one front-desk role the closing-time job of marking every no-show as charged, waived or pending in one notebook, so missed fees stop being overlooked.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_service_errors",
@@ -123,7 +173,17 @@
         "tool_words": []
       },
       "ask_first": "Which tool do you use for online sessions?",
-      "free_stops": "Send rules are in the solution document; confidentiality duties are for your adviser."
+      "free_stops": "Send rules are in the solution document; confidentiality duties are for your adviser.",
+      "extra_ideas": [
+        {
+          "text": "Note each time a session link had to be resent or corrected this week, so the scale of sending mistakes is clear.",
+          "review": false
+        },
+        {
+          "text": "Give one staff role the job of sending all session links during a fixed daily window, so contact checks happen the same way each time.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_manual_work",
@@ -143,7 +203,17 @@
         "tool_words": []
       },
       "ask_first": "Which payers are slowest?",
-      "free_stops": "Document format is in the solution document."
+      "free_stops": "Document format is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note which hand-made receipt and invoice requests arrive in bunches during the week, so you can spot the busiest admin pinch point.",
+          "review": true
+        },
+        {
+          "text": "Give one admin role a fixed weekly hour to write all pending receipts and corporate invoices from one paper list, so requests stop scattering across the week.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_lead_followup_slow",
@@ -163,7 +233,17 @@
         "tool_words": []
       },
       "ask_first": "How do enquiries reach you now?",
-      "free_stops": "Routing rules are in the solution document."
+      "free_stops": "Routing rules are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare the arrival day and reply day on recent enquiries, so you can see how long the inbox is sitting untouched.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member a set time each workday to clear new enquiries from one written list, so replies stop waiting in the inbox.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_licences_renewals",
@@ -183,7 +263,17 @@
         "tool_words": []
       },
       "ask_first": "Who tracks renewals today?",
-      "free_stops": "Reminder schedule is in the solution document; requirements are for your regulator."
+      "free_stops": "Reminder schedule is in the solution document; requirements are for your regulator.",
+      "extra_ideas": [
+        {
+          "text": "Count how many practitioner renewals fall in the same upcoming month by role, so workload clashes can be seen before papers pile up.",
+          "review": false
+        },
+        {
+          "text": "Give one admin role the monthly job of checking one paper renewal list by role, so upcoming licence and supervision dates stop being missed.",
+          "review": true
+        }
+      ]
     }
   ],
   "never_say": [

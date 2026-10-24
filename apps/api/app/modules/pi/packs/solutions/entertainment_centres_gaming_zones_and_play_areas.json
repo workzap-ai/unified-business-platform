@@ -2,7 +2,7 @@
   "industry": "entertainment_centres_gaming_zones_and_play_areas",
   "name": "Entertainment centres, gaming zones and play areas",
   "sector": "7.H Hospitality, events and personal services",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_theft_internal",
@@ -22,7 +22,17 @@
         "tool_words": []
       },
       "ask_first": "Can your card system show sales per cashier?",
-      "free_stops": "How card-system data is pulled in and the mismatch rules are in the solution document."
+      "free_stops": "How card-system data is pulled in and the mismatch rules are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare card top-ups sold with cards activated for one cashier’s shift, so missing money ties to a specific handover period.",
+          "review": false
+        },
+        {
+          "text": "Make the shift supervisor sign for sold card stock and closing cash together, so card sales and cash stay linked.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_void_refund_abuse",
@@ -42,7 +52,17 @@
         "tool_words": []
       },
       "ask_first": "Who can issue free credits today?",
-      "free_stops": "Approval levels and the daily comp report stay for the solution document."
+      "free_stops": "Approval levels and the daily comp report stay for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count free credit entries beside customer complaints for one week, so you see whether giveaways match real service issues.",
+          "review": true
+        },
+        {
+          "text": "Give one supervisor the daily free-credit notebook and end-of-shift review, so staff cannot hand out credits without a clear trail.",
+          "review": true
+        }
+      ]
     },
     {
       "id": "p3_maintenance_downtime",
@@ -62,7 +82,17 @@
         "tool_words": []
       },
       "ask_first": "Is maintenance in-house or by the machine vendor?",
-      "free_stops": "Ticket flow and downtime reporting per machine are in the solution document."
+      "free_stops": "Ticket flow and downtime reporting per machine are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note which machines stayed down longest this week and what issue each had, so vendor delays are easier to challenge.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member the breakdown notebook and vendor follow-up call each afternoon, so faults stop sitting unnoticed between shifts.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_no_dashboard",
@@ -82,7 +112,17 @@
         "tool_words": []
       },
       "ask_first": "How many machines or attractions do you have?",
-      "free_stops": "Ranking rules and how card data is mapped to machines stay for the solution document."
+      "free_stops": "Ranking rules and how card data is mapped to machines stay for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Walk the floor twice on a busy day and note which machines stay occupied longest, so space decisions reflect actual customer pull.",
+          "review": false
+        },
+        {
+          "text": "Assign one person to write each machine’s takings in the same notebook every night, so weak earners stop hiding on the floor.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_booking_appointments",
@@ -102,7 +142,17 @@
         "tool_words": []
       },
       "ask_first": "How many party rooms do you have?",
-      "free_stops": "Package setup and deposit rules go in the solution document."
+      "free_stops": "Package setup and deposit rules go in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare this week’s party promises with rooms actually used, so you see how often chat bookings clash in real trading.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member the party diary and all booking confirmations, so every room commitment passes through one pair of hands.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_checklists_not_done",
@@ -122,7 +172,17 @@
         "tool_words": []
       },
       "ask_first": "Who opens the venue each morning?",
-      "free_stops": "Checklist items are set by you; the photo and time-stamp flow is in the solution document."
+      "free_stops": "Checklist items are set by you; the photo and time-stamp flow is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Walk the venue before opening and note which check points are unsigned this week, so missed routines show by shift.",
+          "review": false
+        },
+        {
+          "text": "Keep one paper check sheet at the opening desk under one supervisor each shift, so checks get handed over clearly.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_repeat_low",
@@ -143,7 +203,17 @@
         "tool_words": []
       },
       "ask_first": "Do you have memberships or only walk-in tickets?",
-      "free_stops": "Messaging plan and repeat-visit rewards are planned in the solution document."
+      "free_stops": "Messaging plan and repeat-visit rewards are planned in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Ask front staff to note whether visiting families are new or returning for one week, so repeat business has a real baseline.",
+          "review": false
+        },
+        {
+          "text": "Give one team member the job of reviewing past party and group visitors each quiet afternoon, so return invitations happen regularly.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_count_mismatch",
@@ -163,7 +233,17 @@
         "tool_words": []
       },
       "ask_first": "Which items go missing most?",
-      "free_stops": "Count routine and mismatch rules stay for the solution document."
+      "free_stops": "Count routine and mismatch rules stay for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare one shift’s prize redemptions and snack sales with closing stock on the same counter, so the leak point narrows fast.",
+          "review": false
+        },
+        {
+          "text": "Put one person in charge of opening count, restock notes and closing count for each counter, so stock movement has one owner.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_receivables_late",
@@ -183,7 +263,17 @@
         "tool_words": []
       },
       "ask_first": "How many schools book with you in a term?",
-      "free_stops": "Invoice and reminder setup is in the solution document."
+      "free_stops": "Invoice and reminder setup is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many school bookings still lack payment papers after the visit date, so late cash collection has a clear queue.",
+          "review": true
+        },
+        {
+          "text": "Give one staff member one notebook for school balances and follow-ups every afternoon, so unpaid trips stop getting overlooked.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p10_branch_comparison",
@@ -203,7 +293,17 @@
         "tool_words": []
       },
       "ask_first": "How many branches do you run?",
-      "free_stops": "Which numbers and where they come from is defined in the solution document."
+      "free_stops": "Which numbers and where they come from is defined in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note one busy day’s ticket sales, party bookings and snack sales from each branch on one page, so weak spots compare fairly.",
+          "review": false
+        },
+        {
+          "text": "Give one person at each branch one closing-time reporting note in the same format, so head office receives matching updates.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

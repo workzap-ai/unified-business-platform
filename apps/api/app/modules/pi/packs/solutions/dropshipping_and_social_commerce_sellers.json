@@ -2,7 +2,7 @@
   "industry": "dropshipping_and_social_commerce_sellers",
   "name": "Dropshipping and social-commerce sellers (Instagram, TikTok, Facebook)",
   "sector": "7.M Digital economy, social and public sector",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_orders_lost",
@@ -22,7 +22,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The order flow and catalogue set-up are designed in the solution document."
+      "free_stops": "The order flow and catalogue set-up are designed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count today’s confirmed orders against parcels actually booked by evening, so you see how many enquiries fall through the cracks.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member the job of writing every confirmed order into one notebook immediately, so packing starts from one place.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_whatsapp_overload",
@@ -42,7 +52,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The reply flow and its wording are prepared in the solution document."
+      "free_stops": "The reply flow and its wording are prepared in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note which products trigger the most price messages this week, so you know where unclear posts are wasting reply time.",
+          "review": true
+        },
+        {
+          "text": "Give one person one daily slot to answer price enquiries from one written product list, so replies stay quick and consistent.",
+          "review": true
+        }
+      ]
     },
     {
       "id": "p3_no_visibility",
@@ -62,7 +82,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "How the supplier updates it and how it links to orders is covered in the solution document."
+      "free_stops": "How the supplier updates it and how it links to orders is covered in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare supplier availability claims with what was actually fillable this week, so unreliable items stop soaking up your chat time.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of marking each supplier item available or out in one notebook each morning, so payments are taken more carefully.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_order_tracking",
@@ -82,7 +112,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The tracker and alert rules are detailed in the solution document."
+      "free_stops": "The tracker and alert rules are detailed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count orders with payment confirmed but no dispatch proof by evening, so you see which supplier follow-ups are being missed.",
+          "review": true
+        },
+        {
+          "text": "Give one person one daily time to chase missing dispatch proof from one written list, so stuck orders move sooner.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_payment_methods",
@@ -102,7 +142,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "How credits are matched to orders is set out in the solution document."
+      "free_stops": "How credits are matched to orders is set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note how many screenshots match real credits and how many do not this week, so the fraud pattern shows.",
+          "review": false
+        },
+        {
+          "text": "Give one person two fixed times to check incoming credits from one list of pending orders, so dispatch decisions stop interrupting the day.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_returns_rto",
@@ -122,7 +172,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The live-sale code system and confirmation steps go in the solution document."
+      "free_stops": "The live-sale code system and confirmation steps go in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count which live-sale items are refused most often this week, so you spot where excitement is not turning into delivery.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of confirming each live order from one written list before booking, so fewer parcels go nowhere.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_campaign_roi_unknown",
@@ -142,7 +202,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The code set-up and reporting are covered in the solution document."
+      "free_stops": "The code set-up and reporting are covered in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note each delivered order beside the post or live it came from this week, so your useful promotions stop blending together.",
+          "review": false
+        },
+        {
+          "text": "Give one person one notebook for recording every order source at confirmation time, so sold items can be tied back to promotion effort.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_pre_orders_custom",
@@ -162,7 +232,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The waitlist and message flow are designed in the solution document."
+      "free_stops": "The waitlist and message flow are designed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many waiting buyers asked again for the same item this week, so the size of the pre-order backlog is clear.",
+          "review": false
+        },
+        {
+          "text": "Give one person one notebook page per item for waiting buyers and advances, so arrivals can be matched without confusion.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_data_loss",
@@ -182,7 +262,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "Where and how records are stored is explained in the solution document."
+      "free_stops": "Where and how records are stored is explained in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Walk through your current orders and note what exists only on the phone, so you see what would disappear if it failed.",
+          "review": false
+        },
+        {
+          "text": "Give one person a daily job of copying active orders into one notebook, so the business can still run during phone trouble.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p10_margin_unknown",
@@ -203,7 +293,17 @@
         "leads_with_view": true
       },
       "ask_first": "",
-      "free_stops": "The cost model and summary layout are prepared in the solution document."
+      "free_stops": "The cost model and summary layout are prepared in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note one week of delivered, returned and cancelled orders beside courier and promotion spending, so your real profit leak is clearer.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of writing every order cost in one notebook daily, so profit stops being guessed.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p11_owner_bottleneck",
@@ -223,7 +323,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The handover set-up and reply library are built in the solution document."
+      "free_stops": "The handover set-up and reply library are built in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many times staff ask you to approve routine work in one day, so your biggest handover gap stands out.",
+          "review": false
+        },
+        {
+          "text": "Give one helper one fixed hour to handle routine order updates from one written list, so you can step away briefly.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

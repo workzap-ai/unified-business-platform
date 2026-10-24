@@ -2,7 +2,7 @@
   "industry": "shipping_agents_and_port_services",
   "name": "Shipping agents and port services",
   "sector": "7.E Trade, distribution and logistics",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_bottleneck",
@@ -22,7 +22,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The request and approval flow is designed in the solution document."
+      "free_stops": "The request and approval flow is designed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many people reach the counter missing one document each day, so the main cause of the queue is visible.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member the job of checking papers before counter handover, so the release desk keeps moving steadily.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_customer_communication",
@@ -42,7 +52,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "Message timing is set in the solution document."
+      "free_stops": "Message timing is set in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note how many customers ask about detention only when paying this week, so surprise charges can be sized clearly.",
+          "review": false
+        },
+        {
+          "text": "Keep one daily list of boxes nearing charge time with one person updating it, so customers get warned before arrival.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_reports_wrong",
@@ -62,7 +82,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "How the calculation is set up is in the solution document."
+      "free_stops": "How the calculation is set up is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare a small set of recent detention invoices against the tariff note, so the common calculation slip is easy to spot.",
+          "review": false
+        },
+        {
+          "text": "Keep one handwritten detention rate reference at the billing desk, so everyone calculates from the same current source.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_no_visibility",
@@ -82,7 +112,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The movement stages and alerts are set in the solution document."
+      "free_stops": "The movement stages and alerts are set in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Walk the outstanding container list once and mark which boxes have no recent return update, so follow up starts with the oldest gaps.",
+          "review": false
+        },
+        {
+          "text": "Give one person a fixed afternoon slot to update box returns in one notebook, so overdue containers are chased sooner.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_cash_flow_tight",
@@ -102,7 +142,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "Ageing and follow-up rules are in the solution document."
+      "free_stops": "Ageing and follow-up rules are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note each vessel call where your team already paid port charges, so the heaviest funding pressure by principal is visible.",
+          "review": false
+        },
+        {
+          "text": "Give one person one notebook for all already paid call expenses awaiting principal cover, so follow up stops getting missed.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_reports_late",
@@ -122,7 +172,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "How invoices are collected into each FDA is designed in the solution document."
+      "free_stops": "How invoices are collected into each FDA is designed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count the open vessel calls waiting on supplier bills this week, so the real hold up in disbursement finalising is clear.",
+          "review": false
+        },
+        {
+          "text": "Keep one outstanding cost list per vessel with one person updating it daily, so missing bills are chased from one place.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_info_lost_in_whatsapp",
@@ -142,7 +202,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The board's structure is set in the solution document."
+      "free_stops": "The board's structure is set in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many boarding updates had to be asked for again this week, so the cost of missed call information is clear.",
+          "review": false
+        },
+        {
+          "text": "Keep one handwritten vessel call log in the office and give one person the update handover, so boarding news lands in one place.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_chat_overload",
@@ -162,7 +232,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "What notices include and when they go is set in the solution document."
+      "free_stops": "What notices include and when they go is set in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many arrival information messages repeat the same question in one day, so the busiest enquiry type is obvious.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member a fixed daily time to send the latest arrival details to waiting customers, so repeated chasing drops.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_record_keeping",
@@ -182,7 +262,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "How depot data connects is mapped in the solution document."
+      "free_stops": "How depot data connects is mapped in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare return dates claimed by customers against depot dates on recent disputed boxes, so the mismatch pattern shows early.",
+          "review": false
+        },
+        {
+          "text": "Keep one return proof file by container number with one person maintaining it, so disputes are answered from one record quickly.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p10_approvals_slow",
@@ -202,7 +292,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "Approval limits are set in the solution document."
+      "free_stops": "Approval limits are set in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many waiver requests waited more than one day this week, so the approval delay is clear by reason.",
+          "review": false
+        },
+        {
+          "text": "Keep one waiver register at the approvals desk with one named owner, so requests stop circling between too many people.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p11_no_dashboard",
@@ -222,7 +322,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "What the report pack contains is set in the solution document."
+      "free_stops": "What the report pack contains is set in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note each vessel call, its principal, revenue and cost on one page this week, so weak earning calls stand out quickly.",
+          "review": false
+        },
+        {
+          "text": "Give one person a fixed weekly time to update the principal summary sheet, so owners get one consistent view.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

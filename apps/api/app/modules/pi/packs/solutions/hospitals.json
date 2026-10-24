@@ -2,7 +2,7 @@
   "industry": "hospitals",
   "name": "Hospitals (operations and admin)",
   "sector": "7.I Health and care",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_bottleneck",
@@ -22,7 +22,17 @@
         "tool_words": []
       },
       "ask_first": "Which step usually takes longest, the insurer or internal returns?",
-      "free_stops": "The step list, escalation rules and who sees what are laid out in the solution document."
+      "free_stops": "The step list, escalation rules and who sees what are laid out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note when files reach billing and when bills are ready for a few discharges, so you see the real billing wait.",
+          "review": false
+        },
+        {
+          "text": "Hand one admin role the daily list of expected discharges before noon, so billing can prepare earlier the same day.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_reports_wrong",
@@ -42,7 +52,17 @@
         "tool_words": []
       },
       "ask_first": "Does your HIS have a bed module staff could use?",
-      "free_stops": "Status definitions and who updates when are set in the solution document."
+      "free_stops": "Status definitions and who updates when are set in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare one shift's bed board updates with a walk round of rooms, so you see which ward misses updates most.",
+          "review": false
+        },
+        {
+          "text": "Make the charge nurse role update the bed board at one fixed handover time, so the next team starts from the same picture.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_receivables_late",
@@ -62,7 +82,17 @@
         "tool_words": []
       },
       "ask_first": "Are government health-card claims handled by the same team?",
-      "free_stops": "The status flow and payer reports are detailed in the solution document."
+      "free_stops": "The status flow and payer reports are detailed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Sort this month's rejections by reason on paper and mark repeats, so the paperwork error hurting claims stands out.",
+          "review": false
+        },
+        {
+          "text": "Give one billing role a fixed daily slot to chase rejected claims from one notebook, so resubmissions stop drifting.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_bad_debt_walkouts",
@@ -82,7 +112,17 @@
         "tool_words": []
       },
       "ask_first": "Do you take an advance at admission for cash patients?",
-      "free_stops": "When estimates go out and how balances are chased is set in the solution document."
+      "free_stops": "When estimates go out and how balances are chased is set in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many final bills stayed unpaid this week and note where discharge papers were at the time, so the hold-up is clearer.",
+          "review": false
+        },
+        {
+          "text": "Give one front desk role the job of checking open balances before discharge papers leave admin, so fewer accounts slip past settlement.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_count_mismatch",
@@ -104,7 +144,17 @@
         ]
       },
       "ask_first": "Does each ward keep its own stock cupboard?",
-      "free_stops": "The approval chain and flag rules are designed in the solution document."
+      "free_stops": "The approval chain and flag rules are designed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Mark repeated item requests from the same ward over one week, so you see which supplies are being indented twice.",
+          "review": false
+        },
+        {
+          "text": "Keep one indent notebook in the store and make one store role check repeat requests before issuing, so duplicate issues reduce.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_expiry_wastage",
@@ -124,7 +174,17 @@
         "tool_words": []
       },
       "ask_first": "Is the pharmacy run in-house or outsourced?",
-      "free_stops": "Alert timing and transfer rules stay for the solution document."
+      "free_stops": "Alert timing and transfer rules stay for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Walk one pharmacy shelf and note items expiring soon that were also bought recently, so buying and stock movement can be compared.",
+          "review": false
+        },
+        {
+          "text": "Give one pharmacy role a fixed weekly near expiry review with purchasing notes in one notebook, so older stock gets attention before reordering.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_approvals_slow",
@@ -144,7 +204,17 @@
         "tool_words": []
       },
       "ask_first": "Do requests wait for quotes or simply for the MD's time?",
-      "free_stops": "The approval limits and reminder flow are set in the solution document."
+      "free_stops": "The approval limits and reminder flow are set in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count purchase requests waiting with the MD today and note their oldest waiting time, so the approval pile has a clear size.",
+          "review": false
+        },
+        {
+          "text": "Set one daily handover time when one admin role places all pending approvals together for the MD, so requests stop arriving piecemeal.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_shift_scheduling",
@@ -164,7 +234,17 @@
         "tool_words": []
       },
       "ask_first": "How many of your nurses come through agencies?",
-      "free_stops": "Swap rules and the invoice check are detailed in the solution document."
+      "free_stops": "Swap rules and the invoice check are detailed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare this week's planned roster with actual duty changes on paper, so you see which shift changes most often.",
+          "review": false
+        },
+        {
+          "text": "Keep one roster copy in one agreed place and make one nursing admin role mark every change there, so staff stop following different versions.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_maintenance_downtime",
@@ -184,7 +264,17 @@
         "tool_words": []
       },
       "ask_first": "Is maintenance in-house or with vendors?",
-      "free_stops": "The register fields and reminder schedule are set in the solution document."
+      "free_stops": "The register fields and reminder schedule are set in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Walk through major equipment and note which items have no visible last service record, so the biggest record gaps stand out.",
+          "review": false
+        },
+        {
+          "text": "Give one biomedical role one notebook for service dates and breakdown handovers, so maintenance history stops getting split across departments.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p10_data_scattered",
@@ -207,7 +297,17 @@
         ]
       },
       "ask_first": "Which number do you most need earlier?",
-      "free_stops": "Data sources and connections are mapped in the solution document."
+      "free_stops": "Data sources and connections are mapped in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare last month's admissions total from each department's sheet for one day, so you see which source disagrees most often.",
+          "review": false
+        },
+        {
+          "text": "Keep one notebook page for number disputes and assign one admin role to close each mismatch, so arguments stop circling between departments.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p11_tasks_dropped",
@@ -227,7 +327,17 @@
         "tool_words": []
       },
       "ask_first": "Who is meant to close a complaint today?",
-      "free_stops": "Deadlines and escalation steps are set in the solution document."
+      "free_stops": "Deadlines and escalation steps are set in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count open complaints sitting in the ward, admin and the MD office today, so you see where handovers are failing.",
+          "review": false
+        },
+        {
+          "text": "Give one admin role the job of updating a single complaints notebook at a fixed daily time, so nothing stalls between offices.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

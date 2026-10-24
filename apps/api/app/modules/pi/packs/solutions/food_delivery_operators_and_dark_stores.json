@@ -2,7 +2,7 @@
   "industry": "food_delivery_operators_and_dark_stores",
   "name": "Food delivery operators and dark stores",
   "sector": "7.B Food and beverage",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_count_mismatch",
@@ -23,7 +23,17 @@
         "tool_words": []
       },
       "ask_first": "How often is the hub counted?",
-      "free_stops": "The count routine and sync set-up are in the solution document."
+      "free_stops": "The count routine and sync set-up are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Walk the fastest-moving shelf after the evening rush and note missing lines still showing available, so cancellations can be traced to specific items.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member the closing shelf check and one notebook for mismatches, so stock updates stop being missed between picking and replenishment.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_order_errors",
@@ -43,7 +53,17 @@
         "tool_words": []
       },
       "ask_first": "What's the most common picking mistake?",
-      "free_stops": "The pick-and-pack checks are detailed in the solution document."
+      "free_stops": "The pick-and-pack checks are detailed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Open a handful of completed bags before rider handover and note the exact item mistakes, so you see whether confusion starts in similar packs or labels.",
+          "review": false
+        },
+        {
+          "text": "Make one picker responsible for the final bag glance at every handover, so missing items are caught before complaints reach the store.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_cod_remittance",
@@ -63,7 +83,17 @@
         "tool_words": []
       },
       "ask_first": "How and to whom do riders hand in cash now?",
-      "free_stops": "The settlement routine and ageing rules are in the solution document."
+      "free_stops": "The settlement routine and ageing rules are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "For one week, note each cash order total beside the rider handover time, so you see which route periods create late or short returns.",
+          "review": false
+        },
+        {
+          "text": "Keep one notebook at dispatch for cash order totals and handover signatures, so COD returns are checked at the same place every shift.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_delivery_late",
@@ -86,7 +116,17 @@
         "leads_with_view": true
       },
       "ask_first": "When do late deliveries happen most?",
-      "free_stops": "The rider and slot planning approach stays for the solution document."
+      "free_stops": "The rider and slot planning approach stays for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note order ready time and rider departure time during the evening peak, so you can see whether delay starts in picking or dispatch.",
+          "review": false
+        },
+        {
+          "text": "Give one dispatcher the peak-hour handover board and update time, so waiting orders are assigned in the order they are actually ready.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_shift_scheduling",
@@ -106,7 +146,17 @@
         "tool_words": []
       },
       "ask_first": "Are riders employed, freelance or through an agency?",
-      "free_stops": "The shift planning rules are in the solution document."
+      "free_stops": "The shift planning rules are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare the planned evening roster with who actually logs in across the week, so the no-show pattern is clear before the next rush.",
+          "review": false
+        },
+        {
+          "text": "Give one person the weekly rider roster and one chat thread for confirmations, so evening coverage stops changing in scattered messages.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_expiry_wastage",
@@ -126,7 +176,17 @@
         "tool_words": []
       },
       "ask_first": "Which categories expire most?",
-      "free_stops": "The expiry rules per category stay for the solution document."
+      "free_stops": "The expiry rules per category stay for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Walk the fresh and chilled shelves each morning and note items nearest expiry by section, so wastage is linked to specific display areas.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member the daily short-date check and one shelf note for removals, so older stock gets attention before new stock is placed.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_fraud",
@@ -146,7 +206,17 @@
         "tool_words": []
       },
       "ask_first": "Who owns the bikes?",
-      "free_stops": "The claim rules and approvals are detailed in the solution document."
+      "free_stops": "The claim rules and approvals are detailed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "For one week, compare each rider's fuel and repair claims with the routes they actually covered, so inflated claims stand out by rider and route.",
+          "review": false
+        },
+        {
+          "text": "Make one dispatcher note any bike issue when a rider returns, so later repair claims can be checked against the shift handover.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_repeat_low",
@@ -166,7 +236,17 @@
         "tool_words": []
       },
       "ask_first": "How do you spot promo abuse today?",
-      "free_stops": "The repeat-order plan stays for the solution document."
+      "free_stops": "The repeat-order plan stays for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare one-time orders by basket type and delivery experience notes, so you can see which early orders fail to earn a second purchase.",
+          "review": false
+        },
+        {
+          "text": "Give one person the weekly review of first-order complaints in one notebook, so repeat-loss reasons are gathered in one place.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_data_scattered",
@@ -186,7 +266,17 @@
         "tool_words": []
       },
       "ask_first": "How many hubs do you run?",
-      "free_stops": "What goes into the daily read is in the solution document."
+      "free_stops": "What goes into the daily read is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Lay out yesterday's hub figures side by side on one page, so missing numbers and mismatched definitions show up immediately.",
+          "review": false
+        },
+        {
+          "text": "Give one person the morning collection of hub numbers in one notebook, so every location reports into the same place each day.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

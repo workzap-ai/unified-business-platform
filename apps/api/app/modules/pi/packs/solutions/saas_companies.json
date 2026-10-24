@@ -2,7 +2,7 @@
   "industry": "saas_companies",
   "name": "SaaS companies",
   "sector": "7.K Professional and business services",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_conversion_low",
@@ -27,7 +27,17 @@
         ]
       },
       "ask_first": "Is your sales mostly self-serve or demo-led?",
-      "free_stops": "which steps to track and when nudges go out are set out in the solution document."
+      "free_stops": "which steps to track and when nudges go out are set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare recent signups with accounts that reached your product's first real value this week, so the activation shortfall is clear.",
+          "review": false
+        },
+        {
+          "text": "Give one teammate the job of checking unused new accounts each afternoon, so early nudges happen before interest fades.",
+          "review": true
+        }
+      ]
     },
     {
       "id": "p2_lead_followup_slow",
@@ -47,7 +57,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "follow-up timing and assignment rules are kept for the solution document."
+      "free_stops": "follow-up timing and assignment rules are kept for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count trials ending this week that have no sales conversation noted, so the unattended trial backlog is clear.",
+          "review": false
+        },
+        {
+          "text": "Keep one shared list of trials ending soon with one owner updating it daily, so outreach happens before access ends.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_churn_subscription",
@@ -68,7 +88,17 @@
         "leads_with_view": true
       },
       "ask_first": "",
-      "free_stops": "the health signals and thresholds are worked out in the solution document."
+      "free_stops": "the health signals and thresholds are worked out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note the last month's cancellations by customer segment and month of departure, so the early-drop pattern shows.",
+          "review": false
+        },
+        {
+          "text": "Assign one person to record every cancellation reason in one notebook line, so product and sales hear the same pattern.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_payment_methods",
@@ -88,7 +118,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "the retry and reminder sequence is set out in the solution document."
+      "free_stops": "the retry and reminder sequence is set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count failed card payments from this week that still have no follow-up note, so missed recovery work is clear.",
+          "review": false
+        },
+        {
+          "text": "Give one teammate the daily job of checking failed payments and noting follow-up in one place, so accounts stop being missed.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_payment_methods",
@@ -108,7 +148,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "how bank data and invoices are connected is kept for the solution document."
+      "free_stops": "how bank data and invoices are connected is kept for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare bank transfers received this week with invoices still unmatched, so the manual reconciliation queue is clear.",
+          "review": false
+        },
+        {
+          "text": "Keep one notebook page for incoming transfers and one person updating matches daily, so open balances are easier to spot.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_manual_work",
@@ -128,7 +178,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "the onboarding steps and reminder timings are designed in the solution document."
+      "free_stops": "the onboarding steps and reminder timings are designed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many onboarding calls each new client needed this week, so the heaviest repeat work is obvious.",
+          "review": false
+        },
+        {
+          "text": "Give one teammate the job of keeping one onboarding checklist for every new client, so handovers stay consistent across calls.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_chat_overload",
@@ -148,7 +208,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "the content set and hand-off to humans are worked out in the solution document."
+      "free_stops": "the content set and hand-off to humans are worked out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Tally this week's repeated support questions by topic, so the biggest source of repeat replies is clear.",
+          "review": false
+        },
+        {
+          "text": "Assign one person to keep approved answers in one shared place, so the team answers common questions the same way.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_info_lost_in_whatsapp",
@@ -168,7 +238,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "which channels are connected and how requests are grouped is kept for the solution document."
+      "free_stops": "which channels are connected and how requests are grouped is kept for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count feature requests from this week that appear in more than one place, so the tracking mess is clear.",
+          "review": false
+        },
+        {
+          "text": "Choose one shared list for all new feature requests and one owner to update it daily, so nothing gets missed.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_manual_reports",
@@ -191,7 +271,17 @@
         ]
       },
       "ask_first": "",
-      "free_stops": "metric definitions and data connections are set out in the solution document."
+      "free_stops": "metric definitions and data connections are set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare the figures different teammates gave for last month's recurring revenue, so definition mismatches are clear.",
+          "review": false
+        },
+        {
+          "text": "Give one person the monthly job of writing the final recurring revenue figure in one agreed notebook, so reporting stays consistent.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p10_lead_followup_slow",
@@ -211,7 +301,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "the routing rules and timings are kept for the solution document."
+      "free_stops": "the routing rules and timings are kept for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many demo requests waited past the same working day this week, so missed sales conversations are clear.",
+          "review": false
+        },
+        {
+          "text": "Set one sales person to check new demo requests at one fixed time daily, so replies stop slipping between tasks.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

@@ -2,7 +2,7 @@
   "industry": "security_guard_companies",
   "name": "Security guard companies",
   "sector": "7.K Professional and business services",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_attendance_lateness",
@@ -22,7 +22,17 @@
         "tool_words": []
       },
       "ask_first": "Roughly how many guards and sites are you running?",
-      "free_stops": "check-in frequency and alert rules are set out in the solution document."
+      "free_stops": "check-in frequency and alert rules are set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note each night post the client reported before your office did, so you see where late reporting is hurting trust.",
+          "review": false
+        },
+        {
+          "text": "Give one night supervisor one notebook for vacant post alerts at a fixed hour, so your office hears gaps before clients do.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_fraud",
@@ -42,7 +52,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "how check-ins are verified is kept for the solution document."
+      "free_stops": "how check-ins are verified is kept for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare register marks with one supervisor's same day visit notes at a few posts, so you see how often attendance is unreliable.",
+          "review": false
+        },
+        {
+          "text": "Give one office person the daily job of keeping attendance doubts in one notebook, so repeat problem posts are not missed.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_accountability",
@@ -62,7 +82,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "the checklist and summary format are worked out in the solution document."
+      "free_stops": "the checklist and summary format are worked out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Write each supervisor's claimed rounds beside client or post updates from the same shift, so missed visits stand out quickly.",
+          "review": false
+        },
+        {
+          "text": "Set one fixed time for supervisors to hand in round notes to one desk, so claimed visits stop floating without a record.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_overtime",
@@ -82,7 +112,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "the roster rules are set out in the solution document."
+      "free_stops": "the roster rules are set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count which posts needed double duty most often this week, so you see where the reliever shortage is biting hardest.",
+          "review": false
+        },
+        {
+          "text": "Give one scheduler one list of reliever requests updated at one daily time, so double duty stops being arranged ad hoc.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_payroll_errors",
@@ -102,7 +142,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "how deductions are shown and approved is kept for the solution document."
+      "free_stops": "how deductions are shown and approved is kept for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count this month's pay disputes by absence, late arrival, uniform issue or site complaint, so the main trigger for arguments becomes visible.",
+          "review": false
+        },
+        {
+          "text": "Give one supervisor the job of noting every shift change in one notebook before pay day, so payroll uses one agreed record.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_pricing_errors",
@@ -123,7 +173,17 @@
         "leads_with_view": true
       },
       "ask_first": "",
-      "free_stops": "how coverage and billing are reconciled is set out in the solution document."
+      "free_stops": "how coverage and billing are reconciled is set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare covered shifts against billed posts for a few recent client dates, so billing gaps show before a client spots them.",
+          "review": false
+        },
+        {
+          "text": "Give one office person the weekly job of checking uncovered posts before billing, so invoices match what was actually staffed.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_cash_flow_tight",
@@ -143,7 +203,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "reminder timings and the cash view are kept for the solution document."
+      "free_stops": "reminder timings and the cash view are kept for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare the date work finished with the date paperwork went out for each client this month, so delays on your side stand out.",
+          "review": false
+        },
+        {
+          "text": "Give one person a fixed weekly time to check missing timesheets and client paperwork, so billing stops waiting on loose papers.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_shrinkage_theft",
@@ -163,7 +233,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "the issue and return routine is designed in the solution document."
+      "free_stops": "the issue and return routine is designed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare issued kit notes with returned kit on hand for a few recent leavers, so you see where returns break down.",
+          "review": false
+        },
+        {
+          "text": "Make one storekeeper keep one return list for all uniforms and equipment, so missing items are chased from one place.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_info_lost_in_whatsapp",
@@ -185,7 +265,17 @@
         ]
       },
       "ask_first": "",
-      "free_stops": "the form fields and routing are worked out in the solution document."
+      "free_stops": "the form fields and routing are worked out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many incident voice notes from this week never reached the written incident book, so the loss is clear.",
+          "review": false
+        },
+        {
+          "text": "Give one duty officer one notebook for every incident summary during each shift, so reports stop disappearing in chat threads.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

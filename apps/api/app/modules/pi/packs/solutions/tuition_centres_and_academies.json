@@ -2,7 +2,7 @@
   "industry": "tuition_centres_and_academies",
   "name": "Tuition centres and academies",
   "sector": "7.J Education and childcare",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_cash_mismatch",
@@ -24,7 +24,17 @@
         ]
       },
       "ask_first": "",
-      "free_stops": "The daily close steps and variance alerts are kept for the document."
+      "free_stops": "The daily close steps and variance alerts are kept for the document.",
+      "extra_ideas": [
+        {
+          "text": "Compare the desk cash, fee card entries and register lines at closing on one busy day, so you see where mismatches start.",
+          "review": false
+        },
+        {
+          "text": "Give one person the closing cash check and keep the day's fee notes in one drawer, so desk collections stop drifting between hands.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_receivables_late",
@@ -44,7 +54,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The reminder sequence and follow-up rules are in the document."
+      "free_stops": "The reminder sequence and follow-up rules are in the document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many fee reminder chats the receptionist sends in one afternoon, so you see the time lost in separate chasing.",
+          "review": false
+        },
+        {
+          "text": "Keep one notebook page per batch for unpaid fees and review it at one fixed time daily, so reminders go out in groups.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_commission_disputes",
@@ -64,7 +84,17 @@
         "tool_words": []
       },
       "ask_first": "Is the share worked out from the register or from fees received?",
-      "free_stops": "The calculation rules for joiners, leavers and part-paid months are kept for the document."
+      "free_stops": "The calculation rules for joiners, leavers and part-paid months are kept for the document.",
+      "extra_ideas": [
+        {
+          "text": "Compare one teacher's class attendance marks with the fees received for that batch, so the source of share disputes becomes visible.",
+          "review": false
+        },
+        {
+          "text": "Keep one attendance register per batch in one place under one staff handover, so teacher counts stay consistent before payout.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_lead_followup_slow",
@@ -84,7 +114,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The follow-up timings and stages are set out in the document."
+      "free_stops": "The follow-up timings and stages are set out in the document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many demo attendees from this week got no follow up by the next day, so missed admissions are easy to spot.",
+          "review": false
+        },
+        {
+          "text": "Give one person the demo follow up list and one fixed check time after classes, so every interested family gets remembered.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_churn_subscription",
@@ -104,7 +144,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The warning signals and re-enrolment messages are kept for the document."
+      "free_stops": "The warning signals and re-enrolment messages are kept for the document.",
+      "extra_ideas": [
+        {
+          "text": "Note which batches have empty seats right after exams this week, so you see where dropouts are starting earliest.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member a weekly leavers note for each batch teacher, so empty seats are flagged before fees simply stop.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_margin_shrinking",
@@ -125,7 +175,17 @@
         "leads_with_view": true
       },
       "ask_first": "",
-      "free_stops": "How costs are allocated per batch is in the document."
+      "free_stops": "How costs are allocated per batch is in the document.",
+      "extra_ideas": [
+        {
+          "text": "Count filled seats in every batch during one evening round, so you can compare crowded rooms against nearly empty ones.",
+          "review": false
+        },
+        {
+          "text": "Give one person the weekly batch size notebook and one place to note shifts, so weak batches are reviewed before more slots open.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_info_lost_in_whatsapp",
@@ -145,7 +205,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The broadcast setup and clash rules are kept for the document."
+      "free_stops": "The broadcast setup and clash rules are kept for the document.",
+      "extra_ideas": [
+        {
+          "text": "Note which timetable changes this week led to late arrivals or missed classes, so you see which batches are not hearing updates.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member the job of sending all timetable changes from one place, so parents stop getting mixed messages from different chats.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_discount_abuse",
@@ -165,7 +235,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The approval levels and report format are in the document."
+      "free_stops": "The approval levels and report format are in the document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many current students are paying a verbal discount this week, so you see how wide the exception habit has spread.",
+          "review": true
+        },
+        {
+          "text": "Keep one paper list of allowed discounts at the desk under one staff owner, so fee quotes stop changing by person.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_branch_comparison",
@@ -185,7 +265,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "Which figures feed the screen and how is kept for the document."
+      "free_stops": "Which figures feed the screen and how is kept for the document.",
+      "extra_ideas": [
+        {
+          "text": "Write each branch's fee collections and teacher payouts from the same week side by side, so weaker branches stand out clearly.",
+          "review": false
+        },
+        {
+          "text": "Give one person the weekly branch summary in one notebook with the same headings, so branch reporting stops changing each time.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p10_fraud",
@@ -205,7 +295,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "How links are issued and checked is set out in the document."
+      "free_stops": "How links are issued and checked is set out in the document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many unfamiliar faces join each online batch this week, so you see which classes leak access most.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member the job of checking each online attendee against the paid list before class, so unpaid joining gets blocked consistently.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

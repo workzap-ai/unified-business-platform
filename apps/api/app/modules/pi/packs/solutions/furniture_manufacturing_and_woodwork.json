@@ -2,7 +2,7 @@
   "industry": "furniture_manufacturing_and_woodwork",
   "name": "Furniture manufacturing and woodwork",
   "sector": "7.D Manufacturing and industry (part 1)",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_delivery_late",
@@ -22,7 +22,17 @@
         "tool_words": []
       },
       "ask_first": "Which stage usually slips — cutting, polish or waiting for material?",
-      "free_stops": "Stage definitions and how late jobs are flagged are set out in the solution document."
+      "free_stops": "Stage definitions and how late jobs are flagged are set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare promised dates with actual workshop stage for each running custom job, so you spot which stage is stretching the full timeline.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of updating a single job board every evening, so delays are noticed before delivery promises slide.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_order_errors",
@@ -43,7 +53,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The measurement form and confirmation flow are covered in the solution document."
+      "free_stops": "The measurement form and confirmation flow are covered in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note which recent fitting problems came from site measurements and which came from workshop cutting, so rework starts reducing at the real source.",
+          "review": false
+        },
+        {
+          "text": "Give one role the job of keeping all final measurements in one notebook before cutting, so the workshop works from one agreed record.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_pre_orders_custom",
@@ -63,7 +83,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "How changes are recorded and charged is set out in the solution document."
+      "free_stops": "How changes are recorded and charged is set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many design changes arrived after cutting on recent jobs, so you see how often production starts before choices are settled.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of recording every design change in one place before workshop work continues, so rework and arguments reduce.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_receivables_late",
@@ -83,7 +113,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "Reminder timing and how contractor retentions are tracked are kept for the solution document."
+      "free_stops": "Reminder timing and how contractor retentions are tracked are kept for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "List delivered jobs with unpaid balances and delivery dates, so you see which completed work is tying up your cash longest.",
+          "review": false
+        },
+        {
+          "text": "Give one person a fixed weekly time to review delivered jobs and note follow ups in one notebook, so balances get chased consistently.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_margin_unknown",
@@ -104,7 +144,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "How labour and materials are captured per job is detailed in the solution document."
+      "free_stops": "How labour and materials are captured per job is detailed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare the quoted materials and labour with what the last finished custom job actually used, so you see where profit is leaking.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of writing actual material and labour use for each finished job in one notebook, so future pricing improves.",
+          "review": true
+        }
+      ]
     },
     {
       "id": "p6_raw_material_shortage",
@@ -124,7 +174,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "How minimum levels are set per item is set out in the solution document."
+      "free_stops": "How minimum levels are set per item is set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note which hardware items stopped jobs during the past week, so you see the small parts causing the biggest production delays.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of checking and noting stopper items in one place before work starts, so mid job shortages interrupt less.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_chat_overload",
@@ -144,7 +204,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "How leads flow in and are followed up is covered in the solution document."
+      "free_stops": "How leads flow in and are followed up is covered in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count open inquiries waiting for a reply across your business chats today, so you see how much potential work is sitting untouched.",
+          "review": false
+        },
+        {
+          "text": "Give one person one written list of all new inquiries at a fixed time each day, so replies stop getting scattered across chats.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_after_sales",
@@ -165,7 +235,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The ticket flow and visit scheduling are set out in the solution document."
+      "free_stops": "The ticket flow and visit scheduling are set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many after sales fixes are still open and how long each has been waiting, so repeat calls stop surprising the team.",
+          "review": false
+        },
+        {
+          "text": "Give one person one notebook for all after sales issues and visit dates, so customers stop calling around for updates.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_overstock_dead_stock",
@@ -185,7 +265,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "How ageing is tracked and shared is kept for the solution document."
+      "free_stops": "How ageing is tracked and shared is kept for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Walk the showroom and note which pieces have not moved or changed position for the longest time, so slow stock gets attention.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of keeping one list of showroom pieces and review dates, so old stock does not keep getting ignored.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p10_owner_bottleneck",
@@ -205,7 +295,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "How rates are stored and approvals work is detailed in the solution document."
+      "free_stops": "How rates are stored and approvals work is detailed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many quote requests waited for the owner since Monday, so you see how much work stalls before pricing starts.",
+          "review": true
+        },
+        {
+          "text": "Give one staff member a notebook for pending quotes and a daily review time with the owner, so pricing keeps moving each day.",
+          "review": true
+        }
+      ]
     }
   ],
   "never_say": [

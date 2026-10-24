@@ -2,7 +2,7 @@
   "industry": "physiotherapy_and_rehabilitation",
   "name": "Physiotherapy and rehabilitation",
   "sector": "7.I Health and care",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_churn_subscription",
@@ -22,7 +22,17 @@
         "tool_words": []
       },
       "ask_first": "How do you track sessions left today?",
-      "free_stops": "Alert rules and follow-up steps are in the solution document."
+      "free_stops": "Alert rules and follow-up steps are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare open packages by start month and latest visit, so you see which buying periods stop showing up sooner.",
+          "review": false
+        },
+        {
+          "text": "Give one person a weekly notebook list of package holders with long gaps, so follow-up stops getting missed at the desk.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_refunds",
@@ -42,7 +52,17 @@
         "tool_words": []
       },
       "ask_first": "Do your packages have an expiry date now?",
-      "free_stops": "Ledger structure and expiry handling are in the solution document; talk to your accountant on how to record it."
+      "free_stops": "Ledger structure and expiry handling are in the solution document; talk to your accountant on how to record it.",
+      "extra_ideas": [
+        {
+          "text": "Compare package sales notes with attended visit notes for open packages, so what may still be owed is easier to spot.",
+          "review": false
+        },
+        {
+          "text": "Keep one notebook page for every open package balance, so refund questions are answered from one place.",
+          "review": true
+        }
+      ]
     },
     {
       "id": "p3_capacity",
@@ -62,7 +82,17 @@
         "tool_words": []
       },
       "ask_first": "Which hours stay empty most often?",
-      "free_stops": "Slot rules are set in the solution document."
+      "free_stops": "Slot rules are set in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare each therapist's midday gaps across this week, so you can see whose book is hardest to fill.",
+          "review": false
+        },
+        {
+          "text": "Give the front desk one midday openings list to check at booking time, so quieter hours get offered more consistently.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_field_team_visibility",
@@ -82,7 +112,17 @@
         "tool_words": []
       },
       "ask_first": "How many therapists do home visits?",
-      "free_stops": "Check-in rules are in the solution document."
+      "free_stops": "Check-in rules are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note planned home visits beside therapist return times for this week, so you can compare field time with the route claimed.",
+          "review": false
+        },
+        {
+          "text": "Give one coordinator the daily home-visit notebook, so departures and returns are checked from one place.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_commission_disputes",
@@ -103,7 +143,17 @@
         "leads_with_view": true
       },
       "ask_first": "Are therapists paid per session or salaried?",
-      "free_stops": "Pay rules and statement format are in the solution document."
+      "free_stops": "Pay rules and statement format are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare diary bookings with end-of-day attendance marks for each therapist this week, so count differences show before pay talk starts.",
+          "review": false
+        },
+        {
+          "text": "Assign one person to close each therapist's daily count in one notebook, so disputes have a single agreed source.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_receivables_late",
@@ -123,7 +173,17 @@
         "tool_words": []
       },
       "ask_first": "Which insurers or claim types cause the most rejections?",
-      "free_stops": "Checklists per claim type are in the solution document; insurer rules are for your adviser."
+      "free_stops": "Checklists per claim type are in the solution document; insurer rules are for your adviser.",
+      "extra_ideas": [
+        {
+          "text": "Compare claim send dates by payer and by clinic location, so you can spot where the longest waits keep clustering.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member a fixed weekly claim-check hour, so unpaid files are reviewed before they drift further.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_cash_leakage",
@@ -143,7 +203,17 @@
         "tool_words": []
       },
       "ask_first": "Do most patients pay a co-pay or the full fee?",
-      "free_stops": "The close format is in the solution document."
+      "free_stops": "The close format is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare front-desk collection notes with the day's attended visits, so you see which shifts miss co-pay collection most often.",
+          "review": false
+        },
+        {
+          "text": "Make one person sign off the co-pay list before the desk closes, so unpaid visits are chased the same day.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_sales_drop",
@@ -164,7 +234,17 @@
         "leads_with_view": true
       },
       "ask_first": "Is the referral source recorded at booking?",
-      "free_stops": "How referrals are captured is in the solution document."
+      "free_stops": "How referrals are captured is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare recent referral slips or notes with the same period earlier, so the quiet sources stand out by name.",
+          "review": false
+        },
+        {
+          "text": "Give one person a weekly walk-round list of quiet referral sources, so outreach keeps happening without waiting for the owner.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_lead_followup_slow",
@@ -184,7 +264,17 @@
         "tool_words": []
       },
       "ask_first": "Who replies to enquiries now?",
-      "free_stops": "Routing set-up is in the solution document."
+      "free_stops": "Routing set-up is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count unanswered enquiry chats at the same time each day this week, so the slow periods become visible.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member one notebook page for new enquiries each shift, so every chat has a clear follow-up owner.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p10_manual_work",
@@ -204,7 +294,17 @@
         "tool_words": []
       },
       "ask_first": "What do you use for bookings today?",
-      "free_stops": "Reminder timing is set in the solution document."
+      "free_stops": "Reminder timing is set in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note how many reminder messages each staff member sends before closing this week, so you see where the manual load really sits.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member the reminder list for each next day, so missed bookings are less likely at opening time.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

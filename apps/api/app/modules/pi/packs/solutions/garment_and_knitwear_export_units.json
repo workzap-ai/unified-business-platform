@@ -2,7 +2,7 @@
   "industry": "garment_and_knitwear_export_units",
   "name": "Garment and knitwear export units",
   "sector": "7.D Manufacturing and industry (part 1)",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_delivery_late",
@@ -23,7 +23,17 @@
         "tool_words": []
       },
       "ask_first": "At which stage do orders usually slip?",
-      "free_stops": "Which milestones are tracked and how risk flags are triggered is set out in the solution document."
+      "free_stops": "Which milestones are tracked and how risk flags are triggered is set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare the planned and actual date for each recent internal handover on the missed order, so the earliest slip stands out.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of updating one wall sheet at the same time daily, so risky orders get chased earlier.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_supplier_late",
@@ -44,7 +54,17 @@
         "tool_words": []
       },
       "ask_first": "Which arrives late most often — fabric, trims or accessories?",
-      "free_stops": "How material delays are tied to each order's ship date is mapped in the solution document."
+      "free_stops": "How material delays are tied to each order's ship date is mapped in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note for each late fabric lot how many days passed between promise and arrival, so the worst mill delays are clear.",
+          "review": false
+        },
+        {
+          "text": "Give one store staff member one notebook for all expected fabric arrivals, so late lots get flagged before stitching waits.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_data_scattered",
@@ -64,7 +84,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The board layout and who updates what are covered in the solution document."
+      "free_stops": "The board layout and who updates what are covered in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many live orders you can see without asking merchandisers individually, so the visibility gap shows.",
+          "review": false
+        },
+        {
+          "text": "Give one coordinator one master order list kept in one place, so you can review all live orders together.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_performance_unknown",
@@ -85,7 +115,17 @@
         "tool_words": []
       },
       "ask_first": "How is line output recorded during the day?",
-      "free_stops": "How efficiency is calculated per style and line is detailed in the solution document."
+      "free_stops": "How efficiency is calculated per style and line is detailed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare output, style and helper availability across two lines on one shift, so likely reasons for variation stand out.",
+          "review": false
+        },
+        {
+          "text": "Give one supervisor the job of noting stoppage reasons in one notebook each shift, so line discussions use facts.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_inspection_missing",
@@ -107,7 +147,17 @@
         ]
       },
       "ask_first": "",
-      "free_stops": "Defect categories and where checkpoints sit are kept for the solution document."
+      "free_stops": "Defect categories and where checkpoints sit are kept for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count defects found inline versus at final check for one busy line, so you see where detection is failing.",
+          "review": false
+        },
+        {
+          "text": "Give one checker one fixed mid-shift walk on the same line daily, so defects get noticed before piles build up.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_wastage_cost",
@@ -128,7 +178,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "How allowances are set and compared per style is set out in the solution document."
+      "free_stops": "How allowances are set and compared per style is set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare leftover fabric rolls and cut panel bundles from one completed style with its costing allowance, so excess loss is clear.",
+          "review": false
+        },
+        {
+          "text": "Give one cutting staff member one place to note leftover fabric by style, so repeat wastage stops being guessed.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_count_mismatch",
@@ -149,7 +209,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "How counts are confirmed and linked to payment is covered in the solution document."
+      "free_stops": "How counts are confirmed and linked to payment is covered in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count bundles sent out and pieces returned for each current subcontract job once, so the largest shortage is clear.",
+          "review": false
+        },
+        {
+          "text": "Give one dispatch person one handover page for sent and returned counts, so piece disputes are checked from one record.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_refunds",
@@ -169,7 +239,17 @@
         "tool_words": []
       },
       "ask_first": "How are claims and deductions tracked today?",
-      "free_stops": "How claims are matched to shipments and followed up is kept for the solution document."
+      "free_stops": "How claims are matched to shipments and followed up is kept for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note each buyer deduction beside the shipment issue mentioned in your papers, so you see which record is missing.",
+          "review": false
+        },
+        {
+          "text": "Give one office person one notebook page for every deduction and related shipment note, so follow-up stops getting lost.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_margin_unknown",
@@ -189,7 +269,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "Which actual costs are captured and how is detailed in the solution document."
+      "free_stops": "Which actual costs are captured and how is detailed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare costing notes with actual rework, extra freight and fabric use on one recent style, so hidden margin loss appears.",
+          "review": false
+        },
+        {
+          "text": "Give one merchandiser one place to note extra costs by style as they happen, so margin review is based on actuals.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p10_website_issues",
@@ -209,7 +299,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The structure and content of the site are planned in the solution document."
+      "free_stops": "The structure and content of the site are planned in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many recent style photos clearly show fabric, stitching and finishing, so you see what capability proof is still missing.",
+          "review": false
+        },
+        {
+          "text": "Give one merchandiser one notebook page for buyer-ready style photos and factory shots, so sending capability stops getting delayed.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

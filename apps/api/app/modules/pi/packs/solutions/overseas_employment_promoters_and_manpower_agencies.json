@@ -2,7 +2,7 @@
   "industry": "overseas_employment_promoters_and_manpower_agencies",
   "name": "Overseas employment promoters and manpower agencies",
   "sector": "7.K Professional and business services",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_no_dashboard",
@@ -23,7 +23,17 @@
         "tool_words": []
       },
       "ask_first": "Roughly how many workers are in your current batch?",
-      "free_stops": "the stages and who updates them are set out in the solution document."
+      "free_stops": "the stages and who updates them are set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Review one current batch and note each file's present stage on one notebook page, so stalled files stand out for action.",
+          "review": false
+        },
+        {
+          "text": "Assign one staff member to update the batch stage page at closing time, so everyone checks the same place before answering.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_whatsapp_overload",
@@ -43,7 +53,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "which steps send updates and in what language is worked out in the solution document."
+      "free_stops": "which steps send updates and in what language is worked out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count one day's status calls and note which batch question repeats most, so you know where your team loses time.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member a fixed status update hour each day, so callers hear back without interrupting the whole office.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_transfers_lost",
@@ -63,7 +83,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "the logging routine and overdue rules are kept for the solution document."
+      "free_stops": "the logging routine and overdue rules are kept for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Walk through the office and note every file currently outside your shelves, so you spot which handovers are not returning.",
+          "review": false
+        },
+        {
+          "text": "Make one outgoing file notebook for all handovers, so any staff member can see what left and what returned.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_tasks_dropped",
@@ -83,7 +113,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "reminder timings and how no-shows are followed up are set out in the solution document."
+      "free_stops": "reminder timings and how no-shows are followed up are set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Check this week's appointment list against yesterday's reminders, so you see how many bookings were left without follow up.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member the evening reminder list every day, so appointments stop being missed when the office gets busy.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_supplier_quality",
@@ -104,7 +144,17 @@
         "leads_with_view": true
       },
       "ask_first": "",
-      "free_stops": "how sub-agents are scored is designed in the solution document."
+      "free_stops": "how sub-agents are scored is designed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare recent trade test outcomes by sub agent and job request, so weak candidate sources show by demand type.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member the job of noting each sub agent's test outcome, so future batches start with better matching.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_handoffs",
@@ -124,7 +174,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "the handoff rules between teams are worked out in the solution document."
+      "free_stops": "the handoff rules between teams are worked out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Review current bookings against each file's last completed stage, so you can spot where travel planning jumped ahead.",
+          "review": false
+        },
+        {
+          "text": "Assign one staff member to clear every file before booking moves ahead, so batch timing stays aligned across the office.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_receivables_late",
@@ -144,7 +204,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "the billing points and reminder sequence are kept for the solution document."
+      "free_stops": "the billing points and reminder sequence are kept for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note each foreign employer and the month each payment usually arrives, so you can spot whose delay disrupts your cash routine most.",
+          "review": true
+        },
+        {
+          "text": "Give one staff member one notebook page for employer payment follow ups every week, so overdue reminders stop getting missed in busy days.",
+          "review": true
+        }
+      ]
     },
     {
       "id": "p8_regulatory_reporting",
@@ -164,7 +234,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "the calendar setup and checklists are designed in the solution document."
+      "free_stops": "the calendar setup and checklists are designed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Look through the last office scramble and note which papers staff kept searching for, so repeated bottlenecks in renewal season become clear.",
+          "review": false
+        },
+        {
+          "text": "Give one person one shelf or drawer for recurring licence papers, so renewal time starts with everything already in one place.",
+          "review": true
+        }
+      ]
     },
     {
       "id": "p9_branches_not_aligned",
@@ -184,7 +264,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "access for each side and what they see is set out in the solution document."
+      "free_stops": "access for each side and what they see is set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare the Pakistan office list with the Dubai partner list for one active batch, so mismatches surface before workers are moved.",
+          "review": false
+        },
+        {
+          "text": "Name one office to send the end of day batch list, so both sides start each morning from the same record.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p10_owner_bottleneck",
@@ -205,7 +295,17 @@
         "leads_with_view": true
       },
       "ask_first": "",
-      "free_stops": "which items reach the owner and which are handled by staff is worked out in the solution document."
+      "free_stops": "which items reach the owner and which are handled by staff is worked out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Tally this week which batch updates, approvals and exceptions reach only you, so the biggest delay points stand out clearly.",
+          "review": false
+        },
+        {
+          "text": "Give one senior staff member the daily batch follow up window, so routine matters stop queueing for your attention.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

@@ -2,7 +2,7 @@
   "industry": "kiryana_corner_shops_and_convenience_stores",
   "name": "Kiryana, corner shops and convenience stores (incl. petrol-station marts)",
   "sector": "7.A Retail and consumer (part 1)",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_credit_customers",
@@ -22,7 +22,17 @@
         "tool_words": []
       },
       "ask_first": "Roughly how many udhaar accounts do you have?",
-      "free_stops": "How accounts are coded, limits set and reminders sent is in the solution document."
+      "free_stops": "How accounts are coded, limits set and reminders sent is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Put a tick beside each udhaar page with money still pending, so you see how many accounts are actually open.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of updating the khata after maghrib daily, so unpaid balances stop drifting for days.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_receivables_late",
@@ -42,7 +52,17 @@
         "tool_words": []
       },
       "ask_first": "Who writes entries in the khata today?",
-      "free_stops": "How payments are recorded and balance messages are sent is in the solution document."
+      "free_stops": "How payments are recorded and balance messages are sent is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare today's cash received with today's khata payment entries once, so missing payment notes show up before arguments start.",
+          "review": true
+        },
+        {
+          "text": "Keep all payment notes in one notebook near the counter, so every claimed payment has one place to be checked.",
+          "review": true
+        }
+      ]
     },
     {
       "id": "p3_cash_mismatch",
@@ -62,7 +82,17 @@
         "tool_words": []
       },
       "ask_first": "Which payment methods do you take?",
-      "free_stops": "The galla check steps and how wallet payments are matched are in the solution document."
+      "free_stops": "The galla check steps and how wallet payments are matched are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note cash taken out for change, tea or loaders during the day, so the evening galla count has fewer surprises.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of writing every cash outflow in one notebook, so small removals stop getting forgotten.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_cash_leakage",
@@ -82,7 +112,17 @@
         "tool_words": []
       },
       "ask_first": "How many hours a day is the helper alone at the counter?",
-      "free_stops": "Which items are counted at handover and how differences are reported are in the solution document."
+      "free_stops": "Which items are counted at handover and how differences are reported are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note the cash total when you leave for mandi and when you return, so you see the size of the drop clearly.",
+          "review": false
+        },
+        {
+          "text": "Keep one handover page for every mandi visit with both cash counts written there, so that time window stays accountable.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_stockout",
@@ -102,7 +142,17 @@
         "tool_words": []
       },
       "ask_first": "Do you have any POS or barcode scanner?",
-      "free_stops": "How sales and stock are captured to build the list is in the solution document."
+      "free_stops": "How sales and stock are captured to build the list is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many times customers ask for missing top items before the weekly wholesaler trip, so the buying gap shows.",
+          "review": false
+        },
+        {
+          "text": "Give one person one running list of sold out items near the counter, so the weekly mandi trip covers real misses.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_price_increases_supplier",
@@ -123,7 +173,17 @@
         "tool_words": []
       },
       "ask_first": "Do you keep your wholesale bills?",
-      "free_stops": "How rates are recorded and flagged is in the solution document."
+      "free_stops": "How rates are recorded and flagged is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Pick five fast selling items and compare their latest wholesale cost with shelf price, so thin margin items stand out.",
+          "review": true
+        },
+        {
+          "text": "Give one person one notebook page for price changes each week, so shelf rates get updated before old pricing lingers.",
+          "review": true
+        }
+      ]
     },
     {
       "id": "p7_whatsapp_overload",
@@ -143,7 +203,17 @@
         "tool_words": []
       },
       "ask_first": "Roughly how many WhatsApp orders a day?",
-      "free_stops": "The order menu, packing flow and status messages are in the solution document."
+      "free_stops": "The order menu, packing flow and status messages are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many chat orders arrived but were written late on parchis today, so the missed load stops feeling random.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of checking chat orders at fixed short times, so packing and dispatch stop getting interrupted all day.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_trust_honesty",
@@ -164,7 +234,17 @@
         "tool_words": []
       },
       "ask_first": "Is the shop open round the clock?",
-      "free_stops": "How fuel and shop data are matched and variances reported is in the solution document."
+      "free_stops": "How fuel and shop data are matched and variances reported is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note the night shift opening cash and morning closing cash for several nights, so the shortage pattern gets tied to time.",
+          "review": false
+        },
+        {
+          "text": "Keep one night shift handover notebook at the mart counter, so each changeover leaves a clear starting record.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_owner_bottleneck",
@@ -185,7 +265,17 @@
         "leads_with_view": true
       },
       "ask_first": "Who helps at the shop besides you?",
-      "free_stops": "What goes into the daily read and how it's captured at the counter is in the solution document."
+      "free_stops": "What goes into the daily read and how it's captured at the counter is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Write down every time staff pause work to call you today, so the repeat questions that trap you become obvious.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of closing the same daily checklist every night, so the shop can finish routine work without you there.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

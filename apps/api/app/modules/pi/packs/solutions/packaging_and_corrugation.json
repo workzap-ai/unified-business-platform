@@ -2,7 +2,7 @@
   "industry": "packaging_and_corrugation",
   "name": "Packaging and corrugation",
   "sector": "7.D Manufacturing and industry (part 1)",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_wrong_location",
@@ -22,7 +22,17 @@
         "tool_words": []
       },
       "ask_first": "How often does a repeat order need a new plate?",
-      "free_stops": "Coding and storage layout are set out in the solution document."
+      "free_stops": "Coding and storage layout are set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Walk the die and plate area and note how many repeat jobs needed a search this week, so delays on reruns are clear.",
+          "review": false
+        },
+        {
+          "text": "Give one store person one notebook for every die and plate movement, so repeat orders stop waiting for searches.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_order_errors",
@@ -43,7 +53,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "How job orders flow from sales to machines is covered in the solution document."
+      "free_stops": "How job orders flow from sales to machines is covered in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many jobs this week reached the floor with size or ply corrected later, so where orders drift gets clearer.",
+          "review": false
+        },
+        {
+          "text": "Give one supervisor the job of marking size and ply on one floor list before running, so wrong boxes reach machines less often.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_price_increases_supplier",
@@ -63,7 +83,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "How the cost is built and updated is detailed in the solution document."
+      "free_stops": "How the cost is built and updated is detailed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note this month's paper reel rate beside each fixed contract job you actually ran, so the most squeezed work shows clearly.",
+          "review": false
+        },
+        {
+          "text": "Give one person one notebook page for paper reel rate changes and related contract jobs, so quotation talks use the latest rate.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_raw_material_shortage",
@@ -83,7 +113,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "How consumption and reorder levels are worked out is set out in the solution document."
+      "free_stops": "How consumption and reorder levels are worked out is set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare kraft reels on hand with jobs waiting to start this week, so stoppages from missing paper show up earlier.",
+          "review": false
+        },
+        {
+          "text": "Give one store person one board for incoming reels and waiting jobs, so production sees shortages before the machine sits idle.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_wastage_cost",
@@ -104,7 +144,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "How waste is measured and compared is kept for the solution document."
+      "free_stops": "How waste is measured and compared is kept for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note trim and setup waste beside each job for one shift on each machine, so the worst waste patterns show.",
+          "review": false
+        },
+        {
+          "text": "Give one shift lead one waste notebook kept at the machine, so trim and setup loss gets recorded every run.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_cash_leakage",
@@ -124,7 +174,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "Weighing and matching steps are covered in the solution document."
+      "free_stops": "Weighing and matching steps are covered in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note the next waste loads by vehicle, weight and buyer type before they leave, so mismatches with the yard record stand out.",
+          "review": false
+        },
+        {
+          "text": "Give one office person one yard register for every waste load leaving the gate, so each movement gets checked in one place.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_receivables_late",
@@ -144,7 +204,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "Reminder timing and limits are set out in the solution document."
+      "free_stops": "Reminder timing and limits are set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count which large customer invoices stayed open past the promised date this month, so the slowest paying customer type becomes visible.",
+          "review": false
+        },
+        {
+          "text": "Give one office person one weekly slot to mark promised dates against open invoices, so late accounts are spotted before dispatch arguments grow.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_owner_bottleneck",
@@ -165,7 +235,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "How the calculator is set up is detailed in the solution document."
+      "free_stops": "How the calculator is set up is detailed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many quote requests waited for that one calculator this week, so the delay from single person dependence is visible.",
+          "review": false
+        },
+        {
+          "text": "Give one backup staff member one notebook of live quote workings for review, so customer replies need not wait a full day.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_manual_reports",
@@ -185,7 +265,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "Which numbers go in and where each comes from is set out in the solution document."
+      "free_stops": "Which numbers go in and where each comes from is set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note which production and waste numbers are chased from people at month end, so the reporting delay shows by source.",
+          "review": false
+        },
+        {
+          "text": "Give one person one daily page for production and waste totals by machine, so month end reporting stops being rebuilt by hand.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

@@ -2,7 +2,7 @@
   "industry": "restaurants",
   "name": "Restaurants (casual and fine dining)",
   "sector": "7.B Food and beverage",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_margin_unknown",
@@ -23,7 +23,17 @@
         "leads_with_view": true
       },
       "ask_first": "Do you have written recipes with quantities, or is it in the chef's head?",
-      "free_stops": "The full costing method, target margins per dish and the repricing approach go in the solution document."
+      "free_stops": "The full costing method, target margins per dish and the repricing approach go in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare this week's supplier prices with the dishes ordered most often, so you see which plates are taking the hit now.",
+          "review": true
+        },
+        {
+          "text": "Give one cook the job of checking portions against the written recipe at service, so plate size stops drifting between shifts.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_wastage_cost",
@@ -43,7 +53,17 @@
         "tool_words": []
       },
       "ask_first": "Is most of the waste cooked food at closing, or raw stock going bad?",
-      "free_stops": "How to set batch sizes by day and season from the wastage data stays for the solution document."
+      "free_stops": "How to set batch sizes by day and season from the wastage data stays for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count and note each tray of rice and gravy thrown away at close for one week, so the nightly waste size shows.",
+          "review": false
+        },
+        {
+          "text": "Give the closing cook one waste page by the pass each night, so thrown food gets recorded before bins are cleared.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_stockout",
@@ -63,7 +83,17 @@
         "tool_words": []
       },
       "ask_first": "Who does the storeroom count now, and how often?",
-      "free_stops": "The par levels for each item and the issue-and-count routine are set out in the solution document."
+      "free_stops": "The par levels for each item and the issue-and-count routine are set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare Friday opening stock of mutton with Saturday sales and the storeroom count, so the weekend shortfall has a clear size.",
+          "review": false
+        },
+        {
+          "text": "Give one kitchen role the weekend mutton issue notebook, so every pot taken from stores has one owner to note it.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_cash_mismatch",
@@ -85,7 +115,17 @@
         ]
       },
       "ask_first": "Is the gap usually in cash, or in card and app payments too?",
-      "free_stops": "The full closing procedure and the void-pattern checks are kept for the solution document."
+      "free_stops": "The full closing procedure and the void-pattern checks are kept for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many voids follow cash payments during one busy shift, so you see whether that pattern matches the nightly shortfall.",
+          "review": false
+        },
+        {
+          "text": "Give one manager the job of signing every void at the time it happens, so each cancellation has a clear handover.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_software_not_connected",
@@ -94,8 +134,8 @@
       "category": "tech_systems",
       "subtype": "software_not_connected",
       "quick_ideas": [
-        "Make one person own the tablets at peak, so app orders have a clear handler",
-        "Compare one night's app order list with the POS, so you see how big the gap really is."
+        "Compare one busy evening's delivery orders with the bills entered at the counter, so missed orders stop hiding inside total sales.",
+        "Give one shift role the delivery screen during peak hours and one notebook for entered orders, so missed punch-ins stop bouncing between staff."
       ],
       "workzap_build": {
         "keys": [
@@ -107,7 +147,11 @@
         ]
       },
       "ask_first": "Which apps do you take orders from?",
-      "free_stops": "Which apps can be linked and how the reconciliation works is detailed in the solution document."
+      "free_stops": "Which apps can be linked and how the reconciliation works is detailed in the solution document.",
+      "quick_ideas_original": [
+        "Make one person own the tablets at peak, so app orders have a clear handler",
+        "Compare one night's app order list with the POS, so you see how big the gap really is."
+      ]
     },
     {
       "id": "p6_branch_underperforming",
@@ -128,7 +172,17 @@
         "leads_with_view": true
       },
       "ask_first": "Does each branch have its own kitchen, or does a central kitchen supply them?",
-      "free_stops": "Which numbers to compare and how to read the gaps between branches goes in the solution document."
+      "free_stops": "Which numbers to compare and how to read the gaps between branches goes in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare biryani taste, portion and wait time at both branches in one dinner period, so the weaker branch problem is easier to pin down.",
+          "review": false
+        },
+        {
+          "text": "Give one kitchen lead the job of checking the biryani recipe before service at both branches, so the dish stops changing with each cook.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_shift_scheduling",
@@ -148,7 +202,17 @@
         "tool_words": []
       },
       "ask_first": "Which role is hardest to keep — cooks, waiters or cashiers?",
-      "free_stops": "The rota rules, swap approvals and cover planning for peak seasons stay in the solution document."
+      "free_stops": "The rota rules, swap approvals and cover planning for peak seasons stay in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note how many times this week someone says they missed their shift message, so you can see if the problem is occasional or daily.",
+          "review": false
+        },
+        {
+          "text": "Give one supervisor the job of posting every rota in the same chat at the same time, so shift notice stops moving around.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_booking_appointments",
@@ -168,7 +232,17 @@
         "tool_words": []
       },
       "ask_first": "How often does a double-booking happen in a normal week?",
-      "free_stops": "How the booking flow, table layout and reminders are set up is covered in the solution document."
+      "free_stops": "How the booking flow, table layout and reminders are set up is covered in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare tonight's phone, message and walk-in reservations against seated tables, so you see where double-booking enters the day.",
+          "review": false
+        },
+        {
+          "text": "Give the host stand one booking notebook for every reservation channel, so table availability stays aligned during service.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_reviews_bad",
@@ -189,7 +263,17 @@
         "tool_words": []
       },
       "ask_first": "Who replies to reviews now?",
-      "free_stops": "The review-request timing and the opt-in guest list setup are kept for the solution document."
+      "free_stops": "The review-request timing and the opt-in guest list setup are kept for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note each complaint about cold food or slow service during one weekend, so you can see which shift and meal period repeat it.",
+          "review": false
+        },
+        {
+          "text": "Give one floor manager a notebook for regular guests' table preferences and visit notes, so returning diners are recognised without guessing.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p10_reports_late",
@@ -211,7 +295,17 @@
         ]
       },
       "ask_first": "What number do you check first when you hear how a day went?",
-      "free_stops": "Which numbers make up the morning read and how they are pulled from your systems is in the solution document."
+      "free_stops": "Which numbers make up the morning read and how they are pulled from your systems is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note daily sales, covers and cash over or short in one notebook for this month, so weak days show before accounts arrive.",
+          "review": false
+        },
+        {
+          "text": "Give the closing manager one fixed nightly reporting time and one page for the figures, so month performance stops arriving weeks late.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

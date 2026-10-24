@@ -2,7 +2,7 @@
   "industry": "movers_and_relocation_companies",
   "name": "Movers and relocation companies",
   "sector": "7.E Trade, distribution and logistics",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_lead_quality",
@@ -22,7 +22,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The intake questions and routing are designed in the solution document."
+      "free_stops": "The intake questions and routing are designed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note which enquiries share full move details before asking about price, so time goes to people closer to booking.",
+          "review": true
+        },
+        {
+          "text": "Keep one notebook list of open enquiries with one person checking it at set times, so fewer serious leads go cold.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_lead_followup_slow",
@@ -42,7 +52,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "Follow-up timing is set in the solution document."
+      "free_stops": "Follow-up timing is set in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare enquiry time with reply time for recent chats, so you see when delays are costing bookings.",
+          "review": false
+        },
+        {
+          "text": "Give one person each shift the enquiry phone duty, so new chats get answered during rush periods.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_cost_overruns",
@@ -62,7 +82,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The survey method and calculator are set in the solution document."
+      "free_stops": "The survey method and calculator are set in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note which quoted jobs needed extra crew time or packing on the day, so underquoted move types stand out.",
+          "review": false
+        },
+        {
+          "text": "Give one estimator the job of checking photo based quotes against completed jobs weekly, so pricing improves from recent mistakes.",
+          "review": true
+        }
+      ]
     },
     {
       "id": "p4_pricing_errors",
@@ -82,7 +112,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The change-approval flow is designed in the solution document."
+      "free_stops": "The change-approval flow is designed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many jobs had extra items added at loading this week, so you see how often pricing disputes start.",
+          "review": true
+        },
+        {
+          "text": "Keep one written add on list with the crew leader on every move, so extras are recorded before the truck leaves.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_reviews_bad",
@@ -103,7 +143,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The photo routine and review flow are set in the solution document."
+      "free_stops": "The photo routine and review flow are set in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note which breakage complaints came from packing, loading or unloading, so the weak part of the move is clear.",
+          "review": false
+        },
+        {
+          "text": "Give one crew member the job of checking fragile items against the job notes before departure, so avoidable damage is less likely.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_order_errors",
@@ -123,7 +173,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The scheduling rules are set in the solution document."
+      "free_stops": "The scheduling rules are set in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare booked jobs against truck assignments for the coming week, so clashes are caught before customers are promised the slot.",
+          "review": false
+        },
+        {
+          "text": "Keep all confirmed jobs in one booking notebook managed by one scheduler, so truck availability stays tied to each promise.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_margin_unknown",
@@ -143,7 +203,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "How costs are captured per job is designed in the solution document."
+      "free_stops": "How costs are captured per job is designed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare each completed job's price with labour, truck time and packing used, so low earning move types become visible.",
+          "review": true
+        },
+        {
+          "text": "Give one person a same day notebook line for each job's crew hours and materials, so job earnings stop being guessed.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_cash_mismatch",
@@ -163,7 +233,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The settlement steps are in the solution document."
+      "free_stops": "The settlement steps are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare cash collected on each job with cash handed in that evening, so missing site collections are spotted quickly.",
+          "review": false
+        },
+        {
+          "text": "Give one office person the daily handover of all site cash with one notebook record, so every collection has an owner.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_campaign_roi_unknown",
@@ -183,7 +263,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "How codes are set per channel is in the solution document."
+      "free_stops": "How codes are set per channel is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count which enquiry sources turned into actual moves this month, so you see where the serious customers come from.",
+          "review": false
+        },
+        {
+          "text": "Keep one source list beside the enquiry phone and make one person note it for every new chat, so comparisons stay complete.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p10_repeat_low",
@@ -203,7 +293,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "Message timing and content are planned in the solution document."
+      "free_stops": "Message timing and content are planned in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many past moves led to another booking or referral this season, so you see where repeat work is leaking.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member a weekly notebook page for past customers due to move again, so follow ups actually happen.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

@@ -2,7 +2,7 @@
   "industry": "mobile_wallet_and_payment_agents",
   "name": "Mobile-wallet and payment agents (e.g. JazzCash/Easypaisa retailers)",
   "sector": "7.L Finance-adjacent, energy and utilities",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_stockout",
@@ -22,7 +22,17 @@
         "tool_words": []
       },
       "ask_first": "On a busy day, which runs out first, e-float or cash?",
-      "free_stops": "Alert levels and how they adjust for busy days are in the solution document."
+      "free_stops": "Alert levels and how they adjust for busy days are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many customers leave without service after float finishes each day, so lost demand at the counter is clearer.",
+          "review": false
+        },
+        {
+          "text": "Give one person the midday float check every day, so replenishment starts before customers drift to the next shop.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_cash_flow_tight",
@@ -42,7 +52,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "How the balance is read and the warning thresholds are set is in the solution document."
+      "free_stops": "How the balance is read and the warning thresholds are set is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note the time cash-outs start being refused each day, so you can spot the stretch hurting service most.",
+          "review": false
+        },
+        {
+          "text": "Give one worker the midday cash check and one page for shortages, so cash-out pressure gets flagged before the rush.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_slow_replenishment",
@@ -62,7 +82,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The log and reminder timing are in the solution document."
+      "free_stops": "The log and reminder timing are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note which busy-day top-up requests arrive after the counter has already slowed or stopped, so the late pattern is clearer.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of making every top-up request at the same daily time, so delays are easier to challenge.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_cash_mismatch",
@@ -82,7 +112,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The day-close layout and variance rules are in the solution document."
+      "free_stops": "The day-close layout and variance rules are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count on which shift the closing difference happens most often, so you can narrow the problem to a routine.",
+          "review": false
+        },
+        {
+          "text": "Keep one day-close sheet at the counter for every shift handover, so the missing piece is caught before closing.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_cash_leakage",
@@ -104,7 +144,17 @@
         ]
       },
       "ask_first": "",
-      "free_stops": "Log design and summary content are in the solution document; pi records the control gap, never names staff."
+      "free_stops": "Log design and summary content are in the solution document; pi records the control gap, never names staff.",
+      "extra_ideas": [
+        {
+          "text": "Count how many times cash changes hands before the khata is updated during one shift, so the leakage point shows.",
+          "review": false
+        },
+        {
+          "text": "Make one person check the khata at each shift handover, so skipped entries are caught while the staff member is present.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_theft_external",
@@ -124,7 +174,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "Incident categories and reporting are in the solution document."
+      "free_stops": "Incident categories and reporting are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note the time, note type and counter worker for each fake note loss, so the pattern behind losses is clearer.",
+          "review": false
+        },
+        {
+          "text": "Give one worker the job of marking every fake-note incident in one notebook, so repeat trouble gets tracked in one place.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_fraud",
@@ -144,7 +204,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "Checklist content is in the solution document."
+      "free_stops": "Checklist content is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many suspicious calls or messages reach the counter in a week, so staff see the fraud pressure is real.",
+          "review": false
+        },
+        {
+          "text": "Give one senior person the job of handling all suspicious transfer requests, so counter staff stop deciding under pressure alone.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_complaints",
@@ -166,7 +236,17 @@
         ]
       },
       "ask_first": "",
-      "free_stops": "Complaint categories and handling flow are in the solution document; pi never explains fees, limits or platform policy."
+      "free_stops": "Complaint categories and handling flow are in the solution document; pi never explains fees, limits or platform policy.",
+      "extra_ideas": [
+        {
+          "text": "Count how many arguments start after customers say money did not arrive, so you see how much counter time they consume.",
+          "review": false
+        },
+        {
+          "text": "Give one worker the job of writing unresolved complaint moments in one notebook, so repeat patterns at the counter stop getting lost.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_commission_reconciliation",
@@ -175,8 +255,8 @@
       "category": "cash_collections",
       "subtype": "commission_reconciliation",
       "quick_ideas": [
-        "Keep weekly totals by transaction type per platform, so there is a figure to compare",
-        "Note each gap and raise it with the platform or distributor in one batch."
+        "Note daily totals by transaction type in one notebook and compare them with the statement later, so mismatches have a starting point.",
+        "Give one person a fixed weekly time to review statement gaps in one place, so reconciliation stops getting left until later."
       ],
       "workzap_build": {
         "keys": [
@@ -189,7 +269,11 @@
         "leads_with_view": true
       },
       "ask_first": "",
-      "free_stops": "Matching logic is in the solution document."
+      "free_stops": "Matching logic is in the solution document.",
+      "quick_ideas_original": [
+        "Keep weekly totals by transaction type per platform, so there is a figure to compare",
+        "Note each gap and raise it with the platform or distributor in one batch."
+      ]
     },
     {
       "id": "p10_margin_unknown",
@@ -212,7 +296,17 @@
         "leads_with_view": true
       },
       "ask_first": "",
-      "free_stops": "How costs are allocated is in the solution document."
+      "free_stops": "How costs are allocated is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many counter transactions happen in your busiest hour and your slowest hour, so the space value is clearer.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member a notebook for daily counter activity and nearby shopwalk observations, so worth is judged from one weekly record.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p11_owner_blind",
@@ -232,7 +326,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "Summary content and multi-shop view are in the solution document."
+      "free_stops": "Summary content and multi-shop view are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note each shift's opening and closing float, cash and unresolved issues in one notebook, so you can see what changed while away.",
+          "review": false
+        },
+        {
+          "text": "Give the closing worker one fixed handover note for every shift, so missing details stop disappearing between staff.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

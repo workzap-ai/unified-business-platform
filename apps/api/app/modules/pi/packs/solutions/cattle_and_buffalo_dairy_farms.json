@@ -2,7 +2,7 @@
   "industry": "cattle_and_buffalo_dairy_farms",
   "name": "Cattle and buffalo dairy farms",
   "sector": "7.C Agriculture, livestock and rural (part 1)",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_no_yield_per_animal",
@@ -22,7 +22,17 @@
         "tool_words": []
       },
       "ask_first": "Is milk measured per animal anywhere today, or only the total in the can?",
-      "free_stops": "How entries are set up per animal and how a \"drop\" is flagged goes in the solution document."
+      "free_stops": "How entries are set up per animal and how a \"drop\" is flagged goes in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare morning and evening milk by thaan for one week, so the drop shows whether the change is tied to particular animals.",
+          "review": false
+        },
+        {
+          "text": "Give one milking shift the job of writing each thaan's milk in one notebook daily, so low output is linked to the same animal each time.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_theft_internal",
@@ -42,7 +52,17 @@
         "tool_words": []
       },
       "ask_first": "Does the gap seem worse on a particular shift or day?",
-      "free_stops": "The handover points and how the gap is tracked by shift are set out in the solution document."
+      "free_stops": "The handover points and how the gap is tracked by shift are set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note the measured total in the shed and the first received total outside it each day, so the loss point gets narrower.",
+          "review": false
+        },
+        {
+          "text": "Give one staff role the job of writing every milk handover in one place at the same spot, so unexplained movement stops between people.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_receivables_late",
@@ -62,7 +82,17 @@
         "tool_words": []
       },
       "ask_first": "Does he pay against your figures, or only his own notebook?",
-      "free_stops": "The reminder timing and statement layout stay in the solution document."
+      "free_stops": "The reminder timing and statement layout stay in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Write each dodhi pickup date and unpaid balance on one page this month, so the old amount is separate from new milk.",
+          "review": false
+        },
+        {
+          "text": "Give one fixed evening each week to update the dodhi balance in one notebook, so dues stop drifting with daily farm work.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_margin_unknown",
@@ -83,7 +113,17 @@
         "leads_with_view": true
       },
       "ask_first": "Do you grow your own fodder, or is it all bought in?",
-      "free_stops": "Which costs go in and how they're split is worked out in the solution document."
+      "free_stops": "Which costs go in and how they're split is worked out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count this week's total wanda used and litres sold, so you see roughly how much wanda is going into each litre.",
+          "review": false
+        },
+        {
+          "text": "Give one staff role the job of noting every feed purchase in one notebook at evening milking, so price jumps stop being missed.",
+          "review": true
+        }
+      ]
     },
     {
       "id": "p5_count_mismatch",
@@ -103,7 +143,17 @@
         "tool_words": []
       },
       "ask_first": "Who signs for feed when it arrives?",
-      "free_stops": "The store log design and reorder levels are kept for the solution document."
+      "free_stops": "The store log design and reorder levels are kept for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Write the truck bag count and store bag count on delivery day for each load, so you see whether shortages start outside or inside.",
+          "review": false
+        },
+        {
+          "text": "Give one store staff role the unloading count job at the same spot every delivery, so bag numbers stop changing between truck and store.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_seasonal_fodder_shortage",
@@ -123,7 +173,17 @@
         "tool_words": []
       },
       "ask_first": "Do you make silage on your own land or buy all of it?",
-      "free_stops": "How weeks-left is worked out from the farm's usage goes in the solution document."
+      "free_stops": "How weeks-left is worked out from the farm's usage goes in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note how many days your last silage stock lasted after opening, so summer shortage timing is based on your own use.",
+          "review": false
+        },
+        {
+          "text": "Give one staff role the weekly silage level check in one notebook, so low stock is noticed before buying at peak rates.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_no_breeding_records",
@@ -143,7 +203,17 @@
         "tool_words": []
       },
       "ask_first": "Who keeps track of insemination dates now?",
-      "free_stops": "The register fields and reminder rules are set out in the solution document."
+      "free_stops": "The register fields and reminder rules are set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Walk the sheds once and note each animal by ear tag and current status, so unknown pregnant and due animals are counted clearly.",
+          "review": false
+        },
+        {
+          "text": "Give one notebook near the office for all status updates from the vet or technician, so due animals stay on one farm list.",
+          "review": true
+        }
+      ]
     },
     {
       "id": "p8_info_lost_in_whatsapp",
@@ -163,7 +233,17 @@
         "tool_words": []
       },
       "ask_first": "Who on the farm is meant to tell you, and how?",
-      "free_stops": "What gets logged and how it reaches the owner is detailed in the solution document."
+      "free_stops": "What gets logged and how it reaches the owner is detailed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many calf births and deaths reached you after the same day this month, so the reporting delay has a real number.",
+          "review": false
+        },
+        {
+          "text": "Give one staff role the same day calf event reporting job into one agreed farm chat, so bad news stops surfacing days later.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_turnover",
@@ -183,7 +263,17 @@
         "tool_words": []
       },
       "ask_first": "How many milkers usually go home around Eid?",
-      "free_stops": "The checklist itself and how missed items are flagged stay in the solution document."
+      "free_stops": "The checklist itself and how missed items are flagged stay in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note which animal questions new milkers ask most during one week, so the handover gaps around your herd are specific.",
+          "review": false
+        },
+        {
+          "text": "Give one experienced milker the handover round with each new milker for the same animals, so animal quirks are passed on openly.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p10_cash_handling_risk",
@@ -203,7 +293,17 @@
         "tool_words": []
       },
       "ask_first": "Do customers pay daily, weekly or monthly?",
-      "free_stops": "The route sheet and evening check are designed in the solution document."
+      "free_stops": "The route sheet and evening check are designed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note each home delivery payment date beside the customer route for one week, so late payers and held cash are separated clearly.",
+          "review": true
+        },
+        {
+          "text": "Give one staff role the evening cash handover job with one notebook kept at the milk room, so rider cash stops sitting overnight.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p11_maintenance_downtime",
@@ -223,7 +323,17 @@
         "tool_words": []
       },
       "ask_first": "Is there a generator, or does the chiller stop completely?",
-      "free_stops": "The downtime log and how losses are costed go in the solution document."
+      "free_stops": "The downtime log and how losses are costed go in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Write the chiller stop time and milk souring time for each power cut this week, so you see how little cooling time you really have.",
+          "review": false
+        },
+        {
+          "text": "Give one staff role the job of checking chiller temperature at fixed times during load-shedding days, so spoiled milk is caught before pickup.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

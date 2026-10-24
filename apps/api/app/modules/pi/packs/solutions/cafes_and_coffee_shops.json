@@ -2,7 +2,7 @@
   "industry": "cafes_and_coffee_shops",
   "name": "Cafés and coffee shops",
   "sector": "7.B Food and beverage",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_expiry_wastage",
@@ -22,7 +22,17 @@
         "tool_words": []
       },
       "ask_first": "Are pastries baked in-house or bought in?",
-      "free_stops": "How order quantities are set by day and season is detailed in the solution document."
+      "free_stops": "How order quantities are set by day and season is detailed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count which pastry trays still have pieces left at closing each day, so you see exactly where the binning keeps happening.",
+          "review": false
+        },
+        {
+          "text": "Give one person the daily pastry order decision and one notebook for leftovers, so ordering stops changing with each shift.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_margin_unknown",
@@ -43,7 +53,17 @@
         "leads_with_view": true
       },
       "ask_first": "When did you last change menu prices?",
-      "free_stops": "The costing breakdown and repricing approach go in the solution document."
+      "free_stops": "The costing breakdown and repricing approach go in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Write down beans, milk, cups and lids used on your busiest drinks once, so price rises stop hiding inside each cup.",
+          "review": true
+        },
+        {
+          "text": "Give one person the job of keeping supplier bills together in one folder, so cost checks stop waiting for spare time.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_stockout",
@@ -63,7 +83,17 @@
         "tool_words": []
       },
       "ask_first": "Who checks stock and places orders now?",
-      "free_stops": "The par levels and reorder points per item are set in the solution document."
+      "free_stops": "The par levels and reorder points per item are set in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note which weekend shift runs out of oat or almond milk first, so you see where the refill plan breaks.",
+          "review": false
+        },
+        {
+          "text": "Give one person the Thursday stock check and one shelf note for weekend needs, so the rush starts with enough on hand.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_consistency_across_branches",
@@ -83,7 +113,17 @@
         "tool_words": []
       },
       "ask_first": "How are recipes taught to new staff now?",
-      "free_stops": "The recipe standards and training flow stay for the solution document."
+      "free_stops": "The recipe standards and training flow stay for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Taste the same drink from different baristas on the same day, so you hear the difference customers are noticing.",
+          "review": false
+        },
+        {
+          "text": "Give one senior barista the handover job for drink standards each shift, so taste stays steadier when staff change.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_bottleneck",
@@ -103,7 +143,17 @@
         "tool_words": []
       },
       "ask_first": "What time is your busiest rush?",
-      "free_stops": "The pre-order flow and slot set-up are described in the solution document."
+      "free_stops": "The pre-order flow and slot set-up are described in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many office orders arrive during the morning rush and how many wait, so the clash with walk-ins is clear.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of writing every office order in one notebook, so chats stop disappearing during the rush.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_basket_small",
@@ -124,7 +174,17 @@
         "leads_with_view": true
       },
       "ask_first": "Which hours are the quietest?",
-      "free_stops": "The offer plan by hour and how it's measured are kept for the solution document."
+      "free_stops": "The offer plan by hour and how it's measured are kept for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note how many afternoon tables stay occupied after only one drink, so the quiet hours problem has a real size.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member the afternoon job of checking seated tables and clearing finished cups, so space looks active and ready.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_cash_mismatch",
@@ -144,7 +204,17 @@
         "tool_words": []
       },
       "ask_first": "Is the closing gap usually in cash or card?",
-      "free_stops": "The closing routine and free-drink rules are set out in the solution document."
+      "free_stops": "The closing routine and free-drink rules are set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note each shift's free drinks beside card and till totals at closing, so giveaway patterns and mismatches can be compared.",
+          "review": false
+        },
+        {
+          "text": "Give one closing person the daily total check in one notebook, so card and till differences are caught on the day.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_loyalty",
@@ -164,7 +234,17 @@
         "tool_words": []
       },
       "ask_first": "How do you reward regulars now?",
-      "free_stops": "The loyalty rules and reward design go in the solution document."
+      "free_stops": "The loyalty rules and reward design go in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many familiar faces come in during one busy period, so regular trade is judged without relying on paper cards.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of marking repeat visitors by simple tally in one notebook, so regular custom stops being a guess.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_campaign_roi_unknown",
@@ -184,7 +264,17 @@
         "tool_words": []
       },
       "ask_first": "Who runs your social pages?",
-      "free_stops": "How codes are set up per post and tracked through to the till stays for the solution document."
+      "free_stops": "How codes are set up per post and tracked through to the till stays for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note how many customers mention your posts when paying this week, so likes are compared with people actually walking in.",
+          "review": false
+        },
+        {
+          "text": "Give one till person the job of tallying walk-ins who mention your posts, so everyone records it the same way.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p10_owner_blind",
@@ -204,7 +294,17 @@
         "tool_words": []
       },
       "ask_first": "Do both outlets use the same POS?",
-      "free_stops": "What goes into the daily read and how it's pulled from each POS is in the solution document."
+      "free_stops": "What goes into the daily read and how it's pulled from each POS is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Have the second outlet note cups sold, pastries binned and cash shortfalls at closing, so your next visit starts with facts.",
+          "review": false
+        },
+        {
+          "text": "Give one person at the second outlet a fixed nightly send time for key numbers, so updates reach you without waiting for visits.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

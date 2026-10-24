@@ -2,7 +2,7 @@
   "industry": "co_working_spaces",
   "name": "Co-working spaces",
   "sector": "7.K Professional and business services",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_lead_followup_slow",
@@ -22,7 +22,17 @@
         "tool_words": []
       },
       "ask_first": "Roughly how full are you right now?",
-      "free_stops": "the follow-up timing and assignment are set out in the solution document."
+      "free_stops": "the follow-up timing and assignment are set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many enquiries are still waiting at midday and closing today, so you see when replies are slipping most.",
+          "review": false
+        },
+        {
+          "text": "Give each shift one person to clear waiting enquiries before handover, so tours are offered while interest is still fresh.",
+          "review": true
+        }
+      ]
     },
     {
       "id": "p2_conversion_low",
@@ -42,7 +52,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "the follow-up sequence is kept for the solution document."
+      "free_stops": "the follow-up sequence is kept for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note each tour and whether it signed up by week end, so you can see which days produce weaker tours.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of writing one reason after each no sign up, so objections stop getting lost.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_booking_appointments",
@@ -62,7 +82,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "booking rules per membership type are set out in the solution document."
+      "free_stops": "booking rules per membership type are set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Check this week's room bookings against the room diary once, so you see which rooms get clashing entries most often.",
+          "review": false
+        },
+        {
+          "text": "Keep one handwritten bookings list at the front desk and hand over changes each shift, so clashes stop being missed.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_pricing_errors",
@@ -82,7 +112,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "how credits and overage are calculated is kept for the solution document."
+      "free_stops": "how credits and overage are calculated is kept for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare one week's meeting room usage against included credits for current members, so unpaid overuse is easy to spot.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member the job of noting extra room use in one notebook daily, so chargeable usage is not missed.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_receivables_late",
@@ -103,7 +143,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "the billing cycle and reminder timings are worked out in the solution document."
+      "free_stops": "the billing cycle and reminder timings are worked out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Write all members with unpaid invoices in one list ordered by oldest due, so the true collections backlog is clear.",
+          "review": false
+        },
+        {
+          "text": "Set one fixed time each week for one person to send overdue reminders, so chasing happens regularly.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_refunds",
@@ -123,7 +173,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "the checklist steps and approvals are designed in the solution document."
+      "free_stops": "the checklist steps and approvals are designed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "List all current move outs and note which deposit or refund point is still open, so messy exits are easier to track.",
+          "review": true
+        },
+        {
+          "text": "Give one person the job of keeping every leaving member on one departures page, so refunds follow the same routine.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_churn_subscription",
@@ -143,7 +203,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "the feedback timing is set out in the solution document."
+      "free_stops": "the feedback timing is set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note how many members leave near their third month this quarter, so the pattern size is clear to the owner.",
+          "review": false
+        },
+        {
+          "text": "Give one person a fixed weekly check in with newer members, so concerns are heard before they drift away.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_maintenance_downtime",
@@ -163,7 +233,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "the ticket flow and response targets are kept for the solution document."
+      "free_stops": "the ticket flow and response targets are kept for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count open Wi Fi and AC complaints by days waiting once, so you can see which issue is dragging longest.",
+          "review": false
+        },
+        {
+          "text": "Keep one notebook for all service complaints and hand it over every shift, so fixes stop getting lost between staff.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_cctv_gaps",
@@ -183,7 +263,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "how the check links to your access system is worked out in the solution document."
+      "free_stops": "how the check links to your access system is worked out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare active access cards with your current member list once this week, so leftover cards from ex members are spotted.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of collecting and disabling access for departures on the same day, so old cards stop staying active.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p10_branch_comparison",
@@ -203,7 +293,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "which figures to track and how they're pulled together is set out in the solution document."
+      "free_stops": "which figures to track and how they're pulled together is set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Write the same daily counts from both locations on one notebook page, so weaker branch patterns stand out quickly.",
+          "review": false
+        },
+        {
+          "text": "Give one person at each location the job of sending the same daily figures before closing, so comparisons arrive consistently.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

@@ -2,7 +2,7 @@
   "industry": "cinemas_and_theatres",
   "name": "Cinemas and theatres",
   "sector": "7.H Hospitality, events and personal services",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_cash_mismatch",
@@ -22,7 +22,17 @@
         "tool_words": []
       },
       "ask_first": "Do you sell only at the counter or through apps too?",
-      "free_stops": "How ticketing data is pulled in and matched is in the solution document."
+      "free_stops": "How ticketing data is pulled in and matched is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note ticket counts and cash collected for each cashier on one busy day, so you see where mismatches begin.",
+          "review": false
+        },
+        {
+          "text": "Make the same supervisor check each cashier's handover note every shift, so box office gaps stop drifting between teams.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_software_not_connected",
@@ -31,8 +41,8 @@
       "category": "tech_systems",
       "subtype": "software_not_connected",
       "quick_ideas": [
-        "Compare one week of app sales with your own records by show, to see which shows differ",
-        "Note which app's settlement doesn't match what you expected, since that is where to start."
+        "Write online sales and counter sales for each show on one daily page, so the mismatch appears by show not by total.",
+        "Give one person the job of closing each show's sales note after the last entry, so both sources are reconciled the same way."
       ],
       "workzap_build": {
         "keys": [
@@ -44,7 +54,11 @@
         ]
       },
       "ask_first": "How many ticketing apps sell your seats?",
-      "free_stops": "The data connection and matching rules stay for the solution document."
+      "free_stops": "The data connection and matching rules stay for the solution document.",
+      "quick_ideas_original": [
+        "Compare one week of app sales with your own records by show, to see which shows differ",
+        "Note which app's settlement doesn't match what you expected, since that is where to start."
+      ]
     },
     {
       "id": "p3_void_refund_abuse",
@@ -64,7 +78,17 @@
         "tool_words": []
       },
       "ask_first": "Who can give a free ticket today?",
-      "free_stops": "Approval levels and reasons list go in the solution document."
+      "free_stops": "Approval levels and reasons list go in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count complimentary tickets by staff role and show for one week, so you spot where free seats are leaking away.",
+          "review": false
+        },
+        {
+          "text": "Keep one paper list for all complimentary tickets beside the box office, so every free seat is logged the same way.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_count_mismatch",
@@ -84,7 +108,17 @@
         "tool_words": []
       },
       "ask_first": "Which items go missing most?",
-      "free_stops": "Count routine and wastage logging are designed in the solution document."
+      "free_stops": "Count routine and wastage logging are designed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count cups, bottles and popcorn packs before opening and after closing for a week, so the loss size becomes visible.",
+          "review": false
+        },
+        {
+          "text": "Give one concession worker the closing stock note each night, so the count happens even on busy evenings.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_wastage_cost",
@@ -105,7 +139,17 @@
         "leads_with_view": true
       },
       "ask_first": "Which items are wasted most?",
-      "free_stops": "How preparation is linked to bookings is in the solution document."
+      "free_stops": "How preparation is linked to bookings is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note each night's leftover popcorn and hot food by item and show timing, so overproduction patterns stand out quickly.",
+          "review": false
+        },
+        {
+          "text": "Assign one kitchen worker to record all throwaways before closing, so waste tracking continues on the busiest nights.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_seasonal_dip",
@@ -125,7 +169,17 @@
         "tool_words": []
       },
       "ask_first": "How many screens do you run?",
-      "free_stops": "Which audiences to target and when are planned in the solution document."
+      "free_stops": "Which audiences to target and when are planned in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare weekday afternoon seat counts by film and day for one week, so you see which slots stay weakest.",
+          "review": false
+        },
+        {
+          "text": "Make one manager review afternoon bookings at the same time daily, so weak shows are spotted before the week ends.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_maintenance_downtime",
@@ -145,7 +199,17 @@
         "tool_words": []
       },
       "ask_first": "Is your technician on staff or on call?",
-      "free_stops": "Equipment list and service schedule stay for the solution document."
+      "free_stops": "Equipment list and service schedule stay for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Write each projector or sound failure with show timing and screen number, so repeat faults stop looking random.",
+          "review": false
+        },
+        {
+          "text": "Give one technician the preopening check note for every screen, so equipment checks happen before guests enter the hall.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_manual_reports",
@@ -165,7 +229,17 @@
         "tool_words": []
       },
       "ask_first": "How many distributors do you settle with?",
-      "free_stops": "Statement content and data sources go in the solution document."
+      "free_stops": "Statement content and data sources go in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many times ticket figures are rewritten for one film statement, so you see where reporting effort is wasted.",
+          "review": false
+        },
+        {
+          "text": "Keep one running paper record of each film's daily ticket totals, so settlement notes are ready without a rebuild.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_chat_overload",
@@ -185,7 +259,17 @@
         "tool_words": []
       },
       "ask_first": "Is your website showtime list kept up to date?",
-      "free_stops": "The assistant's answers and schedule connection are in the solution document."
+      "free_stops": "The assistant's answers and schedule connection are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note which showtimes callers ask for most across one week, so your front desk sees the busiest repeat requests.",
+          "review": false
+        },
+        {
+          "text": "Assign one staff member each morning to update the day's showtime note, so callers hear the same timings every time.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p10_branch_comparison",
@@ -205,7 +289,17 @@
         "tool_words": []
       },
       "ask_first": "Do both locations use the same ticketing system?",
-      "free_stops": "Which numbers and how they're pulled is in the solution document."
+      "free_stops": "Which numbers and how they're pulled is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count the same show, snack and cash notes from both locations for one week, so differences are fair to compare.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member one notebook for both locations' daily figures, so branch comparison stops changing by format.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

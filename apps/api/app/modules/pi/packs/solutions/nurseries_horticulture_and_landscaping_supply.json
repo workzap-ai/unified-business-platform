@@ -2,7 +2,7 @@
   "industry": "nurseries_horticulture_and_landscaping_supply",
   "name": "Nurseries, horticulture and landscaping supply",
   "sector": "7.C Agriculture, livestock and rural (part 2)",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_expiry_wastage",
@@ -22,7 +22,17 @@
         "tool_words": []
       },
       "ask_first": "How many sites do you grow or sell from?",
-      "free_stops": "How losses are logged and reported goes in the solution document."
+      "free_stops": "How losses are logged and reported goes in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Walk the nursery once and note dead or unsellable plants by section, so you spot where losses build before stock count.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of writing every plant loss in one notebook the same day, so losses stop surprising you later.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_slow_replenishment",
@@ -42,7 +52,17 @@
         "tool_words": []
       },
       "ask_first": "Do you grow these lines or buy them in?",
-      "free_stops": "Reorder levels and timing are kept for the solution document."
+      "free_stops": "Reorder levels and timing are kept for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare this spring's fastest-selling indoor lines with last spring's sellouts, so late reordering points stand out early.",
+          "review": false
+        },
+        {
+          "text": "Give one person a standing weekly check of fast-moving indoor lines, so reorder decisions happen before benches empty.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_pricing_errors",
@@ -64,7 +84,17 @@
         ]
       },
       "ask_first": "How many people sell at the counter?",
-      "free_stops": "How the price list and cash close are set up goes in the solution document."
+      "free_stops": "How the price list and cash close are set up goes in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare what staff charged today for the same plant across a few sales, so inconsistent pricing shows up clearly.",
+          "review": true
+        },
+        {
+          "text": "Give one person the job of updating and keeping the dated counter price sheet, so staff stop quoting mixed rates.",
+          "review": true
+        }
+      ]
     },
     {
       "id": "p4_slow_response",
@@ -84,7 +114,17 @@
         "tool_words": []
       },
       "ask_first": "Where do most enquiries come from now?",
-      "free_stops": "How the inbox and reminders work is detailed in the solution document."
+      "free_stops": "How the inbox and reminders work is detailed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count today's unanswered enquiries at closing and note their age, so you see how big the reply backlog is.",
+          "review": false
+        },
+        {
+          "text": "Give one person fixed reply times and one notebook list of pending enquiries, so messages stop slipping through.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_manual_work",
@@ -104,7 +144,17 @@
         "tool_words": []
       },
       "ask_first": "Roughly how many quotes do you prepare in a month?",
-      "free_stops": "How the item library and quote builder are set up goes in the solution document."
+      "free_stops": "How the item library and quote builder are set up goes in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note which parts of your last few landscaping quotes you rewrote each time, so the slowest repeat sections stand out.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member one notebook page for standard quote items and rates, so preparing new quotes takes less rewriting.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_cost_overruns",
@@ -124,7 +174,17 @@
         "tool_words": []
       },
       "ask_first": "How many projects run at once?",
-      "free_stops": "How costs are tracked against quotes is kept for the solution document."
+      "free_stops": "How costs are tracked against quotes is kept for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare one live project's quoted materials with what has already gone to site, so overruns show before the finish.",
+          "review": false
+        },
+        {
+          "text": "Give one person the site issue notebook for all materials and extra labour used, so budget drift gets caught mid-job.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_receivables_late",
@@ -144,7 +204,17 @@
         "tool_words": []
       },
       "ask_first": "Who are your slowest payers?",
-      "free_stops": "The tracker and reminder setup is part of the solution document."
+      "free_stops": "The tracker and reminder setup is part of the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many retention and final payments are overdue right now, so you see which old balances need attention first.",
+          "review": false
+        },
+        {
+          "text": "Give one person one notebook page for due dates and follow-ups, so held payments stop getting missed.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_checklists_not_done",
@@ -164,7 +234,17 @@
         "tool_words": []
       },
       "ask_first": "How are visits scheduled now?",
-      "free_stops": "How scheduling, check-in and reports work goes in the solution document."
+      "free_stops": "How scheduling, check-in and reports work goes in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare this week's planned maintenance visits with the visits actually completed, so missed stops are clear before clients complain.",
+          "review": false
+        },
+        {
+          "text": "Give one supervisor one written weekly visit list and handover check, so crews stop missing scheduled maintenance calls.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_marketplace_listing",
@@ -184,7 +264,17 @@
         "tool_words": []
       },
       "ask_first": "Which marketplaces do you list on?",
-      "free_stops": "How the connection works is detailed in the solution document."
+      "free_stops": "How the connection works is detailed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare listed plants with what is physically on hand during one walk round, so outdated online stock is easy to spot.",
+          "review": false
+        },
+        {
+          "text": "Give one person the end-of-day job of marking sold-out lines on one update list, so old listings come down faster.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p10_repeat_low",
@@ -204,7 +294,17 @@
         "tool_words": []
       },
       "ask_first": "Do you record any customer details today?",
-      "free_stops": "Message timing and content are kept for the solution document."
+      "free_stops": "Message timing and content are kept for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many spring buyers returned by season this year, so you see which period loses them fastest.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member a weekly notebook page for past-buyer follow-ups, so quiet months get some repeat orders started.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

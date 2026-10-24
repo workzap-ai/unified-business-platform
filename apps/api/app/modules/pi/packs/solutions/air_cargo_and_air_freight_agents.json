@@ -2,7 +2,7 @@
   "industry": "air_cargo_and_air_freight_agents",
   "name": "Air cargo and air-freight agents",
   "sector": "7.G Transport, mobility and aviation (part 1)",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_conversion_low",
@@ -22,7 +22,17 @@
         "tool_words": []
       },
       "ask_first": "Rate zyada tar WhatsApp pe maangte hain ya email pe?",
-      "free_stops": "The margin rules and rate structure are worked out in the solution document."
+      "free_stops": "The margin rules and rate structure are worked out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note the last few rate requests that went cold and compare reply times by lane, so you spot where sales is losing urgency.",
+          "review": false
+        },
+        {
+          "text": "Give one desk the job of checking unanswered rate requests at a set time daily, so fewer enquiries drift away unreplied.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_order_tracking",
@@ -43,7 +53,17 @@
         "tool_words": []
       },
       "ask_first": "Staff status kaise check karte hain, airline ko call ya portal?",
-      "free_stops": "Which status points trigger which message, and how status is pulled in, is set out in the solution document."
+      "free_stops": "Which status points trigger which message, and how status is pulled in, is set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Write down each shipment status call for one busy shift and the latest stage reached, so you see which updates trigger chasing.",
+          "review": false
+        },
+        {
+          "text": "Give one role the job of sending stage updates from one running list at fixed times, so customer calls ease during the day.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_customer_communication",
@@ -63,7 +83,17 @@
         "tool_words": []
       },
       "ask_first": "Mahine mein kitni dafa offload ya rollover hota hai, taqreeban?",
-      "free_stops": "The alert flow and who receives it are designed in the solution document."
+      "free_stops": "The alert flow and who receives it are designed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count recent offloads and note whether the customer heard from you or elsewhere, so the missed communication pattern stands out.",
+          "review": false
+        },
+        {
+          "text": "Make operations hand over every offload to one named customer contact role immediately, so news reaches the shipper from your side first.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_margin_unknown",
@@ -84,7 +114,17 @@
         "leads_with_view": true
       },
       "ask_first": "Shipment ka final profit kab tak pata chalta hai?",
-      "free_stops": "How late charges are captured and allocated is worked out in the solution document."
+      "free_stops": "How late charges are captured and allocated is worked out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Pick several closed shipments and compare quoted charges with final charges, so you spot which cost lines keep eroding profit late.",
+          "review": false
+        },
+        {
+          "text": "Assign one role to note every late-arriving charge in one notebook, so pricing reviews use the same recurring surprises.",
+          "review": true
+        }
+      ]
     },
     {
       "id": "p5_duplicate_entry",
@@ -105,7 +145,17 @@
         "tool_words": []
       },
       "ask_first": "Abhi AWB aur invoice kis system mein bante hain?",
-      "free_stops": "How the shipment file connects to your existing systems is set out in the solution document."
+      "free_stops": "How the shipment file connects to your existing systems is set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Watch one file move from booking to billing and note each repeat typing of the same fields, so wasted effort is easy to point out.",
+          "review": false
+        },
+        {
+          "text": "Choose one paper file as the source record for shipment details, so every team copies from the same place each time.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_credit_customers",
@@ -125,7 +175,17 @@
         "tool_words": []
       },
       "ask_first": "Sab se late payment kaun karta hai, customers ya overseas agents?",
-      "free_stops": "Credit limits and reminder timing are worked out in the solution document."
+      "free_stops": "Credit limits and reminder timing are worked out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count each week’s completed shipments against remittance slips received for the same files, so you see which handovers are stalling cash arrival.",
+          "review": false
+        },
+        {
+          "text": "Give one role a fixed weekly slot to mark remittance slips against completed files in one notebook, so unpaid jobs stop getting overlooked.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_info_lost_in_whatsapp",
@@ -145,7 +205,17 @@
         "tool_words": []
       },
       "ask_first": "Kitne staff customers se direct WhatsApp pe deal karte hain?",
-      "free_stops": "How messages are captured into the shipment file is designed in the solution document."
+      "free_stops": "How messages are captured into the shipment file is designed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many bookings this week needed someone to search old chats for proof, so the delay from scattered confirmations is obvious.",
+          "review": false
+        },
+        {
+          "text": "Make one team role move every confirmed booking into one office record before shift end, so operations can find the latest answer quickly.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_discount_abuse",
@@ -166,7 +236,17 @@
         "tool_words": []
       },
       "ask_first": "Discount ka faisla abhi kaun karta hai?",
-      "free_stops": "The approval limits and reporting are set out in the solution document."
+      "free_stops": "The approval limits and reporting are set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare quote sheets with final job files from one busy week, so you see where sold rates changed after the original offer.",
+          "review": false
+        },
+        {
+          "text": "Give one role the job of writing every rate change on one counter list each day, so unapproved changes stop slipping through.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_repeat_low",
@@ -186,7 +266,17 @@
         "tool_words": []
       },
       "ask_first": "Regular customers taqreeban kitne hain?",
-      "free_stops": "What counts as \"gone quiet\" per customer type is worked out in the solution document."
+      "free_stops": "What counts as \"gone quiet\" per customer type is worked out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Look through recent shipments and note which regular shippers have gone quiet compared with their usual sending pattern, so drop-off appears sooner.",
+          "review": false
+        },
+        {
+          "text": "Give one role a weekly check of regular shippers from one notebook list, so silent accounts get noticed before the month ends.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p10_reports_late",
@@ -207,7 +297,17 @@
         "tool_words": []
       },
       "ask_first": "Mahine ka hisaab abhi kis software mein hota hai?",
-      "free_stops": "The report measures and data sources are designed in the solution document."
+      "free_stops": "The report measures and data sources are designed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Mark when each paper or message reaches the accountant for one month, so the real hold-up before reporting is clear.",
+          "review": false
+        },
+        {
+          "text": "Give one staff role a fixed weekly handover of all job files to accounting, so month-end stops waiting for missing papers.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

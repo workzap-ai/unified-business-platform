@@ -2,7 +2,7 @@
   "industry": "language_centres",
   "name": "Language centres",
   "sector": "7.J Education and childcare",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_conversion_low",
@@ -22,7 +22,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The follow-up timing and reason tracking are kept for the document."
+      "free_stops": "The follow-up timing and reason tracking are kept for the document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many placement tests led to enrolment by the next working day, so you spot whether delay after testing is hurting signups.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of noting every finished placement test in one notebook, so follow-up stops being missed at handover.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_repeat_low",
@@ -42,7 +52,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The rollover reminders and reports are in the document."
+      "free_stops": "The rollover reminders and reports are in the document.",
+      "extra_ideas": [
+        {
+          "text": "Compare how many learners finish each level with how many join the next class, so you see where continuation drops most.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member the job of marking expected next-level starters in one list each week, so empty seats are noticed early.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_manual_work",
@@ -62,7 +82,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "How lessons are logged and balances updated is kept for the document."
+      "free_stops": "How lessons are logged and balances updated is kept for the document.",
+      "extra_ideas": [
+        {
+          "text": "Count active packages with no updated remaining hours note this week, so you see how big the tracking backlog is.",
+          "review": false
+        },
+        {
+          "text": "Give one teacher on each shift the handover job for package hours notes, so the desk can answer balance questions clearly.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_hidden_costs",
@@ -82,7 +112,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "How the rules feed billing and pay is in the document."
+      "free_stops": "How the rules feed billing and pay is in the document.",
+      "extra_ideas": [
+        {
+          "text": "Note each private lesson no-show beside whether the teacher was paid, so the weekly cost of missed attendance is clear.",
+          "review": false
+        },
+        {
+          "text": "Give one desk person one notebook page for all private lesson absences, so teacher pay decisions follow the same record.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_shift_scheduling",
@@ -102,7 +142,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The scheduling rules are kept for the document."
+      "free_stops": "The scheduling rules are kept for the document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many timetable changes came after the weekly schedule was shared, so you see the real disruption from shifting availability.",
+          "review": false
+        },
+        {
+          "text": "Give one coordinator the job of collecting all teacher availability into one weekly list, so classes stop moving at the last minute.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_receivables_late",
@@ -122,7 +172,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The reminder schedule is in the document."
+      "free_stops": "The reminder schedule is in the document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many corporate clients have replied after your last payment reminder this month, so slow response patterns stand out by client type.",
+          "review": true
+        },
+        {
+          "text": "Give one staff member one notebook for corporate payment-date promises and a fixed review time, so chasing stays orderly across the team.",
+          "review": true
+        }
+      ]
     },
     {
       "id": "p7_cash_mismatch",
@@ -142,7 +202,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "How sessions are logged and invoiced is kept for the document."
+      "free_stops": "How sessions are logged and invoiced is kept for the document.",
+      "extra_ideas": [
+        {
+          "text": "Compare teacher session notes with corporate attendance summaries for one recent week, so missing or extra class hours stand out quickly.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member the weekly handover of delivered corporate class totals in one notebook, so every client hour count stays consistent.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_margin_shrinking",
@@ -163,7 +233,17 @@
         "leads_with_view": true
       },
       "ask_first": "",
-      "free_stops": "The viability rules are in the document."
+      "free_stops": "The viability rules are in the document.",
+      "extra_ideas": [
+        {
+          "text": "Note which new groups started below your usual class size, so you see where small intakes are creating weak batches.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of checking every upcoming group against the class list on one fixed day, so weak starts are caught sooner.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_whatsapp_overload",
@@ -183,7 +263,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The reply flow and booking page setup are kept for the document."
+      "free_stops": "The reply flow and booking page setup are kept for the document.",
+      "extra_ideas": [
+        {
+          "text": "Count the repeated timing and fee questions that arrive in one day, so you see which answers are taking most chat time.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member one written list of standard course details beside the phone, so reply speed stays steady across shifts.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p10_import_delays",
@@ -203,7 +293,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The order timing rules are in the document."
+      "free_stops": "The order timing rules are in the document.",
+      "extra_ideas": [
+        {
+          "text": "Note which courses began before books arrived this term, so you see which subjects suffer the longest teaching disruption.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member a notebook page for every pending book order, so arrivals are checked against course start dates.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

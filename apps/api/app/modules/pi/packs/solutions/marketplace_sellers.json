@@ -2,7 +2,7 @@
   "industry": "marketplace_sellers",
   "name": "Marketplace sellers (Daraz, Noon, Amazon)",
   "sector": "7.M Digital economy, social and public sector",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_cash_mismatch",
@@ -22,7 +22,17 @@
         "tool_words": []
       },
       "ask_first": "Which marketplace's payouts confuse you most?",
-      "free_stops": "How the reconciler reads each marketplace's reports is set out in the solution document."
+      "free_stops": "How the reconciler reads each marketplace's reports is set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare one recent payout against that period's orders and note each deduction reason, so you can see what is shrinking collections.",
+          "review": false
+        },
+        {
+          "text": "Give one person a fixed weekly payout check in one notebook, so missing deductions are spotted before they pile up.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_margin_unknown",
@@ -43,7 +53,17 @@
         "leads_with_view": true
       },
       "ask_first": "",
-      "free_stops": "The cost model per marketplace goes in the solution document."
+      "free_stops": "The cost model per marketplace goes in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Pick a few best selling items and note what remains after marketplace charges and delivery, so weak items stop hiding inside total sales.",
+          "review": false
+        },
+        {
+          "text": "Give one person a single margin notebook for key items, so price and reorder decisions rely on one current view.",
+          "review": true
+        }
+      ]
     },
     {
       "id": "p3_delivery_late",
@@ -63,7 +83,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The alert timings and board set-up are detailed in the solution document."
+      "free_stops": "The alert timings and board set-up are detailed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count overnight orders and compare them with what gets packed before midday, so the real morning dispatch backlog becomes visible.",
+          "review": false
+        },
+        {
+          "text": "Give one person the morning handover for overnight orders in one written list, so dispatch starts before other shop work pulls staff away.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_transfers_lost",
@@ -83,7 +113,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The tracking and claim workflow is covered in the solution document."
+      "free_stops": "The tracking and claim workflow is covered in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count units per carton before each warehouse transfer and compare them with received units, so shortages are tied to a specific shipment.",
+          "review": false
+        },
+        {
+          "text": "Give one person the transfer log and carton check before stock leaves, so every warehouse sendout has one clear record.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_overstock_dead_stock",
@@ -103,7 +143,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The reorder rules per SKU are worked out in the solution document."
+      "free_stops": "The reorder rules per SKU are worked out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Walk the slow stock area and note which marketplace items have sat untouched all week, so storage-heavy lines are easy to spot.",
+          "review": false
+        },
+        {
+          "text": "Give one person a fixed weekly slow-stock review in one notebook, so reorder decisions stop adding to paid storage.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_stockout",
@@ -123,7 +173,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The checklist and timing for each campaign go in the solution document."
+      "free_stops": "The checklist and timing for each campaign go in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare campaign day sell-through on top items with what was on hand that morning, so short planning shows up item by item.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of writing next campaign stock needs in one list, so replenishment stops being a last-minute guess.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_integration_marketplace",
@@ -143,7 +203,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The sync design and buffer rules are set out in the solution document."
+      "free_stops": "The sync design and buffer rules are set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count oversold items from this week and note where stock differed between channels, so the worst overlap points are clear.",
+          "review": false
+        },
+        {
+          "text": "Give one person one shared stock list to update at set times daily, so channel quantities stay closer to reality.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_slow_response",
@@ -163,7 +233,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The reply library and routing are prepared in the solution document."
+      "free_stops": "The reply library and routing are prepared in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count unanswered buyer messages at the same time each day this week, so the backlog size is clear to everyone.",
+          "review": false
+        },
+        {
+          "text": "Give one person a fixed daily message slot and one place to note pending replies, so buyer questions stop sitting for days.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_manual_reports",
@@ -183,7 +263,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "Which reports are pulled and how they combine is detailed in the solution document."
+      "free_stops": "Which reports are pulled and how they combine is detailed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note which figures you actually read from each morning report this week, so wasted downloading work is easier to cut.",
+          "review": false
+        },
+        {
+          "text": "Give one person one written morning checklist for the required reports, so the routine stays consistent when someone is absent.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p10_no_sop",
@@ -205,7 +295,17 @@
         ]
       },
       "ask_first": "",
-      "free_stops": "The task list and handover set-up are built out in the solution document."
+      "free_stops": "The task list and handover set-up are built out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Watch this week's account work and note every repeated task in one notebook, so handover gaps stop surprising you.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member the job of updating a single process notebook after account work, so leavers take less knowhow with them.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

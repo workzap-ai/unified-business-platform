@@ -2,7 +2,7 @@
   "industry": "radiology_and_imaging_centres",
   "name": "Radiology and imaging centres",
   "sector": "7.I Health and care",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_booking_appointments",
@@ -22,7 +22,17 @@
         "tool_words": []
       },
       "ask_first": "Which machine has the most no-shows?",
-      "free_stops": "Slot lengths per study and reminder timing are set in the solution document."
+      "free_stops": "Slot lengths per study and reminder timing are set in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many MRI slots stayed empty after same day cancellations this week, so you see the real costliest waste pattern.",
+          "review": false
+        },
+        {
+          "text": "Give one receptionist the standby slot list and one check-in time each day, so cancelled MRI time gets reused faster.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_customer_communication",
@@ -42,7 +52,17 @@
         "tool_words": []
       },
       "ask_first": "Who gives patients preparation instructions now?",
-      "free_stops": "Message timing and sequencing are in the solution document; the content always comes from your radiologist."
+      "free_stops": "Message timing and sequencing are in the solution document; the content always comes from your radiologist.",
+      "extra_ideas": [
+        {
+          "text": "Note which study types are most often rescheduled for missing preparation this week, so the front desk knows where confusion starts.",
+          "review": false
+        },
+        {
+          "text": "Give one desk staff member one notebook for preparation-related reschedules, so the same mistakes are caught and discussed daily.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_bottleneck",
@@ -62,7 +82,17 @@
         "tool_words": []
       },
       "ask_first": "Are your radiologists on site or reporting remotely?",
-      "free_stops": "Priority and escalation rules are designed in the solution document."
+      "free_stops": "Priority and escalation rules are designed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many completed scans are still waiting at closing each day, so you see when the reporting pile grows fastest.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of updating a single pending-report list before lunch, so the radiologist gets a clear handover.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_po_tracking",
@@ -82,7 +112,17 @@
         "tool_words": []
       },
       "ask_first": "Do you use one teleradiology provider or more?",
-      "free_stops": "The matching method is in the solution document."
+      "free_stops": "The matching method is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note each day's studies sent for remote reporting in one notebook, so invoice mismatches can be checked against your own count.",
+          "review": true
+        },
+        {
+          "text": "Give one billing staff member one running sent-study list, so every provider bill has one internal record to match.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_maintenance_downtime",
@@ -102,7 +142,17 @@
         "tool_words": []
       },
       "ask_first": "Are your machines under an AMC?",
-      "free_stops": "Log fields and escalation are set in the solution document; contract disputes go to your lawyer."
+      "free_stops": "Log fields and escalation are set in the solution document; contract disputes go to your lawyer.",
+      "extra_ideas": [
+        {
+          "text": "Note every hour the CT stayed unavailable during the last breakdown, so you can show the true disruption to operations.",
+          "review": false
+        },
+        {
+          "text": "Give one manager one place to record every machine fault call and callback, so follow-up with the vendor stays timely.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_margin_unknown",
@@ -123,7 +173,17 @@
         "leads_with_view": true
       },
       "ask_first": "Which machines are leased or on revenue-share?",
-      "free_stops": "Cost allocation is worked out in the solution document; for financial decisions talk to your accountant."
+      "free_stops": "Cost allocation is worked out in the solution document; for financial decisions talk to your accountant.",
+      "extra_ideas": [
+        {
+          "text": "Compare each machine's scan count with its lease and service outflow for the last month, so weaker earners stand out.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member one monthly machine earnings page, so the same comparison gets updated without chasing different papers.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_slow_response",
@@ -143,7 +203,17 @@
         "tool_words": []
       },
       "ask_first": "How are reports handed over now, film, CD or link?",
-      "free_stops": "The delivery flow and link security are set in the solution document."
+      "free_stops": "The delivery flow and link security are set in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many report-ready calls come in by hour for a few days, so you see when the front desk gets swamped.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of updating a single report-ready list at set times, so callers get clearer answers sooner.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_sales_drop",
@@ -166,7 +236,17 @@
         "leads_with_view": true
       },
       "ask_first": "Is the referring doctor recorded at booking now?",
-      "free_stops": "How referral data is captured at the counter is in the solution document."
+      "free_stops": "How referral data is captured at the counter is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare recent referral volumes clinic by clinic with an earlier month, so you see exactly where the slide is happening.",
+          "review": false
+        },
+        {
+          "text": "Give one owner or manager one notebook page per referring clinic, so follow-ups happen consistently after each visit or call.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_cash_mismatch",
@@ -186,7 +266,17 @@
         "tool_words": []
       },
       "ask_first": "Do you run a night shift?",
-      "free_stops": "The close format is in the solution document."
+      "free_stops": "The close format is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare each shift's scans completed with receipts written the same shift, so you see when the cash mismatch starts.",
+          "review": false
+        },
+        {
+          "text": "Give one supervisor the end-of-shift tally in one counter notebook, so differences are caught before the next handover.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p10_data_loss",
@@ -206,7 +296,17 @@
         "tool_words": []
       },
       "ask_first": "Who manages your PACS server?",
-      "free_stops": "The monitoring set-up is in the solution document."
+      "free_stops": "The monitoring set-up is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Write down which image folders cannot be recreated from recent scans, so you see where a backup failure would hurt most.",
+          "review": false
+        },
+        {
+          "text": "Make one senior staff member keep a single backup check note by the server, so missed checks stop slipping past everyone.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

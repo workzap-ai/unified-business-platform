@@ -2,7 +2,7 @@
   "industry": "private_schools_and_school_chains",
   "name": "Private schools and school chains",
   "sector": "7.J Education and childcare",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_receivables_late",
@@ -22,7 +22,17 @@
         "tool_words": []
       },
       "ask_first": "Do most parents pay by challan, wallet or cash at the counter?",
-      "free_stops": "The reminder sequence, its timing and the escalation rules go in the solution document."
+      "free_stops": "The reminder sequence, its timing and the escalation rules go in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many reminder chats go out before midday on one fee day, so you see the chasing load clearly.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member one daily reminder list at a fixed time, so parent follow-up stops getting split across the office.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_cash_mismatch",
@@ -44,7 +54,17 @@
         ]
       },
       "ask_first": "",
-      "free_stops": "How the matching rules handle part payments, siblings and wrong references is kept for the document."
+      "free_stops": "How the matching rules handle part payments, siblings and wrong references is kept for the document.",
+      "extra_ideas": [
+        {
+          "text": "Compare one day's receipt book entries with deposits and counter cash together, so you see which payment path breaks most often.",
+          "review": true
+        },
+        {
+          "text": "Give one cashier the job of writing every payment method in one register daily, so paid status stops being pieced together later.",
+          "review": true
+        }
+      ]
     },
     {
       "id": "p3_discount_abuse",
@@ -64,7 +84,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The approval levels and the monthly concession report format are set out in the document."
+      "free_stops": "The approval levels and the monthly concession report format are set out in the document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many active concessions have a written reason on file at one campus, so the missing record problem has a size.",
+          "review": false
+        },
+        {
+          "text": "Give one office person one concessions notebook for every approval handed over the same day, so exceptions stop spreading across desks.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_lead_followup_slow",
@@ -84,7 +114,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The pipeline stages and follow-up timings are kept for the document."
+      "free_stops": "The pipeline stages and follow-up timings are kept for the document.",
+      "extra_ideas": [
+        {
+          "text": "Count enquiries from walk-ins, calls and messages over one admissions day, so you can see where follow-up gets missed.",
+          "review": false
+        },
+        {
+          "text": "Keep all new admissions enquiries in one notebook with one owner per shift, so no source gets checked later than the rest.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_campaign_roi_unknown",
@@ -104,7 +144,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "How the links and codes are set up per ad and campus is in the document."
+      "free_stops": "How the links and codes are set up per ad and campus is in the document.",
+      "extra_ideas": [
+        {
+          "text": "Note each new enquiry source in one admissions notebook for one week, so you can compare ads against walk-ins and referrals.",
+          "review": false
+        },
+        {
+          "text": "Give one admissions person a fixed end-of-day source tally, so marketing discussions stop relying on impressions from scattered chats.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_forecasting",
@@ -125,7 +175,17 @@
         "leads_with_view": true
       },
       "ask_first": "",
-      "free_stops": "How the tracker follows up on unsure families is kept for the document."
+      "free_stops": "How the tracker follows up on unsure families is kept for the document.",
+      "extra_ideas": [
+        {
+          "text": "Count current families marked staying, leaving or unsure from one class level this week, so next term uncertainty has a visible size.",
+          "review": false
+        },
+        {
+          "text": "Give one admin person one weekly re-enrolment list by class, so planning stops waiting for August conversations.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_shift_scheduling",
@@ -145,7 +205,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The cover rules and fairness balancing are set out in the document."
+      "free_stops": "The cover rules and fairness balancing are set out in the document.",
+      "extra_ideas": [
+        {
+          "text": "Note how many substitutions are arranged after classes start on one morning, so the delay point is easy to spot.",
+          "review": false
+        },
+        {
+          "text": "Give one coordinator one cover list updated at the same time each afternoon, so morning substitutions start from one place.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_manual_reports",
@@ -165,7 +235,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The entry screens, checks and report-card layout are kept for the document."
+      "free_stops": "The entry screens, checks and report-card layout are kept for the document.",
+      "extra_ideas": [
+        {
+          "text": "Compare how many mark files arrive in the agreed format versus reworked format for one report cycle, so the retyping burden is clear.",
+          "review": false
+        },
+        {
+          "text": "Give one academic office person one collection deadline and one handover place for mark files, so report preparation stops chasing teachers individually.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_delivery_late",
@@ -185,7 +265,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "How route changes and delay alerts flow to parents is set out in the document."
+      "free_stops": "How route changes and delay alerts flow to parents is set out in the document.",
+      "extra_ideas": [
+        {
+          "text": "Note actual departure and arrival times for one van route on one school day, so complaint patterns can be checked against reality.",
+          "review": false
+        },
+        {
+          "text": "Give one transport staff member one daily route notebook handed over after each run, so timing changes stop living only in chat threads.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p10_cash_leakage",
@@ -205,7 +295,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The variance limits and alert rules are kept for the document."
+      "free_stops": "The variance limits and alert rules are kept for the document.",
+      "extra_ideas": [
+        {
+          "text": "Note opening snacks, drinks and cash at one canteen once this week, so you can compare the shortfall by shift.",
+          "review": false
+        },
+        {
+          "text": "Give one person the closing canteen count in one notebook each day, so stock and cash stop being checked separately.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p11_branch_comparison",
@@ -225,7 +325,17 @@
         "tool_words": []
       },
       "ask_first": "Do all campuses use the same school system today?",
-      "free_stops": "Which figures feed the screen and how they are pulled from each campus is in the document."
+      "free_stops": "Which figures feed the screen and how they are pulled from each campus is in the document.",
+      "extra_ideas": [
+        {
+          "text": "Write the same weekly campus figures on one page for all branches once, so differences can be compared side by side.",
+          "review": false
+        },
+        {
+          "text": "Give one office person a fixed weekly time to collect each campus total into one notebook, so comparisons stop waiting on separate files.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

@@ -2,7 +2,7 @@
   "industry": "charter_and_private_aviation",
   "name": "Charter and private aviation",
   "sector": "7.G Transport, mobility and aviation (part 1)",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_conversion_low",
@@ -22,7 +22,17 @@
         "tool_words": []
       },
       "ask_first": "Which part of building a quote takes the longest?",
-      "free_stops": "How block time, positioning and fees are calculated in the builder is set out in the solution document."
+      "free_stops": "How block time, positioning and fees are calculated in the builder is set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many broker quote requests wait for missing route or fee details this week, so you see which hold-up costs you speed.",
+          "review": false
+        },
+        {
+          "text": "Give one sales person one master list of commonly reused quote inputs, so urgent broker requests stop stalling between chats.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_empty_leg_unsold",
@@ -42,7 +52,17 @@
         "tool_words": []
       },
       "ask_first": "How often do you have positioning flights in a typical month?",
-      "free_stops": "Who receives which legs and when is decided in the solution document."
+      "free_stops": "Who receives which legs and when is decided in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare this month's empty legs by route and notice which ones were shared only after plans firmed up, so timing issues stand out.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of noting every confirmed repositioning leg in one list, so sales can offer them while interest is fresh.",
+          "review": true
+        }
+      ]
     },
     {
       "id": "p3_margin_unknown",
@@ -63,7 +83,17 @@
         "tool_words": []
       },
       "ask_first": "Which cost surprises you most often, handling, fuel or catering?",
-      "free_stops": "The cost categories and margin view are designed in the solution document."
+      "free_stops": "The cost categories and margin view are designed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note on one recent trip which cost lines arrived long after landing, so you see why profit stays unclear for weeks.",
+          "review": false
+        },
+        {
+          "text": "Give one admin person one trip file for quote notes and supplier estimates, so late bills are easier to challenge and explain.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_receivables_late",
@@ -84,7 +114,17 @@
         "tool_words": []
       },
       "ask_first": "How many managed aircraft do you bill owners for?",
-      "free_stops": "The statement structure and cost allocation are kept for the solution document."
+      "free_stops": "The statement structure and cost allocation are kept for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many owner statement disputes this month are about missing backup or unclear labels, so you see what slows payment.",
+          "review": true
+        },
+        {
+          "text": "Give one admin person one fixed handover time for flight paperwork after each trip, so owner statements go out with fewer arguments.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_info_lost_in_whatsapp",
@@ -104,7 +144,17 @@
         "tool_words": []
       },
       "ask_first": "Who usually receives the client's change first, you, their PA or ops?",
-      "free_stops": "The change-notification flow is set out in the solution document."
+      "free_stops": "The change-notification flow is set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count this week's last-minute trip changes that reached ops but not crew, so you see how often handovers break.",
+          "review": false
+        },
+        {
+          "text": "Give one dispatcher the job of writing every trip change in one notebook line, so ops and crew check the same update source.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_shift_scheduling",
@@ -124,7 +174,17 @@
         "tool_words": []
       },
       "ask_first": "Roughly how many freelance crew do you call on?",
-      "free_stops": "How assignments and acceptance work is designed in the solution document."
+      "free_stops": "How assignments and acceptance work is designed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many times this week crew availability had to be remembered from memory, so you see the size of the scheduling risk.",
+          "review": false
+        },
+        {
+          "text": "Give one ops person one page by crew role for current availability notes, so booking cover no longer waits for your recall.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_credit_customers",
@@ -144,7 +204,17 @@
         "tool_words": []
       },
       "ask_first": "Do most clients pay before the flight or after today?",
-      "free_stops": "The reminder timing and credit rules are worked out in the solution document."
+      "free_stops": "The reminder timing and credit rules are worked out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare recent unpaid or late-paid trips by who approved departure terms, so you see where payment discipline slips.",
+          "review": true
+        },
+        {
+          "text": "Give one person the job of marking payment status beside each new booking, so sales and ops stop assuming someone else checked.",
+          "review": true
+        }
+      ]
     },
     {
       "id": "p8_cost_overruns",
@@ -164,7 +234,17 @@
         "tool_words": []
       },
       "ask_first": "Are the overruns mostly from a few airports or spread across many?",
-      "free_stops": "The checking rules and comparison view are set out in the solution document."
+      "free_stops": "The checking rules and comparison view are set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count which recent overseas trip invoices exceeded the quoted ground costs, so you see where estimating is weakest.",
+          "review": false
+        },
+        {
+          "text": "Give one admin person one place to keep supplier estimates with each trip note, so overruns can be spotted and questioned quickly.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_fleet_utilisation_low",
@@ -185,7 +265,17 @@
         "leads_with_view": true
       },
       "ask_first": "Are the aircraft different sizes, so clients can't switch easily?",
-      "free_stops": "How turned-down demand is captured and reported is part of the solution document."
+      "free_stops": "How turned-down demand is captured and reported is part of the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many turned-down trip requests matched idle time on your other aircraft this month, so missed fit becomes visible.",
+          "review": false
+        },
+        {
+          "text": "Give one scheduler one board showing both aircraft requests and gaps together, so sellable time is noticed before enquiries are declined.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p10_no_customer_data",
@@ -205,7 +295,17 @@
         "tool_words": []
       },
       "ask_first": "Who handles repeat clients today, one person or whoever is free?",
-      "free_stops": "Which preferences are captured and how they surface is designed in the solution document."
+      "free_stops": "Which preferences are captured and how they surface is designed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many repeat account requests this week needed someone to ask around for preferences, so you see how often service starts cold.",
+          "review": false
+        },
+        {
+          "text": "Give one coordinator one notebook page per repeat account role, so preferred cabin and billing habits are ready before each trip.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

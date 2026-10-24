@@ -2,7 +2,7 @@
   "industry": "leather_goods_and_tanneries",
   "name": "Leather goods and tanneries",
   "sector": "7.D Manufacturing and industry (part 1)",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_capacity",
@@ -22,7 +22,17 @@
         "tool_words": []
       },
       "ask_first": "What's the biggest headache in the weeks after Eid ul Adha?",
-      "free_stops": "How arrivals are scheduled and the queue is managed is set out in the solution document."
+      "free_stops": "How arrivals are scheduled and the queue is managed is set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note this week's unloading times and the time sorting actually starts, so handover delays around skin arrivals become visible.",
+          "review": false
+        },
+        {
+          "text": "Give one floor lead the arrivals notebook at one fixed table, so every incoming lot waits in one queue.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_supplier_quality",
@@ -42,7 +52,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "Grade definitions and how disputes are recorded are kept for the solution document."
+      "free_stops": "Grade definitions and how disputes are recorded are kept for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many disputed hides come from each collector type this week, so arguments can be focused where they cost most.",
+          "review": false
+        },
+        {
+          "text": "Give one grader the job of marking the agreed grade on arrival, so each lot has one decision point.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_cash_flow_tight",
@@ -63,7 +83,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "How the cash picture is built from stock and receivables is detailed in the solution document; for financing, talk to your accountant or bank."
+      "free_stops": "How the cash picture is built from stock and receivables is detailed in the solution document; for financing, talk to your accountant or bank.",
+      "extra_ideas": [
+        {
+          "text": "Count how many days each Eid hide lot sits before leaving as finished goods, so the longest lockup point becomes visible.",
+          "review": false
+        },
+        {
+          "text": "Give one person one notebook for all buyer dues and promised dates, so chasing happens before the next hide rush.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_count_mismatch",
@@ -84,7 +114,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "How lots are tracked through each stage is mapped in the solution document."
+      "free_stops": "How lots are tracked through each stage is mapped in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare one rack's physical bundles with the book entry this week, so the mismatch is pinned to a place not the whole store.",
+          "review": false
+        },
+        {
+          "text": "Give one store person the job of writing every movement in one stock notebook, so returns and issues stop scattering across scraps.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_wastage_cost",
@@ -104,7 +144,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "How expected consumption is set per article is set out in the solution document."
+      "free_stops": "How expected consumption is set per article is set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many usable cut pieces come from one hide for one article today, so low yield is tied to a real job.",
+          "review": false
+        },
+        {
+          "text": "Give one cutter the job of keeping all offcuts from each article in one marked spot, so waste is linked back to the work.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_count_mismatch",
@@ -124,7 +174,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "How counts are confirmed and tied to payment is covered in the solution document."
+      "free_stops": "How counts are confirmed and tied to payment is covered in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare one subcontractor's sent count with the returned count this week, so the exact missing balance is clear before another handover.",
+          "review": false
+        },
+        {
+          "text": "Give one dispatch person the job of writing sent and returned pieces in one notebook, so outside work is tracked from one place.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_product_defects",
@@ -144,7 +204,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "Check points and how lots are compared are kept for the solution document."
+      "free_stops": "Check points and how lots are compared are kept for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Lay rejected lots beside an accepted lot from the same buyer, so the visible difference is agreed before dispatch arguments start.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of keeping one approved piece with each outgoing lot, so checking happens against the same reference.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_conversion_low",
@@ -164,7 +234,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "How sample stages are tracked and escalated is set out in the solution document."
+      "free_stops": "How sample stages are tracked and escalated is set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note the days between sample request and dispatch for each open buyer sample, so the slowest part of the sample routine stands out.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of reviewing all open samples at one fixed time daily, so buyer requests stop waiting between departments.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_owner_blind",
@@ -185,7 +265,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "How yield and overheads are built into cost per article is detailed in the solution document."
+      "free_stops": "How yield and overheads are built into cost per article is detailed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count pieces started and pieces packed this week for each main product line, so slow moving lines stand out on the floor.",
+          "review": false
+        },
+        {
+          "text": "Give one floor lead the job of noting daily started and packed pieces in one notebook, so product line reviews use the same routine each evening.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

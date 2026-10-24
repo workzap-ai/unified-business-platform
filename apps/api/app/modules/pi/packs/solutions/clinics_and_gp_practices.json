@@ -2,7 +2,7 @@
   "industry": "clinics_and_gp_practices",
   "name": "Clinics and GP practices",
   "sector": "7.I Health and care",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_booking_appointments",
@@ -22,7 +22,17 @@
         "tool_words": []
       },
       "ask_first": "Are most of your no-shows in the morning sessions or the evening clinic?",
-      "free_stops": "The reminder timing, wording and waitlist rules are set out in the solution document."
+      "free_stops": "The reminder timing, wording and waitlist rules are set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count booked patients against actual arrivals by session for one week, so you know which clinics lose the most booked time.",
+          "review": false
+        },
+        {
+          "text": "Give one receptionist the same daily time to confirm the next clinic list, so empty slots are spotted before the session starts.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_capacity",
@@ -42,7 +52,17 @@
         "tool_words": []
       },
       "ask_first": "Is the morning rush mostly walk-ins or booked patients?",
-      "free_stops": "How slots are re-shaped per doctor and how the board is set up stays for the solution document."
+      "free_stops": "How slots are re-shaped per doctor and how the board is set up stays for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note arrivals by hour and how many chairs are full during one morning, so the crowding pattern is seen on paper.",
+          "review": false
+        },
+        {
+          "text": "Ask reception to move routine return visits into one afternoon list, so mornings stay freer for patients who walk in early.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_cash_mismatch",
@@ -62,7 +82,17 @@
         "tool_words": []
       },
       "ask_first": "How many front-desk shifts do you run in a day?",
-      "free_stops": "The close format and the rules for what counts as a variance go in the solution document."
+      "free_stops": "The close format and the rules for what counts as a variance go in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare each shift's parchi count with cash collected and noncash visits once daily, so the missing part is narrowed to a shift.",
+          "review": false
+        },
+        {
+          "text": "Keep one counter close notebook under one role each shift, so parchis and collections are checked in the same place every time.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_discount_abuse_free_visits",
@@ -82,7 +112,17 @@
         "tool_words": []
       },
       "ask_first": "Who is allowed to approve a free visit today?",
-      "free_stops": "The approval levels and reporting layout are kept for the solution document."
+      "free_stops": "The approval levels and reporting layout are kept for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many visits were marked free by each shift this week, so you can see where giveaways are really happening.",
+          "review": false
+        },
+        {
+          "text": "Give only one role the authority to note free follow-ups in the register, so exceptions stop being handed out casually.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_receivables_late",
@@ -102,7 +142,17 @@
         "tool_words": []
       },
       "ask_first": "Is claim billing done by your own staff or an outside biller?",
-      "free_stops": "The status flow and payer-wise reports are detailed in the solution document."
+      "free_stops": "The status flow and payer-wise reports are detailed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Group this week's returned claims by rejection reason on one page, so the repeat paperwork problem is obvious.",
+          "review": false
+        },
+        {
+          "text": "Keep all returned claims in one resubmission notebook with one owner, so nothing sits untouched after coming back.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_credit_customers",
@@ -122,7 +172,17 @@
         "tool_words": []
       },
       "ask_first": "Roughly how many panel companies do you work with?",
-      "free_stops": "Statement timing and reminder sequence are set in the solution document."
+      "free_stops": "Statement timing and reminder sequence are set in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note when each panel bill was sent and when payment arrived for recent batches, so the slowest payers are clear.",
+          "review": true
+        },
+        {
+          "text": "Give one staff role a fixed weekly statement follow-up round, so overdue panel balances are chased regularly.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_commission_disputes",
@@ -143,7 +203,17 @@
         "leads_with_view": true
       },
       "ask_first": "Is the share worked on visits, on fees collected, or both?",
-      "free_stops": "How the rules are captured and edge cases handled stays for the solution document."
+      "free_stops": "How the rules are captured and edge cases handled stays for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare the consultant's own visit count with your register for one recent clinic, so the disagreement is pinned to a date.",
+          "review": false
+        },
+        {
+          "text": "Keep one signed session summary with visits and collections for each consultant clinic, so payout discussions start from the same record.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_stockout",
@@ -163,7 +233,17 @@
         "tool_words": []
       },
       "ask_first": "Who places orders with the supplier at the moment?",
-      "free_stops": "The minimum levels and alert rules are worked out in the solution document."
+      "free_stops": "The minimum levels and alert rules are worked out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note which consumables run short most often by room during one week, so the true trouble items are separated from the rest.",
+          "review": false
+        },
+        {
+          "text": "Give one staff role the job of checking key consumables before clinic opens, so shortages are caught before patients are waiting.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_whatsapp_overload",
@@ -183,7 +263,17 @@
         "tool_words": []
       },
       "ask_first": "How many people reply from the clinic number now?",
-      "free_stops": "The tags, routing and automatic answers are designed in the solution document."
+      "free_stops": "The tags, routing and automatic answers are designed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count unread messages by type from one recent day, so you know whether bookings or complaints are causing the pileup.",
+          "review": false
+        },
+        {
+          "text": "Keep one handwritten backlog list under one staff role per shift, so older messages are cleared in a steady order.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p10_reviews_bad",
@@ -203,7 +293,17 @@
         "tool_words": []
       },
       "ask_first": "Are most complaints about the evening clinic?",
-      "free_stops": "Timing and routing of the feedback request are set in the solution document."
+      "free_stops": "Timing and routing of the feedback request are set in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note actual arrival and doctor-seen times for one busy clinic, so you can compare the longest waits with the complaints.",
+          "review": true
+        },
+        {
+          "text": "Give the front desk one set time to update waiting patients about delays, so fewer people feel ignored in the waiting area.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p11_no_dashboard",
@@ -223,7 +323,17 @@
         "tool_words": []
       },
       "ask_first": "Do you run one branch or more?",
-      "free_stops": "Which numbers appear and how they are pulled is set out in the solution document."
+      "free_stops": "Which numbers appear and how they are pulled is set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Write each doctor's visits and collected fees by shift for one week, so the stronger earning sessions stand out clearly.",
+          "review": true
+        },
+        {
+          "text": "Make one staff role responsible for the daily doctor totals notebook, so fee and visit figures are captured the same way each day.",
+          "review": true
+        }
+      ]
     }
   ],
   "never_say": [

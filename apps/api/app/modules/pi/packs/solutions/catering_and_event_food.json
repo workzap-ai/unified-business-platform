@@ -2,7 +2,7 @@
   "industry": "catering_and_event_food",
   "name": "Catering and event food",
   "sector": "7.B Food and beverage",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_pre_orders_custom",
@@ -22,7 +22,17 @@
         "tool_words": []
       },
       "ask_first": "When does the client usually confirm the final count?",
-      "free_stops": "The cut-off and extra-guest terms and how buying adjusts to changes are in the solution document."
+      "free_stops": "The cut-off and extra-guest terms and how buying adjusts to changes are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare the final promised guest count with actual plates served at the next event, so shortage patterns stop feeling random.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of writing every headcount change in one notebook, so kitchen prep uses the latest number.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_margin_unknown",
@@ -43,7 +53,17 @@
         "leads_with_view": true
       },
       "ask_first": "Which costs are hardest to pin down per event?",
-      "free_stops": "The costing structure and per-head pricing logic go in the solution document."
+      "free_stops": "The costing structure and per-head pricing logic go in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note the quoted menu beside what was actually bought and paid after one event, so the weak items stand out.",
+          "review": false
+        },
+        {
+          "text": "Give one person one notebook page per event for all spending notes, so profit checking no longer waits for memory.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_orders_lost",
@@ -63,7 +83,17 @@
         "tool_words": []
       },
       "ask_first": "Has a double-booking actually happened?",
-      "free_stops": "The booking statuses and confirmation flow are set out in the solution document."
+      "free_stops": "The booking statuses and confirmation flow are set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many confirmed events already share the same date this month, so double-booking risk is seen before promises go out.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of writing every confirmed event in one dated notebook, so clashes are checked before saying yes.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_lead_followup_slow",
@@ -83,7 +113,17 @@
         "tool_words": []
       },
       "ask_first": "Where do most enquiries come from?",
-      "free_stops": "The quote builder and follow-up timing are detailed in the solution document."
+      "free_stops": "The quote builder and follow-up timing are detailed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note the time each enquiry arrived and when its quote was sent this week, so delay points in your quoting routine stand out.",
+          "review": false
+        },
+        {
+          "text": "Give one person a fixed daily time to send pending quotes from one running list, so fewer enquiries cool off.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_theft_external",
@@ -103,7 +143,17 @@
         "tool_words": []
       },
       "ask_first": "What goes missing most — plates, cutlery or dishes?",
-      "free_stops": "The count routine and loss tracking per event stay for the solution document."
+      "free_stops": "The count routine and loss tracking per event stay for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare the leaving count and return count of each crockery type after the next function, so the worst losses are clear.",
+          "review": false
+        },
+        {
+          "text": "Give one person one written return list for crockery at each event, so missing items are chased before everyone leaves.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_receivables_late",
@@ -123,7 +173,17 @@
         "tool_words": []
       },
       "ask_first": "How long do balances usually take?",
-      "free_stops": "The advance and balance terms and reminder schedule are in the solution document."
+      "free_stops": "The advance and balance terms and reminder schedule are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "List each completed event with whether any balance is still unpaid, so the oldest stuck money is obvious at once.",
+          "review": false
+        },
+        {
+          "text": "Give one person one notebook page for all advances and remaining balances, so follow-up no longer starts from scattered diary notes.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_attendance_lateness",
@@ -143,7 +203,17 @@
         "tool_words": []
       },
       "ask_first": "How many waiters per event are daily-wage?",
-      "free_stops": "The roster and event-day run sheet are detailed in the solution document."
+      "free_stops": "The roster and event-day run sheet are detailed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count who was expected and who actually arrived at the next event, so the repeat no-shows become visible.",
+          "review": false
+        },
+        {
+          "text": "Give one person the venue lead job for each event and note it in one place, so staff know who decides on the night.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_fraud",
@@ -163,7 +233,17 @@
         "tool_words": []
       },
       "ask_first": "Who buys for each event now?",
-      "free_stops": "The approval rules and bill-checking routine are set out in the solution document."
+      "free_stops": "The approval rules and bill-checking routine are set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare purchase notes with the dishes actually served at one event, so billing gaps are easier to spot early.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of writing every purchase for an event in one notebook, so bill checking has a single trail.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_seasonal_dip",
@@ -184,7 +264,17 @@
         "tool_words": []
       },
       "ask_first": "What do you do in the slow months now?",
-      "free_stops": "The off-season offer plan and lead tracking set-up stay for the solution document."
+      "free_stops": "The off-season offer plan and lead tracking set-up stay for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note which enquiries asked only for price and which became bookings this month, so the drop-off point is clearer.",
+          "review": true
+        },
+        {
+          "text": "Give one person one notebook list for venues and referral sources behind each booking, so off-season chasing follows what already works.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

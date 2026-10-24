@@ -2,7 +2,7 @@
   "industry": "facility_management",
   "name": "Facility management",
   "sector": "7.F Construction, real estate and facilities",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_complaints",
@@ -22,7 +22,17 @@
         "tool_words": []
       },
       "ask_first": "How do clients report a problem today?",
-      "free_stops": "Categories, priorities and SLA rules are in the solution document."
+      "free_stops": "Categories, priorities and SLA rules are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare complaint messages received with work orders opened for one client this week, so you see where requests are dropping out.",
+          "review": false
+        },
+        {
+          "text": "Give one coordinator the job of writing every complaint source into one notebook line, so fewer client issues get missed between channels.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_record_keeping",
@@ -44,7 +54,17 @@
         ]
       },
       "ask_first": "Is the time the technician arrives recorded anywhere?",
-      "free_stops": "The proof flow and sign-off are in the solution document."
+      "free_stops": "The proof flow and sign-off are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note the jobs disputed recently and check which ones lack arrival or completion proof, so weak records are easy to spot.",
+          "review": false
+        },
+        {
+          "text": "Give one office person one place to keep each job's time proof the same day, so dispute replies go out faster.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_margin_shrinking",
@@ -67,7 +87,17 @@
         "leads_with_view": true
       },
       "ask_first": "Which SLA targets do you miss most often?",
-      "free_stops": "KPI set-up is in the solution document; penalty clauses are for a lawyer."
+      "free_stops": "KPI set-up is in the solution document; penalty clauses are for a lawyer.",
+      "extra_ideas": [
+        {
+          "text": "Note every call that reached site after the promised response window this week, so the worst client locations and job types stand out.",
+          "review": false
+        },
+        {
+          "text": "Give one dispatcher one afternoon board for open complaints nearing response time, so late attendance is chased before deductions land.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_checklists_not_done",
@@ -87,7 +117,17 @@
         "tool_words": []
       },
       "ask_first": "How do you confirm PPM visits actually happened?",
-      "free_stops": "Scheduling rules are in the solution document; technical content stays with qualified engineers."
+      "free_stops": "Scheduling rules are in the solution document; technical content stays with qualified engineers.",
+      "extra_ideas": [
+        {
+          "text": "Compare a small sample of paper marked done with what can be seen on site, so the true completion picture shows.",
+          "review": false
+        },
+        {
+          "text": "Give one supervisor the job of same day paper checks after visits, so false completion marks are caught early.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_attendance_lateness",
@@ -108,7 +148,17 @@
         "tool_words": []
       },
       "ask_first": "How do you check site headcount against the contract?",
-      "free_stops": "Attendance method and relief rules are in the solution document."
+      "free_stops": "Attendance method and relief rules are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare contracted headcount with the workers physically seen at each site during one daily round, so repeat shortage sites stand out fast.",
+          "review": false
+        },
+        {
+          "text": "Give one supervisor one fixed same time daily headcount note for every site, so shortage follow up happens before the client deducts.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_slow_replenishment",
@@ -129,7 +179,17 @@
         "tool_words": []
       },
       "ask_first": "How are chemicals and spares sent to sites?",
-      "free_stops": "Reorder rules are in the solution document."
+      "free_stops": "Reorder rules are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note which sites ran short and which held excess this week, so transfers can match real usage better.",
+          "review": false
+        },
+        {
+          "text": "Give one storekeeper one shared list for site requests and balances, so stock moves stop waiting on scattered messages.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_manual_reports",
@@ -149,7 +209,17 @@
         "tool_words": []
       },
       "ask_first": "What do clients expect to see monthly?",
-      "free_stops": "Report content is in the solution document."
+      "free_stops": "Report content is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note which report sections take the longest to gather this month, so you see where the week is really going.",
+          "review": false
+        },
+        {
+          "text": "Give one person a fixed weekly time to collect site figures into one notebook, so month end reporting becomes lighter.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_unbilled_work",
@@ -169,7 +239,17 @@
         "tool_words": []
       },
       "ask_first": "How are extra works approved today?",
-      "free_stops": "Approval flow and billing link are in the solution document."
+      "free_stops": "Approval flow and billing link are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count completed extra jobs from site messages and compare them with drafted invoices this month, so missed billing is found while details are fresh.",
+          "review": false
+        },
+        {
+          "text": "Give one coordinator one running notebook page for approved extras awaiting billing, so finished variation work stops slipping past invoicing.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_margin_unknown",
@@ -189,7 +269,17 @@
         "tool_words": []
       },
       "ask_first": "Which contracts do you suspect are losing money?",
-      "free_stops": "Cost allocation rules are in the solution document."
+      "free_stops": "Cost allocation rules are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Pick one contract and note this week's billed work, bought materials, deployed headcount and deductions, so the real earning picture is clearer.",
+          "review": false
+        },
+        {
+          "text": "Give one person one weekly notebook page per contract for costs and deductions, so weak sites are spotted before another month passes.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p10_user_adoption",
@@ -211,7 +301,17 @@
         ]
       },
       "ask_first": "What system do you use for work orders now?",
-      "free_stops": "Integration design is in the solution document."
+      "free_stops": "Integration design is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count completed jobs closed by field message versus entered in the office records this week, so the biggest usage shortfall shows by crew.",
+          "review": false
+        },
+        {
+          "text": "Give one foreman one end of shift check of unfinished job notes, so missed updates are caught before tomorrow's calls start.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

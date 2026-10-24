@@ -2,7 +2,7 @@
   "industry": "law_firms",
   "name": "Law firms (operations and admin)",
   "sector": "7.K Professional and business services",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_tasks_dropped",
@@ -23,7 +23,17 @@
         "tool_words": []
       },
       "ask_first": "Is the diary kept on paper, or already in a sheet?",
-      "free_stops": "how adjournments are captured and who receives which alerts are set out in the solution document."
+      "free_stops": "how adjournments are captured and who receives which alerts are set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many upcoming hearing dates sit only in one diary today, so you see the risk tied to one notebook.",
+          "review": false
+        },
+        {
+          "text": "Write all upcoming hearing dates in one office register before closing daily, so court attendance stops relying on one person's diary.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_manual_work",
@@ -43,7 +53,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "how the list is kept current and how results reach lawyers are worked out in the solution document."
+      "free_stops": "how the list is kept current and how results reach lawyers are worked out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note how long the evening cause list check takes across one week, so you see where admin time is being absorbed.",
+          "review": false
+        },
+        {
+          "text": "Keep one handwritten court-wise matters list beside the checker each evening, so the review stays quick and consistent.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_wrong_location",
@@ -63,7 +83,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "the labelling and check-in routine are designed in the solution document."
+      "free_stops": "the labelling and check-in routine are designed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare the files expected back from court with the files actually on shelves tonight, so missing movement stands out immediately.",
+          "review": false
+        },
+        {
+          "text": "Make one return point for all files coming back from court each day, so chambers always knows where to look next.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_customer_communication",
@@ -83,7 +113,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "the approval step and message format are kept for the solution document."
+      "free_stops": "the approval step and message format are kept for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many calls ask about the last hearing this week, so you see which matters are creating repeat interruptions.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member the job of noting post-hearing updates in one client call list daily, so callers get timely answers.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_margin_unknown",
@@ -104,7 +144,17 @@
         "leads_with_view": true
       },
       "ask_first": "",
-      "free_stops": "how time is captured and how matters are compared are worked out in the solution document."
+      "free_stops": "how time is captured and how matters are compared are worked out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count once this week how many workdays end without any associate notes on tasks done, so missing effort stops being invisible.",
+          "review": false
+        },
+        {
+          "text": "Give one admin person a single end of day check for task notes from each associate, so billing discussions start from complete records.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_receivables_late",
@@ -124,7 +174,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "how expenses are logged and the reminder sequence are set out in the solution document."
+      "free_stops": "how expenses are logged and the reminder sequence are set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count once this week how many matters have firm-paid expenses noted without any matching recovery note, so the backlog size is clear.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member a fixed weekly review of firm-paid expense notes in one notebook, so follow-up stops slipping between desks.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_info_lost_in_whatsapp",
@@ -144,7 +204,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "the template library and versioning rules are designed in the solution document."
+      "free_stops": "the template library and versioning rules are designed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many active matters have more than one draft marked final today, so the confusion is clear at a glance.",
+          "review": false
+        },
+        {
+          "text": "Choose one office location for the current final draft of each matter, so everyone checks the same place before editing.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_documentation",
@@ -153,8 +223,8 @@
       "category": "compliance_admin",
       "subtype": "documentation",
       "quick_ideas": [
-        "Add a deadline column to your matter list and fill it once for every active matter, so dates are written down",
-        "Review that column with the partners once, so nothing urgent is hidden."
+        "Walk through all active matter files once and note every unwritten deadline in one notebook, so urgent exposure shows today.",
+        "Assign one staff member to update one central deadlines register before closing daily, so key dates stop living in memory."
       ],
       "workzap_build": {
         "keys": [
@@ -164,7 +234,11 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "the escalation steps and timings are kept for the solution document."
+      "free_stops": "the escalation steps and timings are kept for the solution document.",
+      "quick_ideas_original": [
+        "Add a deadline column to your matter list and fill it once for every active matter, so dates are written down",
+        "Review that column with the partners once, so nothing urgent is hidden."
+      ]
     },
     {
       "id": "p9_lead_followup_slow",
@@ -184,7 +258,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "the assignment rules and follow-up timings are set out in the solution document."
+      "free_stops": "the assignment rules and follow-up timings are set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count unanswered website enquiries sitting since earlier this week, so you see how much potential work is waiting.",
+          "review": false
+        },
+        {
+          "text": "Give one person the inbox check at the same time each day, so new enquiries get a clear owner immediately.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

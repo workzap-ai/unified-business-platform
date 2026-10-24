@@ -2,7 +2,7 @@
   "industry": "internet_service_providers_and_cable_tv_operators",
   "name": "Internet service providers and cable-TV operators",
   "sector": "7.L Finance-adjacent, energy and utilities",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_info_lost_in_whatsapp",
@@ -22,7 +22,17 @@
         "tool_words": []
       },
       "ask_first": "Roughly how many complaints come in on a normal day?",
-      "free_stops": "Ticket flow and customer updates are in the solution document."
+      "free_stops": "Ticket flow and customer updates are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count complaints received today against complaints written on the main list, so you see how many are getting lost between channels.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member each shift the job of writing every complaint into one notebook, so follow up starts from one place.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_bottleneck",
@@ -42,7 +52,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "Priority rules and queue design are in the solution document."
+      "free_stops": "Priority rules and queue design are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare the oldest open complaint in each area at day end, so you spot where waiting days are piling up.",
+          "review": false
+        },
+        {
+          "text": "Make one dispatcher assign jobs from a single oldest open list each morning, so waiting time stops being decided on the road.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_kpi_undefined",
@@ -64,7 +84,17 @@
         ]
       },
       "ask_first": "",
-      "free_stops": "KPI definitions and the dashboard are in the solution document."
+      "free_stops": "KPI definitions and the dashboard are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Write the received time and resolved time beside each complaint this week, so you can compare short fixes against long ones.",
+          "review": false
+        },
+        {
+          "text": "Give one person the closing notebook and require every technician to report finish time there, so repair timing is captured consistently.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_cash_leakage",
@@ -86,7 +116,17 @@
         ]
       },
       "ask_first": "",
-      "free_stops": "Collection and matching steps are in the solution document; pi records the control gap, not an accusation."
+      "free_stops": "Collection and matching steps are in the solution document; pi records the control gap, not an accusation.",
+      "extra_ideas": [
+        {
+          "text": "Compare each collector's receipt total with the amount handed in the same day, so missing cash is noticed while details are fresh.",
+          "review": false
+        },
+        {
+          "text": "Give one person the handover book for all collections at a fixed evening time, so delays and gaps stand out quickly.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_receivables_late",
@@ -106,7 +146,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "Reminder timing and message wording are in the solution document."
+      "free_stops": "Reminder timing and message wording are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many accounts are still unpaid by area after the usual due week, so you see where chasing time is really going.",
+          "review": false
+        },
+        {
+          "text": "Give one collector one shared unpaid list by area and a fixed follow up hour daily, so chasing stops bouncing around.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_cash_leakage",
@@ -126,7 +176,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "How the two systems are linked is assessed in the solution document; pi never asks for panel logins."
+      "free_stops": "How the two systems are linked is assessed in the solution document; pi never asks for panel logins.",
+      "extra_ideas": [
+        {
+          "text": "Count active connections seen on the service list but missing from the billing notebook, so the size of unbilled service becomes visible.",
+          "review": false
+        },
+        {
+          "text": "Make the same staff member update billing during every new activation handover, so active connections stop being left off the books.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_returns_handling",
@@ -146,7 +206,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "Register design is in the solution document."
+      "free_stops": "Register design is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count devices issued to each technician against devices returned by week end, so you see where recovery is breaking down.",
+          "review": false
+        },
+        {
+          "text": "Give one storekeeper one notebook for all device handovers and returns, so every item has a clear current holder.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_delivery_late",
@@ -166,7 +236,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "Pipeline stages are in the solution document."
+      "free_stops": "Pipeline stages are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count pending installation requests by waiting reason this week, so you see whether delay sits with visits, material or scheduling.",
+          "review": false
+        },
+        {
+          "text": "Give one coordinator one installation backlog page reviewed at the same time daily, so new requests stop disappearing into messages.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_whatsapp_overload",
@@ -186,7 +266,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "Broadcast set-up and wording are in the solution document."
+      "free_stops": "Broadcast set-up and wording are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count missed calls during the last upstream outage and compare them with replies sent, so you see the true communication overload.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of posting the outage update to the staff chat immediately, so everyone answers callers with the same information.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p10_churn_subscription",
@@ -206,7 +296,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "Reason codes and the warning rules are in the solution document."
+      "free_stops": "Reason codes and the warning rules are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many stopped paying after repeat fault complaints this week, so you see whether service issues are driving the losses.",
+          "review": false
+        },
+        {
+          "text": "Give one person a notebook page for nonpayment stoppages and the reason heard, so leaving patterns are caught earlier.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

@@ -2,7 +2,7 @@
   "industry": "furniture_and_home_decor_retail",
   "name": "Furniture and home décor retail",
   "sector": "7.A Retail and consumer (part 1)",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_delivery_late",
@@ -22,7 +22,17 @@
         "tool_words": []
       },
       "ask_first": "Which stage usually holds things up?",
-      "free_stops": "The stages and alert rules are in the solution document."
+      "free_stops": "The stages and alert rules are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare promised dates with actual finish dates on recent custom orders, so you spot which part of the job adds extra waiting.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member a daily notebook for every open custom order status, so delayed pieces are chased before customers start calling.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_order_tracking",
@@ -42,7 +52,17 @@
         "tool_words": []
       },
       "ask_first": "How many orders are running now?",
-      "free_stops": "How vendors update stages is in the solution document."
+      "free_stops": "How vendors update stages is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Walk through the workshop and note each open order beside its current stage once, so missing and stalled pieces stop hiding.",
+          "review": false
+        },
+        {
+          "text": "Assign one person to update a single open orders list before closing time, so everyone checks the same status source.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_info_lost_in_whatsapp",
@@ -62,7 +82,17 @@
         "tool_words": []
       },
       "ask_first": "How do customers approve today?",
-      "free_stops": "How approvals are captured is in the solution document."
+      "free_stops": "How approvals are captured is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Match recent customer approvals against the fabric actually cut or ordered, so you see where choice records are breaking down.",
+          "review": false
+        },
+        {
+          "text": "Keep one paper order file for each custom piece with all customer approvals noted, so disputes over chosen fabric are easier to settle.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_raw_material_shortage",
@@ -82,7 +112,17 @@
         "tool_words": []
       },
       "ask_first": "Which materials run short most?",
-      "free_stops": "How requirements are worked out is in the solution document."
+      "free_stops": "How requirements are worked out is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare materials needed for current orders with what is physically on hand, so work stoppages are spotted before cutting starts.",
+          "review": false
+        },
+        {
+          "text": "Give one person a single notebook page for materials committed to open orders, so wood, foam and fabric are not double promised.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_product_defects",
@@ -102,7 +142,17 @@
         "tool_words": []
       },
       "ask_first": "Do you deliver in-house?",
-      "free_stops": "The delivery check steps are in the solution document."
+      "free_stops": "The delivery check steps are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count which damage appears most often after delivery on recent pieces, so packing or handling weaknesses are easier to target.",
+          "review": false
+        },
+        {
+          "text": "Make one person check every outgoing piece against a single damage note before loading, so avoidable knocks are caught earlier.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_receivables_late",
@@ -122,7 +172,17 @@
         "tool_words": []
       },
       "ask_first": "Which payments are hardest to collect?",
-      "free_stops": "The reminder timing is in the solution document."
+      "free_stops": "The reminder timing is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare delivered orders from last week with balances actually received, so you spot which delivery situations most often leave cash pending.",
+          "review": false
+        },
+        {
+          "text": "Keep all delivered but unpaid orders with one assigned staff member after handover, so balance chasing starts from a single daily queue.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_conversion_low",
@@ -142,7 +202,17 @@
         "tool_words": []
       },
       "ask_first": "What happens after someone visits without buying?",
-      "free_stops": "How follow-ups are timed and assigned is in the solution document."
+      "free_stops": "How follow-ups are timed and assigned is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count showroom visitors and orders on the same days this week, so you see when interest is not turning into bookings.",
+          "review": true
+        },
+        {
+          "text": "Give one salesperson the job of noting why serious visitors leave without ordering, so the team can address repeated objections.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_margin_unknown",
@@ -162,7 +232,17 @@
         "tool_words": []
       },
       "ask_first": "How do you price custom pieces today?",
-      "free_stops": "The costing structure is in the solution document."
+      "free_stops": "The costing structure is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Write one recent custom sofa's fabric, foam, frame, stitching and delivery notes on one page, so hidden cost-heavy parts stand out.",
+          "review": false
+        },
+        {
+          "text": "Make one cutter or supervisor add custom sofa job costs into one notebook before handover, so pricing reviews use the real work recorded.",
+          "review": true
+        }
+      ]
     },
     {
       "id": "p9_owner_bottleneck",
@@ -182,7 +262,17 @@
         "tool_words": []
       },
       "ask_first": "Who else could approve standard quotes?",
-      "free_stops": "Which decisions route where is in the solution document."
+      "free_stops": "Which decisions route where is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many quotes, design changes and price approvals waited for you this week, so your biggest slowdowns become visible.",
+          "review": true
+        },
+        {
+          "text": "Set one daily handover time when staff place routine quote and price decisions together, so you clear them in one batch.",
+          "review": true
+        }
+      ]
     }
   ],
   "never_say": [

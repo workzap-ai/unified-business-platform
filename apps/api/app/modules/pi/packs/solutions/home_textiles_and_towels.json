@@ -2,7 +2,7 @@
   "industry": "home_textiles_and_towels",
   "name": "Home textiles and towels",
   "sector": "7.D Manufacturing and industry (part 1)",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_consistency_across_branches",
@@ -23,7 +23,17 @@
         "tool_words": []
       },
       "ask_first": "Is GSM checked at your end before packing, or only by the buyer?",
-      "free_stops": "Where checks happen and how batches are linked to looms and lots is set out in the solution document."
+      "free_stops": "Where checks happen and how batches are linked to looms and lots is set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare finished towels from the last few batches by feel and weight at packing, so you spot which runs trigger buyer complaints.",
+          "review": false
+        },
+        {
+          "text": "Give one packing checker the job of keeping the approved towel sample at one table, so every batch is judged the same way.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_packing_errors",
@@ -44,7 +54,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The scan-check flow and label format per buyer are covered in the solution document."
+      "free_stops": "The scan-check flow and label format per buyer are covered in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many insert bundles sit near each packing line today, so you see where wrong barcodes can get mixed in.",
+          "review": false
+        },
+        {
+          "text": "Assign one person to hand over inserts for each order from one marked spot, so packing uses the right barcode batch.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_no_visibility",
@@ -65,7 +85,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "How SKUs are coded and counted across locations is detailed in the solution document."
+      "free_stops": "How SKUs are coded and counted across locations is detailed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Walk the godown and note which colour and size piles are mixed together, so hidden stock confusion shows up before selling.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of updating one shelf list at day end, so each design stays tied to one place.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_cash_leakage",
@@ -85,7 +115,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "How B-grade stock is matched to sales and gate passes is kept for the solution document."
+      "free_stops": "How B-grade stock is matched to sales and gate passes is kept for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note every B grade bundle near the gate at closing today, so you can compare movement against billed dispatches.",
+          "review": false
+        },
+        {
+          "text": "Make the gate release B grade only from one office note kept in one place, so unbilled bundles stop slipping out.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_no_sop",
@@ -105,7 +145,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "What each programme record holds and how reorders are set up is set out in the solution document."
+      "free_stops": "What each programme record holds and how reorders are set up is set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Review the last programme reorder papers and note which details were asked again, so repeat reconfirmation points are clear.",
+          "review": false
+        },
+        {
+          "text": "Keep one notebook for programme reorder details with one person responsible, so the next repeat order starts from known instructions.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_supplier_late",
@@ -125,7 +175,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "How dispatches and returns are recorded and flagged is covered in the solution document."
+      "free_stops": "How dispatches and returns are recorded and flagged is covered in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Write down what left for the processing house and what came back this week, so the real delay pattern is visible.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member the job of updating one outside work list daily, so late outsourced lots get chased on time.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_receivables_late",
@@ -146,7 +206,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "Reminder timing and how par levels are set per hotel are kept for the solution document."
+      "free_stops": "Reminder timing and how par levels are set per hotel are kept for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many hotel orders this month were delivered after an older bill was still unpaid, so the riskiest ordering pattern shows.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member a fixed weekly time to note promised payment dates in one notebook, so follow ups stop slipping.",
+          "review": true
+        }
+      ]
     },
     {
       "id": "p8_multi_channel_orders",
@@ -167,7 +237,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "How each channel connects in is mapped in the solution document."
+      "free_stops": "How each channel connects in is mapped in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many open marketplace and shop orders are waiting in the same packing area, so mix up risk is clear today.",
+          "review": false
+        },
+        {
+          "text": "Give one person one order list and one packing zone for marketplace work, so shop orders stop crossing into that flow.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_seasonal_planning",
@@ -188,7 +268,17 @@
         "leads_with_view": true
       },
       "ask_first": "",
-      "free_stops": "How the history is read into a production plan is detailed in the solution document."
+      "free_stops": "How the history is read into a production plan is detailed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare last wedding season's fast selling sets with the designs left afterward, so buying choices reflect what actually moved.",
+          "review": false
+        },
+        {
+          "text": "Give one person one notebook for seasonal sell through notes by design, so next season planning uses one record.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p10_data_scattered",
@@ -208,7 +298,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "Which numbers go in and where each comes from is set out in the solution document."
+      "free_stops": "Which numbers go in and where each comes from is set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Lay the three report sheets side by side and mark repeated figures once, so wasted reporting effort is easy to spot.",
+          "review": false
+        },
+        {
+          "text": "Make one staff member collect all report figures in one notebook every week, so the report stops arriving from scattered places.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

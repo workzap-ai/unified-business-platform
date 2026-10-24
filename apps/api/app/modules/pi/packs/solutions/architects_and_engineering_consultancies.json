@@ -2,7 +2,7 @@
   "industry": "architects_and_engineering_consultancies",
   "name": "Architects and engineering consultancies",
   "sector": "7.F Construction, real estate and facilities",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_scope_creep",
@@ -22,7 +22,17 @@
         "tool_words": []
       },
       "ask_first": "When a client asks for extra work, what happens?",
-      "free_stops": "The approval flow and fee link are in the solution document."
+      "free_stops": "The approval flow and fee link are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count change requests on each live project this week and note which ones were unpaid, so lost fee work stops hiding.",
+          "review": false
+        },
+        {
+          "text": "Give one project role the job of noting every client change in one list, so extra work can be raised before drawings move.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_margin_unknown",
@@ -43,7 +53,17 @@
         "leads_with_view": true
       },
       "ask_first": "How are timesheets filled in today?",
-      "free_stops": "Timesheet structure and fee-burn alerts are in the solution document."
+      "free_stops": "Timesheet structure and fee-burn alerts are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note time spent by role on each live project for one week, so the biggest fee drain becomes visible.",
+          "review": false
+        },
+        {
+          "text": "Keep one times note in one place and review it at day end, so project effort stops getting forgotten.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_invoicing_delays",
@@ -63,7 +83,17 @@
         "tool_words": []
       },
       "ask_first": "Who decides a stage is complete?",
-      "free_stops": "Stage definitions and invoice triggers are in the solution document."
+      "free_stops": "Stage definitions and invoice triggers are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare completed stages against sent invoices on current jobs, so cash held back by admin delay is clear.",
+          "review": false
+        },
+        {
+          "text": "Give one project role the handover job when a stage finishes, so accounts hears in time to bill promptly.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_receivables_late",
@@ -83,7 +113,17 @@
         "tool_words": []
       },
       "ask_first": "How long do clients take to pay?",
-      "free_stops": "Reminder timing and escalation are in the solution document; fee disputes go to a lawyer."
+      "free_stops": "Reminder timing and escalation are in the solution document; fee disputes go to a lawyer.",
+      "extra_ideas": [
+        {
+          "text": "Note unpaid fees by client and how long each has sat, so the slowest payers are easy to spot.",
+          "review": false
+        },
+        {
+          "text": "Keep one chasing list in one place and review it on the same morning each week, so follow ups stop slipping.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_capacity",
@@ -104,7 +144,17 @@
         "leads_with_view": true
       },
       "ask_first": "How do you see who has capacity today?",
-      "free_stops": "Planning rules and views are in the solution document."
+      "free_stops": "Planning rules and views are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count live tasks by role across current projects this week, so overloaded teams and spare capacity are easier to compare.",
+          "review": false
+        },
+        {
+          "text": "Give one manager the weekly job of moving work from the busiest role to the quietest, so deadlines rely less on firefighting.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_service_errors",
@@ -124,7 +174,17 @@
         "tool_words": []
       },
       "ask_first": "Where are the current drawings kept?",
-      "free_stops": "Revision rules and transmittal flow are in the solution document."
+      "free_stops": "Revision rules and transmittal flow are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Check one sample of drawings sent to site against current revisions, so weak points in issuing control show up quickly.",
+          "review": false
+        },
+        {
+          "text": "Make one person the final issuer from one current list of revisions, so outdated drawings stop reaching site.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_permits_approvals",
@@ -144,7 +204,17 @@
         "tool_words": []
       },
       "ask_first": "Which authorities do you submit to most?",
-      "free_stops": "Status stages and alerts are in the solution document."
+      "free_stops": "Status stages and alerts are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count approval files waiting with each authority and note the oldest submission month, so stuck work is easier to prioritise.",
+          "review": false
+        },
+        {
+          "text": "Keep one approvals notebook with one owner updating it after every authority contact, so chasing stops falling between desks.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_slow_response",
@@ -164,7 +234,17 @@
         "tool_words": []
       },
       "ask_first": "How are RFIs tracked now?",
-      "free_stops": "Deadlines and report formats are in the solution document."
+      "free_stops": "Deadlines and report formats are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count open contractor RFIs and note the oldest waiting date, so backlog pressure is clear before site trust drops.",
+          "review": false
+        },
+        {
+          "text": "Give one coordinator the daily handover list for incoming RFIs, so replies keep moving even when project staff are busy.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_conversion_low",
@@ -185,7 +265,17 @@
         "leads_with_view": true
       },
       "ask_first": "Where do most new projects come from?",
-      "free_stops": "Proposal structure and win/loss analysis are in the solution document."
+      "free_stops": "Proposal structure and win/loss analysis are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare recent proposals sent against jobs won and note common delays, so the slow parts hurting win rate stand out.",
+          "review": false
+        },
+        {
+          "text": "Give one person one place to keep past scope notes and fee assumptions, so similar proposals go out faster with less rework.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p10_licences_renewals",
@@ -205,7 +295,17 @@
         "tool_words": []
       },
       "ask_first": "Who keeps track of expiry dates today?",
-      "free_stops": "Alert timing is set in the solution document."
+      "free_stops": "Alert timing is set in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Write every registration and insurance expiry month on one notebook page, so missed renewals stop surprising the office.",
+          "review": true
+        },
+        {
+          "text": "Give one admin role the weekly job of checking that expiry page, so renewals get chased before work is interrupted.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

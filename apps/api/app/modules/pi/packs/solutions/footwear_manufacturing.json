@@ -2,7 +2,7 @@
   "industry": "footwear_manufacturing",
   "name": "Footwear manufacturing",
   "sector": "7.D Manufacturing and industry (part 1)",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_overstock_dead_stock",
@@ -23,7 +23,17 @@
         "tool_words": []
       },
       "ask_first": "How do you see stock by size today?",
-      "free_stops": "How size mix is planned from sales history is set out in the solution document."
+      "free_stops": "How size mix is planned from sales history is set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare pairs sent out by size with pairs left back for the same articles, so the wrong size mix shows clearly.",
+          "review": false
+        },
+        {
+          "text": "Give one storekeeper one shelf list for slow sizes by article, so replenishment stops repeating the same stuck sizes.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_wrong_location",
@@ -43,7 +53,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "How cartons are coded and scanned is covered in the solution document."
+      "free_stops": "How cartons are coded and scanned is covered in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note how many cartons were opened in the godown to complete odd dealer requests this week, so you see what is breaking sets.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of approving any carton opening in one marked notebook, so full sets stay protected for dealers.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_supplier_late",
@@ -63,7 +83,17 @@
         "tool_words": []
       },
       "ask_first": "Which material stops production most?",
-      "free_stops": "How requirements are calculated per article and size is detailed in the solution document."
+      "free_stops": "How requirements are calculated per article and size is detailed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note each day lasting waits for soles against the promised delivery day, so supplier delay is clear in lost production time.",
+          "review": false
+        },
+        {
+          "text": "Give one person one place to note sole needs and supplier promises, so lasting stops chasing material through scattered chats.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_maintenance_downtime",
@@ -83,7 +113,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "Inspection routine and repair priorities are kept for the solution document."
+      "free_stops": "Inspection routine and repair priorities are kept for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count which moulds or presses stopped work most often this season, so attention goes to the equipment causing the longest interruptions.",
+          "review": false
+        },
+        {
+          "text": "Give one fitter one notebook for breakdowns and repairs by machine, so repeat faults are handed over clearly across shifts.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_inspection_missing",
@@ -103,7 +143,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The checklist and how defects are traced to a stage are covered in the solution document."
+      "free_stops": "The checklist and how defects are traced to a stage are covered in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count dealer complaints by defect type from the last cartons returned, so the missed checks match the faults actually reaching market.",
+          "review": false
+        },
+        {
+          "text": "Give one checker the carton closing signoff in one notebook, so faults are owned before goods leave the factory.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_credit_customers",
@@ -123,7 +173,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "How limits and return terms are tracked per dealer is set out in the solution document."
+      "free_stops": "How limits and return terms are tracked per dealer is set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count pairs still lying ready for dealers who still owe from the last season, so blocked stock against blocked cash becomes visible.",
+          "review": false
+        },
+        {
+          "text": "Keep one season dues notebook at the dispatch table under one staff role, so every outgoing pair is checked against old balances.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_commission_disputes",
@@ -144,7 +204,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "How counts are verified and fed into the weekly sheet is detailed in the solution document; for wage rules, talk to your lawyer or accountant."
+      "free_stops": "How counts are verified and fed into the weekly sheet is detailed in the solution document; for wage rules, talk to your lawyer or accountant.",
+      "extra_ideas": [
+        {
+          "text": "Compare the supervisor's daily pair count with each worker's claimed count for one week, so the counting gap shows.",
+          "review": false
+        },
+        {
+          "text": "Give one supervisor one end of day pair register by stage, so weekly piece counts are handed over from one record.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_no_sales_visibility",
@@ -169,7 +239,17 @@
         ]
       },
       "ask_first": "",
-      "free_stops": "How shop sales connect to factory stock is mapped in the solution document."
+      "free_stops": "How shop sales connect to factory stock is mapped in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note each shop's fastest moving articles and sizes at day end for one week, so the factory sees demand before month closing.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member one fixed evening time to collect shop counts in one notebook, so factory planning gets a steady sales picture.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_order_errors",
@@ -189,7 +269,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The pick-check flow is set out in the solution document."
+      "free_stops": "The pick-check flow is set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count which articles and sizes had wrong picks this week, so you see whether the errors come from certain shelves or pairs.",
+          "review": false
+        },
+        {
+          "text": "Give one packer one handwritten online order list at packing time, so size checking happens from a single handover record.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p10_forecasting",
@@ -210,7 +300,17 @@
         "leads_with_view": true
       },
       "ask_first": "",
-      "free_stops": "How the view turns into a production plan is detailed in the solution document."
+      "free_stops": "How the view turns into a production plan is detailed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many dealers asked again for each article after you ran out last season, so next season choices reflect missed demand.",
+          "review": false
+        },
+        {
+          "text": "Give one person one notebook for repeat, drop and change notes after dealer visits, so article planning stays together before the season.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

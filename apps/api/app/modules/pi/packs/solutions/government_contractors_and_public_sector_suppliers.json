@@ -2,7 +2,7 @@
   "industry": "government_contractors_and_public_sector_suppliers",
   "name": "Government contractors and public-sector suppliers",
   "sector": "7.M Digital economy, social and public sector",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_few_leads",
@@ -22,7 +22,17 @@
         "tool_words": []
       },
       "ask_first": "How do you hear about new tenders now?",
-      "free_stops": "Which sources are tracked and how is set out in the solution document."
+      "free_stops": "Which sources are tracked and how is set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note when each tender was first seen and when it closed on recent bids, so you spot how much preparation time you keep losing.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member fixed morning checks and one shared tender notebook, so bid preparation starts earlier and stops scattering.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_manual_work",
@@ -42,7 +52,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The library structure and checklists are prepared in the solution document."
+      "free_stops": "The library structure and checklists are prepared in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count which bid papers were hunted down repeatedly across recent tenders, so you see exactly what slows assembly every time.",
+          "review": false
+        },
+        {
+          "text": "Assign one person to keep one master file of reusable bid papers, so each tender starts from gathered material not fresh chasing.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_contracts_tracking",
@@ -82,7 +102,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The stages and update routine are detailed in the solution document."
+      "free_stops": "The stages and update routine are detailed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many invoices are waiting at each stage from submission to payment, so the worst blockage point becomes visible.",
+          "review": true
+        },
+        {
+          "text": "Give one person one invoice follow-up notebook updated after every call or visit, so stuck bills are easier to chase.",
+          "review": true
+        }
+      ]
     },
     {
       "id": "p5_cash_flow_tight",
@@ -103,7 +133,17 @@
         "leads_with_view": true
       },
       "ask_first": "",
-      "free_stops": "The view's inputs are set out in the solution document; financing questions are for your accountant."
+      "free_stops": "The view's inputs are set out in the solution document; financing questions are for your accountant.",
+      "extra_ideas": [
+        {
+          "text": "List retention and security amounts by contract and compare them with current supplier pressure, so blocked cash is clearer in day-to-day decisions.",
+          "review": false
+        },
+        {
+          "text": "Assign one person to keep one page per contract for held money and expected return timing, so release chasing becomes routine.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_documentation",
@@ -123,7 +163,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The pack contents per buyer are prepared in the solution document."
+      "free_stops": "The pack contents per buyer are prepared in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note the exact paperwork gaps mentioned on recent rejected deliveries, so dispatch checks match what inspection is actually stopping.",
+          "review": false
+        },
+        {
+          "text": "Give one dispatcher one paper checklist kept with outgoing delivery papers, so small document misses stop delaying acceptance.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_record_keeping",
@@ -143,7 +193,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The capture and filing set-up go in the solution document."
+      "free_stops": "The capture and filing set-up go in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many signed challans are missing by contract from the last few weeks, so the loss point is easier to pin down.",
+          "review": false
+        },
+        {
+          "text": "Give returns from drivers to one person and one shelf for signed receipts, so proof of delivery stops going astray.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_attendance_lateness",
@@ -165,7 +225,17 @@
         ]
       },
       "ask_first": "",
-      "free_stops": "The check-in and billing link are detailed in the solution document."
+      "free_stops": "The check-in and billing link are detailed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare attendance recorded by your team with what was billed back on one recent manpower contract, so billing cuts are easier to trace.",
+          "review": false
+        },
+        {
+          "text": "Give one supervisor the daily attendance handover to the office at a fixed time, so billing support arrives before disputes build.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_no_dashboard",
@@ -185,7 +255,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The register design goes in the solution document."
+      "free_stops": "The register design goes in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count all contract dates due this week across delivery, inspection and expiry papers, so the busiest pressure points are clear early.",
+          "review": false
+        },
+        {
+          "text": "Give one person one wall list of every live contract date reviewed weekly, so deadline clashes are noticed before penalties bite.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p10_margin_unknown",

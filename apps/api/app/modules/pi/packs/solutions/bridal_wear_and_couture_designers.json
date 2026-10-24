@@ -2,7 +2,7 @@
   "industry": "bridal_wear_and_couture_designers",
   "name": "Bridal wear and couture designers",
   "sector": "7.A Retail and consumer (part 1)",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_order_tracking",
@@ -22,7 +22,17 @@
         "tool_words": []
       },
       "ask_first": "How many orders are in progress right now?",
-      "free_stops": "The stages, who updates them and when alerts fire are in the solution document."
+      "free_stops": "The stages, who updates them and when alerts fire are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many open bridal orders have no stage written anywhere today, so you see how much chasing starts from missing status.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member the evening job of updating one order notebook, so every caller hears the same latest stage.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_capacity",
@@ -43,7 +53,17 @@
         "leads_with_view": true
       },
       "ask_first": "How many karigars work on your pieces?",
-      "free_stops": "How hours are estimated per design and capacity is planned is in the solution document."
+      "free_stops": "How hours are estimated per design and capacity is planned is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare open bridal bookings with the outfits currently under handwork this week, so overbooking pressure shows before promises pile up.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of marking each new booking against available adda load, so season orders stop stacking blindly.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_info_lost_in_whatsapp",
@@ -63,7 +83,17 @@
         "tool_words": []
       },
       "ask_first": "How do clients approve designs today?",
-      "free_stops": "How approvals and changes are captured and stored is in the solution document."
+      "free_stops": "How approvals and changes are captured and stored is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count recent bridal orders where colour approval sits only inside chat messages, so you see how often proof is hard to find.",
+          "review": false
+        },
+        {
+          "text": "Keep one approval page inside each order file, so staff can check agreed colours without scrolling old chats.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_delivery_late",
@@ -83,7 +113,17 @@
         "tool_words": []
       },
       "ask_first": "Where does the delay usually start?",
-      "free_stops": "The buffer rules and alert points per stage are in the solution document."
+      "free_stops": "The buffer rules and alert points per stage are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note which production stage late bridal orders were waiting at when panic started, so the repeat choke point becomes visible.",
+          "review": false
+        },
+        {
+          "text": "Set one fixed evening handover on delayed orders, so tomorrow's stitching and finishing work starts with clear priorities.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_receivables_late",
@@ -104,7 +144,17 @@
         "tool_words": []
       },
       "ask_first": "Which payment stage is hardest to collect?",
-      "free_stops": "The payment stages and reminder timing are in the solution document."
+      "free_stops": "The payment stages and reminder timing are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count bridal orders nearing handover that still have a payment stage unchecked, so last minute chasing stops surprising the team.",
+          "review": true
+        },
+        {
+          "text": "Give one person the fitting notebook and collection reminders, so payment follow up happens at the same stage each time.",
+          "review": true
+        }
+      ]
     },
     {
       "id": "p6_lead_followup_slow",
@@ -124,7 +174,17 @@
         "tool_words": []
       },
       "ask_first": "Who replies to enquiries today?",
-      "free_stops": "How enquiries are collected and follow-ups timed is in the solution document."
+      "free_stops": "How enquiries are collected and follow-ups timed is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many bridal enquiries have sat unanswered since yesterday, so you see the real reply backlog in the inbox.",
+          "review": false
+        },
+        {
+          "text": "Assign one staff member the midday enquiry check, so interested brides stop waiting while the designer is busy.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_shrinkage_theft",
@@ -144,7 +204,17 @@
         "tool_words": []
       },
       "ask_first": "Who issues materials to the workshop?",
-      "free_stops": "How materials are issued and reconciled is in the solution document."
+      "free_stops": "How materials are issued and reconciled is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare material issued to the adda with material returned from finished bridal orders, so missing fabric and embellishment can be spotted early.",
+          "review": false
+        },
+        {
+          "text": "Give one person one return notebook for adda materials, so every issue and leftover is checked in the same place.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_booking_appointments",
@@ -164,7 +234,17 @@
         "tool_words": []
       },
       "ask_first": "How many clients are abroad?",
-      "free_stops": "The booking setup and reminders are in the solution document."
+      "free_stops": "The booking setup and reminders are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many fittings this week were promised on calls without being written in one place, so double booking risk is clear.",
+          "review": false
+        },
+        {
+          "text": "Keep one appointment diary at the front desk, so every fitting booking lands in the same place before the call ends.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_owner_bottleneck",
@@ -184,7 +264,17 @@
         "tool_words": []
       },
       "ask_first": "Who runs the studio day to day?",
-      "free_stops": "Which decisions route where is in the solution document."
+      "free_stops": "Which decisions route where is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note how many bridal orders paused today only for designer approval, so the waiting load on one person is visible.",
+          "review": false
+        },
+        {
+          "text": "Give the studio manager one daily approval window with the designer, so small decisions stop interrupting work all day.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

@@ -2,7 +2,7 @@
   "industry": "orchards",
   "name": "Orchards (mango, citrus, dates, apples)",
   "sector": "7.C Agriculture, livestock and rural (part 2)",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_receivables_late",
@@ -22,7 +22,17 @@
         "tool_words": []
       },
       "ask_first": "Were the instalment dates written in the agreement?",
-      "free_stops": "How instalments and reminders are set up for your theka deals goes in the solution document."
+      "free_stops": "How instalments and reminders are set up for your theka deals goes in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare the orchard handover notes, harvest timing and payments received in one page, so you can see exactly what is still unsettled.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of keeping every theka payment note in one envelope, so follow up starts from one agreed record.",
+          "review": true
+        }
+      ]
     },
     {
       "id": "p2_margin_unknown",
@@ -43,7 +53,17 @@
         "leads_with_view": true
       },
       "ask_first": "Have you picked any block yourself in the last two seasons?",
-      "free_stops": "Which costs are counted and how the comparison is built stays in the solution document."
+      "free_stops": "Which costs are counted and how the comparison is built stays in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note one block sold on theka beside one similar block picked by your own team, so the earning difference is clearer.",
+          "review": false
+        },
+        {
+          "text": "Give one person one page per block for all picking and sale notes, so season comparisons stop relying on scattered memory.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_commission_disputes",
@@ -63,7 +83,17 @@
         "tool_words": []
       },
       "ask_first": "Who counts the crates during picking now?",
-      "free_stops": "The tally and pay sheet setup is detailed in the solution document."
+      "free_stops": "The tally and pay sheet setup is detailed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count crates at the loading point and compare them with the picker tally once that day, so the mismatch size shows early.",
+          "review": false
+        },
+        {
+          "text": "Give one supervisor the crate count notebook for the whole shift, so picker pay talks start from one running total.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_stockout",
@@ -83,7 +113,17 @@
         "tool_words": []
       },
       "ask_first": "Do you pack yourself or does the buyer bring crates?",
-      "free_stops": "Reorder levels and how usage is tracked go in the solution document."
+      "free_stops": "Reorder levels and how usage is tracked go in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Walk the storage area and count empty and usable crates separately today, so you know how short the next picking day may be.",
+          "review": false
+        },
+        {
+          "text": "Give one store hand the job of noting crates issued and returned in one place, so field teams stop pulling from hidden piles.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_delivery_late",
@@ -103,7 +143,17 @@
         "tool_words": []
       },
       "ask_first": "Do you arrange transport or does the buyer?",
-      "free_stops": "How dispatches and arrival checks are linked is part of the solution document."
+      "free_stops": "How dispatches and arrival checks are linked is part of the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note bruising complaints by truck, route and orchard lot for this week's arrivals, so the roughest movement pattern stands out.",
+          "review": false
+        },
+        {
+          "text": "Give one person the arrival complaint notebook for every load, so transporter follow up is based on one season record.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_no_sales_visibility",
@@ -124,7 +174,17 @@
         "leads_with_view": true
       },
       "ask_first": "Do you sell through one arhti or several?",
-      "free_stops": "How slips are reconciled against dispatches is kept for the solution document."
+      "free_stops": "How slips are reconciled against dispatches is kept for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare the lots sent to the mandi with the sale slips received this week, so missing paper for any sale stands out.",
+          "review": false
+        },
+        {
+          "text": "Give one person one folder for every mandi slip and deduction note, so your season record stays together for review.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_consistency_across_branches",
@@ -144,7 +204,17 @@
         "tool_words": []
       },
       "ask_first": "Do you grade yourself, or does a packing house?",
-      "free_stops": "The grading log design is part of the solution document."
+      "free_stops": "The grading log design is part of the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Lay out one day's graded fruit by grade and compare it with the next shift's output, so the grading drift is easier to spot.",
+          "review": false
+        },
+        {
+          "text": "Give one line leader the job of keeping disputed grades in one tray until review, so daily grading calls stay more consistent.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_owner_blind",
@@ -164,7 +234,17 @@
         "tool_words": []
       },
       "ask_first": "How often are you at the farm during the season?",
-      "free_stops": "What goes into the daily read and how it is fed is set out in the solution document."
+      "free_stops": "What goes into the daily read and how it is fed is set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare the daily totals with separate notes on loads, worker turnout and spending for one week, so weak reporting areas show quickly.",
+          "review": false
+        },
+        {
+          "text": "Give the manager one fixed time to send one daily orchard summary, so you see movement in the farm not only totals.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_whatsapp_overload",
@@ -184,7 +264,17 @@
         "tool_words": []
       },
       "ask_first": "Roughly how many gift orders come in a busy week?",
-      "free_stops": "How orders are captured and tracked is detailed in the solution document."
+      "free_stops": "How orders are captured and tracked is detailed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many gift orders in recent chats lack a packing note or delivery note, so the backlog size is clear.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member one notebook for every incoming gift order that day, so packing work stops getting lost in busy chats.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p10_no_customer_data",
@@ -204,7 +294,17 @@
         "tool_words": []
       },
       "ask_first": "Do you sell any fruit directly to households or offices?",
-      "free_stops": "Message timing and wording are part of the solution document."
+      "free_stops": "Message timing and wording are part of the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many direct buyers from last season you can still identify from old slips and chats, so the missed repeat business shows.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member one notebook for buyer follow ups every market day, so returning buyers hear when the crop is ready.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

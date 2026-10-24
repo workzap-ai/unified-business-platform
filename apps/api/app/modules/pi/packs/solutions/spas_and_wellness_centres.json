@@ -2,7 +2,7 @@
   "industry": "spas_and_wellness_centres",
   "name": "Spas and wellness centres",
   "sector": "7.H Hospitality, events and personal services",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_capacity",
@@ -22,7 +22,17 @@
         "tool_words": []
       },
       "ask_first": "How many treatment rooms and therapists?",
-      "free_stops": "Grid rules and utilisation reporting are in the solution document."
+      "free_stops": "Grid rules and utilisation reporting are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Mark each hour this week when a room sits empty or a therapist waits, so the busiest mismatch periods stand out.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member the daily room and therapist allocation sheet, so late changes stop creating avoidable idle time.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_booking_appointments",
@@ -42,7 +52,17 @@
         "tool_words": []
       },
       "ask_first": "Are you inside a hotel?",
-      "free_stops": "Channel connections go in the solution document."
+      "free_stops": "Channel connections go in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note every booking clash by source for one week, so you see which channel creates most double bookings.",
+          "review": false
+        },
+        {
+          "text": "Make one person record every confirmed booking in one master list, so all channels follow the same availability.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_refunds",
@@ -62,7 +82,17 @@
         "tool_words": []
       },
       "ask_first": "Do vouchers have an expiry now?",
-      "free_stops": "Code setup and redemption flow stay for the solution document."
+      "free_stops": "Code setup and redemption flow stay for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare vouchers redeemed this week with the sale record you already have, so repeat use and missing entries stand out.",
+          "review": false
+        },
+        {
+          "text": "Keep one redemption notebook at the front desk, so every voucher use is marked in the same place.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_loyalty",
@@ -82,7 +112,17 @@
         "tool_words": []
       },
       "ask_first": "How many active packages are there?",
-      "free_stops": "Tracker setup is in the solution document."
+      "free_stops": "Tracker setup is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many package balance disputes happen this week, so you see how often lost cards interrupt reception.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member the package session list after each treatment block, so balances stay current at the desk.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_count_mismatch",
@@ -102,7 +142,17 @@
         "tool_words": []
       },
       "ask_first": "Which products run out fastest?",
-      "free_stops": "Usage norms go in the solution document."
+      "free_stops": "Usage norms go in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare treatments completed with bottles opened this week, so you can judge whether product use matches the work done.",
+          "review": false
+        },
+        {
+          "text": "Store daily issue notes for oils and creams in one notebook, so unusual product draw becomes easier to trace.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_shrinkage_theft",
@@ -122,7 +172,17 @@
         "tool_words": []
       },
       "ask_first": "Is laundry in-house or a vendor?",
-      "free_stops": "Count routine stays for the solution document."
+      "free_stops": "Count routine stays for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare towels and robes sent to laundry with those returned on each run, so the loss point becomes visible.",
+          "review": false
+        },
+        {
+          "text": "Make one person sign linen out to each treatment room each shift, so missing items can be traced quickly.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_commission_disputes",
@@ -143,7 +203,17 @@
         "leads_with_view": true
       },
       "ask_first": "How are therapists paid?",
-      "free_stops": "Commission logic is in the solution document."
+      "free_stops": "Commission logic is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many pay complaints tie to missing session records this pay period, so the main source of arguments is clear.",
+          "review": false
+        },
+        {
+          "text": "Keep one commission tally sheet updated by the shift lead daily, so pay discussions rely on the same record.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_void_refund_abuse",
@@ -163,7 +233,17 @@
         "tool_words": []
       },
       "ask_first": "Who handles billing?",
-      "free_stops": "Approval rules stay for the solution document."
+      "free_stops": "Approval rules stay for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare the treatment booked with the treatment charged on a sample of bills, so undercharging patterns are easier to spot.",
+          "review": false
+        },
+        {
+          "text": "Require one supervisor to note every price change in one log, so cheaper billing no longer passes without review.",
+          "review": true
+        }
+      ]
     },
     {
       "id": "p9_receivables_late",
@@ -183,7 +263,17 @@
         "tool_words": []
       },
       "ask_first": "How long does settlement usually take?",
-      "free_stops": "Statement content is in the solution document."
+      "free_stops": "Statement content is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "List hotel bookings beside settlements received for this week, so the unpaid portion is clear before month end.",
+          "review": false
+        },
+        {
+          "text": "Keep one notebook for hotel settlement dates and amounts received, so late follow-up stops slipping between shifts.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p10_checklists_not_done",
@@ -203,7 +293,17 @@
         "tool_words": []
       },
       "ask_first": "How long is turnaround between treatments?",
-      "free_stops": "Checklist steps stay for the solution document."
+      "free_stops": "Checklist steps stay for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many room turnarounds miss any checklist item this week, so you see which part is breaking most often.",
+          "review": false
+        },
+        {
+          "text": "Keep the turnaround checklist on a clipboard outside each room, so staff finish it before the next treatment starts.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

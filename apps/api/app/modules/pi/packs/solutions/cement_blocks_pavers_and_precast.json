@@ -2,7 +2,7 @@
   "industry": "cement_blocks_pavers_and_precast",
   "name": "Cement, blocks, pavers and precast",
   "sector": "7.D Manufacturing and industry (part 2)",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_shrinkage_theft",
@@ -22,7 +22,17 @@
         "tool_words": []
       },
       "ask_first": "Who holds the store key now?",
-      "free_stops": "The consumption ratios and exception rules are in the solution document."
+      "free_stops": "The consumption ratios and exception rules are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many cement bags leave the store and how many block stacks leave the yard each day, so shrinkage shows by area.",
+          "review": false
+        },
+        {
+          "text": "Give one yard lead the job of writing every store issue in one notebook at shift change, so extra bag movement stops blending into production.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_packing_errors",
@@ -42,7 +52,17 @@
         "tool_words": []
       },
       "ask_first": "Where does most breakage happen, loading or at site?",
-      "free_stops": "The capture steps and how disputes are settled are in the solution document."
+      "free_stops": "The capture steps and how disputes are settled are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Mark on paper which driver and loader team handled each broken load, so you see whether breakage follows a route or crew.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of checking stacking before every truck leaves, so broken pieces stop reaching the contractor unpaid.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_credit_customers",
@@ -62,7 +82,17 @@
         "tool_words": []
       },
       "ask_first": "How many contractors buy on credit?",
-      "free_stops": "Limit rules and collection triggers are in the solution document."
+      "free_stops": "Limit rules and collection triggers are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note which open balances are tied to sites near completion this week, so you spot collections at risk before work ends.",
+          "review": false
+        },
+        {
+          "text": "Keep all credit promises in one notebook with a fixed evening review, so follow-up happens before the contractor moves on.",
+          "review": true
+        }
+      ]
     },
     {
       "id": "p4_order_errors",
@@ -82,7 +112,17 @@
         "tool_words": []
       },
       "ask_first": "How many deliveries go out on a normal day?",
-      "free_stops": "The order intake and dispatch set-up are in the solution document."
+      "free_stops": "The order intake and dispatch set-up are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count this week's wrong deliveries by bad address, wrong quantity or wrong item, so you see which call details are hurting dispatch.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of writing every phone order in one pad, so drivers leave with one clear delivery note.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_theft_internal",
@@ -102,7 +142,17 @@
         "tool_words": []
       },
       "ask_first": "How is diesel issued now?",
-      "free_stops": "The usage benchmarks and alerts are in the solution document."
+      "free_stops": "The usage benchmarks and alerts are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note each vehicle's start meter, return meter and loaded trips for one week, so side-trip patterns stand out by vehicle.",
+          "review": false
+        },
+        {
+          "text": "Give one dispatcher the job of keeping trip notes in one notebook at return time, so diesel issues stay tied to actual yard movements.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_supplier_quality",
@@ -122,7 +172,17 @@
         "tool_words": []
       },
       "ask_first": "Are loads checked at all when they arrive?",
-      "free_stops": "The checking steps and supplier scorecard are in the solution document."
+      "free_stops": "The checking steps and supplier scorecard are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare arrival height across trucks from the same supplier this week, so repeated short loads are easier to challenge immediately.",
+          "review": false
+        },
+        {
+          "text": "Give one yard person the job of noting each incoming load in one register, so payment talks start from one checked record.",
+          "review": true
+        }
+      ]
     },
     {
       "id": "p7_manual_reports",
@@ -142,7 +202,17 @@
         "tool_words": []
       },
       "ask_first": "Which numbers do you want to see each morning?",
-      "free_stops": "The daily form and which figures go into the read are in the solution document."
+      "free_stops": "The daily form and which figures go into the read are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare the supervisor's output message with stacks visible in the yard once this week, so rough reporting gaps stop hiding inside one total.",
+          "review": false
+        },
+        {
+          "text": "Set one fixed evening time for yard count and output message by one person, so daily numbers stop changing by mood.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_cash_mismatch",
@@ -162,7 +232,17 @@
         "tool_words": []
       },
       "ask_first": "Do walk-in buyers mostly pay cash or transfer?",
-      "free_stops": "The matching rules and sign-off are in the solution document."
+      "free_stops": "The matching rules and sign-off are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note walk-in buyer count beside slip count at closing each day, so you see whether mismatch starts before or after the desk.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of writing every walk-in sale in one notebook during shop hours, so missing sales stop blending into the day's rush.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_few_leads",
@@ -182,7 +262,17 @@
         "tool_words": []
       },
       "ask_first": "Do you sell more to contractors or individual home builders?",
-      "free_stops": "The catalogue layout and enquiry flow are in the solution document."
+      "free_stops": "The catalogue layout and enquiry flow are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note how many callers ask about blocks, pavers or precast this week, so you see which line deserves more attention.",
+          "review": false
+        },
+        {
+          "text": "Keep one notebook for every new enquiry near the sales phone, so forgotten callbacks stop wasting the few fresh leads.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

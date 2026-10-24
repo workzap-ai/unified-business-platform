@@ -2,7 +2,7 @@
   "industry": "waste_collection_and_sanitation_services",
   "name": "Waste collection and sanitation services",
   "sector": "7.L Finance-adjacent, energy and utilities",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_order_tracking",
@@ -22,7 +22,17 @@
         "tool_words": []
       },
       "ask_first": "How many trucks run each day?",
-      "free_stops": "Route sheet design and summary format are in the solution document."
+      "free_stops": "Route sheet design and summary format are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count missed pickup complaints against that day's completed stops for one week, so you see which routes trigger the most disputes.",
+          "review": false
+        },
+        {
+          "text": "Give one dispatcher the job of marking every route sheet returned before closing time, so proof of visited stops is kept together.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_no_sop",
@@ -42,7 +52,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "Route set-up is in the solution document."
+      "free_stops": "Route set-up is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Walk one full route with the regular driver and note landmark turns and stop order, so the route can be covered when he is absent.",
+          "review": false
+        },
+        {
+          "text": "Keep each route's written stop order in one notebook kept with dispatch, so cover drivers can collect it before leaving.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_margin_unknown",
@@ -63,7 +83,17 @@
         "leads_with_view": true
       },
       "ask_first": "",
-      "free_stops": "Cost allocation is in the solution document."
+      "free_stops": "Cost allocation is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Write each truck's start and end fuel gauge against the route every day this week, so costly routes are easier to spot.",
+          "review": false
+        },
+        {
+          "text": "Make one person note fuel and route together at return time, so cost tracking happens daily without chasing drivers later.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_pricing_errors",
@@ -83,7 +113,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "Register and alert design are in the solution document."
+      "free_stops": "Register and alert design are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare skips currently out on sites with the hire notebook this week, so unbilled extra days are found before they pile up.",
+          "review": false
+        },
+        {
+          "text": "Give one clerk the job of reviewing all open skip hires every Friday, so overdue time gets noticed in time to bill.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_receivables_late",
@@ -103,7 +143,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "Reminder timing and wording are in the solution document."
+      "free_stops": "Reminder timing and wording are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count unpaid households by society at week end in one notebook, so you see where late payment is concentrated.",
+          "review": true
+        },
+        {
+          "text": "Give one collector the same follow up hour on the same day each week, so unpaid society accounts are chased routinely.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_deposit_delays",
@@ -123,7 +173,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "Matching rules are in the solution document; pi records the control gap, not names."
+      "free_stops": "Matching rules are in the solution document; pi records the control gap, not names.",
+      "extra_ideas": [
+        {
+          "text": "Compare each collector's cash noted received with cash handed in on the same day, so deposit delays are easy to spot.",
+          "review": false
+        },
+        {
+          "text": "Set one daily cash handover time with one receiving person and one notebook, so collections stop sitting overnight unofficially.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_maintenance_downtime",
@@ -143,7 +203,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "Reminder schedule is in the solution document; pi gives no vehicle safety advice."
+      "free_stops": "Reminder schedule is in the solution document; pi gives no vehicle safety advice.",
+      "extra_ideas": [
+        {
+          "text": "Note every missed area beside the truck that failed this month, so you see which vehicle causes the most disruption.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member the job of checking each truck's condition every return, so small faults get written down before areas are missed.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_info_lost_in_whatsapp",
@@ -163,7 +233,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "Ticket flow is in the solution document."
+      "free_stops": "Ticket flow is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count complaints by society and by time received for one week, so you see where messages escalate before your team notices.",
+          "review": false
+        },
+        {
+          "text": "Make one person responsible for checking complaint groups at fixed times daily, so issues are seen before they grow publicly.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_manual_reports",
@@ -183,7 +263,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "Report format is in the solution document."
+      "free_stops": "Report format is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Keep a simple daily count of pickups, misses and complaints by society, so month end reporting pulls from one running note.",
+          "review": false
+        },
+        {
+          "text": "Give one office person one notebook for all society service figures each day, so monthly reports stop being rebuilt from scattered papers.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p10_attendance_lateness",
@@ -203,7 +293,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "Board set-up is in the solution document; pi records no workers' personal details."
+      "free_stops": "Board set-up is in the solution document; pi records no workers' personal details.",
+      "extra_ideas": [
+        {
+          "text": "Mark expected and actual helpers per crew for one week in one notebook, so post Eid absence patterns are clear.",
+          "review": false
+        },
+        {
+          "text": "Make one supervisor responsible for confirming each crew the evening before, so morning departures are less disrupted.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p11_fraud",
@@ -223,7 +323,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "Log design is in the solution document."
+      "free_stops": "Log design is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note each recyclables load by material and estimated sack count before it leaves, so sale weights can be compared later.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of writing every recyclables sale in one ledger, so disputes over fair weight are easier to challenge.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

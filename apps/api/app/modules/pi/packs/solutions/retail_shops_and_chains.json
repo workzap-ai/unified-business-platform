@@ -2,7 +2,7 @@
   "industry": "retail_shops_and_chains",
   "name": "Retail shops and chains (general merchandise, multi-branch)",
   "sector": "7.A Retail and consumer (part 1)",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_footfall_low",
@@ -23,7 +23,17 @@
         "tool_words": []
       },
       "ask_first": "Is the drop at every branch or mainly one location?",
-      "free_stops": "Which messages, codes and timings per branch, and how visits are tracked back to them, are in the solution document."
+      "free_stops": "Which messages, codes and timings per branch, and how visits are tracked back to them, are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Walk each branch frontage at busy time and note blocked signs, dark spots or closed-looking areas, so fewer passersby assume you are shut.",
+          "review": false
+        },
+        {
+          "text": "Give one person per branch the job of checking entrance appearance before peak hours, so the shop looks open when people pass.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_conversion_low",
@@ -45,7 +55,17 @@
         "leads_with_view": true
       },
       "ask_first": "Do you have any count of how many people walk in each day?",
-      "free_stops": "How walk-ins and lost sales are captured at the counter and turned into the daily read is in the solution document."
+      "free_stops": "How walk-ins and lost sales are captured at the counter and turned into the daily read is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note the main item people ask for before leaving empty handed this week, so you spot what sends browsers back out.",
+          "review": false
+        },
+        {
+          "text": "Give one person each shift a single list for customer asks you could not serve, so missed demand reaches buying clearly.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_count_mismatch",
@@ -68,7 +88,17 @@
         ]
       },
       "ask_first": "Is the shortage mostly in certain types of maal?",
-      "free_stops": "Which categories to count on which days, and how gaps are flagged, are in the solution document."
+      "free_stops": "Which categories to count on which days, and how gaps are flagged, are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare shortages by category from the last few counts, so you see whether the main branch problem sits in one type.",
+          "review": false
+        },
+        {
+          "text": "Give one role the job of writing every return, damage and transfer on one page, so missing movements stop blurring counts.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_transfers_lost",
@@ -88,7 +118,17 @@
         "tool_words": []
       },
       "ask_first": "Do transfers go with a paper slip today, or only by phone?",
-      "free_stops": "The transfer steps, who confirms what and the alert timings are in the solution document."
+      "free_stops": "The transfer steps, who confirms what and the alert timings are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare dispatch notes with receiving notes for the last few branch transfers, so you see where handover details break.",
+          "review": false
+        },
+        {
+          "text": "Make the sender note branch, item and dispatch time in one transfer notebook, so warehouse and branch speak from the same record.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_stockout",
@@ -109,7 +149,17 @@
         "tool_words": []
       },
       "ask_first": "Is there a central godown, or does each branch buy for itself?",
-      "free_stops": "Reorder levels per item and branch, and how transfers are suggested, are in the solution document."
+      "free_stops": "Reorder levels per item and branch, and how transfers are suggested, are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Walk both branches and note the same fast movers missing here but piled there, so rebalancing opportunities stand out quickly.",
+          "review": false
+        },
+        {
+          "text": "Give one person the weekly job of comparing fast movers across branches, so stock moves before one side runs dry.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_overstock_dead_stock",
@@ -130,7 +180,17 @@
         "leads_with_view": true
       },
       "ask_first": "Are these items barcoded or recorded anywhere?",
-      "free_stops": "The ageing rules and how transfer suggestions are worked out are in the solution document."
+      "free_stops": "The ageing rules and how transfer suggestions are worked out are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Walk the dead stock room and note which categories take the most space, so the biggest blockage gets named clearly.",
+          "review": false
+        },
+        {
+          "text": "Give one person one notebook for dead stock moved out to branches or display, so this pile starts getting regular attention.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_cash_mismatch",
@@ -150,7 +210,17 @@
         "tool_words": []
       },
       "ask_first": "Is the gap usually the same branch or counter?",
-      "free_stops": "The closing steps, gap limits and deposit alerts are in the solution document."
+      "free_stops": "The closing steps, gap limits and deposit alerts are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare cash gaps by shift and day for one week, so you see when the mismatch usually starts.",
+          "review": false
+        },
+        {
+          "text": "Give one closing role one place to note cash received, paid out and handed over, so the count follows a clear trail.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_discount_abuse",
@@ -170,7 +240,17 @@
         "tool_words": []
       },
       "ask_first": "Does your POS record who applied each discount?",
-      "free_stops": "The approval rules, thresholds and exception alerts are in the solution document."
+      "free_stops": "The approval rules, thresholds and exception alerts are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note which branches and days show the most discounts this month, so the pattern is discussed without naming anyone.",
+          "review": false
+        },
+        {
+          "text": "Give one role per branch the job of writing every special discount reason in one register, so exceptions stop blending into routine selling.",
+          "review": true
+        }
+      ]
     },
     {
       "id": "p9_reports_late",
@@ -190,7 +270,17 @@
         "tool_words": []
       },
       "ask_first": "Do all branches use the same POS?",
-      "free_stops": "Which numbers go in the read and how they are pulled from each branch's system are in the solution document."
+      "free_stops": "Which numbers go in the read and how they are pulled from each branch's system are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note which parts of each branch report arrive late or missing this week, so the hold up is specific instead of general.",
+          "review": false
+        },
+        {
+          "text": "Set one fixed time daily for branch figures to be written in one shared format, so comparisons stop waiting a week.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p10_turnover",
@@ -211,7 +301,17 @@
         "tool_words": []
       },
       "ask_first": "Which role is hardest to keep filled?",
-      "free_stops": "The checklists and how missed items reach the area manager are in the solution document."
+      "free_stops": "The checklists and how missed items reach the area manager are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note which branch and shift each new cashier leaves from this month, so the churn pattern stops looking random.",
+          "review": false
+        },
+        {
+          "text": "Give one senior per branch the job of signing off cashier basics each evening, so training stays steady during frequent joining.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p11_no_online_ordering",
@@ -232,7 +332,17 @@
         "tool_words": []
       },
       "ask_first": "Which cities would you deliver to first?",
-      "free_stops": "How orders flow from each channel to the right branch and to delivery is in the solution document."
+      "free_stops": "How orders flow from each channel to the right branch and to delivery is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many people ask for delivery and which items they mention this week, so you know what demand sounds like.",
+          "review": false
+        },
+        {
+          "text": "Keep one notebook near the counter for delivery requests and missed orders, so staff stop losing these chances between shifts.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

@@ -2,7 +2,7 @@
   "industry": "hvac_ac_sales_installation_and_service",
   "name": "HVAC / AC sales, installation and service",
   "sector": "7.F Construction, real estate and facilities",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_chat_overload",
@@ -22,7 +22,17 @@
         "tool_words": []
       },
       "ask_first": "Roughly how many calls a day come in at peak?",
-      "free_stops": "Booking flow and overflow set-up are in the solution document."
+      "free_stops": "Booking flow and overflow set-up are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "For one busy day, note how many calls ring out before anyone answers, so you see the true size of peak-time overload.",
+          "review": false
+        },
+        {
+          "text": "Give one person the missed-call notebook at fixed call-back times, so enquiries stop disappearing during the June rush.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_orders_lost",
@@ -42,7 +52,17 @@
         "tool_words": []
       },
       "ask_first": "Who assigns jobs to technicians today?",
-      "free_stops": "Dispatch rules are in the solution document."
+      "free_stops": "Dispatch rules are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "For one week, count bookings written down against bookings given to a crew, so you see how many die in the diary.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member the evening assignment check, so every diary booking gets a named crew before closing.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_pricing_errors",
@@ -64,7 +84,17 @@
         ]
       },
       "ask_first": "Is there a fixed rate list today?",
-      "free_stops": "Rate card structure and approval limits are in the solution document."
+      "free_stops": "Rate card structure and approval limits are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "For one week, compare what each technician charged for similar gas and parts jobs, so inconsistent quoting stops surprising you.",
+          "review": false
+        },
+        {
+          "text": "Keep one handwritten price list by the dispatch desk, so technicians quote from one source instead of personal judgment.",
+          "review": true
+        }
+      ]
     },
     {
       "id": "p4_cash_mismatch",
@@ -84,7 +114,17 @@
         "tool_words": []
       },
       "ask_first": "How is cash handed back to the office?",
-      "free_stops": "Matching rules and variance flags are in the solution document."
+      "free_stops": "Matching rules and variance flags are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "For one week, compare each technician's finished jobs with cash handed in, so the mismatch shows by person and day.",
+          "review": false
+        },
+        {
+          "text": "Make one office person receive all technician cash before anyone leaves, so collections stop drifting between jobs and pockets.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_performance_unknown",
@@ -106,7 +146,17 @@
         ]
       },
       "ask_first": "How many technicians are out on a normal day?",
-      "free_stops": "App fields and reports are in the solution document."
+      "free_stops": "App fields and reports are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "For one week, note each technician's completed jobs by day, so you can see who is carrying the workload.",
+          "review": false
+        },
+        {
+          "text": "Give one office person the closing tally sheet each evening, so daily output is known before tomorrow's dispatch starts.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_rework",
@@ -126,7 +176,17 @@
         "tool_words": []
       },
       "ask_first": "How often do repeat calls come in?",
-      "free_stops": "Flag rules are in the solution document."
+      "free_stops": "Flag rules are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "For one week, count call-backs that come soon after a service visit, so repeat cooling complaints are measured not guessed.",
+          "review": false
+        },
+        {
+          "text": "Keep one notebook for all return visits at the office, so repeat jobs get discussed before the same technician is sent again.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_shrinkage_theft",
@@ -146,7 +206,17 @@
         "tool_words": []
       },
       "ask_first": "Which parts run out most often?",
-      "free_stops": "Issue and matching rules are in the solution document."
+      "free_stops": "Issue and matching rules are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "For one week, compare parts issued to each technician with parts mentioned on completed jobs, so missing stock is tied to routine not rumour.",
+          "review": false
+        },
+        {
+          "text": "Make one storekeeper hand out and note every part issue, so stock leaves through one pair of hands only.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_churn_subscription",
@@ -167,7 +237,17 @@
         "tool_words": []
       },
       "ask_first": "How many AMC customers do you have?",
-      "free_stops": "Visit scheduling and reminder timing are in the solution document."
+      "free_stops": "Visit scheduling and reminder timing are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "This week, count how many AMCs end this month against how many renewal calls were made, so silent lapses are no longer hidden.",
+          "review": false
+        },
+        {
+          "text": "Give one person the renewal notebook and one fixed calling time daily, so expiring AMCs are chased before they go cold.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_seasonal_dip",
@@ -187,7 +267,17 @@
         "tool_words": []
       },
       "ask_first": "What does the team do in quiet months?",
-      "free_stops": "Campaign timing and segmentation are in the solution document."
+      "free_stops": "Campaign timing and segmentation are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "This week, note which winter jobs customers already ask for, so you see what work still exists when cooling demand drops.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member the off-season work list and weekly follow-up time, so winter demand is pursued instead of waited for.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p10_reviews_bad",
@@ -207,7 +297,17 @@
         "tool_words": []
       },
       "ask_first": "Do customers get a time slot today?",
-      "free_stops": "Timing and message flow are in the solution document."
+      "free_stops": "Timing and message flow are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "For one week, count booked visits against crews that actually reached site, so missed attendance stops sounding like just unfair reviews.",
+          "review": false
+        },
+        {
+          "text": "Make one dispatcher own the daily arrival board, so every booked visit has a clear handover from booking to crew.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

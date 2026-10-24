@@ -2,7 +2,7 @@
   "industry": "hardware_paint_sanitary_and_building_materials_shops",
   "name": "Hardware, paint, sanitary and building-materials shops",
   "sector": "7.A Retail and consumer (part 2)",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_credit_customers",
@@ -22,7 +22,17 @@
         "tool_words": []
       },
       "ask_first": "Roughly how many contractors take regular udhaar?",
-      "free_stops": "limits, statement timing and reminder flow are kept for the solution document."
+      "free_stops": "limits, statement timing and reminder flow are kept for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many new udhaar sales went to customers already overdue this week, so you see how fast old balances are feeding growth.",
+          "review": false
+        },
+        {
+          "text": "Keep one khata notebook at one counter under one person's care, so every udhaar sale lands in the same place.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_cash_mismatch",
@@ -43,7 +53,17 @@
         "tool_words": []
       },
       "ask_first": "Is the khata kept in a register or on computer?",
-      "free_stops": "the counter entry and close steps go in the solution document."
+      "free_stops": "the counter entry and close steps go in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many credit sales left the shop before the khata entry was written on one busy shift, so missed entries have a real number.",
+          "review": true
+        },
+        {
+          "text": "Give the packer the job of holding every credit item at the exit until the khata note is done, so rush time stops leaking entries.",
+          "review": true
+        }
+      ]
     },
     {
       "id": "p3_pricing_errors",
@@ -63,7 +83,17 @@
         "tool_words": []
       },
       "ask_first": "How do new price lists reach your counter?",
-      "free_stops": "how price lists flow into billing is kept for the solution document."
+      "free_stops": "how price lists flow into billing is kept for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare today's quoted rates on a few fast-selling items with the latest company sheet, so you see where old prices still reach customers.",
+          "review": true
+        },
+        {
+          "text": "Set one fixed time each morning for one person to replace all counter rate sheets, so old quotes stop travelling through the day.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_no_visibility",
@@ -84,7 +114,17 @@
         "tool_words": []
       },
       "ask_first": "Roughly how many items do you keep?",
-      "free_stops": "the catalogue structure and reorder rules go in the solution document."
+      "free_stops": "the catalogue structure and reorder rules go in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Walk one aisle and note every item staff had to search for today, so the worst stock confusion spots stand out.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of returning loose items to one agreed shelf area before closing, so tomorrow starts with less hunting.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_rework",
@@ -104,7 +144,17 @@
         "tool_words": []
       },
       "ask_first": "How often does a shade get remixed?",
-      "free_stops": "the tinting log setup is kept for the solution document."
+      "free_stops": "the tinting log setup is kept for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count this week's remixes by shade complaint and note who mixed them, so the repeat pattern around tinting mistakes becomes visible.",
+          "review": false
+        },
+        {
+          "text": "Keep one notebook beside the tinting area for every remix note, so complaints and causes stay together for quick review.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_order_errors",
@@ -124,7 +174,17 @@
         "tool_words": []
       },
       "ask_first": "Do you use your own loaders or hired ones?",
-      "free_stops": "the delivery confirmation flow goes in the solution document."
+      "free_stops": "the delivery confirmation flow goes in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare one day's delivery notes with what drivers brought back as disputed shortages, so you see which orders create the most arguments.",
+          "review": false
+        },
+        {
+          "text": "Give one loader the job of reading quantities aloud during loading while one note stays with the driver, so handover is clearer.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_target_missed",
@@ -145,7 +205,17 @@
         "leads_with_view": true
       },
       "ask_first": "How many brand schemes are you working towards?",
-      "free_stops": "the tracker setup is kept for the solution document."
+      "free_stops": "the tracker setup is kept for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Write this month's scheme target beside sales already booked for that brand, so the shortfall is clear while time remains.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of updating one wall note every evening, so everyone sees progress before the month slips away.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_info_lost_in_whatsapp",
@@ -165,7 +235,17 @@
         "tool_words": []
       },
       "ask_first": "How many contractor orders come in a day?",
-      "free_stops": "the intake and confirmation flow go in the solution document."
+      "free_stops": "the intake and confirmation flow go in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many voice-note orders needed a follow-up call this week, so you see the workload created by missed details.",
+          "review": false
+        },
+        {
+          "text": "Give one person each shift the job of writing every voice-note order into one order notebook, so contractor requests stop getting buried.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_manual_work",
@@ -185,7 +265,17 @@
         "tool_words": []
       },
       "ask_first": "How many big quotes do you make in a month?",
-      "free_stops": "the quote builder design is kept for the solution document."
+      "free_stops": "the quote builder design is kept for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note which line items appear again and again across recent whole-house quotations, so the repeated writing work becomes obvious.",
+          "review": false
+        },
+        {
+          "text": "Keep one folder of recent house quotations at the quote desk, so staff start from similar jobs instead of blank pages each time.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p10_cash_flow_tight",
@@ -206,7 +296,17 @@
         "leads_with_view": true
       },
       "ask_first": "Roughly how much of your sales are on credit?",
-      "free_stops": "the cash-flow view setup goes in the solution document."
+      "free_stops": "the cash-flow view setup goes in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note each late supplier payment beside the customer amount still unpaid for that sale, so the pressure points become visible.",
+          "review": true
+        },
+        {
+          "text": "Give one staff member the job of updating one notebook of overdue customer balances every afternoon, so supplier promises rely on current facts.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

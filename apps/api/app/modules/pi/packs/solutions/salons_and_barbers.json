@@ -2,7 +2,7 @@
   "industry": "salons_and_barbers",
   "name": "Salons and barbers",
   "sector": "7.H Hospitality, events and personal services",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_booking_appointments",
@@ -22,7 +22,17 @@
         "tool_words": []
       },
       "ask_first": "How many stylists or chairs do you have?",
-      "free_stops": "Booking flow and reminder timing go in the solution document."
+      "free_stops": "Booking flow and reminder timing go in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many bookings arrived in chats but never reached the chair book this week, so you see where double-booking starts.",
+          "review": false
+        },
+        {
+          "text": "Make one staff member the only handover point from chats to the appointment book, so stylist slots stop being promised twice.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_conversion_low",
@@ -42,7 +52,17 @@
         "tool_words": []
       },
       "ask_first": "Do you take advances for any services?",
-      "free_stops": "Reminder and no-show rules are in the solution document."
+      "free_stops": "Reminder and no-show rules are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count Saturday bookings that missed their chair time and how long each chair stayed empty, so you see the real hit on busy hours.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of filling any freed Saturday chair from walk-ins or pending chats, so empty time gets used faster.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_commission_disputes",
@@ -63,7 +83,17 @@
         "leads_with_view": true
       },
       "ask_first": "Salary, commission, chair rent or a mix?",
-      "free_stops": "Commission logic and billing setup stay for the solution document."
+      "free_stops": "Commission logic and billing setup stay for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare one week's billed services by stylist with each stylist's own tally, so the disputed gap is clear before month-end.",
+          "review": false
+        },
+        {
+          "text": "Keep one commission notebook at the counter under one role, so every service is logged the same way all month.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_count_mismatch",
@@ -83,7 +113,17 @@
         "tool_words": []
       },
       "ask_first": "Which products go missing most?",
-      "free_stops": "Usage norms per service and alert rules are in the solution document."
+      "free_stops": "Usage norms per service and alert rules are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many colour and keratin services were billed this week beside packs opened, so unusual product use stands out quickly.",
+          "review": false
+        },
+        {
+          "text": "Make one person issue colour and keratin items from one shelf list, so product use matches billed services more closely.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_void_refund_abuse",
@@ -105,7 +145,17 @@
         ]
       },
       "ask_first": "Who does the billing at the counter?",
-      "free_stops": "Approval rules stay for the solution document."
+      "free_stops": "Approval rules stay for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note a few finished services from the floor and compare them with the bills made, so undercharging patterns become easier to spot.",
+          "review": false
+        },
+        {
+          "text": "Give one role the job of writing any changed price reason in one counter notebook, so cheaper billing stops slipping through quietly.",
+          "review": true
+        }
+      ]
     },
     {
       "id": "p6_cash_mismatch",
@@ -125,7 +175,17 @@
         "tool_words": []
       },
       "ask_first": "How many payment methods do you accept?",
-      "free_stops": "Cash-up steps are in the solution document."
+      "free_stops": "Cash-up steps are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare today's cash in hand with cash-marked services at closing, so the shift where money goes missing becomes visible.",
+          "review": false
+        },
+        {
+          "text": "Give one counter role the closing cash count in one notebook every day, so mismatches are caught before the next shift starts.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_order_errors",
@@ -146,7 +206,17 @@
         "tool_words": []
       },
       "ask_first": "How far ahead do brides book?",
-      "free_stops": "Register setup and trial flow go in the solution document."
+      "free_stops": "Register setup and trial flow go in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many bridal bookings share the same date or time in one week, so you see how often clashes are being accepted.",
+          "review": false
+        },
+        {
+          "text": "Give one person the bridal date book and advance notes, so all promises for event days pass through one check.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_repeat_low",
@@ -167,7 +237,17 @@
         "tool_words": []
       },
       "ask_first": "Do you keep any client list now?",
-      "free_stops": "Messaging plan and loyalty rules are in the solution document."
+      "free_stops": "Messaging plan and loyalty rules are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Mark this week's first-time clients in a notebook and check who returns within the same week, so the drop-off point is clearer.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member a fixed daily slot to review recent first-time visits, so return chances get attention while the visit is fresh.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_theft_internal",
@@ -187,7 +267,17 @@
         "tool_words": []
       },
       "ask_first": "Do you offer home service now?",
-      "free_stops": "Home-service flow stays for the solution document."
+      "free_stops": "Home-service flow stays for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note this week's client requests for home service beside bookings actually recorded, so private work leaking away is easier to size.",
+          "review": false
+        },
+        {
+          "text": "Make one person own all home service requests in one register, so private arrangements outside the salon become easier to notice.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p10_branch_comparison",
@@ -207,7 +297,17 @@
         "tool_words": []
       },
       "ask_first": "Do both branches bill the same way?",
-      "free_stops": "Which numbers and sources go in the solution document."
+      "free_stops": "Which numbers and sources go in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note each branch's chairs filled at the same busy hour for one week, so weaker demand shows by branch and timing.",
+          "review": false
+        },
+        {
+          "text": "Give one person a fixed evening call from both branches for the same daily figures, so comparisons stop changing by branch.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

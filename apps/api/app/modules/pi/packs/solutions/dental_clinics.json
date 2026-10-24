@@ -2,7 +2,7 @@
   "industry": "dental_clinics",
   "name": "Dental clinics",
   "sector": "7.I Health and care",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_conversion_low",
@@ -22,7 +22,17 @@
         "tool_words": []
       },
       "ask_first": "Which treatments are you quoting most, implants, braces or cosmetic work?",
-      "free_stops": "Follow-up timing and stages are set out in the solution document."
+      "free_stops": "Follow-up timing and stages are set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many treatment quotes from last week got no reply at all, so you see where follow-up is dropping away.",
+          "review": false
+        },
+        {
+          "text": "Give one staff role a fixed daily time to review unanswered quotes from agreed callbacks, so interested patients are not missed.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_capacity",
@@ -42,7 +52,17 @@
         "tool_words": []
       },
       "ask_first": "Are your dentists available in the mornings?",
-      "free_stops": "Slot lengths and waitlist rules are set in the solution document."
+      "free_stops": "Slot lengths and waitlist rules are set in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare one week of morning chair gaps with the evening waiting list, so the imbalance is clear in your own bookings.",
+          "review": false
+        },
+        {
+          "text": "Give reception one notebook page for same-week slot changes, so morning spaces can be filled before evenings get squeezed.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_receivables_late",
@@ -62,7 +82,17 @@
         "tool_words": []
       },
       "ask_first": "Do patients pay at the counter or by transfer?",
-      "free_stops": "Reminder timing and overdue steps are detailed in the solution document."
+      "free_stops": "Reminder timing and overdue steps are detailed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note which active instalment plans are already behind by stage of treatment, so you see where stoppages usually begin.",
+          "review": false
+        },
+        {
+          "text": "Give one staff role the weekly job of checking due instalments in one notebook, so missed payments get noticed earlier.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_order_tracking",
@@ -82,7 +112,17 @@
         "tool_words": []
       },
       "ask_first": "Do you use one dental lab or several?",
-      "free_stops": "The tracking fields and invoice match are set in the solution document."
+      "free_stops": "The tracking fields and invoice match are set in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many lab cases now have no clear status or due date, so you see the size of the tracking problem.",
+          "review": false
+        },
+        {
+          "text": "Give one staff role the job of updating one lab case list before closing, so every crown handover has one current record.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_commission_disputes",
@@ -103,7 +143,17 @@
         "leads_with_view": true
       },
       "ask_first": "Is commission on work done or fees collected?",
-      "free_stops": "How the rules are encoded stays for the solution document."
+      "free_stops": "How the rules are encoded stays for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "List this month's commission arguments by associate role and dispute reason, so you can spot which rule causes most friction.",
+          "review": false
+        },
+        {
+          "text": "Give one staff role the job of writing the monthly production figures in one notebook, so everyone checks the same source.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_repeat_low",
@@ -123,7 +173,17 @@
         "tool_words": []
       },
       "ask_first": "Are last-visit dates kept in software or on paper?",
-      "free_stops": "Recall intervals and message flow are set in the solution document."
+      "free_stops": "Recall intervals and message flow are set in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many check-up reminders were meant to go out this week but did not, so the missed recall workload is clear.",
+          "review": false
+        },
+        {
+          "text": "Give one staff role a fixed daily time and one notebook page for due reminders, so check-up recalls actually leave the clinic.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_lead_followup_slow",
@@ -143,7 +203,17 @@
         "tool_words": []
       },
       "ask_first": "Who answers the DMs at the moment?",
-      "free_stops": "Routing and tracking set-up is kept for the solution document."
+      "free_stops": "Routing and tracking set-up is kept for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note the arrival and reply times for recent social media messages, so you see when the longest waits are happening.",
+          "review": false
+        },
+        {
+          "text": "Give one staff role a written handover for unanswered incoming messages at shift change, so leads stop sitting between reception turns.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_discount_abuse",
@@ -163,7 +233,17 @@
         "tool_words": []
       },
       "ask_first": "Do both branches use the same price list now?",
-      "free_stops": "Approval levels and the close format are set in the solution document."
+      "free_stops": "Approval levels and the close format are set in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count each reduced price given at reception this week and note whether approval was recorded, so you see how often the rule is skipped.",
+          "review": true
+        },
+        {
+          "text": "Give one staff role the job of keeping one reception discount notebook, so reduced prices are reviewed from one place each day.",
+          "review": true
+        }
+      ]
     },
     {
       "id": "p9_serial_batch_tracking",
@@ -183,7 +263,17 @@
         "tool_words": []
       },
       "ask_first": "Who has access to implant stock today?",
-      "free_stops": "The register design and checks are in the solution document."
+      "free_stops": "The register design and checks are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count the implant components on hand and compare that with recent usage notes, so missing items or weak recording show up.",
+          "review": false
+        },
+        {
+          "text": "Give one staff role one notebook for every implant component taken from storage, so stock movement has a single written trail.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p10_record_keeping",

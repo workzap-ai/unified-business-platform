@@ -2,7 +2,7 @@
   "industry": "used_car_dealers",
   "name": "Used car dealers",
   "sector": "7.G Transport, mobility and aviation (part 2)",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_overstock_dead_stock",
@@ -23,7 +23,17 @@
         "tool_words": []
       },
       "ask_first": "Roughly how many cars are on the lot right now?",
-      "free_stops": "Ageing thresholds and the weekly review routine are in the solution document."
+      "free_stops": "Ageing thresholds and the weekly review routine are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Mark each standing car with the week it arrived and compare which bays hold the oldest stock, so stuck money gets yard space priority.",
+          "review": false
+        },
+        {
+          "text": "Give one person a fixed weekly walk of the oldest cars with a notebook, so ageing stock stops being ignored.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_margin_unknown",
@@ -44,7 +54,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The cost headings and how plot expenses are shared across cars are in the solution document."
+      "free_stops": "The cost headings and how plot expenses are shared across cars are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Write each car's repair, cleaning and commission costs on one page and compare them with the asking figure, so loss-makers show early.",
+          "review": false
+        },
+        {
+          "text": "Give one person one notebook page per car for every paid expense, so selling decisions use the full cost.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_record_keeping",
@@ -64,7 +84,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "Settlement rules and who sees what are in the solution document."
+      "free_stops": "Settlement rules and who sees what are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many cars have no single note of who added money and when, so the argument's size becomes visible.",
+          "review": false
+        },
+        {
+          "text": "Keep one notebook for partner money by car and write entries the same day, so both point to one timeline.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_marketplace_visibility",
@@ -86,7 +116,17 @@
         ]
       },
       "ask_first": "",
-      "free_stops": "Which platforms connect and how is covered in the solution document."
+      "free_stops": "Which platforms connect and how is covered in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Check your live adverts against cars still on the plot once this week, so sold units stop wasting buyer calls.",
+          "review": false
+        },
+        {
+          "text": "Give one person the sold-car removal list at closing time, so old adverts come down before fresh enquiries get confused.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_lead_followup_slow",
@@ -109,7 +149,17 @@
         ]
       },
       "ask_first": "",
-      "free_stops": "Follow-up timings and source tracking are in the solution document."
+      "free_stops": "Follow-up timings and source tracking are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count last week's missed callbacks by car requested and compare which models were ignored most, so sales effort goes where interest already exists.",
+          "review": true
+        },
+        {
+          "text": "Give one staff member one daily slot to ring back open enquiries from a single list, so prospects stop cooling off.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_order_errors",
@@ -130,7 +180,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "Hold rules and alerts are set in the solution document."
+      "free_stops": "Hold rules and alerts are set in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note every tokened car and compare it with cars still being shown to new buyers, so double promises are caught early.",
+          "review": false
+        },
+        {
+          "text": "Keep one hold list in one place and make one person update it when any token is taken, so the same car is not promised twice.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_handoffs",
@@ -150,7 +210,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "Workshop stages and alert timings are in the solution document."
+      "free_stops": "Workshop stages and alert timings are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Write down every car currently outside the plot and compare promised return days with today, so late workshop jobs are obvious.",
+          "review": false
+        },
+        {
+          "text": "Give one person the outbound car notebook and return check, so every workshop handoff has one owner to chase updates.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_cash_leakage",
@@ -170,7 +240,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The cash-up steps and approvals are in the solution document."
+      "free_stops": "The cash-up steps and approvals are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note each agreed cash amount for the day in one notebook and count how many are missing by closing, so weak spots stand out.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member the job of writing every agreed cash amount in the same notebook before handover, so plot disputes drop at day end.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_documentation",
@@ -190,7 +270,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The steps tracked per country are in the solution document."
+      "free_stops": "The steps tracked per country are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many sold cars are waiting on papers and note how long each file has been sitting, so the oldest backlog gets attention.",
+          "review": false
+        },
+        {
+          "text": "Keep all pending transfer files in one labelled stack with one owner for updates, so paperwork stops drifting between desks.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p10_wrong_location",
@@ -210,7 +300,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "How check-outs are recorded per role is in the solution document."
+      "free_stops": "How check-outs are recorded per role is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Walk the plot once and note any car parked away from its usual spot, so surprise moves stop eating selling time.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member the closing check of keys against parked cars, so missing keys are chased before everyone leaves.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

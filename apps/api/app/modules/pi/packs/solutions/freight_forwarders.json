@@ -2,7 +2,7 @@
   "industry": "freight_forwarders",
   "name": "Freight forwarders",
   "sector": "7.E Trade, distribution and logistics",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_bottleneck",
@@ -22,7 +22,17 @@
         "tool_words": []
       },
       "ask_first": "Which lanes make up most of your quote requests?",
-      "free_stops": "How rates are held and turned into quotes is designed in the solution document."
+      "free_stops": "How rates are held and turned into quotes is designed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note which lanes needed fresh rate chasing on recent urgent quotes, so you see where slow replies are hurting response time.",
+          "review": false
+        },
+        {
+          "text": "Keep one handwritten list of your busiest live rates near the quoting desk, so common enquiries get answered the same day.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_pricing_errors",
@@ -42,7 +52,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The alert and approval rules are set in the solution document."
+      "free_stops": "The alert and approval rules are set in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare this week's sent quotes against the latest carrier offers on hand, so you spot how often old rates are slipping out.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of crossing out expired rates in the shared file, so old prices stop reaching customers.",
+          "review": true
+        }
+      ]
     },
     {
       "id": "p3_lead_followup_slow",
@@ -62,7 +82,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "Follow-up timing and outcome tracking are in the solution document."
+      "free_stops": "Follow-up timing and outcome tracking are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count open quotes from this month with no follow up yet, so you see how much booked work is being left behind.",
+          "review": false
+        },
+        {
+          "text": "Set one fixed time each afternoon for one person to review open quotes, so customers hear back before they book elsewhere.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_order_tracking",
@@ -83,7 +113,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The milestones and message triggers are set in the solution document."
+      "free_stops": "The milestones and message triggers are set in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note how many calls today asked for container location updates, so you see which jobs are creating the most interruptions.",
+          "review": false
+        },
+        {
+          "text": "Keep one visible list of live shipments with latest status beside the ops desk, so anyone can answer routine location calls quickly.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_delivery_late",
@@ -103,7 +143,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "Where alerts come from and who gets them is designed in the solution document."
+      "free_stops": "Where alerts come from and who gets them is designed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare your booking notes with the latest sailing updates for this week's jobs, so late changes are spotted before customers hear elsewhere.",
+          "review": false
+        },
+        {
+          "text": "Give one person a set time to check booked sailings each day, so rollover news reaches customers before it turns into complaints.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_duplicate_entry",
@@ -123,7 +173,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "Which documents are filled, and from what, is mapped in the solution document."
+      "free_stops": "Which documents are filled, and from what, is mapped in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many times one shipment's core details are retyped across today's paperwork, so you see where admin time is leaking away.",
+          "review": false
+        },
+        {
+          "text": "Choose one master job sheet for shipment details, so staff copy from one source and typing mistakes reduce across documents.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_margin_unknown",
@@ -144,7 +204,17 @@
         "leads_with_view": true
       },
       "ask_first": "",
-      "free_stops": "How costs are captured per job is set out in the solution document."
+      "free_stops": "How costs are captured per job is set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare estimated job costs in your notebook with supplier bills that arrived this week, so margin surprises stop landing unseen.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of noting expected external charges on each live file, so weak margin jobs are noticed earlier.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_cash_flow_tight",
@@ -164,7 +234,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "Ageing and reminder rules are in the solution document."
+      "free_stops": "Ageing and reminder rules are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count shipments where line payment left before customer approval to invoice was logged, so you see where handover delay starts the squeeze.",
+          "review": true
+        },
+        {
+          "text": "Give one staff member one afternoon check of uninvoiced completed files in one notebook, so bills go out before line payment pressure builds.",
+          "review": true
+        }
+      ]
     },
     {
       "id": "p9_info_lost_in_whatsapp",
@@ -184,7 +264,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "How job history is captured is designed in the solution document."
+      "free_stops": "How job history is captured is designed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Walk through today's live shipments and note which ones only one ops person can answer, so the handover risk becomes visible.",
+          "review": false
+        },
+        {
+          "text": "Keep one paper handover sheet for every live job at the ops desk, so leave or absence no longer stalls customer updates.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p10_cost_overruns",
@@ -204,7 +294,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "Alert timing per container is set in the solution document."
+      "free_stops": "Alert timing per container is set in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many empties with customers are already past free time today, so you see where detention is draining margin.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member a daily empty return list by customer, so overdue boxes get chased before charges stack up.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p11_few_leads",
@@ -225,7 +325,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The site content and lead flow are planned in the solution document."
+      "free_stops": "The site content and lead flow are planned in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many quotes this month came from new companies versus old accounts, so you see how thin your new business flow is.",
+          "review": false
+        },
+        {
+          "text": "Give one person a weekly list of lapsed shippers to contact, so old relationships start feeding fresh enquiries again.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

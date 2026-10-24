@@ -2,7 +2,7 @@
   "industry": "fashion_and_apparel_brands",
   "name": "Fashion and apparel brands (pret, stitched, western wear)",
   "sector": "7.A Retail and consumer (part 1)",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_stockout",
@@ -27,7 +27,17 @@
         ]
       },
       "ask_first": "How do you decide the size split when you place an order?",
-      "free_stops": "How the size curve is worked out per category and how alerts trigger are in the solution document."
+      "free_stops": "How the size curve is worked out per category and how alerts trigger are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare launch-day sell-through by size across your last few pret articles, so the next cut better matches what actually moves.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member the job of logging every missed size request in one notebook, so replenishment follows real demand.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_no_visibility",
@@ -47,7 +57,17 @@
         "tool_words": []
       },
       "ask_first": "What do you use for the website and the store tills?",
-      "free_stops": "How the website and store tills are connected and buffers set is in the solution document."
+      "free_stops": "How the website and store tills are connected and buffers set is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Check a few fast-moving articles against outlet rail stock once, so you see which items are oversold online.",
+          "review": false
+        },
+        {
+          "text": "Set one fixed closing-time stock note from outlet to online team, so the last piece is less likely sold twice.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_supplier_late",
@@ -67,7 +87,17 @@
         "tool_words": []
       },
       "ask_first": "How many stitching vendors do you use?",
-      "free_stops": "The production stages, check-in points and alerts are in the solution document."
+      "free_stops": "The production stages, check-in points and alerts are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Walk through every launch article with promised handover dates noted together, so you see which pieces threaten the fixed launch.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of collecting each stitching vendor's in-progress count at a fixed time, so delays surface before handover.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_returns_rto",
@@ -88,7 +118,17 @@
         "tool_words": []
       },
       "ask_first": "Which couriers do you use?",
-      "free_stops": "Which orders get confirmed, how, and the RTO rules are in the solution document."
+      "free_stops": "Which orders get confirmed, how, and the RTO rules are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Sort recent COD returns by article, city and size once, so you spot where refusals are hitting hardest.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of marking every returned parcel reason in one list, so avoidable dispatch mistakes stop repeating.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_cod_remittance",
@@ -108,7 +148,17 @@
         "tool_words": []
       },
       "ask_first": "How do couriers send you their statements?",
-      "free_stops": "How statements are matched and gaps reported is in the solution document."
+      "free_stops": "How statements are matched and gaps reported is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count delivered parcels still missing courier proof slips from one recent dispatch batch, so the courier dispute is tied to specific shipments.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member one notebook for courier handovers and proof slips each evening, so missing parcel records stop delaying remittance follow-up.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_multi_channel_orders",
@@ -128,7 +178,17 @@
         "tool_words": []
       },
       "ask_first": "Which channel brings the most orders?",
-      "free_stops": "How each channel is pulled in and how packing and dispatch are tracked is in the solution document."
+      "free_stops": "How each channel is pulled in and how packing and dispatch are tracked is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many orders arrived from each channel during one busy day, so you see where duplicate handling starts.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of rewriting every order into one master list before packing, so dispatch works from one queue.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_after_sales",
@@ -148,7 +208,17 @@
         "tool_words": []
       },
       "ask_first": "How do customers ask for exchanges today?",
-      "free_stops": "The exchange steps and approval rules are in the solution document."
+      "free_stops": "The exchange steps and approval rules are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count open exchange requests sitting across recent messages once, so you see how big the after-sales backlog really is.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member one notebook for all exchange requests at a fixed check time, so customers stop being passed around.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_campaign_roi_unknown",
@@ -169,7 +239,17 @@
         "tool_words": []
       },
       "ask_first": "Where does most of your ad spend go?",
-      "free_stops": "Which codes per ad and influencer, how they're tracked and the daily report are in the solution document."
+      "free_stops": "Which codes per ad and influencer, how they're tracked and the daily report are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare order notes from each recent drop with the days your promotions ran, so you get a rough read on which launch drew attention.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of writing each order beside its drop name in one notebook, so popular launches stop being guessed later.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_branch_underperforming",
@@ -190,7 +270,17 @@
         "leads_with_view": true
       },
       "ask_first": "What do you think is different about that outlet?",
-      "free_stops": "Which numbers are compared and how footfall is captured is in the solution document."
+      "free_stops": "Which numbers are compared and how footfall is captured is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Walk the weak outlet and note missing sizes, slow rails and empty spots once, so the branch problem becomes visible.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of sending one same-time daily note from that outlet, so weak trading gets noticed early.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p10_margin_unknown",
@@ -210,7 +300,17 @@
         "tool_words": []
       },
       "ask_first": "Do you produce in-house or through vendors?",
-      "free_stops": "The costing structure and how it updates are in the solution document."
+      "free_stops": "The costing structure and how it updates are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Write one article's full cost from cutting to packing in your notebook, so pricing stops hiding weak pieces.",
+          "review": true
+        },
+        {
+          "text": "Give one person the job of noting every extra per-article cost in one notebook, so repeat misses stop leaking margin.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

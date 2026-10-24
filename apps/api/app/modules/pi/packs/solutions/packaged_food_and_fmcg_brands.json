@@ -2,7 +2,7 @@
   "industry": "packaged_food_and_fmcg_brands",
   "name": "Packaged food and FMCG brands",
   "sector": "7.B Food and beverage",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_no_dashboard",
@@ -25,7 +25,17 @@
         ]
       },
       "ask_first": "Do any distributors send secondary sales now?",
-      "free_stops": "The portal and data format distributors use are set out in the solution document."
+      "free_stops": "The portal and data format distributors use are set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare one distributor's sell-in with the same week's retailer reorders, so you see where stock is not moving onward.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member a weekly notebook for distributor stock and market offtake notes, so follow-up happens from one place.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_expiry_wastage",
@@ -45,7 +55,17 @@
         "tool_words": []
       },
       "ask_first": "Which SKUs return most?",
-      "free_stops": "The expiry tracking and action rules are detailed in the solution document."
+      "free_stops": "The expiry tracking and action rules are detailed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count returned expired cases by sku and by distributor for one recent cycle, so the worst repeat pockets stand out.",
+          "review": false
+        },
+        {
+          "text": "Make one person update a single near-expiry list every week, so stock gets discussed before it comes back.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_approvals_slow",
@@ -65,7 +85,17 @@
         "tool_words": []
       },
       "ask_first": "How long do claims usually take to settle?",
-      "free_stops": "The claim evidence rules and approval flow stay for the solution document."
+      "free_stops": "The claim evidence rules and approval flow stay for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare claimed scheme outlets with one sales beat's recent shop feedback, so you see whether the scheme reached retailers.",
+          "review": false
+        },
+        {
+          "text": "Give one person a fixed weekly hour to review open claims in one notebook, so approvals stop drifting between desks.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_performance_unknown",
@@ -87,7 +117,17 @@
         ]
       },
       "ask_first": "How do you know bookers visited their shops now?",
-      "free_stops": "The beat plan and check-in rules are in the solution document."
+      "free_stops": "The beat plan and check-in rules are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare each order booker's claimed shop calls with that day's actual orders from those shops, so fake visits show up fast.",
+          "review": false
+        },
+        {
+          "text": "Give one supervisor the daily job of noting missed shops in one place, so every handover starts with the same exceptions.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_forecasting",
@@ -108,7 +148,17 @@
         "leads_with_view": true
       },
       "ask_first": "How do you decide what to produce each week?",
-      "free_stops": "The planning logic is detailed in the solution document."
+      "free_stops": "The planning logic is detailed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare one recent production run by sku with the same period's market offtake and returns, so gut-feel planning gets challenged.",
+          "review": false
+        },
+        {
+          "text": "Give one planner a fixed weekly slot to update one sku shortage and surplus list, so production talks start from facts.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_raw_material_shortage",
@@ -128,7 +178,17 @@
         "tool_words": []
       },
       "ask_first": "Which material runs short most?",
-      "free_stops": "The reorder points per material stay for the solution document."
+      "free_stops": "The reorder points per material stay for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note which packaging items stopped the line in the past few weeks, so the repeat troublemakers are clear.",
+          "review": false
+        },
+        {
+          "text": "Give one store staff member one notebook for packaging lows checked at the same time daily, so reordering gets noticed earlier.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_margin_unknown",
@@ -149,7 +209,17 @@
         "leads_with_view": true
       },
       "ask_first": "Which SKUs do you think make the least?",
-      "free_stops": "The margin model is set out in the solution document."
+      "free_stops": "The margin model is set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare two high-volume skus after returns, freight and schemes from one recent period, so the weaker earner becomes obvious.",
+          "review": false
+        },
+        {
+          "text": "Give one person one page per sku to note all give-aways and returns weekly, so real profitability is reviewed consistently.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_receivables_late",
@@ -169,7 +239,17 @@
         "tool_words": []
       },
       "ask_first": "How long do supermarkets usually take to pay?",
-      "free_stops": "The tracking and dispute steps are in the solution document."
+      "free_stops": "The tracking and dispute steps are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare each supermarket's unpaid invoices with its return deductions for one recent period, so the biggest holdbacks are clear.",
+          "review": false
+        },
+        {
+          "text": "Give one person a fixed weekly slot to update one unpaid invoice list, so follow-up stays active with each account.",
+          "review": true
+        }
+      ]
     },
     {
       "id": "p9_serial_batch_tracking",
@@ -189,7 +269,17 @@
         "tool_words": []
       },
       "ask_first": "If a complaint comes in now, can you trace the batch?",
-      "free_stops": "The traceability set-up is detailed in the solution document."
+      "free_stops": "The traceability set-up is detailed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Check a few recent complaint packs against batch notes from that day, so missing line or shift details show immediately.",
+          "review": false
+        },
+        {
+          "text": "Give one shift lead the job of keeping batch, line and shift notes in one register, so complaints can be traced faster.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

@@ -2,7 +2,7 @@
   "industry": "pet_shops_and_pet_supplies",
   "name": "Pet shops and pet supplies",
   "sector": "7.A Retail and consumer (part 2)",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_stockout",
@@ -22,7 +22,17 @@
         "tool_words": []
       },
       "ask_first": "Is it mostly imported brands that run out?",
-      "free_stops": "reorder levels per brand are worked out in the solution document."
+      "free_stops": "reorder levels per brand are worked out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note every time a regular asks for a missing food brand this week, so you see which empty shelf sends loyal buyers elsewhere.",
+          "review": false
+        },
+        {
+          "text": "Give one person a single reorder page for regulars' food brands, so the fastest moving favourites are checked before they run out.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_repeat_low",
@@ -43,7 +53,17 @@
         "tool_words": []
       },
       "ask_first": "How do regulars reorder today?",
-      "free_stops": "reminder timing and reorder flow are kept for the solution document."
+      "free_stops": "reminder timing and reorder flow are kept for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare this week's repeat orders with last month's usual busy days, so you spot where missed reminders are losing routine monthly sales.",
+          "review": false
+        },
+        {
+          "text": "Give one person a fixed time each day to check the repeat order notebook, so monthly buyers are not missed when the shop gets busy.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_expiry_wastage",
@@ -63,7 +83,17 @@
         "tool_words": []
       },
       "ask_first": "Who checks expiry dates now?",
-      "free_stops": "alert timing is detailed in the solution document."
+      "free_stops": "alert timing is detailed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many food bags in the storeroom expire before the front shelf stock, so you see whether older stock is being stranded behind.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member the weekly storeroom expiry walk and one notebook page, so soon expiring bags get moved before they become waste.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_booking_appointments",
@@ -83,7 +113,17 @@
         "tool_words": []
       },
       "ask_first": "How are appointments booked today?",
-      "free_stops": "slot design and reminder flow go in the solution document."
+      "free_stops": "slot design and reminder flow go in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note each time two grooming bookings overlap this week, so you can see which services or staff create the clashes.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of writing every grooming booking in one diary, so double booking stops when messages come from different places.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_checklists_not_done",
@@ -103,7 +143,17 @@
         "tool_words": []
       },
       "ask_first": "Who looks after the animals each day?",
-      "free_stops": "the checklist and alert setup are kept for the solution document."
+      "free_stops": "the checklist and alert setup are kept for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count which tank cleaning and feeding tasks were skipped on staff off days this week, so the weakest cover points become visible.",
+          "review": false
+        },
+        {
+          "text": "Give one person each shift the care notebook handover, so tank cleaning and feeding still happen when the usual staff are away.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_delivery_cost",
@@ -124,7 +174,17 @@
         "tool_words": []
       },
       "ask_first": "Who delivers, your riders or a courier?",
-      "free_stops": "routing and delivery pricing rules go in the solution document."
+      "free_stops": "routing and delivery pricing rules go in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note which heavy litter deliveries needed separate trips this week, so you can see which orders eat time and fuel.",
+          "review": false
+        },
+        {
+          "text": "Give one person the daily delivery list in one notebook, so nearby heavy orders leave together instead of as costly extra runs.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_wastage_cost",
@@ -145,7 +205,17 @@
         "tool_words": []
       },
       "ask_first": "Do you sell live animals regularly?",
-      "free_stops": "the log and reporting design are kept for the solution document."
+      "free_stops": "the log and reporting design are kept for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Tally missing saleable stock in each cage and tank area at closing this week, so the worst loss point for margin shows.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member the closing stock loss note in one notebook every evening, so loss recording stays consistent across shifts.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_integration_marketplace",
@@ -154,8 +224,8 @@
       "category": "tech_systems",
       "subtype": "integration_marketplace",
       "quick_ideas": [
-        "Check your top items on each app once, because it shows how far they've drifted",
-        "Make one person own app stock, because otherwise nobody updates."
+        "Compare the shelf count with the listed count for your fastest selling pet items once, so you see how often shoppers meet wrong stock.",
+        "Give one person a fixed time to check listed stock against the shelf notebook, so online availability stays closer to what you can actually sell."
       ],
       "workzap_build": {
         "keys": [
@@ -165,7 +235,11 @@
         "tool_words": []
       },
       "ask_first": "Which apps do you sell on?",
-      "free_stops": "connections per app are detailed in the solution document."
+      "free_stops": "connections per app are detailed in the solution document.",
+      "quick_ideas_original": [
+        "Check your top items on each app once, because it shows how far they've drifted",
+        "Make one person own app stock, because otherwise nobody updates."
+      ]
     },
     {
       "id": "p9_import_delays",
@@ -186,7 +260,17 @@
         "leads_with_view": true
       },
       "ask_first": "Do you import directly or through distributors?",
-      "free_stops": "tracking setup is kept for the solution document."
+      "free_stops": "tracking setup is kept for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note which imported food lines customers asked for during empty shelf days, so you see which gaps are hurting regular demand most.",
+          "review": false
+        },
+        {
+          "text": "Give one person one page for expected imported food arrivals and shelf gaps, so staff stop guessing what is delayed and what is sold out.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p10_no_customer_data",
@@ -206,7 +290,17 @@
         "tool_words": []
       },
       "ask_first": "How many staff take orders on their own phones?",
-      "free_stops": "setup and consent flow go in the solution document."
+      "free_stops": "setup and consent flow go in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many repeat orders this week arrived through personal staff numbers, so you see how much customer follow up sits off shop records.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member a notebook beside the till for repeat order details, so the shop keeps the buying pattern when staff change.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

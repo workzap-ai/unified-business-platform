@@ -2,7 +2,7 @@
   "industry": "ground_handling_and_airport_services",
   "name": "Ground handling and airport services",
   "sector": "7.G Transport, mobility and aviation (part 1)",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_penalty_disputes",
@@ -23,7 +23,17 @@
         "tool_words": []
       },
       "ask_first": "Roughly how many penalties land in a typical month?",
-      "free_stops": "Which steps are timed and how the evidence pack is assembled is set out in the solution document."
+      "free_stops": "Which steps are timed and how the evidence pack is assembled is set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare deducted penalties against shifts with any written delay note this week, so weak cases are obvious before arguing.",
+          "review": false
+        },
+        {
+          "text": "Give one supervisor each shift the job of keeping a single delay log, so dispute files stop starting from scraps.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_unbilled_work",
@@ -44,7 +54,17 @@
         "tool_words": []
       },
       "ask_first": "Are your contracts per turnaround, per passenger or monthly fixed?",
-      "free_stops": "The matching rules per contract type are worked out in the solution document."
+      "free_stops": "The matching rules per contract type are worked out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare handled turnarounds from one busy week with draft invoice lines, so missed revenue shows up before billing goes out.",
+          "review": true
+        },
+        {
+          "text": "Give one billing checker a single notebook for extra services and night turnarounds, so fewer completed jobs miss the invoice.",
+          "review": true
+        }
+      ]
     },
     {
       "id": "p3_cash_flow_tight",
@@ -65,7 +85,17 @@
         "tool_words": []
       },
       "ask_first": "Which months feel tightest?",
-      "free_stops": "The reminder schedule and cash view are designed in the solution document."
+      "free_stops": "The reminder schedule and cash view are designed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note which airline payments arrived after payroll pressure last cycle, so the hardest gaps are clear before chasing starts.",
+          "review": false
+        },
+        {
+          "text": "Give one person a fixed weekly time to update one receivables list, so follow up happens before payroll stress peaks.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_shift_scheduling",
@@ -87,7 +117,17 @@
         ]
       },
       "ask_first": "How many staff are on the roster per station?",
-      "free_stops": "The swap and approval rules are set out in the solution document."
+      "free_stops": "The swap and approval rules are set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare the posted roster with actual attendance for one full week, so unapproved swaps stop hiding inside daily operations.",
+          "review": false
+        },
+        {
+          "text": "Give one supervisor the only paper roster to mark all approved swaps, so payroll and attendance use the same version.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_overtime",
@@ -108,7 +148,17 @@
         "tool_words": []
       },
       "ask_first": "Who approves overtime today?",
-      "free_stops": "Approval limits and the reporting view are worked out in the solution document."
+      "free_stops": "Approval limits and the reporting view are worked out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count which peak waves created the most overtime last week, so you know exactly when coverage breaks down.",
+          "review": false
+        },
+        {
+          "text": "Give one shift lead the job of keeping a single overtime list by wave, so extra hours stop appearing without ownership.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_maintenance_downtime",
@@ -129,7 +179,17 @@
         "tool_words": []
       },
       "ask_first": "Is your GSE owned or leased?",
-      "free_stops": "The daily check items and repair workflow are designed in the solution document."
+      "free_stops": "The daily check items and repair workflow are designed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note how many equipment faults were discovered only when a flight was due this week, so surprise downtime is measured clearly.",
+          "review": false
+        },
+        {
+          "text": "Give one person each shift one fault notebook for all equipment issues, so repairs are raised before operations get caught short.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_after_sales",
@@ -150,7 +210,17 @@
         "tool_words": []
       },
       "ask_first": "Who answers passengers when they call today?",
-      "free_stops": "The case stages and update points are set out in the solution document."
+      "free_stops": "The case stages and update points are set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many passenger calls this week were about the same open paper cases, so repeat chasing is easy to spot.",
+          "review": false
+        },
+        {
+          "text": "Give one role the job of updating one case list at a fixed time daily, so callers get a clearer progress answer.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_branch_comparison",
@@ -170,7 +240,17 @@
         "tool_words": []
       },
       "ask_first": "How many stations do you run?",
-      "free_stops": "The station measures and how they're calculated are designed in the solution document."
+      "free_stops": "The station measures and how they're calculated are designed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Lay each station's latest report side by side once, so missing items and unmatched definitions stand out immediately.",
+          "review": false
+        },
+        {
+          "text": "Give one head office role a single weekly report page for every station, so comparisons stop changing with each sender.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_orders_lost",
@@ -190,7 +270,17 @@
         "tool_words": []
       },
       "ask_first": "Which channel do most bookings come from?",
-      "free_stops": "How channels are pulled in and assigned is set out in the solution document."
+      "free_stops": "How channels are pulled in and assigned is set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count missed lounge and meet and assist bookings by source this week, so the leakiest handoff point stands out.",
+          "review": false
+        },
+        {
+          "text": "Give one role the job of maintaining one daily bookings page, so every request lands in the same place before service time.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p10_handoffs",
@@ -210,7 +300,17 @@
         "tool_words": []
       },
       "ask_first": "Where has something slipped between shifts before?",
-      "free_stops": "The handover fields and acknowledgement flow are designed in the solution document."
+      "free_stops": "The handover fields and acknowledgement flow are designed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many open issues from the last seven shifts were repeated after handover, so you see where follow through breaks.",
+          "review": false
+        },
+        {
+          "text": "Make one notebook the only handover place at shift change, so open issues stay visible across supervisors.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

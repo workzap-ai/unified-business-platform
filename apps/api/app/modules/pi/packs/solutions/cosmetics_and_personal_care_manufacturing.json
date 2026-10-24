@@ -2,7 +2,7 @@
   "industry": "cosmetics_and_personal_care_manufacturing",
   "name": "Cosmetics and personal-care manufacturing",
   "sector": "7.D Manufacturing and industry (part 2)",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_campaign_roi_unknown",
@@ -22,7 +22,17 @@
         "tool_words": []
       },
       "ask_first": "Roughly how many influencers do you work with in a month?",
-      "free_stops": "The code set-up and attribution rules are in the solution document."
+      "free_stops": "The code set-up and attribution rules are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note orders after each influencer post beside that influencer's name, so you see which shoutouts actually move your products.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member a weekly notebook page for influencer sends and resulting orders, so paid and gifted activity stops getting mixed up.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_returns_rto",
@@ -42,7 +52,17 @@
         "tool_words": []
       },
       "ask_first": "Which courier do most of your orders go through?",
-      "free_stops": "The confirmation flow and rules are in the solution document."
+      "free_stops": "The confirmation flow and rules are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count refused cash-on-delivery orders by area and order source for one dispatch week, so you spot where refusals are hurting most.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of marking every cash-on-delivery parcel confirmed or unconfirmed before handover, so fewer risky orders leave blindly.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_cod_remittance",
@@ -62,7 +82,17 @@
         "tool_words": []
       },
       "ask_first": "How many couriers do you use?",
-      "free_stops": "The matching logic is in the solution document."
+      "free_stops": "The matching logic is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare one courier payout against your dispatched orders for the same period, so missing cash collections stand out before the trail goes cold.",
+          "review": false
+        },
+        {
+          "text": "Keep one notebook page per courier for unpaid cash-on-delivery orders, so follow-up happens from one place at a fixed time.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_multi_channel_orders",
@@ -83,7 +113,17 @@
         "tool_words": []
       },
       "ask_first": "Which channel brings most orders?",
-      "free_stops": "The channel connections are in the solution document."
+      "free_stops": "The channel connections are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count orders received and parcels dispatched from each channel on the same day, so you can see where orders are slipping.",
+          "review": false
+        },
+        {
+          "text": "Set one daily handover time when all new orders are written into one notebook, so packing starts from a complete list.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_consistency_across_branches",
@@ -103,7 +143,17 @@
         "tool_words": []
       },
       "ask_first": "Is filling done in-house or outsourced?",
-      "free_stops": "The batch register fields are in the solution document."
+      "free_stops": "The batch register fields are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Line up recent complaints by batch note and product name, so you can see whether one run is driving the problem.",
+          "review": false
+        },
+        {
+          "text": "Give one person one shelf for keeping a labeled sample from each batch, so future complaints have something consistent to compare.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_minimum_orders",
@@ -123,7 +173,17 @@
         "tool_words": []
       },
       "ask_first": "Which packaging item causes the most trouble?",
-      "free_stops": "Cover and reorder levels are in the solution document."
+      "free_stops": "Cover and reorder levels are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note how many weeks each jar and bottle type has been sitting unused, so slow packaging becomes obvious before another purchase.",
+          "review": false
+        },
+        {
+          "text": "Give one person a single notebook list for packaging on hand and weekly usage, so buying stops reacting to guesswork.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_margin_unknown",
@@ -144,7 +204,17 @@
         "leads_with_view": true
       },
       "ask_first": "Are ads and returns included in your costing now?",
-      "free_stops": "The unit-economics model is in the solution document."
+      "free_stops": "The unit-economics model is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Write one product's packaging, delivery, returns and promotion costs beside its selling price, so thin-margin items stop hiding inside busy sales.",
+          "review": true
+        },
+        {
+          "text": "Give one person a weekly routine to update product cost notes in one notebook, so pricing decisions use the same basis each time.",
+          "review": true
+        }
+      ]
     },
     {
       "id": "p8_repeat_low",
@@ -164,7 +234,17 @@
         "tool_words": []
       },
       "ask_first": "Do you have customer numbers with permission to message?",
-      "free_stops": "Reminder timing and messages are in the solution document."
+      "free_stops": "Reminder timing and messages are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many orders this week came from returning buyers versus first-time buyers, so the reordering gap shows in your own numbers.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member a fixed weekly time to review past orders for repeat buying, so follow-up decisions come from a regular check.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_chat_overload",
@@ -184,7 +264,17 @@
         "tool_words": []
       },
       "ask_first": "Roughly how many messages come in a day?",
-      "free_stops": "The reply flows are in the solution document."
+      "free_stops": "The reply flows are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note the oldest unanswered message time at opening and closing this week, so you see when reply delays are worst.",
+          "review": false
+        },
+        {
+          "text": "Give one person each shift the handover for unanswered messages in one notebook, so incoming chats stop getting lost between staff.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

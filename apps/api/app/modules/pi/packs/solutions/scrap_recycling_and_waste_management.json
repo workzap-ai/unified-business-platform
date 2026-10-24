@@ -2,7 +2,7 @@
   "industry": "scrap_recycling_and_waste_management",
   "name": "Scrap, recycling and waste management",
   "sector": "7.E Trade, distribution and logistics",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_fraud",
@@ -22,7 +22,17 @@
         "tool_words": []
       },
       "ask_first": "Where is the weight written first — on a parchi, a register, or both?",
-      "free_stops": "The slip design and checks are set in the solution document."
+      "free_stops": "The slip design and checks are set in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare seller slip weights with the yard recheck weights for one shift, so any pattern around the kanta shows quickly.",
+          "review": false
+        },
+        {
+          "text": "Make one supervisor keep all weighment corrections in one notebook, so unusual changes stop slipping through casual talk.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_cash_mismatch",
@@ -42,7 +52,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The reconciliation steps are laid out in the solution document."
+      "free_stops": "The reconciliation steps are laid out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many intake loads were weighed and how many payouts were made in one day, so missing links stand out fast.",
+          "review": false
+        },
+        {
+          "text": "Give one cashier the job of keeping all payout slips in one place by shift, so yard weight and cash can be matched later.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_no_visibility",
@@ -62,7 +82,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "How stock by grade is kept current is designed in the solution document."
+      "free_stops": "How stock by grade is kept current is designed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Walk the yard and note each grade pile and its space used, so the biggest unknown stock area is clear.",
+          "review": false
+        },
+        {
+          "text": "Give one worker the job of updating one yard map when piles move, so each grade stays findable for buying and selling.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_theft_external",
@@ -82,7 +112,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The count routine is set in the solution document."
+      "free_stops": "The count routine is set in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note the opening and closing count of the highest value bundles this week, so the loss window becomes visible.",
+          "review": false
+        },
+        {
+          "text": "Give one shift lead the job of signing one bundle count sheet at handover, so missing copper or aluminium is pinned to a time.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_margin_unknown",
@@ -103,7 +143,17 @@
         "leads_with_view": true
       },
       "ask_first": "",
-      "free_stops": "How yield and margin are calculated is set in the solution document."
+      "free_stops": "How yield and margin are calculated is set in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note one sorted load's buying weight and sale weight by grade, so the worst sorting loss is clear in your own yard.",
+          "review": false
+        },
+        {
+          "text": "Give one sorter the job of writing rejected material in one notebook each day, so margin leaks by grade stop being guessed.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_inspection_missing",
@@ -123,7 +173,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "What is recorded per load is designed in the solution document."
+      "free_stops": "What is recorded per load is designed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare deduction reasons across recent mill loads, so the impurity or moisture complaint hurting you most is obvious.",
+          "review": false
+        },
+        {
+          "text": "Give one dispatch person the job of keeping one pre-dispatch check sheet with each load, so your side has a consistent record.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_receivables_late",
@@ -143,7 +203,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "Reminder timing is in the solution document."
+      "free_stops": "Reminder timing is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note which buyers paid on the promised day and which did not this week, so the slowest accounts are clear.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member the job of updating one buyer dues list every evening, so follow-up stops waiting for memory.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_order_tracking",
@@ -164,7 +234,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The register and schedule design are in the solution document."
+      "free_stops": "The register and schedule design are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many full skips were still waiting at day's end, so missed pickups are seen by site and route.",
+          "review": false
+        },
+        {
+          "text": "Give one dispatcher the job of keeping one live pickup list for all trucks, so full skips stop being forgotten between calls.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_manual_reports",
@@ -184,7 +264,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "What records are produced is set in the solution document."
+      "free_stops": "What records are produced is set in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare recent pickups against issued bills for one client, so unbilled collections are spotted before month end.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member the job of updating one client collection notebook daily, so billing and records are ready when clients ask.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p10_maintenance_downtime",
@@ -204,7 +294,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "Service intervals and reminders are set in the solution document."
+      "free_stops": "Service intervals and reminders are set in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note each stoppage this week with machine name and cause, so you see which breakdown steals the most yard time.",
+          "review": false
+        },
+        {
+          "text": "Give one operator the job of updating a single machine notebook daily, so repairs and service requests stop getting missed.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

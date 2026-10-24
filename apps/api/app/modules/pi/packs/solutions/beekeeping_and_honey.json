@@ -2,7 +2,7 @@
   "industry": "beekeeping_and_honey",
   "name": "Beekeeping and honey",
   "sector": "7.C Agriculture, livestock and rural (part 2)",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_complaints",
@@ -22,7 +22,17 @@
         "tool_words": []
       },
       "ask_first": "Do you have lab reports for any batches?",
-      "free_stops": "How batch pages are set up and what they show goes in the solution document."
+      "free_stops": "How batch pages are set up and what they show goes in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Lay out your current harvest notes, jar markings and source slips together, so you can see what proof is ready to show.",
+          "review": false
+        },
+        {
+          "text": "Keep all batch proof papers and harvest photos in one labelled folder near packing, so staff can answer real honey questions consistently.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_serial_batch_tracking",
@@ -42,7 +52,17 @@
         "tool_words": []
       },
       "ask_first": "Do you produce yourself, buy in, or both?",
-      "free_stops": "The batch log design is detailed in the solution document."
+      "free_stops": "The batch log design is detailed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Pick one filled jar today and trace it back using your current notes, so you see exactly where the record breaks.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of writing the same batch mark on jars and the matching notebook page, so every jar links back later.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_supplier_quality",
@@ -63,7 +83,17 @@
         "leads_with_view": true
       },
       "ask_first": "How many beekeepers do you buy from?",
-      "free_stops": "How sources are compared is kept for the solution document."
+      "free_stops": "How sources are compared is kept for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare the last few purchases side by side in your notebook, so you can spot which source brings the most price variation.",
+          "review": true
+        },
+        {
+          "text": "Keep one page per supplier for purchase notes and later issues, so buying decisions stop being rebuilt each time.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_margin_unknown",
@@ -84,7 +114,17 @@
         "leads_with_view": true
       },
       "ask_first": "Do you migrate hives?",
-      "free_stops": "Which costs are included and how is part of the solution document."
+      "free_stops": "Which costs are included and how is part of the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Put last season's transport, migration and labour notes on one table and compare them with harvested kilos, so your true cost gap appears.",
+          "review": false
+        },
+        {
+          "text": "Give one person one notebook page for each trip and work period, so season costs are captured while they still are fresh.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_count_mismatch",
@@ -104,7 +144,17 @@
         "tool_words": []
       },
       "ask_first": "Roughly how many hives do you run?",
-      "free_stops": "How counts and moves are logged goes in the solution document."
+      "free_stops": "How counts and moves are logged goes in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Walk one field location with the paper count in hand and note every mismatch, so you see how large the count problem is.",
+          "review": false
+        },
+        {
+          "text": "Make one person responsible for updating the site notebook after each move, so the field count and paper count stay aligned.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_stockout",
@@ -124,7 +174,17 @@
         "tool_words": []
       },
       "ask_first": "Who supplies your jars and labels?",
-      "free_stops": "Reorder levels are set out in the solution document."
+      "free_stops": "Reorder levels are set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count empty jars, lids and labels together this week and compare them with recent packing days, so the shortage risk is clearer.",
+          "review": false
+        },
+        {
+          "text": "Give one person a single stock page near packing to update after each batch, so Ramadan supplies stop surprising the team.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_multi_channel_orders",
@@ -144,7 +204,17 @@
         "tool_words": []
       },
       "ask_first": "Which channel brings the most orders?",
-      "free_stops": "How channels feed one inbox is detailed in the solution document."
+      "free_stops": "How channels feed one inbox is detailed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many orders from each message place needed a follow up last week, so the messiest source stands out.",
+          "review": false
+        },
+        {
+          "text": "Assign one person to rewrite every order into one notebook before packing time, so missed and duplicated orders drop.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_cod_remittance",
@@ -164,7 +234,17 @@
         "tool_words": []
       },
       "ask_first": "Do you use one courier or several?",
-      "free_stops": "How COD is matched goes in the solution document."
+      "free_stops": "How COD is matched goes in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare delivered orders against money received for the same period, so you can see which courier balances are trailing.",
+          "review": false
+        },
+        {
+          "text": "Give one person a fixed weekly time to check delivered COD orders against receipts, so late remittances get noticed earlier.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_campaign_roi_unknown",
@@ -184,7 +264,17 @@
         "tool_words": []
       },
       "ask_first": "Where do you advertise now?",
-      "free_stops": "How codes are set up across your channels is part of the solution document."
+      "free_stops": "How codes are set up across your channels is part of the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count new buyers by where they said they found you over one week, so the strongest source starts to stand out.",
+          "review": false
+        },
+        {
+          "text": "Keep one notebook beside order taking for buyer source notes, so the team records the same detail every time.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p10_repeat_low",
@@ -204,7 +294,17 @@
         "tool_words": []
       },
       "ask_first": "How do you stay in touch with past buyers now?",
-      "free_stops": "Message timing and content are kept for the solution document."
+      "free_stops": "Message timing and content are kept for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many jars each buyer takes when they return versus their first purchase, so the repeat buying pattern becomes visible.",
+          "review": false
+        },
+        {
+          "text": "Give one person a weekly notebook page for sold out honey types, so returning buyers hear about restocks sooner.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

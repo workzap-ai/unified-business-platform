@@ -2,7 +2,7 @@
   "industry": "beef_cattle_fattening_and_feedlots",
   "name": "Beef cattle fattening and feedlots",
   "sector": "7.C Agriculture, livestock and rural (part 1)",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_price_comparison",
@@ -22,7 +22,17 @@
         "tool_words": []
       },
       "ask_first": "Is there a scale you can use when buying today?",
-      "free_stops": "How purchases are matched to sales and compared by source goes in the solution document."
+      "free_stops": "How purchases are matched to sales and compared by source goes in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare what you paid per calf at the mandi with what similar calves fetched last trip, so overpaying stands out before buying again.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of carrying one buying notebook at the mandi, so each calf's seller and price stay together.",
+          "review": true
+        }
+      ]
     },
     {
       "id": "p2_no_weight_tracking",
@@ -42,7 +52,17 @@
         "tool_words": []
       },
       "ask_first": "Do you have a scale at the farm?",
-      "free_stops": "The weigh-day routine and how targets are flagged are set out in the solution document."
+      "free_stops": "The weigh-day routine and how targets are flagged are set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note which pens have not had any animals weighed this week, so you can see where follow up is missing.",
+          "review": false
+        },
+        {
+          "text": "Give one worker one fixed weigh day and one notebook page per pen, so gains stop getting missed between rounds.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_hidden_costs",
@@ -63,7 +83,17 @@
         "leads_with_view": true
       },
       "ask_first": "Is each batch's money kept separate, or mixed with general farm spending?",
-      "free_stops": "Which costs are included and how they're spread per head is worked out in the solution document."
+      "free_stops": "Which costs are included and how they're spread per head is worked out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "List every batch expense named after sale day in one notebook, so the real cost of that batch stops surprising you.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of collecting transport, labour and death notes into one batch file, so profit talks use the same numbers.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_theft_internal",
@@ -83,7 +113,17 @@
         "tool_words": []
       },
       "ask_first": "Who has access to the feed store?",
-      "free_stops": "The store log and gap rules stay in the solution document."
+      "free_stops": "The store log and gap rules stay in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare bags issued from the store with pens fed that day, so unusual feed loss stands out quickly.",
+          "review": false
+        },
+        {
+          "text": "Give one worker the bag issue notebook and one worker the store key, so feed leaving the store gets noticed early.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_credit_customers",
@@ -103,7 +143,17 @@
         "tool_words": []
       },
       "ask_first": "How many butchers buy on credit regularly?",
-      "free_stops": "Reminder timing and credit-limit rules go in the solution document."
+      "free_stops": "Reminder timing and credit-limit rules go in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many animals each butcher still owes money on, so you can see whose balance is stretching too far.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of updating one credit notebook after every payment, so collection follow up stays clear and timely.",
+          "review": true
+        }
+      ]
     },
     {
       "id": "p6_booking_no_show",
@@ -123,7 +173,17 @@
         "tool_words": []
       },
       "ask_first": "Are bookings taken only in person, or on WhatsApp too?",
-      "free_stops": "The booking terms and reminder sequence are set out in the solution document."
+      "free_stops": "The booking terms and reminder sequence are set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many booked animals were still unsold by evening after Eid delivery times, so the no show problem has a clear size.",
+          "review": false
+        },
+        {
+          "text": "Give one worker the booking notebook and slot handover each day, so customer promises and pen planning stay aligned.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_partner_accounting",
@@ -144,7 +204,17 @@
         "leads_with_view": true
       },
       "ask_first": "Is the profit split agreed in writing today?",
-      "free_stops": "The statement layout and share calculation go in the solution document."
+      "free_stops": "The statement layout and share calculation go in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count every partner cash and cattle entry in the batch notebook against sale and cost notes, so arguments focus on missing records.",
+          "review": false
+        },
+        {
+          "text": "Give one person the weekly partner update from one notebook after market day, so everyone hears the same batch figures together.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_theft_external",
@@ -164,7 +234,17 @@
         "tool_words": []
       },
       "ask_first": "Who stays with the animals at night now?",
-      "free_stops": "Check-in times and alert routing are detailed in the solution document."
+      "free_stops": "Check-in times and alert routing are detailed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Write down dusk and dawn headcounts for each pen this week, so you can spot where losses are happening.",
+          "review": false
+        },
+        {
+          "text": "Give one night worker the job of handing over one written headcount at sunrise, so missing animals are noticed without delay.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_seasonal_planning",
@@ -185,7 +265,17 @@
         "leads_with_view": true
       },
       "ask_first": "Is it cash or buyers that holds back a second batch?",
-      "free_stops": "How the planner uses past batches is worked out in the solution document."
+      "free_stops": "How the planner uses past batches is worked out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many pens stayed empty after Eid last season, so the cost of idle space is clear before the next cycle.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of keeping one list of off season buyer calls and walk ins, so quieter month demand stops being guessed.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p10_info_lost_in_whatsapp",
@@ -206,7 +296,17 @@
         "leads_with_view": true
       },
       "ask_first": "How many sites or pens does the manager report on?",
-      "free_stops": "What goes into the morning read and how it's collected stays in the solution document."
+      "free_stops": "What goes into the morning read and how it's collected stays in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many manager voice notes you replay each evening, so you can see how much time updates are wasting.",
+          "review": false
+        },
+        {
+          "text": "Give one worker the job of writing each day's animal arrivals, deaths and sales in one notebook, so updates stay clear for everyone.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

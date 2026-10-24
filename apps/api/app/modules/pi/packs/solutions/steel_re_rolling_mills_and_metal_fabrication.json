@@ -2,7 +2,7 @@
   "industry": "steel_re_rolling_mills_and_metal_fabrication",
   "name": "Steel, re-rolling mills and metal fabrication",
   "sector": "7.D Manufacturing and industry (part 2)",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_order_errors",
@@ -22,7 +22,17 @@
         "tool_words": []
       },
       "ask_first": "Do you have your own weighbridge or use an outside kanta?",
-      "free_stops": "How readings are captured and matched is in the solution document."
+      "free_stops": "How readings are captured and matched is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note your kanta weight and the customer's kanta weight for each truck this week, so the mismatch pattern by route or party stands out.",
+          "review": false
+        },
+        {
+          "text": "Give one dispatch person the job of writing both weights on each delivery note, so disputes stop bouncing between yard and sales.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_wastage_cost",
@@ -43,7 +53,17 @@
         "leads_with_view": true
       },
       "ask_first": "Is burning loss recorded per heat or per day now?",
-      "free_stops": "The yield calculation and alert levels are in the solution document."
+      "free_stops": "The yield calculation and alert levels are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare scrap charged and finished output for each heat in one week, so the heats with unusual burning loss stand out clearly.",
+          "review": false
+        },
+        {
+          "text": "Give one furnace record keeper one page for every heat's charge and output, so loss tracking stops breaking across loose slips.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_price_increases_supplier",
@@ -63,7 +83,17 @@
         "tool_words": []
       },
       "ask_first": "How often do you book at a fixed rate in advance?",
-      "free_stops": "Booking rules and exposure limits are in the solution document."
+      "free_stops": "Booking rules and exposure limits are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare each old-rate booking with the latest mill purchase rate in one notebook, so you spot which promised jobs now squeeze cash.",
+          "review": false
+        },
+        {
+          "text": "Keep one open-booking page beside dispatch papers and give one clerk the daily update, so expired price promises stop slipping into production.",
+          "review": true
+        }
+      ]
     },
     {
       "id": "p4_credit_customers",
@@ -83,7 +113,17 @@
         "tool_words": []
       },
       "ask_first": "What's the oldest balance you're chasing?",
-      "free_stops": "Limit rules and reminder timing are in the solution document."
+      "free_stops": "Limit rules and reminder timing are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note which dealers took fresh tonnage while their oldest invoice stayed unpaid this week, so you see whose dispatches are stretching your cash cycle.",
+          "review": true
+        },
+        {
+          "text": "Give one dispatch-side person one shared dues list to check at booking time, so sales promises and outstanding balances stop drifting apart.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_branches_not_aligned",
@@ -103,7 +143,17 @@
         "tool_words": []
       },
       "ask_first": "How do you share the day's rate today?",
-      "free_stops": "The approval and broadcast set-up is in the solution document."
+      "free_stops": "The approval and broadcast set-up is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note the rate each caller receives from different sales staff on the same day, so you can see where the quote mismatch starts.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of writing the day's rate in one shared place each morning, so every branch quotes the same number.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_count_mismatch",
@@ -123,7 +173,17 @@
         "tool_words": []
       },
       "ask_first": "How often is the yard physically counted now?",
-      "free_stops": "Count routine and gate rules are in the solution document."
+      "free_stops": "Count routine and gate rules are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Walk the scrap yard once and note rough piles by type and outgoing trucks by night, so unusual stock movement has a visible baseline.",
+          "review": false
+        },
+        {
+          "text": "Give one gate person one notebook for every outgoing load after dark, so missing material is tied to a single nightly record.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_bottleneck",
@@ -143,7 +203,17 @@
         "tool_words": []
       },
       "ask_first": "Where do jobs usually get delayed?",
-      "free_stops": "Stage set-up and site sign-off flow are in the solution document."
+      "free_stops": "Stage set-up and site sign-off flow are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note each open fabrication job under its current stage on one wall sheet, so the queue causing late finishes becomes visible.",
+          "review": false
+        },
+        {
+          "text": "Give one floor supervisor the job of updating job stage at the same time daily, so handovers stop losing where work is stuck.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_cost_overruns",
@@ -163,7 +233,17 @@
         "tool_words": []
       },
       "ask_first": "Do you work to client drawings or your own?",
-      "free_stops": "Costing method and change-order terms are in the solution document."
+      "free_stops": "Costing method and change-order terms are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare quoted steel, labour time and rework notes against finished jobs this week, so the part of the estimate that misses most stands out.",
+          "review": false
+        },
+        {
+          "text": "Give one estimator one notebook for quote assumptions and later actuals on each job, so repeat underquoting stops hiding inside experience.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_commission_disputes",
@@ -183,7 +263,17 @@
         "tool_words": []
       },
       "ask_first": "Who records output on the floor now?",
-      "free_stops": "The output-log set-up is in the solution document."
+      "free_stops": "The output-log set-up is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count finished pieces by worker role at shift end for one week, so the dispute size and timing become clear before payday.",
+          "review": false
+        },
+        {
+          "text": "Give one supervisor one tally page kept beside production for every shift, so piece counts are settled from one shared record.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p10_reports_late",
@@ -203,7 +293,17 @@
         "tool_words": []
       },
       "ask_first": "Who prepares production figures today?",
-      "free_stops": "How the estimate is calculated is in the solution document."
+      "free_stops": "How the estimate is calculated is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Write yesterday's scrap used, power run, output and labour shift count in one notebook each evening, so cost drift shows before month end.",
+          "review": false
+        },
+        {
+          "text": "Make one shift clerk update the same cost notebook at a fixed closing time daily, so the accountant gets clean figures without chasing.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

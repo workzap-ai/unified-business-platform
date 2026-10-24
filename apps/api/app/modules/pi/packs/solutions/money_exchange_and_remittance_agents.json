@@ -2,7 +2,7 @@
   "industry": "money_exchange_and_remittance_agents",
   "name": "Money exchange and remittance agents",
   "sector": "7.L Finance-adjacent, energy and utilities",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_cash_mismatch",
@@ -22,7 +22,17 @@
         "tool_words": []
       },
       "ask_first": "How many counters run in a normal shift?",
-      "free_stops": "The closing sheet layout and variance rules are in the solution document."
+      "free_stops": "The closing sheet layout and variance rules are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note which count point holds the difference each evening, so you see whether the delay starts in notes, slips or handover.",
+          "review": false
+        },
+        {
+          "text": "Give one closer the job of writing all count totals in one notebook, so the search starts from one clear record.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_cash_leakage",
@@ -42,7 +52,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "Handover steps and sign-off rules are covered in the solution document; pi records the control gap, never names staff."
+      "free_stops": "Handover steps and sign-off rules are covered in the solution document; pi records the control gap, never names staff.",
+      "extra_ideas": [
+        {
+          "text": "Compare shortages by shift and counter for one week, so you see whether one routine or one slot drives the problem.",
+          "review": false
+        },
+        {
+          "text": "Keep one shortage log in the branch office and give one supervisor the update job, so every incident lands in the same place.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_cash_handling_risk",
@@ -65,7 +85,17 @@
         "leads_with_view": true
       },
       "ask_first": "",
-      "free_stops": "How the ceiling is tracked and reported is in the solution document; pi does not record vault or movement details."
+      "free_stops": "How the ceiling is tracked and reported is in the solution document; pi does not record vault or movement details.",
+      "extra_ideas": [
+        {
+          "text": "Note each evening which counter, payout window, or busy hour leaves the largest leftover cash pile, so the pressure point shows.",
+          "review": false
+        },
+        {
+          "text": "Give one closing supervisor the notebook for end-of-day cash concerns at one fixed handover time, so overnight worries get tracked consistently.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_stockout",
@@ -85,7 +115,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "Alert levels and how counts feed the tracker are in the solution document."
+      "free_stops": "Alert levels and how counts feed the tracker are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note the time and currency of each turned away request this week, so you see which shortages hit service most often.",
+          "review": false
+        },
+        {
+          "text": "Give one counter lead the midday cash check job and keep the shortage list in one notebook, so refill requests stop being ad hoc.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_transfers_lost",
@@ -105,7 +145,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "Confirmation steps and exception rules are detailed in the solution document."
+      "free_stops": "Confirmation steps and exception rules are detailed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare the counted bundle totals at send and receive for each branch movement this week, so you see where errors enter the chain.",
+          "review": false
+        },
+        {
+          "text": "Keep one branch movement notebook beside the counter and give one sender the writing job, so each handover has one source record.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_capacity",
@@ -125,7 +175,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "How tallies turn into a roster is in the solution document."
+      "free_stops": "How tallies turn into a roster is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Tally walkouts by hour on the busiest days this week, so you see exactly when lost customers are highest.",
+          "review": false
+        },
+        {
+          "text": "Give one person the break board job before peak days, so counter cover is planned around the rush.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_whatsapp_overload",
@@ -145,7 +205,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The reply flow and wording are in the solution document."
+      "free_stops": "The reply flow and wording are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count status calls and messages by hour for one week, so you see when counter work gets interrupted most.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member each shift the job of handling status chasers, so counter staff can stay on live customers.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_manual_reports",
@@ -165,7 +235,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "Report mapping and formats go in the solution document."
+      "free_stops": "Report mapping and formats go in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note each figure staff must hunt for during report time this week, so the slowest parts of reporting stand out.",
+          "review": false
+        },
+        {
+          "text": "Keep one report prep sheet in one place and give one person the update job through the day, so report time stops starting from scratch.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_pricing_errors",
@@ -185,7 +265,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The checklist steps are in the solution document; pi never discusses the rates themselves."
+      "free_stops": "The checklist steps are in the solution document; pi never discusses the rates themselves.",
+      "extra_ideas": [
+        {
+          "text": "Note the minutes between a board change notice and the counter update each time, so late updates can be traced to a branch routine.",
+          "review": false
+        },
+        {
+          "text": "Keep one board change log at the counter and give one named shift lead the signoff job, so old board use stops being assumed away.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p10_turnover",
@@ -205,7 +295,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The checklist content and incident categories are in the solution document."
+      "free_stops": "The checklist content and incident categories are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note every new staff mistake by task for one week, so training time goes to the errors hurting counters most.",
+          "review": false
+        },
+        {
+          "text": "Keep one handwritten training notebook at the branch and give one senior the update job, so new joiners learn the same routine each time.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

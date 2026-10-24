@@ -2,7 +2,7 @@
   "industry": "sports_goods_and_fitness_equipment_retail",
   "name": "Sports goods and fitness equipment retail",
   "sector": "7.A Retail and consumer (part 2)",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_order_errors",
@@ -23,7 +23,17 @@
         "tool_words": []
       },
       "ask_first": "How many team orders come in a month?",
-      "free_stops": "the order form and proof-approval flow are kept for the solution document."
+      "free_stops": "the order form and proof-approval flow are kept for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many team kit print mistakes came from chat screenshots versus typed lists this week, so the real source stands out.",
+          "review": false
+        },
+        {
+          "text": "Make one staff member keep one final print list for each team order, so old chat versions stop causing misprints.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_stockout",
@@ -43,7 +53,17 @@
         "tool_words": []
       },
       "ask_first": "How do you track sizes today?",
-      "free_stops": "the size curve and reorder rules go in the solution document."
+      "free_stops": "the size curve and reorder rules go in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how often middle shoe and jersey sizes are asked for after they are gone this week, so missed sales are clearer.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of noting middle size stock on one daily list, so reordering happens before shelves empty.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_delivery_late",
@@ -64,7 +84,17 @@
         "tool_words": []
       },
       "ask_first": "Who delivers and installs, your own team or outside?",
-      "free_stops": "scheduling rules and the sign-off flow are kept for the solution document."
+      "free_stops": "scheduling rules and the sign-off flow are kept for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare the promised date and actual visit date for each pending treadmill job this week, so late handovers are easy to spot.",
+          "review": false
+        },
+        {
+          "text": "Give one person one delivery diary page for all treadmill bookings and completed visits, so installers and shop staff stay aligned.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_after_sales",
@@ -84,7 +114,17 @@
         "tool_words": []
       },
       "ask_first": "Do you handle repairs or send them to the brand?",
-      "free_stops": "the service flow and claim tracking are detailed in the solution document."
+      "free_stops": "the service flow and claim tracking are detailed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many broken machine calls are still open from last week, so the service backlog becomes visible.",
+          "review": false
+        },
+        {
+          "text": "Give one person one notebook page for every broken machine call and service request, so callbacks stop getting lost.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_maintenance_downtime",
@@ -105,7 +145,17 @@
         "tool_words": []
       },
       "ask_first": "How many gyms are on AMC?",
-      "free_stops": "the visit planning setup is kept for the solution document."
+      "free_stops": "the visit planning setup is kept for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note each gym that called under contract and compare it with your last visit notes, so overdue sites are easier to see.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member one page for contract visits and last visit dates, so incoming calls get answered with certainty.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_credit_customers",
@@ -125,7 +175,17 @@
         "tool_words": []
       },
       "ask_first": "How long do they usually take to pay?",
-      "free_stops": "limits and reminder timing go in the solution document."
+      "free_stops": "limits and reminder timing go in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many school and academy invoice files are missing a recent payment note, so handover work for collections becomes clearer.",
+          "review": true
+        },
+        {
+          "text": "Give one staff member one notebook for promised payment dates from schools and academies, so follow up calls happen at the same time each day.",
+          "review": true
+        }
+      ]
     },
     {
       "id": "p7_supplier_late",
@@ -150,7 +210,17 @@
         ]
       },
       "ask_first": "Do you buy locally, from Sialkot, or import?",
-      "free_stops": "the buying calendar is worked out in the solution document."
+      "free_stops": "the buying calendar is worked out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Write the needed date beside the actual arrival date for seasonal cricket lines, so purchasing delay is measured clearly.",
+          "review": false
+        },
+        {
+          "text": "Give one person one preseason list of key cricket lines and needed dates, so buying is not left too late.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_multi_channel_orders",
@@ -170,7 +240,17 @@
         "tool_words": []
       },
       "ask_first": "Which online channels do you sell on?",
-      "free_stops": "channel connections are kept for the solution document."
+      "free_stops": "channel connections are kept for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare shelf stock with the shown stock for your fastest selling items once this week, so mismatches are easy to find.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member one stock list to update after every sale and receipt, so shop and online numbers stay closer.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_discount_abuse",
@@ -191,7 +271,17 @@
         "tool_words": []
       },
       "ask_first": "Who can give discounts today?",
-      "free_stops": "rates and approval routing go in the solution document."
+      "free_stops": "rates and approval routing go in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many coach and club sales slips show a price change without a written reason, so unrecorded counter decisions become visible.",
+          "review": true
+        },
+        {
+          "text": "Give one counter person one page for every coach and club price exception this week, so the owner can review patterns without chasing staff.",
+          "review": true
+        }
+      ]
     },
     {
       "id": "p10_margin_unknown",
@@ -212,7 +302,17 @@
         "leads_with_view": true
       },
       "ask_first": "Do you charge delivery separately?",
-      "free_stops": "the margin model is set up in the solution document."
+      "free_stops": "the margin model is set up in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note the selling price and landed cost of your fastest moving lines by brand this week, so weaker categories stand out.",
+          "review": true
+        },
+        {
+          "text": "Give one staff member one notebook page for landed costs by brand and category, so pricing stops being guessed.",
+          "review": true
+        }
+      ]
     }
   ],
   "never_say": [

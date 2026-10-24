@@ -2,7 +2,7 @@
   "industry": "meat_shops_and_butchers",
   "name": "Meat shops and butchers",
   "sector": "7.B Food and beverage",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_margin_unknown",
@@ -23,7 +23,17 @@
         "leads_with_view": true
       },
       "ask_first": "Is bone and trim weighed separately now?",
-      "free_stops": "The yield method per meat type and how it feeds pricing go in the solution document."
+      "free_stops": "The yield method per meat type and how it feeds pricing go in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "For one carcass this week, note tray weights for each cut and the separate pile of bone and trim, so your true saleable share is clear.",
+          "review": false
+        },
+        {
+          "text": "Make one cutter responsible for writing each carcass breakdown in one notebook, so future buying and pricing stop relying on guesswork.",
+          "review": true
+        }
+      ]
     },
     {
       "id": "p2_price_increases_supplier",
@@ -43,7 +53,17 @@
         "tool_words": []
       },
       "ask_first": "How often does your buying price change?",
-      "free_stops": "The pricing rule per cut and the broadcast set-up stay for the solution document."
+      "free_stops": "The pricing rule per cut and the broadcast set-up stay for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Write the supplier rate beside your board price each morning for the same popular cuts, so you spot where today's selling lags today's buying.",
+          "review": true
+        },
+        {
+          "text": "Give one person the job of checking board prices after the purchase arrives, so changes happen as part of the day's opening routine.",
+          "review": true
+        }
+      ]
     },
     {
       "id": "p3_count_mismatch",
@@ -63,7 +83,17 @@
         "tool_words": []
       },
       "ask_first": "Who does the cutting and weighing?",
-      "free_stops": "The reconciliation routine and how gaps are traced are in the solution document."
+      "free_stops": "The reconciliation routine and how gaps are traced are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "For one closing this week, compare total cutting weight with total counter weight sold and leftovers on hand, so the giveaway problem has a size.",
+          "review": false
+        },
+        {
+          "text": "Make the counter book the only place every weighed sale is written by one assigned person, so extra pieces cannot leave unnoticed.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_maintenance_downtime",
@@ -83,7 +113,17 @@
         "tool_words": []
       },
       "ask_first": "What happens now when the chiller or power fails?",
-      "free_stops": "The checking routine and alert rules stay for the solution document."
+      "free_stops": "The checking routine and alert rules stay for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note opening and closing chiller readings in one notebook for a week, so you can spot drift before another overnight failure hurts stock.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member the job of writing chiller checks at the same times daily, so warning signs are not missed on busy days.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_receivables_late",
@@ -103,7 +143,17 @@
         "tool_words": []
       },
       "ask_first": "How many restaurants or caterers buy on credit?",
-      "free_stops": "The credit terms and reminder schedule are set out in the solution document."
+      "free_stops": "The credit terms and reminder schedule are set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "List each restaurant account by role label with balance and oldest unpaid delivery in one place, so collection calls focus on the stalest money.",
+          "review": false
+        },
+        {
+          "text": "Make one person update the credit notebook whenever stock goes out on account, so delivery arguments have a single shared record.",
+          "review": true
+        }
+      ]
     },
     {
       "id": "p6_order_errors",
@@ -123,7 +173,17 @@
         "tool_words": []
       },
       "ask_first": "What goes wrong most often with delivery orders?",
-      "free_stops": "The order flow and packing checks are in the solution document."
+      "free_stops": "The order flow and packing checks are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "For this week's home deliveries, compare packed orders with the original chat notes before riders leave, so wrong cuts and missed packs are counted.",
+          "review": false
+        },
+        {
+          "text": "Give one person the packing list and one notebook for all delivery orders, so cutters and packers work from the same daily queue.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_pre_orders_custom",
@@ -145,7 +205,17 @@
         ]
       },
       "ask_first": "What was hardest last Eid?",
-      "free_stops": "The booking and Eid-day scheduling plan stay for the solution document."
+      "free_stops": "The booking and Eid-day scheduling plan stay for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Write each Qurbani booking with share count, cutting preference and pickup timing in one notebook, so the Eid load is visible before the rush.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of updating all Qurbani changes in one list, so allocations and timing do not get split across chats.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_overtime",
@@ -165,7 +235,17 @@
         "tool_words": []
       },
       "ask_first": "How many cutters do you have?",
-      "free_stops": "The staffing and overtime plan are detailed in the solution document."
+      "free_stops": "The staffing and overtime plan are detailed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note who stayed, who left early and which cutting jobs slipped on the busiest days, so the Eid staffing gap is measured from your floor.",
+          "review": false
+        },
+        {
+          "text": "Assign one lead butcher to mark attendance and handover jobs each shift, so peak days run from a named owner on the floor.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_branch_comparison",
@@ -185,7 +265,17 @@
         "tool_words": []
       },
       "ask_first": "Do both shops buy from the same supplier?",
-      "free_stops": "How each shop's profit is calculated goes in the solution document."
+      "free_stops": "How each shop's profit is calculated goes in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Write each shop's daily sales, buying and unsold trim on facing notebook pages for one week, so the weaker branch stands out in plain view.",
+          "review": false
+        },
+        {
+          "text": "Give each branch one closing time to send the same three figures to you, so both shops are compared from one routine.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

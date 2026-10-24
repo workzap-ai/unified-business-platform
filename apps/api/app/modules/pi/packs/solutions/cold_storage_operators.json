@@ -2,7 +2,7 @@
   "industry": "cold_storage_operators",
   "name": "Cold storage operators",
   "sector": "7.C Agriculture, livestock and rural (part 2)",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_count_mismatch",
@@ -22,7 +22,17 @@
         "tool_words": []
       },
       "ask_first": "How is stock recorded when it comes in?",
-      "free_stops": "How receipts and codes are set up is detailed in the solution document."
+      "free_stops": "How receipts and codes are set up is detailed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare the inward register with unloading notes for the disputed lot once, so you can see exactly where the missing bags entered the paperwork.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of writing the final received bag count on the same inward page before stacking, so later disputes start from one figure.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_no_visibility",
@@ -42,7 +52,17 @@
         "tool_words": []
       },
       "ask_first": "Do most clients take stock out in parts?",
-      "free_stops": "How statements are generated is part of the solution document."
+      "free_stops": "How statements are generated is part of the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many part releases for one client happened this week versus how many balance updates were written, so the balance confusion has a size.",
+          "review": false
+        },
+        {
+          "text": "Keep one balance page beside the release register and make the releasing staff update it before the vehicle leaves, so each client balance stays current.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_wrong_location",
@@ -62,7 +82,17 @@
         "tool_words": []
       },
       "ask_first": "How many chambers do you have?",
-      "free_stops": "The map layout is kept for the solution document."
+      "free_stops": "The map layout is kept for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Walk the chambers and note every lot found somewhere different from its written location, so you see which areas create the longest searches.",
+          "review": false
+        },
+        {
+          "text": "Give one shift one location notebook kept at the chamber entrance, so every moved lot gets one current written place.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_fraud",
@@ -82,7 +112,17 @@
         "tool_words": []
       },
       "ask_first": "Who authorises releases at night?",
-      "free_stops": "How codes and approvals work is detailed in the solution document."
+      "free_stops": "How codes and approvals work is detailed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare this week's issued gate passes with the release register line by line once, so duplicate or missing paperwork stands out quickly.",
+          "review": false
+        },
+        {
+          "text": "Keep all blank gate passes with one responsible person only, so handwritten copies are harder to slip into a release.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_receivables_late",
@@ -102,7 +142,17 @@
         "tool_words": []
       },
       "ask_first": "Is rent charged per bag for the season or monthly?",
-      "free_stops": "Billing and reminder setup goes in the solution document."
+      "free_stops": "Billing and reminder setup goes in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note which clients have no running rent note today and compare them with occupied space, so end season collection fights can be traced early.",
+          "review": false
+        },
+        {
+          "text": "Set one weekly time to update every client's running rent in one notebook, so collection talks start from one shared figure.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_pricing_errors",
@@ -122,7 +172,17 @@
         "tool_words": []
       },
       "ask_first": "Do you have a standard rate list?",
-      "free_stops": "How rates link to billing is part of the solution document."
+      "free_stops": "How rates link to billing is part of the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Check a few recent receipts against each client's account page once, so you spot where agreed rates are drifting in daily work.",
+          "review": false
+        },
+        {
+          "text": "Keep one rate list notebook in the billing spot and assign one person to update it after any agreement, so receipts follow the same record.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_maintenance_downtime",
@@ -142,7 +202,17 @@
         "tool_words": []
       },
       "ask_first": "Do the chambers have any sensors now?",
-      "free_stops": "Which sensors connect and how alerts are routed goes in the solution document."
+      "free_stops": "Which sensors connect and how alerts are routed goes in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note the actual time each night issue was noticed this week and compare it with the last normal round, so the blind hours become visible.",
+          "review": false
+        },
+        {
+          "text": "Give one night shift person one fixed check time and one log page for chamber and power status, so overnight problems are noticed sooner.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_checklists_not_done",
@@ -162,7 +232,17 @@
         "tool_words": []
       },
       "ask_first": "Who fills the log now?",
-      "free_stops": "Log intervals and flags are set out in the solution document."
+      "free_stops": "Log intervals and flags are set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Look at last week's log pages and count entries written in the same handwriting block, so you see how often records are filled late.",
+          "review": false
+        },
+        {
+          "text": "Make one supervisor collect each shift log at handover into one folder, so missing entries are caught the same day.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_utility_costs",
@@ -183,7 +263,17 @@
         "leads_with_view": true
       },
       "ask_first": "What backup do you use when power goes?",
-      "free_stops": "How costs are split by chamber is kept for the solution document."
+      "free_stops": "How costs are split by chamber is kept for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Write generator running hours and load shedding hours side by side for this week, so you can see when fuel use rises beyond outages.",
+          "review": false
+        },
+        {
+          "text": "Give one person one page for every generator fill and running period, so diesel discussions start from one current record.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p10_manual_reports",
@@ -203,7 +293,17 @@
         "tool_words": []
       },
       "ask_first": "How many brand clients want reports?",
-      "free_stops": "Report contents and delivery are detailed in the solution document."
+      "free_stops": "Report contents and delivery are detailed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many times yesterday's stock report was corrected before sending, so you see where daily reporting effort is actually going.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member one notebook page per brand for daily opening, movement and closing figures, so hand reports go out faster and more consistently.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

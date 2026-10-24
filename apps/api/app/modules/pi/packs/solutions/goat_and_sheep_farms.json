@@ -2,7 +2,7 @@
   "industry": "goat_and_sheep_farms",
   "name": "Goat and sheep farms",
   "sector": "7.C Agriculture, livestock and rural (part 1)",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_no_birth_records",
@@ -22,7 +22,17 @@
         "tool_words": []
       },
       "ask_first": "Are the breeding does and ewes tagged today?",
-      "free_stops": "The log fields and performance view are set out in the solution document."
+      "free_stops": "The log fields and performance view are set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count this week's births and deaths against mothers you can identify, so you see where your herd record starts breaking.",
+          "review": false
+        },
+        {
+          "text": "Give one worker the job of noting every birth and death in one notebook the same day, so loss patterns stop getting missed.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_count_mismatch",
@@ -42,7 +52,17 @@
         "tool_words": []
       },
       "ask_first": "Who counts the animals now, and how often?",
-      "free_stops": "Count timing and alert rules go in the solution document."
+      "free_stops": "Count timing and alert rules go in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare the herder count and manager count at evening lockup all week, so you see when the mismatch starts.",
+          "review": false
+        },
+        {
+          "text": "Give one person the final shed total after evening lockup in one notebook, so everyone works from the same number next morning.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_theft_external",
@@ -62,7 +82,17 @@
         "tool_words": []
       },
       "ask_first": "At what time have losses usually happened?",
-      "free_stops": "Check-in times and alert routing are detailed in the solution document."
+      "free_stops": "Check-in times and alert routing are detailed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count animals at lockup and again at dawn for each shed block, so you see exactly where night losses are happening.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of writing every evening lockup count in one shed notebook, so the morning check starts from one trusted record.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_margin_unknown",
@@ -83,7 +113,17 @@
         "leads_with_view": true
       },
       "ask_first": "Do the goats graze, or are they fully stall-fed?",
-      "free_stops": "How costs are split between groups is worked out in the solution document."
+      "free_stops": "How costs are split between groups is worked out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare this week's fodder buying with the current headcount, so you see whether rising spend matches animals actually on the farm.",
+          "review": false
+        },
+        {
+          "text": "Keep fodder, labour and vet spending in one notebook page for the current herd, so your rough cost per animal is easier to judge.",
+          "review": true
+        }
+      ]
     },
     {
       "id": "p5_pricing_errors",
@@ -103,7 +143,17 @@
         "tool_words": []
       },
       "ask_first": "Who agrees the final price with buyers at Eid?",
-      "free_stops": "How the catalogue links to costs goes in the solution document."
+      "free_stops": "How the catalogue links to costs goes in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare what you spent on a sold batch with what came in, so you see which animals were let go too cheaply.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of noting each batch spend in one place before selling, so helpers stop guessing during Eid rush.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_lead_followup_slow",
@@ -123,7 +173,17 @@
         "tool_words": []
       },
       "ask_first": "Who replies to buyer messages now?",
-      "free_stops": "The follow-up rules and timings stay in the solution document."
+      "free_stops": "The follow-up rules and timings stay in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many buyer messages sat unanswered since morning and by evening, so you see the busiest reply gap clearly.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of checking buyer messages at fixed times daily, so interested visitors hear back while plans are fresh.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_credit_customers",
@@ -143,7 +203,17 @@
         "tool_words": []
       },
       "ask_first": "How many buyers owe you right now?",
-      "free_stops": "Reminder timing and limits go in the solution document."
+      "free_stops": "Reminder timing and limits go in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare promised payment dates with the animals already taken each market day, so you see which unpaid handovers are stretching the longest.",
+          "review": true
+        },
+        {
+          "text": "Give one person one notebook for every sale on promise and its due date, so collection follow up stays orderly each week.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_no_customer_data",
@@ -163,7 +233,17 @@
         "tool_words": []
       },
       "ask_first": "Do you sell breeding animals often, or mainly for Eid?",
-      "free_stops": "The card's contents and how it's shared are set out in the solution document."
+      "free_stops": "The card's contents and how it's shared are set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Check how many breeding animals have known parents written anywhere today, so you see the size of the record gap.",
+          "review": false
+        },
+        {
+          "text": "Give one person one notebook for parent notes, tag details and buyer questions, so breeding stock discussions rely less on memory.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_checklists_not_done",
@@ -183,7 +263,17 @@
         "tool_words": []
       },
       "ask_first": "Who runs the farm day to day when you're not there?",
-      "free_stops": "The checklist itself and flag rules stay in the solution document."
+      "free_stops": "The checklist itself and flag rules stay in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Walk the farm at the usual feeding and water times this week, so you see exactly which task slips when you are away.",
+          "review": false
+        },
+        {
+          "text": "Give one worker the job of ticking one paper list at the shed each day, so water and feeding checks happen on time.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p10_succession_family",
@@ -205,7 +295,17 @@
         ]
       },
       "ask_first": "Is your son on the farm now, or in another job?",
-      "free_stops": "What the system covers and how it's handed over goes in the solution document."
+      "free_stops": "What the system covers and how it's handed over goes in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note every task only you answer this week, so you see exactly which handovers block your son each day.",
+          "review": false
+        },
+        {
+          "text": "Give your son one notebook for buyer calls, shed counts and supplier notes, so farm updates stay in one place when you are away.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

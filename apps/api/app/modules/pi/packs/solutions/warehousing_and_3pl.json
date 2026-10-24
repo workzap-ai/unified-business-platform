@@ -2,7 +2,7 @@
   "industry": "warehousing_and_3pl",
   "name": "Warehousing and 3PL",
   "sector": "7.E Trade, distribution and logistics",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_count_mismatch",
@@ -24,7 +24,17 @@
         ]
       },
       "ask_first": "",
-      "free_stops": "The receiving steps are designed in the solution document."
+      "free_stops": "The receiving steps are designed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many inbound cartons arrive with unclear marks or mixed items this week, so dispute patterns show at receiving.",
+          "review": false
+        },
+        {
+          "text": "Give one receiver the job of noting shortages in one dock notebook, so every disputed inbound has the same record.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_wrong_location",
@@ -44,7 +54,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The location scheme is set out in the solution document."
+      "free_stops": "The location scheme is set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note every time a picker finds stock in a different bay than expected this week, so the worst putaway errors stand out.",
+          "review": false
+        },
+        {
+          "text": "Give one putaway lead one location correction list by the dispatch desk, so misplaced stock gets fixed from one place.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_packing_errors",
@@ -64,7 +84,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The pick and check flow is designed in the solution document."
+      "free_stops": "The pick and check flow is designed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count which client orders need item swaps or returns after dispatch this week, so the biggest packing problem is clear.",
+          "review": false
+        },
+        {
+          "text": "Give one pack bench lead the final order sheet at sealing time, so the last check happens on every parcel.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_pricing_errors",
@@ -84,7 +114,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "How activities are captured and priced into invoices is set in the solution document."
+      "free_stops": "How activities are captured and priced into invoices is set in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note each relabelling, repacking and extra touch by client for one week, so missed handling charges are easy to spot.",
+          "review": false
+        },
+        {
+          "text": "Give one person one running list of non-standard client work near dispatch, so chargeable tasks get captured before billing.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_manual_reports",
@@ -104,7 +144,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "How the billing data is joined is mapped in the solution document."
+      "free_stops": "How the billing data is joined is mapped in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Write down every billing item your team retypes from paper or chat this month, so the slowest part of billing is clear.",
+          "review": false
+        },
+        {
+          "text": "Give one billing owner one master list for each client's charge items all month, so month-end collation takes less chasing.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_customer_communication",
@@ -127,7 +177,17 @@
         "leads_with_view": true
       },
       "ask_first": "",
-      "free_stops": "What each client sees is set in the solution document."
+      "free_stops": "What each client sees is set in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note which stock questions each client asks between weekly reports this week, so you see what updates they actually need.",
+          "review": false
+        },
+        {
+          "text": "Give one account coordinator one shared list of client stock updates to send each afternoon, so replies stop slipping.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_expiry_wastage",
@@ -147,7 +207,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "Alert rules per client are set in the solution document."
+      "free_stops": "Alert rules per client are set in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many picks this week came from newer batches while older stock was still on hand, so FEFO misses show.",
+          "review": false
+        },
+        {
+          "text": "Give one picker lead one near-expiry list at the start of each shift, so older batches get checked before newer ones.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_integration_marketplace",
@@ -156,8 +226,8 @@
       "category": "tech_systems",
       "subtype": "integration_marketplace",
       "quick_ideas": [
-        "List which clients send orders by email, WhatsApp or spreadsheet, so you see the retyping load",
-        "Ask the busiest clients which store platforms they use."
+        "Count how many client orders are retyped by hand from messages or emailed files this week, so manual order load is clear.",
+        "Give one coordinator one order intake notebook for all non-connected clients, so copied orders stop getting missed between channels."
       ],
       "workzap_build": {
         "keys": [
@@ -167,7 +237,11 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "Which connections are made is mapped in the solution document."
+      "free_stops": "Which connections are made is mapped in the solution document.",
+      "quick_ideas_original": [
+        "List which clients send orders by email, WhatsApp or spreadsheet, so you see the retyping load",
+        "Ask the busiest clients which store platforms they use."
+      ]
     },
     {
       "id": "p9_attendance_lateness",
@@ -187,7 +261,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The scheduling rules are set in the solution document."
+      "free_stops": "The scheduling rules are set in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note which peak shifts had the biggest no-show gaps this month, so the hardest labour days become visible early.",
+          "review": false
+        },
+        {
+          "text": "Give one supervisor one attendance list checked at a fixed evening time, so next-day labour gaps are known before the rush.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p10_margin_unknown",
@@ -208,7 +292,17 @@
         "leads_with_view": true
       },
       "ask_first": "",
-      "free_stops": "How costs are assigned to clients is set in the solution document."
+      "free_stops": "How costs are assigned to clients is set in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note which clients use the most floor space and extra handling this week, so low-earning accounts stand out sooner.",
+          "review": false
+        },
+        {
+          "text": "Give one supervisor a single notebook for all client handling extras, so billing reviews stop missing busy accounts.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p11_checklists_not_done",
@@ -228,7 +322,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "How the checklist is run and reported is designed in the solution document."
+      "free_stops": "How the checklist is run and reported is designed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare the completed checklist against one walk round each shift, so missed housekeeping tasks are spotted the same day.",
+          "review": false
+        },
+        {
+          "text": "Give one shift lead the checklist board at a fixed handover time, so daily checks actually get signed and reviewed.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

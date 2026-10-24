@@ -2,7 +2,7 @@
   "industry": "electronics_and_home_appliances_retail",
   "name": "Electronics and home appliances retail",
   "sector": "7.A Retail and consumer (part 1)",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_credit_customers",
@@ -22,7 +22,17 @@
         "tool_words": []
       },
       "ask_first": "Roughly how many installment accounts?",
-      "free_stops": "How accounts are coded and overdue lists produced is in the solution document."
+      "free_stops": "How accounts are coded and overdue lists produced is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many installment accounts stopped after a few payments this month, so you see where collection slippage is heaviest.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member the job of reviewing stopped installment accounts every evening from one notebook, so late payers are chased sooner.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_cash_handling_risk",
@@ -43,7 +53,17 @@
         "tool_words": []
       },
       "ask_first": "When does the collected cash reach you?",
-      "free_stops": "How collections are logged and reconciled is in the solution document."
+      "free_stops": "How collections are logged and reconciled is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare each recovery visit noted by the collector with the cash entered that day once, so missing deposits stand out quickly.",
+          "review": false
+        },
+        {
+          "text": "Make one cashier sign for every recovery cash handover in one register, so responsibility stays clear from collection to deposit.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_serial_batch_tracking",
@@ -63,7 +83,17 @@
         "tool_words": []
       },
       "ask_first": "Do you scan or write serials today?",
-      "free_stops": "How serials are captured and linked is in the solution document."
+      "free_stops": "How serials are captured and linked is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count this week's sales invoices missing serial numbers once, so you see how often warranty disputes are being invited.",
+          "review": false
+        },
+        {
+          "text": "Give the invoice writer the job of noting every sold unit serial in one register, so warranty claims are settled with store proof.",
+          "review": true
+        }
+      ]
     },
     {
       "id": "p4_delivery_late",
@@ -84,7 +114,17 @@
         "tool_words": []
       },
       "ask_first": "Do you install yourselves or through outside technicians?",
-      "free_stops": "How zones, slots and assignments are set is in the solution document."
+      "free_stops": "How zones, slots and assignments are set is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note how many pending installations are older than one week by area once, so the backlog shape is clear for dispatch.",
+          "review": false
+        },
+        {
+          "text": "Give one dispatcher the job of keeping one daily installation list, so teams leave with a clear handover each morning.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_after_sales",
@@ -105,7 +145,17 @@
         "tool_words": []
       },
       "ask_first": "Which brands take the longest?",
-      "free_stops": "The claim stages and update messages are in the solution document."
+      "free_stops": "The claim stages and update messages are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many warranty claims have waited more than two weeks once, so you see which cases are hurting trust most.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of updating every open claim from one list each afternoon, so customers hear progress before they complain.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_credit_terms",
@@ -126,7 +176,17 @@
         "leads_with_view": true
       },
       "ask_first": "How many brands do you deal with?",
-      "free_stops": "How sales are matched to each scheme is in the solution document."
+      "free_stops": "How sales are matched to each scheme is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare each brand scheme promised with what actually reached your account once, so shortfalls are spotted before the season ends.",
+          "review": false
+        },
+        {
+          "text": "Give one person one notebook for all brand scheme notes and receipts, so claims are chased from one complete record.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_lead_followup_slow",
@@ -146,7 +206,17 @@
         "tool_words": []
       },
       "ask_first": "Where do most leads come from?",
-      "free_stops": "How leads are assigned and reminders timed is in the solution document."
+      "free_stops": "How leads are assigned and reminders timed is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count this week's installment leads against completed salesman calls once, so the gap shows before leads go cold.",
+          "review": false
+        },
+        {
+          "text": "Give one supervisor the job of assigning every new installment lead from one page, so no enquiry sits untouched all day.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_forecasting",
@@ -167,7 +237,17 @@
         "leads_with_view": true
       },
       "ask_first": "Does your POS keep last year's sales by model?",
-      "free_stops": "How the planner uses past seasons is in the solution document."
+      "free_stops": "How the planner uses past seasons is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare last hot season's fastest selling cooling models with what is on hand now once, so buying guesses get grounded.",
+          "review": false
+        },
+        {
+          "text": "Give one buyer one running list of requested cooling models not available, so missed demand shapes the next purchase plan.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_software_not_connected",
@@ -187,7 +267,17 @@
         "tool_words": []
       },
       "ask_first": "What software does each use?",
-      "free_stops": "How the systems are connected is in the solution document."
+      "free_stops": "How the systems are connected is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count the same fast moving models in showroom and godown once, so list mismatches are seen on items that matter daily.",
+          "review": false
+        },
+        {
+          "text": "Give one stock clerk the job of writing every movement in one shared register, so showroom and godown updates follow one routine.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

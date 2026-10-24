@@ -2,7 +2,7 @@
   "industry": "elevator_and_escalator_services",
   "name": "Elevator and escalator services",
   "sector": "7.F Construction, real estate and facilities",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_slow_response",
@@ -22,7 +22,17 @@
         "tool_words": []
       },
       "ask_first": "How many technicians are on call at night?",
-      "free_stops": "Escalation rules and timings are in the solution document."
+      "free_stops": "Escalation rules and timings are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note each night breakdown call with the time answered or missed, so you can see how often the duty line fails after hours.",
+          "review": false
+        },
+        {
+          "text": "Assign one backup dispatcher for night calls and keep the handover note in one place, so missed calls reach a second person quickly.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_kpi_undefined",
@@ -42,7 +52,17 @@
         "tool_words": []
       },
       "ask_first": "How do breakdown calls reach you, day and night?",
-      "free_stops": "KPI definitions and targets are in the solution document."
+      "free_stops": "KPI definitions and targets are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare reported time and arrival time for each breakdown this week, so your true average delay stops being a guess.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of writing every breakdown start and arrival time in one notebook, so response tracking stays consistent daily.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_checklists_not_done",
@@ -62,7 +82,17 @@
         "tool_words": []
       },
       "ask_first": "How do you confirm a visit actually happened?",
-      "free_stops": "Scheduling rules are in the solution document; checklist content stays with your engineers."
+      "free_stops": "Scheduling rules are in the solution document; checklist content stays with your engineers.",
+      "extra_ideas": [
+        {
+          "text": "Walk through this month's PM list and mark which lifts were visited and which were missed, so client surprises are easier to prevent.",
+          "review": false
+        },
+        {
+          "text": "Set one fixed afternoon each week to update one shared PM list, so missed visits are caught before the client spots them.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_unbilled_work",
@@ -82,7 +112,17 @@
         "tool_words": []
       },
       "ask_first": "How are extra parts billed today?",
-      "free_stops": "Billing rules are in the solution document."
+      "free_stops": "Billing rules are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare parts issued this week against non-comprehensive jobs completed, so missed billable items are easier to spot before invoicing.",
+          "review": false
+        },
+        {
+          "text": "Make one person review every non-comprehensive job slip before filing, so chargeable parts are flagged while the work is still fresh.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_licences_renewals",
@@ -102,7 +142,17 @@
         "tool_words": []
       },
       "ask_first": "Who keeps track of inspection due dates?",
-      "free_stops": "Alert timing is in the solution document; certification rules are for the regulator and licensed inspectors."
+      "free_stops": "Alert timing is in the solution document; certification rules are for the regulator and licensed inspectors.",
+      "extra_ideas": [
+        {
+          "text": "Check every lift's latest inspection date against this month's calendar, so upcoming certificate expiries are seen before clients raise them.",
+          "review": false
+        },
+        {
+          "text": "Give one admin person a fixed weekly check of all certificate dates in one notebook, so renewals stop slipping between other tasks.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_rework",
@@ -122,7 +172,17 @@
         "tool_words": []
       },
       "ask_first": "How many lifts and escalators are you maintaining?",
-      "free_stops": "Alert thresholds and review flow are in the solution document."
+      "free_stops": "Alert thresholds and review flow are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count repeat breakdown visits by lift for this month, so the worst recurring units stand out for deeper technical review.",
+          "review": false
+        },
+        {
+          "text": "Assign one senior technician to own repeat-fault reviews in one shared log, so recurring lift problems get chased to closure.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_serial_batch_tracking",
@@ -143,7 +203,17 @@
         "tool_words": []
       },
       "ask_first": "Which parts are hardest to get?",
-      "free_stops": "Parts tracking design is in the solution document."
+      "free_stops": "Parts tracking design is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare parts taken from stores with jobs closed this week, so missing lift references on used items are easy to spot.",
+          "review": false
+        },
+        {
+          "text": "Keep one issue notebook at the stores desk with one person checking entries daily, so each part leaves with a clear lift destination.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_manual_reports",
@@ -163,7 +233,17 @@
         "tool_words": []
       },
       "ask_first": "What do building managers ask for every month?",
-      "free_stops": "Report content is in the solution document."
+      "free_stops": "Report content is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note which monthly report details are chased at month end, so you see exactly what information was not captured during the month.",
+          "review": false
+        },
+        {
+          "text": "Give one admin person a fixed weekly slot to gather visit and breakdown notes into one file, so month-end report prep is lighter.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_receivables_late",
@@ -183,7 +263,17 @@
         "tool_words": []
       },
       "ask_first": "Which clients pay slowest?",
-      "free_stops": "Reminder schedule is in the solution document."
+      "free_stops": "Reminder schedule is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many AMC invoices went out without a same month visit note attached, so missing proof behind delays becomes visible.",
+          "review": false
+        },
+        {
+          "text": "Keep one notebook page for sent invoices and attached visit notes, so staff can spot missing paperwork before bills leave.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p10_lead_followup_slow",
@@ -203,7 +293,17 @@
         "tool_words": []
       },
       "ask_first": "How many quotes are open right now?",
-      "free_stops": "Pipeline stages are in the solution document."
+      "free_stops": "Pipeline stages are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count open modernisation quotes by weeks since sent, so you see which proposals have gone cold the longest.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member a fixed weekly follow-up hour and one notebook page for all open quotes, so no proposal sits untouched.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

@@ -2,7 +2,7 @@
   "industry": "cold_chain_logistics",
   "name": "Cold-chain logistics",
   "sector": "7.E Trade, distribution and logistics",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_checklists_not_done",
@@ -24,7 +24,17 @@
         ]
       },
       "ask_first": "",
-      "free_stops": "How readings are captured and stored is designed in the solution document."
+      "free_stops": "How readings are captured and stored is designed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare the reading times written on each hand log with actual shift timings this week, so backfilled entries are easy to spot.",
+          "review": false
+        },
+        {
+          "text": "Make one shift lead collect and review every hand log before staff leave, so entries get written during the workday.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_maintenance_downtime",
@@ -44,7 +54,17 @@
         "tool_words": []
       },
       "ask_first": "Do the chambers have any sensor or meter that records readings now?",
-      "free_stops": "Alarm levels and escalation rules are set in the solution document."
+      "free_stops": "Alarm levels and escalation rules are set in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Write down when the last normal temperature was seen each night this week, so the blind hours before morning become visible.",
+          "review": false
+        },
+        {
+          "text": "Give one night person the job of noting one overnight equipment check in a single notebook, so failures are noticed before day staff arrive.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_record_keeping",
@@ -64,7 +84,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "What goes into each claim file is set in the solution document."
+      "free_stops": "What goes into each claim file is set in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Check one disputed lot from receipt to dispatch on paper this week, so you see exactly which proof is missing.",
+          "review": false
+        },
+        {
+          "text": "Keep one folder per client for receipts, storage notes and dispatch papers, so claim discussions start with a complete paper trail.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_utility_costs",
@@ -85,7 +115,17 @@
         "leads_with_view": true
       },
       "ask_first": "",
-      "free_stops": "How costs are split per chamber is set in the solution document."
+      "free_stops": "How costs are split per chamber is set in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note generator start and stop times beside chamber activity for one week, so you see which operating hours drive the longest runs.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of writing every outage and generator run in one notebook, so fuel-heavy periods stop being argued from memory.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_wrong_location",
@@ -105,7 +145,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The register layout is designed in the solution document."
+      "free_stops": "The register layout is designed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Walk each chamber and note any lot whose client cannot be identified at a glance, so the search problem has a clear size.",
+          "review": false
+        },
+        {
+          "text": "Assign one store hand to update a single chamber notebook whenever goods move, so every team member checks the same place.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_shrinkage_theft",
@@ -127,7 +177,17 @@
         ]
       },
       "ask_first": "",
-      "free_stops": "The gate pass flow is set in the solution document."
+      "free_stops": "The gate pass flow is set in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare what is written at receipt with what is physically present for a few selected client lots, so mix-ups show where they start.",
+          "review": false
+        },
+        {
+          "text": "Give one dispatch person the job of updating one withdrawal list before any goods leave, so missing crates are caught at the door.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_receivables_late",
@@ -147,7 +207,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "How rent is calculated is set in the solution document."
+      "free_stops": "How rent is calculated is set in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Review a few recent exits and note where stored days or units were unclear on paper, so billing disputes can be traced to the source.",
+          "review": false
+        },
+        {
+          "text": "Make one clerk maintain a single running list of entries and exits for chargeable storage, so rent calculations use one version.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_product_defects",
@@ -167,7 +237,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "What the trip log records is designed in the solution document."
+      "free_stops": "What the trip log records is designed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note which delivery routes return the most soft-product complaints this week, so the trouble pattern is tied to a route not guesswork.",
+          "review": false
+        },
+        {
+          "text": "Give one dispatcher the job of recording departure and return times for frozen loads in one place, so delays affecting deliveries are easier to pin down.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_seasonal_planning",
@@ -188,7 +268,17 @@
         "leads_with_view": true
       },
       "ask_first": "",
-      "free_stops": "How the planner forecasts is set in the solution document."
+      "free_stops": "How the planner forecasts is set in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Mark full and quiet weeks from your last year notebook on one page, so the slack periods are clear in your own records.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of updating a weekly occupancy page all year, so busy and empty periods are tracked the same way.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p10_owner_blind",
@@ -208,7 +298,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "What the owner view includes is set in the solution document."
+      "free_stops": "What the owner view includes is set in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note the latest reading time and temperature reported from each site on one page daily, so late or missing updates stand out.",
+          "review": false
+        },
+        {
+          "text": "Give one supervisor the job of sending the owner's daily site summary at a fixed hour, so you stop chasing scattered updates.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

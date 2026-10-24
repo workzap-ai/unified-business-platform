@@ -2,7 +2,7 @@
   "industry": "aesthetic_and_dermatology_clinics",
   "name": "Aesthetic and dermatology clinics",
   "sector": "7.I Health and care",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_lead_followup_slow",
@@ -22,7 +22,17 @@
         "tool_words": []
       },
       "ask_first": "Who handles the DMs today?",
-      "free_stops": "Routing and response rules are set in the solution document."
+      "free_stops": "Routing and response rules are set in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count yesterday's unanswered Instagram messages at closing time, so you can see how many potential bookings are waiting.",
+          "review": false
+        },
+        {
+          "text": "Give one team member two fixed message-check times daily and one written handover list, so replies stop getting lost at reception.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_campaign_roi_unknown",
@@ -42,7 +52,17 @@
         "tool_words": []
       },
       "ask_first": "How many campaigns or collabs are running this month?",
-      "free_stops": "How codes are set up per campaign is in the solution document."
+      "free_stops": "How codes are set up per campaign is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare this week's new bookings with the source each caller mentions, so the adverts bringing enquiries are easier to spot.",
+          "review": false
+        },
+        {
+          "text": "Keep one notebook at the booking desk for every new enquiry source, so bookings and promotion activity get matched in one place.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_churn_subscription",
@@ -62,7 +82,17 @@
         "tool_words": []
       },
       "ask_first": "Do packages have an expiry date?",
-      "free_stops": "Reminder timing and rebooking flow are in the solution document."
+      "free_stops": "Reminder timing and rebooking flow are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count open laser packages with missed return dates this week, so you can see how much paid work is sitting unfinished.",
+          "review": false
+        },
+        {
+          "text": "Give one person a fixed weekly slot to review unfinished packages and pass a rebooking list to the front desk, so follow-up happens regularly.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_no_dashboard",
@@ -84,7 +114,17 @@
         ]
       },
       "ask_first": "Do you sell memberships as well as packages?",
-      "free_stops": "The liability calculation is set out in the solution document."
+      "free_stops": "The liability calculation is set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count unused sessions across active packages and note their selling price this week, so the clinic can see what is still owed.",
+          "review": true
+        },
+        {
+          "text": "Keep one package notebook at reception and update remaining sessions after each visit, so unused value is tracked in one place.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_pricing_errors",
@@ -104,7 +144,17 @@
         "tool_words": []
       },
       "ask_first": "Do both branches run the same offers?",
-      "free_stops": "Approval levels are in the solution document."
+      "free_stops": "Approval levels are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare this week's DM discounts with what the counter charged on the same bookings, so mismatches are easy to spot.",
+          "review": false
+        },
+        {
+          "text": "Keep one written offers list at the counter and make one person update it, so DM promises match what reception collects.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_count_mismatch",
@@ -124,7 +174,17 @@
         "tool_words": []
       },
       "ask_first": "Who records usage at the chair today?",
-      "free_stops": "Register fields and checks are in the solution document."
+      "free_stops": "Register fields and checks are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare opened injectable boxes with this week's treatment entries once, so you can see whether the stock gap is small or serious.",
+          "review": false
+        },
+        {
+          "text": "Give one person the end-of-day injectable count and one notebook for every issue and return, so stock handling stays consistent.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_hidden_costs",
@@ -144,7 +204,17 @@
         "tool_words": []
       },
       "ask_first": "Is the device leased or on revenue-share?",
-      "free_stops": "The reconciliation method is in the solution document; lease terms are for your lawyer."
+      "free_stops": "The reconciliation method is in the solution document; lease terms are for your lawyer.",
+      "extra_ideas": [
+        {
+          "text": "Write down the laser shot counter at opening and closing for one week, so billed usage can be checked against clinic activity.",
+          "review": false
+        },
+        {
+          "text": "Make one person note daily shot counts in one notebook beside the machine, so usage records are ready before the bill arrives.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_commission_disputes",
@@ -165,7 +235,17 @@
         "leads_with_view": true
       },
       "ask_first": "Is commission paid on sale or on session delivered?",
-      "free_stops": "Rule details are in the solution document."
+      "free_stops": "Rule details are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare package sales claimed by each therapist with what reception recorded this week, so disputed sales are easier to trace.",
+          "review": false
+        },
+        {
+          "text": "Keep one package sales log at the desk and have reception enter the seller at booking time, so commission credit is handed over clearly.",
+          "review": true
+        }
+      ]
     },
     {
       "id": "p9_reviews_bad",
@@ -185,7 +265,17 @@
         "tool_words": []
       },
       "ask_first": "Who handles complaints today?",
-      "free_stops": "The complaint steps are in the solution document; legal concerns go to your lawyer."
+      "free_stops": "The complaint steps are in the solution document; legal concerns go to your lawyer.",
+      "extra_ideas": [
+        {
+          "text": "Count how many public complaints this month waited more than a day for a reply, so response delay can be judged.",
+          "review": false
+        },
+        {
+          "text": "Choose one person to log complaints and hand any goodwill decision to one approver, so public issues get handled consistently.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p10_record_keeping",
@@ -205,7 +295,17 @@
         "tool_words": []
       },
       "ask_first": "Do you collect written consent today?",
-      "free_stops": "Access set-up is in the solution document."
+      "free_stops": "Access set-up is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Walk the clinic once and count how many before and after sets still sit on personal phones, so the backlog size is clear.",
+          "review": false
+        },
+        {
+          "text": "Make one staff member responsible for moving approved clinic photos into one clinic place each evening, so therapists stop holding records on personal phones.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

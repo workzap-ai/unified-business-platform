@@ -2,7 +2,7 @@
   "industry": "freelancers_solopreneurs_and_home_based_businesses",
   "name": "Freelancers, solopreneurs and home-based businesses",
   "sector": "7.K Professional and business services",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_receivables_late",
@@ -22,7 +22,17 @@
         "tool_words": []
       },
       "ask_first": "Are your clients mostly on a platform, or direct?",
-      "free_stops": "the reminder sequence and payment link setup are kept for the solution document."
+      "free_stops": "the reminder sequence and payment link setup are kept for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many delivered jobs are still unpaid after each week, so you see which work turns into chasing.",
+          "review": false
+        },
+        {
+          "text": "Keep one unpaid jobs page in your notebook and update it at the same time daily, so follow ups stop slipping.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_hidden_costs",
@@ -42,7 +52,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "how scope and revisions are tracked is set out in the solution document."
+      "free_stops": "how scope and revisions are tracked is set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count extra revision rounds on each live job this week, so you see which clients are stretching the original scope.",
+          "review": false
+        },
+        {
+          "text": "Keep one running extras list for every job beside your work area, so unpaid changes get noticed before more time goes in.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_margin_unknown",
@@ -62,7 +82,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "how the earnings view is calculated is kept for the solution document."
+      "free_stops": "how the earnings view is calculated is kept for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare your rough hours and your fee on the last few jobs, so low paying work shows in plain view.",
+          "review": false
+        },
+        {
+          "text": "Block one fixed time daily to note job hours in one notebook, so pricing stops relying on guesses later.",
+          "review": true
+        }
+      ]
     },
     {
       "id": "p4_orders_lost",
@@ -82,7 +112,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "how orders are captured from each app is worked out in the solution document."
+      "free_stops": "how orders are captured from each app is worked out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count open orders waiting in chats against orders on your main list once, so missed requests show before delivery day.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of moving every new order into one notebook before packing starts, so no sale stays buried in messages.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_cod_remittance",
@@ -102,7 +142,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "the matching routine is set out in the solution document."
+      "free_stops": "the matching routine is set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare delivered parcels with cash received from each courier once this week, so late remittances stop hiding inside busy days.",
+          "review": false
+        },
+        {
+          "text": "Keep one courier payments page and let one person update it whenever delivery money arrives, so missing remittances are spotted sooner.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_raw_material_shortage",
@@ -122,7 +172,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "reorder levels and alerts are kept for the solution document."
+      "free_stops": "reorder levels and alerts are kept for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Walk through your work area and note which materials are low against current orders, so mid order stoppages become visible.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of checking key materials at the same time each day, so urgent buying stops interrupting production.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_forecasting",
@@ -142,7 +202,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "the page content and structure are designed in the solution document."
+      "free_stops": "the page content and structure are designed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count where your last few clients came from, so you see how exposed you are to one source drying up.",
+          "review": false
+        },
+        {
+          "text": "Keep one notebook page for lead sources and update it after each new enquiry, so your strongest channels become clearer over time.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_repeat_low",
@@ -163,7 +233,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "message timing and occasions are set out in the solution document."
+      "free_stops": "message timing and occasions are set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many past customers ordered again after their first purchase, so you see whether one time buyers are your main pattern.",
+          "review": false
+        },
+        {
+          "text": "Set one weekly time to review past buyers and note who has gone quiet, so follow ups become a routine task.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_owner_blind",
@@ -183,7 +263,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "the categories and summary format are kept for the solution document."
+      "free_stops": "the categories and summary format are kept for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Mark each money arrival and business spending from last month in your notebook, so your actual take-home from work shows.",
+          "review": false
+        },
+        {
+          "text": "Choose one notebook page for business cash notes and one person to update it nightly, so month-end totals stop drifting.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

@@ -2,7 +2,7 @@
   "industry": "fmcg_distributors_and_sub_distributors",
   "name": "FMCG distributors and sub-distributors",
   "sector": "7.E Trade, distribution and logistics",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_field_team_visibility",
@@ -24,7 +24,17 @@
         ]
       },
       "ask_first": "How many order bookers and routes run on a normal day?",
-      "free_stops": "How visits are confirmed and reported is designed in the solution document."
+      "free_stops": "How visits are confirmed and reported is designed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare one route's claimed shop visits with that route's order slips on the same day, so doubtful coverage on that beat shows.",
+          "review": false
+        },
+        {
+          "text": "Give one supervisor the job of collecting each order booker's end-of-day route sheet, so visit claims get reviewed the same day.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_order_errors",
@@ -44,7 +54,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The order flow from shop to DMS is mapped in the solution document."
+      "free_stops": "The order flow from shop to DMS is mapped in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many paper orders needed correction after entry this week, so you see whether loss or wrong typing hurts more.",
+          "review": false
+        },
+        {
+          "text": "Keep all incoming order slips in one tray until dispatch closes, so entry and picking work from the same pile.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_receivables_late",
@@ -64,7 +84,17 @@
         "tool_words": []
       },
       "ask_first": "What reason does the company give most often for a rejection?",
-      "free_stops": "The claim stages and document checklist are set in the solution document."
+      "free_stops": "The claim stages and document checklist are set in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note which claim papers were sent back most often in recent months, so the repeated rejection point becomes clear.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member the job of keeping all open claim papers in one folder, so follow-up starts from a complete set.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_credit_customers",
@@ -84,7 +114,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "Limit rules and the morning recovery list are designed in the solution document."
+      "free_stops": "Limit rules and the morning recovery list are designed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many recovery visits returned without cash on each route this week, so the worst excuse route stands out.",
+          "review": false
+        },
+        {
+          "text": "Keep one route-wise udhaar notebook with one person updating it every evening, so collectors leave with the same due picture.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_cash_leakage",
@@ -104,7 +144,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The settlement steps and checks are laid out in the solution document."
+      "free_stops": "The settlement steps and checks are laid out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare each van's cash received, receipts issued and deposit made for one week, so the mismatch point becomes visible.",
+          "review": false
+        },
+        {
+          "text": "Hand one cashier the job of closing every cash route before anyone leaves, so any short deposit is caught that day.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_expiry_wastage",
@@ -124,7 +174,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "Alert timings and the push list rules are in the solution document."
+      "free_stops": "Alert timings and the push list rules are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many cases in the godown are already near expiry by brand this week, so the heaviest ageing pile stands out.",
+          "review": false
+        },
+        {
+          "text": "Give one store person the job of keeping all near-expiry stock in one marked area, so dispatch can spot it quickly.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_stockout",
@@ -145,7 +205,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The reorder calculation per SKU is set out in the solution document."
+      "free_stops": "The reorder calculation per SKU is set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note which fast lines were unavailable on picking days this week, so the repeat stockout items are clear.",
+          "review": false
+        },
+        {
+          "text": "Give one buyer the job of reviewing one slow-moving stock list every week, so fresh orders stop ignoring what already sits.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_margin_unknown",
@@ -166,7 +236,17 @@
         "leads_with_view": true
       },
       "ask_first": "",
-      "free_stops": "How costs are assigned to routes is worked out in the solution document."
+      "free_stops": "How costs are assigned to routes is worked out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare one week's route sales with that route's delivery runs and fuel notes, so the costlier route pattern shows.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of writing route sales and running costs in one notebook daily, so route choices use the same facts.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_target_missed",
@@ -187,7 +267,17 @@
         "leads_with_view": true
       },
       "ask_first": "",
-      "free_stops": "The target breakdown by brand and person is set in the solution document."
+      "free_stops": "The target breakdown by brand and person is set in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare daily sales by brand with the month's running target for one week, so the lagging lines stand out before month-end.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of updating one daily target board before the field team leaves, so everyone starts with the same picture.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p10_commission_disputes",
@@ -207,7 +297,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "How the rules are encoded and shown is in the solution document."
+      "free_stops": "How the rules are encoded and shown is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many pay disputes came from sales, returns or schemes last month, so the main source of monthly fights stands out.",
+          "review": false
+        },
+        {
+          "text": "Give one supervisor the job of updating one commission notebook every week, so month-end talks start from the same record.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p11_whatsapp_overload",
@@ -227,7 +327,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The intake flow and confirmation steps are designed in the solution document."
+      "free_stops": "The intake flow and confirmation steps are designed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note how many direct order messages arrived after route cut-off in one week, so you see when forgotten orders usually appear.",
+          "review": false
+        },
+        {
+          "text": "Keep one paper order list beside your phone and let one staff member clear it at a fixed time, so missed orders stop piling up.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

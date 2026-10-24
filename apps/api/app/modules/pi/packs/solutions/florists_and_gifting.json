@@ -2,7 +2,7 @@
   "industry": "florists_and_gifting",
   "name": "Florists and gifting (incl. luxury gifting and corporate gifting)",
   "sector": "7.A Retail and consumer (part 2)",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_expiry_wastage",
@@ -23,7 +23,17 @@
         "tool_words": []
       },
       "ask_first": "Where do your flowers come from?",
-      "free_stops": "the buying method is kept for the solution document."
+      "free_stops": "the buying method is kept for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare which stem types wilt in the bucket with which stem types actually sell that same week, so buying stops favoring slow movers.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of writing each day's oldest flowers on one visible list, so staff sell those stems before fresher stock.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_multi_channel_orders",
@@ -43,7 +53,17 @@
         "tool_words": []
       },
       "ask_first": "Which channel brings most orders?",
-      "free_stops": "channel connections and job-card design go in the solution document."
+      "free_stops": "channel connections and job-card design go in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many orders arrive from each channel during one busy day and how many nearly got missed, so the riskiest handoff stands out.",
+          "review": false
+        },
+        {
+          "text": "Give one person each shift the job of writing every new order into one notebook, so no channel waits for someone to remember it.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_order_errors",
@@ -64,7 +84,17 @@
         "tool_words": []
       },
       "ask_first": "How are card messages captured today?",
-      "free_stops": "the confirmation flow is kept for the solution document."
+      "free_stops": "the confirmation flow is kept for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note whether recent delivery mistakes came from copied details or rushed handovers, so you target the part causing wrong cards or routes.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of reading the delivery details from one written order slip before dispatch, so card and route mix-ups drop.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_delivery_late",
@@ -85,7 +115,17 @@
         "tool_words": []
       },
       "ask_first": "Who delivers, your drivers or an app?",
-      "free_stops": "routing rules and slot design go in the solution document."
+      "free_stops": "routing rules and slot design go in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare late same-day deliveries by area with the time each order was accepted, so you spot whether distance or timing causes missed occasions.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member the job of grouping same-area deliveries into one handover list each day, so drivers stop crisscrossing and arriving late.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_customer_communication",
@@ -106,7 +146,17 @@
         "tool_words": []
       },
       "ask_first": "Who sends photos today?",
-      "free_stops": "the photo step setup is kept for the solution document."
+      "free_stops": "the photo step setup is kept for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many finished orders left without a photo on one busy day, so you see how often the promise is missed.",
+          "review": false
+        },
+        {
+          "text": "Give one person on each shift the job of checking one photo list before dispatch, so customers stop asking where their arrangement picture is.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_approvals_slow",
@@ -128,7 +178,17 @@
         ]
       },
       "ask_first": "How do approvals happen now, WhatsApp, email or both?",
-      "free_stops": "the approval flow is designed in the solution document."
+      "free_stops": "the approval flow is designed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note how many quote versions each corporate order goes through before approval, so you see which clients create the longest back-and-forth.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member the job of keeping each corporate quote conversation in one notebook thread, so rework from mixed messages drops.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_capacity",
@@ -149,7 +209,17 @@
         "tool_words": []
       },
       "ask_first": "Do you bring in extra hands in peak weeks?",
-      "free_stops": "capacity planning rules go in the solution document."
+      "free_stops": "capacity planning rules go in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare how many branded gift units your team planned to finish with how many were actually completed in one day, so deadlines reflect reality.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of writing one daily production list by client and quantity, so the team works from one agreed priority.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_receivables_late",
@@ -169,7 +239,17 @@
         "tool_words": []
       },
       "ask_first": "How do you follow up now?",
-      "free_stops": "terms and reminder timing are kept for the solution document."
+      "free_stops": "terms and reminder timing are kept for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many corporate orders are delivered before a signed approval or purchase note arrives, so weak handovers before billing become visible.",
+          "review": false
+        },
+        {
+          "text": "Give one person a daily notebook check for orders awaiting client approval before packing, so fewer bouquets leave before paperwork is complete.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_raw_material_shortage",
@@ -189,7 +269,17 @@
         "tool_words": []
       },
       "ask_first": "When do you reorder packaging?",
-      "free_stops": "reorder levels are worked out in the solution document."
+      "free_stops": "reorder levels are worked out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count which packaging items run out fastest during busy gift preparation, so you stop being surprised by the same missing pieces.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member the job of noting low packaging items in one notebook place each evening, so peak packing keeps moving.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p10_repeat_low",
@@ -209,7 +299,17 @@
         "tool_words": []
       },
       "ask_first": "How do you reach past corporate clients now?",
-      "free_stops": "the re-engagement plan goes in the solution document."
+      "free_stops": "the re-engagement plan goes in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note which past corporate clients ordered only once and which returned for another occasion, so your Eid follow-up list stops being guesswork.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member the job of keeping one notebook page for upcoming corporate occasions, so follow-ups happen before gift budgets move elsewhere.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

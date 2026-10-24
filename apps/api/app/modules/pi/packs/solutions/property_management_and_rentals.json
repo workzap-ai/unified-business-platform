@@ -2,7 +2,7 @@
   "industry": "property_management_and_rentals",
   "name": "Property management and rentals",
   "sector": "7.F Construction, real estate and facilities",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_bounced_cheques",
@@ -22,7 +22,17 @@
         "tool_words": []
       },
       "ask_first": "Roughly how many units are you collecting cheques for?",
-      "free_stops": "The register design and follow-up flow are in the solution document."
+      "free_stops": "The register design and follow-up flow are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare cheques deposited this week with payment confirmations received, so delayed bounce discoveries stand out while they still matter.",
+          "review": true
+        },
+        {
+          "text": "Give one person the job of noting each cheque outcome every afternoon in one notebook, so missed deposits stop hiding in the pile.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_receivables_late",
@@ -43,7 +53,17 @@
         "tool_words": []
       },
       "ask_first": "At what point does someone start following up today?",
-      "free_stops": "Reminder timing and escalation steps are kept for the solution document."
+      "free_stops": "Reminder timing and escalation steps are kept for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many arrears files have had no follow up this month, so you can see where chasing is stalling.",
+          "review": false
+        },
+        {
+          "text": "Give one person a fixed weekly arrears review with one shared list, so overdue balances get attention before they age further.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_cash_handling_risk",
@@ -63,7 +83,17 @@
         "tool_words": []
       },
       "ask_first": "How do most tenants pay: cash, cheques or transfer?",
-      "free_stops": "The matching rules and variance flags are in the solution document."
+      "free_stops": "The matching rules and variance flags are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count cash payments collected against cash handed over this week, so missing handovers are spotted while memories are still fresh.",
+          "review": false
+        },
+        {
+          "text": "Give one office staff member one daily cash handover notebook, so every collection is matched before anyone leaves for the day.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_manual_reports",
@@ -83,7 +113,17 @@
         "tool_words": []
       },
       "ask_first": "How do your landlord clients get their statements now?",
-      "free_stops": "Statement structure and fee handling are in the solution document."
+      "free_stops": "Statement structure and fee handling are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note which missing papers your accountant chases most during month end, so the real cause of slow owner statements becomes visible.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member one place to gather each property's papers every week, so month end stops starting with a hunt.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_info_lost_in_whatsapp",
@@ -103,7 +143,17 @@
         "tool_words": []
       },
       "ask_first": "How do tenants report a problem today?",
-      "free_stops": "Ticket categories and assignment rules are set out in the solution document."
+      "free_stops": "Ticket categories and assignment rules are set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many maintenance requests arrived from different places this week, so the mess in your intake routine is clear.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member one notebook for every new maintenance request during office hours, so repairs stop disappearing between calls and chats.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_fraud",
@@ -124,7 +174,17 @@
         "tool_words": []
       },
       "ask_first": "Who decides which contractor goes to a job?",
-      "free_stops": "The matching and approval rules are in the solution document."
+      "free_stops": "The matching and approval rules are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare contractor bills from this week with your own notes of reported jobs, so unsupported charges are easier to spot quickly.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of matching each bill to one repair note before approval, so paid work has a clear trail.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_vacancy_high",
@@ -144,7 +204,17 @@
         "tool_words": []
       },
       "ask_first": "What step takes the longest between tenants?",
-      "free_stops": "Trade sequence and target days per unit type are in the solution document."
+      "free_stops": "Trade sequence and target days per unit type are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count the days each empty unit waited for cleaning, repairs or viewings last month, so the biggest delay becomes obvious.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member one handover list at move out, so empty units start getting prepared without waiting for reminders.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_record_keeping",
@@ -166,7 +236,17 @@
         ]
       },
       "ask_first": "What usually causes a deposit argument?",
-      "free_stops": "The inspection checklist and comparison report are in the solution document."
+      "free_stops": "The inspection checklist and comparison report are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Walk one vacant unit and note which rooms have no move photos on file, so missing evidence is obvious before the next handover.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member the move inspection photo check for every handover, so each file is complete before keys change hands.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_double_booking",
@@ -187,7 +267,17 @@
         "tool_words": []
       },
       "ask_first": "Which platforms are you listed on?",
-      "free_stops": "Channel connections and task rules are in the solution document."
+      "free_stops": "Channel connections and task rules are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare this week's bookings across both calendars once, so you see how often dates are clashing before guests arrive.",
+          "review": false
+        },
+        {
+          "text": "Give one person a fixed midday booking cross check in one notebook, so overlapping stays are caught before cleaning and keys are arranged.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p10_contracts_tracking",
@@ -207,7 +297,17 @@
         "tool_words": []
       },
       "ask_first": "How do you keep track of lease end dates now?",
-      "free_stops": "Alert timing and the renewal workflow are in the solution document."
+      "free_stops": "Alert timing and the renewal workflow are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many lease files end within the next two months, so you see how big the renewal rush really is.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member a Friday lease expiry review using one notebook page, so renewals stop slipping past unnoticed.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

@@ -2,7 +2,7 @@
   "industry": "cleaning_and_janitorial_companies",
   "name": "Cleaning and janitorial companies",
   "sector": "7.F Construction, real estate and facilities",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_attendance_lateness",
@@ -22,7 +22,17 @@
         "tool_words": []
       },
       "ask_first": "How many cleaners are working for you right now?",
-      "free_stops": "Check-in method, alert timing and standby rules are in the solution document."
+      "free_stops": "Check-in method, alert timing and standby rules are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note which jobs this week were confirmed by staff but still started late or empty, so the weak points in attendance become clearer.",
+          "review": false
+        },
+        {
+          "text": "Give one person the evening job of checking tomorrow's roster against staff replies, so surprises are caught before customers complain.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_order_errors",
@@ -44,7 +54,17 @@
         ]
       },
       "ask_first": "How do customers book today?",
-      "free_stops": "Assignment rules and booking flow are in the solution document."
+      "free_stops": "Assignment rules and booking flow are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count bookings received from each channel that needed moving after assignment this week, so the busiest source of clashes stands out.",
+          "review": false
+        },
+        {
+          "text": "Keep one notebook page as the only booking list for all incoming jobs, so cleaner assignments stop colliding across channels.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_consistency_across_branches",
@@ -65,7 +85,17 @@
         "tool_words": []
       },
       "ask_first": "What do customers complain about most?",
-      "free_stops": "Checklist content and rating flow are in the solution document."
+      "free_stops": "Checklist content and rating flow are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare complaint notes by service type and by cleaner this week, so you see where standards vary the most.",
+          "review": false
+        },
+        {
+          "text": "Give one supervisor the job of doing the same end of job spot check each day, so every branch is judged the same way.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_cash_handling_risk",
@@ -85,7 +115,17 @@
         "tool_words": []
       },
       "ask_first": "How do home customers pay?",
-      "free_stops": "Matching rules and variance flags are in the solution document."
+      "free_stops": "Matching rules and variance flags are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note how many home jobs ended with cash due but no same day office handover, so weak collection points stand out.",
+          "review": false
+        },
+        {
+          "text": "Keep one notebook at the office for every returned cash envelope, so handovers stop getting disputed between cleaners and staff.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_shrinkage_theft",
@@ -105,7 +145,17 @@
         "tool_words": []
       },
       "ask_first": "How are chemicals and supplies given out?",
-      "free_stops": "Usage benchmarks and alert rules are in the solution document; chemical handling follows product safety instructions."
+      "free_stops": "Usage benchmarks and alert rules are in the solution document; chemical handling follows product safety instructions.",
+      "extra_ideas": [
+        {
+          "text": "Count how many packs or bottles leave storage for each team this week, so unusually heavy usage stands out by crew.",
+          "review": false
+        },
+        {
+          "text": "Give one store key holder the job of noting every item issued in one notebook, so stock stops disappearing between handovers.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_accountability",
@@ -126,7 +176,17 @@
         "tool_words": []
       },
       "ask_first": "How does the client check the headcount?",
-      "free_stops": "Report format and attendance rules are in the solution document."
+      "free_stops": "Report format and attendance rules are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Walk each contract site once this week and count cleaners actually present during billed hours, so short staffing is measured clearly.",
+          "review": false
+        },
+        {
+          "text": "Give one supervisor the job of confirming site attendance at the same time each day, so billing matches what the client receives.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_repeat_low",
@@ -147,7 +207,17 @@
         "tool_words": []
       },
       "ask_first": "Do you contact customers again after a job?",
-      "free_stops": "Reminder timing and plan structure are in the solution document."
+      "free_stops": "Reminder timing and plan structure are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many one time cleaning customers booked again within the same week, so the repeat gap is measured in your own routine.",
+          "review": false
+        },
+        {
+          "text": "Give one person a fixed time each afternoon to note which finished jobs should be offered another slot, so follow up stops slipping away.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_receivables_late",
@@ -167,7 +237,17 @@
         "tool_words": []
       },
       "ask_first": "How long do corporate clients take to pay?",
-      "free_stops": "Reminder schedule and escalation are in the solution document."
+      "free_stops": "Reminder schedule and escalation are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare this month's bill sending dates with each corporate client's usual approval window, so avoidable waiting days become visible.",
+          "review": false
+        },
+        {
+          "text": "Give one office person a fixed weekly slot to review overdue corporate bills, so follow up stays regular across long payment cycles.",
+          "review": true
+        }
+      ]
     },
     {
       "id": "p9_delivery_cost",
@@ -187,7 +267,17 @@
         "tool_words": []
       },
       "ask_first": "How do cleaners get to jobs?",
-      "free_stops": "Routing rules are in the solution document."
+      "free_stops": "Routing rules are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many crews crossed the same busy area more than once in a day, so wasted driving patterns are easier to spot.",
+          "review": false
+        },
+        {
+          "text": "Make one dispatcher own tomorrow's area grouping in one notebook each evening, so crews leave with tighter local runs.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p10_turnover",
@@ -207,7 +297,17 @@
         "tool_words": []
       },
       "ask_first": "What usually makes cleaners leave?",
-      "free_stops": "The onboarding plan is in the solution document; labour-law questions go to a professional."
+      "free_stops": "The onboarding plan is in the solution document; labour-law questions go to a professional.",
+      "extra_ideas": [
+        {
+          "text": "Count how many new cleaners leave before finishing their early weeks this month, so the worst stage of dropout shows.",
+          "review": false
+        },
+        {
+          "text": "Give one supervisor the job of welcoming every new cleaner at the end of each shift, so early frustration gets noticed sooner.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

@@ -2,7 +2,7 @@
   "industry": "housing_society_and_building_management",
   "name": "Housing society and building management (incl. owners' associations)",
   "sector": "7.F Construction, real estate and facilities",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_receivables_late",
@@ -23,7 +23,17 @@
         "tool_words": []
       },
       "ask_first": "How are maintenance charges collected today?",
-      "free_stops": "Reminder timing and the committee view are in the solution document; recovery action is for a lawyer."
+      "free_stops": "Reminder timing and the committee view are in the solution document; recovery action is for a lawyer.",
+      "extra_ideas": [
+        {
+          "text": "Compare this month's expected maintenance total with what actually came in by week end, so the shortfall is plain.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member the overdue dues list and one fixed follow up time weekly, so cash planning gets steadier.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_cash_mismatch",
@@ -43,7 +53,17 @@
         "tool_words": []
       },
       "ask_first": "Who checks the clerk's cash at the end of the day?",
-      "free_stops": "The closing routine and variance rules are set out in the solution document."
+      "free_stops": "The closing routine and variance rules are set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note the cash total at opening and closing beside receipts for one week, so mismatch patterns show by shift.",
+          "review": false
+        },
+        {
+          "text": "Give one person the closing cash check and one notebook for receipt totals, so handover disputes reduce quickly.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_theft_internal",
@@ -64,7 +84,17 @@
         "tool_words": []
       },
       "ask_first": "Who receives the diesel when it arrives?",
-      "free_stops": "The comparison method and alert thresholds are in the solution document."
+      "free_stops": "The comparison method and alert thresholds are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note generator run hours and diesel top ups on the same page this week, so unusual usage days stand out.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member the diesel entry notebook at delivery and refill time, so fuel tracking stays consistent each day.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_delivery_verification",
@@ -84,7 +114,17 @@
         "tool_words": []
       },
       "ask_first": "How many tankers do you order in a typical week?",
-      "free_stops": "The gate flow and bill-matching logic are in the solution document."
+      "free_stops": "The gate flow and bill-matching logic are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count tanker arrivals at the gate and compare that count with the bill once this week, so billing doubts get clearer.",
+          "review": false
+        },
+        {
+          "text": "Give one guard the tanker arrival notebook and one place for daily supplier slips, so payment checks stop relying on scattered papers.",
+          "review": true
+        }
+      ]
     },
     {
       "id": "p5_info_lost_in_whatsapp",
@@ -104,7 +144,17 @@
         "tool_words": []
       },
       "ask_first": "How do you know if a complaint has actually been fixed?",
-      "free_stops": "Categories, assignment and closure rules are in the solution document."
+      "free_stops": "Categories, assignment and closure rules are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many complaints stayed unresolved past the same day this week, so the backlog size becomes visible.",
+          "review": false
+        },
+        {
+          "text": "Give one person the open complaints notebook and one fixed evening review time, so missed issues are chased before chat buries them.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_attendance_lateness",
@@ -124,7 +174,17 @@
         "tool_words": []
       },
       "ask_first": "How many guards, cleaners and maintenance staff are there?",
-      "free_stops": "Checkpoint placement and the alert set-up are in the solution document."
+      "free_stops": "Checkpoint placement and the alert set-up are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note late arrivals and no shows by shift for one week, so the worst timing problem is easier to spot.",
+          "review": false
+        },
+        {
+          "text": "Give one supervisor the duty attendance notebook and one check in time per shift, so staffing gaps get covered sooner.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_contracts_tracking",
@@ -144,7 +204,17 @@
         "tool_words": []
       },
       "ask_first": "Which service contracts do you have running?",
-      "free_stops": "Alert timing and vendor records are designed in the solution document."
+      "free_stops": "Alert timing and vendor records are designed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Look through current service papers and note which agreements end soonest, so renewal pressure is visible before service lapses.",
+          "review": false
+        },
+        {
+          "text": "Give one committee member one notebook page for all contract end dates, so renewals stop slipping past unnoticed.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_approvals_slow",
@@ -164,7 +234,17 @@
         "tool_words": []
       },
       "ask_first": "Where do approvals usually get stuck?",
-      "free_stops": "Limits, approval chains and records are set out in the solution document."
+      "free_stops": "Limits, approval chains and records are set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many purchase requests waited more than a week for signatures, so the approval bottleneck has a size.",
+          "review": false
+        },
+        {
+          "text": "Give one person one pending approvals list and one fixed review time with signers, so routine buying keeps moving.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_manual_reports",
@@ -184,7 +264,17 @@
         "tool_words": []
       },
       "ask_first": "What do owners ask to see at the AGM?",
-      "free_stops": "Report layout and reserve tracking are in the solution document; your accountant signs off the accounts."
+      "free_stops": "Report layout and reserve tracking are in the solution document; your accountant signs off the accounts.",
+      "extra_ideas": [
+        {
+          "text": "Compare one month's bills and receipts with the last AGM figures, so missing support papers show before questions start.",
+          "review": false
+        },
+        {
+          "text": "Give one person one folder for each month's bills and receipts, so account questions are answered faster at meetings.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p10_booking_appointments",
@@ -204,7 +294,17 @@
         "tool_words": []
       },
       "ask_first": "Which facilities do residents book most?",
-      "free_stops": "Booking rules and confirmation flow are in the solution document."
+      "free_stops": "Booking rules and confirmation flow are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many booking changes or clashes happened this week for each hall, so the busiest problem spot is clear.",
+          "review": false
+        },
+        {
+          "text": "Give one person the booking notebook for each facility and one daily handover time, so hall reservations stop colliding.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

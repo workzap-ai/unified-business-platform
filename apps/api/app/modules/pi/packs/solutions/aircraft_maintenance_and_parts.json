@@ -2,7 +2,7 @@
   "industry": "aircraft_maintenance_and_parts",
   "name": "Aircraft maintenance (MRO) and parts",
   "sector": "7.G Transport, mobility and aviation (part 1)",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_po_tracking",
@@ -23,7 +23,17 @@
         "tool_words": []
       },
       "ask_first": "Roughly how many units are out for repair at any one time?",
-      "free_stops": "The chaser schedule and status stages are kept for the solution document."
+      "free_stops": "The chaser schedule and status stages are kept for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare the date sent and last reply for each overseas repair this week, so the longest silent cases stand out.",
+          "review": false
+        },
+        {
+          "text": "Give one role the job of updating one outgoing repairs list every set day, so missing returns get chased earlier.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_no_visibility",
@@ -44,7 +54,17 @@
         "tool_words": []
       },
       "ask_first": "Is your stock list in MRO software, an ERP or Excel today?",
-      "free_stops": "How the sources are connected and searched is set out in the solution document."
+      "free_stops": "How the sources are connected and searched is set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Walk the stock area once and note which fast-moving AOG items are hardest to find after hours, so night delays become visible.",
+          "review": false
+        },
+        {
+          "text": "Give one role the job of keeping one after-hours stock location list by the phone, so urgent searches start faster.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_count_mismatch",
@@ -67,7 +87,17 @@
         ]
       },
       "ask_first": "Is the mismatch mostly consumables or rotables?",
-      "free_stops": "The count cycle and mismatch rules are designed in the solution document."
+      "free_stops": "The count cycle and mismatch rules are designed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare what the store can physically find today against a few urgent requests from this month, so the pain points show.",
+          "review": false
+        },
+        {
+          "text": "Give one role the job of writing every parts move in one notebook at issue and return, so mismatches stop growing unnoticed.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_expiry_wastage",
@@ -87,7 +117,17 @@
         "tool_words": []
       },
       "ask_first": "Which kinds of items expire most often?",
-      "free_stops": "Alert timing and who receives which list are worked out in the solution document."
+      "free_stops": "Alert timing and who receives which list are worked out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many shelf-life items expire within the next few months, so planners can use the riskiest stock sooner.",
+          "review": false
+        },
+        {
+          "text": "Keep one expiry list in one place and give one role a fixed weekly review, so older stock gets attention before it sits too long.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_unbilled_work",
@@ -108,7 +148,17 @@
         "tool_words": []
       },
       "ask_first": "How do customers approve extra work today?",
-      "free_stops": "The approval flow and invoice link are designed in the solution document."
+      "free_stops": "The approval flow and invoice link are designed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare one recent check pack with the customer invoice line by line, so missed findings are easier to spot.",
+          "review": true
+        },
+        {
+          "text": "Give one role the job of keeping one open findings list until invoicing, so extra work is less likely to be missed.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_cost_overruns",
@@ -129,7 +179,17 @@
         "tool_words": []
       },
       "ask_first": "Are technician hours recorded per task today, or only per shift?",
-      "free_stops": "How hours are captured per task and fed back into quotes is set out in the solution document."
+      "free_stops": "How hours are captured per task and fed back into quotes is set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many quoted tasks on one recent check needed extra workshop time, so you spot which scope lines trigger rework.",
+          "review": false
+        },
+        {
+          "text": "Give one role a fixed daily moment to note new customer scope changes in one notebook, so quoting misses stop getting buried.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_hidden_costs",
@@ -149,7 +209,17 @@
         "tool_words": []
       },
       "ask_first": "How many exchange deals are open at a time, roughly?",
-      "free_stops": "Warning timing and handover to shipping are kept for the solution document."
+      "free_stops": "Warning timing and handover to shipping are kept for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many exchange cores are past their return date today, so you see the size of the exposure.",
+          "review": false
+        },
+        {
+          "text": "Keep one core returns list by dispatch and give one role the handover each shift, so due returns stop slipping past.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_handoffs",
@@ -169,7 +239,17 @@
         "tool_words": []
       },
       "ask_first": "Do you run 24/7 shifts or day and evening only?",
-      "free_stops": "The handover fields and acknowledgement flow are designed in the solution document."
+      "free_stops": "The handover fields and acknowledgement flow are designed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note how many open items get rediscovered after each shift change this week, so the handover loss is measurable.",
+          "review": false
+        },
+        {
+          "text": "Give one role the job of updating one open-items page before every shift ends, so the next team starts with the same picture.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_capacity",
@@ -189,7 +269,17 @@
         "tool_words": []
       },
       "ask_first": "How many bays do you plan across?",
-      "free_stops": "How overruns ripple through the plan is worked out in the solution document."
+      "free_stops": "How overruns ripple through the plan is worked out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare planned bay use with actual bay use for this week, so empty time and clashes are clear.",
+          "review": false
+        },
+        {
+          "text": "Give one role the job of updating one bay booking page at a fixed time daily, so late changes stop causing surprises.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p10_slow_response",
@@ -209,7 +299,17 @@
         "tool_words": []
       },
       "ask_first": "Are most of your customers your own airline or third parties?",
-      "free_stops": "The stages that trigger updates are designed in the solution document."
+      "free_stops": "The stages that trigger updates are designed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note how many status calls each aircraft generates in one week, so you see which jobs are driving the interruptions.",
+          "review": false
+        },
+        {
+          "text": "Set one daily time for the team to collect readiness updates in one notebook, so callers get quicker consistent answers.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

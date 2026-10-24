@@ -2,7 +2,7 @@
   "industry": "fuel_stations_and_lpg_cng_distributors",
   "name": "Fuel stations and LPG/CNG distributors",
   "sector": "7.G Transport, mobility and aviation (part 2)",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_cash_mismatch",
@@ -22,7 +22,17 @@
         "tool_words": []
       },
       "ask_first": "Who takes the readings and counts cash at shift change?",
-      "free_stops": "The shift close steps are in the solution document."
+      "free_stops": "The shift close steps are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note each pump's reading change beside that shift's cash total for one week, so the biggest mismatch point shows.",
+          "review": false
+        },
+        {
+          "text": "Keep one variance notebook at the handover desk and make the outgoing supervisor write every difference there, so follow up starts immediately.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_count_mismatch",
@@ -43,7 +53,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "How reconciliation is done is in the solution document; technical tank questions are for your supplier."
+      "free_stops": "How reconciliation is done is in the solution document; technical tank questions are for your supplier.",
+      "extra_ideas": [
+        {
+          "text": "Compare each week's dip difference with the delivery days written in your book, so you see whether the mismatch clusters around receipts.",
+          "review": false
+        },
+        {
+          "text": "Make one supervisor keep dips, delivery notes and daily sales together in one folder, so stock checking stops getting split across papers.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_supplier_quality",
@@ -63,7 +83,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The receiving checklist is in the solution document."
+      "free_stops": "The receiving checklist is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Write the before and after readings for every tanker arrival on one page this week, so short deliveries stand out by load.",
+          "review": false
+        },
+        {
+          "text": "Make one shift supervisor own the delivery record book at arrivals, so every load is checked the same way each time.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_credit_customers",
@@ -83,7 +113,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "Statement timings and reminders are in the solution document."
+      "free_stops": "Statement timings and reminders are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many overdue balances are from transporters versus other credit customers, so collection effort goes where delay is actually building.",
+          "review": true
+        },
+        {
+          "text": "Give one staff member the overdue notebook and a fixed calling hour each day, so chasing happens before balances age further.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_payment_methods",
@@ -103,7 +143,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "Matching steps are in the solution document."
+      "free_stops": "Matching steps are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare each shift's card sales total with the settlement note kept for that shift, so the mismatch point narrows to a day.",
+          "review": false
+        },
+        {
+          "text": "Keep all card slips with one shift envelope and make the cashier hand it over closed, so missing records are spotted at once.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_serial_batch_tracking",
@@ -123,7 +173,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "How cylinders are tracked is in the solution document."
+      "free_stops": "How cylinders are tracked is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count filled and empty cylinders at opening and closing for one week, so the day the return gap grows becomes visible.",
+          "review": false
+        },
+        {
+          "text": "Give one person the returns notebook beside the loading area, so every outgoing and returned cylinder movement lands in one place.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_orders_lost",
@@ -143,7 +203,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The order flow is in the solution document."
+      "free_stops": "The order flow is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count phone orders received and completed each day for one week, so you see when missed deliveries are piling up.",
+          "review": false
+        },
+        {
+          "text": "Keep one order notebook by the main phone and make the dispatcher own it each shift, so delivery work starts from one list.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_reports_late",
@@ -164,7 +234,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "What the daily read includes is in the solution document."
+      "free_stops": "What the daily read includes is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note what time each station's daily sales message reaches you for one week, so the late reporters are clear.",
+          "review": false
+        },
+        {
+          "text": "Set one fixed evening reporting time and one station person to send it, so station comparisons can happen the same night.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_checklists_not_done",
@@ -184,7 +264,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The checklist content is set with your supplier or safety adviser; the tracking is in the solution document."
+      "free_stops": "The checklist content is set with your supplier or safety adviser; the tracking is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many shifts end without a completed checklist this week, so you see where completion is regularly breaking.",
+          "review": false
+        },
+        {
+          "text": "Keep the checklist on one clipboard at the shift handover point and assign it to the outgoing attendant, so it gets closed before leaving.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

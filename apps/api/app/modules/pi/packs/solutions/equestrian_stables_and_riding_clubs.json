@@ -2,7 +2,7 @@
   "industry": "equestrian_stables_and_riding_clubs",
   "name": "Equestrian, stables and riding clubs",
   "sector": "7.C Agriculture, livestock and rural (part 1)",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_booking_appointments",
@@ -22,7 +22,17 @@
         "tool_words": []
       },
       "ask_first": "Who takes bookings now?",
-      "free_stops": "The booking rules and confirmation flow go in the solution document."
+      "free_stops": "The booking rules and confirmation flow go in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare this week's lesson chats against the yard diary once, so you see where double-bookings are actually starting.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of writing every lesson booking in one diary, so parents get one clear answer each time.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_capacity",
@@ -42,7 +52,17 @@
         "tool_words": []
       },
       "ask_first": "How many horses are used for lessons?",
-      "free_stops": "How limits are applied to bookings stays in the solution document."
+      "free_stops": "How limits are applied to bookings stays in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Mark each horse's lesson turns on paper for one full day, so you can spot which horses carry the busiest load.",
+          "review": false
+        },
+        {
+          "text": "Give one groom or instructor the job of updating the horse-use notebook after each lesson, so allocation stops changing mid-day.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_complaints",
@@ -62,7 +82,17 @@
         "tool_words": []
       },
       "ask_first": "How often do cancellations happen in a month?",
-      "free_stops": "The cancellation process and messaging go in the solution document."
+      "free_stops": "The cancellation process and messaging go in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note every same-day instructor cancellation this week and which lesson slot it hit, so the worst pressure points show.",
+          "review": false
+        },
+        {
+          "text": "Set one fixed handover time for instructor changes each day, so parents hear about swaps before arriving at the club.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_receivables_late",
@@ -82,7 +112,17 @@
         "tool_words": []
       },
       "ask_first": "How many horses are on livery?",
-      "free_stops": "Reminder timing and statement layout are set out in the solution document."
+      "free_stops": "Reminder timing and statement layout are set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many horses are still in your stalls with unpaid livery from last month, so today's feeding cost against old bills shows.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member the job of marking paid and unpaid livery on the yard board after evening checks, so handovers stop missed follow ups.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_unbilled_work",
@@ -102,7 +142,17 @@
         "tool_words": []
       },
       "ask_first": "Who arranges the farrier and vet visits?",
-      "free_stops": "How extras are logged and invoiced stays in the solution document."
+      "free_stops": "How extras are logged and invoiced stays in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare this week's yard extras with what was written for each livery account, so missed charges show before bills go out.",
+          "review": false
+        },
+        {
+          "text": "Keep one notebook in the office for all livery extras, so outside costs stop being forgotten at billing time.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_prepaid_balance_tracking",
@@ -122,7 +172,17 @@
         "tool_words": []
       },
       "ask_first": "Do most riders pay per lesson or in packages?",
-      "free_stops": "The balance and renewal rules go in the solution document."
+      "free_stops": "The balance and renewal rules go in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many riders have no clear lesson balance written anywhere, so you can see the size of the package-tracking problem.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member the package balance list and an end-of-day update time, so used lessons are recorded the same day.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_stockout",
@@ -142,7 +202,17 @@
         "tool_words": []
       },
       "ask_first": "Who orders hay and bedding now?",
-      "free_stops": "Reorder points and the cost view are set out in the solution document."
+      "free_stops": "Reorder points and the cost view are set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Walk the store room and note how many days hay and shavings lasted since the last delivery, so ordering timing gets clearer.",
+          "review": false
+        },
+        {
+          "text": "Give one person the stock notebook and one weekly count time, so supplies stop being guessed during busy yard days.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_checklists_not_done",
@@ -162,7 +232,17 @@
         "tool_words": []
       },
       "ask_first": "How many grooms work each day?",
-      "free_stops": "The checklist and flag rules stay in the solution document."
+      "free_stops": "The checklist and flag rules stay in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Check one week's missed daily checklist items against the days you were away, so you see where the routine breaks.",
+          "review": false
+        },
+        {
+          "text": "Give one senior staff member the checklist handover at closing, so unfinished yard jobs are clear before the next shift starts.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_seasonal_dip",
@@ -182,7 +262,17 @@
         "tool_words": []
       },
       "ask_first": "Do you have an indoor or covered arena?",
-      "free_stops": "Timing and audience for the messages go in the solution document."
+      "free_stops": "Timing and audience for the messages go in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare summer lesson attendance with your busiest recent month, so the seasonal drop is clear before staffing decisions.",
+          "review": false
+        },
+        {
+          "text": "Give one person a fixed weekly slot to list inactive riders by age group, so quiet weeks get follow-up without last-minute scrambling.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p10_documentation",
@@ -202,7 +292,17 @@
         "tool_words": []
       },
       "ask_first": "Where are forms kept today?",
-      "free_stops": "The form flow and booking checks stay in the solution document."
+      "free_stops": "The form flow and booking checks stay in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count rider files missing a signed waiver or form today, so you know how much front-desk chasing is pending.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member the rider form folder and end-of-day check, so missing papers stop slipping through busy lesson times.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

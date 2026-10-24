@@ -2,7 +2,7 @@
   "industry": "ambulance_and_patient_transport_services",
   "name": "Ambulance and patient-transport services",
   "sector": "7.I Health and care",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_whatsapp_overload",
@@ -22,7 +22,17 @@
         "tool_words": []
       },
       "ask_first": "How many dispatchers work at peak?",
-      "free_stops": "Routing and log design are in the solution document."
+      "free_stops": "Routing and log design are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count missed calls by phone during one busy shift and note the times, so you see where peak overload is worst.",
+          "review": false
+        },
+        {
+          "text": "Give one person each shift the job of answering overflow from all phones, so missed bookings stop bouncing around.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_no_dashboard",
@@ -44,7 +54,17 @@
         ]
       },
       "ask_first": "Do all vehicles have trackers?",
-      "free_stops": "Tracker connection is mapped in the solution document."
+      "free_stops": "Tracker connection is mapped in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note each vehicle's current status once during the busiest hour, so the dispatcher can see how often availability is unclear.",
+          "review": false
+        },
+        {
+          "text": "Give crews one fixed check-in point after every drop and hand status updates to the dispatcher, so free vehicles are known sooner.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_theft_internal",
@@ -64,7 +84,17 @@
         "tool_words": []
       },
       "ask_first": "Who looks at the tracker data now?",
-      "free_stops": "Exception rules are in the solution document."
+      "free_stops": "Exception rules are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare start and end odometer notes with logged job movement for a few vehicles, so unusual extra distance stands out early.",
+          "review": false
+        },
+        {
+          "text": "Give one supervisor a fixed weekly km review with crews told openly, so detours are checked without hidden monitoring.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_fraud",
@@ -84,7 +114,17 @@
         "tool_words": []
       },
       "ask_first": "Is fuel paid by card, cash or pump account?",
-      "free_stops": "Reconciliation method is in the solution document."
+      "free_stops": "Reconciliation method is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare fuel slips with each vehicle's recent movement notes for one week, so unusual filling patterns are easier to spot.",
+          "review": false
+        },
+        {
+          "text": "Give one office person the job of collecting and filing every fuel slip in one place daily, so missing support is noticed quickly.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_maintenance_downtime",
@@ -104,7 +144,17 @@
         "tool_words": []
       },
       "ask_first": "How many vehicles are off-road today?",
-      "free_stops": "Service intervals are set with your mechanic in the solution document."
+      "free_stops": "Service intervals are set with your mechanic in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Walk the yard and note which vehicles are waiting on service versus running today, so idle time from missed scheduling is clear.",
+          "review": false
+        },
+        {
+          "text": "Give one person one notebook page for upcoming service dates and mileage notes, so workshop bookings stop getting forgotten.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_checklists_not_done",
@@ -124,7 +174,17 @@
         "tool_words": []
       },
       "ask_first": "Who restocks vehicles now?",
-      "free_stops": "Checklist items come from your medical lead; the flow is in the solution document."
+      "free_stops": "Checklist items come from your medical lead; the flow is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Check each vehicle once at shift change and note which ones return without refill done, so the repeat misses are clear.",
+          "review": false
+        },
+        {
+          "text": "Give the returning crew lead the handover duty for refill confirmation before availability is reported, so vehicles stop reappearing unready.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_receivables_late",
@@ -144,7 +204,17 @@
         "tool_words": []
       },
       "ask_first": "Do you bill per trip, per km or by contract?",
-      "free_stops": "Billing rules are in the solution document."
+      "free_stops": "Billing rules are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count unpaid bills by customer and note which ones are oldest, so collection effort goes where cash is already stuck.",
+          "review": false
+        },
+        {
+          "text": "Give one office person a fixed weekly statement follow-up list in one notebook, so chasing late balances becomes routine.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_cash_handling_risk",
@@ -164,7 +234,17 @@
         "tool_words": []
       },
       "ask_first": "How often do crews hand in cash now?",
-      "free_stops": "Hand-in steps are in the solution document."
+      "free_stops": "Hand-in steps are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare cash noted by crews with cash handed in for one recent shift, so the size of delays or shortfalls is clear.",
+          "review": false
+        },
+        {
+          "text": "Give one supervisor a fixed handover time and one place for counted cash notes, so office receipt stops drifting by shift.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_shift_scheduling",
@@ -184,7 +264,17 @@
         "tool_words": []
       },
       "ask_first": "How many crews run per shift?",
-      "free_stops": "Cover rules are in the solution document."
+      "free_stops": "Cover rules are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note every sick call and how long cover took during one week, so the weakest shifts are easier to spot.",
+          "review": false
+        },
+        {
+          "text": "Give one person the duty of keeping one standby contact list by shift, so cover calls start from the same place each time.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p10_licences_renewals",
@@ -204,7 +294,17 @@
         "tool_words": []
       },
       "ask_first": "Who tracks renewals today?",
-      "free_stops": "Reminder schedule is in the solution document; requirements are for the licensing authority."
+      "free_stops": "Reminder schedule is in the solution document; requirements are for the licensing authority.",
+      "extra_ideas": [
+        {
+          "text": "Walk past every vehicle and note each expiry sticker into one notebook page, so the next renewals stop surprising the office.",
+          "review": false
+        },
+        {
+          "text": "Give one office person a fixed weekly check of that notebook page, so renewals get chased before vehicles sit idle.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

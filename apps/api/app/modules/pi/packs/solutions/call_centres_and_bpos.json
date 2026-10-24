@@ -2,7 +2,7 @@
   "industry": "call_centres_and_bpos",
   "name": "Call centres and BPOs",
   "sector": "7.K Professional and business services",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_attendance_lateness",
@@ -23,7 +23,17 @@
         "leads_with_view": true
       },
       "ask_first": "How many seats are you running, and across how many shifts?",
-      "free_stops": "the data sources and alert rules are set out in the solution document."
+      "free_stops": "the data sources and alert rules are set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note actual ready-to-take-calls time against shift start for the night team once, so you see how much client-facing time is really lost.",
+          "review": false
+        },
+        {
+          "text": "Give one team leader the night-shift arrival note in one notebook by the floor entrance, so late starts are caught before queues build.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_accountability",
@@ -44,7 +54,17 @@
         "leads_with_view": true
       },
       "ask_first": "",
-      "free_stops": "the thresholds and how alerts are routed are kept for the solution document."
+      "free_stops": "the thresholds and how alerts are routed are kept for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many agents return from break after the planned time on one shift, so you see how often client complaints have a real floor cause.",
+          "review": false
+        },
+        {
+          "text": "Give one floor supervisor the break-return list at one fixed desk, so long breaks get challenged while the shift is still running.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_turnover",
@@ -64,7 +84,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "how reasons are captured and grouped is worked out in the solution document."
+      "free_stops": "how reasons are captured and grouped is worked out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note whether leavers exit during training, nesting or live calling this week, so you can see where replacement effort keeps getting wasted.",
+          "review": false
+        },
+        {
+          "text": "Give one manager the leaver-reasons notebook and review it every Friday, so hiring and floor issues stop getting mixed together.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_shift_scheduling",
@@ -84,7 +114,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "the forecasting approach and rules are set out in the solution document."
+      "free_stops": "the forecasting approach and rules are set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare one week's busiest calling hours with who was actually on the floor, so you can spot where hand-built schedules leave queues exposed.",
+          "review": false
+        },
+        {
+          "text": "Give one planner the final shift list in one shared place by a fixed weekly time, so floor staffing stops changing at the last minute.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_inspection_missing",
@@ -104,7 +144,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "the sampling rules and scoring form are kept for the solution document."
+      "free_stops": "the sampling rules and scoring form are kept for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many agents had no call review at all this week, so you see which parts of the floor get no quality attention.",
+          "review": false
+        },
+        {
+          "text": "Give one QA lead the weekly review allocation list in one notebook, so checks get spread across the whole team instead of a few voices.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_manual_reports",
@@ -127,7 +177,17 @@
         ]
       },
       "ask_first": "",
-      "free_stops": "which systems are connected and the report format are designed in the solution document."
+      "free_stops": "which systems are connected and the report format are designed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note which report lines get changed by hand each morning for one client, so you see where reporting time is actually being spent.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of collecting yesterday's agreed figures in one notebook before the morning report, so numbers stop being chased across the floor.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_payroll_errors",
@@ -147,7 +207,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "the review step and how deductions are shown are set out in the solution document."
+      "free_stops": "the review step and how deductions are shown are set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many attendance corrections come from lateness, absences, or missing shift notes this week, so the biggest source of confusion shows.",
+          "review": false
+        },
+        {
+          "text": "Give one supervisor one notebook for daily attendance exceptions at shift close, so the monthly attendance summary is easier to compile.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_commission_disputes",
@@ -168,7 +238,17 @@
         "leads_with_view": true
       },
       "ask_first": "",
-      "free_stops": "the calculation setup is kept for the solution document."
+      "free_stops": "the calculation setup is kept for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many monthly sales disputes come from missing sales notes, unclear rules, or late updates, so the main source of arguments stands out.",
+          "review": false
+        },
+        {
+          "text": "Give one team leader one shared place for daily sales exceptions and a fixed weekly check, so monthly disputes surface earlier and calmer.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_maintenance_downtime",
@@ -188,7 +268,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "what is logged and how it is reported is worked out in the solution document."
+      "free_stops": "what is logged and how it is reported is worked out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count outages by shift and note whether internet or power caused each one, so you can see which problem is stealing more working hours.",
+          "review": false
+        },
+        {
+          "text": "Give one floor lead the outage log beside the operations desk, so every disruption is recorded while the details are still clear.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p10_theft_internal",
@@ -208,7 +298,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "the issue and return routine is designed in the solution document."
+      "free_stops": "the issue and return routine is designed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare the equipment on occupied seats with the handover note at shift end, so missing items get spotted before everyone leaves.",
+          "review": false
+        },
+        {
+          "text": "Give one supervisor the end-of-shift equipment check and keep one notebook at the floor exit, so losses stop slipping past handovers.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

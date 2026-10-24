@@ -2,7 +2,7 @@
   "industry": "books_stationery_and_school_supplies",
   "name": "Books, stationery and school supplies",
   "sector": "7.A Retail and consumer (part 2)",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_manual_work",
@@ -23,7 +23,17 @@
         "tool_words": []
       },
       "ask_first": "Roughly how many schools' lists do you handle each season?",
-      "free_stops": "how the booklist library and pre-order link are set up is kept for the solution document."
+      "free_stops": "how the booklist library and pre-order link are set up is kept for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many parent booklist photos repeat the same school and class this week, so you see where typing time is being wasted most.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of keeping one notebook of repeated school and class lists, so common orders can be filled without retyping each photo.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_order_errors",
@@ -44,7 +54,17 @@
         "tool_words": []
       },
       "ask_first": "How do you find out a school has changed an edition?",
-      "free_stops": "the edition library and packing check are detailed in the solution document."
+      "free_stops": "the edition library and packing check are detailed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note every return for wrong edition this week by title and shelf location, so you spot whether the mix-up starts in stocking or picking.",
+          "review": false
+        },
+        {
+          "text": "Make one person check edition and year against the shelf label before handover, so angry returns drop at the counter instead of after collection.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_capacity",
@@ -65,7 +85,17 @@
         "tool_words": []
       },
       "ask_first": "Do most parents buy in the shop or order ahead?",
-      "free_stops": "slot planning and the pre-order flow go in the solution document."
+      "free_stops": "slot planning and the pre-order flow go in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Watch one busy hour and note where the queue stalls most, so you can ease the exact choke point during back-to-school week.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member the job of handing over completed bundles from packing to collection, so counter work keeps moving during the rush.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_overstock_dead_stock",
@@ -86,7 +116,17 @@
         "tool_words": []
       },
       "ask_first": "Can you return unsold books to your suppliers?",
-      "free_stops": "return deadlines and buying rules are worked out in the solution document."
+      "free_stops": "return deadlines and buying rules are worked out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Walk the shelves and note which old syllabus titles still fill the most space, so you see which leftovers are tying up your season most.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of keeping all old syllabus books in one marked area, so current season stock stays easy to pick and explain.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_stockout",
@@ -106,7 +146,17 @@
         "tool_words": []
       },
       "ask_first": "How do you decide quantities today?",
-      "free_stops": "the forecasting method is kept for the solution document."
+      "free_stops": "the forecasting method is kept for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Write down each time a listed book is asked for but unavailable this week, so next buying reflects real missed demand.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member the job of updating one running shortage list for fast-moving titles, so reordering starts from today's gaps not guesswork.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_receivables_late",
@@ -126,7 +176,17 @@
         "tool_words": []
       },
       "ask_first": "How many schools or offices buy on credit?",
-      "free_stops": "account setup and reminder timing go in the solution document."
+      "free_stops": "account setup and reminder timing go in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many school deliveries still lack matching paperwork in your files, so you see what is slowing payment before chasing balances.",
+          "review": true
+        },
+        {
+          "text": "Give one person the job of keeping credit deliveries and invoice copies in one folder, so payment follow-up starts with complete papers.",
+          "review": true
+        }
+      ]
     },
     {
       "id": "p7_info_lost_in_whatsapp",
@@ -146,7 +206,17 @@
         "tool_words": []
       },
       "ask_first": "How many office customers order regularly?",
-      "free_stops": "the intake flow is kept for the solution document."
+      "free_stops": "the intake flow is kept for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note every office order that arrived but was not packed the same day this week, so the leak shows in missed work not impressions.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of writing every office order into one notebook as it arrives, so packing starts from one complete list.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_no_visibility",
@@ -166,7 +236,17 @@
         "tool_words": []
       },
       "ask_first": "How do you check stock before reordering now?",
-      "free_stops": "reorder levels are worked out in the solution document."
+      "free_stops": "reorder levels are worked out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Walk the stationery shelves and note which small items customers ask for most but staff must hunt for, so your blind spots stand out quickly.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member the job of keeping one list of fast-moving stationery counts at closing, so replenishing starts from a known short list.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_cash_mismatch",
@@ -186,7 +266,17 @@
         "tool_words": []
       },
       "ask_first": "Who runs the photocopy counter?",
-      "free_stops": "the reconciliation steps go in the solution document."
+      "free_stops": "the reconciliation steps go in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare photocopy jobs done with cash handed over at each shift end this week, so you see when the mismatch actually starts.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of counting photocopy cash at every handover in one notebook, so shortages are tied to a specific shift.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p10_no_dashboard",
@@ -206,7 +296,17 @@
         "tool_words": []
       },
       "ask_first": "Where are your season sales recorded today?",
-      "free_stops": "the review structure is kept for the solution document."
+      "free_stops": "the review structure is kept for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Pull out last year's and this year's school season notebooks and compare which schools, titles, and weeks drove sales, so buying starts earlier where demand really moved.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member the job of keeping one season notebook for stockouts, leftovers, and busy school requests, so next year's comparison is ready without chasing scraps.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

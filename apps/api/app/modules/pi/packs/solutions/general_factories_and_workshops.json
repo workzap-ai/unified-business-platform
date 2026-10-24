@@ -2,7 +2,7 @@
   "industry": "general_factories_and_workshops",
   "name": "General factories and workshops (made-to-order and made-to-stock)",
   "sector": "7.D Manufacturing and industry (part 1)",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_delivery_late",
@@ -22,7 +22,17 @@
         "tool_words": []
       },
       "ask_first": "Roughly how many orders are open right now?",
-      "free_stops": "The stage list, who taps what and how lateness is flagged are set out in the solution document."
+      "free_stops": "The stage list, who taps what and how lateness is flagged are set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare each open order's current stage with the promised stage by now, so you can spot where late work is stacking up.",
+          "review": false
+        },
+        {
+          "text": "Make one line supervisor update a single open-order board at shift end, so everyone checks the same status before giving dates.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_handoffs",
@@ -42,7 +52,17 @@
         "tool_words": []
       },
       "ask_first": "Which stage hands over most often without the card?",
-      "free_stops": "How hand-overs are confirmed and who sees a stalled card is covered in the solution document."
+      "free_stops": "How hand-overs are confirmed and who sees a stalled card is covered in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many job cards reach assembly without the batch during this week, so you know how often the handover is failing.",
+          "review": false
+        },
+        {
+          "text": "Make cutting place every finished batch and card on one marked handover shelf, so assembly always checks the same spot.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_raw_material_shortage",
@@ -62,7 +82,17 @@
         "tool_words": []
       },
       "ask_first": "Which material runs short most often?",
-      "free_stops": "How minimum levels are worked out per item and who gets which alert sits in the solution document."
+      "free_stops": "How minimum levels are worked out per item and who gets which alert sits in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many times this week purchase hears about a low raw material only after production stops, so the handoff delay shows.",
+          "review": false
+        },
+        {
+          "text": "Give the store keeper one notebook page for low stock alerts at shift end, so purchase gets a steady signal before lines stop.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_count_mismatch",
@@ -83,7 +113,17 @@
         "tool_words": []
       },
       "ask_first": "Where does the count go wrong most — raw material, work in progress or finished goods?",
-      "free_stops": "The counting routine, issue rules and how differences are flagged are kept for the solution document."
+      "free_stops": "The counting routine, issue rules and how differences are flagged are kept for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count one item from store records to shelf by location this week, so you see where pieces are disappearing or shifting.",
+          "review": false
+        },
+        {
+          "text": "Make one store keeper keep all stock corrections in one notebook beside the shelves, so count changes stop getting scattered.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_margin_unknown",
@@ -103,7 +143,17 @@
         "tool_words": []
       },
       "ask_first": "How do you work out a price when you quote today?",
-      "free_stops": "How labour, machine time and overheads are built into the cost is detailed in the solution document."
+      "free_stops": "How labour, machine time and overheads are built into the cost is detailed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Write one recent job's material used, hours spent and scrap left over, so your quoted piece price has a real floor check.",
+          "review": true
+        },
+        {
+          "text": "Make one estimator keep every current cost note in one notebook, so new quotes use the same basis each time.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_receivables_late",
@@ -123,7 +173,17 @@
         "tool_words": []
       },
       "ask_first": "Is anyone following up on overdue bills today?",
-      "free_stops": "Reminder timing, credit limits and how balances are confirmed with dealers are set out in the solution document."
+      "free_stops": "Reminder timing, credit limits and how balances are confirmed with dealers are set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare what each dealer still owes with the date of their latest dispatch, so slow payers stand out before more goods go.",
+          "review": false
+        },
+        {
+          "text": "Make the accounts clerk review one overdue list at the same time each week, so follow-up stops slipping behind dispatch work.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_maintenance_downtime",
@@ -143,7 +203,17 @@
         "tool_words": []
       },
       "ask_first": "Which machine stops the most?",
-      "free_stops": "Which spares to hold and how a maintenance schedule is set per machine are covered in the solution document."
+      "free_stops": "Which spares to hold and how a maintenance schedule is set per machine are covered in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note which machine waited longest for a mechanic or part this month, so you can see where delays hurt the floor most.",
+          "review": false
+        },
+        {
+          "text": "Make one operator leave every machine stoppage note in one fixed place, so the mechanic gets the same handover each time.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_inspection_missing",
@@ -163,7 +233,17 @@
         "tool_words": []
       },
       "ask_first": "Is anyone checking goods before dispatch now?",
-      "free_stops": "The checklist itself and how rejections are traced to a stage are kept for the solution document."
+      "free_stops": "The checklist itself and how rejections are traced to a stage are kept for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many pieces from the last rejected lot had the same fault, so you know whether one issue spoiled the shipment.",
+          "review": false
+        },
+        {
+          "text": "Make one packer check finished goods against the customer's known complaint point before dispatch, so the same rejection reason is less likely.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_orders_lost",
@@ -183,7 +263,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "How orders flow from each channel into production is mapped in the solution document."
+      "free_stops": "How orders flow from each channel into production is mapped in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count open orders from calls, messages and email against what reached production, so you see where orders are dropping out.",
+          "review": false
+        },
+        {
+          "text": "Make the sales coordinator write every new order in one notebook before sharing it onward, so nothing waits in separate channels.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p10_theft_internal",
@@ -204,7 +294,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "Where weighing happens and how weights are matched to sales is detailed in the solution document."
+      "free_stops": "Where weighing happens and how weights are matched to sales is detailed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note each scrap pile by material and approximate size before it leaves this week, so missing sale money has something concrete behind it.",
+          "review": false
+        },
+        {
+          "text": "Make the shift supervisor record every scrap handover in one notebook at dispatch, so floor sales cannot pass without a visible trail.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

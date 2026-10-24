@@ -2,7 +2,7 @@
   "industry": "property_developers",
   "name": "Property developers",
   "sector": "7.F Construction, real estate and facilities",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_double_booking",
@@ -22,7 +22,17 @@
         "tool_words": []
       },
       "ask_first": "Who is allowed to mark a unit as booked today?",
-      "free_stops": "The status rules, hold expiry logic and lock design are set out in the solution document."
+      "free_stops": "The status rules, hold expiry logic and lock design are set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many unit status changes were shared after the sale call this week, so you see where duplicate selling starts.",
+          "review": false
+        },
+        {
+          "text": "Make one person announce every booked and released unit in the team chat, so salespeople stop working from mixed status updates.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_instalment_tracking",
@@ -42,7 +52,17 @@
         "tool_words": []
       },
       "ask_first": "Roughly how many buyers are behind right now?",
-      "free_stops": "The reminder timing, escalation stages and ageing buckets are in the solution document."
+      "free_stops": "The reminder timing, escalation stages and ageing buckets are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note this week's instalments due against collections actually received, so you can see how late chasing really starts.",
+          "review": false
+        },
+        {
+          "text": "Set one fixed morning each week for overdue instalment review with one collections owner, so follow up starts before month end.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_cash_flow_tight",
@@ -63,7 +83,17 @@
         "leads_with_view": true
       },
       "ask_first": "Is the build done by your own construction arm or a main contractor?",
-      "free_stops": "How the forecast is built from instalment plans and package schedules is kept for the solution document."
+      "free_stops": "How the forecast is built from instalment plans and package schedules is kept for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare this week's site payment requests with collections received this week, so you see how far execution is outrunning cash coming in.",
+          "review": true
+        },
+        {
+          "text": "Give one person a single page for upcoming site payments and expected collections, so spending decisions are checked against cash timing.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_discount_abuse",
@@ -83,7 +113,17 @@
         "tool_words": []
       },
       "ask_first": "How many dealers or brokers sell for you?",
-      "free_stops": "Approval limits, who can approve what and the audit trail are detailed in the solution document."
+      "free_stops": "Approval limits, who can approve what and the audit trail are detailed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many deals this week included a discount without your written approval, so you see the size of the leakage.",
+          "review": true
+        },
+        {
+          "text": "Make one person keep a single dated list of approved exceptions, so sales calls stop turning into untracked price changes.",
+          "review": true
+        }
+      ]
     },
     {
       "id": "p5_campaign_roi_unknown",
@@ -106,7 +146,17 @@
         ]
       },
       "ask_first": "Where do most of your enquiries come from today?",
-      "free_stops": "The tagging set-up per channel and the reporting design belong in the solution document."
+      "free_stops": "The tagging set-up per channel and the reporting design belong in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Match this month's bookings to the enquiry source already noted in chats or registers once, so wasted promotion starts standing out.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member one shared lead source register updated the day enquiries arrive, so booked units can be traced back later.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_commission_disputes",
@@ -128,7 +178,17 @@
         ]
       },
       "ask_first": "How is it decided today who gets commission on a booking?",
-      "free_stops": "Registration rules, conflict handling and statement layout are in the solution document."
+      "free_stops": "Registration rules, conflict handling and statement layout are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many commission claims this month lack a dated visit or enquiry note, so the dispute pattern becomes visible.",
+          "review": false
+        },
+        {
+          "text": "Keep one broker claim notebook with one person noting arrival dates and unit interest, so month end arguments have one reference point.",
+          "review": true
+        }
+      ]
     },
     {
       "id": "p7_reports_wrong",
@@ -148,7 +208,17 @@
         "tool_words": []
       },
       "ask_first": "Who tells you how far along the build is today?",
-      "free_stops": "The milestone structure and how progress is weighted are kept for the solution document."
+      "free_stops": "The milestone structure and how progress is weighted are kept for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Walk one block with both progress figures in hand, so you can see exactly which milestones the two sides count differently.",
+          "review": false
+        },
+        {
+          "text": "Make one site milestone list the only reference for contractor and engineer updates, so progress talks use the same yardstick.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_customer_communication",
@@ -168,7 +238,17 @@
         "tool_words": []
       },
       "ask_first": "How do buyers reach you now, and who answers them?",
-      "free_stops": "The message plan, content flow and opt-in handling are in the solution document."
+      "free_stops": "The message plan, content flow and opt-in handling are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many overseas buyer update requests came in unanswered this week, so you see the backlog hurting confidence.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member a fixed weekly slot to send current site photos and notes, so overseas buyers stop chasing individually.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_after_sales",
@@ -188,7 +268,17 @@
         "tool_words": []
       },
       "ask_first": "Roughly how many units are waiting on snag fixes?",
-      "free_stops": "Categories, assignment rules and sign-off flow are set out in the solution document."
+      "free_stops": "Categories, assignment rules and sign-off flow are set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count open snagging complaints by trade from your current messages and registers once, so the oldest bottleneck shows clearly.",
+          "review": false
+        },
+        {
+          "text": "Assign one person one notebook for all snagging items and closures, so subcontractor follow up happens from a single list.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p10_data_scattered",
@@ -211,7 +301,17 @@
         ]
       },
       "ask_first": "What report do you wish you had every Monday morning?",
-      "free_stops": "Which modules come first and how the data is joined is mapped in the solution document."
+      "free_stops": "Which modules come first and how the data is joined is mapped in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare one recent unit across sales, accounts and construction records once, so you see exactly where the team descriptions stop matching.",
+          "review": false
+        },
+        {
+          "text": "Keep one notebook for weekly cross team numbers with one staff member updating it, so your Monday review comes from one place.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

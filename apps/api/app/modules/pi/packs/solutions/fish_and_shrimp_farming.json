@@ -2,7 +2,7 @@
   "industry": "fish_and_shrimp_farming",
   "name": "Fish and shrimp farming (aquaculture)",
   "sector": "7.C Agriculture, livestock and rural (part 1)",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_count_mismatch",
@@ -22,7 +22,17 @@
         "tool_words": []
       },
       "ask_first": "How many ponds do you run?",
-      "free_stops": "The register fields and pond comparison go in the solution document."
+      "free_stops": "The register fields and pond comparison go in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Walk each pond edge and note every place fish can leave unnoticed, so you see where losses may be happening between stocking and harvest.",
+          "review": false
+        },
+        {
+          "text": "Give one worker the job of noting every movement into or out of each pond, so unexplained losses have a clearer starting point.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_maintenance_downtime",
@@ -42,7 +52,17 @@
         "tool_words": []
       },
       "ask_first": "Is there a generator or solar backup for the aerators?",
-      "free_stops": "Round timings and alert routing are detailed in the solution document."
+      "free_stops": "Round timings and alert routing are detailed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare stoppages by time and pond from recent notes, so you can see which hours and locations fail you most often.",
+          "review": false
+        },
+        {
+          "text": "Assign one night worker to report every round in one notebook, so stopped aerators are noticed and passed on without delay.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_theft_internal",
@@ -62,7 +82,17 @@
         "tool_words": []
       },
       "ask_first": "Who issues feed each day?",
-      "free_stops": "The store log and gap rules stay in the solution document."
+      "free_stops": "The store log and gap rules stay in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare feed issued with the days each pond was actively fed, so missing bags stand out against normal store movement.",
+          "review": false
+        },
+        {
+          "text": "Make one person hand over the store count at the same time daily, so bag shortages are caught before they grow.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_margin_unknown",
@@ -83,7 +113,17 @@
         "leads_with_view": true
       },
       "ask_first": "Is feed issued per pond, or for the whole farm?",
-      "free_stops": "Which costs go in and how they're split per pond goes in the solution document."
+      "free_stops": "Which costs go in and how they're split per pond goes in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "For one pond ready to sell, compare feed bags issued with kilos harvested, so costly ponds stand out before the next sale.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member one notebook page per pond cycle for feed, power and labour notes, so cost per kilo can be checked later.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_supplier_quality",
@@ -104,7 +144,17 @@
         "leads_with_view": true
       },
       "ask_first": "How many seed suppliers do you use?",
-      "free_stops": "How sources are compared stays in the solution document."
+      "free_stops": "How sources are compared stays in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare ponds by seed source and later harvest outcome from your notes, so weaker suppliers are easier to spot.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of logging every seed delivery by source and pond, so later losses can be linked back clearly.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_pricing_disputes",
@@ -125,7 +175,17 @@
         "leads_with_view": true
       },
       "ask_first": "Do you sell through one agent or several?",
-      "free_stops": "The harvest record and agent comparison go in the solution document."
+      "free_stops": "The harvest record and agent comparison go in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "For each sale this week, note the arhti rate beside loaded baskets and final weighed kilos, so weight and price differences are easier to spot.",
+          "review": true
+        },
+        {
+          "text": "Give one person the job of keeping each sale slip with the matching weigh paper, so rate disputes are checked from one bundle.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_receivables_late",
@@ -145,7 +205,17 @@
         "tool_words": []
       },
       "ask_first": "How long do payments usually take?",
-      "free_stops": "Reminder timing and statement layout are set out in the solution document."
+      "free_stops": "Reminder timing and statement layout are set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Look back at recent agent sales and note promised versus actual payment days, so the agents causing the longest cash delays stand out.",
+          "review": true
+        },
+        {
+          "text": "Give one staff member one running page for each market agent balance, so follow up starts from the latest due amount each time.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_theft_external",
@@ -165,7 +235,17 @@
         "tool_words": []
       },
       "ask_first": "Which ponds are hit most?",
-      "free_stops": "Check-in timing and alerts go in the solution document."
+      "free_stops": "Check-in timing and alerts go in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note the pond side and time for each night theft report, so you can see which areas are targeted most often.",
+          "review": false
+        },
+        {
+          "text": "Give one person the night incident notebook and tell staff to report every sign of theft there, so police reports use one account.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_delivery_late",
@@ -185,7 +265,17 @@
         "tool_words": []
       },
       "ask_first": "How far does the harvest travel to the buyer?",
-      "free_stops": "The tracking points and alerts stay in the solution document."
+      "free_stops": "The tracking points and alerts stay in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare planned departure and actual arrival times for recent loads, so you can see where delays usually start.",
+          "review": false
+        },
+        {
+          "text": "Assign one person to own the dispatch note from loading to buyer arrival, so late trucks are chased by one clear handover.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p10_supply_consistency",
@@ -205,7 +295,17 @@
         "tool_words": []
       },
       "ask_first": "How many hotel or restaurant clients are asking?",
-      "free_stops": "How the planner matches orders to ponds is worked out in the solution document."
+      "free_stops": "How the planner matches orders to ponds is worked out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Review the last few harvest dates and sale quantities pond by pond, so fixed weekly promises match what your farm usually releases.",
+          "review": false
+        },
+        {
+          "text": "Give one person a notebook for buyer commitments by week, so hotel and restaurant orders stop clashing with likely harvest timing.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

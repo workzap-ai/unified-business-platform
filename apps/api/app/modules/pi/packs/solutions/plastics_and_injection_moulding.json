@@ -2,7 +2,7 @@
   "industry": "plastics_and_injection_moulding",
   "name": "Plastics and injection moulding",
   "sector": "7.D Manufacturing and industry (part 1)",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_price_increases_supplier",
@@ -22,7 +22,17 @@
         "tool_words": []
       },
       "ask_first": "How often do you update your rate list now?",
-      "free_stops": "How the cost is built and how the price list is updated is set out in the solution document."
+      "free_stops": "How the cost is built and how the price list is updated is set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note today's resin rate beside your dealer price for your fastest items, so underpriced pieces are easy to spot.",
+          "review": true
+        },
+        {
+          "text": "Give one person the job of updating one paper dealer price list each week, so quotes follow current resin changes.",
+          "review": true
+        }
+      ]
     },
     {
       "id": "p2_raw_material_shortage",
@@ -42,7 +52,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "How consumption and minimum levels are calculated is covered in the solution document."
+      "free_stops": "How consumption and minimum levels are calculated is covered in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note each machine stoppage caused by delayed resin and the missing grade, so the worst supply gaps stand out.",
+          "review": false
+        },
+        {
+          "text": "Give one store person one notebook for incoming resin promises and actual arrivals, so late traders are easier to challenge.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_maintenance_downtime",
@@ -62,7 +82,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "Inspection routine and maintenance schedule are set out in the solution document."
+      "free_stops": "Inspection routine and maintenance schedule are set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many active jobs depend on each mould now out for repair, so the real production hold-up is clear.",
+          "review": false
+        },
+        {
+          "text": "Give one person one notebook for mould movement, repair dates and return dates, so follow-up with the repair shop stays regular.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_rework",
@@ -83,7 +113,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "How rejects are recorded and compared is kept for the solution document."
+      "free_stops": "How rejects are recorded and compared is kept for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare reject trays across moulds at the end of each shift, so the worst moulds for waste stand out quickly.",
+          "review": false
+        },
+        {
+          "text": "Give one supervisor one board to record rejects by mould each shift, so rework gets tracked the same way every time.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_trust_honesty",
@@ -103,7 +143,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "How readings are captured and checked is set out in the solution document."
+      "free_stops": "How readings are captured and checked is set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare packed goods with the written shift output on a few machines, so the recording gap shows.",
+          "review": false
+        },
+        {
+          "text": "Give one supervisor the handover job for checking written output at each shift end, so reported production stops changing unchecked.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_theft_internal",
@@ -123,7 +173,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "Weighing points and matching are covered in the solution document."
+      "free_stops": "Weighing points and matching are covered in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count scrap and regrind bags leaving the floor each day and note where they went, so missing material patterns stand out.",
+          "review": false
+        },
+        {
+          "text": "Give one store person one place to record every scrap bag handover, so bags stop moving without a trace.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_stockout",
@@ -144,7 +204,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "How stock is matched to orders is set out in the solution document."
+      "free_stops": "How stock is matched to orders is set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Walk the finished goods area and note items with the highest piles beside recent dealer requests, so mismatches stand out clearly.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of updating one stock notebook after each dispatch, so fast-moving items are less likely to run out.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_credit_customers",
@@ -164,7 +234,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "Limits and reminder timing are kept for the solution document."
+      "free_stops": "Limits and reminder timing are kept for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many dealer balances have no promised follow up date written beside them, so missed collection callbacks stop hiding in the week.",
+          "review": false
+        },
+        {
+          "text": "Give one staff role one notebook page for dealer payment follow ups at a fixed daily time, so callbacks happen even on dispatch days.",
+          "review": true
+        }
+      ]
     },
     {
       "id": "p9_utility_costs",
@@ -185,7 +265,17 @@
         "leads_with_view": true
       },
       "ask_first": "",
-      "free_stops": "How power cost is spread per machine and piece is detailed in the solution document; for tariff questions, talk to your utility or adviser."
+      "free_stops": "How power cost is spread per machine and piece is detailed in the solution document; for tariff questions, talk to your utility or adviser.",
+      "extra_ideas": [
+        {
+          "text": "Note which machines stay heated without producing during changeovers this week, so avoidable power waste is easier to spot.",
+          "review": false
+        },
+        {
+          "text": "Give one shift lead the job of noting idle heated machines in one notebook, so wasted running time gets reviewed daily.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p10_website_issues",
@@ -206,7 +296,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "How the catalogue stays in sync with stock is set out in the solution document."
+      "free_stops": "How the catalogue stays in sync with stock is set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count which item photos and item codes dealers ask for most in one week, so the missing range is clear.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member the job of keeping all item photos and codes in one shared folder, so dealer replies go faster.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

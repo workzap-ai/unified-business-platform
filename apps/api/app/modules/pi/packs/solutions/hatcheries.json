@@ -2,7 +2,7 @@
   "industry": "hatcheries",
   "name": "Hatcheries",
   "sector": "7.C Agriculture, livestock and rural (part 1)",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_no_dashboard",
@@ -22,7 +22,17 @@
         "tool_words": []
       },
       "ask_first": "How many setters and hatchers do you run?",
-      "free_stops": "The entry fields and comparison views go in the solution document."
+      "free_stops": "The entry fields and comparison views go in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare one month's hatch results by machine and egg source on facing register pages, so weaker lines stand out for review.",
+          "review": false
+        },
+        {
+          "text": "Give one clerk the weekly job of copying each hatch result into one notebook section, so comparisons stop getting lost across registers.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_order_errors",
@@ -44,7 +54,17 @@
         ]
       },
       "ask_first": "Who takes bookings today?",
-      "free_stops": "Capacity rules and the confirmation flow are set out in the solution document."
+      "free_stops": "Capacity rules and the confirmation flow are set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count bookings against each hatch day's expected boxes in one notebook page, so crowded days are spotted before more promises go out.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member the booking total for each hatch day and one booking notebook, so overbooking stops across scattered chats.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_overstock_dead_stock",
@@ -64,7 +84,17 @@
         "tool_words": []
       },
       "ask_first": "Do you take an advance with bookings?",
-      "free_stops": "The terms and waiting-list flow stay in the solution document."
+      "free_stops": "The terms and waiting-list flow stay in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note cancelled bookings by hatch day and buyer type for one week, so you can see where leftover chicks usually come from.",
+          "review": false
+        },
+        {
+          "text": "Give one person the cancelled chicks list and one call round before dispatch, so spare boxes are offered while demand is still live.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_complaints",
@@ -84,7 +114,17 @@
         "tool_words": []
       },
       "ask_first": "Do you deliver, or do customers collect?",
-      "free_stops": "The dispatch record and confirmation steps go in the solution document."
+      "free_stops": "The dispatch record and confirmation steps go in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare box counts at loading and on the delivery note for each trip, so short-count disputes can be checked quickly.",
+          "review": false
+        },
+        {
+          "text": "Give one dispatcher the job of writing every trip's box total in one register, so each complaint has one count to refer back to.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_serial_batch_tracking",
@@ -104,7 +144,17 @@
         "tool_words": []
       },
       "ask_first": "How do complaints reach you now?",
-      "free_stops": "How batches are linked and traced is detailed in the solution document."
+      "free_stops": "How batches are linked and traced is detailed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Look at recent complaints beside dispatch dates and hatch sources in the register, so repeat trouble can be linked to one batch.",
+          "review": false
+        },
+        {
+          "text": "Give one dispatch clerk one notebook page per hatch batch for all outgoing boxes, so late complaints can be traced without guessing.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_supplier_quality",
@@ -124,7 +174,17 @@
         "tool_words": []
       },
       "ask_first": "How many egg sources do you use?",
-      "free_stops": "The intake log and supplier summary go in the solution document."
+      "free_stops": "The intake log and supplier summary go in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count cracked eggs against each breeder farm arrival this week, so you can show which source is causing avoidable rejection.",
+          "review": false
+        },
+        {
+          "text": "Give one receiving staff member one arrival page per supplier load, so late deliveries and cracked eggs get logged the same way.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_maintenance_downtime",
@@ -144,7 +204,17 @@
         "tool_words": []
       },
       "ask_first": "Do your machines have any alarm output today?",
-      "free_stops": "How alarms are connected and routed stays in the solution document."
+      "free_stops": "How alarms are connected and routed stays in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note every power interruption by time and who informed you this week, so the weak point in night alerting becomes visible.",
+          "review": false
+        },
+        {
+          "text": "Give one night person the owner call duty and one posted handover note, so outages reach you without waiting for someone else.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_receivables_late",
@@ -164,7 +234,17 @@
         "tool_words": []
       },
       "ask_first": "How many dealers buy on credit?",
-      "free_stops": "Reminder timing and limits are set out in the solution document."
+      "free_stops": "Reminder timing and limits are set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare dealers with overdue balances against their latest chick pickups, so you can see which accounts keep extending without clearing.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member one credit notebook and a fixed weekly review time, so overdue follow-up happens before the next dispatch.",
+          "review": true
+        }
+      ]
     },
     {
       "id": "p9_whatsapp_overload",
@@ -184,7 +264,17 @@
         "tool_words": []
       },
       "ask_first": "Roughly how many orders go out on a busy day?",
-      "free_stops": "The update triggers and messages go in the solution document."
+      "free_stops": "The update triggers and messages go in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many ready-order calls come before dispatch time on one busy day, so you can see when customers start chasing updates.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member the ready-order update duty at one fixed time daily, so callers hear back before the phone line gets jammed.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p10_checklists_not_done",
@@ -204,7 +294,17 @@
         "tool_words": []
       },
       "ask_first": "How do you know the night checks were done today?",
-      "free_stops": "The checklist and alert rules stay in the solution document."
+      "free_stops": "The checklist and alert rules stay in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many night checks were logged versus due across one week, so you can see which shift is skipping the routine.",
+          "review": false
+        },
+        {
+          "text": "Give one night supervisor the logbook and one handover time each shift, so missed checks stop being argued about later.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

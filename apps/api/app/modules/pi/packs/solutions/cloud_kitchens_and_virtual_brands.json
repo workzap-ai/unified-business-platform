@@ -2,7 +2,7 @@
   "industry": "cloud_kitchens_and_virtual_brands",
   "name": "Cloud kitchens and virtual brands",
   "sector": "7.B Food and beverage",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_cod_remittance",
@@ -11,8 +11,8 @@
       "category": "cash_collections",
       "subtype": "cod_remittance",
       "quick_ideas": [
-        "Match one week of one app's statement against your own orders, so you know where the gap really sits",
-        "Note the order numbers you can't match, so you can raise them with the app."
+        "Count one busy day's accepted orders and one payout line by line in your notebook, so the mismatch size is clear before raising it.",
+        "Give one person the daily payout check and keep every mismatch in one notebook, so unresolved remittance issues stop getting missed."
       ],
       "workzap_build": {
         "keys": [
@@ -24,7 +24,11 @@
         ]
       },
       "ask_first": "Which app's payouts confuse you most?",
-      "free_stops": "The reconciliation rules for each app and how disputes are tracked go in the solution document."
+      "free_stops": "The reconciliation rules for each app and how disputes are tracked go in the solution document.",
+      "quick_ideas_original": [
+        "Match one week of one app's statement against your own orders, so you know where the gap really sits",
+        "Note the order numbers you can't match, so you can raise them with the app."
+      ]
     },
     {
       "id": "p2_margin_unknown",
@@ -47,7 +51,17 @@
         "leads_with_view": true
       },
       "ask_first": "Do you know the food and packaging cost for your main items?",
-      "free_stops": "The margin model and which costs it includes are set out in the solution document."
+      "free_stops": "The margin model and which costs it includes are set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note one busy day's orders by brand beside their deductions and discounts, so you see which brand truly keeps the least.",
+          "review": false
+        },
+        {
+          "text": "Give one person a notebook page for deduction notes after each payout, so margin surprises stop piling up unnoticed.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_integration_marketplace",
@@ -69,7 +83,17 @@
         ]
       },
       "ask_first": "How many screens are in the kitchen right now?",
-      "free_stops": "Which channels can be merged and how the screen is laid out is in the solution document."
+      "free_stops": "Which channels can be merged and how the screen is laid out is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count missed or delayed orders by source during one rush, so you see whether tablets or direct chats cause more confusion.",
+          "review": false
+        },
+        {
+          "text": "Assign one person to call out every new order source at the pass, so cooks work from one heard queue.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_delivery_late",
@@ -89,7 +113,17 @@
         "tool_words": []
       },
       "ask_first": "Which brand is slowest to prepare?",
-      "free_stops": "How prep times are set and the kitchen flow per brand stay for the solution document."
+      "free_stops": "How prep times are set and the kitchen flow per brand stay for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note rider arrival time and food ready time for each late pickup today, so you see whether delay starts in kitchen timing.",
+          "review": false
+        },
+        {
+          "text": "Give one person the handover job during rush, so riders stop waiting while cooks search for packed orders.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_packing_errors",
@@ -109,7 +143,17 @@
         "tool_words": []
       },
       "ask_first": "Is it the same items missing each time?",
-      "free_stops": "The checklist per brand and how photos are used in app disputes are in the solution document."
+      "free_stops": "The checklist per brand and how photos are used in app disputes are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count which item is missing most often across today's complaints, so you fix the repeat miss hurting your brand every day.",
+          "review": false
+        },
+        {
+          "text": "Give one packer the final bag check at handover, so drinks and sauces stop being skipped in the last minute.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_no_visibility",
@@ -129,7 +173,17 @@
         "tool_words": []
       },
       "ask_first": "Do your brands share most ingredients, or only a few?",
-      "free_stops": "The allocation rules and prep plan logic are kept for the solution document."
+      "free_stops": "The allocation rules and prep plan logic are kept for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare what was prepped against what was actually sold for shared chicken today, so over-prep and brand clashes show.",
+          "review": false
+        },
+        {
+          "text": "Give one person the shared-ingredient list in one notebook place, so both brands check the same stock before prep starts.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_reviews_bad",
@@ -151,7 +205,17 @@
         ]
       },
       "ask_first": "What do the low ratings mention most?",
-      "free_stops": "How themes are tracked and acted on per brand is in the solution document."
+      "free_stops": "How themes are tracked and acted on per brand is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note the complaint words from recent low ratings in one list, so the kitchen sees what is dragging orders down.",
+          "review": false
+        },
+        {
+          "text": "Give one person a fixed weekly review check with the cooks, so the same complaint stops repeating across brands.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_ad_spend_waste",
@@ -174,7 +238,17 @@
         "leads_with_view": true
       },
       "ask_first": "Which brand is doing best, and which least?",
-      "free_stops": "The rules for where ad spend goes and when to close a brand are in the solution document."
+      "free_stops": "The rules for where ad spend goes and when to close a brand are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare each brand's orders on advertised days against similar nonadvertised days, so dead weight brands stand out more clearly.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of noting ad days and order volume together, so spend decisions stop being guesses.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_no_customer_data",
@@ -195,7 +269,17 @@
         "tool_words": []
       },
       "ask_first": "Do you take any orders outside the apps today?",
-      "free_stops": "The direct-order flow and renewal reminder plan stay for the solution document."
+      "free_stops": "The direct-order flow and renewal reminder plan stay for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many tiffin subscribers stopped in the last billing cycle, so you see whether dropoff is occasional or routine.",
+          "review": false
+        },
+        {
+          "text": "Give one person a single notebook list of active tiffin renewals, so follow-up happens on time each cycle.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

@@ -2,7 +2,7 @@
   "industry": "beverage_juice_and_water_bottling_plants",
   "name": "Beverage, juice and water bottling plants",
   "sector": "7.B Food and beverage",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_returns_handling",
@@ -22,7 +22,17 @@
         "tool_words": []
       },
       "ask_first": "Do customers pay a deposit for the bottle today?",
-      "free_stops": "The bottle register and deposit tracking rules are in the solution document."
+      "free_stops": "The bottle register and deposit tracking rules are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare bottles loaded out with empties returned for each van on one day, so the biggest return gap shows.",
+          "review": false
+        },
+        {
+          "text": "Give one dispatcher one notebook for bottle balances by customer, so drivers and office refer to the same record.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_cash_leakage",
@@ -42,7 +52,17 @@
         "tool_words": []
       },
       "ask_first": "How do drivers settle cash now?",
-      "free_stops": "The settlement routine and variance checks stay for the solution document."
+      "free_stops": "The settlement routine and variance checks stay for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare each van's cash handed in with bottles sold that day, so routes with unusual shortfalls stand out quickly.",
+          "review": false
+        },
+        {
+          "text": "Make one supervisor receive cash at a fixed return time daily, so every driver settles the same way before leaving.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_fraud",
@@ -62,7 +82,17 @@
         "tool_words": []
       },
       "ask_first": "How are coupons checked today?",
-      "free_stops": "How the prepaid balance replaces paper coupons is detailed in the solution document."
+      "free_stops": "How the prepaid balance replaces paper coupons is detailed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare used coupons handed in with bottles delivered on each route once, so mismatches point to where checking is weak.",
+          "review": false
+        },
+        {
+          "text": "Give one settlement clerk the job of keeping all redeemed coupons in one place, so late additions become harder.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_orders_lost",
@@ -82,7 +112,17 @@
         "tool_words": []
       },
       "ask_first": "How many vans run daily?",
-      "free_stops": "The ordering flow and route set-up are in the solution document."
+      "free_stops": "The ordering flow and route set-up are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count orders received and orders loaded for one delivery day, so missed bookings are clear before vans leave.",
+          "review": false
+        },
+        {
+          "text": "Assign one person to write every call and chat order into one area list, so dispatch works from one source.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_churn_subscription",
@@ -102,7 +142,17 @@
         "tool_words": []
       },
       "ask_first": "Do you track dispensers placed with customers?",
-      "free_stops": "The reminder and win-back plan stays for the solution document."
+      "free_stops": "The reminder and win-back plan stays for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note which regular accounts have stopped ordering this month and still hold your bottles or dispensers, so recovery work targets the right customers.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member a weekly list of inactive accounts to follow up, so bottle and dispenser returns stop drifting.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_raw_material_shortage",
@@ -122,7 +172,17 @@
         "tool_words": []
       },
       "ask_first": "Which input runs short most?",
-      "free_stops": "The reorder points per input are set in the solution document."
+      "free_stops": "The reorder points per input are set in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Walk the stores once and note which input is nearest to running out, so the next line stoppage is easier to prevent.",
+          "review": false
+        },
+        {
+          "text": "Give one storekeeper one reorder page for preforms and caps, so purchasing happens from a visible list each week.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_maintenance_downtime",
@@ -142,7 +202,17 @@
         "tool_words": []
       },
       "ask_first": "What stops the line most often?",
-      "free_stops": "The maintenance schedule stays for the solution document."
+      "free_stops": "The maintenance schedule stays for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many times each machine stops the line this week, so you know which asset disrupts production most.",
+          "review": false
+        },
+        {
+          "text": "Give one fitter the job of updating one maintenance diary after every stoppage, so repair history stays with the machine.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_inspection_missing",
@@ -162,7 +232,17 @@
         "tool_words": []
       },
       "ask_first": "How are QC checks recorded now?",
-      "free_stops": "The QC log set-up is detailed in the solution document."
+      "free_stops": "The QC log set-up is detailed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare batches produced with batch records completed on the same day once, so late paperwork is easy to spot.",
+          "review": false
+        },
+        {
+          "text": "Give one shift lead one place to collect batch records before handover, so missing pages are chased while the batch is fresh.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_no_dashboard",
@@ -183,7 +263,17 @@
         "tool_words": []
       },
       "ask_first": "How long do office customers take to pay?",
-      "free_stops": "The route profit method and reminder schedule are in the solution document."
+      "free_stops": "The route profit method and reminder schedule are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many office invoices are beyond the usual payment pattern by route this week, so the slowest cash routes become visible.",
+          "review": true
+        },
+        {
+          "text": "Keep one notebook page for route sales and running costs, updated by one office person each evening, so route profit stops being guessed.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

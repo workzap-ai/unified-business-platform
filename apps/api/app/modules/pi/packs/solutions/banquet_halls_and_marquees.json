@@ -2,7 +2,7 @@
   "industry": "banquet_halls_and_marquees",
   "name": "Banquet halls and marquees",
   "sector": "7.H Hospitality, events and personal services",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_order_errors",
@@ -22,7 +22,17 @@
         "tool_words": []
       },
       "ask_first": "How many halls or lawns do you book?",
-      "free_stops": "The booking rules per hall and slot and how advances lock dates go in the solution document."
+      "free_stops": "The booking rules per hall and slot and how advances lock dates go in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare all booked dates on one wall diary against each manager's notes once this week, so double-booked nights surface before families commit.",
+          "review": false
+        },
+        {
+          "text": "Keep every hall booking in one register with one manager updating it at a fixed time daily, so confirmations stop clashing.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_deposit_delays",
@@ -42,7 +52,17 @@
         "tool_words": []
       },
       "ask_first": "Do most clients pay the advance in cash or by transfer?",
-      "free_stops": "The receipt flow and how cash, transfer and balance are tracked per event stay for the solution document."
+      "free_stops": "The receipt flow and how cash, transfer and balance are tracked per event stay for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note each advance taken this week beside the date you actually receive it, so you see how long cash sits away from you.",
+          "review": false
+        },
+        {
+          "text": "Make one notebook the only place advances are entered before handover each evening, so missing cash is spotted the same day.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_receivables_late",
@@ -62,7 +82,17 @@
         "tool_words": []
       },
       "ask_first": "How is the final count agreed with clients now?",
-      "free_stops": "Confirmation timing, counting method and how extras are billed are in the solution document."
+      "free_stops": "Confirmation timing, counting method and how extras are billed are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare booked guests with actual turnout from one recent event, so extra-head arguments are tied to a visible count.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of writing arrivals during each event in one place, so the final bill has a clear base.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_wastage_cost",
@@ -83,7 +113,17 @@
         "leads_with_view": true
       },
       "ask_first": "Is catering in-house or do outside caterers come in?",
-      "free_stops": "The quantity rules per dish and the wastage tracking stay for the solution document."
+      "free_stops": "The quantity rules per dish and the wastage tracking stay for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count leftover trays after each event this week and note any dish that finished early, so cooking guesses get tighter.",
+          "review": false
+        },
+        {
+          "text": "Give one kitchen person the job of recording the final confirmed count in one notebook before cooking starts, so batches match the event better.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_info_lost_in_whatsapp",
@@ -103,7 +143,17 @@
         "tool_words": []
       },
       "ask_first": "Who takes menu changes from the client now?",
-      "free_stops": "Event sheet structure and change alerts per team are designed in the solution document."
+      "free_stops": "Event sheet structure and change alerts per team are designed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare one client's latest menu message with what the kitchen used for that event, so the handover gap shows.",
+          "review": false
+        },
+        {
+          "text": "Make one paper event sheet the only menu reference in the kitchen, with one manager updating it by evening, so changes stop getting buried.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_attendance_lateness",
@@ -123,7 +173,17 @@
         "tool_words": []
       },
       "ask_first": "Roughly how many waiters work a full wedding night?",
-      "free_stops": "Roster rules, standby handling and payout tracking stay for the solution document."
+      "free_stops": "Roster rules, standby handling and payout tracking stay for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note which waiters arrived late or missed the last busy dates, so you see where peak-night staffing actually breaks.",
+          "review": false
+        },
+        {
+          "text": "Give one supervisor the job of confirming and writing peak-date waiter attendance in one notebook each afternoon, so replacements start earlier.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_shrinkage_theft",
@@ -143,7 +203,17 @@
         "tool_words": []
       },
       "ask_first": "What goes missing most?",
-      "free_stops": "Count lists and loss reporting are set in the solution document."
+      "free_stops": "Count lists and loss reporting are set in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count chairs, covers and crockery before and after one busy event, so you see which item disappears most often.",
+          "review": false
+        },
+        {
+          "text": "Make one storekeeper sign items out and back in on one list after every event, so missing stock is traced to the handover.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_lead_followup_slow",
@@ -163,7 +233,17 @@
         "tool_words": []
       },
       "ask_first": "Where do most enquiries come from?",
-      "free_stops": "Follow-up timing and the enquiry flow on WhatsApp go in the solution document."
+      "free_stops": "Follow-up timing and the enquiry flow on WhatsApp go in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many hall visitors this week got no follow-up after they left, so you see how many warm enquiries are cooling.",
+          "review": false
+        },
+        {
+          "text": "Give one person a single notebook for every visit and a fixed follow-up time daily, so families are not forgotten after seeing the hall.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_seasonal_dip",
@@ -183,7 +263,17 @@
         "tool_words": []
       },
       "ask_first": "Which months are slowest for you?",
-      "free_stops": "Which packages to offer and when to message are planned in the solution document."
+      "free_stops": "Which packages to offer and when to message are planned in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "List every event held in your quiet months from the last year, so you see which bookings still fit those dates.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member the job of keeping one list of quiet-month enquiries and call-backs, so slow periods get regular attention.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p10_margin_unknown",
@@ -204,7 +294,17 @@
         "leads_with_view": true
       },
       "ask_first": "Do you quote per head or as a package?",
-      "free_stops": "How each cost is captured and allocated per event stays for the solution document."
+      "free_stops": "How each cost is captured and allocated per event stays for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Write one recent event's food, staff, decor and generator costs beside its sale price, so your true per-event leftover is clear.",
+          "review": true
+        },
+        {
+          "text": "Give one manager the job of closing every event on one notebook page the next morning, so profit arguments stop drifting for days.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

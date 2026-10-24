@@ -2,7 +2,7 @@
   "industry": "solar_panels_inverters_and_batteries",
   "name": "Solar panels, inverters and batteries (assembly and distribution)",
   "sector": "7.D Manufacturing and industry (part 2)",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_price_increases_supplier",
@@ -23,7 +23,17 @@
         "leads_with_view": true
       },
       "ask_first": "How much stock do you usually hold?",
-      "free_stops": "The buying rules and exposure view are in the solution document."
+      "free_stops": "The buying rules and exposure view are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many godown units were bought above today's supplier rate, so you see which stock is hurting margin now.",
+          "review": false
+        },
+        {
+          "text": "Give one person a weekly bought-rate notebook by batch, so future rate drops are spotted before repeat buying.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_serial_batch_tracking",
@@ -44,7 +54,17 @@
         "tool_words": []
       },
       "ask_first": "Who records serials now, if anyone?",
-      "free_stops": "The capture steps are in the solution document."
+      "free_stops": "The capture steps are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Check one recent delivery file against goods already sent out, so missing serial records show up before the next warranty dispute.",
+          "review": false
+        },
+        {
+          "text": "Give dispatch one notebook kept beside packed goods, so every outgoing serial is tied to the customer without arguments later.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_field_team_visibility",
@@ -66,7 +86,17 @@
         ]
       },
       "ask_first": "How many installation teams do you run?",
-      "free_stops": "The checklist content is in the solution document."
+      "free_stops": "The checklist content is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare jobs marked done this week against customer callbacks received, so you see which teams leave unclear handovers.",
+          "review": false
+        },
+        {
+          "text": "Make one supervisor collect an end-of-job call note before crews leave, so incomplete jobs are caught the same day.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_lead_followup_slow",
@@ -86,7 +116,17 @@
         "tool_words": []
       },
       "ask_first": "How many enquiries come in a week?",
-      "free_stops": "The follow-up flow is in the solution document."
+      "free_stops": "The follow-up flow is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count open WhatsApp enquiries from this week that still lack a reply, so you see today's missed sales workload clearly.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member a single follow-up list reviewed at one fixed time daily, so waiting enquiries stop getting missed.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_manual_work",
@@ -106,7 +146,17 @@
         "tool_words": []
       },
       "ask_first": "Who prepares quotes now?",
-      "free_stops": "The quote logic is in the solution document."
+      "free_stops": "The quote logic is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note how long recent quotes sat before going out, so you see where manual calculation is slowing sales replies.",
+          "review": false
+        },
+        {
+          "text": "Keep one notebook of common package prices updated by one person, so repeat quotes go out faster with fewer recalculations.",
+          "review": true
+        }
+      ]
     },
     {
       "id": "p6_receivables_late",
@@ -127,7 +177,17 @@
         "tool_words": []
       },
       "ask_first": "Who handles net-metering paperwork?",
-      "free_stops": "The milestone and file-tracking set-up is in the solution document."
+      "free_stops": "The milestone and file-tracking set-up is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count pending last instalments by approval paper sitting with customer, office or utility, so you see where cash gets stuck most.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member one daily handover list for approval-linked final payments, so customer follow-up stays tied to each file stage.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_cost_overruns",
@@ -148,7 +208,17 @@
         "leads_with_view": true
       },
       "ask_first": "What usually causes the overrun?",
-      "free_stops": "The costing method is in the solution document."
+      "free_stops": "The costing method is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare what was planned and actually used on one finished job, so the main source of overruns becomes visible.",
+          "review": false
+        },
+        {
+          "text": "Give one site lead one extras page per job, so every added cost is noted while work is still fresh.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_shift_scheduling",
@@ -168,7 +238,17 @@
         "tool_words": []
       },
       "ask_first": "Are installers employees or subcontractors?",
-      "free_stops": "The scheduling set-up is in the solution document."
+      "free_stops": "The scheduling set-up is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Write all jobs for the coming week by team on one page, so clashes and double-booking show before crews leave.",
+          "review": false
+        },
+        {
+          "text": "Give one dispatcher the evening handover for next-day team assignments, so mixed messages stop between office and field crews.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_customer_communication",
@@ -188,7 +268,17 @@
         "tool_words": []
       },
       "ask_first": "Do you have customers' permission to message them?",
-      "free_stops": "Reminder timing is in the solution document."
+      "free_stops": "Reminder timing is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count past installations with no maintenance contact noted this month, so you see how many customers may complain silently.",
+          "review": false
+        },
+        {
+          "text": "Give one person a single notebook of installed jobs by month, so reminder calls happen in a steady routine.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

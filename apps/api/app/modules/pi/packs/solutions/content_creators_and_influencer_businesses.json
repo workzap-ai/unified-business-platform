@@ -2,7 +2,7 @@
   "industry": "content_creators_and_influencer_businesses",
   "name": "Content creators and influencer businesses",
   "sector": "7.M Digital economy, social and public sector",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_receivables_late",
@@ -22,7 +22,17 @@
         "tool_words": []
       },
       "ask_first": "Roughly how many brands owe you at the moment?",
-      "free_stops": "The reminder schedule and board set-up are detailed in the solution document."
+      "free_stops": "The reminder schedule and board set-up are detailed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare unpaid brand invoices by how long they have sat since delivery, so you see which follow ups are hurting cash most.",
+          "review": false
+        },
+        {
+          "text": "Give one person a fixed weekly slot to chase unpaid invoices from one written list, so collections stop slipping behind.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_data_scattered",
@@ -42,7 +52,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The deal stages and how deals flow into invoicing are set out in the solution document."
+      "free_stops": "The deal stages and how deals flow into invoicing are set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Write every live brand deal and what is still owed on one page, so you can see the total outstanding at a glance.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of updating one notebook page after each brand message, so what is owed stays current.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_info_lost_in_whatsapp",
@@ -62,7 +82,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The calendar structure and reminder timings are covered in the solution document."
+      "free_stops": "The calendar structure and reminder timings are covered in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many live deliverables still have no deadline written in one place, so missed posting dates become visible.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of writing every agreed deliverable and deadline into one notebook, so handoffs stop getting missed.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_approvals_slow",
@@ -82,7 +112,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "How rounds are logged and flagged goes in the solution document; contract wording is for your lawyer."
+      "free_stops": "How rounds are logged and flagged goes in the solution document; contract wording is for your lawyer.",
+      "extra_ideas": [
+        {
+          "text": "Note how many times each brand deal came back for changes this month, so you see which jobs are eating edit time.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of logging every revision request in one list, so repeated changes are easier to raise early.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_contracts_tracking",
@@ -102,7 +142,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The register fields and alert rules are prepared in the solution document; interpreting terms is for your lawyer."
+      "free_stops": "The register fields and alert rules are prepared in the solution document; interpreting terms is for your lawyer.",
+      "extra_ideas": [
+        {
+          "text": "Check current brand agreements for any exclusivity or usage end dates not written in one place, so unclear contract terms stand out.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of checking one exclusivity list before accepting new brand work, so clashes are caught earlier.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_lead_followup_slow",
@@ -122,7 +172,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The form and sorting set-up are designed in the solution document."
+      "free_stops": "The form and sorting set-up are designed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many brand enquiries from this week sit unanswered across messages and inboxes, so you see the follow up backlog clearly.",
+          "review": false
+        },
+        {
+          "text": "Give one person one daily time to note every new brand enquiry in one list, so replies stop getting buried.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_manual_reports",
@@ -142,7 +202,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The report layout and how figures are gathered are covered in the solution document."
+      "free_stops": "The report layout and how figures are gathered are covered in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many past campaign posts are missing saved insights screenshots, so you see which reports will take longer to assemble.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of saving campaign screenshots into one labelled place after posting, so report prep gets less scattered.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_accountability",
@@ -162,7 +232,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The board and its reminders are set out in the solution document."
+      "free_stops": "The board and its reminders are set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare promised edit handover dates with actual delivery dates for recent pieces, so you see how often posting plans get knocked.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of confirming each edit handover time in one list, so late pieces are caught before posting slips.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_cash_flow_tight",
@@ -183,7 +263,17 @@
         "leads_with_view": true
       },
       "ask_first": "",
-      "free_stops": "The view and its inputs are detailed in the solution document; money planning is for your accountant."
+      "free_stops": "The view and its inputs are detailed in the solution document; money planning is for your accountant.",
+      "extra_ideas": [
+        {
+          "text": "Note which months brought little brand income and which income sources filled the gaps, so quieter periods are easier to plan around.",
+          "review": false
+        },
+        {
+          "text": "Give one person one weekly time to list expected deal payments in one notebook, so lean periods are spotted earlier.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p10_data_loss",
@@ -203,7 +293,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The folder structure and backup routine go in the solution document."
+      "free_stops": "The folder structure and backup routine go in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many shoots still sit on random drives without a second copy, so you see which footage is at risk now.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of noting every shoot's storage place in one notebook, so missing footage is quicker to trace.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

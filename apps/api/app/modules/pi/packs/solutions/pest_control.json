@@ -2,7 +2,7 @@
   "industry": "pest_control",
   "name": "Pest control",
   "sector": "7.F Construction, real estate and facilities",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_documentation",
@@ -23,7 +23,17 @@
         "tool_words": []
       },
       "ask_first": "Roughly how many business clients are on regular contracts?",
-      "free_stops": "Report fields and pack layout are in the solution document."
+      "free_stops": "Report fields and pack layout are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many recent service reports take longer than a short search to find, so audit delays are easy to size.",
+          "review": false
+        },
+        {
+          "text": "Make one cupboard shelf or drawer the only place for finished service reports, so audit requests are answered without rummaging.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_checklists_not_done",
@@ -43,7 +53,17 @@
         "tool_words": []
       },
       "ask_first": "How are follow-up visits scheduled today?",
-      "free_stops": "Scheduling rules are in the solution document."
+      "free_stops": "Scheduling rules are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note how many included follow-up visits were due this week but are still unbooked, so missed prepaid work is easy to spot.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member the job of checking one follow-up list every morning, so included visits get booked before customers chase.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_service_quality",
@@ -64,7 +84,17 @@
         "tool_words": []
       },
       "ask_first": "How do you keep track of visit dates now?",
-      "free_stops": "Alert timing and the register design are in the solution document."
+      "free_stops": "Alert timing and the register design are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare planned AMC visits with visits actually completed this week for each restaurant type, so missed inspection-critical calls stand out early.",
+          "review": false
+        },
+        {
+          "text": "Assign one person to hand tomorrow’s AMC visit list to technicians each evening, so restaurant visits stop being missed.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_rework",
@@ -84,7 +114,17 @@
         "tool_words": []
       },
       "ask_first": "How are re-treatments handled and charged?",
-      "free_stops": "Cause categories are in the solution document; treatment choices stay with the licensed technician."
+      "free_stops": "Cause categories are in the solution document; treatment choices stay with the licensed technician.",
+      "extra_ideas": [
+        {
+          "text": "Count repeat call-backs by job type from the past week, so you can see where return visits are eating time.",
+          "review": false
+        },
+        {
+          "text": "Keep one notebook for every call-back and let one supervisor review it each Friday, so repeat jobs get discussed from facts.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_shrinkage_theft",
@@ -104,7 +144,17 @@
         "tool_words": []
       },
       "ask_first": "How are products issued to technicians?",
-      "free_stops": "Usage benchmarks are in the solution document; dosage stays with the label and technician."
+      "free_stops": "Usage benchmarks are in the solution document; dosage stays with the label and technician.",
+      "extra_ideas": [
+        {
+          "text": "Compare what leaves the store each week with how many jobs were completed, so unusual stock drop gets noticed quickly.",
+          "review": false
+        },
+        {
+          "text": "Make one storekeeper note every issue and return in one notebook at handover time, so stock movement stops being argued about.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_pricing_errors",
@@ -126,7 +176,17 @@
         ]
       },
       "ask_first": "Who decides the price on site?",
-      "free_stops": "Price list structure and approval limits are in the solution document."
+      "free_stops": "Price list structure and approval limits are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare quotes given this week for similar job sizes, so price differences show up before customers start comparing.",
+          "review": true
+        },
+        {
+          "text": "Choose one office person to confirm any nonstandard quote before it is promised, so technicians stop giving mixed prices.",
+          "review": true
+        }
+      ]
     },
     {
       "id": "p7_churn_subscription",
@@ -146,7 +206,17 @@
         "tool_words": []
       },
       "ask_first": "How many AMC clients do you have?",
-      "free_stops": "Reminder timing is in the solution document."
+      "free_stops": "Reminder timing is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many AMC renewals end this month without any reminder noted, so the renewal leak is clear.",
+          "review": false
+        },
+        {
+          "text": "Keep one renewal diary checked at the same time each week by one person, so expiring AMCs get chased in time.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_chat_overload",
@@ -166,7 +236,17 @@
         "tool_words": []
       },
       "ask_first": "How do customers book a treatment?",
-      "free_stops": "Booking flow design is in the solution document."
+      "free_stops": "Booking flow design is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count missed calls by time of day during hot weeks, so you can see when the single phone falls behind.",
+          "review": false
+        },
+        {
+          "text": "Set fixed callback times and give one person the missed-call notebook, so summer demand gets answered more consistently.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_receivables_late",
@@ -186,7 +266,17 @@
         "tool_words": []
       },
       "ask_first": "Which clients cause the most delays?",
-      "free_stops": "Reminder schedule is in the solution document."
+      "free_stops": "Reminder schedule is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note each restaurant AMC invoice beside the service date and sent date, so delays between job completion and billing stand out.",
+          "review": true
+        },
+        {
+          "text": "Give one staff member one weekly time to send every pending restaurant AMC invoice from one notebook list, so billing goes out consistently.",
+          "review": true
+        }
+      ]
     },
     {
       "id": "p10_licences_renewals",
@@ -206,7 +296,17 @@
         "tool_words": []
       },
       "ask_first": "Who keeps track of expiry dates?",
-      "free_stops": "Alert timing is in the solution document."
+      "free_stops": "Alert timing is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many licences and certifications expire within the same season, so the renewal rush is clear before work gets disrupted.",
+          "review": false
+        },
+        {
+          "text": "Keep one paper list of all expiry dates with one office person updating it every Friday, so renewals stop sneaking up.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

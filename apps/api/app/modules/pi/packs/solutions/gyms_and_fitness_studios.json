@@ -2,7 +2,7 @@
   "industry": "gyms_and_fitness_studios",
   "name": "Gyms and fitness studios",
   "sector": "7.H Hospitality, events and personal services",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_customer_communication",
@@ -22,7 +22,17 @@
         "tool_words": []
       },
       "ask_first": "Roughly how many active members do you have?",
-      "free_stops": "Reminder timing and renewal tracking are in the solution document."
+      "free_stops": "Reminder timing and renewal tracking are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count memberships ending in the next few days and how many were actually called, so missed renewals stop slipping past the desk.",
+          "review": false
+        },
+        {
+          "text": "Give one front desk person one notebook page for upcoming expiries each morning, so renewal calls happen before memberships lapse.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_churn_subscription",
@@ -42,7 +52,17 @@
         "tool_words": []
       },
       "ask_first": "How do members get in, card, register or turnstile?",
-      "free_stops": "The inactivity rules and call list flow stay for the solution document."
+      "free_stops": "The inactivity rules and call list flow stay for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare January joiners with who still entered this week, so you see how early attendance is dropping.",
+          "review": false
+        },
+        {
+          "text": "Give one trainer the job of noting absent new joiners on one list each week, so drop off gets spotted sooner.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_cash_leakage",
@@ -62,7 +82,17 @@
         "tool_words": []
       },
       "ask_first": "Does your gym software connect to the turnstile?",
-      "free_stops": "How access and membership data connect is in the solution document."
+      "free_stops": "How access and membership data connect is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many entries this week belonged to expired memberships, so you see how much access is being given away.",
+          "review": false
+        },
+        {
+          "text": "Keep today's expiry list at the entry point with one desk person checking it, so expired members are stopped consistently.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_theft_internal",
@@ -82,7 +112,17 @@
         "tool_words": []
       },
       "ask_first": "How is PT sold now?",
-      "free_stops": "Sign-off method and matching rules stay for the solution document."
+      "free_stops": "Sign-off method and matching rules stay for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note which personal training sessions happened on the floor and compare them with desk receipts once, so unrecorded sessions stand out.",
+          "review": false
+        },
+        {
+          "text": "Make the front desk the only place to note personal training bookings, so private arrangements are harder to hide.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_commission_disputes",
@@ -103,7 +143,17 @@
         "leads_with_view": true
       },
       "ask_first": "Are trainers salaried, on commission or freelance?",
-      "free_stops": "Commission logic and statement layout go in the solution document."
+      "free_stops": "Commission logic and statement layout go in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare each trainer's counted sessions with what the desk noted for the same period, so disagreements are narrowed to specific shifts.",
+          "review": false
+        },
+        {
+          "text": "Give one supervisor one notebook page for trainer sessions each day, so commission talks start from the same record.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_maintenance_downtime",
@@ -123,7 +173,17 @@
         "tool_words": []
       },
       "ask_first": "Who repairs your machines?",
-      "free_stops": "Ticket flow and downtime reporting are in the solution document."
+      "free_stops": "Ticket flow and downtime reporting are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Walk the floor and note each machine that is still out of order with its date, so long delays are clear.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member the broken machine list and one handover time each day, so repair chasing does not stall.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_lead_followup_slow",
@@ -143,7 +203,17 @@
         "tool_words": []
       },
       "ask_first": "Where do most enquiries come from?",
-      "free_stops": "Follow-up timing and lead flow stay for the solution document."
+      "free_stops": "Follow-up timing and lead flow stay for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count trial visitors from this week and how many got a follow up, so missed interest is easy to spot.",
+          "review": true
+        },
+        {
+          "text": "Give one staff member one list of trial visitors at the end of each day, so follow up happens while interest is fresh.",
+          "review": true
+        }
+      ]
     },
     {
       "id": "p8_cash_mismatch",
@@ -163,7 +233,17 @@
         "tool_words": []
       },
       "ask_first": "How do most members pay?",
-      "free_stops": "Matching rules are in the solution document."
+      "free_stops": "Matching rules are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many members entered after paying this week against how many receipts were issued, so unrecorded collections show up quickly.",
+          "review": false
+        },
+        {
+          "text": "Give one staff role the closing check of memberships started, renewed, or extended each day, so front desk handovers stop losing track.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_booking_appointments",
@@ -183,7 +263,17 @@
         "tool_words": []
       },
       "ask_first": "How many classes run a week?",
-      "free_stops": "Booking flow and waitlist rules go in the solution document."
+      "free_stops": "Booking flow and waitlist rules go in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare each class's booked names with who actually arrived this week, so overbooking pressure shows by class.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member one master class list by session time, so booking promises stop clashing across chats.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p10_branch_comparison",
@@ -203,7 +293,17 @@
         "tool_words": []
       },
       "ask_first": "How many branches do you run?",
-      "free_stops": "Which numbers and their sources are in the solution document."
+      "free_stops": "Which numbers and their sources are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note each branch's member entries from the same weekday once this week, so differences in traffic are compared fairly.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of collecting branch figures by one fixed evening, so reports arrive in the same rhythm.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

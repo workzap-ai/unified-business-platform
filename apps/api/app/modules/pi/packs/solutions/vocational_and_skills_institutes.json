@@ -2,7 +2,7 @@
   "industry": "vocational_and_skills_institutes",
   "name": "Vocational and skills institutes",
   "sector": "7.J Education and childcare",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_regulatory_reporting",
@@ -22,7 +22,17 @@
         "tool_words": []
       },
       "ask_first": "Is attendance on paper registers or something digital today?",
-      "free_stops": "How the report pack is assembled to your funder's template is kept for the document."
+      "free_stops": "How the report pack is assembled to your funder's template is kept for the document.",
+      "extra_ideas": [
+        {
+          "text": "Note which report items staff keep chasing each month, so you can see what repeatedly turns a monthly task into a week.",
+          "review": false
+        },
+        {
+          "text": "Assign one staff member to keep a running month file for each batch, so report papers stop being gathered all at once.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_cash_flow_tight",
@@ -42,7 +52,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The cash-gap model and follow-up schedule are in the document."
+      "free_stops": "The cash-gap model and follow-up schedule are in the document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many submitted claims still lack a reply after the usual waiting period, so the reporting backlog becomes visible.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member one notebook for every submission and reply, checked at a fixed weekly time, so follow ups stop getting missed.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_churn_subscription",
@@ -63,7 +83,17 @@
         "leads_with_view": true
       },
       "ask_first": "",
-      "free_stops": "The warning rules and follow-up steps are kept for the document."
+      "free_stops": "The warning rules and follow-up steps are kept for the document.",
+      "extra_ideas": [
+        {
+          "text": "Note which week most dropouts happen in each course, so you can see where funded seats are being lost.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member a fixed weekly dropout watchlist for absent trainees, so someone owns quick follow-up before deductions grow.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_theft_internal",
@@ -83,7 +113,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The expected-usage figures and variance rules are in the document."
+      "free_stops": "The expected-usage figures and variance rules are in the document.",
+      "extra_ideas": [
+        {
+          "text": "Compare one class's expected welding rod and wire use with what was actually issued, so unusual losses stand out by workshop.",
+          "review": false
+        },
+        {
+          "text": "Keep all welding rod and wire issues in one notebook with one storekeeper, so extra handing out stops going untracked.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_shrinkage_theft",
@@ -103,7 +143,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The lending flow and missing-item rules are kept for the document."
+      "free_stops": "The lending flow and missing-item rules are kept for the document.",
+      "extra_ideas": [
+        {
+          "text": "Compare tools issued during one practical session with tools returned after it, so the worst loss points become visible.",
+          "review": false
+        },
+        {
+          "text": "Make one person handle tool handover before and after each practical, so missing returns are caught while trainees are still there.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_maintenance_downtime",
@@ -123,7 +173,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The reporting flow and downtime reports are in the document."
+      "free_stops": "The reporting flow and downtime reports are in the document.",
+      "extra_ideas": [
+        {
+          "text": "Note how long each broken machine has already been out of action, so stalled repairs are obvious to everyone.",
+          "review": false
+        },
+        {
+          "text": "Keep one repair notebook beside the workshop and give one person the update duty, so breakdown follow-up happens in one place.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_checklists_not_done",
@@ -143,7 +203,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "How the checks are scheduled and verified is kept for the document."
+      "free_stops": "How the checks are scheduled and verified is kept for the document.",
+      "extra_ideas": [
+        {
+          "text": "Compare one signed room-opening sheet with what is actually prepared across classrooms that day, so paper completion and real readiness are contrasted.",
+          "review": false
+        },
+        {
+          "text": "Give one manager one notebook for room-opening exceptions during a fixed walk-round, so incomplete preparation gets followed up consistently.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_margin_unknown",
@@ -164,7 +234,17 @@
         "leads_with_view": true
       },
       "ask_first": "",
-      "free_stops": "How costs are shared across courses is set out in the document."
+      "free_stops": "How costs are shared across courses is set out in the document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many classes in one course ask for extra materials during teaching this week, so the heaviest-using course stands out.",
+          "review": false
+        },
+        {
+          "text": "Give one storekeeper one notebook for materials handed out by course each day, so teaching demand is recorded in one place.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_accountability",
@@ -184,7 +264,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The matching rules are kept for the document."
+      "free_stops": "The matching rules are kept for the document.",
+      "extra_ideas": [
+        {
+          "text": "Compare one week's class timetable with what instructors say they covered in lesson notes, so missed, swapped or stretched sessions stand out.",
+          "review": false
+        },
+        {
+          "text": "Give one coordinator one notebook for all class swaps and cover changes at a fixed daily check, so timetable changes have one reference.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p10_kpi_undefined",
@@ -204,7 +294,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "How outcomes are collected after completion is in the document."
+      "free_stops": "How outcomes are collected after completion is in the document.",
+      "extra_ideas": [
+        {
+          "text": "Check the last completed batch and note who was said to be placed versus who you can actually confirm, so overclaiming stops.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member a single notebook for employer feedback and job starts, so placement follow-up does not scatter across chats.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p11_lead_followup_slow",
@@ -224,7 +324,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The capture and follow-up setup are kept for the document."
+      "free_stops": "The capture and follow-up setup are kept for the document.",
+      "extra_ideas": [
+        {
+          "text": "Count this week's TikTok enquiries and compare them with call backs actually made, so you see how many fee-paying prospects are cooling off.",
+          "review": false
+        },
+        {
+          "text": "Set one fixed time daily for one staff member to return TikTok enquiries from one written list, so interested prospects hear back promptly.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

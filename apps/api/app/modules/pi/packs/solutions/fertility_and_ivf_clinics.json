@@ -2,7 +2,7 @@
   "industry": "fertility_and_ivf_clinics",
   "name": "Fertility and IVF clinics (admin)",
   "sector": "7.I Health and care",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_whatsapp_overload",
@@ -22,7 +22,17 @@
         "tool_words": []
       },
       "ask_first": "How many coordinators share the load?",
-      "free_stops": "The question set and routing are designed in the solution document."
+      "free_stops": "The question set and routing are designed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Tally each timing question type arriving in one busy shift, so you see which repeats eat coordinator time most.",
+          "review": false
+        },
+        {
+          "text": "Assign one coordinator per shift to keep a notebook of answered timing topics, so repeat replies stay consistent during busy hours.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_handoffs",
@@ -42,7 +52,17 @@
         "tool_words": []
       },
       "ask_first": "Is the schedule kept on paper or software now?",
-      "free_stops": "Code system and handover rules are in the solution document."
+      "free_stops": "Code system and handover rules are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare tomorrow's due appointments against today's handover note using patient codes only, so missed follow ups before leave become visible.",
+          "review": false
+        },
+        {
+          "text": "Make the end of each shift one fixed handover moment with one duty coordinator, so cover staff know what is due next.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_service_errors",
@@ -62,7 +82,17 @@
         "tool_words": []
       },
       "ask_first": "Who explains the costs to patients now?",
-      "free_stops": "Estimate structure is in the solution document."
+      "free_stops": "Estimate structure is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note which billed add-ons triggered recent surprise complaints, so the front desk sees where package explanations keep failing.",
+          "review": false
+        },
+        {
+          "text": "Give one billing staff member the job of checking add-ons before each package bill leaves, so fewer patients feel caught off guard.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_receivables_late",
@@ -82,7 +112,17 @@
         "tool_words": []
       },
       "ask_first": "Are storage fees billed annually?",
-      "free_stops": "Reminder sequence is in the solution document; storage law is for your lawyer."
+      "free_stops": "Reminder sequence is in the solution document; storage law is for your lawyer.",
+      "extra_ideas": [
+        {
+          "text": "Count how many storage files show a passed renewal month without any payment note, so old unpaid fee backlog looks real.",
+          "review": true
+        },
+        {
+          "text": "Give one admin person one notebook page for storage renewals every week, so unpaid fee chasing stops getting missed at handover.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_receivables_late",
@@ -102,7 +142,17 @@
         "tool_words": []
       },
       "ask_first": "Do you offer financing through a third party?",
-      "free_stops": "Reminder tone and timing are in the solution document."
+      "free_stops": "Reminder tone and timing are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare this week's due instalment files with messages actually sent, so missed gentle follow ups show up before delays grow.",
+          "review": false
+        },
+        {
+          "text": "Set one quiet time each afternoon for one staff member to check overdue instalments, so reminders go out with a steadier tone.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_documentation",
@@ -122,7 +172,17 @@
         "tool_words": []
       },
       "ask_first": "Which documents most often aren't ready?",
-      "free_stops": "Checklist items are in the solution document; what consent must include is for your doctors and lawyer."
+      "free_stops": "Checklist items are in the solution document; what consent must include is for your doctors and lawyer.",
+      "extra_ideas": [
+        {
+          "text": "Check next week's procedure files for unsigned consent pages using file codes only, so missing paperwork is spotted before the day.",
+          "review": false
+        },
+        {
+          "text": "Assign one admin staff member the afternoon check for pending signatures, so procedure day starts with fewer paperwork surprises.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_expiry_wastage",
@@ -142,7 +202,17 @@
         "tool_words": []
       },
       "ask_first": "Which supplies would stop work if they ran out?",
-      "free_stops": "Reorder levels are worked out in the solution document."
+      "free_stops": "Reorder levels are worked out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Walk the lab store once and note items nearest expiry or empty by shelf, so urgent stock risks are obvious early.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member one notebook for critical supply checks each week, so expiring or low items get noticed in time.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_lead_followup_slow",
@@ -162,7 +232,17 @@
         "tool_words": []
       },
       "ask_first": "Where do most international enquiries come from?",
-      "free_stops": "Routing set-up is in the solution document."
+      "free_stops": "Routing set-up is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note how many after-hours enquiries wait until late morning for a reply, so the missed overnight demand is clearer.",
+          "review": false
+        },
+        {
+          "text": "Assign one morning staff member the opening check for overnight abroad enquiries, so fewer messages sit untouched after odd-hour arrivals.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_data_scattered",
@@ -186,7 +266,17 @@
         ]
       },
       "ask_first": "Which systems hold billing and scheduling now?",
-      "free_stops": "Data connections are mapped in the solution document."
+      "free_stops": "Data connections are mapped in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Write this month's key admin totals from each source side by side, so you can see which figures disagree most.",
+          "review": false
+        },
+        {
+          "text": "Give one person the monthly job of collecting each agreed number into one notebook, so reporting stops changing by who prepared it.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

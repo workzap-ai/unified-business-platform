@@ -2,7 +2,7 @@
   "industry": "laundry_and_dry_cleaning",
   "name": "Laundry and dry-cleaning",
   "sector": "7.H Hospitality, events and personal services",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_order_errors",
@@ -22,7 +22,17 @@
         "tool_words": []
       },
       "ask_first": "How do you tag items now?",
-      "free_stops": "Tagging setup is in the solution document."
+      "free_stops": "Tagging setup is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "For one week, count how many orders need a garment search before handover, so you see where mix-ups are really starting.",
+          "review": false
+        },
+        {
+          "text": "Give one counter person the job of keeping all waiting orders in one marked area, so wrong handovers drop during busy times.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_inspection_missing",
@@ -42,7 +52,17 @@
         "tool_words": []
       },
       "ask_first": "Who handles drop-off?",
-      "free_stops": "Photo rules stay for the solution document."
+      "free_stops": "Photo rules stay for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "For one week, note how many complaints mention old stains, tears or missing buttons, so the drop-off checking gap becomes visible.",
+          "review": false
+        },
+        {
+          "text": "Give one counter person the job of writing visible garment issues on the paper ticket, so later disputes are easier to handle.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_rider_management",
@@ -62,7 +82,17 @@
         "tool_words": []
       },
       "ask_first": "How many riders do you have?",
-      "free_stops": "Routing rules are in the solution document."
+      "free_stops": "Routing rules are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "For one week, note missed pickups by area and time promised, so the route confusion shows where the day is breaking.",
+          "review": false
+        },
+        {
+          "text": "Give one dispatcher the job of writing each rider's pickups in one notebook before departure, so missed collections stop bouncing around.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_cod_remittance",
@@ -82,7 +112,17 @@
         "tool_words": []
       },
       "ask_first": "How often do riders settle now?",
-      "free_stops": "Settlement rules stay for the solution document."
+      "free_stops": "Settlement rules stay for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "For one week, compare each rider's delivered orders with cash handed in at closing, so missing remittance is pinned to a shift.",
+          "review": false
+        },
+        {
+          "text": "Give one closing staff member the cash handover notebook every evening, so rider collections are checked before anyone leaves.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_reports_wrong",
@@ -102,7 +142,17 @@
         "tool_words": []
       },
       "ask_first": "How many hotel clients do you serve?",
-      "free_stops": "Count flow is in the solution document."
+      "free_stops": "Count flow is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "For one hotel client this week, compare pickup count, wash count and return count on paper, so the mismatch point is clear.",
+          "review": false
+        },
+        {
+          "text": "Give one shift lead the job of keeping all hotel linen counts in one notebook, so everyone works from the same numbers.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_credit_customers",
@@ -122,7 +172,17 @@
         "tool_words": []
       },
       "ask_first": "What terms did you agree?",
-      "free_stops": "Reminder timing stays for the solution document."
+      "free_stops": "Reminder timing stays for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "This week, note which hotel invoices are oldest and which are largest, so collection effort goes where cash is most stuck.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member a fixed weekly time to review unpaid hotel bills, so follow-up happens without last-minute scrambling.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_chat_overload",
@@ -142,7 +202,17 @@
         "tool_words": []
       },
       "ask_first": "How many orders a day?",
-      "free_stops": "Message flow is in the solution document."
+      "free_stops": "Message flow is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "For two busy days, count how many messages only ask about readiness, so you see the size of the interruption.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of updating the ready list at a fixed time, so replies stay quick even when the counter is busy.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_maintenance_downtime",
@@ -162,7 +232,17 @@
         "tool_words": []
       },
       "ask_first": "Which machines break most?",
-      "free_stops": "Log setup stays for the solution document."
+      "free_stops": "Log setup stays for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "For each machine stoppage this week, note the machine, lost hours and waiting reason, so the biggest downtime pattern stands out.",
+          "review": false
+        },
+        {
+          "text": "Give one supervisor the job of keeping all breakdown notes in one notebook, so repair follow-up has a clear handover each day.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_count_mismatch",
@@ -182,7 +262,17 @@
         "tool_words": []
       },
       "ask_first": "How do you store chemicals?",
-      "free_stops": "Usage norms are in the solution document."
+      "free_stops": "Usage norms are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "For one week, compare loads finished each day with detergent and chemical use noted that day, so unusual consumption is easier to spot.",
+          "review": false
+        },
+        {
+          "text": "Give one storekeeper the job of handing out all detergent and chemicals from one shelf, so extra usage can be traced quickly.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p10_margin_unknown",
@@ -203,7 +293,17 @@
         "leads_with_view": true
       },
       "ask_first": "Do you price per piece or kilo?",
-      "free_stops": "Cost allocation stays for the solution document."
+      "free_stops": "Cost allocation stays for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "For one busy day, note pieces by type and total kilos processed, so your costing guess has a real starting point.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member a notebook for daily supply, utility and rework notes, so cost leaks stop getting forgotten.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

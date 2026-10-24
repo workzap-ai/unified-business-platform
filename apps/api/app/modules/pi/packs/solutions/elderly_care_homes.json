@@ -2,7 +2,7 @@
   "industry": "elderly_care_homes",
   "name": "Elderly care homes",
   "sector": "7.I Health and care",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_receivables_late",
@@ -22,7 +22,17 @@
         "tool_words": []
       },
       "ask_first": "How do overseas families pay now?",
-      "free_stops": "Reminder tone and timing are in the solution document."
+      "free_stops": "Reminder tone and timing are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many family payment reminders were sent last week and how many payments arrived after, so awkward chasing is measured.",
+          "review": true
+        },
+        {
+          "text": "Give one staff member the weekly dues list in one notebook, so every overdue account gets noticed on the same day.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_hidden_costs",
@@ -42,7 +52,17 @@
         "tool_words": []
       },
       "ask_first": "Who records extras today?",
-      "free_stops": "The extras list and billing link are in the solution document."
+      "free_stops": "The extras list and billing link are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare a week's extra supplies used with a week's extra charges added, so missed billable items are easier to spot.",
+          "review": false
+        },
+        {
+          "text": "Give one person one notebook for all chargeable extras used, so billing picks them up before the week ends.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_conversion_low",
@@ -62,7 +82,17 @@
         "tool_words": []
       },
       "ask_first": "Where do most enquiries come from?",
-      "free_stops": "Pipeline stages are in the solution document."
+      "free_stops": "Pipeline stages are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count this week's enquiries, visits and move-ins on one page, so you can see where empty rooms are being lost.",
+          "review": false
+        },
+        {
+          "text": "Give one person the visit follow-up list at a fixed afternoon time, so undecided families hear back while interest is fresh.",
+          "review": true
+        }
+      ]
     },
     {
       "id": "p4_attendance_lateness",
@@ -82,7 +112,17 @@
         "tool_words": []
       },
       "ask_first": "Are night staff in-house or agency?",
-      "free_stops": "Cover and alert rules are in the solution document."
+      "free_stops": "Cover and alert rules are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note each late arrival and no-show by shift for one week, so the worst handover times become clear.",
+          "review": false
+        },
+        {
+          "text": "Give one supervisor the daily cover list before evening, so replacements are arranged without last-minute confusion.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_stockout",
@@ -102,7 +142,17 @@
         "tool_words": []
       },
       "ask_first": "Is the kitchen in-house or catered?",
-      "free_stops": "Par levels are worked out in the solution document."
+      "free_stops": "Par levels are worked out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note which kitchen items ran short this week and when, so emergency market runs can be tied to specific gaps.",
+          "review": false
+        },
+        {
+          "text": "Give one person the weekly kitchen list on one shelf clipboard, so top-up buying happens before staples run out.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_theft_internal",
@@ -122,7 +172,17 @@
         "tool_words": []
       },
       "ask_first": "Who has access to the store?",
-      "free_stops": "The comparison method is in the solution document."
+      "free_stops": "The comparison method is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many packs leave the store each day for one week, so unusually fast usage stands out against occupancy.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member the store key and one issue notebook, so every pack leaving has a single record.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_handoffs",
@@ -142,7 +202,17 @@
         "tool_words": []
       },
       "ask_first": "How many shifts run a day?",
-      "free_stops": "Handover fields are in the solution document; care content stays with your nursing lead."
+      "free_stops": "Handover fields are in the solution document; care content stays with your nursing lead.",
+      "extra_ideas": [
+        {
+          "text": "Count how many tasks were missed after shift change this week, so the cost of verbal handover is easier to see.",
+          "review": false
+        },
+        {
+          "text": "Give each shift lead one handover notebook kept at the desk, so unfinished operational tasks pass forward clearly.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_customer_communication",
@@ -162,7 +232,17 @@
         "tool_words": []
       },
       "ask_first": "Which questions come up most?",
-      "free_stops": "Channel set-up is in the solution document."
+      "free_stops": "Channel set-up is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note family update calls by hour for a few days, so you can see when staff distraction is heaviest.",
+          "review": false
+        },
+        {
+          "text": "Give one person the daily update call window and one list near the desk, so interruptions stop bouncing across staff.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_maintenance_downtime",
@@ -182,7 +262,17 @@
         "tool_words": []
       },
       "ask_first": "Do you have service contracts?",
-      "free_stops": "Service intervals are set with your vendors in the solution document."
+      "free_stops": "Service intervals are set with your vendors in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Write each breakdown, affected item and lost hours from the past month on one page, so reactive repairs are easier to compare.",
+          "review": false
+        },
+        {
+          "text": "Give one person one maintenance notebook for service dates and faults, so overdue checks stop being missed until failure.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p10_owner_blind",
@@ -202,7 +292,17 @@
         "tool_words": []
       },
       "ask_first": "Do you run one home or more?",
-      "free_stops": "Which numbers appear is set in the solution document."
+      "free_stops": "Which numbers appear is set in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Write last week's occupied rooms, fee money collected and staff wages paid on one notebook page, so weekly pressure is easier to judge.",
+          "review": true
+        },
+        {
+          "text": "Give one person the Friday page update in one notebook kept in the office, so you can check the whole picture quickly.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

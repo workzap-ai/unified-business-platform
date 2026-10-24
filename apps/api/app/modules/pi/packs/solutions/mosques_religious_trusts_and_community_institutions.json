@@ -2,7 +2,7 @@
   "industry": "mosques_religious_trusts_and_community_institutions",
   "name": "Mosques, religious trusts and community institutions (administration)",
   "sector": "7.M Digital economy, social and public sector",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_cash_handling_risk",
@@ -22,7 +22,17 @@
         "tool_words": []
       },
       "ask_first": "Who is usually present when the boxes are counted?",
-      "free_stops": "The count process and committee sharing are set out in the solution document."
+      "free_stops": "The count process and committee sharing are set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note how many box collections this month were counted without a witness, so the committee sees the control weakness clearly.",
+          "review": false
+        },
+        {
+          "text": "Assign one second person for every collection count and keep the count sheet in one drawer, so totals are checked the same way each time.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_cash_mismatch",
@@ -42,7 +52,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "How counts and deposits are matched is detailed in the solution document."
+      "free_stops": "How counts and deposits are matched is detailed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare each counted collection with the matching bank deposit slip from this week, so shortfalls or delays stand out quickly.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of attaching each deposit slip to the count note, so counted money and banked money stay matched.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_owner_blind",
@@ -62,7 +82,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The statement format and ledger set-up go in the solution document."
+      "free_stops": "The statement format and ledger set-up go in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "List this month's income notes and expense papers side by side, so you can see which areas have no clear record.",
+          "review": false
+        },
+        {
+          "text": "Give one person the monthly summary notebook and a fixed committee review time, so member questions are answered from one place.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_quality_inconsistent",
@@ -83,7 +113,17 @@
         "leads_with_view": true
       },
       "ask_first": "",
-      "free_stops": "The fund structure is designed in the solution document; rulings stay with your scholars."
+      "free_stops": "The fund structure is designed in the solution document; rulings stay with your scholars.",
+      "extra_ideas": [
+        {
+          "text": "Look at this week's receipts and note which ones mix construction and running money, so the recording confusion is easy to spot.",
+          "review": false
+        },
+        {
+          "text": "Keep one separate page for each fund in the same notebook, so daily entries stop crossing between different purposes.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_receivables_late",
@@ -103,7 +143,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The reminder schedule and wording are prepared in the solution document."
+      "free_stops": "The reminder schedule and wording are prepared in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many fundraiser pledges from the last event still show nothing received, so the unpaid portion is clear.",
+          "review": false
+        },
+        {
+          "text": "Give one person one pledge notebook updated every week, so promised and received amounts are followed in one place.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_maintenance_downtime",
@@ -123,7 +173,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The log and reminder schedule are set out in the solution document."
+      "free_stops": "The log and reminder schedule are set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Walk around and note which equipment has no visible last service date, so neglected items are easier to prioritize.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member the maintenance notebook kept on site, so repairs and servicing stop being forgotten between breakdowns.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_booking_appointments",
@@ -143,7 +203,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The booking rules and messages are designed in the solution document."
+      "free_stops": "The booking rules and messages are designed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare hall booking notes from this month and count clashes or overwritten entries, so double booking risk is no longer guesswork.",
+          "review": false
+        },
+        {
+          "text": "Make one person responsible for the single booking register kept at the hall office, so every nikah booking goes through one handover.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_customer_communication",
@@ -163,7 +233,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The broadcast set-up and language plan go in the solution document."
+      "free_stops": "The broadcast set-up and language plan go in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note which recent announcements reached the notice board but not prayer time verbal reminders, so missed channels are obvious.",
+          "review": false
+        },
+        {
+          "text": "Assign one person to post every key notice in the same physical spots before prayers, so fewer community members miss updates.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_succession_family",
@@ -185,7 +265,17 @@
         ]
       },
       "ask_first": "",
-      "free_stops": "Which areas move in and in what order is set out in the solution document."
+      "free_stops": "Which areas move in and in what order is set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Write down which records are only available at the trustee's home today, so the access risk is plainly sized.",
+          "review": false
+        },
+        {
+          "text": "Choose one cupboard at the institution for core records and one helper for weekly handover, so access continues when the trustee is absent.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p10_shift_scheduling",
@@ -205,7 +295,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The planner and confirmation flow are detailed in the solution document."
+      "free_stops": "The planner and confirmation flow are detailed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many Ramadan volunteer shifts needed replacement last week, so you see where the roster collapses mid month.",
+          "review": false
+        },
+        {
+          "text": "Give one coordinator the live volunteer list in one notebook after evening prayers, so missed shifts get covered earlier.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

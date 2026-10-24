@@ -2,7 +2,7 @@
   "industry": "fast_food_and_qsr_chains",
   "name": "Fast food and QSR chains",
   "sector": "7.B Food and beverage",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_franchise_control",
@@ -30,7 +30,17 @@
         ]
       },
       "ask_first": "Are the franchised branches on the same POS as your own?",
-      "free_stops": "How each POS is connected and what franchisees must share is set out in the solution document."
+      "free_stops": "How each POS is connected and what franchisees must share is set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Stand near the counter at one franchised branch during a busy period and count completed orders, so reported sales can be sense checked.",
+          "review": false
+        },
+        {
+          "text": "Give one head office person the job of collecting branch reports in one notebook every week, so late figures stop arriving in mixed forms.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_bottleneck",
@@ -50,7 +60,17 @@
         "tool_words": []
       },
       "ask_first": "Where does the line slow down most — ordering, kitchen or handover?",
-      "free_stops": "The station layout and peak staffing plan per branch stays for the solution document."
+      "free_stops": "The station layout and peak staffing plan per branch stays for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note how many customers leave the queue during one busy period and where they were waiting, so the true choke point is clearer.",
+          "review": false
+        },
+        {
+          "text": "Make one crew member own drink filling during the rush, so the kitchen can keep moving on food orders.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_consistency_across_branches",
@@ -70,7 +90,17 @@
         "tool_words": []
       },
       "ask_first": "Which item varies most between branches?",
-      "free_stops": "The standards library and the scoring of branch checks are kept for the solution document."
+      "free_stops": "The standards library and the scoring of branch checks are kept for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare one same menu item from each branch side by side this week, so the worst build differences are plain to see.",
+          "review": false
+        },
+        {
+          "text": "Make one person per branch check one finished burger each shift, so the look stays closer across company and franchise stores.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_transfers_lost",
@@ -90,7 +120,17 @@
         "tool_words": []
       },
       "ask_first": "Who decides how much each branch receives from the commissary?",
-      "free_stops": "Par levels per branch and the order-to-dispatch flow are detailed in the solution document."
+      "free_stops": "Par levels per branch and the order-to-dispatch flow are detailed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Write what each branch asked for beside what the commissary sent this week, so the mismatch pattern is easy to spot.",
+          "review": false
+        },
+        {
+          "text": "Give one commissary staff member one notebook for all branch transfer changes, so bun shortages and over sending stop being guessed.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_discount_abuse",
@@ -111,7 +151,17 @@
         "leads_with_view": true
       },
       "ask_first": "Who can apply a discount or refund on the POS today?",
-      "free_stops": "The thresholds and approval rules per role are set in the solution document."
+      "free_stops": "The thresholds and approval rules per role are set in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count discounts and refunds by shift for one week, so the branch and time with the heaviest leakage stands out.",
+          "review": false
+        },
+        {
+          "text": "Make one manager sign every refund note before end of shift, so cashiers stop treating refunds like a casual option.",
+          "review": true
+        }
+      ]
     },
     {
       "id": "p6_integration_marketplace",
@@ -134,7 +184,17 @@
         ]
       },
       "ask_first": "Which app's payout confuses you most?",
-      "free_stops": "Which apps connect and how the reconciliation rules work goes in the solution document."
+      "free_stops": "Which apps connect and how the reconciliation rules work goes in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare packed delivery orders with payout lines from one busy day, so you can see whether the mismatch starts in orders or settlements.",
+          "review": false
+        },
+        {
+          "text": "Assign one person to write every missed tablet alert in one notebook at peak, so lost marketplace orders stop being shrugged off.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_rider_management",
@@ -154,7 +214,17 @@
         "tool_words": []
       },
       "ask_first": "Are riders your own, the app's, or both?",
-      "free_stops": "The allowance rules and how trips are checked against claims stay for the solution document."
+      "free_stops": "The allowance rules and how trips are checked against claims stay for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note dispatch time and arrival back time by branch and area this week, so slow routes and cold order patterns are easier to compare.",
+          "review": false
+        },
+        {
+          "text": "Give one shift lead the job of handing out deliveries in one queue, so riders stop choosing easier trips and delaying others.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_turnover",
@@ -174,7 +244,17 @@
         "tool_words": []
       },
       "ask_first": "Which shift is hardest to staff?",
-      "free_stops": "The onboarding plan and overtime approval rules are in the solution document."
+      "free_stops": "The onboarding plan and overtime approval rules are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count who leaves within their early shifts at each branch this month, so you see where new crew are dropping out fastest.",
+          "review": false
+        },
+        {
+          "text": "Give one supervisor one place to record approved overtime before closing, so claims and clock times are checked while the shift is fresh.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_data_scattered",
@@ -194,7 +274,17 @@
         "tool_words": []
       },
       "ask_first": "What one number would you check every morning?",
-      "free_stops": "What goes into the morning read and how branch data is pulled is in the solution document."
+      "free_stops": "What goes into the morning read and how branch data is pulled is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Lay last week's branch reports side by side and note which figures are missing most often, so the reporting weak spot becomes visible.",
+          "review": false
+        },
+        {
+          "text": "Give one head office person one fixed morning time to collect branch numbers, so late reports stop drifting through the week.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p10_campaign_roi_unknown",
@@ -215,7 +305,17 @@
         "tool_words": []
       },
       "ask_first": "How do you judge whether a deal or LTO worked today?",
-      "free_stops": "The code set-up per channel and the loyalty rules are kept for the solution document."
+      "free_stops": "The code set-up per channel and the loyalty rules are kept for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many lost paper stamp cards are mentioned at the counter this week, so you see whether loyalty leakage is rare or constant.",
+          "review": false
+        },
+        {
+          "text": "Give one shift lead a notebook for redeemed paper cards each day, so missing stamps stop turning into arguments at the till.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

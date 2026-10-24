@@ -2,7 +2,7 @@
   "industry": "bus_coach_and_school_transport_operators",
   "name": "Bus, coach and school-transport operators",
   "sector": "7.G Transport, mobility and aviation (part 2)",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_customer_communication",
@@ -23,7 +23,17 @@
         "tool_words": []
       },
       "ask_first": "How do you find out today where a van is?",
-      "free_stops": "How alerts are set up per route is in the solution document."
+      "free_stops": "How alerts are set up per route is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "For one week, count morning calls by route and note the delay reason beside each, so the noisiest route gets attention first.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member the job of updating route delays at one fixed morning time, so calls drop because updates leave from the office sooner.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_receivables_late",
@@ -43,7 +53,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "Reminder steps are in the solution document."
+      "free_stops": "Reminder steps are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "This week, count unpaid families by route and note how late each account is, so the worst collection route stops being guessed.",
+          "review": false
+        },
+        {
+          "text": "Give one person one route wise dues list and a fixed reminder day each month, so follow up happens consistently before balances age further.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_receivables_late",
@@ -64,7 +84,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "Statement and report layouts are in the solution document."
+      "free_stops": "Statement and report layouts are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "This week, note each school or company invoice date beside its payment date, so the slowest paying clients are clear in one glance.",
+          "review": true
+        },
+        {
+          "text": "Give one staff member one notebook for all client invoices and follow ups, so unpaid bills stop getting missed between calls and visits.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_attendance_lateness",
@@ -84,7 +114,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "Roster rules are in the solution document."
+      "free_stops": "Roster rules are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "For one week, note which routes needed replacement drivers and when the absence was known, so the worst scramble points show.",
+          "review": false
+        },
+        {
+          "text": "Give one dispatcher the evening confirmation list in one notebook, so replacement calls start earlier when a driver is missing.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_cost_overruns",
@@ -105,7 +145,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "How comparisons are made is in the solution document."
+      "free_stops": "How comparisons are made is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "This week, compare fuel bought against each bus's route distance and note the biggest mismatch, so one bus or route can be checked closely.",
+          "review": false
+        },
+        {
+          "text": "Give one person one page per bus for fuel slips and distance notes, so rising fuel use gets spotted before month end.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_cash_leakage",
@@ -125,7 +175,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The cash-up steps are in the solution document."
+      "free_stops": "The cash-up steps are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "For one week, compare each trip's cash handed in with passenger counts from the same trip, so the leakage point narrows fast.",
+          "review": false
+        },
+        {
+          "text": "Give one office person the end of trip cash check in one place, so conductors hand over against the same record every day.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_maintenance_downtime",
@@ -146,7 +206,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "Service intervals and backup rules are in the solution document."
+      "free_stops": "Service intervals and backup rules are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "This week, note every route delay caused by a vehicle problem and which bus it involved, so the most disruptive bus becomes visible.",
+          "review": false
+        },
+        {
+          "text": "Give one supervisor one written fallback bus list for each route, so dispatch can switch vehicles quickly when a bus fails.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_software_not_connected",
@@ -167,7 +237,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "How channels connect is in the solution document."
+      "free_stops": "How channels connect is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "For one week, count how many seats were promised twice or left empty on each departure, so the biggest booking clash is measured.",
+          "review": false
+        },
+        {
+          "text": "Give one person one master departure list kept at the counter, so phone and walk in bookings check the same seat picture.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_licences_renewals",
@@ -187,7 +267,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "Reminder timings are in the solution document."
+      "free_stops": "Reminder timings are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "This week, count renewals due soon by vehicle and note which papers caused last minute chasing before, so the admin load is visible early.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member one renewal diary checked on the same day each week, so paperwork stops surfacing only at the last minute.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p10_margin_unknown",
@@ -208,7 +298,17 @@
         "leads_with_view": true
       },
       "ask_first": "",
-      "free_stops": "Which costs are included is in the solution document."
+      "free_stops": "Which costs are included is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "For one week, note each route's passengers, fuel slips and driver hours together, so weaker routes stop hiding inside busy ones.",
+          "review": false
+        },
+        {
+          "text": "Give one office person a single notebook for every route's daily takings and running costs, so route profit gets reviewed from one place.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

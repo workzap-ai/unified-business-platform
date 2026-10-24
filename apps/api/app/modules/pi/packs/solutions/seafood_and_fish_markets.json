@@ -2,7 +2,7 @@
   "industry": "seafood_and_fish_markets",
   "name": "Seafood and fish markets",
   "sector": "7.B Food and beverage",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_expiry_wastage",
@@ -22,7 +22,17 @@
         "tool_words": []
       },
       "ask_first": "How much is usually unsold at the end of the day?",
-      "free_stops": "The markdown timing and buying rules per species stay for the solution document."
+      "free_stops": "The markdown timing and buying rules per species stay for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count which trays still sit unsold by late afternoon for one week, so tomorrow's buying matches what actually clears.",
+          "review": false
+        },
+        {
+          "text": "Give one seller the markdown call at the same hour daily, so value is protected before evening kills the sale.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_margin_unknown",
@@ -43,7 +53,17 @@
         "leads_with_view": true
       },
       "ask_first": "Do you track weight before and after cleaning now?",
-      "free_stops": "The yield and pricing method per species is detailed in the solution document."
+      "free_stops": "The yield and pricing method per species is detailed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note the cleaned weight beside the whole weight for each main line this week, so your buying cost reflects what remains to sell.",
+          "review": false
+        },
+        {
+          "text": "Give one cleaner one notebook page per species for daily weights, so your pricing stops changing on rough guesses.",
+          "review": true
+        }
+      ]
     },
     {
       "id": "p3_price_increases_supplier",
@@ -63,7 +83,17 @@
         "tool_words": []
       },
       "ask_first": "Who decides the selling price each day?",
-      "free_stops": "The daily pricing rule and broadcast set-up are in the solution document."
+      "free_stops": "The daily pricing rule and broadcast set-up are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare today's buying rate with today's shelf rate each morning, so you spot where retail is trailing the auction.",
+          "review": false
+        },
+        {
+          "text": "Give one person the morning job of rewriting fish prices after buying, so the counter stops selling on yesterday's cost.",
+          "review": true
+        }
+      ]
     },
     {
       "id": "p4_receivables_late",
@@ -83,7 +113,17 @@
         "tool_words": []
       },
       "ask_first": "How do you keep track of what each one owes today?",
-      "free_stops": "The credit terms and reminder schedule are set out in the solution document."
+      "free_stops": "The credit terms and reminder schedule are set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Mark each trade account by how long it has been unpaid, so chasing starts with the balances blocking your cash longest.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member a fixed weekly time to call overdue accounts, so collections happen before another month slips by.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_supplier_payments_late",
@@ -103,7 +143,17 @@
         "tool_words": []
       },
       "ask_first": "How many boats do you advance money to?",
-      "free_stops": "How advances and settlements are tracked per landing stays for the solution document."
+      "free_stops": "How advances and settlements are tracked per landing stays for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare the register balance with one boat owner's own notes each settlement day, so disputes surface while the landing is still fresh.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of updating boat advances in one register after every landing, so balances stay clear for both sides.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_whatsapp_overload",
@@ -123,7 +173,17 @@
         "tool_words": []
       },
       "ask_first": "How many trade orders come in on a normal night?",
-      "free_stops": "The order form and dispatch flow are detailed in the solution document."
+      "free_stops": "The order form and dispatch flow are detailed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many overnight restaurant orders were missed or corrected this week, so you see the true load before dispatch starts.",
+          "review": false
+        },
+        {
+          "text": "Give one person the morning handover of writing every overnight restaurant order into one list, so packing follows one complete queue.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_documentation",
@@ -143,7 +203,17 @@
         "tool_words": []
       },
       "ask_first": "Are export documents handled in-house or by an agent?",
-      "free_stops": "The shipment tracking steps and checklist set-up stay for the solution document."
+      "free_stops": "The shipment tracking steps and checklist set-up stay for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note which shipment paper waits longest before vessel cut off this week, so you see where the admin delay really sits.",
+          "review": false
+        },
+        {
+          "text": "Give each shipment one paper file kept in one place, so documents stop drifting between desks before the vessel leaves.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_count_mismatch",
@@ -163,7 +233,17 @@
         "tool_words": []
       },
       "ask_first": "Who records stock going in and out of the cold store?",
-      "free_stops": "The count routine and variance checks are in the solution document."
+      "free_stops": "The count routine and variance checks are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare one cold store section against the book on one evening, so you learn whether losses come from counting or spoilage.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of noting every stock move in one notebook by the cold store, so the book follows real movement.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_branch_comparison",
@@ -183,7 +263,17 @@
         "tool_words": []
       },
       "ask_first": "Do both stalls buy from the same source?",
-      "free_stops": "How profit by stall and species is worked out goes in the solution document."
+      "free_stops": "How profit by stall and species is worked out goes in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Write each stall's daily sales and buying on facing notebook pages for one week, so the weaker stall stops hiding inside the total.",
+          "review": false
+        },
+        {
+          "text": "Give each stall one person to close with one written summary nightly, so branch performance can be checked without chasing people.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

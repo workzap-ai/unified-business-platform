@@ -2,7 +2,7 @@
   "industry": "diagnostic_labs_and_sample_collection_centres",
   "name": "Diagnostic labs and sample-collection centres",
   "sector": "7.I Health and care",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_delivery_late",
@@ -22,7 +22,17 @@
         "tool_words": []
       },
       "ask_first": "How many collection points does each rider cover?",
-      "free_stops": "Cut-off rules and handover steps are set out in the solution document."
+      "free_stops": "Cut-off rules and handover steps are set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note dispatch and receipt times by collection point for one week, so you see which handovers miss the lab run.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of calling each point at one fixed afternoon time, so batches leave before the main lab starts grouping work.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_bottleneck",
@@ -42,7 +52,17 @@
         "tool_words": []
       },
       "ask_first": "Does the delay start at collection, transport or inside the lab?",
-      "free_stops": "Stage definitions and alert rules are kept for the solution document."
+      "free_stops": "Stage definitions and alert rules are kept for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note the time samples enter and leave each desk for a few days, so the slow stage before evening becomes obvious.",
+          "review": false
+        },
+        {
+          "text": "Give one supervisor a fixed late afternoon check of pending work, so anything stuck gets handed over before night delay starts.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_service_errors",
@@ -62,7 +82,17 @@
         "tool_words": []
       },
       "ask_first": "Do reports go out from one number or several?",
-      "free_stops": "The verification steps and send log are designed in the solution document; for any privacy obligations, talk to your lawyer."
+      "free_stops": "The verification steps and send log are designed in the solution document; for any privacy obligations, talk to your lawyer.",
+      "extra_ideas": [
+        {
+          "text": "Count wrong-send incidents by sending phone and shift for one week, so the risky handover points show.",
+          "review": false
+        },
+        {
+          "text": "Keep all report sending on one branch phone with one named sender per shift, so mixed chats and wrong contacts reduce.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_expiry_wastage",
@@ -82,7 +112,17 @@
         "tool_words": []
       },
       "ask_first": "Are reagents bought outright or under a rental arrangement?",
-      "free_stops": "Reorder levels per test are worked out in the solution document."
+      "free_stops": "Reorder levels per test are worked out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many low-volume reagents were opened but unused this month, so the biggest waste lines stand out.",
+          "review": false
+        },
+        {
+          "text": "Give one person a weekly notebook list of opened low-use items in one place, so ordering and use stop drifting apart.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_deposit_delays",
@@ -102,7 +142,17 @@
         "tool_words": []
       },
       "ask_first": "Do franchise points deposit into your account or settle with you monthly?",
-      "free_stops": "The variance rules and franchise reporting are set in the solution document."
+      "free_stops": "The variance rules and franchise reporting are set in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note each collection point's cash handover day and deposit proof day for one week, so the slowest handovers stand out clearly.",
+          "review": false
+        },
+        {
+          "text": "Give one office person one notebook for all collection point deposit follow ups at a fixed time daily, so delays are chased consistently.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_count_mismatch",
@@ -122,7 +172,17 @@
         "tool_words": []
       },
       "ask_first": "Who counts samples on arrival at the lab?",
-      "free_stops": "The handover check is specified in the solution document."
+      "free_stops": "The handover check is specified in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note dispatch count and receipt count beside each collection point for one week, so the mismatch size by point is clear.",
+          "review": false
+        },
+        {
+          "text": "Make one receiving staff member own the arrival count in one notebook, so every mismatch is handed back to the same day.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_rider_management",
@@ -142,7 +202,17 @@
         "tool_words": []
       },
       "ask_first": "How do home-collection requests come in now?",
-      "free_stops": "Slot planning and routing logic are in the solution document."
+      "free_stops": "Slot planning and routing logic are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note booked time and actual arrival time for each home visit this week, so the late areas and riders stand out.",
+          "review": false
+        },
+        {
+          "text": "Give one dispatcher a fixed evening handover of next day's area-wise bookings, so rider assignment stops changing at the last minute.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_credit_customers",
@@ -162,7 +232,17 @@
         "tool_words": []
       },
       "ask_first": "Which panels take longest to pay?",
-      "free_stops": "Statement format and dispute steps are set in the solution document."
+      "free_stops": "Statement format and dispute steps are set in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count disputed panel bills by dispute reason for one month, so the repeat billing issues are easier to tackle with each company.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member one list for every panel billing dispute and reply date, so follow up stays orderly across companies.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_pricing_errors",
@@ -182,7 +262,17 @@
         "tool_words": []
       },
       "ask_first": "How many branches use their own price lists today?",
-      "free_stops": "How the master list connects to each place is mapped in the solution document."
+      "free_stops": "How the master list connects to each place is mapped in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Walk each branch once and compare the public price list with the counter list, so mismatches are caught before staff quote differently.",
+          "review": true
+        },
+        {
+          "text": "Give one person the job of writing every approved price change in one notebook, so branches update from the same source.",
+          "review": true
+        }
+      ]
     },
     {
       "id": "p10_reports_late",
@@ -202,7 +292,17 @@
         "tool_words": []
       },
       "ask_first": "Does your LIS cover every branch?",
-      "free_stops": "Which numbers and how they are pulled from the LIS is set in the solution document."
+      "free_stops": "Which numbers and how they are pulled from the LIS is set in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Write each branch's daily booking count in one notebook for a week, so volume swings show before month end.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member a fixed evening time to collect branch counts into one chat, so decisions happen while the week is live.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

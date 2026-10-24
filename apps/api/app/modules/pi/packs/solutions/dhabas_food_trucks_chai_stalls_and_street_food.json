@@ -2,7 +2,7 @@
   "industry": "dhabas_food_trucks_chai_stalls_and_street_food",
   "name": "Dhabas, food trucks, chai stalls and street food",
   "sector": "7.B Food and beverage",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_owner_blind",
@@ -22,7 +22,17 @@
         "tool_words": []
       },
       "ask_first": "Do you write anything down at closing now?",
-      "free_stops": "How the daily close and weekly view are set up is in the solution document."
+      "free_stops": "How the daily close and weekly view are set up is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count cups sold and money in hand at closing for one week, so missing sales versus actual takings becomes clear.",
+          "review": false
+        },
+        {
+          "text": "Give one person the closing notebook every night for sales and buying totals, so you get the same end-of-day picture daily.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_cash_mismatch",
@@ -42,7 +52,17 @@
         "tool_words": []
       },
       "ask_first": "Do you handle the galla yourself, or a helper too?",
-      "free_stops": "The closing routine and shift handover rules are set out in the solution document."
+      "free_stops": "The closing routine and shift handover rules are set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count cash sales chits and wallet payment notes separately at shift end, so you can see which side is drifting.",
+          "review": true
+        },
+        {
+          "text": "Keep one page per shift for cash and wallet totals in the galla area, so mixing stops during handover.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_credit_customers",
@@ -62,7 +82,17 @@
         "tool_words": []
       },
       "ask_first": "Roughly how many regulars take udhaar?",
-      "free_stops": "The udhaar rules and reminder approach stay for the solution document."
+      "free_stops": "The udhaar rules and reminder approach stay for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many udhaar entries stayed unpaid since last week, so you see which regular balances are quietly piling up.",
+          "review": false
+        },
+        {
+          "text": "Give one person the udhaar notebook and keep it beside the serving spot, so every credit sale lands in one place.",
+          "review": true
+        }
+      ]
     },
     {
       "id": "p4_price_increases_supplier",
@@ -83,7 +113,17 @@
         "leads_with_view": true
       },
       "ask_first": "Which item's price rise hurt most recently?",
-      "free_stops": "The costing and price-review approach is detailed in the solution document."
+      "free_stops": "The costing and price-review approach is detailed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare this week's milk and sugar buying notes with last week's cup sales, so you see the squeeze on each cup.",
+          "review": false
+        },
+        {
+          "text": "Keep one page only for daily buying rates from suppliers, so price jumps are easy to spot before serving starts.",
+          "review": true
+        }
+      ]
     },
     {
       "id": "p5_wastage_cost",
@@ -103,7 +143,17 @@
         "tool_words": []
       },
       "ask_first": "What's left over at closing most days?",
-      "free_stops": "How cooking quantities are set by day and season goes in the solution document."
+      "free_stops": "How cooking quantities are set by day and season goes in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count leftover parathas and gravy trays at closing for one week, so tomorrow's cooking can match actual rushes.",
+          "review": false
+        },
+        {
+          "text": "Give one helper the evening leftovers note in one notebook near the stove, so cooking amounts get adjusted from real waste.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_stockout",
@@ -123,7 +173,17 @@
         "tool_words": []
       },
       "ask_first": "How often do you buy gas now?",
-      "free_stops": "The usage tracking and reminder set-up stay for the solution document."
+      "free_stops": "The usage tracking and reminder set-up stay for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note when each cylinder starts and ends this week, so you can see the usual timing of a runout.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of checking the active cylinder at shift handover, so service is less likely to stop mid-rush.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_consistency_across_branches",
@@ -143,7 +203,17 @@
         "tool_words": []
       },
       "ask_first": "Which item changes most when you're not there?",
-      "free_stops": "The recipe cards and helper training steps are in the solution document."
+      "free_stops": "The recipe cards and helper training steps are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare customer send-backs or taste comments by shift this week, so you see when the helper's cooking changes your standard.",
+          "review": false
+        },
+        {
+          "text": "Keep one recipe notebook at the cooking station and give one person each shift the tasting handover, so flavour stays steadier without you.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_brand_awareness",
@@ -163,7 +233,17 @@
         "tool_words": []
       },
       "ask_first": "How do customers find out where you are today?",
-      "free_stops": "How the daily broadcast and opt-in list are set up is in the solution document."
+      "free_stops": "How the daily broadcast and opt-in list are set up is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note how many callers ask your location on days you move, so you can judge how much confusion the parking change causes.",
+          "review": false
+        },
+        {
+          "text": "Give one person the daily job of telling your chat group the truck spot and hours, so regulars hear one clear location each day.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_expansion_pains",
@@ -184,7 +264,17 @@
         "leads_with_view": true
       },
       "ask_first": "What's stopping a second spot right now?",
-      "free_stops": "The plan for running both stalls is detailed in the solution document."
+      "free_stops": "The plan for running both stalls is detailed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Walk the stall and note every task only you handled today, so the second stall's owner-dependence becomes visible.",
+          "review": false
+        },
+        {
+          "text": "Give one person the close-of-day handover note for sales, stock and issues, so both stalls can report the same way.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

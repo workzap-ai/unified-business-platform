@@ -2,7 +2,7 @@
   "industry": "media_production_and_publishing",
   "name": "Media production and publishing",
   "sector": "7.K Professional and business services",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_cost_overruns",
@@ -23,7 +23,17 @@
         "tool_words": []
       },
       "ask_first": "How many shoots are planned this season?",
-      "free_stops": "the budget structure and update routine are set out in the solution document."
+      "free_stops": "the budget structure and update routine are set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare the last few shoots by where extra spending appeared, so you see which part of the day keeps pushing costs up.",
+          "review": false
+        },
+        {
+          "text": "Give the production lead one wrap time note for every unplanned spend on each shoot day, so overruns are seen before the final tally.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_hidden_costs",
@@ -63,7 +73,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "reminder timings and round limits are worked out in the solution document."
+      "free_stops": "reminder timings and round limits are worked out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many separate feedback messages arrive for each rough cut, so you see which projects drag because notes are scattered.",
+          "review": false
+        },
+        {
+          "text": "Give the producer one fixed afternoon slot to collect all client notes into one edit list, so the editor gets one clear direction each day.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_bottleneck",
@@ -83,7 +103,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "queue rules and alerts are set out in the solution document."
+      "free_stops": "queue rules and alerts are set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many projects are waiting for edits at today's close, so the size of the queue is clear before deadlines slip.",
+          "review": false
+        },
+        {
+          "text": "Give the producer one daily handover with the editor on the waiting list, so urgent cuts are chosen before smaller jobs fill the day.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_attendance_lateness",
@@ -103,7 +133,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "confirmation timings and reliability tracking are kept for the solution document."
+      "free_stops": "confirmation timings and reliability tracking are kept for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count which crew roles cancel closest to call time across recent shoots, so the weakest points in staffing show.",
+          "review": false
+        },
+        {
+          "text": "Give the production coordinator one fixed evening check before each shoot on crew attendance, so replacements start earlier when someone drops out.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_shrinkage_theft",
@@ -123,7 +163,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "the check-out routine and maintenance schedule are designed in the solution document."
+      "free_stops": "the check-out routine and maintenance schedule are designed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare what left for the last few shoots with what returned damaged or missing, so the riskiest kit movements stand out.",
+          "review": false
+        },
+        {
+          "text": "Give the kit room lead one paper handover list for every shoot return, so missing or damaged gear is tied to a clear return moment.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_data_loss",
@@ -143,7 +193,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "the catalogue structure and backup routine are set out in the solution document."
+      "free_stops": "the catalogue structure and backup routine are set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many times this week editors stop to ask where footage lives, so the search problem shows in lost edit time.",
+          "review": false
+        },
+        {
+          "text": "Give one editor the weekly job of updating one master drive notebook after each footage handover, so everyone checks one place before searching.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_receivables_late",
@@ -163,7 +223,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "the milestone billing and reminder flow are kept for the solution document."
+      "free_stops": "the milestone billing and reminder flow are kept for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare delivered projects by how long payment follow ups stay untouched, so you see where collection routine keeps stalling.",
+          "review": true
+        },
+        {
+          "text": "Give the office manager one fixed weekly slot to update one delivered but unpaid jobs notebook, so follow ups stop slipping after delivery.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_overstock_dead_stock",
@@ -184,7 +254,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "how sales and returns feed print run planning is worked out in the solution document."
+      "free_stops": "how sales and returns feed print run planning is worked out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare recent titles by print run, copies returned and copies still stored, so the overprinting pattern shows title by title.",
+          "review": false
+        },
+        {
+          "text": "Give the warehouse lead one notebook page for distributor returns every week, so the next print decision uses current returns reality.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p10_contracts_tracking",
@@ -204,7 +284,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "the register setup is set out in the solution document."
+      "free_stops": "the register setup is set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many past projects need more than a few minutes to find agreements, so filing trouble shows by project type.",
+          "review": false
+        },
+        {
+          "text": "Give one coordinator a fixed weekly slot to return every signed project paper to one labelled project file, so past usage paperwork is found during client follow ups.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

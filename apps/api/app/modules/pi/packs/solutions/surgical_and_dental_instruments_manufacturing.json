@@ -2,7 +2,7 @@
   "industry": "surgical_and_dental_instruments_manufacturing",
   "name": "Surgical and dental instruments manufacturing",
   "sector": "7.D Manufacturing and industry (part 1)",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_no_visibility",
@@ -23,7 +23,17 @@
         "tool_words": []
       },
       "ask_first": "Roughly how many lots are with vendors at any time?",
-      "free_stops": "How each stage is recorded and overdue lots flagged is set out in the solution document."
+      "free_stops": "How each stage is recorded and overdue lots flagged is set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Walk through current vendor lots and note each lot's last known stage and send date once, so missing handoffs stand out today.",
+          "review": false
+        },
+        {
+          "text": "Give one person one notebook page for every lot sent out, so each vendor handover stays tied to the same lot.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_count_mismatch",
@@ -43,7 +53,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "How counts are confirmed and tied to payment is covered in the solution document."
+      "free_stops": "How counts are confirmed and tied to payment is covered in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare the send note count with the returned tray count for each polishing lot this week, so the mismatch point is pinned down.",
+          "review": false
+        },
+        {
+          "text": "Make one person write outgoing and returned piece counts for each polishing lot in one notebook, so disputed numbers have one source.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_serial_batch_tracking",
@@ -64,7 +84,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "What each record holds and how it is exported is set out in the solution document; regulatory content is for your quality or regulatory adviser."
+      "free_stops": "What each record holds and how it is exported is set out in the solution document; regulatory content is for your quality or regulatory adviser.",
+      "extra_ideas": [
+        {
+          "text": "Note which lot papers are usually rebuilt later and which stage they came from, so the heaviest paperwork gap is obvious.",
+          "review": false
+        },
+        {
+          "text": "Give one role the job of placing each lot paper into one folder on the same day, so buyer records gather during production.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_rework",
@@ -86,7 +116,17 @@
         ]
       },
       "ask_first": "",
-      "free_stops": "Inspection points and rejection categories are kept for the solution document."
+      "free_stops": "Inspection points and rejection categories are kept for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Mark each final inspection rejection by defect type and previous stage for one week, so the stage behind rework starts to show.",
+          "review": false
+        },
+        {
+          "text": "Give one inspector one notebook for rejection reasons at final check, so rework discussions use the same evidence each day.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_order_errors",
@@ -106,7 +146,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "How marking instructions are stored and checked is covered in the solution document."
+      "free_stops": "How marking instructions are stored and checked is covered in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare the buyer order sheet with the marking note before the next private label run, so wrong logos are caught earlier.",
+          "review": false
+        },
+        {
+          "text": "Assign one person to keep each buyer's current marking instructions together in one place, so the floor uses the latest version.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_packing_errors",
@@ -126,7 +176,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The scan-check flow is set out in the solution document."
+      "free_stops": "The scan-check flow is set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note the carton packed, packing list line, and final count for the next few shipments, so the shortage point becomes visible.",
+          "review": false
+        },
+        {
+          "text": "Give one packer the job of keeping one live packing list at the table during packing, so sealed boxes match what was counted.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_licences_renewals",
@@ -146,7 +206,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "Reminder timing and folder structure are kept for the solution document; what each certificate requires is for your regulatory adviser."
+      "free_stops": "Reminder timing and folder structure are kept for the solution document; what each certificate requires is for your regulatory adviser.",
+      "extra_ideas": [
+        {
+          "text": "List every renewal and audit month on one page and compare it with this quarter, so upcoming documentation pressure is visible.",
+          "review": false
+        },
+        {
+          "text": "Assign one role to review the renewals page at the same time each week, so dates stop arriving as last minute surprises.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_receivables_late",
@@ -166,7 +236,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "Reminder schedule and follow-up order are set out in the solution document."
+      "free_stops": "Reminder schedule and follow-up order are set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note each shipped order with shipment date and payment received date once, so the slowest paying buyers are easy to spot.",
+          "review": true
+        },
+        {
+          "text": "Give one person one notebook page for all overdue buyer follow ups at a fixed weekly time, so chasing happens routinely.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_lead_followup_slow",
@@ -187,7 +267,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "How inquiries flow in and the catalogue is structured are covered in the solution document."
+      "free_stops": "How inquiries flow in and the catalogue is structured are covered in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count open inquiries by source and by days waiting for reply once this week, so the biggest response backlog is clear.",
+          "review": false
+        },
+        {
+          "text": "Assign one staff member one list for all new inquiries and one daily reply window, so leads stop sitting unseen.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p10_owner_bottleneck",
@@ -208,7 +298,17 @@
         "leads_with_view": true
       },
       "ask_first": "",
-      "free_stops": "Who owns which follow-up and how it is escalated is set out in the solution document."
+      "free_stops": "Who owns which follow-up and how it is escalated is set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many vendor messages only need status collection versus owner judgment this week, so your personal chasing load is clear.",
+          "review": false
+        },
+        {
+          "text": "Assign one staff member to collect vendor stage updates in one notebook at one daily time, so replies stop waiting for you.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

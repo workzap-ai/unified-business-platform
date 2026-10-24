@@ -2,7 +2,7 @@
   "industry": "edtech_and_online_course_businesses",
   "name": "Edtech and online course businesses",
   "sector": "7.J Education and childcare",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_conversion_low",
@@ -23,7 +23,17 @@
         "leads_with_view": true
       },
       "ask_first": "",
-      "free_stops": "How the funnel stages are measured is kept for the document."
+      "free_stops": "How the funnel stages are measured is kept for the document.",
+      "extra_ideas": [
+        {
+          "text": "Compare the last webinar's questions, attendance drop points and buyer count, so you see where interest fades before purchase.",
+          "review": true
+        },
+        {
+          "text": "Give one person the job of noting buyer objections after each webinar, so your sales pitch gets fixed around real hesitations.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_lead_followup_slow",
@@ -43,7 +53,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The routing and alert rules are in the document."
+      "free_stops": "The routing and alert rules are in the document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many new leads sat untouched at each day part this week, so the slowest handoff period becomes obvious.",
+          "review": false
+        },
+        {
+          "text": "Keep one paper list of new leads beside the calling desk, so every caller works from the same queue.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_payment_methods",
@@ -63,7 +83,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The payment setup and retry flow are kept for the document."
+      "free_stops": "The payment setup and retry flow are kept for the document.",
+      "extra_ideas": [
+        {
+          "text": "Note which course offers and times most often lead to failed card attempts, so patterns around Pakistani learner drop off appear.",
+          "review": false
+        },
+        {
+          "text": "Give one teammate the daily job of reviewing failed payment messages, so follow up stops being delayed or overlooked.",
+          "review": true
+        }
+      ]
     },
     {
       "id": "p4_receivables_late",
@@ -85,7 +115,17 @@
         ]
       },
       "ask_first": "",
-      "free_stops": "The reminder and access rules are in the document."
+      "free_stops": "The reminder and access rules are in the document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many overdue instalment learners still have access by course, so you see where unpaid seats are piling up.",
+          "review": false
+        },
+        {
+          "text": "Keep one overdue access list with one named owner for updates, so billing and access decisions stay aligned each week.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_refunds",
@@ -105,7 +145,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The request flow and evidence kept per case are kept for the document."
+      "free_stops": "The request flow and evidence kept per case are kept for the document.",
+      "extra_ideas": [
+        {
+          "text": "Count open refund requests by channel and age on one page, so you see where delays and duplicate handling start.",
+          "review": true
+        },
+        {
+          "text": "Give one person one notebook for every refund request received, so scattered messages stop slipping past the team.",
+          "review": true
+        }
+      ]
     },
     {
       "id": "p6_theft_external",
@@ -125,7 +175,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The detection signals are in the document."
+      "free_stops": "The detection signals are in the document.",
+      "extra_ideas": [
+        {
+          "text": "Count how often the same login appears active from different places on the same day, so the sharing pattern becomes visible.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member the weekly review of unusual access notes, so follow up on shared logins happens consistently.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_churn_subscription",
@@ -145,7 +205,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The messages and churn reports are kept for the document."
+      "free_stops": "The messages and churn reports are kept for the document.",
+      "extra_ideas": [
+        {
+          "text": "Compare what cancelled subscribers watched or attended in their opening days, so you see which starts fail to hook them.",
+          "review": false
+        },
+        {
+          "text": "Give one person the weekly cancellation reason list in one notebook, so retention fixes follow the same signals each time.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_slow_response",
@@ -165,7 +235,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The help flow and response targets are in the document."
+      "free_stops": "The help flow and response targets are in the document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many support messages this week mention password reset, access link or wrong login, so the biggest blocker is clear.",
+          "review": false
+        },
+        {
+          "text": "Give one person the morning job of clearing login issues from one list, so simple cases stop clogging the support queue.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_commission_disputes",
@@ -185,7 +265,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The tracking and statement setup are kept for the document."
+      "free_stops": "The tracking and statement setup are kept for the document.",
+      "extra_ideas": [
+        {
+          "text": "Compare claimed affiliate sales against your recorded enrolments by campaign period, so the disputed gap is clear before arguments grow.",
+          "review": false
+        },
+        {
+          "text": "Keep one written commission claims list with one owner updating it weekly, so affiliate questions are answered from the same record.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p10_software_not_connected",
@@ -207,7 +297,17 @@
         ]
       },
       "ask_first": "",
-      "free_stops": "Which systems connect and how is set out in the document."
+      "free_stops": "Which systems connect and how is set out in the document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many enrolment, payment and learner-status changes were retyped by staff since Monday, so the busiest break in the workflow shows.",
+          "review": true
+        },
+        {
+          "text": "Assign one staff member the midday update check and keep one paper list by the shared desk, so sales and course access stay aligned.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p11_no_dashboard",
@@ -227,7 +327,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "How the data is pulled together is kept for the document."
+      "free_stops": "How the data is pulled together is kept for the document.",
+      "extra_ideas": [
+        {
+          "text": "Write each course on a page and note revenue, refunds and cancellations from this week, so weak courses stand out fast.",
+          "review": false
+        },
+        {
+          "text": "Give one person a fixed weekly time to update the course totals notebook, so the numbers arrive together for decisions.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

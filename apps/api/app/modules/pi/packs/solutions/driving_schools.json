@@ -2,7 +2,7 @@
   "industry": "driving_schools",
   "name": "Driving schools",
   "sector": "7.G Transport, mobility and aviation (part 2)",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_booking_appointments",
@@ -22,7 +22,17 @@
         "tool_words": []
       },
       "ask_first": "Is there any rule students agree to about cancelling today?",
-      "free_stops": "Reminder timing and the rule set-up are in the solution document."
+      "free_stops": "Reminder timing and the rule set-up are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count last week's cancelled lessons by instructor and time of day, so you can see when idle car time hits hardest.",
+          "review": false
+        },
+        {
+          "text": "Have each instructor mark tomorrow's lesson confirmations in one shared notebook by evening, so empty slots can be reassigned sooner.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_handoffs",
@@ -42,7 +52,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "Calendar rules are in the solution document."
+      "free_stops": "Calendar rules are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note every booking clash this week with the car and instructor involved, so you can spot where double booking starts.",
+          "review": false
+        },
+        {
+          "text": "Assign one person to write every confirmed lesson in one master diary, so car and instructor clashes get checked before promises are made.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_performance_unknown",
@@ -63,7 +83,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "How confirmation and pay calculations work is in the solution document."
+      "free_stops": "How confirmation and pay calculations work is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare each instructor's completed lesson slips for this week, so workload differences stop being guessed.",
+          "review": false
+        },
+        {
+          "text": "Make each instructor hand in one daily lesson tally to one owner notebook, so weekly counts are ready without chasing.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_data_scattered",
@@ -83,7 +113,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "Package tracking set-up is in the solution document."
+      "free_stops": "Package tracking set-up is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many active students have no clear lessons remaining noted today, so you see how big the tracking mess is.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member one notebook page per active learner package, so remaining lessons stay clear before new bookings are promised.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_receivables_late",
@@ -103,7 +143,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "Reminder steps are in the solution document; refund obligations are for your lawyer."
+      "free_stops": "Reminder steps are in the solution document; refund obligations are for your lawyer.",
+      "extra_ideas": [
+        {
+          "text": "Count part paid students who have no next lesson written in the diary, so stuck cash is clearer this week.",
+          "review": false
+        },
+        {
+          "text": "Keep one unpaid balance notebook at the front desk with one staff owner, so follow ups happen before lessons drift away.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_lead_followup_slow",
@@ -124,7 +174,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "Inbox and source set-up are in the solution document."
+      "free_stops": "Inbox and source set-up are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note the time each enquiry arrives and the time it gets answered today, so slow reply periods stand out clearly.",
+          "review": false
+        },
+        {
+          "text": "Give one person fixed reply windows and one handwritten enquiry list, so messages stop sitting unseen during busy lesson hours.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_consistency_across_branches",
@@ -144,7 +204,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The progress card structure is in the solution document."
+      "free_stops": "The progress card structure is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Listen for which lesson topics students mention as repeated or skipped this week, so confusing differences between instructors become visible.",
+          "review": false
+        },
+        {
+          "text": "Make every instructor leave a short handover note after each lesson in one place, so the next lesson follows the same learning path.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_cost_overruns",
@@ -165,7 +235,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "How the log is kept is in the solution document."
+      "free_stops": "How the log is kept is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare each training car's fuel notes with the lessons it actually ran this week, so the thirstiest routine shows.",
+          "review": false
+        },
+        {
+          "text": "Let one person collect all fuel slips and repair notes in one car folder daily, so repeat costs stop slipping past review.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_capacity",
@@ -190,7 +270,17 @@
         ]
       },
       "ask_first": "",
-      "free_stops": "How offers are targeted is in the solution document."
+      "free_stops": "How offers are targeted is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count booked and empty lesson slots this week by morning, evening and weekend, so the quiet times are clear to everyone.",
+          "review": false
+        },
+        {
+          "text": "Let one staff member review next week's empty weekday morning slots at a fixed time, so they can match flexible learners earlier.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

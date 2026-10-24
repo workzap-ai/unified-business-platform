@@ -2,7 +2,7 @@
   "industry": "electricity_and_power_contractors",
   "name": "Electricity and power contractors",
   "sector": "7.L Finance-adjacent, energy and utilities",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_owner_bottleneck",
@@ -22,7 +22,17 @@
         "tool_words": []
       },
       "ask_first": "How long does it usually take to send a quote?",
-      "free_stops": "Library structure and approval flow are in the solution document."
+      "free_stops": "Library structure and approval flow are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note which BOQ items repeat across recent quotes, so staff can draft the common parts before your review.",
+          "review": false
+        },
+        {
+          "text": "Give one estimator the job of preparing every BOQ draft in one notebook, so your role stays only on checking and changes.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_cost_overruns",
@@ -42,7 +52,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "Costing method is in the solution document."
+      "free_stops": "Costing method is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare estimated material lines with what was actually issued on one active job, so overspending starts showing before completion.",
+          "review": false
+        },
+        {
+          "text": "Give one store person a single material issue notebook by job, so extra usage stops slipping through unrecorded.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_transfers_lost",
@@ -62,7 +82,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "Log design is in the solution document."
+      "free_stops": "Log design is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many cable rolls changed sites this week without a note, so you see how often transfers vanish from records.",
+          "review": false
+        },
+        {
+          "text": "Give one storekeeper one transfer page for all site moves, so cable borrowed between jobs can be traced later.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_import_delays",
@@ -82,7 +112,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "Tracker set-up is in the solution document."
+      "free_stops": "Tracker set-up is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note which waiting installations are blocked by each delayed shipment, so customer promises match what stock is actually missing.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member one open-order list with a daily update time, so waiting installations stop drifting unnoticed.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_field_team_visibility",
@@ -102,7 +142,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "Report fields are in the solution document."
+      "free_stops": "Report fields are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many crews finished today without sending work notes, so you see where your blind spots are.",
+          "review": false
+        },
+        {
+          "text": "Give each crew leader one end-of-day reporting time in one shared chat, so daily progress reaches you before site visits.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_pricing_errors",
@@ -122,7 +172,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "Approval flow is in the solution document."
+      "free_stops": "Approval flow is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many completed variation tasks from recent jobs have no billing note, so missed revenue stops hiding in verbal requests.",
+          "review": false
+        },
+        {
+          "text": "Give one supervisor one variation notebook carried to site, so extra work is captured before the crew moves on.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_receivables_late",
@@ -142,7 +202,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "Reminder rules are in the solution document."
+      "free_stops": "Reminder rules are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count old projects with retention still unpaid after the running bill cleared, so neglected follow ups on completed work stand out.",
+          "review": false
+        },
+        {
+          "text": "Keep one notebook page for each project's bill and retention follow up, so accounts can see the latest chase without searching.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_regulatory_reporting",
@@ -162,7 +232,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "Stage set-up is in the solution document; pi gives no advice on approval requirements or eligibility."
+      "free_stops": "Stage set-up is in the solution document; pi gives no advice on approval requirements or eligibility.",
+      "extra_ideas": [
+        {
+          "text": "Note each approval and inspection file's current stage beside the last movement date, so long waiting points are easy to spot.",
+          "review": false
+        },
+        {
+          "text": "Give one administrator the job of updating one shared pending files list each afternoon, so every file's latest position stays in one place.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_lead_followup_slow",
@@ -182,7 +262,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "Qualification steps are in the solution document; pi gives no savings or payback claims."
+      "free_stops": "Qualification steps are in the solution document; pi gives no savings or payback claims.",
+      "extra_ideas": [
+        {
+          "text": "Count how many solar enquiries from this week waited until the next day for a callback, so the response delay is clear.",
+          "review": false
+        },
+        {
+          "text": "Give one salesperson one enquiry list and a fixed callback hour, so fresh solar leads stop sitting unattended.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p10_after_sales",
@@ -202,7 +292,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "Ticket and handover pack design are in the solution document."
+      "free_stops": "Ticket and handover pack design are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many after-sales calls from last week still have no visit date, so you see the current callback backlog.",
+          "review": false
+        },
+        {
+          "text": "Give one supervisor the after-sales diary and a fixed evening handover time, so every callback gets a visit owner.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p11_shrinkage_theft",
@@ -222,7 +322,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "Register design is in the solution document; pi notes the control gap, not names."
+      "free_stops": "Register design is in the solution document; pi notes the control gap, not names.",
+      "extra_ideas": [
+        {
+          "text": "Compare the tool and meter count leaving each site with the count returning, so the loss point gets noticed quickly.",
+          "review": false
+        },
+        {
+          "text": "Make one foreman sign for site tools at pickup and return in one notebook, so missing items trace back to one handover.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

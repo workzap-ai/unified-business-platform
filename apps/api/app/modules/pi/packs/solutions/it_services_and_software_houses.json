@@ -2,7 +2,7 @@
   "industry": "it_services_and_software_houses",
   "name": "IT services and software houses",
   "sector": "7.K Professional and business services",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_cost_overruns",
@@ -23,7 +23,17 @@
         "leads_with_view": true
       },
       "ask_first": "Roughly how many fixed-price projects are running right now?",
-      "free_stops": "how burn and progress are measured and when alerts fire are set out in the solution document."
+      "free_stops": "how burn and progress are measured and when alerts fire are set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note the estimate beside hours already spent on each live fixed price project, so loss making work stands out now.",
+          "review": true
+        },
+        {
+          "text": "Give one person the job of checking project hours against estimates every morning, so overruns are caught before more effort is eaten.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_hidden_costs",
@@ -43,7 +53,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "the approval and pricing flow for change requests is kept for the solution document."
+      "free_stops": "the approval and pricing flow for change requests is kept for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Write down each requirement change on the current project beside the original scope, so unpaid extra work is clear in one place.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of noting every new client request in one project list, so scope discussions stop getting lost.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_capacity",
@@ -63,7 +83,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "how allocation is entered and kept current is designed in the solution document."
+      "free_stops": "how allocation is entered and kept current is designed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many active projects each developer is carrying this week, so overload and bench time can be seen together.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of updating a single team allocation page each morning, so work stops piling onto the same people.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_reports_wrong",
@@ -83,7 +113,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "the nudge timing and how it links to your task tool are worked out in the solution document."
+      "free_stops": "the nudge timing and how it links to your task tool are worked out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare one day's actual task messages with the Friday timesheet version, so you can see how much gets guessed later.",
+          "review": false
+        },
+        {
+          "text": "Give each team lead a fixed end of day check for hours notes, so pricing and reporting rely less on recall.",
+          "review": true
+        }
+      ]
     },
     {
       "id": "p5_tasks_dropped",
@@ -104,7 +144,17 @@
         "leads_with_view": true
       },
       "ask_first": "",
-      "free_stops": "the risk signals used are set out in the solution document."
+      "free_stops": "the risk signals used are set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note every promised demo item beside its current status once this week, so hidden slippage appears before the meeting.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of keeping one deadline list for all projects, so missed handoffs stop surfacing only at demos.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_inspection_missing",
@@ -124,7 +174,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "the checklist contents and sign-off rules are kept for the solution document."
+      "free_stops": "the checklist contents and sign-off rules are kept for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count the returned bugs from recent releases and note which checks were skipped, so the rushed parts of QA show.",
+          "review": false
+        },
+        {
+          "text": "Give one person the release handover list and a fixed check time, so basic QA does not get squeezed out.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_cash_flow_tight",
@@ -144,7 +204,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "chaser timings and invoice triggers are set out in the solution document."
+      "free_stops": "chaser timings and invoice triggers are set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "List the milestones waiting for UAT closure and how long each has been pending, so held cash is easier to prioritise.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of keeping one sign off tracker for every live project, so payment follow up has a clear owner.",
+          "review": true
+        }
+      ]
     },
     {
       "id": "p8_receivables_late",
@@ -164,7 +234,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "the reminder sequence and how receipts are matched are kept for the solution document."
+      "free_stops": "the reminder sequence and how receipts are matched are kept for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note each unpaid foreign invoice beside the usual landing delay you have seen, so cash planning matches your real pattern.",
+          "review": true
+        },
+        {
+          "text": "Give one person the job of updating one receivables notebook every afternoon, so late follow ups stop being scattered across chats.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_handoffs",
@@ -184,7 +264,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "the documentation structure and review routine are designed in the solution document."
+      "free_stops": "the documentation structure and review routine are designed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Look at each critical project once and note whether a second developer can explain its main flow, so handover risk is visible.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of keeping one project overview page per system, so departures do not leave teams stuck.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p10_after_sales",
@@ -204,7 +294,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "how tickets and hours are tracked against contracts is worked out in the solution document."
+      "free_stops": "how tickets and hours are tracked against contracts is worked out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count the support requests handled for each contract this week, so you can spot where free work is swallowing team time.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of noting every support request in one shared list, so renewals can point to actual workload.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

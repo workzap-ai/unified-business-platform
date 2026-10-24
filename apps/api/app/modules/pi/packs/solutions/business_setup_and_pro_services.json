@@ -2,7 +2,7 @@
   "industry": "business_setup_and_pro_services",
   "name": "Business setup and PRO services (UAE)",
   "sector": "7.K Professional and business services",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_lead_followup_slow",
@@ -22,7 +22,17 @@
         "tool_words": []
       },
       "ask_first": "Where do most of your leads come from?",
-      "free_stops": "assignment rules and reply timings are set out in the solution document."
+      "free_stops": "assignment rules and reply timings are set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count today's enquiries that waited past closing without a reply, so you see how much same day response is slipping.",
+          "review": false
+        },
+        {
+          "text": "Set one midday and one late afternoon check for all new enquiries, so replies reach leads while interest is fresh.",
+          "review": true
+        }
+      ]
     },
     {
       "id": "p2_campaign_roi_unknown",
@@ -42,7 +52,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "how tracking is set up for your campaigns is kept for the solution document."
+      "free_stops": "how tracking is set up for your campaigns is kept for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Mark this month's client companies against the lead source already noted in chats, so you see which enquiries actually turned into work.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of noting source beside each new client company, so ad spending links back to signed work.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_pricing_errors",
@@ -62,7 +82,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "package templates and approval rules are designed in the solution document."
+      "free_stops": "package templates and approval rules are designed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare this week's quotations for the same service type across consultants, so inconsistent pricing shows up before more quotes go out.",
+          "review": true
+        },
+        {
+          "text": "Keep one handwritten master list of current package prices at the quoting desk, so every consultant starts from the same numbers.",
+          "review": true
+        }
+      ]
     },
     {
       "id": "p4_customer_communication",
@@ -83,7 +113,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "the stages per service and the update flow are worked out in the solution document."
+      "free_stops": "the stages per service and the update flow are worked out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note which active client companies asked for updates more than once this week, so you spot where silence is driving repeat chasing.",
+          "review": false
+        },
+        {
+          "text": "Give one person a daily time to send progress notes on active cases, so incoming status calls drop and consultants get time back.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_licences_renewals",
@@ -103,7 +143,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "reminder timings and the renewal pipeline are set out in the solution document."
+      "free_stops": "reminder timings and the renewal pipeline are set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Write every managed company expiry due soon on one page and compare it with who was contacted, so missed follow ups stand out.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member the renewal diary and one notebook page for reminders, so expiring cases stop slipping between desks.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_reports_wrong",
@@ -123,7 +173,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "how fees are recorded and matched is kept for the solution document."
+      "free_stops": "how fees are recorded and matched is kept for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare each recent authority payment slip with the matching client bill once, so missing charges or mismatches stand out quickly.",
+          "review": true
+        },
+        {
+          "text": "Make one person add every authority payment to the case note the same day, so billing has one clean place to check.",
+          "review": true
+        }
+      ]
     },
     {
       "id": "p7_cash_flow_tight",
@@ -143,7 +203,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "the collection flow is set out in the solution document."
+      "free_stops": "the collection flow is set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many files were paid out before a client company was billed this week, so you see where cash leaves too early.",
+          "review": false
+        },
+        {
+          "text": "Keep one notebook page for every out of pocket file and let one person update it before close, so missed recovery follow up drops.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_field_team_visibility",
@@ -163,7 +233,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "the planning rules and check-in flow are worked out in the solution document."
+      "free_stops": "the planning rules and check-in flow are worked out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note today's outside visits and compare them with completed tasks reported back, so you see where movement is not turning into progress.",
+          "review": false
+        },
+        {
+          "text": "Give one coordinator the job of writing each PRO's route and end of day outcomes in one notebook, so field work stays trackable.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_turnover",
@@ -183,7 +263,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "access roles and file structure are kept for the solution document."
+      "free_stops": "access roles and file structure are kept for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many active client companies have updates saved only by one consultant, so the handover risk becomes visible.",
+          "review": false
+        },
+        {
+          "text": "Assign one backup owner for each active client company and note it in one team book, so resignations disrupt fewer relationships.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

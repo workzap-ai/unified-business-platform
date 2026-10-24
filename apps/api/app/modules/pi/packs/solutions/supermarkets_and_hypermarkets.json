@@ -2,7 +2,7 @@
   "industry": "supermarkets_and_hypermarkets",
   "name": "Supermarkets and hypermarkets",
   "sector": "7.A Retail and consumer (part 1)",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_expiry_wastage",
@@ -23,7 +23,17 @@
         "tool_words": []
       },
       "ask_first": "Who decides the daily order today?",
-      "free_stops": "How order quantities are calculated and when alerts fire are in the solution document."
+      "free_stops": "How order quantities are calculated and when alerts fire are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare each day's bread and dairy order with that night's leftovers, so you spot which items are being routinely over-bought.",
+          "review": false
+        },
+        {
+          "text": "Give one person the daily bread and dairy order sheet, so ordering follows one clear record instead of habit.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_wastage_cost",
@@ -43,7 +53,17 @@
         "tool_words": []
       },
       "ask_first": "Which fresh section worries you most?",
-      "free_stops": "The wastage categories and weekly report layout are in the solution document."
+      "free_stops": "The wastage categories and weekly report layout are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many crates each produce section throws out by closing time, so the heaviest wastage area gets attention first.",
+          "review": false
+        },
+        {
+          "text": "Give one supervisor one wastage notebook by the back door, so every throwout is noted in the same place.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_slow_replenishment",
@@ -64,7 +84,17 @@
         "tool_words": []
       },
       "ask_first": "When do shelves usually go empty?",
-      "free_stops": "The aisle check routine and task timings are in the solution document."
+      "free_stops": "The aisle check routine and task timings are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note which shelves sit empty longest during the evening walk, so you see where refilling keeps breaking down.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member the evening godown handover list, so refills reach the floor before shoppers face gaps.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_checklists_not_done",
@@ -85,7 +115,17 @@
         "tool_words": []
       },
       "ask_first": "How many deliveries come in on a typical day?",
-      "free_stops": "The receiving steps and the claims tracking are in the solution document."
+      "free_stops": "The receiving steps and the claims tracking are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare cartons received with cartons signed for on a few deliveries, so short counts stop being hidden by quick signatures.",
+          "review": false
+        },
+        {
+          "text": "Give one receiver the carton count on every delivery, so signing happens after a physical check each time.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_cash_mismatch",
@@ -105,7 +145,17 @@
         "tool_words": []
       },
       "ask_first": "Is it spread across tills or mostly certain shifts?",
-      "free_stops": "The exception rules and how they are reported are in the solution document."
+      "free_stops": "The exception rules and how they are reported are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare each cashier's handwritten sales total with the till cash before closing for one week, so the mismatch point shows up earlier.",
+          "review": false
+        },
+        {
+          "text": "Keep one notebook at the cash office for every shortage note before handover, so night teams stop arguing over missing cash.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_pricing_errors",
@@ -125,7 +175,17 @@
         "tool_words": []
       },
       "ask_first": "How do you hear about distributor rate changes today?",
-      "free_stops": "The steps and sign-offs in the price-change flow are in the solution document."
+      "free_stops": "The steps and sign-offs in the price-change flow are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare distributor price changes with shelf labels during one aisle walk, so you see which categories are drifting most.",
+          "review": true
+        },
+        {
+          "text": "Give one person one weekly price-change list, so shelf labels and selling rates are updated from the same note.",
+          "review": true
+        }
+      ]
     },
     {
       "id": "p7_basket_small",
@@ -146,7 +206,17 @@
         "tool_words": []
       },
       "ask_first": "Do you already run a loyalty card?",
-      "free_stops": "Which offers go to which customers and how baskets are tracked are in the solution document."
+      "free_stops": "Which offers go to which customers and how baskets are tracked are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Watch what milk buyers add to their baskets during one busy period, so you see the natural companion items in your store.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member the job of refilling milk companions together, so shoppers keep seeing the add-on items nearby.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_order_errors",
@@ -168,7 +238,17 @@
         ]
       },
       "ask_first": "Which apps do you take orders from?",
-      "free_stops": "How orders from each app are pulled in and picked is in the solution document."
+      "free_stops": "How orders from each app are pulled in and picked is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many picker delays come from missing shelf stock versus missing back stock, so the real blockage becomes visible.",
+          "review": false
+        },
+        {
+          "text": "Give one picker one problem list during each shift, so missing items are handed over for refill without delay.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_maintenance_downtime",
@@ -188,7 +268,17 @@
         "tool_words": []
       },
       "ask_first": "How many chillers and freezers do you run?",
-      "free_stops": "The reading schedule and alert limits are in the solution document."
+      "free_stops": "The reading schedule and alert limits are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note which freezer is warmest at opening and closing this week, so you spot the unit that keeps drifting.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member the opening and closing freezer check, so problems are noticed early and passed on fast.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p10_seasonal_planning",
@@ -209,7 +299,17 @@
         "leads_with_view": true
       },
       "ask_first": "Does your POS keep last year's sales by item?",
-      "free_stops": "How the planner uses past sales and lead times is in the solution document."
+      "free_stops": "How the planner uses past sales and lead times is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count which staples customers ask for most during this week, so Ramadan buying reflects real demand from your own floor.",
+          "review": false
+        },
+        {
+          "text": "Give one buyer one notebook for Ramadan stock notes, so supplier calls and shop requests stay aligned each day.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

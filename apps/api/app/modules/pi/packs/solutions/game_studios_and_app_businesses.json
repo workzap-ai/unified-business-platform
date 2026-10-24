@@ -2,7 +2,7 @@
   "industry": "game_studios_and_app_businesses",
   "name": "Game studios and app businesses",
   "sector": "7.M Digital economy, social and public sector",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_cost_overruns",
@@ -22,7 +22,17 @@
         "tool_words": []
       },
       "ask_first": "How do you estimate a project at the start?",
-      "free_stops": "How hours are captured and alerts are set is covered in the solution document."
+      "free_stops": "How hours are captured and alerts are set is covered in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare what was promised against what was actually built on one finished client project, so the real overrun point stands out.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of noting every extra client ask in one project list, so added work gets seen before delivery.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_handoffs",
@@ -42,7 +52,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The approval flow goes in the solution document; contract terms are for your lawyer."
+      "free_stops": "The approval flow goes in the solution document; contract terms are for your lawyer.",
+      "extra_ideas": [
+        {
+          "text": "Count how many client change requests arrived verbally on one live project this week, so the dispute risk shows before more work starts.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of keeping one dated change list per project, so every extra ask has a clear handover.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_receivables_late",
@@ -62,7 +82,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The reminder schedule and runway view are detailed in the solution document."
+      "free_stops": "The reminder schedule and runway view are detailed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare milestone signoff dates with invoice send dates from recent client work, so you spot where your own studio adds payment delay.",
+          "review": true
+        },
+        {
+          "text": "Give one producer the job of updating one notebook of approved milestones each afternoon, so billing goes out right after client acceptance.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_data_scattered",
@@ -83,7 +113,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "Which sources connect and how is set out in the solution document."
+      "free_stops": "Which sources connect and how is set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Write each title's key daily figures in one notebook page this week, so drops and mismatches are easier to spot quickly.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of collecting the same few title figures at one fixed time, so the team stops chasing numbers.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_info_lost_in_whatsapp",
@@ -103,7 +143,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The form and its connection to your tracker are designed in the solution document."
+      "free_stops": "The form and its connection to your tracker are designed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count bug reports mentioned in chat last week that never reached the team list, so the missed work becomes visible.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of moving every bug from chat into one running list, so fixes stop getting missed.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_inspection_missing",
@@ -123,7 +173,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The checklist content and sign-off flow are prepared in the solution document."
+      "free_stops": "The checklist content and sign-off flow are prepared in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Look at the last build and note which checks were skipped before release, so repeat misses are easier to catch next time.",
+          "review": false
+        },
+        {
+          "text": "Give one tester the job of marking one release list before any build goes out, so QA stops being assumed.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_capacity",
@@ -144,7 +204,17 @@
         "leads_with_view": true
       },
       "ask_first": "",
-      "free_stops": "How allocation is captured and displayed goes in the solution document."
+      "free_stops": "How allocation is captured and displayed goes in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Write every person's current project work on one page today, so overload and spare time can be compared at a glance.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of updating one weekly workload list, so new client work is assigned with fewer surprises.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_performance_unknown",
@@ -164,7 +234,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The timesheet flow and billing link are detailed in the solution document."
+      "free_stops": "The timesheet flow and billing link are detailed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare one recent day's logged hours with what people actually recall doing, so the size of the guesswork becomes visible.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of collecting project hours into one daily list, so billing stops relying on end week memory.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_slow_response",
@@ -184,7 +264,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The triage rules and reply library are set out in the solution document."
+      "free_stops": "The triage rules and reply library are set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count unanswered support emails and store reviews from the last few days, so the backlog size is clear to everyone.",
+          "review": false
+        },
+        {
+          "text": "Give one person a fixed daily slot to clear replies from one queue, so complaints stop piling up unnoticed.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p10_hidden_costs",
@@ -205,7 +295,17 @@
         "leads_with_view": true
       },
       "ask_first": "",
-      "free_stops": "The register and alert set-up go in the solution document."
+      "free_stops": "The register and alert set-up go in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note each licence and cloud service used last week beside each recurring cost, so unused spend stands out title by title.",
+          "review": true
+        },
+        {
+          "text": "Give one person the job of keeping one shared list of every recurring service and its owner, so cancellations stop drifting.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

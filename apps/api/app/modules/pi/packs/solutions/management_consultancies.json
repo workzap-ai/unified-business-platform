@@ -2,7 +2,7 @@
   "industry": "management_consultancies",
   "name": "Management consultancies",
   "sector": "7.K Professional and business services",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_lead_followup_slow",
@@ -22,7 +22,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "the stages and follow-up timings for your type of client are set out in the solution document."
+      "free_stops": "the stages and follow-up timings for your type of client are set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count proposals older than two weeks with no reply noted anywhere, so you see how much effort is sitting unattended.",
+          "review": false
+        },
+        {
+          "text": "Set one weekly time for proposal owners to update one live list, so stale bids stop draining founder attention.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_conversion_low",
@@ -43,7 +53,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "how loss reasons are captured and grouped is designed in the solution document."
+      "free_stops": "how loss reasons are captured and grouped is designed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare lost proposals by service line and note the stated reason for each, so weak offer areas stand out.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of recording every loss reason in one list, so review meetings use evidence not hunches.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_hidden_costs",
@@ -63,7 +83,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "the approval and billing steps are kept for the solution document."
+      "free_stops": "the approval and billing steps are kept for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count extra client requests added after kickoff on one live engagement, so you see where unpaid work is creeping in.",
+          "review": false
+        },
+        {
+          "text": "Give the engagement lead one list for added requests and review it at a fixed weekly time, so scope drift gets raised sooner.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_cost_overruns",
@@ -84,7 +114,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "how effort is tracked and when alerts fire are worked out in the solution document."
+      "free_stops": "how effort is tracked and when alerts fire are worked out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note which fixed fee projects have slipped past their planned end month, so the worst overrun pattern is clear.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of updating planned and actual finish notes in one place, so delays get spotted before handovers drift.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_shift_scheduling",
@@ -104,7 +144,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "how bookings are entered and kept current is designed in the solution document."
+      "free_stops": "how bookings are entered and kept current is designed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare each consultant's booked work for the coming weeks on one page, so overloads and bench time can be seen together.",
+          "review": false
+        },
+        {
+          "text": "Give one manager the weekly job of keeping one staffing list current, so reallocation stops waiting for corridor updates.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_cash_flow_tight",
@@ -124,7 +174,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "the trigger points and chaser timings are set out in the solution document."
+      "free_stops": "the trigger points and chaser timings are set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count deliverables sent but still waiting for client sign off, so you see what is blocking invoice release.",
+          "review": true
+        },
+        {
+          "text": "Give one person the daily job of chasing outstanding sign offs from one list, so invoices stop waiting on scattered messages.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_receivables_late",
@@ -144,7 +204,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "the reminder flow and checklists per client type are kept for the solution document."
+      "free_stops": "the reminder flow and checklists per client type are kept for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare overdue government invoices by missing paperwork note and submission date, so avoidable delays stand out from slow payer habits.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member one list of pending invoice documents and a fixed check time, so submissions stop stalling between teams.",
+          "review": true
+        }
+      ]
     },
     {
       "id": "p8_manual_work",
@@ -164,7 +234,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "the structure and tagging of the library are designed in the solution document."
+      "free_stops": "the structure and tagging of the library are designed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many recent proposals reused earlier material and how many started blank, so the size of the rewrite habit shows.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of keeping one paper list of strong past proposals by service line, so drafters know where to look.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_reports_wrong",
@@ -184,7 +264,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "the timesheet format and nudge timings are set out in the solution document."
+      "free_stops": "the timesheet format and nudge timings are set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare one week's daily time notes with the usual month end entries, so you see how much reconstruction is distorting reports.",
+          "review": false
+        },
+        {
+          "text": "Give each project lead one fixed end of day check for time notes, so month end chasing eases across the team.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p10_supplier_communication",
@@ -204,7 +294,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "how confirmations and matching work is kept for the solution document."
+      "free_stops": "how confirmations and matching work is kept for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many associate invoices arrived after the work week ended this month, so you see how big the delay problem is.",
+          "review": false
+        },
+        {
+          "text": "Give one project lead the job of noting agreed days each week in one notebook, so invoice arguments start from one record.",
+          "review": true
+        }
+      ]
     }
   ],
   "never_say": [

@@ -2,7 +2,7 @@
   "industry": "generator_sales_rental_and_service",
   "name": "Generator sales, rental and service",
   "sector": "7.L Finance-adjacent, energy and utilities",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_wrong_location",
@@ -22,7 +22,17 @@
         "tool_words": []
       },
       "ask_first": "Roughly how many units are in your rental fleet?",
-      "free_stops": "Register fields and update flow are in the solution document."
+      "free_stops": "Register fields and update flow are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Walk the yard and compare the units physically present with the latest dispatch notes, so missing location updates stand out quickly.",
+          "review": false
+        },
+        {
+          "text": "Give one dispatcher the job of updating one movement notebook whenever a unit leaves, arrives, or enters repair, so everyone checks the same place.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_pricing_errors",
@@ -42,7 +52,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "Billing rules are in the solution document; pi gives no advice on what to charge."
+      "free_stops": "Billing rules are in the solution document; pi gives no advice on what to charge.",
+      "extra_ideas": [
+        {
+          "text": "Count how many off-hire units returned after the agreed date this week, so lost billing days become visible.",
+          "review": false
+        },
+        {
+          "text": "Give the yard return check to one person with one notebook for actual return dates, so billing uses what really happened.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_handoffs",
@@ -62,7 +82,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "Checklist items are in the solution document."
+      "free_stops": "Checklist items are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare return notes with dispatch notes for recent hires, so you see how often condition and fuel details are missing.",
+          "review": false
+        },
+        {
+          "text": "Give one yard person the dispatch record book for every outgoing rental unit, so condition notes are written before it leaves.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_bottleneck",
@@ -82,7 +112,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "Intake flow and rota logic are in the solution document."
+      "free_stops": "Intake flow and rota logic are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note which night breakdown calls waited while staff checked who was available, so the delay from unclear cover is clear.",
+          "review": false
+        },
+        {
+          "text": "Give one supervisor the nightly technician availability list in one notebook, so breakdown calls go straight to the right person.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_service_quality",
@@ -102,7 +142,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "Schedule rules are in the solution document."
+      "free_stops": "Schedule rules are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare planned PM visits due this week with signed job sheets received, so missed AMC visits are easy to spot.",
+          "review": false
+        },
+        {
+          "text": "Give one coordinator the AMC visit list and a fixed afternoon check for missing sign-offs, so skipped visits are chased quickly.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_churn_subscription",
@@ -122,7 +172,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "Reminder timing is in the solution document."
+      "free_stops": "Reminder timing is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many AMC contracts expire soon without any renewal note beside them, so the renewal miss is visible early.",
+          "review": false
+        },
+        {
+          "text": "Give one person one renewal notebook and a fixed weekly review of upcoming AMC expiries, so customers are approached before they drift away.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_reports_late",
@@ -142,7 +202,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "Job sheet design is in the solution document."
+      "free_stops": "Job sheet design is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note the days between each completed job and the office receiving its job sheet, so the reporting delay is measurable.",
+          "review": false
+        },
+        {
+          "text": "Give one technician on each shift the handover job of bringing all completed job sheets to one desk before leaving, so paperwork stops piling up.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_stockout",
@@ -162,7 +232,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "Minimum levels and tracking are in the solution document."
+      "free_stops": "Minimum levels and tracking are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Look at recent breakdown jobs and note which filters or parts were missing at the moment of need, so repeat shortages are clear.",
+          "review": false
+        },
+        {
+          "text": "Give one storekeeper one shelf list and a fixed weekly stock check for fast-moving breakdown parts, so shortages are caught before the next call.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_margin_unknown",
@@ -183,7 +263,17 @@
         "leads_with_view": true
       },
       "ask_first": "",
-      "free_stops": "Cost allocation is in the solution document."
+      "free_stops": "Cost allocation is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare each rental unit's recent hire days with its recent maintenance notes, so units with heavy upkeep stand out.",
+          "review": false
+        },
+        {
+          "text": "Give one person one notebook page per rental unit for hire days and maintenance spend, so weak earners stop being mixed with stronger ones.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p10_receivables_late",
@@ -203,7 +293,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "Reminder rules are in the solution document."
+      "free_stops": "Reminder rules are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note which unpaid corporate invoices are waiting on timesheets, purchase orders, or approvals, so you see what is slowing each payment.",
+          "review": true
+        },
+        {
+          "text": "Give one staff member a fixed weekly slot to chase every unpaid rental and service invoice from one notebook, so follow-up stays consistent.",
+          "review": true
+        }
+      ]
     },
     {
       "id": "p11_order_errors",
@@ -223,7 +323,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "Calendar set-up is in the solution document."
+      "free_stops": "Calendar set-up is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare this week's event bookings against units already promised out, so clashes are spotted before trucks are arranged.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of writing every event booking in one shared list before promising availability, so the same unit is not promised twice.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

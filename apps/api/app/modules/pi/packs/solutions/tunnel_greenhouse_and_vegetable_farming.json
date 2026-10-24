@@ -2,7 +2,7 @@
   "industry": "tunnel_greenhouse_and_vegetable_farming",
   "name": "Tunnel, greenhouse and vegetable farming",
   "sector": "7.C Agriculture, livestock and rural (part 2)",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_seasonal_dip",
@@ -23,7 +23,17 @@
         "leads_with_view": true
       },
       "ask_first": "How are planting dates decided at the moment?",
-      "free_stops": "How the calendar and warnings are set up for your tunnels goes in the solution document."
+      "free_stops": "How the calendar and warnings are set up for your tunnels goes in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Walk each tunnel and note which rows are picking heavily this week, so you see how much volume is hitting buyers together.",
+          "review": false
+        },
+        {
+          "text": "Give one person the weekly picking outlook in one notebook, so buyer calls happen before the rush reaches the packing area.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_margin_unknown",
@@ -43,7 +53,17 @@
         "tool_words": []
       },
       "ask_first": "How many tunnels or greenhouses do you run?",
-      "free_stops": "The cost heads and profit view design are part of the solution document."
+      "free_stops": "The cost heads and profit view design are part of the solution document.",
+      "extra_ideas": [
+        {
+          "text": "For one picking day, note each tunnel’s filled crates beside its worker hours, so low-output tunnels stop hiding behind busy ones.",
+          "review": false
+        },
+        {
+          "text": "Give one staff role one notebook for tunnel harvest and work notes after picking, so each tunnel’s performance can be reviewed later.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_product_defects",
@@ -63,7 +83,17 @@
         "tool_words": []
       },
       "ask_first": "Do you get any written rejection note at delivery today?",
-      "free_stops": "How door records and deductions are matched goes in the solution document."
+      "free_stops": "How door records and deductions are matched goes in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Sort deduction notes by rejection reason from the last few deliveries, so the biggest cause of lost value is clear.",
+          "review": false
+        },
+        {
+          "text": "Give one packhouse role the job of keeping all delivery notes and deduction slips together, so disputes can be checked quickly.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_orders_lost",
@@ -83,7 +113,17 @@
         "tool_words": []
       },
       "ask_first": "Roughly how many hotel and restaurant buyers do you supply?",
-      "free_stops": "How messages become a confirmed list is detailed in the solution document."
+      "free_stops": "How messages become a confirmed list is detailed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many buyer messages arrived after closing across one week, so you see the true size of the midnight order pile.",
+          "review": false
+        },
+        {
+          "text": "Give one role the job of writing all overnight orders onto one morning sheet, so kitchen buyers are not missed at dispatch.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_receivables_late",
@@ -103,7 +143,17 @@
         "tool_words": []
       },
       "ask_first": "Who are your slowest payers, supermarkets or restaurants?",
-      "free_stops": "Reminder timing and ledger setup are kept for the solution document."
+      "free_stops": "Reminder timing and ledger setup are kept for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare each buyer’s unpaid papers with this week’s delivery notes, so regular late payers stand out before more produce goes out.",
+          "review": false
+        },
+        {
+          "text": "Give one office role one fixed weekly time to update all unpaid invoice notes, so follow-up keeps moving during harvest pressure.",
+          "review": true
+        }
+      ]
     },
     {
       "id": "p6_count_mismatch",
@@ -123,7 +173,17 @@
         "tool_words": []
       },
       "ask_first": "Who records the daily harvest?",
-      "free_stops": "How harvest and dispatch are matched is part of the solution document."
+      "free_stops": "How harvest and dispatch are matched is part of the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare packed crates, loaded crates and return crates for one dispatch day, so the handover point causing the mismatch shows.",
+          "review": false
+        },
+        {
+          "text": "Give one role the job of writing counts at packing and loading on the same sheet, so losses stop being argued about later.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_maintenance_downtime",
@@ -143,7 +203,17 @@
         "tool_words": []
       },
       "ask_first": "How do you find out about a failure today?",
-      "free_stops": "The checklist and log design go in the solution document."
+      "free_stops": "The checklist and log design go in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note where water flow looked weak during today's walk round, so recurring trouble spots are seen before another surprise stoppage.",
+          "review": false
+        },
+        {
+          "text": "Give one worker one page for pump and line checks at the same morning time, so faults get noticed before harvest suffers.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_checklists_not_done",
@@ -163,7 +233,17 @@
         "tool_words": []
       },
       "ask_first": "Is there a supervisor on site every day?",
-      "free_stops": "How tasks, proof and sign-off are set up is detailed in the solution document."
+      "free_stops": "How tasks, proof and sign-off are set up is detailed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare the tunnel task lists with what was actually finished by evening, so the jobs most often skipped stand out.",
+          "review": false
+        },
+        {
+          "text": "Give one supervisor one place to collect all completed tunnel lists each day, so missed work is spotted before the next shift.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_utility_costs",
@@ -184,7 +264,17 @@
         "leads_with_view": true
       },
       "ask_first": "Which cost worries you most: power, water or diesel?",
-      "free_stops": "How readings are captured and costs worked out is kept for the solution document."
+      "free_stops": "How readings are captured and costs worked out is kept for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note power meter readings and cooling run hours on the same weekday, so the heaviest summer usage periods are easier to spot.",
+          "review": false
+        },
+        {
+          "text": "Give one staff role one notebook for meter readings, generator hours and bill dates, so utility records stay together for review.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p10_churn_subscription",
@@ -206,7 +296,17 @@
         ]
       },
       "ask_first": "How do subscribers order and pay now?",
-      "free_stops": "How skips, orders and reasons are handled is part of the solution document."
+      "free_stops": "How skips, orders and reasons are handled is part of the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note each cancellation beside the last box contents and delivery day, so the main reason for drop-offs stands out.",
+          "review": false
+        },
+        {
+          "text": "Give one person a single notebook for pauses, complaints and cancellations, so follow-up stops getting missed after busy harvest days.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

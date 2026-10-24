@@ -2,7 +2,7 @@
   "industry": "medical_equipment_and_device_distributors",
   "name": "Medical equipment and device distributors",
   "sector": "7.I Health and care",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_expiry_wastage",
@@ -22,7 +22,17 @@
         "tool_words": []
       },
       "ask_first": "Do you have more than one warehouse?",
-      "free_stops": "Alert windows and list rules are in the solution document."
+      "free_stops": "Alert windows and list rules are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Walk the warehouse and note which tender-waiting consumables expire soonest, so you see where stock will be lost first.",
+          "review": false
+        },
+        {
+          "text": "Give one store person a fixed weekly expiry check in one notebook, so tender-waiting stock gets noticed before it sits too long.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_serial_batch_tracking",
@@ -42,7 +52,17 @@
         "tool_words": []
       },
       "ask_first": "Are lot numbers recorded at dispatch today?",
-      "free_stops": "How lot capture fits your dispatch is in the solution document; recall procedures are for your principal and regulator."
+      "free_stops": "How lot capture fits your dispatch is in the solution document; recall procedures are for your principal and regulator.",
+      "extra_ideas": [
+        {
+          "text": "Pick one recent hospital delivery and trace the lot back from dispatch papers, so you see exactly where the record breaks.",
+          "review": false
+        },
+        {
+          "text": "Give dispatch one place to note hospital type beside each lot sent, so tracing stops relying on separate papers.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_count_mismatch",
@@ -62,7 +82,17 @@
         "tool_words": []
       },
       "ask_first": "Roughly how many sites hold consignment stock?",
-      "free_stops": "Visit schedule and reconciliation steps are in the solution document."
+      "free_stops": "Visit schedule and reconciliation steps are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare your consignment list with one hospital shelf count this week, so the size of the mismatch is clear.",
+          "review": false
+        },
+        {
+          "text": "Make one person update one consignment notebook after every issue and return, so hospital stock stops drifting between counts.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_import_delays",
@@ -82,7 +112,17 @@
         "tool_words": []
       },
       "ask_first": "Which stage usually holds shipments up?",
-      "free_stops": "Stage definitions are in the solution document; customs rules are for your clearing agent."
+      "free_stops": "Stage definitions are in the solution document; customs rules are for your clearing agent.",
+      "extra_ideas": [
+        {
+          "text": "Note the current stage of each delayed shipment on one page, so you can see where port hold ups cluster.",
+          "review": false
+        },
+        {
+          "text": "Give one person a fixed weekly handover with the clearing agent update, so customer promises use the latest shipment status.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_receivables_late",
@@ -102,7 +142,17 @@
         "tool_words": []
       },
       "ask_first": "Which customer type owes you the most right now?",
-      "free_stops": "Follow-up steps are in the solution document; financing questions are for your accountant."
+      "free_stops": "Follow-up steps are in the solution document; financing questions are for your accountant.",
+      "extra_ideas": [
+        {
+          "text": "Count how many government hospital invoices are waiting for signed receipt notes versus payment approval, so the slow point is clearer.",
+          "review": true
+        },
+        {
+          "text": "Give one staff member one notebook page for every government hospital invoice handover and follow-up date, so missing paperwork gets chased faster.",
+          "review": true
+        }
+      ]
     },
     {
       "id": "p6_target_missed",
@@ -122,7 +172,17 @@
         "tool_words": []
       },
       "ask_first": "How many tenders do you bid on in a typical month?",
-      "free_stops": "Checklist set-up is in the solution document; tender rules are for your adviser."
+      "free_stops": "Checklist set-up is in the solution document; tender rules are for your adviser.",
+      "extra_ideas": [
+        {
+          "text": "Compare tender notices seen this month with bids actually submitted, so the drop between opportunity and action is clear.",
+          "review": false
+        },
+        {
+          "text": "Give one person one tender notebook checked at the same time daily, so every deadline has an owner before it passes.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_pricing_errors",
@@ -142,7 +202,17 @@
         "tool_words": []
       },
       "ask_first": "Who prepares quotes today?",
-      "free_stops": "Pricing logic is in the solution document."
+      "free_stops": "Pricing logic is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Look at recent quotes for the same device and note which ones used different revision dates, so resend mistakes are easier to spot.",
+          "review": false
+        },
+        {
+          "text": "Make one person keep one handwritten outgoing quote register by item and revision date, so sales staff check the latest version before sending.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_churn_subscription",
@@ -162,7 +232,17 @@
         "tool_words": []
       },
       "ask_first": "How many engineers do you have?",
-      "free_stops": "Reminder timing and engineer scheduling are in the solution document."
+      "free_stops": "Reminder timing and engineer scheduling are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many AMC files end this month and next month by customer type, so renewal workload is easier to see.",
+          "review": false
+        },
+        {
+          "text": "Give one person one weekly AMC diary check from one renewal list, so customers hear before contract periods end.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_field_team_visibility",
@@ -182,7 +262,17 @@
         "tool_words": []
       },
       "ask_first": "How many reps are in the field?",
-      "free_stops": "Check-in rules are in the solution document."
+      "free_stops": "Check-in rules are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare each rep's claimed hospital visits with new enquiries or orders from those hospital types, so visit quality is easier to judge.",
+          "review": false
+        },
+        {
+          "text": "Give each rep one end of day handover in the team chat, so hospital rounds are logged while details are fresh.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p10_manual_reports",
@@ -202,7 +292,17 @@
         "tool_words": []
       },
       "ask_first": "How many principals do you report to?",
-      "free_stops": "Report mapping is in the solution document."
+      "free_stops": "Report mapping is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Mark every item requested across the last reporting packs, so repeated fields are obvious before month end work starts.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member one notebook page per principal for report inputs, so monthly packing into their format takes less chasing.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

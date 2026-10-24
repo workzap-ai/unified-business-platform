@@ -2,7 +2,7 @@
   "industry": "photography_and_videography_studios",
   "name": "Photography and videography studios",
   "sector": "7.H Hospitality, events and personal services",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_delivery_late",
@@ -22,7 +22,17 @@
         "tool_words": []
       },
       "ask_first": "How many projects are waiting right now?",
-      "free_stops": "Stage definitions and client update flow are in the solution document."
+      "free_stops": "Stage definitions and client update flow are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note each pending project by editing stage and waiting reason, so you spot whether delays come from editing, selections or approvals.",
+          "review": false
+        },
+        {
+          "text": "Give one editor the job of updating one backlog list each evening, so everyone knows what can move next without chasing.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_bottleneck",
@@ -42,7 +52,17 @@
         "tool_words": []
       },
       "ask_first": "How many album designers do you have?",
-      "free_stops": "Album workflow stays for the solution document."
+      "free_stops": "Album workflow stays for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many albums are waiting at each handover point this week, so the slowest stage in last season's pile becomes visible.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of keeping all album handovers in one notebook, so stalled jobs stop sitting between teams unnoticed.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_receivables_late",
@@ -62,7 +82,17 @@
         "tool_words": []
       },
       "ask_first": "When do clients pay the balance now?",
-      "free_stops": "Milestone and reminder rules go in the solution document."
+      "free_stops": "Milestone and reminder rules go in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare albums waiting on final delivery with albums already handed over this month, so you spot where the handover timing weakens your studio routine.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member the job of marking each album as ready, waiting, or handed over in one notebook, so the team handles delivery status the same way daily.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_shift_scheduling",
@@ -82,7 +112,17 @@
         "tool_words": []
       },
       "ask_first": "How many shooters are freelance?",
-      "free_stops": "Roster setup is in the solution document."
+      "free_stops": "Roster setup is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "List every upcoming wedding night with assigned shooters and gaps, so you can see where double bookings leave you short.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of recording each booking and assigned crew in one place, so staffing clashes stop surprising you late.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_data_loss",
@@ -102,7 +142,17 @@
         "tool_words": []
       },
       "ask_first": "Where do files go after a shoot?",
-      "free_stops": "Register setup and backup checks stay for the solution document."
+      "free_stops": "Register setup and backup checks stay for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Check each current wedding project for its main copy and second copy location, so you know which jobs are still exposed.",
+          "review": false
+        },
+        {
+          "text": "Give one editor the job of writing each project's file location in one notebook before leaving, so footage stops becoming hard to trace.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_shrinkage_theft",
@@ -122,7 +172,17 @@
         "tool_words": []
       },
       "ask_first": "How many teams go out on a busy night?",
-      "free_stops": "Equipment list setup is in the solution document."
+      "free_stops": "Equipment list setup is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count which cameras, lenses, and batteries returned late or missing after recent events, so you see where losses happen most often.",
+          "review": false
+        },
+        {
+          "text": "Give one event lead the job of noting gear taken out and brought back in one notebook, so missing kit is spotted fast.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_pre_orders_custom",
@@ -142,7 +202,17 @@
         "tool_words": []
       },
       "ask_first": "How do you handle extra requests now?",
-      "free_stops": "Scope sheet and approval flow go in the solution document."
+      "free_stops": "Scope sheet and approval flow go in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many recent projects needed extra edit rounds beyond the package, so you see which jobs keep stretching your editing time.",
+          "review": false
+        },
+        {
+          "text": "Give one editor the job of noting every extra edit request in one notebook, so package limits stay clear before more work gets added.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_conversion_low",
@@ -162,7 +232,17 @@
         "tool_words": []
       },
       "ask_first": "Do you share prices before a call?",
-      "free_stops": "Follow-up timing stays for the solution document."
+      "free_stops": "Follow-up timing stays for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many price enquiries this week reached a booking versus went quiet, so you see the drop after price talks.",
+          "review": true
+        },
+        {
+          "text": "Give one staff member the job of keeping all price enquiries in one notebook, so follow ups stop getting lost during shoots.",
+          "review": true
+        }
+      ]
     },
     {
       "id": "p9_margin_unknown",
@@ -183,7 +263,17 @@
         "leads_with_view": true
       },
       "ask_first": "Do you price per package or per day?",
-      "free_stops": "Cost capture is in the solution document."
+      "free_stops": "Cost capture is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare the planned shoot day against what actually happened on one recent wedding, so you spot where extra work quietly expanded the job.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of noting every added task from shoot to delivery in one notebook, so each wedding's workload stops being guessed later.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p10_owner_bottleneck",
@@ -203,7 +293,17 @@
         "tool_words": []
       },
       "ask_first": "Who else on your team could handle clients?",
-      "free_stops": "Update flow stays for the solution document."
+      "free_stops": "Update flow stays for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many client chats reached only you this week, so you see which questions overload your day most.",
+          "review": false
+        },
+        {
+          "text": "Give one team member the job of handling booking status updates at a set time daily, so client interruptions stop landing only on you.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

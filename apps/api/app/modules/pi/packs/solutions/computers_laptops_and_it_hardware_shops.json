@@ -2,7 +2,7 @@
   "industry": "computers_laptops_and_it_hardware_shops",
   "name": "Computers, laptops and IT hardware shops",
   "sector": "7.A Retail and consumer (part 1)",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_pricing_errors",
@@ -22,7 +22,17 @@
         "tool_words": []
       },
       "ask_first": "How many quotes a month?",
-      "free_stops": "How quotes are built and flagged is in the solution document."
+      "free_stops": "How quotes are built and flagged is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare this week's sent quotes with today's supplier rates for the same items, so sudden margin loss on delayed confirmations shows.",
+          "review": false
+        },
+        {
+          "text": "Give one person the quote register and one daily review time, so changed rates are caught before client confirmations arrive.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_conversion_low",
@@ -42,7 +52,17 @@
         "tool_words": []
       },
       "ask_first": "Who follows up quotes?",
-      "free_stops": "How quotes are tracked and followed up is in the solution document."
+      "free_stops": "How quotes are tracked and followed up is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Mark this week's pending quotes against actual orders received, so you see which hardware enquiries stall after pricing.",
+          "review": true
+        },
+        {
+          "text": "Give one staff member the job of noting every quote outcome in one notebook, so lost follow ups stop slipping away.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_receivables_late",
@@ -62,7 +82,17 @@
         "tool_words": []
       },
       "ask_first": "How many corporate clients?",
-      "free_stops": "How ageing and reminders are set is in the solution document."
+      "free_stops": "How ageing and reminders are set is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many corporate invoices are waiting past the agreed month, so you see which billing promises are hurting cash flow most.",
+          "review": false
+        },
+        {
+          "text": "Keep all unpaid corporate invoice notes with one staff member at one fixed review time, so follow up stays regular with accounts teams.",
+          "review": true
+        }
+      ]
     },
     {
       "id": "p4_order_tracking",
@@ -83,7 +113,17 @@
         "tool_words": []
       },
       "ask_first": "How many jobs are open now?",
-      "free_stops": "The job stages and updates are in the solution document."
+      "free_stops": "The job stages and updates are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count all open repair jobs waiting on parts, testing or pickup, so you see where customer update calls are coming from.",
+          "review": false
+        },
+        {
+          "text": "Give one counter person the open repair list and one evening handover, so every caller gets the latest status quickly.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_after_sales",
@@ -103,7 +143,17 @@
         "tool_words": []
       },
       "ask_first": "Which distributors are slowest?",
-      "free_stops": "How RMAs are tracked is in the solution document."
+      "free_stops": "How RMAs are tracked is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note each RMA case with the item type and send week, so you spot which hardware lines are causing the longest customer waits.",
+          "review": false
+        },
+        {
+          "text": "Assign one person to keep the whole RMA notebook and the supplier handover, so customers get clearer updates when claims drag on.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_field_team_visibility",
@@ -125,7 +175,17 @@
         ]
       },
       "ask_first": "How many technicians go out?",
-      "free_stops": "The job app steps and linking are in the solution document."
+      "free_stops": "The job app steps and linking are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note each field visit's site, arrival and work done in one daily page, so missed visits and unclear effort stand out.",
+          "review": false
+        },
+        {
+          "text": "Give one coordinator the job of collecting every technician update before closing, so dispatch and billing stay aligned.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_repeat_low",
@@ -145,7 +205,17 @@
         "tool_words": []
       },
       "ask_first": "How many offices buy consumables?",
-      "free_stops": "How cycles are worked out is in the solution document."
+      "free_stops": "How cycles are worked out is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Check last order dates for regular toner buyers against their usual buying pattern, so overdue repeat business is easy to spot.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member the repeat order reminder list and one fixed calling hour, so regular office demand returns to you sooner.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_serial_batch_tracking",
@@ -165,7 +235,17 @@
         "tool_words": []
       },
       "ask_first": "Do you give shop warranty?",
-      "free_stops": "How serials are captured is in the solution document."
+      "free_stops": "How serials are captured is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Check returned units against any box labels, warranty slips or invoice notes already available, so disputed returns are easier to challenge.",
+          "review": true
+        },
+        {
+          "text": "Give one counter person the job of writing every serial in one notebook at sale time, so returns can be matched fast.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_data_scattered",
@@ -186,7 +266,17 @@
         "tool_words": []
       },
       "ask_first": "How many distributors send rate lists?",
-      "free_stops": "How rates are pulled in is in the solution document."
+      "free_stops": "How rates are pulled in is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Walk through the shop and note which fast moving items have stock written in one place but rates found somewhere else, so quoting delays show.",
+          "review": false
+        },
+        {
+          "text": "Give one person one master notebook for current stock and buying rates, so the counter stops hunting across different places.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

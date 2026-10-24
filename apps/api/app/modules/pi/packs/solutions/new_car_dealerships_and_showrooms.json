@@ -2,7 +2,7 @@
   "industry": "new_car_dealerships_and_showrooms",
   "name": "New car dealerships and showrooms",
   "sector": "7.G Transport, mobility and aviation (part 2)",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_order_tracking",
@@ -23,7 +23,17 @@
         "tool_words": []
       },
       "ask_first": "Where does a booking's status live today: the DMS, a register or salesmen's phones?",
-      "free_stops": "The exact stages, who ticks each one and when customers are messaged go into the solution document."
+      "free_stops": "The exact stages, who ticks each one and when customers are messaged go into the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many pending bookings have no latest arrival note today, so you see why callers keep chasing the showroom.",
+          "review": false
+        },
+        {
+          "text": "Keep one arrival update list by the main phone, so every caller hears the same current position.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_lead_followup_slow",
@@ -45,7 +55,17 @@
         ]
       },
       "ask_first": "Which source sends you the most enquiries right now?",
-      "free_stops": "Assignment rules, follow-up timings and the escalation path are set out in the solution document."
+      "free_stops": "Assignment rules, follow-up timings and the escalation path are set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count this week's untouched portal, social and walk in leads once, so you see which source is being neglected.",
+          "review": false
+        },
+        {
+          "text": "Give one supervisor the daily untouched lead list, so missed enquiries get pushed back into the selling routine.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_accountability",
@@ -65,7 +85,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "How handovers and access are set up per role is covered in the solution document."
+      "free_stops": "How handovers and access are set up per role is covered in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note how many active buyer chats sit only on personal phones today, so the handover risk is visible before someone leaves.",
+          "review": false
+        },
+        {
+          "text": "Keep one showroom lead register with every live enquiry assigned there, so open buyers stay with the business.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_order_errors",
@@ -86,7 +116,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "How the board links to bookings and allocations is detailed in the solution document."
+      "free_stops": "How the board links to bookings and allocations is detailed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Walk the yard and compare reserved units with promised units on paper today, so double promises show up before another sale.",
+          "review": false
+        },
+        {
+          "text": "Make one person update the reserved car board immediately after every booking, so the floor stops promising the same unit twice.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_overstock_dead_stock",
@@ -107,7 +147,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The ageing thresholds and how they feed ordering are in the solution document."
+      "free_stops": "The ageing thresholds and how they feed ordering are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count which colours have waited longest in the yard beside colours customers ask for this week, so the mismatch is obvious.",
+          "review": false
+        },
+        {
+          "text": "Give one person a weekly slow colour review walk, so stale units are discussed before fresh requests are sent onward.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_margin_unknown",
@@ -128,7 +178,17 @@
         "leads_with_view": true
       },
       "ask_first": "",
-      "free_stops": "Which costs are captured and how they roll up is set out in the solution document."
+      "free_stops": "Which costs are captured and how they roll up is set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Review a handful of recent delivery files and note every added item beside each car, so hidden handouts stop surprising you.",
+          "review": false
+        },
+        {
+          "text": "Keep one handwritten delivery extras sheet inside each car file, so staff record what was added before handover.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_discount_abuse",
@@ -148,7 +208,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "Limits by role and the approval path are in the solution document."
+      "free_stops": "Limits by role and the approval path are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count recent handovers where added extras were mentioned only at the end, so you see how often approvals are being skipped.",
+          "review": false
+        },
+        {
+          "text": "Give one supervisor the daily extras notebook by the delivery desk, so every added item is checked before keys change hands.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_approvals_slow",
@@ -168,7 +238,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The stage list and alert timings are in the solution document."
+      "free_stops": "The stage list and alert timings are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Write each open bank case on one page with its current step, so the common stopping point across desks stands out.",
+          "review": false
+        },
+        {
+          "text": "Give one coordinator the afternoon bank case follow up round and one notebook, so stalled customer files stop bouncing between desks.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_checklists_not_done",
@@ -188,7 +268,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The checklist itself and photo rules are in the solution document."
+      "free_stops": "The checklist itself and photo rules are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count tomorrow's handovers with washing, inspection or papers still open by evening, so the delivery crunch is measured before morning.",
+          "review": false
+        },
+        {
+          "text": "Give one person the pre handover readiness list each afternoon, so delivery day starts with fewer last minute surprises.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p10_after_sales",
@@ -209,7 +299,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "Reminder timing and booking flow are in the solution document."
+      "free_stops": "Reminder timing and booking flow are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many delivered customers returned for service last month against total deliveries, so the drop after handover is plain.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member the first service booking log at delivery, so every buyer leaves tied to your workshop.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p11_reports_late",
@@ -230,7 +330,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "Which numbers are pulled and how branches are compared is in the solution document."
+      "free_stops": "Which numbers are pulled and how branches are compared is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note each day's bookings, deliveries and cancellations in one notebook for a week, so you can compare your view with the late totals.",
+          "review": false
+        },
+        {
+          "text": "Give one person the closing count call every evening, so sales visibility reaches you before the accountant's batch.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

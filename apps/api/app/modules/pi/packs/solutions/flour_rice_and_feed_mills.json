@@ -2,7 +2,7 @@
   "industry": "flour_rice_and_feed_mills",
   "name": "Flour, rice and feed mills",
   "sector": "7.C Agriculture, livestock and rural (part 2)",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_wastage_cost",
@@ -23,7 +23,17 @@
         "leads_with_view": true
       },
       "ask_first": "How do you measure output per lot now?",
-      "free_stops": "How yield is measured and flagged for your mill goes in the solution document."
+      "free_stops": "How yield is measured and flagged for your mill goes in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare wheat received with flour, bran and residue from one shift on one page, so the loss point gets narrower fast.",
+          "review": false
+        },
+        {
+          "text": "Make one shift incharge own the lot note from receiving to packing, so missing quantity stops getting lost between teams.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_count_mismatch",
@@ -43,7 +53,17 @@
         "tool_words": []
       },
       "ask_first": "Do you have your own weighbridge?",
-      "free_stops": "The receiving log design is part of the solution document."
+      "free_stops": "The receiving log design is part of the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare each incoming truck's slip with your own receiving weight for one week, so you see whether the mismatch clusters by time or source.",
+          "review": false
+        },
+        {
+          "text": "Keep all receiving slips in one marked file with one clerk responsible, so disputes stop bouncing between weighbridge and purchase staff.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_supplier_quality",
@@ -63,7 +83,17 @@
         "tool_words": []
       },
       "ask_first": "Who takes the moisture reading?",
-      "free_stops": "How readings and cuts are shared is detailed in the solution document."
+      "free_stops": "How readings and cuts are shared is detailed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note each lot's moisture reading beside the deduction actually applied for one week, so recurring dispute patterns stand out before the next delivery.",
+          "review": false
+        },
+        {
+          "text": "Give one receiving person the job of writing the agreed deduction on the lot note, so arguments reduce at unloading time.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_raw_material_shortage",
@@ -83,7 +113,17 @@
         "tool_words": []
       },
       "ask_first": "How do you buy raw material now, open market or contracts?",
-      "free_stops": "Alert levels and the stock view are kept for the solution document."
+      "free_stops": "Alert levels and the stock view are kept for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count the main grain on hand against one day's milling use each evening for one week, so stoppage risk is seen before the bins empty.",
+          "review": false
+        },
+        {
+          "text": "Make one notebook the place for stock left and stock expected each day, so purchasing gets a clear handover before material runs short.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_shrinkage_theft",
@@ -103,7 +143,17 @@
         "tool_words": []
       },
       "ask_first": "Who counts finished bags?",
-      "free_stops": "How counts and gate passes are matched goes in the solution document."
+      "free_stops": "How counts and gate passes are matched goes in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count finished bags in one godown row against dispatch notes after loading each day, so you spot where the record starts drifting.",
+          "review": false
+        },
+        {
+          "text": "Give one store person the job of updating one dispatch and balance list before any truck leaves, so bag movement matches the godown count.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_receivables_late",
@@ -123,7 +173,17 @@
         "tool_words": []
       },
       "ask_first": "How long do distributors usually take to pay?",
-      "free_stops": "Limits and reminder rules are set out in the solution document."
+      "free_stops": "Limits and reminder rules are set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note which credit dispatches stayed unpaid past the promised day this week, so collection effort goes where cash is already stuck.",
+          "review": true
+        },
+        {
+          "text": "Give one person the daily overdue follow up list in one notebook, so distributor balances stop slipping between sales and accounts.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_pricing_errors",
@@ -143,7 +203,17 @@
         "tool_words": []
       },
       "ask_first": "How many people make invoices?",
-      "free_stops": "How rates reach invoicing is detailed in the solution document."
+      "free_stops": "How rates reach invoicing is detailed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare today's loaded invoices with today's announced rate before dispatch for one week, so you see when wrong pricing enters the paperwork.",
+          "review": true
+        },
+        {
+          "text": "Give one desk the job of keeping the current rate page and removing the old one, so billing staff use one clear price only.",
+          "review": true
+        }
+      ]
     },
     {
       "id": "p8_consistency_across_branches",
@@ -163,7 +233,17 @@
         "tool_words": []
       },
       "ask_first": "Do bags carry any batch number today?",
-      "free_stops": "How batch codes link to production is part of the solution document."
+      "free_stops": "How batch codes link to production is part of the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note complaints by production day and packing shift for one week, so you see whether variation ties to a routine inside the mill.",
+          "review": false
+        },
+        {
+          "text": "Make one register the home for every batch complaint and hand it to one supervisor daily, so follow up stops getting scattered.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_whatsapp_overload",
@@ -183,7 +263,17 @@
         "tool_words": []
       },
       "ask_first": "Roughly how many distributors order from you?",
-      "free_stops": "How orders flow to dispatch goes in the solution document."
+      "free_stops": "How orders flow to dispatch goes in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many orders arrive by call and how many by message for one week, so the busiest source of confusion is clear.",
+          "review": false
+        },
+        {
+          "text": "Give one dispatcher one master order list updated at fixed times daily, so loading follows one queue instead of scattered chats.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p10_reports_late",
@@ -203,7 +293,17 @@
         "tool_words": []
       },
       "ask_first": "Which number do you most want to see daily?",
-      "free_stops": "What the morning read contains is kept for the solution document."
+      "free_stops": "What the morning read contains is kept for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note intake, output, dispatch and cash on one page at closing for one week, so month end stops bringing surprises.",
+          "review": false
+        },
+        {
+          "text": "Give one supervisor the closing numbers message at the same time daily, so you see the mill's position while work is moving.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

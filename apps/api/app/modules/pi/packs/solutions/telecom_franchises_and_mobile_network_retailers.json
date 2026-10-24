@@ -2,7 +2,7 @@
   "industry": "telecom_franchises_and_mobile_network_retailers",
   "name": "Telecom franchises and mobile-network retailers",
   "sector": "7.L Finance-adjacent, energy and utilities",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_target_missed",
@@ -23,7 +23,17 @@
         "leads_with_view": true
       },
       "ask_first": "Which target is hardest to hit each month?",
-      "free_stops": "How targets are split and tracked per outlet is in the solution document."
+      "free_stops": "How targets are split and tracked per outlet is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare each outlet's weekly sales with the same week last month, so slow branches show up before month end.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of writing each outlet's running total every evening, so shortfalls are spotted earlier.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_commission_reconciliation",
@@ -44,7 +54,17 @@
         "leads_with_view": true
       },
       "ask_first": "",
-      "free_stops": "Matching logic and clawback analysis are in the solution document; pi does not interpret operator policy."
+      "free_stops": "Matching logic and clawback analysis are in the solution document; pi does not interpret operator policy.",
+      "extra_ideas": [
+        {
+          "text": "Note each disputed incentive line by sales month and outlet, so clawback patterns are easier to challenge with records.",
+          "review": false
+        },
+        {
+          "text": "Keep one notebook for all incentive disputes and updates, so old mismatches are not reopened from memory.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_serial_batch_tracking",
@@ -64,7 +84,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "Register structure and alert rules are in the solution document."
+      "free_stops": "Register structure and alert rules are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count unassigned kit serials at each outlet this week, so you see where accountability is loosest.",
+          "review": false
+        },
+        {
+          "text": "Make one staff member hand over kits against a single written list each day, so missing stock has a last holder.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_overstock_dead_stock",
@@ -84,7 +114,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "Ageing and reorder logic are in the solution document."
+      "free_stops": "Ageing and reorder logic are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Walk each outlet and note handsets untouched for the longest time, so slow movers are separated from genuine demand.",
+          "review": false
+        },
+        {
+          "text": "Give one person the weekly job of moving aged stock onto one shelf, so staff stop overlooking tied-up inventory.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_transfers_lost",
@@ -104,7 +144,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "Confirmation steps are in the solution document."
+      "free_stops": "Confirmation steps are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare stock sent and stock received on recent outlet transfers, so you see how often counts change in transit.",
+          "review": false
+        },
+        {
+          "text": "Use one transfer notebook that travels with the stock until handover, so both outlets refer to the same record.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_field_team_visibility",
@@ -124,7 +174,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "Log design and comparison method are in the solution document."
+      "free_stops": "Log design and comparison method are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many field claims name a place visited but no sale outcome, so weak activity reporting stands out.",
+          "review": false
+        },
+        {
+          "text": "Set one fixed time for field notes to reach one supervisor daily, so outside work stops arriving in fragments.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_commission_disputes",
@@ -145,7 +205,17 @@
         "leads_with_view": true
       },
       "ask_first": "",
-      "free_stops": "How the rule is applied and shown is in the solution document."
+      "free_stops": "How the rule is applied and shown is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note which sale situations trigger the most credit arguments this month, so the rule can match real friction points.",
+          "review": true
+        },
+        {
+          "text": "Make the shift lead mark the credited seller at sale time in one place, so incentive ownership is settled early.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_slow_response",
@@ -165,7 +235,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "Tally categories and roster logic are in the solution document."
+      "free_stops": "Tally categories and roster logic are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Tally how many complaint visitors leave before being served at busy hours, so the queue problem has a clear size.",
+          "review": false
+        },
+        {
+          "text": "Assign one staff member to own complaint handovers during peak times, so waiting customers are not restarted by each shift.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_reviews_bad",
@@ -185,7 +265,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "Request timing and wording are in the solution document; reviews only ever come from real customers."
+      "free_stops": "Request timing and wording are in the solution document; reviews only ever come from real customers.",
+      "extra_ideas": [
+        {
+          "text": "Note the wait-time complaints mentioned most often in recent reviews, so the outlet sees the exact pain customers repeat.",
+          "review": false
+        },
+        {
+          "text": "Give one person the daily job of checking the walk-in line twice, so long waits are noticed before tempers rise.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p10_data_scattered",
@@ -205,7 +295,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "Which figures and how they are collected is in the solution document."
+      "free_stops": "Which figures and how they are collected is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note when each outlet's screenshot actually arrives for one week, so late reporting by branch is clear.",
+          "review": false
+        },
+        {
+          "text": "Make one manager collect all outlet figures into one notebook each evening, so you can review all branches together.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p11_returns_handling",
@@ -225,7 +325,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "Case stages are in the solution document."
+      "free_stops": "Case stages are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many return slips are missing the device location this week, so you see where warranty cases lose track.",
+          "review": false
+        },
+        {
+          "text": "Keep all return papers in one marked folder at the counter, so any staff member can find the case quickly.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

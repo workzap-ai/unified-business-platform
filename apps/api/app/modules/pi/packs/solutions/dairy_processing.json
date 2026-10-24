@@ -2,7 +2,7 @@
   "industry": "dairy_processing",
   "name": "Dairy processing (milk, yoghurt, cheese)",
   "sector": "7.B Food and beverage",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_count_mismatch",
@@ -24,7 +24,17 @@
         ]
       },
       "ask_first": "How do collection records reach the plant now?",
-      "free_stops": "The intake app set-up per collection point is in the solution document."
+      "free_stops": "The intake app set-up per collection point is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many milk intake slips lack a matching paper lab result from the same day, so the mismatch size is clear.",
+          "review": false
+        },
+        {
+          "text": "Give one clerk the daily job of clipping each intake slip with its lab paper in one folder, so disputes trace faster.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_supplier_payments_late",
@@ -44,7 +54,17 @@
         "tool_words": []
       },
       "ask_first": "How often are farmers paid?",
-      "free_stops": "How the payment rule and statements are set up stays for the solution document."
+      "free_stops": "How the payment rule and statements are set up stays for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many farmer code payment complaints mention fat test differences this week, so you see whether delays or disputes dominate.",
+          "review": true
+        },
+        {
+          "text": "Give one person the daily job of updating one notebook by farmer code for litres, fat and payment status, so complaints resolve faster.",
+          "review": true
+        }
+      ]
     },
     {
       "id": "p3_inspection_missing",
@@ -64,7 +84,17 @@
         "tool_words": []
       },
       "ask_first": "Which tests are recorded at intake?",
-      "free_stops": "The quality record and flag rules are in the solution document."
+      "free_stops": "The quality record and flag rules are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note which collection point codes are linked to watered milk findings this month, so repeat problem sources stand out.",
+          "review": false
+        },
+        {
+          "text": "Give one intake person the job of writing each suspect delivery's collection point code in one notebook, so later supplier-quality follow-up starts from one place.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_expiry_wastage",
@@ -85,7 +115,17 @@
         "leads_with_view": true
       },
       "ask_first": "Which products come back most?",
-      "free_stops": "How deliveries per shop are adjusted is detailed in the solution document."
+      "free_stops": "How deliveries per shop are adjusted is detailed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare shop returns by route and product for one week, so you spot where yoghurt and fresh milk are over-sent.",
+          "review": false
+        },
+        {
+          "text": "Give one dispatcher the job of keeping all shop return notes in one notebook each evening, so next sends reflect actual sell-through.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_forecasting",
@@ -106,7 +146,17 @@
         "leads_with_view": true
       },
       "ask_first": "How do you decide daily production now?",
-      "free_stops": "The planning logic stays for the solution document."
+      "free_stops": "The planning logic stays for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare next day's orders with what production actually made for one week, so the planning miss is measured clearly.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of collecting all next day orders into one written list by a fixed evening time, so production starts from one version.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_maintenance_downtime",
@@ -126,7 +176,17 @@
         "tool_words": []
       },
       "ask_first": "Where does the cold chain break most — plant, vans or shops?",
-      "free_stops": "The maintenance and cold-chain log set-up is in the solution document."
+      "free_stops": "The maintenance and cold-chain log set-up is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many stoppages each chiller or pasteuriser had this week, so the machine causing most batch loss is obvious.",
+          "review": false
+        },
+        {
+          "text": "Give one operator the job of writing every stoppage in one notebook kept near the machines, so repair discussions use the same record.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_cash_mismatch",
@@ -146,7 +206,17 @@
         "tool_words": []
       },
       "ask_first": "How do drivers settle cash and returns now?",
-      "free_stops": "The settlement routine is detailed in the solution document."
+      "free_stops": "The settlement routine is detailed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare each van's loaded stock, cash brought back and returned items at day end, so the weak route is easier to spot.",
+          "review": false
+        },
+        {
+          "text": "Give one checker the job of recording each van's returns and cash on one day-end sheet, so route handover stays consistent.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_churn_subscription",
@@ -166,7 +236,17 @@
         "tool_words": []
       },
       "ask_first": "How are pauses handled now?",
-      "free_stops": "The reminder plan stays for the solution document."
+      "free_stops": "The reminder plan stays for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many paused home deliveries have passed their restart date this week, so forgotten restarts stop hiding in the list.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member the job of keeping every paused subscriber in one notebook with restart date, so resumptions are checked on time.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_data_scattered",
@@ -186,7 +266,17 @@
         "tool_words": []
       },
       "ask_first": "Who puts these numbers together now?",
-      "free_stops": "What goes into the morning read is in the solution document."
+      "free_stops": "What goes into the morning read is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Write one day's intake, production and dispatch totals side by side on one page, so where the numbers break becomes visible.",
+          "review": false
+        },
+        {
+          "text": "Give one supervisor the job of copying daily intake, production and dispatch totals into one notebook before closing, so the morning review starts quickly.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

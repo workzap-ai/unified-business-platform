@@ -2,7 +2,7 @@
   "industry": "pr_and_media_agencies",
   "name": "PR and media agencies",
   "sector": "7.K Professional and business services",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_no_customer_data",
@@ -22,7 +22,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "the register structure and refresh routine are set out in the solution document."
+      "free_stops": "the register structure and refresh routine are set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many outlet contacts changed role since your last big pitch, so you see how much of the list is already drifting.",
+          "review": false
+        },
+        {
+          "text": "Give one person a fixed weekly slot to note outlet and beat changes in one master list, so pitches stop going to old desks.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_turnover",
@@ -42,7 +52,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "access rights and what is logged are worked out in the solution document."
+      "free_stops": "access rights and what is logged are worked out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare one account manager's contact notes with the agency list once, so you see how much relationship information would walk out.",
+          "review": false
+        },
+        {
+          "text": "Make one shared contact notebook the handover place for every account, so client outreach survives staff changes.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_manual_reports",
@@ -62,7 +82,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "the report layout and how coverage is captured are kept for the solution document."
+      "free_stops": "the report layout and how coverage is captured are kept for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note how many coverage items are gathered after month end for one client, so you see why reporting days get swallowed.",
+          "review": false
+        },
+        {
+          "text": "Give one person the daily job of writing new coverage into one running client log, so report building becomes a tidy wrap up.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_duplicate_entry",
@@ -82,7 +112,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "how pitches link to coverage is designed in the solution document."
+      "free_stops": "how pitches link to coverage is designed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Check one recent client's coverage file against its report once, so you can count how often items sit under the wrong name.",
+          "review": false
+        },
+        {
+          "text": "Choose one place where every coverage item is written with the client name at saving time, so reports stop mixing accounts.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_approvals_slow",
@@ -102,7 +142,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "the approval steps and nudge timings are set out in the solution document."
+      "free_stops": "the approval steps and nudge timings are set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many client comments arrive after the internal draft is ready for one release, so the approval drag becomes visible.",
+          "review": false
+        },
+        {
+          "text": "Assign one client side approver contact for each release in one shared note, so drafts stop circling through extra people.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_receivables_late",
@@ -122,7 +172,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "how bookings flow into client billing is kept for the solution document."
+      "free_stops": "how bookings flow into client billing is kept for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count bookings already placed where the client approval note is missing or scattered, so delayed handoffs tying up work become visible.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member a daily slot to note every placed booking awaiting client follow-up in one notebook, so chasing stops slipping.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_hidden_costs",
@@ -143,7 +203,17 @@
         "leads_with_view": true
       },
       "ask_first": "",
-      "free_stops": "how activities are logged and compared is worked out in the solution document."
+      "free_stops": "how activities are logged and compared is worked out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note every extra event and urgent support request for one retainer client this month, so renewal talks rest on actual workload.",
+          "review": false
+        },
+        {
+          "text": "Assign one person to keep one running extras list for each retainer, so added work is noticed while it is happening.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_cost_overruns",
@@ -163,7 +233,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "the event stages and budget tracking are designed in the solution document."
+      "free_stops": "the event stages and budget tracking are designed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare the last event brief with what suppliers actually delivered late or differently, so the repeat causes of overruns stand out.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of keeping all supplier promises and delivery times in one notebook, so delays get spotted before event day.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_shift_scheduling",
@@ -183,7 +263,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "rota rules and the escalation chain are set out in the solution document."
+      "free_stops": "rota rules and the escalation chain are set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many weekend client issues came straight to you in the last month, so the true out of hours load is clear.",
+          "review": false
+        },
+        {
+          "text": "Name one duty person for each upcoming weekend and write the handover note in one place, so cover no longer rests on you alone.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p10_no_visibility",
@@ -203,7 +293,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "the follow-up rules are kept for the solution document."
+      "free_stops": "the follow-up rules are kept for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count the product samples sent out this week by client and recipient type, so missing returns and follow ups are easier to spot.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member the send out notebook and require every parcel to be written there, so nothing leaves without a record.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

@@ -2,7 +2,7 @@
   "industry": "juice_shakes_dessert_and_ice_cream_parlours",
   "name": "Juice, shakes, dessert and ice-cream parlours",
   "sector": "7.B Food and beverage",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_expiry_wastage",
@@ -22,7 +22,17 @@
         "tool_words": []
       },
       "ask_first": "Who decides how much fruit to buy?",
-      "free_stops": "How buying quantities are set by day and season goes in the solution document."
+      "free_stops": "How buying quantities are set by day and season goes in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare fruit thrown after each buying day with fruit sold that same day, so purchasing matches what the counter actually uses.",
+          "review": false
+        },
+        {
+          "text": "Give one person the closing fruit check and one notebook page for soft stock, so tomorrow's prep uses it before new crates open.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_margin_unknown",
@@ -43,7 +53,17 @@
         "leads_with_view": true
       },
       "ask_first": "How often do you change prices now?",
-      "free_stops": "The costing method and repricing approach are detailed in the solution document."
+      "free_stops": "The costing method and repricing approach are detailed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note today's fruit buying rates beside your busiest drinks and desserts, so you spot which menu items are now carrying less room.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of counting servings from every new ice-cream tub, so portion drift stops hiding your real cost.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_maintenance_downtime",
@@ -63,7 +83,17 @@
         "tool_words": []
       },
       "ask_first": "What happens to your freezers when power goes?",
-      "free_stops": "The checking routine and alert set-up stay for the solution document."
+      "free_stops": "The checking routine and alert set-up stay for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Walk round at opening and note any unusual freezer sound, frost pattern or puddle, so trouble is noticed before stock is lost.",
+          "review": false
+        },
+        {
+          "text": "Give one person the closing check of every freezer plug, door and power light, so overnight failures are less likely to go unseen.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_stockout",
@@ -83,7 +113,17 @@
         "tool_words": []
       },
       "ask_first": "Which flavours run out first?",
-      "free_stops": "Reorder points per flavour and outlet are set in the solution document."
+      "free_stops": "Reorder points per flavour and outlet are set in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare what sold out last hot weekend with what stayed untouched, so next buying follows flavour demand instead of habit.",
+          "review": false
+        },
+        {
+          "text": "Give one person the Thursday flavour count in one notebook, so weekend ordering starts from what is really left.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_no_sop",
@@ -103,7 +143,17 @@
         "tool_words": []
       },
       "ask_first": "How do new staff learn recipes now?",
-      "free_stops": "The recipe standards and training flow are in the solution document."
+      "free_stops": "The recipe standards and training flow are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare the same falooda or shake from each outlet once this week, so size and build differences show clearly.",
+          "review": false
+        },
+        {
+          "text": "Give one senior person the daily portion check at every outlet, so recipes stay consistent across counters and shifts.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_seasonal_dip",
@@ -124,7 +174,17 @@
         "leads_with_view": true
       },
       "ask_first": "What have you tried in the slow months?",
-      "free_stops": "The seasonal menu plan stays for the solution document."
+      "free_stops": "The seasonal menu plan stays for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Look at last winter's bills and note which items still moved each week, so you back what customers already chose in cold months.",
+          "review": false
+        },
+        {
+          "text": "Give one person a fixed weekly review of winter sellers and dead stock, so buying changes with the season instead of habit.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_cash_mismatch",
@@ -144,7 +204,17 @@
         "tool_words": []
       },
       "ask_first": "Where does the cash gap show up most?",
-      "free_stops": "The closing routine and staff-treat rules are in the solution document."
+      "free_stops": "The closing routine and staff-treat rules are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare each shift's cash with its handwritten sales notes and staff treats taken, so the shortfall is tied to a specific handover.",
+          "review": false
+        },
+        {
+          "text": "Give one person one page for every staff drink or dessert taken, so stock use stops disappearing into the night's cash gap.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_branch_comparison",
@@ -164,7 +234,17 @@
         "tool_words": []
       },
       "ask_first": "Can you see each outlet's sales daily now?",
-      "free_stops": "How outlet profitability is calculated goes in the solution document."
+      "free_stops": "How outlet profitability is calculated goes in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note each outlet's daily sales, wastage and staff on one page this week, so the weaker branch stands out in simple terms.",
+          "review": false
+        },
+        {
+          "text": "Give one person the evening branch summary call and one notebook for all outlets, so comparison happens regularly instead of ad hoc.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_pre_orders_custom",
@@ -184,7 +264,17 @@
         "tool_words": []
       },
       "ask_first": "How do party orders reach you now?",
-      "free_stops": "The event order flow is detailed in the solution document."
+      "free_stops": "The event order flow is detailed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare this week's event orders in chat with what was actually prepared, so the mix-up point shows before the next booking.",
+          "review": false
+        },
+        {
+          "text": "Give one person one notebook page for every party order handover, so kitchen and counter work from the same booking details.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

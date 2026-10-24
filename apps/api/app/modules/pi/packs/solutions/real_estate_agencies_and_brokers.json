@@ -2,7 +2,7 @@
   "industry": "real_estate_agencies_and_brokers",
   "name": "Real estate agencies and brokers",
   "sector": "7.F Construction, real estate and facilities",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_lead_followup_slow",
@@ -24,7 +24,17 @@
         ]
       },
       "ask_first": "Who decides which agent gets a new lead today?",
-      "free_stops": "The assignment rules and response targets are set in the solution document."
+      "free_stops": "The assignment rules and response targets are set in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note the time each portal enquiry arrives and the time of first call back today, so waiting hours show up clearly.",
+          "review": false
+        },
+        {
+          "text": "Assign one desk person each half day to call fresh portal leads, so replies start before interest cools.",
+          "review": true
+        }
+      ]
     },
     {
       "id": "p2_campaign_roi_unknown",
@@ -33,8 +43,8 @@
       "category": "marketing_leads",
       "subtype": "campaign_roi_unknown",
       "quick_ideas": [
-        "Export each portal's own lead report once, to see calls per listing",
-        "Ask agents to note the portal on every lead for a week, so you have a first comparison."
+        "For one week, count calls and booked viewings from each advertised property source in a notebook, so weak listing sources stand out.",
+        "Give one staff member a fixed evening check to note every inquiry source on one office page, so source comparisons stay complete."
       ],
       "workzap_build": {
         "keys": [
@@ -47,7 +57,11 @@
         ]
       },
       "ask_first": "Which portals do you pay for right now?",
-      "free_stops": "How sources are tagged and the report is structured is in the solution document."
+      "free_stops": "How sources are tagged and the report is structured is in the solution document.",
+      "quick_ideas_original": [
+        "Export each portal's own lead report once, to see calls per listing",
+        "Ask agents to note the portal on every lead for a week, so you have a first comparison."
+      ]
     },
     {
       "id": "p3_stale_listings",
@@ -69,7 +83,17 @@
         ]
       },
       "ask_first": "Roughly how many active listings do you have?",
-      "free_stops": "The duplicate-matching logic and portal update flow are in the solution document."
+      "free_stops": "The duplicate-matching logic and portal update flow are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Walk through your live property ads and mark repeated or already rented homes once, so clutter stealing enquiries is obvious.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member the weekly job of removing repeated and closed listings from one master list, so old stock stops resurfacing.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_commission_disputes",
@@ -90,7 +114,17 @@
         "tool_words": []
       },
       "ask_first": "What usually starts a commission argument?",
-      "free_stops": "Split rules for teams and co-brokes are worked out in the solution document."
+      "free_stops": "Split rules for teams and co-brokes are worked out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare disputed deals against the earliest office record of contact and viewing, so arguments shrink around one shared timeline.",
+          "review": false
+        },
+        {
+          "text": "Give one admin person the job of writing each new client contact into one office log, so ownership starts from a common record.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_data_loss",
@@ -110,7 +144,17 @@
         "tool_words": []
       },
       "ask_first": "Where does an agent's client list live today: CRM, Excel or their phone?",
-      "free_stops": "The pipeline stages and handover process are defined in the solution document."
+      "free_stops": "The pipeline stages and handover process are defined in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "List all active deals each agent holds on their own phone today, so the pipeline at risk is clear before anyone leaves.",
+          "review": false
+        },
+        {
+          "text": "Make Friday handover notes one routine in one office notebook, so live deals stay with the agency when staff change.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_performance_unknown",
@@ -131,7 +175,17 @@
         "leads_with_view": true
       },
       "ask_first": "How many agents do you have, and how are they paid?",
-      "free_stops": "Which measures to track and how they are captured is in the solution document."
+      "free_stops": "Which measures to track and how they are captured is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count each agent's viewings, follow ups and new conversations this week, so idle time stands out beside real effort.",
+          "review": false
+        },
+        {
+          "text": "Give one team lead a fixed weekly check in with one shared activity page, so work gets reviewed without chasing everyone.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_licences_renewals",
@@ -151,7 +205,17 @@
         "tool_words": []
       },
       "ask_first": "Who keeps track of expiry dates today?",
-      "free_stops": "Alert timing and the link between permits and live ads are in the solution document."
+      "free_stops": "Alert timing and the link between permits and live ads are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Write every permit and registration expiry month on one page this week, so last minute renewals stop surprising the office.",
+          "review": false
+        },
+        {
+          "text": "Give one admin person the standing job of checking renewal dates every Monday, so expiry chasing has a clear owner.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_handoffs",
@@ -171,7 +235,17 @@
         "tool_words": []
       },
       "ask_first": "How are viewings booked today?",
-      "free_stops": "The checklist steps and confirmation flow are in the solution document."
+      "free_stops": "The checklist steps and confirmation flow are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note how many viewings this week start late because keys or access are missing, so the handoff problem has a size.",
+          "review": false
+        },
+        {
+          "text": "Assign one person to own the daily key and access handover list, so booked viewings stop failing at the door.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_receivables_late",
@@ -191,7 +265,17 @@
         "tool_words": []
       },
       "ask_first": "Who owes you commission at the moment: developers, landlords or clients?",
-      "free_stops": "The reminder schedule and escalation steps are kept for the solution document."
+      "free_stops": "The reminder schedule and escalation steps are kept for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many agreed commission files are still waiting after handover each week, so delays by developer are easier to compare.",
+          "review": false
+        },
+        {
+          "text": "Keep all post deal follow ups in one office notebook with one owner check time, so aging commission files stop being overlooked.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p10_repeat_low",
@@ -212,7 +296,17 @@
         "tool_words": []
       },
       "ask_first": "What happens with a client after the deal closes today?",
-      "free_stops": "Timing and the message journey are planned in the solution document."
+      "free_stops": "Timing and the message journey are planned in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many past buyers you placed last season received any check in message, so repeat business you are missing becomes visible.",
+          "review": false
+        },
+        {
+          "text": "Give one agent a weekly past buyer follow up hour and one notebook page, so old clients stop slipping away quietly.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

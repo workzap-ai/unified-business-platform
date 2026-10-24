@@ -2,7 +2,7 @@
   "industry": "crop_farming",
   "name": "Crop farming (wheat, rice, cotton, sugarcane, maize)",
   "sector": "7.C Agriculture, livestock and rural (part 2)",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_margin_unknown",
@@ -22,7 +22,17 @@
         "tool_words": []
       },
       "ask_first": "Roughly how many separate plots do you farm?",
-      "free_stops": "How the plots, cost heads and per-acre view are set up for your land goes in the solution document."
+      "free_stops": "How the plots, cost heads and per-acre view are set up for your land goes in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Take one field and note every spend already remembered for it on one page, so the missing cost areas stand out.",
+          "review": false
+        },
+        {
+          "text": "Choose one notebook for field costs and make one person enter each spend against the field that day, so plots stop mixing together.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_theft_internal",
@@ -42,7 +52,17 @@
         "tool_words": []
       },
       "ask_first": "Is the tractor your own or hired?",
-      "free_stops": "The matching rules and how the log fits your machines are kept for the solution document."
+      "free_stops": "The matching rules and how the log fits your machines are kept for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many times diesel is taken out in one week and compare that with tractor and tube-well use, so suspicious days stand out.",
+          "review": false
+        },
+        {
+          "text": "Make one person open and close the diesel record at a fixed evening time, so missing entries stop slipping through.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_owner_blind",
@@ -62,7 +82,17 @@
         "tool_words": []
       },
       "ask_first": "How often are you physically at the farm?",
-      "free_stops": "What the morning read contains and how entries reach it is detailed in the solution document."
+      "free_stops": "What the morning read contains and how entries reach it is detailed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare one week's spoken spend totals with the bills and slips already on hand, so you can see how wide the checking gap is.",
+          "review": false
+        },
+        {
+          "text": "Set one daily time when one person puts that day's spend proofs in one place for you, so cash updates stop arriving as verbal summaries.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_receivables_late",
@@ -82,7 +112,17 @@
         "tool_words": []
       },
       "ask_first": "Who buys most of your crop?",
-      "free_stops": "How the ledger and reminders are set up for your buyers goes in the solution document."
+      "free_stops": "How the ledger and reminders are set up for your buyers goes in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "List every unpaid CPR and sale paper by date on one page, so you can see how much old money is stuck.",
+          "review": false
+        },
+        {
+          "text": "Give one person a fixed weekly time to review unpaid mill and arhti papers in one notebook, so follow ups stop being delayed.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_cash_mismatch",
@@ -102,7 +142,17 @@
         "tool_words": []
       },
       "ask_first": "Do you get a written slip from the arhti today?",
-      "free_stops": "How slips are captured and checked is part of the solution document."
+      "free_stops": "How slips are captured and checked is part of the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare one payment paper with what you noted at delivery for weight and deductions, so the exact disagreement is easier to spot.",
+          "review": true
+        },
+        {
+          "text": "Keep every agreed deduction on one page with the related sale paper, so payment checks stop starting from arguments.",
+          "review": true
+        }
+      ]
     },
     {
       "id": "p6_attendance_lateness",
@@ -122,7 +172,17 @@
         "tool_words": []
       },
       "ask_first": "Roughly how many people work at peak season?",
-      "free_stops": "The attendance flow and wage sheet design are kept for the solution document."
+      "free_stops": "The attendance flow and wage sheet design are kept for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare one day's cash wage payout with the morning head count by plot, so you can see where attendance proof is missing.",
+          "review": true
+        },
+        {
+          "text": "Give one person the job of keeping one daily attendance page by plot before wages are counted, so cash pay has a matching record.",
+          "review": true
+        }
+      ]
     },
     {
       "id": "p7_commission_disputes",
@@ -142,7 +202,17 @@
         "tool_words": []
       },
       "ask_first": "How much of the land is on batai?",
-      "free_stops": "How terms and shared costs are structured in the tracker goes in the solution document."
+      "free_stops": "How terms and shared costs are structured in the tracker goes in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Pull out one disputed plot and note the shared costs and crop share already written anywhere, so the weak points in the settlement show.",
+          "review": false
+        },
+        {
+          "text": "Keep one running page per plot for batai costs and shares under one person's care, so season end talks start from a common record.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_contracts_tracking",
@@ -162,7 +232,17 @@
         "tool_words": []
       },
       "ask_first": "Are you mostly leasing land in, or also leasing it out?",
-      "free_stops": "The register layout and reminder timing are set out in the solution document."
+      "free_stops": "The register layout and reminder timing are set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Write each leased plot and its payment month from memory onto one page, so you can see which dates are still uncertain.",
+          "review": true
+        },
+        {
+          "text": "Keep all lease papers and due notes in one notebook with one person updating it after each payment, so dates stop living across different diaries.",
+          "review": true
+        }
+      ]
     },
     {
       "id": "p9_count_mismatch",
@@ -182,7 +262,17 @@
         "tool_words": []
       },
       "ask_first": "Where is the crop kept after harvest?",
-      "free_stops": "How counts are recorded and when alerts fire is detailed in the solution document."
+      "free_stops": "How counts are recorded and when alerts fire is detailed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count one stack in the godown yourself and compare it with the munshi's figure for that same stack, so the mismatch size is clear.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of updating one bag movement page whenever bags enter or leave the godown, so stock stops shifting without a trail.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p10_supplier_late",
@@ -202,7 +292,17 @@
         "tool_words": []
       },
       "ask_first": "Which crop's harvest is most affected?",
-      "free_stops": "How bookings and reminders are organised for your area goes in the solution document."
+      "free_stops": "How bookings and reminders are organised for your area goes in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Write down each promised cutting date and the day the machine actually arrived this harvest, so the delay pattern is clear.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of keeping next harvest machine promises on one notebook page, so follow up happens before slots disappear.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

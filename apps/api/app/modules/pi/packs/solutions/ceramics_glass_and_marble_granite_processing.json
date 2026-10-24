@@ -2,7 +2,7 @@
   "industry": "ceramics_glass_and_marble_granite_processing",
   "name": "Ceramics, glass and marble/granite processing",
   "sector": "7.D Manufacturing and industry (part 2)",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_order_errors",
@@ -22,7 +22,17 @@
         "tool_words": []
       },
       "ask_first": "How are slabs identified in the yard now?",
-      "free_stops": "The numbering and reservation set-up is in the solution document."
+      "free_stops": "The numbering and reservation set-up is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many delivered slabs needed a return or exchange this week, so you see how often selection is getting mixed up.",
+          "review": false
+        },
+        {
+          "text": "Give one yard person the job of matching selected slab notes to the truck load list, so the right slab leaves each time.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_wastage_cost",
@@ -42,7 +52,17 @@
         "tool_words": []
       },
       "ask_first": "Where does most breakage happen?",
-      "free_stops": "The capture steps are in the solution document."
+      "free_stops": "The capture steps are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note each broken piece by route and driver for one week, so you can spot where margin is getting hit hardest.",
+          "review": false
+        },
+        {
+          "text": "Give one loader the job of writing every damaged item in one notebook before unloading finishes, so claims stop getting missed.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_margin_unknown",
@@ -63,7 +83,17 @@
         "leads_with_view": true
       },
       "ask_first": "Do you buy blocks or have your own quarry?",
-      "free_stops": "The yield calculation is in the solution document."
+      "free_stops": "The yield calculation is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note each block received beside the saleable pieces produced from it, so you can see which blocks are paying back properly.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of recording block in and saleable out in one notebook, so yield stops being guessed.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_rework",
@@ -83,7 +113,17 @@
         "tool_words": []
       },
       "ask_first": "Who takes measurements at site?",
-      "free_stops": "The form and sign-off flow are in the solution document."
+      "free_stops": "The form and sign-off flow are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare written site sizes with the sizes actually used in cutting on recent jobs, so you can see where wrong measurements enter.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of keeping all site measurements in one notebook before cutting starts, so fewer jobs get remade.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_consistency_across_branches",
@@ -103,7 +143,17 @@
         "tool_words": []
       },
       "ask_first": "Is stock labelled by batch now?",
-      "free_stops": "Allocation rules are in the solution document."
+      "free_stops": "Allocation rules are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many refused orders involved mixed batches this month, so you see how much shade variation is costing sales.",
+          "review": false
+        },
+        {
+          "text": "Give one branch staff member the job of keeping each order's batch note in one place, so mixed shades stop reaching customers.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_credit_customers",
@@ -123,7 +173,17 @@
         "tool_words": []
       },
       "ask_first": "Who are your main credit customers?",
-      "free_stops": "Limit and reminder rules are in the solution document."
+      "free_stops": "Limit and reminder rules are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many finished projects still have unpaid material, so you see which completed jobs are still blocking fresh marble purchases.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member the job of noting every material issue against each site in one notebook daily, so bill disputes drop at collection time.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_delivery_late",
@@ -143,7 +203,17 @@
         "tool_words": []
       },
       "ask_first": "How many installation teams do you run?",
-      "free_stops": "The scheduling set-up is in the solution document."
+      "free_stops": "The scheduling set-up is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note every promised installation date against the actual arrival date this week, so you can see which teams slip most.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of keeping next week's installation promises in one notebook, so double booking stops causing missed days.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_conversion_low",
@@ -163,7 +233,17 @@
         "tool_words": []
       },
       "ask_first": "Who prepares quotations today?",
-      "free_stops": "The quote logic is in the solution document."
+      "free_stops": "The quote logic is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many big project quotations sat unfinished beyond the same week, so you see where response time is stalling sales.",
+          "review": false
+        },
+        {
+          "text": "Give one estimator the job of keeping all pending project quotations in one notebook, so urgent bids stop getting buried.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_website_issues",
@@ -183,7 +263,17 @@
         "tool_words": []
       },
       "ask_first": "Do you sell mostly to homeowners or contractors?",
-      "free_stops": "The catalogue set-up is in the solution document."
+      "free_stops": "The catalogue set-up is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Walk the showroom and note how many ranges a walk in customer cannot view in one visit, so missing visibility becomes clear.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member the job of keeping a single photo list of current ranges, so buyers can see more without waiting.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

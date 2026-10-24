@@ -2,7 +2,7 @@
   "industry": "tour_operators_and_dmcs",
   "name": "Tour operators and DMCs",
   "sector": "7.G Transport, mobility and aviation (part 1)",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_conversion_low",
@@ -22,7 +22,17 @@
         "tool_words": []
       },
       "ask_first": "Requests zyada B2B agents se aati hain ya direct guests se?",
-      "free_stops": "The rate structure and markup rules are set out in the solution document."
+      "free_stops": "The rate structure and markup rules are set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note how long rate confirmations from hotels and transport partners take on recent enquiries, so you spot what slows itinerary pricing.",
+          "review": true
+        },
+        {
+          "text": "Give one staff member the handover job for every open quote at day's end, so pricing keeps moving when someone steps away.",
+          "review": true
+        }
+      ]
     },
     {
       "id": "p2_resource_double_booking",
@@ -42,7 +52,17 @@
         "tool_words": []
       },
       "ask_first": "Peak mein ek waqt mein kitne tours chal rahe hote hain?",
-      "free_stops": "The allocation rules and acknowledgement flow are designed in the solution document."
+      "free_stops": "The allocation rules and acknowledgement flow are designed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Check one week's bookings against guide and vehicle assignments once, so the busiest clash points stand out before another overlap.",
+          "review": false
+        },
+        {
+          "text": "Keep one assignment notebook with one dispatcher updating every change, so guides and vehicles stop getting promised twice.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_wastage_cost",
@@ -62,7 +82,17 @@
         "tool_words": []
       },
       "ask_first": "Kitne hotels ke saath allotment hai?",
-      "free_stops": "Alert timing and the register layout are worked out in the solution document."
+      "free_stops": "Alert timing and the register layout are worked out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare unsold rooms paid after release dates with the tours they were held for once, so the costly routes stand out.",
+          "review": false
+        },
+        {
+          "text": "Set one daily release check time and one staff owner for allotments, so rooms get cut in time to protect margin.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_margin_unknown",
@@ -83,7 +113,17 @@
         "leads_with_view": true
       },
       "ask_first": "Mid-season kaun si cost sab se zyada barhti hai?",
-      "free_stops": "The cost categories and report are designed in the solution document."
+      "free_stops": "The cost categories and report are designed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare two finished tours on the same route and note guide, jeep and tip differences, so margin drift on similar trips shows.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of writing every tour cost in one notebook after return, so pricing decisions use real trip spend.",
+          "review": true
+        }
+      ]
     },
     {
       "id": "p5_info_lost_in_whatsapp",
@@ -103,7 +143,17 @@
         "tool_words": []
       },
       "ask_first": "Changes abhi driver tak kaise pohnchti hain?",
-      "free_stops": "The run sheet and change flow are set out in the solution document."
+      "free_stops": "The run sheet and change flow are set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Look at recent tour changes and note which ones reached the guide but missed the driver, so the weak handover point stands out.",
+          "review": false
+        },
+        {
+          "text": "Make one operations person responsible for passing every agent change to drivers and guides, so no update stops halfway.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_receivables_late",
@@ -124,7 +174,17 @@
         "tool_words": []
       },
       "ask_first": "Sab se late kaun se agents pay karte hain?",
-      "free_stops": "Reminder timing and the cash view are worked out in the solution document."
+      "free_stops": "Reminder timing and the cash view are worked out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare payment delays by agent against the tours already completed once, so the slowest payers are obvious before new departures.",
+          "review": true
+        },
+        {
+          "text": "Keep one receivables list with one staff member updating due and received dates, so follow-up happens on time every week.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_reviews_bad",
@@ -144,7 +204,17 @@
         "tool_words": []
       },
       "ask_first": "Reviews zyada Google pe aate hain ya TripAdvisor pe?",
-      "free_stops": "The feedback questions and request timing are designed in the solution document."
+      "free_stops": "The feedback questions and request timing are designed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare mixed reviews by tour type and guide once, so you see where service slips are hurting future enquiries.",
+          "review": false
+        },
+        {
+          "text": "Give one person a fixed weekly slot to reply to reviews, so your public page stops looking unattended to new guests.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_cash_leakage",
@@ -164,7 +234,17 @@
         "tool_words": []
       },
       "ask_first": "Guides tour pe kitna cash collect karte hain, kaun se services ka?",
-      "free_stops": "The reconciliation rules are set out in the solution document."
+      "free_stops": "The reconciliation rules are set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare guide cash handovers with the tours finished that week once, so missing amounts or late deposits stand out quickly.",
+          "review": false
+        },
+        {
+          "text": "Set one handover time and one office person to record every guide collection, so tour cash reaches the business the same way each time.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_campaign_roi_unknown",
@@ -185,7 +265,17 @@
         "tool_words": []
       },
       "ask_first": "Bookings zyada Instagram se aati hain ya agents se?",
-      "free_stops": "How codes are set per channel is designed in the solution document."
+      "free_stops": "How codes are set per channel is designed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare this week's enquiries with the posts published before them once, so you see which themes lead to real booking conversations.",
+          "review": false
+        },
+        {
+          "text": "Give one person a single notebook to mark each enquiry source daily, so posting choices follow what actually brings leads.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p10_seasonal_planning",
@@ -206,7 +296,17 @@
         "tool_words": []
       },
       "ask_first": "Off-season mein kaun se mahine sab se khaali hote hain?",
-      "free_stops": "The offer timing and audience groups are worked out in the solution document."
+      "free_stops": "The offer timing and audience groups are worked out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare quiet-month enquiries with vehicles and staff sitting idle once, so you see which capacity goes unused longest.",
+          "review": false
+        },
+        {
+          "text": "Give one person a weekly off-season offers list by route and vehicle type, so idle days get pitched instead of wasted.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

@@ -2,7 +2,7 @@
   "industry": "commission_agents_in_grain_fruit_and_vegetable_mandis",
   "name": "Commission agents (arhti) in grain, fruit and vegetable mandis",
   "sector": "7.C Agriculture, livestock and rural (part 2)",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_complaints",
@@ -22,7 +22,17 @@
         "tool_words": []
       },
       "ask_first": "Who writes the rate at the time of boli?",
-      "free_stops": "How the digital parchi is set up for your shop goes in the solution document."
+      "free_stops": "How the digital parchi is set up for your shop goes in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note each lot's boli and final sale on the same page for one market day, so any shortfall against the boli is clear.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of calling out the boli while another writes it beside the lot, so later complaints have a same-time record.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_manual_work",
@@ -42,7 +52,17 @@
         "tool_words": []
       },
       "ask_first": "How many munshis write parchis?",
-      "free_stops": "How entries flow to the ledgers is detailed in the solution document."
+      "free_stops": "How entries flow to the ledgers is detailed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many parchis are rewritten in one week and note when they go missing, so the weak point in handling shows.",
+          "review": false
+        },
+        {
+          "text": "Give one tray or folder as the only place for fresh parchis until bahi entry, so loose papers stop drifting around the phari.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_credit_customers",
@@ -62,7 +82,17 @@
         "tool_words": []
       },
       "ask_first": "Roughly how much of your selling is on credit?",
-      "free_stops": "Limits and reminder rules are kept for the solution document."
+      "free_stops": "Limits and reminder rules are kept for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many buyers took maal again while an older balance was still open, so repeat credit exposure in the season shows.",
+          "review": true
+        },
+        {
+          "text": "Keep one closing-time register of outstanding buyer accounts under one staff member, so fresh maal leaves only after balances are checked.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_receivables_late",
@@ -82,7 +112,17 @@
         "tool_words": []
       },
       "ask_first": "How do you keep track of peshgi now?",
-      "free_stops": "How advances and arrivals are linked goes in the solution document."
+      "free_stops": "How advances and arrivals are linked goes in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many peshgi accounts brought crop through your phari this week and how many did not, so the leakage around advances is clearer.",
+          "review": false
+        },
+        {
+          "text": "Keep one peshgi notebook with one person updating it whenever any farmer’s crop reaches your phari, so follow-up stays tied to arrivals.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_cash_mismatch",
@@ -102,7 +142,17 @@
         "tool_words": []
       },
       "ask_first": "Who handles cash at the shop?",
-      "free_stops": "How the cash close is built is part of the solution document."
+      "free_stops": "How the cash close is built is part of the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare the phari cash total with the bahi total at the same closing time each night, so the mismatch day becomes visible.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of noting each cash payout in one notebook beside the bahi, so night matching has fewer missed entries.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_pricing_errors",
@@ -122,7 +172,17 @@
         "tool_words": []
       },
       "ask_first": "Which deduction causes the most disputes?",
-      "free_stops": "How the rules are set up in the calculator is detailed in the solution document."
+      "free_stops": "How the rules are set up in the calculator is detailed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare a handful of parchis for the same kind of deduction this week, so you can see where amounts are changing between munshis.",
+          "review": false
+        },
+        {
+          "text": "Give one munshi the job of checking deduction lines before parchis leave the desk, so the same rule is applied each time.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_manual_reports",
@@ -142,7 +202,17 @@
         "tool_words": []
       },
       "ask_first": "How often do you settle with farmers?",
-      "free_stops": "The statement design goes in the solution document."
+      "free_stops": "The statement design goes in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many times farmers ask for statements in one week and note which accounts take longest, so the slowest work is obvious.",
+          "review": false
+        },
+        {
+          "text": "Keep one dedicated page for each active account in one notebook, so statement requests are answered from an already running record.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_orders_lost",
@@ -162,7 +232,17 @@
         "tool_words": []
       },
       "ask_first": "How many outside buyers order regularly?",
-      "free_stops": "How orders link to dispatch is kept for the solution document."
+      "free_stops": "How orders link to dispatch is kept for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count outside orders received and compare them with dispatches for the same day, so missed orders are spotted before buyers complain.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of writing every outside order in one notebook as it arrives, so dispatch works from one complete list.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_data_loss",
@@ -182,7 +262,17 @@
         "tool_words": []
       },
       "ask_first": "Does anyone else in the family use the bahi?",
-      "free_stops": "How the move from bahi happens is detailed in the solution document."
+      "free_stops": "How the move from bahi happens is detailed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many bahi pages are fully updated by closing each week, so you know exactly how much work would be lost.",
+          "review": false
+        },
+        {
+          "text": "Set a fixed weekly time for one staff member to capture the latest bahi pages into one kept record, so loss is limited to a shorter span.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p10_succession_family",
@@ -205,7 +295,17 @@
         "leads_with_view": true
       },
       "ask_first": "Who in the family runs the shop day to day?",
-      "free_stops": "How the side-by-side transition is run goes in the solution document."
+      "free_stops": "How the side-by-side transition is run goes in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many entries in one busy day are read back from the bahi before action, so both generations see where trust is needed.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of marking each matched bahi and new entry before closing, so comparison stays orderly during the trial.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

@@ -2,7 +2,7 @@
   "industry": "sports_clubs_academies_and_turf_court_rentals",
   "name": "Sports clubs, academies and turf/court rentals",
   "sector": "7.H Hospitality, events and personal services",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_booking_appointments",
@@ -22,7 +22,17 @@
         "tool_words": []
       },
       "ask_first": "How many courts or turfs do you have?",
-      "free_stops": "Booking flow and slot rules per court go in the solution document."
+      "free_stops": "Booking flow and slot rules per court go in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare this week's double-booked slot clashes with the total slots sold, so you see how often chat bookings create overlaps.",
+          "review": false
+        },
+        {
+          "text": "Write every confirmed slot in one booking notebook kept at the desk, so staff stop selling the same hour twice.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_conversion_low",
@@ -42,7 +52,17 @@
         "tool_words": []
       },
       "ask_first": "Do you take any advance for slots now?",
-      "free_stops": "Advance rules and waitlist handling are in the solution document."
+      "free_stops": "Advance rules and waitlist handling are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note which late-night bookings actually arrived this week, so you see which days and groups waste your best hours.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member the late-slot callback list each afternoon, so empty night hours get refilled before kickoff.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_cash_handling_risk",
@@ -62,7 +82,17 @@
         "tool_words": []
       },
       "ask_first": "How do most players pay?",
-      "free_stops": "Matching rules and payment flow stay for the solution document."
+      "free_stops": "Matching rules and payment flow stay for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare each advance noted for slots this week with what reached you, so missing collections stand out early.",
+          "review": false
+        },
+        {
+          "text": "Make one cash handover note for every advance received on site, so each slot payment is tied to the staff handoff.",
+          "review": true
+        }
+      ]
     },
     {
       "id": "p4_receivables_late",
@@ -82,7 +112,17 @@
         "tool_words": []
       },
       "ask_first": "How many students are enrolled?",
-      "free_stops": "Register setup and reminder timing are in the solution document."
+      "free_stops": "Register setup and reminder timing are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count unpaid academy fees by batch at the same time this week, so you see where late payment is concentrated.",
+          "review": true
+        },
+        {
+          "text": "Keep one fee notebook by batch and let one person update it daily, so payment status stays clear for every parent.",
+          "review": true
+        }
+      ]
     },
     {
       "id": "p5_commission_disputes",
@@ -102,7 +142,17 @@
         "tool_words": []
       },
       "ask_first": "Are coaches paid per session or salaried?",
-      "free_stops": "Check-in method and payout rules go in the solution document."
+      "free_stops": "Check-in method and payout rules go in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count sessions actually held this week by batch and compare them with coach claims, so disputed commission lines show clearly.",
+          "review": false
+        },
+        {
+          "text": "Keep one attendance and session log at the ground with one staff signer, so session counts stop changing later.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_utility_costs",
@@ -123,7 +173,17 @@
         "leads_with_view": true
       },
       "ask_first": "Do you have a separate meter for floodlights?",
-      "free_stops": "How usage is logged and costed is in the solution document."
+      "free_stops": "How usage is logged and costed is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note which late bookings used floodlights this week and which hours had lights on without play, so waste is separated from earning time.",
+          "review": false
+        },
+        {
+          "text": "Give one evening staff member the lights notebook and switch-off check, so unused floodlights stop running after slots end.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_maintenance_downtime",
@@ -143,7 +203,17 @@
         "tool_words": []
       },
       "ask_first": "What fails most often?",
-      "free_stops": "Asset list and service schedule stay for the solution document."
+      "free_stops": "Asset list and service schedule stay for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note every generator or light failure this month with the match time affected, so you see which fault causes most refunds.",
+          "review": false
+        },
+        {
+          "text": "Assign one pre-evening walk round to one staff member with one fault list, so known issues are raised before players arrive.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_churn_subscription",
@@ -163,7 +233,17 @@
         "tool_words": []
       },
       "ask_first": "When do students usually leave?",
-      "free_stops": "Note template and drop-off rules are in the solution document."
+      "free_stops": "Note template and drop-off rules are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count leavers from each academy batch this season and note when they left, so the weak retention period becomes visible.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member a weekly leavers list in one notebook, so follow-up reasons are captured while they are still fresh.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_manual_work",
@@ -185,7 +265,17 @@
         ]
       },
       "ask_first": "How many teams enter a typical tournament?",
-      "free_stops": "Module setup stays for the solution document."
+      "free_stops": "Module setup stays for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare paper registrations with group announcements before the next tournament, so you spot missing teams and conflicting fixture notes.",
+          "review": false
+        },
+        {
+          "text": "Keep one master tournament list with one person updating entries and fixtures, so matchday decisions come from one record.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p10_checklists_not_done",
@@ -205,7 +295,17 @@
         "tool_words": []
       },
       "ask_first": "What time do you close?",
-      "free_stops": "Checklist steps and timing are in the solution document."
+      "free_stops": "Checklist steps and timing are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many closings this week still have lights on or locks unchecked, so you see how often the miss happens.",
+          "review": false
+        },
+        {
+          "text": "Keep one closing sheet by the exit and give one night person the pen, so lockup gets finished before anyone leaves.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

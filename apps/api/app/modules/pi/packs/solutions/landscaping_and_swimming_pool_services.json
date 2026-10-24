@@ -2,7 +2,7 @@
   "industry": "landscaping_and_swimming_pool_services",
   "name": "Landscaping and swimming-pool services",
   "sector": "7.F Construction, real estate and facilities",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_accountability",
@@ -22,7 +22,17 @@
         "tool_words": []
       },
       "ask_first": "After a visit, does the team send anything back?",
-      "free_stops": "Check-in method and proof rules are in the solution document."
+      "free_stops": "Check-in method and proof rules are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare the morning route list with completed visit notes at day end, so missed villas are caught before complaints pile up.",
+          "review": false
+        },
+        {
+          "text": "Make one supervisor own the daily completion list in one notebook, so every skipped villa gets chased the same day.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_record_keeping",
@@ -45,7 +55,17 @@
         ]
       },
       "ask_first": "How many pools do you service each week?",
-      "free_stops": "Log fields and summary format are in the solution document."
+      "free_stops": "Log fields and summary format are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count completed pool visits that have a same day service note in one place, so missing proof is obvious while details are fresh.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of collecting each day's pool service notes into one notebook, so proof is ready when disputes start.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_route_planning",
@@ -65,7 +85,17 @@
         "tool_words": []
       },
       "ask_first": "How many teams and vehicles do you have?",
-      "free_stops": "Routing logic is in the solution document."
+      "free_stops": "Routing logic is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Write each team's actual driving detours beside the planned round for a week, so wasted cross city running stands out clearly.",
+          "review": false
+        },
+        {
+          "text": "Give one dispatcher the weekly area plan in one notebook, so teams stop being sent back across the city.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_shrinkage_theft",
@@ -85,7 +115,17 @@
         "tool_words": []
       },
       "ask_first": "How are chemicals given to teams?",
-      "free_stops": "Usage rules are in the solution document; dosing stays with trained technicians and product labels."
+      "free_stops": "Usage rules are in the solution document; dosing stays with trained technicians and product labels.",
+      "extra_ideas": [
+        {
+          "text": "Compare weekly stock issued to each team with visits completed that week, so unusual drawdowns stand out for checking.",
+          "review": false
+        },
+        {
+          "text": "Give one storekeeper one notebook for every stock issue by team and day, so each handover has a clear owner.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_maintenance_downtime",
@@ -105,7 +145,17 @@
         "tool_words": []
       },
       "ask_first": "How do clients report a broken sprinkler or pump?",
-      "free_stops": "Ticket flow is in the solution document; electrical work on pumps stays with a qualified electrician."
+      "free_stops": "Ticket flow is in the solution document; electrical work on pumps stays with a qualified electrician.",
+      "extra_ideas": [
+        {
+          "text": "Count how many irrigation faults sit overnight before anyone responds, so the slow handoff causing plant loss is clear.",
+          "review": false
+        },
+        {
+          "text": "Make one person own a single fault list checked at a fixed time daily, so breakdowns stop waiting unseen.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_unbilled_variations",
@@ -125,7 +175,17 @@
         "tool_words": []
       },
       "ask_first": "How are extras agreed now?",
-      "free_stops": "Approval flow is in the solution document."
+      "free_stops": "Approval flow is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count site extras done this week against extras written into job notes, so unpaid work leaking from jobs is visible.",
+          "review": false
+        },
+        {
+          "text": "Give one supervisor the job of writing every approved extra in one notebook before work starts, so billing has something to point to.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_churn_subscription",
@@ -145,7 +205,17 @@
         "tool_words": []
       },
       "ask_first": "What usually makes a client leave?",
-      "free_stops": "Alert timing and the renewal workflow are in the solution document."
+      "free_stops": "Alert timing and the renewal workflow are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Look at which contracts end soon and have had recent complaints or missed visits, so likely losses are easier to prioritise.",
+          "review": false
+        },
+        {
+          "text": "Give one person one notebook of contract end months reviewed at a fixed weekly time, so renewals stop being missed.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_receivables_late",
@@ -165,7 +235,17 @@
         "tool_words": []
       },
       "ask_first": "Which type of client is slowest to pay?",
-      "free_stops": "Reminder schedule is in the solution document."
+      "free_stops": "Reminder schedule is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare unpaid invoices that have visit proof ready with those still missing proof, so avoidable approval delays become easier to spot.",
+          "review": false
+        },
+        {
+          "text": "Give one person one list of unpaid invoices reviewed at the same time each week, so follow ups stop slipping.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_seasonal_dip",
@@ -185,7 +265,17 @@
         "tool_words": []
       },
       "ask_first": "What do the teams do in the quiet months?",
-      "free_stops": "Campaign timing is in the solution document."
+      "free_stops": "Campaign timing is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note which winter weeks had the fewest pool visits last season, so you can see the slack periods to fill.",
+          "review": false
+        },
+        {
+          "text": "Give one person one notebook for off season work leads from past clients, so quiet weeks have a live list to call.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p10_margin_unknown",
@@ -206,7 +296,17 @@
         "leads_with_view": true
       },
       "ask_first": "Roughly how many maintenance clients do you visit each week?",
-      "free_stops": "Cost allocation is in the solution document."
+      "free_stops": "Cost allocation is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note travel time, time on site, and materials used for a few recurring contracts, so weak contracts stand out fast.",
+          "review": false
+        },
+        {
+          "text": "Give one person a single notebook for all extra labour and materials by contract, so renewal talks use facts not guesses.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

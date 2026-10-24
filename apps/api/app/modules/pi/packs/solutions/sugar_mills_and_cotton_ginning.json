@@ -2,7 +2,7 @@
   "industry": "sugar_mills_and_cotton_ginning",
   "name": "Sugar mills and cotton ginning",
   "sector": "7.C Agriculture, livestock and rural (part 2)",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_bottleneck",
@@ -24,7 +24,17 @@
         ]
       },
       "ask_first": "Where does the longest wait happen today?",
-      "free_stops": "How tokens and timing are managed goes in the solution document."
+      "free_stops": "How tokens and timing are managed goes in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare how long trolleys wait at unloading, weighment and yard entry for one busy day, so the true choke point is clear.",
+          "review": false
+        },
+        {
+          "text": "Give one yard clerk the job of keeping a single arrival line on paper, so trolley movement follows one order all day.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_complaints",
@@ -44,7 +54,17 @@
         "tool_words": []
       },
       "ask_first": "How do growers see their weights now?",
-      "free_stops": "How weighment messages are generated is part of the solution document."
+      "free_stops": "How weighment messages are generated is part of the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note how many weight disputes happen on each shift this week, so you see when mistrust rises most.",
+          "review": false
+        },
+        {
+          "text": "Give one weighbridge person the job of showing and noting each final reading, so fewer loads turn into arguments at the bridge.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_duplicate_entry",
@@ -64,7 +84,17 @@
         "tool_words": []
       },
       "ask_first": "Which systems hold CPRs and payments?",
-      "free_stops": "How the two systems connect is detailed in the solution document."
+      "free_stops": "How the two systems connect is detailed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare one day's CPR entries with the same day's payment entries line by line, so the mismatch pattern is obvious.",
+          "review": true
+        },
+        {
+          "text": "Give one clerk one master register for CPR reference beside payment posting, so both records follow the same source each day.",
+          "review": true
+        }
+      ]
     },
     {
       "id": "p4_fraud",
@@ -87,7 +117,17 @@
         "leads_with_view": true
       },
       "ask_first": "How many purchase centres do you run?",
-      "free_stops": "What the dashboard tracks is kept for the solution document."
+      "free_stops": "What the dashboard tracks is kept for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many queue order complaints come from each purchase centre this week, so you see where control is weakest.",
+          "review": false
+        },
+        {
+          "text": "Give one head office caller the job of checking the first and last trolley served daily, so queue order gets watched routinely.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_maintenance_downtime",
@@ -108,7 +148,17 @@
         "leads_with_view": true
       },
       "ask_first": "How are breakdowns recorded now?",
-      "free_stops": "The downtime log design goes in the solution document."
+      "free_stops": "The downtime log design goes in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note which section causes the longest unplanned stop during each shift this week, so repeat breakdown trouble stands out fast.",
+          "review": false
+        },
+        {
+          "text": "Give one shift engineer one stoppage log kept in the control room, so every breakdown gets handed over with the cause noted.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_shrinkage_theft",
@@ -128,7 +178,17 @@
         "tool_words": []
       },
       "ask_first": "Who authorises tanker releases?",
-      "free_stops": "How tanker records are matched is part of the solution document."
+      "free_stops": "How tanker records are matched is part of the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count tanker exits against the day's molasses dispatch notes for one week, so missing load records show up quickly.",
+          "review": false
+        },
+        {
+          "text": "Give one gate person one dispatch notebook for every tanker leaving, so outbound loads are counted from one place each day.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_receivables_late",
@@ -148,7 +208,17 @@
         "tool_words": []
       },
       "ask_first": "How long do buyers usually take to pay?",
-      "free_stops": "Reminder rules are set out in the solution document."
+      "free_stops": "Reminder rules are set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare which buyers pay latest against the dates goods left the gate, so slow accounts stop blending into the rest.",
+          "review": false
+        },
+        {
+          "text": "Give one office person a fixed weekly calling hour for overdue buyers, so follow up happens regularly before balances age further.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_supplier_quality",
@@ -168,7 +238,17 @@
         "tool_words": []
       },
       "ask_first": "Who decides the deduction now?",
-      "free_stops": "How deductions are recorded and shared goes in the solution document."
+      "free_stops": "How deductions are recorded and shared goes in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note which purchase point creates the most trash deduction arguments this week, so you know where checking is least consistent.",
+          "review": false
+        },
+        {
+          "text": "Give one grader one deductions register kept at the buying table, so every quality call is written in the same place immediately.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_manual_reports",
@@ -188,7 +268,17 @@
         "tool_words": []
       },
       "ask_first": "How long does the report take now?",
-      "free_stops": "Report contents and data sources are kept for the solution document."
+      "free_stops": "Report contents and data sources are kept for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count which daily crushing figures arrive last each evening, so you know exactly what delays the board report.",
+          "review": false
+        },
+        {
+          "text": "Give one office person the job of collecting all section figures at one fixed time, so report making stops drifting across the night.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p10_training",
@@ -208,7 +298,17 @@
         "tool_words": []
       },
       "ask_first": "How many people do you add each season?",
-      "free_stops": "The onboarding content and flow are detailed in the solution document."
+      "free_stops": "The onboarding content and flow are detailed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count the mistakes new seasonal staff repeat most during one shift, so this year's training covers the weak spots sooner.",
+          "review": false
+        },
+        {
+          "text": "Give one supervisor a notebook for starter points at shift change, so each batch learns the same essentials every season.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

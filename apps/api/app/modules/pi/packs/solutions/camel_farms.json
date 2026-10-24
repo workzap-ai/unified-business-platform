@@ -2,7 +2,7 @@
   "industry": "camel_farms",
   "name": "Camel farms (UAE and Cholistan)",
   "sector": "7.C Agriculture, livestock and rural (part 1)",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_no_yield_per_animal",
@@ -22,7 +22,17 @@
         "tool_words": []
       },
       "ask_first": "How many camels are in milk right now?",
-      "free_stops": "How entries are set up per camel and how drops are flagged goes in the solution document."
+      "free_stops": "How entries are set up per camel and how drops are flagged goes in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare each milking camel's bucket amount once this week against the tank total, so low-yield animals stop hiding inside one number.",
+          "review": false
+        },
+        {
+          "text": "Give one milker one notebook page for camel names and amounts each milking, so daily yield stays tied to each animal.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_rejections",
@@ -42,7 +52,17 @@
         "tool_words": []
       },
       "ask_first": "Does the collector give any reason today?",
-      "free_stops": "How rejections are logged and compared stays in the solution document."
+      "free_stops": "How rejections are logged and compared stays in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Write down each rejected milk collection with the stated reason and amount refused, so you can see which problem repeats most.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of logging every collector complaint in one notebook, so reasons stop getting lost between calls.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_delivery_late",
@@ -62,7 +82,17 @@
         "tool_words": []
       },
       "ask_first": "How many delivery routes run each day?",
-      "free_stops": "Route timing rules and alerts are detailed in the solution document."
+      "free_stops": "Route timing rules and alerts are detailed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note the milking finish time beside the van departure time each day, so you can see where summer delay really starts.",
+          "review": false
+        },
+        {
+          "text": "Give one driver one departure notebook kept by the keys, so late trips are handed over clearly every day.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_churn_subscription",
@@ -82,7 +112,17 @@
         "tool_words": []
       },
       "ask_first": "Do customers order daily, weekly or as they need?",
-      "free_stops": "When a customer counts as \"gone quiet\" and the follow-up flow go in the solution document."
+      "free_stops": "When a customer counts as \"gone quiet\" and the follow-up flow go in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many regular homes missed their usual order this week, so the drop in repeat buying is clear.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member one list of regular homes to update after rounds, so follow-up stays part of delivery routine.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_count_mismatch",
@@ -102,7 +142,17 @@
         "tool_words": []
       },
       "ask_first": "Who receives hay deliveries at the ezba?",
-      "free_stops": "The delivery log and cost-per-camel view stay in the solution document."
+      "free_stops": "The delivery log and cost-per-camel view stay in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare the delivery note with the bales stacked on the ground before unloading ends, so shortages are caught while the truck is there.",
+          "review": false
+        },
+        {
+          "text": "Give one worker the arrival count and one notebook by the gate, so every hay load is checked the same way.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_stray_lost_animals",
@@ -122,7 +172,17 @@
         "tool_words": []
       },
       "ask_first": "Do herders have phone signal in the grazing areas?",
-      "free_stops": "Check-in timing and the stray log design are set out in the solution document."
+      "free_stops": "Check-in timing and the stray log design are set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note where and when each herd was last counted at dusk this week, so search starts from the freshest place.",
+          "review": false
+        },
+        {
+          "text": "Give one herder the dusk headcount and one shared notebook in camp, so missing camels are spotted before days are lost.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_hidden_costs",
@@ -142,7 +202,17 @@
         "tool_words": []
       },
       "ask_first": "How many camels race or show each season?",
-      "free_stops": "What's tracked per camel and how it's compared goes in the solution document."
+      "free_stops": "What's tracked per camel and how it's compared goes in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Put each racing camel's transport, entry and care spending on one page this week, so heavy spenders stand out quickly.",
+          "review": false
+        },
+        {
+          "text": "Give one person one notebook for every racing camel expense as it happens, so cost tracking survives busy travel days.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_succession_family",
@@ -162,7 +232,17 @@
         "tool_words": []
       },
       "ask_first": "How many family members share the herd?",
-      "free_stops": "The ledger structure and who sees what stay in the solution document."
+      "free_stops": "The ledger structure and who sees what stay in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Walk the herd once and note which animals more than one brother claims, so the overlap is visible before arguments grow.",
+          "review": false
+        },
+        {
+          "text": "Give one family member one herd list kept in one place for ownership notes, so disputes stop restarting from memory.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_petty_cash",
@@ -184,7 +264,17 @@
         ]
       },
       "ask_first": "How many staff handle cash for the farm?",
-      "free_stops": "Float rules and approvals are detailed in the solution document."
+      "free_stops": "Float rules and approvals are detailed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare cash given for supplies with items actually brought back this week, so the size of the missing proof is clear.",
+          "review": false
+        },
+        {
+          "text": "Give one herder one notebook page for each cash handover and return, so supply money has a clear trail.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p10_owner_blind",
@@ -204,7 +294,17 @@
         "tool_words": []
       },
       "ask_first": "If you could see one number every morning, what would it be?",
-      "free_stops": "What goes into the morning read is worked out in the solution document."
+      "free_stops": "What goes into the morning read is worked out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note how many days pass between a farm issue happening and you hearing it, so weekend surprises shrink.",
+          "review": false
+        },
+        {
+          "text": "Give one worker the job of sending one notebook page photo at sunset, so the farm stops going quiet midweek.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

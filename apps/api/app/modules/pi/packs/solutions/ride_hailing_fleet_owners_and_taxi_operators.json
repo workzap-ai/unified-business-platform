@@ -2,7 +2,7 @@
   "industry": "ride_hailing_fleet_owners_and_taxi_operators",
   "name": "Ride-hailing fleet owners and taxi operators",
   "sector": "7.G Transport, mobility and aviation (part 2)",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_cash_mismatch",
@@ -25,7 +25,17 @@
         ]
       },
       "ask_first": "How often do you settle with drivers, daily or weekly?",
-      "free_stops": "How payouts are combined and settlements calculated is in the solution document."
+      "free_stops": "How payouts are combined and settlements calculated is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "For one settlement round, count cash trips and card trips separately for each car, so arguments narrow to one side.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member the settlement notebook and closing time each day, so every driver is checked the same way.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_receivables_late",
@@ -45,7 +55,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "Limits and alert steps are in the solution document."
+      "free_stops": "Limits and alert steps are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note which cars are overdue by one cycle and which by longer, so you see where arrears are stacking up.",
+          "review": false
+        },
+        {
+          "text": "Give one person the arrears list and a fixed review time each week, so late rent gets chased consistently.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_no_dashboard",
@@ -65,7 +85,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The measures and sources used are in the solution document."
+      "free_stops": "The measures and sources used are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "For one week, note each car's key handover time and return time, so actual working hours stop being guessed.",
+          "review": false
+        },
+        {
+          "text": "Give the key handover notebook to one shift lead at every changeover, so each car's worked time gets captured.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_fraud",
@@ -86,7 +116,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "How gaps are flagged is in the solution document."
+      "free_stops": "How gaps are flagged is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "For one week, compare each car's fuel fills with its shift distance, so cars needing a closer look stand out.",
+          "review": false
+        },
+        {
+          "text": "Make one supervisor note fuel slips and end shift kilometres in one notebook, so fuel checks stop getting missed.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_maintenance_downtime",
@@ -107,7 +147,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "Service intervals and tracking are in the solution document."
+      "free_stops": "Service intervals and tracking are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Walk around every car this week and note tyres, oil leaks and warning lights, so overdue attention becomes visible.",
+          "review": false
+        },
+        {
+          "text": "Give one person the car care list and a fixed check time each week, so skipped maintenance gets caught earlier.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_no_sop",
@@ -127,7 +177,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The incident steps are in the solution document; insurance questions are for your insurer or lawyer."
+      "free_stops": "The incident steps are in the solution document; insurance questions are for your insurer or lawyer.",
+      "extra_ideas": [
+        {
+          "text": "Count how many past accident cases still have unclear costs or missing notes, so the confusion has a clear size.",
+          "review": false
+        },
+        {
+          "text": "Give one owner representative every accident handover note in one notebook, so follow up stays with one responsible person.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_receivables_late",
@@ -147,7 +207,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "How matching works is in the solution document."
+      "free_stops": "How matching works is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare fine dates with your car shift record for the past few cases, so weak handovers around driver exits show up.",
+          "review": false
+        },
+        {
+          "text": "Give one person the departing driver check on the last car return, so outstanding fines are reviewed before handover ends.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_licences_renewals",
@@ -167,7 +237,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "Reminder timings are in the solution document."
+      "free_stops": "Reminder timings are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Look through all vehicle papers once and note which renewals fall soonest, so urgent cars are obvious this week.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member one renewal notebook and a fixed weekly review time, so vehicle papers stop being missed.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_info_lost_in_whatsapp",
@@ -188,7 +268,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "How messages and handovers are set up is in the solution document."
+      "free_stops": "How messages and handovers are set up is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many driver issues from this week needed old messages searched again, so the rework from buried chats is clear.",
+          "review": false
+        },
+        {
+          "text": "Give one person one written issues list updated at a fixed time daily, so important follow ups stop sinking in chat.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

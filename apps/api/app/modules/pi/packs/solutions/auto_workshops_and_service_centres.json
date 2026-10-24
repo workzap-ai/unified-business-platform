@@ -2,7 +2,7 @@
   "industry": "auto_workshops_and_service_centres",
   "name": "Auto workshops and service centres",
   "sector": "7.G Transport, mobility and aviation (part 2)",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_complaints",
@@ -23,7 +23,17 @@
         "tool_words": []
       },
       "ask_first": "Is the estimate written today, or given verbally?",
-      "free_stops": "The approval flow and job card layout are in the solution document."
+      "free_stops": "The approval flow and job card layout are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count this week's jobs where the final bill changed after approval, so you see how often surprise extras are starting arguments.",
+          "review": false
+        },
+        {
+          "text": "Keep one written extras list at the front desk under one person's watch, so added work gets agreed before the bill grows.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_supplier_late",
@@ -43,7 +53,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "Supplier records and alert rules are in the solution document."
+      "free_stops": "Supplier records and alert rules are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note each waiting car, promised part date and actual arrival in one page this week, so delay patterns by supplier become visible.",
+          "review": false
+        },
+        {
+          "text": "Give one person the waiting-parts board and customer update call at the same time daily, so parked cars get chased consistently.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_rework",
@@ -63,7 +83,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "How comebacks are classified and reviewed is in the solution document."
+      "free_stops": "How comebacks are classified and reviewed is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count this week's comeback jobs by original repair type, so you can spot where repeat work is eating bay time.",
+          "review": false
+        },
+        {
+          "text": "Assign one person to review every comeback with the original job card before new work starts, so repeat issues are handled with context.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_performance_unknown",
@@ -84,7 +114,17 @@
         "leads_with_view": true
       },
       "ask_first": "",
-      "free_stops": "The measures used and how they're shown are in the solution document."
+      "free_stops": "The measures used and how they're shown are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare each mechanic's started jobs against finished jobs this week, so idle time and handover delays show up clearly.",
+          "review": false
+        },
+        {
+          "text": "Make one person update a single bay board whenever a job moves stage, so workload stops being guessed by who looks busy.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_shrinkage_theft",
@@ -105,7 +145,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "Issue rules and count routines are in the solution document."
+      "free_stops": "Issue rules and count routines are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare this week's billed parts against parts taken to open jobs, so you can see where stock leaves without sales.",
+          "review": false
+        },
+        {
+          "text": "Give one storekeeper the only stock issue notebook beside the parts shelf, so every part taken gets tied to a job.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_customer_communication",
@@ -125,7 +175,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "Message timing and triggers are in the solution document."
+      "free_stops": "Message timing and triggers are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many ready-status calls come in before noon each day, so you see when silence from the workshop is driving interruptions.",
+          "review": false
+        },
+        {
+          "text": "Set one fixed update time daily for all waiting cars under one staff member, so incoming calls stop breaking the front desk flow.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_receivables_late",
@@ -145,7 +205,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "Statement timing and reminder steps are in the solution document; credit terms are for your accountant."
+      "free_stops": "Statement timing and reminder steps are in the solution document; credit terms are for your accountant.",
+      "extra_ideas": [
+        {
+          "text": "Compare open fleet invoices by company and by oldest month this week, so you can see which accounts are blocking cash longest.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member one notebook for all fleet follow-ups every afternoon, so collection chasing happens regularly without scattered notes.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_checklists_not_done",
@@ -165,7 +235,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The photo routine and storage are in the solution document."
+      "free_stops": "The photo routine and storage are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count this week's check-ins with no arrival photos before work begins, so you know how often missing proof is feeding scratch disputes.",
+          "review": false
+        },
+        {
+          "text": "Make reception own one arrival condition log for every vehicle at handover, so photo proof gets captured before the keys move inside.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_cash_mismatch",
@@ -185,7 +265,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The cash-up steps are in the solution document."
+      "free_stops": "The cash-up steps are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare today's closed job cards with today's cash and billed amounts at closing, so the shortfall is narrowed to the same day.",
+          "review": false
+        },
+        {
+          "text": "Give one person the closing cash check and one notebook for differences, so missing money is flagged before the next shift starts.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p10_repeat_low",
@@ -206,7 +296,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "Reminder timing and booking setup are in the solution document."
+      "free_stops": "Reminder timing and booking setup are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Mark this week's oil change customers in one notebook, so you can see how many past visits never turned into another booking.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member a daily callback list for past oil change customers, so your workshop stays top of mind between services.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

@@ -2,7 +2,7 @@
   "industry": "pharmacies_and_medical_stores",
   "name": "Pharmacies and medical stores",
   "sector": "7.A Retail and consumer (part 2)",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_expiry_wastage",
@@ -22,7 +22,17 @@
         "tool_words": []
       },
       "ask_first": "How do you find out what's near expiry today?",
-      "free_stops": "alert timing and the return process are kept for the solution document."
+      "free_stops": "alert timing and the return process are kept for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many packs on one fast moving shelf expire sooner than the packs behind them, so avoidable expiry waste becomes visible.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member the weekly near expiry shelf walk and one notebook page, so older packs get noticed before they pile up.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_stockout",
@@ -43,7 +53,17 @@
         "tool_words": []
       },
       "ask_first": "How many distributors do you buy from?",
-      "free_stops": "the shortage workflow goes in the solution document."
+      "free_stops": "the shortage workflow goes in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note each medicine customers ask for but you cannot supply during one busy day, so you see which gaps send people elsewhere.",
+          "review": true
+        },
+        {
+          "text": "Keep one shortage notebook at the counter and assign one person each shift to update it, so reordering follows the same routine.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_price_comparison",
@@ -64,7 +84,17 @@
         "leads_with_view": true
       },
       "ask_first": "How do you decide who to order from each day?",
-      "free_stops": "the comparison method is kept for the solution document."
+      "free_stops": "the comparison method is kept for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare the same small basket of regularly bought items across recent distributor invoices, so you spot where schemes still leave you paying more.",
+          "review": false
+        },
+        {
+          "text": "Keep one buyer notebook with a page per regular item, so supplier comparisons stay together when purchase calls happen.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_serial_batch_tracking",
@@ -85,7 +115,17 @@
         "tool_words": []
       },
       "ask_first": "Is batch recorded anywhere when stock comes in?",
-      "free_stops": "the receiving and recall process goes in the solution document."
+      "free_stops": "the receiving and recall process goes in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Check one recent supplier delivery against what was written down for batches, so you see exactly where recall tracing breaks.",
+          "review": false
+        },
+        {
+          "text": "Make the receiver write batches in one receiving book before shelves are filled, so recall checks start from one reliable place.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_checklists_not_done",
@@ -105,7 +145,17 @@
         "tool_words": []
       },
       "ask_first": "Who checks the fridge today?",
-      "free_stops": "reminder and alert setup is kept for the solution document; whether stock is safe is a question for your pharmacist or regulator."
+      "free_stops": "reminder and alert setup is kept for the solution document; whether stock is safe is a question for your pharmacist or regulator.",
+      "extra_ideas": [
+        {
+          "text": "Look at the recent fridge log and note which days or shifts were filled late, so the weak point is clear.",
+          "review": false
+        },
+        {
+          "text": "Assign one person per shift to complete and hand over the fridge log, so the record gets done on time each day.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_count_mismatch",
@@ -126,7 +176,17 @@
         "tool_words": []
       },
       "ask_first": "How often do you count stock?",
-      "free_stops": "the count rotation goes in the solution document."
+      "free_stops": "the count rotation goes in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare one shelf section pack by pack with the recorded count, so you see which product groups drift most.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member the same shelf section to recount on a fixed day, so mismatches stop moving around unnoticed.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_receivables_late",
@@ -147,7 +207,17 @@
         "tool_words": []
       },
       "ask_first": "Do you bill insurance?",
-      "free_stops": "the claim workflow is kept for the solution document."
+      "free_stops": "the claim workflow is kept for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Tally which support papers were missing on recent rejected claims, so you see the few admin misses that keep holding payment.",
+          "review": true
+        },
+        {
+          "text": "Keep each claim's support papers together in one dated store envelope, so staff stop losing pieces between counter and back office.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_cash_mismatch",
@@ -167,7 +237,17 @@
         "tool_words": []
       },
       "ask_first": "How many shifts do you run?",
-      "free_stops": "the close steps go in the solution document."
+      "free_stops": "the close steps go in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note which closing shift had a mismatch on each recent day, so you see whether the problem starts with a particular handover.",
+          "review": false
+        },
+        {
+          "text": "Give one closer the job of writing every cash difference in one notebook at shut time, so disputes at next opening reduce.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_info_lost_in_whatsapp",
@@ -189,7 +269,17 @@
         ]
       },
       "ask_first": "How do delivery orders reach you?",
-      "free_stops": "the intake flow is kept for the solution document."
+      "free_stops": "the intake flow is kept for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count delivery order messages received during one rush period and compare them with orders actually sent out, so missed chats are sized.",
+          "review": false
+        },
+        {
+          "text": "Give one counter staff member the delivery order notebook during busy hours, so message orders stop getting buried in rush traffic.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p10_licences_renewals",
@@ -209,7 +299,17 @@
         "tool_words": []
       },
       "ask_first": "How many branches hold licences?",
-      "free_stops": "the calendar setup goes in the solution document; what the rules require stays with your regulator or adviser."
+      "free_stops": "the calendar setup goes in the solution document; what the rules require stays with your regulator or adviser.",
+      "extra_ideas": [
+        {
+          "text": "Count how many renewal dates sit in drawers, frames, and message threads today, so inspection preparation stops starting with a paper hunt.",
+          "review": false
+        },
+        {
+          "text": "Keep every licence copy and renewal note in one labelled folder near the counter, so nobody scrambles across shifts before inspections.",
+          "review": true
+        }
+      ]
     }
   ],
   "never_say": [

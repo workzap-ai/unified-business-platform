@@ -2,7 +2,7 @@
   "industry": "corporate_events_and_exhibitions",
   "name": "Corporate events and exhibitions",
   "sector": "7.H Hospitality, events and personal services",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_receivables_late",
@@ -22,7 +22,17 @@
         "tool_words": []
       },
       "ask_first": "What payment terms do your clients usually agree?",
-      "free_stops": "Reminder timing and escalation steps are set out in the solution document."
+      "free_stops": "Reminder timing and escalation steps are set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note each event invoice beside the vendor payments already made for that same job, so the cash drain per client is clear.",
+          "review": true
+        },
+        {
+          "text": "Keep one notebook page for promised payment dates and give one staff member the follow up call slot, so overdue client promises stop slipping past.",
+          "review": true
+        }
+      ]
     },
     {
       "id": "p2_po_tracking",
@@ -42,7 +52,17 @@
         "tool_words": []
       },
       "ask_first": "How many active jobs are running without a PO?",
-      "free_stops": "The approval gate and what counts as approval are defined in the solution document."
+      "free_stops": "The approval gate and what counts as approval are defined in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count current jobs that started on verbal approval and still lack written backing, so you see how much live work is exposed.",
+          "review": false
+        },
+        {
+          "text": "Give one person one notebook list of jobs awaiting written approval, so fabrication start and paperwork are handed over clearly.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_cost_overruns",
@@ -63,7 +83,17 @@
         "leads_with_view": true
       },
       "ask_first": "Is fabrication done in your own workshop?",
-      "free_stops": "The cost lines and update flow are designed in the solution document."
+      "free_stops": "The cost lines and update flow are designed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare quoted and actual spend on recent stands by material, labor and transport, so the biggest budget leaks stand out fast.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of writing every extra cost against each stand daily, so overruns are caught before the job closes.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_shrinkage_theft",
@@ -83,7 +113,17 @@
         "tool_words": []
       },
       "ask_first": "How do you track what's out on site now?",
-      "free_stops": "Equipment lists, booking rules and damage notes stay for the solution document."
+      "free_stops": "Equipment lists, booking rules and damage notes stay for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count missing or damaged cables and accessories after each return by job, so you spot which event routines cause the losses.",
+          "review": false
+        },
+        {
+          "text": "Give one person one return notebook for all gear checked back after breakdown, so damage and missing items stop being argued later.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_approvals_slow",
@@ -103,7 +143,17 @@
         "tool_words": []
       },
       "ask_first": "Who on the client side usually holds up approvals?",
-      "free_stops": "Approval stages and reminder timing go in the solution document."
+      "free_stops": "Approval stages and reminder timing go in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note how many days each client takes to approve artwork, layout or branding, so rushed jobs can be linked to waiting time.",
+          "review": false
+        },
+        {
+          "text": "Give one person one approvals list reviewed at the same time daily, so delayed client signoff stops surprising the build team.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_info_lost_in_whatsapp",
@@ -123,7 +173,17 @@
         "tool_words": []
       },
       "ask_first": "How many people work on a typical build-up?",
-      "free_stops": "File structure and change alerts per role stay for the solution document."
+      "free_stops": "File structure and change alerts per role stay for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many client changes reached site after the crew had already started work, so the handover weak point shows.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of updating one current change list before crew call time, so last-minute edits reach the floor team.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_attendance_lateness",
@@ -144,7 +204,17 @@
         "tool_words": []
       },
       "ask_first": "How many crew are freelance?",
-      "free_stops": "Roster and overtime sign-off rules are in the solution document."
+      "free_stops": "Roster and overtime sign-off rules are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note who arrived late, who did not show and the disputed overtime by shift, so problem freelancers are easy to compare.",
+          "review": false
+        },
+        {
+          "text": "Give one supervisor one attendance page for each overnight build-up, so start and finish times are recorded the same way every time.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_documentation",
@@ -164,7 +234,17 @@
         "tool_words": []
       },
       "ask_first": "How many tenders do you send a month?",
-      "free_stops": "Library structure and tender checklists stay for the solution document."
+      "free_stops": "Library structure and tender checklists stay for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note which tender sections your team rewrites every time and how long each takes, so the slowest document work is obvious.",
+          "review": false
+        },
+        {
+          "text": "Give one person one place for standard company documents and past project notes, so tender work stops starting from scattered files.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_manual_work",
@@ -184,7 +264,17 @@
         "tool_words": []
       },
       "ask_first": "Do you run registration for clients or for your own expos?",
-      "free_stops": "The registration flow and how client data is handled stay for the solution document."
+      "free_stops": "The registration flow and how client data is handled stay for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count where the longest check-in queues formed and what details people kept asking for, so bottlenecks at registration are visible.",
+          "review": false
+        },
+        {
+          "text": "Give one person one master paper list for registration changes on the day, so desk staff stop working from conflicting versions.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p10_data_scattered",
@@ -206,7 +296,17 @@
         ]
       },
       "ask_first": "Do you run separate companies in each country?",
-      "free_stops": "What the dashboard pulls from each country is in the solution document."
+      "free_stops": "What the dashboard pulls from each country is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Write each live event and its latest cash in and cash out on one notebook page, so country-by-country pressure is clear.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of updating that page every evening, so your books stop drifting between Dubai and Pakistan jobs.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

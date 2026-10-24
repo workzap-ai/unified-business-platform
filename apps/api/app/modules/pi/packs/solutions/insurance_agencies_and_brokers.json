@@ -2,7 +2,7 @@
   "industry": "insurance_agencies_and_brokers",
   "name": "Insurance agencies and brokers",
   "sector": "7.L Finance-adjacent, energy and utilities",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_churn_subscription",
@@ -22,7 +22,17 @@
         "tool_words": []
       },
       "ask_first": "Roughly how many renewals come up in a normal month?",
-      "free_stops": "The reminder timings, the register layout and the customer message wording go in the solution document."
+      "free_stops": "The reminder timings, the register layout and the customer message wording go in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count last month's lapsed renewals and note who noticed each one first, so you can see where the handoff is failing.",
+          "review": false
+        },
+        {
+          "text": "Give one person the daily renewal due check at a fixed time, so missed dates stop surfacing only after lapse.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_data_scattered",
@@ -44,7 +54,17 @@
         ]
       },
       "ask_first": "Are the sheets split by agent, by line or by insurer?",
-      "free_stops": "How the sheets are merged and which fields matter for each line is detailed in the solution document."
+      "free_stops": "How the sheets are merged and which fields matter for each line is detailed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare the renewal dates for the same few files across all sheets, so you can see how often the lists disagree.",
+          "review": false
+        },
+        {
+          "text": "Keep one notebook beside the main desk for every renewal date change, so sheet updates come from one place each day.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_lead_followup_slow",
@@ -64,7 +84,17 @@
         "tool_words": []
       },
       "ask_first": "Where do most of your new enquiries come from?",
-      "free_stops": "Assignment rules, response timers and follow-up sequences are set out in the solution document."
+      "free_stops": "Assignment rules, response timers and follow-up sequences are set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note today's enquiry time and first callback time for each lead, so you can see how long replies really take.",
+          "review": false
+        },
+        {
+          "text": "Give one person each shift the callback list and handover, so new enquiries are owned the moment they arrive.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_bottleneck",
@@ -84,7 +114,17 @@
         "tool_words": []
       },
       "ask_first": "What part of getting a quote takes the longest?",
-      "free_stops": "The request format and chasing schedule are worked out in the solution document."
+      "free_stops": "The request format and chasing schedule are worked out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note when each quote request was sent and when each reply arrived, so the slowest chasers stand out by insurer.",
+          "review": false
+        },
+        {
+          "text": "Set one fixed chasing time daily for outstanding quote requests, so follow up happens before the inbox gets buried.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_campaign_roi_unknown",
@@ -104,7 +144,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "How codes are set up per platform and tied to policies is in the solution document."
+      "free_stops": "How codes are set up per platform and tied to policies is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count this week's new enquiries by where they said they found you, so policy sources stop being guesswork.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member the job of noting enquiry source on every new case, so each sale can be traced back later.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_commission_reconciliation",
@@ -124,7 +174,17 @@
         "tool_words": []
       },
       "ask_first": "Is it the amount or the timing of commission that causes more trouble?",
-      "free_stops": "The matching logic and ledger structure are covered in the solution document."
+      "free_stops": "The matching logic and ledger structure are covered in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note how many statement line items needed manual checking last cycle, so you can see where reconciliation effort is piling up.",
+          "review": false
+        },
+        {
+          "text": "Give one person a fixed weekly slot to collect all mismatch notes in one notebook, so follow ups stop getting scattered.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_commission_disputes",
@@ -144,7 +204,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "How the share rules are encoded and statements produced is in the solution document; pi does not decide who is right in any dispute."
+      "free_stops": "How the share rules are encoded and statements produced is in the solution document; pi does not decide who is right in any dispute.",
+      "extra_ideas": [
+        {
+          "text": "Note how many recent sales had more than one sub-agent claiming credit, so you can see how often the rule is tested.",
+          "review": true
+        },
+        {
+          "text": "Make one person write the introducer on the shared case list when the enquiry arrives, so payout arguments have an early record.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_info_lost_in_whatsapp",
@@ -164,7 +234,17 @@
         "tool_words": []
       },
       "ask_first": "Where do the documents for one claim usually end up?",
-      "free_stops": "The stage list, update rhythm and customer wording go in the solution document; pi never comments on claim outcomes."
+      "free_stops": "The stage list, update rhythm and customer wording go in the solution document; pi never comments on claim outcomes.",
+      "extra_ideas": [
+        {
+          "text": "Count open claims with no recorded next action today, so you can see why update requests keep piling up.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member a fixed afternoon claims roundup, so customers get updates from the latest office view.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_order_errors",
@@ -184,7 +264,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The request format and confirmation steps are detailed in the solution document."
+      "free_stops": "The request format and confirmation steps are detailed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare a few client change emails against what was actually sent on, so missed additions and deletions show up clearly.",
+          "review": false
+        },
+        {
+          "text": "Make one person maintain a single pending changes page for each corporate account, so requests stop getting lost across threads.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p10_no_dashboard",
@@ -204,7 +294,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "Which figures feed the screen and how they are pulled together is in the solution document."
+      "free_stops": "Which figures feed the screen and how they are pulled together is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count policies written this month by each line on one notebook page, so you can see which line lacks daily visibility.",
+          "review": false
+        },
+        {
+          "text": "Make one staff member update a single monthly page by line each afternoon, so month end totals are ready without chasing.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p11_theft_internal",
@@ -226,7 +326,17 @@
         ]
       },
       "ask_first": "",
-      "free_stops": "Access roles and handover steps are set out in the solution document."
+      "free_stops": "Access roles and handover steps are set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many active client conversations are still only on ex-staff contacts or notebooks, so the handover risk becomes visible.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member a weekly check of where new client contacts are saved, so records stay under the agency’s control.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

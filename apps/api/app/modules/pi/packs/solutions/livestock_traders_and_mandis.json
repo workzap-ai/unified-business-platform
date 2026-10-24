@@ -2,7 +2,7 @@
   "industry": "livestock_traders_and_mandis",
   "name": "Livestock traders and mandis (incl. qurbani / Eid ul Adha animals)",
   "sector": "7.C Agriculture, livestock and rural (part 1)",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_fraud",
@@ -22,7 +22,17 @@
         "tool_words": []
       },
       "ask_first": "Roughly how much comes in cash compared with transfers?",
-      "free_stops": "The handover routine and how transfers are matched go in the solution document."
+      "free_stops": "The handover routine and how transfers are matched go in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note which sale times and cash points brought the most note disputes this week, so you can see where fake note risk clusters.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of taking cash and writing each sale in one notebook, so fewer hands touch notes before animals leave.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_theft_internal",
@@ -42,7 +52,17 @@
         "tool_words": []
       },
       "ask_first": "How many helpers take payments at peak?",
-      "free_stops": "How sales are logged per helper is set out in the solution document."
+      "free_stops": "How sales are logged per helper is set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare animals gone with cash written by helper for the same day, so missing money is spotted before the rush buries it.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of handing over sold animals after cash is noted in one notebook, so a helper cannot close sales alone.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_order_errors",
@@ -62,7 +82,17 @@
         "tool_words": []
       },
       "ask_first": "Who is allowed to take a bayana today?",
-      "free_stops": "The locking rules and who can enter a bayana stay in the solution document."
+      "free_stops": "The locking rules and who can enter a bayana stay in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many animals already have more than one buyer name or token against them, so double promise risk is clear today.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of marking an animal as promised in one master notebook, so helpers stop offering the same animal twice.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_pre_orders_custom",
@@ -82,7 +112,17 @@
         "tool_words": []
       },
       "ask_first": "Is the agreed price written anywhere when the bayana is taken?",
-      "free_stops": "The booking terms and reminder schedule go in the solution document."
+      "free_stops": "The booking terms and reminder schedule go in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many bayana animals have no agreed amount or pickup day written beside them, so later arguments are easier to prevent.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of writing every bayana detail in one notebook before the animal is held, so vanished buyers are easier to track.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_delivery_late",
@@ -102,7 +142,17 @@
         "tool_words": []
       },
       "ask_first": "How many deliveries do you do on the last two days?",
-      "free_stops": "Route planning and the delivery-day flow are detailed in the solution document."
+      "free_stops": "Route planning and the delivery-day flow are detailed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many Chand Raat delivery slips still lack a clear area or landmark, so the real routing mess is visible now.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of checking every delivery slip into one area wise notebook each evening, so drivers stop chasing unclear locations.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_duplicate_entry",
@@ -122,7 +172,17 @@
         "tool_words": []
       },
       "ask_first": "How do customers find out their meat is ready now?",
-      "free_stops": "The share sheet and messaging flow go in the solution document."
+      "free_stops": "The share sheet and messaging flow go in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Look through current hissa papers and count animals with repeated share marks or crossed names, so duplicate booking trouble is sized early.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of filling shares on one animal sheet only, so each animal's remaining hissa stays clear all day.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_whatsapp_overload",
@@ -142,7 +202,17 @@
         "tool_words": []
       },
       "ask_first": "Who replies to messages at peak?",
-      "free_stops": "What the assistant answers and when it hands over stays in the solution document."
+      "free_stops": "What the assistant answers and when it hands over stays in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count today's chats that asked price, location or timings only, so you can see how much serious buyer time gets swallowed.",
+          "review": true
+        },
+        {
+          "text": "Give one person the job of checking incoming messages at fixed times from one phone, so serious buyers get noticed sooner.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_margin_unknown",
@@ -163,7 +233,17 @@
         "leads_with_view": true
       },
       "ask_first": "Are costs kept by animal, by stall, or only as one total?",
-      "free_stops": "How shared costs are spread per animal is worked out in the solution document."
+      "free_stops": "How shared costs are spread per animal is worked out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Pick a few sold animals and note buying amount beside selling amount on paper, so loss making deals stop hiding inside the rush.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of writing purchase and sale amounts for each animal in one notebook, so profitable and weak trades separate by season end.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_overstock_dead_stock",
@@ -184,7 +264,17 @@
         "leads_with_view": true
       },
       "ask_first": "Did you have unsold animals last Eid as well?",
-      "free_stops": "The season comparison and what it tracks go in the solution document."
+      "free_stops": "The season comparison and what it tracks go in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count animals left each evening by type and compare with that day's sold count, so the late season pileup is seen sooner.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of updating one leftover list at the same time nightly, so slow moving animals are flagged before the final rush.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p10_no_customer_data",
@@ -204,7 +294,17 @@
         "tool_words": []
       },
       "ask_first": "Do most buyers come back to you each year?",
-      "free_stops": "The broadcast timing and list setup stay in the solution document."
+      "free_stops": "The broadcast timing and list setup stay in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many buyers this season left with no phone number noted beside their animal, so next year's follow up gap shows.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of noting each buyer's number in one notebook at handover, so next year's contact list actually exists.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

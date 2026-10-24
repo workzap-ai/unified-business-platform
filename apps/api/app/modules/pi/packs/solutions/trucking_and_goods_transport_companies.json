@@ -2,7 +2,7 @@
   "industry": "trucking_and_goods_transport_companies",
   "name": "Trucking and goods transport companies",
   "sector": "7.E Trade, distribution and logistics",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_freight_costs",
@@ -22,7 +22,17 @@
         "tool_words": []
       },
       "ask_first": "Who looks for return loads today — the driver, the munshi, or you?",
-      "free_stops": "How trucks and bookings are matched is designed in the solution document."
+      "free_stops": "How trucks and bookings are matched is designed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note which upcountry returns came back empty and from which cities this week, so you see where backload effort is weakest.",
+          "review": false
+        },
+        {
+          "text": "Make one person note expected unloading time and return city for every outbound truck, so backload calling starts before the truck is free.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_cash_leakage",
@@ -43,7 +53,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The comparison method and flags are set in the solution document."
+      "free_stops": "The comparison method and flags are set in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare fuel slips with trip distance for each truck this week, so the worst mismatches are clear enough to investigate.",
+          "review": false
+        },
+        {
+          "text": "Keep all fuel slips for each truck in one envelope until trip closing, so missing support is caught before cash is settled.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_order_tracking",
@@ -63,7 +83,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "Update points and message triggers are in the solution document."
+      "free_stops": "Update points and message triggers are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many customer calls trigger a separate driver call each day, so you see the load created by missing status updates.",
+          "review": false
+        },
+        {
+          "text": "Give dispatch one fixed time to collect route updates from all running trucks, so customer replies go out without repeated chasing.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_margin_unknown",
@@ -83,7 +113,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "How costs are captured per trip is designed in the solution document."
+      "free_stops": "How costs are captured per trip is designed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Write last week's trips on one page with diesel, tolls, allowance and repairs beside each, so weak routes stand out quickly.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of closing every finished trip in the same notebook, so trip earnings and trip costs stay together.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_receivables_late",
@@ -103,7 +143,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "Reminder timing is set in the solution document."
+      "free_stops": "Reminder timing is set in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note which big customers still owe long after delivery and whether proof reached them, so delay patterns can be seen clearly.",
+          "review": false
+        },
+        {
+          "text": "Keep one folder for finished delivery proofs awaiting billing, so invoices stop waiting for missing papers on someone's desk.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_cash_mismatch",
@@ -123,7 +173,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The matching rules are set in the solution document."
+      "free_stops": "The matching rules are set in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count this week's to-pay consignments against cash handed into the office, so the shortfall shows by route or adda.",
+          "review": false
+        },
+        {
+          "text": "Make one handover point in the office for all to-pay cash and bilties, so collection responsibility stays clear every day.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_petty_cash",
@@ -143,7 +203,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The settlement steps are laid out in the solution document."
+      "free_stops": "The settlement steps are laid out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare trip advances given with trip papers returned this week, so you see which unsettled balances are piling up.",
+          "review": false
+        },
+        {
+          "text": "Assign one clerk to close every driver's trip advance on return day in one notebook, so old balances stop rolling forward.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_maintenance_downtime",
@@ -163,7 +233,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "Service intervals and alerts are set in the solution document."
+      "free_stops": "Service intervals and alerts are set in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Walk around the parked trucks and note which ones missed their last service mark, so overdue vehicles are visible before another highway stop.",
+          "review": false
+        },
+        {
+          "text": "Give one supervisor the job of updating one service notebook whenever a truck returns, so workshop timing stops slipping.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_licences_renewals",
@@ -183,7 +263,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "Reminder timing is set in the solution document."
+      "free_stops": "Reminder timing is set in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Look through current vehicle papers and note which expiries fall soon, so renewals can be chased before trucks are held up.",
+          "review": false
+        },
+        {
+          "text": "Keep all permit and document expiry notes in one diary with one staff owner, so renewal follow-up stays in one routine.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p10_conversion_low",
@@ -204,7 +294,17 @@
         "leads_with_view": true
       },
       "ask_first": "",
-      "free_stops": "How status is kept current is designed in the solution document."
+      "free_stops": "How status is kept current is designed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many booking calls wait while availability is checked this week, so you see how often slow replies lose loads.",
+          "review": false
+        },
+        {
+          "text": "Keep one notebook beside the booking phone for truck status changes, so staff can confirm availability without chasing around.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p11_commission_disputes",
@@ -224,7 +324,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "How shares are calculated is set in the solution document."
+      "free_stops": "How shares are calculated is set in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare this month's trip notes with what each attached vehicle owner expected, so the disputed trips stand out before arguments spread.",
+          "review": false
+        },
+        {
+          "text": "Give one office person the job of updating one running trip register for attached vehicles, so share talks start from the same record.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

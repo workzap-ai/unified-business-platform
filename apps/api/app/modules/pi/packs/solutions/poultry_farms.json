@@ -2,7 +2,7 @@
   "industry": "poultry_farms",
   "name": "Poultry farms (broiler and layer)",
   "sector": "7.C Agriculture, livestock and rural (part 1)",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_reports_wrong",
@@ -22,7 +22,17 @@
         "tool_words": []
       },
       "ask_first": "Who counts and records deaths each day?",
-      "free_stops": "How counts are checked against placement and lifting goes in the solution document."
+      "free_stops": "How counts are checked against placement and lifting goes in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare the board total with one walk through the shed and your own rough count, so under-reporting shows before flock end.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of writing mortality in one notebook at one fixed time, so the board matches one source all week.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_pricing_errors",
@@ -43,7 +53,17 @@
         "leads_with_view": true
       },
       "ask_first": "How is the rate decided on lifting day?",
-      "free_stops": "How rates are collected and compared stays in the solution document."
+      "free_stops": "How rates are collected and compared stays in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note the rate discussed before lifting and the rate used at lifting side by side, so the drop is clear in your own record.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of noting every buyer rate in one notebook before lifting week, so sale talks stop relying on memory.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_credit_terms",
@@ -63,7 +83,17 @@
         "tool_words": []
       },
       "ask_first": "Does the dealer also owe you from earlier flocks?",
-      "free_stops": "The ledger layout and settlement check are set out in the solution document."
+      "free_stops": "The ledger layout and settlement check are set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare the dealer's credit entries with your own notebook of each delivery and settlement, so forced rate cuts are easier to challenge.",
+          "review": true
+        },
+        {
+          "text": "Give one person the job of keeping all credit notes and lifting settlements in one place, so each flock closes with fewer surprises.",
+          "review": true
+        }
+      ]
     },
     {
       "id": "p4_count_mismatch",
@@ -83,7 +113,17 @@
         "tool_words": []
       },
       "ask_first": "Who receives feed at each farm?",
-      "free_stops": "The receiving log and flag rules go in the solution document."
+      "free_stops": "The receiving log and flag rules go in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count the bags on the truck beside the bill before unloading finishes, so any short delivery is caught while the driver is there.",
+          "review": false
+        },
+        {
+          "text": "Give one worker the job of noting each delivery count in one notebook at unloading, so the bill can be checked the same day.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_stockout",
@@ -103,7 +143,17 @@
         "tool_words": []
       },
       "ask_first": "How many days' feed do you usually keep?",
-      "free_stops": "How days-left and reorder points are worked out stays in the solution document."
+      "free_stops": "How days-left and reorder points are worked out stays in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note evening bags left beside the usual daily use for each shed, so a Sunday runout is visible earlier in the week.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of writing remaining bags in one notebook every evening, so reorder timing stops shifting between workers.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_reports_late",
@@ -123,7 +173,17 @@
         "tool_words": []
       },
       "ask_first": "Are feed issues written per shed or for the whole farm?",
-      "free_stops": "How the running figures are calculated is detailed in the solution document."
+      "free_stops": "How the running figures are calculated is detailed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare feed issued this week with the last flock at the same stage, so unusual usage is seen before sale day.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of writing feed issued per shed in one notebook each day, so mid-flock review is possible with your team.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_maintenance_downtime",
@@ -143,7 +203,17 @@
         "tool_words": []
       },
       "ask_first": "How do you find out about a failure at night today?",
-      "free_stops": "Round timings and alert routing go in the solution document."
+      "free_stops": "Round timings and alert routing go in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note every night start issue and delay in one notebook this week, so the weak point around generator failure is easier to spot.",
+          "review": false
+        },
+        {
+          "text": "Give the night worker one written call list kept beside the generator, so breakdowns move faster when the power fails.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_shrinkage_theft",
@@ -163,7 +233,17 @@
         "tool_words": []
       },
       "ask_first": "Where do the shortages usually show up?",
-      "free_stops": "The count points and gap rules stay in the solution document."
+      "free_stops": "The count points and gap rules stay in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare trays counted at the shed with trays counted at loading each day, so the loss point between handovers gets clearer.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of recording breakage and missing trays in one notebook at each handover, so blame stops shifting later.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_margin_unknown",
@@ -184,7 +264,17 @@
         "leads_with_view": true
       },
       "ask_first": "Which part of the settlement is hardest to follow?",
-      "free_stops": "How the comparison is laid out goes in the solution document."
+      "free_stops": "How the comparison is laid out goes in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note each line on the settlement sheet beside your own flock figures, so the deductions that drive your margin stand out.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of keeping chicks placed, feed received, deaths and birds lifted in one notebook, so settlement checking becomes quicker.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p10_field_team_visibility",
@@ -205,7 +295,17 @@
         "leads_with_view": true
       },
       "ask_first": "Who sends updates from each farm?",
-      "free_stops": "Which numbers go in and how farms are compared is set out in the solution document."
+      "free_stops": "Which numbers go in and how farms are compared is set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare each farm's voice note against one notebook page of daily key numbers, so weak updates stand out before a problem grows.",
+          "review": false
+        },
+        {
+          "text": "Give one supervisor the job of sending each farm's daily numbers at one fixed time, so you stop chasing updates across three farms.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

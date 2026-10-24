@@ -2,7 +2,7 @@
   "industry": "e_commerce_and_d2c_brands",
   "name": "E-commerce and D2C brands",
   "sector": "7.M Digital economy, social and public sector",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_returns_rto",
@@ -22,7 +22,17 @@
         "tool_words": []
       },
       "ask_first": "Do returns come mostly from certain cities or certain products?",
-      "free_stops": "The confirmation flow, hold rules and return-tracking set-up go in the solution document."
+      "free_stops": "The confirmation flow, hold rules and return-tracking set-up go in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count returned COD parcels once by product and area this week, so you spot where failed deliveries are costing most.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of reviewing all returned COD parcels each afternoon, so repeat issues get logged before new dispatches.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_cod_remittance",
@@ -42,7 +52,17 @@
         "tool_words": []
       },
       "ask_first": "Which couriers do you use at the moment?",
-      "free_stops": "How the matching runs across all couriers and order sources is detailed in the solution document."
+      "free_stops": "How the matching runs across all couriers and order sources is detailed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare one recent courier settlement against your delivered parcels list, so missing remittance patterns stand out before cash planning slips.",
+          "review": false
+        },
+        {
+          "text": "Keep one notebook page for unpaid delivered parcels and one owner for updates, so courier follow up stays organised.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_count_mismatch",
@@ -62,7 +82,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The sync design and alert levels per product are set out in the solution document."
+      "free_stops": "The sync design and alert levels per product are set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare shelf counts against website stock for your fastest movers today, so you see which items create the most cancellations.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of writing every stock movement in one notebook, so stock changes stop getting lost between sales and packing.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_stockout",
@@ -83,7 +113,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "Which products to watch and how alerts tie to campaigns is covered in the solution document."
+      "free_stops": "Which products to watch and how alerts tie to campaigns is covered in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note which advertised products went unavailable during recent promotions, so you see where demand and stock planning are disconnecting.",
+          "review": false
+        },
+        {
+          "text": "Set one fixed daily time to review ad-driven items before dispatch starts, so low stock gets noticed while action is still possible.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_packing_errors",
@@ -103,7 +143,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The scan-and-check process and its reports are detailed in the solution document."
+      "free_stops": "The scan-and-check process and its reports are detailed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count wrong size and wrong colour complaints separately for one week, so the bigger packing mistake gets attention first.",
+          "review": false
+        },
+        {
+          "text": "Give one person the final parcel check at sealing time, so size and colour mismatches are caught before handover.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_campaign_roi_unknown",
@@ -124,7 +174,17 @@
         "tool_words": []
       },
       "ask_first": "Which channels are you spending on right now?",
-      "free_stops": "How tags are set up and joined to courier delivery data goes in the solution document."
+      "free_stops": "How tags are set up and joined to courier delivery data goes in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare yesterday's delivered orders with the campaign names your team used in messages, so unclear attribution points show up quickly.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of noting the stated campaign source beside each order, so sales tracking stops getting skipped during busy hours.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_whatsapp_overload",
@@ -144,7 +204,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The tracking connection and reply flow are described in the solution document."
+      "free_stops": "The tracking connection and reply flow are described in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count parcel status chats during one busy afternoon and note their common timing, so you see when dispatch updates are failing customers.",
+          "review": false
+        },
+        {
+          "text": "Set one shared time to review parcel status questions together, so packing work is interrupted less through the day.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_repeat_low",
@@ -164,7 +234,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "The segments, timing and message plan stay for the solution document."
+      "free_stops": "The segments, timing and message plan stay for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many recent orders came from past buyers versus new buyers for your top products, so retention weakness shows by product.",
+          "review": false
+        },
+        {
+          "text": "Give one person a weekly list of past buyer follow ups in one notebook, so repeat sales activity happens on schedule.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_margin_unknown",
@@ -185,7 +265,17 @@
         "leads_with_view": true
       },
       "ask_first": "",
-      "free_stops": "How each cost is pulled in and allocated is set out in the solution document."
+      "free_stops": "How each cost is pulled in and allocated is set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Write down one recent order from each top product with shipping, return and ad costs beside it, so thinner items stand out.",
+          "review": false
+        },
+        {
+          "text": "Give one person one notebook page per top product for order costs, so profit checks become part of the weekly routine.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p10_multi_channel_orders",
@@ -206,7 +296,17 @@
         "tool_words": []
       },
       "ask_first": "",
-      "free_stops": "Which channels connect and how is detailed in the solution document."
+      "free_stops": "Which channels connect and how is detailed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count for one day how many confirmed orders sit unpicked in each sales channel at closing, so missed handovers show where delays start.",
+          "review": false
+        },
+        {
+          "text": "Make one person own the master packing list during each shift, so orders from every channel reach packing without duplication.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p11_seasonal_planning",
@@ -227,7 +327,17 @@
         "leads_with_view": true
       },
       "ask_first": "",
-      "free_stops": "The planning model and daily read layout go in the solution document."
+      "free_stops": "The planning model and daily read layout go in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note which Eid items sold out earliest last season and which lingered longest, so buying follows real festive demand patterns.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of updating a single Eid prep notebook daily, so making and buying decisions stay aligned.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

@@ -2,7 +2,7 @@
   "industry": "tractor_and_farm_machinery_dealers_and_rental",
   "name": "Tractor and farm machinery dealers and rental",
   "sector": "7.C Agriculture, livestock and rural (part 2)",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_delivery_late",
@@ -22,7 +22,17 @@
         "tool_words": []
       },
       "ask_first": "Roughly how many bookings are waiting right now?",
-      "free_stops": "How the queue and status updates are set up goes in the solution document."
+      "free_stops": "How the queue and status updates are set up goes in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many booked tractors are past their promised arrival by branch or model, so you see where the calling pressure is heaviest.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member the waiting-booking list and a fixed daily update time, so callers hear the same status without interrupting everyone.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_capacity",
@@ -42,7 +52,17 @@
         "tool_words": []
       },
       "ask_first": "How many machines do you rent out?",
-      "free_stops": "Calendar rules and the utilisation view are part of the solution document."
+      "free_stops": "Calendar rules and the utilisation view are part of the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare each harvester's booked days against days actually worked this week, so idle gaps and clash periods show up together.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of writing every booking and completion in one place each evening, so machine time stops being guessed.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_cash_mismatch",
@@ -62,7 +82,17 @@
         "tool_words": []
       },
       "ask_first": "Who measures the acres today?",
-      "free_stops": "How jobs are logged and confirmed is detailed in the solution document."
+      "free_stops": "How jobs are logged and confirmed is detailed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note each completed field job with the operator's acreage and the farmer's acreage on the same page, so disputed work is easy to spot.",
+          "review": false
+        },
+        {
+          "text": "Give one office person the job of collecting both acreage notes before any bill is raised, so arguments are caught before cash collection.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_cash_leakage",
@@ -82,7 +112,17 @@
         "tool_words": []
       },
       "ask_first": "Do farmers mostly pay the operator or the office?",
-      "free_stops": "How jobs and collections are matched goes in the solution document."
+      "free_stops": "How jobs and collections are matched goes in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare jobs completed this week with cash handed in for those same jobs, so short handovers show where money slips away.",
+          "review": false
+        },
+        {
+          "text": "Make one office person receive all operator handovers at a fixed evening time in one notebook, so missing cash is noticed the same day.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_theft_internal",
@@ -102,7 +142,17 @@
         "tool_words": []
       },
       "ask_first": "Who fills diesel for the rental machines?",
-      "free_stops": "The matching rules are kept for the solution document."
+      "free_stops": "The matching rules are kept for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count diesel fills for each rental machine beside its hours worked this week, so the worst mismatches stand out fast.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member the job of writing every fill in one notebook before the machine leaves, so fuel questions come back to one record.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_maintenance_downtime",
@@ -122,7 +172,17 @@
         "tool_words": []
       },
       "ask_first": "Do you service the fleet yourselves?",
-      "free_stops": "How service schedules and alerts are set for your fleet goes in the solution document."
+      "free_stops": "How service schedules and alerts are set for your fleet goes in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count field breakdowns by machine during the last busy week, so you see which units are causing the harvest delays.",
+          "review": false
+        },
+        {
+          "text": "Give one person a fixed evening check of machine hours and overdue services in one notebook, so peak-season downtime gets less surprise.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_stockout",
@@ -142,7 +202,17 @@
         "tool_words": []
       },
       "ask_first": "Roughly how many parts lines do you carry?",
-      "free_stops": "Minimum levels and the issue process are set out in the solution document."
+      "free_stops": "Minimum levels and the issue process are set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note every time the counter could not supply a filter or belt this week, so the parts hurting sales are plain.",
+          "review": false
+        },
+        {
+          "text": "Give one counter person one notebook for out-of-stock notes at closing time, so reordering stops relying on rushed conversations.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_receivables_late",
@@ -162,7 +232,17 @@
         "tool_words": []
       },
       "ask_first": "Do you finance instalments yourselves or through a third party?",
-      "free_stops": "Reminder timing and the tracker setup are part of the solution document."
+      "free_stops": "Reminder timing and the tracker setup are part of the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many instalments due this week were not received on time, so the size of the collection problem is clear.",
+          "review": false
+        },
+        {
+          "text": "Give one person one overdue list and a fixed follow-up hour each day, so late accounts get attention before excuses pile up.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_lead_followup_slow",
@@ -182,7 +262,17 @@
         "tool_words": []
       },
       "ask_first": "Where do most enquiries come from now?",
-      "free_stops": "How enquiries are captured and followed up is detailed in the solution document."
+      "free_stops": "How enquiries are captured and followed up is detailed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count new enquiries and compare them with callbacks made the same day, so missed sales attention is easy to see.",
+          "review": false
+        },
+        {
+          "text": "Give one salesperson one notebook for every incoming enquiry and a fixed callback hour, so leads stop getting buried under daily shop noise.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p10_branch_comparison",
@@ -204,7 +294,17 @@
         ]
       },
       "ask_first": "How many branches and workshops do you have?",
-      "free_stops": "What the dashboard measures is kept for the solution document."
+      "free_stops": "What the dashboard measures is kept for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count tractors sold, rentals started, workshop jobs closed and parts bills written at each branch this week, so weak branches stand out clearly.",
+          "review": false
+        },
+        {
+          "text": "Give one person at each branch a fixed end-of-day note for those four counts in one notebook, so head office compares branches without chasing.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [

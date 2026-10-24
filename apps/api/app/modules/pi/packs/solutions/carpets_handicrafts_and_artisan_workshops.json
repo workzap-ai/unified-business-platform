@@ -2,7 +2,7 @@
   "industry": "carpets_handicrafts_and_artisan_workshops",
   "name": "Carpets, handicrafts and artisan workshops",
   "sector": "7.D Manufacturing and industry (part 2)",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_cash_flow_tight",
@@ -22,7 +22,17 @@
         "tool_words": []
       },
       "ask_first": "How are advances recorded now?",
-      "free_stops": "How work value is measured against advances is in the solution document."
+      "free_stops": "How work value is measured against advances is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many advanced pieces are still unfinished at week end, so you can see cash tied up in pending work.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member one notebook for advances and completed pieces, so each new payment links to visible progress.",
+          "review": true
+        }
+      ]
     },
     {
       "id": "p2_no_visibility",
@@ -42,7 +52,17 @@
         "tool_words": []
       },
       "ask_first": "How do updates reach you today?",
-      "free_stops": "The update routine for home-based artisans is in the solution document."
+      "free_stops": "The update routine for home-based artisans is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Walk the looms and count pieces actually in progress against the contractor's claim, so you know the true work on hand.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of noting each loom's active piece in one notebook, so contractor updates match workshop reality.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_delivery_late",
@@ -62,7 +82,17 @@
         "tool_words": []
       },
       "ask_first": "Are most orders custom or from ready stock?",
-      "free_stops": "Milestone set-up is in the solution document."
+      "free_stops": "Milestone set-up is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note each export order's current stage on one page every afternoon, so missed handovers show before the deadline passes.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of updating delayed pieces at closing time, so late work reaches you before shipment is missed.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_shrinkage_theft",
@@ -82,7 +112,17 @@
         "tool_words": []
       },
       "ask_first": "Who buys the wool, you or the artisans?",
-      "free_stops": "The issue and return rules are in the solution document."
+      "free_stops": "The issue and return rules are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare wool and dye issued with what each carpet returns in leftovers once, so loss around specific pieces becomes visible.",
+          "review": false
+        },
+        {
+          "text": "Give one person one return spot for leftover wool and dye, so missing material is noticed when work comes back.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_product_defects",
@@ -102,7 +142,17 @@
         "tool_words": []
       },
       "ask_first": "What do buyers reject most often?",
-      "free_stops": "The checklist content is in the solution document."
+      "free_stops": "The checklist content is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count which rejection issues repeat across recently returned pieces, so you can see the defect hurting inspections most.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of checking finished pieces in one corner before packing, so buyer rejections are caught earlier.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_no_visibility",
@@ -122,7 +172,17 @@
         "tool_words": []
       },
       "ask_first": "How do buyers see your stock now?",
-      "free_stops": "The catalogue set-up is in the solution document."
+      "free_stops": "The catalogue set-up is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Walk the finished stock and note which pieces have no photo or size written, so selling time is not wasted searching.",
+          "review": false
+        },
+        {
+          "text": "Give one person one notebook for finished pieces and their storage spots, so staff can find saleable stock quickly.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_multi_channel_orders",
@@ -142,7 +202,17 @@
         "tool_words": []
       },
       "ask_first": "Which channel sells most?",
-      "free_stops": "Channel connections are in the solution document."
+      "free_stops": "Channel connections are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many orders arrived from each sales channel this week, so you see where missed follow ups are most likely.",
+          "review": false
+        },
+        {
+          "text": "Give one person one daily order list from every channel, so dispatch work starts from one complete record.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_slow_response",
@@ -162,7 +232,17 @@
         "tool_words": []
       },
       "ask_first": "Which time zones are your buyers in?",
-      "free_stops": "The message flow is in the solution document."
+      "free_stops": "The message flow is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note how many overnight buyer messages are still unanswered by midday, so you can see the morning reply backlog clearly.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of clearing night enquiries at opening time, so overseas buyers hear back while they are still active.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_owner_bottleneck",
@@ -183,7 +263,17 @@
         "leads_with_view": true
       },
       "ask_first": "Which area takes most of your time?",
-      "free_stops": "Which figures and handovers to set up is in the solution document."
+      "free_stops": "Which figures and handovers to set up is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note every decision that waited for you this week, so you can see which area stalls when you are busy.",
+          "review": false
+        },
+        {
+          "text": "Give one person one fixed handover time for design, buyer or payment updates, so routine decisions stop waiting for your attention.",
+          "review": true
+        }
+      ]
     }
   ],
   "never_say": [

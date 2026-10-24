@@ -2,7 +2,7 @@
   "industry": "hajj_and_umrah_operators",
   "name": "Hajj and Umrah operators",
   "sector": "7.G Transport, mobility and aviation (part 1)",
-  "version": "1.0",
+  "version": "1.1",
   "problems": [
     {
       "id": "p1_price_increases_supplier",
@@ -23,7 +23,17 @@
         "leads_with_view": true
       },
       "ask_first": "Hotels ka rate aap package bechne se pehle confirm karte hain ya baad mein?",
-      "free_stops": "How costs and exchange rates feed the live margin is set out in the solution document."
+      "free_stops": "How costs and exchange rates feed the live margin is set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare what you quoted against what you finally paid for one recent departure, so you spot whether hotels or transport hurt margin more.",
+          "review": false
+        },
+        {
+          "text": "Make one staff member note supplier confirmations in one notebook each afternoon, so sales stop relying on unconfirmed costs.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p2_receivables_late",
@@ -43,7 +53,17 @@
         "tool_words": []
       },
       "ask_first": "Zyada tar families upfront dete hain ya instalments mein?",
-      "free_stops": "Reminder timing and cut-off rules are designed in the solution document."
+      "free_stops": "Reminder timing and cut-off rules are designed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many bookings were still short near the last departure, so you see how often instalments stall at the riskiest time.",
+          "review": false
+        },
+        {
+          "text": "Give one person a daily instalment follow-up hour and one notebook for all due bookings, so departures stop getting blocked by scattered chasing.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p3_cash_flow_tight",
@@ -64,7 +84,17 @@
         "leads_with_view": true
       },
       "ask_first": "Saudi partners ko payment kab tak deni hoti hai?",
-      "free_stops": "How collections and payments are matched per group is worked out in the solution document."
+      "free_stops": "How collections and payments are matched per group is worked out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note one recent season's partner payment dates beside your own collection dates, so you see exactly when cash pressure bites hardest.",
+          "review": true
+        },
+        {
+          "text": "Give one person the job of updating one weekly dues list, so partner payments and incoming collections are watched together.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p4_order_errors",
@@ -84,7 +114,17 @@
         "tool_words": []
       },
       "ask_first": "Rooming list abhi kaun banata hai?",
-      "free_stops": "The grouping rules and hotel export format are designed in the solution document."
+      "free_stops": "The grouping rules and hotel export format are designed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many families were split across rooms on one recent trip, so you see whether allocation mistakes are occasional or routine.",
+          "review": false
+        },
+        {
+          "text": "Give one person the final say on room changes in one place, so families stop being split by mixed messages.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p5_customer_communication",
@@ -104,7 +144,17 @@
         "tool_words": []
       },
       "ask_first": "Ek group mein taqreeban kitne log hote hain?",
-      "free_stops": "The broadcast setup and read tracking are set out in the solution document."
+      "free_stops": "The broadcast setup and read tracking are set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Look at one recent group chat and count how many update messages were buried by replies, so you see why pilgrims miss key notices.",
+          "review": false
+        },
+        {
+          "text": "Set one fixed time for official group updates from one staff member, so important notices land without constant chat clutter.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p6_field_team_visibility",
@@ -124,7 +174,17 @@
         "tool_words": []
       },
       "ask_first": "Group leaders abhi office ko kaise report karte hain?",
-      "free_stops": "The report fields and office view are designed in the solution document."
+      "free_stops": "The report fields and office view are designed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note how long the office waited for answers from the ground on one recent day, so you see where communication slows decisions.",
+          "review": false
+        },
+        {
+          "text": "Give each group one office handover contact for every shift, so leaders reach the right desk without repeated calling around.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p7_checklists_not_done",
@@ -144,7 +204,17 @@
         "tool_words": []
       },
       "ask_first": "Ek season mein kitne groups chalte hain, taqreeban?",
-      "free_stops": "The checklist types and alert timing are worked out in the solution document."
+      "free_stops": "The checklist types and alert timing are worked out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Walk through one active group's file and count how many items are still marked pending, so missing paperwork gets sized clearly.",
+          "review": false
+        },
+        {
+          "text": "Keep one pending-items list in one place under one staff owner, so each group's chases move in an orderly routine.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p8_lead_followup_slow",
@@ -164,7 +234,17 @@
         "tool_words": []
       },
       "ask_first": "Enquiries zyada WhatsApp pe aati hain ya calls pe?",
-      "free_stops": "The auto-reply content and follow-up timing are designed in the solution document."
+      "free_stops": "The auto-reply content and follow-up timing are designed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many open enquiries are older than your usual reply pace, so you see the real backlog before Ramadan rush grows.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member one follow-up block and one enquiry list each day, so unanswered leads stop drifting between people.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p9_repeat_low",
@@ -185,7 +265,17 @@
         "tool_words": []
       },
       "ask_first": "Trip ke baad families se feedback lete hain?",
-      "free_stops": "The feedback questions and re-contact timing are set out in the solution document."
+      "free_stops": "The feedback questions and re-contact timing are set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare how many last season's families asked again versus stayed silent, so you judge whether repeat demand is slipping or stable.",
+          "review": false
+        },
+        {
+          "text": "Give one person a single notebook for past-family follow-ups at a fixed weekly time, so return business gets regular attention.",
+          "review": false
+        }
+      ]
     },
     {
       "id": "p10_cod_remittance",
@@ -205,7 +295,17 @@
         "tool_words": []
       },
       "ask_first": "Kitne sub-agents aap ke packages bechte hain?",
-      "free_stops": "The remittance rules and reminders are worked out in the solution document."
+      "free_stops": "The remittance rules and reminders are worked out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note how many days each recent sub-agent held collections before passing them on, so the worst delays stop surprising your cash planning.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member a single remittance notebook checked each afternoon, so every sub-agent delay is chased from one place.",
+          "review": false
+        }
+      ]
     }
   ],
   "never_say": [
