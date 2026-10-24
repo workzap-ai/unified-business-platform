@@ -17,6 +17,7 @@ from sqlalchemy import delete, or_, select, update
 from sqlalchemy.exc import ProgrammingError
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.modules.customers.models import Customer
 from app.modules.pi.brain_docs_models import PiBrainDocument, PiBrainPayment
 from app.modules.pi.experience_models import PiExperience
 from app.modules.pi.learning_models import PiLearningExample
@@ -158,8 +159,21 @@ async def erase_customer(
         await session.execute(
             update(PiConversation)
             .where(*mine(PiConversation), PiConversation.id.in_(conversation_ids))
-            .values(service_brief={"erased": True}, followup_due_at=None)
+            # The summary and preview are words from their chats, read back to the model every
+            # turn: they go too (R-PRIV-06), or pi would keep remembering what was deleted.
+            .values(
+                service_brief={"erased": True},
+                followup_due_at=None,
+                summary="",
+                last_message_preview=ERASED,
+            )
         )
+    # What pi inferred onto the customer record (industry) is brain data, not CRM contact data.
+    await session.execute(
+        update(Customer)
+        .where(*mine(Customer), Customer.id == customer_id)
+        .values(industry_primary=None, industry_secondary=[], industry_confidence=None)
+    )
     kept = {
         "documents": len(
             list(

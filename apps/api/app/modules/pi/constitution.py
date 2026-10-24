@@ -479,6 +479,33 @@ REASK_FIELDS: tuple[tuple[str, re.Pattern[str]], ...] = (
             re.IGNORECASE,
         ),
     ),
+    (
+        "role",
+        re.compile(
+            r"\bwhat(?:'s| is) your (?:role|position|job title)\b"
+            r"|\bwhat do you do (?:there|at (?:the|your) (?:business|company|shop|store))\b"
+            r"|\baap\s*ka\s*(?:role|kirdar|kirdaar|position)\b",
+            re.IGNORECASE,
+        ),
+    ),
+    (
+        "team_size",
+        re.compile(
+            r"\bhow many (?:staff|employees|people|workers|branches|shops|outlets|team members)"
+            r"\b[^?]{0,20}\b(?:do you (?:have|employ)|work (?:for|with) you|are (?:there|you))\b"
+            r"|\bkitne\s*(?:staff|log|employees|branches|shops|workers)\s*(?:hain|hein|ho|hen)\b",
+            re.IGNORECASE,
+        ),
+    ),
+    (
+        "current_tools",
+        re.compile(
+            r"\bwhat (?:do|are) you (?:use|using)\b[^?]{0,30}\b(?:today|now|currently|at the moment)\b"
+            r"|\bwhich (?:software|system|tool|app)s? (?:do you|are you) (?:use|using)\b"
+            r"|\bkaunsa\s*(?:software|system|tool)\s*(?:use|istemal)\b",
+            re.IGNORECASE,
+        ),
+    ),
 )
 
 
@@ -492,17 +519,33 @@ def _reasks_known_profile(reply: str, context: dict[str, Any], add: Any) -> None
     profile = context.get("customer_profile") or {}
     if not isinstance(profile, dict):
         return
+    # The durable memory block (memory_block.py) knows facts from earlier chats and the questions
+    # already asked and left unanswered in this one.
+    block = context.get("what_i_know") or {}
+    block = block if isinstance(block, dict) else {}
+    pending = [str(k) for k in block.get("already_asked") or []]
     for sentence in _sentences(reply):
         if not sentence.endswith(QUESTION_MARKS):
             continue
         for field, pattern in REASK_FIELDS:
-            known = str(profile.get(field) or "").strip()
-            if known and not _PLACEHOLDER_PROFILE_VALUE.search(known) and pattern.search(sentence):
+            known = str(profile.get(field) or block.get(field) or "").strip()
+            if not pattern.search(sentence):
+                continue
+            if known and not _PLACEHOLDER_PROFILE_VALUE.search(known):
                 add(
                     Violation(
                         "R-MEM-02",
                         f'they already told you their {field.replace("_", " ")} ("{known}"): '
                         "do not ask again, use what you already know",
+                    )
+                )
+                return
+            if field in pending:
+                add(
+                    Violation(
+                        "R-MEM-02",
+                        f"you already asked for their {field.replace('_', ' ')} in this chat "
+                        "and they did not answer: do not ask again, never press for it",
                     )
                 )
                 return

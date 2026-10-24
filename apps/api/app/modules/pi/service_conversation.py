@@ -35,6 +35,7 @@ from app.modules.pi import (
     industry_packs,
     latency,
     learning_context,
+    memory_block,
     price_policy,
     problem_extract,
     problems,
@@ -1059,7 +1060,12 @@ def system_for(context: dict[str, Any]) -> str:
     if context.get("pi_mode") == "brain":
         asked = solution_turn(context)
         return (
-            SYSTEM + BRAIN_PROBLEMS + BRAIN_DECISIONS + BRAIN_VOICE + (BRAIN_ASK if asked else "")
+            SYSTEM
+            + BRAIN_PROBLEMS
+            + BRAIN_DECISIONS
+            + BRAIN_VOICE
+            + (BRAIN_ASK if asked else "")
+            + (memory_block.SYSTEM_LINE if context.get("what_i_know") else "")
         )
     return SYSTEM
 
@@ -1307,6 +1313,7 @@ async def brain_problems(
     embedder: Any = None,
     noted_problems: list[dict[str, Any]] | None = None,
     customer: Any = LOOKUP,
+    last_chat_at: datetime | None = None,
 ) -> dict[str, Any]:
     """What pi has noted so far for this customer (brain mode), for the prompt.
 
@@ -1396,7 +1403,7 @@ async def brain_problems(
         if quote is not None:
             context["open_quote"] = quote
     context.update(matching_the_person(conversation, message, rows or []))
-    if away := days_away(message, rows or []):
+    if away := days_away(message, rows or [], last_chat_at):
         context["days_away"] = away
     if learning_context.active(policy.response_rules):
         context.update(
@@ -1443,8 +1450,12 @@ async def brain_problems(
     return context
 
 
-def days_away(message: PiMessage | None, rows: list[PiMessage]) -> int:
-    """Whole days between the person's previous message and this one (0 when unknown)."""
+def days_away(
+    message: PiMessage | None, rows: list[PiMessage], earlier_chat_at: datetime | None = None
+) -> int:
+    """Whole days between the person's previous message and this one (0 when unknown). In a
+    conversation that has no earlier message of theirs (a closed chat reopened as a new one) the
+    last message of their earlier conversation counts."""
     if message is None or message.created_at is None:
         return 0
     before = [
@@ -1452,6 +1463,8 @@ def days_away(message: PiMessage | None, rows: list[PiMessage]) -> int:
         for m in rows
         if m.sender_type == "customer" and m.id != message.id and m.created_at is not None
     ]
+    if not before and earlier_chat_at is not None:
+        return max(0, (message.created_at - earlier_chat_at).days)
     return max(0, (message.created_at - max(before)).days) if before else 0
 
 
@@ -1768,8 +1781,14 @@ def _brain_gate(
         effects, marks = BOUNDARY_EFFECTS.get(limit, ([], {}))
         if chat_level or effects:
             move = flow.State.X_OUT_OF_SCOPE if limit == safety.Boundary.WRONG_NUMBER else None
+            said_back = safety.boundary_reply(limit, language, bool(context.get("noted_problems")))
+            if limit == safety.Boundary.MEMORY_ASK:
+                # R-PRIV-06: what pi keeps, from the very block the model reads.
+                said_back = memory_block.memory_reply(
+                    context.get("what_i_know") or {}, language, said_back
+                )
             return fixed(
-                safety.boundary_reply(limit, language, bool(context.get("noted_problems"))),
+                said_back,
                 move,
                 list(effects),
                 dict(marks),
@@ -2615,6 +2634,20 @@ async def prepare_context(
         if flow.brain_mode(policy.response_rules) and conversation.customer_id is not None
         else None
     )
+    # What pi knows about this person, from durable memory (spec 3.10): one small block.
+    known_block: dict[str, Any] = {}
+    known_language: str | None = None
+    last_chat_at: datetime | None = None
+    if flow.brain_mode(policy.response_rules) and conversation.customer_id is not None:
+        known = await latency.timed(
+            "ctx.memory", memory_block.load(session, scope, conversation, customer)
+        )
+        memory_block.merge_profile(known, profile)
+        known_block = memory_block.build(
+            known, list((conversation.service_brief or {}).get("asked_facts") or [])
+        )
+        known_language = known.prefs.get("language")
+        last_chat_at = known.last_chat_at
     industry = await latency.timed(
         "ctx.industry",
         industry_context_for(
@@ -2642,11 +2675,14 @@ async def prepare_context(
             embedder,
             noted_problems=noted,
             customer=customer,
+            last_chat_at=last_chat_at,
         ),
     )
     # read once, used twice below
     team_notes = await latency.timed("ctx.team_notes", _team_notes(session, scope, conversation.id))
     return {
+        # First, so its place in the prompt never moves.
+        **({"what_i_know": known_block} if known_block else {}),
         **industry,
         **solution_lint_context(industry, policy, conversation),
         **brain,
@@ -2666,7 +2702,7 @@ async def prepare_context(
         "brief": {
             k: v
             for k, v in (conversation.service_brief or {}).items()
-            if k not in ("free_rider", "howto_asked", "declines")
+            if k not in ("free_rider", "howto_asked", "declines", "asked_facts")
         },
         "conversation_summary": conversation.summary or "",
         "history": [
@@ -2693,7 +2729,7 @@ async def prepare_context(
         "shared_links": (message.media or {}).get("links") or [],
         "shared_documents": shared_documents(message, rows),
         "team_notes": team_notes,
-        **reply_language(conversation, message, rows),
+        **reply_language(conversation, message, rows, known_language),
         "tone": policy.response_rules.get("tone", "friendly"),
         **brain_context(policy, conversation, rows),
         "now_local": _now_local(policy.timezone),
@@ -2905,7 +2941,10 @@ CAPTION_LABELS = re.compile(r"^Customer caption: |\nAttachment: .*$", re.S)
 
 
 def reply_language(
-    conversation: PiConversation, message: PiMessage, rows: list[PiMessage]
+    conversation: PiConversation,
+    message: PiMessage,
+    rows: list[PiMessage],
+    remembered: str | None = None,
 ) -> dict[str, str]:
     """The language pi must answer in, from the customer's own latest words. Image and
     file descriptions are system English, so those fall back to the customer's last text."""
@@ -2935,9 +2974,10 @@ def reply_language(
         detected[0] = None
     language = next(
         (found for found in detected if found),
-        # Nothing clear in their recent messages ("ok", an emoji, a link): English, the
-        # main language. pi never picks another language on its own.
-        "en",
+        # Nothing clear in their recent messages ("ok", an emoji, a link): the language they
+        # used in an earlier chat (their own, remembered), else English, the main language.
+        # pi never picks another language on its own.
+        remembered if remembered in NAMES else "en",
     )
     return {"reply_language": language, "reply_language_name": NAMES[language]} if language else {}
 
@@ -4112,7 +4152,10 @@ def welcome_back(context: dict[str, Any], *, ask: bool = True) -> str | None:
     if context.get("pi_mode") != "brain":
         return None
     noted = context.get("noted_problems") or []
-    if not noted or not any(h.get("role") == "ai" for h in context.get("history") or []):
+    spoke_before = any(h.get("role") == "ai" for h in context.get("history") or [])
+    # A person whose earlier chat was closed starts a new conversation with no history: they are
+    # still returning (R-MEM-03), their problems are noted at customer level.
+    if not noted or not (spoke_before or context.get("returning_customer")):
         return None
     if int(context.get("days_away") or 0) < 1:  # only after a gap, not mid-chat
         return None
@@ -4638,6 +4681,23 @@ async def save_service_turn(
         ),
     }
     await remember_customer(session, scope, conversation, brief["customer_profile"])
+    if flow.brain_mode(policy.response_rules):
+        # Durable memory at customer level, from this turn's own output (spec 3.10): what they
+        # said, a correction archiving the old value, their language and voice-note habit.
+        await memory_block.refresh(
+            session,
+            scope,
+            conversation,
+            profile=turn.customer_profile.model_dump(),
+            language=str(turn.language or ""),
+            voice_note=message.message_type == "audio",
+            message_id=message.id,
+        )
+        brief["asked_facts"] = list(
+            dict.fromkeys(
+                [*(previous.get("asked_facts") or []), *memory_block.asked_keys(turn.reply)]
+            )
+        )[-12:]
     known = list(previous.get("knowledge_gaps") or [])
     new_gaps = [g for g in dict.fromkeys(turn.knowledge_gaps) if g not in known]
     brief["knowledge_gaps"] = [*known, *new_gaps][-10:]
@@ -4661,7 +4721,13 @@ async def save_service_turn(
     from app.modules.pi.business_form import after_turn
 
     await after_turn(session, scope, conversation, message, policy, turn.reply, turn.mood)
-    conversation.summary = turn.summary
+    # Brain mode: the summary is read back to the model every turn, so it passes the redactor
+    # (roles, never a third party's name or contact details) before it is kept.
+    conversation.summary = (
+        safety.redact_pii(turn.summary).text
+        if flow.brain_mode(policy.response_rules)
+        else turn.summary
+    )
     conversation.summary_message_count += 1
     conversation.language = turn.language
     conversation.followup_due_at = None  # Scheduled only once the reply is actually sent.
@@ -4916,10 +4982,12 @@ async def customer_profile(
                 PiConversation.customer_id == conversation.customer_id,
                 PiConversation.id != conversation.id,
             )
-            .order_by(PiConversation.last_message_at.asc().nulls_first())
+            # The NEWEST ten, oldest of those first so a later chat's fact wins (it used to be the
+            # oldest ten: a person with many chats lost what they said last).
+            .order_by(PiConversation.last_message_at.desc().nulls_last())
             .limit(10)
         )
-        for row in earlier:
+        for row in reversed(list(earlier)):
             returning = True
             earlier_profile = (row.service_brief or {}).get("customer_profile") or {}
             profile = merge_profile(profile, earlier_profile)
