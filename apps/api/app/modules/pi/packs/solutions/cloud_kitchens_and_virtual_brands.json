@@ -18,7 +18,7 @@
         "keys": [
           "cash_reconciliation"
         ],
-        "text": "every app statement matched to your orders automatically, with commission, discounts, ads, refunds and net shown per order and brand.",
+        "text": "Every delivery-service statement would be matched to your orders, showing commission, discounts, ads, refunds and net per order and brand.",
         "tool_words": [
           "app"
         ]
@@ -44,7 +44,7 @@
         "keys": [
           "dashboards_reports"
         ],
-        "text": "true margin per brand per app after every deduction, recalculated every week automatically.",
+        "text": "You would see true margin per brand per delivery service after every deduction, refreshed each week.",
         "tool_words": [
           "app"
         ],
@@ -77,7 +77,7 @@
         "keys": [
           "order_capture"
         ],
-        "text": "one kitchen screen combining every app and direct WhatsApp orders, with brand labels and timers.",
+        "text": "One kitchen screen would show every delivery service's orders and direct WhatsApp orders together, with brand labels and timers.",
         "tool_words": [
           "app"
         ]
@@ -199,7 +199,7 @@
         "keys": [
           "reviews_collection"
         ],
-        "text": "a weekly ratings and review digest across apps, with complaint themes by brand pulled out automatically.",
+        "text": "You would get a weekly digest of ratings and reviews across delivery services, with complaint themes picked out by brand.",
         "tool_words": [
           "app"
         ]
@@ -231,7 +231,7 @@
         "keys": [
           "dashboards_reports"
         ],
-        "text": "a weekly owner report with orders, ad spend, net payout, margin and rating trend by brand and app.",
+        "text": "You would get a weekly owner report with orders, ad spend, net payout, margin and rating trend by brand and delivery service.",
         "tool_words": [
           "app"
         ],

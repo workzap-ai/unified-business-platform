@@ -262,7 +262,7 @@
         "text": "One order book where WhatsApp, phone and email orders land, each linked to a job card and tracked to dispatch automatically.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do forgotten orders come mostly through messages, or through phone calls?",
       "free_stops": "How orders flow from each channel into production is mapped in the solution document.",
       "extra_ideas": [
         {
@@ -293,7 +293,7 @@
         "text": "A scrap register where every weighing and sale is matched to a receipt, with a monthly comparison against production.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Is the scrap sold mostly at the gate to regular buyers, or taken out in small amounts through the day?",
       "free_stops": "Where weighing happens and how weights are matched to sales is detailed in the solution document.",
       "extra_ideas": [
         {

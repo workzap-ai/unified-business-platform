@@ -51,7 +51,7 @@
         "text": "a deposit tracker matching counted cash to bank deposits with alerts for gaps or delays.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Is the gap usually after Friday collections, or after special fundraisers?",
       "free_stops": "How counts and deposits are matched is detailed in the solution document.",
       "extra_ideas": [
         {
@@ -81,7 +81,7 @@
         "text": "a fund-wise ledger with a simple monthly statement for members and the committee.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Who asks most often, the donors, the committee or the wider community?",
       "free_stops": "The statement format and ledger set-up go in the solution document.",
       "extra_ideas": [
         {
@@ -112,7 +112,7 @@
         "tool_words": [],
         "leads_with_view": true
       },
-      "ask_first": "",
+      "ask_first": "Is the mixing in how it is written down, or in how the money is actually spent?",
       "free_stops": "The fund structure is designed in the solution document; rulings stay with your scholars.",
       "extra_ideas": [
         {
@@ -142,7 +142,7 @@
         "text": "a pledge register with polite WhatsApp reminders and progress against the fundraising target.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Is it a few large pledges that stay unpaid, or many small ones?",
       "free_stops": "The reminder schedule and wording are prepared in the solution document.",
       "extra_ideas": [
         {
@@ -172,7 +172,7 @@
         "text": "a maintenance log for AC, sound, generator and plumbing with service reminders.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Which breaks down most often, the cooling, the sound or the generator?",
       "free_stops": "The log and reminder schedule are set out in the solution document.",
       "extra_ideas": [
         {
@@ -202,7 +202,7 @@
         "text": "a hall and room booking calendar with confirmation messages that blocks clashes.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do the clashes happen when bookings are taken by phone, or when several people take them?",
       "free_stops": "The booking rules and messages are designed in the solution document.",
       "extra_ideas": [
         {
@@ -232,7 +232,7 @@
         "text": "a broadcast list for announcements in the community's languages, separate from discussion.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Which group misses the notices most, the elders, the youth or the families far away?",
       "free_stops": "The broadcast set-up and language plan go in the solution document.",
       "extra_ideas": [
         {
@@ -259,12 +259,12 @@
         "keys": [
           "erp_nori_platform"
         ],
-        "text": "one system holding funds, bookings, staff and records under the committee's control, with role-based access.",
+        "text": "one shared record holding funds, bookings, staff and records under the committee's control, with each person seeing only what their role allows.",
         "tool_words": [
           "system"
         ]
       },
-      "ask_first": "",
+      "ask_first": "Does anyone else on the committee know where the records are kept, or only that trustee?",
       "free_stops": "Which areas move in and in what order is set out in the solution document.",
       "extra_ideas": [
         {
@@ -294,7 +294,7 @@
         "text": "a Ramadan planner with volunteer shifts, WhatsApp confirmations and iftar headcount estimates.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do volunteers drop out in the first days, or later in the month?",
       "free_stops": "The planner and confirmation flow are detailed in the solution document.",
       "extra_ideas": [
         {

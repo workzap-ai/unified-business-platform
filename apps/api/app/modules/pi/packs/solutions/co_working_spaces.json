@@ -51,7 +51,7 @@
         "text": "tour outcomes and reasons recorded for every prospect, with follow-ups scheduled automatically.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do most visitors say they will think about it, or do they say the price is too high?",
       "free_stops": "the follow-up sequence is kept for the solution document.",
       "extra_ideas": [
         {
@@ -81,7 +81,7 @@
         "text": "meeting room booking via web or WhatsApp, with clashes blocked automatically.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do the clashes happen with walk-in requests at the desk, or with bookings made by members themselves?",
       "free_stops": "booking rules per membership type are set out in the solution document.",
       "extra_ideas": [
         {
@@ -111,7 +111,7 @@
         "text": "credits tracked per member with overage added to invoices automatically.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Is it a few members who go over their credits every month, or many of them now and then?",
       "free_stops": "how credits and overage are calculated is kept for the solution document.",
       "extra_ideas": [
         {
@@ -142,7 +142,7 @@
         "text": "recurring invoices with payment links and late-payment reminders sent automatically.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Is the hand-made invoicing slow because of room extras, or because of members on different plans?",
       "free_stops": "the billing cycle and reminder timings are worked out in the solution document.",
       "extra_ideas": [
         {
@@ -172,7 +172,7 @@
         "text": "a move-out flow covering access card deactivation, deposit settlement and mail redirect.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Is the mess usually about the deposit amount, or about damage and dues found after the member leaves?",
       "free_stops": "the checklist steps and approvals are designed in the solution document.",
       "extra_ideas": [
         {
@@ -202,7 +202,7 @@
         "text": "a membership register with start and renewal dates, feedback pulses and exit reasons recorded.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do those members leave for a cheaper place, or because the space no longer suits their work?",
       "free_stops": "the feedback timing is set out in the solution document.",
       "extra_ideas": [
         {
@@ -232,7 +232,7 @@
         "text": "maintenance tickets from members via WhatsApp, tracked until fixed with response times recorded.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Is the delay usually in someone noticing the complaint, or in getting the technician to come?",
       "free_stops": "the ticket flow and response targets are kept for the solution document.",
       "extra_ideas": [
         {
@@ -262,7 +262,7 @@
         "text": "access card deactivation built into the move-out flow, with a monthly cross-check of cards against members.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Is it a few cards from long ago, or does it happen with most members who leave?",
       "free_stops": "how the check links to your access system is worked out in the solution document.",
       "extra_ideas": [
         {
@@ -292,7 +292,7 @@
         "text": "a location screen with occupancy, revenue, costs, collections and complaints per site.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Which figures do you most want to compare between the two locations, income, occupancy or costs?",
       "free_stops": "which figures to track and how they're pulled together is set out in the solution document.",
       "extra_ideas": [
         {

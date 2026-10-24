@@ -81,7 +81,7 @@
         "text": "live sync between the shelf count and the storefront, with low-stock alerts on best-sellers before they run out.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Is the mismatch mostly on a few popular items, or across most of your catalogue?",
       "free_stops": "The sync design and alert levels per product are set out in the solution document.",
       "extra_ideas": [
         {
@@ -112,7 +112,7 @@
         "text": "a daily morning read of best-seller stock against running campaigns, with alerts when an advertised item runs low.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Does it come up on most campaigns, or only when an ad suddenly does much better than planned?",
       "free_stops": "Which products to watch and how alerts tie to campaigns is covered in the solution document.",
       "extra_ideas": [
         {
@@ -142,7 +142,7 @@
         "text": "a phone pick-and-pack check that flags a wrong item before sealing and records errors by packer and product.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Is the mix-up mostly in size, mostly in colour, or equally both?",
       "free_stops": "The scan-and-check process and its reports are detailed in the solution document.",
       "extra_ideas": [
         {
@@ -203,7 +203,7 @@
         "text": "a WhatsApp reply that reads courier tracking and answers parcel questions on its own, all day.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do most of those messages come after dispatch, or before the parcel has even left?",
       "free_stops": "The tracking connection and reply flow are described in the solution document.",
       "extra_ideas": [
         {
@@ -233,7 +233,7 @@
         "text": "a repeat-buyer and win-back list (counted in reports, never exposed) with scheduled restock messages to customers who gave permission.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do the buyers who return mostly come from one product, or is repeat buying weak across everything?",
       "free_stops": "The segments, timing and message plan stay for the solution document.",
       "extra_ideas": [
         {
@@ -264,7 +264,7 @@
         "tool_words": [],
         "leads_with_view": true
       },
-      "ask_first": "",
+      "ask_first": "Do you already know the profit on your top few products, or has none been worked out?",
       "free_stops": "How each cost is pulled in and allocated is set out in the solution document.",
       "extra_ideas": [
         {
@@ -295,7 +295,7 @@
         "text": "a single order inbox pulling website, Instagram and marketplace orders into one packing queue automatically.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Which channel brings most of your orders, the website, Instagram or Daraz?",
       "free_stops": "Which channels connect and how is detailed in the solution document.",
       "extra_ideas": [
         {
@@ -326,7 +326,7 @@
         "tool_words": [],
         "leads_with_view": true
       },
-      "ask_first": "",
+      "ask_first": "Is the problem guessing quantities for each product, or booking enough staff and courier space?",
       "free_stops": "The planning model and daily read layout go in the solution document.",
       "extra_ideas": [
         {

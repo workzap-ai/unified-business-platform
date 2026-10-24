@@ -52,7 +52,7 @@
         "tool_words": [],
         "leads_with_view": true
       },
-      "ask_first": "",
+      "ask_first": "Does most of the yearly income arrive in the three months before the test, or only about half?",
       "free_stops": "How the season plan is modelled from your past cohorts is in the document.",
       "extra_ideas": [
         {
@@ -82,7 +82,7 @@
         "text": "Every enquiry tagged to the ad, influencer or branch that brought it and followed to a paid seat, measured across the season.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do you run ads on several channels, or mainly on one?",
       "free_stops": "How the codes are set up and tied to enrolments is kept for the document.",
       "extra_ideas": [
         {
@@ -109,12 +109,12 @@
         "keys": [
           "credit_ledger"
         ],
-        "text": "integration — An installment schedule that reminds automatically and pauses or restores online access under the rule you set, with collections measured per cohort.",
+        "text": "An instalment schedule would remind students by itself and pause or restore online access under your rule, with collections measured per cohort.",
         "tool_words": [
           "integration"
         ]
       },
-      "ask_first": "",
+      "ask_first": "Do students stop after the first instalment on all courses, or only on some?",
       "free_stops": "The reminder sequence and access rules are set out in the document.",
       "extra_ideas": [
         {
@@ -144,7 +144,7 @@
         "text": "A refund and transfer log with approval and status for every request, reported per cohort.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do the requests concern refunds more often, or transfers between batches?",
       "free_stops": "The request flow and approval steps are kept for the document.",
       "extra_ideas": [
         {
@@ -174,7 +174,7 @@
         "text": "Device-limited logins and account-number watermarking on videos, with sharing alerts every day.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Is the sharing mostly on recorded lectures, or in live classes too?",
       "free_stops": "The sharing signals and how access is limited are kept for the document.",
       "extra_ideas": [
         {
@@ -204,7 +204,7 @@
         "text": "Book stock linked to enrolments per branch, with an automatic alert when a reprint is needed in time for the printer.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do books run out mid-course for one subject, or for several?",
       "free_stops": "The reorder triggers per title and branch are in the document.",
       "extra_ideas": [
         {
@@ -231,12 +231,12 @@
         "keys": [
           "custom_build"
         ],
-        "text": "An online mock platform with automatic marking and cohort-level results, without names in owner reports.",
+        "text": "Mock tests would be taken online and marked automatically, with results per cohort and no names in owner reports.",
         "tool_words": [
           "platform"
         ]
       },
-      "ask_first": "",
+      "ask_first": "Does checking take long for one subject, or across all of them?",
       "free_stops": "The marking setup and reports are kept for the document.",
       "extra_ideas": [
         {
@@ -266,7 +266,7 @@
         "text": "Each session logged and matched to the timetable automatically before pay, with differences flagged per branch.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Are the extra claims from a few instructors, or from many?",
       "free_stops": "The matching rules for swaps and cancellations are in the document.",
       "extra_ideas": [
         {
@@ -296,7 +296,7 @@
         "text": "Codes per influencer with usage limits and expiry, and each one's enrolments reported automatically.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Are the codes shared on social media, or passed around in groups?",
       "free_stops": "The code limits and reporting are kept for the document.",
       "extra_ideas": [
         {
@@ -326,7 +326,7 @@
         "text": "One owner screen with revenue per cohort, ad spend per enrolment, collections and branch comparison, updated daily.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Which is hardest to see per cohort: enrolments, collections or dropouts?",
       "free_stops": "How the data is pulled together is set out in the document.",
       "extra_ideas": [
         {

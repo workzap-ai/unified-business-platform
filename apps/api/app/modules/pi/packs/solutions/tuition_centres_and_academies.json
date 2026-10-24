@@ -18,12 +18,12 @@
         "keys": [
           "cash_reconciliation"
         ],
-        "text": "A fee desk app issuing a digital receipt for every cash, wallet or transfer payment and closing cash per receptionist every day, across branches.",
+        "text": "a fee desk receipt tool giving a digital receipt for every cash, wallet or transfer payment, and closing cash per receptionist each day across branches.",
         "tool_words": [
           "app"
         ]
       },
-      "ask_first": "",
+      "ask_first": "Does the mismatch come mostly from cash payments, or also from wallet and transfers?",
       "free_stops": "The daily close steps and variance alerts are kept for the document.",
       "extra_ideas": [
         {
@@ -53,7 +53,7 @@
         "text": "customer_messaging — Monthly reminders sent automatically on WhatsApp, with a live paid/unpaid list per batch by fee card number.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Does the receptionist chase every family, or only the late few?",
       "free_stops": "The reminder sequence and follow-up rules are in the document.",
       "extra_ideas": [
         {
@@ -113,7 +113,7 @@
         "text": "Every enquiry tracked from source to demo to admission, with automatic follow-up reminders and a weekly conversion count per branch.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do you run demo classes weekly, or only at the start of a session?",
       "free_stops": "The follow-up timings and stages are set out in the document.",
       "extra_ideas": [
         {
@@ -143,7 +143,7 @@
         "text": "Families tracked by reference across sessions, with likely leavers flagged automatically and reminded about the next session.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do students leave mostly after board exams, or after any exam?",
       "free_stops": "The warning signals and re-enrolment messages are kept for the document.",
       "extra_ideas": [
         {
@@ -174,7 +174,7 @@
         "tool_words": [],
         "leads_with_view": true
       },
-      "ask_first": "",
+      "ask_first": "Are the thin batches mostly in one subject, or in many?",
       "free_stops": "How costs are allocated per batch is in the document.",
       "extra_ideas": [
         {
@@ -204,7 +204,7 @@
         "text": "customer_messaging — Timetable and room booking with a clash check, and every change sent automatically to just the batches affected.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do parents miss changes mostly in groups with many members, or in all of them?",
       "free_stops": "The broadcast setup and clash rules are kept for the document.",
       "extra_ideas": [
         {
@@ -234,7 +234,7 @@
         "text": "Every discount approved before it applies, with a monthly report by branch.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Who gives these discounts, the owner, the reception, or the teachers?",
       "free_stops": "The approval levels and report format are in the document.",
       "extra_ideas": [
         {
@@ -264,7 +264,7 @@
         "text": "A branch screen updated daily with enrolment, collections, teacher costs, rent and margin per branch.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do you run just a couple of branches, or many?",
       "free_stops": "Which figures feed the screen and how is kept for the document.",
       "extra_ideas": [
         {
@@ -294,7 +294,7 @@
         "text": "A unique join link per enrolled family with an automatic attendance count, so shared links are spotted.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Does the sharing come up mostly in one batch, or across all online classes?",
       "free_stops": "How links are issued and checked is set out in the document.",
       "extra_ideas": [
         {

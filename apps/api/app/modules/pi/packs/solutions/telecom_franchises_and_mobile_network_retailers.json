@@ -53,7 +53,7 @@
         "tool_words": [],
         "leads_with_view": true
       },
-      "ask_first": "",
+      "ask_first": "Do the surprises come mostly from one operator, or from several?",
       "free_stops": "Matching logic and clawback analysis are in the solution document; pi does not interpret operator policy.",
       "extra_ideas": [
         {
@@ -83,7 +83,7 @@
         "text": "transfer_tracking — A serialised stock register for kits and handsets showing received, issued by role, sold and returned, with alerts for kits out too long.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do kits go missing with a few BAs, or with most of them?",
       "free_stops": "Register structure and alert rules are in the solution document.",
       "extra_ideas": [
         {
@@ -113,7 +113,7 @@
         "text": "nori_daily_read — A daily read of stock per outlet with ageing flags for slow handsets and low-stock alerts for fast ones.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Is the slow stock mostly cheap handsets, or costly ones?",
       "free_stops": "Ageing and reorder logic are in the solution document.",
       "extra_ideas": [
         {
@@ -143,7 +143,7 @@
         "text": "An inter-outlet transfer log with confirm-on-receipt that flags anything sent and not received.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do just two outlets trade stock with each other, or many?",
       "free_stops": "Confirmation steps are in the solution document.",
       "extra_ideas": [
         {
@@ -173,7 +173,7 @@
         "text": "A BA daily check-in and sales log by place name (not live tracking) rolled into a weekly view per BA.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do you have a few BAs on the street, or a large team?",
       "free_stops": "Log design and comparison method are in the solution document.",
       "extra_ideas": [
         {
@@ -204,7 +204,7 @@
         "tool_words": [],
         "leads_with_view": true
       },
-      "ask_first": "",
+      "ask_first": "Do disputes come up mostly at month end, or through the whole month?",
       "free_stops": "How the rule is applied and shown is in the solution document.",
       "extra_ideas": [
         {
@@ -234,7 +234,7 @@
         "text": "A queue and visit-reason tally that feeds a staff roster for peak hours per outlet.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Are queues worst at certain hours, or all day long?",
       "free_stops": "Tally categories and roster logic are in the solution document.",
       "extra_ideas": [
         {
@@ -264,7 +264,7 @@
         "text": "Automatic review requests to customers who agreed to be contacted after a smooth visit, with a weekly review summary per outlet.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Are the bad reviews mostly about waiting, or about staff manner?",
       "free_stops": "Request timing and wording are in the solution document; reviews only ever come from real customers.",
       "extra_ideas": [
         {
@@ -294,7 +294,7 @@
         "text": "cash_reconciliation — A morning read of sales, stock and cash closing across every outlet, with the one outlet that needs attention.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do all managers send screenshots on time, or only some of them?",
       "free_stops": "Which figures and how they are collected is in the solution document.",
       "extra_ideas": [
         {
@@ -324,7 +324,7 @@
         "text": "A returns and warranty tracker with status and handover by role, reminding staff of cases waiting too long.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Are the returns mostly handsets, or mostly accessories?",
       "free_stops": "Case stages are in the solution document.",
       "extra_ideas": [
         {

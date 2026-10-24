@@ -51,7 +51,7 @@
         "text": "dashboards_reports — A receivables tracker for funder and corporate payments, with expected dates, reminders and a cash-gap view updated daily.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do funders pay months late on every batch, or only on certain programmes?",
       "free_stops": "The cash-gap model and follow-up schedule are in the document.",
       "extra_ideas": [
         {
@@ -82,7 +82,7 @@
         "tool_words": [],
         "leads_with_view": true
       },
-      "ask_first": "",
+      "ask_first": "Do trainees leave in the first weeks, or after the middle of the course?",
       "free_stops": "The warning rules and follow-up steps are kept for the document.",
       "extra_ideas": [
         {
@@ -112,7 +112,7 @@
         "text": "field_checks — Issue slips per practical, usage per batch compared with expected every day, and reorder alerts per workshop.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do the rods and wire disappear from the store, or on the workshop floor?",
       "free_stops": "The expected-usage figures and variance rules are in the document.",
       "extra_ideas": [
         {
@@ -142,7 +142,7 @@
         "text": "A tool lending register with check-out and check-in by phone and a daily missing-item report per workshop.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Are the lost tools mostly small hand tools, or larger items?",
       "free_stops": "The lending flow and missing-item rules are kept for the document.",
       "extra_ideas": [
         {
@@ -172,7 +172,7 @@
         "text": "Breakdowns reported by phone with a photo of the machine, repair status tracked and downtime measured per machine and campus.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do machines wait for a repair person, or for spare parts to arrive?",
       "free_stops": "The reporting flow and downtime reports are in the document.",
       "extra_ideas": [
         {
@@ -202,7 +202,7 @@
         "text": "Checklists completed on a phone with time, location and a photo of the area, and completion measured per workshop every day.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Are the signed checklists for workshop machines, or for fire and general safety?",
       "free_stops": "How the checks are scheduled and verified is kept for the document.",
       "extra_ideas": [
         {
@@ -233,7 +233,7 @@
         "tool_words": [],
         "leads_with_view": true
       },
-      "ask_first": "",
+      "ask_first": "Do you suspect the weak courses are the ones using lots of material, or those with few students?",
       "free_stops": "How costs are shared across courses is set out in the document.",
       "extra_ideas": [
         {
@@ -263,7 +263,7 @@
         "text": "Timesheets matched to the timetable automatically before pay, with differences flagged per campus.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do the timesheet gaps come from swaps between instructors, or from classes that did not run?",
       "free_stops": "The matching rules are kept for the document.",
       "extra_ideas": [
         {
@@ -293,7 +293,7 @@
         "text": "Placement outcomes recorded as counts by course and campus, kept up to date after each batch.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do you promise placement to every student, or only to those on certain courses?",
       "free_stops": "How outcomes are collected after completion is in the document.",
       "extra_ideas": [
         {
@@ -323,7 +323,7 @@
         "text": "Social enquiries captured automatically into a follow-up queue with reminders and a weekly enrolment count.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do the enquiries arrive as direct messages, or as comments under your videos?",
       "free_stops": "The capture and follow-up setup are kept for the document.",
       "extra_ideas": [
         {

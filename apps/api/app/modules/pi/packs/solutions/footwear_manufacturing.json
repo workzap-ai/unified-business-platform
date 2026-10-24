@@ -52,7 +52,7 @@
         "text": "Size-set carton packing with scan-in and scan-out, so every carton opened or moved is recorded.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do sets get broken when dealers order loose sizes, or when your own staff open cartons at the godown?",
       "free_stops": "How cartons are coded and scanned is covered in the solution document.",
       "extra_ideas": [
         {
@@ -112,7 +112,7 @@
         "text": "A mould register by article and size with condition and repair history, and a log of every press breakdown.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Does the breakdown usually hit a mould, or the press itself?",
       "free_stops": "Inspection routine and repair priorities are kept for the solution document.",
       "extra_ideas": [
         {
@@ -142,7 +142,7 @@
         "text": "A pre-dispatch QC checklist with defect types and photos recorded for every lot.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Are the defects mostly in sole bonding, or in stitching and finish?",
       "free_stops": "The checklist and how defects are traced to a stage are covered in the solution document.",
       "extra_ideas": [
         {
@@ -172,7 +172,7 @@
         "text": "A dealer ledger with ageing, credit limits checked at order time and season-end return tracking.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Is the credit mostly with a few big dealers, or spread across many small shops?",
       "free_stops": "How limits and return terms are tracked per dealer is set out in the solution document.",
       "extra_ideas": [
         {
@@ -203,7 +203,7 @@
         "text": "Daily piece counts per worker role entered by supervisors, feeding a weekly count sheet everyone can see.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do the disputes come from the count of pairs, or from which rate applies to each stage?",
       "free_stops": "How counts are verified and fed into the weekly sheet is detailed in the solution document; for wage rules, talk to your lawyer or accountant.",
       "extra_ideas": [
         {
@@ -238,7 +238,7 @@
           "integration"
         ]
       },
-      "ask_first": "",
+      "ask_first": "Do your own shops sit in one city, or are they spread across several?",
       "free_stops": "How shop sales connect to factory stock is mapped in the solution document.",
       "extra_ideas": [
         {
@@ -268,7 +268,7 @@
         "text": "Online orders in one list with a pick check against article and size before dispatch.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Does the wrong size come from picking at the shelf, or from mislabelled cartons?",
       "free_stops": "The pick-check flow is set out in the solution document.",
       "extra_ideas": [
         {
@@ -299,7 +299,7 @@
         "tool_words": [],
         "leads_with_view": true
       },
-      "ask_first": "",
+      "ask_first": "Do you choose articles by feel at the start of the season, or from last season's sales list?",
       "free_stops": "How the view turns into a production plan is detailed in the solution document.",
       "extra_ideas": [
         {

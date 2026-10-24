@@ -140,7 +140,7 @@
           "attribution_codes",
           "lead_followup"
         ],
-        "text": "Every portal, Meta and expo lead lands in one queue tagged with its source, gets a follow-up task, and a report shows which channel turned into bookings each week.",
+        "text": "Every listing-site, Facebook and expo lead would land in one queue tagged with its source and get a follow-up task, and a weekly report would show which channel turned into bookings.",
         "tool_words": [
           "portal"
         ]
@@ -172,7 +172,7 @@
         "keys": [
           "custom_build"
         ],
-        "text": "A broker portal that timestamps every lead registration and produces commission statements per broker automatically each month.",
+        "text": "A broker page that would timestamp every lead registration and produce each broker's commission statement every month.",
         "tool_words": [
           "portal"
         ]
@@ -294,7 +294,7 @@
         "keys": [
           "erp_nori_platform"
         ],
-        "text": "One system on nori running inventory, instalments, construction cost and handover, with an owner dashboard updated every day.",
+        "text": "One shared record running inventory, instalments, construction cost and handover, with an owner view that would update every day.",
         "tool_words": [
           "system",
           "dashboard"

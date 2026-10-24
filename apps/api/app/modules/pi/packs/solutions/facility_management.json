@@ -48,7 +48,7 @@
         "keys": [
           "field_checks"
         ],
-        "text": "A technician work-order app with arrival time, before/after photos, parts used and client sign-off.",
+        "text": "Technicians would record arrival time, before and after photos, parts used and client sign-off on their phones.",
         "tool_words": [
           "app"
         ]
@@ -80,7 +80,7 @@
         "keys": [
           "dashboards_reports"
         ],
-        "text": "An SLA dashboard per contract showing response and fix times and penalties at risk, updated daily.",
+        "text": "You would see response and fix times and penalties at risk for each contract, updated daily.",
         "tool_words": [
           "dashboard"
         ],
@@ -295,7 +295,7 @@
         "keys": [
           "integration"
         ],
-        "text": "A simple WhatsApp-based work-order flow for technicians that feeds your existing system, so nothing is typed twice.",
+        "text": "Technicians would send work orders by WhatsApp that land in your existing records, so nothing is typed twice.",
         "tool_words": [
           "system"
         ]

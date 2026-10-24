@@ -48,12 +48,12 @@
         "keys": [
           "cash_reconciliation"
         ],
-        "text": "integration — Challan references and wallet transaction IDs matched to fee accounts every day across all campuses, with money that has no account, and accounts marked paid with no money, flagged each morning.",
+        "text": "Challan references and wallet transaction IDs would be matched to fee accounts every day across all campuses, with money that has no account, and accounts marked paid with no money, flagged each morning.",
         "tool_words": [
           "integration"
         ]
       },
-      "ask_first": "",
+      "ask_first": "Do unmatched payments come mostly from challans, or from wallet transfers?",
       "free_stops": "How the matching rules handle part payments, siblings and wrong references is kept for the document.",
       "extra_ideas": [
         {
@@ -83,7 +83,7 @@
         "text": "Every concession goes through owner approval before it reaches the fee ledger, with a monthly report by campus.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do the unrecorded discounts come from one campus, or from several?",
       "free_stops": "The approval levels and the monthly concession report format are set out in the document.",
       "extra_ideas": [
         {
@@ -113,7 +113,7 @@
         "text": "Every enquiry from ads, WhatsApp, the website and walk-ins captured automatically, with stage, source and follow-up reminders, plus a season-to-date view of enquiries turning into admissions per campus.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Which source brings most enquiries: Instagram, WhatsApp, or walk-ins?",
       "free_stops": "The pipeline stages and follow-up timings are kept for the document.",
       "extra_ideas": [
         {
@@ -143,7 +143,7 @@
         "text": "Every enquiry tagged by the ad and campus that brought it, measured all season down to admissions.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Did you run the admission ads for one campus, or for all campuses?",
       "free_stops": "How the links and codes are set up per ad and campus is in the document.",
       "extra_ideas": [
         {
@@ -174,7 +174,7 @@
         "tool_words": [],
         "leads_with_view": true
       },
-      "ask_first": "",
+      "ask_first": "Do you hear about leavers mostly in summer, or through the whole year?",
       "free_stops": "How the tracker follows up on unsure families is kept for the document.",
       "extra_ideas": [
         {
@@ -204,7 +204,7 @@
         "text": "Absences logged each morning, free periods matched automatically and the cover teacher told on WhatsApp, with a count of cover load per teacher by campus.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do teacher absences mostly come the same morning, or are they known the day before?",
       "free_stops": "The cover rules and fairness balancing are set out in the document.",
       "extra_ideas": [
         {
@@ -234,7 +234,7 @@
         "text": "Marks entered once by teachers and report cards produced automatically, with access limited to staff who need it.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do the delays come mostly from late marks, or from different file formats?",
       "free_stops": "The entry screens, checks and report-card layout are kept for the document.",
       "extra_ideas": [
         {
@@ -264,7 +264,7 @@
         "text": "cash_reconciliation — A transport register of routes, seats and fees that reconciles every month, with a one-tap delay message to parents on the affected route.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do parents complain mostly about morning pick-up, or afternoon drop-off?",
       "free_stops": "How route changes and delay alerts flow to parents is set out in the document.",
       "extra_ideas": [
         {
@@ -294,7 +294,7 @@
         "text": "stock_alerts — A daily canteen close comparing stock sold with cash counted, with an alert to the owner when gaps repeat.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Does the canteen gap show more in cash, or in stock?",
       "free_stops": "The variance limits and alert rules are kept for the document.",
       "extra_ideas": [
         {

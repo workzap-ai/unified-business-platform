@@ -21,7 +21,7 @@
         "text": "A waitlist and tour tracker with follow-up dates and offer status, checked automatically each month across centres.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Of the families on the waitlist, are most still interested, or have you lost touch with most?",
       "free_stops": "The waitlist stages and follow-up timing are kept for the document.",
       "extra_ideas": [
         {
@@ -52,7 +52,7 @@
         "tool_words": [],
         "leads_with_view": true
       },
-      "ask_first": "",
+      "ask_first": "Is the toddler room full all year, or only in certain months?",
       "free_stops": "How room moves are forecast is in the document.",
       "extra_ideas": [
         {
@@ -82,7 +82,7 @@
         "text": "A roster planner showing staffing per room against expected attendance and your own ratio settings, with the cover list contacted automatically.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do sick calls come mostly on certain days, or spread across the week?",
       "free_stops": "The roster rules and cover order are kept for the document.",
       "extra_ideas": [
         {
@@ -112,7 +112,7 @@
         "text": "Daily attendance counts compiled automatically into a claim workbook for you to check and submit.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do the subsidy claim evenings go mostly on counting attendance, or on filling in the forms?",
       "free_stops": "How the workbook is built to your province's format is in the document.",
       "extra_ideas": [
         {
@@ -143,7 +143,7 @@
         "tool_words": [],
         "leads_with_view": true
       },
-      "ask_first": "",
+      "ask_first": "Do subsidy payments arrive a few days late, or weeks late?",
       "free_stops": "How the cash view is set up is kept for the document.",
       "extra_ideas": [
         {
@@ -173,7 +173,7 @@
         "text": "A fee ledger with automatic reminders and payment links, and a daily overdue count per centre.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do late payers owe a little each, or do a few families owe a lot?",
       "free_stops": "The reminder sequence and overdue rules are in the document.",
       "extra_ideas": [
         {
@@ -203,7 +203,7 @@
         "text": "Late pick-ups picked up from sign-out times and added to the next invoice automatically, under your policy.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do late pick-ups occur most days, or mainly on certain days?",
       "free_stops": "How sign-out feeds billing is kept for the document.",
       "extra_ideas": [
         {
@@ -233,7 +233,7 @@
         "text": "Digital sign-in and sign-out on a tablet with PINs for adults the centre authorises, and missing times flagged daily.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Are times missing mostly at morning drop-off, or at evening pick-up?",
       "free_stops": "The sign-in setup and authorisation flow are in the document.",
       "extra_ideas": [
         {
@@ -263,7 +263,7 @@
         "text": "A supplies and food register with reorder alerts, and meal counts matched to expected attendance to cut waste.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Which item runs out most often: nappies, wipes or formula?",
       "free_stops": "The minimum levels and alert setup are kept for the document.",
       "extra_ideas": [
         {
@@ -293,7 +293,7 @@
         "text": "Room checklists completed on a phone with time and a photo of the room (no children in frame), with completion measured per centre.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Which cleaning checks worry you most: the toddler rooms, the kitchen, or the bathrooms?",
       "free_stops": "How the checks are scheduled and verified is in the document.",
       "extra_ideas": [
         {
@@ -323,7 +323,7 @@
         "text": "A centre messaging channel separate from staff phones, with templated daily updates and automatic replies to common questions.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do parents message teachers mostly during class hours, or in the evenings and weekends?",
       "free_stops": "The update templates and reply setup are kept for the document.",
       "extra_ideas": [
         {

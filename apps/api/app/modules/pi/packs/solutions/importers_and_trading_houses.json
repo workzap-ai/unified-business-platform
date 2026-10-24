@@ -147,7 +147,7 @@
           "credit_ledger"
         ]
       },
-      "ask_first": "",
+      "ask_first": "Is the delay mostly from a few large customers, or does almost everyone pay late?",
       "free_stops": "How the view is laid out and refreshed is covered in the solution document.",
       "extra_ideas": [
         {
@@ -237,7 +237,7 @@
         "text": "A port-to-godown log with photos at each handoff that flags any load where sent and received counts differ, every time.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do you think the cartons go missing at the port, on the road, or at the godown?",
       "free_stops": "The handoff points and proof captured at each are set in the solution document.",
       "extra_ideas": [
         {
@@ -267,7 +267,7 @@
         "text": "A rate list pushed to salesmen's phones daily, with every quote logged per party and anything below list sent for approval automatically.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do rate differences come mostly from one or two salesmen, or from all of them?",
       "free_stops": "Approval rules and the quote log design are in the solution document.",
       "extra_ideas": [
         {
@@ -327,7 +327,7 @@
         "text": "A short owner read on WhatsApp each morning: stock value, receivables, shipments in transit, top and slow items, and the one thing to look at.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do you get any figures before year end, or nothing at all until the accountant finishes?",
       "free_stops": "Which numbers appear and how they are worked out is set in the solution document.",
       "extra_ideas": [
         {
@@ -358,7 +358,7 @@
         "text": "Marketplace order intake that feeds Daraz orders into the same stock as the godown automatically, so trade and online never sell the same maal twice.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Is the main worry stock and orders for Daraz, or who will run it day to day?",
       "free_stops": "The order flow and stock-sharing rules are in the solution document.",
       "extra_ideas": [
         {

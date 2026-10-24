@@ -52,7 +52,7 @@
         "text": "collection records per visit reconciled to deposits each day.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do recovery staff collect instalments at customers' homes, or at the shop counter?",
       "free_stops": "The collection steps are in the solution document.",
       "extra_ideas": [
         {
@@ -83,7 +83,7 @@
         "text": "a registration file tracker with stages and a message when it's ready.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Is the delay with the registration office, or with the agent who handles your files?",
       "free_stops": "File stages are in the solution document.",
       "extra_ideas": [
         {
@@ -114,7 +114,7 @@
         "text": "a booking and stock tracker by model and colour with customer updates.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Are customers waiting for certain models or colours, or for almost everything in the range?",
       "free_stops": "Tracker set-up is in the solution document.",
       "extra_ideas": [
         {
@@ -145,7 +145,7 @@
         "text": "job cards with parts issued linked to billing, and a parts register with reorder levels.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do parts go missing from the shelves, or leave the workshop without a job card?",
       "free_stops": "Issue rules are in the solution document.",
       "extra_ideas": [
         {
@@ -176,7 +176,7 @@
         "text": "fleet servicing schedule and billing with ageing.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do fleet clients pay late on a monthly bill, or after each service visit?",
       "free_stops": "Billing set-up is in the solution document.",
       "extra_ideas": [
         {
@@ -206,7 +206,7 @@
         "text": "online enquiry capture from Facebook and WhatsApp with follow-up reminders.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do the enquirers go quiet after you give the price, or do they never answer at all?",
       "free_stops": "Follow-up timings are in the solution document.",
       "extra_ideas": [
         {
@@ -237,7 +237,7 @@
         "tool_words": [],
         "leads_with_view": true
       },
-      "ask_first": "",
+      "ask_first": "Which eats most of your margin: discounts, free helmets, or other extras?",
       "free_stops": "Which costs are included is in the solution document.",
       "extra_ideas": [
         {
@@ -268,7 +268,7 @@
         "text": "a daily cash-up against sales and collections, with the owner's summary on WhatsApp.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do you keep the register for sales and collections together, or only for credit customers?",
       "free_stops": "What the daily read includes is in the solution document.",
       "extra_ideas": [
         {

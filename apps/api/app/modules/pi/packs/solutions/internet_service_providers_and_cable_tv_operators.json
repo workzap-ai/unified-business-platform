@@ -51,7 +51,7 @@
         "text": "A technician job queue on phone ordered by age and area, with assign, accept and close, and parts used.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do technicians pick nearby jobs to save travel, or because nobody gives them a clear job order?",
       "free_stops": "Priority rules and queue design are in the solution document.",
       "extra_ideas": [
         {
@@ -78,12 +78,12 @@
         "keys": [
           "dashboards_reports"
         ],
-        "text": "A daily ticket dashboard of open, overdue and average fix time by area and technician.",
+        "text": "You would see a daily view of open, overdue and average fix time for complaints, by area and technician.",
         "tool_words": [
           "dashboard"
         ]
       },
-      "ask_first": "",
+      "ask_first": "Is the missing piece the time a complaint came in, or the time it was fixed?",
       "free_stops": "KPI definitions and the dashboard are in the solution document.",
       "extra_ideas": [
         {
@@ -110,12 +110,12 @@
         "keys": [
           "cash_reconciliation"
         ],
-        "text": "A collection app where collectors mark paid by connection reference, with daily totals and deposit confirmation flagged against collections.",
+        "text": "You would see collectors marking each connection paid by its reference, with daily totals and deposits flagged against what was collected.",
         "tool_words": [
           "app"
         ]
       },
-      "ask_first": "",
+      "ask_first": "Do collectors hand over cash daily, or keep it until they have collected from a whole area?",
       "free_stops": "Collection and matching steps are in the solution document; pi records the control gap, not an accusation.",
       "extra_ideas": [
         {
@@ -145,7 +145,7 @@
         "text": "customer_messaging — An unpaid list with automatic reminders to subscribers who agreed to messages, and an online payment link where available.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do late payers mostly pay a few days late, or several weeks late?",
       "free_stops": "Reminder timing and message wording are in the solution document.",
       "extra_ideas": [
         {
@@ -175,7 +175,7 @@
         "text": "dashboards_reports — A reconciliation report comparing active connections on the panel with billed connections, flagging each mismatch.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do the unbilled connections come mostly from new installations, or from reconnections after a break?",
       "free_stops": "How the two systems are linked is assessed in the solution document; pi never asks for panel logins.",
       "extra_ideas": [
         {
@@ -205,7 +205,7 @@
         "text": "job_tracking — An equipment register of routers and ONUs issued, installed and recovered on disconnection by serial number, with reorder alerts for fibre and splitters.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do devices go missing mostly with technicians, or with customers who have left?",
       "free_stops": "Register design is in the solution document.",
       "extra_ideas": [
         {
@@ -235,7 +235,7 @@
         "text": "A new connection pipeline from request to survey to install with waiting time at each step.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Are new requests waiting mostly for a survey visit, or for equipment and a free technician?",
       "free_stops": "Pipeline stages are in the solution document.",
       "extra_ideas": [
         {
@@ -265,7 +265,7 @@
         "text": "An outage broadcast and status message to subscribers in affected areas who agreed to messages, with a follow-up when service returns.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do customers call mostly the office phone, or the personal numbers of individual staff?",
       "free_stops": "Broadcast set-up and wording are in the solution document.",
       "extra_ideas": [
         {
@@ -295,7 +295,7 @@
         "text": "dashboards_reports — A churn log with reason codes on disconnection and an early-warning list of subscribers with repeat faults.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do subscribers leave mostly for a lower price, or for faster speeds from the bigger company?",
       "free_stops": "Reason codes and the warning rules are in the solution document.",
       "extra_ideas": [
         {

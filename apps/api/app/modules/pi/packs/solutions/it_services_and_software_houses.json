@@ -52,7 +52,7 @@
         "text": "a change request log per project with approval, cost and time impact, feeding straight into invoices.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do changes come on most projects, or mainly with a few particular clients?",
       "free_stops": "the approval and pricing flow for change requests is kept for the solution document.",
       "extra_ideas": [
         {
@@ -82,7 +82,7 @@
         "text": "a resource planner showing each person's allocation by week and bench time, updated as projects change.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Is the uneven load mostly on senior developers, or across the whole team?",
       "free_stops": "how allocation is entered and kept current is designed in the solution document.",
       "extra_ideas": [
         {
@@ -112,7 +112,7 @@
         "text": "timesheet capture linked to projects and tasks with daily nudges instead of a Friday catch-up.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Does everyone fill timesheets on Friday, or only a few people?",
       "free_stops": "the nudge timing and how it links to your task tool are worked out in the solution document.",
       "extra_ideas": [
         {
@@ -143,7 +143,7 @@
         "tool_words": [],
         "leads_with_view": true
       },
-      "ask_first": "",
+      "ask_first": "Do deadlines slip mostly in one team, or on projects across the company?",
       "free_stops": "the risk signals used are set out in the solution document.",
       "extra_ideas": [
         {
@@ -173,7 +173,7 @@
         "text": "a release checklist that must be completed and signed off before anything goes to the client, with returned issues logged per release.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do the returning bugs come mostly from one product, or from all your projects?",
       "free_stops": "the checklist contents and sign-off rules are kept for the solution document.",
       "extra_ideas": [
         {
@@ -203,7 +203,7 @@
         "text": "a milestone billing tracker with UAT sign-off dates, chasers when sign-off stalls and invoices drafted the moment it closes.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Is it one or two big clients holding back payment, or most of them?",
       "free_stops": "chaser timings and invoice triggers are set out in the solution document.",
       "extra_ideas": [
         {
@@ -233,7 +233,7 @@
         "text": "receivables by client with ageing, reminders and remittance receipt recorded, so you see what's due and what has actually arrived.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do payments run late mostly from one country, or from clients everywhere?",
       "free_stops": "the reminder sequence and how receipts are matched are kept for the solution document.",
       "extra_ideas": [
         {
@@ -263,7 +263,7 @@
         "text": "a knowledge handover checklist and documentation register per project, with reminders when documents go out of date.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Does this worry you more for one critical project, or for most of your work?",
       "free_stops": "the documentation structure and review routine are designed in the solution document.",
       "extra_ideas": [
         {
@@ -293,7 +293,7 @@
         "text": "support ticket intake with hours logged per client against the support contract, flagged when a client goes over.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Is the free work mostly from a few clients, or from nearly all support contracts?",
       "free_stops": "how tickets and hours are tracked against contracts is worked out in the solution document.",
       "extra_ideas": [
         {

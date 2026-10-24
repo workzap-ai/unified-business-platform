@@ -51,7 +51,7 @@
         "text": "an approval tracker per deliverable with automatic client reminders and a daily list of what's stuck and for how long.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do clients delay sign-off mostly on one or two accounts, or on most?",
       "free_stops": "reminder timings and escalation are worked out in the solution document.",
       "extra_ideas": [
         {
@@ -81,7 +81,7 @@
         "text": "every deliverable tracked with revision rounds counted against what the agreement allows, flagged when it goes over.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do unlimited revisions come mostly from one or two clients, or from nearly all?",
       "free_stops": "how rounds are counted and flagged is kept for the solution document.",
       "extra_ideas": [
         {
@@ -112,7 +112,7 @@
         "tool_words": [],
         "leads_with_view": true
       },
-      "ask_first": "",
+      "ask_first": "Have the retainers grown most for your oldest clients, or for your biggest ones?",
       "free_stops": "how scope is defined and compared is designed in the solution document.",
       "extra_ideas": [
         {
@@ -143,7 +143,7 @@
         "tool_words": [],
         "leads_with_view": true
       },
-      "ask_first": "",
+      "ask_first": "Does your team note time per client today, or not at all?",
       "free_stops": "how time is logged without slowing the team is worked out in the solution document.",
       "extra_ideas": [
         {
@@ -173,7 +173,7 @@
         "text": "an ad spend reimbursement tracker per client with invoices, ageing and reminders.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Is the front money mostly for a few clients, or for many?",
       "free_stops": "the reimbursement and reminder flow is set out in the solution document.",
       "extra_ideas": [
         {
@@ -201,13 +201,13 @@
           "integration",
           "dashboards_reports"
         ],
-        "text": "monthly client reports pulled automatically from the ad platforms and social analytics into a branded summary.",
+        "text": "Monthly client reports would be pulled together from the ad accounts and social pages into one branded summary.",
         "tool_words": [
           "platform",
           "analytics"
         ]
       },
-      "ask_first": "",
+      "ask_first": "Do the client reports cost most time in gathering numbers, or in making them look right?",
       "free_stops": "which sources are connected and the report design are kept for the solution document.",
       "extra_ideas": [
         {
@@ -237,7 +237,7 @@
         "text": "a shared content calendar with status for every post from drafted to live, alerting the owner when a scheduled post isn't approved in time.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Are posts missed mostly on one client's calendar, or across several?",
       "free_stops": "the status stages and alerts are worked out in the solution document.",
       "extra_ideas": [
         {
@@ -267,7 +267,7 @@
         "text": "a team capacity board by person and week that updates as tasks are assigned.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do the overloads fall on the same designers every week, or move around?",
       "free_stops": "how workload is measured per person is designed in the solution document.",
       "extra_ideas": [
         {
@@ -298,7 +298,7 @@
         "tool_words": [],
         "leads_with_view": true
       },
-      "ask_first": "",
+      "ask_first": "Do clients leave mostly after a bad month, or without any complaint?",
       "free_stops": "the health signals and thresholds are kept for the solution document.",
       "extra_ideas": [
         {

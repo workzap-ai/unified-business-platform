@@ -83,7 +83,7 @@
         "text": "One shared order board that every merchandiser updates, so the owner sees all styles on one screen and order knowledge stays when people leave.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do just a few merchandisers keep their own order lists, or all of them?",
       "free_stops": "The board layout and who updates what are covered in the solution document.",
       "extra_ideas": [
         {
@@ -141,12 +141,12 @@
         "keys": [
           "field_checks"
         ],
-        "text": "An inline and final QC app recording defects by type, operation and line with photos, summarised daily so rework is caught early.",
+        "text": "Inline and final checks would record defects by type, operation and line with photos, summarised daily so rework is caught early.",
         "tool_words": [
           "app"
         ]
       },
-      "ask_first": "",
+      "ask_first": "Do defects start mostly in a few operations, or across the whole line?",
       "free_stops": "Defect categories and where checkpoints sit are kept for the solution document.",
       "extra_ideas": [
         {
@@ -177,7 +177,7 @@
         "text": "A cutting register comparing fabric issued, pieces cut and costing allowance per style, with leftovers logged.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Is cutting wastage high on most styles, or on a few difficult ones?",
       "free_stops": "How allowances are set and compared per style is set out in the solution document.",
       "extra_ideas": [
         {
@@ -208,7 +208,7 @@
         "text": "A subcontractor ledger for pieces sent, received, rejected and paid, flagging any shortfall the day goods come back.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Is the shortfall with one subcontractor, or with most of them?",
       "free_stops": "How counts are confirmed and linked to payment is covered in the solution document.",
       "extra_ideas": [
         {
@@ -268,7 +268,7 @@
         "text": "A costing tool that compares actual against costing after every shipment, per style.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do rework and air freight hit most styles, or only a few rushed ones?",
       "free_stops": "Which actual costs are captured and how is detailed in the solution document.",
       "extra_ideas": [
         {
@@ -298,7 +298,7 @@
         "text": "A simple capability website and digital lookbook that new buyers can browse and enquire from.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do new buyers ask first for photos of your products, or for your certifications and capacity?",
       "free_stops": "The structure and content of the site are planned in the solution document.",
       "extra_ideas": [
         {

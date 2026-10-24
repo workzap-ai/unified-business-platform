@@ -51,7 +51,7 @@
         "text": "a change-request log where every ask is recorded, estimated and approved by the client before work begins.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do scope disputes come mostly from a few clients, or from almost every project?",
       "free_stops": "The approval flow goes in the solution document; contract terms are for your lawyer.",
       "extra_ideas": [
         {
@@ -81,7 +81,7 @@
         "text": "a receivables ageing board with automated reminders to each client and a view of what's due before payroll.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Is it a few big clients paying late, or most of your foreign clients?",
       "free_stops": "The reminder schedule and runway view are detailed in the solution document.",
       "extra_ideas": [
         {
@@ -112,7 +112,7 @@
         "text": "a unified revenue view pulling store and ad-network reports into one daily screen per title.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do you need to check just a few of those income sources each week, or all of them?",
       "free_stops": "Which sources connect and how is set out in the solution document.",
       "extra_ideas": [
         {
@@ -142,7 +142,7 @@
         "text": "a bug intake form that pushes reports straight into the team's tracker.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do most bug reports come from your own testers, or from clients and players?",
       "free_stops": "The form and its connection to your tracker are designed in the solution document.",
       "extra_ideas": [
         {
@@ -172,7 +172,7 @@
         "text": "a release checklist with QA sign-off that must be completed before a build is submitted.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Does this occur on every release, or mainly when a deadline is tight?",
       "free_stops": "The checklist content and sign-off flow are prepared in the solution document.",
       "extra_ideas": [
         {
@@ -203,7 +203,7 @@
         "tool_words": [],
         "leads_with_view": true
       },
-      "ask_first": "",
+      "ask_first": "Is the uneven load mostly in one team, or across several projects at the same time?",
       "free_stops": "How allocation is captured and displayed goes in the solution document.",
       "extra_ideas": [
         {
@@ -233,7 +233,7 @@
         "text": "a lightweight daily timesheet via WhatsApp or web, tied straight to client billing.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do some people fill timesheets daily and others never, or does nobody fill them properly?",
       "free_stops": "The timesheet flow and billing link are detailed in the solution document.",
       "extra_ideas": [
         {
@@ -263,7 +263,7 @@
         "text": "a support inbox that triages store reviews and emails with saved replies and ageing.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Is it mostly support emails piling up, or mostly store reviews?",
       "free_stops": "The triage rules and reply library are set out in the solution document.",
       "extra_ideas": [
         {
@@ -294,7 +294,7 @@
         "tool_words": [],
         "leads_with_view": true
       },
-      "ask_first": "",
+      "ask_first": "Do the unused costs come mostly from cloud servers, or from tools bought for individual staff?",
       "free_stops": "The register and alert set-up go in the solution document.",
       "extra_ideas": [
         {

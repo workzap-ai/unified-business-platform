@@ -22,7 +22,7 @@
         "text": "a part catalogue with car-model lookup and shelf location, so any counter person can find a part, kept in step with every sale.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Does the missing part sit on the wrong shelf, or was it sold without being written down?",
       "free_stops": "How the catalogue and locations are structured is in the solution document.",
       "extra_ideas": [
         {
@@ -52,7 +52,7 @@
         "text": "reorder alerts on fast movers by shop, sent on WhatsApp before they run out.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Which items run out most often: filters, pads, or something else?",
       "free_stops": "Reorder levels and how they adjust by season are in the solution document.",
       "extra_ideas": [
         {
@@ -83,7 +83,7 @@
         "tool_words": [],
         "leads_with_view": true
       },
-      "ask_first": "",
+      "ask_first": "Is the dead stock mostly old tyres and batteries, or parts for discontinued models?",
       "free_stops": "How age and value are calculated is in the solution document.",
       "extra_ideas": [
         {
@@ -113,7 +113,7 @@
         "text": "batch and date tracking for tyres and batteries that flags ageing stock and puts older units first.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Is the old stock mostly tyres, or mostly batteries?",
       "free_stops": "Ageing rules per item are in the solution document.",
       "extra_ideas": [
         {
@@ -173,7 +173,7 @@
         "text": "a rate list manager that updates counter prices at every shop when supplier prices change.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do staff use an old printed list, or an old note on their phone?",
       "free_stops": "How updates flow to each counter is in the solution document.",
       "extra_ideas": [
         {
@@ -203,7 +203,7 @@
         "text": "discount limits by role with approvals for exceptions, logged on every sale.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do the friends get discounts on tyres and batteries, or on small parts?",
       "free_stops": "Limits and approval paths are in the solution document.",
       "extra_ideas": [
         {
@@ -233,7 +233,7 @@
         "text": "a warranty claim tracker per battery or tyre with supplier status and reminders.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do claims wait with the supplier, or at your own shop before they are sent?",
       "free_stops": "Claim stages and reminders are in the solution document.",
       "extra_ideas": [
         {
@@ -263,7 +263,7 @@
         "text": "a daily cash-up against recorded sales for each shop, sent to the owner each evening.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Is the drawer short on busy evenings, or across every shift?",
       "free_stops": "The cash-up steps are in the solution document.",
       "extra_ideas": [
         {
@@ -293,7 +293,7 @@
         "text": "a WhatsApp enquiry flow capturing the part photo, model and year, routed to a counter person and tracked to sale.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do the missed replies come at the busiest hours, or after closing time?",
       "free_stops": "The enquiry flow and routing are in the solution document.",
       "extra_ideas": [
         {
@@ -323,7 +323,7 @@
         "text": "a short read of sales and stock by item, brand and shop on WhatsApp each morning, with the one thing to look at.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do you have one shop to check, or several shops to look at each night?",
       "free_stops": "What the daily read includes is in the solution document.",
       "extra_ideas": [
         {

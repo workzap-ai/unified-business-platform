@@ -52,7 +52,7 @@
         "text": "a parts request tracker showing supplier, expected date and car waiting, with overdue alerts.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Is it mostly one or two suppliers who are late, or parts of every kind arriving slowly?",
       "free_stops": "Supplier records and alert rules are in the solution document.",
       "extra_ideas": [
         {
@@ -82,7 +82,7 @@
         "text": "a comeback log tied to the original job card, showing patterns by job type and mechanic over time.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Does the same fault come back mostly on one type of job, or across all kinds of repairs?",
       "free_stops": "How comebacks are classified and reviewed is in the solution document.",
       "extra_ideas": [
         {
@@ -113,7 +113,7 @@
         "tool_words": [],
         "leads_with_view": true
       },
-      "ask_first": "",
+      "ask_first": "Is the idle time mostly on certain days, or does it vary between mechanics all week?",
       "free_stops": "The measures used and how they're shown are in the solution document.",
       "extra_ideas": [
         {
@@ -144,7 +144,7 @@
         "text": "a parts register where every issue is tied to a job so it reaches the bill, with low-stock alerts.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do the missing parts mostly come from fast-moving items like oil and filters, or from costly spares?",
       "free_stops": "Issue rules and count routines are in the solution document.",
       "extra_ideas": [
         {
@@ -174,7 +174,7 @@
         "text": "automatic \"car ready\" and delay messages from the job card, with the customer's permission.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do most calls come in the afternoon, or all day long whenever a car is due?",
       "free_stops": "Message timing and triggers are in the solution document.",
       "extra_ideas": [
         {
@@ -204,7 +204,7 @@
         "text": "a ledger for fleet and insurance accounts with ageing alerts and statements sent automatically every month.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Is it a few large fleet clients holding most of the money, or many smaller ones?",
       "free_stops": "Statement timing and reminder steps are in the solution document; credit terms are for your accountant.",
       "extra_ideas": [
         {
@@ -234,7 +234,7 @@
         "text": "check-in photos on phone saved against each job card with a time stamp, every car, every time.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Does it occur mostly on busy days, or whenever reception hands the car straight to a mechanic?",
       "free_stops": "The photo routine and storage are in the solution document.",
       "extra_ideas": [
         {
@@ -264,7 +264,7 @@
         "text": "a daily cash-up matching payments to closed jobs, sent to the owner each evening.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Is the shortfall mostly on certain days, or does it show a little every day?",
       "free_stops": "The cash-up steps are in the solution document.",
       "extra_ideas": [
         {
@@ -295,7 +295,7 @@
         "text": "next-service reminders with booking slots, sent automatically.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do most customers return for something else eventually, or do they go to a different garage?",
       "free_stops": "Reminder timing and booking setup are in the solution document.",
       "extra_ideas": [
         {

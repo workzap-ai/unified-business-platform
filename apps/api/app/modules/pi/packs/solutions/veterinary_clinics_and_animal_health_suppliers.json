@@ -228,7 +228,7 @@
         "keys": [
           "job_tracking"
         ],
-        "text": "a field-visit app where each visit, items used and travel are logged and the invoice goes out by WhatsApp automatically.",
+        "text": "a field-visit form on the phone where each visit, items used and travel would be logged and the invoice would go out by WhatsApp.",
         "tool_words": [
           "app"
         ]

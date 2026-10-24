@@ -78,7 +78,7 @@
         "keys": [
           "cash_reconciliation"
         ],
-        "text": "A simple counter app with a fixed price list and a daily cash close per site.",
+        "text": "a simple counter sheet with a fixed price list and a daily cash close per site.",
         "tool_words": [
           "app"
         ]

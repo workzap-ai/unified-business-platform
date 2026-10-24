@@ -21,7 +21,7 @@
         "text": "a pipeline tracker with stage, owner and next action date for every proposal, reminding the owner automatically when a follow-up is due.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "How many proposals are out right now, just a handful or a long list?",
       "free_stops": "the stages and follow-up timings for your type of client are set out in the solution document.",
       "extra_ideas": [
         {
@@ -52,7 +52,7 @@
         "text": "loss reasons captured every time a bid closes, with a regular view of wins and losses by service line and client type.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do you lose mostly after the first meeting, or after the proposal goes out?",
       "free_stops": "how loss reasons are captured and grouped is designed in the solution document.",
       "extra_ideas": [
         {
@@ -82,7 +82,7 @@
         "text": "a scope change log per engagement where each request is recorded, approved and flagged for billing.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Is the extra work from a few clients, or from almost every engagement?",
       "free_stops": "the approval and billing steps are kept for the solution document.",
       "extra_ideas": [
         {
@@ -113,7 +113,7 @@
         "text": "an engagement tracker showing effort used against plan every week, with alerts when an engagement starts to slip.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do overruns come mostly from scope growth, or from slow client responses?",
       "free_stops": "how effort is tracked and when alerts fire are worked out in the solution document.",
       "extra_ideas": [
         {
@@ -143,7 +143,7 @@
         "text": "a resource planner showing who is booked where week by week, with bench time and overloads visible to the partners every day.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Is the imbalance mostly among senior staff, or across the whole team?",
       "free_stops": "how bookings are entered and kept current is designed in the solution document.",
       "extra_ideas": [
         {
@@ -173,7 +173,7 @@
         "text": "a milestone billing trigger where the invoice is drafted as soon as a deliverable is signed off, with sign-off chasers and receivables ageing.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Is sign-off stuck with a few clients, or on most deliverables?",
       "free_stops": "the trigger points and chaser timings are set out in the solution document.",
       "extra_ideas": [
         {
@@ -203,7 +203,7 @@
         "text": "receivables per client with ageing, document checklists per invoice and scheduled reminders.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Is it mostly one department paying late, or all your government clients?",
       "free_stops": "the reminder flow and checklists per client type are kept for the solution document.",
       "extra_ideas": [
         {
@@ -233,7 +233,7 @@
         "text": "a proposal library of past proposals, CVs and case write-ups tagged by service line, searchable by the whole team.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Is the biggest time loss in starting the document, or in finding earlier material?",
       "free_stops": "the structure and tagging of the library are designed in the solution document.",
       "extra_ideas": [
         {
@@ -263,7 +263,7 @@
         "text": "a weekly timesheet linked to engagements with daily nudges, showing utilisation per consultant as it happens instead of after month-end.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do all consultants fill timesheets late, or only some of them?",
       "free_stops": "the timesheet format and nudge timings are set out in the solution document.",
       "extra_ideas": [
         {
@@ -293,7 +293,7 @@
         "text": "an associate register with availability, agreed rates and days confirmed weekly, matched automatically against their invoices.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Is it mostly a few associates who argue over days, or nearly all of them?",
       "free_stops": "how confirmations and matching work is kept for the solution document.",
       "extra_ideas": [
         {

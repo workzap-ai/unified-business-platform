@@ -51,7 +51,7 @@
         "text": "a bid document library with expiry alerts on every certificate and a checklist per tender.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Which part takes longest each time, the company papers, the pricing or the technical documents?",
       "free_stops": "The library structure and checklists are prepared in the solution document.",
       "extra_ideas": [
         {
@@ -81,7 +81,7 @@
         "text": "a guarantee register with issue, expiry and release dates and automatic reminders.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Are these bank bonds held at one bank, or spread across several, and who tracks them now?",
       "free_stops": "The register and reminder rules go in the solution document."
     },
     {
@@ -101,7 +101,7 @@
         "text": "an invoice pipeline board showing where each bill sits and how many days it has waited.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Is the payment usually stuck at the department, or at the audit or bank stage?",
       "free_stops": "The stages and update routine are detailed in the solution document.",
       "extra_ideas": [
         {
@@ -132,7 +132,7 @@
         "tool_words": [],
         "leads_with_view": true
       },
-      "ask_first": "",
+      "ask_first": "Is the money mostly tied up in security deposits, or in retention held back on bills?",
       "free_stops": "The view's inputs are set out in the solution document; financing questions are for your accountant.",
       "extra_ideas": [
         {
@@ -162,7 +162,7 @@
         "text": "a delivery and inspection pack per order with challans, photos of goods and signed acceptance scans.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Is it usually the same missing paper, or does it differ by department?",
       "free_stops": "The pack contents per buyer are prepared in the solution document.",
       "extra_ideas": [
         {
@@ -192,7 +192,7 @@
         "text": "phone capture of signed challans filed automatically against each contract.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do they get lost at the site, in transit back, or in the office?",
       "free_stops": "The capture and filing set-up go in the solution document.",
       "extra_ideas": [
         {
@@ -219,12 +219,12 @@
         "keys": [
           "field_checks"
         ],
-        "text": "a site check-in app for deployed staff feeding monthly billing and payroll.",
+        "text": "a check-in on the phone for deployed staff that would feed monthly billing and payroll.",
         "tool_words": [
           "app"
         ]
       },
-      "ask_first": "",
+      "ask_first": "Do the disputes come from one client site, or from most of them?",
       "free_stops": "The check-in and billing link are detailed in the solution document.",
       "extra_ideas": [
         {
@@ -254,7 +254,7 @@
         "text": "a contract register with milestones, inspection status, penalties and retention on one screen.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Is it a handful of contracts that slip, or do you lose sight of most of them?",
       "free_stops": "The register design goes in the solution document.",
       "extra_ideas": [
         {
@@ -285,7 +285,7 @@
         "tool_words": [],
         "leads_with_view": true
       },
-      "ask_first": "",
+      "ask_first": "Which cost surprises you most, the delay, the bank bond charges or the penalties?",
       "free_stops": "The costing model is set out in the solution document."
     }
   ],

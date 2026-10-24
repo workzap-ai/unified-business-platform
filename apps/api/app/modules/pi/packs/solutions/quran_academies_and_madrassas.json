@@ -21,7 +21,7 @@
         "text": "workflow_automation — A donation and fee ledger with receipts and bank and wallet matching every day, producing the monthly trustee summary automatically.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do most donations arrive by cash, by bank, or by wallet?",
       "free_stops": "The ledger structure and receipt flow are kept for the document.",
       "extra_ideas": [
         {
@@ -51,7 +51,7 @@
         "text": "Every entry tagged to a fund category the institution sets, with balances per fund kept separate automatically.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Does the mixing occur mostly during Ramadan, or through the whole year?",
       "free_stops": "How funds are tagged and reported is in the document.",
       "extra_ideas": [
         {
@@ -81,7 +81,7 @@
         "text": "customer_messaging — Fee reminders by family reference sent automatically each month, with a paid/unpaid count for the office.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Is it mostly the same families late each month, or different ones?",
       "free_stops": "The reminder timing and wording are kept for the document.",
       "extra_ideas": [
         {
@@ -141,7 +141,7 @@
         "text": "A cancellation and make-up log that applies your pay rules automatically each month.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do the cancellations come mostly from a few families, or from many?",
       "free_stops": "How the rules feed teacher pay is kept for the document.",
       "extra_ideas": [
         {
@@ -171,7 +171,7 @@
         "text": "dashboards_reports — Class start times taken from meeting logs, with lateness alerts and a weekly count per teacher, without any recording of children.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do teachers miss classes often each week, or only now and then?",
       "free_stops": "How attendance is pulled from meeting logs is in the document.",
       "extra_ideas": [
         {
@@ -201,7 +201,7 @@
         "text": "Every enquiry tracked from trial to enrolment, with automatic follow-up reminders and monthly conversion counts.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do most trial families vanish after the class, or even before attending?",
       "free_stops": "The follow-up timings are kept for the document.",
       "extra_ideas": [
         {
@@ -231,7 +231,7 @@
         "text": "Payment links connected to the fee ledger, with failed payments and chargebacks tracked automatically.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do failures come mostly from families abroad in one country, or from all of them?",
       "free_stops": "The payment setup and retry flow are in the document.",
       "extra_ideas": [
         {
@@ -261,7 +261,7 @@
         "text": "A ration register of purchases, daily issue and stock left, with reorder alerts before it runs out.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Does the ration run out mostly in the last week, or earlier in the month?",
       "free_stops": "The reorder levels are kept for the document.",
       "extra_ideas": [
         {
@@ -291,7 +291,7 @@
         "text": "Petty cash entered by phone with receipt photos and a weekly summary to trustees.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Is the buying done by one person, or by several staff?",
       "free_stops": "The approval and reporting flow is in the document.",
       "extra_ideas": [
         {
@@ -321,7 +321,7 @@
         "text": "A trustee summary of fees, donations by fund, kitchen and utilities, produced automatically each month.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Is the hard part collecting the figures, or putting them into the trustees' format?",
       "free_stops": "How the summary is put together is kept for the document.",
       "extra_ideas": [
         {

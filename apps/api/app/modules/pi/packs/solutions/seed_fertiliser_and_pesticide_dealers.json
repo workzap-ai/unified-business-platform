@@ -288,7 +288,7 @@
         "keys": [
           "dashboards_reports"
         ],
-        "text": "A branch dashboard showing sales, margin, credit outstanding and stock value per shop every day.",
+        "text": "You would see sales, margin, credit outstanding and stock value for each shop every day.",
         "tool_words": [
           "dashboard"
         ]

@@ -51,7 +51,7 @@
         "text": "Resin and masterbatch stock with consumption per job and reorder alerts before machines stop.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do deliveries run late from most traders, or mainly from one?",
       "free_stops": "How consumption and minimum levels are calculated is covered in the solution document.",
       "extra_ideas": [
         {
@@ -81,7 +81,7 @@
         "text": "A mould register with owner, location, cavities, standard cycle time and repair history, plus a preventive maintenance calendar.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Are the broken moulds mostly old ones, or newly made ones?",
       "free_stops": "Inspection routine and maintenance schedule are set out in the solution document.",
       "extra_ideas": [
         {
@@ -112,7 +112,7 @@
         "text": "A machine-wise shift log of shots, rejects and downtime reasons, with a daily view per machine and shift.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Are high rejects on a few moulds, or on most of them?",
       "free_stops": "How rejects are recorded and compared is kept for the solution document.",
       "extra_ideas": [
         {
@@ -142,7 +142,7 @@
         "text": "A shift log on phone where the supervisor records counter readings, pieces, rejects and downtime openly each shift.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do the made-up looking numbers show on every shift, or on certain ones?",
       "free_stops": "How readings are captured and checked is set out in the solution document.",
       "extra_ideas": [
         {
@@ -172,7 +172,7 @@
         "text": "A regrind and scrap weighing log with gate pass matching.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do the bags go missing from the floor, or from the store?",
       "free_stops": "Weighing points and matching are covered in the solution document.",
       "extra_ideas": [
         {
@@ -203,7 +203,7 @@
         "text": "Finished goods stock by item and colour with dealer order matching and a daily read of what is short.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do piles build up in certain colours, or in certain items?",
       "free_stops": "How stock is matched to orders is set out in the solution document.",
       "extra_ideas": [
         {
@@ -233,7 +233,7 @@
         "text": "A dealer ledger with credit limits and payment reminders.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Is slow payment from a few dealers, or from most of them?",
       "free_stops": "Limits and reminder timing are kept for the solution document.",
       "extra_ideas": [
         {
@@ -264,7 +264,7 @@
         "tool_words": [],
         "leads_with_view": true
       },
-      "ask_first": "",
+      "ask_first": "Is power wasted mostly by idle machines, or by power cuts?",
       "free_stops": "How power cost is spread per machine and piece is detailed in the solution document; for tariff questions, talk to your utility or adviser.",
       "extra_ideas": [
         {
@@ -295,7 +295,7 @@
         "text": "A WhatsApp catalogue for dealers with item photos and current availability.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do dealers ask on WhatsApp mostly for photos, or for prices?",
       "free_stops": "How the catalogue stays in sync with stock is set out in the solution document.",
       "extra_ideas": [
         {

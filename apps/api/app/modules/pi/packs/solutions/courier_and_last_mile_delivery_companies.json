@@ -21,7 +21,7 @@
         "text": "A daily COD reconciliation of parcels delivered vs cash handed in per rider, flagging shortages on the spot.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Is cash short mostly from a few riders, or spread across most of them?",
       "free_stops": "The settlement steps and checks are designed in the solution document.",
       "extra_ideas": [
         {
@@ -52,7 +52,7 @@
         "text": "A merchant remittance schedule with statements generated and sent automatically.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Are merchants paid late mostly because riders deposit late, or because your own payout day slips?",
       "free_stops": "The statement format and schedule are set in the solution document.",
       "extra_ideas": [
         {
@@ -110,12 +110,12 @@
         "keys": [
           "field_checks"
         ],
-        "text": "A rider app that records each attempt with time, location and proof, agreed with riders and visible to them.",
+        "text": "Riders would record each delivery attempt on their phones with time, location and proof, agreed with riders and visible to them.",
         "tool_words": [
           "app"
         ]
       },
-      "ask_first": "",
+      "ask_first": "Does customer not answering come up mostly with a few riders, or across all of them?",
       "free_stops": "What counts as a valid attempt is set in the solution document.",
       "extra_ideas": [
         {
@@ -145,7 +145,7 @@
         "text": "A hub scan-in and scan-out log that shows exactly where a parcel was last seen.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do parcels go missing mostly during hub sorting, or when handed over to riders?",
       "free_stops": "The scan points are designed in the solution document.",
       "extra_ideas": [
         {
@@ -176,7 +176,7 @@
         "text": "Automatic status messages at each parcel milestone, so most questions are answered before they're asked.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do most where-is-my-parcel messages come from delayed parcels, or from ones still on time?",
       "free_stops": "The message triggers are set in the solution document.",
       "extra_ideas": [
         {
@@ -203,13 +203,13 @@
         "keys": [
           "dashboards_reports"
         ],
-        "text": "A zone and rider dashboard showing success rate, RTO and cost per parcel, updated daily.",
+        "text": "You would see success rate, returns and cost per parcel by zone and rider, updated daily.",
         "tool_words": [
           "dashboard"
         ],
         "leads_with_view": true
       },
-      "ask_first": "",
+      "ask_first": "Do the losing zones lose money mostly from failed deliveries, or from long distances?",
       "free_stops": "How costs are assigned to zones is set in the solution document.",
       "extra_ideas": [
         {
@@ -239,7 +239,7 @@
         "text": "A rider pay calculator per parcel and attempt that riders can see, updating from the day's deliveries.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do pay disputes come mostly from parcel counts, or from the rate per parcel?",
       "free_stops": "How the rules are built into the calculator is in the solution document.",
       "extra_ideas": [
         {
@@ -269,7 +269,7 @@
         "text": "Order upload that accepts merchants' spreadsheets or connects to their Shopify or WooCommerce stores directly.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do most merchants send orders in different formats, or only a few large ones?",
       "free_stops": "Which connections are made, and how, is mapped in the solution document.",
       "extra_ideas": [
         {
@@ -299,7 +299,7 @@
         "text": "A peak-day planner using past sale events to plan rider and hub shifts, with confirmations sent to riders.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "On sale days, do delays start at the hub, or from not having enough riders?",
       "free_stops": "The planning method is set in the solution document.",
       "extra_ideas": [
         {

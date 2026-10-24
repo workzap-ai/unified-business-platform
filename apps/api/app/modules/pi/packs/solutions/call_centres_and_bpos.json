@@ -53,7 +53,7 @@
         "tool_words": [],
         "leads_with_view": true
       },
-      "ask_first": "",
+      "ask_first": "Do breaks run long for a few agents every day, or across whole teams on certain shifts?",
       "free_stops": "the thresholds and how alerts are routed are kept for the solution document.",
       "extra_ideas": [
         {
@@ -83,7 +83,7 @@
         "text": "an attrition tracker by stage, reason and team leader, updated with every exit.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do most new hires leave within the first few weeks of training, or after a few months on the floor?",
       "free_stops": "how reasons are captured and grouped is worked out in the solution document.",
       "extra_ideas": [
         {
@@ -113,7 +113,7 @@
         "text": "a schedule builder using past volume per hour for each campaign to propose shifts.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Is the mismatch mostly at certain hours of the day, or on certain days of the week?",
       "free_stops": "the forecasting approach and rules are set out in the solution document.",
       "extra_ideas": [
         {
@@ -143,7 +143,7 @@
         "text": "a QA scoring form with random sampling per agent, calibration notes and agent-level trends.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do you check calls at random, or only the ones a client or customer has complained about?",
       "free_stops": "the sampling rules and scoring form are kept for the solution document.",
       "extra_ideas": [
         {
@@ -171,12 +171,12 @@
           "integration",
           "dashboards_reports"
         ],
-        "text": "a daily client report pulled from the dialer, CRM and QA into each client's format.",
+        "text": "You would find each client's daily report already prepared in their own format from the dialler, customer records and quality checks, without anyone building it by hand each morning.",
         "tool_words": [
           "crm"
         ]
       },
-      "ask_first": "",
+      "ask_first": "Is it one client's report that eats the morning, or the same work repeated for every client?",
       "free_stops": "which systems are connected and the report format are designed in the solution document.",
       "extra_ideas": [
         {
@@ -206,7 +206,7 @@
         "text": "attendance data feeding payroll deductions with a review step, and a summary each agent can see.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do the errors mostly come from late arrivals and half days, or from missed punches and leave?",
       "free_stops": "the review step and how deductions are shown are set out in the solution document.",
       "extra_ideas": [
         {
@@ -237,7 +237,7 @@
         "tool_words": [],
         "leads_with_view": true
       },
-      "ask_first": "",
+      "ask_first": "Do the fights come from what counts as a sale, or from how the amount was worked out?",
       "free_stops": "the calculation setup is kept for the solution document.",
       "extra_ideas": [
         {
@@ -267,7 +267,7 @@
         "text": "an uptime log for power and internet outages with generator use recorded from phone, and a monthly summary.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do you lose hours mostly to internet failures, or to power cuts that outlast your backup?",
       "free_stops": "what is logged and how it is reported is worked out in the solution document.",
       "extra_ideas": [
         {
@@ -297,7 +297,7 @@
         "text": "an asset register for headsets, PCs and access cards issued and returned, with counts by floor.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do headsets and equipment disappear during shifts, or only at handover and the end of the day?",
       "free_stops": "the issue and return routine is designed in the solution document.",
       "extra_ideas": [
         {

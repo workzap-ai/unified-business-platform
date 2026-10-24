@@ -22,7 +22,7 @@
         "text": "A file tracker that sends the client a WhatsApp update automatically when their file changes stage.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do clients mostly call about files stuck at the port, or about files still waiting inside your office?",
       "free_stops": "The stages and message triggers are set in the solution document.",
       "extra_ideas": [
         {
@@ -52,7 +52,7 @@
         "text": "A file tracker showing each consignment's stage, responsible staff and age, with stuck files flagged daily.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Is the whiteboard kept by one person in the office, or does each file handler update it themselves?",
       "free_stops": "The tracker's stages and alerts are designed in the solution document.",
       "extra_ideas": [
         {
@@ -82,7 +82,7 @@
         "text": "A document checklist per file type showing what's received and missing, with reminders sent to the client automatically.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do clients mostly miss the commercial documents, or the permits and certificates?",
       "free_stops": "The checklist per file type comes from your team's own practice and is set in the solution document.",
       "extra_ideas": [
         {
@@ -112,7 +112,7 @@
         "text": "A runner mobile form logging port actions with time stamps and receipt photos, visible to the office immediately.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do your runners at the port mostly forget to update you, or find it hard to reach you?",
       "free_stops": "What runners log, and how, is designed in the solution document.",
       "extra_ideas": [
         {
@@ -142,7 +142,7 @@
         "text": "A client advance ledger of deposits, payments made on their behalf and balance remaining, alerting when an advance runs low.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Is most of the money you front for duties and terminal charges, or for freight and other costs?",
       "free_stops": "Advance rules and alert levels are set in the solution document.",
       "extra_ideas": [
         {
@@ -173,7 +173,7 @@
         "text": "Expense capture per file so every charge is recorded and a draft invoice is produced automatically when the file closes.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Which charges slip most often: examination days, extra trips, or storage?",
       "free_stops": "How expenses are captured and billed is designed in the solution document.",
       "extra_ideas": [
         {
@@ -203,7 +203,7 @@
         "text": "Receivables ageing by client with reminder messages the owner approves before sending.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Are the unpaid clients mostly a few large accounts, or many small ones?",
       "free_stops": "Reminder timing and hold rules are in the solution document.",
       "extra_ideas": [
         {
@@ -233,7 +233,7 @@
         "text": "A runner petty cash log with receipts and a daily settlement per runner.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Does the cash go out to runners each morning, or only when a file needs a payment at the port?",
       "free_stops": "The settlement steps are laid out in the solution document.",
       "extra_ideas": [
         {
@@ -263,7 +263,7 @@
         "text": "Step checklists per clearance type that staff tick through on each file, so nothing is skipped.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do the checklists differ because of the type of cargo, or because each handler keeps their own?",
       "free_stops": "How your own steps become checklists is set in the solution document.",
       "extra_ideas": [
         {
@@ -294,7 +294,7 @@
         "tool_words": [],
         "leads_with_view": true
       },
-      "ask_first": "",
+      "ask_first": "Do staff come to you mostly about files stuck at the port, or about decisions on charges and clients?",
       "free_stops": "What the morning read includes is set in the solution document.",
       "extra_ideas": [
         {

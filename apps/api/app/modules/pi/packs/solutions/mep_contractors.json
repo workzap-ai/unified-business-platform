@@ -199,7 +199,7 @@
         "keys": [
           "field_checks"
         ],
-        "text": "Installation and testing checklists per system with photo proof, feeding inspection readiness; technical standards stay with your engineers and the authority.",
+        "text": "You would see installation and testing checklists for each service with photo proof, so you know you are ready for inspection; technical standards stay with your engineers and the authority.",
         "tool_words": [
           "system"
         ]
@@ -291,7 +291,7 @@
         "keys": [
           "job_tracking"
         ],
-        "text": "An AMC and service-call module that logs, assigns and tracks every call after handover.",
+        "text": "You would see every service call after handover logged, assigned and tracked, including maintenance contract visits.",
         "tool_words": [
           "module"
         ]

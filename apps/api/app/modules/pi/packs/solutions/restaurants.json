@@ -109,7 +109,7 @@
         "keys": [
           "cash_reconciliation"
         ],
-        "text": "a nightly close per branch matching cash, card and app takings to sales, with voids and comps by shift and role and any void after payment flagged automatically.",
+        "text": "Each branch's cash, card and delivery-service takings would be matched to sales every night, with voids and comps by shift and role, and any void after payment flagged.",
         "tool_words": [
           "app"
         ]
@@ -141,7 +141,7 @@
         "keys": [
           "integration"
         ],
-        "text": "app orders pulled into one screen beside POS sales automatically, with each app's payout checked against what was sold every day.",
+        "text": "Delivery-service orders would appear on one screen beside counter sales, with each service's payout checked against what was sold every day.",
         "tool_words": [
           "app"
         ]
@@ -289,7 +289,7 @@
         "keys": [
           "nori_daily_read"
         ],
-        "text": "a short morning read on WhatsApp with each branch's covers, sales by channel, voids, cash vs card vs app and wastage, and the one thing to look at today.",
+        "text": "You would get a short morning WhatsApp read with each branch's covers, sales by channel, voids, cash against card against delivery, wastage, and the one thing to look at today.",
         "tool_words": [
           "app"
         ]

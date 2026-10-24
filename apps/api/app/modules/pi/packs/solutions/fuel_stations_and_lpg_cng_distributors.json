@@ -52,7 +52,7 @@
         "text": "a tank stock book reconciled daily with gain and loss trends per tank.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Is the gap mostly in one product, or in all your tanks every week?",
       "free_stops": "How reconciliation is done is in the solution document; technical tank questions are for your supplier.",
       "extra_ideas": [
         {
@@ -82,7 +82,7 @@
         "text": "a tanker receiving checklist with photos and readings before and after decanting.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Is it mostly one supplier or tanker company, or short deliveries from several?",
       "free_stops": "The receiving checklist is in the solution document.",
       "extra_ideas": [
         {
@@ -112,7 +112,7 @@
         "text": "a credit and fleet customer ledger with automatic monthly statements and overdue reminders.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Is it mostly a few big transporters owing you, or many small credit customers?",
       "free_stops": "Statement timings and reminders are in the solution document.",
       "extra_ideas": [
         {
@@ -142,7 +142,7 @@
         "text": "card settlement reconciliation against recorded card sales.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Is the difference mostly on certain days, or does it show a little on every card machine?",
       "free_stops": "Matching steps are in the solution document.",
       "extra_ideas": [
         {
@@ -172,7 +172,7 @@
         "text": "a cylinder register by serial and customer type, with return tracking and deposit status.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Are the missing cylinders mostly with households, or with shops and commercial customers?",
       "free_stops": "How cylinders are tracked is in the solution document.",
       "extra_ideas": [
         {
@@ -202,7 +202,7 @@
         "text": "gas orders over WhatsApp with rider assignment and delivery confirmation.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do missed orders come mostly in busy hours, or when the person taking calls is away?",
       "free_stops": "The order flow is in the solution document.",
       "extra_ideas": [
         {
@@ -233,7 +233,7 @@
         "text": "a morning read of litres, revenue, variances and receivables per station.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do you run a few stations nearby, or many spread across different cities?",
       "free_stops": "What the daily read includes is in the solution document.",
       "extra_ideas": [
         {
@@ -263,7 +263,7 @@
         "text": "checklists on phone with photos and time, with missed checks flagged to the owner.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Does the checklist go unfilled on every shift, or mainly at night and on weekends?",
       "free_stops": "The checklist content is set with your supplier or safety adviser; the tracking is in the solution document.",
       "extra_ideas": [
         {

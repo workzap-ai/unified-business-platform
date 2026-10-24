@@ -53,7 +53,7 @@
         "text": "A packing checklist per buyer with barcode scan verification against the order and carton labels generated from order data.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Did the wrong barcode come from the printing side, or from the packing floor?",
       "free_stops": "The scan-check flow and label format per buyer are covered in the solution document.",
       "extra_ideas": [
         {
@@ -84,7 +84,7 @@
         "text": "SKU-level stock by design, colour, size and A/B grade across godowns and shops, with a daily read of what is low and what is piling up.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Is the confusion mostly in the godown, or between the godown and the office record?",
       "free_stops": "How SKUs are coded and counted across locations is detailed in the solution document.",
       "extra_ideas": [
         {
@@ -114,7 +114,7 @@
         "text": "A B-grade sales register with an invoice per sale matched to stock and a monthly summary for the owner.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Does the B-grade leave through the main gate on certain days, or at random times?",
       "free_stops": "How B-grade stock is matched to sales and gate passes is kept for the solution document.",
       "extra_ideas": [
         {
@@ -144,7 +144,7 @@
         "text": "A programme library storing specs, accessories and packing instructions, so a reorder opens with everything already filled in.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Which details were hardest to reconfirm, the specifications, the accessories or the packing instructions?",
       "free_stops": "What each programme record holds and how reorders are set up is set out in the solution document.",
       "extra_ideas": [
         {
@@ -174,7 +174,7 @@
         "text": "An outsourced job tracker showing what is at each processing or stitching party and flagging anything not back on time.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Is it one processing house that is late, or all the outside parties you use?",
       "free_stops": "How dispatches and returns are recorded and flagged is covered in the solution document.",
       "extra_ideas": [
         {
@@ -205,7 +205,7 @@
         "text": "A statement of account per hotel client with scheduled reminders, plus par-level reorder prompts sent on WhatsApp with their permission.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Is it a few big hotels that pay late, or most of them?",
       "free_stops": "Reminder timing and how par levels are set per hotel are kept for the solution document.",
       "extra_ideas": [
         {
@@ -236,7 +236,7 @@
         "text": "A single order inbox pulling marketplace and shop orders into one list, tracked to dispatch.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Is the mix-up mostly in stock counts, or in packing the wrong order?",
       "free_stops": "How each channel connects in is mapped in the solution document.",
       "extra_ideas": [
         {
@@ -267,7 +267,7 @@
         "tool_words": [],
         "leads_with_view": true
       },
-      "ask_first": "",
+      "ask_first": "Which hurts more each season, selling out too early or being left with leftover sets?",
       "free_stops": "How the history is read into a production plan is detailed in the solution document.",
       "extra_ideas": [
         {
@@ -297,7 +297,7 @@
         "text": "An owner weekly summary of output, dispatches, stock by grade and receivables pulled together automatically.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Which of the three sheets do you trust least, and who fills it?",
       "free_stops": "Which numbers go in and where each comes from is set out in the solution document.",
       "extra_ideas": [
         {

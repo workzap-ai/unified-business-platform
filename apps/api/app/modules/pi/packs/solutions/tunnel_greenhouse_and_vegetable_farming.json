@@ -290,7 +290,7 @@
         "keys": [
           "loyalty_repeat"
         ],
-        "text": "A subscription box system handling weekly orders and skips, with every cancellation reason captured.",
+        "text": "Weekly box orders and skips would be handled in one place, with every cancellation reason captured.",
         "tool_words": [
           "system"
         ]

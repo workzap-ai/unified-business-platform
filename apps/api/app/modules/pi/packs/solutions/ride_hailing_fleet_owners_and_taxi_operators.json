@@ -19,7 +19,7 @@
           "credit_ledger",
           "integration"
         ],
-        "text": "a driver settlement ledger that combines platform payouts with rent, cash collected and deductions, and sends each driver a WhatsApp statement automatically.",
+        "text": "You would see one driver settlement record joining ride payouts with rent, cash collected and deductions, and each driver receiving a statement in chat on their own.",
         "tool_words": [
           "platform"
         ]
@@ -54,7 +54,7 @@
         "text": "balances per driver with alerts when arrears cross a set limit.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do most drivers pay rent a few days late, or fall behind by several weeks?",
       "free_stops": "Limits and alert steps are in the solution document.",
       "extra_ideas": [
         {
@@ -84,7 +84,7 @@
         "text": "car-by-car utilisation with shifts worked, kilometres, earnings and idle days, every morning.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do you run cars on day shifts only, or on day and night shifts?",
       "free_stops": "The measures and sources used are in the solution document.",
       "extra_ideas": [
         {
@@ -115,7 +115,7 @@
         "text": "a fuel log per car matched to trips and kilometres, flagging gaps automatically.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Does the fuel overspend show up in a few cars, or across most of the fleet?",
       "free_stops": "How gaps are flagged is in the solution document.",
       "extra_ideas": [
         {
@@ -146,7 +146,7 @@
         "text": "a maintenance schedule by kilometres with workshop tracking and off-road days.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do cars skip services because drivers do not bring them in, or because nobody tracks the kilometres?",
       "free_stops": "Service intervals and tracking are in the solution document.",
       "extra_ideas": [
         {
@@ -176,7 +176,7 @@
         "text": "an incident register with photos, workshop status and agreed cost split recorded.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Does the argument start over damage to your car, or over damage to the other vehicle?",
       "free_stops": "The incident steps are in the solution document; insurance questions are for your insurer or lawyer.",
       "extra_ideas": [
         {
@@ -206,7 +206,7 @@
         "text": "a fines register per car and date matched to the driver on shift.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do the fines mostly come from traffic cameras, or from officers on the road?",
       "free_stops": "How matching works is in the solution document.",
       "extra_ideas": [
         {
@@ -236,7 +236,7 @@
         "text": "a document and renewal tracker per vehicle with reminders.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Which renewal gets missed most often: registration, fitness, or insurance?",
       "free_stops": "Reminder timings are in the solution document.",
       "extra_ideas": [
         {
@@ -267,7 +267,7 @@
         "text": "an announcement channel for drivers plus a shift handover check for fuel, damage photos and kilometres.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do drivers mostly use the group to report problems, or to ask about money?",
       "free_stops": "How messages and handovers are set up is in the solution document.",
       "extra_ideas": [
         {

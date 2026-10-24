@@ -56,7 +56,7 @@
         "text": "every trial recorded and assigned, with follow-up tasks timed to the trial's stage and an owner's daily list.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do most trial users stop logging in early, or use the product until the trial ends?",
       "free_stops": "follow-up timing and assignment rules are kept for the solution document.",
       "extra_ideas": [
         {
@@ -87,7 +87,7 @@
         "tool_words": [],
         "leads_with_view": true
       },
-      "ask_first": "",
+      "ask_first": "Do cancellations come mostly from small customers, or from larger ones too?",
       "free_stops": "the health signals and thresholds are worked out in the solution document.",
       "extra_ideas": [
         {
@@ -117,7 +117,7 @@
         "text": "a failed payment flow with retries, reminders and a task for the team when an account stays unpaid.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do cards fail mostly on renewals, or on the first payment?",
       "free_stops": "the retry and reminder sequence is set out in the solution document.",
       "extra_ideas": [
         {
@@ -147,7 +147,7 @@
         "text": "a reconciliation helper matching incoming transfers to invoices and flagging anything unmatched.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Is the transfer matching done by one person, or by several?",
       "free_stops": "how bank data and invoices are connected is kept for the solution document.",
       "extra_ideas": [
         {
@@ -177,7 +177,7 @@
         "text": "an onboarding checklist per account with automatic reminders to the customer and the team at each step.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Does the week of calls go mostly on training users, or on setting up their data?",
       "free_stops": "the onboarding steps and reminder timings are designed in the solution document.",
       "extra_ideas": [
         {
@@ -207,7 +207,7 @@
         "text": "a help-centre and WhatsApp assistant answering common questions from your approved content, with a weekly summary of top recurring issues.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Are the repeat questions mostly about getting started, or about billing?",
       "free_stops": "the content set and hand-off to humans are worked out in the solution document.",
       "extra_ideas": [
         {
@@ -237,7 +237,7 @@
         "text": "a feature request log that captures requests from every channel and links them to customer accounts.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Which channel carries most of the requests, Slack, email or WhatsApp?",
       "free_stops": "which channels are connected and how requests are grouped is kept for the solution document.",
       "extra_ideas": [
         {
@@ -265,12 +265,12 @@
           "dashboards_reports",
           "integration"
         ],
-        "text": "a subscription metrics screen pulling from your billing system each day, showing MRR, new, expansion and churn by plan and market.",
+        "text": "a subscription figures screen pulling from your billing records each day, showing monthly recurring revenue, new, expansion and churn by plan and market.",
         "tool_words": [
           "system"
         ]
       },
-      "ask_first": "",
+      "ask_first": "Is the day spent pulling the data together, or fixing figures that don't match?",
       "free_stops": "metric definitions and data connections are set out in the solution document.",
       "extra_ideas": [
         {
@@ -300,7 +300,7 @@
         "text": "demo requests acknowledged immediately and routed to a salesperson, with reminders until contact is made.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do demo requests arrive mostly outside working hours, or during the day?",
       "free_stops": "the routing rules and timings are kept for the solution document.",
       "extra_ideas": [
         {

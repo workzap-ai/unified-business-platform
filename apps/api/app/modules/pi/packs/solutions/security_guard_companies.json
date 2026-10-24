@@ -51,7 +51,7 @@
         "text": "phone check-in by each guard at the site, tied to time and location, replacing the paper register.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Does this occur mostly at night posts, or at all posts?",
       "free_stops": "how check-ins are verified is kept for the solution document.",
       "extra_ideas": [
         {
@@ -81,7 +81,7 @@
         "text": "a supervisor visit log with site check-in and a short checklist per site, plus a nightly summary for the owner.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do supervisors cover a few close sites, or many far apart?",
       "free_stops": "the checklist and summary format are worked out in the solution document.",
       "extra_ideas": [
         {
@@ -111,7 +111,7 @@
         "text": "a digital roster by site and shift with a reliever pool and double-duty flags.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Is the shortage across all sites, or at a few key posts?",
       "free_stops": "the roster rules are set out in the solution document.",
       "extra_ideas": [
         {
@@ -141,7 +141,7 @@
         "text": "salary worked out from check-in attendance with transparent deductions and an approval step.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Are the fights mostly about absences, or about fines?",
       "free_stops": "how deductions are shown and approved is kept for the solution document.",
       "extra_ideas": [
         {
@@ -172,7 +172,7 @@
         "tool_words": [],
         "leads_with_view": true
       },
-      "ask_first": "",
+      "ask_first": "Is the uncovered post mostly at night, or on days when guards are absent?",
       "free_stops": "how coverage and billing are reconciled is set out in the solution document.",
       "extra_ideas": [
         {
@@ -202,7 +202,7 @@
         "text": "receivables per client with ageing and scheduled reminders, alongside the coming salary run.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Is it a few large clients paying late, or almost all of them?",
       "free_stops": "reminder timings and the cash view are kept for the solution document.",
       "extra_ideas": [
         {
@@ -232,7 +232,7 @@
         "text": "a kit and equipment register by guard role and post, with issue and return recorded.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Is the unreturned kit mostly uniforms, or mostly equipment like torches and belts?",
       "free_stops": "the issue and return routine is designed in the solution document.",
       "extra_ideas": [
         {
@@ -259,12 +259,12 @@
         "keys": [
           "workflow_automation"
         ],
-        "text": "an incident form via WhatsApp or app with photo, time and post, routed to the supervisor and owner.",
+        "text": "an incident form sent through WhatsApp with photo, time and post, which would route straight to the supervisor and owner.",
         "tool_words": [
           "app"
         ]
       },
-      "ask_first": "",
+      "ask_first": "Do the voice notes come from guards at posts, or from supervisors on rounds?",
       "free_stops": "the form fields and routing are worked out in the solution document.",
       "extra_ideas": [
         {

@@ -78,7 +78,7 @@
         "keys": [
           "workflow_automation"
         ],
-        "text": "A rate card inside the technician app, with any deviation needing office approval on the spot.",
+        "text": "You would see technicians quoting from a rate card on their phones, with any change from it needing the office to agree on the spot.",
         "tool_words": [
           "app"
         ]
@@ -140,7 +140,7 @@
         "keys": [
           "job_tracking"
         ],
-        "text": "A technician job app recording arrival, photos, work done, parts used and customer confirmation, rolled into a daily jobs-per-technician view.",
+        "text": "You would see each job recorded by the technician with arrival, photos, work done, parts used and customer confirmation, adding up to a daily count per technician.",
         "tool_words": [
           "app"
         ]

@@ -288,7 +288,7 @@
         "keys": [
           "dashboards_reports"
         ],
-        "text": "An owner dashboard with today's sales, commission, cash, receivables and munshi-wise entries, readable by every family member who is given access.",
+        "text": "A single daily page showing today's sales, commission, cash, receivables and munshi-wise entries, which every family member given access would be able to read.",
         "tool_words": [
           "dashboard"
         ],

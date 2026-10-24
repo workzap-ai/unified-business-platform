@@ -51,7 +51,7 @@
         "text": "Automatic on-the-way and delivered updates to customers from the driver's marked status.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do customers call mostly soon after booking, or after the promised slot has passed?",
       "free_stops": "Update triggers and wording are in the solution document.",
       "extra_ideas": [
         {
@@ -81,7 +81,7 @@
         "text": "field_checks — A driver trip log with trips, cash collected and diesel filled, matched automatically against bookings each evening.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Does the gap show up on credit trips, or on cash trips?",
       "free_stops": "Matching rules are in the solution document; pi records the control gap, never names drivers.",
       "extra_ideas": [
         {
@@ -111,7 +111,7 @@
         "text": "Daily start and end readings with photos on phone, compared with booked trips and flagged when they do not fit.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do the private trips happen at night, or in the daytime between bookings?",
       "free_stops": "The check design is in the solution document.",
       "extra_ideas": [
         {
@@ -142,7 +142,7 @@
         "tool_words": [],
         "leads_with_view": true
       },
-      "ask_first": "",
+      "ask_first": "Is your biggest cost diesel, or driver pay and buying the water?",
       "free_stops": "Cost allocation is in the solution document; pi gives no pricing advice.",
       "extra_ideas": [
         {
@@ -172,7 +172,7 @@
         "text": "stock_alerts — A bottle circulation ledger per customer reference with bottles out, empties returned and deposit taken, flagging customers holding too many.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do the bottles stay with regular customers, or get lost on the delivery route?",
       "free_stops": "Ledger design and deposit tracking are in the solution document.",
       "extra_ideas": [
         {
@@ -202,7 +202,7 @@
         "text": "A credit customer ledger with monthly statements and automatic reminders.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Are the late payers mostly buildings, or offices?",
       "free_stops": "Statement and reminder rules are in the solution document.",
       "extra_ideas": [
         {
@@ -232,7 +232,7 @@
         "text": "workflow_automation — A plant maintenance and filter-change log with due-date reminders and a downtime record.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Does the plant stop more often from a pump failure, or from a worn membrane?",
       "free_stops": "Maintenance schedule set-up is in the solution document; pi gives no treatment or specification advice.",
       "extra_ideas": [
         {
@@ -262,7 +262,7 @@
         "text": "Daily plant checks on phone with photos and time stamps, linked to quality complaints.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Was the filter change date never written down, or written somewhere nobody can find?",
       "free_stops": "Check items are in the solution document; testing and treatment questions go to a qualified water specialist.",
       "extra_ideas": [
         {
@@ -293,7 +293,7 @@
         "tool_words": [],
         "leads_with_view": true
       },
-      "ask_first": "",
+      "ask_first": "Is the shortage in tankers, or in drivers once summer starts?",
       "free_stops": "Planning method is in the solution document.",
       "extra_ideas": [
         {
@@ -323,7 +323,7 @@
         "text": "customer_messaging — A subscription schedule with reminders to customers who agreed to messages and missed-delivery flags to the owner.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do regular customers drop off after a bad delivery, or quietly with no reason you know?",
       "free_stops": "Schedule and flag rules are in the solution document.",
       "extra_ideas": [
         {

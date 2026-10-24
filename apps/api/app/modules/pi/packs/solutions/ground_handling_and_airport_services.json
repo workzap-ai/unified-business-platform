@@ -111,7 +111,7 @@
         "keys": [
           "booking_scheduling"
         ],
-        "text": "a shift roster app with swap requests, supervisor approval and check-in, so the live roster is always current across stations.",
+        "text": "You would see swap requests go to a supervisor for sign-off and staff checking in, so the live roster stays current across stations.",
         "tool_words": [
           "app"
         ]

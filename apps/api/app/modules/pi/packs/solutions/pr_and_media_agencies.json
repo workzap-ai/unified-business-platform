@@ -21,7 +21,7 @@
         "text": "an agency-owned media register with outlet, role, beat and last contact, prompting the team to refresh entries that haven't been confirmed recently.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Is the media list kept in one file in the office, or on each person's phone?",
       "free_stops": "the register structure and refresh routine are set out in the solution document.",
       "extra_ideas": [
         {
@@ -51,7 +51,7 @@
         "text": "the shared media register with access controls and a log of every pitch and contact, so relationships stay with the agency.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do account managers keep contacts on their phones, or in their own sheets?",
       "free_stops": "access rights and what is logged are worked out in the solution document.",
       "extra_ideas": [
         {
@@ -81,7 +81,7 @@
         "text": "a coverage log with links, screenshots and outlet type that builds each client's monthly report automatically.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Does the time go into finding the coverage, or into laying it out in each client's format?",
       "free_stops": "the report layout and how coverage is captured are kept for the solution document.",
       "extra_ideas": [
         {
@@ -111,7 +111,7 @@
         "text": "a pitch and coverage tracker per client, so each clipping is tied to the story and client it came from.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Does the mix-up occur when clippings are saved, or when the report is put together?",
       "free_stops": "how pitches link to coverage is designed in the solution document.",
       "extra_ideas": [
         {
@@ -141,7 +141,7 @@
         "text": "an approval workflow for releases with timestamps and automatic client nudges as the deadline nears.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do the rounds come from several people at the client, or from one person changing their mind?",
       "free_stops": "the approval steps and nudge timings are set out in the solution document.",
       "extra_ideas": [
         {
@@ -171,7 +171,7 @@
         "text": "a media-buying ledger per client with bookings, outlet invoices, client billing and payment status.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Is the unpaid gap mostly on newspaper and television bookings, or on digital ads?",
       "free_stops": "how bookings flow into client billing is kept for the solution document.",
       "extra_ideas": [
         {
@@ -202,7 +202,7 @@
         "tool_words": [],
         "leads_with_view": true
       },
-      "ask_first": "",
+      "ask_first": "Do retainer clients ask for extra events more often, or for urgent crisis support?",
       "free_stops": "how activities are logged and compared is worked out in the solution document.",
       "extra_ideas": [
         {
@@ -232,7 +232,7 @@
         "text": "an event planner with supplier deliverables, deadlines and budget versus actual updated as costs come in.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do suppliers deliver late mostly on printing and decor, or on venue and sound?",
       "free_stops": "the event stages and budget tracking are designed in the solution document.",
       "extra_ideas": [
         {
@@ -262,7 +262,7 @@
         "text": "an out-of-hours rota with the escalation chain and reminders to whoever is on duty.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do weekend crises come from a few clients, or from across all your accounts?",
       "free_stops": "rota rules and the escalation chain are set out in the solution document.",
       "extra_ideas": [
         {
@@ -292,7 +292,7 @@
         "text": "a seeding tracker showing products sent, follow-up dates and whether coverage came back.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do you send products mostly to journalists, or mostly to influencers?",
       "free_stops": "the follow-up rules are kept for the solution document.",
       "extra_ideas": [
         {

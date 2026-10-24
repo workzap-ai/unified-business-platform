@@ -52,7 +52,7 @@
         "text": "A site measurement form on phone with sketches and photos, sent straight to the workshop and confirmed by the client on WhatsApp.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Does the wrong measurement usually come from the client's own numbers, or from your team's site visit?",
       "free_stops": "The measurement form and confirmation flow are covered in the solution document.",
       "extra_ideas": [
         {
@@ -82,7 +82,7 @@
         "text": "A design approval and change-order record with client confirmation on WhatsApp, linked to the job's cost.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Does the client change the design after seeing the cut pieces, or after seeing the first sample?",
       "free_stops": "How changes are recorded and charged is set out in the solution document.",
       "extra_ideas": [
         {
@@ -112,7 +112,7 @@
         "text": "An advance and balance tracker per job with scheduled reminders.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Is the unpaid balance usually with a few large clients, or spread over many small jobs?",
       "free_stops": "Reminder timing and how contractor retentions are tracked are kept for the solution document.",
       "extra_ideas": [
         {
@@ -143,7 +143,7 @@
         "text": "Job costing with materials issued and labour per job compared against the quote, plus a quote builder with saved rates.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do you price jobs from a rate per piece, or add up wood, hardware and labour yourself?",
       "free_stops": "How labour and materials are captured per job is detailed in the solution document.",
       "extra_ideas": [
         {
@@ -173,7 +173,7 @@
         "text": "Yard and store stock for timber, boards, hardware and finishes with reorder alerts.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Which hardware runs out most often: hinges, runners, or handles?",
       "free_stops": "How minimum levels are set per item is set out in the solution document.",
       "extra_ideas": [
         {
@@ -203,7 +203,7 @@
         "text": "A lead inbox combining Instagram, Facebook, WhatsApp and website inquiries with follow-up reminders.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do the missed messages come mostly from Instagram, or from WhatsApp?",
       "free_stops": "How leads flow in and are followed up is covered in the solution document.",
       "extra_ideas": [
         {
@@ -234,7 +234,7 @@
         "text": "An after-sales ticket log with visit scheduling and completion photos.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do after-sales calls come mostly from fitting faults, or from damage after delivery?",
       "free_stops": "The ticket flow and visit scheduling are set out in the solution document.",
       "extra_ideas": [
         {
@@ -264,7 +264,7 @@
         "text": "Showroom stock with ageing and a photo catalogue that can be shared.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Are the showroom pieces that sit unsold mostly high priced, or mostly older designs?",
       "free_stops": "How ageing is tracked and shared is kept for the solution document.",
       "extra_ideas": [
         {
@@ -294,7 +294,7 @@
         "text": "A quote builder with saved materials and labour rates, with owner approval in one tap.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Is the quote waiting mostly for site measurements, or for the pricing decision only you can make?",
       "free_stops": "How rates are stored and approvals work is detailed in the solution document.",
       "extra_ideas": [
         {

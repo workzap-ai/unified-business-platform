@@ -18,12 +18,12 @@
         "keys": [
           "custom_build"
         ],
-        "text": "A temperature dashboard pulling readings from sensors or loggers per chamber, so a complete record exists without hand-filling.",
+        "text": "You would see temperature readings arrive from sensors in each chamber on their own, so a complete record exists without anyone filling in logs by hand.",
         "tool_words": [
           "dashboard"
         ]
       },
-      "ask_first": "",
+      "ask_first": "Do staff fill the logs from memory at shift end, or from readings noted on paper during the day?",
       "free_stops": "How readings are captured and stored is designed in the solution document.",
       "extra_ideas": [
         {
@@ -83,7 +83,7 @@
         "text": "A claim file per incident that collects temperature records, photos and handover notes automatically.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Is the dispute usually about temperature during storage, or about the condition of goods on arrival?",
       "free_stops": "What goes into each claim file is set in the solution document.",
       "extra_ideas": [
         {
@@ -114,7 +114,7 @@
         "tool_words": [],
         "leads_with_view": true
       },
-      "ask_first": "",
+      "ask_first": "Does the generator run through the working day, or mostly through the evening and night?",
       "free_stops": "How costs are split per chamber is set in the solution document.",
       "extra_ideas": [
         {
@@ -144,7 +144,7 @@
         "text": "A chamber-wise stock register by client role, lot, units and date in, with a location map.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do you lose track of goods right after unloading, or when lots are moved between chambers later?",
       "free_stops": "The register layout is designed in the solution document.",
       "extra_ideas": [
         {
@@ -171,12 +171,12 @@
         "keys": [
           "transfer_tracking"
         ],
-        "text": "A gate pass system for goods in and out, linked to each client's stock.",
+        "text": "You would have a gate pass for every lot going in and out, tied to each client's stock, so you can see who took what and when.",
         "tool_words": [
           "system"
         ]
       },
-      "ask_first": "",
+      "ask_first": "Do crates go missing at withdrawal time, or get mixed up when stored together?",
       "free_stops": "The gate pass flow is set in the solution document.",
       "extra_ideas": [
         {
@@ -206,7 +206,7 @@
         "text": "A rent calculator by unit and days stored that produces client statements and tracks balances.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Is the dispute over how many days were counted, or over how many units were charged?",
       "free_stops": "How rent is calculated is set in the solution document.",
       "extra_ideas": [
         {
@@ -236,7 +236,7 @@
         "text": "A reefer trip log with temperature trace and door-open events per delivery.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do frozen deliveries arrive soft on long multi-drop routes, or even on short single deliveries?",
       "free_stops": "What the trip log records is designed in the solution document.",
       "extra_ideas": [
         {
@@ -267,7 +267,7 @@
         "tool_words": [],
         "leads_with_view": true
       },
-      "ask_first": "",
+      "ask_first": "Is the store empty mostly because one crop fills it, or because regular clients pull out after the season?",
       "free_stops": "How the planner forecasts is set in the solution document.",
       "extra_ideas": [
         {
@@ -297,7 +297,7 @@
         "text": "An owner phone view across sites: temperatures, alarms, occupancy and receivables.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Are your sites in one city, or spread across several cities and provinces?",
       "free_stops": "What the owner view includes is set in the solution document.",
       "extra_ideas": [
         {

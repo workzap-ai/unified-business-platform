@@ -139,7 +139,7 @@
         "keys": [
           "workflow_automation"
         ],
-        "text": "a counter billing app with price-change approvals logged.",
+        "text": "Every price change at the counter would need your approval and be logged, so cheaper billing would stand out.",
         "tool_words": [
           "app"
         ]

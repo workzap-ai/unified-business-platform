@@ -18,7 +18,7 @@
         "keys": [
           "erp_nori_platform"
         ],
-        "text": "a distributor portal where every distributor submits secondary sales and stock weekly in one format, feeding your dashboard.",
+        "text": "a weekly form where every distributor would submit secondary sales and stock in one format, feeding one owner summary.",
         "tool_words": [
           "portal",
           "dashboard"
@@ -111,7 +111,7 @@
         "keys": [
           "field_checks"
         ],
-        "text": "an order booker app with beat plan, shop check-in with location and photo during work hours, order capture and visit history, with bookers told how it works.",
+        "text": "an order booker phone tool with a beat plan, shop check-in with location and photo during work hours, order capture and visit history, with bookers told how it works.",
         "tool_words": [
           "app"
         ]

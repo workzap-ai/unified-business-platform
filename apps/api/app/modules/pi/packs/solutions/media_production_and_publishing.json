@@ -52,7 +52,7 @@
         "text": "a change log per project recording client changes with cost impact, feeding billing.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Does this come up with most clients, or mostly on larger productions?",
       "free_stops": "how changes are approved and billed is kept for the solution document."
     },
     {
@@ -72,7 +72,7 @@
         "text": "an approval tracker for scripts and edits with rounds counted, timestamps and client reminders.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do cuts go back and forth because many people give feedback, or because feedback arrives slowly?",
       "free_stops": "reminder timings and round limits are worked out in the solution document.",
       "extra_ideas": [
         {
@@ -102,7 +102,7 @@
         "text": "a post-production queue showing each editor's projects and deadlines, with alerts when deadlines are at risk.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Is it one editor holding everything, or several projects stuck at the same stage?",
       "free_stops": "queue rules and alerts are set out in the solution document.",
       "extra_ideas": [
         {
@@ -132,7 +132,7 @@
         "text": "a crew roster and booking with availability, confirmations, reminders and reliability notes.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do the same people cancel, or is it different crew every time?",
       "free_stops": "confirmation timings and reliability tracking are kept for the solution document.",
       "extra_ideas": [
         {
@@ -162,7 +162,7 @@
         "text": "an equipment register with check-out and check-in per shoot, condition notes and missing items flagged.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Is it mostly damage, mostly missing items, or both?",
       "free_stops": "the check-out routine and maintenance schedule are designed in the solution document.",
       "extra_ideas": [
         {
@@ -192,7 +192,7 @@
         "text": "a footage and asset catalogue mapping projects to drives or cloud storage, with backup status shown.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Is lost footage mostly on older projects, or on current ones too?",
       "free_stops": "the catalogue structure and backup routine are set out in the solution document.",
       "extra_ideas": [
         {
@@ -222,7 +222,7 @@
         "text": "receivables per project with milestones, ageing and scheduled reminders.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Is it mostly agencies or mostly channels that pay late?",
       "free_stops": "the milestone billing and reminder flow are kept for the solution document.",
       "extra_ideas": [
         {
@@ -253,7 +253,7 @@
         "text": "a publishing stock tracker covering print runs, warehouse stock, distributor stock and returns.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Is it a few titles returning heavily, or returns across most of your list?",
       "free_stops": "how sales and returns feed print run planning is worked out in the solution document.",
       "extra_ideas": [
         {
@@ -283,7 +283,7 @@
         "text": "a contracts and usage-rights register per project with expiry reminders.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Is it the contracts that are hard to find, or the usage rights for finished work?",
       "free_stops": "the register setup is set out in the solution document.",
       "extra_ideas": [
         {

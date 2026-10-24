@@ -52,7 +52,7 @@
         "tool_words": [],
         "leads_with_view": true
       },
-      "ask_first": "",
+      "ask_first": "Do you breach response times on urgent tickets, or on routine requests that sit unnoticed?",
       "free_stops": "alert thresholds per contract are kept for the solution document.",
       "extra_ideas": [
         {
@@ -83,7 +83,7 @@
         "tool_words": [],
         "leads_with_view": true
       },
-      "ask_first": "",
+      "ask_first": "Is the extra use mostly remote support calls, or visits to the client's site?",
       "free_stops": "how effort is measured against each contract is worked out in the solution document.",
       "extra_ideas": [
         {
@@ -110,12 +110,12 @@
         "keys": [
           "field_checks"
         ],
-        "text": "a field visit app with assigned jobs, site check-in and check-out, work notes and photos, and client sign-off.",
+        "text": "You would see engineers' assigned jobs with check-in and check-out at each site, work notes, photos and client sign-off.",
         "tool_words": [
           "app"
         ]
       },
-      "ask_first": "",
+      "ask_first": "Do engineers go straight from site to site, or come back to the office between visits?",
       "free_stops": "the visit flow and sign-off steps are set out in the solution document.",
       "extra_ideas": [
         {
@@ -145,7 +145,7 @@
         "text": "a renewal calendar with reminders to the team and the client at set intervals before each date.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do missed renewals mostly involve licences for office tools, or security and backup subscriptions?",
       "free_stops": "reminder timings and the client approval flow are kept for the solution document.",
       "extra_ideas": [
         {
@@ -175,7 +175,7 @@
         "text": "receivables per client linked to renewal dates, with invoices raised ahead of vendor payments and reminders.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do you pay the vendor before invoicing the client, or invoice first and the client pays slowly?",
       "free_stops": "the invoicing timeline is set out in the solution document.",
       "extra_ideas": [
         {
@@ -205,7 +205,7 @@
         "text": "an out-of-scope work log that drafts invoices automatically when a job is closed.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Does extra work go unbilled because nobody records it, or because it is billed late?",
       "free_stops": "how out-of-scope work is identified is worked out in the solution document.",
       "extra_ideas": [
         {
@@ -235,7 +235,7 @@
         "text": "a client documentation vault with structure and asset lists (not credentials in plain view), access controls and change history.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Does the senior engineer hold mostly the network layout, or the history of past faults?",
       "free_stops": "the vault structure and access rules are kept for the solution document.",
       "extra_ideas": [
         {
@@ -265,7 +265,7 @@
         "text": "recurring maintenance checklists with completion tracked by client and engineer, and overdue items flagged.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do the backup checks slip mostly for small clients, or for busy ones with the most data?",
       "free_stops": "the checklist contents and schedule are designed in the solution document.",
       "extra_ideas": [
         {
@@ -295,7 +295,7 @@
         "text": "a store and spare parts register with issue and return to engineers and alerts when items run low.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Are the mismatches mostly in small cheap parts, or in expensive items?",
       "free_stops": "the issue and return routine is set out in the solution document.",
       "extra_ideas": [
         {

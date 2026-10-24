@@ -48,7 +48,7 @@
         "keys": [
           "erp_nori_platform"
         ],
-        "text": "A nori system where renewals, leads, quotes and claims live under the agency's account with access by role, updated as staff work rather than copied between sheets.",
+        "text": "Renewals, leads, quotes and claims would sit in one place under the agency's own account, with access by role, updated as staff work rather than copied between sheets.",
         "tool_words": [
           "system"
         ]
@@ -143,7 +143,7 @@
         "text": "dashboards_reports — Codes and links per ad that follow each enquiry through to a written policy, with a monthly view of enquiries and policies by source.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do most of your ads bring phone calls, or WhatsApp messages?",
       "free_stops": "How codes are set up per platform and tied to policies is in the solution document.",
       "extra_ideas": [
         {
@@ -203,7 +203,7 @@
         "text": "A producer and sub-agent credit log that applies the agreed share rule to each policy and sends every sub-agent a monthly statement.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do the arguments come mostly over who introduced the customer, or over the share owed?",
       "free_stops": "How the share rules are encoded and statements produced is in the solution document; pi does not decide who is right in any dispute.",
       "extra_ideas": [
         {
@@ -263,7 +263,7 @@
         "text": "A change-request log per corporate client that tracks each addition or deletion to confirmation and flags any still open.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do the missed additions and deletions come from a few corporate clients, or from many?",
       "free_stops": "The request format and confirmation steps are detailed in the solution document.",
       "extra_ideas": [
         {
@@ -293,7 +293,7 @@
         "text": "An owner screen showing policies written, renewals due and lost, leads and response times by branch and producer, refreshed daily.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Which lines matter most to see: health, motor, life or something else?",
       "free_stops": "Which figures feed the screen and how they are pulled together is in the solution document.",
       "extra_ideas": [
         {
@@ -320,12 +320,12 @@
         "keys": [
           "erp_nori_platform"
         ],
-        "text": "Client, renewal and claims records held in the agency's own system with role-based access that can be switched off the day someone leaves.",
+        "text": "Client, renewal and claims records would be held under the agency's own account, with access by role that could be switched off the day someone leaves.",
         "tool_words": [
           "system"
         ]
       },
-      "ask_first": "",
+      "ask_first": "Did the agent keep clients' numbers on his own phone, or in the agency's files?",
       "free_stops": "Access roles and handover steps are set out in the solution document.",
       "extra_ideas": [
         {

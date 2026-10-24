@@ -52,7 +52,7 @@
         "text": "a fee and contract tracker with automatic reminders and receipts.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Is it the same few families paying late each month, or different ones every time?",
       "free_stops": "Reminder steps are in the solution document.",
       "extra_ideas": [
         {
@@ -83,7 +83,7 @@
         "text": "contract invoices with ageing and monthly trip reports generated for each client.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Which pay slower, the schools or the companies?",
       "free_stops": "Statement and report layouts are in the solution document.",
       "extra_ideas": [
         {
@@ -113,7 +113,7 @@
         "text": "a driver roster and attendance with quick replacement and duty-hour logs.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Does this come up mostly on Mondays and after holidays, or at random through the week?",
       "free_stops": "Roster rules are in the solution document.",
       "extra_ideas": [
         {
@@ -144,7 +144,7 @@
         "text": "a fuel log per vehicle and route with comparisons and flags on unusual use.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Is the rise across all buses, or mainly a few older ones on certain routes?",
       "free_stops": "How comparisons are made is in the solution document.",
       "extra_ideas": [
         {
@@ -174,7 +174,7 @@
         "text": "conductor cash matched against tickets per trip.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Is the missing cash mostly on a few routes, or across most conductors?",
       "free_stops": "The cash-up steps are in the solution document.",
       "extra_ideas": [
         {
@@ -205,7 +205,7 @@
         "text": "a maintenance schedule with a breakdown log and backup vehicle assignment.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do breakdowns come mostly from a few old vehicles, or across the whole fleet?",
       "free_stops": "Service intervals and backup rules are in the solution document.",
       "extra_ideas": [
         {
@@ -236,7 +236,7 @@
         "text": "one seat booking list combining counter and online sales, with seat locks and no-show tracking.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Which channel causes most of the double selling, the counter, the phone or online?",
       "free_stops": "How channels connect is in the solution document.",
       "extra_ideas": [
         {
@@ -266,7 +266,7 @@
         "text": "a renewal tracker for permits, fitness and insurance with reminders.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Is it mostly one kind of renewal, such as permit, fitness or insurance, that gets left late?",
       "free_stops": "Reminder timings are in the solution document.",
       "extra_ideas": [
         {
@@ -297,7 +297,7 @@
         "tool_words": [],
         "leads_with_view": true
       },
-      "ask_first": "",
+      "ask_first": "Do you have a rough feel for which few routes are strongest, or no idea at all?",
       "free_stops": "Which costs are included is in the solution document.",
       "extra_ideas": [
         {

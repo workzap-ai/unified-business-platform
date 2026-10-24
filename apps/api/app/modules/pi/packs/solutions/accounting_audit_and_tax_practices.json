@@ -52,7 +52,7 @@
         "text": "WhatsApp document intake where anything sent to the office number is filed under the right client and job, acknowledged automatically, and ticked off against that job's missing-documents checklist.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do most statements arrive on a few staff phones, or are they spread across everyone's chats?",
       "free_stops": "how files are matched to clients and jobs, and the acknowledgement flow, are set out in the solution document.",
       "extra_ideas": [
         {
@@ -83,7 +83,7 @@
         "text": "a partner screen updated every day showing jobs by stage and staff member, with any file that hasn't moved for several days flagged automatically.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Are jobs mostly stuck waiting on clients for papers, or waiting inside the office for someone to review?",
       "free_stops": "which stages to track and when a job counts as stuck are worked out for your practice in the solution document.",
       "extra_ideas": [
         {
@@ -113,7 +113,7 @@
         "text": "a review queue showing every file waiting for partner sign-off, how long it has waited and whether the senior check is done, with a daily nudge when files sit too long.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Is your sign-off needed on every file, or only on certain kinds of work like audits and returns?",
       "free_stops": "the review levels, checklists and escalation timings are kept for the solution document.",
       "extra_ideas": [
         {
@@ -143,7 +143,7 @@
         "text": "a receivables ledger per client with ageing and polite reminders sent on schedule, so the partner sees each morning who owes what and for how long.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Is it a handful of large clients paying late, or most of your bookkeeping clients?",
       "free_stops": "the reminder sequence and how it links to your invoicing are designed in the solution document.",
       "extra_ideas": [
         {
@@ -174,7 +174,7 @@
         "text": "a simple phone timesheet linked to each job, rolled up daily into fee versus hours per client, with fixed-fee clients flagged when they run over.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Is the extra work mostly from a few difficult clients, or spread across most fixed-fee clients?",
       "free_stops": "how time is captured without slowing staff, and how the profitability view is calculated, are left for the solution document.",
       "extra_ideas": [
         {
@@ -204,7 +204,7 @@
         "text": "an extra-work log per client where requests outside the retainer are recorded as they arrive and flagged for billing automatically.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Are the extra reports mostly asked for by a few clients, or do most of your clients ask for them?",
       "free_stops": "how scope is defined per service and how extras flow into invoices are covered in the solution document.",
       "extra_ideas": [
         {
@@ -234,7 +234,7 @@
         "text": "a deadline calendar per client and jurisdiction with reminders to staff and to clients at set intervals, and a weekly look-ahead sent to the partners.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Was that one missed deadline, or does it occur a few times every busy season?",
       "free_stops": "reminder timings and how deadlines are loaded and kept current are set out in the solution document.",
       "extra_ideas": [
         {
@@ -264,7 +264,7 @@
         "text": "secure shared client folders with access by role and an activity log, so files stay with the firm and every change is recorded.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do those files exist anywhere else, or are the laptop and the USB the only copies?",
       "free_stops": "the folder structure, access roles and backup routine are designed in the solution document.",
       "extra_ideas": [
         {

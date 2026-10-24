@@ -21,7 +21,7 @@
         "text": "A lesson ledger that tracks missed and make-up lessons under your rules, with parents booking make-ups themselves.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do make-up requests come mostly from illness, or from travel and exams?",
       "free_stops": "How the rules and booking work is kept for the document.",
       "extra_ideas": [
         {
@@ -51,7 +51,7 @@
         "text": "Packs and terms tracked with lessons used and expiry, with renewal reminders sent automatically.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do packs expire mostly with lessons unused, or after the last lesson is taken?",
       "free_stops": "The reminder timing is in the document.",
       "extra_ideas": [
         {
@@ -81,7 +81,7 @@
         "text": "Every trial tracked to enrolment, with automatic follow-up reminders and conversion by discipline.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do trials fail to convert in one discipline, or across all of them?",
       "free_stops": "The follow-up timing is kept for the document.",
       "extra_ideas": [
         {
@@ -111,7 +111,7 @@
         "text": "Retention tracked by term and discipline as counts, with next-term reminders sent automatically.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do children quit mostly after exams or recitals, or at any point in the term?",
       "free_stops": "The retention reports and reminders are in the document.",
       "extra_ideas": [
         {
@@ -141,7 +141,7 @@
         "text": "dashboards_reports — A room and teacher calendar with self-booking, studio-hire slots and room-hour use measured.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Are weekday rooms empty all day, or only in the mornings?",
       "free_stops": "How slots and pricing for hire are set up is kept for the document.",
       "extra_ideas": [
         {
@@ -172,7 +172,7 @@
         "tool_words": [],
         "leads_with_view": true
       },
-      "ask_first": "",
+      "ask_first": "Do the arguments come from lesson counts, or from deductions like room costs?",
       "free_stops": "The pay rules are in the document.",
       "extra_ideas": [
         {
@@ -202,7 +202,7 @@
         "text": "A recital planner with tasks, rehearsals, costume orders, seat counts and fees, with reminders sent automatically.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Is recital planning missed mostly on costumes, or on rehearsals and bookings?",
       "free_stops": "The planner stages are kept for the document.",
       "extra_ideas": [
         {
@@ -232,7 +232,7 @@
         "text": "A rental register with condition notes, deposits and return reminders.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do instruments more often come back damaged, or not come back at all?",
       "free_stops": "How condition and deposits are tracked is in the document.",
       "extra_ideas": [
         {
@@ -262,7 +262,7 @@
         "text": "customer_messaging — Fee reminders sent automatically each term or month, with an overdue count for the office.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do most families pay a little late, or do a few stay behind for months?",
       "free_stops": "The reminder timing and wording are kept for the document.",
       "extra_ideas": [
         {
@@ -292,7 +292,7 @@
         "text": "website_digital — Automatic WhatsApp replies with a booking link, and a booking page where parents choose slots.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do DMs arrive mostly in the evening, or throughout the day?",
       "free_stops": "The reply flow and booking page are in the document.",
       "extra_ideas": [
         {

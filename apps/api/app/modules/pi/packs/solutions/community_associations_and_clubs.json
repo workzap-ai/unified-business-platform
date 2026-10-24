@@ -51,7 +51,7 @@
         "text": "a payment matcher linking transfers, cash and cheques to member codes automatically.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do most members pay cash at the office, or by transfer into the bank account?",
       "free_stops": "The matching rules are set out in the solution document.",
       "extra_ideas": [
         {
@@ -78,12 +78,12 @@
         "keys": [
           "booking_scheduling"
         ],
-        "text": "a facility booking app for courts, hall, pool and BBQ areas with slot rules and member-only checks.",
+        "text": "You would see court, hall, pool and barbecue slots booked from one place, with slot rules applied and only members able to reserve.",
         "tool_words": [
           "app"
         ]
       },
-      "ask_first": "",
+      "ask_first": "Do the fights come over popular evening slots, or over bookings that were never confirmed?",
       "free_stops": "The slot rules and booking flow are designed in the solution document.",
       "extra_ideas": [
         {
@@ -113,7 +113,7 @@
         "text": "a notice broadcast channel that keeps announcements apart from chatter, with delivery to every member.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Is the chaos mostly chat between members, or mostly committee notices getting buried?",
       "free_stops": "The broadcast set-up goes in the solution document.",
       "extra_ideas": [
         {
@@ -143,7 +143,7 @@
         "text": "a handover pack keeping records and contracts under the association's control with role-based access.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do records vanish when the old committee leaves, or were they never written down in the first place?",
       "free_stops": "The handover structure and access roles are prepared in the solution document.",
       "extra_ideas": [
         {
@@ -173,7 +173,7 @@
         "text": "an AGM financial pack generated from the ledger, plus a budget against spend view.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do the weeks go into chasing figures from different people, or into sorting and totalling them?",
       "free_stops": "The pack layout and data flow are detailed in the solution document.",
       "extra_ideas": [
         {
@@ -200,12 +200,12 @@
         "keys": [
           "field_checks"
         ],
-        "text": "a guard patrol checkpoint app where guards scan known points with timestamps, plus staff attendance, used openly with staff.",
+        "text": "You would see guards scanning set checkpoints on their rounds with times recorded, alongside staff attendance, all used openly with the guards.",
         "tool_words": [
           "app"
         ]
       },
-      "ask_first": "",
+      "ask_first": "Do guards skip rounds mostly at night, or through the day as well?",
       "free_stops": "Checkpoint placement and reporting are set out in the solution document.",
       "extra_ideas": [
         {
@@ -235,7 +235,7 @@
         "text": "a complaint and repair tracker with status updates to the member who reported it.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do repairs take long because nobody reports them, or because spare parts and sign-off take time?",
       "free_stops": "The tracker and status updates are designed in the solution document.",
       "extra_ideas": [
         {
@@ -266,7 +266,7 @@
         "text": "event ticketing with QR entry and sales reconciled to cash at close.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Is the ticket money mostly lost at the gate on the day, or between the volunteers and the treasurer?",
       "free_stops": "The ticketing and reconciliation set-up go in the solution document.",
       "extra_ideas": [
         {
@@ -297,7 +297,7 @@
         "text": "a canteen stock and sales tracker with a daily morning read of cash and stock.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Does the canteen lose money mostly on stock that goes missing, or on prices set too low?",
       "free_stops": "The tracker and daily read are detailed in the solution document.",
       "extra_ideas": [
         {

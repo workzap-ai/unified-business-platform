@@ -52,7 +52,7 @@
         "tool_words": [],
         "leads_with_view": true
       },
-      "ask_first": "",
+      "ask_first": "Which item group do you worry about most, the fast sellers or the ones with high fees?",
       "free_stops": "The cost model per marketplace goes in the solution document.",
       "extra_ideas": [
         {
@@ -82,7 +82,7 @@
         "text": "a dispatch board showing orders at risk of missing handover time, with WhatsApp alerts to packers.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "How many orders usually arrive overnight, and is it every night or only during sales?",
       "free_stops": "The alert timings and board set-up are detailed in the solution document.",
       "extra_ideas": [
         {
@@ -112,7 +112,7 @@
         "text": "an inbound tracker comparing sent and received quantities for every shipment, with claim reminders before deadlines pass.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Is the shortage usually a few pieces in many cartons, or whole cartons going missing?",
       "free_stops": "The tracking and claim workflow is covered in the solution document.",
       "extra_ideas": [
         {
@@ -142,7 +142,7 @@
         "text": "a reorder view using sales speed and lead time per SKU, flagging slow movers before storage fees build.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Is it a handful of items that sit for months, or a large part of what you hold?",
       "free_stops": "The reorder rules per SKU are worked out in the solution document.",
       "extra_ideas": [
         {
@@ -172,7 +172,7 @@
         "text": "a campaign-day checklist covering stock, approved prices and staff rota, sent to the team with reminders before each event.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Did you run out of your top items, or of items you did not expect to sell?",
       "free_stops": "The checklist and timing for each campaign go in the solution document.",
       "extra_ideas": [
         {
@@ -202,7 +202,7 @@
         "text": "multi-channel stock sync with buffer rules, so Daraz, Noon, Amazon and your own site draw from one count.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "How often does an oversell happen, every week or only on busy days?",
       "free_stops": "The sync design and buffer rules are set out in the solution document.",
       "extra_ideas": [
         {
@@ -232,7 +232,7 @@
         "text": "a shared reply library and a daily list of unanswered buyer messages by marketplace, with ageing.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Are the unanswered questions about stock and delivery, or about the product itself?",
       "free_stops": "The reply library and routing are prepared in the solution document.",
       "extra_ideas": [
         {
@@ -262,7 +262,7 @@
         "text": "one combined daily sales view across marketplaces and countries, without downloads.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Which of the three reports do you use most each morning?",
       "free_stops": "Which reports are pulled and how they combine is detailed in the solution document.",
       "extra_ideas": [
         {
@@ -289,12 +289,12 @@
         "keys": [
           "workflow_automation"
         ],
-        "text": "a task checklist for seller-portal work with reminders, so any staff member can pick it up.",
+        "text": "a task checklist for seller-centre work with reminders, so any staff member could pick it up.",
         "tool_words": [
           "portal"
         ]
       },
-      "ask_first": "",
+      "ask_first": "Which job is most at risk now, listing updates, order handling or claims and returns?",
       "free_stops": "The task list and handover set-up are built out in the solution document.",
       "extra_ideas": [
         {

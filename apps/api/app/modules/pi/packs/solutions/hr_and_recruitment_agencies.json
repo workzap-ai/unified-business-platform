@@ -51,7 +51,7 @@
         "text": "a candidate pipeline per job order through offered, confirmed, joined and in guarantee, with check-in tasks before the joining date created automatically.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do the no-shows come mostly from one type of role, or from one client?",
       "free_stops": "the check-in points and backup rules are worked out in the solution document.",
       "extra_ideas": [
         {
@@ -81,7 +81,7 @@
         "text": "duplicate detection when a candidate is added, with the source and the recruiter who added them recorded at the same moment.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do the duplicates come from candidates applying again, or from different recruiters adding them?",
       "free_stops": "how matches are detected and how credit is recorded is kept for the solution document.",
       "extra_ideas": [
         {
@@ -111,7 +111,7 @@
         "text": "one shared pipeline per job order owned by the agency, so every candidate, stage and note stays when a recruiter leaves.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Is it mostly the senior recruiters who keep candidates on their phones, or everyone?",
       "free_stops": "access rights and how the pipeline is structured are designed in the solution document.",
       "extra_ideas": [
         {
@@ -142,7 +142,7 @@
         "text": "source and recruiter credit recorded the moment a candidate enters, with a commission view each recruiter can see.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do the arguments start when a candidate was sourced by one recruiter and closed by another?",
       "free_stops": "the credit rules and commission view are set out in the solution document.",
       "extra_ideas": [
         {
@@ -173,7 +173,7 @@
         "tool_words": [],
         "leads_with_view": true
       },
-      "ask_first": "",
+      "ask_first": "Which count do you most want to see weekly, CVs sent, interviews arranged or placements made?",
       "free_stops": "which activities to measure and how is worked out in the solution document.",
       "extra_ideas": [
         {
@@ -203,7 +203,7 @@
         "text": "fee invoicing triggered by the joining date, with receivables ageing, guarantee end dates and reminders sent on schedule.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Is it a few large clients who hold fees back, or most clients?",
       "free_stops": "the invoicing triggers and reminder sequence are kept for the solution document.",
       "extra_ideas": [
         {
@@ -233,7 +233,7 @@
         "text": "timesheets captured on phone, approved by the client supervisor, and fed into both payroll and client billing.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do the wrong timesheets come from a few client sites, or from many?",
       "free_stops": "the approval flow and how it links to payroll are set out in the solution document.",
       "extra_ideas": [
         {
@@ -263,7 +263,7 @@
         "text": "separate application links per job board and channel, so every placement shows where it came from.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "How many job boards do you pay for, and do applicants usually say which one they used?",
       "free_stops": "how sources are tagged and reported is designed in the solution document.",
       "extra_ideas": [
         {
@@ -293,7 +293,7 @@
         "text": "automatic WhatsApp updates to candidates, with their permission, each time they move to a new stage.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do most candidates ask about interview dates, or about the result after an interview?",
       "free_stops": "which stages trigger an update is worked out in the solution document.",
       "extra_ideas": [
         {

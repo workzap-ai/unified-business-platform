@@ -18,7 +18,7 @@
         "keys": [
           "booking_scheduling"
         ],
-        "text": "a token and queue system with estimated wait times on a screen and on WhatsApp, plus a daily view of waits by hour.",
+        "text": "a token queue with estimated wait times shown on a screen and on WhatsApp, plus a daily view of waits by hour.",
         "tool_words": [
           "system"
         ]
@@ -54,7 +54,7 @@
         "text": "a job tracker by reference number with automatic WhatsApp updates, with the customer's permission, when a job changes stage or is ready.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do most callers ask about ordinary typing jobs, or about attestation and translation jobs?",
       "free_stops": "which stages send updates is worked out in the solution document.",
       "extra_ideas": [
         {
@@ -84,7 +84,7 @@
         "text": "a document custody log showing which originals are in the office, which shelf, and who took them out and when.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do the originals go missing at the counter, or between staff desks and the back office?",
       "free_stops": "the custody routine is kept for the solution document.",
       "extra_ideas": [
         {
@@ -114,7 +114,7 @@
         "text": "handover recorded against each job reference, so documents can only be marked collected for the matching job.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Did the mix-up happen at a busy hour, or when handing over to someone collecting for another person?",
       "free_stops": "the handover check is designed in the solution document.",
       "extra_ideas": [
         {
@@ -144,7 +144,7 @@
         "text": "a courier and dispatch tracker with expected return dates, flagging pouches sent but not received.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Is the delay mostly at the courier, or at the embassy end?",
       "free_stops": "the return rules and alerts are set out in the solution document.",
       "extra_ideas": [
         {
@@ -174,7 +174,7 @@
         "text": "a translator assignment board with deadlines, reminders and on-time records per translator.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Is it the same few freelancers who are late, or many of them?",
       "free_stops": "assignment and reminder rules are kept for the solution document.",
       "extra_ideas": [
         {
@@ -204,7 +204,7 @@
         "text": "a check step per service before submission, with rejections and rework logged per person and service.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do the errors come mostly from names and numbers, or from missing details?",
       "free_stops": "the checks per service are worked out in the solution document.",
       "extra_ideas": [
         {
@@ -231,12 +231,12 @@
         "keys": [
           "workflow_automation"
         ],
-        "text": "a standard price list in the system, so every counter charges the same and every receipt matches.",
+        "text": "a standard price list held in one place, so every counter would charge the same and every receipt would match.",
         "tool_words": [
           "system"
         ]
       },
-      "ask_first": "",
+      "ask_first": "Do the different charges come from new staff, or even from experienced ones?",
       "free_stops": "how prices and receipts are set up is designed in the solution document.",
       "extra_ideas": [
         {
@@ -266,7 +266,7 @@
         "text": "a daily reconciliation of service charges, government fees paid and counter cash, by counter and branch.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Is the gap usually small and daily, or large on certain days?",
       "free_stops": "how fees and cash are matched is kept for the solution document.",
       "extra_ideas": [
         {
@@ -296,7 +296,7 @@
         "text": "a corporate account ledger with statements and scheduled reminders.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Is it a few corporate clients who owe most, or many with small balances?",
       "free_stops": "the reminder sequence is set out in the solution document.",
       "extra_ideas": [
         {

@@ -51,7 +51,7 @@
         "text": "Rate expiry alerts and a block on quoting from expired rates, running automatically across the team.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do staff quote from an old email, or from a rate sheet that nobody updates?",
       "free_stops": "The alert and approval rules are set in the solution document.",
       "extra_ideas": [
         {
@@ -81,7 +81,7 @@
         "text": "A quote tracker showing every open quote, its age and outcome, with follow-up reminders sent automatically.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do quotes go unfollowed mostly for new customers, or for regular ones?",
       "free_stops": "Follow-up timing and outcome tracking are in the solution document.",
       "extra_ideas": [
         {
@@ -112,7 +112,7 @@
         "text": "A shipment board with every job's milestones and automatic WhatsApp updates to the customer when a milestone changes.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do customers mostly call about booked cargo not yet shipped, or about containers already at sea?",
       "free_stops": "The milestones and message triggers are set in the solution document.",
       "extra_ideas": [
         {
@@ -142,7 +142,7 @@
         "text": "Rollover and delay alerts on the shipment board that reach ops and the customer automatically.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Does the rollover news reach you late from the shipping line, or reach you in time but not get passed on?",
       "free_stops": "Where alerts come from and who gets them is designed in the solution document.",
       "extra_ideas": [
         {
@@ -172,7 +172,7 @@
         "text": "Single job entry that fills the HBL, invoice, arrival notice and manifest templates automatically.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Which documents take the retyping: the booking, the bill of lading, the invoice, or the customs papers?",
       "free_stops": "Which documents are filled, and from what, is mapped in the solution document.",
       "extra_ideas": [
         {
@@ -203,7 +203,7 @@
         "tool_words": [],
         "leads_with_view": true
       },
-      "ask_first": "",
+      "ask_first": "Do you miss the profit because line charges come late, or because extra local charges are added afterwards?",
       "free_stops": "How costs are captured per job is set out in the solution document.",
       "extra_ideas": [
         {
@@ -233,7 +233,7 @@
         "text": "Customer and agent receivables with ageing, profit-share reconciliation and reminders queued for approval.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Is the cash gap mostly from a few large customers, or from many customers paying slowly?",
       "free_stops": "Ageing and reminder rules are in the solution document.",
       "extra_ideas": [
         {
@@ -263,7 +263,7 @@
         "text": "A shared job history with notes and documents per shipment, so no job is stuck in one inbox.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Does the information sit in one inbox for every shipment, or only for certain customers?",
       "free_stops": "How job history is captured is designed in the solution document.",
       "extra_ideas": [
         {
@@ -293,7 +293,7 @@
         "text": "A detention clock per container with free-time alerts sent to the customer automatically.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do the detention charges come mostly from one or two customers, or from many?",
       "free_stops": "Alert timing per container is set in the solution document.",
       "extra_ideas": [
         {
@@ -324,7 +324,7 @@
         "text": "A clear website with a rate request form and a lead tracker that records and follows up every enquiry.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do you reach new customers mostly by personal calls, or by waiting for them to find you?",
       "free_stops": "The site content and lead flow are planned in the solution document.",
       "extra_ideas": [
         {

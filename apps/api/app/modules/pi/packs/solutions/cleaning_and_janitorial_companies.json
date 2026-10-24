@@ -48,7 +48,7 @@
         "keys": [
           "booking_scheduling"
         ],
-        "text": "A booking system with a WhatsApp flow and web page that assigns cleaners by area and availability and blocks double bookings automatically.",
+        "text": "You would see every booking from chat, calls and the web land in one calendar, with cleaners assigned by area and availability and double bookings blocked.",
         "tool_words": [
           "system"
         ]

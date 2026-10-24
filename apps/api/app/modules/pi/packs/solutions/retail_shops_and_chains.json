@@ -82,7 +82,7 @@
           "field_checks",
           "stock_alerts"
         ],
-        "text": "short daily counts by category on phone with photos, compared automatically with system stock, with the gap tracked per branch and category over time.",
+        "text": "short daily counts by category taken on a phone with photos, compared with recorded stock, with the gap tracked for each branch and category over time.",
         "tool_words": [
           "system"
         ]

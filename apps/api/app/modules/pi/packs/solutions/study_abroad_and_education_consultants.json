@@ -21,7 +21,7 @@
         "text": "Fair and seminar leads captured into a follow-up queue the same day, with first-response timers per counsellor.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do the fair leads wait because they are never handed to counsellors, or because counsellors are busy with files?",
       "free_stops": "The capture and assignment setup is kept for the document.",
       "extra_ideas": [
         {
@@ -51,7 +51,7 @@
         "text": "Every enquiry tagged to its ad and followed to a signed client, so each ad's quality is measured.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do the unqualified enquiries ask about countries you do not cover, or about budgets they cannot meet?",
       "free_stops": "How the tags and quality measures are set up is in the document.",
       "extra_ideas": [
         {
@@ -81,7 +81,7 @@
         "text": "A shared file pipeline per intake by case reference, with institutions, offer and deposit status, owned by the company, not the counsellor.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do counsellors keep their sheets on their own laptops, or on their phones and personal email?",
       "free_stops": "The pipeline stages and views are kept for the document.",
       "extra_ideas": [
         {
@@ -111,7 +111,7 @@
         "text": "A secure document checklist per case under the consultancy's own controls, with missing items chased automatically.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do documents arrive mostly through chat messages, or mostly by email?",
       "free_stops": "The checklist and access setup are in the document.",
       "extra_ideas": [
         {
@@ -141,7 +141,7 @@
         "text": "A deadline calendar tied to each case, with reminders sent automatically to the right counsellor.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do you miss deadlines for university intakes, or for visa and funding submissions?",
       "free_stops": "The reminder rules are kept for the document.",
       "extra_ideas": [
         {
@@ -171,7 +171,7 @@
         "text": "A commission tracker showing eligible enrolments, invoices, amounts received and ageing by currency and institution.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do commissions come late from a few universities, or from most of them?",
       "free_stops": "How eligibility and ageing are tracked is in the document.",
       "extra_ideas": [
         {
@@ -201,7 +201,7 @@
         "text": "Monthly sub-agent statements produced automatically from agreed splits, with a dispute log.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do sub-agents dispute the percentage, or the cases they are said to have brought?",
       "free_stops": "The statement setup is kept for the document.",
       "extra_ideas": [
         {
@@ -231,7 +231,7 @@
         "text": "A service fee ledger with automatic reminders and a refund request register.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do instalments stop after the first payment, or in the middle of the process?",
       "free_stops": "The reminder sequence is in the document.",
       "extra_ideas": [
         {
@@ -261,7 +261,7 @@
         "text": "Stage-based WhatsApp status updates sent automatically to students and parents, with numbers given with permission.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do parents call because they get no updates, or because the updates they get are unclear?",
       "free_stops": "The stage messages and triggers are kept for the document.",
       "extra_ideas": [
         {
@@ -292,7 +292,7 @@
         "tool_words": [],
         "leads_with_view": true
       },
-      "ask_first": "",
+      "ask_first": "Do you judge counsellors by enquiries handled, or by clients signed?",
       "free_stops": "How performance is measured is in the document.",
       "extra_ideas": [
         {

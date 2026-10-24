@@ -51,7 +51,7 @@
         "text": "a brand deal tracker from enquiry to paid, with each deal's stage and ageing in one place.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Is the money owed to you mostly from a few big brands, or from many small deals?",
       "free_stops": "The deal stages and how deals flow into invoicing are set out in the solution document.",
       "extra_ideas": [
         {
@@ -81,7 +81,7 @@
         "text": "a deliverables calendar with go-live dates and approval rounds, sending WhatsApp reminders to you and your editor.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Are deadlines mostly lost between you and the brand, or between you and your editor?",
       "free_stops": "The calendar structure and reminder timings are covered in the solution document.",
       "extra_ideas": [
         {
@@ -111,7 +111,7 @@
         "text": "an approval tracker that logs each revision round per deal and flags when the agreed limit is reached.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do endless revisions come mostly from a few brands, or from almost every deal?",
       "free_stops": "How rounds are logged and flagged goes in the solution document; contract wording is for your lawyer.",
       "extra_ideas": [
         {
@@ -141,7 +141,7 @@
         "text": "a terms register for exclusivity windows, usage periods and whitelisting end dates, with alerts before each one expires.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do exclusivity clashes come mostly from long contracts, or from short deals you forgot?",
       "free_stops": "The register fields and alert rules are prepared in the solution document; interpreting terms is for your lawyer.",
       "extra_ideas": [
         {
@@ -171,7 +171,7 @@
         "text": "an enquiry form on your link-in-bio page that sorts brand requests into one inbox with follow-up reminders.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do brand emails get lost mostly in Instagram DMs, or across email and WhatsApp as well?",
       "free_stops": "The form and sorting set-up are designed in the solution document.",
       "extra_ideas": [
         {
@@ -201,7 +201,7 @@
         "text": "a campaign report builder that compiles screenshots and figures into a branded PDF for each brand.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do brands ask for insights after every post, or once at the end of a campaign?",
       "free_stops": "The report layout and how figures are gathered are covered in the solution document.",
       "extra_ideas": [
         {
@@ -231,7 +231,7 @@
         "text": "an editor task board with due dates, revision counts and handoff status, with reminders before each deadline.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Is your editor late on most pieces, or mainly on the bigger projects?",
       "free_stops": "The board and its reminders are set out in the solution document.",
       "extra_ideas": [
         {
@@ -262,7 +262,7 @@
         "tool_words": [],
         "leads_with_view": true
       },
-      "ask_first": "",
+      "ask_first": "Do the slow months follow big campaigns ending, or fall in the same months every year?",
       "free_stops": "The view and its inputs are detailed in the solution document; money planning is for your accountant.",
       "extra_ideas": [
         {
@@ -292,7 +292,7 @@
         "text": "an asset library structure with backup reminders after every shoot.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Is your footage spread across a few drives, or across many drives and phones?",
       "free_stops": "The folder structure and backup routine go in the solution document.",
       "extra_ideas": [
         {

@@ -22,7 +22,7 @@
         "tool_words": [],
         "leads_with_view": true
       },
-      "ask_first": "",
+      "ask_first": "Do most webinar sign-ups never attend, or do they attend and then not buy?",
       "free_stops": "How the funnel stages are measured is kept for the document.",
       "extra_ideas": [
         {
@@ -52,7 +52,7 @@
         "text": "Leads routed to the sales team the moment they arrive, with speed alerts and call outcomes logged.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do leads wait days for a call mostly at weekends, or throughout the week?",
       "free_stops": "The routing and alert rules are in the document.",
       "extra_ideas": [
         {
@@ -82,7 +82,7 @@
         "text": "Local payment options connected alongside cards, with failed payments retried and followed up automatically.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do card payments fail mostly at the payment step, or when the bank declines them?",
       "free_stops": "The payment setup and retry flow are kept for the document.",
       "extra_ideas": [
         {
@@ -109,12 +109,12 @@
         "keys": [
           "credit_ledger"
         ],
-        "text": "integration — An installment manager that reminds automatically and pauses or restores course access under your rule.",
+        "text": "Instalment reminders would go out by themselves, and course access would pause or return under your own rule.",
         "tool_words": [
           "integration"
         ]
       },
-      "ask_first": "",
+      "ask_first": "Do instalment buyers stop in month two on most courses, or only on the costly ones?",
       "free_stops": "The reminder and access rules are in the document.",
       "extra_ideas": [
         {
@@ -144,7 +144,7 @@
         "text": "A refund and chargeback register with reasons and access history for each case.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do refund requests come mostly through WhatsApp, or are they spread across email and DMs?",
       "free_stops": "The request flow and evidence kept per case are kept for the document.",
       "extra_ideas": [
         {
@@ -174,7 +174,7 @@
         "text": "Sharing detection from login signals and per-account watermarking on videos, with alerts every day.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Is sharing mostly a few accounts used by many, or lots of accounts used by a few?",
       "free_stops": "The detection signals are in the document.",
       "extra_ideas": [
         {
@@ -204,7 +204,7 @@
         "text": "customer_messaging — Churn tracked by cohort and reason, with first-week messages sent automatically to those who haven't started.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do subscribers cancel after the first month mostly on one course, or across all of them?",
       "free_stops": "The messages and churn reports are kept for the document.",
       "extra_ideas": [
         {
@@ -234,7 +234,7 @@
         "text": "WhatsApp support intake with automatic answers for login and access issues and response times measured.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Are login problems mostly forgotten passwords, or learners who cannot get in after paying?",
       "free_stops": "The help flow and response targets are in the document.",
       "extra_ideas": [
         {
@@ -264,7 +264,7 @@
         "text": "Affiliate links and codes tracked to purchases, with monthly commission statements produced automatically.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do affiliate claims come mostly from a few affiliates, or from most of them?",
       "free_stops": "The tracking and statement setup are kept for the document.",
       "extra_ideas": [
         {
@@ -291,12 +291,12 @@
         "keys": [
           "integration"
         ],
-        "text": "LMS, payments and CRM connected so each sale, refund and access change updates everywhere at once.",
+        "text": "Each sale, refund and access change would show up in your course, payment and customer records at once, with no copy-pasting.",
         "tool_words": [
           "crm"
         ]
       },
-      "ask_first": "",
+      "ask_first": "Which copying takes most time: sales into accounts, refunds, or access changes?",
       "free_stops": "Which systems connect and how is set out in the document.",
       "extra_ideas": [
         {
@@ -326,7 +326,7 @@
         "text": "One screen with revenue, refunds, churn and ad spend per course and channel, updated daily.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Which is hardest to see per course: revenue, refunds or churn?",
       "free_stops": "How the data is pulled together is kept for the document.",
       "extra_ideas": [
         {

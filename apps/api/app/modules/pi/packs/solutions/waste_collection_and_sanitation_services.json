@@ -51,7 +51,7 @@
         "text": "booking_scheduling — Written routes on phone with a crew assignment board and stand-in planning.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Are most of your routes kept in drivers' heads, or only a few?",
       "free_stops": "Route set-up is in the solution document.",
       "extra_ideas": [
         {
@@ -82,7 +82,7 @@
         "tool_words": [],
         "leads_with_view": true
       },
-      "ask_first": "",
+      "ask_first": "Is fuel guessed mostly for collection routes, or for disposal trips?",
       "free_stops": "Cost allocation is in the solution document.",
       "extra_ideas": [
         {
@@ -112,7 +112,7 @@
         "text": "workflow_automation — A skip and bin register with placement date, hire end and overdue alerts for billing.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Are the overdue skips mostly at building sites, or at other places?",
       "free_stops": "Register and alert design are in the solution document.",
       "extra_ideas": [
         {
@@ -142,7 +142,7 @@
         "text": "customer_messaging — A subscriber billing and collection tracker with reminders and online payment links where available.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do the late payers sit in a few societies, or across many?",
       "free_stops": "Reminder timing and wording are in the solution document.",
       "extra_ideas": [
         {
@@ -172,7 +172,7 @@
         "text": "A collector deposit log with variance flags by collector role.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Are deposits late by a day, or by several days?",
       "free_stops": "Matching rules are in the solution document; pi records the control gap, not names.",
       "extra_ideas": [
         {
@@ -202,7 +202,7 @@
         "text": "Vehicle maintenance reminders by date and a breakdown log showing areas affected.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do breakdowns come mostly with old trucks, or after heavy loads?",
       "free_stops": "Reminder schedule is in the solution document; pi gives no vehicle safety advice.",
       "extra_ideas": [
         {
@@ -232,7 +232,7 @@
         "text": "Complaint intake from WhatsApp into tickets with response timers and a closure photo.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do complaints concern mostly missed pickups, or staff behaviour?",
       "free_stops": "Ticket flow is in the solution document.",
       "extra_ideas": [
         {
@@ -262,7 +262,7 @@
         "text": "A monthly service report generator for societies and commercial clients built from route records and photos.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do societies want service reports weekly, or monthly?",
       "free_stops": "Report format is in the solution document.",
       "extra_ideas": [
         {
@@ -292,7 +292,7 @@
         "text": "A crew attendance and daily assignment board with stand-in planning for peak and holiday periods.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do helpers miss work mostly after Eid, or all year?",
       "free_stops": "Board set-up is in the solution document; pi records no workers' personal details.",
       "extra_ideas": [
         {
@@ -322,7 +322,7 @@
         "text": "A recyclables sales log with weights and rates recorded at each sale and a monthly summary.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Is the kabari your only buyer, or do you sell to several?",
       "free_stops": "Log design is in the solution document.",
       "extra_ideas": [
         {

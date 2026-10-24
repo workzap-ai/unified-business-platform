@@ -51,7 +51,7 @@
         "text": "dashboards_reports — A job costing tracker of estimated versus actual material and labour per job, updated from site.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Does the overrun come mostly from cable and fittings, or from a few large items?",
       "free_stops": "Costing method is in the solution document.",
       "extra_ideas": [
         {
@@ -81,7 +81,7 @@
         "text": "stock_alerts — A material issue and return log per site with a store stock register and minimum levels.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Does this occur mostly between nearby sites, or across all your running sites?",
       "free_stops": "Log design is in the solution document.",
       "extra_ideas": [
         {
@@ -111,7 +111,7 @@
         "text": "An import order tracker with expected dates linked to the jobs waiting on them.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Is it one supplier causing most delays, or imports in general running late?",
       "free_stops": "Tracker set-up is in the solution document.",
       "extra_ideas": [
         {
@@ -141,7 +141,7 @@
         "text": "A daily site report on phone with crew present, work done, photos and issues, plus crew attendance by site.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do your crews work on a few sites close by, or on many spread far apart?",
       "free_stops": "Report fields are in the solution document.",
       "extra_ideas": [
         {
@@ -171,7 +171,7 @@
         "text": "A variation request log with approval status and a billing flag.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Does this occur mostly with one client, or with most of your clients?",
       "free_stops": "Approval flow is in the solution document.",
       "extra_ideas": [
         {
@@ -201,7 +201,7 @@
         "text": "A running bill and retention tracker per project with due dates and automatic reminders.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Is the bigger amount in running bills held up now, or in old retentions never collected?",
       "free_stops": "Reminder rules are in the solution document.",
       "extra_ideas": [
         {
@@ -231,7 +231,7 @@
         "text": "An approvals and inspection file tracker by stage with reminders.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Is the delay mostly at one office, or does every type of approval take long?",
       "free_stops": "Stage set-up is in the solution document; pi gives no advice on approval requirements or eligibility.",
       "extra_ideas": [
         {
@@ -261,7 +261,7 @@
         "text": "A lead inbox for solar and service enquiries with response timers and qualification notes.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do the leads wait because nobody is assigned, or because calls only get made when the team is free?",
       "free_stops": "Qualification steps are in the solution document; pi gives no savings or payback claims.",
       "extra_ideas": [
         {
@@ -291,7 +291,7 @@
         "text": "An after-sales ticket log with assigned technician and a handover pack of documents, warranties and photos.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do those calls mostly concern faults after installation, or questions about warranty and paperwork?",
       "free_stops": "Ticket and handover pack design are in the solution document.",
       "extra_ideas": [
         {
@@ -321,7 +321,7 @@
         "text": "A tool register with check-out and check-in by crew and weekly counts.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do the missing items go mostly from sites, or from the store before they are issued?",
       "free_stops": "Register design is in the solution document; pi notes the control gap, not names.",
       "extra_ideas": [
         {

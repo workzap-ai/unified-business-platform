@@ -138,7 +138,7 @@
         "keys": [
           "transfer_tracking"
         ],
-        "text": "a ward indent and store system with approval, issue and receipt confirmation that flags repeat indents and items sent but not received, with ward-wise consumption reports.",
+        "text": "You would see ward indents go through sign-off, issue and receipt confirmation, with repeat indents and items sent but not received flagged, and ward-wise consumption shown.",
         "tool_words": [
           "system"
         ]
@@ -290,7 +290,7 @@
         "keys": [
           "dashboards_reports"
         ],
-        "text": "integration — a management dashboard with admissions, occupancy, revenue by payer and department and receivables, with HIS billing connected to accounts so totals agree daily.",
+        "text": "You would see admissions, occupancy, revenue by payer and department, and receivables in one daily view, with hospital billing joined to accounts so totals agree each day.",
         "tool_words": [
           "integration",
           "dashboard"

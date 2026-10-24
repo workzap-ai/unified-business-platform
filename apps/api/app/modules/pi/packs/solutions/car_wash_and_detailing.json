@@ -21,7 +21,7 @@
         "text": "before-and-after photos per car saved against each job with time stamp, at every site and van.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Does this happen mostly with new customers, or with regulars, and is it usually a scratch that was already there?",
       "free_stops": "The photo routine and storage are in the solution document.",
       "extra_ideas": [
         {
@@ -82,7 +82,7 @@
         "text": "a subscription record of washes used, renewal date and payment status, with automatic monthly summaries.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do these customers say they missed washes at one branch or time, or is it spread across the whole month?",
       "free_stops": "Package tracking and summary timing are in the solution document.",
       "extra_ideas": [
         {
@@ -112,7 +112,7 @@
         "text": "package payment tracking with automatic reminders and receipts.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Is it a few package customers who are always late, or many of them each month?",
       "free_stops": "Reminder steps are in the solution document.",
       "extra_ideas": [
         {
@@ -142,7 +142,7 @@
         "text": "WhatsApp booking with time slots per service and bay, confirmations and reminders.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Is it every weekend all day, or only a few peak hours on one day?",
       "free_stops": "Slot rules per service are in the solution document.",
       "extra_ideas": [
         {
@@ -173,7 +173,7 @@
         "text": "one place where bookings from every channel land, confirmed and reminded automatically.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Which channel causes most of the mix-ups, WhatsApp, Instagram or phone calls?",
       "free_stops": "Channel set-up and confirmation flow are in the solution document.",
       "extra_ideas": [
         {
@@ -204,7 +204,7 @@
         "text": "a consumables issue log with usage per car and alerts on unusual use.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Is it one item, like shampoo, that is rising fastest, or all of them together?",
       "free_stops": "How usage is measured per service is in the solution document.",
       "extra_ideas": [
         {
@@ -234,7 +234,7 @@
         "text": "a daily cash-up matched to cars washed per site.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Is the cash usually short on the same days or with the same staff, or does it vary?",
       "free_stops": "The cash-up steps are in the solution document.",
       "extra_ideas": [
         {
@@ -264,7 +264,7 @@
         "text": "service checklists on phone per wash level, ticked by the washer, with quality visible by site.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Is the difference mostly in how long each washer takes, or in how clean the car is at the end?",
       "free_stops": "The checklists themselves are in the solution document.",
       "extra_ideas": [
         {
@@ -294,7 +294,7 @@
         "text": "automatic maintenance reminders for ceramic and PPF customers.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do coating customers simply forget maintenance, or do they go to another place for it?",
       "free_stops": "Reminder timing is in the solution document.",
       "extra_ideas": [
         {

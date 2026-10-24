@@ -19,7 +19,7 @@
           "integration",
           "dashboards_reports"
         ],
-        "text": "a multi-branch dashboard pulling POS data from every outlet, including franchisees on other systems, by hour and channel every day.",
+        "text": "You would see every outlet's sales, franchisees included, by hour and channel each day in one view, even where outlets use different tills.",
         "tool_words": [
           "dashboard",
           "system"
@@ -178,7 +178,7 @@
           "integration",
           "cash_reconciliation"
         ],
-        "text": "all app orders on one screen beside POS sales, and each app's payout reconciled every day with commission, refunds and missed orders shown.",
+        "text": "You would see all delivery partner orders on one screen beside till sales, with each partner's payout matched daily and commission, refunds and missed orders shown.",
         "tool_words": [
           "app"
         ]

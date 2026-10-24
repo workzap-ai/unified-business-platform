@@ -18,7 +18,7 @@
         "keys": [
           "booking_scheduling"
         ],
-        "text": "a central booking calendar per vessel that takes bookings from staff, website and platforms and blocks double bookings automatically.",
+        "text": "a central booking calendar per vessel that would take bookings from staff, website and booking sites and block double bookings.",
         "tool_words": [
           "platform"
         ]
@@ -269,7 +269,7 @@
         "keys": [
           "cash_reconciliation"
         ],
-        "text": "a deposit and payment ledger per booking, reconciled automatically against each platform's payouts with differences flagged.",
+        "text": "a deposit and payment record per booking, matched against each booking site's payouts with differences flagged.",
         "tool_words": [
           "platform"
         ]

@@ -108,7 +108,7 @@
         "keys": [
           "dashboards_reports"
         ],
-        "text": "an owner dashboard showing package liability, bookings, revenue by service and branch, updated daily.",
+        "text": "You would see unused package value, bookings and revenue by service and branch, refreshed every morning.",
         "tool_words": [
           "dashboard"
         ]

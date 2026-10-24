@@ -48,7 +48,7 @@
         "keys": [
           "booking_scheduling"
         ],
-        "text": "a booking system with a daily capacity limit and written confirmations sent to customers automatically.",
+        "text": "a booking calendar with a daily capacity limit, and written confirmations that would go to customers straight away.",
         "tool_words": [
           "system"
         ]

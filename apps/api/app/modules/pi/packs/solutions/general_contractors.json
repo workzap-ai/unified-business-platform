@@ -261,7 +261,7 @@
           "field_checks",
           "dashboards_reports"
         ],
-        "text": "A daily site report form (manpower, work done, material, issues, photos) that rolls up into one owner dashboard across all sites; it also builds the site diary.",
+        "text": "A daily site report form (manpower, work done, material, issues, photos) that would roll up into one owner view across all sites and also build the site diary.",
         "tool_words": [
           "dashboard"
         ]

@@ -53,7 +53,7 @@
         "text": "a car-by-car cost sheet capturing purchase, recon, parts, paint and commission, showing true margin the moment it sells.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Which cost surprises you most: the mechanic, the painter, or the commission?",
       "free_stops": "The cost headings and how plot expenses are shared across cars are in the solution document.",
       "extra_ideas": [
         {
@@ -83,7 +83,7 @@
         "text": "a partner and investor ledger showing each person's capital in each car and their settlement on sale, visible to everyone involved.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do you and your partner mix money in many cars, or in a few big ones?",
       "free_stops": "Settlement rules and who sees what are in the solution document.",
       "extra_ideas": [
         {
@@ -110,12 +110,12 @@
         "keys": [
           "integration"
         ],
-        "text": "a listing tool that publishes and removes cars on the platforms you use from one place, tied to the stock register.",
+        "text": "Cars would be listed and taken down on the sites you use from one place, tied to your stock list.",
         "tool_words": [
           "platform"
         ]
       },
-      "ask_first": "",
+      "ask_first": "Do you list cars on one site, or on several?",
       "free_stops": "Which platforms connect and how is covered in the solution document.",
       "extra_ideas": [
         {
@@ -143,12 +143,12 @@
           "lead_followup",
           "attribution_codes"
         ],
-        "text": "a lead log with call-back reminders and the source of each enquiry, showing which platforms bring real buyers.",
+        "text": "Every enquiry would be logged with a call-back reminder and its source, showing which sites bring real buyers.",
         "tool_words": [
           "platform"
         ]
       },
-      "ask_first": "",
+      "ask_first": "Do the enquiries come mostly by phone, or by WhatsApp?",
       "free_stops": "Follow-up timings and source tracking are in the solution document.",
       "extra_ideas": [
         {
@@ -179,7 +179,7 @@
         "text": "a token register that locks a car once a deposit is recorded and alerts when the hold runs out.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Does the double token occur when two staff sell, or when you are away?",
       "free_stops": "Hold rules and alerts are set in the solution document.",
       "extra_ideas": [
         {
@@ -209,7 +209,7 @@
         "text": "a recon tracker with expected return dates and overdue alerts for every car out.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do cars go to one workshop, or to several?",
       "free_stops": "Workshop stages and alert timings are in the solution document.",
       "extra_ideas": [
         {
@@ -239,7 +239,7 @@
         "text": "a daily cash sheet for each lot matched automatically to sales and tokens recorded.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Does the cash gap show at the final sale, or at the token stage?",
       "free_stops": "The cash-up steps and approvals are in the solution document.",
       "extra_ideas": [
         {
@@ -269,7 +269,7 @@
         "text": "a paperwork tracker per car with reminders on pending steps, holding only the status, never documents or ID numbers.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Are delays at the transfer office, or in collecting papers from sellers?",
       "free_stops": "The steps tracked per country are in the solution document.",
       "extra_ideas": [
         {
@@ -299,7 +299,7 @@
         "text": "a phone check-out for keys and cars with time and location, and an evening count sent to the owner.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do keys go missing at closing time, or during the day?",
       "free_stops": "How check-outs are recorded per role is in the solution document.",
       "extra_ideas": [
         {

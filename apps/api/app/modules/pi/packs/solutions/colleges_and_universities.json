@@ -51,7 +51,7 @@
         "text": "Stalled applications spotted every day and reminded on a timed sequence until the fee is paid or the applicant opts out, with drop-off measured per programme.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do students drop off at the payment step itself, or after filling the form and going quiet?",
       "free_stops": "The reminder timings and drop-off reasons tracking are in the document.",
       "extra_ideas": [
         {
@@ -81,7 +81,7 @@
         "text": "An installment tracker that sends due-date reminders automatically and gives finance a weekly early-warning list, with account numbers instead of names in owner reports.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do instalment students fall behind mostly early in a term, or closer to exams?",
       "free_stops": "The reminder sequence and early-warning thresholds are kept for the document.",
       "extra_ideas": [
         {
@@ -108,12 +108,12 @@
         "keys": [
           "cash_reconciliation"
         ],
-        "text": "integration — Reference numbers from every bank matched to fee accounts daily, with unmatched receipts flagged each morning.",
+        "text": "Reference numbers from every bank would be matched to fee accounts daily, with unmatched receipts flagged to you each morning.",
         "tool_words": [
           "integration"
         ]
       },
-      "ask_first": "",
+      "ask_first": "Which causes most delay in matching: missing reference numbers, or payments arriving at many different banks?",
       "free_stops": "How each bank's statement is read and matched is set out in the document.",
       "extra_ideas": [
         {
@@ -143,7 +143,7 @@
         "text": "One timestamped approval trail for scholarships, discounts and refunds, showing approvers only what they need and measuring turnaround per office.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do scholarship files stall longest with one of the three people, or move slowly between all of them?",
       "free_stops": "The approval routing and turnaround targets are kept for the document.",
       "extra_ideas": [
         {
@@ -173,7 +173,7 @@
         "text": "Every claim checked automatically against the timetable and lecture logs before payment, with differences flagged per department.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do claims differ from the timetable mostly in hours claimed, or in classes that never took place?",
       "free_stops": "The matching rules for swaps, make-up lectures and cancellations are in the document.",
       "extra_ideas": [
         {
@@ -203,7 +203,7 @@
         "text": "A timetable and room tool that checks every change for clashes before anything is published.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do clashes involve mostly rooms, or the same teachers being placed in two classes?",
       "free_stops": "The clash rules and room-capacity logic are kept for the document.",
       "extra_ideas": [
         {
@@ -230,12 +230,12 @@
         "keys": [
           "integration"
         ],
-        "text": "Registrar records and the fee system connected so course changes update fee bills automatically, every day of the add/drop window.",
+        "text": "Course changes recorded by the registrar would update fee bills by themselves, every day of the add/drop window.",
         "tool_words": [
           "system"
         ]
       },
-      "ask_first": "",
+      "ask_first": "Do wrong fee bills affect a few students each term, or a large share?",
       "free_stops": "Which fields sync and how exceptions are handled is in the document.",
       "extra_ideas": [
         {
@@ -265,7 +265,7 @@
         "text": "Every request given a reference, tracked to completion and measured for turnaround, with automatic status updates to the requester.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Which request type piles up most: transcripts or verification letters?",
       "free_stops": "The request stages and status messages are kept for the document.",
       "extra_ideas": [
         {
@@ -295,7 +295,7 @@
         "text": "One board screen filled daily from source data, showing enrolment, collections, dropouts and costs by campus and programme.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do board reports take long because offices send late, or because their figures differ?",
       "free_stops": "How each office's data feeds the screen is set out in the document.",
       "extra_ideas": [
         {

@@ -51,7 +51,7 @@
         "text": "dashboards_reports — An overtime and hours approval log matched to client-approved hours, flagging mismatches before an invoice goes out.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do invoices bounce mostly over hours, or over rates and job descriptions?",
       "free_stops": "Matching rules are in the solution document.",
       "extra_ideas": [
         {
@@ -81,7 +81,7 @@
         "text": "An invoice and payment tracker per client and project with ageing and retention follow-up dates.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do clients pay slowly mostly on invoices, or on retention money?",
       "free_stops": "Ledger structure is in the solution document; pi gives no financing advice.",
       "extra_ideas": [
         {
@@ -111,7 +111,7 @@
         "text": "A certification and pass expiry matrix by role and certificate type with advance alerts (IDs stay in the company's own secured records).",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do expired certificates come mostly with new hires, or with long-serving workers?",
       "free_stops": "Alert timing and matrix design are in the solution document; pi stores no worker IDs or medical records.",
       "extra_ideas": [
         {
@@ -141,7 +141,7 @@
         "text": "A mobilisation checklist per call-off covering crew, valid certificates, equipment, transport and documents, with status per item.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Does mobilising take long mostly in finding available crew, or in sorting their papers?",
       "free_stops": "Checklist content is in the solution document; permit and HSE questions go to the client's HSE team.",
       "extra_ideas": [
         {
@@ -171,7 +171,7 @@
         "text": "A rotation and manpower planner showing who is on which site and when they rotate, with clash alerts.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Are rotations kept on one list today, or in each supervisor's own notes?",
       "free_stops": "Planner design is in the solution document.",
       "extra_ideas": [
         {
@@ -201,7 +201,7 @@
         "text": "workflow_automation — An equipment and tool register with location, status and calibration or inspection due dates and reminders.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Is equipment lost mostly between sites, or between the yard and a site?",
       "free_stops": "Register fields are in the solution document.",
       "extra_ideas": [
         {
@@ -232,7 +232,7 @@
         "tool_words": [],
         "leads_with_view": true
       },
-      "ask_first": "",
+      "ask_first": "Do overruns come mostly from labour, or from materials and subcontractors?",
       "free_stops": "Cost feeds and dashboard design are in the solution document.",
       "extra_ideas": [
         {
@@ -262,7 +262,7 @@
         "text": "dashboards_reports — A site daily report form with progress, photos and issues that compiles into the client's format.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do site reports arrive from most sites, or only from a few?",
       "free_stops": "Form and client format mapping are in the solution document.",
       "extra_ideas": [
         {
@@ -292,7 +292,7 @@
         "text": "A prequalification document library with version and expiry tracking and a tender calendar with submission checklists.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do clients ask for the same documents each time, or different ones?",
       "free_stops": "Library structure is in the solution document.",
       "extra_ideas": [
         {

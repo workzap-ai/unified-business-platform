@@ -52,7 +52,7 @@
         "text": "A fuel log comparing litres issued with distance per truck, flagging unusual consumption automatically.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Is the extra diesel on long highway trips, or on short local runs?",
       "free_stops": "The comparison method and flags are set in the solution document.",
       "extra_ideas": [
         {
@@ -82,7 +82,7 @@
         "text": "Trip updates to customers on WhatsApp from tracker locations, sent automatically.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do customers call mostly during the trip, or after the expected arrival time has passed?",
       "free_stops": "Update points and message triggers are in the solution document.",
       "extra_ideas": [
         {
@@ -112,7 +112,7 @@
         "text": "A trip register recording each trip's truck, route, freight, advance, diesel, tolls and expenses, with profit per trip and per truck each month.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Which cost is hardest to pin down on a trip: tolls, allowance, or repairs?",
       "free_stops": "How costs are captured per trip is designed in the solution document.",
       "extra_ideas": [
         {
@@ -142,7 +142,7 @@
         "text": "Receivables with ageing and owner-approved reminders, with POD photos attached to each invoice.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do big customers pay late after every trip, or only after a monthly bill?",
       "free_stops": "Reminder timing is set in the solution document.",
       "extra_ideas": [
         {
@@ -172,7 +172,7 @@
         "text": "To-pay freight tracked per bilty and adda, with uncollected or unremitted amounts flagged daily.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Does the to-pay cash go missing at the destination adda, or on the way back?",
       "free_stops": "The matching rules are set in the solution document.",
       "extra_ideas": [
         {
@@ -202,7 +202,7 @@
         "text": "A driver advance and settlement ledger per trip.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do drivers return with unspent advance money, or with receipts that do not add up?",
       "free_stops": "The settlement steps are laid out in the solution document.",
       "extra_ideas": [
         {
@@ -232,7 +232,7 @@
         "text": "A maintenance and tyre register per truck with service-due alerts and tyre serial tracking.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do the breakdowns come mostly from tyres, or from engine and brakes?",
       "free_stops": "Service intervals and alerts are set in the solution document.",
       "extra_ideas": [
         {
@@ -262,7 +262,7 @@
         "text": "An expiry calendar for vehicle and driver documents (dates only) with reminders before each.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do the expiries hit vehicle permits more often, or driver documents?",
       "free_stops": "Reminder timing is set in the solution document.",
       "extra_ideas": [
         {
@@ -293,7 +293,7 @@
         "tool_words": [],
         "leads_with_view": true
       },
-      "ask_first": "",
+      "ask_first": "Do you lose bookings on phone calls, or on chat enquiries that wait too long?",
       "free_stops": "How status is kept current is designed in the solution document.",
       "extra_ideas": [
         {
@@ -323,7 +323,7 @@
         "text": "Attached-vehicle owner statements showing trips, freight and share, produced automatically each month.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do owners argue over the freight amount of trips, or over the deductions for fuel and repairs?",
       "free_stops": "How shares are calculated is set in the solution document.",
       "extra_ideas": [
         {

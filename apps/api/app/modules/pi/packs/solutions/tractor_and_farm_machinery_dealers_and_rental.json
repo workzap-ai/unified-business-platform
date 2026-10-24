@@ -288,7 +288,7 @@
         "keys": [
           "dashboards_reports"
         ],
-        "text": "A branch dashboard showing sales, rental utilisation, workshop revenue, parts and outstanding amounts every day.",
+        "text": "You would see sales, rental use, workshop revenue, parts and outstanding amounts for each branch every day.",
         "tool_words": [
           "dashboard"
         ]

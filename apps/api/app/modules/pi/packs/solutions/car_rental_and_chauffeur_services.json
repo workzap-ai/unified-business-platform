@@ -21,7 +21,7 @@
         "text": "a fleet availability calendar showing every car's bookings, off-hire and returns, which blocks double bookings.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do double bookings usually come from walk-ins and calls, or from website and agent bookings?",
       "free_stops": "Calendar rules and handovers are in the solution document.",
       "extra_ideas": [
         {
@@ -48,12 +48,12 @@
         "keys": [
           "field_checks"
         ],
-        "text": "a check-out and check-in app with timed photos, fuel and kilometre readings, signed on phone.",
+        "text": "Cars would be checked out and back in on a phone, with timed photos, fuel and kilometre readings, signed by the customer.",
         "tool_words": [
           "app"
         ]
       },
-      "ask_first": "",
+      "ask_first": "Do these scratch arguments come mostly with short rentals, or with long ones?",
       "free_stops": "The inspection steps are in the solution document; liability is for your lawyer.",
       "extra_ideas": [
         {
@@ -115,7 +115,7 @@
         "tool_words": [],
         "leads_with_view": true
       },
-      "ask_first": "",
+      "ask_first": "Do you mostly need to know which cars are free the same day, or days ahead?",
       "free_stops": "What the fleet view shows is in the solution document.",
       "extra_ideas": [
         {
@@ -146,7 +146,7 @@
         "text": "a service and renewal scheduler by kilometres and dates, with off-hire alerts.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do cars miss services because kilometres are not noted, or because the workshop slot is never booked?",
       "free_stops": "Service intervals and alerts are in the solution document.",
       "extra_ideas": [
         {
@@ -176,7 +176,7 @@
         "text": "a chauffeur duty roster with pickup confirmations and duty-hour logs.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Are late pickups mostly a few chauffeurs, or spread across most of the team?",
       "free_stops": "Roster and confirmation rules are in the solution document.",
       "extra_ideas": [
         {
@@ -207,7 +207,7 @@
         "text": "corporate bills generated from logged trips, with statements and ageing.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do corporate bills take long because there are many clients, or because trip logs arrive late?",
       "free_stops": "Billing and statement set-up are in the solution document.",
       "extra_ideas": [
         {
@@ -237,7 +237,7 @@
         "text": "booking capture from every channel, including after hours, into one list with confirmations.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Which channel loses the most bookings: WhatsApp, calls, the website or agents?",
       "free_stops": "Channel set-up and replies are in the solution document.",
       "extra_ideas": [
         {
@@ -268,7 +268,7 @@
         "tool_words": [],
         "leads_with_view": true
       },
-      "ask_first": "",
+      "ask_first": "Do you want profit for the whole fleet, or first for a few key cars?",
       "free_stops": "Which costs are included and how is in the solution document.",
       "extra_ideas": [
         {

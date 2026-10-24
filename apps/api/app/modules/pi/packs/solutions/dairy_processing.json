@@ -18,7 +18,7 @@
         "keys": [
           "field_checks"
         ],
-        "text": "a milk intake app at collection points recording supplier code, litres, fat and SNF readings, time and slip photo, synced to the plant.",
+        "text": "a milk intake record at each collection point that would capture supplier code, litres, fat and SNF readings, time and slip photo, and reach the plant the same day.",
         "tool_words": [
           "app"
         ]

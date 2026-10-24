@@ -169,7 +169,7 @@
         "keys": [
           "field_checks"
         ],
-        "text": "a job app with tasks, photos, client sign-off and time spent, linked to AMC or billable work.",
+        "text": "a job sheet on the technician's phone with tasks, photos, client sign-off and time spent, which would link each visit to AMC or billable work.",
         "tool_words": [
           "app"
         ]

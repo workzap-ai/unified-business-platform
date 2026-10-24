@@ -113,7 +113,7 @@
         "text": "An energy downtime log recording every interruption and lost hours, shown next to output in the owner's daily view.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "How often does the gas drop, a few times a week or most days?",
       "free_stops": "How downtime is costed and planned around is detailed in the solution document.",
       "extra_ideas": [
         {
@@ -143,7 +143,7 @@
         "text": "A lot tracker linking cotton lot to yarn lot to beam to cloth roll, so any roll can be traced in seconds.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Does the mix-up happen in the godown, or when the yarn reaches the looms?",
       "free_stops": "How lots are linked through each stage is mapped in the solution document.",
       "extra_ideas": [
         {
@@ -173,7 +173,7 @@
         "text": "A cloth fault log at folding with loom number, fault type and photo, summarised automatically by loom and jobber group.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Are the faults mostly from a few looms, or spread across the shed?",
       "free_stops": "Fault categories and how they feed back to jobbers are set out in the solution document.",
       "extra_ideas": [
         {
@@ -234,7 +234,7 @@
         "text": "A conversion work register for yarn in, metres out, rate and balance per party, with each delivery confirmed and the balance always current.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Is it one party who disputes the metres, or several?",
       "free_stops": "How confirmations are captured and balances reconciled is covered in the solution document.",
       "extra_ideas": [
         {
@@ -264,7 +264,7 @@
         "text": "A costing sheet per count or quality that updates with current cotton, power and labour rates and each month's output.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Which cost do you know least, the power, the labour or the waste?",
       "free_stops": "How overheads and waste are spread across counts is detailed in the solution document.",
       "extra_ideas": [
         {
@@ -295,7 +295,7 @@
         "tool_words": [],
         "leads_with_view": true
       },
-      "ask_first": "",
+      "ask_first": "Which three people do you call, and what do you mainly ask each?",
       "free_stops": "Which numbers go in and where they come from is set out in the solution document.",
       "extra_ideas": [
         {

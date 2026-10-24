@@ -18,7 +18,7 @@
         "keys": [
           "field_checks"
         ],
-        "text": "A field visit app where officers see their planned groups, check in openly at each centre meeting and mark visits done or not done with a reason, rolled up per branch daily (no live tracking).",
+        "text": "a field visit sheet on the officer's phone where they would see planned groups, check in openly at each centre meeting, and mark visits done or not done with a reason, rolled up daily per branch, with no live tracking.",
         "tool_words": [
           "app"
         ]
@@ -53,7 +53,7 @@
         "text": "cash_reconciliation — Group-total collection capture at the centre meeting feeding the branch day-end, with mismatches flagged automatically.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Is the mismatch mostly with a few officers, or across many groups?",
       "free_stops": "Confirmation steps and matching rules are in the solution document; pi notes the control gap, never names individuals.",
       "extra_ideas": [
         {
@@ -83,7 +83,7 @@
         "text": "A branch day-end cash handover and deposit log with time stamps and variance flags per officer role.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do officers carry cash mostly from distant centres, or from every centre?",
       "free_stops": "The handover log design is in the solution document; pi records no cash movement routes or times.",
       "extra_ideas": [
         {
@@ -113,7 +113,7 @@
         "text": "Collection totals captured on phone at the centre meeting and passed into the MIS, so registers are not retyped.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Is the typing delay worst at certain branches, or at all of them?",
       "free_stops": "What the MIS can accept and how the link works is assessed in the solution document.",
       "extra_ideas": [
         {
@@ -140,12 +140,12 @@
         "keys": [
           "dashboards_reports"
         ],
-        "text": "A daily branch dashboard of visits planned versus done, collections versus due and deposits made, in aggregate only, with an area comparison view.",
+        "text": "a daily branch summary of visits planned versus done, collections versus due and deposits made, in totals only, with a side-by-side view of areas.",
         "tool_words": [
           "dashboard"
         ]
       },
-      "ask_first": "",
+      "ask_first": "Is the delay mostly in collecting figures at branch level, or in the area office sending them on?",
       "free_stops": "Which figures feed it and from where is in the solution document.",
       "extra_ideas": [
         {
@@ -175,7 +175,7 @@
         "text": "One data source per branch that produces each required report format automatically.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Did just a couple of different formats come in this quarter, or many?",
       "free_stops": "Format mapping is in the solution document.",
       "extra_ideas": [
         {
@@ -205,7 +205,7 @@
         "text": "workflow_automation — A file movement tracker showing where each file is, who has it and how long it has waited, with a document checklist per file type.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do files from certain branches wait longest, or from every branch?",
       "free_stops": "Stages and checklist contents are in the solution document.",
       "extra_ideas": [
         {
@@ -235,7 +235,7 @@
         "text": "A travel and fuel claim log tied to completed visits, with approval and a flag for claims without matching visits.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Are claims hard to check for all officers, or only those covering far areas?",
       "free_stops": "Claim rules and approval flow are in the solution document.",
       "extra_ideas": [
         {
@@ -265,7 +265,7 @@
         "text": "A circulars channel with read confirmation per branch and reminders to those who have not acknowledged.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do instructions get lost mostly in busy group chats, or in direct messages?",
       "free_stops": "Channel set-up is in the solution document.",
       "extra_ideas": [
         {
@@ -295,7 +295,7 @@
         "text": "An officer onboarding checklist with short process guides and a record of which files are returned and why.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do new officers mostly get loan files wrong, or daily collection records?",
       "free_stops": "Guide content and tracking are in the solution document.",
       "extra_ideas": [
         {

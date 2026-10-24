@@ -49,12 +49,12 @@
           "attribution_codes",
           "dashboards_reports"
         ],
-        "text": "Source tracking on every inquiry and order, showing which platform or channel actually brings business.",
+        "text": "Every inquiry and order would carry its source, showing which membership or channel actually brings business.",
         "tool_words": [
           "platform"
         ]
       },
-      "ask_first": "",
+      "ask_first": "Do you pay for several memberships, or mainly one?",
       "free_stops": "How sources are tagged and reported is covered in the solution document.",
       "extra_ideas": [
         {
@@ -84,7 +84,7 @@
         "text": "A quotation and sample tracker with status, deadlines and conversion to orders, flagging samples running late.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do samples take longest at design, or at stitching?",
       "free_stops": "Sample stages and approval flow are set out in the solution document.",
       "extra_ideas": [
         {
@@ -115,7 +115,7 @@
         "text": "A custom order spec sheet per order with logo files, colours, sizes, names and numbers and the approved mock-up, checked before production.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Is the logo mistake mostly in colour, or in placement?",
       "free_stops": "How specs are captured and checked before print is kept for the solution document.",
       "extra_ideas": [
         {
@@ -145,7 +145,7 @@
         "text": "An outsourced stitching ledger for panels issued per centre, balls returned, rejects and payments, flagging overdue and short returns.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Are late returns from a few stitching centres, or from most of them?",
       "free_stops": "How issues and returns are recorded and reconciled is covered in the solution document.",
       "extra_ideas": [
         {
@@ -175,7 +175,7 @@
         "text": "A QC log per lot with weight, shape and stitching checks and photos, linked to the stitching centre.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Are rejections more often for shape, or for weight?",
       "free_stops": "Check points and how they are tied to centres are set out in the solution document.",
       "extra_ideas": [
         {
@@ -205,7 +205,7 @@
         "text": "A buyer payment tracker for advances and balances with scheduled reminders.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do late balances come mostly from new buyers, or from regular ones?",
       "free_stops": "Reminder timing and how balances are tied to shipments are kept for the solution document.",
       "extra_ideas": [
         {
@@ -235,7 +235,7 @@
         "text": "A shipment tracker that sends buyers updates automatically by WhatsApp or email, with their permission.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do buyers ask for tracking mostly by WhatsApp, or by email?",
       "free_stops": "Which updates go out and when is set out in the solution document.",
       "extra_ideas": [
         {
@@ -266,7 +266,7 @@
         "text": "A buyer list with order history and timely reorder reminders, sent with their permission.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do buyers leave after a problem with an order, or without any complaint?",
       "free_stops": "Timing and content of reorder messages are kept for the solution document.",
       "extra_ideas": [
         {
@@ -301,7 +301,7 @@
           "custom_build"
         ]
       },
-      "ask_first": "",
+      "ask_first": "Do you want margin for each product line, or for each buyer?",
       "free_stops": "How freight, samples and currency effects are built in is detailed in the solution document.",
       "extra_ideas": [
         {

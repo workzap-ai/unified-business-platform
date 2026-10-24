@@ -18,7 +18,7 @@
         "keys": [
           "lead_followup"
         ],
-        "text": "One inbox pulling portal, Meta, website and WhatsApp enquiries together, assigning each automatically and timing the response, with every agent's speed visible to you daily.",
+        "text": "You would see enquiries from property websites, social ads, your own site and chat gathered in one inbox, each assigned on its own and timed, with every agent's speed visible to you daily.",
         "tool_words": [
           "portal"
         ]
@@ -51,7 +51,7 @@
           "attribution_codes",
           "dashboards_reports"
         ],
-        "text": "Spend against leads and deals per portal, listing and agent, measured continuously from the lead inbox.",
+        "text": "You would see spend set against leads and deals for each listing site, listing and agent, kept up to date from the lead inbox.",
         "tool_words": [
           "portal"
         ]
@@ -77,7 +77,7 @@
         "keys": [
           "custom_build"
         ],
-        "text": "A listings register with mandate and permit expiry per property, a duplicate check across your own ads, and status pushed to portals when a deal closes.",
+        "text": "You would see one register of listings with mandate and permit expiry per property, a check for duplicate ads, and listing sites told when a deal closes.",
         "tool_words": [
           "portal"
         ]

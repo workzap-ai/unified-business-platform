@@ -51,7 +51,7 @@
         "text": "a vehicle and cold-storage scheduling board that shows availability and blocks double-booking.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do clashes involve mostly the hearse, or other vehicles too?",
       "free_stops": "The board set-up is detailed in the solution document.",
       "extra_ideas": [
         {
@@ -81,7 +81,7 @@
         "text": "a maintenance log for vehicles and cold storage with service reminders and temperature alerts.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Did the cold storage unit break down in summer, or at other times too?",
       "free_stops": "The check routine and alert levels go in the solution document; body-handling rules are for the health authority.",
       "extra_ideas": [
         {
@@ -111,7 +111,7 @@
         "text": "a supply tracker for shrouds, coffins and washing materials with reorder alerts.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Which runs out more often: kafan cloth or coffins?",
       "free_stops": "The reorder levels and tracker are prepared in the solution document.",
       "extra_ideas": [
         {
@@ -141,7 +141,7 @@
         "text": "a digital graveyard register with plot status and an allocation workflow, access restricted by role.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Does the old register cover one graveyard, or several sections across different sites?",
       "free_stops": "The register design and allocation flow are set out in the solution document.",
       "extra_ideas": [
         {
@@ -171,7 +171,7 @@
         "text": "an allocation step that checks plot status first and locks a plot once allotted.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do double allotments come in busy times, or when a different person writes the entry?",
       "free_stops": "The allocation rules go in the solution document.",
       "extra_ideas": [
         {
@@ -201,7 +201,7 @@
         "text": "a payment and donation register with receipts and a daily cash close.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Is cash unrecorded mostly from service payments, or from donations?",
       "free_stops": "The register and cash close routine are detailed in the solution document.",
       "extra_ideas": [
         {
@@ -231,7 +231,7 @@
         "text": "gentle, automatic status messages to the family's chosen contact at each step.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do families call mostly before the funeral, or in the days after?",
       "free_stops": "The steps and message wording are prepared in the solution document.",
       "extra_ideas": [
         {
@@ -261,7 +261,7 @@
         "text": "a staff rota and on-call calendar with daily wage records.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Are gravediggers and washers paid per job, or a fixed daily amount?",
       "free_stops": "The rota and wage record set-up go in the solution document.",
       "extra_ideas": [
         {
@@ -291,7 +291,7 @@
         "text": "a monthly committee report of services handled, income, expenses and plots remaining.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Does the committee mainly need services and income, or expenses too?",
       "free_stops": "The report layout and inputs are set out in the solution document.",
       "extra_ideas": [
         {

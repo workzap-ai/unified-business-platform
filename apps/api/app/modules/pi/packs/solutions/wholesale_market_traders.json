@@ -52,7 +52,7 @@
         "text": "Buyer balances with ageing and WhatsApp reminders queued automatically for the owner to approve, sent only with the buyer's permission.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do upcountry buyers go quiet mostly after the first order, or after several?",
       "free_stops": "Reminder timing and hold rules are set in the solution document.",
       "extra_ideas": [
         {
@@ -82,7 +82,7 @@
         "text": "A daily closing screen comparing parchis, cash, bank transfers and new credit, flagging any difference automatically.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Is the mismatch there every day, or only on busy days?",
       "free_stops": "The closing steps and checks are laid out in the solution document.",
       "extra_ideas": [
         {
@@ -110,12 +110,12 @@
           "credit_ledger",
           "nori_daily_read"
         ],
-        "text": "Records kept in a system the owner can read any time, with an evening summary of sales, cash, new credit and recoveries.",
+        "text": "Records would be kept where you can read them any time, with an evening summary of sales, cash, new credit and recoveries.",
         "tool_words": [
           "system"
         ]
       },
-      "ask_first": "",
+      "ask_first": "Does the munshi hold only the credit records, or the stock records too?",
       "free_stops": "Which records move first, and how, is planned in the solution document.",
       "extra_ideas": [
         {
@@ -145,7 +145,7 @@
         "text": "A godown-to-shop log by bag and case that flags any transfer where sent and received don't match.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do bags go missing mostly on busy days, or randomly?",
       "free_stops": "The slip and count flow are designed in the solution document.",
       "extra_ideas": [
         {
@@ -175,7 +175,7 @@
         "text": "A daily rate board shared with salesmen, with every quote logged by buyer role and date.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do rate disputes come with a few buyers, or with many?",
       "free_stops": "The rate board and quote log setup are in the solution document.",
       "extra_ideas": [
         {
@@ -206,7 +206,7 @@
         "tool_words": [],
         "leads_with_view": true
       },
-      "ask_first": "",
+      "ask_first": "Do your buying rates change daily, or weekly?",
       "free_stops": "How lots are matched to sales is set in the solution document.",
       "extra_ideas": [
         {
@@ -236,7 +236,7 @@
         "text": "Lot ageing alerts that warn automatically when stock has sat too long, ahead of the summer months.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Does the insect trouble hit only dry fruit, or other stock too?",
       "free_stops": "Alert rules per item are set in the solution document.",
       "extra_ideas": [
         {
@@ -266,7 +266,7 @@
         "text": "WhatsApp and phone orders gathered into one list, tracked until the maal is sent.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do the missed orders come mostly by phone, or by WhatsApp?",
       "free_stops": "The intake and confirmation flow are in the solution document.",
       "extra_ideas": [
         {
@@ -297,7 +297,7 @@
         "text": "Incoming transfers matched to bills and buyer balances each day, with unmatched payments flagged.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do most buyers pay by bank transfer, or is it a mix?",
       "free_stops": "The matching rules are set in the solution document.",
       "extra_ideas": [
         {
@@ -328,7 +328,7 @@
         "text": "A buyer list with purchases and frequency that prompts follow-up before Ramadan, winter and wedding season.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do you want to know regular buyers by value, or by how often they come?",
       "free_stops": "How the list is built and used is planned in the solution document.",
       "extra_ideas": [
         {

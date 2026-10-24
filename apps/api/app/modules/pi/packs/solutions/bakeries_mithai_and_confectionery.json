@@ -78,7 +78,7 @@
         "keys": [
           "transfer_tracking"
         ],
-        "text": "a dispatch and receiving app with variances between factory and branch flagged every day.",
+        "text": "Dispatch and receiving would be recorded on phones, and any difference between factory and branch would be flagged to you every day.",
         "tool_words": [
           "app"
         ]
@@ -141,7 +141,7 @@
         "keys": [
           "job_tracking"
         ],
-        "text": "a custom-cake order system with design photo, message, pickup time and advance paid, kitchen tickets, and an automatic WhatsApp confirmation to the customer.",
+        "text": "Each custom cake order would be captured with design photo, message, pickup time and advance paid, kitchen tickets would be printed, and the customer would get a WhatsApp confirmation.",
         "tool_words": [
           "system"
         ]

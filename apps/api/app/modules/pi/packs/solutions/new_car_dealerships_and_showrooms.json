@@ -49,7 +49,7 @@
         "keys": [
           "lead_followup"
         ],
-        "text": "one inbox pulling portal, website, Facebook, PakWheels/Dubizzle and walk-in leads, assigning each to a consultant and chasing follow-ups every day, with a view of who is falling behind.",
+        "text": "one inbox pulling in leads from the website, Facebook, car listing sites and walk-ins, assigning each to a consultant and chasing follow-ups daily, with a view of who is falling behind.",
         "tool_words": [
           "portal"
         ]
@@ -84,7 +84,7 @@
         "text": "a showroom-owned customer record where every call, test drive and quotation is logged against the business and can be handed to another consultant in one step.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do customers mostly message the consultants on their own phones, or the showroom number?",
       "free_stops": "How handovers and access are set up per role is covered in the solution document.",
       "extra_ideas": [
         {
@@ -115,7 +115,7 @@
         "text": "a live yard board by variant, colour and chassis that blocks a second reservation on the same unit across all branches.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Does the double promise happen with popular models, or with any car in the yard?",
       "free_stops": "How the board links to bookings and allocations is detailed in the solution document.",
       "extra_ideas": [
         {
@@ -146,7 +146,7 @@
         "text": "a stock-age view with alerts on slow units and floor-plan days, set against open bookings by variant and colour.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Are the slow colours the same across models, or different for each model?",
       "free_stops": "The ageing thresholds and how they feed ordering are in the solution document.",
       "extra_ideas": [
         {
@@ -177,7 +177,7 @@
         "tool_words": [],
         "leads_with_view": true
       },
-      "ask_first": "",
+      "ask_first": "Which of the three takes most of the margin, the discounts, the freebies or the commission?",
       "free_stops": "Which costs are captured and how they roll up is set out in the solution document.",
       "extra_ideas": [
         {
@@ -207,7 +207,7 @@
         "text": "an approval flow that sends any discount or freebie above the limit to the owner on WhatsApp for a one-tap decision, logged against the car.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Is it the same few salesmen giving extras, or most of the team?",
       "free_stops": "Limits by role and the approval path are in the solution document.",
       "extra_ideas": [
         {
@@ -237,7 +237,7 @@
         "text": "a finance-case tracker by bank and stage with ageing alerts every day, holding only status and never buyer documents.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Is the delay mostly at the bank, or in the customer's papers?",
       "free_stops": "The stage list and alert timings are in the solution document.",
       "extra_ideas": [
         {
@@ -267,7 +267,7 @@
         "text": "a phone handover checklist with photos for each step, so a car can't be marked ready until everything is done, with the owner seeing every delivery.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Which of the three is missed most, the wash, the pre-delivery check or the documents?",
       "free_stops": "The checklist itself and photo rules are in the solution document.",
       "extra_ideas": [
         {
@@ -298,7 +298,7 @@
         "text": "automatic first-service reminders to new buyers, with their permission, with a booking link into your own workshop.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do they go to a cheaper workshop, or to one nearer their home?",
       "free_stops": "Reminder timing and booking flow are in the solution document.",
       "extra_ideas": [
         {
@@ -329,7 +329,7 @@
         "text": "a short morning read of leads, bookings, deliveries and margin by branch and consultant, pulled from a DMS export so nothing is retyped in Excel.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do you run one showroom or several, and which figure do you most want first?",
       "free_stops": "Which numbers are pulled and how branches are compared is in the solution document.",
       "extra_ideas": [
         {

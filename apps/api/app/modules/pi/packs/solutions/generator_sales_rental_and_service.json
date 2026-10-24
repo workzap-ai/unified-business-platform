@@ -51,7 +51,7 @@
         "text": "Hire billing from actual out and in dates with automatic alerts for overdue returns.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do hires come back late on most contracts, or only a few?",
       "free_stops": "Billing rules are in the solution document; pi gives no advice on what to charge.",
       "extra_ideas": [
         {
@@ -81,7 +81,7 @@
         "text": "An on-hire and off-hire checklist on phone with photos, running hours and fuel level, compared automatically at return.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Is the trouble mostly fuel level, mostly damage, or both?",
       "free_stops": "Checklist items are in the solution document.",
       "extra_ideas": [
         {
@@ -111,7 +111,7 @@
         "text": "booking_scheduling — Breakdown call intake via WhatsApp with technician assignment from the on-call rota, response time and closure.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do night calls come every week, or only during storms and long power cuts?",
       "free_stops": "Intake flow and rota logic are in the solution document.",
       "extra_ideas": [
         {
@@ -141,7 +141,7 @@
         "text": "field_checks — A PM schedule by running hours or dates per AMC customer, with reminders and visit sign-off on phone.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Is it a few contracts with missed visits, or most of them?",
       "free_stops": "Schedule rules are in the solution document.",
       "extra_ideas": [
         {
@@ -171,7 +171,7 @@
         "text": "AMC renewal reminders and a renewal pipeline showing which contracts are due, in talks or lost.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do you lose customers mostly at renewal time, or earlier when a visit is missed?",
       "free_stops": "Reminder timing is in the solution document.",
       "extra_ideas": [
         {
@@ -201,7 +201,7 @@
         "text": "Digital job sheets with parts used, linked to stock deduction and visible to the office as soon as they are closed.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do job sheets come late from every technician, or mainly from those working far away?",
       "free_stops": "Job sheet design is in the solution document.",
       "extra_ideas": [
         {
@@ -231,7 +231,7 @@
         "text": "Spare parts stock with minimum levels and alerts, with import or supplier order tracking.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Is it a few common parts running out, or a wide range of parts?",
       "free_stops": "Minimum levels and tracking are in the solution document.",
       "extra_ideas": [
         {
@@ -262,7 +262,7 @@
         "tool_words": [],
         "leads_with_view": true
       },
-      "ask_first": "",
+      "ask_first": "Do you rent out mostly a few large units, or many small ones?",
       "free_stops": "Cost allocation is in the solution document.",
       "extra_ideas": [
         {
@@ -292,7 +292,7 @@
         "text": "A receivables tracker with statements and automatic reminders by customer.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Is it a few big corporate customers owing most, or many paying late?",
       "free_stops": "Reminder rules are in the solution document.",
       "extra_ideas": [
         {
@@ -322,7 +322,7 @@
         "text": "An event booking calendar that blocks clashes and confirms bookings to the customer.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do double bookings come up mostly on weekends, or whenever two people take bookings?",
       "free_stops": "Calendar set-up is in the solution document.",
       "extra_ideas": [
         {

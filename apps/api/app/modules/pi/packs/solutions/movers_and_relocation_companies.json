@@ -21,7 +21,7 @@
         "text": "WhatsApp enquiry intake that collects move details and photos and routes serious enquiries to the surveyor quickly.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do most enquiries vanish right after you quote, or before you can even ask the details?",
       "free_stops": "The intake questions and routing are designed in the solution document.",
       "extra_ideas": [
         {
@@ -51,7 +51,7 @@
         "text": "Every enquiry recorded with follow-up reminders until it's booked or closed.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Are replies slowest during the day, or in the evenings and weekends?",
       "free_stops": "Follow-up timing is set in the solution document.",
       "extra_ideas": [
         {
@@ -81,7 +81,7 @@
         "text": "A survey checklist and volume calculator by room that produces a standard quote.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Are quotes wrong mostly for large homes, or for all sizes of move?",
       "free_stops": "The survey method and calculator are set in the solution document.",
       "extra_ideas": [
         {
@@ -111,7 +111,7 @@
         "text": "A move-day change form where added items are priced and approved by the customer on WhatsApp before loading.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do extra items come mostly on home moves, or on office moves too?",
       "free_stops": "The change-approval flow is designed in the solution document.",
       "extra_ideas": [
         {
@@ -142,7 +142,7 @@
         "text": "Pre- and post-move condition photos per job, and review requests sent automatically to genuinely happy customers.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Is it mostly broken furniture, or mostly missing items?",
       "free_stops": "The photo routine and review flow are set in the solution document.",
       "extra_ideas": [
         {
@@ -172,7 +172,7 @@
         "text": "A job calendar with crew, truck and helpers assigned, blocking double bookings and confirming helpers the night before.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Does the clash come when one person books, or when several people book?",
       "free_stops": "The scheduling rules are set in the solution document.",
       "extra_ideas": [
         {
@@ -202,7 +202,7 @@
         "text": "Job costing with labour hours, truck and materials used vs quoted, per job.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do you track any cost per job now, or only the total at month end?",
       "free_stops": "How costs are captured per job is designed in the solution document.",
       "extra_ideas": [
         {
@@ -232,7 +232,7 @@
         "text": "Payment status per job with on-site cash logged and matched daily.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Is the missing cash from a few crew leaders, or from most of them?",
       "free_stops": "The settlement steps are in the solution document.",
       "extra_ideas": [
         {
@@ -262,7 +262,7 @@
         "text": "Links and codes per channel showing which ads and listings bring paying jobs.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do most of your customers come from referrals, from ads, or from Google?",
       "free_stops": "How codes are set per channel is in the solution document.",
       "extra_ideas": [
         {
@@ -292,7 +292,7 @@
         "text": "Follow-up messages to past customers who agreed, with referral reminders at the right time.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do you hear again from past customers at all, or never once the move ends?",
       "free_stops": "Message timing and content are planned in the solution document.",
       "extra_ideas": [
         {

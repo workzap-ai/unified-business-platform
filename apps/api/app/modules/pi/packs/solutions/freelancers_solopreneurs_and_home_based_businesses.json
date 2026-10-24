@@ -51,7 +51,7 @@
         "text": "a scope and revision log per job, so extra requests are visible and can be quoted.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Is it usually the same few clients asking for extra revisions, or most of them?",
       "free_stops": "how scope and revisions are tracked is set out in the solution document.",
       "extra_ideas": [
         {
@@ -81,7 +81,7 @@
         "text": "a phone time logger per job showing hours spent and what each job really earned per hour.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do you charge by the job, or by the hour, and does it differ between clients?",
       "free_stops": "how the earnings view is calculated is kept for the solution document.",
       "extra_ideas": [
         {
@@ -111,7 +111,7 @@
         "text": "DMs and WhatsApp orders turned into one numbered order list, with details confirmed back to the customer automatically.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Which chat loses more orders, Instagram or WhatsApp, and is it usually when you are busy?",
       "free_stops": "how orders are captured from each app is worked out in the solution document.",
       "extra_ideas": [
         {
@@ -141,7 +141,7 @@
         "text": "a COD and courier tracker matching delivered orders to money received, with returns recorded.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Is the delay mostly with one courier, or do they all pay late?",
       "free_stops": "the matching routine is set out in the solution document.",
       "extra_ideas": [
         {
@@ -171,7 +171,7 @@
         "text": "a materials list with low-stock alerts and supplier reorder notes based on orders coming in.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Is it the same few materials that run out, or different ones each time?",
       "free_stops": "reorder levels and alerts are kept for the solution document.",
       "extra_ideas": [
         {
@@ -201,7 +201,7 @@
         "text": "a simple one-page website or ordering page linked to WhatsApp, so clients can find you directly.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Does it feel like most of your income comes from that one place, or nearly all of it?",
       "free_stops": "the page content and structure are designed in the solution document.",
       "extra_ideas": [
         {
@@ -232,7 +232,7 @@
         "text": "a repeat customer list with reminder messages for occasions and re-orders, sent with their permission.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do those customers have a reason to need you again soon, or is it a one-time purchase?",
       "free_stops": "message timing and occasions are set out in the solution document.",
       "extra_ideas": [
         {
@@ -262,7 +262,7 @@
         "text": "an income and expense log separating business from personal, with a monthly summary.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Is the mixing mostly in one bank account, or in cash and wallets as well?",
       "free_stops": "the categories and summary format are kept for the solution document.",
       "extra_ideas": [
         {

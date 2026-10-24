@@ -109,7 +109,7 @@
         "keys": [
           "job_tracking"
         ],
-        "text": "a warranty claim app where dealers scan the serial and upload photos, checked against dispatch records.",
+        "text": "You would see dealers scanning the serial and uploading photos for each warranty claim, checked against dispatch records so genuine claims stand out.",
         "tool_words": [
           "app"
         ]
@@ -201,7 +201,7 @@
         "keys": [
           "order_capture"
         ],
-        "text": "a rep order app feeding one order book, with status sent back to the rep.",
+        "text": "You would see reps sending their orders into one order book, with the status of each order sent back to the rep.",
         "tool_words": [
           "app"
         ]

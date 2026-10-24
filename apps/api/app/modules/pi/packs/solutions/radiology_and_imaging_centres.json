@@ -229,7 +229,7 @@
         "keys": [
           "dashboards_reports"
         ],
-        "text": "a referral dashboard showing volume by referring clinic each month, flagging sudden drops.",
+        "text": "You would see volume by referring clinic each month, with sudden drops flagged.",
         "tool_words": [
           "dashboard"
         ],

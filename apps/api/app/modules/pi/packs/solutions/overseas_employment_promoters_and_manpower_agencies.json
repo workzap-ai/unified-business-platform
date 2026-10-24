@@ -52,7 +52,7 @@
         "text": "automatic WhatsApp status updates to workers, with their permission, each time they move to the next step.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do workers call mostly after the medical stage, or while waiting for the visa?",
       "free_stops": "which steps send updates and in what language is worked out in the solution document.",
       "extra_ideas": [
         {
@@ -82,7 +82,7 @@
         "text": "a document movement log showing which file went where, when, and flagging anything sent but not returned.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do documents go missing mostly at the medical centre, or at the embassy?",
       "free_stops": "the logging routine and overdue rules are kept for the solution document.",
       "extra_ideas": [
         {
@@ -112,7 +112,7 @@
         "text": "appointment tracking per worker with automatic WhatsApp reminders before each one, and a list of no-shows for the office.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do workers miss their medical dates because nobody told them, or because they were told too late?",
       "free_stops": "reminder timings and how no-shows are followed up are set out in the solution document.",
       "extra_ideas": [
         {
@@ -143,7 +143,7 @@
         "tool_words": [],
         "leads_with_view": true
       },
-      "ask_first": "",
+      "ask_first": "Do unsuitable candidates come from a few sub-agents, or from most of them?",
       "free_stops": "how sub-agents are scored is designed in the solution document.",
       "extra_ideas": [
         {
@@ -173,7 +173,7 @@
         "text": "a handoff check where ticketing only opens for a worker once the earlier stage is confirmed on the batch board.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Is the visa held up by the embassy, or by missing papers on your side?",
       "free_stops": "the handoff rules between teams are worked out in the solution document.",
       "extra_ideas": [
         {
@@ -203,7 +203,7 @@
         "text": "employer billing per batch with receivables ageing and reminders in the employer's currency.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do foreign employers pay late on every batch, or only on some batches?",
       "free_stops": "the billing points and reminder sequence are kept for the solution document.",
       "extra_ideas": [
         {
@@ -233,7 +233,7 @@
         "text": "a compliance calendar with a document checklist and reminders well before each date.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do you miss the renewal date itself, or the papers the bureau asks for?",
       "free_stops": "the calendar setup and checklists are designed in the solution document.",
       "extra_ideas": [
         {
@@ -263,7 +263,7 @@
         "text": "a shared batch view for both ends of the corridor, so the office and destination partners see the same status every day.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do the two lists differ in which workers are on them, or in the stage each worker has reached?",
       "free_stops": "access for each side and what they see is set out in the solution document.",
       "extra_ideas": [
         {
@@ -294,7 +294,7 @@
         "tool_words": [],
         "leads_with_view": true
       },
-      "ask_first": "",
+      "ask_first": "Do batches wait mostly for your decisions on workers, or on payments and documents?",
       "free_stops": "which items reach the owner and which are handled by staff is worked out in the solution document.",
       "extra_ideas": [
         {

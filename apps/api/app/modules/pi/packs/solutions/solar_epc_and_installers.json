@@ -261,7 +261,7 @@
           "customer_messaging",
           "loyalty_repeat"
         ],
-        "text": "A maintenance reminder schedule per installed system, sent automatically to customers who opted in.",
+        "text": "You would see a maintenance reminder schedule for each installation, sent on its own to customers who agreed to hear from you.",
         "tool_words": [
           "system"
         ]

@@ -52,7 +52,7 @@
         "text": "A vendor issue and receive ledger with counts, shortfalls and payments per stage.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Is the mismatch mostly with one polisher, or across all your vendors?",
       "free_stops": "How counts are confirmed and tied to payment is covered in the solution document.",
       "extra_ideas": [
         {
@@ -83,7 +83,7 @@
         "text": "A digital batch record built automatically as each stage is completed, exportable per shipment.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Which record do buyers ask for most, the material certificate, the inspection result or the process dates?",
       "free_stops": "What each record holds and how it is exported is set out in the solution document; regulatory content is for your quality or regulatory adviser.",
       "extra_ideas": [
         {
@@ -110,12 +110,12 @@
         "keys": [
           "field_checks"
         ],
-        "text": "An inspection app recording results per lot and stage, rejection reasons and photos, summarised by stage and vendor.",
+        "text": "An inspection form on the phone recording results per lot and stage, rejection reasons and photos, summarised by stage and vendor.",
         "tool_words": [
           "app"
         ]
       },
-      "ask_first": "",
+      "ask_first": "Does the rejection show up more at the finishing stage, or the forging and grinding stage?",
       "free_stops": "Inspection points and rejection categories are kept for the solution document.",
       "extra_ideas": [
         {
@@ -145,7 +145,7 @@
         "text": "A marking job sheet checked against the order and the buyer's item master before marking starts.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Does the wrong logo happen with new private-label buyers, or with repeat ones as well?",
       "free_stops": "How marking instructions are stored and checked is covered in the solution document.",
       "extra_ideas": [
         {
@@ -175,7 +175,7 @@
         "text": "A packing list builder with scan-check against the order before boxes close.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Is the shortage usually a few pieces on large orders, or whole boxes missing?",
       "free_stops": "The scan-check flow is set out in the solution document.",
       "extra_ideas": [
         {
@@ -205,7 +205,7 @@
         "text": "A certificate and audit calendar with reminders well ahead and a document folder.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Which comes up most unexpectedly, the certificates, the audits or the licence renewals?",
       "free_stops": "Reminder timing and folder structure are kept for the solution document; what each certificate requires is for your regulatory adviser.",
       "extra_ideas": [
         {
@@ -235,7 +235,7 @@
         "text": "A buyer receivables ledger with ageing and scheduled reminders.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Is it a few big buyers who pay months late, or most of them?",
       "free_stops": "Reminder schedule and follow-up order are set out in the solution document.",
       "extra_ideas": [
         {
@@ -266,7 +266,7 @@
         "text": "An inquiry tracker with reply timers, and an updated digital catalogue searchable by category and catalogue number.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Which source brings the most unanswered inquiries, the website or the buyer listing sites?",
       "free_stops": "How inquiries flow in and the catalogue is structured are covered in the solution document.",
       "extra_ideas": [
         {
@@ -297,7 +297,7 @@
         "tool_words": [],
         "leads_with_view": true
       },
-      "ask_first": "",
+      "ask_first": "Which stage do you chase vendors for most, the forging, the polishing or the plating?",
       "free_stops": "Who owns which follow-up and how it is escalated is set out in the solution document.",
       "extra_ideas": [
         {

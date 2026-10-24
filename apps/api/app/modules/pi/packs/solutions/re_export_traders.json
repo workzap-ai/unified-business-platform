@@ -52,7 +52,7 @@
         "text": "Reservations on the stock register so confirmed goods are held automatically and released only when loaded or cancelled.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Does the double sale happen with fast-moving lots, or mostly when several salesmen are selling?",
       "free_stops": "The hold and release rules are set in the solution document.",
       "extra_ideas": [
         {
@@ -82,7 +82,7 @@
         "text": "Ageing alerts for fast-depreciating items, sent automatically as stock passes set ages.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Is it a few old lots that sit, or a large share of what you hold?",
       "free_stops": "Ageing thresholds per category are set in the solution document.",
       "extra_ideas": [
         {
@@ -112,7 +112,7 @@
         "text": "An order book per buyer that turns WhatsApp orders into tracked lines through to loading and container.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Which gets missed more, the quantities or the model details in a voice note?",
       "free_stops": "The intake and confirmation flow are in the solution document.",
       "extra_ideas": [
         {
@@ -142,7 +142,7 @@
         "text": "A credit ledger with ageing and approval rules per agent, with reminders queued for the owner to approve.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Is it one agent who keeps pushing payment, or several?",
       "free_stops": "Approval rules and reminder timing are in the solution document.",
       "extra_ideas": [
         {
@@ -172,7 +172,7 @@
         "text": "Payments logged against proformas daily, with unmatched receipts flagged.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Which way causes most of the matching trouble, bank transfer, cash or cheque?",
       "free_stops": "The matching rules are set out in the solution document.",
       "extra_ideas": [
         {
@@ -202,7 +202,7 @@
         "text": "A showroom cash log with daily closing and deposit tracking, flagging days when deposit doesn't match sales.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Is the cash piling up over a few days, or building up through the week?",
       "free_stops": "The closing and deposit steps are laid out in the solution document.",
       "extra_ideas": [
         {
@@ -233,7 +233,7 @@
         "tool_words": [],
         "leads_with_view": true
       },
-      "ask_first": "",
+      "ask_first": "Which cost do you know least for each market, the freight, the discounts or the duties?",
       "free_stops": "How costs are assigned to markets is worked out in the solution document.",
       "extra_ideas": [
         {
@@ -263,7 +263,7 @@
         "text": "A company-owned buyer database with purchase history and last contact, shared across the sales team.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Has a salesman left with his buyers before, or is this a worry for now?",
       "free_stops": "Who sees what, and how the list is kept current, is in the solution document.",
       "extra_ideas": [
         {
@@ -293,7 +293,7 @@
         "text": "A catalogue with photos, videos and current prices that salesmen can send in one tap, kept up to date from stock.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Which request comes most often, the photos, the videos or the prices?",
       "free_stops": "How the catalogue is structured and updated is in the solution document.",
       "extra_ideas": [
         {
@@ -323,7 +323,7 @@
         "text": "Every visit and enquiry recorded, with follow-up reminders sent automatically to the right salesperson.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Are the visitors mostly new buyers, or known ones who did not order this time?",
       "free_stops": "The follow-up timing and steps are set in the solution document.",
       "extra_ideas": [
         {
@@ -353,7 +353,7 @@
         "text": "A loading checklist with carton counts and photos per container, shared with the buyer on WhatsApp.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Does the wrong loading happen with certain items, or when the warehouse is rushed?",
       "free_stops": "The checklist and photo steps are designed in the solution document.",
       "extra_ideas": [
         {

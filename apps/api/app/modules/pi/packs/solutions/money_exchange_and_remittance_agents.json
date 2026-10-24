@@ -51,7 +51,7 @@
         "text": "A shift and till handover log with opening float, handover count and closing signed off by role, showing which shift a variance began in.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Is the shortage always at the same counter, or does it move between counters?",
       "free_stops": "Handover steps and sign-off rules are covered in the solution document; pi records the control gap, never names staff.",
       "extra_ideas": [
         {
@@ -78,13 +78,13 @@
         "keys": [
           "dashboards_reports"
         ],
-        "text": "A daily cash position view per branch against the owner's ceiling, flagging days it was exceeded (security details stay out of the system).",
+        "text": "You would see each branch's cash position daily against your own ceiling, with the days it was exceeded flagged, and security details kept out.",
         "tool_words": [
           "system"
         ],
         "leads_with_view": true
       },
-      "ask_first": "",
+      "ask_first": "Is overnight cash high every day, or mainly after weekends and salary days?",
       "free_stops": "How the ceiling is tracked and reported is in the solution document; pi does not record vault or movement details.",
       "extra_ideas": [
         {
@@ -114,7 +114,7 @@
         "text": "A note and currency stock tracker per branch that alerts the owner when a denomination or currency drops below the level they set.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do you run out mostly of a few common currencies, or of less common notes?",
       "free_stops": "Alert levels and how counts feed the tracker are in the solution document.",
       "extra_ideas": [
         {
@@ -144,7 +144,7 @@
         "text": "An inter-branch transfer log with confirm-on-receipt that flags any transfer sent but not confirmed or received short.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Is the count wrong on arrival for most transfers, or only a few?",
       "free_stops": "Confirmation steps and exception rules are detailed in the solution document.",
       "extra_ideas": [
         {
@@ -174,7 +174,7 @@
         "text": "A staff roster built from hourly footfall tallies, with shift reminders and late-arrival tracking for peak days.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do queues peak mostly on Fridays, or after salary days?",
       "free_stops": "How tallies turn into a roster is in the solution document.",
       "extra_ideas": [
         {
@@ -204,7 +204,7 @@
         "text": "A standard WhatsApp auto-reply that directs status questions to the principal's tracking channel, handling no transaction data.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do customers ask about arrival mostly by phone, or by WhatsApp?",
       "free_stops": "The reply flow and wording are in the solution document.",
       "extra_ideas": [
         {
@@ -234,7 +234,7 @@
         "text": "A daily report that compiles branch figures from the closing sheets into the format the owner sends, with aggregates only.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Which daily report takes longest to prepare: cash position, transactions, or currency stock?",
       "free_stops": "Report mapping and formats go in the solution document.",
       "extra_ideas": [
         {
@@ -264,7 +264,7 @@
         "text": "A rate board update checklist with a time-stamped confirmation per branch, flagging any branch that has not confirmed.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Is the rate board late mostly in the morning, or after midday changes?",
       "free_stops": "The checklist steps are in the solution document; pi never discusses the rates themselves.",
       "extra_ideas": [
         {
@@ -294,7 +294,7 @@
         "text": "An onboarding checklist with short process guides that tracks each new joiner's progress and an incident log showing where mistakes recur.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do new staff leave within the first few months, or after a year or more?",
       "free_stops": "The checklist content and incident categories are in the solution document.",
       "extra_ideas": [
         {

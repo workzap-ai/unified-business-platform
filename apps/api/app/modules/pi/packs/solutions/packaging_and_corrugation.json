@@ -52,7 +52,7 @@
         "text": "A digital job order with size, ply, flute, paper grade, print and die and plate references, sent to the floor from the approved spec.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do the wrong sizes come mostly from the order form, or from the machine setup?",
       "free_stops": "How job orders flow from sales to machines is covered in the solution document.",
       "extra_ideas": [
         {
@@ -82,7 +82,7 @@
         "text": "A quote calculator using live paper rates, board area, wastage allowance and printing costs.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Are your prices fixed with customers for months, or only per order?",
       "free_stops": "How the cost is built and updated is detailed in the solution document.",
       "extra_ideas": [
         {
@@ -112,7 +112,7 @@
         "text": "A reel stock register by GSM, BF, width and supplier with consumption per job and reorder alerts.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Is the paper shortage in one grade or width, or across several?",
       "free_stops": "How consumption and reorder levels are worked out is set out in the solution document.",
       "extra_ideas": [
         {
@@ -143,7 +143,7 @@
         "text": "A production log per machine for output, setup and trim waste and downtime reasons.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Does the waste come mostly from setup at job changes, or from trim?",
       "free_stops": "How waste is measured and compared is kept for the solution document.",
       "extra_ideas": [
         {
@@ -173,7 +173,7 @@
         "text": "A waste paper weighing and sales register matched with gate passes.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Is the mismatch in the weight, or in the money received?",
       "free_stops": "Weighing and matching steps are covered in the solution document.",
       "extra_ideas": [
         {
@@ -203,7 +203,7 @@
         "text": "A customer ledger with ageing, credit limits and WhatsApp reminders.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do the late payers include a few large customers, or many?",
       "free_stops": "Reminder timing and limits are set out in the solution document.",
       "extra_ideas": [
         {
@@ -234,7 +234,7 @@
         "text": "A quote calculator anyone in sales can use, with approval in one tap.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Does quoting wait for that one person mostly on new box designs, or on repeat jobs too?",
       "free_stops": "How the calculator is set up is detailed in the solution document.",
       "extra_ideas": [
         {
@@ -264,7 +264,7 @@
         "text": "A monthly owner report on output, waste, top customers by volume and margin, and overdues, pulled automatically.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Does the report take long in gathering the numbers, or in putting them together?",
       "free_stops": "Which numbers go in and where each comes from is set out in the solution document.",
       "extra_ideas": [
         {

@@ -18,7 +18,7 @@
         "keys": [
           "booking_scheduling"
         ],
-        "text": "A yard token system sending each trolley a WhatsApp token with queue position and expected weighment time.",
+        "text": "a yard token that would send each trolley a WhatsApp message with its queue position and expected weighment time.",
         "tool_words": [
           "system"
         ]
@@ -110,7 +110,7 @@
         "keys": [
           "dashboards_reports"
         ],
-        "text": "A purchase centre dashboard showing arrivals, weights, queue order and issues reported at every centre.",
+        "text": "a purchase centre summary showing arrivals, weights, queue order and issues reported at every centre.",
         "tool_words": [
           "dashboard"
         ],

@@ -21,7 +21,7 @@
         "text": "Every placement test tracked to enrolment, with automatic follow-ups, reasons recorded and conversion measured per branch.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do most of them leave after hearing the fee, or after the level result?",
       "free_stops": "The follow-up timing and reason tracking are kept for the document.",
       "extra_ideas": [
         {
@@ -51,7 +51,7 @@
         "text": "Rollover tracked by level and teacher as counts, with next-level reminders sent automatically.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do learners drop out because of timing and cost, or because they feel they have learnt enough?",
       "free_stops": "The rollover reminders and reports are in the document.",
       "extra_ideas": [
         {
@@ -81,7 +81,7 @@
         "text": "An hours bank showing hours bought, used and left for every package, with automatic low-balance reminders.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Is the hours count kept by teachers, by the front desk, or not at all?",
       "free_stops": "How lessons are logged and balances updated is kept for the document.",
       "extra_ideas": [
         {
@@ -111,7 +111,7 @@
         "text": "No-shows recorded and your rules applied automatically to billing and teacher pay.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do the no-shows come from a few learners, or from many of them now and then?",
       "free_stops": "How the rules feed billing and pay is in the document.",
       "extra_ideas": [
         {
@@ -141,7 +141,7 @@
         "text": "A teacher availability and scheduling board with room allocation and clash warnings.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Is the change mostly late notice from teachers, or availability that shifts through the week?",
       "free_stops": "The scheduling rules are kept for the document.",
       "extra_ideas": [
         {
@@ -171,7 +171,7 @@
         "text": "Corporate invoices with ageing and automatic reminders, reported per client.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Is it one or two big companies that pay late, or nearly all of them?",
       "free_stops": "The reminder schedule is in the document.",
       "extra_ideas": [
         {
@@ -201,7 +201,7 @@
         "text": "Sessions delivered per corporate client logged with attendance counts, turned into the monthly invoice automatically.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Is the gap usually in sessions that were cancelled, or in sessions the client never confirmed?",
       "free_stops": "How sessions are logged and invoiced is kept for the document.",
       "extra_ideas": [
         {
@@ -232,7 +232,7 @@
         "tool_words": [],
         "leads_with_view": true
       },
-      "ask_first": "",
+      "ask_first": "Does this happen with certain courses or times, or with any new group?",
       "free_stops": "The viability rules are in the document.",
       "extra_ideas": [
         {
@@ -262,7 +262,7 @@
         "text": "website_digital — Automatic WhatsApp replies for common questions with hand-off to staff, plus an online booking page for placement tests and lessons.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Which question comes most, the timings, the fees or how to enrol?",
       "free_stops": "The reply flow and booking page setup are kept for the document.",
       "extra_ideas": [
         {
@@ -292,7 +292,7 @@
         "text": "Book stock and import orders linked to upcoming course starts, with alerts when an order is due.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Is the delay in placing the order, or in shipping and customs once ordered?",
       "free_stops": "The order timing rules are in the document.",
       "extra_ideas": [
         {

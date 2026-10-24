@@ -290,7 +290,7 @@
         "keys": [
           "dashboards_reports"
         ],
-        "text": "a multi-country dashboard showing events, cash and receivables by entity, updated daily.",
+        "text": "a single page showing events, cash and receivables for each country, brought up to date every day.",
         "tool_words": [
           "dashboard"
         ]

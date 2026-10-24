@@ -18,7 +18,7 @@
         "keys": [
           "field_checks"
         ],
-        "text": "An order-booker app that logs each shop visit with time and location, agreed with staff, and shows planned vs visited shops per route every evening.",
+        "text": "Order bookers would log each shop visit with time and location, agreed with staff, and you would see planned against visited shops per route every evening.",
         "tool_words": [
           "app"
         ]
@@ -53,7 +53,7 @@
         "text": "Orders taken at the shop on phone or WhatsApp that flow straight into the godown pick list and DMS entry, with no retyping.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do paper orders go wrong mostly when they are lost, or when they are typed in wrongly?",
       "free_stops": "The order flow from shop to DMS is mapped in the solution document.",
       "extra_ideas": [
         {
@@ -113,7 +113,7 @@
         "text": "A retailer ledger with ageing and limits that sends each recovery man his route list every morning and shows the owner promises against collections.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Is udhaar growing mostly with a few big shops, or across many small ones?",
       "free_stops": "Limit rules and the morning recovery list are designed in the solution document.",
       "extra_ideas": [
         {
@@ -143,7 +143,7 @@
         "text": "A daily van settlement screen showing loaded, delivered, returned, cash and credit per salesman, with any shortfall flagged that evening.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Is the cash shortfall from a few salesmen, or across most of them?",
       "free_stops": "The settlement steps and checks are laid out in the solution document.",
       "extra_ideas": [
         {
@@ -173,7 +173,7 @@
         "text": "An expiry register by batch that alerts automatically before expiry and gives order bookers a daily list of what to push on which route.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Does expiry stock come mostly from a few products, or from many?",
       "free_stops": "Alert timings and the push list rules are in the solution document.",
       "extra_ideas": [
         {
@@ -204,7 +204,7 @@
         "text": "Reorder suggestions per SKU from daily secondary sales and lead time, with low-stock alerts sent automatically.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do you run short mostly on a few fast products, or on many of them?",
       "free_stops": "The reorder calculation per SKU is set out in the solution document.",
       "extra_ideas": [
         {
@@ -235,7 +235,7 @@
         "tool_words": [],
         "leads_with_view": true
       },
-      "ask_first": "",
+      "ask_first": "Do you want to compare routes by area, or by van?",
       "free_stops": "How costs are assigned to routes is worked out in the solution document.",
       "extra_ideas": [
         {
@@ -266,7 +266,7 @@
         "tool_words": [],
         "leads_with_view": true
       },
-      "ask_first": "",
+      "ask_first": "Do you see target progress at all during the month, or only at the end?",
       "free_stops": "The target breakdown by brand and person is set in the solution document.",
       "extra_ideas": [
         {
@@ -296,7 +296,7 @@
         "text": "An incentive calculator with rules each order booker can see and running totals that update automatically from sales.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do the commission fights come mostly from incentive slabs, or from whose sales count?",
       "free_stops": "How the rules are encoded and shown is in the solution document.",
       "extra_ideas": [
         {
@@ -326,7 +326,7 @@
         "text": "A WhatsApp order intake that turns each shop's message into a tracked order on the godown list, so none is missed.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do you miss shopkeepers' WhatsApp orders mostly in busy hours, or when you are travelling?",
       "free_stops": "The intake flow and confirmation steps are designed in the solution document.",
       "extra_ideas": [
         {

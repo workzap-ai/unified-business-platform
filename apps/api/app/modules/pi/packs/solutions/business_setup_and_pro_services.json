@@ -51,7 +51,7 @@
         "text": "tracked links and codes per ad and channel, so every client shows which campaign brought them.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do most of your new leads come from Google ads, or do the ads bring only a few?",
       "free_stops": "how tracking is set up for your campaigns is kept for the solution document.",
       "extra_ideas": [
         {
@@ -81,7 +81,7 @@
         "text": "a quotation builder from your price list and package templates, with an approval step for discounts.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do consultants differ mainly on discounts, or on which services they include in the quote?",
       "free_stops": "package templates and approval rules are designed in the solution document.",
       "extra_ideas": [
         {
@@ -112,7 +112,7 @@
         "text": "a case tracker with stages for each service, sending clients a WhatsApp update automatically at each stage.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do clients mostly ask about licences that are delayed, or about ones still within the normal time?",
       "free_stops": "the stages per service and the update flow are worked out in the solution document.",
       "extra_ideas": [
         {
@@ -142,7 +142,7 @@
         "text": "an expiry calendar for licences, visas, IDs, tenancy registrations and cards across all managed companies, with reminders at several points before each date and renewal quotes drafted automatically.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do expiries slip mostly on licences or on visas, and is it a few clients or many?",
       "free_stops": "reminder timings and the renewal pipeline are set out in the solution document.",
       "extra_ideas": [
         {
@@ -172,7 +172,7 @@
         "text": "a government fee ledger per case, reconciled against client invoices and payments.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do the differences come mostly from fees you forgot to bill, or from fees paid that nobody recorded?",
       "free_stops": "how fees are recorded and matched is kept for the solution document.",
       "extra_ideas": [
         {
@@ -202,7 +202,7 @@
         "text": "client balances per case with fees advanced, invoices and scheduled reminders.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Is the money tied up mostly with a few large clients, or spread across many small ones?",
       "free_stops": "the collection flow is set out in the solution document.",
       "extra_ideas": [
         {
@@ -232,7 +232,7 @@
         "text": "a PRO day planner grouping visits by location, with check-in and completion notes from phone.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do your PROs lose most time travelling between offices, or waiting in queues at each one?",
       "free_stops": "the planning rules and check-in flow are worked out in the solution document.",
       "extra_ideas": [
         {
@@ -262,7 +262,7 @@
         "text": "a client file vault and case history with access by role, so every case stays with the firm.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "When a consultant leaves, do clients follow within days, or only after a few months?",
       "free_stops": "access roles and file structure are kept for the solution document.",
       "extra_ideas": [
         {

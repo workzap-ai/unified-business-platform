@@ -21,7 +21,7 @@
         "text": "a WhatsApp order flow where buyers choose item, size and colour, and every confirmed order lands in one list automatically.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Which place do most of the lost orders come from, direct messages, comments or WhatsApp?",
       "free_stops": "The order flow and catalogue set-up are designed in the solution document.",
       "extra_ideas": [
         {
@@ -51,7 +51,7 @@
         "text": "an automatic first reply with price, sizes and an order link, so you only handle serious buyers.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Roughly what share of those price messages come from live sales or posts, and how many are repeat askers?",
       "free_stops": "The reply flow and its wording are prepared in the solution document.",
       "extra_ideas": [
         {
@@ -81,7 +81,7 @@
         "text": "a stock sheet shared with your supplier, showing what is available before you take payment.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Does this happen with one supplier mostly, or with several, and how often in a week?",
       "free_stops": "How the supplier updates it and how it links to orders is covered in the solution document.",
       "extra_ideas": [
         {
@@ -111,7 +111,7 @@
         "text": "a dispatch tracker with a tracking number per order and WhatsApp alerts when one is overdue.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Is it one supplier that goes quiet after payment, or most of them?",
       "free_stops": "The tracker and alert rules are detailed in the solution document.",
       "extra_ideas": [
         {
@@ -141,7 +141,7 @@
         "text": "an advance-payment log matching wallet and bank credits to orders and flagging unmatched screenshots.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do most payments come by bank transfer, or through wallets like Easypaisa and JazzCash?",
       "free_stops": "How credits are matched to orders is set out in the solution document.",
       "extra_ideas": [
         {
@@ -171,7 +171,7 @@
         "text": "a live-sale order taker where buyers reply with item codes and every order is confirmed automatically before booking.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do the refusals come mostly from live sales, or from ordinary posts as well?",
       "free_stops": "The live-sale code system and confirmation steps go in the solution document.",
       "extra_ideas": [
         {
@@ -201,7 +201,7 @@
         "text": "codes per post or boost tied to orders, showing which content actually sold.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do you boost a few posts each week, or many, and do buyers usually say where they saw the item?",
       "free_stops": "The code set-up and reporting are covered in the solution document.",
       "extra_ideas": [
         {
@@ -231,7 +231,7 @@
         "text": "a pre-order waitlist that sends an \"it's back\" WhatsApp message automatically to buyers who asked.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Is the waiting list mostly in chats, or on paper, and how many items are pre-ordered at a time?",
       "free_stops": "The waitlist and message flow are designed in the solution document.",
       "extra_ideas": [
         {
@@ -261,7 +261,7 @@
         "text": "order and buyer history kept safely in the cloud, off the phone.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Is your order list only in WhatsApp chats, or is it also written somewhere else?",
       "free_stops": "Where and how records are stored is explained in the solution document.",
       "extra_ideas": [
         {
@@ -292,7 +292,7 @@
         "tool_words": [],
         "leads_with_view": true
       },
-      "ask_first": "",
+      "ask_first": "Which cost do you least know, the courier, the returns or the boosting?",
       "free_stops": "The cost model and summary layout are prepared in the solution document.",
       "extra_ideas": [
         {
@@ -322,7 +322,7 @@
         "text": "a shared reply library and posting calendar with reminders, so helpers can run the routine without you.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Which job stops you most, answering buyers, booking couriers or dealing with suppliers?",
       "free_stops": "The handover set-up and reply library are built in the solution document.",
       "extra_ideas": [
         {

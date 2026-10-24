@@ -51,7 +51,7 @@
         "text": "Daily reconciliation of scrap purchases against weighed intake, flagging differences.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Is the gap larger on busy days, or does it appear with certain buyers at the weighbridge?",
       "free_stops": "The reconciliation steps are laid out in the solution document.",
       "extra_ideas": [
         {
@@ -81,7 +81,7 @@
         "text": "Yard stock by grade updated from purchases, sorting output and sales.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Which grades do you least know the stock of, the metals or the paper and plastic?",
       "free_stops": "How stock by grade is kept current is designed in the solution document.",
       "extra_ideas": [
         {
@@ -111,7 +111,7 @@
         "text": "Scheduled counts of high-value grades with photos, flagging gaps against the register.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Does it go missing at night, during the day, or in transit out of the yard?",
       "free_stops": "The count routine is set in the solution document.",
       "extra_ideas": [
         {
@@ -142,7 +142,7 @@
         "tool_words": [],
         "leads_with_view": true
       },
-      "ask_first": "",
+      "ask_first": "Is the sorting loss bigger on certain grades, or on certain suppliers?",
       "free_stops": "How yield and margin are calculated is set in the solution document.",
       "extra_ideas": [
         {
@@ -172,7 +172,7 @@
         "text": "A sales log per buyer with deductions and photos recorded.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Is it the same mills deducting, or all of them, and is it moisture or impurities more often?",
       "free_stops": "What is recorded per load is designed in the solution document.",
       "extra_ideas": [
         {
@@ -202,7 +202,7 @@
         "text": "Receivables ageing per buyer with reminders queued for the owner to approve.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Is it a few big mills that pay late, or most buyers?",
       "free_stops": "Reminder timing is in the solution document.",
       "extra_ideas": [
         {
@@ -233,7 +233,7 @@
         "text": "A skip register and pickup schedule with driver confirmation photos and client \"full\" requests on WhatsApp.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do the missed pickups come from truck breakdowns, or from clients not telling you in time?",
       "free_stops": "The register and schedule design are in the solution document.",
       "extra_ideas": [
         {
@@ -263,7 +263,7 @@
         "text": "Monthly invoices and collection records per client generated automatically from logged pickups.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Is the delay in noting down the pickups, or in making the bill?",
       "free_stops": "What records are produced is set in the solution document.",
       "extra_ideas": [
         {
@@ -293,7 +293,7 @@
         "text": "An equipment maintenance log for balers, shredders, weighbridge and trucks, with service reminders.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Does the machine usually break after long hard runs, or without any warning?",
       "free_stops": "Service intervals and reminders are set in the solution document.",
       "extra_ideas": [
         {

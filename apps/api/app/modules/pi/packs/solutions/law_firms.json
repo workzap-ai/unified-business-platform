@@ -52,7 +52,7 @@
         "text": "an evening routine that lists the firm's active matters by court for the clerk to tick off, records that the check was done, and sends any matter fixed for tomorrow to the responsible lawyer.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Is the evening check mostly about one court, or several different courts each day?",
       "free_stops": "how the list is kept current and how results reach lawyers are worked out in the solution document.",
       "extra_ideas": [
         {
@@ -82,7 +82,7 @@
         "text": "a file check-out and check-in log on phone showing who holds each physical file and since when, flagging files that went to court and haven't come back.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do files go missing mostly on the way to court, or after coming back to chambers?",
       "free_stops": "the labelling and check-in routine are designed in the solution document.",
       "extra_ideas": [
         {
@@ -112,7 +112,7 @@
         "text": "a post-hearing note drafted from the diary entry and sent to the client by WhatsApp once the lawyer approves it.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do most calls come from a few clients, or from nearly every client after each hearing?",
       "free_stops": "the approval step and message format are kept for the solution document.",
       "extra_ideas": [
         {
@@ -143,7 +143,7 @@
         "tool_words": [],
         "leads_with_view": true
       },
-      "ask_first": "",
+      "ask_first": "Do all lawyers skip recording time, or mainly the juniors on fixed-fee work?",
       "free_stops": "how time is captured and how matters are compared are worked out in the solution document.",
       "extra_ideas": [
         {
@@ -173,7 +173,7 @@
         "text": "a balance per matter that includes court fees and disbursements, adds them to invoices automatically and sends reminders on schedule.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do clients vanish mostly on a few matter types, or on all kinds of cases?",
       "free_stops": "how expenses are logged and the reminder sequence are set out in the solution document.",
       "extra_ideas": [
         {
@@ -203,7 +203,7 @@
         "text": "a template and draft register per matter with version history, so every draft is saved in one place and the final is locked.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do drafts go missing mostly with a few lawyers, or across the whole firm?",
       "free_stops": "the template library and versioning rules are designed in the solution document.",
       "extra_ideas": [
         {
@@ -233,7 +233,7 @@
         "text": "a deadline tracker with escalating alerts to the responsible lawyer and then the partner as each date approaches.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Have you missed a date before, or has it only been a close call so far?",
       "free_stops": "the escalation steps and timings are kept for the solution document.",
       "quick_ideas_original": [
         "Add a deadline column to your matter list and fill it once for every active matter, so dates are written down",
@@ -257,7 +257,7 @@
         "text": "every enquiry from the website, phone and WhatsApp recorded, assigned and followed up on time, with the source noted so you see which channels bring paying clients.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do leads sit because nobody checks the inbox, or because nobody knows whose job it is?",
       "free_stops": "the assignment rules and follow-up timings are set out in the solution document.",
       "extra_ideas": [
         {

@@ -51,7 +51,7 @@
         "text": "A hide intake register for source type, count, weight, grade at receipt and photos, with disputed lots flagged.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do grading fights occur with most collectors, or mainly with one or two?",
       "free_stops": "Grade definitions and how disputes are recorded are kept for the solution document.",
       "extra_ideas": [
         {
@@ -82,7 +82,7 @@
         "text": "A receivables and claims tracker per buyer alongside a view of stock bought and still unsold, kept current every day.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Does your cash stay tied up until the leather is sold, or until buyers pay?",
       "free_stops": "How the cash picture is built from stock and receivables is detailed in the solution document; for financing, talk to your accountant or bank.",
       "extra_ideas": [
         {
@@ -113,7 +113,7 @@
         "text": "Leather stock in sq ft by grade, colour and lot across stores, tracked from raw hide to finished with yield at each stage.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Does the mismatch show in one grade or colour, or across all of them?",
       "free_stops": "How lots are tracked through each stage is mapped in the solution document.",
       "extra_ideas": [
         {
@@ -143,7 +143,7 @@
         "text": "A cutting issue and return log per karigar role with expected against actual consumption, and an offcut register.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Is yield low on all articles, or mainly on certain ones?",
       "free_stops": "How expected consumption is set per article is set out in the solution document.",
       "extra_ideas": [
         {
@@ -173,7 +173,7 @@
         "text": "A subcontractor ledger for pieces sent, received, rejected and paid, flagging shortfalls on the day of return.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Is the mismatch with one outside karigar, or with most of them?",
       "free_stops": "How counts are confirmed and tied to payment is covered in the solution document.",
       "extra_ideas": [
         {
@@ -203,7 +203,7 @@
         "text": "A pre-dispatch check per lot against the approved swatch, with photos and rejection reasons recorded.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Does the variation show mostly in colour, or in finish?",
       "free_stops": "Check points and how lots are compared are kept for the solution document.",
       "extra_ideas": [
         {
@@ -233,7 +233,7 @@
         "text": "An order and sample tracker with buyer deadlines and status, alerting when a sample is running late.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Are samples slow mostly at making, or while waiting for the buyer's reply?",
       "free_stops": "How sample stages are tracked and escalated is set out in the solution document.",
       "extra_ideas": [
         {
@@ -264,7 +264,7 @@
         "text": "A costing sheet per article using current hide and chemical rates, with a monthly margin view by product line.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do you sell mostly bags, or a wider mix of leather items?",
       "free_stops": "How yield and overheads are built into cost per article is detailed in the solution document.",
       "extra_ideas": [
         {

@@ -18,12 +18,12 @@
         "keys": [
           "field_checks"
         ],
-        "text": "An inbound receiving app that counts against the ASN, captures damage photos and sends the client a discrepancy report the same day.",
+        "text": "an inbound receiving check that would count against the advance shipping notice, capture damage photos and send the client a discrepancy report the same day.",
         "tool_words": [
           "app"
         ]
       },
-      "ask_first": "",
+      "ask_first": "Does the count differ mostly on a few clients, or across all inbound deliveries?",
       "free_stops": "The receiving steps are designed in the solution document.",
       "extra_ideas": [
         {
@@ -53,7 +53,7 @@
         "text": "A location-based stock register with bin labels and putaway confirmation.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Is the wrong placing mostly done by new staff, or at busy times?",
       "free_stops": "The location scheme is set out in the solution document.",
       "extra_ideas": [
         {
@@ -83,7 +83,7 @@
         "text": "Pick lists sorted by location with scan-to-confirm, catching wrong items before packing.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Are the wrong items mostly from similar-looking products, or from picks at busy times?",
       "free_stops": "The pick and check flow is designed in the solution document.",
       "extra_ideas": [
         {
@@ -113,7 +113,7 @@
         "text": "Activity-based billing that captures storage days, pallets, picks, packs and labelling automatically into a monthly invoice per client.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Which extra handling goes unbilled most often, labelling, repacking or extra labour?",
       "free_stops": "How activities are captured and priced into invoices is set in the solution document.",
       "extra_ideas": [
         {
@@ -143,7 +143,7 @@
         "text": "A billing view that pulls all logged activity per client into one draft invoice ready each month-end.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do you bill from many sheets per client, or just a few?",
       "free_stops": "How the billing data is joined is mapped in the solution document.",
       "extra_ideas": [
         {
@@ -170,13 +170,13 @@
         "keys": [
           "dashboards_reports"
         ],
-        "text": "A client portal or WhatsApp report giving live stock, orders shipped and inbound status.",
+        "text": "a client WhatsApp report or web page giving live stock, orders shipped and inbound status.",
         "tool_words": [
           "portal"
         ],
         "leads_with_view": true
       },
-      "ask_first": "",
+      "ask_first": "Do clients want stock figures daily, or only when they plan new orders?",
       "free_stops": "What each client sees is set in the solution document.",
       "extra_ideas": [
         {
@@ -206,7 +206,7 @@
         "text": "FEFO picking rules and expiry alerts per client batch.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Does near-expiry stock affect a few clients, or most of them?",
       "free_stops": "Alert rules per client are set in the solution document.",
       "extra_ideas": [
         {
@@ -236,7 +236,7 @@
         "text": "Order intake that accepts client spreadsheets or connects to Shopify and marketplaces, so orders arrive without retyping.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do most clients sell on Shopify, or on a mix of marketplaces?",
       "free_stops": "Which connections are made is mapped in the solution document.",
       "quick_ideas_original": [
         "List which clients send orders by email, WhatsApp or spreadsheet, so you see the retyping load",
@@ -260,7 +260,7 @@
         "text": "Shift scheduling with confirmations and reminders, planned from clients' sale calendars.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Does the no-show come up mostly on a few days, or at random?",
       "free_stops": "The scheduling rules are set in the solution document.",
       "extra_ideas": [
         {
@@ -291,7 +291,7 @@
         "tool_words": [],
         "leads_with_view": true
       },
-      "ask_first": "",
+      "ask_first": "Do you track space used per client now, or only revenue?",
       "free_stops": "How costs are assigned to clients is set in the solution document.",
       "extra_ideas": [
         {
@@ -321,7 +321,7 @@
         "text": "A daily phone checklist with photo proof per item, with missed checks flagged to the manager.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Is the checklist skipped mostly on night shifts, or on all shifts?",
       "free_stops": "How the checklist is run and reported is designed in the solution document.",
       "extra_ideas": [
         {

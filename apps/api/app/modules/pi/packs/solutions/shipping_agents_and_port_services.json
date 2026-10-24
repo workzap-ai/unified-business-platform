@@ -21,7 +21,7 @@
         "text": "An online DO request and payment flow with document upload and status messages, cutting counter visits.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Is the queue worst at certain hours or days, or mostly because customers arrive with missing papers?",
       "free_stops": "The request and approval flow is designed in the solution document.",
       "extra_ideas": [
         {
@@ -51,7 +51,7 @@
         "text": "Live free-time countdowns and detention estimates sent to the customer on WhatsApp automatically.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do customers mostly call to ask about charges, or only find out when they come to pay?",
       "free_stops": "Message timing is set in the solution document.",
       "extra_ideas": [
         {
@@ -81,7 +81,7 @@
         "text": "A detention and demurrage calculator per container using gate-out and return dates.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do the mistakes come from the free days count, or from the tariff rate used?",
       "free_stops": "How the calculation is set up is in the solution document.",
       "extra_ideas": [
         {
@@ -111,7 +111,7 @@
         "text": "A container movement tracker (gate out, with customer, returned to depot) with overdue alerts and an equipment balance view by port.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Is it one depot or line that fails to report returns, or several?",
       "free_stops": "The movement stages and alerts are set in the solution document.",
       "extra_ideas": [
         {
@@ -141,7 +141,7 @@
         "text": "A principal receivables tracker with ageing and settlement status.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Is it one or two principals who pay late, or most of them?",
       "free_stops": "Ageing and follow-up rules are in the solution document.",
       "extra_ideas": [
         {
@@ -171,7 +171,7 @@
         "text": "A PDA/FDA builder that collects port invoices as they arrive and shows what's still outstanding.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Which holds you up most, the port invoices, the agent costs or the principal's approval?",
       "free_stops": "How invoices are collected into each FDA is designed in the solution document.",
       "extra_ideas": [
         {
@@ -201,7 +201,7 @@
         "text": "A vessel call board with ETA, berth, boarding updates, tasks and responsible staff.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Do the lost updates happen on busy vessel days, or on any call?",
       "free_stops": "The board's structure is set in the solution document.",
       "extra_ideas": [
         {
@@ -231,7 +231,7 @@
         "text": "Automatic arrival notices to consignees from the manifest.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Which question comes most, the arrival date, the berth or the documents?",
       "free_stops": "What notices include and when they go is set in the solution document.",
       "extra_ideas": [
         {
@@ -261,7 +261,7 @@
         "text": "Depot return data flowing into your records daily, so each dispute can be checked against a dated record.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Is the dispute usually about the return date, or about the days counted before it?",
       "free_stops": "How depot data connects is mapped in the solution document.",
       "extra_ideas": [
         {
@@ -291,7 +291,7 @@
         "text": "A waiver approval workflow with reasons and limits by role.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "How many people does a waiver usually pass through, and is it the same ones each time?",
       "free_stops": "Approval limits are set in the solution document.",
       "extra_ideas": [
         {
@@ -321,7 +321,7 @@
         "text": "A principal view and KPI report pack produced from operational data.",
         "tool_words": []
       },
-      "ask_first": "",
+      "ask_first": "Which view do you most want for each principal, the costs, the revenue or the number of calls?",
       "free_stops": "What the report pack contains is set in the solution document.",
       "extra_ideas": [
         {

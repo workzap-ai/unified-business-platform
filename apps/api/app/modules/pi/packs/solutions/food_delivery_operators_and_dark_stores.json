@@ -109,7 +109,7 @@
         "keys": [
           "dashboards_reports"
         ],
-        "text": "a delivery time dashboard by hub, zone and hour against the promised time.",
+        "text": "a daily view of delivery times by hub, zone and hour set against the promised time.",
         "tool_words": [
           "dashboard"
         ],
