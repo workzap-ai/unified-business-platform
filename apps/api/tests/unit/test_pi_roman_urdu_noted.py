@@ -1,3 +1,4 @@
+# ruff: noqa: E501
 from app.modules.pi import constitution
 
 
@@ -157,6 +158,7 @@ def test_handed_ideas_are_written_by_the_application_when_the_model_left_them_ou
 
     context = {
         "reply_language": "en",
+        "history": [{"role": "ai", "text": "Hi, I am pi."}],
         "solution_ideas": ["Mark the oldest unpaid accounts first.", "Add up every balance once"],
     }
     turn = SimpleNamespace(
@@ -248,8 +250,16 @@ def test_no_idea_for_the_problem_is_said_plainly() -> None:
         _decision=None,
         request_human=False,
         awaiting_customer=False,
+        _free=False,
     )
-    brain_no_ideas(turn, {"solution_asked_no_ideas": True, "reply_language": "roman_ur"})
+    brain_no_ideas(
+        turn,
+        {
+            "solution_asked_no_ideas": True,
+            "reply_language": "roman_ur",
+            "history": [{"role": "ai", "text": "Hi, I am pi."}],
+        },
+    )
     assert turn.reply.startswith("Ji. ") and "solution document" in turn.reply
 
 
@@ -294,14 +304,22 @@ def test_the_no_idea_line_is_not_repeated_word_for_word() -> None:
             _decision=None,
             request_human=False,
             awaiting_customer=False,
+            _free=False,
         )
 
     first = turn()
-    context = {"solution_asked_no_ideas": True, "reply_language": "en", "history": []}
+    context = {
+        "solution_asked_no_ideas": True,
+        "reply_language": "en",
+        "history": [{"role": "ai", "text": "Hi, I am pi."}],
+    }
     brain_no_ideas(first, context)
     assert first.reply == NO_IDEA_LINES["en"]
     second = turn()
-    context["history"] = [{"role": "ai", "text": first.reply}]
+    context["history"] = [
+        {"role": "ai", "text": "Hi, I am pi."},
+        {"role": "ai", "text": first.reply},
+    ]
     brain_no_ideas(second, context)
     assert second.reply != first.reply and "solution document" in second.reply
 
@@ -346,3 +364,125 @@ async def test_a_seeding_race_never_costs_the_reply() -> None:
     finally:
         solution_context._build = original
     assert out == {"solution_ideas": ["x"]} and calls["n"] == 2
+
+
+def test_free_ideas_parse_and_only_vetted_ones_survive() -> None:
+    from app.modules.pi import solution_free
+
+    answer = (
+        '{"ideas": ["Write each animal\'s daily feed cost on one card, so you see which animal '
+        'costs the most.", "Install a farm management app, so everything is tracked automatically.", '
+        '"Give one worker the job of noting every sale in one notebook, so profit per animal can be '
+        'checked."]}'
+    )
+    ideas = solution_free.vetted(solution_free.parse(answer), "40 janwar, kharcha?", [])
+    assert len(ideas) == 2 and all("app" not in i.lower() for i in ideas)
+    assert solution_free.parse("not json") == []
+    assert solution_free.vetted(["Feed 5 kg of fodder twice a day, so they grow."], "", []) == []
+
+
+async def test_the_model_gives_two_ideas_when_no_entry_fits() -> None:
+    from types import SimpleNamespace
+
+    from app.modules.pi.service_conversation import brain_free_ideas
+
+    class Manager:
+        async def complete(self, *args: object, **kwargs: object) -> SimpleNamespace:
+            return SimpleNamespace(
+                text='{"ideas": ["Note each animal\'s feed and sale on its own card, so you see which '
+                'animal earns more than it costs.", "Give one worker the job of writing the day\'s '
+                'spending in one notebook, so the daily cost is known."]}'
+            )
+
+    conversation = SimpleNamespace(id=None, service_brief={})
+    turn = SimpleNamespace(
+        reply="Ji. Koi chhota idea nahi.",
+        _summary=False,
+        _decision=None,
+        request_human=False,
+        awaiting_customer=False,
+        _free=False,
+        _english=False,
+    )
+    policy = SimpleNamespace(response_rules={"pi_mode": "brain"}, ai_config={})
+    context = {
+        "solution_asked_no_ideas": True,
+        "latest_customer_message": "40 janwar hain, kharcha samajh nahi aata. Koi hal batao.",
+        "history": [{"role": "ai", "text": "Hi, I am pi."}],
+    }
+    await brain_free_ideas(Manager(), None, conversation, policy, turn, context)  # type: ignore[arg-type]
+    assert turn.reply.startswith("Sure.") and turn.reply.count("•") == 2 and turn._free
+    assert conversation.service_brief["ideas_given"] == 2
+
+
+def test_the_first_message_keeps_its_ai_line_when_ideas_replace_the_reply() -> None:
+    from types import SimpleNamespace
+
+    from app.modules.pi.service_conversation import brain_ideas
+
+    turn = SimpleNamespace(
+        reply="Hi, I'm pi, an AI from Workzap. Noted.",
+        _summary=False,
+        _decision=None,
+        request_human=False,
+        awaiting_customer=False,
+        _english=False,
+    )
+    brain_ideas(
+        turn, {"reply_language": "en", "history": [], "solution_ideas": ["Count the gap once"]}
+    )
+    assert "an AI from Workzap" in turn.reply or "AI" in turn.reply
+    assert turn.reply.count(chr(0x2022)) == 1 and turn._english
+
+
+def test_misspelt_roman_urdu_asks_for_a_fix_are_asks() -> None:
+    from app.modules.pi import solution_ask
+
+    for said in (
+        "Ap de skty hain solution?",
+        "Ap dein solution",
+        "Aur mujeh ek ai CCTV cameras ka app bnwana hai, usky liye idea ?",
+        "mujhe koi mashwara dein",
+        "iske liye koi hal",
+    ):
+        assert solution_ask.asked_for_ideas(said), said
+    for said in (
+        "mera idea hai ke dukan badi karun",
+        "hal nahi mil raha",
+        "do din se stock nahi aaya",
+    ):
+        assert not solution_ask.asked_for_ideas(said), said
+
+
+def test_ek_near_a_price_word_is_not_an_amount_but_real_amounts_still_are() -> None:
+    from app.modules.pi import price_policy
+
+    fine = (
+        "Ek worker ko roz ka kharch ek notebook mein likhne ka kaam do, taake profit saaf nazar aaye.",
+        "Har janwar ka feed, labour aur kharcha ek jagah note karo.",
+        "Assign one worker to record daily spending at one fixed time, so your kharcha stays clear.",
+        "Aaj shed ko ek dafa walk karo aur feed note karo, taake tum dekh sako paisa kahan ja raha hai.",
+    )
+    for text in fine:
+        assert price_policy.disclosures(text) == [], text
+    for text in (
+        "Iska kharcha ek hazaar rupaye hoga.",
+        "The fee is 500 rupees.",
+        "Iski qeemat teen hazaar hai.",
+        "Cost would be fifty thousand.",
+        "The fee is one dollar.",
+        "Ye ek rupaya mein ho jayega.",
+    ):
+        assert price_policy.disclosures(text), text
+
+
+def test_english_bullets_in_a_roman_urdu_chat_are_recognised() -> None:
+    from app.modules.pi.service_conversation import english_bullets
+
+    assert english_bullets(
+        "Sure.\n• Number every thaan so the same animal is always written the same way."
+    )
+    assert not english_bullets(
+        "Sure.\n• Har janwar ka milk alag likho, taake low yielder samne aa jaye."
+    )
+    assert not english_bullets("Theek hai, no bullets here at all.")

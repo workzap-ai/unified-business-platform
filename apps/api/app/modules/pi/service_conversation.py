@@ -42,6 +42,7 @@ from app.modules.pi import (
     safety,
     solution_ask,
     solution_context,
+    solution_free,
     solution_rules,
     solutions,
     spec_handbook,
@@ -280,6 +281,8 @@ class ServiceTurn(BaseModel):
     _ask_team: bool = PrivateAttr(default=False)
     # Brain mode: the sorted summary replaced the reply; the trade question was due.
     _summary: bool = PrivateAttr(default=False)
+    _english: bool = PrivateAttr(default=False)  # an English list was written: translate it
+    _free: bool = PrivateAttr(default=False)  # the ideas were the model's own, vetted
     _board: bool = PrivateAttr(default=False)  # the notes were shown again, no state change
     _asked_shape: bool = PrivateAttr(default=False)
     # Brain mode: a fixed reply and move chosen by the decision gates (pi/decisions.py).
@@ -1841,8 +1844,84 @@ def brain_ideas(turn: "ServiceTurn", context: dict[str, Any]) -> None:
     ):
         return
     lines = "\n".join(f"• {idea.rstrip('. ')}." for idea in ideas)
-    turn.reply = f"Sure.\n{lines}"
+    language = str(context.get("reply_language") or "en")
+    turn.reply = with_disclosure(f"Sure.\n{lines}", context, language)
+    turn._english = True
     turn.awaiting_customer = True
+
+
+ENGLISH_FUNCTION_WORDS = re.compile(
+    r"\b(?:the|a|an|so|is|are|to|of|and|for|by|you|your|every|each|with|that|this|it|in|on|at|be|"
+    r"one|same|whether|see|which|what|when|how)\b",
+    re.IGNORECASE,
+)
+
+
+def english_bullets(reply: str) -> bool:
+    """A "• " point written in English (at least four English function words in it)."""
+    return any(
+        len(ENGLISH_FUNCTION_WORDS.findall(line)) >= 4
+        for line in reply.splitlines()
+        if line.lstrip().startswith("•")
+    )
+
+
+async def brain_free_ideas(
+    manager: LLMManager,
+    scope: WorkspaceScope,
+    conversation: PiConversation,
+    policy: PiSettings,
+    turn: "ServiceTurn",
+    context: dict[str, Any],
+) -> None:
+    """They asked for a fix and no industry entry fits (or they told the problem and asked in one
+    message): the model gives two ideas of its own, vetted by the idea guard, instead of "no quick
+    idea". The ideas count against the chat's idea budget like any other."""
+    if not context.get("solution_asked_no_ideas") or context.get("solution_ideas"):
+        return
+    if turn._summary or turn._decision is not None or turn.request_human:
+        return
+    if solution_rules.has_safety_referral(turn.reply):
+        return
+    left = 4 - solution_context.given_so_far(conversation)
+    if left <= 0:
+        return
+    keys = [str(k) for k in context.get("industry_keys") or []][:1]
+    industry = (solutions.load(keys[0]) or {}).get("name") if keys else None
+    never_say = [str(n) for n in context.get("solution_never_say") or []] or (
+        solutions.never_say(keys) if keys else []
+    )
+    customer = [
+        str(h.get("text") or "")
+        for h in context.get("history") or []
+        if h.get("role") == "customer"
+    ]
+    said = str(context.get("latest_customer_message") or "")
+    ideas = await latency.timed(
+        "model.free_ideas",
+        solution_free.free_ideas(
+            manager,
+            scope,
+            alias=reply_alias(policy),
+            conversation_id=conversation.id,
+            said=said,
+            earlier=customer,
+            industry=industry,
+            never_say=never_say,
+        ),
+    )
+    ideas = ideas[:left]
+    if not ideas:
+        return
+    language = str(context.get("reply_language") or "en")
+    bullets = "\n".join(f"\u2022 {idea}" for idea in ideas)
+    turn.reply = with_disclosure("Sure.\n" + bullets, context, language)
+    turn._english = True
+    turn.awaiting_customer = True
+    turn._free = True
+    brief = dict(conversation.service_brief or {})
+    brief["ideas_given"] = int(brief.get("ideas_given") or 0) + len(ideas)
+    conversation.service_brief = brief
 
 
 NO_IDEA_LINES = {  # noqa: E501
@@ -1865,7 +1944,7 @@ def brain_no_ideas(turn: "ServiceTurn", context: dict[str, Any]) -> None:
     follows. The model's own try used to be "Noted. What else is getting in the way?"."""
     if not context.get("solution_asked_no_ideas") or context.get("solution_ideas"):
         return
-    if turn._summary or turn._decision is not None or turn.request_human:
+    if turn._summary or turn._decision is not None or turn.request_human or turn._free:
         return
     if solution_rules.has_safety_referral(turn.reply):
         return
@@ -1876,7 +1955,7 @@ def brain_no_ideas(turn: "ServiceTurn", context: dict[str, Any]) -> None:
     ]
     if any(line in said for said in told[-6:]):
         line = NO_IDEA_AGAIN.get(language, NO_IDEA_AGAIN["en"])  # not the same words twice
-    turn.reply = line
+    turn.reply = with_disclosure(line, context, language)
     turn.awaiting_customer = True
 
 
@@ -4344,9 +4423,16 @@ async def compose_service_turn(
         brain_summary(turn, context)
         brain_decision(turn, context)
         brain_ideas(turn, context)
+        await brain_free_ideas(manager, scope, conversation, policy, turn, context)
         brain_no_ideas(turn, context)
         brain_offer(turn, context)
-    if expected in NAMES and mixed_line(turn.reply, str(expected)):
+    if expected in NAMES and expected != "en" and not turn._english and english_bullets(turn.reply):
+        turn._english = True  # the model left a list of ideas in English: it is translated below
+    if expected in NAMES and (
+        (turn._english and expected != "en")
+        or mixed_line(turn.reply, str(expected))
+        or clearly_other(turn.reply, str(expected))
+    ):
         latency.count("model_calls")
         latency.note("language_fix", f"reply mixed languages, expected {expected}")
         turn.reply = await latency.timed(

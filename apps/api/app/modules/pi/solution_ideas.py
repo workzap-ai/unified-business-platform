@@ -139,6 +139,17 @@ async def entries(
     return [*seed["problems"], *live]
 
 
+def _arm_status(key: str, text: str, kind: str, extras: dict[str, Any]) -> str:
+    """A seed idea is live when the idea guard passes it; an added one is "testing" (a tenth of the
+    chats), or waits for a person when the guard flags it or its entry marked it for review."""
+    if key in extras:
+        verdict = solution_rules.check_idea(text)
+        return (
+            "testing" if verdict.ok and not verdict.review and not extras[key].review else "review"
+        )
+    return "active" if kind == ASK or solution_rules.check_idea(text).ok else "review"
+
+
 async def ensure_arms(session: AsyncSession, scope: WorkspaceScope, industry_key: str) -> int:
     """Seed one industry's idea arms from Part 4 (once). Returns how many were added."""
     seed = solutions.load(industry_key)
@@ -154,6 +165,7 @@ async def ensure_arms(session: AsyncSession, scope: WorkspaceScope, industry_key
     )
     added = 0
     for problem in seed["problems"]:
+        extras = {i.arm_id: i for i in solutions.ideas(industry_key, problem) if i.extra}
         wanted = [
             (i.arm_id, i.text, solution_rules.idea_kind(i.text))
             for i in solutions.ideas(industry_key, problem)
@@ -173,9 +185,11 @@ async def ensure_arms(session: AsyncSession, scope: WorkspaceScope, industry_key
                 text=text[:500],
                 kind=kind,
                 # a seed idea the guard would refuse today waits for a person (R-VAL, R-BUILD)
-                status="active" if kind == ASK or solution_rules.check_idea(text).ok else "review",
-                source="seed",
+                status=_arm_status(key, text, kind, extras),
+                source="seed_extra" if key in extras else "seed",
                 version=solution_versions.BASE,
+                # an added idea is tested on a tenth of the chats until it has been used enough
+                traffic_cap=0.1 if key in extras else 1.0,
             )
             session.add(arm)
             await session.flush()

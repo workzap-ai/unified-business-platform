@@ -107,6 +107,16 @@ CURRENCY = _words(_CURRENCY_WORDS, _CURRENCY_SCRIPT)
 MAGNITUDE = _words(_MAGNITUDE_WORDS, _MAGNITUDE_SCRIPT)
 PRICE_TERM = _words(_PRICE_TERMS, _PRICE_SCRIPT)
 NUMBER_WORD = _words(_NUMBER_WORDS, _NUMBER_SCRIPT)
+# "ek" is Roman Urdu for "a/one" and "one" is English for it ("ek worker", "one notebook"): beside
+# a price word or the word "paisa" they are no amount. A single hard-currency unit ("one dollar",
+# "ek rupaya") is still caught by ONE_UNIT, and bigger amounts by the magnitude words.
+NUMBER_WORD_AMOUNT = _words(
+    _NUMBER_WORDS.replace("|ek|", "|").replace("one|two", "two", 1), _NUMBER_SCRIPT
+)
+ONE_UNIT = re.compile(
+    r"\b(?:one|ek|aik)\s+(?:usd|eur|dollars?|euros?|pounds?|dirhams?|riyals?|rupees?|rupaya|"
+    r"rupaye|rupiya)\b"
+)
 DIGITS = re.compile(r"\d")
 # A count of ordinary things ("three things", "one branch", "two shops") is not an amount.
 COUNTED_THING = re.compile(
@@ -143,13 +153,18 @@ def disclosures(text: str) -> list[str]:
     counted = COUNTED_THING.sub(" ", t)
     # A currency sign always counts. A currency word ("paise", "rupees") counts only next to a
     # number: the person's own "udhaar ke paise wapas nahi aate" is not an amount.
-    if any(unicodedata.category(ch) == "Sc" for ch in t) or (
-        CURRENCY.search(t) and (_near(t, CURRENCY, DIGITS) or _near(counted, CURRENCY, NUMBER_WORD))
+    if (
+        any(unicodedata.category(ch) == "Sc" for ch in t)
+        or (
+            CURRENCY.search(t)
+            and (_near(t, CURRENCY, DIGITS) or _near(counted, CURRENCY, NUMBER_WORD_AMOUNT))
+        )
+        or ONE_UNIT.search(t)
     ):
         reasons.append("currency")
     if MAGNITUDE.search(t) or SHORTHAND.search(t):
         reasons.append("magnitude")
-    if _near(t, PRICE_TERM, DIGITS) or _near(counted, PRICE_TERM, NUMBER_WORD):
+    if _near(t, PRICE_TERM, DIGITS) or _near(counted, PRICE_TERM, NUMBER_WORD_AMOUNT):
         reasons.append("priced_number")
     return reasons
 

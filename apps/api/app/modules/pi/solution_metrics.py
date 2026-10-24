@@ -90,7 +90,7 @@ async def compute(
     for key, status, source, n in await session.execute(
         arms.group_by(PiIdeaArm.industry_key, PiIdeaArm.status, PiIdeaArm.source)
     ):
-        if source != "seed":
+        if source not in ("seed", "seed_extra"):  # learned or owner ideas, not shipped ones
             counts[key]["_added"] += n
         if status == "retired":
             counts[key]["_retired"] += n

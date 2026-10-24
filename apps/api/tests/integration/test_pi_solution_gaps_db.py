@@ -386,8 +386,11 @@ async def test_g5_promotion_needs_a_non_negative_score_and_the_best_live_rate(
     young = await make_testing_arm(
         business_db, scope, industry, problem["id"], MORE[3], uses=10, n=2, score_sum=6, alpha=3.0
     )
+    mine = {low.id, slow.id, good.id, young.id}
     view = {
-        r["id"]: r["decision"] for r in await learning_solutions.canary_view(business_db, scope)
+        r["id"]: r["decision"]
+        for r in await learning_solutions.canary_view(business_db, scope)
+        if r["id"] in mine  # the industry's shipped extra ideas are in testing too
     }
     assert view == {
         low.id: "hold",

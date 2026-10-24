@@ -33,7 +33,7 @@ def test_every_industry_has_solutions_linked_to_its_pack():
 @pytest.mark.parametrize("key", INDUSTRIES)
 def test_each_entry_is_complete_and_inside_the_value_line(key):
     data = load(key)
-    assert data and data["version"] == "1.0" and data["industry"] == key
+    assert data and data["version"] in ("1.0", "1.1") and data["industry"] == key
     assert data["problems"] and data["never_say"]
     if key not in NO_SAMPLE:
         assert data["sample_reply"]["person"] and data["sample_reply"]["pi"]
@@ -77,7 +77,7 @@ def test_tool_words_are_banned_unless_the_person_said_them_first():
 
 def test_each_quick_idea_is_an_arm_with_a_stable_id():
     problem = load("retail_shops_and_chains")["problems"][0]
-    arms = ideas("retail_shops_and_chains", problem)
+    arms = [a for a in ideas("retail_shops_and_chains", problem) if not a.extra]  # the seed's two
     assert [a.arm_id for a in arms] == [
         f"retail_shops_and_chains:{problem['id']}:q1",
         f"retail_shops_and_chains:{problem['id']}:q2",

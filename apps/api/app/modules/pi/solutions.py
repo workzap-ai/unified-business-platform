@@ -172,6 +172,8 @@ class Idea:
     industry: str
     problem_id: str
     text: str
+    extra: bool = False  # an improvement added after the Part 4 seed: tested on a share of chats
+    review: bool = False  # it needs a person's decision before it is served (regulated topics)
 
 
 @lru_cache(maxsize=256)
@@ -189,11 +191,27 @@ def industries() -> tuple[str, ...]:
 
 
 def ideas(industry_key: str, problem: dict[str, Any]) -> list[Idea]:
-    """The two quick ideas of a problem entry, each with its stable arm id."""
-    return [
+    """The quick ideas of a problem entry (the two of Part 4), each with its stable arm id, then the
+    `extra_ideas` added since (x1, x2): tested on a share of chats, never replacing a seed idea."""
+    found = [
         Idea(f"{industry_key}:{problem['id']}:q{n}", industry_key, problem["id"], text)
         for n, text in enumerate(problem.get("quick_ideas") or [], start=1)
     ]
+    for n, item in enumerate(problem.get("extra_ideas") or [], start=1):
+        text = str(item.get("text") if isinstance(item, dict) else item or "")
+        if text:
+            review = bool(item.get("review")) if isinstance(item, dict) else False
+            found.append(
+                Idea(
+                    f"{industry_key}:{problem['id']}:x{n}",
+                    industry_key,
+                    problem["id"],
+                    text,
+                    extra=True,
+                    review=review,
+                )
+            )
+    return found
 
 
 def never_say(industry_keys: list[str]) -> list[str]:
