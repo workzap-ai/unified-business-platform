@@ -137,3 +137,36 @@ def test_free_ideas_never_state_a_time() -> None:
     assert kept == [
         "Keep one list per brand with the last promise, so chasing stays tidy and nothing is forgotten."
     ]
+
+
+def test_brain_never_leaves_an_empty_reply() -> None:
+    from types import SimpleNamespace
+
+    from app.modules.pi.service_conversation import brain_never_empty
+
+    turn = SimpleNamespace(
+        reply="", request_human=False, _decision=None, _summary=False, awaiting_customer=False
+    )
+    context = {
+        "reply_language": "en",
+        "latest_customer_message": "Ye kaise karna hai?",
+        "flow": {"state": "S3_NOTED"},
+        "history": [{"role": "ai", "text": "Hi"}],
+    }
+    brain_never_empty(turn, context)
+    assert "solution document once the problems are noted" in turn.reply and turn.reply.strip()
+
+
+def test_roman_urdu_idea_lines_lose_their_english_scaffolding() -> None:
+    from types import SimpleNamespace
+
+    from app.modules.pi.service_conversation import brain_prose_ideas
+
+    turn = SimpleNamespace(
+        reply="Sure.\nFirst, register dekho, so nuksan saaf ho.\nSecond, safha alag likho, so hisaab milay.",
+        _summary=False,
+        _free=True,
+    )
+    brain_prose_ideas(turn, {"solution_ideas": ["x"], "reply_language": "roman_ur"})
+    assert "Pehle, register dekho, taake nuksan saaf ho." in turn.reply
+    assert "Doosra, safha alag likho, taake hisaab milay." in turn.reply

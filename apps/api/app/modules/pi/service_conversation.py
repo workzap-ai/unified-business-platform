@@ -1947,6 +1947,16 @@ BULLET_LINE = re.compile(r"^\s*[•*-]\s+(.*)$")
 POSITIONS = {"roman_ur": ("Pehle", "Doosra"), "en": ("First", "Second")}
 
 
+ROMAN_SCAFFOLD = re.compile(r"^(First|Second),\s+|,\s+so\s+(?=[a-z])", re.IGNORECASE)
+
+
+def roman_scaffold(found: "re.Match[str]") -> str:
+    word = found.group(1)
+    if word:
+        return "Pehle, " if word.lower() == "first" else "Doosra, "
+    return ", taake "
+
+
 def brain_prose_ideas(turn: "ServiceTurn", context: dict[str, Any]) -> None:
     """A reply that hands over the entries' ideas as dots reads them as plain sentences instead
     ("First, ... Second, ..."), in English or Roman Urdu. Other languages and every other kind of
@@ -1955,6 +1965,10 @@ def brain_prose_ideas(turn: "ServiceTurn", context: dict[str, Any]) -> None:
         return
     marks = POSITIONS.get(str(context.get("reply_language") or "en"))
     lines = turn.reply.splitlines()
+    if context.get("reply_language") == "roman_ur":
+        # English scaffolding the model left inside a Roman Urdu idea line ("First, ... so aapko")
+        lines = [ROMAN_SCAFFOLD.sub(roman_scaffold, line) for line in lines]
+        turn.reply = chr(10).join(lines)
     found = [n for n, line in enumerate(lines) if BULLET_LINE.match(line)]
     contiguous = found == list(range(found[0], found[0] + len(found))) if found else False
     if not marks or not 1 <= len(found) <= 2 or not contiguous:
@@ -2129,20 +2143,36 @@ def brain_howto(turn: "ServiceTurn", context: dict[str, Any]) -> None:
         return
     if solution_rules.has_safety_referral(turn.reply):
         return
-    covers = " ".join(str(howto.get("covers") or "").split()).strip(" .")
-    line = (
-        f"The detail is in the solution document: it covers {covers[:1].lower()}{covers[1:]}."
-        if covers
-        else "The detail is in the solution document."
-    )
+    line = "The detail is in the solution document."
     if howto.get("which_app"):
         line = f"I don't recommend specific apps. {line}"
     language = str(context.get("reply_language") or "en")
-    turn.reply = with_disclosure(
-        f"{line} Workzap would set the whole thing up for you.", context, language
-    )
+    turn.reply = with_disclosure(line, context, language)
     turn._english = True
     turn.awaiting_customer = True
+
+
+def brain_never_empty(turn: "ServiceTurn", context: dict[str, Any]) -> None:
+    """Brain mode never stores or sends an empty reply (a real-model sweep ended 14 chats on one
+    after a "how exactly?" or a solution ask): the safe line for the state follows instead, and a
+    document ask is answered with the one thing pi may say while it listens."""
+    if turn.reply.strip() or turn.request_human or turn._decision is not None or turn._summary:
+        return
+    said = str(context.get("latest_customer_message") or "")
+    language = str(context.get("reply_language") or "en")
+    line = constitution.safe_fallback(context)
+    if solution_ask.asked_howto(said) or solution_ask.asked_for_ideas(said):
+        line = f"{DOCUMENT_ONCE_NOTED.get(language, DOCUMENT_ONCE_NOTED['en'])} {line}"
+    turn.reply = line
+    turn.awaiting_customer = True
+    turn._english = language != "en"
+
+
+DOCUMENT_ONCE_NOTED = {
+    "en": "Workzap can prepare a solution document once the problems are noted.",
+    "roman_ur": "Workzap solution document tab bana sakta hai jab masail note ho jayen.",
+    "ar": "يمكن لـ Workzap إعداد وثيقة حل بعد تسجيل المشكلات.",
+}
 
 
 def brain_offer(turn: "ServiceTurn", context: dict[str, Any]) -> None:
@@ -4674,6 +4704,7 @@ async def compose_service_turn(
         brain_prose_ideas(turn, context)
         brain_no_ideas(turn, context)
         brain_howto(turn, context)
+        brain_never_empty(turn, context)
         brain_offer(turn, context)
     if context.get("handback_notice") and not turn.request_human and turn._decision is None:
         short = safety.handback_reply(str(context.get("reply_language") or "en"))

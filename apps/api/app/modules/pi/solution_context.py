@@ -344,6 +344,13 @@ async def _build(
     state = conversation.flow_state or ""
     explicit = solution_ask.asked_for_ideas(said)
     reacting = bool(next_kind)
+    if howto and not noted and state in solution_ask.ASKABLE:
+        # "how exactly?" before anything is noted still gets the one answer pi may give: the detail
+        # is in the solution document (an empty reply here ended chats in a real-model sweep)
+        return {
+            "solution_howto": {"covers": "", "which_app": solution_ask.asked_which_app(said)},
+            "solution_never_say": solutions.never_say([industry])[:6],
+        }
     if not (noted or reacting) or not (
         state in GIVING or ((asked or howto) and state in solution_ask.ASKABLE)
     ):

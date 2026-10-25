@@ -581,7 +581,7 @@ def test_how_exactly_gets_the_document_answer_when_the_model_says_noted() -> Non
     }
     generic = turn("Thanks, that's noted. Is there anything else you want to add?")
     brain_howto(generic, context)
-    assert "solution document: it covers how accounts are coded" in generic.reply
+    assert generic.reply == "The detail is in the solution document."  # one fixed, grammatical line
     assert generic._english and "?" not in generic.reply
     invented = turn(
         "Workzap aisa intezam kar sakta hai ke traceability fields aur reconciliation steps ho."
