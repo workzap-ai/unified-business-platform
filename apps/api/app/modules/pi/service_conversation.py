@@ -1895,6 +1895,15 @@ def strip_dangling_opener(turn: "ServiceTurn") -> None:
     turn.reply = "\n".join(kept).strip()
 
 
+def ideas_opener(context: dict[str, Any]) -> str:
+    """ "Sure." answers a request for a fix; ideas offered on a message that asked for none (a
+    problem told, a "yes") start with the ideas themselves."""
+    said = str(context.get("latest_customer_message") or "")
+    if said and not solution_ask.asked_for_ideas(said):
+        return ""
+    return "Sure." + chr(10)
+
+
 def brain_ideas(turn: "ServiceTurn", context: dict[str, Any]) -> None:
     """The ideas the application chose for this turn reach the person even when the model left
     them out of its reply ("Noted. What else is getting in the way?" after "any solution?").
@@ -1910,7 +1919,7 @@ def brain_ideas(turn: "ServiceTurn", context: dict[str, Any]) -> None:
         return
     lines = solution_rules.idea_lines(ideas)
     language = str(context.get("reply_language") or "en")
-    turn.reply = with_disclosure(f"Sure.\n{lines}", context, language)
+    turn.reply = with_disclosure(f"{ideas_opener(context)}{lines}", context, language)
     turn._english = True
     turn.awaiting_customer = True
 
@@ -2058,7 +2067,9 @@ async def brain_free_ideas(
     if not ideas:
         return
     language = str(context.get("reply_language") or "en")
-    turn.reply = with_disclosure("Sure.\n" + solution_rules.idea_lines(ideas), context, language)
+    turn.reply = with_disclosure(
+        ideas_opener(context) + solution_rules.idea_lines(ideas), context, language
+    )
     turn._english = True
     turn.awaiting_customer = True
     turn._free = True
@@ -3929,7 +3940,12 @@ async def in_one_language(
     except Exception:  # noqa: BLE001 - the checks below still guard the reply
         return reply
     fixed = str(response.text or "").strip()
-    return fixed if fixed and (expected not in NAMES or not mixed_line(fixed, expected)) else reply
+    # A rewrite that still keeps a few English nouns ("vet", "flock", "technical team") is the
+    # person's own business words, not a failed rewrite: only one still mostly in the other
+    # language is thrown away (a real-model sweep lost 18 Roman Urdu turns to the stricter check)
+    if not fixed or (expected in NAMES and clearly_other(fixed, expected)):
+        return reply
+    return fixed
 
 
 def project_words(text: str) -> set[str]:
@@ -4786,11 +4802,13 @@ async def compose_service_turn(
         )
     if expected in NAMES and expected != "en" and not turn._english and english_bullets(turn.reply):
         turn._english = True  # the model left a list of ideas in English: it is translated below
+    rewritten = False
     if expected in NAMES and (
         (turn._english and expected != "en")
         or mixed_line(turn.reply, str(expected))
         or clearly_other(turn.reply, str(expected))
     ):
+        rewritten = True
         latency.count("model_calls")
         latency.note("language_fix", f"reply mixed languages, expected {expected}")
         turn.reply = await latency.timed(
@@ -4800,7 +4818,7 @@ async def compose_service_turn(
     latest_language = detect_language(str(context.get("latest_customer_message", "")))
     if latest_language == expected and (
         clearly_other(turn.reply, str(expected or ""))
-        or mixed_line(turn.reply, str(expected or ""))
+        or (not rewritten and mixed_line(turn.reply, str(expected or "")))
     ):
         # A failed rewrite must not send the same wrong-language reply to WhatsApp. Only
         # when the customer clearly wrote in that language: otherwise the turn (and what

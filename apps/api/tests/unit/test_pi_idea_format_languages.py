@@ -212,3 +212,11 @@ def test_the_conditional_line_and_later_states_are_left_alone() -> None:
     later = _promise_turn("Maine Workzap se document aur quote tayyar karne ko keh diya hai.")
     brain_no_early_promise(later, {"flow": {"state": "S5_READINESS"}})
     assert later.reply.startswith("Maine Workzap")
+
+
+def test_sure_only_answers_a_request_for_a_fix() -> None:
+    from app.modules.pi.service_conversation import ideas_opener
+
+    assert ideas_opener({"latest_customer_message": "Ap solution dein"}) == "Sure.\n"
+    assert ideas_opener({"latest_customer_message": "Haan, har hafte hota hai"}) == ""
+    assert ideas_opener({}) == "Sure.\n"
