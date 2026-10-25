@@ -17,18 +17,20 @@ from uuid import UUID
 
 from app.ai.manager import LLMManager
 from app.ai.types import Message
-from app.modules.pi import solution_rules
+from app.modules.pi import constitution, solution_rules
 from app.shared.scope import WorkspaceScope
 
 RULES = """You give FREE quick ideas for pi, a WhatsApp business assistant, to say to the owner of a
 small or medium business in Pakistan, the UAE or Canada who asked "what can I do about this?".
 Give exactly two ideas, written in plain English (they are translated for the owner later). Each:
 - is ONE sentence of 12 to 24 words: what to do, a comma, then "so" and the benefit in the owner's own terms;
-- can be done this week by the owner or staff with what they already have: a notebook, a phone they
+- can be done by the owner or staff with what they already have: a notebook, a phone they
   own, a chat group, a walk round the premises. Nothing to buy, install or set up;
 - is specific to the problem the owner described, not generic advice;
 - names no app, software, spreadsheet, template, dashboard, tool, brand or vendor;
 - has no digits, no percentage, no amount, no promised result;
+- names no time or duration at all (no "this week", "today", "tomorrow", "daily", "one week", "a month"):
+  pi may not state a timeline;
 - has no steps, no settings, no wording to copy;
 - asks no question and asks for no names, phone numbers, ID or card details;
 - gives no medical, veterinary, legal, tax or financial advice, and nothing about doses, feed
@@ -69,6 +71,8 @@ def vetted(ideas: list[str], said: str, never_say: list[str]) -> list[str]:
             continue  # a person decides about money or a regulated topic: never served unreviewed
         if never_say and solution_rules.never_say_hit(idea, never_say):
             continue
+        if constitution.TIMELINE_STRONG.search(idea) or constitution.TIMELINE_WEAK.search(idea):
+            continue  # R-HONEST-01: pi never states a time or duration it was not given
         if idea not in kept:
             kept.append(idea.rstrip(". ") + ".")
         if len(kept) == 2:

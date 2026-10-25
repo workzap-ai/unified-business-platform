@@ -86,7 +86,9 @@ ENOUGH_HOWTO = 3  # "how exactly?" asked this many times
 ENOUGH_DECLINES = 2  # or the offer declined this many times
 
 IN_THE_DOCUMENT = re.compile(
-    r"\s*\b(?:are|is) in the solution document\.?\s*$|\s*\bsolution document mein\b.*$", re.I
+    r"\s*\b(?:are|is)(?: (?:set|settled|decided|agreed|fixed|written|worked out|covered))?"
+    r" in the solution document\.?\s*$|\s*\bsolution document mein\b.*$",
+    re.I,
 )
 
 

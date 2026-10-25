@@ -82,7 +82,7 @@ def in_script(text: str | None, name: str) -> bool:
     """The text is written mostly in that other language's script (a reply is checked with this)."""
     pattern = dict(OTHER_SCRIPTS).get(name)
     letters = len(re.findall(r"[^\W\d_]", text or ""))
-    return bool(pattern) and len(pattern.findall(text or "")) * 2 >= letters
+    return pattern is not None and len(pattern.findall(text or "")) * 2 >= letters
 
 
 NAMES = {

@@ -1,3 +1,4 @@
+# ruff: noqa: E501
 """Ideas read as plain sentences (no dots), other scripts keep their own language, and short
 Roman Urdu asks and dislikes are understood."""
 
@@ -116,3 +117,23 @@ def test_a_message_that_tells_the_problem_and_asks_for_a_fix_is_still_extracted(
     assert problem_extract.wants_extraction({**base, "solution_asked_no_ideas": True}, "", [])
     noted = {**base, "solution_asked": True, "noted_problems": [{"ref": "p1"}]}
     assert not problem_extract.wants_extraction(noted, "", [])
+
+
+def test_covers_is_a_noun_phrase_even_for_are_set_in_the_document() -> None:
+    covered = solution_ask.covers(
+        {"free_stops": "Recall intervals and message flow are set in the solution document."}
+    )
+    assert covered == "Recall intervals and message flow"
+
+
+def test_free_ideas_never_state_a_time() -> None:
+    from app.modules.pi import solution_free
+
+    ideas = [
+        "Check this week's payouts against the order slips, so you can see which brand is mixed up.",
+        "Keep one list per brand with the last promise, so chasing stays tidy and nothing is forgotten.",
+    ]
+    kept = solution_free.vetted(ideas, "payouts are mixed up", [])
+    assert kept == [
+        "Keep one list per brand with the last promise, so chasing stays tidy and nothing is forgotten."
+    ]
