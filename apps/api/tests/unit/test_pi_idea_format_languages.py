@@ -220,3 +220,66 @@ def test_sure_only_answers_a_request_for_a_fix() -> None:
     assert ideas_opener({"latest_customer_message": "Ap solution dein"}) == "Sure.\n"
     assert ideas_opener({"latest_customer_message": "Haan, har hafte hota hai"}) == ""
     assert ideas_opener({}) == "Sure.\n"
+
+
+def test_an_idea_already_said_is_not_said_again() -> None:
+    from types import SimpleNamespace
+
+    from app.modules.pi.service_conversation import brain_no_repeat
+
+    first = "First, count each branch's unpaid fees by name, so you see who owes the most."
+    context = {
+        "reply_language": "en",
+        "history": [{"role": "ai", "text": "Sure.\n" + first + "\nSecond, write the dates down."}],
+    }
+    same = SimpleNamespace(
+        reply="Sure.\n" + first + "\nSecond, write the dates down.",
+        _summary=False,
+        _decision=None,
+        request_human=False,
+        _english=False,
+        awaiting_customer=False,
+    )
+    brain_no_repeat(same, context)
+    assert same.reply.startswith("Those are the ideas I have")
+    mixed = SimpleNamespace(
+        reply="Sure.\n" + first + "\nSecond, ask parents to pay by bank transfer on a fixed day.",
+        _summary=False,
+        _decision=None,
+        request_human=False,
+        _english=False,
+        awaiting_customer=False,
+    )
+    brain_no_repeat(mixed, context)
+    assert "count each branch" not in mixed.reply and "bank transfer" in mixed.reply
+
+
+def test_roman_polish_removes_leftover_english_scaffolding() -> None:
+    from app.modules.pi.service_conversation import roman_polish
+
+    out = roman_polish(
+        "Sure.\nFirst, register dekho, so nuksan saaf ho.\nSecond, safha alag likho."
+    )
+    assert out.splitlines()[0] == "Theek hai."
+    assert (
+        "Pehle, register dekho, taake nuksan saaf ho." in out and "Doosra, safha alag likho." in out
+    )
+    assert roman_polish("Ji bilkul, note kar liya.") == "Ji bilkul, note kar liya."
+
+
+def test_problem_words_pick_the_trade_when_none_is_stated() -> None:
+    from app.modules.pi import industry_overlap, industry_packs
+
+    said = [
+        "Lakkar mandi mein do yard hain. Carpenter udhaar pe maal le jaate hain aur mahinon nahi dete."
+    ]
+    fused = industry_overlap.fuse(industry_packs.detect(said), said)
+    assert fused.primary == "forestry_timber_and_wood_traders"
+
+
+def test_a_stated_trade_is_never_overridden_by_problem_words() -> None:
+    from app.modules.pi import industry_overlap, industry_packs
+
+    said = ["I run a private school with 800 students. Fees and attendance are manual."]
+    found = industry_packs.detect(said)
+    assert found.stated and industry_overlap.fuse(found, said) is found

@@ -32,6 +32,7 @@ from app.modules.pi import (
     decisions,
     flow,
     followup_policy,
+    industry_overlap,
     industry_packs,
     latency,
     learning_context,
@@ -1966,6 +1967,56 @@ def roman_scaffold(found: "re.Match[str]") -> str:
     return ", taake "
 
 
+IDEA_LINE = re.compile(r"^(?:First|Second|Pehle|Doosra)\s*,\s*(.*)$", re.IGNORECASE)
+
+
+def _word_set(text: str) -> set[str]:
+    return {w for w in re.findall(r"[a-z؀-ۿ]{3,}", text.casefold())}
+
+
+def brain_no_repeat(turn: "ServiceTurn", context: dict[str, Any]) -> None:
+    """An idea pi already said in this chat is not said again (a second ask got the same two
+    ideas word for word): repeated idea lines are dropped, and when every one was a repeat the
+    reply is the honest 'those are the ideas I have' line (the offer follows)."""
+    if turn._summary or turn._decision is not None or turn.request_human:
+        return
+    lines = turn.reply.splitlines()
+    found = [n for n, line in enumerate(lines) if IDEA_LINE.match(line.strip())]
+    if not found:
+        return
+    earlier = [
+        _word_set(str(h.get("text") or ""))
+        for h in context.get("history") or []
+        if h.get("role") == "ai"
+    ]
+    repeated = []
+    for n in found:
+        mine = _word_set(IDEA_LINE.match(lines[n].strip()).group(1))  # type: ignore[union-attr]
+        if mine and any(len(mine & old) / len(mine) >= 0.75 for old in earlier):
+            repeated.append(n)
+    if not repeated:
+        return
+    language = str(context.get("reply_language") or "en")
+    if len(repeated) == len(found):
+        turn.reply = NO_MORE_IDEAS.get(language, NO_MORE_IDEAS["en"])
+        turn._english = False
+        turn.awaiting_customer = True
+        return
+    turn.reply = chr(10).join(line for n, line in enumerate(lines) if n not in repeated)
+
+
+ENGLISH_FILLER = re.compile(r"^(?:Sure|Yes|Okay|Ok)\.(?=\s*$)", re.IGNORECASE | re.MULTILINE)
+
+
+def roman_polish(reply: str) -> str:
+    """What a Roman Urdu reply keeps of English after the language step: the 'First,'/'Second,'
+    of idea lines, 'so' as the connector, and a lone 'Sure.' opener."""
+    if not ROMAN_SCAFFOLD.search(reply) and not ENGLISH_FILLER.search(reply):
+        return reply
+    lines = [ROMAN_SCAFFOLD.sub(roman_scaffold, line) for line in reply.splitlines()]
+    return ENGLISH_FILLER.sub("Theek hai.", chr(10).join(lines))
+
+
 def brain_prose_ideas(turn: "ServiceTurn", context: dict[str, Any]) -> None:
     """A reply that hands over the entries' ideas as dots reads them as plain sentences instead
     ("First, ... Second, ..."), in English or Roman Urdu. Other languages and every other kind of
@@ -2586,7 +2637,9 @@ def industry_context(
     and phrases rotate through the pack's areas turn by turn.
     """
     stored = [k for k in [customer.industry_primary, *(customer.industry_secondary or [])] if k]
-    found = industry_packs.detect(texts, known=stored, answers=answers)
+    found = industry_overlap.fuse(
+        industry_packs.detect(texts, known=stored, answers=answers), texts
+    )
     if stored and latest:
         # The stored trade keeps the choice steady between messages, but a person who now says
         # plainly that they run a different business ("I own a clothing business") changes it:
@@ -4782,6 +4835,7 @@ async def compose_service_turn(
             ):
                 turn.problem_ops = found
         brain_prose_ideas(turn, context)
+        brain_no_repeat(turn, context)
         brain_no_ideas(turn, context)
         brain_howto(turn, context)
         brain_no_early_promise(turn, context)
@@ -4815,6 +4869,8 @@ async def compose_service_turn(
             "model.language",
             in_one_language(manager, scope, policy, conversation, turn.reply, str(expected)),
         )
+    if expected == "roman_ur":
+        turn.reply = roman_polish(turn.reply)
     latest_language = detect_language(str(context.get("latest_customer_message", "")))
     if latest_language == expected and (
         clearly_other(turn.reply, str(expected or ""))
