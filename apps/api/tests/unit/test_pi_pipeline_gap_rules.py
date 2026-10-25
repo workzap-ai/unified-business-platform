@@ -447,3 +447,19 @@ def test_a_whole_sentence_is_never_bold_but_the_summary_group_names_are() -> Non
     summary = "*Marketing and leads* (2)\n• Late replies\n\n*Operations and workflow* (1)\n• Slow"
     assert polished(summary) == summary
     assert polished("The *bold word* stays") == "The *bold word* stays"
+
+
+def test_pi_does_not_say_you_are_right_when_the_owner_corrected_nothing() -> None:
+    """Real sweep: 'You're right. I've changed it to ...' after a plain extra detail."""
+    from app.modules.pi import constitution
+
+    def hits(said: str, reply: str, **context) -> list[str]:
+        ctx = {"latest_customer_message": said, "flow": {"state": "S3_NOTED"}, **context}
+        return [v.rule for v in constitution.lint(reply, ctx) if v.rule == "R-CORR-04"]
+
+    reply = "You're right. I've changed it to: design changes every week. What next?"
+    assert hits("It happens every week and I am not sure how much we lose.", reply)
+    assert hits("Haan har hafte hota hai", "Aap sahi keh rahe hain, badal diya. Phir?")
+    assert not hits("Actually it is every day, not weekly", reply)
+    assert not hits("that's not what I said", reply, said_wrong=True)
+    assert not hits("Haan har hafte hota hai", "Samajh gaya. Phir kya hota hai?")

@@ -404,6 +404,18 @@ def _allowed_bangs(context: dict[str, Any]) -> int:
     return 1 if "!" in said and FESTIVAL.search(said) and not earlier else 0
 
 
+# A confirmed correction ("you're right, I've changed it") when they corrected nothing: found in a
+# real sweep after a plain extra detail.
+CONFIRMS_CORRECTION = re.compile(
+    r"\byou'?re right\b|\bi'?ve (?:changed|fixed|corrected|updated) it\b"
+    r"|\baap sahi keh rahe hain\b|\bbadal diya\b|\btheek kar diya\b",
+    re.IGNORECASE,
+)
+# Words that make a message a correction even when the strict detector missed it.
+CORRECTION_CUE = re.compile(
+    r"\b(?:actually|instead|rather|correction|i meant|i mean|not (?:\w+ ){1,3}but|wrong|mistake|typo|sorry|change(?:d)?|update|galat|ghalat|nahi (?:\w+ ){0,3}balke|balkay|dar asal|asal mein|ye nahi|maaf|badal|theek kar|sahi kar)\b",
+    re.IGNORECASE,
+)
 NOT_UNDERSTOOD = re.compile(
     r"\b(?:samajh|samjh|samjha|samja) (?:nahi|nhi|nahin)"
     r"(?: (?:aayi|aaya|aai|aya|ayi|paya|payi|saka|saki|aa raha|aa rahi))?\b"
@@ -1305,6 +1317,19 @@ def lint(reply: str, context: dict[str, Any]) -> list[Violation]:
                 "R-CORR-02",
                 "they corrected something you noted: say they are right and that it is "
                 "fixed or removed, never that you did not understand",
+            )
+        )
+    if (
+        not context.get("said_wrong")
+        and not context.get("corrects_noted")
+        and CONFIRMS_CORRECTION.search(reply)
+        and not CORRECTION_CUE.search(str(context.get("latest_customer_message") or ""))
+    ):
+        add(
+            Violation(
+                "R-CORR-04",
+                "they corrected nothing: do not say they are right or that you changed it; "
+                "confirm only what is new in this message",
             )
         )
     if STIFF_APOLOGY.search(reply):
