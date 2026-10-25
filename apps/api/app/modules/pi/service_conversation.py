@@ -1965,7 +1965,7 @@ def brain_prose_ideas(turn: "ServiceTurn", context: dict[str, Any]) -> None:
         return
     marks = POSITIONS.get(str(context.get("reply_language") or "en"))
     lines = turn.reply.splitlines()
-    if context.get("reply_language") == "roman_ur":
+    if context.get("reply_language") == "roman_ur" and not getattr(turn, "_english", False):
         # English scaffolding the model left inside a Roman Urdu idea line ("First, ... so aapko")
         lines = [ROMAN_SCAFFOLD.sub(roman_scaffold, line) for line in lines]
         turn.reply = chr(10).join(lines)
@@ -2130,6 +2130,18 @@ def brain_no_ideas(turn: "ServiceTurn", context: dict[str, Any]) -> None:
 MENTIONS_DOCUMENT = re.compile(r"document|وثيقة|مستند|دستاویز", re.IGNORECASE)
 
 
+HOWTO_LINES = {
+    "en": "The detail is in the solution document.",
+    "roman_ur": "Is ki tafseel solution document mein hogi.",
+    "ar": "التفاصيل في وثيقة الحل.",
+}
+NO_APP_LINES = {
+    "en": "I don't recommend specific apps.",
+    "roman_ur": "Main kisi khaas app ka mashwara nahi deta.",
+    "ar": "لا أوصي بتطبيق محدد.",
+}
+
+
 def brain_howto(turn: "ServiceTurn", context: dict[str, Any]) -> None:
     """They asked "how exactly?", "step by step" or "which app?" (Addendum 1.4): the detail is the
     solution document, named by what it covers, with no steps and no tool. The model's own words
@@ -2143,12 +2155,56 @@ def brain_howto(turn: "ServiceTurn", context: dict[str, Any]) -> None:
         return
     if solution_rules.has_safety_referral(turn.reply):
         return
-    line = "The detail is in the solution document."
-    if howto.get("which_app"):
-        line = f"I don't recommend specific apps. {line}"
     language = str(context.get("reply_language") or "en")
+    line = HOWTO_LINES.get(language, HOWTO_LINES["en"])
+    if howto.get("which_app"):
+        line = f"{NO_APP_LINES.get(language, NO_APP_LINES['en'])} {line}"
     turn.reply = with_disclosure(line, context, language)
-    turn._english = True
+    # written in the person's own language where there is a line for it: an English line next to the
+    # Roman Urdu offer is a mixed reply the language check refuses (a real-model run lost the turn)
+    turn._english = language not in HOWTO_LINES
+    turn.awaiting_customer = True
+
+
+PROMISED_DOCUMENT = re.compile(
+    r"(?:document|quote).{0,80}(?:tayy?ar|ready|banega|banay ?ga|banwa|bhej"
+    r"|ban(?:ne|a) (?:jayega|diya)"
+    r"|will be|is being|being prepared|on its way)"
+    r"|(?:maine|i(?:'ve| have) asked).{0,60}(?:document|quote)",
+    re.IGNORECASE | re.DOTALL,
+)
+CONDITIONAL = re.compile(r"\b(?:jab|once|when|after|agar|if|tab)\b", re.IGNORECASE)
+
+
+def brain_no_early_promise(turn: "ServiceTurn", context: dict[str, Any]) -> None:
+    """Before the offer was made and accepted, the document is never promised ("the document and
+    quote will be prepared"): a reply that does is replaced by the offer itself when something is
+    noted (the next explicit yes then goes through the gate), else by what pi may say while it
+    listens."""
+    if turn._summary or turn._decision is not None or turn.request_human:
+        return
+    if (context.get("flow") or {}).get("state") not in solution_ask.OFFERABLE:
+        return
+    if not PROMISED_DOCUMENT.search(turn.reply) or CONDITIONAL.search(turn.reply):
+        return
+    if solution_ask.already_offers(turn.reply):
+        return
+    language = str(context.get("reply_language") or "en")
+    created = [op for op in turn.problem_ops if op.op == "create"]
+    if context.get("noted_problems") or created:
+        turn.reply = solution_ask.offer_line(language)
+        turn._decision = decisions.Decision(
+            None, flow.State.S5_READINESS, {"offer_asked": True}, why="R-OFFER-01"
+        )
+    else:
+        turn.reply = " ".join(
+            (
+                DOCUMENT_ONCE_NOTED.get(language, DOCUMENT_ONCE_NOTED["en"]),
+                constitution.FALLBACK_LISTENING.get(
+                    language, constitution.FALLBACK_LISTENING["en"]
+                ),
+            )
+        )
     turn.awaiting_customer = True
 
 
@@ -4701,9 +4757,18 @@ async def compose_service_turn(
         strip_dangling_opener(turn)
         brain_ideas(turn, context)
         await brain_free_ideas(manager, scope, conversation, policy, turn, context)
+        if turn._free and not turn.problem_ops and not context.get("noted_problems"):
+            # Free ideas on a first message that told the problem: they never replace noting, so
+            # the problem is recorded here when the reply model and the earlier extraction missed it
+            latency.count("model_calls")
+            if found := await latency.timed(
+                "model.extract", problem_extract.extract(manager, scope, context)
+            ):
+                turn.problem_ops = found
         brain_prose_ideas(turn, context)
         brain_no_ideas(turn, context)
         brain_howto(turn, context)
+        brain_no_early_promise(turn, context)
         brain_never_empty(turn, context)
         brain_offer(turn, context)
     if context.get("handback_notice") and not turn.request_human and turn._decision is None:

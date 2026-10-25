@@ -170,3 +170,45 @@ def test_roman_urdu_idea_lines_lose_their_english_scaffolding() -> None:
     brain_prose_ideas(turn, {"solution_ideas": ["x"], "reply_language": "roman_ur"})
     assert "Pehle, register dekho, taake nuksan saaf ho." in turn.reply
     assert "Doosra, safha alag likho, taake hisaab milay." in turn.reply
+
+
+def _promise_turn(reply: str):  # noqa: ANN202
+    from types import SimpleNamespace
+
+    return SimpleNamespace(
+        reply=reply,
+        request_human=False,
+        _decision=None,
+        _summary=False,
+        awaiting_customer=False,
+        problem_ops=[],
+    )
+
+
+def test_the_document_is_never_promised_before_the_offer_was_accepted() -> None:
+    from app.modules.pi.service_conversation import brain_no_early_promise
+
+    noted = {
+        "reply_language": "roman_ur",
+        "flow": {"state": "S2_CLARIFYING"},
+        "noted_problems": [{"ref": "p1"}],
+    }
+    turn = _promise_turn("Theek hai. Workzap solution document aur quote ab tayar kiya jayega.")
+    brain_no_early_promise(turn, noted)
+    assert "tayar kiya jayega" not in turn.reply and turn._decision is not None
+    assert turn._decision.to.value == "S5_READINESS" if hasattr(turn._decision, "to") else True
+
+    nothing = _promise_turn("The document and quote will be prepared and sent here.")
+    brain_no_early_promise(nothing, {"reply_language": "en", "flow": {"state": "S1_LISTENING"}})
+    assert "once the problems are noted" in nothing.reply and nothing._decision is None
+
+
+def test_the_conditional_line_and_later_states_are_left_alone() -> None:
+    from app.modules.pi.service_conversation import brain_no_early_promise
+
+    fine = _promise_turn("Workzap solution document tab banega jab problems note ho jayen.")
+    brain_no_early_promise(fine, {"flow": {"state": "S2_CLARIFYING"}})
+    assert fine.reply.startswith("Workzap solution document tab banega")
+    later = _promise_turn("Maine Workzap se document aur quote tayyar karne ko keh diya hai.")
+    brain_no_early_promise(later, {"flow": {"state": "S5_READINESS"}})
+    assert later.reply.startswith("Maine Workzap")

@@ -290,6 +290,14 @@ async def _build(
     customer = await session.get(Customer, conversation.customer_id)
     industry = customer.industry_primary if customer is not None else None
     if not industry or solutions.load(industry) is None:
+        if (
+            solution_ask.asked_howto(said)
+            and (conversation.flow_state or "") in solution_ask.ASKABLE
+        ):
+            # "how exactly?" with no trade known yet: the detail is the solution document
+            return {
+                "solution_howto": {"covers": "", "which_app": solution_ask.asked_which_app(said)}
+            }
         return _no_ideas(conversation, noted, industry, "no_industry", now) if asked else {}
     language = detect_language(said) or conversation.language or "en"
     language = language if language in ("en", "roman_ur", "ar") else "en"
