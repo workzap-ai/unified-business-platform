@@ -777,6 +777,28 @@ async def process_pi_event(ctx: dict[str, Any], event_id: str) -> None:
             await session.commit()
             return
         event.attempts += 1
+        # Workzap Connect: the Workzap number asks NORI first (link codes and linked members).
+        from app.modules.pi_saas import nori_bridge
+
+        handled, nori_reply = await nori_bridge.try_handle(ctx, connection, event.payload)
+        if handled:
+            # Committed before the send: a retry never sends twice.
+            event.status = "processed"
+            await session.commit()
+            if nori_reply:
+                from app.integrations.whatsapp_bridge import token as connection_token
+                from app.modules.pi.whatsapp import WhatsApp
+
+                try:
+                    await WhatsApp(ctx["settings"], ctx["http"], connection.provider).send(
+                        connection.phone_number_id,
+                        str(event.payload.get("sender") or ""),
+                        nori_reply,
+                        await connection_token(session, ctx["settings"], connection),
+                    )
+                except BusinessRuleViolation:
+                    logger.warning("pi_nori_reply_failed")
+            return
         message = await persist_inbound(session, event, connection, scope)
         event.status = "queued" if message else "processed"
         released: list[str] = []
