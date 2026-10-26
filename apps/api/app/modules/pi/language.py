@@ -96,20 +96,16 @@ LATIN_OTHER: dict[str, frozenset[str]] = {
         " bagaimana tapi karena atau jadi lebih sangat banget aja deh".split()
     ),
     "Turkish": frozenset(
-        "merhaba evet hayir bir ben sen bu icin ama çok cok nasil nasıl tamam lütfen lutfen teşekkürler"
-        " var yok degil değil benim senin isletme işletme sorun".split()
+        "ama ben benim bir bu cok degil değil evet hayir hayır icin isletme için işletme karışıyor lutfen lütfen mağaza mağazam merhaba müşteri nasil nasıl olur sen senin sipariş siparişler sorun sık tamam teşekkürler var ve yardım yok çok".split()
     ),
     "French": frozenset(
-        "bonjour je suis vous nous est une des les pour avec pas mais très merci s'il svp comment"
-        " problème entreprise mon ma mes oui non".split()
+        "aide avec besoin bonjour boutique c'est client clients commandes comment d'accord dans de des du elle entreprise est et il j'ai je la le les leur ma magasin mais merci mes mon ne non nous oui pas pour problème que qui s'il ses souvent suis sur svp toujours très tu un une vous".split()
     ),
     "Spanish": frozenset(
-        "hola que qué por para con una los las pero muy gracias favor cómo como problema negocio mi"
-        " tengo quiero necesito sí no".split()
+        "ayuda cada clientes como con cómo de el en favor frecuencia gracias hola la las los mes mi mis muy necesito negocio no para pedidos pero por problema que quiero qué sí tengo tienda un una vale y".split()
     ),
     "German": frozenset(
-        "hallo ich bin sie wir ist eine der die das und nicht aber sehr danke bitte wie problem"
-        " geschäft mein meine ja nein".split()
+        "aber bestellungen bin bitte danke das der die ein eine einen geschäft gut habe hallo hilfe ich ist ja kunden laden mein meine nein nicht oft problem sehr sie sind und verwechselt wie wir".split()
     ),
 }
 

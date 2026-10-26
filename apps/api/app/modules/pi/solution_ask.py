@@ -70,6 +70,16 @@ SOLUTION_ASK_PLAIN = re.compile(
     r"|\b(?:ap|aap|app)\s+(?:solution|hal|idea|mashwara)\s+(?:dw|dy|dyn|de|do|dein|den|dain)\b"
     r"|\b(?:ap|aap|app|tum)?\s*kya\s+(?:kar|kr)\s+(?:sakte|skte|skty|sakty|sakta|skta)\b"
     r"|\bkuch\s+(?:kar|kr)\s+(?:sakte|skte|skty|sakty)\b"
+    # "koi idea?" / "koi hal?" and the same asks in the other languages pi serves
+    r"|\bkoi (?:idea|hal|solution|mashwara|tareeqa)\s*[?؟]"
+    r"|\b(?:tienes|tiene|hay) (?:alguna|una) idea\b|\bfikr\w* var m[ıi]\b|\bbir (?:öneri|fikir)\b"
+    r"|\bcomment (?:commencer|d[ée]marrer|d[ée]buter)\b|\bpar o[uù] commencer\b"
+    r"|\b(?:c[óo]mo|por d[óo]nde) (?:empezar|comenzar|iniciar)\b"
+    r"|\b(?:bagaimana|gimana) (?:cara )?(?:memulai|mulai)\b|\bcara (?:memulai|mulai)\b"
+    r"|\bnas[ıi]l (?:ba[şs]lar[ıi]m|ba[şs]layabilirim|ba[şs]lamal[ıi]y[ıi]m|ba[şs]lan[ıi]r)\b"
+    r"|\bwie (?:fange|beginne|starte) ich\b"
+    r"|怎么开始|如何开始|怎样开始|从哪里开始|كيف (?:أبدأ|ابدأ|نبدأ)|من أين أبدأ"
+    r"|कैसे (?:शुरू|शुरुआत)|कहाँ से शुरू|چطور شروع|چگونه شروع|از کجا شروع|کیسے شروع|کہاں سے شروع"
     # "how do I begin" (a would-be founder, a live replay): English and Roman Urdu
     r"|\bhow (?:to|do i|can i|should i) (?:start|begin|get started|take (?:the )?first step)\b"
     r"|\bwhere (?:do i|to|should i) (?:start|begin)\b|\bwhat (?:should i|do i) do first\b"

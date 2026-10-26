@@ -3464,9 +3464,14 @@ CAPTION_LABELS = re.compile(r"^Customer caption: |\nAttachment: .*$", re.S)
 _SHORT_WORDS = (
     "no|nope|nah|yes|yeah|yep|ok|okay|k|sure|hmm+|hm+|haan|han|ha|ji|jee|g|nahi|nahin|nhi|nai|"
     "theek|thik|hai|acha|accha|bilkul|zaroor|shukriya|thanks|thank|you|please|pls|done|bas|"
-    "right|fine|good|alright|ah+|oh+|hi|hello|hey|hii+|helo"
+    "right|fine|good|alright|ah+|oh+|hi|hello|hey|hii+|helo|"
+    # the same short answers in the other languages pi serves (R-LANG-09)
+    "نعم|لا|تمام|أكيد|ايوه|شكرا|ہاں|جی|نہیں|ٹھیک|شکریہ|हाँ|हां|नहीं|ठीक|जी|धन्यवाद|"
+    "باشه|آره|نه|بله|خوب|مرسی|oui|non|d'accord|merci|s[ií]|vale|gracias|iya|ya|tidak|oke|"
+    "makasih|terima kasih|evet|hay[ıi]r|tamam|te[şs]ekk[üu]rler|olur|ja|nein|danke|gut|"
+    "好|是|不|行|可以|谢谢|嗯|好的"
 )
-AMBIGUOUS_SHORT = re.compile(rf"^\W*(?:(?:{_SHORT_WORDS})\b\W*){{1,3}}$", re.IGNORECASE)
+AMBIGUOUS_SHORT = re.compile(rf"^\W*(?:(?:{_SHORT_WORDS})(?!\w)\W*){{1,3}}$", re.IGNORECASE)
 
 
 def _code_mixed(text: str) -> bool:
@@ -4805,6 +4810,26 @@ def greeting_reply(context: dict[str, Any]) -> str:
     return f"{hello} How can I help you today?"
 
 
+async def in_their_language(
+    manager: Any,
+    scope: WorkspaceScope,
+    policy: Any,
+    conversation: PiConversation,
+    turn: "ServiceTurn",
+    context: dict[str, Any],
+) -> None:
+    """A fixed line (an emergency, the PII reminder, a boundary, the greeting) that went out early
+    exists in English, Roman Urdu and Arabic only. For a person writing another language it is
+    rewritten into theirs, so it never stays in English unannounced. A rewrite that loses or changes
+    a number (an emergency number) is thrown away and the original stays."""
+    other = str(context.get("reply_language_other") or "")
+    if not other or not turn.reply.strip() or in_language(turn.reply, other):
+        return
+    fixed = await in_one_language(manager, scope, policy, conversation, turn.reply, other)
+    if re.findall(r"\d+", fixed) == re.findall(r"\d+", turn.reply):
+        turn.reply = fixed
+
+
 async def compose_service_turn(
     manager: LLMManager,
     scope: WorkspaceScope,
@@ -4813,6 +4838,7 @@ async def compose_service_turn(
     context: dict[str, Any],
 ) -> ServiceTurn:
     if context.get("pi_mode") == "brain" and (safe := brain_safety(context)) is not None:
+        await in_their_language(manager, scope, policy, conversation, safe, context)
         return safe
     if (
         context.get("latest_message_kind") in (None, "text")
@@ -4837,6 +4863,7 @@ async def compose_service_turn(
         turn._greeting_only = True
         if any(c.isdigit() for c in turn.reply):  # the welcome-back count is pi's own figure
             context["fixed_lines"] = [*context.get("fixed_lines", []), turn.reply]
+        await in_their_language(manager, scope, policy, conversation, turn, context)
         return turn
     # Built once: the rewrite below sends the very same system text and context again.
     with latency.stage("prompt.assemble"):
