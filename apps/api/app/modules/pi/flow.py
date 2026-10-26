@@ -19,6 +19,7 @@ class State(StrEnum):
     S4_SORTED_SUMMARY = "S4_SORTED_SUMMARY"
     S5_READINESS = "S5_READINESS"
     S5B_DECLINED = "S5b_DECLINED"
+    S_ADVISE = "S_ADVISE"
     S6_PREPARING = "S6_PREPARING"
     S7_DELIVERED = "S7_DELIVERED"
     S8_REVIEW = "S8_REVIEW"
@@ -43,16 +44,18 @@ NORMAL = frozenset(set(State) - EXCEPTIONS)
 # The listening states: pi notes and sorts, and never suggests, sells or mentions a quote.
 LISTENING = frozenset({S.S0_NEW, S.S1_LISTENING, S.S2_CLARIFYING, S.S3_NOTED, S.S4_SORTED_SUMMARY})
 # Where pi must not raise a solution document or quote on its own (R-SELL-01, 02, 05).
-NO_OFFER = LISTENING | {S.S5B_DECLINED}
+NO_OFFER = LISTENING | {S.S5B_DECLINED}  # S_ADVISE is not here: ideas and the offer are its job
 
 TRANSITIONS: dict[State, frozenset[State]] = {
     S.S0_NEW: frozenset({S.S1_LISTENING}),
-    S.S1_LISTENING: frozenset({S.S2_CLARIFYING, S.S3_NOTED}),
-    S.S2_CLARIFYING: frozenset({S.S1_LISTENING, S.S3_NOTED}),
-    S.S3_NOTED: frozenset({S.S1_LISTENING, S.S4_SORTED_SUMMARY}),
-    S.S4_SORTED_SUMMARY: frozenset({S.S1_LISTENING, S.S5_READINESS}),
+    S.S1_LISTENING: frozenset({S.S2_CLARIFYING, S.S3_NOTED, S.S_ADVISE}),
+    S.S2_CLARIFYING: frozenset({S.S1_LISTENING, S.S3_NOTED, S.S_ADVISE}),
+    S.S3_NOTED: frozenset({S.S1_LISTENING, S.S4_SORTED_SUMMARY, S.S_ADVISE}),
+    S.S4_SORTED_SUMMARY: frozenset({S.S1_LISTENING, S.S5_READINESS, S.S_ADVISE}),
+    # Platform spec Book 2 Part 9: a solution ask from any listening state; ideas, then the offer.
+    S.S_ADVISE: frozenset({S.S1_LISTENING, S.S5_READINESS, S.S6_PREPARING, S.S5B_DECLINED}),
     S.S5_READINESS: frozenset({S.S6_PREPARING, S.S5B_DECLINED, S.S1_LISTENING}),
-    S.S5B_DECLINED: frozenset({S.S1_LISTENING, S.S5_READINESS}),
+    S.S5B_DECLINED: frozenset({S.S1_LISTENING, S.S5_READINESS, S.S_ADVISE}),
     S.S6_PREPARING: frozenset({S.S7_DELIVERED}),
     S.S7_DELIVERED: frozenset({S.S8_REVIEW}),
     S.S8_REVIEW: frozenset({S.S8B_CHANGES_REQUESTED, S.S9_APPROVED, S.S9B_DECLINED_QUOTE}),
@@ -84,6 +87,9 @@ GUIDANCE: dict[State, str] = {
     "getting in the way. Do not repeat what you already know.",
     S.S4_SORTED_SUMMARY: "Show what is noted and sorted, grouped, and say none of it is solved. "
     "Invite corrections. Do not offer a document in this message.",
+    S.S_ADVISE: "They asked for a solution. Answer in your first sentence, give the free ideas "
+    "you were handed (two at most, none repeated), note any new problem, and let the application "
+    "make the offer. No price, no promised result, one question at most.",
     S.S5_READINESS: "The offer was sent: a solution document and a quote, and they can say no. "
     "Answer questions about it. Cost depends on what is built and is written on the quote; "
     "the quote is free and is not a charge; never give a range. Do not repeat the offer.",

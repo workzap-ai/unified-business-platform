@@ -142,6 +142,7 @@ DIRECT_FROM = (
     State.S2_CLARIFYING,
     State.S3_NOTED,
     State.S4_SORTED_SUMMARY,
+    State.S_ADVISE,
     State.S5_READINESS,
 )
 
@@ -436,7 +437,13 @@ def decide(
         not can_approve
         and (OFFER_REQUEST.search(message) or direct)
         and state
-        in (State.S3_NOTED, State.S4_SORTED_SUMMARY, State.S5_READINESS, State.S5B_DECLINED)
+        in (
+            State.S3_NOTED,
+            State.S4_SORTED_SUMMARY,
+            State.S_ADVISE,
+            State.S5_READINESS,
+            State.S5B_DECLINED,
+        )
     ):
         return _member(language, facts, brief)  # "send the quote" from a non-decider (R-OFFER-06)
 
@@ -458,7 +465,14 @@ def decide(
         )
 
     if (
-        state in (State.S1_LISTENING, State.S2_CLARIFYING, State.S3_NOTED, State.S4_SORTED_SUMMARY)
+        state
+        in (
+            State.S1_LISTENING,
+            State.S2_CLARIFYING,
+            State.S3_NOTED,
+            State.S4_SORTED_SUMMARY,
+            State.S_ADVISE,
+        )
         and facts.get("problem_count")
         and _ok(answer, Answer.YES)
         and asks_for_document(message)

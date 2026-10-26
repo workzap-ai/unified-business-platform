@@ -19,7 +19,7 @@ HAPPY_PATH = [
 def test_every_state_has_moves_and_guidance():
     assert set(flow.TRANSITIONS) == set(S)
     assert set(flow.GUIDANCE) == set(S)
-    assert len(S) == 22
+    assert len(S) == 23  # the spec's 22 plus S_ADVISE (platform spec Book 2 Part 9)
 
 
 def test_the_whole_journey_is_legal_one_step_at_a_time():
@@ -209,3 +209,19 @@ def test_path_finds_the_legal_steps_between_states():
     assert chain[-1] == S.S13_IN_BUILD
     for step_from, step_to in zip(chain, chain[1:], strict=False):
         assert flow.can_move(step_from, step_to)
+
+
+def test_s_advise_moves_follow_platform_spec_part_9():
+    advise = S.S_ADVISE
+    for source in (
+        S.S1_LISTENING,
+        S.S2_CLARIFYING,
+        S.S3_NOTED,
+        S.S4_SORTED_SUMMARY,
+        S.S5B_DECLINED,
+    ):
+        assert flow.can_move(source, advise)
+    for target in (S.S1_LISTENING, S.S5_READINESS, S.S6_PREPARING, S.S5B_DECLINED, S.X_PAUSED):
+        assert flow.can_move(advise, target)
+    assert not flow.can_move(advise, S.S7_DELIVERED)
+    assert advise not in flow.NO_OFFER and advise not in flow.LISTENING
