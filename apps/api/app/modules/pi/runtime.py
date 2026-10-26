@@ -1766,6 +1766,30 @@ def _record_usage(
         run.output_tokens = sum(x.output_tokens or 0 for x in gateway.attempts)
 
 
+async def is_duplicate_send(session: AsyncSession, message: PiMessage) -> bool:
+    """The same text was already sent to this conversation in the last 24 hours (platform spec
+    Book 4 5.3 and G29: a reminder repeated the 2:19 message five hours later). Only messages pi
+    starts itself are held back; the reply to something the person just said always goes out, so
+    a fixed line used twice in a day can never leave a message unanswered."""
+    if message.sender_type != "ai" or (message.idempotency_key or "").startswith("reply:"):
+        return False
+    body = " ".join((message.body or "").casefold().split())
+    if not body:
+        return False
+    since = datetime.now(UTC) - timedelta(hours=24)
+    sent = await session.scalars(
+        select(PiMessage.body).where(
+            PiMessage.conversation_id == message.conversation_id,
+            PiMessage.direction == "outbound",
+            PiMessage.sender_type == "ai",
+            PiMessage.id != message.id,
+            PiMessage.status.in_(("sent", "delivered", "read")),
+            PiMessage.created_at >= since,
+        )
+    )
+    return any(" ".join((text or "").casefold().split()) == body for text in sent)
+
+
 async def send_pi_message(ctx: dict[str, Any], message_id: str) -> None:
     async with ctx["sessions"]() as session:
         message = await session.get(PiMessage, UUID(message_id))
@@ -1804,6 +1828,10 @@ async def send_pi_message(ctx: dict[str, Any], message_id: str) -> None:
             message.error_code = (
                 "CONVERSATION_CLOSED" if conversation.status != "open" else "HUMAN_TAKEOVER"
             )
+            await session.commit()
+            return
+        if await is_duplicate_send(session, message):
+            message.status, message.error_code = "skipped", "DUPLICATE_24H"
             await session.commit()
             return
         message.status = "processing"
