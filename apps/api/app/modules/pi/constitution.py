@@ -74,7 +74,7 @@ ASKS_IF_AI = re.compile(
 TEAM_READS = re.compile(
     r"\b(?:team|someone|somebody|a person|a human|staff|people)\b[^.?!\n]{0,40}"
     r"\b(?:reads?|is reading|are reading|will read|reading|sees?|monitors?)\b[^.?!\n]{0,25}"
-    r"\b(?:this|the|your) (?:chat|conversation|messages?)\b",
+    r"\b(?:this|the|your) (?:chat|conversation|messages?)\b" + langs.TEAM_READS,
     re.IGNORECASE,
 )
 
@@ -90,7 +90,8 @@ HUMAN_CLAIM = re.compile(
     r"|\bmy name is (?!pi\b)[a-z]+"
     r"|\b(?:this is|it's|i'm|i am) (?!pi\b|an? ai\b|workzap)[a-z]+ from (?:sales|support|the team|"
     r"marketing|accounts|karachi|lahore|dubai|toronto|islamabad)\b"
-    r"|\bI(?:'m| am) (?:also )?from (?!workzap)[a-z]{3,}\b|\bI (?:live|am based|work) in [a-z]{3,}\b",
+    r"|\bI(?:'m| am) (?:also )?from (?!workzap)[a-z]{3,}\b|\bI (?:live|am based|work) in [a-z]{3,}\b"
+    + langs.HUMAN_CLAIM,
     re.IGNORECASE,
 )
 
@@ -101,7 +102,8 @@ SENSITIVE = re.compile(
     r"|بطاقت[كيه]|رقم البطاقة|بطاقة (?:ائتمان|الائتمان|مصرفية|بنكية|الدفع)|كلمة (?:المرور|السر)|"
     r"رمز (?:التحقق|الأمان|الامان|التفعيل)|الرقم السري|رمز (?:ال)?(?:بن|otp)|آيبان|ايبان|رقم الحساب|"
     r"كلمة المرور|الحساب البنكي|[کك]ارڈ نمبر|[کك]ریڈٹ [کك]ارڈ|ڈیبٹ [کك]ارڈ|پاس ورڈ|اوٹی پی|او ٹی پی|"
-    r"پن کوڈ|اکاؤنٹ نمبر|اکاونٹ نمبر|آئی بی اے این|پاسپورٹ|شناختی [کك]ارڈ|سی این آئی سی",
+    r"پن کوڈ|اکاؤنٹ نمبر|اکاونٹ نمبر|آئی بی اے این|پاسپورٹ|شناختی [کك]ارڈ|سی این آئی سی"
+    + langs.SENSITIVE,
     re.IGNORECASE,
 )
 # National ID and similar numbers (R-PRIV-03): asked for in any wording.
@@ -109,19 +111,21 @@ NATIONAL_ID = re.compile(
     r"\b(?:national id|national identity|id card|identity card|id number|id photo|photo of your id|"
     r"emirates id|iqama|aadhaar|aadhar|ssn|social security|sin|nic|ntn|driving licen[cs]e|"
     r"licen[cs]e number|tax (?:id|number)|shanakhti card|national identification)\b"
-    r"|رقم الهوية|بطاقة الهوية|الهوية الوطنية|هويتك|رقم الإقامة|الرقم الوطني|قومی شناختی|شناختی نمبر",
+    r"|رقم الهوية|بطاقة الهوية|الهوية الوطنية|هويتك|رقم الإقامة|الرقم الوطني|قومی شناختی|شناختی نمبر"
+    + langs.NATIONAL_ID,
     re.IGNORECASE,
 )
 ASKING = re.compile(
     r"\b(?:send|share|give|provide|enter|type|tell me|forward|bhej\w*|batao|bata do|de do|dein)\b"
     r"|\bwhat(?:'s| is) your\b|\b(?:i need|i'll need|may i have|can i (?:have|get)) your\b|دیں|بھیج"
     r"|ارسل|أرسل|ارسلي|أرسلي|شارك|أعطني|اعطني|زودني|أدخل|ادخل|اكتب|أخبرني|اخبرني|أحتاج|احتاج|أريد|اريد"
-    r"|ما هو رقم|ما هي|بتائیں|بتائیے|شیئر|دیجیے|دیجئے|درکار|لکھیں|ٹائپ|مجھے چاہیے",
+    r"|ما هو رقم|ما هي|بتائیں|بتائیے|شیئر|دیجیے|دیجئے|درکار|لکھیں|ٹائپ|مجھے چاہیے" + langs.ASKING,
     re.IGNORECASE,
 )
 REFUSING = re.compile(
     r"\b(?:don't|do not|dont|never|no need|not need|without|mat |na |nahi|nahin)\b|نہیں|ضرورت"
-    r"|لا ترسل|لا تشارك|لا تعطني|لا داعي|لا تحتاج|لا أحتاج|لا احتاج|لا أطلب|لا اطلب|بدون|مت |نہ ",
+    r"|لا ترسل|لا تشارك|لا تعطني|لا داعي|لا تحتاج|لا أحتاج|لا احتاج|لا أطلب|لا اطلب|بدون|مت |نہ "
+    + langs.REFUSING,
     re.IGNORECASE,
 )
 
@@ -143,7 +147,7 @@ PAYMENT_RECEIVED = re.compile(
     r"|وصلت (?:ال)?(?:دفعة|دفع|حوالة|تحويل)|تم (?:ال)?دفع\b|تم تأكيد (?:ال)?(?:دفع|دفعة|تحويل)"
     # Urdu script
     r"|ادائیگی (?:موصول|وصول|مل گئی|مل چکی|ہو گئی|ہو چکی|کنفرم)|(?:پیمنٹ|رقم|پیسے) (?:مل گئی|مل گئے|موصول|وصول|ہو گئی)"
-    r"|ہمیں (?:ادائیگی|پیمنٹ|رقم) مل",
+    r"|ہمیں (?:ادائیگی|پیمنٹ|رقم) مل" + langs.PAYMENT_RECEIVED,
     re.IGNORECASE,
 )
 
@@ -378,7 +382,7 @@ CODE_PROMISE = re.compile(
 ON_ITS_WAY = re.compile(r"\bon its way\b", re.IGNORECASE)
 SIGN_IN_WORDS = re.compile(r"\b(?:codes?|otp|pins?|passwords?)\b", re.IGNORECASE)
 ENGLISH_NOTED = re.compile(r"\bI(?:'ve| have) noted\b|^\s*Thanks\.\s", re.IGNORECASE)
-NOTING = re.compile(r"\bnoted?\b|note kar|likh liya|likh liye", re.IGNORECASE)
+NOTING = re.compile(r"\bnoted?\b|note kar|likh liya|likh liye" + langs.NOTING, re.IGNORECASE)
 ATTRIBUTIVE_NOUNS = re.compile(
     r"\s+(?:count|number|minimum|headcount|guests?|deposit|amount)\b", re.IGNORECASE
 )
@@ -1024,17 +1028,20 @@ TIMELINE_STRONG = re.compile(
     r"(?:din|dino|hafte|haftay|hafta|mahine|mahina|mahinay|ghante|ghanta|saal)(?: mein| me| main| tak| ke andar)\b"
     # Arabic and Urdu script
     r"|خلال (?:يوم|يومين|أسبوع|اسبوع|أسبوعين|اسبوعين|شهر|شهرين|ساعة|ساعتين|\S+ (?:أيام|ايام|أسابيع|اسابيع|أشهر|اشهر|ساعات))"
-    r"|بحلول (?:الغد|غدا|غداً|نهاية)|(?:دو|ایک|تین|چار|پانچ) (?:ہفتے|دن|مہینے|گھنٹے) (?:میں|تک)|کل تک",
+    r"|بحلول (?:الغد|غدا|غداً|نهاية)|(?:دو|ایک|تین|چار|پانچ) (?:ہفتے|دن|مہینے|گھنٹے) (?:میں|تک)|کل تک"
+    + langs.TIMELINE_STRONG,
     re.IGNORECASE,
 )
 TIMELINE_WEAK = re.compile(
     rf"\b(?:tomorrow|tonight|next (?:week|month|{_WEEKDAY})|this (?:week|weekend)|same day|"
-    rf"(?:a|one|two|three|a few|a couple of) (?:day|week|month|fortnight)s?)\b",
+    rf"(?:a|one|two|three|a few|a couple of) (?:day|week|month|fortnight)s?)\b"
+    + langs.TIMELINE_WEAK,
     re.IGNORECASE,
 )
 PROMISE_CUE = re.compile(
     r"\b(?:will|'ll|would|should|can|could|shall|going to|usually|typically|normally|takes?|take|ready|"
-    r"done|delivered?|deliver|finish(?:ed)?|complete[sd]?|launch|live|build|get it|get you|send|have it)\b",
+    r"done|delivered?|deliver|finish(?:ed)?|complete[sd]?|launch|live|build|get it|get you|send|have it)\b"
+    + langs.PROMISE_CUE,
     re.IGNORECASE,
 )
 INVENTED_PROOF = re.compile(
@@ -1139,7 +1146,7 @@ def _honesty(reply: str, context: dict[str, Any], heard: str, add: Any) -> None:
                 continue
             # "Noted, ek hafte tak ki der": recording the delay they described is not a promise
             if NOTING.search(low) and re.search(
-                r"hafte|hafta|din|mahin|ghant|week|day|month", heard
+                r"hafte|hafta|din|mahin|ghant|week|day|month" + langs.HEARD_TIME, heard
             ):
                 continue
             hit = text

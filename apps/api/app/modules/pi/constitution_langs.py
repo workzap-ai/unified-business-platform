@@ -140,6 +140,157 @@ OFFER_TAIL = (
 )
 
 
+# --- The older safety lines (R-PAY-02, R-PRIV-03, R-PAY-05, R-DISC-03, R-DISC-04, R-HONEST-01) --------
+SENSITIVE = (
+    r"|numéro de (?:votre )?carte|carte (?:bancaire|de crédit|de débit)|\bmot de passe\b|\bcode (?:secret|pin|de sécurité|de vérification|otp)\b|\bcryptogramme\b|\bcvv\b|\biban\b|numéro de compte"
+    r"|número de (?:su )?tarjeta|tarjeta (?:de crédito|de débito|bancaria)|\bcontraseña\b|\bclave\b|código (?:de verificación|de seguridad|otp|pin)|\bcódigo secreto\b|número de cuenta"
+    r"|कार्ड\s+(?:नंबर|नम्बर)|क्रेडिट\s+कार्ड|डेबिट\s+कार्ड|पासवर्ड|ओटीपी|ओ\s?टी\s?पी|पिन\s+(?:कोड|नंबर)|सीवीवी|अकाउंट\s+नंबर|खाता\s+(?:संख्या|नंबर)|बैंक\s+(?:खाता|अकाउंट)"
+    r"|شماره\s+کارت|کارت\s+(?:بانکی|اعتباری)|رمز\s+(?:عبور|کارت|دوم|یک["
+    + ZW
+    + r"\s]?بار["
+    + ZW
+    + r"\s]?مصرف|پویا)|گذرواژه|کد\s+(?:تایید|تأیید|امنیتی)|\bپین\b|شماره\s+حساب|شبا"
+)
+NATIONAL_ID = (
+    r"|carte d'identité|numéro de passeport|\bpasseport\b|numéro de sécurité sociale"
+    r"|\b(?:dni|nie|pasaporte|cédula|curp|rfc)\b|número de identificación|documento de identidad"
+    r"|आधार|पैन\s+कार्ड|पासपोर्ट|पहचान\s+पत्र|राष्ट्रीय\s+पहचान"
+    r"|کد\s+ملی|کارت\s+ملی|شماره\s+ملی|شناسنامه|پاسپورت|گذرنامه"
+    r"|جواز\s+السفر|رقم\s+الجواز|الرقم\s+القومي|بطاقة\s+الرقم\s+القومي"
+)
+ASKING = (
+    r"|\b(?:envoyez|envoyer|partagez|donnez|fournissez|indiquez|saisissez|tapez|communiquez)\b|\bj'ai besoin\b|\bquel(?:le)? est votre\b|\bpouvez-vous (?:m'envoyer|me donner|partager|me communiquer)\b"
+    r"|\b(?:envíe(?:me)?|envíen|comparta|déme|proporcione|indique|escriba|dígame)\b|\bnecesito\b|\bme puede (?:enviar|dar)\b|\bcuál es su\b"
+    r"|भेजिए|भेजें|भेज\s+दीजिए|बताइए|बताएं|दीजिए|शेयर\s+कीजिए|साझा\s+कीजिए|लिखिए|मुझे\s+चाहिए|चाहिए"
+    r"|بفرستید|ارسال\s+کنید|به\s+من\s+بدهید|بدهید|بگویید|وارد\s+کنید|بنویسید|نیاز\s+دارم|چیست|ارسال\s+کریں"
+)
+REFUSING = (
+    r"|\bne\s+[^.?!]{0,30}?\bpas\b|\bjamais\b|\bsans\b|\bpas besoin\b"
+    r"|\bno\s+(?:me\s+)?(?:env[ií]e|comparta|d[eé]|escriba|necesito|le pido|pido)\b|\bnunca\b|\bsin\b|\bno hace falta\b|\bno es necesario\b"
+    r"|नहीं|मत\s|बिना|ज़रूरत\s+नहीं|(?<!\w)न\s+(?:भेजें|भेजिए|दें|बताएं|लिखें|शेयर)"
+    r"|نفرستید|نیازی\s+نیست|هرگز|هیچ["
+    + ZW
+    + r"\s]?وقت|بدون|نمی["
+    + ZW
+    + r"\s]?(?:خواهم|خواهیم|فرستید)|نکنید|مبادا"
+)
+PAYMENT_RECEIVED = (
+    r"|\bpaiement\s+(?:bien\s+)?(?:reçu|confirmé|effectué|validé)\b|\b(?:nous\s+)?avons\s+(?:bien\s+)?reçu\s+(?:votre|le)\s+(?:paiement|virement|règlement|argent)\b|\bvirement\s+(?:reçu|confirmé)\b|\bj'ai\s+bien\s+reçu\s+(?:votre|le)\s+(?:paiement|virement)\b"
+    r"|\bpago\s+(?:recibido|confirmado|acreditado)\b|\b(?:hemos|he)\s+recibido\s+(?:su|el)\s+(?:pago|transferencia|dinero)\b|\btransferencia\s+(?:recibida|confirmada)\b|\bya\s+recibimos\s+(?:su|el)\s+(?:pago|transferencia)\b"
+    r"|भुगतान\s+(?:प्राप्त|मिल)|पेमेंट\s+(?:मिल|प्राप्त|हो\s+गया)|पैसे\s+मिल\s+गए|राशि\s+(?:प्राप्त|मिल)|हमें\s+(?:आपका\s+)?(?:भुगतान|पेमेंट)\s+मिल"
+    r"|پرداخت\s+(?:شما\s+)?(?:دریافت|تأیید|تایید)\s+شد|مبلغ\s+(?:به\s+دست|دریافت)|پول\s+(?:رسید|دریافت)|واریز\s+(?:شما\s+)?(?:تأیید|تایید|دریافت)"
+)
+HUMAN_CLAIM = (
+    r"|\bje suis (?:un |une )?(?:humain|humaine|vraie personne|personne réelle|homme|femme|mère|père)\b|\bma (?:famille|femme|mère|sœur)\b|\bmon (?:mari|père|frère|fils)\b|\bje m'appelle (?!pi\b)\w+|\bj'habite à\b|\bje suis de (?!workzap)\w{3,}"
+    r"|\bsoy (?:un |una )?(?:humano|humana|persona real|persona|hombre|mujer|madre|padre)\b|\bmi (?:familia|esposa|esposo|madre|padre|hermano|hermana|hijo|hija)\b|\bme llamo (?!pi\b)\w+|\bvivo en\b|\bsoy de (?!workzap)\w{3,}"
+    r"|मैं\s+(?:एक\s+)?(?:इंसान|इन्सान|असली\s+इंसान|आदमी|औरत|महिला)\s+हूँ|मेरा\s+परिवार|मेरी\s+(?:पत्नी|माँ|बहन|बेटी)|मेरे\s+(?:पति|पिता|भाई|बेटे)|मेरा\s+नाम\s+(?!pi\b)\S+"
+    r"|میں\s+(?:ایک\s+)?(?:انسان|حقیقی\s+انسان|آدمی|عورت)\s+ہوں|میرا\s+خاندان|میری\s+(?:بیوی|ماں|بہن|بیٹی)|میرے\s+(?:شوہر|والد|بھائی|بیٹے)|میرا\s+نام\s+(?!pi\b)\S+"
+    r"|أنا\s+(?:ال)?(?:إنسان|انسان|شخص\s+حقيقي|رجل|امرأة|إنسانة)\b|عائلتي|زوجتي|زوجي|\bأمي\b|\bأبي\b|اسمي\s+(?!pi\b)\S+|أعيش\s+في"
+    r"|من\s+(?:یک\s+)?(?:انسان|آدم|مرد|زن)\s+(?:هستم|واقعی)|خانواده["
+    + ZW
+    + r"\s]?ام|همسرم|مادرم|پدرم|اسم\s+من\s+(?!pi\b)\S+|من\s+در\s+\S+\s+زندگی"
+)
+TEAM_READS = (
+    r"|(?:notre )?(?:équipe|une personne|quelqu'un|un humain)\b[^.?!\n]{0,40}\b(?:lit|lira|lisent|consulte|surveille|voit)\b[^.?!\n]{0,25}\b(?:ce|cette|votre|vos)\s+(?:chat|conversation|messages?|discussion)"
+    r"|(?:el equipo|nuestro equipo|una persona|alguien)\b[^.?!\n]{0,40}\b(?:lee|leerá|leen|revisa|ve|supervisa)\b[^.?!\n]{0,25}\b(?:este|esta|su|sus)\s+(?:chat|conversación|mensajes?)"
+    r"|(?:टीम|कोई\s+व्यक्ति|कोई\s+इंसान)[^.?!।\n]{0,40}(?:पढ़|देख)[^.?!।\n]{0,25}(?:चैट|बातचीत|संदेश|मैसेज)"
+    r"|(?:चैट|बातचीत|संदेश|मैसेज)[^.?!।\n]{0,40}(?:टीम|कोई\s+व्यक्ति)[^.?!।\n]{0,20}(?:पढ़|देख)"
+    r"|(?:ٹیم|کوئی\s+شخص|کوئی\s+انسان)[^.؟!۔\n]{0,40}(?:پڑھ|دیکھ)[^.؟!۔\n]{0,25}(?:چیٹ|بات\s*چیت|پیغام|میسج)"
+    r"|(?:چیٹ|بات\s*چیت|پیغام|میسج)[^.؟!۔\n]{0,40}(?:ٹیم|کوئی\s+شخص)[^.؟!۔\n]{0,20}(?:پڑھ|دیکھ)"
+    r"|(?:الفريق|فريقنا|شخص|أحد)[^.؟!\n]{0,40}(?:يقرأ|سيقرأ|يقرؤون|يراجع|يرى|يشاهد)[^.؟!\n]{0,25}(?:المحادثة|الدردشة|الرسائل|الشات)"
+    r"|(?:تیم|یک\s+نفر|کسی)[^.؟!\n]{0,40}(?:می["
+    + ZW
+    + r"\s]?خواند|خواهد\s+خواند|می["
+    + ZW
+    + r"\s]?بیند|بررسی\s+می["
+    + ZW
+    + r"\s]?کند)[^.؟!\n]{0,25}(?:چت|گفتگو|پیام)"
+)
+# R-HONEST-01: a duration or date pi was not given.
+TIMELINE_STRONG = (
+    r"|\b(?:dans|en|sous|d'ici)\s+(?:environ\s+|à peu près\s+|seulement\s+)?(?:\d+|un|une|deux|trois|quatre|cinq|six|sept|huit|dix|quelques)\s+(?:jours?|semaines?|mois|heures?|ans?)\b|\bd'ici (?:demain|la fin)\b"
+    r"|\b(?:en|dentro de|para)\s+(?:unos\s+|alrededor de\s+|solo\s+)?(?:\d+|un|una|dos|tres|cuatro|cinco|seis|siete|ocho|diez)\s+(?:días?|semanas?|meses|horas?|años?)\b"
+    r"|(?:\d+|एक|दो|तीन|चार|पाँच|पांच|छह|सात|आठ|दस)\s+(?:दिन|हफ्ते|हफ़्ते|सप्ताह|महीने|घंटे|घंटों)\s+(?:में|के\s+अंदर|तक)|कल\s+तक|अगले\s+(?:हफ्ते|सप्ताह|महीने)"
+    r"|\d+\s+(?:ہفتے|دن|مہینے|گھنٹے)\s+(?:میں|تک)|اگلے\s+(?:ہفتے|مہینے)"
+    r"|في\s+غضون\s+\S+|بعد\s+(?:\d+|يوم|يومين|أسبوع|أسبوعين|شهر|شهرين)"
+    r"|(?:ظرف|طی|در)\s+(?:\d+|یک|دو|سه|چهار|پنج|شش|هفت|ده)\s+(?:روز|هفته|ماه|ساعت)|تا\s+فردا"
+)
+TIMELINE_WEAK = (
+    r"|\b(?:demain|ce soir|la semaine prochaine|le mois prochain|cette semaine|le jour même)\b"
+    r"|\b(?:mañana|esta noche|la próxima semana|el próximo mes|esta semana|el mismo día)\b"
+    r"|(?:कल|आज\s+रात|अगले\s+हफ्ते|इस\s+हफ्ते|अगले\s+महीने|उसी\s+दिन)(?!\w)"
+    r"|(?:کل|آج\s+رات|اگلے\s+ہفتے|اس\s+ہفتے|اگلے\s+مہینے)(?!\w)"
+    r"|(?:غداً?|الليلة|الأسبوع\s+(?:القادم|المقبل)|هذا\s+الأسبوع|الشهر\s+(?:القادم|المقبل))(?!\w)"
+    r"|(?:فردا|امشب|هفته\s+(?:بعد|آینده)|این\s+هفته|ماه\s+(?:بعد|آینده))(?!\w)"
+)
+PROMISE_CUE = (
+    r"|\b(?:sera|seront|serai|pourra|pouvons|pouvez|peut|prêt|prête|livré|livrée|terminé|terminée|lancé|livrons|enverrons|aurez|aura|prend|prendra|devrait|normalement|généralement|habituellement)\b"
+    r"|\b(?:será|serán|estará|estarán|podrá|podemos|listo|lista|entregado|terminado|lanzado|entregamos|enviaremos|tendrá|tarda|tardará|debería|normalmente|generalmente|habitualmente)\b"
+    r"|होगा|होगी|होंगे|तैयार|भेज\s+देंगे|मिल\s+जाएगा|मिल\s+जाएगी|लगेंगे|लगेगा|आमतौर\s+पर"
+    r"|ہو\s+جائے\s+گا|ہو\s+جائے\s+گی|ہوگا|ہوگی|تیار|بھیج\s+دیں\s+گے|ملے\s+گا|لگیں\s+گے|عام\s+طور\s+پر"
+    r"|سيكون|ستكون|سيتم|جاهز|سنرسل|سنسلم|يستغرق|\bعادة|\bيجب"
+    r"|خواهد\s+بود|می["
+    + ZW
+    + r"\s]?شود|آماده|ارسال\s+می["
+    + ZW
+    + r"\s]?کنیم|معمولاً|طول\s+می["
+    + ZW
+    + r"\s]?کشد"
+)
+NOTING = r"|\bnoté\b|\banotado\b|\banoté\b|नोट\s+कर\s+लिया|نوٹ\s+کر\s+لیا|تم\s+تسجيل|ثبت\s+شد"
+HEARD_TIME = r"|jours?|semaines?|\bmois\b|d[ií]as?|semanas?|\bmes\b|दिन|हफ्ते|महीने|ہفتے|دن|مہینے|أسبوع|يوم|شهر|روز|هفته|ماه"
+
+# --- slots.py: the generic closer and the one-word answers that skip it ------------------------
+ANYTHING_ELSE = GENERIC_CLOSER + (
+    r"|\bautre chose\b|\bd'autres? (?:problèmes?|questions?)\b|\botros? (?:problemas?|asuntos)\b|\balgo más\b"
+    r"|कोई\s+और\s+(?:समस्या|बात|परेशानी)|کوئی\s+اور\s+(?:مسئلہ|بات)|هل\s+من\s+مشكلة\s+أخرى|مشكلة\s+أخرى|مشکل\s+دیگری"
+)
+SKIP_ACK = (
+    r"^\W*(?:(?:d'accord|ok|oui|bon|merci|bien|hum+|hmm+|vale|bueno|gracias|sí|si|aja|ठीक(?:\s+है)?|हाँ|हां|जी|अच्छा|ओके|हम्म|धन्यवाद|शुक्रिया"
+    r"|ٹھیک(?:\s+ہے)?|جی|اچھا|ہاں|شکریہ|ہمم|او\s+کے|حسنا|حسناً|طيب|تمام|نعم|شكرا|شكراً|أوكي|اوكي|همم|ماشي"
+    r"|باشه|خب|بله|آره|مرسی|ممنون|اوکی|هوم|حله)(?!\w)\W*){1,3}$"
+)
+
+# --- open_requests.py: a timeline or a person asked for, and what addresses each ----------------
+OPEN_TIMELINE = (
+    r"combien de temps|dans combien de temps|quand (?:sera|aurai|est-ce)|d'ici quand|\bdélai\b|\blivraison\b"
+    r"|cu[aá]nto (?:tiempo|tarda|demora)|cu[aá]ndo (?:estar[aá]|tendr[eé])|\bplazo\b|en cu[aá]nto tiempo"
+    r"|कितने\s+दिन|कितना\s+समय|कब\s+तक|कब\s+मिलेगा|समय\s+सीमा"
+    r"|کتنے\s+دن|کتنا\s+وقت|کب\s+تک|کب\s+ملے\s+گا|کتنی\s+دیر"
+    r"|كم\s+(?:يستغرق|يأخذ|من\s+الوقت|يوم)|متى\s+(?:سيكون|يكون|تنتهون|سأحصل)|\bالمدة\b"
+    r"|چقدر\s+(?:طول|زمان)|چند\s+روز|کی\s+(?:آماده|تحویل)|تا\s+کی\b|\bمدت\b"
+)
+OPEN_HUMAN = (
+    r"parler (?:à|avec) (?:une personne|un humain|quelqu'un|un conseiller|un responsable)|une vraie personne|un vrai humain"
+    r"|hablar con (?:una persona|un humano|alguien|un asesor|un responsable)|una persona real|un humano de verdad"
+    r"|किसी\s+(?:इंसान|इन्सान|व्यक्ति)\s+से\s+बात|असली\s+इंसान|इंसान\s+से\s+बात|मैनेजर\s+से\s+बात"
+    r"|کسی\s+انسان\s+سے\s+بات|حقیقی\s+انسان|انسان\s+سے\s+بات|مینیجر\s+سے\s+بات"
+    r"|(?:أتحدث|اتحدث|أكلم|اكلم|التحدث|كلام)\s+(?:مع|إلى)\s+(?:شخص|إنسان|انسان|موظف|مدير)|شخص\s+حقيقي|إنسان\s+حقيقي"
+    r"|با\s+(?:یک\s+)?(?:انسان|آدم|شخص|کارمند|مدیر)\s+(?:صحبت|حرف)|آدم\s+واقعی|انسان\s+واقعی"
+)
+ADDRESS_TIMELINE = (
+    r"devis|document|plan|estimation|calendrier|équipe|délai|durée|cotización|presupuesto|documento|estimación"
+    r"|cronograma|equipo|plazo|duración|कोट|दस्तावेज़|डॉक्यूमेंट|योजना|अनुमान|टीम|समय|दिन|کوٹ|دستاویز"
+    r"|ڈاکیومنٹ|منصوبہ|اندازہ|ٹیم|وقت|عرض\s+السعر|المستند|الوثيقة|الخطة|التقدير|الفريق|المدة|الوقت"
+    r"|پیشنهاد|قیمت|سند|برنامه|برآورد|تیم|زمان|مدت"
+)
+ADDRESS_HUMAN = (
+    r"équipe|personne|humain|collègue|quelqu'un|responsable|equipo|persona|humano|colega|alguien"
+    r"|टीम|व्यक्ति|इंसान|सहकर्मी|कोई|मैनेजर|ٹیم|شخص|انسان|ساتھی|کوئی|مینیجر|الفريق|إنسان|زميل|أحد|المدير|موظف"
+    r"|تیم|انسان|همکار|کسی|مدیر|کارمند"
+)
+
+# Hindi, Urdu and Persian put the verb last: "the team reads your chat" is team, chat, verb (SOV).
+TEAM_READS += (
+    r"|(?:टीम|कोई\s+व्यक्ति|कोई\s+इंसान)[^.?!।\n]{0,25}(?:चैट|बातचीत|संदेश|मैसेज)[^.?!।\n]{0,25}(?:पढ़|देख)"
+    r"|(?:ٹیم|کوئی\s+شخص|کوئی\s+انسان)[^.؟!۔\n]{0,25}(?:چیٹ|بات\s*چیت|پیغام|میسج)[^.؟!۔\n]{0,25}(?:پڑھ|دیکھ)"
+    r"|(?:تیم|یک\s+نفر|کسی)[^.؟!\n]{0,25}(?:چت|گفتگو|پیام)[^.؟!\n]{0,25}(?:می["
+    + ZW
+    + r"\s]?خواند|خواهد\s+خواند|می["
+    + ZW
+    + r"\s]?بیند)"
+)
+
 # One form for combined letters (Hindi "ढ़" is one character or two): every phrase set is normalised
 # the way `constitution.lint` normalises the reply.
 for _name, _value in list(globals().items()):

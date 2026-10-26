@@ -13,6 +13,7 @@ Only pi's own question text is stored, never the person's words.
 import re
 from typing import Any
 
+from app.modules.pi import constitution_langs as langs
 from app.modules.pi import industry_packs
 
 KEEP = 24  # closed slots kept per conversation
@@ -34,13 +35,14 @@ ANYTHING_ELSE_SLOT = "anything_else"
 ANYTHING_ELSE = re.compile(
     r"\banything else\b|\bwhat else\b|\bis there anything\b|\bany other (?:problem|issue)\b"
     r"|\b(?:aur|or) koi (?:masla|cheez|baat|problem)\b|\bkoi aur (?:masla|cheez|baat|problem)\b"
-    r"|\baur kya (?:masla|cheez)\b|\bmasla ho to\b",
+    r"|\baur kya (?:masla|cheez)\b|\bmasla ho to\b" + langs.ANYTHING_ELSE,
     re.IGNORECASE,
 )
 SKIP_ACK = re.compile(
     r"^\W*(?:(?:ok|okay|k|hmm+|hm+|acha|accha|theek|thik|hai|fine|alright|sure|thanks|thank|you|shukriya|ji|g)\b\W*){1,3}$",
     re.IGNORECASE,
 )
+SKIP_ACK_OTHER = re.compile(langs.SKIP_ACK, re.IGNORECASE)
 
 
 def question_of(reply: str) -> str:
@@ -88,9 +90,10 @@ def advance(
     if last.get("q") and is_answer(said):
         if ANYTHING_ELSE.search(str(last["q"])):
             # only a skip ("ok", "hmm") closes it; anything else they say answers it for real
-            if SKIP_ACK.match(" ".join((said or "").split())) and not any(
-                c.get("slot") == ANYTHING_ELSE_SLOT for c in closed
-            ):
+            if (
+                SKIP_ACK.match(" ".join((said or "").split()))
+                or SKIP_ACK_OTHER.match(" ".join((said or "").split()))
+            ) and not any(c.get("slot") == ANYTHING_ELSE_SLOT for c in closed):
                 closed.append({"slot": ANYTHING_ELSE_SLOT, "q": str(last["q"])})
         else:
             known = any(

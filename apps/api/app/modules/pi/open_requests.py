@@ -15,27 +15,32 @@ which is what the guard is for.
 import re
 from typing import Any
 
+from app.modules.pi import constitution_langs as langs
+
 MAX_OPEN_TURNS = 3  # a request nobody could answer is dropped after this many replies
 TIMELINE = re.compile(
     r"\b(?:kitne\s+din|kitna\s+waqt|kab\s+tak|kab\s+milega|kab\s+tayyar|how\s+long|how\s+many\s+days"
     r"|how\s+soon|when\s+(?:will|can)\s+(?:it|we|you)|by\s+when|delivery\s+date|timeline"
-    r"|turnaround)\b",
+    r"|turnaround)\b" + "|" + langs.OPEN_TIMELINE,
     re.IGNORECASE,
 )
 HUMAN = re.compile(
     r"\b(?:insaan\s+se|kisi\s+insaan|real\s+person|a\s+human|talk\s+to\s+(?:a\s+)?(?:person|human|"
     r"someone)|speak\s+to\s+(?:a\s+)?(?:person|human|someone)|manager\s+se\s+baat|team\s+se\s+baat"
-    r"|connect\s+me\s+(?:to|with))\b",
+    r"|connect\s+me\s+(?:to|with))\b" + "|" + langs.OPEN_HUMAN,
     re.IGNORECASE,
 )
 ADDRESSES: dict[str, re.Pattern[str]] = {
     "timeline": re.compile(
         r"\b(?:quote|solution\s+document|document|plan|estimate|schedule|team|workzap\s+will"
-        r"|samay|waqt|din)\b",
+        r"|samay|waqt|din)\b" + "|" + langs.ADDRESS_TIMELINE,
         re.IGNORECASE,
     ),
     "human": re.compile(
-        r"\b(?:team|person|human|colleague|someone|insaan|banda|manager)\b", re.IGNORECASE
+        r"\b(?:team|person|human|colleague|someone|insaan|banda|manager)\b"
+        + "|"
+        + langs.ADDRESS_HUMAN,
+        re.IGNORECASE,
     ),
 }
 
