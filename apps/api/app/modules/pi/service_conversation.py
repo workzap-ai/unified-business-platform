@@ -2343,9 +2343,21 @@ def brain_offer(turn: "ServiceTurn", context: dict[str, Any]) -> None:
         return
     state = (context.get("flow") or {}).get("state")
     created = [op for op in turn.problem_ops if op.op == "create"]
+    language = str(context.get("reply_language") or "en")
+    if (
+        state == flow.State.S5_READINESS
+        and context.get("solution_ideas")
+        and not solution_ask.already_offers(turn.reply)
+        and solution_ask.offer_line(language) not in turn.reply
+        and not turn.reply.rstrip().endswith(constitution.QUESTION_MARKS)
+    ):
+        # R-VAL-06: ideas never end on nothing. The offer is open and they asked for more ideas, so
+        # the ideas close with the offer line (one question, last); the move stays S5.
+        turn.reply = f"{turn.reply.rstrip()}\n\n{solution_ask.offer_line(language)}"
+        turn.awaiting_customer = True
+        return
     if state not in solution_ask.OFFERABLE or not (context.get("noted_problems") or created):
         return
-    language = str(context.get("reply_language") or "en")
     if not solution_ask.already_offers(turn.reply):
         turn.reply = f"{turn.reply.rstrip()}\n\n{solution_ask.offer_line(language)}"
     turn.awaiting_customer = True
