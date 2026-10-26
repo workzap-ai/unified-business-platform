@@ -1887,6 +1887,11 @@ def brain_summary(turn: "ServiceTurn", context: dict[str, Any]) -> None:
         not context.get("can_approve", True) or (context.get("brief") or {}).get("non_decider")
     ):
         return
+    if why == "document_asked" and decisions.asks_for_document(said) and items:
+        # Platform spec Book 4 5.2 (G28): asking for the document IS the yes. The decision gate
+        # moves the chat to preparing; a summary first would ignore the request (found in a real
+        # replay: "haan document aur quote bana dein" was answered with the sorted summary).
+        return
     if not listening and why not in ("map", "show"):
         return  # after the summary only an explicit ask to see the notes shows them again
     if solution_turn(context):

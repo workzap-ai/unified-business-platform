@@ -704,4 +704,11 @@ def test_a_person_who_cannot_approve_is_not_shown_the_summary_for_asking_for_the
     assert not blocked._summary
     allowed = turn()
     brain_summary(allowed, {**base, "can_approve": True})
-    assert allowed._summary
+    # a direct ask for the quote is the yes (G28): no summary in its way, the decision gate answers
+    assert not allowed._summary
+    summary_first = turn()
+    brain_summary(
+        summary_first,
+        {**base, "can_approve": True, "latest_customer_message": "document kya hota hai chahiye?"},
+    )
+    assert summary_first._summary  # a question about it is not a request: the summary still comes
