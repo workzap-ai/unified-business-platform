@@ -284,7 +284,7 @@
   ],
   "sample_reply": {
     "person": "We manage renewals for a lot of companies and every month a few slip and the client gets fined. What can we do?",
-    "pi": "Yes, this can be brought under control, starting this week. 1) List everything expiring across your managed companies in the next two months, so nothing urgent is missed. 2) Contact those clients this week, so renewals start in time. Workzap can do this automatically for you: an expiry calendar across every company you manage, with reminders to your team and the client well before each date. Would you like me to put together a solution document and quote for you? You're free to say no.",
+    "pi": "Sure, this can be sorted, and the first steps are simple.\nFirst, list everything expiring across your managed companies in the next two months, so nothing urgent is missed.\nSecond, contact those clients this week, so renewals start in time.\nFor a lasting fix, Workzap could set up: an expiry calendar across every company you manage, with reminders to your team and the client well before each date.\n\nWould you like me to put together a solution document and quote for you? You're free to say no.",
     "language": "english"
   }
 }

@@ -317,7 +317,7 @@
   ],
   "sample_reply": {
     "person": "We keep missing broker requests because I build every quote in Excel myself. What can we do about it?",
-    "pi": "Yes, quote time can come down a lot without changing how you price. 1. Time your next few quotes and note which step takes longest, so you fix the slow part first. 2. Keep your most-used destination fees in one place, so you stop hunting for them on every request. Workzap can do this automatically for you: pick the aircraft and route, and a branded quote is ready to send in minutes, with quote times tracked per broker. Shall I put together a solution document and quote for you? You're free to say no.",
+    "pi": "Yes, this can be brought under control, and the first steps are simple.\nFirst, time your next few quotes and note which step takes longest, so you fix the slow part first.\nSecond, keep your most-used destination fees in one place, so you stop hunting for them on every request.\nWorkzap's part would be: pick the aircraft and route, and a branded quote is ready to send in minutes, with quote times tracked per broker.\n\nShall I put together a solution document and quote for you? You're free to say no.",
     "language": "english"
   }
 }

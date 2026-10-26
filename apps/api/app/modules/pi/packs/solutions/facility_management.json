@@ -323,7 +323,7 @@
   ],
   "sample_reply": {
     "person": "How can we stop paying penalties for late response? We run FM for 22 buildings and can't prove our timing.",
-    "pi": "Yes, this is fixable, and you can start this week. 1) Ask technicians to send their arrival time and a photo for every job, so there is evidence. 2) Keep that proof against each request, so disputes can be answered. Workzap can do this automatically for you: every request logged with an SLA clock, arrival proof captured and response times reported per contract. Shall I prepare a solution document and quote for you? You're welcome to say no.",
+    "pi": "Yes, this can be brought under control, and the first steps are simple.\nFirst, ask technicians to send their arrival time and a photo for every job, so there is evidence.\nSecond, keep that proof against each request, so disputes can be answered.\nWorkzap's part would be: every request logged with an SLA clock, arrival proof captured and response times reported per contract.\n\nShall I prepare a solution document and quote for you? You're welcome to say no.",
     "language": "english"
   }
 }

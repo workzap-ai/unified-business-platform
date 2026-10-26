@@ -320,7 +320,7 @@
   ],
   "sample_reply": {
     "person": "Can you suggest a fix for the lab problem? Jobs go out in a paper envelope with a WhatsApp message and half the time they aren't back when the customer arrives.",
-    "pi": "Yes, this can be fixed. 1. List every job currently at the lab with its promised date, so you can see how many are already late. 2. Compare the lab's real turnaround with the dates you give customers, because the gap is often in the promise. Workzap can do this automatically for you: every job tracked from sent to collected, late ones flagged each morning, and customers told when their glasses are ready. Would you like me to arrange a solution document and quote for you? You're welcome to say no.",
+    "pi": "Yes, this can be brought under control, and none of it needs special equipment.\nFirst, list every job currently at the lab with its promised date, so you can see how many are already late.\nSecond, compare the lab's real turnaround with the dates you give customers, because the gap is often in the promise.\nA lasting version would be: every job tracked from sent to collected, late ones flagged each morning, and customers told when their glasses are ready.\n\nWould you like me to arrange a solution document and quote for you? You're welcome to say no.",
     "language": "english"
   }
 }

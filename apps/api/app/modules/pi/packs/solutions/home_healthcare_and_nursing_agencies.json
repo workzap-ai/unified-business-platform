@@ -316,7 +316,7 @@
   ],
   "sample_reply": {
     "person": "Sab se bara masla yeh hai ke attendant shift pe nahi pohanchta aur family raat ko 11 baje mujhe call karti hai. Kya karoon?",
-    "pi": "Ji, is ka hal mumkin hai aur shuruat isi hafte ki ja sakti hai. 1) Har attendant shift pe pohanch kar coordinator ko message kare, taake message na aaye to pehli warning wahi ho. 2) Har raat standby staff ki list pehle se bana lein, taake replacement tayyar ho. Workzap yeh sab aap ke liye khud-ba-khud kar sakta hai: location ke saath check-in, check-in miss hone par foran alert, aur replacement ke liye available staff ko message. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "pi": "Bilkul, ye masla hal ho sakta hai, aur pehla qadam aasan hai.\nPehle, har attendant shift pe pohanch kar coordinator ko message kare, taake message na aaye to pehli warning wahi ho.\nDoosra, har raat standby staff ki list pehle se bana lein, taake replacement tayyar ho.\nWorkzap aap ke liye ye rakh sakta hai: location ke saath check-in, check-in miss hone par foran alert, aur replacement ke liye available staff ko message.\n\nKya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
     "language": "roman_urdu"
   }
 }

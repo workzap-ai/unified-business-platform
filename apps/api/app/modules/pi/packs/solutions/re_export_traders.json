@@ -377,7 +377,7 @@
   ],
   "sample_reply": {
     "person": "We keep stock in Jebel Ali and Al Ras, and twice this month we confirmed goods to a buyer that weren't there. What can we do about it?",
-    "pi": "Yes, this can be fixed, and you can start this week. 1. Mark goods as held the moment a buyer confirms, so nobody else can promise them. 2. Make the stock sheet, not a call to the warehouse, the only basis for confirming. Workzap can do this automatically for you: one register across both warehouses with live availability, holding promised goods until they're loaded. Shall I have a solution document and quote prepared for you? You're welcome to say no.",
+    "pi": "Sure, you can start on this now, and the first steps are simple.\nFirst, mark goods as held the moment a buyer confirms, so nobody else can promise them.\nSecond, make the stock sheet, not a call to the warehouse, the only basis for confirming.\nOn top of this, Workzap could arrange: one register across both warehouses with live availability, holding promised goods until they're loaded.\n\nShall I have a solution document and quote prepared for you? You're welcome to say no.",
     "language": "english"
   }
 }

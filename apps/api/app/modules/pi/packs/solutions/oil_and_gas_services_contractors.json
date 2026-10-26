@@ -315,7 +315,7 @@
   ],
   "sample_reply": {
     "person": "Timesheets come in late from site and the client rejects half our invoices. Can you suggest a solution?",
-    "pi": "Yes, this can be improved, and you can start this week on your own. 1) Ask site supervisors to send signed timesheets weekly rather than at month end, so invoicing is not held back. 2) Check hours against the client's approved figures before each invoice goes out, so mismatches are caught in-house. Workzap can do this automatically for you: timesheets captured and signed off at site that flow straight into invoicing, with mismatches flagged before anything reaches the client. Shall I have a solution document and quote prepared for you? You are free to say no.",
+    "pi": "Sure, you can start on this now, and the first steps are simple.\nFirst, ask site supervisors to send signed timesheets weekly rather than at month end, so invoicing is not held back.\nSecond, check hours against the client's approved figures before each invoice goes out, so mismatches are caught in-house.\nOn top of this, Workzap could arrange: timesheets captured and signed off at site that flow straight into invoicing, with mismatches flagged before anything reaches the client.\n\nShall I have a solution document and quote prepared for you? You are free to say no.",
     "language": "english"
   }
 }

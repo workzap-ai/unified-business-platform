@@ -759,7 +759,7 @@ SUMMARY_TEXT = {
     ),
     "roman_ur": (
         "Ab tak jo maine note aur sort kiya hai, ye hai. Inme se abhi kuch bhi hal nahi hua.",
-        "…aur {n} aur hain. Poori list bhej sakta hoon.",
+        "…aur {n} aur hain. Poori list bhej di ja sakti hai.",
         "Kuch ghalat hai ya reh gaya hai?",
     ),
     "ur": (

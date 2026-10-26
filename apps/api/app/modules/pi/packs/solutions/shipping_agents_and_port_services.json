@@ -344,7 +344,7 @@
   ],
   "sample_reply": {
     "person": "We're agents for two lines in Jebel Ali and detention disputes are killing us. Customers swear they returned empties earlier than our records. Any fix?",
-    "pi": "Yes, disputes like these can be settled much faster, and you can start this week. 1. Ask the depot for return dates every day rather than every few days, so your records are current. 2. Keep proof of each return with the container record, so every dispute is checked against something dated. Workzap can do this automatically for you: depot return data flowing in daily, with a free-time countdown each customer sees on WhatsApp. Shall I have a solution document and quote prepared for you? You're welcome to say no.",
+    "pi": "Sure, this can be sorted, and none of it needs special equipment.\nFirst, ask the depot for return dates every day rather than every few days, so your records are current.\nSecond, keep proof of each return with the container record, so every dispute is checked against something dated.\nWorkzap could take it further with: depot return data flowing in daily, with a free-time countdown each customer sees on WhatsApp.\n\nShall I have a solution document and quote prepared for you? You're welcome to say no.",
     "language": "english"
   }
 }

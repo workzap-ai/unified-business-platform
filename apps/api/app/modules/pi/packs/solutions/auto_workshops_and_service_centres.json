@@ -319,7 +319,7 @@
   ],
   "sample_reply": {
     "person": "Estimate aur final bill ka jhagra roz hota hai, koi solution do.",
-    "pi": "Haan, is jhagre ka hal mumkin hai, aur aaj se shuruaat ho sakti hai. 1) Kaam shuru hone se pehle har estimate likh kar dein, taake dono ke paas ek hi raqam ho. 2) Extra kaam ke liye pehle customer ki likhit haan lein, taake bill pe koi hairani na ho. Workzap yeh sab aap ke liye automatically kar sakta hai: digital job card jis se estimate aur extra kaam customer ko WhatsApp pe approval ke liye khud jaye. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "pi": "Ji haan, ye theek ho sakta hai, aur pehla qadam aasan hai.\nPehle, kaam shuru hone se pehle har estimate likh kar dein, taake dono ke paas ek hi raqam ho.\nDoosra, extra kaam ke liye pehle customer ki likhit haan lein, taake bill pe koi hairani na ho.\nWorkzap is ke liye ye bana sakta hai: digital job card jis se estimate aur extra kaam customer ko WhatsApp pe approval ke liye khud jaye.\n\nKya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
     "language": "roman_urdu"
   }
 }

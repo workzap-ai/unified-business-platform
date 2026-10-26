@@ -422,7 +422,76 @@ NOT_UNDERSTOOD = re.compile(
     r"|\bdid(?:n'?t| not) (?:understand|follow|get)\b|\bdon'?t (?:understand|follow)\b",
     re.IGNORECASE,
 )
-STIFF_APOLOGY = re.compile(r"\bmaa?zrat\b|\bmaazerat\b", re.IGNORECASE)
+# "Maazrat" as a short opener is right when they are impatient (Live Audit 2, G27); only the stiff
+# "mujhe maazrat chahiye" form is not.
+STIFF_APOLOGY = re.compile(
+    r"\bmujhe\s+maa?zrat\b|\bmaa?zrat\s+(?:chahta|chahti|chahiye)\b|\bmaazerat\b", re.IGNORECASE
+)
+# Roman Urdu has no gender-free "I", so pi uses neutral forms ("maine note kar liya", "bhej diya
+# jayega"), always the "aap" imperative ("karein", never "karo") and the common spellings (Book 2
+# 10.5 and 10.6, Book 4 5.1: R-GEN-01, R-TONE, R-SPELL).
+GENDERED_URDU = re.compile(
+    r"\b(?:samajh\s+gay[ai]|\w+(?:ta|ti)\s+h[ou]o?n|(?:raha|rahi)\s+h[ou]o?n|dunga|dungi|lunga|"
+    r"(?:kar|bhej|bata|bana|dikha|dekh|rakh|sun|likh|pooch|nikal|laga|ban|aa|ja|ho)(?:unga|ungi))\b",
+    re.IGNORECASE,
+)
+INFORMAL_IMPERATIVE = re.compile(
+    r"\b(?:karo|kro|rakho|bhejo|dekho|likho|batao|banao|uthao|lagao|nikalo|gino|poochho|pucho|"
+    r"puchho|chalao|bulao)\b",
+    re.IGNORECASE,
+)
+WRONG_SPELLING = {
+    "ghoor": "ghaur",
+    "zarur": "zaroor",
+    "zaroorr": "zaroor",
+    "bilkol": "bilkul",
+    "ziada": "zyada",
+    "hisab": "hisaab",
+    "intizar": "intezaar",
+    "dukan": "dukaan",
+}
+QUOTED = re.compile(r"\*[^*]+\*|\"[^\"]+\"|“[^”]+”")
+
+
+def roman_urdu_tone(reply: str, heard: str) -> list[Violation]:
+    """R-GEN-01, R-TONE and R-SPELL for a Roman Urdu reply: neutral first person, "aap" forms and
+    the common spellings. What the person said first, or pi quotes of theirs, is left alone."""
+    # only words the person said first are left alone, never a bold or quoted span of pi's own
+    own = QUOTED.sub(
+        lambda m: " " if m.group(0).strip('*"“” ').lower() in heard else m.group(0), reply
+    )
+    found: list[Violation] = []
+    gendered = next(
+        (m.group(0) for m in GENDERED_URDU.finditer(own) if m.group(0).lower() not in heard), None
+    )
+    if gendered:
+        found.append(
+            Violation(
+                "R-GEN-01",
+                f'pi has no gender: not "{gendered}" ("maine note kar liya", "bhej diya jayega")',
+            )
+        )
+    informal = next(
+        (m.group(0) for m in INFORMAL_IMPERATIVE.finditer(own) if m.group(0).lower() not in heard),
+        None,
+    )
+    if informal:
+        found.append(
+            Violation("R-TONE-04", f'use the "aap" form ("karein", "rakhein"), not "{informal}"')
+        )
+    spelled = next(
+        (
+            (w, right)
+            for w, right in WRONG_SPELLING.items()
+            if re.search(rf"\b{w}\b", own, re.IGNORECASE) and not re.search(rf"\b{w}\b", heard)
+        ),
+        None,
+    )
+    if spelled:
+        found.append(Violation("R-SPELL-01", f'spell it "{spelled[1]}", not "{spelled[0]}"'))
+    return found
+
+
 BULLET = ("•", "- ")
 WORDS_PER_POINT = 4  # a list point needs about this many of their words in the latest message
 
@@ -1379,6 +1448,8 @@ def lint(reply: str, context: dict[str, Any]) -> list[Violation]:
                 "no English sentence inside a Roman Urdu reply",
             )
         )
+    if str(context.get("reply_language") or "") == "roman_ur":
+        found.extend(roman_urdu_tone(reply, heard))
     if CODE_PROMISE.search(reply) or (
         ON_ITS_WAY.search(reply)
         and (SIGN_IN_WORDS.search(reply) or SIGN_IN_WORDS.search(_customer_words(context)))

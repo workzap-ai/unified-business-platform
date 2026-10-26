@@ -312,7 +312,7 @@
   ],
   "sample_reply": {
     "person": "My regulars buy the same premium food every month, but when it's out they just go elsewhere. What can I do?",
-    "pi": "Yes, this can be fixed. 1. List the brands your regulars buy most, because those are the ones you can't run out of. 2. Compare your distributor's delivery time with how fast each sells, which shows when you really need to reorder. Workzap can do this automatically for you: stock alerts based on real sales speed, and reminders to regulars who opt in when their food is due. Would you like me to arrange a solution document and quote for you? You're welcome to say no.",
+    "pi": "Sure, you can start on this now, and the first steps are simple.\nFirst, list the brands your regulars buy most, because those are the ones you can't run out of.\nSecond, compare your distributor's delivery time with how fast each sells, which shows when you really need to reorder.\nOn top of this, Workzap could arrange: stock alerts based on real sales speed, and reminders to regulars who opt in when their food is due.\n\nWould you like me to arrange a solution document and quote for you? You're welcome to say no.",
     "language": "english"
   }
 }

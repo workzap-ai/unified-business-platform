@@ -316,7 +316,7 @@
   ],
   "sample_reply": {
     "person": "Is there a way to stop clients changing their minds mid-project and expecting the same price? We redid one kitchen three times.",
-    "pi": "Yes, this can be brought under control, and you can start this week. 1) Get a written sign-off at the end of each design stage, so any later change is clearly a change. 2) Confirm every change in one written message with its cost before work begins. Workzap can do this automatically for you: stage sign-offs, change orders the client approves on WhatsApp, and each one added straight to the bill. Shall I prepare a solution document and quote for you? You're welcome to say no.",
+    "pi": "Sure, you can start on this now, and the first steps are simple.\nFirst, get a written sign-off at the end of each design stage, so any later change is clearly a change.\nSecond, confirm every change in one written message with its cost before work begins.\nOn top of this, Workzap could arrange: stage sign-offs, change orders the client approves on WhatsApp, and each one added straight to the bill.\n\nShall I prepare a solution document and quote for you? You're welcome to say no.",
     "language": "english"
   }
 }

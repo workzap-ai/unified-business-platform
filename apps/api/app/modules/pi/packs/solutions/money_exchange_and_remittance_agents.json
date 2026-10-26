@@ -317,7 +317,7 @@
   ],
   "sample_reply": {
     "person": "Can you give me a solution for the evening closing? Every day one of the tills is short or excess and we spend an hour finding it.",
-    "pi": "Yes, this can be brought under control, and you can start this week on your own. 1) Give each till to one person per shift and count it with both people present at every handover, so a difference is tied to one shift. 2) Count by denomination at close and write a reason beside every short or excess that evening, so patterns show. Workzap can do this automatically for you: a handover and closing log on phone for every till that flags variances the moment they happen and gives you one evening summary across counters. Shall I have a solution document and quote prepared for you? You are free to say no.",
+    "pi": "Yes, there are practical first steps, and the first steps are simple.\nFirst, give each till to one person per shift and count it with both people present at every handover, so a difference is tied to one shift.\nSecond, count by denomination at close and write a reason beside every short or excess that evening, so patterns show.\nWhat Workzap would add is: a handover and closing log on phone for every till that flags variances the moment they happen and gives you one evening summary across counters.\n\nShall I have a solution document and quote prepared for you? You are free to say no.",
     "language": "english"
   }
 }

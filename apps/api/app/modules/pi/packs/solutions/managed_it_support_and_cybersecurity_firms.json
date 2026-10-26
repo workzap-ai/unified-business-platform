@@ -317,7 +317,7 @@
   ],
   "sample_reply": {
     "person": "Half our AMC clients just WhatsApp my engineers directly and nothing gets logged. How do we fix this?",
-    "pi": "Yes, this is very fixable, and you can start this week. 1) Give every client one support number and tell them about it once, so requests stop landing on personal phones. 2) Ask engineers to forward this week's direct messages to that number, so you see the real workload. Workzap can do this automatically for you: every WhatsApp or email request logged as a ticket with an SLA timer and a reference number sent back. Would you like me to put together a solution document and quote for you? You're free to say no.",
+    "pi": "Yes, this can be fixed, and none of it needs special equipment.\nFirst, give every client one support number and tell them about it once, so requests stop landing on personal phones.\nSecond, ask engineers to forward this week's direct messages to that number, so you see the real workload.\nTo make it stick, Workzap could build: every WhatsApp or email request logged as a ticket with an SLA timer and a reference number sent back.\n\nWould you like me to put together a solution document and quote for you? You're free to say no.",
     "language": "english"
   }
 }

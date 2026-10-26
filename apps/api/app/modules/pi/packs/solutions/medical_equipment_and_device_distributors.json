@@ -315,7 +315,7 @@
   ],
   "sample_reply": {
     "person": "Government hospitals pay us after 6-8 months, and meanwhile we pay our principals in advance. How do we manage this?",
-    "pi": "Yes, this gap can be managed better, and you can start this week. 1) List receivables by customer type with how long each has been open, so the oldest are clear. 2) Give one person ownership of follow-up, so every invoice is chased on time. Workzap can do this automatically for you with a receivables tracker that ages every invoice and sends reminders, and your accountant can advise on the financing side. Shall I have a solution document and quote prepared for you? You're welcome to say no.",
+    "pi": "Sure, this can be sorted, and none of it needs special equipment.\nFirst, list receivables by customer type with how long each has been open, so the oldest are clear.\nSecond, give one person ownership of follow-up, so every invoice is chased on time.\nWorkzap could take it further with: with a receivables tracker that ages every invoice and sends reminders, and your accountant can advise on the financing side.\n\nShall I have a solution document and quote prepared for you? You're welcome to say no.",
     "language": "english"
   }
 }

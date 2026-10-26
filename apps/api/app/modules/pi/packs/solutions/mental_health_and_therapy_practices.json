@@ -286,7 +286,7 @@
   ],
   "sample_reply": {
     "person": "Late cancellations are killing us. Therapists lose hours every week and we never charge the fee. What can we do?",
-    "pi": "Yes, this can be brought under control, and you can start this week. 1) Count late cancellations per therapist for a week, so the lost time is measured. 2) Make sure every client has seen the cancellation policy, so it is clear before it is needed. Workzap can do this automatically for you with online booking, reminders, policy acknowledgement and a log of fees due. Shall I have a solution document and quote prepared for you? You're welcome to say no.",
+    "pi": "Yes, there is a way through this, and none of it needs special equipment.\nFirst, count late cancellations per therapist for a week, so the lost time is measured.\nSecond, make sure every client has seen the cancellation policy, so it is clear before it is needed.\nThe next step up would be: with online booking, reminders, policy acknowledgement and a log of fees due.\n\nShall I have a solution document and quote prepared for you? You're welcome to say no.",
     "language": "english"
   }
 }

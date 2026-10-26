@@ -317,7 +317,7 @@
   ],
   "sample_reply": {
     "person": "Most of our patients buy a 10-session package and vanish after 4 or 5. Any way to fix this?",
-    "pi": "Yes, this is very fixable, and you can start this week. 1) List current packages with sessions left and last visit date, so you can see who has dropped off. 2) Call anyone who has missed two booked sessions, with their permission, so they hear from you before they drift away. Workzap can do this automatically for you with a package tracker that alerts the front desk and sends rebooking prompts, measured by therapist. Shall I have a solution document and quote prepared for you? You're welcome to say no.",
+    "pi": "Yes, this can be brought under control, and none of it needs special equipment.\nFirst, list current packages with sessions left and last visit date, so you can see who has dropped off.\nSecond, call anyone who has missed two booked sessions, with their permission, so they hear from you before they drift away.\nA lasting version would be: with a package tracker that alerts the front desk and sends rebooking prompts, measured by therapist.\n\nShall I have a solution document and quote prepared for you? You're welcome to say no.",
     "language": "english"
   }
 }

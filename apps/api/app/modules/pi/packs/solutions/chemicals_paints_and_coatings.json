@@ -318,7 +318,7 @@
   ],
   "sample_reply": {
     "person": "Can you suggest a solution? Dealers keep sending back full cartons over shade complaints and we never know which batch they're from.",
-    "pi": "Yes, this can be solved, and you can start this week. 1) Write the batch number on every dispatch note, so any returned carton can be traced. 2) Keep a retained sample of each batch to compare complaints against. Workzap can do this automatically for you: a batch register that links each batch to the dealers it went to, so one code shows where else it was sent. Shall I have a solution document and quote prepared for you? You're free to say no.",
+    "pi": "Sure, this is fixable, and the first steps are simple.\nFirst, write the batch number on every dispatch note, so any returned carton can be traced.\nSecond, keep a retained sample of each batch to compare complaints against.\nTo make it last, Workzap could put in place: a batch register that links each batch to the dealers it went to, so one code shows where else it was sent.\n\nShall I have a solution document and quote prepared for you? You're free to say no.",
     "language": "english"
   }
 }

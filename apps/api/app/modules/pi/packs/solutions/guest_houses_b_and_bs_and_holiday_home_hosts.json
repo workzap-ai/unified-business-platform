@@ -318,7 +318,7 @@
   ],
   "sample_reply": {
     "person": "My cleaners never know who's checking out, guests wait in the lobby and leave bad reviews. What can I do about it?",
-    "pi": "Yes, this can be fixed, and you can start this week. 1) Send each cleaner tomorrow's turnovers the evening before, so their morning doesn't depend on your messages. 2) Ask for a photo of every finished unit, so you know it's ready before the guest arrives. Workzap can do this automatically for you: a turnover list that goes to each cleaner every day, updates itself when bookings change, and shows you which units are ready. Shall I prepare a solution document and quote for you? You can say no.",
+    "pi": "Sure, this is fixable, and the first steps are simple.\nFirst, send each cleaner tomorrow's turnovers the evening before, so their morning doesn't depend on your messages.\nSecond, ask for a photo of every finished unit, so you know it's ready before the guest arrives.\nTo make it last, Workzap could put in place: a turnover list that goes to each cleaner every day, updates itself when bookings change, and shows you which units are ready.\n\nShall I prepare a solution document and quote for you? You can say no.",
     "language": "english"
   }
 }

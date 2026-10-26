@@ -318,7 +318,7 @@
   ],
   "sample_reply": {
     "person": "Most of last quarter's events are still unpaid and I've already paid the vendors. What's the fix?",
-    "pi": "Yes, there's a clear way to get on top of this. 1) List every unpaid invoice with how far past terms it is, so you chase the oldest first. 2) Stop starting work before a PO or written approval is in, so new jobs don't add to the pile. Workzap can do this automatically for you: a tracker that ages every invoice, sends reminders on schedule, and holds work orders until the PO is logged. Shall I prepare a solution document and quote for you? You can say no.",
+    "pi": "Yes, there is a way through this, and the first steps are simple.\nFirst, list every unpaid invoice with how far past terms it is, so you chase the oldest first.\nSecond, stop starting work before a PO or written approval is in, so new jobs don't add to the pile.\nHere is what Workzap would build: a tracker that ages every invoice, sends reminders on schedule, and holds work orders until the PO is logged.\n\nShall I prepare a solution document and quote for you? You can say no.",
     "language": "english"
   }
 }

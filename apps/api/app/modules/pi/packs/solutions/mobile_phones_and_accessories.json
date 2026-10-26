@@ -285,7 +285,7 @@
   ],
   "sample_reply": {
     "person": "Repair ke kaam mein gadbad hai, customer aata hai to phone dhoondna parta hai. Solution batao.",
-    "pi": "Ji haan, iska aasaan shuru hai aur aaj se ho sakta hai. 1) Har repair ko number wali slip aur phone pe wahi number ka tag dein, taa ke har phone ki pehchaan ho. 2) Repair wale phones label wali trays mein rakhein, taa ke dhoondna na pare. Workzap ye aap ke liye khud-ba-khud kar sakta hai: repair board jis mein har job ka number, technician, part aur status ho, aur phone ready hone pe customer ko WhatsApp message. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "pi": "Ji haan, ye theek ho sakta hai, aur is ke liye bade kharch ki zaroorat nahi.\nPehle, har repair ko number wali slip aur phone pe wahi number ka tag dein, taa ke har phone ki pehchaan ho.\nDoosra, repair wale phones label wali trays mein rakhein, taa ke dhoondna na pare.\nIs ka pakka hal Workzap ye bana sakta hai: repair board jis mein har job ka number, technician, part aur status ho, aur phone ready hone pe customer ko WhatsApp message.\n\nKya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
     "language": "roman_urdu"
   }
 }

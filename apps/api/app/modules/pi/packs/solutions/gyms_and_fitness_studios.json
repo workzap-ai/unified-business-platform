@@ -315,7 +315,7 @@
   ],
   "sample_reply": {
     "person": "Renewals are a mess, memberships expire and nobody calls anyone. Can you suggest a fix?",
-    "pi": "Yes, this is very fixable. 1) List the memberships ending this month, so you know exactly who to contact. 2) Have the front desk reach each of those members once before their plan ends. Workzap can do this automatically for you: renewal reminders sent on WhatsApp before every expiry, with a daily view of who renewed and who didn't. Shall I prepare a solution document and quote for you? You can say no.",
+    "pi": "Yes, this can be improved, and the first steps are simple.\nFirst, list the memberships ending this month, so you know exactly who to contact.\nSecond, have the front desk reach each of those members once before their plan ends.\nBeyond these, Workzap could provide: renewal reminders sent on WhatsApp before every expiry, with a daily view of who renewed and who didn't.\n\nShall I prepare a solution document and quote for you? You can say no.",
     "language": "english"
   }
 }

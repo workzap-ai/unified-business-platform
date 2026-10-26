@@ -290,7 +290,7 @@
   ],
   "sample_reply": {
     "person": "Koi hal batao. Summer mein pankhay pooray nahi hotay aur September ke baad godown bhara hota hai.",
-    "pi": "Ji, is ka hal mumkin hai, aur pichle season ka data hi kaafi madad karega. 1) Pichle saal ki sales model aur hafte ke hisaab se dekhein, taake pata chale demand asal mein kab shuru hoti hai. 2) Season se pehle har model ka stock target tay karein, taake planning andaze se na ho. Workzap yeh aap ke liye khud-ba-khud chala sakta hai: model-wise season build plan jo roz dikhaye ke plan ke muqable kahan khade hain. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "pi": "Ji haan, shuruaat chhoti si ho sakti hai, aur pehla qadam aasan hai.\nPehle, pichle saal ki sales model aur hafte ke hisaab se dekhein, taake pata chale demand asal mein kab shuru hoti hai.\nDoosra, season se pehle har model ka stock target tay karein, taake planning andaze se na ho.\nIs ko mazboot karne ke liye Workzap ye de sakta hai: model-wise season build plan jo roz dikhaye ke plan ke muqable kahan khade hain.\n\nKya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
     "language": "roman_urdu"
   }
 }

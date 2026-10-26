@@ -289,7 +289,7 @@
   ],
   "sample_reply": {
     "person": "Our coordinators spend the whole day answering the same WhatsApp questions about timings and what to bring. Can this be solved?",
-    "pi": "Yes, this can be solved, and you can start this week. 1) List the logistics questions your coordinators get most often, so the repeats are clear. 2) Have the clinic approve one set of logistics answers, so every coordinator says the same thing. Workzap can do this automatically for you with a WhatsApp flow that answers logistics questions and routes anything clinical to your staff. Shall I have a solution document and quote prepared for you? You're welcome to say no.",
+    "pi": "Yes, there are practical first steps, and the first steps are simple.\nFirst, list the logistics questions your coordinators get most often, so the repeats are clear.\nSecond, have the clinic approve one set of logistics answers, so every coordinator says the same thing.\nWhat Workzap would add is: with a WhatsApp flow that answers logistics questions and routes anything clinical to your staff.\n\nShall I have a solution document and quote prepared for you? You're welcome to say no.",
     "language": "english"
   }
 }

@@ -327,7 +327,7 @@
   ],
   "sample_reply": {
     "person": "Two groups showed up for the same yacht last Friday because sales staff each keep their own sheet and platforms send emails. How do we stop this?",
-    "pi": "Yes, this can be stopped, and the first step is one calendar per boat. 1. Put every upcoming booking onto a single calendar per vessel this week, so any clash shows up now rather than on the dock. 2. Let one person confirm bookings until that's in place, so two staff can't sell the same slot. Workzap can do this automatically for you: one booking calendar per vessel that takes bookings from staff, your website and the platforms, and blocks a second booking for the same slot. Shall I put together a solution document and quote for you? You're free to say no.",
+    "pi": "Sure, this can be sorted, and none of it needs special equipment.\nFirst, put every upcoming booking onto a single calendar per vessel this week, so any clash shows up now rather than on the dock.\nSecond, let one person confirm bookings until that's in place, so two staff can't sell the same slot.\nWorkzap could take it further with: one booking calendar per vessel that takes bookings from staff, your website and the platforms, and blocks a second booking for the same slot.\n\nShall I put together a solution document and quote for you? You're free to say no.",
     "language": "english"
   }
 }

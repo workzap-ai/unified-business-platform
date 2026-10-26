@@ -319,7 +319,7 @@
   ],
   "sample_reply": {
     "person": "Can you suggest a fix for installment students? Finance finds out who hasn't paid only when admit cards are being printed.",
-    "pi": "Yes, this can be caught much earlier, and you can start this week. 1) Pull today's list of installment accounts past due, by account number only, so finance sees the real size of it. 2) Agree a mid-semester checkpoint with the registrar, so overdue accounts come up long before exams. Workzap can do this automatically for you, with reminders on every due date and a weekly early-warning list for finance. Would you like me to arrange a solution document and quote for you? You're welcome to say no.",
+    "pi": "Yes, this can be fixed, and the first steps are simple.\nFirst, pull today's list of installment accounts past due, by account number only, so finance sees the real size of it.\nSecond, agree a mid-semester checkpoint with the registrar, so overdue accounts come up long before exams.\nWorkzap could build this for you: with reminders on every due date and a weekly early-warning list for finance.\n\nWould you like me to arrange a solution document and quote for you? You're welcome to say no.",
     "language": "english"
   }
 }

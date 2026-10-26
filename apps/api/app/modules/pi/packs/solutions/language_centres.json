@@ -316,7 +316,7 @@
   ],
   "sample_reply": {
     "person": "We sell private lessons in 10 and 20 hour packages, but nobody really knows how many hours anyone has left. Any ideas?",
-    "pi": "Yes, this can be brought under control, and you can start this week. 1) Add up the hours used on every active package once, so you have a true starting balance. 2) Have teachers report hours to one place after each lesson, so balances stay current. Workzap can do this automatically for you with an hours bank that updates after every lesson and reminds learners when they're running low. Would you like me to arrange a solution document and quote for you? You're welcome to say no.",
+    "pi": "Yes, this can be brought under control, and the first steps are simple.\nFirst, add up the hours used on every active package once, so you have a true starting balance.\nSecond, have teachers report hours to one place after each lesson, so balances stay current.\nWorkzap's part would be: with an hours bank that updates after every lesson and reminds learners when they're running low.\n\nWould you like me to arrange a solution document and quote for you? You're welcome to say no.",
     "language": "english"
   }
 }

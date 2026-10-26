@@ -348,7 +348,7 @@
   ],
   "sample_reply": {
     "person": "Float roz dopehar tak khatam ho jata hai aur customer doosri dukaan chale jate hain, koi hal batayein.",
-    "pi": "Ji, is ka hal mumkin hai aur shuruaat aap isi hafte khud kar sakte hain. 1) Ek hafte tak note karein float kis waqt khatam hota hai, taake asal khatre ka waqt pata chale. 2) Us waqt se pehle top-up karein, zero pe pohanchne ke baad nahi, taake rush ka waqt cover ho. Workzap yeh kaam aap ke liye khud-ba-khud roz kar sakta hai: counter ke totals se float aur cash ka level dekh kar khatam hone se pehle alert, aur har shaam aap ko poore din ki summary. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "pi": "Haan, is ko behtar kiya ja sakta hai, aur pehla qadam aasan hai.\nPehle, ek hafte tak note karein float kis waqt khatam hota hai, taake asal khatre ka waqt pata chale.\nDoosra, us waqt se pehle top-up karein, zero pe pohanchne ke baad nahi, taake rush ka waqt cover ho.\nWorkzap is tarah ka intezam kar sakta hai: counter ke totals se float aur cash ka level dekh kar khatam hone se pehle alert, aur har shaam aap ko poore din ki summary.\n\nKya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
     "language": "roman_urdu"
   }
 }

@@ -318,7 +318,7 @@
   ],
   "sample_reply": {
     "person": "We look after about 120 villas and clients keep saying the gardener didn't come. How do I fix this?",
-    "pi": "Yes, this can be fixed, and you can start this week. 1) Ask each team to send a before/after photo from every visit, so each visit has proof. 2) Spot-check a few visits against the morning list, so gaps show early. Workzap can do this automatically for you: location check-ins and photos for every visit, and a visit summary sent to each client. Shall I prepare a solution document and quote for you? You're welcome to say no.",
+    "pi": "Yes, this can be fixed, and none of it needs special equipment.\nFirst, ask each team to send a before/after photo from every visit, so each visit has proof.\nSecond, spot-check a few visits against the morning list, so gaps show early.\nTo make it stick, Workzap could build: location check-ins and photos for every visit, and a visit summary sent to each client.\n\nShall I prepare a solution document and quote for you? You're welcome to say no.",
     "language": "english"
   }
 }

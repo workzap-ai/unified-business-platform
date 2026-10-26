@@ -321,7 +321,7 @@
   ],
   "sample_reply": {
     "person": "I run school vans in Lahore and my phone doesn't stop every morning, parents asking where the van is. What can be done?",
-    "pi": "Yes, this can be fixed, and you can start this week. 1) Ask drivers to tell the office when they leave the depot, so you know before parents ask. 2) Let parents on a late route know as soon as you know, so they hear it from you. Workzap can do this automatically for you: a route board with live departure and arrival status and WhatsApp alerts to parents, without storing any child's details. Shall I get a solution document and quote prepared for you? You're free to say no.",
+    "pi": "Sure, this can be sorted, and the first steps are simple.\nFirst, ask drivers to tell the office when they leave the depot, so you know before parents ask.\nSecond, let parents on a late route know as soon as you know, so they hear it from you.\nFor a lasting fix, Workzap could set up: a route board with live departure and arrival status and WhatsApp alerts to parents, without storing any child's details.\n\nShall I get a solution document and quote prepared for you? You're free to say no.",
     "language": "english"
   }
 }

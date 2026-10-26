@@ -344,7 +344,7 @@
   ],
   "sample_reply": {
     "person": "We run a 3PL with around twenty clients and monthly billing takes my accountant most of a week. Can this be fixed?",
-    "pi": "Yes, billing can be made much lighter, and you can start this week. 1. List every sheet that feeds billing, so you can see exactly where the days go. 2. Log a week of extra handling per client, so you can see what currently goes unbilled. Workzap can do this automatically for you: storage, picks, packs and labelling captured as they happen and turned into each client's monthly invoice. Shall I have a solution document and quote prepared for you? You're welcome to say no.",
+    "pi": "Yes, this can be brought under control, and none of it needs special equipment.\nFirst, list every sheet that feeds billing, so you can see exactly where the days go.\nSecond, log a week of extra handling per client, so you can see what currently goes unbilled.\nA lasting version would be: storage, picks, packs and labelling captured as they happen and turned into each client's monthly invoice.\n\nShall I have a solution document and quote prepared for you? You're welcome to say no.",
     "language": "english"
   }
 }

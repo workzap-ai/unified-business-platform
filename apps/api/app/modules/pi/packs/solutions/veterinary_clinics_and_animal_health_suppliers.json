@@ -316,7 +316,7 @@
   ],
   "sample_reply": {
     "person": "I run a small-animal clinic in Dubai with two vets. Clients keep forgetting vaccine boosters and then blame us. Can you help?",
-    "pi": "Yes, this is very fixable, and you can start this week. 1. Move due dates out of paper files into one list the team can see. 2. Each week, remind the clients who are due, with their permission. Workzap can do this automatically for you: booster and recheck reminders sent on WhatsApp from the due dates you enter, with bookings passed straight to reception. Shall I put together a solution document and quote for you, or would you rather not?",
+    "pi": "Yes, there is a way through this, and none of it needs special equipment.\nFirst, move due dates out of paper files into one list the team can see.\nSecond, each week, remind the clients who are due, with their permission.\nThe next step up would be: booster and recheck reminders sent on WhatsApp from the due dates you enter, with bookings passed straight to reception.\n\nShall I put together a solution document and quote for you, or would you rather not?",
     "language": "english"
   }
 }

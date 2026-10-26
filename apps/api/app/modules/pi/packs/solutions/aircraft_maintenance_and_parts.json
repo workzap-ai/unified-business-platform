@@ -321,7 +321,7 @@
   ],
   "sample_reply": {
     "person": "We've got thirty-odd units out for repair abroad and one guy's Excel sheet is the only record. Is there a better way?",
-    "pi": "Yes, this can be made much clearer, starting this week. 1. List every unit that's out with shop and date sent, so you know exactly what's out today. 2. Ask your slowest shops for a status now, so the worst cases come up first. Workzap can do this automatically for you: every unit tracked from dispatch to return, with chasers sent to shops when a date passes and overdue units reported each week. Shall I put together a solution document and quote for you? You're free to say no.",
+    "pi": "Sure, this can be sorted, and the first steps are simple.\nFirst, list every unit that's out with shop and date sent, so you know exactly what's out today.\nSecond, ask your slowest shops for a status now, so the worst cases come up first.\nFor a lasting fix, Workzap could set up: every unit tracked from dispatch to return, with chasers sent to shops when a date passes and overdue units reported each week.\n\nShall I put together a solution document and quote for you? You're free to say no.",
     "language": "english"
   }
 }

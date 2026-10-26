@@ -347,7 +347,7 @@
   ],
   "sample_reply": {
     "person": "We lose bookings because quotes take us till next day. Lines email rates, we calculate, customer has gone. Any solution?",
-    "pi": "Yes, quotes can get much quicker, and you can start this week. 1. Gather current rates for your busiest lanes in one place your team can see, so the common quotes need no fresh emails. 2. Look at which step slowed your last few quotes, so you know where the hours go. Workzap can do this automatically for you: a rate sheet by lane with validity alerts and a quote builder that produces and logs a quote in minutes. Shall I have a solution document and quote prepared for you? You're welcome to say no.",
+    "pi": "Sure, this is fixable, and the first steps are simple.\nFirst, gather current rates for your busiest lanes in one place your team can see, so the common quotes need no fresh emails.\nSecond, look at which step slowed your last few quotes, so you know where the hours go.\nTo make it last, Workzap could put in place: a rate sheet by lane with validity alerts and a quote builder that produces and logs a quote in minutes.\n\nShall I have a solution document and quote prepared for you? You're welcome to say no.",
     "language": "english"
   }
 }

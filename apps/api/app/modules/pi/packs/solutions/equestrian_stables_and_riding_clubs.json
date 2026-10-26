@@ -314,7 +314,7 @@
   ],
   "sample_reply": {
     "person": "We have a riding school in Lahore with 18 horses, mostly kids. Weekend bookings are chaos and some horses end up doing six lessons. What can we do?",
-    "pi": "Yes, both of these can be sorted, starting this weekend. 1. Bring all bookings into one shared schedule on one number, so the same slot can't be given twice. 2. Agree a daily limit per horse with your instructor and vet, and keep a count against it. Workzap can do this automatically for you: lesson booking that assigns instructor and horse, blocks double bookings and stops any horse going past its limit. Shall I put together a solution document and quote for you, or would you rather not?",
+    "pi": "Yes, this can be brought under control, and the first steps are simple.\nFirst, bring all bookings into one shared schedule on one number, so the same slot can't be given twice.\nSecond, agree a daily limit per horse with your instructor and vet, and keep a count against it.\nWorkzap's part would be: lesson booking that assigns instructor and horse, blocks double bookings and stops any horse going past its limit.\n\nShall I put together a solution document and quote for you, or would you rather not?",
     "language": "english"
   }
 }

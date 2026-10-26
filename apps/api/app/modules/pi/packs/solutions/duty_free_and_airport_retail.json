@@ -319,7 +319,7 @@
   ],
   "sample_reply": {
     "person": "We're a departures concession and our best sellers are gone an hour into the morning wave. Stock can only come through overnight. What can we do?",
-    "pi": "Yes, this can be improved. 1. Note what sells out first in the morning wave for a week, so the night team knows exactly what to bring. 2. Look at hourly sales from your POS once, because the gaps follow the flight banks. Workzap can do this automatically for you: pick lists for each overnight window built from sales per flight wave, every night, for every outlet. Would you like me to arrange a solution document and quote for you? You're welcome to say no.",
+    "pi": "Yes, there is a way through this, and the first steps are simple.\nFirst, note what sells out first in the morning wave for a week, so the night team knows exactly what to bring.\nSecond, look at hourly sales from your POS once, because the gaps follow the flight banks.\nHere is what Workzap would build: pick lists for each overnight window built from sales per flight wave, every night, for every outlet.\n\nWould you like me to arrange a solution document and quote for you? You're welcome to say no.",
     "language": "english"
   }
 }

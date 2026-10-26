@@ -315,7 +315,7 @@
   ],
   "sample_reply": {
     "person": "We're movers in Dubai. We quote from photos, then on the day there's way more stuff and the customer won't pay extra. How do we fix this?",
-    "pi": "Yes, this can be fixed, and you can start this week. 1. Compare your last few quotes against the real volume moved, so you see how far off the photo method runs. 2. Get any added items approved by the customer before loading, so the extra is agreed, not argued. Workzap can do this automatically for you: a room-by-room survey calculator for quotes and a move-day change form the customer approves on WhatsApp. Shall I have a solution document and quote prepared for you? You're welcome to say no.",
+    "pi": "Yes, there are practical first steps, and the first steps are simple.\nFirst, compare your last few quotes against the real volume moved, so you see how far off the photo method runs.\nSecond, get any added items approved by the customer before loading, so the extra is agreed, not argued.\nWhat Workzap would add is: a room-by-room survey calculator for quotes and a move-day change form the customer approves on WhatsApp.\n\nShall I have a solution document and quote prepared for you? You're welcome to say no.",
     "language": "english"
   }
 }

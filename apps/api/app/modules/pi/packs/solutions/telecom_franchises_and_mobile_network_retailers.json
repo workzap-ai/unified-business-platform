@@ -347,7 +347,7 @@
   ],
   "sample_reply": {
     "person": "We keep realising on the 28th that we are behind on gross adds. Is there a fix for this?",
-    "pi": "Yes, there is, and you can start this week on your own. 1) Check progress against each target type every Monday, so you know by mid-month whether you are behind. 2) Turn the monthly target into a weekly number per outlet, so each manager can see their own gap. Workzap can do this automatically for you: a tracker fed by daily staff entries that shows progress against days left for every outlet and BA and alerts you mid-month. Shall I have a solution document and quote prepared for you? You are free to say no.",
+    "pi": "Yes, this can be fixed, and none of it needs special equipment.\nFirst, check progress against each target type every Monday, so you know by mid-month whether you are behind.\nSecond, turn the monthly target into a weekly number per outlet, so each manager can see their own gap.\nTo make it stick, Workzap could build: a tracker fed by daily staff entries that shows progress against days left for every outlet and BA and alerts you mid-month.\n\nShall I have a solution document and quote prepared for you? You are free to say no.",
     "language": "english"
   }
 }

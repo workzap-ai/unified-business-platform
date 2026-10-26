@@ -1262,7 +1262,7 @@ ADVICE_WHO = {
 ADVICE_TEXT = {
     "ar": "لا أستطيع تقديم نصيحة {kind}، و{who} هو الشخص المناسب لذلك. يمكنني تسجيلها كمشكلة في عملك. هل أفعل ذلك؟",
     "en": "I can't give {kind} advice, and {who} is the right person for that. I can note it as a problem in your business. Want me to?",
-    "roman_ur": "Main {kind} mashwara nahi de sakta, is ke liye {who} sahi insaan hai. Main ise aap ke business ki ek problem ke taur par note kar sakta hoon. Kya karun?",
+    "roman_ur": "Mere liye {kind} mashwara dena mumkin nahi, is ke liye {who} sahi insaan hai. Ise aap ke business ki ek problem ke taur par note kiya ja sakta hai. Kya note kar loon?",
 }
 ADVICE_WORD = {
     "ar": {
@@ -1342,7 +1342,7 @@ GREETING_TEXT = {
 # R-FUP-02: after "stop" pi confirms once and then writes no more.
 OPT_OUT_TEXT = {
     "en": "Understood. I won't message you again. If you ever want to talk, just write here.",
-    "roman_ur": "Theek hai. Main dobara paigham nahi bhejunga. Kabhi baat karni ho to yahin likh dein.",
+    "roman_ur": "Theek hai. Dobara paigham nahi bheja jayega. Kabhi baat karni ho to yahin likh dein.",
     "ar": "حسنًا. لن أرسل لك رسائل بعد الآن. إن أردت التحدث يومًا فاكتب هنا.",
 }
 
@@ -1465,8 +1465,8 @@ IDENTITY_TEXT = {
         Identity.SCAM: "Jayez sawal hai. Main Workzap ka AI hoon. Main yahan kabhi payment, card number ya password nahi maangta, aur aap par kuch kharidna zaroori nahi. Mazeed workzap.ai/pi/trust par.",
         Identity.META: "Nahi. Mujhe Workzap ne banaya hai aur main WhatsApp ke business platform se chat karta hoon. Mujhe WhatsApp ya Meta ne nahi banaya, na chalata hai, na endorse karta hai.",
         Identity.MODEL: "Main pi hoon, Workzap ka AI. Main aap ke business ke masail note aur sort karne ke liye hoon.",
-        Identity.RULES: "Main bata sakta hoon main kaise kaam karta hoon: masail note aur sort karta hoon, yahan kabhi payment nahi leta, aur quote par faisla aap ka hota hai. Poori tafseel workzap.ai/pi/how-it-works par hai.",
-        Identity.COMPANY: "Ye sawal main Workzap ki team tak pahuncha sakta hoon.",
+        Identity.RULES: "Kaam ka tareeqa ye hai: masail note aur sort kiye jate hain, yahan kabhi payment nahi li jati, aur quote par faisla aap ka hota hai. Poori tafseel workzap.ai/pi/how-it-works par hai.",
+        Identity.COMPANY: "Ye sawal Workzap ki team tak pahunchaya ja sakta hai.",
         Identity.OFFER: "Workzap masail dhoondne aur hal karne ka software banata hai. Main kuch bechne nahi aaya: main aap ke business ki rukawat note karta hoon, aur aap chahein to Workzap phir solution document bana sakta hai. Abhi sab se bada masla kya hai?",
     },
     "ar": {
@@ -1996,11 +1996,11 @@ BOUNDARY_TEXT = {
         Boundary.QUOTE_ONLY: "The quote is for building what's in the document, so they come together. I can only ask Workzap for both.",
     },
     "roman_ur": {
-        Boundary.DELETION: "Aap ka data delete karne ki darkhwast maine Workzap ki team ko bhej di hai. Wo yahan tasdeeq kar dein ge, aur tab tak main kuch naya note nahi karunga.",
+        Boundary.DELETION: "Aap ka data delete karne ki darkhwast maine Workzap ki team ko bhej di hai. Wo yahan tasdeeq kar dein ge, aur tab tak kuch naya note nahi kiya jayega.",
         Boundary.POLITICS: "Main siyasat aur rai se door rehta hoon. Main aap ke business mein rukawat note karne ke liye hoon. Abhi sab se bada masla kya hai?",
         Boundary.COMPETITOR: "Main Workzap ka doosri companies se muqabla nahi karta. Main aap ke business mein rukawat note karne ke liye hoon. Abhi sab se bada masla kya hai?",
-        Boundary.OUTCOME: "Main nateejon ka wada nahi kar sakta. Main masla note kar sakta hoon aur Workzap bata sakta hai wo kya karega. Masla kya hai?",
-        Boundary.FRAUD: "Main jali invoice ya aamdani chupane mein madad nahi kar sakta. Agar asli invoices ka hisaab rakhna mushkil hai to ise masla note kar sakta hoon. Kya karun?",
+        Boundary.OUTCOME: "Nateejon ka wada nahi kiya ja sakta. Masla note kiya ja sakta hai, aur Workzap bata sakta hai wo kya karega. Masla kya hai?",
+        Boundary.FRAUD: "Jali invoice ya aamdani chupane mein madad nahi ki ja sakti. Agar asli invoices ka hisaab rakhna mushkil hai to ise masla note kiya ja sakta hai. Kya note kar loon?",
         Boundary.THIRD_PARTY: "Main kisi aur ki chat share nahi kar sakta. Main sirf wo rakhta hoon jo aap is chat mein batate hain. Business ke baare mein kya note karun?",
         Boundary.BANK_CHANGE: "Main is chat mein bank details ki tasdeeq nahi kar sakta. Payment ki tafseel sirf aap ke approved quote par hoti hai, aur maine aap ka paigham Workzap ki team ko check ke liye bhej diya hai.",
         Boundary.OFF_TOPIC: "Ye mere dayre se bahar hai. Main aap ke business mein rukawat note karne ke liye hoon. Abhi sab se bada masla kya hai?",
@@ -2013,7 +2013,7 @@ BOUNDARY_TEXT = {
         Boundary.DISCOUNT: "Quote badalna mere ikhtiyar mein nahi; ye darkhwast Workzap tak pahuncha di jayegi. Wo yahin jawab dein ge.",
         Boundary.PAY_FOR_ME: "Payments mere bas mein nahi. Agar suppliers ko payment karna aap ke business ka masla hai to ise note kiya ja sakta hai.",
         Boundary.PRODUCT_REC: "Main products recommend nahi karta. Aap ke mojooda setup mein kya masla hai, ye note kiya ja sakta hai taake Workzap dekh sake.",
-        Boundary.DECIDE_FOR_ME: "Ye aap ka faisla hai: main aap ke liye faisla nahi karta. Aap ne jo bataya wo sort karke dikha sakta hoon taake dekhna aasan ho.",
+        Boundary.DECIDE_FOR_ME: "Ye aap ka faisla hai: aap ke liye faisla nahi kiya jata. Aap ne jo bataya wo sort karke dikhaya ja sakta hai taake dekhna aasan ho.",
         Boundary.RIVAL: "Main doosre businesses par raaye nahi deta. Aap ki taraf kya masla chal raha hai?",
         Boundary.WRONG_NUMBER: "Lagta hai aap ne galat number mila diya hai. Main pi hoon, Workzap ka AI, business ke masail ke liye.",
         Boundary.MEMORY_ASK: "Main aap ke batae hue masail, aap ki di hui tafseel, aur documents aur quotes rakhta hoon. Aap inhein delete karne ko keh sakte hain.",
@@ -2378,7 +2378,7 @@ ABUSE_TEXT = {
         "warn": "Main aap ke business mein madad karne ko tayyar hoon. Agar ye jari raha to mujhe ye chat Workzap ki team ko dena paray gi.",
         "refuse": "Main is par aage nahi chal sakta. Main aap ke business ke masail ke liye hoon.",
         "spam": "Main aap ke business ke masail ke liye hoon.",
-        "pass": "Main ye chat Workzap ki team ko de raha hoon.",
+        "pass": "Ye chat Workzap ki team ko di ja rahi hai.",
     },
 }
 

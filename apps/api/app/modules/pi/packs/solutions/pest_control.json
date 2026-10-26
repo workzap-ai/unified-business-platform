@@ -318,7 +318,7 @@
   ],
   "sample_reply": {
     "person": "Is there a better way to handle service reports? Restaurants need them for inspections and ours are handwritten and half go missing.",
-    "pi": "Yes, this can be sorted, and you can start this week. 1) Ask technicians to photograph each report and send it to one office number, so nothing stays in a van. 2) File those by client and month, so any report can be found in minutes. Workzap can do this automatically for you: digital reports made on the technician's phone, sent to the client instantly and stored as an audit pack. Shall I prepare a solution document and quote for you? You're welcome to say no.",
+    "pi": "Yes, there is a way through this, and none of it needs special equipment.\nFirst, ask technicians to photograph each report and send it to one office number, so nothing stays in a van.\nSecond, file those by client and month, so any report can be found in minutes.\nThe next step up would be: digital reports made on the technician's phone, sent to the client instantly and stored as an audit pack.\n\nShall I prepare a solution document and quote for you? You're welcome to say no.",
     "language": "english"
   }
 }

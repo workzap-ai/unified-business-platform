@@ -321,7 +321,7 @@
   ],
   "sample_reply": {
     "person": "Our bakery and dairy wastage is out of control. We throw away so much every night. Can you suggest a solution?",
-    "pi": "Yes, this is very fixable, and you can start this week. 1) Have the closing supervisor write down leftover bread and dairy by item for a week, so the order follows what actually sold. 2) Compare weekday and weekend leftovers, because one fixed quantity rarely fits both. Workzap can do this automatically for you: a phone wastage log and a suggested daily order for bread, dairy and produce worked out from recent sales, with near-expiry alerts. Shall I have a solution document and quote prepared for you? You're free to say no.",
+    "pi": "Yes, there is a way through this, and none of it needs special equipment.\nFirst, have the closing supervisor write down leftover bread and dairy by item for a week, so the order follows what actually sold.\nSecond, compare weekday and weekend leftovers, because one fixed quantity rarely fits both.\nThe next step up would be: a phone wastage log and a suggested daily order for bread, dairy and produce worked out from recent sales, with near-expiry alerts.\n\nShall I have a solution document and quote prepared for you? You're free to say no.",
     "language": "english"
   }
 }

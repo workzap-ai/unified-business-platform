@@ -325,7 +325,7 @@
   ],
   "sample_reply": {
     "person": "We get lots of Alibaba inquiries but very few orders, and samples take too long. What would you suggest?",
-    "pi": "Yes, there is a lot that can be done here, starting this week. 1) List every open inquiry with the date it arrived and give one person responsibility for first replies, so buyers are not left waiting. 2) Note what held up your last lost sample, so that step gets attention first. Workzap can do this automatically for you: one inbox for Alibaba, email and WhatsApp leads with reply timers, and a sample tracker that flags anything running late. Shall I prepare a solution document and quote for you? You're welcome to say no.",
+    "pi": "Yes, this can be fixed, and none of it needs special equipment.\nFirst, list every open inquiry with the date it arrived and give one person responsibility for first replies, so buyers are not left waiting.\nSecond, note what held up your last lost sample, so that step gets attention first.\nTo make it stick, Workzap could build: one inbox for Alibaba, email and WhatsApp leads with reply timers, and a sample tracker that flags anything running late.\n\nShall I prepare a solution document and quote for you? You're welcome to say no.",
     "language": "english"
   }
 }

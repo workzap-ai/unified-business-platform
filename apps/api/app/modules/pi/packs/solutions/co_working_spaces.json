@@ -316,7 +316,7 @@
   ],
   "sample_reply": {
     "person": "Our occupancy has been stuck for months. Enquiries come in but replies are slow. What would you do?",
-    "pi": "Yes, there's a clear place to start, this week. 1) Reply today to every waiting enquiry with a tour offer, so warm leads aren't lost. 2) Follow up once with everyone who toured this month, and ask those who didn't sign one question about why. Workzap can do this automatically for you: one enquiry inbox with tour booking, follow-up reminders and reasons recorded for every prospect. Would you like me to put together a solution document and quote for you? You're free to say no.",
+    "pi": "Yes, this can be brought under control, and the first steps are simple.\nFirst, reply today to every waiting enquiry with a tour offer, so warm leads aren't lost.\nSecond, follow up once with everyone who toured this month, and ask those who didn't sign one question about why.\nWorkzap's part would be: one enquiry inbox with tour booking, follow-up reminders and reasons recorded for every prospect.\n\nWould you like me to put together a solution document and quote for you? You're free to say no.",
     "language": "english"
   }
 }

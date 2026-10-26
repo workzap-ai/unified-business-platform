@@ -288,7 +288,7 @@
   ],
   "sample_reply": {
     "person": "Hamari 40 collection points hain, parchi pe likha jata hai aur plant tak aate aate sab gadbad ho jata hai. Fat pe farmers se jhagra hota hai. Solution chahiye.",
-    "pi": "Ji haan, is ka hal mumkin hai, aur shuruaat isi hafte ho sakti hai. 1) Ek din ki har collection point ki parchiyan plant ki receiving se milayein, taake pata chale gadbad kahan se shuru hoti hai. 2) Har farmer ko code ke saath litres, fat aur raqam ki statement dein, taake jhagra ek hi record se shuru ho. Workzap ye aap ke liye automatically kar sakta hai: collection point par phone se intake, fat aur SNF reading, waqt aur parchi ki photo, sab plant tak foran, aur har supplier code ki payment statement khud tayyar. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "pi": "Haan, is ko behtar kiya ja sakta hai, aur pehla qadam aasan hai.\nPehle, ek din ki har collection point ki parchiyan plant ki receiving se milayein, taake pata chale gadbad kahan se shuru hoti hai.\nDoosra, har farmer ko code ke saath litres, fat aur raqam ki statement dein, taake jhagra ek hi record se shuru ho.\nWorkzap is tarah ka intezam kar sakta hai: collection point par phone se intake, fat aur SNF reading, waqt aur parchi ki photo, sab plant tak foran, aur har supplier code ki payment statement khud tayyar.\n\nKya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
     "language": "roman_urdu"
   }
 }

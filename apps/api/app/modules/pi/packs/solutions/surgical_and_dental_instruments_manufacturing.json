@@ -321,7 +321,7 @@
   ],
   "sample_reply": {
     "person": "Our lots go through forging, filing and polishing outside and I never know where they are. Can you help?",
-    "pi": "Yes, this can definitely be organised, and you can start this week. 1) List every lot currently out with vendors, with its stage and the date it left, so you have one clear picture today. 2) Mark which lots belong to the nearest shipment, so those are chased first. Workzap can do this automatically for you: a lot tracker that follows each lot through every vendor stage and flags overdue or short returns each day. Shall I prepare a solution document and quote for you? You're welcome to say no.",
+    "pi": "Sure, this can be sorted, and none of it needs special equipment.\nFirst, list every lot currently out with vendors, with its stage and the date it left, so you have one clear picture today.\nSecond, mark which lots belong to the nearest shipment, so those are chased first.\nWorkzap could take it further with: a lot tracker that follows each lot through every vendor stage and flags overdue or short returns each day.\n\nShall I prepare a solution document and quote for you? You're welcome to say no.",
     "language": "english"
   }
 }

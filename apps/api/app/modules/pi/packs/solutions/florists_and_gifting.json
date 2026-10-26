@@ -321,7 +321,7 @@
   ],
   "sample_reply": {
     "person": "Before Eid our corporate clients change the design three times and then want hundreds of boxes in a few days. Any solution?",
-    "pi": "Yes, this can be brought under control. 1. Ask each client for one person who approves, because many voices slow everything down. 2. Work out how many boxes your team really makes in a day, so deadlines you agree are honest. Workzap can do this automatically for you: a portal where clients approve designs and quantities with full history, and a production board showing load against your capacity. Would you like me to arrange a solution document and quote for you? You're welcome to say no.",
+    "pi": "Yes, this can be brought under control, and the first steps are simple.\nFirst, ask each client for one person who approves, because many voices slow everything down.\nSecond, work out how many boxes your team really makes in a day, so deadlines you agree are honest.\nWorkzap's part would be: a page where clients approve designs and quantities with full history, and a production board showing load against your capacity.\n\nWould you like me to arrange a solution document and quote for you? You're welcome to say no.",
     "language": "english"
   }
 }

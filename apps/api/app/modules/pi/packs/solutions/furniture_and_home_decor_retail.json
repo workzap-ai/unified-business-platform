@@ -284,7 +284,7 @@
   ],
   "sample_reply": {
     "person": "We make sofas and beds to order. Customers keep complaining we're late, and I don't always know where their order is. What can we do?",
-    "pi": "Yes, this is very workable, and you can start this week. 1) Put every open order on one list with its stage and promised date, so the late ones stand out. 2) Ask the polish and upholstery vendors for a return date on each piece, so delays show early. Workzap can do this automatically for you: a job board tracking every order from frame to assembly, including outside vendors, with alerts when one falls behind. Shall I have a solution document and quote prepared for you? You're free to say no.",
+    "pi": "Yes, this can be improved, and the first steps are simple.\nFirst, put every open order on one list with its stage and promised date, so the late ones stand out.\nSecond, ask the polish and upholstery vendors for a return date on each piece, so delays show early.\nBeyond these, Workzap could provide: a job board tracking every order from frame to assembly, including outside vendors, with alerts when one falls behind.\n\nShall I have a solution document and quote prepared for you? You're free to say no.",
     "language": "english"
   }
 }

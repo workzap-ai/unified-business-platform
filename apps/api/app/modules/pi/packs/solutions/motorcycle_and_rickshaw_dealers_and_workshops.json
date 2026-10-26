@@ -292,7 +292,7 @@
   ],
   "sample_reply": {
     "person": "Qiston pe bikes deta hoon, register mein likha hai, total baqaya kitna hai mujhe khud nahi pata. Koi solution?",
-    "pi": "Haan, is ka hal bilkul mumkin hai, aur is hafte shuruaat ho sakti hai. 1) Har qist wale customer ka baqaya ek list pe likh lein, taake total saamne ho. 2) Jo late hain un pe nishan laga dein, taake recovery wahin se shuru ho. Workzap yeh sab aap ke liye automatically kar sakta hai: har sale ka qist khata, overdue din aur customer ki ijazat se WhatsApp yaad dehani. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "pi": "Ji haan, shuruaat chhoti si ho sakti hai, aur pehla qadam aasan hai.\nPehle, har qist wale customer ka baqaya ek list pe likh lein, taake total saamne ho.\nDoosra, jo late hain un pe nishan laga dein, taake recovery wahin se shuru ho.\nIs ko mazboot karne ke liye Workzap ye de sakta hai: har sale ka qist khata, overdue din aur customer ki ijazat se WhatsApp yaad dehani.\n\nKya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
     "language": "roman_urdu"
   }
 }

@@ -5,6 +5,7 @@ products are vendors, emergency numbers are not claims, "will" is not promised, 
 never-say list is in the linter, and the value line cannot be learned away."""
 
 import json
+import re
 from pathlib import Path
 
 import pytest
@@ -352,60 +353,29 @@ def _sample_failures() -> dict[str, list[str]]:
     return out
 
 
-def test_the_sample_replies_are_all_present_and_mostly_use_automatically():
+def test_the_sample_replies_no_longer_lead_the_build_with_automatically():
     files = sorted(SAMPLES.glob("*.json"))
     assert len(files) == 211
-    uses = sum(
-        1
+    leads = re.compile(r"automatically for you|khud-ba-khud kar sakta hai", re.IGNORECASE)
+    stuck = [
+        p.stem
         for p in files
-        if solutions.AUTOMATIC.search(
-            json.loads(p.read_text(encoding="utf-8"))["sample_reply"]["pi"]
-        )
-    )
-    assert uses == KNOWN_AUTOMATIC
+        if leads.search(json.loads(p.read_text(encoding="utf-8"))["sample_reply"]["pi"])
+    ]
+    # platform spec A2-FIX-4: only the Arabic sample and one tuition sample (whose own build
+    # sentence could not be parsed mechanically) keep the document's wording
+    assert set(stuck) <= {"tuition_centres_and_academies"}, stuck
 
 
-def test_the_known_failing_sample_replies_are_exactly_these():
-    failing = _sample_failures()
-    assert sorted(failing) == KNOWN_FAILING, sorted(set(failing) ^ set(KNOWN_FAILING))
-    # nothing in the data was edited to make this pass: it names the audit's problem
-    assert len(failing) == len(KNOWN_FAILING)
+def test_no_two_industries_in_a_sector_open_a_sample_reply_the_same_way():
+    seen: dict[tuple[str, str], str] = {}
+    for p in sorted(SAMPLES.glob("*.json")):
+        data = json.loads(p.read_text(encoding="utf-8"))
+        opener = data["sample_reply"]["pi"].splitlines()[0].strip()
+        key = (data["sector"], opener)
+        assert key not in seen, (p.stem, seen.get(key))
+        seen[key] = p.stem
 
 
-# Regenerated 2026-10-24 with pymupdf (pypdf misread this PDF's font for punctuation: hyphens,
-# parentheses and a dropped build key were corrupting the data). 210 of 211 use "automatically";
-# most of the 186 failures are the PDF's own "1) idea one. 2) idea two." numbering inside the
-# illustrative reply, which solution_rules.HOWTO's bare "1) " marker reads as a how-to step
-# (flagged to Learn to Pi for solution_rules.py tuning, not edited here). Do not edit the data to
-# change this list in a test file; when the data is rebuilt the failing set changes and this test
-# says so.
-KNOWN_AUTOMATIC = 210
-KNOWN_FAILING = [
-    "air_cargo_and_air_freight_agents",
-    "banquet_halls_and_marquees",
-    "cloud_kitchens_and_virtual_brands",
-    "cold_chain_logistics",
-    "cosmetics_and_beauty_retail",
-    "customs_clearing_agents",
-    "entertainment_centres_gaming_zones_and_play_areas",
-    "fast_food_and_qsr_chains",
-    "fish_and_shrimp_farming",
-    "florists_and_gifting",
-    "fmcg_distributors_and_sub_distributors",
-    "freelancers_solopreneurs_and_home_based_businesses",
-    "furniture_manufacturing_and_woodwork",
-    "general_factories_and_workshops",
-    "ground_handling_and_airport_services",
-    "hardware_paint_sanitary_and_building_materials_shops",
-    "hatcheries",
-    "importers_and_trading_houses",
-    "packaged_food_and_fmcg_brands",
-    "plastics_and_injection_moulding",
-    "restaurants",
-    "ride_hailing_fleet_owners_and_taxi_operators",
-    "scrap_recycling_and_waste_management",
-    "steel_re_rolling_mills_and_metal_fabrication",
-    "tiles_marble_and_bathroom_kitchen_showrooms",
-    "trucking_and_goods_transport_companies",
-    "wholesale_market_traders",
-]
+def test_every_sample_reply_passes_the_value_line_check():
+    assert _sample_failures() == {}

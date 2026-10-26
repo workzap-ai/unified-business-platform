@@ -316,7 +316,7 @@
   ],
   "sample_reply": {
     "person": "Make-up classes are driving us mad. Parents say lessons were missed and we have no way to check. What would you suggest?",
-    "pi": "Yes, this can be sorted, and you can start this week. 1) Write one make-up rule and share it with parents, so every request is judged the same way. 2) List the make-ups owed today, so you have a clean starting point. Workzap can do this automatically for you, tracking every missed and make-up lesson under your rule and letting parents book make-ups themselves. Would you like me to arrange a solution document and quote for you? You're welcome to say no.",
+    "pi": "Sure, this is fixable, and the first steps are simple.\nFirst, write one make-up rule and share it with parents, so every request is judged the same way.\nSecond, list the make-ups owed today, so you have a clean starting point.\nThe lasting fix would work by tracking every missed and make-up lesson under your rule and letting parents book make-ups themselves.\n\nWould you like me to arrange a solution document and quote for you? You're welcome to say no.",
     "language": "english"
   }
 }

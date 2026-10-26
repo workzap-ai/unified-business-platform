@@ -345,7 +345,7 @@
   ],
   "sample_reply": {
     "person": "Our rental units come back with less fuel and damaged panels and we can never prove it. What can we do?",
-    "pi": "Yes, this is fixable, and you can start this week on your own. 1) Take photos and note running hours and fuel level every time a unit leaves the yard, so there is a starting record. 2) Get the site contact to sign at delivery and at return, so both sides agree on the condition. Workzap can do this automatically for you: a dispatch and return checklist on phone that compares the two records for every unit and shows you which hires came back short. Shall I have a solution document and quote prepared for you? You are free to say no.",
+    "pi": "Sure, this can be sorted, and the first steps are simple.\nFirst, take photos and note running hours and fuel level every time a unit leaves the yard, so there is a starting record.\nSecond, get the site contact to sign at delivery and at return, so both sides agree on the condition.\nFor a lasting fix, Workzap could set up: a dispatch and return checklist on phone that compares the two records for every unit and shows you which hires came back short.\n\nShall I have a solution document and quote prepared for you? You are free to say no.",
     "language": "english"
   }
 }

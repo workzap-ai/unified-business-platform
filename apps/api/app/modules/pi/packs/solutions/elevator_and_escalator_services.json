@@ -315,7 +315,7 @@
   ],
   "sample_reply": {
     "person": "What can we do about night breakdown calls? We maintain about 300 lifts and the duty technician doesn't always answer.",
-    "pi": "Yes, this can be fixed, and if anyone is ever stuck in a lift, emergency services come first. 1) Give every building a second number to call when the duty technician doesn't answer, so no call dead-ends. 2) Share the night roster with each building so guards know who is on. Workzap can do this automatically for you: every call time-stamped as a ticket and escalated up the roster if nobody picks up. Shall I prepare a solution document and quote for you? You're welcome to say no.",
+    "pi": "Yes, there is a way through this, and the first steps are simple.\nFirst, give every building a second number to call when the duty technician doesn't answer, so no call dead-ends.\nSecond, share the night roster with each building so guards know who is on.\nHere is what Workzap would build: every call time-stamped as a ticket and escalated up the roster if nobody picks up.\n\nShall I prepare a solution document and quote for you? You're welcome to say no.",
     "language": "english"
   }
 }

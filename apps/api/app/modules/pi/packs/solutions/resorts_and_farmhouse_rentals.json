@@ -316,7 +316,7 @@
   ],
   "sample_reply": {
     "person": "Chowkidar meri gair-mojoodgi mein bookings le leta hai, advance bhi kabhi usay milta hai kabhi mujhe. Koi solution batao.",
-    "pi": "Ji, is ko control karna mumkin hai, aur shuruaat isi hafte ho sakti hai. 1) Tay kar dein ke date sirf ek number se confirm hogi, taake clash ka ek hi zariya rahe. 2) Har advance ke liye ek hi account diya jaye, taake paisa ek jagah aaye. Workzap yeh sab aap ke liye khud-ba-khud chala sakta hai: ek calendar jo chowkidar dekh sake lekin badal na sake, aur date sirf advance darj hone par pakki ho. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "pi": "Bilkul, is ka hal mumkin hai, aur is ke liye bade kharch ki zaroorat nahi.\nPehle, tay kar dein ke date sirf ek number se confirm hogi, taake clash ka ek hi zariya rahe.\nDoosra, har advance ke liye ek hi account diya jaye, taake paisa ek jagah aaye.\nWorkzap is se aage ye kar sakta hai: ek calendar jo chowkidar dekh sake lekin badal na sake, aur date sirf advance darj hone par pakki ho.\n\nKya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
     "language": "roman_urdu"
   }
 }

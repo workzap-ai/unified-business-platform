@@ -6,13 +6,13 @@ Statuses: **DONE** code and a test that fails if the rule breaks. **PARTIAL** co
 
 ## Counts
 
-index counts: DONE 378, PARTIAL 36, CODE-ONLY 0, PROMPT-ONLY 10, HUMAN 18, MISSING 3
+index counts: DONE 380, PARTIAL 35, CODE-ONLY 0, PROMPT-ONLY 10, HUMAN 18, MISSING 2
 
 | PDF | Rules | DONE | PARTIAL | CODE-ONLY | PROMPT-ONLY | HUMAN | MISSING |
 |---|---|---|---|---|---|---|---|
 | pi-brain-v3 (Brain) | 364 | 312 | 27 | 0 | 10 | 15 | 0 |
-| pi-industry-solutions (Addendum 2) | 81 | 66 | 9 | 0 | 0 | 3 | 3 |
-| Both | 445 | 378 | 36 | 0 | 10 | 18 | 3 |
+| pi-industry-solutions (Addendum 2) | 81 | 68 | 8 | 0 | 0 | 3 | 2 |
+| Both | 445 | 380 | 35 | 0 | 10 | 18 | 2 |
 
 24 of the 378 DONE rules are exercised only by integration tests (they need the disposable Postgres on port 55432); the rest have a unit test that runs with no database. The index lists each test, so `rule_index.json` shows which. Every identifier family the PDFs define is in the index: R-xxx-nn (155 ids), RT1-29, G1-15, L1-14, E1-9, M1-10, A1-8, X1-5, SL-1..10, VAL-1..6, Job 1-10, Job S1-S8, rubric 1-20 (RUB-n), Appendix D (App.D-n). SPEC-x.y rows are numbered sections of the Brain that have requirements but no rule id; A2-x rows are the same for Addendum 2. The per-industry text of Part 7 and Part 4 is data, covered by SPEC-7.0 and A2-4-DATA.
 
@@ -23,7 +23,6 @@ Who: a lane of work, not a person. Linter hardening session = `constitution.py` 
 | Rule | PDF p. | Status | What is missing | Who |
 |---|---|---|---|---|
 | `A2-1.5-SECRETS` | Add.2 10 | MISSING | pi never reveals Workzap's internal methods, tools, vendors, pricing logic or how catalogue...: Nothing enforces it and it is not in the prompt: the handbook is built from the Brain PDF only, and the linter blocks internal terms (knowledge pack, prompt, rule ids) and named products, not an explanation of how a build works, a vendor Workzap uses or pricing logic. | linter hardening session (linter change) or prompt owner |
-| `A2-FIX-4` | Add.2 14 | MISSING | Part 4 data: rewrite sample replies so no two industries in a sector share an opener and...: 210 of 211 sample replies use 'automatically' (the test pins the count rather than the fix) and 27 fail the value-line check. They seed the example bank through a gate, so the worst are dropped, but the rewrite was never done. | solutions session (data change: needs the owner's go-ahead) |
 | `A2-FIX-5` | Add.2 14 | MISSING | Bridge openers and build phrasings are voice variants that pi learns from owners' responses: Openers rotate and never repeat in a chat, but they are not learned: learning_voice has no variant set for them, so there is no response-based preference. | learning session |
 | `R-PRIV-08` | Brain 13 | PROMPT-ONLY | Never pressures the person for detail they hesitate to give: Only the handbook text (always in the prompt) carries it; nothing detects pressure. | prompt owner (not in scope for code) |
 | `R-VOICE-11` | Brain 16 | PROMPT-ONLY | Names things the way the person names them ('the Gulberg branch', not 'Location 2'): Carried only by the handbook text in the prompt; no check compares pi's names for things with the person's. | prompt owner (not in scope for code) |
@@ -53,9 +52,8 @@ Who: a lane of work, not a person. Linter hardening session = `constitution.py` 
 | `8.13` | Brain 429 | PARTIAL | Learning metrics on the dashboard: reward, first-time confirmation, questions per problem,...: Reward, confusion, correction, opt-out, first-time confirmation, repeat-question, complaint and rule-break rates (and reward by language) are reported. Questions per noted problem, share of situations with a proven best question, lexicon coverage and time-to-use are not. | learning session |
 | `9.10` | Brain 433 | PARTIAL | Every default number is a config value inside the spec's tested range; numbers that touch a...: Two defaults differ from the spec table: debounce is 5 s (spec 10 s, range 5-20; lowered on purpose on 2026-10-24 for latency) and the link-suggestion threshold is 60% with range 50-85 (spec 75%, range 60-90; pinned by test_the_threshold_starts_at_sixty_and_stays_inside_its_range). The low-confidence threshold (0.6) and the severity weights are fixed constants, not tunable. | Workzap owner (confirm or restore the two defaults) |
 | `A2-FIX-2` | Add.2 14 | PARTIAL | Part 4 data: a view build leads at most one problem in four per industry: About 10 industries stay over the cap because no action key exists among the keys the document lists for those problems; the builder reports them and invents nothing. | solutions session (needs a person to choose builds) |
-| `A2-FIX-3` | Add.2 14 | PARTIAL | Part 4 data: rewrite every Workzap sentence that uses a banned tool word in the phrase-bank...: The builder flags tool words but does not rewrite: 122 of 2103 stored Workzap sentences still contain one. What pi says aloud comes from the catalogue phrase bank, so they are not spoken, but they remain in the data. | solutions session |
 | `A2-2.1` | Add.2 15 | PARTIAL | Retrieval order: the industry's own solutions, overlays, sector neighbours, the generic...: Steps 1 and 5 (the industry's entries as learned, and the learned idea bank) are used. Steps 2 to 4 (overlays, sector neighbours, the generic Addendum 1 library) are not: the library is not in the repository. | solutions session (needs Addendum 1) |
-| `A2-2.4-SECTOR` | Add.2 16 | PARTIAL | One solution test per sector using a sample reply from Part 4: One test runs every sample reply through the value-line check, but it pins the 27 known failures instead of asserting none; there is no per-sector test that passes a sample through the live pipeline. | solutions session |
+| `A2-2.4-SECTOR` | Add.2 16 | PARTIAL | One test runs every sample reply through the value-line check and it now asserts none fail; there is no per-sector test that passes a sample through the live pipeline (it needs the model). | solutions session |
 | `A2-3.3` | Add.2 19 | PARTIAL | Instant: a solution memory per business; never repeat an idea; swap kind on rejection; learn...: Memory, no-repeat, kind swap and return continuity are built. Learning the owner's taste (practical steps versus 'this will show you the numbers') and leaning that way in their style profile is not. | learning session |
 | `Job S3` | Add.2 20 | PARTIAL | Find new ideas from owners, Workzap's documents, the miner model and neighbouring...: An owner's idea enters only when a reviewer submits it through the route; nothing extracts an idea from an owner's own chat message automatically (spec: extracted, redacted, generalised). | learning session |
 | `A2-3.10` | Add.2 23 | PARTIAL | Solutions metrics: engagement, generic and already-tried rates, didn't-help, unanswered...: Rates, counts, unanswered requests and learned sample replies are reported; time from a new pattern to use and offer acceptance (reported, never optimised) are not. | solutions session |

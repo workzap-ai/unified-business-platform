@@ -317,7 +317,7 @@
   ],
   "sample_reply": {
     "person": "Can you suggest a fix for our Noon payouts? They never match what we think we sold.",
-    "pi": "Yes, this can be fixed, and you can make a start this week. 1) Line up one month's settlement report against your orders, so every deduction becomes visible. 2) Group those deductions by type once, so repeated charges stand out across Noon and Amazon. Workzap can do this automatically for you: a reconciler that reads each settlement, matches every line to an order and lists anything that doesn't add up. Would you like me to prepare a solution document and quote for you? You're welcome to say no.",
+    "pi": "Sure, you can start on this now, and the first steps are simple.\nFirst, line up one month's settlement report against your orders, so every deduction becomes visible.\nSecond, group those deductions by type once, so repeated charges stand out across Noon and Amazon.\nOn top of this, Workzap could arrange: a reconciler that reads each settlement, matches every line to an order and lists anything that doesn't add up.\n\nWould you like me to prepare a solution document and quote for you? You're welcome to say no.",
     "language": "english"
   }
 }

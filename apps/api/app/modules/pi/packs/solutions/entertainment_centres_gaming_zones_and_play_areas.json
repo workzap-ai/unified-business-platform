@@ -315,7 +315,7 @@
   ],
   "sample_reply": {
     "person": "I'm sure some cash at our game zone card counter is going missing. What can I do?",
-    "pi": "Yes, this can be checked and tightened quickly. 1) Pull one week of card sales by cashier from your card system and compare it with the cash handed in, to see where the gaps sit. 2) Count the drawer together with the next cashier at every shift change, so each gap belongs to one shift. Workzap can do this automatically for you: a daily match of card sales, top-ups and cash by cashier, with any gap sent to you on WhatsApp. Shall I prepare a solution document and quote for you? You can say no.",
+    "pi": "Yes, this can be brought under control, and the first steps are simple.\nFirst, pull one week of card sales by cashier from your card machine and compare it with the cash handed in, to see where the gaps sit.\nSecond, count the drawer together with the next cashier at every shift change, so each gap belongs to one shift.\nWorkzap's part would be: a daily match of card sales, top-ups and cash by cashier, with any gap sent to you on WhatsApp.\n\nShall I prepare a solution document and quote for you? You can say no.",
     "language": "english"
   }
 }

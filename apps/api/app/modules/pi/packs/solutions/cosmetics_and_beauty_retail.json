@@ -350,7 +350,7 @@
   ],
   "sample_reply": {
     "person": "Instagram pe orders bohat aate hain lekin COD ke aadhe parcel wapis aa jaate hain. Koi solution hai?",
-    "pi": "Ji haan, is ke liye kaafi kuch kiya ja sakta hai. 1. Dispatch se pehle har COD order customer se confirm karwa lein, kyun ke bina confirmation wale parcel hi zyada wapis aate hain. 2. Pichle mahine ke wapis aaye parcels area ke hisaab se dekh lein, taake pata chale masla kahan hai. Workzap ye kaam aap ke liye khud-ba-khud kar sakta hai: har COD order pe confirmation apne aap jaye aur har parcel ka status aur courier ki payment ek jagah nazar aaye. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "pi": "Bilkul, is ka hal mumkin hai, aur pehla qadam aasan hai.\nPehle, dispatch se pehle har COD order customer se confirm karwa lein, kyun ke bina confirmation wale parcel hi zyada wapis aate hain.\nDoosra, pichle mahine ke wapis aaye parcels area ke hisaab se dekh lein, taake pata chale masla kahan hai.\nPakke hal ke liye Workzap ye banwa sakta hai: har COD order pe confirmation apne aap jaye aur har parcel ka status aur courier ki payment ek jagah nazar aaye.\n\nKya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
     "language": "roman_urdu"
   }
 }

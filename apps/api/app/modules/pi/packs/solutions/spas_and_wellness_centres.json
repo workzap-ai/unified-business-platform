@@ -315,7 +315,7 @@
   ],
   "sample_reply": {
     "person": "We sell lots of gift vouchers in December but nobody knows which have been used. What can we do?",
-    "pi": "Yes, this can be sorted before the next season. 1) List every voucher sold this season with its number, so you know what's out there. 2) Check that list before redeeming any voucher, so none is used twice. Workzap can do this automatically for you: a voucher register with unique codes that shows sold, redeemed and expired status in real time. Shall I prepare a solution document and quote for you? You can say no.",
+    "pi": "Yes, this can be brought under control, and none of it needs special equipment.\nFirst, list every voucher sold this season with its number, so you know what's out there.\nSecond, check that list before redeeming any voucher, so none is used twice.\nA lasting version would be: a voucher register with unique codes that shows sold, redeemed and expired status in real time.\n\nShall I prepare a solution document and quote for you? You can say no.",
     "language": "english"
   }
 }

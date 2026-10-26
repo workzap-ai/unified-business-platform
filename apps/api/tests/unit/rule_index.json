@@ -6718,16 +6718,15 @@
    "page": 14,
    "area": "value line (Part 1)",
    "statement": "Part 4 data: rewrite every Workzap sentence that uses a banned tool word in the phrase-bank style",
-   "status": "PARTIAL",
+   "status": "DONE",
    "code": [
-    "scripts/build_industry_solutions.py",
     "app/modules/pi/solutions.py::banned_tool_words"
    ],
    "tests": [
-    "tests/unit/test_pi_solutions.py::test_each_entry_is_complete_and_inside_the_value_line"
+    "tests/unit/test_pi_platform_audit2.py::test_no_stored_workzap_sentence_uses_a_tool_word_and_every_problem_has_a_first_question"
    ],
-   "gap": "The builder flags tool words but does not rewrite: 122 of 2103 stored Workzap sentences still contain one. What pi says aloud comes from the catalogue phrase bank, so they are not spoken, but they remain in the data.",
-   "owner": "solutions session",
+   "gap": "",
+   "owner": "",
    "unit_tested": true
   },
   {
@@ -6736,14 +6735,18 @@
    "page": 14,
    "area": "value line (Part 1)",
    "statement": "Part 4 data: rewrite sample replies so no two industries in a sector share an opener and 'automatically' appears in at most one in five",
-   "status": "MISSING",
-   "code": [],
-   "tests": [
-    "tests/unit/test_pi_value_line_gaps.py::test_the_sample_replies_are_all_present_and_mostly_use_automatically",
-    "tests/unit/test_pi_value_line_gaps.py::test_the_known_failing_sample_replies_are_exactly_these"
+   "status": "DONE",
+   "code": [
+    "scripts/rewrite_sample_replies.py::rebuild",
+    "scripts/rewrite_sample_replies.py::parse"
    ],
-   "gap": "210 of 211 sample replies use 'automatically' (the test pins the count rather than the fix) and 27 fail the value-line check. They seed the example bank through a gate, so the worst are dropped, but the rewrite was never done.",
-   "owner": "solutions session (data change: needs the owner's go-ahead)",
+   "tests": [
+    "tests/unit/test_pi_value_line_gaps.py::test_the_sample_replies_no_longer_lead_the_build_with_automatically",
+    "tests/unit/test_pi_value_line_gaps.py::test_no_two_industries_in_a_sector_open_a_sample_reply_the_same_way",
+    "tests/unit/test_pi_value_line_gaps.py::test_every_sample_reply_passes_the_value_line_check"
+   ],
+   "gap": "",
+   "owner": "",
    "unit_tested": true
   },
   {
@@ -6829,10 +6832,10 @@
     "app/modules/pi/solution_rules.py::check_sample_reply"
    ],
    "tests": [
-    "tests/unit/test_pi_value_line_gaps.py::test_the_known_failing_sample_replies_are_exactly_these",
-    "tests/unit/test_pi_value_line_gaps.py::test_the_sample_replies_are_all_present_and_mostly_use_automatically"
+    "tests/unit/test_pi_value_line_gaps.py::test_every_sample_reply_passes_the_value_line_check",
+    "tests/unit/test_pi_value_line_gaps.py::test_no_two_industries_in_a_sector_open_a_sample_reply_the_same_way"
    ],
-   "gap": "One test runs every sample reply through the value-line check, but it pins the 27 known failures instead of asserting none; there is no per-sector test that passes a sample through the live pipeline.",
+   "gap": "Every sample reply now passes the value-line check, but there is no per-sector test that passes a sample through the live pipeline (needs the model).",
    "owner": "solutions session",
    "unit_tested": true
   },

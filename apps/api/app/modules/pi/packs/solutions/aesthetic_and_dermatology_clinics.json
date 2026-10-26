@@ -318,7 +318,7 @@
   ],
   "sample_reply": {
     "person": "We get so many DMs from our Instagram ads but my team replies late and bookings are low. What's the fix?",
-    "pi": "Yes, this is a common fix, and you can start this week. 1) Check how long last week's DMs waited for a reply, so you know the real delay. 2) Give DMs to one person at fixed times instead of the front desk, so they have an owner. Workzap can do this automatically for you with one inbox for all channels, response timers and codes that show which ad brought each booking. Shall I have a solution document and quote prepared for you? You're welcome to say no.",
+    "pi": "Yes, this can be fixed, and the first steps are simple.\nFirst, check how long last week's DMs waited for a reply, so you know the real delay.\nSecond, give DMs to one person at fixed times instead of the front desk, so they have an owner.\nWorkzap could build this for you: with one inbox for all channels, response timers and codes that show which ad brought each booking.\n\nShall I have a solution document and quote prepared for you? You're welcome to say no.",
     "language": "english"
   }
 }

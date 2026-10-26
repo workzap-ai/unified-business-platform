@@ -319,7 +319,7 @@
   ],
   "sample_reply": {
     "person": "Our MRI has a week-long waiting list but I see the machine idle after 7pm. What can we do?",
-    "pi": "Yes, there's room to use those evenings, and you can start checking this week. 1) Map one week of MRI use hour by hour, so you know exactly how many evening hours sit idle. 2) List what an evening shift needs in technologist and reporting cover, so the real blocker is clear. Workzap can do the tracking automatically for you with machine-wise booking, a waitlist and a reporting worklist, so evening slots can be filled and measured. Shall I have a solution document and quote prepared for you? You're welcome to say no.",
+    "pi": "Sure, this is fixable, and none of it needs special equipment.\nFirst, map one week of MRI use hour by hour, so you know exactly how many evening hours sit idle.\nSecond, list what an evening shift needs in technologist and reporting cover, so the real blocker is clear.\nWorkzap could make it permanent with: with machine-wise booking, a waitlist and a reporting worklist, so evening slots can be filled and measured.\n\nShall I have a solution document and quote prepared for you? You're welcome to say no.",
     "language": "english"
   }
 }

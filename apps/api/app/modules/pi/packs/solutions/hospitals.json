@@ -350,7 +350,7 @@
   ],
   "sample_reply": {
     "person": "Discharge is our biggest headache. Patient is ready by 11 but the family is still sitting at 5 waiting for the bill. What can we do?",
-    "pi": "Yes, this can be improved, and you can start this week. 1) Time-stamp each clearance step on a few discharges, so you can see exactly where the hours go. 2) Start the bill when the discharge decision is made, so billing isn't the last thing to begin. Workzap can do this automatically for you with a discharge tracker that shows every step and which role is holding it, measured daily on every ward and without patient details on screen. Shall I have a solution document and quote prepared for you? You're welcome to say no.",
+    "pi": "Yes, this can be fixed, and none of it needs special equipment.\nFirst, time-stamp each clearance step on a few discharges, so you can see exactly where the hours go.\nSecond, start the bill when the discharge decision is made, so billing isn't the last thing to begin.\nTo make it stick, Workzap could build: with a discharge tracker that shows every step and which role is holding it, measured daily on every ward and without patient details on screen.\n\nShall I have a solution document and quote prepared for you? You're welcome to say no.",
     "language": "english"
   }
 }

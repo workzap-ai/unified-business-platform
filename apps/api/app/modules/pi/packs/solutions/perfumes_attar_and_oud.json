@@ -318,7 +318,7 @@
   ],
   "sample_reply": {
     "person": "I run six mall kiosks and every night I get sales on WhatsApp in different formats, some totals, some photos of slips. What can I do?",
-    "pi": "Yes, this is very fixable. 1. Agree one closing format for all kiosks, because mixed formats can't be compared. 2. Check one kiosk's slips against its cash, which shows whether the gap is general or local. Workzap can do this automatically for you: each kiosk closes on a phone, cash is matched to sales, and you get one morning summary across every outlet. Would you like me to arrange a solution document and quote for you? You're welcome to say no.",
+    "pi": "Yes, there are practical first steps, and the first steps are simple.\nFirst, agree one closing format for all kiosks, because mixed formats can't be compared.\nSecond, check one kiosk's slips against its cash, which shows whether the gap is general or local.\nWhat Workzap would add is: each kiosk closes on a phone, cash is matched to sales, and you get one morning summary across every outlet.\n\nWould you like me to arrange a solution document and quote for you? You're welcome to say no.",
     "language": "english"
   }
 }

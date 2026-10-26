@@ -320,7 +320,7 @@
   ],
   "sample_reply": {
     "person": "Revisions are my biggest headache. Clients send changes late at night and the designers redo work again and again. What can I do?",
-    "pi": "Yes, there's a way to get this under control, starting this week. 1) Count the revision rounds on this week's deliverables, so you can see exactly where the extra work goes. 2) Share that count with your heaviest client once, so the conversation is based on facts. Workzap can do this automatically for you: every deliverable tracked with rounds counted against the agreement, and clients reminded about approvals. Would you like me to put together a solution document and quote for you? You're free to say no.",
+    "pi": "Yes, there is a way through this, and none of it needs special equipment.\nFirst, count the revision rounds on this week's deliverables, so you can see exactly where the extra work goes.\nSecond, share that count with your heaviest client once, so the conversation is based on facts.\nThe next step up would be: every deliverable tracked with rounds counted against the agreement, and clients reminded about approvals.\n\nWould you like me to put together a solution document and quote for you? You're free to say no.",
     "language": "english"
   }
 }

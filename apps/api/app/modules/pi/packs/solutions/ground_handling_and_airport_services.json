@@ -322,7 +322,7 @@
   ],
   "sample_reply": {
     "person": "Airlines keep cutting penalties off our invoices and we never have proof it wasn't us. Can you help?",
-    "pi": "Yes, this is fixable, and it starts with what gets recorded at the time of the delay. 1. Go through last month's penalties and see which had any ramp record at all, so you know how many you could never have won. 2. Ask supervisors to note the time and reason of every delay this week, so evidence starts building straight away. Workzap can do this automatically for you: every turnaround timed step by step on a phone, with photos and the supervisor's sign-off, and an evidence pack ready for each flight an airline disputes. Shall I put together a solution document and quote for you? You're free to say no.",
+    "pi": "Yes, this can be improved, and the first steps are simple.\nFirst, go through last month's penalties and see which had any ramp record at all, so you know how many you could never have won.\nSecond, ask supervisors to note the time and reason of every delay this week, so evidence starts building straight away.\nBeyond these, Workzap could provide: every turnaround timed stage by stage on a phone, with photos and the supervisor's sign-off, and an evidence pack ready for each flight an airline disputes.\n\nShall I put together a solution document and quote for you? You're free to say no.",
     "language": "english"
   }
 }

@@ -320,7 +320,7 @@
   ],
   "sample_reply": {
     "person": "I'm treasurer for our owners' association. Owners are late on service charges and I chase them one by one. Can you help?",
-    "pi": "Yes, this can be made much lighter, and you can start this week. 1) Bring every unit code's payment status into one list, so you can see the whole picture at once. 2) Ask owners to quote their unit code as the transfer reference, so payments match without guesswork. Workzap can do this automatically for you: a dues ledger that matches each payment to its unit and sends reminders on schedule. Would you like me to prepare a solution document and quote for you? You're welcome to say no.",
+    "pi": "Yes, this can be fixed, and the first steps are simple.\nFirst, bring every unit code's payment status into one list, so you can see the whole picture at once.\nSecond, ask owners to quote their unit code as the transfer reference, so payments match without guesswork.\nWorkzap could build this for you: a dues ledger that matches each payment to its unit and sends reminders on schedule.\n\nWould you like me to prepare a solution document and quote for you? You're welcome to say no.",
     "language": "english"
   }
 }

@@ -347,7 +347,7 @@
   ],
   "sample_reply": {
     "person": "The funded batch paperwork is killing us. Can you suggest something so my two staff stop losing a week every month?",
-    "pi": "Yes, that week can be won back, and you can start this month. 1) Keep each batch's attendance in one place from the first day, so the report isn't rebuilt at month-end. 2) Write down every document the programme office asks for once, so nothing is chased at the last minute. Workzap can do this automatically for you, building the funder-format report each month from attendance you already record. Would you like me to arrange a solution document and quote for you? You're welcome to say no.",
+    "pi": "Yes, there is a way through this, and none of it needs special equipment.\nFirst, keep each batch's attendance in one place from the first day, so the report isn't rebuilt at month-end.\nSecond, write down every document the programme office asks for once, so nothing is chased at the last minute.\nA lasting version would work by building the funder-format report each month from attendance you already record.\n\nWould you like me to arrange a solution document and quote for you? You're welcome to say no.",
     "language": "english"
   }
 }

@@ -317,7 +317,7 @@
   ],
   "sample_reply": {
     "person": "We do client work to fund our own games, but client projects always overrun. Any solution?",
-    "pi": "Yes, there's a clear way to get on top of this, and you can start this week. 1) Compare estimated against actual hours on your last finished project, so you can see where it slipped. 2) Write down every client change request and get it acknowledged before work starts. Workzap can do this automatically for you: a tracker showing estimate against actual hours per milestone, alerts when a project starts overrunning, and a change log the client approves. Would you like me to prepare a solution document and quote for you? You're welcome to say no.",
+    "pi": "Yes, this can be improved, and the first steps are simple.\nFirst, compare estimated against actual hours on your last finished project, so you can see where it slipped.\nSecond, write down every client change request and get it acknowledged before work starts.\nBeyond these, Workzap could provide: a tracker showing estimate against actual hours per milestone, alerts when a project starts overrunning, and a change log the client approves.\n\nWould you like me to prepare a solution document and quote for you? You're welcome to say no.",
     "language": "english"
   }
 }

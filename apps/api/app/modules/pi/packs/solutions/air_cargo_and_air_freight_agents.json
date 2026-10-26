@@ -319,7 +319,7 @@
   ],
   "sample_reply": {
     "person": "Customers saara din call karte hain ke cargo kahan hai, mere staff ka poora din isi mein nikal jata hai. Koi hal hai?",
-    "pi": "Ji haan, yeh kaam kaafi had tak khud-ba-khud ho sakta hai. 1. Ek busy din ki status calls gin lein, taa ke pata chale asal mein kitna waqt ja raha hai. 2. Apne regular shippers ko bata dein ke har ahem marhale pe update unhein khud milegi, taa ke unhein poochna na pade. Workzap yeh sab aap ke liye khud-ba-khud kar sakta hai: har shipment ka status booked se delivered tak customer ko WhatsApp par, un ki ijazat se, khud chala jaye, aur ek tracking link bhi saath ho. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "pi": "Ji haan, ye theek ho sakta hai, aur pehla qadam aasan hai.\nPehle, ek busy din ki status calls gin lein, taa ke pata chale asal mein kitna waqt ja raha hai.\nDoosra, apne regular shippers ko bata dein ke har ahem marhale pe update unhein khud milegi, taa ke unhein poochna na pade.\nWorkzap is ke liye ye bana sakta hai: har shipment ka status booked se delivered tak customer ko WhatsApp par, un ki ijazat se, khud chala jaye, aur ek tracking link bhi saath ho.\n\nKya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
     "language": "roman_urdu"
   }
 }

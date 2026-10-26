@@ -319,7 +319,7 @@
   ],
   "sample_reply": {
     "person": "Can you suggest a solution? Our tenants pay with PDCs and we only learn about bounced cheques when the bank statement arrives.",
-    "pi": "Yes, this can be fixed, and you can start this week. 1) List this month's PDCs by deposit date so you know exactly which ones to watch. 2) Check the bank the day after each deposit, so a bounce is caught at once. Workzap can do this automatically for you: deposit reminders for every unit, bounce flags, and an arrears list that updates daily. Shall I prepare a solution document and quote for you? You're welcome to say no.",
+    "pi": "Sure, this is fixable, and none of it needs special equipment.\nFirst, list this month's PDCs by deposit date so you know exactly which ones to watch.\nSecond, check the bank the day after each deposit, so a bounce is caught at once.\nWorkzap could make it permanent with: deposit reminders for every unit, bounce flags, and an arrears list that updates daily.\n\nShall I prepare a solution document and quote for you? You're welcome to say no.",
     "language": "english"
   }
 }

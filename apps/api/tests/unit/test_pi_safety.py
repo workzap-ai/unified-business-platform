@@ -188,7 +188,9 @@ def test_advice_is_turned_down_in_plain_words_with_who_to_ask():
     assert "an accountant" in s.advice_reply(Advice.TAX, "en")
     assert "a vet" in s.advice_reply(Advice.VETERINARY, "en")
     assert "doctor or pharmacist" in s.advice_reply(Advice.MEDICAL, "en")
-    assert s.advice_reply(Advice.TAX, "roman_ur").startswith("Main tax ka mashwara nahi de sakta")
+    assert s.advice_reply(Advice.TAX, "roman_ur").startswith(
+        "Mere liye tax ka mashwara dena mumkin nahi"
+    )
 
 
 @pytest.mark.parametrize(

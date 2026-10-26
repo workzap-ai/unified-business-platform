@@ -350,7 +350,7 @@
   ],
   "sample_reply": {
     "person": "Our biggest headache is shade variation. Clients come back for more and the new batch is a different shade. What can we do?",
-    "pi": "Yes, this is very solvable. 1. Record batch and shade for every design in stock, because the system only tracks design codes. 2. Agree a rule that each order comes from a single batch, so boxes aren't picked by whatever is nearest. Workzap can do this automatically for you: stock held by batch and shade, every order allocated from one batch, and repeat orders matched to the batch the client had. Would you like me to arrange a solution document and quote for you? You're welcome to say no.",
+    "pi": "Yes, there is a way through this, and none of it needs special equipment.\nFirst, record batch and shade for every design in stock, because the stock record only tracks design codes.\nSecond, agree a rule that each order comes from a single batch, so boxes aren't picked by whatever is nearest.\nThe next step up would be: stock held by batch and shade, every order allocated from one batch, and repeat orders matched to the batch the client had.\n\nWould you like me to arrange a solution document and quote for you? You're welcome to say no.",
     "language": "english"
   }
 }

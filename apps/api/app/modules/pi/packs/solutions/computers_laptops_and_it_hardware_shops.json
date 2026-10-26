@@ -288,7 +288,7 @@
   ],
   "sample_reply": {
     "person": "Corporate clients ko quote dete hain, do hafte baad confirm karte hain aur tab tak GPU ka rate barh jaata hai. Koi solution?",
-    "pi": "Ji haan, iska hal hai aur aaj se shuru ho sakta hai. 1) Har quote pe validity date likh dein, taa ke purana rate khud khatam ho. 2) Pichle mahine ke quotes dekh lein kaun se order bane, taa ke pata chale kitna kaam ruka hua hai. Workzap ye aap ke liye khud-ba-khud kar sakta hai: quotation builder jis mein validity date ho, rate badalne pe alert aaye, aur har quote ka order banne tak hisaab rahe. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "pi": "Bilkul, is ka hal mumkin hai, aur pehla qadam aasan hai.\nPehle, har quote pe validity date likh dein, taa ke purana rate khud khatam ho.\nDoosra, pichle mahine ke quotes dekh lein kaun se order bane, taa ke pata chale kitna kaam ruka hua hai.\nPakke hal ke liye Workzap ye banwa sakta hai: quotation builder jis mein validity date ho, rate badalne pe alert aaye, aur har quote ka order banne tak hisaab rahe.\n\nKya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
     "language": "roman_urdu"
   }
 }

@@ -323,7 +323,7 @@
   ],
   "sample_reply": {
     "person": "Every time a flight is delayed our call centre gets buried and passengers still find out at the airport. Can you suggest a fix?",
-    "pi": "Yes, this can be improved, and it starts with who tells passengers first. 1. Decide one person who sends updates during a disruption, so outbound news isn't stuck behind incoming calls. 2. After the next delay, check how many callers simply hadn't been told, so you know how big the gap is. Workzap can do this automatically for you: every affected booking gets notified the moment a delay is entered, with the passenger's permission, plus a link to request rebooking or a refund. Shall I put together a solution document and quote for you? You're free to say no.",
+    "pi": "Yes, there is a way through this, and the first steps are simple.\nFirst, decide one person who sends updates during a disruption, so outbound news isn't stuck behind incoming calls.\nSecond, after the next delay, check how many callers simply hadn't been told, so you know how big the gap is.\nHere is what Workzap would build: every affected booking gets notified the moment a delay is entered, with the passenger's permission, plus a link to request rebooking or a refund.\n\nShall I put together a solution document and quote for you? You're free to say no.",
     "language": "english"
   }
 }

@@ -56,16 +56,6 @@ _YES_REQUEST = re.compile(
     r"|(?:bana|banwa|bhej|send|prepare|make|create).*(?:document|quote|quotation|proposal|solution)",
     re.IGNORECASE,
 )
-# A direct request for the document or the quote itself (the word "solution" alone asks for ideas,
-# not for the document): "dain solution document mujhay", "quote do", "send me the document".
-_DOC_REQUEST = re.compile(
-    r"(?:document|quote|quotation|proposal).*(?:bana|banwa|bhej|send|prepare|make|create|dein|den|dain|do|chahiye|chahie|chahiay|mujhay|mujhe|me)"
-    r"|(?:bana|banwa|bhej|send|prepare|make|create|dein|den|dain|de do|dedo).*(?:document|quote|quotation|proposal)",
-    re.IGNORECASE,
-)
-_PRICEY = re.compile(
-    r"\b(?:how much|kitna|kitne|price|cost|qeemat|kharcha|charges?)\b", re.IGNORECASE
-)
 _NO = re.compile(rf"^\W*(?:{NO_WORDS})\W*$", re.IGNORECASE)
 _NO_LEAD = re.compile(rf"^\W*(?:{NO_WORDS})\b", re.IGNORECASE)
 _LATER = re.compile(rf"\b(?:{LATER_WORDS})\b|(?:{LATER_WORDS})", re.IGNORECASE)
@@ -110,6 +100,62 @@ OFFER_REQUEST = re.compile(
     r"\b(?:please|chahiye|bhej|bana)\b",
     re.IGNORECASE,
 )
+# A direct ask for the document or the quote ("dain solution document mujhay", "send me the quote")
+# is a yes from any listening state once something is noted (Live Audit 2, cause 4, G28), whether or
+# not the offer was ever made. Questions about price, refusals and "later" are not.
+_LEAD = (
+    r"^\W*(?:(?:yes|yeah|ok|okay|please|pls|plz|haan|han|ji|jee|theek hai|bilkul|zaroor|sure)\W+)*"
+)
+_ONE = r"(?:(?:solution|full|final)\s+)?(?:document|documents|quote|quotation|proposal)"
+_NOUN = rf"{_ONE}(?:\s+(?:and|aur|or|&)\s+(?:the\s+)?{_ONE})?"
+_ME = r"(?:mujhe\s+|mujhay\s+|hamein\s+|hamen\s+)?"
+_UR_VERB = (
+    r"(?:de(?:in|n)?|dain|do|dedo|de do|dijiye|dijiyega|bhej\w*|bhij\w*|bana\w*|banwa\w*|"
+    r"chahiye|chahie|chahiay|tayyar\w*)"
+)
+# The ask must be addressed to pi and start the message (after a yes or a please): a problem that
+# merely mentions quotes or documents ("it takes me two hours to prepare a quote") is not one.
+DIRECT_DOCUMENT = re.compile(
+    rf"{_LEAD}(?:(?:can|could|would)\s+you\s+)?(?:please\s+)?(?:send|give|prepare|make|create|share)"
+    rf"(?:\s+(?:me|us))?(?:\s+(?:the|a|my|our))?\s+{_NOUN}\b"
+    rf"|{_LEAD}(?:i|we)\s+(?:do\s+|really\s+)?(?:want|need|would like)\s+(?:(?:the|a|my|our)\s+)?{_NOUN}\b"
+    rf"|{_LEAD}(?:can|could|may)\s+(?:i|we)\s+(?:get|have)\s+(?:(?:the|a)\s+)?{_NOUN}\b"
+    rf"|{_LEAD}{_ME}(?:(?:ab|abhi|jaldi|please)\s+)?{_NOUN}\s+{_ME}{_UR_VERB}\b"
+    rf"|{_LEAD}(?:de(?:in|n)?|dain|dijiye|bhej\w*|bana\w*|banwa\w*)\s+{_ME}{_NOUN}\b"
+    r"|^\W*(?:نعم\W+)?(?:جهز|أرسل|ارسل|ابعث|أعطن|اعطن|أريد|اريد|نريد|أحتاج)\w*\s+"
+    r"(?:ال)?(?:المستند|مستند|وثيقة|عرض (?:ال)?سعر|عرض أسعار)"
+    r"|^\W*(?:جی\W+|ہاں\W+)?(?:مجھے\s+)?(?:دستاویز|کوٹیشن)\s+(?:بھیج|بنا|دیں|دیجئے|دیجیے|چاہیے|چاہئے)",
+    re.IGNORECASE,
+)
+NOT_A_REQUEST = re.compile(
+    r"\b(?:how much|kitna|kitne|kitni|price|prices|cost|costs|charge|charges|fee|fees|qeemat|keemat|"
+    r"kharcha|paisa|paise|rate|don'?t|do not|never|without|bina|stop|cancel|won'?t|can'?t|cannot|"
+    r"no|nhi|nai|na|mat|nahi|nahin|not|later|baad mein|baad me)\b"
+    r"|(?<!\w)كم(?!\w)|تكلفة|ليس الآن|(?<!\w)لا(?!\w)|نہیں|نہ|مت",
+    re.IGNORECASE,
+)
+_POLITE_QUESTION = re.compile(rf"{_LEAD}(?:can|could|would)\s+you\b", re.IGNORECASE)
+
+
+DIRECT_FROM = (
+    State.S1_LISTENING,
+    State.S2_CLARIFYING,
+    State.S3_NOTED,
+    State.S4_SORTED_SUMMARY,
+    State.S5_READINESS,
+)
+
+
+def asks_for_document(message: str) -> bool:
+    """The message itself asks for the solution document or the quote."""
+    said = " ".join((message or "").split())
+    if not said or NOT_A_REQUEST.search(said):
+        return False
+    if ("?" in said or "؟" in said) and not _POLITE_QUESTION.match(said):
+        return False  # "which document do you mean?" is a question, not a request
+    return bool(DIRECT_DOCUMENT.match(said))
+
+
 APPROVE = re.compile(
     r"^\W*(?:approve|approved|i approve|approve it|approve the quote|go ahead with the quote|"
     r"manzoor(?: hai)?|منظور(?: ہے)?|موافق|أوافق)\W*$",
@@ -178,7 +224,7 @@ TEXT: dict[str, dict[str, str]] = {
         ),
         "roman_ur": (
             "Shukriya. Maine Workzap se aap ka solution document aur quote tayyar karne ko "
-            "keh diya hai. Tayyar hote hi yahin bhej dunga."
+            "keh diya hai. Tayyar hote hi yahin bhej diya jayega."
         ),
     },
     "declined": {
@@ -199,7 +245,7 @@ TEXT: dict[str, dict[str, str]] = {
             "quote, and they can message me directly at workzap.ai/pi/talk-to-pi."
         ),
         "roman_ur": (
-            "Main note kar leta hoon ke aap ye chahte hain. {business} ke owner ko quote par "
+            "Maine note kar liya hai ke aap ye chahte hain. {business} ke owner ko quote par "
             "haan kehna hoga, wo mujhe seedha workzap.ai/pi/talk-to-pi par message kar sakte hain."
         ),
     },
@@ -211,7 +257,7 @@ TEXT: dict[str, dict[str, str]] = {
             "and how would you like to involve them?"
         ),
         "roman_ur": (
-            "Main note kar leta hoon ke aap ye chahte hain. {business} ke owner ko quote par "
+            "Maine note kar liya hai ke aap ye chahte hain. {business} ke owner ko quote par "
             "haan kehna hoga, wo mujhe seedha workzap.ai/pi/talk-to-pi par message kar sakte "
             "hain, ya main wo link aap ko de dun. Kya document faisla karne wale ko bhejna "
             "chahiye, aur aap unhein kaise shamil karna chahenge?"
@@ -348,7 +394,7 @@ def classify(message: str) -> tuple[Answer, float]:
             Answer.YES,
             0.92,
         )  # "haan document aur quote bana dein": a yes that asks for the offer
-    if len(said.split()) <= 14 and _DOC_REQUEST.search(said) and not _PRICEY.search(said):
+    if asks_for_document(said):
         return Answer.YES, 0.92  # a direct request for the document or quote is a yes (Book 4, 5.2)
     return Answer.UNCLEAR, 0.4
 
@@ -385,19 +431,37 @@ def decide(
     can_approve = facts.get("can_approve", True)
     answer = classify(message)
 
+    direct = asks_for_document(message)
     if (
         not can_approve
-        and OFFER_REQUEST.search(message)
+        and (OFFER_REQUEST.search(message) or direct)
         and state
         in (State.S3_NOTED, State.S4_SORTED_SUMMARY, State.S5_READINESS, State.S5B_DECLINED)
     ):
         return _member(language, facts, brief)  # "send the quote" from a non-decider (R-OFFER-06)
 
+    scope_pending = bool(brief.get("scope_asked") and not brief.get("scope_done"))
+    if (
+        direct
+        and can_approve
+        and facts.get("problem_count")
+        and not scope_pending
+        and state in DIRECT_FROM
+    ):
+        # Book 4 5.2, G28: asking for the document IS the yes, from any listening step and
+        # whether or not the offer was made. Everything noted is covered, the confirmation asks
+        # nothing, and the chat moves on to preparing.
+        # no reminder-permission question on this confirmation: it asks nothing (G28)
+        quiet = {**facts, "ask_consent": False}
+        return _prepare(
+            language, quiet, list(facts.get("problem_refs") or []), {"scope_done": True}
+        )
+
     if (
         state in (State.S1_LISTENING, State.S2_CLARIFYING, State.S3_NOTED, State.S4_SORTED_SUMMARY)
         and facts.get("problem_count")
         and _ok(answer, Answer.YES)
-        and _DOC_REQUEST.search(message)
+        and asks_for_document(message)
     ):
         # They ask for the document or quote itself and at least one problem is noted: that is a
         # yes from any step of the listening, whether or not the offer was made (platform spec,

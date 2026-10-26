@@ -317,7 +317,7 @@
   ],
   "sample_reply": {
     "person": "Ramzan mein donations cash, bank aur JazzCash se aati hain, hisaab nahi milta. Koi hal hai?",
-    "pi": "Ji haan, is ka hal mumkin hai aur shuruaat isi hafte ho sakti hai. 1) Ek hafte ki saari donations har tareeqe se ek hi list mein layein, taake farq saamne aa jaye. 2) Us list ko ek muqarrar din bank aur wallet statement se milayein. Workzap yeh kaam aap ke liye automatically kar sakta hai: har donation fund ke saath ek register mein, roz bank aur wallet se match, aur donor ko receipt khud chali jaye. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "pi": "Bilkul, is ka hal mumkin hai, aur is ke liye bade kharch ki zaroorat nahi.\nPehle, ek hafte ki saari donations har tareeqe se ek hi list mein layein, taake farq saamne aa jaye.\nDoosra, us list ko ek muqarrar din bank aur wallet statement se milayein.\nWorkzap is se aage ye kar sakta hai: har donation fund ke saath ek register mein, roz bank aur wallet se match, aur donor ko receipt khud chali jaye.\n\nKya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
     "language": "roman_urdu"
   }
 }

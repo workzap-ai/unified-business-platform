@@ -322,7 +322,7 @@
   ],
   "sample_reply": {
     "person": "We keep missing ex-factory because fabric comes late, and I only find out when it's too late. What can we do?",
-    "pi": "Yes, this can be brought under control, and you can start this week. 1) List every open fabric and trims order with its promised and actual arrival date, so you can see which supplier slips most. 2) Next to each one, mark the ship date that depends on it, so a delay shows its knock-on straight away. Workzap can do this automatically for you: a material tracker tied to each order's TNA that alerts you the day fabric slips and shows every at-risk ship date each morning. Shall I prepare a solution document and quote for you? You're welcome to say no.",
+    "pi": "Yes, there is a way through this, and the first steps are simple.\nFirst, list every open fabric and trims order with its promised and actual arrival date, so you can see which supplier slips most.\nSecond, next to each one, mark the ship date that depends on it, so a delay shows its knock-on straight away.\nHere is what Workzap would build: a material tracker tied to each order's TNA that alerts you the day fabric slips and shows every at-risk ship date each morning.\n\nShall I prepare a solution document and quote for you? You're welcome to say no.",
     "language": "english"
   }
 }

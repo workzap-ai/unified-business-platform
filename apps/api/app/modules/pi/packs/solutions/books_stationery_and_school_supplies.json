@@ -318,7 +318,7 @@
   ],
   "sample_reply": {
     "person": "Every April parents send booklist pictures on WhatsApp and my staff type everything out. Is there a better way?",
-    "pi": "Yes, there's a much better way. 1. Build a master list of each school's class booklists before the rush, because most photos repeat the same lists. 2. Ask parents for just the school and class, which replaces a whole typed list. Workzap can do this automatically for you: parents choose school and class from a link, the bundle is created and they get a pickup slot. Would you like me to arrange a solution document and quote for you? You're welcome to say no.",
+    "pi": "Yes, this can be fixed, and the first steps are simple.\nFirst, build a master list of each school's class booklists before the rush, because most photos repeat the same lists.\nSecond, ask parents for just the school and class, which replaces a whole typed list.\nWorkzap could build this for you: parents choose school and class from a link, the bundle is created and they get a pickup slot.\n\nWould you like me to arrange a solution document and quote for you? You're welcome to say no.",
     "language": "english"
   }
 }

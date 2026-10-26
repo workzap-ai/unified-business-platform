@@ -286,7 +286,7 @@
   ],
   "sample_reply": {
     "person": "Koi solution batao. Customer yard mein slab pasand karta hai aur delivery pe koi aur slab chala jata hai.",
-    "pi": "Ji, is ka hal bilkul mumkin hai. 1) Yard ke har slab ko ek dafa number de kar photo le lein, taake har slab ki pehchan ho. 2) Jis din customer slab chune, usi din use order ke saath tag kar dein, taake woh kahin aur na jaye. Workzap yeh aap ke liye khud-ba-khud kar sakta hai: slab register jahan chuna hua slab order se reserve ho jaye aur galat slab dispatch na ho sake. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "pi": "Ji, is ka rasta nikal sakta hai, aur pehla qadam aasan hai.\nPehle, yard ke har slab ko ek dafa number de kar photo le lein, taake har slab ki pehchan ho.\nDoosra, jis din customer slab chune, usi din use order ke saath tag kar dein, taake woh kahin aur na jaye.\nLambay arse ke liye Workzap ye set kar sakta hai: slab register jahan chuna hua slab order se reserve ho jaye aur galat slab dispatch na ho sake.\n\nKya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
     "language": "roman_urdu"
   }
 }

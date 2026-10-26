@@ -316,7 +316,7 @@
   ],
   "sample_reply": {
     "person": "We run a broiler hatchery near Lahore. Bookings come by phone and WhatsApp into the manager's diary and we keep overbooking. What can we do?",
-    "pi": "Yes, this can be brought under control, starting this week. 1. Fix each hatch day's capacity and stop taking bookings once it's reached. 2. Take all bookings on one number, so there's a single list. Workzap can do this automatically for you: a booking system with a daily capacity limit, written confirmations and ready/dispatched updates sent to every customer. Shall I put together a solution document and quote for you, or would you rather not?",
+    "pi": "Yes, there are practical first steps, and the first steps are simple.\nFirst, fix each hatch day's capacity and stop taking bookings once it's reached.\nSecond, take all bookings on one number, so there's a single list.\nWhat Workzap would add is: a booking list with a daily capacity limit, written confirmations and ready/dispatched updates sent to every customer.\n\nShall I put together a solution document and quote for you, or would you rather not?",
     "language": "english"
   }
 }

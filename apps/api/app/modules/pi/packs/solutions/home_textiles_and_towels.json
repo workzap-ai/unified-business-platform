@@ -321,7 +321,7 @@
   ],
   "sample_reply": {
     "person": "Our towels keep failing GSM with one buyer and we can't tell which batch is the problem. Is there a fix?",
-    "pi": "Yes, this is very fixable, and you can start this week. 1) Check GSM on every batch for one week and note the loom and dye lot each came from, so the source of the variation shows up. 2) Keep one approved reference piece at packing, so every checker compares against the same standard. Workzap can do this automatically for you: a batch record for every dye lot with GSM and QC result linked to the order, so every batch is checked and traceable. Shall I prepare a solution document and quote for you? You're welcome to say no.",
+    "pi": "Sure, this is fixable, and the first steps are simple.\nFirst, check GSM on every batch for one week and note the loom and dye lot each came from, so the source of the variation shows up.\nSecond, keep one approved reference piece at packing, so every checker compares against the same standard.\nTo make it last, Workzap could put in place: a batch record for every dye lot with GSM and QC result linked to the order, so every batch is checked and traceable.\n\nShall I prepare a solution document and quote for you? You're welcome to say no.",
     "language": "english"
   }
 }

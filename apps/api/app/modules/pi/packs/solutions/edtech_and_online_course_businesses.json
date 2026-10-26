@@ -350,7 +350,7 @@
   ],
   "sample_reply": {
     "person": "Our biggest leak is shared accounts. One student buys, then the whole group logs in. What can we do?",
-    "pi": "Yes, this can be brought under control, and you can start today. 1) Check which accounts were used from several places at once, so you know how widespread it is. 2) Reset the accounts that stand out, so the current sharing stops. Workzap can do this automatically for you, spotting sharing every day and watermarking videos by account. Would you like me to arrange a solution document and quote for you? You're welcome to say no.",
+    "pi": "Yes, there is a way through this, and the first steps are simple.\nFirst, check which accounts were used from several places at once, so you know how widespread it is.\nSecond, reset the accounts that stand out, so the current sharing stops.\nWorkzap could take this on by spotting sharing every day and watermarking videos by account.\n\nWould you like me to arrange a solution document and quote for you? You're welcome to say no.",
     "language": "english"
   }
 }

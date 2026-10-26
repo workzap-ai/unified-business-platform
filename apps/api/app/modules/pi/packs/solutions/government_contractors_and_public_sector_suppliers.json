@@ -298,7 +298,7 @@
   ],
   "sample_reply": {
     "person": "Hum hospitals ko medical consumables supply karte hain. Payment mahino nahi aati aur pata nahi file kahan atki hai. Koi hal?",
-    "pi": "Ji haan, is ka hal kiya ja sakta hai aur shuruaat isi hafte ho sakti hai. 1) Har jama shuda invoice ki ek list banayein jis mein tareekh aur maujooda marhala likha ho. 2) Har follow-up ke baad woh list update karein, taake sab kuch yaadasht par na rahe. Workzap yeh kaam aap ke liye automatically kar sakta hai: ek board jahan har bill ka marhala aur intezar ke din nazar aayein, saath reminders. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "pi": "Ji haan, shuruaat chhoti si ho sakti hai, aur pehla qadam aasan hai.\nPehle, har jama shuda invoice ki ek list banayein jis mein tareekh aur maujooda marhala likha ho.\nDoosra, har follow-up ke baad woh list update karein, taake sab kuch yaadasht par na rahe.\nIs ko mazboot karne ke liye Workzap ye de sakta hai: ek board jahan har bill ka marhala aur intezar ke din nazar aayein, saath reminders.\n\nKya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
     "language": "roman_urdu"
   }
 }

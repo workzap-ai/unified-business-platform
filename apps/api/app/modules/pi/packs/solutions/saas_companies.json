@@ -323,7 +323,7 @@
   ],
   "sample_reply": {
     "person": "Signups are decent but churn is bad. People leave after a couple of months. Any ideas?",
-    "pi": "Yes, there's plenty that can be done, starting this week. 1) Call a few recent cancellers and ask one question about why, so you get real reasons instead of blank fields. 2) Decide what \"first real value\" looks like in your product, so you can see who never got there. Workzap can do this automatically for you: a customer health view that flags at-risk accounts early, plus onboarding nudges when new users stall. Would you like me to put together a solution document and quote for you? You're free to say no.",
+    "pi": "Yes, there are practical first steps, and none of it needs special equipment.\nFirst, call a few recent cancellers and ask one question about why, so you get real reasons instead of blank fields.\nSecond, decide what \"first real value\" looks like in your product, so you can see who never got there.\nWorkzap could then give you: a customer health view that flags at-risk accounts early, plus onboarding nudges when new users stall.\n\nWould you like me to put together a solution document and quote for you? You're free to say no.",
     "language": "english"
   }
 }

@@ -347,7 +347,7 @@
   ],
   "sample_reply": {
     "person": "The subsidy paperwork is brutal. I sit with the sign-in sheets for two nights every month. Is there any way out of this?",
-    "pi": "Yes, those two evenings can be won back, and you can start this month. 1) Total attendance days per room at the end of each day, so month-end is just adding up. 2) Confirm the claim format once with your provincial programme contact, so nothing is redone. Workzap can do this automatically for you, turning daily attendance into a claim workbook you simply check and submit. Would you like me to arrange a solution document and quote for you? You're welcome to say no.",
+    "pi": "Sure, this can be sorted, and the first steps are simple.\nFirst, total attendance days per room at the end of each day, so month-end is just adding up.\nSecond, confirm the claim format once with your provincial programme contact, so nothing is redone.\nWorkzap would handle this by turning daily attendance into a claim workbook you simply check and submit.\n\nWould you like me to arrange a solution document and quote for you? You're welcome to say no.",
     "language": "english"
   }
 }

@@ -322,7 +322,7 @@
   ],
   "sample_reply": {
     "person": "Our riders keep coming back short on COD cash and merchants are getting angry about late payments. What can we do?",
-    "pi": "Yes, this can be brought under control, and you can start this week. 1. Settle every rider before they leave for the day, so a shortfall is caught the same day. 2. Match the cash against delivered parcels rather than a rough total, so any gap points to specific parcels. Workzap can do this automatically for you: a daily COD reconciliation per rider that flags shortages on the spot and sends merchants their remittance statements on schedule. Shall I have a solution document and quote prepared for you? You're welcome to say no.",
+    "pi": "Sure, this can be sorted, and the first steps are simple.\nFirst, settle every rider before they leave for the day, so a shortfall is caught the same day.\nSecond, match the cash against delivered parcels rather than a rough total, so any gap points to specific parcels.\nFor a lasting fix, Workzap could set up: a daily COD reconciliation per rider that flags shortages on the spot and sends merchants their remittance statements on schedule.\n\nShall I have a solution document and quote prepared for you? You're welcome to say no.",
     "language": "english"
   }
 }

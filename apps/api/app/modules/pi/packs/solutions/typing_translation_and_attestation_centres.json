@@ -318,7 +318,7 @@
   ],
   "sample_reply": {
     "person": "Our phones don't stop. Every customer calls several times asking if their attestation is back. Is there a fix for this?",
-    "pi": "Yes, there is, and you can start this week. 1) Tell every customer once at the counter when to expect their job back, so status calls drop. 2) Message today the customers whose jobs are already ready, so they come in without calling. Workzap can do this automatically for you: every job tracked by reference number, with a WhatsApp update to the customer, with their permission, at each stage. Would you like me to put together a solution document and quote for you? You're free to say no.",
+    "pi": "Yes, this can be fixed, and the first step is a small one.\nFirst, tell every customer once at the counter when to expect their job back, so status calls drop.\nSecond, message today the customers whose jobs are already ready, so they come in without calling.\nWorkzap's build would be: every job tracked by reference number, with a WhatsApp update to the customer, with their permission, at each stage.\n\nWould you like me to put together a solution document and quote for you? You're free to say no.",
     "language": "english"
   }
 }

@@ -315,7 +315,7 @@
   ],
   "sample_reply": {
     "person": "Can you help me sort out chasing brands for payment? It's killing me.",
-    "pi": "Yes, this is very fixable, and you can start this week. 1) List every unpaid invoice once with its date and brand, so you know exactly who to chase first. 2) Agree payment terms in writing before your next deal starts, so there's something clear to point to. Workzap can do the tracking automatically for you: one board showing what each brand owes and for how long, with reminders sent on schedule. Would you like me to prepare a solution document and quote for you? You're welcome to say no.",
+    "pi": "Sure, this can be sorted, and the first steps are simple.\nFirst, list every unpaid invoice once with its date and brand, so you know exactly who to chase first.\nSecond, agree payment terms in writing before your next deal starts, so there's something clear to point to.\nFor a lasting fix, Workzap could set up: one board showing what each brand owes and for how long, with reminders sent on schedule.\n\nWould you like me to prepare a solution document and quote for you? You're welcome to say no.",
     "language": "english"
   }
 }

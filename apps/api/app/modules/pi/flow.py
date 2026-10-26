@@ -117,7 +117,7 @@ OPENING = {
     "en": "Hi, I'm pi, an AI from Workzap. Tell me what's going wrong in your business and I'll "
     "start on it.",
     "roman_ur": "Hi, main pi hoon, Workzap ka AI. Business mein jo bhi masla chal raha hai, bata "
-    "dein, main usay note kar lunga.",
+    "dein, usay note kar liya jayega.",
 }
 
 

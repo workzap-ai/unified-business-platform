@@ -321,7 +321,7 @@
   ],
   "sample_reply": {
     "person": "Night shift pe agents late aate hain aur breaks lambe ho jate hain, client SLA pe complaint karta hai. Kya kiya ja sakta hai?",
-    "pi": "Ji haan, is pe kaafi kuch kiya ja sakta hai aur is hafte se shuruaat ho sakti hai. 1) Ek hafte ke liye team leaders shift shuru hote hi roll call karein, taake late aana agle din nahi balke usi waqt nazar aaye. 2) Ek dafa likh lein ke kaun late aaya aur kyun, taake pata chale masla transport ka hai ya roster ka. Workzap yeh aap ke liye automatically kar sakta hai: dialer ke data se live floor board aur breaks lambe hone pe team leader ko foran alert. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "pi": "Haan, is par kaam ho sakta hai, aur pehla qadam aasan hai.\nPehle, ek hafte ke liye team leaders shift shuru hote hi roll call karein, taake late aana agle din nahi balke usi waqt nazar aaye.\nDoosra, ek dafa likh lein ke kaun late aaya aur kyun, taake pata chale masla transport ka hai ya roster ka.\nWorkzap ye tayyar kar sakta hai: dialer ke data se live floor board aur breaks lambe hone pe team leader ko foran alert.\n\nKya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
     "language": "roman_urdu"
   }
 }

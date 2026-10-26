@@ -314,7 +314,7 @@
   ],
   "sample_reply": {
     "person": "Every month our hotel clients say we returned fewer sheets than they gave us. How do I fix this?",
-    "pi": "Yes, this can be settled with a clear count. 1) Count linen together with the hotel at pickup, so both sides agree the number. 2) Get a signature when you deliver back, so the return count is on record. Workzap can do this automatically for you: a linen count sheet signed by both sides on pickup and delivery, feeding straight into the monthly invoice. Shall I prepare a solution document and quote for you? You can say no.",
+    "pi": "Sure, you can start on this now, and the first steps are simple.\nFirst, count linen together with the hotel at pickup, so both sides agree the number.\nSecond, get a signature when you deliver back, so the return count is on record.\nOn top of this, Workzap could arrange: a linen count sheet signed by both sides on pickup and delivery, feeding straight into the monthly invoice.\n\nShall I prepare a solution document and quote for you? You can say no.",
     "language": "english"
   }
 }
