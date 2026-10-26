@@ -152,8 +152,8 @@ def test_the_lesson_names_the_other_spellings():
 
 
 def test_roman_urdu_voice_seeds_follow_the_style_and_pass_the_gate():
-    for moment, by_language in learning_voice.SEEDS.items():
-        seeds = by_language["roman_ur"]
+    for moment in learning_voice.MINED:  # the bridge openers are approved text, not written
+        seeds = learning_voice.SEEDS[moment]["roman_ur"]
         assert len(seeds) >= learning_voice.MIN_LIVE
         for text in seeds:
             assert learning_voice.valid(moment, text) == [], text

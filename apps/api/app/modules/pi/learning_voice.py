@@ -26,7 +26,7 @@ from pydantic import BaseModel, ConfigDict, Field
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.modules.pi import learning, learning_arms
+from app.modules.pi import learning, learning_arms, solutions
 from app.modules.pi.experience_models import PiExperience
 from app.modules.pi.learning_bank import LISTENING_STATES, tokens
 from app.modules.pi.learning_models import PiLearningChange, PiQuestionArm
@@ -64,6 +64,15 @@ SEEDS: dict[str, dict[str, list[str]]] = {
         ],
     },
 }
+# A2-FIX-5: the opener of the Workzap line ("If doing it by hand gets heavy, Workzap could") is a
+# voice variant too. The approved openers are the variants (the first one is the baseline); no model
+# writes new ones, because an opener has to fit the build phrase that follows it. Which one is shown
+# is chosen like any other variant, only when learning is on, and credited when the reply used it.
+SEEDS["bridge"] = {
+    language: [o[language] for o in solutions.BRIDGE_OPENERS if o[language]]
+    for language in ("en", "roman_ur")
+}
+MINED = ("acknowledge", "correct")  # the moments a model may write new phrasings for
 MIN_USES = 30  # before a variant's rate means anything
 BELOW_BASELINE = 0.10
 RETIRE_AFTER = timedelta(days=14)
@@ -398,6 +407,8 @@ async def mine(
         return counts
     await ensure_seeded(session, scope)
     for moment, by_language in SEEDS.items():
+        if moment not in MINED:
+            continue
         for language in by_language:
             live = await _live(session, scope, moment, language)
             if len(live) >= MIN_LIVE or counts["proposed"] >= MAX_PER_RUN:

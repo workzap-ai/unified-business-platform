@@ -195,7 +195,8 @@ def test_voice_moments_and_what_counts_as_used():
     assert v.valid("acknowledge", "Is it a problem?")  # a question
     assert v.valid("acknowledge", "Fine")  # one word
     assert v.valid("opening", "Hi, I'm pi.")  # a fixed line is never varied
-    assert set(v.SEEDS) == {"acknowledge", "correct"}
+    # A2-FIX-5 added the opener of the Workzap line; the opening line and the offer stay fixed
+    assert set(v.SEEDS) == {"acknowledge", "correct", "bridge"}
 
 
 async def test_a_trial_is_not_judged_before_four_weeks_even_with_plenty_of_data(wire):

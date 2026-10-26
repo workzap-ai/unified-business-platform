@@ -24,6 +24,7 @@ from app.modules.pi import (
     learning_bank,
     learning_rules,
     learning_solutions,
+    learning_voice,
     solution_ask,
     solution_ideas,
     solution_library,
@@ -149,6 +150,36 @@ def _from_library(
     return out
 
 
+async def _prefer_bridge(
+    session: AsyncSession,
+    scope: WorkspaceScope,
+    conversation: PiConversation,
+    said: str,
+    used: dict[str, Any],
+) -> None:
+    """A2-FIX-5: with learning on, the opener of this turn's Workzap line is the learned choice;
+    with learning frozen (no `voice_arm` key in the stamp) the openers rotate as before. The variant
+    is stamped on the turn, and credited only if the reply really used it."""
+    if conversation is None:
+        return
+    brief = conversation.service_brief or {}
+    if "voice_arm" not in used:  # learning is off for this turn: no preference carries over
+        if brief.get("bridge_preferred"):
+            _put(conversation, bridge_preferred="")
+        return
+    if used.get("voice_arm"):
+        return  # the stamp holds one voice variant: an acknowledgement is already in it
+    language = detect_language(said) or conversation.language or "en"
+    if language not in ("en", "roman_ur"):
+        return
+    await learning_voice.ensure_seeded(session, scope)
+    arm = await learning_voice.choose(session, scope, "bridge", language)
+    if arm is None:
+        return
+    _put(conversation, bridge_preferred=arm.text)
+    used["voice_arm"] = str(arm.id)
+
+
 async def build(
     session: AsyncSession,
     scope: WorkspaceScope,
@@ -162,6 +193,7 @@ async def build(
     `solution_asked_no_ideas`, `solution_next`, `solution_not_tried` (each may be missing); fills
     `used` with the stamp for the nightly scoring. Never raises: before migration 0043 is applied
     the tables are missing and pi simply gives no ideas."""
+    await _prefer_bridge(session, scope, conversation, said, used)
     carried = bool((getattr(conversation, "service_brief", None) or {}).get("open_ask"))
     if carried and conversation is not None:
         _put(conversation, open_ask=False)  # one turn only: the answer to pi's one question

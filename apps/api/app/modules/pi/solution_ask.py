@@ -216,6 +216,10 @@ def bridge(
         i for i, opener in enumerate(solutions.BRIDGE_OPENERS) if opener[key] and i not in used
     ]
     index = order[0] if order else len(solutions.BRIDGE_OPENERS) - 1  # the one with no opener
+    preferred = str(brief.get("bridge_preferred") or "")  # the learned choice (A2-FIX-5)
+    if preferred:
+        match = next((i for i in order if solutions.BRIDGE_OPENERS[i][key] == preferred), None)
+        index = index if match is None else match
     return {
         "says": solutions.build_phrase(keys[0], language, sector),
         "opener": solutions.BRIDGE_OPENERS[index][key],
