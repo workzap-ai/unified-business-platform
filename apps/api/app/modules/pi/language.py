@@ -412,5 +412,111 @@ MEETING_NOTICES = {
 }
 
 
+# The same notices in Urdu script, Hindi, Persian, French and Spanish, so a chat in those languages
+# never gets an English line (Part 14, language lock). Urdu and Hindi wording avoids gendered verbs.
+# Native-speaker review is still wanted before wide use.
+_MORE_NOTICES: dict[str, dict[str, str]] = {
+    "ur": {
+        "handoff": "آپ کے پیغام کا شکریہ۔ ہماری ٹیم جلد ہی یہاں آپ کو جواب دے گی۔",
+        "brain_handoff": "آپ کے پیغام کا شکریہ۔ Workzap کی ٹیم کا کوئی رکن یہیں جواب دے گا۔",
+        "brain_team_check": "اسے Workzap کی ٹیم سے چیک کیا جا رہا ہے، وہ یہیں تصدیق کریں گے۔",
+        "brain_ack": "شکریہ، یہ بات میرے پاس ہے۔",
+        "media": "اٹیچمنٹ بھیجنے کا شکریہ۔ ہماری ٹیم اسے دیکھ کر یہاں جواب دے گی۔",
+        "team_check": "ٹیم سے تصدیق کر کے یہیں جلد اپ ڈیٹ ملے گا۔",
+        "tech_down": "pi میں ابھی مسئلہ ہے۔ آپ کے پیغامات محفوظ ہیں، اور pi جیسے ہی ممکن ہوا جواب دے گا۔",
+        "tool_fail": "ابھی اسے محفوظ نہیں کیا جا سکا۔ کیا آپ تھوڑی دیر بعد دوبارہ بھیج سکتے ہیں؟",
+        "video": "یہاں ویڈیو دیکھنا ممکن نہیں۔ کیا آپ ایک لائن میں بتا سکتے ہیں کہ اس میں کیا ہے؟",
+        "voice": "اس وائس نوٹ کی پوری بات سمجھ نہیں آئی۔ کیا آپ بنیادی مسئلہ ایک لائن میں لکھ سکتے ہیں؟",
+        "media_unreadable": "شکریہ۔ یہ فائل یہاں کھل نہیں سکی، اور اسے ٹیم کو بھیج دیا گیا ہے۔ "
+        "کیا آپ مختصر لکھ کر بتا سکتے ہیں، یا PDF یا اسکرین شاٹ بھیج دیں؟",
+        "meeting": "ضرور، میٹنگ رکھ لیتے ہیں۔ آپ کو کون سے دن اور وقت ٹھیک رہیں گے؟ "
+        "ہماری ٹیم یہاں وقت کی تصدیق کر دے گی۔",
+    },
+    "hi": {
+        "handoff": "आपके संदेश के लिए धन्यवाद। हमारी टीम जल्द ही यहीं आपको जवाब देगी।",
+        "brain_handoff": "आपके संदेश के लिए धन्यवाद। Workzap टीम का कोई सदस्य यहीं जवाब देगा।",
+        "brain_team_check": "इसे Workzap टीम से जाँचा जा रहा है, वे यहीं पुष्टि करेंगे।",
+        "brain_ack": "धन्यवाद, यह बात मेरे पास है।",
+        "media": "अटैचमेंट भेजने के लिए धन्यवाद। हमारी टीम इसे देखकर यहीं जवाब देगी।",
+        "team_check": "टीम से पुष्टि करके यहीं जल्द अपडेट मिलेगा।",
+        "tech_down": "pi में अभी समस्या है। आपके संदेश सुरक्षित हैं, और pi जैसे ही संभव होगा जवाब देगा।",
+        "tool_fail": "इसे अभी सहेजा नहीं जा सका। क्या आप थोड़ी देर बाद दोबारा भेज सकते हैं?",
+        "video": "यहाँ वीडियो देखना संभव नहीं है। क्या आप एक लाइन में बता सकते हैं कि इसमें क्या है?",
+        "voice": "इस वॉइस नोट की पूरी बात समझ नहीं आई। क्या आप मुख्य समस्या एक लाइन में लिख सकते हैं?",
+        "media_unreadable": "धन्यवाद। यह फ़ाइल यहाँ खुल नहीं सकी, और इसे टीम को भेज दिया गया है। "
+        "क्या आप थोड़े शब्दों में बता सकते हैं, या PDF या स्क्रीनशॉट भेज सकते हैं?",
+        "meeting": "ज़रूर, मीटिंग रख लेते हैं। आपको कौन से दिन और समय ठीक रहेंगे? "
+        "हमारी टीम यहीं समय की पुष्टि कर देगी।",
+    },
+    "fa": {
+        "handoff": "از پیام شما سپاسگزاریم. یکی از اعضای تیم ما به‌زودی همین‌جا پاسخ می‌دهد.",
+        "brain_handoff": "از پیام شما سپاسگزاریم. یکی از اعضای تیم Workzap همین‌جا پاسخ می‌دهد.",
+        "brain_team_check": "این موضوع با تیم Workzap بررسی می‌شود و همین‌جا تأیید خواهند کرد.",
+        "brain_ack": "ممنون، این موضوع را دریافت کردم.",
+        "media": "از ارسال فایل سپاسگزاریم. تیم ما آن را بررسی می‌کند و همین‌جا پاسخ می‌دهد.",
+        "team_check": "با تیم هماهنگ می‌کنم و به‌زودی همین‌جا خبر می‌دهم.",
+        "tech_down": "pi اکنون با مشکل روبه‌رو است. پیام‌های شما ذخیره شده‌اند و pi به محض امکان پاسخ می‌دهد.",
+        "tool_fail": "الان نتوانستم این را ذخیره کنم. می‌شود کمی بعد دوباره بفرستید؟",
+        "video": "نمی‌توانم اینجا ویدیو ببینم. می‌شود در یک خط بگویید چه چیزی در آن است؟",
+        "voice": "همه‌ی پیام صوتی را متوجه نشدم. می‌شود مشکل اصلی را در یک خط بنویسید؟",
+        "media_unreadable": "ممنون. نتوانستم این فایل را اینجا باز کنم و آن را برای تیم فرستادم. "
+        "می‌شود کوتاه توضیح دهید یا آن را به‌صورت PDF یا اسکرین‌شات بفرستید؟",
+        "meeting": "با کمال میل جلسه می‌گذاریم. چه روزها و ساعت‌هایی برای شما مناسب است؟ "
+        "تیم ما زمان را همین‌جا تأیید می‌کند.",
+    },
+    "fr": {
+        "handoff": "Merci pour votre message. Un membre de notre équipe vous répondra ici sous peu.",
+        "brain_handoff": "Merci pour votre message. Un membre de l'équipe Workzap vous répondra ici.",
+        "brain_team_check": "Je vérifie cela avec l'équipe Workzap, qui confirmera ici.",
+        "brain_ack": "Merci, j'ai bien reçu cela.",
+        "media": "Merci pour la pièce jointe. Un membre de notre équipe l'examinera et vous répondra ici.",
+        "team_check": "Je vérifie cela avec l'équipe et je confirme ici sous peu.",
+        "tech_down": "pi rencontre un problème en ce moment. Vos messages sont enregistrés, "
+        "et pi répondra dès que possible.",
+        "tool_fail": "Je n'ai pas pu enregistrer cela à l'instant. Pourriez-vous le renvoyer dans un moment ?",
+        "video": "Je ne peux pas regarder de vidéos ici. Pourriez-vous me dire en une ligne ce qu'elle montre ?",
+        "voice": "Je n'ai pas bien compris ce message vocal. "
+        "Pourriez-vous écrire le problème principal en une ligne ?",
+        "media_unreadable": "Merci. Je n'ai pas pu ouvrir ce fichier ici et je l'ai transmis à l'équipe. "
+        "Pourriez-vous le décrire en quelques mots, ou l'envoyer en PDF ou en capture d'écran ?",
+        "meeting": "Avec plaisir, organisons une réunion. Quels jours et horaires vous conviennent ? "
+        "Notre équipe confirmera l'horaire ici.",
+    },
+    "es": {
+        "handoff": "Gracias por su mensaje. Un miembro de nuestro equipo le responderá aquí en breve.",
+        "brain_handoff": "Gracias por su mensaje. Un miembro del equipo de Workzap le responderá aquí.",
+        "brain_team_check": "Lo estoy revisando con el equipo de Workzap, que lo confirmará aquí.",
+        "brain_ack": "Gracias, lo he recibido.",
+        "media": "Gracias por el archivo adjunto. Un miembro de nuestro equipo lo revisará y le responderá aquí.",
+        "team_check": "Lo estoy confirmando con el equipo y le aviso aquí en breve.",
+        "tech_down": "pi tiene un problema en este momento. Sus mensajes están guardados "
+        "y pi responderá en cuanto pueda.",
+        "tool_fail": "No pude guardarlo ahora mismo. ¿Podría enviarlo de nuevo en un momento?",
+        "video": "No puedo ver vídeos aquí. ¿Podría decirme en una línea qué muestra?",
+        "voice": "No logré entender todo el mensaje de voz. ¿Podría escribir el problema principal en una línea?",
+        "media_unreadable": "Gracias. No pude abrir ese archivo aquí y lo he pasado al equipo. "
+        "¿Podría describirlo en pocas palabras, o enviarlo como PDF o captura de pantalla?",
+        "meeting": "Con gusto organizamos una reunión. ¿Qué días y horarios le convienen? "
+        "Nuestro equipo confirmará la hora aquí.",
+    },
+}
+for _lang, _lines in _MORE_NOTICES.items():
+    for _table, _key in (
+        (HANDOFF_NOTICES, "handoff"),
+        (BRAIN_HANDOFF_NOTICES, "brain_handoff"),
+        (BRAIN_TEAM_CHECK_NOTICES, "brain_team_check"),
+        (BRAIN_ACK_NOTICES, "brain_ack"),
+        (MEDIA_NOTICES, "media"),
+        (TEAM_CHECK_NOTICES, "team_check"),
+        (TECH_DOWN_NOTICES, "tech_down"),
+        (TOOL_FAIL_NOTICES, "tool_fail"),
+        (VIDEO_UNREADABLE_NOTICES, "video"),
+        (VOICE_UNREADABLE_NOTICES, "voice"),
+        (MEDIA_UNREADABLE_NOTICES, "media_unreadable"),
+        (MEETING_NOTICES, "meeting"),
+    ):
+        _table[_lang] = _lines[_key]
+
+
 def notice_in(notices: dict[str, str], language: str | None) -> str:
     return notices.get(language or "en", notices["en"])

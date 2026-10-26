@@ -63,7 +63,9 @@ def test_a_reply_in_the_other_language_is_caught_but_borrowed_words_are_not() ->
 def test_fixed_notices_follow_the_language() -> None:
     assert notice_in(HANDOFF_NOTICES, "roman_ur").startswith("Aap ke message")
     assert notice_in(HANDOFF_NOTICES, "en").startswith("Thanks for your message")
-    assert notice_in(HANDOFF_NOTICES, "fr") == HANDOFF_NOTICES["en"]
+    assert notice_in(HANDOFF_NOTICES, "fr").startswith("Merci pour votre message")
+    assert notice_in(HANDOFF_NOTICES, "ur") != HANDOFF_NOTICES["en"]
+    assert notice_in(HANDOFF_NOTICES, "pt") == HANDOFF_NOTICES["en"]  # no notice yet: English
     assert notice_in(HANDOFF_NOTICES, None) == HANDOFF_NOTICES["en"]
 
 
