@@ -42,6 +42,7 @@ from app.modules.pi import (
     problems,
     reply_voice,
     safety,
+    slots,
     solution_ask,
     solution_context,
     solution_free,
@@ -315,6 +316,9 @@ class ServiceTurn(BaseModel):
     # Who the customer is (name, business): filled from their words, kept for every chat.
     customer_profile: CustomerProfile = Field(default_factory=CustomerProfile)
     missing: list[str] = Field(default_factory=list, max_length=12)
+    # Brain mode (R-ASK-07): a short dotted key of what the question in the reply asks about
+    # ("footfall.current_marketing", "shops.count"); empty when the reply asks nothing.
+    asked_slot: str = Field(default="", max_length=60)
     # Internal: how the customer feels, and what they asked that knowledge can't answer
     # (the team is told, so they can teach pi).
     mood: Literal["calm", "confused", "frustrated", "urgent"] = "calm"
@@ -970,6 +974,11 @@ Script and company facts (pi_mode "brain"; these override the shared rules above
 - If they complain about the questions or show impatience ("sawal hi poochti rahogi?", "why so
   many questions", "kab se pooch raha hoon", "jaldi"), start with a short sorry ("Maazrat" /
   "Sorry"), then give the ideas. Ask no question before them.
+- asked_slot: when your reply asks a question, name what it asks about as a short dotted key in
+  English ("footfall.current_marketing", "shops.count", "branch.taste_changes"); leave it empty
+  when you ask nothing. closed_slots (when present) are the questions they already answered,
+  even with "no" or "pata nahi", in this or an earlier chat and in any language: never ask one
+  again, move on.
 - clarify_first (when present) is the ref of the noted problem to ask about first. pattern_hint
   (when present) is a pattern worth saying once, as an observation, never a diagnosis: for
   example "Three of the problems you've mentioned are about stock" (kind group) or "Shop C
@@ -3015,8 +3024,27 @@ async def prepare_context(
         "brief": {
             k: v
             for k, v in (conversation.service_brief or {}).items()
-            if k not in ("free_rider", "howto_asked", "declines", "asked_facts")
+            if k
+            not in (
+                "free_rider",
+                "howto_asked",
+                "declines",
+                "asked_facts",
+                "closed_slots",
+                "last_question",
+            )
         },
+        # Questions already answered, kept across sessions and languages (R-ASK-07). The question
+        # asked last turn counts as answered by what they say now, before the turn is saved.
+        **(
+            {"closed_slots": closed_slots}
+            if (
+                closed_slots := slots.advance(
+                    conversation.service_brief or {}, message.body or "", "", ""
+                )[0]
+            )
+            else {}
+        ),
         "conversation_summary": conversation.summary or "",
         "history": [
             {
@@ -4663,6 +4691,16 @@ async def compose_service_turn(
         problem = f"{early_ask}, and also: {problem}" if problem else early_ask
     if again := repeats_itself(turn.reply, context):
         problem = f"{again}, and also: {problem}" if problem else again
+    if brain and (
+        closed := slots.asked_again(turn.asked_slot, turn.reply, context["closed_slots"])
+        if context.get("closed_slots")
+        else None
+    ):
+        closed_text = (
+            f'you already asked "{closed[:90]}" and they answered it (any answer closes it, '
+            'even "no" or "pata nahi"): do not ask it again, in any language; move on'
+        )
+        problem = f"{closed_text}, and also: {problem}" if problem else closed_text
     if unasked := unasked_status(turn.reply, context):
         problem = f"{unasked}, and also: {problem}" if problem else unasked
     if promise := empty_promise(turn, context):
@@ -5057,6 +5095,11 @@ async def save_service_turn(
                 [*(previous.get("asked_facts") or []), *memory_block.asked_keys(turn.reply)]
             )
         )[-12:]
+        # R-ASK-07: the question asked last turn is answered now (any answer closes it); the one
+        # in this reply is the open one. Kept in the brief, so it survives sessions and languages.
+        closed, opened = slots.advance(previous, message.body or "", turn.reply, turn.asked_slot)
+        brief["closed_slots"] = closed
+        brief["last_question"] = opened
     known = list(previous.get("knowledge_gaps") or [])
     new_gaps = [g for g in dict.fromkeys(turn.knowledge_gaps) if g not in known]
     brief["knowledge_gaps"] = [*known, *new_gaps][-10:]
