@@ -38,6 +38,7 @@ from app.modules.pi import (
     latency,
     learning_context,
     memory_block,
+    open_requests,
     price_policy,
     problem_extract,
     problems,
@@ -993,6 +994,14 @@ Script and company facts (pi_mode "brain"; these override the shared rules above
   ideas were already given, ask whether they would like the solution document and quote. Write
   it in the language of their last message. (check_in_now.missed is different: answer that
   message.)
+- Answer first (R-ANS-01, R-ANS-02): when they ask you a direct question, the first sentence of
+  your reply answers it ("Haan, kar sakte hain", an honest "Ye Workzap nahi karta"); a question
+  back is never a substitute. A yes/no question gets a yes or a no first, then the detail.
+- Describe the problem, never judge the person or the business (R-TONE-01, R-TONE-02): turn a
+  complaint into something that can be solved ("dhanda nahi chal raha" becomes "sale aur footfall
+  barhani hai", "staff kaam nahi karte" becomes "kaam waqt par nahi hota").
+- A frustrated person (R-TONE-03) gets no defensiveness, no "please be patient", no lecture on
+  why you ask questions: give them the answer or the next step.
 - clarify_first (when present) is the ref of the noted problem to ask about first. pattern_hint
   (when present) is a pattern worth saying once, as an observation, never a diagnosis: for
   example "Three of the problems you've mentioned are about stock" (kind group) or "Shop C
@@ -3118,8 +3127,15 @@ async def prepare_context(
                 "asked_facts",
                 "closed_slots",
                 "last_question",
+                "open_requests",
             )
         },
+        # Requests left unanswered last turn, to answer first (R-ANS-03).
+        **(
+            {"open_requests": open_left}
+            if (open_left := (conversation.service_brief or {}).get("open_requests"))
+            else {}
+        ),
         # Questions already answered, kept across sessions and languages (R-ASK-07). The question
         # asked last turn counts as answered by what they say now, before the turn is saved.
         **(
@@ -4803,6 +4819,17 @@ async def compose_service_turn(
             'even "no" or "pata nahi"): do not ask it again, in any language; move on'
         )
         problem = f"{closed_text}, and also: {problem}" if problem else closed_text
+    if brain and (
+        left := open_requests.unanswered(
+            context.get("open_requests"), turn.reply, request_human=turn.request_human
+        )
+    ):
+        # R-ANS-03: a request left open for one reply is dealt with before anything else.
+        open_text = (
+            f"they asked for {' and '.join(left)} earlier and your last reply did not answer it "
+            "(R-ANS-03): answer it first in this reply, in the first sentence"
+        )
+        problem = f"{open_text}, and also: {problem}" if problem else open_text
     if unasked := unasked_status(turn.reply, context):
         problem = f"{unasked}, and also: {problem}" if problem else unasked
     if promise := empty_promise(turn, context):
@@ -5220,6 +5247,14 @@ async def save_service_turn(
         )
         brief["closed_slots"] = closed
         brief["last_question"] = opened
+        # R-ANS-03: what they asked for (a timeline, a person) that this reply did not address stays
+        # open, and the next reply must deal with it first.
+        brief["open_requests"] = open_requests.update(
+            previous.get("open_requests"),
+            message.body or "",
+            turn.reply,
+            request_human=turn.request_human,
+        )
     known = list(previous.get("knowledge_gaps") or [])
     new_gaps = [g for g in dict.fromkeys(turn.knowledge_gaps) if g not in known]
     brief["knowledge_gaps"] = [*known, *new_gaps][-10:]
