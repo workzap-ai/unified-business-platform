@@ -1,0 +1,306 @@
+{
+ "version": "1.0",
+ "source": "pi-platform-spec Book 2 Part 7.4",
+ "categories": {
+  "stock_inventory": {
+   "ideas": [
+    "Keep a “running lowˮ list at each counter that staff fill in.",
+    "Check expiry dates on the oldest stock first every Monday.",
+    "Move slow items to the front with a small offer before buying more.",
+    "Write every transfer between shops on a slip signed at both ends."
+   ],
+   "dropped": [
+    {
+     "text": "count the 20 best-selling items every evening instead of everything once a month",
+     "why": "a number, percentage, amount or promised result (no invented claims)"
+    }
+   ],
+   "build_keys": [
+    "stock_alerts",
+    "transfer_tracking",
+    "nori_daily_read",
+    "field_checks"
+   ],
+   "never_say": "“you'll never run out againˮ, any shrinkage percentage"
+  },
+  "sales_revenue": {
+   "ideas": [
+    "Compare each shop's sales day by day with the same day last week to see where the drop is.",
+    "Ask staff to note why browsing customers left without buying.",
+    "Try one offer on your slowest day and compare."
+   ],
+   "dropped": [
+    {
+     "text": "find the 10 items that sell most and make sure they're always on display",
+     "why": "a number, percentage, amount or promised result (no invented claims)"
+    }
+   ],
+   "build_keys": [
+    "nori_daily_read",
+    "dashboards_reports",
+    "customer_messaging"
+   ],
+   "never_say": "predicted sales growth; “best practice saysˮ"
+  },
+  "cash_collections": {
+   "ideas": [
+    "Count cash at closing with two people and note it in one place.",
+    "Keep a list of everyone who owes, with date and amount, and send a polite reminder each week.",
+    "Deposit cash daily at a fixed time.",
+    "For COD, check each courier's statement against your orders every week."
+   ],
+   "dropped": [],
+   "build_keys": [
+    "cash_reconciliation",
+    "credit_ledger",
+    "dashboards_reports"
+   ],
+   "never_say": "anything about loans, financing, interest or tax treatment RADV"
+  },
+  "margin_cost": {
+   "ideas": [],
+   "dropped": [
+    {
+     "text": "list your top 20 items with their buying cost and selling price to see real margin",
+     "why": "a number, percentage, amount or promised result (no invented claims); money or a regulated topic: a person decides"
+    },
+    {
+     "text": "add delivery, packing and platform fees to cost before setting prices",
+     "why": "tool words or a build named for free (R-BUILD-01); how-to, steps, settings or wording to copy (R-VAL-04, R-VAL-05); money or a regulated topic: a person decides"
+    },
+    {
+     "text": "check which supplier raised prices this year and get one comparison quote",
+     "why": "money or a regulated topic: a person decides"
+    }
+   ],
+   "build_keys": [
+    "dashboards_reports",
+    "nori_daily_read",
+    "erp_nori_platform"
+   ],
+   "never_say": "what price they should charge; tax advice"
+  },
+  "customers_retention": {
+   "ideas": [
+    "Collect every customer's WhatsApp number at billing (with their permission).",
+    "Message past customers when new stock arrives.",
+    "Reply to every review, good or bad, within a day."
+   ],
+   "dropped": [
+    {
+     "text": "ask “how did you hear about us?ˮ at the counter",
+     "why": "a question inside an idea (R-ASK: the one question is pi's last sentence)"
+    }
+   ],
+   "build_keys": [
+    "customer_messaging",
+    "loyalty_repeat",
+    "reviews_collection"
+   ],
+   "never_say": "“customers will come backˮ; anything that sends messages without customers' permission"
+  },
+  "marketing_leads": {
+   "ideas": [
+    "Complete the Google Maps profile of every location (photos, timings, WhatsApp, category).",
+    "Put a code or “show this messageˮ offer in every ad so you can tell which ad brings people.",
+    "Reply to every enquiry within an hour, even just “we'll send details shortlyˮ.",
+    "Stop the ads that bring no visits or enquiries after a fair test."
+   ],
+   "dropped": [
+    {
+     "text": "post new arrivals with prices on WhatsApp Status and Instagram",
+     "why": "money or a regulated topic: a person decides"
+    }
+   ],
+   "build_keys": [
+    "attribution_codes",
+    "lead_followup",
+    "customer_messaging",
+    "reviews_collection",
+    "dashboards_reports"
+   ],
+   "never_say": "cost-per-lead numbers, “go viralˮ, platform policy advice"
+  },
+  "orders_fulfilment": {
+   "ideas": [
+    "Write every order in one list (even a shared sheet) instead of across chats.",
+    "Confirm COD orders on WhatsApp before dispatch.",
+    "Tell customers their delivery day upfront.",
+    "Note the reason for every return."
+   ],
+   "dropped": [],
+   "build_keys": [
+    "order_capture",
+    "job_tracking",
+    "integration"
+   ],
+   "never_say": "“zero returnsˮ"
+  },
+  "suppliers_purchasing": {
+   "ideas": [
+    "Keep one list of open purchase orders with expected dates and follow up a day before.",
+    "Check quality on arrival and note problems with photos.",
+    "Buy based on what sold last month, not on the order booker's push."
+   ],
+   "dropped": [],
+   "build_keys": [
+    "workflow_automation",
+    "stock_alerts",
+    "dashboards_reports"
+   ],
+   "never_say": "customs, duty or contract advice"
+  },
+  "people_staff": {
+   "ideas": [
+    "Put the shift schedule where everyone can see it a week ahead.",
+    "Use a short opening and closing checklist.",
+    "Share a weekly target with each shop and the result.",
+    "Have new staff shadow your best person for a few days."
+   ],
+   "dropped": [],
+   "build_keys": [
+    "field_checks",
+    "workflow_automation",
+    "booking_scheduling"
+   ],
+   "never_say": "labour-law or termination advice; anything about watching staff without their knowledge"
+  },
+  "operations_process": {
+   "ideas": [
+    "Write the three most repeated tasks as simple steps.",
+    "Find the task you type twice and pick one place for it.",
+    "Set one person responsible for each recurring job.",
+    "Keep a maintenance log for key machines."
+   ],
+   "dropped": [],
+   "build_keys": [
+    "workflow_automation",
+    "field_checks",
+    "job_tracking",
+    "integration"
+   ],
+   "never_say": ""
+  },
+  "reporting_visibility": {
+   "ideas": [
+    "Have each shop send them by a fixed time in one format.",
+    "Compare with the same day last week."
+   ],
+   "dropped": [
+    {
+     "text": "decide the 3 numbers you want every morning (e.g. yesterday's sales per shop, cash, low stock)",
+     "why": "more than one sentence (R-VAL-03); a number, percentage, amount or promised result (no invented claims)"
+    }
+   ],
+   "build_keys": [
+    "nori_daily_read",
+    "dashboards_reports"
+   ],
+   "never_say": ""
+  },
+  "tech_systems": {
+   "ideas": [
+    "List every tool you use and what you type into it.",
+    "Pick one place to be the main record."
+   ],
+   "dropped": [
+    {
+     "text": "back up your Excel or register photos weekly",
+     "why": "how-to, steps, settings or wording to copy (R-VAL-04, R-VAL-05); names a vendor, an app to buy, a product or a competitor"
+    }
+   ],
+   "build_keys": [
+    "integration",
+    "erp_nori_platform",
+    "workflow_automation"
+   ],
+   "never_say": "which brand of POS/software to buy (v3 A5"
+  },
+  "quality_complaints": {
+   "ideas": [
+    "Check a sample of every batch or job before it leaves.",
+    "Note each complaint with a photo and reason.",
+    "Share the top complaint with the team each week."
+   ],
+   "dropped": [],
+   "build_keys": [
+    "field_checks",
+    "job_tracking"
+   ],
+   "never_say": ""
+  },
+  "compliance_admin": {
+   "ideas": [
+    "Keep documents in one folder by month."
+   ],
+   "dropped": [
+    {
+     "text": "keep a calendar of every licence, renewal and filing date",
+     "why": "money or a regulated topic: a person decides"
+    }
+   ],
+   "build_keys": [
+    "workflow_automation"
+   ],
+   "never_say": "what the law requires, tax amounts, filing advice"
+  },
+  "communication_coordination": {
+   "ideas": [
+    "Use one group per purpose instead of one group for everything.",
+    "End each day with a short “what's pendingˮ list.",
+    "Give every task one owner and a date."
+   ],
+   "dropped": [],
+   "build_keys": [
+    "workflow_automation",
+    "dashboards_reports"
+   ],
+   "never_say": ""
+  },
+  "loss_security": {
+   "ideas": [
+    "Have two people at cash and stock counts.",
+    "Check voids and refunds daily.",
+    "Count high-value items more often."
+   ],
+   "dropped": [],
+   "build_keys": [
+    "cash_reconciliation",
+    "transfer_tracking",
+    "field_checks"
+   ],
+   "never_say": "accusations, legal action advice, covert monitoring"
+  },
+  "planning_growth": {
+   "ideas": [
+    "Look at last year's peak season sales by week to plan stock.",
+    "Open a new branch only after the current one's numbers are clear month by month."
+   ],
+   "dropped": [],
+   "build_keys": [
+    "nori_daily_read",
+    "erp_nori_platform",
+    "dashboards_reports"
+   ],
+   "never_say": "investment or financing advice"
+  },
+  "customer_experience_digital": {
+   "ideas": [
+    "Add online booking or ordering if most enquiries ask the same thing.",
+    "Fix the website's contact button first."
+   ],
+   "dropped": [
+    {
+     "text": "make sure your WhatsApp Business profile has address, timings and catalogue",
+     "why": "names a vendor, an app to buy, a product or a competitor"
+    }
+   ],
+   "build_keys": [
+    "website_digital",
+    "booking_scheduling",
+    "order_capture"
+   ],
+   "never_say": ""
+  }
+ }
+}

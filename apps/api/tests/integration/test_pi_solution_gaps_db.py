@@ -164,7 +164,14 @@ async def test_g3_a_request_with_no_industry_yields_a_marker_not_silence(
         api, business_db, monkeypatch, "S2_CLARIFYING"
     )
     customer.industry_primary = None
-    noted = [{"title": "stock runs out every week", "group": "stock_inventory"}]
+    # the generic library (platform spec Book 2 7.4) answers a category it holds ideas for
+    stock = [{"title": "stock runs out every week", "group": "stock_inventory"}]
+    library = await solution_context.build(
+        business_db, scope, conversation, "solution do", stock, {}
+    )
+    assert len(library["solution_ideas"]) == 2 and library["solution_asked"] is True
+    # a category the library has no passing idea for (margin_cost) still gets the honest marker
+    noted = [{"title": "stock runs out every week", "group": "margin_cost"}]
     got = await solution_context.build(business_db, scope, conversation, "solution do", noted, {})
     assert got["solution_asked_no_ideas"] is True
     assert got["solution_noted"] == ["stock runs out every week"]

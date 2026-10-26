@@ -26,6 +26,7 @@ from app.modules.pi import (
     learning_solutions,
     solution_ask,
     solution_ideas,
+    solution_library,
     solutions,
     value_line,
 )
@@ -99,6 +100,50 @@ def _no_ideas(
     )
     titles = [str(n.get("title") or "")[:80] for n in noted[-NOTED_TITLES:] if n.get("title")]
     return {"solution_asked_no_ideas": True, "solution_noted": titles, "solution_why": why}
+
+
+def _from_library(
+    conversation: PiConversation, noted: list[dict[str, Any]], language: str
+) -> dict[str, Any] | None:
+    """Two ideas from the generic library for the latest noted problem's category (platform spec
+    Book 2 Part 7.4), when no industry entry has any: an unknown industry, or a problem none of the
+    entry's problems matches. None when the budget is spent, nothing is noted, or the library has
+    nothing new for the category: the honest "those are the ideas I have" line then follows."""
+    brief = conversation.service_brief or {}
+    left = allowance(brief, given_so_far(conversation))
+    if left <= 0 or not noted:
+        return None
+    before = [str(x) for x in brief.get("library_given") or []]
+    ideas: list[str] = []
+    category = ""
+    for item in reversed(noted):
+        category = str(item.get("group") or "")
+        count = min(value_line.IDEAS_PER_MESSAGE, left)
+        ideas = solution_library.ideas_for(category, before, count)
+        if ideas:
+            break
+    if not ideas:
+        return None
+    problem = {
+        "id": f"library:{category}",
+        "workzap_build": {"keys": solution_library.build_keys(category)},
+    }
+    line = solution_ask.bridge(dict(brief), problem, language, None)
+    conversation.service_brief = solution_ask.remember_bridge(
+        {
+            **brief,
+            "ideas_given": given_so_far(conversation) + len(ideas),
+            "library_given": [*before, *ideas][-20:],
+            "solution_last_problem": problem["id"],
+        },
+        line,
+    )
+    out: dict[str, Any] = {"solution_ideas": ideas, "solution_asked": True}
+    if never := solution_library.never_say(category):
+        out["solution_never_say"] = [never]
+    if line:
+        out["solution_build"] = solution_ask.public(line)
+    return out
 
 
 async def build(
@@ -298,6 +343,12 @@ async def _build(
             return {
                 "solution_howto": {"covers": "", "which_app": solution_ask.asked_which_app(said)}
             }
+        if asked and (conversation.flow_state or "") in solution_ask.ASKABLE:
+            from_library = _from_library(
+                conversation, noted, detect_language(said) or conversation.language or "en"
+            )
+            if from_library is not None:
+                return from_library
         return _no_ideas(conversation, noted, industry, "no_industry", now) if asked else {}
     language = detect_language(said) or conversation.language or "en"
     language = language if language in ("en", "roman_ur", "ar") else "en"
@@ -424,6 +475,8 @@ async def _build(
             ):
                 used["unmatched"] = words  # only words with no name, figure or contact in them
                 used["customer"] = str(conversation.customer_id)
+        if explicit and (from_library := _from_library(conversation, noted, language)) is not None:
+            return from_library
         return _no_ideas(conversation, noted, industry, "no_match", now) if explicit else {}
     handed = await _give(
         session,
