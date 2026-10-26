@@ -1334,7 +1334,7 @@ def brain_context(
             # A chat that began before brain mode and never told the person pi is an AI: its first
             # brain reply says so once (R-DISC-01), instead of carrying on as if it had.
             context["legacy_undisclosed"] = bool(replied) and not any(
-                SAYS_AI.search(str(m.body or "")) for m in replied
+                SAYS_AI.search(str(getattr(m, "body", "") or "")) for m in replied
             )
         if state == flow.State.S7_DELIVERED:  # they reacted to the documents: S7 to S8
             state = flow.advance(state, flow.State.S8_REVIEW)
