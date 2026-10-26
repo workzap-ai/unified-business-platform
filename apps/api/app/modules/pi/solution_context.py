@@ -123,7 +123,7 @@ def _from_library(
     category = ""
     heard = " ".join(
         " ".join([str(n.get("title") or ""), *[str(w) for w in n.get("user_words") or []]])
-        for n in noted[-3:]
+        for n in noted
     )
     for category in solution_library.best_category(noted):
         count = min(value_line.IDEAS_PER_MESSAGE, left)
@@ -474,6 +474,12 @@ async def _build(
     # The latest noted problem first, then the earlier ones: a person who then mentions something
     # off the page ("staff forget the entry") still gets ideas for the problem that does match.
     best_fit = -1
+    # Every fact noted so far counts for the fit, not only the one problem being matched ("call se
+    # parents ko bura lagta hai" next to "fee late" says which fee entry is meant, live test 5)
+    everything = " ".join(
+        " ".join([str(n.get("title") or ""), *[str(w) for w in n.get("user_words") or []]])
+        for n in noted or []
+    )
     for item in reversed(noted or []):
         group, subtype = str(item.get("group") or ""), str(item.get("subtype") or "")
         said_words = " ".join(
@@ -489,7 +495,7 @@ async def _build(
         # The entry that fits the person's own words best, not the first one the category gave
         # (live test 4: "views but no orders" took the attribution ideas before the entry for
         # "price asked in DM, then silence"); a tie goes to the latest noted problem.
-        fit = solution_ideas.fit(found, said_words)
+        fit = solution_ideas.fit(found, f"{said_words} {everything}")
         if fit > best_fit:
             best_fit = fit
             problem = found

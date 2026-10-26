@@ -31,8 +31,12 @@ business problems in it, in the exact shape asked for. Rules:
 - A request for software or a service still has a problem behind it (a cost, a delay, a manual
   job): note that problem, never the product.
 - title: English, at most 8 words, starts with the subject, no names, no blame, no solution words.
-- title_local: the same in the person's language and script.
-- user_words: their own words, verbatim, 1 to 3 short pieces.
+- title_local: the same in the person's language and script (Roman Urdu stays in Roman letters,
+  never Urdu script).
+- user_words: their own words, verbatim, 1 to 3 short pieces. A reason the problem hurts ("parents
+  feel bad when we call", "we only collect in the first week") is a detail of it: keep it in
+  user_words, and when it is a separate pain make it a second problem. Never drop it because the
+  first problem is already noted.
 - category and subtype: choose from the list given; leave subtype empty if none fits.
 - where, of_total, frequency, impact_types, money_text: only what they said; otherwise empty.
 - Never write a person's name; use roles. Do not repeat a problem already noted.
