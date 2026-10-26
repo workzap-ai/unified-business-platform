@@ -49,7 +49,7 @@
           "credit_ledger",
           "customer_messaging"
         ],
-        "text": "Buyer balances with ageing and WhatsApp reminders queued automatically for the owner to approve, sent only with the buyer's permission.",
+        "text": "Buyer balances with ageing and WhatsApp reminders queued for the owner to approve, sent only with the buyer's permission.",
         "tool_words": []
       },
       "ask_first": "Do upcountry buyers go quiet mostly after the first order, or after several?",
@@ -79,7 +79,7 @@
         "keys": [
           "cash_reconciliation"
         ],
-        "text": "A daily closing screen comparing parchis, cash, bank transfers and new credit, flagging any difference automatically.",
+        "text": "A daily closing screen comparing parchis, cash, bank transfers and new credit, flagging any difference to you right away.",
         "tool_words": []
       },
       "ask_first": "Is the mismatch there every day, or only on busy days?",
@@ -233,7 +233,7 @@
         "keys": [
           "stock_alerts"
         ],
-        "text": "Lot ageing alerts that warn automatically when stock has sat too long, ahead of the summer months.",
+        "text": "Lot ageing alerts that warn you when stock has sat too long, ahead of the summer months.",
         "tool_words": []
       },
       "ask_first": "Does the insect trouble hit only dry fruit, or other stock too?",
@@ -351,7 +351,7 @@
   ],
   "sample_reply": {
     "person": "Roz shaam ko gaddi ka cash parchiyon se nahi milta. Is ka kya hal hai?",
-    "pi": "Zaroor, ye sambhal sakta hai, aur is ke liye bade kharch ki zaroorat nahi.\nPehle, numbered parchi books istemaal karein, taake har sale ka record gina ja sake.\nDoosra, closing par ek banda gine aur doosra check kare, taake ginti par bharosa ho.\nWorkzap ye banwane mein madad kar sakta hai: parchi, cash, transfer aur udhaar roz ek screen par milein aur farq apne aap nazar aaye, phone par bhi.\n\nKya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "pi": "Zaroor, ye sambhal sakta hai, aur is ke liye bade kharch ki zaroorat nahi.\nPehle, numbered parchi books istemaal karein, taake har sale ka record gina ja sake.\nDoosra, closing par ek banda gine aur doosra check kare, taake ginti par bharosa ho.\nWorkzap ye banwane mein madad kar sakta hai: parchi, cash, transfer aur udhaar roz ek screen par milein aur farq saaf nazar aaye, phone par bhi.\n\nKya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
     "language": "roman_urdu"
   }
 }

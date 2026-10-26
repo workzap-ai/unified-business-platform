@@ -18,7 +18,7 @@
         "keys": [
           "stock_alerts"
         ],
-        "text": "a leftover log by item and branch with what was reworked, discounted or discarded, feeding a daily production suggestion automatically.",
+        "text": "a leftover log by item and branch with what was reworked, discounted or discarded, giving you a daily production suggestion.",
         "tool_words": []
       },
       "ask_first": "Who decides how much to bake each day?",
@@ -203,7 +203,7 @@
         "keys": [
           "credit_ledger"
         ],
-        "text": "corporate order and receivables tracking with balances by customer label and automatic payment reminders.",
+        "text": "corporate order and receivables tracking with balances by customer label and payment reminders sent to clients.",
         "tool_words": []
       },
       "ask_first": "How many corporate customers buy on credit?",

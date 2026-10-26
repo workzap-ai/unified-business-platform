@@ -79,7 +79,7 @@
         "keys": [
           "workflow_automation"
         ],
-        "text": "A project register where completing a stage raises the invoice task automatically.",
+        "text": "A project register where completing a stage raises the invoice task straight away.",
         "tool_words": []
       },
       "ask_first": "Who decides a stage is complete?",

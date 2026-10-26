@@ -261,7 +261,7 @@
         "keys": [
           "reviews_collection"
         ],
-        "text": "Automatic review requests to customers who agreed to be contacted after a smooth visit, with a weekly review summary per outlet.",
+        "text": "Review requests sent to customers who agreed to be contacted after a smooth visit, with a weekly review summary per outlet.",
         "tool_words": []
       },
       "ask_first": "Are the bad reviews mostly about waiting, or about staff manner?",

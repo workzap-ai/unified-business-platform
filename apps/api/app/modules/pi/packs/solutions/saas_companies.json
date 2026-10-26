@@ -174,7 +174,7 @@
         "keys": [
           "workflow_automation"
         ],
-        "text": "an onboarding checklist per account with automatic reminders to the customer and the team at each step.",
+        "text": "an onboarding checklist per account with reminder messages sent to the customer and the team at each step.",
         "tool_words": []
       },
       "ask_first": "Does the week of calls go mostly on training users, or on setting up their data?",

@@ -18,10 +18,10 @@
         "keys": [
           "integration"
         ],
-        "text": "one booking calendar across Airbnb, Booking.com and direct bookings for every unit, with an automatic alert the moment two bookings overlap.",
+        "text": "one booking calendar across Airbnb, Booking.com and direct bookings for every unit, alerting you the moment two bookings overlap.",
         "tool_words": []
       },
-      "ask_first": "How many units, and on how many platforms each?",
+      "ask_first": "How many units, and on how many booking sites each?",
       "free_stops": "How the calendars are connected and the clash rules go in the solution document.",
       "extra_ideas": [
         {
@@ -48,7 +48,7 @@
         "keys": [
           "field_checks"
         ],
-        "text": "a daily turnover list sent to each cleaner automatically, updated when bookings change overnight, with tap-to-mark \"cleaned\", photo proof and turnaround times across all units.",
+        "text": "a daily turnover list sent to each cleaner every morning, updated when bookings change overnight, with tap-to-mark \"cleaned\", photo proof and turnaround times across all units.",
         "tool_words": []
       },
       "ask_first": "Are your cleaners your own staff or freelancers?",
@@ -108,7 +108,7 @@
         "keys": [
           "field_checks"
         ],
-        "text": "a check-out inspection with photos linked automatically to each stay, so the record is there whenever a dispute comes up.",
+        "text": "a check-out inspection with photos attached directly to each stay, so the record is there whenever a dispute comes up.",
         "tool_words": []
       },
       "ask_first": "Do you take a security deposit now?",
@@ -138,7 +138,7 @@
         "keys": [
           "dashboards_reports"
         ],
-        "text": "a unit-level profit view that pulls payouts, commissions, cleaning, utilities and supplies automatically each month.",
+        "text": "a unit-level profit view that pulls payouts, commissions, cleaning, utilities and supplies each month.",
         "tool_words": [],
         "leads_with_view": true
       },
@@ -169,7 +169,7 @@
         "keys": [
           "workflow_automation"
         ],
-        "text": "owner statements generated automatically from each unit's bookings and costs and sent as a PDF every month.",
+        "text": "owner statements generated from each unit's bookings and costs and sent as a PDF every month.",
         "tool_words": []
       },
       "ask_first": "How many owners do you report to?",
@@ -199,7 +199,7 @@
         "keys": [
           "stock_alerts"
         ],
-        "text": "stock per unit with par levels, updated from cleaners' turnovers, with automatic restock alerts.",
+        "text": "stock per unit with par levels, updated from cleaners' turnovers, sending restock alerts when low.",
         "tool_words": []
       },
       "ask_first": "Do you have one central store or supplies kept in each unit?",
@@ -229,7 +229,7 @@
         "keys": [
           "credit_ledger"
         ],
-        "text": "a cleaner ledger that adds each completed turnover automatically and shows a running balance per cleaner.",
+        "text": "a cleaner ledger that adds each completed turnover as it finishes and shows a running balance per cleaner.",
         "tool_words": []
       },
       "ask_first": "Do you pay cleaners per turnover or by the hour?",
@@ -291,7 +291,7 @@
         "keys": [
           "workflow_automation"
         ],
-        "text": "a renewal tracker per unit that sends reminders automatically and keeps a document checklist for each.",
+        "text": "a renewal tracker per unit that sends reminders before due dates and keeps a document checklist for each.",
         "tool_words": []
       },
       "ask_first": "How many units need renewals this year?",

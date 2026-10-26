@@ -18,7 +18,7 @@
         "keys": [
           "job_tracking"
         ],
-        "text": "a batch register linking every batch's date, shade and QC result to the dealers it went to, filled automatically from dispatch.",
+        "text": "a batch register linking every batch's date, shade and QC result to the dealers it went to, filled right from dispatch.",
         "tool_words": []
       },
       "ask_first": "Are complaints mostly on dealer-tinted shades or factory-made shades?",
@@ -78,7 +78,7 @@
         "keys": [
           "credit_ledger"
         ],
-        "text": "a dealer ledger with limits, ageing and automatic WhatsApp reminders, flagging orders from dealers over their limit.",
+        "text": "a dealer ledger with limits, ageing and WhatsApp reminders sent to dealers, flagging orders from dealers over their limit.",
         "tool_words": []
       },
       "ask_first": "Who approves dealer credit today, you or the sales officers?",
@@ -142,7 +142,7 @@
         "tool_words": []
       },
       "ask_first": "Are coupons redeemed at dealers or at your office?",
-      "free_stops": "The code system and redemption checks are in the solution document.",
+      "free_stops": "The code rules and redemption checks are in the solution document.",
       "extra_ideas": [
         {
           "text": "Count how many redeemed coupons arrive with marks or numbers already seen, so you gauge whether repeat claims are isolated or routine.",
@@ -199,7 +199,7 @@
         "keys": [
           "stock_alerts"
         ],
-        "text": "a raw-material board showing stock cover and open consignments, alerting automatically when cover drops low.",
+        "text": "a raw-material board showing stock cover and open consignments, alerting the owner when cover drops low.",
         "tool_words": []
       },
       "ask_first": "Which raw material has stopped production most often?",
@@ -261,7 +261,7 @@
         "keys": [
           "order_capture"
         ],
-        "text": "one order book for WhatsApp, calls and SO orders, tracked to dispatch with confirmations sent automatically.",
+        "text": "one order book for WhatsApp, calls and SO orders, tracked to dispatch with confirmations sent to buyers.",
         "tool_words": []
       },
       "ask_first": "Roughly how many dealer orders come in a day?",

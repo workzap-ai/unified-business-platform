@@ -144,7 +144,7 @@
         "tool_words": []
       },
       "ask_first": "Do most of your ads bring phone calls, or WhatsApp messages?",
-      "free_stops": "How codes are set up per platform and tied to policies is in the solution document.",
+      "free_stops": "How codes are set up per channel and tied to policies is in the solution document.",
       "extra_ideas": [
         {
           "text": "Count this week's new enquiries by where they said they found you, so policy sources stop being guesswork.",
@@ -170,7 +170,7 @@
         "keys": [
           "credit_ledger"
         ],
-        "text": "An expected-versus-received commission ledger by insurer and month that flags every mismatch automatically and keeps a running list of what is still owed.",
+        "text": "An expected-versus-received commission ledger by insurer and month that highlights every mismatch immediately and keeps a running list of what is still owed.",
         "tool_words": []
       },
       "ask_first": "Is it the amount or the timing of commission that causes more trouble?",
@@ -347,7 +347,7 @@
     "Any request for policy numbers, customer names, IDs, medical details, vehicle numbers or bank details."
   ],
   "sample_reply": {
-    "person": "Bhai renewals ka koi system nahi, har agent apni Excel chalata hai aur policies lapse ho jati hain. Koi hal batao.",
+    "person": "Bhai renewals ka koi sahi tareeqah nahi, har agent apni Excel chalata hai aur policies lapse ho jati hain. Koi hal batao.",
     "pi": "Haan, is par kaam ho sakta hai, aur pehla qadam aasan hai.\nPehle, saari renewal dates ek hi list mein le aayein aur har policy ke saath ek zimmedar ka naam likhein, taake koi renewal be-malik na rahe.\nDoosra, har Monday chhoti si meeting mein agle mahine ki renewals baant dein, taake call due date se pehle ho.\nWorkzap ye tayyar kar sakta hai: har agent ko waqt pe yaad-dehani, customer ko unki ijazat se WhatsApp reminder, aur aap ke saamne roz ki report ke kaun si renewal bachi aur kaun si lapse hui.\n\nKya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
     "language": "roman_urdu"
   }

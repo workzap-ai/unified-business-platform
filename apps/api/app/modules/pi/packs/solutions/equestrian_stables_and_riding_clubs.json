@@ -18,7 +18,7 @@
         "keys": [
           "booking_scheduling"
         ],
-        "text": "lesson booking with instructor and horse assigned, blocking double bookings and sending confirmations automatically.",
+        "text": "lesson booking with instructor and horse assigned, blocking double bookings and sending confirmations right away.",
         "tool_words": []
       },
       "ask_first": "Who takes bookings now?",
@@ -78,7 +78,7 @@
         "keys": [
           "booking_scheduling"
         ],
-        "text": "customer_messaging — an instructor schedule with a cancellation log and automatic messages to affected parents.",
+        "text": "customer_messaging — an instructor schedule with a cancellation log and messages sent to affected parents right when changes happen.",
         "tool_words": []
       },
       "ask_first": "How often do cancellations happen in a month?",
@@ -108,7 +108,7 @@
         "keys": [
           "credit_ledger"
         ],
-        "text": "livery billing with balances and reminders sent automatically.",
+        "text": "livery billing with balances and reminders sent on time.",
         "tool_words": []
       },
       "ask_first": "How many horses are on livery?",
@@ -138,7 +138,7 @@
         "keys": [
           "job_tracking"
         ],
-        "text": "credit_ledger — extras logged as they happen and added to each owner's invoice automatically.",
+        "text": "credit_ledger — extras logged as they happen and added straight onto each owner's invoice.",
         "tool_words": []
       },
       "ask_first": "Who arranges the farrier and vet visits?",
@@ -168,7 +168,7 @@
         "keys": [
           "booking_scheduling"
         ],
-        "text": "loyalty_repeat — package balances that update with every lesson, with renewal reminders sent automatically.",
+        "text": "loyalty_repeat — package balances that update with every lesson, with renewal reminders sent right on time.",
         "tool_words": []
       },
       "ask_first": "Do most riders pay per lesson or in packages?",
@@ -198,7 +198,7 @@
         "keys": [
           "stock_alerts"
         ],
-        "text": "hay, feed and bedding stock with reorder alerts and cost per horse kept automatically.",
+        "text": "hay, feed and bedding stock with reorder alerts and cost per horse kept updated as you go.",
         "tool_words": []
       },
       "ask_first": "Who orders hay and bedding now?",
@@ -228,7 +228,7 @@
         "keys": [
           "field_checks"
         ],
-        "text": "a daily care checklist per stable block with timestamps and photos, flagging missed items automatically.",
+        "text": "a daily care checklist per stable block with timestamps and photos, flagging missed items right away.",
         "tool_words": []
       },
       "ask_first": "How many grooms work each day?",
@@ -258,7 +258,7 @@
         "keys": [
           "customer_messaging"
         ],
-        "text": "messages to past riders and parents sent automatically ahead of camps and the new season.",
+        "text": "messages to past riders and parents sent right before camps and the new season.",
         "tool_words": []
       },
       "ask_first": "Do you have an indoor or covered arena?",

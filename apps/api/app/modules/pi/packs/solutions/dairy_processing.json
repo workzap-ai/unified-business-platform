@@ -24,7 +24,7 @@
         ]
       },
       "ask_first": "How do collection records reach the plant now?",
-      "free_stops": "The intake app set-up per collection point is in the solution document.",
+      "free_stops": "The intake set-up details per collection point are in the solution document.",
       "extra_ideas": [
         {
           "text": "Count how many milk intake slips lack a matching paper lab result from the same day, so the mismatch size is clear.",
@@ -232,7 +232,7 @@
         "keys": [
           "customer_messaging"
         ],
-        "text": "a subscription manager with pause and automatic resume reminders.",
+        "text": "a subscription manager with pause options and timely resume reminders.",
         "tool_words": []
       },
       "ask_first": "How are pauses handled now?",

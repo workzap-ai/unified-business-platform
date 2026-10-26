@@ -110,7 +110,7 @@
         "keys": [
           "field_checks"
         ],
-        "text": "A tanker receiving log at the gate with time, photo and quantity, matched to supplier bills automatically each month.",
+        "text": "A tanker receiving log at the gate with time, photo and quantity, matched to supplier bills each month.",
         "tool_words": []
       },
       "ask_first": "How many tankers do you order in a typical week?",
@@ -290,7 +290,7 @@
         "keys": [
           "booking_scheduling"
         ],
-        "text": "A facility booking calendar for hall, pool and courts with rules and automatic confirmations.",
+        "text": "A facility booking calendar for hall, pool and courts with rules and instant confirmations.",
         "tool_words": []
       },
       "ask_first": "Which facilities do residents book most?",

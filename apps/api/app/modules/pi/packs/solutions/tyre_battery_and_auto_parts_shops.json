@@ -140,7 +140,7 @@
         "keys": [
           "credit_ledger"
         ],
-        "text": "a credit ledger per workshop with statements sent automatically on WhatsApp and reminders on overdue balances.",
+        "text": "a credit record for each workshop with statements sent on WhatsApp and reminders when payments are overdue.",
         "tool_words": []
       },
       "ask_first": "Roughly how many workshops buy from you on credit?",

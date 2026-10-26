@@ -48,7 +48,7 @@
         "keys": [
           "customer_messaging"
         ],
-        "text": "Live free-time countdowns and detention estimates sent to the customer on WhatsApp automatically.",
+        "text": "Live free-time countdowns and detention estimates sent to the customer on WhatsApp as time runs.",
         "tool_words": []
       },
       "ask_first": "Do customers mostly call to ask about charges, or only find out when they come to pay?",
@@ -228,7 +228,7 @@
         "keys": [
           "customer_messaging"
         ],
-        "text": "Automatic arrival notices to consignees from the manifest.",
+        "text": "Arrival notices sent directly to consignees from the manifest.",
         "tool_words": []
       },
       "ask_first": "Which question comes most, the arrival date, the berth or the documents?",

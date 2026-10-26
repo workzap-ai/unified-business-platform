@@ -18,7 +18,7 @@
         "keys": [
           "workflow_automation"
         ],
-        "text": "a headcount change log per event with automatic cut-off reminders to the client, linked to the purchase list.",
+        "text": "a headcount change log per event with cut-off reminders sent to the client, linked to the purchase list.",
         "tool_words": []
       },
       "ask_first": "When does the client usually confirm the final count?",
@@ -48,7 +48,7 @@
         "keys": [
           "dashboards_reports"
         ],
-        "text": "an event costing sheet that totals purchases, staff, transport and crockery against the quoted price for every event automatically.",
+        "text": "an event costing sheet that totals purchases, staff, transport and crockery against the quoted price for every event for the owner.",
         "tool_words": [],
         "leads_with_view": true
       },
@@ -79,7 +79,7 @@
         "keys": [
           "booking_scheduling"
         ],
-        "text": "an event booking calendar with status, venue and clash warnings, updated automatically as advances come in.",
+        "text": "an event booking calendar with status, venue and clash warnings, updated right away as advances come in.",
         "tool_words": []
       },
       "ask_first": "Has a double-booking actually happened?",
@@ -109,7 +109,7 @@
         "keys": [
           "lead_followup"
         ],
-        "text": "every enquiry recorded with a quick quote sent on WhatsApp and automatic follow-up reminders until it's booked or closed.",
+        "text": "every enquiry recorded with a quick quote sent on WhatsApp and follow-up reminders sent to clients until it's booked or closed.",
         "tool_words": []
       },
       "ask_first": "Where do most enquiries come from?",
@@ -169,7 +169,7 @@
         "keys": [
           "credit_ledger"
         ],
-        "text": "advances and balances per event with automatic reminders before and after the event date.",
+        "text": "advances and balances per event with reminders sent to clients before and after the event date.",
         "tool_words": []
       },
       "ask_first": "How long do balances usually take?",
@@ -199,7 +199,7 @@
         "keys": [
           "booking_scheduling"
         ],
-        "text": "a staff roster per event with automatic WhatsApp confirmations the day before, and a run sheet shared with the venue lead.",
+        "text": "a staff roster per event with WhatsApp confirmations sent to staff the day before, and a run sheet shared with the venue lead.",
         "tool_words": []
       },
       "ask_first": "How many waiters per event are daily-wage?",
@@ -229,7 +229,7 @@
         "keys": [
           "workflow_automation"
         ],
-        "text": "purchase requests and bill photos captured per event with your approval, totalled automatically against the event's budget.",
+        "text": "purchase requests and bill photos captured per event with your approval, totalled against the event's budget for the owner.",
         "tool_words": []
       },
       "ask_first": "Who buys for each event now?",

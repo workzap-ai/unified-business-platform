@@ -18,10 +18,10 @@
         "keys": [
           "credit_ledger"
         ],
-        "text": "a simple ledger of every job and payment with polite reminders sent automatically when a payment is late.",
+        "text": "A simple ledger of every job and payment with polite reminders sent to the customer when a payment is late.",
         "tool_words": []
       },
-      "ask_first": "Are your clients mostly on a platform, or direct?",
+      "ask_first": "Are your clients mostly on freelancing websites, or direct?",
       "free_stops": "the reminder sequence and payment link setup are kept for the solution document.",
       "extra_ideas": [
         {
@@ -108,11 +108,11 @@
         "keys": [
           "order_capture"
         ],
-        "text": "DMs and WhatsApp orders turned into one numbered order list, with details confirmed back to the customer automatically.",
+        "text": "DMs and WhatsApp orders turned into one numbered order list, with details confirmed back to the customer right after they order.",
         "tool_words": []
       },
       "ask_first": "Which chat loses more orders, Instagram or WhatsApp, and is it usually when you are busy?",
-      "free_stops": "how orders are captured from each app is worked out in the solution document.",
+      "free_stops": "How orders are gathered from each ordering channel is worked out in the solution document.",
       "extra_ideas": [
         {
           "text": "Count open orders waiting in chats against orders on your main list once, so missed requests show before delivery day.",

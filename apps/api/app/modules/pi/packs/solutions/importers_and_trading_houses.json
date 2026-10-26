@@ -18,7 +18,7 @@
         "keys": [
           "custom_build"
         ],
-        "text": "A landed-cost tracker where staff log each charge as it is paid and every shipment's per-item cost updates itself automatically, provisional then final.",
+        "text": "A landed-cost tracker where staff log each charge as it is paid and every shipment's per-item cost updates directly, provisional then final.",
         "tool_words": []
       },
       "ask_first": "Who puts the cost together today — you, the accountant or a clerk?",
@@ -48,7 +48,7 @@
         "keys": [
           "dashboards_reports"
         ],
-        "text": "A margin view that records the assumed and actual rate for every shipment and flags affected open quotes automatically whenever the rate moves.",
+        "text": "A margin view that records the assumed and actual rate for every shipment and flags affected open quotes whenever the rate moves.",
         "tool_words": [],
         "leads_with_view": true
       },
@@ -79,7 +79,7 @@
         "keys": [
           "job_tracking"
         ],
-        "text": "A shipment tracker showing every container's stage and missing documents, sending alerts automatically when arrival is close and papers are incomplete.",
+        "text": "A shipment tracker showing every container's stage and missing documents, sending alerts when arrival is close and papers are incomplete.",
         "tool_words": []
       },
       "ask_first": "Which document is usually the one that arrives late?",
@@ -174,7 +174,7 @@
         "keys": [
           "stock_alerts"
         ],
-        "text": "A reorder planner that reads past sales and supplier lead times every day and warns automatically when an item must go into the next container.",
+        "text": "A reorder planner that reads past sales and supplier lead times every day and warns when an item must go into the next container.",
         "tool_words": []
       },
       "ask_first": "Do you track stock by item and size, or only by carton?",
@@ -204,7 +204,7 @@
         "keys": [
           "field_checks"
         ],
-        "text": "A phone stock register with in/out slips and a daily count routine across every godown, producing a variance report for the owner automatically.",
+        "text": "A phone stock register with in/out slips and a daily count routine across every godown, producing a variance report for the owner daily.",
         "tool_words": []
       },
       "ask_first": "Who is allowed to take maal out of the godown today?",
@@ -264,7 +264,7 @@
         "keys": [
           "workflow_automation"
         ],
-        "text": "A rate list pushed to salesmen's phones daily, with every quote logged per party and anything below list sent for approval automatically.",
+        "text": "A rate list pushed to salesmen's phones daily, with every quote logged per party and anything below list sent for approval.",
         "tool_words": []
       },
       "ask_first": "Do rate differences come mostly from one or two salesmen, or from all of them?",
@@ -297,7 +297,7 @@
         "text": "A connection so sales and receipts are entered once and Tally or QuickBooks and the stock register stay in step every day.",
         "tool_words": []
       },
-      "ask_first": "Which system does a sale get entered into first?",
+      "ask_first": "Where does a sale get entered first?",
       "free_stops": "What connects, in which direction, is mapped in the solution document.",
       "extra_ideas": [
         {
@@ -355,7 +355,7 @@
           "order_capture",
           "integration"
         ],
-        "text": "Marketplace order intake that feeds Daraz orders into the same stock as the godown automatically, so trade and online never sell the same maal twice.",
+        "text": "Marketplace order intake that feeds Daraz orders into the same stock as the godown, so trade and online never sell the same maal twice.",
         "tool_words": []
       },
       "ask_first": "Is the main worry stock and orders for Daraz, or who will run it day to day?",
@@ -382,7 +382,7 @@
   ],
   "sample_reply": {
     "person": "Bhai har container ke baad cost do hafte baad aati hai, tab tak andaze se rate chal raha hota hai. Koi hal batao is ka.",
-    "pi": "Haan, is ko behtar kiya ja sakta hai, aur pehla qadam aasan hai.\nPehle, pichle container ke saare kharche ek jagah jama karein, taake dikhe ke arrival ke din kitni cost pehle se maloom thi.\nDoosra, maujooda container ke liye accountant ke saath ek provisional per-item cost tay kar lein, taake rate isi shipment par bane.\nWorkzap is tarah ka intezam kar sakta hai: staff har kharcha phone par daale aur har shipment ki per-item cost roz apne aap update ho.\n\nKya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "pi": "Haan, is ko behtar kiya ja sakta hai, aur pehla qadam aasan hai.\nPehle, pichle container ke saare kharche ek jagah jama karein, taake dikhe ke arrival ke din kitni cost pehle se maloom thi.\nDoosra, maujooda container ke liye accountant ke saath ek provisional per-item cost tay kar lein, taake rate isi shipment par bane.\nWorkzap is tarah ka intezam kar sakta hai: staff har kharcha phone par daale aur har shipment ki per-item cost roz update ho kar mile.\n\nKya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
     "language": "roman_urdu"
   }
 }

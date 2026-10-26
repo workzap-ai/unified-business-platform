@@ -170,7 +170,7 @@
           "job_tracking",
           "workflow_automation"
         ],
-        "text": "Contractor invoices matched automatically to closed tickets, so only jobs with proof go for payment.",
+        "text": "Contractor invoices matched directly to closed tickets, so only jobs with proof go for payment.",
         "tool_words": []
       },
       "ask_first": "Who decides which contractor goes to a job?",
@@ -263,10 +263,10 @@
           "booking_scheduling",
           "integration"
         ],
-        "text": "Short-let calendars synced across channels, with cleaning and check-in tasks assigned automatically for every stay.",
+        "text": "Short-let calendars synced across channels, with cleaning and check-in tasks assigned right away for every stay.",
         "tool_words": []
       },
-      "ask_first": "Which platforms are you listed on?",
+      "ask_first": "Which listing sites are you listed on?",
       "free_stops": "Channel connections and task rules are in the solution document.",
       "extra_ideas": [
         {

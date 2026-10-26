@@ -18,7 +18,7 @@
         "keys": [
           "field_checks"
         ],
-        "text": "A phone register where every cost the munshi enters is tagged to its plot automatically, building a per-acre cost and income view by crop and season that can be compared year on year.",
+        "text": "A phone register where every cost the munshi enters is tagged to its plot right away, building a per-acre cost and income view by crop and season that can be compared year on year.",
         "tool_words": []
       },
       "ask_first": "Roughly how many separate plots do you farm?",
@@ -108,7 +108,7 @@
         "keys": [
           "credit_ledger"
         ],
-        "text": "A buyer ledger for mill, arhti and ginner sales that ages every CPR and payment automatically and reminds you when each one is overdue.",
+        "text": "A buyer ledger for mill, arhti and ginner sales that tracks every CPR and payment timeline and reminds you when each one is overdue.",
         "tool_words": []
       },
       "ask_first": "Who buys most of your crop?",
@@ -288,7 +288,7 @@
         "keys": [
           "booking_scheduling"
         ],
-        "text": "A machinery booking list with confirmed dates and automatic reminders to you and the operator before the window opens.",
+        "text": "A machinery booking list with confirmed dates and reminders sent to you and the operator before the window opens.",
         "tool_words": []
       },
       "ask_first": "Which crop's harvest is most affected?",

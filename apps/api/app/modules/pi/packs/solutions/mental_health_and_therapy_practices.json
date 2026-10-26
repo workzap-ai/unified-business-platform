@@ -18,7 +18,7 @@
         "keys": [
           "booking_scheduling"
         ],
-        "text": "online booking per practitioner with reminders and a policy acknowledgement at booking, tracking cancellations automatically.",
+        "text": "online booking per practitioner with reminders and a policy acknowledgement at booking, tracking cancellations as they happen.",
         "tool_words": []
       },
       "ask_first": "How do clients cancel now?",

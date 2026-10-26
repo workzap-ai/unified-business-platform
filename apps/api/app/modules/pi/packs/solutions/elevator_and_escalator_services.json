@@ -18,7 +18,7 @@
         "keys": [
           "workflow_automation"
         ],
-        "text": "A breakdown line that creates a time-stamped ticket and escalates up the on-call roster automatically, with entrapments escalated to management within minutes.",
+        "text": "A breakdown line that creates a time-stamped ticket and alerts the on-call staff in turn, with entrapments escalated to management within minutes.",
         "tool_words": []
       },
       "ask_first": "How many technicians are on call at night?",

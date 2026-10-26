@@ -19,7 +19,7 @@
           "order_capture",
           "website_digital"
         ],
-        "text": "parents pick school and class from a WhatsApp link, the bundle is created automatically and they get a pickup slot, with no retyping.",
+        "text": "parents pick school and class from a WhatsApp link, the bundle is created right away and they get a pickup slot, with no retyping.",
         "tool_words": []
       },
       "ask_first": "Roughly how many schools' lists do you handle each season?",
@@ -172,7 +172,7 @@
         "keys": [
           "credit_ledger"
         ],
-        "text": "institutional accounts with orders, delivery notes, invoices, ageing and automatic reminders.",
+        "text": "institutional accounts with orders, delivery notes, invoices, ageing and payment reminders sent to clients.",
         "tool_words": []
       },
       "ask_first": "How many schools or offices buy on credit?",
@@ -262,7 +262,7 @@
         "keys": [
           "cash_reconciliation"
         ],
-        "text": "a daily photocopy and printing log reconciled with cash automatically.",
+        "text": "a daily photocopy and printing log matched straight with cash collected.",
         "tool_words": []
       },
       "ask_first": "Who runs the photocopy counter?",

@@ -18,7 +18,7 @@
         "keys": [
           "credit_ledger"
         ],
-        "text": "a receivables tracker with ageing per client and polite reminders sent automatically on schedule.",
+        "text": "a receivables tracker with ageing per client and polite reminders sent on schedule.",
         "tool_words": []
       },
       "ask_first": "What payment terms do your clients usually agree?",
@@ -139,7 +139,7 @@
         "keys": [
           "workflow_automation"
         ],
-        "text": "design approvals with deadlines and automatic reminders, showing which jobs are waiting on whom.",
+        "text": "design approvals with deadlines and reminder messages, showing which jobs are waiting on whom.",
         "tool_words": []
       },
       "ask_first": "Who on the client side usually holds up approvals?",
@@ -169,7 +169,7 @@
         "keys": [
           "job_tracking"
         ],
-        "text": "one project file per event where every change reaches the workshop and site crew automatically.",
+        "text": "one project file per event where every change reaches the workshop and site crew the moment it happens.",
         "tool_words": []
       },
       "ask_first": "How many people work on a typical build-up?",
@@ -296,7 +296,7 @@
         ]
       },
       "ask_first": "Do you run separate companies in each country?",
-      "free_stops": "What the dashboard pulls from each country is in the solution document.",
+      "free_stops": "What gets gathered from each country is in the solution document.",
       "extra_ideas": [
         {
           "text": "Write each live event and its latest cash in and cash out on one notebook page, so country-by-country pressure is clear.",

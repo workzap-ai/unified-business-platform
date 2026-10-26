@@ -19,7 +19,7 @@
           "field_checks",
           "stock_alerts"
         ],
-        "text": "oil stock in ml or tola per grade, deducted with each sale, with automatic variance checks and low-stock alerts per outlet.",
+        "text": "oil stock in ml or tola per grade, deducted with each sale, with variance checks and low-stock alerts sent per outlet.",
         "tool_words": []
       },
       "ask_first": "Which grades are sold loose?",
@@ -140,7 +140,7 @@
           "cash_reconciliation",
           "nori_daily_read"
         ],
-        "text": "a kiosk close on phone sent automatically to the owner, cash matched to sales, and one morning read across all outlets.",
+        "text": "a kiosk close on phone sent straight to the owner, cash matched to sales, and one morning read across all outlets.",
         "tool_words": []
       },
       "ask_first": "How many kiosks or shops do you run?",
@@ -262,7 +262,7 @@
         "keys": [
           "customer_messaging"
         ],
-        "text": "a consented scent preference list with restock and festival messages sent automatically.",
+        "text": "a consented scent preference list with restock and festival messages sent directly to customers.",
         "tool_words": []
       },
       "ask_first": "Which scents run out most often?",
@@ -292,7 +292,7 @@
         "keys": [
           "credit_ledger"
         ],
-        "text": "a wholesale credit ledger with ageing and automatic WhatsApp reminders.",
+        "text": "a wholesale credit ledger with ageing and WhatsApp reminders sent to buyers.",
         "tool_words": []
       },
       "ask_first": "How many wholesale buyers take credit?",

@@ -24,7 +24,7 @@
         ]
       },
       "ask_first": "How many boats and booking channels do you run?",
-      "free_stops": "How platforms and staff bookings feed the calendar is set out in the solution document.",
+      "free_stops": "How booking websites and staff bookings feed the calendar is set out in the solution document.",
       "extra_ideas": [
         {
           "text": "Count how many Friday evening requests mention the same yacht, so you see which vessel keeps causing booking clashes.",
@@ -116,7 +116,7 @@
           "website_digital",
           "workflow_automation"
         ],
-        "text": "an online booking and deposit link showing clear terms, with no-sail rescheduling offered automatically (the sail or no-sail decision stays with your captain).",
+        "text": "an online booking and deposit link showing clear terms, with no-sail rescheduling offered right away (the sail or no-sail decision stays with your captain).",
         "tool_words": []
       },
       "ask_first": "Do you prefer to reschedule or refund when a trip is called off?",
@@ -274,8 +274,8 @@
           "platform"
         ]
       },
-      "ask_first": "How many platforms sell your charters?",
-      "free_stops": "The matching rules per platform are worked out in the solution document.",
+      "ask_first": "How many booking channels sell your charters?",
+      "free_stops": "The matching rules per booking channel are worked out in the solution document.",
       "extra_ideas": [
         {
           "text": "Note each completed charter and the day its payout message arrives, so you can see which channels are slowest to clear.",
@@ -301,7 +301,7 @@
         "keys": [
           "dashboards_reports"
         ],
-        "text": "revenue and utilisation per vessel, with monthly owner statements produced automatically from bookings and costs.",
+        "text": "revenue and utilisation per vessel, with monthly owner statements produced for you from bookings and costs.",
         "tool_words": []
       },
       "ask_first": "How many managed yachts do you run?",
@@ -326,8 +326,8 @@
     "Fake reviews or misleading photos, and any storage of guests' names, passport or Emirates ID numbers, card details or crew licence data."
   ],
   "sample_reply": {
-    "person": "Two groups showed up for the same yacht last Friday because sales staff each keep their own sheet and platforms send emails. How do we stop this?",
-    "pi": "Sure, this can be sorted, and none of it needs special equipment.\nFirst, put every upcoming booking onto a single calendar per vessel this week, so any clash shows up now rather than on the dock.\nSecond, let one person confirm bookings until that's in place, so two staff can't sell the same slot.\nWorkzap could take it further with: one booking calendar per vessel that takes bookings from staff, your website and the platforms, and blocks a second booking for the same slot.\n\nShall I put together a solution document and quote for you? You're free to say no.",
+    "person": "Two groups showed up for the same yacht last Friday because sales staff each keep their own sheet and booking sites send emails. How do we stop this?",
+    "pi": "Sure, this can be sorted, and none of it needs special equipment.\nFirst, put every upcoming booking onto a single calendar per vessel this week, so any clash shows up now rather than on the dock.\nSecond, let one person confirm bookings until that's in place, so two staff can't sell the same slot.\nWorkzap could take it further with: one booking calendar per vessel that takes bookings from staff, your website and booking channels, and blocks a second booking for the same slot.\n\nShall I put together a solution document and quote for you? You're free to say no.",
     "language": "english"
   }
 }

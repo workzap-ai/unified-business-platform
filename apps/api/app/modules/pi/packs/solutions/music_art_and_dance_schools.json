@@ -48,7 +48,7 @@
         "keys": [
           "credit_ledger"
         ],
-        "text": "Packs and terms tracked with lessons used and expiry, with renewal reminders sent automatically.",
+        "text": "Packs and terms tracked with lessons used and expiry, with renewal reminders sent when due.",
         "tool_words": []
       },
       "ask_first": "Do packs expire mostly with lessons unused, or after the last lesson is taken?",
@@ -78,7 +78,7 @@
         "keys": [
           "lead_followup"
         ],
-        "text": "Every trial tracked to enrolment, with automatic follow-up reminders and conversion by discipline.",
+        "text": "Every trial tracked to enrolment, with scheduled follow-up reminders and conversion by discipline.",
         "tool_words": []
       },
       "ask_first": "Do trials fail to convert in one discipline, or across all of them?",
@@ -108,7 +108,7 @@
         "keys": [
           "loyalty_repeat"
         ],
-        "text": "Retention tracked by term and discipline as counts, with next-term reminders sent automatically.",
+        "text": "Retention tracked by term and discipline as counts, with next-term reminders sent on time.",
         "tool_words": []
       },
       "ask_first": "Do children quit mostly after exams or recitals, or at any point in the term?",
@@ -168,7 +168,7 @@
         "keys": [
           "dashboards_reports"
         ],
-        "text": "Teacher pay worked out automatically from delivered lessons and agreed splits, with a monthly statement.",
+        "text": "Teacher pay worked out directly from delivered lessons and agreed splits, with a monthly statement.",
         "tool_words": [],
         "leads_with_view": true
       },
@@ -199,7 +199,7 @@
         "keys": [
           "workflow_automation"
         ],
-        "text": "A recital planner with tasks, rehearsals, costume orders, seat counts and fees, with reminders sent automatically.",
+        "text": "A recital planner with tasks, rehearsals, costume orders, seat counts and fees, with reminders sent on schedule.",
         "tool_words": []
       },
       "ask_first": "Is recital planning missed mostly on costumes, or on rehearsals and bookings?",
@@ -259,7 +259,7 @@
         "keys": [
           "credit_ledger"
         ],
-        "text": "customer_messaging — Fee reminders sent automatically each term or month, with an overdue count for the office.",
+        "text": "customer_messaging — Fee reminders sent out each term or month, with an overdue count for the office.",
         "tool_words": []
       },
       "ask_first": "Do most families pay a little late, or do a few stay behind for months?",
@@ -289,7 +289,7 @@
         "keys": [
           "customer_messaging"
         ],
-        "text": "website_digital — Automatic WhatsApp replies with a booking link, and a booking page where parents choose slots.",
+        "text": "website_digital — Parents get WhatsApp messages with a booking link, and a booking page where they choose slots.",
         "tool_words": []
       },
       "ask_first": "Do DMs arrive mostly in the evening, or throughout the day?",

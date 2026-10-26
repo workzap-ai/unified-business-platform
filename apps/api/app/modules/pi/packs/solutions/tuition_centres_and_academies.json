@@ -50,7 +50,7 @@
         "keys": [
           "credit_ledger"
         ],
-        "text": "customer_messaging — Monthly reminders sent automatically on WhatsApp, with a live paid/unpaid list per batch by fee card number.",
+        "text": "customer_messaging — Monthly reminders sent to parents on WhatsApp, with a live paid/unpaid list per batch by fee card number.",
         "tool_words": []
       },
       "ask_first": "Does the receptionist chase every family, or only the late few?",
@@ -80,7 +80,7 @@
         "keys": [
           "workflow_automation"
         ],
-        "text": "A teacher share calculator that counts paid enrolments per teacher automatically every month and sends the figure for sign-off.",
+        "text": "A teacher share calculator that counts paid enrolments per teacher every month and sends the figure to them for sign-off.",
         "tool_words": []
       },
       "ask_first": "Is the share worked out from the register or from fees received?",
@@ -110,7 +110,7 @@
         "keys": [
           "lead_followup"
         ],
-        "text": "Every enquiry tracked from source to demo to admission, with automatic follow-up reminders and a weekly conversion count per branch.",
+        "text": "Every enquiry tracked from source to demo to admission, sending staff follow-up reminders and a weekly conversion count per branch.",
         "tool_words": []
       },
       "ask_first": "Do you run demo classes weekly, or only at the start of a session?",
@@ -140,7 +140,7 @@
         "keys": [
           "loyalty_repeat"
         ],
-        "text": "Families tracked by reference across sessions, with likely leavers flagged automatically and reminded about the next session.",
+        "text": "Families tracked by reference across sessions, flagging likely leavers for you and sending them reminders about the next session.",
         "tool_words": []
       },
       "ask_first": "Do students leave mostly after board exams, or after any exam?",
@@ -201,7 +201,7 @@
         "keys": [
           "booking_scheduling"
         ],
-        "text": "customer_messaging — Timetable and room booking with a clash check, and every change sent automatically to just the batches affected.",
+        "text": "customer_messaging — Timetable and room booking with a clash check, sending every change to just the batches affected.",
         "tool_words": []
       },
       "ask_first": "Do parents miss changes mostly in groups with many members, or in all of them?",
@@ -291,7 +291,7 @@
         "keys": [
           "custom_build"
         ],
-        "text": "A unique join link per enrolled family with an automatic attendance count, so shared links are spotted.",
+        "text": "A unique join link per enrolled family that counts attendance as they join, so shared links are spotted.",
         "tool_words": []
       },
       "ask_first": "Does the sharing come up mostly in one batch, or across all online classes?",
@@ -318,7 +318,7 @@
   ],
   "sample_reply": {
     "person": "Teachers ke hisse ka koi hal batayein. Har mahine end pe jhagra hota hai ke kitne bachay the aur kis ki fees aayi.",
-    "pi": "Ji haan, ye masla kaafi had tak is mahine se hi hal kiya ja sakta hai. 1) Teachers ke saath likh kar tay kar lein ke hissa attend karne walon pe banega ya fees dene walon pe, taake ek hi qaida ho. 2) Is mahine salary se pehle har teacher ko us ke batches ki paid ginti dikha dein, taake ikhtilaaf pehle saamne aa jaye. Workzap ye ginti aur hissa aap ke liye har mahine khud-ba-khud nikaal sakta hai aur teacher ko sign-off ke liye bhej sakta hai. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "pi": "Ji haan, ye masla kaafi had tak is mahine se hi hal kiya ja sakta hai. 1) Teachers ke saath likh kar tay kar lein ke hissa attend karne walon pe banega ya fees dene walon pe, taake ek hi qaida ho. 2) Is mahine salary se pehle har teacher ko us ke batches ki paid ginti dikha dein, taake ikhtilaaf pehle saamne aa jaye. Workzap ye ginti aur hissa aap ke liye har mahine nikaal sakta hai aur teacher ko sign-off ke liye bhej sakta hai. Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
     "language": "roman_urdu"
   }
 }

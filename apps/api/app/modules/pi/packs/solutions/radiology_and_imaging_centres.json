@@ -48,7 +48,7 @@
         "keys": [
           "customer_messaging"
         ],
-        "text": "preparation reminders sent automatically at booking and the day before, using only text supplied and approved by your radiologist.",
+        "text": "Preparation reminders sent to patients upon booking and the day before, using only text written and approved by your radiologist.",
         "tool_words": []
       },
       "ask_first": "Who gives patients preparation instructions now?",

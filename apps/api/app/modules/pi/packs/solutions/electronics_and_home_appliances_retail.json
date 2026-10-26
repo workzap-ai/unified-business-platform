@@ -266,8 +266,8 @@
         "text": "one stock across showroom, godown and marketplaces.",
         "tool_words": []
       },
-      "ask_first": "What software does each use?",
-      "free_stops": "How the systems are connected is in the solution document.",
+      "ask_first": "What tools does each use?",
+      "free_stops": "How the setup connects together is in the solution document.",
       "extra_ideas": [
         {
           "text": "Count the same fast moving models in showroom and godown once, so list mismatches are seen on items that matter daily.",

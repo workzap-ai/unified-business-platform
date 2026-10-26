@@ -110,7 +110,7 @@
         "keys": [
           "cash_reconciliation"
         ],
-        "text": "Daily cash reconciliation per technician against completed jobs, with any gap flagged automatically.",
+        "text": "Daily cash reconciliation per technician against completed jobs, with any gap flagged immediately.",
         "tool_words": []
       },
       "ask_first": "How is cash handed back to the office?",
@@ -146,7 +146,7 @@
         ]
       },
       "ask_first": "How many technicians are out on a normal day?",
-      "free_stops": "App fields and reports are in the solution document.",
+      "free_stops": "Entry fields and reports are in the solution document.",
       "extra_ideas": [
         {
           "text": "For one week, note each technician's completed jobs by day, so you can see who is carrying the workload.",
@@ -172,7 +172,7 @@
         "keys": [
           "job_tracking"
         ],
-        "text": "A repeat-fault flag raised automatically when the same unit gets a call again within a set number of days.",
+        "text": "A repeat-fault flag raised whenever the same unit gets a call again within a set number of days.",
         "tool_words": []
       },
       "ask_first": "How often do repeat calls come in?",
@@ -233,7 +233,7 @@
           "workflow_automation",
           "customer_messaging"
         ],
-        "text": "An AMC register that schedules visits and sends renewal reminders automatically.",
+        "text": "An AMC register that schedules visits and sends renewal reminders directly.",
         "tool_words": []
       },
       "ask_first": "How many AMC customers do you have?",
@@ -293,7 +293,7 @@
         "keys": [
           "reviews_collection"
         ],
-        "text": "Automatic review requests after jobs the customer confirmed as done.",
+        "text": "Review requests sent right after jobs the customer confirmed as done.",
         "tool_words": []
       },
       "ask_first": "Do customers get a time slot today?",

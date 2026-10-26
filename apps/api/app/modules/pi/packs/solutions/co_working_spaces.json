@@ -48,7 +48,7 @@
         "keys": [
           "lead_followup"
         ],
-        "text": "tour outcomes and reasons recorded for every prospect, with follow-ups scheduled automatically.",
+        "text": "tour outcomes and reasons recorded for every prospect, with follow-up messages sent on schedule.",
         "tool_words": []
       },
       "ask_first": "Do most visitors say they will think about it, or do they say the price is too high?",
@@ -78,7 +78,7 @@
         "keys": [
           "booking_scheduling"
         ],
-        "text": "meeting room booking via web or WhatsApp, with clashes blocked automatically.",
+        "text": "meeting room booking via web or WhatsApp, with double bookings blocked right away.",
         "tool_words": []
       },
       "ask_first": "Do the clashes happen with walk-in requests at the desk, or with bookings made by members themselves?",
@@ -108,7 +108,7 @@
         "keys": [
           "booking_scheduling"
         ],
-        "text": "credits tracked per member with overage added to invoices automatically.",
+        "text": "credits tracked for each member, with extra charges added straight to their bill.",
         "tool_words": []
       },
       "ask_first": "Is it a few members who go over their credits every month, or many of them now and then?",
@@ -139,7 +139,7 @@
           "credit_ledger",
           "workflow_automation"
         ],
-        "text": "recurring invoices with payment links and late-payment reminders sent automatically.",
+        "text": "regular bills with payment links and late payment reminders sent on schedule.",
         "tool_words": []
       },
       "ask_first": "Is the hand-made invoicing slow because of room extras, or because of members on different plans?",
@@ -263,7 +263,7 @@
         "tool_words": []
       },
       "ask_first": "Is it a few cards from long ago, or does it happen with most members who leave?",
-      "free_stops": "how the check links to your access system is worked out in the solution document.",
+      "free_stops": "how the check connects to your door access is worked out in the solution document.",
       "extra_ideas": [
         {
           "text": "Compare active access cards with your current member list once this week, so leftover cards from ex members are spotted.",

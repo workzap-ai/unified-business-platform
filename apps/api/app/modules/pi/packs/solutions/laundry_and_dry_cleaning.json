@@ -198,7 +198,7 @@
         "keys": [
           "customer_messaging"
         ],
-        "text": "automatic \"ready\" messages and uncollected reminders.",
+        "text": "ready messages sent to customers and uncollected item reminders.",
         "tool_words": []
       },
       "ask_first": "How many orders a day?",

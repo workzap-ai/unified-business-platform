@@ -49,10 +49,10 @@
           "customer_messaging",
           "job_tracking"
         ],
-        "text": "automatic WhatsApp status updates and a tracking link for every shipment (booked, departed, offloaded, arrived, cleared, delivered), sent with the customer's permission.",
+        "text": "WhatsApp status updates and a tracking link sent to the customer at each stage (booked, departed, offloaded, arrived, cleared, delivered), with their permission.",
         "tool_words": []
       },
-      "ask_first": "Staff status kaise check karte hain, airline ko call ya portal?",
+      "ask_first": "Staff status kaise check karte hain, airline ko call karke ya unki website par?",
       "free_stops": "Which status points trigger which message, and how status is pulled in, is set out in the solution document.",
       "extra_ideas": [
         {
@@ -79,7 +79,7 @@
         "keys": [
           "customer_messaging"
         ],
-        "text": "an offload alert that notifies the customer and the sales person automatically as soon as an offload or rollover is entered.",
+        "text": "an offload alert that sends a message to the customer and the sales person as soon as an offload or rollover is entered.",
         "tool_words": []
       },
       "ask_first": "Mahine mein kitni dafa offload ya rollover hota hai, taqreeban?",
@@ -144,8 +144,8 @@
         "text": "one shipment entry that creates AWB data, invoice and tracking once, without re-typing.",
         "tool_words": []
       },
-      "ask_first": "Abhi AWB aur invoice kis system mein bante hain?",
-      "free_stops": "How the shipment file connects to your existing systems is set out in the solution document.",
+      "ask_first": "Abhi AWB aur invoice kahan par bante hain?",
+      "free_stops": "How the shipment file connects to your existing records is set out in the solution document.",
       "extra_ideas": [
         {
           "text": "Watch one file move from booking to billing and note each repeat typing of the same fields, so wasted effort is easy to point out.",
@@ -171,7 +171,7 @@
         "keys": [
           "credit_ledger"
         ],
-        "text": "a receivables ledger for customers and overseas agents with ageing, limits and automatic reminders.",
+        "text": "a receivables ledger for customers and overseas agents showing ageing, limits and reminders sent when payments are due.",
         "tool_words": []
       },
       "ask_first": "Sab se late payment kaun karta hai, customers ya overseas agents?",
@@ -296,7 +296,7 @@
         "text": "a daily read of shipments, revenue and margin by lane, customer and salesperson, so the month end is already done.",
         "tool_words": []
       },
-      "ask_first": "Mahine ka hisaab abhi kis software mein hota hai?",
+      "ask_first": "Mahine ka hisaab abhi kis jagah hota hai?",
       "free_stops": "The report measures and data sources are designed in the solution document.",
       "extra_ideas": [
         {

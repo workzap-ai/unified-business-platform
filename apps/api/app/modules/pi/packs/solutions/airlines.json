@@ -18,7 +18,7 @@
         "keys": [
           "nori_daily_read"
         ],
-        "text": "a morning read on the owner's WhatsApp every day showing load, revenue and ancillaries per flight, with the weakest midweek sectors flagged automatically across the whole network.",
+        "text": "a morning read on the owner's WhatsApp every day showing load, revenue and ancillaries per flight, with the weakest midweek sectors flagged across the whole network.",
         "tool_words": [],
         "leads_with_view": true
       },
@@ -112,7 +112,7 @@
           "job_tracking",
           "customer_messaging"
         ],
-        "text": "a refund pipeline where every request shows stage, age and owner, and the passenger is updated automatically each time it moves.",
+        "text": "a refund list where every request shows stage, age and owner, and the passenger gets a message each time it moves.",
         "tool_words": []
       },
       "ask_first": "Where does a refund usually get stuck, approval, accounts or payout?",
@@ -142,7 +142,7 @@
         "keys": [
           "customer_messaging"
         ],
-        "text": "a disruption flow that notifies every affected booking automatically (contacts used with passengers' permission) and offers a rebooking or refund request link, with response counts tracked.",
+        "text": "a disruption process that messages every affected booking (contacts used with passengers' permission) and offers a rebooking or refund request link, with response counts tracked.",
         "tool_words": []
       },
       "ask_first": "Do most bookings carry a mobile number today?",

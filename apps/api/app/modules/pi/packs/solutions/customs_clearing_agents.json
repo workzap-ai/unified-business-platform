@@ -19,7 +19,7 @@
           "job_tracking",
           "customer_messaging"
         ],
-        "text": "A file tracker that sends the client a WhatsApp update automatically when their file changes stage.",
+        "text": "A file tracker that sends the client a WhatsApp update the moment their file changes stage.",
         "tool_words": []
       },
       "ask_first": "Do clients mostly call about files stuck at the port, or about files still waiting inside your office?",
@@ -79,7 +79,7 @@
         "keys": [
           "workflow_automation"
         ],
-        "text": "A document checklist per file type showing what's received and missing, with reminders sent to the client automatically.",
+        "text": "A document checklist per file type showing what's received and missing, with reminders sent to the client on schedule.",
         "tool_words": []
       },
       "ask_first": "Do clients mostly miss the commercial documents, or the permits and certificates?",
@@ -170,7 +170,7 @@
           "job_tracking",
           "workflow_automation"
         ],
-        "text": "Expense capture per file so every charge is recorded and a draft invoice is produced automatically when the file closes.",
+        "text": "Expense capture per file so every charge is recorded and a draft invoice is ready for you when the file closes.",
         "tool_words": []
       },
       "ask_first": "Which charges slip most often: examination days, extra trips, or storage?",
@@ -318,7 +318,7 @@
   ],
   "sample_reply": {
     "person": "Sir clients din bhar phone karte hain ke file kahan pohanchi. Staff ka aadha din isi mein chala jata hai. Koi solution hai?",
-    "pi": "Haan, is par kaam ho sakta hai, aur pehla qadam aasan hai.\nPehle, har client ko roz ek muqarrar waqt par ek status update bhejein, taake unhein poochne ki zaroorat na pade.\nDoosra, har file ke liye ek hi tarah ke stage naam rakhein, taake update har dafa saaf ho.\nWorkzap ye tayyar kar sakta hai: jab bhi file ka stage badle, client ko WhatsApp par apne aap update chala jaye.\n\nKya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "pi": "Haan, is par kaam ho sakta hai, aur pehla qadam aasan hai.\nPehle, har client ko roz ek muqarrar waqt par ek status update bhejein, taake unhein poochne ki zaroorat na pade.\nDoosra, har file ke liye ek hi tarah ke stage naam rakhein, taake update har dafa saaf ho.\nWorkzap ye tayyar kar sakta hai: jab bhi file ka stage badle, client ko WhatsApp par foran update chala jaye.\n\nKya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
     "language": "roman_urdu"
   }
 }

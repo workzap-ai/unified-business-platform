@@ -290,7 +290,7 @@
         "keys": [
           "booking_scheduling"
         ],
-        "text": "automatic reminders for every booked session, with time and place only, sent to consenting patients.",
+        "text": "reminders sent for every booked session, with time and place only, to consenting patients.",
         "tool_words": []
       },
       "ask_first": "What do you use for bookings today?",

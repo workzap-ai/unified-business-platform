@@ -48,7 +48,7 @@
         "keys": [
           "workflow_automation"
         ],
-        "text": "Rate expiry alerts and a block on quoting from expired rates, running automatically across the team.",
+        "text": "Rate expiry warnings and a block on quoting from expired rates, enforced across the team without manual checks.",
         "tool_words": []
       },
       "ask_first": "Do staff quote from an old email, or from a rate sheet that nobody updates?",
@@ -78,7 +78,7 @@
         "keys": [
           "lead_followup"
         ],
-        "text": "A quote tracker showing every open quote, its age and outcome, with follow-up reminders sent automatically.",
+        "text": "A quote tracker showing every open quote, its age and outcome, with follow-up reminders sent to sales staff when due.",
         "tool_words": []
       },
       "ask_first": "Do quotes go unfollowed mostly for new customers, or for regular ones?",
@@ -109,7 +109,7 @@
           "job_tracking",
           "customer_messaging"
         ],
-        "text": "A shipment board with every job's milestones and automatic WhatsApp updates to the customer when a milestone changes.",
+        "text": "A shipment board with every job's milestones and instant WhatsApp messages to the customer when a milestone changes.",
         "tool_words": []
       },
       "ask_first": "Do customers mostly call about booked cargo not yet shipped, or about containers already at sea?",
@@ -139,7 +139,7 @@
         "keys": [
           "job_tracking"
         ],
-        "text": "Rollover and delay alerts on the shipment board that reach ops and the customer automatically.",
+        "text": "Rollover and delay alerts on the shipment board that reach ops staff and the customer the moment delays happen.",
         "tool_words": []
       },
       "ask_first": "Does the rollover news reach you late from the shipping line, or reach you in time but not get passed on?",
@@ -169,7 +169,7 @@
         "keys": [
           "workflow_automation"
         ],
-        "text": "Single job entry that fills the HBL, invoice, arrival notice and manifest templates automatically.",
+        "text": "Single job entry that fills out the HBL, invoice, arrival notice and manifest templates without retyping.",
         "tool_words": []
       },
       "ask_first": "Which documents take the retyping: the booking, the bill of lading, the invoice, or the customs papers?",
@@ -290,7 +290,7 @@
         "keys": [
           "workflow_automation"
         ],
-        "text": "A detention clock per container with free-time alerts sent to the customer automatically.",
+        "text": "A detention timer per container with free-time warnings sent to the customer before extra charges start.",
         "tool_words": []
       },
       "ask_first": "Do the detention charges come mostly from one or two customers, or from many?",

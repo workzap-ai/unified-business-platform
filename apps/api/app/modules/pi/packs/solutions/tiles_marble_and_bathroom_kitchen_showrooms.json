@@ -21,7 +21,7 @@
         "text": "stock by design, size, batch, shade and caliber with location, so every order is allocated from one batch and repeat orders know which batch the client had.",
         "tool_words": []
       },
-      "ask_first": "Does your system record batch today, or only the design?",
+      "ask_first": "Do your records show the batch today, or only the design?",
       "free_stops": "the batch allocation rules and warehouse flow are kept for the solution document.",
       "extra_ideas": [
         {

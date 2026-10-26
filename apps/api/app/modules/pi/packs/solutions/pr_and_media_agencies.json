@@ -78,7 +78,7 @@
         "keys": [
           "dashboards_reports"
         ],
-        "text": "a coverage log with links, screenshots and outlet type that builds each client's monthly report automatically.",
+        "text": "a coverage log with links, screenshots and outlet type that builds each client's monthly report directly.",
         "tool_words": []
       },
       "ask_first": "Does the time go into finding the coverage, or into laying it out in each client's format?",
@@ -138,7 +138,7 @@
         "keys": [
           "workflow_automation"
         ],
-        "text": "an approval workflow for releases with timestamps and automatic client nudges as the deadline nears.",
+        "text": "an approval workflow for releases with timestamps and reminders sent to clients as the deadline nears.",
         "tool_words": []
       },
       "ask_first": "Do the rounds come from several people at the client, or from one person changing their mind?",

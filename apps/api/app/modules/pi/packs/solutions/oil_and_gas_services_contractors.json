@@ -233,7 +233,7 @@
         "leads_with_view": true
       },
       "ask_first": "Do overruns come mostly from labour, or from materials and subcontractors?",
-      "free_stops": "Cost feeds and dashboard design are in the solution document.",
+      "free_stops": "Cost feeds and report layouts are in the solution document.",
       "extra_ideas": [
         {
           "text": "Compare this week's crew hours and hired equipment days on one live project against what the supervisor expected, so drift shows before closeout.",

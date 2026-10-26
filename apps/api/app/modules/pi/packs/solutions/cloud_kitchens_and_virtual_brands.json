@@ -23,8 +23,8 @@
           "app"
         ]
       },
-      "ask_first": "Which app's payouts confuse you most?",
-      "free_stops": "The reconciliation rules for each app and how disputes are tracked go in the solution document.",
+      "ask_first": "Which partner's payouts confuse you most?",
+      "free_stops": "The matching rules for each partner and how disputes are tracked go in the solution document.",
       "quick_ideas_original": [
         "Match one week of one app's statement against your own orders, so you know where the gap really sits",
         "Note the order numbers you can't match, so you can raise them with the app."
@@ -143,7 +143,7 @@
         "tool_words": []
       },
       "ask_first": "Is it the same items missing each time?",
-      "free_stops": "The checklist per brand and how photos are used in app disputes are in the solution document.",
+      "free_stops": "The checklist per brand and how photos are used in partner disputes are in the solution document.",
       "extra_ideas": [
         {
           "text": "Count which item is missing most often across today's complaints, so you fix the repeat miss hurting your brand every day.",
@@ -169,7 +169,7 @@
         "keys": [
           "stock_alerts"
         ],
-        "text": "shared stock allocated by brand from your recipes automatically, with a daily prep plan per brand from recent orders.",
+        "text": "shared stock allocated by brand from your recipes, with a daily prep plan per brand from recent orders.",
         "tool_words": []
       },
       "ask_first": "Do your brands share most ingredients, or only a few?",
@@ -265,10 +265,10 @@
           "customer_messaging",
           "loyalty_repeat"
         ],
-        "text": "a WhatsApp direct-order flow for opted-in customers and a tiffin manager with plans, pauses and automatic renewal reminders.",
+        "text": "a WhatsApp direct-order flow for opted-in customers and a tiffin service with plans, pauses and scheduled renewal reminders.",
         "tool_words": []
       },
-      "ask_first": "Do you take any orders outside the apps today?",
+      "ask_first": "Do you take any orders outside online delivery services today?",
       "free_stops": "The direct-order flow and renewal reminder plan stay for the solution document.",
       "extra_ideas": [
         {

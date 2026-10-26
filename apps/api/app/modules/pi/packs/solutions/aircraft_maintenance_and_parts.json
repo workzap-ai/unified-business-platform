@@ -19,7 +19,7 @@
           "job_tracking",
           "workflow_automation"
         ],
-        "text": "a repair-out tracker where every unit has PO, shop and expected return, with automatic chasers when a date passes and overdue units reported weekly.",
+        "text": "a repair-out tracker where every unit has PO, shop and expected return, with chasers sent when a date passes and overdue units reported weekly.",
         "tool_words": []
       },
       "ask_first": "Roughly how many units are out for repair at any one time?",
@@ -53,7 +53,7 @@
         "text": "one phone search across own stock, consignment and brokers' last quotes by part number, kept current every day and available round the clock.",
         "tool_words": []
       },
-      "ask_first": "Is your stock list in MRO software, an ERP or Excel today?",
+      "ask_first": "Is your stock list in MRO records, computer files or Excel today?",
       "free_stops": "How the sources are connected and searched is set out in the solution document.",
       "extra_ideas": [
         {
@@ -113,7 +113,7 @@
         "keys": [
           "stock_alerts"
         ],
-        "text": "expiry lists by bin and part number sent automatically every week before items run out of shelf life (whether any item is usable stays with your quality team).",
+        "text": "expiry lists by bin and part number sent to you every week before items run out of shelf life (whether any item is usable stays with your quality team).",
         "tool_words": []
       },
       "ask_first": "Which kinds of items expire most often?",
@@ -144,7 +144,7 @@
           "job_tracking",
           "workflow_automation"
         ],
-        "text": "a check tracker where findings are logged with hours and parts, sent to the customer for approval automatically, and fed straight into the invoice.",
+        "text": "a check tracker where findings are logged with hours and parts, sent to the customer for approval right away, and fed straight into the invoice.",
         "tool_words": []
       },
       "ask_first": "How do customers approve extra work today?",
@@ -205,7 +205,7 @@
         "keys": [
           "job_tracking"
         ],
-        "text": "a core return tracker with due dates and automatic warnings before penalties apply.",
+        "text": "a core return tracker showing due dates and sending warnings before penalties apply.",
         "tool_words": []
       },
       "ask_first": "How many exchange deals are open at a time, roughly?",
@@ -295,7 +295,7 @@
         "keys": [
           "customer_messaging"
         ],
-        "text": "automatic progress messages to each customer as their aircraft or component moves through job stages.",
+        "text": "progress messages sent to each customer as their aircraft or component moves through job stages.",
         "tool_words": []
       },
       "ask_first": "Are most of your customers your own airline or third parties?",

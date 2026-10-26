@@ -18,7 +18,7 @@
         "keys": [
           "credit_ledger"
         ],
-        "text": "a credit ledger per shopkeeper label with balances, ageing, statements and automatic reminders.",
+        "text": "a credit ledger per shopkeeper label with balances, ageing, statements and payment reminder messages.",
         "tool_words": []
       },
       "ask_first": "Who reminds shopkeepers to pay now?",
@@ -78,7 +78,7 @@
         "keys": [
           "stock_alerts"
         ],
-        "text": "a godown register by item, grade and lot with purchase date, showing age and flagging slow lots automatically.",
+        "text": "a godown register by item, grade and lot with purchase date, showing age and highlighting slow-moving lots.",
         "tool_words": []
       },
       "ask_first": "How do you decide which lot goes out first?",
@@ -229,7 +229,7 @@
         "keys": [
           "integration"
         ],
-        "text": "stock synced between the shop and online listings automatically.",
+        "text": "stock updated across the shop and online listings whenever items sell.",
         "tool_words": []
       },
       "ask_first": "Which marketplaces do you sell on?",

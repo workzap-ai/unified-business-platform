@@ -79,7 +79,7 @@
         "keys": [
           "integration"
         ],
-        "text": "Local payment options connected alongside cards, with failed payments retried and followed up automatically.",
+        "text": "Local payment options listed alongside cards, with failed payments retried and follow-up messages sent to customers right away.",
         "tool_words": []
       },
       "ask_first": "Do card payments fail mostly at the payment step, or when the bank declines them?",
@@ -201,7 +201,7 @@
         "keys": [
           "loyalty_repeat"
         ],
-        "text": "customer_messaging — Churn tracked by cohort and reason, with first-week messages sent automatically to those who haven't started.",
+        "text": "customer_messaging — Churn tracked by cohort and reason, with first-week messages sent to buyers who haven't started.",
         "tool_words": []
       },
       "ask_first": "Do subscribers cancel after the first month mostly on one course, or across all of them?",
@@ -231,7 +231,7 @@
         "keys": [
           "workflow_automation"
         ],
-        "text": "WhatsApp support intake with automatic answers for login and access issues and response times measured.",
+        "text": "WhatsApp support intake with instant answers for login and access issues and response times measured.",
         "tool_words": []
       },
       "ask_first": "Are login problems mostly forgotten passwords, or learners who cannot get in after paying?",
@@ -261,7 +261,7 @@
         "keys": [
           "attribution_codes"
         ],
-        "text": "Affiliate links and codes tracked to purchases, with monthly commission statements produced automatically.",
+        "text": "Affiliate links and codes tracked to purchases, with monthly commission statements sent out every month.",
         "tool_words": []
       },
       "ask_first": "Do affiliate claims come mostly from a few affiliates, or from most of them?",
@@ -297,7 +297,7 @@
         ]
       },
       "ask_first": "Which copying takes most time: sales into accounts, refunds, or access changes?",
-      "free_stops": "Which systems connect and how is set out in the document.",
+      "free_stops": "Which tools connect and how is set out in the document.",
       "extra_ideas": [
         {
           "text": "Count how many enrolment, payment and learner-status changes were retyped by staff since Monday, so the busiest break in the workflow shows.",

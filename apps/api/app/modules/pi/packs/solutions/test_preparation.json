@@ -18,7 +18,7 @@
         "keys": [
           "lead_followup"
         ],
-        "text": "customer_messaging — A WhatsApp first reply that goes out automatically on announcement day, then hands each enquiry to a counsellor with a follow-up queue and response times measured per branch.",
+        "text": "customer_messaging — A WhatsApp first reply that goes out on announcement day, then hands each enquiry to a counsellor with a follow-up queue and response times measured per branch.",
         "tool_words": []
       },
       "ask_first": "Who answers the messages today — one person or a team?",
@@ -201,7 +201,7 @@
         "keys": [
           "stock_alerts"
         ],
-        "text": "Book stock linked to enrolments per branch, with an automatic alert when a reprint is needed in time for the printer.",
+        "text": "Book stock linked to enrolments per branch, with an alert sent when a reprint is needed in time for the printer.",
         "tool_words": []
       },
       "ask_first": "Do books run out mid-course for one subject, or for several?",
@@ -231,7 +231,7 @@
         "keys": [
           "custom_build"
         ],
-        "text": "Mock tests would be taken online and marked automatically, with results per cohort and no names in owner reports.",
+        "text": "Mock tests would be taken online and marked instantly, with results per cohort and no names in owner reports.",
         "tool_words": [
           "platform"
         ]
@@ -263,7 +263,7 @@
         "keys": [
           "workflow_automation"
         ],
-        "text": "Each session logged and matched to the timetable automatically before pay, with differences flagged per branch.",
+        "text": "Each session logged and matched to the timetable before pay, with differences flagged per branch.",
         "tool_words": []
       },
       "ask_first": "Are the extra claims from a few instructors, or from many?",
@@ -293,7 +293,7 @@
         "keys": [
           "attribution_codes"
         ],
-        "text": "Codes per influencer with usage limits and expiry, and each one's enrolments reported automatically.",
+        "text": "Codes per influencer with usage limits and expiry, and each one's enrolments reported to you.",
         "tool_words": []
       },
       "ask_first": "Are the codes shared on social media, or passed around in groups?",

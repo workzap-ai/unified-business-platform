@@ -229,7 +229,7 @@
         "keys": [
           "customer_messaging"
         ],
-        "text": "Weekly progress photos and status sent to each client automatically.",
+        "text": "Weekly progress photos and status delivered directly to each client.",
         "tool_words": []
       },
       "ask_first": "How do clients get updates now?",

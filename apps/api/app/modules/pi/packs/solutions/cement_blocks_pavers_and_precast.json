@@ -78,7 +78,7 @@
         "keys": [
           "credit_ledger"
         ],
-        "text": "a contractor ledger with limits, ageing and project-linked balances, with automatic reminders.",
+        "text": "a contractor ledger with limits, ageing and project-linked balances, with reminders sent to contractors.",
         "tool_words": []
       },
       "ask_first": "How many contractors buy on credit?",

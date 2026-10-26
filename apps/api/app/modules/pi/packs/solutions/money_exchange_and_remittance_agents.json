@@ -18,7 +18,7 @@
         "keys": [
           "cash_reconciliation"
         ],
-        "text": "A day-end closing sheet on phone for every till and branch that flags variances automatically, keeps the reason and shows the owner each evening which counters matched.",
+        "text": "A day-end closing sheet on phone for every till and branch that flags variances right away, keeps the reason and shows the owner each evening which counters matched.",
         "tool_words": []
       },
       "ask_first": "How many counters run in a normal shift?",

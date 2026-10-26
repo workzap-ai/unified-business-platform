@@ -49,7 +49,7 @@
           "job_tracking",
           "customer_messaging"
         ],
-        "text": "A net metering tracker per customer with stage and documents checklist, sending a WhatsApp update automatically whenever a file moves.",
+        "text": "A net metering tracker per customer with stage and documents checklist, sending a WhatsApp update whenever a file moves.",
         "tool_words": []
       },
       "ask_first": "Roughly how many files are pending right now?",
@@ -80,7 +80,7 @@
           "stock_alerts",
           "job_tracking"
         ],
-        "text": "A stock register with serial numbers per panel batch and inverter, linked automatically to each installation and warranty.",
+        "text": "A stock register with serial numbers per panel batch and inverter, linked directly to each installation and warranty.",
         "tool_words": []
       },
       "ask_first": "Do you hold stock or buy per order?",
@@ -144,7 +144,7 @@
         "tool_words": []
       },
       "ask_first": "Who prepares quotes today?",
-      "free_stops": "Package structure and survey fields are in the solution document; system sizing stays with a qualified engineer.",
+      "free_stops": "Package structure and survey fields are in the solution document; equipment sizing stays with a qualified engineer.",
       "extra_ideas": [
         {
           "text": "Note which quote details staff retype again and again this week, so you see where quoting time is being lost.",
@@ -230,7 +230,7 @@
         "keys": [
           "field_checks"
         ],
-        "text": "An installation and commissioning checklist with photos and readings saved per job automatically.",
+        "text": "An installation and commissioning checklist with photos and readings saved per job upon completion.",
         "tool_words": []
       },
       "ask_first": "What gets recorded before handover?",
@@ -293,7 +293,7 @@
         "keys": [
           "credit_ledger"
         ],
-        "text": "A dealer ledger with balances, limits and automatic reminders.",
+        "text": "A dealer ledger with balances, limits and payment reminder messages sent to dealers.",
         "tool_words": []
       },
       "ask_first": "How many dealers buy on credit?",

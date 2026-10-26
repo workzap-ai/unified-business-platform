@@ -79,7 +79,7 @@
         "keys": [
           "customer_messaging"
         ],
-        "text": "one live price list per dealer tier, sent to dealers automatically when copper rates change.",
+        "text": "one live price list per dealer tier, sent to dealers right away when copper rates change.",
         "tool_words": []
       },
       "ask_first": "How do dealers find out about new prices today?",
@@ -145,7 +145,7 @@
         "tool_words": []
       },
       "ask_first": "Which areas are fakes showing up in?",
-      "free_stops": "The code system design is in the solution document.",
+      "free_stops": "The code design setup is in the solution document.",
       "extra_ideas": [
         {
           "text": "Note which product lines and market areas bring the most fake returns this month, so staff know where checks matter most.",
@@ -171,7 +171,7 @@
         "keys": [
           "credit_ledger"
         ],
-        "text": "a dealer ledger with tier, discount, scheme and credit on one record, applied automatically to orders.",
+        "text": "a dealer ledger with tier, discount, scheme and credit on one record, applied directly to orders.",
         "tool_words": []
       },
       "ask_first": "How many active dealers do you have?",

@@ -18,7 +18,7 @@
         "keys": [
           "order_capture"
         ],
-        "text": "a WhatsApp order flow where buyers choose item, size and colour, and every confirmed order lands in one list automatically.",
+        "text": "a WhatsApp order flow where buyers choose item, size and colour, and every confirmed order lands in your main list.",
         "tool_words": []
       },
       "ask_first": "Which place do most of the lost orders come from, direct messages, comments or WhatsApp?",
@@ -48,7 +48,7 @@
         "keys": [
           "customer_messaging"
         ],
-        "text": "an automatic first reply with price, sizes and an order link, so you only handle serious buyers.",
+        "text": "an instant first reply with price, sizes and an order link, so you only handle serious buyers.",
         "tool_words": []
       },
       "ask_first": "Roughly what share of those price messages come from live sales or posts, and how many are repeat askers?",
@@ -168,11 +168,11 @@
         "keys": [
           "order_capture"
         ],
-        "text": "a live-sale order taker where buyers reply with item codes and every order is confirmed automatically before booking.",
+        "text": "a live-sale order taker where buyers reply with item codes and every order gets confirmed before booking.",
         "tool_words": []
       },
       "ask_first": "Do the refusals come mostly from live sales, or from ordinary posts as well?",
-      "free_stops": "The live-sale code system and confirmation steps go in the solution document.",
+      "free_stops": "The live-sale code setup and confirmation steps go in the solution document.",
       "extra_ideas": [
         {
           "text": "Count which live-sale items are refused most often this week, so you spot where excitement is not turning into delivery.",
@@ -228,7 +228,7 @@
         "keys": [
           "customer_messaging"
         ],
-        "text": "a pre-order waitlist that sends an \"it's back\" WhatsApp message automatically to buyers who asked.",
+        "text": "a pre-order waitlist that sends an \"it's back\" WhatsApp message to buyers who asked.",
         "tool_words": []
       },
       "ask_first": "Is the waiting list mostly in chats, or on paper, and how many items are pre-ordered at a time?",

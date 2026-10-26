@@ -18,7 +18,7 @@
         "keys": [
           "dashboards_reports"
         ],
-        "text": "a carcass yield tracker recording purchase weight, cuts, bone, fat and trim for every carcass, with cost per saleable kilo worked out automatically.",
+        "text": "a carcass yield tracker recording purchase weight, cuts, bone, fat and trim for every carcass, with cost per saleable kilo worked out right away.",
         "tool_words": [],
         "leads_with_view": true
       },
@@ -139,7 +139,7 @@
         "keys": [
           "credit_ledger"
         ],
-        "text": "a credit ledger for restaurant and caterer accounts by label, with statements and automatic reminders.",
+        "text": "a credit ledger for restaurant and caterer accounts by label, with statements and balance reminders.",
         "tool_words": []
       },
       "ask_first": "How many restaurants or caterers buy on credit?",

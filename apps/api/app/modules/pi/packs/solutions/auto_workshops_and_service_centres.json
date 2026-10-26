@@ -171,7 +171,7 @@
         "keys": [
           "customer_messaging"
         ],
-        "text": "automatic \"car ready\" and delay messages from the job card, with the customer's permission.",
+        "text": "\"car ready\" and delay messages sent from the job card to the customer, with their permission.",
         "tool_words": []
       },
       "ask_first": "Do most calls come in the afternoon, or all day long whenever a car is due?",
@@ -201,7 +201,7 @@
         "keys": [
           "credit_ledger"
         ],
-        "text": "a ledger for fleet and insurance accounts with ageing alerts and statements sent automatically every month.",
+        "text": "a ledger for fleet and insurance accounts with ageing alerts and statements sent to clients every month.",
         "tool_words": []
       },
       "ask_first": "Is it a few large fleet clients holding most of the money, or many smaller ones?",
@@ -292,7 +292,7 @@
           "customer_messaging",
           "booking_scheduling"
         ],
-        "text": "next-service reminders with booking slots, sent automatically.",
+        "text": "next-service reminders with booking slots, sent directly to customers.",
         "tool_words": []
       },
       "ask_first": "Do most customers return for something else eventually, or do they go to a different garage?",

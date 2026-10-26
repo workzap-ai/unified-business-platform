@@ -18,7 +18,7 @@
         "keys": [
           "workflow_automation"
         ],
-        "text": "a feedback chaser that reminds the client automatically when a shortlist has had no response after a set number of days, with a daily list of stalled shortlists for the account manager.",
+        "text": "a feedback chaser that reminds the client when a shortlist has had no response after a set number of days, with a daily list of stalled shortlists for the account manager.",
         "tool_words": []
       },
       "ask_first": "Roughly how many open roles are you working on right now?",
@@ -48,7 +48,7 @@
         "keys": [
           "job_tracking"
         ],
-        "text": "a candidate pipeline per job order through offered, confirmed, joined and in guarantee, with check-in tasks before the joining date created automatically.",
+        "text": "a candidate pipeline per job order through offered, confirmed, joined and in guarantee, with check-in tasks created before the joining date.",
         "tool_words": []
       },
       "ask_first": "Do the no-shows come mostly from one type of role, or from one client?",
@@ -290,7 +290,7 @@
         "keys": [
           "customer_messaging"
         ],
-        "text": "automatic WhatsApp updates to candidates, with their permission, each time they move to a new stage.",
+        "text": "WhatsApp updates sent to candidates, with their permission, each time they move to a new stage.",
         "tool_words": []
       },
       "ask_first": "Do most candidates ask about interview dates, or about the result after an interview?",

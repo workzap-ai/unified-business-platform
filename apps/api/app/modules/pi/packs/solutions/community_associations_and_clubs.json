@@ -48,7 +48,7 @@
         "keys": [
           "cash_reconciliation"
         ],
-        "text": "a payment matcher linking transfers, cash and cheques to member codes automatically.",
+        "text": "a payment matcher linking transfers, cash and cheques to member codes directly.",
         "tool_words": []
       },
       "ask_first": "Do most members pay cash at the office, or by transfer into the bank account?",

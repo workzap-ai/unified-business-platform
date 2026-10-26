@@ -48,7 +48,7 @@
         "keys": [
           "attribution_codes"
         ],
-        "text": "a code or link per campaign and influencer collab, tied to enquiries, bookings and revenue automatically.",
+        "text": "a code or link per campaign and influencer collab, showing enquiries, bookings and revenue brought in by each.",
         "tool_words": []
       },
       "ask_first": "How many campaigns or collabs are running this month?",
@@ -78,7 +78,7 @@
         "keys": [
           "customer_messaging"
         ],
-        "text": "loyalty_repeat — a package ledger with next-session reminders sent automatically to consenting clients, with completion tracked by branch.",
+        "text": "loyalty_repeat — a package ledger with next-session reminders sent to consenting clients before their visit, with completion tracked by branch.",
         "tool_words": []
       },
       "ask_first": "Do packages have an expiry date?",

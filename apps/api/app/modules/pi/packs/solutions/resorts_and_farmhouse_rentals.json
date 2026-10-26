@@ -18,7 +18,7 @@
         "keys": [
           "booking_scheduling"
         ],
-        "text": "one calendar for all properties, shared read-only with the caretaker, where a date confirms automatically only after the advance is logged.",
+        "text": "one calendar for all properties, shared read-only with the caretaker, where a date locks in only after the advance payment is logged.",
         "tool_words": []
       },
       "ask_first": "How many farmhouses or chalets do you run?",
@@ -48,7 +48,7 @@
         "keys": [
           "credit_ledger"
         ],
-        "text": "an advance and deposit ledger per booking, updated automatically, showing who received each payment and what balance is due.",
+        "text": "an advance and deposit ledger per booking, updated instantly, showing who received each payment and what balance is due.",
         "tool_words": []
       },
       "ask_first": "Do guests pay advances mostly by transfer or in cash?",
@@ -78,7 +78,7 @@
         "keys": [
           "field_checks"
         ],
-        "text": "a daily caretaker check-in with photo and location, matched automatically against the booking calendar so unbooked use stands out.",
+        "text": "a daily caretaker check-in with photo and location, matched against the booking calendar so unbooked use stands out immediately.",
         "tool_words": []
       },
       "ask_first": "How often are you on site in a week?",
@@ -138,7 +138,7 @@
         "keys": [
           "field_checks"
         ],
-        "text": "a pre-arrival checklist with photo proof and time stamps for every booking, sent to the owner automatically, with missed checks counted.",
+        "text": "a pre-arrival checklist with photo proof and time stamps for every booking, delivered straight to the owner, with missed checks counted.",
         "tool_words": []
       },
       "ask_first": "What has gone wrong most often when guests arrive?",
@@ -168,7 +168,7 @@
         "keys": [
           "lead_followup"
         ],
-        "text": "an enquiry tracker pulling Instagram and WhatsApp enquiries into one list with automatic follow-up reminders and a count of what converted.",
+        "text": "an enquiry tracker pulling Instagram and WhatsApp enquiries into one list with follow-up reminders sent out and a count of what converted.",
         "tool_words": []
       },
       "ask_first": "Where do most enquiries come from now?",
@@ -198,7 +198,7 @@
         "keys": [
           "field_checks"
         ],
-        "text": "a post-checkout inspection with photos linked automatically to each booking.",
+        "text": "a post-checkout inspection with photos linked straight to each booking.",
         "tool_words": []
       },
       "ask_first": "Do you take a refundable security deposit now?",
@@ -228,7 +228,7 @@
         "keys": [
           "dashboards_reports"
         ],
-        "text": "a monthly profit view per property, pulling bookings, fuel, salaries, repairs and supplies automatically.",
+        "text": "a monthly profit view per property, bringing together bookings, fuel, salaries, repairs and supplies without extra effort.",
         "tool_words": [],
         "leads_with_view": true
       },
@@ -289,7 +289,7 @@
         "keys": [
           "booking_scheduling"
         ],
-        "text": "a peak-day roster with automatic confirmations and reminders, showing who has and hasn't confirmed.",
+        "text": "a peak-day roster sending out confirmations and reminders, showing who has and hasn't confirmed.",
         "tool_words": []
       },
       "ask_first": "Which role is hardest to cover on Eid?",

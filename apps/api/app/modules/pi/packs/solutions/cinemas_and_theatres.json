@@ -18,10 +18,10 @@
         "keys": [
           "cash_reconciliation"
         ],
-        "text": "a daily box-office reconciliation by show and cashier, flagging gaps to the owner automatically.",
+        "text": "a daily box-office reconciliation by show and cashier, flagging gaps to the owner every evening.",
         "tool_words": []
       },
-      "ask_first": "Do you sell only at the counter or through apps too?",
+      "ask_first": "Do you sell only at the counter or online too?",
       "free_stops": "How ticketing data is pulled in and matched is in the solution document.",
       "extra_ideas": [
         {
@@ -53,7 +53,7 @@
           "app"
         ]
       },
-      "ask_first": "How many ticketing apps sell your seats?",
+      "ask_first": "How many ticketing websites sell your seats?",
       "free_stops": "The data connection and matching rules stay for the solution document.",
       "quick_ideas_original": [
         "Compare one week of app sales with your own records by show, to see which shows differ",
@@ -225,7 +225,7 @@
         "keys": [
           "workflow_automation"
         ],
-        "text": "settlement statements generated automatically per film per week from ticket sales.",
+        "text": "settlement statements delivered per film every week from ticket sales.",
         "tool_words": []
       },
       "ask_first": "How many distributors do you settle with?",
@@ -288,7 +288,7 @@
         "text": "a morning read per location with tickets, occupancy, concessions, comps and refunds.",
         "tool_words": []
       },
-      "ask_first": "Do both locations use the same ticketing system?",
+      "ask_first": "Do both locations handle ticketing the same way?",
       "free_stops": "Which numbers and how they're pulled is in the solution document.",
       "extra_ideas": [
         {

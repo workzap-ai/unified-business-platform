@@ -49,7 +49,7 @@
           "field_checks",
           "customer_messaging"
         ],
-        "text": "Technicians would log tests done, equipment checks and photos on their phones, and the client would get a visit summary automatically, with no dosing guidance included.",
+        "text": "Technicians would log tests done, equipment checks and photos on their phones, and the client would get a visit summary right away, with no dosing guidance included.",
         "tool_words": [
           "system"
         ]

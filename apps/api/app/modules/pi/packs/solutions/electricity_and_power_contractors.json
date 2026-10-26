@@ -198,7 +198,7 @@
         "keys": [
           "credit_ledger"
         ],
-        "text": "A running bill and retention tracker per project with due dates and automatic reminders.",
+        "text": "A running bill and retention tracker per project with due dates and reminders sent to clients.",
         "tool_words": []
       },
       "ask_first": "Is the bigger amount in running bills held up now, or in old retentions never collected?",

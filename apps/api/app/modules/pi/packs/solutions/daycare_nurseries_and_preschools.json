@@ -18,7 +18,7 @@
         "keys": [
           "lead_followup"
         ],
-        "text": "A waitlist and tour tracker with follow-up dates and offer status, checked automatically each month across centres.",
+        "text": "A waitlist and tour tracker with follow-up dates and offer status, reviewed each month across centres.",
         "tool_words": []
       },
       "ask_first": "Of the families on the waitlist, are most still interested, or have you lost touch with most?",
@@ -79,7 +79,7 @@
         "keys": [
           "booking_scheduling"
         ],
-        "text": "A roster planner showing staffing per room against expected attendance and your own ratio settings, with the cover list contacted automatically.",
+        "text": "A roster planner showing staffing per room against expected attendance and your own ratio settings, with the cover list contacted when needed.",
         "tool_words": []
       },
       "ask_first": "Do sick calls come mostly on certain days, or spread across the week?",
@@ -109,7 +109,7 @@
         "keys": [
           "workflow_automation"
         ],
-        "text": "Daily attendance counts compiled automatically into a claim workbook for you to check and submit.",
+        "text": "Daily attendance counts put together into a claim workbook for you to check and submit.",
         "tool_words": []
       },
       "ask_first": "Do the subsidy claim evenings go mostly on counting attendance, or on filling in the forms?",
@@ -170,7 +170,7 @@
         "keys": [
           "credit_ledger"
         ],
-        "text": "A fee ledger with automatic reminders and payment links, and a daily overdue count per centre.",
+        "text": "A fee ledger that sends reminders and payment links to parents, with a daily overdue count per centre.",
         "tool_words": []
       },
       "ask_first": "Do late payers owe a little each, or do a few families owe a lot?",
@@ -200,7 +200,7 @@
         "keys": [
           "workflow_automation"
         ],
-        "text": "Late pick-ups picked up from sign-out times and added to the next invoice automatically, under your policy.",
+        "text": "Late pick-ups noticed from sign-out times and added to the next invoice, under your policy.",
         "tool_words": []
       },
       "ask_first": "Do late pick-ups occur most days, or mainly on certain days?",
@@ -320,7 +320,7 @@
         "keys": [
           "customer_messaging"
         ],
-        "text": "A centre messaging channel separate from staff phones, with templated daily updates and automatic replies to common questions.",
+        "text": "A centre messaging channel separate from staff phones, with set daily updates and instant replies to common questions.",
         "tool_words": []
       },
       "ask_first": "Do parents message teachers mostly during class hours, or in the evenings and weekends?",

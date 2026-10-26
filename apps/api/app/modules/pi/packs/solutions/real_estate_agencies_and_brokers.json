@@ -27,11 +27,11 @@
       "free_stops": "The assignment rules and response targets are set in the solution document.",
       "extra_ideas": [
         {
-          "text": "Note the time each portal enquiry arrives and the time of first call back today, so waiting hours show up clearly.",
+          "text": "Note the time each online enquiry arrives and the time of first call back today, so waiting hours show up clearly.",
           "review": false
         },
         {
-          "text": "Assign one desk person each half day to call fresh portal leads, so replies start before interest cools.",
+          "text": "Assign one desk person each half day to call fresh online leads, so replies start before interest cools.",
           "review": true
         }
       ]
@@ -56,7 +56,7 @@
           "portal"
         ]
       },
-      "ask_first": "Which portals do you pay for right now?",
+      "ask_first": "Which listing websites do you pay for right now?",
       "free_stops": "How sources are tagged and the report is structured is in the solution document.",
       "quick_ideas_original": [
         "Export each portal's own lead report once, to see calls per listing",
@@ -83,7 +83,7 @@
         ]
       },
       "ask_first": "Roughly how many active listings do you have?",
-      "free_stops": "The duplicate-matching logic and portal update flow are in the solution document.",
+      "free_stops": "The duplicate-matching steps and site update rules are in the proposal document.",
       "extra_ideas": [
         {
           "text": "Walk through your live property ads and mark repeated or already rented homes once, so clutter stealing enquiries is obvious.",
@@ -143,7 +143,7 @@
         "text": "A central pipeline where every lead and deal belongs to the agency, with stage and next step, so it can be reassigned the day someone leaves.",
         "tool_words": []
       },
-      "ask_first": "Where does an agent's client list live today: CRM, Excel or their phone?",
+      "ask_first": "Where does an agent's client list live today: spreadsheets, paper files, or their phone?",
       "free_stops": "The pipeline stages and handover process are defined in the solution document.",
       "extra_ideas": [
         {
@@ -231,7 +231,7 @@
         "keys": [
           "booking_scheduling"
         ],
-        "text": "A viewing scheduler with an access check and automatic WhatsApp confirmations and reminders to the client.",
+        "text": "A viewing calendar with an access check that sends instant WhatsApp confirmations and reminders to the client.",
         "tool_words": []
       },
       "ask_first": "How are viewings booked today?",
@@ -292,7 +292,7 @@
           "customer_messaging",
           "reviews_collection"
         ],
-        "text": "Lease-expiry and anniversary messages to past clients who opted in, and a review request after each smooth deal, sent automatically.",
+        "text": "Lease-expiry and anniversary messages to past clients who opted in, and a review request sent right after each smooth deal.",
         "tool_words": []
       },
       "ask_first": "What happens with a client after the deal closes today?",
@@ -317,8 +317,8 @@
     "Any covert monitoring of agents' phones; suspected fraud is a business risk, not an investigation."
   ],
   "sample_reply": {
-    "person": "I need a fix for this — we're paying for three portals and I genuinely can't tell which one is producing deals.",
-    "pi": "Yes, this can be improved, and none of it needs special equipment.\nFirst, route every portal enquiry to one office number or inbox, so the source is known from the first contact.\nSecond, put one month of spend, leads and closed deals per portal side by side before renewing any package.\nTo keep it going, Workzap could set up: every enquiry tagged by portal and listing, assigned to an agent, and spend against deals reported each week.\n\nShall I prepare a solution document and quote for you? You're welcome to say no.",
+    "person": "I need a fix for this — we're paying for three listing websites and I genuinely can't tell which one is producing deals.",
+    "pi": "Yes, this can be improved, and none of it needs special equipment.\nFirst, route every website enquiry to one office number or inbox, so the source is known from the first contact.\nSecond, put one month of spend, leads and closed deals per listing site side by side before renewing any package.\nTo keep it going, Workzap could set up: every enquiry tagged by site source and listing, assigned to an agent, and spend against deals reported each week.\n\nShall I prepare a proposal document and quote for you? You're welcome to say no.",
     "language": "english"
   }
 }

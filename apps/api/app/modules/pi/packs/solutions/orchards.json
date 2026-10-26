@@ -48,7 +48,7 @@
         "keys": [
           "dashboards_reports"
         ],
-        "text": "An orchard register by block that records picks, sales and costs every season, so theka and own-picking compare side by side automatically.",
+        "text": "An orchard register by block that records picks, sales and costs every season, so you compare theka and own-picking side by side.",
         "tool_words": [],
         "leads_with_view": true
       },
@@ -79,7 +79,7 @@
         "keys": [
           "field_checks"
         ],
-        "text": "A picking tally on phone recording crates per picker number per day with the supervisor's count, producing the pay sheet automatically.",
+        "text": "A picking tally on phone recording crates per picker number per day with the supervisor's count, producing the pay sheet right away.",
         "tool_words": []
       },
       "ask_first": "Who counts the crates during picking now?",

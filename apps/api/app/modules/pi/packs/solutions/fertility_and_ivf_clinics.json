@@ -51,8 +51,8 @@
         "text": "a coordinator scheduling board by patient code (no names on the shared view) with cover handover notes.",
         "tool_words": []
       },
-      "ask_first": "Is the schedule kept on paper or software now?",
-      "free_stops": "Code system and handover rules are in the solution document.",
+      "ask_first": "Is the schedule kept on paper or digitally now?",
+      "free_stops": "Code structure and handover rules are in the solution document.",
       "extra_ideas": [
         {
           "text": "Compare tomorrow's due appointments against today's handover note using patient codes only, so missed follow ups before leave become visible.",
@@ -265,7 +265,7 @@
           "system"
         ]
       },
-      "ask_first": "Which systems hold billing and scheduling now?",
+      "ask_first": "Where do you keep your billing and schedule right now?",
       "free_stops": "Data connections are mapped in the solution document.",
       "extra_ideas": [
         {

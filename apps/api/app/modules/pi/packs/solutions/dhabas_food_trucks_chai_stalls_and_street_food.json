@@ -18,7 +18,7 @@
         "keys": [
           "nori_daily_read"
         ],
-        "text": "a WhatsApp daily close where you send the totals and get a running weekly view of earnings back automatically.",
+        "text": "a WhatsApp daily close where you send the totals and get a running weekly view of earnings back.",
         "tool_words": []
       },
       "ask_first": "Do you write anything down at closing now?",
@@ -108,7 +108,7 @@
         "keys": [
           "dashboards_reports"
         ],
-        "text": "a daily buying list with prices that shows price changes over time and your cost per cup or plate automatically.",
+        "text": "a daily buying list with prices that shows price changes over time and your cost per cup or plate.",
         "tool_words": [],
         "leads_with_view": true
       },

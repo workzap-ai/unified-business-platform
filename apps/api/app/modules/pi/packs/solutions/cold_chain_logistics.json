@@ -50,7 +50,7 @@
         "keys": [
           "custom_build"
         ],
-        "text": "WhatsApp alarms to the on-duty person when a reading goes out of range, escalating automatically if not acknowledged.",
+        "text": "WhatsApp messages to the person on duty when a reading goes out of range, passing to the next person if unanswered.",
         "tool_words": []
       },
       "ask_first": "Do the chambers have any sensor or meter that records readings now?",
@@ -80,7 +80,7 @@
         "keys": [
           "workflow_automation"
         ],
-        "text": "A claim file per incident that collects temperature records, photos and handover notes automatically.",
+        "text": "A claim file per incident that gathers temperature records, photos and handover notes together.",
         "tool_words": []
       },
       "ask_first": "Is the dispute usually about temperature during storage, or about the condition of goods on arrival?",
@@ -320,7 +320,7 @@
   ],
   "sample_reply": {
     "person": "Pichle hafte raat ko ek chamber ka compressor band ho gaya aur subah pata chala. Aisa dobara na ho, koi tareeqa batao.",
-    "pi": "Ji haan, ye theek ho sakta hai, aur pehla qadam aasan hai.\nPehle, raat ke temperature round ke liye ek banda muqarrar karein, taake koi zimmedaar dekh raha ho.\nDoosra, raat ke liye technician ka number har waqt maujood rakhein, taake masla hote hi rabta ho sake.\nWorkzap is ke liye ye bana sakta hai: reading had se bahar jaye to duty wale ko WhatsApp alarm jaye, aur jawab na aaye to agla banda apne aap alert ho.\n\nKya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "pi": "Ji haan, ye theek ho sakta hai, aur pehla qadam aasan hai.\nPehle, raat ke temperature round ke liye ek banda muqarrar karein, taake koi zimmedaar dekh raha ho.\nDoosra, raat ke liye technician ka number har waqt maujood rakhein, taake masla hote hi rabta ho sake.\nWorkzap is ke liye ye bana sakta hai: reading had se bahar jaye to duty wale ko WhatsApp alarm jaye, aur jawab na aaye to agla banda alert ho jaye.\n\nKya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
     "language": "roman_urdu"
   }
 }

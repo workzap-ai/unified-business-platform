@@ -48,7 +48,7 @@
         "keys": [
           "dashboards_reports"
         ],
-        "text": "fruit price per kilo and scoop yield per tub logged daily, with cost per glass or scoop worked out automatically.",
+        "text": "fruit price per kilo and scoop yield per tub logged daily, with cost per glass or scoop worked out instantly.",
         "tool_words": [],
         "leads_with_view": true
       },
@@ -260,7 +260,7 @@
         "keys": [
           "order_capture"
         ],
-        "text": "an event order form with date, quantities and advance that feeds one list and confirms to the client automatically.",
+        "text": "an event order form with date, quantities and advance that feeds one list and confirms to the client straight away.",
         "tool_words": []
       },
       "ask_first": "How do party orders reach you now?",

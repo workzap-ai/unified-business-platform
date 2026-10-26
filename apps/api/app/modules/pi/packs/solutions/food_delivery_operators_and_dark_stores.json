@@ -19,7 +19,7 @@
           "stock_alerts",
           "integration"
         ],
-        "text": "hub stock with bin locations, cycle counts and variance alerts, synced to your listings automatically.",
+        "text": "Hub stock with shelf locations, stock counts and mismatch alerts, updated on your online listings right when items move.",
         "tool_words": []
       },
       "ask_first": "How often is the hub counted?",

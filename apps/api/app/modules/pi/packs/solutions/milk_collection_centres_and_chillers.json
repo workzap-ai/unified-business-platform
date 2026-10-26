@@ -18,7 +18,7 @@
         "keys": [
           "workflow_automation"
         ],
-        "text": "credit_ledger — each delivery entered at intake, with a WhatsApp slip sent to the supplier automatically (with their permission) and weekly statements built on their own.",
+        "text": "credit_ledger — each delivery entered at intake, with a WhatsApp slip sent to the supplier (with their permission) and weekly statements built without manual effort.",
         "tool_words": []
       },
       "ask_first": "What's tested when milk arrives today?",
@@ -48,7 +48,7 @@
         "keys": [
           "dashboards_reports"
         ],
-        "text": "supplier activity tracked daily, with suppliers who've dropped off flagged automatically.",
+        "text": "supplier activity tracked daily, with suppliers who've dropped off flagged right away.",
         "tool_words": [],
         "leads_with_view": true
       },
@@ -79,7 +79,7 @@
         "keys": [
           "transfer_tracking"
         ],
-        "text": "each tanker's load, sources, seal photo and plant result logged, with rejections linked back to routes automatically.",
+        "text": "each tanker's load, sources, seal photo and plant result logged, with rejections linked back to routes without manual work.",
         "tool_words": []
       },
       "ask_first": "Does the plant give you the rejection reason in writing?",
@@ -109,7 +109,7 @@
         "keys": [
           "transfer_tracking"
         ],
-        "text": "dashboards_reports — collected vs dispatched reconciled automatically by day and centre.",
+        "text": "daily_reports — collected vs dispatched reconciled without extra work by day and centre.",
         "tool_words": []
       },
       "ask_first": "Where do you think the gap happens?",
@@ -139,7 +139,7 @@
         "keys": [
           "credit_ledger"
         ],
-        "text": "an advance ledger per supplier that deducts repayments from each payout automatically.",
+        "text": "an advance ledger per supplier that deducts repayments from each payout on its own.",
         "tool_words": []
       },
       "ask_first": "How many suppliers have advances right now?",
@@ -200,7 +200,7 @@
         "keys": [
           "cash_reconciliation"
         ],
-        "text": "every payout recorded by route and method, with cash out checked against statements automatically.",
+        "text": "every payout recorded by route and method, with cash out checked against statements on its own.",
         "tool_words": []
       },
       "ask_first": "How are most suppliers paid now?",
@@ -260,7 +260,7 @@
         "keys": [
           "transfer_tracking"
         ],
-        "text": "a dispatch log with litres, seal photo and times, matched to the plant receipt automatically.",
+        "text": "a dispatch log with litres, seal photo and times, matched to the plant receipt right away.",
         "tool_words": []
       },
       "ask_first": "Who drives the tanker, and how do you know when it leaves and arrives?",
@@ -290,7 +290,7 @@
         "keys": [
           "nori_daily_read"
         ],
-        "text": "an automatic morning read across all centres with litres, average readings, active suppliers and cash due in and out.",
+        "text": "a morning summary read across all centres with litres, average readings, active suppliers and cash due in and out.",
         "tool_words": []
       },
       "ask_first": "How do the centres report to you now?",

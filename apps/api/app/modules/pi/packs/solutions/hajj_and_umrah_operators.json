@@ -49,7 +49,7 @@
         "keys": [
           "credit_ledger"
         ],
-        "text": "an instalment tracker per booking reference (no ID data) with automatic reminders and departure cut-off flags.",
+        "text": "an instalment tracker per booking reference (no ID data) with scheduled reminders and departure cut-off flags.",
         "tool_words": []
       },
       "ask_first": "Zyada tar families upfront dete hain ya instalments mein?",
@@ -291,7 +291,7 @@
         "keys": [
           "credit_ledger"
         ],
-        "text": "a sub-agent collections ledger with balances, remittance dates and automatic reminders.",
+        "text": "a sub-agent collections ledger with balances, remittance dates and scheduled reminders.",
         "tool_words": []
       },
       "ask_first": "Kitne sub-agents aap ke packages bechte hain?",

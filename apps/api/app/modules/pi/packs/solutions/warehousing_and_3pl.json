@@ -110,7 +110,7 @@
         "keys": [
           "workflow_automation"
         ],
-        "text": "Activity-based billing that captures storage days, pallets, picks, packs and labelling automatically into a monthly invoice per client.",
+        "text": "Activity-based billing that captures storage days, pallets, picks, packs and labelling into a monthly invoice per client.",
         "tool_words": []
       },
       "ask_first": "Which extra handling goes unbilled most often, labelling, repacking or extra labour?",

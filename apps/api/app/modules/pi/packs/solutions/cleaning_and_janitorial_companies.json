@@ -111,7 +111,7 @@
         "keys": [
           "cash_reconciliation"
         ],
-        "text": "A cash log per cleaner per day, reconciled automatically against completed home jobs.",
+        "text": "A cash log per cleaner per day, matched against completed home jobs.",
         "tool_words": []
       },
       "ask_first": "How do home customers pay?",
@@ -172,7 +172,7 @@
           "field_checks",
           "dashboards_reports"
         ],
-        "text": "A site headcount register with a daily attendance report sent to the client automatically.",
+        "text": "A site headcount register with a daily attendance report sent to the client every day.",
         "tool_words": []
       },
       "ask_first": "How does the client check the headcount?",

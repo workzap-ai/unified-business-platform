@@ -48,7 +48,7 @@
         "keys": [
           "customer_messaging"
         ],
-        "text": "booking_scheduling — booster and recheck reminders sent automatically from the due dates the clinic enters.",
+        "text": "booking_scheduling — booster and recheck reminders sent to owners on the due dates the clinic enters.",
         "tool_words": []
       },
       "ask_first": "Where are due dates kept today?",
@@ -78,7 +78,7 @@
         "keys": [
           "booking_scheduling"
         ],
-        "text": "appointment reminders and confirmations sent automatically, with freed slots offered to the waiting list.",
+        "text": "appointment reminders and confirmations sent to clients, with freed slots offered to the waiting list.",
         "tool_words": []
       },
       "ask_first": "How far ahead are surgeries booked?",
@@ -138,7 +138,7 @@
         "keys": [
           "stock_alerts"
         ],
-        "text": "a pharmacy stock list with batch and expiry dates and near-expiry alerts sent automatically.",
+        "text": "a pharmacy stock list with batch and expiry dates and near-expiry alerts sent to the team.",
         "tool_words": []
       },
       "ask_first": "Who looks after pharmacy stock?",
@@ -168,7 +168,7 @@
         "keys": [
           "workflow_automation"
         ],
-        "text": "a billing checklist linking each consultation to items used, with daily stock-vs-bills gaps flagged automatically.",
+        "text": "a billing checklist linking each consultation to items used, showing daily gaps between stock and bills.",
         "tool_words": []
       },
       "ask_first": "Is there one dispensing point or several?",
@@ -198,7 +198,7 @@
         "keys": [
           "credit_ledger"
         ],
-        "text": "a farm client ledger with statements and reminders sent automatically.",
+        "text": "a farm client ledger with statements and payment reminders sent to farmers.",
         "tool_words": []
       },
       "ask_first": "How many farm clients buy on credit?",
@@ -260,7 +260,7 @@
         "keys": [
           "reviews_collection"
         ],
-        "text": "real clients asked for a review automatically after their visit, so feedback reflects everyone, not just the unhappy few.",
+        "text": "real clients asked for a review right after their visit, so feedback reflects everyone, not just the unhappy few.",
         "tool_words": []
       },
       "ask_first": "What do unhappy clients mention most?",
@@ -290,7 +290,7 @@
         "keys": [
           "booking_scheduling"
         ],
-        "text": "a rota planner that spreads night and weekend cover and sends shift reminders automatically.",
+        "text": "a rota planner that spreads night and weekend cover and sends shift reminders to staff.",
         "tool_words": []
       },
       "ask_first": "How many vets share the rota?",

@@ -18,7 +18,7 @@
         "keys": [
           "credit_ledger"
         ],
-        "text": "a receivables board showing what each brand owes and for how long, with automatic payment reminders to the brand's finance contact.",
+        "text": "a receivables board showing what each brand owes and for how long, with payment reminders sent to the brand's finance contact.",
         "tool_words": []
       },
       "ask_first": "Roughly how many brands owe you at the moment?",

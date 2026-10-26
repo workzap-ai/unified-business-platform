@@ -109,7 +109,7 @@
         "keys": [
           "credit_ledger"
         ],
-        "text": "a credit and fleet customer ledger with automatic monthly statements and overdue reminders.",
+        "text": "A credit and fleet customer ledger with monthly statements and overdue reminders sent directly to clients.",
         "tool_words": []
       },
       "ask_first": "Is it mostly a few big transporters owing you, or many small credit customers?",

@@ -49,7 +49,7 @@
           "job_tracking",
           "customer_messaging"
         ],
-        "text": "a refund and credit shell tracker with status, age and owner, sending customers an update automatically whenever their refund moves.",
+        "text": "a refund and credit shell tracker with status, age and owner, sending customers an update whenever their refund moves.",
         "tool_words": []
       },
       "ask_first": "Is waqt taqreeban kitne refunds pending honge?",
@@ -140,7 +140,7 @@
         "keys": [
           "credit_ledger"
         ],
-        "text": "a corporate and sub-agent credit ledger with limits, ageing and automatic reminders timed ahead of BSP dates.",
+        "text": "a corporate and sub-agent credit ledger with limits, ageing and reminders sent to clients ahead of BSP dates.",
         "tool_words": []
       },
       "ask_first": "Credit sab se zyada kis ko dete hain, corporates ya sub-agents?",

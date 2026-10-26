@@ -261,7 +261,7 @@
         "keys": [
           "dashboards_reports"
         ],
-        "text": "A monthly owner report on output, waste, top customers by volume and margin, and overdues, pulled automatically.",
+        "text": "A monthly owner report on output, waste, top customers by volume and margin, and overdues, prepared for you.",
         "tool_words": []
       },
       "ask_first": "Does the report take long in gathering the numbers, or in putting them together?",

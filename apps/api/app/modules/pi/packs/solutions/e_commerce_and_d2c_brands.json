@@ -18,7 +18,7 @@
         "keys": [
           "order_capture"
         ],
-        "text": "a WhatsApp confirmation flow that messages every COD buyer automatically, holds unconfirmed orders and shows returns by city, courier and product every day.",
+        "text": "a WhatsApp confirmation flow that messages every COD buyer, holds unconfirmed orders and shows returns by city, courier and product every day.",
         "tool_words": []
       },
       "ask_first": "Do returns come mostly from certain cities or certain products?",
@@ -292,7 +292,7 @@
           "order_capture",
           "integration"
         ],
-        "text": "a single order inbox pulling website, Instagram and marketplace orders into one packing queue automatically.",
+        "text": "a single order inbox pulling website, Instagram and marketplace orders into one packing queue for staff.",
         "tool_words": []
       },
       "ask_first": "Which channel brings most of your orders, the website, Instagram or Daraz?",

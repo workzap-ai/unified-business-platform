@@ -49,7 +49,7 @@
           "field_checks",
           "dashboards_reports"
         ],
-        "text": "A shift log on phone per loom for picks and stop reasons, feeding an automatic morning efficiency view by shed, shift and loom type.",
+        "text": "A shift log on phone per loom for picks and stop reasons, feeding a morning efficiency view by shed, shift and loom type.",
         "tool_words": []
       },
       "ask_first": "Is daily output recorded by loom or shed, or just as a total?",
@@ -79,7 +79,7 @@
         "keys": [
           "field_checks"
         ],
-        "text": "A waste register with weighing at source, automatic gate pass matching and a weekly view of waste by department.",
+        "text": "A waste register with weighing at source, gate pass matching and a weekly view of waste by department.",
         "tool_words": []
       },
       "ask_first": "Who weighs the waste when it goes out of the gate?",
@@ -170,7 +170,7 @@
         "keys": [
           "field_checks"
         ],
-        "text": "A cloth fault log at folding with loom number, fault type and photo, summarised automatically by loom and jobber group.",
+        "text": "A cloth fault log at folding with loom number, fault type and photo, summarised by loom and jobber group.",
         "tool_words": []
       },
       "ask_first": "Are the faults mostly from a few looms, or spread across the shed?",
@@ -291,7 +291,7 @@
         "keys": [
           "dashboards_reports"
         ],
-        "text": "A daily owner summary of output, efficiency, waste, stoppages and dispatches, pulled automatically from the shift logs.",
+        "text": "A daily owner summary of output, efficiency, waste, stoppages and dispatches, pulled straight from the shift logs.",
         "tool_words": [],
         "leads_with_view": true
       },

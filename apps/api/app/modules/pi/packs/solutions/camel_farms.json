@@ -18,7 +18,7 @@
         "keys": [
           "field_checks"
         ],
-        "text": "nori_daily_read — herders enter milk per naqa on the phone, and the owner gets an automatic morning read of totals and camels below their usual yield.",
+        "text": "nori_daily_read — herders enter milk per naqa on the phone, and the owner gets a morning read of totals and camels below their usual yield.",
         "tool_words": []
       },
       "ask_first": "How many camels are in milk right now?",
@@ -48,7 +48,7 @@
         "keys": [
           "field_checks"
         ],
-        "text": "dashboards_reports — rejected quantity and reason logged against each day's milking, with a monthly pattern shown to the owner automatically.",
+        "text": "daily summary — rejected quantity and reason logged against each day's milking, with a monthly pattern shown to the owner at month end.",
         "tool_words": []
       },
       "ask_first": "Does the collector give any reason today?",
@@ -78,7 +78,7 @@
         "keys": [
           "order_capture"
         ],
-        "text": "a delivery tracker with departure and arrival times per route and missed-delivery alerts sent automatically.",
+        "text": "a delivery tracker with departure and arrival times per route and missed-delivery alerts sent to you.",
         "tool_words": []
       },
       "ask_first": "How many delivery routes run each day?",
@@ -108,7 +108,7 @@
         "keys": [
           "customer_messaging"
         ],
-        "text": "order_capture — a milk subscription list with pauses, which spots customers who've gone quiet and messages them automatically.",
+        "text": "order_capture — a milk subscription list with pauses, which spots customers who've gone quiet and sends them a message.",
         "tool_words": []
       },
       "ask_first": "Do customers order daily, weekly or as they need?",
@@ -138,7 +138,7 @@
         "keys": [
           "stock_alerts"
         ],
-        "text": "hay and feed deliveries vs orders logged with photos, stock kept running and cost per camel per month worked out automatically.",
+        "text": "hay and feed deliveries vs orders logged with photos, stock kept running and monthly cost per camel shown to the owner.",
         "tool_words": []
       },
       "ask_first": "Who receives hay deliveries at the ezba?",
@@ -198,7 +198,7 @@
         "keys": [
           "job_tracking"
         ],
-        "text": "dashboards_reports — a racing and show tracker that totals costs and results per camel across the season automatically.",
+        "text": "performance reports — a racing and show tracker that totals costs and results per camel across the season for the owner.",
         "tool_words": []
       },
       "ask_first": "How many camels race or show each season?",
@@ -290,7 +290,7 @@
         "keys": [
           "nori_daily_read"
         ],
-        "text": "an automatic morning read with milk, headcount, births, deaths, deliveries and cash, from the entries staff already make.",
+        "text": "a morning read sent to the owner with milk, headcount, births, deaths, deliveries and cash, from the entries staff already make.",
         "tool_words": []
       },
       "ask_first": "If you could see one number every morning, what would it be?",

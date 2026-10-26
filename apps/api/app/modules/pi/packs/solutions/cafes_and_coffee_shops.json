@@ -18,7 +18,7 @@
         "keys": [
           "stock_alerts"
         ],
-        "text": "a tablet wastage log for pastries and milk that shows the trend by item and day automatically and suggests tomorrow's order from what actually sold.",
+        "text": "a tablet wastage log for pastries and milk that shows the trend by item and day and suggests tomorrow's order from what actually sold.",
         "tool_words": []
       },
       "ask_first": "Are pastries baked in-house or bought in?",
@@ -79,7 +79,7 @@
         "keys": [
           "stock_alerts"
         ],
-        "text": "par levels for milks, beans, syrups and cups with automatic WhatsApp reorder alerts when anything falls low.",
+        "text": "par levels for milks, beans, syrups and cups with WhatsApp reorder alerts sent to the owner when anything falls low.",
         "tool_words": []
       },
       "ask_first": "Who checks stock and places orders now?",
@@ -139,7 +139,7 @@
         "keys": [
           "order_capture"
         ],
-        "text": "a WhatsApp or web pre-order flow with ready-time slots, so office runs and regulars are queued automatically and none are missed.",
+        "text": "a WhatsApp or web pre-order flow with ready-time slots, so office runs and regulars are queued in order and none are missed.",
         "tool_words": []
       },
       "ask_first": "What time is your busiest rush?",
@@ -230,7 +230,7 @@
         "keys": [
           "loyalty_repeat"
         ],
-        "text": "phone-number loyalty at the counter for customers who opt in, with visit history and abuse checks running automatically.",
+        "text": "phone-number loyalty at the counter for customers who opt in, with visit history recorded and abuse checks running in the background.",
         "tool_words": []
       },
       "ask_first": "How do you reward regulars now?",
@@ -260,7 +260,7 @@
         "keys": [
           "attribution_codes"
         ],
-        "text": "codes and links showing which post or message brought which customer, counted automatically.",
+        "text": "codes and links showing which post or message brought which customer, counted as sales come in.",
         "tool_words": []
       },
       "ask_first": "Who runs your social pages?",

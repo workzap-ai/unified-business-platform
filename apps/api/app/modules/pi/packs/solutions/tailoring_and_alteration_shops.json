@@ -18,7 +18,7 @@
         "keys": [
           "job_tracking"
         ],
-        "text": "a capacity planner that warns automatically when booked orders exceed what the team can make.",
+        "text": "a capacity planner that warns you when booked orders exceed what the team can make.",
         "tool_words": []
       },
       "ask_first": "How many karigars work for you?",
@@ -49,7 +49,7 @@
           "job_tracking",
           "customer_messaging"
         ],
-        "text": "an order status board with automatic \"ready\" or delay messages.",
+        "text": "an order status board with \"ready\" or delay messages sent to customers.",
         "tool_words": []
       },
       "ask_first": "How do you record orders now?",
@@ -199,7 +199,7 @@
         "keys": [
           "customer_messaging"
         ],
-        "text": "automatic reminders for uncollected orders.",
+        "text": "reminders sent to customers for uncollected orders.",
         "tool_words": []
       },
       "ask_first": "How much advance do you take?",
@@ -229,7 +229,7 @@
         "keys": [
           "customer_messaging"
         ],
-        "text": "automatic \"ready for collection\" WhatsApp messages.",
+        "text": "\"ready for collection\" WhatsApp messages sent to customers.",
         "tool_words": []
       },
       "ask_first": "How many orders do you deliver a day?",

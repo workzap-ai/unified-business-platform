@@ -234,8 +234,8 @@
         "text": "stock synced to Talabat, Noon or Instashop listings so items you don't have aren't shown.",
         "tool_words": []
       },
-      "ask_first": "Which apps do you sell on?",
-      "free_stops": "connections per app are detailed in the solution document.",
+      "ask_first": "Which online sales channels do you sell on?",
+      "free_stops": "connections per sales channel are detailed in the solution document.",
       "quick_ideas_original": [
         "Check your top items on each app once, because it shows how far they've drifted",
         "Make one person own app stock, because otherwise nobody updates."

@@ -18,7 +18,7 @@
         "keys": [
           "field_checks"
         ],
-        "text": "dashboards_reports — a batch register that records every calf's source, weight and price at purchase and automatically matches it to its sale, showing which sources and prices paid off.",
+        "text": "a batch register that records every calf's source, weight and price at purchase and matches it to its sale, showing which sources and prices paid off.",
         "tool_words": []
       },
       "ask_first": "Is there a scale you can use when buying today?",
@@ -48,7 +48,7 @@
         "keys": [
           "field_checks"
         ],
-        "text": "weigh-day entries on the phone that work out gain per animal and per batch automatically and flag animals below the farm's own target.",
+        "text": "weigh-day entries on the phone that work out gain per animal and per batch and flag animals below the farm's own target.",
         "tool_words": []
       },
       "ask_first": "Do you have a scale at the farm?",
@@ -109,7 +109,7 @@
         "keys": [
           "stock_alerts"
         ],
-        "text": "field_checks — deliveries, daily issue and stock left logged on the phone, with gaps and days of feed remaining calculated automatically.",
+        "text": "field checks — deliveries, daily issue and stock left logged on the phone, with gaps and days of feed remaining calculated for you.",
         "tool_words": []
       },
       "ask_first": "Who has access to the feed store?",
@@ -139,7 +139,7 @@
         "keys": [
           "credit_ledger"
         ],
-        "text": "a buyer ledger that keeps every butcher's balance up to date and sends polite reminders automatically.",
+        "text": "a buyer ledger that keeps every butcher's balance up to date and sends polite reminders to them.",
         "tool_words": []
       },
       "ask_first": "How many butchers buy on credit regularly?",
@@ -169,7 +169,7 @@
         "keys": [
           "booking_scheduling"
         ],
-        "text": "customer_messaging — Eid bookings with advance, reserved animal (tag and photo), slot and balance, with confirmations and reminders sent automatically.",
+        "text": "customer_messaging — Eid bookings with advance, reserved animal (tag and photo), slot and balance, with confirmations and reminders sent right to customers.",
         "tool_words": []
       },
       "ask_first": "Are bookings taken only in person, or on WhatsApp too?",
@@ -199,7 +199,7 @@
         "keys": [
           "dashboards_reports"
         ],
-        "text": "a partner statement per batch that updates automatically from costs and sales and goes to every partner on the same day.",
+        "text": "a partner statement per batch that calculates from costs and sales and reaches every partner on the same day.",
         "tool_words": [],
         "leads_with_view": true
       },
@@ -230,7 +230,7 @@
         "keys": [
           "field_checks"
         ],
-        "text": "timed night check-ins with headcount photos, alerting the owner automatically if one is missed.",
+        "text": "timed night check-ins with headcount photos, sending the owner an alert if one is missed.",
         "tool_words": []
       },
       "ask_first": "Who stays with the animals at night now?",
@@ -291,7 +291,7 @@
         "keys": [
           "nori_daily_read"
         ],
-        "text": "a morning WhatsApp summary for the owner with headcount, deaths, feed days left and cash due, built automatically from the manager's entries.",
+        "text": "a morning WhatsApp summary for the owner with headcount, deaths, feed days left and cash due, created right from the manager's entries.",
         "tool_words": [],
         "leads_with_view": true
       },

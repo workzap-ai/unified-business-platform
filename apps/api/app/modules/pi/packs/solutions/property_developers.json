@@ -301,7 +301,7 @@
         ]
       },
       "ask_first": "What report do you wish you had every Monday morning?",
-      "free_stops": "Which modules come first and how the data is joined is mapped in the solution document.",
+      "free_stops": "Which parts come first and how the data connects is mapped in the solution document.",
       "extra_ideas": [
         {
           "text": "Compare one recent unit across sales, accounts and construction records once, so you see exactly where the team descriptions stop matching.",

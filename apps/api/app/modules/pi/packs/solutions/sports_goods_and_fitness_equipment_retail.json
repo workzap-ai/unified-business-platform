@@ -141,7 +141,7 @@
           "booking_scheduling",
           "job_tracking"
         ],
-        "text": "an AMC register with visit schedule, parts used and automatic reminders.",
+        "text": "an AMC register with visit schedule, parts used and reminders sent on schedule.",
         "tool_words": []
       },
       "ask_first": "How many gyms are on AMC?",
@@ -171,7 +171,7 @@
         "keys": [
           "credit_ledger"
         ],
-        "text": "an institutional credit ledger with ageing and automatic WhatsApp reminders.",
+        "text": "an institutional credit ledger with ageing and WhatsApp reminder messages sent to buyers.",
         "tool_words": []
       },
       "ask_first": "How long do they usually take to pay?",

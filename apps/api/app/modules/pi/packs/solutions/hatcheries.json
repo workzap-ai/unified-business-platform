@@ -18,7 +18,7 @@
         "keys": [
           "dashboards_reports"
         ],
-        "text": "hatch results entered per batch, compared automatically by machine and egg source from the hatchery's own data.",
+        "text": "hatch results entered per batch, compared side-by-side by machine and egg source from the hatchery's own data.",
         "tool_words": []
       },
       "ask_first": "How many setters and hatchers do you run?",
@@ -80,7 +80,7 @@
         "keys": [
           "booking_scheduling"
         ],
-        "text": "customer_messaging — cancellations tracked by customer, with waiting-list customers messaged automatically when chicks free up.",
+        "text": "customer_messaging — cancellations tracked by customer, with waiting-list customers messaged on WhatsApp when chicks free up.",
         "tool_words": []
       },
       "ask_first": "Do you take an advance with bookings?",
@@ -140,7 +140,7 @@
         "keys": [
           "job_tracking"
         ],
-        "text": "each hatch batch traced from egg source and machine to the customers who received it, so a complaint links back automatically.",
+        "text": "each hatch batch traced from egg source and machine to the customers who received it, so a complaint links right back to the source.",
         "tool_words": []
       },
       "ask_first": "How do complaints reach you now?",
@@ -170,7 +170,7 @@
         "keys": [
           "field_checks"
         ],
-        "text": "egg intake logged by source with counts and photos, summarised per supplier automatically.",
+        "text": "egg intake logged by source with counts and photos, summarised per supplier right after logging.",
         "tool_words": []
       },
       "ask_first": "How many egg sources do you use?",
@@ -230,7 +230,7 @@
         "keys": [
           "credit_ledger"
         ],
-        "text": "a dealer ledger that keeps balances current and sends reminders automatically.",
+        "text": "a dealer ledger that keeps balances current and sends reminders to dealers when payment is due.",
         "tool_words": []
       },
       "ask_first": "How many dealers buy on credit?",
@@ -260,7 +260,7 @@
         "keys": [
           "customer_messaging"
         ],
-        "text": "automatic WhatsApp updates when chicks are ready and dispatched.",
+        "text": "WhatsApp updates sent to customers when chicks are ready and dispatched.",
         "tool_words": []
       },
       "ask_first": "Roughly how many orders go out on a busy day?",

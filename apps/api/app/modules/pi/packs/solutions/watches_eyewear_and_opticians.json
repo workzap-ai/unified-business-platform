@@ -203,7 +203,7 @@
           "customer_messaging",
           "booking_scheduling"
         ],
-        "text": "reminders sent automatically only to customers who agreed, with a link to book a slot.",
+        "text": "reminders sent only to customers who agreed, with a link to book a slot.",
         "tool_words": []
       },
       "ask_first": "Do you keep any record of customers who'd like to hear from you?",
@@ -267,7 +267,7 @@
         "text": "sell-out reports generated straight from POS data in each brand's format, every month.",
         "tool_words": []
       },
-      "ask_first": "What system do you use for billing?",
+      "ask_first": "What do you use for billing?",
       "free_stops": "the report mapping per brand is kept for the solution document.",
       "extra_ideas": [
         {

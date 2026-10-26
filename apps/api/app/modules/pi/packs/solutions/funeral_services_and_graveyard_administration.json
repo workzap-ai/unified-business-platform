@@ -228,7 +228,7 @@
         "keys": [
           "customer_messaging"
         ],
-        "text": "gentle, automatic status messages to the family's chosen contact at each step.",
+        "text": "Gentle status messages sent to the family's chosen contact at each step.",
         "tool_words": []
       },
       "ask_first": "Do families call mostly before the funeral, or in the days after?",

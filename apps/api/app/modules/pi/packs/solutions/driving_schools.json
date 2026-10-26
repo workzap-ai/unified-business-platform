@@ -18,7 +18,7 @@
         "keys": [
           "booking_scheduling"
         ],
-        "text": "lesson booking with automatic reminders and the cancellation rule recorded on each booking.",
+        "text": "lesson booking that sends reminders to students and records the cancellation rule on each booking.",
         "tool_words": []
       },
       "ask_first": "Is there any rule students agree to about cancelling today?",
@@ -79,7 +79,7 @@
           "job_tracking",
           "dashboards_reports"
         ],
-        "text": "an instructor lesson log confirmed by the student, feeding pay or commission automatically.",
+        "text": "an instructor lesson log confirmed by the student, updating pay or commission for you.",
         "tool_words": []
       },
       "ask_first": "Are instructors' lessons noted anywhere today, or only remembered at pay time?",
@@ -139,7 +139,7 @@
         "keys": [
           "credit_ledger"
         ],
-        "text": "payment status per package with automatic reminders.",
+        "text": "payment status per package with reminders sent to clients.",
         "tool_words": []
       },
       "ask_first": "Do students leave mostly after the first payment, or in the middle of the course?",

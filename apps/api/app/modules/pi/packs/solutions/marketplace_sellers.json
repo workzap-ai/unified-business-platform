@@ -18,7 +18,7 @@
         "keys": [
           "cash_reconciliation"
         ],
-        "text": "a payout reconciler that reads every settlement automatically and matches each fee, commission, penalty and refund to its order.",
+        "text": "a payout reconciler that reads every settlement and matches each fee, commission, penalty and refund to its order.",
         "tool_words": []
       },
       "ask_first": "Which marketplace's payouts confuse you most?",

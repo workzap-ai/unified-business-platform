@@ -18,7 +18,7 @@
         "keys": [
           "credit_ledger"
         ],
-        "text": "customer_messaging — A fee ledger by family account number that sends reminders automatically on a set schedule every month and shows each campus head a daily defaulter count, not a list of children.",
+        "text": "customer_messaging — A fee ledger by family account number that sends reminders on a set schedule every month and shows each campus head a daily defaulter count, not a list of children.",
         "tool_words": []
       },
       "ask_first": "Do most parents pay by challan, wallet or cash at the counter?",
@@ -110,7 +110,7 @@
         "keys": [
           "lead_followup"
         ],
-        "text": "Every enquiry from ads, WhatsApp, the website and walk-ins captured automatically, with stage, source and follow-up reminders, plus a season-to-date view of enquiries turning into admissions per campus.",
+        "text": "Every enquiry from ads, WhatsApp, the website and walk-ins captured directly, with stage, source and follow-up reminders, plus a season-to-date view of enquiries turning into admissions per campus.",
         "tool_words": []
       },
       "ask_first": "Which source brings most enquiries: Instagram, WhatsApp, or walk-ins?",
@@ -201,7 +201,7 @@
         "keys": [
           "booking_scheduling"
         ],
-        "text": "Absences logged each morning, free periods matched automatically and the cover teacher told on WhatsApp, with a count of cover load per teacher by campus.",
+        "text": "Absences logged each morning, free periods matched right away and the cover teacher told on WhatsApp, with a count of cover load per teacher by campus.",
         "tool_words": []
       },
       "ask_first": "Do teacher absences mostly come the same morning, or are they known the day before?",
@@ -231,7 +231,7 @@
         "keys": [
           "workflow_automation"
         ],
-        "text": "Marks entered once by teachers and report cards produced automatically, with access limited to staff who need it.",
+        "text": "Marks entered once by teachers and report cards created without retyping, with access limited to staff who need it.",
         "tool_words": []
       },
       "ask_first": "Do the delays come mostly from late marks, or from different file formats?",
@@ -324,7 +324,7 @@
         "text": "One owner screen updated daily with enrolment, fee collection, defaults, staff turnover and expenses per campus, side by side.",
         "tool_words": []
       },
-      "ask_first": "Do all campuses use the same school system today?",
+      "ask_first": "Do all campuses use the same school setup today?",
       "free_stops": "Which figures feed the screen and how they are pulled from each campus is in the document.",
       "extra_ideas": [
         {

@@ -18,7 +18,7 @@
         "keys": [
           "booking_scheduling"
         ],
-        "text": "a slot calendar per court or turf with WhatsApp booking, automatic confirmations and clash blocking.",
+        "text": "a slot calendar per court or turf with WhatsApp booking, instant confirmation messages, and double-booking prevention.",
         "tool_words": []
       },
       "ask_first": "How many courts or turfs do you have?",
@@ -48,7 +48,7 @@
         "keys": [
           "booking_scheduling"
         ],
-        "text": "a no-show tracker per group with an advance link on peak slots, and freed slots offered to a waitlist automatically.",
+        "text": "a no-show tracker per group with an advance link on peak slots, and freed slots offered to a waitlist straight away.",
         "tool_words": []
       },
       "ask_first": "Do you take any advance for slots now?",
@@ -108,7 +108,7 @@
         "keys": [
           "credit_ledger"
         ],
-        "text": "an academy register by student ID number with fee status and automatic reminders to parents.",
+        "text": "an academy register by student ID number with fee status and reminder messages sent to parents.",
         "tool_words": []
       },
       "ask_first": "How many students are enrolled?",
@@ -138,7 +138,7 @@
         "keys": [
           "field_checks"
         ],
-        "text": "coach check-in per batch with automatic monthly payout calculation.",
+        "text": "coach check-in per batch with monthly payouts calculated for you.",
         "tool_words": []
       },
       "ask_first": "Are coaches paid per session or salaried?",
@@ -265,7 +265,7 @@
         ]
       },
       "ask_first": "How many teams enter a typical tournament?",
-      "free_stops": "Module setup stays for the solution document.",
+      "free_stops": "Setup details stay for the solution document.",
       "extra_ideas": [
         {
           "text": "Compare paper registrations with group announcements before the next tournament, so you spot missing teams and conflicting fixture notes.",

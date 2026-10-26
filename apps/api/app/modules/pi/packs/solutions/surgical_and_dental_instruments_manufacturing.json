@@ -80,7 +80,7 @@
           "job_tracking",
           "workflow_automation"
         ],
-        "text": "A digital batch record built automatically as each stage is completed, exportable per shipment.",
+        "text": "A digital batch record built as each stage is completed, exportable per shipment.",
         "tool_words": []
       },
       "ask_first": "Which record do buyers ask for most, the material certificate, the inspection result or the process dates?",

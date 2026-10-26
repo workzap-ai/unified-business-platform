@@ -81,7 +81,7 @@
           "credit_ledger",
           "dashboards_reports"
         ],
-        "text": "a receivables tracker per airline with ageing, automatic statement reminders and a view of expected receipts against payroll dates.",
+        "text": "a receivables tracker per airline with ageing, statement reminders sent on schedule, and a view of expected receipts against payroll dates.",
         "tool_words": []
       },
       "ask_first": "Which months feel tightest?",
@@ -206,7 +206,7 @@
           "job_tracking",
           "customer_messaging"
         ],
-        "text": "a baggage case tracker with status and ageing, sending passengers template updates automatically as their case moves.",
+        "text": "a baggage case tracker with status and ageing, sending passengers template updates as their case moves.",
         "tool_words": []
       },
       "ask_first": "Who answers passengers when they call today?",

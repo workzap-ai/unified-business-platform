@@ -205,7 +205,7 @@
         "keys": [
           "dashboards_reports"
         ],
-        "text": "Monthly client report packs generated automatically per site from work orders and attendance.",
+        "text": "Monthly client report packs created right on time per site from work orders and attendance.",
         "tool_words": []
       },
       "ask_first": "What do clients expect to see monthly?",
@@ -300,8 +300,8 @@
           "system"
         ]
       },
-      "ask_first": "What system do you use for work orders now?",
-      "free_stops": "Integration design is in the solution document.",
+      "ask_first": "How do you keep track of work orders now?",
+      "free_stops": "How things connect together is in the solution document.",
       "extra_ideas": [
         {
           "text": "Count completed jobs closed by field message versus entered in the office records this week, so the biggest usage shortfall shows by crew.",

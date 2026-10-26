@@ -18,7 +18,7 @@
         "keys": [
           "lead_followup"
         ],
-        "text": "a pipeline tracker with stage, owner and next action date for every proposal, reminding the owner automatically when a follow-up is due.",
+        "text": "a pipeline tracker with stage, owner and next action date for every proposal, reminding the owner when a follow-up is due.",
         "tool_words": []
       },
       "ask_first": "How many proposals are out right now, just a handful or a long list?",
@@ -290,7 +290,7 @@
         "keys": [
           "workflow_automation"
         ],
-        "text": "an associate register with availability, agreed rates and days confirmed weekly, matched automatically against their invoices.",
+        "text": "an associate register with availability, agreed rates and days confirmed weekly, matched against their invoices.",
         "tool_words": []
       },
       "ask_first": "Is it mostly a few associates who argue over days, or nearly all of them?",

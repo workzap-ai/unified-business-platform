@@ -51,7 +51,7 @@
           "job_tracking",
           "customer_messaging"
         ],
-        "text": "a job tracker by reference number with automatic WhatsApp updates, with the customer's permission, when a job changes stage or is ready.",
+        "text": "a job tracker by reference number sending WhatsApp updates to the customer, with their permission, when a job changes stage or is ready.",
         "tool_words": []
       },
       "ask_first": "Do most callers ask about ordinary typing jobs, or about attestation and translation jobs?",

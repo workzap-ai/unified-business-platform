@@ -48,7 +48,7 @@
         "keys": [
           "field_checks"
         ],
-        "text": "credit_ledger — an extras log where staff record billable items, feeding the monthly invoice automatically.",
+        "text": "credit_ledger — an extras log where staff record billable items, adding them to the monthly invoice directly.",
         "tool_words": []
       },
       "ask_first": "Who records extras today?",
@@ -138,7 +138,7 @@
         "keys": [
           "stock_alerts"
         ],
-        "text": "a kitchen and consumables list with par levels, weekly usage and supplier orders sent automatically.",
+        "text": "a kitchen and consumables list with target stock levels, weekly usage and orders sent to suppliers on schedule.",
         "tool_words": []
       },
       "ask_first": "Is the kitchen in-house or catered?",

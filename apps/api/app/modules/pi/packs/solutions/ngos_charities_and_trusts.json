@@ -48,7 +48,7 @@
         "keys": [
           "workflow_automation"
         ],
-        "text": "automatic receipts by WhatsApp or email as soon as a donation is recorded.",
+        "text": "donors get receipts by WhatsApp or email as soon as a donation is recorded.",
         "tool_words": []
       },
       "ask_first": "Do receipts wait because someone must write them by hand, or because donations are not matched to donors?",
@@ -83,7 +83,7 @@
         "leads_with_view": true
       },
       "ask_first": "Do the funds get mixed when money arrives, or when it is spent?",
-      "free_stops": "The fund structure in the system is designed in the solution document; rulings stay with your scholars.",
+      "free_stops": "The fund structure for your business is designed in the solution document; rulings stay with your scholars.",
       "extra_ideas": [
         {
           "text": "Count how many entries in this week's record do not clearly show fund type, so separation problems are visible before reporting.",

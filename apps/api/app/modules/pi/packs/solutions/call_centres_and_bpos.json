@@ -177,7 +177,7 @@
         ]
       },
       "ask_first": "Is it one client's report that eats the morning, or the same work repeated for every client?",
-      "free_stops": "which systems are connected and the report format are designed in the solution document.",
+      "free_stops": "which tools are connected and the report format are designed in the solution document.",
       "extra_ideas": [
         {
           "text": "Note which report lines get changed by hand each morning for one client, so you see where reporting time is actually being spent.",

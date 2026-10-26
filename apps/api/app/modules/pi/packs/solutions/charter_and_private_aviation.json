@@ -48,7 +48,7 @@
         "keys": [
           "customer_messaging"
         ],
-        "text": "an empty-leg broadcaster that sends every available leg to your opted-in broker and client list and website automatically as soon as it's entered, with sales tracked.",
+        "text": "an empty-leg broadcaster that sends every available leg to your opted-in broker and client list and website as soon as it's entered, with sales tracked.",
         "tool_words": []
       },
       "ask_first": "How often do you have positioning flights in a typical month?",
@@ -110,7 +110,7 @@
           "workflow_automation",
           "dashboards_reports"
         ],
-        "text": "monthly owner statements built automatically from trip and cost records, with supporting invoices attached and payment status tracked.",
+        "text": "monthly owner statements created from trip and cost records, with supporting invoices attached and payment status tracked.",
         "tool_words": []
       },
       "ask_first": "How many managed aircraft do you bill owners for?",
@@ -140,7 +140,7 @@
         "keys": [
           "job_tracking"
         ],
-        "text": "one trip file holding schedule, catering, handling and crew notes, notifying everyone involved automatically whenever anything changes and recording who has seen it.",
+        "text": "one trip file holding schedule, catering, handling and crew notes, notifying everyone involved whenever anything changes and recording who has seen it.",
         "tool_words": []
       },
       "ask_first": "Who usually receives the client's change first, you, their PA or ops?",
@@ -200,7 +200,7 @@
         "keys": [
           "credit_ledger"
         ],
-        "text": "a client balance ledger with due dates, automatic reminders and late-payer flags, checked every day.",
+        "text": "a client balance ledger with due dates, payment reminders and late-payer flags, checked every day.",
         "tool_words": []
       },
       "ask_first": "Do most clients pay before the flight or after today?",
@@ -291,7 +291,7 @@
         "keys": [
           "loyalty_repeat"
         ],
-        "text": "account preference notes shown automatically to ops whenever a repeat client books, with no ID or itinerary data stored.",
+        "text": "account preference notes shown to ops whenever a repeat client books, with no ID or itinerary data stored.",
         "tool_words": []
       },
       "ask_first": "Who handles repeat clients today, one person or whoever is free?",

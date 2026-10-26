@@ -78,7 +78,7 @@
         "keys": [
           "workflow_automation"
         ],
-        "text": "a guarantee register with issue, expiry and release dates and automatic reminders.",
+        "text": "a guarantee register with issue, expiry and release dates that sends you reminders.",
         "tool_words": []
       },
       "ask_first": "Are these bank bonds held at one bank, or spread across several, and who tracks them now?",
@@ -189,7 +189,7 @@
         "keys": [
           "field_checks"
         ],
-        "text": "phone capture of signed challans filed automatically against each contract.",
+        "text": "phone capture of signed challans filed directly under each contract.",
         "tool_words": []
       },
       "ask_first": "Do they get lost at the site, in transit back, or in the office?",

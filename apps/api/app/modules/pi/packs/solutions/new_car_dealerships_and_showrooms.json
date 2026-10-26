@@ -19,7 +19,7 @@
           "job_tracking",
           "customer_messaging"
         ],
-        "text": "a booking-to-delivery tracker where each stage is ticked by the team and the buyer automatically gets a WhatsApp update every time their car moves forward.",
+        "text": "a booking-to-delivery tracker where each stage is ticked by the team and the buyer gets a WhatsApp update every time their car moves forward.",
         "tool_words": []
       },
       "ask_first": "Where does a booking's status live today: the DMS, a register or salesmen's phones?",
@@ -58,7 +58,7 @@
       "free_stops": "Assignment rules, follow-up timings and the escalation path are set out in the solution document.",
       "extra_ideas": [
         {
-          "text": "Count this week's untouched portal, social and walk in leads once, so you see which source is being neglected.",
+          "text": "Count this week's untouched online, social and walk in leads once, so you see which source is being neglected.",
           "review": false
         },
         {
@@ -295,7 +295,7 @@
           "customer_messaging",
           "booking_scheduling"
         ],
-        "text": "automatic first-service reminders to new buyers, with their permission, with a booking link into your own workshop.",
+        "text": "new buyers get first-service reminders, with their permission, with a booking link into your own workshop.",
         "tool_words": []
       },
       "ask_first": "Do they go to a cheaper workshop, or to one nearer their home?",

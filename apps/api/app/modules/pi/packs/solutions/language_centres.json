@@ -18,7 +18,7 @@
         "keys": [
           "lead_followup"
         ],
-        "text": "Every placement test tracked to enrolment, with automatic follow-ups, reasons recorded and conversion measured per branch.",
+        "text": "Every placement test tracked to enrolment, with scheduled follow-ups, reasons recorded and conversion measured per branch.",
         "tool_words": []
       },
       "ask_first": "Do most of them leave after hearing the fee, or after the level result?",
@@ -48,7 +48,7 @@
         "keys": [
           "loyalty_repeat"
         ],
-        "text": "Rollover tracked by level and teacher as counts, with next-level reminders sent automatically.",
+        "text": "Rollover tracked by level and teacher as counts, with next-level reminders sent as due.",
         "tool_words": []
       },
       "ask_first": "Do learners drop out because of timing and cost, or because they feel they have learnt enough?",
@@ -78,7 +78,7 @@
         "keys": [
           "credit_ledger"
         ],
-        "text": "An hours bank showing hours bought, used and left for every package, with automatic low-balance reminders.",
+        "text": "An hours bank showing hours bought, used and left for every package, with timely low-balance reminders.",
         "tool_words": []
       },
       "ask_first": "Is the hours count kept by teachers, by the front desk, or not at all?",
@@ -108,7 +108,7 @@
         "keys": [
           "workflow_automation"
         ],
-        "text": "No-shows recorded and your rules applied automatically to billing and teacher pay.",
+        "text": "No-shows recorded and your rules applied instantly to billing and teacher pay.",
         "tool_words": []
       },
       "ask_first": "Do the no-shows come from a few learners, or from many of them now and then?",
@@ -168,7 +168,7 @@
         "keys": [
           "credit_ledger"
         ],
-        "text": "Corporate invoices with ageing and automatic reminders, reported per client.",
+        "text": "Corporate invoices with ageing and scheduled reminders, reported per client.",
         "tool_words": []
       },
       "ask_first": "Is it one or two big companies that pay late, or nearly all of them?",
@@ -198,7 +198,7 @@
         "keys": [
           "job_tracking"
         ],
-        "text": "Sessions delivered per corporate client logged with attendance counts, turned into the monthly invoice automatically.",
+        "text": "Sessions delivered per corporate client logged with attendance counts, turned into the monthly invoice right away.",
         "tool_words": []
       },
       "ask_first": "Is the gap usually in sessions that were cancelled, or in sessions the client never confirmed?",
@@ -259,7 +259,7 @@
         "keys": [
           "customer_messaging"
         ],
-        "text": "website_digital — Automatic WhatsApp replies for common questions with hand-off to staff, plus an online booking page for placement tests and lessons.",
+        "text": "website_digital — Instant WhatsApp replies for common questions with hand-off to staff, plus an online booking page for placement tests and lessons.",
         "tool_words": []
       },
       "ask_first": "Which question comes most, the timings, the fees or how to enrol?",

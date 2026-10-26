@@ -112,7 +112,7 @@
           "field_checks",
           "dashboards_reports"
         ],
-        "text": "a fuel log per car matched to trips and kilometres, flagging gaps automatically.",
+        "text": "a fuel log per car matched to trips and kilometres, flagging gaps right away.",
         "tool_words": []
       },
       "ask_first": "Does the fuel overspend show up in a few cars, or across most of the fleet?",

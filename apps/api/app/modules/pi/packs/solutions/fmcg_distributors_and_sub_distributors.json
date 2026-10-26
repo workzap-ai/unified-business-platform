@@ -80,7 +80,7 @@
         "keys": [
           "job_tracking"
         ],
-        "text": "A claims tracker showing each claim's documents, status and age with the principal, and reminding staff automatically about missing papers.",
+        "text": "A claims tracker showing each claim's documents, status and age with the principal, and reminding staff about missing papers when due.",
         "tool_words": []
       },
       "ask_first": "What reason does the company give most often for a rejection?",
@@ -170,7 +170,7 @@
         "keys": [
           "stock_alerts"
         ],
-        "text": "An expiry register by batch that alerts automatically before expiry and gives order bookers a daily list of what to push on which route.",
+        "text": "An expiry record by batch that sends warnings days before items expire and gives order bookers a daily list of what to push on which route.",
         "tool_words": []
       },
       "ask_first": "Does expiry stock come mostly from a few products, or from many?",
@@ -201,7 +201,7 @@
           "stock_alerts",
           "dashboards_reports"
         ],
-        "text": "Reorder suggestions per SKU from daily secondary sales and lead time, with low-stock alerts sent automatically.",
+        "text": "Reorder suggestions per item from daily secondary sales and lead time, with low-stock alerts sent to the owner when stock runs low.",
         "tool_words": []
       },
       "ask_first": "Do you run short mostly on a few fast products, or on many of them?",
@@ -293,7 +293,7 @@
         "keys": [
           "custom_build"
         ],
-        "text": "An incentive calculator with rules each order booker can see and running totals that update automatically from sales.",
+        "text": "An incentive sheet with rules each order booker can see and running totals that update instantly whenever a sale is added.",
         "tool_words": []
       },
       "ask_first": "Do the commission fights come mostly from incentive slabs, or from whose sales count?",
@@ -350,7 +350,7 @@
   ],
   "sample_reply": {
     "person": "Har shaam van wale salesman ka hisaab karne mein do ghante lagte hain aur cash phir bhi kam nikalta hai. Koi tareeqa batao.",
-    "pi": "Ji, is ka rasta nikal sakta hai, aur pehla qadam aasan hai.\nPehle, har van ka settlement usi shaam staff ke jaane se pehle karein, taake farq usi din pakra jaye.\nDoosra, dukaanon ko har cash payment par numbered raseed dein, taake cash raseedon se mil sake.\nLambay arse ke liye Workzap ye set kar sakta hai: har salesman ka load, delivery, returns aur cash ek screen par aaye aur farq roz shaam apne aap saamne aa jaye.\n\nKya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "pi": "Ji, is ka rasta nikal sakta hai, aur pehla qadam aasan hai.\nPehle, har van ka settlement usi shaam staff ke jaane se pehle karein, taake farq usi din pakra jaye.\nDoosra, dukaanon ko har cash payment par numbered raseed dein, taake cash raseedon se mil sake.\nLambay arse ke liye Workzap ye set kar sakta hai: har salesman ka load, delivery, returns aur cash ek jagah dikhai dein aur farq roz shaam seedha saamne aa jaye.\n\nKya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
     "language": "roman_urdu"
   }
 }

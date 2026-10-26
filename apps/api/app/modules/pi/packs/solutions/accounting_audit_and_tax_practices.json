@@ -19,7 +19,7 @@
           "job_tracking",
           "workflow_automation"
         ],
-        "text": "a season board where every client job moves through documents requested, received, in progress, review, filed and billed, with polite chasers going out automatically for missing papers and a daily count of what is still outstanding.",
+        "text": "a season board where every client job moves through documents requested, received, in progress, review, filed and billed, with polite reminders sent to clients for missing papers and a daily message showing what is still outstanding.",
         "tool_words": []
       },
       "ask_first": "Roughly how many of your clients are monthly retainers versus one-off filings?",
@@ -49,7 +49,7 @@
         "keys": [
           "workflow_automation"
         ],
-        "text": "WhatsApp document intake where anything sent to the office number is filed under the right client and job, acknowledged automatically, and ticked off against that job's missing-documents checklist.",
+        "text": "WhatsApp document intake where anything sent to the office number is filed under the right client and job, acknowledged with an immediate message, and ticked off against that job's missing-documents checklist.",
         "tool_words": []
       },
       "ask_first": "Do most statements arrive on a few staff phones, or are they spread across everyone's chats?",
@@ -80,7 +80,7 @@
           "job_tracking",
           "dashboards_reports"
         ],
-        "text": "a partner screen updated every day showing jobs by stage and staff member, with any file that hasn't moved for several days flagged automatically.",
+        "text": "a partner screen updated every day showing jobs by stage and staff member, with a warning message when a file hasn't moved for several days.",
         "tool_words": []
       },
       "ask_first": "Are jobs mostly stuck waiting on clients for papers, or waiting inside the office for someone to review?",
@@ -201,7 +201,7 @@
         "keys": [
           "job_tracking"
         ],
-        "text": "an extra-work log per client where requests outside the retainer are recorded as they arrive and flagged for billing automatically.",
+        "text": "an extra-work log per client where requests outside the retainer are recorded as they arrive and marked for billing right away.",
         "tool_words": []
       },
       "ask_first": "Are the extra reports mostly asked for by a few clients, or do most of your clients ask for them?",

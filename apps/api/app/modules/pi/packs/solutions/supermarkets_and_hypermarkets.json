@@ -202,7 +202,7 @@
           "loyalty_repeat",
           "customer_messaging"
         ],
-        "text": "a customer list (with their permission) showing visits and baskets, and WhatsApp offers sent to regulars automatically.",
+        "text": "a customer list (with their permission) showing visits and baskets, and WhatsApp offers sent straight to regulars.",
         "tool_words": []
       },
       "ask_first": "Do you already run a loyalty card?",
@@ -237,8 +237,8 @@
           "app"
         ]
       },
-      "ask_first": "Which apps do you take orders from?",
-      "free_stops": "How orders from each app are pulled in and picked is in the solution document.",
+      "ask_first": "Which channels do you take orders from?",
+      "free_stops": "How orders from each channel are pulled in and picked is in the solution document.",
       "extra_ideas": [
         {
           "text": "Count how many picker delays come from missing shelf stock versus missing back stock, so the real blockage becomes visible.",

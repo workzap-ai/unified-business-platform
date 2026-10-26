@@ -202,7 +202,7 @@
         "keys": [
           "job_tracking"
         ],
-        "text": "an out-of-scope work log that drafts invoices automatically when a job is closed.",
+        "text": "an out-of-scope work log that drafts invoices when a job is closed.",
         "tool_words": []
       },
       "ask_first": "Does extra work go unbilled because nobody records it, or because it is billed late?",

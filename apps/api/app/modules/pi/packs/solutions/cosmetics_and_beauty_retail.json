@@ -80,7 +80,7 @@
           "order_capture",
           "workflow_automation"
         ],
-        "text": "every COD order confirmed automatically before dispatch, with each parcel tracked as confirmed, delivered or refused.",
+        "text": "every COD order confirmed with the buyer before dispatch, with each parcel tracked as confirmed, delivered or refused.",
         "tool_words": []
       },
       "ask_first": "Is most of your online business COD?",
@@ -170,7 +170,7 @@
         "keys": [
           "attribution_codes"
         ],
-        "text": "unique codes and links per influencer or campaign, with the orders each one brought in, reported automatically.",
+        "text": "unique codes and links per influencer or campaign, with the orders each one brought in shown to you right away.",
         "tool_words": []
       },
       "ask_first": "Do you pay influencers or send PR boxes, or both?",
@@ -350,7 +350,7 @@
   ],
   "sample_reply": {
     "person": "Instagram pe orders bohat aate hain lekin COD ke aadhe parcel wapis aa jaate hain. Koi solution hai?",
-    "pi": "Bilkul, is ka hal mumkin hai, aur pehla qadam aasan hai.\nPehle, dispatch se pehle har COD order customer se confirm karwa lein, kyun ke bina confirmation wale parcel hi zyada wapis aate hain.\nDoosra, pichle mahine ke wapis aaye parcels area ke hisaab se dekh lein, taake pata chale masla kahan hai.\nPakke hal ke liye Workzap ye banwa sakta hai: har COD order pe confirmation apne aap jaye aur har parcel ka status aur courier ki payment ek jagah nazar aaye.\n\nKya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "pi": "Bilkul, is ka hal mumkin hai, aur pehla qadam aasan hai.\nPehle, dispatch se pehle har COD order customer se confirm karwa lein, kyun ke bina confirmation wale parcel hi zyada wapis aate hain.\nDoosra, pichle mahine ke wapis aaye parcels area ke hisaab se dekh lein, taake pata chale masla kahan hai.\nPakke hal ke liye Workzap ye banwa sakta hai: har COD order pe confirmation customer ko foran jaye aur har parcel ka status aur courier ki payment ek jagah nazar aaye.\n\nKya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
     "language": "roman_urdu"
   }
 }

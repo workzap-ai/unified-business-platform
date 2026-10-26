@@ -232,7 +232,7 @@
         "keys": [
           "order_capture"
         ],
-        "text": "WhatsApp orders from aftermarket shops fed into one order book with status sent back automatically.",
+        "text": "WhatsApp orders from aftermarket shops fed into one order book with status sent back to them as updates happen.",
         "tool_words": []
       },
       "ask_first": "Roughly how many shops order from you?",

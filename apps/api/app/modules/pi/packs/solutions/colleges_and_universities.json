@@ -18,7 +18,7 @@
         "keys": [
           "lead_followup"
         ],
-        "text": "Every enquiry and application captured by source, programme and counsellor, with automatic follow-up reminders and a daily funnel view per programme and campus.",
+        "text": "Every enquiry and application captured by source, programme and counsellor, with follow-up reminders sent on time and a daily breakdown per programme and campus.",
         "tool_words": []
       },
       "ask_first": "Where do most applications start — website, social, walk-in or agents?",
@@ -78,7 +78,7 @@
         "keys": [
           "credit_ledger"
         ],
-        "text": "An installment tracker that sends due-date reminders automatically and gives finance a weekly early-warning list, with account numbers instead of names in owner reports.",
+        "text": "An installment tracker that sends due-date reminders when payment is near and gives finance a weekly early-warning list, with account numbers instead of names in owner reports.",
         "tool_words": []
       },
       "ask_first": "Do instalment students fall behind mostly early in a term, or closer to exams?",
@@ -170,7 +170,7 @@
         "keys": [
           "workflow_automation"
         ],
-        "text": "Every claim checked automatically against the timetable and lecture logs before payment, with differences flagged per department.",
+        "text": "Every claim checked against the timetable and lecture logs before payment, with differences flagged per department.",
         "tool_words": []
       },
       "ask_first": "Do claims differ from the timetable mostly in hours claimed, or in classes that never took place?",
@@ -262,7 +262,7 @@
         "keys": [
           "job_tracking"
         ],
-        "text": "Every request given a reference, tracked to completion and measured for turnaround, with automatic status updates to the requester.",
+        "text": "Every request given a reference, tracked to completion and measured for turnaround, with regular status updates sent to the requester.",
         "tool_words": []
       },
       "ask_first": "Which request type piles up most: transcripts or verification letters?",

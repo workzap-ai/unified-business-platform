@@ -18,7 +18,7 @@
         "keys": [
           "customer_messaging"
         ],
-        "text": "a member register that sends renewal reminders on WhatsApp automatically before expiry and tracks who renewed.",
+        "text": "a member register that sends renewal reminders on WhatsApp before expiry and tracks who renewed.",
         "tool_words": []
       },
       "ask_first": "Roughly how many active members do you have?",
@@ -78,10 +78,10 @@
         "keys": [
           "integration"
         ],
-        "text": "an access check linking the turnstile or desk to membership status, flagging expired entries automatically.",
+        "text": "an access check linking the turnstile or desk to membership status, flagging expired entries right at entry.",
         "tool_words": []
       },
-      "ask_first": "Does your gym software connect to the turnstile?",
+      "ask_first": "Does your gym setup connect to the turnstile?",
       "free_stops": "How access and membership data connect is in the solution document.",
       "extra_ideas": [
         {
@@ -138,7 +138,7 @@
         "keys": [
           "dashboards_reports"
         ],
-        "text": "automatic monthly commission per trainer from signed-off sessions.",
+        "text": "monthly commission calculated per trainer from signed-off sessions.",
         "tool_words": [],
         "leads_with_view": true
       },
@@ -199,7 +199,7 @@
         "keys": [
           "lead_followup"
         ],
-        "text": "a trial-to-member tracker with automatic follow-up reminders and conversion counts.",
+        "text": "a trial-to-member tracker with timed follow-up reminders and conversion counts.",
         "tool_words": []
       },
       "ask_first": "Where do most enquiries come from?",

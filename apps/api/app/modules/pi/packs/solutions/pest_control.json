@@ -49,7 +49,7 @@
         "keys": [
           "booking_scheduling"
         ],
-        "text": "A job scheduler that creates the follow-up visit automatically for every treatment that includes one.",
+        "text": "A job scheduler that sets up the follow-up visit for every treatment that includes one.",
         "tool_words": []
       },
       "ask_first": "How are follow-up visits scheduled today?",

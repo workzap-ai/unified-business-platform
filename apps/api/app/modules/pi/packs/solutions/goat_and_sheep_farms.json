@@ -18,7 +18,7 @@
         "keys": [
           "field_checks"
         ],
-        "text": "a kidding/lambing log on the phone that builds each doe's and ewe's record of births, twins and losses automatically.",
+        "text": "a kidding/lambing log on the phone that builds each doe's and ewe's record of births, twins and losses as entries come in.",
         "tool_words": []
       },
       "ask_first": "Are the breeding does and ewes tagged today?",
@@ -78,7 +78,7 @@
         "keys": [
           "field_checks"
         ],
-        "text": "timed night check-ins with headcount photos, alerting the owner automatically when one is missed.",
+        "text": "timed night check-ins with headcount photos, alerting the owner straight away when one is missed.",
         "tool_words": []
       },
       "ask_first": "At what time have losses usually happened?",
@@ -108,7 +108,7 @@
         "keys": [
           "dashboards_reports"
         ],
-        "text": "cost per animal and per batch worked out automatically from the bills and headcounts the farm enters.",
+        "text": "cost per animal and per batch worked out from the bills and headcounts the farm enters.",
         "tool_words": [],
         "leads_with_view": true
       },
@@ -169,7 +169,7 @@
         "keys": [
           "lead_followup"
         ],
-        "text": "Instagram, Facebook and WhatsApp enquiries pulled into one list, with follow-up reminders sent automatically.",
+        "text": "Instagram, Facebook and WhatsApp enquiries pulled into one list, with follow-up reminders sent on schedule.",
         "tool_words": []
       },
       "ask_first": "Who replies to buyer messages now?",
@@ -229,7 +229,7 @@
         "keys": [
           "custom_build"
         ],
-        "text": "a shareable record card for each breeding animal, filled automatically from the farm's own herd data.",
+        "text": "a shareable record card for each breeding animal, filled directly from the farm's own herd data.",
         "tool_words": []
       },
       "ask_first": "Do you sell breeding animals often, or mainly for Eid?",
@@ -259,7 +259,7 @@
         "keys": [
           "field_checks"
         ],
-        "text": "a daily care checklist with timestamps and photos that flags missed items to the owner automatically.",
+        "text": "a daily care checklist with timestamps and photos that flags missed items to the owner straight away.",
         "tool_words": []
       },
       "ask_first": "Who runs the farm day to day when you're not there?",
@@ -295,7 +295,7 @@
         ]
       },
       "ask_first": "Is your son on the farm now, or in another job?",
-      "free_stops": "What the system covers and how it's handed over goes in the solution document.",
+      "free_stops": "What is covered and how it's handed over goes in the solution document.",
       "extra_ideas": [
         {
           "text": "Note every task only you answer this week, so you see exactly which handovers block your son each day.",

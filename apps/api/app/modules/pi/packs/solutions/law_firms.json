@@ -170,7 +170,7 @@
         "keys": [
           "credit_ledger"
         ],
-        "text": "a balance per matter that includes court fees and disbursements, adds them to invoices automatically and sends reminders on schedule.",
+        "text": "a balance per matter that includes court fees and disbursements, adds them to invoices and sends reminders on schedule.",
         "tool_words": []
       },
       "ask_first": "Do clients vanish mostly on a few matter types, or on all kinds of cases?",

@@ -18,7 +18,7 @@
         "keys": [
           "job_tracking"
         ],
-        "text": "a project board from shot to delivered, with ageing per project and stage updates sent to clients automatically.",
+        "text": "a project board from shot to delivered, with ageing per project and stage updates sent to clients on time.",
         "tool_words": []
       },
       "ask_first": "How many projects are waiting right now?",
@@ -48,7 +48,7 @@
         "keys": [
           "job_tracking"
         ],
-        "text": "album tracking with automatic selection reminders and lab order dates.",
+        "text": "album tracking with timely selection reminders and lab order dates.",
         "tool_words": []
       },
       "ask_first": "How many album designers do you have?",
@@ -228,7 +228,7 @@
         "keys": [
           "lead_followup"
         ],
-        "text": "an enquiry tracker from Instagram and WhatsApp with automatic follow-ups.",
+        "text": "an enquiry tracker from Instagram and WhatsApp with timed follow-up messages.",
         "tool_words": []
       },
       "ask_first": "Do you share prices before a call?",
@@ -289,7 +289,7 @@
         "keys": [
           "customer_messaging"
         ],
-        "text": "automatic client updates at each stage so you only handle the exceptions.",
+        "text": "client updates sent at each stage so you only handle the exceptions.",
         "tool_words": []
       },
       "ask_first": "Who else on your team could handle clients?",

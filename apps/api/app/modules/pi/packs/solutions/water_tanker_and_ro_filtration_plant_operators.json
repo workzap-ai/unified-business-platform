@@ -48,7 +48,7 @@
         "keys": [
           "order_capture"
         ],
-        "text": "Automatic on-the-way and delivered updates to customers from the driver's marked status.",
+        "text": "On-the-way and delivered updates sent to customers when the driver marks their status.",
         "tool_words": []
       },
       "ask_first": "Do customers call mostly soon after booking, or after the promised slot has passed?",
@@ -78,7 +78,7 @@
         "keys": [
           "cash_reconciliation"
         ],
-        "text": "field_checks — A driver trip log with trips, cash collected and diesel filled, matched automatically against bookings each evening.",
+        "text": "field_checks — A driver trip log with trips, cash collected and diesel filled, matched against bookings each evening.",
         "tool_words": []
       },
       "ask_first": "Does the gap show up on credit trips, or on cash trips?",
@@ -199,7 +199,7 @@
         "keys": [
           "credit_ledger"
         ],
-        "text": "A credit customer ledger with monthly statements and automatic reminders.",
+        "text": "A credit customer ledger with monthly statements and reminders sent to buyers when due.",
         "tool_words": []
       },
       "ask_first": "Are the late payers mostly buildings, or offices?",

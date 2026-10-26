@@ -18,7 +18,7 @@
         "keys": [
           "integration"
         ],
-        "text": "a room board where a walk-in sold at the desk closes the room on every channel automatically, with a clash alert and a weekly count of near-misses.",
+        "text": "a room board where a walk-in sold at the desk closes the room on every channel right away, with a clash alert and a weekly count of near-misses.",
         "tool_words": []
       },
       "ask_first": "Do you use a channel manager now, or does someone update each OTA by hand?",
@@ -48,7 +48,7 @@
         "keys": [
           "cash_reconciliation"
         ],
-        "text": "a shift handover on the phone that matches cash, card and open folios against the register every shift and flags gaps to the owner automatically.",
+        "text": "a shift handover on the phone that matches cash, card and open folios against the register every shift and flags gaps to the owner right away.",
         "tool_words": []
       },
       "ask_first": "How many shifts run at the desk in 24 hours?",
@@ -140,7 +140,7 @@
         "keys": [
           "job_tracking"
         ],
-        "text": "maintenance tickets raised from the desk or housekeeping with a photo, assigned automatically, closed only when the desk confirms, with time-to-fix measured.",
+        "text": "maintenance tickets raised from the desk or housekeeping with a photo, assigned instantly to staff, closed only when the desk confirms, with time-to-fix measured.",
         "tool_words": []
       },
       "ask_first": "Is maintenance in-house or a contractor you call?",
@@ -170,7 +170,7 @@
         "keys": [
           "credit_ledger"
         ],
-        "text": "a corporate ledger with ageing per client and automatic monthly statements and reminders, without anyone remembering to send them.",
+        "text": "a corporate ledger with ageing per client and monthly statements and reminders sent out, without anyone remembering to send them.",
         "tool_words": []
       },
       "ask_first": "How many corporate accounts are on credit right now?",
@@ -200,7 +200,7 @@
         "keys": [
           "nori_daily_read"
         ],
-        "text": "a morning read on WhatsApp built automatically from the night's data: occupancy, average rate, revenue by channel, cash and discounts, with the one thing to look at.",
+        "text": "a morning read on WhatsApp created every day from the night's data: occupancy, average rate, revenue by channel, cash and discounts, with the one thing to look at.",
         "tool_words": []
       },
       "ask_first": "What do you look at first each morning now?",
@@ -261,7 +261,7 @@
         "keys": [
           "stock_alerts"
         ],
-        "text": "a linen tracker with par levels per floor and laundry out and in counts, alerting automatically when stock falls or returns don't match.",
+        "text": "a linen tracker with par levels per floor and laundry out and in counts, alerting staff when stock falls or returns don't match.",
         "tool_words": []
       },
       "ask_first": "Is laundry done in-house or by a vendor?",
@@ -291,7 +291,7 @@
         "keys": [
           "booking_scheduling"
         ],
-        "text": "a group block tracker that reminds organisers and the desk automatically and shows pickup against each block.",
+        "text": "a group block tracker that reminds organisers and the desk when dates approach and shows pickup against each block.",
         "tool_words": []
       },
       "ask_first": "Do you take a deposit when you hold a block?",

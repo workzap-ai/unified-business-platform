@@ -18,7 +18,7 @@
         "keys": [
           "booking_scheduling"
         ],
-        "text": "doctor-wise WhatsApp booking that sends reminders automatically every day, takes confirm and cancel replies, fills freed slots from a waitlist and tracks no-shows by doctor and branch, with no medical details in any message.",
+        "text": "doctor-wise WhatsApp booking that sends daily reminders, takes confirm and cancel replies, fills freed slots from a waitlist and tracks no-shows by doctor and branch, with no medical details in any message.",
         "tool_words": []
       },
       "ask_first": "Are most of your no-shows in the morning sessions or the evening clinic?",
@@ -168,7 +168,7 @@
         "keys": [
           "credit_ledger"
         ],
-        "text": "a panel ledger that issues monthly statements automatically, tracks balances per company and sends reminders to each panel's accounts contact on schedule.",
+        "text": "a panel ledger that issues monthly statements, tracks balances per company and sends reminders to each panel's accounts contact on schedule.",
         "tool_words": []
       },
       "ask_first": "Roughly how many panel companies do you work with?",
@@ -263,7 +263,7 @@
         "tool_words": []
       },
       "ask_first": "How many people reply from the clinic number now?",
-      "free_stops": "The tags, routing and automatic answers are designed in the solution document.",
+      "free_stops": "The tags, routing and instant answers are designed in the solution document.",
       "extra_ideas": [
         {
           "text": "Count unread messages by type from one recent day, so you know whether bookings or complaints are causing the pileup.",

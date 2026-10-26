@@ -18,7 +18,7 @@
         "keys": [
           "field_checks"
         ],
-        "text": "a weighbridge log where each truck's weights, reading photo, gate pass and invoice are tied together automatically.",
+        "text": "a weighbridge log where each truck's weights, reading photo, gate pass and invoice are saved together.",
         "tool_words": []
       },
       "ask_first": "Do you have your own weighbridge or use an outside kanta?",
@@ -109,7 +109,7 @@
         "keys": [
           "credit_ledger"
         ],
-        "text": "a dealer ledger with limits, ageing and automatic reminders, visible to whoever books orders.",
+        "text": "a dealer ledger with limits, ageing and reminder messages sent out, visible to whoever books orders.",
         "tool_words": []
       },
       "ask_first": "What's the oldest balance you're chasing?",
@@ -259,7 +259,7 @@
         "keys": [
           "field_checks"
         ],
-        "text": "a piece-rate output log visible to supervisor and staff, totalled automatically for payday.",
+        "text": "a piece-rate output log visible to supervisor and staff, totalled ready for payday.",
         "tool_words": []
       },
       "ask_first": "Who records output on the floor now?",
@@ -316,7 +316,7 @@
   ],
   "sample_reply": {
     "person": "Koi solution do yaar. Har truck pe weight ka jhagra hota hai, hamara kanta kuch kehta hai party ka kuch aur.",
-    "pi": "Ji, is ka rasta nikal sakta hai, aur is ke liye bade kharch ki zaroorat nahi.\nPehle, har truck ki weighbridge reading ki photo lein, taake dono taraf ek hi saboot ho.\nDoosra, regular parties ke saath pehle se tay kar lein ke kis kante ka wazan maana jayega.\nIs ke baad Workzap ye bana sakta hai: weighbridge log jahan har truck ka wazan, photo, gate pass aur invoice apne aap jud jayein.\n\nKya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "pi": "Ji, is ka rasta nikal sakta hai, aur is ke liye bade kharch ki zaroorat nahi.\nPehle, har truck ki weighbridge reading ki photo lein, taake dono taraf ek hi saboot ho.\nDoosra, regular parties ke saath pehle se tay kar lein ke kis kante ka wazan maana jayega.\nIs ke baad Workzap ye bana sakta hai: weighbridge log jahan har truck ka wazan, photo, gate pass aur invoice ek saath jud jayein.\n\nKya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
     "language": "roman_urdu"
   }
 }

@@ -48,7 +48,7 @@
         "keys": [
           "integration"
         ],
-        "text": "all channels feeding one booking grid, with automatic reminders.",
+        "text": "all channels feeding one booking grid, with reminder messages sent to guests.",
         "tool_words": []
       },
       "ask_first": "Are you inside a hotel?",

@@ -109,7 +109,7 @@
           "job_tracking",
           "customer_messaging"
         ],
-        "text": "a case tracker with stages for each service, sending clients a WhatsApp update automatically at each stage.",
+        "text": "a case tracker with stages for each service, sending clients a WhatsApp update at each stage.",
         "tool_words": []
       },
       "ask_first": "Do clients mostly ask about licences that are delayed, or about ones still within the normal time?",
@@ -139,7 +139,7 @@
         "keys": [
           "workflow_automation"
         ],
-        "text": "an expiry calendar for licences, visas, IDs, tenancy registrations and cards across all managed companies, with reminders at several points before each date and renewal quotes drafted automatically.",
+        "text": "an expiry calendar for licences, visas, IDs, tenancy registrations and cards across all managed companies, with reminders sent at several points before each date and renewal quotes prepared.",
         "tool_words": []
       },
       "ask_first": "Do expiries slip mostly on licences or on visas, and is it a few clients or many?",

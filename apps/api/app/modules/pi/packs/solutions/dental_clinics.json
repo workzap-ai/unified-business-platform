@@ -18,7 +18,7 @@
         "keys": [
           "lead_followup"
         ],
-        "text": "a treatment-plan pipeline (quoted, accepted, in progress, paused, completed) that creates follow-up tasks for reception automatically and shows acceptance by dentist and branch, with no clinical details in messages.",
+        "text": "a treatment-plan tracker (quoted, accepted, in progress, paused, completed) that gives follow-up tasks to reception and shows acceptance by dentist and branch, with no clinical details in messages.",
         "tool_words": []
       },
       "ask_first": "Which treatments are you quoting most, implants, braces or cosmetic work?",
@@ -48,7 +48,7 @@
         "keys": [
           "booking_scheduling"
         ],
-        "text": "a chair-wise calendar with WhatsApp booking, automatic reminders and a waitlist that fills cancellations, with chair use measured daily.",
+        "text": "a chair-wise calendar with WhatsApp booking, client reminders and a waitlist that fills cancellations, with chair use measured daily.",
         "tool_words": []
       },
       "ask_first": "Are your dentists available in the mornings?",
@@ -138,7 +138,7 @@
         "keys": [
           "dashboards_reports"
         ],
-        "text": "a production and commission statement generated automatically from completed procedures and the agreed rules.",
+        "text": "a production and commission statement created right from completed procedures and the agreed rules.",
         "tool_words": [],
         "leads_with_view": true
       },
@@ -172,7 +172,7 @@
         "text": "a recall engine that reminds consenting patients on schedule from their last visit date, with no treatment details, and tracks who rebooked.",
         "tool_words": []
       },
-      "ask_first": "Are last-visit dates kept in software or on paper?",
+      "ask_first": "Are last-visit dates kept on a computer or on paper?",
       "free_stops": "Recall intervals and message flow are set in the solution document.",
       "extra_ideas": [
         {

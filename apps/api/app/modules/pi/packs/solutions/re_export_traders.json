@@ -49,7 +49,7 @@
         "keys": [
           "custom_build"
         ],
-        "text": "Reservations on the stock register so confirmed goods are held automatically and released only when loaded or cancelled.",
+        "text": "Reservations on the stock register so confirmed goods are set aside immediately and released only when loaded or cancelled.",
         "tool_words": []
       },
       "ask_first": "Does the double sale happen with fast-moving lots, or mostly when several salesmen are selling?",
@@ -79,7 +79,7 @@
         "keys": [
           "stock_alerts"
         ],
-        "text": "Ageing alerts for fast-depreciating items, sent automatically as stock passes set ages.",
+        "text": "Ageing alerts for fast-depreciating items, sent to you the day stock reaches set ages.",
         "tool_words": []
       },
       "ask_first": "Is it a few old lots that sit, or a large share of what you hold?",
@@ -320,7 +320,7 @@
         "keys": [
           "lead_followup"
         ],
-        "text": "Every visit and enquiry recorded, with follow-up reminders sent automatically to the right salesperson.",
+        "text": "Every visit and enquiry recorded, with follow-up reminders sent right away to the assigned salesperson.",
         "tool_words": []
       },
       "ask_first": "Are the visitors mostly new buyers, or known ones who did not order this time?",

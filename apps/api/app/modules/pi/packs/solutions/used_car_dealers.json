@@ -116,7 +116,7 @@
         ]
       },
       "ask_first": "Do you list cars on one site, or on several?",
-      "free_stops": "Which platforms connect and how is covered in the solution document.",
+      "free_stops": "Which tools connect and how is covered in the solution document.",
       "extra_ideas": [
         {
           "text": "Check your live adverts against cars still on the plot once this week, so sold units stop wasting buyer calls.",
@@ -236,7 +236,7 @@
         "keys": [
           "cash_reconciliation"
         ],
-        "text": "a daily cash sheet for each lot matched automatically to sales and tokens recorded.",
+        "text": "a daily cash sheet for each lot matched to sales and recorded tokens every evening.",
         "tool_words": []
       },
       "ask_first": "Does the cash gap show at the final sale, or at the token stage?",

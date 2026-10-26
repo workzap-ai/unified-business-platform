@@ -18,7 +18,7 @@
         "keys": [
           "field_checks"
         ],
-        "text": "nori_daily_read — milkers enter each animal's milk on the phone morning and evening, and every morning the owner automatically sees yesterday's total and which animals dropped below their usual yield.",
+        "text": "nori_daily_read — milkers enter each animal's milk on the phone morning and evening, and every morning the owner sees yesterday's total and which animals dropped below their usual yield.",
         "tool_words": []
       },
       "ask_first": "Is milk measured per animal anywhere today, or only the total in the can?",
@@ -48,7 +48,7 @@
         "keys": [
           "field_checks"
         ],
-        "text": "dashboards_reports — litres milked, sold and used at home are entered at each handover, and the daily gap is calculated automatically and shown to the owner by shift.",
+        "text": "shift summary — litres milked, sold and used at home are entered at each handover, and the daily gap is shown to the owner by shift.",
         "tool_words": []
       },
       "ask_first": "Does the gap seem worse on a particular shift or day?",
@@ -108,7 +108,7 @@
         "keys": [
           "dashboards_reports"
         ],
-        "text": "cost per litre worked out automatically every day from the bills and milk the farm enters, so price rises show the week they happen.",
+        "text": "cost per litre calculated every day from the bills and milk the farm enters, so price rises show to the owner the week they happen.",
         "tool_words": [],
         "leads_with_view": true
       },
@@ -139,7 +139,7 @@
         "keys": [
           "stock_alerts"
         ],
-        "text": "field_checks — bags ordered, received and issued are logged with a photo of the slip, stock left is kept running daily, and a reorder alert goes out automatically.",
+        "text": "field_checks — bags ordered, received and issued are logged with a photo of the slip, stock left is kept running daily, and a reorder message goes to the owner when stock runs low.",
         "tool_words": []
       },
       "ask_first": "Who signs for feed when it arrives?",
@@ -169,7 +169,7 @@
         "keys": [
           "stock_alerts"
         ],
-        "text": "weekly fodder stock entries with an automatic alert showing how many weeks are left at the farm's own usage.",
+        "text": "weekly fodder stock entries with a message sent to the owner showing how many weeks are left at the farm's own usage.",
         "tool_words": []
       },
       "ask_first": "Do you make silage on your own land or buy all of it?",
@@ -199,7 +199,7 @@
         "keys": [
           "field_checks"
         ],
-        "text": "workflow_automation — a herd register on the phone that keeps every status and date the farm enters and sends reminders automatically when an entered due or dry-off date comes up.",
+        "text": "daily_work_routines — a herd register on the phone that keeps every status and date the farm enters and sends reminders to the owner when an entered due or dry-off date comes up.",
         "tool_words": []
       },
       "ask_first": "Who keeps track of insemination dates now?",
@@ -229,7 +229,7 @@
         "keys": [
           "field_checks"
         ],
-        "text": "nori_daily_read — an event log for births, deaths, vet visits and their costs that lands in the owner's morning read automatically the same day.",
+        "text": "nori_daily_read — an event log for births, deaths, vet visits and their costs that lands in the owner's morning message the same day.",
         "tool_words": []
       },
       "ask_first": "Who on the farm is meant to tell you, and how?",
@@ -289,7 +289,7 @@
         "keys": [
           "order_capture"
         ],
-        "text": "cash_reconciliation — the rider marks each delivery and payment on the phone, and cash collected vs due is checked automatically every evening.",
+        "text": "cash_reconciliation — the rider marks each delivery and payment on the phone, and cash collected vs due is checked for the owner every evening.",
         "tool_words": []
       },
       "ask_first": "Do customers pay daily, weekly or monthly?",
@@ -319,7 +319,7 @@
         "keys": [
           "field_checks"
         ],
-        "text": "dashboards_reports — generator and chiller downtime logged daily with milk lost, totalled automatically for the owner each month.",
+        "text": "daily_reports — generator and chiller downtime logged daily with milk lost, totalled for the owner each month.",
         "tool_words": []
       },
       "ask_first": "Is there a generator, or does the chiller stop completely?",

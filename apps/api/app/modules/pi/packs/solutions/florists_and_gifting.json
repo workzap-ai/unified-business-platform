@@ -114,7 +114,7 @@
         "text": "delivery routing by area and slot with driver proof of delivery and a live late list.",
         "tool_words": []
       },
-      "ask_first": "Who delivers, your drivers or an app?",
+      "ask_first": "Who delivers, your own drivers or an outside service?",
       "free_stops": "routing rules and slot design go in the solution document.",
       "extra_ideas": [
         {
@@ -142,7 +142,7 @@
           "customer_messaging",
           "job_tracking"
         ],
-        "text": "a pre-delivery photo sent to the customer automatically on WhatsApp.",
+        "text": "a pre-delivery photo sent to the customer on WhatsApp before dispatch.",
         "tool_words": []
       },
       "ask_first": "Who sends photos today?",
@@ -235,7 +235,7 @@
         "keys": [
           "credit_ledger"
         ],
-        "text": "corporate receivables with ageing and polite automatic reminders.",
+        "text": "corporate receivables with ageing and polite reminders sent out.",
         "tool_words": []
       },
       "ask_first": "How do you follow up now?",

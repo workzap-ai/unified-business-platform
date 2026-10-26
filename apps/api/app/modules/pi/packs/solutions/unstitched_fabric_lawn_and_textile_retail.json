@@ -200,7 +200,7 @@
         "keys": [
           "dashboards_reports"
         ],
-        "text": "commission worked out automatically from sales by salesman code, visible to each salesman.",
+        "text": "commission worked out from sales by salesman code, visible to each salesman.",
         "tool_words": [],
         "leads_with_view": true
       },

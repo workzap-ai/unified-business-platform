@@ -48,7 +48,7 @@
         "keys": [
           "dashboards_reports"
         ],
-        "text": "a daily buying log by species with yield after cleaning and cost per kilo worked out automatically against your margin rule.",
+        "text": "a daily buying log by species with yield after cleaning and cost per kilo worked out directly against your margin rule.",
         "tool_words": [],
         "leads_with_view": true
       },
@@ -109,7 +109,7 @@
         "keys": [
           "credit_ledger"
         ],
-        "text": "a restaurant and hotel ledger by account label with statements and automatic payment reminders.",
+        "text": "a restaurant and hotel ledger by account label with statements and payment reminder messages sent to clients.",
         "tool_words": []
       },
       "ask_first": "How do you keep track of what each one owes today?",

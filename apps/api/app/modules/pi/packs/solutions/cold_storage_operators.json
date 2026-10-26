@@ -168,7 +168,7 @@
         "keys": [
           "credit_ledger"
         ],
-        "text": "Agreed rates stored per client account and applied automatically on every bill.",
+        "text": "Agreed rates stored per client account and added directly to every bill.",
         "tool_words": []
       },
       "ask_first": "Do you have a standard rate list?",
@@ -228,7 +228,7 @@
         "keys": [
           "field_checks"
         ],
-        "text": "A temperature and power log filled hourly by the shift on phone, flagged automatically if an entry is missed.",
+        "text": "A temperature and power log filled hourly by staff on phone, warning you right away if an entry is missed.",
         "tool_words": []
       },
       "ask_first": "Who fills the log now?",
@@ -289,7 +289,7 @@
         "keys": [
           "dashboards_reports"
         ],
-        "text": "A daily stock report emailed to each brand client automatically, from the same inward/outward records.",
+        "text": "A daily stock report emailed to each brand client, created from the same inward and outward records.",
         "tool_words": []
       },
       "ask_first": "How many brand clients want reports?",

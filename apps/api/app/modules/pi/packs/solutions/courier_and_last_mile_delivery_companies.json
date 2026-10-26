@@ -49,7 +49,7 @@
           "workflow_automation",
           "customer_messaging"
         ],
-        "text": "A merchant remittance schedule with statements generated and sent automatically.",
+        "text": "A merchant remittance schedule with statements created and sent on schedule.",
         "tool_words": []
       },
       "ask_first": "Are merchants paid late mostly because riders deposit late, or because your own payout day slips?",
@@ -173,7 +173,7 @@
           "customer_messaging",
           "job_tracking"
         ],
-        "text": "Automatic status messages at each parcel milestone, so most questions are answered before they're asked.",
+        "text": "Status messages sent to buyers at each parcel milestone, so most questions are answered before they're asked.",
         "tool_words": []
       },
       "ask_first": "Do most where-is-my-parcel messages come from delayed parcels, or from ones still on time?",

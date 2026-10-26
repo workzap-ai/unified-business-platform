@@ -18,7 +18,7 @@
         "keys": [
           "order_capture"
         ],
-        "text": "A booking queue that tracks every booking from advance to delivery and sends customers WhatsApp status updates automatically as things change.",
+        "text": "A booking queue that tracks every booking from advance to delivery and sends customers WhatsApp status updates whenever things change.",
         "tool_words": []
       },
       "ask_first": "Roughly how many bookings are waiting right now?",
@@ -198,7 +198,7 @@
         "keys": [
           "stock_alerts"
         ],
-        "text": "Parts stock with minimum levels and automatic reorder alerts, with parts issued only against job cards.",
+        "text": "Parts stock with minimum levels, sending you reorder alerts when stock runs low, with parts issued only against job cards.",
         "tool_words": []
       },
       "ask_first": "Roughly how many parts lines do you carry?",
@@ -294,7 +294,7 @@
         ]
       },
       "ask_first": "How many branches and workshops do you have?",
-      "free_stops": "What the dashboard measures is kept for the solution document.",
+      "free_stops": "What we measure for your business is kept for the solution document.",
       "extra_ideas": [
         {
           "text": "Count tractors sold, rentals started, workshop jobs closed and parts bills written at each branch this week, so weak branches stand out clearly.",

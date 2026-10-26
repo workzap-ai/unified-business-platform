@@ -19,7 +19,7 @@
           "job_tracking",
           "dashboards_reports"
         ],
-        "text": "An order and TNA board for every style with milestone dates and status, flagging at-risk orders automatically each morning for merchandisers and the owner.",
+        "text": "An order and TNA board for every style with milestone dates and status, sending warnings for delayed orders each morning to merchandisers and the owner.",
         "tool_words": []
       },
       "ask_first": "At which stage do orders usually slip?",

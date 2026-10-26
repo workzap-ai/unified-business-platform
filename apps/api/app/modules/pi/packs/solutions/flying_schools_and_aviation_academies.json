@@ -19,7 +19,7 @@
           "booking_scheduling",
           "dashboards_reports"
         ],
-        "text": "cancellations logged by reason every day, affected students offered the next free slot automatically, and a weekly view of slots lost per aircraft and per course.",
+        "text": "cancellations logged by reason every day, affected students offered the next free slot right away, and a weekly view of slots lost per aircraft and per course.",
         "tool_words": []
       },
       "ask_first": "Zyada tar slots kis wajah se cancel hote hain, aircraft, instructor ya mausam?",
@@ -80,7 +80,7 @@
           "workflow_automation",
           "customer_messaging"
         ],
-        "text": "when maintenance marks an aircraft unavailable, it drops off the schedule automatically and affected students get a WhatsApp notice with alternatives (the maintenance decision itself stays with your engineers).",
+        "text": "when maintenance marks an aircraft unavailable, it drops off the schedule right away and affected students get a WhatsApp notice with alternatives (the maintenance decision itself stays with your engineers).",
         "tool_words": []
       },
       "ask_first": "Maintenance wale abhi schedule wale ko kaise batate hain?",
@@ -110,7 +110,7 @@
         "keys": [
           "credit_ledger"
         ],
-        "text": "an instalment tracker with automatic reminders to the payer and a flag on the booking board when an overdue student tries to book.",
+        "text": "an instalment tracker sending reminders to the payer and showing a flag on the booking board when an overdue student tries to book.",
         "tool_words": []
       },
       "ask_first": "Students upfront dete hain, per hour ya instalments mein?",
@@ -141,7 +141,7 @@
           "customer_messaging",
           "dashboards_reports"
         ],
-        "text": "a progress view showing hours flown, stages done and hours remaining per student (no ID or logbook data stored), with an automatic monthly update to the payer with their permission.",
+        "text": "a progress view showing hours flown, stages done and hours remaining per student (no ID or logbook data stored), with a monthly update sent to the payer with their permission.",
         "tool_words": []
       },
       "ask_first": "Progress ka record abhi kahan rakha jata hai?",
@@ -202,7 +202,7 @@
         "keys": [
           "workflow_automation"
         ],
-        "text": "instructor hours and pay calculated automatically from completed sessions, with a monthly statement each instructor can check.",
+        "text": "instructor hours and pay worked out from completed sessions, with a monthly statement each instructor can check.",
         "tool_words": []
       },
       "ask_first": "Instructors full-time hain ya per hour?",
@@ -264,7 +264,7 @@
           "field_checks",
           "dashboards_reports"
         ],
-        "text": "fuel uplift entered by phone with a photo of the slip, reconciled automatically against hours flown per aircraft each week.",
+        "text": "fuel uplift entered by phone with a photo of the slip, matched against hours flown per aircraft for the owner each week.",
         "tool_words": []
       },
       "ask_first": "Fuel ka record abhi kaun rakhta hai?",
@@ -294,7 +294,7 @@
         "keys": [
           "workflow_automation"
         ],
-        "text": "a renewal tracker for insurance, aircraft documents and school approvals with automatic reminders well before each date (what each renewal requires stays with your accountable manager).",
+        "text": "a renewal tracker for insurance, aircraft documents and school approvals sending reminders well before each date (what each renewal requires stays with your accountable manager).",
         "tool_words": []
       },
       "ask_first": "Kitni renewals ka hisaab rakhna padta hai, taqreeban?",

@@ -49,7 +49,7 @@
         "keys": [
           "customer_messaging"
         ],
-        "text": "automatic WhatsApp status updates to workers, with their permission, each time they move to the next step.",
+        "text": "workers get WhatsApp status updates, with their permission, each time they move to the next step.",
         "tool_words": []
       },
       "ask_first": "Do workers call mostly after the medical stage, or while waiting for the visa?",
@@ -109,7 +109,7 @@
         "keys": [
           "booking_scheduling"
         ],
-        "text": "appointment tracking per worker with automatic WhatsApp reminders before each one, and a list of no-shows for the office.",
+        "text": "appointment tracking per worker with WhatsApp reminders sent before each one, and a list of no-shows for the office.",
         "tool_words": []
       },
       "ask_first": "Do workers miss their medical dates because nobody told them, or because they were told too late?",

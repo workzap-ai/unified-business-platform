@@ -51,7 +51,7 @@
         "text": "dashboards_reports — a bed board on screen and phone updated by ward and housekeeping roles, showing each bed's status by ward in real time with no patient names.",
         "tool_words": []
       },
-      "ask_first": "Does your HIS have a bed module staff could use?",
+      "ask_first": "Does your HIS have a bed section staff could use?",
       "free_stops": "Status definitions and who updates when are set in the solution document.",
       "extra_ideas": [
         {
@@ -200,7 +200,7 @@
         "keys": [
           "workflow_automation"
         ],
-        "text": "a purchase request and approval chain on WhatsApp with limits per role, automatic reminders and a log of who approved what and when.",
+        "text": "a purchase request and approval chain on WhatsApp with limits per role, reminders sent to approvers and a log of who approved what and when.",
         "tool_words": []
       },
       "ask_first": "Do requests wait for quotes or simply for the MD's time?",

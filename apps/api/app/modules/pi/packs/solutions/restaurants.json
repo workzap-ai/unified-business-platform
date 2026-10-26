@@ -18,7 +18,7 @@
         "keys": [
           "dashboards_reports"
         ],
-        "text": "a recipe costing sheet that picks up every new purchase price automatically and flags any dish the moment a price rise pushes it below your target margin, across all branches.",
+        "text": "a recipe costing sheet that picks up every new purchase price right away and flags any dish the moment a price rise pushes it below your target margin, across all branches.",
         "tool_words": [],
         "leads_with_view": true
       },
@@ -114,7 +114,7 @@
           "app"
         ]
       },
-      "ask_first": "Is the gap usually in cash, or in card and app payments too?",
+      "ask_first": "Is the gap usually in cash, or in card and online payments too?",
       "free_stops": "The full closing procedure and the void-pattern checks are kept for the solution document.",
       "extra_ideas": [
         {
@@ -146,8 +146,8 @@
           "app"
         ]
       },
-      "ask_first": "Which apps do you take orders from?",
-      "free_stops": "Which apps can be linked and how the reconciliation works is detailed in the solution document.",
+      "ask_first": "Which online channels do you take orders from?",
+      "free_stops": "Which online channels can be linked and how the reconciliation works is detailed in the solution document.",
       "quick_ideas_original": [
         "Make one person own the tablets at peak, so app orders have a clear handler",
         "Compare one night's app order list with the POS, so you see how big the gap really is."
@@ -198,7 +198,7 @@
         "keys": [
           "booking_scheduling"
         ],
-        "text": "a rota sent to each staff member on WhatsApp automatically, with confirmations, swap requests and a list for the manager of who hasn't confirmed.",
+        "text": "a rota sent straight to each staff member on WhatsApp, with confirmations, swap requests and a list for the manager of who hasn't confirmed.",
         "tool_words": []
       },
       "ask_first": "Which role is hardest to keep — cooks, waiters or cashiers?",
@@ -228,7 +228,7 @@
         "keys": [
           "booking_scheduling"
         ],
-        "text": "a booking page and WhatsApp booking flow feeding one reservation list, with automatic reminders to guests and clash warnings.",
+        "text": "a booking page and WhatsApp booking flow feeding one reservation list, with reminders sent to guests and clash warnings.",
         "tool_words": []
       },
       "ask_first": "How often does a double-booking happen in a normal week?",
@@ -259,7 +259,7 @@
           "reviews_collection",
           "customer_messaging"
         ],
-        "text": "review requests sent automatically to guests who agreed to be contacted, a review inbox with reply status, and an opt-in guest list for Ramadan and Eid offers.",
+        "text": "review requests sent directly to guests who agreed to be contacted, a review inbox with reply status, and an opt-in guest list for Ramadan and Eid offers.",
         "tool_words": []
       },
       "ask_first": "Who replies to reviews now?",
@@ -295,7 +295,7 @@
         ]
       },
       "ask_first": "What number do you check first when you hear how a day went?",
-      "free_stops": "Which numbers make up the morning read and how they are pulled from your systems is in the solution document.",
+      "free_stops": "Which numbers make up the morning read and how they are pulled from your records is in the solution document.",
       "extra_ideas": [
         {
           "text": "Note daily sales, covers and cash over or short in one notebook for this month, so weak days show before accounts arrive.",

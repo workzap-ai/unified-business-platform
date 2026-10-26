@@ -78,7 +78,7 @@
         "keys": [
           "credit_ledger"
         ],
-        "text": "a payment schedule per event with reminders sent automatically before each instalment and balances visible in one place.",
+        "text": "a payment schedule per event with reminders sent to clients before each instalment and balances visible in one place.",
         "tool_words": []
       },
       "ask_first": "In how many stages do clients pay you now?",
@@ -168,7 +168,7 @@
         "keys": [
           "workflow_automation"
         ],
-        "text": "day-before WhatsApp confirmations sent to every vendor automatically, with late or missing replies flagged to you.",
+        "text": "day-before WhatsApp confirmations sent to every vendor, with late or missing replies flagged to you.",
         "tool_words": []
       },
       "ask_first": "Which vendor type lets you down most?",
@@ -229,7 +229,7 @@
           "lead_followup",
           "attribution_codes"
         ],
-        "text": "an enquiry tracker with source tags and automatic follow-up reminders, showing which posts and ads bring real bookings.",
+        "text": "an enquiry tracker with source tags and follow-up reminders sent to you, showing which posts and ads bring real bookings.",
         "tool_words": []
       },
       "ask_first": "Do you share prices before or after a consultation?",
@@ -259,7 +259,7 @@
         "keys": [
           "dashboards_reports"
         ],
-        "text": "a per-event profit report pulling quote, change orders, vendor bills and labour automatically.",
+        "text": "a per-event profit report pulling together quote, change orders, vendor bills and labour costs.",
         "tool_words": [],
         "leads_with_view": true
       },
@@ -290,7 +290,7 @@
         "keys": [
           "credit_ledger"
         ],
-        "text": "a labour and freelancer payout ledger per event, with balances updated automatically.",
+        "text": "a labour and freelancer payout ledger per event, with balances updated whenever payouts are made.",
         "tool_words": []
       },
       "ask_first": "How many labourers work a typical event?",

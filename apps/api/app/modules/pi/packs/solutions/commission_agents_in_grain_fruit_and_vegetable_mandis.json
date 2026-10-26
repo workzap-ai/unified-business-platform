@@ -168,7 +168,7 @@
         "keys": [
           "workflow_automation"
         ],
-        "text": "A deduction calculator with fixed rules applied to every parchi automatically.",
+        "text": "A deduction calculator with fixed rules applied to every parchi directly.",
         "tool_words": []
       },
       "ask_first": "Which deduction causes the most disputes?",

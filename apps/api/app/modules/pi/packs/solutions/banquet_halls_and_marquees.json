@@ -18,7 +18,7 @@
         "keys": [
           "booking_scheduling"
         ],
-        "text": "a hall and slot calendar that blocks a date automatically only once the advance is logged, across every hall and marquee.",
+        "text": "a hall and slot calendar that blocks a date only once the advance is logged, across every hall and marquee.",
         "tool_words": []
       },
       "ask_first": "How many halls or lawns do you book?",
@@ -48,7 +48,7 @@
         "keys": [
           "credit_ledger"
         ],
-        "text": "an advance and payment ledger per event that sends a receipt on WhatsApp the moment money is logged and shows balances due automatically.",
+        "text": "an advance and payment ledger per event that sends a receipt on WhatsApp the moment money is logged and shows balances due right away.",
         "tool_words": []
       },
       "ask_first": "Do most clients pay the advance in cash or by transfer?",
@@ -139,7 +139,7 @@
         "keys": [
           "job_tracking"
         ],
-        "text": "an event sheet per booking with menu, count, decor and timings, where every change reaches kitchen, decor and floor teams automatically.",
+        "text": "an event sheet per booking with menu, count, decor and timings, where every change reaches kitchen, decor and floor teams straight away.",
         "tool_words": []
       },
       "ask_first": "Who takes menu changes from the client now?",
@@ -169,7 +169,7 @@
         "keys": [
           "booking_scheduling"
         ],
-        "text": "a daily-wage roster that sends confirmations automatically, shows who's confirmed per event and logs per-event payouts.",
+        "text": "a daily-wage roster that sends confirmations to workers, shows who's confirmed per event and logs per-event payouts.",
         "tool_words": []
       },
       "ask_first": "Roughly how many waiters work a full wedding night?",
@@ -199,7 +199,7 @@
         "keys": [
           "field_checks"
         ],
-        "text": "post-event counts on the phone for crockery, chairs and decor, with losses tracked per event automatically.",
+        "text": "post-event counts on the phone for crockery, chairs and decor, with losses tracked per event.",
         "tool_words": []
       },
       "ask_first": "What goes missing most?",
@@ -229,7 +229,7 @@
         "keys": [
           "lead_followup"
         ],
-        "text": "an enquiry and hall-visit tracker with automatic follow-up reminders and a record of which enquiries became bookings.",
+        "text": "an enquiry and hall-visit tracker with follow-up reminders and a record of which enquiries became bookings.",
         "tool_words": []
       },
       "ask_first": "Where do most enquiries come from?",
@@ -289,7 +289,7 @@
         "keys": [
           "dashboards_reports"
         ],
-        "text": "a per-event profit report pulling revenue, food, staff, decor and power automatically after every event.",
+        "text": "a per-event profit report pulling together revenue, food, staff, decor and power right after every event.",
         "tool_words": [],
         "leads_with_view": true
       },

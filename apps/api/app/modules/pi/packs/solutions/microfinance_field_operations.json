@@ -50,7 +50,7 @@
         "keys": [
           "field_checks"
         ],
-        "text": "cash_reconciliation — Group-total collection capture at the centre meeting feeding the branch day-end, with mismatches flagged automatically.",
+        "text": "cash_reconciliation — Group-total collection capture at the centre meeting feeding the branch day-end, with mismatches flagged right away.",
         "tool_words": []
       },
       "ask_first": "Is the mismatch mostly with a few officers, or across many groups?",
@@ -172,7 +172,7 @@
         "keys": [
           "dashboards_reports"
         ],
-        "text": "One data source per branch that produces each required report format automatically.",
+        "text": "One record sheet per branch that produces each required report format without extra work.",
         "tool_words": []
       },
       "ask_first": "Did just a couple of different formats come in this quarter, or many?",

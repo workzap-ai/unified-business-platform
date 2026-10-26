@@ -18,7 +18,7 @@
         "keys": [
           "field_checks"
         ],
-        "text": "dashboards_reports — a pond register that tracks stocking, losses seen and harvest per pond and shows the gap automatically.",
+        "text": "a pond register that tracks stocking, losses seen and harvest per pond and shows the owner where numbers do not match.",
         "tool_words": []
       },
       "ask_first": "How many ponds do you run?",
@@ -78,7 +78,7 @@
         "keys": [
           "stock_alerts"
         ],
-        "text": "feed deliveries, issue per pond and stock left logged daily, with gaps flagged automatically.",
+        "text": "feed deliveries, issue per pond and stock left logged daily, sending the owner an alert when gaps appear.",
         "tool_words": []
       },
       "ask_first": "Who issues feed each day?",
@@ -108,7 +108,7 @@
         "keys": [
           "dashboards_reports"
         ],
-        "text": "cost per pond and per kg worked out automatically from the farm's own entries.",
+        "text": "cost per pond and per kg calculated for the owner directly from the farm's own entries.",
         "tool_words": [],
         "leads_with_view": true
       },
@@ -170,7 +170,7 @@
         "keys": [
           "dashboards_reports"
         ],
-        "text": "a harvest record with kg, rate and slip photo per load, compared across agents automatically.",
+        "text": "a harvest record with kg, rate and slip photo per load, compared across agents for the owner.",
         "tool_words": [],
         "leads_with_view": true
       },
@@ -201,7 +201,7 @@
         "keys": [
           "credit_ledger"
         ],
-        "text": "a buyer ledger for agents, exporters and hotels with dues and reminders sent automatically.",
+        "text": "a buyer ledger for agents, exporters and hotels showing pending dues and sending payment reminders to them.",
         "tool_words": []
       },
       "ask_first": "How long do payments usually take?",
@@ -231,7 +231,7 @@
         "keys": [
           "field_checks"
         ],
-        "text": "timed night check-ins with photos, alerting the owner automatically when one is missed.",
+        "text": "timed night check-ins with photos, alerting the owner right away when staff miss one.",
         "tool_words": []
       },
       "ask_first": "Which ponds are hit most?",
@@ -291,7 +291,7 @@
         "keys": [
           "order_capture"
         ],
-        "text": "dashboards_reports — a weekly supply planner that matches client orders against pond harvest windows automatically.",
+        "text": "a weekly supply planner that matches client orders against pond harvest windows for the owner.",
         "tool_words": []
       },
       "ask_first": "How many hotel or restaurant clients are asking?",

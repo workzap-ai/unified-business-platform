@@ -18,7 +18,7 @@
         "keys": [
           "job_tracking"
         ],
-        "text": "a proof approval link on every job that locks the approved version and time to the job card automatically, so no one has to remember.",
+        "text": "a proof approval link on every job that saves the approved version and time to the job card right away, so no one has to remember.",
         "tool_words": []
       },
       "ask_first": "Are these reprint demands mostly from corporate jobs or walk-in customers?",
@@ -138,7 +138,7 @@
         "keys": [
           "credit_ledger"
         ],
-        "text": "a receivables ledger showing each customer's advance, balance and age, with reminders sent automatically on set dates.",
+        "text": "a receivables ledger showing each customer's advance, balance and age, with reminders sent to them on set dates.",
         "tool_words": []
       },
       "ask_first": "Is the delay usually paperwork on their side or simply slow payment?",

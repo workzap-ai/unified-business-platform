@@ -48,7 +48,7 @@
         "keys": [
           "workflow_automation"
         ],
-        "text": "Hire billing from actual out and in dates with automatic alerts for overdue returns.",
+        "text": "Hire billing from actual out and in dates with alerts for overdue returns sent to you.",
         "tool_words": []
       },
       "ask_first": "Do hires come back late on most contracts, or only a few?",
@@ -78,7 +78,7 @@
         "keys": [
           "field_checks"
         ],
-        "text": "An on-hire and off-hire checklist on phone with photos, running hours and fuel level, compared automatically at return.",
+        "text": "An on-hire and off-hire checklist on phone with photos, running hours and fuel level, compared at return.",
         "tool_words": []
       },
       "ask_first": "Is the trouble mostly fuel level, mostly damage, or both?",
@@ -289,7 +289,7 @@
         "keys": [
           "credit_ledger"
         ],
-        "text": "A receivables tracker with statements and automatic reminders by customer.",
+        "text": "A receivables tracker with statements and customer reminders sent out.",
         "tool_words": []
       },
       "ask_first": "Is it a few big corporate customers owing most, or many paying late?",

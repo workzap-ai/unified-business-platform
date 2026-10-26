@@ -19,7 +19,7 @@
           "customer_messaging",
           "dashboards_reports"
         ],
-        "text": "a route board with departure and arrival status, and automatic WhatsApp alerts per route to parents who have agreed, without storing any child's details.",
+        "text": "a route board with departure and arrival status, and WhatsApp alerts per route sent to parents who have agreed, without storing any child's details.",
         "tool_words": []
       },
       "ask_first": "How do you find out today where a van is?",
@@ -49,7 +49,7 @@
         "keys": [
           "credit_ledger"
         ],
-        "text": "a fee and contract tracker with automatic reminders and receipts.",
+        "text": "a fee and contract tracker sending reminders and receipts straight to clients.",
         "tool_words": []
       },
       "ask_first": "Is it the same few families paying late each month, or different ones every time?",

@@ -18,7 +18,7 @@
         "keys": [
           "attribution_codes"
         ],
-        "text": "unique codes and links per influencer, with orders attributed and totalled automatically.",
+        "text": "unique codes and links per influencer, with orders attributed and totalled as sales come in.",
         "tool_words": []
       },
       "ask_first": "Roughly how many influencers do you work with in a month?",
@@ -78,7 +78,7 @@
         "keys": [
           "cash_reconciliation"
         ],
-        "text": "courier remittance files matched to orders automatically, with gaps flagged.",
+        "text": "courier remittance files matched to orders without delay, with gaps flagged.",
         "tool_words": []
       },
       "ask_first": "How many couriers do you use?",

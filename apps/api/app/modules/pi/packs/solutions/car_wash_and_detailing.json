@@ -79,7 +79,7 @@
           "loyalty_repeat",
           "customer_messaging"
         ],
-        "text": "a subscription record of washes used, renewal date and payment status, with automatic monthly summaries.",
+        "text": "a subscription record of washes used, renewal date and payment status, with monthly summaries sent to the owner.",
         "tool_words": []
       },
       "ask_first": "Do these customers say they missed washes at one branch or time, or is it spread across the whole month?",
@@ -109,7 +109,7 @@
         "keys": [
           "credit_ledger"
         ],
-        "text": "package payment tracking with automatic reminders and receipts.",
+        "text": "package payment tracking with payment reminders and receipts sent to customers.",
         "tool_words": []
       },
       "ask_first": "Is it a few package customers who are always late, or many of them each month?",
@@ -170,7 +170,7 @@
           "order_capture",
           "booking_scheduling"
         ],
-        "text": "one place where bookings from every channel land, confirmed and reminded automatically.",
+        "text": "one place where bookings from every channel land, with confirmations and reminders sent to customers.",
         "tool_words": []
       },
       "ask_first": "Which channel causes most of the mix-ups, WhatsApp, Instagram or phone calls?",
@@ -291,7 +291,7 @@
         "keys": [
           "customer_messaging"
         ],
-        "text": "automatic maintenance reminders for ceramic and PPF customers.",
+        "text": "maintenance reminders sent to ceramic and PPF customers when due.",
         "tool_words": []
       },
       "ask_first": "Do coating customers simply forget maintenance, or do they go to another place for it?",

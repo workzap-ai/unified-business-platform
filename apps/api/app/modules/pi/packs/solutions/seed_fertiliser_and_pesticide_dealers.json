@@ -294,7 +294,7 @@
         ]
       },
       "ask_first": "Do both shops use the same register?",
-      "free_stops": "What the dashboard measures and how is kept for the solution document.",
+      "free_stops": "What numbers are tracked and how is kept for the solution document.",
       "extra_ideas": [
         {
           "text": "Count how many cash sales, credit sales and returns each shop records this week, so weaker branch habits stand out quickly.",

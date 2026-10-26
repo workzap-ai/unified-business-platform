@@ -78,7 +78,7 @@
         "keys": [
           "workflow_automation"
         ],
-        "text": "a supplier contract register with rate validity and automatic release-date alerts showing unsold rooms.",
+        "text": "a supplier contract register with rate validity, sending you alerts on release dates showing unsold rooms.",
         "tool_words": []
       },
       "ask_first": "Kitne hotels ke saath allotment hai?",
@@ -170,7 +170,7 @@
           "credit_ledger",
           "dashboards_reports"
         ],
-        "text": "a B2B agent receivables tracker with automatic reminders, alongside a supplier deposit schedule.",
+        "text": "a B2B agent receivables tracker sending payment reminders when due, alongside a supplier deposit schedule.",
         "tool_words": []
       },
       "ask_first": "Sab se late kaun se agents pay karte hain?",

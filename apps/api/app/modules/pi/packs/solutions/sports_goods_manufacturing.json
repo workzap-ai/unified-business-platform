@@ -232,7 +232,7 @@
         "keys": [
           "customer_messaging"
         ],
-        "text": "A shipment tracker that sends buyers updates automatically by WhatsApp or email, with their permission.",
+        "text": "A shipment tracker that sends buyers WhatsApp or email updates when status changes, with their permission.",
         "tool_words": []
       },
       "ask_first": "Do buyers ask for tracking mostly by WhatsApp, or by email?",

@@ -84,7 +84,7 @@
         ]
       },
       "ask_first": "Is the missing piece the time a complaint came in, or the time it was fixed?",
-      "free_stops": "KPI definitions and the dashboard are in the solution document.",
+      "free_stops": "KPI definitions and the summary overview page are in the solution document.",
       "extra_ideas": [
         {
           "text": "Write the received time and resolved time beside each complaint this week, so you can compare short fixes against long ones.",
@@ -142,7 +142,7 @@
         "keys": [
           "credit_ledger"
         ],
-        "text": "customer_messaging — An unpaid list with automatic reminders to subscribers who agreed to messages, and an online payment link where available.",
+        "text": "customer_messaging — An unpaid list that sends reminders to subscribers who agreed to messages, and an online payment link where available.",
         "tool_words": []
       },
       "ask_first": "Do late payers mostly pay a few days late, or several weeks late?",
@@ -176,7 +176,7 @@
         "tool_words": []
       },
       "ask_first": "Do the unbilled connections come mostly from new installations, or from reconnections after a break?",
-      "free_stops": "How the two systems are linked is assessed in the solution document; pi never asks for panel logins.",
+      "free_stops": "How the two tools are linked is assessed in the solution document; pi never asks for panel logins.",
       "extra_ideas": [
         {
           "text": "Count active connections seen on the service list but missing from the billing notebook, so the size of unbilled service becomes visible.",

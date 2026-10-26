@@ -205,7 +205,7 @@
         ]
       },
       "ask_first": "What usually causes rework or failed tests?",
-      "free_stops": "Checklist structure per system is in the solution document.",
+      "free_stops": "Checklist structure for each setup is in the solution document.",
       "extra_ideas": [
         {
           "text": "Look at recent failed test notes beside the latest issued drawing, so you see which work areas repeat drawing misses.",

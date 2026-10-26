@@ -18,7 +18,7 @@
         "keys": [
           "workflow_automation"
         ],
-        "text": "brief intake that turns a client request into a structured task with deadline and assets, confirmed back to the client automatically.",
+        "text": "brief intake that turns a client request into a structured task with deadline and assets, confirmed back to the client.",
         "tool_words": []
       },
       "ask_first": "Roughly how many active clients is the team handling?",
@@ -48,7 +48,7 @@
         "keys": [
           "workflow_automation"
         ],
-        "text": "an approval tracker per deliverable with automatic client reminders and a daily list of what's stuck and for how long.",
+        "text": "an approval tracker per deliverable with client reminders and a daily list of what's stuck and for how long.",
         "tool_words": []
       },
       "ask_first": "Do clients delay sign-off mostly on one or two accounts, or on most?",

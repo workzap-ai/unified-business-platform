@@ -18,7 +18,7 @@
         "keys": [
           "field_checks"
         ],
-        "text": "shift check-in and check-out on WhatsApp with location confirmation, and an automatic alert to the coordinator when a check-in is missed.",
+        "text": "shift check-in and check-out on WhatsApp with location confirmation, and an immediate alert to the coordinator when a check-in is missed.",
         "tool_words": []
       },
       "ask_first": "How long after a shift starts do you usually find out?",
@@ -108,7 +108,7 @@
         "keys": [
           "credit_ledger"
         ],
-        "text": "deposits and advances tracked per family account and settled automatically against the final bill.",
+        "text": "deposits and advances tracked per family account and settled directly against the final bill.",
         "tool_words": []
       },
       "ask_first": "How are deposits settled when a placement ends?",

@@ -138,7 +138,7 @@
         "keys": [
           "stock_alerts"
         ],
-        "text": "a weekly buying list built automatically from what sold and what's low, grouped by wholesaler.",
+        "text": "a weekly buying list prepared from what sold and what's low, grouped by wholesaler.",
         "tool_words": []
       },
       "ask_first": "Do you have any POS or barcode scanner?",

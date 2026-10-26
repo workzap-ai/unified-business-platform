@@ -18,11 +18,11 @@
         "keys": [
           "cash_reconciliation"
         ],
-        "text": "a daily match of card sales, top-ups and cash by cashier and shift, with gaps flagged to the owner automatically across branches.",
+        "text": "a daily match of card sales, top-ups and cash by cashier and shift, with gap alerts sent to the owner across branches.",
         "tool_words": []
       },
-      "ask_first": "Can your card system show sales per cashier?",
-      "free_stops": "How card-system data is pulled in and the mismatch rules are in the solution document.",
+      "ask_first": "Can your card machine show sales per cashier?",
+      "free_stops": "How card payment data is pulled in and the mismatch rules are in the solution document.",
       "extra_ideas": [
         {
           "text": "Compare card top-ups sold with cards activated for one cashier’s shift, so missing money ties to a specific handover period.",
@@ -78,7 +78,7 @@
         "keys": [
           "job_tracking"
         ],
-        "text": "maintenance tickets per machine with vendor assignment and time-to-fix measured automatically.",
+        "text": "maintenance tickets per machine with vendor assignment and time-to-fix measured for every job.",
         "tool_words": []
       },
       "ask_first": "Is maintenance in-house or by the machine vendor?",
@@ -138,7 +138,7 @@
         "keys": [
           "booking_scheduling"
         ],
-        "text": "a party booking calendar with packages, deposits and automatic WhatsApp confirmations and reminders.",
+        "text": "a party booking calendar with packages, deposits and WhatsApp confirmations and reminders sent to customers.",
         "tool_words": []
       },
       "ask_first": "How many party rooms do you have?",
@@ -229,7 +229,7 @@
         "keys": [
           "stock_alerts"
         ],
-        "text": "a stock tracker with counts per shift compared to sales, with mismatches and low stock flagged automatically.",
+        "text": "a stock tracker with counts per shift compared to sales, sending alerts to the owner for mismatches and low stock.",
         "tool_words": []
       },
       "ask_first": "Which items go missing most?",
@@ -259,7 +259,7 @@
         "keys": [
           "credit_ledger"
         ],
-        "text": "a group booking tracker with invoices and automatic payment reminders.",
+        "text": "a group booking tracker with invoices and payment reminders sent when money is due.",
         "tool_words": []
       },
       "ask_first": "How many schools book with you in a term?",

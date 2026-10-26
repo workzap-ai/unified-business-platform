@@ -114,7 +114,7 @@
         "keys": [
           "transfer_tracking"
         ],
-        "text": "a request, dispatch and receive flow on phone where branches tick items in, and anything not received within a set time is flagged to you automatically.",
+        "text": "a request, dispatch and receive flow on phone where branches tick items in, and anything not received within a set time is flagged to you straight away.",
         "tool_words": []
       },
       "ask_first": "Do transfers go with a paper slip today, or only by phone?",
@@ -175,7 +175,7 @@
         "keys": [
           "dashboards_reports"
         ],
-        "text": "a dead-stock report by age and branch, refreshed automatically, with suggested transfers to branches where each item still sells.",
+        "text": "a dead-stock report by age and branch, refreshed continuously, with suggested transfers to branches where each item still sells.",
         "tool_words": [],
         "leads_with_view": true
       },
@@ -206,7 +206,7 @@
         "keys": [
           "cash_reconciliation"
         ],
-        "text": "a daily closing entry on phone compared automatically with the POS, the gap logged per counter, shift and branch, plus days since each branch last deposited.",
+        "text": "a daily closing entry on phone compared directly with the POS, the gap logged per counter, shift and branch, plus days since each branch last deposited.",
         "tool_words": []
       },
       "ask_first": "Is the gap usually the same branch or counter?",
@@ -270,7 +270,7 @@
         "tool_words": []
       },
       "ask_first": "Do all branches use the same POS?",
-      "free_stops": "Which numbers go in the read and how they are pulled from each branch's system are in the solution document.",
+      "free_stops": "Which numbers go in the read and how they are pulled from each branch's records are in the solution document.",
       "extra_ideas": [
         {
           "text": "Note which parts of each branch report arrive late or missing this week, so the hold up is specific instead of general.",

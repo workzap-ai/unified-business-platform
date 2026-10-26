@@ -18,7 +18,7 @@
         "keys": [
           "workflow_automation"
         ],
-        "text": "dashboards_reports — Attendance and completion data that builds the funder-format report automatically each month, for every campus.",
+        "text": "reports — Attendance and completion data that builds the funder-format report each month, for every campus.",
         "tool_words": []
       },
       "ask_first": "Is attendance on paper registers or something digital today?",
@@ -260,7 +260,7 @@
         "keys": [
           "workflow_automation"
         ],
-        "text": "Timesheets matched to the timetable automatically before pay, with differences flagged per campus.",
+        "text": "Timesheets matched to the timetable before pay, with differences flagged per campus.",
         "tool_words": []
       },
       "ask_first": "Do the timesheet gaps come from swaps between instructors, or from classes that did not run?",
@@ -320,7 +320,7 @@
         "keys": [
           "lead_followup"
         ],
-        "text": "Social enquiries captured automatically into a follow-up queue with reminders and a weekly enrolment count.",
+        "text": "Social enquiries captured into a follow-up queue with reminders and a weekly enrolment count.",
         "tool_words": []
       },
       "ask_first": "Do the enquiries arrive as direct messages, or as comments under your videos?",

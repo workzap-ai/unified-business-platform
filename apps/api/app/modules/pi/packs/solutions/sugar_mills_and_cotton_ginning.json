@@ -83,8 +83,8 @@
         "text": "CPR-to-payment reconciliation connecting weighment and accounts, with outstanding by grower code and centre.",
         "tool_words": []
       },
-      "ask_first": "Which systems hold CPRs and payments?",
-      "free_stops": "How the two systems connect is detailed in the solution document.",
+      "ask_first": "Where are CPRs and payments kept?",
+      "free_stops": "How the two places connect is detailed in the solution document.",
       "extra_ideas": [
         {
           "text": "Compare one day's CPR entries with the same day's payment entries line by line, so the mismatch pattern is obvious.",
@@ -117,7 +117,7 @@
         "leads_with_view": true
       },
       "ask_first": "How many purchase centres do you run?",
-      "free_stops": "What the dashboard tracks is kept for the solution document.",
+      "free_stops": "What is tracked overall is kept for the solution document.",
       "extra_ideas": [
         {
           "text": "Count how many queue order complaints come from each purchase centre this week, so you see where control is weakest.",
@@ -264,7 +264,7 @@
         "keys": [
           "dashboards_reports"
         ],
-        "text": "A daily crushing or ginning report generated automatically for owners and the board.",
+        "text": "A daily crushing or ginning report sent directly to owners and the board.",
         "tool_words": []
       },
       "ask_first": "How long does the report take now?",

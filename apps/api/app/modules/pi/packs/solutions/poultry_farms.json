@@ -18,7 +18,7 @@
         "keys": [
           "field_checks"
         ],
-        "text": "nori_daily_read — daily mortality entered per shed with photo, rolled into the owner's morning read and checked against placement automatically.",
+        "text": "nori_daily_read — daily mortality entered per shed with photo, rolled into the owner's morning read and checked against placement on the spot.",
         "tool_words": []
       },
       "ask_first": "Who counts and records deaths each day?",
@@ -48,7 +48,7 @@
         "keys": [
           "dashboards_reports"
         ],
-        "text": "a daily rate log compared automatically with the farm's sale rates flock after flock.",
+        "text": "a daily rate log compared directly with the farm's sale rates flock after flock.",
         "tool_words": [],
         "leads_with_view": true
       },
@@ -79,7 +79,7 @@
         "keys": [
           "credit_ledger"
         ],
-        "text": "a dealer ledger of chicks, feed and other items on credit, birds lifted, weights, rates and balance, settled flock by flock automatically.",
+        "text": "a dealer ledger of chicks, feed and other items on credit, birds lifted, weights, rates and balance, settled flock by flock without delay.",
         "tool_words": []
       },
       "ask_first": "Does the dealer also owe you from earlier flocks?",
@@ -109,7 +109,7 @@
         "keys": [
           "stock_alerts"
         ],
-        "text": "bags received vs billed logged with photo of the slip, and mismatches flagged to the owner automatically.",
+        "text": "bags received vs billed logged with photo of the slip, and mismatches flagged to the owner right away.",
         "tool_words": []
       },
       "ask_first": "Who receives feed at each farm?",
@@ -139,7 +139,7 @@
         "keys": [
           "stock_alerts"
         ],
-        "text": "feed stock per shed kept running daily with days-left and an automatic reorder alert.",
+        "text": "feed stock per shed kept running daily with days-left and a reorder alert sent when low.",
         "tool_words": []
       },
       "ask_first": "How many days' feed do you usually keep?",
@@ -199,7 +199,7 @@
         "keys": [
           "field_checks"
         ],
-        "text": "workflow_automation — a night-round checklist with timestamps and a generator log, alerting the owner automatically when a round is missed.",
+        "text": "workflow_routine — a night-round checklist with timestamps and a generator log, alerting the owner right away when a round is missed.",
         "tool_words": []
       },
       "ask_first": "How do you find out about a failure at night today?",
@@ -229,7 +229,7 @@
         "keys": [
           "transfer_tracking"
         ],
-        "text": "field_checks — egg counts logged at shed, store and truck, with gaps flagged automatically each day.",
+        "text": "field_checks — egg counts logged at shed, store and truck, with gaps flagged to the owner each day.",
         "tool_words": []
       },
       "ask_first": "Where do the shortages usually show up?",
@@ -259,7 +259,7 @@
         "keys": [
           "dashboards_reports"
         ],
-        "text": "a flock record built from the farm's own entries, set beside the settlement automatically so differences stand out.",
+        "text": "a flock record built from the farm's own entries, set beside the settlement sheet so differences stand out.",
         "tool_words": [],
         "leads_with_view": true
       },
@@ -290,7 +290,7 @@
         "keys": [
           "nori_daily_read"
         ],
-        "text": "one automatic morning read across all farms with mortality, feed left, power issues and cash.",
+        "text": "one morning read sent across all farms with mortality, feed left, power issues and cash.",
         "tool_words": [],
         "leads_with_view": true
       },

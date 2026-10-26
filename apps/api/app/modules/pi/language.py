@@ -347,14 +347,14 @@ BRAIN_HANDOFF_NOTICES = {
     "ar": "شكرًا لرسالتك. سيرد عليك أحد أعضاء فريق Workzap هنا.",
 }
 BRAIN_TEAM_CHECK_NOTICES = {
-    "en": "Noted. I'm checking this with the Workzap team, and they'll confirm here.",
-    "roman_ur": "Noted. Ise Workzap ki team se check kiya ja raha hai, wo yahin tasdeeq karein ge.",
+    "en": "I'm checking this with the Workzap team, and they'll confirm here.",
+    "roman_ur": "Ise Workzap ki team se check kiya ja raha hai, wo yahin tasdeeq karein ge.",
     "ar": "تم. أتحقق من ذلك مع فريق Workzap وسيؤكدون لك هنا.",
 }
 BRAIN_ACK_NOTICES = {
-    "en": "Thanks, I've got that. Is there anything else getting in the way?",
-    "roman_ur": "Shukriya, maine note kar liya. Aur koi cheez rukawat bani hui hai?",
-    "ar": "شكرًا، فهمت. هل هناك شيء آخر يعيق عملك؟",
+    "en": "Thanks, I've got that.",
+    "roman_ur": "Shukriya, ye baat mere paas hai.",
+    "ar": "شكرًا، وصلتني الفكرة.",
 }
 MEDIA_NOTICES = {
     "en": "Thanks for the attachment. A member of our team will review it and reply here.",
@@ -363,8 +363,8 @@ MEDIA_NOTICES = {
 }
 # pi keeps the chat while the team checks something (no handoff).
 TEAM_CHECK_NOTICES = {
-    "en": "Noted. I'm checking this with the team and will confirm here shortly.",
-    "roman_ur": "Noted. Team se confirm karke yahin jaldi update milega.",
+    "en": "I'm checking this with the team and will confirm here shortly.",
+    "roman_ur": "Team se confirm karke yahin jaldi update milega.",
     "ar": "تم. سأتحقق من ذلك مع الفريق وأؤكد لك هنا قريبًا.",
 }
 # Brain mode, spec 6.11: when the model or a tool fails, say exactly that (no promise of a time).

@@ -116,7 +116,7 @@
         "keys": [
           "transfer_tracking"
         ],
-        "text": "branch orders against par levels, dispatch notes and receiving confirmation on phone, with any sent-not-received gap flagged automatically.",
+        "text": "branch orders against par levels, dispatch notes and receiving confirmation on phone, with any sent-not-received gap flagged right away.",
         "tool_words": []
       },
       "ask_first": "Who decides how much each branch receives from the commissary?",
@@ -183,8 +183,8 @@
           "app"
         ]
       },
-      "ask_first": "Which app's payout confuses you most?",
-      "free_stops": "Which apps connect and how the reconciliation rules work goes in the solution document.",
+      "ask_first": "Which partner's payout confuses you most?",
+      "free_stops": "Which ordering channels connect and how the reconciliation rules work goes in the solution document.",
       "extra_ideas": [
         {
           "text": "Compare packed delivery orders with payout lines from one busy day, so you can see whether the mismatch starts in orders or settlements.",
@@ -213,7 +213,7 @@
         "text": "a rider log of trips, areas, delivery times and fuel claims by rider label, summarised daily per branch.",
         "tool_words": []
       },
-      "ask_first": "Are riders your own, the app's, or both?",
+      "ask_first": "Are riders your own, the partner's, or both?",
       "free_stops": "The allowance rules and how trips are checked against claims stay for the solution document.",
       "extra_ideas": [
         {
@@ -240,7 +240,7 @@
         "keys": [
           "booking_scheduling"
         ],
-        "text": "crew rota and clock-in on phone, with overtime summarised automatically per branch for approval.",
+        "text": "crew rota and clock-in on phone, with overtime summarised per branch for quick approval.",
         "tool_words": []
       },
       "ask_first": "Which shift is hardest to staff?",
@@ -301,7 +301,7 @@
           "attribution_codes",
           "loyalty_repeat"
         ],
-        "text": "codes showing which channel brought each order, an LTO tracker measured automatically, and phone-number loyalty for opted-in customers.",
+        "text": "codes showing which channel brought each order, an LTO tracker updated live, and phone-number loyalty for opted-in customers.",
         "tool_words": []
       },
       "ask_first": "How do you judge whether a deal or LTO worked today?",

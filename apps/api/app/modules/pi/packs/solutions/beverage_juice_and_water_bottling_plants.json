@@ -138,7 +138,7 @@
         "keys": [
           "customer_messaging"
         ],
-        "text": "subscription schedules for home and office customers with pause and stop handling and automatic bottle-return reminders.",
+        "text": "subscription schedules for home and office customers with pause and stop handling and bottle-return reminders sent to them.",
         "tool_words": []
       },
       "ask_first": "Do you track dispensers placed with customers?",

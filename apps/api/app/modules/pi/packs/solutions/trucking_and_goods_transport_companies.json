@@ -49,7 +49,7 @@
           "field_checks",
           "dashboards_reports"
         ],
-        "text": "A fuel log comparing litres issued with distance per truck, flagging unusual consumption automatically.",
+        "text": "A fuel log comparing litres issued with distance per truck, sending you a notice whenever consumption is unusual.",
         "tool_words": []
       },
       "ask_first": "Is the extra diesel on long highway trips, or on short local runs?",
@@ -79,7 +79,7 @@
         "keys": [
           "customer_messaging"
         ],
-        "text": "Trip updates to customers on WhatsApp from tracker locations, sent automatically.",
+        "text": "Trip updates sent to customers on WhatsApp using tracker locations as the truck moves.",
         "tool_words": []
       },
       "ask_first": "Do customers call mostly during the trip, or after the expected arrival time has passed?",
@@ -320,7 +320,7 @@
         "keys": [
           "custom_build"
         ],
-        "text": "Attached-vehicle owner statements showing trips, freight and share, produced automatically each month.",
+        "text": "Attached-vehicle owner statements showing trips, freight and share, sent to owners each month.",
         "tool_words": []
       },
       "ask_first": "Do owners argue over the freight amount of trips, or over the deductions for fuel and repairs?",
@@ -346,7 +346,7 @@
   ],
   "sample_reply": {
     "person": "Mere truck Karachi se Lahore bhare jaate hain lekin wapsi pe zyada tar khali aate hain. Is ka koi hal batao.",
-    "pi": "Haan, is par kaam ho sakta hai, aur is ke liye bade kharch ki zaroorat nahi.\nPehle, har truck kab Lahore mein free hoga, yeh pehle se likh lein, taake wapsi ka load waqt par dhoonda ja sake.\nDoosra, lahore aur aas paas ke un customers ki list banayein jo Karachi ki taraf maal bhejte hain, taake pata ho kis se baat karni hai.\nWorkzap ye tarteeb de sakta hai: wapas aane wale trucks roz pending bookings se apne aap match hon.\n\nKya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "pi": "Haan, is par kaam ho sakta hai, aur is ke liye bade kharch ki zaroorat nahi.\nPehle, har truck kab Lahore mein free hoga, yeh pehle se likh lein, taake wapsi ka load waqt par dhoonda ja sake.\nDoosra, lahore aur aas paas ke un customers ki list banayein jo Karachi ki taraf maal bhejte hain, taake pata ho kis se baat karni hai.\nWorkzap ye tarteeb de sakta hai: wapas aane wale trucks roz pending bookings se match ho jayein.\n\nKya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
     "language": "roman_urdu"
   }
 }

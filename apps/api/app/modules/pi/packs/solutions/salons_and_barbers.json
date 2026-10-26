@@ -18,7 +18,7 @@
         "keys": [
           "booking_scheduling"
         ],
-        "text": "an appointment book per stylist with WhatsApp booking, automatic reminders and clash blocking.",
+        "text": "an appointment book per stylist with WhatsApp booking, reminder messages to clients, and clash blocking.",
         "tool_words": []
       },
       "ask_first": "How many stylists or chairs do you have?",
@@ -48,7 +48,7 @@
         "keys": [
           "booking_scheduling"
         ],
-        "text": "automatic reminders and no-show tracking per client, with freed slots offered to the waitlist.",
+        "text": "reminder messages and missed visit tracking per client, with freed slots offered to waiting customers.",
         "tool_words": []
       },
       "ask_first": "Do you take advances for any services?",
@@ -78,7 +78,7 @@
         "keys": [
           "dashboards_reports"
         ],
-        "text": "daily sales by stylist with automatic monthly commission statements.",
+        "text": "daily sales by stylist with monthly commission statements delivered to staff.",
         "tool_words": [],
         "leads_with_view": true
       },

@@ -230,7 +230,7 @@
         "keys": [
           "workflow_automation"
         ],
-        "text": "A purchase request flow from site to office with limits, phone approvals and a purchase order created automatically.",
+        "text": "A purchase request flow from site to office with limits, phone approvals and a purchase order created straight away.",
         "tool_words": []
       },
       "ask_first": "Who approves purchases from site today?",
@@ -267,7 +267,7 @@
         ]
       },
       "ask_first": "What do you wish you could see without calling site?",
-      "free_stops": "The report fields and dashboard design are in the solution document.",
+      "free_stops": "The report fields and report screen design are in the solution document.",
       "extra_ideas": [
         {
           "text": "Compare how many daily voice updates arrived from each site this week, so silent sites and late reporting stand out.",
@@ -327,7 +327,7 @@
         "tool_words": []
       },
       "ask_first": "How do you compare actual spend to plan today?",
-      "free_stops": "Cost allocation rules and module order are in the solution document.",
+      "free_stops": "Cost allocation rules and setup order are in the solution document.",
       "extra_ideas": [
         {
           "text": "Compare one finished project's final bill total with all supplier, labour and rent outflows noted in your file, so margin guesswork drops.",

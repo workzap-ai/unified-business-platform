@@ -170,7 +170,7 @@
         "keys": [
           "credit_ledger"
         ],
-        "text": "a distributor ledger with ageing, approved returns and automatic reminders.",
+        "text": "a distributor ledger with ageing, approved returns and reminders sent when payment is due.",
         "tool_words": []
       },
       "ask_first": "Which distributors are slowest to pay?",

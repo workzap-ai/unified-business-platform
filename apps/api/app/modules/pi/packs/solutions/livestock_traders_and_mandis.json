@@ -18,7 +18,7 @@
         "keys": [
           "cash_reconciliation"
         ],
-        "text": "cash and transfers logged per helper as they happen, with an automatic end-of-night handover record.",
+        "text": "cash and transfers logged per helper as they happen, with an end-of-night handover record created for the owner.",
         "tool_words": []
       },
       "ask_first": "Roughly how much comes in cash compared with transfers?",
@@ -48,7 +48,7 @@
         "keys": [
           "order_capture"
         ],
-        "text": "cash_reconciliation — a helper sales log linking each sale to a helper, animal and payment, with the nightly count checked automatically.",
+        "text": "cash_reconciliation — a helper sales log linking each sale to a helper, animal and payment, checking the nightly count at close.",
         "tool_words": []
       },
       "ask_first": "How many helpers take payments at peak?",
@@ -108,7 +108,7 @@
         "keys": [
           "booking_scheduling"
         ],
-        "text": "customer_messaging — bookings with agreed price and due date, and automatic WhatsApp reminders to buyers who agreed to receive them.",
+        "text": "customer_messaging — bookings with agreed price and due date, sending WhatsApp reminders to buyers who agreed to receive them.",
         "tool_words": []
       },
       "ask_first": "Is the agreed price written anywhere when the bayana is taken?",
@@ -168,7 +168,7 @@
         "keys": [
           "job_tracking"
         ],
-        "text": "customer_messaging — a collective-qurbani share manager that stops double shares and sends each customer a meat-ready message automatically.",
+        "text": "customer_messaging — a collective-qurbani share manager that stops double shares and sends each customer a meat-ready message.",
         "tool_words": []
       },
       "ask_first": "How do customers find out their meat is ready now?",
@@ -228,7 +228,7 @@
         "keys": [
           "dashboards_reports"
         ],
-        "text": "a per-animal and per-season margin view that updates automatically as purchases, costs and sales are entered.",
+        "text": "a per-animal and per-season margin view that updates as purchases, costs and sales are entered.",
         "tool_words": [],
         "leads_with_view": true
       },
@@ -259,7 +259,7 @@
         "keys": [
           "nori_daily_read"
         ],
-        "text": "a daily read of animals bought, reserved, sold and left, compared automatically with the same day last Eid.",
+        "text": "a daily read of animals bought, reserved, sold and left, compared with the same day last Eid.",
         "tool_words": [],
         "leads_with_view": true
       },
@@ -290,7 +290,7 @@
         "keys": [
           "customer_messaging"
         ],
-        "text": "a consent-based buyer list that messages past buyers automatically when new animals arrive before next Eid.",
+        "text": "a consent-based buyer list that messages past buyers when new animals arrive before next Eid.",
         "tool_words": []
       },
       "ask_first": "Do most buyers come back to you each year?",
