@@ -1926,6 +1926,8 @@ def ideas_opener(context: dict[str, Any]) -> str:
     said = str(context.get("latest_customer_message") or "")
     if said and not solution_ask.asked_for_ideas(said):
         return ""
+    if solution_ask.impatient(said):
+        return "Sorry about the wait." + chr(10)  # Book 4 G27: "Maazrat", then the ideas
     return "Sure." + chr(10)
 
 

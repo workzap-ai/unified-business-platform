@@ -242,3 +242,19 @@ def already_offers(reply: str) -> bool:
     """The reply already ends by asking whether to prepare the solution document and quote (a
     model sometimes writes the offer itself): the application must not add its own on top."""
     return bool(OFFERS_DOCUMENT.search((reply or "").rstrip()))
+
+
+# An owner losing patience ("kab se pooch raha hoon", "jaldi", "time nahi hai", "already asked"):
+# the reply starts with a short apology and gives the ideas, with no question before them
+# (platform spec Book 4, G27).
+IMPATIENT = re.compile(
+    r"\bk[au]b s(?:e|ay) (?:pooch|puch)\w*\b|\bpooch\w* (?:raha|rha|rahi) (?:hoon|hun|hu|hoan)\b|\bjaldi\b"
+    r"|\btime nahi (?:hai|he)\b|\bsawal hi\b|\bkitne sawal\b|\bitne sawal\b|\bbar bar\b"
+    r"|\b(?:i have|i've|already) (?:been )?ask(?:ed|ing)\b|\bhow many times\b|\bfor the (?:third|fourth|fifth) time\b"
+    r"|\bstop asking\b|\bjust (?:tell|give) me\b|\bseedha batao\b|\bcome on\b",
+    re.IGNORECASE,
+)
+
+
+def impatient(said: str) -> bool:
+    return bool(IMPATIENT.search(said or ""))

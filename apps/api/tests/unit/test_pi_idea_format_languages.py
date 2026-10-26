@@ -528,3 +528,26 @@ def test_other_languages_ask_for_ideas(text: str) -> None:
 )
 def test_a_story_or_a_greeting_in_another_language_is_not_an_ask(text: str) -> None:
     assert not solution_ask.asked_for_ideas(text)
+
+
+@pytest.mark.parametrize(
+    "text",
+    [
+        "sub ok hai solution bataye kub say pooch raha hoan?",
+        "kab se pooch raha hoon, jaldi solution dain",
+        "I have asked three times, just give me a solution",
+        "seedha batao, time nahi hai",
+    ],
+)
+def test_an_impatient_ask_gets_a_short_apology_before_the_ideas(text: str) -> None:
+    from app.modules.pi.service_conversation import ideas_opener
+
+    assert solution_ask.impatient(text)
+    assert ideas_opener({"latest_customer_message": text}).startswith("Sorry")
+
+
+def test_a_calm_ask_gets_sure_not_an_apology() -> None:
+    from app.modules.pi.service_conversation import ideas_opener
+
+    assert ideas_opener({"latest_customer_message": "Solution dain"}) == "Sure.\n"
+    assert not solution_ask.impatient("Solution dain")
