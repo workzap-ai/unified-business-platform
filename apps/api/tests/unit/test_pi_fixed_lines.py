@@ -93,3 +93,35 @@ def test_the_card_and_id_reminders_follow_the_language(lang: str) -> None:
 def test_the_other_reminders_are_unchanged() -> None:
     text, _ = safety.pii_notice([safety.Pii.SECRET], [], "en", "fr")
     assert text == safety.PII_TEXT["en"][safety.Pii.SECRET]
+
+
+GENDERED = {
+    "hi": re.compile(r"सकता|सकती|रहा |रही |गया |गयी |गई "),
+    "ur": re.compile(r"سکتا|سکتی|رہا |رہی |گیا |گئی "),
+}
+WRONG_QUOTE = {"hi": re.compile(r"कोट(?!ेशन)"), "ur": re.compile(r"کوٹ(?!یشن)")}
+
+
+def every_line(lang: str) -> list[str]:
+    lines = [table[lang] for table in fixed_lines.LINES.values()]
+    return lines + list(fixed_lines.EMERGENCY.get(lang, {}).values())
+
+
+@pytest.mark.parametrize("lang", ["hi", "ur"])
+def test_no_hindi_or_urdu_fixed_line_has_a_gendered_first_person_form(lang: str) -> None:
+    """R-GEN-01: pi has no gender, so no 'main ... sakta/sakti' style verb."""
+    for text in every_line(lang):
+        assert not GENDERED[lang].search(text), text
+
+
+@pytest.mark.parametrize("lang", ["hi", "ur"])
+def test_a_quote_is_a_quotation_not_a_coat(lang: str) -> None:
+    for text in every_line(lang):
+        assert not WRONG_QUOTE[lang].search(text), text
+
+
+@pytest.mark.parametrize("lang", ["fr", "es"])
+def test_no_french_or_spanish_line_is_gendered_by_agreement(lang: str) -> None:
+    said = re.compile(r"\b(?:je suis|j'ai été|soy|estoy)\s+(?!pi\b|une\b|un\b|una\b)\w+", re.I)
+    for text in every_line(lang):
+        assert not said.search(text), text

@@ -38,9 +38,9 @@ LINES: dict[str, dict[str, str]] = {
     "offer": {
         "en": "Shall I get a solution document and a quote made for you? You can say no.",
         "roman_ur": "Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
-        "ur": "کیا میں آپ کے لیے حل کی دستاویز اور کوٹ بنوا دوں؟ آپ منع بھی کر سکتے ہیں۔",
+        "ur": "کیا میں آپ کے لیے حل کی دستاویز اور کوٹیشن بنوا دوں؟ آپ منع بھی کر سکتے ہیں۔",
         "ar": "هل أجهّز لك وثيقة حل وعرض سعر؟ يمكنك أن تقول لا.",
-        "hi": "क्या मैं आपके लिए एक समाधान दस्तावेज़ और कोट बनवा दूँ? आप मना भी कर सकते हैं।",
+        "hi": "क्या मैं आपके लिए एक समाधान दस्तावेज़ और कोटेशन बनवा दूँ? आप मना भी कर सकते हैं।",
         "fr": "Souhaitez-vous que je fasse préparer un document de solution et un devis ? Vous pouvez dire non.",
         "fa": "آیا مایلید یک سند راه‌حل و یک پیش‌فاکتور برایتان آماده کنم؟ می‌توانید نه بگویید.",
         "es": "¿Quiere que le prepare un documento de solución y un presupuesto? Puede decir que no.",
@@ -68,9 +68,9 @@ LINES: dict[str, dict[str, str]] = {
     "cost": {
         "en": "The cost depends on what would be built. It is written on the quote before you decide, and the quote is free, not a charge.",
         "roman_ur": "Kharcha is par depend karta hai ke kya banaya jaye. Woh quote par likha hota hai, aap ke faisle se pehle, aur quote muft hai, koi charge nahi.",
-        "ur": "لاگت اس پر منحصر ہے کہ کیا بنایا جائے۔ وہ آپ کے فیصلے سے پہلے کوٹ پر لکھی ہوتی ہے، اور کوٹ مفت ہے، کوئی چارج نہیں۔",
+        "ur": "لاگت اس پر منحصر ہے کہ کیا بنایا جائے۔ وہ آپ کے فیصلے سے پہلے کوٹیشن پر لکھی ہوتی ہے، اور کوٹیشن مفت ہے، کوئی چارج نہیں۔",
         "ar": "تعتمد التكلفة على ما سيتم بناؤه. تُكتب في عرض السعر قبل أن تقرر، وعرض السعر مجاني وليس رسمًا.",
-        "hi": "लागत इस पर निर्भर करती है कि क्या बनाया जाएगा। वह आपके फ़ैसले से पहले कोट पर लिखी होती है, और कोट मुफ़्त है, कोई शुल्क नहीं।",
+        "hi": "लागत इस पर निर्भर करती है कि क्या बनाया जाएगा। वह आपके फ़ैसले से पहले कोटेशन पर लिखी होती है, और कोटेशन मुफ़्त है, कोई शुल्क नहीं।",
         "fr": "Le coût dépend de ce qui serait construit. Il est écrit sur le devis avant que vous décidiez, et le devis est gratuit, ce n'est pas un paiement.",
         "fa": "هزینه به این بستگی دارد که چه چیزی ساخته شود. پیش از تصمیم شما روی پیش‌فاکتور نوشته می‌شود و پیش‌فاکتور رایگان است، نه یک هزینه.",
         "es": "El coste depende de lo que se construiría. Está escrito en el presupuesto antes de que usted decida, y el presupuesto es gratis, no es un cobro.",
@@ -82,16 +82,16 @@ LINES: dict[str, dict[str, str]] = {
 # older lines (English, then the translation step) until the owner has seen a wording for them.
 EMERGENCY: dict[str, dict[str, str]] = {
     "ur": {
-        "fire": "میں ہنگامی صورتحال میں مدد نہیں کر سکتا۔ براہِ مہربانی ابھی {fire} پر کال کریں۔",
-        "medical": "میں ہنگامی صورتحال میں مدد نہیں کر سکتا۔ براہِ مہربانی ایمبولینس کے لیے ابھی {ambulance} پر کال کریں۔",
-        "violence": "میں ہنگامی صورتحال میں مدد نہیں کر سکتا۔ براہِ مہربانی ابھی {police} پر کال کریں اور محفوظ جگہ پر چلے جائیں۔",
-        "generic": "میں ہنگامی صورتحال میں مدد نہیں کر سکتا۔ براہِ مہربانی ابھی {police} پر کال کریں۔",
+        "fire": "ہنگامی صورتحال میں مدد کرنا میرے بس میں نہیں۔ براہِ مہربانی ابھی {fire} پر کال کریں۔",
+        "medical": "ہنگامی صورتحال میں مدد کرنا میرے بس میں نہیں۔ براہِ مہربانی ایمبولینس کے لیے ابھی {ambulance} پر کال کریں۔",
+        "violence": "ہنگامی صورتحال میں مدد کرنا میرے بس میں نہیں۔ براہِ مہربانی ابھی {police} پر کال کریں اور محفوظ جگہ پر چلے جائیں۔",
+        "generic": "ہنگامی صورتحال میں مدد کرنا میرے بس میں نہیں۔ براہِ مہربانی ابھی {police} پر کال کریں۔",
     },
     "hi": {
-        "fire": "मैं आपात स्थिति में मदद नहीं कर सकता। कृपया अभी {fire} पर कॉल करें।",
-        "medical": "मैं आपात स्थिति में मदद नहीं कर सकता। कृपया एम्बुलेंस के लिए अभी {ambulance} पर कॉल करें।",
-        "violence": "मैं आपात स्थिति में मदद नहीं कर सकता। कृपया अभी {police} पर कॉल करें और सुरक्षित जगह पर चले जाएँ।",
-        "generic": "मैं आपात स्थिति में मदद नहीं कर सकता। कृपया अभी {police} पर कॉल करें।",
+        "fire": "आपात स्थिति में मदद करना मेरे बस में नहीं है। कृपया अभी {fire} पर कॉल करें।",
+        "medical": "आपात स्थिति में मदद करना मेरे बस में नहीं है। कृपया एम्बुलेंस के लिए अभी {ambulance} पर कॉल करें।",
+        "violence": "आपात स्थिति में मदद करना मेरे बस में नहीं है। कृपया अभी {police} पर कॉल करें और सुरक्षित जगह पर चले जाएँ।",
+        "generic": "आपात स्थिति में मदद करना मेरे बस में नहीं है। कृपया अभी {police} पर कॉल करें।",
     },
     "fr": {
         "fire": "Je ne peux pas aider en cas d'urgence. Veuillez appeler {fire} maintenant.",
