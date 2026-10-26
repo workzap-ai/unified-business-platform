@@ -6,16 +6,16 @@ Statuses: **DONE** code and a test that fails if the rule breaks. **PARTIAL** co
 
 ## Counts
 
-index counts: DONE 403, PARTIAL 42, CODE-ONLY 0, PROMPT-ONLY 10, HUMAN 18, MISSING 1
+index counts: DONE 404, PARTIAL 42, CODE-ONLY 0, PROMPT-ONLY 10, HUMAN 18, MISSING 1
 
 | PDF | Rules | DONE | PARTIAL | CODE-ONLY | PROMPT-ONLY | HUMAN | MISSING |
 |---|---|---|---|---|---|---|---|
 | pi-brain-v3 (Brain) | 364 | 312 | 27 | 0 | 10 | 15 | 0 |
 | pi-industry-solutions (Addendum 2) | 81 | 69 | 8 | 0 | 0 | 3 | 1 |
-| pi-platform-spec (Platform: Book 4, Part A, Book 2 amendments) | 29 | 22 | 7 | 0 | 0 | 0 | 0 |
-| Both | 474 | 403 | 42 | 0 | 10 | 18 | 1 |
+| pi-platform-spec (Platform: Book 4, Part A, Book 2 amendments) | 30 | 23 | 7 | 0 | 0 | 0 | 0 |
+| Both | 475 | 404 | 42 | 0 | 10 | 18 | 1 |
 
-25 of the 403 DONE rules are exercised only by integration tests (they need the disposable Postgres on port 55432); the rest have a unit test that runs with no database. The index lists each test, so `rule_index.json` shows which. Every identifier family the PDFs define is in the index: R-xxx-nn (155 ids), RT1-29, G1-15, L1-14, E1-9, M1-10, A1-8, X1-5, SL-1..10, VAL-1..6, Job 1-10, Job S1-S8, rubric 1-20 (RUB-n), Appendix D (App.D-n). SPEC-x.y rows are numbered sections of the Brain that have requirements but no rule id; A2-x rows are the same for Addendum 2. The per-industry text of Part 7 and Part 4 is data, covered by SPEC-7.0 and A2-4-DATA.
+25 of the 404 DONE rules are exercised only by integration tests (they need the disposable Postgres on port 55432); the rest have a unit test that runs with no database. The index lists each test, so `rule_index.json` shows which. Every identifier family the PDFs define is in the index: R-xxx-nn (155 ids), RT1-29, G1-15, L1-14, E1-9, M1-10, A1-8, X1-5, SL-1..10, VAL-1..6, Job 1-10, Job S1-S8, rubric 1-20 (RUB-n), Appendix D (App.D-n). SPEC-x.y rows are numbered sections of the Brain that have requirements but no rule id; A2-x rows are the same for Addendum 2. The per-industry text of Part 7 and Part 4 is data, covered by SPEC-7.0 and A2-4-DATA.
 
 ## Everything that is not DONE
 
@@ -59,7 +59,7 @@ Who: a lane of work, not a person. Linter hardening session = `constitution.py` 
 | `8.13` | Brain 429 | PARTIAL | Learning metrics on the dashboard: reward, first-time confirmation, questions per problem,...: Reward, confusion, correction, opt-out, first-time confirmation, repeat-question, complaint and rule-break rates (and reward by language) are reported. Questions per noted problem, share of situations with a proven best question, lexicon coverage and time-to-use are not. | learning session |
 | `9.10` | Brain 433 | PARTIAL | Every default number is a config value inside the spec's tested range; numbers that touch a...: Two defaults differ from the spec table: debounce is 5 s (spec 10 s, range 5-20; lowered on purpose on 2026-10-24 for latency) and the link-suggestion threshold is 60% with range 50-85 (spec 75%, range 60-90; pinned by test_the_threshold_starts_at_sixty_and_stays_inside_its_range). The low-confidence threshold (0.6) and the severity weights are fixed constants, not tunable. | Workzap owner (confirm or restore the two defaults) |
 | `A2-FIX-2` | Add.2 14 | PARTIAL | Part 4 data: a view build leads at most one problem in four per industry: About 10 industries stay over the cap because no action key exists among the keys the document lists for those problems; the builder reports them and invents nothing. | solutions session (needs a person to choose builds) |
-| `A2-2.1` | Add.2 15 | PARTIAL | Retrieval order: the industry's own solutions, overlays, sector neighbours, the generic...: Steps 1 and 5 (the industry's entries as learned, and the learned idea bank) are used. Steps 2 to 4 (overlays, sector neighbours, the generic Addendum 1 library) are not: the library is not in the repository. | solutions session (needs Addendum 1) |
+| `A2-2.1` | Add.2 15 | PARTIAL | Retrieval order: Steps 1, 4 and 5 are used: the industry's entries as learned, the generic library when no industry entry has an idea, and the learned idea bank. Steps 2 and 3 (overlays and sector neighbours) are not. The library is not the spec's verbatim text: owner_rewrites.json records that the owner approved rewriting its quick ideas on 2026-10-26. | solutions session |
 | `A2-2.4-SECTOR` | Add.2 16 | PARTIAL | One test runs every sample reply through the value-line check and it now asserts none fail; there is no per-sector test that passes a sample through the live pipeline (it needs the model). | solutions session |
 | `A2-3.3` | Add.2 19 | PARTIAL | Instant: a solution memory per business; never repeat an idea; swap kind on rejection; learn...: Memory, no-repeat, kind swap and return continuity are built. Learning the owner's taste (practical steps versus 'this will show you the numbers') and leaning that way in their style profile is not. | learning session |
 | `Job S3` | Add.2 20 | PARTIAL | Find new ideas from owners, Workzap's documents, the miner model and neighbouring...: An owner's idea enters only when a reviewer submits it through the route; nothing extracts an idea from an owner's own chat message automatically (spec: extracted, redacted, generalised). | learning session |
