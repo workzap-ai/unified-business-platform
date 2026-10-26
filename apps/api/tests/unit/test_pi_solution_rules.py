@@ -150,7 +150,8 @@ def test_almost_every_seed_idea_passes_the_guard_and_the_rest_wait_for_a_person(
             for idea in problem["quick_ideas"]:
                 total += 1
                 failed += not solution_rules.check_idea(idea).ok
-    assert total == 4206 and failed / total < 0.02
+    # 4,206 from the PDF and 2 from the owner-added fashion entry (solutions_overlay)
+    assert total == 4208 and failed / total < 0.02
 
 
 def test_the_linter_checks_a_reply_that_carried_free_ideas():

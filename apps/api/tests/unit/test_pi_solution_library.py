@@ -121,3 +121,49 @@ def test_the_overlay_names_the_deviation_from_the_spec() -> None:
         (Path(solution_library.LIBRARY).parent / "owner_rewrites.json").read_text(encoding="utf-8")
     )
     assert "not verbatim" in data["note"] and len(data["rewrites"]) == 51
+
+
+def test_the_owner_added_fashion_entry_is_loaded_and_is_not_in_the_pdf_pack() -> None:
+    import json
+
+    from app.modules.pi import solution_ideas, solutions
+
+    pack = solutions.SOLUTIONS_DIR / "fashion_and_apparel_brands.json"
+    from_pdf = {p["id"] for p in json.loads(pack.read_text(encoding="utf-8"))["problems"]}
+    assert "x1_price_asked_then_silence" not in from_pdf  # a rebuild of the packs cannot erase it
+    loaded = {p["id"]: p for p in solutions.load("fashion_and_apparel_brands")["problems"]}  # type: ignore[index]
+    entry = loaded["x1_price_asked_then_silence"]
+    overlay = json.loads(
+        (solutions.OVERLAY_DIR / "fashion_and_apparel_brands.json").read_text(encoding="utf-8")
+    )
+    assert "NOT from the PDF" in overlay["note"]
+    found = solution_ideas.match_problem(
+        list(loaded.values()),
+        "sales_revenue",
+        "conversion_low",
+        "roz 30-40 log price poochte hain DM mein, price bata deta hoon to reply hi nahi aata",
+    )
+    assert found is not None and found["id"] == entry["id"]
+
+
+def test_every_idea_of_the_owner_added_entry_passes_the_guard_and_is_an_owner_action() -> None:
+    from app.modules.pi import solution_rules, solutions
+
+    entry = {p["id"]: p for p in solutions.load("fashion_and_apparel_brands")["problems"]}[  # type: ignore[index]
+        "x1_price_asked_then_silence"
+    ]
+    ideas = [*entry["quick_ideas"], *[e["text"] for e in entry["extra_ideas"]]]
+    assert len(ideas) == 4
+    for idea in ideas:
+        verdict = solution_rules.check_idea(idea)
+        assert not verdict.reject and not verdict.review, idea
+        assert solution_rules.is_owner_action(idea), idea
+
+
+def test_a_free_idea_may_talk_about_a_price_but_not_set_one() -> None:
+    from app.modules.pi import solution_free
+
+    talk = "Send a clear photo and the size chart with the price, so they need not ask again."
+    setting = "Lower your prices a little on slow items, so they sell."
+    assert solution_free.vetted([talk], "price asked in DM", []) == [talk]
+    assert solution_free.vetted([setting], "price asked in DM", []) == []

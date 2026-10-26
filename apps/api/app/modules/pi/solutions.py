@@ -18,6 +18,7 @@ from pathlib import Path
 from typing import Any
 
 SOLUTIONS_DIR = Path(__file__).parent / "packs" / "solutions"
+OVERLAY_DIR = Path(__file__).parent / "packs" / "solutions_overlay"
 
 # The build catalogue (Addendum 1 Part 7.2 is not in the repository, so it is taken from the phrase
 # bank in Addendum 2 Part 1.9, which names every build Part 4 may use). Each build is said as what
@@ -220,7 +221,14 @@ def load(industry_key: str) -> dict[str, Any] | None:
     path = SOLUTIONS_DIR / f"{industry_key}.json"
     if not re.fullmatch(r"[a-z0-9_]+", industry_key or "") or not path.exists():
         return None
-    return json.loads(path.read_text(encoding="utf-8"))  # type: ignore[no-any-return]
+    data: dict[str, Any] = json.loads(path.read_text(encoding="utf-8"))
+    extra = OVERLAY_DIR / f"{industry_key}.json"
+    if extra.exists():  # owner-added problems (not from the PDF), merged so a rebuild keeps them
+        added = json.loads(extra.read_text(encoding="utf-8")).get("problems") or []
+        have = list(data.get("problems") or [])
+        known = {str(p.get("id")) for p in have}
+        data = {**data, "problems": [*have, *[p for p in added if p["id"] not in known]]}
+    return data
 
 
 @lru_cache(maxsize=1)

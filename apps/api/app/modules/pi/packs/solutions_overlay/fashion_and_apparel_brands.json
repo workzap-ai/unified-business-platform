@@ -1,0 +1,35 @@
+{
+ "note": "Owner-added entry, NOT from the PDF. On 2026-10-26 the owner asked for a fashion problem that the Addendum 2 pack lacks: people ask the price in DM, then go quiet. Ideas 1 and 2 are the owner's own words (idea 2 with the time word taken out). This file is merged by solutions.load(), so a rebuild of the packs from the PDF (scripts/build_industry_solutions.py) cannot erase it.",
+ "problems": [
+  {
+   "id": "x1_price_asked_then_silence",
+   "n": 11,
+   "words": "Many people ask the price in DM every day and after I tell the price there is no reply. Roz bohat log DM mein price poochte hain, price batane ke baad reply nahi aata",
+   "category": "sales_revenue",
+   "subtype": "conversion_low",
+   "quick_ideas": [
+    "Send a clear photo, the size chart and a line about delivery together with the rate, so they need not ask again.",
+    "Message the people who asked the rate and went quiet with a short note on the most liked pair, so the talk starts again."
+   ],
+   "workzap_build": {
+    "keys": [
+     "customer_messaging"
+    ],
+    "text": "a reply with photo, size chart and delivery in one message, plus a gentle follow-up for people who went quiet and agreed to hear from you.",
+    "tool_words": []
+   },
+   "ask_first": "Do they go quiet right after you tell the price?",
+   "free_stops": "How the reply and the follow-up are set up is in the solution document.",
+   "extra_ideas": [
+    {
+     "text": "Add one line saying what the rate includes, so people do not leave over a number alone.",
+     "review": false
+    },
+    {
+     "text": "Look at the enquiries that did turn into orders and copy what those replies had in common, so the next reply starts from what worked.",
+     "review": false
+    }
+   ]
+  }
+ ]
+}

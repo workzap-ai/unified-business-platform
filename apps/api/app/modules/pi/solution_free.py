@@ -96,6 +96,24 @@ def uses_a_fact(idea: str, facts: set[str]) -> bool:
     return not facts or bool(fact_words(idea) & facts)
 
 
+PRICE_WORD = re.compile(r"\bprices?\b|\bpricing\b", re.IGNORECASE)
+PRICE_SETTING = re.compile(
+    r"\b(?:set|raise|lower|cut|reduce|increase|change|fix|decide|charge|drop)\s+(?:your\s+|the\s+)?"
+    r"(?:prices?|pricing)\b|\bpricing\b|\bwhat\s+price\b",
+    re.IGNORECASE,
+)
+
+
+def only_price_talk(idea: str) -> bool:
+    """The idea was held for review only because it says "price" (send the price with a photo, share a
+    menu with prices): talking about a price is not advice on what price to charge. Any other money
+    or regulated word, or advice to set, change or decide a price, still waits for a person."""
+    if PRICE_SETTING.search(idea):
+        return False
+    rest = PRICE_WORD.sub("", idea)
+    return bool(solution_rules.check_idea(rest).review == []) and bool(PRICE_WORD.search(idea))
+
+
 def vetted(
     ideas: list[str], said: str, never_say: list[str], facts: set[str] | None = None
 ) -> list[str]:
@@ -103,7 +121,7 @@ def vetted(
     kept: list[str] = []
     for idea in ideas:
         verdict = solution_rules.check_idea(idea, said)
-        if verdict.reject or verdict.review:
+        if verdict.reject or (verdict.review and not only_price_talk(idea)):
             continue  # a person decides about money or a regulated topic: never served unreviewed
         if never_say and solution_rules.never_say_hit(idea, never_say):
             continue
