@@ -452,3 +452,34 @@ def test_the_word_real_does_not_name_the_real_estate_trade() -> None:
 
     found = industry_packs.detect(["After cleaning, weight drops and I don't know my real cost"])
     assert found.primary != "real_estate_agencies_and_brokers"
+
+
+def _honest(reply: str, context: dict | None = None) -> list[str]:
+    from app.modules.pi import constitution
+
+    ctx = {
+        "pi_mode": "brain",
+        "flow": {"state": "S5_READINESS"},
+        "history": [{"role": "ai", "text": "Hi"}],
+    }
+    ctx.update(context or {})
+    return [v.rule for v in constitution.lint(reply, ctx) if v.rule == "R-HONEST-01"]
+
+
+def test_a_time_in_advice_to_the_owner_is_not_a_timeline_claim() -> None:
+    assert not _honest(
+        "Sure.\nFirst, count the unpaid slips from this week, so you see the real size."
+    )
+    assert not _honest(
+        "Doosra, ek hafte tak har ghar ka udhaar alag likhein, taake hisaab saaf ho."
+    )
+    ideas = {
+        "solution_ideas": ["Write every order in one notebook for this week, so none is missed."]
+    }
+    assert not _honest("Write every order in one notebook for this week, so none is missed.", ideas)
+
+
+def test_a_time_claim_about_workzap_or_the_document_is_still_refused() -> None:
+    assert _honest("Workzap will have the document ready within 3 days.")
+    assert _honest("Your quote will be prepared by tomorrow.")
+    assert _honest("We can build this in two weeks.")

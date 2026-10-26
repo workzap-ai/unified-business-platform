@@ -993,11 +993,36 @@ def _approved_text(context: dict[str, Any]) -> str:
     return str(raw).lower()
 
 
+IDEA_OPENER = re.compile(r"^\W*(?:first|second|pehle|doosra|dusra)\s*,", re.IGNORECASE)
+WORKZAP_CLAIM = re.compile(
+    r"\b(?:workzap|document|quote|price|cost|we|our|hum|hamari|hamara|team|prepared?|deliver\w*)\b",
+    re.IGNORECASE,
+)
+
+
+def _owner_advice(low: str, context: dict[str, Any]) -> bool:
+    """An idea sentence that tells the owner what to do ("count the slips this week", "ek hafte
+    tak likhein") names a time for the owner's own action, not a date or duration Workzap or pi
+    promises. A sentence about Workzap, the document, the quote or a price is never advice."""
+    if WORKZAP_CLAIM.search(low):
+        return False
+    if IDEA_OPENER.match(low):
+        return True
+    ideas = [str(i).lower() for i in context.get("solution_ideas") or []]
+    words = set(re.findall(r"\w{3,}", low))
+    return any(
+        words and len(words & set(re.findall(r"\w{3,}", idea))) / len(words) >= 0.75
+        for idea in ideas
+    )
+
+
 def _honesty(reply: str, context: dict[str, Any], heard: str, add: Any) -> None:
     approved = _approved_text(context)
     said_pairs = _time_pairs(heard)
     for sentence in _statements(reply):
         low = sentence.lower()
+        if _owner_advice(low, context):
+            continue
         hit = None
         for m in TIMELINE_STRONG.finditer(low):
             text = m.group(0)
