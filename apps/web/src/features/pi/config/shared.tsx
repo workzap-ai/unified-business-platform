@@ -57,6 +57,7 @@ export const PROVIDER_LABELS: Record<ProviderName, string> = {
   openai: "OpenAI",
   gemini: "Gemini",
   groq: "Groq",
+  anthropic: "Claude",
 };
 
 export const MODEL_ALIASES: {

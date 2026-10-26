@@ -36,6 +36,7 @@ export const ProviderNameSchema: z.ZodType<Pi.ProviderName> = z.union([
   z.literal("openai"),
   z.literal("gemini"),
   z.literal("groq"),
+  z.literal("anthropic"),
 ]);
 export const RunStepSchema: z.ZodType<Pi.RunStep> = z.union([
   z.literal("router"),
@@ -613,7 +614,12 @@ export const KnowledgeDocumentSchema: z.ZodType<Pi.KnowledgeDocument> =
     body: z.union([z.undefined(), z.string()]).optional(),
   });
 export const ProviderHealthSchema: z.ZodType<Pi.ProviderHealth> = z.object({
-  name: z.union([z.literal("openai"), z.literal("gemini"), z.literal("groq")]),
+  name: z.union([
+    z.literal("openai"),
+    z.literal("gemini"),
+    z.literal("groq"),
+    z.literal("anthropic"),
+  ]),
   role: z.union([
     z.literal("primary"),
     z.literal("fallback"),
@@ -671,6 +677,7 @@ export const PiOverviewSchema: z.ZodType<Pi.PiOverview> = z.object({
         z.literal("openai"),
         z.literal("gemini"),
         z.literal("groq"),
+        z.literal("anthropic"),
       ]),
       role: z.union([
         z.literal("primary"),
@@ -783,12 +790,14 @@ export const PiAnalyticsSchema: z.ZodType<Pi.PiAnalytics> = z.object({
         z.literal("openai"),
         z.literal("gemini"),
         z.literal("groq"),
+        z.literal("anthropic"),
       ]),
       to: z.union([
         z.literal("handoff"),
         z.literal("openai"),
         z.literal("gemini"),
         z.literal("groq"),
+        z.literal("anthropic"),
       ]),
       count: z.number(),
       top_reason: z.string(),
@@ -868,7 +877,12 @@ export const PiSettingsSchema: z.ZodType<Pi.PiSettings> = z.object({
   }),
   provider_config: z.object({
     order: z.array(
-      z.union([z.literal("openai"), z.literal("gemini"), z.literal("groq")]),
+      z.union([
+        z.literal("openai"),
+        z.literal("gemini"),
+        z.literal("groq"),
+        z.literal("anthropic"),
+      ]),
     ),
     retry_transient: z.boolean(),
     max_retries: z.number(),

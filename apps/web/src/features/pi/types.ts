@@ -24,7 +24,7 @@ export type AgentKey =
   | "requirement"
   | "sales_order"
   | "handoff";
-export type ProviderName = "openai" | "gemini" | "groq";
+export type ProviderName = "openai" | "gemini" | "groq" | "anthropic";
 // A run's steps: the agents, plus what pi did besides replying.
 export type RunStep = AgentKey | "team_question" | "meeting_request";
 
