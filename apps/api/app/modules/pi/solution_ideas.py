@@ -58,7 +58,29 @@ def _words(text: str) -> set[str]:
     }
 
 
+RELEVANT_AT = 3  # content words of theirs, from which a match must share at least one with its entry
+
+
+def relevant(entry: dict[str, Any], words: str) -> bool:
+    """An entry is served only when it shares a real content word with what the person said (a
+    category or a sub-type alone gave a fashion shop with a price problem the exchange ideas, live
+    test 3). A short phrase, which has too few words to judge by, is not held to this."""
+    said = _words(words)
+    if len(said) < RELEVANT_AT:
+        return True
+    theirs = _words(entry.get("words", "")) | _words(" ".join(entry.get("quick_ideas") or []))
+    return bool(said & theirs)
+
+
 def match_problem(
+    problems: list[dict[str, Any]], category: str, subtype: str, words: str = ""
+) -> dict[str, Any] | None:
+    """The closest entry, if it is also relevant to what they said (see ``relevant``)."""
+    found = _closest(problems, category, subtype, words)
+    return found if found is not None and relevant(found, words) else None
+
+
+def _closest(
     problems: list[dict[str, Any]], category: str, subtype: str, words: str = ""
 ) -> dict[str, Any] | None:
     """The numbered problem of an industry closest to a noted problem, by category, sub-type and
