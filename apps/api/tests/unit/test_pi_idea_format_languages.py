@@ -623,3 +623,56 @@ def test_a_problem_created_from_a_bare_fact_is_sent_back() -> None:
         "not something they said"
         not in (problems.check_ops([op], set(), True, "60 bhainsein hain, doodh kam hai") or "")
     )
+
+
+def test_a_greeting_keeps_the_chat_language_it_does_not_switch_it() -> None:
+    """The owner asked for Roman Urdu; a later plain "hello" must not bring English back."""
+    from types import SimpleNamespace
+
+    from app.modules.pi.service_conversation import reply_language
+
+    def msg(body: str) -> SimpleNamespace:
+        return SimpleNamespace(body=body, message_type="text", sender_type="customer")
+
+    earlier = [msg("ap kya kr skty hain meir problem mai"), msg("roman urdu ma bt kro")]
+    got = reply_language(None, msg("hello"), earlier, None)  # type: ignore[arg-type]
+    assert got.get("reply_language") == "roman_ur"
+    first = reply_language(None, msg("hello"), [], None)  # type: ignore[arg-type]
+    assert first.get("reply_language") == "en"  # nothing earlier: English, the main language
+
+
+def test_the_returning_greeting_is_in_roman_urdu_for_a_roman_urdu_chat() -> None:
+    from app.modules.pi.service_conversation import greeting_reply
+
+    context = {
+        "pi_mode": "brain",
+        "reply_language": "roman_ur",
+        "history": [{"role": "ai", "text": "Hi"}],
+        "customer_profile": {"name": "SAW"},
+    }
+    assert greeting_reply(context) == "Hi SAW. Bataiye, aap ke business mein kya masla hai?"
+
+
+def test_an_invented_promise_of_an_update_is_replaced_by_the_invitation() -> None:
+    from types import SimpleNamespace
+
+    from app.modules.pi.service_conversation import brain_no_early_promise
+
+    turn = SimpleNamespace(
+        reply="Ji, yahin chat mein update aayega.",
+        request_human=False,
+        _decision=None,
+        _summary=False,
+        awaiting_customer=False,
+        problem_ops=[],
+    )
+    context = {"reply_language": "roman_ur", "flow": {"state": "S1_LISTENING"}}
+    brain_no_early_promise(turn, context)
+    assert "update aayega" not in turn.reply and "masla" in turn.reply
+
+
+def test_first_person_verbs_that_carry_a_gender_become_neutral() -> None:
+    from app.modules.pi.service_conversation import roman_polish
+
+    out = roman_polish("Main aap ki problem note kar sakta hoon aur bhej dunga.")
+    assert "sakta" not in out and "dunga" not in out and "sakte hain" in out and "bhej denge" in out

@@ -2057,13 +2057,17 @@ def brain_no_repeat(turn: "ServiceTurn", context: dict[str, Any]) -> None:
 ENGLISH_FILLER = re.compile(r"^(?:Sure|Yes|Okay|Ok)\.(?=\s*$)", re.IGNORECASE | re.MULTILINE)
 
 
-FAMILIAR_IMPERATIVES = re.compile(
-    chr(92)
-    + "b(karo|rakho|dekho|likho|bhejo|milao|batao|lagao|banao|uthao|samajh gaya)"
-    + chr(92)
-    + "b",
-    re.IGNORECASE,
-)
+GENDERED = {
+    "sakta hoon": "sakte hain",
+    "sakta hun": "sakte hain",
+    "karta hoon": "karte hain",
+    "deta hoon": "dete hain",
+    "rakhta hoon": "rakhte hain",
+    "bhej dunga": "bhej denge",
+    "karunga": "karenge",
+    "bataunga": "batayenge",
+    "dunga": "denge",
+}
 FORMAL = {
     "karo": "karein",
     "rakho": "rakhein",
@@ -2077,11 +2081,20 @@ FORMAL = {
     "uthao": "uthayein",
     "samajh gaya": "samajh liya",
 }
+FAMILIAR_IMPERATIVES = re.compile(
+    chr(92)
+    + "b("
+    + "|".join(sorted({*FORMAL, *GENDERED}, key=len, reverse=True))
+    + ")"
+    + chr(92)
+    + "b",
+    re.IGNORECASE,
+)
 
 
 def _formal(found: "re.Match[str]") -> str:
-    word = found.group(1)
-    return FORMAL.get(word.lower(), word)
+    word = found.group(1).lower()
+    return FORMAL.get(word) or GENDERED.get(word) or found.group(1)
 
 
 def roman_polish(reply: str) -> str:
@@ -2311,6 +2324,12 @@ PROMISED_DOCUMENT = re.compile(
     r"|(?:maine|i(?:'ve| have) asked).{0,60}(?:document|quote)",
     re.IGNORECASE | re.DOTALL,
 )
+PROMISED_UPDATE = re.compile(
+    r"(?:update|jawab|nateeja|khabar|reply)\s+(?:\w+\s+){0,3}"
+    r"(?:aayega|ayega|milega|bheja jayega|bhej dunga)"
+    r"|(?:will|i'll|i will) (?:send|share|post) (?:an? )?update",
+    re.IGNORECASE,
+)
 CONDITIONAL = re.compile(r"\b(?:jab|once|when|after|agar|if|tab)\b", re.IGNORECASE)
 
 
@@ -2323,7 +2342,8 @@ def brain_no_early_promise(turn: "ServiceTurn", context: dict[str, Any]) -> None
         return
     if (context.get("flow") or {}).get("state") not in solution_ask.OFFERABLE:
         return
-    if not PROMISED_DOCUMENT.search(turn.reply) or CONDITIONAL.search(turn.reply):
+    promised = PROMISED_DOCUMENT.search(turn.reply) or PROMISED_UPDATE.search(turn.reply)
+    if not promised or CONDITIONAL.search(turn.reply):
         return
     if solution_ask.already_offers(turn.reply):
         return
@@ -2335,9 +2355,9 @@ def brain_no_early_promise(turn: "ServiceTurn", context: dict[str, Any]) -> None
             None, flow.State.S5_READINESS, {"offer_asked": True}, why="R-OFFER-01"
         )
     else:
-        turn.reply = constitution.FALLBACK_LISTENING.get(
-            language, constitution.FALLBACK_LISTENING["en"]
-        )
+        invite = constitution.FIRST_INVITE if not context.get("noted_problems") else None
+        table = invite or constitution.FALLBACK_LISTENING
+        turn.reply = table.get(language, table["en"])
     turn.awaiting_customer = True
 
 
@@ -3339,7 +3359,7 @@ CAPTION_LABELS = re.compile(r"^Customer caption: |\nAttachment: .*$", re.S)
 _SHORT_WORDS = (
     "no|nope|nah|yes|yeah|yep|ok|okay|k|sure|hmm+|hm+|haan|han|ha|ji|jee|g|nahi|nahin|nhi|nai|"
     "theek|thik|hai|acha|accha|bilkul|zaroor|shukriya|thanks|thank|you|please|pls|done|bas|"
-    "right|fine|good|alright|ah+|oh+"
+    "right|fine|good|alright|ah+|oh+|hi|hello|hey|hii+|helo"
 )
 AMBIGUOUS_SHORT = re.compile(rf"^\W*(?:(?:{_SHORT_WORDS})\b\W*){{1,3}}$", re.IGNORECASE)
 
@@ -4657,6 +4677,8 @@ def greeting_reply(context: dict[str, Any]) -> str:
         )
     if open_project:
         return f"{hello} Shall we carry on with your {open_project}?"
+    if context.get("reply_language") == "roman_ur":
+        return f"{hello} Bataiye, aap ke business mein kya masla hai?"
     return f"{hello} How can I help you today?"
 
 
