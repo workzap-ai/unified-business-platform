@@ -1,0 +1,159 @@
+# ruff: noqa: E501  (one language per line reads better than wrapped patterns)
+"""The reply linter's phrase sets for Urdu script, Arabic, Hindi, French, Spanish and Persian.
+
+`constitution.py` builds its rules from English and Roman Urdu; each pattern below is the same rule
+in the other languages, appended to the matching English pattern (every string starts with "|").
+Roman Urdu, English, Urdu script and Arabic have fixed lines in `constitution.py`; French, Spanish,
+Hindi and Persian replies are written by the model in the person's language, and these patterns
+are what catches a rule break in them. Non-Latin patterns carry no word boundaries (prefixes and
+combining marks stick to the word); Latin ones use them.
+
+Only the rules the answer-first, tone, echo, closer, secrets and forecast work added, plus the
+sentence ends, the AI words and the "are you human?" question, are here. The older safety lines
+(card and password words, "payment received") are English, Roman Urdu, Urdu and Arabic only."""
+
+import re
+import unicodedata
+
+ZW = "‌"  # the Persian half-space
+WORD = r"[^\s.!?؟۔।]+"
+
+# --- R-DISC-01 (the first message says pi is an AI) and the "are you human?" question -----------
+AI_WORDS = r"|\bIA\b|intelligence artificielle|inteligencia artificial|هوش مصنوعی|एआई|कृत्रिम"
+SELF_WORDS = r"|\bje\b|\bj'|\bsoy\b|\bestoy\b|\byo\b|هستم|من\s+pi"
+ASKS_IF_AI = (
+    r"|\b(?:êtes|etes)[- ]vous\b[^.?!]{0,20}\b(?:humain|robot|bot|personne|ia)\b"
+    r"|\b(?:eres|es usted|usted es)\b[^.?!¿]{0,20}\b(?:humano|humana|persona|robot|bot|ia)\b"
+    r"|\bhablo con (?:un|una)\b[^.?!¿]{0,20}\b(?:humano|persona|robot|bot|ia)\b"
+    r"|क्या\s+(?:आप|तुम)[^?।]{0,20}(?:इंसान|इन्सान|इनसान|रोबोट|बॉट|मशीन|असली)"
+    r"|آیا\s+(?:شما|تو)[^؟?]{0,20}(?:انسان|ربات|آدم|هوش مصنوعی)"
+)
+
+# --- R-ANS-01/02: a thank-you or "noted" is not an answer; yes/no questions ---------------------
+ACK_OPENER = (
+    r"|^\W*(?:شکریہ|نوٹ کر لیا|شكرا|شكراً|تم تسجيل|धन्यवाद|शुक्रिया|नोट कर लिया|ممنون|متشکرم|ثبت شد"
+    r"|merci|c'est noté|noté|gracias|anotado|entendido)(?!\w)"
+)
+YES_NO_QUESTION = (
+    r"|هل\s+(?:يمكنك|يمكن|تستطيع|تقدر|هناك)|کیا\s+آپ|क्या\s+(?:आप|तुम)|\b(?:pouvez|savez)-vous\b"
+    r"|\best-ce que\b|\bpeut-on\b|¿(?:puede|puedes|pueden|se puede|tiene|tienen)\b|آیا"
+)
+
+# --- R-ECHO-01: the noted frame, in each language ---------------------------------------------
+NOTED_FRAME = r"|نوٹ کر لیا|تم تسجيل(?:\s+ذلك)?|नोट कर लिया|c'est noté|\bnoté|\banotado|ثبت شد"
+TITLE_STOP = "۔؟।"  # the Urdu and Hindi sentence ends the title must stop at
+
+# --- R-TONE-01: verdict openers and judgements --------------------------------------------------
+VERDICT_OPENER = (
+    r"|^\W*(?:یہ|یہ ایک)\s+(?:ایک\s+)?(?:حقیقی|اصل|سنگین|بڑا|اہم)\s+(?:مسئلہ|مسلہ|بات)"
+    r"|^\W*(?:هذه|هذا)\s+(?:مشكلة|مسألة)\s+(?:حقيقية|كبيرة|خطيرة|مهمة)"
+    r"|^\W*(?:यह|ये)\s+(?:एक\s+)?(?:असली|वास्तविक|गंभीर|बड़ी|बड़ा|सच्ची)\s+(?:समस्या|परेशानी|बात)"
+    r"|^\W*(?:c'est|il s'agit d')\s*(?:un|une)?\s*(?:vrai|véritable|réel|gros|sérieux|grave)\w*\s+(?:problème|souci)"
+    r"|^\W*(?:es|esto es|eso es)\s+(?:un|una)\s+(?:verdadero\s+|gran\s+|serio\s+|grave\s+)?(?:problema|asunto)\s+(?:real|serio|grave)"
+    r"|^\W*(?:es|esto es|eso es)\s+(?:un|una)\s+(?:verdadero|gran|serio|grave)\s+(?:problema|asunto)"
+    r"|^\W*(?:این|اين)\s+(?:یک\s+)?(?:مشکل|مسئله)\s+(?:واقعی|جدی|بزرگ)"
+)
+THANKS_THEN_NOTED = r"|^\W*شکریہ[۔.،,!]?\s+(?:میں نے\s+)?نوٹ"
+JUDGEMENT = (
+    r"|\b(?:votre|ton|ta) (?:entreprise|commerce|activité|boutique) (?:va mal|est un échec|est nulle?)\b|\bvous vous y prenez mal\b"
+    r"|\bsu negocio (?:va mal|es un desastre|está fracasando)\b|\b(?:lo|la) está haciendo mal\b|\blo estás haciendo mal\b"
+    r"|आपका\s+(?:बिज़नेस|बिजनेस|व्यापार|धंधा)\s+(?:ख़राब|खराब|फेल)|आप\s+ग़लत\s+कर\s+रहे|आप\s+गलत\s+कर\s+रहे"
+    r"|آپ\s+کا\s+(?:کاروبار|دھندا)\s+(?:خراب|ناکام|فیل)|آپ\s+غلط\s+کر\s+رہے"
+    r"|عملك\s+(?:فاشل|سيء|سيئ)|أنت\s+تفعل\s+ذلك\s+بشكل\s+خاطئ|أنت\s+تخطئ"
+    r"|کسب[" + ZW + r"\s]?وکار\s+شما\s+(?:بد|خراب|شکست)|شما\s+اشتباه\s+می[" + ZW + r"\s]?کنید"
+)
+
+# --- R-TONE-03: "please be patient", "I only ask because..." ------------------------------------
+PATIENCE = (
+    r"|براہ\s+کرم\s+صبر|يرجى\s+التحلي\s+بالصبر|الرجاء\s+الصبر|कृपया\s+धैर्य|\bveuillez\s+patienter\b|\bmerci de patienter\b"
+    r"|\bsoyez\s+patient\b|\bayez\s+de la patience\b|\btenga\s+paciencia\b|\bpor favor,?\s+(?:sea\s+)?paciente\b"
+    r"|لطفاً?\s+صبور\s+باشید|لطفاً?\s+صبر\s+کنید"
+)
+
+# --- R-ASK-05: the generic closer ("anything else?") -------------------------------------------
+GENERIC_CLOSER = (
+    r"|کچھ\s+اور\s+(?:بتانا|شامل|کہنا)|اور\s+کوئی\s+(?:مسئلہ|بات)|هل\s+(?:هناك|تريد)\s+(?:شيء|شي)\s+آخر|شيء\s+آخر|कुछ\s+और\s+(?:जोड़ना|बताना|कहना)|और\s+कोई\s+(?:समस्या|बात)"
+    r"|\bautre chose\b|\bquelque chose d'autre\b|\bautre problème\b|\balgo más\b|\balguna otra\b|\botro problema\b"
+    r"|چیز\s+دیگری|مورد\s+دیگری|مشکل\s+دیگری"
+)
+
+# --- A2-1.5-SECRETS: methods, vendors, pricing logic, how the catalogue is built -----------------
+_V = r"(?:openai|chatgpt|gpt-?\d|anthropic|claude|gemini|llama|mistral|neon|railway|fastapi|postgres|twilio|supabase|vercel|aws|azure|langchain|pinecone)"
+_USE = (
+    r"(?:nous utilisons|on utilise|j'utilise|basé sur|propulsé par|fonctionne avec|construit avec|développé avec"
+    r"|usamos|utilizamos|funciona con|basado en|impulsado por|construido con|desarrollado con"
+    r"|उपयोग\s+करते|इस्तेमाल\s+करते|पर\s+आधारित|से\s+चलता|द्वारा\s+संचालित"
+    r"|استعمال\s+کرتے|استعمال\s+کرتا|پر\s+مبنی|سے\s+چلتا"
+    r"|نستخدم|أستخدم|مبني\s+على|يعمل\s+(?:بـ|على|مع)|مدعوم\s+(?:من|بـ)"
+    r"|استفاده\s+می[" + ZW + r"\s]?کنیم|استفاده\s+می[" + ZW + r"\s]?کنم|بر\s+پایه|مبتنی\s+بر)"
+)
+SECRETS = (
+    r"|" + _USE + r"[^.!?؟۔।\n]{0,30}?(?<![\w])" + _V + r"(?!\w)"
+    r"|(?<![\w])"
+    + _V
+    + r"(?!\w)[^.!?؟۔।\n]{0,25}?"
+    + _USE
+    + r"|notre (?:méthode|processus|formule|algorithme|outil)s? (?:interne|secret|propriétaire)|logique de (?:tarification|prix)|formule de prix"
+    r"|le catalogue est (?:construit|généré|créé) (?:par|à partir|avec)|comment (?:nous )?(?:construisons|le catalogue (?:est|se) (?:construit|génère))"
+    r"|nuestro método (?:interno|secreto)|nuestra (?:fórmula|lógica) (?:interna|secreta|de precios)|lógica de precios|fórmula de precios"
+    r"|el catálogo (?:se )?(?:construye|genera|crea|está construido)|cómo (?:construimos|se construye)"
+    r"|हमारी?\s+(?:आंतरिक|गुप्त)\s+(?:विधि|प्रक्रिया|तकनीक|फॉर्मूला)|प्राइसिंग\s+लॉजिक|कीमत\s+(?:का|तय\s+करने\s+का)\s+(?:फॉर्मूला|लॉजिक)|कैटलॉग\s+(?:कैसे\s+)?(?:बनता|बनाया\s+जाता)"
+    r"|ہمارا\s+(?:اندرونی|خفیہ)\s+(?:طریقہ|فارمولا|عمل)|قیمت\s+(?:کا|طے\s+کرنے\s+کا)\s+(?:فارمولا|منطق|لاجک)|پرائسنگ\s+لاجک|کیٹلاگ\s+(?:کیسے\s+)?(?:بنتا|بنایا\s+جاتا)"
+    r"|طريقتنا\s+(?:الداخلية|السرية)|منطق\s+التسعير|معادلة\s+التسعير|صيغة\s+التسعير|كيف\s+(?:يتم\s+)?(?:بناء|يُبنى|يبنى)\s+الكتالوج|الكتالوج\s+(?:يُبنى|يبنى|مبني)\s+(?:من|بواسطة|باستخدام)"
+    r"|روش\s+(?:داخلی|محرمانه)\s+ما|منطق\s+قیمت["
+    + ZW
+    + r"\s]?گذاری|فرمول\s+قیمت["
+    + ZW
+    + r"\s]?گذاری|کاتالوگ\s+چگونه\s+ساخته"
+)
+
+# --- R-PROM-01/03: guarantees and forecasts of the person's own numbers -------------------------
+PROMISE = (
+    r"|\bgaranti(?:e|es|s|t|ssons|rons|rai)\b|\bsans risque\b|\bgarantiz\w*|\bgarant[ií]a\b|\bsin riesgo\b"
+    r"|(?:les ventes|le chiffre d'affaires|les bénéfices|les profits|les clients|les commandes|vos ventes|vos clients)\s+(?:vont|va)\s+(?:certainement |sûrement |forcément )?(?:augmenter|monter|doubler|grimper|exploser|revenir)\b"
+    r"|\bvous\s+(?:allez|gagnerez|économiserez)\s+(?:plus|beaucoup|de l'argent)\b"
+    r"|(?:las ventas|los ingresos|las ganancias|los clientes|los pedidos|sus ventas|sus clientes)\s+(?:van a\s+|vamos a\s+)?(?:definitivamente |seguro )?(?:subir|aumentar|crecer|duplicar|mejorar|volver)\b"
+    r"|\b(?:las ventas|los ingresos|las ganancias|los clientes|los pedidos)\s+(?:aumentar[aá]n|subir[aá]n|crecer[aá]n|se duplicar[aá]n|mejorar[aá]n)\b"
+    r"|\busted\s+(?:ganar[aá]|ahorrar[aá]|vender[aá])\b"
+    r"|गारंटी|गारण्टी|(?:बिक्री|मुनाफ़ा|मुनाफा|ग्राहक|आमदनी|आय|ऑर्डर)\s+(?:ज़रूर\s+|जरूर\s+)?(?:बढ़ेगी|बढ़ेगा|बढ़ेंगे|बढ़\s+जाएगी|बढ़\s+जाएंगे|बढ़\s+जाएगा|दोगुनी\s+हो\s+जाएगी)"
+    r"|आप\s+(?:ज़्यादा|ज्यादा|और)\s+(?:कमाएंगे|कमाएँगे|बचाएंगे|बचाएँगे)"
+    r"|گارنٹی|ضمانت|(?:فروخت|سیل|منافع|آمدنی|گاہک|آرڈرز?)\s+(?:ضرور\s+)?(?:بڑھ\s+جائے\s+گی|بڑھے\s+گی|بڑھیں\s+گے|بڑھ\s+جائیں\s+گے|دوگنی\s+ہو\s+جائے\s+گی)"
+    r"|نضمن|أضمن|اضمن|مضمون|بدون\s+مخاطر"
+    r"|(?:ستزيد|سترتفع|سوف\s+تزيد|سوف\s+ترتفع|ستتضاعف|سوف\s+تتضاعف)\s+(?:ال)?(?:مبيعات|أرباح|ارباح|إيرادات|طلبات|عملاء|زبائن)"
+    r"|(?:المبيعات|الأرباح|الطلبات|الإيرادات|الزبائن|العملاء)\s+(?:ستزيد|سترتفع|ستتضاعف|سوف\s+تزيد|سوف\s+ترتفع)"
+    r"|تضمین|بدون\s+ریسک|(?:فروش|سود|درآمد|مشتری|مشتریان|سفارش(?:["
+    + ZW
+    + r"]?ها)?)\s+(?:شما\s+)?(?:قطعاً\s+|حتماً\s+|قطعا\s+|حتما\s+)?(?:افزایش\s+می["
+    + ZW
+    + r"\s]?یابد|زیاد\s+می["
+    + ZW
+    + r"\s]?شود|بالا\s+می["
+    + ZW
+    + r"\s]?رود|دو\s+برابر\s+می["
+    + ZW
+    + r"\s]?شود)"
+)
+# --- R-VOICE-02: the fixed offer ends "...? You can say no." (the tail only says no is fine) ----
+OFFER_TAIL = (
+    r"|vous\s+pouvez\s+(?:aussi\s+)?refuser|puede\s+(?:también\s+)?decir\s+que\s+no|आप\s+मना\s+भी\s+कर\s+सकते\s+हैं"
+    r"|آپ\s+منع\s+بھی\s+کر\s+سکتے\s+ہیں|می[" + ZW + r"\s]?توانید\s+(?:هم\s+)?رد\s+کنید"
+)
+
+
+# One form for combined letters (Hindi "ढ़" is one character or two): every phrase set is normalised
+# the way `constitution.lint` normalises the reply.
+for _name, _value in list(globals().items()):
+    if _name.isupper() and isinstance(_value, str) and _name != "ZW":
+        globals()[_name] = unicodedata.normalize("NFC", _value)
+
+_NEG = unicodedata.normalize(
+    "NFC",
+    r"(?:pas|jamais|aucune?|sans|nunca|ninguna?|sin|no|नहीं|नही|कोई|कभी|نہیں|کوئی|لا|لن|ليس|بدون|نمی|هیچ|نه)",
+)
+# A promise word the sentence negates ("aucune garantie", "कोई गारंटी नहीं", "لا يمكننا ضمان")
+NEGATED_BEFORE = re.compile(
+    r"(?<!\w)" + _NEG + r"(?!\w)[\s" + ZW + r"]*(?:" + WORD + r"\s+){0,3}$", re.IGNORECASE
+)
+NEGATED_AFTER = re.compile(
+    r"^\s*(?:" + WORD + r"\s+){0,2}(?<!\w)" + _NEG + r"(?!\w)", re.IGNORECASE
+)

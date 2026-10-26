@@ -11,23 +11,26 @@ the stricter voice differs from the shared prompt.
 
 import logging
 import re
+import unicodedata
 from dataclasses import dataclass
 from typing import Any
 
+from app.modules.pi import constitution_langs as langs
 from app.modules.pi import flow
 
 logger = logging.getLogger(__name__)
 
 AI_WORDS = re.compile(
     r"\b(?:AI|A\.I\.|artificial intelligence|bot|robot)\b|مصنوعی|الذكاء الاصطناعي|ذكاء اصطناعي"
-    r"|[اإ]صطناعي|[اإ]صطناعى|ذكاء صناعي|ذكاء اصطناعى|اے آئی|ای آئی|एआई|कृत्रिम बुद्धिमत्ता|रोबोट|बॉट",
+    r"|[اإ]صطناعي|[اإ]صطناعى|ذكاء صناعي|ذكاء اصطناعى|اے آئی|ای آئی|एआई|कृत्रिम बुद्धिमत्ता|रोबोट|बॉट"
+    + langs.AI_WORDS,
     re.IGNORECASE,
 )
 # A first message names itself: the AI word sits in a sentence that speaks about pi or "I"
 # (R-DISC-01), in English, Roman Urdu, Urdu, Arabic or Hindi.
 SELF_WORDS = re.compile(
     r"\bI(?:'m| am)\b|\bI\b|\bpi\b|\bmain\b|\bmai\b|\bmein\b|\bhoon\b|\bhun\b|\bhu\b|\bhai\b"
-    r"|میں|ہوں|ہے|أنا|انا|إنني|معك|مساعد|मैं|हूँ|हूं",
+    r"|میں|ہوں|ہے|أنا|انا|إنني|معك|مساعد|मैं|हूँ|हूं" + langs.SELF_WORDS,
     re.IGNORECASE,
 )
 OPENING = {
@@ -51,7 +54,7 @@ def opening_line(context: dict[str, Any]) -> str:
     return OPENING.get(str(language), OPENING["en"])
 
 
-SENTENCE = re.compile(r"(?<=[.!?؟۔])\s+|\n+")
+SENTENCE = re.compile(r"(?<=[.!?؟۔।])\s+|\n+")
 QUESTION_MARKS = ("?", "؟")
 
 ASKS_IF_AI = re.compile(
@@ -64,7 +67,7 @@ ASKS_IF_AI = re.compile(
     r"|\bkya (?:aap|ap|ye|yeh|tum|app)\b[^.?!؟]{0,20}\b(?:insaan|insan|bot|human|robot|machine)\b"
     r"|\b(?:insaan|insan|bot|robot) (?:ho|hai|hain)\b|هل أنت|هل هذا|کیا آپ[^؟?]{0,15}(?:انسان|بوٹ|روبوٹ)"
     r"|هل (?:انت|أنت) (?:إنسان|انسان|بشر|روبوت|بوت)|من (?:انت|أنت)\b|\baap kon (?:ho|hain)\b"
-    r"|\btum kaun ho\b|آپ کون ہیں|تم کون ہو",
+    r"|\btum kaun ho\b|آپ کون ہیں|تم کون ہو" + langs.ASKS_IF_AI,
     re.IGNORECASE,
 )
 
@@ -155,7 +158,7 @@ PROMISE = re.compile(
     r"|\byou(?:'ll| will) (?:get|see|reach) (?:more|higher|better|many)\b"
     r"|\b(?:sale|footfall|munafa|profit|customers?|income)\s+(?:zaroor\s+)?"
     r"(?:barh(?:\s+(?:jaye|jayegi|jayega|jayenge|jaaye|jaayegi))|barh(?:egi|ega|enge)|badh(?:egi|ega|enge))\b"
-    r"|\b(?:next (?:year|month)|agle (?:saal|mahine)) you(?:'ll| will)\b",
+    r"|\b(?:next (?:year|month)|agle (?:saal|mahine)) you(?:'ll| will)\b" + langs.PROMISE,
     re.IGNORECASE,
 )
 NEGATED_PROMISE = re.compile(
@@ -201,7 +204,7 @@ SECRETS = re.compile(
     r"|how\s+(?:we|the\s+catalogue|our\s+catalogue)\s+(?:build|builds|built|work|works|generate|"
     r"generates|make|makes|price|prices)\b"
     r"|(?:catalogue|catalog)\s+(?:is|are)\s+(?:built|generated|made|created)\s+(?:by|from|with|using)"
-    r"|(?:internal|backend)\s+(?:cost|costs|margin|margins)\b)",
+    r"|(?:internal|backend)\s+(?:cost|costs|margin|margins)\b)" + langs.SECRETS,
     re.IGNORECASE,
 )
 # "tool" and "prompt" are internal terms too (2.4), unless the person said them first.
@@ -345,6 +348,10 @@ NOT_ATTRIBUTIVE = re.compile(
 def _promise_hits(reply: str, heard: str = "") -> bool:
     for match in PROMISE.finditer(reply):
         if NEGATED_PROMISE.search(reply[max(0, match.start() - 30) : match.start()]):
+            continue
+        if langs.NEGATED_BEFORE.search(reply[max(0, match.start() - 40) : match.start()]):
+            continue
+        if langs.NEGATED_AFTER.search(reply[match.end() : match.end() + 40]):
             continue
         word = match.group(0).lower()
         # "guaranteed count" in a banquet hall: a word they used, as a name for a thing, is not a
@@ -531,7 +538,7 @@ JUDGEMENT = re.compile(
     r"(?:not\s+doing\s+well|doing\s+(?:badly|poorly)|failing|bad|poor|terrible|a\s+mess)\b"
     r"|\byou(?:'re|\s+are)\s+doing\s+(?:it|this|things)\s+wrong\b"
     r"|\baap\s*ka\s+(?:business|dhanda|karobar)\s+(?:fail|kharab|barbad|theek\s+nahi)\b"
-    r"|\baap\s+(?:ghalat|galat)\s+kar\s+rahe\b",
+    r"|\baap\s+(?:ghalat|galat)\s+kar\s+rahe\b" + langs.JUDGEMENT,
     re.IGNORECASE,
 )
 # R-TONE-03 (Book 2 10.2): a frustrated person gets value, not defensiveness, "please be patient" or
@@ -540,14 +547,14 @@ PATIENCE = re.compile(
     r"\bplease\s+be\s+patient\b|\bbear\s+with\s+me\b|\bi\s+was\s+only\s+trying\b"
     r"|\bthe\s+reason\s+(?:i|we)\s+(?:ask|am\s+asking)\b|\bwhy\s+i(?:'m|\s+am)\s+asking\b"
     r"|\bi\s+need\s+to\s+ask\s+(?:these|this|so\s+many)\b"
-    r"|\bsabar\s+(?:karein|rakhein)\b|\bisliye\s+(?:pooch|puch)\w*\b",
+    r"|\bsabar\s+(?:karein|rakhein)\b|\bisliye\s+(?:pooch|puch)\w*\b" + langs.PATIENCE,
     re.IGNORECASE,
 )
 # The fixed offer ends "...? You can say no." (Book 2 R-OFFER-02): the question is still the last
 # sentence of the offer, the tail only says no is fine (R-VOICE-02 must not flag it).
 OFFER_TAIL = re.compile(
     r"\s*(?:you\s+can\s+say\s+no|mana\s+bhi\s+kar\s+sakte\s+hain|aap\s+mana\s+bhi\s+kar\s+sakte"
-    r"\s+hain|يمكنك\s+أن\s+تقول\s+لا)\s*[.!]*\s*$",
+    r"\s+hain|يمكنك\s+أن\s+تقول\s+لا" + langs.OFFER_TAIL + r")\s*[.!।۔]*\s*$",
     re.IGNORECASE,
 )
 # R-ANS-01/02 (Book 2 3.1): a direct question to pi gets its answer in the first sentence; a yes/no
@@ -555,23 +562,26 @@ OFFER_TAIL = re.compile(
 DIRECT_QUESTION = re.compile(r"[?؟]\s*$")
 YES_NO_QUESTION = re.compile(
     r"\b(?:can|could|will|would|do|does|are|is)\s+(?:you|it|this)\b[^?]*[?]"
-    r"|\bkar\s+(?:sakte|sakti)\s+(?:ho|hain)\b|\bho\s+sakta\s+hai\b|\bya\s+nahi\b|\bkya\s+aap\b",
+    r"|\bkar\s+(?:sakte|sakti)\s+(?:ho|hain)\b|\bho\s+sakta\s+hai\b|\bya\s+nahi\b|\bkya\s+aap\b"
+    + langs.YES_NO_QUESTION,
     re.IGNORECASE,
 )
 ACK_OPENER = re.compile(
-    r"^\W*(?:thanks|thank\s+you|noted|got\s+it|shukriya|note\s+kar\s+liya|samajh\s+liya)\b",
+    r"^\W*(?:thanks|thank\s+you|noted|got\s+it|shukriya|note\s+kar\s+liya|samajh\s+liya)\b"
+    + langs.ACK_OPENER,
     re.IGNORECASE,
 )
 # R-TONE-01 / R-ECHO-01 (live chat 2026-10-26): no verdict opener ("Ye real masla hai.", "That's a real
 # problem.") and no stock thank-you before the noted line ("Shukriya. Maine note kar liya: ...").
 VERDICT_OPENER = re.compile(
     r"^\W*(?:ye|yeh|this|that)(?:\s+is|'s|\s+ek)?\s+(?:a\s+|ek\s+)?(?:real|genuine|serious|"
-    r"bara|bada|badi|important|valid)(?:\s+(?:masla|problem|issue|baat))?\s*(?:hai|problem|issue)?\b",
+    r"bara|bada|badi|important|valid)(?:\s+(?:masla|problem|issue|baat))?\s*(?:hai|problem|issue)?\b"
+    + langs.VERDICT_OPENER,
     re.IGNORECASE,
 )
 THANKS_THEN_NOTED = re.compile(
     r"^\W*(?:shukriya)[.!,]?\s+(?:(?:maine|main\s+ne|i(?:'ve|\s+have))?\s*"
-    r"(?:note|noted))\b",
+    r"(?:note|noted))\b" + langs.THANKS_THEN_NOTED,
     re.IGNORECASE,
 )
 NOTED_WORDS = (
@@ -581,7 +591,8 @@ NOTED_WORDS = (
 # detail: ask something specific about the detail instead.
 GENERIC_CLOSER = re.compile(
     r"\banything else\b|\bwhat else\b|\bis there anything\b|\b(?:aur|or) (?:koi|kuch)\b"
-    r"|\bkoi aur\b|\bkuch (?:aur|add)\b|\badd karna\b|\bmasla ho to\b|\banything to add\b",
+    r"|\bkoi aur\b|\bkuch (?:aur|add)\b|\badd karna\b|\bmasla ho to\b|\banything to add\b"
+    + langs.GENERIC_CLOSER,
     re.IGNORECASE,
 )
 CONCRETE_STATES = (
@@ -592,7 +603,9 @@ CONCRETE_STATES = (
 )
 # R-ECHO-01: the noted confirmation names the problem in at most 12 words.
 NOTED_TITLE = re.compile(
-    r"\b(?:i(?:'ve|\s+have)\s+noted(?:\s+it)?|noted|note\s+kar\s+liya)\s*:\s*([^.?!\n]+)",
+    r"\b(?:i(?:'ve|\s+have)\s+noted(?:\s+it)?|noted|note\s+kar\s+liya"
+    + langs.NOTED_FRAME
+    + r")\s*[:：]\s*([^.?!\n۔؟।]+)",
     re.IGNORECASE,
 )
 # R-ECHO-01..03 (Book 2 10.1): pi does not restate the person's message back to them.
@@ -1406,6 +1419,15 @@ def lint(reply: str, context: dict[str, Any]) -> list[Violation]:
     """Every constitution or voice rule the draft breaks (empty when it is fine to send)."""
     found: list[Violation] = []
     add = found.append
+    # One form for combined letters (Hindi "ढ़" can be one character or two), so the phrase sets match.
+    reply = unicodedata.normalize("NFC", reply)
+    if "latest_customer_message" in context:
+        context = {
+            **context,
+            "latest_customer_message": unicodedata.normalize(
+                "NFC", str(context["latest_customer_message"])
+            ),
+        }
     first_sentence = (_sentences(reply) or [""])[0]
     history = context.get("history") or []
 
@@ -1855,7 +1877,7 @@ def _scrub(reply: str) -> str:
     """Drop sentences that carry scripted empathy, hype or a template phrase, when something is left."""
     kept = []
     for line in reply.split("\n"):
-        pieces = re.split(r"(?<=[.!?؟۔])\s+", line)
+        pieces = re.split(r"(?<=[.!?؟۔।])\s+", line)
         good = [
             p
             for p in pieces
