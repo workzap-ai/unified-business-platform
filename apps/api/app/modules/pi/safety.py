@@ -512,8 +512,8 @@ EMERGENCY_TEXT = {
             "liya gaya hai, tab business ki baat karenge."
         ),
         Emergency.SELF_HARM: (
-            "Mujhe afsos hai ke halaat itne bhaari hain. Main AI hoon aur is mein madad nahi kar sakta, "
-            "lekin kisi bharose ke insaan se baat karein, ya khatre mein hon to {police} par call karein. "
+            "Mujhe afsos hai ke halaat itne bhaari hain. Main AI hoon aur is mein madad nahi kar sakta. "
+            "Kisi bharose ke insaan se baat karein, ya khatre mein hon to {police} par call karein. "
             "Business ki taraf main jab chahein haazir hoon."
         ),
     },
@@ -1465,9 +1465,9 @@ IDENTITY_TEXT = {
         Identity.SCAM: "Jayez sawal hai. Main Workzap ka AI hoon. Main yahan kabhi payment, card number ya password nahi maangta, aur aap par kuch kharidna zaroori nahi. Mazeed workzap.ai/pi/trust par.",
         Identity.META: "Nahi. Mujhe Workzap ne banaya hai aur yahan WhatsApp ke business platform par chat hoti hai. Mujhe WhatsApp ya Meta ne nahi banaya, na chalata hai, na endorse karta hai.",
         Identity.MODEL: "Main pi hoon, Workzap ka AI. Main aap ke business ke masail note aur sort karne ke liye hoon.",
-        Identity.RULES: "Kaam ka tareeqa ye hai: masail note aur sort kiye jate hain, yahan kabhi payment nahi li jati, aur quote par faisla aap ka hota hai. Poori tafseel workzap.ai/pi/how-it-works par hai.",
+        Identity.RULES: "Kaam ka tareeqa ye hai: masail note aur sort kiye jate hain. Yahan kabhi payment nahi li jati, aur quote par faisla aap ka hota hai. Poori tafseel workzap.ai/pi/how-it-works par hai.",
         Identity.COMPANY: "Ye sawal Workzap ki team tak pahunchaya ja sakta hai.",
-        Identity.OFFER: "Workzap masail dhoondne aur hal karne ka software banata hai. Main kuch bechne nahi aaya: yahan aap ke business ki rukawat note ki jati hai, aur aap chahein to Workzap phir solution document bana sakta hai. Abhi sab se bada masla kya hai?",
+        Identity.OFFER: "Workzap masail dhoondne aur hal karne ka software banata hai. Main kuch bechne nahi aaya: yahan aap ke business ki rukawat note ki jati hai. Aap chahein to Workzap phir solution document bana sakta hai. Abhi sab se bada masla kya hai?",
     },
     "ar": {
         Identity.PERSON: "أنا ذكاء اصطناعي ولست شخصًا. أنا pi من Workzap.",
@@ -2002,7 +2002,7 @@ BOUNDARY_TEXT = {
         Boundary.OUTCOME: "Nateejon ka wada nahi kiya ja sakta. Masla note kiya ja sakta hai, aur Workzap bata sakta hai wo kya karega. Masla kya hai?",
         Boundary.FRAUD: "Jali invoice ya aamdani chupane mein madad nahi ki ja sakti. Agar asli invoices ka hisaab rakhna mushkil hai to ise masla note kiya ja sakta hai. Kya note kar loon?",
         Boundary.THIRD_PARTY: "Kisi aur ki chat share nahi ki ja sakti. Sirf wo rakha jata hai jo aap is chat mein batate hain. Business ke baare mein kya note kar loon?",
-        Boundary.BANK_CHANGE: "Is chat mein bank details ki tasdeeq nahi ki ja sakti. Payment ki tafseel sirf aap ke approved quote par hoti hai, aur maine aap ka paigham Workzap ki team ko check ke liye bhej diya hai.",
+        Boundary.BANK_CHANGE: "Is chat mein bank details ki tasdeeq nahi ki ja sakti. Payment ki tafseel sirf aap ke approved quote par hoti hai. Maine aap ka paigham Workzap ki team ko check ke liye bhej diya hai.",
         Boundary.OFF_TOPIC: "Ye mere dayre se bahar hai. Main aap ke business mein rukawat note karne ke liye hoon. Abhi sab se bada masla kya hai?",
         Boundary.COMPLAINT: "Batane ka shukriya. Maine ye Workzap ki team tak pahuncha diya hai.",
         Boundary.ILLEGAL: "Is mein madad nahi ki ja sakti. Main aap ke business ke masail ke liye hoon.",
@@ -2230,9 +2230,9 @@ NORI_TEXT = {
         Nori.ABOUT: "nori is Workzap's daily read for the shop. Each night it reads sales and stock from every shop, and each morning it gives one short read of what changed, why, and what to look at. There is more at workzap.ai/nori. Is something in your business prompting the question?",
     },
     "roman_ur": {
-        Nori.VISION: "nori ka Vision (CCTV) hissa jald aa raha hai. Abhi available nahi hai. nori aaj har dukan ki sales aur stock parh kar subah ek chhota sa read deta hai. Kya aap ki dukanon mein kuch aisa hai jis ki wajah se ye sawal aaya?",
+        Nori.VISION: "nori ka Vision (CCTV) hissa jald aa raha hai. Abhi available nahi hai. nori aaj har dukaan ki sales aur stock parh kar subah ek chhota sa read deta hai. Kya aap ki dukanon mein kuch aisa hai jis ki wajah se ye sawal aaya?",
         Nori.PRICING: "nori ke teen plans hain: Starter, Growth aur Enterprise, jo size aur support mein farq rakhte hain. Qeematein workzap.ai/nori/pricing par hain.",
-        Nori.ABOUT: "nori Workzap ka dukan ke liye roz ka read hai. Har raat ye har dukan ki sales aur stock parhta hai, aur subah ek chhota read deta hai: kya badla, kyun, aur kis par nazar rakhni hai. Mazeed workzap.ai/nori par hai. Kya aap ke business mein kuch aisa hai jis ki wajah se ye sawal aaya?",
+        Nori.ABOUT: "nori Workzap ka dukaan ke liye roz ka read hai. Har raat ye har dukaan ki sales aur stock parhta hai. Subah ek chhota read deta hai: kya badla, kyun, aur kis par nazar rakhni hai. Mazeed workzap.ai/nori par hai. Kya aap ke business mein kuch aisa hai jis ki wajah se ye sawal aaya?",
     },
 }
 

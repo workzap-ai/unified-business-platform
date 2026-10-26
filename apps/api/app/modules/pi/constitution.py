@@ -634,6 +634,24 @@ NOTED_START = re.compile(
 SPLIT_WORDS = re.compile(r"[^\s.,;:!?؟۔।¿¡()\"«»…-]+")
 RESTATE_SHARE = 0.7  # the share of a sentence's words that are theirs
 RESTATE_MIN_WORDS = 4
+# R-ANS-01 (live chats 1 and 3): "ap kya kr skty hain wo btyn" is answered with the ideas, not with
+# "Aap chahen to main abhi solution ideas bataun?" (a permission question to a person who just asked).
+CAPABILITY_ASK = re.compile(
+    r"\b(?:kya|kia|kuch)\s+(?:kar|kr)\s+(?:sakte|skte|skty|sakty|sakti|skti)\b|\b(?:any|kuch)\s+ideas?\b"
+    r"|\bideas?\s+(?:do|dein|dijiye|btao|batao|bataye|btayn|batayen)\b|\bkya\s+madad\b|\bmadad\s+(?:kar|kr)\b"
+    r"|\bhow\s+can\s+you\s+help\b|\bwhat\s+(?:ideas|help)\b|\bwo\s+(?:btyn|batayen|bataein)\b",
+    re.IGNORECASE,
+)
+PERMISSION_FOR_IDEAS = re.compile(
+    r"\b(?:aap|ap)\s+(?:chahen|chahein|chahain|chaho)\s+to\b[^?؟]{0,60}(?:ideas?|solution|hal|batau|bataun|bata\s+(?:doon|dun)|share|suggestion)"
+    r"|\bkya\s+main\b[^?؟]{0,40}(?:ideas?|solution|hal|batau|bataun|share)"
+    r"|\b(?:would\s+you\s+like(?:\s+me)?\s+to|do\s+you\s+want\s+me\s+to|shall\s+i|should\s+i|may\s+i|can\s+i)\b[^?؟]{0,50}(?:ideas?|suggest|share|tell\s+you)",
+    re.IGNORECASE,
+)
+# R-LANG-02: a Roman Urdu reply does not open with an English filler.
+ENGLISH_FILLER_OPENER = re.compile(
+    r"^\W*(?:thanks|thank\s+you|sure|okay|ok|alright|great|perfect|got\s+it|yes)\b", re.IGNORECASE
+)
 # R-ECHO-01: the noted confirmation names the problem in at most 12 words.
 NOTED_TITLE = re.compile(
     r"\b(?:i(?:'ve|\s+have)\s+noted(?:\s+it)?|noted|note\s+kar\s+liya"
@@ -1664,6 +1682,28 @@ def lint(reply: str, context: dict[str, Any]) -> list[Violation]:
                 'hain" / an honest "Ye Workzap nahi karta"), then the detail',
             )
         )
+    permission = next((x for x in reversed(_sentences(reply)) if x.endswith(QUESTION_MARKS)), "")
+    if (
+        latest_said
+        and (ASKED_FOR_HELP.search(latest_said) or CAPABILITY_ASK.search(latest_said))
+        and PERMISSION_FOR_IDEAS.search(permission)
+        and not re.search(r"document|quote", permission, re.IGNORECASE)
+    ):
+        add(
+            Violation(
+                "R-ANS-01",
+                "they asked what you can do or for ideas: give the two ideas now, never a question "
+                "asking whether they want them",
+            )
+        )
+    if context.get("reply_language") == "roman_ur" and ENGLISH_FILLER_OPENER.match(reply):
+        add(
+            Violation(
+                "R-LANG-02",
+                'a Roman Urdu reply does not open with an English filler ("Thanks", "Sure", "Okay"): '
+                'start with "Note kar liya, ..." or the answer',
+            )
+        )
     if VERDICT_OPENER.match(reply):
         add(
             Violation(
@@ -1881,13 +1921,13 @@ AI_ANSWER = {
 # nothing, ask nothing sensitive, and ask one question last. The first message keeps its disclosure.
 FALLBACK_LISTENING = {
     "en": "Noted. What else is getting in the way?",
-    "roman_ur": "Noted. Aur kya masla aa raha hai?",
+    "roman_ur": "Note kar liya. Aur kya masla aa raha hai?",
     "ur": "نوٹ کر لیا۔ اور کیا مسئلہ آ رہا ہے؟",
     "ar": "تم تسجيل ذلك. ما الذي يعيقك أيضاً؟",
 }
 FALLBACK_OTHER = {
     "en": "Thanks, that's noted. Is there anything else you want to add?",
-    "roman_ur": "Shukriya, noted. Kya aap kuch aur batana chahenge?",
+    "roman_ur": "Shukriya, note kar liya. Kya aap kuch aur batana chahenge?",
     "ur": "شکریہ، نوٹ کر لیا۔ کیا آپ کچھ اور بتانا چاہیں گے؟",
     "ar": "شكراً، تم تسجيل ذلك. هل تريد إضافة شيء آخر؟",
 }
