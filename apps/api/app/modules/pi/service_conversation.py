@@ -1713,8 +1713,10 @@ def with_disclosure(
     if SAYS_AI.search(reply) or constitution._discloses(reply):
         return reply  # it already says so, in its own words: not twice
     if after:
-        tail = DISCLOSURE_TAIL.get(language, DISCLOSURE_TAIL["en"])
-        return f"{reply}\n{fixed_lines.line('opening', fixed_lines.code(context), tail)}"
+        code = fixed_lines.code(context)
+        if code in DISCLOSURE_TAIL:  # English, Roman Urdu and Arabic have their own short tail
+            return f"{reply}\n{DISCLOSURE_TAIL[code]}"
+        return f"{reply}\n{fixed_lines.line('opening', code, DISCLOSURE_TAIL['en'])}"
     opening = DISCLOSURE_LINE.get(language, DISCLOSURE_LINE["en"])
     return f"{fixed_lines.line('opening', fixed_lines.code(context), opening)} {reply}"
 
