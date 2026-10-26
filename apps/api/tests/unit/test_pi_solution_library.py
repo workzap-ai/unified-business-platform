@@ -22,7 +22,7 @@ def test_the_library_is_parsed_and_every_idea_passes_the_idea_guard() -> None:
 
 
 def test_a_category_with_no_idea_that_passes_the_guard_has_none() -> None:
-    assert solution_library.ideas_for("margin_cost") == []  # every spec idea there fails the guard
+    assert len(solution_library.ideas_for("margin_cost")) == 2  # the owner rewrote its three ideas
     assert solution_library.ideas_for("no_such_category") == []
 
 
@@ -49,7 +49,7 @@ def test_an_unknown_industry_with_a_noted_problem_gets_two_ideas_and_the_build_l
 
 def test_a_category_without_library_ideas_degrades_to_the_honest_line() -> None:
     chat = _chat()
-    noted = [{"group": "margin_cost", "title": "Margin unknown"}]
+    noted = [{"group": "no_such_category", "title": "Margin unknown"}]
     assert solution_context._from_library(chat, noted, "en") is None
 
 
@@ -61,7 +61,7 @@ def test_the_latest_problem_with_library_ideas_is_used() -> None:
     chat = _chat()
     noted = [
         {"group": "people_staff", "title": "Staff late"},
-        {"group": "margin_cost", "title": "Margin unknown"},
+        {"group": "no_such_category", "title": "Margin unknown"},
     ]
     out = solution_context._from_library(chat, noted, "en")
     assert out is not None and chat.service_brief["solution_last_problem"] == "library:people_staff"
@@ -120,7 +120,7 @@ def test_the_overlay_names_the_deviation_from_the_spec() -> None:
     data = json.loads(
         (Path(solution_library.LIBRARY).parent / "owner_rewrites.json").read_text(encoding="utf-8")
     )
-    assert "not verbatim" in data["note"] and len(data["rewrites"]) == 51
+    assert "not verbatim" in data["note"] and len(data["rewrites"]) == 54
 
 
 def test_the_owner_added_fashion_entry_is_loaded_and_is_not_in_the_pdf_pack() -> None:

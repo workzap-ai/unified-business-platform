@@ -95,10 +95,11 @@ def build(text: str) -> dict[str, object]:
                 continue
             verdict = solution_rules.check_idea(idea + ".")
             reasons = [*verdict.reject, *verdict.review]
-            if reasons:
+            original = idea[:1].upper() + idea[1:] + "."
+            # An idea the guard holds comes back when the owner rewrote it into one it passes
+            if reasons and original not in rewrites:
                 dropped.append({"text": idea, "why": "; ".join(reasons)})
             else:
-                original = idea[:1].upper() + idea[1:] + "."
                 new = rewrites.get(original)
                 if new is None:
                     kept.append(original)

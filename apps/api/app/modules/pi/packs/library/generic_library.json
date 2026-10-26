@@ -58,21 +58,12 @@
    "never_say": "anything about loans, financing, interest or tax treatment RADV"
   },
   "margin_cost": {
-   "ideas": [],
-   "dropped": [
-    {
-     "text": "list your top 20 items with their buying cost and selling price to see real margin",
-     "why": "a number, percentage, amount or promised result (no invented claims); money or a regulated topic: a person decides"
-    },
-    {
-     "text": "add delivery, packing and platform fees to cost before setting prices",
-     "why": "tool words or a build named for free (R-BUILD-01); how-to, steps, settings or wording to copy (R-VAL-04, R-VAL-05); money or a regulated topic: a person decides"
-    },
-    {
-     "text": "check which supplier raised prices this year and get one comparison quote",
-     "why": "money or a regulated topic: a person decides"
-    }
+   "ideas": [
+    "Write down what each of your best-selling items costs you and what it sells for, so you can see which ones really earn.",
+    "Add delivery, packing and marketplace fees to what each item costs you before you decide what to charge, so no cost is forgotten.",
+    "Ask each supplier for the same item in writing and compare the offers side by side, so you see who is dearer."
    ],
+   "dropped": [],
    "build_keys": [
     "dashboards_reports",
     "nori_daily_read",
@@ -101,7 +92,7 @@
   },
   "marketing_leads": {
    "ideas": [
-    "Complete the Google Maps profile of every location with photos, timings and a WhatsApp number, so people find you and can ask you easily.",
+    "Complete the online map listing of every location with photos, timings and a WhatsApp number, so people find you and can ask you easily.",
     "Put a code or a \"show this message\" offer in every ad, so you can tell which ad brings people.",
     "Reply to every enquiry quickly, even with just \"we'll send details shortly\", so people do not go to the next shop.",
     "Stop the ads that bring no visits or enquiries after a fair test, so the money goes to the ones that work."

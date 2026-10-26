@@ -1,5 +1,5 @@
 {
- "note": "Owner-edited, not verbatim from the PDF. On 2026-10-26 the owner approved rewriting the library's quick ideas (platform spec Book 2 Part 7.4) as modern 'what to do, so the benefit' sentences, and the first seven ('running low' list, transfer slip, owed list, one order list, purchase orders, opening checklist, folder) with the wording proposed to them. The spec text is the key of each entry; scripts/build_generic_library.py applies this file after parsing, so a rebuild keeps it. Every rewrite must pass solution_rules.check_idea and carry no time word.",
+ "note": "Owner-edited, not verbatim from the PDF. On 2026-10-26 the owner approved rewriting the library's quick ideas (platform spec Book 2 Part 7.4) as modern 'what to do, so the benefit' sentences, and the first seven, the three margin and cost ideas, the map listing line (brand-free) ('running low' list, transfer slip, owed list, one order list, purchase orders, opening checklist, folder) with the wording proposed to them. The spec text is the key of each entry; scripts/build_generic_library.py applies this file after parsing, so a rebuild keeps it. Every rewrite must pass solution_rules.check_idea and carry no time word.",
  "rewrites": {
   "Keep a \"running low\" list at each counter that staff fill in.": "Ask staff to message a photo of any shelf running low to one shared chat, so the buyer sees it straight away.",
   "Check expiry dates on the oldest stock first every Monday.": "Check the expiry dates on the oldest stock first and move it to the front, so nothing is left to expire at the back.",
@@ -15,7 +15,7 @@
   "Collect every customer's WhatsApp number at billing (with their permission).": "Collect every customer's WhatsApp number at billing, with their permission, so you can reach them again.",
   "Message past customers when new stock arrives.": "Message the past customers who agreed to hear from you when new stock arrives, so they come back first.",
   "Reply to every review, good or bad, within a day.": "Reply politely to every review, good or bad, so new customers see that you listen.",
-  "Complete the Google Maps profile of every location (photos, timings, WhatsApp, category).": "Complete the Google Maps profile of every location with photos, timings and a WhatsApp number, so people find you and can ask you easily.",
+  "Complete the Google Maps profile of every location (photos, timings, WhatsApp, category).": "Complete the online map listing of every location with photos, timings and a WhatsApp number, so people find you and can ask you easily.",
   "Put a code or \"show this message\" offer in every ad so you can tell which ad brings people.": "Put a code or a \"show this message\" offer in every ad, so you can tell which ad brings people.",
   "Reply to every enquiry within an hour, even just \"we'll send details shortly\".": "Reply to every enquiry quickly, even with just \"we'll send details shortly\", so people do not go to the next shop.",
   "Stop the ads that bring no visits or enquiries after a fair test.": "Stop the ads that bring no visits or enquiries after a fair test, so the money goes to the ones that work.",
@@ -51,6 +51,9 @@
   "Look at last year's peak season sales by week to plan stock.": "Look at last season's sales by week to plan stock, so you buy for the busy and slow periods.",
   "Open a new branch only after the current one's numbers are clear month by month.": "Open a new branch only after the current branch's numbers are clear, so the next one rests on facts.",
   "Add online booking or ordering if most enquiries ask the same thing.": "Add online booking or ordering if most enquiries ask the same thing, so customers can do it themselves.",
-  "Fix the website's contact button first.": "Fix the website's contact button first, so interested people can reach you easily."
+  "Fix the website's contact button first.": "Fix the website's contact button first, so interested people can reach you easily.",
+  "List your top 20 items with their buying cost and selling price to see real margin.": "Write down what each of your best-selling items costs you and what it sells for, so you can see which ones really earn.",
+  "Add delivery, packing and platform fees to cost before setting prices.": "Add delivery, packing and marketplace fees to what each item costs you before you decide what to charge, so no cost is forgotten.",
+  "Check which supplier raised prices this year and get one comparison quote.": "Ask each supplier for the same item in writing and compare the offers side by side, so you see who is dearer."
  }
 }
