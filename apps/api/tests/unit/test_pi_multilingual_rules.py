@@ -27,6 +27,16 @@ def lint(reply: str, said: str = "", state: str = "S3_NOTED", language: str = "e
 
 # (language, first message, noted reply, what the person said, ideas reply)
 NORMAL = {
+    "en": (
+        "Hi, I'm pi, an AI from Workzap. Tell me what's going wrong in your business and I'll start on it.",
+        "Noted: customers are not coming back. How long has this been happening?",
+        "customers have not come back for a month now",
+    ),
+    "roman_ur": (
+        "Hi, main pi hoon, Workzap ka AI. Apne business ka masla batayein.",
+        "Note kar liya, customers wapis nahi aa rahe. Ye kab se ho raha hai?",
+        "customers ek mahine se wapis nahi aa rahe",
+    ),
     "fr": (
         "Salut, je suis pi, une IA de Workzap. Dites-moi ce qui ne va pas dans votre activité et je m'en occupe.",
         "Noté : les clients ne reviennent pas. Depuis quand est-ce que cela dure ?",
