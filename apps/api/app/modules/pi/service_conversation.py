@@ -5176,7 +5176,13 @@ async def save_service_turn(
         )[-12:]
         # R-ASK-07: the question asked last turn is answered now (any answer closes it); the one
         # in this reply is the open one. Kept in the brief, so it survives sessions and languages.
-        closed, opened = slots.advance(previous, message.body or "", turn.reply, turn.asked_slot)
+        closed, opened = slots.advance(
+            previous,
+            message.body or "",
+            turn.reply,
+            turn.asked_slot,
+            new_problem=any(op.op == "create" for op in turn.problem_ops),  # R-ASK-05: reopens
+        )
         brief["closed_slots"] = closed
         brief["last_question"] = opened
     known = list(previous.get("knowledge_gaps") or [])

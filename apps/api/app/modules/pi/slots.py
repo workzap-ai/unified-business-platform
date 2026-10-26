@@ -28,6 +28,21 @@ STOP = frozenset(
 )
 
 
+# R-ASK-05: the generic closer ("anything else?", "aur koi masla?") is a slot of its own. An "ok" or
+# a "hmm" skips it, and a skipped question is not asked again until they raise a new problem.
+ANYTHING_ELSE_SLOT = "anything_else"
+ANYTHING_ELSE = re.compile(
+    r"\banything else\b|\bwhat else\b|\bis there anything\b|\bany other (?:problem|issue)\b"
+    r"|\b(?:aur|or) koi (?:masla|cheez|baat|problem)\b|\bkoi aur (?:masla|cheez|baat|problem)\b"
+    r"|\baur kya (?:masla|cheez)\b|\bmasla ho to\b",
+    re.IGNORECASE,
+)
+SKIP_ACK = re.compile(
+    r"^\W*(?:(?:ok|okay|k|hmm+|hm+|acha|accha|theek|thik|hai|fine|alright|sure|thanks|thank|you|shukriya|ji|g)\b\W*){1,3}$",
+    re.IGNORECASE,
+)
+
+
 def question_of(reply: str) -> str:
     """The last question in the reply, "" when it asks none."""
     for sentence in reversed(re.split(r"(?<=[.!?؟])\s+|\n+", reply.strip())):
@@ -61,19 +76,30 @@ def is_answer(said: str) -> bool:
 
 
 def advance(
-    previous: dict[str, Any], said: str, reply: str, slot: str
+    previous: dict[str, Any], said: str, reply: str, slot: str, *, new_problem: bool = False
 ) -> tuple[list[dict[str, str]], dict[str, str]]:
     """(closed slots, the question now open) after a turn: the question asked last turn closes when
-    the person answered it, and the question in this reply becomes the open one."""
+    the person answered it, and the question in this reply becomes the open one. A new problem
+    reopens the generic "anything else?" (R-ASK-05)."""
     closed = [dict(c) for c in previous.get("closed_slots") or []]
+    if new_problem:
+        closed = [c for c in closed if c.get("slot") != ANYTHING_ELSE_SLOT]
     last = previous.get("last_question") or {}
     if last.get("q") and is_answer(said):
-        known = any(
-            (c.get("slot") and c["slot"] == last.get("slot")) or same_question(c["q"], last["q"])
-            for c in closed
-        )
-        if not known:
-            closed.append({"slot": str(last.get("slot") or ""), "q": str(last["q"])})
+        if ANYTHING_ELSE.search(str(last["q"])):
+            # only a skip ("ok", "hmm") closes it; anything else they say answers it for real
+            if SKIP_ACK.match(" ".join((said or "").split())) and not any(
+                c.get("slot") == ANYTHING_ELSE_SLOT for c in closed
+            ):
+                closed.append({"slot": ANYTHING_ELSE_SLOT, "q": str(last["q"])})
+        else:
+            known = any(
+                (c.get("slot") and c["slot"] == last.get("slot"))
+                or same_question(c["q"], last["q"])
+                for c in closed
+            )
+            if not known:
+                closed.append({"slot": str(last.get("slot") or ""), "q": str(last["q"])})
     question = question_of(reply)
     opened = {"slot": slot.strip()[:60], "q": question} if question else {}
     return closed[-KEEP:], opened
@@ -85,6 +111,10 @@ def asked_again(slot: str, reply: str, closed: list[dict[str, Any]]) -> str | No
     if not question:
         return None
     key = slot.strip()
+    if ANYTHING_ELSE.search(question) or key == ANYTHING_ELSE_SLOT:
+        skipped = next((c for c in closed or [] if c.get("slot") == ANYTHING_ELSE_SLOT), None)
+        if skipped is not None:
+            return str(skipped.get("q") or "anything else?")
     for entry in closed or []:
         if key and entry.get("slot") == key:
             return str(entry.get("q") or key)

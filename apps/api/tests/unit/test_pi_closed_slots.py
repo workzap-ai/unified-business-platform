@@ -62,3 +62,40 @@ def test_only_the_last_twenty_four_slots_are_kept():
     }
     closed, _ = slots.advance(previous, "yes", "Noted.", "")
     assert len(closed) == slots.KEEP and closed[-1]["slot"] == "s.new"
+
+
+GENERIC = {"last_question": {"slot": "", "q": "Aur koi masla ho to bata dein?"}}
+
+
+def test_an_ok_or_a_hmm_skips_the_generic_closer_and_it_is_not_asked_again():
+    """R-ASK-05, real replay: 'Aur koi masla ho to bata dein' again after 'ok' and after 'hmm'."""
+    for said in ("ok", "hmm", "Theek hai", "👍".replace("👍", "ok ji")):
+        closed, _ = slots.advance(GENERIC, said, "Noted.", "")
+        assert [c["slot"] for c in closed] == ["anything_else"], said
+        for again in (
+            "Anything else getting in the way?",
+            "What else is making it hard?",
+            "Koi aur masla ho to batayein?",
+        ):
+            assert slots.asked_again("", again, closed), (said, again)
+
+
+def test_a_real_answer_does_not_skip_the_closer_and_a_new_problem_reopens_it():
+    closed, _ = slots.advance(GENERIC, "Haan, staff late aata hai", "Noted.", "")
+    assert closed == []  # they answered it for real: nothing is closed
+    skipped, _ = slots.advance(GENERIC, "ok", "Noted.", "")
+    assert slots.asked_again("", "Anything else?", skipped)
+    reopened, _ = slots.advance(
+        {"closed_slots": skipped, "last_question": {}},
+        "stock khatam hota hai",
+        "Noted.",
+        "",
+        new_problem=True,
+    )
+    assert slots.asked_again("", "Anything else?", reopened) is None
+
+
+def test_other_questions_still_close_on_any_answer_including_ok():
+    previous = {"last_question": {"slot": "shops.count", "q": "How many shops do you have now?"}}
+    closed, _ = slots.advance(previous, "ok", "Noted.", "")
+    assert [c["slot"] for c in closed] == ["shops.count"]
