@@ -63,6 +63,14 @@ SOLUTION_ASK_PLAIN = re.compile(
     # live chats: "Solution dain", "solution?", "Let me know a solution", "mujhe solution den",
     # "koi solution hai iska?", "solution bataye"
     r"|^\W*(?:solutions?|hal|ilaj|ideas?|suggestions?)\W*$"
+    # "how do I begin" (a would-be founder, a live replay): English and Roman Urdu
+    r"|\bhow (?:to|do i|can i|should i) (?:start|begin|get started|take (?:the )?first step)\b"
+    r"|\bwhere (?:do i|to|should i) (?:start|begin)\b|\bwhat (?:should i|do i) do first\b"
+    r"|\bhow to do\s*[?.!]*\s*$"
+    r"|\b(?:what(?:'s| is)|which|tell me) (?:the )?first step\b"
+    r"|\bkaise (?:shuru|start|shuruaat) (?:karun|karoon|karon|kare|karein|krun|karna|karen)\b"
+    r"|\bkahan se (?:shuru|start)\b|\bshuru kaise\b|\bpehla (?:qadam|step|kaam)\b"
+    r"|\b(?:pehle|pehla) (?:kya|kia) (?:karun|karoon|krun|kare|karna)\b"
     # impatience and "what do you do" phrasings from the platform spec's audit chats
     r"|\bkya (?:aap|ap|tum) (?:ye |yeh |ise |isay |isko )?(?:kar|kr) (?:sakte|skte) (?:ho|hain|hn)\b"
     r"|\bseedha (?:batao|bataiye|bata do|btao)\b|\bkahin aur jaun\b|\baap log (?:karte|krte) kya\b"

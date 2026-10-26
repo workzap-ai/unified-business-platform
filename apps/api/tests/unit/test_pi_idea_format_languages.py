@@ -551,3 +551,34 @@ def test_a_calm_ask_gets_sure_not_an_apology() -> None:
 
     assert ideas_opener({"latest_customer_message": "Solution dain"}) == "Sure.\n"
     assert not solution_ask.impatient("Solution dain")
+
+
+@pytest.mark.parametrize(
+    "text",
+    [
+        "I want to start a clothing business how to do",
+        "how to take first step i am very confuse i'll do first online or onsite",
+        "how to start",
+        "where do I begin?",
+        "what is the first step",
+        "kaise shuru karun",
+        "kahan se shuru karna chahiye",
+        "shuru kaise karein",
+        "pehle kya karun",
+        "pehla qadam kya hai",
+    ],
+)
+def test_how_do_i_begin_is_an_ask_for_ideas(text: str) -> None:
+    assert solution_ask.asked_for_ideas(text)
+
+
+@pytest.mark.parametrize(
+    "text",
+    [
+        "the first step of our process is the cutting table",
+        "we start work at nine and orders begin to pile up",
+        "hum subah shuru karte hain aur hisaab gadbad rehta hai",
+    ],
+)
+def test_a_sentence_about_starting_or_a_first_step_is_not_an_ask(text: str) -> None:
+    assert not solution_ask.asked_for_ideas(text)
