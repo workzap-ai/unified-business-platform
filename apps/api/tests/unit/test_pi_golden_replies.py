@@ -73,18 +73,7 @@ GOLDEN = [
 ]
 
 
-def _marked(case):
-    state, language, reply = case
-    if OFFER in reply:
-        # The spec's offer line ends "...You can say no." after the question, so R-VOICE-02 must
-        # exempt it. That exemption is in Learn to Pi's commit 659652a, not pushed yet.
-        return pytest.param(
-            *case, marks=pytest.mark.xfail(reason="offer-tail exemption (659652a)", strict=False)
-        )
-    return pytest.param(*case)
-
-
-@pytest.mark.parametrize(("state", "language", "reply"), [_marked(c) for c in GOLDEN])
+@pytest.mark.parametrize(("state", "language", "reply"), GOLDEN)
 def test_a_golden_reply_breaks_no_rule(state, language, reply):
     context = {
         "pi_mode": "brain",
