@@ -190,7 +190,7 @@ NEVER_SAY = (
     "get back to you shortly", "get back to you soon", "our team will get back",
 )  # fmt: skip
 INTERNAL = re.compile(
-    r"\b(?:knowledge pack|industry pack|pipeline|system prompt|LLM|S\d+_[A-Z_]+|X_[A-Z_]+|R-[A-Z]+-\d+)\b"
+    r"\b(?:knowledge pack|industry pack|(?:learning|nightly|brain|processing) pipeline|system prompt|LLM|S\d+_[A-Z_]+|X_[A-Z_]+|R-[A-Z]+-\d+)\b"
 )
 # A2-1.5-SECRETS: pi never reveals Workzap's internal methods, tools, vendors, pricing logic or how the
 # catalogue is built, even when asked (the person saying a word first does not lift this).
@@ -1160,10 +1160,35 @@ WORKZAP_CLAIM = re.compile(
 )
 
 
+STRICT_CLAIM = re.compile(
+    r"\b(?:workzap|hum|hamari|hamara|solution document|your quote|our quote|this quote|the document)\b",
+    re.IGNORECASE,
+)
+
+
+def _ideas_given(context: dict[str, Any]) -> bool:
+    return (
+        bool(context.get("solution_asked"))
+        or "solution_howto" in context
+        or bool(context.get("solution_ideas"))
+    )
+
+
+def _advice_free(reply: str, context: dict[str, Any]) -> str:
+    """The reply without its idea bullets when it gives ideas. A bullet tells the owner what to do
+    about their own business (their discounts, their offers, their tools, a deadline to move on),
+    which is not pi pressing someone, offering a discount or naming its own insides."""
+    if not _ideas_given(context):
+        return reply
+    return "\n".join(x for x in reply.splitlines() if not x.lstrip().startswith(BULLET))
+
+
 def _owner_advice(low: str, context: dict[str, Any]) -> bool:
     """An idea sentence that tells the owner what to do ("count the slips this week", "ek hafte
     tak likhein") names a time for the owner's own action, not a date or duration Workzap or pi
     promises. A sentence about Workzap, the document, the quote or a price is never advice."""
+    if low.lstrip().startswith(BULLET) and _ideas_given(context):
+        return not STRICT_CLAIM.search(low)  # a bullet is about the owner unless it names Workzap
     if WORKZAP_CLAIM.search(low):
         return False
     if IDEA_OPENER.match(low):
@@ -1322,7 +1347,8 @@ META_POLICY = re.compile(
 )
 META_OK = re.compile(
     r"\b(?:not|isn't|aren't)\b[^.?!\n]{0,30}\b(?:made|run|endorsed|owned|affiliated|approved)\b"
-    r"|\bmade by workzap\b|\bbusiness platform\b|\bthrough whatsapp\b|\bchat(?:s|ting)? (?:through|on|via)\b",
+    r"|\bmade by workzap\b|\bbusiness platform\b|\bthrough whatsapp\b|\bchat(?:s|ting)? (?:through|on|via)\b"
+    r"|\b(?:your|their)\s+(?:app|platform|marketplace|aggregator|delivery)\s+(?:terms|rules|polic(?:y|ies))\b",
     re.IGNORECASE,
 )
 ILLUSTRATION = re.compile(
@@ -1439,8 +1465,9 @@ def _advice_and_policy(reply: str, heard: str, add: Any) -> None:
 
 
 def _style_soft(reply: str, context: dict[str, Any], heard: str, state: Any, add: Any) -> None:
-    if INTERNAL_PLAIN.search(reply):
-        word = INTERNAL_PLAIN.search(reply)
+    own = _advice_free(reply, context)
+    if INTERNAL_PLAIN.search(own):
+        word = INTERNAL_PLAIN.search(own)
         if (
             word
             and word.group(0).lower().rstrip("s") not in heard
@@ -1544,7 +1571,8 @@ def lint(reply: str, context: dict[str, Any]) -> list[Violation]:
 
     # No pitching while listening (R-SELL)
     state = flow.parse((context.get("flow") or {}).get("state"))
-    if URGENCY.search(reply) or _offers_discount(reply, heard):
+    own = _advice_free(reply, context)
+    if URGENCY.search(own) or _offers_discount(own, heard):
         add(Violation("R-SELL-03", "no urgency, scarcity or discounts to move a decision", True))
     # Solution mode (Addendum 2, 1.4 and 1.6): they asked for a fix or for the detail, so this
     # reply may carry the ideas, the Workzap line and the document. The value-line checks below
