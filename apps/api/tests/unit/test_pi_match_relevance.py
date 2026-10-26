@@ -21,7 +21,9 @@ STOP = set(
         "ka ki ke ko se mein par ye woh kya kuch bhi"
     ).split()
 )
-FALSE_MATCH_CEILING = 0.66  # share of served entries with no shared content word (goal: 0.05)
+FALSE_MATCH_CEILING = (
+    0.13  # share of served entries with no shared content word (was 0.65; goal 0.05)
+)
 
 
 def _tokens(text: str) -> set[str]:
