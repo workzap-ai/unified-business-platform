@@ -6,6 +6,7 @@ industry packs may add their own (snake_case), which are kept as written. Labels
 Arabic come from the spec and still need a native-speaker review before launch (spec 2.5.1).
 """
 
+import re
 from dataclasses import dataclass
 from decimal import Decimal
 
@@ -26,11 +27,11 @@ def _c(key: str, en: str, roman_ur: str, ur: str, ar: str, subtypes: str) -> Cat
 
 CATEGORIES: tuple[Category, ...] = (
     _c("stock_inventory", "Stock", "Maal", "اسٹاک", "المخزون",
-       "stockout overstock_dead_stock shrinkage_theft count_mismatch transfers_lost expiry_wastage "
+       "stockout overstock_dead_stock overstock_ageing shrinkage_theft count_mismatch transfers_lost expiry_wastage "
        "wrong_location slow_replenishment no_visibility returns_handling serial_batch_tracking "
        "raw_material_shortage"),
     _c("sales_revenue", "Sales", "Bikri", "سیل", "المبيعات",
-       "sales_drop branch_underperforming target_missed seasonal_dip conversion_low basket_small "
+       "sales_drop clearance branch_underperforming target_missed seasonal_dip conversion_low basket_small "
        "pricing_errors discount_abuse salesforce_performance no_sales_visibility channel_conflict"),
     _c("cash_collections", "Cash & payments", "Paisa aur wusooli", "نقد", "النقد والتحصيل",
        "cash_mismatch receivables_late credit_customers cash_handling_risk deposit_delays "
@@ -100,7 +101,10 @@ IMPACT_TYPES = (
 )  # fmt: skip
 LINK_TYPES = (
     "same_root_suspected", "causes", "same_area", "duplicate_across_contacts", "blocks",
+    "worsens", "competes", "same_root", "symptom_of",
 )  # fmt: skip
+# Who stands behind a link (spec 4.3): the owner's own words, pi's inference, or confirmed.
+LINK_EVIDENCE = ("owner_said", "pi_inferred", "confirmed")
 LINK_STATUSES = ("suggested", "confirmed", "rejected")
 
 # Confidence under this means pi checks with the person before the note is confirmed.
@@ -173,3 +177,74 @@ def severity_band(score: Decimal) -> str:
     if score < 27:
         return "high"
     return "critical"
+
+
+# Goal verbs (spec 7.2): what the owner wants done decides the sort, not the nouns they use.
+GOAL_VERBS = (
+    "sell_clear",  # sell / clear
+    "know_track",  # know / track
+    "avoid_running_out",
+    "bring_back",
+    "collect_cash",
+    "get_customers",
+    "cut_cost",
+    "stop_loss",
+    "save_time",
+)
+
+
+@dataclass(frozen=True)
+class GoalSort:
+    goal_verb: str
+    category: str
+    subtype: str
+    secondary: tuple[str, str] | None = None  # (category, subtype)
+
+
+# (pattern, sort). Checked in order, first match wins; the specific shapes come first.
+_GOAL_RULES: tuple[tuple[str, GoalSort], ...] = (
+    (
+        r"(stock|maal|inventory|goods)\W+(\w+\W+){0,3}?(bech(na|ni|ne)|bik(ta|ti|te)?\s+nahi|clear|sell|selling|"
+        r"not\s+sell|sitting|ageing|aging|purana|dead)|"
+        r"(bech(na|ni|ne)|sell|clear|clearance|offload|dispose)\W+(\w+\W+){0,4}?(stock|maal|inventory|goods)",
+        GoalSort(
+            "sell_clear", "stock_inventory", "overstock_ageing", ("sales_revenue", "clearance")
+        ),
+    ),
+    (
+        r"maal\s+(kam|khatam|ruk)|stock\s+(kam|khatam)\s+ho|run(ning)?\s+out\s+of\s+(stock|goods|items)|"
+        r"(stock|maal)\s+(runs?|ran)\s+(out|short)|out\s+of\s+stock|stock\s*out|short\s+of\s+(stock|maal)",
+        GoalSort("avoid_running_out", "stock_inventory", "stockout"),
+    ),
+    (
+        r"(stock|maal|inventory)\s+(ka\s+)?(hisaab|hisab|record|count|tracking|track|trace)|"
+        r"(track|know|see|count)\s+(my\s+|our\s+|the\s+)?(stock|inventory)|"
+        r"(stock|inventory)\s+(tracking|count|numbers?)\s+(is|are)?\s*(wrong|off|missing)|"
+        r"(stock|maal)\s+(ka\s+)?pata\s+nahi",
+        GoalSort("know_track", "stock_inventory", "no_visibility"),
+    ),
+    (
+        r"(customers?|gahak|gaahak|clients?)\s+(\w+\s+){0,2}?(wapas|wapis|dobara|repeat|return|come\s+back)|"
+        r"(bring|win|get)\s+(back\s+)?(old\s+|lost\s+)?(customers?|clients?)\s+back|"
+        r"(customers?|clients?)\s+(don'?t|do\s+not|never)\s+(come\s+back|return)",
+        GoalSort("bring_back", "customers_retention", "repeat_low"),
+    ),
+    (
+        r"recovery|wusooli|wasooli|waisooli|collect\s+(my\s+|our\s+|the\s+)?(payments?|money|cash|dues)|"
+        r"(payments?|paisa|paise|udhaar|udhar)\s+(\w+\s+){0,2}?(nahi\s+aa|late|stuck|pending|owed)|"
+        r"unpaid\s+invoices?|customers?\s+(don'?t|do\s+not)\s+pay",
+        GoalSort("collect_cash", "cash_collections", "receivables_late"),
+    ),
+)
+
+
+def goal_sort(text: str) -> GoalSort | None:
+    """The goal verb and the right sort for what the owner said, or None when no rule fits
+    (the model's own category then stands). English and Roman Urdu; spec 7.2."""
+    lowered = " ".join((text or "").lower().replace("’", "'").split())
+    if not lowered:
+        return None
+    for pattern, sort in _GOAL_RULES:
+        if re.search(pattern, lowered):
+            return sort
+    return None

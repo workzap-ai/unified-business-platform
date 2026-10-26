@@ -102,6 +102,10 @@ class PiProblem(WorkspaceRow):
     pii_redacted: Mapped[bool] = mapped_column(Boolean, default=False, server_default="false")
     language: Mapped[str | None] = mapped_column(String(16), nullable=True)
     merged_into: Mapped[UUID | None] = mapped_column(Uuid, nullable=True)
+    goal_verb: Mapped[str | None] = mapped_column(String(24), nullable=True)  # spec 7.2
+    raised_voluntarily: Mapped[bool] = mapped_column(
+        Boolean, default=False, server_default="false"
+    )  # B5: raised on their own, not only as an answer
 
 
 class PiProblemRevision(WorkspaceRow):
@@ -136,6 +140,7 @@ class PiProblemLink(WorkspaceRow):
         ),
         CheckConstraint(_in("type", taxonomy.LINK_TYPES), name="type"),
         CheckConstraint(_in("status", taxonomy.LINK_STATUSES), name="status"),
+        CheckConstraint(_in("evidence", taxonomy.LINK_EVIDENCE), name="evidence"),
         CheckConstraint("from_id <> to_id", name="distinct"),
         CheckConstraint("confidence >= 0 AND confidence <= 1", name="confidence_range"),
     )
@@ -145,3 +150,6 @@ class PiProblemLink(WorkspaceRow):
     confidence: Mapped[Decimal] = mapped_column(Numeric(3, 2), default=Decimal("0.6"))
     created_by: Mapped[str] = mapped_column(String(8), default="pi", server_default="pi")
     status: Mapped[str] = mapped_column(String(12), default="suggested", server_default="suggested")
+    evidence: Mapped[str] = mapped_column(
+        String(12), default="pi_inferred", server_default="pi_inferred"
+    )  # owner_said | pi_inferred | confirmed (spec 4.3)
