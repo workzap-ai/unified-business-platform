@@ -321,3 +321,15 @@ def test_the_card_reminder_is_not_said_twice_when_the_model_repeats_it() -> None
     assert without_repeated_sentences(notice, echoed) == ""
     own = "Aap ka masla note hai. Kya aap bata sakte hain ke payment kab aati hai?"
     assert without_repeated_sentences(notice, f"{echoed} {own}") == own
+
+
+def test_a_live_roman_urdu_promise_that_the_document_is_being_prepared_is_caught() -> None:
+    from app.modules.pi.service_conversation import PROMISED_DOCUMENT
+
+    # live chat 2026-10-26: a bare "g" was answered with this before any yes to the offer
+    assert PROMISED_DOCUMENT.search(
+        "Ji, document aur quote prepare ho rahe hain. Yahin chat mein aayega."
+    )
+    assert not PROMISED_DOCUMENT.search(
+        "Kya aap in sab ke liye solution document aur quote chahenge?"
+    )

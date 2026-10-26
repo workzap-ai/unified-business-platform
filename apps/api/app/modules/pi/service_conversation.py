@@ -2318,7 +2318,7 @@ def brain_howto(turn: "ServiceTurn", context: dict[str, Any]) -> None:
 
 
 PROMISED_DOCUMENT = re.compile(
-    r"(?:document|quote).{0,80}(?:tayy?ar|ready|banega|banay ?ga|banwa|bhej"
+    r"(?:document|quote).{0,80}(?:tayy?ar|ready|prepare ho|banega|banay ?ga|banwa|bhej"
     r"|ban(?:ne|a) (?:jayega|diya)"
     r"|will be|is being|being prepared|on its way)"
     r"|(?:maine|i(?:'ve| have) asked).{0,60}(?:document|quote)",
