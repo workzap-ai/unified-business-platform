@@ -51,7 +51,9 @@ DEFAULT_MODELS: dict[str, dict[str, str]] = {
     "gemini": {
         "router": "gemini-2.5-flash-lite",
         "agent": "gemini-2.5-flash",
-        "pi_brain": "gemini-2.5-flash",
+        # gemini-2.5-flash answers 404 NOT_FOUND on the platform key (checked live 2026-10-26);
+        # gemini-3.5-flash, already the stored "agent" model, answers a pi reply in 5 to 7 s.
+        "pi_brain": "gemini-3.5-flash",
         "summarize": "gemini-2.5-flash-lite",
         "vision": "gemini-2.5-flash",
         "video": "gemini-2.5-flash",

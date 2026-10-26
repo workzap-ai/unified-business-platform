@@ -68,7 +68,7 @@ class OpenAICompatibleProvider(HttpAdapter):
         error = error_body(response)
         code = str(error.get("code") or error.get("type") or "")
         kind = classify_status(status)
-        if code in {"insufficient_quota", "billing_hard_limit_reached"}:
+        if code in {"insufficient_quota", "billing_hard_limit_reached", "credit_balance_exhausted"}:
             kind = ErrorKind.QUOTA
         elif code in {"content_policy_violation", "content_filter"}:
             kind = ErrorKind.CONTENT_POLICY

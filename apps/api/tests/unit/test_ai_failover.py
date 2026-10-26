@@ -200,3 +200,10 @@ async def test_probe_leaves_room_for_models_that_think_first(settings):
         result = await probe(probe_settings(settings), client, "openai")
     assert result["ok"]
     assert all(body["max_completion_tokens"] >= 128 for body in bodies)
+
+
+def test_gemini_pi_brain_model_is_one_that_exists():
+    from app.ai.registry import DEFAULT_MODELS
+
+    # live check 2026-10-26: gemini-2.5-flash is a 404 for the platform key; 3.5-flash answers
+    assert DEFAULT_MODELS["gemini"]["pi_brain"] == "gemini-3.5-flash"

@@ -104,6 +104,10 @@ def to_gemini_schema(schema: Mapping[str, Any]) -> dict[str, Any]:
     return convert(schema)
 
 
+def _schema_key(schema: Mapping[str, Any]) -> str:
+    return json.dumps(schema, sort_keys=True, default=str)
+
+
 class GeminiProvider(HttpAdapter):
     """Implements LLMProvider, VisionProvider, EmbeddingProvider, SpeechToTextProvider."""
 
@@ -124,6 +128,8 @@ class GeminiProvider(HttpAdapter):
         super().__init__(name, http, base_url)
         self._key = api_key
         self.capabilities = capabilities
+        # Response schemas Gemini refused as too deep or wide: sent as text from then on.
+        self._schema_in_prompt: set[str] = set()
 
     def _headers(self) -> dict[str, str]:
         return {"x-goog-api-key": self._key.get_secret_value()}
@@ -182,20 +188,12 @@ class GeminiProvider(HttpAdapter):
         if any(m.images() for m in request.messages):
             self._unsupported("vision")
         model = self._model(request.model)
-        body: dict[str, Any] = {"contents": self._contents(request.messages)}
-        system = "\n\n".join(m.text() for m in request.messages if m.role == "system")
-        if system:
-            body["systemInstruction"] = {"parts": [{"text": system}]}
-        config: dict[str, Any] = {}
-        if request.temperature is not None:
-            config["temperature"] = request.temperature
-        if request.max_tokens is not None:
-            config["maxOutputTokens"] = request.max_tokens
-        if request.schema is not None:
-            config["responseMimeType"] = "application/json"
-            config["responseSchema"] = to_gemini_schema(request.schema.schema)
-        if config:
-            body["generationConfig"] = config
+        schema = request.schema
+        # Gemini refuses a response schema that is too deep or wide ("invalid argument"; pi's own
+        # reply schema is one, checked live 2026-10-26). Such a schema is then sent as text in the
+        # system instruction with the JSON mime type, and the reply is validated as before.
+        in_prompt = schema is not None and _schema_key(schema.schema) in self._schema_in_prompt
+        body = self._chat_body(request, in_prompt)
         if request.tools:
             declarations = []
             for tool in request.tools:
@@ -210,13 +208,51 @@ class GeminiProvider(HttpAdapter):
                 if mode is None:
                     calling["allowedFunctionNames"] = [request.tool_choice]
                 body["toolConfig"] = {"functionCallingConfig": calling}
-        data = await self.post(
-            f"models/{model}:generateContent",
-            headers=self._headers(),
-            json_body=body,
-            request_timeout=request.timeout,
-        )
+        try:
+            data = await self.post(
+                f"models/{model}:generateContent",
+                headers=self._headers(),
+                json_body=body,
+                request_timeout=request.timeout,
+            )
+        except ProviderError as error:
+            if schema is None or in_prompt or error.kind != ErrorKind.INVALID_REQUEST:
+                raise
+            self._schema_in_prompt.add(_schema_key(schema.schema))
+            retry_body = self._chat_body(request, True)
+            for key in ("tools", "toolConfig"):
+                if key in body:
+                    retry_body[key] = body[key]
+            data = await self.post(
+                f"models/{model}:generateContent",
+                headers=self._headers(),
+                json_body=retry_body,
+                request_timeout=request.timeout,
+            )
         return self._parse(data, model)
+
+    def _chat_body(self, request: LLMRequest, schema_in_prompt: bool) -> dict[str, Any]:
+        body: dict[str, Any] = {"contents": self._contents(request.messages)}
+        system = "\n\n".join(m.text() for m in request.messages if m.role == "system")
+        if schema_in_prompt and request.schema is not None:
+            system = (
+                f"{system}\n\nReturn ONLY one JSON object that matches this JSON schema (no prose, "
+                f"no markdown):\n{json.dumps(request.schema.schema)}"
+            )
+        if system:
+            body["systemInstruction"] = {"parts": [{"text": system}]}
+        config: dict[str, Any] = {}
+        if request.temperature is not None:
+            config["temperature"] = request.temperature
+        if request.max_tokens is not None:
+            config["maxOutputTokens"] = request.max_tokens
+        if request.schema is not None:
+            config["responseMimeType"] = "application/json"
+            if not schema_in_prompt:
+                config["responseSchema"] = to_gemini_schema(request.schema.schema)
+        if config:
+            body["generationConfig"] = config
+        return body
 
     async def analyze(self, request: LLMRequest) -> LLMResponse:
         self._unsupported("vision")
