@@ -50,7 +50,11 @@ def test_a_rewritten_idea_passes_the_reply_rules_and_a_blocked_one_is_not_picked
     for changes in DATA.values():
         for new in changes.values():
             assert solution_lint.passes(new), new
-    assert not solution_lint.passes("Name who may give a discount, so there is one rule.")
+    # A discount in an idea about the owner's own business is advice, not pi pressing anyone
+    # (R-SELL-03 judges pi's own sentences): a promise or a Workzap time claim stays blocked.
+    assert solution_lint.passes("Name who may give a discount, so there is one rule.")
+    assert not solution_lint.passes("Workzap will deliver this in three weeks.")
+    assert not solution_lint.passes("Promise customers a guaranteed 20% rise in sales.")
     assert solution_lint.passes("Ask staff to send a photo of each delivery note, so none is lost.")
 
 
