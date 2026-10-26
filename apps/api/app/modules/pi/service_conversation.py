@@ -1653,6 +1653,20 @@ def redisclose_due(context: dict[str, Any]) -> bool:
     return int(context.get("days_away") or 0) > limit
 
 
+def without_repeated_sentences(fixed: str, reply: str) -> str:
+    """The model's reply without the sentences that say again what the fixed text before it already
+    said (a real replay sent the card-number reminder twice, once fixed and once in the model's own
+    words). A sentence counts as a repeat when most of its words are in the fixed text."""
+    fixed_words = set(re.findall(r"\w+", fixed.lower()))
+    kept = []
+    for sentence in re.split(r"(?<=[.!?])\s+", reply.strip()):
+        words = re.findall(r"\w+", sentence.lower())
+        if words and sum(w in fixed_words for w in words) / len(words) >= 0.7:
+            continue
+        kept.append(sentence)
+    return " ".join(kept)
+
+
 def with_disclosure(
     reply: str, context: dict[str, Any], language: str, *, after: bool = False
 ) -> str:
@@ -5075,7 +5089,9 @@ async def compose_service_turn(
     ):
         turn.consent = "unchanged"
     if (context.get("pii") or {}).get("notice"):
-        turn.reply = f"{context['pii']['notice']} {turn.reply}"  # R-PRIV-02: said once
+        notice = str(context["pii"]["notice"])
+        turn.reply = f"{notice} {without_repeated_sentences(notice, turn.reply)}".strip()
+        # R-PRIV-02: said once
     if context.get("pi_mode") == "brain" and not turn._greeting_only:
         if business_name := context.get("business_disclosure_name"):
             # R-MEM-06, spec 4.9: said once, at the first message after joining a business.

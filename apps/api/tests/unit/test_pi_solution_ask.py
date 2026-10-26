@@ -305,3 +305,19 @@ def test_the_owners_own_loss_does_not_count_as_pushing_for_a_fix() -> None:
         assert not asked_for_ideas(said), said
     for said in ("what now?", "so what can you do", "kuch kar sakte ho", "how much would it cost"):
         assert what_now(said), said
+
+
+def test_the_card_reminder_is_not_said_twice_when_the_model_repeats_it() -> None:
+    from app.modules.pi.service_conversation import without_repeated_sentences
+
+    notice = (
+        "Meherbani karke yahan card number na bhejein. Mujhe in ki zaroorat nahi, aur payment is "
+        "chat mein kabhi nahi hoti. Maine ise apne notes se nikaal diya hai."
+    )
+    echoed = (
+        "Meherbani karke card number yahan na bhejein. Mujhe is ki zaroorat nahi, aur payment is "
+        "chat mein kabhi nahi hoti. Maine isay apne notes se nikaal diya hai."
+    )
+    assert without_repeated_sentences(notice, echoed) == ""
+    own = "Aap ka masla note hai. Kya aap bata sakte hain ke payment kab aati hai?"
+    assert without_repeated_sentences(notice, f"{echoed} {own}") == own
