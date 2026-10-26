@@ -21,10 +21,14 @@ Layout is deterministic: no randomness, ties broken by the order the nodes arriv
 `previous` slot map keeps old problems where they were when the map grows. The same map always
 gives the same bytes, so a picture can be cached by `map_hash`.
 
-Scripts. The font is Pillow's bundled Latin font. Pillow here has no raqm (complex text layout)
-and the project has neither `arabic_reshaper` nor `python-bidi`, so Urdu, Arabic and Persian script
-cannot be shaped: those languages (and any map whose words the font cannot draw) get the text
-fallback only, written right to left, never a badly shaped picture. See `NEEDS_FOR_RTL_IMAGES`.
+Scripts. Latin text (English, Roman Urdu) uses Pillow's bundled font. Urdu, Arabic and Persian
+(Pashto and Sindhi borrow the Urdu words) are drawn right to left with Noto Naskh Arabic (SIL OFL,
+`fonts/`): each line is shaped with `arabic_reshaper` and put in visual order with `python-bidi`
+(Pillow here has no raqm), and the layout is mirrored (first card on the right, text right-aligned,
+arrows read leftwards). Naskh has no Latin letters, so Latin runs ("Workzap", Roman words) are drawn
+with the Latin font. If the font file or the two packages are missing at run time, or a word needs a
+glyph the font lacks, the picture is skipped and the right-to-left text fallback comes back with the
+reason; never a badly shaped picture.
 
 Safety: every drawn word passes the project's redactor, long digit runs, e-mail addresses and
 links are removed, and when the owner's messages are supplied a number the owner never said is not
@@ -37,6 +41,8 @@ import json
 import re
 import zlib
 from dataclasses import dataclass, field
+from functools import lru_cache
+from pathlib import Path
 from typing import Any
 
 from PIL import Image, ImageDraw, ImageFont
@@ -55,13 +61,11 @@ MAX_LABEL_WORDS = 6
 MAX_LINK_WORDS = 3
 MAX_FACT_LINES = 3
 
-DRAWABLE_LANGUAGES = ("en", "roman_ur")
+DRAWABLE_LANGUAGES = ("en", "roman_ur", "ur", "ar", "fa")
 RTL_LANGUAGES = ("ur", "ar", "fa", "ps", "sd")
-NEEDS_FOR_RTL_IMAGES = (
-    "a Naskh-capable font file (Noto Naskh Arabic, SIL OFL 1.1) vendored into the repo, and either "
-    "Pillow built with raqm (libraqm, fribidi, harfbuzz) or the arabic_reshaper and python-bidi "
-    "packages added to pyproject.toml"
-)
+FONT_DIR = Path(__file__).parent / "fonts"
+NASKH_REGULAR = FONT_DIR / "NotoNaskhArabic-Regular.ttf"
+NASKH_BOLD = FONT_DIR / "NotoNaskhArabic-Bold.ttf"
 
 # Colours (RGB). Text pairs are listed in TEXT_PAIRS and checked by the tests (WCAG, 4.5 to 1).
 BG = (238, 242, 246)
@@ -97,7 +101,8 @@ TEXT_PAIRS = (
 TEXT: dict[str, dict[str, Any]] = {
     "en": {
         "header": "Your business map",
-        "summary": "Version {v} · {n} {problems} · {l} {links}",
+        "version": "Version",
+        "summary": "{version} {v} · {pc} · {lc}",
         "problem": "problem",
         "problems": "problems",
         "link": "link",
@@ -111,9 +116,9 @@ TEXT: dict[str, dict[str, Any]] = {
         "cluster": "One root: {title}",
         "others": "Other problems",
         "more": "More below",
-        "caption": "Version {v}: {n} {problems}, {l} {links}.",
-        "caption_overview": "Version {v}, overview: {k} groups.",
-        "caption_detail": "Version {v}, {title}: {n} {problems}.",
+        "caption": "{version} {v}: {pc}, {lc}.",
+        "caption_overview": "{version} {v}, overview: {k} groups.",
+        "caption_detail": "{version} {v}, {title}: {pc}.",
         "alt_node": "Problem: {label}",
         "alt_guess": "my guess, please confirm",
         "alt_link": "Link: {a} to {b} ({label}; {kind})",
@@ -130,7 +135,8 @@ TEXT: dict[str, dict[str, Any]] = {
     },
     "roman_ur": {
         "header": "Aap ke karobar ka naqsha",
-        "summary": "Version {v} · {n} {problems} · {l} {links}",
+        "version": "Version",
+        "summary": "{version} {v} · {pc} · {lc}",
         "problem": "masla",
         "problems": "masle",
         "link": "jorr",
@@ -144,9 +150,9 @@ TEXT: dict[str, dict[str, Any]] = {
         "cluster": "Ek hi jar: {title}",
         "others": "Baqi masle",
         "more": "Aage dekhein",
-        "caption": "Version {v}: {n} {problems}, {l} {links}.",
-        "caption_overview": "Version {v}, mukhtasar: {k} hisse.",
-        "caption_detail": "Version {v}, {title}: {n} {problems}.",
+        "caption": "{version} {v}: {pc}, {lc}.",
+        "caption_overview": "{version} {v}, mukhtasar: {k} hisse.",
+        "caption_detail": "{version} {v}, {title}: {pc}.",
         "alt_node": "Masla: {label}",
         "alt_guess": "hamara andaza, aap tasdeeq karein",
         "alt_link": "Jorr: {a} se {b} ({label}; {kind})",
@@ -161,14 +167,171 @@ TEXT: dict[str, dict[str, Any]] = {
         },
         "guess_note": "(hamara andaza)",
     },
-    # Urdu script: text fallback only (see the module note on scripts).
+    # Urdu script (Pashto and Sindhi readers get these words too). Gender neutral: "aap", no verbs
+    # that change with the speaker.
     "ur": {
         "header": "آپ کے کاروبار کا نقشہ",
-        "summary": "ورژن {v} · {n} مسئلے · {l} جوڑ",
+        "version": "ورژن",
+        "summary": "{version} {v} · {pc} · {lc}",
+        "problem": "مسئلہ",
+        "problems": "مسئلے",
+        "link": "جوڑ",
+        "links": "جوڑ",
+        "new": "نیا",
+        "legend_owner": "آپ نے بتایا",
+        "legend_guess": "ہمارا اندازہ",
+        "legend_new": "شامل ہوا",
         "foot": "صرف آپ کے بتائے ہوئے نمبر۔ کوئی نام یا ذاتی تفصیل نہیں۔",
+        "overview": "مختصر نقشہ",
+        "cluster": "ایک ہی جڑ: {title}",
+        "others": "باقی مسئلے",
+        "more": "آگے دیکھیں",
+        "caption": "{version} {v}: {pc}، {lc}۔",
+        "caption_overview": "{version} {v}، مختصر نقشہ: {k} حصے۔",
+        "caption_detail": "{version} {v}، {title}: {pc}۔",
+        "alt_node": "مسئلہ: {label}",
+        "alt_guess": "ہمارا اندازہ، براہِ کرم تصدیق کریں",
+        "alt_link": "جوڑ: {a} سے {b} ({label}؛ {kind})",
+        "alt_owner": "آپ نے بتایا",
+        "types": {
+            "causes": "اثر",
+            "worsens": "بگاڑ",
+            "competes": "ٹکراؤ",
+            "same_root": "ایک جڑ",
+            "blocks": "رکاوٹ",
+            "symptom_of": "نشانی",
+        },
         "guess_note": "(ہمارا اندازہ)",
     },
+    "ar": {
+        "header": "خريطة نشاطك التجاري",
+        "version": "الإصدار",
+        "summary": "{version} {v} · {pc} · {lc}",
+        "problem": "مشكلة",
+        "problems": "مشكلات",
+        "n_problem": "المشكلات: {n}",
+        "n_link": "الروابط: {n}",
+        "link": "رابط",
+        "links": "روابط",
+        "new": "جديد",
+        "legend_owner": "من كلامك",
+        "legend_guess": "تقديرنا",
+        "legend_new": "تمت إضافته",
+        "foot": "الأرقام المستخدمة هي التي ذكرتها فقط. بلا أسماء أو بيانات شخصية.",
+        "overview": "نظرة عامة",
+        "cluster": "جذر واحد: {title}",
+        "others": "مشكلات أخرى",
+        "more": "المزيد أدناه",
+        "caption": "{version} {v}: {pc}، {lc}.",
+        "caption_overview": "{version} {v}، نظرة عامة: عدد المجموعات {k}.",
+        "caption_detail": "{version} {v}، {title}: {pc}.",
+        "alt_node": "مشكلة: {label}",
+        "alt_guess": "تقديرنا، يرجى التأكيد",
+        "alt_link": "رابط: من {a} إلى {b} ({label}؛ {kind})",
+        "alt_owner": "من كلامك",
+        "types": {
+            "causes": "يسبب",
+            "worsens": "يفاقم",
+            "competes": "يتنافس",
+            "same_root": "جذر واحد",
+            "blocks": "يعيق",
+            "symptom_of": "من أعراض",
+        },
+        "guess_note": "(تقديرنا)",
+    },
+    "fa": {
+        "header": "نقشه کسب‌وکار شما",
+        "version": "نسخه",
+        "summary": "{version} {v} · {pc} · {lc}",
+        "problem": "مشکل",
+        "problems": "مشکل",
+        "link": "پیوند",
+        "links": "پیوند",
+        "new": "جدید",
+        "legend_owner": "گفته شما",
+        "legend_guess": "حدس ما",
+        "legend_new": "افزوده شد",
+        "foot": "فقط عددهایی که شما گفتید استفاده شده است. بدون نام یا مشخصات شخصی.",
+        "overview": "نمای کلی",
+        "cluster": "یک ریشه: {title}",
+        "others": "مشکل‌های دیگر",
+        "more": "ادامه در پایین",
+        "caption": "{version} {v}: {pc}، {lc}.",
+        "caption_overview": "{version} {v}، نمای کلی: {k} گروه.",
+        "caption_detail": "{version} {v}، {title}: {pc}.",
+        "alt_node": "مشکل: {label}",
+        "alt_guess": "حدس ما، لطفاً تأیید کنید",
+        "alt_link": "پیوند: {a} به {b} ({label}؛ {kind})",
+        "alt_owner": "گفته شما",
+        "types": {
+            "causes": "اثر",
+            "worsens": "تشدید",
+            "competes": "رقابت",
+            "same_root": "یک ریشه",
+            "blocks": "مانع",
+            "symptom_of": "نشانه",
+        },
+        "guess_note": "(حدس ما)",
+    },
 }
+
+# Names for the colour legend in right-to-left maps (the category keys come from taxonomy.py).
+CATEGORY_NAMES: dict[str, dict[str, str]] = {
+    "fa": {
+        "stock_inventory": "موجودی کالا",
+        "sales_revenue": "فروش",
+        "cash_collections": "پول و دریافتی",
+        "margin_cost": "سود و هزینه",
+        "customers_retention": "مشتریان",
+        "marketing_leads": "بازاریابی",
+        "orders_fulfilment": "سفارش و تحویل",
+        "suppliers_purchasing": "تأمین‌کنندگان و خرید",
+        "people_staff": "کارکنان",
+        "operations_process": "عملیات",
+        "reporting_visibility": "گزارش‌ها",
+        "tech_systems": "سامانه‌ها",
+        "quality_complaints": "کیفیت",
+        "compliance_admin": "امور اداری و قانونی",
+        "communication_coordination": "هماهنگی",
+        "loss_security": "ضرر و امنیت",
+        "planning_growth": "برنامه‌ریزی و رشد",
+        "customer_experience_digital": "حضور آنلاین",
+        "other": "سایر",
+    },
+}
+
+
+def category_name(category: str, lang: str) -> str:
+    """The legend name of a category: localised for right-to-left maps, else the key as words."""
+    if lang in ("ur", "ar"):
+        from app.modules.pi import taxonomy
+
+        found = taxonomy.BY_KEY.get(category)
+        if found:
+            return str(getattr(found, lang))
+    elif lang in CATEGORY_NAMES and category in CATEGORY_NAMES[lang]:
+        return CATEGORY_NAMES[lang][category]
+    return category.replace("_", " ")
+
+
+def count_phrase(words: dict[str, Any], kind: str, n: int) -> str:
+    """ "3 problems" (or the language's own counted form, e.g. Arabic "المشكلات: 3")."""
+    template = words.get(f"n_{kind}")
+    if template:
+        return str(template).format(n=n)
+    return f"{n} {words[kind + 's'] if n != 1 else words[kind]}"
+
+
+def counts(words: dict[str, Any], version: int, n: int, links: int) -> dict[str, Any]:
+    """The fields every summary or caption template may use."""
+    return {
+        "version": words["version"],
+        "v": version,
+        "n": n,
+        "l": links,
+        "pc": count_phrase(words, "problem", n),
+        "lc": count_phrase(words, "link", links),
+    }
 
 
 def _words(language: str | None) -> dict[str, Any]:
@@ -181,7 +344,9 @@ def is_rtl(language: str | None) -> bool:
 
 def _lang(language: str | None) -> str:
     base = (language or "en").split("-")[0].lower()
-    return base if base in ("en", "roman_ur", "ur") else ("ur" if base in RTL_LANGUAGES else "en")
+    if base in ("en", "roman_ur", "ur", "ar", "fa"):
+        return base
+    return "ur" if base in RTL_LANGUAGES else "en"
 
 
 # --- numbers and personal data ------------------------------------------------------------------
@@ -439,14 +604,19 @@ def layout(
     return slots
 
 
-def _geometry(slots: dict[str, Slot]) -> tuple[dict[str, tuple[int, int]], int]:
-    """Top-left pixel of every card (empty rows squeezed out) and the height the cards use."""
+def _geometry(slots: dict[str, Slot], rtl: bool = False) -> tuple[dict[str, tuple[int, int]], int]:
+    """Top-left pixel of every card (empty rows squeezed out) and the height the cards use.
+
+    Right to left: column 0 is the right-hand column, so the first problem sits on the right.
+    """
     rows = sorted({s[0] for s in slots.values()})
     row_index = {r: i for i, r in enumerate(rows)}
     alone = {r: sum(1 for s in slots.values() if s[0] == r) == 1 for r in rows}
     pos: dict[str, tuple[int, int]] = {}
     for nid, (row, col) in slots.items():
         x = MARGIN + col * (CARD_W + COL_GAP)
+        if rtl:
+            x = WIDTH - x - CARD_W
         if alone[row]:
             x = (WIDTH - CARD_W) // 2
         pos[nid] = (x, HEADER_H + PAD_TOP + OUTLINE_TITLE + row_index[row] * (CARD_H + GAP_Y))
@@ -457,33 +627,128 @@ def _geometry(slots: dict[str, Slot]) -> tuple[dict[str, tuple[int, int]], int]:
 # --- drawing primitives -------------------------------------------------------------------------
 
 
-def _font(size: int) -> Any:
-    return ImageFont.load_default(size=max(size, MIN_TEXT_PX))
+NASKH_SCALE = 1.1  # Naskh looks smaller than the Latin font at the same size
+_NEUTRAL = " ​‌‍‎‏⁦⁧⁨⁩‪‫‬‭‮"
+_LATIN_PUNCT = "–—‘’“”…·"
+
+
+def _font(size: int, bold: bool = False, naskh: bool = False) -> Any:
+    size = max(size, MIN_TEXT_PX)
+    if naskh:
+        return _naskh_font(round(size * NASKH_SCALE), bold)
+    return ImageFont.load_default(size=size)
+
+
+@lru_cache(maxsize=64)
+def _naskh_font(size: int, bold: bool) -> Any:
+    return ImageFont.truetype(str(NASKH_BOLD if bold else NASKH_REGULAR), size)
+
+
+@lru_cache(maxsize=1)
+def _load_rtl() -> tuple[Any, Any]:
+    """The shaping tools and both Naskh fonts; ImportError or OSError when something is missing."""
+    import arabic_reshaper  # type: ignore[import-untyped]
+    from bidi.algorithm import get_display  # type: ignore[import-untyped]
+
+    _naskh_font(MIN_TEXT_PX, False)
+    _naskh_font(MIN_TEXT_PX, True)
+    return arabic_reshaper.reshape, get_display
+
+
+@lru_cache(maxsize=4096)
+def shape_rtl(text: str) -> str:
+    """The line in visual (left to right) order with joined letter forms, ready to draw."""
+    reshape, display = _load_rtl()
+    return str(display(reshape(text), base_dir="R"))
+
+
+@lru_cache(maxsize=1)
+def _naskh_missing() -> tuple[Any, float]:
+    font = _naskh_font(MIN_TEXT_PX, False)
+    return font.getbbox("￿"), float(font.getlength("￿"))
+
+
+@lru_cache(maxsize=4096)
+def _naskh_has(char: str) -> bool:
+    font = _naskh_font(MIN_TEXT_PX, False)
+    return (font.getbbox(char), float(font.getlength(char))) != _naskh_missing()
+
+
+def _latin_ok(char: str) -> bool:
+    return ord(char) < 0x250 or char in _LATIN_PUNCT
+
+
+def _uses_latin_font(char: str) -> bool:
+    """Naskh lacks Latin letters, brackets, hyphen, dot and ellipsis: those use the Latin font."""
+    if char in _NEUTRAL:
+        return False
+    if char.isalpha() and ord(char) < 0x250:
+        return True
+    return not _naskh_has(char)
+
+
+def _runs(visual: str) -> list[tuple[str, bool]]:
+    """Split a shaped line into (text, is_latin) runs; spaces stay with the run before them."""
+    runs: list[tuple[str, bool]] = []
+    for char in visual:
+        latin = _uses_latin_font(char)
+        if char in _NEUTRAL and runs:
+            latin = runs[-1][1]
+        if runs and runs[-1][1] == latin:
+            runs[-1] = (runs[-1][0] + char, latin)
+        else:
+            runs.append((char, latin))
+    return runs
+
+
+def rtl_drawable(text: str) -> bool:
+    """True when every character of the (shaped) text has a glyph in Naskh or the Latin font."""
+    for char in shape_rtl(text):
+        if char in _NEUTRAL or _naskh_has(char):
+            continue
+        if not _latin_ok(char):
+            return False
+    return True
 
 
 class Canvas:
-    """A PNG being drawn. Records every text that does not fit its box or leaves the image."""
+    """A PNG being drawn. Records every text that does not fit its box or leaves the image.
 
-    def __init__(self, height: int) -> None:
+    With `rtl` set, every text is shaped and ordered for right-to-left script and drawn with the
+    Naskh font (Latin runs with the Latin font); the callers mirror the layout.
+    """
+
+    def __init__(self, height: int, rtl: bool = False) -> None:
         self.height = max(MIN_HEIGHT, min(height, MAX_HEIGHT))
+        self.rtl = rtl
         self.image = Image.new("RGB", (WIDTH, self.height), BG)
         self.draw = ImageDraw.Draw(self.image)
         self.overflow: list[str] = []
         self.smallest = 10_000
 
-    def width_of(self, text: str, size: int) -> float:
-        return float(self.draw.textlength(text, font=_font(size)))
+    def width_of(self, text: str, size: int, bold: bool = False) -> float:
+        if not self.rtl:
+            return float(self.draw.textlength(text, font=_font(size)))
+        return sum(
+            float(self.draw.textlength(run, font=_font(size, bold, not latin)))
+            for run, latin in _runs(shape_rtl(text))
+        )
 
-    def wrap(self, text: str, size: int, width: int, max_lines: int) -> list[str]:
+    def wrap(
+        self, text: str, size: int, width: int, max_lines: int, bold: bool = False
+    ) -> list[str]:
         """Lines that fit `width`; the last ends with an ellipsis when the text is cut."""
-        font = _font(size)
+
+        def wide(value: str) -> float:
+            return self.width_of(value, size, bold)
+
         words = text.split()
         lines: list[str] = []
         current = ""
         for word in words:
-            while self.draw.textlength(word, font=font) > width:  # one very long word
+            while wide(word) > width:  # one very long word
                 cut = len(word)
-                while cut > 1 and self.draw.textlength(word[:cut], font=font) > width:
+                while cut > 1 and wide(word[:cut]) > width:
                     cut -= 1
                 if current:
                     lines.append(current)
@@ -491,7 +756,7 @@ class Canvas:
                 lines.append(word[:cut])
                 word = word[cut:]
             trial = f"{current} {word}".strip()
-            if current and self.draw.textlength(trial, font=font) > width:
+            if current and wide(trial) > width:
                 lines.append(current)
                 current = word
             else:
@@ -501,7 +766,7 @@ class Canvas:
         if len(lines) > max_lines:
             lines = lines[:max_lines]
             last = lines[-1]
-            while last and self.draw.textlength(last + "…", font=font) > width:
+            while last and wide(last + "…") > width:
                 last = last[:-1]
             lines[-1] = last.rstrip() + "…"
         return lines
@@ -514,15 +779,51 @@ class Canvas:
         fill: tuple[int, int, int],
         width: int | None = None,
         anchor: str = "la",
+        bold: bool = False,
     ) -> None:
-        font = _font(size)
         self.smallest = min(self.smallest, max(size, MIN_TEXT_PX))
+        if self.rtl:
+            self._text_rtl(xy, text, size, fill, width, anchor, bold)
+            return
+        font = _font(size)
         box = self.draw.textbbox(xy, text, font=font, anchor=anchor)
         if box[0] < 0 or box[2] > WIDTH or box[3] > self.height or box[1] < 0:
             self.overflow.append(text)
         elif width is not None and (box[2] - box[0]) > width + 0.5:
             self.overflow.append(text)
         self.draw.text(xy, text, fill=fill, font=font, anchor=anchor)
+
+    def _text_rtl(
+        self,
+        xy: tuple[float, float],
+        text: str,
+        size: int,
+        fill: tuple[int, int, int],
+        width: int | None,
+        anchor: str,
+        bold: bool,
+    ) -> None:
+        """Draw run by run on one baseline; `xy` is the top left or top right of the line."""
+        runs = _runs(shape_rtl(text))
+        fonts = [_font(size, bold, not latin) for _, latin in runs]
+        total = sum(
+            float(self.draw.textlength(run, font=f))
+            for (run, _), f in zip(runs, fonts, strict=True)
+        )
+        x = xy[0] if anchor.startswith("l") else xy[0] - total
+        baseline = xy[1] + _font(size).getmetrics()[0]
+        x0, top, x1, bottom = x, 10_000.0, x, -10_000.0
+        for (run, _), font in zip(runs, fonts, strict=True):
+            box = self.draw.textbbox((x, baseline), run, font=font, anchor="ls")
+            top, bottom = min(top, box[1]), max(bottom, box[3])
+            x1 = max(x1, box[2])
+            x0 = min(x0, box[0])
+            self.draw.text((x, baseline), run, fill=fill, font=font, anchor="ls")
+            x += float(self.draw.textlength(run, font=font))
+        if x0 < 0 or x1 > WIDTH or bottom > self.height or top < 0:
+            self.overflow.append(text)
+        elif width is not None and total > width + 0.5:
+            self.overflow.append(text)
 
     def dashed(
         self,
@@ -622,6 +923,7 @@ class RenderedImage:
     overflow: list[str]
     smallest_text: int
     positions: dict[str, Slot] = field(default_factory=dict)
+    pixels: dict[str, tuple[int, int]] = field(default_factory=dict)  # top-left of each card
 
 
 @dataclass
@@ -639,10 +941,15 @@ class MapRender:
 
 def _header(canvas: Canvas, words: dict[str, Any], sub: str, title: str | None = None) -> None:
     canvas.draw.rectangle([0, 0, WIDTH, HEADER_H], fill=HEADER_BG)
-    canvas.text(
-        (MARGIN, 24), title or words["header"], 44, HEADER_INK, width=WIDTH - 2 * MARGIN - 190
-    )
-    canvas.text((MARGIN, 88), sub, 28, HEADER_SUB, width=WIDTH - 2 * MARGIN - 190)
+    room = WIDTH - 2 * MARGIN - 190
+    head = title or words["header"]
+    if canvas.rtl:
+        canvas.text((WIDTH - MARGIN, 24), head, 44, HEADER_INK, width=room, anchor="ra", bold=True)
+        canvas.text((WIDTH - MARGIN, 88), sub, 28, HEADER_SUB, width=room, anchor="ra")
+        canvas.text((MARGIN, 24), "Workzap", 30, HEADER_INK)
+        return
+    canvas.text((MARGIN, 24), head, 44, HEADER_INK, width=room)
+    canvas.text((MARGIN, 88), sub, 28, HEADER_SUB, width=room)
     canvas.text((WIDTH - MARGIN, 24), "Workzap", 30, HEADER_INK, anchor="ra")
 
 
@@ -652,43 +959,55 @@ def _footer(
     categories: list[str],
     hues: dict[str, int],
     show_new: bool,
+    lang: str = "en",
 ) -> None:
-    top = canvas.height - 250
-    y = top
-    x = MARGIN
-    canvas.draw.line([(x, y + 14), (x + 60, y + 14)], fill=ARROW_SOLID, width=4)
-    canvas.arrow_head((x + 62, y + 14), (x + 30, y + 14), ARROW_SOLID)
-    canvas.text((x + 76, y), words["legend_owner"], MIN_TEXT_PX, INK)
-    x += 76 + int(canvas.width_of(words["legend_owner"], MIN_TEXT_PX)) + 36
-    canvas.dashed((x, y + 14), (x + 60, y + 14), ARROW_DASH, 4, on=10, off=8)
-    canvas.arrow_head((x + 62, y + 14), (x + 30, y + 14), ARROW_DASH)
-    canvas.text((x + 76, y), words["legend_guess"], MIN_TEXT_PX, INK)
-    x += 76 + int(canvas.width_of(words["legend_guess"], MIN_TEXT_PX)) + 36
+    rtl = canvas.rtl
+    # `step` is +1 left to right and -1 right to left; `edge` is where each row starts.
+    step = -1 if rtl else 1
+    edge = WIDTH - MARGIN if rtl else MARGIN
+    anchor = "ra" if rtl else "la"
+    y = canvas.height - 250
+    x = edge
+    for text, solid in ((words["legend_owner"], True), (words["legend_guess"], False)):
+        tail = x + step * 60
+        if solid:
+            canvas.draw.line([(x, y + 14), (tail, y + 14)], fill=ARROW_SOLID, width=4)
+        else:
+            canvas.dashed((x, y + 14), (tail, y + 14), ARROW_DASH, 4, on=10, off=8)
+        colour = ARROW_SOLID if solid else ARROW_DASH
+        canvas.arrow_head((tail + step * 2, y + 14), (x + step * 30, y + 14), colour)
+        canvas.text((x + step * 76, y), text, MIN_TEXT_PX, INK, anchor=anchor)
+        x += step * (76 + int(canvas.width_of(text, MIN_TEXT_PX)) + 36)
     if show_new:
-        _tag(canvas, x, y - 2, words["new"])
-        canvas.text((x + 100, y), words["legend_new"], MIN_TEXT_PX, INK)
+        tag_w = _tag(canvas, x, y - 2, words["new"])
+        label_x = x + step * (tag_w + 16)
+        canvas.text((label_x, y), words["legend_new"], MIN_TEXT_PX, INK, anchor=anchor)
     y += 50
-    x = MARGIN
+    x = edge
     for category in categories[:MAX_HUES]:
-        label = category.replace("_", " ")
+        label = category_name(category, lang) if rtl else category.replace("_", " ")
         label = canvas.wrap(label, MIN_TEXT_PX, 210, 1)[0] if label else label
         w = int(canvas.width_of(label, MIN_TEXT_PX))
-        if x + 28 + w > WIDTH - MARGIN:
-            x, y = MARGIN, y + 38
-        canvas.draw.rectangle([x, y + 3, x + 16, y + 27], fill=hue_of(category, hues))
-        canvas.text((x + 26, y), label, MIN_TEXT_PX, INK, width=w + 2)
-        x += 26 + w + 28
+        if (x - 28 - w < MARGIN) if rtl else (x + 28 + w > WIDTH - MARGIN):
+            x, y = edge, y + 38
+        swatch = x - 16 if rtl else x
+        canvas.draw.rectangle([swatch, y + 3, swatch + 16, y + 27], fill=hue_of(category, hues))
+        canvas.text((x + step * 26, y), label, MIN_TEXT_PX, INK, width=w + 2, anchor=anchor)
+        x += step * (26 + w + 28)
     y += 56
     lines = canvas.wrap(words["foot"], MIN_TEXT_PX, WIDTH - 2 * MARGIN, 3)
     for line in lines:
-        canvas.text((MARGIN, y), line, MIN_TEXT_PX, MUTED, width=WIDTH - 2 * MARGIN)
+        canvas.text((edge, y), line, MIN_TEXT_PX, MUTED, width=WIDTH - 2 * MARGIN, anchor=anchor)
         y += 32
 
 
-def _tag(canvas: Canvas, x: int, y: int, label: str) -> None:
+def _tag(canvas: Canvas, x: int, y: int, label: str) -> int:
+    """A "New" tag with its left edge at x (right to left: its right edge); returns its width."""
     w = int(canvas.width_of(label, MIN_TEXT_PX)) + 24
-    canvas.draw.rounded_rectangle([x, y, x + w, y + 34], radius=8, fill=TAG_BG)
-    canvas.text((x + 12, y + 3), label, MIN_TEXT_PX, TAG_INK, width=w - 12)
+    left = x - w if canvas.rtl else x
+    canvas.draw.rounded_rectangle([left, y, left + w, y + 34], radius=8, fill=TAG_BG)
+    canvas.text((left + 12, y + 3), label, MIN_TEXT_PX, TAG_INK, width=w - 12)
+    return w
 
 
 def _card(
@@ -699,25 +1018,29 @@ def _card(
     words: dict[str, Any],
 ) -> None:
     x, y = xy
+    rtl = canvas.rtl
     box = [x, y, x + CARD_W, y + CARD_H]
     canvas.draw.rounded_rectangle(box, radius=14, fill=CARD, outline=(203, 213, 225), width=2)
     bar = RESOLVED_BAR if node.resolved else hue_of(node.category, hues)
-    canvas.draw.rounded_rectangle([x, y, x + 14, y + CARD_H], radius=7, fill=bar)
+    bar_x = x + CARD_W - 14 if rtl else x
+    canvas.draw.rounded_rectangle([bar_x, y, bar_x + 14, y + CARD_H], radius=7, fill=bar)
     ink = MUTED if node.resolved else INK
     inner = CARD_W - 14 - 2 * 18
+    tx = x + CARD_W - 32 if rtl else x + 32
+    anchor = "ra" if rtl else "la"
     ty = y + 22
-    for line in canvas.wrap(node.label, 30, inner, 2):
-        canvas.text((x + 32, ty), line, 30, ink, width=inner)
+    for line in canvas.wrap(node.label, 30, inner, 2, bold=rtl):
+        canvas.text((tx, ty), line, 30, ink, width=inner, anchor=anchor, bold=rtl)
         ty += 36
     ty = y + 22 + 2 * 36 + 4
     if node.facts:
         text = " · ".join(node.facts)
         for line in canvas.wrap(text, MIN_TEXT_PX, inner, MAX_FACT_LINES):
-            canvas.text((x + 32, ty), line, MIN_TEXT_PX, MUTED, width=inner)
+            canvas.text((tx, ty), line, MIN_TEXT_PX, MUTED, width=inner, anchor=anchor)
             ty += 30
     if node.is_new:
         w = int(canvas.width_of(words["new"], MIN_TEXT_PX)) + 24
-        _tag(canvas, x + CARD_W - w - 12, y - 17, words["new"])
+        _tag(canvas, x + 12 + w if rtl else x + CARD_W - w - 12, y - 17, words["new"])
 
 
 def _edge_points(
@@ -794,7 +1117,10 @@ def _draw_labels(
         placed.append((x0, y0, x0 + w, y0 + h))
         canvas.draw.rounded_rectangle([x0, y0, x0 + w, y0 + h], radius=8, fill=BG)
         for n, line in enumerate(lines):
-            canvas.text((x0 + 7, y0 + 3 + 30 * n), line, MIN_TEXT_PX, INK, width=w - 8)
+            if canvas.rtl:
+                canvas.text((x0 + w - 7, y0 + 3 + 30 * n), line, MIN_TEXT_PX, INK, anchor="ra")
+            else:
+                canvas.text((x0 + 7, y0 + 3 + 30 * n), line, MIN_TEXT_PX, INK, width=w - 8)
 
 
 def _outlines(
@@ -823,7 +1149,12 @@ def _outlines(
         canvas.dashed_rect((x0, y0, x1, y1), OUTLINE)
         title = words["cluster"].format(title=cluster.title) if cluster.title else ""
         for line in canvas.wrap(title, MIN_TEXT_PX, x1 - x0 - 24, 1):
-            canvas.text((x0 + 12, y0 + 8), line, MIN_TEXT_PX, MUTED, width=x1 - x0 - 24)
+            if canvas.rtl:
+                canvas.text(
+                    (x1 - 12, y0 + 8), line, MIN_TEXT_PX, MUTED, anchor="ra", width=x1 - x0 - 24
+                )
+            else:
+                canvas.text((x0 + 12, y0 + 8), line, MIN_TEXT_PX, MUTED, width=x1 - x0 - 24)
 
 
 def _alt(nodes: list[Node], links: list[Link], words: dict[str, Any]) -> list[str]:
@@ -855,7 +1186,9 @@ def _render_nodes(
     previous: dict[str, Slot] | None,
     hues: dict[str, int],
     title: str | None = None,
-) -> tuple[Canvas, dict[str, Slot]]:
+    rtl: bool = False,
+    lang: str = "en",
+) -> tuple[Canvas, dict[str, Slot], dict[str, tuple[int, int]]]:
     shown = {n.id for n in nodes}
     clusters = [
         Cluster(c.id, c.title, [i for i in c.node_ids if i in shown])
@@ -865,13 +1198,13 @@ def _render_nodes(
     links = [lk for lk in links if lk.a in shown and lk.b in shown]
     footer_h = 270
     slots = layout(nodes, links, clusters, previous, cluster_rows=True)
-    pos, used = _geometry(slots)
+    pos, used = _geometry(slots, rtl)
     height = HEADER_H + PAD_TOP + OUTLINE_TITLE + used + 40 + footer_h
     if height > MAX_HEIGHT:
         slots = layout(nodes, links, clusters, previous, cluster_rows=False)
-        pos, used = _geometry(slots)
+        pos, used = _geometry(slots, rtl)
         height = HEADER_H + PAD_TOP + OUTLINE_TITLE + used + 40 + footer_h
-    canvas = Canvas(height)
+    canvas = Canvas(height, rtl)
     _header(canvas, words, sub, title)
     _outlines(canvas, clusters, pos, words)
     labels = _draw_links(canvas, links, pos, words)
@@ -882,8 +1215,8 @@ def _render_nodes(
     for node in nodes:
         if node.category not in cats:
             cats.append(node.category)
-    _footer(canvas, words, cats, hues, any(n.is_new for n in nodes))
-    return canvas, slots
+    _footer(canvas, words, cats, hues, any(n.is_new for n in nodes), lang)
+    return canvas, slots, pos
 
 
 def _bubbles(
@@ -891,36 +1224,46 @@ def _bubbles(
     words: dict[str, Any],
     sub: str,
     hues: dict[str, int],
+    rtl: bool = False,
+    lang: str = "en",
 ) -> Canvas:
     rows = (len(groups) + 1) // 2
     height = HEADER_H + 40 + rows * 190 + 40 + 270
-    canvas = Canvas(height)
+    canvas = Canvas(height, rtl)
     _header(canvas, words, sub, f"{words['header']}")
     cats: list[str] = []
     for i, (title, members, link_count) in enumerate(groups):
         row, col = divmod(i, 2)
         x = MARGIN + col * (CARD_W + COL_GAP)
+        if rtl:
+            x = WIDTH - x - CARD_W
         y = HEADER_H + 40 + row * 190
-        counts: dict[str, int] = {}
+        counts_: dict[str, int] = {}
         for node in members:
-            counts[node.category] = counts.get(node.category, 0) + 1
+            counts_[node.category] = counts_.get(node.category, 0) + 1
             if node.category not in cats:
                 cats.append(node.category)
-        dominant = sorted(counts, key=lambda c: (-counts[c], c))[0]
+        dominant = sorted(counts_, key=lambda c: (-counts_[c], c))[0]
         canvas.draw.rounded_rectangle([x, y, x + CARD_W, y + 160], radius=24, fill=CARD)
         canvas.dashed_rect((x, y, x + CARD_W, y + 160), OUTLINE)
+        bar_x = x + CARD_W - 18 if rtl else x + 4
         canvas.draw.rounded_rectangle(
-            [x + 4, y + 4, x + 18, y + 156], radius=6, fill=hue_of(dominant, hues)
+            [bar_x, y + 4, bar_x + 14, y + 156], radius=6, fill=hue_of(dominant, hues)
         )
         inner = CARD_W - 60
-        for n, line in enumerate(canvas.wrap(title, 30, inner, 2)):
-            canvas.text((x + 36, y + 18 + 36 * n), line, 30, INK, width=inner)
-        count = f"{len(members)} {words['problems'] if len(members) != 1 else words['problem']}"
-        canvas.text((x + 36, y + 100), count, 28, MUTED, width=inner)
+        near = x + CARD_W - 36 if rtl else x + 36  # the side the text starts from
+        far = x + 20 if rtl else x + CARD_W - 20
+        anchor = "ra" if rtl else "la"
+        for n, line in enumerate(canvas.wrap(title, 30, inner, 2, bold=rtl)):
+            canvas.text(
+                (near, y + 18 + 36 * n), line, 30, INK, width=inner, anchor=anchor, bold=rtl
+            )
+        count = count_phrase(words, "problem", len(members))
+        canvas.text((near, y + 100), count, 28, MUTED, width=inner, anchor=anchor)
         if link_count:
-            tail = f"{link_count} {words['links'] if link_count != 1 else words['link']}"
-            canvas.text((x + CARD_W - 20, y + 100), tail, 28, MUTED, anchor="ra", width=170)
-    _footer(canvas, words, cats, hues, False)
+            tail = count_phrase(words, "link", link_count)
+            canvas.text((far, y + 100), tail, 28, MUTED, anchor="la" if rtl else "ra", width=170)
+    _footer(canvas, words, cats, hues, False, lang)
     return canvas
 
 
@@ -999,11 +1342,7 @@ def text_fallback(
     out = [str(words["header"]), ""]
     out.append(
         str(words["summary"]).format(
-            v=prep.version,
-            n=len(prep.nodes),
-            l=len(prep.links),
-            problems=words.get("problems", ""),
-            links=words.get("links", ""),
+            **counts(words, prep.version, len(prep.nodes), len(prep.links))
         )
     )
     out += [f"- {line}" for line in lines]
@@ -1017,12 +1356,24 @@ def text_fallback(
 
 def _drawable_text(prep: Prepared) -> bool:
     def ok(text: str) -> bool:
-        return all(ord(c) < 0x250 or c in "–—‘’“”…·" for c in text)
+        return all(ord(c) < 0x250 or c in _LATIN_PUNCT for c in text)
 
     for n in prep.nodes:
         if not all(ok(t) for t in [n.label, *n.facts]):
             return False
     return all(ok(lk.label) for lk in prep.links) and all(ok(c.title) for c in prep.clusters)
+
+
+def _rtl_drawable_text(prep: Prepared, words: dict[str, Any]) -> bool:
+    """Every word of the map, and the language's own wording, has a glyph in Naskh or Latin."""
+    texts = [t for n in prep.nodes for t in [n.label, *n.facts]]
+    texts += [lk.label for lk in prep.links] + [c.title for c in prep.clusters]
+    for value in words.values():
+        if isinstance(value, str):
+            texts.append(value)
+        elif isinstance(value, dict):
+            texts += [v for v in value.values() if isinstance(v, str)]
+    return all(rtl_drawable(t) for t in texts if t)
 
 
 def render_map(
@@ -1035,6 +1386,8 @@ def render_map(
 
     `previous` is the `positions` of the version before: problems in it keep their place.
     `owner_messages`, when given, stops any number the owner never wrote from being drawn.
+    Right-to-left languages are drawn mirrored with the Naskh font; if the font or the shaping
+    packages are missing, `reason` starts with "rtl_support_missing" and only the text is returned.
     """
     lang = _lang(language)
     rtl = is_rtl(language)
@@ -1047,35 +1400,49 @@ def render_map(
     text = text_fallback(map_, language, said)
     digest = map_hash(map_, lang)
     result = MapRender([], text, lang, rtl, False, dropped=prep.dropped, hash=digest)
-    if rtl or lang not in DRAWABLE_LANGUAGES:
-        result.reason = "rtl_script_needs_font_and_shaping" if rtl else "unsupported_language"
+    if lang not in DRAWABLE_LANGUAGES:
+        result.reason = "unsupported_language"
         return result
     if not prep.nodes:
         result.reason = "empty_map"
         return result
-    if not _drawable_text(prep):
+    words = _words(lang)
+    if rtl:
+        try:
+            _load_rtl()
+            drawable = _rtl_drawable_text(prep, words)
+        except (ImportError, OSError) as error:
+            result.reason = f"rtl_support_missing: {type(error).__name__}: {error}"
+            return result
+        if not drawable:
+            result.reason = "text_not_drawable_in_naskh_font"
+            return result
+    elif not _drawable_text(prep):
         result.reason = "text_not_drawable_in_latin_font"
         return result
+    try:
+        _draw_all(result, prep, words, lang, rtl, previous)
+    except (ImportError, OSError) as error:
+        result.images, result.positions, result.drawable = [], {}, False
+        result.reason = f"rtl_support_missing: {type(error).__name__}: {error}"
+    return result
+
+
+def _draw_all(
+    result: MapRender,
+    prep: Prepared,
+    words: dict[str, Any],
+    lang: str,
+    rtl: bool,
+    previous: dict[str, Slot] | None,
+) -> None:
     result.drawable = True
-    words = _words(lang)
     hues = assign_hues([n.category for n in prep.nodes])
-    full_sub = str(words["summary"]).format(
-        v=prep.version,
-        n=len(prep.nodes),
-        l=len(prep.links),
-        problems=words["problems"] if len(prep.nodes) != 1 else words["problem"],
-        links=words["links"] if len(prep.links) != 1 else words["link"],
-    )
+    fields = counts(words, prep.version, len(prep.nodes), len(prep.links))
+    full_sub = str(words["summary"]).format(**fields)
     if len(prep.nodes) <= MAX_NODES:
-        canvas, slots = _render_nodes(
-            prep.nodes, prep.links, prep.clusters, words, full_sub, previous, hues
-        )
-        caption = str(words["caption"]).format(
-            v=prep.version,
-            n=len(prep.nodes),
-            l=len(prep.links),
-            problems=words["problems"] if len(prep.nodes) != 1 else words["problem"],
-            links=words["links"] if len(prep.links) != 1 else words["link"],
+        canvas, slots, pixels = _render_nodes(
+            prep.nodes, prep.links, prep.clusters, words, full_sub, previous, hues, None, rtl, lang
         )
         result.images.append(
             RenderedImage(
@@ -1084,15 +1451,16 @@ def render_map(
                 canvas.png(),
                 WIDTH,
                 canvas.height,
-                caption,
+                str(words["caption"]).format(**fields),
                 _alt(prep.nodes, prep.links, words),
                 canvas.overflow,
                 canvas.smallest,
                 slots,
+                pixels,
             )
         )
         result.positions = slots
-        return result
+        return
 
     groups = _group_clusters(prep, words)
     by_id = {n.id: n for n in prep.nodes}
@@ -1102,14 +1470,17 @@ def render_map(
         ids = set(cluster.node_ids)
         return sum(1 for lk in prep.links if lk.a in ids and lk.b in ids)
 
+    version = f"{words['version']} {prep.version}"
     bubble_rows = [(c.title, members_of[c.id], inside(c)) for c in groups]
     for part, chunk in enumerate(_chunks(bubble_rows, MAX_BUBBLES), 1):
-        sub = f"Version {prep.version} · {words['overview']}"
+        sub = f"{version} · {words['overview']}"
         if len(bubble_rows) > MAX_BUBBLES:
             sub += f" {part}"
-        canvas = _bubbles(chunk, words, sub, hues)
-        caption = str(words["caption_overview"]).format(v=prep.version, k=len(groups))
-        alt = [f"{t}: {len(m)} {words['problems']}" for t, m, _ in chunk]
+        canvas = _bubbles(chunk, words, sub, hues, rtl, lang)
+        caption = str(words["caption_overview"]).format(
+            version=words["version"], v=prep.version, k=len(groups)
+        )
+        alt = [f"{t}: {count_phrase(words, 'problem', len(m))}" for t, m, _ in chunk]
         result.images.append(
             RenderedImage(
                 "overview",
@@ -1128,10 +1499,10 @@ def render_map(
         for part, chunk in enumerate(_chunks(nodes, MAX_NODES), 1):
             ids = {n.id for n in chunk}
             sub_links = [lk for lk in prep.links if lk.a in ids and lk.b in ids]
-            sub = f"Version {prep.version} · {cluster.title}"
+            sub = f"{version} · {cluster.title}"
             if len(nodes) > MAX_NODES:
                 sub += f" ({part}/{len(_chunks(nodes, MAX_NODES))})"
-            canvas, slots = _render_nodes(
+            canvas, slots, pixels = _render_nodes(
                 chunk,
                 sub_links,
                 [],
@@ -1142,9 +1513,14 @@ def render_map(
                 title=str(words["cluster"]).format(title=cluster.title)
                 if cluster.id != "_other"
                 else str(words["others"]),
+                rtl=rtl,
+                lang=lang,
             )
             caption = str(words["caption_detail"]).format(
-                v=prep.version, title=cluster.title, n=len(chunk), problems=words["problems"]
+                version=words["version"],
+                v=prep.version,
+                title=cluster.title,
+                pc=count_phrase(words, "problem", len(chunk)),
             )
             result.images.append(
                 RenderedImage(
@@ -1158,7 +1534,7 @@ def render_map(
                     canvas.overflow,
                     canvas.smallest,
                     slots,
+                    pixels,
                 )
             )
             result.positions.update(slots)
-    return result

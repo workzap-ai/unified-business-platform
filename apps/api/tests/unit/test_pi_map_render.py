@@ -1,7 +1,9 @@
 """Drawing the problem map (spec 4.6, 4.7): sizes, determinism, overflow, contrast, RTL, numbers."""
 
 import io
+import re
 
+import pytest
 from PIL import Image
 
 from app.modules.pi import map_render as m
@@ -115,30 +117,186 @@ def test_text_contrast_is_at_least_4_5_to_1():
     assert b >= r and b >= g - 10 and min(m.BG) > 220
 
 
-def test_urdu_script_is_right_to_left_text_only_and_says_what_is_missing():
-    urdu = {
-        "version": 2,
-        "nodes": [
-            {"id": "a", "label": "پرانا مال رکا ہے", "facts": [], "category": "stock"},
-            {"id": "b", "label": "پیسہ پھنسا ہے", "facts": [], "category": "cash"},
-        ],
-        "links": [
-            {"from": "a", "to": "b", "type": "causes", "label": "", "evidence": "owner_said"}
-        ],
-        "clusters": [],
-    }
-    r = m.render_map(urdu, "ur")
-    assert r.rtl and not r.drawable and r.images == []
-    assert r.reason == "rtl_script_needs_font_and_shaping"
-    assert "←" in r.text and "→" not in r.text
-    assert r.text.index("پیسہ") < r.text.index("پرانا") or "←" in r.text
-    assert "نقشہ" in r.text
-    assert "Naskh" in m.NEEDS_FOR_RTL_IMAGES
+RTL_MAPS = {
+    "ur": (
+        ["پرانا مال رکا ہوا ہے", "پیسہ پھنسا ہوا ہے Workzap", "تنخواہ دیر سے ملتی ہے"],
+        [["6 کروڑ لاگت پر"], ["45 دن سے"], []],
+    ),
+    "ar": (
+        ["مخزون قديم متوقف", "الأموال عالقة", "تأخر الرواتب"],
+        [["6 ملايين بسعر التكلفة"], ["منذ 45 يوما"], []],
+    ),
+    "fa": (
+        ["کالای قدیمی مانده است", "پول گیر کرده است", "حقوق دیر پرداخت می‌شود"],
+        [["۶ میلیون به قیمت تمام‌شده"], ["۴۵ روز است"], []],
+    ),
+}
+
+
+def rtl_map(lang: str, n: int = 3) -> dict:
+    labels, facts = RTL_MAPS[lang]
+    nodes = []
+    for i in range(n):
+        nodes.append(
+            {
+                "id": f"n{i}",
+                "label": labels[i % 3],
+                "facts": facts[i % 3],
+                "category": ["stock_inventory", "cash_collections", "people_staff"][i % 3],
+                "is_new": i == 2,
+            }
+        )
+    links = [
+        {"from": "n0", "to": "n1", "type": "causes", "label": "", "evidence": "owner_said"},
+        {"from": "n1", "to": "n2", "type": "worsens", "label": "", "evidence": "pi_inferred"},
+    ]
+    return {"version": 3, "nodes": nodes, "links": links, "clusters": []}
+
+
+def latin_twin(n: int = 3) -> dict:
+    """The same shape of map in English, to compare the layout with."""
+    twin = rtl_map("ur", n)
+    for node in twin["nodes"]:
+        node["label"] = "Old stock stuck"
+        node["facts"] = []
+    return twin
+
+
+def ink_columns(png: bytes, box: tuple[int, int, int, int]) -> list[int]:
+    """The x of every dark pixel inside the box (text and bars), for where-is-it checks."""
+    pic = decode(png).convert("RGB").crop(box)
+    width, height = pic.size
+    data = pic.load()
+    return [x for x in range(width) for y in range(height) if sum(data[x, y]) < 330]
+
+
+@pytest.mark.parametrize("lang", ["ur", "ar", "fa"])
+def test_right_to_left_scripts_are_drawn_with_size_determinism_and_no_overflow(lang):
+    r = m.render_map(rtl_map(lang), lang)
+    assert r.rtl and r.drawable and r.reason == "" and len(r.images) == 1
+    image = r.images[0]
+    pic = decode(image.png)
+    assert pic.format == "PNG" and pic.size[0] == 1080
+    assert m.MIN_HEIGHT <= pic.size[1] <= m.MAX_HEIGHT and len(image.png) < m.MAX_PNG_BYTES
+    assert image.overflow == [] and image.smallest_text >= m.MIN_TEXT_PX
+    again = m.render_map(rtl_map(lang), lang)
+    assert [i.png for i in again.images] == [image.png] and again.hash == r.hash
+    assert image.caption and image.alt and all(a for a in image.alt)
+    # the same map with more problems: overview plus detail images, none overflowing
+    big = m.render_map(rtl_map(lang, 25), lang)
+    assert big.images[0].kind == "overview"
+    assert any(i.kind == "overview" for i in big.images)
+    assert all(i.overflow == [] and i.smallest_text >= 24 and i.width == 1080 for i in big.images)
+    assert all(i.height <= m.MAX_HEIGHT for i in big.images)
+    assert sum(len(i.alt) for i in big.images if i.kind == "detail") >= 25
+
+
+@pytest.mark.parametrize("lang", ["ur", "ar", "fa"])
+def test_right_to_left_layout_is_the_mirror_of_the_left_to_right_one(lang):
+    n = 3
+    left = m.render_map(latin_twin(n), "en").images[0]
+    right = m.render_map(rtl_map(lang, n), lang).images[0]
+    assert left.positions == right.positions  # the same slots: column 0 is the first card
+    for nid, (x, y) in left.pixels.items():
+        rx, ry = right.pixels[nid]
+        assert ry == y and rx == m.WIDTH - x - m.CARD_W
+    # the first card sits on the right, the second to its left
+    assert right.pixels["n0"][0] > right.pixels["n1"][0]
+    assert left.pixels["n0"][0] < left.pixels["n1"][0]
+    # colour bar on the right edge of a card, text hugging the right edge (not the left)
+    x, y = right.pixels["n0"]
+    inner = (x, y, x + m.CARD_W - 20, y + m.CARD_H)
+    xs = ink_columns(right.png, inner)
+    assert xs and sum(xs) / len(xs) > m.CARD_W * 0.55
+    # header title is on the right, the brand name on the left
+    bright = decode(right.png).convert("RGB").crop((0, 0, 1080, 150))
+    lit = [x for x in range(1080) for yy in range(20, 70) if sum(bright.getpixel((x, yy))) > 600]
+    assert min(lit) < 200 and max(lit) > 900
+
+
+@pytest.mark.parametrize("lang", ["ur", "ar", "fa"])
+def test_right_to_left_picture_is_not_blank_and_differs_from_the_latin_one(lang):
+    right = decode(m.render_map(rtl_map(lang), lang).images[0].png).convert("RGB")
+    left = decode(m.render_map(latin_twin(), "en").images[0].png).convert("RGB")
+    assert right.size[0] == left.size[0]
+    colours = right.getcolors(maxcolors=1_000_000) or []
+    background = max(colours)[1]
+    assert background == m.BG
+    ink = sum(c for c, rgb in colours if sum(rgb) < 330)
+    assert ink > 3000  # real glyphs were drawn
+    assert right.size != left.size or right.tobytes() != left.tobytes()
+    assert len(colours) > 20  # anti-aliased text, bars, tag
+
+
+def test_right_to_left_wording_is_complete_and_in_script():
+    english = set(m.TEXT["en"])
+    for lang in ("ur", "ar", "fa"):
+        words = m.TEXT[lang]
+        assert english <= set(words), (lang, english - set(words))
+        assert set(words["types"]) == set(m.TEXT["en"]["types"])
+        for key, value in words.items():
+            if isinstance(value, str):
+                letters = [c for c in re.sub(r"{[^}]*}", "", value) if c.isalpha()]
+                assert all(not ("a" <= c.lower() <= "z") for c in letters), (lang, key, value)
+        assert "Workzap" not in " ".join(str(v) for v in words.values())
+    assert m.TEXT["ur"]["new"] == "نیا" and m.TEXT["ur"]["header"] == "آپ کے کاروبار کا نقشہ"
+    # Pashto and Sindhi readers get the Urdu picture; Latin-script Roman Urdu is untouched
+    assert m.render_map(rtl_map("ur"), "ps").language == "ur"
+    assert m.render_map(rtl_map("ur"), "sd").drawable
+    assert m.render_map(rtl_map("ar"), "ar-SA").language == "ar"
+    assert m.is_rtl("ur") and m.is_rtl("ar-SA") and not m.is_rtl("roman_ur")
+    assert not hasattr(m, "NEEDS_FOR_RTL_IMAGES")
+
+
+def test_numbers_in_right_to_left_pictures_must_be_the_owners():
+    mp = rtl_map("ur")
+    mp["nodes"][1]["facts"] = ["99 دن سے", "45 دن سے"]
+    r = m.render_map(mp, "ur", owner_messages=["پیسہ 45 دن سے پھنسا ہے", "6 کروڑ"])
+    assert r.drawable and r.dropped == ["99 دن سے"]
+    assert all("99" not in line for line in r.images[0].alt)
+    assert any("45" in line for line in r.images[0].alt)
+
+
+def test_right_to_left_falls_back_to_text_when_drawing_is_impossible(monkeypatch):
+    def broken():
+        raise ImportError("arabic_reshaper")
+
+    monkeypatch.setattr(m, "_load_rtl", broken)
+    urdu = m.render_map(rtl_map("ur"), "ur")
+    assert urdu.rtl and not urdu.drawable and urdu.images == []
+    assert urdu.reason.startswith("rtl_support_missing") and "arabic_reshaper" in urdu.reason
+    assert "←" in urdu.text and "→" not in urdu.text and "نقشہ" in urdu.text
+    assert m.render_map(make_map(3), "roman_ur").drawable  # Latin never needs the packages
+
+    def no_font():
+        raise OSError("cannot open resource")
+
+    monkeypatch.setattr(m, "_load_rtl", no_font)
+    arabic = m.render_map(rtl_map("ar"), "ar")
+    assert not arabic.drawable and "OSError" in arabic.reason and "←" in arabic.text
+
+
+def test_words_the_fonts_cannot_draw_fall_back_to_text():
+    odd = rtl_map("ur")
+    odd["nodes"][0]["label"] = "漢字 مال"
+    r = m.render_map(odd, "ur")
+    assert not r.drawable and r.reason == "text_not_drawable_in_naskh_font" and "←" in r.text
     # Arabic script words inside an English map are not drawn with a Latin font either
     mixed = make_map(2)
     mixed["nodes"][0]["label"] = "مال رکا"
     assert not m.render_map(mixed, "en").drawable
-    assert m.is_rtl("ur") and m.is_rtl("ar-SA") and not m.is_rtl("roman_ur")
+    assert m.render_map({"version": 1, "nodes": []}, "ur").reason == "empty_map"
+
+
+def test_latin_words_inside_right_to_left_text_use_the_latin_font():
+    assert m.rtl_drawable("پیسہ Workzap 45 (ok)…")
+    runs = m._runs(m.shape_rtl("پیسہ Workzap"))
+    assert any(latin for _, latin in runs) and any(not latin for _, latin in runs)
+    assert not m.rtl_drawable("漢字")
+    assert m.NASKH_REGULAR.exists() and m.NASKH_BOLD.exists()
+    assert (m.FONT_DIR / "OFL.txt").exists()
+    # Arabic letters are joined: the shaped text has presentation forms, not the raw letters
+    assert m.shape_rtl("بب") != "بب"
 
 
 def test_text_fallback_reads_cause_to_effect_in_words():

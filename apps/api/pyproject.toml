@@ -20,6 +20,8 @@ dependencies = [
   # QR codes for the pay-by-link flow (encodes the pay-page URL, never raw payment data).
   "qrcode>=7.4,<9", "pillow>=11,<14", "webauthn>=2.2,<3",
   "opencv-python-headless>=4.10,<5",
+  # Urdu, Arabic and Persian text in the problem-map picture (shaping, then right-to-left order).
+  "arabic-reshaper>=3.0,<4", "python-bidi>=0.6,<1",
 ]
 
 [project.optional-dependencies]
