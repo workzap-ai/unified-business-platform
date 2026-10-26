@@ -84,14 +84,54 @@ def already_said(idea: str, given: list[str]) -> bool:
     return bool(mine) and any(len(mine & _words(g)) / len(mine) >= SAME_IDEA for g in given)
 
 
-def ideas_for(category: str, given: list[str] | None = None, count: int = 2) -> list[str]:
-    """Up to `count` ideas of the category not yet given (in order, the spec's best first)."""
+MODERN = Path(__file__).parent / "packs" / "library" / "modern_ideas.json"
+MODERN_WEIGHT = 1  # a modern idea wins a tie with an older one; it never hides one
+
+
+@lru_cache(maxsize=1)
+def modern() -> dict[str, list[dict[str, str]]]:
+    """The owner's modern ideas by library category (modern_ideas.json), each with a stable id."""
+    try:
+        data = json.loads(MODERN.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return {}
+    out: dict[str, list[dict[str, str]]] = {}
+    for item in data.get("ideas") or []:
+        out.setdefault(str(item["category"]), []).append(item)
+    return out
+
+
+def idea_id(category: str, text: str) -> str:
+    """The id learning scores an idea under: the modern idea's own, else one from its position."""
+    for item in modern().get(category, []):
+        if item["text"] == text:
+            return item["id"]
+    ideas = (load().get(category) or {}).get("ideas") or []
+    return f"library:{category}:{ideas.index(text) + 1}" if text in ideas else f"library:{category}"
+
+
+def ideas_for(
+    category: str, given: list[str] | None = None, count: int = 2, said: str = ""
+) -> list[str]:
+    """Up to `count` ideas of the category not yet given. The ones that share the most evidence with
+    the person's words come first (a modern idea before an older one on a tie), then the spec's
+    order. Only ideas the reply rules would let pi say are used."""
+    from app.modules.pi import solution_lint
+    from app.modules.pi.solution_ideas import _evidence
+
     entry = load().get(category) or {}
-    said = list(given or [])
+    pool = [(item["text"], MODERN_WEIGHT) for item in modern().get(category, [])]
+    pool += [(str(idea), 0) for idea in entry.get("ideas") or []]
+    heard = _evidence(said)
+    ranked = sorted(
+        enumerate(pool),
+        key=lambda pair: (-(len(heard & _evidence(pair[1][0])) + pair[1][1]), pair[0]),
+    )
+    taken = list(given or [])
     chosen: list[str] = []
-    for idea in entry.get("ideas") or []:
-        if not already_said(str(idea), said + chosen):
-            chosen.append(str(idea))
+    for _n, (idea, _weight) in ranked:
+        if solution_lint.passes(idea) and not already_said(idea, taken + chosen):
+            chosen.append(idea)
         if len(chosen) == count:
             break
     return chosen

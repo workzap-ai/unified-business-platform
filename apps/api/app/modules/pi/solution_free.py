@@ -52,6 +52,13 @@ people, places): an idea that would fit any business is not an idea. Do not use 
 "count X from one busy day" or "assign one person at a fixed time"; say what is different for THIS
 problem. One idea looks at something to see the real size of the problem, the other changes how a
 specific thing is done or kept.
+Examples of the right kind (do not copy them; say what fits THIS problem): "Put the rate and how to
+order in the first line of every short video caption, so a viewer can act without asking."; "Count the
+cash at closing with two people and post the total in one shared chat, so a gap is seen at once.";
+"Keep a list of customers who agreed to hear from you and message them when new stock arrives, so
+they come back first."; "Send a clear photo, the size chart and one line on delivery together with
+the rate, so the buyer has no reason to ask again." When the owner named a channel (a DM, reels, a
+chat), use their word for it.
 Answer with a JSON object only: {"ideas": ["first idea", "second idea"]}"""
 
 MAX_WORDS = 28

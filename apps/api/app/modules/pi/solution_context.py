@@ -121,9 +121,13 @@ def _from_library(
     before = [str(x) for x in brief.get("library_given") or []]
     ideas: list[str] = []
     category = ""
+    heard = " ".join(
+        " ".join([str(n.get("title") or ""), *[str(w) for w in n.get("user_words") or []]])
+        for n in noted[-3:]
+    )
     for category in solution_library.best_category(noted):
         count = min(value_line.IDEAS_PER_MESSAGE, left)
-        ideas = solution_library.ideas_for(category, before, count)
+        ideas = solution_library.ideas_for(category, before, count, heard)
         if ideas:
             break
     if not ideas:

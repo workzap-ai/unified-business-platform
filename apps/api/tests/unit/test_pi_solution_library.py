@@ -31,7 +31,11 @@ def test_two_ideas_not_yet_given_and_never_a_repeat() -> None:
     assert len(first) == 2
     second = solution_library.ideas_for("people_staff", first)
     assert len(second) == 2 and not set(first) & set(second)
-    assert solution_library.ideas_for("people_staff", first + second) == []
+    given = first + second
+    while more := solution_library.ideas_for("people_staff", given):
+        assert not set(more) & set(given)  # never a repeat, until the category has none left
+        given += more
+    assert len(given) >= 4 and solution_library.ideas_for("people_staff", given) == []
 
 
 def test_an_unknown_industry_with_a_noted_problem_gets_two_ideas_and_the_build_line() -> None:

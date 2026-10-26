@@ -1,0 +1,155 @@
+{
+ "note": "Owner's modern, brand-free, owner-action ideas (docs/pi-saas/pi-modern-ideas.md), by library category. Preferred over the spec's older ideas when two fit equally.",
+ "ideas": [
+  {
+   "id": "modern:sales_conversion:1",
+   "category": "sales_revenue",
+   "text": "Send a clear photo, the size chart and one line on delivery together with the rate, so the buyer has no reason to ask again."
+  },
+  {
+   "id": "modern:sales_conversion:2",
+   "category": "sales_revenue",
+   "text": "Answer each enquiry with a short voice note as well as the text, so it feels like a person and not a list."
+  },
+  {
+   "id": "modern:sales_conversion:3",
+   "category": "sales_revenue",
+   "text": "Message the people who went quiet after the rate with your most liked piece, so the talk starts again."
+  },
+  {
+   "id": "modern:attention_without_orders:1",
+   "category": "marketing_leads",
+   "text": "Put the rate and how to order in the first line of every short video caption, so a viewer can act without asking."
+  },
+  {
+   "id": "modern:attention_without_orders:2",
+   "category": "marketing_leads",
+   "text": "Pin one short video at the top of your page that explains ordering, so new visitors know what to do."
+  },
+  {
+   "id": "modern:attention_without_orders:3",
+   "category": "marketing_leads",
+   "text": "Ask your recent buyers which video made them order, so you can make more of that kind."
+  },
+  {
+   "id": "modern:no_customers_yet:1",
+   "category": "marketing_leads",
+   "text": "Show your best five pieces in short videos with the fabric close up, so people can judge quality before they ask."
+  },
+  {
+   "id": "modern:no_customers_yet:2",
+   "category": "marketing_leads",
+   "text": "Offer a small group of friends and family a first look in a private chat, so your first buyers become your first reviews."
+  },
+  {
+   "id": "modern:no_customers_yet:3",
+   "category": "marketing_leads",
+   "text": "Set up an online catalogue with clear photos and rates for each piece, so people can browse and share it."
+  },
+  {
+   "id": "modern:repeat_customers:1",
+   "category": "customers_retention",
+   "text": "Ask every happy buyer for a short review with a photo and share it in your chat and page, so new customers trust you faster."
+  },
+  {
+   "id": "modern:repeat_customers:2",
+   "category": "customers_retention",
+   "text": "Keep a list of customers who agreed to hear from you and message them when new stock arrives, so they come back first."
+  },
+  {
+   "id": "modern:repeat_customers:3",
+   "category": "customers_retention",
+   "text": "Send a thank-you note with a small gift idea to buyers who ordered twice, so they feel known and order again."
+  },
+  {
+   "id": "modern:footfall_local_shop:1",
+   "category": "marketing_leads",
+   "text": "Put your shop on the online map with photos, timings and a way to message you, so nearby people can find you."
+  },
+  {
+   "id": "modern:footfall_local_shop:2",
+   "category": "marketing_leads",
+   "text": "Share a short video of the shop floor and new arrivals each week, so people nearby want to visit."
+  },
+  {
+   "id": "modern:footfall_local_shop:3",
+   "category": "marketing_leads",
+   "text": "Reply to every review and every message from nearby people on the same day, so they choose you over the next shop."
+  },
+  {
+   "id": "modern:cash_and_stock_loss:1",
+   "category": "loss_security",
+   "text": "Count the cash at closing with two people and post the total in one shared chat, so a gap is seen at once."
+  },
+  {
+   "id": "modern:cash_and_stock_loss:2",
+   "category": "loss_security",
+   "text": "Photograph the stock shelves at opening and closing and share them in the staff chat, so a missing item shows up early."
+  },
+  {
+   "id": "modern:cash_and_stock_loss:3",
+   "category": "loss_security",
+   "text": "Match each day's sales record against the stock count before you leave, so the difference is clear while it is fresh."
+  },
+  {
+   "id": "modern:payments_late:1",
+   "category": "cash_collections",
+   "text": "Send a polite reminder on the day it is due, so paying is easy and nobody feels chased."
+  },
+  {
+   "id": "modern:payments_late:2",
+   "category": "cash_collections",
+   "text": "Keep one shared list of who owes you and what, and update it after every call, so nothing is forgotten."
+  },
+  {
+   "id": "modern:payments_late:3",
+   "category": "cash_collections",
+   "text": "Agree one fixed day with your biggest buyers and confirm it in the chat, so both sides know when to settle."
+  },
+  {
+   "id": "modern:orders_and_delivery:1",
+   "category": "orders_fulfilment",
+   "text": "Confirm every order in the chat with the item, rate and address before dispatch, so fewer parcels come back refused."
+  },
+  {
+   "id": "modern:orders_and_delivery:2",
+   "category": "orders_fulfilment",
+   "text": "Send the buyer a photo of the packed parcel before it leaves, so there is no doubt about what was sent."
+  },
+  {
+   "id": "modern:orders_and_delivery:3",
+   "category": "orders_fulfilment",
+   "text": "Share the courier tracking message with the buyer as soon as it is booked, so they stop asking where the parcel is."
+  },
+  {
+   "id": "modern:staff_and_work:1",
+   "category": "people_staff",
+   "text": "Write the opening and closing tasks in a shared checklist and ask for a photo when done, so you can see it was done."
+  },
+  {
+   "id": "modern:staff_and_work:2",
+   "category": "people_staff",
+   "text": "Share the week's roster in the staff chat in advance and ask each person to reply with a thumbs up, so nobody can say they did not know."
+  },
+  {
+   "id": "modern:staff_and_work:3",
+   "category": "people_staff",
+   "text": "Give each recurring job one owner by name in the team chat, so nothing waits for someone else."
+  },
+  {
+   "id": "modern:bookings_and_no_shows:1",
+   "category": "customer_experience_digital",
+   "text": "Send a reminder message the day before and ask for a yes, so empty slots are known early."
+  },
+  {
+   "id": "modern:bookings_and_no_shows:2",
+   "category": "customer_experience_digital",
+   "text": "Keep a short waiting list in a shared chat and message it when a slot opens, so a cancelled slot is filled."
+  },
+  {
+   "id": "modern:bookings_and_no_shows:3",
+   "category": "customer_experience_digital",
+   "text": "Share your booking steps in one pinned message with the timings and a way to confirm, so people book without calling."
+  }
+ ]
+}
