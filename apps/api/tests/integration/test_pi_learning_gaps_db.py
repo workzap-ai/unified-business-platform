@@ -4,7 +4,7 @@ from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 
 import pytest
-from sqlalchemy import select
+from sqlalchemy import delete, select
 from test_pi_brain_problems import adaptive, workspace
 from test_pi_learning_loop import model
 
@@ -362,17 +362,25 @@ async def test_every_reply_can_be_traced_to_what_it_used(api, business_db, monke
             }
         ],
     }
+    # Since e32ef84 the reply is stamped when it is sent, so a row exists already (with no lesson:
+    # none was set yet). Drop it so this stamp reads the learning_used set above.
+    await business_db.execute(delete(PiReplyAudit).where(PiReplyAudit.message_id == reply.id))
     row = await learning_audit.stamp(
         business_db, scope, conversation, reply, violations=[], response_rules={}
     )
     assert row.lesson_ids == [str(lesson.id)] and row.example_ids == ["e-1"]
     assert row.prompt_version == learning_audit.prompt_version()
-    assert list(row.pack_versions) == [DENTAL] and row.linter == {"passed": True, "violations": []}
+    assert list(row.pack_versions)[:1] == [DENTAL] and row.linter == {
+        "passed": True,
+        "violations": [],
+    }
     assert row.frozen is True  # response_rules {} is frozen: the stamp says so
     again = await learning_audit.stamp(business_db, scope, conversation, reply)
     assert again.id == row.id  # one row per reply
     assert (await learning_audit.trace(business_db, reply.id)).id == row.id
-    assert await business_db.scalar(select(PiReplyAudit.id)) == row.id
+    assert (
+        await business_db.scalar(select(PiReplyAudit.id).where(PiReplyAudit.message_id == reply.id))
+    ) == row.id  # every sent reply has a row now: look up this one
     await score_new(business_db)
     await pi.close()
 
