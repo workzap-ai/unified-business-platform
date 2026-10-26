@@ -6444,12 +6444,19 @@
    "page": 10,
    "area": "value line (Part 1)",
    "statement": "pi never reveals Workzap's internal methods, tools, vendors, pricing logic or how catalogue builds work technically",
-   "status": "MISSING",
-   "code": [],
-   "tests": [],
-   "gap": "Nothing enforces it and it is not in the prompt: the handbook is built from the Brain PDF only, and the linter blocks internal terms (knowledge pack, prompt, rule ids) and named products, not an explanation of how a build works, a vendor Workzap uses or pricing logic.",
-   "owner": "linter hardening session (linter change) or prompt owner",
-   "unit_tested": false
+   "status": "DONE",
+   "code": [
+    "app/modules/pi/constitution.py::SECRETS",
+    "app/modules/pi/constitution.py::lint"
+   ],
+   "tests": [
+    "tests/unit/test_pi_secrets.py::test_a_reply_that_reveals_how_workzap_works_inside_is_blocked",
+    "tests/unit/test_pi_secrets.py::test_the_person_asking_does_not_lift_it",
+    "tests/unit/test_pi_secrets.py::test_ordinary_replies_are_not_flagged"
+   ],
+   "gap": "",
+   "owner": "",
+   "unit_tested": true
   },
   {
    "id": "A2-1.7",
@@ -9132,17 +9139,18 @@
    "page": 95,
    "area": "answering (Book 2 3.1)",
    "statement": "The first sentence of a reply answers a direct question; a question back is never a substitute",
-   "status": "PARTIAL",
+   "status": "DONE",
    "code": [
-    "app/modules/pi/solution_ask.py::asked_for_ideas",
-    "app/modules/pi/service_conversation.py::status_missed"
+    "app/modules/pi/constitution.py::DIRECT_QUESTION",
+    "app/modules/pi/constitution.py::lint"
    ],
    "tests": [
+    "tests/unit/test_pi_answer_first_and_tone.py::test_a_question_back_is_not_an_answer_to_a_direct_question",
     "tests/unit/test_pi_spec_supersession.py::test_the_guidance_carries_the_governing_answer_first_rules",
     "tests/unit/test_pi_golden_solution_mode.py::test_g19_what_do_you_do_is_answered_not_ignored"
    ],
-   "gap": "Solution asks, 'what do you do' and status asks are answered first in code; any other direct question ('kitne din lagenge?') is answered first only by the handbook and prompt, and no linter check compares sentence one with the question.",
-   "owner": "linter hardening session",
+   "gap": "",
+   "owner": "",
    "unit_tested": true
   },
   {
@@ -9151,12 +9159,17 @@
    "page": 95,
    "area": "answering (Book 2 3.1)",
    "statement": "A yes/no question gets a yes or no first, then the detail",
-   "status": "PROMPT-ONLY",
-   "code": [],
-   "tests": [],
-   "gap": "Carried only by the handbook text in the prompt; nothing detects a yes/no question or checks that the reply starts with yes or no.",
-   "owner": "prompt owner",
-   "unit_tested": false
+   "status": "PARTIAL",
+   "code": [
+    "app/modules/pi/constitution.py::YES_NO_QUESTION",
+    "app/modules/pi/constitution.py::ACK_OPENER"
+   ],
+   "tests": [
+    "tests/unit/test_pi_answer_first_and_tone.py::test_a_yes_no_question_is_not_answered_with_thanks_noted"
+   ],
+   "gap": "A yes/no question answered with an acknowledgement ('Thanks, noted') is sent back; a reply that opens with something else but neither yes nor no is not caught, and yes/no questions are found by a pattern list.",
+   "owner": "linter hardening session",
+   "unit_tested": true
   },
   {
    "id": "R-ANS-03",
@@ -9164,17 +9177,22 @@
    "page": 96,
    "area": "answering (Book 2 3.1, 10.4)",
    "statement": "A request (solution, price, timeline, human) that goes unanswered once is dealt with before anything else; a code guard blocks a reply that ignores it",
-   "status": "PARTIAL",
+   "status": "DONE",
    "code": [
-    "app/modules/pi/service_conversation.py::status_missed",
-    "app/modules/pi/solution_ask.py::asked_for_ideas"
+    "app/modules/pi/open_requests.py::update",
+    "app/modules/pi/open_requests.py::unanswered",
+    "app/modules/pi/open_requests.py::kinds",
+    "app/modules/pi/service_conversation.py::status_missed"
    ],
    "tests": [
-    "tests/unit/test_pi_live_fixes.py::test_status_only_when_asked_and_no_empty_promises",
-    "tests/unit/test_pi_value_line_gaps.py::test_a_request_answered_with_only_a_pitch_is_soft_when_ideas_were_handed"
+    "tests/unit/test_pi_open_requests.py::test_the_tracked_requests_in_a_message",
+    "tests/unit/test_pi_open_requests.py::test_a_request_the_reply_ignores_stays_open_and_one_it_answers_does_not",
+    "tests/unit/test_pi_open_requests.py::test_the_next_reply_is_checked_against_what_was_left_open",
+    "tests/unit/test_pi_open_requests.py::test_a_request_that_stays_unanswered_is_dropped_after_three_replies",
+    "tests/unit/test_pi_live_fixes.py::test_status_only_when_asked_and_no_empty_promises"
    ],
-   "gap": "Status asks and solution asks are guarded; there is no general open_requests log, so a price, timeline or human request left unanswered for one turn is not blocked or logged as solution_request_ignored.",
-   "owner": "linter hardening session",
+   "gap": "",
+   "owner": "",
    "unit_tested": true
   },
   {
@@ -9185,14 +9203,14 @@
    "statement": "pi does not restate the person's message; a noted confirmation is allowed once per problem in 12 words or fewer, never a list of their sentences",
    "status": "PARTIAL",
    "code": [
-    "app/modules/pi/constitution.py::echo_overlap",
-    "app/modules/pi/constitution.py::ECHO_MIN_WORDS"
+    "app/modules/pi/constitution.py::NOTED_TITLE",
+    "app/modules/pi/constitution.py::echo_overlap"
    ],
    "tests": [
-    "tests/unit/test_pi_echo_and_tone.py::test_a_reply_that_restates_the_message_is_flagged_as_an_echo",
-    "tests/unit/test_pi_echo_and_tone.py::test_a_short_confirmation_and_a_fresh_reply_are_not_echoes"
+    "tests/unit/test_pi_answer_first_and_tone.py::test_the_noted_line_names_the_problem_in_at_most_twelve_words",
+    "tests/unit/test_pi_echo_and_tone.py::test_a_reply_that_restates_the_message_is_flagged_as_an_echo"
    ],
-   "gap": "A long echo is caught by the overlap check (R-ECHO-03); the 12-word limit and 'once per problem' are not counted.",
+   "gap": "The noted line is held to 12 words and a long echo is caught; 'once per problem' (no second noted line for the same problem) is not counted.",
    "owner": "linter hardening session",
    "unit_tested": true
   },
@@ -9219,17 +9237,18 @@
    "page": 96,
    "area": "solutions (Book 2 3.2)",
    "statement": "After a solution request pi may ask at most one clarifying question before giving an idea; with impatience the budget is zero",
-   "status": "PARTIAL",
+   "status": "DONE",
    "code": [
-    "app/modules/pi/solution_ask.py::asked_for_ideas",
-    "app/modules/pi/service_conversation.py::brain_ideas"
+    "app/modules/pi/solution_context.py",
+    "app/modules/pi/solution_ask.py::asked_for_ideas"
    ],
    "tests": [
+    "tests/unit/test_pi_idea_format_languages.py::test_sol02_the_one_question_is_answered_with_ideas_not_another_question",
     "tests/unit/test_pi_golden_solution_mode.py::test_g17_an_impatient_ask_gets_an_apology_then_the_ideas",
     "tests/unit/test_pi_idea_format_languages.py::test_an_impatient_ask_gets_a_short_apology_before_the_ideas"
    ],
-   "gap": "Impatience gets an apology then ideas with no question first; for an ordinary solution request the ideas come in the same reply, but 'at most one question before value' is not counted across replies.",
-   "owner": "solutions session",
+   "gap": "",
+   "owner": "",
    "unit_tested": true
   },
   {
@@ -9240,13 +9259,15 @@
    "statement": "A churn signal ('kahin aur jaun', 'forget it') gets reassurance and something useful in the same message, and is logged",
    "status": "PARTIAL",
    "code": [
-    "app/modules/pi/solution_ask.py::churn_risk"
+    "app/modules/pi/solution_ask.py::churn_risk",
+    "app/modules/pi/solution_context.py"
    ],
    "tests": [
+    "tests/unit/test_pi_idea_format_languages.py::test_sol03_a_churn_signal_is_logged_on_the_chat",
     "tests/unit/test_pi_golden_solution_mode.py::test_g18_an_owner_about_to_leave_is_reassured_and_given_ideas",
     "tests/unit/test_pi_golden_solution_mode.py::test_g18_a_plain_no_is_not_mistaken_for_leaving"
    ],
-   "gap": "The signal is detected, routes to ideas and feeds the dashboard alert; the reassuring wording is the model's and is not checked.",
+   "gap": "The signal is logged on the chat (flag and time, never the words), feeds the dashboard alert and routes to ideas in the same reply; the reassuring wording is the model's and is not checked.",
    "owner": "solutions session",
    "unit_tested": true
   },
@@ -9258,14 +9279,13 @@
    "statement": "Every idea uses at least one fact the person gave; generic lists are banned",
    "status": "PARTIAL",
    "code": [
-    "app/modules/pi/solutions.py::ideas",
-    "app/modules/pi/solution_rules.py::check_idea"
+    "app/modules/pi/solution_free.py::uses_a_fact",
+    "app/modules/pi/solution_free.py::vetted"
    ],
    "tests": [
-    "tests/unit/test_pi_solutions.py::test_each_entry_is_complete_and_inside_the_value_line",
-    "tests/unit/test_pi_solution_rules.py::test_ideas_that_give_away_the_how_or_make_claims_are_refused"
+    "tests/unit/test_pi_idea_format_languages.py::test_sol04_a_free_idea_must_use_something_the_person_said_and_generic_ones_are_banned"
    ],
-   "gap": "Ideas come from the industry entry matched to the noted problem and pass the idea guard, but nothing checks that an idea reuses a fact the person gave (their branch, channel or dish).",
+   "gap": "Free ideas (written for this chat) must use something the person said and generic ones are dropped; the stored industry-entry ideas are matched to the noted problem but not checked against the person's own words.",
    "owner": "solutions session",
    "unit_tested": true
   },
@@ -9386,12 +9406,16 @@
    "page": 109,
    "area": "respectful framing (Book 2 10.2)",
    "statement": "Stay respectful when frustrated: no defensiveness, no 'please be patient', no lecture about why pi asks questions; give value instead",
-   "status": "PROMPT-ONLY",
-   "code": [],
-   "tests": [],
-   "gap": "Carried by the handbook and the prompt line for impatience; nothing detects defensive or patience phrases in a reply.",
-   "owner": "linter hardening session",
-   "unit_tested": false
+   "status": "DONE",
+   "code": [
+    "app/modules/pi/constitution.py::PATIENCE"
+   ],
+   "tests": [
+    "tests/unit/test_pi_answer_first_and_tone.py::test_a_frustrated_person_gets_no_please_be_patient_and_no_lecture"
+   ],
+   "gap": "",
+   "owner": "",
+   "unit_tested": true
   }
  ]
 }
