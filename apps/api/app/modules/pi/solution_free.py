@@ -27,6 +27,9 @@ Give exactly two ideas, written in plain English (they are translated for the ow
 - can be done by the owner or staff with what they already have: a notebook, a phone they
   own, a chat group, a walk round the premises. Nothing to buy, install or set up;
 - is specific to the problem the owner described, not generic advice;
+- when it fits the problem, reflects how customers find and talk to businesses today (short
+  videos, a listing and reviews on the online map, chats and photos with customers, an online
+  catalogue), always said by kind and never by app or brand name, never a custom from decades ago;
 - names no app, software, spreadsheet, template, dashboard, tool, brand or vendor;
 - uses plain words a shopkeeper uses: no jargon (bottleneck, workflow, streamline, optimise, leverage,
   touchpoint, KPI);
