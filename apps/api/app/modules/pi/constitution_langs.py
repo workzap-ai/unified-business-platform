@@ -291,6 +291,107 @@ TEAM_READS += (
     + r"\s]?بیند)"
 )
 
+# --- R-PRIV-04 / R-ASK-06: staff or customer names and phones, exact revenue or salaries ----------
+ASK_VERB = (
+    r"|\b(?:envoyez|donnez|partagez|indiquez|communiquez|quel(?:le)? est|quels sont|j'ai besoin|puis-je avoir)\b|\bpouvez-vous (?:m'envoyer|me donner|partager|me dire)\b"
+    r"|\b(?:envíe(?:me)?|comparta|déme|indíqueme|dígame|cuál es|cuáles son|necesito)\b|¿puede (?:enviarme|darme|decirme)\b"
+    r"|भेजिए|भेजें|बताइए|बताएं|दीजिए|शेयर\s+कीजिए|क्या\s+है|मुझे\s+चाहिए"
+    r"|بھیجیں|بتائیں|بتائیے|دیجیے|دیجئے|شیئر\s+کریں|کیا\s+ہے|مجھے\s+چاہیے"
+    r"|أرسل|شارك|أعطني|أخبرني|ما\s+هو|ما\s+هي|أحتاج"
+    r"|بفرستید|بگویید|بدهید|چیست|نیاز\s+دارم"
+)
+ASK_PEOPLE = (
+    r"|\b(?:nom|noms|numéro|numéros|téléphone|adresse)s? (?:de |du |des |d')?(?:vos |votre |la |l')?(?:employés?|personnel|clients?|fournisseurs?|ouvriers?|patients?|caissiers?|chauffeurs?|comptable|responsable)\b"
+    r"|\b(?:nombres?|tel[eé]fonos?|n[uú]meros?|direcci[oó]n(?:es)?) de(?:l| sus| su| los| las)? (?:empleados?|personal|clientes?|proveedores?|trabajadores?|pacientes?|cajeros?|conductores?|contador|gerente)\b"
+    r"|(?:कर्मचारियों|कर्मचारी|स्टाफ|ग्राहकों|ग्राहक|सप्लायर|मरीज|ड्राइवर|मैनेजर)\s+(?:का|के|की)\s+(?:नाम|फोन|फ़ोन|नंबर|पता|मोबाइल)"
+    r"|(?:ملازمین|ملازم|اسٹاف|گاہکوں|گاہک|سپلائر|مریض|ڈرائیور|مینیجر)\s+(?:کا|کے|کی)\s+(?:نام|فون|نمبر|پتہ|موبائل)"
+    r"|(?:اسم|أسماء|رقم|أرقام|هاتف|عنوان)\s+(?:ال)?(?:موظف|موظفين|موظفيك|عملاء|عميل|مورد|موردين|مرضى|مريض|سائق|محاسب|مدير)"
+    r"|(?:نام|شماره|تلفن|آدرس)\s+(?:کارمند|کارمندان|مشتری|مشتریان|تأمین["
+    + ZW
+    + r"\s]?کننده|بیمار|راننده|حسابدار|مدیر)"
+)
+ASK_MONEY = (
+    r"|\b(?:chiffre d'affaires|revenus?|salaires?|bénéfices?|profits?)\s+(?:exacts?|précis(?:es?)?)\b|\bmontant exact\b|\bsolde (?:bancaire|de votre compte)\b|\brelevé bancaire\b|\bcombien (?:exactement|précisément) (?:gagnez|payez|vendez)\b"
+    r"|\b(?:ingresos|ventas|salarios?|ganancias|sueldos?)\s+exactos?\b|\bmonto exacto\b|\bsaldo (?:bancario|de su cuenta)\b|\bextracto bancario\b|\bcuánto exactamente (?:gana|paga|vende)\b"
+    r"|(?:सटीक|ठीक-ठीक|पूरी)\s+(?:आमदनी|कमाई|सैलरी|वेतन|मुनाफा|बिक्री)|बैंक\s+(?:बैलेंस|स्टेटमेंट)|अकाउंट\s+बैलेंस"
+    r"|(?:درست|ٹھیک\s+ٹھیک)\s+(?:آمدنی|کمائی|تنخواہ|منافع|فروخت)|بینک\s+(?:بیلنس|اسٹیٹمنٹ)|اکاؤنٹ\s+بیلنس"
+    r"|(?:الدخل|الإيرادات|الراتب|الرواتب|الأرباح|المبيعات)\s+(?:بالضبط|الدقيق|الدقيقة|الفعلي)|المبلغ\s+الدقيق|رصيد\s+(?:البنك|حسابك)|كشف\s+الحساب"
+    r"|(?:درآمد|فروش|حقوق|سود)\s+(?:دقیق|واقعی)|موجودی\s+(?:بانک|حساب)|صورت["
+    + ZW
+    + r"\s]?حساب\s+بانکی"
+)
+ROUGH = (
+    r"|\b(?:environ|approximativement|à peu près|aproximadamente|más o menos|alrededor)\b|लगभग|मोटे\s+तौर|अंदाज़न"
+    r"|تقریباً|اندازاً|موٹے\s+طور|تقريباً|حوالي|بشكل\s+تقريبي|حدود|تخمینی"
+)
+
+# --- R-ADV-01 / R-ADV-04: advice and opinions pi never gives -------------------------------------
+_COMP = r"(?:Zoho|QuickBooks|Odoo|Shopify|Foodics|Square|Toast|SAP|Tally|Xero|Salesforce|HubSpot|Wave|Marg)"
+ADVICE = (
+    # French
+    r"|\bvous pouvez (?:légalement )?(?:licencier|poursuivre|retenir|expulser|déduire)\b|\bc'est (?:parfaitement )?(?:légal|illégal)\b|\bvous avez (?:un )?(?:bon )?(?:dossier|recours)\b"
+    r"|\b(?:la )?tva (?:est|de|à) \d+|\bappliquez \d+\s?% de tva\b|\b(?:prenez|contractez|demandez) un prêt\b|\binvestissez (?:dans|en)\b|\bvous devriez (?:investir|emprunter)\b|\b(?:achetez|vendez) (?:des |vos )?actions\b"
+    r"|\bprenez (?:\w+ ){0,2}(?:comprimés?|cachets?|gélules?|pilules?)\b|\bdose de \d+|\bvous avez (?:probablement )?(?:du diabète|une infection|un cancer|la grippe|une dépression|de l'asthme|une hépatite)\b"
+    r"|\b(?:votre|le) \w+ (?:vous )?(?:vole|ment|triche|détourne)\b|\best (?:un voleur|en train de voler)\b"
+    # Spanish
+    r"|\busted puede (?:legalmente )?(?:despedir|demandar|retener|desalojar|deducir)\b|\bes (?:perfectamente )?(?:legal|ilegal)\b|\btiene un (?:buen )?caso\b"
+    r"|\bel iva (?:es|de) \d+|\bcobre \d+\s?% de iva\b|\b(?:pida|solicite) un préstamo\b|\binvierta en\b|\bdebería (?:invertir|pedir prestado)\b|\b(?:compre|venda) acciones\b"
+    r"|\btome (?:\w+ ){0,2}(?:pastillas?|comprimidos?|cápsulas?)\b|\bdosis de \d+|\busted (?:probablemente )?tiene (?:diabetes|una infección|cáncer|gripe|depresión|asma|hepatitis)\b"
+    r"|\b(?:su|el) \w+ (?:le |lo )?(?:está robando|le está mintiendo|miente|roba|engaña)\b|\bes un ladrón\b"
+    # Hindi
+    r"|आप\s+(?:कानूनी\s+तौर\s+पर\s+)?(?:नौकरी\s+से\s+निकाल|केस\s+कर|मुकदमा)|यह\s+(?:पूरी\s+तरह\s+)?(?:कानूनी|गैरकानूनी)\s+है|जीएसटी\s+\d+|\d+\s?%\s+(?:जीएसटी|टैक्स)"
+    r"|लोन\s+(?:ले\s+लें|लीजिए|लें)|निवेश\s+कीजिए|आपको\s+(?:निवेश|उधार)\s+(?:करना|लेना)\s+चाहिए|शेयर\s+(?:खरीदें|बेचें)"
+    r"|गोली\s+(?:लें|खाएं)|दवा\s+(?:लें|खाएं)|खुराक|आपको\s+(?:शायद\s+)?(?:डायबिटीज|संक्रमण|कैंसर|फ्लू|डिप्रेशन|अस्थमा|हेपेटाइटिस)"
+    r"|(?:आपका|आपके)\s+\S+\s+(?:चोरी\s+कर\s+रहा|झूठ\s+बोल\s+रहा|धोखा\s+दे\s+रहा)|चोर\s+है"
+    # Urdu
+    r"|آپ\s+(?:قانونی\s+طور\s+پر\s+)?(?:نکال\s+سکتے|مقدمہ\s+کر\s+سکتے)|یہ\s+(?:بالکل\s+)?(?:قانونی|غیر\s*قانونی)\s+ہے|\d+\s?%\s+(?:ٹیکس|جی\s*ایس\s*ٹی)|جی\s*ایس\s*ٹی\s+\d+"
+    r"|قرض\s+(?:لے\s+لیں|لیجیے|لیں)|لون\s+(?:لے\s+لیں|لیں)|سرمایہ\s+کاری\s+کریں|شیئرز?\s+(?:خریدیں|بیچیں)"
+    r"|گولی\s+(?:لیں|کھائیں)|دوا\s+(?:لیں|کھائیں)|خوراک|آپ\s+(?:کو\s+)?(?:شاید\s+)?(?:ذیابیطس|شوگر|انفیکشن|کینسر|فلو|ڈپریشن|دمہ|ہیپاٹائٹس)\s+(?:ہے|ہو)"
+    r"|چور\s+ہے|(?:آپ\s+کا|آپ\s+کے)\s+\S+\s+(?:چوری\s+کر\s+رہا|جھوٹ\s+بول\s+رہا|دھوکہ\s+دے\s+رہا)"
+    # Arabic
+    r"|يمكنك\s+(?:قانونياً\s+)?(?:فصل|مقاضاة|رفع\s+دعوى|حجز)|هذا\s+(?:قانوني|غير\s+قانوني)|ضريبة\s+(?:القيمة\s+المضافة\s+)?(?:هي|بنسبة)\s+\d+|\d+\s?%\s+ضريبة"
+    r"|خذ\s+قرضاً|اقترض|استثمر\s+في|يجب\s+أن\s+تستثمر|اشتر[ِ]?\s+أسهم|بع\s+الأسهم"
+    r"|خذ\s+(?:\S+\s+){0,2}(?:حبوب|أقراص|كبسولات)|جرعة\s+\d+|لديك\s+(?:على\s+الأرجح\s+)?(?:السكري|التهاب|السرطان|الإنفلونزا|اكتئاب|الربو)"
+    r"|(?:موظفك|شريكك|المحاسب)\s+(?:يسرق|يكذب|يخدعك)|\bسارق\b"
+    # Persian
+    r"|می["
+    + ZW
+    + r"\s]?توانید\s+(?:قانوناً\s+)?(?:اخراج|شکایت)|این\s+(?:کاملاً\s+)?(?:قانونی|غیرقانونی)\s+است|مالیات\s+بر\s+ارزش\s+افزوده\s+\d+|\d+\s?%\s+مالیات"
+    r"|وام\s+بگیرید|سرمایه["
+    + ZW
+    + r"\s]?گذاری\s+کنید|باید\s+(?:سرمایه["
+    + ZW
+    + r"\s]?گذاری|قرض)|سهام\s+(?:بخرید|بفروشید)"
+    r"|قرص\s+(?:بخورید|مصرف\s+کنید)|دوز\s+\d+|شما\s+(?:احتمالاً\s+)?(?:دیابت|عفونت|سرطان|آنفولانزا|افسردگی|آسم)\s+دارید"
+    r"|(?:کارمندتان|شریکتان|حسابدارتان)\s+(?:دزدی\s+می["
+    + ZW
+    + r"\s]?کند|دروغ\s+می["
+    + ZW
+    + r"\s]?گوید)|دزد\s+است"
+)
+OPINION = (
+    r"|\bvotez pour\b|\bvote por\b|वोट\s+दीजिए|को\s+वोट\s+दें|ووٹ\s+دیں|کو\s+ووٹ|صوّ?ت\s+ل|رأی\s+بدهید"
+    r"|\b(?:l'islam|les musulmans|le christianisme|les chrétiens|l'hindouisme|les hindous|les juifs|la religion)\b[^.?!\n]{0,40}\best (?:meilleur|pire|faux|vrai|la meilleure)\b"
+    r"|\b(?:el islam|los musulmanes|el cristianismo|los cristianos|el hinduismo|los hindúes|los judíos|la religión)\b[^.?!\n]{0,40}\bes (?:mejor|peor|falso|verdadero|la mejor)\b"
+    r"|(?:इस्लाम|मुसलमान|ईसाई|हिंदू|हिन्दू|धर्म)[^.?!।\n]{0,40}(?:बेहतर|बदतर|ग़लत|गलत|सही|झूठा|सच्चा)\s+है"
+    r"|(?:اسلام|مسلمان|عیسائی|ہندو|مذہب)[^.؟!۔\n]{0,40}(?:بہتر|بدتر|غلط|درست|جھوٹا|سچا)\s+ہے"
+    r"|(?:الإسلام|المسلمون|المسيحية|المسيحيون|الهندوسية|اليهود|الدين)[^.؟!\n]{0,40}(?:أفضل|أسوأ|خاطئ|صحيح|باطل)"
+    r"|(?:اسلام|مسلمانان|مسیحیت|مسیحیان|هندوها|یهودیان|دین)[^.؟!\n]{0,40}(?:بهتر|بدتر|غلط|درست|باطل)\s+است"
+    r"|\ble gouvernement\b[^.?!\n]{0,40}\best (?:corrompu|nul|le pire|un échec)\b|\bel gobierno\b[^.?!\n]{0,40}\bes (?:corrupto|terrible|inútil|un fracaso)\b"
+    r"|सरकार[^.?!।\n]{0,40}(?:भ्रष्ट|नाकाम|बेकार)|حکومت[^.؟!۔\n]{0,40}(?:کرپٹ|ناکام|بیکار)|الحكومة[^.؟!\n]{0,40}(?:فاسدة|فاشلة|سيئة)|دولت[^.؟!\n]{0,40}(?:فاسد|ناکارآمد|بد)\b"
+    r"|\b(?:meilleur|pire|moins cher|plus fiable|mejor|peor|más barato|más fiable) (?:que|qu') ?"
+    + _COMP
+    + r"\b"
+    r"|\b" + _COMP + r"\s+(?:से|سے)\s+(?:बेहतर|सस्ता|अधिक\s+भरोसेमंद|بہتر|سستا)"
+    r"|(?:أفضل|أسوأ|أرخص)\s+من\s+"
+    + _COMP
+    + r"\b|(?:بهتر|بدتر|ارزان["
+    + ZW
+    + r"]?تر)\s+از\s+"
+    + _COMP
+    + r"\b"
+)
+
 # One form for combined letters (Hindi "ढ़" is one character or two): every phrase set is normalised
 # the way `constitution.lint` normalises the reply.
 for _name, _value in list(globals().items()):

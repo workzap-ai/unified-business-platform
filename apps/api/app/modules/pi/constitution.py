@@ -1197,7 +1197,7 @@ ASK_PEOPLE = re.compile(
     r"(?:full )?(?:names?|phones?|phone numbers?|numbers?|addresses|address|mobile|whatsapp|cell|contacts?)\b"
     r"|\bnames? of (?:your |the )?(?:staff|employees?|customers?|clients?|suppliers?|workers?|cashiers?|"
     r"drivers?|patients?|managers?)\b"
-    r"|\b(?:his|her|their|the customer's|the client's) (?:name|number|phone)\b",
+    r"|\b(?:his|her|their|the customer's|the client's) (?:name|number|phone)\b" + langs.ASK_PEOPLE,
     re.IGNORECASE,
 )
 ASK_MONEY = re.compile(
@@ -1206,12 +1206,14 @@ ASK_MONEY = re.compile(
     r"|\b(?:revenue|turnover|profit|income|earnings) (?:figures?|numbers?) (?:to the|exactly)\b"
     r"|\bhow much (?:exactly|precisely) (?:do you|did you|are you) (?:earn|make|sell|pay)\b"
     r"|\bbank (?:balance|statement)s?\b|\baccount balance\b|\bbalance in (?:your )?(?:bank|account)\b"
-    r"|\b(?:what(?:'s| is)|how much (?:is|does)) (?:[A-Z][a-z]+'s|his|her|\w+'s) (?:salary|pay|wage)\b",
+    r"|\b(?:what(?:'s| is)|how much (?:is|does)) (?:[A-Z][a-z]+'s|his|her|\w+'s) (?:salary|pay|wage)\b"
+    + langs.ASK_MONEY,
     re.IGNORECASE,
 )
 ASK_VERB = re.compile(
     r"\b(?:send|share|give|provide|tell me|what(?:'s| is)|what are|may i have|can i (?:have|get)|could you "
-    r"(?:send|share|give|tell)|can you (?:send|share|give|tell)|i need|i'll need|please (?:send|share|give))\b",
+    r"(?:send|share|give|tell)|can you (?:send|share|give|tell)|i need|i'll need|please (?:send|share|give))\b"
+    + langs.ASK_VERB,
     re.IGNORECASE,
 )
 
@@ -1243,7 +1245,7 @@ ADVICE = re.compile(
     r"|\b(?:your|the) (?:[a-z]+ ){0,2}(?:is|are|must be|has been|probably is|are probably) "
     r"(?:stealing|lying|cheating|embezzling|skimming|a thief|thieves)\b"
     r"|\b(?-i:[A-Z][a-z]{2,}) (?:is|was|has been|must be|may be|might be|is probably|is likely) "
-    r"(?:stealing|a thief|lying|cheating|embezzling|skimming|a fraud|corrupt)\b",
+    r"(?:stealing|a thief|lying|cheating|embezzling|skimming|a fraud|corrupt)\b" + langs.ADVICE,
     re.IGNORECASE,
 )
 OPINION = re.compile(
@@ -1254,7 +1256,7 @@ OPINION = re.compile(
     r"|\b(?:islam|muslims?|christianity|christians?|hindus?|hinduism|jews?|religion)\b[^.?!\n]{0,40}"
     r"\b(?:is|are) (?:better|worse|wrong|right|false|true|the best)\b"
     r"|\b(?:better|worse|cheaper|more reliable) than (?:Zoho|QuickBooks|Odoo|Shopify|Foodics|Square|Toast|SAP|"
-    r"Tally|Xero|Salesforce|HubSpot|Wave|Marg)\b",
+    r"Tally|Xero|Salesforce|HubSpot|Wave|Marg)\b" + langs.OPINION,
     re.IGNORECASE,
 )
 OFF_TOPIC = re.compile(
@@ -1345,7 +1347,9 @@ def _asks_for_what_it_never_asks(reply: str, heard: str, add: Any) -> None:
                 )
                 return
             if ASK_MONEY.search(sentence) and not re.search(
-                r"\b(?:roughly|approximately|about|rough|ballpark)\b", sentence, re.IGNORECASE
+                r"\b(?:roughly|approximately|about|rough|ballpark)\b" + langs.ROUGH,
+                sentence,
+                re.IGNORECASE,
             ):
                 add(
                     Violation(

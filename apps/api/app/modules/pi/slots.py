@@ -11,6 +11,7 @@ Only pi's own question text is stored, never the person's words.
 """
 
 import re
+import unicodedata
 from typing import Any
 
 from app.modules.pi import constitution_langs as langs
@@ -27,6 +28,20 @@ STOP = frozenset(
     " ko se mein hai hain hua hui aur ya ye wo bhi nahi nhi koi kuch sab har par kar kya aap ap"
     " apne apka apki kis kaun kitna kitni kitne".split()
 )
+# Question words of the other priority languages (French and Spanish are Latin and fold like the
+# rest; Hindi, Urdu, Arabic and Persian are kept as written, `industry_packs._fold` splits them).
+STOP |= frozenset(
+    "les des est que qui dans pour avec vous votre vos une pas plus ont sont quel quelle quels"
+    " quoi comment depuis cette ces aux sur par los las del por para con una usted como cual"
+    " cuando donde esta estos sus tiene tienen".split()
+)
+STOP_OTHER_SCRIPT = frozenset(
+    "है हैं का के की में से को पर और या क्या आप कब कौन कैसे आपके आपकी आपका"
+    " ہے ہیں کا کے کی میں سے کو پر اور یا کیا آپ کب کون کیسے"
+    " هل ما هو هي في من على إلى عن أو هذا هذه كان كيف متى"
+    " است را در به از که یا آیا شما کدام چه چرا چگونه".split()
+)
+WORD_SPLIT = re.compile(r"[^\ẁ-ًͯ-ٟऀ-ॿ‌]+")
 
 
 # R-ASK-05: the generic closer ("anything else?", "aur koi masla?") is a slot of its own. An "ok" or
@@ -55,8 +70,15 @@ def question_of(reply: str) -> str:
 
 
 def words(question: str) -> frozenset[str]:
-    found = re.findall(r"[a-z]{3,}", industry_packs._fold(question))
-    return frozenset(industry_packs._stem(w) for w in found if w not in STOP)
+    found: set[str] = set()
+    for token in WORD_SPLIT.split(unicodedata.normalize("NFC", question).lower()):
+        if re.fullmatch(r"[a-zÀ-ɏ']+", token):  # Latin: fold accents, drop stop words
+            word = industry_packs._fold(token)
+            if len(word) >= 3 and word not in STOP and re.fullmatch(r"[a-z]+", word):
+                found.add(industry_packs._stem(word))
+        elif len(token) >= 3 and token not in STOP_OTHER_SCRIPT:
+            found.add(industry_packs._arabic_stem(token.replace("‌", "")))
+    return frozenset(found)
 
 
 def same_question(a: str, b: str) -> bool:
