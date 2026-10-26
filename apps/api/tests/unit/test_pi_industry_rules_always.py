@@ -24,7 +24,7 @@ def replies():
 
 
 CASES = list(replies())
-KNOWN_BREAKS = 25
+KNOWN_BREAKS = 0
 
 
 def test_there_are_industry_cases_to_check():
