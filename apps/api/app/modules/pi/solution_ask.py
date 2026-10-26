@@ -132,6 +132,22 @@ def asks_in_other_language(text: str) -> bool:
     )
 
 
+# What a model said about a message the phrase banks do not know (ask_classifier). Kept for that exact
+# text only, bounded, and only ever consulted when the phrase banks say "not an ask".
+_LEARNED_ASKS: dict[str, bool] = {}
+LEARNED_LIMIT = 500
+
+
+def remember_ask(said: str, value: bool) -> None:
+    if len(_LEARNED_ASKS) >= LEARNED_LIMIT:
+        _LEARNED_ASKS.pop(next(iter(_LEARNED_ASKS)))
+    _LEARNED_ASKS[said or ""] = value
+
+
+def known_ask(said: str) -> bool | None:
+    return _LEARNED_ASKS.get(said or "")
+
+
 def asked_for_ideas(said: str) -> bool:
     """They want a fix now: "solution do", "kuch kar sakte ho?", "what can you do?"."""
     text = said or ""
@@ -143,6 +159,7 @@ def asked_for_ideas(said: str) -> bool:
         or what_now(text)
         or asks_in_other_language(text)
         or CHURN.search(text)
+        or _LEARNED_ASKS.get(text) is True
     )
 
 

@@ -1195,6 +1195,21 @@ async def process_pi_event(ctx: dict[str, Any], event_id: str) -> None:
                 )
                 message.media = {**message.media, "links": links}
                 await session.commit()
+        if service_discovery and brain_on and message.message_type in ("text", "audio") and body:
+            # a request for a fix in a language or wording the phrase banks lack (Book 2, Part 5)
+            from app.modules.pi import ask_classifier
+
+            await latency.timed(
+                "model.ask_classify",
+                ask_classifier.prefetch(
+                    build_llm_manager(ctx["settings"], ctx["http"], ctx["sessions"]),
+                    scope,
+                    said=body,
+                    flow_state=conversation.flow_state or "",
+                    conversation_id=conversation_id,
+                    alias=str(policy.ai_config.get("router_alias", "fast")),
+                ),
+            )
         service_context = (
             await latency.timed(
                 "prepare_context",
