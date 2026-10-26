@@ -66,12 +66,23 @@ WEAK = frozenset(
     "staff customer client order other work team sale money business shop item thing people "
     "problem issue match claim record take track lose make give keep long many day week".split()
 )
+# The nouns of a trade itself: every entry of a shop mentions them, so sharing them says nothing
+# about which problem is meant, not even two of them together (live test 6: "stock" and "outlet"
+# sent a clearance problem to the website and outlet stock sync entry)
+TRADE = frozenset(
+    "stock outlet warehouse godown store items item products product goods inventory".split()
+)
 # The same thing said in English and Roman Urdu, so a person's own word finds the entry's
 SAME = {
     "chori": "theft", "chor": "theft", "stolen": "theft", "steal": "theft", "thief": "theft",
     "theft": "theft", "raqam": "price", "rate": "price", "pricing": "price", "price": "price",
     "baad": "after", "hisaab": "account", "udhaar": "credit", "udhar": "credit",
     "kharcha": "cost", "nuksan": "loss", "gahak": "customer", "stock": "stock", "maal": "stock",
+    "bechna": "clearance", "bechni": "clearance", "becho": "clearance", "clearance": "clearance",
+    "offload": "clearance", "liquidate": "clearance", "unsold": "clearance", "excess": "clearance",
+    "surplus": "clearance", "overstock": "clearance", "dead": "clearance", "slow": "clearance",
+    "lying": "clearance", "parha": "clearance", "pada": "clearance", "bacha": "clearance",
+    "leftover": "clearance", "leftovers": "clearance",
 }  # fmt: skip
 
 
@@ -89,13 +100,13 @@ def relevant(entry: dict[str, Any], words: str) -> bool:
     said = _evidence(words)
     if len(said) < RELEVANT_AT:
         return True
-    shared = said & _evidence(entry.get("words", ""))
+    shared = (said & _evidence(entry.get("words", ""))) - TRADE
     return bool(shared - WEAK) or len(shared & WEAK) >= 2
 
 
 def fit(entry: dict[str, Any], words: str) -> int:
     """How much evidence the entry shares with the person's words (more is a better fit)."""
-    shared = _evidence(words) & _evidence(entry.get("words", ""))
+    shared = (_evidence(words) & _evidence(entry.get("words", ""))) - TRADE
     return len(shared - WEAK) * 2 + len(shared & WEAK)
 
 
@@ -110,7 +121,7 @@ def match_problem(
         return found
     # The model's own sub-type for this entry and one shared word, even a general one ("orders"):
     # enough, as the real-model sweeps showed (orders from food apps are the entry's own).
-    shared = _evidence(words) & _evidence(found.get("words", ""))
+    shared = (_evidence(words) & _evidence(found.get("words", ""))) - TRADE
     if subtype and found.get("subtype") == subtype and shared:
         return found
     return None

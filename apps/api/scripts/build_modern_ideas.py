@@ -1,3 +1,4 @@
+# ruff: noqa: E501  (the owner's sentences stay on one line each)
 """Build packs/library/modern_ideas.json from docs/pi-saas/pi-modern-ideas.md (the owner's modern,
 brand-free, owner-action ideas by problem kind), mapped to the library's categories.
 
@@ -49,8 +50,26 @@ def parse(text: str) -> list[dict[str, str]]:
     return found
 
 
+# Owner-approved on 2026-10-26 (live test 6), not in the document: excess or slow stock to sell off
+EXTRA = {
+    "excess_stock": (
+        "stock_inventory",
+        [
+            "Offer past buyers a first look at the unsold sets in a private chat with photos and one clear rate, so they get first pick.",
+            "Show each ready set in a short video with the fabric close up, so viewers can judge it without asking.",
+            "Display the slow sets at the front of the outlet with the most walk-ins, so more shoppers see them.",
+            "Send a simple photo list of the sets to bulk buyers and nearby shops, so a large part of the stock can move in one deal.",
+            "Group the unsold pieces into ready sets with one clear offer, so buyers see a simple choice.",
+        ],
+    )
+}
+
+
 def main() -> None:
     ideas = parse(SOURCE.read_text(encoding="utf-8"))
+    for kind, (category, texts) in EXTRA.items():
+        for n, text in enumerate(texts, start=1):
+            ideas.append({"id": f"modern:{kind}:{n}", "category": category, "text": text})
     data = {
         "note": "Owner's modern, brand-free, owner-action ideas (docs/pi-saas/pi-modern-ideas.md), "
         "by library category. Preferred over the spec's older ideas when two fit equally.",

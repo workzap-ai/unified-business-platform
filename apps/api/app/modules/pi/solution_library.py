@@ -36,7 +36,7 @@ def _words(text: str) -> set[str]:
 CUES: dict[str, str] = {
     "loss_security": "theft chori stolen steal thief fraud loss missing leak shrinkage void refund nuksan kam",
     "cash_collections": "cash owed udhaar credit payment collect receivable balance deposit paisa wusooli",
-    "stock_inventory": "stock maal shelf expiry inventory count shortage low warehouse godown",
+    "stock_inventory": "stock maal shelf expiry inventory count shortage low warehouse godown clearance",
     "sales_revenue": "sales price rate raqam views orders buy browse offer conversion silence reply sale",
     "marketing_leads": "ads instagram reels leads enquiry reach followers promotion campaign views",
     "customers_retention": "repeat review complaint regular return loyal feedback",

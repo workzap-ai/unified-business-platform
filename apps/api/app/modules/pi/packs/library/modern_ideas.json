@@ -150,6 +150,31 @@
    "id": "modern:bookings_and_no_shows:3",
    "category": "customer_experience_digital",
    "text": "Share your booking steps in one pinned message with the timings and a way to confirm, so people book without calling."
+  },
+  {
+   "id": "modern:excess_stock:1",
+   "category": "stock_inventory",
+   "text": "Offer past buyers a first look at the unsold sets in a private chat with photos and one clear rate, so they get first pick."
+  },
+  {
+   "id": "modern:excess_stock:2",
+   "category": "stock_inventory",
+   "text": "Show each ready set in a short video with the fabric close up, so viewers can judge it without asking."
+  },
+  {
+   "id": "modern:excess_stock:3",
+   "category": "stock_inventory",
+   "text": "Display the slow sets at the front of the outlet with the most walk-ins, so more shoppers see them."
+  },
+  {
+   "id": "modern:excess_stock:4",
+   "category": "stock_inventory",
+   "text": "Send a simple photo list of the sets to bulk buyers and nearby shops, so a large part of the stock can move in one deal."
+  },
+  {
+   "id": "modern:excess_stock:5",
+   "category": "stock_inventory",
+   "text": "Group the unsold pieces into ready sets with one clear offer, so buyers see a simple choice."
   }
  ]
 }

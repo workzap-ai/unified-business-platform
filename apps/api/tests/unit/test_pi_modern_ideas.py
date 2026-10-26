@@ -1,4 +1,4 @@
-"""The owner's 30 modern ideas (docs/pi-saas/pi-modern-ideas.md) are in the generic library by
+"""The owner's 35 modern ideas (docs/pi-saas/pi-modern-ideas.md) are in the generic library by
 category with stable ids, pass the reply rules, come first when they fit as well as an older idea,
 and never hide the spec's own ideas."""
 
@@ -7,10 +7,10 @@ import json
 from app.modules.pi import solution_free, solution_library, solution_lint
 
 
-def test_all_thirty_ideas_are_loaded_and_pass_the_reply_rules() -> None:
+def test_all_modern_ideas_are_loaded_and_pass_the_reply_rules() -> None:
     items = [i for v in solution_library.modern().values() for i in v]
-    assert len(items) == 30
-    assert len({i["id"] for i in items}) == 30
+    assert len(items) == 35
+    assert len({i["id"] for i in items}) == 35
     for item in items:
         assert solution_lint.passes(item["text"]), item["id"]
         assert item["category"] in solution_library.load(), item["id"]
@@ -42,7 +42,7 @@ def test_a_modern_idea_has_a_stable_id_learning_can_score() -> None:
 
 def test_the_file_is_what_the_builder_reads_from_the_owners_document() -> None:
     data = json.loads(solution_library.MODERN.read_text(encoding="utf-8"))
-    assert len(data["ideas"]) == 30
+    assert len(data["ideas"]) == 35
 
 
 def test_the_free_idea_prompt_is_modern_without_assuming_what_the_owner_never_said() -> None:

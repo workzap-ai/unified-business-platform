@@ -3831,6 +3831,16 @@ def reply_language(
         and "roman_ur" in detected[1:]
     ):
         detected[0] = None
+    # The same for an earlier short English fragment ("warehouse and outlets") that sits between the
+    # latest ambiguous message ("poore sets") and the Roman Urdu one: it never decides the language
+    # (live test 6).
+    for index in range(1, len(detected)):
+        if (
+            detected[index] == "en"
+            and len(re.findall(r"[^\W\d_]+", texts[index])) <= 3
+            and "roman_ur" in detected
+        ):
+            detected[index] = None
     # A code-mixed message ("Dono mai whatsapp and instagram but mostly instagram") that has a Roman
     # Urdu word and about as many English words as Urdu ones follows the chat's Roman Urdu too.
     if detected and detected[0] == "en" and "roman_ur" in detected[1:] and _code_mixed(texts[0]):

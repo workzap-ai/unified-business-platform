@@ -1,5 +1,5 @@
 {
- "note": "Owner-added entry, NOT from the PDF. On 2026-10-26 the owner asked for a fashion problem that the Addendum 2 pack lacks: people ask the price in DM, then go quiet. Ideas 1 and 2 are the owner's own words (idea 2 with the time word taken out). This file is merged by solutions.load(), so a rebuild of the packs from the PDF (scripts/build_industry_solutions.py) cannot erase it.",
+ "note": "Owner-added entry, NOT from the PDF. On 2026-10-26 the owner asked for a fashion problem that the Addendum 2 pack lacks: people ask the price in DM, then go quiet. Ideas 1 and 2 are the owner's own words (idea 2 with the time word taken out). This file is merged by solutions.load(), so a rebuild of the packs from the PDF (scripts/build_industry_solutions.py) cannot erase it. Entry x2 (2026-10-26, live test 6): a large stock of unsold sets to sell off; the five ideas are the owner's own.",
  "problems": [
   {
    "id": "x1_price_asked_then_silence",
@@ -27,6 +27,36 @@
     },
     {
      "text": "Look at the enquiries that did turn into orders and copy what those replies had in common, so the next reply starts from what worked.",
+     "review": false
+    }
+   ]
+  },
+  {
+   "id": "x2_excess_stock_to_sell",
+   "n": 12,
+   "words": "A large stock of unsold sets lying in the warehouse and outlets that must be sold off. Bohat stock warehouse aur outlets mein parha hai jo bechna hai, poore sets bik nahi rahe",
+   "category": "stock_inventory",
+   "subtype": "overstock_dead_stock",
+   "quick_ideas": [
+    "Offer past buyers a first look at the unsold sets in a private chat with photos and one clear rate, so they get first pick.",
+    "Show each ready set in a short video with the fabric close up, so viewers can judge it without asking."
+   ],
+   "workzap_build": {
+    "keys": [
+     "customer_messaging"
+    ],
+    "text": "a message to past buyers with photos of the unsold sets and one clear rate, sent only to people who agreed to hear from you.",
+    "tool_words": []
+   },
+   "ask_first": "Are the sets unsold in the outlets, the warehouse, or both?",
+   "free_stops": "How the messages and the bulk list are set up is in the solution document.",
+   "extra_ideas": [
+    {
+     "text": "Display the slow sets at the front of the outlet with the most walk-ins, so more shoppers see them.",
+     "review": false
+    },
+    {
+     "text": "Send a simple photo list of the sets to bulk buyers and nearby shops, so a large part of the stock can move in one deal.",
      "review": false
     }
    ]
