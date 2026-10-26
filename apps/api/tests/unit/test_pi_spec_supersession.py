@@ -62,3 +62,25 @@ def test_the_prompt_version_changes_when_the_supersession_changes():
 def test_g4_stays_until_the_owner_decides():
     """Spec G4 against Book 2 4.2 is an open decision, not silently dropped."""
     assert "G4" in spec_handbook.sections()
+
+
+def test_no_prompt_layer_still_teaches_the_superseded_listen_only_rule():
+    """Platform spec A.5, principle 1: one rule per topic. The system prompt, the brain voice, the
+    flow guidance and the lint message must not say 'never suggest a fix' or 'the document comes
+    once the problems are noted' (Brain v3 R-SELL-01/02/04, superseded by Book 2)."""
+    import inspect
+
+    from app.modules.pi import constitution, service_conversation
+
+    texts = {
+        "SYSTEM": service_conversation.SYSTEM,
+        "BRAIN_VOICE": service_conversation.BRAIN_VOICE,
+        "flow.GUIDANCE": " ".join(flow.GUIDANCE.values()),
+        "constitution": inspect.getsource(constitution),
+    }
+    for name, text in texts.items():
+        flat = " ".join(text.split())
+        assert "once the problems are noted" not in flat, name
+        assert "Never suggest a fix" not in flat, name
+        assert "never suggest a fix" not in flat, name
+        assert "You only listen and note problems" not in flat, name

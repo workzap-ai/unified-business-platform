@@ -710,6 +710,22 @@ async def send_whatsapp_message(ctx: ToolContext, data: SendInput) -> SendOutput
             )
         )
         ctx.run.response_message_id = existing.id
+        from app.modules.pi.configuration import settings_row
+
+        rules = (await settings_row(ctx.session, ctx.scope)).response_rules
+        if rules.get("pi_mode") == "brain":
+            # Platform spec A.2 #8 / A.8: every reply logs the prompt, pack and build versions
+            # that produced it, so a change that did not change behaviour can be traced.
+            from app.modules.pi import learning_audit
+
+            await learning_audit.stamp_safely(
+                ctx.session,
+                ctx.scope,
+                ctx.conversation,
+                existing,
+                response_rules=rules,
+                run=ctx.run,
+            )
         if status == "pending_approval":
             from app.modules.notifications.service import notify
 

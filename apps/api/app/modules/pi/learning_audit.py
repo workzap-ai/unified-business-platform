@@ -7,10 +7,12 @@ version, the version of each pack that fed the prompt, the lesson, example and w
 stores identifiers only, never text. It is safe to call for every reply, learning on or off
 (a frozen workspace simply shows no learned ids), and calling it twice for one reply is harmless.
 
-The runtime calls it once, after the reply message is saved (see the report: one line).
+`send_whatsapp_message` calls `stamp_safely` once, after the reply message is saved (brain mode).
 """
 
 import hashlib
+import logging
+import os
 from collections.abc import Sequence
 from pathlib import Path
 from typing import Any
@@ -22,6 +24,8 @@ from app.modules.pi import industry_packs, learning, spec_handbook
 from app.modules.pi.learning_models import PiReplyAudit
 from app.modules.pi.models import PiAgentRun, PiConversation, PiMessage
 from app.shared.scope import WorkspaceScope
+
+logger = logging.getLogger(__name__)
 
 
 def _digest(path: Path) -> str:
@@ -43,6 +47,15 @@ def prompt_version() -> str:
         except OSError:
             digest.update(b"-")
     return digest.hexdigest()[:12]
+
+
+def build_id() -> str:
+    """Which code was running: the commit the host deployed (Railway sets one of these), else
+    "unknown". Short, never a secret."""
+    for name in ("RAILWAY_GIT_COMMIT_SHA", "GIT_COMMIT", "SOURCE_VERSION", "COMMIT_SHA"):
+        if value := os.environ.get(name, "").strip():
+            return value[:12]
+    return "unknown"
 
 
 def pack_versions(conversation: PiConversation, used: dict[str, Any]) -> dict[str, str]:
@@ -102,7 +115,7 @@ async def stamp(
         conversation_id=conversation.id,
         run_id=run.id if run is not None else None,
         prompt_version=prompt or prompt_version(),
-        pack_versions=pack_versions(conversation, used),
+        pack_versions={**pack_versions(conversation, used), "build": build_id()},
         lesson_ids=[str(x) for x in used.get("lessons") or []],
         example_ids=[str(x) for x in used.get("examples") or []],
         arm_ids=[str(x) for x in (used.get("arm"), used.get("voice_arm")) if x],
@@ -118,6 +131,22 @@ async def stamp(
     session.add(row)
     await session.flush()
     return row
+
+
+async def stamp_safely(
+    session: AsyncSession,
+    scope: WorkspaceScope,
+    conversation: PiConversation,
+    reply: PiMessage,
+    **kwargs: Any,
+) -> None:
+    """`stamp` that can never fail the reply: the audit is an extra. It runs in a savepoint, so a
+    database error rolls back only the stamp and the reply's own transaction stays healthy."""
+    try:
+        async with session.begin_nested():
+            await stamp(session, scope, conversation, reply, **kwargs)
+    except Exception:  # noqa: BLE001 - never a reason to lose a reply
+        logger.warning("pi_reply_audit_failed", exc_info=True)
 
 
 async def trace(session: AsyncSession, message_id: Any) -> PiReplyAudit | None:

@@ -1327,9 +1327,9 @@ def lint(reply: str, context: dict[str, Any]) -> list[Violation]:
             add(
                 Violation(
                     "R-SELL-01",
-                    "they are still describing problems: suggest no fix, product, document or "
-                    "quote. If they asked, say only that Workzap can prepare a solution "
-                    "document once the problems are noted, then go back to listening",
+                    "they have not asked for a fix: do not volunteer a fix, product, document or "
+                    "quote; note what they said and ask one question. If their message does ask "
+                    "for one, in any words, answer it in the first sentence instead",
                     True,
                 )
             )
