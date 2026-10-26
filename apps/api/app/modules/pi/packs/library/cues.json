@@ -12,16 +12,26 @@
      "fraud",
      "pilfer",
      "shrinkage",
-     "embezzl"
+     "embezzl",
+     "leakage",
+     "disappear",
+     "vanish",
+     "suspect",
+     "embezzle"
     ],
     "roman_ur": [
      "chori",
      "chor ",
      "ghapla",
-     "gayab",
      "kam nikal",
      "fraud",
-     "dhoka"
+     "dhoka",
+     "shak hai",
+     "shak",
+     "hera pheri",
+     "ghayab ho rahe",
+     "paise ghaib",
+     "paisay ghaib"
     ],
     "hi": [
      "चोरी",
@@ -75,12 +85,24 @@
      "taking money",
      "money from the till",
      "skim",
-     "till is short"
+     "till is short",
+     "shortage",
+     "short every",
+     "drawer",
+     "discrepanc",
+     "unaccounted",
+     "shrink",
+     "tampering"
     ],
     "roman_ur": [
      "kam nikalta",
      "kam ho jata",
-     "nuksan"
+     "nuksan",
+     "gayab",
+     "ghayab",
+     "kami",
+     "kam ho rahe",
+     "galla"
     ],
     "hi": [
      "कम निकल",
@@ -112,7 +134,12 @@
      "desaparece"
     ]
    },
-   "generic": {}
+   "generic": {
+    "roman_ur": [
+     "gayab",
+     "ghayab"
+    ]
+   }
   },
   "cash_collections": {
    "strong": {
@@ -126,7 +153,16 @@
      "receivable",
      "collect",
      "chasing",
-     "chase"
+     "chase",
+     "outstanding",
+     "stuck money",
+     "money stuck",
+     "not paying",
+     "don't pay",
+     "dont pay",
+     "pending payment",
+     "advance",
+     "recover"
     ],
     "roman_ur": [
      "wusooli",
@@ -135,7 +171,18 @@
      "baqaya",
      "payment late",
      "paisa late",
-     "raqam wapas"
+     "raqam wapas",
+     "phansi",
+     "phans",
+     "paise nahi",
+     "paisay nahi",
+     "paise wapas",
+     "paisay wapas",
+     "raqam phans",
+     "outstanding",
+     "pending payment",
+     "bakaya",
+     "recovery"
     ],
     "hi": [
      "उधार",
@@ -193,7 +240,11 @@
      "cash",
      "credit",
      "invoice",
-     "jama"
+     "jama",
+     "paise",
+     "paisay",
+     "raqam phansi",
+     "dete nahi"
     ],
     "hi": [
      "नकद",
@@ -362,7 +413,18 @@
      "reply hi nahi",
      "order nahi aate",
      "rate poochte",
-     "discount"
+     "discount",
+     "rate pooch",
+     "price pooch",
+     "rate puch",
+     "pooch kar",
+     "pooch ke",
+     "reply nahi",
+     "jawab nahi",
+     "ghayab ho jata",
+     "ghayab ho jate",
+     "bhaw",
+     "bhao"
     ],
     "hi": [
      "कीमत",
@@ -409,15 +471,27 @@
    "specific": {
     "en": [
      "quote",
-     "buyers",
-     "buy",
      "sales",
-     "sale"
+     "sale",
+     "buying",
+     "purchase",
+     "ask the rate",
+     "asks the rate",
+     "ask about the rate",
+     "ask for the rate",
+     "rate",
+     "disappear after",
+     "ghost",
+     "vanish after"
     ],
     "roman_ur": [
      "quote",
      "sale",
-     "khareed"
+     "khareed",
+     "rate",
+     "order nahi",
+     "ghayab",
+     "gayab"
     ],
     "hi": [
      "बिक",
@@ -584,7 +658,17 @@
      "never see them",
      "see them again",
      "try us once",
-     "first-time buyers"
+     "first-time buyers",
+     "come again",
+     "keep customers",
+     "keep buyers",
+     "returning customers",
+     "return customers",
+     "customers leave",
+     "customers stop",
+     "lose customers",
+     "buyers come back",
+     "second purchase"
     ],
     "roman_ur": [
      "dobara nahi",
@@ -593,7 +677,14 @@
      "repeat",
      "loyal",
      "aik baar",
-     "ek baar"
+     "ek baar",
+     "wapas aaye",
+     "wapas aayen",
+     "dobara aaye",
+     "dobara aayen",
+     "wapas laana",
+     "customers wapas",
+     "jo ek baar"
     ],
     "hi": [
      "वापस नहीं",
@@ -773,7 +864,15 @@
      "hiring",
      "turnover",
      "overtime",
-     "training"
+     "training",
+     "hire",
+     "hires",
+     "quit",
+     "resign",
+     "attrition",
+     "walk out",
+     "new joiner",
+     "leave within"
     ],
     "roman_ur": [
      "shift",
@@ -836,10 +935,30 @@
    "specific": {
     "en": [
      "employees",
-     "workers"
+     "workers",
+     "careless",
+     "timing",
+     "discipline",
+     "lazy",
+     "negligen",
+     "punctual",
+     "attitude",
+     "team does not",
+     "my team",
+     "follow timings"
     ],
     "roman_ur": [
-     "workers"
+     "workers",
+     "timing",
+     "laparwah",
+     "lazy",
+     "discipline",
+     "naya staff",
+     "staff chhod",
+     "naukri chhod",
+     "chhor jate",
+     "chhod jate",
+     "team"
     ],
     "hi": [
      "स्टाफ",
@@ -869,7 +988,9 @@
    "generic": {
     "en": [
      "staff",
-     "late"
+     "late",
+     "team",
+     "careless"
     ],
     "roman_ur": [
      "late",
@@ -1024,7 +1145,17 @@
      "damaged",
      "rework",
      "poor quality",
-     "bad quality"
+     "bad quality",
+     "quality control",
+     "quality check",
+     "inspect",
+     "angry customer",
+     "customers are angry",
+     "unhappy customer",
+     "upset customer",
+     "dissatisf",
+     "poor workmanship",
+     "substandard"
     ],
     "roman_ur": [
      "shikayat",
@@ -1033,7 +1164,14 @@
      "damaged",
      "rework",
      "quality kharab",
-     "quality ka masla"
+     "quality ka masla",
+     "nuqs",
+     "nuqz",
+     "ghussa",
+     "naraz",
+     "nakhush",
+     "quality control",
+     "qc"
     ],
     "hi": [
      "शिकायत",
@@ -1075,14 +1213,25 @@
      "mala calidad"
     ]
    },
-   "specific": {},
-   "generic": {
+   "specific": {
     "en": [
-     "quality"
+     "quality",
+     "weak control",
+     "angry",
+     "unhappy",
+     "upset",
+     "mistake",
+     "returns"
     ],
     "roman_ur": [
-     "quality"
+     "quality",
+     "galti",
+     "complaint"
     ]
+   },
+   "generic": {
+    "en": [],
+    "roman_ur": []
    }
   },
   "operations_process": {
@@ -1097,7 +1246,16 @@
      "manual work",
      "slow work",
      "disorganis",
-     "disorganiz"
+     "disorganiz",
+     "no system of",
+     "no standard",
+     "standard procedure",
+     "everything is verbal",
+     "verbal",
+     "ad hoc",
+     "no structure",
+     "disorgani",
+     "workflow"
     ],
     "roman_ur": [
      "mujh par",
@@ -1107,7 +1265,14 @@
      "sop",
      "manual kaam",
      "tareeqa",
-     "kaam ka masla"
+     "kaam ka masla",
+     "nizam",
+     "zabani",
+     "zubani",
+     "koi system nahi",
+     "structure nahi",
+     "intezam nahi",
+     "bina nizam"
     ],
     "hi": [
      "मुझ पर",
@@ -1151,12 +1316,20 @@
      "slow",
      "process",
      "manual",
-     "delay"
+     "delay",
+     "standard",
+     "procedure",
+     "structure",
+     "inefficien",
+     "chaos"
     ],
     "roman_ur": [
      "process",
      "manual",
-     "delay"
+     "delay",
+     "intezam",
+     "chaos",
+     "sab zabani"
     ]
    },
    "generic": {
@@ -1261,7 +1434,17 @@
      "communication",
      "groups",
      "meetings",
-     "lost in"
+     "lost in",
+     "tasks",
+     "follows up",
+     "follow up on",
+     "who is responsible",
+     "accountab",
+     "reminders to staff",
+     "instructions",
+     "handover",
+     "hand over",
+     "miscommunication"
     ],
     "roman_ur": [
      "messages kho",
@@ -1271,7 +1454,17 @@
      "groups mein",
      "group mein",
      "meeting",
-     "rabta"
+     "rabta",
+     "task",
+     "follow up",
+     "follow-up",
+     "kisi ko nahi pata",
+     "kaun zimmedar",
+     "zimmedari",
+     "update nahi",
+     "batate nahi",
+     "hidayat",
+     "instructions"
     ],
     "hi": [
      "मैसेज खो",
@@ -1323,11 +1516,22 @@
    "specific": {
     "en": [
      "messages",
-     "whatsapp group"
+     "whatsapp group",
+     "follow up",
+     "follow-up",
+     "followup",
+     "task",
+     "update",
+     "inform",
+     "nobody"
     ],
     "roman_ur": [
      "messages",
-     "whatsapp group"
+     "whatsapp group",
+     "update",
+     "inform",
+     "yaad dehani",
+     "koi nahi"
     ]
    },
    "generic": {}
