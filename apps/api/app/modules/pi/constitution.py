@@ -562,6 +562,34 @@ ACK_OPENER = re.compile(
     r"^\W*(?:thanks|thank\s+you|noted|got\s+it|shukriya|note\s+kar\s+liya|samajh\s+liya)\b",
     re.IGNORECASE,
 )
+# R-TONE-01 / R-ECHO-01 (live chat 2026-10-26): no verdict opener ("Ye real masla hai.", "That's a real
+# problem.") and no stock thank-you before the noted line ("Shukriya. Maine note kar liya: ...").
+VERDICT_OPENER = re.compile(
+    r"^\W*(?:ye|yeh|this|that)(?:\s+is|'s|\s+ek)?\s+(?:a\s+|ek\s+)?(?:real|genuine|serious|"
+    r"bara|bada|badi|important|valid)(?:\s+(?:masla|problem|issue|baat))?\s*(?:hai|problem|issue)?\b",
+    re.IGNORECASE,
+)
+THANKS_THEN_NOTED = re.compile(
+    r"^\W*(?:shukriya)[.!,]?\s+(?:(?:maine|main\s+ne|i(?:'ve|\s+have))?\s*"
+    r"(?:note|noted))\b",
+    re.IGNORECASE,
+)
+NOTED_WORDS = (
+    8  # the golden noted line is a few words: "Note kar liya, views aate hain magar orders nahi."
+)
+# R-ASK-05: the generic closer ("anything else?", "aur kuch add karna hai?") straight after a concrete
+# detail: ask something specific about the detail instead.
+GENERIC_CLOSER = re.compile(
+    r"\banything else\b|\bwhat else\b|\bis there anything\b|\b(?:aur|or) (?:koi|kuch)\b"
+    r"|\bkoi aur\b|\bkuch (?:aur|add)\b|\badd karna\b|\bmasla ho to\b|\banything to add\b",
+    re.IGNORECASE,
+)
+CONCRETE_STATES = (
+    flow.State.S1_LISTENING,
+    flow.State.S2_CLARIFYING,
+    flow.State.S3_NOTED,
+    flow.State.S5_READINESS,
+)
 # R-ECHO-01: the noted confirmation names the problem in at most 12 words.
 NOTED_TITLE = re.compile(
     r"\b(?:i(?:'ve|\s+have)\s+noted(?:\s+it)?|noted|note\s+kar\s+liya)\s*:\s*([^.?!\n]+)",
@@ -1569,13 +1597,43 @@ def lint(reply: str, context: dict[str, Any]) -> list[Violation]:
                 'hain" / an honest "Ye Workzap nahi karta"), then the detail',
             )
         )
+    if VERDICT_OPENER.match(reply):
+        add(
+            Violation(
+                "R-TONE-01",
+                'no verdict opener ("Ye real masla hai.", "This is a real problem."): note what '
+                "they said in a few words, then ask",
+            )
+        )
+    if THANKS_THEN_NOTED.match(reply):
+        add(
+            Violation(
+                "R-ECHO-01",
+                'no stock thank-you before the noted line: start with "Note kar liya, ..." and '
+                "the problem in a few words",
+            )
+        )
+    last_question = next((x for x in reversed(_sentences(reply)) if x.endswith(QUESTION_MARKS)), "")
+    detail = latest_said.split()
+    if (
+        state in CONCRETE_STATES
+        and GENERIC_CLOSER.search(last_question)
+        and (len(detail) >= 6 or any(ch.isdigit() for ch in latest_said))
+    ):
+        add(
+            Violation(
+                "R-ASK-05",
+                "they just gave a concrete detail: ask one specific question about it (how long, "
+                "how many, what happens next), not the generic 'anything else?'",
+            )
+        )
     for title in NOTED_TITLE.findall(reply):
-        if len(title.split()) > 12:
+        if len(title.split()) > NOTED_WORDS:
             add(
                 Violation(
                     "R-ECHO-01",
-                    "the noted line names the problem in at most 12 words, in their words, never "
-                    "a list of their sentences",
+                    f"the noted line names the problem in at most {NOTED_WORDS} words, in their "
+                    "words, never a list of their sentences",
                 )
             )
             break

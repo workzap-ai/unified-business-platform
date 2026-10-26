@@ -103,7 +103,7 @@ def test_golden_conversations_split_into_person_and_pi_turns():
 def test_a_seed_passes_the_live_gate_or_is_dropped():
     ok, _ = learning_seed.admit(
         "We keep running out of our best-selling items.",
-        "That's a real problem. Is it happening in every shop, or only some?",
+        "Noted, stock keeps running out. Is it happening in every shop, or only some?",
     )
     assert ok
     named, _ = learning_seed.admit(
@@ -198,7 +198,9 @@ LISTEN = {
 
 
 def test_a_clean_conversation_grades_two_and_a_hard_break_is_a_rule_break():
-    clean = learning_gate.grade_replies([("That's a real problem. Is it every shop?", LISTEN)])
+    clean = learning_gate.grade_replies(
+        [("Noted, stock keeps running out. Is it every shop?", LISTEN)]
+    )
     assert clean.mean == 2.0 and not clean.rule_break
     broke = learning_gate.grade_replies(
         [("Please send me your card number and the OTP so I can check?", LISTEN)]
