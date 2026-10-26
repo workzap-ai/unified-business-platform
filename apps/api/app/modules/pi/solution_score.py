@@ -40,7 +40,10 @@ _RULES: tuple[tuple[str, re.Pattern[str]], ...] = (
             r"kuch naya batao|kuch naya bataiye|something new|tell me something new|obvious hai|"
             r"(?:pasand|psnd|pasnd|psand|pasan)\s*(?:nahi|nahin|nai|nhi|nh|ni)|(?:acha|achi|achay|theek|thik|"
             r"sahi)\s*(?:nahi|nahin|nai|nhi|nh|ni)\s*(?:lag|hai|he)|bekar|bekaar|useless|"
-            r"not (?:useful|helpful|good|great)|(?:don'?t|do not|didn'?t) like|kaam ke nahi)\b",
+            r"not (?:useful|helpful|good|great)|(?:don'?t|do not|didn'?t) like|kaam ke nahi|kaam ka nahi|"
+            r"(?:glt|galat|ghalat|ghlat) (?:hai|he|hy|h)|(?:it'?s|is|are|that'?s) wrong|wrong (?:ideas?|solution|answer)|"
+            r"not what i (?:asked|meant|said)|(?:ye|yeh|wo|woh) nahi(?! ho)|mel nahi kha|(?:again|dobara|phir se) (?:den|dein|do|batao)|"
+            r"doosra (?:idea|solution)|dusra (?:idea|solution))\b",
             re.IGNORECASE,
         ),
     ),

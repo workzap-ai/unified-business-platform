@@ -2062,6 +2062,9 @@ def ideas_opener(context: dict[str, Any]) -> str:
     """ "Sure." answers a request for a fix; ideas offered on a message that asked for none (a
     problem told, a "yes") start with the ideas themselves."""
     said = str(context.get("latest_customer_message") or "")
+    if context.get("solution_rejected_fit") and context.get("solution_ideas"):
+        # they said the first ideas were wrong for their problem: one short clause, then new ideas
+        return "Sorry, those did not fit your problem. Here are two different ideas:" + chr(10)
     if said and not solution_ask.asked_for_ideas(said):
         return ""
     if solution_ask.churn_risk(said):
@@ -2250,6 +2253,7 @@ ROMAN_OPENER = {
     "normal": "Ji, ye do ideas abhi aazma sakte hain:",
     "impatient": "Maazrat. Ye do ideas hain:",
     "churn": "Koi dabao nahi. Ye do ideas hain:",
+    "wrong": "Maazrat, wo aap ke masle se mel nahi khate. Ye do naye ideas hain:",
 }
 WORKZAP_MODAL = re.compile(r"\bWorkzap\s+(?:could|can|would|will)\s+", re.IGNORECASE)
 
@@ -2267,7 +2271,9 @@ def roman_ideas_opener(reply: str, context: dict[str, Any]) -> str:
         return reply
     said = str(context.get("latest_customer_message") or "")
     kind = (
-        "churn"
+        "wrong"
+        if context.get("solution_rejected_fit")
+        else "churn"
         if solution_ask.churn_risk(said)
         else "impatient"
         if solution_ask.impatient(said)

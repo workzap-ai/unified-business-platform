@@ -316,6 +316,15 @@ OFFERABLE = ("S1_LISTENING", "S2_CLARIFYING", "S3_NOTED", "S4_SORTED_SUMMARY")
 ASKABLE = (*OFFERABLE, "S5_READINESS", "S5b_DECLINED")
 
 
+def rejects_ideas(text: str | None) -> bool:
+    """The person says the ideas were wrong or not what they asked ("solution glt hai again den",
+    "ye nahi", "not what I asked"): a request for different ideas, never silence."""
+    from app.modules.pi import solution_score
+
+    reaction = solution_score.classify(text or "")
+    return bool(reaction and reaction.signal in ("idea_generic", "idea_no_help"))
+
+
 def offer_line(language: str | None, context: dict[str, Any] | None = None) -> str:
     """The offer, in the person's language: one of the eight priority languages by the script and
     words of their message, else the chat's language."""

@@ -417,7 +417,7 @@ async def _build(
     owner_words = " ".join(
         [said, *(f"{n.get('title') or ''} {n.get('user_words') or ''}" for n in noted)]
     )  # what the owner said: an idea may assume nothing beyond it (G2)
-    asked = solution_ask.asked_for_ideas(said)  # an explicit request for a fix (Part 1.6)
+    asked = solution_ask.asked_for_ideas(said) or solution_ask.rejects_ideas(said)  # Part 1.6
     if conversation.customer_id is None:
         return _no_ideas(conversation, noted, None, "no_customer", now) if asked else {}
     customer = await session.get(Customer, conversation.customer_id)
@@ -490,7 +490,7 @@ async def _build(
     howto = solution_ask.asked_howto(said)
     asked = asked or bool(next_kind)
     state = conversation.flow_state or ""
-    explicit = solution_ask.asked_for_ideas(said)
+    explicit = solution_ask.asked_for_ideas(said) or solution_ask.rejects_ideas(said)
     reacting = bool(next_kind)
     if howto and not noted and state in solution_ask.ASKABLE:
         # "how exactly?" before anything is noted still gets the one answer pi may give: the detail
@@ -603,8 +603,57 @@ async def _build(
         next_kind=next_kind,
         owner_words=owner_words,
     )
+    spent = handed
+    declined = int((conversation.service_brief or {}).get("declines") or 0) > 0
+    wrong = solution_ask.rejects_ideas(said)  # R-VAL-01 holds for a repeated ask, not a rejection
+    if (handed is None or not handed.get("solution_ideas")) and wrong and not declined:
+        handed = None
+        # The entry has no idea left, or the person said the ideas were wrong: the next-best entry
+        # that shares evidence with their words, then the library category the cues name, and only
+        # then the honest line (live test 7: "solution glt hai again den" ended on "those are all
+        # the ideas I have")
+        heard = f"{said} {everything}"
+        others = sorted(
+            (e for e in entries if e["id"] != problem["id"] and solution_ideas.relevant(e, heard)),
+            key=lambda e: -solution_ideas.fit(e, heard),
+        )
+        for other in others:
+            handed = await _give(
+                session,
+                scope,
+                conversation,
+                industry=industry,
+                build_line=False,
+                problem=other,
+                language=language,
+                used=used,
+                now=now,
+                asked=explicit,
+                offerable=offerable,
+                next_kind=next_kind,
+            )
+            if handed is not None and handed.get("solution_ideas"):
+                break
+            handed = None
+        if handed is None:
+            from_library = _from_library(conversation, noted, language)
+            if from_library is not None:
+                handed = from_library
+        if handed is None:
+            handed = spent  # nothing else fits: the exhausted marker, or the honest line below
     if handed is None:
         return _no_ideas(conversation, noted, industry, "none_left", now) if explicit else {}
+    if next_kind == "swap" or solution_ask.rejects_ideas(said):
+        handed = {**handed, "solution_rejected_fit": True}
+    if handed.get("solution_ideas"):
+        # what was said is remembered by its words, so the library never repeats an entry's idea
+        kept = [str(x) for x in (conversation.service_brief or {}).get("library_given") or []]
+        _put(
+            conversation,
+            library_given=[*kept, *[str(i) for i in handed["solution_ideas"] if i not in kept]][
+                -20:
+            ],
+        )
     return handed
 
 

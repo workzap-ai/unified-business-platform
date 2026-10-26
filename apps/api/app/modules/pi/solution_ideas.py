@@ -64,7 +64,8 @@ RELEVANT_AT = 2  # content words of theirs, from which a match must share eviden
 # the shift rota (live test 4). They count as evidence only next to another shared word.
 WEAK = frozenset(
     "staff customer client order other work team sale money business shop item thing people "
-    "problem issue match claim record take track lose make give keep long many day week".split()
+    "problem issue match claim record take track lose make give keep long many day week "
+    "sell sold".split()
 )
 # The nouns of a trade itself: every entry of a shop mentions them, so sharing them says nothing
 # about which problem is meant, not even two of them together (live test 6: "stock" and "outlet"
