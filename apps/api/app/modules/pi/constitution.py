@@ -2214,9 +2214,13 @@ def _drop_slips(reply: str, context: dict[str, Any]) -> str:
     first = flat[0]
     opener = text(first)
     short = len(opener.split()) <= 4
+    # "Shukriya." before "Note kar liya" is the spec's own G6 line: only the model is asked to drop
+    # it (R-ECHO-01); "Theek hai." and an English filler are taken out here.
+    filler_before_noted = bool(
+        THANKS_THEN_NOTED.match(reply) and not re.match(r"^\W*shukriya", reply, re.IGNORECASE)
+    )
     if VERDICT_OPENER.match(opener) or (
-        short
-        and (THANKS_THEN_NOTED.match(reply) or (roman and ENGLISH_FILLER_OPENER.match(opener)))
+        short and (filler_before_noted or (roman and ENGLISH_FILLER_OPENER.match(opener)))
     ):
         dropped.add(first)
     elif roman and ENGLISH_FILLER_OPENER.match(opener):
