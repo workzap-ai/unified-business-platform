@@ -6,16 +6,16 @@ Statuses: **DONE** code and a test that fails if the rule breaks. **PARTIAL** co
 
 ## Counts
 
-index counts: DONE 393, PARTIAL 35, CODE-ONLY 0, PROMPT-ONLY 10, HUMAN 18, MISSING 2
+index counts: DONE 394, PARTIAL 35, CODE-ONLY 0, PROMPT-ONLY 10, HUMAN 18, MISSING 2
 
 | PDF | Rules | DONE | PARTIAL | CODE-ONLY | PROMPT-ONLY | HUMAN | MISSING |
 |---|---|---|---|---|---|---|---|
 | pi-brain-v3 (Brain) | 364 | 312 | 27 | 0 | 10 | 15 | 0 |
 | pi-industry-solutions (Addendum 2) | 81 | 68 | 8 | 0 | 0 | 3 | 2 |
-| pi-platform-spec (Platform: Book 4, Part A, Book 2 amendments) | 13 | 13 | 0 | 0 | 0 | 0 | 0 |
-| Both | 458 | 393 | 35 | 0 | 10 | 18 | 2 |
+| pi-platform-spec (Platform: Book 4, Part A, Book 2 amendments) | 14 | 14 | 0 | 0 | 0 | 0 | 0 |
+| Both | 459 | 394 | 35 | 0 | 10 | 18 | 2 |
 
-25 of the 393 DONE rules are exercised only by integration tests (they need the disposable Postgres on port 55432); the rest have a unit test that runs with no database. The index lists each test, so `rule_index.json` shows which. Every identifier family the PDFs define is in the index: R-xxx-nn (155 ids), RT1-29, G1-15, L1-14, E1-9, M1-10, A1-8, X1-5, SL-1..10, VAL-1..6, Job 1-10, Job S1-S8, rubric 1-20 (RUB-n), Appendix D (App.D-n). SPEC-x.y rows are numbered sections of the Brain that have requirements but no rule id; A2-x rows are the same for Addendum 2. The per-industry text of Part 7 and Part 4 is data, covered by SPEC-7.0 and A2-4-DATA.
+25 of the 394 DONE rules are exercised only by integration tests (they need the disposable Postgres on port 55432); the rest have a unit test that runs with no database. The index lists each test, so `rule_index.json` shows which. Every identifier family the PDFs define is in the index: R-xxx-nn (155 ids), RT1-29, G1-15, L1-14, E1-9, M1-10, A1-8, X1-5, SL-1..10, VAL-1..6, Job 1-10, Job S1-S8, rubric 1-20 (RUB-n), Appendix D (App.D-n). SPEC-x.y rows are numbered sections of the Brain that have requirements but no rule id; A2-x rows are the same for Addendum 2. The per-industry text of Part 7 and Part 4 is data, covered by SPEC-7.0 and A2-4-DATA.
 
 ## Everything that is not DONE
 

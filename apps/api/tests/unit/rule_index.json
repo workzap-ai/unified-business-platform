@@ -9103,6 +9103,28 @@
    "gap": "",
    "owner": "",
    "unit_tested": true
+  },
+  {
+   "id": "P-A5-ONE-PROMPT",
+   "source": "platform",
+   "page": 9,
+   "area": "one prompt (Part A.5)",
+   "statement": "One prompt per reply type, built from versioned parts, with no override patches: brain mode has its own system prompt with the account-manager sales flow cut out, other workspaces keep the same prompt",
+   "status": "DONE",
+   "code": [
+    "app/modules/pi/brain_prompt.py::cut",
+    "app/modules/pi/service_conversation.py::BRAIN_SYSTEM"
+   ],
+   "tests": [
+    "tests/unit/test_pi_brain_prompt.py::test_every_other_workspace_still_gets_exactly_the_same_prompt",
+    "tests/unit/test_pi_brain_prompt.py::test_the_brain_prompt_has_none_of_the_account_manager_playbook",
+    "tests/unit/test_pi_brain_prompt.py::test_the_brain_prompt_keeps_the_shared_rules_it_still_needs",
+    "tests/unit/test_pi_brain_prompt.py::test_the_brain_prompt_is_the_brain_blocks_on_the_shorter_system",
+    "tests/unit/test_pi_brain_prompt.py::test_a_cut_that_no_longer_matches_fails_loudly_instead_of_silently"
+   ],
+   "gap": "",
+   "owner": "",
+   "unit_tested": true
   }
  ]
 }
