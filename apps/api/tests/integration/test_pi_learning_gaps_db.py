@@ -86,10 +86,12 @@ async def test_seeds_are_candidates_scoped_to_an_industry_and_never_active(
     assert counts["added"] > 0
     rows = list(await business_db.scalars(select(PiLearningExample)))
     assert rows and {r.status for r in rows} == {"candidate"}  # through the gate, never straight in
-    assert {r.source for r in rows} <= {"pack", "golden"} and all(
+    assert {r.source for r in rows} <= {"pack", "golden", "owner"} and all(
         r.message_id is None for r in rows
     )
     assert {r.situation.get("industry", "") for r in rows} <= {DENTAL, DAIRY, ""}
+    owner = [r for r in rows if r.source == "owner"]
+    assert owner and all(r.situation.get("owner_approved") == "yes" for r in owner)
     again = await learning_seed.seed_examples(business_db, scope, {DENTAL, DAIRY})
     assert again["added"] == 0  # idempotent
     arms = await learning_seed.seed_arms(business_db, scope, {DENTAL})

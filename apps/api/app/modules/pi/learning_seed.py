@@ -20,6 +20,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.modules.pi import (
+    golden_replies,
     industry_packs,
     learning,
     learning_bank,
@@ -161,12 +162,16 @@ async def seed_examples(
     }
     counts = {"added": 0, "rejected": 0, "skipped": 0}
     work: list[tuple[str, str, str, str]] = []  # (source, industry, person, reply)
+    owner_state: dict[str, str] = {}
     for key, pack in sorted(industry_packs.load_packs().items()):
         if industries is not None and key not in industries:
             continue
         work += [("pack", key, p, r) for p, r in pack_pairs(pack)]
     if golden:
         work += [("golden", "", p, r) for _, p, r in golden_pairs()]
+        # The owner-approved golden replies (pi-golden-replies.md): same gates, flagged below.
+        work += [("owner", "", p, r) for _, _, p, r in golden_replies.listening()]
+        owner_state = {p: st for st, _, p, _ in golden_replies.listening()}
     for source, industry, person, reply in work:
         if (industry, person[:500]) in have:
             counts["skipped"] += 1
@@ -183,6 +188,9 @@ async def seed_examples(
             "turn_kind": "question" if said.rstrip().endswith(("?", "؟")) else "statement",
             **learning_situation.extras(industry, "", None),
         }
+        if source == "owner":
+            sit["state"] = owner_state.get(person, sit["state"])
+            sit["owner_approved"] = "yes"  # a flag on the candidate; it still passes every gate
         session.add(
             PiLearningExample(
                 tenant_id=scope.tenant_id,
@@ -195,7 +203,7 @@ async def seed_examples(
                 reply_text=said[:500],
                 reward=0,
                 status="candidate",
-                source_contacts=[f"seed:{industry or 'golden'}"],
+                source_contacts=[f"seed:{industry or source}"],
                 redaction_confidence=Decimal(str(confidence)),
             )
         )
