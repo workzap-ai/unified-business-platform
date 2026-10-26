@@ -492,6 +492,41 @@ def roman_urdu_tone(reply: str, heard: str) -> list[Violation]:
     return found
 
 
+# R-TONE-01 (Book 2 10.2): describe the problem, never judge the person or the business. Said by
+# pi, never allowed, even when the person said something like it first.
+JUDGEMENT = re.compile(
+    r"\byour\s+(?:business|shop|shops|company|work|team|sales)\s+(?:is|are)\s+"
+    r"(?:not\s+doing\s+well|doing\s+(?:badly|poorly)|failing|bad|poor|terrible|a\s+mess)\b"
+    r"|\byou(?:'re|\s+are)\s+doing\s+(?:it|this|things)\s+wrong\b"
+    r"|\baap\s*ka\s+(?:business|dhanda|karobar)\s+(?:fail|kharab|barbad|theek\s+nahi)\b"
+    r"|\baap\s+(?:ghalat|galat)\s+kar\s+rahe\b",
+    re.IGNORECASE,
+)
+# R-ECHO-01..03 (Book 2 10.1): pi does not restate the person's message back to them.
+ECHO_GRAM = 3  # words in a sequence
+ECHO_MAX = 0.4  # share of the reply's word sequences that may come from their last two messages
+ECHO_MIN_WORDS = 13  # a "noted" confirmation of up to 12 words is allowed (R-ECHO-01)
+
+
+def _grams(text: str) -> list[tuple[str, ...]]:
+    words = re.findall(r"[\w']+", text.lower().replace("’", "'"))
+    return [tuple(words[i : i + ECHO_GRAM]) for i in range(len(words) - ECHO_GRAM + 1)]
+
+
+def echo_overlap(reply: str, context: dict[str, Any]) -> float:
+    """The share of the reply's word sequences that repeat the person's last two messages."""
+    said = [str(context.get("latest_customer_message", ""))]
+    earlier = [
+        str(h.get("text", "")) for h in context.get("history") or [] if h.get("role") == "customer"
+    ]
+    said += earlier[-1:]
+    theirs = {g for text in said for g in _grams(text)}
+    mine = _grams(reply)
+    if not mine or not theirs:
+        return 0.0
+    return sum(1 for g in mine if g in theirs) / len(mine)
+
+
 BULLET = ("•", "- ")
 WORDS_PER_POINT = 4  # a list point needs about this many of their words in the latest message
 
@@ -1399,6 +1434,28 @@ def lint(reply: str, context: dict[str, Any]) -> list[Violation]:
                 "R-CORR-04",
                 "they corrected nothing: do not say they are right or that you changed it; "
                 "confirm only what is new in this message",
+            )
+        )
+    if JUDGEMENT.search(reply):
+        add(
+            Violation(
+                "R-TONE-01",
+                'describe the problem, never judge the person or the business: not "your '
+                'business is not doing well" but what is hard ("sales and footfall are low")',
+                True,
+            )
+        )
+    if (
+        state != flow.State.S4_SORTED_SUMMARY  # the summary restates (R-ECHO-02)
+        and len(reply.split()) >= ECHO_MIN_WORDS
+        and len(_points(reply)) < 3  # so does confirming three new problems at once
+        and echo_overlap(reply, context) > ECHO_MAX
+    ):
+        add(
+            Violation(
+                "R-ECHO-03",
+                "do not restate their message back to them: confirm it once in at most 12 words "
+                "in their own words, then ask the one question",
             )
         )
     if STIFF_APOLOGY.search(reply):
