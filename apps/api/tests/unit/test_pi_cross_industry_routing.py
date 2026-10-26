@@ -13,8 +13,8 @@ from app.modules.pi import solution_ideas as si
 from app.modules.pi import solution_library as lib
 from app.modules.pi import solutions
 
-WITH_GROUP_FLOOR = 0.94  # goal 0.98
-WORDS_ONLY_FLOOR = 0.39  # goal 0.80
+WITH_GROUP_FLOOR = 0.98  # goal 0.98, reached 2026-10-26
+WORDS_ONLY_FLOOR = 0.80  # goal 0.80, reached 2026-10-26
 
 # (expected library category, English, Roman Urdu)
 PROBLEMS = [
@@ -132,4 +132,4 @@ def test_from_the_owners_words_alone_the_router_finds_the_category():
 def test_every_library_category_has_cue_words():
     # 8 of 18 had none on 2026-10-26: such a category can only be reached by the model's label
     missing = sorted(set(lib.load()) - set(lib.CUES))
-    assert len(missing) <= 10, missing  # goal: empty
+    assert missing == [], missing

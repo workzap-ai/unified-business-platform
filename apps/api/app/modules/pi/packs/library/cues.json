@@ -1,0 +1,1658 @@
+{
+ "note": "Cue words that say which library category a problem is in, by language (en, roman_ur, hi, ur, ar, fr, fa, es). strong counts 3, specific 2, generic 1; Latin stems match at the start of a word, other scripts inside the text. solution_library.best_category scores them.",
+ "categories": {
+  "loss_security": {
+   "strong": {
+    "en": [
+     "steal",
+     "stole",
+     "theft",
+     "thief",
+     "stolen",
+     "fraud",
+     "pilfer",
+     "shrinkage",
+     "embezzl"
+    ],
+    "roman_ur": [
+     "chori",
+     "chor ",
+     "ghapla",
+     "gayab",
+     "kam nikal",
+     "fraud",
+     "dhoka"
+    ],
+    "hi": [
+     "चोरी",
+     "चोर",
+     "धोखा",
+     "गायब"
+    ],
+    "ur": [
+     "چوری",
+     "چور",
+     "دھوکہ",
+     "غائب"
+    ],
+    "ar": [
+     "سرقة",
+     "يسرق",
+     "سرق",
+     "احتيال",
+     "اختلاس"
+    ],
+    "fr": [
+     "vol ",
+     "vole",
+     "voleur",
+     "volé",
+     "fraude",
+     "détourn"
+    ],
+    "fa": [
+     "دزدی",
+     "سرقت",
+     "کلاهبردار",
+     "اختلاس"
+    ],
+    "es": [
+     "robo",
+     "robar",
+     "roban",
+     "fraude",
+     "hurto"
+    ]
+   },
+   "specific": {
+    "en": [
+     "missing",
+     "leak",
+     "cctv",
+     "void",
+     "refund abuse",
+     "loss of",
+     "taking money",
+     "money from the till",
+     "skim",
+     "till is short"
+    ],
+    "roman_ur": [
+     "kam nikalta",
+     "kam ho jata",
+     "nuksan"
+    ],
+    "hi": [
+     "कम निकल",
+     "नुकसान"
+    ],
+    "ur": [
+     "کم نکل",
+     "نقصان"
+    ],
+    "ar": [
+     "مفقود",
+     "ناقص",
+     "خسارة"
+    ],
+    "fr": [
+     "disparu",
+     "manquant",
+     "pertes"
+    ],
+    "fa": [
+     "گم می",
+     "کسری",
+     "ضرر"
+    ],
+    "es": [
+     "falta",
+     "faltante",
+     "pérdida",
+     "desaparece"
+    ]
+   },
+   "generic": {}
+  },
+  "cash_collections": {
+   "strong": {
+    "en": [
+     "payment",
+     "unpaid",
+     "overdue",
+     "owed",
+     "owes",
+     "owe me",
+     "receivable",
+     "collect",
+     "chasing",
+     "chase"
+    ],
+    "roman_ur": [
+     "wusooli",
+     "udhaar",
+     "udhar",
+     "baqaya",
+     "payment late",
+     "paisa late",
+     "raqam wapas"
+    ],
+    "hi": [
+     "उधार",
+     "वसूली",
+     "बकाया",
+     "भुगतान"
+    ],
+    "ur": [
+     "ادھار",
+     "وصولی",
+     "بقایا",
+     "ادائیگی"
+    ],
+    "ar": [
+     "دفعة",
+     "مدفوع",
+     "ديون",
+     "تحصيل",
+     "متأخرات",
+     "مستحق"
+    ],
+    "fr": [
+     "paiement",
+     "paient",
+     "payer",
+     "payé",
+     "impayé",
+     "relance",
+     "encaiss",
+     "créance"
+    ],
+    "fa": [
+     "پرداخت",
+     "بدهی",
+     "مطالبات",
+     "وصول"
+    ],
+    "es": [
+     "pago",
+     "cobrar",
+     "cobro",
+     "impagado",
+     "deuda",
+     "moroso"
+    ]
+   },
+   "specific": {
+    "en": [
+     "credit",
+     "cash",
+     "deposit",
+     "invoice"
+    ],
+    "roman_ur": [
+     "cash",
+     "credit",
+     "invoice",
+     "jama"
+    ],
+    "hi": [
+     "नकद",
+     "क्रेडिट"
+    ],
+    "ur": [
+     "نقد",
+     "کریڈٹ"
+    ],
+    "ar": [
+     "نقد",
+     "فاتورة"
+    ],
+    "fr": [
+     "espèces",
+     "facture",
+     "crédit"
+    ],
+    "fa": [
+     "نقد",
+     "فاکتور"
+    ],
+    "es": [
+     "efectivo",
+     "factura",
+     "crédito"
+    ]
+   },
+   "generic": {
+    "en": [
+     "pay",
+     "due",
+     "late"
+    ],
+    "roman_ur": [
+     "pay",
+     "dete hain",
+     "due"
+    ]
+   }
+  },
+  "stock_inventory": {
+   "strong": {
+    "en": [
+     "unsold",
+     "warehouse",
+     "godown",
+     "overstock",
+     "dead stock",
+     "expir",
+     "stockout",
+     "out of stock",
+     "running out",
+     "shelves",
+     "shelf",
+     "inventory"
+    ],
+    "roman_ur": [
+     "parha",
+     "pada hai",
+     "bik nahi",
+     "godown",
+     "warehouse",
+     "stock khatam",
+     "maal khatam",
+     "expiry",
+     "inventory"
+    ],
+    "hi": [
+     "गोदाम",
+     "स्टॉक खत्म",
+     "माल पड़ा",
+     "बिक नहीं",
+     "एक्सपायर"
+    ],
+    "ur": [
+     "گودام",
+     "اسٹاک ختم",
+     "مال پڑا",
+     "بک نہیں"
+    ],
+    "ar": [
+     "مخزون",
+     "مستودع",
+     "نفد",
+     "منتهي الصلاحية",
+     "راكد"
+    ],
+    "fr": [
+     "entrepôt",
+     "invendu",
+     "rupture",
+     "stock dormant",
+     "péremption"
+    ],
+    "fa": [
+     "انبار",
+     "موجودی",
+     "فروش نرفته",
+     "تمام شده",
+     "منقضی"
+    ],
+    "es": [
+     "almacén",
+     "inventario",
+     "sin vender",
+     "agotado",
+     "caducidad",
+     "sobrestock"
+    ]
+   },
+   "specific": {
+    "en": [
+     "stock"
+    ],
+    "roman_ur": [
+     "maal",
+     "stock"
+    ],
+    "hi": [
+     "स्टॉक",
+     "माल"
+    ],
+    "ur": [
+     "اسٹاک",
+     "مال"
+    ],
+    "ar": [
+     "بضاعة",
+     "المخزون"
+    ],
+    "fr": [
+     "stock",
+     "marchandise"
+    ],
+    "fa": [
+     "کالا",
+     "استوک"
+    ],
+    "es": [
+     "stock",
+     "mercancía"
+    ]
+   },
+   "generic": {}
+  },
+  "sales_revenue": {
+   "strong": {
+    "en": [
+     "price",
+     "pricing",
+     "go quiet",
+     "went quiet",
+     "never order",
+     "sales drop",
+     "sales are down",
+     "conversion",
+     "negotiat",
+     "discount"
+    ],
+    "roman_ur": [
+     "price",
+     "raqam",
+     "bikri",
+     "sale kam",
+     "reply hi nahi",
+     "order nahi aate",
+     "rate poochte",
+     "discount"
+    ],
+    "hi": [
+     "कीमत",
+     "दाम",
+     "बिक्री",
+     "ऑर्डर नहीं",
+     "रेट"
+    ],
+    "ur": [
+     "قیمت",
+     "ریٹ",
+     "فروخت",
+     "آرڈر نہیں"
+    ],
+    "ar": [
+     "السعر",
+     "أسعار",
+     "المبيعات",
+     "لا يردون",
+     "لا يطلبون"
+    ],
+    "fr": [
+     "prix",
+     "ventes",
+     "ne répondent plus",
+     "ne commandent",
+     "remise"
+    ],
+    "fa": [
+     "قیمت",
+     "فروش",
+     "جواب نمی",
+     "سفارش نمی",
+     "تخفیف"
+    ],
+    "es": [
+     "precio",
+     "ventas",
+     "no responden",
+     "no compran",
+     "descuento"
+    ]
+   },
+   "specific": {
+    "en": [
+     "quote",
+     "buyers",
+     "buy",
+     "sales",
+     "sale"
+    ],
+    "roman_ur": [
+     "quote",
+     "sale",
+     "khareed"
+    ],
+    "hi": [
+     "बिक",
+     "खरीद"
+    ],
+    "ur": [
+     "خرید",
+     "بک"
+    ],
+    "ar": [
+     "شراء",
+     "بيع"
+    ],
+    "fr": [
+     "acheter",
+     "vente"
+    ],
+    "fa": [
+     "خرید",
+     "فروش"
+    ],
+    "es": [
+     "comprar",
+     "venta"
+    ]
+   },
+   "generic": {
+    "en": [
+     "order",
+     "customers",
+     "quiet"
+    ],
+    "roman_ur": [
+     "order",
+     "customers"
+    ]
+   }
+  },
+  "marketing_leads": {
+   "strong": {
+    "en": [
+     "ads",
+     "advert",
+     "campaign",
+     "views",
+     "reach",
+     "followers",
+     "enquir",
+     "inquir",
+     "leads",
+     "reels",
+     "instagram",
+     "facebook",
+     "tiktok",
+     "promotion",
+     "marketing"
+    ],
+    "roman_ur": [
+     "ads",
+     "views",
+     "enquiry",
+     "inquiry",
+     "leads",
+     "reels",
+     "instagram",
+     "facebook",
+     "marketing",
+     "followers"
+    ],
+    "hi": [
+     "विज्ञापन",
+     "एड",
+     "व्यूज",
+     "इंक्वायरी",
+     "फॉलोअर",
+     "मार्केटिंग"
+    ],
+    "ur": [
+     "اشتہار",
+     "ایڈ",
+     "ویوز",
+     "انکوائری",
+     "مارکیٹنگ"
+    ],
+    "ar": [
+     "إعلان",
+     "إعلانات",
+     "مشاهدات",
+     "استفسار",
+     "تسويق",
+     "متابعين"
+    ],
+    "fr": [
+     "publicité",
+     "annonces",
+     "vues",
+     "demandes",
+     "prospects",
+     "abonnés",
+     "marketing"
+    ],
+    "fa": [
+     "تبلیغ",
+     "بازدید",
+     "پرسش",
+     "مشتری بالقوه",
+     "فالوور",
+     "بازاریابی"
+    ],
+    "es": [
+     "anuncios",
+     "publicidad",
+     "vistas",
+     "consultas",
+     "seguidores",
+     "marketing"
+    ]
+   },
+   "specific": {
+    "en": [
+     "online",
+     "social",
+     "page",
+     "video"
+    ],
+    "roman_ur": [
+     "online",
+     "social",
+     "page",
+     "video"
+    ],
+    "fr": [
+     "en ligne"
+    ],
+    "es": [
+     "en línea"
+    ],
+    "ar": [
+     "أونلاين"
+    ],
+    "hi": [
+     "ऑनलाइन"
+    ],
+    "ur": [
+     "آن لائن"
+    ],
+    "fa": [
+     "آنلاین"
+    ]
+   },
+   "generic": {}
+  },
+  "customers_retention": {
+   "strong": {
+    "en": [
+     "come back",
+     "repeat",
+     "loyal",
+     "retention",
+     "churn",
+     "never return",
+     "once and never",
+     "regulars",
+     "never see them",
+     "see them again",
+     "try us once",
+     "first-time buyers"
+    ],
+    "roman_ur": [
+     "dobara nahi",
+     "wapas nahi aate",
+     "phir nahi aate",
+     "repeat",
+     "loyal",
+     "aik baar",
+     "ek baar"
+    ],
+    "hi": [
+     "वापस नहीं",
+     "दोबारा नहीं",
+     "एक बार",
+     "लौटकर"
+    ],
+    "ur": [
+     "دوبارہ نہیں",
+     "واپس نہیں",
+     "ایک بار"
+    ],
+    "ar": [
+     "لا يعودون",
+     "مرة واحدة",
+     "ولاء",
+     "عملاء دائمين"
+    ],
+    "fr": [
+     "ne reviennent pas",
+     "fidél",
+     "une seule fois",
+     "reviennent"
+    ],
+    "fa": [
+     "برنمی گردند",
+     "یک بار",
+     "وفادار",
+     "تکراری"
+    ],
+    "es": [
+     "no vuelven",
+     "una sola vez",
+     "fideliz",
+     "recurrentes"
+    ]
+   },
+   "specific": {
+    "en": [
+     "review",
+     "customers"
+    ],
+    "roman_ur": [
+     "review",
+     "customers",
+     "gahak"
+    ],
+    "hi": [
+     "ग्राहक"
+    ],
+    "ur": [
+     "گاہک"
+    ],
+    "ar": [
+     "العملاء",
+     "الزبائن"
+    ],
+    "fr": [
+     "clients"
+    ],
+    "fa": [
+     "مشتری"
+    ],
+    "es": [
+     "clientes"
+    ]
+   },
+   "generic": {}
+  },
+  "orders_fulfilment": {
+   "strong": {
+    "en": [
+     "parcel",
+     "deliver",
+     "dispatch",
+     "courier",
+     "shipping",
+     "rider",
+     "returned",
+     "rto",
+     "packing",
+     "tracking"
+    ],
+    "roman_ur": [
+     "parcel",
+     "delivery",
+     "dispatch",
+     "courier",
+     "rider",
+     "wapas aa",
+     "packing",
+     "cod"
+    ],
+    "hi": [
+     "पार्सल",
+     "डिलीवरी",
+     "कूरियर",
+     "वापस आ",
+     "पैकिंग"
+    ],
+    "ur": [
+     "پارسل",
+     "ڈیلیوری",
+     "کوریئر",
+     "واپس آ",
+     "پیکنگ"
+    ],
+    "ar": [
+     "طرد",
+     "توصيل",
+     "شحن",
+     "مرتجع",
+     "تسليم"
+    ],
+    "fr": [
+     "colis",
+     "livraison",
+     "expédition",
+     "retourné",
+     "coursier"
+    ],
+    "fa": [
+     "بسته",
+     "تحویل",
+     "ارسال",
+     "مرجوع",
+     "پیک"
+    ],
+    "es": [
+     "paquete",
+     "entrega",
+     "envío",
+     "devuelto",
+     "mensajero"
+    ]
+   },
+   "specific": {
+    "en": [
+     "orders",
+     "order"
+    ],
+    "roman_ur": [
+     "order"
+    ],
+    "hi": [
+     "ऑर्डर"
+    ],
+    "ur": [
+     "آرڈر"
+    ],
+    "ar": [
+     "طلبات"
+    ],
+    "fr": [
+     "commandes"
+    ],
+    "fa": [
+     "سفارش"
+    ],
+    "es": [
+     "pedidos"
+    ]
+   },
+   "generic": {}
+  },
+  "people_staff": {
+   "strong": {
+    "en": [
+     "shift",
+     "roster",
+     "rota",
+     "attendance",
+     "absent",
+     "payroll",
+     "salary",
+     "salaries",
+     "hiring",
+     "turnover",
+     "overtime",
+     "training"
+    ],
+    "roman_ur": [
+     "shift",
+     "roster",
+     "attendance",
+     "tankhwah",
+     "salary",
+     "chutti",
+     "hiring",
+     "late aata",
+     "late aate",
+     "gair hazir"
+    ],
+    "hi": [
+     "शिफ्ट",
+     "वेतन",
+     "तनख्वाह",
+     "छुट्टी",
+     "हाज़िरी",
+     "भर्ती"
+    ],
+    "ur": [
+     "شفٹ",
+     "تنخواہ",
+     "چھٹی",
+     "حاضری",
+     "بھرتی"
+    ],
+    "ar": [
+     "وردية",
+     "رواتب",
+     "راتب",
+     "حضور",
+     "غياب",
+     "توظيف"
+    ],
+    "fr": [
+     "horaires",
+     "salaire",
+     "absent",
+     "recrutement",
+     "planning des équipes"
+    ],
+    "fa": [
+     "شیفت",
+     "حقوق",
+     "حضور و غیاب",
+     "غیبت",
+     "استخدام"
+    ],
+    "es": [
+     "turno",
+     "salario",
+     "ausente",
+     "asistencia",
+     "contratar",
+     "nómina"
+    ]
+   },
+   "specific": {
+    "en": [
+     "employees",
+     "workers"
+    ],
+    "roman_ur": [
+     "workers"
+    ],
+    "hi": [
+     "स्टाफ",
+     "कर्मचारी"
+    ],
+    "ur": [
+     "عملہ",
+     "اسٹاف"
+    ],
+    "ar": [
+     "الموظفين",
+     "العمال"
+    ],
+    "fr": [
+     "personnel",
+     "employés"
+    ],
+    "fa": [
+     "کارمندان",
+     "کارکنان"
+    ],
+    "es": [
+     "personal",
+     "empleados"
+    ]
+   },
+   "generic": {
+    "en": [
+     "staff",
+     "late"
+    ],
+    "roman_ur": [
+     "late",
+     "staff"
+    ],
+    "fr": [
+     "retard",
+     "personnel"
+    ],
+    "es": [
+     "tarde"
+    ],
+    "ar": [
+     "يتأخرون"
+    ]
+   }
+  },
+  "suppliers_purchasing": {
+   "strong": {
+    "en": [
+     "supplier",
+     "vendor",
+     "wholesaler",
+     "purchase order",
+     "raw material",
+     "reorder",
+     "procure",
+     "purchasing"
+    ],
+    "roman_ur": [
+     "supplier",
+     "vendor",
+     "wholesaler",
+     "purchase order",
+     "khareed",
+     "maal mangwa",
+     "raw material",
+     "party se maal"
+    ],
+    "hi": [
+     "सप्लायर",
+     "आपूर्तिकर्ता",
+     "थोक विक्रेता",
+     "खरीद ऑर्डर",
+     "कच्चा माल"
+    ],
+    "ur": [
+     "سپلائر",
+     "تھوک",
+     "خریداری",
+     "خام مال"
+    ],
+    "ar": [
+     "مورد",
+     "المورد",
+     "موردين",
+     "مشتريات",
+     "مواد خام"
+    ],
+    "fr": [
+     "fournisseur",
+     "grossiste",
+     "bon de commande",
+     "matières premières",
+     "approvisionnement"
+    ],
+    "fa": [
+     "تامین‌کننده",
+     "تامین کننده",
+     "عمده‌فروش",
+     "خرید مواد",
+     "مواد اولیه"
+    ],
+    "es": [
+     "proveedor",
+     "mayorista",
+     "orden de compra",
+     "materia prima",
+     "abastecimiento"
+    ]
+   },
+   "specific": {},
+   "generic": {}
+  },
+  "margin_cost": {
+   "strong": {
+    "en": [
+     "profit",
+     "margin",
+     "expense",
+     "overhead",
+     "costs",
+     "cost of",
+     "rising cost"
+    ],
+    "roman_ur": [
+     "munafa",
+     "kharcha",
+     "kharche",
+     "profit",
+     "margin",
+     "expense"
+    ],
+    "hi": [
+     "मुनाफा",
+     "खर्च",
+     "लाभ",
+     "लागत"
+    ],
+    "ur": [
+     "منافع",
+     "خرچہ",
+     "اخراجات",
+     "لاگت"
+    ],
+    "ar": [
+     "ربح",
+     "هامش",
+     "مصاريف",
+     "تكاليف"
+    ],
+    "fr": [
+     "bénéfice",
+     "marge",
+     "dépenses",
+     "coûts",
+     "charges"
+    ],
+    "fa": [
+     "سود",
+     "حاشیه سود",
+     "هزینه",
+     "هزینه‌ها"
+    ],
+    "es": [
+     "ganancia",
+     "margen",
+     "gastos",
+     "costos",
+     "costes"
+    ]
+   },
+   "specific": {},
+   "generic": {}
+  },
+  "quality_complaints": {
+   "strong": {
+    "en": [
+     "complain",
+     "faulty",
+     "defect",
+     "damaged",
+     "rework",
+     "poor quality",
+     "bad quality"
+    ],
+    "roman_ur": [
+     "shikayat",
+     "kharab",
+     "defect",
+     "damaged",
+     "rework",
+     "quality kharab",
+     "quality ka masla"
+    ],
+    "hi": [
+     "शिकायत",
+     "खराब",
+     "दोष",
+     "टूटा"
+    ],
+    "ur": [
+     "شکایت",
+     "خراب",
+     "نقص",
+     "ٹوٹا"
+    ],
+    "ar": [
+     "شكوى",
+     "شكاوى",
+     "معيب",
+     "تالف",
+     "جودة سيئة"
+    ],
+    "fr": [
+     "plainte",
+     "défectueux",
+     "défaut",
+     "abîmé",
+     "mauvaise qualité"
+    ],
+    "fa": [
+     "شکایت",
+     "معیوب",
+     "خراب",
+     "کیفیت پایین"
+    ],
+    "es": [
+     "queja",
+     "defectuoso",
+     "defecto",
+     "dañado",
+     "mala calidad"
+    ]
+   },
+   "specific": {},
+   "generic": {
+    "en": [
+     "quality"
+    ],
+    "roman_ur": [
+     "quality"
+    ]
+   }
+  },
+  "operations_process": {
+   "strong": {
+    "en": [
+     "depends on me",
+     "everything depends",
+     "messy",
+     "bottleneck",
+     "sop",
+     "no process",
+     "manual work",
+     "slow work",
+     "disorganis",
+     "disorganiz"
+    ],
+    "roman_ur": [
+     "mujh par",
+     "mujh pe",
+     "uljha",
+     "sust",
+     "sop",
+     "manual kaam",
+     "tareeqa",
+     "kaam ka masla"
+    ],
+    "hi": [
+     "मुझ पर",
+     "उलझा",
+     "सुस्त",
+     "प्रक्रिया"
+    ],
+    "ur": [
+     "مجھ پر",
+     "الجھا",
+     "سست",
+     "طریقہ کار"
+    ],
+    "ar": [
+     "يعتمد علي",
+     "فوضى",
+     "بطيء",
+     "إجراءات"
+    ],
+    "fr": [
+     "dépend de moi",
+     "désorganis",
+     "lent",
+     "processus"
+    ],
+    "fa": [
+     "به من وابسته",
+     "نابسامان",
+     "کند",
+     "فرآیند"
+    ],
+    "es": [
+     "depende de mí",
+     "desorden",
+     "lento",
+     "proceso"
+    ]
+   },
+   "specific": {
+    "en": [
+     "slow",
+     "process",
+     "manual",
+     "delay"
+    ],
+    "roman_ur": [
+     "process",
+     "manual",
+     "delay"
+    ]
+   },
+   "generic": {
+    "en": [
+     "work",
+     "everything"
+    ],
+    "roman_ur": [
+     "kaam",
+     "sab kaam"
+    ]
+   }
+  },
+  "tech_systems": {
+   "strong": {
+    "en": [
+     "same data",
+     "records do not",
+     "spreadsheet",
+     "excel",
+     "software",
+     "duplicate entry",
+     "data entry",
+     "pos system",
+     "crm"
+    ],
+    "roman_ur": [
+     "same data",
+     "aik hi data",
+     "ek hi data",
+     "record mel",
+     "excel",
+     "software",
+     "data kai jagah",
+     "pos",
+     "system"
+    ],
+    "hi": [
+     "एक ही डेटा",
+     "रिकॉर्ड मेल",
+     "सॉफ्टवेयर",
+     "एक्सेल",
+     "डेटा"
+    ],
+    "ur": [
+     "ایک ہی ڈیٹا",
+     "ریکارڈ میل",
+     "سافٹ ویئر",
+     "ایکسل",
+     "ڈیٹا"
+    ],
+    "ar": [
+     "نفس البيانات",
+     "برنامج",
+     "إكسل",
+     "سجلات",
+     "نظام"
+    ],
+    "fr": [
+     "mêmes données",
+     "logiciel",
+     "excel",
+     "saisie",
+     "enregistrements"
+    ],
+    "fa": [
+     "همان داده",
+     "نرم‌افزار",
+     "اکسل",
+     "سوابق",
+     "سیستم"
+    ],
+    "es": [
+     "mismos datos",
+     "software",
+     "excel",
+     "registros",
+     "sistema"
+    ]
+   },
+   "specific": {
+    "en": [
+     "data",
+     "records",
+     "system"
+    ],
+    "roman_ur": [
+     "data",
+     "record",
+     "system"
+    ]
+   },
+   "generic": {}
+  },
+  "communication_coordination": {
+   "strong": {
+    "en": [
+     "messages get lost",
+     "nobody knows",
+     "who is doing",
+     "coordination",
+     "communication",
+     "groups",
+     "meetings",
+     "lost in"
+    ],
+    "roman_ur": [
+     "messages kho",
+     "kisi ko pata nahi",
+     "kaun kya kar",
+     "coordination",
+     "groups mein",
+     "group mein",
+     "meeting",
+     "rabta"
+    ],
+    "hi": [
+     "मैसेज खो",
+     "किसी को पता नहीं",
+     "कौन क्या कर",
+     "ग्रुप",
+     "मीटिंग"
+    ],
+    "ur": [
+     "پیغامات کھو",
+     "کسی کو پتا نہیں",
+     "کون کیا کر",
+     "گروپ",
+     "میٹنگ"
+    ],
+    "ar": [
+     "الرسائل تضيع",
+     "لا أحد يعرف",
+     "من يفعل",
+     "المجموعات",
+     "اجتماعات",
+     "تنسيق"
+    ],
+    "fr": [
+     "messages se perdent",
+     "personne ne sait",
+     "qui fait quoi",
+     "groupes",
+     "coordination",
+     "réunions"
+    ],
+    "fa": [
+     "پیام‌ها گم",
+     "هیچ‌کس نمی‌داند",
+     "چه کسی چه",
+     "گروه",
+     "هماهنگی",
+     "جلسه"
+    ],
+    "es": [
+     "mensajes se pierden",
+     "nadie sabe",
+     "quién hace qué",
+     "grupos",
+     "coordinación",
+     "reuniones"
+    ]
+   },
+   "specific": {
+    "en": [
+     "messages",
+     "whatsapp group"
+    ],
+    "roman_ur": [
+     "messages",
+     "whatsapp group"
+    ]
+   },
+   "generic": {}
+  },
+  "reporting_visibility": {
+   "strong": {
+    "en": [
+     "report",
+     "dashboard",
+     "visibility",
+     "figures",
+     "numbers",
+     "don't know how much",
+     "dont know how much",
+     "branch comparison",
+     "kpi"
+    ],
+    "roman_ur": [
+     "report",
+     "dashboard",
+     "hisaab",
+     "numbers",
+     "kitna bik",
+     "pata nahi chalta",
+     "figures"
+    ],
+    "hi": [
+     "रिपोर्ट",
+     "डैशबोर्ड",
+     "हिसाब",
+     "आंकड़े",
+     "पता नहीं चलता"
+    ],
+    "ur": [
+     "رپورٹ",
+     "ڈیش بورڈ",
+     "حساب",
+     "اعداد",
+     "پتا نہیں چلتا"
+    ],
+    "ar": [
+     "تقرير",
+     "تقارير",
+     "لوحة",
+     "أرقام",
+     "لا أعرف كم"
+    ],
+    "fr": [
+     "rapport",
+     "tableau de bord",
+     "chiffres",
+     "visibilité",
+     "je ne sais pas combien"
+    ],
+    "fa": [
+     "گزارش",
+     "داشبورد",
+     "آمار",
+     "ارقام",
+     "نمی‌دانم چقدر"
+    ],
+    "es": [
+     "informe",
+     "reporte",
+     "tablero",
+     "cifras",
+     "visibilidad",
+     "no sé cuánto"
+    ]
+   },
+   "specific": {},
+   "generic": {}
+  },
+  "compliance_admin": {
+   "strong": {
+    "en": [
+     "licence",
+     "license",
+     "tax filing",
+     "audit",
+     "paperwork",
+     "permit",
+     "registration",
+     "contract",
+     "renewal",
+     "compliance",
+     "fbr",
+     "vat"
+    ],
+    "roman_ur": [
+     "licence",
+     "license",
+     "tax",
+     "audit",
+     "kaghaz",
+     "permit",
+     "registration",
+     "contract",
+     "renewal",
+     "fbr",
+     "documents"
+    ],
+    "hi": [
+     "लाइसेंस",
+     "टैक्स",
+     "ऑडिट",
+     "कागज़",
+     "परमिट",
+     "पंजीकरण",
+     "अनुबंध"
+    ],
+    "ur": [
+     "لائسنس",
+     "ٹیکس",
+     "آڈٹ",
+     "کاغذ",
+     "پرمٹ",
+     "رجسٹریشن",
+     "معاہدہ"
+    ],
+    "ar": [
+     "رخصة",
+     "ترخيص",
+     "ضريبة",
+     "تدقيق",
+     "أوراق",
+     "تصريح",
+     "عقد",
+     "تجديد"
+    ],
+    "fr": [
+     "licence",
+     "impôt",
+     "déclaration",
+     "audit",
+     "paperasse",
+     "permis",
+     "contrat",
+     "renouvellement"
+    ],
+    "fa": [
+     "مجوز",
+     "مالیات",
+     "ممیزی",
+     "کاغذبازی",
+     "ثبت",
+     "قرارداد",
+     "تمدید"
+    ],
+    "es": [
+     "licencia",
+     "impuesto",
+     "auditoría",
+     "papeleo",
+     "permiso",
+     "registro",
+     "contrato",
+     "renovación"
+    ]
+   },
+   "specific": {},
+   "generic": {}
+  },
+  "planning_growth": {
+   "strong": {
+    "en": [
+     "expand",
+     "expansion",
+     "new branch",
+     "growth",
+     "forecast",
+     "franchise",
+     "season",
+     "budget",
+     "scale up",
+     "grow"
+    ],
+    "roman_ur": [
+     "expand",
+     "naya branch",
+     "new branch",
+     "growth",
+     "forecast",
+     "franchise",
+     "season",
+     "budget",
+     "barhana",
+     "planning"
+    ],
+    "hi": [
+     "विस्तार",
+     "नई शाखा",
+     "ग्रोथ",
+     "फ्रैंचाइज़ी",
+     "सीज़न",
+     "बजट",
+     "योजना"
+    ],
+    "ur": [
+     "توسیع",
+     "نئی برانچ",
+     "گروتھ",
+     "فرنچائز",
+     "سیزن",
+     "بجٹ",
+     "منصوبہ"
+    ],
+    "ar": [
+     "توسع",
+     "فرع جديد",
+     "نمو",
+     "امتياز",
+     "موسم",
+     "ميزانية",
+     "تخطيط"
+    ],
+    "fr": [
+     "expansion",
+     "nouvelle succursale",
+     "croissance",
+     "franchise",
+     "saison",
+     "budget",
+     "planification"
+    ],
+    "fa": [
+     "توسعه",
+     "شعبه جدید",
+     "رشد",
+     "فرنچایز",
+     "فصل",
+     "بودجه",
+     "برنامه‌ریزی"
+    ],
+    "es": [
+     "expandir",
+     "nueva sucursal",
+     "crecimiento",
+     "franquicia",
+     "temporada",
+     "presupuesto",
+     "planificación"
+    ]
+   },
+   "specific": {},
+   "generic": {}
+  },
+  "customer_experience_digital": {
+   "strong": {
+    "en": [
+     "website",
+     "booking",
+     "bookings",
+     "appointment",
+     "reservation",
+     "catalogue",
+     "catalog",
+     "google maps",
+     "listing",
+     "online ordering",
+     "no show",
+     "no-show"
+    ],
+    "roman_ur": [
+     "website",
+     "booking",
+     "appointment",
+     "reservation",
+     "catalogue",
+     "google maps",
+     "listing",
+     "online order",
+     "no show"
+    ],
+    "hi": [
+     "वेबसाइट",
+     "बुकिंग",
+     "अपॉइंटमेंट",
+     "कैटलॉग",
+     "गूगल मैप",
+     "ऑनलाइन ऑर्डर"
+    ],
+    "ur": [
+     "ویب سائٹ",
+     "بکنگ",
+     "اپائنٹمنٹ",
+     "کیٹلاگ",
+     "گوگل میپ",
+     "آن لائن آرڈر"
+    ],
+    "ar": [
+     "موقع إلكتروني",
+     "حجز",
+     "موعد",
+     "كتالوج",
+     "خرائط جوجل",
+     "طلب عبر الإنترنت"
+    ],
+    "fr": [
+     "site web",
+     "réservation",
+     "rendez-vous",
+     "catalogue",
+     "google maps",
+     "commande en ligne"
+    ],
+    "fa": [
+     "وب‌سایت",
+     "رزرو",
+     "نوبت",
+     "کاتالوگ",
+     "نقشه گوگل",
+     "سفارش آنلاین"
+    ],
+    "es": [
+     "sitio web",
+     "reserva",
+     "cita",
+     "catálogo",
+     "google maps",
+     "pedido en línea"
+    ]
+   },
+   "specific": {},
+   "generic": {}
+  }
+ }
+}

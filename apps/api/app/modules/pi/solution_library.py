@@ -33,41 +33,75 @@ def _words(text: str) -> set[str]:
 # Words that say which category a problem is in, in the owner's own words (English and Roman Urdu):
 # a category is chosen by what they said, not only by the group the model filed the problem under
 # ("staff" in a theft problem is not a scheduling problem, live test 4).
-CUES: dict[str, str] = {
-    "loss_security": "theft chori stolen steal thief fraud loss missing leak shrinkage void refund nuksan kam",
-    "cash_collections": "cash owed udhaar credit payment collect receivable balance deposit paisa wusooli",
-    "stock_inventory": "stock maal shelf expiry inventory count shortage low warehouse godown clearance",
-    "sales_revenue": "sales price rate raqam views orders buy browse offer conversion silence reply sale",
-    "marketing_leads": "ads instagram reels leads enquiry reach followers promotion campaign views",
-    "customers_retention": "repeat review complaint regular return loyal feedback",
-    "orders_fulfilment": "delivery order dispatch courier parcel rider shipping",
-    "people_staff": "shift rota schedule attendance late training hire leave",
-}
+CUES_FILE = Path(__file__).parent / "packs" / "library" / "cues.json"
+TIERS = (("strong", 3), ("specific", 2), ("generic", 1))
+PRIOR = 3  # the group the model filed the problem under: more than one weak cue hit, less than two
+
+
+@lru_cache(maxsize=1)
+def cues() -> dict[str, dict[str, dict[str, list[str]]]]:
+    """{category: {tier: {language: [cue words]}}} from packs/library/cues.json."""
+    try:
+        data = json.loads(CUES_FILE.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return {}
+    return dict(data.get("categories") or {})
+
+
+CUES = cues()
+
+
+@lru_cache(maxsize=4096)
+def _pattern(cue: str) -> re.Pattern[str]:
+    """A Latin cue matches at the start of a word ("steal" finds "stealing"); any other script
+    matches anywhere in the text."""
+    if cue.isascii():
+        return re.compile(r"(?<!\w)" + re.escape(cue), re.IGNORECASE)
+    return re.compile(re.escape(cue))
+
+
+def cue_score(text: str, category: str) -> tuple[int, int]:
+    """(score, distinct generic hits) of the person's words for a category: strong cues count 3,
+    specific 2, generic 1. A generic cue alone never decides: it needs a second one."""
+    found, generic = 0, 0
+    tiers = cues().get(category) or {}
+    for tier, weight in TIERS:
+        seen: set[str] = set()
+        for words in (tiers.get(tier) or {}).values():
+            for cue in words:
+                if cue not in seen and _pattern(cue).search(text):
+                    seen.add(cue)
+        if tier == "generic":
+            generic = len(seen)
+            found += weight * generic if generic >= 2 else 0
+        else:
+            found += weight * len(seen)
+    return found, generic
 
 
 def best_category(noted: list[dict[str, Any]]) -> list[str]:
-    """The library categories for the noted problems, best fit first: each problem's own words
-    score against the cue words of every category (and the group the model filed it under counts a
-    little). Only categories that have ideas are returned; the latest problem wins a tie."""
-    from app.modules.pi.solution_ideas import _evidence
-
+    """The library categories for the noted problems, best fit first. The person's own words score
+    against the cue words of every category in eight languages; the group the model filed the
+    problem under adds a prior, so a group that has ideas beats one weak cue hit but not two. Only
+    categories that have ideas are returned; the latest problem wins a tie."""
     have = load()
     scored: list[tuple[int, int, str]] = []
     for age, item in enumerate(reversed(noted)):
-        said = _evidence(
-            " ".join(
-                [
-                    str(item.get("title") or ""),
-                    str(item.get("title_local") or ""),
-                    *[str(w) for w in item.get("user_words") or []],
-                ]
-            )
+        said = " ".join(
+            [
+                str(item.get("title") or ""),
+                str(item.get("title_local") or ""),
+                *[str(w) for w in item.get("user_words") or []],
+            ]
         )
-        for category, cues in CUES.items():
-            hits = len(said & _evidence(cues))
-            prior = 1 if str(item.get("group") or "") == category else 0
-            if (hits or prior) and have.get(category, {}).get("ideas"):
-                scored.append((hits * 3 + prior, -age, category))
+        group = str(item.get("group") or "")
+        for category in cues():
+            if not have.get(category, {}).get("ideas"):
+                continue
+            hits, _generic = cue_score(said, category)
+            prior = PRIOR if group == category else 0
+            if hits >= 2 or prior:
+                scored.append((hits + prior, -age, category))
     ordered: list[str] = []
     for _score, _age, category in sorted(scored, reverse=True):
         if category not in ordered:

@@ -57,7 +57,7 @@ def test_an_unknown_industry_with_a_noted_problem_gets_two_ideas_and_the_build_l
 
 def test_a_category_without_library_ideas_degrades_to_the_honest_line() -> None:
     chat = _chat()
-    noted = [{"group": "no_such_category", "title": "Margin unknown"}]
+    noted = [{"group": "no_such_category", "title": "Something odd happens"}]
     assert solution_context._from_library(chat, noted, "en") is None
 
 
@@ -69,7 +69,7 @@ def test_the_latest_problem_with_library_ideas_is_used() -> None:
     chat = _chat()
     noted = [
         {"group": "people_staff", "title": "Staff late"},
-        {"group": "no_such_category", "title": "Margin unknown"},
+        {"group": "no_such_category", "title": "Something odd happens"},
     ]
     out = solution_context._from_library(chat, noted, "en")
     assert out is not None and chat.service_brief["solution_last_problem"] == "library:people_staff"
