@@ -436,12 +436,15 @@
    "code": [
     "app/modules/pi/constitution.py::lint",
     "app/modules/pi/constitution.py::PROMISE",
-    "app/modules/pi/constitution.py::_promise_hits"
+    "app/modules/pi/constitution.py::_promise_hits",
+    "app/modules/pi/constitution_langs.py"
    ],
    "tests": [
     "tests/unit/test_pi_constitution.py::test_pi_never_promises_a_result",
     "tests/unit/test_pi_constitution.py::test_saying_it_cannot_guarantee_is_fine",
-    "tests/unit/test_pi_redteam.py::test_rt24_pi_never_promises_a_result"
+    "tests/unit/test_pi_redteam.py::test_rt24_pi_never_promises_a_result",
+    "tests/unit/test_pi_multilingual_rules.py::test_the_rule_catches_its_reply_in_every_language",
+    "tests/unit/test_pi_multilingual_rules.py::test_a_refusal_of_a_guarantee_is_not_a_promise"
    ],
    "gap": "",
    "owner": "",
@@ -509,13 +512,16 @@
    "status": "DONE",
    "code": [
     "app/modules/pi/constitution.py::lint",
-    "app/modules/pi/constitution.py::_asks_for_what_it_never_asks"
+    "app/modules/pi/constitution.py::_asks_for_what_it_never_asks",
+    "app/modules/pi/constitution_langs.py"
    ],
    "tests": [
     "tests/unit/test_pi_constitution.py::test_pi_never_asks_for_card_password_otp_or_id",
     "tests/unit/test_pi_constitution.py::test_refusing_to_take_sensitive_data_is_allowed",
     "tests/unit/test_pi_linter_hardening.py::test_arabic_and_urdu_asks_for_cards_and_ids_are_hard",
-    "tests/unit/test_pi_redteam.py::test_rt7_pi_never_asks_for_an_otp_pin_or_card"
+    "tests/unit/test_pi_redteam.py::test_rt7_pi_never_asks_for_an_otp_pin_or_card",
+    "tests/unit/test_pi_multilingual_safety.py::test_the_unsafe_reply_is_a_hard_violation_in_every_language",
+    "tests/unit/test_pi_multilingual_safety.py::test_a_normal_reply_and_the_refusal_to_take_a_card_break_none_of_them"
    ],
    "gap": "",
    "owner": "",
@@ -672,11 +678,14 @@
    "status": "DONE",
    "code": [
     "app/modules/pi/constitution.py::_asks_for_what_it_never_asks",
-    "app/modules/pi/constitution.py::NATIONAL_ID"
+    "app/modules/pi/constitution.py::NATIONAL_ID",
+    "app/modules/pi/constitution_langs.py"
    ],
    "tests": [
     "tests/unit/test_pi_linter_hardening.py::test_asking_for_ids_is_hard",
-    "tests/unit/test_pi_linter_hardening.py::test_arabic_and_urdu_asks_for_cards_and_ids_are_hard"
+    "tests/unit/test_pi_linter_hardening.py::test_arabic_and_urdu_asks_for_cards_and_ids_are_hard",
+    "tests/unit/test_pi_multilingual_safety.py::test_the_unsafe_reply_is_a_hard_violation_in_every_language",
+    "tests/unit/test_pi_multilingual_safety.py::test_a_normal_reply_and_the_refusal_to_take_a_card_break_none_of_them"
    ],
    "gap": "",
    "owner": "",
@@ -692,12 +701,16 @@
    "code": [
     "app/modules/pi/constitution.py::_asks_for_what_it_never_asks",
     "app/modules/pi/constitution.py::ASK_PEOPLE",
-    "app/modules/pi/safety.py::redact_pii"
+    "app/modules/pi/safety.py::redact_pii",
+    "app/modules/pi/constitution_langs.py"
    ],
    "tests": [
     "tests/unit/test_pi_linter_hardening.py::test_asking_for_staff_or_customer_details_is_hard",
     "tests/unit/test_pi_safety_trades.py::test_names_introduced_by_a_role_become_the_role",
-    "tests/unit/test_pi_real_chat_fixes.py::test_a_third_partys_name_in_roman_urdu_keeps_only_the_role"
+    "tests/unit/test_pi_real_chat_fixes.py::test_a_third_partys_name_in_roman_urdu_keeps_only_the_role",
+    "tests/unit/test_pi_multilingual_advice.py::test_the_unsafe_reply_is_a_hard_violation_in_every_language",
+    "tests/unit/test_pi_multilingual_advice.py::test_a_normal_reply_and_a_rough_question_break_none_of_these_rules",
+    "tests/unit/test_pi_multilingual_advice.py::test_the_same_question_is_found_again_in_any_script_and_another_is_not"
    ],
    "gap": "",
    "owner": "",
@@ -795,12 +808,16 @@
     "app/modules/pi/safety.py::advice_asked",
     "app/modules/pi/safety.py::advice_reply",
     "app/modules/pi/constitution.py::_advice_and_policy",
-    "app/modules/pi/constitution.py::ADVICE"
+    "app/modules/pi/constitution.py::ADVICE",
+    "app/modules/pi/constitution_langs.py"
    ],
    "tests": [
     "tests/unit/test_pi_safety.py::test_advice_that_is_not_pis_to_give",
     "tests/unit/test_pi_linter_hardening.py::test_advice_in_the_reply_is_hard",
-    "tests/unit/test_pi_safety_trades.py::test_advice_classes"
+    "tests/unit/test_pi_safety_trades.py::test_advice_classes",
+    "tests/unit/test_pi_multilingual_advice.py::test_the_unsafe_reply_is_a_hard_violation_in_every_language",
+    "tests/unit/test_pi_multilingual_advice.py::test_a_normal_reply_and_a_rough_question_break_none_of_these_rules",
+    "tests/unit/test_pi_multilingual_advice.py::test_the_same_question_is_found_again_in_any_script_and_another_is_not"
    ],
    "gap": "",
    "owner": "",
@@ -852,11 +869,15 @@
    "status": "DONE",
    "code": [
     "app/modules/pi/constitution.py::OPINION",
-    "app/modules/pi/safety.py::boundary_asked"
+    "app/modules/pi/safety.py::boundary_asked",
+    "app/modules/pi/constitution_langs.py"
    ],
    "tests": [
     "tests/unit/test_pi_linter_hardening.py::test_politics_religion_competitors_are_hard",
-    "tests/unit/test_pi_safety.py::test_things_pi_will_not_do"
+    "tests/unit/test_pi_safety.py::test_things_pi_will_not_do",
+    "tests/unit/test_pi_multilingual_advice.py::test_the_unsafe_reply_is_a_hard_violation_in_every_language",
+    "tests/unit/test_pi_multilingual_advice.py::test_a_normal_reply_and_a_rough_question_break_none_of_these_rules",
+    "tests/unit/test_pi_multilingual_advice.py::test_the_same_question_is_found_again_in_any_script_and_another_is_not"
    ],
    "gap": "",
    "owner": "",
@@ -1164,12 +1185,17 @@
    "code": [
     "app/modules/pi/constitution.py::lint",
     "app/modules/pi/constitution.py::repair",
-    "app/modules/pi/constitution.py::_one_question_last"
+    "app/modules/pi/constitution.py::_one_question_last",
+    "app/modules/pi/constitution_langs.py"
    ],
    "tests": [
     "tests/unit/test_pi_constitution.py::test_one_question_and_it_comes_last",
     "tests/unit/test_pi_redteam.py::test_rt23_still_one_question",
-    "tests/unit/test_pi_real_chat_fixes.py::test_two_questions_are_repaired_in_place_without_a_model_call"
+    "tests/unit/test_pi_real_chat_fixes.py::test_two_questions_are_repaired_in_place_without_a_model_call",
+    "tests/unit/test_pi_multilingual_rules.py::test_two_questions_are_one_too_many_in_every_language",
+    "tests/unit/test_pi_multilingual_rules.py::test_the_offer_tail_in_another_language_is_not_a_second_question_slot",
+    "tests/unit/test_pi_live_chat_3.py::test_reply_6_theek_hai_filler_and_the_two_questions_in_one",
+    "tests/unit/test_pi_live_chat_3.py::test_a_list_question_with_one_or_is_one_question"
    ],
    "gap": "",
    "owner": "",
@@ -1718,11 +1744,13 @@
    "statement": "A skipped or ignored question is not re-asked; the field is marked unknown",
    "status": "PROMPT-ONLY",
    "code": [
-    "app/modules/pi/spec_handbook.py"
+    "app/modules/pi/spec_handbook.py",
+    "app/modules/pi/constitution_langs.py"
    ],
    "tests": [
     "tests/unit/test_pi_spec_handbook.py::test_the_guidance_follows_the_stage_and_the_topic",
-    "tests/unit/test_pi_rule_gaps.py::test_a_prompt_only_rule_is_in_the_text_pi_reads_while_listening"
+    "tests/unit/test_pi_rule_gaps.py::test_a_prompt_only_rule_is_in_the_text_pi_reads_while_listening",
+    "tests/unit/test_pi_multilingual_rules.py::test_the_rule_catches_its_reply_in_every_language"
    ],
    "gap": "Nothing compares a new question with questions already ignored; the exact-repeat check (reply_quality) only catches an identical message.",
    "owner": "linter hardening session",
@@ -1737,11 +1765,15 @@
    "status": "DONE",
    "code": [
     "app/modules/pi/constitution.py::_asks_for_what_it_never_asks",
-    "app/modules/pi/constitution.py::ASK_MONEY"
+    "app/modules/pi/constitution.py::ASK_MONEY",
+    "app/modules/pi/constitution_langs.py"
    ],
    "tests": [
     "tests/unit/test_pi_linter_hardening.py::test_asking_for_revenue_balances_or_salaries_is_hard",
-    "tests/unit/test_pi_linter_hardening.py::test_rough_scale_and_refusals_are_fine"
+    "tests/unit/test_pi_linter_hardening.py::test_rough_scale_and_refusals_are_fine",
+    "tests/unit/test_pi_multilingual_advice.py::test_the_unsafe_reply_is_a_hard_violation_in_every_language",
+    "tests/unit/test_pi_multilingual_advice.py::test_a_normal_reply_and_a_rough_question_break_none_of_these_rules",
+    "tests/unit/test_pi_multilingual_advice.py::test_the_same_question_is_found_again_in_any_script_and_another_is_not"
    ],
    "gap": "",
    "owner": "",
@@ -2353,10 +2385,14 @@
    "status": "DONE",
    "code": [
     "app/modules/pi/learning.py::reward",
-    "app/modules/pi/learning.py::REWARDS"
+    "app/modules/pi/learning.py::REWARDS",
+    "app/modules/pi/constitution.py::CONFIRMS_CORRECTION"
    ],
    "tests": [
-    "tests/unit/test_pi_learning.py::test_confusion_correction_frustration_cost_reward"
+    "tests/unit/test_pi_learning.py::test_confusion_correction_frustration_cost_reward",
+    "tests/unit/test_pi_live_chat_3.py::test_reply_5_you_are_right_to_a_plain_answer_and_the_question_asked_again",
+    "tests/unit/test_pi_live_chat_3.py::test_the_replies_the_new_rules_catch_in_this_chat",
+    "tests/unit/test_pi_live_chat_3.py::test_the_agreement_fillers_in_other_wordings"
    ],
    "gap": "",
    "owner": "",
@@ -6447,12 +6483,14 @@
    "status": "DONE",
    "code": [
     "app/modules/pi/constitution.py::SECRETS",
-    "app/modules/pi/constitution.py::lint"
+    "app/modules/pi/constitution.py::lint",
+    "app/modules/pi/constitution_langs.py"
    ],
    "tests": [
     "tests/unit/test_pi_secrets.py::test_a_reply_that_reveals_how_workzap_works_inside_is_blocked",
     "tests/unit/test_pi_secrets.py::test_the_person_asking_does_not_lift_it",
-    "tests/unit/test_pi_secrets.py::test_ordinary_replies_are_not_flagged"
+    "tests/unit/test_pi_secrets.py::test_ordinary_replies_are_not_flagged",
+    "tests/unit/test_pi_multilingual_rules.py::test_the_rule_catches_its_reply_in_every_language"
    ],
    "gap": "",
    "owner": "",
@@ -6781,14 +6819,17 @@
     "app/modules/pi/solution_ideas.py::choose",
     "app/modules/pi/solution_context.py::_give",
     "app/modules/pi/solution_context.py::_from_library",
-    "app/modules/pi/solution_library.py::ideas_for"
+    "app/modules/pi/solution_library.py::ideas_for",
+    "app/modules/pi/solutions.py::load"
    ],
    "tests": [
     "tests/unit/test_pi_solutions.py::test_every_industry_has_solutions_linked_to_its_pack",
     "tests/unit/test_pi_solution_library.py::test_an_unknown_industry_with_a_noted_problem_gets_two_ideas_and_the_build_line",
-    "tests/unit/test_pi_solution_library.py::test_the_latest_problem_with_library_ideas_is_used"
+    "tests/unit/test_pi_solution_library.py::test_the_latest_problem_with_library_ideas_is_used",
+    "tests/unit/test_pi_solution_library.py::test_the_owner_added_fashion_entry_is_loaded_and_is_not_in_the_pdf_pack",
+    "tests/unit/test_pi_solution_library.py::test_every_idea_of_the_owner_added_entry_passes_the_guard_and_is_an_owner_action"
    ],
-   "gap": "Steps 1, 4 and 5 are used: the industry's entries as learned, the generic library when no industry entry has an idea, and the learned idea bank. Steps 2 and 3 (overlays and sector neighbours) are not. The library is not the spec's verbatim text: owner_rewrites.json records that the owner approved rewriting its quick ideas on 2026-10-26.",
+   "gap": "Steps 1, 4 and 5 are used (the industry's entries as learned, the generic library when no industry entry has an idea, and the learned idea bank). Step 2 (overlays) exists as a mechanism (packs/solutions_overlay, merged by solutions.load so a pack rebuild keeps it) but holds one entry, the owner-added fashion entry 'price asked in DM, then silence', which is NOT from the PDF. Step 3 (sector neighbours) is not built. The library is not the spec's verbatim text: owner_rewrites.json records that the owner approved rewriting its quick ideas on 2026-10-26.",
    "owner": "solutions session",
    "unit_tested": true
   },
@@ -8990,10 +9031,12 @@
    "statement": "pi describes the problem and never judges the person or the business, even if they said it first",
    "status": "DONE",
    "code": [
-    "app/modules/pi/constitution.py::JUDGEMENT"
+    "app/modules/pi/constitution.py::JUDGEMENT",
+    "app/modules/pi/constitution_langs.py"
    ],
    "tests": [
-    "tests/unit/test_pi_echo_and_tone.py::test_judging_the_person_or_the_business_is_banned_even_if_they_said_it_first"
+    "tests/unit/test_pi_echo_and_tone.py::test_judging_the_person_or_the_business_is_banned_even_if_they_said_it_first",
+    "tests/unit/test_pi_multilingual_rules.py::test_the_rule_catches_its_reply_in_every_language"
    ],
    "gap": "",
    "owner": "",
@@ -9146,12 +9189,15 @@
    "status": "DONE",
    "code": [
     "app/modules/pi/constitution.py::DIRECT_QUESTION",
-    "app/modules/pi/constitution.py::lint"
+    "app/modules/pi/constitution.py::lint",
+    "app/modules/pi/constitution_langs.py"
    ],
    "tests": [
     "tests/unit/test_pi_answer_first_and_tone.py::test_a_question_back_is_not_an_answer_to_a_direct_question",
     "tests/unit/test_pi_spec_supersession.py::test_the_guidance_carries_the_governing_answer_first_rules",
-    "tests/unit/test_pi_golden_solution_mode.py::test_g19_what_do_you_do_is_answered_not_ignored"
+    "tests/unit/test_pi_golden_solution_mode.py::test_g19_what_do_you_do_is_answered_not_ignored",
+    "tests/unit/test_pi_multilingual_rules.py::test_the_rule_catches_its_reply_in_every_language",
+    "tests/unit/test_pi_multilingual_rules.py::test_a_question_back_is_not_the_answer_to_a_question"
    ],
    "gap": "",
    "owner": "",
@@ -9166,10 +9212,13 @@
    "status": "PARTIAL",
    "code": [
     "app/modules/pi/constitution.py::YES_NO_QUESTION",
-    "app/modules/pi/constitution.py::ACK_OPENER"
+    "app/modules/pi/constitution.py::ACK_OPENER",
+    "app/modules/pi/constitution_langs.py"
    ],
    "tests": [
-    "tests/unit/test_pi_answer_first_and_tone.py::test_a_yes_no_question_is_not_answered_with_thanks_noted"
+    "tests/unit/test_pi_answer_first_and_tone.py::test_a_yes_no_question_is_not_answered_with_thanks_noted",
+    "tests/unit/test_pi_multilingual_rules.py::test_the_rule_catches_its_reply_in_every_language",
+    "tests/unit/test_pi_multilingual_rules.py::test_a_thank_you_is_not_the_answer_to_a_yes_no_question"
    ],
    "gap": "A yes/no question answered with an acknowledgement ('Thanks, noted') is sent back; a reply that opens with something else but neither yes nor no is not caught, and yes/no questions are found by a pattern list.",
    "owner": "linter hardening session",
@@ -9208,11 +9257,13 @@
    "status": "PARTIAL",
    "code": [
     "app/modules/pi/constitution.py::NOTED_TITLE",
-    "app/modules/pi/constitution.py::echo_overlap"
+    "app/modules/pi/constitution.py::echo_overlap",
+    "app/modules/pi/constitution_langs.py"
    ],
    "tests": [
     "tests/unit/test_pi_answer_first_and_tone.py::test_the_noted_line_names_the_problem_in_at_most_twelve_words",
-    "tests/unit/test_pi_echo_and_tone.py::test_a_reply_that_restates_the_message_is_flagged_as_an_echo"
+    "tests/unit/test_pi_echo_and_tone.py::test_a_reply_that_restates_the_message_is_flagged_as_an_echo",
+    "tests/unit/test_pi_multilingual_rules.py::test_the_rule_catches_its_reply_in_every_language"
    ],
    "gap": "The noted line is held to 12 words and a long echo is caught; 'once per problem' (no second noted line for the same problem) is not counted.",
    "owner": "linter hardening session",
@@ -9284,12 +9335,17 @@
    "status": "PARTIAL",
    "code": [
     "app/modules/pi/solution_free.py::uses_a_fact",
-    "app/modules/pi/solution_free.py::vetted"
+    "app/modules/pi/solution_free.py::vetted",
+    "app/modules/pi/solution_rules.py::is_owner_action",
+    "app/modules/pi/service_conversation.py::reject_passive_ideas"
    ],
    "tests": [
-    "tests/unit/test_pi_idea_format_languages.py::test_sol04_a_free_idea_must_use_something_the_person_said_and_generic_ones_are_banned"
+    "tests/unit/test_pi_idea_format_languages.py::test_sol04_a_free_idea_must_use_something_the_person_said_and_generic_ones_are_banned",
+    "tests/unit/test_pi_idea_format_languages.py::test_an_idea_that_is_not_an_action_for_the_owner_is_refused",
+    "tests/unit/test_pi_idea_format_languages.py::test_an_action_for_the_owner_is_accepted",
+    "tests/unit/test_pi_idea_format_languages.py::test_a_reply_whose_idea_lines_are_not_owner_actions_is_dropped_whole"
    ],
-   "gap": "Free ideas (written for this chat) must use something the person said and generic ones are dropped; the stored industry-entry ideas are matched to the noted problem but not checked against the person's own words.",
+   "gap": "Free ideas must be an action for the owner and use something the person said; a reply whose idea lines are not owner actions is dropped whole. The stored industry-entry ideas are checked against the idea guard when built, but not against the person's own words.",
    "owner": "solutions session",
    "unit_tested": true
   },
@@ -9412,10 +9468,12 @@
    "statement": "Stay respectful when frustrated: no defensiveness, no 'please be patient', no lecture about why pi asks questions; give value instead",
    "status": "DONE",
    "code": [
-    "app/modules/pi/constitution.py::PATIENCE"
+    "app/modules/pi/constitution.py::PATIENCE",
+    "app/modules/pi/constitution_langs.py"
    ],
    "tests": [
-    "tests/unit/test_pi_answer_first_and_tone.py::test_a_frustrated_person_gets_no_please_be_patient_and_no_lecture"
+    "tests/unit/test_pi_answer_first_and_tone.py::test_a_frustrated_person_gets_no_please_be_patient_and_no_lecture",
+    "tests/unit/test_pi_multilingual_rules.py::test_the_rule_catches_its_reply_in_every_language"
    ],
    "gap": "",
    "owner": "",
@@ -9442,6 +9500,65 @@
    ],
    "gap": "",
    "owner": "",
+   "unit_tested": true
+  },
+  {
+   "id": "R-ECHO-04",
+   "source": "platform",
+   "page": 108,
+   "area": "no echo (Book 2 10.1; live chat 3)",
+   "statement": "A sentence that only says again what the person said, with no noted frame, is sent back; the noted line in their words stays allowed",
+   "status": "DONE",
+   "code": [
+    "app/modules/pi/constitution.py::_restates"
+   ],
+   "tests": [
+    "tests/unit/test_pi_live_chat_3.py::test_reply_2_restates_the_customer_and_says_drop_off",
+    "tests/unit/test_pi_live_chat_3.py::test_the_noted_line_in_their_words_is_still_fine"
+   ],
+   "gap": "",
+   "owner": "",
+   "unit_tested": true
+  },
+  {
+   "id": "P-LANGS-8",
+   "source": "platform",
+   "page": 3,
+   "area": "priority languages (platform spec)",
+   "statement": "The linter rules (answer first, echo, tone, secrets, promises, closed slots, open requests, privacy, payment and advice words) are enforced in Urdu script, Arabic, Hindi, French, Spanish and Persian as well as English and Roman Urdu",
+   "status": "DONE",
+   "code": [
+    "app/modules/pi/constitution_langs.py"
+   ],
+   "tests": [
+    "tests/unit/test_pi_multilingual_rules.py::test_a_normal_reply_breaks_no_rule",
+    "tests/unit/test_pi_multilingual_rules.py::test_the_rule_catches_its_reply_in_every_language",
+    "tests/unit/test_pi_multilingual_advice.py::test_the_unsafe_reply_is_a_hard_violation_in_every_language",
+    "tests/unit/test_pi_multilingual_safety.py::test_the_unsafe_reply_is_a_hard_violation_in_every_language",
+    "tests/unit/test_pi_multilingual_safety.py::test_the_generic_closer_is_a_slot_in_every_language",
+    "tests/unit/test_pi_multilingual_safety.py::test_an_unanswered_request_stays_open_and_an_answered_one_does_not"
+   ],
+   "gap": "",
+   "owner": "",
+   "unit_tested": true
+  },
+  {
+   "id": "P-LANG-PIN",
+   "source": "platform",
+   "page": 108,
+   "area": "language stickiness (Book 2 10.3)",
+   "statement": "The reply language is pinned to the person's last substantive message in every priority language",
+   "status": "PARTIAL",
+   "code": [
+    "app/modules/pi/language.py::detect_language",
+    "app/modules/pi/service_conversation.py::reply_language"
+   ],
+   "tests": [
+    "tests/unit/test_pi_language_stickiness.py::test_a_substantive_message_does_switch_the_language",
+    "tests/unit/test_pi_idea_format_languages.py::test_other_languages_are_recognised"
+   ],
+   "gap": "detect_language still returns only en, roman_ur or ar (Devanagari counts as roman_ur); Urdu script, French, Spanish and Persian are recognised by name through OTHER_SCRIPTS and a requested language is honoured, but there is no pinned detection for them.",
+   "owner": "solutions session",
    "unit_tested": true
   }
  ]
