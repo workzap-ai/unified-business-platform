@@ -61,7 +61,7 @@ def test_the_index_has_the_expected_shape():
             "id"
         ]
         assert r["status"] in STATUSES, f"{r['id']}: unknown status {r['status']}"
-        assert r["source"] in ("brain", "addendum2"), r["id"]
+        assert r["source"] in ("brain", "addendum2", "platform"), r["id"]
         assert 1 <= r["page"] <= 467 and r["statement"].strip(), r["id"]
 
 
@@ -124,7 +124,12 @@ def test_the_status_matches_its_evidence(rule):
 
 
 def counts() -> dict[str, dict[str, int]]:
-    out: dict[str, Counter] = {"brain": Counter(), "addendum2": Counter(), "all": Counter()}
+    out: dict[str, Counter] = {
+        "brain": Counter(),
+        "addendum2": Counter(),
+        "platform": Counter(),
+        "all": Counter(),
+    }
     for r in RULES:
         out[r["source"]][r["status"]] += 1
         out["all"][r["status"]] += 1
@@ -136,7 +141,7 @@ def test_the_summary(capsys):
     only_integration = [r["id"] for r in RULES if r["status"] == "DONE" and not r["unit_tested"]]
     with capsys.disabled():
         print("\nrule index summary")
-        for source in ("brain", "addendum2", "all"):
+        for source in ("brain", "addendum2", "platform", "all"):
             total = sum(table[source].values())
             parts = ", ".join(f"{s} {table[source].get(s, 0)}" for s in INDEX["statuses"])
             print(f"  {source:10} {total:4} rules: {parts}")

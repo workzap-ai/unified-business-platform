@@ -8856,6 +8856,253 @@
    "gap": "",
    "owner": "",
    "unit_tested": true
+  },
+  {
+   "id": "P-G28",
+   "source": "platform",
+   "page": 139,
+   "area": "offer and yes (Book 4 5.2)",
+   "statement": "A direct ask for the solution document or quote is an explicit yes from any listening step once a problem is noted; the confirmation asks nothing",
+   "status": "DONE",
+   "code": [
+    "app/modules/pi/decisions.py::asks_for_document",
+    "app/modules/pi/decisions.py::decide"
+   ],
+   "tests": [
+    "tests/unit/test_pi_platform_audit2.py::test_a_direct_ask_for_the_document_is_recognised",
+    "tests/unit/test_pi_platform_audit2.py::test_the_ask_is_a_yes_from_any_listening_step_and_covers_everything_noted",
+    "tests/unit/test_pi_platform_audit2.py::test_a_problem_or_a_question_or_a_refusal_that_mentions_the_document_is_not_the_ask",
+    "tests/unit/test_pi_platform_audit2.py::test_the_direct_confirmation_never_carries_the_reminder_question"
+   ],
+   "gap": "",
+   "owner": "",
+   "unit_tested": true
+  },
+  {
+   "id": "P-G27",
+   "source": "platform",
+   "page": 139,
+   "area": "tone (Book 4 5.1)",
+   "statement": "Maazrat is allowed as a short opener for an impatient owner; only the stiff 'mujhe maazrat chahiye' form is flagged",
+   "status": "DONE",
+   "code": [
+    "app/modules/pi/constitution.py::STIFF_APOLOGY"
+   ],
+   "tests": [
+    "tests/unit/test_pi_platform_audit2.py::test_maazrat_as_an_opener_is_not_a_stiff_apology"
+   ],
+   "gap": "",
+   "owner": "",
+   "unit_tested": true
+  },
+  {
+   "id": "R-GEN-01",
+   "source": "platform",
+   "page": 109,
+   "area": "Roman Urdu (Book 2 10.5)",
+   "statement": "Roman Urdu replies use gender-neutral first-person forms (maine note kar liya, bhej diya jayega), never samajh gaya or karunga",
+   "status": "DONE",
+   "code": [
+    "app/modules/pi/constitution.py::roman_urdu_tone",
+    "app/modules/pi/constitution.py::GENDERED_URDU"
+   ],
+   "tests": [
+    "tests/unit/test_pi_platform_audit2.py::test_gendered_first_person_urdu_is_flagged",
+    "tests/unit/test_pi_platform_audit2.py::test_neutral_forms_pass",
+    "tests/unit/test_pi_platform_audit2.py::test_more_gendered_forms_are_caught_and_ordinary_words_are_not",
+    "tests/unit/test_pi_platform_audit2.py::test_bold_or_quoted_pi_text_is_not_a_way_around_the_tone_rules"
+   ],
+   "gap": "",
+   "owner": "",
+   "unit_tested": true
+  },
+  {
+   "id": "R-TONE-04",
+   "source": "platform",
+   "page": 139,
+   "area": "Roman Urdu (Book 4 5.1)",
+   "statement": "Roman Urdu imperatives use the aap form (karein, rakhein), never karo",
+   "status": "DONE",
+   "code": [
+    "app/modules/pi/constitution.py::INFORMAL_IMPERATIVE"
+   ],
+   "tests": [
+    "tests/unit/test_pi_platform_audit2.py::test_the_informal_imperative_is_flagged_and_the_aap_form_is_not",
+    "tests/unit/test_pi_platform_audit2.py::test_words_the_owner_used_first_are_not_corrected_back_at_them"
+   ],
+   "gap": "",
+   "owner": "",
+   "unit_tested": true
+  },
+  {
+   "id": "R-SPELL-01",
+   "source": "platform",
+   "page": 109,
+   "area": "Roman Urdu (Book 2 10.6)",
+   "statement": "Roman Urdu replies use the common spellings (ghaur not ghoor, zaroor, bilkul, hisaab)",
+   "status": "DONE",
+   "code": [
+    "app/modules/pi/constitution.py::WRONG_SPELLING"
+   ],
+   "tests": [
+    "tests/unit/test_pi_platform_audit2.py::test_a_known_wrong_spelling_is_flagged"
+   ],
+   "gap": "",
+   "owner": "",
+   "unit_tested": true
+  },
+  {
+   "id": "R-ECHO-03",
+   "source": "platform",
+   "page": 108,
+   "area": "no echo (Book 2 10.1)",
+   "statement": "A reply that restates more than 40% of the person's last two messages is sent back; the summary and a short noted line are exempt",
+   "status": "DONE",
+   "code": [
+    "app/modules/pi/constitution.py::echo_overlap",
+    "app/modules/pi/constitution.py::ECHO_MAX"
+   ],
+   "tests": [
+    "tests/unit/test_pi_echo_and_tone.py::test_a_reply_that_restates_the_message_is_flagged_as_an_echo",
+    "tests/unit/test_pi_echo_and_tone.py::test_a_short_confirmation_and_a_fresh_reply_are_not_echoes",
+    "tests/unit/test_pi_echo_and_tone.py::test_the_summary_may_restate_what_was_noted"
+   ],
+   "gap": "",
+   "owner": "",
+   "unit_tested": true
+  },
+  {
+   "id": "R-TONE-01",
+   "source": "platform",
+   "page": 108,
+   "area": "respectful framing (Book 2 10.2)",
+   "statement": "pi describes the problem and never judges the person or the business, even if they said it first",
+   "status": "DONE",
+   "code": [
+    "app/modules/pi/constitution.py::JUDGEMENT"
+   ],
+   "tests": [
+    "tests/unit/test_pi_echo_and_tone.py::test_judging_the_person_or_the_business_is_banned_even_if_they_said_it_first"
+   ],
+   "gap": "",
+   "owner": "",
+   "unit_tested": true
+  },
+  {
+   "id": "R-ASK-07",
+   "source": "platform",
+   "page": 108,
+   "area": "closed slots (Book 2 10.4)",
+   "statement": "Any answer closes the question asked; a reply that asks a closed slot again, in any language, is sent back",
+   "status": "DONE",
+   "code": [
+    "app/modules/pi/slots.py::asked_again",
+    "app/modules/pi/slots.py::advance"
+   ],
+   "tests": [
+    "tests/unit/test_pi_closed_slots.py::test_an_answer_closes_the_question_asked_before_it",
+    "tests/unit/test_pi_closed_slots.py::test_asking_a_closed_slot_again_is_found_by_its_name_across_languages",
+    "tests/unit/test_pi_closed_slots.py::test_asking_the_same_question_in_other_words_is_found_without_a_slot_name",
+    "tests/integration/test_pi_closed_slots_flow.py::test_an_answered_question_is_closed_and_asking_it_again_is_sent_back"
+   ],
+   "gap": "",
+   "owner": "",
+   "unit_tested": true
+  },
+  {
+   "id": "R-LANG-09",
+   "source": "platform",
+   "page": 108,
+   "area": "language stickiness (Book 2 10.3)",
+   "statement": "A short or ambiguous message does not change the conversation language; a substantive one does",
+   "status": "DONE",
+   "code": [
+    "app/modules/pi/service_conversation.py::reply_language",
+    "app/modules/pi/service_conversation.py::AMBIGUOUS_SHORT"
+   ],
+   "tests": [
+    "tests/unit/test_pi_language_stickiness.py::test_a_short_answer_keeps_a_roman_urdu_chat_in_roman_urdu",
+    "tests/unit/test_pi_language_stickiness.py::test_a_short_answer_keeps_an_english_chat_in_english_even_in_urdu_words",
+    "tests/unit/test_pi_language_stickiness.py::test_a_substantive_message_does_switch_the_language"
+   ],
+   "gap": "",
+   "owner": "",
+   "unit_tested": true
+  },
+  {
+   "id": "P-G29-DUP",
+   "source": "platform",
+   "page": 140,
+   "area": "no duplicate sends (Book 4 5.3)",
+   "statement": "A message pi starts itself (reminder) is not sent twice to the same person within 24 hours; replies are never held back",
+   "status": "DONE",
+   "code": [
+    "app/modules/pi/runtime.py::is_duplicate_send"
+   ],
+   "tests": [
+    "tests/integration/test_pi_duplicate_send.py::test_a_repeated_reminder_is_held_back_but_a_reply_never_is"
+   ],
+   "gap": "",
+   "owner": "",
+   "unit_tested": false
+  },
+  {
+   "id": "P-FOLLOWUP-5.4",
+   "source": "platform",
+   "page": 138,
+   "area": "follow-ups (Book 4 5.4)",
+   "statement": "A follow-up after silence never carries new solutions",
+   "status": "DONE",
+   "code": [
+    "app/modules/pi/check_in.py::without_solutions"
+   ],
+   "tests": [
+    "tests/unit/test_pi_follow_up_no_ideas.py::test_a_quiet_follow_up_context_loses_every_solution_field",
+    "tests/unit/test_pi_follow_up_no_ideas.py::test_a_follow_up_that_still_carries_ideas_is_not_sent"
+   ],
+   "gap": "",
+   "owner": "",
+   "unit_tested": true
+  },
+  {
+   "id": "P-A8-STAMP",
+   "source": "platform",
+   "page": 11,
+   "area": "version stamp (Part A.8)",
+   "statement": "Every brain reply logs the prompt version, pack versions and build id that produced it",
+   "status": "DONE",
+   "code": [
+    "app/modules/pi/learning_audit.py::stamp_safely",
+    "app/modules/pi/learning_audit.py::build_id"
+   ],
+   "tests": [
+    "tests/unit/test_pi_reply_stamp.py::test_the_build_id_is_the_deployed_commit_and_never_a_secret",
+    "tests/unit/test_pi_reply_stamp.py::test_a_failing_stamp_never_fails_the_reply",
+    "tests/integration/test_pi_reply_stamp_flow.py::test_a_brain_reply_carries_its_prompt_and_build_version"
+   ],
+   "gap": "",
+   "owner": "",
+   "unit_tested": true
+  },
+  {
+   "id": "P-SUPERSESSION",
+   "source": "platform",
+   "page": 5,
+   "area": "which rule wins (Read this first)",
+   "statement": "The prompt handbook carries the platform spec's governing text, never a superseded listen-only rule",
+   "status": "DONE",
+   "code": [
+    "app/modules/pi/spec_handbook.py::superseded",
+    "app/modules/pi/spec_handbook.py::guidance"
+   ],
+   "tests": [
+    "tests/unit/test_pi_spec_supersession.py::test_the_guidance_never_carries_a_superseded_listen_only_rule",
+    "tests/unit/test_pi_spec_supersession.py::test_the_guidance_carries_the_governing_answer_first_rules",
+    "tests/unit/test_pi_spec_supersession.py::test_every_patch_still_applies_to_the_handbook_it_patches"
+   ],
+   "gap": "",
+   "owner": "",
+   "unit_tested": true
   }
  ]
 }
