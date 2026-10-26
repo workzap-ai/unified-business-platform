@@ -1,3 +1,4 @@
+# ruff: noqa: E501  (Roman Urdu replies read better unbroken)
 """The golden replies of docs/pi-saas/pi-golden-replies.md pass the reply linter in brain mode.
 
 They are the target voice (owner-approved, 2026-10-26): if the linter rejects one, either the
