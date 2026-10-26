@@ -446,7 +446,11 @@ class ProblemBook:
             facet = bool(subtype_now) and (
                 existing.category == category_now and existing.subtype == subtype_now
             )
-            overlap = facet_overlap(existing, title, [str(w) for w in note.user_words or []])
+            # Only across categories: the same category keeps the sub-type rule above, and two
+            # problems of one category the person (or a reviewer) may merge by hand stay apart.
+            overlap = existing.category != category_now and facet_overlap(
+                existing, title, [str(w) for w in note.user_words or []]
+            )
             if same or alike or facet or overlap:
                 # The first title stands: a second wording of the same symptom adds detail, it
                 # never renames the problem the person already saw confirmed.
