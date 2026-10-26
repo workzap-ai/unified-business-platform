@@ -22,6 +22,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from app.modules.pi import solution_rules, solutions, taxonomy  # noqa: E402
 
 OUT = Path(__file__).resolve().parents[1] / "app" / "modules" / "pi" / "packs" / "library"
+OVERLAY = OUT / "owner_rewrites.json"
 HEADER = re.compile(r"^(?P<name>[^\n(]+?)\s*\((?P<key>[a-z_]+)\)\s*$")
 NEEDS_REVIEW_WORDS = ("CCTV",)
 
@@ -68,12 +69,22 @@ def parse(text: str) -> dict[str, dict[str, object]]:
     return categories
 
 
+def overlay() -> dict[str, str]:
+    """The owner-approved rewrites, keyed by the spec's own idea text (see the file's note)."""
+    try:
+        return dict(json.loads(OVERLAY.read_text(encoding="utf-8")).get("rewrites") or {})
+    except (OSError, ValueError):
+        return {}
+
+
 def build(text: str) -> dict[str, object]:
     categories = parse(text)
     catalogue = set(solutions.CATALOGUE)
+    rewrites = overlay()
     out: dict[str, object] = {
-        "version": "1.0",
-        "source": "pi-platform-spec Book 2 Part 7.4",
+        "version": "1.1",
+        "source": "pi-platform-spec Book 2 Part 7.4; the quick ideas are rewritten with the owner's "
+        "approval (owner_rewrites.json), so they are not verbatim",
         "categories": {},
     }
     for key, parts in categories.items():
@@ -87,7 +98,15 @@ def build(text: str) -> dict[str, object]:
             if reasons:
                 dropped.append({"text": idea, "why": "; ".join(reasons)})
             else:
-                kept.append(idea[:1].upper() + idea[1:] + ".")
+                original = idea[:1].upper() + idea[1:] + "."
+                new = rewrites.get(original)
+                if new is None:
+                    kept.append(original)
+                    continue
+                check = solution_rules.check_idea(new)
+                if check.reject or check.review:
+                    raise SystemExit(f"owner rewrite fails the idea guard: {new} {check.reject}")
+                kept.append(new)
         keys = [
             k
             for k in re.findall(r"[a-z_]{4,}", str(parts["build"]).split(".")[0])

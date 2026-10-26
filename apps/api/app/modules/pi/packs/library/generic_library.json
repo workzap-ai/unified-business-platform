@@ -1,13 +1,13 @@
 {
- "version": "1.0",
- "source": "pi-platform-spec Book 2 Part 7.4",
+ "version": "1.1",
+ "source": "pi-platform-spec Book 2 Part 7.4; the quick ideas are rewritten with the owner's approval (owner_rewrites.json), so they are not verbatim",
  "categories": {
   "stock_inventory": {
    "ideas": [
-    "Keep a \"running low\" list at each counter that staff fill in.",
-    "Check expiry dates on the oldest stock first every Monday.",
-    "Move slow items to the front with a small offer before buying more.",
-    "Write every transfer between shops on a slip signed at both ends."
+    "Ask staff to message a photo of any shelf running low to one shared chat, so the buyer sees it straight away.",
+    "Check the expiry dates on the oldest stock first and move it to the front, so nothing is left to expire at the back.",
+    "Move slow items to the front with a small offer before buying more, so shelf space goes to what actually sells.",
+    "Send a photo of each transfer note in a shared chat before the goods leave, so a missing parcel is spotted quickly."
    ],
    "dropped": [
     {
@@ -25,9 +25,9 @@
   },
   "sales_revenue": {
    "ideas": [
-    "Compare each shop's sales day by day with the same day last week to see where the drop is.",
-    "Ask staff to note why browsing customers left without buying.",
-    "Try one offer on your slowest day and compare."
+    "Compare each shop's sales with the shop that sells best, so you can see where the drop is happening.",
+    "Ask staff to note why browsing customers left without buying, so you learn what stops the sale.",
+    "Try one offer on your slowest day and compare it with a normal one, so you see if it brings people in."
    ],
    "dropped": [
     {
@@ -44,10 +44,10 @@
   },
   "cash_collections": {
    "ideas": [
-    "Count cash at closing with two people and note it in one place.",
-    "Keep a list of everyone who owes, with date and amount, and send a polite reminder each week.",
-    "Deposit cash daily at a fixed time.",
-    "For COD, check each courier's statement against your orders every week."
+    "Count the cash at closing with two people and post the total in one shared chat, so a gap is seen at once.",
+    "Keep one shared list of who owes you and send a polite WhatsApp reminder, so nobody is forgotten.",
+    "Deposit the cash at the same fixed time every time, so it never sits around the shop.",
+    "For cash on delivery, check each courier's statement against your orders, so missing payments show up."
    ],
    "dropped": [],
    "build_keys": [
@@ -82,9 +82,9 @@
   },
   "customers_retention": {
    "ideas": [
-    "Collect every customer's WhatsApp number at billing (with their permission).",
-    "Message past customers when new stock arrives.",
-    "Reply to every review, good or bad, within a day."
+    "Collect every customer's WhatsApp number at billing, with their permission, so you can reach them again.",
+    "Message the past customers who agreed to hear from you when new stock arrives, so they come back first.",
+    "Reply politely to every review, good or bad, so new customers see that you listen."
    ],
    "dropped": [
     {
@@ -101,10 +101,10 @@
   },
   "marketing_leads": {
    "ideas": [
-    "Complete the Google Maps profile of every location (photos, timings, WhatsApp, category).",
-    "Put a code or \"show this message\" offer in every ad so you can tell which ad brings people.",
-    "Reply to every enquiry within an hour, even just \"we'll send details shortly\".",
-    "Stop the ads that bring no visits or enquiries after a fair test."
+    "Complete the Google Maps profile of every location with photos, timings and a WhatsApp number, so people find you and can ask you easily.",
+    "Put a code or a \"show this message\" offer in every ad, so you can tell which ad brings people.",
+    "Reply to every enquiry quickly, even with just \"we'll send details shortly\", so people do not go to the next shop.",
+    "Stop the ads that bring no visits or enquiries after a fair test, so the money goes to the ones that work."
    ],
    "dropped": [
     {
@@ -123,10 +123,10 @@
   },
   "orders_fulfilment": {
    "ideas": [
-    "Write every order in one list (even a shared sheet) instead of across chats.",
-    "Confirm COD orders on WhatsApp before dispatch.",
-    "Tell customers their delivery day upfront.",
-    "Note the reason for every return."
+    "Move every order from the different chats into one shared list, so none is missed or taken twice.",
+    "Confirm cash on delivery orders on WhatsApp before dispatch, so fewer parcels come back refused.",
+    "Tell customers their delivery day upfront, so they are not left guessing.",
+    "Note the reason for every return in one place, so you see what keeps going wrong."
    ],
    "dropped": [],
    "build_keys": [
@@ -138,9 +138,9 @@
   },
   "suppliers_purchasing": {
    "ideas": [
-    "Keep one list of open purchase orders with expected dates and follow up a day before.",
-    "Check quality on arrival and note problems with photos.",
-    "Buy based on what sold last month, not on the order booker's push."
+    "Keep open purchase orders in one shared list and message the supplier before the expected date, so a late delivery shows early.",
+    "Check quality when goods arrive and send a photo of any problem to the supplier, so it is fixed before you pay.",
+    "Buy based on what sold well recently, not on what the order booker pushes, so money is not tied up in slow stock."
    ],
    "dropped": [],
    "build_keys": [
@@ -152,10 +152,10 @@
   },
   "people_staff": {
    "ideas": [
-    "Put the shift schedule where everyone can see it a week ahead.",
-    "Use a short opening and closing checklist.",
-    "Share a weekly target with each shop and the result.",
-    "Have new staff shadow your best person for a few days."
+    "Put the shift schedule in the staff chat well ahead, so everyone knows when they work.",
+    "Ask staff to send a photo after each opening and closing check, so you can see it was done.",
+    "Share a target with each shop and the result in the team chat, so everyone sees how they are doing.",
+    "Have new staff shadow your best person at first, so they learn the right way from the start."
    ],
    "dropped": [],
    "build_keys": [
@@ -167,10 +167,10 @@
   },
   "operations_process": {
    "ideas": [
-    "Write the three most repeated tasks as simple steps.",
-    "Find the task you type twice and pick one place for it.",
-    "Set one person responsible for each recurring job.",
-    "Keep a maintenance log for key machines."
+    "Write the most repeated tasks as simple steps and share them in the staff chat, so anyone can do them the same way.",
+    "Find the task you type twice and pick one place for it, so you only enter it once.",
+    "Set one person responsible for each recurring job, so nothing is left for someone else to do.",
+    "Keep a maintenance log for key machines in a shared note, so a problem is caught before it stops work."
    ],
    "dropped": [],
    "build_keys": [
@@ -183,8 +183,8 @@
   },
   "reporting_visibility": {
    "ideas": [
-    "Have each shop send them by a fixed time in one format.",
-    "Compare with the same day last week."
+    "Have each shop send its key numbers in one format at a fixed time, so you can compare the shops easily.",
+    "Compare each shop's numbers with the best shop, so you see where to look first."
    ],
    "dropped": [
     {
@@ -200,8 +200,8 @@
   },
   "tech_systems": {
    "ideas": [
-    "List every tool you use and what you type into it.",
-    "Pick one place to be the main record."
+    "List every tool you use and what you type into it, so you see where the same thing is typed twice.",
+    "Pick one place to be the main record, so there is one version to trust."
    ],
    "dropped": [
     {
@@ -218,9 +218,9 @@
   },
   "quality_complaints": {
    "ideas": [
-    "Check a sample of every batch or job before it leaves.",
-    "Note each complaint with a photo and reason.",
-    "Share the top complaint with the team each week."
+    "Check a sample of every batch or job before it leaves, so a fault is caught before the customer sees it.",
+    "Note each complaint with a photo and the reason, so you can see what keeps repeating.",
+    "Share the top complaint with the team, so everyone works on the same fix."
    ],
    "dropped": [],
    "build_keys": [
@@ -231,7 +231,7 @@
   },
   "compliance_admin": {
    "ideas": [
-    "Keep documents in one folder by month."
+    "Keep documents in one shared folder by month on your phone, so nothing is hunted for later."
    ],
    "dropped": [
     {
@@ -246,9 +246,9 @@
   },
   "communication_coordination": {
    "ideas": [
-    "Use one group per purpose instead of one group for everything.",
-    "End each day with a short \"what's pending\" list.",
-    "Give every task one owner and a date."
+    "Use one group per purpose instead of one group for everything, so important messages are not lost.",
+    "Close the working day with a short \"what's pending\" message in the team chat, so nothing is forgotten.",
+    "Give every task one owner and a date, so everyone knows who is doing it and by when."
    ],
    "dropped": [],
    "build_keys": [
@@ -259,9 +259,9 @@
   },
   "loss_security": {
    "ideas": [
-    "Have two people at cash and stock counts.",
-    "Check voids and refunds daily.",
-    "Count high-value items more often."
+    "Have two people at cash and stock counts, so a mistake or a loss is seen by someone else too.",
+    "Check the voids and refunds regularly, so odd ones are noticed early.",
+    "Count high-value items more often than the rest, so a missing one shows up early."
    ],
    "dropped": [],
    "build_keys": [
@@ -273,8 +273,8 @@
   },
   "planning_growth": {
    "ideas": [
-    "Look at last year's peak season sales by week to plan stock.",
-    "Open a new branch only after the current one's numbers are clear month by month."
+    "Look at last season's sales by week to plan stock, so you buy for the busy and slow periods.",
+    "Open a new branch only after the current branch's numbers are clear, so the next one rests on facts."
    ],
    "dropped": [],
    "build_keys": [
@@ -286,8 +286,8 @@
   },
   "customer_experience_digital": {
    "ideas": [
-    "Add online booking or ordering if most enquiries ask the same thing.",
-    "Fix the website's contact button first."
+    "Add online booking or ordering if most enquiries ask the same thing, so customers can do it themselves.",
+    "Fix the website's contact button first, so interested people can reach you easily."
    ],
    "dropped": [
     {

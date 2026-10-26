@@ -65,3 +65,59 @@ def test_the_latest_problem_with_library_ideas_is_used() -> None:
     ]
     out = solution_context._from_library(chat, noted, "en")
     assert out is not None and chat.service_brief["solution_last_problem"] == "library:people_staff"
+
+
+def _builder():  # noqa: ANN202
+    import importlib.util
+    from pathlib import Path
+
+    path = Path(__file__).resolve().parents[2] / "scripts" / "build_generic_library.py"
+    spec = importlib.util.spec_from_file_location("build_generic_library", path)
+    module = importlib.util.module_from_spec(spec)  # type: ignore[arg-type]
+    spec.loader.exec_module(module)  # type: ignore[union-attr]
+    return module
+
+
+def test_every_library_idea_is_what_to_do_so_the_benefit_in_one_short_plain_sentence() -> None:
+    import re
+
+    from app.modules.pi import constitution
+
+    time_words = re.compile(
+        r"\b(?:today|tomorrow|tonight|daily|weekly|monthly|this week|next week|every "
+        r"(?:day|week|monday|month)|each week|per week|within a day|an hour|overnight)\b",
+        re.IGNORECASE,
+    )
+    for key, entry in solution_library.load().items():
+        for idea in entry["ideas"]:
+            assert ", so " in idea and len(idea.split()) <= 28, (key, idea)
+            assert not time_words.search(idea), (key, idea)
+            assert not constitution.TIMELINE_STRONG.search(idea.lower()), (key, idea)
+
+
+def test_the_owner_rewrites_survive_a_rebuild_from_the_spec_text() -> None:
+    builder = _builder()
+    spec_text = (
+        "Library by category\n"
+        "Paperwork (compliance_admin)\n"
+        "Quick ideas: keep a calendar of every licence, renewal and filing date · keep documents in one "
+        "folder by month.\n"
+        "Workzap would build: workflow_automation (reminders, document checklists).\n"
+        "Never say: what the law requires.\n"
+        "Part 8 Deep playbook\n"
+    )
+    rebuilt = builder.build(spec_text)["categories"]["compliance_admin"]["ideas"]  # type: ignore[index]
+    assert rebuilt == [
+        "Keep documents in one shared folder by month on your phone, so nothing is hunted for later."
+    ]
+    assert "owner" in builder.build(spec_text)["source"]  # type: ignore[operator]
+
+
+def test_the_overlay_names_the_deviation_from_the_spec() -> None:
+    import json
+    from pathlib import Path
+
+    data = json.loads(
+        (Path(solution_library.LIBRARY).parent / "owner_rewrites.json").read_text(encoding="utf-8")
+    )
+    assert "not verbatim" in data["note"] and len(data["rewrites"]) == 51
