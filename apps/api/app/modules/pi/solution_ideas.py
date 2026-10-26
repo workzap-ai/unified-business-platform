@@ -58,7 +58,9 @@ def _words(text: str) -> set[str]:
     }
 
 
-RELEVANT_AT = 3  # content words of theirs, from which a match must share at least one with its entry
+RELEVANT_AT = (
+    3  # content words of theirs, from which a match must share at least one with its entry
+)
 
 
 def relevant(entry: dict[str, Any], words: str) -> bool:

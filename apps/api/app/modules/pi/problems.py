@@ -171,6 +171,27 @@ def same_symptom(a: str, b: str, threshold: float = 0.8) -> bool:
     return len(smaller) >= 3 and smaller <= larger
 
 
+GENERIC_TOKENS = frozenset(
+    "problem problems issue issues customer customers business orders order sales sale kam hai "
+    "hain nahi mein that this with from have when they them what about very more less".split()
+)
+
+
+def facet_overlap(existing: PiProblem, title: str, user_words: list[str] | None = None) -> bool:
+    """The same symptom told with other words (spec 4.3, the facet rule with the word overlap the
+    owner approved): three content words in common, or two that are half of the shorter one's, in
+    any category, because the model files "price asked, then silence" under sales, customers and
+    marketing in turn."""
+    old = _tokens(" ".join([existing.title, *[str(w) for w in existing.user_words or []]]))
+    new = _tokens(" ".join([title, *(user_words or [])]))
+    old = {w for w in old if len(w) >= 4 and w not in GENERIC_TOKENS}
+    new = {w for w in new if len(w) >= 4 and w not in GENERIC_TOKENS}
+    common = old & new
+    return len(common) >= 3 or (
+        len(common) >= 2 and len(common) / max(1, min(len(old), len(new))) >= 0.5
+    )
+
+
 def json_safe(value: Any) -> Any:
     """`value` as something a JSONB column can store (UUIDs, dates and decimals become text)."""
     if isinstance(value, UUID | Decimal):
@@ -425,7 +446,8 @@ class ProblemBook:
             facet = bool(subtype_now) and (
                 existing.category == category_now and existing.subtype == subtype_now
             )
-            if same or alike or facet:
+            overlap = facet_overlap(existing, title, [str(w) for w in note.user_words or []])
+            if same or alike or facet or overlap:
                 # The first title stands: a second wording of the same symptom adds detail, it
                 # never renames the problem the person already saw confirmed.
                 await self.update(
@@ -782,6 +804,8 @@ async def noted_context(
 
 # --- the S4 summary ---------------------------------------------------------------------
 
+ARABIC_SCRIPT = re.compile(r"[؀-ۿ]")
+
 SUMMARY_TEXT = {
     "en": (
         "Here's what I've noted and sorted so far. None of it is solved yet.",
@@ -822,11 +846,14 @@ def summary_message(problems: list[dict[str, Any]], language: str = "en") -> str
     hidden = 0
     for key in order:
         items = sorted(groups[key], key=lambda i: -float(i.get("score") or 0))
-        lines.append(f"*{names.get(key) or taxonomy.label(key, language)}* ({len(items)})")
+        heading = names.get(key) if language == "en" else ""
+        lines.append(f"*{heading or taxonomy.label(key, language)}* ({len(items)})")
         shown = items[:2] if long else items
         hidden += len(items) - len(shown)
         for item in shown:
             own = str(item.get("title_local") or "") if language != "en" else ""
+            if own and bool(ARABIC_SCRIPT.search(own)) != (language in ("ur", "ar")):
+                own = ""  # a title in another script than the chat's is not shown in it
             words = (own or str(item["title"])).split()[:SUMMARY_LINE_WORDS]
             lines.append("• " + " ".join(words))
         lines.append("")

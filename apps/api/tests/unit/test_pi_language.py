@@ -100,3 +100,20 @@ def test_short_english_looking_answers_keep_a_roman_urdu_chat_in_roman_urdu() ->
     sentence = said("Actually can we continue this conversation in English please")
     found = reply_language(SimpleNamespace(), sentence, rows)  # type: ignore[arg-type]
     assert found["reply_language"] == "en"
+
+
+def test_a_mixed_roman_urdu_message_keeps_the_roman_urdu_chat() -> None:
+    """Live test 3: "Dono mai whatsapp and instagram but mostly instagram" got an English reply."""
+    from types import SimpleNamespace
+
+    from app.modules.pi.service_conversation import reply_language
+
+    def said(body: str) -> SimpleNamespace:
+        return SimpleNamespace(sender_type="customer", message_type="text", body=body)
+
+    rows = [said("Log DM mein price poochte hain phir reply nahi aata"), said("Hello")]
+    mixed = said("Dono mai whatsapp and instagram but mostly instagram")
+    assert reply_language(SimpleNamespace(), mixed, rows)["reply_language"] == "roman_ur"  # type: ignore[arg-type]
+    # A whole English sentence with no Roman Urdu word still switches, as before.
+    english = said("Actually can we continue this conversation in English please")
+    assert reply_language(SimpleNamespace(), english, rows)["reply_language"] == "en"  # type: ignore[arg-type]

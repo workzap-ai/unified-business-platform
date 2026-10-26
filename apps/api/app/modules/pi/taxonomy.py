@@ -25,43 +25,43 @@ def _c(key: str, en: str, roman_ur: str, ur: str, ar: str, subtypes: str) -> Cat
 
 
 CATEGORIES: tuple[Category, ...] = (
-    _c("stock_inventory", "Stock", "Maal / Stock", "اسٹاک", "المخزون",
+    _c("stock_inventory", "Stock", "Maal", "اسٹاک", "المخزون",
        "stockout overstock_dead_stock shrinkage_theft count_mismatch transfers_lost expiry_wastage "
        "wrong_location slow_replenishment no_visibility returns_handling serial_batch_tracking "
        "raw_material_shortage"),
-    _c("sales_revenue", "Sales", "Sale", "سیل", "المبيعات",
+    _c("sales_revenue", "Sales", "Bikri", "سیل", "المبيعات",
        "sales_drop branch_underperforming target_missed seasonal_dip conversion_low basket_small "
        "pricing_errors discount_abuse salesforce_performance no_sales_visibility channel_conflict"),
-    _c("cash_collections", "Cash & payments", "Paisa / Cash", "نقد", "النقد والتحصيل",
+    _c("cash_collections", "Cash & payments", "Paisa aur wusooli", "نقد", "النقد والتحصيل",
        "cash_mismatch receivables_late credit_customers cash_handling_risk deposit_delays "
        "payment_methods cash_flow_tight supplier_payments_late petty_cash refunds cod_remittance"),
-    _c("margin_cost", "Margin & costs", "Munafa / Kharcha", "منافع", "الهامش والتكاليف",
+    _c("margin_cost", "Margin & costs", "Munafa aur kharcha", "منافع", "الهامش والتكاليف",
        "margin_unknown margin_shrinking cost_overruns wastage_cost utility_costs rent freight_costs "
        "price_increases_supplier currency_exposure hidden_costs"),
-    _c("customers_retention", "Customers", "Customers / Gahak", "گاہک", "العملاء",
+    _c("customers_retention", "Customers", "Gahak", "گاہک", "العملاء",
        "repeat_low complaints reviews_bad no_customer_data slow_response service_quality loyalty "
        "churn_subscription customer_communication after_sales"),
-    _c("marketing_leads", "Marketing & leads", "Marketing / Leads", "مارکیٹنگ", "التسويق",
+    _c("marketing_leads", "Marketing & leads", "Ishtehaar aur naye gahak", "مارکیٹنگ", "التسويق",
        "few_leads lead_quality ad_spend_waste no_tracking social_media_inconsistent brand_awareness "
        "lead_followup_slow campaign_roi_unknown website_issues marketplace_visibility"),
-    _c("orders_fulfilment", "Orders & delivery", "Order / Delivery", "آرڈر", "الطلبات والتوصيل",
+    _c("orders_fulfilment", "Orders & delivery", "Order aur delivery", "آرڈر", "الطلبات والتوصيل",
        "orders_lost order_errors delivery_late delivery_cost rider_management returns_rto "
        "order_tracking packing_errors multi_channel_orders pre_orders_custom"),
-    _c("suppliers_purchasing", "Suppliers & buying", "Supplier / Khareed", "سپلائر",
+    _c("suppliers_purchasing", "Suppliers & buying", "Supplier aur khareed", "سپلائر",
        "الموردون والمشتريات",
        "supplier_late supplier_quality po_tracking buying_wrong_items price_comparison "
        "import_delays minimum_orders supplier_communication credit_terms"),
-    _c("people_staff", "Staff", "Staff / Log", "عملہ", "الموظفون",
+    _c("people_staff", "Staff", "Staff", "عملہ", "الموظفون",
        "attendance_lateness turnover hiring_difficulty training performance_unknown accountability "
        "payroll_errors shift_scheduling commission_disputes communication_internal trust_honesty "
        "overtime"),
     _c("operations_process", "Operations", "Kaam ka tareeqa", "آپریشنز", "العمليات",
        "manual_work duplicate_entry bottleneck approvals_slow no_sop quality_inconsistent capacity "
        "maintenance_downtime checklists_not_done handoffs"),
-    _c("reporting_visibility", "Reports & visibility", "Report / Hisaab", "رپورٹس", "التقارير",
+    _c("reporting_visibility", "Reports & visibility", "Report aur hisaab", "رپورٹس", "التقارير",
        "reports_late reports_wrong data_scattered no_dashboard owner_blind branch_comparison "
        "kpi_undefined manual_reports"),
-    _c("tech_systems", "Systems & tools", "System / Software", "سسٹم", "الأنظمة",
+    _c("tech_systems", "Systems & tools", "System aur software", "سسٹم", "الأنظمة",
        "pos_issues software_not_connected outdated_system no_system system_downtime vendor_lock "
        "whatsapp_overload excel_dependency data_loss user_adoption integration_marketplace"),
     _c("quality_complaints", "Quality", "Quality", "معیار", "الجودة",
@@ -72,7 +72,7 @@ CATEGORIES: tuple[Category, ...] = (
     _c("communication_coordination", "Coordination", "Rabta", "رابطہ", "التنسيق",
        "info_lost_in_whatsapp branches_not_aligned owner_bottleneck meetings_wasteful tasks_dropped "
        "field_team_visibility"),
-    _c("loss_security", "Loss & security", "Chori / Nuksan", "نقصان", "الفقد والأمن",
+    _c("loss_security", "Loss & security", "Chori aur nuksan", "نقصان", "الفقد والأمن",
        "theft_internal theft_external fraud cash_leakage cctv_gaps void_refund_abuse"),
     _c("planning_growth", "Planning & growth", "Planning", "منصوبہ بندی", "التخطيط والنمو",
        "expansion_pains forecasting budgeting_process new_branch_setup franchise_control "

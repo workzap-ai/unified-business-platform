@@ -40,7 +40,7 @@ def test_every_industry_pack_problem_uses_a_master_category():
 
 def test_labels_follow_the_language_and_unknown_keys_fall_back():
     assert taxonomy.label("stock_inventory") == "Stock"
-    assert taxonomy.label("stock_inventory", "roman_ur") == "Maal / Stock"
+    assert taxonomy.label("stock_inventory", "roman_ur") == "Maal"
     assert taxonomy.label("cash_collections", "ar") == "النقد والتحصيل"
     assert taxonomy.label("nonsense", "en") == "Other"
     assert taxonomy.normalise_category("sales_revenue") == "sales_revenue"
@@ -204,7 +204,7 @@ def test_a_summary_line_is_ten_words_at_most():
 
 def test_the_summary_speaks_the_persons_language():
     roman = problems.summary_message(items(("stock_inventory", "Maal khatam", 1)), "roman_ur")
-    assert "Ab tak jo maine note aur sort kiya hai" in roman and "*Maal / Stock* (1)" in roman
+    assert "Ab tak jo maine note aur sort kiya hai" in roman and "*Maal* (1)" in roman
     assert roman.endswith("Kuch ghalat hai ya reh gaya hai?")
     assert "*اسٹاک* (1)" in problems.summary_message(items(("stock_inventory", "x", 1)), "ur")
     assert "*المخزون* (1)" in problems.summary_message(items(("stock_inventory", "x", 1)), "ar")
