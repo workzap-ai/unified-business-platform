@@ -61,7 +61,10 @@ from app.modules.pi import (
 from app.modules.pi.guard import ReplyRejected, validate_reply
 from app.modules.pi.knowledge import KnowledgeService, remember
 from app.modules.pi.language import (
+    ENGLISH,
+    LATIN_WORD,
     NAMES,
+    ROMAN_URDU,
     asked_language,
     clearly_other,
     detect_language,
@@ -3427,6 +3430,15 @@ _SHORT_WORDS = (
 AMBIGUOUS_SHORT = re.compile(rf"^\W*(?:(?:{_SHORT_WORDS})\b\W*){{1,3}}$", re.IGNORECASE)
 
 
+def _code_mixed(text: str) -> bool:
+    """Roman Urdu with English words in it: at least one Urdu word and at most one more English
+    word than Urdu ones (a plain English message has no Urdu word)."""
+    words = LATIN_WORD.findall(text.lower())
+    urdu = sum(word in ROMAN_URDU for word in words)
+    english = sum(word in ENGLISH for word in words)
+    return urdu >= 1 and english - urdu <= 1
+
+
 def reply_language(
     conversation: PiConversation,
     message: PiMessage,
@@ -3469,6 +3481,10 @@ def reply_language(
         and len(re.findall(r"[^\W\d_]+", texts[0])) <= 3
         and "roman_ur" in detected[1:]
     ):
+        detected[0] = None
+    # A code-mixed message ("Dono mai whatsapp and instagram but mostly instagram") that has a Roman
+    # Urdu word and about as many English words as Urdu ones follows the chat's Roman Urdu too.
+    if detected and detected[0] == "en" and "roman_ur" in detected[1:] and _code_mixed(texts[0]):
         detected[0] = None
     language = next(
         (found for found in detected if found),

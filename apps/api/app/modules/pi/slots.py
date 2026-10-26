@@ -43,6 +43,17 @@ STOP_OTHER_SCRIPT = frozenset(
     " هل ما هو هي في من على إلى عن أو هذا هذه كان كيف متى"
     " است را در به از که یا آیا شما کدام چه چرا چگونه".split()
 )
+# Roman Urdu words for the same ideas an English question uses, so a repeat is found across the two.
+CONCEPTS = {
+    "baad": "after", "hota": "happen", "hoti": "happen", "hote": "happen", "hotay": "happen",
+    "hoga": "happen", "hogi": "happen", "hua": "happen", "pooch": "ask", "puch": "ask",
+    "poochte": "ask", "puchte": "ask", "poochty": "ask", "puchty": "ask", "poochta": "ask",
+    "puchta": "ask", "poochna": "ask", "raqam": "price", "qeemat": "price", "keemat": "price",
+    "rate": "price", "kahan": "where", "kyun": "why", "kyon": "why", "log": "people",
+    "logon": "people", "kitne": "many", "kitni": "many", "kitna": "much", "dukaan": "shop",
+    "dukan": "shop", "dukanain": "shop", "dukaanain": "shop", "gahak": "customer",
+    "mahine": "month", "hafte": "week", "roz": "daily", "rozana": "daily",
+}  # fmt: skip
 WORD_SPLIT = re.compile(r"[^\ẁ-ًͯ-ٟऀ-ॿ‌]+")
 
 
@@ -77,7 +88,8 @@ def words(question: str) -> frozenset[str]:
         if re.fullmatch(r"[a-zÀ-ɏ']+", token):  # Latin: fold accents, drop stop words
             word = industry_packs._fold(token)
             if len(word) >= 3 and word not in STOP and re.fullmatch(r"[a-z]+", word):
-                found.add(industry_packs._stem(word))
+                stem = industry_packs._stem(word)
+                found.add(CONCEPTS.get(stem, stem))
         elif len(token) >= 3 and token not in STOP_OTHER_SCRIPT:
             found.add(industry_packs._arabic_stem(token.replace("‌", "")))
     return frozenset(found)
