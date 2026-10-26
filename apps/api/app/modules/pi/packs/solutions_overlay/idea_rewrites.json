@@ -1,0 +1,201 @@
+{
+ "note": "Owner-approved on 2026-10-26: quick ideas of the industry packs rewritten so they pass the reply rules when pi says them (no time words inside advice, no brand or tool wording). Keyed by the spec's own sentence; solutions.load applies it, so a rebuild of the packs keeps it. Not verbatim from the PDF.",
+ "rewrites": {
+  "aircraft_maintenance_and_parts": {
+   "Send each customer a progress update on a set day this week, so they stop needing to call": "Send each customer a short progress update at each stage of the job, so they stop needing to call"
+  },
+  "architects_and_engineering_consultancies": {
+   "Make marking a stage complete the trigger to tell accounts the same day.": "Make marking a stage complete the trigger that tells accounts straight away."
+  },
+  "books_stationery_and_school_supplies": {
+   "Note the machine counter at open and close for one week, because it shows what should be in the till": "Note the machine counter at open and close, because it shows what should be in the till"
+  },
+  "bridal_wear_and_couture_designers": {
+   "List decisions waiting on you for a week, so you see which ones others could take": "List the decisions waiting on you, so you see which ones others could take"
+  },
+  "business_setup_and_pro_services": {
+   "List everything expiring across your managed companies in the next two months, so nothing urgent is missed": "List everything about to expire across your managed companies, so nothing urgent is missed"
+  },
+  "catering_and_event_food": {
+   "Reply to every enquiry the same day, even if only to say when the quote will come.": "Reply to every enquiry promptly, even if only to say when the quote will come."
+  },
+  "charter_and_private_aviation": {
+   "Ask freelancers for next month's free dates once, so you have it on paper": "Ask freelancers for their free dates once, so you have it on paper"
+  },
+  "cleaning_and_janitorial_companies": {
+   "Record what each team or site is issued this week, so usage can be compared": "Record what each team or site is issued, so usage can be compared"
+  },
+  "clinics_and_gp_practices": {
+   "Send tomorrow's booked patients a one-time confirmation of time and place, so cancellations surface the night before": "Send booked patients a one-time confirmation of time and place beforehand, so cancellations surface early",
+   "Mark every no-show in the register for a week, so you can see which sessions suffer most.": "Mark every no-show in the register, so you can see which sessions suffer most.",
+   "Ask for a reason against each free visit this week, so you can see how often it happens.": "Ask for a reason against each free visit, so you can see how often it happens."
+  },
+  "cloud_kitchens_and_virtual_brands": {
+   "Invite repeat customers to order direct on WhatsApp where your app terms allow, with their permission, so you start owning the relationship": "Invite repeat customers to order direct on WhatsApp, with their permission, so you start owning the relationship"
+  },
+  "co_working_spaces": {
+   "Send each overdue member a statement this week, so payment is requested.": "Send each overdue member a statement, so payment is requested."
+  },
+  "crop_farming": {
+   "Note the tractor and tube-well hours beside each diesel fill for one week, so you can see whether fills match running time": "Note the tractor and tube-well hours beside each diesel fill, so you can see whether fills match running time"
+  },
+  "customs_clearing_agents": {
+   "Send each client one status update a day at a fixed time, so they stop calling to ask": "Send each client regular status updates, so they stop calling to ask"
+  },
+  "dropshipping_and_social_commerce_sellers": {
+   "Ask the supplier to send the tracking number per order the same day": "Ask the supplier to send the tracking number per order straight away"
+  },
+  "duty_free_and_airport_retail": {
+   "Note what sells out first in the morning wave for a week, because it shows what the night team should bring": "Note what sells out first, because it shows what the night team should bring"
+  },
+  "edtech_and_online_course_businesses": {
+   "Write down every place your team copies the same data by hand from one tool to another, so you see the real load": "Write down every place your team copies the same data by hand from one place to another, so you see the real load"
+  },
+  "electricity_and_power_contractors": {
+   "Sign tools out and back in by crew, so each has a holder": "Sign equipment out and back in by crew, so each has a holder",
+   "Count tools at the end of each week, so losses are found early.": "Count the equipment regularly, so losses are found early."
+  },
+  "fast_food_and_qsr_chains": {
+   "Note time out and back for each trip for a few days, so fuel claims can be compared with real trips": "Note the time out and back for each trip, so fuel claims can be compared with real trips"
+  },
+  "florists_and_gifting": {
+   "Work out how many boxes your team really makes in a day, because it sets honest deadlines": "Work out how many boxes your team really makes, because it sets honest deadlines"
+  },
+  "fmcg_distributors_and_sub_distributors": {
+   "Walk the godown once and list what expires in the next few weeks, so it can be pushed on routes in time": "Walk the godown and list what is close to expiry, so it can be pushed on routes in time"
+  },
+  "food_delivery_operators_and_dark_stores": {
+   "Compare a week of fuel claims with trips done, so you see if there's a real gap": "Compare fuel claims with trips done, so you see if there's a real gap"
+  },
+  "freelancers_solopreneurs_and_home_based_businesses": {
+   "Note your hours on every job this week, so you see what each one really takes": "Note your hours on every job, so you see what each one really takes"
+  },
+  "furniture_and_home_decor_retail": {
+   "List decisions waiting on you for a week, so you see which ones others could take": "List the decisions waiting on you, so you see which ones others could take"
+  },
+  "game_studios_and_app_businesses": {
+   "Review each live project's hours against its estimate once a week.": "Review each live project's hours against its estimate regularly.",
+   "List every recurring tool and cloud cost once with its owner": "List every recurring subscription and online cost once with its owner"
+  },
+  "generator_sales_rental_and_service": {
+   "Ask for a photo of each signed job sheet the same day, so the office knows it is done": "Ask for a photo of each signed job sheet straight away, so the office knows it is done"
+  },
+  "guest_houses_b_and_bs_and_holiday_home_hosts": {
+   "Send each cleaner tomorrow's turnovers the evening before, so mornings don't depend on your messages": "Send each cleaner the list of turnovers ahead of time, so mornings don't depend on your messages",
+   "Note the questions you answered most this week, since a handful usually make up most messages": "Note the questions you answered most, since a handful usually make up most messages"
+  },
+  "hatcheries": {
+   "Take a month's figures to the supplier.": "Take the figures to the supplier."
+  },
+  "hotels": {
+   "Share tomorrow's expected check-outs with housekeeping tonight, so they can plan the morning.": "Share the expected check-outs with housekeeping ahead of time, so they can plan."
+  },
+  "housing_society_and_building_management": {
+   "Record diesel received and generator run hours side by side for a week, so usage can be compared": "Record diesel received and generator run hours side by side, so usage can be compared"
+  },
+  "hr_and_recruitment_agencies": {
+   "Ask each recruiter to move their active candidates into the shared list, with the candidates' permission, so the agency holds the pipeline": "Ask each recruiter to move their active candidates into the shared list, with the candidates' permission, so the agency holds all its candidates"
+  },
+  "hvac_ac_sales_installation_and_service": {
+   "Match each technician's cash to their completed jobs at day's end, so gaps show the same day": "Match each technician's cash to their completed jobs at closing, so gaps show up fast"
+  },
+  "interior_design_and_fit_out": {
+   "Pick one fixed day a week to send each client a short update with photos": "Send each client a short update with photos at each stage, so they know where the job stands"
+  },
+  "it_services_and_software_houses": {
+   "Ask the team to log time daily for one week, so you can compare it with the Friday version": "Ask the team to log time as they work, so you can compare it with the version rebuilt later"
+  },
+  "kiryana_corner_shops_and_convenience_stores": {
+   "Write down the few things only you know (rates, wholesaler numbers, udhaar limits), so someone else can run a day": "Write down the few things only you know (rates, wholesaler numbers, udhaar limits), so someone else can run the shop"
+  },
+  "law_firms": {
+   "Send each client with a balance one statement this week, so the amount is in front of them.": "Send each client with a balance a statement, so the amount is in front of them."
+  },
+  "managed_it_support_and_cybersecurity_firms": {
+   "Ask engineers to send a short end-of-day list of visits for one week, so you get a first picture": "Ask engineers to send a short list of their visits when they finish, so you get a first picture"
+  },
+  "management_consultancies": {
+   "Go through every proposal sent in the last three months once and mark it live, lost or unknown, so you see the real pipeline": "Go through every proposal sent and mark it live, lost or unknown, so you see what is really open",
+   "Ask the team to note time daily for one week, so you can compare it with the usual month-end version": "Ask the team to note their time as they work, so you can compare it with the version rebuilt at month end"
+  },
+  "marketing_creative_and_digital_agencies": {
+   "Put an approval-needed-by date on everything you send this week, so delays are visible": "Put an approval-needed-by date on everything you send, so delays are visible",
+   "Check next week's content calendar against what's actually ready, so gaps are caught now": "Check the content calendar against what's actually ready, so gaps are caught early"
+  },
+  "microfinance_field_operations": {
+   "Review planned versus completed visits every evening, so a missed visit surfaces the same day, not a week later.": "Review planned versus completed visits when the day ends, so a missed visit surfaces quickly."
+  },
+  "money_exchange_and_remittance_agents": {
+   "Note how long each report takes for a week, so you see where the time goes.": "Note how long each report takes, so you see where the time goes."
+  },
+  "new_car_dealerships_and_showrooms": {
+   "Gather this week's leads from every source onto one list with a consultant against each, so you can see how many went quiet": "Gather leads from every source onto one list with a consultant against each, so you can see how many went quiet",
+   "Ask each branch for it every evening for a week, so you can compare them.": "Ask each branch for it in the same format, so you can compare them."
+  },
+  "oil_and_gas_services_contractors": {
+   "Compare budget with actual cost on one live project this week, so you see how far it has moved": "Compare budget with actual cost on one live project, so you see how far it has moved"
+  },
+  "overseas_employment_promoters_and_manpower_agencies": {
+   "Note for one day every decision people bring to you, so you see which ones could be delegated": "Note every decision people bring to you, so you see which ones could be delegated"
+  },
+  "pest_control": {
+   "Call those ending in the next couple of months.": "Call those whose contract is about to end."
+  },
+  "pharmacies_and_medical_stores": {
+   "Count a day's WhatsApp orders and how many were delivered, because it shows the leak": "Count the WhatsApp orders and how many were delivered, because it shows the leak"
+  },
+  "printing_presses_and_print_on_demand": {
+   "Note the make-ready sheets on each job card for one week, so you get a first real picture of waste": "Note the make-ready sheets on each job card, so you get a first real picture of waste"
+  },
+  "private_schools_and_school_chains": {
+   "Match one week of bank statement against the fee register by hand, so you can see how big the gap really is.": "Match the bank statement against the fee register by hand, so you can see how big the gap really is."
+  },
+  "property_developers": {
+   "Pull next month's due instalments into one list now, so follow-up can start before the date": "Pull the upcoming due instalments into one list now, so follow-up can start before the date"
+  },
+  "real_estate_agencies_and_brokers": {
+   "Ask every agent to put active deals in one shared office list by Friday": "Ask every agent to put active deals in one shared office list"
+  },
+  "restaurants": {
+   "Have the closing cook note what is thrown away for a week, because you can't cut what you haven't seen": "Have the closing cook note what is thrown away, because you can't cut what you haven't seen"
+  },
+  "retail_shops_and_chains": {
+   "Ask all branches for those same numbers once this week, so you can compare them side by side for the first time.": "Ask all branches for those same numbers, so you can compare them side by side for the first time."
+  },
+  "security_guard_companies": {
+   "Ask supervisors to send a photo from each site they visit tonight, so rounds leave a record": "Ask supervisors to send a photo from each site they visit, so rounds leave a record"
+  },
+  "study_abroad_and_education_consultants": {
+   "Send current files a status update once this week, so calls drop.": "Send current files a status update, so calls drop."
+  },
+  "supermarkets_and_hypermarkets": {
+   "Write down leftover bread and dairy by item for a week, so orders can follow real sales instead of a fixed quantity": "Write down leftover bread and dairy by item, so orders can follow real sales instead of a fixed quantity",
+   "Look at a few days of receipts to see what regulars usually buy together.": "Look at recent receipts to see what regulars usually buy together."
+  },
+  "tailoring_and_alteration_shops": {
+   "Work out how many pieces your team really finishes in a week, so you know your limit": "Work out how many pieces your team really finishes, so you know your limit"
+  },
+  "textile_spinning_and_weaving_mills": {
+   "Ask the weaving master for one list of looms due for a new beam in the next few days and give it to preparation, so warping works to real need": "Ask the weaving master for one list of looms due for a new beam and give it to preparation, so warping works to real need"
+  },
+  "tractor_and_farm_machinery_dealers_and_rental": {
+   "Record every fill with machine and hour reading for one week, so fills can be checked against work done": "Record every fill with machine and hour reading, so fills can be checked against work done"
+  },
+  "trucking_and_goods_transport_companies": {
+   "Note the odometer reading at each fuel-up for a week, so litres can be compared with distance": "Note the odometer reading at each fuel-up, so litres can be compared with distance"
+  },
+  "tunnel_greenhouse_and_vegetable_farming": {
+   "Note meter and generator hours once a week, so you can see which month and source costs most": "Note meter and generator hours regularly, so you can see which source costs most"
+  },
+  "typing_translation_and_attestation_centres": {
+   "Send each a statement this week, so the amount is in front of them.": "Send each a statement, so the amount is in front of them."
+  },
+  "vocational_and_skills_institutes": {
+   "Count the store once this week and compare with what the practicals should have used, so you know the real gap": "Count the store and compare with what the practicals should have used, so you know the real gap",
+   "Number every tool once, so each one can be traced": "Number every piece of equipment once, so each one can be traced"
+  },
+  "waste_collection_and_sanitation_services": {
+   "Send reminders a few days before the due date, with residents' permission, so payment is front of mind.": "Send reminders ahead of the due date, with residents' permission, so payment is front of mind."
+  }
+ }
+}

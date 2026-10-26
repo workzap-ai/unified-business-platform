@@ -19,6 +19,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.modules.pi import (
     learning,
+    solution_lint,
     solution_rules,
     solution_score,
     solution_versions,
@@ -208,13 +209,12 @@ async def ensure_arms(session: AsyncSession, scope: WorkspaceScope, industry_key
     if seed is None:
         return 0
     await solution_versions.ensure_base(session, scope, industry_key)
-    have = set(
-        await session.scalars(
-            select(PiIdeaArm.arm_key).where(
-                *_where_arm(scope), PiIdeaArm.industry_key == industry_key
-            )
+    have = {
+        row.arm_key: row
+        for row in await session.scalars(
+            select(PiIdeaArm).where(*_where_arm(scope), PiIdeaArm.industry_key == industry_key)
         )
-    )
+    }
     added = 0
     for problem in seed["problems"]:
         extras = {i.arm_id: i for i in solutions.ideas(industry_key, problem) if i.extra}
@@ -226,6 +226,12 @@ async def ensure_arms(session: AsyncSession, scope: WorkspaceScope, industry_key
             wanted.append((f"{industry_key}:{problem['id']}:ask1", problem["ask_first"], ASK))
         for key, text, kind in wanted:
             if key in have:
+                # a seed idea the owner rewrote since it was stored keeps its record, with new words
+                current = have[key]
+                if current.source in ("seed", "seed_extra") and current.text != text[:500]:
+                    current.text = text[:500]
+                    current.language = detect_language(text) or "en"
+                    current.kind = kind
                 continue
             arm = PiIdeaArm(
                 tenant_id=scope.tenant_id,
@@ -333,7 +339,7 @@ async def choose(
         for m in memory
         if m.reaction in ("rejected", "generic") and m.idea_arm_id in by_id
     }
-    pool = [r for r in rows if r.id not in seen]
+    pool = [r for r in rows if r.id not in seen and solution_lint.passes(r.text)]
     # the owner's own language first; the other language only when it is all that is left
     same = [r for r in pool if r.language == language]
     pool = same if len(same) >= 1 else pool

@@ -228,7 +228,28 @@ def load(industry_key: str) -> dict[str, Any] | None:
         have = list(data.get("problems") or [])
         known = {str(p.get("id")) for p in have}
         data = {**data, "problems": [*have, *[p for p in added if p["id"] not in known]]}
+    changes = idea_rewrites().get(industry_key)
+    if changes:  # owner-approved rewrites of a quick idea, keyed by the spec's own sentence
+        data = {
+            **data,
+            "problems": [
+                {**p, "quick_ideas": [changes.get(i, i) for i in p.get("quick_ideas") or []]}
+                if p.get("quick_ideas")
+                else p
+                for p in data.get("problems") or []
+            ],
+        }
     return data
+
+
+@lru_cache(maxsize=1)
+def idea_rewrites() -> dict[str, dict[str, str]]:
+    """{industry: {the spec's idea sentence: the owner-approved rewrite}} (packs/solutions_overlay/
+    idea_rewrites.json). Applied by `load`, so a rebuild of the packs from the PDF keeps them."""
+    path = OVERLAY_DIR / "idea_rewrites.json"
+    if not path.exists():
+        return {}
+    return dict(json.loads(path.read_text(encoding="utf-8")).get("rewrites") or {})
 
 
 @lru_cache(maxsize=1)
