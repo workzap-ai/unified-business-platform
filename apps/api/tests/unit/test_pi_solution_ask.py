@@ -333,3 +333,23 @@ def test_a_live_roman_urdu_promise_that_the_document_is_being_prepared_is_caught
     assert not PROMISED_DOCUMENT.search(
         "Kya aap in sab ke liye solution document aur quote chahenge?"
     )
+
+
+def test_a_chat_that_began_before_brain_mode_is_told_once_that_pi_is_an_ai() -> None:
+    from types import SimpleNamespace
+
+    from app.modules.pi.service_conversation import brain_context
+
+    policy = SimpleNamespace(response_rules={"pi_mode": "brain"})
+
+    def ai(body: str) -> SimpleNamespace:
+        return SimpleNamespace(sender_type="ai", body=body)
+
+    old_chat = SimpleNamespace(flow_state=None, flow_state_since=None)
+    context = brain_context(policy, old_chat, [ai("Hi SAW. How can I help you today?")])  # type: ignore[arg-type]
+    assert context["legacy_undisclosed"] is True and old_chat.flow_state == "S1_LISTENING"
+    told = SimpleNamespace(flow_state=None, flow_state_since=None)
+    context = brain_context(policy, told, [ai("Hi, I'm pi, an AI from Workzap.")])  # type: ignore[arg-type]
+    assert context["legacy_undisclosed"] is False
+    fresh = SimpleNamespace(flow_state=None, flow_state_since=None)
+    assert brain_context(policy, fresh, [])["legacy_undisclosed"] is False  # type: ignore[arg-type]

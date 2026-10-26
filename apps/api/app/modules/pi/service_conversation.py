@@ -1327,9 +1327,15 @@ def brain_context(
     if flow.brain_mode(policy.response_rules):
         state = flow.parse(conversation.flow_state)
         if state is None:
-            state = flow.initial_state(any(m.sender_type == "ai" for m in rows))
+            replied = [m for m in rows if m.sender_type == "ai"]
+            state = flow.initial_state(bool(replied))
             conversation.flow_state = state.value
             conversation.flow_state_since = datetime.now(UTC)
+            # A chat that began before brain mode and never told the person pi is an AI: its first
+            # brain reply says so once (R-DISC-01), instead of carrying on as if it had.
+            context["legacy_undisclosed"] = bool(replied) and not any(
+                SAYS_AI.search(str(m.body or "")) for m in replied
+            )
         if state == flow.State.S7_DELIVERED:  # they reacted to the documents: S7 to S8
             state = flow.advance(state, flow.State.S8_REVIEW)
             conversation.flow_state = state.value
@@ -5132,7 +5138,9 @@ async def compose_service_turn(
                 )
             turn.reply = f"{back} {turn.reply}"
             context["fixed_lines"] = [*context.get("fixed_lines", []), back]
-        elif redisclose_due(context) and not SAYS_AI.search(turn.reply):
+        elif (redisclose_due(context) or context.get("legacy_undisclosed")) and not SAYS_AI.search(
+            turn.reply
+        ):
             turn.reply = with_disclosure(turn.reply, context, str(turn.language or "en"))
     return turn
 
