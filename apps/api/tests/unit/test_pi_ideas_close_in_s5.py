@@ -42,3 +42,19 @@ def test_a_declined_offer_is_never_repeated_and_other_states_are_untouched():
     no_ideas = ServiceTurn(reply="Noted.")
     brain_offer(no_ideas, {k: v for k, v in S5.items() if k != "solution_ideas"})
     assert no_ideas.reply == "Noted."
+
+
+def test_ideas_that_came_as_an_answer_not_a_request_also_close_with_the_offer():
+    """Real replay (clinics, fashion, pharmacies at S5): the owner answered a question, the ideas
+    carried no solution_ask context, and ended on nothing."""
+    context = {
+        "flow": {"state": "S5_READINESS"},
+        "noted_problems": [{"ref": "a", "group": "x", "title": "Stock goes short"}],
+        "reply_language": "en",
+    }
+    t = ServiceTurn(reply="Yes.\nFirst, count the fast movers.\nSecond, note expiry on arrival.")
+    brain_offer(t, context)
+    assert t.reply.endswith(solution_ask.offer_line("en"))
+    plain = ServiceTurn(reply="Noted. What else is getting in the way?")
+    brain_offer(plain, context)
+    assert plain.reply == "Noted. What else is getting in the way?"  # no ideas: nothing added

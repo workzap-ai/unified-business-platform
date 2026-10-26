@@ -12,6 +12,7 @@ ladder in ``pi_customer.engine``; this only covers the first hours.
 """
 
 import logging
+import re
 from datetime import UTC, datetime, timedelta
 from typing import Any
 from uuid import UUID
@@ -36,6 +37,22 @@ PROFILE_FIELDS = (
     ("business_name", "their business name"),
     ("business_type", "what their business does"),
 )
+# Platform spec Book 4 5.4: a follow-up after silence never carries new solutions. A reminder that
+# answers a MISSED message is a reply, and keeps whatever the answer needs.
+IDEA_LINES = re.compile(r"(?mi)^\s*(?:first|second|pehle|doosra|dusra)\b[,:]")
+
+
+def without_solutions(context: dict[str, Any]) -> dict[str, Any]:
+    """The context of a quiet follow-up with every solution field removed: the earlier request
+    ("Solution dain") is still the latest inbound message, so the detector would hand over ideas
+    again, hours later, for a message that was already answered."""
+    for key in [k for k in context if k.startswith("solution_")]:
+        context.pop(key)
+    return context
+
+
+def carries_ideas(body: str) -> bool:
+    return bool(IDEA_LINES.search(body or ""))
 
 
 def missing_profile(profile: dict[str, str], returning: bool) -> list[str]:
@@ -244,6 +261,8 @@ async def check_in(ctx: dict[str, Any], conversation_id: UUID, now: datetime) ->
                 if p.get("status") in (None, "", "collecting") and p.get("title")
             ][:3],
         }
+        if not missed:
+            without_solutions(context)
         await session.commit()  # No transaction is held across the model call.
 
     manager = build_llm_manager(ctx["settings"], ctx["http"], ctx["sessions"])
@@ -254,7 +273,7 @@ async def check_in(ctx: dict[str, Any], conversation_id: UUID, now: datetime) ->
         await _skip(ctx, conversation_id, str(last.id), now)
         return None
     body = turn.reply.strip()
-    if not body or turn.request_human:
+    if not body or turn.request_human or (not missed and carries_ideas(body)):
         await _skip(ctx, conversation_id, str(last.id), now)
         return None
 

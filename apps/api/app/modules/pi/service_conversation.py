@@ -979,6 +979,13 @@ Script and company facts (pi_mode "brain"; these override the shared rules above
   when you ask nothing. closed_slots (when present) are the questions they already answered,
   even with "no" or "pata nahi", in this or an earlier chat and in any language: never ask one
   again, move on.
+- check_in_now (a follow-up after silence): it never gives new ideas, never asks for a fact you
+  already know or a question in closed_slots, never asks their name or business, and never
+  repeats a message you already sent. It may only offer to carry on where you stopped, in their
+  words ("Pichli baat wahin se jaari rakhein? Aap ne ... ke baare mein bataya tha."), or, when
+  ideas were already given, ask whether they would like the solution document and quote. Write
+  it in the language of their last message. (check_in_now.missed is different: answer that
+  message.)
 - clarify_first (when present) is the ref of the noted problem to ask about first. pattern_hint
   (when present) is a pattern worth saying once, as an observation, never a diagnosis: for
   example "Three of the problems you've mentioned are about stock" (kind group) or "Shop C
@@ -2327,11 +2334,31 @@ def brain_never_empty(turn: "ServiceTurn", context: dict[str, Any]) -> None:
     turn._english = language not in ("en", "roman_ur", "ar")
 
 
+# Idea lines as pi writes them: "First, ...", "Second, ...", "Pehle, ...", "Doosra, ..." (a line of
+# its own, so a sentence that merely contains the word is not one).
+IDEA_LINES = re.compile(r"(?mi)^\s*(?:first|second|pehle|doosra|dusra)\b[,:]")
+
+
 def brain_offer(turn: "ServiceTurn", context: dict[str, Any]) -> None:
     """After free ideas on request, or a "how exactly?" answer, the application makes the offer
     itself and moves the chat to S5 (Part 1.4 and 1.6), so a later "haan" goes through the
     explicit-yes gate. The model never writes the offer."""
     if turn._summary or turn._decision is not None:
+        return
+    state = (context.get("flow") or {}).get("state")
+    language = str(context.get("reply_language") or "en")
+    if (
+        state == flow.State.S5_READINESS
+        and (context.get("solution_ideas") or IDEA_LINES.search(turn.reply))
+        and not solution_ask.already_offers(turn.reply)
+        and solution_ask.offer_line(language) not in turn.reply
+        and not turn.reply.rstrip().endswith(constitution.QUESTION_MARKS)
+    ):
+        # R-VAL-06: ideas never end on nothing, however they came (a request, an answer, the
+        # model's own). The offer is open, so the ideas close with the offer line (one question,
+        # last); the move stays S5.
+        turn.reply = f"{turn.reply.rstrip()}\n\n{solution_ask.offer_line(language)}"
+        turn.awaiting_customer = True
         return
     # The offer follows a request for a fix, a "how exactly?" and a request no idea could meet; a
     # follow-up on earlier ideas or "I did not try them" gets no offer.
@@ -2341,21 +2368,7 @@ def brain_offer(turn: "ServiceTurn", context: dict[str, Any]) -> None:
         or context.get("solution_asked_no_ideas")
     ):
         return
-    state = (context.get("flow") or {}).get("state")
     created = [op for op in turn.problem_ops if op.op == "create"]
-    language = str(context.get("reply_language") or "en")
-    if (
-        state == flow.State.S5_READINESS
-        and context.get("solution_ideas")
-        and not solution_ask.already_offers(turn.reply)
-        and solution_ask.offer_line(language) not in turn.reply
-        and not turn.reply.rstrip().endswith(constitution.QUESTION_MARKS)
-    ):
-        # R-VAL-06: ideas never end on nothing. The offer is open and they asked for more ideas, so
-        # the ideas close with the offer line (one question, last); the move stays S5.
-        turn.reply = f"{turn.reply.rstrip()}\n\n{solution_ask.offer_line(language)}"
-        turn.awaiting_customer = True
-        return
     if state not in solution_ask.OFFERABLE or not (context.get("noted_problems") or created):
         return
     if not solution_ask.already_offers(turn.reply):
@@ -3291,6 +3304,14 @@ def looks_foreign(text: str) -> bool:
 # A media message's body can be "Customer caption: ...\nAttachment: ...": the labels are system
 # English, never the customer's language.
 CAPTION_LABELS = re.compile(r"^Customer caption: |\nAttachment: .*$", re.S)
+# R-LANG-09 (Book 2 10.3): a short or ambiguous message is the same in both languages, so it keeps
+# the chat's language: yes/no/ok, "haan", "theek hai", "thanks", a number or an emoji.
+_SHORT_WORDS = (
+    "no|nope|nah|yes|yeah|yep|ok|okay|k|sure|hmm+|hm+|haan|han|ha|ji|jee|g|nahi|nahin|nhi|nai|"
+    "theek|thik|hai|acha|accha|bilkul|zaroor|shukriya|thanks|thank|you|please|pls|done|bas|"
+    "right|fine|good|alright|ah+|oh+"
+)
+AMBIGUOUS_SHORT = re.compile(rf"^\W*(?:(?:{_SHORT_WORDS})\b\W*){{1,3}}$", re.IGNORECASE)
 
 
 def reply_language(
@@ -3325,6 +3346,8 @@ def reply_language(
         if other := other_script(earlier):
             return {"reply_language_other": other}
     detected = [detect_language(t) for t in texts[:3]]
+    if texts and AMBIGUOUS_SHORT.match(texts[0]):
+        detected[0] = None  # R-LANG-09: "no", "ok", "haan", "theek hai" never switch the language
     # A very short English-looking answer ("Yes all", "Not well") inside a Roman Urdu chat
     # follows the chat: English words alone do not switch the language (R-VOICE-04).
     if (
