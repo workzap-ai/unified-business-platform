@@ -3,14 +3,37 @@ so the link works for the person who was sent it and says nothing about them."""
 
 from fastapi import APIRouter, HTTPException, Request, Response
 from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core import rate_limit
 from app.modules.access.dependencies import Session
-from app.modules.pi import brain_visuals, taxonomy
+from app.modules.pi import brain_visuals, map_render, taxonomy
+from app.modules.pi.box_models import PiMapVersion
 from app.modules.pi.models import PiConversation
 from app.modules.pi.problem_models import PiProblem
 
 public_router = APIRouter(prefix="/brain-visuals", tags=["pi-brain-visuals"])
+
+
+async def _map_png(
+    session: AsyncSession, conversation: PiConversation, version: int, language: str
+) -> bytes:
+    """The picture of one saved map version of this conversation's customer (spec 4.9: the same
+    data as the dashboard)."""
+    row = await session.scalar(
+        select(PiMapVersion).where(
+            PiMapVersion.tenant_id == conversation.tenant_id,
+            PiMapVersion.environment_id == conversation.environment_id,
+            PiMapVersion.customer_id == conversation.customer_id,
+            PiMapVersion.version == version,
+        )
+    )
+    if row is None:
+        raise HTTPException(status_code=404)
+    drawn = map_render.render_map(row.map_json, language)
+    if not drawn.images:
+        raise HTTPException(status_code=404)
+    return drawn.images[0].png
 
 
 @public_router.get("/{token}/{name}")
@@ -27,7 +50,9 @@ async def visual(token: str, name: str, request: Request, session: Session) -> R
     if conversation is None or conversation.customer_id is None:
         raise HTTPException(status_code=404)
     language = claims["language"]
-    if claims["kind"] == "progress":
+    if claims["kind"] == "map":
+        png = await _map_png(session, conversation, claims["version"], language)
+    elif claims["kind"] == "progress":
         png = brain_visuals.render_progress(claims["step"], language)
     else:
         rows = list(

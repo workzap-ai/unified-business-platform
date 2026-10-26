@@ -787,7 +787,6 @@ async def process_pi_event(ctx: dict[str, Any], event_id: str) -> None:
             await session.commit()
             if nori_reply:
                 from app.integrations.whatsapp_bridge import token as connection_token
-                from app.modules.pi.whatsapp import WhatsApp
 
                 try:
                     await WhatsApp(ctx["settings"], ctx["http"], connection.provider).send(
@@ -1734,6 +1733,21 @@ async def process_pi_event(ctx: dict[str, Any], event_id: str) -> None:
 
             outbound = await brain_visual_queue.attach_board(
                 session, scope, ctx["settings"], conversation, outbound, service_turn.language
+            )
+        from app.modules.pi import map_builder
+
+        if service_turn is not None and map_builder.share_enabled(policy.response_rules):
+            # Book 5 (4.4): the problem map as a picture when it is due; off unless map_share.
+            from app.modules.pi import brain_visual_queue, problems
+
+            outbound = await brain_visual_queue.attach_map(
+                session,
+                scope,
+                ctx["settings"],
+                conversation,
+                outbound,
+                service_turn.language,
+                asked=problems.asks_for_map(message.body),
             )
         # A form Pi decided to send in this turn goes out with the reply.
         forms = await session.scalars(

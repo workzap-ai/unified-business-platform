@@ -20,12 +20,14 @@ from app.modules.customers.schemas import normalize_phone
 from app.modules.pi.whatsapp import WhatsApp
 from app.modules.pi_customer import access, service
 from app.modules.pi_customer.access import CustomerSession
+from app.modules.pi_customer.map_routes import router as map_router
 from app.modules.pi_customer.models import CustomerPrefs, CustomerShareLink
 from app.shared.errors import BusinessRuleViolation
 
 logger = logging.getLogger("platform")
 router = APIRouter(prefix="/customer-portal", tags=["pi-customer"])
 Customer = Annotated[CustomerSession, Depends(access.current)]
+router.include_router(map_router)  # the problem map and the Solution Box card
 
 CODE_MESSAGE = (
     "Your PI Customer code: *{code}*\n"

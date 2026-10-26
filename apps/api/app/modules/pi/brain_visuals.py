@@ -21,11 +21,11 @@ from uuid import UUID
 from PIL import Image, ImageDraw, ImageFont
 
 from app.core.config import Settings
-from app.modules.pi import taxonomy
+from app.modules.pi import map_render, taxonomy
 from app.modules.pi_customer.access import _sign
 
 VISUAL_SECONDS = 7 * 86400
-KINDS = ("board", "progress")
+KINDS = ("board", "progress", "map")
 LANGUAGES = ("en", "roman_ur")  # the scripts the font can draw
 WIDTH = 1080
 MARGIN = 56
@@ -86,7 +86,12 @@ class Group:
 
 
 def token(
-    settings: Settings, conversation_id: UUID, kind: str, language: str, step: int = 0
+    settings: Settings,
+    conversation_id: UUID,
+    kind: str,
+    language: str,
+    step: int = 0,
+    version: int = 0,
 ) -> str:
     data = json.dumps(
         {
@@ -94,6 +99,7 @@ def token(
             "k": kind,
             "l": language,
             "s": step,
+            "v": version,
             "e": int(time.time()) + VISUAL_SECONDS,
         },
         separators=(",", ":"),
@@ -112,11 +118,14 @@ def read(settings: Settings, value: str) -> dict[str, Any] | None:
         if int(claims["e"]) < time.time() or claims["k"] not in KINDS:
             return None
         language = str(claims.get("l") or "en")
+        # The problem map is drawn in more scripts than the board (right to left included).
+        allowed = map_render.DRAWABLE_LANGUAGES if claims["k"] == "map" else LANGUAGES
         return {
             "conversation_id": UUID(claims["c"]),
             "kind": claims["k"],
-            "language": language if language in LANGUAGES else "en",
+            "language": language if language in allowed else "en",
             "step": max(0, min(3, int(claims.get("s") or 0))),
+            "version": max(0, int(claims.get("v") or 0)),
         }
     except (ValueError, KeyError, TypeError):
         return None

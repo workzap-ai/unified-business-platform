@@ -1,5 +1,6 @@
 "use client";
 
+import { SolutionBoxCard } from "./problem-map";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -333,6 +334,13 @@ export function Dashboard({ me }: { me: CustomerMe }) {
             </section>
 
             <aside className="space-y-4 lg:sticky lg:top-6">
+              {items.map((c) => (
+                <SolutionBoxCard
+                  key={c.id}
+                  conversationId={c.id}
+                  business={items.length > 1 ? c.business : undefined}
+                />
+              ))}
               <ShareCard lang={lang} />
               <CustomerSecurityCard />
             </aside>

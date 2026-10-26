@@ -305,3 +305,74 @@ export type CustomerIssues = {
   issues: CustomerIssue[];
   links?: IssueLink[];
 };
+
+/** The problem map (Book 5, 4.9): the same data pi draws on WhatsApp. */
+export type MapNodeData = {
+  id: string;
+  label: string;
+  facts: string[];
+  category: string;
+  status: "open" | "parked" | "resolved";
+  is_new: boolean;
+};
+export type MapLinkData = {
+  from: string;
+  to: string;
+  type: string;
+  label: string;
+  /** pi_inferred is pi's guess: drawn dashed until the owner says yes. */
+  evidence: "owner_said" | "pi_inferred" | "confirmed";
+};
+export type MapClusterData = {
+  id: string;
+  title: string;
+  node_ids: string[];
+  root: string;
+};
+export type MapVersionSummary = {
+  version: number;
+  created_at: string;
+  shared_at: string | null;
+  problems: number;
+  links: number;
+};
+export type ProblemMapVersion = MapVersionSummary & {
+  map: {
+    version: number;
+    nodes: MapNodeData[];
+    links: MapLinkData[];
+    clusters: MapClusterData[];
+  };
+};
+export type ProblemMapPayload = {
+  available: boolean;
+  language: string | null;
+  latest: ProblemMapVersion | null;
+  versions: MapVersionSummary[];
+};
+export type MapEditAction = "resolve" | "park" | "reopen" | "rename";
+
+/** Where the Solution Box stands. Never carries an amount. */
+export type SolutionBoxStatus = {
+  available: boolean;
+  state:
+    | "collecting"
+    | "ready"
+    | "offered"
+    | "drafting"
+    | "in_review"
+    | "sent"
+    | "accepted"
+    | "declined"
+    | "changes_asked"
+    | "revised"
+    | null;
+  version: number;
+  map_version: number | null;
+  document: {
+    ref: string;
+    approved: boolean;
+    sent: boolean;
+    sent_at: string | null;
+  } | null;
+};
