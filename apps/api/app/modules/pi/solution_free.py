@@ -17,7 +17,7 @@ from uuid import UUID
 
 from app.ai.manager import LLMManager
 from app.ai.types import Message
-from app.modules.pi import constitution, solution_rules
+from app.modules.pi import constitution, idea_filter, solution_rules
 from app.modules.pi.language import detect_language
 from app.shared.scope import WorkspaceScope
 
@@ -132,6 +132,8 @@ def vetted(
             continue  # a person decides about money or a regulated topic: never served unreviewed
         if never_say and solution_rules.never_say_hit(idea, never_say):
             continue
+        if idea_filter.failures(idea, said):
+            continue  # Book 5, G1 and G2: against the owner's goal, or a channel they never named
         if GENERIC.search(idea) or not uses_a_fact(idea, facts or set()):
             continue  # R-SOL-04: every idea uses something the person said; generic lists are banned
         if len(idea.split()) > MAX_WORDS or JARGON.search(idea):
@@ -187,4 +189,5 @@ async def free_ideas(
     # nothing to compare an English idea with.
     english = bool(problems) or detect_language(said) == "en"
     facts = fact_words(said, *earlier[-4:], *(problems or [])) if english else set()
-    return vetted(parse(str(getattr(response, "text", "") or "")), said, never_say, facts)
+    owner_words = " ".join([*(earlier[:1]), *(problems or []), said])
+    return vetted(parse(str(getattr(response, "text", "") or "")), owner_words, never_say, facts)

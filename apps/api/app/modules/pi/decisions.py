@@ -15,6 +15,7 @@ from datetime import date
 from enum import StrEnum
 from typing import Any
 
+from app.modules.pi import box
 from app.modules.pi.flow import State
 
 YES_AT = 0.9  # an explicit yes needs this much confidence to start anything
@@ -488,6 +489,11 @@ def decide(
         # "Is anything wrong or missing?" answered "no" or "no, that's right" (spec G5) means the
         # summary stands, exactly as "yes that's right" does.
         confirmed = (_ok(answer, Answer.YES) or _ok(answer, Answer.NO)) and not _correcting(message)
+        if (summary_ok(message) or confirmed) and facts.get("box_offer"):
+            # Book 5, 5.4: with the Solution Box on, pi offers only when R1 to R3 or B1 to B7 hold.
+            allowed, rule, reason = box.can_offer(facts["box_offer"])
+            if not allowed:
+                return Decision(None, None, {}, [], why=f"{rule}-blocked: {reason}")
         if summary_ok(message) or confirmed:
             return Decision(
                 text("offer", language),

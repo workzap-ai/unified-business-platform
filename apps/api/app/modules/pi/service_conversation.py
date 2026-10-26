@@ -24,6 +24,7 @@ from app.modules.catalog.models import CatalogProduct
 from app.modules.memberships.models import Membership
 from app.modules.notifications.service import notify
 from app.modules.pi import (
+    box,
     brain_config,
     brain_docs,
     brain_payments,
@@ -1407,6 +1408,8 @@ async def brain_problems(
     context["served_industries"] = served if isinstance(served, list) else None
     if think_prompt.enabled(policy.response_rules):  # Book 5: absent unless exactly true
         context["thinking"] = True
+    if box.box_offer_enabled(policy.response_rules):  # Book 5: the Solution Box offer rule
+        context["box_offer"] = True
     context["brain_settings"] = {
         key: brain_config.value(policy.response_rules, key)
         for key in (
@@ -2528,6 +2531,8 @@ def brain_offer(turn: "ServiceTurn", context: dict[str, Any]) -> None:
     created = [op for op in turn.problem_ops if op.op == "create"]
     if state not in solution_ask.OFFERABLE or not (context.get("noted_problems") or created):
         return
+    if context.get("box_offer") and not box.can_offer(box.offer_facts(context))[0]:
+        return  # Book 5, 5.4: ideas were free, the offer waits for R1 to R3 or B1 to B7
     if not solution_ask.already_offers(turn.reply):
         turn.reply = f"{turn.reply.rstrip()}\n\n{solution_ask.offer_line(language, context)}"
     turn.awaiting_customer = True
@@ -2563,6 +2568,8 @@ def brain_decision(turn: "ServiceTurn", context: dict[str, Any]) -> None:
         "message_kind": context.get("latest_message_kind"),
         "brief": context.get("brief") or {},
         "open_quote": context.get("open_quote"),
+        # Book 5: set only when response_rules.brain.box_offer is exactly true.
+        "box_offer": box.offer_facts(context) if context.get("box_offer") else None,
     }
     decision = decisions.decide(
         state,
