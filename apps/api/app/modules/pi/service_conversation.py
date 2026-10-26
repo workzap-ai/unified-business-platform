@@ -4825,7 +4825,8 @@ async def compose_service_turn(
     if context.get("pi_mode") == "brain" and turn.problem_ops:
         known = {p["ref"] for p in context.get("noted_problems") or []}
         replied = turn.reply.rstrip().endswith(("?", "\u061f"))
-        if bad := problems.check_ops(turn.problem_ops, known, replied):
+        said_now = str(context.get("latest_customer_message") or "")
+        if bad := problems.check_ops(turn.problem_ops, known, replied, said_now):
             text = f"the problem notes are wrong: {bad}"
             problem = f"{text}, and also: {problem}" if problem else text
     asks_status = bool(STATUS_ASK.search(str(context.get("latest_customer_message", ""))))

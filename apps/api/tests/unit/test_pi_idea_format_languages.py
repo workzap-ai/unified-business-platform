@@ -582,3 +582,44 @@ def test_how_do_i_begin_is_an_ask_for_ideas(text: str) -> None:
 )
 def test_a_sentence_about_starting_or_a_first_step_is_not_an_ask(text: str) -> None:
     assert not solution_ask.asked_for_ideas(text)
+
+
+@pytest.mark.parametrize(
+    ("said", "thin"),
+    [
+        ("60 bhainsein", True),
+        ("hamari 3 dukaanein hain", True),
+        ("restaurant", True),
+        ("udhaar", False),
+        ("stock khatam ho jata hai", False),
+        ("chori ho rahi hai", False),
+        ("late delivery", False),
+        ("hisaab kitaab copy mein likhta hoon, ghalti ho jati hai", False),
+        ("document bhej dein", False),
+    ],
+)
+def test_a_bare_fact_is_not_a_problem_but_a_short_problem_is(said: str, thin: bool) -> None:
+    from app.modules.pi import problems
+
+    assert problems.thin_message(said) is thin
+
+
+def test_a_problem_created_from_a_bare_fact_is_sent_back() -> None:
+    from app.modules.pi import problems
+    from app.modules.pi.problems import ProblemNote, ProblemOp
+
+    op = ProblemOp(
+        op="create",
+        note=ProblemNote(
+            title="Dairy farm stock management issues",
+            user_words=["60 bhainsein"],
+            category="stock_inventory",
+            confidence=0.9,
+        ),
+    )
+    bad = problems.check_ops([op], set(), True, "60 bhainsein")
+    assert bad is not None and "not something they said" in bad
+    assert problems.check_ops([op], set(), True, "60 bhainsein hain, doodh kam hai") is None or (
+        "not something they said"
+        not in (problems.check_ops([op], set(), True, "60 bhainsein hain, doodh kam hai") or "")
+    )

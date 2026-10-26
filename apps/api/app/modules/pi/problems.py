@@ -206,7 +206,33 @@ def title_problem(title: str) -> str | None:
     return None
 
 
-def check_ops(ops: list[ProblemOp], known_refs: set[str], noted_in_reply: bool) -> str | None:
+# Words that make a short message a problem ("udhaar", "late", "chori", "no stock"). A message of a
+# few words without one is a fact ("60 bhainsein"), and no problem is made of it.
+PROBLEM_CUE = re.compile(
+    r"masla|masle|masail|problem|issue|complain|shikayat|nahi|nahin|nhi|\bno\b|\bnot\b|kam\b|"
+    r"zyada|jyada|late|delay|dair|ghalat|galat|gadbad|ghalti|mistake|error|loss|nuksan|nuqsan|"
+    r"udhaar|udhar|chori|theft|stolen|miss|khatam|expire|waste|kharab|damage|tang|mushkil|pareshan|"
+    r"wapas|return|refund|jhagra|dispute|short|slow|dheela|band\b|down\b|bohat|bahut|\bcan'?t\b|"
+    r"\bhard\b|difficult|confus|stuck|fail|\bwrong\b|\blow\b|bar bar|roz|hamesha|always|never",
+    re.IGNORECASE,
+)
+THIN_MESSAGE_WORDS = 4
+
+
+def thin_message(said: str) -> bool:
+    """A few words with nothing in them that goes wrong: a fact, not a problem."""
+    words = (said or "").split()
+    return (
+        bool(words)
+        and len(words) <= THIN_MESSAGE_WORDS
+        and not PROBLEM_CUE.search(said)
+        and not is_document_request(words)
+    )
+
+
+def check_ops(
+    ops: list[ProblemOp], known_refs: set[str], noted_in_reply: bool, said: str = ""
+) -> str | None:
     """What is wrong with the model's ops, for a rewrite, or None when they can go through."""
     issues: list[str] = []
     for op in ops:
@@ -215,6 +241,11 @@ def check_ops(ops: list[ProblemOp], known_refs: set[str], noted_in_reply: bool) 
             if note is None or not note.title.strip():
                 issues.append("a create op has no title")
                 continue
+            if thin_message(said):
+                issues.append(
+                    f'"{note.title}" is not something they said: a short message with no problem '
+                    "in it makes no problem record, so ask what is going wrong instead"
+                )
             if (why := title_problem(note.title)) is not None:
                 issues.append(why)
             if not note.user_words:
