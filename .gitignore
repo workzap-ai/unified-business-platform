@@ -17,3 +17,6 @@ test-results/
 coverage/
 .coverage
 .cache/
+
+# scratch real-model harnesses (they call a paid model and need a key): never commit
+apps/api/tests/integration/test_zz_*.py
