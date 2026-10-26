@@ -676,3 +676,46 @@ def test_first_person_verbs_that_carry_a_gender_become_neutral() -> None:
 
     out = roman_polish("Main aap ki problem note kar sakta hoon aur bhej dunga.")
     assert "sakta" not in out and "dunga" not in out and "sakte hain" in out and "bhej denge" in out
+
+
+def test_sol04_a_free_idea_must_use_something_the_person_said_and_generic_ones_are_banned() -> None:
+    from app.modules.pi import solution_free
+
+    facts = solution_free.fact_words(
+        "Orders get missed on WhatsApp and phone", "Order desk problem"
+    )
+    specific = "Write each WhatsApp order in one notebook, so none is missed when the phone rings."
+    unrelated = "Keep the shelves tidy every morning, so customers find things quickly."
+    generic = "Improve your marketing and use social media, so more people hear about orders."
+    kept = solution_free.vetted([unrelated, generic, specific], "orders get missed", [], facts)
+    assert kept == [specific]
+    assert solution_free.vetted([unrelated], "orders get missed", [], set()) == [unrelated]
+
+
+def test_sol02_the_one_question_is_answered_with_ideas_not_another_question() -> None:
+    from types import SimpleNamespace
+
+    from app.modules.pi import solution_context
+    from app.modules.pi.service_conversation import asked_without_ideas
+
+    chat = SimpleNamespace(service_brief={}, flow_state="S1_LISTENING")
+    solution_context._no_ideas(
+        chat, [], None, "nothing_noted", __import__("datetime").datetime.now()
+    )
+    assert chat.service_brief["open_ask"] is True  # they asked, nothing was noted: one question
+    context = {
+        "open_ask": True,
+        "flow": {"state": "S1_LISTENING"},
+        "latest_customer_message": "orders miss hote hain",
+    }
+    assert asked_without_ideas(context)  # the answer gets ideas
+    assert not asked_without_ideas(
+        {"flow": {"state": "S1_LISTENING"}, "latest_customer_message": "orders miss hote hain"}
+    )
+
+
+def test_sol03_a_churn_signal_is_logged_on_the_chat() -> None:
+    from app.modules.pi import solution_ask
+
+    for said in ("kahin aur jaun?", "rehne do, koi aur dekh leta hoon", "I'll look elsewhere"):
+        assert solution_ask.churn_risk(said)

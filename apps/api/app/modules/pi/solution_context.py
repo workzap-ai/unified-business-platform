@@ -98,6 +98,10 @@ def _no_ideas(
         solution_unanswered=log,
         solution_unanswered_n=int(brief.get("solution_unanswered_n") or 0) + 1,
     )
+    if why == "nothing_noted":
+        # R-SOL-02: they asked and nothing is noted yet. pi may ask ONE question; the answer to it
+        # (the problem) is answered with ideas, not with another question: carried to the next turn
+        _put(conversation, open_ask=True)
     titles = [str(n.get("title") or "")[:80] for n in noted[-NOTED_TITLES:] if n.get("title")]
     return {"solution_asked_no_ideas": True, "solution_noted": titles, "solution_why": why}
 
@@ -159,10 +163,23 @@ async def build(
     `solution_asked_no_ideas`, `solution_next`, `solution_not_tried` (each may be missing); fills
     `used` with the stamp for the nightly scoring. Never raises: before migration 0043 is applied
     the tables are missing and pi simply gives no ideas."""
+    carried = bool((getattr(conversation, "service_brief", None) or {}).get("open_ask"))
+    if carried and conversation is not None:
+        _put(conversation, open_ask=False)  # one turn only: the answer to pi's one question
+    churning = solution_ask.churn_risk(said) and conversation is not None
+    if churning:
+        # R-SOL-03: the churn signal is logged on the chat (the flag and the time, never the words)
+        stamp = (now or datetime.now(UTC)).isoformat()
+        _put(conversation, churn_risk_at=stamp)
     for attempt in (1, 2):
         try:
             async with session.begin_nested():
-                return await _build(session, scope, conversation, said, noted, used, now)
+                out = await _build(session, scope, conversation, said, noted, used, now)
+            if carried and not out.get("solution_ideas"):
+                out = {**out, "open_ask": True}
+            if churning:
+                out = {**out, "churn_risk": True}
+            return out
         except ProgrammingError:
             return {}
         except IntegrityError:

@@ -2143,6 +2143,10 @@ def asked_without_ideas(context: dict[str, Any]) -> bool:
         return False
     if context.get("solution_asked_no_ideas"):
         return True
+    if context.get("open_ask") and str((context.get("flow") or {}).get("state") or "") in (
+        solution_ask.ASKABLE
+    ):
+        return True  # R-SOL-02: they asked, pi asked one question, this is the answer: ideas now
     state = str((context.get("flow") or {}).get("state") or "")
     said = str(context.get("latest_customer_message") or "")
     if int(context.get("ideas_given") or 0) > 0 and state in solution_ask.ASKABLE:
@@ -2422,6 +2426,7 @@ def brain_offer(turn: "ServiceTurn", context: dict[str, Any]) -> None:
         context.get("solution_asked")
         or "solution_howto" in context
         or context.get("solution_asked_no_ideas")
+        or context.get("open_ask")
     ):
         return
     created = [op for op in turn.problem_ops if op.op == "create"]

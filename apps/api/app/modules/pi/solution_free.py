@@ -18,6 +18,7 @@ from uuid import UUID
 from app.ai.manager import LLMManager
 from app.ai.types import Message
 from app.modules.pi import constitution, solution_rules
+from app.modules.pi.language import detect_language
 from app.shared.scope import WorkspaceScope
 
 RULES = """You give FREE quick ideas for pi, a WhatsApp business assistant, to say to the owner of a
@@ -72,7 +73,30 @@ def parse(text: str) -> list[str]:
     return [str(i).strip() for i in ideas if str(i).strip()][:4] if isinstance(ideas, list) else []
 
 
-def vetted(ideas: list[str], said: str, never_say: list[str]) -> list[str]:
+GENERIC = re.compile(
+    r"\b(?:improve|boost|grow|enhance) (?:your )?(?:marketing|sales|business|brand)\b"
+    r"|\buse social media\b|\bbuild (?:your )?brand\b|\bstay consistent\b|\bbe patient\b",
+    re.IGNORECASE,
+)
+FACT_PREFIX = 5  # letters compared, so "orders" and "order", "branches" and "branch" count as one
+
+
+def fact_words(*texts: str) -> set[str]:
+    """What the person said, as short word stems an idea can be checked against."""
+    found: set[str] = set()
+    for text in texts:
+        for word in re.findall(r"[^\W\d_]{4,}", (text or "").lower()):
+            found.add(word[:FACT_PREFIX])
+    return found
+
+
+def uses_a_fact(idea: str, facts: set[str]) -> bool:
+    return not facts or bool(fact_words(idea) & facts)
+
+
+def vetted(
+    ideas: list[str], said: str, never_say: list[str], facts: set[str] | None = None
+) -> list[str]:
     """At most two ideas that pass pi's own idea guard and the industry's never-say list."""
     kept: list[str] = []
     for idea in ideas:
@@ -81,6 +105,8 @@ def vetted(ideas: list[str], said: str, never_say: list[str]) -> list[str]:
             continue  # a person decides about money or a regulated topic: never served unreviewed
         if never_say and solution_rules.never_say_hit(idea, never_say):
             continue
+        if GENERIC.search(idea) or not uses_a_fact(idea, facts or set()):
+            continue  # R-SOL-04: every idea uses something the person said; generic lists are banned
         if len(idea.split()) > MAX_WORDS or JARGON.search(idea):
             continue  # R-VAL-03: one short plain sentence (a long or jargon idea turns to mush in Urdu)
         if constitution.TIMELINE_STRONG.search(idea) or constitution.TIMELINE_WEAK.search(idea):
@@ -129,4 +155,9 @@ async def free_ideas(
         )
     except Exception:  # noqa: BLE001 - the caller has a plain fallback
         return []
-    return vetted(parse(str(getattr(response, "text", "") or "")), said, never_say)
+    # The ideas are written in English, so a fact is checked only against English words: the problem
+    # titles pi noted, or an owner who wrote in English. A Roman Urdu or Arabic message alone gives
+    # nothing to compare an English idea with.
+    english = bool(problems) or detect_language(said) == "en"
+    facts = fact_words(said, *earlier[-4:], *(problems or [])) if english else set()
+    return vetted(parse(str(getattr(response, "text", "") or "")), said, never_say, facts)
