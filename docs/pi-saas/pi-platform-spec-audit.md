@@ -145,3 +145,16 @@ by design only identifiers are, `pi_reply_audits`). A final-prompt capture needs
 - **Industry empty.** Workzap tenant: 14 customers without an industry, 8 with. Industry is stored only when `industry_packs` is on, which is recent, so
   older customers are empty by design. New chats since the switch are filled.
 - **Fallback line fixed** in `constitution.py` (`FALLBACK_LISTENING`) and the "Noted…/anything else getting in the way" notices in `language.py`.
+
+## The 211-row table (A.4), scripted, 2026-10-27
+
+Full table: [pi-211-industry-check.csv](pi-211-industry-check.csv). Probes: three first messages per industry written from the pack's own
+`signals` (English, Roman Urdu, mixed), run through `industry_packs.detect`. No model was used.
+
+- pack stored 211 of 211; solution entry stored 211 of 211.
+- Industry identified on at least 2 of 3 probes: **207 of 211** (pass mark: every industry). Gaps: `cold_chain_logistics`,
+  `electricity_and_power_contractors`, `general_contractors`, `solar_epc_and_installers` (1 of 3 each: neighbouring trades share words).
+- Tool-word lines in spoken fields after the rewrite: 7, all in `quick_ideas` and all about a tool the owner already has (an aggregator app, a
+  portal, a platform payout); the run-time rule allows a tool word the owner used, so these are kept on purpose.
+- "automatically" endings: 0 files.
+- `final_prompt_contains` (does the block survive into the final prompt) needs the real prompt path: not part of this scripted run.
