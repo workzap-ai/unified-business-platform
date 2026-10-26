@@ -2162,6 +2162,45 @@ def roman_polish(reply: str) -> str:
     return IDEA_FIRST_WORD.sub(chr(8226) + chr(32), text)
 
 
+ROMAN_OPENER = {
+    "normal": "Ji, ye do ideas abhi aazma sakte hain:",
+    "impatient": "Maazrat. Ye do ideas hain:",
+    "churn": "Koi dabao nahi. Ye do ideas hain:",
+}
+WORKZAP_MODAL = re.compile(r"\bWorkzap\s+(?:could|can|would|will)\s+", re.IGNORECASE)
+
+
+def roman_ideas_opener(reply: str, context: dict[str, Any]) -> str:
+    """The line before the idea bullets of a Roman Urdu reply is the golden opener, whatever the
+    language step made of the English one ("Theek hai, seedha solution." for a person who was not
+    in a hurry); "Workzap could" never stays inside a Roman Urdu sentence."""
+    reply = WORKZAP_MODAL.sub("Workzap ", reply)
+    if not (context.get("solution_ideas") or "• " in reply):
+        return reply
+    lines = reply.splitlines()
+    first = next((n for n, ln in enumerate(lines) if ln.lstrip().startswith(chr(8226))), None)
+    if first is None or not context.get("solution_asked"):
+        return reply
+    said = str(context.get("latest_customer_message") or "")
+    kind = (
+        "churn"
+        if solution_ask.churn_risk(said)
+        else "impatient"
+        if solution_ask.impatient(said)
+        else "normal"
+    )
+    before = [n for n in range(first) if lines[n].strip()]
+    if before:
+        last = before[-1]
+        if SAYS_AI.search(lines[last]) or "pi" in lines[last].split():
+            lines.insert(first, ROMAN_OPENER[kind])  # the disclosure line stays, the opener follows
+        else:
+            lines[last] = ROMAN_OPENER[kind]
+    else:
+        lines.insert(first, ROMAN_OPENER[kind])
+    return chr(10).join(lines)
+
+
 def brain_prose_ideas(turn: "ServiceTurn", context: dict[str, Any]) -> None:
     """The ideas of a reply are always shown the same way: one plain sentence per line, starting
     with "• " (the golden replies). A model that wrote them as "First, ... Second, ..." or as
@@ -4207,6 +4246,9 @@ async def in_one_language(
                     "For Roman Urdu always use the polite aap forms (karein, rakhein, dekhein), "
                     "never karo or rakho, and no gendered first-person verbs. Keep each "
                     "sentence short and use everyday Urdu words, not English business jargon. "
+                    "Write plain everyday Urdu: never translate an English word into Urdu word for "
+                    "word when there is no such Urdu phrase (not 'drop naam'); keep a name or term "
+                    "like 'drop-off point' or 'COD' as it is, or say it in a few plain words. "
                     "Say 'Here are two ideas you can try now:' as 'Ji, ye do ideas abhi aazma "
                     "sakte hain:' and 'Sorry about the wait.' as 'Maazrat.'. "
                     "Reply with the rewritten text only."
@@ -5124,7 +5166,7 @@ async def compose_service_turn(
             in_one_language(manager, scope, policy, conversation, turn.reply, str(expected)),
         )
     if expected == "roman_ur":
-        turn.reply = roman_polish(turn.reply)
+        turn.reply = roman_ideas_opener(roman_polish(turn.reply), context)
     latest_language = detect_language(str(context.get("latest_customer_message", "")))
     if latest_language == expected and (
         clearly_other(turn.reply, str(expected or ""))

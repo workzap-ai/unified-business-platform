@@ -170,11 +170,11 @@ async def test_g3_a_request_with_no_industry_yields_a_marker_not_silence(
         business_db, scope, conversation, "solution do", stock, {}
     )
     assert len(library["solution_ideas"]) == 2 and library["solution_asked"] is True
-    # a category the library has no passing idea for (margin_cost) still gets the honest marker
-    noted = [{"title": "stock runs out every week", "group": "margin_cost"}]
+    # a problem no library category fits still gets the honest marker
+    noted = [{"title": "something odd happens", "group": "no_such_category"}]
     got = await solution_context.build(business_db, scope, conversation, "solution do", noted, {})
     assert got["solution_asked_no_ideas"] is True
-    assert got["solution_noted"] == ["stock runs out every week"]
+    assert got["solution_noted"] == ["something odd happens"]
     assert got["solution_why"] == "no_industry"
     brief = conversation.service_brief
     assert brief["solution_unanswered_n"] == 1 and brief["solution_unanswered"][0]["why"]

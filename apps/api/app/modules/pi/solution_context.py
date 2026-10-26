@@ -120,8 +120,7 @@ def _from_library(
     before = [str(x) for x in brief.get("library_given") or []]
     ideas: list[str] = []
     category = ""
-    for item in reversed(noted):
-        category = str(item.get("group") or "")
+    for category in solution_library.best_category(noted):
         count = min(value_line.IDEAS_PER_MESSAGE, left)
         ideas = solution_library.ideas_for(category, before, count)
         if ideas:
@@ -438,6 +437,7 @@ async def _build(
     strong = False  # the entry matches by the main rule, not only by a near-problem fallback
     # The latest noted problem first, then the earlier ones: a person who then mentions something
     # off the page ("staff forget the entry") still gets ideas for the problem that does match.
+    best_fit = -1
     for item in reversed(noted or []):
         group, subtype = str(item.get("group") or ""), str(item.get("subtype") or "")
         said_words = " ".join(
@@ -447,10 +447,17 @@ async def _build(
                 *[str(w) for w in item.get("user_words") or []],
             ]
         )
-        problem = solution_ideas.match_problem(entries, group, subtype, said_words)
-        if problem is not None:
-            strong = solution_ideas.is_strong_match(problem, group, subtype, said_words)
-            break
+        found = solution_ideas.match_problem(entries, group, subtype, said_words)
+        if found is None:
+            continue
+        # The entry that fits the person's own words best, not the first one the category gave
+        # (live test 4: "views but no orders" took the attribution ideas before the entry for
+        # "price asked in DM, then silence"); a tie goes to the latest noted problem.
+        fit = solution_ideas.fit(found, said_words)
+        if fit > best_fit:
+            best_fit = fit
+            problem = found
+            strong = solution_ideas.is_strong_match(found, group, subtype, said_words)
     if problem is None and reacting:
         strong = True  # the entry the ideas were already given for
     if problem is None and reacting:

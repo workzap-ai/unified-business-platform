@@ -59,20 +59,44 @@ def _words(text: str) -> set[str]:
     }
 
 
-RELEVANT_AT = (
-    3  # content words of theirs, from which a match must share at least one with its entry
+RELEVANT_AT = 2  # content words of theirs, from which a match must share evidence with its entry
+# Words that name a whole part of a business, not a problem: "staff" alone sent a theft problem to
+# the shift rota (live test 4). They count as evidence only next to another shared word.
+WEAK = frozenset(
+    "staff customer client order other work team sale money business shop item thing people "
+    "problem issue match claim record take track lose make give keep long many day week".split()
 )
+# The same thing said in English and Roman Urdu, so a person's own word finds the entry's
+SAME = {
+    "chori": "theft", "chor": "theft", "stolen": "theft", "steal": "theft", "thief": "theft",
+    "theft": "theft", "raqam": "price", "rate": "price", "pricing": "price", "price": "price",
+    "baad": "after", "hisaab": "account", "udhaar": "credit", "udhar": "credit",
+    "kharcha": "cost", "nuksan": "loss", "gahak": "customer", "stock": "stock", "maal": "stock",
+}  # fmt: skip
+
+
+def _evidence(text: str) -> set[str]:
+    words = re.findall(r"[a-z]{3,}", (text or "").lower())
+    return {SAME.get(w) or _stem(w) for w in words if len(w) >= 4 or w in SAME} - STOP
 
 
 def relevant(entry: dict[str, Any], words: str) -> bool:
-    """An entry is served only when it shares a real content word with what the person said (a
-    category or a sub-type alone gave a fashion shop with a price problem the exchange ideas, live
-    test 3). A short phrase, which has too few words to judge by, is not held to this."""
-    said = _words(words)
+    """An entry is served only when it shares real evidence with what the person said: a content
+    word that is more than the name of a part of the business (a category or a sub-type alone gave a
+    fashion shop with a price problem the exchange ideas, live test 3, and "staff" gave a theft
+    problem the shift rota, live test 4). A phrase with fewer than two content words has too little
+    to judge by and is not held to this."""
+    said = _evidence(words)
     if len(said) < RELEVANT_AT:
         return True
-    theirs = _words(entry.get("words", "")) | _words(" ".join(entry.get("quick_ideas") or []))
-    return bool(said & theirs)
+    shared = said & _evidence(entry.get("words", ""))
+    return bool(shared - WEAK) or len(shared & WEAK) >= 2
+
+
+def fit(entry: dict[str, Any], words: str) -> int:
+    """How much evidence the entry shares with the person's words (more is a better fit)."""
+    shared = _evidence(words) & _evidence(entry.get("words", ""))
+    return len(shared - WEAK) * 2 + len(shared & WEAK)
 
 
 def match_problem(
@@ -80,7 +104,16 @@ def match_problem(
 ) -> dict[str, Any] | None:
     """The closest entry, if it is also relevant to what they said (see ``relevant``)."""
     found = _closest(problems, category, subtype, words)
-    return found if found is not None and relevant(found, words) else None
+    if found is None:
+        return None
+    if relevant(found, words):
+        return found
+    # The model's own sub-type for this entry and one shared word, even a general one ("orders"):
+    # enough, as the real-model sweeps showed (orders from food apps are the entry's own).
+    shared = _evidence(words) & _evidence(found.get("words", ""))
+    if subtype and found.get("subtype") == subtype and shared:
+        return found
+    return None
 
 
 def _closest(
