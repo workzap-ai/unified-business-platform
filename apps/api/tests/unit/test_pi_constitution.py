@@ -140,6 +140,31 @@ def test_pi_never_promises_a_result(reply):
     assert "R-PROM-01" in rules(reply)
 
 
+@pytest.mark.parametrize(
+    "reply",
+    [
+        "Your sales will rise once you start.",
+        "You'll see more customers soon.",
+        "Footfall barh jayegi, fikar na karein.",
+        "Next year you will be bigger.",
+    ],
+)
+def test_pi_never_forecasts_the_persons_numbers(reply):  # R-PROM-03
+    assert "R-PROM-01" in rules(reply)
+
+
+@pytest.mark.parametrize(
+    "reply",
+    [
+        "I can't say sales will rise.",
+        "Sale barhani hai, ye note kar liya hai.",
+        "The document will cover it.",
+    ],
+)
+def test_noting_a_goal_or_refusing_to_forecast_is_fine(reply):
+    assert "R-PROM-01" not in rules(reply)
+
+
 def test_saying_it_cannot_guarantee_is_fine():
     assert "R-PROM-01" not in rules("I can't guarantee anything. Which shop?")
 

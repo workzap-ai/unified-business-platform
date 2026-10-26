@@ -147,7 +147,15 @@ PAYMENT_RECEIVED = re.compile(
 PROMISE = re.compile(
     r"\bguarantee[ds]?\b|\b100\s?%|\balways works\b|\bno risk\b|\brisk[- ]free\b"
     r"|\bwill (?:definitely |certainly |surely |absolutely )?(?:fix|solve|work|save|increase|boost|grow|"
-    r"double|improve)\b|\bthis will (?:fix|solve)\b|\byou(?:'ll| will) (?:save|earn)\b",
+    r"double|improve)\b|\bthis will (?:fix|solve)\b|\byou(?:'ll| will) (?:save|earn)\b"
+    # R-PROM-03: a forecast of the person's own numbers, in English and Roman Urdu
+    r"|\b(?:sales|profits?|revenue|footfall|customers|orders|income|leads|traffic)\s+"
+    r"(?:will|are going to|should)\s+(?:definitely |certainly |surely )?"
+    r"(?:rise|go up|jump|grow|increase|improve|double|climb|come|pick up)\b"
+    r"|\byou(?:'ll| will) (?:get|see|reach) (?:more|higher|better|many)\b"
+    r"|\b(?:sale|footfall|munafa|profit|customers?|income)\s+(?:zaroor\s+)?"
+    r"(?:barh(?:\s+(?:jaye|jayegi|jayega|jayenge|jaaye|jaayegi))|barh(?:egi|ega|enge)|badh(?:egi|ega|enge))\b"
+    r"|\b(?:next (?:year|month)|agle (?:saal|mahine)) you(?:'ll| will)\b",
     re.IGNORECASE,
 )
 NEGATED_PROMISE = re.compile(
