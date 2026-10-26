@@ -1,3 +1,4 @@
+# ruff: noqa: E501
 """Which language a customer wrote in, decided by code, not the model.
 
 pi must answer in the language of the customer's latest words. Models drift toward the
@@ -50,7 +51,7 @@ ENGLISH = frozenset(
 BORROWED_ANSWERS = frozenset("no yes please thanks thank sorry okay".split())
 
 URDU_LETTERS = re.compile(r"[ٹڈڑںےھہۓ]")
-PERSIAN_LETTERS = re.compile(r"[پچگژک]")
+PERSIAN_LETTERS = re.compile("[پچگژکی]")
 ARABIC_SCRIPT = re.compile(r"[؀-ۿݐ-ݿﭐ-﷿ﹰ-﻿]")
 DEVANAGARI = re.compile(r"[ऀ-ॿ]")
 LATIN_WORD = re.compile(r"[a-z]+(?:'[a-z]+)?")
@@ -72,10 +73,106 @@ def other_script(text: str | None) -> str | None:
     """The language name when the text is mostly in a script pi keeps no fixed notices for."""
     text = text or ""
     latin = len(re.findall(r"[A-Za-z]", text))
+    arabic = len(ARABIC_SCRIPT.findall(text))
+    if (
+        arabic >= max(2, latin // 3)
+        and PERSIAN_LETTERS.search(text)
+        and not URDU_LETTERS.search(text)
+    ):
+        return "Persian"  # Persian and Dari (Arabic script with Persian letters, no Urdu ones)
     for name, pattern in OTHER_SCRIPTS:
         if len(pattern.findall(text)) >= max(2, latin // 3):
             return name
     return None
+
+
+# Latin-script languages pi keeps no fixed notices for, told apart by their own small words. The
+# model writes the reply in the same language; these only say which one the person is using.
+LATIN_OTHER: dict[str, frozenset[str]] = {
+    "Indonesian": frozenset(
+        "yang dan aku saya kamu anda tidak gak ga tolong pakai bahasa indonesia indonesian apa ini itu"
+        " bisa mau kenapa dengan untuk sama kalau buat bukan sudah belum juga dong sih punya usaha"
+        " jualan lagi ada masalah sering keliru siapa nomor mohon terima kasih halo selamat pagi"
+        " bagaimana tapi karena atau jadi lebih sangat banget aja deh".split()
+    ),
+    "Turkish": frozenset(
+        "merhaba evet hayir bir ben sen bu icin ama çok cok nasil nasıl tamam lütfen lutfen teşekkürler"
+        " var yok degil değil benim senin isletme işletme sorun".split()
+    ),
+    "French": frozenset(
+        "bonjour je suis vous nous est une des les pour avec pas mais très merci s'il svp comment"
+        " problème entreprise mon ma mes oui non".split()
+    ),
+    "Spanish": frozenset(
+        "hola que qué por para con una los las pero muy gracias favor cómo como problema negocio mi"
+        " tengo quiero necesito sí no".split()
+    ),
+    "German": frozenset(
+        "hallo ich bin sie wir ist eine der die das und nicht aber sehr danke bitte wie problem"
+        " geschäft mein meine ja nein".split()
+    ),
+}
+
+
+def latin_hits(text: str | None, name: str) -> int:
+    words = set(re.findall(r"[^\W\d_]+", (text or "").lower()))
+    return len(words & LATIN_OTHER[name])
+
+
+def latin_other(text: str | None) -> str | None:
+    """A Latin-script language pi has no fixed notices for, when its own words clearly outnumber
+    the English and Roman Urdu ones ("Pakai bahasa Indonesia ya")."""
+    words = set(re.findall(r"[^\W\d_]+", (text or "").lower()))
+    rival = len(words & ROMAN_URDU) + len(words & ENGLISH)
+    best_name, best = None, 0
+    for name, vocabulary in LATIN_OTHER.items():
+        hits = len(words & vocabulary)
+        if hits > best:
+            best_name, best = name, hits
+    if best >= 2 and best > rival:
+        return best_name
+    return None
+
+
+def in_language(text: str | None, name: str) -> bool:
+    """The reply is already in that language: its script, or enough of its own words."""
+    if name in LATIN_OTHER:
+        return latin_hits(text, name) >= 2
+    return in_script(text, name)
+
+
+ASKED_LANGUAGE = re.compile(
+    r"\b(?:in|speak|talk|reply|write|answer|use|pakai|gunakan|berbahasa|translate(?:\s+to)?|auf|en)\s+(?:to me\s+)?(?:in\s+)?"
+    r"(?:bahasa\s+)?(indonesian?|indonesia|malay|turkish|french|spanish|german|persian|farsi|dari|"
+    r"pashto|swahili|portuguese|italian|russian|chinese|japanese|korean)\b",
+    re.IGNORECASE,
+)
+ASKED_NAMES = {
+    "indonesian": "Indonesian",
+    "indonesia": "Indonesian",
+    "malay": "Malay",
+    "turkish": "Turkish",
+    "french": "French",
+    "spanish": "Spanish",
+    "german": "German",
+    "persian": "Persian",
+    "farsi": "Persian",
+    "dari": "Persian",
+    "pashto": "Pashto",
+    "swahili": "Swahili",
+    "portuguese": "Portuguese",
+    "italian": "Italian",
+    "russian": "Russian",
+    "chinese": "Chinese (Simplified)",
+    "japanese": "Japanese",
+    "korean": "Korean",
+}
+
+
+def asked_language(text: str | None) -> str | None:
+    """A language the person asks pi to use ("Pakai bahasa Indonesia", "reply in French")."""
+    found = ASKED_LANGUAGE.search(text or "")
+    return ASKED_NAMES.get(found.group(1).lower()) if found else None
 
 
 def in_script(text: str | None, name: str) -> bool:

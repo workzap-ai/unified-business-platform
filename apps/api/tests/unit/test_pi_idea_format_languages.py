@@ -283,3 +283,77 @@ def test_a_stated_trade_is_never_overridden_by_problem_words() -> None:
     said = ["I run a private school with 800 students. Fees and attendance are manual."]
     found = industry_packs.detect(said)
     assert found.stated and industry_overlap.fuse(found, said) is found
+
+
+def test_a_direct_document_request_is_a_yes_but_a_solution_ask_is_not() -> None:
+    from app.modules.pi import decisions
+    from app.modules.pi.flow import State
+
+    facts = {"problem_count": 2, "group_count": 1, "problem_refs": ["a", "b"], "brief": {}}
+    for said in ("dain solution document mujhay", "quote do", "Haan document aur quote bana dein"):
+        decided = decisions.decide(State.S3_NOTED, said, "roman_ur", facts)
+        assert decided is not None and decided.next_state == State.S6_PREPARING, said
+    # "solution dain" asks for ideas, never for the document
+    assert decisions.decide(State.S3_NOTED, "Solution dain", "roman_ur", facts) is None
+    # a question about cost is not a request
+    assert (
+        decisions.decide(State.S3_NOTED, "document ka quote kitna hoga", "roman_ur", facts) is None
+    )
+
+
+@pytest.mark.parametrize(
+    "text",
+    [
+        "Solution dain",
+        "solution?",
+        "Let me know a solution",
+        "mujhe solution den",
+        "koi solution hai iska?",
+        "sub ok hai solution bataye kub say pooch raha hoan?",
+    ],
+)
+def test_live_chat_phrases_ask_for_ideas(text: str) -> None:
+    assert solution_ask.asked_for_ideas(text)
+
+
+def test_a_problem_statement_with_koi_hal_nahi_is_not_an_ask() -> None:
+    assert not solution_ask.asked_for_ideas("koi hal nahi hai is masle ka")
+
+
+@pytest.mark.parametrize(
+    ("text", "name"),
+    [
+        (
+            "Halo Pi, tolong pakai bahasa Indonesia ya. Aku punya usaha jualan baju online dan lagi ada masalah di pencatatan pesanan, sering keliru.",
+            "Indonesian",
+        ),
+        ("Pakai bahasa Indonesia", "Indonesian"),
+        ("Kamu ada ai yang lain tidak? Aku mau chat mereka", "Indonesian"),
+        ("میشه در فارسی صبحت کنم", "Persian"),
+        ("کار من خیاطی", "Persian"),
+    ],
+)
+def test_other_languages_are_recognised(text: str, name: str) -> None:
+    from app.modules.pi.language import asked_language, latin_other, other_script
+
+    assert (asked_language(text) or latin_other(text) or other_script(text)) == name
+
+
+def test_english_roman_urdu_and_urdu_script_are_not_other_languages() -> None:
+    from app.modules.pi.language import latin_other, other_script
+
+    for text in (
+        "Hi, I run a private school with 800 students and the fees are manual",
+        "Mera kiryana store hai aur udhaar ka hisaab kitab mein gadbad hai",
+        "میرا کام ٹیکسٹائل کا ہے اور مجھے ہاں کی ضرورت ہے",
+        "مرحبا، عندي شركة توصيل",
+    ):
+        assert latin_other(text) is None and other_script(text) is None, text
+
+
+def test_a_requested_language_is_asked_for_by_name() -> None:
+    from app.modules.pi.language import asked_language
+
+    assert asked_language("Please reply in French") == "French"
+    assert asked_language("Translate Indonesia") == "Indonesian"
+    assert asked_language("Talk to me in English please") is None

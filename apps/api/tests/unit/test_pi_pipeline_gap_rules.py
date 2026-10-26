@@ -290,7 +290,9 @@ def test_send_the_quote_from_a_non_decider_gets_the_members_answer_and_one_quest
 
 def test_a_decider_asking_for_the_quote_is_not_blocked():
     facts = {"can_approve": True, "problem_count": 3}
-    assert decisions.decide(S.S4_SORTED_SUMMARY, "send the quote", "en", facts) is None
+    # a direct request for the quote is a yes from any listening step (platform spec, Book 4 5.2)
+    decided = decisions.decide(S.S4_SORTED_SUMMARY, "send the quote", "en", facts)
+    assert decided is not None and decided.next_state == S.S6_PREPARING
 
 
 # --- consent for follow-ups beyond 24 hours (spec 3.9.1) ----------------------------------------

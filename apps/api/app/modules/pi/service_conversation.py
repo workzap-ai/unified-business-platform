@@ -59,11 +59,13 @@ from app.modules.pi.guard import ReplyRejected, validate_reply
 from app.modules.pi.knowledge import KnowledgeService, remember
 from app.modules.pi.language import (
     NAMES,
+    asked_language,
     clearly_other,
     detect_language,
     english_greeting,
     festival_wish,
-    in_script,
+    in_language,
+    latin_other,
     other_script,
     returning_greeting,
     salam,
@@ -3237,6 +3239,8 @@ def reply_language(
     """The language pi must answer in, from the customer's own latest words. Image and
     file descriptions are system English, so those fall back to the customer's last text."""
     texts = [message.body] if message.message_type in ("text", "audio") else []
+    if texts and (asked := asked_language(texts[0])):
+        return {"reply_language_other": asked}  # "Pakai bahasa Indonesia", "reply in French"
     if (
         texts
         and not detect_language(texts[0])
@@ -3251,6 +3255,8 @@ def reply_language(
         if m.sender_type == "customer" and m.message_type in ("text", "audio") and m.body
     ]
     for earlier in texts[:3]:
+        if other := latin_other(earlier):
+            return {"reply_language_other": other}  # Indonesian and the like, in Latin letters
         if detect_language(earlier):
             break
         if other := other_script(earlier):
@@ -4848,7 +4854,7 @@ async def compose_service_turn(
         brief["handback_notice"] = False
         conversation.service_brief = brief
     other_language = str(context.get("reply_language_other") or "")
-    if other_language and (turn._english or not in_script(turn.reply, other_language)):
+    if other_language and (turn._english or not in_language(turn.reply, other_language)):
         latency.count("model_calls")
         turn.reply = await latency.timed(
             "model.language",

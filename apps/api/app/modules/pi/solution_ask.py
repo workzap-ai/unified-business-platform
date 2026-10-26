@@ -59,7 +59,13 @@ SOLUTION_ASK_PLAIN = re.compile(
     r"|\b(?:suggest|recommend) (?:something|anything|a (?:way|fix|solution))\b"
     r"|\b(?:iska|is ka|isay|ise|isko|inka|in ka) (?:hal|solution|ilaj)\b"
     r"|\b(?:theek|thik|sahi|hal) (?:kaise )?(?:karein|karen|kare|karun|karu|hoga)\b"
-    r"|\bkya (?:karein|karen|kare|karna hai|karna chahiye)\b",
+    r"|\bkya (?:karein|karen|kare|karna hai|karna chahiye)\b"
+    # live chats: "Solution dain", "solution?", "Let me know a solution", "mujhe solution den",
+    # "koi solution hai iska?", "solution bataye"
+    r"|^\W*(?:solutions?|hal|ilaj|ideas?|suggestions?)\W*$"
+    r"|\bsolutions? (?:dain|dayen|den|dijiye|dijie|bataye|bataiye|bata do|batain|batayen)\b"
+    r"|\b(?:let me know|tell me|show me|need|want) (?:a |the |some |your )?(?:solutions?|ideas?|suggestions?)\b"
+    r"|\bkoi (?:solution|hal|ilaj|tareeqa|tarika|idea|mashwara) (?:hai|he|hoga)\b(?!\s*(?:nahi|nhi))",
     re.IGNORECASE,
 )
 COST = re.compile(r"\b(?:how much|kitna|kitne|price|pricing|cost|qeemat|kharcha|quote)\b", re.I)

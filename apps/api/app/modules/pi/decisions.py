@@ -56,6 +56,16 @@ _YES_REQUEST = re.compile(
     r"|(?:bana|banwa|bhej|send|prepare|make|create).*(?:document|quote|quotation|proposal|solution)",
     re.IGNORECASE,
 )
+# A direct request for the document or the quote itself (the word "solution" alone asks for ideas,
+# not for the document): "dain solution document mujhay", "quote do", "send me the document".
+_DOC_REQUEST = re.compile(
+    r"(?:document|quote|quotation|proposal).*(?:bana|banwa|bhej|send|prepare|make|create|dein|den|dain|do|chahiye|chahie|chahiay|mujhay|mujhe|me)"
+    r"|(?:bana|banwa|bhej|send|prepare|make|create|dein|den|dain|de do|dedo).*(?:document|quote|quotation|proposal)",
+    re.IGNORECASE,
+)
+_PRICEY = re.compile(
+    r"\b(?:how much|kitna|kitne|price|cost|qeemat|kharcha|charges?)\b", re.IGNORECASE
+)
 _NO = re.compile(rf"^\W*(?:{NO_WORDS})\W*$", re.IGNORECASE)
 _NO_LEAD = re.compile(rf"^\W*(?:{NO_WORDS})\b", re.IGNORECASE)
 _LATER = re.compile(rf"\b(?:{LATER_WORDS})\b|(?:{LATER_WORDS})", re.IGNORECASE)
@@ -338,6 +348,8 @@ def classify(message: str) -> tuple[Answer, float]:
             Answer.YES,
             0.92,
         )  # "haan document aur quote bana dein": a yes that asks for the offer
+    if len(said.split()) <= 14 and _DOC_REQUEST.search(said) and not _PRICEY.search(said):
+        return Answer.YES, 0.92  # a direct request for the document or quote is a yes (Book 4, 5.2)
     return Answer.UNCLEAR, 0.4
 
 
@@ -383,13 +395,13 @@ def decide(
 
     if (
         state in (State.S1_LISTENING, State.S2_CLARIFYING, State.S3_NOTED, State.S4_SORTED_SUMMARY)
-        and brief.get("offer_asked")
         and facts.get("problem_count")
         and _ok(answer, Answer.YES)
-        and _YES_REQUEST.search(message)
+        and _DOC_REQUEST.search(message)
     ):
-        # The offer is open, a later problem moved the chat back to listening, and now they ask
-        # for the document and quote: that is the offer's yes, whatever step the chat fell back to.
+        # They ask for the document or quote itself and at least one problem is noted: that is a
+        # yes from any step of the listening, whether or not the offer was made (platform spec,
+        # Book 4 prompt 5.2: a direct request for the document counts as yes).
         state = State.S5_READINESS
 
     if state == State.S4_SORTED_SUMMARY:

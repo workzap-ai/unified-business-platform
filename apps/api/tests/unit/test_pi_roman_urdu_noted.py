@@ -611,7 +611,8 @@ def test_an_explicit_document_yes_with_an_offer_open_is_the_offers_yes_from_any_
         decided = decisions.decide(step, said, "en", facts)
         assert decided is not None and decided.next_state == State.S6_PREPARING, step
     no_offer = decisions.decide(State.S3_NOTED, said, "en", {**facts, "brief": {}})
-    assert no_offer is None or no_offer.next_state != State.S6_PREPARING
+    # even before the offer was made: a direct request for the document is a yes (Book 4 5.2)
+    assert no_offer is not None and no_offer.next_state == State.S6_PREPARING
 
 
 def test_only_a_complaint_about_pi_or_workzap_counts_as_one() -> None:
