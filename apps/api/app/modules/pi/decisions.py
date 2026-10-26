@@ -792,6 +792,11 @@ def cost_asked(text: str) -> bool:
     return bool(COST_ASKED.search(OWN_MONEY.sub(" ", text or "")))
 
 
-def cost_answer(language: str | None) -> str:
+def cost_answer(language: str | None, context: dict[str, Any] | None = None) -> str:
     """An honest answer with no figure and no range, given before the summary or the offer."""
-    return COST_ANSWER["roman_ur"] if language == "roman_ur" else COST_ANSWER["en"]
+    from app.modules.pi import fixed_lines
+
+    base = COST_ANSWER["roman_ur"] if language == "roman_ur" else COST_ANSWER["en"]
+    if context is None:
+        return base
+    return fixed_lines.line("cost", fixed_lines.code(context), base)

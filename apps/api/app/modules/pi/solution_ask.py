@@ -274,8 +274,15 @@ OFFERABLE = ("S1_LISTENING", "S2_CLARIFYING", "S3_NOTED", "S4_SORTED_SUMMARY")
 ASKABLE = (*OFFERABLE, "S5_READINESS", "S5b_DECLINED")
 
 
-def offer_line(language: str | None) -> str:
-    return OFFER_AFTER.get(language or "en", OFFER_AFTER["en"])
+def offer_line(language: str | None, context: dict[str, Any] | None = None) -> str:
+    """The offer, in the person's language: one of the eight priority languages by the script and
+    words of their message, else the chat's language."""
+    from app.modules.pi import fixed_lines
+
+    base = OFFER_AFTER.get(language or "en", OFFER_AFTER["en"])
+    if context is None:
+        return base
+    return fixed_lines.line("offer", fixed_lines.code(context), base)
 
 
 OFFERS_DOCUMENT = re.compile(

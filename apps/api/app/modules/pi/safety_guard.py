@@ -15,7 +15,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.config import Settings
 from app.integrations.crypto import CredentialManager
 from app.integrations.errors import IntegrationError
-from app.modules.pi import safety
+from app.modules.pi import fixed_lines, safety
 from app.modules.pi.models import PiConversation, PiMessage
 from app.modules.pi.quarantine_models import RETENTION_DAYS, PiQuarantine
 from app.shared.scope import WorkspaceScope
@@ -54,7 +54,10 @@ async def guard_inbound(
     message.body = found.text
     brief = dict(conversation.service_brief or {})
     notice, told = safety.pii_notice(
-        found.kinds, list(brief.get("pii_told") or []), conversation.language
+        found.kinds,
+        list(brief.get("pii_told") or []),
+        conversation.language,
+        fixed_lines.code_of_text(original, conversation.language),
     )
     brief["pii_told"] = told
     conversation.service_brief = brief

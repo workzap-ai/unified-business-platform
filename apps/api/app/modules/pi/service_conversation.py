@@ -31,6 +31,7 @@ from app.modules.pi import (
     business,
     constitution,
     decisions,
+    fixed_lines,
     flow,
     followup_policy,
     industry_overlap,
@@ -1712,8 +1713,10 @@ def with_disclosure(
     if SAYS_AI.search(reply) or constitution._discloses(reply):
         return reply  # it already says so, in its own words: not twice
     if after:
-        return f"{reply}\n{DISCLOSURE_TAIL.get(language, DISCLOSURE_TAIL['en'])}"
-    return f"{DISCLOSURE_LINE.get(language, DISCLOSURE_LINE['en'])} {reply}"
+        tail = DISCLOSURE_TAIL.get(language, DISCLOSURE_TAIL["en"])
+        return f"{reply}\n{fixed_lines.line('opening', fixed_lines.code(context), tail)}"
+    opening = DISCLOSURE_LINE.get(language, DISCLOSURE_LINE["en"])
+    return f"{fixed_lines.line('opening', fixed_lines.code(context), opening)} {reply}"
 
 
 def brain_safety(context: dict[str, Any]) -> "ServiceTurn | None":
@@ -1784,7 +1787,7 @@ def _brain_gate(
 
     if (kind := safety.emergency(text)) is not None:
         return fixed(
-            safety.emergency_reply(kind, country, language),
+            safety.emergency_reply(kind, country, language, fixed_lines.code(context)),
             flow.State.X_EMERGENCY,
             ["emergency"],
             {"emergency": {"kind": kind.value}},
@@ -1946,7 +1949,7 @@ def brain_summary(turn: "ServiceTurn", context: dict[str, Any]) -> None:
     language = str(context.get("reply_language") or "en")
     turn.reply = problems.summary_message(items, language)
     if decisions.cost_asked(said):  # answer the cost question first, then the summary
-        turn.reply = f"{decisions.cost_answer(language)}\n\n{turn.reply}"
+        turn.reply = f"{decisions.cost_answer(language, context)}\n\n{turn.reply}"
     # The group counts are figures pi wrote itself: the no-digits rule must let them through.
     context["fixed_lines"] = [ln for ln in turn.reply.splitlines() if any(c.isdigit() for c in ln)]
     turn.awaiting_customer = True
@@ -2371,7 +2374,7 @@ def brain_no_ideas(turn: "ServiceTurn", context: dict[str, Any]) -> None:
     if at_offer and not solution_ask.already_offers(turn.reply):
         # The chat is already at the offer (brain_offer only adds it from the listening states):
         # a person who keeps asking for a fix gets the open question again, never a dead end.
-        turn.reply = f"{turn.reply}\n\n{solution_ask.offer_line(language)}"
+        turn.reply = f"{turn.reply}\n\n{solution_ask.offer_line(language, context)}"
     turn.awaiting_customer = True
 
 
@@ -2447,7 +2450,7 @@ def brain_no_early_promise(turn: "ServiceTurn", context: dict[str, Any]) -> None
     language = str(context.get("reply_language") or "en")
     created = [op for op in turn.problem_ops if op.op == "create"]
     if context.get("noted_problems") or created:
-        turn.reply = solution_ask.offer_line(language)
+        turn.reply = solution_ask.offer_line(language, context)
         turn._decision = decisions.Decision(
             None, flow.State.S5_READINESS, {"offer_asked": True}, why="R-OFFER-01"
         )
@@ -2472,7 +2475,7 @@ def brain_never_empty(turn: "ServiceTurn", context: dict[str, Any]) -> None:
     ):
         line = f"{NO_IDEA_LINES.get(language, NO_IDEA_LINES['en'])}"
         if not solution_ask.already_offers(line):
-            line = line + chr(10) + chr(10) + solution_ask.offer_line(language)
+            line = line + chr(10) + chr(10) + solution_ask.offer_line(language, context)
         turn._decision = decisions.Decision(
             None, flow.State.S5_READINESS, {"offer_asked": True}, why="R-OFFER-01"
         )
@@ -2498,13 +2501,13 @@ def brain_offer(turn: "ServiceTurn", context: dict[str, Any]) -> None:
         state == flow.State.S5_READINESS
         and (context.get("solution_ideas") or IDEA_LINES.search(turn.reply))
         and not solution_ask.already_offers(turn.reply)
-        and solution_ask.offer_line(language) not in turn.reply
+        and solution_ask.offer_line(language, context) not in turn.reply
         and not turn.reply.rstrip().endswith(constitution.QUESTION_MARKS)
     ):
         # R-VAL-06: ideas never end on nothing, however they came (a request, an answer, the
         # model's own). The offer is open, so the ideas close with the offer line (one question,
         # last); the move stays S5.
-        turn.reply = f"{turn.reply.rstrip()}\n\n{solution_ask.offer_line(language)}"
+        turn.reply = f"{turn.reply.rstrip()}\n\n{solution_ask.offer_line(language, context)}"
         turn.awaiting_customer = True
         return
     # The offer follows a request for a fix, a "how exactly?" and a request no idea could meet; a
@@ -2520,7 +2523,7 @@ def brain_offer(turn: "ServiceTurn", context: dict[str, Any]) -> None:
     if state not in solution_ask.OFFERABLE or not (context.get("noted_problems") or created):
         return
     if not solution_ask.already_offers(turn.reply):
-        turn.reply = f"{turn.reply.rstrip()}\n\n{solution_ask.offer_line(language)}"
+        turn.reply = f"{turn.reply.rstrip()}\n\n{solution_ask.offer_line(language, context)}"
     turn.awaiting_customer = True
     turn._decision = decisions.Decision(
         None, flow.State.S5_READINESS, {"offer_asked": True}, why="R-OFFER-01"

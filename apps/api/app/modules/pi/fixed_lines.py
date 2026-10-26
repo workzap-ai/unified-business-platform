@@ -1,0 +1,167 @@
+# ruff: noqa: E501  (one fixed line per row reads better than wrapped text)
+"""The fixed lines pi sends without asking a model, in the eight priority languages (owner order:
+English, Roman Urdu, Urdu, Arabic, Hindi, French, Persian, Spanish). A fixed line is the safe
+fallback when a rewrite fails, so for these languages it must never be English: the opening, the AI
+answer, the offer, the card and ID reminders, the emergency answer and the cost answer.
+
+The Hindi, French, Persian and Spanish wording was approved by the owner on 2026-10-26; the Urdu and
+Arabic lines were written from the Roman Urdu and English ones in the same files. Anything a language
+has no line for here comes from the older per-file tables, and from English last."""
+
+import re
+from typing import Any
+
+PRIORITY = ("en", "roman_ur", "ur", "ar", "hi", "fr", "fa", "es")
+CODES = {"Persian": "fa", "French": "fr", "Spanish": "es", "Hindi": "hi", "Urdu": "ur"}
+
+LINES: dict[str, dict[str, str]] = {
+    "opening": {
+        "en": "Hi, I'm pi, an AI from Workzap.",
+        "roman_ur": "Hi, main pi hoon, Workzap ka AI.",
+        "ur": "ہیلو، میں pi ہوں، Workzap کی طرف سے ایک مصنوعی ذہانت۔",
+        "ar": "مرحباً، أنا pi، ذكاء اصطناعي من Workzap.",
+        "hi": "नमस्ते, मैं pi हूँ, Workzap का एक AI।",
+        "fr": "Bonjour, je suis pi, une IA de Workzap.",
+        "fa": "سلام، من pi هستم، یک هوش مصنوعی از Workzap.",
+        "es": "Hola, soy pi, una IA de Workzap.",
+    },
+    "ai_answer": {
+        "en": "I'm an AI, not a person. I'm pi, from Workzap.",
+        "roman_ur": "Main AI hoon, insaan nahi. Main pi hoon, Workzap se.",
+        "ur": "میں ایک مصنوعی ذہانت ہوں، انسان نہیں۔ میں pi ہوں، Workzap سے۔",
+        "ar": "أنا ذكاء اصطناعي، ولست إنساناً. أنا pi من Workzap.",
+        "hi": "मैं एक AI हूँ, इंसान नहीं। मैं Workzap का pi हूँ।",
+        "fr": "Je suis une IA, pas une personne. Je suis pi, de Workzap.",
+        "fa": "من یک هوش مصنوعی هستم، نه یک انسان. من pi از Workzap هستم.",
+        "es": "Soy una IA, no una persona. Soy pi, de Workzap.",
+    },
+    "offer": {
+        "en": "Shall I get a solution document and a quote made for you? You can say no.",
+        "roman_ur": "Kya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+        "ur": "کیا میں آپ کے لیے حل کی دستاویز اور کوٹ بنوا دوں؟ آپ منع بھی کر سکتے ہیں۔",
+        "ar": "هل أجهّز لك وثيقة حل وعرض سعر؟ يمكنك أن تقول لا.",
+        "hi": "क्या मैं आपके लिए एक समाधान दस्तावेज़ और कोट बनवा दूँ? आप मना भी कर सकते हैं।",
+        "fr": "Souhaitez-vous que je fasse préparer un document de solution et un devis ? Vous pouvez dire non.",
+        "fa": "آیا مایلید یک سند راه‌حل و یک پیش‌فاکتور برایتان آماده کنم؟ می‌توانید نه بگویید.",
+        "es": "¿Quiere que le prepare un documento de solución y un presupuesto? Puede decir que no.",
+    },
+    "card": {
+        "en": "Please don't send card numbers here. I never need them, and payment never happens in this chat. I've left that out of my notes.",
+        "roman_ur": "Meherbani karke yahan card number na bhejein. Mujhe in ki zaroorat nahi, aur payment is chat mein kabhi nahi hoti. Maine ise apne notes se nikaal diya hai.",
+        "ur": "براہِ مہربانی یہاں کارڈ نمبر نہ بھیجیں۔ مجھے ان کی ضرورت نہیں، اور ادائیگی اس چیٹ میں کبھی نہیں ہوتی۔ میں نے اسے اپنے نوٹس سے نکال دیا ہے۔",
+        "ar": "يرجى عدم إرسال أرقام البطاقات هنا. لا أحتاج إليها أبدًا، والدفع لا يتم أبدًا في هذه المحادثة. لقد أبقيتها خارج ملاحظاتي.",
+        "hi": "कृपया यहाँ कार्ड नंबर न भेजें। मुझे इनकी ज़रूरत नहीं है, और भुगतान इस चैट में कभी नहीं होता। मैंने इसे अपने नोट्स से हटा दिया है।",
+        "fr": "Merci de ne pas envoyer de numéros de carte ici. Je n'en ai jamais besoin, et le paiement ne se fait jamais dans ce chat. Je l'ai laissé de côté dans mes notes.",
+        "fa": "لطفاً شماره کارت را اینجا نفرستید. من هرگز به آن نیاز ندارم و پرداخت هیچ‌گاه در این گفتگو انجام نمی‌شود. آن را از یادداشت‌هایم کنار گذاشته‌ام.",
+        "es": "Por favor, no envíe números de tarjeta aquí. Nunca los necesito, y el pago nunca se hace en este chat. Lo he dejado fuera de mis notas.",
+    },
+    "id": {
+        "en": "Please don't send ID numbers here. I don't need them. I've left that out of my notes.",
+        "roman_ur": "Meherbani karke yahan ID number na bhejein. Mujhe in ki zaroorat nahi. Maine ise apne notes se nikaal diya hai.",
+        "ur": "براہِ مہربانی یہاں شناختی نمبر نہ بھیجیں۔ مجھے ان کی ضرورت نہیں۔ میں نے اسے اپنے نوٹس سے نکال دیا ہے۔",
+        "ar": "يرجى عدم إرسال أرقام الهوية هنا. لا أحتاج إليها. لقد أبقيتها خارج ملاحظاتي.",
+        "hi": "कृपया यहाँ पहचान-पत्र (ID) नंबर न भेजें। मुझे इनकी ज़रूरत नहीं है। मैंने इसे अपने नोट्स से हटा दिया है।",
+        "fr": "Merci de ne pas envoyer de numéros de pièce d'identité ici. Je n'en ai pas besoin. Je l'ai laissé de côté dans mes notes.",
+        "fa": "لطفاً شماره مدارک شناسایی را اینجا نفرستید. به آن نیازی ندارم. آن را از یادداشت‌هایم کنار گذاشته‌ام.",
+        "es": "Por favor, no envíe números de documentos de identidad aquí. No los necesito. Lo he dejado fuera de mis notas.",
+    },
+    "cost": {
+        "en": "The cost depends on what would be built. It is written on the quote before you decide, and the quote is free, not a charge.",
+        "roman_ur": "Kharcha is par depend karta hai ke kya banaya jaye. Woh quote par likha hota hai, aap ke faisle se pehle, aur quote muft hai, koi charge nahi.",
+        "ur": "لاگت اس پر منحصر ہے کہ کیا بنایا جائے۔ وہ آپ کے فیصلے سے پہلے کوٹ پر لکھی ہوتی ہے، اور کوٹ مفت ہے، کوئی چارج نہیں۔",
+        "ar": "تعتمد التكلفة على ما سيتم بناؤه. تُكتب في عرض السعر قبل أن تقرر، وعرض السعر مجاني وليس رسمًا.",
+        "hi": "लागत इस पर निर्भर करती है कि क्या बनाया जाएगा। वह आपके फ़ैसले से पहले कोट पर लिखी होती है, और कोट मुफ़्त है, कोई शुल्क नहीं।",
+        "fr": "Le coût dépend de ce qui serait construit. Il est écrit sur le devis avant que vous décidiez, et le devis est gratuit, ce n'est pas un paiement.",
+        "fa": "هزینه به این بستگی دارد که چه چیزی ساخته شود. پیش از تصمیم شما روی پیش‌فاکتور نوشته می‌شود و پیش‌فاکتور رایگان است، نه یک هزینه.",
+        "es": "El coste depende de lo que se construiría. Está escrito en el presupuesto antes de que usted decida, y el presupuesto es gratis, no es un cobro.",
+    },
+}
+
+# The emergency answers for the new languages. {fire}, {ambulance} and {police} are filled with the
+# person's local numbers by safety.emergency_reply. Self-harm and safeguarding keep their longer
+# older lines (English, then the translation step) until the owner has seen a wording for them.
+EMERGENCY: dict[str, dict[str, str]] = {
+    "ur": {
+        "fire": "میں ہنگامی صورتحال میں مدد نہیں کر سکتا۔ براہِ مہربانی ابھی {fire} پر کال کریں۔",
+        "medical": "میں ہنگامی صورتحال میں مدد نہیں کر سکتا۔ براہِ مہربانی ایمبولینس کے لیے ابھی {ambulance} پر کال کریں۔",
+        "violence": "میں ہنگامی صورتحال میں مدد نہیں کر سکتا۔ براہِ مہربانی ابھی {police} پر کال کریں اور محفوظ جگہ پر چلے جائیں۔",
+        "generic": "میں ہنگامی صورتحال میں مدد نہیں کر سکتا۔ براہِ مہربانی ابھی {police} پر کال کریں۔",
+    },
+    "hi": {
+        "fire": "मैं आपात स्थिति में मदद नहीं कर सकता। कृपया अभी {fire} पर कॉल करें।",
+        "medical": "मैं आपात स्थिति में मदद नहीं कर सकता। कृपया एम्बुलेंस के लिए अभी {ambulance} पर कॉल करें।",
+        "violence": "मैं आपात स्थिति में मदद नहीं कर सकता। कृपया अभी {police} पर कॉल करें और सुरक्षित जगह पर चले जाएँ।",
+        "generic": "मैं आपात स्थिति में मदद नहीं कर सकता। कृपया अभी {police} पर कॉल करें।",
+    },
+    "fr": {
+        "fire": "Je ne peux pas aider en cas d'urgence. Veuillez appeler {fire} maintenant.",
+        "medical": "Je ne peux pas aider en cas d'urgence. Veuillez appeler {ambulance} pour une ambulance maintenant.",
+        "violence": "Je ne peux pas aider en cas d'urgence. Veuillez appeler {police} maintenant et vous mettre en sécurité.",
+        "generic": "Je ne peux pas aider en cas d'urgence. Veuillez appeler {police} maintenant.",
+    },
+    "fa": {
+        "fire": "من نمی‌توانم در موارد اضطراری کمک کنم. لطفاً همین حالا با {fire} تماس بگیرید.",
+        "medical": "من نمی‌توانم در موارد اضطراری کمک کنم. لطفاً همین حالا برای آمبولانس با {ambulance} تماس بگیرید.",
+        "violence": "من نمی‌توانم در موارد اضطراری کمک کنم. لطفاً همین حالا با {police} تماس بگیرید و به جای امن بروید.",
+        "generic": "من نمی‌توانم در موارد اضطراری کمک کنم. لطفاً همین حالا با {police} تماس بگیرید.",
+    },
+    "es": {
+        "fire": "No puedo ayudar con emergencias. Por favor, llame ahora al {fire}.",
+        "medical": "No puedo ayudar con emergencias. Por favor, llame ahora al {ambulance} para pedir una ambulancia.",
+        "violence": "No puedo ayudar con emergencias. Por favor, llame ahora al {police} y póngase a salvo.",
+        "generic": "No puedo ayudar con emergencias. Por favor, llame ahora al {police}.",
+    },
+}
+# What stands for "the number" when the person's country is unknown, in their language
+LOCAL_NUMBER = {
+    "ur": "آپ کا مقامی ہنگامی نمبر ({numbers})",
+    "ar": "رقم الطوارئ المحلي ({numbers})",
+    "hi": "आपका स्थानीय आपातकालीन नंबर ({numbers})",
+    "fr": "votre numéro d'urgence local ({numbers})",
+    "fa": "شماره اورژانس محلی شما ({numbers})",
+    "es": "su número de emergencia local ({numbers})",
+}
+
+DEVANAGARI = re.compile(r"[ऀ-ॿ]")
+ARABIC = re.compile(r"[؀-ۿ]")
+URDU_ONLY = re.compile(r"[ٹڈڑںھہےۓ]")
+PERSIAN_ONLY = re.compile(r"[پچژگکی]")
+
+
+def code_of_text(text: str | None, base: str | None = None) -> str:
+    """The fixed-line language of what the person wrote: its script (Devanagari is Hindi, Arabic
+    script is Urdu, Persian or Arabic by its letters) or its own French and Spanish words, else
+    `base` (the chat's language) or English."""
+    from app.modules.pi.language import latin_other
+
+    text = text or ""
+    latin = len(re.findall(r"[A-Za-z]", text))
+    if len(DEVANAGARI.findall(text)) > latin:
+        return "hi"
+    if len(ARABIC.findall(text)) > latin:
+        if URDU_ONLY.search(text):
+            return "ur"
+        return "fa" if PERSIAN_ONLY.search(text) else "ar"
+    other = latin_other(text)
+    if other == "French":
+        return "fr"
+    if other == "Spanish":
+        return "es"
+    return base if base in LINES["opening"] else "en"
+
+
+def code(context: dict[str, Any]) -> str:
+    """The language the fixed lines of this turn go out in: the language the person asked for or
+    wrote ("reply_language_other"), else the script and words of their latest message, else the
+    chat's language."""
+    other = CODES.get(str(context.get("reply_language_other") or ""))
+    if other:
+        return other
+    base = str(context.get("reply_language") or "en")
+    return code_of_text(str(context.get("latest_customer_message") or ""), base)
+
+
+def line(key: str, language: str | None, default: str | None = None) -> str:
+    """One fixed line in that language, else `default`, else English."""
+    table = LINES[key]
+    return table.get(language or "en") or default or table["en"]

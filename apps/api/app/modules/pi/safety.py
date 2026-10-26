@@ -549,10 +549,18 @@ def emergency(text: str) -> Emergency | None:
 CRISIS_LINE = {"PK": "1122", "AE": "999", "CA": "9-8-8 (or 911 if you're in danger)"}
 
 
-def emergency_reply(kind: Emergency, country: str | None, language: str | None) -> str:
-    """The fixed emergency answer with the person's local numbers (every country when unknown)."""
+def emergency_reply(
+    kind: Emergency, country: str | None, language: str | None, fixed: str | None = None
+) -> str:
+    """The fixed emergency answer with the person's local numbers (every country when unknown).
+    `fixed` is the language of the person's message among the eight priority languages."""
+    from app.modules.pi import fixed_lines
+
     table = EMERGENCY_TEXT.get(language or "en", EMERGENCY_TEXT["en"])
     template = table[kind]
+    own = fixed_lines.EMERGENCY.get(fixed or "")
+    if own and kind in (Emergency.FIRE, Emergency.MEDICAL, Emergency.VIOLENCE, Emergency.GENERIC):
+        template = own[kind.value]
     if country in NUMBERS:
         numbers = NUMBERS[country]
         police = (
@@ -565,7 +573,8 @@ def emergency_reply(kind: Emergency, country: str | None, language: str | None) 
             ambulance=numbers["ambulance"],
             police=police,
         )
-    wide = f"your local emergency number ({ALL_COUNTRIES})"
+    wide = fixed_lines.LOCAL_NUMBER.get(fixed or "", "your local emergency number ({numbers})")
+    wide = wide.format(numbers=ALL_COUNTRIES)
     return template.format(fire=wide, ambulance=wide, police=wide)
 
 
@@ -889,12 +898,24 @@ PII_TEXT = {
 }
 
 
-def pii_notice(kinds: list[Pii], told: list[str], language: str | None) -> tuple[str, list[str]]:
+def pii_notice(
+    kinds: list[Pii], told: list[str], language: str | None, fixed: str | None = None
+) -> tuple[str, list[str]]:
     """The reminder for kinds not yet reminded in this conversation, and the updated list: one reminder per
-    kind per conversation, never a scolding (spec 6.3)."""
+    kind per conversation, never a scolding (spec 6.3). `fixed` is the language of the person's message among
+    the eight priority languages: the card and ID reminders exist in all of them."""
+    from app.modules.pi import fixed_lines
+
     table = PII_TEXT.get(language or "en", PII_TEXT["en"])
     fresh = [k for k in kinds if k.value not in told]
-    return " ".join(table[k] for k in fresh), [*told, *(k.value for k in fresh)]
+    own = {Pii.CARD: "card", Pii.ID: "id"}
+
+    def said(kind: Pii) -> str:
+        if kind in own and fixed in fixed_lines.LINES[own[kind]]:
+            return fixed_lines.LINES[own[kind]][str(fixed)]
+        return table[kind]
+
+    return " ".join(said(k) for k in fresh), [*told, *(k.value for k in fresh)]
 
 
 # --- advice that is not pi's to give (R-ADV-01 to 05) -----------------------------------------

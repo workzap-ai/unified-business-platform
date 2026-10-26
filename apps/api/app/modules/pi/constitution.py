@@ -43,15 +43,17 @@ OPENING = {
 
 def opening_line(context: dict[str, Any]) -> str:
     """The one-line AI disclosure in the person's language and script (R-DISC-01, R-LANG-02)."""
+    from app.modules.pi import fixed_lines
     from app.modules.pi.language import ARABIC_SCRIPT, URDU_LETTERS
 
     language = context.get("reply_language")
     said = str(context.get("latest_customer_message", ""))
     if language == "roman_ur":
-        return OPENING[
-            "ur" if ARABIC_SCRIPT.search(said) and URDU_LETTERS.search(said) else language
-        ]
-    return OPENING.get(str(language), OPENING["en"])
+        key = "ur" if ARABIC_SCRIPT.search(said) and URDU_LETTERS.search(said) else language
+        base = OPENING[key]
+    else:
+        base = OPENING.get(str(language), OPENING["en"])
+    return fixed_lines.line("opening", fixed_lines.code(context), base)
 
 
 SENTENCE = re.compile(r"(?<=[.!?؟۔।])\s+|\n+")
@@ -2105,6 +2107,12 @@ def _language(context: dict[str, Any]) -> str:
     return language if language in OPENING else "en"
 
 
+def _ai_answer(context: dict[str, Any], language: str) -> str:
+    from app.modules.pi import fixed_lines
+
+    return fixed_lines.line("ai_answer", fixed_lines.code(context), AI_ANSWER[language])
+
+
 def safe_fallback(context: dict[str, Any]) -> str:
     """The safe line for the state, in the person's language (spec 9.5)."""
     language = _language(context)
@@ -2116,7 +2124,7 @@ def safe_fallback(context: dict[str, Any]) -> str:
         parts.append(f"{opening_line(context)} {FIRST_INVITE[language]}")
     else:
         if ASKS_IF_AI.search(str(context.get("latest_customer_message", ""))):
-            parts.append(AI_ANSWER[language])
+            parts.append(_ai_answer(context, language))
         listening = state in flow.LISTENING or state in (None, flow.State.S5B_DECLINED)
         parts.append((FALLBACK_LISTENING if listening else FALLBACK_OTHER)[language])
     return " ".join(parts)
@@ -2176,7 +2184,7 @@ def repair(reply: str, context: dict[str, Any]) -> str:
         and ASKS_IF_AI.search(str(context.get("latest_customer_message", "")))
         and not AI_WORDS.search((_sentences(fixed) or [""])[0])
     ):
-        fixed = f"{AI_ANSWER[_language(context)]} {fixed}".strip()
+        fixed = f"{_ai_answer(context, _language(context))} {fixed}".strip()
     fixed = fixed.strip()
     remaining = [
         v
