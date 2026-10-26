@@ -13,7 +13,7 @@ from app.modules.pi.flow import State as S
     [
         "yes", "Yes!", "yeah", "sure", "yes please", "go ahead", "okay go ahead", "haan",
         "ji", "ji haan", "theek hai", "haan kar do", "bilkul", "bana do", "👍", "نعم", "جی ہاں",
-        "haan theek hai bana do",
+        "haan theek hai bana do", "proceed",
     ],
 )  # fmt: skip
 def test_a_plain_yes_is_an_explicit_yes(said):
@@ -27,6 +27,7 @@ def test_a_plain_yes_is_an_explicit_yes(said):
         "ok", "okay", "hmm", "hmmm", "maybe", "let me think", "I'll think about it",
         "dekhte hain", "how much?", "yes but how much", "yes, if it is cheap",
         "please explain how it works", "ji aap ka rate kya hai", "what does it cost", "",
+        "Aage barhein", "agy barhein", "Let's continue", "continue",  # resume a chat, not a yes
     ],
 )  # fmt: skip
 def test_ok_hmm_maybe_and_hedged_answers_are_not_a_yes(said):

@@ -30,7 +30,7 @@ class Answer(StrEnum):
 YES_WORDS = (
     r"yes|yeah|yep|yup|yess+|sure|of course|please do|go ahead|go for it|do it|"
     r"haan|han|hn|hnn|haa+n|haa|ji|ji haan|ji han|jee|theek hai|thik hai|theek|bilkul|zaroor|zarur|"
-    r"kar do|kardo|bhej do|bana do|bana dein|bhej dein|kar dein|"
+    r"kar do|kardo|bhej do|bana do|bana dein|bhej dein|kar dein|proceed|"
     r"نعم|ايوه|أيوه|اي|أكيد|تمام|جي|جی|ہاں|ٹھیک ہے|ٹھیک|بالکل|کر دیں|کر دو|"
     r"👍|✅|🙏"
 )
