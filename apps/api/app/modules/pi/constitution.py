@@ -185,6 +185,25 @@ NEVER_SAY = (
 INTERNAL = re.compile(
     r"\b(?:knowledge pack|industry pack|pipeline|system prompt|LLM|S\d+_[A-Z_]+|X_[A-Z_]+|R-[A-Z]+-\d+)\b"
 )
+# A2-1.5-SECRETS: pi never reveals Workzap's internal methods, tools, vendors, pricing logic or how the
+# catalogue is built, even when asked (the person saying a word first does not lift this).
+VENDORS = (
+    r"openai|chatgpt|gpt-?\d|anthropic|claude|gemini|llama|mistral|neon|railway|fastapi|postgres|"
+    r"twilio|supabase|vercel|aws|azure|langchain|pinecone"
+)
+SECRETS = re.compile(
+    r"\b(?:(?:we|workzap|i|pi)\s+(?:use|uses|run|runs|am\s+built|is\s+built|are\s+built|built|"
+    r"was\s+built|work|works)\s+(?:on|with|using|by|via)?\s*(?:" + VENDORS + r")\b"
+    r"|(?:powered|built|trained|running)\s+(?:by|with|on|using)\s+(?:" + VENDORS + r")\b"
+    r"|our\s+(?:internal|secret|proprietary)\s+(?:method|methods|process|formula|tools?|system|"
+    r"pricing|algorithm)"
+    r"|(?:pricing|price)\s+(?:logic|formula|algorithm|model|engine|rules?)\b"
+    r"|how\s+(?:we|the\s+catalogue|our\s+catalogue)\s+(?:build|builds|built|work|works|generate|"
+    r"generates|make|makes|price|prices)\b"
+    r"|(?:catalogue|catalog)\s+(?:is|are)\s+(?:built|generated|made|created)\s+(?:by|from|with|using)"
+    r"|(?:internal|backend)\s+(?:cost|costs|margin|margins)\b)",
+    re.IGNORECASE,
+)
 # "tool" and "prompt" are internal terms too (2.4), unless the person said them first.
 INTERNAL_PLAIN = re.compile(r"\b(?:tools?|prompts?)\b", re.IGNORECASE)
 LECTURE = re.compile(
@@ -513,6 +532,39 @@ JUDGEMENT = re.compile(
     r"|\byou(?:'re|\s+are)\s+doing\s+(?:it|this|things)\s+wrong\b"
     r"|\baap\s*ka\s+(?:business|dhanda|karobar)\s+(?:fail|kharab|barbad|theek\s+nahi)\b"
     r"|\baap\s+(?:ghalat|galat)\s+kar\s+rahe\b",
+    re.IGNORECASE,
+)
+# R-TONE-03 (Book 2 10.2): a frustrated person gets value, not defensiveness, "please be patient" or
+# a lecture on why pi asks questions.
+PATIENCE = re.compile(
+    r"\bplease\s+be\s+patient\b|\bbear\s+with\s+me\b|\bi\s+was\s+only\s+trying\b"
+    r"|\bthe\s+reason\s+(?:i|we)\s+(?:ask|am\s+asking)\b|\bwhy\s+i(?:'m|\s+am)\s+asking\b"
+    r"|\bi\s+need\s+to\s+ask\s+(?:these|this|so\s+many)\b"
+    r"|\bsabar\s+(?:karein|rakhein)\b|\bisliye\s+(?:pooch|puch)\w*\b",
+    re.IGNORECASE,
+)
+# The fixed offer ends "...? You can say no." (Book 2 R-OFFER-02): the question is still the last
+# sentence of the offer, the tail only says no is fine (R-VOICE-02 must not flag it).
+OFFER_TAIL = re.compile(
+    r"\s*(?:you\s+can\s+say\s+no|mana\s+bhi\s+kar\s+sakte\s+hain|aap\s+mana\s+bhi\s+kar\s+sakte"
+    r"\s+hain|يمكنك\s+أن\s+تقول\s+لا)\s*[.!]*\s*$",
+    re.IGNORECASE,
+)
+# R-ANS-01/02 (Book 2 3.1): a direct question to pi gets its answer in the first sentence; a yes/no
+# question gets a yes or a no first. A question back, or "Thanks, noted", is not an answer.
+DIRECT_QUESTION = re.compile(r"[?؟]\s*$")
+YES_NO_QUESTION = re.compile(
+    r"\b(?:can|could|will|would|do|does|are|is)\s+(?:you|it|this)\b[^?]*[?]"
+    r"|\bkar\s+(?:sakte|sakti)\s+(?:ho|hain)\b|\bho\s+sakta\s+hai\b|\bya\s+nahi\b|\bkya\s+aap\b",
+    re.IGNORECASE,
+)
+ACK_OPENER = re.compile(
+    r"^\W*(?:thanks|thank\s+you|noted|got\s+it|shukriya|note\s+kar\s+liya|samajh\s+liya)\b",
+    re.IGNORECASE,
+)
+# R-ECHO-01: the noted confirmation names the problem in at most 12 words.
+NOTED_TITLE = re.compile(
+    r"\b(?:i(?:'ve|\s+have)\s+noted(?:\s+it)?|noted|note\s+kar\s+liya)\s*:\s*([^.?!\n]+)",
     re.IGNORECASE,
 )
 # R-ECHO-01..03 (Book 2 10.1): pi does not restate the person's message back to them.
@@ -1425,7 +1477,7 @@ def lint(reply: str, context: dict[str, Any]) -> list[Violation]:
 
     # Voice (R-VOICE)
     asked = sum(reply.count(mark) for mark in QUESTION_MARKS)
-    stripped = reply.rstrip().rstrip(ALLOWED_EMOJI).rstrip()
+    stripped = OFFER_TAIL.sub("", reply.rstrip().rstrip(ALLOWED_EMOJI).rstrip()).rstrip()
     if asked > 1:
         add(Violation("R-VOICE-02", "ask one question at most"))
     elif asked == 1 and not stripped.endswith(QUESTION_MARKS):
@@ -1487,6 +1539,46 @@ def lint(reply: str, context: dict[str, Any]) -> list[Violation]:
                 True,
             )
         )
+    if PATIENCE.search(reply):
+        add(
+            Violation(
+                "R-TONE-03",
+                'no defensiveness, no "please be patient", no explaining why you ask: give them '
+                "value now, then the one question",
+            )
+        )
+    latest_said = str(context.get("latest_customer_message", "")).strip()
+    first = (_sentences(reply) or [""])[0]
+    if latest_said and DIRECT_QUESTION.search(latest_said) and first.endswith(QUESTION_MARKS):
+        add(
+            Violation(
+                "R-ANS-01",
+                "they asked you a question: the first sentence answers it; a question back is "
+                "never a substitute",
+            )
+        )
+    elif (
+        YES_NO_QUESTION.search(latest_said)
+        and DIRECT_QUESTION.search(latest_said)  # the message itself ends as a question
+        and ACK_OPENER.match(first)
+    ):
+        add(
+            Violation(
+                "R-ANS-02",
+                'they asked a yes/no question: start with the yes or the no ("Haan, kar sakte '
+                'hain" / an honest "Ye Workzap nahi karta"), then the detail',
+            )
+        )
+    for title in NOTED_TITLE.findall(reply):
+        if len(title.split()) > 12:
+            add(
+                Violation(
+                    "R-ECHO-01",
+                    "the noted line names the problem in at most 12 words, in their words, never "
+                    "a list of their sentences",
+                )
+            )
+            break
     if (
         state != flow.State.S4_SORTED_SUMMARY  # the summary restates (R-ECHO-02)
         and len(reply.split()) >= ECHO_MIN_WORDS
@@ -1596,6 +1688,15 @@ def lint(reply: str, context: dict[str, Any]) -> list[Violation]:
     never = _contains(reply, NEVER_SAY)
     if never and not (never.startswith(("get back", "our team")) and context.get("escalation_sla")):
         add(Violation("R-VOICE-06", f'pi never says "{never}"', True))
+    if secret := SECRETS.search(reply):
+        add(
+            Violation(
+                "A2-1.5-SECRETS",
+                f'never reveal how Workzap works inside ("{secret.group(0)}"): methods, tools, '
+                "vendors, pricing logic or how the catalogue is built",
+                True,
+            )
+        )
     internal = INTERNAL.search(reply)
     if internal and internal.group(0).lower() not in heard:
         add(
