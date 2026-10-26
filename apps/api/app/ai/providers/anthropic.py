@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import base64
 import json
+import re
 from typing import Any
 
 import httpx
@@ -39,6 +40,12 @@ ERROR_KINDS = {
 }
 
 
+# Claude 5 models answer 400 "`temperature` is deprecated for this model" (live 2026-10-26: every pi
+# reply failed on it and, because an invalid request stops the chain, no fallback ran). They are
+# never sent one; any other model that refuses it is retried once without it and remembered.
+NO_TEMPERATURE = re.compile(r"^claude-(?:sonnet|opus|haiku|fable)-5")
+
+
 class AnthropicProvider(HttpAdapter):
     """Implements LLMProvider and VisionProvider."""
 
@@ -48,6 +55,7 @@ class AnthropicProvider(HttpAdapter):
     def __init__(self, http: httpx.AsyncClient, base_url: str, api_key: SecretStr) -> None:
         super().__init__("anthropic", http, base_url)
         self._key = api_key
+        self._no_temperature: set[str] = set()
 
     def _headers(self) -> dict[str, str]:
         return {"x-api-key": self._key.get_secret_value(), "anthropic-version": API_VERSION}
@@ -80,7 +88,12 @@ class AnthropicProvider(HttpAdapter):
         }
         if system:
             body["system"] = system
-        if request.temperature is not None:
+        sends_temperature = (
+            request.temperature is not None
+            and not NO_TEMPERATURE.match(request.model)
+            and request.model not in self._no_temperature
+        )
+        if sends_temperature:
             body["temperature"] = request.temperature
         if request.tools:
             body["tools"] = [
@@ -94,9 +107,24 @@ class AnthropicProvider(HttpAdapter):
                 body["tool_choice"] = {"type": choice}
             elif choice:
                 body["tool_choice"] = {"type": "tool", "name": choice}
-        data = await self.post(
-            "messages", headers=self._headers(), json_body=body, request_timeout=request.timeout
-        )
+        try:
+            data = await self.post(
+                "messages",
+                headers=self._headers(),
+                json_body=body,
+                request_timeout=request.timeout,
+            )
+        except ProviderError as error:
+            if not sends_temperature or error.kind != ErrorKind.INVALID_REQUEST:
+                raise
+            self._no_temperature.add(request.model)
+            body.pop("temperature", None)
+            data = await self.post(
+                "messages",
+                headers=self._headers(),
+                json_body=body,
+                request_timeout=request.timeout,
+            )
         return self._parse(data, request.model)
 
     async def analyze(self, request: LLMRequest) -> LLMResponse:

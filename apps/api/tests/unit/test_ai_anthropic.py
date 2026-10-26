@@ -85,3 +85,48 @@ def test_registry_builds_anthropic_with_defaults(settings):
     models = ModelRegistry({}, use_defaults=True)
     assert models.resolve("anthropic", "agent") == "claude-sonnet-5-5"
     assert models.resolve("anthropic", "embed") is None
+
+
+async def test_claude_5_models_are_never_sent_a_temperature():
+    # live 2026-10-26: claude-sonnet-5-5 answers 400 "`temperature` is deprecated for this model"
+    # and pi sends 0.2 on every reply: that took pi down because an invalid request stops the chain
+    seen = []
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        seen.append(json.loads(request.content))
+        return httpx.Response(
+            200,
+            json={"content": [{"type": "text", "text": "ok"}], "stop_reason": "end_turn"},
+        )
+
+    provider = _provider(handler)
+    request = LLMRequest(model="claude-sonnet-5-5", messages=[Message.user("hi")], temperature=0.2)
+    await provider.complete(request)
+    assert "temperature" not in seen[0]
+
+
+async def test_a_model_that_refuses_a_temperature_is_retried_without_it_and_remembered():
+    seen = []
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        body = json.loads(request.content)
+        seen.append(body)
+        if "temperature" in body:
+            return httpx.Response(400, json={"error": {"type": "invalid_request_error"}})
+        return httpx.Response(
+            200,
+            json={"content": [{"type": "text", "text": "ok"}], "stop_reason": "end_turn"},
+        )
+
+    provider = _provider(handler)
+    request = LLMRequest(model="claude-legacy-9", messages=[Message.user("hi")], temperature=0.2)
+    assert (await provider.complete(request)).text == "ok"
+    assert len(seen) == 2 and "temperature" in seen[0] and "temperature" not in seen[1]
+    await provider.complete(request)  # remembered: one call, no temperature
+    assert len(seen) == 3 and "temperature" not in seen[2]
+    # a 400 that is not about the temperature of a request that sent none is still raised
+    failing = _provider(
+        lambda r: httpx.Response(400, json={"error": {"type": "invalid_request_error"}})
+    )
+    with pytest.raises(ProviderError):
+        await failing.complete(LLMRequest(model="claude-sonnet-5-5", messages=[Message.user("hi")]))
