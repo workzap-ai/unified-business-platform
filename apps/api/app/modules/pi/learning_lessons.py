@@ -72,11 +72,13 @@ async def propose(
     author_id: UUID | None,
     created_by: str = "staff",
     kind: str | None = None,
+    hold: str = "",
 ) -> PiLearningLesson:
     """Add a lesson. Refused when it is the wrong size or breaks the never-learn list for a reason
     no reviewer could fix (personal data, instructions aimed at pi's rules). A `kind` marks a
     lesson that is not for the chat (document wording): it is always HIGH and always waits for a
-    second person, and the change log says so."""
+    second person, and the change log says so. A `hold` (a reason) keeps even a low-risk lesson in
+    review: a lesson mined from chats is never live or a canary before a person approves it."""
     said = " ".join((text or "").split())
     if not MIN_LENGTH <= len(said) <= MAX_LENGTH:
         raise BusinessRuleViolation(
@@ -104,6 +106,8 @@ async def propose(
         )
     if risk == "LOW" and not await learning_gate.allows(session, scope):
         held = "the release gate is failing: waits for a person"
+    if hold:
+        held = hold
     status = "review" if risk != "LOW" or held else "canary"
     lesson = PiLearningLesson(
         tenant_id=scope.tenant_id,

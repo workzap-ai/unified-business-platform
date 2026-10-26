@@ -27,7 +27,9 @@ _RULES: tuple[tuple[str, re.Pattern[str]], ...] = (
         "idea_no_help",
         re.compile(
             r"\b(?:(?:i |we |maine |humne |hum ne )?(?:tried|try kiya|kar ke dekha|kiya tha)[^.?!]{0,40}(?:didn'?t|did not|nahi|no)\s*(?:help|work|farq|fayda)|"
-            r"didn'?t help|did not help|koi farq nahi|fayda nahi|faida nahi|no change|kuch nahi hua)\b",
+            r"didn'?t help|did not help|koi farq nahi|fayda nahi|faida nahi|no change|kuch nahi hua|"
+            r"(?:kaam|kam) nahi (?:aya|aaya|ayi|aai|kiya|kar (?:raha|rahi|rha|rhi))|nahi chala|chala nahi|"
+            r"(?:koi )?result nahi (?:aya|aaya)|farq nahi (?:pada|para|hua))\b",
             re.IGNORECASE,
         ),
     ),
@@ -54,7 +56,8 @@ _RULES: tuple[tuple[str, re.Pattern[str]], ...] = (
         "idea_already_doing",
         re.compile(
             r"\b(?:pehle se (?:kar|hai|karte)|ye to (?:hum )?(?:pehle se )?karte|already (?:doing|do|did|have|done)|"
-            r"we already|i already|ye pehle se|pehle se ho raha)\b",
+            r"we already|i already|ye pehle se|pehle se ho raha|already (?:kar|kr|ho|chal|use)\w*|"
+            r"(?:pehle|pehlay) (?:hi|bhi) (?:se )?(?:kar|kr)\w*)\b",
             re.IGNORECASE,
         ),
     ),

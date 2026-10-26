@@ -23,6 +23,7 @@ from app.modules.pi import (
     learning_bank,
     learning_canary,
     learning_drift,
+    learning_feedback,
     learning_gate,
     learning_grader,
     learning_lexicon,
@@ -143,6 +144,7 @@ async def run_workspace(
         )
         digest["packs"]["went_live"] = await learning_packs.promote_shadows(session, scope, now)
         digest["vocabulary"] = await learning_lexicon.learn(session, scope)
+        digest["idea_lessons"] = await learning_feedback.mine(session, scope, since, now)
         digest["arms"] = await learning_arms.learn_from(session, scope, since)
         digest["questions"] = await learning_miner.mine(
             session, scope, question_writer(scope) if question_writer else None
