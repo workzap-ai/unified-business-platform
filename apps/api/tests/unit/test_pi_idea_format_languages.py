@@ -495,3 +495,36 @@ def test_free_ideas_are_short_and_plain() -> None:
     jargon = "Streamline the way slips are filled in, so staff stop losing time on repeats."
     good = "Note who waits longest at the counter each evening, so you see where the queue builds."
     assert solution_free.vetted([long_idea, jargon, good], "long waits", []) == [good]
+
+
+@pytest.mark.parametrize(
+    "text",
+    [
+        "tolong kasih solusi",
+        "kya aap ye kar sakte ho?",
+        "ada ide gak?",
+        "راه حل بده",
+        "donnez-moi une solution",
+        "avez-vous une idée ?",
+        "dame una solución",
+        "bana bir çözüm ver",
+        "gib mir eine Lösung",
+        "मुझे समाधान चाहिए",
+    ],
+)
+def test_other_languages_ask_for_ideas(text: str) -> None:
+    assert solution_ask.asked_for_ideas(text)
+
+
+@pytest.mark.parametrize(
+    "text",
+    [
+        "I have no idea why they leave",
+        "we sell solar solutions to farms",
+        "Nuestra empresa tiene mil clientes en tres ciudades y cada mes perdemos pedidos por una solución",
+        "hola",
+        "saya punya toko baju online dan pesanan sering keliru",
+    ],
+)
+def test_a_story_or_a_greeting_in_another_language_is_not_an_ask(text: str) -> None:
+    assert not solution_ask.asked_for_ideas(text)

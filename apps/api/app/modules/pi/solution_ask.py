@@ -64,6 +64,7 @@ SOLUTION_ASK_PLAIN = re.compile(
     # "koi solution hai iska?", "solution bataye"
     r"|^\W*(?:solutions?|hal|ilaj|ideas?|suggestions?)\W*$"
     # impatience and "what do you do" phrasings from the platform spec's audit chats
+    r"|\bkya (?:aap|ap|tum) (?:ye |yeh |ise |isay |isko )?(?:kar|kr) (?:sakte|skte) (?:ho|hain|hn)\b"
     r"|\bseedha (?:batao|bataiye|bata do|btao)\b|\bkahin aur jaun\b|\baap log (?:karte|krte) kya\b"
     r"|\bkya (?:bana|bna) (?:sakte|skte) (?:ho|hain|hn)\b|\bkab se (?:pooch|puch)\w* (?:raha|rha)\b"
     r"|\bsolutions? (?:dain|dayen|den|dijiye|dijie|bataye|bataiye|bata do|batain|batayen)\b"
@@ -101,12 +102,47 @@ IN_THE_DOCUMENT = re.compile(
 )
 
 
+# The word for "solution" / "idea" / "suggestion" in the languages pi has no phrase bank for. A short
+# message that holds one is an ask ("tolong kasih solusi", "راه حل بده", "dame una solución"); a long
+# one is a story that happens to use the word, and the bare "idea" of Spanish and Italian is left
+# out because "no idea why they leave" is a problem in English.
+OTHER_LANGUAGE_NOUN = re.compile(
+    r"\b(?:solusi|ide|saran|jalan keluar|idée|idee|conseils?|solución|sugerencia|consejo|"
+    r"soluzione|soluções?|solução|çözüm|öneri|fikir|lösung|vorschlag|oplossing|решени\w*|совет\w*)\b"
+    r"|راه\s*حل|راهکار|راه‌حل|پیشنهاد|समाधान|उपाय|सुझाव|आइडिया|解决|建议|办法|方案|해결|제안|解決|アイデア",
+    re.IGNORECASE,
+)
+OTHER_LANGUAGE_WORDS = 9
+# French shares "solution" with English, so only its asking forms count here
+FRENCH_ASK = re.compile(
+    r"\b(?:donne[zr]?-?moi|avez-vous|auriez-vous|as-tu|propose[zr]?(?:-moi)?)\b[^.?!]{0,25}\bsolution\b",
+    re.IGNORECASE,
+)
+
+
+def asks_in_other_language(text: str) -> bool:
+    if FRENCH_ASK.search(text):
+        return True
+    return (
+        len(text.split()) <= OTHER_LANGUAGE_WORDS
+        and bool(OTHER_LANGUAGE_NOUN.search(text))
+        and not re.search(
+            r"\b(?:no|sin|ohne|keine?|nessuna?|nenhuma?|tidak ada)\s+\w*$", text, re.I
+        )
+    )
+
+
 def asked_for_ideas(said: str) -> bool:
     """They want a fix now: "solution do", "kuch kar sakte ho?", "what can you do?"."""
     text = said or ""
     if COST.search(text) and not (SOLUTION_ASK.search(text) or SOLUTION_ASK_PLAIN.search(text)):
         return False
-    return bool(SOLUTION_ASK.search(text) or SOLUTION_ASK_PLAIN.search(text) or what_now(text))
+    return bool(
+        SOLUTION_ASK.search(text)
+        or SOLUTION_ASK_PLAIN.search(text)
+        or what_now(text)
+        or asks_in_other_language(text)
+    )
 
 
 def asked_howto(said: str) -> bool:
