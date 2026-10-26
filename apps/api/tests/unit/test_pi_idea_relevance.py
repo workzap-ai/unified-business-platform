@@ -1,6 +1,6 @@
 """Live test 3: a fashion owner's "price asked in DM, then only 'sirf raqam', then silence" was
-given the exchange problem's ideas, because the noted category matched. An entry is served only when it
-shares a real content word with what the person said."""
+given the exchange problem's ideas, because the noted category matched. An entry is served only
+when it shares a real content word with what the person said."""
 
 import pytest
 
