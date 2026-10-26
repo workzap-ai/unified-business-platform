@@ -1062,9 +1062,9 @@ They asked for a fix, or for the detail (Addendum 2, the value line; this overri
 about asking directly for a fix for THIS reply). The one question of this reply is the offer the
 application adds after it, so you ask none.
 - solution_asked is true: they asked for a solution. Say yes plainly first ("Theek hai, seedha
-  solution." / "Sure."), then give the solution_ideas as two plain sentences, one per line, the
-  first starting "First," and the second "Second," (in their language: "Pehle," / "Doosra,"), never
-  dots, dashes or numbers: at most two, one line each
+  solution." / "Sure."), then give the solution_ideas as two lines, each starting with "• " and
+  holding ONE plain sentence (what to do, so the benefit), never numbers or "First/Second": at
+  most two, one line each
   (what plus why, about 25 words), in your own words and their language. No steps, no
   settings, no wording to copy, no app or tool to use, no numbers, never a third idea even if they
   ask for more. Never say you were handed them.
@@ -1975,10 +1975,10 @@ def ideas_opener(context: dict[str, Any]) -> str:
     if said and not solution_ask.asked_for_ideas(said):
         return ""
     if solution_ask.churn_risk(said):
-        return "No problem, here is something you can use straight away." + chr(10)  # G18
+        return "No pressure at all. Here are two ideas:" + chr(10)  # G18
     if solution_ask.impatient(said):
-        return "Sorry about the wait." + chr(10)  # Book 4 G27: "Maazrat", then the ideas
-    return "Sure." + chr(10)
+        return "Sorry about the wait. Here are two ideas:" + chr(10)  # Book 4 G27: "Maazrat"
+    return "Here are two ideas you can try now:" + chr(10)
 
 
 def brain_ideas(turn: "ServiceTurn", context: dict[str, Any]) -> None:
@@ -2030,6 +2030,9 @@ DIFFERENT_IDEA_SIGNALS = frozenset(
 )
 
 BULLET_LINE = re.compile(r"^\s*[•*-]\s+(.*)$")
+IDEA_MARK = re.compile(
+    r"^\s*(?:[•*-]\s+|(?:first|second|pehle|pehla|doosra|dusra)\s*,\s*)(.*)$", re.IGNORECASE
+)
 POSITIONS = {"roman_ur": ("Pehle", "Doosra"), "en": ("First", "Second")}
 
 
@@ -2043,7 +2046,7 @@ def roman_scaffold(found: "re.Match[str]") -> str:
     return ", taake "
 
 
-IDEA_LINE = re.compile(r"^(?:First|Second|Pehle|Doosra)\s*,\s*(.*)$", re.IGNORECASE)
+IDEA_LINE = IDEA_MARK
 
 
 def _word_set(text: str) -> set[str]:
@@ -2119,6 +2122,11 @@ FAMILIAR_IMPERATIVES = re.compile(
 )
 
 
+IDEA_FIRST_WORD = re.compile(
+    r"(?mi)^[ 	]*(?:first|second|pehle|pehla|doosra|dusra)[ 	]*,[ 	]*"
+)
+
+
 def _formal(found: "re.Match[str]") -> str:
     word = found.group(1).lower()
     return FORMAL.get(word) or GENDERED.get(word) or found.group(1)
@@ -2130,29 +2138,29 @@ def roman_polish(reply: str) -> str:
     (pi says 'aap' and 'karein', and never a gendered 'samajh gaya', platform spec Book 4 5.1)."""
     lines = [ROMAN_SCAFFOLD.sub(roman_scaffold, line) for line in reply.splitlines()]
     text = ENGLISH_FILLER.sub("Theek hai.", chr(10).join(lines))
-    return FAMILIAR_IMPERATIVES.sub(_formal, text)
+    text = FAMILIAR_IMPERATIVES.sub(_formal, text)
+    # idea lines are "• " lines (the golden replies), whatever marker the rewrite kept
+    return IDEA_FIRST_WORD.sub(chr(8226) + chr(32), text)
 
 
 def brain_prose_ideas(turn: "ServiceTurn", context: dict[str, Any]) -> None:
-    """A reply that hands over the entries' ideas as dots reads them as plain sentences instead
-    ("First, ... Second, ..."), in English or Roman Urdu. Other languages and every other kind of
-    list (the problems of a summary) stay as they are."""
+    """The ideas of a reply are always shown the same way: one plain sentence per line, starting
+    with "• " (the golden replies). A model that wrote them as "First, ... Second, ..." or as
+    dashes is brought to that form. Every other kind of list (the problems of a summary) stays."""
     if not (context.get("solution_ideas") or turn._free) or turn._summary:
         return
-    marks = POSITIONS.get(str(context.get("reply_language") or "en"))
     lines = turn.reply.splitlines()
     if context.get("reply_language") == "roman_ur" and not getattr(turn, "_english", False):
         # English scaffolding the model left inside a Roman Urdu idea line ("First, ... so aapko")
         lines = [ROMAN_SCAFFOLD.sub(roman_scaffold, line) for line in lines]
+    found = [n for n, line in enumerate(lines) if IDEA_MARK.match(line)]
+    if not 1 <= len(found) <= 2 or found != list(range(found[0], found[0] + len(found))):
         turn.reply = chr(10).join(lines)
-    found = [n for n, line in enumerate(lines) if BULLET_LINE.match(line)]
-    contiguous = found == list(range(found[0], found[0] + len(found))) if found else False
-    if not marks or not 1 <= len(found) <= 2 or not contiguous:
         return
-    for position, n in zip(marks, found, strict=False):
-        found_line = BULLET_LINE.match(lines[n])
-        text = (found_line.group(1) if found_line else lines[n]).strip()
-        lines[n] = text if len(found) == 1 else f"{position}, {text[:1].lower()}{text[1:]}"
+    for n in found:
+        matched = IDEA_MARK.match(lines[n])
+        text = (matched.group(1) if matched else lines[n]).strip()
+        lines[n] = chr(8226) + chr(32) + text[:1].upper() + text[1:]
     turn.reply = chr(10).join(lines)
 
 
@@ -2417,7 +2425,7 @@ def brain_never_empty(turn: "ServiceTurn", context: dict[str, Any]) -> None:
 
 # Idea lines as pi writes them: "First, ...", "Second, ...", "Pehle, ...", "Doosra, ..." (a line of
 # its own, so a sentence that merely contains the word is not one).
-IDEA_LINES = re.compile(r"(?mi)^\s*(?:first|second|pehle|doosra|dusra)\b[,:]")
+IDEA_LINES = re.compile(r"(?mi)^\s*(?:(?:first|second|pehle|doosra|dusra)\b[,:]|•\s)")
 
 
 def brain_offer(turn: "ServiceTurn", context: dict[str, Any]) -> None:
@@ -4167,6 +4175,8 @@ async def in_one_language(
                     "For Roman Urdu always use the polite aap forms (karein, rakhein, dekhein), "
                     "never karo or rakho, and no gendered first-person verbs. Keep each "
                     "sentence short and use everyday Urdu words, not English business jargon. "
+                    "Say 'Here are two ideas you can try now:' as 'Ji, ye do ideas abhi aazma "
+                    "sakte hain:' and 'Sorry about the wait.' as 'Maazrat.'. "
                     "Reply with the rewritten text only."
                 ),
                 Message.user(reply),

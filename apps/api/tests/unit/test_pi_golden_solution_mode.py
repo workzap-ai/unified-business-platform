@@ -18,7 +18,7 @@ def test_g17_an_impatient_ask_gets_an_apology_then_the_ideas() -> None:
 def test_g18_an_owner_about_to_leave_is_reassured_and_given_ideas() -> None:
     said = "rehne do, koi aur dekh leta hoon"
     assert solution_ask.asked_for_ideas(said) and solution_ask.churn_risk(said)
-    assert ideas_opener({"latest_customer_message": said}).startswith("No problem")
+    assert ideas_opener({"latest_customer_message": said}).startswith("No pressure")
 
 
 @pytest.mark.parametrize("said", ["rehne do", "not interested", "forget it"])

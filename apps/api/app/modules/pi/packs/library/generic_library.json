@@ -4,7 +4,7 @@
  "categories": {
   "stock_inventory": {
    "ideas": [
-    "Keep a “running lowˮ list at each counter that staff fill in.",
+    "Keep a \"running low\" list at each counter that staff fill in.",
     "Check expiry dates on the oldest stock first every Monday.",
     "Move slow items to the front with a small offer before buying more.",
     "Write every transfer between shops on a slip signed at both ends."
@@ -21,7 +21,7 @@
     "nori_daily_read",
     "field_checks"
    ],
-   "never_say": "“you'll never run out againˮ, any shrinkage percentage"
+   "never_say": "\"you'll never run out again\", any shrinkage percentage"
   },
   "sales_revenue": {
    "ideas": [
@@ -40,7 +40,7 @@
     "dashboards_reports",
     "customer_messaging"
    ],
-   "never_say": "predicted sales growth; “best practice saysˮ"
+   "never_say": "predicted sales growth; \"best practice says\""
   },
   "cash_collections": {
    "ideas": [
@@ -88,7 +88,7 @@
    ],
    "dropped": [
     {
-     "text": "ask “how did you hear about us?ˮ at the counter",
+     "text": "ask \"how did you hear about us?\" at the counter",
      "why": "a question inside an idea (R-ASK: the one question is pi's last sentence)"
     }
    ],
@@ -97,13 +97,13 @@
     "loyalty_repeat",
     "reviews_collection"
    ],
-   "never_say": "“customers will come backˮ; anything that sends messages without customers' permission"
+   "never_say": "\"customers will come back\"; anything that sends messages without customers' permission"
   },
   "marketing_leads": {
    "ideas": [
     "Complete the Google Maps profile of every location (photos, timings, WhatsApp, category).",
-    "Put a code or “show this messageˮ offer in every ad so you can tell which ad brings people.",
-    "Reply to every enquiry within an hour, even just “we'll send details shortlyˮ.",
+    "Put a code or \"show this message\" offer in every ad so you can tell which ad brings people.",
+    "Reply to every enquiry within an hour, even just \"we'll send details shortly\".",
     "Stop the ads that bring no visits or enquiries after a fair test."
    ],
    "dropped": [
@@ -119,7 +119,7 @@
     "reviews_collection",
     "dashboards_reports"
    ],
-   "never_say": "cost-per-lead numbers, “go viralˮ, platform policy advice"
+   "never_say": "cost-per-lead numbers, \"go viral\", platform policy advice"
   },
   "orders_fulfilment": {
    "ideas": [
@@ -134,7 +134,7 @@
     "job_tracking",
     "integration"
    ],
-   "never_say": "“zero returnsˮ"
+   "never_say": "\"zero returns\""
   },
   "suppliers_purchasing": {
    "ideas": [
@@ -247,7 +247,7 @@
   "communication_coordination": {
    "ideas": [
     "Use one group per purpose instead of one group for everything.",
-    "End each day with a short “what's pendingˮ list.",
+    "End each day with a short \"what's pending\" list.",
     "Give every task one owner and a date."
    ],
    "dropped": [],

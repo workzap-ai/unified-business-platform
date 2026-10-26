@@ -11,23 +11,22 @@ from app.modules.pi.solution_rules import count_ideas, idea_lines
 CHINESE = "Chinese (Simplified)"
 
 
-def test_idea_lines_are_prose_not_bullets() -> None:
+def test_idea_lines_are_bullet_lines_of_one_sentence_each() -> None:
     text = idea_lines(
         [
             "Count the till together at shift change, so a gap is placed.",
             "Log each order in one book, so none is missed.",
         ]
     )
-    assert text.splitlines()[0].startswith("First, count the till")
-    assert text.splitlines()[1].startswith("Second, log each order")
-    assert "•" not in text
+    assert text.splitlines()[0].startswith("• Count the till")
+    assert text.splitlines()[1].startswith("• Log each order")
     assert count_ideas(text) == 2
 
 
 def test_one_idea_is_one_sentence() -> None:
     assert (
         idea_lines(["Write the order down, so it is not missed"])
-        == "Write the order down, so it is not missed."
+        == "• Write the order down, so it is not missed."
     )
 
 
@@ -81,8 +80,8 @@ def test_model_bullets_become_prose_for_handed_ideas() -> None:
 
     turn = _turn("Theek hai.\n• Sheets alag rakhein.\n• Roz update karein.\n\nKya main banwa doon?")
     brain_prose_ideas(turn, {"solution_ideas": ["x"], "reply_language": "roman_ur"})
-    assert turn.reply.splitlines()[1] == "Pehle, sheets alag rakhein."
-    assert turn.reply.splitlines()[2] == "Doosra, roz update karein."
+    assert turn.reply.splitlines()[1] == "• Sheets alag rakhein."
+    assert turn.reply.splitlines()[2] == "• Roz update karein."
     assert asked_without_ideas(
         {
             "ideas_given": 2,
@@ -168,8 +167,8 @@ def test_roman_urdu_idea_lines_lose_their_english_scaffolding() -> None:
         _free=True,
     )
     brain_prose_ideas(turn, {"solution_ideas": ["x"], "reply_language": "roman_ur"})
-    assert "Pehle, register dekho, taake nuksan saaf ho." in turn.reply
-    assert "Doosra, safha alag likho, taake hisaab milay." in turn.reply
+    assert "• Register dekho, taake nuksan saaf ho." in turn.reply
+    assert "• Safha alag likho, taake hisaab milay." in turn.reply
 
 
 def _promise_turn(reply: str):  # noqa: ANN202
@@ -214,12 +213,15 @@ def test_the_conditional_line_and_later_states_are_left_alone() -> None:
     assert later.reply.startswith("Maine Workzap")
 
 
-def test_sure_only_answers_a_request_for_a_fix() -> None:
+def test_the_ideas_opener_answers_a_request_for_a_fix() -> None:
     from app.modules.pi.service_conversation import ideas_opener
 
-    assert ideas_opener({"latest_customer_message": "Ap solution dein"}) == "Sure.\n"
+    assert (
+        ideas_opener({"latest_customer_message": "Ap solution dein"})
+        == "Here are two ideas you can try now:\n"
+    )
     assert ideas_opener({"latest_customer_message": "Haan, har hafte hota hai"}) == ""
-    assert ideas_opener({}) == "Sure.\n"
+    assert ideas_opener({}) == "Here are two ideas you can try now:\n"
 
 
 def test_an_idea_already_said_is_not_said_again() -> None:
@@ -261,10 +263,7 @@ def test_roman_polish_removes_leftover_english_scaffolding() -> None:
         "Sure.\nFirst, register dekho, so nuksan saaf ho.\nSecond, safha alag likho."
     )
     assert out.splitlines()[0] == "Theek hai."
-    assert (
-        "Pehle, register dekhein, taake nuksan saaf ho." in out
-        and "Doosra, safha alag likhein." in out
-    )
+    assert "• register dekhein, taake nuksan saaf ho." in out and "• safha alag likhein." in out
     assert roman_polish("Ji bilkul, note kar liya.") == "Ji bilkul, note kar liya."
 
 
@@ -546,10 +545,13 @@ def test_an_impatient_ask_gets_a_short_apology_before_the_ideas(text: str) -> No
     assert ideas_opener({"latest_customer_message": text}).startswith("Sorry")
 
 
-def test_a_calm_ask_gets_sure_not_an_apology() -> None:
+def test_a_calm_ask_gets_the_plain_opener_not_an_apology() -> None:
     from app.modules.pi.service_conversation import ideas_opener
 
-    assert ideas_opener({"latest_customer_message": "Solution dain"}) == "Sure.\n"
+    assert (
+        ideas_opener({"latest_customer_message": "Solution dain"})
+        == "Here are two ideas you can try now:\n"
+    )
     assert not solution_ask.impatient("Solution dain")
 
 

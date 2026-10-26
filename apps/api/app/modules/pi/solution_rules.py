@@ -343,12 +343,10 @@ ORDINALS = ("First", "Second")
 
 
 def idea_lines(ideas: list[str]) -> str:
-    """Ideas as plain sentences, one per line, in prose by position ("First, ... Second, ..."),
-    never dots or numbers: they read as a person talking. Counted by `prose_ideas`."""
+    """Ideas as the golden replies show them: one plain sentence per line, each starting with
+    "• " (owner-approved role-play, docs/pi-saas/pi-golden-replies.md). Counted by `count_ideas`."""
     clean = [" ".join(str(i).split()).rstrip(". ") + "." for i in ideas if str(i).strip()][:2]
-    if len(clean) == 1:
-        return clean[0]
-    return "\n".join(f"{ORDINALS[n]}, {i[:1].lower()}{i[1:]}" for n, i in enumerate(clean))
+    return chr(10).join(chr(8226) + chr(32) + i[:1].upper() + i[1:] for i in clean)
 
 
 def idea_items(text: str) -> list[str]:

@@ -28,6 +28,8 @@ NEEDS_REVIEW_WORDS = ("CCTV",)
 
 def clean(text: str) -> str:
     text = text.replace("ʼ", "'").replace("’", "'")
+    # the PDF writes a closing double quote as U+02EE and an opening one as U+201C
+    text = text.replace("ˮ", '"').replace("“", '"').replace("”", '"')
     return re.sub(r"\s+", " ", text).strip()
 
 
