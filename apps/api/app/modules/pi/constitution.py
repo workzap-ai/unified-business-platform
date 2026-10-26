@@ -638,6 +638,10 @@ NOTED_START = re.compile(
 SPLIT_WORDS = re.compile(r"[^\s.,;:!?؟۔।¿¡()\"«»…-]+")
 RESTATE_SHARE = 0.7  # the share of a sentence's words that are theirs
 RESTATE_MIN_WORDS = 4
+SHORT_ANSWER_WORDS = 6  # their message is this short...
+SHORT_ECHO_WORDS = 8  # ...and the sentence that says it again no longer than this
+SHORT_ECHO_COVERAGE = 0.8  # of their content words are in that sentence
+ECHO_STOP = frozenset("and aur ya the for with hai hain ka ke ki ko se mein par kya nahi".split())
 # R-ANS-01 (live chats 1 and 3): "ap kya kr skty hain wo btyn" is answered with the ideas, not with
 # "Aap chahen to main abhi solution ideas bataun?" (a permission question to a person who just asked).
 CAPABILITY_ASK = re.compile(
@@ -2248,7 +2252,14 @@ def repair(reply: str, context: dict[str, Any]) -> str:
     """Safe, meaning-preserving fixes: stray '!', emoji, hype and scripted empathy, several questions,
     a missing AI answer or disclosure. What still breaks a hard rule afterwards is replaced by the
     safe line for the state (spec 9.5) instead of being sent or ending in a hand-off."""
-    fixed = reply
+    fixed = re.sub(r"\s*[—–]\s*", ", ", reply)  # we write plain punctuation: no dashes
+    if context.get("reply_language") == "roman_ur":
+        from app.modules.pi.language import clearly_other
+
+        if clearly_other(fixed, "roman_ur"):
+            # English in a Roman Urdu chat that survived the rewrite: never sent as it is
+            nxt = _next_question(context, "") if context.get("noted_problems") else ""
+            return f"Note kar liya. {nxt}" if nxt else safe_fallback(context)
     allowed = _allowed_bangs(context)
     if fixed.count("!") > allowed:
         kept = 0
@@ -2333,6 +2344,16 @@ def _restates(reply: str, said: str) -> str:
         if (
             len(mine) >= RESTATE_MIN_WORDS
             and sum(w in theirs for w in mine) / len(mine) >= RESTATE_SHARE
+        ):
+            return sentence
+        # A short answer ("warehouse and outlets") said back in a few words ("Warehouse aur outlets,
+        # dono jagah parha hai."): the sentence holds nearly all of what they said and adds little.
+        said_content = {w for w in theirs if w not in ECHO_STOP}
+        if (
+            len(said_content) >= 2
+            and len(SPLIT_WORDS.findall(said)) <= SHORT_ANSWER_WORDS
+            and len(mine) <= SHORT_ECHO_WORDS
+            and len(said_content & set(mine)) / len(said_content) >= SHORT_ECHO_COVERAGE
         ):
             return sentence
     return ""
