@@ -483,3 +483,15 @@ def test_a_time_claim_about_workzap_or_the_document_is_still_refused() -> None:
     assert _honest("Workzap will have the document ready within 3 days.")
     assert _honest("Your quote will be prepared by tomorrow.")
     assert _honest("We can build this in two weeks.")
+
+
+def test_free_ideas_are_short_and_plain() -> None:
+    from app.modules.pi import solution_free
+
+    long_idea = (
+        "Walk through the clinic queue and note where people stand longest, so you see the real "
+        "bottleneck behind the long waits and the poor reviews your front desk keeps hearing about."
+    )
+    jargon = "Streamline the way slips are filled in, so staff stop losing time on repeats."
+    good = "Note who waits longest at the counter each evening, so you see where the queue builds."
+    assert solution_free.vetted([long_idea, jargon, good], "long waits", []) == [good]

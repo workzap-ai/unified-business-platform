@@ -4053,7 +4053,8 @@ async def in_one_language(
                     f"{NAMES.get(expected, expected)}. Keep its "
                     "meaning, line breaks, '• ' points, links and names exactly; add nothing. "
                     "For Roman Urdu always use the polite aap forms (karein, rakhein, dekhein), "
-                    "never karo or rakho, and no gendered first-person verbs. "
+                    "never karo or rakho, and no gendered first-person verbs. Keep each "
+                    "sentence short and use everyday Urdu words, not English business jargon. "
                     "Reply with the rewritten text only."
                 ),
                 Message.user(reply),

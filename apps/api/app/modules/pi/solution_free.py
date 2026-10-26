@@ -28,6 +28,8 @@ Give exactly two ideas, written in plain English (they are translated for the ow
   own, a chat group, a walk round the premises. Nothing to buy, install or set up;
 - is specific to the problem the owner described, not generic advice;
 - names no app, software, spreadsheet, template, dashboard, tool, brand or vendor;
+- uses plain words a shopkeeper uses: no jargon (bottleneck, workflow, streamline, optimise, leverage,
+  touchpoint, KPI);
 - has no digits, no percentage, no amount, no promised result;
 - names no time or duration at all (no "this week", "today", "tomorrow", "daily", "one week", "a month"):
   pi may not state a timeline;
@@ -46,6 +48,11 @@ problem. One idea looks at something to see the real size of the problem, the ot
 specific thing is done or kept.
 Answer with a JSON object only: {"ideas": ["first idea", "second idea"]}"""
 
+MAX_WORDS = 28
+JARGON = re.compile(
+    r"\b(?:bottlenecks?|workflows?|streamlin\w*|optimi[sz]\w*|leverag\w*|touchpoints?|kpis?|synerg\w*)\b",
+    re.IGNORECASE,
+)
 JSON_OBJECT = re.compile(r"\{.*\}", re.DOTALL)
 
 
@@ -71,6 +78,8 @@ def vetted(ideas: list[str], said: str, never_say: list[str]) -> list[str]:
             continue  # a person decides about money or a regulated topic: never served unreviewed
         if never_say and solution_rules.never_say_hit(idea, never_say):
             continue
+        if len(idea.split()) > MAX_WORDS or JARGON.search(idea):
+            continue  # R-VAL-03: one short plain sentence (a long or jargon idea turns to mush in Urdu)
         if constitution.TIMELINE_STRONG.search(idea) or constitution.TIMELINE_WEAK.search(idea):
             continue  # R-HONEST-01: pi never states a time or duration it was not given
         if idea not in kept:
