@@ -431,3 +431,24 @@ def test_the_trade_fusion_is_stable_and_leaves_a_confident_detection_alone() -> 
     strong = ["I run a restaurant. Orders get missed and staff make mistakes."]
     found = industry_packs.detect(strong)
     assert industry_overlap.fuse(found, strong) is found
+
+
+def test_a_generic_later_reply_does_not_move_the_stored_trade() -> None:
+    from types import SimpleNamespace
+
+    from app.modules.pi.service_conversation import industry_context
+
+    customer = SimpleNamespace(industry_primary=None, industry_secondary=[], industry_confidence=0)
+    first = "Students book on WhatsApp and cancel an hour before. My instructors sit doing nothing."
+    industry_context(customer, [first], latest=first)
+    stored = customer.industry_primary
+    later = [first, "Yes, it happens every week and I am not sure how much we lose because of it."]
+    industry_context(customer, later, latest=later[-1])
+    assert customer.industry_primary == stored == "driving_schools"
+
+
+def test_the_word_real_does_not_name_the_real_estate_trade() -> None:
+    from app.modules.pi import industry_packs
+
+    found = industry_packs.detect(["After cleaning, weight drops and I don't know my real cost"])
+    assert found.primary != "real_estate_agencies_and_brokers"

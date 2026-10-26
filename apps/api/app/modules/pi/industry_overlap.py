@@ -26,7 +26,12 @@ STOP = frozenset(
 FLOOR = 7.3  # a pack score worth a confidence of about 0.6
 CLEAN = 0.85  # a pack score this confident is never overridden
 OVERRIDE = 1.3  # the overlap for a new primary against the old one, to replace it
-WEIGHT = 1.0  # overlap evidence against the pack score, both scaled to their own best
+NAME_BONUS = 0.3  # a word of the industry's own name was used
+KEEP_BONUS = 0.4  # the industry already stored for this business
+MIN_EVIDENCE = 1.1  # the best overlap needed before the problem words decide anything
+WEAK = 0.75  # below this confidence the pack score is a hunch, not a finding
+WEIGHT = 1.0
+WEIGHT_BLIND = 3.0  # the same, when the pack scores found no trade at all  # overlap evidence against the pack score, both scaled to their own best
 
 
 def _tokens(text: str) -> set[str]:
@@ -67,24 +72,59 @@ def overlap(text: str) -> dict[str, float]:
     return scores
 
 
-def fuse(found: industry_packs.Detection, texts: list[str]) -> industry_packs.Detection:
-    """`found` with its primary re-chosen from the pack scores plus the problem-word overlap, for a
-    person who did not state their trade. The same text always gives the same answer (sorted
-    iteration, ties broken by key). A stated trade, a confident pack score, or no evidence at all
-    is left alone, and an existing primary is replaced only when the overlap clearly favours the new
-    one."""
+@lru_cache(maxsize=1)
+def _names() -> dict[str, set[str]]:
+    """industry key -> the words of its own name (all of them, even the ones shared with sibling
+    trades such as "clinic": here they only add to the problem-word evidence)."""
+    names: dict[str, set[str]] = {}
+    for key in solutions.industries():
+        entry = solutions.load(key) or {}
+        plain = re.sub(r"\([^)]*\)", " ", str(entry.get("name") or key.replace("_", " ")))
+        names[key] = {w for w in _tokens(plain) if len(w) >= 4}
+    return names
+
+
+def name_hits(text: str) -> dict[str, int]:
+    asked = _tokens(text)
+    return {key: len(asked & words) for key, words in sorted(_names().items()) if asked & words}
+
+
+def fuse(
+    found: industry_packs.Detection, texts: list[str], known: tuple[str, ...] = ()
+) -> industry_packs.Detection:
+    """`found` with its primary re-chosen from the pack scores plus the problem-word overlap and
+    the trade words the person used, for a person who did not state their trade. The same text
+    always gives the same answer (sorted iteration, ties broken by key). A stated trade, a
+    confident pack score, or no evidence at all is left alone; each message counts on its own, so
+    a generic reply ("it happens every week") cannot dilute the one that named the problem; an
+    industry already stored is kept unless another is clearly better supported."""
     if found.stated or (found.primary and found.confidence >= CLEAN):
         return found
-    evidence = overlap(" ".join(texts))
+    evidence: dict[str, float] = {}
+    for text in texts:
+        for key, value in overlap(text).items():
+            evidence[key] = max(evidence.get(key, 0.0), value)
+    hits: dict[str, int] = {}
+    for text in texts:
+        for key, value in name_hits(text).items():
+            hits[key] = max(hits.get(key, 0), value)
     top = max(evidence.values(), default=0.0)
-    if top <= 0:
-        return found
+    if top < MIN_EVIDENCE:
+        return found  # a few shared common words are no evidence of a trade
     best_pack = max(found.scores.values(), default=0.0) or 1.0
-    keys = sorted(set(evidence) | set(found.scores))
+    # with no pack score at all the person's problem words are all there is to go on
+    weight = WEIGHT_BLIND if not found.primary or found.confidence < WEAK else WEIGHT
+    keys = sorted(set(evidence) | set(found.scores) | set(hits))
 
     def blended(key: str) -> float:
+        named = NAME_BONUS if hits.get(key) else 0.0
+        stored = KEEP_BONUS if key in known else 0.0
         return round(
-            WEIGHT * evidence.get(key, 0.0) / top + found.scores.get(key, 0.0) / best_pack, 6
+            weight * evidence.get(key, 0.0) / top
+            + found.scores.get(key, 0.0) / best_pack
+            + named
+            + stored,
+            6,
         )
 
     primary = max(keys, key=lambda k: (blended(k), k))

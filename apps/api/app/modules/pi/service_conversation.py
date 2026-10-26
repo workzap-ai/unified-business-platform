@@ -2663,7 +2663,7 @@ def industry_context(
     """
     stored = [k for k in [customer.industry_primary, *(customer.industry_secondary or [])] if k]
     found = industry_overlap.fuse(
-        industry_packs.detect(texts, known=stored, answers=answers), texts
+        industry_packs.detect(texts, known=stored, answers=answers), texts, tuple(stored)
     )
     if stored and latest:
         # The stored trade keeps the choice steady between messages, but a person who now says

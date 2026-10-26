@@ -99,7 +99,7 @@ NAME_STOP = frozenset(
 # wrong trade far more often than the right one, so a name word on this list is not evidence alone.
 AMBIGUOUS_NAME_WORDS = frozenset(
     "call used private abroad material design building book patient seller air driving lot "
-    "part front desk class lesson order record data".split()
+    "part front desk class lesson order record data real free power".split()
 )
 
 # Question-bank areas are written in plain words; map a problem category to the ones that fit.
