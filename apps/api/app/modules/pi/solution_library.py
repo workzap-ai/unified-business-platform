@@ -48,7 +48,18 @@ def cues() -> dict[str, dict[str, dict[str, list[str]]]]:
     return dict(data.get("categories") or {})
 
 
-CUES = cues()
+# The flat vocabulary of each category (English and Roman Urdu cue words, as one string): what the
+# idea filter's G8 reads. The tiers and the other languages stay in cues().
+CUES: dict[str, str] = {
+    category: " ".join(
+        word
+        for tier in tiers.values()
+        for lang, words in tier.items()
+        if lang in ("en", "roman_ur")
+        for word in words
+    )
+    for category, tiers in cues().items()
+}
 
 
 @lru_cache(maxsize=4096)
