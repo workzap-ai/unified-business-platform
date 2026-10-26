@@ -719,3 +719,32 @@ def test_sol03_a_churn_signal_is_logged_on_the_chat() -> None:
 
     for said in ("kahin aur jaun?", "rehne do, koi aur dekh leta hoon", "I'll look elsewhere"):
         assert solution_ask.churn_risk(said)
+
+
+@pytest.mark.parametrize(
+    "text",
+    [
+        "solution ap dw",
+        "solution dw",
+        "solution dy",
+        "ap kya kr skty hain",
+        "kya kar skty hain wo btyn",
+        "ap kya kr skty hain wo btyn",
+        "solution aap dy",
+        "idea ap dw",
+        "kuch kr skty hain",
+        "hal btyn",
+    ],
+)
+def test_heavy_short_roman_urdu_spellings_ask_for_ideas(text: str) -> None:
+    assert solution_ask.asked_for_ideas(text)
+
+
+def test_an_unseen_spelling_with_an_ask_word_goes_to_the_model_check() -> None:
+    from app.modules.pi import ask_classifier
+
+    state = "S3_NOTED"
+    assert ask_classifier.needed(
+        "ap koi hal nikalen is ka", state
+    )  # 'hal' with a spelling the banks lack
+    assert not ask_classifier.needed("udhaar ka hisaab gadbad hai bhai", state)  # a plain statement

@@ -63,6 +63,13 @@ SOLUTION_ASK_PLAIN = re.compile(
     # live chats: "Solution dain", "solution?", "Let me know a solution", "mujhe solution den",
     # "koi solution hai iska?", "solution bataye"
     r"|^\W*(?:solutions?|hal|ilaj|ideas?|suggestions?)\W*$"
+    # heavy short Roman Urdu spellings from a live chat: "solution ap dw", "solution dy",
+    # "ap kya kr skty hain", "kya kar skty hain wo btyn", "hal btyn"
+    r"|\b(?:solution|sol|hal|idea|ideas|mashwara|suggestion)s?\s+(?:(?:ap|aap|app)\s+)?"
+    r"(?:dw|dy|dyn|de|do|dein|den|dain|dijiye|dedo|dena|btyn|batayen|batain|bataen|bataiye|btao|batao)\b"
+    r"|\b(?:ap|aap|app)\s+(?:solution|hal|idea|mashwara)\s+(?:dw|dy|dyn|de|do|dein|den|dain)\b"
+    r"|\b(?:ap|aap|app|tum)?\s*kya\s+(?:kar|kr)\s+(?:sakte|skte|skty|sakty|sakta|skta)\b"
+    r"|\bkuch\s+(?:kar|kr)\s+(?:sakte|skte|skty|sakty)\b"
     # "how do I begin" (a would-be founder, a live replay): English and Roman Urdu
     r"|\bhow (?:to|do i|can i|should i) (?:start|begin|get started|take (?:the )?first step)\b"
     r"|\bwhere (?:do i|to|should i) (?:start|begin)\b|\bwhat (?:should i|do i) do first\b"

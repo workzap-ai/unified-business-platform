@@ -27,6 +27,13 @@ do", "can you help with this?", the same in any language or wording.
 false: describing a problem, a greeting, a yes or no, a thanks, an answer to a question, a question about
 price or cost, a question about who the assistant is, anything else."""
 
+# A short Roman Urdu or English message with an ask-like word in it: the phrase banks may have missed
+# a heavy spelling ("solution ap dw"), so the model decides.
+ASKISH = re.compile(
+    r"solution|\bhal\b|idea|mashwara|suggest|btyn|batayen|batain|\bskt?[yae]\b|\bsakt[ea]\b|"
+    r"\bhelp\b|madad|\bwhat can\b|\bcan you\b",
+    re.IGNORECASE,
+)
 MIN_WORDS = 3
 MAX_WORDS = 60
 VERDICT = re.compile(r'"asks"\s*:\s*(true|false)', re.IGNORECASE)
@@ -56,7 +63,12 @@ def needed(said: str, flow_state: str) -> bool:
         return False
     if solution_ask.known_ask(said) is not None or solution_ask.asked_for_ideas(said):
         return False
-    return language.detect_language(said) not in ("en", "roman_ur") or "?" in said or "؟" in said
+    return (
+        language.detect_language(said) not in ("en", "roman_ur")
+        or "?" in said
+        or "؟" in said
+        or bool(ASKISH.search(said))
+    )
 
 
 async def prefetch(
