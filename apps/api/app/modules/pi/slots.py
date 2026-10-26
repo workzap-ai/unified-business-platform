@@ -20,10 +20,12 @@ from app.modules.pi import industry_packs
 KEEP = 24  # closed slots kept per conversation
 SAME = 0.6  # share of shared content words that makes two questions the same slot
 MIN_WORDS = 3  # a question with fewer content words is too thin to compare
+CROSS_SHARED = 2  # words two questions in different languages must share to be the same slot
+CROSS_SHARE = 0.35  # and the share of the shorter question's words those make
 QUESTION_END = ("?", "؟")
 STOP = frozenset(
-    "the and for with from are was were been our your this that they them their have has had does"
-    " did not can could would should will just very but about into than then there here what"
+    "the and for with from are was were been our you your this that they them their have has had"
+    " does did not can could would should will just very but about into than then there here what"
     " which who how when where why all any some more most much many also only own such ke ki ka"
     " ko se mein hai hain hua hui aur ya ye wo bhi nahi nhi koi kuch sab har par kar kya aap ap"
     " apne apka apki kis kaun kitna kitni kitne".split()
@@ -81,11 +83,29 @@ def words(question: str) -> frozenset[str]:
     return frozenset(found)
 
 
+def _language_of(question: str) -> str | None:
+    from app.modules.pi.language import detect_language
+
+    return detect_language(question)
+
+
 def same_question(a: str, b: str) -> bool:
     left, right = words(a), words(b)
     if len(left) < MIN_WORDS or len(right) < MIN_WORDS:
         return False
-    return len(left & right) / len(left | right) >= SAME
+    if len(left & right) / len(left | right) >= SAME:
+        return True
+    # English one turn, Roman Urdu the next: the wording differs but the names and loan words they
+    # share ("Instagram", "price", "delivery") are the topic.
+    shared = left & right
+    one, two = _language_of(a), _language_of(b)
+    return bool(
+        one
+        and two
+        and one != two
+        and len(shared) >= CROSS_SHARED
+        and len(shared) / min(len(left), len(right)) >= CROSS_SHARE
+    )
 
 
 def is_answer(said: str) -> bool:

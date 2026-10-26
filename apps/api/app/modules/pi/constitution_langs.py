@@ -392,6 +392,21 @@ OPINION = (
     + r"\b"
 )
 
+# --- R-CORR-04: "you are right" to a person who corrected nothing; the words of a real correction ----
+CONFIRMS_CORRECTION = (
+    r"|\bvous avez (?:tout à fait )?raison\b|\btiene (?:toda la )?razón\b|\btienes razón\b"
+    r"|आप\s+(?:बिल्कुल\s+)?सही\s+(?:कह|कहते)|آپ\s+(?:بالکل\s+)?(?:ٹھیک|صحیح|درست)\s+(?:کہہ|کہتے)"
+    r"|أنت\s+(?:على\s+)?(?:محق|صواب)|معك\s+حق|حق\s+با\s+شماست|شما\s+(?:کاملاً\s+)?درست\s+می["
+    + ZW
+    + r"\s]?گویید"
+)
+CORRECTION_CUE = (
+    r"|\b(?:en fait|plutôt|erreur|faux|je voulais dire|pardon|changer|corriger|en realidad|más bien|error|falso|quise decir|perdón|cambiar|corregir)\b"
+    r"|दरअसल|बल्कि|ग़लत|गलत|गलती|माफ़|बदल|सुधार|دراصل|بلکہ|غلط|غلطی|معاف|بدل|درست\s+کر"
+    r"|في\s+الواقع|خطأ|قصدت|آسف|غيّر|صحح|در\s+واقع|بلکه|اشتباه|منظورم|ببخشید|تغییر|اصلاح"
+)
+THANKS_THEN_NOTED += r"|^\W*(?:ٹھیک\s+ہے|اچھا|جی)[۔.،,!]?\s+(?:میں نے\s+)?نوٹ|^\W*(?:ठीक\s+है|अच्छा|जी)[।.,!]?\s+(?:मैंने\s+)?नोट"
+
 # One form for combined letters (Hindi "ढ़" is one character or two): every phrase set is normalised
 # the way `constitution.lint` normalises the reply.
 for _name, _value in list(globals().items()):

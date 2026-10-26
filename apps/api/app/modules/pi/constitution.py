@@ -226,6 +226,14 @@ JARGON = (
     "stakeholder",
     "leverage",
     "synergy",
+    "drop-off",
+    "dropoff",
+    "drop off",
+    "funnel",
+    "touchpoint",
+    "bottleneck",
+    "conversion rate",
+    "engagement rate",
 )
 SOLVED = re.compile(r"\bsolved\b", re.IGNORECASE)
 NOT_SOLVED = re.compile(r"\b(?:not|n't|none|yet|unsolved|isn't|aren't)\b", re.IGNORECASE)
@@ -451,12 +459,17 @@ def _allowed_bangs(context: dict[str, Any]) -> int:
 # real sweep after a plain extra detail.
 CONFIRMS_CORRECTION = re.compile(
     r"\byou'?re right\b|\bi'?ve (?:changed|fixed|corrected|updated) it\b"
-    r"|\baap sahi keh rahe hain\b|\bbadal diya\b|\btheek kar diya\b",
+    r"|\baap sahi keh rahe hain\b|\bbadal diya\b|\btheek kar diya\b"
+    r"|\baap\s+(?:bilkul\s+)?(?:sahi|theek|thik)\s+(?:keh|kah|kehte|kehti|farma)\w*\b|\baap\s+ne\s+(?:bilkul\s+)?sahi\s+kaha\b"
+    r"|\bsahi\s+kaha\b|\bbilkul\s+sahi\b|\byou(?:'re|\s+are)\s+(?:absolutely\s+|totally\s+|completely\s+|quite\s+)?(?:right|correct)\b"
+    r"|\bthat(?:'s|\s+is)\s+(?:absolutely\s+|totally\s+)?(?:right|correct)\b|\b(?:good|fair|great)\s+point\b"
+    + langs.CONFIRMS_CORRECTION,
     re.IGNORECASE,
 )
 # Words that make a message a correction even when the strict detector missed it.
 CORRECTION_CUE = re.compile(
-    r"\b(?:actually|instead|rather|correction|i meant|i mean|not (?:\w+ ){1,3}but|wrong|mistake|typo|sorry|change(?:d)?|update|galat|ghalat|nahi (?:\w+ ){0,3}balke|balkay|dar asal|asal mein|ye nahi|maaf|badal|theek kar|sahi kar)\b",
+    r"\b(?:actually|instead|rather|correction|i meant|i mean|not (?:\w+ ){1,3}but|wrong|mistake|typo|sorry|change(?:d)?|update|galat|ghalat|nahi (?:\w+ ){0,3}balke|balkay|dar asal|asal mein|ye nahi|maaf|badal|theek kar|sahi kar)\b"
+    + langs.CORRECTION_CUE,
     re.IGNORECASE,
 )
 NOT_UNDERSTOOD = re.compile(
@@ -584,7 +597,7 @@ VERDICT_OPENER = re.compile(
     re.IGNORECASE,
 )
 THANKS_THEN_NOTED = re.compile(
-    r"^\W*(?:shukriya)[.!,]?\s+(?:(?:maine|main\s+ne|i(?:'ve|\s+have))?\s*"
+    r"^\W*(?:shukriya|theek\s+hai|thik\s+hai|acha|accha|ji\s+haan|haan|ji)[.!,]?\s+(?:(?:maine|main\s+ne|i(?:'ve|\s+have))?\s*"
     r"(?:note|noted))\b" + langs.THANKS_THEN_NOTED,
     re.IGNORECASE,
 )
@@ -605,6 +618,22 @@ CONCRETE_STATES = (
     flow.State.S3_NOTED,
     flow.State.S5_READINESS,
 )
+# R-VOICE-02: "size, colour, ya delivery bhi poochte hain, ya bas raqam par baat ruk jati hai?" asks two
+# questions in one sentence: an "or" that follows another "or" and a comma.
+DOUBLE_OR = re.compile(
+    r"\b(?:ya|or)\b[^?؟]*,\s*(?:ya|or)\b|یا[^?؟]*[,،]\s*یا",
+    re.IGNORECASE,
+)
+# R-ECHO-04: a sentence that only says again what they said, with no "noted" frame.
+NOTED_START = re.compile(
+    r"^\W*(?:thanks[.,]?\s+|thank\s+you[.,]?\s+)?(?:i(?:'ve|\s+have)\s+noted|noted|(?:maine\s+)?note\s+kar\s+liya|likh\s+liya"
+    + langs.NOTED_FRAME
+    + r")",
+    re.IGNORECASE,
+)
+SPLIT_WORDS = re.compile(r"[^\s.,;:!?؟۔।¿¡()\"«»…-]+")
+RESTATE_SHARE = 0.7  # the share of a sentence's words that are theirs
+RESTATE_MIN_WORDS = 4
 # R-ECHO-01: the noted confirmation names the problem in at most 12 words.
 NOTED_TITLE = re.compile(
     r"\b(?:i(?:'ve|\s+have)\s+noted(?:\s+it)?|noted|note\s+kar\s+liya"
@@ -1538,6 +1567,11 @@ def lint(reply: str, context: dict[str, Any]) -> list[Violation]:
 
     # Voice (R-VOICE)
     asked = sum(reply.count(mark) for mark in QUESTION_MARKS)
+    asked += sum(
+        1
+        for sentence in _sentences(reply)
+        if sentence.rstrip().endswith(QUESTION_MARKS) and DOUBLE_OR.search(sentence)
+    )
     stripped = OFFER_TAIL.sub("", reply.rstrip().rstrip(ALLOWED_EMOJI).rstrip()).rstrip()
     if asked > 1:
         add(Violation("R-VOICE-02", "ask one question at most"))
@@ -1681,6 +1715,14 @@ def lint(reply: str, context: dict[str, Any]) -> list[Violation]:
                 "R-ECHO-03",
                 "do not restate their message back to them: confirm it once in at most 12 words "
                 "in their own words, then ask the one question",
+            )
+        )
+    if state != flow.State.S4_SORTED_SUMMARY and _restates(reply, latest_said):
+        add(
+            Violation(
+                "R-ECHO-04",
+                'do not say again what they said: write "Note kar liya, ..." with the problem in a '
+                "few words, or go straight to the one question",
             )
         )
     if STIFF_APOLOGY.search(reply):
@@ -1970,6 +2012,25 @@ def quiet_fix(reply: str, broke: list[Violation], context: dict[str, Any]) -> st
     if not fixed or fixed == reply.strip() or lint(fixed, context):
         return None
     return fixed
+
+
+def _restates(reply: str, said: str) -> str:
+    """The sentence of the reply that repeats the person's words as a statement (empty when none)."""
+    theirs = {w for w in SPLIT_WORDS.findall(said.lower()) if len(w) >= 3}
+    if not theirs:
+        return ""
+    for sentence in _sentences(reply):
+        if sentence.rstrip().endswith(QUESTION_MARKS) or sentence.lstrip().startswith(BULLET):
+            continue
+        if NOTED_START.match(sentence):
+            continue  # the noted line is allowed to name the problem in their words (R-ECHO-01)
+        mine = [w for w in SPLIT_WORDS.findall(sentence.lower()) if len(w) >= 3]
+        if (
+            len(mine) >= RESTATE_MIN_WORDS
+            and sum(w in theirs for w in mine) / len(mine) >= RESTATE_SHARE
+        ):
+            return sentence
+    return ""
 
 
 def _one_question_last(reply: str, cap: int = WORD_CAP) -> str:

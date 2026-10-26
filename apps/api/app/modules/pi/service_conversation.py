@@ -1000,6 +1000,8 @@ Script and company facts (pi_mode "brain"; these override the shared rules above
   when you ask nothing. closed_slots (when present) are the questions they already answered,
   even with "no" or "pata nahi", in this or an earlier chat and in any language: never ask one
   again, move on.
+  When your question is about the same thing as a closed slot (the chat may have changed language
+  between them), reuse that slot's exact key in asked_slot: that is how a repeat is caught.
 - check_in_now (a follow-up after silence): it never gives new ideas, never asks for a fact you
   already know or a question in closed_slots, never asks their name or business, and never
   repeats a message you already sent. It may only offer to carry on where you stopped, in their
