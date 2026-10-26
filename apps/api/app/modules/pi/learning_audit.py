@@ -33,8 +33,16 @@ def _digest(path: Path) -> str:
 
 def prompt_version() -> str:
     """Which prompt text was in force: a short hash of the specification handbook the model is
-    given every turn (it changes only when the spec is rebuilt)."""
-    return _digest(spec_handbook.PATH)
+    given every turn plus what the platform specification replaced in it (it changes only when
+    either file is rebuilt)."""
+    parts = [spec_handbook.PATH, spec_handbook.SUPERSESSION]
+    digest = hashlib.sha256()
+    for path in parts:
+        try:
+            digest.update(path.read_bytes())
+        except OSError:
+            digest.update(b"-")
+    return digest.hexdigest()[:12]
 
 
 def pack_versions(conversation: PiConversation, used: dict[str, Any]) -> dict[str, str]:

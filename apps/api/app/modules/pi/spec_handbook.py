@@ -23,6 +23,7 @@ from pathlib import Path
 from typing import Any
 
 PATH = Path(__file__).parent / "spec" / "handbook.json"
+SUPERSESSION = Path(__file__).parent / "spec" / "supersession.json"
 MAX_CHARS = 46_000
 MAX_GOLDEN = 3
 
@@ -158,11 +159,32 @@ FRAME = (
 )
 
 
+def superseded(book: dict[str, dict[str, str]]) -> dict[str, dict[str, str]]:
+    """The handbook (built from Brain v3) with what the platform specification replaced applied:
+    sections replaced by their governing text, fragments patched, sections dropped
+    (`spec/supersession.json`, built by `scripts/build_spec_supersession.py`). A fragment that is no
+    longer there is a stale patch and is reported by the unit test, never silently ignored."""
+    if not SUPERSESSION.exists():
+        return book
+    data = json.loads(SUPERSESSION.read_text(encoding="utf-8"))
+    out = {key: dict(item) for key, item in book.items()}
+    for item in data.get("replace", []):
+        out[item["id"]] = item
+    for patch in data.get("patch", []):
+        item = out.get(patch["id"])
+        if item is not None:
+            item["text"] = item["text"].replace(patch["old"], patch["new"])
+    for key in data.get("remove", []):
+        out.pop(key, None)
+    return out
+
+
 @lru_cache(maxsize=1)
 def sections() -> dict[str, dict[str, str]]:
     if not PATH.exists():
         return {}
-    return {item["id"]: item for item in json.loads(PATH.read_text(encoding="utf-8"))}
+    book = {item["id"]: item for item in json.loads(PATH.read_text(encoding="utf-8"))}
+    return superseded(book)
 
 
 def _render(item: dict[str, str]) -> str:
@@ -202,7 +224,7 @@ def chosen_ids(
     if re.search(
         r"\b(?:app|software|system|solution)\b.*\b(?:make|build|fix|can you)\b", message or "", re.I
     ):
-        golden.insert(0, "G4")
+        golden.insert(0, "G4")  # kept pending the owner's decision (spec G4 against Book 2 4.2)
     return _unique(rules), _unique(golden)[:MAX_GOLDEN]
 
 
