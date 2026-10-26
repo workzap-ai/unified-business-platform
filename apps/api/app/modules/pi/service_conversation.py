@@ -4283,6 +4283,9 @@ def too_long(reply: str, context: dict[str, Any]) -> str | None:
         len(latest.split()) > SIMPLE_ASK
         or context.get("check_in_now")
         or context.get("team_answer_now")
+        # "Solution batao" is a short message that asks for exactly the two ideas and the offer
+        or context.get("solution_asked")
+        or "solution_howto" in context
     ):
         return None
     if re.search(r"\b(?:ideas?|list|options?|summary|brief|details?|explain)\b", latest, re.I):
@@ -5032,6 +5035,13 @@ async def compose_service_turn(
         mode,
         allowed,
     )
+    if context.get("pi_mode") == "brain" and any(
+        v.rule in constitution.FINAL_CHECKS for v in constitution.lint(turn.reply, context)
+    ):
+        # Platform spec A.3 step 6: the text that is sent is checked, not only the model's draft.
+        # The application's own replacements and the translation come after the first lint, so the
+        # rules that must never break are run once more on the final reply.
+        raise rejected_with(turn, "CONSTITUTION_BREAK")
     latest = str(context["latest_customer_message"])
     if link_unread(turn, context):
         # Honest first line: the link wasn't read (e.g. a site that blocks readers).

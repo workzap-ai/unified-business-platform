@@ -247,6 +247,11 @@ ASKED_FOR_HELP = re.compile(
 WORD_CAP = 60
 SUMMARY_CAP = 160
 DOCUMENT_CAP = 120
+# Book 2 4.1: a solution answer (level 1: answer, two ideas, the offer) may run to 120 words, and
+# with the one line on what Workzap would build (level 2) to 150. It is not a 60-word listening
+# reply, and a compliant 70-word one used to cost a rewrite.
+SOLUTION_CAP = 120
+SOLUTION_BUILD_CAP = 150
 
 
 def _cap(context: dict[str, Any], key: str, default: int) -> int:
@@ -1419,6 +1424,10 @@ def lint(reply: str, context: dict[str, Any]) -> list[Violation]:
         add(Violation("R-VOICE-02", "the question must be the last sentence"))
     bullets = sum(1 for line in reply.splitlines() if line.lstrip().startswith(("•", "- ")))
     normal_cap = _cap(context, "word_cap", WORD_CAP)
+    if given:
+        normal_cap = max(
+            normal_cap, SOLUTION_BUILD_CAP if context.get("solution_build") else SOLUTION_CAP
+        )
     cap = (
         _cap(context, "summary_word_cap", SUMMARY_CAP)
         if bullets >= 3
@@ -1487,8 +1496,11 @@ def lint(reply: str, context: dict[str, Any]) -> list[Violation]:
         add(Violation("R-VOICE-04", 'say "Maaf kijiye", not "mujhe maazrat chahiye"'))
     if words > cap:
         add(Violation("R-VOICE-01", f"too long: {words} words, the limit is {cap}"))
-    elif cap == normal_cap and words > int(
-        int((context.get("style") or {}).get("reply_up_to_words") or cap) * MIRROR_GRACE
+    elif (
+        not given
+        and cap == normal_cap
+        and words
+        > int(int((context.get("style") or {}).get("reply_up_to_words") or cap) * MIRROR_GRACE)
     ):
         # They write short: stay near one and a half times their length (spec 8.4.1). A few words
         # over is not worth a second model call (real chat 2026-10-24: 28 words for a limit of 25
@@ -1607,6 +1619,14 @@ def hard(violations: list[Violation]) -> list[Violation]:
 def describe(violations: list[Violation]) -> str:
     """The reason to show the model when its draft is sent back for a rewrite."""
     return "it breaks pi's rules: " + "; ".join(f"{v.message} ({v.rule})" for v in violations)
+
+
+# The rules that run again on the FINAL reply, after the application's replacements and the
+# translation (platform spec A.3 step 6): never ask for a card, password or OTP, never type bank
+# details, never claim to be a person, never name another company. Not the rules about when an offer
+# may be made: the application's own fixed lines (a document confirmation, the offer) are meant to
+# say "document" and "quote" in a listening state.
+FINAL_CHECKS = frozenset({"R-PAY-02", "R-PAY-03", "R-DISC-03", "R-BRAND-01"})
 
 
 AI_ANSWER = {
