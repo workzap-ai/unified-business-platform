@@ -318,7 +318,7 @@
   ],
   "sample_reply": {
     "person": "We do basement washes across several buildings in Dubai. Customers say their car wasn't washed and my guys say it was. What can I do?",
-    "pi": "Yes, this can be brought under control, and the first steps are simple.\nFirst, ask for a photo of each finished car instead of a tick, so there's proof of work.\nSecond, spot-check a few cars yourself each week, so the team knows the proof matters.\nWorkzap's part would be: a job list per washer with photo, time and location for every car, and a morning summary to you.\n\nShall I get a solution document and quote prepared for you? You're free to say no.",
+    "pi": "Yes, this can be brought under control, and the first steps are simple.\nFirst, ask for a photo of each finished car instead of a tick, so there's proof of work.\nSecond, spot-check a few cars yourself each week, so the team knows the proof matters.\nWorkzap's part would be: a job list per washer with photo, time and location for every car, and a morning summary to you.",
     "language": "english"
   }
 }

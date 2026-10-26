@@ -285,7 +285,7 @@
   ],
   "sample_reply": {
     "person": "We do 19-litre water delivery in Sharjah and Ajman. Bottles just disappear. What can we do?",
-    "pi": "Sure, this can be sorted, and the first steps are simple.\nFirst, count the bottles in the plant and on vans once, so you know how many are really out.\nSecond, have drivers note empties collected at every stop, so each account has a balance.\nFor a lasting fix, Workzap could set up: with a bottle and dispenser register by account number updated from every route, showing delivered, returned and outstanding.\n\nShall I get a solution document and quote prepared for you? You're welcome to say no.",
+    "pi": "Sure, this can be sorted, and the first steps are simple.\nFirst, count the bottles in the plant and on vans once, so you know how many are really out.\nSecond, have drivers note empties collected at every stop, so each account has a balance.\nFor a lasting fix, Workzap could set up: with a bottle and dispenser register by account number updated from every route, showing delivered, returned and outstanding.",
     "language": "english"
   }
 }

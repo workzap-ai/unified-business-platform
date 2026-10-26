@@ -316,7 +316,7 @@
   ],
   "sample_reply": {
     "person": "Har doosri shadi pe guest zyada aa jate hain aur phir bill pe jhagra hota hai. Is ka koi hal hai?",
-    "pi": "Ji haan, ye theek ho sakta hai, aur pehla qadam aasan hai.\nPehle, final head count client se event se pehle likhit mein liya jaye, taake bill ke waqt ek pakki baat ho.\nDoosra, event ki raat darwaze pe asal ginti ki jaye, andaze ke bajaye.\nWorkzap is ke liye ye bana sakta hai: client message pe count confirm kare, raat ki ginti us ke saath darj ho, aur extra ka hisaab saaf nazar aaye.\n\nKya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "pi": "Ji haan, ye theek ho sakta hai, aur pehla qadam aasan hai.\nPehle, final head count client se event se pehle likhit mein liya jaye, taake bill ke waqt ek pakki baat ho.\nDoosra, event ki raat darwaze pe asal ginti ki jaye, andaze ke bajaye.\nWorkzap is ke liye ye bana sakta hai: client message pe count confirm kare, raat ki ginti us ke saath darj ho, aur extra ka hisaab saaf nazar aaye.",
     "language": "roman_urdu"
   }
 }

@@ -87,10 +87,15 @@ def test_a_title_with_a_qualifier_is_the_same_symptom() -> None:
 
 
 def test_no_thats_right_confirms_the_summary() -> None:
-    from app.modules.pi import decisions
+    from app.modules.pi import box, decisions
     from app.modules.pi.flow import State
 
-    facts = {"problem_count": 2, "brief": {}, "changed": False}
+    facts = {
+        "problem_count": 2,
+        "brief": {},
+        "changed": False,
+        "box_offer": box.OfferFacts(said_yes=True),  # the offer exists only through can_offer
+    }
     for said in ("no that's right", "no", "no, nothing missing"):
         decided = decisions.decide(State.S4_SORTED_SUMMARY, said, "en", facts)
         assert decided is not None and decided.next_state == State.S5_READINESS

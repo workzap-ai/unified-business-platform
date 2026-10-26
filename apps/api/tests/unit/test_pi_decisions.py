@@ -3,6 +3,7 @@
 
 import pytest
 
+from app.modules.pi import box
 from app.modules.pi import decisions as d
 from app.modules.pi.decisions import Answer
 from app.modules.pi.flow import State as S
@@ -88,7 +89,8 @@ def go(state, said, **changes):
 
 @pytest.mark.parametrize("said", ["ok", "looks right", "theek hai", "that's all correct", "yes"])
 def test_after_the_summary_a_confirmation_brings_the_offer(said):
-    decision = go(S.S4_SORTED_SUMMARY, said)
+    assert go(S.S4_SORTED_SUMMARY, said) is None  # box off: no offer of its own (Book 5 Part 14)
+    decision = go(S.S4_SORTED_SUMMARY, said, box_offer=box.OfferFacts(said_yes=True))
     assert decision.next_state == S.S5_READINESS and decision.reply == d.text("offer", "en")
     assert "You can say no" in decision.reply and "an offer, not a charge" in decision.reply
     assert decision.why == "R-OFFER-01"
@@ -258,7 +260,9 @@ def test_cancelling_before_payment_is_accepted_and_told_to_workzap():
 
 
 def test_replies_come_in_roman_urdu_too():
-    offer = d.decide(S.S4_SORTED_SUMMARY, "theek hai", "roman_ur", facts())
+    offer = d.decide(
+        S.S4_SORTED_SUMMARY, "theek hai", "roman_ur", facts(box_offer=box.OfferFacts(said_yes=True))
+    )
     assert offer.reply == d.TEXT["offer"]["roman_ur"]
     no = d.decide(S.S5_READINESS, "nahi shukriya", "roman_ur", facts())
     assert no.reply == d.TEXT["declined"]["roman_ur"]

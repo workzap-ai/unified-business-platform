@@ -288,7 +288,7 @@
   ],
   "sample_reply": {
     "person": "We run 4 dark stores in Lahore. Biggest headache is COD cash from riders, some hold it for days. Need a fix.",
-    "pi": "Yes, this can be fixed, and none of it needs special equipment.\nFirst, settle each rider's COD at the end of every shift, so cash doesn't sit with them.\nSecond, keep a record of expected cash per rider per shift, so any gap is clear.\nTo make it stick, Workzap could build: with a COD settlement tool per rider ID showing expected against handed in at every hub and how long any cash has been outstanding.\n\nShall I get a solution document and quote prepared for you? You're welcome to say no.",
+    "pi": "Yes, this can be fixed, and none of it needs special equipment.\nFirst, settle each rider's COD at the end of every shift, so cash doesn't sit with them.\nSecond, keep a record of expected cash per rider per shift, so any gap is clear.\nTo make it stick, Workzap could build: with a COD settlement tool per rider ID showing expected against handed in at every hub and how long any cash has been outstanding.",
     "language": "english"
   }
 }

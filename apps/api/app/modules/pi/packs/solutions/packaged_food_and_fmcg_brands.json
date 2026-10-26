@@ -291,7 +291,7 @@
   ],
   "sample_reply": {
     "person": "We sell through 14 distributors. I see what I sell to them, but no clue what they sell to shops. Need a solution before Ramadan.",
-    "pi": "Yes, this can be brought under control, and none of it needs special equipment.\nFirst, ask your largest distributors for secondary sales and godown stock once, so you see the size of the gap before Ramadan.\nSecond, give them all one simple format, so their numbers can be compared.\nA lasting version would be: with a shared form where every distributor submits sales and stock weekly in one format, feeding a simple view of stock in the market by SKU and city.\n\nShall I get a solution document and quote prepared for you? You're welcome to say no.",
+    "pi": "Yes, this can be brought under control, and none of it needs special equipment.\nFirst, ask your largest distributors for secondary sales and godown stock once, so you see the size of the gap before Ramadan.\nSecond, give them all one simple format, so their numbers can be compared.\nA lasting version would be: with a shared form where every distributor submits sales and stock weekly in one format, feeding a simple view of stock in the market by SKU and city.",
     "language": "english"
   }
 }

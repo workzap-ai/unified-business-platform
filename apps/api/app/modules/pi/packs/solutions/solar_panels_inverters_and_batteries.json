@@ -291,7 +291,7 @@
   ],
   "sample_reply": {
     "person": "Koi hal hai? Warranty claim pe har dafa behes hoti hai kyun ke serial number kahin likha hi nahi hota.",
-    "pi": "Haan, is par kaam ho sakta hai, aur is ke liye bade kharch ki zaroorat nahi.\nPehle, har installation par panels, inverter aur battery ke serial note karein, taake har cheez project se jude.\nDoosra, serial labels ki photo le lein, taake claim par saboot ho.\nWorkzap ye tarteeb de sakta hai: serial register jo goods-in par serial le aur installation par customer project se jod de, phir claim aate hi record saamne ho.\n\nKya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "pi": "Haan, is par kaam ho sakta hai, aur is ke liye bade kharch ki zaroorat nahi.\nPehle, har installation par panels, inverter aur battery ke serial note karein, taake har cheez project se jude.\nDoosra, serial labels ki photo le lein, taake claim par saboot ho.\nWorkzap ye tarteeb de sakta hai: serial register jo goods-in par serial le aur installation par customer project se jod de, phir claim aate hi record saamne ho.",
     "language": "roman_urdu"
   }
 }

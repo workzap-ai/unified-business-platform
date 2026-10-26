@@ -319,7 +319,7 @@
   ],
   "sample_reply": {
     "person": "Net metering file ke status ke liye roz itni calls aati hain, koi hal hai is ka?",
-    "pi": "Ji haan, shuruaat chhoti si ho sakti hai, aur is ke liye bade kharch ki zaroorat nahi.\nPehle, har pending file ki ek list banayen jis mein us ka current stage likha ho, taake office ka koi bhi banda jawab de sake.\nDoosra, har intezar karne wale customer ko ek dafa status ka chhota sa update bhej dein, taake unhein pata ho baat kahan hai.\nIs ke liye Workzap ye intezam de sakta hai: har file ka tracker, aur file aage badhte hi customer ko WhatsApp pe update.\n\nKya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "pi": "Ji haan, shuruaat chhoti si ho sakti hai, aur is ke liye bade kharch ki zaroorat nahi.\nPehle, har pending file ki ek list banayen jis mein us ka current stage likha ho, taake office ka koi bhi banda jawab de sake.\nDoosra, har intezar karne wale customer ko ek dafa status ka chhota sa update bhej dein, taake unhein pata ho baat kahan hai.\nIs ke liye Workzap ye intezam de sakta hai: har file ka tracker, aur file aage badhte hi customer ko WhatsApp pe update.",
     "language": "roman_urdu"
   }
 }

@@ -291,7 +291,7 @@
   ],
   "sample_reply": {
     "person": "I run 3 brands out of one kitchen on Talabat and Deliveroo. Give me a solution for the payouts, refunds especially.",
-    "pi": "Sure, this is fixable, and the first steps are simple.\nFirst, match one week of one delivery partner's statement against your own orders, so you see whether the gap is commission, discounts or refunds.\nSecond, group refunds by brand and reason, because one brand and one mistake usually drive most of them.\nThe lasting fix would work by matching every delivery partner statement to your orders each week and showing net per order, brand and delivery partner, with refunds broken down.\n\nShall I get a solution document and quote prepared for you? You're welcome to say no.",
+    "pi": "Sure, this is fixable, and the first steps are simple.\nFirst, match one week of one delivery partner's statement against your own orders, so you see whether the gap is commission, discounts or refunds.\nSecond, group refunds by brand and reason, because one brand and one mistake usually drive most of them.\nThe lasting fix would work by matching every delivery partner statement to your orders each week and showing net per order, brand and delivery partner, with refunds broken down.",
     "language": "english"
   }
 }

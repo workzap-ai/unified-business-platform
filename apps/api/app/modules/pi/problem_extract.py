@@ -76,7 +76,13 @@ def wants_extraction(context: dict[str, Any], reply: str, ops: list[Any]) -> boo
     if context.get("pi_mode") != "brain" or ops:
         return False
     state = (context.get("flow") or {}).get("state", "")
-    if state not in ("S1_LISTENING", "S2_CLARIFYING", "S3_NOTED", "S4_SORTED_SUMMARY", "S_ADVISE"):
+    if state not in (
+        "S1_LISTENING",
+        "S2_CLARIFYING",
+        "S3_NOTED",
+        "S4_SORTED_SUMMARY",
+        "S_LISTEN_THINK",
+    ):
         return False
     said = str(context.get("latest_customer_message", ""))
     if len(re.findall(r"\w+", said)) < MIN_WORDS:

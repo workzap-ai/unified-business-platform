@@ -17,12 +17,12 @@ S5 = {
 }
 
 
-def test_ideas_at_the_open_offer_close_with_the_offer_and_the_move_stays_s5():
+def test_ideas_at_the_open_offer_get_no_second_offer_and_the_move_stays_s5():
+    # Book 5 Part 14: the offer is made once, for the whole set; ideas never carry it as an ending.
     t = ServiceTurn(reply=IDEAS)
     brain_offer(t, S5)
-    assert t.reply.endswith(solution_ask.offer_line("en"))
+    assert t.reply == IDEAS
     assert t._decision is None  # no state change: the chat stays at S5
-    assert t.awaiting_customer
 
 
 def test_it_does_not_double_up_when_the_reply_already_asks_or_offers():
@@ -44,7 +44,7 @@ def test_a_declined_offer_is_never_repeated_and_other_states_are_untouched():
     assert no_ideas.reply == "Noted."
 
 
-def test_ideas_that_came_as_an_answer_not_a_request_also_close_with_the_offer():
+def test_ideas_that_came_as_an_answer_not_a_request_get_no_offer_ending():
     """Real replay (clinics, fashion, pharmacies at S5): the owner answered a question, the ideas
     carried no solution_ask context, and ended on nothing."""
     context = {
@@ -54,7 +54,7 @@ def test_ideas_that_came_as_an_answer_not_a_request_also_close_with_the_offer():
     }
     t = ServiceTurn(reply="Yes.\nFirst, count the fast movers.\nSecond, note expiry on arrival.")
     brain_offer(t, context)
-    assert t.reply.endswith(solution_ask.offer_line("en"))
+    assert "solution document" not in t.reply
     plain = ServiceTurn(reply="Noted. What else is getting in the way?")
     brain_offer(plain, context)
     assert plain.reply == "Noted. What else is getting in the way?"  # no ideas: nothing added

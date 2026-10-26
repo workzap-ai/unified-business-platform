@@ -315,7 +315,7 @@
   ],
   "sample_reply": {
     "person": "We run a broiler feed mill in Sargodha. Farmers keep saying one batch is fine and the next isn't. What can we do?",
-    "pi": "Sure, this is fixable, and the first steps are simple.\nFirst, start putting a batch code on every bag, so any complaint can be traced to its production run.\nSecond, log each complaint against its batch, and take any formulation question to your nutritionist or vet.\nThe lasting fix would work by linking every dispatch to its production lot so complaints trace back in one tap and patterns show across distributors.\n\nShall I get a solution document and quote prepared for you? You can say no.",
+    "pi": "Sure, this is fixable, and the first steps are simple.\nFirst, start putting a batch code on every bag, so any complaint can be traced to its production run.\nSecond, log each complaint against its batch, and take any formulation question to your nutritionist or vet.\nThe lasting fix would work by linking every dispatch to its production lot so complaints trace back in one tap and patterns show across distributors.",
     "language": "english"
   }
 }

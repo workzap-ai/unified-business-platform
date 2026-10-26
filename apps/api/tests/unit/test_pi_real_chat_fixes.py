@@ -271,5 +271,5 @@ def test_the_offer_line_exists_in_arabic_and_falls_back_to_english():
     from app.modules.pi.solution_ask import offer_line
 
     assert "وثيقة" in offer_line("ar")
-    assert offer_line("fr").startswith("Shall I get a solution document")
+    assert offer_line("fr").startswith("Shall I get one solution document")
     assert offer_line(None).startswith("Shall I get")

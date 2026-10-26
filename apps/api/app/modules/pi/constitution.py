@@ -1797,7 +1797,7 @@ def lint(reply: str, context: dict[str, Any]) -> list[Violation]:
             Violation(
                 "R-LANG-02",
                 'a Roman Urdu reply does not open with an English filler ("Thanks", "Sure", "Okay"): '
-                'start with "Note kar liya, ..." or the answer',
+                "start with the answer or the problem in a few words",
             )
         )
     if context.get("reply_language") == "roman_ur":
@@ -1872,8 +1872,8 @@ def lint(reply: str, context: dict[str, Any]) -> list[Violation]:
         add(
             Violation(
                 "R-ECHO-01",
-                'no stock thank-you before the noted line: start with "Note kar liya, ..." and '
-                "the problem in a few words",
+                "no stock thank-you before the noted line: start with the problem in a few words "
+                "or with the question",
             )
         )
     last_question = next((x for x in reversed(_sentences(reply)) if x.endswith(QUESTION_MARKS)), "")
@@ -1919,8 +1919,8 @@ def lint(reply: str, context: dict[str, Any]) -> list[Violation]:
         add(
             Violation(
                 "R-ECHO-04",
-                'do not say again what they said: write "Note kar liya, ..." with the problem in a '
-                "few words, or go straight to the one question",
+                "do not say again what they said: name the problem in a few words inside the "
+                "sentence, or go straight to the one question",
             )
         )
     if STIFF_APOLOGY.search(reply):
@@ -2088,10 +2088,10 @@ FALLBACK_LISTENING = {
     "ar": "ما أكثر جزء في هذا يكلّفك الآن؟",
 }
 FALLBACK_OTHER = {
-    "en": "Thanks, that's noted. Is there anything else you want to add?",
-    "roman_ur": "Shukriya, note kar liya. Kya aap kuch aur batana chahenge?",
-    "ur": "شکریہ، نوٹ کر لیا۔ کیا آپ کچھ اور بتانا چاہیں گے؟",
-    "ar": "شكراً، تم تسجيل ذلك. هل تريد إضافة شيء آخر؟",
+    "en": "What would you like to ask about this next?",
+    "roman_ur": "Aap is ke baare mein aage kya poochna chahenge?",
+    "ur": "آپ اس کے بارے میں آگے کیا پوچھنا چاہیں گے؟",
+    "ar": "ما الذي تود أن تسأل عنه بعد ذلك؟",
 }
 FIRST_INVITE = {
     "en": "Tell me what's going wrong in your business.",

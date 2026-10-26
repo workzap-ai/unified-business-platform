@@ -83,7 +83,7 @@ def test_a_shared_word_with_the_subtypes_entry_keeps_the_subtype() -> None:
     assert hit and hit["id"] == "p5_software_not_connected"
 
 
-def test_no_idea_at_the_offer_ends_on_the_offer_question_not_a_dead_end() -> None:
+def test_no_idea_at_the_offer_does_not_repeat_the_offer() -> None:
     from types import SimpleNamespace
 
     from app.modules.pi.service_conversation import brain_no_ideas
@@ -107,7 +107,7 @@ def test_no_idea_at_the_offer_ends_on_the_offer_question_not_a_dead_end() -> Non
     }
     at_offer = turn()
     brain_no_ideas(at_offer, context)
-    assert at_offer.reply.rstrip().endswith("You can say no.")
+    assert "Shall I" not in at_offer.reply  # the offer is made once, never repeated
     declined = turn()
     brain_no_ideas(declined, {**context, "flow": {"state": "S5b_DECLINED"}})
     assert "solution document and a quote" not in declined.reply.split("\n\n")[-1]

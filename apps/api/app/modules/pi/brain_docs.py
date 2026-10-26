@@ -89,8 +89,8 @@ Rules:
 - "wont_do" is never empty: say what this does not change (for example how they order from
   suppliers) and anything the person must confirm.
 - "covers": the parts of the business it touches (shops, teams, channels, data).
-- "needs": what Workzap would need from them (a contact person, sample data). Never ask for
-  passwords or payment details in chat; access is arranged at kickoff.
+- "needs": what Workzap would need from them (a contact person, sample data). Never list a
+  password, code, OTP or payment detail as a need: pi never asks for or accepts them in chat.
 - No price, no date, no promise of an outcome (never "will increase sales" or "you will save").
 - text is English. When language is not English, local is the same sentence in that language
   (Roman Urdu uses everyday English business words); otherwise leave local empty.

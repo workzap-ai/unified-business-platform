@@ -317,7 +317,7 @@
   ],
   "sample_reply": {
     "person": "Fuel ka kharcha har mahine barh raha hai aur trips utni hi hain. Lagta hai drivers gaari personal kaam ke liye use karte hain. Koi hal?",
-    "pi": "Bilkul, is ka hal mumkin hai, aur pehla qadam aasan hai.\nPehle, ek hafte ke register km ko tracker data se milayein, taake farq saamne aa jaye.\nDoosra, crew ko saaf bata dein ke km check honge, taake sab ko pata ho.\nPakke hal ke liye Workzap ye banwa sakta hai: driver ke phone pe trip sheet, tracker aur fuel se roz ka milaan, aur har farq ka alert.\n\nKya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "pi": "Bilkul, is ka hal mumkin hai, aur pehla qadam aasan hai.\nPehle, ek hafte ke register km ko tracker data se milayein, taake farq saamne aa jaye.\nDoosra, crew ko saaf bata dein ke km check honge, taake sab ko pata ho.\nPakke hal ke liye Workzap ye banwa sakta hai: driver ke phone pe trip sheet, tracker aur fuel se roz ka milaan, aur har farq ka alert.",
     "language": "roman_urdu"
   }
 }

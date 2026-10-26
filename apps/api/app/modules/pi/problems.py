@@ -797,6 +797,8 @@ async def noted_context(
                 "where": list((problem.scope or {}).get("where") or [])[:4],
                 "group": problem.category,
                 "subtype": problem.subtype or "",
+                "goal_verb": problem.goal_verb or "",
+                "cause": problem.person_believes_cause or "",
                 "group_name": renamed.get(problem.category, ""),
                 "score": float(problem.severity_score) if problem.severity_score else None,
                 "status": problem.status,

@@ -9,8 +9,6 @@ and the real-model replay (a grader compares live replies with these).
 Each entry is (state, language, what the person said, pi's reply). The person's words are made up
 for the seed: they carry no real name, number or business."""
 
-OFFER = "Kya aap in sab ke liye solution document aur quote chahenge? Aap mana bhi kar sakte hain."
-
 GOLDEN: tuple[tuple[str, str, str, str], ...] = (
     (
         "S1_LISTENING",
@@ -36,15 +34,13 @@ GOLDEN: tuple[tuple[str, str, str, str], ...] = (
         "S3_NOTED",
         "roman_ur",
         "mere pas client nahi hain aur stock bohat para hai",
-        "Note kar liya, client nahi hain aur stock bohat para hai. Kya pehle kabhi aap ke paas koi "
-        "customer aaye hain?",
+        "Pehle kabhi aap ke paas koi customer aaye hain?",
     ),
     (
         "S3_NOTED",
         "roman_ur",
         "g purane customers se rabta nahi raha",
-        "Note kar liya, purane customers se rabta nahi raha. Naye customers dhoondne ke liye ab tak "
-        "kuch aazmaya hai?",
+        "Naye customers dhoondne ke liye ab tak kuch aazmaya hai?",
     ),
     (
         "S3_NOTED",
@@ -60,7 +56,8 @@ GOLDEN: tuple[tuple[str, str, str, str], ...] = (
         "• Kuch behtareen joron ki saaf roshni mein chhoti video banayein, taake dekhne wale kapra aur "
         "rang pehchan sakein.\n"
         "• Jaan pehchan walon se kahein ke pasandeeda joron ki tasveer apne chat mein dikhayein, taake "
-        "pehle customer wahin se aa jayein.\n\n" + OFFER,
+        "pehle customer wahin se aa jayein.\n\n"
+        "In mein se kaun si baat pehle aazmana aap ke liye aasan rahegi?",
     ),
     (
         "S5_READINESS",
@@ -87,7 +84,7 @@ GOLDEN: tuple[tuple[str, str, str, str], ...] = (
 
 
 def listening() -> tuple[tuple[str, str, str, str], ...]:
-    """The golden turns the example bank may hold: a listening reply, not ideas, the offer or the
+    """The golden turns the example bank may hold: a listening reply, not ideas or the
     cost answer (those have their own gate in `learning_solutions_grow`, and a price answer is a
     fixed line, never learned)."""
     from app.modules.pi import safety
@@ -96,7 +93,6 @@ def listening() -> tuple[tuple[str, str, str, str], ...]:
         g
         for g in GOLDEN
         if "•" not in g[3]
-        and OFFER not in g[3]
         and "quote" not in g[3].lower()
         and safety.advice_asked(g[2])
         is None  # an advice ask is never learned, its refusal included

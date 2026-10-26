@@ -122,18 +122,33 @@ def only_price_talk(idea: str) -> bool:
 
 
 def vetted(
-    ideas: list[str], said: str, never_say: list[str], facts: set[str] | None = None
+    ideas: list[str],
+    said: str,
+    never_say: list[str],
+    facts: set[str] | None = None,
+    ctx: idea_filter.IdeaContext | None = None,
+    report: dict[str, Any] | None = None,
 ) -> list[str]:
-    """At most two ideas that pass pi's own idea guard and the industry's never-say list."""
+    """At most two ideas that pass pi's own idea guard and the industry's never-say list.
+
+    With an `IdeaContext` the rest of the idea filter runs too (G3, G4, G7, G8). `report`, when
+    given, gets `filtered` (how many ideas the filter alone dropped) and `rules` (which)."""
     kept: list[str] = []
+    if report is not None:
+        report.update(filtered=0, rules=[])
     for idea in ideas:
         verdict = solution_rules.check_idea(idea, said)
         if verdict.reject or (verdict.review and not only_price_talk(idea)):
             continue  # a person decides about money or a regulated topic: never served unreviewed
         if never_say and solution_rules.never_say_hit(idea, never_say):
             continue
-        if idea_filter.failures(idea, said):
-            continue  # Book 5, G1 and G2: against the owner's goal, or a channel they never named
+        if broke := idea_filter.failures(idea, said, ctx):
+            # Book 5 7.1: against the goal (G1), invented context (G2), another sub-type (G3), a
+            # cause nobody gave (G4), already given (G7), off the map (G8)
+            if report is not None:
+                report["filtered"] += 1
+                report["rules"] = [*report["rules"], *broke]
+            continue
         if GENERIC.search(idea) or not uses_a_fact(idea, facts or set()):
             continue  # R-SOL-04: every idea uses something the person said; generic lists are banned
         if len(idea.split()) > MAX_WORDS or JARGON.search(idea):
@@ -159,10 +174,23 @@ async def free_ideas(
     never_say: list[str],
     already_said: list[str] | None = None,
     problems: list[str] | None = None,
+    idea_ctx: idea_filter.IdeaContext | None = None,
+    report: dict[str, Any] | None = None,
 ) -> list[str]:
     """Two vetted ideas for what the person described, or [] (the model failed or nothing passed)."""
+    sorted_as = (
+        {
+            "problem_sub_type": idea_ctx.subtype,
+            "owner_goal": idea_ctx.goal_verb,
+            "known_cause": idea_ctx.cause[:200]
+            or "not known: give ideas useful whatever the cause",
+        }
+        if idea_ctx is not None and idea_ctx.active()
+        else {}
+    )
     user = json.dumps(
         {
+            **sorted_as,
             "owner_latest_message": said,
             "owner_first_message": (earlier[:1] or [""])[0][:500],
             "problems_noted": [p[:120] for p in (problems or [])[-4:]],
@@ -190,4 +218,11 @@ async def free_ideas(
     english = bool(problems) or detect_language(said) == "en"
     facts = fact_words(said, *earlier[-4:], *(problems or [])) if english else set()
     owner_words = " ".join([*(earlier[:1]), *(problems or []), said])
-    return vetted(parse(str(getattr(response, "text", "") or "")), owner_words, never_say, facts)
+    return vetted(
+        parse(str(getattr(response, "text", "") or "")),
+        owner_words,
+        never_say,
+        facts,
+        idea_ctx,
+        report,
+    )

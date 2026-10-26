@@ -22,6 +22,18 @@ from app.modules.pi_saas.models import PiStaffRequest
 
 pytestmark = pytest.mark.integration
 
+
+@pytest.fixture(autouse=True)
+def the_offer_is_open(monkeypatch):
+    """These journeys start at the offer. Since Book 5 Part 14 pi offers only through can_offer
+    (R1 to R3 or B1 to B7), which the unit tests cover; here the gate is held open so the chat
+    reaches the offer and the tests can exercise what follows it."""
+    from app.modules.pi import box
+
+    monkeypatch.setattr(box, "box_offer_enabled", lambda rules: True)
+    monkeypatch.setattr(box, "can_offer", lambda facts: (True, "R2", "held open for this journey"))
+
+
 DOCS = "/api/v1/pi/brain-documents"
 
 

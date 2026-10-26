@@ -35,6 +35,7 @@ from app.modules.pi import (
     fixed_lines,
     flow,
     followup_policy,
+    idea_filter,
     industry_overlap,
     industry_packs,
     latency,
@@ -2293,6 +2294,21 @@ async def brain_free_ideas(
         if h.get("role") == "ai"
     ][-3:]
     said = str(context.get("latest_customer_message") or "")
+    noted_now = [p for p in context.get("noted_problems") or [] if isinstance(p, dict)]
+    idea_ctx: idea_filter.IdeaContext | None = None
+    if noted_now:  # G3, G4, G7, G8 need the map; with none noted only G1, G2 apply
+        given_before = [
+            str(h.get("text") or "") for h in context.get("history") or [] if h.get("role") == "ai"
+        ]
+        brief_now = conversation.service_brief or {}
+        given_before += [str(x) for x in brief_now.get("library_given") or []]
+        idea_ctx = idea_filter.context_from(
+            noted_now,
+            " ".join([*customer[:1], said]),
+            given_before,
+            (solutions.load(keys[0]) or {}).get("problems") or [] if keys else [],
+        )
+    report: dict[str, Any] = {}
     ideas = await latency.timed(
         "model.free_ideas",
         solution_free.free_ideas(
@@ -2310,10 +2326,20 @@ async def brain_free_ideas(
                 for p in context.get("noted_problems") or []
                 if p.get("title")
             ],
+            idea_ctx=idea_ctx,
+            report=report,
         ),
     )
     ideas = ideas[:left]
     if not ideas:
+        if report.get("filtered") and idea_ctx is not None:
+            # Book 5 7.1: the filter removed everything. No weak idea: one missing fact, one
+            # question, last. Not counted as ideas given.
+            language = str(context.get("reply_language") or "en")
+            turn.reply = with_disclosure(idea_filter.need_fact_line(idea_ctx), context, language)
+            turn._english = True
+            turn.awaiting_customer = True
+            turn._free = True
         return
     language = str(context.get("reply_language") or "en")
     turn.reply = with_disclosure(
@@ -2379,11 +2405,6 @@ def brain_no_ideas(turn: "ServiceTurn", context: dict[str, Any]) -> None:
         if any(line in said for said in told[-6:]):
             line = NO_IDEA_THIRD.get(language, NO_IDEA_THIRD["en"])
     turn.reply = with_disclosure(line, context, language)
-    at_offer = (context.get("flow") or {}).get("state") == "S5_READINESS"
-    if at_offer and not solution_ask.already_offers(turn.reply):
-        # The chat is already at the offer (brain_offer only adds it from the listening states):
-        # a person who keeps asking for a fix gets the open question again, never a dead end.
-        turn.reply = f"{turn.reply}\n\n{solution_ask.offer_line(language, context)}"
     turn.awaiting_customer = True
 
 
@@ -2458,7 +2479,7 @@ def brain_no_early_promise(turn: "ServiceTurn", context: dict[str, Any]) -> None
         return
     language = str(context.get("reply_language") or "en")
     created = [op for op in turn.problem_ops if op.op == "create"]
-    if context.get("noted_problems") or created:
+    if (context.get("noted_problems") or created) and box_offer_allowed(context):
         turn.reply = solution_ask.offer_line(language, context)
         turn._decision = decisions.Decision(
             None, flow.State.S5_READINESS, {"offer_asked": True}, why="R-OFFER-01"
@@ -2483,11 +2504,12 @@ def brain_never_empty(turn: "ServiceTurn", context: dict[str, Any]) -> None:
         "noted_problems"
     ):
         line = f"{NO_IDEA_LINES.get(language, NO_IDEA_LINES['en'])}"
-        if not solution_ask.already_offers(line):
-            line = line + chr(10) + chr(10) + solution_ask.offer_line(language, context)
-        turn._decision = decisions.Decision(
-            None, flow.State.S5_READINESS, {"offer_asked": True}, why="R-OFFER-01"
-        )
+        if box_offer_allowed(context):
+            if not solution_ask.already_offers(line):
+                line = line + chr(10) + chr(10) + solution_ask.offer_line(language, context)
+            turn._decision = decisions.Decision(
+                None, flow.State.S5_READINESS, {"offer_asked": True}, why="R-OFFER-01"
+            )
     turn.reply = line
     turn.awaiting_customer = True
     turn._english = language not in ("en", "roman_ur", "ar")
@@ -2498,6 +2520,12 @@ def brain_never_empty(turn: "ServiceTurn", context: dict[str, Any]) -> None:
 IDEA_LINES = re.compile(r"(?mi)^\s*(?:(?:first|second|pehle|doosra|dusra)\b[,:]|•\s)")
 
 
+def box_offer_allowed(context: dict[str, Any]) -> bool:
+    """The one place an offer may start (Book 5, 5.4 and 10.9): the Solution Box is on and R1 to R3
+    or B1 to B7 hold. Without it pi makes no offer of its own."""
+    return bool(context.get("box_offer")) and box.can_offer(box.offer_facts(context))[0]
+
+
 def brain_offer(turn: "ServiceTurn", context: dict[str, Any]) -> None:
     """After free ideas on request, or a "how exactly?" answer, the application makes the offer
     itself and moves the chat to S5 (Part 1.4 and 1.6), so a later "haan" goes through the
@@ -2506,19 +2534,6 @@ def brain_offer(turn: "ServiceTurn", context: dict[str, Any]) -> None:
         return
     state = (context.get("flow") or {}).get("state")
     language = str(context.get("reply_language") or "en")
-    if (
-        state == flow.State.S5_READINESS
-        and (context.get("solution_ideas") or IDEA_LINES.search(turn.reply))
-        and not solution_ask.already_offers(turn.reply)
-        and solution_ask.offer_line(language, context) not in turn.reply
-        and not turn.reply.rstrip().endswith(constitution.QUESTION_MARKS)
-    ):
-        # R-VAL-06: ideas never end on nothing, however they came (a request, an answer, the
-        # model's own). The offer is open, so the ideas close with the offer line (one question,
-        # last); the move stays S5.
-        turn.reply = f"{turn.reply.rstrip()}\n\n{solution_ask.offer_line(language, context)}"
-        turn.awaiting_customer = True
-        return
     # The offer follows a request for a fix, a "how exactly?" and a request no idea could meet; a
     # follow-up on earlier ideas or "I did not try them" gets no offer.
     if not (
@@ -2531,8 +2546,8 @@ def brain_offer(turn: "ServiceTurn", context: dict[str, Any]) -> None:
     created = [op for op in turn.problem_ops if op.op == "create"]
     if state not in solution_ask.OFFERABLE or not (context.get("noted_problems") or created):
         return
-    if context.get("box_offer") and not box.can_offer(box.offer_facts(context))[0]:
-        return  # Book 5, 5.4: ideas were free, the offer waits for R1 to R3 or B1 to B7
+    if not box_offer_allowed(context):
+        return  # Book 5, 5.4 and 10.9: ideas were free, the offer waits for R1 to R3 or B1 to B7
     if not solution_ask.already_offers(turn.reply):
         turn.reply = f"{turn.reply.rstrip()}\n\n{solution_ask.offer_line(language, context)}"
     turn.awaiting_customer = True
@@ -5157,7 +5172,7 @@ async def compose_service_turn(
             )
             raise rejected_with(turn, "CONSTITUTION_BREAK")
     if context.get("pi_mode") == "brain":
-        turn.ready_for_team = False  # no lead, proposal or team brief before the offer (R-SELL-02)
+        turn.ready_for_team = False  # no lead, proposal or team brief before the offer
         turn.projects = []
         brain_summary(turn, context)
         brain_decision(turn, context)
@@ -5435,7 +5450,7 @@ async def save_service_turn(
     proposals_due: list[UUID] = []
     projects = [p for p in turn.projects if p.title.strip()]
     if flow.brain_mode(policy.response_rules):
-        pass  # brain mode opens no lead and writes no proposal before the offer (R-SELL-02)
+        pass  # brain mode opens no lead and writes no proposal before the offer
     elif projects:
         # One deal per project: each gets its own lead, brief and proposal.
         won = await won_projects(session, scope, conversation)

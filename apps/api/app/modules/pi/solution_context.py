@@ -21,6 +21,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.modules.pi import (
     flow,
+    idea_retrieval,
     learning_bank,
     learning_rules,
     learning_solutions,
@@ -88,7 +89,7 @@ def _no_ideas(
     why: str,
     now: datetime,
 ) -> dict[str, Any]:
-    """A request for a fix that gets no idea must still be answered (R-SELL-04): pi says honestly
+    """A request for a fix that gets no idea must still be answered (R-SOL): pi says honestly
     what it noted and offers the document. The miss is logged on the chat for the audit (S7) and
     the metrics (3.10: solution request left unanswered, always 0)."""
     brief = conversation.service_brief or {}
@@ -474,6 +475,7 @@ async def _build(
     # The latest noted problem first, then the earlier ones: a person who then mentions something
     # off the page ("staff forget the entry") still gets ideas for the problem that does match.
     best_fit = -1
+    best_key = 0  # Book 5 7.3: (sub-type, goal verb, cause) before words; 0 = unknown, words decide
     # Every fact noted so far counts for the fit, not only the one problem being matched ("call se
     # parents ko bura lagta hai" next to "fee late" says which fee entry is meant, live test 5)
     everything = " ".join(
@@ -490,14 +492,20 @@ async def _build(
             ]
         )
         found = solution_ideas.match_problem(entries, group, subtype, said_words)
+        target, goal_verb = idea_retrieval.target_subtype(subtype, said_words)
+        cause = str(item.get("cause") or "")
+        keyed = idea_retrieval.preferred_entry(entries, subtype, said_words, cause, group)
+        key = idea_retrieval.key_rank(found, target, goal_verb, cause) if found is not None else 0
+        if keyed is not None and keyed[1] > key:
+            found, key = keyed  # the entry keyed by the sub-type, goal verb and cause
         if found is None:
             continue
         # The entry that fits the person's own words best, not the first one the category gave
         # (live test 4: "views but no orders" took the attribution ideas before the entry for
         # "price asked in DM, then silence"); a tie goes to the latest noted problem.
         fit = solution_ideas.fit(found, f"{said_words} {everything}")
-        if fit > best_fit:
-            best_fit = fit
+        if (key, fit) > (best_key, best_fit):
+            best_key, best_fit = key, fit
             problem = found
             strong = solution_ideas.is_strong_match(found, group, subtype, said_words)
     if problem is None and reacting:

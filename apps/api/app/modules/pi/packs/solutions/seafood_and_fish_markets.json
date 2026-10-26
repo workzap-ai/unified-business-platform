@@ -285,7 +285,7 @@
   ],
   "sample_reply": {
     "person": "Every morning I buy at the auction and restaurants pay so late, some owe for three months. What's the solution?",
-    "pi": "Yes, this can be improved, and none of it needs special equipment.\nFirst, list every restaurant and hotel account with its balance and oldest unpaid date, so you chase the oldest first.\nSecond, send each one a statement, because many delays are balances nobody has looked at.\nWorkzap could handle the rest by keeping a ledger for every trade account with statements and reminders going out on time.\n\nShall I get a solution document and quote prepared for you? You're welcome to say no.",
+    "pi": "Yes, this can be improved, and none of it needs special equipment.\nFirst, list every restaurant and hotel account with its balance and oldest unpaid date, so you chase the oldest first.\nSecond, send each one a statement, because many delays are balances nobody has looked at.\nWorkzap could handle the rest by keeping a ledger for every trade account with statements and reminders going out on time.",
     "language": "english"
   }
 }

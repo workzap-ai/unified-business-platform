@@ -321,7 +321,7 @@
   ],
   "sample_reply": {
     "person": "Mera sab se bara masla expiry hai. Har mahine maal expire hota hai aur hisab mein expiry daalte hi nahi. Kya karoon?",
-    "pi": "Ji haan, ye theek ho sakta hai, aur is ke liye bade kharch ki zaroorat nahi.\nPehle, ek dafa poori expiry check kar ke agle kuch mahine mein expire hone wala maal list kar lein, taake asal nuqsan saamne aaye.\nDoosra, maal aate waqt expiry likhna shuru karein, kyun ke abhi sirf bill hi record hai.\nIs ka pakka hal Workzap ye bana sakta hai: har batch ki expiry darj ho, waqt se pehle alert aaye aur distributor ko wapsi ka hisaab ek jagah nazar aaye.\n\nKya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "pi": "Ji haan, ye theek ho sakta hai, aur is ke liye bade kharch ki zaroorat nahi.\nPehle, ek dafa poori expiry check kar ke agle kuch mahine mein expire hone wala maal list kar lein, taake asal nuqsan saamne aaye.\nDoosra, maal aate waqt expiry likhna shuru karein, kyun ke abhi sirf bill hi record hai.\nIs ka pakka hal Workzap ye bana sakta hai: har batch ki expiry darj ho, waqt se pehle alert aaye aur distributor ko wapsi ka hisaab ek jagah nazar aaye.",
     "language": "roman_urdu"
   }
 }

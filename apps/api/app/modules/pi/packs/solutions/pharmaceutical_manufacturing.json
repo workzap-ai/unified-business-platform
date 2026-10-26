@@ -288,7 +288,7 @@
   ],
   "sample_reply": {
     "person": "Is ka koi solution hai? Distributors near-expiry stock wapas bhej ke poora credit maangte hain aur humein batch ka pata hi nahi hota.",
-    "pi": "Ji haan, ye theek ho sakta hai, aur is ke liye bade kharch ki zaroorat nahi.\nPehle, har dispatch par batch number note karein, taake wapsi par check ho sake ke batch aap ka tha.\nDoosra, returns policy likhit mein sab distributors ko bhej dein, taake credit par behes kam ho.\nIs ka pakka hal Workzap ye bana sakta hai: batch-to-distributor register aur near-expiry alerts, jo har return ko approve hone se pehle check kar lein.\n\nKya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "pi": "Ji haan, ye theek ho sakta hai, aur is ke liye bade kharch ki zaroorat nahi.\nPehle, har dispatch par batch number note karein, taake wapsi par check ho sake ke batch aap ka tha.\nDoosra, returns policy likhit mein sab distributors ko bhej dein, taake credit par behes kam ho.\nIs ka pakka hal Workzap ye bana sakta hai: batch-to-distributor register aur near-expiry alerts, jo har return ko approve hone se pehle check kar lein.",
     "language": "roman_urdu"
   }
 }

@@ -143,7 +143,7 @@ DIRECT_FROM = (
     State.S2_CLARIFYING,
     State.S3_NOTED,
     State.S4_SORTED_SUMMARY,
-    State.S_ADVISE,
+    State.S_LISTEN_THINK,
     State.S5_READINESS,
 )
 
@@ -441,7 +441,7 @@ def decide(
         in (
             State.S3_NOTED,
             State.S4_SORTED_SUMMARY,
-            State.S_ADVISE,
+            State.S_LISTEN_THINK,
             State.S5_READINESS,
             State.S5B_DECLINED,
         )
@@ -472,7 +472,7 @@ def decide(
             State.S2_CLARIFYING,
             State.S3_NOTED,
             State.S4_SORTED_SUMMARY,
-            State.S_ADVISE,
+            State.S_LISTEN_THINK,
         )
         and facts.get("problem_count")
         and _ok(answer, Answer.YES)
@@ -489,12 +489,15 @@ def decide(
         # "Is anything wrong or missing?" answered "no" or "no, that's right" (spec G5) means the
         # summary stands, exactly as "yes that's right" does.
         confirmed = (_ok(answer, Answer.YES) or _ok(answer, Answer.NO)) and not _correcting(message)
-        if (summary_ok(message) or confirmed) and facts.get("box_offer"):
-            # Book 5, 5.4: with the Solution Box on, pi offers only when R1 to R3 or B1 to B7 hold.
+        if summary_ok(message) or confirmed:
+            # Book 5, 5.4 and 10.9: the offer is one place only, for the whole set, and only when
+            # the Solution Box is on and R1 to R3 or B1 to B7 hold. Accepting the summary is not an
+            # offer trigger on its own.
+            if not facts.get("box_offer"):
+                return None
             allowed, rule, reason = box.can_offer(facts["box_offer"])
             if not allowed:
                 return Decision(None, None, {}, [], why=f"{rule}-blocked: {reason}")
-        if summary_ok(message) or confirmed:
             return Decision(
                 text("offer", language),
                 State.S5_READINESS,

@@ -349,7 +349,7 @@
   ],
   "sample_reply": {
     "person": "Bhai returns ka koi hal batao, COD parcels wapas aa rahe hain aur double shipping lag rahi hai.",
-    "pi": "Ji, is ka rasta nikal sakta hai, aur pehla qadam aasan hai.\nPehle, har COD order booking se pehle buyer se confirm karein, taake bina confirm parcel na niklein.\nDoosra, pichle mahine ke returns ek dafa sheher aur product ke hisaab se dekhein, taake pata chale masla kahan zyada hai.\nLambay arse ke liye Workzap ye set kar sakta hai: har buyer ko khud confirmation message, bina confirm orders hold, aur roz returns ka hisaab sheher, courier aur product ke saath.\n\nKya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "pi": "Ji, is ka rasta nikal sakta hai, aur pehla qadam aasan hai.\nPehle, har COD order booking se pehle buyer se confirm karein, taake bina confirm parcel na niklein.\nDoosra, pichle mahine ke returns ek dafa sheher aur product ke hisaab se dekhein, taake pata chale masla kahan zyada hai.\nLambay arse ke liye Workzap ye set kar sakta hai: har buyer ko khud confirmation message, bina confirm orders hold, aur roz returns ka hisaab sheher, courier aur product ke saath.",
     "language": "roman_urdu"
   }
 }

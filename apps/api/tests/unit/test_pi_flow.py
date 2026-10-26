@@ -19,7 +19,8 @@ HAPPY_PATH = [
 def test_every_state_has_moves_and_guidance():
     assert set(flow.TRANSITIONS) == set(S)
     assert set(flow.GUIDANCE) == set(S)
-    assert len(S) == 23  # the spec's 22 plus S_ADVISE (platform spec Book 2 Part 9)
+    assert len(S) == 28  # the Brain's states, S_ADVISE replaced by the six of Book 5, 11.1
+    assert "S_ADVISE" not in {s.value for s in S}
 
 
 def test_the_whole_journey_is_legal_one_step_at_a_time():
@@ -211,8 +212,8 @@ def test_path_finds_the_legal_steps_between_states():
         assert flow.can_move(step_from, step_to)
 
 
-def test_s_advise_moves_follow_platform_spec_part_9():
-    advise = S.S_ADVISE
+def test_s_listen_think_takes_the_old_s_advise_moves():
+    think = S.S_LISTEN_THINK
     for source in (
         S.S1_LISTENING,
         S.S2_CLARIFYING,
@@ -220,8 +221,25 @@ def test_s_advise_moves_follow_platform_spec_part_9():
         S.S4_SORTED_SUMMARY,
         S.S5B_DECLINED,
     ):
-        assert flow.can_move(source, advise)
+        assert flow.can_move(source, think)
     for target in (S.S1_LISTENING, S.S5_READINESS, S.S6_PREPARING, S.S5B_DECLINED, S.X_PAUSED):
-        assert flow.can_move(advise, target)
-    assert not flow.can_move(advise, S.S7_DELIVERED)
-    assert advise not in flow.NO_OFFER and advise not in flow.LISTENING
+        assert flow.can_move(think, target)
+    assert not flow.can_move(think, S.S7_DELIVERED)
+    assert think not in flow.NO_OFFER and think not in flow.LISTENING
+
+
+def test_a_stored_s_advise_reads_as_s_listen_think():
+    assert flow.parse("S_ADVISE") == S.S_LISTEN_THINK
+    assert flow.parse("S_HOLD") == S.S_HOLD
+    assert flow.parse("nonsense") is None
+
+
+def test_the_book_5_states_have_sensible_moves():
+    assert flow.can_move(S.S_LISTEN_THINK, S.S_MAP_SHARE)
+    assert flow.can_move(S.S_MAP_SHARE, S.S_BOX_OFFER)
+    assert flow.can_move(S.S_BOX_OFFER, S.S_BOX_DRAFT)
+    assert flow.can_move(S.S_BOX_DRAFT, S.S6_PREPARING)
+    assert not flow.can_move(S.S1_LISTENING, S.S_BOX_OFFER)  # only through the thinking step
+    assert not flow.can_move(S.S_HOLD, S.S_BOX_OFFER)  # no offer after a heavy disclosure
+    assert S.S_HOLD in flow.NO_OFFER
+    assert flow.can_move(S.S_HOLD, S.X_EMERGENCY)  # emergency states stay reachable from all

@@ -327,7 +327,7 @@
   ],
   "sample_reply": {
     "person": "We have nine branches, four franchised. I need a solution — I never know what the franchise ones are really selling, and two use their own POS.",
-    "pi": "Sure, you can start on this now, and the first steps are simple.\nFirst, ask every franchisee for the same few numbers on a fixed day, so their reports can at least be compared.\nSecond, visit one franchised branch at peak and compare what you see with what they send.\nWorkzap could set this up by pulling sales from every outlet, including the two on their own POS, into one daily view by hour and channel, with a short morning read on WhatsApp.\n\nShall I get a solution document and quote prepared for you? You're welcome to say no.",
+    "pi": "Sure, you can start on this now, and the first steps are simple.\nFirst, ask every franchisee for the same few numbers on a fixed day, so their reports can at least be compared.\nSecond, visit one franchised branch at peak and compare what you see with what they send.\nWorkzap could set this up by pulling sales from every outlet, including the two on their own POS, into one daily view by hour and channel, with a short morning read on WhatsApp.",
     "language": "english"
   }
 }

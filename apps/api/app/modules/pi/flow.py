@@ -19,7 +19,12 @@ class State(StrEnum):
     S4_SORTED_SUMMARY = "S4_SORTED_SUMMARY"
     S5_READINESS = "S5_READINESS"
     S5B_DECLINED = "S5b_DECLINED"
-    S_ADVISE = "S_ADVISE"
+    S_LISTEN_THINK = "S_LISTEN_THINK"
+    S_MAP_SHARE = "S_MAP_SHARE"
+    S_BOX_OFFER = "S_BOX_OFFER"
+    S_BOX_DRAFT = "S_BOX_DRAFT"
+    S_RETURN = "S_RETURN"
+    S_HOLD = "S_HOLD"
     S6_PREPARING = "S6_PREPARING"
     S7_DELIVERED = "S7_DELIVERED"
     S8_REVIEW = "S8_REVIEW"
@@ -43,25 +48,58 @@ NORMAL = frozenset(set(State) - EXCEPTIONS)
 
 # The listening states: pi notes and sorts, and never suggests, sells or mentions a quote.
 LISTENING = frozenset({S.S0_NEW, S.S1_LISTENING, S.S2_CLARIFYING, S.S3_NOTED, S.S4_SORTED_SUMMARY})
-# Where pi must not raise a solution document or quote on its own (R-SELL-01, 02, 05).
-NO_OFFER = LISTENING | {S.S5B_DECLINED}  # S_ADVISE is not here: ideas and the offer are its job
+# Where pi must not raise a solution document or quote on its own (nothing sold while listening).
+# S_LISTEN_THINK is not here: ideas and the offer are its job. S_HOLD is: no ideas, no offer.
+NO_OFFER = LISTENING | {S.S5B_DECLINED, S.S_HOLD}
 
 TRANSITIONS: dict[State, frozenset[State]] = {
     S.S0_NEW: frozenset({S.S1_LISTENING}),
-    S.S1_LISTENING: frozenset({S.S2_CLARIFYING, S.S3_NOTED, S.S_ADVISE}),
-    S.S2_CLARIFYING: frozenset({S.S1_LISTENING, S.S3_NOTED, S.S_ADVISE}),
-    S.S3_NOTED: frozenset({S.S1_LISTENING, S.S4_SORTED_SUMMARY, S.S_ADVISE}),
-    S.S4_SORTED_SUMMARY: frozenset({S.S1_LISTENING, S.S5_READINESS, S.S_ADVISE}),
-    # Platform spec Book 2 Part 9: a solution ask from any listening state; ideas, then the offer.
-    S.S_ADVISE: frozenset({S.S1_LISTENING, S.S5_READINESS, S.S6_PREPARING, S.S5B_DECLINED}),
+    S.S1_LISTENING: frozenset(
+        {S.S2_CLARIFYING, S.S3_NOTED, S.S_LISTEN_THINK, S.S_MAP_SHARE, S.S_HOLD}
+    ),
+    S.S2_CLARIFYING: frozenset(
+        {S.S1_LISTENING, S.S3_NOTED, S.S_LISTEN_THINK, S.S_MAP_SHARE, S.S_HOLD}
+    ),
+    S.S3_NOTED: frozenset(
+        {S.S1_LISTENING, S.S4_SORTED_SUMMARY, S.S_LISTEN_THINK, S.S_MAP_SHARE, S.S_HOLD}
+    ),
+    S.S4_SORTED_SUMMARY: frozenset(
+        {S.S1_LISTENING, S.S5_READINESS, S.S_LISTEN_THINK, S.S_MAP_SHARE, S.S_HOLD}
+    ),
+    # The default (Book 5, 11.1): each turn thinks, picks a move and updates the map. A solution ask
+    # from any listening state lands here (the old S_ADVISE moves): ideas, then the offer.
+    S.S_LISTEN_THINK: frozenset(
+        {
+            S.S1_LISTENING,
+            S.S5_READINESS,
+            S.S6_PREPARING,
+            S.S5B_DECLINED,
+            S.S_MAP_SHARE,
+            S.S_BOX_OFFER,
+            S.S_RETURN,
+            S.S_HOLD,
+        }
+    ),
+    # A map version is drawn and sent; pi waits for the reply and applies the edits.
+    S.S_MAP_SHARE: frozenset({S.S_LISTEN_THINK, S.S1_LISTENING, S.S_BOX_OFFER, S.S_HOLD}),
+    # Entered only through can_offer: one offer, one answer.
+    S.S_BOX_OFFER: frozenset(
+        {S.S_BOX_DRAFT, S.S5_READINESS, S.S5B_DECLINED, S.S_LISTEN_THINK, S.S_HOLD}
+    ),
+    # The owner said yes: pi drafts, then hands over to staff.
+    S.S_BOX_DRAFT: frozenset({S.S6_PREPARING, S.S_LISTEN_THINK}),
+    # The returning owner (Book 5, Part 6): continuity and the map, never a restart.
+    S.S_RETURN: frozenset({S.S_LISTEN_THINK, S.S1_LISTENING, S.S_MAP_SHARE, S.S_HOLD}),
+    # After a heavy disclosure or distress: no ideas, no offer.
+    S.S_HOLD: frozenset({S.S_LISTEN_THINK, S.S1_LISTENING}),
     S.S5_READINESS: frozenset({S.S6_PREPARING, S.S5B_DECLINED, S.S1_LISTENING}),
-    S.S5B_DECLINED: frozenset({S.S1_LISTENING, S.S5_READINESS, S.S_ADVISE}),
+    S.S5B_DECLINED: frozenset({S.S1_LISTENING, S.S5_READINESS, S.S_LISTEN_THINK, S.S_RETURN}),
     S.S6_PREPARING: frozenset({S.S7_DELIVERED}),
     S.S7_DELIVERED: frozenset({S.S8_REVIEW}),
     S.S8_REVIEW: frozenset({S.S8B_CHANGES_REQUESTED, S.S9_APPROVED, S.S9B_DECLINED_QUOTE}),
     S.S8B_CHANGES_REQUESTED: frozenset({S.S7_DELIVERED}),
     S.S9_APPROVED: frozenset({S.S10_AWAITING_PAYMENT}),
-    S.S9B_DECLINED_QUOTE: frozenset({S.S1_LISTENING, S.S5_READINESS}),
+    S.S9B_DECLINED_QUOTE: frozenset({S.S1_LISTENING, S.S5_READINESS, S.S_RETURN}),
     # Cancelling after approval but before payment is confirmed (R-DEC-05).
     S.S10_AWAITING_PAYMENT: frozenset({S.S11_PAYMENT_CONFIRMED, S.S9B_DECLINED_QUOTE}),
     S.S11_PAYMENT_CONFIRMED: frozenset({S.S12_KICKOFF}),
@@ -87,9 +125,20 @@ GUIDANCE: dict[State, str] = {
     "getting in the way. Do not repeat what you already know.",
     S.S4_SORTED_SUMMARY: "Show what is noted and sorted, grouped, and say none of it is solved. "
     "Invite corrections. Do not offer a document in this message.",
-    S.S_ADVISE: "They asked for a solution. Answer in your first sentence, give the free ideas "
-    "you were handed (two at most, none repeated), note any new problem, and let the application "
-    "make the offer. No price, no promised result, one question at most.",
+    S.S_LISTEN_THINK: "They asked for a solution, or you are thinking about the next move. Answer "
+    "in your first sentence if they asked, give the free ideas you were handed (two at most, none "
+    "repeated), note any new problem, and let the application make any offer. No price, no "
+    "promised result, one question at most.",
+    S.S_MAP_SHARE: "A map version was drawn and sent. Wait for their reply and apply their "
+    "edits in their words. Do not offer anything in this message.",
+    S.S_BOX_OFFER: "The offer was made, for the whole set and never for one problem. They can "
+    "say no. Answer questions about it; do not repeat it and do not name a price.",
+    S.S_BOX_DRAFT: "They said yes. Say what happens next in plain words: Workzap's team reviews "
+    "and prepares the quote. Invent no content, no price and no time.",
+    S.S_RETURN: "They are back. Open with continuity and the map, not with a fresh greeting. "
+    "Offer nothing unless they ask for it.",
+    S.S_HOLD: "They shared something heavy or are distressed. Be kind and brief. No ideas, no "
+    "offer, no question that pushes.",
     S.S5_READINESS: "The offer was sent: a solution document and a quote, and they can say no. "
     "Answer questions about it. Cost depends on what is built and is written on the quote; "
     "the quote is free and is not a charge; never give a range. Do not repeat the offer.",
@@ -135,7 +184,13 @@ class IllegalTransition(ValueError):
         self.target = target
 
 
+# Stored states that no longer exist read as their replacement, so old rows and stored context load.
+RETIRED = {"S_ADVISE": State.S_LISTEN_THINK}
+
+
 def parse(value: str | None) -> State | None:
+    if value in RETIRED:
+        return RETIRED[str(value)]
     try:
         return State(value) if value else None
     except ValueError:

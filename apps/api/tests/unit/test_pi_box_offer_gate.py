@@ -1,5 +1,5 @@
-"""The Solution Box offer rule in the conversation (platform spec Book 5, 5.4): off by default,
-and when on, pi's own offer waits for R1 to R3 or B1 to B7."""
+"""The Solution Box offer rule in the conversation (platform spec Book 5, 5.4): off by default
+(no offer of its own), and when on, pi's own offer waits for R1 to R3 or B1 to B7."""
 
 from app.modules.pi import box, decisions
 from app.modules.pi.flow import State
@@ -11,9 +11,9 @@ def _facts(**more: object) -> dict[str, object]:
     return {"problem_count": 2, "group_count": 1, "problem_refs": ["P1", "P2"], **more}
 
 
-def test_with_the_box_off_the_summary_still_leads_to_the_offer() -> None:
-    d = decisions.decide(State.S4_SORTED_SUMMARY, SUMMARY_OK, "roman_ur", _facts())
-    assert d is not None and d.next_state == State.S5_READINESS
+def test_with_the_box_off_the_summary_makes_no_offer() -> None:
+    # Book 5 Part 14: accepting the summary is no longer an offer trigger on its own.
+    assert decisions.decide(State.S4_SORTED_SUMMARY, SUMMARY_OK, "roman_ur", _facts()) is None
 
 
 def test_with_the_box_on_two_problems_and_no_map_review_hold_the_offer_back() -> None:

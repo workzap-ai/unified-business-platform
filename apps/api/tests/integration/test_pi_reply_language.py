@@ -156,7 +156,7 @@ async def test_a_rewrite_still_in_the_wrong_language_is_never_sent(
     assert len(prompts) == 2
     assert json.loads(prompts[0])["reply_language"] == "en"
     [reply] = await pi.outbound()
-    assert reply.body == "Noted. I'm checking this with the team and will confirm here shortly."
+    assert reply.body == "I'm checking this with the team and will confirm here shortly."
     assert draft not in reply.body
     assert (await pi.conversation()).mode == "ai"
     assert (await api.get("/api/v1/pi/requests")).json()["items"]
@@ -170,7 +170,7 @@ async def test_team_notice_is_in_the_customers_language(api, business_db, monkey
     await pi.deliver_all()
     assert (await pi.conversation()).mode == "ai"
     [notice] = await pi.outbound()
-    assert notice.body.startswith("Noted. Team se confirm")
+    assert notice.body.startswith("Team se confirm")
     await pi.close()
 
 

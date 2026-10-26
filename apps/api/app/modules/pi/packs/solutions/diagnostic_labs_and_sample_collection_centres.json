@@ -315,7 +315,7 @@
   ],
   "sample_reply": {
     "person": "Hamaray collection points se samples der se aate hain aur lab ka evening run miss ho jata hai. Is ka koi hal hai?",
-    "pi": "Zaroor, ye sambhal sakta hai, aur pehla qadam aasan hai.\nPehle, ek hafte tak har point se batch nikalne aur lab pohanchne ka waqt likhein, taake late routes saamne aa jayein.\nDoosra, har point ka ek fixed cut-off time tay karein, taake rider ko pata ho kab nikalna hai.\nIs mein Workzap ye shamil kar sakta hai: har batch ka collection point se lab tak record, rider handover ke saath, aur late ya missing batch ka roz alert.\n\nKya main aap ke liye solution document aur quote banwa doon? Mana bhi kar sakte hain.",
+    "pi": "Zaroor, ye sambhal sakta hai, aur pehla qadam aasan hai.\nPehle, ek hafte tak har point se batch nikalne aur lab pohanchne ka waqt likhein, taake late routes saamne aa jayein.\nDoosra, har point ka ek fixed cut-off time tay karein, taake rider ko pata ho kab nikalna hai.\nIs mein Workzap ye shamil kar sakta hai: har batch ka collection point se lab tak record, rider handover ke saath, aur late ya missing batch ka roz alert.",
     "language": "roman_urdu"
   }
 }

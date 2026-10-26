@@ -76,6 +76,17 @@ def test_the_free_rider_signal_never_needs_a_tone_change():
     assert solution_ask.free_rider({}, "this is for my client, an agency")
 
 
+BOX_READY = {
+    "box_offer": True,
+    "noted_problems": [
+        {"ref": "a", "since": "a year"},
+        {"ref": "b", "impact": "cash"},
+        {"ref": "c"},
+    ],
+    "brief": {"map_reviewed": True, "ranked": True, "voluntary_problems": 1},
+    "history": [{"role": "ai"}] * 9,
+}
+
 LISTENING = {
     "flow": {"state": "S1_LISTENING"},
     "noted_problems": [{"ref": "a", "group": "x", "title": "Footfall is low"}],
@@ -86,9 +97,15 @@ def turn(reply="Do badlav foran karein. Workzap yahan seedha sa kaam kar sakta h
     return ServiceTurn(reply=reply)
 
 
-def test_the_application_makes_the_offer_after_ideas_and_moves_to_s5():
+def test_without_the_box_the_application_makes_no_offer_after_ideas():
     t = turn()
     brain_offer(t, {**LISTENING, "solution_asked": True, "reply_language": "en"})
+    assert t.reply == turn().reply and t._decision is None
+
+
+def test_with_the_box_ready_the_application_makes_the_offer_after_ideas_and_moves_to_s5():
+    t = turn()
+    brain_offer(t, {**LISTENING, **BOX_READY, "solution_asked": True, "reply_language": "en"})
     assert t.reply.endswith(solution_ask.offer_line("en"))
     assert t._decision.next_state == flow.State.S5_READINESS
     assert t._decision.brief == {"offer_asked": True}
@@ -116,7 +133,10 @@ def test_no_offer_when_it_was_already_made_or_nothing_is_noted_or_it_is_a_summar
 
 def test_how_exactly_gets_the_offer_too():
     t = turn("Ye solution document mein detail se hota hai: har ad ka alag code.")
-    brain_offer(t, {**LISTENING, "solution_howto": {"covers": "x"}, "reply_language": "roman_ur"})
+    brain_offer(
+        t,
+        {**LISTENING, **BOX_READY, "solution_howto": {"covers": "x"}, "reply_language": "roman_ur"},
+    )
     assert t.reply.endswith(solution_ask.offer_line("roman_ur"))
 
 
