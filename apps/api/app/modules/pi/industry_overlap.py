@@ -24,6 +24,8 @@ STOP = frozenset(
     " hai hain hua hui aur ya ye wo bhi nahi nhi koi kuch sab har par kar kya".split()
 )
 FLOOR = 7.3  # a pack score worth a confidence of about 0.6
+CLEAN = 0.85  # a pack score this confident is never overridden
+OVERRIDE = 1.3  # the overlap for a new primary against the old one, to replace it
 WEIGHT = 1.0  # overlap evidence against the pack score, both scaled to their own best
 
 
@@ -54,34 +56,42 @@ def overlap(text: str) -> dict[str, float]:
     packs, weight = _entries()
     asked = _tokens(text)
     scores: dict[str, float] = {}
-    for key, entries in packs.items():
+    for key in sorted(packs):
         best = 0.0
-        for words in entries:
+        for words in packs[key]:
             shared = asked & words
             if shared:
-                total = sum(weight[w] for w in words) ** 0.5 or 1.0
-                best = max(best, sum(weight[w] for w in shared) / total)
-        scores[key] = best
+                total = sum(weight[w] for w in sorted(words)) ** 0.5 or 1.0
+                best = max(best, sum(weight[w] for w in sorted(shared)) / total)
+        scores[key] = round(best, 6)
     return scores
 
 
 def fuse(found: industry_packs.Detection, texts: list[str]) -> industry_packs.Detection:
     """`found` with its primary re-chosen from the pack scores plus the problem-word overlap, for a
-    person who did not state their trade. A stated trade, or no evidence at all, is left alone."""
-    if found.stated:
+    person who did not state their trade. The same text always gives the same answer (sorted
+    iteration, ties broken by key). A stated trade, a confident pack score, or no evidence at all
+    is left alone, and an existing primary is replaced only when the overlap clearly favours the new
+    one."""
+    if found.stated or (found.primary and found.confidence >= CLEAN):
         return found
     evidence = overlap(" ".join(texts))
     top = max(evidence.values(), default=0.0)
     if top <= 0:
         return found
     best_pack = max(found.scores.values(), default=0.0) or 1.0
-    keys = set(evidence) | set(found.scores)
-    primary = max(
-        keys,
-        key=lambda k: WEIGHT * evidence.get(k, 0.0) / top + found.scores.get(k, 0.0) / best_pack,
-    )
+    keys = sorted(set(evidence) | set(found.scores))
+
+    def blended(key: str) -> float:
+        return round(
+            WEIGHT * evidence.get(key, 0.0) / top + found.scores.get(key, 0.0) / best_pack, 6
+        )
+
+    primary = max(keys, key=lambda k: (blended(k), k))
     if primary == found.primary:
         return found
+    if found.primary and evidence.get(primary, 0.0) < OVERRIDE * evidence.get(found.primary, 0.0):
+        return found  # the old primary is nearly as well supported: keep it
     industries = [primary, *[k for k in found.industries if k != primary]]
     scores = {**found.scores, primary: max(found.scores.get(primary, 0.0), FLOOR)}
     return replace(found, industries=industries[: industry_packs.MAX_PACKS], scores=scores)

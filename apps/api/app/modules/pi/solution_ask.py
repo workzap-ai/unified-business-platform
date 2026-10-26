@@ -63,6 +63,9 @@ SOLUTION_ASK_PLAIN = re.compile(
     # live chats: "Solution dain", "solution?", "Let me know a solution", "mujhe solution den",
     # "koi solution hai iska?", "solution bataye"
     r"|^\W*(?:solutions?|hal|ilaj|ideas?|suggestions?)\W*$"
+    # impatience and "what do you do" phrasings from the platform spec's audit chats
+    r"|\bseedha (?:batao|bataiye|bata do|btao)\b|\bkahin aur jaun\b|\baap log (?:karte|krte) kya\b"
+    r"|\bkya (?:bana|bna) (?:sakte|skte) (?:ho|hain|hn)\b|\bkab se (?:pooch|puch)\w* (?:raha|rha)\b"
     r"|\bsolutions? (?:dain|dayen|den|dijiye|dijie|bataye|bataiye|bata do|batain|batayen)\b"
     r"|\b(?:let me know|tell me|show me|need|want) (?:a |the |some |your )?(?:solutions?|ideas?|suggestions?)\b"
     r"|\bkoi (?:solution|hal|ilaj|tareeqa|tarika|idea|mashwara) (?:hai|he|hoga)\b(?!\s*(?:nahi|nhi))",

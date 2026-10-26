@@ -403,3 +403,31 @@ def test_an_empty_reply_to_a_solution_ask_gets_the_honest_line_and_the_offer_not
     brain_never_empty(turn, context)
     assert "once the problems are noted" not in turn.reply
     assert "quick idea" in turn.reply and turn._decision is not None
+
+
+@pytest.mark.parametrize(
+    "text",
+    [
+        "seedha batao, time nahi hai",
+        "kahin aur jaun",
+        "aap log karte kya ho?",
+        "mujhe bas batao aap kya bana sakte ho",
+        "sub ok hai solution bataye kub say pooch raha hoan?",
+    ],
+)
+def test_the_specs_impatience_and_what_do_you_do_phrases_ask_for_ideas(text: str) -> None:
+    assert solution_ask.asked_for_ideas(text)
+
+
+def test_the_trade_fusion_is_stable_and_leaves_a_confident_detection_alone() -> None:
+    from app.modules.pi import industry_overlap, industry_packs
+
+    said = [
+        "Carpenter udhaar pe maal le jaate hain aur mahinon nahi dete, lakkar mandi mein yard hain."
+    ]
+    first = industry_overlap.fuse(industry_packs.detect(said), said)
+    again = industry_overlap.fuse(industry_packs.detect(said), said)
+    assert first.industries == again.industries and first.scores == again.scores
+    strong = ["I run a restaurant. Orders get missed and staff make mistakes."]
+    found = industry_packs.detect(strong)
+    assert industry_overlap.fuse(found, strong) is found
