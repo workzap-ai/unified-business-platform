@@ -9125,6 +9125,273 @@
    "gap": "",
    "owner": "",
    "unit_tested": true
+  },
+  {
+   "id": "R-ANS-01",
+   "source": "platform",
+   "page": 95,
+   "area": "answering (Book 2 3.1)",
+   "statement": "The first sentence of a reply answers a direct question; a question back is never a substitute",
+   "status": "PARTIAL",
+   "code": [
+    "app/modules/pi/solution_ask.py::asked_for_ideas",
+    "app/modules/pi/service_conversation.py::status_missed"
+   ],
+   "tests": [
+    "tests/unit/test_pi_spec_supersession.py::test_the_guidance_carries_the_governing_answer_first_rules",
+    "tests/unit/test_pi_golden_solution_mode.py::test_g19_what_do_you_do_is_answered_not_ignored"
+   ],
+   "gap": "Solution asks, 'what do you do' and status asks are answered first in code; any other direct question ('kitne din lagenge?') is answered first only by the handbook and prompt, and no linter check compares sentence one with the question.",
+   "owner": "linter hardening session",
+   "unit_tested": true
+  },
+  {
+   "id": "R-ANS-02",
+   "source": "platform",
+   "page": 95,
+   "area": "answering (Book 2 3.1)",
+   "statement": "A yes/no question gets a yes or no first, then the detail",
+   "status": "PROMPT-ONLY",
+   "code": [],
+   "tests": [],
+   "gap": "Carried only by the handbook text in the prompt; nothing detects a yes/no question or checks that the reply starts with yes or no.",
+   "owner": "prompt owner",
+   "unit_tested": false
+  },
+  {
+   "id": "R-ANS-03",
+   "source": "platform",
+   "page": 96,
+   "area": "answering (Book 2 3.1, 10.4)",
+   "statement": "A request (solution, price, timeline, human) that goes unanswered once is dealt with before anything else; a code guard blocks a reply that ignores it",
+   "status": "PARTIAL",
+   "code": [
+    "app/modules/pi/service_conversation.py::status_missed",
+    "app/modules/pi/solution_ask.py::asked_for_ideas"
+   ],
+   "tests": [
+    "tests/unit/test_pi_live_fixes.py::test_status_only_when_asked_and_no_empty_promises",
+    "tests/unit/test_pi_value_line_gaps.py::test_a_request_answered_with_only_a_pitch_is_soft_when_ideas_were_handed"
+   ],
+   "gap": "Status asks and solution asks are guarded; there is no general open_requests log, so a price, timeline or human request left unanswered for one turn is not blocked or logged as solution_request_ignored.",
+   "owner": "linter hardening session",
+   "unit_tested": true
+  },
+  {
+   "id": "R-ECHO-01",
+   "source": "platform",
+   "page": 108,
+   "area": "no echo (Book 2 10.1)",
+   "statement": "pi does not restate the person's message; a noted confirmation is allowed once per problem in 12 words or fewer, never a list of their sentences",
+   "status": "PARTIAL",
+   "code": [
+    "app/modules/pi/constitution.py::echo_overlap",
+    "app/modules/pi/constitution.py::ECHO_MIN_WORDS"
+   ],
+   "tests": [
+    "tests/unit/test_pi_echo_and_tone.py::test_a_reply_that_restates_the_message_is_flagged_as_an_echo",
+    "tests/unit/test_pi_echo_and_tone.py::test_a_short_confirmation_and_a_fresh_reply_are_not_echoes"
+   ],
+   "gap": "A long echo is caught by the overlap check (R-ECHO-03); the 12-word limit and 'once per problem' are not counted.",
+   "owner": "linter hardening session",
+   "unit_tested": true
+  },
+  {
+   "id": "R-ECHO-02",
+   "source": "platform",
+   "page": 108,
+   "area": "no echo (Book 2 10.1)",
+   "statement": "Bulleted restatements only in the summary S4 (or when confirming 3 new problems from one message)",
+   "status": "PARTIAL",
+   "code": [
+    "app/modules/pi/constitution.py::lint"
+   ],
+   "tests": [
+    "tests/unit/test_pi_constitution.py::test_while_listening_pi_does_not_list_back_what_it_already_confirmed"
+   ],
+   "gap": "Bullets are allowed only in summaries (R-VOICE-09); the exception for confirming three new problems from one message is not built.",
+   "owner": "linter hardening session",
+   "unit_tested": true
+  },
+  {
+   "id": "R-SOL-02",
+   "source": "platform",
+   "page": 96,
+   "area": "solutions (Book 2 3.2)",
+   "statement": "After a solution request pi may ask at most one clarifying question before giving an idea; with impatience the budget is zero",
+   "status": "PARTIAL",
+   "code": [
+    "app/modules/pi/solution_ask.py::asked_for_ideas",
+    "app/modules/pi/service_conversation.py::brain_ideas"
+   ],
+   "tests": [
+    "tests/unit/test_pi_golden_solution_mode.py::test_g17_an_impatient_ask_gets_an_apology_then_the_ideas",
+    "tests/unit/test_pi_idea_format_languages.py::test_an_impatient_ask_gets_a_short_apology_before_the_ideas"
+   ],
+   "gap": "Impatience gets an apology then ideas with no question first; for an ordinary solution request the ideas come in the same reply, but 'at most one question before value' is not counted across replies.",
+   "owner": "solutions session",
+   "unit_tested": true
+  },
+  {
+   "id": "R-SOL-03",
+   "source": "platform",
+   "page": 96,
+   "area": "solutions (Book 2 3.2)",
+   "statement": "A churn signal ('kahin aur jaun', 'forget it') gets reassurance and something useful in the same message, and is logged",
+   "status": "PARTIAL",
+   "code": [
+    "app/modules/pi/solution_ask.py::churn_risk"
+   ],
+   "tests": [
+    "tests/unit/test_pi_golden_solution_mode.py::test_g18_an_owner_about_to_leave_is_reassured_and_given_ideas",
+    "tests/unit/test_pi_golden_solution_mode.py::test_g18_a_plain_no_is_not_mistaken_for_leaving"
+   ],
+   "gap": "The signal is detected, routes to ideas and feeds the dashboard alert; the reassuring wording is the model's and is not checked.",
+   "owner": "solutions session",
+   "unit_tested": true
+  },
+  {
+   "id": "R-SOL-04",
+   "source": "platform",
+   "page": 96,
+   "area": "solutions (Book 2 3.2)",
+   "statement": "Every idea uses at least one fact the person gave; generic lists are banned",
+   "status": "PARTIAL",
+   "code": [
+    "app/modules/pi/solutions.py::ideas",
+    "app/modules/pi/solution_rules.py::check_idea"
+   ],
+   "tests": [
+    "tests/unit/test_pi_solutions.py::test_each_entry_is_complete_and_inside_the_value_line",
+    "tests/unit/test_pi_solution_rules.py::test_ideas_that_give_away_the_how_or_make_claims_are_refused"
+   ],
+   "gap": "Ideas come from the industry entry matched to the noted problem and pass the idea guard, but nothing checks that an idea reuses a fact the person gave (their branch, channel or dish).",
+   "owner": "solutions session",
+   "unit_tested": true
+  },
+  {
+   "id": "R-SOL-05",
+   "source": "platform",
+   "page": 96,
+   "area": "solutions (Book 2 3.2)",
+   "statement": "Ideas, not guarantees: no predicted results, percentages or 'will increase sales'",
+   "status": "DONE",
+   "code": [
+    "app/modules/pi/solution_rules.py::claim_hits",
+    "app/modules/pi/constitution.py::lint"
+   ],
+   "tests": [
+    "tests/unit/test_pi_solution_rules.py::test_ideas_that_give_away_the_how_or_make_claims_are_refused",
+    "tests/unit/test_pi_constitution.py::test_pi_never_promises_a_result",
+    "tests/unit/test_pi_linter_hardening.py::test_a_word_the_customer_used_is_not_a_promise_but_a_promise_is"
+   ],
+   "gap": "",
+   "owner": "",
+   "unit_tested": true
+  },
+  {
+   "id": "R-SOL-06",
+   "source": "platform",
+   "page": 96,
+   "area": "solutions (Book 2 3.2)",
+   "statement": "No invented facts: no statistics, studies or case studies",
+   "status": "DONE",
+   "code": [
+    "app/modules/pi/solution_rules.py::claim_hits",
+    "app/modules/pi/constitution.py::lint"
+   ],
+   "tests": [
+    "tests/unit/test_pi_linter_hardening.py::test_invented_proof_is_hard",
+    "tests/unit/test_pi_solution_rules.py::test_ideas_that_give_away_the_how_or_make_claims_are_refused"
+   ],
+   "gap": "",
+   "owner": "",
+   "unit_tested": true
+  },
+  {
+   "id": "R-SOL-07",
+   "source": "platform",
+   "page": 96,
+   "area": "solutions (Book 2 3.2)",
+   "statement": "pi says Workzap can build something only if it is in the approved catalogue",
+   "status": "DONE",
+   "code": [
+    "app/modules/pi/solution_rules.py::check_build_line",
+    "app/modules/pi/solutions.py::build_phrase"
+   ],
+   "tests": [
+    "tests/unit/test_pi_solution_rules.py::test_a_build_line_must_name_catalogue_builds_and_never_promise",
+    "tests/unit/test_pi_solution_gaps_unit.py::test_a_drafted_entry_needs_catalogue_keys_a_clean_question_and_a_clean_stop"
+   ],
+   "gap": "",
+   "owner": "",
+   "unit_tested": true
+  },
+  {
+   "id": "R-SOL-08",
+   "source": "platform",
+   "page": 96,
+   "area": "solutions (Book 2 3.2)",
+   "statement": "No prices outside the quote: asked how much it costs, pi says the cost is on the quote, the quote is free and no is fine",
+   "status": "DONE",
+   "code": [
+    "app/modules/pi/price_policy.py::check"
+   ],
+   "tests": [
+    "tests/unit/test_pi_price_policy.py::test_teen_amounts_are_refused_in_no_price_modes",
+    "tests/unit/test_pi_golden_solution_mode.py::test_g20_a_cost_question_is_a_cost_question_and_never_an_idea_ask"
+   ],
+   "gap": "",
+   "owner": "",
+   "unit_tested": true
+  },
+  {
+   "id": "R-SOL-09",
+   "source": "platform",
+   "page": 96,
+   "area": "solutions (Book 2 3.2)",
+   "statement": "No regulated advice in solution mode: ideas stay operational, no legal, tax, medical, financial, veterinary or agronomy advice",
+   "status": "PARTIAL",
+   "code": [
+    "app/modules/pi/safety.py::advice_reply",
+    "app/modules/pi/constitution.py::lint"
+   ],
+   "tests": [
+    "tests/unit/test_pi_safety.py::test_advice_is_turned_down_in_plain_words_with_who_to_ask"
+   ],
+   "gap": "Advice asks are turned down by the safety gate and the linter; the free-idea guard (check_idea) does not itself reject a stored idea that is regulated advice, and no test feeds one through solution mode.",
+   "owner": "solutions session",
+   "unit_tested": true
+  },
+  {
+   "id": "R-TONE-02",
+   "source": "platform",
+   "page": 109,
+   "area": "respectful framing (Book 2 10.2)",
+   "statement": "Turn complaints into solvable problems ('staff kaam nahi karte' becomes 'kaam waqt par nahi hota')",
+   "status": "PARTIAL",
+   "code": [
+    "app/modules/pi/problems.py::title_problem"
+   ],
+   "tests": [
+    "tests/unit/test_pi_problem_model.py::test_title_rules"
+   ],
+   "gap": "Problem titles are checked for blame and for being a solution; the wording pi uses in a reply is the model's.",
+   "owner": "prompt owner",
+   "unit_tested": true
+  },
+  {
+   "id": "R-TONE-03",
+   "source": "platform",
+   "page": 109,
+   "area": "respectful framing (Book 2 10.2)",
+   "statement": "Stay respectful when frustrated: no defensiveness, no 'please be patient', no lecture about why pi asks questions; give value instead",
+   "status": "PROMPT-ONLY",
+   "code": [],
+   "tests": [],
+   "gap": "Carried by the handbook and the prompt line for impatience; nothing detects defensive or patience phrases in a reply.",
+   "owner": "linter hardening session",
+   "unit_tested": false
   }
  ]
 }

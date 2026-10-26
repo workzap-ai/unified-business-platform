@@ -6,16 +6,16 @@ Statuses: **DONE** code and a test that fails if the rule breaks. **PARTIAL** co
 
 ## Counts
 
-index counts: DONE 394, PARTIAL 35, CODE-ONLY 0, PROMPT-ONLY 10, HUMAN 18, MISSING 2
+index counts: DONE 398, PARTIAL 44, CODE-ONLY 0, PROMPT-ONLY 12, HUMAN 18, MISSING 2
 
 | PDF | Rules | DONE | PARTIAL | CODE-ONLY | PROMPT-ONLY | HUMAN | MISSING |
 |---|---|---|---|---|---|---|---|
 | pi-brain-v3 (Brain) | 364 | 312 | 27 | 0 | 10 | 15 | 0 |
 | pi-industry-solutions (Addendum 2) | 81 | 68 | 8 | 0 | 0 | 3 | 2 |
-| pi-platform-spec (Platform: Book 4, Part A, Book 2 amendments) | 14 | 14 | 0 | 0 | 0 | 0 | 0 |
-| Both | 459 | 394 | 35 | 0 | 10 | 18 | 2 |
+| pi-platform-spec (Platform: Book 4, Part A, Book 2 amendments) | 29 | 18 | 9 | 0 | 2 | 0 | 0 |
+| Both | 474 | 398 | 44 | 0 | 12 | 18 | 2 |
 
-25 of the 394 DONE rules are exercised only by integration tests (they need the disposable Postgres on port 55432); the rest have a unit test that runs with no database. The index lists each test, so `rule_index.json` shows which. Every identifier family the PDFs define is in the index: R-xxx-nn (155 ids), RT1-29, G1-15, L1-14, E1-9, M1-10, A1-8, X1-5, SL-1..10, VAL-1..6, Job 1-10, Job S1-S8, rubric 1-20 (RUB-n), Appendix D (App.D-n). SPEC-x.y rows are numbered sections of the Brain that have requirements but no rule id; A2-x rows are the same for Addendum 2. The per-industry text of Part 7 and Part 4 is data, covered by SPEC-7.0 and A2-4-DATA.
+25 of the 398 DONE rules are exercised only by integration tests (they need the disposable Postgres on port 55432); the rest have a unit test that runs with no database. The index lists each test, so `rule_index.json` shows which. Every identifier family the PDFs define is in the index: R-xxx-nn (155 ids), RT1-29, G1-15, L1-14, E1-9, M1-10, A1-8, X1-5, SL-1..10, VAL-1..6, Job 1-10, Job S1-S8, rubric 1-20 (RUB-n), Appendix D (App.D-n). SPEC-x.y rows are numbered sections of the Brain that have requirements but no rule id; A2-x rows are the same for Addendum 2. The per-industry text of Part 7 and Part 4 is data, covered by SPEC-7.0 and A2-4-DATA.
 
 ## Everything that is not DONE
 
@@ -23,6 +23,17 @@ Who: a lane of work, not a person. Linter hardening session = `constitution.py` 
 
 | Rule | PDF p. | Status | What is missing | Who |
 |---|---|---|---|---|
+| `R-ANS-01` | Platform 95 | PARTIAL | The first sentence of a reply answers a direct question; a question back is never a substi: Solution asks, 'what do you do' and status asks are answered first in code; any other direct question ('kitne din lagenge?') is answered first only by the handbook and prompt, and no linter check compares sentence one with the question. | linter hardening session |
+| `R-ANS-02` | Platform 95 | PROMPT-ONLY | A yes/no question gets a yes or no first, then the detail: Carried only by the handbook text in the prompt; nothing detects a yes/no question or checks that the reply starts with yes or no. | prompt owner |
+| `R-ANS-03` | Platform 96 | PARTIAL | A request (solution, price, timeline, human) that goes unanswered once is dealt with befor: Status asks and solution asks are guarded; there is no general open_requests log, so a price, timeline or human request left unanswered for one turn is not blocked or logged as solution_request_ignored. | linter hardening session |
+| `R-ECHO-01` | Platform 108 | PARTIAL | pi does not restate the person's message; a noted confirmation is allowed once per problem: A long echo is caught by the overlap check (R-ECHO-03); the 12-word limit and 'once per problem' are not counted. | linter hardening session |
+| `R-ECHO-02` | Platform 108 | PARTIAL | Bulleted restatements only in the summary S4 (or when confirming 3 new problems from one m: Bullets are allowed only in summaries (R-VOICE-09); the exception for confirming three new problems from one message is not built. | linter hardening session |
+| `R-SOL-02` | Platform 96 | PARTIAL | After a solution request pi may ask at most one clarifying question before giving an idea;: Impatience gets an apology then ideas with no question first; for an ordinary solution request the ideas come in the same reply, but 'at most one question before value' is not counted across replies. | solutions session |
+| `R-SOL-03` | Platform 96 | PARTIAL | A churn signal ('kahin aur jaun', 'forget it') gets reassurance and something useful in th: The signal is detected, routes to ideas and feeds the dashboard alert; the reassuring wording is the model's and is not checked. | solutions session |
+| `R-SOL-04` | Platform 96 | PARTIAL | Every idea uses at least one fact the person gave; generic lists are banned: Ideas come from the industry entry matched to the noted problem and pass the idea guard, but nothing checks that an idea reuses a fact the person gave (their branch, channel or dish). | solutions session |
+| `R-SOL-09` | Platform 96 | PARTIAL | No regulated advice in solution mode: ideas stay operational, no legal, tax, medical, fina: Advice asks are turned down by the safety gate and the linter; the free-idea guard (check_idea) does not itself reject a stored idea that is regulated advice, and no test feeds one through solution mode. | solutions session |
+| `R-TONE-02` | Platform 109 | PARTIAL | Turn complaints into solvable problems ('staff kaam nahi karte' becomes 'kaam waqt par nah: Problem titles are checked for blame and for being a solution; the wording pi uses in a reply is the model's. | prompt owner |
+| `R-TONE-03` | Platform 109 | PROMPT-ONLY | Stay respectful when frustrated: no defensiveness, no 'please be patient', no lecture abou: Carried by the handbook and the prompt line for impatience; nothing detects defensive or patience phrases in a reply. | linter hardening session |
 | `A2-1.5-SECRETS` | Add.2 10 | MISSING | pi never reveals Workzap's internal methods, tools, vendors, pricing logic or how catalogue...: Nothing enforces it and it is not in the prompt: the handbook is built from the Brain PDF only, and the linter blocks internal terms (knowledge pack, prompt, rule ids) and named products, not an explanation of how a build works, a vendor Workzap uses or pricing logic. | linter hardening session (linter change) or prompt owner |
 | `A2-FIX-5` | Add.2 14 | MISSING | Bridge openers and build phrasings are voice variants that pi learns from owners' responses: Openers rotate and never repeat in a chat, but they are not learned: learning_voice has no variant set for them, so there is no response-based preference. | learning session |
 | `R-PRIV-08` | Brain 13 | PROMPT-ONLY | Never pressures the person for detail they hesitate to give: Only the handbook text (always in the prompt) carries it; nothing detects pressure. | prompt owner (not in scope for code) |
