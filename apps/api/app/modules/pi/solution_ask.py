@@ -142,6 +142,7 @@ def asked_for_ideas(said: str) -> bool:
         or SOLUTION_ASK_PLAIN.search(text)
         or what_now(text)
         or asks_in_other_language(text)
+        or CHURN.search(text)
     )
 
 
@@ -258,3 +259,17 @@ IMPATIENT = re.compile(
 
 def impatient(said: str) -> bool:
     return bool(IMPATIENT.search(said or ""))
+
+
+# An owner about to leave ("rehne do, koi aur dekh leta hoon", "I'll look elsewhere"): pi reassures
+# in one line and gives the ideas in the same message (platform spec Book 2, G18). The same cue is
+# what the dashboard's churn alert reads.
+CHURN = re.compile(
+    r"\brehne do\b[^.?!]{0,20}\bkoi aur\b|\bkoi aur dekh\w*\b|\bkahin aur (?:jaun|jaaun|chala)\w*\b"
+    r"|\b(?:i(?:'ll| will)|let me) (?:look|check|try) (?:elsewhere|somewhere else|another)\b",
+    re.IGNORECASE,
+)
+
+
+def churn_risk(said: str) -> bool:
+    return bool(CHURN.search(said or ""))
