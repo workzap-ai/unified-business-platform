@@ -16,7 +16,7 @@ from dataclasses import dataclass
 from typing import Any
 
 from app.modules.pi import constitution_langs as langs
-from app.modules.pi import flow
+from app.modules.pi import flow, think_lint
 
 logger = logging.getLogger(__name__)
 
@@ -2049,6 +2049,10 @@ def lint(reply: str, context: dict[str, Any]) -> list[Violation]:
         if phrase in lowered and sum(phrase in p.lower() for p in _pi_replies(context)) >= 2:
             add(Violation("R-VOICE-04", f'say "{phrase}" in different words: it was used twice'))
             break
+    # The thinking checks (Book 5, spec 3.9): soft, and only behind response_rules.brain.thinking.
+    if context.get("thinking"):
+        for flag in think_lint.think_flags(reply, context):
+            add(Violation(flag.rule, flag.message))
     return found
 
 
@@ -2078,10 +2082,10 @@ AI_ANSWER = {
 # Safe lines for when a reply still breaks a rule after its one rewrite (spec 9.5): they promise
 # nothing, ask nothing sensitive, and ask one question last. The first message keeps its disclosure.
 FALLBACK_LISTENING = {
-    "en": "Noted. What else is getting in the way?",
-    "roman_ur": "Note kar liya. Aur kya masla aa raha hai?",
-    "ur": "نوٹ کر لیا۔ اور کیا مسئلہ آ رہا ہے؟",
-    "ar": "تم تسجيل ذلك. ما الذي يعيقك أيضاً؟",
+    "en": "What part of this costs you the most right now?",
+    "roman_ur": "Is mein sab se zyada nuqsan kis baat ka ho raha hai?",
+    "ur": "اس میں سب سے زیادہ نقصان کس بات کا ہو رہا ہے؟",
+    "ar": "ما أكثر جزء في هذا يكلّفك الآن؟",
 }
 FALLBACK_OTHER = {
     "en": "Thanks, that's noted. Is there anything else you want to add?",

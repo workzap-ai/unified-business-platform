@@ -55,6 +55,7 @@ from app.modules.pi import (
     spec_handbook,
     style,
     taxonomy,
+    think_prompt,
 )
 from app.modules.pi import (
     critique as critique_mod,
@@ -1131,6 +1132,7 @@ def system_for(context: dict[str, Any]) -> str:
             + BRAIN_VOICE
             + (BRAIN_ASK if asked else "")
             + (memory_block.SYSTEM_LINE if context.get("what_i_know") else "")
+            + think_prompt.block(context)
         )
     return SYSTEM
 
@@ -1403,6 +1405,8 @@ async def brain_problems(
     context: dict[str, Any] = {"noted_problems": noted}
     served = (policy.response_rules.get("brain") or {}).get("served_industries")
     context["served_industries"] = served if isinstance(served, list) else None
+    if think_prompt.enabled(policy.response_rules):  # Book 5: absent unless exactly true
+        context["thinking"] = True
     context["brain_settings"] = {
         key: brain_config.value(policy.response_rules, key)
         for key in (
