@@ -40,16 +40,15 @@ PREFIX = "voice_"
 SEEDS: dict[str, dict[str, list[str]]] = {
     "acknowledge": {
         "en": [
-            "That's a real problem.",
-            "That sounds costly.",
-            "That's worth sorting.",
             "Got it.",
+            "Understood.",
+            "I see.",
+            "Noted.",
         ],
         "roman_ur": [
-            "Ye sach mein masla hai.",
-            "Is mein nuqsan ho sakta hai.",
-            "Is par kaam banta hai.",
             "Samajh gaya.",
+            "Ji, samajh aaya.",
+            "Aap ki baat samajh aayi.",
         ],
     },
     "correct": {
@@ -73,6 +72,18 @@ SEEDS["bridge"] = {
     for language in ("en", "roman_ur")
 }
 MINED = ("acknowledge", "correct")  # the moments a model may write new phrasings for
+# Verdicts and hollow promises the owner does not want in pi's mouth (live chats 3 and 5). Rows made
+# from them earlier are retired the next time the seeds are checked.
+DROPPED = frozenset(
+    {
+        "That's a real problem.",
+        "That sounds costly.",
+        "That's worth sorting.",
+        "Ye sach mein masla hai.",
+        "Is mein nuqsan ho sakta hai.",
+        "Is par kaam banta hai.",
+    }
+)
 MIN_USES = 30  # before a variant's rate means anything
 BELOW_BASELINE = 0.10
 RETIRE_AFTER = timedelta(days=14)
@@ -119,6 +130,15 @@ async def ensure_seeded(session: AsyncSession, scope: WorkspaceScope) -> int:
             select(PiQuestionArm).where(*_scoped(scope), PiQuestionArm.slot.like(PREFIX + "%"))
         )
     }
+    for arm in await session.scalars(
+        select(PiQuestionArm).where(
+            *_scoped(scope),
+            PiQuestionArm.slot == slot_of("acknowledge"),
+            PiQuestionArm.text.in_(DROPPED),
+            PiQuestionArm.status != "retired",
+        )
+    ):
+        arm.status = "retired"
     added = 0
     for moment, by_language in SEEDS.items():
         for language, texts in by_language.items():

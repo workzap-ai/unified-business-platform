@@ -418,18 +418,18 @@ async def test_a_variant_worse_than_the_canonical_wording_for_two_weeks_is_retir
             select(PiQuestionArm).where(PiQuestionArm.slot == v.slot_of("acknowledge"))
         )
     }
-    canonical = arms["That's a real problem."]
+    canonical = arms[v.SEEDS["acknowledge"]["en"][0]]  # "Got it."
     canonical.alpha, canonical.beta, canonical.uses = 41.0, 11.0, 50
-    arms["Got it."].alpha, arms["Got it."].beta, arms["Got it."].uses = 11.0, 41.0, 50
-    arms["That sounds costly."].alpha, arms["That sounds costly."].beta = 39.0, 13.0
-    arms["That sounds costly."].uses = 50
+    arms["Noted."].alpha, arms["Noted."].beta, arms["Noted."].uses = 11.0, 41.0, 50
+    arms["Understood."].alpha, arms["Understood."].beta = 39.0, 13.0
+    arms["Understood."].uses = 50
     now = datetime.now(UTC)
     first = await v.retire_worse(business_db, scope, now)
     assert first == {"flagged": 1, "retired": 0}  # worse, but only just noticed
     assert (await v.retire_worse(business_db, scope, now + timedelta(days=7)))["retired"] == 0
     later = await v.retire_worse(business_db, scope, now + timedelta(days=15))
-    assert later["retired"] == 1 and arms["Got it."].status == "retired"
-    assert canonical.status != "retired" and arms["That sounds costly."].status != "retired"
+    assert later["retired"] == 1 and arms["Noted."].status == "retired"
+    assert canonical.status != "retired" and arms["Understood."].status != "retired"
 
     asked: list[str] = []
 
@@ -439,7 +439,7 @@ async def test_a_variant_worse_than_the_canonical_wording_for_two_weeks_is_retir
 
     await v.mine(business_db, scope, writer)
     assert asked == ["correct"]  # acknowledge has three live variants: enough; correct has two
-    arms["That's worth sorting."].status = "retired"
+    arms["I see."].status = "retired"
     mined = await v.mine(business_db, scope, writer)
     assert "acknowledge" in asked
     assert mined["proposed"] >= 1

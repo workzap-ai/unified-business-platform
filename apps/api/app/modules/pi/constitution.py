@@ -681,6 +681,43 @@ OPTION_STOP = frozenset(
     "side wala wali wale taraf type kya masla problem hai hain mein par ko ki ka ke se aur ya the "
     "and for with that this which what ho hota hoti hote".split()
 )
+# R-TONE-01 (live chat 5): a hollow verdict that promises nothing and notes nothing.
+HOLLOW_OPENER = re.compile(
+    r"^\W*(?:is\s+par\s+kaam\s+banta\s+hai|is\s+mein\s+nuqsan\s+ho\s+sakta\s+hai|that\s+sounds\s+costly|"
+    r"that(?:'s|\s+is)\s+worth\s+sorting|that\s+sounds\s+like\s+a\s+headache|ye\s+sunna\s+mushkil\s+hai)"
+    r"\W*$",
+    re.IGNORECASE,
+)
+# "Theek hai," / "Acha." in front of anything: an acknowledgement that adds nothing.
+FILLER_LEAD = re.compile(r"^\W*(?:theek\s+hai|thik\s+hai|acha|accha)\s*[,.!]\s*", re.IGNORECASE)
+# Words that say how much or how often and nothing else: "zyada tar", "bas thora", "mostly".
+BARE_WORDS = frozenset(
+    "zyada zyadatar tar bas sirf bohat bahut kuch thora thoda kam kabhi aksar shayad pata nahi nhi "
+    "haan han ji g theek thik hai hmm ok okay yes no most mostly often some sometimes maybe yeah "
+    "right acha accha bilkul".split()
+)
+BARE_MAX_WORDS = 4  # an answer of this many words ("zyada tar", "nahi") adds nothing to note
+PROGRESS_STATES = (
+    flow.State.S1_LISTENING,
+    flow.State.S2_CLARIFYING,
+    flow.State.S3_NOTED,
+)
+# the ids of the question slots (learning_arms.ORDER) and what in the person's words answers them
+SLOT_ANSWERED = {
+    "frequency": re.compile(
+        r"\b(?:roz|rozana|daily|har\s+din|har\s+hafte|hafte|haftay|weekly|mahine|mahinay|monthly|"
+        r"kabhi\s+kabhi|aksar|every\s+(?:day|week|month))\b|\d+\s*(?:baar|dafa|times|din)\b",
+        re.IGNORECASE,
+    ),
+    "since": re.compile(
+        r"\b(?:hamesha\s+se|pehle\s+se|since|always|\d+\s*(?:saal|mahine|din|years?|months?|weeks?)\s+se)\b",
+        re.IGNORECASE,
+    ),
+    "impact": re.compile(
+        r"\b(?:nuqsan|loss|paise|paisa|waqt|time\s+waste|pareshan|stress|kharcha|cost|mehnga)\b",
+        re.IGNORECASE,
+    ),
+}
 # R-ECHO-01: the noted confirmation names the problem in at most 12 words.
 NOTED_TITLE = re.compile(
     r"\b(?:i(?:'ve|\s+have)\s+noted(?:\s+it)?|noted|note\s+kar\s+liya"
@@ -1787,6 +1824,40 @@ def lint(reply: str, context: dict[str, Any]) -> list[Violation]:
                 f"is still unknown ({why_again})",
             )
         )
+    opener_sentence = (_sentences(reply) or [""])[0]
+    if HOLLOW_OPENER.match(opener_sentence) and len(_sentences(reply)) > 1:
+        add(
+            Violation(
+                "R-TONE-01",
+                f'"{opener_sentence}" says nothing and notes nothing: start with what you noted or the '
+                "question",
+            )
+        )
+    if (
+        _bare_fragment(latest_said)
+        and any(NOTED_CLAIM.search(x) for x in _sentences(reply))
+        and state in PROGRESS_STATES
+    ):
+        add(
+            Violation(
+                "R-HONEST-02",
+                "they said almost nothing ("
+                f'"{latest_said}"): there is nothing new to note, so do not say "noted"; ask the next '
+                "specific question",
+            )
+        )
+    if (
+        _ensure_next_step(reply, context) != reply
+        and not any(x.endswith(QUESTION_MARKS) for x in _sentences(reply))
+        and state in PROGRESS_STATES
+    ):
+        add(
+            Violation(
+                "R-PROG-01",
+                "this reply ends on a statement with no next step: ask the next specific question "
+                "about what is still unknown",
+            )
+        )
     if VERDICT_OPENER.match(reply):
         add(
             Violation(
@@ -2094,6 +2165,7 @@ def repair(reply: str, context: dict[str, Any]) -> str:
     fixed = re.sub(" ?" + EMOJI.pattern, drop, SKIN_TONES.sub("", fixed.replace("️", "")))
     fixed = _scrub(fixed)
     fixed = _drop_slips(fixed, context)
+    fixed = _ensure_next_step(fixed, context)
     fixed = _one_question_last(fixed, _cap(context, "word_cap", WORD_CAP))
     history = context.get("history") or []
     first = not any(h.get("role") == "ai" for h in history)
@@ -2227,6 +2299,16 @@ def _drop_slips(reply: str, context: dict[str, Any]) -> str:
         stripped = ENGLISH_FILLER_OPENER.sub("", opener, count=1).lstrip(" ,.!")
         parts[first[0]][first[1]] = stripped[:1].upper() + stripped[1:]
         changed = True
+    if HOLLOW_OPENER.match(opener):
+        dropped.add(first)
+    elif FILLER_LEAD.match(opener) and not dropped:
+        stripped = FILLER_LEAD.sub("", opener, count=1)
+        parts[first[0]][first[1]] = stripped[:1].upper() + stripped[1:]
+        changed = True
+    if state in PROGRESS_STATES and _bare_fragment(latest):
+        for at in flat:
+            if at not in dropped and NOTED_CLAIM.search(text(at)) and not is_question(at):
+                dropped.add(at)
     if CONFIRMS_CORRECTION.search(opener) and not (
         context.get("said_wrong") or context.get("corrects_noted") or CORRECTION_CUE.search(latest)
     ):
@@ -2252,6 +2334,92 @@ def _drop_slips(reply: str, context: dict[str, Any]) -> str:
         if kept or not lines[i].strip():
             out.append(" ".join(kept))
     return "\n".join(out).strip()
+
+
+NOTED_CLAIM = re.compile(
+    r"\b(?:note\s+kar\s+liya|noted|maine\s+note|i(?:'ve|\s+have)\s+noted)\b", re.IGNORECASE
+)
+
+
+def _bare_fragment(said: str) -> bool:
+    """A reply of a word or three ("zyada tar", "nahi", "bas pehle hafte mein"): nothing new to note."""
+    from app.modules.pi import slots
+
+    words = [w.lower() for w in re.findall(r"\w+", said or "")]
+    if slots.SKIP_ACK.match(said or "") or slots.SKIP_ACK_OTHER.match(said or ""):
+        return False  # "ok", "hmm", "nahi": an answer, and "noted" for it is fine
+    return 0 < len(words) <= BARE_MAX_WORDS and all(w in BARE_WORDS for w in words)
+
+
+def _generic_closers_before(context: dict[str, Any]) -> int:
+    """How many of pi's earlier replies ended on the generic closer ("anything else?")."""
+    count = 0
+    for text in _pi_replies(context):
+        asked = [x for x in _sentences(text) if x.endswith(QUESTION_MARKS)]
+        if asked and GENERIC_CLOSER.search(asked[-1]):
+            count += 1
+    return count
+
+
+def _next_question(context: dict[str, Any], reply: str) -> str:
+    """The next specific question about the latest noted problem: the first slot still open (not
+    answered in their words, not closed, not asked in this chat already), in the chat's language.
+    Empty when the chat is not in English or Roman Urdu or nothing is left to ask."""
+    from app.modules.pi import learning_arms
+
+    language = str(context.get("reply_language") or "en")
+    if language not in ("en", "roman_ur"):
+        return ""
+    heard = _heard(context)
+    closed = " ".join(str(c.get("slot") or "") for c in context.get("closed_slots") or [])
+    before = " ".join(_pi_replies(context)).lower() + " " + reply.lower()
+    noted = context.get("noted_problems") or []
+    missing = list((noted[-1].get("missing") or []) if noted else [])
+    wanted = learning_arms.slot_for(missing)
+    order = [wanted] if wanted else []
+    order += [slot for slot in learning_arms.ORDER if slot != wanted]
+    for slot in order:
+        answered = SLOT_ANSWERED.get(slot)
+        if (answered and answered.search(heard)) or slot in closed:
+            continue
+        for wording in learning_arms.SEEDS[slot][language]:
+            if wording.lower().rstrip("?") not in before:
+                return wording
+    return ""
+
+
+def _ensure_next_step(reply: str, context: dict[str, Any]) -> str:
+    """Spec 9.3: every reply while listening notes, asks or gives; none ends on a statement alone.
+    A reply with no question (and no offer or ideas) gets the next specific question; a second
+    generic closer, or one straight after an answer with nothing in it, is swapped for one."""
+    state = flow.parse((context.get("flow") or {}).get("state"))
+    latest = str(context.get("latest_customer_message") or "")
+    history = context.get("history") or []
+    if (
+        state not in PROGRESS_STATES
+        or not context.get("noted_problems")  # nothing noted yet: the first question is the model's
+        or not latest
+        or not any(h.get("role") == "ai" for h in history)
+        or context.get("solution_asked")
+        or context.get("handback_notice")
+        or "•" in reply
+        or re.search(r"document|quote", reply, re.IGNORECASE)
+        or ASKS_IF_AI.search(latest)
+        or DIRECT_QUESTION.search(latest)
+    ):
+        return reply
+    sentences = _sentences(reply)
+    asked = [x for x in sentences if x.endswith(QUESTION_MARKS)]
+    closer = asked[-1] if asked and GENERIC_CLOSER.search(asked[-1]) else ""
+    if asked and not closer:
+        return reply
+    if closer and not (_generic_closers_before(context) >= 1 or _bare_fragment(latest)):
+        return reply  # the first generic closer, after a real answer: allowed once
+    nxt = _next_question(context, reply)
+    if not nxt:
+        return reply
+    kept = [x for x in sentences if x != closer]
+    return " ".join([*kept, nxt]).strip()
 
 
 def _one_question_last(reply: str, cap: int = WORD_CAP) -> str:
