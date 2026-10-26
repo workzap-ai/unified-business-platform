@@ -27,6 +27,7 @@ from app.modules.pi import (
     brain_config,
     brain_docs,
     brain_payments,
+    brain_prompt,
     business,
     constitution,
     decisions,
@@ -872,6 +873,10 @@ Proposals:
   account number yourself: the application appends the exact payment details.
 """
 
+# Brain mode gets the same prompt without the account-manager sales flow (brain_prompt.CUTS), so no
+# brain rule has to "override" it. Every other workspace keeps SYSTEM exactly as written.
+BRAIN_SYSTEM = brain_prompt.cut(SYSTEM)
+
 
 BRAIN_PROBLEMS = """
 Noting problems (pi_mode "brain"). Record every problem the customer describes in
@@ -1090,7 +1095,7 @@ def system_for(context: dict[str, Any]) -> str:
     if context.get("pi_mode") == "brain":
         asked = solution_turn(context)
         return (
-            SYSTEM
+            BRAIN_SYSTEM
             + BRAIN_PROBLEMS
             + BRAIN_DECISIONS
             + BRAIN_VOICE
