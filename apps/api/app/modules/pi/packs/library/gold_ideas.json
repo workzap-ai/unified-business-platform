@@ -1,0 +1,226 @@
+[
+ {
+  "industry": "clinics",
+  "problem": "patients book but do not come and the doctor sits idle",
+  "ideas": [
+   "Send each patient a reminder message before the visit and ask for a one-word reply, so slots nobody confirmed can be offered to others.",
+   "Keep a short waiting list in a shared chat and message it the moment a slot opens, so a cancelled visit is filled."
+  ]
+ },
+ {
+  "industry": "restaurants",
+  "problem": "cash is short and stock goes missing from the kitchen",
+  "ideas": [
+   "Count the cash drawer with two people at closing and post the total in one shared chat, so any gap is seen straight away.",
+   "Photograph the kitchen shelves when it opens and closes and share them in the staff chat, so a missing item shows up early."
+  ]
+ },
+ {
+  "industry": "bakeries",
+  "problem": "Eid stock is baked in bulk and a lot is thrown away unsold",
+  "ideas": [
+   "Ask each counter to post a photo of what is left at the midpoint of the rush, so the next batch is decided from facts.",
+   "Take pre-orders from regular customers in a chat before the rush, so a large part of the baking is already sold."
+  ]
+ },
+ {
+  "industry": "garment factories",
+  "problem": "orders are late because work piles up at one stage",
+  "ideas": [
+   "Mark every order with the stage it is waiting at on one shared board photo, so the stage where it piles up is obvious.",
+   "Give the stage that piles up one extra helper from the quiet stage, so the line stops stalling at one point."
+  ]
+ },
+ {
+  "industry": "transport",
+  "problem": "fuel use per vehicle is more than it should be and nobody can explain it",
+  "ideas": [
+   "Ask each driver to send a photo of the meter and the fuel slip at every fill, so each vehicle can be compared.",
+   "Compare vehicles on the same route side by side in one list, so the odd one out is easy to see."
+  ]
+ },
+ {
+  "industry": "real estate agents",
+  "problem": "enquiries come in but most buyers go cold after the first call",
+  "ideas": [
+   "Send each enquirer two matching listings with photos in a chat right after the call, so they have something to react to.",
+   "Keep one shared list of who asked about what and message them when a matching listing comes, so no buyer is forgotten."
+  ]
+ },
+ {
+  "industry": "dairy farms",
+  "problem": "the milk buyer pays late and the household and fodder bills pile up",
+  "ideas": [
+   "Write each delivery in one shared note with the buyer's confirmation, so the amount owed is clear to both sides.",
+   "Agree one fixed settling day with the buyer and confirm it in the chat, so everyone knows what to expect."
+  ]
+ },
+ {
+  "industry": "online shops",
+  "problem": "many cash on delivery parcels are refused and come back",
+  "ideas": [
+   "Confirm every cash on delivery order on chat with the item and the address before dispatch, so fewer parcels are refused.",
+   "Send the buyer a photo of the packed parcel before it leaves, so there is no doubt about what was sent."
+  ]
+ },
+ {
+  "industry": "salons",
+  "problem": "customers do not turn up for bookings and the chairs sit empty",
+  "ideas": [
+   "Message each customer a reminder before the booking and ask them to confirm, so a free chair is known early.",
+   "Keep a short list of walk-in regulars in a shared chat and message them when a chair is free, so the slot is used."
+  ]
+ },
+ {
+  "industry": "gyms",
+  "problem": "members join with energy and stop coming after a short while",
+  "ideas": [
+   "Message members who have missed their usual visits with a friendly note, so they feel noticed and come back.",
+   "Give every new member a small first goal and check in with them on it, so they have a reason to keep coming."
+  ]
+ },
+ {
+  "industry": "pharmacies",
+  "problem": "stock near expiry sits on the shelf and gets wasted",
+  "ideas": [
+   "Keep one list of items near expiry on the counter and move them to the front, so they are sold first.",
+   "Tell regular customers in a chat about items that need to be sold soon, so they can pick them up in time."
+  ]
+ },
+ {
+  "industry": "electronics shops",
+  "problem": "customers argue about warranty because we have no record of what we sold",
+  "ideas": [
+   "Photograph the serial number and the bill together at the sale and keep it in one shared album, so every claim can be checked.",
+   "Send the customer the same photo in a chat at the time of sale, so both sides hold the same proof."
+  ]
+ },
+ {
+  "industry": "printing presses",
+  "problem": "customers keep changing the design after we start and jobs get repeated",
+  "ideas": [
+   "Send the final proof as a photo and ask for a clear reply before printing, so changes after that are agreed as a new job.",
+   "Keep each job's approved proof in one shared folder with the customer's reply, so there is no argument later."
+  ]
+ },
+ {
+  "industry": "contractors",
+  "problem": "clients delay stage billing and argue about extra work",
+  "ideas": [
+   "Write every extra request in the chat with a photo before doing it and get a reply, so extra work is agreed in advance.",
+   "Send a photo report at the end of each stage, so the client sees the progress that earns the next stage."
+  ]
+ },
+ {
+  "industry": "hotels",
+  "problem": "guests leave reviews about cleanliness and we lose bookings",
+  "ideas": [
+   "Ask housekeeping to send a photo of each finished room to one shared chat, so a missed spot is caught before the guest arrives.",
+   "Reply to every cleanliness review politely with what was fixed, so new guests see that you act on it."
+  ]
+ },
+ {
+  "industry": "online academies",
+  "problem": "students join a course and drop out halfway",
+  "ideas": [
+   "Message students who have gone quiet with a short check-in and one easy next step, so they come back to the lesson.",
+   "Share a short result photo from a past student in the group, so others see where the course leads."
+  ]
+ },
+ {
+  "industry": "wholesale traders",
+  "problem": "I sell on credit to many shops and cannot track who owes what",
+  "ideas": [
+   "Keep one shared list of each shop and what it owes, updated after every delivery, so nothing is forgotten.",
+   "Send each shop a short balance message before its next order, so the old balance is cleared with the new order."
+  ]
+ },
+ {
+  "industry": "car workshops",
+  "problem": "customers dispute the bill because they say they did not ask for the extra work",
+  "ideas": [
+   "Send a photo of each extra problem found in a chat and wait for a yes before fixing it, so the bill is agreed.",
+   "Give the customer a written job card with a photo of the car when it comes in, so the starting point is clear."
+  ]
+ },
+ {
+  "industry": "event caterers",
+  "problem": "the guest count changes at the last moment and we cook too much or too little",
+  "ideas": [
+   "Tell the client in writing that the final count is fixed at a set point, so late changes are agreed separately.",
+   "Ask the client to confirm the count in the chat once more near the event, so the buying matches the real number."
+  ]
+ },
+ {
+  "industry": "photographers",
+  "problem": "clients ask for endless edits and the job never closes",
+  "ideas": [
+   "Agree in the chat how many edit rounds are included before starting, so extra rounds are a separate request.",
+   "Send the edit choices as one short list the client replies to once, so the changes come together."
+  ]
+ },
+ {
+  "industry": "software agencies",
+  "problem": "the client keeps adding work and delays the bill",
+  "ideas": [
+   "Write every new request in the chat as a separate item with its own note, so extra work is visible to both sides.",
+   "Share a short progress summary at each milestone and ask the client to confirm it, so billing follows agreed progress."
+  ]
+ },
+ {
+  "industry": "agri input dealers",
+  "problem": "farmers buy on credit in the season and the money comes very late",
+  "ideas": [
+   "Keep one shared list of each farmer and what is owed, updated at every sale, so the full picture is always clear.",
+   "Agree a settling time tied to the farmer's harvest in the chat, so the due date is known and fair."
+  ]
+ },
+ {
+  "industry": "ice cream distributors",
+  "problem": "stock melts and is spoiled on the way to shops",
+  "ideas": [
+   "Ask each driver to send a photo of the box when loaded and again when handed over, so the point of spoilage is clear.",
+   "Group the shops by route and serve the farthest one first from a full cold box, so the box is not opened and warmed on the way."
+  ]
+ },
+ {
+  "industry": "cinemas",
+  "problem": "drinks and snacks counts do not match the sales",
+  "ideas": [
+   "Count the high-value items at the start and end of each shift with a second person, so a gap is seen by someone else.",
+   "Make one person responsible for the snack counter stock in each shift, so a mismatch has a clear owner."
+  ]
+ },
+ {
+  "industry": "travel agencies",
+  "problem": "visa cases stall and customers blame us for delays",
+  "ideas": [
+   "Send each customer a short checklist of what is still needed with a photo example, so missing papers are not the reason for a stall.",
+   "Update each customer in the chat whenever their case moves to a new step, so they are never left guessing."
+  ]
+ },
+ {
+  "industry": "laundries",
+  "problem": "customers say clothes are lost or mixed up",
+  "ideas": [
+   "Tag each customer's bag with a number at pick-up and photograph the clothes, so every piece is traceable.",
+   "Send the customer the pick-up photo in a chat, so both sides know exactly what was handed over."
+  ]
+ },
+ {
+  "industry": "tailors",
+  "problem": "Eid orders are delivered late and customers get angry",
+  "ideas": [
+   "Stop taking new orders for the busy rush once the work fills the team, so the promised dates can be kept.",
+   "Message each customer a progress photo at each stage, so they see the work moving and ask less."
+  ]
+ },
+ {
+  "industry": "courier companies",
+  "problem": "riders collect cash on delivery but it is not deposited fully",
+  "ideas": [
+   "Ask each rider to post a photo of the cash and the parcel list at every handover, so each amount can be checked.",
+   "Match each rider's deposited cash against the delivered parcels in one list before the next run, so a gap is seen at once."
+  ]
+ }
+]
