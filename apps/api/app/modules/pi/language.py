@@ -357,7 +357,7 @@ BRAIN_TEAM_CHECK_NOTICES = {
 }
 BRAIN_ACK_NOTICES = {
     "en": "Thanks, I've got that. Is there anything else getting in the way?",
-    "roman_ur": "Shukriya, samajh gaya. Aur koi cheez rukawat bani hui hai?",
+    "roman_ur": "Shukriya, maine note kar liya. Aur koi cheez rukawat bani hui hai?",
     "ar": "شكرًا، فهمت. هل هناك شيء آخر يعيق عملك؟",
 }
 MEDIA_NOTICES = {

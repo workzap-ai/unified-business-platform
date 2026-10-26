@@ -127,6 +127,25 @@ def url(settings: Settings, value: str, kind: str) -> str:
     return f"{base}/api/v1/pi-app/brain-visuals/{value}/{kind}.png"
 
 
+def _drawable(text: str) -> bool:
+    """The Latin font can draw it (Arabic and Urdu script came out as empty boxes)."""
+    return all(ord(c) < 0x250 or c in "–—‘’“”…" for c in text)
+
+
+def _drawable_words(rows: list[Any]) -> list[str]:
+    """The person's own words for each problem, without the quote marks they were stored with and
+    never in a script the font cannot draw: the problem's title stands in for those."""
+    out: list[str] = []
+    for problem in rows:
+        for raw in (problem.user_words or [])[:1]:
+            word = str(raw).strip().strip("\"'“”‘’ ").strip()
+            if word and not _drawable(word):
+                word = str(getattr(problem, "title", "") or "").strip()
+            if word and word not in out:
+                out.append(word)
+    return out
+
+
 def groups_of(problems: list[Any], language: str) -> list[Group]:
     """Problems grouped by area, biggest group first, with the person's own words."""
     by_area: dict[str, list[Any]] = {}
@@ -136,7 +155,7 @@ def groups_of(problems: list[Any], language: str) -> list[Group]:
     out: list[Group] = []
     for category in order[:MAX_GROUPS]:
         rows = by_area[category]
-        words = [str(w) for p in rows for w in (p.user_words or [])[:1] if str(w).strip()]
+        words = _drawable_words(rows)
         out.append(Group(taxonomy.label(category, language), len(rows), words[:MAX_WORDS_SHOWN]))
     return out
 

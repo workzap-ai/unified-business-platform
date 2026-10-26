@@ -2010,13 +2010,40 @@ def brain_no_repeat(turn: "ServiceTurn", context: dict[str, Any]) -> None:
 ENGLISH_FILLER = re.compile(r"^(?:Sure|Yes|Okay|Ok)\.(?=\s*$)", re.IGNORECASE | re.MULTILINE)
 
 
+FAMILIAR_IMPERATIVES = re.compile(
+    chr(92)
+    + "b(karo|rakho|dekho|likho|bhejo|milao|batao|lagao|banao|uthao|samajh gaya)"
+    + chr(92)
+    + "b",
+    re.IGNORECASE,
+)
+FORMAL = {
+    "karo": "karein",
+    "rakho": "rakhein",
+    "dekho": "dekhein",
+    "likho": "likhein",
+    "bhejo": "bhejein",
+    "milao": "milayein",
+    "batao": "bataein",
+    "lagao": "lagayein",
+    "banao": "banayein",
+    "uthao": "uthayein",
+    "samajh gaya": "samajh liya",
+}
+
+
+def _formal(found: "re.Match[str]") -> str:
+    word = found.group(1)
+    return FORMAL.get(word.lower(), word)
+
+
 def roman_polish(reply: str) -> str:
     """What a Roman Urdu reply keeps of English after the language step: the 'First,'/'Second,'
-    of idea lines, 'so' as the connector, and a lone 'Sure.' opener."""
-    if not ROMAN_SCAFFOLD.search(reply) and not ENGLISH_FILLER.search(reply):
-        return reply
+    of idea lines, 'so' as the connector, a lone 'Sure.' opener, and the familiar 'karo' forms
+    (pi says 'aap' and 'karein', and never a gendered 'samajh gaya', platform spec Book 4 5.1)."""
     lines = [ROMAN_SCAFFOLD.sub(roman_scaffold, line) for line in reply.splitlines()]
-    return ENGLISH_FILLER.sub("Theek hai.", chr(10).join(lines))
+    text = ENGLISH_FILLER.sub("Theek hai.", chr(10).join(lines))
+    return FAMILIAR_IMPERATIVES.sub(_formal, text)
 
 
 def brain_prose_ideas(turn: "ServiceTurn", context: dict[str, Any]) -> None:
@@ -2145,7 +2172,7 @@ NO_MORE_IDEAS = {  # noqa: E501
 }
 NO_IDEA_AGAIN = {  # noqa: E501
     "en": "That is all I can give here for now. The solution document is where Workzap sets out what it would build, and you can say no to it.",  # noqa: E501
-    "roman_ur": "Abhi yahan itna hi de sakta hoon. Workzap kya banayega, ye solution document mein hota hai, aur aap mana bhi kar sakte hain.",  # noqa: E501
+    "roman_ur": "Abhi yahan itna hi hai. Workzap kya banayega, ye solution document mein hota hai, aur aap mana bhi kar sakte hain.",  # noqa: E501
     "ar": "هذا كل ما يمكنني تقديمه هنا الآن. تفاصيل ما ستبنيه Workzap في وثيقة الحل، ويمكنك الرفض.",  # noqa: E501
 }
 
@@ -2261,38 +2288,33 @@ def brain_no_early_promise(turn: "ServiceTurn", context: dict[str, Any]) -> None
             None, flow.State.S5_READINESS, {"offer_asked": True}, why="R-OFFER-01"
         )
     else:
-        turn.reply = " ".join(
-            (
-                DOCUMENT_ONCE_NOTED.get(language, DOCUMENT_ONCE_NOTED["en"]),
-                constitution.FALLBACK_LISTENING.get(
-                    language, constitution.FALLBACK_LISTENING["en"]
-                ),
-            )
+        turn.reply = constitution.FALLBACK_LISTENING.get(
+            language, constitution.FALLBACK_LISTENING["en"]
         )
     turn.awaiting_customer = True
 
 
 def brain_never_empty(turn: "ServiceTurn", context: dict[str, Any]) -> None:
     """Brain mode never stores or sends an empty reply (a real-model sweep ended 14 chats on one
-    after a "how exactly?" or a solution ask): the safe line for the state follows instead, and a
-    document ask is answered with the one thing pi may say while it listens."""
+    after a "how exactly?" or a solution ask): a person who asked for a fix gets the honest 'no idea
+    I can give here' line and the offer when something is noted; otherwise the safe line."""
     if turn.reply.strip() or turn.request_human or turn._decision is not None or turn._summary:
         return
     said = str(context.get("latest_customer_message") or "")
     language = str(context.get("reply_language") or "en")
     line = constitution.safe_fallback(context)
-    if solution_ask.asked_howto(said) or solution_ask.asked_for_ideas(said):
-        line = f"{DOCUMENT_ONCE_NOTED.get(language, DOCUMENT_ONCE_NOTED['en'])} {line}"
+    if (solution_ask.asked_howto(said) or solution_ask.asked_for_ideas(said)) and context.get(
+        "noted_problems"
+    ):
+        line = f"{NO_IDEA_LINES.get(language, NO_IDEA_LINES['en'])}"
+        if not solution_ask.already_offers(line):
+            line = line + chr(10) + chr(10) + solution_ask.offer_line(language)
+        turn._decision = decisions.Decision(
+            None, flow.State.S5_READINESS, {"offer_asked": True}, why="R-OFFER-01"
+        )
     turn.reply = line
     turn.awaiting_customer = True
-    turn._english = language != "en"
-
-
-DOCUMENT_ONCE_NOTED = {
-    "en": "Workzap can prepare a solution document once the problems are noted.",
-    "roman_ur": "Workzap solution document tab bana sakta hai jab masail note ho jayen.",
-    "ar": "يمكن لـ Workzap إعداد وثيقة حل بعد تسجيل المشكلات.",
-}
+    turn._english = language not in ("en", "roman_ur", "ar")
 
 
 def brain_offer(turn: "ServiceTurn", context: dict[str, Any]) -> None:
@@ -3989,6 +4011,8 @@ async def in_one_language(
                     f"Rewrite this WhatsApp reply entirely in "
                     f"{NAMES.get(expected, expected)}. Keep its "
                     "meaning, line breaks, '• ' points, links and names exactly; add nothing. "
+                    "For Roman Urdu always use the polite aap forms (karein, rakhein, dekhein), "
+                    "never karo or rakho, and no gendered first-person verbs. "
                     "Reply with the rewritten text only."
                 ),
                 Message.user(reply),

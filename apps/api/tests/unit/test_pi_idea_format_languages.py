@@ -154,7 +154,7 @@ def test_brain_never_leaves_an_empty_reply() -> None:
         "history": [{"role": "ai", "text": "Hi"}],
     }
     brain_never_empty(turn, context)
-    assert "solution document once the problems are noted" in turn.reply and turn.reply.strip()
+    assert turn.reply.strip() and "once the problems are noted" not in turn.reply
 
 
 def test_roman_urdu_idea_lines_lose_their_english_scaffolding() -> None:
@@ -200,7 +200,7 @@ def test_the_document_is_never_promised_before_the_offer_was_accepted() -> None:
 
     nothing = _promise_turn("The document and quote will be prepared and sent here.")
     brain_no_early_promise(nothing, {"reply_language": "en", "flow": {"state": "S1_LISTENING"}})
-    assert "once the problems are noted" in nothing.reply and nothing._decision is None
+    assert "once the problems are noted" not in nothing.reply and nothing._decision is None
 
 
 def test_the_conditional_line_and_later_states_are_left_alone() -> None:
@@ -262,7 +262,8 @@ def test_roman_polish_removes_leftover_english_scaffolding() -> None:
     )
     assert out.splitlines()[0] == "Theek hai."
     assert (
-        "Pehle, register dekho, taake nuksan saaf ho." in out and "Doosra, safha alag likho." in out
+        "Pehle, register dekhein, taake nuksan saaf ho." in out
+        and "Doosra, safha alag likhein." in out
     )
     assert roman_polish("Ji bilkul, note kar liya.") == "Ji bilkul, note kar liya."
 
@@ -357,3 +358,48 @@ def test_a_requested_language_is_asked_for_by_name() -> None:
     assert asked_language("Please reply in French") == "French"
     assert asked_language("Translate Indonesia") == "Indonesian"
     assert asked_language("Talk to me in English please") is None
+
+
+def test_the_problem_card_never_draws_script_the_font_cannot_and_never_doubles_quotes() -> None:
+    from types import SimpleNamespace
+
+    from app.modules.pi import brain_visuals
+
+    rows = [
+        SimpleNamespace(
+            user_words=['"Mera kiryana store hai"'], title="Udhaar hisaab", category="x"
+        ),
+        SimpleNamespace(user_words=["کسٹمر رابطہ"], title="Customer rabta", category="x"),
+    ]
+    words = brain_visuals._drawable_words(rows)
+    assert words == ["Mera kiryana store hai", "Customer rabta"]
+
+
+def test_roman_urdu_uses_aap_forms_and_no_gendered_samajh_gaya() -> None:
+    from app.modules.pi.service_conversation import roman_polish
+
+    out = roman_polish("Notebook mein roz likho aur check karo, samajh gaya.")
+    assert "likhein" in out and "karein" in out and "samajh liya" in out
+    assert "karo" not in out and "likho" not in out
+
+
+def test_an_empty_reply_to_a_solution_ask_gets_the_honest_line_and_the_offer_not_the_old_v3_line() -> (
+    None
+):
+    from types import SimpleNamespace
+
+    from app.modules.pi.service_conversation import brain_never_empty
+
+    turn = SimpleNamespace(
+        reply="", request_human=False, _decision=None, _summary=False, awaiting_customer=False
+    )
+    context = {
+        "reply_language": "en",
+        "latest_customer_message": "Solution dain",
+        "noted_problems": [{"ref": "p1"}],
+        "flow": {"state": "S3_NOTED"},
+        "history": [{"role": "ai", "text": "Hi"}],
+    }
+    brain_never_empty(turn, context)
+    assert "once the problems are noted" not in turn.reply
+    assert "quick idea" in turn.reply and turn._decision is not None
