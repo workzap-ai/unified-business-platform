@@ -750,3 +750,61 @@ def test_an_unseen_spelling_with_an_ask_word_goes_to_the_model_check() -> None:
         "ap koi hal nikalen is ka", state
     )  # 'hal' with a spelling the banks lack
     assert not ask_classifier.needed("udhaar ka hisaab gadbad hai bhai", state)  # a plain statement
+
+
+@pytest.mark.parametrize(
+    "idea",
+    [
+        "Pehle, hum dekh sakte hain ke price poochne ke baad reply kahan toot raha hai",
+        "Doosra, aap ke Instagram aur WhatsApp flow ko aisa note kiya ja sakta hai ke team ko clear ho jaye",
+        "We can review where buyers drop off after the price is asked",
+        "Where buyers drop can be analysed, so the team sees it",
+    ],
+)
+def test_an_idea_that_is_not_an_action_for_the_owner_is_refused(idea: str) -> None:
+    from app.modules.pi import solution_rules
+
+    assert not solution_rules.is_owner_action(idea)
+    assert solution_rules.check_idea(idea).reject
+
+
+@pytest.mark.parametrize(
+    "idea",
+    [
+        "Price ke saath saaf tasveer aur size chart bhi bhejein, taake dobara poochna na paray.",
+        "Send a clear photo and the size chart with the price, so they need not ask again.",
+        "Ask staff to message a photo of any shelf running low, so the buyer sees it straight away.",
+        "Aap team ko batayein ke kaunsa order pehle jayega, taake koi order na rukay.",
+    ],
+)
+def test_an_action_for_the_owner_is_accepted(idea: str) -> None:
+    from app.modules.pi import solution_rules
+
+    assert solution_rules.is_owner_action(idea)
+
+
+def test_a_reply_whose_idea_lines_are_not_owner_actions_is_dropped_whole() -> None:
+    """The live chat: price asked, then silence; pi's two 'ideas' were what Workzap would note."""
+    from types import SimpleNamespace
+
+    from app.modules.pi.service_conversation import reject_passive_ideas
+
+    reply = (
+        "Haan, is maslay par help ki ja sakti hai.\n"
+        "Pehle, hum dekh sakte hain ke price poochne ke baad reply kahan toot raha hai.\n"
+        "Doosra, aap ke Instagram aur WhatsApp flow ko aisa note kiya ja sakta hai ke team ko clear ho jaye."
+    )
+    turn = SimpleNamespace(
+        reply=reply, _summary=False, _decision=None, request_human=False, _ideas_rejected=False
+    )
+    reject_passive_ideas(turn, {})
+    assert turn.reply == "" and turn._ideas_rejected is True
+    good = SimpleNamespace(
+        reply="Ji, ye do ideas abhi aazma sakte hain:\n• Price ke saath saaf tasveer bhi bhejein, taake dobara poochna na paray.",
+        _summary=False,
+        _decision=None,
+        request_human=False,
+        _ideas_rejected=False,
+    )
+    reject_passive_ideas(good, {})
+    assert good.reply and good._ideas_rejected is False

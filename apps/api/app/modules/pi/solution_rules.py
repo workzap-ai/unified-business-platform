@@ -238,6 +238,31 @@ class Verdict:
         return not self.reject and bool(self.review)
 
 
+# An idea is something the OWNER can do. "Hum dekh sakte hain", "note kiya ja sakta hai", "team ko
+# clear ho jaye", "we can review it", "can be analysed" describe what Workzap or pi would do, or say
+# nothing the owner can act on (a live chat: both "ideas" were of this kind and passed every check).
+NOT_AN_ACTION = re.compile(
+    r"\b(?:hum|ham|we|workzap|pi)\s+(?:dekh|check|analy[sz]e|review|note|look|samajh|sort|bana)\w*\b"
+    r"|\b(?:we|workzap|pi)\s+(?:can|will|could|would)\b"
+    r"|\bja\s+sak(?:ta|ti|te)\b"
+    r"|\bki\s+ja\s+sakti\s+hai\b"
+    r"|\bcan\s+be\s+(?:noted|reviewed|analy[sz]ed|checked|looked|worked|sorted)\b"
+    r"|\bteam\s+ko\s+(?:clear|samajh|pata)\b",
+    re.IGNORECASE,
+)
+
+
+BENEFIT_SPLIT = re.compile(r",\s+(?:so that|so|taake|taa ke)\b", re.IGNORECASE)
+
+
+def is_owner_action(text: str) -> bool:
+    """The action part of the idea (before ', so <benefit>') is something the owner does. The
+    benefit may be passive ("so billed usage can be checked"): it is what the idea gives, not what
+    anyone is told to do."""
+    action = BENEFIT_SPLIT.split(text or "", maxsplit=1)[0]
+    return not NOT_AN_ACTION.search(action)
+
+
 def check_idea(text: str, said: str = "") -> Verdict:
     """Judge one idea (a learned one, or a seed being loaded). One line, what plus why."""
     one = " ".join((text or "").split())
@@ -259,6 +284,8 @@ def check_idea(text: str, said: str = "") -> Verdict:
         )
     if not referral and len(re.findall(r"[.!]" + chr(92) + "s+" + chr(92) + "S", one)) > 0:
         out.reject.append("more than one sentence (R-VAL-03)")
+    if not is_owner_action(one):
+        out.reject.append("not something the owner can do: an idea is an action for the owner")
     if solutions.banned_tool_words(one, said):
         out.reject.append("tool words or a build named for free (R-BUILD-01)")
     if HOWTO.search(one):  # an idea never asks, so every marker counts (the idea check is strict)

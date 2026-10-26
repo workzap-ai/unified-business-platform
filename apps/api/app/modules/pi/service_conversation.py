@@ -293,6 +293,7 @@ class ServiceTurn(BaseModel):
     _summary: bool = PrivateAttr(default=False)
     _english: bool = PrivateAttr(default=False)  # an English list was written: translate it
     _free: bool = PrivateAttr(default=False)  # the ideas were the model's own, vetted
+    _ideas_rejected: bool = PrivateAttr(default=False)  # its idea lines were not owner actions
     _board: bool = PrivateAttr(default=False)  # the notes were shown again, no state change
     _asked_shape: bool = PrivateAttr(default=False)
     # Brain mode: a fixed reply and move chosen by the decision gates (pi/decisions.py).
@@ -1981,6 +1982,19 @@ def ideas_opener(context: dict[str, Any]) -> str:
     return "Here are two ideas you can try now:" + chr(10)
 
 
+def reject_passive_ideas(turn: "ServiceTurn", context: dict[str, Any]) -> None:
+    """An idea line that is not something the owner can do ("hum dekh sakte hain", "note kiya ja
+    sakta hai", "team ko clear ho jaye") is never sent. The whole reply is dropped, so the ideas the
+    application holds (pack, library) or the model's vetted free ideas take its place; with none,
+    the honest line follows. Every idea path passes through here, the model's own prose included."""
+    if turn._summary or turn._decision is not None or turn.request_human:
+        return
+    lines = [ln for ln in turn.reply.splitlines() if IDEA_MARK.match(ln)]
+    if lines and any(not solution_rules.is_owner_action(ln) for ln in lines):
+        turn.reply = ""
+        turn._ideas_rejected = True
+
+
 def brain_ideas(turn: "ServiceTurn", context: dict[str, Any]) -> None:
     """The ideas the application chose for this turn reach the person even when the model left
     them out of its reply ("Noted. What else is getting in the way?" after "any solution?").
@@ -2198,7 +2212,7 @@ async def brain_free_ideas(
     """They asked for a fix and no industry entry fits (or they told the problem and asked in one
     message): the model gives two ideas of its own, vetted by the idea guard, instead of "no quick
     idea". The ideas count against the chat's idea budget like any other."""
-    if not asked_without_ideas(context):
+    if not (asked_without_ideas(context) or (turn._ideas_rejected and not turn.reply.strip())):
         return
     if turn._summary or turn._decision is not None or turn.request_human:
         return
@@ -2287,7 +2301,7 @@ def brain_no_ideas(turn: "ServiceTurn", context: dict[str, Any]) -> None:
     """They asked for a fix and the industry has no free idea for the problem (no industry yet, or
     no matching entry): the application says so plainly, in their language, and the offer line
     follows. The model's own try used to be "Noted. What else is getting in the way?"."""
-    if not asked_without_ideas(context):
+    if not (asked_without_ideas(context) or (turn._ideas_rejected and not turn.reply.strip())):
         return
     if turn._summary or turn._decision is not None or turn.request_human or turn._free:
         return
@@ -5045,6 +5059,7 @@ async def compose_service_turn(
         brain_summary(turn, context)
         brain_decision(turn, context)
         strip_dangling_opener(turn)
+        reject_passive_ideas(turn, context)
         brain_ideas(turn, context)
         await brain_free_ideas(manager, scope, conversation, policy, turn, context)
         if turn._free and not turn.problem_ops and not context.get("noted_problems"):

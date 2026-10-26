@@ -39,7 +39,7 @@ PROFILE_FIELDS = (
 )
 # Platform spec Book 4 5.4: a follow-up after silence never carries new solutions. A reminder that
 # answers a MISSED message is a reply, and keeps whatever the answer needs.
-IDEA_LINES = re.compile(r"(?mi)^\s*(?:first|second|pehle|doosra|dusra)\b[,:]")
+IDEA_LINES = re.compile(r"(?mi)^\s*(?:(?:first|second|pehle|doosra|dusra)\b[,:]|•\s)")
 
 
 def without_solutions(context: dict[str, Any]) -> dict[str, Any]:

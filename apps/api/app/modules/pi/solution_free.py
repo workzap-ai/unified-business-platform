@@ -27,6 +27,8 @@ Give exactly two ideas, written in plain English (they are translated for the ow
 - is ONE sentence of 12 to 24 words: what to do, a comma, then "so" and the benefit in the owner's own terms;
 - can be done by the owner or staff with what they already have: a notebook, a phone they
   own, a chat group, a walk round the premises. Nothing to buy, install or set up;
+- is something the OWNER does ("send a clear photo with the price", "ask staff to ..."), never what
+  Workzap, pi or "we" would do and never passive ("we can look at", "can be noted", "team ko clear");
 - is specific to the problem the owner described, not generic advice;
 - when it fits the problem, reflects how customers find and talk to businesses today (short
   videos, a listing and reviews on the online map, chats and photos with customers, an online
