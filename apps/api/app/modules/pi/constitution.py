@@ -591,9 +591,11 @@ ACK_OPENER = re.compile(
 # R-TONE-01 / R-ECHO-01 (live chat 2026-10-26): no verdict opener ("Ye real masla hai.", "That's a real
 # problem.") and no stock thank-you before the noted line ("Shukriya. Maine note kar liya: ...").
 VERDICT_OPENER = re.compile(
-    r"^\W*(?:ye|yeh|this|that)(?:\s+is|'s|\s+ek)?\s+(?:a\s+|ek\s+)?(?:real|genuine|serious|"
-    r"bara|bada|badi|important|valid)(?:\s+(?:masla|problem|issue|baat))?\s*(?:hai|problem|issue)?\b"
-    + langs.VERDICT_OPENER,
+    r"^\W*(?:ye|yeh|wo|woh|this|that)(?:\s+to)?(?:'s)?(?:\s+(?:is|ek|a|an))*"
+    r"\s+(?:(?:sach\s+mein|sach\s+much|waqai(?:\s+mein)?|waqaee|haqeeqat\s+mein|bilkul|asli|ek\s+asli|"
+    r"really|truly|genuinely|indeed|real|genuine|serious|valid|important|big|major|a|an|ek|"
+    r"bara|bada|badi|bari|zaroori|ahem)\s+)+"
+    r"(?:ek\s+)?(?:masla|masle|problem|issue|baat|mushkil|challenge)\b" + langs.VERDICT_OPENER,
     re.IGNORECASE,
 )
 THANKS_THEN_NOTED = re.compile(
@@ -651,6 +653,33 @@ PERMISSION_FOR_IDEAS = re.compile(
 # R-LANG-02: a Roman Urdu reply does not open with an English filler.
 ENGLISH_FILLER_OPENER = re.compile(
     r"^\W*(?:thanks|thank\s+you|sure|okay|ok|alright|great|perfect|got\s+it|yes)\b", re.IGNORECASE
+)
+# R-LANG-02: English function words ("... likha hota hai before aap decide karein") in a Roman Urdu reply.
+ENGLISH_FUNCTION = re.compile(
+    r"\b(?:before|after|because|while|without|about|until|since|whenever|however|therefore|also|"
+    r"just|really|very|please|actually|maybe|your|our|with|from|into|and|but|then)\b",
+    re.IGNORECASE,
+)
+# R-ASK-03: a question the person has already answered in their own words.
+FREQUENCY_QUESTION = re.compile(
+    r"\b(?:kitni\s+(?:dafa|baar|bar)|kitna\s+aksar|kab\s+kab|how\s+(?:often|many\s+times)|"
+    r"kitni\s+der\s+baad)\b",
+    re.IGNORECASE,
+)
+SAID_FREQUENCY = re.compile(
+    r"\b(?:roz|rozana|daily|har\s+din|har\s+hafte|hafte|haftay|haftey|weekly|mahine|mahinay|monthly|"
+    r"kabhi\s+kabhi|aksar|every\s+(?:day|week|month)|once\s+a|(?:per|a)\s+(?:day|week))\b"
+    r"|\d+\s*(?:baar|dafa|times|din|bar)\b",
+    re.IGNORECASE,
+)
+COMPARATIVE = re.compile(
+    r"\b(?:zyada|zyadah|jyada|kam|more|most|less|least|worst|bura|buri|behtar|better|best|sab\s+se|"
+    r"slowest|biggest|which|kaun|kahan)\b",
+    re.IGNORECASE,
+)
+OPTION_STOP = frozenset(
+    "side wala wali wale taraf type kya masla problem hai hain mein par ko ki ka ke se aur ya the "
+    "and for with that this which what ho hota hoti hote".split()
 )
 # R-ECHO-01: the noted confirmation names the problem in at most 12 words.
 NOTED_TITLE = re.compile(
@@ -1732,6 +1761,32 @@ def lint(reply: str, context: dict[str, Any]) -> list[Violation]:
                 'start with "Note kar liya, ..." or the answer',
             )
         )
+    if context.get("reply_language") == "roman_ur":
+        quoted = QUOTED.sub(" ", reply)
+        extra = next(
+            (
+                m.group(0)
+                for m in ENGLISH_FUNCTION.finditer(quoted)
+                if m.group(0).lower() not in heard
+            ),
+            None,
+        )
+        if extra:
+            add(
+                Violation(
+                    "R-LANG-02",
+                    f'an English word ("{extra}") in a Roman Urdu reply: say it in Roman Urdu',
+                )
+            )
+    asked_again, why_again = _answered_already(reply, context)
+    if asked_again:
+        add(
+            Violation(
+                "R-ASK-03",
+                "they already told you this in their own words: do not ask it again, ask what "
+                f"is still unknown ({why_again})",
+            )
+        )
     if VERDICT_OPENER.match(reply):
         add(
             Violation(
@@ -1749,6 +1804,8 @@ def lint(reply: str, context: dict[str, Any]) -> list[Violation]:
             )
         )
     last_question = next((x for x in reversed(_sentences(reply)) if x.endswith(QUESTION_MARKS)), "")
+    if not last_question and (closing := (_sentences(reply) or [""])[-1]):
+        last_question = closing  # a closer asked without its "?" is still a closer
     detail = latest_said.split()
     if (
         state in CONCRETE_STATES
@@ -2036,6 +2093,7 @@ def repair(reply: str, context: dict[str, Any]) -> str:
 
     fixed = re.sub(" ?" + EMOJI.pattern, drop, SKIN_TONES.sub("", fixed.replace("️", "")))
     fixed = _scrub(fixed)
+    fixed = _drop_slips(fixed, context)
     fixed = _one_question_last(fixed, _cap(context, "word_cap", WORD_CAP))
     history = context.get("history") or []
     first = not any(h.get("role") == "ai" for h in history)
@@ -2099,6 +2157,97 @@ def _restates(reply: str, said: str) -> str:
         ):
             return sentence
     return ""
+
+
+def _answered_already(reply: str, context: dict[str, Any]) -> tuple[str, str]:
+    """(the question, "frequency" or "options") when the reply asks what the person already said:
+    how often, after they said "roz 30-40 log"; "cash side ya stock side?", after they named both in
+    their last message. ("", "") when it asks something new."""
+    heard = _heard(context)
+    latest = str(context.get("latest_customer_message", "")).lower()
+    for sentence in _sentences(reply):
+        if not sentence.rstrip().endswith(QUESTION_MARKS):
+            continue
+        low = sentence.lower()
+        if FREQUENCY_QUESTION.search(low) and SAID_FREQUENCY.search(heard):
+            return sentence, "frequency"
+        if COMPARATIVE.search(low):
+            continue
+        options = [o for o in re.split(r"\b(?:ya|or)\b|,", low) if o.strip()]
+        if len(options) < 2:
+            continue
+        said = set(re.findall(r"[a-z]{3,}", latest))
+        if all(
+            any(w in said for w in re.findall(r"[a-z]{3,}", option) if w not in OPTION_STOP)
+            for option in options
+        ):
+            return sentence, "options"
+    return "", ""
+
+
+def _drop_slips(reply: str, context: dict[str, Any]) -> str:
+    """Tone slips that survived the model's one rewrite, taken out in place when something useful is
+    left (live chats 1 to 4): a verdict opener, "Theek hai." or an English filler before the noted
+    line, "Aap sahi keh rahe hain" to a person who corrected nothing, a sentence that only says
+    again what they said, a question about what they already told us. A question is only dropped
+    when a statement stays; a statement only when a question or another statement stays."""
+    latest = str(context.get("latest_customer_message") or "")
+    state = flow.parse((context.get("flow") or {}).get("state"))
+    roman = context.get("reply_language") == "roman_ur"
+    lines = reply.split("\n")
+    parts = [[x for x in re.split(r"(?<=[.!?؟۔।])\s+", ln) if x.strip()] for ln in lines]
+    flat = [(i, k) for i, ps in enumerate(parts) for k in range(len(ps))]
+    if len(flat) < 2:
+        return reply
+    dropped: set[tuple[int, int]] = set()
+    changed = False
+
+    def text(at: tuple[int, int]) -> str:
+        return parts[at[0]][at[1]]
+
+    def is_question(at: tuple[int, int]) -> bool:
+        return text(at).rstrip().endswith(QUESTION_MARKS)
+
+    def left(kind: str) -> bool:  # is a question (or a statement) still there after the drops
+        return any(a not in dropped and is_question(a) == (kind == "question") for a in flat)
+
+    first = flat[0]
+    opener = text(first)
+    short = len(opener.split()) <= 4
+    if VERDICT_OPENER.match(opener) or (
+        short
+        and (THANKS_THEN_NOTED.match(reply) or (roman and ENGLISH_FILLER_OPENER.match(opener)))
+    ):
+        dropped.add(first)
+    elif roman and ENGLISH_FILLER_OPENER.match(opener):
+        stripped = ENGLISH_FILLER_OPENER.sub("", opener, count=1).lstrip(" ,.!")
+        parts[first[0]][first[1]] = stripped[:1].upper() + stripped[1:]
+        changed = True
+    if CONFIRMS_CORRECTION.search(opener) and not (
+        context.get("said_wrong") or context.get("corrects_noted") or CORRECTION_CUE.search(latest)
+    ):
+        dropped.add(first)
+    if state != flow.State.S4_SORTED_SUMMARY and (said_again := _restates(reply, latest)):
+        for at in flat:
+            if text(at) == said_again and at not in dropped:
+                dropped.add(at)
+                if not left("question") or len(dropped) >= len(flat):
+                    dropped.discard(at)
+    asked, why = _answered_already(reply, context)
+    if asked and why == "frequency":
+        for at in flat:
+            if text(at) == asked and at not in dropped:
+                dropped.add(at)
+                if not left("statement"):
+                    dropped.discard(at)
+    if len(dropped) >= len(flat) or not (dropped or changed):
+        return reply
+    out = []
+    for i, ps in enumerate(parts):
+        kept = [x for k, x in enumerate(ps) if (i, k) not in dropped]
+        if kept or not lines[i].strip():
+            out.append(" ".join(kept))
+    return "\n".join(out).strip()
 
 
 def _one_question_last(reply: str, cap: int = WORD_CAP) -> str:

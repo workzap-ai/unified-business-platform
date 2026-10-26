@@ -319,7 +319,7 @@ TEXT: dict[str, dict[str, str]] = {
     },
     "expired_quote": {
         "en": "That quote is past its valid-until date, so it can't be approved as it stands. I've asked Workzap to send a refreshed one.",
-        "roman_ur": "Is quote ki valid-until tareekh guzar chuki hai, isliye ye is haal mein approve nahi ho sakta. Maine Workzap se naya quote bhejne ko kaha hai.",
+        "roman_ur": "Is quote ki aakhri tareekh guzar chuki hai, isliye ye is haal mein approve nahi ho sakta. Maine Workzap se naya quote bhejne ko kaha hai.",
     },
     "after_payment": {
         "en": "I'll pass this to the Workzap team now. They'll reply here.",

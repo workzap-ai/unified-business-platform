@@ -112,6 +112,13 @@ def test_no_english_fragments(source, text):
 
 
 @pytest.mark.parametrize(("source", "text"), LINES, ids=ids(LINES))
+def test_no_english_function_words(source, text):
+    """Live chat 4: "...likha hota hai before aap decide karein"."""
+    found = constitution.ENGLISH_FUNCTION.search(plain(text))
+    assert found is None, (source, found and found.group(0))
+
+
+@pytest.mark.parametrize(("source", "text"), LINES, ids=ids(LINES))
 def test_neutral_first_person_aap_forms_and_spelling(source, text):
     assert constitution.roman_urdu_tone(text, "") == [], source
 

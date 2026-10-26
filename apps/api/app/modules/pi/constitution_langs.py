@@ -45,13 +45,16 @@ TITLE_STOP = "۔؟।"  # the Urdu and Hindi sentence ends the title must stop a
 
 # --- R-TONE-01: verdict openers and judgements --------------------------------------------------
 VERDICT_OPENER = (
-    r"|^\W*(?:یہ|یہ ایک)\s+(?:ایک\s+)?(?:حقیقی|اصل|سنگین|بڑا|اہم)\s+(?:مسئلہ|مسلہ|بات)"
-    r"|^\W*(?:هذه|هذا)\s+(?:مشكلة|مسألة)\s+(?:حقيقية|كبيرة|خطيرة|مهمة)"
-    r"|^\W*(?:यह|ये)\s+(?:एक\s+)?(?:असली|वास्तविक|गंभीर|बड़ी|बड़ा|सच्ची)\s+(?:समस्या|परेशानी|बात)"
-    r"|^\W*(?:c'est|il s'agit d')\s*(?:un|une)?\s*(?:vrai|véritable|réel|gros|sérieux|grave)\w*\s+(?:problème|souci)"
-    r"|^\W*(?:es|esto es|eso es)\s+(?:un|una)\s+(?:verdadero\s+|gran\s+|serio\s+|grave\s+)?(?:problema|asunto)\s+(?:real|serio|grave)"
+    r"|^\W*(?:یہ|وہ)\s+(?:ایک\s+)?(?:(?:سچ\s+میں|سچ\s+مچ|واقعی|بالکل|حقیقی|اصل|سنگین|بڑا|بڑی|اہم|ایک)\s+)+(?:ایک\s+)?(?:مسئلہ|مسلہ|بات)"
+    r"|^\W*(?:هذه|هذا)\s+(?:(?:حقاً|فعلاً|بالفعل|حقا|فعلا)\s+)?(?:مشكلة|مسألة)\s+(?:حقيقية|كبيرة|خطيرة|مهمة|حقاً|فعلاً)"
+    r"|^\W*(?:यह|ये)\s+(?:एक\s+)?(?:(?:सच\s+में|वाकई|बिल्कुल|असली|वास्तविक|गंभीर|बड़ी|बड़ा|सच्ची|एक)\s+)+(?:समस्या|परेशानी|बात)"
+    r"|^\W*(?:c'est|il s'agit d')\s*(?:vraiment\s+|réellement\s+|bien\s+)?(?:un|une)?\s*(?:vrai|véritable|réel|gros|sérieux|grave)\w*\s+(?:problème|souci)"
+    r"|^\W*(?:c'est|il s'agit d')\s+(?:vraiment|réellement)\s+(?:un|une)\s+(?:problème|souci)"
+    r"|^\W*(?:es|esto es|eso es)\s+(?:realmente\s+|verdaderamente\s+|de\s+verdad\s+)?(?:un|una)\s+(?:verdadero\s+|gran\s+|serio\s+|grave\s+)?(?:problema|asunto)\s+(?:real|serio|grave)"
     r"|^\W*(?:es|esto es|eso es)\s+(?:un|una)\s+(?:verdadero|gran|serio|grave)\s+(?:problema|asunto)"
-    r"|^\W*(?:این|اين)\s+(?:یک\s+)?(?:مشکل|مسئله)\s+(?:واقعی|جدی|بزرگ)"
+    r"|^\W*(?:es|esto es|eso es)\s+(?:realmente|verdaderamente|de\s+verdad)\s+(?:un|una)\s+(?:problema|asunto)"
+    r"|^\W*(?:این|اين)\s+(?:(?:واقعاً|حقیقتاً|واقعا)\s+)?(?:یک\s+)?(?:مشکل|مسئله)\s+(?:واقعی|جدی|بزرگ|واقعاً)"
+    r"|^\W*(?:این|اين)\s+(?:واقعاً|حقیقتاً|واقعا)\s+(?:یک\s+)?(?:مشکل|مسئله)"
 )
 THANKS_THEN_NOTED = r"|^\W*شکریہ[۔.،,!]?\s+(?:میں نے\s+)?نوٹ"
 JUDGEMENT = (
@@ -406,6 +409,15 @@ CORRECTION_CUE = (
     r"|في\s+الواقع|خطأ|قصدت|آسف|غيّر|صحح|در\s+واقع|بلکه|اشتباه|منظورم|ببخشید|تغییر|اصلاح"
 )
 THANKS_THEN_NOTED += r"|^\W*(?:ٹھیک\s+ہے|اچھا|جی)[۔.،,!]?\s+(?:میں نے\s+)?نوٹ|^\W*(?:ठीक\s+है|अच्छा|जी)[।.,!]?\s+(?:मैंने\s+)?नोट"
+
+# R-ASK-05, Roman Urdu: "Aur kya cheez mushkil kar rahi hai?" is the generic closer in other words.
+_AUR_KYA = (
+    r"|\baur\s+kya\s+(?:\w+\s+){0,3}(?:mushkil|masla|problem|rukawat|pareshan|dikkat|slow|dheema)\w*"
+    r"|\bkya\s+aur\s+(?:masla|cheez|baat|mushkil|dikkat)\b|\bkoi\s+aur\s+(?:mushkil|dikkat|pareshani|rukawat)\b"
+    r"|\bwhat\s+else\s+(?:is|are)\b"
+)
+GENERIC_CLOSER += _AUR_KYA
+ANYTHING_ELSE += _AUR_KYA  # the closed-slot skip (slots.py) knows the same family
 
 # One form for combined letters (Hindi "ढ़" is one character or two): every phrase set is normalised
 # the way `constitution.lint` normalises the reply.

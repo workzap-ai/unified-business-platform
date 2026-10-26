@@ -1301,11 +1301,16 @@ ADVICE_WORD = {
 
 
 def advice_asked(text: str) -> Advice | None:
+    from app.modules.pi import safety_advice
+
     said = " ".join((text or "").split())
+    treated = safety_advice.treatment_asked(said)  # who is sick and what to give, any order
+    if treated is Advice.VETERINARY:
+        return treated  # a sick animal outranks the human "which medicine" patterns
     for kind, pattern in ADVICE_PATTERNS:
         if pattern.search(said):
             return kind
-    return None
+    return treated
 
 
 def advice_reply(kind: Advice, language: str | None) -> str:

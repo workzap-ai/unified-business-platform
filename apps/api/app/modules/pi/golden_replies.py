@@ -90,6 +90,14 @@ def listening() -> tuple[tuple[str, str, str, str], ...]:
     """The golden turns the example bank may hold: a listening reply, not ideas, the offer or the
     cost answer (those have their own gate in `learning_solutions_grow`, and a price answer is a
     fixed line, never learned)."""
+    from app.modules.pi import safety
+
     return tuple(
-        g for g in GOLDEN if "•" not in g[3] and OFFER not in g[3] and "quote" not in g[3].lower()
+        g
+        for g in GOLDEN
+        if "•" not in g[3]
+        and OFFER not in g[3]
+        and "quote" not in g[3].lower()
+        and safety.advice_asked(g[2])
+        is None  # an advice ask is never learned, its refusal included
     )
