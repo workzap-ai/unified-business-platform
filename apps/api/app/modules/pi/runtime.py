@@ -1853,6 +1853,13 @@ async def process_pi_event(ctx: dict[str, Any], event_id: str) -> None:
         )
         outbound += [str(f) for f in forms]
         await log_extra_model_calls(session, scope, conversation, message_id)
+        if (timing := latency.summary()) is not None and message.created_at is not None:
+            # Kept on the owner's message so a slow reply can be traced from the database: every
+            # stage, and how long after the message arrived this turn reached the commit.
+            timing["since_inbound_ms"] = round(
+                (datetime.now(UTC) - message.created_at).total_seconds() * 1000
+            )
+            message.media = {**message.media, "timing": timing}
         with latency.stage("final_commit"):
             await session.commit()
     with latency.stage("enqueue_send"):

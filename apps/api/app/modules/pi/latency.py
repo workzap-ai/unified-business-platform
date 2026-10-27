@@ -94,3 +94,18 @@ def emit(logger: logging.Logger, **extra: Any) -> None:
         logger.debug("pi turn timing could not be logged", exc_info=True)
     finally:
         _turn.set(None)
+
+
+def summary() -> dict[str, Any] | None:
+    """This turn's timing as plain numbers, small enough to keep on the message so a slow reply
+    can be traced from the database alone (no log access): every stage in ms, the time since the
+    turn began, and the model calls and prompt size. None when no turn is being timed."""
+    record = _turn.get()
+    if record is None:
+        return None
+    return {
+        "stages_ms": {k: round(v) for k, v in record["stages_ms"].items()},
+        "wall_ms": round((time.perf_counter() - record["t0"]) * 1000),
+        "model_calls": record["model_calls"],
+        "prompt_chars": record["prompt_chars"],
+    }
