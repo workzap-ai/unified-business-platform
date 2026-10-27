@@ -2367,6 +2367,17 @@ def expert_library_ideas(
     return found
 
 
+def trade_name(conversation: Any, keys: list[str]) -> str | None:
+    """The trade for the expert's persona: the industry pack's name, else what the owner said the
+    business does ("garment export", "a school bus service"), so a trade outside the 211 packs is
+    still understood as that trade and not as "small"."""
+    if keys:
+        return (solutions.load(keys[0]) or {}).get("name")
+    profile = (getattr(conversation, "service_brief", None) or {}).get("customer_profile") or {}
+    said = " ".join(str(profile.get("business_type") or "").split())[:80]
+    return said or None
+
+
 KNOWN_LANGUAGE_NAMES = frozenset({"roman urdu", "urdu", "hindi", "hinglish"})
 LANGUAGE_NAME = re.compile(r"^[A-Za-z][A-Za-z() -]{1,38}$")
 
@@ -2495,7 +2506,7 @@ async def brain_free_ideas(
     if left <= 0:
         return
     keys = [str(k) for k in context.get("industry_keys") or []][:1]
-    industry = (solutions.load(keys[0]) or {}).get("name") if keys else None
+    industry = trade_name(conversation, keys)
     never_say = [str(n) for n in context.get("solution_never_say") or []] or (
         solutions.never_say(keys) if keys else []
     )
@@ -2642,7 +2653,7 @@ async def brain_expert_diagnosis(
     if main is None or expert_advisor.cached(brief, noted_now) is not None:
         return
     keys = [str(k) for k in context.get("industry_keys") or []][:1]
-    industry = (solutions.load(keys[0]) or {}).get("name") if keys else None
+    industry = trade_name(conversation, keys)
     customer = [
         str(h.get("text") or "")
         for h in context.get("history") or []

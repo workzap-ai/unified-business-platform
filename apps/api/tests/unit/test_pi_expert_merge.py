@@ -122,3 +122,15 @@ def test_the_diagnosis_parser_reads_the_language() -> None:
         diag([GOOD_ONE]).replace('"problem"', '"owner_language": "Pashto", "problem"', 1)
     )
     assert parsed is not None and parsed.language == "Pashto"
+
+
+def test_a_trade_outside_the_packs_is_the_one_the_owner_named() -> None:
+    from app.modules.pi.service_conversation import trade_name
+
+    named = SimpleNamespace(
+        service_brief={"customer_profile": {"business_type": "school bus service"}}
+    )
+    assert trade_name(named, []) == "school bus service"
+    assert trade_name(SimpleNamespace(service_brief={}), []) is None
+    pack = trade_name(named, ["restaurants"])
+    assert pack and pack != "school bus service"  # a matched pack's own name wins
