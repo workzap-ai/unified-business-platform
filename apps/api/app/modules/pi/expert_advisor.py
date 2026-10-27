@@ -130,6 +130,16 @@ PROMPT_RULE = """
   owner's last message already answers it.
 """
 
+# What the brain prompt always carries when the expert advisor is on (before any diagnosis exists).
+VOICE_RULE = """
+- Never start a reply with "Noted", "Note kar liya", "Thanks" or a restatement of what they just said.
+  Show what you understood inside your one question or go straight to it.
+- Your one question is about WHY the owner's main problem happens: the reason, when, who or what it
+  happens with, how often. Never ask how the business works in general (how customers pay, which
+  system, record or channel they use, who does which job) unless the owner linked that to the problem.
+- Never say that the team, a person or Workzap staff will see, read or receive this chat or their message.
+"""
+
 QUALITIES = ("fits", "correct", "current", "grounded", "specific", "safe")
 JSON_OBJECT = re.compile(r"\{.*\}", re.DOTALL)
 FENCE = re.compile(r"^```(?:json)?\s*|\s*```$", re.IGNORECASE)

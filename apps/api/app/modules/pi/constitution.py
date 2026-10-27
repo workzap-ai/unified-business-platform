@@ -1038,6 +1038,12 @@ def _value_line_every_reply(
         )
 
 
+TEAM_WILL_SEE = re.compile(
+    r"\bteam\s+(?:tak|ko)\s+(?:bhi\s+)?(?:poh?anch|pahunch|bhej)\w*"
+    r"|\b(?:the\s+)?(?:team|someone|a person|staff)\s+(?:will|can|may)\s+(?:also\s+)?(?:see|read|receive|get)\b"
+    r"|\b(?:reach|reaches|reached)\s+(?:the\s+)?(?:workzap\s+)?team\b",
+    re.IGNORECASE,
+)
 IDEA_LIST_LINE = re.compile(r"(?m)^\s*(?:•|-|\*|(?:first|second|pehle|doosra|dusra)\b[,:])\s*\S")
 
 
@@ -1955,6 +1961,25 @@ def lint(reply: str, context: dict[str, Any]) -> list[Violation]:
                     "R-ASK-08",
                     "the question must be about the owner's main problem or its likely causes, "
                     "not an adjacent process: ask about the problem they raised",
+                )
+            )
+    if context.get("expert_on"):
+        # the expert advisor's voice (seen live, 2026-10-27: "Note kar liya hai: ... Ye team tak bhi
+        # pohanch jayega. Parents fee kaise jama karte hain?")
+        if NOTED_START.match(reply):
+            add(
+                Violation(
+                    "R-ECHO-05",
+                    "do not open with 'Noted', 'Note kar liya' or 'Thanks': go straight to your one "
+                    "question and show what you understood in a few words inside it",
+                )
+            )
+        if TEAM_WILL_SEE.search(reply):
+            add(
+                Violation(
+                    "R-DISC-05",
+                    "never say the team or a person will see, read or receive this chat: pi talks "
+                    "to the owner itself",
                 )
             )
     for title in NOTED_TITLE.findall(reply):

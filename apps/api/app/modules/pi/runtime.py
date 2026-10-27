@@ -730,10 +730,35 @@ async def enqueue_sends(ctx: dict[str, Any], message_ids: list[str]) -> None:
             await ctx["queue"].enqueue("send_pi_message", outbound_id, job_id=f"send:{outbound_id}")
 
 
+# A request to reach someone: "I want a person", "insaan se baat karni hai", "connect me".
+_ASKS_FOR_SOMEONE = re.compile(
+    r"\b(?:want|wanna|need|chahiye|chahta|chahti|chahte|talk|speak|connect|transfer|baat|bat|rabta|"
+    r"raabta|milao|milwa|bulao|please|plz|pls|call me|phone me|put me|let me|can i|could i|may i|"
+    r"pass me|get me|give me)\b",
+    re.IGNORECASE,
+)
+# Someone in THEIR business phoning people: the problem they describe, not a request to pi.
+_THEIR_STAFF_CALLS = re.compile(
+    r"\b(?:phone|call|fon)\s+(?:karta|karti|karte|krta|krti|krte)\b|\bkeeps?\s+(?:calling|phoning)\b",
+    re.IGNORECASE,
+)
+
+
 def _keyword_handoff(policy: PiSettings, body: str) -> bool:
+    """A handoff keyword ("human", "person", "banda") hands the chat to staff only when the keyword
+    is a whole word and the message asks for someone: a short message, or one with a request in it.
+    A substring match made "accounts wala banda baar baar phone karta hai" (a school owner telling
+    pi their problem) hand the chat over twice and silence pi (live 2026-10-27)."""
     words = [str(x).casefold() for x in policy.handoff_rules.get("keywords", []) if str(x).strip()]
     value = body.casefold()
-    return any(word in value for word in words)
+    found = any(
+        re.search(r"(?<!\w)" + re.escape(word) + r"(?!\w)", value) is not None for word in words
+    )
+    if not found:
+        return False
+    if _THEIR_STAFF_CALLS.search(value):
+        return False
+    return len(value.split()) <= 8 or _ASKS_FOR_SOMEONE.search(value) is not None
 
 
 _typing_tasks: set[asyncio.Task[bool]] = set()

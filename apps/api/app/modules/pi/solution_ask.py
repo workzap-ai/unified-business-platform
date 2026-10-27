@@ -206,7 +206,18 @@ def asked_for_ideas(said: str) -> bool:
     return _asked_for_ideas(said or "") or (fixed != (said or "") and _asked_for_ideas(fixed))
 
 
+# "Do something", the most common way an owner asks for a fix in Roman Urdu: "kuch karo", "kuch kro",
+# "kuch to kijiye", "kuch kar do". A refusal ("kuch nahi karna") is not an ask.
+DO_SOMETHING = re.compile(
+    r"\bkuch (?:to |bhi )?(?:kar|kr|karo|kro|karen|kren|kare|kre|kijiye|kijye|kijiyega|kardo|krdo)\b",
+    re.IGNORECASE,
+)
+REFUSAL_NEAR = re.compile(r"\b(?:nahi|nhi|mat|na)\b", re.IGNORECASE)
+
+
 def _asked_for_ideas(text: str) -> bool:
+    if DO_SOMETHING.search(text) and not REFUSAL_NEAR.search(text):
+        return True
     if COST.search(text) and not (SOLUTION_ASK.search(text) or SOLUTION_ASK_PLAIN.search(text)):
         return False
     return bool(

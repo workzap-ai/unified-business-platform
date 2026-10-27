@@ -1157,6 +1157,7 @@ def system_for(context: dict[str, Any]) -> str:
             + BRAIN_DECISIONS
             + BRAIN_VOICE
             + (BRAIN_ASK if asked else "")
+            + (expert_advisor.VOICE_RULE if context.get("expert_on") else "")
             + (expert_advisor.PROMPT_RULE if context.get("main_problem") else "")
             + (memory_block.SYSTEM_LINE if context.get("what_i_know") else "")
             + think_prompt.block(context)
@@ -1576,6 +1577,7 @@ async def brain_problems(
             )
         )
     if expert_advisor.switched_on(policy.response_rules):
+        context["expert_on"] = True
         # the next question targets the main problem's most uncertain cause
         context.update(expert_advisor.question_context(conversation.service_brief, noted or []))
     # The specification itself, in its own words, for this stage and topic (spec Appendix A).
@@ -6164,6 +6166,11 @@ def needs_person(turn: ServiceTurn, context: dict[str, Any]) -> bool:
         return False
     if PERSON_WORDS.search(latest):
         return True
+    if DESCRIBES_THEIR_CALLS.search(latest):
+        # "Accounts wala banda baar baar phone karta hai": someone at THEIR business phones people.
+        # It is the problem they describe, not a request to talk to a person (live 2026-10-27: a
+        # school owner was handed to staff twice for it, and the chat went silent).
+        return False
     # "That's all" / "yes" / "ok" never asks for a person, whatever the model guessed.
     closing = len(latest) <= 40 and bool(CLOSING.match(latest) or AGREES.search(latest))
     # The model's guess counts only when they really ask to talk to or reach someone
@@ -6179,6 +6186,14 @@ WANTS_TALK = re.compile(
     re.IGNORECASE,
 )
 
+
+# A third person phoning or calling (their staff, a debt collector), not a request to pi.
+DESCRIBES_THEIR_CALLS = re.compile(
+    r"\b(?:phone|call|fon|kal)\s+(?:karta|karti|karte|krta|krti|krte|kerta|kerte)\b"
+    r"|\b(?:phone|call)s?\s+(?:the\s+)?(?:parents|customers|clients|patients|students|people)\b"
+    r"|\bkeeps?\s+(?:calling|phoning)\b|\b(?:he|she|they|staff|accountant)\s+(?:calls?|phones?)\b",
+    re.IGNORECASE,
+)
 
 # Asking for a person, in the languages pi's customers write in.
 PERSON_WORDS = re.compile(
