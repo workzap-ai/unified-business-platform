@@ -21,6 +21,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.modules.pi import (
     flow,
+    idea_filter,
     idea_retrieval,
     learning_bank,
     learning_rules,
@@ -285,6 +286,7 @@ async def _give(
     offerable: bool,
     next_kind: str = "",
     build_line: bool = True,
+    owner_words: str = "",
 ) -> dict[str, Any] | None:
     """Choose, record and hand over the ideas for one problem inside every cap. None when there is
     nothing to give (the budget is spent, or nothing new is left for this business)."""
@@ -306,6 +308,7 @@ async def _give(
         customer_id=conversation.customer_id,
         count=min(value_line.IDEAS_PER_MESSAGE, left),
         conversation_id=conversation.id,
+        owner_words=owner_words,
     )
     if not choice.arms:
         # "Nothing new left" is only true when this business was given ideas for the problem; an
@@ -335,6 +338,12 @@ async def _give(
         if (asked or next_kind == "worked") and build_line
         else None  # a near-problem's build line would read as an irrelevant template
     )
+    if (
+        line
+        and owner_words
+        and idea_filter.invented_context(str(line.get("says") or ""), owner_words)
+    ):
+        line = None  # the Workzap line never talks about a channel or asset the owner never named
     brief = solution_ask.remember_bridge(
         {
             **(conversation.service_brief or {}),
@@ -382,6 +391,9 @@ async def _build(
     from app.modules.customers.models import Customer
 
     now = now or datetime.now(UTC)
+    owner_words = " ".join(
+        [said, *(f"{n.get('title') or ''} {n.get('user_words') or ''}" for n in noted)]
+    )  # what the owner said: an idea may assume nothing beyond it (G2)
     asked = solution_ask.asked_for_ideas(said)  # an explicit request for a fix (Part 1.6)
     if conversation.customer_id is None:
         return _no_ideas(conversation, noted, None, "no_customer", now) if asked else {}
@@ -447,6 +459,7 @@ async def _build(
                         asked=False,
                         offerable=False,
                         next_kind="worked" if back["worked"] else "swap",
+                        owner_words=owner_words,
                     )
                     if more:
                         out.update(more)
@@ -565,6 +578,7 @@ async def _build(
         asked=explicit,
         offerable=offerable,
         next_kind=next_kind,
+        owner_words=owner_words,
     )
     if handed is None:
         return _no_ideas(conversation, noted, industry, "none_left", now) if explicit else {}

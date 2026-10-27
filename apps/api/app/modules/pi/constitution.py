@@ -1038,6 +1038,31 @@ def _value_line_every_reply(
         )
 
 
+IDEA_LIST_LINE = re.compile(r"(?m)^\s*(?:•|-|\*|(?:first|second|pehle|doosra|dusra)\b[,:])\s*\S")
+
+
+def _ideas_nobody_asked_for(reply: str, context: dict[str, Any], add: Any) -> None:
+    """R-VAL-07: ideas were already given and this message is not a request for more (it asks about
+    one of them, "where do I make the page?"): answer that question, do not list new ideas
+    (seen live, 2026-10-27: a question about an idea got two more ideas instead of an answer)."""
+    if (
+        int(context.get("ideas_given") or 0) > 0
+        and not context.get("solution_asked")
+        and not context.get("solution_ideas")
+        and not context.get("solution_asked_no_ideas")
+        and not context.get("open_ask")
+        and len(IDEA_LIST_LINE.findall(reply)) >= 2
+    ):
+        add(
+            Violation(
+                "R-VAL-07",
+                "they asked about an earlier idea, not for new ones: answer their question in one "
+                "or two plain sentences, and if the idea assumed something they never said they "
+                "have, say so and ask about it",
+            )
+        )
+
+
 def _given_turn_limits(reply: str, context: dict[str, Any], add: Any) -> None:
     """What a reply to a request for a fix or for the detail still may not say."""
     if GIVEN_PITCH.search(reply):
@@ -1665,6 +1690,7 @@ def lint(reply: str, context: dict[str, Any]) -> list[Violation]:
 
     if "solution_howto" in context or context.get("solution_asked"):
         _value_line(reply, context, add)
+    _ideas_nobody_asked_for(reply, context, add)
 
     # Honesty (R-HONEST, R-PROM)
     if _promise_hits(reply, heard):

@@ -335,6 +335,7 @@ async def choose(
     count: int = 2,
     rng: random.Random | None = None,
     conversation_id: UUID | None = None,
+    owner_words: str = "",
 ) -> Choice:
     """The ideas to give this business for this problem: never one it has been given, tried or
     rejected; of a different kind from any it rejected; best-scoring more often, new ones tried
@@ -373,6 +374,10 @@ async def choose(
         if m.reaction in ("rejected", "generic") and m.idea_arm_id in by_id
     }
     pool = [r for r in rows if r.id not in seen and solution_lint.passes(r.text)]
+    if owner_words:  # G2: an entry idea never assumes a channel or asset the owner did not name
+        from app.modules.pi import idea_filter
+
+        pool = [r for r in pool if idea_filter.invented_context(r.text, owner_words) is None]
     # the owner's own language first; the other language only when it is all that is left
     same = [r for r in pool if r.language == language]
     pool = same if len(same) >= 1 else pool

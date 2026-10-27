@@ -163,11 +163,47 @@ def goal_conflict(idea: str, owner_words: str) -> str | None:
     return None
 
 
+# A channel or asset an idea may only assume when the owner named it (or a word of the same kind): a
+# car showroom owner who never said "video" or "page" is not told to "pin a short video on your page"
+# (seen live, 2026-10-27). Telling the owner to ASK customers, LOOK at what a customer sees, or use
+# what they said they have (their manager, their records, their showroom) needs no such word.
+_ASSET_GROUPS: tuple[tuple[re.Pattern[str], re.Pattern[str]], ...] = (
+    (  # videos
+        re.compile(r"\b(?:videos?|reels?|shorts|clips?|captions?|vlogs?|tiktok|youtube)\b", re.I),
+        re.compile(r"\b(?:videos?|reels?|shorts|clips?|captions?|vlogs?|tiktok|youtube)\b", re.I),
+    ),
+    (  # a social page or account
+        re.compile(
+            r"\b(?:(?:your |the |a )(?:business |social |facebook |instagram )?(?:page|pages)"
+            r"|posts?|stories|story|followers?|facebook|instagram|insta|social media)\b",
+            re.I,
+        ),
+        re.compile(
+            r"\b(?:page|pages|posts?|stories|story|followers?|facebook|instagram|insta|"
+            r"social|fb|tiktok|reels?|whatsapp status)\b",
+            re.I,
+        ),
+    ),
+    (  # paid adverts
+        re.compile(
+            r"\b(?:ads?|adverts?|advertis\w*|campaigns?|boost(?:ed|ing)?|sponsored)\b", re.I
+        ),
+        re.compile(
+            r"\b(?:ads?|adverts?|advertis\w*|campaigns?|boost\w*|sponsored|ishtehaar)\b", re.I
+        ),
+    ),
+)
+
+
 def invented_context(idea: str, owner_words: str) -> str | None:
-    """G2: the rule id when the idea brings in a channel or business model the owner never named."""
+    """G2: the rule id when the idea brings in a channel, asset or business model the owner never
+    named."""
     for match in _INVENTED_CONTEXT.finditer(idea):
         word = match.group(0).lower()
         if word.split()[0] not in owner_words.lower():
+            return "G2"
+    for in_idea, in_owner in _ASSET_GROUPS:
+        if in_idea.search(idea) and not in_owner.search(owner_words):
             return "G2"
     return None
 

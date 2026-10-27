@@ -45,5 +45,9 @@ def test_the_file_is_what_the_builder_reads_from_the_owners_document() -> None:
     assert len(data["ideas"]) == 30
 
 
-def test_the_free_idea_prompt_shows_the_modern_kind() -> None:
-    assert "short video caption" in solution_free.RULES and "use their word" in solution_free.RULES
+def test_the_free_idea_prompt_is_modern_without_assuming_what_the_owner_never_said() -> None:
+    rules = solution_free.RULES
+    # a channel is used only when the owner named it; the modern angle is a check or a question
+    assert "use their word" in rules and "ASSUMES ONLY" in rules.upper()
+    assert "how they first heard" in rules and "search for it nearby" in rules
+    assert "short video caption" not in rules  # the old example was copied into a showroom chat

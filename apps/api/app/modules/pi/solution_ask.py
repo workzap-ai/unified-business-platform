@@ -173,9 +173,40 @@ def known_ask(said: str) -> bool | None:
     return _LEARNED_ASKS.get(said or "")
 
 
+_SOLUTION_TYPOS = ("solution", "solutions", "solushan", "solusion")
+_GIVE_TYPOS = {"dw": "do", "dyn": "dein", "dain": "dein", "dijye": "dijiye", "dejiye": "dijiye"}
+
+
+def fix_typos(text: str) -> str:
+    """Quick typing of the ask ("soluton dw", "solutin do") read as what was meant. Only the word
+    "solution" and the few ways of saying "give" that people shorten; every other word is kept."""
+    import difflib
+
+    if not text or len(text) > 120:
+        return text
+    words = text.split()
+    fixed: list[str] = []
+    for word in words:
+        bare = re.sub(r"[^\w]", "", word).lower()
+        if 6 <= len(bare) <= 10 and difflib.get_close_matches(bare, _SOLUTION_TYPOS, 1, 0.82):
+            fixed.append("solution")
+        elif bare in _GIVE_TYPOS and any(
+            w in _SOLUTION_TYPOS or w.startswith("solu") for w in (x.lower() for x in words)
+        ):
+            fixed.append(_GIVE_TYPOS[bare])
+        else:
+            fixed.append(word)
+    return " ".join(fixed)
+
+
 def asked_for_ideas(said: str) -> bool:
     """They want a fix now: "solution do", "kuch kar sakte ho?", "what can you do?"."""
-    text = said or ""
+    fixed = fix_typos(said or "")
+    # as typed first (other languages' own words), then with the typing slips read as meant
+    return _asked_for_ideas(said or "") or (fixed != (said or "") and _asked_for_ideas(fixed))
+
+
+def _asked_for_ideas(text: str) -> bool:
     if COST.search(text) and not (SOLUTION_ASK.search(text) or SOLUTION_ASK_PLAIN.search(text)):
         return False
     return bool(

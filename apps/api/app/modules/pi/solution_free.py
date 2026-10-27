@@ -30,9 +30,15 @@ Give exactly two ideas, written in plain English (they are translated for the ow
 - is something the OWNER does ("send a clear photo with the price", "ask staff to ..."), never what
   Workzap, pi or "we" would do and never passive ("we can look at", "can be noted", "team ko clear");
 - is specific to the problem the owner described, not generic advice;
-- when it fits the problem, reflects how customers find and talk to businesses today (short
-  videos, a listing and reviews on the online map, chats and photos with customers, an online
-  catalogue), always said by kind and never by app or brand name, never a custom from decades ago;
+- assumes ONLY what the owner said they have or do. If they never mentioned videos, a page, ads,
+  a website, a customer list or a chat group, the idea must not tell them to post, pin, caption,
+  advertise or message through one: they may not have it. An idea may tell the owner to ASK
+  customers or staff something, to LOOK at what a customer sees today (how the business shows up
+  when someone searches for it nearby, the reviews, the shop front), to COUNT or NOTE something
+  from the records and people they named, or to change how something they named is done;
+- reflects how customers find businesses today only through a check or a question like those
+  (for example asking each recent buyer how they first heard of the business), said by kind and
+  never by app or brand name; use a channel only when the owner named it;
 - names no app, software, spreadsheet, template, dashboard, tool, brand or vendor;
 - uses plain words a shopkeeper uses: no jargon (bottleneck, workflow, streamline, optimise, leverage,
   touchpoint, KPI);
@@ -52,13 +58,13 @@ people, places): an idea that would fit any business is not an idea. Do not use 
 "count X from one busy day" or "assign one person at a fixed time"; say what is different for THIS
 problem. One idea looks at something to see the real size of the problem, the other changes how a
 specific thing is done or kept.
-Examples of the right kind (do not copy them; say what fits THIS problem): "Put the rate and how to
-order in the first line of every short video caption, so a viewer can act without asking."; "Count the
-cash at closing with two people and post the total in one shared chat, so a gap is seen at once.";
-"Keep a list of customers who agreed to hear from you and message them when new stock arrives, so
-they come back first."; "Send a clear photo, the size chart and one line on delivery together with
-the rate, so the buyer has no reason to ask again." When the owner named a channel (a DM, reels, a
-chat), use their word for it.
+Examples of the right kind (do not copy them; say what fits THIS problem): "Ask each of your last
+few buyers how they first heard of the shop, so you see which way people really find you."; "Count
+the cash at closing with two people and note the total in one shared place, so a gap is seen at
+once."; "Look at your business the way a stranger does when they search for it nearby, so you see
+what puts them off before they ever visit."; "Send a clear photo, the size chart and one line on
+delivery together with the rate, so the buyer has no reason to ask again." When the owner named a
+channel (a DM, reels, a chat), use their word for it.
 Answer with a JSON object only: {"ideas": ["first idea", "second idea"]}"""
 
 MAX_WORDS = 28
