@@ -1215,7 +1215,11 @@ INVENTED_PROOF = re.compile(
 )
 CURRENCY_AMOUNT = re.compile(
     r"(?:\bRs\.?|\bPKR|\bAED|\bUSD|\bCAD|[$₹€£])\s?\d[\d,.]*"
-    r"|\b\d[\d,.]*\s?(?:rupees?|dollars?|dirhams?|k|lakhs?|lacs?|crores?|PKR|AED|USD)\b",
+    r"|\b\d[\d,.]*\s?(?:rupees?|rupay|rupaye|rupaiye|rupya|rupiya|dollars?|dirhams?|k|lakhs?|"
+    r"lacs?|crores?|hazaar|hazar|PKR|AED|USD)\b"
+    # RT46: an amount in Roman Urdu words, 'pachaas hazaar', 'do lakh'
+    r"|\b(?:ek|aik|do|teen|chaar|panch|paanch|chhe|saat|aath|nau|das|bees|pachees|tees|chalees|"
+    r"pachaas|pachas|sau)\s+(?:hazaar|hazar|lakh|lac|crore)\b",
     re.IGNORECASE,
 )
 

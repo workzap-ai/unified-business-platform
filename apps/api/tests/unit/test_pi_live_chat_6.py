@@ -48,7 +48,8 @@ def test_english_in_a_roman_urdu_chat_without_anything_noted_gets_the_safe_local
     ctx = context("poore sets", [M2], [R2])
     ctx["noted_problems"] = []
     fixed = constitution.repair(R4, ctx)
-    assert fixed == constitution.safe_fallback(ctx) and "Aur kya masla" in fixed
+    assert fixed == constitution.safe_fallback(ctx)
+    assert fixed.endswith("?") and "anything else" not in fixed.lower()
 
 
 @pytest.mark.parametrize("dash", ["—", "–"])

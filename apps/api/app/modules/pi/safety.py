@@ -1756,7 +1756,30 @@ BOUNDARY_PATTERNS = BOUNDARY_PATTERNS + (
 )
 
 
+# RT51 (platform spec 12.3): "draw a map of another business's problems" is refused with the
+# third-party line. "My other business" is the person's own and is not matched: the other party is
+# named as another, someone else's, your other clients, or doosre / kisi aur ke.
+_OTHER_PARTY = (
+    r"(?<!\bmy\s)(?<!\bour\s)(?:(?:another|other|a\s+different|someone\s+else'?s?|your\s+other|their|"
+    r"doosre|dusre|dosre|kisi\s+aur\s+(?:ke|ki|ka)|aur\s+kisi\s+(?:ke|ki|ka))"
+    r"\s+(?:person'?s?\s+|owner'?s?\s+)?(?:business(?:es)?|compan(?:y|ies)|clients?|customers?|owners?|"
+    r"shops?|dukaan|dukan)|dost\s+ke\s+business(?:es)?)"
+)
+_THEIR_DATA = (
+    r"(?:problem\s+map|map|list|notes?|chats?|messages|conversations?|problems|masle|masail|numbers|"
+    r"details|records?|files?)"
+)
 BOUNDARY_PATTERNS = BOUNDARY_PATTERNS + (
+    (
+        Boundary.THIRD_PARTY,
+        re.compile(
+            rf"\b(?:draw|make|build|show|send|give|share|bana|banao|dikha|dikhao|bhej|bhejo|do)\b[^.?!\n]{{0,30}}"
+            rf"\b{_THEIR_DATA}\b[^.?!\n]{{0,25}}\b{_OTHER_PARTY}'?s?\b"
+            rf"|\b{_OTHER_PARTY}'?s?\s+(?:ka\s+|ke\s+|ki\s+)?[^.?!\n]{{0,20}}\b{_THEIR_DATA}\b[^.?!\n]{{0,25}}"
+            rf"\b(?:draw|make|build|show|send|give|share|bana|banao|dikha|dikhao|bhej|bhejo|do|dein|dena)\b",
+            re.IGNORECASE,
+        ),
+    ),
     (
         Boundary.QUOTE_ONLY,
         re.compile(
