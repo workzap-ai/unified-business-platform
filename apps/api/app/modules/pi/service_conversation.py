@@ -6005,6 +6005,19 @@ async def compose_service_turn(
     return turn
 
 
+async def guarded(session: AsyncSession, name: str, work: Any) -> None:
+    """An optional step of saving a turn (the customer's record, a consent, the idea feedback): if
+    it fails, inside its own savepoint so the transaction survives, the failure is logged and the
+    turn is still saved. Live chat 2026-10-27: a step before the brief was assigned raised from the
+    third reply on, the caller swallowed it, and the brief (the open question, the closed ones) was
+    never saved again, so pi asked the same question twice."""
+    try:
+        async with session.begin_nested():
+            await work
+    except Exception:  # noqa: BLE001
+        logger.warning("pi_save_step_failed", extra={"step": name}, exc_info=True)
+
+
 async def save_service_turn(
     session: AsyncSession,
     scope: WorkspaceScope,
@@ -6053,7 +6066,11 @@ async def save_service_turn(
             previous.get("customer_profile"), turn.customer_profile.model_dump()
         ),
     }
-    await remember_customer(session, scope, conversation, brief["customer_profile"])
+    await guarded(
+        session,
+        "remember_customer",
+        remember_customer(session, scope, conversation, brief["customer_profile"]),
+    )
     if flow.brain_mode(policy.response_rules):
         # Durable memory at customer level, from this turn's own output (spec 3.10): what they
         # said, a correction archiving the old value, their language and voice-note habit.
@@ -6073,23 +6090,29 @@ async def save_service_turn(
         )[-12:]
         # R-ASK-07: the question asked last turn is answered now (any answer closes it); the one
         # in this reply is the open one. Kept in the brief, so it survives sessions and languages.
-        closed, opened = slots.advance(
-            previous,
-            message.body or "",
-            turn.reply,
-            turn.asked_slot,
-            new_problem=any(op.op == "create" for op in turn.problem_ops),  # R-ASK-05: reopens
-        )
-        brief["closed_slots"] = closed
-        brief["last_question"] = opened
+        try:
+            closed, opened = slots.advance(
+                previous,
+                message.body or "",
+                turn.reply,
+                turn.asked_slot,
+                new_problem=any(op.op == "create" for op in turn.problem_ops),  # R-ASK-05: reopens
+            )
+            brief["closed_slots"] = closed
+            brief["last_question"] = opened
+        except Exception:  # noqa: BLE001 - one memory step never costs the rest of the brief
+            logger.warning("pi_slots_advance_failed", exc_info=True)
         # R-ANS-03: what they asked for (a timeline, a person) that this reply did not address stays
         # open, and the next reply must deal with it first.
-        brief["open_requests"] = open_requests.update(
-            previous.get("open_requests"),
-            message.body or "",
-            turn.reply,
-            request_human=turn.request_human,
-        )
+        try:
+            brief["open_requests"] = open_requests.update(
+                previous.get("open_requests"),
+                message.body or "",
+                turn.reply,
+                request_human=turn.request_human,
+            )
+        except Exception:  # noqa: BLE001
+            logger.warning("pi_open_requests_failed", exc_info=True)
     known = list(previous.get("knowledge_gaps") or [])
     new_gaps = [g for g in dict.fromkeys(turn.knowledge_gaps) if g not in known]
     brief["knowledge_gaps"] = [*known, *new_gaps][-10:]
@@ -6099,16 +6122,22 @@ async def save_service_turn(
             # The customer-level record (shown on their profile) follows what they said.
             from app.modules.pi_saas.campaigns import set_consent
 
-            await set_consent(
+            await guarded(
                 session,
-                scope,
-                conversation.customer_id,
-                "reminders",
-                turn.consent == "granted",
-                f'Customer said "{turn.consent_evidence[:200]}" on WhatsApp',
-                message.id,
+                "set_consent",
+                set_consent(
+                    session,
+                    scope,
+                    conversation.customer_id,
+                    "reminders",
+                    turn.consent == "granted",
+                    f'Customer said "{turn.consent_evidence[:200]}" on WhatsApp',
+                    message.id,
+                ),
             )
-    await save_feedback(session, scope, conversation, brief, turn)
+    await guarded(
+        session, "save_feedback", save_feedback(session, scope, conversation, brief, turn)
+    )
     conversation.service_brief = brief
     from app.modules.pi.business_form import after_turn
 
