@@ -1224,7 +1224,39 @@ async def process_pi_event(ctx: dict[str, Any], event_id: str) -> None:
         # Service messages retain language-aware discovery; injection never reaches this model
         # (in brain mode it does, as ordinary text: the model is told to ignore instructions).
         service_discovery = service_discovery and (brain_on or not (fast_intent and fast_intent[2]))
-        if service_discovery and message.message_type == "text" and "links" not in message.media:
+        # Part 16: in the warm-up, a link the owner gives gets the safe quick look (not the general
+        # link reader) and only its short profile fields are kept on the message.
+        from app.modules.pi import warmup
+
+        warming = (
+            brain_on
+            and message.message_type == "text"
+            and warmup.enabled(policy.response_rules)
+            and (conversation.service_brief or {}).get("warmup", {}).get("step")
+            in (warmup.IDENTITY_ASKED, warmup.PAGE_ASKED)
+            and bool(warmup.link_in(body))
+        )
+        if warming and "page_look" not in message.media:
+            from dataclasses import asdict
+
+            from app.integrations.http import OutboundClient
+            from app.modules.pi import public_page
+
+            look = await public_page.quick_look(
+                OutboundClient(
+                    ctx["settings"], ctx["http"], resolver=ctx.get("integration_resolver")
+                ),
+                warmup.link_in(body),
+            )
+            look_kept = {k: v for k, v in asdict(look).items() if k != "text"}  # no page text
+            message.media = {**message.media, "page_look": look_kept}
+            await session.commit()
+        if (
+            service_discovery
+            and message.message_type == "text"
+            and "links" not in message.media
+            and not warming
+        ):
             # Links the customer sent (a YouTube video, a website): read them first so
             # pi answers about what they show instead of promising to look later.
             from app.integrations.http import OutboundClient

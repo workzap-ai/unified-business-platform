@@ -33,11 +33,6 @@ KEYS = (
     "online_orders",
     "language",
 )
-_ORDERS = re.compile(
-    r"\b(?:add to cart|checkout|order online|buy now|shop now|book (?:now|online)|"
-    r"place (?:an )?order|order now)\b",
-    re.IGNORECASE,
-)
 _TITLE_SPLIT = re.compile(r"\s[|–—-]\s")
 _EMAIL = re.compile(r"[\w.+-]+@[\w-]+\.[\w.-]+")
 _PHONE = re.compile(r"(?<!\w)\+?\d[\d\s().-]{7,}\d")
@@ -107,7 +102,7 @@ def from_page(profile: dict[str, Any], result: public_page.PageResult) -> dict[s
     add_fact(profile, "website_url", result.url, OWNER)  # the owner gave it
     if result.social_links:
         add_fact(profile, "social_urls", " ".join(result.social_links), PAGE, url=result.url)
-    if _ORDERS.search(result.text):
+    if result.orders_online:
         add_fact(
             profile, "online_orders", "yes", PAGE, evidence="cart or order button", url=result.url
         )

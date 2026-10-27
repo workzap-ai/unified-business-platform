@@ -47,6 +47,7 @@ def validate_section(section: str, value: Any) -> None:
                 "drift_check",
                 "solution_source",
                 "expert_judge",
+                "warmup",
             }
             ensure(isinstance(brain, dict) and set(brain) <= {*TUNABLES, *flags})
             ensure(type(brain.get("learning_frozen", True)) is bool)
@@ -58,6 +59,7 @@ def validate_section(section: str, value: Any) -> None:
             ensure(type(brain.get("drift_check", False)) is bool)  # Part A.7: daily drift run
             ensure(brain.get("solution_source", "packs_first") in {"packs_first", "expert"})
             ensure(type(brain.get("expert_judge", True)) is bool)  # skip the judge call when false
+            ensure(type(brain.get("warmup", False)) is bool)  # spec v1.4 Part 16: the opening
             ensure(all(type(v) is int for k, v in brain.items() if k not in flags))
             served = brain.get("served_industries", [])  # regulated trades Workzap serves (7.N)
             ensure(isinstance(served, list) and set(served) <= set(REGULATED_TRADES))

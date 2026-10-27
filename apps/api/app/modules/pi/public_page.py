@@ -64,6 +64,11 @@ _TITLE = re.compile(r"<title[^>]*>(.*?)</title>", re.IGNORECASE | re.DOTALL)
 _META = re.compile(r"<meta\b[^>]*>", re.IGNORECASE)
 _ATTR = re.compile(r"([a-zA-Z:-]+)\s*=\s*(?:\"([^\"]*)\"|'([^']*)')")
 _HREF = re.compile(r"<a\b[^>]*\bhref\s*=\s*[\"']([^\"'#][^\"']*)[\"']", re.IGNORECASE)
+ORDERS = re.compile(
+    r"\b(?:add to cart|checkout|order online|buy now|shop now|book (?:now|online)|"
+    r"place (?:an )?order|order now)\b",
+    re.IGNORECASE,
+)
 _LANG = re.compile(r"<html\b[^>]*\blang\s*=\s*[\"']([A-Za-z-]+)[\"']", re.IGNORECASE)
 
 
@@ -84,6 +89,7 @@ class PageResult:
     social_links: list[str] = field(default_factory=list)
     pages: list[str] = field(default_factory=list)
     content_hash: str = ""
+    orders_online: bool = False  # a cart, checkout or booking button shows on the page
 
     @property
     def ok(self) -> bool:
@@ -245,6 +251,7 @@ async def _look(outbound: Any, url: str, max_pages: int) -> PageResult:
         social_links=_social(raw),
         pages=pages,
         content_hash=hashlib.sha256(text.encode()).hexdigest()[:16],
+        orders_online=bool(ORDERS.search(text)),
     )
 
 

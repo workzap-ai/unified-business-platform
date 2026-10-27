@@ -68,6 +68,7 @@ from app.modules.pi import (
     think_plan,
     think_prompt,
     value_line,
+    warmup,
 )
 from app.modules.pi import (
     critique as critique_mod,
@@ -1557,6 +1558,14 @@ async def brain_problems(
         context["hours_away"] = hours_away(message, rows or [], last_chat_at)
         if pending := await pending_handoff(session, conversation):
             context["pending_handoff"] = pending
+    if message is not None and warmup.enabled(policy.response_rules):
+        # Part 16: the opening is for a first-time owner who says "Hi"; the quick look result (if
+        # they gave a link) rides on the message and is removed before the model sees the context.
+        said_now = message.body or ""
+        context["warmup"] = {"enabled": True}
+        context["greeting_only"] = bool(english_greeting(said_now) or returning_greeting(said_now))
+        if (message.media or {}).get("page_look"):
+            context["page_look"] = message.media["page_look"]
     if learning_context.active(policy.response_rules):
         context.update(
             await latency.timed(
@@ -5651,6 +5660,18 @@ async def compose_service_turn(
     if context.get("pi_mode") == "brain" and (safe := brain_safety(context)) is not None:
         await in_their_language(manager, scope, policy, conversation, safe, context)
         return safe
+    if context.get("pi_mode") == "brain" and context.get("warmup"):
+        warm = warmup.plan(context)
+        context.pop("page_look", None)  # page words never reach the model (untrusted data)
+        if warm is not None:
+            kept = dict(conversation.service_brief or {})
+            kept["warmup"], kept["business_profile"] = warm.state, warm.profile
+            conversation.service_brief = kept
+            if warm.reply:
+                turn = ServiceTurn(reply=warm.reply, language="en")
+                turn._greeting_only = True  # nothing to note; the owner has not described a problem
+                await in_their_language(manager, scope, policy, conversation, turn, context)
+                return turn
     if (
         context.get("latest_message_kind") in (None, "text")
         and (
