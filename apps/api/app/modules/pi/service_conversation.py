@@ -2079,7 +2079,7 @@ def brain_summary(turn: "ServiceTurn", context: dict[str, Any]) -> None:
 
 
 IDEAS_LEAD = {
-    "en": "Here are some ideas you can try now:",
+    "en": "Here are some ideas for you:",
     "roman_ur": "Ji, ye do ideas abhi aazma sakte hain:",
 }
 _BULLET_LINE = re.compile(r"^\s*•\s+\S")
@@ -2167,7 +2167,7 @@ def ideas_opener(context: dict[str, Any]) -> str:
         return "No pressure at all. Here are two ideas:" + chr(10)  # G18
     if solution_ask.impatient(said):
         return "Sorry about the wait. Here are two ideas:" + chr(10)  # Book 4 G27: "Maazrat"
-    return "Here are some ideas you can try now:" + chr(10)
+    return "Here are some ideas for you:" + chr(10)
 
 
 def reject_passive_ideas(turn: "ServiceTurn", context: dict[str, Any]) -> None:
@@ -2647,8 +2647,10 @@ async def brain_free_ideas(
     ][-3:]
     said = str(context.get("latest_customer_message") or "")
     noted_now, new_problem = noted_with_turn(context, turn)
-    idea_ctx: idea_filter.IdeaContext | None = None
-    if noted_now:  # G3, G4, G7, G8 need the map; with none noted only G1, G2 apply
+    idea_ctx: idea_filter.IdeaContext | None = (
+        idea_filter.IdeaContext(industries=tuple(keys[:1])) if keys else None
+    )  # G9 needs only the trade
+    if noted_now:  # G3, G4, G7, G8 need the map; with none noted only G1, G2, G9 apply
         given_before = [
             str(h.get("text") or "") for h in context.get("history") or [] if h.get("role") == "ai"
         ]
@@ -2659,6 +2661,7 @@ async def brain_free_ideas(
             " ".join([*customer[:1], said]),
             given_before,
             (solutions.load(keys[0]) or {}).get("problems") or [] if keys else [],
+            keys[:1],
         )
     report: dict[str, Any] = {}
     if expert and await brain_expert_ideas(
@@ -3395,9 +3398,34 @@ def industry_context(
     return {
         "industry": names,
         "industry_keys": list(found.industries),
+        "industry_stated": bool(found.stated),
         "industry_knowledge": industry_packs.prompt_section(
             found, categories, budget=max_chars, country=country, rotation=len(texts)
         ),
+    }
+
+
+UNCONFIRMED_TRADE = (
+    "THE OWNER HAS NOT SAID WHAT TRADE THIS IS. Do not name a trade, a product, a machine or a "
+    "customer type, and do not assume any of them (spec G11). Use only what they said. If you "
+    "need to know what they do, ask it openly, in one short question."
+)
+
+
+def unconfirmed_trade(found: dict[str, Any], conversation: PiConversation) -> dict[str, Any]:
+    """Spec 17.3, G11: a trade guessed from weak words is a tool, not a fact. Until the owner has
+    said it, the prompt carries no trade knowledge, only the instruction not to assume one. Once
+    said (or confirmed), that stays on the brief so the knowledge is shown from then on."""
+    brief = dict(conversation.service_brief or {})
+    if found.get("industry_stated") or brief.get("industry_confirmed"):
+        if not brief.get("industry_confirmed"):
+            brief["industry_confirmed"] = True
+            conversation.service_brief = brief
+        return found
+    return {
+        **found,
+        "industry_unconfirmed": True,
+        "industry_knowledge": UNCONFIRMED_TRADE,
     }
 
 
@@ -3447,6 +3475,8 @@ async def industry_context_for(
             + [(False, message.body or "")]
         ),
     )
+    if found:
+        found = unconfirmed_trade(found, conversation)
     if not found and not customer.industry_primary:
         # Spec 7.O: no pack fits, so keep the person's own description (the nightly run
         # clusters these into a new pack once five similar businesses have arrived).
@@ -4831,7 +4861,7 @@ async def in_one_language(
                     "Write plain everyday Urdu: never translate an English word into Urdu word for "
                     "word when there is no such Urdu phrase (not 'drop naam'); keep a name or term "
                     "like 'drop-off point' or 'COD' as it is, or say it in a few plain words. "
-                    "Say 'Here are some ideas you can try now:' as 'Ji, ye do ideas abhi aazma "
+                    "Say 'Here are some ideas for you:' as 'Ji, ye do ideas abhi aazma "
                     "sakte hain:' and 'Sorry about the wait.' as 'Maazrat.'. "
                     "Reply with the rewritten text only."
                 ),

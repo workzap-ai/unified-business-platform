@@ -46,7 +46,7 @@ def test_asked_ideas_keep_the_list_and_get_the_lead_if_it_is_missing() -> None:
 def test_an_english_owner_gets_the_english_lead() -> None:
     turn = ServiceTurn(reply=IDEAS)
     shape_expert_ideas(turn, {**ctx("what can you do?"), "reply_language": "en"})
-    assert turn.reply.startswith("Here are some ideas you can try now:")
+    assert turn.reply.startswith("Here are some ideas for you:")
 
 
 def test_an_existing_lead_is_not_doubled() -> None:

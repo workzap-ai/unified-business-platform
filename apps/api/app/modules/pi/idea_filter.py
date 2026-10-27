@@ -1,5 +1,5 @@
 # ruff: noqa: E501
-"""The idea filter of the platform spec Book 5, 7.1 (G1 to G8).
+"""The idea filter of the platform spec Book 5, 7.1 (G1 to G9).
 
 `solution_rules.check_idea` already covers honesty (G6) and no how-to (G5), and the free idea
 vetting covers "uses something the person said". This module adds the rest, from the live chats:
@@ -10,6 +10,7 @@ vetting covers "uses something the person said". This module adds the rest, from
 - G4 cause-fit: an idea that assumes a cause the owner did not give (or one other than theirs).
 - G7 new: an idea that repeats one already given in the conversation.
 - G8 on the map: an idea for a problem the owner never raised.
+- G9 vocabulary: an idea in another trade's words (`idea_vocabulary`), when the trade is known.
 
 G1 and G2 need only the owner's words. G3, G4, G7 and G8 need what the conversation holds (the noted
 problems with their sub-type, goal verb and cause, the ideas already given, the map nodes), passed
@@ -23,7 +24,7 @@ from collections.abc import Sequence
 from dataclasses import dataclass
 from typing import Any
 
-from app.modules.pi import solution_ideas, solution_library, taxonomy
+from app.modules.pi import idea_vocabulary, solution_ideas, solution_library, taxonomy
 
 # A goal verb and the ideas that work against it.
 _AGAINST_CLEARING = re.compile(
@@ -146,6 +147,7 @@ class IdeaContext:
     entry_ideas: tuple[str, ...] = ()  # the ideas of the industry entry for this sub-type
     given: tuple[str, ...] = ()  # ideas (and replies) already given in this conversation
     nodes: tuple[str, ...] = ()  # the words of each node on the map
+    industries: tuple[str, ...] = ()  # the trade(s) pi is talking about (G9); () when unknown
     node_categories: tuple[str, ...] = ()  # the category of each node
 
     def active(self) -> bool:
@@ -287,6 +289,8 @@ def failures(idea: str, owner_words: str, ctx: IdeaContext | None = None) -> lis
     """Rule ids of the filter that the idea breaks (empty when it passes). G1 and G2 always; G3,
     G4, G7 and G8 only with an `IdeaContext` that holds data."""
     found = [goal_conflict(idea, owner_words), invented_context(idea, owner_words)]
+    if ctx is not None and ctx.industries:
+        found.append(idea_vocabulary.foreign_vocabulary(idea, owner_words, ctx.industries))
     if ctx is not None and ctx.active():
         found += [
             wrong_subtype(idea, ctx.subtype, ctx.entry_ideas),
@@ -302,6 +306,7 @@ def context_from(
     owner_words: str,
     given: Sequence[str] = (),
     entries: Sequence[dict[str, Any]] = (),
+    industries: Sequence[str] = (),
 ) -> IdeaContext:
     """The context from the noted problems (what `problems.noted_context` returns), the owner's
     words, the ideas already given and the industry's entries. The latest noted problem that has a
@@ -342,6 +347,7 @@ def context_from(
         given=tuple(given),
         nodes=nodes,
         node_categories=tuple(str(n.get("group") or "") for n in noted),
+        industries=tuple(industries),
     )
 
 
