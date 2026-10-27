@@ -2129,7 +2129,12 @@ def safe_fallback(context: dict[str, Any]) -> str:
     else:
         if ASKS_IF_AI.search(str(context.get("latest_customer_message", ""))):
             parts.append(_ai_answer(context, language))
-        listening = state in flow.LISTENING or state in (None, flow.State.S5B_DECLINED)
+        listening = state in flow.LISTENING or state in (
+            None,
+            flow.State.S5B_DECLINED,
+            flow.State.S_RETURN,
+            flow.State.S_MAP_SHARE,
+        )
         parts.append((FALLBACK_LISTENING if listening else FALLBACK_OTHER)[language])
     return " ".join(parts)
 

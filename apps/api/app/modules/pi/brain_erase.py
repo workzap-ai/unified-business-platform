@@ -30,6 +30,7 @@ from app.modules.pi.problem_models import (
 )
 from app.modules.pi.quarantine_models import PiQuarantine
 from app.modules.pi.solution_models import PiIdeaFeedback, PiSolutionMemory
+from app.modules.pi.think_models import PiHypothesis, PiMoveLog
 from app.shared.scope import WorkspaceScope
 
 ERASED = "[deleted at the customer's request]"
@@ -140,6 +141,17 @@ async def erase_customer(
                 delete(PiExperience).where(
                     *mine(PiExperience), PiExperience.conversation_id.in_(conversation_ids)
                 )
+            )
+        )
+        # the thinking step's notes about the chat (hypotheses hold the owner's own words)
+        await session.execute(
+            delete(PiHypothesis).where(
+                *mine(PiHypothesis), PiHypothesis.conversation_id.in_(conversation_ids)
+            )
+        )
+        await session.execute(
+            delete(PiMoveLog).where(
+                *mine(PiMoveLog), PiMoveLog.conversation_id.in_(conversation_ids)
             )
         )
         removed["quarantine"] = _n(

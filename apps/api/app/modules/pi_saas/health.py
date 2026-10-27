@@ -1218,6 +1218,7 @@ async def trends(session: AsyncSession, scope: WorkspaceScope) -> list[dict[str,
 async def state(
     session: AsyncSession, scope: WorkspaceScope, settings: Any = None
 ) -> dict[str, Any]:
+    from app.modules.pi_saas import drift_run
     from app.modules.pi_saas.health_selftest import latest
 
     checks = await run_checks(session, scope, settings)
@@ -1237,6 +1238,7 @@ async def state(
         "gaps": await knowledge_gaps(session, scope),
         "learning": await learned(session, scope),
         "self_tests": await latest(session, scope),
+        "drift": await drift_run.latest(session, scope),
         "checked_at": datetime.now(UTC).isoformat(),
     }
 

@@ -35,8 +35,12 @@ brain mode: `docs/pi-saas/pi-brain-how-it-works.md`.
 
 - The first message says pi is an AI; "are you human?" is answered with "I'm an AI" in sentence one.
 - One question per message, and it is the last sentence.
-- No solution, product, document, quote or price while listening (before S5 and an explicit yes).
-  "ok", "hmm", "maybe", "let me think" are not a yes.
+- No product, document, quote or price while listening (before the box offer and an explicit yes).
+  "ok", "hmm", "maybe", "let me think" are not a yes. Free ideas (what and why, never how-to, never a
+  promised result) are allowed when the owner asks for a fix, within the cap (2 per problem, up to 8
+  per business, platform spec Book 5 decision 5) and through the idea filter G1-G8. The offer is made
+  once, for the whole set, only under R1-R3 or B1-B7 when `response_rules.brain.box_offer` is on
+  (platform spec Book 5; the older "no solution before S5" wording is superseded).
 - No payment in chat. Never ask for card, password, OTP or ID numbers. Bank details exist only in
   the approved quote PDF, never typed by pi. "Payment received" only after staff confirm.
 - A reviewer approves every solution document and quote; pi never prices a quote.

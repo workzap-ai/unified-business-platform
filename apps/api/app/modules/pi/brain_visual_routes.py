@@ -7,19 +7,31 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core import rate_limit
 from app.modules.access.dependencies import Session
-from app.modules.pi import brain_visuals, map_render, taxonomy
+from app.modules.pi import brain_visuals, map_builder, map_render, taxonomy
 from app.modules.pi.box_models import PiMapVersion
 from app.modules.pi.models import PiConversation
 from app.modules.pi.problem_models import PiProblem
+from app.shared.scope import WorkspaceScope
 
 public_router = APIRouter(prefix="/brain-visuals", tags=["pi-brain-visuals"])
 
 
+def _scope_of(conversation: PiConversation) -> WorkspaceScope:
+    return WorkspaceScope.system(
+        conversation.tenant_id, conversation.environment_id, frozenset(), "pi brain visual"
+    )
+
+
 async def _map_png(
-    session: AsyncSession, conversation: PiConversation, version: int, language: str
+    session: AsyncSession,
+    conversation: PiConversation,
+    version: int,
+    language: str,
+    part: int = 0,
 ) -> bytes:
     """The picture of one saved map version of this conversation's customer (spec 4.9: the same
-    data as the dashboard)."""
+    data as the dashboard). `part` picks the overview (0) or a cluster's detail picture when the
+    map has more than nine problems. Nodes keep the places the owner saw them at."""
     row = await session.scalar(
         select(PiMapVersion).where(
             PiMapVersion.tenant_id == conversation.tenant_id,
@@ -30,10 +42,17 @@ async def _map_png(
     )
     if row is None:
         raise HTTPException(status_code=404)
-    drawn = map_render.render_map(row.map_json, language)
-    if not drawn.images:
+    # What this version already drew is reused as is; otherwise the version before it sets places.
+    before = map_builder.slots_of(row.positions) or await map_builder.previous_positions(
+        session, _scope_of(conversation), conversation.customer_id, version
+    )
+    drawn = map_render.render_map(row.map_json, language, previous=before)
+    if part >= len(drawn.images):
         raise HTTPException(status_code=404)
-    return drawn.images[0].png
+    if not row.positions and drawn.positions:
+        map_builder.remember_positions(row, drawn.positions)
+        await session.commit()
+    return drawn.images[part].png
 
 
 @public_router.get("/{token}/{name}")
@@ -51,7 +70,7 @@ async def visual(token: str, name: str, request: Request, session: Session) -> R
         raise HTTPException(status_code=404)
     language = claims["language"]
     if claims["kind"] == "map":
-        png = await _map_png(session, conversation, claims["version"], language)
+        png = await _map_png(session, conversation, claims["version"], language, claims["part"])
     elif claims["kind"] == "progress":
         png = brain_visuals.render_progress(claims["step"], language)
     else:

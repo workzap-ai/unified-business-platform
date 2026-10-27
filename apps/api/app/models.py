@@ -71,6 +71,7 @@ from app.modules.pi.solution_models import (
     PiSolutionMemory,
     PiSolutionVersion,
 )
+from app.modules.pi.think_models import PiHypothesis, PiMoveLog
 from app.modules.pi_customer.models import (
     CustomerFace,
     CustomerPasskey,
@@ -152,6 +153,8 @@ __all__ = [
     "PiBusiness",
     "PiMapVersion",
     "PiOfferLog",
+    "PiMoveLog",
+    "PiHypothesis",
     "PiSolutionBox",
     "PiProblem",
     "PiProblemGroup",

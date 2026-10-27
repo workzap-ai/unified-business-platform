@@ -31,10 +31,11 @@ def test_not_tried_is_a_cue_worth_nothing_and_never_a_sales_signal():
 
 def test_the_idea_budget_before_and_after_a_declined_offer():
     assert solution_context.allowance({}, 0) == value_line.IDEAS_BEFORE_OFFER
-    assert solution_context.allowance({}, 4) == 0
-    declined = {"declines": 1, "ideas_at_decline": 4}
-    assert solution_context.allowance(declined, 4) == value_line.IDEAS_AFTER_DECLINE
-    assert solution_context.allowance(declined, 6) == 0
+    assert solution_context.allowance({}, 4) == 4  # Book 5 decision 5: eight, two per problem
+    assert solution_context.allowance({}, 8) == 0
+    declined = {"declines": 1, "ideas_at_decline": 8}
+    assert solution_context.allowance(declined, 8) == value_line.IDEAS_AFTER_DECLINE
+    assert solution_context.allowance(declined, 10) == 0
     # the decline was seen before the budget was stamped: nothing taken yet
     assert solution_context.allowance({"declines": 1}, 3) == value_line.IDEAS_AFTER_DECLINE
 

@@ -47,6 +47,10 @@ class PiMapVersion(WorkspaceRow):
     version: Mapped[int] = mapped_column(Integer)
     map_json: Mapped[dict[str, Any]] = mapped_column("json", JSONB, default=dict)
     image_hash: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    # Where the owner saw each node (node id -> [row, column]); the next version keeps them there.
+    positions: Mapped[dict[str, Any]] = mapped_column(
+        JSONB, default=dict, server_default="{}", nullable=False
+    )
     shared_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     shared_message_id: Mapped[UUID | None] = mapped_column(Uuid, nullable=True)
 

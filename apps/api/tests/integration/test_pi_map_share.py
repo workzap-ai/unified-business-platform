@@ -68,8 +68,11 @@ async def test_the_first_map_is_sent_as_a_picture_with_caption_alt_and_one_quest
     [version] = (await business_db.scalars(select(PiMapVersion))).all()
     assert version.shared_at is not None and str(version.shared_message_id) == str(shared.id)
     assert [n["label"] for n in version.map_json["nodes"]][0].startswith("purana maal")
-    images = [m for m in pi.sent if m.get("type") == "image"]
-    link = images[0]["image"]["link"]
+    # the picture goes as the header of a quick-reply message: right, wrong, missing
+    [card] = [m for m in pi.sent if m.get("type") == "interactive"]
+    link = card["interactive"]["header"]["image"]["link"]
+    titles = [b["reply"]["title"] for b in card["interactive"]["action"]["buttons"]]
+    assert titles == ["The map is correct", "Something's wrong", "Something's missing"]
     assert link.endswith("/map.png") and "/brain-visuals/" in link
     served = await api.get(f"/api/v1/pi-app{link[link.index('/brain-visuals/') :]}")
     assert served.status_code == 200 and served.content[:8] == b"\x89PNG\r\n\x1a\n"

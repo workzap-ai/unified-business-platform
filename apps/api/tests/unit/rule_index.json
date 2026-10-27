@@ -6177,7 +6177,7 @@
    "source": "addendum2",
    "page": 9,
    "area": "value line (Part 1)",
-   "statement": "Four free ideas per conversation before the offer; after a declined offer at most two more, for a new problem only",
+   "statement": "Two free ideas per problem, up to eight per business before the box offer; after a declined offer at most two more, for a new problem only",
    "status": "DONE",
    "code": [
     "app/modules/pi/constitution.py::_value_line_every_reply",

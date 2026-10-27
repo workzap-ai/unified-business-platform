@@ -50,21 +50,29 @@ NORMAL = frozenset(set(State) - EXCEPTIONS)
 LISTENING = frozenset({S.S0_NEW, S.S1_LISTENING, S.S2_CLARIFYING, S.S3_NOTED, S.S4_SORTED_SUMMARY})
 # Where pi must not raise a solution document or quote on its own (nothing sold while listening).
 # S_LISTEN_THINK is not here: ideas and the offer are its job. S_HOLD is: no ideas, no offer.
-NO_OFFER = LISTENING | {S.S5B_DECLINED, S.S_HOLD}
+# S_RETURN and S_MAP_SHARE are: a returning owner or a map is never met with a pitch (R-SELL-01).
+NO_OFFER = LISTENING | {S.S5B_DECLINED, S.S_HOLD, S.S_RETURN, S.S_MAP_SHARE}
 
 TRANSITIONS: dict[State, frozenset[State]] = {
     S.S0_NEW: frozenset({S.S1_LISTENING}),
     S.S1_LISTENING: frozenset(
-        {S.S2_CLARIFYING, S.S3_NOTED, S.S_LISTEN_THINK, S.S_MAP_SHARE, S.S_HOLD}
+        {S.S2_CLARIFYING, S.S3_NOTED, S.S_LISTEN_THINK, S.S_MAP_SHARE, S.S_RETURN, S.S_HOLD}
     ),
     S.S2_CLARIFYING: frozenset(
-        {S.S1_LISTENING, S.S3_NOTED, S.S_LISTEN_THINK, S.S_MAP_SHARE, S.S_HOLD}
+        {S.S1_LISTENING, S.S3_NOTED, S.S_LISTEN_THINK, S.S_MAP_SHARE, S.S_RETURN, S.S_HOLD}
     ),
     S.S3_NOTED: frozenset(
-        {S.S1_LISTENING, S.S4_SORTED_SUMMARY, S.S_LISTEN_THINK, S.S_MAP_SHARE, S.S_HOLD}
+        {
+            S.S1_LISTENING,
+            S.S4_SORTED_SUMMARY,
+            S.S_LISTEN_THINK,
+            S.S_MAP_SHARE,
+            S.S_RETURN,
+            S.S_HOLD,
+        }
     ),
     S.S4_SORTED_SUMMARY: frozenset(
-        {S.S1_LISTENING, S.S5_READINESS, S.S_LISTEN_THINK, S.S_MAP_SHARE, S.S_HOLD}
+        {S.S1_LISTENING, S.S5_READINESS, S.S_LISTEN_THINK, S.S_MAP_SHARE, S.S_RETURN, S.S_HOLD}
     ),
     # The default (Book 5, 11.1): each turn thinks, picks a move and updates the map. A solution ask
     # from any listening state lands here (the old S_ADVISE moves): ideas, then the offer.
@@ -81,7 +89,9 @@ TRANSITIONS: dict[State, frozenset[State]] = {
         }
     ),
     # A map version is drawn and sent; pi waits for the reply and applies the edits.
-    S.S_MAP_SHARE: frozenset({S.S_LISTEN_THINK, S.S1_LISTENING, S.S_BOX_OFFER, S.S_HOLD}),
+    S.S_MAP_SHARE: frozenset(
+        {S.S_LISTEN_THINK, S.S1_LISTENING, S.S_BOX_OFFER, S.S_RETURN, S.S_HOLD}
+    ),
     # Entered only through can_offer: one offer, one answer.
     S.S_BOX_OFFER: frozenset(
         {S.S_BOX_DRAFT, S.S5_READINESS, S.S5B_DECLINED, S.S_LISTEN_THINK, S.S_HOLD}
@@ -113,6 +123,19 @@ TRANSITIONS: dict[State, frozenset[State]] = {
     S.X_BLOCKED: frozenset({S.S1_LISTENING}),
 }
 
+# Where an owner who comes back after a day or more is met as a returning owner (Book 5, Part 6).
+# A declined offer, a quote in progress and the exceptions are not here: they keep their own state.
+RETURNABLE = frozenset(
+    {
+        S.S1_LISTENING,
+        S.S2_CLARIFYING,
+        S.S3_NOTED,
+        S.S4_SORTED_SUMMARY,
+        S.S_LISTEN_THINK,
+        S.S_MAP_SHARE,
+    }
+)
+
 GUIDANCE: dict[State, str] = {
     S.S0_NEW: "Nothing sent yet. Open with who you are (an AI from Workzap) and invite them to say "
     "what is going wrong. Ask nothing else.",
@@ -135,7 +158,9 @@ GUIDANCE: dict[State, str] = {
     "say no. Answer questions about it; do not repeat it and do not name a price.",
     S.S_BOX_DRAFT: "They said yes. Say what happens next in plain words: Workzap's team reviews "
     "and prepares the quote. Invent no content, no price and no time.",
-    S.S_RETURN: "They are back. Open with continuity and the map, not with a fresh greeting. "
+    S.S_RETURN: "They are back after a day or more. Open with continuity, not with a fresh "
+    "greeting, and answer what they wrote. Do not assume old problems are still true. The map from "
+    "last time follows in its own message with the open question, so ask no question yourself. "
     "Offer nothing unless they ask for it.",
     S.S_HOLD: "They shared something heavy or are distressed. Be kind and brief. No ideas, no "
     "offer, no question that pushes.",
@@ -304,6 +329,8 @@ def after_turn(
     noted, the sorted summary was shown, or pi asked a question. Later states are moved by
     their own events (offer, document, approval, payment), never by the model."""
     state = source
+    if state == State.S_RETURN:
+        state = State.S1_LISTENING  # the returning owner was met; from here the loop is the same
     if state == State.S0_NEW:
         state = State.S1_LISTENING  # the opening went out
         if not (noted or summary):

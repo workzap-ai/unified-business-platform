@@ -61,7 +61,7 @@ MAX_LABEL_WORDS = 6
 MAX_LINK_WORDS = 3
 MAX_FACT_LINES = 3
 
-DRAWABLE_LANGUAGES = ("en", "roman_ur", "ur", "ar", "fa")
+DRAWABLE_LANGUAGES = ("en", "roman_ur", "ur", "ar", "fa", "fr", "es")
 RTL_LANGUAGES = ("ur", "ar", "fa", "ps", "sd")
 FONT_DIR = Path(__file__).parent / "fonts"
 NASKH_REGULAR = FONT_DIR / "NotoNaskhArabic-Regular.ttf"
@@ -108,6 +108,7 @@ TEXT: dict[str, dict[str, Any]] = {
         "link": "link",
         "links": "links",
         "new": "New",
+        "stale": "From last time",
         "legend_owner": "You said it",
         "legend_guess": "My guess",
         "legend_new": "added",
@@ -142,6 +143,7 @@ TEXT: dict[str, dict[str, Any]] = {
         "link": "jorr",
         "links": "jorr",
         "new": "Naya",
+        "stale": "Pichli baar ka",
         "legend_owner": "Aap ne bataya",
         "legend_guess": "Hamara andaza",
         "legend_new": "naya",
@@ -178,6 +180,7 @@ TEXT: dict[str, dict[str, Any]] = {
         "link": "جوڑ",
         "links": "جوڑ",
         "new": "نیا",
+        "stale": "پچھلی بار کا",
         "legend_owner": "آپ نے بتایا",
         "legend_guess": "ہمارا اندازہ",
         "legend_new": "شامل ہوا",
@@ -214,6 +217,7 @@ TEXT: dict[str, dict[str, Any]] = {
         "link": "رابط",
         "links": "روابط",
         "new": "جديد",
+        "stale": "من المرة السابقة",
         "legend_owner": "من كلامك",
         "legend_guess": "تقديرنا",
         "legend_new": "تمت إضافته",
@@ -248,6 +252,7 @@ TEXT: dict[str, dict[str, Any]] = {
         "link": "پیوند",
         "links": "پیوند",
         "new": "جدید",
+        "stale": "از دفعه قبل",
         "legend_owner": "گفته شما",
         "legend_guess": "حدس ما",
         "legend_new": "افزوده شد",
@@ -273,10 +278,122 @@ TEXT: dict[str, dict[str, Any]] = {
         },
         "guess_note": "(حدس ما)",
     },
+    "fr": {
+        "header": "La carte de votre activité",
+        "version": "Version",
+        "summary": "{version} {v} · {pc} · {lc}",
+        "problem": "problème",
+        "problems": "problèmes",
+        "link": "lien",
+        "links": "liens",
+        "new": "Nouveau",
+        "stale": "De la dernière fois",
+        "legend_owner": "Vous l'avez dit",
+        "legend_guess": "Mon hypothèse",
+        "legend_new": "ajouté",
+        "foot": "Seuls vos chiffres sont utilisés. Ni noms ni données personnelles.",
+        "overview": "Vue d'ensemble",
+        "cluster": "Une racine : {title}",
+        "others": "Autres problèmes",
+        "more": "Suite ci-dessous",
+        "caption": "{version} {v} : {pc}, {lc}.",
+        "caption_overview": "{version} {v}, vue d'ensemble : {k} groupes.",
+        "caption_detail": "{version} {v}, {title} : {pc}.",
+        "alt_node": "Problème : {label}",
+        "alt_guess": "mon hypothèse, merci de confirmer",
+        "alt_link": "Lien : {a} vers {b} ({label} ; {kind})",
+        "alt_owner": "vous l'avez dit",
+        "types": {
+            "causes": "mène à",
+            "worsens": "aggrave",
+            "competes": "est en concurrence",
+            "same_root": "même racine",
+            "blocks": "bloque",
+            "symptom_of": "symptôme de",
+        },
+        "guess_note": "(mon hypothèse)",
+    },
+    "es": {
+        "header": "El mapa de su negocio",
+        "version": "Versión",
+        "summary": "{version} {v} · {pc} · {lc}",
+        "problem": "problema",
+        "problems": "problemas",
+        "link": "vínculo",
+        "links": "vínculos",
+        "new": "Nuevo",
+        "stale": "De la vez anterior",
+        "legend_owner": "Usted lo dijo",
+        "legend_guess": "Mi suposición",
+        "legend_new": "añadido",
+        "foot": "Solo se usan los números que usted dio. Sin nombres ni datos personales.",
+        "overview": "Vista general",
+        "cluster": "Una raíz: {title}",
+        "others": "Otros problemas",
+        "more": "Más abajo",
+        "caption": "{version} {v}: {pc}, {lc}.",
+        "caption_overview": "{version} {v}, vista general: {k} grupos.",
+        "caption_detail": "{version} {v}, {title}: {pc}.",
+        "alt_node": "Problema: {label}",
+        "alt_guess": "mi suposición, por favor confirme",
+        "alt_link": "Vínculo: {a} a {b} ({label}; {kind})",
+        "alt_owner": "usted lo dijo",
+        "types": {
+            "causes": "lleva a",
+            "worsens": "empeora",
+            "competes": "compite",
+            "same_root": "misma raíz",
+            "blocks": "bloquea",
+            "symptom_of": "síntoma de",
+        },
+        "guess_note": "(mi suposición)",
+    },
 }
 
 # Names for the colour legend in right-to-left maps (the category keys come from taxonomy.py).
 CATEGORY_NAMES: dict[str, dict[str, str]] = {
+    "fr": {
+        "stock_inventory": "Stock",
+        "sales_revenue": "Ventes",
+        "cash_collections": "Trésorerie et encaissements",
+        "margin_cost": "Marge et coûts",
+        "customers_retention": "Clients",
+        "marketing_leads": "Marketing",
+        "orders_fulfilment": "Commandes et livraison",
+        "suppliers_purchasing": "Fournisseurs et achats",
+        "people_staff": "Équipe",
+        "operations_process": "Opérations",
+        "reporting_visibility": "Suivi et rapports",
+        "tech_systems": "Outils",
+        "quality_complaints": "Qualité",
+        "compliance_admin": "Administratif et légal",
+        "communication_coordination": "Coordination",
+        "loss_security": "Pertes et sécurité",
+        "planning_growth": "Planification et croissance",
+        "customer_experience_digital": "Présence en ligne",
+        "other": "Autre",
+    },
+    "es": {
+        "stock_inventory": "Inventario",
+        "sales_revenue": "Ventas",
+        "cash_collections": "Caja y cobros",
+        "margin_cost": "Margen y costos",
+        "customers_retention": "Clientes",
+        "marketing_leads": "Marketing",
+        "orders_fulfilment": "Pedidos y entregas",
+        "suppliers_purchasing": "Proveedores y compras",
+        "people_staff": "Personal",
+        "operations_process": "Operaciones",
+        "reporting_visibility": "Informes",
+        "tech_systems": "Herramientas",
+        "quality_complaints": "Calidad",
+        "compliance_admin": "Administración y legal",
+        "communication_coordination": "Coordinación",
+        "loss_security": "Pérdidas y seguridad",
+        "planning_growth": "Planificación y crecimiento",
+        "customer_experience_digital": "Presencia en línea",
+        "other": "Otros",
+    },
     "fa": {
         "stock_inventory": "موجودی کالا",
         "sales_revenue": "فروش",
@@ -344,9 +461,16 @@ def is_rtl(language: str | None) -> bool:
 
 def _lang(language: str | None) -> str:
     base = (language or "en").split("-")[0].lower()
-    if base in ("en", "roman_ur", "ur", "ar", "fa"):
+    if base in DRAWABLE_LANGUAGES:
         return base
     return "ur" if base in RTL_LANGUAGES else "en"
+
+
+def share_language(language: str | None) -> str:
+    """The language the whole map message uses, so the picture and the line that comes with it
+    never mix scripts: a language the picture cannot be drawn in (Hindi has no bundled font yet)
+    gets English for both."""
+    return _lang(language)
 
 
 # --- numbers and personal data ------------------------------------------------------------------
@@ -442,6 +566,8 @@ class Node:
     category: str
     is_new: bool
     resolved: bool
+    stale: bool = False  # untouched for 90 days: "pichli baar ka" until the owner confirms
+    parked: bool = False
 
 
 @dataclass
@@ -494,6 +620,8 @@ def _prepare(map_: dict[str, Any], said: set[str] | None) -> Prepared:
                 category=str(raw.get("category") or "other"),
                 is_new=bool(raw.get("is_new")),
                 resolved=str(raw.get("status") or "") == "resolved",
+                stale=bool(raw.get("stale")),
+                parked=str(raw.get("status") or "") == "parked",
             )
         )
     links: list[Link] = []
@@ -1021,10 +1149,11 @@ def _card(
     rtl = canvas.rtl
     box = [x, y, x + CARD_W, y + CARD_H]
     canvas.draw.rounded_rectangle(box, radius=14, fill=CARD, outline=(203, 213, 225), width=2)
-    bar = RESOLVED_BAR if node.resolved else hue_of(node.category, hues)
+    quiet = node.resolved or node.parked
+    bar = RESOLVED_BAR if quiet else hue_of(node.category, hues)
     bar_x = x + CARD_W - 14 if rtl else x
     canvas.draw.rounded_rectangle([bar_x, y, bar_x + 14, y + CARD_H], radius=7, fill=bar)
-    ink = MUTED if node.resolved else INK
+    ink = MUTED if quiet else INK
     inner = CARD_W - 14 - 2 * 18
     tx = x + CARD_W - 32 if rtl else x + 32
     anchor = "ra" if rtl else "la"
@@ -1038,9 +1167,10 @@ def _card(
         for line in canvas.wrap(text, MIN_TEXT_PX, inner, MAX_FACT_LINES):
             canvas.text((tx, ty), line, MIN_TEXT_PX, MUTED, width=inner, anchor=anchor)
             ty += 30
-    if node.is_new:
-        w = int(canvas.width_of(words["new"], MIN_TEXT_PX)) + 24
-        _tag(canvas, x + 12 + w if rtl else x + CARD_W - w - 12, y - 17, words["new"])
+    tag = words["new"] if node.is_new else (words["stale"] if node.stale else "")
+    if tag:
+        w = int(canvas.width_of(tag, MIN_TEXT_PX)) + 24
+        _tag(canvas, x + 12 + w if rtl else x + CARD_W - w - 12, y - 17, tag)
 
 
 def _edge_points(
@@ -1166,6 +1296,8 @@ def _alt(nodes: list[Node], links: list[Link], words: dict[str, Any]) -> list[st
             line += ": " + "; ".join(node.facts[:MAX_FACT_LINES])
         if node.is_new:
             line += f" ({words['new']})"
+        elif node.stale:
+            line += f" ({words['stale']})"
         out.append(line)
     for link in links:
         if link.a in label and link.b in label:
@@ -1302,7 +1434,8 @@ def text_fallback(
     rtl = is_rtl(language)
     arrow = "←" if rtl else "→"
     prep = _prepare(map_, said)
-    name = {n.id: n.label for n in prep.nodes}
+    stale = f" ({words['stale']})"
+    name = {n.id: n.label + (stale if n.stale else "") for n in prep.nodes}
     solid = {(lk.a, lk.b): lk.solid for lk in prep.links}
     # cause first: a symptom_of link points at the cause, so flip it
     edges: list[tuple[str, str]] = []
@@ -1338,7 +1471,7 @@ def text_fallback(
             if guess:
                 line += f" {words.get('guess_note', TEXT['en']['guess_note'])}"
             lines.append(line)
-    alone = [n.label for n in prep.nodes if n.id not in linked]
+    alone = [name[n.id] for n in prep.nodes if n.id not in linked]
     out = [str(words["header"]), ""]
     out.append(
         str(words["summary"]).format(

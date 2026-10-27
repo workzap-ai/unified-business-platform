@@ -132,7 +132,7 @@ async def test_g2_after_a_declined_offer_two_more_ideas_for_a_new_problem_only(
     conversation.flow_state = "S4_SORTED_SUMMARY"
     conversation.service_brief = {
         "declines": 1,
-        "ideas_given": 4,
+        "ideas_given": 8,
         "ideas_problems": [first["id"]],
     }
     again = await solution_context.build(
@@ -144,7 +144,7 @@ async def test_g2_after_a_declined_offer_two_more_ideas_for_a_new_problem_only(
     )
     assert 1 <= len(fresh["solution_ideas"]) <= 2
     after = conversation.service_brief
-    assert after["ideas_at_decline"] == 4 and after["ideas_given"] == 4 + len(
+    assert after["ideas_at_decline"] == 8 and after["ideas_given"] == 8 + len(
         fresh["solution_ideas"]
     )
     more = await solution_context.build(

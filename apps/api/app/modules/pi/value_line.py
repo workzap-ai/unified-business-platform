@@ -10,7 +10,8 @@ import re
 
 IDEAS_PER_MESSAGE = 2  # R-VAL-01: two ideas per message, two per problem, never a third
 IDEAS_PER_PROBLEM = 2
-IDEAS_BEFORE_OFFER = 4  # R-VAL-02: four free ideas per conversation before the offer
+# R-VAL-02 (Book 5 decision 5): two ideas per problem, up to eight per business before the box offer
+IDEAS_BEFORE_OFFER = 8
 IDEAS_AFTER_DECLINE = 2  # at most two more, and only for a new problem
 IDEA_MAX_WORDS = 25  # R-VAL-03: one line each, "about" 25 words
 IDEA_WORD_SLACK = 5  # "about": a line of up to 30 words is still a line

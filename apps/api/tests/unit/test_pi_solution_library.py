@@ -47,8 +47,12 @@ def test_an_unknown_industry_with_a_noted_problem_gets_two_ideas_and_the_build_l
     assert chat.service_brief["ideas_given"] == 2
     again = solution_context._from_library(chat, noted, "en")
     assert again is not None and not set(out["solution_ideas"]) & set(again["solution_ideas"])
+    for _ in range(4):  # the budget is eight (Book 5 decision 5), two per message
+        if solution_context._from_library(chat, noted, "en") is None:
+            break
     spent = solution_context._from_library(chat, noted, "en")
-    assert spent is None  # the chat's idea budget is used up: the honest line follows
+    assert spent is None  # the budget or the library is used up: the honest line follows
+    assert 4 <= chat.service_brief["ideas_given"] <= 8
 
 
 def test_a_category_without_library_ideas_degrades_to_the_honest_line() -> None:

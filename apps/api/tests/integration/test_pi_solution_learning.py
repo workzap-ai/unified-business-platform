@@ -414,8 +414,8 @@ async def test_sl11_ideas_reach_the_prompt_only_when_switched_on_sorted_and_with
     )
     assert 1 <= len(got["solution_ideas"]) <= value_line.IDEAS_PER_MESSAGE
     assert used["ideas"] and used["industry"] == industry
-    # four ideas already given in this chat: no more before the offer
-    conversation.service_brief = {"learning_used": [{"ideas": ["a", "b"]}, {"ideas": ["c", "d"]}]}
+    # eight ideas already given in this chat: no more before the offer (Book 5 decision 5)
+    conversation.service_brief = {"ideas_given": value_line.IDEAS_BEFORE_OFFER}
     none = await solution_context.build(
         business_db, scope, conversation, "stock runs out", noted, {}
     )

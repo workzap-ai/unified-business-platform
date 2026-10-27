@@ -13,7 +13,7 @@ template; "stop" ends everything (the caller checks `opted_out`).
 from dataclasses import dataclass
 from datetime import datetime, timedelta
 
-from app.modules.pi import brain_config, flow
+from app.modules.pi import brain_config, flow, map_share
 
 S = flow.State
 
@@ -45,6 +45,11 @@ MESSAGES: dict[str, dict[str, str]] = {
             "to poochh lein."
         ),
     },
+    # Decision 6 (Book 5, 6.3): value first, mentions the map, no pressure, never the Solution Box.
+    "map": {
+        "en": map_share.FOLLOWUP["en"],
+        "roman_ur": map_share.FOLLOWUP["roman_ur"],
+    },
     "kickoff_24h": {
         "en": "Reminder: your Workzap kickoff is {when}.",
         "roman_ur": "Yaad dehani: aap ka Workzap kickoff {when} ko hai.",
@@ -69,6 +74,9 @@ class Chat:
     kickoff_at: datetime | None = None
     opted_out: bool = False
     noted_problems: int = 0
+    has_map: bool = False  # a problem map has been saved for this customer
+    map_sent: int = 0  # map follow-ups since the owner last wrote
+    map_total: int = 0  # map follow-ups in all
 
 
 @dataclass(frozen=True)
@@ -120,6 +128,40 @@ def next_followup(
         return None
     soonest = min(options, key=lambda due: due.at)
     return soonest if (now is None or soonest.at <= now) else None
+
+
+# Where a quiet owner may get a map follow-up: the listening states and the map states. Not after a
+# decline, not while a quote or a project is in progress (their own follow-ups cover those), not
+# in an exception state (a person has the chat, an emergency, "pause", a block).
+MAP_STATES = frozenset(
+    {
+        S.S1_LISTENING,
+        S.S2_CLARIFYING,
+        S.S3_NOTED,
+        S.S4_SORTED_SUMMARY,
+        S.S_LISTEN_THINK,
+        S.S_MAP_SHARE,
+        S.S_RETURN,
+    }
+)
+
+
+def next_map_followup(chat: Chat, now: datetime | None = None) -> Due | None:
+    """The next quiet-owner map follow-up (decision 6): a small number, spaced out, then stop. At
+    3 and 10 days after the owner's last message, at most four over the life of the chat; always
+    past the 24-hour window, so only an approved template can carry it (the sender checks the
+    template and the owner's reminder consent). Nothing when they opted out."""
+    if chat.opted_out or not chat.has_map or chat.state not in MAP_STATES:
+        return None
+    if (
+        chat.map_sent >= len(map_share.FOLLOWUP_DAYS)
+        or chat.map_total >= map_share.FOLLOWUP_LIFETIME
+    ):
+        return None
+    at = chat.last_inbound_at + timedelta(days=map_share.FOLLOWUP_DAYS[chat.map_sent])
+    if now is not None and at > now:
+        return None
+    return Due("map", at, _template(at, chat))
 
 
 def text_for(kind: str, language: str | None, *, n: int = 0, when: str = "") -> str:

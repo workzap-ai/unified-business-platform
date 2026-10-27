@@ -14,6 +14,7 @@ problems stay, greyed; parked ones stay too. Withdrawn and merged problems are n
 import hashlib
 import json
 from dataclasses import dataclass
+from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 from typing import Any
 from uuid import UUID
@@ -31,9 +32,12 @@ from app.shared.workspace_repository import WorkspaceRepository
 MAX_LABEL_WORDS = 6
 MAX_FACTS = 3
 LINK_MIN = Decimal("0.5")  # a pi_inferred link under this confidence is not drawn
-PARKED_TAG = "parked"
-# Statuses drawn on the map: everything in play, plus resolved (greyed, part of the story).
-DRAWN = (*taxonomy.ACTIVE, "resolved")
+PARKED_TAG = "parked"  # the older way (before migration 0048); still read, never written
+PARKED = "parked"  # the status of a problem the owner said to leave (Book 5, 4.5)
+STALE_AFTER = timedelta(days=90)  # Book 5, 6.4: "pichli baar ka" until the owner confirms
+# Statuses drawn on the map: everything in play, plus parked and resolved (greyed, part of the
+# story).
+DRAWN = (*taxonomy.ACTIVE, PARKED, "resolved")
 # Link types the map knows (spec 4.2); the older suspicion type is a dashed same_root.
 _TYPE_OF = {
     "causes": "causes",
@@ -155,6 +159,20 @@ def clusters_of(nodes: list[dict[str, Any]], links: list[dict[str, Any]]) -> lis
     return out
 
 
+def is_stale(problem: Any, now: datetime) -> bool:
+    """Untouched for 90 days (any edit, mention or confirmation bumps `updated_at`)."""
+    touched = getattr(problem, "updated_at", None)
+    if not isinstance(touched, datetime):
+        return False
+    if touched.tzinfo is None:
+        touched = touched.replace(tzinfo=UTC)
+    return now - touched >= STALE_AFTER
+
+
+def stale_ids(map_: dict[str, Any]) -> list[str]:
+    return [n["id"] for n in map_.get("nodes") or [] if n.get("stale")]
+
+
 def content_hash(map_: dict[str, Any]) -> str:
     """Hash of what the owner sees, apart from the version number, the 'new' tags (they depend on
     the version before) and the hash itself."""
@@ -174,9 +192,12 @@ def build_map(
     version: int = 1,
     previous: dict[str, Any] | None = None,
     link_min: Decimal = LINK_MIN,
+    now: datetime | None = None,
 ) -> dict[str, Any]:
     """The map dict for `map_render.render_map`, plus `hash` (see `content_hash`). `previous` is
-    the map of the version before: a problem not in it is new."""
+    the map of the version before: a problem not in it is new. An open or parked problem nobody
+    touched for 90 days carries `stale` (drawn "pichli baar ka") until the owner confirms it."""
+    now = now or datetime.now(UTC)
     rows = sorted(
         (p for p in problems if str(p.status) in DRAWN and p.merged_into is None),
         key=lambda p: p.number,
@@ -187,7 +208,7 @@ def build_map(
     for p in rows:
         number[p.id] = p.number
         status = "resolved" if str(p.status) == "resolved" else "open"
-        if status == "open" and PARKED_TAG in (p.tags or []):
+        if status == "open" and (str(p.status) == PARKED or PARKED_TAG in (p.tags or [])):
             status = "parked"
         node: dict[str, Any] = {
             "id": node_id(p.number),
@@ -197,6 +218,8 @@ def build_map(
             "status": status,
             "is_new": previous is not None and node_id(p.number) not in before,
         }
+        if status != "resolved" and is_stale(p, now):
+            node["stale"] = True
         if (rank := box_signals.rank_of(p.tags)) is not None:
             node["rank"] = rank  # the owner's own order (B4), shown on the page, only when set
         nodes.append(node)
@@ -322,6 +345,45 @@ async def versions(
     )
 
 
+# --- where the owner saw the nodes (stored so the next version keeps them there) --------------
+
+
+def slots_of(raw: Any) -> dict[str, tuple[int, int]]:
+    """Stored positions ({node id: [row, column]}) as slots; anything malformed is left out."""
+    out: dict[str, tuple[int, int]] = {}
+    for key, value in (raw or {}).items() if isinstance(raw, dict) else []:
+        if isinstance(value, list | tuple) and len(value) == 2:
+            try:
+                out[str(key)] = (int(value[0]), int(value[1]))
+            except (TypeError, ValueError):
+                continue
+    return out
+
+
+async def previous_positions(
+    session: AsyncSession, scope: WorkspaceScope, customer_id: UUID, version: int
+) -> dict[str, tuple[int, int]] | None:
+    """The positions of the nearest earlier version that has any (None for the first map)."""
+    rows = await session.scalars(
+        WorkspaceRepository(session, PiMapVersion, scope)
+        .select()
+        .where(PiMapVersion.customer_id == customer_id, PiMapVersion.version < version)
+        .order_by(PiMapVersion.version.desc())
+        .limit(5)
+    )
+    for row in rows:
+        found = slots_of(row.positions)
+        if found:
+            return found
+    return None
+
+
+def remember_positions(row: PiMapVersion, positions: dict[str, tuple[int, int]]) -> None:
+    """Keep where this version drew the nodes (once: what the owner saw does not move)."""
+    if positions and not row.positions:
+        row.positions = {k: [v[0], v[1]] for k, v in positions.items()}
+
+
 # --- when pi shares the map (spec 4.4) ---------------------------------------------------------
 
 
@@ -345,6 +407,8 @@ class ShareFacts:
     openness: int = 1  # 0 is closed (spec 2)
     asked: bool = False  # "naqsha dikhao"
     at_offer: bool = False  # the set check-in before the Solution Box offer
+    returning: bool = False  # the owner is back after a day or more (Part 6)
+    changed_since_share: bool = True  # the latest version is not the one they last saw
 
 
 def share_due(facts: ShareFacts) -> tuple[bool, str]:
@@ -357,7 +421,10 @@ def share_due(facts: ShareFacts) -> tuple[bool, str]:
     if facts.asked:
         return True, "asked"
     if facts.at_offer:
-        return True, "offer"
+        # the set check-in: shown once, so a map the owner has just seen is not sent again
+        return (True, "offer") if facts.changed_since_share else (False, "offer_seen")
+    if facts.returning:
+        return True, "return"  # Part 6: they are back, the map is the memory
     if facts.hurried:
         return False, "hurried"
     since = facts.pi_messages_since_share

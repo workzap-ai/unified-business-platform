@@ -56,6 +56,10 @@ def confirms_or_changes_map(message: str) -> bool:
     said = " ".join((message or "").split())
     if not said:
         return False
+    from app.modules.pi import map_share
+
+    if said.casefold() in map_share.CONFIRM_TITLES:
+        return True
     if decisions.summary_ok(said):
         return True
     answer, sure = decisions.classify(said)

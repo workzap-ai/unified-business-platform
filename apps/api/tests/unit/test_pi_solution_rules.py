@@ -106,7 +106,7 @@ def test_no_setting_of_the_value_line_may_be_learned():
     for setting in ("ideas_per_message", "ideas_before_offer", "idea_max_words", "value_line"):
         assert not value_line.may_learn(setting)
     assert value_line.may_learn("question_arms")
-    assert value_line.IDEAS_PER_MESSAGE == 2 and value_line.IDEAS_BEFORE_OFFER == 4
+    assert value_line.IDEAS_PER_MESSAGE == 2 and value_line.IDEAS_BEFORE_OFFER == 8
     assert MIN_LIVE_IDEAS > value_line.IDEAS_PER_MESSAGE
 
 

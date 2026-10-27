@@ -8,6 +8,7 @@ anywhere: the box card says whether a document is approved or sent, never what i
 """
 
 import re
+from datetime import UTC, datetime
 from typing import Annotated, Any, Literal
 from uuid import UUID
 
@@ -17,7 +18,7 @@ from sqlalchemy import select
 
 from app.core.rate_limit import hit
 from app.modules.access.dependencies import Session
-from app.modules.pi import box, box_signals, map_builder
+from app.modules.pi import box, box_signals, map_builder, map_share
 from app.modules.pi.box_models import PiMapVersion, PiSolutionBox
 from app.modules.pi.brain_docs_models import PiBrainDocument
 from app.modules.pi.models import PiConversation
@@ -36,7 +37,7 @@ MAX_LABEL = 60
 
 class ProblemEdit(BaseModel):
     model_config = ConfigDict(extra="forbid")
-    action: Literal["resolve", "park", "reopen", "rename", "rank", "unrank"]
+    action: Literal["resolve", "park", "reopen", "rename", "rank", "unrank", "confirm"]
     label: str = Field(default="", max_length=MAX_LABEL * 2)
     # "rank": where this problem comes in the owner's own order, 1 is where to start (B4)
     priority: int | None = Field(default=None, ge=1, le=box_signals.MAX_RANK)
@@ -190,15 +191,18 @@ async def _apply(
         problem.status = "resolved"
         reason = "resolved"
     elif body.action == "park":
-        if map_builder.PARKED_TAG in tags:
+        if problem.status in (map_builder.PARKED, "resolved"):
             return False
-        diff = {"tags": [tags, [*tags, map_builder.PARKED_TAG]]}
-        problem.tags = [*tags, map_builder.PARKED_TAG]
+        diff = {"status": [problem.status, map_builder.PARKED]}
+        problem.status = map_builder.PARKED  # a real status (migration 0048), not a tag
+        if map_builder.PARKED_TAG in tags:  # a leftover of the older way
+            problem.tags = [t for t in tags if t != map_builder.PARKED_TAG]
+            diff["tags"] = [tags, problem.tags]
         reason = "parked"
     elif body.action == "reopen":
         diff = {}
-        if problem.status == "resolved":
-            diff["status"] = ["resolved", "confirmed"]
+        if problem.status in ("resolved", map_builder.PARKED):
+            diff["status"] = [problem.status, "confirmed"]
             problem.status = "confirmed"
         if map_builder.PARKED_TAG in tags:
             kept = [t for t in tags if t != map_builder.PARKED_TAG]
@@ -207,6 +211,13 @@ async def _apply(
         if not diff:
             return False
         reason = "reopened"
+    elif body.action == "confirm":
+        # "Still true" (Book 5, 6.4): the owner confirms an old node, so it is no longer shown
+        # as "pichli baar ka". Any edit touches it; this is the one that changes nothing else.
+        if problem.status == "resolved" or not map_builder.is_stale(problem, datetime.now(UTC)):
+            return False
+        diff = {"confirmed": True}
+        reason = "confirmed"
     elif body.action in ("rank", "unrank"):
         wanted = body.priority if body.action == "rank" else None
         if body.action == "rank" and wanted is None:
@@ -248,6 +259,21 @@ async def _mark_reviewed(
     conversation.service_brief = brief
 
 
+async def _note_change(
+    session: Any, scope: WorkspaceScope, conversation: PiConversation, problem: PiProblem
+) -> None:
+    """With map_share on, remember that the owner changed their map here, so pi can say in one
+    short line in WhatsApp what it saw (quiet hours and the 24-hour window are kept by the sweep
+    that sends it, see brain_followups)."""
+    from app.modules.pi.configuration import settings_row
+
+    if not map_builder.share_enabled((await settings_row(session, scope)).response_rules):
+        return
+    conversation.service_brief = map_share.note_dashboard_change(
+        dict(conversation.service_brief or {}), map_builder.label_of(problem), datetime.now(UTC)
+    )
+
+
 @router.post("/conversations/{conversation_id}/map/problems/{node}")
 async def edit_problem(
     conversation_id: UUID,
@@ -282,6 +308,7 @@ async def edit_problem(
     changed = await _apply(session, scope, problem, body)
     if changed:
         await _mark_reviewed(session, scope, conversation, ranked=body.action == "rank")
+        await _note_change(session, scope, conversation, problem)
     await session.flush()
     await map_builder.save_if_changed(session, scope, conversation.customer_id)
     await session.commit()

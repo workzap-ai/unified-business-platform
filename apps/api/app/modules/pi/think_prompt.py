@@ -21,6 +21,17 @@ def enabled(response_rules: dict[str, Any] | None) -> bool:
     return ((response_rules or {}).get("brain") or {}).get(THINKING_FLAG) is True
 
 
+MOVE_KEYS_TEXT = ", ".join(m.value for m in moves.Move)
+
+# What the output field move_plan holds (added to the prompt with the block, never otherwise).
+PLAN_FIELD_HINT = (
+    "Output field move_plan (fill it right after plan; internal, English, never shown): "
+    f"move = one move key from [{MOVE_KEYS_TEXT}]; reason = one short line, why this move now; "
+    "asks_question = true only when the reply ends in a question, and it must match the reply; "
+    "hypothesis = {action: none | add | against | drop, text, confidence, evidence, test}, usually "
+    "none. Never mark a hypothesis confirmed: only the owner confirms."
+)
+
 MOVE_LINES = "\n".join(f"- {m.value}: {moves.INFO[m].does}" for m in moves.Move)
 
 BLOCK = f"""
@@ -74,16 +85,53 @@ def _customer_messages(context: dict[str, Any]) -> list[str]:
     return said
 
 
+def recent_turns(context: dict[str, Any]) -> list[moves.Turn]:
+    """pi's earlier messages as the variety rules read them. Only messages whose move is known
+    (history key `move`, fed from pi_move_log) count; the rest are skipped."""
+    out: list[moves.Turn] = []
+    for h in context.get("history") or []:
+        if h.get("role") != "ai":
+            continue
+        move = moves.parse_move(h.get("move"))
+        if move is None:
+            continue
+        text = str(h.get("text", ""))
+        out.append(
+            moves.Turn(move, think_lint.ends_in_question(text), think_lint.adds_something(text))
+        )
+    return out[-moves.WINDOW :]
+
+
+def suggested(context: dict[str, Any]) -> moves.Choice | None:
+    """The move the rules suggest for the next message (None: no owner words yet)."""
+    texts = _customer_messages(context)
+    if not texts:
+        return None
+    state = dials_mod.estimate(texts)
+    latest = dials_mod.read_signals(texts[-1], first_message=len(texts) == 1)
+    figures = any(think_lint.NUMBER.search(t) for t in texts)
+    latest_gave = bool(think_lint.NUMBER.search(texts[-1]) or think_lint.HALF.search(texts[-1]))
+    fresh = latest_gave and any(think_lint.NUMBER.search(t) for t in texts[:-1])
+    return moves.choose(
+        moves.Situation(
+            dials=state,
+            recent=recent_turns(context),
+            heavy=any(r in latest.reasons for r in ("sensitive", "feeling")),
+            upset="feeling" in latest.reasons,
+            corrected=latest.correction,
+            has_number=figures,
+            fresh_number=fresh,
+            ideas_asked=latest.mode == dials_mod.Mode.FIX and "fix" in latest.reasons,
+        )
+    )
+
+
 def situation_note(context: dict[str, Any]) -> str:
     """This conversation's dials and the move the rules suggest, as lines for the prompt."""
     texts = _customer_messages(context)
     if not texts:
         return ""
     state = dials_mod.estimate(texts)
-    latest = dials_mod.read_signals(texts[-1], first_message=len(texts) == 1)
-    figures = any(think_lint.NUMBER.search(t) for t in texts)
-    latest_gave = bool(think_lint.NUMBER.search(texts[-1]) or think_lint.HALF.search(texts[-1]))
-    fresh = latest_gave and any(think_lint.NUMBER.search(t) for t in texts[:-1])
     ai_texts = [
         str(h.get("text", "")) for h in context.get("history") or [] if h.get("role") == "ai"
     ]
@@ -93,17 +141,8 @@ def situation_note(context: dict[str, Any]) -> str:
     question_only = bool(ai_texts) and (
         think_lint.ends_in_question(ai_texts[-1]) and not think_lint.adds_something(ai_texts[-1])
     )
-    choice = moves.choose(
-        moves.Situation(
-            dials=state,
-            heavy=any(r in latest.reasons for r in ("sensitive", "feeling")),
-            upset="feeling" in latest.reasons,
-            corrected=latest.correction,
-            has_number=figures,
-            fresh_number=fresh,
-            ideas_asked=latest.mode == dials_mod.Mode.FIX and "fix" in latest.reasons,
-        )
-    )
+    choice = suggested(context)
+    assert choice is not None
     lines = [
         "Dials for this conversation (an estimate from their words, not a fact about them): "
         f"openness {state.openness} of {dials_mod.OPENNESS_MAX}, pace {state.pace.name.lower()}, "
@@ -116,6 +155,9 @@ def situation_note(context: dict[str, Any]) -> str:
         lines.append("Your last two messages ended in a question: this one carries no question.")
     if question_only:
         lines.append("Your last message was only a question: this one must give something first.")
+    recent = [t.move.value for t in recent_turns(context)]
+    if recent:
+        lines.append("Your last moves, oldest first: " + ", ".join(recent) + ".")
     return "\n".join(lines)
 
 
@@ -124,4 +166,4 @@ def block(context: dict[str, Any]) -> str:
     if not context.get(THINKING_FLAG):
         return ""
     note = situation_note(context)
-    return BLOCK + ("\n" + note if note else "")
+    return BLOCK + "\n" + PLAN_FIELD_HINT + ("\n" + note if note else "")

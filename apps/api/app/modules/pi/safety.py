@@ -1342,9 +1342,9 @@ def advice_reply(kind: Advice, language: str | None) -> str:
 
 # R-DISC-04 (spec 6.6): when a person hands the chat back, pi says who it is again, once.
 HANDBACK_TEXT = {
-    "en": "Thanks. I'm pi again, the AI from Workzap. Shall we carry on?",
-    "roman_ur": "Shukriya. Main phir se pi hoon, Workzap ka AI. Kya baat jari rakhein?",
-    "ar": "شكرًا. أنا pi مرة أخرى، الذكاء الاصطناعي من Workzap. هل نواصل؟",
+    "en": "I'm pi again, the AI from Workzap. Where would you like to carry on?",
+    "roman_ur": "Main phir se pi hoon, Workzap ka AI. Aap kahan se baat jari rakhna chahenge?",
+    "ar": "أنا pi مرة أخرى، الذكاء الاصطناعي من Workzap. من أين تريد أن نواصل؟",
 }
 
 

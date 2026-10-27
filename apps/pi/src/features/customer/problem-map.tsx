@@ -49,6 +49,8 @@ const WORDS = {
     ur: "Jab pi chat mein kuch masle note kar lega, naqsha yahan nazar aaye ga.",
   },
   newTag: { en: "New", ur: "Naya" },
+  staleTag: { en: "From last time", ur: "Pichli baar ka" },
+  stillTrue: { en: "Still true", ur: "Ab bhi sahi hai" },
   guess: { en: "pi's guess", ur: "pi ka andaza" },
   said: { en: "You said", ur: "Aap ne bataya" },
   list: { en: "List", ur: "List" },
@@ -307,24 +309,28 @@ function MapPicture({
                   {line}
                 </text>
               ))}
-              {node.is_new && (
+              {(node.is_new || node.stale) && (
                 <g>
                   <rect
-                    x={rtl ? x + 6 : x + CARD_W - 52}
+                    x={rtl ? x + 6 : x + CARD_W - (node.is_new ? 52 : 100)}
                     y={y - 9}
-                    width={46}
+                    width={node.is_new ? 46 : 94}
                     height={18}
                     rx={9}
                     fill="#fbbf24"
                   />
                   <text
-                    x={rtl ? x + 29 : x + CARD_W - 29}
+                    x={
+                      rtl
+                        ? x + (node.is_new ? 29 : 53)
+                        : x + CARD_W - (node.is_new ? 29 : 53)
+                    }
                     y={y + 4}
                     textAnchor="middle"
                     className="text-[11px] font-semibold"
                     fill="#1f2933"
                   >
-                    {t("newTag", lang)}
+                    {node.is_new ? t("newTag", lang) : t("staleTag", lang)}
                   </text>
                 </g>
               )}
@@ -417,6 +423,9 @@ function MapList({
                       <span className="font-medium">{n.label}</span>
                       {n.is_new && (
                         <Badge tone="warning">{t("newTag", lang)}</Badge>
+                      )}
+                      {!n.is_new && n.stale && (
+                        <Badge tone="warning">{t("staleTag", lang)}</Badge>
                       )}
                       {n.status === "resolved" && (
                         <Badge tone="success">{t("resolved", lang)}</Badge>
@@ -541,6 +550,17 @@ function Editor({
             >
               <RotateCcw className="size-4" aria-hidden />
               {t("reopen", lang)}
+            </Button>
+          )}
+          {node.stale && node.status !== "resolved" && (
+            <Button
+              variant="secondary"
+              size="sm"
+              disabled={busy}
+              onClick={() => onEdit("confirm")}
+            >
+              <Check className="size-4" aria-hidden />
+              {t("stillTrue", lang)}
             </Button>
           )}
           {node.status === "open" && node.rank !== 1 && (

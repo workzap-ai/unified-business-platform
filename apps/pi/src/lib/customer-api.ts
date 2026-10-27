@@ -314,6 +314,8 @@ export type MapNodeData = {
   category: string;
   status: "open" | "parked" | "resolved";
   is_new: boolean;
+  /** Untouched for 90 days: shown "from last time" until the owner confirms it is still true. */
+  stale?: boolean;
   /** The owner's own order, 1 is where to start; absent until they set one. */
   rank?: number;
 };
@@ -353,7 +355,7 @@ export type ProblemMapPayload = {
   versions: MapVersionSummary[];
 };
 export type MapEditAction =
-  "resolve" | "park" | "reopen" | "rename" | "rank" | "unrank";
+  "resolve" | "park" | "reopen" | "rename" | "rank" | "unrank" | "confirm";
 
 /** Where the Solution Box stands. Never carries an amount. */
 export type SolutionBoxStatus = {

@@ -90,9 +90,10 @@ OTHER = "other"
 
 STATUSES = (
     "draft", "confirmed", "corrected", "merged", "split",
-    "in_document", "quoted", "in_build", "resolved", "withdrawn",
+    "in_document", "quoted", "in_build", "resolved", "withdrawn", "parked",
 )  # fmt: skip
-# Problems still in play: shown in summaries and counted in groups.
+# Problems still in play: shown in summaries and counted in groups. A parked problem (the owner
+# said to leave it, Book 5 4.5) is not: it stays on the map, greyed, and can be reopened.
 ACTIVE = ("draft", "confirmed", "corrected", "in_document", "quoted", "in_build")
 SEVERITIES = ("low", "medium", "high", "critical", "unknown")
 FREQUENCIES = ("daily", "weekly", "monthly", "seasonal", "once", "unknown")

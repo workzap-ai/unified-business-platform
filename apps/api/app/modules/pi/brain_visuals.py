@@ -74,6 +74,9 @@ TEXT: dict[str, dict[str, Any]] = {
 }
 
 
+MAX_MAP_PARTS = 8  # a map picture is the overview and at most seven cluster pictures
+
+
 def supported(language: str | None) -> bool:
     return (language or "en") in LANGUAGES
 
@@ -92,6 +95,7 @@ def token(
     language: str,
     step: int = 0,
     version: int = 0,
+    part: int = 0,
 ) -> str:
     data = json.dumps(
         {
@@ -100,6 +104,7 @@ def token(
             "l": language,
             "s": step,
             "v": version,
+            "n": part,
             "e": int(time.time()) + VISUAL_SECONDS,
         },
         separators=(",", ":"),
@@ -126,6 +131,7 @@ def read(settings: Settings, value: str) -> dict[str, Any] | None:
             "language": language if language in allowed else "en",
             "step": max(0, min(3, int(claims.get("s") or 0))),
             "version": max(0, int(claims.get("v") or 0)),
+            "part": max(0, min(MAX_MAP_PARTS - 1, int(claims.get("n") or 0))),
         }
     except (ValueError, KeyError, TypeError):
         return None

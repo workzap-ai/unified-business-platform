@@ -72,10 +72,10 @@ def test_the_conversation_budget_is_soft_and_a_referral_is_exempt():
         "1. Give each ad a code, to see which works.\n2. Ask who sent them, to learn why."
         + WITH_LINE
     )
-    assert "R-VAL-02" in rules(two, ideas_given=3)
-    assert "R-VAL-02" not in rules(two, ideas_given=2)
-    assert "R-VAL-02" not in rules(two, ideas_given=3, state="S5b_DECLINED")
-    assert "R-VAL-02" not in hard_rules(two, ideas_given=3)
+    assert "R-VAL-02" in rules(two, ideas_given=7)
+    assert "R-VAL-02" not in rules(two, ideas_given=6)
+    assert "R-VAL-02" not in rules(two, ideas_given=7, state="S5b_DECLINED")
+    assert "R-VAL-02" not in hard_rules(two, ideas_given=7)
 
 
 def test_ideas_that_lead_nowhere_are_soft():

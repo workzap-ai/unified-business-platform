@@ -1591,6 +1591,17 @@ async def process_pi_event(ctx: dict[str, Any], event_id: str) -> None:
                 sent = await agent_ctx.tool(reply_agent, "send_whatsapp_message", {"body": text})
                 if sent.ok and sent.data is not None:
                     outbound.append(str(sent.data["message_id"]))
+                    if service_turn is not None and (service_context or {}).get("thinking"):
+                        from app.modules.pi import think_plan
+
+                        await think_plan.record_sent(
+                            session,
+                            scope,
+                            conversation.id,
+                            UUID(str(sent.data["message_id"])),
+                            service_turn,
+                            text,
+                        )
                     if service_turn is not None and service_turn.request_human:
                         # This is the handoff acknowledgement, allowed after mode changes.
                         notice_message = await service.messages.get(UUID(sent.data["message_id"]))
@@ -1726,20 +1737,26 @@ async def process_pi_event(ctx: dict[str, Any], event_id: str) -> None:
         from app.modules.pi.buttons import add_consent_buttons
 
         await add_consent_buttons(session, scope, outbound)
-        if service_turn is not None and (
-            getattr(service_turn, "_summary", False) or getattr(service_turn, "_board", False)
+        from app.modules.pi import map_builder
+        from app.modules.pi import problems as problem_notes
+
+        map_on = service_turn is not None and map_builder.share_enabled(policy.response_rules)
+        # Never two pictures in one turn: asked for the map, the map goes and not the board.
+        if (
+            service_turn is not None
+            and (getattr(service_turn, "_summary", False) or getattr(service_turn, "_board", False))
+            and not (map_on and problem_notes.asks_for_map(message.body))
         ):
             from app.modules.pi import brain_visual_queue
 
             outbound = await brain_visual_queue.attach_board(
                 session, scope, ctx["settings"], conversation, outbound, service_turn.language
             )
-        from app.modules.pi import map_builder
-
-        if service_turn is not None and map_builder.share_enabled(policy.response_rules):
+        if service_turn is not None and map_on:
             # Book 5 (4.4): the problem map as a picture when it is due; off unless map_share.
             from app.modules.pi import box, brain_visual_queue, problems
 
+            made = getattr(service_turn, "_decision", None)
             outbound = await brain_visual_queue.attach_map(
                 session,
                 scope,
@@ -1748,7 +1765,9 @@ async def process_pi_event(ctx: dict[str, Any], event_id: str) -> None:
                 outbound,
                 service_turn.language,
                 asked=problems.asks_for_map(message.body),
+                at_offer=bool(made is not None and made.brief.get("offer_asked")),
                 await_review=box.box_offer_enabled(policy.response_rules),
+                inbound=message,
             )
         # A form Pi decided to send in this turn goes out with the reply.
         forms = await session.scalars(

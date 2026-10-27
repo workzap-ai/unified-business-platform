@@ -12,7 +12,7 @@ from decimal import Decimal
 from typing import Any, Literal
 from uuid import UUID
 
-from pydantic import BaseModel, ConfigDict, Field, PrivateAttr, model_validator
+from pydantic import BaseModel, ConfigDict, Field, PrivateAttr, field_validator, model_validator
 from sqlalchemy import delete, select
 from sqlalchemy.exc import DBAPIError
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -41,6 +41,8 @@ from app.modules.pi import (
     industry_packs,
     latency,
     learning_context,
+    map_builder,
+    map_share,
     memory_block,
     open_requests,
     price_policy,
@@ -58,6 +60,7 @@ from app.modules.pi import (
     spec_handbook,
     style,
     taxonomy,
+    think_plan,
     think_prompt,
 )
 from app.modules.pi import (
@@ -435,6 +438,19 @@ class ServiceTurn(BaseModel):
         refs = data.get("include_refs")
         data["include_refs"] = [str(r)[:16] for r in refs[:40]] if isinstance(refs, list) else []
         return data
+
+
+class ThinkingServiceTurn(ServiceTurn):
+    """The brain turn when `response_rules.brain.thinking` is on (Book 5, spec 3.2): the same turn
+    plus the plan of the thinking step. Used only then, so every other workspace keeps the schema
+    it has."""
+
+    move_plan: think_plan.MovePlan = Field(default_factory=think_plan.MovePlan)
+
+    @field_validator("move_plan", mode="before")
+    @classmethod
+    def _tolerate_plan(cls, value: Any) -> Any:
+        return value if isinstance(value, (dict, think_plan.MovePlan)) else {}
 
 
 SYSTEM = """You are pi (always lowercase), a company's AI assistant on WhatsApp. You help
@@ -1350,7 +1366,10 @@ def validate_service_reply(
 
 
 def brain_context(
-    policy: PiSettings, conversation: PiConversation, rows: list[PiMessage]
+    policy: PiSettings,
+    conversation: PiConversation,
+    rows: list[PiMessage],
+    message: PiMessage | None = None,
 ) -> dict[str, Any]:
     """The strict voice flag and, in brain mode, the conversation's flow state for the prompt.
     A chat that has no state yet gets its first one here (S0 until pi has replied)."""
@@ -1371,6 +1390,17 @@ def brain_context(
             )
         if state == flow.State.S7_DELIVERED:  # they reacted to the documents: S7 to S8
             state = flow.advance(state, flow.State.S8_REVIEW)
+            conversation.flow_state = state.value
+            conversation.flow_state_since = datetime.now(UTC)
+        if (
+            state in flow.RETURNABLE
+            and message is not None
+            and map_builder.share_enabled(policy.response_rules)
+            and map_share.returning(rows, message)
+        ):
+            # Book 5, Part 6: they are back after a day or more. This turn is met with continuity
+            # (S_RETURN); the turn's end moves the chat on to listening again.
+            state = flow.advance(state, flow.State.S_RETURN)
             conversation.flow_state = state.value
             conversation.flow_state_since = datetime.now(UTC)
         context["pi_mode"] = "brain"
@@ -3244,6 +3274,12 @@ async def prepare_context(
     )
     # read once, used twice below
     team_notes = await latency.timed("ctx.team_notes", _team_notes(session, scope, conversation.id))
+    # Book 5: the move behind each of pi's earlier messages, only when thinking is on
+    move_of = (
+        await latency.timed("ctx.moves", think_plan.recent_safely(session, scope, conversation.id))
+        if think_prompt.enabled(policy.response_rules)
+        else {}
+    )
     return {
         # First, so its place in the prompt never moves.
         **({"what_i_know": known_block} if known_block else {}),
@@ -3301,6 +3337,7 @@ async def prepare_context(
                 "role": m.sender_type,
                 "kind": m.message_type,
                 "at": f"{m.created_at:%Y-%m-%d %H:%M}",
+                **({"move": move_of[str(m.id)]} if str(m.id) in move_of else {}),
                 "text": (
                     m.body[:1500]
                     + ("\n" + link_note(m.media["links"]) if m.media.get("links") else "")
@@ -3322,7 +3359,7 @@ async def prepare_context(
         "team_notes": team_notes,
         **reply_language(conversation, message, rows, known_language),
         "tone": policy.response_rules.get("tone", "friendly"),
-        **brain_context(policy, conversation, rows),
+        **brain_context(policy, conversation, rows, message),
         "now_local": _now_local(policy.timezone),
         "feedback_for": ((conversation.service_brief or {}).get("awaiting_feedback") or {}).get(
             "project", ""
@@ -3584,6 +3621,15 @@ def reply_language(
             break
         if other := other_script(earlier):
             return {"reply_language_other": other}
+    if (
+        texts
+        and english_greeting(texts[0])
+        and sum(detect_language(t) == "roman_ur" for t in texts[1:6]) < 2
+    ):
+        # "hi", "hello", "good morning" on their own are English unless this chat has already been
+        # in Roman Urdu for a while, whatever language was remembered from elsewhere: otherwise
+        # "hi" answers in Roman Urdu and "hello" in English.
+        return {"reply_language": "en", "reply_language_name": NAMES["en"]}
     detected = [detect_language(t) for t in texts[:3]]
     if texts and AMBIGUOUS_SHORT.match(texts[0]):
         detected[0] = None  # R-LANG-09: "no", "ok", "haan", "theek hai" never switch the language
@@ -4941,11 +4987,12 @@ async def compose_service_turn(
         context_json = json.dumps(context, ensure_ascii=False)
     latency.count("prompt_chars", len(system_text) + len(context_json))
     latency.count("model_calls")
+    turn_model = ThinkingServiceTurn if context.get("thinking") else ServiceTurn
     result = await latency.timed(
         "model.reply",
         manager.complete_structured(
             scope,
-            ServiceTurn,
+            turn_model,
             alias=reply_alias(policy),
             purpose="pi_service",
             messages=[Message.system(system_text), Message.user(context_json)],
@@ -5062,6 +5109,9 @@ async def compose_service_turn(
             '"teen concepts", "do options"), use "• " for lists instead of 1. 2. 3., '
             "drop any time or date promise, and never state a price"
         )
+    if context.get("thinking") and (bad_plan := think_plan.check_turn(turn, context)):
+        problem = f"{bad_plan}, and also: {problem}" if problem else bad_plan
+    think_plan.settle_turn(turn, context)  # context["plan"]: this message's move, for T-REPEAT
     strict = flow.strict_voice(policy.response_rules)
     if strict and (broke := constitution.lint(turn.reply, context)):
         if (quiet := constitution.quiet_fix(turn.reply, broke, context)) is not None:
@@ -5075,6 +5125,7 @@ async def compose_service_turn(
             context["lint_slipped"] = True  # scored later as a rule break (spec 8.3)
         text = constitution.describe(broke)
         problem = f"{text}, and also: {problem}" if problem else text
+    context.pop("plan", None)  # not part of what the rewrite request sends back to the model
     if context.get("pi_mode") == "brain" and turn.problem_ops:
         known = {p["ref"] for p in context.get("noted_problems") or []}
         replied = turn.reply.rstrip().endswith(("?", "\u061f"))
@@ -5106,7 +5157,7 @@ async def compose_service_turn(
             "model.rewrite",
             manager.complete_structured(
                 scope,
-                ServiceTurn,
+                turn_model,
                 alias=reply_alias(policy),
                 purpose="pi_service",
                 messages=[
@@ -5201,6 +5252,7 @@ async def compose_service_turn(
             for project in turn.projects:
                 if project.title in held:
                     project.status = "awaiting_confirmation"
+    think_plan.settle_turn(turn, context)  # the rewrite's own plan, checked once more
     if strict:
         # Style slips that survived the rewrite are fixed in place; a hard break (identity,
         # money, privacy, promises) is never sent.
@@ -5210,6 +5262,7 @@ async def compose_service_turn(
                 "pi reply broke the constitution", extra={"rules": [v.rule for v in blocked]}
             )
             raise rejected_with(turn, "CONSTITUTION_BREAK")
+    context.pop("plan", None)
     if context.get("pi_mode") == "brain":
         turn.ready_for_team = False  # no lead, proposal or team brief before the offer
         turn.projects = []
