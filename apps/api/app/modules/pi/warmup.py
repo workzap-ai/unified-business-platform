@@ -26,10 +26,12 @@ DONE = "done"
 SKIPPED = "skipped"
 
 IDENTITY = {
-    "en": "Hi, I'm pi, an AI from Workzap. You can talk to me in English or Urdu, whichever "
-    "suits you. First, a little about your business: what is it called, and what does it do?",
-    "roman_ur": "Hi, main pi hoon, Workzap ka AI. Aap English ya Urdu, jis mein chahein, baat kar "
-    "sakte hain. Pehle thora aap ke karobar ke baare mein: naam kya hai, aur kis cheez ka hai?",
+    # No language offer: pi answers in the language the owner writes in, as before (the owner asked
+    # for the "English or Urdu" line to be removed, 2026-10-27).
+    "en": "Hi, I'm pi, an AI from Workzap. First, a little about your business: what is it called, "
+    "and what does it do?",
+    "roman_ur": "Hi, main pi hoon, Workzap ka AI. Pehle thora aap ke karobar ke baare mein: naam "
+    "kya hai, aur kis cheez ka hai?",
 }
 PAGE_ASK = {
     "en": "If you have a website or an Instagram page, send the link and I'll take a look so I "
@@ -129,6 +131,10 @@ def plan(context: dict[str, Any]) -> Plan | None:
     if states_problem(said):
         return Plan("", {**state, "step": SKIPPED}, profile)  # they went straight to the problem
     if step == IDENTITY_ASKED:
+        if context.get("greeting_only"):
+            # "Hi" again is not an answer (live 2026-10-27: the second "Hi" was taken as the
+            # business and the page was asked for): ask the identity question once more.
+            return Plan(IDENTITY[lang], state, profile)
         profile = _grow(profile, said)
         if url := link_in(said):
             return Plan("", {**state, "step": PAGE_ASKED, "asked": 2}, profile, ask_page=url)

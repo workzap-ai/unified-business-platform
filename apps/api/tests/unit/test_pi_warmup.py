@@ -29,10 +29,19 @@ def test_it_is_off_unless_the_flag_is_true() -> None:
 def test_hi_gets_the_ai_line_and_one_identity_question() -> None:  # OT1, OT2
     plan = warmup.plan(ctx("Hi"))
     assert plan is not None and "an AI from Workzap" in plan.reply
-    assert "English or Urdu" in plan.reply and plan.reply.count("?") == 1
+    assert "English" not in plan.reply and "Urdu" not in plan.reply  # no language offer (owner)
+    assert plan.reply.count("?") == 1
     assert plan.state["step"] == warmup.IDENTITY_ASKED
     roman = warmup.plan(ctx("Hi", language="roman_ur"))
     assert roman is not None and "Workzap ka AI" in roman.reply and roman.reply.count("?") == 1
+
+
+def test_a_second_hi_is_not_the_answer_the_identity_question_is_asked_again() -> None:
+    brief = {"warmup": {"step": warmup.IDENTITY_ASKED, "asked": 1}}
+    plan = warmup.plan(ctx("Hi", brief))
+    assert plan is not None and plan.reply == warmup.IDENTITY["en"]
+    assert plan.state["step"] == warmup.IDENTITY_ASKED
+    assert bp.grounded(plan.profile) == {}  # "Hi" is not kept as what the business does
 
 
 def test_a_hurried_owner_gets_no_warmup_and_it_is_remembered() -> None:  # OT3
