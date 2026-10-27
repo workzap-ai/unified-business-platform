@@ -1375,6 +1375,21 @@ async def process_pi_event(ctx: dict[str, Any], event_id: str) -> None:
                     keep_notes(conversation, kept)
             except GatewayUnavailable:
                 decision["provider_failed"] = True
+            if (
+                service_turn is not None
+                and service_context.get("pi_mode") == "brain"
+                and await stale_reply(session, message, policy.response_rules)
+            ):
+                # Spec v1.4, 17.2 (staleReply): the owner wrote again while this reply was being
+                # written. The draft answers an older picture of the chat, so it is dropped; the
+                # newer message answers them all, once.
+                message.status, message.error_code, event.status = (
+                    "skipped",
+                    "BURST_COALESCED",
+                    "processed",
+                )
+                await session.commit()
+                return
         elif keyword_handoff:
             decision = {
                 "message": body,
@@ -2156,6 +2171,14 @@ async def newer_waiting(session: Any, message: PiMessage) -> bool:
         .limit(1)
     )
     return later is not None
+
+
+async def stale_reply(session: Any, message: PiMessage, response_rules: dict[str, Any]) -> bool:
+    """A newer message of this person arrived while the reply was being written, and the burst is
+    not yet older than its cap (a person who keeps typing still gets an answer)."""
+    return await newer_waiting(session, message) and not await burst_too_long(
+        session, message, response_rules
+    )
 
 
 async def burst_too_long(session: Any, message: PiMessage, response_rules: dict[str, Any]) -> bool:
