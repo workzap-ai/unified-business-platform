@@ -17,7 +17,7 @@ from pydantic import BaseModel, Field, field_validator
 from sqlalchemy.exc import DBAPIError
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.modules.pi import moves, think_lint, think_prompt
+from app.modules.pi import hypothesis_reply, moves, think_lint, think_prompt
 from app.modules.pi import problems as problem_records
 from app.modules.pi.think_models import PiHypothesis, PiMoveLog
 from app.shared.scope import WorkspaceScope
@@ -284,6 +284,111 @@ async def apply_hypothesis(
         row.evidence_against = list(h.evidence_against)
         row.confidence = h.confidence.value
         row.status = h.status.value
+
+
+def _mark(h: moves.Hypothesis, row: PiHypothesis | None) -> None:
+    if row is not None:
+        row.evidence_for = list(h.evidence_for)
+        row.evidence_against = list(h.evidence_against)
+        row.confidence = h.confidence.value
+        row.status = h.status.value
+        row.ignored = h.ignored
+
+
+def _apply_verdict(
+    book: moves.HypothesisLedger, h: moves.Hypothesis, verdict: str, words: str
+) -> bool:
+    """The owner's reply applied to one hypothesis. Evidence only; the confirmed state is reached
+    by an explicit owner yes to the hypothesis question and by nothing else."""
+    if verdict == "none":
+        return False
+    if verdict == "ignored":
+        changed = not h.ignored
+        h.ignored = True
+        return changed
+    if words in h.evidence_for or words in h.evidence_against:
+        return False  # the same message processed twice
+    h.ignored = False  # it was answered after all
+    if verdict == "against":
+        book.against(h, words)
+    else:
+        h.evidence_for.append(words)
+        if verdict == "confirm":
+            book.confirm(h, by="owner")
+        elif h.confidence == moves.Confidence.LOW:
+            h.confidence = moves.Confidence.MEDIUM  # supported, never confirmed
+    return True
+
+
+async def reflect(
+    session: AsyncSession,
+    scope: WorkspaceScope,
+    conversation_id: UUID,
+    *,
+    previous_ai: str,
+    previous_move: str | None,
+    said: str,
+) -> str | None:
+    """Update the ledger from the owner's reply to pi's last message (the statuses used to change
+    only when the model sent add/against/drop). A reply that supports or contradicts an open
+    hypothesis's cause adds evidence_for or evidence_against (stored redacted); the hypothesis pi
+    put to the owner as a question is `ignored` when the reply deflects or asks something else, and
+    `confirmed` only on an explicit owner yes. Returns the verdict for that hypothesis (or None)."""
+    if not said.strip():
+        return None
+    book, rows = await ledger(session, scope, conversation_id)
+    live = [(i, h) for i, h in enumerate(book.items) if h.status == moves.Status.OPEN]
+    if not live:
+        return None
+    put: int | None = None
+    if hypothesis_reply.is_question(previous_ai):
+        asked = hypothesis_reply.stems(previous_ai)
+        shared, best = max(
+            ((len(asked & hypothesis_reply.stems(h.text)), i) for i, h in live),
+            key=lambda pair: (pair[0], pair[1]),
+        )
+        if shared >= hypothesis_reply.MIN_SHARED:
+            put = best
+        elif previous_move == moves.Move.M4.value:
+            unanswered = [i for i, h in live if not h.ignored]
+            put = max(unanswered) if unanswered else None
+    words = problem_records.redact(" ".join(said.split()))[0][:300]
+    out: str | None = None
+    for i, h in live:
+        is_put = i == put
+        verdict = hypothesis_reply.judge(said, h.text, put_to_owner=is_put)
+        changed = _apply_verdict(book, h, verdict, words)
+        if changed:
+            _mark(h, rows.get(i))
+        if is_put:
+            out = verdict
+    await session.flush()
+    return out
+
+
+async def reflect_safely(
+    session: AsyncSession,
+    scope: WorkspaceScope,
+    conversation_id: UUID,
+    *,
+    previous_ai: str,
+    previous_move: str | None,
+    said: str,
+) -> str | None:
+    """`reflect`, but a missing table or any failure only means the ledger is left as it was."""
+    try:
+        async with session.begin_nested():
+            return await reflect(
+                session,
+                scope,
+                conversation_id,
+                previous_ai=previous_ai,
+                previous_move=previous_move,
+                said=said,
+            )
+    except Exception:  # an aid to the thinking step; the reply must never wait on it
+        logging.getLogger(__name__).warning("pi_hypothesis_reflect_failed", exc_info=True)
+        return None
 
 
 # --- the turn-level helpers the conversation flow calls -----------------------------------------

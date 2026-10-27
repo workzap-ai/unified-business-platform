@@ -1387,6 +1387,30 @@
     "visible": true
   },
   {
+    "analytics_id": "nav.pi.review",
+    "any_permissions": [],
+    "badge": null,
+    "description": "",
+    "enabled": true,
+    "environment_scope": null,
+    "icon": "shield-check",
+    "key": "pi-review",
+    "keywords": [],
+    "label": "Review",
+    "parent": "pi",
+    "required_feature": null,
+    "required_permissions": [
+      "pi.handoffs.manage"
+    ],
+    "required_product": "pi",
+    "required_roles": [],
+    "route": "/pi/review",
+    "section": "main",
+    "sort_order": 61,
+    "type": "page",
+    "visible": true
+  },
+  {
     "analytics_id": "nav.pi.settings",
     "any_permissions": [],
     "badge": null,

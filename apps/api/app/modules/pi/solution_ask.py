@@ -199,8 +199,31 @@ def fix_typos(text: str) -> str:
     return " ".join(fixed)
 
 
+# A sentence that only DESCRIBES their business or their customers, with a word that also appears in
+# real asks ("we provide solutions", "clients need solutions", "kuch bhi kar lete hain", "marizon ko
+# ilaj chahiye", "other options nearby"). Never an ask for ideas.
+NOT_AN_ASK = re.compile(
+    r"\b(?:we|our|they|their|my (?:clients?|customers?)|customers?|clients?|patients?|students?)\b"
+    r"[^.?!\n]{0,30}\b(?:provide|offer|sell|give|need|want|needs|wants|have|use)\b"
+    r"[^.?!\n]{0,25}\b(?:solutions?|ideas?|options?|suggestions?)\b"
+    r"|\b(?:other|different|some|few)\s+(?:options?|solutions?)\s+(?:nearby|around|available|in the market)\b"
+    r"|\bkuch (?:bhi )?kar (?:lete|leta|leti|lena|ke|kar)\b"
+    r"|\b(?:marizon|mareezon|patients?|logon|logo)\s+ko\b[^.?!\n]{0,20}\b(?:ilaj|hal|solution)\b"
+    r"|\bke liye\s+(?:ek\s+)?solution\s+(?:use|istemal|lagaya|lagate|karte)\b"
+    r"|\bhow to (?:start|begin|use)\b[^.?!\n]{0,20}\b(?:don'?t know|do not know|nahi pata)\b"
+    r"|\b(?:don'?t|do not)\s+know\s+how\s+to\s+(?:start|begin|use)\b",
+    re.IGNORECASE,
+)
+# Chinese, Japanese and Korean have no spaces: a long message is a story, not an ask.
+_CJK = re.compile(r"[぀-ヿ㐀-鿿가-힯]")
+
+
 def asked_for_ideas(said: str) -> bool:
     """They want a fix now: "solution do", "kuch kar sakte ho?", "what can you do?"."""
+    if NOT_AN_ASK.search(said or ""):
+        return False
+    if len(_CJK.findall(said or "")) > 24:
+        return False
     fixed = fix_typos(said or "")
     # as typed first (other languages' own words), then with the typing slips read as meant
     return _asked_for_ideas(said or "") or (fixed != (said or "") and _asked_for_ideas(fixed))
@@ -214,9 +237,62 @@ DO_SOMETHING = re.compile(
 )
 REFUSAL_NEAR = re.compile(r"\b(?:nahi|nhi|mat|na)\b", re.IGNORECASE)
 
+# More very common ways to say "what should I do / give me a way / how do I fix this" in Roman Urdu,
+# Hindi, Urdu script and Arabic (spelling variants included). STRONG ones are an ask wherever they
+# stand; WEAK ones ("koi hal", "kuch batao") also open ordinary sentences ("koi hal nahi mila",
+# "unko kuch batao to...") so they count only in a short message. A refusal or "I do not know"
+# anywhere in the message ("koi hal nahi", "pata nahi") is never an ask.
+EXTRA_REFUSAL = re.compile(
+    r"\b(?:nahi|nahin|nhi|nai|mat|pata|maloom|malum|nothing|no|not|dont|don't)\b"
+    r"|(?<!\w)(?:نہیں|نہی|مت|معلوم|پتا|پتہ|नहीं|नही|मत|पता|لا|ليس|مش|مو)(?!\w)|ما\s+في",
+    re.IGNORECASE,
+)
+EXTRA_STRONG = re.compile(
+    r"\b(?:ab |phir |to |tou |toh )?(?:main |mein |mai |hum |ham |mujhe |mujhy |mjhe )?"
+    r"(?:kya|kia|kiya|ky) (?:karun|karoon|karon|krun|krn|karen|karein|kren|krna|karna|karna chahiye|krna chahiye)\b"
+    r"|\bkya (?:kiya|kia|kia) (?:jaye|jae|jai|jaaye|jaiye|jayega|jaega)\b"
+    r"|\bkaise (?:theek|thik|thek|sahi|durust|solve|fix|hal) (?:ho|hoga|hogi|hogaa|karen|karein|karun|kar sakte)\b"
+    r"|\b(?:is|iss|isay|ise|isko)(?: \w+){0,3} kaise (?:nipt|nibt|nibat|nipat)\w*"
+    r"|\bhal (?:nikal|nikaal)\w*"
+    r"|\b(?:koi )?(?:rasta|raasta|raah|tareeqa|tariqa|tarika|tareeqe|ilaj) (?:batao|btao|bataiye|bataen|batayen|dikhao|dikhaiye|do|dein|chahiye)\b"
+    r"|क्या (?:करूं|करूँ|करें|करना चाहिए|किया जाए|किया जाये|करना होगा)"
+    r"|(?:मुझे|अब) क्या करना"
+    r"|कैसे (?:ठीक|हल|सुलझ)|कोई (?:हल|उपाय|तरीका|समाधान|रास्ता)\s+(?:बताओ|बताइए|बताएं|दो|दीजिए|चाहिए)"
+    r"|कुछ (?:करो|कीजिए|कीजिये|कर दो)"
+    r"|کیا\s+(?:کروں|کریں|کرنا\s+چاہیے|کرنا\s+چاہئے|کرنا\s+ہوگا|کیا\s+جائے)"
+    r"|کیسے\s+(?:ٹھیک|حل|درست)|کچھ\s+(?:کریں|کرو|کیجیے|کیجئے)"
+    r"|(?:کوئی\s+)?(?:طریقہ|راستہ|علاج|ترکیب)\s+(?:بتائیں|بتاؤ|بتاو|بتائیے|دیں|دو|چاہیے|چاہئے)"
+    r"|ماذا\s+(?:أفعل|افعل|أعمل|اعمل|يجب\s+أن\s+أفعل)|ما\s+العمل\b|كيف\s+(?:أحل|احل|أصلح|اصلح|أعالج|اعالج|أتصرف|اتصرف|أتعامل|اتعامل)"
+    r"|(?:شو|وش|ايش|إيش|شنو|شلون)\s+(?:أسوي|اسوي|أعمل|اعمل|أسوّي)"
+    r"|(?:أحتاج|احتاج|محتاج)\s+(?:إلى\s+)?(?:حل|نصيحة|اقتراح)|(?:أعطني|اعطني|عطني)\s+(?:نصيحة|اقتراح|اقتراحا)",
+    re.IGNORECASE,
+)
+EXTRA_WEAK = re.compile(
+    r"\bkoi (?:hal|haal|tareeqa|tariqa|tarika|tareeqe|rasta|raasta|raah|ilaj|solution|upaay|upay)\b"
+    r"|\bkuch (?:to |tou |toh )?(?:bata|btao|batao|bataiye|bataen|batain|batayen|batana|bataye|bataein|btaye|btayen)"
+    r"(?:\s+(?:na|please|plz|yar|yaar|ji|ap|aap|zara|do|dein))*\s*[?.!]*$"
+    r"|कोई (?:हल|उपाय|तरीका|समाधान|रास्ता)|कुछ (?:बताओ|बताइए|बताएं)"
+    r"|کوئی\s+(?:حل|طریقہ|راستہ|علاج)|کچھ\s+(?:بتائیں|بتاؤ|بتاو|بتائیے)"
+    r"|(?:أي|اي)\s+حل|هل\s+من\s+حل|ما\s+الحل|(?:نصيحة|اقتراح)\s*[؟?]",
+    re.IGNORECASE,
+)
+EXTRA_WEAK_WORDS = 6  # a longer message is a story that happens to hold the phrase
+
+
+def asked_in_other_ways(text: str) -> bool:
+    """The extra common asks above ("ab kya karun", "koi hal", "kya kiya jaye", "ماذا أفعل")."""
+    said = " ".join((text or "").split())
+    if not said or EXTRA_REFUSAL.search(said):
+        return False
+    if EXTRA_STRONG.search(said):
+        return True
+    return len(said.split()) <= EXTRA_WEAK_WORDS and bool(EXTRA_WEAK.search(said))
+
 
 def _asked_for_ideas(text: str) -> bool:
     if DO_SOMETHING.search(text) and not REFUSAL_NEAR.search(text):
+        return True
+    if asked_in_other_ways(text):
         return True
     if COST.search(text) and not (SOLUTION_ASK.search(text) or SOLUTION_ASK_PLAIN.search(text)):
         return False

@@ -60,6 +60,7 @@ from app.modules.pi.read_routes import router as pi_read_router
 from app.modules.pi.routes import router as pi_router
 from app.modules.pi.routes import webhook_router
 from app.modules.pi.solution_routes import router as pi_solutions_router
+from app.modules.pi.staff_review_routes import router as pi_staff_review_router
 from app.modules.pi_customer.routes import router as pi_customer_router
 from app.modules.pi_customer.second_step import router as pi_customer_second_step_router
 from app.modules.pi_saas.app_routes import router as pi_app_router
@@ -126,6 +127,7 @@ ROUTERS = [
     pi_solutions_router,
     pi_brain_moderation_router,
     pi_brain_health_router,
+    pi_staff_review_router,
     payment_link_router,
     customer_files_router,
     pi_requests_router,
@@ -217,6 +219,7 @@ PI_APP_ROUTERS = [
     pi_solutions_router,
     pi_brain_moderation_router,
     pi_brain_health_router,
+    pi_staff_review_router,
     payment_link_router,
     customer_files_router,
     pi_requests_router,

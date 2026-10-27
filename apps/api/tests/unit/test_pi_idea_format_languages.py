@@ -775,7 +775,7 @@ def test_an_unseen_spelling_with_an_ask_word_goes_to_the_model_check() -> None:
 
     state = "S3_NOTED"
     assert ask_classifier.needed(
-        "ap koi hal nikalen is ka", state
+        "ap hal dhoondein is masle ka", state
     )  # 'hal' with a spelling the banks lack
     assert not ask_classifier.needed("udhaar ka hisaab gadbad hai bhai", state)  # a plain statement
 

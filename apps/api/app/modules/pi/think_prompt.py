@@ -11,7 +11,7 @@ loosen a rule: it sits below the constitution and says so.
 from typing import Any
 
 from app.modules.pi import dials as dials_mod
-from app.modules.pi import moves, think_lint
+from app.modules.pi import hypothesis_reply, moves, think_lint
 
 THINKING_FLAG = "thinking"
 
@@ -85,11 +85,42 @@ def _customer_messages(context: dict[str, Any]) -> list[str]:
     return said
 
 
+def replies_after_ai(context: dict[str, Any]) -> dict[int, str]:
+    """For each pi message in the history (by position), the owner's next message: the one after it
+    in the history, or for the last one the owner's latest message."""
+    history = context.get("history") or []
+    out: dict[int, str] = {}
+    pending: int | None = None
+    for n, h in enumerate(history):
+        if h.get("role") == "ai":
+            pending = n
+        elif h.get("role") == "customer" and pending is not None:
+            out[pending] = str(h.get("text", ""))
+            pending = None
+    latest = str(context.get("latest_customer_message") or "")
+    if pending is not None and latest.strip():
+        out[pending] = latest
+    return out
+
+
+def landed_flags(context: dict[str, Any]) -> dict[int, bool | None]:
+    """Did the owner's reply take up each pi message (history position -> landed)? None: nothing was
+    asked or there is no reply yet. This is the `landed` input of the variety rule "a move that did
+    not land is not repeated"."""
+    history = context.get("history") or []
+    return {
+        n: hypothesis_reply.landed(str(history[n].get("text", "")), reply)
+        for n, reply in replies_after_ai(context).items()
+    }
+
+
 def recent_turns(context: dict[str, Any]) -> list[moves.Turn]:
     """pi's earlier messages as the variety rules read them. Only messages whose move is known
-    (history key `move`, fed from pi_move_log) count; the rest are skipped."""
+    (history key `move`, fed from pi_move_log) count; the rest are skipped. `landed` comes from the
+    owner's reply to each message."""
     out: list[moves.Turn] = []
-    for h in context.get("history") or []:
+    flags = landed_flags(context)
+    for n, h in enumerate(context.get("history") or []):
         if h.get("role") != "ai":
             continue
         move = moves.parse_move(h.get("move"))
@@ -97,7 +128,12 @@ def recent_turns(context: dict[str, Any]) -> list[moves.Turn]:
             continue
         text = str(h.get("text", ""))
         out.append(
-            moves.Turn(move, think_lint.ends_in_question(text), think_lint.adds_something(text))
+            moves.Turn(
+                move,
+                think_lint.ends_in_question(text),
+                think_lint.adds_something(text),
+                landed=flags.get(n),
+            )
         )
     return out[-moves.WINDOW :]
 
@@ -155,9 +191,15 @@ def situation_note(context: dict[str, Any]) -> str:
         lines.append("Your last two messages ended in a question: this one carries no question.")
     if question_only:
         lines.append("Your last message was only a question: this one must give something first.")
-    recent = [t.move.value for t in recent_turns(context)]
+    turns = recent_turns(context)
+    recent = [t.move.value for t in turns]
     if recent:
         lines.append("Your last moves, oldest first: " + ", ".join(recent) + ".")
+    if turns and turns[-1].landed is False:
+        lines.append(
+            f"Your last move ({turns[-1].move.value}) did not land: the owner's reply left it "
+            "unanswered. Do not repeat it; give a number, a fork or something they can use."
+        )
     return "\n".join(lines)
 
 

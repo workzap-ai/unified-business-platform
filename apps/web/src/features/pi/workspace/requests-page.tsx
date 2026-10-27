@@ -10,6 +10,7 @@ import {
   MessageCircleQuestion,
   MessageSquare,
   Receipt,
+  ShieldCheck,
   Stamp,
   Target,
 } from "lucide-react";
@@ -41,6 +42,7 @@ import {
   type PiRequest,
   type RequestKind,
 } from "../requests-service";
+import { reviewHref } from "../review-service";
 import { inboxHref } from "./lib";
 import { MeetingDialog } from "./meeting-dialog";
 
@@ -223,6 +225,13 @@ function RequestCard({
                 <MessageSquare /> Chat
               </Link>
             </Button>
+            {can("pi.handoffs.manage") && (
+              <Button size="sm" variant="secondary" asChild>
+                <Link href={reviewHref(r.conversation_id)}>
+                  <ShieldCheck /> Briefing
+                </Link>
+              </Button>
+            )}
             {r.quote_id && (
               <Button size="sm" variant="secondary" asChild>
                 <Link

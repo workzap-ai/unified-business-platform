@@ -16,6 +16,7 @@ same chat and a returning customer's "it worked" is heard.
 from datetime import UTC, datetime
 from typing import Any
 
+from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError, ProgrammingError
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -76,11 +77,59 @@ def _put(conversation: PiConversation, **changes: Any) -> dict[str, Any]:
 
 def allowance(brief: dict[str, Any], given: int) -> int:
     """How many more ideas this chat may be given (R-VAL-02 and RV-02). Before any decline the
-    budget is IDEAS_BEFORE_OFFER in all; once the offer was declined, IDEAS_AFTER_DECLINE more."""
+    budget is IDEAS_BEFORE_OFFER in all; once the offer was declined, IDEAS_AFTER_DECLINE more.
+    The eight are per business (platform spec Book 5 decision 5): what the same customer was given
+    in other chats (`ideas_elsewhere`, set by `sync_elsewhere` for the expert) counts too."""
     if int(brief.get("declines") or 0) > 0:
         taken = given - int(brief.get("ideas_at_decline", given))
         return value_line.IDEAS_AFTER_DECLINE - taken
-    return value_line.IDEAS_BEFORE_OFFER - given
+    return value_line.IDEAS_BEFORE_OFFER - given - int(brief.get("ideas_elsewhere") or 0)
+
+
+def elsewhere(brief: dict[str, Any] | None) -> int:
+    """Ideas this business was given in its other chats (0 until `sync_elsewhere` has run)."""
+    return int((brief or {}).get("ideas_elsewhere") or 0)
+
+
+async def sync_elsewhere(
+    session: AsyncSession, scope: WorkspaceScope, conversation: PiConversation
+) -> None:
+    """Count, across the customer's OTHER conversations, the ideas given (`ideas_given`) and the
+    expert ideas per problem (`expert_given`), and keep the totals on this conversation's brief
+    (`ideas_elsewhere`, `expert_given_elsewhere`) so the per-business cap (eight before the offer,
+    two per problem) holds across chats while every per-chat count stays as it was. Declines are
+    per chat and never read from here. A failure leaves the brief as it was."""
+    if conversation.customer_id is None:
+        return
+    try:
+        rows = list(
+            await session.scalars(
+                select(PiConversation.service_brief).where(
+                    PiConversation.tenant_id == scope.tenant_id,
+                    PiConversation.environment_id == scope.environment_id,
+                    PiConversation.customer_id == conversation.customer_id,
+                    PiConversation.id != conversation.id,
+                )
+            )
+        )
+    except Exception:  # noqa: BLE001 - the cap then stays per chat, as before
+        return
+    total = 0
+    per_problem: dict[str, int] = {}
+    for other in rows:
+        if not isinstance(other, dict):
+            continue
+        total += int(other.get("ideas_given") or 0)
+        table = other.get("expert_given")
+        if isinstance(table, dict):
+            for key, count in table.items():
+                per_problem[str(key)] = per_problem.get(str(key), 0) + int(count or 0)
+    brief = conversation.service_brief or {}
+    if total == int(brief.get("ideas_elsewhere") or 0) and per_problem == (
+        brief.get("expert_given_elsewhere") or {}
+    ):
+        return
+    _put(conversation, ideas_elsewhere=total, expert_given_elsewhere=per_problem)
 
 
 def _no_ideas(

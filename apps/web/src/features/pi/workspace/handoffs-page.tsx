@@ -11,6 +11,7 @@ import {
   Inbox,
   MessageSquare,
   MoreHorizontal,
+  ShieldCheck,
   PauseCircle,
   RotateCcw,
   SearchX,
@@ -46,6 +47,7 @@ import { useUrlState } from "@/hooks/use-url-state";
 import { useSession } from "@/features/auth/session-provider";
 import { HANDOFF_FLOW, piService } from "../service";
 import type { Handoff, HandoffStatus } from "../types";
+import { reviewHref } from "../review-service";
 import { HANDOFF_REASON_LABELS, inboxHref, piKeys, slugForStatus } from "./lib";
 import { PriorityBadge } from "./parts";
 
@@ -268,6 +270,13 @@ export function HandoffsPage({ status }: { status?: HandoffStatus }) {
                   <Inbox /> Open conversation
                 </Link>
               </DropdownMenuItem>
+              {canManage && (
+                <DropdownMenuItem asChild>
+                  <Link href={reviewHref(h.conversation_id)}>
+                    <ShieldCheck /> Review briefing
+                  </Link>
+                </DropdownMenuItem>
+              )}
               {canManage && HANDOFF_FLOW[h.status].length > 0 && (
                 <DropdownMenuSeparator />
               )}

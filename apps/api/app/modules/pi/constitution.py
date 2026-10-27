@@ -999,7 +999,8 @@ def _value_line_every_reply(
         add(Violation("R-VAL-03", "one line per idea, about 25 words: what and why, no sub-steps"))
     if not given and WORKZAP_WILL.search(reply) and (count or carried):
         add(Violation("R-BUILD-06", '"would" or "could", never "will": no promised results', True))
-    ideas_given = int(context.get("ideas_given") or 0)
+    # the eight are per business: ideas given in the owner's other chats count (expert advisor on)
+    ideas_given = int(context.get("ideas_given") or 0) + int(context.get("ideas_elsewhere") or 0)
     total = ideas_given + (0 if handed else count)
     if (
         total > value_line.IDEAS_BEFORE_OFFER
@@ -1617,8 +1618,8 @@ MAIN_PROBLEM_MIN_WORDS = 3  # a question shorter than this has too few content w
 def _off_the_main_problem(question: str, context: dict[str, Any]) -> bool:
     """True when the question's content words overlap neither the main problem (title and the
     owner's words) nor any listed cause. Generic closers are R-ASK-05's business."""
-    if GENERIC_CLOSER.search(question):
-        return False
+    if GENERIC_CLOSER.search(question) or CAUSE_FINDING.search(question):
+        return False  # a question that looks for the reason ("wo kya wajah batate hain?") is on it
     if str(context.get("reply_language") or "en") not in ("en", "roman_ur"):
         return False  # words in another script cannot be compared with the English title
     asked = _stems(question)
@@ -1634,6 +1635,44 @@ def _off_the_main_problem(question: str, context: dict[str, Any]) -> bool:
         )
     )
     return not (asked & about)
+
+
+# A question about how the business works in general (how customers pay, which system or record is
+# used, who does which job) is an adjacent process, not the reason the owner's problem happens.
+ADJACENT_PROCESS = re.compile(
+    r"\b(?:kaise|kese|kaisay|how)\b[^?؟]{0,40}?\b(?:jama|pay|payment|collect|bharte|bharwate|dete|submit|manage|handle|track|record|maintain)\w*"
+    r"|\b(?:cash|challan|online|bank|cheque|easypaisa|jazzcash|card)\b[\s,]{1,3}(?:(?:cash|challan|online|bank|cheque|easypaisa|jazzcash|card)[\s,]{1,3})*(?:ya|or|aur)\s+(?:cash|challan|online|bank|cheque|easypaisa|jazzcash|card)\b"
+    r"|\b(?:which|konsa|kaunsa|kaun sa|kya)\s+(?:system|software|app|register|tool|crm|sheet|channel|platform)\b"
+    r"|\bkya use karte\b|\bwhat do you use\b|\bwho (?:follows|handles|manages|looks after|takes care)\b|\bkaun (?:follow|dekh|handle|sambhal)\w*"
+    r"|\bkitne (?:staff|log|banday|employees)\b|\bhow many (?:staff|people|employees)\b",
+    re.IGNORECASE,
+)
+# What a question that looks for the reason itself contains: it is never an adjacent process.
+CAUSE_FINDING = re.compile(
+    r"\b(?:why|reason|reasons|cause|wajah|waja|wajoohat|kyun|kyon|kiyun|sabab|bahana|bahane|excuse|late|delay|deri|der se|bhool|bhul|forget|forgets|"
+    r"jab|when|aksar|often|kitni baar|kab|kis liye|kis wajah)\b",
+    re.IGNORECASE,
+)
+ADJACENT_IGNORED = {"kaise", "kese", "kaisay"}
+
+
+def _adjacent_when_diagnosed(question: str, context: dict[str, Any]) -> bool:
+    """R-ASK-08 with a cached diagnosis (expert advisor on): the question asks how the business
+    works in general instead of why the problem happens. A question that looks for the reason
+    ("wo kya wajah batate hain?") or touches a listed cause never counts."""
+    if not context.get("expert_on"):
+        return False
+    causes = [str(c) for c in context.get("main_problem_causes") or []]
+    suggested = str(context.get("suggested_next_question") or "")
+    if not (causes or suggested):
+        return False
+    if CAUSE_FINDING.search(question):
+        return False
+    found = [m.group(0) for m in ADJACENT_PROCESS.finditer(question)]
+    if not found:
+        return False
+    process = _stems(" ".join(found)) - ADJACENT_IGNORED
+    return not (process & _stems(" ".join([*causes, suggested])))
 
 
 def lint(reply: str, context: dict[str, Any]) -> list[Violation]:
@@ -1963,12 +2002,20 @@ def lint(reply: str, context: dict[str, Any]) -> list[Violation]:
         )
     if context.get("main_problem") and last_question.endswith(QUESTION_MARKS):
         # R-ASK-08 (expert advisor on): the question is about the main problem or its causes
-        if _off_the_main_problem(last_question, context):
+        if _off_the_main_problem(last_question, context) or _adjacent_when_diagnosed(
+            last_question, context
+        ):
+            suggested = str(context.get("suggested_next_question") or "")
             add(
                 Violation(
                     "R-ASK-08",
                     "the question must be about the owner's main problem or its likely causes, "
-                    "not an adjacent process: ask about the problem they raised",
+                    "not an adjacent process: ask about the problem they raised"
+                    + (
+                        f" (for example: {suggested[:160]}, in the owner's language)"
+                        if suggested
+                        else ""
+                    ),
                 )
             )
     if context.get("expert_on"):
@@ -1985,7 +2032,7 @@ def lint(reply: str, context: dict[str, Any]) -> list[Violation]:
         if TEAM_WILL_SEE.search(reply):
             add(
                 Violation(
-                    "R-DISC-05",
+                    "R-DISC-06",
                     "never say the team or a person will see, read or receive this chat: pi talks "
                     "to the owner itself",
                 )

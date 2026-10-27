@@ -23,7 +23,7 @@ def test_the_live_noted_opener_and_the_team_claim_are_caught() -> None:
         "pohanch jayega. Parents fee kaise jama karwate hain?"
     )
     found = rules(reply)
-    assert "R-ECHO-05" in found and "R-DISC-05" in found
+    assert "R-ECHO-05" in found and "R-DISC-06" in found
 
 
 def test_a_question_about_the_reason_is_clean() -> None:
@@ -31,14 +31,14 @@ def test_a_question_about_the_reason_is_clean() -> None:
         "Jab accounts wala late parent se baat karta hai, to wo kya wajah batate hain?"
     ) & {
         "R-ECHO-05",
-        "R-DISC-05",
+        "R-DISC-06",
     }
 
 
 def test_the_rules_apply_only_when_the_expert_is_on() -> None:
     assert not rules("Note kar liya: fee late hoti hai. Kya wajah hai?", expert_on=False) & {
         "R-ECHO-05",
-        "R-DISC-05",
+        "R-DISC-06",
     }
 
 

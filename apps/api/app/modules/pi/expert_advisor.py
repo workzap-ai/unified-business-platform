@@ -36,11 +36,13 @@ from app.ai.manager import LLMManager
 from app.ai.types import Message
 from app.modules.pi import (
     currency_notes,
+    hypothesis_reply,
     idea_filter,
     solution_free,
     solution_lint,
     solution_rules,
 )
+from app.modules.pi import problems as problem_records
 from app.shared.scope import WorkspaceScope
 
 logger = logging.getLogger(__name__)
@@ -61,7 +63,16 @@ helping the owner of one on WhatsApp through pi, an AI assistant. You know how t
 (today is {today}): what customers expect, where money and time leak, which practices are current in 2026 and which
 are outdated. You never give advice a licence is needed for (medical, veterinary, legal, tax, financial)."""
 
-DIAGNOSE_RULES = """Think like that operator, then answer with ONE JSON object and nothing else:
+STEER_RULES = """- previous_diagnosis (when given) is what you concluded before the owner's latest answers. Update it: an
+  owner's answer that supports a cause goes into that cause's evidence_for, one that contradicts it into
+  evidence_against, and a cause the answers rule out drops from the list. Keep the cause names stable.
+- questions_pi_already_asked and facts_owner_already_answered (when given): the question must NOT repeat or
+  reword any of the first, must not ask for anything in the second, and is the next most useful question for
+  finding WHY the problem happens (when, with whom or what, how often, what they say when it happens). Never
+  ask how the business works in general (how customers pay, which system, record or channel is used, who does
+  which job) unless the owner linked that to the problem."""
+
+_DIAGNOSE_BODY = """Think like that operator, then answer with ONE JSON object and nothing else:
 {
  "problem": "the owner's problem restated in their own words, one sentence",
  "owner_language": "the language and script the owner writes in, in English words: Roman Urdu, Urdu script, Hindi, Arabic, French, Persian, Swahili ... (English if they write English)",
@@ -107,7 +118,26 @@ Rules:
   borrow the channel or asset they assume.
 - Do not repeat or reword anything in pi_already_said_do_not_repeat_or_reword.
 - If the owner has not said enough to find the cause, say so in missing_fact and still give 5 ideas that are useful
-  whatever the cause is."""
+  whatever the cause is.
+"""
+DIAGNOSE_RULES = _DIAGNOSE_BODY + STEER_RULES
+
+_LIGHT_BODY = """Think like that operator, then answer with ONE JSON object and nothing else (no ideas yet):
+{
+ "problem": "the owner's problem restated in their own words, one sentence",
+ "causes": [ {"cause": "a likely cause, 3 to 10 words", "evidence_for": ["owner's words that support it"], "evidence_against": ["owner's words that weaken it"]} ],
+ "missing_fact": "the single fact that would most change your advice",
+ "question": "that fact as ONE plain English question to the owner, one sentence, about the main problem or its causes only"
+}
+Rules:
+- Write every field in plain ENGLISH whatever language the owner writes in (pi translates afterwards).
+- causes: at most 3, ranked most likely first. evidence_for and evidence_against come ONLY from what the owner
+  said (quote or near-quote); an empty list is better than a guess. Never invent a fact about the business.
+- question: about THE PROBLEM THE OWNER RAISED and its causes. Never about another process (who follows up,
+  what staff do, what the CRM is) unless the owner linked it to the problem. No mention of solutions, documents,
+  quotes or prices. It ends with a question mark.
+"""
+LIGHT_RULES = _LIGHT_BODY + STEER_RULES
 
 JUDGE_RULES = """You are a strict reviewer for pi, a WhatsApp business assistant. Below are the owner's own words, the likely causes and
 candidate ideas. Score EACH candidate 0 to 5 on:
@@ -129,6 +159,11 @@ PROMPT_RULE = """
   about an adjacent process (who follows up, what staff do, which system) the owner did not link to it.
   When suggested_next_question is present, ask it (in your own words, in the owner's language) unless the
   owner's last message already answers it.
+- questions_already_asked (when present) are questions you have already put: never ask them again or reword
+  them. owner_answers_since (when present) are facts the owner gave after the diagnosis was made: treat them
+  as known, and when they answer suggested_next_question or the cause it tests, ask instead the next most
+  useful question about WHY the problem happens (a different cause from main_problem_causes, or when, with
+  whom or what, how often). Never switch to how the business works in general.
 """
 
 # What the brain prompt always carries when the expert advisor is on (before any diagnosis exists).
@@ -156,6 +191,23 @@ OUTCOME_CLAIM = re.compile(
 )
 MAX_QUESTION_WORDS = 30
 # A channel or asset a pack idea may assume: kept out of the examples unless the owner named it.
+# Channels and assets an idea may name only when the owner did: nouns, not verbs ("pin" or
+# "boost" alone are ordinary words).
+ASSET_NOUNS = re.compile(
+    r"\b(?:videos?|reels?|captions?|pages?|posts?|stories|facebook|instagram|tiktok|youtube|google|"
+    r"whatsapp|newsletter|email|sms|catalogue|catalog|app|software|spreadsheet|dashboard|crm|websites?|"
+    r"web ?shop|ads?|adverts?|online)\b",
+    re.IGNORECASE,
+)
+# The expert's own question never asks for identity or contact details, bank details, or a person's
+# name (R-PRIV-03, R-PRIV-04): it asks about the problem and its causes only.
+ASKS_FOR_PERSONAL_DATA = re.compile(
+    r"\b(?:cnic|nic number|passport|id card|identity|iban|account number|bank account|card number|"
+    r"phone number|mobile number|whatsapp number|email|e-mail|home address|full name|"
+    r"name of (?:the |your )?(?:supplier|customer|client|patient|student|parent|person|employee|"
+    r"staff|manager|salesman|driver|doctor))\b",
+    re.IGNORECASE,
+)
 CHANNEL = re.compile(
     r"\b(?:videos?|reels?|shorts|clips?|captions?|pin(?:ned)?|pages?|posts?|stories|story|ads?|adverts?|advertis\w*|"
     r"campaigns?|boost\w*|websites?|web ?shop|online|facebook|instagram|tiktok|youtube|google|whatsapp|"
@@ -212,6 +264,31 @@ class Diagnosis:
     question: str = ""
     language: str = ""
     candidates: list[Candidate] = field(default_factory=list)
+
+
+@dataclass
+class Steer:
+    """What the diagnosis call is told so the next question is the next most useful one about WHY the
+    problem happens: the questions pi already asked, the facts the owner already answered, and the
+    diagnosis as it stood. `light`: only the causes and the question (no ideas), the cheap refresh."""
+
+    asked: list[str] = field(default_factory=list)
+    answered: list[str] = field(default_factory=list)
+    previous: dict[str, Any] | None = None
+    light: bool = False
+
+    def payload(self) -> dict[str, Any]:
+        out: dict[str, Any] = {}
+        if self.asked:
+            out["questions_pi_already_asked"] = [q[:160] for q in self.asked[-6:]]
+        if self.answered:
+            out["facts_owner_already_answered"] = [a[:300] for a in self.answered[-4:]]
+        if self.previous:
+            out["previous_diagnosis"] = {
+                "causes": [str(c)[:120] for c in self.previous.get("causes") or []][:MAX_CAUSES],
+                "question": str(self.previous.get("question") or "")[:200],
+            }
+        return out
 
 
 @dataclass
@@ -350,7 +427,7 @@ def question_ok(question: str) -> bool:
         return False
     if len(q.split()) > MAX_QUESTION_WORDS or SOLUTION_WORDS.search(q):
         return False
-    if re.search(r"\d{3,}", q):
+    if re.search(r"\d{3,}", q) or ASKS_FOR_PERSONAL_DATA.search(q):
         return False
     return len(re.findall(r"[.!]\s", q)) == 0  # one sentence
 
@@ -414,6 +491,12 @@ def vet(
         idea = one[0]
         if not solution_lint.passes(idea):
             continue
+        if any(m.group(0).lower() not in owner_words.lower() for m in ASSET_NOUNS.finditer(idea)):
+            # a channel, tool or asset the owner never named: checked in code whether or not the
+            # judge ran (the judge can be off or return nothing usable)
+            if trace is not None:
+                trace.append(f"channel_not_named: {idea[:110]}")
+            continue
         if OUTCOME_CLAIM.search(idea):  # "so X never happens" is a promised result
             if trace is not None:
                 trace.append(f"outcome_claim: {idea[:110]}")
@@ -469,39 +552,40 @@ async def diagnose(
     already_said: list[str],
     examples: list[str],
     today: str,
+    steer: "Steer | None" = None,
 ) -> Diagnosis | None:
     kind = industry or "small"
+    light = steer is not None and steer.light
     system = (
         PERSONA.format(industry=kind, country=country or "Pakistan, the UAE or Canada", today=today)
         + "\n\n"
-        + DIAGNOSE_RULES.replace("{industry}", kind)
+        + (LIGHT_RULES if light else DIAGNOSE_RULES).replace("{industry}", kind)
     )
-    user = json.dumps(
-        {
-            "today": today,
-            "industry": industry or "not known yet",
-            "problem_sub_type": subtype or "not known",
-            "country": country or "not known",
-            "problems_noted": [p[:120] for p in problems[-4:]],
-            "owner_first_message": (owner_said[:1] or [""])[0][:600],
-            "owner_messages_in_order": [m[:500] for m in owner_said[-8:]],
-            "never_say_list": never_say[:8],
-            "pi_already_said_do_not_repeat_or_reword": already_said[-8:],
-            "examples_of_level_not_to_copy": examples[:3],
-            "sector_briefing_2026_may_help_never_assume": currency_notes.prompt_block(
-                industry or ""
-            ),
-        },
-        ensure_ascii=False,
-    )
+    payload: dict[str, Any] = {
+        "today": today,
+        "industry": industry or "not known yet",
+        "problem_sub_type": subtype or "not known",
+        "country": country or "not known",
+        "problems_noted": [p[:120] for p in problems[-4:]],
+        "owner_first_message": (owner_said[:1] or [""])[0][:600],
+        "owner_messages_in_order": [m[:500] for m in owner_said[-8:]],
+        "never_say_list": never_say[:8],
+        "pi_already_said_do_not_repeat_or_reword": already_said[-8:],
+        "sector_briefing_2026_may_help_never_assume": currency_notes.prompt_block(industry or ""),
+    }
+    if not light:
+        payload["examples_of_level_not_to_copy"] = examples[:3]
+    if steer is not None:
+        payload.update(steer.payload())
+    user = json.dumps(payload, ensure_ascii=False)
     try:
         response = await manager.complete(
             scope,
             alias=alias,
             purpose=PURPOSE_DIAGNOSE,
             messages=[Message.system(system), Message.user(user)],
-            max_tokens=4000,
-            temperature=0.4,
+            max_tokens=1500 if light else 4000,
+            temperature=0.3 if light else 0.4,
             conversation_id=conversation_id,
         )
     except Exception:  # noqa: BLE001 - the caller falls back
@@ -573,6 +657,7 @@ async def _pipeline(
     use_judge: bool,
     today: str,
     ideas_wanted: bool,
+    steer: Steer | None = None,
 ) -> Advice | None:
     diagnosis = await diagnose(
         manager,
@@ -588,10 +673,13 @@ async def _pipeline(
         already_said=already_said,
         examples=examples,
         today=today,
+        steer=steer,
     )
     if diagnosis is None:
         return None
     question = diagnosis.question if question_ok(diagnosis.question) else ""
+    if question and steer is not None and same_as_any(question, steer.asked):
+        question = ""  # a question pi already asked is never the next one
     advice = Advice(
         question=question,
         causes=[c.cause for c in diagnosis.causes],
@@ -649,6 +737,7 @@ async def advise(
     ideas_wanted: bool = True,
     today: str | None = None,
     time_limit: float = TOTAL_TIMEOUT,
+    steer: Steer | None = None,
 ) -> Advice | None:
     """The expert's ideas and missing-fact question for what the owner described, or None (the model
     failed, timed out or answered nothing usable): the caller then falls back. Never raises."""
@@ -677,6 +766,7 @@ async def advise(
                 use_judge=use_judge,
                 today=when,
                 ideas_wanted=ideas_wanted,
+                steer=steer,
             )
     except Exception:  # noqa: BLE001 - including the timeout: the caller has a fallback
         logger.warning("pi_expert_advise_failed", exc_info=True)
@@ -693,11 +783,7 @@ def need_fact_reply(question: str) -> str:
     return f"{NEED_FACT_PREFIX} {question}"
 
 
-def main_problem(noted: list[dict[str, Any]]) -> dict[str, Any] | None:
-    """The owner's main problem: the one they ranked first, else the most severe, else the latest."""
-    items = [p for p in noted or [] if isinstance(p, dict) and p.get("title")]
-    if not items:
-        return None
+def _first_of(items: list[dict[str, Any]]) -> dict[str, Any]:
     ranks = [p for p in items if isinstance(p.get("rank"), int)]
     if ranks:
         return min(ranks, key=lambda p: p["rank"])
@@ -705,6 +791,30 @@ def main_problem(noted: list[dict[str, Any]]) -> dict[str, Any] | None:
     if scored:
         return max(scored, key=lambda p: (p["score"], items.index(p)))
     return items[-1]
+
+
+def main_problem(
+    noted: list[dict[str, Any]],
+    brief: dict[str, Any] | None = None,
+    prefer: dict[str, Any] | None = None,
+) -> dict[str, Any] | None:
+    """The problem pi is working on: the one they ranked first, else the most severe, else the
+    latest. With the brief, a problem whose two ideas have been given is closed for ideas, and the
+    next open problem (same order) takes over, so the owner starting a different problem is never
+    held back by the cap of the first. `prefer` (a problem noted by this very message) goes first
+    when it still has room."""
+    items = [p for p in noted or [] if isinstance(p, dict) and p.get("title")]
+    if not items:
+        return None
+    if brief is None:
+        return _first_of(items)
+    if prefer is not None and given_for(brief, prefer) < PER_PROBLEM:
+        return prefer
+    base = _first_of(items)
+    if given_for(brief, base) < PER_PROBLEM:
+        return base
+    open_ones = [p for p in items if given_for(brief, p) < PER_PROBLEM]
+    return _first_of(open_ones) if open_ones else base
 
 
 def problem_key(problem: dict[str, Any] | None) -> str:
@@ -721,27 +831,57 @@ def problem_key(problem: dict[str, Any] | None) -> str:
 
 
 def remember(
-    brief: dict[str, Any], problem: dict[str, Any] | None, advice: Advice
+    brief: dict[str, Any],
+    problem: dict[str, Any] | None,
+    advice: Advice,
+    owner_turns: int | None = None,
 ) -> dict[str, Any]:
-    """The diagnosis cached on the brief (a copy), so it is not recomputed each turn."""
+    """The diagnosis cached on the brief (a copy), so it is not recomputed each turn. `owner_turns`:
+    how many messages the owner had sent when it was made, so a later answer can tell it is older."""
     if problem is None or not (advice.causes or advice.question):
         return brief
-    return {
-        **brief,
-        "expert_diag": {
-            "key": problem_key(problem),
-            "problem": advice.problem,
-            "causes": advice.causes[:MAX_CAUSES],
-            "question": advice.question,
-            "at": datetime.now(UTC).isoformat(),
-        },
+    # model text restated from the owner's words: card, ID, phone and email patterns are removed
+    # before it is stored (R-PRIV-01), the same redaction the problem records use
+    stored: dict[str, Any] = {
+        "key": problem_key(problem),
+        "problem": problem_records.redact(advice.problem)[0],
+        "causes": [problem_records.redact(c)[0] for c in advice.causes[:MAX_CAUSES]],
+        "question": problem_records.redact(advice.question)[0],
+        "at": datetime.now(UTC).isoformat(),
     }
+    if owner_turns is not None:
+        stored["owner_turns"] = int(owner_turns)
+    return {**brief, "expert_diag": stored}
 
 
-def cached(brief: dict[str, Any] | None, noted: list[dict[str, Any]]) -> dict[str, Any] | None:
-    """The cached diagnosis when it still describes the main problem, else None (stale)."""
+def needs_refresh(
+    brief: dict[str, Any] | None,
+    noted: list[dict[str, Any]],
+    owner_turns: int,
+    said: str,
+    prefer: dict[str, Any] | None = None,
+) -> bool:
+    """True when there is no diagnosis for the working problem, or the owner answered something since
+    it was made and the answer adds a fact (not an "ok", not "I do not know"). The cache key still
+    changes on a new problem or new words on the problem; this adds the answers that carry no new
+    problem words ("cash")."""
+    stored = cached(brief, noted, prefer)
+    if stored is None:
+        return True
+    seen = stored.get("owner_turns")
+    if not isinstance(seen, int) or owner_turns <= seen:
+        return False  # made this turn or before turns were counted (old cache): still fresh
+    return hypothesis_reply.substantive(said)
+
+
+def cached(
+    brief: dict[str, Any] | None,
+    noted: list[dict[str, Any]],
+    prefer: dict[str, Any] | None = None,
+) -> dict[str, Any] | None:
+    """The cached diagnosis when it still describes the working problem, else None (stale)."""
     stored = (brief or {}).get("expert_diag")
-    problem = main_problem(noted)
+    problem = main_problem(noted, brief, prefer)
     if (
         isinstance(stored, dict)
         and problem is not None
@@ -751,29 +891,108 @@ def cached(brief: dict[str, Any] | None, noted: list[dict[str, Any]]) -> dict[st
     return None
 
 
-def question_context(brief: dict[str, Any] | None, noted: list[dict[str, Any]]) -> dict[str, Any]:
-    """What the brain prompt and the linter get when the expert is on and a main problem is noted:
-    the problem, its likely causes and the question that would settle the most uncertain one."""
-    problem = main_problem(noted)
+def _stems(text: str) -> set[str]:
+    return {w[:5] for w in re.findall(r"[^\W\d_]{4,}", (text or "").lower())}
+
+
+def same_question(a: str, b: str) -> bool:
+    """True when two questions ask the same thing: most of the shorter one's content words are in
+    the other (same language only; across languages the owner-turn bookkeeping decides)."""
+    first, second = _stems(a), _stems(b)
+    if len(first) < 2 or len(second) < 2:
+        return False
+    return len(first & second) / min(len(first), len(second)) >= 0.6
+
+
+def same_as_any(question: str, others: list[str]) -> bool:
+    return any(same_question(question, other) for other in others or [])
+
+
+def questions_in(texts: list[str]) -> list[str]:
+    """The last question sentence of each of pi's messages, oldest first (what pi already asked)."""
+    out: list[str] = []
+    for text in texts:
+        sentences = [s.strip() for s in re.split(r"(?<=[.!?؟])\s+", text or "") if s.strip()]
+        question = next((s for s in reversed(sentences) if s.endswith(QUESTION_MARKS)), "")
+        if question:
+            out.append(question[:200])
+    return out
+
+
+def question_context(
+    brief: dict[str, Any] | None,
+    noted: list[dict[str, Any]],
+    *,
+    asked: list[str] | None = None,
+    owner_messages: list[str] | None = None,
+    owner_turns: int | None = None,
+    prefer: dict[str, Any] | None = None,
+) -> dict[str, Any]:
+    """What the brain prompt and the linter get when the expert is on and a problem is noted: the
+    problem, its likely causes, the question that would settle the most uncertain one, the questions
+    pi already asked and what the owner answered since the diagnosis was made, so every next question
+    is the next most useful one about why the problem happens, never a repeat or an adjacent process."""
+    problem = main_problem(noted, brief, prefer)
     if problem is None:
         return {}
     out: dict[str, Any] = {
         "main_problem": str(problem.get("title") or "")[:120],
         "main_problem_words": " ".join(str(w) for w in problem.get("user_words") or [])[:300],
     }
-    if stored := cached(brief, noted):
+    if stored := cached(brief, noted, prefer):
         out["main_problem_causes"] = [str(c) for c in stored.get("causes") or []][:MAX_CAUSES]
-        if stored.get("question"):
-            out["suggested_next_question"] = str(stored["question"])
+        suggested = str(stored.get("question") or "")
+        if suggested and not stored.get("consumed") and not same_as_any(suggested, asked or []):
+            out["suggested_next_question"] = suggested
+        seen = stored.get("owner_turns")
+        said = [m for m in owner_messages or [] if m.strip()]
+        turns = owner_turns if owner_turns is not None else len(said)
+        if isinstance(seen, int) and turns > seen and said:
+            out["owner_answers_since"] = [m[:300] for m in said[-min(turns - seen, 3) :]]
+    if asked:
+        out["questions_already_asked"] = [q[:160] for q in asked[-4:]]
     return out
 
 
+def count_owner_turn(brief: dict[str, Any], message_id: str, in_window: int) -> dict[str, Any]:
+    """The brief with `owner_n` (how many messages the owner has sent in this chat) counted once for
+    this message. A chat the counter has not seen starts from the messages in the history window."""
+    if brief.get("owner_n_id") == message_id:
+        return brief
+    seen = brief.get("owner_n")
+    count = (int(seen) if isinstance(seen, int) else in_window) + 1
+    return {**brief, "owner_n": count, "owner_n_id": message_id}
+
+
+def mark_consumed(brief: dict[str, Any], reply: str) -> dict[str, Any]:
+    """pi has just asked a question while the cached one was on offer: it is not offered again (the
+    next turn works from the causes, the questions asked and the owner's answer)."""
+    stored = brief.get("expert_diag")
+    if (
+        not isinstance(stored, dict)
+        or stored.get("consumed")
+        or not (reply or "").rstrip().endswith(QUESTION_MARKS)
+    ):
+        return brief
+    return {**brief, "expert_diag": {**stored, "consumed": True}}
+
+
+def _given_keys(problem: dict[str, Any] | None) -> list[str]:
+    if problem is None:
+        return []
+    keys = [str(problem.get("ref") or ""), str(problem.get("title") or "")]
+    return list(dict.fromkeys(k for k in keys if k))
+
+
 def given_for(brief: dict[str, Any] | None, problem: dict[str, Any] | None) -> int:
-    """Ideas already handed over for this problem (the cap is two per problem)."""
-    table = (brief or {}).get("expert_given")
-    if not isinstance(table, dict) or problem is None:
-        return 0
-    return int(table.get(str(problem.get("ref") or problem.get("title") or "")) or 0)
+    """Ideas already handed over for this problem, in this chat and (`expert_given_elsewhere`, kept
+    by `solution_context.sync_elsewhere`) in the owner's other chats: the cap is two per problem."""
+    total = 0
+    for name in ("expert_given", "expert_given_elsewhere"):
+        table = (brief or {}).get(name)
+        if isinstance(table, dict):
+            total += sum(int(table.get(key) or 0) for key in _given_keys(problem))
+    return total
 
 
 def record_given(
