@@ -17,7 +17,8 @@ from sqlalchemy import delete, select
 from sqlalchemy.exc import DBAPIError
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.ai.manager import LLMManager
+from app.ai.errors import GatewayUnavailable
+from app.ai.manager import LLMManager, StructuredResult
 from app.ai.types import Attempt, Message
 from app.modules.business_settings.service import get_settings_row
 from app.modules.catalog.models import CatalogProduct
@@ -168,6 +169,10 @@ TEXT_LIMITS = {
     "proposal_evidence": 500,
     "feedback": 500,
     "plan": 800,
+    # Both have a max_length on the model but were never clipped: a long "understanding" of a
+    # three-message batch or a long dotted slot key failed the whole turn (schema.understanding).
+    "understanding": 600,
+    "asked_slot": 60,
 }
 
 
@@ -4946,6 +4951,92 @@ async def in_their_language(
         turn.reply = fixed
 
 
+class ReplyOnlyTurn(BaseModel):
+    """The reduced schema of the lenient retry: no enums, patterns or nested records for a model
+    or provider to reject, so a customer still gets pi's reply when the full turn cannot parse."""
+
+    model_config = ConfigDict(extra="ignore")
+    reply: str = ""
+    language: str = "en"
+
+    @model_validator(mode="before")
+    @classmethod
+    def _tolerate(cls, data: Any) -> Any:
+        if not isinstance(data, dict):
+            return {}
+        return {
+            "reply": _text(data.get("reply"), 4000),
+            "language": _text(data.get("language") or "en", 40),
+        }
+
+
+BAD_SHAPE_KINDS = ("invalid_output", "invalid_request")
+
+
+async def structured_turn(
+    manager: LLMManager,
+    scope: WorkspaceScope,
+    turn_model: type[ServiceTurn],
+    *,
+    alias: str,
+    messages: list[Message],
+    temperature: float,
+    conversation_id: UUID,
+) -> StructuredResult[ServiceTurn]:
+    """The model's full turn; when every provider failed only because its output (or the schema)
+    was rejected, one more call asks for the reply alone, so the customer never gets the
+    tech-down notice for a formatting problem. Real unavailability still raises."""
+    try:
+        return await manager.complete_structured(
+            scope,
+            turn_model,
+            alias=alias,
+            purpose="pi_service",
+            messages=messages,
+            temperature=temperature,
+            max_tokens=4096,  # thinking models (Gemini 3.x) count their thinking here too
+            conversation_id=conversation_id,
+        )
+    except GatewayUnavailable as failed:
+        bad = [a for a in failed.attempts if a.error_kind in BAD_SHAPE_KINDS]
+        if not bad:
+            raise
+        # Provider and kind only: the field path is already in the manager's ai.attempt log.
+        logger.warning(
+            "pi.structured_fallback kinds=%s providers=%s",
+            sorted({str(a.error_kind) for a in bad}),
+            sorted({a.provider for a in bad}),
+        )
+        lenient = [
+            *messages,
+            Message.user(
+                'Answer again as a JSON object with only two keys: "reply" (the whole reply to '
+                'the customer, written as the rules above say) and "language". Nothing else.'
+            ),
+        ]
+        try:
+            plain = await manager.complete_structured(
+                scope,
+                ReplyOnlyTurn,
+                alias=alias,
+                purpose="pi_service",
+                messages=lenient,
+                temperature=temperature,
+                max_tokens=2048,
+                conversation_id=conversation_id,
+            )
+        except GatewayUnavailable as again:
+            again.attempts = [*failed.attempts, *again.attempts]
+            raise again from None
+        if not plain.value.reply.strip():
+            raise failed from None
+        turn = ServiceTurn.model_validate(
+            {"reply": plain.value.reply, "language": plain.value.language}
+        )
+        plain.response.attempts = [*failed.attempts, *plain.response.attempts]
+        return StructuredResult(turn, plain.response)
+
+
 async def compose_service_turn(
     manager: LLMManager,
     scope: WorkspaceScope,
@@ -4990,14 +5081,13 @@ async def compose_service_turn(
     turn_model = ThinkingServiceTurn if context.get("thinking") else ServiceTurn
     result = await latency.timed(
         "model.reply",
-        manager.complete_structured(
+        structured_turn(
+            manager,
             scope,
             turn_model,
             alias=reply_alias(policy),
-            purpose="pi_service",
             messages=[Message.system(system_text), Message.user(context_json)],
             temperature=float(policy.ai_config.get("temperature", "0.20")),
-            max_tokens=4096,  # thinking models (Gemini 3.x) count their thinking here too
             conversation_id=conversation.id,
         ),
     )
@@ -5155,11 +5245,11 @@ async def compose_service_turn(
         latency.note("rewrite_reason", problem)
         retry = await latency.timed(
             "model.rewrite",
-            manager.complete_structured(
+            structured_turn(
+                manager,
                 scope,
                 turn_model,
                 alias=reply_alias(policy),
-                purpose="pi_service",
                 messages=[
                     # Rebuilt: the checks above may have added flags to the context (lint_slipped).
                     Message.system(system_for(context)),
@@ -5189,7 +5279,6 @@ async def compose_service_turn(
                     ),
                 ],
                 temperature=float(policy.ai_config.get("temperature", "0.20")),
-                max_tokens=4096,
                 conversation_id=conversation.id,
             ),
         )
