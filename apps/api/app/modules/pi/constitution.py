@@ -2232,6 +2232,31 @@ FALLBACK_LISTENING = {
     "ur": "اس میں سب سے زیادہ نقصان کس بات کا ہو رہا ہے؟",
     "ar": "ما أكثر جزء في هذا يكلّفك الآن؟",
 }
+# More safe questions for the same state: the safe line is a fixed question, so two replies that both
+# fell back asked the SAME question twice (live chat 2026-10-27, turns 15 and 17). The next one that
+# was not asked yet in this chat is used.
+FALLBACK_LISTENING_MORE = {
+    "en": [
+        "Which of these problems should we sort out first?",
+        "Where or when do you notice this first?",
+        "What have you tried so far for this?",
+    ],
+    "roman_ur": [
+        "In mein se sab se pehle kis masle ko theek karna zaroori hai?",
+        "Ye masla sab se pehle kab ya kahan nazar aata hai?",
+        "Aap ne is ke liye ab tak kya try kiya hai?",
+    ],
+    "ur": [
+        "ان میں سے سب سے پہلے کس مسئلے کو ٹھیک کرنا ضروری ہے؟",
+        "یہ مسئلہ سب سے پہلے کب یا کہاں نظر آتا ہے؟",
+        "آپ نے اس کے لیے اب تک کیا آزمایا ہے؟",
+    ],
+    "ar": [
+        "أي هذه المشاكل يجب معالجتها أولاً؟",
+        "أين أو متى تلاحظ هذا أولاً؟",
+        "ماذا جربت حتى الآن لهذا؟",
+    ],
+}
 FALLBACK_OTHER = {
     "en": "What would you like to ask about this next?",
     "roman_ur": "Aap is ke baare mein aage kya poochna chahenge?",
@@ -2262,6 +2287,17 @@ def _ai_answer(context: dict[str, Any], language: str) -> str:
     return fixed_lines.line("ai_answer", fixed_lines.code(context), AI_ANSWER[language])
 
 
+def _fresh_question(context: dict[str, Any], language: str) -> str:
+    """The safe listening question that pi has not asked in this chat yet: the standard one, then the
+    others in order; every one asked already gives the next-slot question or, last, the standard one."""
+    said = " ".join(_pi_replies(context)).lower()
+    options = [FALLBACK_LISTENING[language], *FALLBACK_LISTENING_MORE.get(language, [])]
+    for line in options:
+        if line.lower().rstrip("?؟") not in said:
+            return line
+    return _next_question(context, "") or FALLBACK_LISTENING[language]
+
+
 def safe_fallback(context: dict[str, Any]) -> str:
     """The safe line for the state, in the person's language (spec 9.5)."""
     language = _language(context)
@@ -2280,7 +2316,7 @@ def safe_fallback(context: dict[str, Any]) -> str:
             flow.State.S_RETURN,
             flow.State.S_MAP_SHARE,
         )
-        parts.append((FALLBACK_LISTENING if listening else FALLBACK_OTHER)[language])
+        parts.append(_fresh_question(context, language) if listening else FALLBACK_OTHER[language])
     return " ".join(parts)
 
 

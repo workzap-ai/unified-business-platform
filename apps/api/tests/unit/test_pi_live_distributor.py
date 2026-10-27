@@ -69,3 +69,50 @@ def test_a_message_that_answers_and_asks_still_closes_the_open_question() -> Non
 
 def test_the_classifier_still_stays_out_of_plain_statements() -> None:
     assert not ask_classifier.needed("Sub alag alag dept kaam kar rahay hain", "S1_LISTENING")
+
+
+# --- the repeated question was the safe fallback line itself ------------------------------------
+
+
+def fallback_context(history: list[dict[str, str]]) -> dict:
+    return {
+        "pi_mode": "brain",
+        "flow": {"state": "S1_LISTENING"},
+        "reply_language": "roman_ur",
+        "latest_customer_message": M16,
+        "history": history,
+    }
+
+
+def test_the_safe_line_is_never_the_same_question_twice_in_a_chat() -> None:
+    from app.modules.pi import constitution
+
+    history = [{"role": "ai", "text": "Hi, main pi hoon, Workzap ka AI. Kia haal hain?"}]
+    seen: list[str] = []
+    for _ in range(4):
+        line = constitution.safe_fallback(fallback_context(history))
+        assert line not in seen, (line, seen)
+        seen.append(line)
+        history = [*history, {"role": "ai", "text": line}, {"role": "customer", "text": "jawab"}]
+    assert seen[0] == constitution.FALLBACK_LISTENING["roman_ur"]  # the first time is unchanged
+
+
+def test_when_every_safe_question_was_asked_the_next_slot_question_or_the_standard_one_follows() -> (
+    None
+):
+    from app.modules.pi import constitution
+
+    asked = [
+        constitution.FALLBACK_LISTENING["roman_ur"],
+        *constitution.FALLBACK_LISTENING_MORE["roman_ur"],
+    ]
+    history = [{"role": "ai", "text": q} for q in asked]
+    line = constitution.safe_fallback(fallback_context(history))
+    assert line.endswith("?")
+
+
+def test_the_safe_lines_exist_in_every_language_the_fallback_has() -> None:
+    from app.modules.pi import constitution
+
+    for language in constitution.FALLBACK_LISTENING:
+        assert len(constitution.FALLBACK_LISTENING_MORE[language]) == 3
