@@ -64,6 +64,7 @@ are outdated. You never give advice a licence is needed for (medical, veterinary
 DIAGNOSE_RULES = """Think like that operator, then answer with ONE JSON object and nothing else:
 {
  "problem": "the owner's problem restated in their own words, one sentence",
+ "owner_language": "the language and script the owner writes in, in English words: Roman Urdu, Urdu script, Hindi, Arabic, French, Persian, Swahili ... (English if they write English)",
  "causes": [ {"cause": "a likely cause, 3 to 10 words", "evidence_for": ["owner's words that support it"], "evidence_against": ["owner's words that weaken it"]} ],
  "missing_fact": "the single fact that would most change your advice",
  "question": "that fact as ONE plain English question to the owner, one sentence, about the main problem or its causes only",
@@ -209,6 +210,7 @@ class Diagnosis:
     causes: list[Cause] = field(default_factory=list)
     missing_fact: str = ""
     question: str = ""
+    language: str = ""
     candidates: list[Candidate] = field(default_factory=list)
 
 
@@ -221,6 +223,7 @@ class Advice:
     question: str = ""
     causes: list[str] = field(default_factory=list)
     problem: str = ""
+    language: str = ""  # the language the model read the owner writing in
     judged: bool = False
     dropped: int = 0  # candidates the vetting removed
     drops: list[str] = field(default_factory=list)  # why, for the evaluation (never shown)
@@ -287,6 +290,7 @@ def parse_diagnosis(text: str) -> Diagnosis | None:
         causes=causes,
         missing_fact=str(data.get("missing_fact") or "").strip()[:300],
         question=" ".join(str(data.get("question") or "").split())[:300],
+        language=" ".join(str(data.get("owner_language") or "").split())[:40],
         candidates=candidates[: CANDIDATES + 2],
     )
     if not (diagnosis.candidates or diagnosis.question or diagnosis.causes):
@@ -592,6 +596,7 @@ async def _pipeline(
         question=question,
         causes=[c.cause for c in diagnosis.causes],
         problem=diagnosis.problem,
+        language=diagnosis.language,
     )
     if not ideas_wanted or want <= 0 or not diagnosis.candidates:
         return advice

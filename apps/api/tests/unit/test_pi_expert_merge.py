@@ -74,3 +74,51 @@ async def test_the_library_fallback_never_repeats_what_was_given() -> None:
     _c, second = await run(manager, make_policy(), make_context(noted_problems=noted), brief)
     again = [line for line in second.reply.splitlines() if line.startswith("•")]
     assert not set(given) & set(again)
+
+
+# --- the language the expert read the owner writing in (for a language the code does not know) ---
+
+SWAHILI = "Nina duka la nguo na mauzo yamepungua sana, wateja hawarudi tena"
+
+
+async def test_a_language_the_code_does_not_know_is_taken_from_the_expert_and_remembered() -> None:
+    answer = diag([GOOD_ONE, GOOD_TWO]).replace(
+        '"problem"', '"owner_language": "Swahili", "problem"', 1
+    )
+    context = make_context(latest_customer_message=SWAHILI)
+    context.pop("reply_language", None)  # the code found nothing it knows
+    conversation, turn = await run(Manager(answer), make_policy(judge=False), context)
+    assert context["reply_language_other"] == "Swahili"
+    assert conversation.service_brief["owner_language"] == "Swahili" and turn.reply.count("•") == 2
+
+
+async def test_the_codes_own_detection_is_never_overridden_by_the_model() -> None:
+    answer = diag([GOOD_ONE, GOOD_TWO]).replace(
+        '"problem"', '"owner_language": "Swahili", "problem"', 1
+    )
+    context = make_context(reply_language="roman_ur")
+    conversation, _turn = await run(Manager(answer), make_policy(judge=False), context)
+    assert (
+        "reply_language_other" not in context and "owner_language" not in conversation.service_brief
+    )
+
+
+async def test_english_or_nonsense_from_the_model_changes_nothing() -> None:
+    for named in ("English", "unknown", "12345", "Roman Urdu"):
+        answer = diag([GOOD_ONE, GOOD_TWO]).replace(
+            '"problem"', f'"owner_language": "{named}", "problem"', 1
+        )
+        context = make_context()
+        context.pop("reply_language", None)
+        conversation, _turn = await run(Manager(answer), make_policy(judge=False), context)
+        assert "reply_language_other" not in context, named
+        assert "owner_language" not in conversation.service_brief, named
+
+
+def test_the_diagnosis_parser_reads_the_language() -> None:
+    from app.modules.pi import expert_advisor
+
+    parsed = expert_advisor.parse_diagnosis(
+        diag([GOOD_ONE]).replace('"problem"', '"owner_language": "Pashto", "problem"', 1)
+    )
+    assert parsed is not None and parsed.language == "Pashto"

@@ -1582,6 +1582,10 @@ async def brain_problems(
         context["expert_on"] = True
         # the next question targets the main problem's most uncertain cause
         context.update(expert_advisor.question_context(conversation.service_brief, noted or []))
+    if not context.get("reply_language") and not context.get("reply_language_other"):
+        # a language the code does not know, read once by the expert and remembered for the chat
+        if saved := str((conversation.service_brief or {}).get("owner_language") or ""):
+            context["reply_language_other"] = saved
     # The specification itself, in its own words, for this stage and topic (spec Appendix A).
     context["spec_guidance"] = spec_handbook.guidance(
         conversation.flow_state or "S1_LISTENING",
@@ -2363,6 +2367,29 @@ def expert_library_ideas(
     return found
 
 
+KNOWN_LANGUAGE_NAMES = frozenset({"roman urdu", "urdu", "hindi", "hinglish"})
+LANGUAGE_NAME = re.compile(r"^[A-Za-z][A-Za-z() -]{1,38}$")
+
+
+def adopt_model_language(
+    context: dict[str, Any], brief: dict[str, Any], named: str
+) -> dict[str, Any]:
+    """The code found no language it knows in the owner's words (it returned nothing: a real
+    message in another language, Swahili, Pashto, Korean ...), so the language the expert read them
+    writing in is used: remembered for the chat and given to the translation step, which writes the
+    ideas and the fixed lines in it. The code's own detection is never overridden when it found
+    something."""
+    if context.get("reply_language") or context.get("reply_language_other"):
+        return brief
+    name = " ".join(str(named or "").split())
+    if not LANGUAGE_NAME.match(name) or name.lower() in ("english", "none", "unknown", "n/a"):
+        return brief
+    if name.lower() in KNOWN_LANGUAGE_NAMES:
+        return brief  # the code's own notices cover these
+    context["reply_language_other"] = name.title()
+    return {**brief, "owner_language": name.title()}
+
+
 async def brain_expert_ideas(
     manager: LLMManager,
     scope: WorkspaceScope,
@@ -2413,6 +2440,7 @@ async def brain_expert_ideas(
     )
     if advice is None:
         return False
+    brief = adopt_model_language(context, brief, advice.language)
     language = str(context.get("reply_language") or "en")
     brief = expert_advisor.remember(brief, main, advice)
     if not advice.ideas:
