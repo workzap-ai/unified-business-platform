@@ -31,7 +31,8 @@ price or cost, a question about who the assistant is, anything else."""
 # a heavy spelling ("solution ap dw"), so the model decides.
 ASKISH = re.compile(
     r"solution|\bhal\b|idea|mashwara|suggest|btyn|batayen|batain|\bskt?[yae]\b|\bsakt[ea]\b|"
-    r"\bhelp\b|madad|\bwhat can\b|\bcan you\b",
+    r"\bhelp\b|madad|\bwhat can\b|\bcan you\b|\bkaise\b|\bsamjha|samajh nahi|\bsystem\b|control|"
+    r"\bwhat should\b|\bhow (?:do|can|should) i\b",
     re.IGNORECASE,
 )
 MIN_WORDS = 3

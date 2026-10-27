@@ -289,7 +289,33 @@ def asked_in_other_ways(text: str) -> bool:
     return len(said.split()) <= EXTRA_WEAK_WORDS and bool(EXTRA_WEAK.search(said))
 
 
+# An owner who is lost asks for help without the word "solution" (live chat, 2026-10-27: a distributor
+# with crores of stock and no visibility said "in sab ko control kaise karun", "aisa system kaise
+# banega" and "aap mujhe samjhayen ke kya system banana chahiye" and got five more questions). These
+# are a request to be helped. "Samajh nahi aa raha" counts only with "kaise" (how): without it the
+# owner is puzzled about a cause ("samajh nahi aa raha ye kyun ho raha hai"), which is not an ask.
+IMPLICIT_HELP = re.compile(
+    r"\b(?:control|handle|manage|sambhal\w*|sanbhal\w*|theek|thik|solve|fix|monitor)(?: \w+){0,2}"
+    r" (?:kaise|kese|kesay|kaisay) (?:karun|karoon|karon|krun|karen|karein|kren|kar sakta|kar sakte)\b"
+    r"|\b(?:kaise|kese|kesay|kaisay) (?:control|handle|manage|monitor|sambhal\w*|sanbhal\w*)"
+    r"(?: \w+){0,2} (?:karun|karoon|karon|krun|karen|karein|kren)\b"
+    r"|\bsystem (?:kaise|kese|kesay|kaisay) (?:banega|banay ga|bnega|bane ga|banayen|bnayen|banaen|banta|ban sakta)\b"
+    r"|\bkya (?:system|software|app|tareeqa|tariqa|hal)(?: \w+){0,2} (?:banana|bnana|banani|bnani|banayen|bnayen|lagana|lagani|chahiye|chahie)\b"
+    r"|\b(?:aap |ap |app )?(?:mujhe|mujhy|mjhe|hamein|humein)(?: \w+){0,2} (?:samjhayen|samjhaiye|samjhaen|samjhaye|samjha dein|samjha do|samjhao|samjhaiye ga)\b"
+    r"|\bsamajh nahi (?:aa|a) raha (?:ke |ki |hai ke )?(?:\w+ ){0,10}(?:kaise|kese|kesay|kaisay)\b"
+    r"|\b(?:mujhe|mjhe) (?:kuch )?(?:madad|help|rehnumai|rahnumai|mashwara) (?:chahiye|chahie|do|dein|karen)\b"
+    r"|\bhow (?:do|can|should) i (?:control|handle|manage|fix|solve|track|monitor)\b"
+    r"|\bwhat (?:system|tool|setup) (?:should|do) (?:i|we) (?:build|need|use|set up)\b"
+    r"|\bi (?:don't|dont|do not) know how to (?:control|handle|manage|fix|solve|track)\b"
+    r"|मुझे समझ नहीं आ रहा[^.?!\n]{0,60}कैसे|कैसे (?:कंट्रोल|संभाल|ठीक) करूं|कौन सा सिस्टम"
+    r"|سمجھ نہیں آ رہا[^.?!\n]{0,60}کیسے|کیسے (?:کنٹرول|سنبھال|ٹھیک) کروں|کون سا سسٹم",
+    re.IGNORECASE,
+)
+
+
 def _asked_for_ideas(text: str) -> bool:
+    if IMPLICIT_HELP.search(text) and not NOT_AN_ASK.search(text):
+        return True
     if DO_SOMETHING.search(text) and not REFUSAL_NEAR.search(text):
         return True
     if asked_in_other_ways(text):

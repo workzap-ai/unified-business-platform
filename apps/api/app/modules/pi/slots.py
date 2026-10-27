@@ -120,6 +120,9 @@ def same_question(a: str, b: str) -> bool:
     )
 
 
+LONG_ANSWER_WORDS = 12
+
+
 def is_answer(said: str) -> bool:
     """Anything the person says closes the last question, unless it is only a request that pi
     answer something else first (a solution ask, a document ask) or too empty to be an answer."""
@@ -128,7 +131,12 @@ def is_answer(said: str) -> bool:
     text = " ".join((said or "").split())
     if not any(ch.isalnum() for ch in text):
         return bool(text)  # a thumbs-up or a number is an answer
-    return not solution_ask.asked_for_ideas(text)
+    if not solution_ask.asked_for_ideas(text):
+        return True
+    # A long message that also asks for help (live chat 2026-10-27: facts about the losses, then
+    # "aap mujhe samjhayen ... kya system banana chahiye") answered the question too; only a short
+    # bare request ("solution do") is nothing but a request.
+    return len(text.split()) >= LONG_ANSWER_WORDS
 
 
 def advance(
