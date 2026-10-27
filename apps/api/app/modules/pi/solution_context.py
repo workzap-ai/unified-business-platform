@@ -240,7 +240,7 @@ def _expert_hold(
     its prompt, and as the fallback). The context says "asked, no idea yet" and
     `brain_free_ideas` runs the expert. None: this turn is not that (how-to, outside the askable
     states, or the idea budget is spent: the usual path answers)."""
-    asked = solution_ask.asked_for_ideas(said)
+    asked = solution_ask.asked_for_ideas(said) or solution_ask.rejects_ideas(said)
     if (conversation.flow_state or "") not in solution_ask.ASKABLE or not (asked or carried):
         return None
     if solution_ask.asked_howto(said) and not asked:

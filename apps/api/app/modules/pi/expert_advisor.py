@@ -420,6 +420,14 @@ def vet(
     return chosen
 
 
+def gold_examples(owner_words: str, industry: str | None, count: int = 2) -> list[str]:
+    """One idea from each of the owner's gold problems nearest to what they said and their trade:
+    the best examples of level there are (owner-approved), shown before any pack idea."""
+    from app.modules.pi import gold_ideas as gold
+
+    return gold.examples(owner_words, industry or "", count)
+
+
 def pack_examples(entry_ideas: list[str], owner_words: str, count: int = 3) -> list[str]:
     """Pack ideas as examples of level: those that assume no channel or asset the owner never named."""
     out: list[str] = []
@@ -655,7 +663,10 @@ async def advise(
                 country=country,
                 never_say=never_say or [],
                 already_said=already_said or [],
-                examples=pack_examples(entry_ideas or [], owner_words),
+                examples=[
+                    *gold_examples(owner_words, industry),
+                    *pack_examples(entry_ideas or [], owner_words),
+                ],
                 ctx=idea_ctx,
                 want=want,
                 use_judge=use_judge,

@@ -56,6 +56,8 @@ from app.modules.pi import (
     solution_ask,
     solution_context,
     solution_free,
+    solution_library,
+    solution_lint,
     solution_rules,
     solution_score,
     solutions,
@@ -2338,6 +2340,29 @@ def asked_without_ideas(context: dict[str, Any]) -> bool:
 COUNTRY_NAMES = {"PK": "Pakistan", "AE": "the UAE", "CA": "Canada"}
 
 
+def expert_library_ideas(
+    brief: dict[str, Any],
+    noted_now: list[dict[str, Any]],
+    owner_words: str,
+    idea_ctx: "idea_filter.IdeaContext | None",
+    room: int,
+) -> list[str]:
+    """When the expert gives nothing (the model failed or timed out, or every candidate was dropped)
+    the owner still gets ideas: the library category the cue words name, through the same idea
+    filter and reply linter as the expert's own, never one already given."""
+    before = [str(x) for x in brief.get("library_given") or []]
+    found: list[str] = []
+    for category in solution_library.best_category(noted_now):
+        for idea in solution_library.ideas_for(category, before, 4, owner_words):
+            if idea_filter.failures(idea, owner_words, idea_ctx) or not solution_lint.passes(idea):
+                continue
+            if not solution_library.already_said(idea, [*before, *found]):
+                found.append(idea)
+            if len(found) >= room:
+                return found
+    return found
+
+
 async def brain_expert_ideas(
     manager: LLMManager,
     scope: WorkspaceScope,
@@ -2520,6 +2545,29 @@ async def brain_free_ideas(
             turn._english = True
             turn.awaiting_customer = True
             turn._free = True
+            return
+        if expert:
+            # never a dead end in expert mode: the cue-chosen library ideas, vetted like the rest
+            titles = [str(p.get("title") or "") for p in context.get("noted_problems") or []]
+            brief = dict(conversation.service_brief or {})
+            library = expert_library_ideas(
+                brief,
+                context.get("noted_problems") or [],
+                " ".join([said, *titles]),
+                idea_ctx,
+                left,
+            )[:2]
+            if library:
+                language = str(context.get("reply_language") or "en")
+                turn.reply = with_disclosure(
+                    ideas_opener(context) + solution_rules.idea_lines(library), context, language
+                )
+                turn._english = True
+                turn.awaiting_customer = True
+                turn._free = True
+                brief["ideas_given"] = int(brief.get("ideas_given") or 0) + len(library)
+                brief["library_given"] = [*(brief.get("library_given") or []), *library][-20:]
+                conversation.service_brief = brief
         return
     language = str(context.get("reply_language") or "en")
     turn.reply = with_disclosure(
