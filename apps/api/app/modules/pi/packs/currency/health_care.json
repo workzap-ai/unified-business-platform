@@ -1,0 +1,76 @@
+{
+ "cluster": "health_care",
+ "version": 1,
+ "as_of": "2026-10",
+ "industries": [
+  "aesthetic_and_dermatology_clinics",
+  "ambulance_and_patient_transport_services",
+  "clinics_and_gp_practices",
+  "dental_clinics",
+  "diagnostic_labs_and_sample_collection_centres",
+  "elderly_care_homes",
+  "fertility_and_ivf_clinics",
+  "home_healthcare_and_nursing_agencies",
+  "hospitals",
+  "medical_equipment_and_device_distributors",
+  "mental_health_and_therapy_practices",
+  "pharmacies_and_medical_stores",
+  "physiotherapy_and_rehabilitation",
+  "radiology_and_imaging_centres"
+ ],
+ "how_customers_find_and_choose": [
+  "Patients search the map listing for the nearest trusted provider and read reviews about waiting time and how they were treated",
+  "Referral from a doctor, a relative or a friend still matters most, especially for serious or sensitive care",
+  "Patients message to ask about timings, availability of a doctor and how to book before they come",
+  "Clear information on who the doctors are, what services exist and how to reach the clinic builds trust",
+  "Families choose elder and home care mainly on reputation, staff quality and responsiveness to questions"
+ ],
+ "what_works_now": [
+  "A complete map listing with hours, doctor names, services and a phone or chat contact",
+  "Appointment booking by chat or phone with a reminder the day before to cut missed visits",
+  "Clear wait-time and cost information given when booking, and the policy for cancellations",
+  "Polite, quick reply to patient messages with a person handling them at set hours",
+  "Reminders for follow-up visits, vaccinations, screenings or repeat tests where the clinic keeps patient records",
+  "Respectful handling of patient information: only the minimum is shared in chat",
+  "Educational posts and messages that explain, in plain words, how the clinic can help, without promises of results"
+ ],
+ "outdated_or_weak": [
+  "Advertising guaranteed cures, results or comparative claims about other providers",
+  "Before and after photos of patients without clear consent",
+  "Discount offers on medical treatment as the main selling point",
+  "Printed pamphlets as the main source of new patients",
+  "Chasing patients with repeated promotional messages"
+ ],
+ "local_context": {
+  "PK": [
+   "Cash on delivery and cash at the counter are still common; bank transfer and mobile wallet payments are now normal for many customers",
+   "Ramadan and the two Eids reshape demand, opening hours and staff availability every year",
+   "Summer heat, monsoon rain and power cuts affect operations and footfall",
+   "Customers often write in Urdu, Roman Urdu or a regional language, and chat is the usual first contact",
+   "Patients often pay in cash at the counter; insurance coverage varies by clinic and employer",
+   "Seasonal illness patterns and Ramadan fasting affect visit patterns and timings",
+   "Health care providers are regulated by the medical and pharmacy authorities; the owner confirms specifics with them"
+  ],
+  "UAE": [
+   "Customers are multilingual and expect quick replies in chat; card and tap payments are normal",
+   "Winter is the busy season; many residents travel in summer so demand can dip",
+   "Ramadan and Eid change hours and buying patterns; the licence a business holds decides what it may sell and advertise, so the owner checks that with the licensing body",
+   "Insurance is central; patients check which providers are covered before booking",
+   "Health care is licensed by the health authority, which also sets rules on advertising and patient data; the owner confirms specifics"
+  ],
+  "CA": [
+   "Customers expect online booking or enquiry, card and bank e-transfer payment, and clear written confirmation",
+   "Long winters and a short summer peak shape outdoor and seasonal trades",
+   "English and French (in Quebec) matter, and many communities prefer their own language; consent for marketing messages and sales tax rules vary, so the owner checks them with a professional",
+   "Public health care is the first point; private clinics serve allied care such as dental, physiotherapy and therapy",
+   "Health information is protected by privacy rules; the owner confirms specifics with the regulator"
+  ]
+ },
+ "never_assume": [
+  "A website or a booking link",
+  "Electronic patient records",
+  "Permission to share patient photos or stories",
+  "Insurance billing staff"
+ ],
+ "review_status": "needs human review"
+}

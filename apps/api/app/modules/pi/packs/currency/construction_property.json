@@ -1,0 +1,77 @@
+{
+ "cluster": "construction_property",
+ "version": 1,
+ "as_of": "2026-10",
+ "industries": [
+  "architects_and_engineering_consultancies",
+  "cleaning_and_janitorial_companies",
+  "elevator_and_escalator_services",
+  "facility_management",
+  "general_contractors",
+  "housing_society_and_building_management",
+  "hvac_ac_sales_installation_and_service",
+  "interior_design_and_fit_out",
+  "landscaping_and_swimming_pool_services",
+  "mep_contractors",
+  "pest_control",
+  "property_developers",
+  "property_management_and_rentals",
+  "real_estate_agencies_and_brokers",
+  "solar_epc_and_installers"
+ ],
+ "how_customers_find_and_choose": [
+  "Homeowners search the map listing, read reviews and look at photos of finished jobs before calling",
+  "Property seekers start with online listings, photos and short video walkthroughs, then move to chat or a call with the agent",
+  "Referrals from neighbours, friends and previous clients remain the strongest source for trades and contractors",
+  "Business and building clients choose on past projects, response speed and clear written scope",
+  "Customers expect a visit or a clear written estimate soon after the first contact"
+ ],
+ "what_works_now": [
+  "A short gallery of finished jobs with before and after photos, shared in chat on request",
+  "A written scope, timeline and payment milestones agreed before work starts",
+  "Sharing progress photos with the client during a project without being asked",
+  "A reply within hours to every enquiry, with a clear next step such as a site visit",
+  "A saved list of past clients asked for a review once the job is complete",
+  "For agents and developers: honest, current listings with clear photos and a short video tour",
+  "A simple log of service dates for contract customers, with a reminder when the next visit is due"
+ ],
+ "outdated_or_weak": [
+  "Cold-calling and pamphlets in neighbourhoods as the main source of work",
+  "Verbal estimates and promises with nothing in writing",
+  "Listings with old photos or properties already sold",
+  "Generic advice to 'build a brand' with no projects shown",
+  "Claiming a finished look with only renderings and no real photos"
+ ],
+ "local_context": {
+  "PK": [
+   "Cash on delivery and cash at the counter are still common; bank transfer and mobile wallet payments are now normal for many customers",
+   "Ramadan and the two Eids reshape demand, opening hours and staff availability every year",
+   "Summer heat, monsoon rain and power cuts affect operations and footfall",
+   "Customers often write in Urdu, Roman Urdu or a regional language, and chat is the usual first contact",
+   "Raw material price changes, summer heat and monsoon rain affect schedules",
+   "Informal contracts and advance payments are common; written scope protects both sides",
+   "Approvals from the local development authority are a touchpoint the owner confirms with the authority"
+  ],
+  "UAE": [
+   "Customers are multilingual and expect quick replies in chat; card and tap payments are normal",
+   "Winter is the busy season; many residents travel in summer so demand can dip",
+   "Ramadan and Eid change hours and buying patterns; the licence a business holds decides what it may sell and advertise, so the owner checks that with the licensing body",
+   "Property and fit-out activity follow the market cycle; developers and agents are regulated by the real estate authority",
+   "Tenancy and facility rules are set by the authority or the building owner; the owner confirms specifics"
+  ],
+  "CA": [
+   "Customers expect online booking or enquiry, card and bank e-transfer payment, and clear written confirmation",
+   "Long winters and a short summer peak shape outdoor and seasonal trades",
+   "English and French (in Quebec) matter, and many communities prefer their own language; consent for marketing messages and sales tax rules vary, so the owner checks them with a professional",
+   "Building codes, permits and licences apply to trades and are checked with the local authority or licensing body",
+   "Winter shuts down outdoor work; spring and summer are the busy months"
+  ]
+ },
+ "never_assume": [
+  "A website with a project gallery",
+  "Past project photos kept in one place",
+  "Staff who answer enquiries full time",
+  "A written estimate template"
+ ],
+ "review_status": "needs human review"
+}

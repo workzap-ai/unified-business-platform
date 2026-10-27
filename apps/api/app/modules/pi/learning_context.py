@@ -44,6 +44,7 @@ async def build(
     embedder: Embedder | None = None,
     canary_percent: int = 10,
     solution_mode: bool = False,
+    expert: bool = False,
 ) -> dict[str, Any]:
     """`learned_examples`, `question_hint` and `lessons` for this turn (each may be missing)."""
     said = message.body if message is not None and message.body else ""
@@ -124,7 +125,11 @@ async def build(
             out["voice_hint"] = {"moment": moment, "wording": variant.text}
             used["voice_arm"] = str(variant.id)
     if solution_mode:
-        out.update(await solution_context.build(session, scope, conversation, said, noted, used))
+        out.update(
+            await solution_context.build(
+                session, scope, conversation, said, noted, used, expert=expert
+            )
+        )
     if (
         used["arm"]
         or used["examples"]

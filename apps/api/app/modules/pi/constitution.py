@@ -1593,6 +1593,35 @@ def _style_soft(reply: str, context: dict[str, Any], heard: str, state: Any, add
         add(Violation("R-VOICE-09", "bullets only in summaries"))
 
 
+def _stems(text: str) -> set[str]:
+    return {w[:5] for w in re.findall(r"[^\W\d_]{4,}", (text or "").lower())}
+
+
+MAIN_PROBLEM_MIN_WORDS = 3  # a question shorter than this has too few content words to judge
+
+
+def _off_the_main_problem(question: str, context: dict[str, Any]) -> bool:
+    """True when the question's content words overlap neither the main problem (title and the
+    owner's words) nor any listed cause. Generic closers are R-ASK-05's business."""
+    if GENERIC_CLOSER.search(question):
+        return False
+    if str(context.get("reply_language") or "en") not in ("en", "roman_ur"):
+        return False  # words in another script cannot be compared with the English title
+    asked = _stems(question)
+    if len(asked) < MAIN_PROBLEM_MIN_WORDS:
+        return False
+    about = _stems(
+        " ".join(
+            [
+                str(context.get("main_problem") or ""),
+                str(context.get("main_problem_words") or ""),
+                *[str(c) for c in context.get("main_problem_causes") or []],
+            ]
+        )
+    )
+    return not (asked & about)
+
+
 def lint(reply: str, context: dict[str, Any]) -> list[Violation]:
     """Every constitution or voice rule the draft breaks (empty when it is fine to send)."""
     found: list[Violation] = []
@@ -1918,6 +1947,16 @@ def lint(reply: str, context: dict[str, Any]) -> list[Violation]:
                 "how many, what happens next), not the generic 'anything else?'",
             )
         )
+    if context.get("main_problem") and last_question.endswith(QUESTION_MARKS):
+        # R-ASK-08 (expert advisor on): the question is about the main problem or its causes
+        if _off_the_main_problem(last_question, context):
+            add(
+                Violation(
+                    "R-ASK-08",
+                    "the question must be about the owner's main problem or its likely causes, "
+                    "not an adjacent process: ask about the problem they raised",
+                )
+            )
     for title in NOTED_TITLE.findall(reply):
         if len(title.split()) > NOTED_WORDS:
             add(

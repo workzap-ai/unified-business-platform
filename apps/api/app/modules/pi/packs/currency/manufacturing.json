@@ -1,0 +1,84 @@
+{
+ "cluster": "manufacturing",
+ "version": 1,
+ "as_of": "2026-10",
+ "industries": [
+  "auto_parts_manufacturers_and_vendors_to_oems",
+  "carpets_handicrafts_and_artisan_workshops",
+  "cement_blocks_pavers_and_precast",
+  "ceramics_glass_and_marble_granite_processing",
+  "chemicals_paints_and_coatings",
+  "cosmetics_and_personal_care_manufacturing",
+  "electrical_goods",
+  "footwear_manufacturing",
+  "furniture_manufacturing_and_woodwork",
+  "garment_and_knitwear_export_units",
+  "general_factories_and_workshops",
+  "home_textiles_and_towels",
+  "leather_goods_and_tanneries",
+  "mining_and_quarrying",
+  "packaging_and_corrugation",
+  "pharmaceutical_manufacturing",
+  "plastics_and_injection_moulding",
+  "printing_presses_and_print_on_demand",
+  "solar_panels_inverters_and_batteries",
+  "sports_goods_manufacturing",
+  "steel_re_rolling_mills_and_metal_fabrication",
+  "surgical_and_dental_instruments_manufacturing",
+  "textile_spinning_and_weaving_mills"
+ ],
+ "how_customers_find_and_choose": [
+  "Business buyers find makers through trade contacts, referrals, exhibitions and increasingly through online business directories and chat",
+  "Buyers ask for samples, photos or short videos of the product and the factory floor before a visit",
+  "Reliability on quality, delivery time and honest communication decides repeat orders more than the lowest quote",
+  "Export buyers check certifications, past orders and responsiveness; local buyers lean on reputation and credit terms"
+ ],
+ "what_works_now": [
+  "A short product catalogue or sample set with clear specifications, easy to send in chat",
+  "Photo and video proof of the factory floor, process and finished lots shared with buyers",
+  "Giving buyers an order status update before they ask: in production, packed, dispatched",
+  "Written order sheets with quantity, specification, date and agreed terms so disputes are rare",
+  "Tracking rejections and rework by cause so the same fault is not repeated",
+  "Planning raw material orders against confirmed orders, not hope",
+  "A complete company listing online with address, product range and contact"
+ ],
+ "outdated_or_weak": [
+  "Relying only on a few big buyers with no second source of orders",
+  "Hand-written orders and verbal promises that nobody can check later",
+  "Generic marketing advice made for consumer shops, such as social media daily posts or discount offers",
+  "Waiting for buyers to arrive at trade fairs as the only lead source",
+  "Quoting from memory with no record of material cost changes"
+ ],
+ "local_context": {
+  "PK": [
+   "Cash on delivery and cash at the counter are still common; bank transfer and mobile wallet payments are now normal for many customers",
+   "Ramadan and the two Eids reshape demand, opening hours and staff availability every year",
+   "Summer heat, monsoon rain and power cuts affect operations and footfall",
+   "Customers often write in Urdu, Roman Urdu or a regional language, and chat is the usual first contact",
+   "Power and gas supply interruptions and raw material price swings affect planning",
+   "Export units follow buyer compliance and shipping deadlines closely; credit terms between businesses are long and cash flow is a constant concern",
+   "Eid holidays close many units for days; labour availability dips around them"
+  ],
+  "UAE": [
+   "Customers are multilingual and expect quick replies in chat; card and tap payments are normal",
+   "Winter is the busy season; many residents travel in summer so demand can dip",
+   "Ramadan and Eid change hours and buying patterns; the licence a business holds decides what it may sell and advertise, so the owner checks that with the licensing body",
+   "Many factories are in industrial zones and free zones with their own licensing rules; the owner asks the zone authority",
+   "Local manufacturing is often for re-export, regional supply or construction demand"
+  ],
+  "CA": [
+   "Customers expect online booking or enquiry, card and bank e-transfer payment, and clear written confirmation",
+   "Long winters and a short summer peak shape outdoor and seasonal trades",
+   "English and French (in Quebec) matter, and many communities prefer their own language; consent for marketing messages and sales tax rules vary, so the owner checks them with a professional",
+   "Smaller makers often serve specialty or custom niches and sell online and through local shops",
+   "Product safety, labelling and environmental rules apply by sector; the owner checks with the relevant authority"
+  ]
+ },
+ "never_assume": [
+  "A website or a product catalogue",
+  "A sales team or a dedicated person handling enquiries",
+  "Computerised stock or production records",
+  "Export or certification experience"
+ ],
+ "review_status": "needs human review"
+}

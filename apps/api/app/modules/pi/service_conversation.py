@@ -34,6 +34,7 @@ from app.modules.pi import (
     business,
     constitution,
     decisions,
+    expert_advisor,
     fixed_lines,
     flow,
     followup_policy,
@@ -63,6 +64,7 @@ from app.modules.pi import (
     taxonomy,
     think_plan,
     think_prompt,
+    value_line,
 )
 from app.modules.pi import (
     critique as critique_mod,
@@ -1155,6 +1157,7 @@ def system_for(context: dict[str, Any]) -> str:
             + BRAIN_DECISIONS
             + BRAIN_VOICE
             + (BRAIN_ASK if asked else "")
+            + (expert_advisor.PROMPT_RULE if context.get("main_problem") else "")
             + (memory_block.SYSTEM_LINE if context.get("what_i_know") else "")
             + think_prompt.block(context)
         )
@@ -1551,6 +1554,7 @@ async def brain_problems(
                     embedder=embedder,
                     canary_percent=brain_config.value(policy.response_rules, "canary_percent"),
                     solution_mode=solution_context.switched_on(policy.response_rules),
+                    expert=expert_advisor.switched_on(policy.response_rules),
                 ),
             )
         )
@@ -1560,9 +1564,20 @@ async def brain_problems(
         context.update(
             await latency.timed(
                 "brain.solutions",
-                solution_context.build(session, scope, conversation, message.body or "", noted, {}),
+                solution_context.build(
+                    session,
+                    scope,
+                    conversation,
+                    message.body or "",
+                    noted,
+                    {},
+                    expert=expert_advisor.switched_on(policy.response_rules),
+                ),
             )
         )
+    if expert_advisor.switched_on(policy.response_rules):
+        # the next question targets the main problem's most uncertain cause
+        context.update(expert_advisor.question_context(conversation.service_brief, noted or []))
     # The specification itself, in its own words, for this stage and topic (spec Appendix A).
     context["spec_guidance"] = spec_handbook.guidance(
         conversation.flow_state or "S1_LISTENING",
@@ -2312,6 +2327,86 @@ def asked_without_ideas(context: dict[str, Any]) -> bool:
     return state in solution_ask.ASKABLE and solution_ask.asked_for_ideas(said)
 
 
+COUNTRY_NAMES = {"PK": "Pakistan", "AE": "the UAE", "CA": "Canada"}
+
+
+async def brain_expert_ideas(
+    manager: LLMManager,
+    scope: WorkspaceScope,
+    conversation: PiConversation,
+    policy: PiSettings,
+    turn: "ServiceTurn",
+    context: dict[str, Any],
+    *,
+    customer: list[str],
+    said: str,
+    industry: str | None,
+    never_say: list[str],
+    already: list[str],
+    noted_now: list[dict[str, Any]],
+    idea_ctx: idea_filter.IdeaContext | None,
+    left: int,
+) -> bool:
+    """solution_source "expert": the senior-operator pipeline (diagnose, judge, vet). True when the
+    turn is settled (ideas given, the one missing-fact question asked, or the problem's idea cap
+    reached); False when the pipeline gave nothing and the usual free ideas should try."""
+    main = expert_advisor.main_problem(noted_now)
+    brief = dict(conversation.service_brief or {})
+    room = min(left, value_line.IDEAS_PER_PROBLEM - expert_advisor.given_for(brief, main))
+    if room <= 0:
+        return True  # two per problem (Book 5 decision 5): brain_no_ideas says so honestly
+    owner = [*customer] if (customer and customer[-1] == said) else [*customer, said]
+    owner = [m for m in owner if m.strip()]
+    titles = [str(p.get("title") or "") for p in noted_now if p.get("title")]
+    advice = await latency.timed(
+        "model.expert",
+        expert_advisor.advise(
+            manager,
+            scope,
+            alias=reply_alias(policy),
+            conversation_id=conversation.id,
+            owner_said=owner,
+            problems=titles,
+            industry=industry,
+            subtype=idea_ctx.subtype if idea_ctx is not None else "",
+            country=COUNTRY_NAMES.get(str(context.get("customer_country") or ""), ""),
+            never_say=never_say,
+            already_said=already,
+            entry_ideas=list(idea_ctx.entry_ideas) if idea_ctx is not None else [],
+            idea_ctx=idea_ctx,
+            want=room,
+            use_judge=expert_advisor.judge_on(policy.response_rules),
+        ),
+    )
+    if advice is None:
+        return False
+    language = str(context.get("reply_language") or "en")
+    brief = expert_advisor.remember(brief, main, advice)
+    if not advice.ideas:
+        question = advice.question or (
+            idea_filter.need_fact_line(idea_ctx) if idea_ctx is not None else ""
+        )
+        if not question:
+            return False
+        if question == advice.question:
+            question = expert_advisor.need_fact_reply(question)
+        turn.reply = with_disclosure(question, context, language)
+        turn._english = True
+        turn.awaiting_customer = True
+        turn._free = True
+        conversation.service_brief = brief
+        return True
+    turn.reply = with_disclosure(
+        ideas_opener(context) + solution_rules.idea_lines(advice.ideas), context, language
+    )
+    turn._english = True
+    turn.awaiting_customer = True
+    turn._free = True
+    brief["ideas_given"] = int(brief.get("ideas_given") or 0) + len(advice.ideas)
+    conversation.service_brief = expert_advisor.record_given(brief, main, len(advice.ideas))
+    return True
+
+
 async def brain_free_ideas(
     manager: LLMManager,
     scope: WorkspaceScope,
@@ -2329,7 +2424,13 @@ async def brain_free_ideas(
         return
     if solution_rules.has_safety_referral(turn.reply):
         return
-    left = 4 - solution_context.given_so_far(conversation)
+    expert = expert_advisor.switched_on(policy.response_rules)
+    given_now = solution_context.given_so_far(conversation)
+    left = (
+        solution_context.allowance(conversation.service_brief or {}, given_now)
+        if expert
+        else 4 - given_now
+    )
     if left <= 0:
         return
     keys = [str(k) for k in context.get("industry_keys") or []][:1]
@@ -2363,6 +2464,23 @@ async def brain_free_ideas(
             (solutions.load(keys[0]) or {}).get("problems") or [] if keys else [],
         )
     report: dict[str, Any] = {}
+    if expert and await brain_expert_ideas(
+        manager,
+        scope,
+        conversation,
+        policy,
+        turn,
+        context,
+        customer=customer,
+        said=said,
+        industry=industry,
+        never_say=never_say,
+        already=already,
+        noted_now=noted_now,
+        idea_ctx=idea_ctx,
+        left=left,
+    ):
+        return
     ideas = await latency.timed(
         "model.free_ideas",
         solution_free.free_ideas(
@@ -2405,6 +2523,68 @@ async def brain_free_ideas(
     brief = dict(conversation.service_brief or {})
     brief["ideas_given"] = int(brief.get("ideas_given") or 0) + len(ideas)
     conversation.service_brief = brief
+
+
+async def brain_expert_diagnosis(
+    manager: LLMManager,
+    scope: WorkspaceScope,
+    conversation: PiConversation,
+    policy: PiSettings,
+    turn: "ServiceTurn",
+    context: dict[str, Any],
+) -> None:
+    """solution_source "expert": once a main problem is noted (and again when a new problem is noted
+    or the owner adds a fact to it) the likely causes and the one missing fact are worked out and
+    cached on the brief, so the NEXT question targets the main problem's most uncertain cause. Not
+    on a turn that already ran the pipeline, gave a summary or a decision, or handed over."""
+    if not expert_advisor.switched_on(policy.response_rules):
+        return
+    if turn._free or turn._summary or turn._decision is not None or turn.request_human:
+        return
+    noted_now = [p for p in context.get("noted_problems") or [] if isinstance(p, dict)]
+    for op in getattr(turn, "problem_ops", None) or []:
+        # a problem noted by this very turn is not in the context yet: diagnose it now
+        note = getattr(op, "note", None)
+        if getattr(op, "op", "") == "create" and note is not None and note.title:
+            noted_now.append(
+                {
+                    "title": note.title,
+                    "user_words": [str(w)[:200] for w in (note.user_words or [])[:2]],
+                    "subtype": note.subtype or "",
+                }
+            )
+    main = expert_advisor.main_problem(noted_now)
+    brief = conversation.service_brief or {}
+    if main is None or expert_advisor.cached(brief, noted_now) is not None:
+        return
+    keys = [str(k) for k in context.get("industry_keys") or []][:1]
+    industry = (solutions.load(keys[0]) or {}).get("name") if keys else None
+    customer = [
+        str(h.get("text") or "")
+        for h in context.get("history") or []
+        if h.get("role") == "customer"
+    ]
+    said = str(context.get("latest_customer_message") or "")
+    if said.strip() and (not customer or customer[-1] != said):
+        customer.append(said)
+    advice = await latency.timed(
+        "model.expert_diag",
+        expert_advisor.advise(
+            manager,
+            scope,
+            alias=reply_alias(policy),
+            conversation_id=conversation.id,
+            owner_said=customer,
+            problems=[str(p.get("title") or "") for p in noted_now if p.get("title")],
+            industry=industry,
+            subtype=str(main.get("subtype") or ""),
+            country=COUNTRY_NAMES.get(str(context.get("customer_country") or ""), ""),
+            ideas_wanted=False,
+            time_limit=25.0,
+        ),
+    )
+    if advice is not None:
+        conversation.service_brief = expert_advisor.remember(dict(brief), main, advice)
 
 
 NO_IDEA_LINES = {  # noqa: E501
@@ -3317,6 +3497,8 @@ async def prepare_context(
                 "last_question",
                 "open_requests",
                 "map_awaiting",
+                "expert_diag",
+                "expert_given",
             )
         },
         # Requests left unanswered last turn, to answer first (R-ANS-03).
@@ -5361,6 +5543,7 @@ async def compose_service_turn(
         reject_passive_ideas(turn, context)
         brain_ideas(turn, context)
         await brain_free_ideas(manager, scope, conversation, policy, turn, context)
+        await brain_expert_diagnosis(manager, scope, conversation, policy, turn, context)
         if turn._free and not turn.problem_ops and not context.get("noted_problems"):
             # Free ideas on a first message that told the problem: they never replace noting, so
             # the problem is recorded here when the reply model and the earlier extraction missed it

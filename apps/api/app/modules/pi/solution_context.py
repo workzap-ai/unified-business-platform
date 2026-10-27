@@ -194,6 +194,7 @@ async def build(
     noted: list[dict[str, Any]],
     used: dict[str, Any],
     now: datetime | None = None,
+    expert: bool = False,
 ) -> dict[str, Any]:
     """Context keys `solution_ideas`, `solution_followup`, `solution_exhausted`,
     `solution_asked_no_ideas`, `solution_next`, `solution_not_tried` (each may be missing); fills
@@ -203,6 +204,9 @@ async def build(
     carried = bool((getattr(conversation, "service_brief", None) or {}).get("open_ask"))
     if carried and conversation is not None:
         _put(conversation, open_ask=False)  # one turn only: the answer to pi's one question
+    if expert and conversation is not None and noted:
+        if held := _expert_hold(conversation, said, noted, carried):
+            return held
     churning = solution_ask.churn_risk(said) and conversation is not None
     if churning:
         # R-SOL-03: the churn signal is logged on the chat (the flag and the time, never the words)
@@ -226,6 +230,25 @@ async def build(
             if attempt == 2:
                 return {}
     return {}
+
+
+def _expert_hold(
+    conversation: PiConversation, said: str, noted: list[dict[str, Any]], carried: bool
+) -> dict[str, Any] | None:
+    """solution_source "expert": a request for a fix is answered by the expert advisor, not by the
+    industry entries, so nothing is chosen or recorded here (the entries only serve as examples in
+    its prompt, and as the fallback). The context says "asked, no idea yet" and
+    `brain_free_ideas` runs the expert. None: this turn is not that (how-to, outside the askable
+    states, or the idea budget is spent: the usual path answers)."""
+    asked = solution_ask.asked_for_ideas(said)
+    if (conversation.flow_state or "") not in solution_ask.ASKABLE or not (asked or carried):
+        return None
+    if solution_ask.asked_howto(said) and not asked:
+        return None
+    if allowance(conversation.service_brief or {}, given_so_far(conversation)) <= 0:
+        return None
+    titles = [str(n.get("title") or "")[:80] for n in noted[-NOTED_TITLES:] if n.get("title")]
+    return {"solution_asked_no_ideas": True, "solution_noted": titles, "solution_why": "expert"}
 
 
 async def _instant(

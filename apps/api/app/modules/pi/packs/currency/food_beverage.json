@@ -1,0 +1,77 @@
+{
+ "cluster": "food_beverage",
+ "version": 1,
+ "as_of": "2026-10",
+ "industries": [
+  "bakeries_mithai_and_confectionery",
+  "beverage_juice_and_water_bottling_plants",
+  "cafes_and_coffee_shops",
+  "catering_and_event_food",
+  "cloud_kitchens_and_virtual_brands",
+  "dairy_processing",
+  "dhabas_food_trucks_chai_stalls_and_street_food",
+  "fast_food_and_qsr_chains",
+  "food_delivery_operators_and_dark_stores",
+  "juice_shakes_dessert_and_ice_cream_parlours",
+  "meat_shops_and_butchers",
+  "packaged_food_and_fmcg_brands",
+  "restaurants",
+  "seafood_and_fish_markets",
+  "spices_dry_fruit_and_nuts_traders"
+ ],
+ "how_customers_find_and_choose": [
+  "Diners find places through the map listing, photos of dishes and recent reviews",
+  "Short videos of food being made or served drive curiosity, especially for new or street-style places",
+  "Ordering happens through delivery listings, direct chat or a phone call; many regulars prefer ordering direct",
+  "Cleanliness, freshness and portion honesty are judged from reviews and photos before the first visit",
+  "Group and family orders, gifting boxes and event catering still come mostly from personal recommendation"
+ ],
+ "what_works_now": [
+  "A short, photographed menu that is easy to send in chat, with clear sizes",
+  "Complete map listing with hours, location pin and fresh photos of the actual food",
+  "Direct ordering in chat for regulars, with a saved reply for menu, delivery area and timing",
+  "Replying to reviews, especially complaints, politely and quickly",
+  "A small number of strong dishes made consistently well",
+  "Pre-orders for festivals, family gatherings and bulk boxes",
+  "Counting waste and the busiest hours so prep matches demand"
+ ],
+ "outdated_or_weak": [
+  "Heavy discounting to win delivery rankings when margins are thin",
+  "Printed menus and flyers as the main reach",
+  "Advice to 'be on every channel' without capacity to keep each one current",
+  "Long menus that slow the kitchen and confuse customers",
+  "Generic 'run a food festival' ideas with no clear way to count the result"
+ ],
+ "local_context": {
+  "PK": [
+   "Cash on delivery and cash at the counter are still common; bank transfer and mobile wallet payments are now normal for many customers",
+   "Ramadan and the two Eids reshape demand, opening hours and staff availability every year",
+   "Summer heat, monsoon rain and power cuts affect operations and footfall",
+   "Customers often write in Urdu, Roman Urdu or a regional language, and chat is the usual first contact",
+   "Ramadan reshapes timing: evening and pre-dawn meals, iftar boxes and catering peak",
+   "Eid and wedding seasons drive bulk and sweet orders; sacrificial-meat season affects butchers around Eid al-Adha",
+   "Summer heat makes cold chain and freshness a daily issue"
+  ],
+  "UAE": [
+   "Customers are multilingual and expect quick replies in chat; card and tap payments are normal",
+   "Winter is the busy season; many residents travel in summer so demand can dip",
+   "Ramadan and Eid change hours and buying patterns; the licence a business holds decides what it may sell and advertise, so the owner checks that with the licensing body",
+   "Delivery and cloud kitchen competition is strong; dine-in places win on experience and consistency",
+   "Food businesses are inspected by the municipal food authority; the owner keeps to its rules and asks it about any doubt"
+  ],
+  "CA": [
+   "Customers expect online booking or enquiry, card and bank e-transfer payment, and clear written confirmation",
+   "Long winters and a short summer peak shape outdoor and seasonal trades",
+   "English and French (in Quebec) matter, and many communities prefer their own language; consent for marketing messages and sales tax rules vary, so the owner checks them with a professional",
+   "Allergy and dietary labelling expectations are high; the owner checks local food rules with the health authority",
+   "Third-party delivery is widely used but takes a cut; some owners steer repeat customers to direct ordering"
+  ]
+ },
+ "never_assume": [
+  "A delivery rider or delivery listing",
+  "A website or online ordering link",
+  "A social page with active followers",
+  "A written recipe costing"
+ ],
+ "review_status": "needs human review"
+}

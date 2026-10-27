@@ -45,6 +45,8 @@ def validate_section(section: str, value: Any) -> None:
                 "box_offer",
                 "thinking",
                 "drift_check",
+                "solution_source",
+                "expert_judge",
             }
             ensure(isinstance(brain, dict) and set(brain) <= {*TUNABLES, *flags})
             ensure(type(brain.get("learning_frozen", True)) is bool)
@@ -54,6 +56,8 @@ def validate_section(section: str, value: Any) -> None:
             ensure(type(brain.get("box_offer", False)) is bool)  # Book 5 5.4: the box offer rule
             ensure(type(brain.get("thinking", False)) is bool)  # Book 5 Part 3: dials and moves
             ensure(type(brain.get("drift_check", False)) is bool)  # Part A.7: daily drift run
+            ensure(brain.get("solution_source", "packs_first") in {"packs_first", "expert"})
+            ensure(type(brain.get("expert_judge", True)) is bool)  # skip the judge call when false
             ensure(all(type(v) is int for k, v in brain.items() if k not in flags))
             served = brain.get("served_industries", [])  # regulated trades Workzap serves (7.N)
             ensure(isinstance(served, list) and set(served) <= set(REGULATED_TRADES))

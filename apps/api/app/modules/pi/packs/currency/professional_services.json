@@ -1,0 +1,71 @@
+{
+ "cluster": "professional_services",
+ "version": 1,
+ "as_of": "2026-10",
+ "industries": [
+  "accounting_audit_and_tax_practices",
+  "business_setup_and_pro_services",
+  "co_working_spaces",
+  "freelancers_solopreneurs_and_home_based_businesses",
+  "hr_and_recruitment_agencies",
+  "law_firms",
+  "management_consultancies",
+  "overseas_employment_promoters_and_manpower_agencies",
+  "security_guard_companies",
+  "typing_translation_and_attestation_centres"
+ ],
+ "how_customers_find_and_choose": [
+  "Clients choose professionals mainly on referral and reputation, then check the map listing, reviews and a professional profile",
+  "A short, plain explanation of who the firm helps and how often a client gets an answer builds trust before the first meeting",
+  "Business clients ask in chat for quotes and next steps and expect a prompt, clear reply",
+  "Individuals often search the map listing for a nearby office when they need paperwork or a service done in person"
+ ],
+ "what_works_now": [
+  "A short written description of services and how a typical job runs, step by step",
+  "A clear first-response routine: acknowledge in the same day, say what is needed and when to expect an answer",
+  "A written engagement or scope note so the client knows what is included",
+  "Tracking each client's pending documents and deadlines in one list and sending polite reminders",
+  "Sharing useful short notes with clients when rules or deadlines change, with consent",
+  "Asking satisfied clients for a short review or referral",
+  "A complete map listing and professional profile with accurate contact details"
+ ],
+ "outdated_or_weak": [
+  "Cold messaging or mass broadcasts to find clients",
+  "Competing mainly on the lowest fee",
+  "Vague promises such as guaranteed approvals or results",
+  "Printed visiting cards and brochures as the main way to be found",
+  "Generic 'build your personal brand' advice with nothing to show"
+ ],
+ "local_context": {
+  "PK": [
+   "Cash on delivery and cash at the counter are still common; bank transfer and mobile wallet payments are now normal for many customers",
+   "Ramadan and the two Eids reshape demand, opening hours and staff availability every year",
+   "Summer heat, monsoon rain and power cuts affect operations and footfall",
+   "Customers often write in Urdu, Roman Urdu or a regional language, and chat is the usual first contact",
+   "Deadlines set by tax and regulatory bodies, and Ramadan and Eid, shape workload through the year",
+   "Documents often arrive in chat as photos; keeping them organised is a daily issue",
+   "Regulated professions follow their own bodies' rules on advertising; the owner confirms specifics"
+  ],
+  "UAE": [
+   "Customers are multilingual and expect quick replies in chat; card and tap payments are normal",
+   "Winter is the busy season; many residents travel in summer so demand can dip",
+   "Ramadan and Eid change hours and buying patterns; the licence a business holds decides what it may sell and advertise, so the owner checks that with the licensing body",
+   "Company formation, visas and licences make professional services a large local market; many clients are new arrivals",
+   "Fee and advertising rules differ by profession and authority; the owner confirms specifics"
+  ],
+  "CA": [
+   "Customers expect online booking or enquiry, card and bank e-transfer payment, and clear written confirmation",
+   "Long winters and a short summer peak shape outdoor and seasonal trades",
+   "English and French (in Quebec) matter, and many communities prefer their own language; consent for marketing messages and sales tax rules vary, so the owner checks them with a professional",
+   "Many clients are newcomers to the country; professionals who explain clearly and in several languages stand out",
+   "Professional bodies set their own rules on advertising and conduct; the owner confirms specifics"
+  ]
+ },
+ "never_assume": [
+  "A website",
+  "A client list in a tracked form",
+  "Staff to handle admin",
+  "Online payment or e-sign tools"
+ ],
+ "review_status": "needs human review"
+}

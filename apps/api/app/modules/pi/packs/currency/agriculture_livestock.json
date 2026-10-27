@@ -1,0 +1,84 @@
+{
+ "cluster": "agriculture_livestock",
+ "version": 1,
+ "as_of": "2026-10",
+ "industries": [
+  "beef_cattle_fattening_and_feedlots",
+  "beekeeping_and_honey",
+  "camel_farms",
+  "cattle_and_buffalo_dairy_farms",
+  "cold_storage_operators",
+  "commission_agents_in_grain_fruit_and_vegetable_mandis",
+  "crop_farming",
+  "equestrian_stables_and_riding_clubs",
+  "fish_and_shrimp_farming",
+  "flour_rice_and_feed_mills",
+  "forestry_timber_and_wood_traders",
+  "goat_and_sheep_farms",
+  "hatcheries",
+  "livestock_traders_and_mandis",
+  "milk_collection_centres_and_chillers",
+  "nurseries_horticulture_and_landscaping_supply",
+  "orchards",
+  "poultry_farms",
+  "seed_fertiliser_and_pesticide_dealers",
+  "sugar_mills_and_cotton_ginning",
+  "tractor_and_farm_machinery_dealers_and_rental",
+  "tunnel_greenhouse_and_vegetable_farming",
+  "veterinary_clinics_and_animal_health_suppliers"
+ ],
+ "how_customers_find_and_choose": [
+  "Buyers and traders are mostly reached through phone calls, chat groups and personal relationships built over years",
+  "Rates and availability are shared in chat groups, often with a photo or a short video of the produce or animal",
+  "Quality and trust are judged on sight, by reputation and by repeat dealing; direct-to-consumer sellers are starting to use chat and map listings",
+  "Farmers learn new methods from short videos and from neighbours who tried them first"
+ ],
+ "what_works_now": [
+  "Short phone-camera videos of the produce, animal, shed or field shown to buyers before they travel",
+  "A simple written record of each batch, animal or field: dates, feed or inputs, what was sold and to whom",
+  "A saved chat group or broadcast list of regular buyers told when a lot is ready",
+  "Direct sale of a graded, packed or branded portion to households, restaurants or shops for a better margin where the owner can handle the extra work",
+  "Writing down every delivery, weight and payment so disputes with traders end quickly",
+  "Weather and market rate checks before deciding when to sell, using trusted shared sources",
+  "Basic tidy packing and clean labelling for anything sold directly"
+ ],
+ "outdated_or_weak": [
+  "Advice to 'build a website' for a business whose buyers deal by phone and relationship",
+  "Generic 'go digital' or 'use social media' advice with no specific first step",
+  "Assuming the owner has steady internet, a computer or time to sit at one",
+  "Long forms or logins that the owner or workers will not use in the field",
+  "Copying urban retail marketing ideas such as flyers or loyalty cards"
+ ],
+ "local_context": {
+  "PK": [
+   "Cash on delivery and cash at the counter are still common; bank transfer and mobile wallet payments are now normal for many customers",
+   "Ramadan and the two Eids reshape demand, opening hours and staff availability every year",
+   "Summer heat, monsoon rain and power cuts affect operations and footfall",
+   "Customers often write in Urdu, Roman Urdu or a regional language, and chat is the usual first contact",
+   "Crop seasons, mandi days and weather decide the calendar; credit between traders and farmers is common",
+   "Eid al-Adha is the peak for sacrificial animals, with buyers booking weeks ahead",
+   "Connectivity in rural areas can be weak; voice notes and short videos work better than long typed messages"
+  ],
+  "UAE": [
+   "Customers are multilingual and expect quick replies in chat; card and tap payments are normal",
+   "Winter is the busy season; many residents travel in summer so demand can dip",
+   "Ramadan and Eid change hours and buying patterns; the licence a business holds decides what it may sell and advertise, so the owner checks that with the licensing body",
+   "Farms and stables often serve a niche market of private buyers, restaurants and tourists",
+   "Animal and food businesses are subject to municipal and veterinary rules; the owner checks them with the authority"
+  ],
+  "CA": [
+   "Customers expect online booking or enquiry, card and bank e-transfer payment, and clear written confirmation",
+   "Long winters and a short summer peak shape outdoor and seasonal trades",
+   "English and French (in Quebec) matter, and many communities prefer their own language; consent for marketing messages and sales tax rules vary, so the owner checks them with a professional",
+   "Direct-to-consumer and farm-gate sales, farmers markets and subscription boxes exist alongside large buyers",
+   "Farming has strict animal welfare and food rules by province; the owner checks them with the relevant authority"
+  ]
+ },
+ "never_assume": [
+  "A smartphone with steady data, or any computer",
+  "A website, a social page or a customer list",
+  "Written records of the farm beyond a notebook",
+  "Cold storage or transport of their own"
+ ],
+ "review_status": "needs human review"
+}
