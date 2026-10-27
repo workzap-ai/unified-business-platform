@@ -4,7 +4,7 @@
 -- to the real database.
 --
 -- Needs migrations 0047, 0048 and 0049 (all applied to the real database on 2026-10-27).
--- Targets Workzap's production, active environment by name, like enable-solution-mode-workzap.sql.
+-- Targets the tenant "Workzap" (Production) by its settings id, never by name.
 
 -- Step 1 (read-only): what is set now.
 SELECT e.name AS env, e.kind, e.status,
@@ -27,11 +27,10 @@ SET response_rules = s.response_rules
 FROM tenants t, environments e
 WHERE s.tenant_id = t.id
   AND s.environment_id = e.id
-  AND t.name ILIKE '%workzap%'
-  AND e.kind = 'production'
-  AND e.status = 'active'
+  AND s.id = 'ddb494a7-5e55-4e8b-944e-f111d0d034a0'  -- tenant "Workzap", Production, by id
 RETURNING s.id, t.name, e.name, e.kind, s.response_rules->'brain' AS brain;
 
--- If Step 2 returns more than one row, stop and tell Claude.
+-- Step 2 is by id on purpose: the name pattern '%workzap%' also matches the DIFFERENT tenant
+-- "Workzap.ai" (b29e78ba-2e6b-4772-8784-08842710858b). It must return exactly ONE row.
 
 -- To undo, run Step 2 again with {"map_share": false, "thinking": false}.
