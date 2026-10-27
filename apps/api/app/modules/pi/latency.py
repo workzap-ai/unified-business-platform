@@ -108,4 +108,6 @@ def summary() -> dict[str, Any] | None:
         "wall_ms": round((time.perf_counter() - record["t0"]) * 1000),
         "model_calls": record["model_calls"],
         "prompt_chars": record["prompt_chars"],
+        "rewrites": record.get("rewrites", 0),
+        "notes": dict(record.get("notes", {})),  # why a draft was sent back, for finding causes
     }
