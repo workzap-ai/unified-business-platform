@@ -318,6 +318,7 @@ class ServiceTurn(BaseModel):
     _expert_tried: bool = PrivateAttr(default=False)  # the diagnosis call ran this turn: not twice
     _problem_capped: bool = PrivateAttr(default=False)  # the working problem's two ideas were given
     _board: bool = PrivateAttr(default=False)  # the notes were shown again, no state change
+    _handoff_status: str = PrivateAttr(default="")  # the open request whose status was told
     _asked_shape: bool = PrivateAttr(default=False)
     # Brain mode: a fixed reply and move chosen by the decision gates (pi/decisions.py).
     _decision: Any = PrivateAttr(default=None)
@@ -1552,6 +1553,10 @@ async def brain_problems(
     context.update(matching_the_person(conversation, message, rows or []))
     if away := days_away(message, rows or [], last_chat_at):
         context["days_away"] = away
+    if message is not None:
+        context["hours_away"] = hours_away(message, rows or [], last_chat_at)
+        if pending := await pending_handoff(session, conversation):
+            context["pending_handoff"] = pending
     if learning_context.active(policy.response_rules):
         context.update(
             await latency.timed(
@@ -1631,6 +1636,63 @@ async def brain_problems(
         safety.NUMBERS[country] if country in safety.NUMBERS else safety.ALL_COUNTRIES
     )
     return context
+
+
+def hours_away(
+    message: PiMessage, rows: list[PiMessage], earlier_chat_at: datetime | None = None
+) -> int:
+    """Whole hours between the person's previous message and this one (0 when unknown)."""
+    if message.created_at is None:
+        return 0
+    before = [
+        m.created_at
+        for m in rows
+        if m.sender_type == "customer" and m.id != message.id and m.created_at is not None
+    ]
+    last = max(before) if before else earlier_chat_at
+    return max(0, int((message.created_at - last).total_seconds() // 3600)) if last else 0
+
+
+async def pending_handoff(session: AsyncSession, conversation: PiConversation) -> dict[str, str]:
+    """The oldest request to the team about this chat that nobody has answered yet (spec v1.4, 17.7:
+    an open item), or {} when there is none."""
+    from app.modules.pi_saas.models import ESCALATION_KINDS, PiStaffRequest
+
+    row = await session.scalar(
+        select(PiStaffRequest)
+        .where(
+            PiStaffRequest.tenant_id == conversation.tenant_id,
+            PiStaffRequest.environment_id == conversation.environment_id,
+            PiStaffRequest.conversation_id == conversation.id,
+            PiStaffRequest.status == "open",
+            PiStaffRequest.kind.in_(ESCALATION_KINDS),
+        )
+        .order_by(PiStaffRequest.created_at)
+        .limit(1)
+    )
+    return {"id": str(row.id), "kind": str(row.kind)} if row is not None else {}
+
+
+HANDOFF_STATUS = {
+    "en": "Your message to the Workzap team has not been answered yet. I've asked again, and I'm "
+    "here meanwhile.",
+    "roman_ur": "Workzap team ko aap ki baat ka abhi jawab nahi aaya. Maine dobara kaha hai, aur "
+    "main yahin hoon.",
+    "ar": "لم يصلك رد من فريق Workzap بعد. سألتهم مرة أخرى وأنا هنا في هذه الأثناء.",
+}
+RETURN_AFTER_HOURS = 4  # "back" means a gap of this many hours (spec v1.4, Part 6 and 17.7)
+
+
+def handoff_status_line(context: dict[str, Any]) -> str:
+    """When the owner is back after a gap and a request to the team is still open, say so once, in
+    their language, with no promised time (spec v1.4, 17.7: the return line states the handoff)."""
+    pending = context.get("pending_handoff") or {}
+    if not pending or int(context.get("hours_away") or 0) < RETURN_AFTER_HOURS:
+        return ""
+    if (context.get("brief") or {}).get("handoff_status_said") == pending.get("id"):
+        return ""
+    language = str(context.get("reply_language") or "en")
+    return HANDOFF_STATUS.get(language, HANDOFF_STATUS["en"])
 
 
 def days_away(
@@ -6003,6 +6065,9 @@ async def compose_service_turn(
             turn.reply
         ):
             turn.reply = with_disclosure(turn.reply, context, str(turn.language or "en"))
+        if (status := handoff_status_line(context)) and not turn.request_human:
+            turn.reply = f"{status} {turn.reply}"
+            turn._handoff_status = str((context.get("pending_handoff") or {}).get("id") or "")
     return turn
 
 
@@ -6059,6 +6124,7 @@ async def save_service_turn(
             else None
         ),
         "source_message_id": str(message.id),
+        **({"handoff_status_said": turn._handoff_status} if turn._handoff_status else {}),
         "mood": turn.mood,
         "projects": [project.model_dump() for project in turn.projects],
         "meeting_requested": turn.meeting_requested or bool(previous.get("meeting_requested")),
