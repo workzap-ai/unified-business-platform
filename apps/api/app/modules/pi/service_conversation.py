@@ -2787,8 +2787,6 @@ async def brain_expert_diagnosis(
         # still fresh: pi has just asked a question, so the cached one is not offered again
         conversation.service_brief = expert_advisor.mark_consumed(dict(brief), turn.reply)
         return
-    keys = [str(k) for k in context.get("industry_keys") or []][:1]
-    industry = (solutions.load(keys[0]) or {}).get("name") if keys else None
     told = [
         str(h.get("text") or "")[:400]
         for h in context.get("history") or []
