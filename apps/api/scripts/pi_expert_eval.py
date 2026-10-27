@@ -255,7 +255,7 @@ async def run_generator(
     result = expert(**kwargs)
     if inspect.isawaitable(result):
         result = await result
-    for attr in ("question", "causes", "problem", "judged", "dropped"):
+    for attr in ("question", "causes", "problem", "judged", "dropped", "drops"):
         if hasattr(result, attr):
             report[attr] = getattr(result, attr)
     return normalise(result), report
@@ -375,6 +375,11 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     p.add_argument("--max-calls", type=int, default=DEFAULT_MAX_CALLS)
     p.add_argument("--alias", default="pi_brain", help="model alias (the brain-mode reply alias)")
     p.add_argument("--module-function", default=None, help="entry point in expert_advisor")
+    p.add_argument(
+        "--provider",
+        default="",
+        help="put this provider first (e.g. anthropic) so a rate-limited free tier does not decide the run",
+    )
     p.add_argument("--concurrency", type=int, default=CONCURRENCY)
     p.add_argument(
         "--dry-run", action="store_true", help="build inputs only, no database, no model"
@@ -427,6 +432,10 @@ async def main_async(args: argparse.Namespace) -> int:
         await session.execute(text("SET default_transaction_read_only = on"))
         await platform_config.apply(session, settings)
     await engine.dispose()
+    if args.provider:
+        settings.primary_llm_provider = args.provider
+    if not settings.anthropic_base_url.rstrip("/").endswith("/v1"):
+        settings.anthropic_base_url = settings.anthropic_base_url.rstrip("/") + "/v1"
 
     sem = asyncio.Semaphore(max(1, args.concurrency))
     results: list[dict[str, Any]] = []

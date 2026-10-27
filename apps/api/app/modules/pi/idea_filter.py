@@ -184,6 +184,17 @@ _ASSET_GROUPS: tuple[tuple[re.Pattern[str], re.Pattern[str]], ...] = (
             re.I,
         ),
     ),
+    (  # an online listing, search result or map entry
+        re.compile(
+            r"(?:search(?:es|ed|ing)? (?:for|online|nearby)|online (?:listing|presence|reviews?)|"
+            r"(?:map|google|business) listing|listing|google)",
+            re.I,
+        ),
+        re.compile(
+            r"(?:search|online|google|listing|map|website|facebook|instagram|page|app|reviews?)",
+            re.I,
+        ),
+    ),
     (  # paid adverts
         re.compile(
             r"\b(?:ads?|adverts?|advertis\w*|campaigns?|boost(?:ed|ing)?|sponsored)\b", re.I

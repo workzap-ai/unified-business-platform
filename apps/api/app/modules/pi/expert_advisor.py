@@ -23,6 +23,7 @@ The model's text is data: it can never relax a rule, the rules are applied here 
 """
 
 import asyncio
+import dataclasses
 import json
 import logging
 import re
@@ -33,8 +34,13 @@ from uuid import UUID
 
 from app.ai.manager import LLMManager
 from app.ai.types import Message
-from app.modules.pi import currency_notes, idea_filter, solution_free, solution_lint
-from app.modules.pi.language import detect_language
+from app.modules.pi import (
+    currency_notes,
+    idea_filter,
+    solution_free,
+    solution_lint,
+    solution_rules,
+)
 from app.shared.scope import WorkspaceScope
 
 logger = logging.getLogger(__name__)
@@ -64,6 +70,8 @@ DIAGNOSE_RULES = """Think like that operator, then answer with ONE JSON object a
  "ideas": [ {"idea": "...", "addresses": "the cause it works on", "assumes": ["what the owner must already have"], "current_practice": "the 2026 practice it rests on, a few words"} ]
 }
 Rules:
+- Write every field, the question and the ideas in plain ENGLISH whatever language the owner writes in (pi
+  translates for the owner afterwards and checks the English).
 - causes: at most 3, ranked most likely first. evidence_for and evidence_against come ONLY from what the owner
   said (quote or near-quote); an empty list is better than a guess. Never invent a fact about the business.
 - question: about THE PROBLEM THE OWNER RAISED and its causes. Never about another process (who follows up,
@@ -76,13 +84,21 @@ Rules:
     showroom, the records they named). Nothing to buy, install, subscribe to or set up;
   * assumes ONLY what the owner said. Never assume videos, a page, a website, ads, a customer list, a chat group
     or any asset or channel the owner did not name. An idea may tell the owner to ASK customers or staff
-    something, LOOK at what a customer sees today, COUNT or NOTE something from records they named, or change
-    how something they named is done;
+    something, LOOK at what a customer sees in the place they named (shop front, counter, queue), COUNT or NOTE
+    something from records they named, or change how something they named is done. Never assume an online
+    listing, a search result, a page or a map entry exists; never assume a record, size chart, register,
+    notebook, past bookings or staff role they did not mention (ask or note instead);
   * is correct for {industry} today and current for 2026: not a practice that has been outdated by how customers
     now find, compare and decide; say it by kind, never by app, brand or product name;
   * is specific to THIS problem and uses the owner's own nouns; an idea that would fit any business is wrong;
   * has no digits, no percentage, no amount, no time or duration (no "this week", "daily", "a month"), no steps
     and no wording to copy, no jargon (bottleneck, workflow, streamline, optimise, leverage, touchpoint, KPI);
+  * never tells the owner how to set a price, rate, discount, credit limit or payment term (those need a person), and
+    the benefit after "so" says what the owner will SEE or KNOW, never an outcome (no "never", "always", "cannot",
+    "stops", "pulls buyers");
+  * assumes no equipment, machine, scale, vehicle, phone or record the owner did not name;
+  * never tells the owner to START something they already said they do (they keep a register: do not ask them
+    to keep a notebook; find what is wrong with how the register is kept and change that);
   * never says what Workzap, pi or "we" would do, asks no question, and never gives medical, legal, tax or
     financial advice;
   * never contains anything in never_say_list.
@@ -95,11 +111,11 @@ Rules:
 JUDGE_RULES = """You are a strict reviewer for pi, a WhatsApp business assistant. Below are the owner's own words, the likely causes and
 candidate ideas. Score EACH candidate 0 to 5 on:
 - fits: it works on the most likely cause (5) or only a remote one (0)
-- correct: right for this industry as it really works (0 = wrong or misleading)
+- correct: right for this industry as it really works (0 = wrong or misleading, or tells the owner to start something they said they already do)
 - current: how a good operator does it in 2026 (0 = outdated practice)
 - grounded: assumes nothing the owner did not say: no video, page, ads, list, tool, staff or asset they never mentioned (0 = invents things)
 - specific: tied to THIS problem, not generic advice that fits any business (0 = generic)
-- safe: no medical, veterinary, legal, tax or financial advice, no promised result (0 = unsafe)
+- safe: no medical, veterinary, legal, tax or financial advice, no promised result, no advice on how to set a price, rate, discount or payment term (0 = unsafe)
 Then choose the best two candidates (different in kind) with a one-line reason each.
 Answer with ONE JSON object only:
 {"scores": [{"i": 0, "fits": 0, "correct": 0, "current": 0, "grounded": 0, "specific": 0, "safe": 0}],
@@ -123,6 +139,10 @@ SOLUTION_WORDS = re.compile(
     re.IGNORECASE,
 )
 QUESTION_MARKS = ("?", "؟")
+OUTCOME_CLAIM = re.compile(
+    r"\bso\b[^.]*\b(?:never|always|cannot|can't|guarantee\w*|pulls? (?:buyers|customers|guests)|stops? for good)\b",
+    re.IGNORECASE,
+)
 MAX_QUESTION_WORDS = 30
 # A channel or asset a pack idea may assume: kept out of the examples unless the owner named it.
 CHANNEL = re.compile(
@@ -193,6 +213,7 @@ class Advice:
     problem: str = ""
     judged: bool = False
     dropped: int = 0  # candidates the vetting removed
+    drops: list[str] = field(default_factory=list)  # why, for the evaluation (never shown)
 
 
 # --- parsing (tolerant: a model that adds a fence or a sentence around the JSON still counts) ----
@@ -320,6 +341,30 @@ def question_ok(question: str) -> bool:
     return len(re.findall(r"[.!]\s", q)) == 0  # one sentence
 
 
+def why_dropped(
+    idea: str,
+    owner_words: str,
+    never_say: list[str],
+    facts: set[str],
+    ctx: idea_filter.IdeaContext | None,
+) -> str:
+    """The first guard an idea fails, for the evaluation log (same order as solution_free.vetted)."""
+    verdict = solution_rules.check_idea(idea, owner_words)
+    if verdict.reject:
+        return "check_idea:reject " + ",".join(str(x) for x in verdict.reject)[:60]
+    if verdict.review and not solution_free.only_price_talk(idea):
+        return "check_idea:review " + ",".join(str(x) for x in verdict.review)[:60]
+    if never_say and solution_rules.never_say_hit(idea, never_say):
+        return "never_say"
+    if broke := idea_filter.failures(idea, owner_words, ctx):
+        return "filter:" + ",".join(broke)
+    if solution_free.GENERIC.search(idea) or not solution_free.uses_a_fact(idea, facts):
+        return "generic_or_no_fact"
+    if len(idea.split()) > solution_free.MAX_WORDS or solution_free.JARGON.search(idea):
+        return "too_long_or_jargon"
+    return "timeline_or_other"
+
+
 def vet(
     ordered: list[Candidate],
     *,
@@ -329,10 +374,16 @@ def vet(
     ctx: idea_filter.IdeaContext | None,
     want: int,
     report: dict[str, Any] | None = None,
+    trace: list[str] | None = None,
 ) -> list[str]:
     """The first `want` candidates, in order, that pass every guard (one at a time, so a failure is
     replaced by the next best)."""
     chosen: list[str] = []
+    if ctx is not None and ctx.nodes:
+        # G8 judges an idea against the map by shared words. These candidates were written for the
+        # owner's own main problem, and "salesman" against "sales team" is no reason to drop a good
+        # one, so the map check is left to the diagnosis (seen on a real model, 2026-10-27).
+        ctx = dataclasses.replace(ctx, nodes=(), node_categories=())
     for candidate in ordered:
         if len(chosen) >= want:
             break
@@ -341,9 +392,17 @@ def vet(
             continue
         one = solution_free.vetted([text], owner_words, never_say, facts, ctx, report)
         if not one:
+            if trace is not None:
+                trace.append(
+                    f"{why_dropped(text, owner_words, never_say, facts, ctx)}: {text[:110]}"
+                )
             continue
         idea = one[0]
         if not solution_lint.passes(idea):
+            continue
+        if OUTCOME_CLAIM.search(idea):  # "so X never happens" is a promised result
+            if trace is not None:
+                trace.append(f"outcome_claim: {idea[:110]}")
             continue
         if idea_filter.repeats(idea, chosen):  # two near-identical ideas are one idea
             continue
@@ -419,7 +478,7 @@ async def diagnose(
             alias=alias,
             purpose=PURPOSE_DIAGNOSE,
             messages=[Message.system(system), Message.user(user)],
-            max_tokens=2500,
+            max_tokens=4000,
             temperature=0.4,
             conversation_id=conversation_id,
         )
@@ -528,8 +587,9 @@ async def _pipeline(
             industry=industry,
         )
     owner_words = " ".join([*owner_said, *problems])
-    english = bool(problems) or any(detect_language(m) == "en" for m in owner_said)
-    facts = solution_free.fact_words(*owner_said[-5:], *problems) if english else set()
+    # the 'uses a word the owner said' check compares English with the owner's own language and
+    # wrongly dropped every idea for a Roman Urdu petrol-pump owner; the judge scores groundedness
+    facts: set[str] = set()
     report: dict[str, Any] = {}
     order = ranked(diagnosis.candidates)
     advice.ideas = vet(
@@ -540,6 +600,7 @@ async def _pipeline(
         ctx=ctx,
         want=want,
         report=report,
+        trace=advice.drops,
     )
     advice.dropped = len(diagnosis.candidates) - len(advice.ideas)
     return advice

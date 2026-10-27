@@ -44,6 +44,12 @@ ERROR_KINDS = {
 # reply failed on it and, because an invalid request stops the chain, no fallback ran). They are
 # never sent one; any other model that refuses it is retried once without it and remembered.
 NO_TEMPERATURE = re.compile(r"^claude-(?:sonnet|opus|haiku|fable)-5")
+# Claude 5 models always think, and at their default effort the thinking alone can use the whole
+# `max_tokens` (live 2026-10-27: a 4096 budget ended mid-JSON, so pi answered "pi mein abhi
+# masla hai"; the same prompt at medium effort ends in about a thousand tokens). Medium keeps the
+# quality of a structured reply and leaves room for the answer. A model that refuses the setting
+# is retried once without it and remembered.
+EFFORT = "medium"
 
 
 class AnthropicProvider(HttpAdapter):
@@ -56,6 +62,7 @@ class AnthropicProvider(HttpAdapter):
         super().__init__("anthropic", http, base_url)
         self._key = api_key
         self._no_temperature: set[str] = set()
+        self._no_effort: set[str] = set()
 
     def _headers(self) -> dict[str, str]:
         return {"x-api-key": self._key.get_secret_value(), "anthropic-version": API_VERSION}
@@ -95,6 +102,11 @@ class AnthropicProvider(HttpAdapter):
         )
         if sends_temperature:
             body["temperature"] = request.temperature
+        sends_effort = bool(NO_TEMPERATURE.match(request.model)) and (
+            request.model not in self._no_effort
+        )
+        if sends_effort:
+            body["output_config"] = {"effort": EFFORT}
         if request.tools:
             body["tools"] = [
                 {"name": t.name, "description": t.description, "input_schema": dict(t.parameters)}
@@ -115,10 +127,14 @@ class AnthropicProvider(HttpAdapter):
                 request_timeout=request.timeout,
             )
         except ProviderError as error:
-            if not sends_temperature or error.kind != ErrorKind.INVALID_REQUEST:
+            if error.kind != ErrorKind.INVALID_REQUEST or not (sends_temperature or sends_effort):
                 raise
-            self._no_temperature.add(request.model)
-            body.pop("temperature", None)
+            if sends_temperature:
+                self._no_temperature.add(request.model)
+                body.pop("temperature", None)
+            if sends_effort:
+                self._no_effort.add(request.model)
+                body.pop("output_config", None)
             data = await self.post(
                 "messages",
                 headers=self._headers(),

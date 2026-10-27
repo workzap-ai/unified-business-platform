@@ -49,5 +49,5 @@ def test_the_free_idea_prompt_is_modern_without_assuming_what_the_owner_never_sa
     rules = solution_free.RULES
     # a channel is used only when the owner named it; the modern angle is a check or a question
     assert "use their word" in rules and "ASSUMES ONLY" in rules.upper()
-    assert "how they first heard" in rules and "search for it nearby" in rules
+    assert "how they first heard" in rules and "search for it nearby" not in rules
     assert "short video caption" not in rules  # the old example was copied into a showroom chat

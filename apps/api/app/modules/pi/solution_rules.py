@@ -154,6 +154,40 @@ REGULATED = re.compile(
     re.IGNORECASE,
 )
 
+# Money words that are the owner's own subject when they used them: a kiryana owner's problem IS
+# "credit", so an idea to note, tally or remind about it is not advice on credit. Rates, loans,
+# interest, tax, discounts and prices still wait for a person.
+OWNER_SUBJECT_WORDS = frozenset(
+    {"credit", "payment", "invoice", "refund", "doctor", "medicine", "medical", "insurance", "loan"}
+)
+
+
+def _regulated_hit(one: str, said: str = "") -> bool:
+    """A regulated or money word in the idea that the owner did not raise themselves."""
+    heard = (said or "").lower()
+    for found in REGULATED.finditer(one):
+        word = found.group(0).lower()
+        if word in OWNER_SUBJECT_WORDS and word[:5] in heard:
+            continue
+        return True
+    return False
+
+
+# An idea that tells the owner how to set a rate, a discount or a payment term is a pricing decision:
+# a person decides (spec value line), whatever the trade ("a lower return-trip rate", "your rate
+# holds until the day ends", "delay paying the hotel", "a clearance rate below theirs").
+PRICE_TERMS = re.compile(
+    r"\b(?:lower|higher|cheaper|discounted|special|reduced|fixed|clearance|bulk|return[- ]trip)\s+"
+    r"(?:\w+\s+){0,2}(?:rates?|prices?|terms)\b"
+    r"|\b(?:your|the)\s+rates?\s+(?:hold|holds|sit|sits|move|moves|stay|stays|is|are)\b"
+    r"|<brate that moves\b|<brates? (?:below|above|lower|higher)\b"
+    r"|\b(?:delay|defer|hold back|withhold)\s+(?:paying|payment|the (?:full )?advance)\b"
+    r"|\b(?:payment|credit) terms\b|<boffer\b[^.]{0,30}\b(?:rate|discount|price)s?\b"
+    r"|\b(?:set|raise|lower|cut|reduce|change|adjust)\s+(?:a |your |the )?(?:rates?|prices?)\b",
+    re.IGNORECASE,
+)
+
+
 KINDS: dict[str, re.Pattern[str]] = {
     "measure": re.compile(
         r"\b(?:code|codes|measure|count|compare|track|tally|note every|log|record|survey|check which|"
@@ -301,8 +335,10 @@ def check_idea(text: str, said: str = "") -> Verdict:
         out.reject.append("tries to give pi instructions or change the value line")
     if has_personal_data(one):
         out.reject.append("personal data (R-PRIV-07)")
-    if REGULATED.search(one) or safety.advice_asked(one) is not None:
+    if _regulated_hit(one, said) or safety.advice_asked(one) is not None:
         out.review.append("money or a regulated topic: a person decides")
+    elif PRICE_TERMS.search(one):
+        out.review.append("a rate, discount or payment term: a person decides")
     return out
 
 
