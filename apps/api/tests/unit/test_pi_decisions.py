@@ -89,7 +89,9 @@ def go(state, said, **changes):
 
 @pytest.mark.parametrize("said", ["ok", "looks right", "theek hai", "that's all correct", "yes"])
 def test_after_the_summary_a_confirmation_brings_the_offer(said):
-    assert go(S.S4_SORTED_SUMMARY, said) is None  # box off: no offer of its own (Book 5 Part 14)
+    assert go(S.S4_SORTED_SUMMARY, said).next_state == S.S5_READINESS  # box off: whole-set offer
+    held = go(S.S4_SORTED_SUMMARY, said, box_offer=box.OfferFacts())  # box on, B1 to B7 not met
+    assert held.next_state is None and held.why.startswith("B-blocked")
     decision = go(S.S4_SORTED_SUMMARY, said, box_offer=box.OfferFacts(said_yes=True))
     assert decision.next_state == S.S5_READINESS and decision.reply == d.text("offer", "en")
     assert "You can say no" in decision.reply and "an offer, not a charge" in decision.reply

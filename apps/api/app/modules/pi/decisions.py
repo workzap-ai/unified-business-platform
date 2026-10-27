@@ -490,14 +490,14 @@ def decide(
         # summary stands, exactly as "yes that's right" does.
         confirmed = (_ok(answer, Answer.YES) or _ok(answer, Answer.NO)) and not _correcting(message)
         if summary_ok(message) or confirmed:
-            # Book 5, 5.4 and 10.9: the offer is one place only, for the whole set, and only when
-            # the Solution Box is on and R1 to R3 or B1 to B7 hold. Accepting the summary is not an
-            # offer trigger on its own.
-            if not facts.get("box_offer"):
-                return None
-            allowed, rule, reason = box.can_offer(facts["box_offer"])
-            if not allowed:
-                return Decision(None, None, {}, [], why=f"{rule}-blocked: {reason}")
+            # Book 5, 5.4 and 10.9: the offer is for the whole set, never per problem. With the
+            # Solution Box on it also waits for R1 to R3 or B1 to B7; with it off (the default,
+            # until the map flow that sets B3 and B4 is live) the summary being accepted is the
+            # trigger, so the chat never reaches a dead end.
+            if facts.get("box_offer"):
+                allowed, rule, reason = box.can_offer(facts["box_offer"])
+                if not allowed:
+                    return Decision(None, None, {}, [], why=f"{rule}-blocked: {reason}")
             return Decision(
                 text("offer", language),
                 State.S5_READINESS,

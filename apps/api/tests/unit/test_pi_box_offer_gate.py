@@ -11,9 +11,11 @@ def _facts(**more: object) -> dict[str, object]:
     return {"problem_count": 2, "group_count": 1, "problem_refs": ["P1", "P2"], **more}
 
 
-def test_with_the_box_off_the_summary_makes_no_offer() -> None:
-    # Book 5 Part 14: accepting the summary is no longer an offer trigger on its own.
-    assert decisions.decide(State.S4_SORTED_SUMMARY, SUMMARY_OK, "roman_ur", _facts()) is None
+def test_with_the_box_off_the_summary_still_brings_the_whole_set_offer() -> None:
+    # Until the map flow that sets B3 and B4 is live the box stays off and the offer follows the
+    # accepted summary, for the whole set, so the chat never reaches a dead end.
+    d = decisions.decide(State.S4_SORTED_SUMMARY, SUMMARY_OK, "roman_ur", _facts())
+    assert d is not None and d.next_state == State.S5_READINESS
 
 
 def test_with_the_box_on_two_problems_and_no_map_review_hold_the_offer_back() -> None:

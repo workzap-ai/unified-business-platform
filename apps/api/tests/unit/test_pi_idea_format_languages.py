@@ -194,7 +194,7 @@ def test_the_document_is_never_promised_before_the_offer_was_accepted() -> None:
     }
     box_off = _promise_turn("Theek hai. Workzap solution document aur quote ab tayar kiya jayega.")
     brain_no_early_promise(box_off, noted)
-    assert "tayar kiya jayega" not in box_off.reply and box_off._decision is None  # no offer either
+    assert "tayar kiya jayega" not in box_off.reply and box_off._decision is not None  # box off
     ready = {
         **noted,
         "box_offer": True,
@@ -411,7 +411,7 @@ def test_an_empty_reply_to_a_solution_ask_gets_the_honest_line_and_the_offer_not
     }
     brain_never_empty(turn, context)
     assert "once the problems are noted" not in turn.reply
-    assert "quick idea" in turn.reply and turn._decision is None  # box off: no offer
+    assert "quick idea" in turn.reply and turn._decision is not None  # box off: whole-set offer
     ready = SimpleNamespace(
         reply="", request_human=False, _decision=None, _summary=False, awaiting_customer=False
     )

@@ -2521,9 +2521,12 @@ IDEA_LINES = re.compile(r"(?mi)^\s*(?:(?:first|second|pehle|doosra|dusra)\b[,:]|
 
 
 def box_offer_allowed(context: dict[str, Any]) -> bool:
-    """The one place an offer may start (Book 5, 5.4 and 10.9): the Solution Box is on and R1 to R3
-    or B1 to B7 hold. Without it pi makes no offer of its own."""
-    return bool(context.get("box_offer")) and box.can_offer(box.offer_facts(context))[0]
+    """May pi start the whole-set offer now? With the Solution Box on (Book 5, 5.4 and 10.9) only
+    when R1 to R3 or B1 to B7 hold. With it off, the offer follows the request that already led to
+    it, as before, so a workspace without the map flow does not lose its offer."""
+    if not context.get("box_offer"):
+        return True
+    return box.can_offer(box.offer_facts(context))[0]
 
 
 def brain_offer(turn: "ServiceTurn", context: dict[str, Any]) -> None:

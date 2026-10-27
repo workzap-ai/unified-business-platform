@@ -97,9 +97,16 @@ def turn(reply="Do badlav foran karein. Workzap yahan seedha sa kaam kar sakta h
     return ServiceTurn(reply=reply)
 
 
-def test_without_the_box_the_application_makes_no_offer_after_ideas():
+def test_without_the_box_the_offer_follows_the_ask_as_before():
     t = turn()
     brain_offer(t, {**LISTENING, "solution_asked": True, "reply_language": "en"})
+    assert t.reply.endswith(solution_ask.offer_line("en"))
+    assert t._decision.next_state == flow.State.S5_READINESS
+
+
+def test_with_the_box_on_and_not_ready_the_offer_waits():
+    t = turn()
+    brain_offer(t, {**LISTENING, "box_offer": True, "solution_asked": True, "reply_language": "en"})
     assert t.reply == turn().reply and t._decision is None
 
 
