@@ -18,7 +18,7 @@ from app.modules.pi.think_plan import MovePlan
 pytestmark = pytest.mark.integration
 
 HYPOTHESIS = "parents forget the due date because nobody reminds them"
-FIRST = "Mere school mein parents fee late dete hain"
+FIRST = "In my school many parents pay the fee late every month"
 ASKING = "I have a guess and I may be wrong: parents forget the due date because nobody reminds them. Is that the reason?"
 
 
