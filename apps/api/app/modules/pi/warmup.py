@@ -43,6 +43,10 @@ DOOR = {
     "en": "Now tell me, what feels heaviest in your business these days?",
     "roman_ur": "Ab bataiye, in dino sab se zyada kya bhaari lag raha hai?",
 }
+LOOKED = {  # the page gave no more than a name: nothing to say back
+    "en": "I had a look at the page.",
+    "roman_ur": "Page par ek nazar daal li.",
+}
 NO_LINK = {"en": "That's fine.", "roman_ur": "Theek hai."}
 CANNOT_OPEN = {
     "en": "That page won't open, no problem.",
@@ -153,7 +157,7 @@ def _after_page(
         result = public_page.PageResult(**{k: v for k, v in look.items() if k in _FIELDS})
         if result.ok:
             business_profile.from_page(profile, result)
-            line = business_profile.say_back(profile, lang)
+            line = business_profile.say_back(profile, lang) or LOOKED[lang]
             return Plan(f"{line} {DOOR[lang]}".strip(), done, profile)
         note = {"needs_screenshot": SCREENSHOT, "refused": ONLY_BUSINESS}.get(
             result.status, CANNOT_OPEN

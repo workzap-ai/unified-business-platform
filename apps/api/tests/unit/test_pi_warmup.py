@@ -124,3 +124,16 @@ def test_a_page_that_cannot_be_read_is_said_calmly() -> None:  # OT7, OT9, OT10
         bad = {"status": status, "url": "https://x.example", "reason": "x"}
         plan = warmup.plan(ctx("https://x.example", brief, page_look=bad))
         assert plan is not None and expect in plan.reply and plan.reply.count("?") == 1
+
+
+def test_a_page_with_only_a_name_is_not_said_back() -> None:
+    # live 2026-10-27: "From your page I understood: Metavative." said nothing
+    result = public_page.PageResult(
+        "ok", "https://m.example/", title="Metavative", site_name="Metavative"
+    )
+    bare = {k: v for k, v in asdict(result).items() if k != "text"}
+    brief = {"warmup": {"step": warmup.PAGE_ASKED}}
+    plan = warmup.plan(ctx("https://m.example", brief, page_look=bare))
+    assert plan is not None and plan.reply.startswith("I had a look at the page.")
+    assert "understood" not in plan.reply and plan.reply.count("?") == 1
+    assert bp.say_back(plan.profile) == ""

@@ -143,17 +143,13 @@ SAY_BACK = {
 
 def say_back(profile: dict[str, Any], language: str | None = None) -> str:
     """One line of what pi understood, labelled as coming from the page (never "your business is").
-    Empty when the page gave nothing worth saying."""
-    parts = [f["value"] for f in profile.get("facts", []) if f["source"] == PAGE]
-    pieces = [
-        f["value"]
-        for key in ("what_they_do", "business_name")
-        if (f := fact(profile, key)) is not None and f["source"] == PAGE
-    ]
-    if not pieces:
+    Empty unless the page said what the business does: a name alone is not an understanding
+    (live 2026-10-27: "From your page I understood: Metavative.")."""
+    what_they_do = fact(profile, "what_they_do")
+    if what_they_do is None or what_they_do["source"] != PAGE:
         return ""
+    pieces = [what_they_do["value"]]
     if fact(profile, "online_orders"):
         pieces.append("orders online" if language != "roman_ur" else "online order ka option")
-    del parts
     what = "; ".join(dict.fromkeys(pieces))[:240]
     return SAY_BACK["roman_ur" if language == "roman_ur" else "en"].format(what=what)
