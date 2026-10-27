@@ -2203,6 +2203,59 @@ def shape_expert_ideas(turn: "ServiceTurn", context: dict[str, Any]) -> None:
     turn.reply = text
 
 
+# Spec v1.4, 17.5: "what can you do?" means Workzap too. The two ideas are followed by one line of
+# what Workzap COULD build, said as what the owner would notice (never "will", no tool words, no
+# price), from the approved catalogue.
+CAPABILITY_ASK = re.compile(
+    r"\bwhat can you do\b|\bwhat do you do\b|\bhow can you help\b|"
+    r"\b(?:aap|ap)\s+kya\s+(?:kar|kr)\s+(?:sakte|skte|sakty|sakti|skti)\b",
+    re.IGNORECASE,
+)
+COULD_LINE = {
+    "en": "Workzap could set it up so {phrase}.",
+    "roman_ur": "Workzap ye kar sakta hai: {phrase}.",
+}
+WORKZAP_COULD = re.compile(r"\bworkzap\s+(?:could|ye kar sakta|aisa)", re.IGNORECASE)
+
+
+def capability_line(context: dict[str, Any]) -> str:
+    """The one Workzap line for a "what can you do?" answer, or "" when none is safe to say."""
+    said = str(context.get("latest_customer_message") or "")
+    if not CAPABILITY_ASK.search(said):
+        return ""
+    language = "roman_ur" if context.get("reply_language") == "roman_ur" else "en"
+    keys: list[str] = []
+    build = context.get("solution_build") or {}
+    if build.get("says"):
+        phrase = str(build["says"])
+    else:
+        for item in reversed(context.get("noted_problems") or []):
+            keys = solution_library.build_keys(str(item.get("group") or ""))
+            if keys:
+                break
+        if not keys:
+            return ""
+        phrase = solutions.build_phrase(keys[0], language)
+    if language == "en":
+        phrase = phrase[:1].lower() + phrase[1:]
+    line = COULD_LINE[language].format(phrase=phrase.rstrip(". "))
+    if solutions.banned_tool_words(line, said) or any(ch.isdigit() for ch in line):
+        return ""
+    return line
+
+
+def add_capability_line(turn: "ServiceTurn", context: dict[str, Any]) -> None:
+    """After the ideas of a "what can you do?" answer, before its one question."""
+    lines = turn.reply.split(chr(10))
+    bullets = [n for n, line in enumerate(lines) if _BULLET_LINE.match(line)]
+    if len(bullets) < 2 or WORKZAP_COULD.search(turn.reply) or OFFER_LINE.search(turn.reply):
+        return
+    if not (line := capability_line(context)):
+        return
+    lines[bullets[-1] + 1 : bullets[-1] + 1] = ["", line]
+    turn.reply = chr(10).join(lines)
+
+
 def strip_dangling_opener(turn: "ServiceTurn") -> None:
     """A reply must not stop on the Workzap line's opener ("...Workzap could set it up so"): the
     model sometimes leaves the build itself out (found in a real-model school chat)."""
@@ -6000,6 +6053,7 @@ async def compose_service_turn(
     turn.reply = polished(re.sub(r"[ \t]+•[ \t]*", "\n• ", turn.reply).strip())
     if context.get("expert_on"):
         shape_expert_ideas(turn, context)
+        add_capability_line(turn, context)
         turn.reply = reply_layout.tidy(turn.reply)  # short paragraphs, the question on its own line
     allowed = allowed_text(context)
     turn.reply = validate_service_reply(
