@@ -298,9 +298,21 @@ async def raise_escalation(
 UNCLAIMED_TEXT = {
     "en": "The Workzap team hasn't picked this up yet. I've flagged it again.",
     "roman_ur": "Workzap ki team ne abhi tak ise nahi uthaya. Maine ise dobara flag kar diya hai.",
+    "ar": "لم يستلم فريق Workzap هذا الطلب بعد. لقد نبّهتهم مرة أخرى.",
 }
 FLAGGED = "\n[flagged again]"
-SLA_DEFAULT_MINUTES = 60
+SLA_DEFAULT_MINUTES = 30  # platform spec v1.4, 17.7 (it was an hour)
+
+
+def unclaimed_text(known_language: str | None, last_message: str | None) -> str:
+    """The honest line in the language of the owner's LAST message (spec v1.4, 17.7: live chat A
+    got this line in English inside a Roman Urdu chat); the chat's language when that message
+    shows none."""
+    from app.modules.pi.language import detect_language, notice_in
+
+    return notice_in(UNCLAIMED_TEXT, detect_language(last_message) or known_language)
+
+
 SLA_RANGE = (5, 1440)
 # No message to someone pi stopped answering (X_BLOCKED) or about an abuse ticket.
 NO_UNCLAIMED_MESSAGE = frozenset({"abuse", "deletion_request"})
@@ -394,13 +406,24 @@ async def flag_unclaimed(ctx: dict[str, Any], now: datetime | None = None) -> li
                         and conversation.flow_state != "X_BLOCKED"
                         and (conversation.flow_state != "X_HUMAN" or waiting_for_person)
                     ):
-                        language = "roman_ur" if conversation.language == "roman_ur" else "en"
+                        last_said = await session.scalar(
+                            select(PiMessage.body)
+                            .where(
+                                PiMessage.tenant_id == row.tenant_id,
+                                PiMessage.environment_id == row.environment_id,
+                                PiMessage.conversation_id == conversation.id,
+                                PiMessage.direction == "inbound",
+                                PiMessage.message_type == "text",
+                            )
+                            .order_by(PiMessage.created_at.desc())
+                            .limit(1)
+                        )
                         message = await service.messages.add(
                             service.messages.new(
                                 conversation_id=conversation.id,
                                 direction="outbound",
                                 sender_type="system",
-                                body=UNCLAIMED_TEXT[language],
+                                body=unclaimed_text(conversation.language, last_said),
                                 status="queued",
                                 idempotency_key=key,
                             )

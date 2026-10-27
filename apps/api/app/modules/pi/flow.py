@@ -195,10 +195,11 @@ GUIDANCE: dict[State, str] = {
 }
 
 OPENING = {
-    "en": "Hi, I'm pi, an AI from Workzap. Tell me what's going wrong in your business and I'll "
-    "start on it.",
-    "roman_ur": "Hi, main pi hoon, Workzap ka AI. Business mein jo bhi masla chal raha hai, bata "
-    "dein, usay note kar liya jayega.",
+    # Spec v1.4, Part 14 and 16.1: the old "Tell me what's going wrong ... I'll start on it" and
+    # "usay note kar liya jayega" openings are removed; the opening says what pi is and asks one
+    # open question about the business (the full warm-up is Part 16).
+    "en": "Hi, I'm pi, an AI from Workzap. What does your business do?",
+    "roman_ur": "Hi, main pi hoon, Workzap ka AI. Aap ka business kya kaam karta hai?",
 }
 
 

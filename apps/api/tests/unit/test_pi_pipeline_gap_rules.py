@@ -378,7 +378,7 @@ def test_the_honest_unclaimed_line_promises_no_time():
         "The Workzap team hasn't picked this up yet. I've flagged it again."
     )
     assert not any(c.isdigit() for c in team_requests.UNCLAIMED_TEXT["en"])
-    assert team_requests.sla_minutes(None) == 60
+    assert team_requests.sla_minutes(None) == 30  # spec v1.4, 17.7
     assert team_requests.sla_minutes({"brain": {"handover_sla_minutes": 1}}) == 5
     assert team_requests.sla_minutes({"brain": {"handover_sla_minutes": 30}}) == 30
     assert team_requests.sla_minutes({"brain": {"handover_sla_minutes": 10**6}}) == 1440
@@ -465,3 +465,20 @@ def test_pi_does_not_say_you_are_right_when_the_owner_corrected_nothing() -> Non
     assert not hits("Actually it is every day, not weekly", reply)
     assert not hits("that's not what I said", reply, said_wrong=True)
     assert not hits("Haan har hafte hota hai", "Samajh gaya. Phir kya hota hai?")
+
+
+def test_the_unclaimed_line_follows_the_language_of_the_last_message():
+    # live chat A (spec v1.4, 17.7): an English line in a Roman Urdu chat
+    roman = team_requests.unclaimed_text("en", "Maslay bohat hain, koi nahi uthata")
+    assert roman == team_requests.UNCLAIMED_TEXT["roman_ur"]
+    assert (
+        team_requests.unclaimed_text("roman_ur", "please call me")
+        == (team_requests.UNCLAIMED_TEXT["en"])
+    )
+    assert (
+        team_requests.unclaimed_text("roman_ur", "ok") == team_requests.UNCLAIMED_TEXT["roman_ur"]
+    )
+    assert team_requests.unclaimed_text(None, None) == team_requests.UNCLAIMED_TEXT["en"]
+    assert (
+        team_requests.unclaimed_text("en", "مرحبا كيف الحال") == team_requests.UNCLAIMED_TEXT["ar"]
+    )

@@ -43,9 +43,9 @@ async def test_hi_gets_the_fixed_opening_and_the_chat_starts_listening(
     await brain_on(api)
     await pi.process("Hi", "brain-hi")
     await pi.deliver_all()
+    # spec v1.4, Part 14: the old "Tell me what's going wrong ... I'll start on it" is gone
     assert (await pi.reply_to("brain-hi")).body == (
-        "Hi, I'm pi, an AI from Workzap. Tell me what's going wrong in your business "
-        "and I'll start on it."
+        "Hi, I'm pi, an AI from Workzap. What does your business do?"
     )
     conversation = await pi.conversation()
     await business_db.refresh(conversation)
