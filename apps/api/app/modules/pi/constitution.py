@@ -690,7 +690,13 @@ OPTION_STOP = frozenset(
 # R-TONE-01 (live chat 5): a hollow verdict that promises nothing and notes nothing.
 HOLLOW_OPENER = re.compile(
     r"^\W*(?:is\s+par\s+kaam\s+banta\s+hai|is\s+mein\s+nuqsan\s+ho\s+sakta\s+hai|that\s+sounds\s+costly|"
-    r"that(?:'s|\s+is)\s+worth\s+sorting|that\s+sounds\s+like\s+a\s+headache|ye\s+sunna\s+mushkil\s+hai)"
+    r"that(?:'s|\s+is)\s+worth\s+sorting|that\s+sounds\s+like\s+a\s+headache|ye\s+sunna\s+mushkil\s+hai|"
+    # an apology with a verdict ("Maaf kijiye, ye bohat mushkil hai."): nothing to be sorry for
+    r"(?:maaf\s+(?:kijiye|kijiyega|karein|karna)|sorry|i(?:'m|\s+am)\s+sorry|afsos)[,.]?\s+"
+    r"(?:ye|yeh|wo|woh|that|this)\s+(?:(?:sounds|is|seems)\s+)?"
+    r"(?:(?:bohat|bahut|kaafi|very|really|so)\s+)?"
+    r"(?:mushkil|bura|dukh\s+ki\s+baat|hard|tough|difficult|sad|stressful|frustrating)"
+    r"(?:\s+(?:hai|hota\s+hai))?)"
     r"\W*$",
     re.IGNORECASE,
 )
@@ -2018,17 +2024,17 @@ def lint(reply: str, context: dict[str, Any]) -> list[Violation]:
                     ),
                 )
             )
-    if context.get("expert_on"):
-        # the expert advisor's voice (seen live, 2026-10-27: "Note kar liya hai: ... Ye team tak bhi
-        # pohanch jayega. Parents fee kaise jama karte hain?")
-        if NOTED_START.match(reply):
-            add(
-                Violation(
-                    "R-ECHO-05",
-                    "do not open with 'Noted', 'Note kar liya' or 'Thanks': go straight to your one "
-                    "question and show what you understood in a few words inside it",
-                )
+    if context.get("pi_mode") == "brain" and NOTED_START.match(reply):
+        # spec v1.4, 17.6, every brain workspace (seen live, 2026-10-27: "Note kar liya hai: ... Ye
+        # team tak bhi pohanch jayega. Parents fee kaise jama karte hain?")
+        add(
+            Violation(
+                "R-ECHO-05",
+                "do not open with 'Noted', 'Note kar liya' or 'Thanks': go straight to your one "
+                "question and show what you understood in a few words inside it",
             )
+        )
+    if context.get("expert_on"):
         if TEAM_WILL_SEE.search(reply):
             add(
                 Violation(

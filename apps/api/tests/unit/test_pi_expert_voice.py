@@ -35,11 +35,10 @@ def test_a_question_about_the_reason_is_clean() -> None:
     }
 
 
-def test_the_rules_apply_only_when_the_expert_is_on() -> None:
-    assert not rules("Note kar liya: fee late hoti hai. Kya wajah hai?", expert_on=False) & {
-        "R-ECHO-05",
-        "R-DISC-06",
-    }
+def test_the_noted_ban_is_everywhere_the_team_line_is_expert_only() -> None:
+    # spec v1.4, 17.6: no "noted" announcement in any brain workspace
+    assert "R-ECHO-05" in rules("Note kar liya: fee late hoti hai. Kya wajah hai?", expert_on=False)
+    assert "R-DISC-06" not in rules("Ye team tak pohanch jayega. Kya wajah hai?", expert_on=False)
 
 
 def test_the_voice_rule_is_in_the_expert_prompt_and_not_without_it() -> None:

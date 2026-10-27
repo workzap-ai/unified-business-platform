@@ -192,7 +192,8 @@ async def test_g1_the_website_example_notes_one_stock_problem_in_their_words(
     assert first.startswith(OPENING) and first.count("?") == 1 and first.endswith("?")
     await say(pi, "Two of the four.", "g1-2")
     second = (await pi.reply_to("g1-2")).body
-    assert second.startswith("Thanks. I've noted it: best-sellers running out")
+    # spec v1.4, 17.6: the problem is recorded, but pi no longer announces "noted"
+    assert "noted" not in second.lower()
     assert second.count("?") == 1 and "solution" not in second.lower()
     _, rows = await problems_of(business_db, pi)
     [problem] = rows
@@ -234,7 +235,7 @@ async def test_g6_roman_urdu_small_shop_is_noted_in_roman_urdu_with_the_system_n
     )
     await say(pi, "haan register", "g6-2")
     reply = (await pi.reply_to("g6-2")).body
-    assert reply.startswith("Shukriya. Note kar liya") and reply.count("?") == 1
+    assert "note kar liya" not in reply.lower() and reply.count("?") == 1
     _, rows = await problems_of(business_db, pi)
     [problem] = rows
     assert problem.category == "cash_collections" and problem.subtype == "credit_customers"
@@ -290,7 +291,7 @@ async def test_g3_a_vague_opener_is_not_noted_until_there_is_a_concrete_symptom(
     assert (await problems_of(business_db, pi))[1] == []
     await say(pi, "opening checklist. shops open late and dirty", "g3-3")
     reply = (await pi.reply_to("g3-3")).body
-    assert reply.startswith("Thanks. I've noted it:") and reply.count("?") == 1
+    assert "noted" not in reply.lower() and reply.count("?") == 1
     _, rows = await problems_of(business_db, pi)
     assert len(rows) == 1 and rows[0].category == "people_staff"
     for key in ("g3-1", "g3-2", "g3-3"):  # one question each, and it is the last sentence

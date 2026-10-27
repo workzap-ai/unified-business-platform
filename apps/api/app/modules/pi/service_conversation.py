@@ -939,11 +939,10 @@ problem: ask what it would fix and note that; keep the wish in requested_solutio
   fields that changed (reason "correction" or "enrichment"). Same symptom told twice: op
   "merge" (ref kept, refs folded in). Different symptoms that may share a root: op "link".
   "Never mind that one": op "withdraw".
-- Confirm each new problem in their words and language: "Thanks. I've noted it: {short title}.
-  Anything else getting in the way?" If your confidence is under 0.6, ask one question to
-  confirm instead of asking for more problems. Translate the whole sentence, "noted" included
-  (Roman Urdu: "note kar liya", Arabic: "سجلت ذلك"): never leave the English word inside a
-  reply in another language. Say you noted it only when you also record it in problem_ops.
+- Show you understood each new problem by naming it in a few of their words inside your one
+  question (never "Thanks", "Noted", "Note kar liya" or "Anything else"). If your confidence is
+  under 0.6, ask one question to confirm instead of asking for more problems. Record the problem
+  in problem_ops; never announce that you noted it.
 - noted_problems lists what is already noted (ref, title, group, status, missing). Never ask
   for anything not in "missing" of the problem you are on, and never re-note a problem.
 - If shape_question_due is true, this reply's ONE question must be that one, asked once, naturally
@@ -1167,10 +1166,6 @@ def system_for(context: dict[str, Any]) -> str:
             + (memory_block.SYSTEM_LINE if context.get("what_i_know") else "")
             + think_prompt.block(context)
         )
-        if context.get("expert_on"):
-            # the base prompt's own example of confirming a problem is the "Thanks. I've noted it:"
-            # opener the expert voice forbids: the model copies an example before a rule
-            prompt = prompt.replace(expert_advisor.OLD_CONFIRM, expert_advisor.NEW_CONFIRM)
         return prompt
     return SYSTEM
 
@@ -2076,6 +2071,16 @@ def brain_summary(turn: "ServiceTurn", context: dict[str, Any]) -> None:
         turn._summary = True
     else:
         turn._board = True  # shown again with its board picture; the chat stays where it is
+
+
+def voice_noted(reply: str, context: dict[str, Any]) -> str:
+    """Brain workspaces never announce "noted it" (spec v1.4, 17.6); other workspaces keep the
+    frame, translated into the person's language."""
+    if context.get("pi_mode") == "brain":
+        return reply_voice.drop_noted(reply)
+    return reply_voice.localise_noted(
+        reply, context.get("reply_language"), reply_voice.noted_before(context)
+    )
 
 
 IDEAS_LEAD = {
@@ -5578,9 +5583,7 @@ async def compose_service_turn(
     turn = result.value
     turn._attempts = result.response.attempts
     turn.reply = tidy_list_numbers(turn.reply)
-    turn.reply = reply_voice.localise_noted(
-        turn.reply, context.get("reply_language"), reply_voice.noted_before(context)
-    )
+    turn.reply = voice_noted(turn.reply, context)
     send_now(turn, context)
     meeting_yes(turn, context)
     mode = price_policy.price_mode(policy.response_rules, service=True)
@@ -5769,9 +5772,7 @@ async def compose_service_turn(
         turn = retry.value
         turn._attempts = [*result.response.attempts, *retry.response.attempts]
         turn.reply = without_filler(tidy_list_numbers(turn.reply))
-        turn.reply = reply_voice.localise_noted(
-            turn.reply, context.get("reply_language"), reply_voice.noted_before(context)
-        )
+        turn.reply = voice_noted(turn.reply, context)
         meeting = arranged_meeting(context)
         latest_words = str(context.get("latest_customer_message", ""))
         if (

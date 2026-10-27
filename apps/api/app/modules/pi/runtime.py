@@ -910,8 +910,10 @@ async def process_pi_event(ctx: dict[str, Any], event_id: str) -> None:
             with latency.stage("debounce"):
                 await asyncio.sleep(brain_config.value(policy.response_rules, "debounce_seconds"))
             await session.refresh(message)
-        if policy.response_rules.get("pi_mode") == "brain" and await newer_waiting(
-            session, message
+        if (
+            policy.response_rules.get("pi_mode") == "brain"
+            and await newer_waiting(session, message)
+            and not await burst_too_long(session, message, policy.response_rules)
         ):
             message.status, message.error_code, event.status = (
                 "skipped",
@@ -2154,6 +2156,37 @@ async def newer_waiting(session: Any, message: PiMessage) -> bool:
         .limit(1)
     )
     return later is not None
+
+
+async def burst_too_long(session: Any, message: PiMessage, response_rules: dict[str, Any]) -> bool:
+    """Spec v1.4, 17.2: a burst is waited out only so long. When the first unanswered message of
+    this chat is older than `burst_max_seconds`, this message answers them all now even though a
+    newer one is waiting (a person who keeps typing must still get a reply)."""
+    from app.modules.pi import brain_config
+
+    last_reply = await session.scalar(
+        select(func.max(PiMessage.created_at)).where(
+            PiMessage.tenant_id == message.tenant_id,
+            PiMessage.environment_id == message.environment_id,
+            PiMessage.conversation_id == message.conversation_id,
+            PiMessage.direction == "outbound",
+            PiMessage.created_at < message.created_at,
+        )
+    )
+    first = await session.scalar(
+        select(func.min(PiMessage.created_at)).where(
+            PiMessage.tenant_id == message.tenant_id,
+            PiMessage.environment_id == message.environment_id,
+            PiMessage.conversation_id == message.conversation_id,
+            PiMessage.direction == "inbound",
+            PiMessage.created_at <= message.created_at,
+            *([PiMessage.created_at > last_reply] if last_reply is not None else []),
+        )
+    )
+    if first is None:
+        return False
+    limit = brain_config.value(response_rules, "burst_max_seconds")
+    return bool((datetime.now(UTC) - first).total_seconds() >= limit)
 
 
 async def sweep_pi(ctx: dict[str, Any]) -> None:

@@ -1,7 +1,6 @@
 # ruff: noqa: E501
 """Expert workspaces: no unasked ideas, a lead line for asked ones, no 'Thanks. I've noted it:' example."""
 
-from app.modules.pi import expert_advisor
 from app.modules.pi import service_conversation as sc
 from app.modules.pi.service_conversation import ServiceTurn, shape_expert_ideas
 
@@ -61,9 +60,9 @@ def test_one_bullet_or_no_bullets_are_left_alone() -> None:
     assert BULLET in turn.reply
 
 
-def test_the_noted_it_example_is_replaced_in_the_expert_prompt_only() -> None:
-    assert expert_advisor.OLD_CONFIRM in sc.BRAIN_PROBLEMS
-    expert = sc.system_for({"pi_mode": "brain", "expert_on": True})
-    plain = sc.system_for({"pi_mode": "brain"})
-    assert expert_advisor.NEW_CONFIRM in expert and expert_advisor.OLD_CONFIRM not in expert
-    assert expert_advisor.OLD_CONFIRM in plain
+def test_no_brain_prompt_teaches_the_noted_it_opener() -> None:
+    # spec v1.4, 17.6: the base prompt's example of confirming a problem is not "Thanks. I've noted it:"
+    for context in ({"pi_mode": "brain"}, {"pi_mode": "brain", "expert_on": True}):
+        prompt = sc.system_for(context)
+        assert "I've noted it" not in prompt
+        assert "naming it in a few of their words" in prompt

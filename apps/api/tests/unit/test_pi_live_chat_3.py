@@ -101,7 +101,7 @@ def test_the_replies_the_new_rules_catch_in_this_chat():
         )
     }
     assert caught["R2"] and caught["R5"] and caught["R6"]
-    assert not caught["R3"]
+    assert not (caught["R3"] - {"R-ECHO-05"})  # the old noted opener is banned (spec v1.4, 17.6)
 
 
 def test_two_different_questions_that_share_one_loan_word_are_not_the_same():

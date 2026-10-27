@@ -10,9 +10,11 @@ from typing import Any
 
 # key: (default, lowest tested value, highest tested value)
 TUNABLES: dict[str, tuple[int, int, int]] = {
-    # Lowered 10 -> 5 (2026-10-24, live-chat latency complaints): still the tested floor, so pi
-    # waits half as long to see if a burst of messages is still coming before it starts replying.
-    "debounce_seconds": (5, 5, 20),
+    # Platform spec v1.4, 17.2: wait for a quiet window of 6 s before replying to a burst (it was
+    # lowered 10 -> 5 on 2026-10-24 for latency; 6 s is the spec's own number, the floor stays 5).
+    "debounce_seconds": (6, 5, 20),
+    # ... but never keep a burst waiting longer than this after its first message (17.2).
+    "burst_max_seconds": (25, 15, 60),
     "max_clarify": (3, 1, 3),
     "summary_trigger": (7, 5, 10),
     "quiet_before_summary": (2, 1, 3),  # "anything else?" replies with nothing new, then a summary

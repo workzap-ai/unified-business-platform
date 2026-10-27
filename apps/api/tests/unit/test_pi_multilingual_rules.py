@@ -74,7 +74,9 @@ NORMAL = {
 def test_a_normal_reply_breaks_no_rule(lang):
     first, noted, said = NORMAL[lang]
     assert lint(first, state="S0_NEW") == set(), lang
-    assert lint(noted, said) == set(), lang
+    # these sample replies open with the old "noted" line, which spec v1.4 (17.6) now bans in every
+    # language (R-ECHO-05); this test is about language and the other rules
+    assert lint(noted, said) - {"R-ECHO-05"} == set(), lang
 
 
 @pytest.mark.parametrize(

@@ -47,3 +47,31 @@ def localise_noted(reply: str, language: str | None, seen: int = 0) -> str:
     if frames is None or not reply or not NOTED_FRAME.search(reply):
         return reply
     return NOTED_FRAME.sub(frames[seen % len(frames)], reply, count=1)
+
+
+# Spec v1.4 17.6: pi does not announce that it noted something ("Thanks. I've noted it: ...",
+# "Note kar liya: ...", "Noted: ..."), in any language it writes in Latin letters. The sentence is
+# taken out; what the model understood is shown inside its one question instead. Anywhere in the
+# reply, one sentence at a time, and only when something else is left to send.
+_THANKS = r"(?:(?:thanks|thank you|shukriya|theek hai|samajh liya|got it|understood)[.,!]?\s*)?"
+# Only at the start of a sentence ("Once I've noted what is wrong, ..." is ordinary speech), and
+# only the announcement forms: "noted:", "I've noted it", "Noted.", "note kar liya", "likh liya".
+NOTED_SENTENCE = re.compile(
+    r"(?:^|(?<=[.!?]\s))"
+    + _THANKS
+    + r"(?:(?:i(?:'ve| have)\s+)?noted\s*:|i(?:'ve| have)\s+noted\s+it\b|noted\s*[.!]|"
+    r"(?:maine\s+)?note\s+kar\s+li(?:ya|a)(?:\s+hai)?\b|likh\s+liya(?:\s+hai)?\b|"
+    r"maine\s+(?:\w+\s+){0,3}(?:masle|masla|problems?|baatein|baat)\s+"
+    r"note\s+kar\s+li(?:ye|ya)(?:\s+hain?)?\b)\s*:?[^.?!\n:]*[.?!]?[ \t]*",
+    re.IGNORECASE,
+)
+
+
+def drop_noted(reply: str) -> str:
+    """The reply without its "noted it" announcements; unchanged when nothing else would be left
+    or when the announcement is the whole message."""
+    if not reply or not NOTED_SENTENCE.search(reply):
+        return reply
+    lines = [NOTED_SENTENCE.sub("", line) for line in reply.split("\n")]
+    text = re.sub(r"\n{3,}", "\n\n", "\n".join(line.rstrip() for line in lines)).strip()
+    return text if len(text.split()) >= 4 else reply

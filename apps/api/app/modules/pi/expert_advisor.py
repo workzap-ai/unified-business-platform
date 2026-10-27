@@ -166,17 +166,6 @@ PROMPT_RULE = """
   whom or what, how often). Never switch to how the business works in general.
 """
 
-# The base brain prompt's instruction for confirming a new problem, and what replaces it when the
-# expert advisor is on (the exact text of service_conversation.BRAIN_PROBLEMS).
-OLD_CONFIRM = (
-    "Confirm each new problem in their words and language: \"Thanks. I've noted it: {short title}.\n"
-    '  Anything else getting in the way?" If your confidence'
-)
-NEW_CONFIRM = (
-    "Show you understood each new problem by naming it in a few of their words inside your one\n"
-    '  question (never "Thanks", "Noted", "Note kar liya" or "Anything else"). If your confidence'
-)
-
 # What the brain prompt always carries when the expert advisor is on (before any diagnosis exists).
 VOICE_RULE = """
 - Never start a reply with "Noted", "Note kar liya", "Thanks" or a restatement of what they just said.
