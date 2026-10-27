@@ -25,6 +25,7 @@ from app.modules.memberships.models import Membership
 from app.modules.notifications.service import notify
 from app.modules.pi import (
     box,
+    box_signals,
     brain_config,
     brain_docs,
     brain_payments,
@@ -1400,7 +1401,13 @@ async def brain_problems(
         noted_problems
         if noted_problems is not None
         else await latency.timed(
-            "brain.noted", problems.noted_context(session, scope, conversation.customer_id)
+            "brain.noted",
+            problems.noted_context(
+                session,
+                scope,
+                conversation.customer_id,
+                box_signals=box.box_offer_enabled(policy.response_rules),
+            ),
         )
     )
     brief = conversation.service_brief or {}
@@ -1411,6 +1418,18 @@ async def brain_problems(
         context["thinking"] = True
     if box.box_offer_enabled(policy.response_rules):  # Book 5: the Solution Box offer rule
         context["box_offer"] = True
+        # B3 and B4 from the owner's words, kept in the brief like the other brief keys. The flag
+        # `map_awaiting` is set when a map picture goes out and used up by the very next message.
+        said = (message.body if message is not None else "") or ""
+        seen: dict[str, Any] = {}
+        awaiting = bool(brief.get("map_awaiting")) and message is not None
+        if awaiting and not brief.get("map_reviewed") and box_signals.confirms_or_changes_map(said):
+            seen["map_reviewed"] = True  # confirmed or corrected the map pi just showed
+        if not brief.get("ranked") and noted and box_signals.says_start_here(said):
+            seen["ranked"] = True  # said where to start
+        if seen or awaiting:
+            brief = {k: v for k, v in brief.items() if k != "map_awaiting"} | seen
+            conversation.service_brief = brief
     context["brain_settings"] = {
         key: brain_config.value(policy.response_rules, key)
         for key in (
@@ -2758,8 +2777,10 @@ async def note_problems(
     conversation: PiConversation,
     message: PiMessage,
     turn: "ServiceTurn",
+    box_on: bool = False,
 ) -> None:
-    """Save the turn's problem ops (brain mode) and move the conversation's state."""
+    """Save the turn's problem ops (brain mode) and move the conversation's state. `box_on`: the
+    Solution Box offer is on, so a problem the owner raised unasked is marked (B5)."""
     noted = False
     if turn.problem_ops and conversation.customer_id is not None:
         applied = await problems.apply_ops(
@@ -2773,6 +2794,14 @@ async def note_problems(
             await link_floor(session, scope, conversation.customer_id),
         )
         noted = bool(applied.created)
+        if (
+            box_on
+            and applied.created
+            and message.created_at is not None
+            and not await box_signals.previous_ai_asked(session, conversation, message.created_at)
+        ):
+            for created in applied.created:
+                created.raised_voluntarily = True  # nobody asked: they brought it up themselves
         if applied.rejected:
             logger.warning("pi problem ops skipped", extra={"ops": applied.rejected[:5]})
     elif conversation.customer_id is not None:
@@ -3158,7 +3187,13 @@ async def prepare_context(
     # What was noted is read once: the industry step and the brain step both use it.
     noted = (
         await latency.timed(
-            "ctx.noted", problems.noted_context(session, scope, conversation.customer_id)
+            "ctx.noted",
+            problems.noted_context(
+                session,
+                scope,
+                conversation.customer_id,
+                box_signals=box.box_offer_enabled(policy.response_rules),
+            ),
         )
         if flow.brain_mode(policy.response_rules) and conversation.customer_id is not None
         else None
@@ -3240,6 +3275,7 @@ async def prepare_context(
                 "closed_slots",
                 "last_question",
                 "open_requests",
+                "map_awaiting",
             )
         },
         # Requests left unanswered last turn, to answer first (R-ANS-03).
@@ -5346,7 +5382,14 @@ async def save_service_turn(
     """Save the turn. Returns the leads pi should now write a proposal for (the caller
     queues it after commit, so the model call never runs under these row locks)."""
     if flow.brain_mode(policy.response_rules):
-        await note_problems(session, scope, conversation, message, turn)
+        await note_problems(
+            session,
+            scope,
+            conversation,
+            message,
+            turn,
+            box_on=box.box_offer_enabled(policy.response_rules),
+        )
     if turn._greeting_only:
         conversation.language = turn.language
         return []

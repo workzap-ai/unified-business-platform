@@ -21,8 +21,8 @@ from uuid import UUID
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.modules.pi import box_signals, taxonomy
 from app.modules.pi import problems as problem_book
-from app.modules.pi import taxonomy
 from app.modules.pi.box_models import PiMapVersion
 from app.modules.pi.problem_models import PiProblem, PiProblemLink
 from app.shared.scope import WorkspaceScope
@@ -189,16 +189,17 @@ def build_map(
         status = "resolved" if str(p.status) == "resolved" else "open"
         if status == "open" and PARKED_TAG in (p.tags or []):
             status = "parked"
-        nodes.append(
-            {
-                "id": node_id(p.number),
-                "label": label_of(p),
-                "facts": facts_of(p),
-                "category": p.category if p.category in taxonomy.KEYS else taxonomy.OTHER,
-                "status": status,
-                "is_new": previous is not None and node_id(p.number) not in before,
-            }
-        )
+        node: dict[str, Any] = {
+            "id": node_id(p.number),
+            "label": label_of(p),
+            "facts": facts_of(p),
+            "category": p.category if p.category in taxonomy.KEYS else taxonomy.OTHER,
+            "status": status,
+            "is_new": previous is not None and node_id(p.number) not in before,
+        }
+        if (rank := box_signals.rank_of(p.tags)) is not None:
+            node["rank"] = rank  # the owner's own order (B4), shown on the page, only when set
+        nodes.append(node)
     drawn: list[dict[str, Any]] = []
     for link in links:
         item = _drawn_link(link, number, link_min)

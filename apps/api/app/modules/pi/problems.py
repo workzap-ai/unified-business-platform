@@ -754,9 +754,17 @@ async def apply_ops(
 
 
 async def noted_context(
-    session: AsyncSession, scope: WorkspaceScope, customer_id: UUID, limit: int = 40
+    session: AsyncSession,
+    scope: WorkspaceScope,
+    customer_id: UUID,
+    limit: int = 40,
+    box_signals: bool = False,
 ) -> list[dict[str, Any]]:
-    """The noted problems as compact JSON for the prompt: ref, title, group, status, gaps."""
+    """The noted problems as compact JSON for the prompt: ref, title, group, status, gaps.
+    `box_signals` (the Solution Box offer is on) adds `raised_voluntarily` (B5) and the owner's
+    `rank` (B4) where set; off, the output is what it always was."""
+    from app.modules.pi import box_signals as signals
+
     book = ProblemBook(session, scope, customer_id, "en")
     compact: list[dict[str, Any]] = []
     renamed = {
@@ -788,8 +796,15 @@ async def noted_context(
             )
             if not known
         ]
+        extra: dict[str, Any] = {}
+        if box_signals:
+            if problem.raised_voluntarily:
+                extra["raised_voluntarily"] = True
+            if (rank := signals.rank_of(problem.tags)) is not None:
+                extra["rank"] = rank
         compact.append(
             {
+                **extra,
                 "ref": short_ref(problem.id),
                 "title": problem.title,
                 "title_local": problem.title_local or "",

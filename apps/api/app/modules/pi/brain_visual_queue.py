@@ -179,6 +179,7 @@ async def attach_map(
     *,
     asked: bool = False,
     at_offer: bool = False,
+    await_review: bool = False,
 ) -> list[str]:
     """After pi's reply: the problem map as a picture with its caption and one question, when
     spec 4.4 says it is due. Only inside the 24-hour window; if the picture cannot be drawn the
@@ -186,7 +187,8 @@ async def attach_map(
 
     The alt text list is stored on the message (`media.alt`). The picture itself is drawn when
     WhatsApp fetches the signed link, from the saved version, so the chat and the dashboard show
-    the same data. Returns the message ids to send, pi's reply first."""
+    the same data. `await_review` marks the chat so the next reply is read as a review of the map
+    (Solution Box B3, see `box_signals`). Returns the message ids to send, pi's reply first."""
     now = datetime.now(UTC)
     if conversation.customer_id is None or not outbound:
         return outbound
@@ -251,4 +253,6 @@ async def attach_map(
     message_id = await _queue_reply(session, scope, conversation, body, key, media)
     row.shared_at = now
     row.shared_message_id = UUID(message_id)
+    if await_review:  # Solution Box on: the owner's next reply can confirm or change the map (B3)
+        conversation.service_brief = {**(conversation.service_brief or {}), "map_awaiting": True}
     return [*outbound, message_id]

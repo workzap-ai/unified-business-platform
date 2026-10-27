@@ -17,7 +17,7 @@ from sqlalchemy import select
 
 from app.core.rate_limit import hit
 from app.modules.access.dependencies import Session
-from app.modules.pi import map_builder
+from app.modules.pi import box, box_signals, map_builder
 from app.modules.pi.box_models import PiMapVersion, PiSolutionBox
 from app.modules.pi.brain_docs_models import PiBrainDocument
 from app.modules.pi.models import PiConversation
@@ -36,8 +36,10 @@ MAX_LABEL = 60
 
 class ProblemEdit(BaseModel):
     model_config = ConfigDict(extra="forbid")
-    action: Literal["resolve", "park", "reopen", "rename"]
+    action: Literal["resolve", "park", "reopen", "rename", "rank", "unrank"]
     label: str = Field(default="", max_length=MAX_LABEL * 2)
+    # "rank": where this problem comes in the owner's own order, 1 is where to start (B4)
+    priority: int | None = Field(default=None, ge=1, le=box_signals.MAX_RANK)
 
 
 def _scope(conversation: PiConversation) -> WorkspaceScope:
@@ -205,6 +207,16 @@ async def _apply(
         if not diff:
             return False
         reason = "reopened"
+    elif body.action in ("rank", "unrank"):
+        wanted = body.priority if body.action == "rank" else None
+        if body.action == "rank" and wanted is None:
+            raise HTTPException(422, "Choose a priority")
+        if box_signals.rank_of(tags) == wanted:
+            return False
+        kept = box_signals.with_rank(tags, wanted)
+        diff = {"tags": [tags, kept]}
+        problem.tags = kept
+        reason = "ranked" if wanted else "unranked"
     else:
         label = redact(" ".join(body.label.split())[:MAX_LABEL])[0].strip()
         if not label:
@@ -219,6 +231,23 @@ async def _apply(
     return True
 
 
+async def _mark_reviewed(
+    session: Any, scope: WorkspaceScope, conversation: PiConversation, *, ranked: bool
+) -> None:
+    """The owner changed their map here: B3 holds, and B4 when they ranked a problem. Written to
+    THIS conversation's brief (the one the signed-in number owns), and only when the Solution Box
+    offer is on for the workspace, so other workspaces' briefs are untouched."""
+    from app.modules.pi.configuration import settings_row
+
+    if not box.box_offer_enabled((await settings_row(session, scope)).response_rules):
+        return
+    brief = dict(conversation.service_brief or {})
+    brief["map_reviewed"] = True
+    if ranked:
+        brief["ranked"] = True
+    conversation.service_brief = brief
+
+
 @router.post("/conversations/{conversation_id}/map/problems/{node}")
 async def edit_problem(
     conversation_id: UUID,
@@ -228,8 +257,9 @@ async def edit_problem(
     customer: Customer,
     session: Session,
 ) -> dict[str, Any]:
-    """Mark a problem resolved, parked or reopened, or rename it. Applied to the same noted
-    problem pi keeps in the chat, so the map in WhatsApp and here never disagree."""
+    """Mark a problem resolved, parked or reopened, rename it, or rank it (1 is where to start).
+    Applied to the same noted problem pi keeps in the chat, so the map in WhatsApp and here never
+    disagree."""
     if not await hit(request, "pi-customer-map-edit", customer.phone, 120, 3600):
         raise HTTPException(429, "Please wait a moment and try again.")
     found = NODE.match(node)
@@ -249,7 +279,9 @@ async def edit_problem(
     )
     if problem is None:
         raise HTTPException(404, "Problem not found")
-    await _apply(session, scope, problem, body)
+    changed = await _apply(session, scope, problem, body)
+    if changed:
+        await _mark_reviewed(session, scope, conversation, ranked=body.action == "rank")
     await session.flush()
     await map_builder.save_if_changed(session, scope, conversation.customer_id)
     await session.commit()

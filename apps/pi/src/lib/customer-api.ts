@@ -314,6 +314,8 @@ export type MapNodeData = {
   category: string;
   status: "open" | "parked" | "resolved";
   is_new: boolean;
+  /** The owner's own order, 1 is where to start; absent until they set one. */
+  rank?: number;
 };
 export type MapLinkData = {
   from: string;
@@ -350,7 +352,8 @@ export type ProblemMapPayload = {
   latest: ProblemMapVersion | null;
   versions: MapVersionSummary[];
 };
-export type MapEditAction = "resolve" | "park" | "reopen" | "rename";
+export type MapEditAction =
+  "resolve" | "park" | "reopen" | "rename" | "rank" | "unrank";
 
 /** Where the Solution Box stands. Never carries an amount. */
 export type SolutionBoxStatus = {

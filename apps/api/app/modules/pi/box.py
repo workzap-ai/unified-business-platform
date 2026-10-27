@@ -170,22 +170,26 @@ _UNDERSTOOD_KEYS = ("since", "impact", "scope", "cause", "person_believes_cause"
 
 
 def offer_facts(context: dict[str, Any], *, asked_for_document: bool = False) -> OfferFacts:
-    """The readiness facts from what the conversation already holds. Keys the map work will set
-    later (`map_reviewed`, `ranked`, `voluntary_problems`, `declined_recently`, `trust_trend`,
-    `upset`) are read from the conversation brief; until something sets them, B3 and B4 hold the
-    offer back, which is what the spec asks for (R1 to R3 still go through)."""
+    """The readiness facts from what the conversation already holds. B3 and B4 (`map_reviewed`,
+    `ranked`) are brief keys the portal map edits and the owner's replies to a shared map set (see
+    `box_signals`); B5 counts the noted problems the owner raised on their own; B7 (trust, upset)
+    comes from the dials when `brain.thinking` is on, else steady and not upset. Until a signal is
+    set the offer is held back, as the spec asks (R1 to R3 still go through)."""
+    from app.modules.pi import box_signals
+
     noted = context.get("noted_problems") or []
     brief = context.get("brief") or {}
     history = context.get("history") or []
+    trust_trend, upset = box_signals.trust_and_upset(context)
     return OfferFacts(
         problem_count=len(noted),
         understood_count=sum(1 for p in noted if any(p.get(k) for k in _UNDERSTOOD_KEYS)),
         map_reviewed=bool(brief.get("map_reviewed")),
-        ranked=bool(brief.get("ranked")),
-        voluntary_count=int(brief.get("voluntary_problems") or 0),
+        ranked=bool(brief.get("ranked")) or any(p.get("rank") for p in noted),
+        voluntary_count=box_signals.voluntary_count(context),
         pi_message_count=sum(1 for h in history if h.get("role") == "ai"),
-        trust_trend=str(brief.get("trust_trend") or "steady"),
-        upset=bool(brief.get("upset")),
+        trust_trend=trust_trend,
+        upset=upset,
         declined_recently=bool(brief.get("declined_recently")),
         asked_for_document_or_price=asked_for_document,
         no_other_problems=bool(brief.get("no_other_problems")),

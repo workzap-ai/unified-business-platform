@@ -12,7 +12,15 @@
 
 import { Fragment, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Check, List, Network, Pause, RotateCcw, Pencil } from "lucide-react";
+import {
+  Check,
+  Flag,
+  List,
+  Network,
+  Pause,
+  RotateCcw,
+  Pencil,
+} from "lucide-react";
 
 import { errorText } from "@/lib/api";
 import {
@@ -57,6 +65,9 @@ const WORDS = {
   park: { en: "Park it", ur: "Chhor dein" },
   reopen: { en: "Open again", ur: "Dobara kholein" },
   rename: { en: "Rename", ur: "Naam badlein" },
+  startHere: { en: "Start here", ur: "Yahan se shuru" },
+  clearStart: { en: "Not first", ur: "Pehle nahi" },
+  first: { en: "Start here", ur: "Yahan se shuru" },
   save: { en: "Save", ur: "Save" },
   foot: {
     en: "Only the numbers you told pi. No names or personal details.",
@@ -317,6 +328,16 @@ function MapPicture({
                   </text>
                 </g>
               )}
+              {node.rank !== undefined && !off && (
+                <text
+                  x={textX}
+                  y={y + CARD_H - 10}
+                  textAnchor={rtl ? "end" : "start"}
+                  className="fill-muted-foreground text-[12px]"
+                >
+                  {node.rank === 1 ? t("first", lang) : `#${node.rank}`}
+                </text>
+              )}
               {off && (
                 <text
                   x={textX}
@@ -403,6 +424,11 @@ function MapList({
                       {n.status === "parked" && (
                         <Badge>{t("parked", lang)}</Badge>
                       )}
+                      {n.rank !== undefined && (
+                        <Badge tone="accent">
+                          {n.rank === 1 ? t("first", lang) : `#${n.rank}`}
+                        </Badge>
+                      )}
                     </span>
                     <span className="mt-0.5 block text-xs text-muted-foreground">
                       {categoryName(n.category)}
@@ -450,7 +476,7 @@ function Editor({
   lang: Lang;
   busy: boolean;
   error: string | null;
-  onEdit: (action: MapEditAction, label?: string) => void;
+  onEdit: (action: MapEditAction, label?: string, priority?: number) => void;
 }) {
   const [name, setName] = useState(node.label);
   const [renaming, setRenaming] = useState(false);
@@ -517,6 +543,27 @@ function Editor({
               {t("reopen", lang)}
             </Button>
           )}
+          {node.status === "open" && node.rank !== 1 && (
+            <Button
+              variant="secondary"
+              size="sm"
+              disabled={busy}
+              onClick={() => onEdit("rank", undefined, 1)}
+            >
+              <Flag className="size-4" aria-hidden />
+              {t("startHere", lang)}
+            </Button>
+          )}
+          {node.rank !== undefined && (
+            <Button
+              variant="secondary"
+              size="sm"
+              disabled={busy}
+              onClick={() => onEdit("unrank")}
+            >
+              {t("clearStart", lang)}
+            </Button>
+          )}
           <Button
             variant="secondary"
             size="sm"
@@ -566,10 +613,19 @@ export function ProblemMapSection({
     enabled: old !== null,
   });
   const edit = useMutation({
-    mutationFn: (v: { node: string; action: MapEditAction; label?: string }) =>
+    mutationFn: (v: {
+      node: string;
+      action: MapEditAction;
+      label?: string;
+      priority?: number;
+    }) =>
       customerPost<ProblemMapPayload>(
         `/conversations/${conversationId}/map/problems/${v.node}`,
-        { action: v.action, ...(v.label ? { label: v.label } : {}) },
+        {
+          action: v.action,
+          ...(v.label ? { label: v.label } : {}),
+          ...(v.priority ? { priority: v.priority } : {}),
+        },
       ),
     onSuccess: (data) => {
       client.setQueryData(key, data);
@@ -690,8 +746,8 @@ export function ProblemMapSection({
               lang={lang}
               busy={edit.isPending}
               error={edit.isError ? errorText(edit.error) : null}
-              onEdit={(action, label) =>
-                edit.mutate({ node: node.id, action, label })
+              onEdit={(action, label, priority) =>
+                edit.mutate({ node: node.id, action, label, priority })
               }
             />
           )}

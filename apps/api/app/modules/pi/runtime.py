@@ -1738,7 +1738,7 @@ async def process_pi_event(ctx: dict[str, Any], event_id: str) -> None:
 
         if service_turn is not None and map_builder.share_enabled(policy.response_rules):
             # Book 5 (4.4): the problem map as a picture when it is due; off unless map_share.
-            from app.modules.pi import brain_visual_queue, problems
+            from app.modules.pi import box, brain_visual_queue, problems
 
             outbound = await brain_visual_queue.attach_map(
                 session,
@@ -1748,6 +1748,7 @@ async def process_pi_event(ctx: dict[str, Any], event_id: str) -> None:
                 outbound,
                 service_turn.language,
                 asked=problems.asks_for_map(message.body),
+                await_review=box.box_offer_enabled(policy.response_rules),
             )
         # A form Pi decided to send in this turn goes out with the reply.
         forms = await session.scalars(
