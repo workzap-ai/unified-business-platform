@@ -50,6 +50,7 @@ from app.modules.pi import (
     price_policy,
     problem_extract,
     problems,
+    reply_layout,
     reply_voice,
     safety,
     slots,
@@ -5839,6 +5840,8 @@ async def compose_service_turn(
         turn.summary = team_summary(turn)
     # WhatsApp shows a list only when each point starts its own line.
     turn.reply = polished(re.sub(r"[ \t]+•[ \t]*", "\n• ", turn.reply).strip())
+    if context.get("expert_on"):
+        turn.reply = reply_layout.tidy(turn.reply)  # short paragraphs, the question on its own line
     allowed = allowed_text(context)
     turn.reply = validate_service_reply(
         without_blocked_lines(turn.reply, mode, allowed),
