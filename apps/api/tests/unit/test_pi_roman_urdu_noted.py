@@ -174,7 +174,7 @@ def test_handed_ideas_are_written_by_the_application_when_the_model_left_them_ou
         awaiting_customer=False,
     )
     brain_ideas(turn, context)
-    assert turn.reply.startswith("Here are two ideas") and turn.reply.count("•") == 2
+    assert turn.reply.startswith("Here are some ideas") and turn.reply.count("•") == 2
 
     turn.reply = "Sure.\n• Do one.\n• Do two."
     brain_ideas(turn, context)
@@ -189,7 +189,7 @@ def test_handed_ideas_are_written_by_the_application_when_the_model_left_them_ou
     )
     brain_ideas(roman, {**context, "reply_language": "roman_ur"})
     # the list is written in English; the reply-language step after it rewrites the whole reply
-    assert roman.reply.startswith("Here are two ideas") and roman.reply.count("•") == 2
+    assert roman.reply.startswith("Here are some ideas") and roman.reply.count("•") == 2
 
 
 def test_haan_document_aur_quote_chahiye_is_a_yes_to_the_offer() -> None:
@@ -416,7 +416,7 @@ async def test_the_model_gives_two_ideas_when_no_entry_fits() -> None:
         "history": [{"role": "ai", "text": "Hi, I am pi."}],
     }
     await brain_free_ideas(Manager(), None, conversation, policy, turn, context)  # type: ignore[arg-type]
-    assert turn.reply.startswith("Here are two ideas") and turn.reply.count("•") == 2 and turn._free
+    assert turn.reply.startswith("Here are some ideas") and turn.reply.count("•") == 2 and turn._free
     assert conversation.service_brief["ideas_given"] == 2
 
 

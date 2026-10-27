@@ -228,10 +228,10 @@ def test_the_ideas_opener_answers_a_request_for_a_fix() -> None:
 
     assert (
         ideas_opener({"latest_customer_message": "Ap solution dein"})
-        == "Here are two ideas you can try now:\n"
+        == "Here are some ideas you can try now:\n"
     )
     assert ideas_opener({"latest_customer_message": "Haan, har hafte hota hai"}) == ""
-    assert ideas_opener({}) == "Here are two ideas you can try now:\n"
+    assert ideas_opener({}) == "Here are some ideas you can try now:\n"
 
 
 def test_an_idea_already_said_is_not_said_again() -> None:
@@ -578,7 +578,7 @@ def test_a_calm_ask_gets_the_plain_opener_not_an_apology() -> None:
 
     assert (
         ideas_opener({"latest_customer_message": "Solution dain"})
-        == "Here are two ideas you can try now:\n"
+        == "Here are some ideas you can try now:\n"
     )
     assert not solution_ask.impatient("Solution dain")
 

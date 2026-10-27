@@ -1156,7 +1156,7 @@ def system_for(context: dict[str, Any]) -> str:
     """The prompt: the shared rules, plus the brain rules in brain mode."""
     if context.get("pi_mode") == "brain":
         asked = solution_turn(context)
-        return (
+        prompt = (
             BRAIN_SYSTEM
             + BRAIN_PROBLEMS
             + BRAIN_DECISIONS
@@ -1167,6 +1167,11 @@ def system_for(context: dict[str, Any]) -> str:
             + (memory_block.SYSTEM_LINE if context.get("what_i_know") else "")
             + think_prompt.block(context)
         )
+        if context.get("expert_on"):
+            # the base prompt's own example of confirming a problem is the "Thanks. I've noted it:"
+            # opener the expert voice forbids: the model copies an example before a rule
+            prompt = prompt.replace(expert_advisor.OLD_CONFIRM, expert_advisor.NEW_CONFIRM)
+        return prompt
     return SYSTEM
 
 
@@ -2073,6 +2078,64 @@ def brain_summary(turn: "ServiceTurn", context: dict[str, Any]) -> None:
         turn._board = True  # shown again with its board picture; the chat stays where it is
 
 
+IDEAS_LEAD = {
+    "en": "Here are some ideas you can try now:",
+    "roman_ur": "Ji, ye do ideas abhi aazma sakte hain:",
+}
+_BULLET_LINE = re.compile(r"^\s*•\s+\S")
+OFFER_LINE = re.compile(
+    r"solution document.{0,60}quote|document (?:and|aur) (?:a )?quote", re.IGNORECASE
+)
+
+
+def shape_expert_ideas(turn: "ServiceTurn", context: dict[str, Any]) -> None:
+    """Expert workspaces: ideas appear only when the owner asked for them, and always with a
+    one-line lead. A model that lists ideas on its own (live 2026-10-27: a second business was told
+    in a statement and pi answered with more ideas for the FIRST business) loses the list, the lead
+    and the offer line, and the reply keeps its question; a list the app wrote after a request gets
+    its lead if it lost it."""
+    lines = turn.reply.split("\n")
+    bullets = [n for n, line in enumerate(lines) if _BULLET_LINE.match(line)]
+    if len(bullets) < 2:
+        return
+    said = str(context.get("latest_customer_message") or "")
+    asked = bool(
+        turn._free
+        or context.get("solution_asked")
+        or context.get("solution_ideas")
+        or context.get("solution_asked_no_ideas")
+        or context.get("open_ask")
+        or solution_ask.asked_for_ideas(said)
+        or solution_ask.rejects_ideas(said)
+    )
+    language = str(context.get("reply_language") or "en")
+    if asked:
+        first = next((line for line in lines if line.strip()), "")
+        if _BULLET_LINE.match(first):
+            lead = IDEAS_LEAD.get(language, IDEAS_LEAD["en"])
+            turn.reply = lead + "\n" + turn.reply
+        return
+    drop: set[int] = set(bullets)
+    before = bullets[0] - 1
+    while before >= 0 and not lines[before].strip():
+        before -= 1  # blank lines between the lead and the list
+    if before >= 0 and lines[before].rstrip().endswith(":"):
+        drop.add(before)  # the lead line of the list
+    for n, line in enumerate(lines):
+        if OFFER_LINE.search(line):
+            drop.add(n)  # an offer needs ideas that were asked for
+    kept = [line for n, line in enumerate(lines) if n not in drop]
+    text = "\n".join(kept).strip()
+    if not text.rstrip().endswith(("?", "؟")):
+        if len(text.split()) <= 6:
+            text = ""  # "Haan, ho sakta hai." answers nothing once the list is gone
+        fallback = constitution.FALLBACK_LISTENING.get(
+            language, constitution.FALLBACK_LISTENING["en"]
+        )
+        text = (text + "\n\n" if text else "") + fallback
+    turn.reply = text
+
+
 def strip_dangling_opener(turn: "ServiceTurn") -> None:
     """A reply must not stop on the Workzap line's opener ("...Workzap could set it up so"): the
     model sometimes leaves the build itself out (found in a real-model school chat)."""
@@ -2104,7 +2167,7 @@ def ideas_opener(context: dict[str, Any]) -> str:
         return "No pressure at all. Here are two ideas:" + chr(10)  # G18
     if solution_ask.impatient(said):
         return "Sorry about the wait. Here are two ideas:" + chr(10)  # Book 4 G27: "Maazrat"
-    return "Here are two ideas you can try now:" + chr(10)
+    return "Here are some ideas you can try now:" + chr(10)
 
 
 def reject_passive_ideas(turn: "ServiceTurn", context: dict[str, Any]) -> None:
@@ -4768,7 +4831,7 @@ async def in_one_language(
                     "Write plain everyday Urdu: never translate an English word into Urdu word for "
                     "word when there is no such Urdu phrase (not 'drop naam'); keep a name or term "
                     "like 'drop-off point' or 'COD' as it is, or say it in a few plain words. "
-                    "Say 'Here are two ideas you can try now:' as 'Ji, ye do ideas abhi aazma "
+                    "Say 'Here are some ideas you can try now:' as 'Ji, ye do ideas abhi aazma "
                     "sakte hain:' and 'Sorry about the wait.' as 'Maazrat.'. "
                     "Reply with the rewritten text only."
                 ),
@@ -5751,6 +5814,10 @@ async def compose_service_turn(
         brain_summary(turn, context)
         brain_decision(turn, context)
         strip_dangling_opener(turn)
+        if context.get("expert_on"):
+            # before the passive-idea check and the fallbacks: a list the owner did not ask for must
+            # not be "rescued" by library ideas for an older problem (live 2026-10-27)
+            shape_expert_ideas(turn, context)
         reject_passive_ideas(turn, context)
         brain_ideas(turn, context)
         await brain_free_ideas(manager, scope, conversation, policy, turn, context)
@@ -5841,6 +5908,7 @@ async def compose_service_turn(
     # WhatsApp shows a list only when each point starts its own line.
     turn.reply = polished(re.sub(r"[ \t]+•[ \t]*", "\n• ", turn.reply).strip())
     if context.get("expert_on"):
+        shape_expert_ideas(turn, context)
         turn.reply = reply_layout.tidy(turn.reply)  # short paragraphs, the question on its own line
     allowed = allowed_text(context)
     turn.reply = validate_service_reply(
