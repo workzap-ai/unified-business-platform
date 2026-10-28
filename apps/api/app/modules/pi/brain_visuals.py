@@ -30,7 +30,7 @@ LANGUAGES = ("en", "roman_ur")  # the scripts the font can draw
 WIDTH = 1080
 MARGIN = 56
 MAX_GROUPS = 8
-MAX_WORDS_SHOWN = 2
+MAX_WORDS_SHOWN = 4  # one line per problem, so every problem the owner raised is on the card
 LIST_ROWS = 10  # a WhatsApp list message holds at most ten rows
 
 INK, MUTED, PAPER, CARD, ACCENT, DONE = (
@@ -44,12 +44,13 @@ INK, MUTED, PAPER, CARD, ACCENT, DONE = (
 
 TEXT: dict[str, dict[str, Any]] = {
     "en": {
-        "board": "What I've noted so far",
-        "board_sub": "Sorted by area. None of it is solved yet.",
+        "board": "Your problems, so far",
+        "board_sub": "In your own words, by area. Nothing is fixed yet.",
+        "more": "+ {n} more",
         "for": "for {name}",
         "problem": "problem",
         "problems": "problems",
-        "board_foot": "Tap the list below to correct anything.",
+        "board_foot": "Wrong or missing something? Pick it from the list below.",
         "caption": "Your list, at a glance.",
         "list_button": "Correct one",
         "progress": "Where things stand",
@@ -58,12 +59,13 @@ TEXT: dict[str, dict[str, Any]] = {
         "progress_caption": "Where things stand.",
     },
     "roman_ur": {
-        "board": "Ab tak jo maine note kiya",
-        "board_sub": "Hisson mein sort kiya hai. Inme se abhi kuch hal nahi hua.",
+        "board": "Aap ke masle, ab tak",
+        "board_sub": "Aap ke apne lafzon mein, hisson mein. Abhi kuch theek nahi hua.",
+        "more": "+ {n} aur",
         "for": "{name} ke liye",
         "problem": "masla",
         "problems": "masail",
-        "board_foot": "Kuch ghalat ho to neeche list se chunein.",
+        "board_foot": "Kuch ghalat ya reh gaya ho to neeche list se chunein.",
         "caption": "Ye rahi aap ki list.",
         "list_button": "Theek karein",
         "progress": "Kaam kahan tak pohancha",
@@ -210,47 +212,61 @@ def _png(image: Image.Image) -> bytes:
 
 
 def render_board(groups: list[Group], language: str, business: str | None = None) -> bytes:
-    """The problem board: one card per area with its count and the person's own words."""
+    """The problem board: one card per area; inside it one row per problem, in the person's own
+    words (up to four, then "+ N more"), with a dot for each and the area's count on the right."""
     words = TEXT.get(language, TEXT["en"])
-    title, body, small = _font(54), _font(34), _font(28)
+    title, body, small = _font(56), _font(36), _font(30)
     probe = ImageDraw.Draw(Image.new("RGB", (WIDTH, 10)))
-    inner = WIDTH - 2 * MARGIN - 48
-    cards: list[tuple[Group, list[str]]] = []
+    inner = WIDTH - 2 * MARGIN - 48 - 40  # the card's padding and the dot's column
+    cards: list[tuple[Group, list[list[str]], int]] = []
     for group in groups:
-        quotes = [
-            line for w in group.words for line in _wrap(probe, f"“{w[:80]}”", small, inner)[:2]
-        ]
-        cards.append((group, quotes))
-    height = 300 + sum(120 + 38 * len(q) for _, q in cards) + 120
-    image = Image.new("RGB", (WIDTH, max(height, 520)), PAPER)
+        rows = [_wrap(probe, f"“{w[:90]}”", small, inner)[:2] for w in group.words]
+        more = max(0, group.count - len(group.words))
+        cards.append((group, rows, more))
+    top = 330 if business else 290
+    height = top + 140
+    for _, rows, more in cards:
+        height += 96 + sum(14 + 40 * len(r) for r in rows) + (46 if more else 0) + 28
+    image = Image.new("RGB", (WIDTH, max(height, 560)), PAPER)
     draw = ImageDraw.Draw(image)
     draw.text((MARGIN, 48), "pi", fill=ACCENT, font=_font(46))
     draw.text((MARGIN, 112), words["board"], fill=INK, font=title)
-    draw.text((MARGIN, 186), words["board_sub"], fill=MUTED, font=small)
+    draw.text((MARGIN, 190), words["board_sub"], fill=MUTED, font=small)
     if business:
-        draw.text((MARGIN, 228), words["for"].format(name=business[:40]), fill=MUTED, font=small)
-    y = 290
-    for group, quotes in cards:
-        card_height = 100 + 38 * len(quotes)
+        draw.text((MARGIN, 236), words["for"].format(name=business[:40]), fill=MUTED, font=small)
+    y = top
+    for group, rows, more in cards:
+        card_height = 96 + sum(14 + 40 * len(r) for r in rows) + (46 if more else 0)
         draw.rounded_rectangle(
             (MARGIN, y, WIDTH - MARGIN, y + card_height),
-            radius=24,
+            radius=26,
             fill=CARD,
             outline=(232, 226, 218),
         )
+        draw.rounded_rectangle(  # the area's accent bar
+            (MARGIN, y + 22, MARGIN + 8, y + card_height - 22), radius=4, fill=ACCENT
+        )
         noun = words["problem"] if group.count == 1 else words["problems"]
-        draw.text((MARGIN + 24, y + 22), group.label[:34], fill=INK, font=body)
+        draw.text((MARGIN + 32, y + 22), group.label[:34], fill=INK, font=body)
         label = f"{group.count} {noun}"
         draw.text(
-            (WIDTH - MARGIN - 24 - draw.textlength(label, font=small), y + 28),
+            (WIDTH - MARGIN - 28 - draw.textlength(label, font=small), y + 30),
             label,
             fill=ACCENT,
             font=small,
         )
-        for n, line in enumerate(quotes):
-            draw.text((MARGIN + 24, y + 78 + 38 * n), line, fill=MUTED, font=small)
-        y += card_height + 20
-    draw.text((MARGIN, y + 24), words["board_foot"], fill=MUTED, font=small)
+        line_y = y + 92
+        for lines in rows:
+            draw.ellipse((MARGIN + 34, line_y + 12, MARGIN + 46, line_y + 24), fill=ACCENT)
+            for n, line in enumerate(lines):
+                draw.text((MARGIN + 66, line_y + 40 * n), line, fill=MUTED, font=small)
+            line_y += 14 + 40 * len(lines)
+        if more:
+            draw.text(
+                (MARGIN + 66, line_y + 2), words["more"].format(n=more), fill=ACCENT, font=small
+            )
+        y += card_height + 28
+    draw.text((MARGIN, y + 20), words["board_foot"], fill=MUTED, font=small)
     return _png(image.crop((0, 0, WIDTH, y + 90)))
 
 

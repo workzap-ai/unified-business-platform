@@ -933,7 +933,13 @@ problem: ask what it would fix and note that; keep the wish in requested_solutio
   impact_types, severity_stated (only if they said it), workaround, systems, believes_cause
   (what they think the cause is: never a judgement about a named person), confidence 0 to 1.
 - One message with several problems with different symptoms: one create each. One symptom with
-  several facets (stock out in shop B and D) is one problem.
+  several facets (stock out in shop B and D) is one problem. "Kabhi A, kabhi B" or "A, aur B bhi"
+  names two things going wrong: two creates. What the owner feels as the result (orders arrive
+  late, money does not match) is a problem of its own, and each cause they name (the material is
+  missing, work is called done but is not ready, nobody sees each order's stage) is another:
+  create the causes and the result, then op "link" them. A furniture maker who says orders are late,
+  that wood is sometimes missing and that workers say "done" while delivery is not ready has three
+  problems, not one (live 2026-10-28: only the first was kept and the owner had to repeat himself).
 - Their answer to your own follow-up question (how often, where, how much, since when) or any
   later detail about a problem already in noted_problems is an "update" of THAT problem, never a
   new one: one thing going wrong is one record, however many messages describe it. A new
