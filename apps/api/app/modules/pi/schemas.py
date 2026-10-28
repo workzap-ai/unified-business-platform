@@ -66,6 +66,9 @@ class ConversationView(BaseModel):
     pending_confirmation: bool = False
 
 
+VISUALS = frozenset({"map", "map_text", "board", "progress"})
+
+
 class MessageView(BaseModel):
     model_config = ConfigDict(from_attributes=True)
     id: UUID
@@ -90,12 +93,15 @@ class MessageView(BaseModel):
     @classmethod
     def sent_card(cls, data: Any) -> Any:
         media = data.get("media") if isinstance(data, dict) else getattr(data, "media", None)
-        if not isinstance(media, dict) or not media.get("card") or not media.get("image"):
+        if not isinstance(media, dict) or not media.get("image"):
             return data
+        # pi Customer's map or journey card ("card"), or a picture of the brain (the problem map,
+        # the board, a progress card: "visual"): the team sees what the customer got.
+        kind = media.get("card") or (media.get("visual") if media.get("visual") in VISUALS else "")
         image = str(media["image"])
-        if not image.startswith("http"):
+        if not kind or not image.startswith("http"):
             return data
-        card = {"kind": str(media["card"]), "image": image}
+        card = {"kind": str(kind), "image": image}
         if isinstance(data, dict):
             return {**data, "card": card}
         fields = {name: getattr(data, name) for name in cls.model_fields if hasattr(data, name)}
@@ -104,15 +110,52 @@ class MessageView(BaseModel):
     @field_validator("media", mode="before")
     @classmethod
     def public_media(cls, value: Any) -> dict[str, Any] | None:
-        # Only media Pi actually processed (it then knows the size); a provider's file
-        # type alone, stored on arrival, is not shown.
-        if not isinstance(value, dict) or not value.get("mime_type") or "size" not in value:
+        """What the team's thread may show of a message's media. Inbound media pi processed (it
+        then knows the size; a provider's file type alone, stored on arrival, is not shown) with
+        its reading and its saved file; and what pi SENT: the picture of a map, a board or a
+        progress card, a document link, and the buttons. Nothing else leaves the server."""
+        if not isinstance(value, dict):
             return None
-        return {
-            key: value[key]
-            for key in ("mime_type", "size", "duration_s", "transcript", "description")
-            if key in value
-        }
+        out: dict[str, Any] = {}
+        if value.get("mime_type") and "size" in value:
+            for key in (
+                "mime_type",
+                "size",
+                "duration_s",
+                "transcript",
+                "description",
+                "file_id",
+                "filename",
+                "file_kind",
+                "doc_kind",
+            ):
+                if key in value:
+                    out[key] = value[key]
+        image = value.get("image")
+        if isinstance(image, str) and image.startswith("http") and value.get("visual") in VISUALS:
+            out["image"] = image
+            out["visual"] = value["visual"]
+            if isinstance(value.get("alt"), str):
+                out["alt"] = value["alt"][:300]
+            if "map_version" in value:
+                out["map_version"] = value["map_version"]
+        document = value.get("document")
+        if isinstance(document, dict) and str(document.get("link") or "").startswith("http"):
+            out["document"] = {
+                "link": str(document["link"]),
+                "filename": str(document.get("filename") or "")[:120],
+            }
+        buttons = value.get("buttons")
+        if isinstance(buttons, list):
+            titles = [
+                str(b.get("title") or b.get("text") or "")[:40]
+                if isinstance(b, dict)
+                else str(b)[:40]
+                for b in buttons[:10]
+            ]
+            if any(titles):
+                out["buttons"] = [t for t in titles if t]
+        return out or None
 
 
 class HandoffView(BaseModel):
