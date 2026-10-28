@@ -1549,8 +1549,11 @@ async def process_pi_event(ctx: dict[str, Any], event_id: str) -> None:
                 if agent is not None and not agent.enabled:
                     handoff_reason = "policy"
                 else:
-                    proposals_for = await save_service_turn(
-                        session, scope, conversation, message, policy, service_turn
+                    proposals_for = await latency.timed(
+                        "save_service_turn",
+                        save_service_turn(
+                            session, scope, conversation, message, policy, service_turn
+                        ),
                     )
                     if service_context is not None and service_context.get("lint_slipped"):
                         slips = list((conversation.service_brief or {}).get("lint_slips") or [])
@@ -1564,8 +1567,11 @@ async def process_pi_event(ctx: dict[str, Any], event_id: str) -> None:
                         handoff_reason = "customer_request"
                         handoff_summary = service_turn.summary
                     elif service_context is not None:
-                        service_appendix, failed = await run_service_action(
-                            agent_ctx, service_turn, service_context, message.body
+                        service_appendix, failed = await latency.timed(
+                            "service_action",
+                            run_service_action(
+                                agent_ctx, service_turn, service_context, message.body
+                            ),
                         )
                         if failed:
                             handoff_reason, handoff_summary = "tool_failure", failed
@@ -1943,10 +1949,18 @@ async def is_duplicate_send(session: AsyncSession, message: PiMessage) -> bool:
 
 
 async def send_pi_message(ctx: dict[str, Any], message_id: str) -> None:
+    import time
+
+    started = time.perf_counter()
     async with ctx["sessions"]() as session:
         message = await session.get(PiMessage, UUID(message_id))
         if not message or message.status != "queued":
             return
+        picked_ms = (
+            round((datetime.now(UTC) - message.created_at).total_seconds() * 1000)
+            if message.created_at is not None
+            else None
+        )
         connection = await session.scalar(
             select(WhatsAppConnection)
             .join(PiConversation, PiConversation.connection_id == WhatsAppConnection.id)
@@ -2149,6 +2163,16 @@ async def send_pi_message(ctx: dict[str, Any], message_id: str) -> None:
                 if message.sender_type == "ai" and conversation.service_brief:
                     schedule_followup(conversation, policy)
             message.status, message.error_code = "sent", None
+            # Where the time between "queued" and "delivered" goes: how long the job waited for a
+            # worker, and how long the checks and the provider call took (kept for tracing a slow
+            # delivery from the database; never shown to the customer).
+            message.media = {
+                **message.media,
+                "send_timing": {
+                    "picked_ms": picked_ms,
+                    "send_ms": round((time.perf_counter() - started) * 1000),
+                },
+            }
             await meter(session, scope.tenant_id, scope.environment_id, "messages_out")
             if reminder or campaign:
                 await meter(session, scope.tenant_id, scope.environment_id, "template_messages")
