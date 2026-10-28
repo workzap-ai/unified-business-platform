@@ -1,4 +1,4 @@
-import { expect, test } from "@playwright/test";
+import { expect, test, type Locator } from "@playwright/test";
 
 import { mockApi, noHorizontalOverflow, OWNER } from "./support";
 
@@ -51,6 +51,13 @@ const connector = (
   ...extra,
 });
 
+// "Your accounts" also holds the email card (its own tests are elsewhere); these checks look at
+// the Google Calendar and Shopify cards only.
+const card = (accounts: Locator, name: string) =>
+  accounts
+    .getByRole("heading", { name })
+    .locator("xpath=ancestor::div[contains(@class,'rounded-2xl')][1]");
+
 const MANAGER = [...OWNER, "integrations.read", "integrations.manage"];
 const base = {
   "GET /account": account,
@@ -74,7 +81,12 @@ test("an owner connects Google Calendar and returns to a clear result", async ({
   });
   await page.goto("/my-pi/tools");
   const accounts = page.getByRole("region", { name: "Your accounts" });
-  await expect(accounts.getByText("Not connected")).toHaveCount(2);
+  await expect(
+    card(accounts, "Google Calendar").getByText("Not connected"),
+  ).toBeVisible();
+  await expect(
+    card(accounts, "Shopify").getByText("Not connected"),
+  ).toBeVisible();
   const shopify = accounts.getByRole("button", { name: "Connect Shopify" });
   await expect(shopify).toBeDisabled();
   await accounts.getByLabel("Your store address").fill("bright.myshopify.com");
@@ -152,7 +164,10 @@ test("unavailable accounts and view-only members get no connect buttons", async 
   await expect(
     accounts.getByText(/can't be connected on this pi server yet/),
   ).toBeVisible();
-  await expect(accounts.getByRole("button")).toHaveCount(0);
+  await expect(
+    card(accounts, "Google Calendar").getByRole("button"),
+  ).toHaveCount(0);
+  await expect(card(accounts, "Shopify").getByRole("button")).toHaveCount(0);
   await expect(
     accounts.getByText(
       "Ask the business owner or an admin to change this connection.",

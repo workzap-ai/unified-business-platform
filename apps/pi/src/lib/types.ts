@@ -148,6 +148,18 @@ export interface Message {
   sent_by_label?: string | null;
   /** A problem map or journey card pi sent the customer on WhatsApp. */
   card?: { kind: string; image: string } | null;
+  /** What pi had understood when it sent this message (whitelisted by the API; read-only). */
+  understood?: Understood | null;
+}
+
+export interface Understood {
+  move?: string;
+  label?: string;
+  reason?: string;
+  problems?: { number?: number; title: string; category?: string }[];
+  hypotheses?: { text: string; confidence: "low" | "medium" | "high" }[];
+  offer?: { rule: string; allowed: boolean; blocked_reason: string | null };
+  box_state?: string;
 }
 
 export interface History {

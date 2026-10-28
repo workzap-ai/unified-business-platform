@@ -46,6 +46,7 @@ import {
 import { del, errorText, get, post } from "@/lib/api";
 import product from "@/components/product.module.css";
 import { dateTime, timeAgo } from "@/lib/format";
+import { staffReviewLink } from "@/lib/staff-links";
 import { IncomingSoundToggle } from "@/features/incoming-alert";
 import {
   CustomerImage,
@@ -54,6 +55,7 @@ import {
   SentDocument,
   SentPicture,
 } from "@/features/message-media";
+import { MessageNotes } from "@/features/message-notes";
 import { useAction, useBusinessKey, useCan, useSession } from "@/lib/session";
 import type {
   Conversation,
@@ -917,6 +919,7 @@ function MessageBubble({
             {dateTime(message.created_at)} <StatusIcon message={message} />
           </p>
         </div>
+        {!inbound ? <MessageNotes message={message} /> : null}
         {pending && can("pi.inbox.reply") ? (
           <div className="mt-2 flex flex-wrap justify-end gap-2">
             {editing ? (
@@ -1182,6 +1185,7 @@ function CustomerPanel({
       success: "Assignment updated",
     },
   );
+  const review = staffReviewLink(conversation.id);
   const requirements = (brief?.requirements ?? {}) as Record<string, string>;
   const filled = Object.entries(requirements).filter(([, v]) => v);
   const projects = Array.isArray(brief?.projects)
@@ -1209,15 +1213,24 @@ function CustomerPanel({
         >
           <UserRound className="size-4" aria-hidden /> Full profile
         </Link>
-        {process.env.NEXT_PUBLIC_OWNER_OS_URL ? (
-          <a
-            href={`${process.env.NEXT_PUBLIC_OWNER_OS_URL.replace(/\/+$/, "")}/pi/review?c=${encodeURIComponent(conversation.id)}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="mt-1 ms-3 inline-flex items-center gap-1 text-sm text-accent underline"
-          >
-            <ExternalLink className="size-4" aria-hidden /> Staff review
-          </a>
+        {can("pi.handoffs.manage") ? (
+          review.external ? (
+            <a
+              href={review.href}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-1 ms-3 inline-flex items-center gap-1 text-sm text-accent underline"
+            >
+              <ExternalLink className="size-4" aria-hidden /> Staff review
+            </a>
+          ) : (
+            <Link
+              href={review.href}
+              className="mt-1 ms-3 inline-flex items-center gap-1 text-sm text-accent underline"
+            >
+              <ExternalLink className="size-4" aria-hidden /> Staff review
+            </Link>
+          )
         ) : null}
       </div>
       {conversation.summary ? (

@@ -46,6 +46,8 @@ export type Agent = {
   key: string;
   name: string;
   role: string;
+  /** "brain" or "legacy": the engine answering this workspace's chats (response_rules.pi_mode). */
+  pi_mode?: "brain" | "legacy";
   description: string;
   enabled: boolean;
   current_version: number;
@@ -235,16 +237,17 @@ export function AgentsPage() {
  * cannot read settings (GET /pi/settings needs pi.settings.manage). */
 type PiMode = "brain" | "other" | "unknown";
 
-function usePiMode(): PiMode {
+function usePiMode(fromAgents?: "brain" | "legacy"): PiMode {
   const key = useBusinessKey();
   const can = useCan();
   const query = useQuery({
     queryKey: key(["settings"]),
     queryFn: () =>
       get<{ response_rules?: Record<string, unknown> }>("/pi/settings"),
-    enabled: can("pi.settings.manage"),
+    enabled: !fromAgents && can("pi.settings.manage"),
     retry: false,
   });
+  if (fromAgents) return fromAgents === "brain" ? "brain" : "other";
   if (!query.data) return "unknown";
   return query.data.response_rules?.pi_mode === "brain" ? "brain" : "other";
 }
@@ -286,11 +289,12 @@ function BrainAgentCard({ agent, mode }: { agent: Agent; mode: PiMode }) {
 
 function AgentList() {
   const key = useBusinessKey();
-  const mode = usePiMode();
+  const can = useCan();
   const query = useQuery({
     queryKey: key(["agents"]),
     queryFn: () => get<Agent[]>("/pi/agents"),
   });
+  const mode = usePiMode(query.data?.[0]?.pi_mode);
   if (query.isPending) return <LoadingBlock rows={4} label="Loading agents" />;
   if (query.isError)
     return (
@@ -313,16 +317,45 @@ function AgentList() {
     );
   if (mode === "other")
     return (
-      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-        {query.data.map((agent) => (
-          <AgentCard key={agent.id} agent={agent} />
-        ))}
+      <div className="space-y-5">
+        <div
+          className="flex flex-wrap items-center gap-3"
+          data-testid="pi-mode"
+        >
+          <Badge>Legacy mode</Badge>
+          <span className="text-sm text-muted-foreground">
+            pi answers with the helpers below.
+          </span>
+        </div>
+        <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+          {query.data.map((agent) => (
+            <AgentCard key={agent.id} agent={agent} />
+          ))}
+        </div>
       </div>
     );
   const brain = query.data.find((a) => a.key === BRAIN_KEY);
   const others = query.data.filter((a) => a.key !== BRAIN_KEY);
   return (
     <div className="space-y-5">
+      <div className="flex flex-wrap items-center gap-3" data-testid="pi-mode">
+        <Badge tone={mode === "brain" ? "accent" : "neutral"}>
+          {mode === "brain" ? "Brain mode" : "Legacy mode"}
+        </Badge>
+        <span className="text-sm text-muted-foreground">
+          {mode === "brain"
+            ? "pi answers with the brain."
+            : "pi answers with the helpers below."}
+        </span>
+        {mode === "brain" && can("pi.handoffs.manage") ? (
+          <Link
+            href="/brain/review"
+            className="ms-auto text-sm text-accent underline"
+          >
+            Brain review, health and documents
+          </Link>
+        ) : null}
+      </div>
       {brain ? <BrainAgentCard agent={brain} mode={mode} /> : null}
       {others.length ? (
         <details className="rounded-2xl border border-border bg-surface-muted/50 p-4">
@@ -472,7 +505,7 @@ export function AgentDetailPage({ id }: { id: string }) {
 }
 
 function AgentDetail({ agent }: { agent: Agent }) {
-  const mode = usePiMode();
+  const mode = usePiMode(agent.pi_mode);
   const [tab, setTab] = React.useState<Tab>("instructions");
   const tabRefs = React.useRef<Record<Tab, HTMLButtonElement | null>>({
     instructions: null,
