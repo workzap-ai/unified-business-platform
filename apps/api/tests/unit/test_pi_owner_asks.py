@@ -97,3 +97,66 @@ def test_ye_note_kar_liya_hai_is_not_sent() -> None:
     reply = "Ji, samajh aaya. Ye note kar liya hai.\n\nAbhi ek waqt mein kitne orders chal rahe hote hain?"
     assert reply_voice.drop_noted(reply) == "Abhi ek waqt mein kitne orders chal rahe hote hain?"
     assert constitution.NOTED_START.match("Ji, samajh aaya. Ye note kar liya hai. Kitne orders?")
+
+
+NO_QUESTION_ASKS = [
+    "Maine kaha tha ke abhi mujh se aur sawal na karein. Aap khud best practical approach recommend karein.",
+    "abhi mujh se aur sawal na karein",
+    "Please, no more questions right now",
+    "Don't ask me any more questions, just recommend",
+    "bas sawal mat karein",
+]
+
+
+@pytest.mark.parametrize("said", NO_QUESTION_ASKS)
+def test_an_owner_asking_for_no_questions_is_seen(said: str) -> None:
+    assert owner_asks.asked_no_questions(said)
+
+
+def test_a_normal_message_is_not_a_request_for_no_questions() -> None:
+    assert not owner_asks.asked_no_questions("Mere paas ek sawal hai ke ye kaise chalega")
+
+
+def test_the_questions_are_taken_out_of_the_reply() -> None:
+    reply = (
+        "Pehle order tracking, phir wood ki ginti. Aap ko mobile par stage nazar aayega.\n\n"
+        "In mein se kaun sa shuru karna aap ke liye sab se aasaan rahega?"
+    )
+    out = owner_asks.without_questions(reply)
+    assert "?" not in out and out.startswith("Pehle order tracking")
+
+
+def test_an_offer_is_taken_out_with_its_you_can_say_no() -> None:
+    reply = (
+        "Ye shuru ke liye kaafi hai.\n\nKya aap chahte hain ke main solution document aur quote "
+        "banwa doon? Aap mana bhi kar sakte hain."
+    )
+    out = owner_asks.without_questions(reply)
+    assert out == "Ye shuru ke liye kaafi hai." or out.startswith("Ye shuru ke liye kaafi hai")
+    assert "mana" not in out and "?" not in out
+
+
+def test_a_reply_that_is_only_a_question_is_left_for_the_guards() -> None:
+    assert owner_asks.without_questions("Kaun si dukaan?") == "Kaun si dukaan?"
+
+
+def test_a_recall_question_is_not_a_how_to() -> None:
+    from app.modules.pi import solution_ask
+
+    said = (
+        "Mujhe yaad nahi hum ne kya decide kiya tha, pehle kaunsa system banana tha, "
+        "aur wood stock tracking ko baad mein kyun rakhna tha?"
+    )
+    assert owner_asks.asks_for_recall(said)
+    assert not solution_ask.asked_howto(said)
+    assert solution_ask.asked_howto("Ye sab kaise hoga step by step? Kaunsa software?")
+
+
+def test_asks_to_suggest_and_to_explain_the_alert() -> None:
+    assert owner_asks.asks_to_suggest(
+        "Aap delay ki common wajahon ki ek practical list khud suggest karein."
+    )
+    assert owner_asks.asks_for_plan(
+        "Batayein ke agar worker order ka stage update karna bhool jaye to system mujhe kaise alert karega."
+    )
+    assert not owner_asks.asks_to_suggest("Mere workers ke paas mobile hai")

@@ -12,7 +12,7 @@ later "haan" goes through the explicit-yes gate.
 import re
 from typing import Any
 
-from app.modules.pi import solutions
+from app.modules.pi import owner_asks, solutions
 from app.modules.pi.problems import what_now
 
 # Asking for a fix, in any of the ways owners put it (Part 1.6). A cost question is not one.
@@ -333,7 +333,8 @@ def _asked_for_ideas(text: str) -> bool:
 
 
 def asked_howto(said: str) -> bool:
-    return bool(HOWTO.search(said or ""))
+    # "pehle kaunsa system banana tha?" asks about the past (what was decided), not how to build
+    return bool(HOWTO.search(said or "")) and not owner_asks.asks_for_recall(said)
 
 
 def asked_which_app(said: str) -> bool:

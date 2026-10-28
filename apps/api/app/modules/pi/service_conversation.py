@@ -1175,6 +1175,9 @@ def system_for(context: dict[str, Any]) -> str:
             + (owner_asks.NO_RECORDS_RULE if context.get("owner_unknowns") else "")
             + (owner_asks.PLAN_RULE if context.get("plan_asked") else "")
             + (owner_asks.REPEAT_RULE if context.get("repeat_complaint") else "")
+            + (owner_asks.NO_QUESTIONS_RULE if context.get("no_questions") else "")
+            + (owner_asks.RECALL_RULE if context.get("recall_asked") else "")
+            + (owner_asks.SUGGEST_RULE if context.get("suggest_asked") else "")
             + (memory_block.SYSTEM_LINE if context.get("what_i_know") else "")
             + think_prompt.block(context)
         )
@@ -1580,6 +1583,12 @@ async def brain_problems(
             context["plan_asked"] = True
         if owner_asks.complains_of_repeats(said_now):
             context["repeat_complaint"] = True
+        if any(owner_asks.asked_no_questions(t) for t in [*theirs[-2:], said_now]):
+            context["no_questions"] = True  # "abhi mujh se aur sawal na karein": no question now
+        if owner_asks.asks_for_recall(said_now):
+            context["recall_asked"] = True
+        if owner_asks.asks_to_suggest(said_now):
+            context["suggest_asked"] = True
     if message is not None and warmup.enabled(policy.response_rules):
         # Part 16: the opening is for a first-time owner who says "Hi"; the quick look result (if
         # they gave a link) rides on the message and is removed before the model sees the context.
@@ -2325,6 +2334,7 @@ def settle_ideas(turn: "ServiceTurn", context: dict[str, Any]) -> None:
         and _BULLET_LINE.match(last)
         and not OFFER_LINE.search(text)
         and language in ASK_AFTER_IDEAS
+        and not context.get("no_questions")
     ):
         how_many = "one" if len(bullets) == 1 else "many"
         text = f"{text}{chr(10)}{chr(10)}{ASK_AFTER_IDEAS[language][how_many]}"
@@ -6149,6 +6159,8 @@ async def compose_service_turn(
         shape_expert_ideas(turn, context)
         add_capability_line(turn, context)
         turn.reply = reply_layout.tidy(turn.reply)  # short paragraphs, the question on its own line
+    if context.get("no_questions"):
+        turn.reply = owner_asks.without_questions(turn.reply)
     allowed = allowed_text(context)
     turn.reply = validate_service_reply(
         without_blocked_lines(turn.reply, mode, allowed),
