@@ -8,6 +8,7 @@ import {
   Bot,
   Check,
   CheckCheck,
+  ExternalLink,
   Clock,
   Hand,
   Inbox as InboxIcon,
@@ -46,6 +47,13 @@ import { del, errorText, get, post } from "@/lib/api";
 import product from "@/components/product.module.css";
 import { dateTime, timeAgo } from "@/lib/format";
 import { IncomingSoundToggle } from "@/features/incoming-alert";
+import {
+  CustomerImage,
+  CustomerReading,
+  SentButtons,
+  SentDocument,
+  SentPicture,
+} from "@/features/message-media";
 import { useAction, useBusinessKey, useCan, useSession } from "@/lib/session";
 import type {
   Conversation,
@@ -802,6 +810,26 @@ function Thread({ id, onBack }: { id: string; onBack: () => void }) {
   );
 }
 
+/** For a processed picture or voice note the reading is shown in its own labelled note. */
+function visibleBody(message: Message): string {
+  const media = message.media;
+  const body = message.body || "";
+  if (message.message_type === "text" || !media) {
+    return (
+      body ||
+      (message.message_type !== "text" ? `[${message.message_type}]` : "")
+    );
+  }
+  const caption = /^Customer caption: ([\s\S]*?)\nAttachment: /.exec(body);
+  if (caption) return caption[1];
+  const reading =
+    (typeof media.transcript === "string" && media.transcript) ||
+    (typeof media.description === "string" && media.description) ||
+    "";
+  if (reading && body.trim() === reading.trim()) return "";
+  return body || `[${message.message_type}]`;
+}
+
 function MessageBubble({
   message,
   conversationId,
@@ -859,21 +887,8 @@ function MessageBubble({
             />
           ) : (
             <>
-              {message.card && (
-                <a href={message.card.image} target="_blank" rel="noreferrer">
-                  {/* eslint-disable-next-line @next/next/no-img-element -- signed external card */}
-                  <img
-                    src={message.card.image}
-                    alt={
-                      message.card.kind === "map"
-                        ? "Problem map sent on WhatsApp"
-                        : "Journey card sent on WhatsApp"
-                    }
-                    loading="lazy"
-                    className="mb-1.5 block w-full max-w-[260px] rounded-xl border border-border"
-                  />
-                </a>
-              )}
+              <SentPicture message={message} />
+              <SentDocument message={message} />
               {message.media?.file_kind === "document" &&
                 typeof message.media.file_id === "string" && (
                   <a
@@ -886,12 +901,16 @@ function MessageBubble({
                     </span>
                   </a>
                 )}
-              <p className="whitespace-pre-line" data-user-text>
-                {message.body ||
-                  (message.message_type !== "text"
-                    ? `[${message.message_type}]`
-                    : "")}
-              </p>
+              {inbound && message.message_type === "image" && (
+                <CustomerImage message={message} />
+              )}
+              {visibleBody(message) ? (
+                <p className="whitespace-pre-line" data-user-text dir="auto">
+                  {visibleBody(message)}
+                </p>
+              ) : null}
+              <CustomerReading message={message} />
+              <SentButtons message={message} />
             </>
           )}
           <p className="mt-1 flex items-center justify-end gap-1.5 text-[11px] text-muted-foreground">
@@ -1190,6 +1209,16 @@ function CustomerPanel({
         >
           <UserRound className="size-4" aria-hidden /> Full profile
         </Link>
+        {process.env.NEXT_PUBLIC_OWNER_OS_URL ? (
+          <a
+            href={`${process.env.NEXT_PUBLIC_OWNER_OS_URL.replace(/\/+$/, "")}/pi/review?c=${encodeURIComponent(conversation.id)}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mt-1 ms-3 inline-flex items-center gap-1 text-sm text-accent underline"
+          >
+            <ExternalLink className="size-4" aria-hidden /> Staff review
+          </a>
+        ) : null}
       </div>
       {conversation.summary ? (
         <section>

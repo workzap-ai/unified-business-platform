@@ -89,27 +89,16 @@ export function MessageItem({
           )}
         >
           <MediaBlock message={message} />
-          {message.card && (
-            <a href={message.card.image} target="_blank" rel="noreferrer">
-              {/* eslint-disable-next-line @next/next/no-img-element -- signed external card */}
-              <img
-                src={message.card.image}
-                alt={
-                  message.card.kind === "map"
-                    ? "Problem map sent on WhatsApp"
-                    : "Journey card sent on WhatsApp"
-                }
-                loading="lazy"
-                className="mb-1.5 block w-full max-w-[260px] rounded-xl border border-border"
-              />
-            </a>
-          )}
+          <SentPicture message={message} />
+          <SentDocument message={message} />
           {visibleBody(message) && (
             <FormattedText
               text={visibleBody(message)}
               className="break-words whitespace-pre-wrap"
+              dir="auto"
             />
           )}
+          <SentButtons message={message} />
           {message.confirmation && (
             <ConfirmationCard confirmation={message.confirmation} />
           )}
@@ -171,15 +160,17 @@ function tidy(text: string) {
 function FormattedText({
   text,
   className,
+  dir,
 }: {
   text: string;
   className?: string;
+  dir?: "auto";
 }) {
   const parts = tidy(text).split(
     /((?<!\w)(?:\*[^*\n]+\*|_[^_\n]+_|~[^~\n]+~)(?!\w))/g,
   );
   return (
-    <p className={className}>
+    <p className={className} dir={dir}>
       {parts.map((part, i) => {
         const inner = part.slice(1, -1);
         if (part.length > 2 && part.startsWith("*") && part.endsWith("*"))
@@ -191,6 +182,113 @@ function FormattedText({
         return part;
       })}
     </p>
+  );
+}
+
+const VISUAL_LABEL: Record<string, string> = {
+  map: "Problem map",
+  map_text: "Problem map",
+  board: "Board",
+  progress: "Progress",
+};
+
+function str(value: unknown): string {
+  return typeof value === "string" ? value : "";
+}
+
+/** A picture pi sent. Signed links expire, so a failed load shows a calm placeholder. */
+function SentPicture({ message }: { message: Message }) {
+  const media = (message.media ?? {}) as Record<string, unknown>;
+  const src = str(media.image) || message.card?.image || "";
+  const [failed, setFailed] = useState(false);
+  if (!src) return null;
+  const visual = str(media.visual) || message.card?.kind || "";
+  const label = VISUAL_LABEL[visual] ?? "Picture";
+  const alt = str(media.alt);
+  const version = media.map_version;
+  return (
+    <figure className="mb-1.5" data-testid="sent-picture">
+      <figcaption className="mb-1 text-[11px] font-semibold tracking-wide text-muted-foreground uppercase">
+        {label}
+        {version !== undefined && version !== null && version !== ""
+          ? ` · version ${String(version)}`
+          : ""}
+      </figcaption>
+      {failed ? (
+        <div
+          role="img"
+          aria-label={alt || "Picture expired"}
+          className="flex h-24 w-full max-w-[260px] items-center justify-center gap-2 rounded-xl border border-dashed border-border bg-surface text-sm text-muted-foreground"
+        >
+          <ImageIcon className="size-4" aria-hidden="true" /> Picture expired
+        </div>
+      ) : (
+        <a href={src} target="_blank" rel="noopener noreferrer">
+          {/* eslint-disable-next-line @next/next/no-img-element -- signed external picture */}
+          <img
+            src={src}
+            alt={alt || `${label} sent on WhatsApp`}
+            loading="lazy"
+            onError={() => setFailed(true)}
+            className="block w-full max-w-[260px] rounded-xl border border-border"
+          />
+        </a>
+      )}
+      {alt ? (
+        <p
+          className="mt-1 max-w-[260px] text-xs text-muted-foreground"
+          dir="auto"
+        >
+          {alt}
+        </p>
+      ) : null}
+    </figure>
+  );
+}
+
+/** A PDF pi sent (solution document or quote). */
+function SentDocument({ message }: { message: Message }) {
+  const doc = (message.media as Record<string, unknown> | null)?.document as
+    { link?: unknown; filename?: unknown } | undefined;
+  const link = str(doc?.link);
+  if (!link) return null;
+  return (
+    <a
+      href={link}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="mb-1.5 flex items-center gap-2 rounded-lg border border-border bg-surface px-2.5 py-1.5 text-xs font-medium text-primary hover:underline"
+    >
+      <FileText className="size-4 shrink-0" aria-hidden="true" />
+      <span className="min-w-0 truncate">
+        {str(doc?.filename) || "Document.pdf"}
+      </span>
+    </a>
+  );
+}
+
+/** The buttons pi sent with a message (information only, not clickable). */
+function SentButtons({ message }: { message: Message }) {
+  const buttons = (message.media as Record<string, unknown> | null)?.buttons;
+  if (!Array.isArray(buttons) || !buttons.length) return null;
+  return (
+    <div
+      className="mt-1.5 flex flex-wrap items-center gap-1.5"
+      data-testid="sent-buttons"
+    >
+      <span className="text-[11px] font-medium text-muted-foreground">
+        Buttons sent
+      </span>
+      {buttons.map((b, i) => (
+        <span
+          key={`${String(b)}-${i}`}
+          className="rounded-full border border-border bg-surface px-2 py-0.5 text-xs text-muted-foreground"
+          dir="auto"
+        >
+          {String(b)}
+        </span>
+      ))}
+    </div>
   );
 }
 

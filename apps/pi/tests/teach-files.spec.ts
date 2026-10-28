@@ -53,6 +53,6 @@ test("a file upload is sent as multipart and becomes a draft to review", async (
   expect(sent.headers()["content-type"]).toContain("multipart/form-data");
   expect(sent.headers()["x-csrf-token"]).toBeDefined();
   await expect(
-    page.getByText(/Pi read it\. Review the draft below/),
+    page.getByText(/pi read it\. Review the draft below/),
   ).toBeVisible();
 });

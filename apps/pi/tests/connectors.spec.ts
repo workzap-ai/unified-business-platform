@@ -150,7 +150,7 @@ test("unavailable accounts and view-only members get no connect buttons", async 
   const accounts = page.getByRole("region", { name: "Your accounts" });
   await expect(accounts.getByText("Not available yet")).toBeVisible();
   await expect(
-    accounts.getByText(/can't be connected on this Pi server yet/),
+    accounts.getByText(/can't be connected on this pi server yet/),
   ).toBeVisible();
   await expect(accounts.getByRole("button")).toHaveCount(0);
   await expect(

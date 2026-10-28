@@ -231,8 +231,62 @@ export function AgentsPage() {
   );
 }
 
+/** "brain" or "other" when the workspace setting is readable; "unknown" when this person
+ * cannot read settings (GET /pi/settings needs pi.settings.manage). */
+type PiMode = "brain" | "other" | "unknown";
+
+function usePiMode(): PiMode {
+  const key = useBusinessKey();
+  const can = useCan();
+  const query = useQuery({
+    queryKey: key(["settings"]),
+    queryFn: () =>
+      get<{ response_rules?: Record<string, unknown> }>("/pi/settings"),
+    enabled: can("pi.settings.manage"),
+    retry: false,
+  });
+  if (!query.data) return "unknown";
+  return query.data.response_rules?.pi_mode === "brain" ? "brain" : "other";
+}
+
+const BRAIN_KEY = "requirement";
+
+function BrainAgentCard({ agent, mode }: { agent: Agent; mode: PiMode }) {
+  const { name } = friendly(agent);
+  return (
+    <section
+      aria-labelledby="brain-agent-title"
+      className="rounded-2xl border-2 border-accent/50 bg-accent-soft/30 p-1"
+      data-testid="brain-agent-card"
+    >
+      <div className="flex flex-wrap items-center gap-2 px-4 pt-3">
+        <Badge tone="accent">Brain agent</Badge>
+        <h2 id="brain-agent-title" className="font-semibold">
+          {name}
+        </h2>
+      </div>
+      <p className="px-4 pt-2 text-sm">
+        {mode === "brain" ? "pi is in brain mode. " : "In brain mode, "}
+        this is the only helper that matters. What you publish in its
+        instructions is passed to pi as guidance from you, such as tone, what to
+        mention and when to bring in your team. Its tools and its on/off switch
+        also apply. The other helpers are not used.
+      </p>
+      <p className="px-4 pt-2 text-sm font-medium">
+        Guidance cannot override pi&apos;s safety rules. pi will always say it
+        is an AI, ask one question at a time, and never take payment in chat or
+        give legal, medical or financial advice, whatever the instructions say.
+      </p>
+      <div className="p-1 pt-3">
+        <AgentCard agent={agent} />
+      </div>
+    </section>
+  );
+}
+
 function AgentList() {
   const key = useBusinessKey();
+  const mode = usePiMode();
   const query = useQuery({
     queryKey: key(["agents"]),
     queryFn: () => get<Agent[]>("/pi/agents"),
@@ -257,11 +311,33 @@ function AgentList() {
         </EmptyState>
       </Card>
     );
+  if (mode === "other")
+    return (
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+        {query.data.map((agent) => (
+          <AgentCard key={agent.id} agent={agent} />
+        ))}
+      </div>
+    );
+  const brain = query.data.find((a) => a.key === BRAIN_KEY);
+  const others = query.data.filter((a) => a.key !== BRAIN_KEY);
   return (
-    <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-      {query.data.map((agent) => (
-        <AgentCard key={agent.id} agent={agent} />
-      ))}
+    <div className="space-y-5">
+      {brain ? <BrainAgentCard agent={brain} mode={mode} /> : null}
+      {others.length ? (
+        <details className="rounded-2xl border border-border bg-surface-muted/50 p-4">
+          <summary className="cursor-pointer text-sm font-medium text-muted-foreground">
+            {mode === "brain"
+              ? `Not used in brain mode (${others.length} helpers)`
+              : `Other helpers: not used if pi is in brain mode (${others.length})`}
+          </summary>
+          <div className="mt-4 grid grid-cols-1 gap-4 opacity-75 lg:grid-cols-2">
+            {others.map((agent) => (
+              <AgentCard key={agent.id} agent={agent} />
+            ))}
+          </div>
+        </details>
+      ) : null}
     </div>
   );
 }
@@ -396,6 +472,7 @@ export function AgentDetailPage({ id }: { id: string }) {
 }
 
 function AgentDetail({ agent }: { agent: Agent }) {
+  const mode = usePiMode();
   const [tab, setTab] = React.useState<Tab>("instructions");
   const tabRefs = React.useRef<Record<Tab, HTMLButtonElement | null>>({
     instructions: null,
@@ -415,6 +492,20 @@ function AgentDetail({ agent }: { agent: Agent }) {
   }
   return (
     <div className="min-w-0 space-y-5">
+      {mode !== "other" && agent.key === BRAIN_KEY ? (
+        <Notice tone="info" title="Brain agent">
+          In brain mode this helper&apos;s published instructions become your
+          guidance to pi, and its tools and on/off switch apply. Guidance cannot
+          override pi&apos;s safety rules.
+        </Notice>
+      ) : null}
+      {mode !== "other" && agent.key !== BRAIN_KEY ? (
+        <Notice tone="info" title="Not used in brain mode">
+          {mode === "brain"
+            ? "This workspace is in brain mode, so this helper is bypassed. Changes here have no effect on replies."
+            : "If this workspace is in brain mode, this helper is bypassed and changes here have no effect on replies."}
+        </Notice>
+      ) : null}
       {!agent.enabled ? (
         <Notice tone="warning" title="This helper is off">
           pi won&apos;t use it until you switch it back on from the Agents list.
@@ -999,7 +1090,7 @@ function TestTab({ agent }: { agent: Agent }) {
             <Field
               label="Try a customer message"
               htmlFor={id}
-              hint="See which helper pi would pick. Nothing is sent and no records are created."
+              hint="Routing preview only, not a full reply. It shows which helper pi would pick. Nothing is sent and no records are created."
             >
               <Textarea
                 id={id}
@@ -1017,7 +1108,7 @@ function TestTab({ agent }: { agent: Agent }) {
               disabled={!trimmed}
             >
               <Send className="size-4" aria-hidden />
-              Run test
+              Run routing preview
             </Button>
           </form>
         </CardSection>
@@ -1026,8 +1117,9 @@ function TestTab({ agent }: { agent: Agent }) {
         <CardSection aria-live="polite">
           {!result ? (
             <p className="text-sm text-muted-foreground">
-              The result shows here: what pi thinks the customer wants, which
-              helpers handle it, and how long it took.
+              Routing preview only, not a full reply. The result shows here:
+              what pi thinks the customer wants, which helpers handle it, and
+              how long it took.
             </p>
           ) : (
             <div className="space-y-4">

@@ -189,3 +189,23 @@ export async function streamEvents<E>(
     if (done) return;
   }
 }
+
+/** A file (a customer's picture or voice note) from a GET endpoint, with the session cookie. */
+export async function apiBlob(path: string): Promise<Blob> {
+  let response: Response;
+  try {
+    response = await fetch(BASE + path, {
+      credentials: "same-origin",
+      signal: AbortSignal.timeout(60_000),
+    });
+  } catch {
+    throw new ApiError(
+      0,
+      "NETWORK",
+      "We couldn't reach pi. Check your connection and try again.",
+    );
+  }
+  if (!response.ok)
+    throw new ApiError(response.status, "ERROR", friendly(response.status));
+  return response.blob();
+}

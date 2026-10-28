@@ -111,7 +111,7 @@ export const MessageSchema: z.ZodType<Pi.Message> = z.object({
   media: z.union([
     z.null(),
     z.object({
-      mime_type: z.string(),
+      mime_type: z.union([z.undefined(), z.string()]).optional(),
       size: z.union([z.undefined(), z.number()]).optional(),
       duration_s: z.union([z.undefined(), z.number()]).optional(),
       transcript: z.union([z.undefined(), z.string()]).optional(),
@@ -119,6 +119,20 @@ export const MessageSchema: z.ZodType<Pi.Message> = z.object({
       file_kind: z.union([z.undefined(), z.literal("document")]).optional(),
       file_id: z.union([z.undefined(), z.string()]).optional(),
       filename: z.union([z.undefined(), z.string()]).optional(),
+      image: z.union([z.undefined(), z.string()]).optional(),
+      visual: z.union([z.undefined(), z.string()]).optional(),
+      alt: z.union([z.undefined(), z.string()]).optional(),
+      map_version: z.union([z.undefined(), z.string(), z.number()]).optional(),
+      document: z
+        .union([
+          z.undefined(),
+          z.object({
+            link: z.union([z.undefined(), z.string()]).optional(),
+            filename: z.union([z.undefined(), z.string()]).optional(),
+          }),
+        ])
+        .optional(),
+      buttons: z.union([z.undefined(), z.array(z.string())]).optional(),
     }),
   ]),
   status: z.union([
