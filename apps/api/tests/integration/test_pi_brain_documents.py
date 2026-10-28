@@ -472,7 +472,7 @@ async def test_approval_opens_a_payment_and_only_staff_can_confirm_it(
     # "I have paid" is a claim: thanked, never confirmed, and the team is told.
     await say(pi, "I have paid the transfer", "pay-4")
     reply = (await pi.reply_to("pay-4")).body
-    assert reply == "Thanks. The Workzap team will confirm here when the transfer arrives."
+    assert reply == "The Workzap team will confirm here when the transfer arrives."
     await business_db.refresh(payment)
     assert payment.status == "claimed" and payment.claimed_at is not None
     await business_db.refresh(conversation)

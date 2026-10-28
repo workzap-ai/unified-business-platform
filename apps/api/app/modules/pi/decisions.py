@@ -132,6 +132,10 @@ NOT_A_REQUEST = re.compile(
     r"\b(?:how much|kitna|kitne|kitni|price|prices|cost|costs|charge|charges|fee|fees|qeemat|keemat|"
     r"kharcha|paisa|paise|rate|don'?t|do not|never|without|bina|stop|cancel|won'?t|can'?t|cannot|"
     r"no|nhi|nai|na|mat|nahi|nahin|not|later|baad mein|baad me)\b"
+    # "Quote banane SE PEHLE mujhe samjhayen ...": a wish to understand first, not a request for the
+    # quote (live 2026-10-28: pi sent the document and quote on this); "before", "after", "explain"
+    r"|\b(?:se|say)\s+pehl(?:e|ay)\b|\bke\s+baad\b|\bbefore\b|\bafter\b|\bsamjha\w*|\bexplain\b"
+    r"|\bkaise\s+(?:kaam|chalega|hoga|banega|karega)\b"
     r"|(?<!\w)كم(?!\w)|تكلفة|ليس الآن|(?<!\w)لا(?!\w)|نہیں|نہ|مت",
     re.IGNORECASE,
 )
@@ -224,11 +228,11 @@ TEXT: dict[str, dict[str, str]] = {
     },
     "preparing": {
         "en": (
-            "Thanks. I've asked Workzap to prepare your solution document and quote. "
+            "I've asked Workzap to prepare your solution document and quote. "
             "I'll send them here once they're ready."
         ),
         "roman_ur": (
-            "Shukriya. Maine Workzap se aap ka solution document aur quote tayyar karne ko "
+            "Maine Workzap se aap ka solution document aur quote tayyar karne ko "
             "keh diya hai. Tayyar hote hi yahin bhej diya jayega."
         ),
         "ar": ("طلبت من Workzap تجهيز وثيقة الحل وعرض السعر. سأرسلهما هنا فور أن يصبحا جاهزين."),
@@ -285,12 +289,12 @@ TEXT: dict[str, dict[str, str]] = {
     },
     "approved": {
         "en": (
-            "Thanks. To start, payment is by bank transfer. The bank details are on your "
+            "To start, payment is by bank transfer. The bank details are on your "
             "approved quote. Workzap will confirm here when the transfer arrives. Please "
             "don't send card details or payment in this chat."
         ),
         "roman_ur": (
-            "Shukriya. Shuru karne ke liye payment bank transfer se hoti hai. Bank details "
+            "Shuru karne ke liye payment bank transfer se hoti hai. Bank details "
             "aap ke approved quote par hain. Transfer aane par Workzap yahin confirm karega. "
             "Meherbani karke is chat mein card ki details ya payment na bhejein."
         ),
@@ -328,8 +332,8 @@ TEXT: dict[str, dict[str, str]] = {
         ),
     },
     "payment_claimed": {
-        "en": "Thanks. The Workzap team will confirm here when the transfer arrives.",
-        "roman_ur": "Shukriya. Transfer aane par Workzap ki team yahin confirm karegi.",
+        "en": "The Workzap team will confirm here when the transfer arrives.",
+        "roman_ur": "Transfer aane par Workzap ki team yahin confirm karegi.",
         "ar": "سيؤكد فريق Workzap هنا عند وصول التحويل.",
     },
     "payment_confirmed": {

@@ -294,7 +294,7 @@ def test_the_other_states_make_no_decision():
 )
 def test_saying_they_paid_is_only_a_claim(said):
     decision = go(S.S10_AWAITING_PAYMENT, said)
-    assert decision.reply == "Thanks. The Workzap team will confirm here when the transfer arrives."
+    assert decision.reply == "The Workzap team will confirm here when the transfer arrives."
     assert decision.effects == ["payment_claimed"] and decision.next_state is None
     assert "received" not in decision.reply.lower()
 

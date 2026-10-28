@@ -19,7 +19,7 @@ from decimal import Decimal
 from typing import Any
 from uuid import UUID
 
-from sqlalchemy import func, select
+from sqlalchemy import Select, func, select
 from sqlalchemy.exc import DBAPIError
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -2275,6 +2275,28 @@ async def burst_too_long(session: Any, message: PiMessage, response_rules: dict[
     return bool((datetime.now(UTC) - first).total_seconds() >= limit)
 
 
+# An event a worker is already processing must not be picked up again by the sweeper (it runs every
+# 30 s and a model turn takes 40 s or more: found 2026-10-28, every model turn was processed TWICE,
+# attempts = 2, doubling the model calls and the load). Only an event nobody has touched for this
+# long is a stuck one; a running job saves its progress (updated_at) long before.
+EVENT_GRACE_SECONDS = 120
+
+
+def due_events(now: datetime) -> Select[tuple[UUID]]:
+    """The webhook events the sweeper hands to a worker again: received or queued, not yet tried
+    three times, and untouched for EVENT_GRACE_SECONDS."""
+    return (
+        select(WhatsAppWebhookEvent.id)
+        .where(
+            WhatsAppWebhookEvent.status.in_(["received", "queued"]),
+            WhatsAppWebhookEvent.attempts < 3,
+            WhatsAppWebhookEvent.updated_at < now - timedelta(seconds=EVENT_GRACE_SECONDS),
+        )
+        .order_by(WhatsAppWebhookEvent.created_at)
+        .limit(50)
+    )
+
+
 async def sweep_pi(ctx: dict[str, Any]) -> None:
     async with ctx["sessions"]() as session:
         expired = list(
@@ -2336,17 +2358,7 @@ async def sweep_pi(ctx: dict[str, Any]) -> None:
                     "Delivery was interrupted. Reconcile with WhatsApp before retrying.",
                 )
         await session.commit()
-        events = list(
-            await session.scalars(
-                select(WhatsAppWebhookEvent.id)
-                .where(
-                    WhatsAppWebhookEvent.status.in_(["received", "queued"]),
-                    WhatsAppWebhookEvent.attempts < 3,
-                )
-                .order_by(WhatsAppWebhookEvent.created_at)
-                .limit(50)
-            )
-        )
+        events = list(await session.scalars(due_events(datetime.now(UTC))))
         messages = list(
             await session.scalars(
                 select(PiMessage.id)

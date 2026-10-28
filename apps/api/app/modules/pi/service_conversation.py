@@ -2266,6 +2266,49 @@ def add_capability_line(turn: "ServiceTurn", context: dict[str, Any]) -> None:
     turn.reply = chr(10).join(lines)
 
 
+ONE_IDEA_LEAD = {
+    "en": "Here is an idea for you:",
+    "roman_ur": "Ji, ye ek idea abhi aazma sakte hain:",
+}
+ASK_AFTER_IDEAS = {  # one plain question when ideas end the reply with nothing after them
+    "en": {
+        "one": "Would this be easy to start with?",
+        "many": "Which of these would be easiest to start with?",
+    },
+    "roman_ur": {
+        "one": "Kya ye shuru karna aap ke liye aasaan rahega?",
+        "many": "In mein se kaun sa shuru karna aap ke liye sab se aasaan rahega?",
+    },
+}
+
+
+def settle_ideas(turn: "ServiceTurn", context: dict[str, Any]) -> None:
+    """After every guard has taken lines out (live 2026-10-28: the lead said "do ideas" over one
+    idea, and an ideas reply ended on the idea with no question): the lead names the ideas that are
+    left, and a reply that ends on an idea gets its one question."""
+    lines = turn.reply.split(chr(10))
+    bullets = [n for n, line in enumerate(lines) if _BULLET_LINE.match(line)]
+    language = str(context.get("reply_language") or "en")
+    plural = IDEAS_LEAD.get(language, IDEAS_LEAD["en"])
+    first = next((n for n, line in enumerate(lines) if line.strip()), None)
+    if first is not None and lines[first].strip() == plural:
+        if not bullets:
+            del lines[first]  # no idea is left: no lead either
+        elif len(bullets) == 1:
+            lines[first] = ONE_IDEA_LEAD.get(language, ONE_IDEA_LEAD["en"])
+    text = chr(10).join(lines).strip()
+    last = text.split(chr(10))[-1].strip() if text else ""
+    if (
+        bullets
+        and _BULLET_LINE.match(last)
+        and not OFFER_LINE.search(text)
+        and language in ASK_AFTER_IDEAS
+    ):
+        how_many = "one" if len(bullets) == 1 else "many"
+        text = f"{text}{chr(10)}{chr(10)}{ASK_AFTER_IDEAS[language][how_many]}"
+    turn.reply = text
+
+
 def strip_dangling_opener(turn: "ServiceTurn") -> None:
     """A reply must not stop on the Workzap line's opener ("...Workzap could set it up so"): the
     model sometimes leaves the build itself out (found in a real-model school chat)."""
@@ -6091,6 +6134,8 @@ async def compose_service_turn(
         mode,
         allowed,
     )
+    if context.get("expert_on"):
+        settle_ideas(turn, context)  # after the guards: the count and the question are then final
     if context.get("pi_mode") == "brain" and any(
         v.rule in constitution.FINAL_CHECKS for v in constitution.lint(turn.reply, context)
     ):
