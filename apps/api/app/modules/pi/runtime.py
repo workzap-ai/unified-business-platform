@@ -1290,6 +1290,24 @@ async def process_pi_event(ctx: dict[str, Any], event_id: str) -> None:
                     alias=str(policy.ai_config.get("router_alias", "fast")),
                 ),
             )
+        if service_discovery and brain_on and message.message_type in ("text", "audio") and body:
+            # what the owner asks of pi (no questions, plan, recall, ...) in a language owner_asks
+            # does not know; the verdict stays on the message for later turns
+            from app.modules.pi import owner_intents
+
+            intents = await latency.timed(
+                "model.owner_intents",
+                owner_intents.classify(
+                    build_llm_manager(ctx["settings"], ctx["http"], ctx["sessions"]),
+                    scope,
+                    said=body,
+                    conversation_id=conversation_id,
+                    alias=str(policy.ai_config.get("router_alias", "fast")),
+                ),
+            )
+            if intents is not None:
+                message.media = {**message.media, "intents": intents}
+                await session.commit()
         service_context = (
             await latency.timed(
                 "prepare_context",

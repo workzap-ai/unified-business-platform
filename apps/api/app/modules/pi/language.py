@@ -312,12 +312,17 @@ def detect_language(text: str | None) -> str | None:
         return None  # "no", "yes please", "thanks": the chat keeps its language
     urdu = sum(word in ROMAN_URDU for word in words)
     english = sum(word in ENGLISH for word in words)
-    if urdu > english:
+    # One marker word in a longer text is not evidence: "de" is French and Spanish too, "no" is
+    # Spanish and Italian. Latin-script languages other than these two stay undetected (None).
+    sure = len(words) <= 3
+    if urdu > english and (urdu >= 2 or sure):
         return "roman_ur"
-    if english > urdu:
+    if english > urdu and (english >= 2 or sure):
         return "en"
     # As much English as Urdu ("bas yehi, that's all"): English, the main language.
-    return ("en" if english else "roman_ur") if urdu else None
+    if urdu and (sure or urdu + english >= 3):
+        return "en" if english else "roman_ur"
+    return None
 
 
 def clearly_other(reply: str, expected: str) -> str | None:

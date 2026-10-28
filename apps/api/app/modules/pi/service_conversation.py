@@ -48,6 +48,7 @@ from app.modules.pi import (
     memory_block,
     open_requests,
     owner_asks,
+    owner_intents,
     price_policy,
     problem_extract,
     problems,
@@ -1574,20 +1575,25 @@ async def brain_problems(
     if message is not None:
         # What the owner says they do not have, and whether they ask to understand the plan or
         # complain that pi keeps asking (live 2026-10-28, a furniture maker): see owner_asks.
-        theirs = [m.body or "" for m in (rows or []) if m.sender_type == "customer"][-6:]
-        said_now = message.body or ""
-        unknowns = owner_asks.count_unknowns([*theirs, said_now])
-        if unknowns:
-            context["owner_unknowns"] = unknowns
-        if owner_asks.asks_for_plan(said_now):
+        # (phrase banks for English and Roman Urdu, the stored model verdict for other languages)
+        theirs = [
+            (m.body or "", m.media)
+            for m in (rows or [])
+            if m.sender_type == "customer" and m.id != message.id
+        ][-6:]
+        seen = owner_intents.read([*theirs, (message.body or "", message.media)])
+        last = len(theirs)
+        if seen["no_records"]:
+            context["owner_unknowns"] = len(seen["no_records"])
+        if last in seen["asks_plan"]:
             context["plan_asked"] = True
-        if owner_asks.complains_of_repeats(said_now):
+        if last in seen["repeat_complaint"]:
             context["repeat_complaint"] = True
-        if any(owner_asks.asked_no_questions(t) for t in [*theirs[-2:], said_now]):
+        if any(i >= last - 2 for i in seen["no_questions"]):
             context["no_questions"] = True  # "abhi mujh se aur sawal na karein": no question now
-        if owner_asks.asks_for_recall(said_now):
+        if last in seen["asks_recall"]:
             context["recall_asked"] = True
-        if owner_asks.asks_to_suggest(said_now):
+        if last in seen["asks_suggest"]:
             context["suggest_asked"] = True
     if message is not None and warmup.enabled(policy.response_rules):
         # Part 16: the opening is for a first-time owner who says "Hi"; the quick look result (if

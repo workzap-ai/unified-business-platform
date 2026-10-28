@@ -76,7 +76,9 @@ ASKS_RECALL = re.compile(
     r"|\b(?:pehle|pichli\s+baar|pichle)\b.{0,50}\b(?:baat|discuss|decide|plan|chat|tay)\w*"
     r"|\b(?:decide|discuss|tay)\s+(?:kiya|hua|kia)\s+(?:tha|thi|the)\b"
     r"|\bwhat\s+did\s+we\s+(?:decide|discuss|agree|say)\b|\bremind\s+me\b"
-    r"|\bdo\s+you\s+remember\b|\blast\s+time\s+we\b",
+    r"|\bdo\s+you\s+remember\b|\blast\s+time\s+we\b"
+    r"|\b(?:don'?t|do\s+not|cannot|can'?t)\s+(?:remember|recall)\b|\bforgot(?:ten)?\s+what\b"
+    r"|\bwhat\s+(?:was|were)\s+(?:decided|agreed)\b",
     re.IGNORECASE,
 )
 
@@ -155,7 +157,7 @@ def complains_of_repeats(said: str) -> bool:
     return bool(REPEAT_COMPLAINT.search(said or ""))
 
 
-_SENTENCE_END = re.compile(r"(?<=[.!?؟۔])\s+")
+_SENTENCE_END = re.compile(r"(?<=[.!?؟۔？。！])\s*(?=\S)|(?<=[.!?؟۔])\s+")
 _NO_ASK = re.compile(
     r"^\W*(?:aap\s+)?mana\s+bhi\s+kar\s+sakte\s+hain\W*$|^\W*you\s+can\s+say\s+no\W*$",
     re.IGNORECASE,
@@ -181,9 +183,11 @@ def without_questions(reply: str) -> str:
     for line in (reply or "").split(chr(10)):
         sentences = _SENTENCE_END.split(line)
         kept = [
-            x for x in sentences if not x.rstrip().endswith(("?", "؟")) and not _NO_ASK.match(x)
+            x
+            for x in sentences
+            if not x.rstrip().endswith(("?", "؟", "？")) and not _NO_ASK.match(x)
         ]
         if kept or not line.strip():
             kept_lines.append(" ".join(kept))
     text = re.sub(r"\n{3,}", chr(10) * 2, chr(10).join(kept_lines)).strip()
-    return text if len(text.split()) >= 4 else reply
+    return text if len(text.split()) >= 4 or (" " not in text and len(text) >= 6) else reply
