@@ -15,6 +15,7 @@ from typing import Any
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.modules.pi import fixed_lines
 from app.modules.pi.models import PiConversation, PiMessage
 from app.shared.scope import WorkspaceScope
 from app.shared.workspace_repository import WorkspaceRepository
@@ -27,16 +28,17 @@ CONSENT = {
 }
 FOLLOW_UP = {
     "en": ["Let's continue", "Remind me later", "Stop reminders"],
-    "roman_ur": ["Aage barhein", "Baad mein yaad dilao", "Reminders band karo"],
+    "roman_ur": ["Aage barhein", "Baad mein yaad dilao", "Reminder band karein"],
     "ar": ["لنكمل", "ذكرني لاحقًا", "أوقف التذكيرات"],
 }
-REMIND_LATER = {titles[1].casefold() for titles in FOLLOW_UP.values()}
+# "baad mein yaad dilao" is the older title of this button: an earlier message may still carry it
+REMIND_LATER = {titles[1].casefold() for titles in FOLLOW_UP.values()} | {"baad mein yaad dilao"}
 PAUSE = timedelta(days=2)
 assert all(len(t) <= 20 for v in (*CONSENT.values(), *FOLLOW_UP.values()) for t in v)
 
 
 def follow_up_buttons(language: str | None) -> list[str]:
-    return FOLLOW_UP.get(language or "en", FOLLOW_UP["en"])
+    return FOLLOW_UP[fixed_lines.table_language(language, FOLLOW_UP)]
 
 
 def consent_buttons(body: str) -> list[str] | None:
@@ -45,7 +47,7 @@ def consent_buttons(body: str) -> list[str] | None:
 
     for language, question in CONSENT_QUESTION.items():
         if body.rstrip().endswith(question):
-            return CONSENT.get(language, CONSENT["en"])
+            return CONSENT[fixed_lines.table_language(language, CONSENT)]
     from app.modules.pi import decisions
 
     return decisions.buttons_for(body)

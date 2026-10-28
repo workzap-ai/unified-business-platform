@@ -50,7 +50,8 @@ MAX_TOUCHES = 4
 HUMAN_QUIET = timedelta(hours=12)
 SLA_HOURS = ((12, "info"), (24, "warning"), (48, "critical"))
 STOP = re.compile(
-    r"\b(?:stop|unsubscribe|opt[\s-]?out|band karo|band kar do|band kardo|mat bhejo|mat bhejna|"
+    r"\b(?:stop|unsubscribe|opt[\s-]?out|band karo|band kar do|band kardo|reminders? band karein|"
+    r"mat bhejo|mat bhejna|"
     r"no more messages|don'?t message|أوقف\s*التذكيرات|لا\s*ترسل|بند\s*کریں|مت\s*بھیجو)\b",
     re.IGNORECASE,
 )

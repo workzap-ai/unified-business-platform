@@ -27,7 +27,15 @@ from app.ai.types import Message
 from app.core.config import Settings
 from app.modules.customers import files
 from app.modules.customers.models import Customer
-from app.modules.pi import brain_pdf, constitution, decisions, flow, industry_packs, problems
+from app.modules.pi import (
+    brain_pdf,
+    constitution,
+    decisions,
+    fixed_lines,
+    flow,
+    industry_packs,
+    problems,
+)
 from app.modules.pi.brain_docs_models import PiBrainDocument
 from app.modules.pi.models import PiConversation, PiMessage, WhatsAppConnection
 from app.modules.pi.problem_models import PiProblem
@@ -792,7 +800,7 @@ async def send(
             "template. Ask them to reply, then send again.",
             409,
         )
-    language = conversation.language if conversation.language in COVER else "en"
+    language = fixed_lines.table_language(conversation.language, COVER)
     ids: list[str] = []
     for doc in fresh:
         label = CAPTION[language][doc.kind]
@@ -834,7 +842,9 @@ async def send(
         if progress:  # "Your decision": the third of Sorted, Preparing, Your decision, Build
             ids.append(progress)
     cover = (REVISED if revised else COVER)[language].format(n=len(solution.problem_ids))
-    buttons = decisions.DECISION_BUTTONS.get(language, decisions.DECISION_BUTTONS["en"])
+    buttons = decisions.DECISION_BUTTONS[
+        fixed_lines.table_language(language, decisions.DECISION_BUTTONS)
+    ]
     ids.append(
         await queue_message(
             session,

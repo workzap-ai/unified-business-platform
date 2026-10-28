@@ -13,17 +13,21 @@ template; "stop" ends everything (the caller checks `opted_out`).
 from dataclasses import dataclass
 from datetime import datetime, timedelta
 
-from app.modules.pi import brain_config, flow, map_share
+from app.modules.pi import brain_config, fixed_lines, flow, map_share
 
 S = flow.State
 
 WINDOW = timedelta(hours=24)
 
 # kind -> (text in the window, template text outside it). {n} is the count of noted problems.
+# The Arabic lines are written in Modern Standard Arabic in the plural "you", which is neutral for
+# gender: native-speaker review wanted. Urdu, Hindi and Persian chats get the Roman Urdu lines
+# (the chat's reply language); every other language falls back to English.
 MESSAGES: dict[str, dict[str, str]] = {
     "silent": {
         "en": "Still here whenever you want to carry on. I've kept everything you told me.",
         "roman_ur": "Jab chahein baat jari rakhein, main yahin hoon. Aap ne jo bataya wo sab mehfooz hai.",
+        "ar": "ما زلت هنا متى أردتم المتابعة. احتفظت بكل ما أخبرتموني به.",
     },
     "paused": {
         "en": (
@@ -33,6 +37,10 @@ MESSAGES: dict[str, dict[str, str]] = {
         "roman_ur": (
             "Hi, main pi hoon, Workzap ka AI. Aap ne kaha tha ke main aap ke {n} note kiye hue "
             "masail par dobara poochoon. Kya baat aage barhayein?"
+        ),
+        "ar": (
+            "مرحباً، أنا pi، الذكاء الاصطناعي من Workzap. طلبتم مني أن أعود إليكم بخصوص "
+            "المشكلات المسجلة وعددها {n}. هل نتابع؟"
         ),
     },
     "documents": {
@@ -44,19 +52,23 @@ MESSAGES: dict[str, dict[str, str]] = {
             "Aap ka solution document aur quote yahan maujood hain, jab ready hon. Koi sawal ho "
             "to poochh lein."
         ),
+        "ar": "وثيقة الحل وعرض السعر جاهزان لكم متى شئتم. إن كان لديكم أي سؤال فاسألوني.",
     },
     # Decision 6 (Book 5, 6.3): value first, mentions the map, no pressure, never the Solution Box.
     "map": {
         "en": map_share.FOLLOWUP["en"],
         "roman_ur": map_share.FOLLOWUP["roman_ur"],
+        "ar": map_share.FOLLOWUP["ar"],
     },
     "kickoff_24h": {
         "en": "Reminder: your Workzap kickoff is {when}.",
         "roman_ur": "Yaad dehani: aap ka Workzap kickoff {when} ko hai.",
+        "ar": "تذكير: موعد اجتماع الانطلاق مع Workzap هو {when}.",
     },
     "kickoff_1h": {
         "en": "Reminder: your Workzap kickoff is {when}.",
         "roman_ur": "Yaad dehani: aap ka Workzap kickoff {when} ko hai.",
+        "ar": "تذكير: موعد اجتماع الانطلاق مع Workzap هو {when}.",
     },
 }
 # Words that would turn a follow-up into pressure (R-FUP-01). A test keeps every message clear.
@@ -166,5 +178,5 @@ def next_map_followup(chat: Chat, now: datetime | None = None) -> Due | None:
 
 def text_for(kind: str, language: str | None, *, n: int = 0, when: str = "") -> str:
     table = MESSAGES[kind]
-    template = table["roman_ur" if language == "roman_ur" else "en"]
+    template = table[fixed_lines.table_language(language, table, persian=True)]
     return template.format(n=n, when=when)

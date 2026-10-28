@@ -13,7 +13,7 @@ from uuid import UUID
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.modules.pi import brain_docs, decisions, flow
+from app.modules.pi import brain_docs, decisions, fixed_lines, flow
 from app.modules.pi.brain_docs_models import PiBrainDocument, PiBrainPayment
 from app.modules.pi.models import PiConversation
 from app.shared.errors import BusinessRuleViolation
@@ -118,10 +118,8 @@ async def confirm(
         conversation.flow_state_since = now
     brief = dict(conversation.service_brief or {})
     brief["payment"] = {"status": "confirmed", "at": now.isoformat(), "reference": reference[:120]}
-    language = (
-        conversation.language
-        if conversation.language in decisions.TEXT["payment_confirmed"]
-        else "en"
+    language = fixed_lines.table_language(
+        conversation.language, decisions.TEXT["payment_confirmed"]
     )
     ids: list[str] = []
     if conversation.last_inbound_at and conversation.last_inbound_at > now - brain_docs.WINDOW:

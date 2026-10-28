@@ -261,7 +261,8 @@ def test_the_meeting_link_survives_the_price_guard():
         "link": "https://meet.jit.si/pi-meeting-43ada63cddd3d2a1",
     }
     text = meeting_message(meeting, "roman_ur")
-    assert "*Monday 12 October, 06:00 PM* (Pakistan time)" in text and meeting["link"] in text
+    # the Roman Urdu message no longer carries the English "Pakistan time"
+    assert "*Monday 12 October, 06:00 PM* (Pakistan ka waqt)" in text and meeting["link"] in text
     reply = f"Your meeting is at {meeting['label']}. Join: {meeting['link']}"
     allowed = allowed_text({"brief": {"meeting": meeting}})
     assert without_blocked_lines(reply, "quote", allowed) == reply

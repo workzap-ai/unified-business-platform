@@ -32,13 +32,41 @@ def test_a_priority_language_line_is_not_the_english_one(lang: str) -> None:
         assert table[lang] != table["en"], (lang, key)
 
 
+# Urdu and Hindi script are answered in Roman Urdu (the chat's reply language), so one chat never
+# mixes scripts; only safety lines keep the person's own script (script=True).
+FIXED_OF = {"ur": "roman_ur", "hi": "roman_ur"}
+
+
 @pytest.mark.parametrize("lang", list(SAMPLES))
 def test_the_language_of_a_message_picks_its_fixed_language(lang: str) -> None:
-    expected = lang
+    expected = FIXED_OF.get(lang, lang)
     assert (
         fixed_lines.code_of_text(SAMPLES[lang], "en" if lang != "roman_ur" else "roman_ur")
         == expected
     )
+
+
+@pytest.mark.parametrize("lang", ["ur", "hi"])
+def test_safety_lines_keep_the_script_the_person_wrote(lang: str) -> None:
+    assert fixed_lines.code_of_text(SAMPLES[lang], "roman_ur", script=True) == lang
+    context = {"reply_language": "roman_ur", "latest_customer_message": SAMPLES[lang]}
+    assert fixed_lines.code(context) == "roman_ur"
+    assert fixed_lines.code(context, script=True) == lang
+
+
+@pytest.mark.parametrize("lang", ["ur", "hi"])
+def test_a_hindi_or_urdu_script_chat_gets_roman_urdu_fixed_lines(lang: str) -> None:
+    context = {"reply_language": "roman_ur", "latest_customer_message": SAMPLES[lang]}
+    roman = fixed_lines.LINES
+    assert opening_line(context) == roman["opening"]["roman_ur"]
+    assert solution_ask.offer_line("roman_ur", context) == roman["offer"]["roman_ur"]
+    assert decisions.cost_answer("roman_ur", context) == roman["cost"]["roman_ur"]
+    text, _ = safety.pii_notice(
+        [safety.Pii.CARD], [], "roman_ur", fixed_lines.code_of_text(SAMPLES[lang], "roman_ur")
+    )
+    assert text == roman["card"]["roman_ur"]
+    for key in ("opening", "offer", "cost", "card", "id", "ai_answer"):
+        assert not re.search(r"[ऀ-ॿ؀-ۿ]", roman[key]["roman_ur"]), key
 
 
 @pytest.mark.parametrize("lang", list(SAMPLES))
@@ -46,10 +74,21 @@ def test_the_opening_the_offer_and_the_cost_answer_follow_the_message(lang: str)
     base = (
         "roman_ur" if lang in ("roman_ur", "ur", "hi") else lang if lang in ("en", "ar") else "en"
     )
+    expected = FIXED_OF.get(lang, lang)
     context = {"reply_language": base, "latest_customer_message": SAMPLES[lang]}
-    assert opening_line(context) == fixed_lines.LINES["opening"][lang]
-    assert solution_ask.offer_line(base, context) == fixed_lines.LINES["offer"][lang]
-    assert decisions.cost_answer(base, context) == fixed_lines.LINES["cost"][lang]
+    assert opening_line(context) == fixed_lines.LINES["opening"][expected]
+    assert solution_ask.offer_line(base, context) == fixed_lines.LINES["offer"][expected]
+    assert decisions.cost_answer(base, context) == fixed_lines.LINES["cost"][expected]
+
+
+def test_table_language_folds_urdu_and_hindi_and_falls_back_to_english() -> None:
+    have = {"en": 1, "roman_ur": 2, "ar": 3}
+    pick = fixed_lines.table_language
+    assert [pick(x, have) for x in ("en", "roman_ur", "ur", "hi", "ar", None, "fr", "fa")] == [
+        "en", "roman_ur", "roman_ur", "roman_ur", "ar", "en", "en", "en",
+    ]  # fmt: skip
+    assert pick("fa", have, persian=True) == "roman_ur"
+    assert pick("ar-SA", have) == "ar"
 
 
 @pytest.mark.parametrize("lang", ["hi", "fr", "fa", "es", "ur"])

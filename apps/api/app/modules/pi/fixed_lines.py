@@ -128,19 +128,21 @@ URDU_ONLY = re.compile(r"[ٹڈڑںھہےۓ]")
 PERSIAN_ONLY = re.compile(r"[پچژگکی]")
 
 
-def code_of_text(text: str | None, base: str | None = None) -> str:
-    """The fixed-line language of what the person wrote: its script (Devanagari is Hindi, Arabic
-    script is Urdu, Persian or Arabic by its letters) or its own French and Spanish words, else
-    `base` (the chat's language) or English."""
+def code_of_text(text: str | None, base: str | None = None, *, script: bool = False) -> str:
+    """The fixed-line language of what the person wrote. Devanagari (Hindi) and Urdu script are
+    answered in Roman Urdu like the rest of that chat (the chat's reply language is `roman_ur`, so
+    one chat never mixes scripts); with `script=True` they keep their own script ("hi", "ur"), which
+    only safety lines use. Persian or Arabic script is told by its letters, French and Spanish by
+    their own words, else `base` (the chat's language) or English."""
     from app.modules.pi.language import latin_other
 
     text = text or ""
     latin = len(re.findall(r"[A-Za-z]", text))
     if len(DEVANAGARI.findall(text)) > latin:
-        return "hi"
+        return "hi" if script else "roman_ur"
     if len(ARABIC.findall(text)) > latin:
         if URDU_ONLY.search(text):
-            return "ur"
+            return "ur" if script else "roman_ur"
         return "fa" if PERSIAN_ONLY.search(text) else "ar"
     other = latin_other(text)
     if other == "French":
@@ -150,15 +152,26 @@ def code_of_text(text: str | None, base: str | None = None) -> str:
     return base if base in LINES["opening"] else "en"
 
 
-def code(context: dict[str, Any]) -> str:
+def code(context: dict[str, Any], *, script: bool = False) -> str:
     """The language the fixed lines of this turn go out in: the language the person asked for or
     wrote ("reply_language_other"), else the script and words of their latest message, else the
-    chat's language."""
+    chat's language. Hindi and Urdu script give Roman Urdu unless `script=True` (emergency lines
+    stay in the person's own script: they are safety-critical)."""
     other = CODES.get(str(context.get("reply_language_other") or ""))
     if other:
         return other
     base = str(context.get("reply_language") or "en")
-    return code_of_text(str(context.get("latest_customer_message") or ""), base)
+    return code_of_text(str(context.get("latest_customer_message") or ""), base, script=script)
+
+
+def table_language(language: str | None, have: Any, *, persian: bool = False) -> str:
+    """The key to use in a table that only has some languages. Urdu and Hindi chats are answered
+    in Roman Urdu (`persian=True` adds Persian, for the follow-up tables); anything else the table
+    has no entry for falls back to English."""
+    key = (language or "en").split("-")[0]
+    if key in ("ur", "hi") or (persian and key == "fa"):
+        key = "roman_ur"
+    return key if key in have else "en"
 
 
 def line(key: str, language: str | None, default: str | None = None) -> str:

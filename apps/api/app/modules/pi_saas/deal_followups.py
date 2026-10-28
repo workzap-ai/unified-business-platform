@@ -1,3 +1,4 @@
+# ruff: noqa: E501  (one message text per row reads better than wrapped Arabic)
 """Automatic follow-ups: pi nudges the customer when a deal goes quiet.
 
     proposal sent, not opened after 2 days      → "your proposal is waiting"
@@ -25,6 +26,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.config import Settings
 from app.modules.billing.models import Invoice
 from app.modules.customers.models import Customer
+from app.modules.pi import fixed_lines
 from app.modules.pi.models import PiConversation, PiMessage
 from app.modules.pi_saas import deals
 from app.modules.pi_saas.deal_models import PiDocument
@@ -47,25 +49,33 @@ TEXTS: dict[str, dict[str, str]] = {
         "roman_ur": "Assalam o alaikum{hi}, yaad dehani: {business} ka proposal {number} "
         "({total}) pichle message mein hai. Yahin reply kar ke accept karein ya changes "
         "batayein.",
+        "ar": "مرحباً{hi}، تذكير لطيف: عرضكم {number} من {business} ({total}) في رسالتنا السابقة. أجيبوا هنا لقبوله أو لطلب تعديلات.",
     },
     "proposal_unanswered": {
         "en": "Hi{hi}, any questions about proposal {number}? Reply here to accept it, or "
         "tell us what you'd like changed.",
-        "roman_ur": "Assalam o alaikum{hi}, proposal {number} ke baare mein koi sawal? Yahin "
-        "reply kar ke accept karein, ya batayein kya change karna hai.",
+        "roman_ur": "Assalam o alaikum{hi}, yahin reply kar ke proposal {number} accept karein, "
+        "ya batayein kya change karna hai. Is ke baare mein koi sawal hai?",
+        "ar": "مرحباً{hi}، أجيبوا هنا لقبول العرض {number}، أو أخبرونا بما تودون تغييره. هل لديكم أي أسئلة بخصوصه؟",
     },
     "invoice_due": {
         "en": "Hi{hi}, a reminder that invoice {number} ({amount}) is due on {due}.{pay}",
         "roman_ur": "Assalam o alaikum{hi}, yaad dehani: invoice {number} ({amount}) ki "
         "aakhri tareekh {due} hai.{pay}",
+        "ar": "مرحباً{hi}، تذكير بأن موعد استحقاق الفاتورة {number} ({amount}) هو {due}.{pay}",
     },
     "invoice_overdue": {
         "en": "Hi{hi}, invoice {number} ({amount}) was due on {due} and is still open.{pay} "
         "Reply here if anything is unclear.",
         "roman_ur": "Assalam o alaikum{hi}, invoice {number} ({amount}) ki tareekh {due} thi "
         "aur payment abhi baqi hai.{pay} Koi masla ho to yahin batayein.",
+        "ar": "مرحباً{hi}، كان موعد استحقاق الفاتورة {number} ({amount}) هو {due} وما زالت مفتوحة.{pay} أجيبوا هنا إن كان هناك أي غموض.",
     },
-    "pay": {"en": "\nPay here: {url}", "roman_ur": "\nYahan pay karein: {url}"},
+    "pay": {
+        "en": "\nPay here: {url}",
+        "roman_ur": "\nYahan pay karein: {url}",
+        "ar": "\nيمكنكم الدفع هنا: {url}",
+    },
 }
 NOTES = {
     "proposal_unopened": "reminded the customer about unopened proposal {number}",
@@ -77,7 +87,7 @@ NOTES = {
 
 def text(key: str, language: str, **values: str) -> str:
     found = TEXTS[key]
-    return found.get(language, found["en"]).format(**values)
+    return found[fixed_lines.table_language(language, found)].format(**values)
 
 
 def key_for(kind: str, doc_id: UUID) -> str:

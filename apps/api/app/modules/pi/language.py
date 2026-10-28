@@ -66,6 +66,7 @@ OTHER_SCRIPTS: tuple[tuple[str, "re.Pattern[str]"], ...] = (
     ("Thai", re.compile(r"[฀-๿]")),
     ("Hebrew", re.compile(r"[֐-׿]")),
     ("Greek", re.compile(r"[Ͱ-Ͽ]")),
+    ("Punjabi (Gurmukhi)", re.compile(r"[਀-੿]")),
 )
 
 

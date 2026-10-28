@@ -1972,7 +1972,8 @@ def _brain_gate(
 
     if (kind := safety.emergency(text)) is not None:
         return fixed(
-            safety.emergency_reply(kind, country, language, fixed_lines.code(context)),
+            # an emergency stays in the person's own script (safety first), unlike other fixed lines
+            safety.emergency_reply(kind, country, language, fixed_lines.code(context, script=True)),
             flow.State.X_EMERGENCY,
             ["emergency"],
             {"emergency": {"kind": kind.value}},
@@ -5516,7 +5517,7 @@ def greeting_reply(context: dict[str, Any]) -> str:
     name = str((context.get("customer_profile") or {}).get("name") or "").split(" ")[0]
     name = name.rstrip(".,")  # "Dalal&Co." -> "Hi Dalal&Co.", never "Co.."
     roman = context.get("reply_language") == "roman_ur"
-    greeting = "Salam" if roman else "Hi"  # no English greeting in a Roman Urdu chat
+    greeting = "Hi"  # "Hi" is ordinary in Roman Urdu too (the established greeting, kept)
     hello = f"{greeting} {name}." if name and not PLACEHOLDER_NAME.search(name) else f"{greeting}."
     brief = context.get("brief") or {}
     open_project = next(

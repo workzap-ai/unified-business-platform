@@ -23,7 +23,7 @@ from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.modules.notifications.service import notify
-from app.modules.pi import flow, followup_policy, map_builder, map_share
+from app.modules.pi import fixed_lines, flow, followup_policy, map_builder, map_share
 from app.modules.pi.box_models import PiMapVersion
 from app.modules.pi.configuration import settings_row
 from app.modules.pi.followups import (
@@ -104,7 +104,11 @@ def chat_of(
 
 
 def language_of(conversation: PiConversation) -> str:
-    return "roman_ur" if (conversation.language or "") == "roman_ur" else "en"
+    """The language of the follow-up text and of its template: Roman Urdu for Roman Urdu, Urdu,
+    Hindi and Persian chats, Arabic for Arabic, English for the rest."""
+    return fixed_lines.table_language(
+        conversation.language, followup_policy.MESSAGES["silent"], persian=True
+    )
 
 
 def when_label(at: datetime, timezone: str) -> str:

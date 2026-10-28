@@ -23,7 +23,14 @@ from app.modules.pi.language import ENGLISH
 
 TABLES = {
     "constitution": ("OPENING", "AI_ANSWER", "FALLBACK_LISTENING", "FALLBACK_OTHER", "FIRST_INVITE"),
-    "decisions": ("TEXT", "CONSENT_ASK", "COST_ANSWER"),
+    "decisions": ("TEXT", "CONSENT_ASK", "COST_ANSWER", "OFFER_BUTTONS", "DECISION_BUTTONS"),
+    "buttons": ("CONSENT", "FOLLOW_UP"),
+    "map_share": (
+        "QUESTIONS", "BUTTONS", "RETURN_OPEN", "RETURN_QUESTION", "RETURN_STALE", "DASHBOARD_LINE",
+        "CHANGED", "FOLLOWUP",
+    ),
+    "pi_saas.meetings": ("MEETING_WORDS", "ZONE_WORDS"),
+    "pi_saas.deal_followups": ("TEXTS",),
     "safety": (
         "EMERGENCY_TEXT", "PII_TEXT", "ADVICE_TEXT", "HANDBACK_TEXT", "OPT_OUT_TEXT", "IDENTITY_TEXT",
         "BOUNDARY_TEXT", "ASKS_WHAT_PROBLEM", "ENQUIRY_TEXT", "NORI_TEXT", "ABUSE_TEXT", "NOT_SERVED_TEXT",
@@ -76,7 +83,8 @@ def roman_urdu(value):
 def shipped_lines() -> list[tuple[str, str]]:
     lines = []
     for module, names in TABLES.items():
-        mod = importlib.import_module(f"app.modules.pi.{module}")
+        package = "app.modules" if module.startswith("pi_saas.") else "app.modules.pi"
+        mod = importlib.import_module(f"{package}.{module}")
         for name in names:
             table = getattr(mod, name)
             found = list(roman_urdu(table if isinstance(table, dict) else {}))
@@ -101,6 +109,14 @@ def ids(lines):
 
 def test_there_are_at_least_twenty_roman_urdu_lines_to_check():
     assert len(LINES) >= 20, len(LINES)
+
+
+def test_the_scan_reaches_the_follow_up_button_meeting_and_nudge_tables():
+    sources = {src.split(".")[0] if "." not in src.split(":")[0] else src for src, _ in LINES}
+    for expected in ("buttons.FOLLOW_UP", "map_share.FOLLOWUP", "pi_saas.meetings.MEETING_WORDS",
+                     "pi_saas.deal_followups.TEXTS", "decisions.DECISION_BUTTONS",
+                     "followup_policy.MESSAGES"):  # fmt: skip
+        assert expected in sources, expected
 
 
 @pytest.mark.parametrize(("source", "text"), LINES, ids=ids(LINES))

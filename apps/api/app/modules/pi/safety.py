@@ -2230,16 +2230,29 @@ def enquiry_reply(kind: Enquiry, language: str | None) -> str:
 # --- a language pi cannot read yet (RT19): graceful, never mocking ---------------------------------
 
 PASHTO_LETTERS = re.compile("[\u067c\u0689\u0693\u0696\u069a\u06bc\u06cd\u06d0]")
+# Sindhi writes Arabic script with letters Urdu does not use (the implosives and nasals).
+SINDHI_LETTERS = re.compile(
+    "[\u067b\u067f\u0680\u0683\u0684\u0687\u068a\u068c\u068d\u068f\u06a6\u06aa\u06b1\u06b3\u06bb\u0699]"
+)
+GURMUKHI = re.compile("[\u0a00-\u0a7f]")  # Punjabi written in Gurmukhi
+# One polite line for Pashto, Punjabi (Gurmukhi) and Sindhi: the English part keeps "I can't read
+# Pashto well yet" (the first language people write it in). The Roman Urdu part is gender-neutral.
 UNSUPPORTED_TEXT = (
-    "I can't read Pashto well yet, and I'd rather not guess. Please write to me in English or "
-    "Urdu (Roman or script) and I'll note everything you tell me. "
-    "Main abhi Pashto theek se nahi padh sakta. Meherbani karke English ya Urdu mein likhein."
+    "I can't read Pashto well yet, and the same goes for Punjabi and Sindhi, and I'd rather not "
+    "guess. Please write to me in English or Urdu (Roman or script) and I'll note everything you "
+    "tell me. "
+    "Abhi mere liye Pashto, Punjabi aur Sindhi theek se padhna mushkil hai. Meherbani karke "
+    "English ya Urdu mein likhein."
 )
 
 
 def unsupported_language(text: str) -> bool:
-    """Pashto, which uses letters Urdu does not: two or more of them in the message."""
-    return len(PASHTO_LETTERS.findall(text or "")) >= 2
+    """Pashto, Sindhi or Punjabi in Gurmukhi: letters Urdu does not use, two or more of them in
+    the message. (Punjabi in Shahmukhi reads as Urdu script and is answered as Urdu.)"""
+    text = text or ""
+    return any(
+        len(pattern.findall(text)) >= 2 for pattern in (PASHTO_LETTERS, SINDHI_LETTERS, GURMUKHI)
+    )
 
 
 # --- questions about nori, answered from the approved facts only (spec 0.4, 6.9, golden G15) -------
@@ -2394,7 +2407,7 @@ OPT_OUT_PHRASE = re.compile(
     r"|\b(?:pl(?:ea)?se|pls|plz)?\s*(?:do(?:n'?t| not)|dont|never)\s+(?:msg|message|text|contact|write(?: to)?|"
     r"whatsapp|call)\s+me(?:\s+again|\s+anymore|\s+any more)?\b"
     r"|\b(?:leave me alone|stop (?:messaging|texting|contacting|writing to) me|no more messages|"
-    r"remove me from (?:the |your )?(?:list|chat)|band karo|band kar do|mujhe message na karo|"
+    r"remove me from (?:the |your )?(?:list|chat)|band karo|band kar do|reminders? band kar(?:ein|do)|mujhe message na karo|"
     r"mujhe msg mat karo|dobara message mat karo)\b"
     r"|(?:لا ترسل لي|توقف عن (?:مراسلتي|الإرسال)|دعني وشأني)|(?:مجھے میسج نہ کریں|مجھے تنگ نہ کریں|میسج بند کریں)",
     re.IGNORECASE,

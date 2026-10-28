@@ -15,7 +15,7 @@ from datetime import date
 from enum import StrEnum
 from typing import Any
 
-from app.modules.pi import box
+from app.modules.pi import box, fixed_lines
 from app.modules.pi.flow import State
 
 YES_AT = 0.9  # an explicit yes needs this much confidence to start anything
@@ -210,14 +210,17 @@ TEXT: dict[str, dict[str, str]] = {
             "sakte hain. Document mein likha hota hai ke Workzap kya banayega, aasan lafzon "
             "mein. Quote mein kharcha aur waqt hota hai. Ye ek offer hai, charge nahi."
         ),
+        "ar": fixed_lines.LINES["offer"]["ar"],
     },
     "ask_all_or_some": {
         "en": "Should it cover all of these, or only some?",
         "roman_ur": "Kya ye sab ke liye ho, ya sirf kuch ke liye?",
+        "ar": "هل يشمل ذلك كل هذه المشكلات أم بعضها فقط؟",
     },
     "confirm_go": {
         "en": "Shall I go ahead and ask Workzap to prepare them?",
         "roman_ur": "Kya main Workzap se inhe tayyar karne ko keh dun?",
+        "ar": "هل أطلب من Workzap تجهيزها؟",
     },
     "preparing": {
         "en": (
@@ -228,18 +231,22 @@ TEXT: dict[str, dict[str, str]] = {
             "Shukriya. Maine Workzap se aap ka solution document aur quote tayyar karne ko "
             "keh diya hai. Tayyar hote hi yahin bhej diya jayega."
         ),
+        "ar": ("طلبت من Workzap تجهيز وثيقة الحل وعرض السعر. سأرسلهما هنا فور أن يصبحا جاهزين."),
     },
     "declined": {
         "en": "No problem. Everything you've told me is kept here if you change your mind.",
         "roman_ur": "Koi baat nahi. Jo aap ne bataya hai wo yahin mehfooz hai, agar ray badle.",
+        "ar": "لا بأس. كل ما أخبرتموني به محفوظ هنا إن غيرتم رأيكم.",
     },
     "later": {
         "en": "No rush. I'll keep what you've told me. Come back whenever.",
         "roman_ur": "Koi jaldi nahi. Jo aap ne bataya hai wo mehfooz hai. Jab marzi wapas aayein.",
+        "ar": "لا استعجال. سأحتفظ بما أخبرتموني به. عودوا في أي وقت.",
     },
     "re_offer": {
         "en": "Sure. Shall I ask Workzap to prepare the solution document and quote for these?",
         "roman_ur": "Zaroor. Kya main Workzap se in ke liye solution document aur quote banwa dun?",
+        "ar": "بكل سرور. هل أطلب من Workzap تجهيز وثيقة الحل وعرض السعر لهذه المشكلات؟",
     },
     "member": {
         "en": (
@@ -249,6 +256,9 @@ TEXT: dict[str, dict[str, str]] = {
         "roman_ur": (
             "Maine note kar liya hai ke aap ye chahte hain. {business} ke owner ko quote par "
             "haan kehna hoga, wo mujhe seedha workzap.ai/pi/talk-to-pi par message kar sakte hain."
+        ),
+        "ar": (
+            "سجلت أنكم ترغبون في ذلك. يلزم أن يوافق مالك {business} على عرض السعر، ويمكنه مراسلتي مباشرة عبر workzap.ai/pi/talk-to-pi."
         ),
     },
     "member_ask": {
@@ -264,10 +274,14 @@ TEXT: dict[str, dict[str, str]] = {
             "hain, ya main wo link aap ko de dun. Kya document faisla karne wale ko bhejna "
             "chahiye, aur aap unhein kaise shamil karna chahenge?"
         ),
+        "ar": (
+            "سجلت أنكم ترغبون في ذلك. يلزم أن يوافق مالك {business} على عرض السعر، ويمكنه مراسلتي مباشرة عبر workzap.ai/pi/talk-to-pi، أو أعطيكم الرابط لتمرروه إليه. هل ترسل الوثيقة إلى صاحب القرار، وكيف تودون إشراكه؟"
+        ),
     },
     "confirm_approval": {
         "en": "Just to confirm: you approve quote {quote} for {total}. Is that right?",
         "roman_ur": "Bas confirm karne ke liye: aap quote {quote} {total} ke liye manzoor karte hain. Theek hai?",
+        "ar": "للتأكد فقط: أنتم توافقون على عرض السعر {quote} بمبلغ {total}. هل هذا صحيح؟",
     },
     "approved": {
         "en": (
@@ -280,18 +294,24 @@ TEXT: dict[str, dict[str, str]] = {
             "aap ke approved quote par hain. Transfer aane par Workzap yahin confirm karega. "
             "Meherbani karke is chat mein card ki details ya payment na bhejein."
         ),
+        "ar": (
+            "للبدء، يتم الدفع بالتحويل المصرفي. التفاصيل المصرفية موجودة في عرض السعر المعتمد. ستؤكد Workzap هنا عند وصول التحويل. يرجى عدم إرسال بيانات البطاقة أو أي مدفوعات في هذه المحادثة."
+        ),
     },
     "approval_dropped": {
         "en": "Okay, I haven't approved anything. Would you like to approve, ask for changes, or say no?",
         "roman_ur": "Theek hai, maine kuch manzoor nahi kiya. Aap manzoor karna chahenge, tabdeeli maangenge, ya nahi kahenge?",
+        "ar": "حسناً، لم أوافق على أي شيء. هل تودون الموافقة، أم طلب تعديلات، أم الرفض؟",
     },
     "changes": {
         "en": "What would you like changed?",
         "roman_ur": "Aap kya badalna chahte hain?",
+        "ar": "ما الذي تودون تغييره؟",
     },
     "changes_noted": {
         "en": "Noted: {changes}. I've sent this to Workzap. They'll send a revised version here.",
         "roman_ur": "Note kar liya: {changes}. Maine ye Workzap ko bhej diya hai. Wo yahin nayi version bhejenge.",
+        "ar": "سجلت: {changes}. أرسلت هذا إلى Workzap وسترسل نسخة معدلة هنا.",
     },
     "quote_declined": {
         "en": (
@@ -303,10 +323,14 @@ TEXT: dict[str, dict[str, str]] = {
             "Koi baat nahi. Kuch charge nahi hoga. Jo aap ne bataya hai wo yahin rahega. "
             "Agar wajah batana chahein to Workzap ke liye madadgar hai, lekin zaroori nahi."
         ),
+        "ar": (
+            "لا بأس. لن يُحتسب أي مبلغ. كل ما أخبرتموني به يبقى هنا إن أردتم العودة إليه. وإن شئتم ذكر السبب فهذا يفيد Workzap، لكنه ليس مطلوباً."
+        ),
     },
     "payment_claimed": {
         "en": "Thanks. The Workzap team will confirm here when the transfer arrives.",
         "roman_ur": "Shukriya. Transfer aane par Workzap ki team yahin confirm karegi.",
+        "ar": "سيؤكد فريق Workzap هنا عند وصول التحويل.",
     },
     "payment_confirmed": {
         "en": (
@@ -317,18 +341,22 @@ TEXT: dict[str, dict[str, str]] = {
             "Workzap ne aap ka transfer confirm kar diya hai. Shukriya. Shuru karne ke liye kya "
             "hum tafseelat tay karne ke liye kickoff call book karein?"
         ),
+        "ar": ("أكدت Workzap وصول تحويلكم. للبدء، هل نحجز مكالمة انطلاق للاتفاق على التفاصيل؟"),
     },
     "expired_quote": {
         "en": "That quote is past its valid-until date, so it can't be approved as it stands. I've asked Workzap to send a refreshed one.",
         "roman_ur": "Is quote ki aakhri tareekh guzar chuki hai, isliye ye is haal mein approve nahi ho sakta. Maine Workzap se naya quote bhejne ko kaha hai.",
+        "ar": "انتهت صلاحية عرض السعر هذا، لذلك لا يمكن اعتماده كما هو. طلبت من Workzap إرسال عرض محدث.",
     },
     "after_payment": {
         "en": "I'll pass this to the Workzap team now. They'll reply here.",
         "roman_ur": "Ye Workzap ki team ko bhej diya gaya hai. Wo yahin jawab dein ge.",
+        "ar": "سأحيل هذا الآن إلى فريق Workzap وسيردّون هنا.",
     },
     "cancelled": {
         "en": "That's fine. Nothing is charged. I've told Workzap.",
         "roman_ur": "Koi baat nahi. Kuch charge nahi hoga. Maine Workzap ko bata diya hai.",
+        "ar": "لا بأس. لن يُحتسب أي مبلغ. أبلغت Workzap.",
     },
 }
 
@@ -341,19 +369,21 @@ CONSENT_ASK = {
     "en": "Can I message you here when there's an update, or if we need anything from you?",
     "roman_ur": "Kya hum aap ko yahan message kar sakte hain jab koi update ho, ya hamein "
     "aap se kuch chahiye ho?",
+    "ar": "هل يمكننا مراسلتكم هنا عند وجود تحديث، أو إذا احتجنا إلى شيء منكم؟",
 }
 
 
 def text(key: str, language: str | None, **values: str) -> str:
     options = TEXT[key]
-    return options.get(language or "en", options["en"]).format(**values)
+    return options[fixed_lines.table_language(language, options)].format(**values)
 
 
 def with_consent(reply: str, language: str | None, facts: dict[str, Any]) -> str:
     """Add the reminder permission question to a fixed reply, once, when it is still unknown."""
     if not facts.get("ask_consent") or "?" in reply:
         return reply
-    return f"{reply.rstrip()} {CONSENT_ASK.get(language or 'en', CONSENT_ASK['en'])}"
+    ask = CONSENT_ASK[fixed_lines.table_language(language, CONSENT_ASK)]
+    return f"{reply.rstrip()} {ask}"
 
 
 def buttons_for(body: str) -> list[str] | None:
@@ -781,6 +811,7 @@ COST_ANSWER = {
         "Kharcha is par depend karta hai ke kya banaya jaye. Woh quote par likha hota hai, aap ke "
         "faisle se pehle, aur quote muft hai, koi charge nahi."
     ),
+    "ar": fixed_lines.LINES["cost"]["ar"],
 }
 
 
@@ -803,9 +834,7 @@ def cost_asked(text: str) -> bool:
 
 def cost_answer(language: str | None, context: dict[str, Any] | None = None) -> str:
     """An honest answer with no figure and no range, given before the summary or the offer."""
-    from app.modules.pi import fixed_lines
-
-    base = COST_ANSWER["roman_ur"] if language == "roman_ur" else COST_ANSWER["en"]
+    base = COST_ANSWER[fixed_lines.table_language(language, COST_ANSWER)]
     if context is None:
         return base
     return fixed_lines.line("cost", fixed_lines.code(context), base)

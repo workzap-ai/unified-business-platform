@@ -132,8 +132,12 @@ MAX_CHANGE_LABELS = 3
 
 
 def pick(table: dict[str, Any], language: str | None) -> Any:
-    """The entry for this language, English when pi has none for it."""
-    return table.get((language or "en").split("-")[0], table["en"])
+    """The entry for this language, English when pi has none for it. A Urdu or Hindi chat is
+    answered in Roman Urdu like every other line of that chat (one script per chat)."""
+    key = (language or "en").split("-")[0]
+    if key in ("ur", "hi") and "roman_ur" in table:
+        key = "roman_ur"
+    return table.get(key, table["en"])
 
 
 def question(language: str | None, shared_before: int = 0) -> str:

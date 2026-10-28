@@ -17,21 +17,21 @@ def roman(**over):
     }
 
 
-def test_the_plain_return_is_salam_not_hi() -> None:
+def test_the_plain_return_keeps_the_usual_hi() -> None:
     text = greeting_reply(roman())
-    assert text.startswith("Salam Ali.") and "Bataiye" in text and text.count("?") <= 1
+    assert text.startswith("Hi Ali.") and "Bataiye" in text and text.count("?") <= 1
 
 
 def test_an_open_project_is_offered_in_roman_urdu() -> None:
     text = greeting_reply(
         roman(brief={"projects": [{"title": "stock register", "status": "collecting"}]})
     )
-    assert text == "Salam Ali. Kya hum stock register par aage barhein?"
+    assert text == "Hi Ali. Kya hum stock register par aage barhein?"
 
 
 def test_an_active_deal_update_is_offered_in_roman_urdu() -> None:
     one = greeting_reply(roman(project_deals=[{"project": "gaam ka app", "stage": "won"}]))
-    assert one == "Salam Ali. Kya aap gaam ka app ka update chahte hain, ya koi nayi baat hai?"
+    assert one == "Hi Ali. Kya aap gaam ka app ka update chahte hain, ya koi nayi baat hai?"
     many = greeting_reply(
         roman(project_deals=[{"project": "a", "stage": "won"}, {"project": "b", "stage": "won"}])
     )
