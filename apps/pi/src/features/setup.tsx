@@ -51,7 +51,6 @@ export const LANGUAGES: [string, string][] = [
   ["ar", "Arabic"],
   ["ur", "Urdu"],
   ["roman_ur", "Roman Urdu"],
-  ["hi", "Hindi"],
   ["es", "Spanish"],
   ["fr", "French"],
   ["de", "German"],

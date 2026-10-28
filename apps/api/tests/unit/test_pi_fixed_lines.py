@@ -91,14 +91,14 @@ def test_table_language_folds_urdu_and_hindi_and_falls_back_to_english() -> None
     assert pick("ar-SA", have) == "ar"
 
 
-@pytest.mark.parametrize("lang", ["hi", "fr", "fa", "es", "ur"])
+@pytest.mark.parametrize("lang", ["fr", "fa", "es", "ur"])
 def test_a_language_asked_for_by_name_gets_its_fixed_lines(lang: str) -> None:
     name = {v: k for k, v in fixed_lines.CODES.items()}[lang]
     context = {"reply_language_other": name, "latest_customer_message": "ok"}
     assert fixed_lines.code(context) == lang
 
 
-@pytest.mark.parametrize("lang", ["ur", "hi", "fr", "fa", "es"])
+@pytest.mark.parametrize("lang", ["ur", "fr", "fa", "es"])
 def test_the_emergency_answer_is_in_the_language_with_the_local_numbers(lang: str) -> None:
     for kind in (
         safety.Emergency.FIRE,
@@ -120,7 +120,7 @@ def test_an_emergency_in_english_is_unchanged() -> None:
     )
 
 
-@pytest.mark.parametrize("lang", ["ur", "hi", "fr", "fa", "es", "ar"])
+@pytest.mark.parametrize("lang", ["ur", "fr", "fa", "es", "ar"])
 def test_the_card_and_id_reminders_follow_the_language(lang: str) -> None:
     text, told = safety.pii_notice([safety.Pii.CARD, safety.Pii.ID], [], "en", lang)
     assert fixed_lines.LINES["card"][lang] in text and fixed_lines.LINES["id"][lang] in text
@@ -146,14 +146,14 @@ def every_line(lang: str) -> list[str]:
     return lines + list(fixed_lines.EMERGENCY.get(lang, {}).values())
 
 
-@pytest.mark.parametrize("lang", ["hi", "ur"])
+@pytest.mark.parametrize("lang", ["ur"])
 def test_no_hindi_or_urdu_fixed_line_has_a_gendered_first_person_form(lang: str) -> None:
     """R-GEN-01: pi has no gender, so no 'main ... sakta/sakti' style verb."""
     for text in every_line(lang):
         assert not GENDERED[lang].search(text), text
 
 
-@pytest.mark.parametrize("lang", ["hi", "ur"])
+@pytest.mark.parametrize("lang", ["ur"])
 def test_a_quote_is_a_quotation_not_a_coat(lang: str) -> None:
     for text in every_line(lang):
         assert not WRONG_QUOTE[lang].search(text), text
@@ -164,3 +164,16 @@ def test_no_french_or_spanish_line_is_gendered_by_agreement(lang: str) -> None:
     said = re.compile(r"\b(?:je suis|j'ai été|soy|estoy)\s+(?!pi\b|une\b|un\b|una\b)\w+", re.I)
     for text in every_line(lang):
         assert not said.search(text), text
+
+
+def test_hindi_has_no_fixed_texts_but_keeps_its_emergency_line() -> None:
+    # the owner removed Hindi from pi's texts (2026-10-28): understood, answered in Roman Urdu; an
+    # emergency is still told in Hindi (it is about someone's safety)
+    from app.modules.pi import fixed_lines
+
+    assert "hi" not in fixed_lines.PRIORITY
+    for table in fixed_lines.LINES.values():
+        assert "hi" not in table
+    assert "hi" in fixed_lines.EMERGENCY and "hi" in fixed_lines.LOCAL_NUMBER
+    assert fixed_lines.code_of_text("मेरी दुकान में माल खत्म हो जाता है") == "roman_ur"
+    assert fixed_lines.code_of_text("आग लगी है", script=True) == "hi"

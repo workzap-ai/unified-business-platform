@@ -11,8 +11,8 @@ has no line for here comes from the older per-file tables, and from English last
 import re
 from typing import Any
 
-PRIORITY = ("en", "roman_ur", "ur", "ar", "hi", "fr", "fa", "es")
-CODES = {"Persian": "fa", "French": "fr", "Spanish": "es", "Hindi": "hi", "Urdu": "ur"}
+PRIORITY = ("en", "roman_ur", "ur", "ar", "fr", "fa", "es")
+CODES = {"Persian": "fa", "French": "fr", "Spanish": "es", "Urdu": "ur"}
 
 LINES: dict[str, dict[str, str]] = {
     "opening": {
@@ -20,7 +20,6 @@ LINES: dict[str, dict[str, str]] = {
         "roman_ur": "Hi, main pi hoon, Workzap ka AI.",
         "ur": "ہیلو، میں pi ہوں، Workzap کی طرف سے ایک مصنوعی ذہانت۔",
         "ar": "مرحباً، أنا pi، ذكاء اصطناعي من Workzap.",
-        "hi": "नमस्ते, मैं pi हूँ, Workzap का एक AI।",
         "fr": "Bonjour, je suis pi, une IA de Workzap.",
         "fa": "سلام، من pi هستم، یک هوش مصنوعی از Workzap.",
         "es": "Hola, soy pi, una IA de Workzap.",
@@ -30,7 +29,6 @@ LINES: dict[str, dict[str, str]] = {
         "roman_ur": "Main AI hoon, insaan nahi. Main pi hoon, Workzap se.",
         "ur": "میں ایک مصنوعی ذہانت ہوں، انسان نہیں۔ میں pi ہوں، Workzap سے۔",
         "ar": "أنا ذكاء اصطناعي، ولست إنساناً. أنا pi من Workzap.",
-        "hi": "मैं एक AI हूँ, इंसान नहीं। मैं Workzap का pi हूँ।",
         "fr": "Je suis une IA, pas une personne. Je suis pi, de Workzap.",
         "fa": "من یک هوش مصنوعی هستم، نه یک انسان. من pi از Workzap هستم.",
         "es": "Soy una IA, no una persona. Soy pi, de Workzap.",
@@ -40,7 +38,6 @@ LINES: dict[str, dict[str, str]] = {
         "roman_ur": "Kya main in sab ke liye ek solution document aur quote banwa doon? Mana bhi kar sakte hain.",
         "ur": "کیا میں ان سب کے لیے ایک حل کی دستاویز اور کوٹیشن بنوا دوں؟ آپ منع بھی کر سکتے ہیں۔",
         "ar": "هل أجهّز لكل هذه المشكلات وثيقة حل واحدة وعرض سعر؟ يمكنك أن تقول لا.",
-        "hi": "क्या मैं इन सभी के लिए एक समाधान दस्तावेज़ और कोटेशन बनवा दूँ? आप मना भी कर सकते हैं।",
         "fr": "Souhaitez-vous que je fasse préparer un seul document de solution et un devis pour l'ensemble ? Vous pouvez dire non.",
         "fa": "آیا مایلید برای همه این‌ها یک سند راه‌حل و یک پیش‌فاکتور آماده کنم؟ می‌توانید نه بگویید.",
         "es": "¿Quiere que prepare un documento de solución y un presupuesto para todo esto junto? Puede decir que no.",
@@ -50,7 +47,6 @@ LINES: dict[str, dict[str, str]] = {
         "roman_ur": "Meherbani karke yahan card number na bhejein. Mujhe in ki zaroorat nahi, aur payment is chat mein kabhi nahi hoti. Maine ise apne notes se nikaal diya hai.",
         "ur": "براہِ مہربانی یہاں کارڈ نمبر نہ بھیجیں۔ مجھے ان کی ضرورت نہیں، اور ادائیگی اس چیٹ میں کبھی نہیں ہوتی۔ میں نے اسے اپنے نوٹس سے نکال دیا ہے۔",
         "ar": "يرجى عدم إرسال أرقام البطاقات هنا. لا أحتاج إليها أبدًا، والدفع لا يتم أبدًا في هذه المحادثة. لقد أبقيتها خارج ملاحظاتي.",
-        "hi": "कृपया यहाँ कार्ड नंबर न भेजें। मुझे इनकी ज़रूरत नहीं है, और भुगतान इस चैट में कभी नहीं होता। मैंने इसे अपने नोट्स से हटा दिया है।",
         "fr": "Merci de ne pas envoyer de numéros de carte ici. Je n'en ai jamais besoin, et le paiement ne se fait jamais dans ce chat. Je l'ai laissé de côté dans mes notes.",
         "fa": "لطفاً شماره کارت را اینجا نفرستید. من هرگز به آن نیاز ندارم و پرداخت هیچ‌گاه در این گفتگو انجام نمی‌شود. آن را از یادداشت‌هایم کنار گذاشته‌ام.",
         "es": "Por favor, no envíe números de tarjeta aquí. Nunca los necesito, y el pago nunca se hace en este chat. Lo he dejado fuera de mis notas.",
@@ -60,7 +56,6 @@ LINES: dict[str, dict[str, str]] = {
         "roman_ur": "Meherbani karke yahan ID number na bhejein. Mujhe in ki zaroorat nahi. Maine ise apne notes se nikaal diya hai.",
         "ur": "براہِ مہربانی یہاں شناختی نمبر نہ بھیجیں۔ مجھے ان کی ضرورت نہیں۔ میں نے اسے اپنے نوٹس سے نکال دیا ہے۔",
         "ar": "يرجى عدم إرسال أرقام الهوية هنا. لا أحتاج إليها. لقد أبقيتها خارج ملاحظاتي.",
-        "hi": "कृपया यहाँ पहचान-पत्र (ID) नंबर न भेजें। मुझे इनकी ज़रूरत नहीं है। मैंने इसे अपने नोट्स से हटा दिया है।",
         "fr": "Merci de ne pas envoyer de numéros de pièce d'identité ici. Je n'en ai pas besoin. Je l'ai laissé de côté dans mes notes.",
         "fa": "لطفاً شماره مدارک شناسایی را اینجا نفرستید. به آن نیازی ندارم. آن را از یادداشت‌هایم کنار گذاشته‌ام.",
         "es": "Por favor, no envíe números de documentos de identidad aquí. No los necesito. Lo he dejado fuera de mis notas.",
@@ -70,7 +65,6 @@ LINES: dict[str, dict[str, str]] = {
         "roman_ur": "Kharcha is par depend karta hai ke kya banaya jaye. Woh quote par likha hota hai, aap ke faisle se pehle, aur quote muft hai, koi charge nahi.",
         "ur": "لاگت اس پر منحصر ہے کہ کیا بنایا جائے۔ وہ آپ کے فیصلے سے پہلے کوٹیشن پر لکھی ہوتی ہے، اور کوٹیشن مفت ہے، کوئی چارج نہیں۔",
         "ar": "تعتمد التكلفة على ما سيتم بناؤه. تُكتب في عرض السعر قبل أن تقرر، وعرض السعر مجاني وليس رسمًا.",
-        "hi": "लागत इस पर निर्भर करती है कि क्या बनाया जाएगा। वह आपके फ़ैसले से पहले कोटेशन पर लिखी होती है, और कोटेशन मुफ़्त है, कोई शुल्क नहीं।",
         "fr": "Le coût dépend de ce qui serait construit. Il est écrit sur le devis avant que vous décidiez, et le devis est gratuit, ce n'est pas un paiement.",
         "fa": "هزینه به این بستگی دارد که چه چیزی ساخته شود. پیش از تصمیم شما روی پیش‌فاکتور نوشته می‌شود و پیش‌فاکتور رایگان است، نه یک هزینه.",
         "es": "El coste depende de lo que se construiría. Está escrito en el presupuesto antes de que usted decida, y el presupuesto es gratis, no es un cobro.",
