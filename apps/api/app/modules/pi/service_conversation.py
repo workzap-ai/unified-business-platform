@@ -5515,7 +5515,9 @@ def greeting_reply(context: dict[str, Any]) -> str:
         )
     name = str((context.get("customer_profile") or {}).get("name") or "").split(" ")[0]
     name = name.rstrip(".,")  # "Dalal&Co." -> "Hi Dalal&Co.", never "Co.."
-    hello = f"Hi {name}." if name and not PLACEHOLDER_NAME.search(name) else "Hi."
+    roman = context.get("reply_language") == "roman_ur"
+    greeting = "Salam" if roman else "Hi"  # no English greeting in a Roman Urdu chat
+    hello = f"{greeting} {name}." if name and not PLACEHOLDER_NAME.search(name) else f"{greeting}."
     brief = context.get("brief") or {}
     open_project = next(
         (
@@ -5532,14 +5534,19 @@ def greeting_reply(context: dict[str, Any]) -> str:
         if d.get("stage") not in {"lost", "brief"} and d.get("status") != "delivered"
     ]
     if active:
+        if roman:
+            which = active[0] if len(active) == 1 else "apne projects"
+            return f"{hello} Kya aap {which} ka update chahte hain, ya koi nayi baat hai?"
         which = f"your {active[0]}" if len(active) == 1 else "your projects"
         return (
             f"{hello} Would you like an update on {which}, or is there something new I "
             "can help with?"
         )
     if open_project:
+        if roman:
+            return f"{hello} Kya hum {open_project} par aage barhein?"
         return f"{hello} Shall we carry on with your {open_project}?"
-    if context.get("reply_language") == "roman_ur":
+    if roman:
         return f"{hello} Bataiye, aap ke business mein kya masla hai?"
     return f"{hello} How can I help you today?"
 
