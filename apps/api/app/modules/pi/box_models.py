@@ -80,6 +80,7 @@ class PiSolutionBox(WorkspaceRow):
     version: Mapped[int] = mapped_column(Integer, default=1, server_default="1")
     parent_box_id: Mapped[UUID | None] = mapped_column(Uuid, nullable=True)
     reviewer: Mapped[str | None] = mapped_column(String(120), nullable=True)
+    offered_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
 
 
 class PiOfferLog(WorkspaceRow):
@@ -96,3 +97,22 @@ class PiOfferLog(WorkspaceRow):
     rule: Mapped[str] = mapped_column(String(2))
     allowed: Mapped[bool] = mapped_column(Boolean)
     blocked_reason: Mapped[str | None] = mapped_column(Text, nullable=True)
+
+
+class PiBoxTransition(WorkspaceRow):
+    """One legal move of a Solution Box (spec 5.3): who moved it, from where, to where, and why.
+    The time is created_at. Rows are only added, never changed."""
+
+    __tablename__ = "pi_box_transitions"
+    __table_args__ = workspace_args(
+        "pi_box_transitions",
+        scoped_fk("pi_box_transitions", "box_id", "pi_solution_boxes"),
+        Index("ix_pi_box_transitions_box", "tenant_id", "environment_id", "box_id"),
+        CheckConstraint(_in("actor", box.ACTORS), name="actor"),
+    )
+    box_id: Mapped[UUID] = mapped_column(Uuid)
+    from_state: Mapped[str] = mapped_column(String(16))
+    to_state: Mapped[str] = mapped_column(String(16))
+    actor: Mapped[str] = mapped_column(String(8))
+    actor_ref: Mapped[str | None] = mapped_column(String(120), nullable=True)
+    reason: Mapped[str] = mapped_column(Text, default="", server_default="")

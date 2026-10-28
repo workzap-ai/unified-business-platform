@@ -69,6 +69,7 @@ from app.modules.pi import (
     taxonomy,
     think_plan,
     think_prompt,
+    turn_coverage,
     value_line,
     warmup,
 )
@@ -1600,6 +1601,10 @@ async def brain_problems(
         # they gave a link) rides on the message and is removed before the model sees the context.
         said_now = message.body or ""
         context["warmup"] = {"enabled": True}
+        from app.modules.pi import business_profile_store
+
+        # the stored profile wins over the brief; its confirmed facts ground ideas (G2)
+        await business_profile_store.sync_context(session, scope, conversation, context)
         context["greeting_only"] = bool(english_greeting(said_now) or returning_greeting(said_now))
         if (message.media or {}).get("page_look"):
             context["page_look"] = message.media["page_look"]
@@ -2874,6 +2879,7 @@ async def brain_free_ideas(
             (solutions.load(keys[0]) or {}).get("problems") or [] if keys else [],
             keys[:1],
         )
+    idea_ctx = idea_filter.with_grounding(idea_ctx, str(context.get("profile_grounding") or ""))
     report: dict[str, Any] = {}
     if expert and await brain_expert_ideas(
         manager,
@@ -3307,6 +3313,11 @@ async def apply_decision(
             brief.pop(key, None)
         else:
             brief[key] = value
+    from app.modules.pi import box_lifecycle  # Solution Box lifecycle; a no-op unless box_offer
+    from app.modules.pi.configuration import settings_row as _box_rules
+
+    box_rules = (await _box_rules(session, scope)).response_rules
+    await box_lifecycle.on_decision(session, scope, conversation, decision, brief, box_rules)
     now = datetime.now(UTC).isoformat()
     if "request_solution" in decision.effects and conversation.customer_id is not None:
         book = problems.ProblemBook(session, scope, conversation.customer_id, "en")
@@ -5938,6 +5949,12 @@ async def compose_service_turn(
     asks_status = bool(STATUS_ASK.search(str(context.get("latest_customer_message", ""))))
     if not turn.request_human and (missed_status := status_missed(turn.reply, context)):
         problem = f"{missed_status}, and also: {problem}" if problem else missed_status
+    if context.get("pi_mode") == "brain" and context.get("burst_texts"):
+        # Spec v1.4, 17.2 (turnCoverage): a reply that skips the biggest message of a burst.
+        owner_turn = [*context["burst_texts"], str(context.get("latest_customer_message") or "")]
+        if skipped := turn_coverage.skipped_topic(turn.reply, owner_turn):
+            text = turn_coverage.rewrite_reason(skipped)
+            problem = f"{text}, and also: {problem}" if problem else text
     if (
         not problem
         and context.get("pi_mode") == "brain"

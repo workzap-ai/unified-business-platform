@@ -21,7 +21,7 @@ Pure functions. An idea that fails is dropped; if every idea fails pi asks for o
 
 import re
 from collections.abc import Sequence
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from typing import Any
 
 from app.modules.pi import idea_vocabulary, solution_ideas, solution_library, taxonomy
@@ -149,6 +149,7 @@ class IdeaContext:
     nodes: tuple[str, ...] = ()  # the words of each node on the map
     industries: tuple[str, ...] = ()  # the trade(s) pi is talking about (G9); () when unknown
     node_categories: tuple[str, ...] = ()  # the category of each node
+    grounded: str = ""  # words of the CONFIRMED business-profile facts: they ground G2 (OT13)
 
     def active(self) -> bool:
         return bool(self.subtype or self.cause or self.given or self.nodes)
@@ -285,10 +286,19 @@ def off_the_map(
     return "G8"
 
 
+def with_grounding(ctx: IdeaContext | None, grounded: str) -> IdeaContext | None:
+    """The context with the confirmed profile facts added for G2 (spec 16.3). A fact from a page
+    or a photo the owner has not confirmed is never passed here; with no facts, nothing changes."""
+    if not grounded.strip():
+        return ctx
+    return replace(ctx or IdeaContext(), grounded=grounded.strip())
+
+
 def failures(idea: str, owner_words: str, ctx: IdeaContext | None = None) -> list[str]:
     """Rule ids of the filter that the idea breaks (empty when it passes). G1 and G2 always; G3,
     G4, G7 and G8 only with an `IdeaContext` that holds data."""
-    found = [goal_conflict(idea, owner_words), invented_context(idea, owner_words)]
+    grounded_words = f"{owner_words} {ctx.grounded}" if ctx is not None and ctx.grounded else owner_words
+    found = [goal_conflict(idea, owner_words), invented_context(idea, grounded_words)]
     if ctx is not None and ctx.industries:
         found.append(idea_vocabulary.foreign_vocabulary(idea, owner_words, ctx.industries))
     if ctx is not None and ctx.active():

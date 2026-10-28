@@ -23,7 +23,14 @@ from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.modules.notifications.service import notify
-from app.modules.pi import fixed_lines, flow, followup_policy, map_builder, map_share
+from app.modules.pi import (
+    box_lifecycle,
+    fixed_lines,
+    flow,
+    followup_policy,
+    map_builder,
+    map_share,
+)
 from app.modules.pi.box_models import PiMapVersion
 from app.modules.pi.configuration import settings_row
 from app.modules.pi.followups import (
@@ -202,6 +209,14 @@ async def send_one(
     staff or recorded). Marks the step as sent only when a message was queued."""
     brief = dict(conversation.service_brief or {})
     kind = due.kind
+    if (
+        kind in box_lifecycle.BOX_FOLLOWUP_KINDS
+        and box_lifecycle.enabled_for(policy.response_rules)
+        and box_lifecycle.quiet_after_decline(
+            brief, await box_lifecycle.pi_sent_count(session, scope, conversation.id)
+        )
+    ):
+        return None  # spec 6.3: no follow-up that mentions the box for 8 messages after a decline
     is_map = kind == "map"
     step = (chat.map_sent if is_map else int(chat.sent.get(kind, 0))) + 1
     language = language_of(conversation)

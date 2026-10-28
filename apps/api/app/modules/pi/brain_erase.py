@@ -18,6 +18,7 @@ from sqlalchemy.exc import ProgrammingError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.modules.customers.models import Customer
+from app.modules.pi import business_profile_store
 from app.modules.pi.brain_docs_models import PiBrainDocument, PiBrainPayment
 from app.modules.pi.experience_models import PiExperience
 from app.modules.pi.learning_models import PiLearningExample
@@ -180,6 +181,14 @@ async def erase_customer(
                 last_message_preview=ERASED,
             )
         )
+    # the Business Profile (facts, page snapshots) is what the owner told pi about their business
+    try:  # the profile tables arrive with migration 0050
+        async with session.begin_nested():
+            removed["business_profiles"] = await business_profile_store.erase_for_customer(
+                session, scope, customer_id
+            )
+    except ProgrammingError:
+        pass
     # What pi inferred onto the customer record (industry) is brain data, not CRM contact data.
     await session.execute(
         update(Customer)

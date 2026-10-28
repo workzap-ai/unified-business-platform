@@ -31,7 +31,7 @@ from app.ai.types import Message, TextPart, VideoPart
 from app.modules.business_settings.capabilities import business_permissions
 from app.modules.customers.service import CustomerService
 from app.modules.environments.models import Environment
-from app.modules.pi import latency, price_policy
+from app.modules.pi import latency, outage, price_policy
 from app.modules.pi.agents import AgentContext, run_specialists
 from app.modules.pi.configuration import seed_agents, settings_cache_for_turn, settings_row
 from app.modules.pi.graph import AGENTS, RouteState, keyword_intent, route_message
@@ -570,7 +570,9 @@ async def guard_on_arrival(
     return found
 
 
-BURST_CODES = ("BURST_COALESCED", "RATE_LIMIT_CONVERSATION")
+# OUTAGE_QUEUED: owner messages kept while the reply path was down (spec v1.4, 17.7); the turn that
+# answers after recovery covers them too.
+BURST_CODES = ("BURST_COALESCED", "RATE_LIMIT_CONVERSATION", outage.CODE)
 
 
 async def burst_before(session: AsyncSession, message: PiMessage) -> list[PiMessage]:
@@ -582,6 +584,7 @@ async def burst_before(session: AsyncSession, message: PiMessage) -> list[PiMess
             PiMessage.environment_id == message.environment_id,
             PiMessage.conversation_id == message.conversation_id,
             PiMessage.direction == "outbound",
+            outage.real_reply(),  # a holding line is not an answer
         )
     )
     query = select(PiMessage).where(
@@ -1328,6 +1331,13 @@ async def process_pi_event(ctx: dict[str, Any], event_id: str) -> None:
             # model reads, and the safety gates and the team's escalations see every one of them.
             earlier = await burst_before(session, message)
             if earlier:
+                from app.modules.pi import turn_coverage
+
+                # Spec v1.4, 17.2 / 17.8: the model is told it answers a whole owner turn (and
+                # after an outage, to name the earliest queued message first).
+                service_context["owner_turn_note"] = turn_coverage.turn_note(
+                    any(m.error_code == outage.CODE for m in earlier)
+                )
                 from app.modules.pi.service_conversation import (
                     burst_escalations,
                     escalation_question,
@@ -1425,6 +1435,17 @@ async def process_pi_event(ctx: dict[str, Any], event_id: str) -> None:
                     keep_notes(conversation, kept)
             except GatewayUnavailable:
                 decision["provider_failed"] = True
+            if service_context.get("warmup") and service_context.get("pi_mode") == "brain":
+                from app.modules.pi import business_profile_store
+
+                # Part 16: the profile the warm-up built is kept in its tables (best effort)
+                await business_profile_store.persist(
+                    session,
+                    scope,
+                    conversation.customer_id,
+                    (conversation.service_brief or {}).get("business_profile"),
+                    (message.media or {}).get("page_look"),
+                )
             if (
                 service_turn is not None
                 and service_context.get("pi_mode") == "brain"
@@ -1756,6 +1777,19 @@ async def process_pi_event(ctx: dict[str, Any], event_id: str) -> None:
                 service_turn.proposal_evidence,
                 http=OutboundClient(ctx["settings"], ctx["http"]),
             )
+        outage_queued = False
+        if (
+            handoff_reason == "provider_failure"
+            and (service_context or {}).get("pi_mode") == "brain"
+            and not outbound
+        ):
+            # Spec v1.4, 17.7: the model is down. One holding line in the owner's language, the
+            # message is kept and replayed by the sweeper when the provider is back (never lost,
+            # never answered twice); a person is alerted after two hours.
+            outbound += await outage.queue_turn(session, scope, conversation, message, event.id)
+            outage_queued, handoff_reason = True, None
+            run.agent_path = [*run.agent_path, "outage_queue"]
+            run.error_code = run.error_code or "provider_failure"
         if handoff_reason in SOFT_REASONS and conversation.customer_id is not None:
             await ask_team(
                 session,
@@ -1831,6 +1865,8 @@ async def process_pi_event(ctx: dict[str, Any], event_id: str) -> None:
             "processed",
             datetime.now(UTC),
         )
+        if outage_queued:
+            outage.park(message)  # waits for the replay (the event itself is done)
         # The reminder permission question gets [Yes] [No] buttons.
         from app.modules.pi.buttons import add_consent_buttons
 
@@ -2385,6 +2421,19 @@ async def sweep_pi(ctx: dict[str, Any]) -> None:
                 .limit(50)
             )
         )
+        # Spec v1.4, 17.7 (outageReplayer): owner messages kept during an outage are retried with
+        # backoff, oldest chat first; updates at 30 minutes, a person alerted at 2 hours.
+        replays, outage_sends = await outage.sweep(session, datetime.now(UTC))
+    for replay in replays:
+        if ctx.get("redis"):
+            await ctx["redis"].enqueue_job(
+                "process_pi_event",
+                str(replay.event_id),
+                _job_id=f"outage:{replay.event_id}:{replay.failures}",
+            )
+        else:
+            await process_pi_event(ctx, str(replay.event_id))
+    await enqueue_sends(ctx, outage_sends)
     for event_id in events:
         if ctx.get("redis"):
             await ctx["redis"].enqueue_job(

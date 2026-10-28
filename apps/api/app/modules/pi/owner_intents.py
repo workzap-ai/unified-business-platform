@@ -144,6 +144,9 @@ async def classify(
     """Ask the model when it is needed. Never raises; None means the phrase banks stay the answer."""
     if not needed(said):
         return None
+    from app.modules.pi.safety import redact_pii
+
+    said = redact_pii(said).text  # cards, ID numbers, codes and contact details never leave
     try:
         response = await manager.complete(
             scope,

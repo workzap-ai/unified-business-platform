@@ -20,7 +20,7 @@ from app.core import rate_limit
 from app.modules.access.dependencies import Scope, Session
 from app.modules.audit.service import record
 from app.modules.customers import files
-from app.modules.pi import brain_docs, brain_payments, learning_docs
+from app.modules.pi import box_lifecycle, brain_docs, brain_payments, learning_docs
 from app.modules.pi.brain_docs_models import PiBrainDocument, PiBrainPayment
 from app.modules.pi.configuration import settings_row
 from app.modules.pi.service import require_pi
@@ -220,6 +220,7 @@ async def approve_document(doc_id: UUID, scope: Scope, session: Session) -> dict
     await require_pi(session, scope, "quotes.write")
     doc = await _doc(session, scope, doc_id)
     await brain_docs.approve(session, scope, doc, scope.user_id)
+    await box_lifecycle.on_approved(session, scope, doc.customer_id, str(scope.user_id or ""))
     await record(
         session,
         "pi.brain_document_approved",
@@ -259,6 +260,15 @@ async def send_offer(
     """Send the approved solution document and quote to the customer on WhatsApp."""
     await require_pi(session, scope, "quotes.write")
     ids = await brain_docs.send(session, scope, request.app.state.settings, offer_id)
+    sent_solution, sent_quote = await brain_docs.latest_pair(session, scope, offer_id)
+    pair = [d for d in (sent_solution, sent_quote) if d is not None]
+    await box_lifecycle.on_sent(
+        session,
+        scope,
+        sent_solution.customer_id if sent_solution else None,
+        str(scope.user_id or ""),
+        approved_document=len(pair) == 2 and all(d.status in ("approved", "sent") for d in pair),
+    )
     await record(
         session,
         "pi.brain_documents_sent",

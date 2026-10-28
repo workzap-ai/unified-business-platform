@@ -454,6 +454,9 @@ async def draft_offer(
         **brief,
         "offer": {**offer, "offer_id": str(offer_id), "drafted_at": datetime.now(UTC).isoformat()},
     }
+    from app.modules.pi import box_lifecycle  # the box goes to review; a no-op unless box_offer
+
+    await box_lifecycle.on_draft_ready(session, scope, customer.id)
     return solution, quote
 
 

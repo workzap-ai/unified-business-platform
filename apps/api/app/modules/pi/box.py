@@ -169,6 +169,16 @@ def value_line(ideas_by_problem: dict[str, list[str]]) -> tuple[bool, list[str]]
 _UNDERSTOOD_KEYS = ("since", "impact", "scope", "cause", "person_believes_cause")
 
 
+def _declined_within_quiet(brief: dict[str, Any], history: list[dict[str, Any]]) -> bool:
+    """B7: pi has sent fewer than 8 messages since the owner declined. box_lifecycle keeps the
+    decline time ("%Y-%m-%d %H:%M", the format of the history) in the brief."""
+    declined = brief.get("box_declined_at")
+    if not isinstance(declined, str) or not declined:
+        return False
+    since = sum(1 for h in history if h.get("role") == "ai" and str(h.get("at") or "") > declined)
+    return since < DECLINE_QUIET_MESSAGES
+
+
 def offer_facts(context: dict[str, Any], *, asked_for_document: bool = False) -> OfferFacts:
     """The readiness facts from what the conversation already holds. B3 and B4 (`map_reviewed`,
     `ranked`) are brief keys the portal map edits and the owner's replies to a shared map set (see
@@ -190,7 +200,8 @@ def offer_facts(context: dict[str, Any], *, asked_for_document: bool = False) ->
         pi_message_count=sum(1 for h in history if h.get("role") == "ai"),
         trust_trend=trust_trend,
         upset=upset,
-        declined_recently=bool(brief.get("declined_recently")),
+        declined_recently=bool(brief.get("declined_recently"))
+        or _declined_within_quiet(brief, history),
         asked_for_document_or_price=asked_for_document,
         no_other_problems=bool(brief.get("no_other_problems")),
     )

@@ -35,6 +35,7 @@ KEYS = (
 )
 _TITLE_SPLIT = re.compile(r"\s[|–—-]\s")
 _EMAIL = re.compile(r"[\w.+-]+@[\w-]+\.[\w.-]+")
+_REMOVED = re.compile(r"\[[^\]]*removed\]")
 _PHONE = re.compile(r"(?<!\w)\+?\d[\d\s().-]{7,}\d")
 
 
@@ -46,7 +47,9 @@ def _clean(value: str, limit: int = 300) -> str:
     """The value without card, ID, phone and email details; empty when it was only that."""
     text = safety.redact_pii(value or "").text
     text = _PHONE.sub("", _EMAIL.sub("", text))
-    return re.sub(r"\s+", " ", text).strip()[:limit]
+    text = re.sub(r"\s+", " ", text).strip()[:limit]
+    # a value that was nothing but personal details is no fact at all
+    return text if re.search(r"\w", _REMOVED.sub("", text)) else ""
 
 
 def add_fact(

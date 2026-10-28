@@ -88,6 +88,16 @@ class MessageView(BaseModel):
     # A picture pi sent (pi Customer's problem map or journey card): the team sees the
     # same image the customer got, not only its caption.
     card: dict[str, str] | None = None
+    # What pi had understood when it sent this message (read-only; see message_understood.py).
+    understood: dict[str, Any] | None = None
+
+    @field_validator("understood", mode="before")
+    @classmethod
+    def public_understood(cls, value: Any) -> dict[str, Any] | None:
+        """Only the whitelisted keys of the annotation leave the server."""
+        from app.modules.pi import message_understood
+
+        return message_understood.public_understood(value)
 
     @model_validator(mode="before")
     @classmethod
