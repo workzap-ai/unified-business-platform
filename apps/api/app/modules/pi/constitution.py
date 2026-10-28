@@ -16,7 +16,7 @@ from dataclasses import dataclass
 from typing import Any
 
 from app.modules.pi import constitution_langs as langs
-from app.modules.pi import flow, think_lint
+from app.modules.pi import flow, owner_asks, think_lint
 
 logger = logging.getLogger(__name__)
 
@@ -630,7 +630,8 @@ DOUBLE_OR = re.compile(
 )
 # R-ECHO-04: a sentence that only says again what they said, with no "noted" frame.
 NOTED_START = re.compile(
-    r"^\W*(?:thanks[.,]?\s+|thank\s+you[.,]?\s+)?(?:i(?:'ve|\s+have)\s+noted|noted|(?:maine\s+)?note\s+kar\s+liya|likh\s+liya"
+    r"^\W*(?:thanks[.,]?\s+|thank\s+you[.,]?\s+|ji[,.]?\s+samajh\s+(?:aaya|gaya|gayi)[.,]?\s+)?"
+    r"(?:i(?:'ve|\s+have)\s+noted|noted|(?:(?:maine|ye|yeh|isay|ise)\s+)?note\s+kar\s+liya|likh\s+liya"
     + langs.NOTED_FRAME
     + r")",
     re.IGNORECASE,
@@ -2024,6 +2025,30 @@ def lint(reply: str, context: dict[str, Any]) -> list[Violation]:
                     ),
                 )
             )
+    if (
+        context.get("owner_unknowns")
+        and last_question.endswith(QUESTION_MARKS)
+        and owner_asks.asks_for_history(last_question)
+    ):
+        # R-ASK-09 (live 2026-10-28, a furniture maker who said six times that no records exist): a
+        # fact the owner has said they do not have is closed; asking how often, how many or what
+        # happened before is asking for it again.
+        add(
+            Violation(
+                "R-ASK-09",
+                "they told you they have no records or do not know: do not ask about the past, how "
+                "often or how many again. Say what is worth writing down from today and ask one "
+                "question that moves forward (a start, a choice)",
+            )
+        )
+    if context.get("repeat_complaint") and last_question.endswith(QUESTION_MARKS):
+        add(
+            Violation(
+                "R-ASK-09",
+                "they say you keep asking: ask no fact now. Say sorry shortly, give what they "
+                "asked for from what you know, and ask nothing or one choice answerable in a word",
+            )
+        )
     if context.get("pi_mode") == "brain" and NOTED_START.match(reply):
         # spec v1.4, 17.6, every brain workspace (seen live, 2026-10-27: "Note kar liya hai: ... Ye
         # team tak bhi pohanch jayega. Parents fee kaise jama karte hain?")
@@ -2263,11 +2288,13 @@ FALLBACK_LISTENING_MORE = {
         "ماذا جربت حتى الآن لهذا؟",
     ],
 }
+# The safe question when the chat is not in a listening state. It leads: it never hands the next move
+# back ("what would you like to ask next?" was sent live on 2026-10-28 after six requests for a plan).
 FALLBACK_OTHER = {
-    "en": "What would you like to ask about this next?",
-    "roman_ur": "Aap is ke baare mein aage kya poochna chahenge?",
-    "ur": "آپ اس کے بارے میں آگے کیا پوچھنا چاہیں گے؟",
-    "ar": "ما الذي تود أن تسأل عنه بعد ذلك؟",
+    "en": "Which of these would you most like to see fixed first?",
+    "roman_ur": "In mein se aap sab se pehle kis cheez ko theek hota dekhna chahenge?",
+    "ur": "ان میں سے آپ سب سے پہلے کس چیز کو ٹھیک ہوتا دیکھنا چاہیں گے؟",
+    "ar": "أي هذه الأمور تودّ أن تراها تُحلّ أولاً؟",
 }
 FIRST_INVITE = {
     "en": "Tell me what's going wrong in your business.",

@@ -47,6 +47,7 @@ from app.modules.pi import (
     map_share,
     memory_block,
     open_requests,
+    owner_asks,
     price_policy,
     problem_extract,
     problems,
@@ -1165,6 +1166,9 @@ def system_for(context: dict[str, Any]) -> str:
             + (BRAIN_ASK if asked else "")
             + (expert_advisor.VOICE_RULE if context.get("expert_on") else "")
             + (expert_advisor.PROMPT_RULE if context.get("main_problem") else "")
+            + (owner_asks.NO_RECORDS_RULE if context.get("owner_unknowns") else "")
+            + (owner_asks.PLAN_RULE if context.get("plan_asked") else "")
+            + (owner_asks.REPEAT_RULE if context.get("repeat_complaint") else "")
             + (memory_block.SYSTEM_LINE if context.get("what_i_know") else "")
             + think_prompt.block(context)
         )
@@ -1558,6 +1562,18 @@ async def brain_problems(
         context["hours_away"] = hours_away(message, rows or [], last_chat_at)
         if pending := await pending_handoff(session, conversation):
             context["pending_handoff"] = pending
+    if message is not None:
+        # What the owner says they do not have, and whether they ask to understand the plan or
+        # complain that pi keeps asking (live 2026-10-28, a furniture maker): see owner_asks.
+        theirs = [m.body or "" for m in (rows or []) if m.sender_type == "customer"][-6:]
+        said_now = message.body or ""
+        unknowns = owner_asks.count_unknowns([*theirs, said_now])
+        if unknowns:
+            context["owner_unknowns"] = unknowns
+        if owner_asks.asks_for_plan(said_now):
+            context["plan_asked"] = True
+        if owner_asks.complains_of_repeats(said_now):
+            context["repeat_complaint"] = True
     if message is not None and warmup.enabled(policy.response_rules):
         # Part 16: the opening is for a first-time owner who says "Hi"; the quick look result (if
         # they gave a link) rides on the message and is removed before the model sees the context.
