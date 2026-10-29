@@ -137,3 +137,14 @@ def test_a_page_with_only_a_name_is_not_said_back() -> None:
     assert plan is not None and plan.reply.startswith("I had a look at the page.")
     assert "understood" not in plan.reply and plan.reply.count("?") == 1
     assert bp.say_back(plan.profile) == ""
+
+
+def test_how_the_owner_found_pi_is_not_a_hurried_message() -> None:  # live 2026-10-28
+    plan = warmup.plan(ctx("My friend shared your number", greeting=False))
+    assert plan is not None and plan.state["step"] == warmup.IDENTITY_ASKED
+    assert "an AI from Workzap" in plan.reply and plan.reply.count("?") == 1
+
+
+def test_a_problem_after_a_social_opener_still_skips_the_warmup() -> None:
+    plan = warmup.plan(ctx("A friend told me about you, my stock is a mess", greeting=False))
+    assert plan is not None and plan.state["step"] == warmup.SKIPPED

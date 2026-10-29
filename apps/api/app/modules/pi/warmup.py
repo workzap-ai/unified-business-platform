@@ -107,6 +107,21 @@ def states_problem(said: str) -> bool:
     return bool(PROBLEM_WORDS.search(said or ""))
 
 
+# "My friend shared your number": how the owner found pi, not a problem and not a business. After
+# "Hello" it is still an unhurried first-timer (live 2026-10-28: the second message skipped the
+# opening and the model wrote the old greeting).
+SOCIAL_OPENER = re.compile(
+    r"\b(?:friend|referr\w*|recommend\w*|shared\s+(?:your\s+)?(?:number|contact)|"
+    r"gave\s+me\s+your|told\s+me\s+about|found\s+you|saw\s+your|heard\s+(?:about|of)\s+you|"
+    r"dost|doost|ne\s+bataya)\b",
+    re.IGNORECASE,
+)
+
+
+def social_opener(said: str) -> bool:
+    return bool(SOCIAL_OPENER.search(said or "")) and not states_problem(said)
+
+
 def _grow(profile: dict[str, Any], said: str) -> dict[str, Any]:
     """The owner's own words about what the business is (kept short, never a name of a person)."""
     business_profile.add_fact(profile, "what_they_do", said[:200], business_profile.OWNER)
@@ -129,7 +144,7 @@ def plan(context: dict[str, Any]) -> Plan | None:
     if step is None:
         if context.get("noted_problems") or context.get("returning_customer"):
             return None  # not a first-time owner: use the profile, no opening (16.7)
-        if not context.get("greeting_only"):
+        if not (context.get("greeting_only") or social_opener(said)):
             return Plan("", {"step": SKIPPED}, profile)  # a first message with content: no warm-up
         return Plan(IDENTITY[lang], {"step": IDENTITY_ASKED, "asked": 1}, profile)
     if states_problem(said):
