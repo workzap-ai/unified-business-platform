@@ -205,13 +205,13 @@ assert all(len(t) <= 20 for b in (*OFFER_BUTTONS.values(), *DECISION_BUTTONS.val
 TEXT: dict[str, dict[str, str]] = {
     "offer": {
         "en": (
-            "Would you like a solution document and a quote for these? You can say no. "
+            "Would you like a solution document and a quote for these? "
             "The document sets out what Workzap would build, in plain words. The quote says "
             "what it would cost and how long it would take. It's an offer, not a charge."
         ),
         "roman_ur": (
-            "Kya aap in sab ke liye solution document aur quote chahenge? Aap mana bhi kar "
-            "sakte hain. Document mein likha hota hai ke Workzap kya banayega, aasan lafzon "
+            "Kya aap in sab ke liye solution document aur quote chahenge? "
+            "Document mein likha hota hai ke Workzap kya banayega, aasan lafzon "
             "mein. Quote mein kharcha aur waqt hota hai. Ye ek offer hai, charge nahi."
         ),
         "ar": fixed_lines.LINES["offer"]["ar"],

@@ -50,7 +50,7 @@ from PIL import Image, ImageDraw, ImageFont
 from app.modules.pi import safety
 
 WIDTH = 1080
-MIN_HEIGHT = 1350
+MIN_HEIGHT = 640
 MAX_HEIGHT = 1920
 MAX_NODES = 9
 MAX_BUBBLES = 12
@@ -112,12 +112,13 @@ TEXT: dict[str, dict[str, Any]] = {
         "legend_owner": "You said it",
         "legend_guess": "My guess",
         "legend_new": "added",
-        "foot": "Only the numbers you gave are used. No names or personal details.",
+        "foot": "Your numbers only. No names.",
+        "no_links": "No links yet",
         "overview": "Overview",
         "cluster": "One root: {title}",
         "others": "Other problems",
         "more": "More below",
-        "caption": "{version} {v}: {pc}, {lc}.",
+        "caption": "Here is what I have so far: {pc}, {lc}. Is this right? Tell me what to change.",
         "caption_overview": "{version} {v}, overview: {k} groups.",
         "caption_detail": "{version} {v}, {title}: {pc}.",
         "alt_node": "Problem: {label}",
@@ -148,6 +149,7 @@ TEXT: dict[str, dict[str, Any]] = {
         "legend_guess": "Hamara andaza",
         "legend_new": "naya",
         "foot": "Sirf aap ke bataye hue number. Koi naam ya zaati tafseel nahi.",
+        "no_links": "Abhi koi jorr nahi",
         "overview": "Mukhtasar naqsha",
         "cluster": "Ek hi jar: {title}",
         "others": "Baqi masle",
@@ -185,6 +187,7 @@ TEXT: dict[str, dict[str, Any]] = {
         "legend_guess": "ہمارا اندازہ",
         "legend_new": "شامل ہوا",
         "foot": "صرف آپ کے بتائے ہوئے نمبر۔ کوئی نام یا ذاتی تفصیل نہیں۔",
+        "no_links": "ابھی کوئی جوڑ نہیں",
         "overview": "مختصر نقشہ",
         "cluster": "ایک ہی جڑ: {title}",
         "others": "باقی مسئلے",
@@ -222,6 +225,7 @@ TEXT: dict[str, dict[str, Any]] = {
         "legend_guess": "تقديرنا",
         "legend_new": "تمت إضافته",
         "foot": "الأرقام المستخدمة هي التي ذكرتها فقط. بلا أسماء أو بيانات شخصية.",
+        "no_links": "لا روابط بعد",
         "overview": "نظرة عامة",
         "cluster": "جذر واحد: {title}",
         "others": "مشكلات أخرى",
@@ -257,6 +261,7 @@ TEXT: dict[str, dict[str, Any]] = {
         "legend_guess": "حدس ما",
         "legend_new": "افزوده شد",
         "foot": "فقط عددهایی که شما گفتید استفاده شده است. بدون نام یا مشخصات شخصی.",
+        "no_links": "هنوز پیوندی نیست",
         "overview": "نمای کلی",
         "cluster": "یک ریشه: {title}",
         "others": "مشکل‌های دیگر",
@@ -292,6 +297,7 @@ TEXT: dict[str, dict[str, Any]] = {
         "legend_guess": "Mon hypothèse",
         "legend_new": "ajouté",
         "foot": "Seuls vos chiffres sont utilisés. Ni noms ni données personnelles.",
+        "no_links": "Pas encore de lien",
         "overview": "Vue d'ensemble",
         "cluster": "Une racine : {title}",
         "others": "Autres problèmes",
@@ -327,6 +333,7 @@ TEXT: dict[str, dict[str, Any]] = {
         "legend_guess": "Mi suposición",
         "legend_new": "añadido",
         "foot": "Solo se usan los números que usted dio. Sin nombres ni datos personales.",
+        "no_links": "Aún sin vínculos",
         "overview": "Vista general",
         "cluster": "Una raíz: {title}",
         "others": "Otros problemas",
@@ -447,7 +454,9 @@ def counts(words: dict[str, Any], version: int, n: int, links: int) -> dict[str,
         "n": n,
         "l": links,
         "pc": count_phrase(words, "problem", n),
-        "lc": count_phrase(words, "link", links),
+        "lc": count_phrase(words, "link", links)
+        if links or "no_links" not in words
+        else words["no_links"],
     }
 
 
@@ -658,8 +667,8 @@ def map_hash(map_: dict[str, Any], language: str | None = None) -> str:
 
 CARD_W = 440
 CARD_H = 212
-COL_GAP = 120
-MARGIN = 40
+COL_GAP = 104
+MARGIN = 48
 GAP_Y = 80
 HEADER_H = 150
 PAD_TOP = 30
@@ -1076,7 +1085,10 @@ def _header(canvas: Canvas, words: dict[str, Any], sub: str, title: str | None =
         canvas.text((WIDTH - MARGIN, 88), sub, 28, HEADER_SUB, width=room, anchor="ra")
         canvas.text((MARGIN, 24), "Workzap", 30, HEADER_INK)
         return
-    canvas.text((MARGIN, 24), head, 44, HEADER_INK, width=room)
+    size = 44
+    while size > 36 and canvas.width_of(head, size) > room:
+        size -= 2
+    canvas.text((MARGIN, 24), head, size, HEADER_INK, width=room)
     canvas.text((MARGIN, 88), sub, 28, HEADER_SUB, width=room)
     canvas.text((WIDTH - MARGIN, 24), "Workzap", 30, HEADER_INK, anchor="ra")
 
@@ -1088,7 +1100,11 @@ def _footer(
     hues: dict[str, int],
     show_new: bool,
     lang: str = "en",
+    has_links: bool = True,
+    has_numbers: bool = True,
 ) -> None:
+    """Spec v1.5, 18.7: the legend lists only what the image shows, and the footer line appears only
+    when a number is drawn."""
     rtl = canvas.rtl
     # `step` is +1 left to right and -1 right to left; `edge` is where each row starts.
     step = -1 if rtl else 1
@@ -1096,7 +1112,8 @@ def _footer(
     anchor = "ra" if rtl else "la"
     y = canvas.height - 250
     x = edge
-    for text, solid in ((words["legend_owner"], True), (words["legend_guess"], False)):
+    arrows = ((words["legend_owner"], True), (words["legend_guess"], False)) if has_links else ()
+    for text, solid in arrows:
         tail = x + step * 60
         if solid:
             canvas.draw.line([(x, y + 14), (tail, y + 14)], fill=ARROW_SOLID, width=4)
@@ -1112,7 +1129,7 @@ def _footer(
         canvas.text((label_x, y), words["legend_new"], MIN_TEXT_PX, INK, anchor=anchor)
     y += 50
     x = edge
-    for category in categories[:MAX_HUES]:
+    for category in categories[:MAX_HUES] if (len(categories) > 1 or has_links) else []:
         label = category_name(category, lang) if rtl else category.replace("_", " ")
         label = canvas.wrap(label, MIN_TEXT_PX, 210, 1)[0] if label else label
         w = int(canvas.width_of(label, MIN_TEXT_PX))
@@ -1123,7 +1140,7 @@ def _footer(
         canvas.text((x + step * 26, y), label, MIN_TEXT_PX, INK, width=w + 2, anchor=anchor)
         x += step * (26 + w + 28)
     y += 56
-    lines = canvas.wrap(words["foot"], MIN_TEXT_PX, WIDTH - 2 * MARGIN, 3)
+    lines = canvas.wrap(words["foot"], MIN_TEXT_PX, WIDTH - 2 * MARGIN, 3) if has_numbers else []
     for line in lines:
         canvas.text((edge, y), line, MIN_TEXT_PX, MUTED, width=WIDTH - 2 * MARGIN, anchor=anchor)
         y += 32
@@ -1347,7 +1364,8 @@ def _render_nodes(
     for node in nodes:
         if node.category not in cats:
             cats.append(node.category)
-    _footer(canvas, words, cats, hues, any(n.is_new for n in nodes), lang)
+    numbered = any(numbers_in(t) for n in nodes for t in (n.label, *n.facts))
+    _footer(canvas, words, cats, hues, any(n.is_new for n in nodes), lang, bool(links), numbered)
     return canvas, slots, pos
 
 

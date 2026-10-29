@@ -2297,10 +2297,18 @@ FALLBACK_OTHER = {
     "ar": "أي هذه الأمور تودّ أن تراها تُحلّ أولاً؟",
 }
 FIRST_INVITE = {
-    "en": "Tell me what's going wrong in your business.",
-    "roman_ur": "Apne business mein jo masla hai woh batayein.",
-    "ur": "اپنے کاروبار میں جو مسئلہ ہے وہ بتائیں۔",
-    "ar": "أخبرني ما الذي لا يسير على ما يرام في عملك.",
+    "en": "Tell me about the biggest problem in your business.",
+    "roman_ur": "Apne business ka sab se bara masla batayein.",
+    "ur": "اپنے کاروبار کا سب سے بڑا مسئلہ بتائیں۔",
+    "ar": "أخبرني عن أكبر مشكلة في عملك.",
+}
+# The question after the AI line in pi's very first message when the warm-up is off (spec Part 14
+# row 9, 16.1): one open question about the business, never "tell me what's going wrong" on its own.
+FIRST_QUESTION = {
+    "en": "What does your business do?",
+    "roman_ur": "Aap ka business kya kaam karta hai?",
+    "ur": "آپ کا کاروبار کیا کام کرتا ہے؟",
+    "ar": "ما نوع عملك؟",
 }
 
 

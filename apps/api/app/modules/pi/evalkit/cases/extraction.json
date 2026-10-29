@@ -1,0 +1,4170 @@
+[
+ {
+  "id": "acc_list_en",
+  "industry": "accounting_audit_and_tax_practices",
+  "language": "en",
+  "kind": "list",
+  "regression": false,
+  "messages": [
+   "We are a small tax and audit firm. Three things hurt: clients send documents on WhatsApp and we lose them, we miss filing deadlines about twice a month, and nobody tracks billable hours."
+  ],
+  "expected": {
+   "problems": [
+    {
+     "id": "p1",
+     "any": [
+      "document",
+      "whatsapp",
+      "lose"
+     ],
+     "figures": []
+    },
+    {
+     "id": "p2",
+     "any": [
+      "deadline",
+      "filing",
+      "miss"
+     ],
+     "figures": [
+      "twice a month"
+     ]
+    },
+    {
+     "id": "p3",
+     "any": [
+      "billable",
+      "hours",
+      "track"
+     ],
+     "figures": []
+    }
+   ],
+   "stated": [
+    "clients send documents on WhatsApp and we lose them",
+    "we miss filing deadlines about twice a month",
+    "nobody tracks billable hours"
+   ],
+   "missing": [
+    "budget",
+    "cause",
+    "what has been tried"
+   ],
+   "hypothesis_only": [],
+   "corrections": []
+  },
+  "recorded": {
+   "origin": "reference output written by hand, not model output",
+   "notes": [
+    {
+     "title": "Client documents lost across WhatsApp chats",
+     "title_local": "Client documents lost across WhatsApp chats",
+     "user_words": [
+      "clients send documents on WhatsApp and we lose them"
+     ],
+     "summary": "Client documents lost across WhatsApp chats",
+     "category": "communication_coordination"
+    },
+    {
+     "title": "Filing deadlines missed twice a month",
+     "title_local": "Filing deadlines missed twice a month",
+     "user_words": [
+      "we miss filing deadlines about twice a month"
+     ],
+     "summary": "Filing deadlines missed twice a month",
+     "category": "compliance_admin"
+    },
+    {
+     "title": "Billable hours are not tracked",
+     "title_local": "Billable hours are not tracked",
+     "user_words": [
+      "nobody tracks billable hours"
+     ],
+     "summary": "Billable hours are not tracked",
+     "category": "reporting_visibility"
+    }
+   ]
+  }
+ },
+ {
+  "id": "acc_single_ur",
+  "industry": "accounting_audit_and_tax_practices",
+  "language": "roman_ur",
+  "kind": "single",
+  "regression": false,
+  "messages": [
+   "Hamari firm mein tax returns ka kaam season mein bohat barh jata hai aur staff raat 10 baje tak rukta hai, phir bhi 15 clients ki return late ho gayi."
+  ],
+  "expected": {
+   "problems": [
+    {
+     "id": "p1",
+     "any": [
+      "staff",
+      "raat",
+      "return",
+      "late",
+      "season"
+     ],
+     "figures": [
+      "15 clients"
+     ]
+    }
+   ],
+   "stated": [
+    "staff raat 10 baje tak rukta hai aur 15 clients ki return late ho gayi"
+   ],
+   "missing": [
+    "budget",
+    "cause",
+    "what has been tried"
+   ],
+   "hypothesis_only": [],
+   "corrections": []
+  },
+  "recorded": {
+   "origin": "reference output written by hand, not model output",
+   "notes": [
+    {
+     "title": "Season workload keeps staff late and returns late",
+     "title_local": "Season workload keeps staff late and returns late",
+     "user_words": [
+      "staff raat 10 baje tak rukta hai aur 15 clients ki return late ho gayi"
+     ],
+     "summary": "Season workload keeps staff late and returns late",
+     "category": "people_staff"
+    }
+   ]
+  }
+ },
+ {
+  "id": "acc_correction_en",
+  "industry": "accounting_audit_and_tax_practices",
+  "language": "en",
+  "kind": "correction",
+  "regression": false,
+  "messages": [
+   "We lost about 10 clients last year because reports came late.",
+   "Sorry, not 10, it was 100 clients."
+  ],
+  "expected": {
+   "problems": [
+    {
+     "id": "p1",
+     "any": [
+      "client",
+      "lost",
+      "reports",
+      "late"
+     ],
+     "figures": [
+      "100"
+     ]
+    }
+   ],
+   "stated": [
+    "we lost 100 clients last year because reports came late"
+   ],
+   "missing": [
+    "budget",
+    "cause",
+    "what has been tried"
+   ],
+   "hypothesis_only": [],
+   "corrections": [
+    {
+     "wrong": "10",
+     "right": "100",
+     "problem": "p1"
+    }
+   ]
+  },
+  "recorded": {
+   "origin": "reference output written by hand, not model output",
+   "notes": [
+    {
+     "title": "Clients lost because reports came late",
+     "title_local": "Clients lost because reports came late",
+     "user_words": [
+      "we lost 100 clients last year because reports came late"
+     ],
+     "summary": "Clients lost because reports came late",
+     "category": "customers_retention"
+    }
+   ]
+  }
+ },
+ {
+  "id": "aes_list_en",
+  "industry": "aesthetic_and_dermatology_clinics",
+  "language": "en",
+  "kind": "list",
+  "regression": false,
+  "messages": [
+   "Our skin clinic has three problems. Patients book by Instagram DM and we double book. Follow-up after a laser session depends on the nurse remembering. And stock of fillers expires because nobody checks dates."
+  ],
+  "expected": {
+   "problems": [
+    {
+     "id": "p1",
+     "any": [
+      "book",
+      "instagram",
+      "double"
+     ],
+     "figures": []
+    },
+    {
+     "id": "p2",
+     "any": [
+      "follow",
+      "laser",
+      "nurse"
+     ],
+     "figures": []
+    },
+    {
+     "id": "p3",
+     "any": [
+      "filler",
+      "expire",
+      "stock"
+     ],
+     "figures": []
+    }
+   ],
+   "stated": [
+    "Patients book by Instagram DM and we double book",
+    "follow-up after a laser session depends on the nurse remembering",
+    "stock of fillers expires because nobody checks dates"
+   ],
+   "missing": [
+    "budget",
+    "cause",
+    "what has been tried"
+   ],
+   "hypothesis_only": [],
+   "corrections": []
+  },
+  "recorded": {
+   "origin": "reference output written by hand, not model output",
+   "notes": [
+    {
+     "title": "Double bookings from Instagram messages",
+     "title_local": "Double bookings from Instagram messages",
+     "user_words": [
+      "Patients book by Instagram DM and we double book"
+     ],
+     "summary": "Double bookings from Instagram messages",
+     "category": "orders_fulfilment"
+    },
+    {
+     "title": "Laser follow-ups depend on nurse memory",
+     "title_local": "Laser follow-ups depend on nurse memory",
+     "user_words": [
+      "follow-up after a laser session depends on the nurse remembering"
+     ],
+     "summary": "Laser follow-ups depend on nurse memory",
+     "category": "customers_retention"
+    },
+    {
+     "title": "Filler stock expires unchecked",
+     "title_local": "Filler stock expires unchecked",
+     "user_words": [
+      "stock of fillers expires because nobody checks dates"
+     ],
+     "summary": "Filler stock expires unchecked",
+     "category": "stock_inventory"
+    }
+   ]
+  }
+ },
+ {
+  "id": "aes_single_ur",
+  "industry": "aesthetic_and_dermatology_clinics",
+  "language": "roman_ur",
+  "kind": "single",
+  "regression": false,
+  "messages": [
+   "Clinic mein patients ka record register mein likha jata hai, pichle treatment ki detail dhoondne mein 10 minute lag jate hain."
+  ],
+  "expected": {
+   "problems": [
+    {
+     "id": "p1",
+     "any": [
+      "record",
+      "register",
+      "treatment",
+      "dhoond"
+     ],
+     "figures": [
+      "10 minute"
+     ]
+    }
+   ],
+   "stated": [
+    "pichle treatment ki detail dhoondne mein 10 minute lag jate hain"
+   ],
+   "missing": [
+    "budget",
+    "cause",
+    "what has been tried"
+   ],
+   "hypothesis_only": [],
+   "corrections": []
+  },
+  "recorded": {
+   "origin": "reference output written by hand, not model output",
+   "notes": [
+    {
+     "title": "Patient records on paper take long to find",
+     "title_local": "Patient records on paper take long to find",
+     "user_words": [
+      "pichle treatment ki detail dhoondne mein 10 minute lag jate hain"
+     ],
+     "summary": "Patient records on paper take long to find",
+     "category": "reporting_visibility"
+    }
+   ]
+  }
+ },
+ {
+  "id": "aes_rant_en",
+  "industry": "aesthetic_and_dermatology_clinics",
+  "language": "en",
+  "kind": "rant",
+  "regression": false,
+  "messages": [
+   "I am so tired. Reception forgets to confirm appointments, so 8 of 30 patients per week simply do not show up, and then the doctor sits idle while the waiting list is full."
+  ],
+  "expected": {
+   "problems": [
+    {
+     "id": "p1",
+     "any": [
+      "appointment",
+      "show",
+      "confirm"
+     ],
+     "figures": [
+      "8 of 30"
+     ]
+    },
+    {
+     "id": "p2",
+     "any": [
+      "doctor",
+      "idle",
+      "waiting"
+     ],
+     "figures": []
+    }
+   ],
+   "stated": [
+    "8 of 30 patients per week simply do not show up",
+    "the doctor sits idle while the waiting list is full"
+   ],
+   "missing": [
+    "budget",
+    "cause",
+    "what has been tried"
+   ],
+   "hypothesis_only": [],
+   "corrections": []
+  },
+  "recorded": {
+   "origin": "reference output written by hand, not model output",
+   "notes": [
+    {
+     "title": "Unconfirmed appointments cause no-shows",
+     "title_local": "Unconfirmed appointments cause no-shows",
+     "user_words": [
+      "8 of 30 patients per week simply do not show up"
+     ],
+     "summary": "Unconfirmed appointments cause no-shows",
+     "category": "customers_retention"
+    },
+    {
+     "title": "Doctor idle while waiting list is full",
+     "title_local": "Doctor idle while waiting list is full",
+     "user_words": [
+      "the doctor sits idle while the waiting list is full"
+     ],
+     "summary": "Doctor idle while waiting list is full",
+     "category": "operations_process"
+    }
+   ]
+  }
+ },
+ {
+  "id": "car_list_en",
+  "industry": "new_car_dealerships_and_showrooms",
+  "language": "en",
+  "kind": "list",
+  "regression": false,
+  "messages": [
+   "Showroom problems: enquiries from the website are not followed up, test drive slots clash, and the finance paperwork takes about 5 days to complete."
+  ],
+  "expected": {
+   "problems": [
+    {
+     "id": "p1",
+     "any": [
+      "enquir",
+      "website",
+      "follow"
+     ],
+     "figures": []
+    },
+    {
+     "id": "p2",
+     "any": [
+      "test",
+      "drive",
+      "slot",
+      "clash"
+     ],
+     "figures": []
+    },
+    {
+     "id": "p3",
+     "any": [
+      "finance",
+      "paperwork",
+      "days"
+     ],
+     "figures": [
+      "5 days"
+     ]
+    }
+   ],
+   "stated": [
+    "enquiries from the website are not followed up",
+    "test drive slots clash",
+    "finance paperwork takes about 5 days to complete"
+   ],
+   "missing": [
+    "budget",
+    "cause",
+    "what has been tried"
+   ],
+   "hypothesis_only": [],
+   "corrections": []
+  },
+  "recorded": {
+   "origin": "reference output written by hand, not model output",
+   "notes": [
+    {
+     "title": "Website enquiries not followed up",
+     "title_local": "Website enquiries not followed up",
+     "user_words": [
+      "enquiries from the website are not followed up"
+     ],
+     "summary": "Website enquiries not followed up",
+     "category": "marketing_leads"
+    },
+    {
+     "title": "Test drive slots clash",
+     "title_local": "Test drive slots clash",
+     "user_words": [
+      "test drive slots clash"
+     ],
+     "summary": "Test drive slots clash",
+     "category": "operations_process"
+    },
+    {
+     "title": "Finance paperwork takes about five days",
+     "title_local": "Finance paperwork takes about five days",
+     "user_words": [
+      "finance paperwork takes about 5 days to complete"
+     ],
+     "summary": "Finance paperwork takes about five days",
+     "category": "compliance_admin"
+    }
+   ]
+  }
+ },
+ {
+  "id": "car_single_ur",
+  "industry": "new_car_dealerships_and_showrooms",
+  "language": "roman_ur",
+  "kind": "single",
+  "regression": false,
+  "messages": [
+   "Showroom mein footfall gir gaya hai, pichle mahine 120 log aaye the ab sirf 60 aa rahe hain."
+  ],
+  "expected": {
+   "problems": [
+    {
+     "id": "p1",
+     "any": [
+      "footfall",
+      "log",
+      "showroom"
+     ],
+     "figures": [
+      "120",
+      "60"
+     ]
+    }
+   ],
+   "stated": [
+    "pichle mahine 120 log aaye the ab sirf 60 aa rahe hain"
+   ],
+   "missing": [
+    "budget",
+    "cause",
+    "what has been tried"
+   ],
+   "hypothesis_only": [],
+   "corrections": []
+  },
+  "recorded": {
+   "origin": "reference output written by hand, not model output",
+   "notes": [
+    {
+     "title": "Showroom footfall has halved",
+     "title_local": "Showroom footfall has halved",
+     "user_words": [
+      "pichle mahine 120 log aaye the ab sirf 60 aa rahe hain"
+     ],
+     "summary": "Showroom footfall has halved",
+     "category": "sales_revenue"
+    }
+   ]
+  }
+ },
+ {
+  "id": "car_multi_en",
+  "industry": "new_car_dealerships_and_showrooms",
+  "language": "en",
+  "kind": "multi_turn",
+  "regression": false,
+  "messages": [
+   "Our sales team loses track of customers.",
+   "They keep notes in their own phones, so when someone leaves the leads go with them.",
+   "Also the used car stock list is a spreadsheet nobody updates."
+  ],
+  "expected": {
+   "problems": [
+    {
+     "id": "p1",
+     "any": [
+      "customer",
+      "leads",
+      "notes",
+      "phones"
+     ],
+     "figures": []
+    },
+    {
+     "id": "p2",
+     "any": [
+      "stock",
+      "spreadsheet",
+      "used"
+     ],
+     "figures": []
+    }
+   ],
+   "stated": [
+    "when someone leaves the leads go with them",
+    "the used car stock list is a spreadsheet nobody updates"
+   ],
+   "missing": [
+    "budget",
+    "cause",
+    "what has been tried"
+   ],
+   "hypothesis_only": [],
+   "corrections": []
+  },
+  "recorded": {
+   "origin": "reference output written by hand, not model output",
+   "notes": [
+    {
+     "title": "Sales team loses track of customers and leads",
+     "title_local": "Sales team loses track of customers and leads",
+     "user_words": [
+      "when someone leaves the leads go with them"
+     ],
+     "summary": "Sales team loses track of customers and leads",
+     "category": "customers_retention"
+    },
+    {
+     "title": "Used car stock list is never updated",
+     "title_local": "Used car stock list is never updated",
+     "user_words": [
+      "the used car stock list is a spreadsheet nobody updates"
+     ],
+     "summary": "Used car stock list is never updated",
+     "category": "stock_inventory"
+    }
+   ]
+  }
+ },
+ {
+  "id": "pha_list_en",
+  "industry": "pharmacies_and_medical_stores",
+  "language": "en",
+  "kind": "list",
+  "regression": false,
+  "messages": [
+   "Pharmacy: expiry dates are checked by eye once a month, the supplier orders are on paper, and cash in the drawer does not match the sales slips at night."
+  ],
+  "expected": {
+   "problems": [
+    {
+     "id": "p1",
+     "any": [
+      "expiry",
+      "dates",
+      "eye"
+     ],
+     "figures": [
+      "once a month"
+     ]
+    },
+    {
+     "id": "p2",
+     "any": [
+      "supplier",
+      "orders",
+      "paper"
+     ],
+     "figures": []
+    },
+    {
+     "id": "p3",
+     "any": [
+      "cash",
+      "drawer",
+      "slips"
+     ],
+     "figures": []
+    }
+   ],
+   "stated": [
+    "expiry dates are checked by eye once a month",
+    "the supplier orders are on paper",
+    "cash in the drawer does not match the sales slips at night"
+   ],
+   "missing": [
+    "budget",
+    "cause",
+    "what has been tried"
+   ],
+   "hypothesis_only": [],
+   "corrections": []
+  },
+  "recorded": {
+   "origin": "reference output written by hand, not model output",
+   "notes": [
+    {
+     "title": "Expiry dates checked by eye monthly",
+     "title_local": "Expiry dates checked by eye monthly",
+     "user_words": [
+      "expiry dates are checked by eye once a month"
+     ],
+     "summary": "Expiry dates checked by eye monthly",
+     "category": "stock_inventory"
+    },
+    {
+     "title": "Supplier orders kept on paper",
+     "title_local": "Supplier orders kept on paper",
+     "user_words": [
+      "the supplier orders are on paper"
+     ],
+     "summary": "Supplier orders kept on paper",
+     "category": "suppliers_purchasing"
+    },
+    {
+     "title": "Drawer cash does not match sales slips",
+     "title_local": "Drawer cash does not match sales slips",
+     "user_words": [
+      "cash in the drawer does not match the sales slips at night"
+     ],
+     "summary": "Drawer cash does not match sales slips",
+     "category": "cash_collections"
+    }
+   ]
+  }
+ },
+ {
+  "id": "pha_single_ur",
+  "industry": "pharmacies_and_medical_stores",
+  "language": "roman_ur",
+  "kind": "single",
+  "regression": false,
+  "messages": [
+   "Medical store par udhaar bohat ho gaya hai, kareeb 4 lakh rupay customers se lene hain aur koi hisaab nahi."
+  ],
+  "expected": {
+   "problems": [
+    {
+     "id": "p1",
+     "any": [
+      "udhaar",
+      "lakh",
+      "hisaab",
+      "customers"
+     ],
+     "figures": [
+      "4 lakh"
+     ]
+    }
+   ],
+   "stated": [
+    "kareeb 4 lakh rupay customers se lene hain aur koi hisaab nahi"
+   ],
+   "missing": [
+    "budget",
+    "cause",
+    "what has been tried"
+   ],
+   "hypothesis_only": [],
+   "corrections": []
+  },
+  "recorded": {
+   "origin": "reference output written by hand, not model output",
+   "notes": [
+    {
+     "title": "4 lakh owed by customers, no record",
+     "title_local": "4 lakh owed by customers, no record",
+     "user_words": [
+      "kareeb 4 lakh rupay customers se lene hain aur koi hisaab nahi"
+     ],
+     "summary": "4 lakh owed by customers, no record",
+     "category": "cash_collections"
+    }
+   ]
+  }
+ },
+ {
+  "id": "pha_correction_ur",
+  "industry": "pharmacies_and_medical_stores",
+  "language": "roman_ur",
+  "kind": "correction",
+  "regression": false,
+  "messages": [
+   "Mere paas 20 staff hain jo dukan par kaam karte hain.",
+   "Nahi 20 nahi, 12 staff hain."
+  ],
+  "expected": {
+   "problems": [
+    {
+     "id": "p1",
+     "any": [
+      "staff",
+      "dukan"
+     ],
+     "figures": [
+      "12"
+     ]
+    }
+   ],
+   "stated": [
+    "12 staff hain jo dukan par kaam karte hain"
+   ],
+   "missing": [
+    "budget",
+    "cause",
+    "what has been tried"
+   ],
+   "hypothesis_only": [],
+   "corrections": [
+    {
+     "wrong": "20",
+     "right": "12",
+     "problem": "p1"
+    }
+   ]
+  },
+  "recorded": {
+   "origin": "reference output written by hand, not model output",
+   "notes": [
+    {
+     "title": "Staff of twelve on the shop floor",
+     "title_local": "Staff of twelve on the shop floor",
+     "user_words": [
+      "12 staff hain jo dukan par kaam karte hain"
+     ],
+     "summary": "Staff of twelve on the shop floor",
+     "category": "people_staff"
+    }
+   ]
+  }
+ },
+ {
+  "id": "bee_single_en",
+  "industry": "beekeeping_and_honey",
+  "language": "en",
+  "kind": "single",
+  "regression": false,
+  "messages": [
+   "I sell honey in jars but customers keep asking whether it is pure, and I have no batch records to show where each jar came from."
+  ],
+  "expected": {
+   "problems": [
+    {
+     "id": "p1",
+     "any": [
+      "batch",
+      "records",
+      "pure",
+      "jar"
+     ],
+     "figures": []
+    }
+   ],
+   "stated": [
+    "no batch records to show where each jar came from"
+   ],
+   "missing": [
+    "budget",
+    "cause",
+    "what has been tried"
+   ],
+   "hypothesis_only": [],
+   "corrections": []
+  },
+  "recorded": {
+   "origin": "reference output written by hand, not model output",
+   "notes": [
+    {
+     "title": "No batch records to prove honey purity",
+     "title_local": "No batch records to prove honey purity",
+     "user_words": [
+      "no batch records to show where each jar came from"
+     ],
+     "summary": "No batch records to prove honey purity",
+     "category": "quality_complaints"
+    }
+   ]
+  }
+ },
+ {
+  "id": "bee_list_ur",
+  "industry": "beekeeping_and_honey",
+  "language": "roman_ur",
+  "kind": "list",
+  "regression": false,
+  "messages": [
+   "Shehad ke karobar mein teen masle hain: hives ka record nahi, orders WhatsApp par aate hain, aur winter mein production 40 percent gir jati hai."
+  ],
+  "expected": {
+   "problems": [
+    {
+     "id": "p1",
+     "any": [
+      "hives",
+      "record"
+     ],
+     "figures": []
+    },
+    {
+     "id": "p2",
+     "any": [
+      "orders",
+      "whatsapp"
+     ],
+     "figures": []
+    },
+    {
+     "id": "p3",
+     "any": [
+      "winter",
+      "production",
+      "gir"
+     ],
+     "figures": [
+      "40 percent"
+     ]
+    }
+   ],
+   "stated": [
+    "hives ka record nahi",
+    "orders WhatsApp par aate hain",
+    "winter mein production 40 percent gir jati hai"
+   ],
+   "missing": [
+    "budget",
+    "cause",
+    "what has been tried"
+   ],
+   "hypothesis_only": [],
+   "corrections": []
+  },
+  "recorded": {
+   "origin": "reference output written by hand, not model output",
+   "notes": [
+    {
+     "title": "No record kept of hives",
+     "title_local": "No record kept of hives",
+     "user_words": [
+      "hives ka record nahi"
+     ],
+     "summary": "No record kept of hives",
+     "category": "reporting_visibility"
+    },
+    {
+     "title": "Orders arrive on WhatsApp",
+     "title_local": "Orders arrive on WhatsApp",
+     "user_words": [
+      "orders WhatsApp par aate hain"
+     ],
+     "summary": "Orders arrive on WhatsApp",
+     "category": "orders_fulfilment"
+    },
+    {
+     "title": "Winter production falls by forty percent",
+     "title_local": "Winter production falls by forty percent",
+     "user_words": [
+      "winter mein production 40 percent gir jati hai"
+     ],
+     "summary": "Winter production falls by forty percent",
+     "category": "planning_growth"
+    }
+   ]
+  }
+ },
+ {
+  "id": "bee_urdu_script",
+  "industry": "beekeeping_and_honey",
+  "language": "ur",
+  "kind": "single",
+  "regression": false,
+  "messages": [
+   "ہمارے شہد کے کاروبار میں آرڈر واٹس ایپ پر آتے ہیں اور ہم اکثر بھول جاتے ہیں کہ کس کو کتنا بھیجنا ہے۔"
+  ],
+  "expected": {
+   "problems": [
+    {
+     "id": "p1",
+     "any": [
+      "آرڈر",
+      "واٹس",
+      "بھول"
+     ],
+     "figures": []
+    }
+   ],
+   "stated": [
+    "آرڈر واٹس ایپ پر آتے ہیں اور ہم اکثر بھول جاتے ہیں"
+   ],
+   "missing": [
+    "budget",
+    "cause",
+    "what has been tried"
+   ],
+   "hypothesis_only": [],
+   "corrections": []
+  },
+  "recorded": {
+   "origin": "reference output written by hand, not model output",
+   "notes": [
+    {
+     "title": "Orders on WhatsApp are forgotten",
+     "title_local": "Orders on WhatsApp are forgotten",
+     "user_words": [
+      "آرڈر واٹس ایپ پر آتے ہیں اور ہم اکثر بھول جاتے ہیں"
+     ],
+     "summary": "Orders on WhatsApp are forgotten",
+     "category": "orders_fulfilment"
+    }
+   ]
+  }
+ },
+ {
+  "id": "isp_list_en",
+  "industry": "internet_service_providers_and_cable_tv_operators",
+  "language": "en",
+  "kind": "list",
+  "regression": false,
+  "messages": [
+   "ISP issues: complaints come from calls, WhatsApp and the shop, and we do not know which are open. Bill collection is door to door and 30 percent are late. Technicians drive back and forth because jobs are not grouped by area."
+  ],
+  "expected": {
+   "problems": [
+    {
+     "id": "p1",
+     "any": [
+      "complaint",
+      "open",
+      "whatsapp"
+     ],
+     "figures": []
+    },
+    {
+     "id": "p2",
+     "any": [
+      "bill",
+      "collection",
+      "late"
+     ],
+     "figures": [
+      "30 percent"
+     ]
+    },
+    {
+     "id": "p3",
+     "any": [
+      "technician",
+      "jobs",
+      "area"
+     ],
+     "figures": []
+    }
+   ],
+   "stated": [
+    "complaints come from calls, WhatsApp and the shop",
+    "Bill collection is door to door and 30 percent are late",
+    "Technicians drive back and forth because jobs are not grouped by area"
+   ],
+   "missing": [
+    "budget",
+    "cause",
+    "what has been tried"
+   ],
+   "hypothesis_only": [],
+   "corrections": []
+  },
+  "recorded": {
+   "origin": "reference output written by hand, not model output",
+   "notes": [
+    {
+     "title": "Complaints from three channels with no open list",
+     "title_local": "Complaints from three channels with no open list",
+     "user_words": [
+      "complaints come from calls, WhatsApp and the shop"
+     ],
+     "summary": "Complaints from three channels with no open list",
+     "category": "quality_complaints"
+    },
+    {
+     "title": "Thirty percent of bills collected late",
+     "title_local": "Thirty percent of bills collected late",
+     "user_words": [
+      "Bill collection is door to door and 30 percent are late"
+     ],
+     "summary": "Thirty percent of bills collected late",
+     "category": "cash_collections"
+    },
+    {
+     "title": "Technician jobs not grouped by area",
+     "title_local": "Technician jobs not grouped by area",
+     "user_words": [
+      "Technicians drive back and forth because jobs are not grouped by area"
+     ],
+     "summary": "Technician jobs not grouped by area",
+     "category": "operations_process"
+    }
+   ]
+  }
+ },
+ {
+  "id": "isp_single_ur",
+  "industry": "internet_service_providers_and_cable_tv_operators",
+  "language": "roman_ur",
+  "kind": "single",
+  "regression": false,
+  "messages": [
+   "Customers ka connection kat jata hai aur hum ko pata hi nahi chalta jab tak woh phone na karein."
+  ],
+  "expected": {
+   "problems": [
+    {
+     "id": "p1",
+     "any": [
+      "connection",
+      "kat",
+      "phone",
+      "pata"
+     ],
+     "figures": []
+    }
+   ],
+   "stated": [
+    "connection kat jata hai aur hum ko pata hi nahi chalta jab tak woh phone na karein"
+   ],
+   "missing": [
+    "budget",
+    "cause",
+    "what has been tried"
+   ],
+   "hypothesis_only": [],
+   "corrections": []
+  },
+  "recorded": {
+   "origin": "reference output written by hand, not model output",
+   "notes": [
+    {
+     "title": "Outages are known only when customers call",
+     "title_local": "Outages are known only when customers call",
+     "user_words": [
+      "connection kat jata hai aur hum ko pata hi nahi chalta jab tak woh phone na karein"
+     ],
+     "summary": "Outages are known only when customers call",
+     "category": "quality_complaints"
+    }
+   ]
+  }
+ },
+ {
+  "id": "isp_correction_en",
+  "industry": "internet_service_providers_and_cable_tv_operators",
+  "language": "en",
+  "kind": "correction",
+  "regression": false,
+  "messages": [
+   "We have about 500 subscribers and collection is slow.",
+   "Correction, 5,000 subscribers, not 500."
+  ],
+  "expected": {
+   "problems": [
+    {
+     "id": "p1",
+     "any": [
+      "subscriber",
+      "collection",
+      "slow"
+     ],
+     "figures": [
+      "5000"
+     ]
+    }
+   ],
+   "stated": [
+    "5,000 subscribers and collection is slow"
+   ],
+   "missing": [
+    "budget",
+    "cause",
+    "what has been tried"
+   ],
+   "hypothesis_only": [],
+   "corrections": [
+    {
+     "wrong": "500",
+     "right": "5000",
+     "problem": "p1"
+    }
+   ]
+  },
+  "recorded": {
+   "origin": "reference output written by hand, not model output",
+   "notes": [
+    {
+     "title": "Slow collection from 5,000 subscribers",
+     "title_local": "Slow collection from 5,000 subscribers",
+     "user_words": [
+      "5,000 subscribers and collection is slow"
+     ],
+     "summary": "Slow collection from 5,000 subscribers",
+     "category": "cash_collections"
+    }
+   ]
+  }
+ },
+ {
+  "id": "til_list_en",
+  "industry": "tiles_marble_and_bathroom_kitchen_showrooms",
+  "language": "en",
+  "kind": "list",
+  "regression": false,
+  "messages": [
+   "Showroom: breakage in transit costs us around 2 lakh a month, shade mismatch between batches causes returns, and quotations take two days because prices sit in a notebook."
+  ],
+  "expected": {
+   "problems": [
+    {
+     "id": "p1",
+     "any": [
+      "breakage",
+      "transit",
+      "lakh"
+     ],
+     "figures": [
+      "2 lakh"
+     ]
+    },
+    {
+     "id": "p2",
+     "any": [
+      "shade",
+      "batch",
+      "return"
+     ],
+     "figures": []
+    },
+    {
+     "id": "p3",
+     "any": [
+      "quotation",
+      "notebook",
+      "prices"
+     ],
+     "figures": [
+      "two days"
+     ]
+    }
+   ],
+   "stated": [
+    "breakage in transit costs us around 2 lakh a month",
+    "shade mismatch between batches causes returns",
+    "quotations take two days because prices sit in a notebook"
+   ],
+   "missing": [
+    "budget",
+    "cause",
+    "what has been tried"
+   ],
+   "hypothesis_only": [],
+   "corrections": []
+  },
+  "recorded": {
+   "origin": "reference output written by hand, not model output",
+   "notes": [
+    {
+     "title": "Transit breakage costs about two lakh monthly",
+     "title_local": "Transit breakage costs about two lakh monthly",
+     "user_words": [
+      "breakage in transit costs us around 2 lakh a month"
+     ],
+     "summary": "Transit breakage costs about two lakh monthly",
+     "category": "loss_security"
+    },
+    {
+     "title": "Shade mismatch between batches causes returns",
+     "title_local": "Shade mismatch between batches causes returns",
+     "user_words": [
+      "shade mismatch between batches causes returns"
+     ],
+     "summary": "Shade mismatch between batches causes returns",
+     "category": "quality_complaints"
+    },
+    {
+     "title": "Quotations take two days from a notebook",
+     "title_local": "Quotations take two days from a notebook",
+     "user_words": [
+      "quotations take two days because prices sit in a notebook"
+     ],
+     "summary": "Quotations take two days from a notebook",
+     "category": "operations_process"
+    }
+   ]
+  }
+ },
+ {
+  "id": "til_single_ur",
+  "industry": "tiles_marble_and_bathroom_kitchen_showrooms",
+  "language": "roman_ur",
+  "kind": "single",
+  "regression": false,
+  "messages": [
+   "Dealers ko credit par tiles dete hain, 15 dealers ke 30 lakh rupay phanse hue hain."
+  ],
+  "expected": {
+   "problems": [
+    {
+     "id": "p1",
+     "any": [
+      "dealers",
+      "lakh",
+      "credit",
+      "phanse"
+     ],
+     "figures": [
+      "15",
+      "30 lakh"
+     ]
+    }
+   ],
+   "stated": [
+    "15 dealers ke 30 lakh rupay phanse hue hain"
+   ],
+   "missing": [
+    "budget",
+    "cause",
+    "what has been tried"
+   ],
+   "hypothesis_only": [],
+   "corrections": []
+  },
+  "recorded": {
+   "origin": "reference output written by hand, not model output",
+   "notes": [
+    {
+     "title": "30 lakh stuck with 15 dealers on credit",
+     "title_local": "30 lakh stuck with 15 dealers on credit",
+     "user_words": [
+      "15 dealers ke 30 lakh rupay phanse hue hain"
+     ],
+     "summary": "30 lakh stuck with 15 dealers on credit",
+     "category": "cash_collections"
+    }
+   ]
+  }
+ },
+ {
+  "id": "til_rant_en",
+  "industry": "tiles_marble_and_bathroom_kitchen_showrooms",
+  "language": "en",
+  "kind": "rant",
+  "regression": false,
+  "messages": [
+   "Honestly it is chaos. The godown guys don't know what is where, so a customer waits 40 minutes while someone searches, and last week we sold the same slab twice."
+  ],
+  "expected": {
+   "problems": [
+    {
+     "id": "p1",
+     "any": [
+      "wait",
+      "search",
+      "godown"
+     ],
+     "figures": [
+      "40 minutes"
+     ]
+    },
+    {
+     "id": "p2",
+     "any": [
+      "slab",
+      "twice",
+      "sold"
+     ],
+     "figures": []
+    }
+   ],
+   "stated": [
+    "a customer waits 40 minutes while someone searches",
+    "we sold the same slab twice"
+   ],
+   "missing": [
+    "budget",
+    "cause",
+    "what has been tried"
+   ],
+   "hypothesis_only": [],
+   "corrections": []
+  },
+  "recorded": {
+   "origin": "reference output written by hand, not model output",
+   "notes": [
+    {
+     "title": "Customers wait while stock is searched",
+     "title_local": "Customers wait while stock is searched",
+     "user_words": [
+      "a customer waits 40 minutes while someone searches"
+     ],
+     "summary": "Customers wait while stock is searched",
+     "category": "stock_inventory"
+    },
+    {
+     "title": "Same slab sold twice",
+     "title_local": "Same slab sold twice",
+     "user_words": [
+      "we sold the same slab twice"
+     ],
+     "summary": "Same slab sold twice",
+     "category": "stock_inventory"
+    }
+   ]
+  }
+ },
+ {
+  "id": "kir_list_ur",
+  "industry": "kiryana_corner_shops_and_convenience_stores",
+  "language": "roman_ur",
+  "kind": "list",
+  "regression": false,
+  "messages": [
+   "Dukan ke masle: udhaar ka hisaab copy mein hai, maal khatam ho jata hai pata nahi chalta, aur raat ko cash gin kar bhi sales se nahi milta."
+  ],
+  "expected": {
+   "problems": [
+    {
+     "id": "p1",
+     "any": [
+      "udhaar",
+      "hisaab",
+      "copy"
+     ],
+     "figures": []
+    },
+    {
+     "id": "p2",
+     "any": [
+      "maal",
+      "khatam",
+      "pata"
+     ],
+     "figures": []
+    },
+    {
+     "id": "p3",
+     "any": [
+      "cash",
+      "raat",
+      "sales"
+     ],
+     "figures": []
+    }
+   ],
+   "stated": [
+    "udhaar ka hisaab copy mein hai",
+    "maal khatam ho jata hai pata nahi chalta",
+    "raat ko cash gin kar bhi sales se nahi milta"
+   ],
+   "missing": [
+    "budget",
+    "cause",
+    "what has been tried"
+   ],
+   "hypothesis_only": [],
+   "corrections": []
+  },
+  "recorded": {
+   "origin": "reference output written by hand, not model output",
+   "notes": [
+    {
+     "title": "Credit kept in a notebook",
+     "title_local": "Credit kept in a notebook",
+     "user_words": [
+      "udhaar ka hisaab copy mein hai"
+     ],
+     "summary": "Credit kept in a notebook",
+     "category": "cash_collections"
+    },
+    {
+     "title": "Stock runs out unnoticed",
+     "title_local": "Stock runs out unnoticed",
+     "user_words": [
+      "maal khatam ho jata hai pata nahi chalta"
+     ],
+     "summary": "Stock runs out unnoticed",
+     "category": "stock_inventory"
+    },
+    {
+     "title": "Night cash does not match sales",
+     "title_local": "Night cash does not match sales",
+     "user_words": [
+      "raat ko cash gin kar bhi sales se nahi milta"
+     ],
+     "summary": "Night cash does not match sales",
+     "category": "cash_collections"
+    }
+   ]
+  }
+ },
+ {
+  "id": "kir_single_en",
+  "industry": "kiryana_corner_shops_and_convenience_stores",
+  "language": "en",
+  "kind": "single",
+  "regression": false,
+  "messages": [
+   "My shop sells groceries and the supplier visits twice a week but I order by guess, so I run out of sugar and flour often."
+  ],
+  "expected": {
+   "problems": [
+    {
+     "id": "p1",
+     "any": [
+      "order",
+      "guess",
+      "sugar",
+      "flour"
+     ],
+     "figures": []
+    }
+   ],
+   "stated": [
+    "I order by guess, so I run out of sugar and flour often"
+   ],
+   "missing": [
+    "budget",
+    "cause",
+    "what has been tried"
+   ],
+   "hypothesis_only": [],
+   "corrections": []
+  },
+  "recorded": {
+   "origin": "reference output written by hand, not model output",
+   "notes": [
+    {
+     "title": "Ordering by guess runs out of staples",
+     "title_local": "Ordering by guess runs out of staples",
+     "user_words": [
+      "I order by guess, so I run out of sugar and flour often"
+     ],
+     "summary": "Ordering by guess runs out of staples",
+     "category": "suppliers_purchasing"
+    }
+   ]
+  }
+ },
+ {
+  "id": "kir_mixed",
+  "industry": "kiryana_corner_shops_and_convenience_stores",
+  "language": "roman_ur",
+  "kind": "mixed",
+  "regression": false,
+  "messages": [
+   "Bhai my shop mein 3 workers hain but koi attendance ka record nahi, aur salary pe jhagra hota hai."
+  ],
+  "expected": {
+   "problems": [
+    {
+     "id": "p1",
+     "any": [
+      "attendance",
+      "salary",
+      "jhagra"
+     ],
+     "figures": [
+      "3 workers"
+     ]
+    }
+   ],
+   "stated": [
+    "3 workers hain but koi attendance ka record nahi, aur salary pe jhagra hota hai"
+   ],
+   "missing": [
+    "budget",
+    "cause",
+    "what has been tried"
+   ],
+   "hypothesis_only": [],
+   "corrections": []
+  },
+  "recorded": {
+   "origin": "reference output written by hand, not model output",
+   "notes": [
+    {
+     "title": "No attendance record causes salary disputes",
+     "title_local": "No attendance record causes salary disputes",
+     "user_words": [
+      "3 workers hain but koi attendance ka record nahi, aur salary pe jhagra hota hai"
+     ],
+     "summary": "No attendance record causes salary disputes",
+     "category": "people_staff"
+    }
+   ]
+  }
+ },
+ {
+  "id": "cli_list_en",
+  "industry": "clinics_and_gp_practices",
+  "language": "en",
+  "kind": "list",
+  "regression": false,
+  "messages": [
+   "GP clinic: patients wait over an hour, prescriptions are handwritten and get misread, and we cannot find old test reports."
+  ],
+  "expected": {
+   "problems": [
+    {
+     "id": "p1",
+     "any": [
+      "wait",
+      "hour",
+      "patients"
+     ],
+     "figures": [
+      "hour"
+     ]
+    },
+    {
+     "id": "p2",
+     "any": [
+      "prescription",
+      "handwritten",
+      "misread"
+     ],
+     "figures": []
+    },
+    {
+     "id": "p3",
+     "any": [
+      "test",
+      "reports",
+      "find"
+     ],
+     "figures": []
+    }
+   ],
+   "stated": [
+    "patients wait over an hour",
+    "prescriptions are handwritten and get misread",
+    "we cannot find old test reports"
+   ],
+   "missing": [
+    "budget",
+    "cause",
+    "what has been tried"
+   ],
+   "hypothesis_only": [],
+   "corrections": []
+  },
+  "recorded": {
+   "origin": "reference output written by hand, not model output",
+   "notes": [
+    {
+     "title": "Patients wait over an hour",
+     "title_local": "Patients wait over an hour",
+     "user_words": [
+      "patients wait over an hour"
+     ],
+     "summary": "Patients wait over an hour",
+     "category": "operations_process"
+    },
+    {
+     "title": "Handwritten prescriptions get misread",
+     "title_local": "Handwritten prescriptions get misread",
+     "user_words": [
+      "prescriptions are handwritten and get misread"
+     ],
+     "summary": "Handwritten prescriptions get misread",
+     "category": "quality_complaints"
+    },
+    {
+     "title": "Old test reports cannot be found",
+     "title_local": "Old test reports cannot be found",
+     "user_words": [
+      "we cannot find old test reports"
+     ],
+     "summary": "Old test reports cannot be found",
+     "category": "reporting_visibility"
+    }
+   ]
+  }
+ },
+ {
+  "id": "cli_single_ur",
+  "industry": "clinics_and_gp_practices",
+  "language": "roman_ur",
+  "kind": "single",
+  "regression": false,
+  "messages": [
+   "Clinic mein appointment ke bina bohat log aa jate hain isliye rush hota hai aur doctor 2 ghante late ho jata hai."
+  ],
+  "expected": {
+   "problems": [
+    {
+     "id": "p1",
+     "any": [
+      "appointment",
+      "rush",
+      "doctor",
+      "late"
+     ],
+     "figures": [
+      "2 ghante"
+     ]
+    }
+   ],
+   "stated": [
+    "doctor 2 ghante late ho jata hai"
+   ],
+   "missing": [
+    "budget",
+    "cause",
+    "what has been tried"
+   ],
+   "hypothesis_only": [],
+   "corrections": []
+  },
+  "recorded": {
+   "origin": "reference output written by hand, not model output",
+   "notes": [
+    {
+     "title": "Walk-ins cause rush and doctor runs late",
+     "title_local": "Walk-ins cause rush and doctor runs late",
+     "user_words": [
+      "doctor 2 ghante late ho jata hai"
+     ],
+     "summary": "Walk-ins cause rush and doctor runs late",
+     "category": "operations_process"
+    }
+   ]
+  }
+ },
+ {
+  "id": "cli_urdu_script",
+  "industry": "clinics_and_gp_practices",
+  "language": "ur",
+  "kind": "single",
+  "regression": false,
+  "messages": [
+   "کلینک میں مریضوں کا ریکارڈ کاغذ پر ہے اور پرانی رپورٹیں ڈھونڈنے میں بہت وقت لگتا ہے۔"
+  ],
+  "expected": {
+   "problems": [
+    {
+     "id": "p1",
+     "any": [
+      "ریکارڈ",
+      "کاغذ",
+      "رپورٹیں"
+     ],
+     "figures": []
+    }
+   ],
+   "stated": [
+    "مریضوں کا ریکارڈ کاغذ پر ہے اور پرانی رپورٹیں ڈھونڈنے میں بہت وقت لگتا ہے"
+   ],
+   "missing": [
+    "budget",
+    "cause",
+    "what has been tried"
+   ],
+   "hypothesis_only": [],
+   "corrections": []
+  },
+  "recorded": {
+   "origin": "reference output written by hand, not model output",
+   "notes": [
+    {
+     "title": "Paper patient records take long to search",
+     "title_local": "Paper patient records take long to search",
+     "user_words": [
+      "مریضوں کا ریکارڈ کاغذ پر ہے اور پرانی رپورٹیں ڈھونڈنے میں بہت وقت لگتا ہے"
+     ],
+     "summary": "Paper patient records take long to search",
+     "category": "reporting_visibility"
+    }
+   ]
+  }
+ },
+ {
+  "id": "res_list_en",
+  "industry": "restaurants",
+  "language": "en",
+  "kind": "list",
+  "regression": false,
+  "messages": [
+   "Restaurant: food cost is too high, waiters take wrong orders, and the kitchen runs out of chicken every Friday."
+  ],
+  "expected": {
+   "problems": [
+    {
+     "id": "p1",
+     "any": [
+      "food",
+      "cost",
+      "high"
+     ],
+     "figures": []
+    },
+    {
+     "id": "p2",
+     "any": [
+      "waiters",
+      "wrong",
+      "orders"
+     ],
+     "figures": []
+    },
+    {
+     "id": "p3",
+     "any": [
+      "kitchen",
+      "chicken",
+      "friday"
+     ],
+     "figures": []
+    }
+   ],
+   "stated": [
+    "food cost is too high",
+    "waiters take wrong orders",
+    "the kitchen runs out of chicken every Friday"
+   ],
+   "missing": [
+    "budget",
+    "cause",
+    "what has been tried"
+   ],
+   "hypothesis_only": [],
+   "corrections": []
+  },
+  "recorded": {
+   "origin": "reference output written by hand, not model output",
+   "notes": [
+    {
+     "title": "Food cost is too high",
+     "title_local": "Food cost is too high",
+     "user_words": [
+      "food cost is too high"
+     ],
+     "summary": "Food cost is too high",
+     "category": "margin_cost"
+    },
+    {
+     "title": "Waiters take wrong orders",
+     "title_local": "Waiters take wrong orders",
+     "user_words": [
+      "waiters take wrong orders"
+     ],
+     "summary": "Waiters take wrong orders",
+     "category": "quality_complaints"
+    },
+    {
+     "title": "Kitchen runs out of chicken on Fridays",
+     "title_local": "Kitchen runs out of chicken on Fridays",
+     "user_words": [
+      "the kitchen runs out of chicken every Friday"
+     ],
+     "summary": "Kitchen runs out of chicken on Fridays",
+     "category": "stock_inventory"
+    }
+   ]
+  }
+ },
+ {
+  "id": "res_single_ur",
+  "industry": "restaurants",
+  "language": "roman_ur",
+  "kind": "single",
+  "regression": false,
+  "messages": [
+   "Restaurant mein weekend par 25 percent orders late jate hain aur customers complain karte hain."
+  ],
+  "expected": {
+   "problems": [
+    {
+     "id": "p1",
+     "any": [
+      "weekend",
+      "orders",
+      "late"
+     ],
+     "figures": [
+      "25 percent"
+     ]
+    }
+   ],
+   "stated": [
+    "weekend par 25 percent orders late jate hain"
+   ],
+   "missing": [
+    "budget",
+    "cause",
+    "what has been tried"
+   ],
+   "hypothesis_only": [],
+   "corrections": []
+  },
+  "recorded": {
+   "origin": "reference output written by hand, not model output",
+   "notes": [
+    {
+     "title": "A quarter of weekend orders go out late",
+     "title_local": "A quarter of weekend orders go out late",
+     "user_words": [
+      "weekend par 25 percent orders late jate hain"
+     ],
+     "summary": "A quarter of weekend orders go out late",
+     "category": "orders_fulfilment"
+    }
+   ]
+  }
+ },
+ {
+  "id": "res_correction_en",
+  "industry": "restaurants",
+  "language": "en",
+  "kind": "correction",
+  "regression": false,
+  "messages": [
+   "We waste about 5 kg of rice each day.",
+   "No wait, it is 15 kg, I checked the bin."
+  ],
+  "expected": {
+   "problems": [
+    {
+     "id": "p1",
+     "any": [
+      "waste",
+      "rice"
+     ],
+     "figures": [
+      "15"
+     ]
+    }
+   ],
+   "stated": [
+    "we waste about 15 kg of rice each day"
+   ],
+   "missing": [
+    "budget",
+    "cause",
+    "what has been tried"
+   ],
+   "hypothesis_only": [],
+   "corrections": [
+    {
+     "wrong": "5",
+     "right": "15",
+     "problem": "p1"
+    }
+   ]
+  },
+  "recorded": {
+   "origin": "reference output written by hand, not model output",
+   "notes": [
+    {
+     "title": "Fifteen kilos of rice wasted daily",
+     "title_local": "Fifteen kilos of rice wasted daily",
+     "user_words": [
+      "we waste about 15 kg of rice each day"
+     ],
+     "summary": "Fifteen kilos of rice wasted daily",
+     "category": "margin_cost"
+    }
+   ]
+  }
+ },
+ {
+  "id": "reg_audit5_four_lines",
+  "industry": "unknown_business_owner",
+  "language": "en",
+  "kind": "list",
+  "regression": true,
+  "messages": [
+   "I run a business. It has alot of problems",
+   "All of the above",
+   "Sales: uses QB. Stock: about 10 crore, written on paper. Staff: no track of who comes and goes. Cash: in and out dont match."
+  ],
+  "expected": {
+   "problems": [
+    {
+     "id": "p1",
+     "any": [
+      "sales",
+      "qb"
+     ],
+     "figures": []
+    },
+    {
+     "id": "p2",
+     "any": [
+      "stock",
+      "paper"
+     ],
+     "figures": [
+      "10 crore"
+     ]
+    },
+    {
+     "id": "p3",
+     "any": [
+      "staff",
+      "track"
+     ],
+     "figures": []
+    },
+    {
+     "id": "p4",
+     "any": [
+      "cash",
+      "match"
+     ],
+     "figures": []
+    }
+   ],
+   "stated": [
+    "Sales: uses QB",
+    "Stock: about 10 crore, written on paper",
+    "Staff: no track of who comes and goes",
+    "Cash: in and out dont match"
+   ],
+   "missing": [
+    "budget",
+    "cause",
+    "what has been tried"
+   ],
+   "hypothesis_only": [
+    "stock and cash are one problem"
+   ],
+   "corrections": []
+  },
+  "recorded": {
+   "origin": "reference output written by hand, not model output",
+   "notes": [
+    {
+     "title": "Sales tracked in QuickBooks",
+     "title_local": "Sales tracked in QuickBooks",
+     "user_words": [
+      "Sales: uses QB"
+     ],
+     "summary": "Sales tracked in QuickBooks",
+     "category": "sales_revenue"
+    },
+    {
+     "title": "About 10 crore of stock on paper",
+     "title_local": "About 10 crore of stock on paper",
+     "user_words": [
+      "Stock: about 10 crore, written on paper"
+     ],
+     "summary": "About 10 crore of stock on paper",
+     "category": "stock_inventory"
+    },
+    {
+     "title": "No record of staff in and out",
+     "title_local": "No record of staff in and out",
+     "user_words": [
+      "Staff: no track of who comes and goes"
+     ],
+     "summary": "No record of staff in and out",
+     "category": "people_staff"
+    },
+    {
+     "title": "Cash in and out do not match",
+     "title_local": "Cash in and out do not match",
+     "user_words": [
+      "Cash: in and out dont match"
+     ],
+     "summary": "Cash in and out do not match",
+     "category": "cash_collections"
+    }
+   ]
+  }
+ },
+ {
+  "id": "gar_list_en",
+  "industry": "garment_and_knitwear_export_units",
+  "language": "en",
+  "kind": "list",
+  "regression": false,
+  "messages": [
+   "Export unit problems: buyers change orders late and we find out on the floor, about 6 percent of pieces fail final inspection, and fabric stock is counted by hand once a quarter."
+  ],
+  "expected": {
+   "problems": [
+    {
+     "id": "p1",
+     "any": [
+      "buyer",
+      "order",
+      "change",
+      "late"
+     ],
+     "figures": []
+    },
+    {
+     "id": "p2",
+     "any": [
+      "pieces",
+      "inspection",
+      "fail"
+     ],
+     "figures": [
+      "6 percent"
+     ]
+    },
+    {
+     "id": "p3",
+     "any": [
+      "fabric",
+      "stock",
+      "counted",
+      "hand"
+     ],
+     "figures": [
+      "once a quarter"
+     ]
+    }
+   ],
+   "stated": [
+    "buyers change orders late and we find out on the floor",
+    "about 6 percent of pieces fail final inspection",
+    "fabric stock is counted by hand once a quarter"
+   ],
+   "missing": [
+    "budget",
+    "cause",
+    "what has been tried"
+   ],
+   "hypothesis_only": [],
+   "corrections": []
+  },
+  "recorded": {
+   "origin": "reference output written by hand, not model output",
+   "notes": [
+    {
+     "title": "Buyer order changes reach the floor late",
+     "title_local": "Buyer order changes reach the floor late",
+     "user_words": [
+      "buyers change orders late and we find out on the floor"
+     ],
+     "summary": "Buyer order changes reach the floor late",
+     "category": "communication_coordination"
+    },
+    {
+     "title": "Six percent of pieces fail inspection",
+     "title_local": "Six percent of pieces fail inspection",
+     "user_words": [
+      "about 6 percent of pieces fail final inspection"
+     ],
+     "summary": "Six percent of pieces fail inspection",
+     "category": "quality_complaints"
+    },
+    {
+     "title": "Fabric stock counted by hand quarterly",
+     "title_local": "Fabric stock counted by hand quarterly",
+     "user_words": [
+      "fabric stock is counted by hand once a quarter"
+     ],
+     "summary": "Fabric stock counted by hand quarterly",
+     "category": "stock_inventory"
+    }
+   ]
+  }
+ },
+ {
+  "id": "gar_single_ur",
+  "industry": "garment_and_knitwear_export_units",
+  "language": "roman_ur",
+  "kind": "single",
+  "regression": false,
+  "messages": [
+   "Stitching line par roz 40 minute machine kharab hone ki wajah se ruk jati hai aur shipment late ho rahi hai."
+  ],
+  "expected": {
+   "problems": [
+    {
+     "id": "p1",
+     "any": [
+      "machine",
+      "stitching",
+      "shipment",
+      "kharab"
+     ],
+     "figures": [
+      "40 minute"
+     ]
+    }
+   ],
+   "stated": [
+    "roz 40 minute machine kharab hone ki wajah se ruk jati hai"
+   ],
+   "missing": [
+    "budget",
+    "cause",
+    "what has been tried"
+   ],
+   "hypothesis_only": [],
+   "corrections": []
+  },
+  "recorded": {
+   "origin": "reference output written by hand, not model output",
+   "notes": [
+    {
+     "title": "Daily machine stoppages delay shipments",
+     "title_local": "Daily machine stoppages delay shipments",
+     "user_words": [
+      "roz 40 minute machine kharab hone ki wajah se ruk jati hai"
+     ],
+     "summary": "Daily machine stoppages delay shipments",
+     "category": "operations_process"
+    }
+   ]
+  }
+ },
+ {
+  "id": "gar_correction_en",
+  "industry": "garment_and_knitwear_export_units",
+  "language": "en",
+  "kind": "correction",
+  "regression": false,
+  "messages": [
+   "We have about 200 workers on the line.",
+   "Correction, 350 workers, not 200."
+  ],
+  "expected": {
+   "problems": [
+    {
+     "id": "p1",
+     "any": [
+      "workers",
+      "line"
+     ],
+     "figures": [
+      "350"
+     ]
+    }
+   ],
+   "stated": [
+    "350 workers on the line"
+   ],
+   "missing": [
+    "budget",
+    "cause",
+    "what has been tried"
+   ],
+   "hypothesis_only": [],
+   "corrections": [
+    {
+     "wrong": "200",
+     "right": "350",
+     "problem": "p1"
+    }
+   ]
+  },
+  "recorded": {
+   "origin": "reference output written by hand, not model output",
+   "notes": [
+    {
+     "title": "Attendance of 350 line workers is not tracked",
+     "title_local": "Attendance of 350 line workers is not tracked",
+     "user_words": [
+      "350 workers on the line"
+     ],
+     "summary": "Attendance of 350 line workers is not tracked",
+     "category": "people_staff"
+    }
+   ]
+  }
+ },
+ {
+  "id": "gym_list_en",
+  "industry": "gyms_and_fitness_studios",
+  "language": "en",
+  "kind": "list",
+  "regression": false,
+  "messages": [
+   "The gym has three headaches: members freeze their plans and we forget to call them back, trainers' schedules clash, and fee payments are tracked in a register."
+  ],
+  "expected": {
+   "problems": [
+    {
+     "id": "p1",
+     "any": [
+      "freeze",
+      "members",
+      "call"
+     ],
+     "figures": []
+    },
+    {
+     "id": "p2",
+     "any": [
+      "trainers",
+      "schedules",
+      "clash"
+     ],
+     "figures": []
+    },
+    {
+     "id": "p3",
+     "any": [
+      "fee",
+      "payments",
+      "register"
+     ],
+     "figures": []
+    }
+   ],
+   "stated": [
+    "members freeze their plans and we forget to call them back",
+    "trainers' schedules clash",
+    "fee payments are tracked in a register"
+   ],
+   "missing": [
+    "budget",
+    "cause",
+    "what has been tried"
+   ],
+   "hypothesis_only": [],
+   "corrections": []
+  },
+  "recorded": {
+   "origin": "reference output written by hand, not model output",
+   "notes": [
+    {
+     "title": "Frozen members are never called back",
+     "title_local": "Frozen members are never called back",
+     "user_words": [
+      "members freeze their plans and we forget to call them back"
+     ],
+     "summary": "Frozen members are never called back",
+     "category": "customers_retention"
+    },
+    {
+     "title": "Trainer schedules clash",
+     "title_local": "Trainer schedules clash",
+     "user_words": [
+      "trainers' schedules clash"
+     ],
+     "summary": "Trainer schedules clash",
+     "category": "operations_process"
+    },
+    {
+     "title": "Fee payments tracked in a register",
+     "title_local": "Fee payments tracked in a register",
+     "user_words": [
+      "fee payments are tracked in a register"
+     ],
+     "summary": "Fee payments tracked in a register",
+     "category": "cash_collections"
+    }
+   ]
+  }
+ },
+ {
+  "id": "gym_single_ur",
+  "industry": "gyms_and_fitness_studios",
+  "language": "roman_ur",
+  "kind": "single",
+  "regression": false,
+  "messages": [
+   "Gym mein 300 members hain lekin sirf 120 regular aate hain, baqi 3 mahine mein chhor dete hain."
+  ],
+  "expected": {
+   "problems": [
+    {
+     "id": "p1",
+     "any": [
+      "members",
+      "chhor",
+      "regular"
+     ],
+     "figures": [
+      "300",
+      "120"
+     ]
+    }
+   ],
+   "stated": [
+    "sirf 120 regular aate hain, baqi 3 mahine mein chhor dete hain"
+   ],
+   "missing": [
+    "budget",
+    "cause",
+    "what has been tried"
+   ],
+   "hypothesis_only": [],
+   "corrections": []
+  },
+  "recorded": {
+   "origin": "reference output written by hand, not model output",
+   "notes": [
+    {
+     "title": "Most members leave within three months",
+     "title_local": "Most members leave within three months",
+     "user_words": [
+      "300 members hain lekin sirf 120 regular aate hain, baqi 3 mahine mein chhor dete hain"
+     ],
+     "summary": "Most members leave within three months",
+     "category": "customers_retention"
+    }
+   ]
+  }
+ },
+ {
+  "id": "gym_urdu_script",
+  "industry": "gyms_and_fitness_studios",
+  "language": "ur",
+  "kind": "single",
+  "regression": false,
+  "messages": [
+   "جم میں ممبرشپ کی فیس رجسٹر میں لکھی جاتی ہے اور ہر مہینے کئی ممبر فیس دینا بھول جاتے ہیں۔"
+  ],
+  "expected": {
+   "problems": [
+    {
+     "id": "p1",
+     "any": [
+      "فیس",
+      "رجسٹر",
+      "ممبر"
+     ],
+     "figures": []
+    }
+   ],
+   "stated": [
+    "ممبرشپ کی فیس رجسٹر میں لکھی جاتی ہے اور ہر مہینے کئی ممبر فیس دینا بھول جاتے ہیں"
+   ],
+   "missing": [
+    "budget",
+    "cause",
+    "what has been tried"
+   ],
+   "hypothesis_only": [],
+   "corrections": []
+  },
+  "recorded": {
+   "origin": "reference output written by hand, not model output",
+   "notes": [
+    {
+     "title": "Membership fees on a register and often missed",
+     "title_local": "Membership fees on a register and often missed",
+     "user_words": [
+      "ممبرشپ کی فیس رجسٹر میں لکھی جاتی ہے اور ہر مہینے کئی ممبر فیس دینا بھول جاتے ہیں"
+     ],
+     "summary": "Membership fees on a register and often missed",
+     "category": "cash_collections"
+    }
+   ]
+  }
+ },
+ {
+  "id": "har_list_en",
+  "industry": "hardware_paint_sanitary_and_building_materials_shops",
+  "language": "en",
+  "kind": "list",
+  "regression": false,
+  "messages": [
+   "Hardware shop: contractors take material on credit and 12 lakh is outstanding, we do not know what is in the back godown, and paint tinting mistakes come back as returns."
+  ],
+  "expected": {
+   "problems": [
+    {
+     "id": "p1",
+     "any": [
+      "contractors",
+      "credit",
+      "outstanding"
+     ],
+     "figures": [
+      "12 lakh"
+     ]
+    },
+    {
+     "id": "p2",
+     "any": [
+      "godown",
+      "know"
+     ],
+     "figures": []
+    },
+    {
+     "id": "p3",
+     "any": [
+      "paint",
+      "tinting",
+      "returns"
+     ],
+     "figures": []
+    }
+   ],
+   "stated": [
+    "contractors take material on credit and 12 lakh is outstanding",
+    "we do not know what is in the back godown",
+    "paint tinting mistakes come back as returns"
+   ],
+   "missing": [
+    "budget",
+    "cause",
+    "what has been tried"
+   ],
+   "hypothesis_only": [],
+   "corrections": []
+  },
+  "recorded": {
+   "origin": "reference output written by hand, not model output",
+   "notes": [
+    {
+     "title": "Twelve lakh outstanding from contractor credit",
+     "title_local": "Twelve lakh outstanding from contractor credit",
+     "user_words": [
+      "contractors take material on credit and 12 lakh is outstanding"
+     ],
+     "summary": "Twelve lakh outstanding from contractor credit",
+     "category": "cash_collections"
+    },
+    {
+     "title": "Back godown contents are unknown",
+     "title_local": "Back godown contents are unknown",
+     "user_words": [
+      "we do not know what is in the back godown"
+     ],
+     "summary": "Back godown contents are unknown",
+     "category": "stock_inventory"
+    },
+    {
+     "title": "Paint tinting mistakes come back as returns",
+     "title_local": "Paint tinting mistakes come back as returns",
+     "user_words": [
+      "paint tinting mistakes come back as returns"
+     ],
+     "summary": "Paint tinting mistakes come back as returns",
+     "category": "quality_complaints"
+    }
+   ]
+  }
+ },
+ {
+  "id": "har_single_ur",
+  "industry": "hardware_paint_sanitary_and_building_materials_shops",
+  "language": "roman_ur",
+  "kind": "single",
+  "regression": false,
+  "messages": [
+   "Dukan par rate roz badalte hain aur staff ko naye rate nahi pata hote, customer se jhagra hota hai."
+  ],
+  "expected": {
+   "problems": [
+    {
+     "id": "p1",
+     "any": [
+      "rate",
+      "staff",
+      "customer",
+      "jhagra"
+     ],
+     "figures": []
+    }
+   ],
+   "stated": [
+    "staff ko naye rate nahi pata hote, customer se jhagra hota hai"
+   ],
+   "missing": [
+    "budget",
+    "cause",
+    "what has been tried"
+   ],
+   "hypothesis_only": [],
+   "corrections": []
+  },
+  "recorded": {
+   "origin": "reference output written by hand, not model output",
+   "notes": [
+    {
+     "title": "Staff do not know the daily rate changes",
+     "title_local": "Staff do not know the daily rate changes",
+     "user_words": [
+      "staff ko naye rate nahi pata hote, customer se jhagra hota hai"
+     ],
+     "summary": "Staff do not know the daily rate changes",
+     "category": "communication_coordination"
+    }
+   ]
+  }
+ },
+ {
+  "id": "har_multi_en",
+  "industry": "hardware_paint_sanitary_and_building_materials_shops",
+  "language": "en",
+  "kind": "multi_turn",
+  "regression": false,
+  "messages": [
+   "Supplier deliveries are always late.",
+   "Last month cement came 9 days after we ordered it.",
+   "And we cannot tell which customer orders are waiting on it."
+  ],
+  "expected": {
+   "problems": [
+    {
+     "id": "p1",
+     "any": [
+      "supplier",
+      "deliveries",
+      "cement",
+      "late"
+     ],
+     "figures": [
+      "9 days"
+     ]
+    },
+    {
+     "id": "p2",
+     "any": [
+      "customer",
+      "orders",
+      "waiting"
+     ],
+     "figures": []
+    }
+   ],
+   "stated": [
+    "cement came 9 days after we ordered it",
+    "we cannot tell which customer orders are waiting on it"
+   ],
+   "missing": [
+    "budget",
+    "cause",
+    "what has been tried"
+   ],
+   "hypothesis_only": [],
+   "corrections": []
+  },
+  "recorded": {
+   "origin": "reference output written by hand, not model output",
+   "notes": [
+    {
+     "title": "Supplier deliveries arrive late",
+     "title_local": "Supplier deliveries arrive late",
+     "user_words": [
+      "cement came 9 days after we ordered it"
+     ],
+     "summary": "Supplier deliveries arrive late",
+     "category": "suppliers_purchasing"
+    },
+    {
+     "title": "Cannot tell which orders wait on stock",
+     "title_local": "Cannot tell which orders wait on stock",
+     "user_words": [
+      "we cannot tell which customer orders are waiting on it"
+     ],
+     "summary": "Cannot tell which orders wait on stock",
+     "category": "orders_fulfilment"
+    }
+   ]
+  }
+ },
+ {
+  "id": "mos_list_en",
+  "industry": "mosques_religious_trusts_and_community_institutions",
+  "language": "en",
+  "kind": "list",
+  "regression": false,
+  "messages": [
+   "Our trust has donations in cash and bank, nobody reconciles them, the volunteer roster is on a WhatsApp group, and we cannot show donors where the money went."
+  ],
+  "expected": {
+   "problems": [
+    {
+     "id": "p1",
+     "any": [
+      "donations",
+      "reconcile",
+      "cash",
+      "bank"
+     ],
+     "figures": []
+    },
+    {
+     "id": "p2",
+     "any": [
+      "volunteer",
+      "roster",
+      "whatsapp"
+     ],
+     "figures": []
+    },
+    {
+     "id": "p3",
+     "any": [
+      "donors",
+      "money",
+      "show"
+     ],
+     "figures": []
+    }
+   ],
+   "stated": [
+    "donations in cash and bank, nobody reconciles them",
+    "the volunteer roster is on a WhatsApp group",
+    "we cannot show donors where the money went"
+   ],
+   "missing": [
+    "budget",
+    "cause",
+    "what has been tried"
+   ],
+   "hypothesis_only": [],
+   "corrections": []
+  },
+  "recorded": {
+   "origin": "reference output written by hand, not model output",
+   "notes": [
+    {
+     "title": "Cash and bank donations are never reconciled",
+     "title_local": "Cash and bank donations are never reconciled",
+     "user_words": [
+      "donations in cash and bank, nobody reconciles them"
+     ],
+     "summary": "Cash and bank donations are never reconciled",
+     "category": "cash_collections"
+    },
+    {
+     "title": "Volunteer roster lives in a WhatsApp group",
+     "title_local": "Volunteer roster lives in a WhatsApp group",
+     "user_words": [
+      "the volunteer roster is on a WhatsApp group"
+     ],
+     "summary": "Volunteer roster lives in a WhatsApp group",
+     "category": "people_staff"
+    },
+    {
+     "title": "Cannot show donors where money went",
+     "title_local": "Cannot show donors where money went",
+     "user_words": [
+      "we cannot show donors where the money went"
+     ],
+     "summary": "Cannot show donors where money went",
+     "category": "reporting_visibility"
+    }
+   ]
+  }
+ },
+ {
+  "id": "mos_single_ur",
+  "industry": "mosques_religious_trusts_and_community_institutions",
+  "language": "roman_ur",
+  "kind": "single",
+  "regression": false,
+  "messages": [
+   "Masjid ke chande ka hisaab ek register mein hota hai aur har saal 2 baar ghalti nikalti hai."
+  ],
+  "expected": {
+   "problems": [
+    {
+     "id": "p1",
+     "any": [
+      "chande",
+      "hisaab",
+      "register",
+      "ghalti"
+     ],
+     "figures": [
+      "2 baar"
+     ]
+    }
+   ],
+   "stated": [
+    "chande ka hisaab ek register mein hota hai aur har saal 2 baar ghalti nikalti hai"
+   ],
+   "missing": [
+    "budget",
+    "cause",
+    "what has been tried"
+   ],
+   "hypothesis_only": [],
+   "corrections": []
+  },
+  "recorded": {
+   "origin": "reference output written by hand, not model output",
+   "notes": [
+    {
+     "title": "Donation register has errors twice yearly",
+     "title_local": "Donation register has errors twice yearly",
+     "user_words": [
+      "chande ka hisaab ek register mein hota hai aur har saal 2 baar ghalti nikalti hai"
+     ],
+     "summary": "Donation register has errors twice yearly",
+     "category": "reporting_visibility"
+    }
+   ]
+  }
+ },
+ {
+  "id": "mos_urdu_script",
+  "industry": "mosques_religious_trusts_and_community_institutions",
+  "language": "ur",
+  "kind": "single",
+  "regression": false,
+  "messages": [
+   "مدرسے کے طلبہ کی حاضری کاپی میں لگتی ہے اور فیس کا کوئی ریکارڈ نہیں رہتا۔"
+  ],
+  "expected": {
+   "problems": [
+    {
+     "id": "p1",
+     "any": [
+      "حاضری",
+      "کاپی",
+      "فیس",
+      "ریکارڈ"
+     ],
+     "figures": []
+    }
+   ],
+   "stated": [
+    "طلبہ کی حاضری کاپی میں لگتی ہے اور فیس کا کوئی ریکارڈ نہیں رہتا"
+   ],
+   "missing": [
+    "budget",
+    "cause",
+    "what has been tried"
+   ],
+   "hypothesis_only": [],
+   "corrections": []
+  },
+  "recorded": {
+   "origin": "reference output written by hand, not model output",
+   "notes": [
+    {
+     "title": "Attendance on paper and no fee record",
+     "title_local": "Attendance on paper and no fee record",
+     "user_words": [
+      "طلبہ کی حاضری کاپی میں لگتی ہے اور فیس کا کوئی ریکارڈ نہیں رہتا"
+     ],
+     "summary": "Attendance on paper and no fee record",
+     "category": "reporting_visibility"
+    }
+   ]
+  }
+ },
+ {
+  "id": "phm_list_en",
+  "industry": "pharmaceutical_manufacturing",
+  "language": "en",
+  "kind": "list",
+  "regression": false,
+  "messages": [
+   "Plant issues: batch records are filled on paper and take two days to review, a machine changeover wastes 3 hours, and we cannot trace a raw material to the batches it went into."
+  ],
+  "expected": {
+   "problems": [
+    {
+     "id": "p1",
+     "any": [
+      "batch",
+      "records",
+      "paper",
+      "review"
+     ],
+     "figures": [
+      "two days"
+     ]
+    },
+    {
+     "id": "p2",
+     "any": [
+      "changeover",
+      "machine",
+      "wastes"
+     ],
+     "figures": [
+      "3 hours"
+     ]
+    },
+    {
+     "id": "p3",
+     "any": [
+      "trace",
+      "raw",
+      "material",
+      "batches"
+     ],
+     "figures": []
+    }
+   ],
+   "stated": [
+    "batch records are filled on paper and take two days to review",
+    "a machine changeover wastes 3 hours",
+    "we cannot trace a raw material to the batches it went into"
+   ],
+   "missing": [
+    "budget",
+    "cause",
+    "what has been tried"
+   ],
+   "hypothesis_only": [],
+   "corrections": []
+  },
+  "recorded": {
+   "origin": "reference output written by hand, not model output",
+   "notes": [
+    {
+     "title": "Paper batch records take two days to review",
+     "title_local": "Paper batch records take two days to review",
+     "user_words": [
+      "batch records are filled on paper and take two days to review"
+     ],
+     "summary": "Paper batch records take two days to review",
+     "category": "compliance_admin"
+    },
+    {
+     "title": "Machine changeover wastes three hours",
+     "title_local": "Machine changeover wastes three hours",
+     "user_words": [
+      "a machine changeover wastes 3 hours"
+     ],
+     "summary": "Machine changeover wastes three hours",
+     "category": "operations_process"
+    },
+    {
+     "title": "Raw materials cannot be traced to batches",
+     "title_local": "Raw materials cannot be traced to batches",
+     "user_words": [
+      "we cannot trace a raw material to the batches it went into"
+     ],
+     "summary": "Raw materials cannot be traced to batches",
+     "category": "quality_complaints"
+    }
+   ]
+  }
+ },
+ {
+  "id": "phm_single_ur",
+  "industry": "pharmaceutical_manufacturing",
+  "language": "roman_ur",
+  "kind": "single",
+  "regression": false,
+  "messages": [
+   "Production plan har hafte badalta hai kyunke sales team ke orders aakhri din aate hain, 15 percent stock expire ho jata hai."
+  ],
+  "expected": {
+   "problems": [
+    {
+     "id": "p1",
+     "any": [
+      "orders",
+      "plan",
+      "expire",
+      "stock"
+     ],
+     "figures": [
+      "15 percent"
+     ]
+    }
+   ],
+   "stated": [
+    "sales team ke orders aakhri din aate hain, 15 percent stock expire ho jata hai"
+   ],
+   "missing": [
+    "budget",
+    "cause",
+    "what has been tried"
+   ],
+   "hypothesis_only": [],
+   "corrections": []
+  },
+  "recorded": {
+   "origin": "reference output written by hand, not model output",
+   "notes": [
+    {
+     "title": "Late orders churn the plan and stock expires",
+     "title_local": "Late orders churn the plan and stock expires",
+     "user_words": [
+      "sales team ke orders aakhri din aate hain, 15 percent stock expire ho jata hai"
+     ],
+     "summary": "Late orders churn the plan and stock expires",
+     "category": "planning_growth"
+    }
+   ]
+  }
+ },
+ {
+  "id": "phm_rant_en",
+  "industry": "pharmaceutical_manufacturing",
+  "language": "en",
+  "kind": "rant",
+  "regression": false,
+  "messages": [
+   "Audit is in two weeks and I have no idea whether our training records are complete, the QA manager says yes, production says no, and nobody has a single list of who is trained on what."
+  ],
+  "expected": {
+   "problems": [
+    {
+     "id": "p1",
+     "any": [
+      "training",
+      "records",
+      "complete",
+      "audit"
+     ],
+     "figures": [
+      "two weeks"
+     ]
+    },
+    {
+     "id": "p2",
+     "any": [
+      "list",
+      "trained"
+     ],
+     "figures": []
+    }
+   ],
+   "stated": [
+    "I have no idea whether our training records are complete",
+    "nobody has a single list of who is trained on what"
+   ],
+   "missing": [
+    "budget",
+    "cause",
+    "what has been tried"
+   ],
+   "hypothesis_only": [],
+   "corrections": []
+  },
+  "recorded": {
+   "origin": "reference output written by hand, not model output",
+   "notes": [
+    {
+     "title": "Training records completeness is unknown before audit",
+     "title_local": "Training records completeness is unknown before audit",
+     "user_words": [
+      "Audit is in two weeks and I have no idea whether our training records are complete"
+     ],
+     "summary": "Training records completeness is unknown before audit",
+     "category": "compliance_admin"
+    },
+    {
+     "title": "No single list of who is trained",
+     "title_local": "No single list of who is trained",
+     "user_words": [
+      "nobody has a single list of who is trained on what"
+     ],
+     "summary": "No single list of who is trained",
+     "category": "reporting_visibility"
+    }
+   ]
+  }
+ },
+ {
+  "id": "rea_list_en",
+  "industry": "real_estate_agencies_and_brokers",
+  "language": "en",
+  "kind": "list",
+  "regression": false,
+  "messages": [
+   "Agency problems: leads from portals sit unanswered for hours, listings are in spreadsheets that differ between agents, and viewings are double booked."
+  ],
+  "expected": {
+   "problems": [
+    {
+     "id": "p1",
+     "any": [
+      "leads",
+      "portals",
+      "unanswered"
+     ],
+     "figures": []
+    },
+    {
+     "id": "p2",
+     "any": [
+      "listings",
+      "spreadsheets",
+      "agents"
+     ],
+     "figures": []
+    },
+    {
+     "id": "p3",
+     "any": [
+      "viewings",
+      "double",
+      "booked"
+     ],
+     "figures": []
+    }
+   ],
+   "stated": [
+    "leads from portals sit unanswered for hours",
+    "listings are in spreadsheets that differ between agents",
+    "viewings are double booked"
+   ],
+   "missing": [
+    "budget",
+    "cause",
+    "what has been tried"
+   ],
+   "hypothesis_only": [],
+   "corrections": []
+  },
+  "recorded": {
+   "origin": "reference output written by hand, not model output",
+   "notes": [
+    {
+     "title": "Portal leads sit unanswered for hours",
+     "title_local": "Portal leads sit unanswered for hours",
+     "user_words": [
+      "leads from portals sit unanswered for hours"
+     ],
+     "summary": "Portal leads sit unanswered for hours",
+     "category": "marketing_leads"
+    },
+    {
+     "title": "Listings differ between agents' spreadsheets",
+     "title_local": "Listings differ between agents' spreadsheets",
+     "user_words": [
+      "listings are in spreadsheets that differ between agents"
+     ],
+     "summary": "Listings differ between agents' spreadsheets",
+     "category": "reporting_visibility"
+    },
+    {
+     "title": "Viewings are double booked",
+     "title_local": "Viewings are double booked",
+     "user_words": [
+      "viewings are double booked"
+     ],
+     "summary": "Viewings are double booked",
+     "category": "operations_process"
+    }
+   ]
+  }
+ },
+ {
+  "id": "rea_single_ur",
+  "industry": "real_estate_agencies_and_brokers",
+  "language": "roman_ur",
+  "kind": "single",
+  "regression": false,
+  "messages": [
+   "Property dealers ke 25 leads roz aate hain lekin follow-up koi nahi karta, 5 deals hath se nikal gayin."
+  ],
+  "expected": {
+   "problems": [
+    {
+     "id": "p1",
+     "any": [
+      "leads",
+      "follow",
+      "deals"
+     ],
+     "figures": [
+      "25",
+      "5 deals"
+     ]
+    }
+   ],
+   "stated": [
+    "25 leads roz aate hain lekin follow-up koi nahi karta"
+   ],
+   "missing": [
+    "budget",
+    "cause",
+    "what has been tried"
+   ],
+   "hypothesis_only": [],
+   "corrections": []
+  },
+  "recorded": {
+   "origin": "reference output written by hand, not model output",
+   "notes": [
+    {
+     "title": "Daily leads are not followed up",
+     "title_local": "Daily leads are not followed up",
+     "user_words": [
+      "25 leads roz aate hain lekin follow-up koi nahi karta, 5 deals hath se nikal gayin"
+     ],
+     "summary": "Daily leads are not followed up",
+     "category": "marketing_leads"
+    }
+   ]
+  }
+ },
+ {
+  "id": "rea_correction_ur",
+  "industry": "real_estate_agencies_and_brokers",
+  "language": "roman_ur",
+  "kind": "correction",
+  "regression": false,
+  "messages": [
+   "Mere paas 30 properties listed hain.",
+   "30 nahi, 80 properties hain."
+  ],
+  "expected": {
+   "problems": [
+    {
+     "id": "p1",
+     "any": [
+      "properties",
+      "listed"
+     ],
+     "figures": [
+      "80"
+     ]
+    }
+   ],
+   "stated": [
+    "80 properties listed hain"
+   ],
+   "missing": [
+    "budget",
+    "cause",
+    "what has been tried"
+   ],
+   "hypothesis_only": [],
+   "corrections": [
+    {
+     "wrong": "30",
+     "right": "80",
+     "problem": "p1"
+    }
+   ]
+  },
+  "recorded": {
+   "origin": "reference output written by hand, not model output",
+   "notes": [
+    {
+     "title": "Eighty listed properties are hard to keep current",
+     "title_local": "Eighty listed properties are hard to keep current",
+     "user_words": [
+      "80 properties listed hain"
+     ],
+     "summary": "Eighty listed properties are hard to keep current",
+     "category": "reporting_visibility"
+    }
+   ]
+  }
+ },
+ {
+  "id": "sal_list_en",
+  "industry": "salons_and_barbers",
+  "language": "en",
+  "kind": "list",
+  "regression": false,
+  "messages": [
+   "Salon: walk-ins and bookings clash at weekends, stylists' commission is calculated by hand and disputed, and colour products run out mid-week."
+  ],
+  "expected": {
+   "problems": [
+    {
+     "id": "p1",
+     "any": [
+      "walk",
+      "bookings",
+      "clash",
+      "weekends"
+     ],
+     "figures": []
+    },
+    {
+     "id": "p2",
+     "any": [
+      "commission",
+      "stylists",
+      "hand"
+     ],
+     "figures": []
+    },
+    {
+     "id": "p3",
+     "any": [
+      "colour",
+      "products",
+      "run"
+     ],
+     "figures": []
+    }
+   ],
+   "stated": [
+    "walk-ins and bookings clash at weekends",
+    "stylists' commission is calculated by hand and disputed",
+    "colour products run out mid-week"
+   ],
+   "missing": [
+    "budget",
+    "cause",
+    "what has been tried"
+   ],
+   "hypothesis_only": [],
+   "corrections": []
+  },
+  "recorded": {
+   "origin": "reference output written by hand, not model output",
+   "notes": [
+    {
+     "title": "Weekend walk-ins clash with bookings",
+     "title_local": "Weekend walk-ins clash with bookings",
+     "user_words": [
+      "walk-ins and bookings clash at weekends"
+     ],
+     "summary": "Weekend walk-ins clash with bookings",
+     "category": "operations_process"
+    },
+    {
+     "title": "Stylist commission worked out by hand and disputed",
+     "title_local": "Stylist commission worked out by hand and disputed",
+     "user_words": [
+      "stylists' commission is calculated by hand and disputed"
+     ],
+     "summary": "Stylist commission worked out by hand and disputed",
+     "category": "people_staff"
+    },
+    {
+     "title": "Colour products run out mid-week",
+     "title_local": "Colour products run out mid-week",
+     "user_words": [
+      "colour products run out mid-week"
+     ],
+     "summary": "Colour products run out mid-week",
+     "category": "stock_inventory"
+    }
+   ]
+  }
+ },
+ {
+  "id": "sal_single_ur",
+  "industry": "salons_and_barbers",
+  "language": "roman_ur",
+  "kind": "single",
+  "regression": false,
+  "messages": [
+   "Salon mein appointment ke bina aane wale 10 customers roz wapas chale jate hain kyunke chair khali nahi hoti."
+  ],
+  "expected": {
+   "problems": [
+    {
+     "id": "p1",
+     "any": [
+      "customers",
+      "wapas",
+      "chair"
+     ],
+     "figures": [
+      "10 customers"
+     ]
+    }
+   ],
+   "stated": [
+    "10 customers roz wapas chale jate hain kyunke chair khali nahi hoti"
+   ],
+   "missing": [
+    "budget",
+    "cause",
+    "what has been tried"
+   ],
+   "hypothesis_only": [],
+   "corrections": []
+  },
+  "recorded": {
+   "origin": "reference output written by hand, not model output",
+   "notes": [
+    {
+     "title": "Walk-ins leave because no chair is free",
+     "title_local": "Walk-ins leave because no chair is free",
+     "user_words": [
+      "10 customers roz wapas chale jate hain kyunke chair khali nahi hoti"
+     ],
+     "summary": "Walk-ins leave because no chair is free",
+     "category": "sales_revenue"
+    }
+   ]
+  }
+ },
+ {
+  "id": "sal_mixed",
+  "industry": "salons_and_barbers",
+  "language": "roman_ur",
+  "kind": "mixed",
+  "regression": false,
+  "messages": [
+   "Bhai staff ki salary 15 tareekh ko due hai but commission ka hisaab kisi ko samajh nahi aata."
+  ],
+  "expected": {
+   "problems": [
+    {
+     "id": "p1",
+     "any": [
+      "commission",
+      "hisaab",
+      "salary"
+     ],
+     "figures": [
+      "15"
+     ]
+    }
+   ],
+   "stated": [
+    "commission ka hisaab kisi ko samajh nahi aata"
+   ],
+   "missing": [
+    "budget",
+    "cause",
+    "what has been tried"
+   ],
+   "hypothesis_only": [],
+   "corrections": []
+  },
+  "recorded": {
+   "origin": "reference output written by hand, not model output",
+   "notes": [
+    {
+     "title": "Nobody understands the commission calculation",
+     "title_local": "Nobody understands the commission calculation",
+     "user_words": [
+      "staff ki salary 15 tareekh ko due hai but commission ka hisaab kisi ko samajh nahi aata"
+     ],
+     "summary": "Nobody understands the commission calculation",
+     "category": "people_staff"
+    }
+   ]
+  }
+ },
+ {
+  "id": "dai_list_en",
+  "industry": "dairy_processing",
+  "language": "en",
+  "kind": "list",
+  "regression": false,
+  "messages": [
+   "Dairy plant: milk collection quality is checked by smell, 4 percent of batches are rejected, and cold chain breaks during delivery are not recorded."
+  ],
+  "expected": {
+   "problems": [
+    {
+     "id": "p1",
+     "any": [
+      "milk",
+      "collection",
+      "quality",
+      "smell"
+     ],
+     "figures": []
+    },
+    {
+     "id": "p2",
+     "any": [
+      "batches",
+      "rejected"
+     ],
+     "figures": [
+      "4 percent"
+     ]
+    },
+    {
+     "id": "p3",
+     "any": [
+      "cold",
+      "chain",
+      "delivery",
+      "recorded"
+     ],
+     "figures": []
+    }
+   ],
+   "stated": [
+    "milk collection quality is checked by smell",
+    "4 percent of batches are rejected",
+    "cold chain breaks during delivery are not recorded"
+   ],
+   "missing": [
+    "budget",
+    "cause",
+    "what has been tried"
+   ],
+   "hypothesis_only": [],
+   "corrections": []
+  },
+  "recorded": {
+   "origin": "reference output written by hand, not model output",
+   "notes": [
+    {
+     "title": "Milk quality at collection checked by smell",
+     "title_local": "Milk quality at collection checked by smell",
+     "user_words": [
+      "milk collection quality is checked by smell"
+     ],
+     "summary": "Milk quality at collection checked by smell",
+     "category": "quality_complaints"
+    },
+    {
+     "title": "Four percent of batches rejected",
+     "title_local": "Four percent of batches rejected",
+     "user_words": [
+      "4 percent of batches are rejected"
+     ],
+     "summary": "Four percent of batches rejected",
+     "category": "loss_security"
+    },
+    {
+     "title": "Cold chain breaks in delivery unrecorded",
+     "title_local": "Cold chain breaks in delivery unrecorded",
+     "user_words": [
+      "cold chain breaks during delivery are not recorded"
+     ],
+     "summary": "Cold chain breaks in delivery unrecorded",
+     "category": "reporting_visibility"
+    }
+   ]
+  }
+ },
+ {
+  "id": "dai_single_ur",
+  "industry": "dairy_processing",
+  "language": "roman_ur",
+  "kind": "single",
+  "regression": false,
+  "messages": [
+   "Farmers ko payment har hafte hoti hai magar kitna doodh aaya iska hisaab register mein hai, 20 farmers se jhagra rehta hai."
+  ],
+  "expected": {
+   "problems": [
+    {
+     "id": "p1",
+     "any": [
+      "farmers",
+      "doodh",
+      "register",
+      "jhagra"
+     ],
+     "figures": [
+      "20 farmers"
+     ]
+    }
+   ],
+   "stated": [
+    "kitna doodh aaya iska hisaab register mein hai, 20 farmers se jhagra rehta hai"
+   ],
+   "missing": [
+    "budget",
+    "cause",
+    "what has been tried"
+   ],
+   "hypothesis_only": [],
+   "corrections": []
+  },
+  "recorded": {
+   "origin": "reference output written by hand, not model output",
+   "notes": [
+    {
+     "title": "Farmer milk volumes are on a register",
+     "title_local": "Farmer milk volumes are on a register",
+     "user_words": [
+      "kitna doodh aaya iska hisaab register mein hai, 20 farmers se jhagra rehta hai"
+     ],
+     "summary": "Farmer milk volumes are on a register",
+     "category": "reporting_visibility"
+    }
+   ]
+  }
+ },
+ {
+  "id": "dai_urdu_script",
+  "industry": "dairy_processing",
+  "language": "ur",
+  "kind": "single",
+  "regression": false,
+  "messages": [
+   "ڈیری میں دودھ کی ترسیل کا کوئی ریکارڈ نہیں اور ٹھنڈی گاڑیاں اکثر دیر سے پہنچتی ہیں۔"
+  ],
+  "expected": {
+   "problems": [
+    {
+     "id": "p1",
+     "any": [
+      "دودھ",
+      "ترسیل",
+      "ریکارڈ",
+      "گاڑیاں"
+     ],
+     "figures": []
+    }
+   ],
+   "stated": [
+    "دودھ کی ترسیل کا کوئی ریکارڈ نہیں اور ٹھنڈی گاڑیاں اکثر دیر سے پہنچتی ہیں"
+   ],
+   "missing": [
+    "budget",
+    "cause",
+    "what has been tried"
+   ],
+   "hypothesis_only": [],
+   "corrections": []
+  },
+  "recorded": {
+   "origin": "reference output written by hand, not model output",
+   "notes": [
+    {
+     "title": "Milk deliveries unrecorded and cold vans late",
+     "title_local": "Milk deliveries unrecorded and cold vans late",
+     "user_words": [
+      "دودھ کی ترسیل کا کوئی ریکارڈ نہیں اور ٹھنڈی گاڑیاں اکثر دیر سے پہنچتی ہیں"
+     ],
+     "summary": "Milk deliveries unrecorded and cold vans late",
+     "category": "operations_process"
+    }
+   ]
+  }
+ },
+ {
+  "id": "bef_list_en",
+  "industry": "beef_cattle_fattening_and_feedlots",
+  "language": "en",
+  "kind": "list",
+  "regression": false,
+  "messages": [
+   "Feedlot problems: we do not know the weight gain per animal, feed cost is rising about 10 percent a quarter, and vet treatments are written in a notebook."
+  ],
+  "expected": {
+   "problems": [
+    {
+     "id": "p1",
+     "any": [
+      "weight",
+      "gain",
+      "animal"
+     ],
+     "figures": []
+    },
+    {
+     "id": "p2",
+     "any": [
+      "feed",
+      "cost",
+      "rising"
+     ],
+     "figures": [
+      "10 percent"
+     ]
+    },
+    {
+     "id": "p3",
+     "any": [
+      "vet",
+      "treatments",
+      "notebook"
+     ],
+     "figures": []
+    }
+   ],
+   "stated": [
+    "we do not know the weight gain per animal",
+    "feed cost is rising about 10 percent a quarter",
+    "vet treatments are written in a notebook"
+   ],
+   "missing": [
+    "budget",
+    "cause",
+    "what has been tried"
+   ],
+   "hypothesis_only": [],
+   "corrections": []
+  },
+  "recorded": {
+   "origin": "reference output written by hand, not model output",
+   "notes": [
+    {
+     "title": "Weight gain per animal is unknown",
+     "title_local": "Weight gain per animal is unknown",
+     "user_words": [
+      "we do not know the weight gain per animal"
+     ],
+     "summary": "Weight gain per animal is unknown",
+     "category": "reporting_visibility"
+    },
+    {
+     "title": "Feed cost rising ten percent a quarter",
+     "title_local": "Feed cost rising ten percent a quarter",
+     "user_words": [
+      "feed cost is rising about 10 percent a quarter"
+     ],
+     "summary": "Feed cost rising ten percent a quarter",
+     "category": "margin_cost"
+    },
+    {
+     "title": "Vet treatments written in a notebook",
+     "title_local": "Vet treatments written in a notebook",
+     "user_words": [
+      "vet treatments are written in a notebook"
+     ],
+     "summary": "Vet treatments written in a notebook",
+     "category": "reporting_visibility"
+    }
+   ]
+  }
+ },
+ {
+  "id": "bef_single_ur",
+  "industry": "beef_cattle_fattening_and_feedlots",
+  "language": "roman_ur",
+  "kind": "single",
+  "regression": false,
+  "messages": [
+   "Farm mein 150 janwar hain aur kis ko kitni khurak di gayi iska koi record nahi, kuch janwar kamzor ho rahe hain."
+  ],
+  "expected": {
+   "problems": [
+    {
+     "id": "p1",
+     "any": [
+      "khurak",
+      "record",
+      "janwar"
+     ],
+     "figures": [
+      "150"
+     ]
+    }
+   ],
+   "stated": [
+    "kis ko kitni khurak di gayi iska koi record nahi"
+   ],
+   "missing": [
+    "budget",
+    "cause",
+    "what has been tried"
+   ],
+   "hypothesis_only": [],
+   "corrections": []
+  },
+  "recorded": {
+   "origin": "reference output written by hand, not model output",
+   "notes": [
+    {
+     "title": "No feed record per animal",
+     "title_local": "No feed record per animal",
+     "user_words": [
+      "Farm mein 150 janwar hain aur kis ko kitni khurak di gayi iska koi record nahi"
+     ],
+     "summary": "No feed record per animal",
+     "category": "reporting_visibility"
+    }
+   ]
+  }
+ },
+ {
+  "id": "bef_correction_en",
+  "industry": "beef_cattle_fattening_and_feedlots",
+  "language": "en",
+  "kind": "correction",
+  "regression": false,
+  "messages": [
+   "We lose around 2 animals a month to disease.",
+   "Actually not 2, it is 7 animals a month."
+  ],
+  "expected": {
+   "problems": [
+    {
+     "id": "p1",
+     "any": [
+      "animals",
+      "lose",
+      "disease"
+     ],
+     "figures": [
+      "7"
+     ]
+    }
+   ],
+   "stated": [
+    "we lose around 7 animals a month to disease"
+   ],
+   "missing": [
+    "budget",
+    "cause",
+    "what has been tried"
+   ],
+   "hypothesis_only": [],
+   "corrections": [
+    {
+     "wrong": "2",
+     "right": "7",
+     "problem": "p1"
+    }
+   ]
+  },
+  "recorded": {
+   "origin": "reference output written by hand, not model output",
+   "notes": [
+    {
+     "title": "Seven animals a month lost to disease",
+     "title_local": "Seven animals a month lost to disease",
+     "user_words": [
+      "we lose around 7 animals a month to disease"
+     ],
+     "summary": "Seven animals a month lost to disease",
+     "category": "loss_security"
+    }
+   ]
+  }
+ },
+ {
+  "id": "cou_list_en",
+  "industry": "courier_and_last_mile_delivery_companies",
+  "language": "en",
+  "kind": "list",
+  "regression": false,
+  "messages": [
+   "Courier problems: 15 percent of parcels fail first delivery, riders report cash collection on paper slips, and customers keep calling to ask where their parcel is."
+  ],
+  "expected": {
+   "problems": [
+    {
+     "id": "p1",
+     "any": [
+      "parcels",
+      "delivery",
+      "fail"
+     ],
+     "figures": [
+      "15 percent"
+     ]
+    },
+    {
+     "id": "p2",
+     "any": [
+      "riders",
+      "cash",
+      "slips"
+     ],
+     "figures": []
+    },
+    {
+     "id": "p3",
+     "any": [
+      "customers",
+      "calling",
+      "parcel"
+     ],
+     "figures": []
+    }
+   ],
+   "stated": [
+    "15 percent of parcels fail first delivery",
+    "riders report cash collection on paper slips",
+    "customers keep calling to ask where their parcel is"
+   ],
+   "missing": [
+    "budget",
+    "cause",
+    "what has been tried"
+   ],
+   "hypothesis_only": [],
+   "corrections": []
+  },
+  "recorded": {
+   "origin": "reference output written by hand, not model output",
+   "notes": [
+    {
+     "title": "Fifteen percent of parcels fail first delivery",
+     "title_local": "Fifteen percent of parcels fail first delivery",
+     "user_words": [
+      "15 percent of parcels fail first delivery"
+     ],
+     "summary": "Fifteen percent of parcels fail first delivery",
+     "category": "orders_fulfilment"
+    },
+    {
+     "title": "Rider cash collection on paper slips",
+     "title_local": "Rider cash collection on paper slips",
+     "user_words": [
+      "riders report cash collection on paper slips"
+     ],
+     "summary": "Rider cash collection on paper slips",
+     "category": "cash_collections"
+    },
+    {
+     "title": "Customers call to ask where parcels are",
+     "title_local": "Customers call to ask where parcels are",
+     "user_words": [
+      "customers keep calling to ask where their parcel is"
+     ],
+     "summary": "Customers call to ask where parcels are",
+     "category": "communication_coordination"
+    }
+   ]
+  }
+ },
+ {
+  "id": "cou_single_ur",
+  "industry": "courier_and_last_mile_delivery_companies",
+  "language": "roman_ur",
+  "kind": "single",
+  "regression": false,
+  "messages": [
+   "Riders raste ka plan khud banate hain isliye aik hi area mein 3 riders chale jate hain aur doosre area ke parcel ruk jate hain."
+  ],
+  "expected": {
+   "problems": [
+    {
+     "id": "p1",
+     "any": [
+      "riders",
+      "area",
+      "parcel",
+      "raste"
+     ],
+     "figures": [
+      "3 riders"
+     ]
+    }
+   ],
+   "stated": [
+    "aik hi area mein 3 riders chale jate hain aur doosre area ke parcel ruk jate hain"
+   ],
+   "missing": [
+    "budget",
+    "cause",
+    "what has been tried"
+   ],
+   "hypothesis_only": [],
+   "corrections": []
+  },
+  "recorded": {
+   "origin": "reference output written by hand, not model output",
+   "notes": [
+    {
+     "title": "Riders overlap on routes while areas wait",
+     "title_local": "Riders overlap on routes while areas wait",
+     "user_words": [
+      "aik hi area mein 3 riders chale jate hain aur doosre area ke parcel ruk jate hain"
+     ],
+     "summary": "Riders overlap on routes while areas wait",
+     "category": "operations_process"
+    }
+   ]
+  }
+ },
+ {
+  "id": "cou_multi_en",
+  "industry": "courier_and_last_mile_delivery_companies",
+  "language": "en",
+  "kind": "multi_turn",
+  "regression": false,
+  "messages": [
+   "Our riders lose parcels.",
+   "About 20 a month go missing between the hub and the customer.",
+   "We only find out when the customer complains."
+  ],
+  "expected": {
+   "problems": [
+    {
+     "id": "p1",
+     "any": [
+      "parcels",
+      "missing",
+      "lose",
+      "hub"
+     ],
+     "figures": [
+      "20"
+     ]
+    },
+    {
+     "id": "p2",
+     "any": [
+      "find",
+      "customer",
+      "complains"
+     ],
+     "figures": []
+    }
+   ],
+   "stated": [
+    "About 20 a month go missing between the hub and the customer",
+    "We only find out when the customer complains"
+   ],
+   "missing": [
+    "budget",
+    "cause",
+    "what has been tried"
+   ],
+   "hypothesis_only": [],
+   "corrections": []
+  },
+  "recorded": {
+   "origin": "reference output written by hand, not model output",
+   "notes": [
+    {
+     "title": "About twenty parcels a month go missing",
+     "title_local": "About twenty parcels a month go missing",
+     "user_words": [
+      "About 20 a month go missing between the hub and the customer"
+     ],
+     "summary": "About twenty parcels a month go missing",
+     "category": "loss_security"
+    },
+    {
+     "title": "Losses are found only when customers complain",
+     "title_local": "Losses are found only when customers complain",
+     "user_words": [
+      "We only find out when the customer complains"
+     ],
+     "summary": "Losses are found only when customers complain",
+     "category": "quality_complaints"
+    }
+   ]
+  }
+ },
+ {
+  "id": "reg_six_problems",
+  "industry": "unknown_business_owner",
+  "language": "en",
+  "kind": "list",
+  "regression": true,
+  "messages": [
+   "Problems: 1) no stock count, 2) staff late every day, 3) cash short about 20000 weekly, 4) suppliers deliver late, 5) customers complain about delays, 6) no sales report."
+  ],
+  "expected": {
+   "problems": [
+    {
+     "id": "p1",
+     "any": [
+      "stock",
+      "count"
+     ],
+     "figures": []
+    },
+    {
+     "id": "p2",
+     "any": [
+      "staff",
+      "late"
+     ],
+     "figures": []
+    },
+    {
+     "id": "p3",
+     "any": [
+      "cash",
+      "short"
+     ],
+     "figures": [
+      "20000"
+     ]
+    },
+    {
+     "id": "p4",
+     "any": [
+      "suppliers",
+      "deliver"
+     ],
+     "figures": []
+    },
+    {
+     "id": "p5",
+     "any": [
+      "customers",
+      "complain",
+      "delays"
+     ],
+     "figures": []
+    },
+    {
+     "id": "p6",
+     "any": [
+      "sales",
+      "report"
+     ],
+     "figures": []
+    }
+   ],
+   "stated": [
+    "no stock count",
+    "staff late every day",
+    "cash short about 20000 weekly",
+    "suppliers deliver late",
+    "customers complain about delays",
+    "no sales report"
+   ],
+   "missing": [
+    "budget",
+    "cause",
+    "what has been tried"
+   ],
+   "hypothesis_only": [],
+   "corrections": []
+  },
+  "recorded": {
+   "origin": "reference output written by hand, not model output",
+   "notes": [
+    {
+     "title": "No stock count is done",
+     "title_local": "No stock count is done",
+     "user_words": [
+      "no stock count"
+     ],
+     "summary": "No stock count is done",
+     "category": "stock_inventory"
+    },
+    {
+     "title": "Staff arrive late every day",
+     "title_local": "Staff arrive late every day",
+     "user_words": [
+      "staff late every day"
+     ],
+     "summary": "Staff arrive late every day",
+     "category": "people_staff"
+    },
+    {
+     "title": "Cash short about 20000 weekly",
+     "title_local": "Cash short about 20000 weekly",
+     "user_words": [
+      "cash short about 20000 weekly"
+     ],
+     "summary": "Cash short about 20000 weekly",
+     "category": "cash_collections"
+    },
+    {
+     "title": "Suppliers deliver late",
+     "title_local": "Suppliers deliver late",
+     "user_words": [
+      "suppliers deliver late"
+     ],
+     "summary": "Suppliers deliver late",
+     "category": "suppliers_purchasing"
+    },
+    {
+     "title": "Customers complain about delays",
+     "title_local": "Customers complain about delays",
+     "user_words": [
+      "customers complain about delays"
+     ],
+     "summary": "Customers complain about delays",
+     "category": "quality_complaints"
+    },
+    {
+     "title": "No sales report exists",
+     "title_local": "No sales report exists",
+     "user_words": [
+      "no sales report"
+     ],
+     "summary": "No sales report exists",
+     "category": "reporting_visibility"
+    }
+   ]
+  }
+ },
+ {
+  "id": "reg_correction_figure",
+  "industry": "unknown_business_owner",
+  "language": "en",
+  "kind": "correction",
+  "regression": true,
+  "messages": [
+   "We lost about 10 clients last year because reports came late.",
+   "Sorry, not 10, it was 100 clients."
+  ],
+  "expected": {
+   "problems": [
+    {
+     "id": "p1",
+     "any": [
+      "clients",
+      "lost",
+      "reports"
+     ],
+     "figures": [
+      "100"
+     ]
+    }
+   ],
+   "stated": [
+    "we lost 100 clients last year because reports came late"
+   ],
+   "missing": [
+    "budget",
+    "cause",
+    "what has been tried"
+   ],
+   "hypothesis_only": [],
+   "corrections": [
+    {
+     "wrong": "10",
+     "right": "100",
+     "problem": "p1"
+    }
+   ]
+  },
+  "recorded": {
+   "origin": "reference output written by hand, not model output",
+   "notes": [
+    {
+     "title": "Clients lost because reports came late",
+     "title_local": "Clients lost because reports came late",
+     "user_words": [
+      "we lost 100 clients last year because reports came late"
+     ],
+     "summary": "Clients lost because reports came late",
+     "category": "customers_retention"
+    }
+   ]
+  }
+ }
+]

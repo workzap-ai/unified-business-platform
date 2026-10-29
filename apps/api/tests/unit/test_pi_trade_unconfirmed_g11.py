@@ -35,3 +35,17 @@ def test_a_stated_trade_is_kept_and_remembered() -> None:
 def test_once_confirmed_a_later_weak_turn_keeps_the_knowledge() -> None:
     out = sc.unconfirmed_trade(found(False), conversation({"industry_confirmed": True}))
     assert out["industry_knowledge"].startswith("AC units")
+
+
+def test_a_guess_leaves_no_trade_name_or_key_for_the_expert_or_the_sector_rules() -> None:
+    # Reproduction (Live Audit 5, A53): the guessed pack's name and key stayed in the context, so the
+    # expert persona (`trade_name`), `never_say` and the sector never-rules still used the guess.
+    out = sc.unconfirmed_trade(found(False), conversation())
+    assert out["industry"] == [] and out["industry_keys"] == []
+    assert out["industry_unconfirmed"] is True
+
+
+def test_a_stated_or_confirmed_trade_keeps_its_name_and_key() -> None:
+    assert sc.unconfirmed_trade(found(True), conversation())["industry_keys"] == ["x"]
+    confirmed = sc.unconfirmed_trade(found(False), conversation({"industry_confirmed": True}))
+    assert confirmed["industry"] == ["Air conditioning"]

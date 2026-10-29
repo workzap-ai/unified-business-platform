@@ -101,8 +101,21 @@ Who: a lane of work, not a person. Linter hardening session = `constitution.py` 
 - R-CONV (promise P2, 'No forms. Just chat.'): `business_form.after_turn` sent the 'Business details' WhatsApp form on pi's second unanswered ask for the business, in brain mode too. Brain mode now skips it (`test_pi_rule_gaps.py::test_brain_mode_never_sends_the_business_form`).
 - Rules that had code but no test got one: R-CANT-03, R-KICK-03, R-VOICE-13, Job S8, spec 1.9 (priority order of the gates), X5 (distress is not an emergency). Prompt-only rules are checked to be in the prompt text (`test_a_prompt_only_rule_is_in_the_text_pi_reads_while_listening`).
 - Stale claims in the previous version of this page are gone: the 'open' red-team list (all 29 attacks and all 15 golden conversations have named tests, see `test_pi_part10_coverage.py`), 'R-QUOTE-09 open' (the fixed answer exists and is tested), 'build-fit confirmation is not built' (it is: `test_g10c_build_fit_is_recorded_from_projects_and_confirmed_by_a_reviewer`), and the rows that called R-ASK-02, R-ASK-06, R-PRIV-04, R-VOICE-14, R-LANG-07 and R-LANG-08 prompt-only or partial although the linter, the redactor or the courtesy gate enforce and test them.
-- Code that differs from the spec and is left for the owner (not changed here): the two 9.10 defaults (debounce 5 s, link threshold 60%), listed under `9.10` above.
+- Code that differs from the spec and is left for the owner (not changed here): nothing for 9.10: the link threshold (75%) and the debounce (6 s) now follow the spec.
 
 ## Keeping it true
 
 Change a guard, change its row in `rule_index.json` (code and tests), run `pytest tests/unit/test_pi_rule_index.py -s` for the summary, and update the table above to match: the last test in that file compares the counts line and every open rule id. A rule is DONE only when a test fails if it breaks; if you remove or rename a test the index names, the test file fails and tells you which rule lost its proof.
+
+## Platform spec v1.5, Part 18 (2026-10-29)
+
+| Check | Where | State |
+|---|---|---|
+| openingGate (18.2), forbidden strings in EN/Roman Urdu/Urdu, `FORCE_OPENING` | `reply_gates.py`, wired by `part18_problem` in `service_conversation.py` | enforced on the model reply; the fixed warm-up line is still a template (open decision) |
+| noEmptyOpener (18.8) | `reply_gates.empty_opener` | enforced |
+| closed list of areas before the business is known (18.5) | `reply_gates.closed_list_early` | enforced |
+| "You can say no" removed from every offer (18.3) | `fixed_lines.py`, `solution_ask.py`, `decisions.py` | done |
+| "I already told you" blocks the offer for eight messages (18.3) | `box_signals.repeat_complaint_recent` | done |
+| owner turns, ideas tied to problems, correction, direct question (18.4 to 18.8) | `think_prompt.BLOCK` | prompt only, no code check yet |
+| map image v2 (18.7): margin 48, height from content, "No links yet", legend and footer only when used, caption asks if it is right | `map_render.py` | done except card size 45% and text 28 px |
+| G12 idea link (`problem_id` on every idea), full alreadyAnswered, replays G54/G55, openingGate log | | open |

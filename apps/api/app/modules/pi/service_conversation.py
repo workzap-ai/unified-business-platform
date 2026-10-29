@@ -35,6 +35,7 @@ from app.modules.pi import (
     constitution,
     decisions,
     expert_advisor,
+    figure_correction,
     fixed_lines,
     flow,
     followup_policy,
@@ -52,6 +53,7 @@ from app.modules.pi import (
     price_policy,
     problem_extract,
     problems,
+    reply_gates,
     reply_layout,
     reply_voice,
     safety,
@@ -3449,6 +3451,28 @@ async def link_floor(session: AsyncSession, scope: WorkspaceScope, customer_id: 
     return learning_links.threshold_for(rules, customer.industry_primary if customer else None)
 
 
+async def figure_fix_for(
+    session: AsyncSession, scope: WorkspaceScope, conversation: PiConversation, message: PiMessage
+) -> tuple[str, str] | None:
+    """(wrong, right) when this message corrects a number the owner gave earlier ("not 10, 100")."""
+    body = message.body or ""
+    if not figure_correction.numbers_in(body):
+        return None
+    earlier = await session.scalars(
+        select(PiMessage.body)
+        .where(
+            PiMessage.tenant_id == scope.tenant_id,
+            PiMessage.environment_id == scope.environment_id,
+            PiMessage.conversation_id == conversation.id,
+            PiMessage.direction == "inbound",
+            PiMessage.created_at < message.created_at,
+        )
+        .order_by(PiMessage.created_at.desc())
+        .limit(3)
+    )
+    return figure_correction.numeric_correction(body, [str(t) for t in reversed(list(earlier))])
+
+
 async def note_problems(
     session: AsyncSession,
     scope: WorkspaceScope,
@@ -3460,7 +3484,8 @@ async def note_problems(
     """Save the turn's problem ops (brain mode) and move the conversation's state. `box_on`: the
     Solution Box offer is on, so a problem the owner raised unasked is marked (B5)."""
     noted = False
-    if turn.problem_ops and conversation.customer_id is not None:
+    fix = await figure_fix_for(session, scope, conversation, message)
+    if (turn.problem_ops or fix) and conversation.customer_id is not None:
         applied = await problems.apply_ops(
             session,
             scope,
@@ -3470,6 +3495,7 @@ async def note_problems(
             turn.problem_ops,
             turn.language,
             await link_floor(session, scope, conversation.customer_id),
+            figure_fix=fix,
         )
         noted = bool(applied.created)
         if (
@@ -3644,6 +3670,10 @@ def unconfirmed_trade(found: dict[str, Any], conversation: PiConversation) -> di
         return found
     return {
         **found,
+        # The guessed trade's name and key go too: the expert persona (`trade_name`), `never_say`
+        # and the sector never-rules read them (Live Audit 5, A53: "boxes", "board", "godown").
+        "industry": [],
+        "industry_keys": [],
         "industry_unconfirmed": True,
         "industry_knowledge": UNCONFIRMED_TRADE,
     }
@@ -4844,6 +4874,24 @@ EMPTY_PROMISE = re.compile(
 )
 
 
+def part18_problem(reply: str, context: dict[str, Any]) -> str | None:
+    """Spec v1.5, Part 18 checks on a drafted reply: openingGate (18.2), noEmptyOpener (18.8) and a
+    closed list of areas before the business is known (18.5). None when the reply may go."""
+    owner = [
+        *(str(t) for t in context.get("burst_texts") or []),
+        str(context.get("latest_customer_message") or ""),
+    ]
+    profile = (context.get("brief") or {}).get("business_profile") or {}
+    skipped = ((context.get("brief") or {}).get("warmup") or {}).get("step") == warmup.SKIPPED
+    known = bool(profile.get("facts")) or skipped  # a first message with content: no identity ask
+    found = [
+        reply_gates.opening_problem(reply, context, known),
+        reply_gates.empty_opener(reply),
+        reply_gates.closed_list_early(reply, owner, known),
+    ]
+    return "; ".join(f for f in found if f) or None
+
+
 def unasked_status(reply: str, context: dict[str, Any]) -> str | None:
     """A project status list the customer didn't ask for (they changed a requirement,
     asked about a meeting, asked for Roman Urdu...)."""
@@ -5767,13 +5815,25 @@ async def compose_service_turn(
             kept = dict(conversation.service_brief or {})
             kept["warmup"], kept["business_profile"] = warm.state, warm.profile
             conversation.service_brief = kept
-            if warm.reply:
+            if warm.model_writes:
+                # 18.2: no fixed first message. The model writes the opening; openingGate checks
+                # it, and the fixed line is only the fallback.
+                context["opening_by_model"] = True
+                context["opening_fallback"] = warm.reply
+                context["owner_turn_note"] = (
+                    f"{context.get('owner_turn_note') or ''} This is the first reply to a new "
+                    "number: greet in half a sentence, say you are pi, an AI from Workzap, then "
+                    "ask one question: the business name and what it makes or sells. No problem "
+                    "question, no list of areas, no guess about the business."
+                ).strip()
+            elif warm.reply:
                 turn = ServiceTurn(reply=warm.reply, language="en")
                 turn._greeting_only = True  # nothing to note; the owner has not described a problem
                 await in_their_language(manager, scope, policy, conversation, turn, context)
                 return turn
     if (
         context.get("latest_message_kind") in (None, "text")
+        and not context.get("opening_by_model")
         and (
             english_greeting(str(context.get("latest_customer_message", "")))
             or (
@@ -5955,6 +6015,23 @@ async def compose_service_turn(
         if skipped := turn_coverage.skipped_topic(turn.reply, owner_turn):
             text = turn_coverage.rewrite_reason(skipped)
             problem = f"{text}, and also: {problem}" if problem else text
+    if context.get("pi_mode") == "brain" and (
+        fix := figure_correction.numeric_correction(
+            str(context.get("latest_customer_message") or ""),
+            [
+                str(h.get("text") or "")
+                for h in (context.get("history") or [])[-6:]
+                if h.get("role") == "customer"
+            ],
+        )
+    ):
+        # B7.1/B7.3: a corrected figure is used in the reply, never the old one as a fact.
+        if text := figure_correction.reply_problem(turn.reply, *fix):
+            problem = f"{text}, and also: {problem}" if problem else text
+    if context.get("pi_mode") == "brain":
+        # Spec v1.5, Part 18: openingGate, noEmptyOpener, closed list before the business is known.
+        if problem_text := part18_problem(turn.reply, context):
+            problem = f"{problem_text}, and also: {problem}" if problem else problem_text
     if (
         not problem
         and context.get("pi_mode") == "brain"
@@ -6253,6 +6330,15 @@ async def compose_service_turn(
         if (status := handoff_status_line(context)) and not turn.request_human:
             turn.reply = f"{status} {turn.reply}"
             turn._handoff_status = str((context.get("pending_handoff") or {}).get("id") or "")
+    if context.get("opening_by_model") and reply_gates.opening_problem(turn.reply, context, False):
+        # Failed openingGate twice: the safe fixed line, and a log for the audit (18.2 Logging).
+        logger.warning("openingGate fail, fallback sent", extra={"path": "template"})
+        # The same turn the fixed line always made, so the script rule (one script per chat) holds.
+        turn = ServiceTurn(reply=str(context["opening_fallback"]), language="en")
+        turn._greeting_only = True
+        await in_their_language(manager, scope, policy, conversation, turn, context)
+    elif context.get("opening_by_model"):
+        logger.info("openingGate pass", extra={"path": "model"})
     return turn
 
 

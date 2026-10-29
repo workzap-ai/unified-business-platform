@@ -90,6 +90,27 @@ def customer_texts(context: dict[str, Any]) -> list[str]:
     return said
 
 
+# Spec v1.5, 18.3: these phrases mean trust is falling, and the offer is blocked for the next eight
+# messages.
+REPEAT_COMPLAINT = re.compile(
+    r"i\s+already\s+(?:told|said|gave|mentioned)|already\s+told\s+you|i\s+told\s+you|"
+    r"maine\s+(?:to\s+)?(?:bataya|bata\s+diya|keh\s+diya)|phir\s+se\s+(?:puch|pooch)|"
+    r"bataya\s+to\s+hai|میں\s+نے\s+بتایا",
+    re.IGNORECASE,
+)
+FALLING_QUIET_MESSAGES = 8
+
+
+def repeat_complaint_recent(context: dict[str, Any]) -> bool:
+    """The owner said "I already told you" (or similar) within the last eight messages."""
+    history = [h for h in context.get("history") or [] if h.get("role") in ("customer", "ai")][
+        -FALLING_QUIET_MESSAGES:
+    ]
+    texts = [str(h.get("text", "")) for h in history if h.get("role") == "customer"]
+    texts.append(str(context.get("latest_customer_message") or ""))
+    return any(REPEAT_COMPLAINT.search(t) for t in texts)
+
+
 def trust_and_upset(context: dict[str, Any]) -> tuple[str, bool]:
     """(trust trend, upset) for B7. From the dials when `brain.thinking` is on and the owner's
     words are available; otherwise "steady" and not upset. A brief key, when present, overrides."""
@@ -103,6 +124,8 @@ def trust_and_upset(context: dict[str, Any]) -> tuple[str, bool]:
             dials.Trust.RISING: "rising",
         }.get(state.trust_trend, "steady")
         upset = "feeling" in dials.read_signals(texts[-1], first_message=len(texts) == 1).reasons
+    if repeat_complaint_recent(context):
+        trend = "falling"
     if brief.get("trust_trend") is not None:
         trend = str(brief["trust_trend"])
     if brief.get("upset") is not None:

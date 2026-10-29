@@ -85,6 +85,9 @@ class Plan:
     state: dict[str, Any]
     profile: dict[str, Any]
     ask_page: str = ""  # a link to take a quick look at (the runtime does it before the turn)
+    # Spec v1.5, 18.2: the first reply is written by the model; `reply` is then only the safe
+    # fallback sent when the model's reply fails openingGate twice.
+    model_writes: bool = False
 
 
 def enabled(response_rules: dict[str, Any] | None) -> bool:
@@ -146,14 +149,16 @@ def plan(context: dict[str, Any]) -> Plan | None:
             return None  # not a first-time owner: use the profile, no opening (16.7)
         if not (context.get("greeting_only") or social_opener(said)):
             return Plan("", {"step": SKIPPED}, profile)  # a first message with content: no warm-up
-        return Plan(IDENTITY[lang], {"step": IDENTITY_ASKED, "asked": 1}, profile)
+        return Plan(
+            IDENTITY[lang], {"step": IDENTITY_ASKED, "asked": 1}, profile, model_writes=True
+        )
     if states_problem(said):
         return Plan("", {**state, "step": SKIPPED}, profile)  # they went straight to the problem
     if step == IDENTITY_ASKED:
         if context.get("greeting_only"):
             # "Hi" again is not an answer (live 2026-10-27: the second "Hi" was taken as the
             # business and the page was asked for): ask the identity question once more.
-            return Plan(IDENTITY[lang], state, profile)
+            return Plan(IDENTITY[lang], state, profile, model_writes=True)
         profile = _grow(profile, said)
         if url := link_in(said):
             return Plan("", {**state, "step": PAGE_ASKED, "asked": 2}, profile, ask_page=url)

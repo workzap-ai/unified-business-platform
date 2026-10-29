@@ -94,7 +94,8 @@ def test_after_the_summary_a_confirmation_brings_the_offer(said):
     assert held.next_state is None and held.why.startswith("B-blocked")
     decision = go(S.S4_SORTED_SUMMARY, said, box_offer=box.OfferFacts(said_yes=True))
     assert decision.next_state == S.S5_READINESS and decision.reply == d.text("offer", "en")
-    assert "You can say no" in decision.reply and "an offer, not a charge" in decision.reply
+    # Spec v1.5, 18.3: "You can say no" is pressure and is not in the offer.
+    assert "You can say no" not in decision.reply and "an offer, not a charge" in decision.reply
     assert decision.why == "R-OFFER-01"
 
 

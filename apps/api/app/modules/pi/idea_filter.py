@@ -11,6 +11,8 @@ vetting covers "uses something the person said". This module adds the rest, from
 - G7 new: an idea that repeats one already given in the conversation.
 - G8 on the map: an idea for a problem the owner never raised.
 - G9 vocabulary: an idea in another trade's words (`idea_vocabulary`), when the trade is known.
+- G12 idea link (v1.5, 18.4): with no problem on the map there is nothing for an idea to answer.
+- G10 feasible: an idea the owner's stated size cannot carry (`feasibility`), when `resources` is set.
 
 G1 and G2 need only the owner's words. G3, G4, G7 and G8 need what the conversation holds (the noted
 problems with their sub-type, goal verb and cause, the ideas already given, the map nodes), passed
@@ -150,6 +152,9 @@ class IdeaContext:
     industries: tuple[str, ...] = ()  # the trade(s) pi is talking about (G9); () when unknown
     node_categories: tuple[str, ...] = ()  # the category of each node
     grounded: str = ""  # words of the CONFIRMED business-profile facts: they ground G2 (OT13)
+    resources: str = ""  # the owner's own words about their size (people, shops): G10 (spec 17.4)
+
+    needs_problem: bool = False  # G12 (spec v1.5, 18.4): no problem known, no idea at all
 
     def active(self) -> bool:
         return bool(self.subtype or self.cause or self.given or self.nodes)
@@ -294,11 +299,25 @@ def with_grounding(ctx: IdeaContext | None, grounded: str) -> IdeaContext | None
     return replace(ctx or IdeaContext(), grounded=grounded.strip())
 
 
+def with_resources(ctx: IdeaContext | None, owner_words: str) -> IdeaContext | None:
+    """The context with the owner's words about their size, so G10 can judge feasibility (spec 17.4,
+    TS5). Empty words change nothing: a caller without `thinking` behaves as before."""
+    if not owner_words.strip():
+        return ctx
+    return replace(ctx or IdeaContext(), resources=owner_words.strip())
+
+
 def failures(idea: str, owner_words: str, ctx: IdeaContext | None = None) -> list[str]:
     """Rule ids of the filter that the idea breaks (empty when it passes). G1 and G2 always; G3,
     G4, G7 and G8 only with an `IdeaContext` that holds data."""
-    grounded_words = f"{owner_words} {ctx.grounded}" if ctx is not None and ctx.grounded else owner_words
+    grounded_words = (
+        f"{owner_words} {ctx.grounded}" if ctx is not None and ctx.grounded else owner_words
+    )
     found = [goal_conflict(idea, owner_words), invented_context(idea, grounded_words)]
+    if ctx is not None and ctx.needs_problem and not any(n.strip() for n in ctx.nodes):
+        found.append("G12")  # an idea must name a problem the owner stated; none is known yet
+    if ctx is not None and ctx.resources:
+        found.append(feasibility.check(idea, ctx.resources))  # G10
     if ctx is not None and ctx.industries:
         found.append(idea_vocabulary.foreign_vocabulary(idea, owner_words, ctx.industries))
     if ctx is not None and ctx.active():

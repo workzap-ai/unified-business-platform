@@ -409,9 +409,9 @@ def free_rider(brief: dict[str, Any], said: str) -> bool:
 
 
 OFFER_AFTER = {
-    "en": "Shall I get one solution document and a quote made for all of these together? You can say no.",
-    "roman_ur": "Kya main in sab ke liye ek solution document aur quote banwa doon? Mana bhi kar sakte hain.",
-    "ar": "هل أجهّز لكل هذه المشكلات وثيقة حل واحدة وعرض سعر؟ يمكنك أن تقول لا.",
+    "en": "Shall I get one solution document and a quote made for all of these together?",
+    "roman_ur": "Kya main in sab ke liye ek solution document aur quote banwa doon?",
+    "ar": "هل أجهّز لكل هذه المشكلات وثيقة حل واحدة وعرض سعر؟",
 }
 OFFERABLE = ("S1_LISTENING", "S2_CLARIFYING", "S3_NOTED", "S4_SORTED_SUMMARY")
 # Where a request for a fix or for the detail may be answered: while listening, and at the offer

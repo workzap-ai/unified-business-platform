@@ -17,7 +17,7 @@ from pydantic import BaseModel, ConfigDict, Field
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.modules.pi import business, taxonomy
+from app.modules.pi import business, figure_correction, taxonomy
 from app.modules.pi.language import amount_value, date_estimate
 from app.modules.pi.problem_models import (
     PiProblem,
@@ -548,7 +548,15 @@ class ProblemBook:
         if _snake(note.subtype):
             put("subtype", _snake(note.subtype))
         words, redacted = _words(note.user_words)
-        merged_words = [*problem.user_words, *[w for w in words if w not in problem.user_words]]
+        # A correction replaces the earlier wording that gave the old figure ("10 clients" then "it
+        # was 100 clients"); the old list stays in the revision diff, so nothing is lost.
+        fresh = [*words, note.summary, note.title, note.money_text, note.of_total]
+        kept = [
+            w
+            for w in problem.user_words
+            if not figure_correction.superseded(w, fresh, reason == "correction")
+        ]
+        merged_words = [*kept, *[w for w in words if w not in kept]]
         put("user_words", merged_words[: MAX_USER_WORDS * 2])
         if redacted:
             put("pii_redacted", True)
@@ -604,6 +612,60 @@ class ProblemBook:
         self._score(problem)
         problem.revision += 1
         await self._revise(problem, diff, reason, "person" if reason == "correction" else "pi")
+        return True
+
+    STRING_FIELDS = (
+        "title",
+        "title_local",
+        "summary",
+        "current_workaround",
+        "trigger",
+        "person_believes_cause",
+        "who_notices",
+    )
+
+    @staticmethod
+    def figure_text(problem: PiProblem) -> str:
+        """Everything the record says now that a figure could be in."""
+        parts = [str(getattr(problem, name) or "") for name in ProblemBook.STRING_FIELDS]
+        parts += [str(w) for w in problem.user_words]
+        for field_name in ("impact", "scope", "frequency"):
+            values = (getattr(problem, field_name) or {}).values()
+            parts += [v for v in values if isinstance(v, str)]
+        return " ".join(parts)
+
+    async def correct_figure(
+        self, problem: PiProblem, wrong: str, right: str, message_id: UUID | None
+    ) -> bool:
+        """The owner corrected a figure ("not 10, 100"): write `right` wherever the record gave
+        `wrong`. The revision diff keeps every old value, so the correction is history, not loss."""
+        diff: dict[str, Any] = {}
+
+        def put(name: str, value: Any) -> None:
+            if getattr(problem, name) != value:
+                diff[name] = [json_safe(getattr(problem, name)), json_safe(value)]
+                setattr(problem, name, value)
+
+        def fix(text: str) -> str:
+            return figure_correction.replace_figure(text, wrong, right)
+
+        for name in self.STRING_FIELDS:
+            put(name, fix(str(getattr(problem, name) or "")))
+        put("user_words", [fix(str(w)) for w in problem.user_words])
+        for field_name in ("impact", "scope", "frequency"):
+            current = dict(getattr(problem, field_name) or {})
+            put(
+                field_name,
+                {k: (fix(v) if isinstance(v, str) else v) for k, v in current.items()},
+            )
+        if not diff:
+            return False
+        if message_id and str(message_id) not in problem.source_message_ids:
+            put("source_message_ids", [*problem.source_message_ids, str(message_id)])
+        put("status", "corrected")
+        self._score(problem)
+        problem.revision += 1
+        await self._revise(problem, diff, "correction", "person")
         return True
 
     async def merge(self, keep: PiProblem, others: list[PiProblem]) -> None:
@@ -662,8 +724,13 @@ async def apply_ops(
     ops: list[ProblemOp],
     language: str,
     link_min: Decimal = Decimal(0),
+    figure_fix: tuple[str, str] | None = None,
 ) -> Applied:
-    """Apply the model's ops in order. Bad ones are skipped and listed, never raised."""
+    """Apply the model's ops in order. Bad ones are skipped and listed, never raised.
+
+    `figure_fix` is (wrong, right) when the owner just corrected a number: after the ops, the one
+    problem whose record still gives the wrong figure is corrected by the code, so a model that
+    ignored the correction cannot leave the old number as the current fact."""
     book = ProblemBook(session, scope, customer_id, language)
     result = Applied()
     refs = await book.by_ref()
@@ -747,6 +814,15 @@ async def apply_ops(
                 result.rejected.append(f"{op.op}:{op.ref or op.note and op.note.title or ''}")
         except ValueError:
             result.rejected.append(op.op)
+    if figure_fix is not None:
+        wrong, right = figure_fix
+        holders = [
+            p
+            for p in await book.active()
+            if figure_correction.has_figure(book.figure_text(p), wrong)
+        ]
+        if len(holders) == 1 and await book.correct_figure(holders[0], wrong, right, message_id):
+            result.updated.append(holders[0])  # one problem gave it: no guessing between several
     await session.flush()
     await book.confirm_drafts(result.touched)
     await session.flush()

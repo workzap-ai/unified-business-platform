@@ -1355,14 +1355,14 @@ def handback_reply(language: str | None) -> str:
 # R-LANG-08: religious and cultural courtesy, one line, then back to the business.
 GREETING_TEXT = {
     "salam": {
-        "en": "Wa alaikum assalam. What's going wrong in your business?",
-        "roman_ur": "Wa alaikum assalam. Aap ke business mein kya masla chal raha hai?",
-        "ar": "وعليكم السلام. ما الذي يعيق عملك؟",
+        "en": "Wa alaikum assalam. What does your business do?",
+        "roman_ur": "Wa alaikum assalam. Aap ka business kya kaam karta hai?",
+        "ar": "وعليكم السلام. ما نوع عملك؟",
     },
     "festival": {
-        "en": "Eid Mubarak to you too. What's going wrong in your business?",
-        "roman_ur": "Aap ko bhi Eid Mubarak. Aap ke business mein kya masla chal raha hai?",
-        "ar": "عيد مبارك لك أيضًا. ما الذي يعيق عملك؟",
+        "en": "Eid Mubarak to you too. What does your business do?",
+        "roman_ur": "Aap ko bhi Eid Mubarak. Aap ka business kya kaam karta hai?",
+        "ar": "عيد مبارك لك أيضًا. ما نوع عملك؟",
     },
 }
 # R-FUP-02: after "stop" pi confirms once and then writes no more.

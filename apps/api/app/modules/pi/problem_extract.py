@@ -21,7 +21,8 @@ from app.modules.pi.problems import ProblemNote, ProblemOp, check_ops
 logger = logging.getLogger(__name__)
 
 MIN_WORDS = 5
-MAX_NOTES = 2
+MAX_NOTES = 8  # a list of problems in one message is one problem each (spec v1.5, 18.6)
+MAX_MESSAGE_CHARS = 2000
 
 SYSTEM = """You read what a small-business owner told an assistant on WhatsApp and write down the
 business problems in it, in the exact shape asked for. Rules:
@@ -63,7 +64,7 @@ class SimpleNote(BaseModel):
 
 class Extracted(BaseModel):
     model_config = ConfigDict(extra="ignore")
-    found: list[SimpleNote] = Field(default_factory=list, max_length=4)
+    found: list[SimpleNote] = Field(default_factory=list, max_length=MAX_NOTES)
 
 
 def category_list() -> str:
@@ -107,7 +108,7 @@ async def extract(manager: Any, scope: Any, context: dict[str, Any]) -> list[Pro
     ][-3:]
     said = str(context.get("latest_customer_message", ""))
     payload = {
-        "latest": said[:800],
+        "latest": said[:MAX_MESSAGE_CHARS],
         "earlier": [t for t in history if t != said][-2:],
         "already_noted": [p.get("title", "") for p in context.get("noted_problems") or []][:12],
         "language": context.get("reply_language") or "en",
@@ -127,7 +128,7 @@ async def extract(manager: Any, scope: Any, context: dict[str, Any]) -> list[Pro
                 Message.user(json.dumps(payload, ensure_ascii=False)),
             ],
             temperature=0.1,
-            max_tokens=700,
+            max_tokens=1500,
         )
     except Exception:  # noqa: BLE001 - an extra call must never fail the reply
         logger.warning("pi_problem_extract_failed", exc_info=True)
@@ -141,6 +142,6 @@ async def extract(manager: Any, scope: Any, context: dict[str, Any]) -> list[Pro
         if note.title.strip() and note.title.strip().lower() not in known
     ]
     known_refs = {p["ref"] for p in context.get("noted_problems") or []}
-    if ops and check_ops(ops, known_refs, True):
-        return []  # the same checks as any note: a bad one is dropped, never stored
-    return ops
+    # The same checks as any note, one note at a time: a bad one is dropped and never stored, but it
+    # does not take the good ones with it (Live Audit 5, A52).
+    return [op for op in ops if not check_ops([op], known_refs, True)]
