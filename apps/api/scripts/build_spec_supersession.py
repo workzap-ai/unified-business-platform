@@ -64,6 +64,10 @@ def governing_rules(text: str) -> dict[str, str]:
     return rules
 
 
+OLD_OPENING_TAIL = "Tell me what's going wrong in your business and I'll start on it."
+NEW_OPENING_TAIL = "What does your business do?"
+
+
 def old_section(book: list[dict[str, str]], section_id: str) -> dict[str, str]:
     return next(item for item in book if item["id"] == section_id)
 
@@ -99,6 +103,11 @@ def main() -> None:
         "patch": [
             {"id": "0.2", "old": REPLACE_0_2[0], "new": REPLACE_0_2[1]},
             {"id": "3.2", "old": REPLACE_3_2[0], "new": REPLACE_3_2[1]},
+            # Part 14 deletes the old opening; Brain v3 still prints it as the "canonical" first
+            # message in 1.1 and in the 2.3 table, and a model copies a canonical line (live
+            # 2026-10-28: "Tell me what's going wrong ... I'll start on it").
+            {"id": "1.1", "old": OLD_OPENING_TAIL, "new": NEW_OPENING_TAIL},
+            {"id": "2.3", "old": OLD_OPENING_TAIL, "new": NEW_OPENING_TAIL},
         ],
         "remove": [],
         "open_decision": "G4 (can you make an app for this? answered with the superseded R-SELL-04 "

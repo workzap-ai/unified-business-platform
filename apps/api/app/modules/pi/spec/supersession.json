@@ -18,6 +18,16 @@
    "id": "3.2",
    "old": "Acknowledge, ask 1 question\nSuggest, sell, summarise early",
    "new": "Acknowledge, ask 1 question (a solution request moves to S_ADVISE: answer it, Book 2 Part 9)\nSell, summarise early"
+  },
+  {
+   "id": "1.1",
+   "old": "Tell me what's going wrong in your business and I'll start on it.",
+   "new": "What does your business do?"
+  },
+  {
+   "id": "2.3",
+   "old": "Tell me what's going wrong in your business and I'll start on it.",
+   "new": "What does your business do?"
   }
  ],
  "remove": [],

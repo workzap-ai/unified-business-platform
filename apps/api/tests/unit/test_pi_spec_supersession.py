@@ -84,3 +84,11 @@ def test_no_prompt_layer_still_teaches_the_superseded_listen_only_rule():
         assert "Never suggest a fix" not in flat, name
         assert "never suggest a fix" not in flat, name
         assert "You only listen and note problems" not in flat, name
+
+
+def test_the_old_opening_is_not_in_the_prompt_text():
+    """Part 14 deletes "Tell me what's going wrong ... I'll start on it"; Brain v3 printed it as the
+    canonical first message and a model copies a canonical line (live, 2026-10-28)."""
+    for section_id, item in spec_handbook.sections().items():
+        assert "I'll start on it" not in item["text"], section_id
+        assert "going wrong in your business and" not in item["text"], section_id
