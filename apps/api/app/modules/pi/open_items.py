@@ -20,7 +20,7 @@ from uuid import UUID
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.modules.pi import fixed_lines, open_requests, safety
+from app.modules.pi import fixed_lines, open_requests, safety, third_party
 from app.modules.pi.map_edit import PROBLEMISH
 from app.modules.pi.models import PiConversation, PiMessage
 from app.modules.pi.open_item_models import PiOpenItem
@@ -37,6 +37,43 @@ SLA_MINUTES = {
 RETURN_AFTER_HOURS = 4
 MAX_SURFACED = 2
 TEXT_CAP = 300
+# Q6-1: what an owner's earlier chats hand to a new chat (same workspace, same customer only).
+# CARRY_DAYS is the one retention constant (subject to the P-4 retention decision).
+CARRY_DAYS = 30
+CARRY_MAX = 10
+# An item is only taken from a chat that has been quiet this long (the same gap as the return line),
+# so a chat that is still active is never raided.
+CARRY_IDLE_HOURS = RETURN_AFTER_HOURS
+CARRY_CANDIDATES = 200  # the most rows one carry reads; the cap of CARRY_MAX applies after them
+# A staff request closes a carried question only when the team has dealt with it (never when it
+# was dismissed) and it belongs to this question: it is about the same words (`tied`) and was not
+# raised before the item (at most TEAM_SLACK before it: it is raised in the same turn). Time alone
+# never ties it, and a request about different words does not close it even in that window: the
+# question then stays open, which is the safe side.
+TEAM_ANSWERED = ("answered", "published", "resolved")
+TEAM_SLACK = timedelta(minutes=10)
+TIE_MIN_SHARED = 2
+# Common words that do not tie a request to a question (English, Roman Urdu, Urdu, Arabic).
+TIE_STOP = frozenset(
+    {
+        "what", "your", "have", "this", "with", "about", "that", "from", "they", "them",
+        "will", "would", "could", "should", "there", "their", "then", "than", "when", "where",
+        "which", "while", "been", "being", "were", "just", "also", "some", "many", "much",
+        "more", "most", "very", "here", "into", "over", "only", "does", "doing", "after",
+        "before", "again", "still", "need", "want", "like", "make", "please", "thanks",
+        "kitna", "kitne", "kitni", "kaise", "kyun", "kyon", "kabhi", "abhi", "phir", "lekin",
+        "aapka", "aapki", "aapke", "mera", "meri", "mere", "hamare", "hamari", "hamara",
+        "kuch", "bahut", "bohat", "kyunki", "taake", "jaise", "agar", "hain", "hoga", "hogi",
+        "honge", "karna", "karne", "karen", "kijiye", "chahiye", "sakta", "sakte", "sakti",
+        "batayen", "bataye", "bataiye",
+        "کیا", "کیوں", "کہاں", "کون", "کتنا", "کتنی", "کتنے", "میرا", "میری", "میرے", "ہمارا",
+        "لیکن", "اگر", "بھی", "کچھ", "بہت", "ہوگا", "ہوگی", "کرنا", "چاہیے", "سکتا", "سکتے",
+        "بارے", "ساتھ", "لئے", "لیے",
+        "ماذا", "لماذا", "كيف", "متى", "هذا", "هذه", "ذلك", "التي", "الذي", "لكن", "أريد",
+        "يمكن", "بعد", "قبل", "كان", "يكون",
+    }
+)  # fmt: skip
+CARRY_REASON = "carried_to_new_chat"
 
 HANDOFF_STATUS = {
     "en": "Your message to the Workzap team has not been answered yet. I've asked again, and I'm "
@@ -104,8 +141,11 @@ QUESTION_MARKS = re.compile(r"[?？؟⁇⁈]")
 
 
 def clean(text: str) -> str:
-    """The owner's words as they are kept: redacted (roles, never contact details) and short."""
-    return " ".join(safety.redact_pii(text or "").text.split())[:TEXT_CAP]
+    """The owner's words as they are kept: redacted (roles, never contact details) and short. A
+    third party's name is taken out where the words around it give it away (`third_party`), which
+    is best effort and not a privacy boundary."""
+    redacted = safety.redact_pii(text or "").text
+    return " ".join(third_party.protect(redacted).split())[:TEXT_CAP]
 
 
 def sla_minutes(kind: str) -> int:
@@ -142,6 +182,19 @@ def answers(question: str, reply: str) -> bool:
         return False
     have = {w.lower() for w in WORDS.findall(reply or "")}
     return len(wanted & have) >= max(2, (len(wanted) + 1) // 2)
+
+
+def tie_words(text: str) -> set[str]:
+    """The words of a text that can tie it to another: 4 letters or more, none a common word."""
+    return {w.lower() for w in WORDS.findall(text or "")} - TIE_STOP
+
+
+def tied(text: str, question: str) -> bool:
+    """A staff question belongs to an item when they share at least TIE_MIN_SHARED words that are
+    not common words, and those are at least half of the item's own such words."""
+    wanted = tie_words(text)
+    shared = wanted & tie_words(question)
+    return len(shared) >= TIE_MIN_SHARED and len(shared) * 2 >= len(wanted)
 
 
 def return_line_for(items: list[dict[str, Any]], language: str | None) -> str:
@@ -203,25 +256,156 @@ async def _open_rows(
     )
 
 
+class Carried(int):
+    """How many items a carry moved. `complete` is False while an eligible item was left behind (its
+    chat is not quiet yet, or the cap is full), so the caller tries again on a later turn."""
+
+    complete: bool
+
+    def __new__(cls, moved: int, complete: bool) -> "Carried":
+        found = super().__new__(cls, moved)
+        found.complete = complete
+        return found
+
+
+async def carry_into(
+    session: AsyncSession,
+    scope: WorkspaceScope,
+    conversation: PiConversation,
+    *,
+    now: datetime | None = None,
+) -> Carried:
+    """Q6-1: an owner who returns in a NEW chat finds what is still open. The open items of the
+    same customer in this workspace, from other chats that have been quiet for CARRY_IDLE_HOURS, are
+    moved under this conversation: newest first (ties by id), at most CARRY_MAX counting the items
+    this chat already holds, none older than CARRY_DAYS, none that is answered or dropped (erased
+    items no longer exist). A (kind, key) already held, or open in two old chats, moves once, and
+    the cap counts after that. The brief's `open_requests` get the same entries, from the same rows.
+
+    The rows are read with FOR UPDATE SKIP LOCKED, so two chats starting at once cannot both move
+    (or double) the same row. A moved row is one row, never a copy, and it keeps its creation time, so
+    the age limit is counted from when the owner asked. It is deleted by the existing erase of the
+    conversation (`brain_erase`). What stays on the row: `ref_id` (the id of a staff request of this
+    workspace, no words); `source_message_id`, which pointed into an earlier chat, is cleared. Never
+    crosses the tenant, the environment or the customer.
+
+    Returns how many moved; `.complete` is False when an eligible item stays behind (a chat that is
+    not quiet yet, or the cap is full), so the next turn tries again. A chat with no last message time
+    is never quiet. Items are read up to CARRY_CANDIDATES rows."""
+    if conversation.customer_id is None:
+        return Carried(0, True)
+    now = now or datetime.now(UTC)
+    cutoff = now - timedelta(days=CARRY_DAYS)
+    quiet = list(
+        await session.scalars(
+            select(PiConversation.id).where(
+                PiConversation.tenant_id == scope.tenant_id,
+                PiConversation.environment_id == scope.environment_id,
+                PiConversation.customer_id == conversation.customer_id,
+                PiConversation.id != conversation.id,
+                PiConversation.last_message_at <= now - timedelta(hours=CARRY_IDLE_HOURS),
+            )
+        )
+    )
+    held_rows = await _open_rows(session, scope, conversation.id)
+    room = CARRY_MAX - len(held_rows)
+    held = {(r.kind, r.key) for r in held_rows}
+    moved: list[PiOpenItem] = []
+    if quiet and room > 0:
+        rows = list(
+            await session.scalars(
+                select(PiOpenItem)
+                .where(
+                    *_mine(scope),
+                    PiOpenItem.customer_id == conversation.customer_id,
+                    PiOpenItem.conversation_id.in_(quiet),
+                    PiOpenItem.status == "open",
+                    PiOpenItem.created_at >= cutoff,
+                )
+                .order_by(PiOpenItem.created_at.desc(), PiOpenItem.id.desc())
+                .limit(CARRY_CANDIDATES)
+                .with_for_update(skip_locked=True)
+            )
+        )
+        for row in rows:
+            if len(moved) >= room:
+                break
+            if (row.kind, row.key) in held:
+                continue
+            held.add((row.kind, row.key))
+            row.conversation_id = conversation.id
+            row.source_message_id = None
+            moved.append(row)
+    entries = [
+        {"kind": r.key, "turns": 0}  # turns 0 marks a carried entry: named on return, not forced
+        for r in moved
+        if r.kind == "owner_request" and r.key in open_requests.ADDRESSES
+    ]
+    left = await session.scalars(
+        select(PiOpenItem)
+        .where(
+            *_mine(scope),
+            PiOpenItem.customer_id == conversation.customer_id,
+            PiOpenItem.conversation_id != conversation.id,
+            PiOpenItem.status == "open",
+            PiOpenItem.created_at >= cutoff,
+        )
+        .limit(CARRY_CANDIDATES)
+    )
+    complete = all((r.kind, r.key) in held for r in left)
+    # Last: a failure above must leave the conversation untouched (a savepoint rollback does not
+    # undo an attribute set in Python, and an expired attribute reloads on the next read).
+    if entries:
+        brief = dict(conversation.service_brief or {})
+        have = [e for e in brief.get("open_requests") or [] if isinstance(e, dict)]
+        kinds = {str(e.get("kind")) for e in have}
+        brief["open_requests"] = [*have, *[e for e in entries if e["kind"] not in kinds]]
+        conversation.service_brief = brief
+    return Carried(len(moved), complete)
+
+
 async def team_answered_after(
-    session: AsyncSession, scope: WorkspaceScope, conversation_id: UUID, since: datetime
+    session: AsyncSession,
+    scope: WorkspaceScope,
+    conversation_id: UUID,
+    since: datetime,
+    *,
+    customer_id: UUID | None = None,
+    text: str = "",
 ) -> bool:
-    """The team answered a question of this chat from the request desk after `since`."""
+    """The team dealt with a question from the request desk after `since` (answered, published or
+    resolved; a dismissed request never counts).
+
+    Without `customer_id` it is any question of this chat, as before. With it (an item carried into
+    a new chat keeps its staff request under the old conversation id) it is a question of that
+    customer in this workspace that belongs to the item: about the same words as `text` (`tied`)
+    and not raised before the item (more than TEAM_SLACK earlier)."""
     from app.modules.pi_saas.models import PiStaffRequest
 
-    found = await session.scalar(
-        select(PiStaffRequest.id)
+    whose = (
+        PiStaffRequest.customer_id == customer_id
+        if customer_id is not None
+        else PiStaffRequest.conversation_id == conversation_id
+    )
+    requests = await session.scalars(
+        select(PiStaffRequest)
         .where(
             PiStaffRequest.tenant_id == scope.tenant_id,
             PiStaffRequest.environment_id == scope.environment_id,
-            PiStaffRequest.conversation_id == conversation_id,
+            whose,
             PiStaffRequest.kind == "question",
-            PiStaffRequest.status != "open",
+            PiStaffRequest.status.in_(TEAM_ANSWERED),
             PiStaffRequest.resolved_at >= since,
         )
-        .limit(1)
+        .order_by(PiStaffRequest.created_at.desc())
+        .limit(20)
     )
-    return found is not None
+    for request in requests:
+        if customer_id is None:
+            return True
+        if request.created_at >= since - TEAM_SLACK and tied(text, request.question):
+            return True
+    return False
 
 
 def _close(row: PiOpenItem, status: str, reason: str, now: datetime) -> None:
@@ -262,8 +446,16 @@ async def sync(
             if open_requests.addressed(row.key, reply, request_human=request_human):
                 _close(row, "answered", "reply_addressed", now)
         elif row.kind == "owner_question" and not knowledge_gaps:
+            # A row carried into this chat has no source message (the move cleared it): the
+            # team's answer is then looked for among the customer's questions, not this chat's.
+            carried = row.source_message_id is None
             if answers(row.text, reply) or await team_answered_after(
-                session, scope, conversation.id, row.created_at
+                session,
+                scope,
+                conversation.id,
+                row.created_at,
+                customer_id=conversation.customer_id if carried else None,
+                text=row.text,
             ):
                 _close(row, "answered", "reply_answered", now)
     if drops(said):

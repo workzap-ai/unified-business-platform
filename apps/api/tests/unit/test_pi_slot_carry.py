@@ -18,11 +18,10 @@ def brief(**extra):
     return {"closed_slots": [{"slot": "shops.where", "q": "Which shop is it?"}], **extra}
 
 
-def test_a_recent_answered_question_is_carried_and_marked() -> None:
+def test_a_recent_answered_question_is_carried_without_a_mark() -> None:
+    # No "carried" flag: closed_slots reaches the model, and nothing reads such a flag.
     out = slot_carry.carried([(brief(), FRESH)], NOW)
-    assert out["closed_slots"] == [
-        {"slot": "shops.where", "q": "Which shop is it?", "carried": True}
-    ]
+    assert out["closed_slots"] == [{"slot": "shops.where", "q": "Which shop is it?"}]
 
 
 def test_only_closed_slots_and_asked_facts_are_ever_copied() -> None:

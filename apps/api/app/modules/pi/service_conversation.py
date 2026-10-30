@@ -3854,11 +3854,7 @@ async def prepare_context(
     if flow.brain_mode(policy.response_rules) and conversation.customer_id is not None:
         # S4: a new chat starts with what the owner's earlier chats closed, once, before the closed
         # slots below are read. A failure never costs the owner their reply.
-        try:
-            async with session.begin_nested():
-                await slot_carry.carry_into(session, scope, conversation)
-        except Exception:  # noqa: BLE001
-            logger.warning("slot carry failed", exc_info=True)
+        await slot_carry.carry_safely(session, scope, conversation)
     tools = await latency.timed(
         "ctx.tools", ToolRegistry(session).enabled_tools(scope, "requirement")
     )
