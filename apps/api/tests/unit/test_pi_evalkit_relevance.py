@@ -1,7 +1,10 @@
 """The scripted relevance scorer (FT-A3): its verdicts, hard failures, negative controls, report,
 Held-out access log and the calibration helpers. Everything here is a check of code and case files.
 No model is called, so none of it measures how well pi solves a problem. Agent-drafted labels and
-human labels are separate inputs and are never merged."""
+human labels are separate inputs and are never merged.
+
+Held-out discipline: no test asserts an expected verdict for a Held-out case and none names a
+Held-out id in a failure; for Held-out the tests only check that scoring runs and is logged."""
 
 import copy
 import json
@@ -25,8 +28,10 @@ from app.modules.pi.evalkit import (
 CASES_DIR = Path(replay.__file__).with_name("cases")
 ALL_PLAN = json.loads((CASES_DIR / "plan.json").read_text(encoding="utf-8"))
 PLAN = [c for c in ALL_PLAN if c["kind"] != "borderline_relevance"]  # the 30 core cases
+HELD_CORE = [c for c in PLAN if splits.split_of(c) == splits.HELD_OUT]
+DEV_CORE = [c for c in PLAN if splits.split_of(c) != splits.HELD_OUT]  # Development + Regression
 EXTRACTION = replay.load_cases(str(CASES_DIR / "extraction.json"))
-HELD_IDS = {c["id"] for c in PLAN if splits.split_of(c) == splits.HELD_OUT}
+HELD_IDS = {c["id"] for c in HELD_CORE}
 
 
 @pytest.fixture()
@@ -53,13 +58,23 @@ def brief(constraints=(), words=("late orders",), facts=("two supervisors",)):
 
 
 # ------------------------------------------------------------------ the scorer
-@pytest.mark.parametrize("case", PLAN, ids=lambda c: c["id"])
-def test_the_scorer_reproduces_every_expected_verdict(case) -> None:
+@pytest.mark.parametrize("case", DEV_CORE, ids=lambda c: c["id"])
+def test_the_scorer_reproduces_every_expected_verdict_on_development_cases(case) -> None:
     result = relevance.score_case(case)
     wrong = [
         (r["id"], r["expected"], r["got"]) for r in result["results"] if r["expected"] != r["got"]
     ]
     assert wrong == []
+
+
+def test_held_out_core_cases_are_scored_and_logged_and_no_verdict_is_asserted(workdir) -> None:
+    """Held-out is never a tuning target: only that scoring runs and a log line is written."""
+    log = workdir / "access.jsonl"
+    text, totals = relevance_report.build(HELD_CORE, log, "lane E", "scripted run check")
+    assert totals["split:held_out"]["cases"] == len(HELD_CORE)
+    assert not any(case_id in text for case_id in HELD_IDS), "Held-out ids are never printed"
+    rows = access_log.read(log)
+    assert len(rows) == 1 and rows[0]["count"] == len(HELD_CORE)
 
 
 def test_a_violated_confirmed_constraint_rejects_the_idea_whatever_its_link_score() -> None:
@@ -110,13 +125,38 @@ def test_no_idea_is_a_valid_result_and_is_never_padded_to_a_quota() -> None:
     assert relevance.pick_ideas(brief(), [strong, *weak], wanted=3) == [strong]
 
 
+def test_numbers_are_never_truncated_so_a_figure_stays_distinct() -> None:
+    assert relevance.stems("20000") != relevance.stems("200000")
+    assert relevance.stems("200000") == {"200000"}
+    assert relevance.stems("15000 rupees") >= {"15000"}
+    constraint = {"kind": "budget", "text": "limit", "blocks": ["200000"], "status": "confirmed"}
+    b = brief([constraint])
+    assert relevance.score_candidate(b, "Spend 20000 on late orders")["verdict"] != (
+        "violates_constraint"
+    )
+    assert relevance.score_candidate(b, "Spend 200000 on late orders")["verdict"] == (
+        "violates_constraint"
+    )
+
+
+def test_the_disclaimer_is_in_the_module_docstring_and_in_the_report(workdir) -> None:
+    assert " ".join(relevance.DISCLAIMER.split()) in " ".join((relevance.__doc__ or "").split())
+    assert relevance.DISCLAIMER.startswith("Not a quality gate and not a learning reward.")
+    assert (
+        "Scorer agreed 55% with an independent grader on the borderline set" in relevance.DISCLAIMER
+    )
+    text, _ = relevance_report.build(DEV_CORE, workdir / "a.jsonl", "lane E", "disclaimer check")
+    assert relevance.DISCLAIMER in text
+    assert "agent-drafted labels (not a score)" in text
+
+
 def test_the_scorer_is_deterministic() -> None:
-    case = PLAN[0]
+    case = DEV_CORE[0]
     assert relevance.score_case(case) == relevance.score_case(copy.deepcopy(case))
 
 
 def test_layer_b_plan_fields_are_inert() -> None:
-    case = copy.deepcopy(PLAN[0])
+    case = copy.deepcopy(DEV_CORE[0])
     before = relevance.score_case(case)
     case["expected"]["plan"] = {
         "steps": [{"id": "s1", "any": ["anything"]}],
@@ -128,12 +168,12 @@ def test_layer_b_plan_fields_are_inert() -> None:
 
 
 def test_negative_controls_fail_when_a_label_is_wrong() -> None:
-    case = copy.deepcopy(PLAN[0])
+    case = copy.deepcopy(DEV_CORE[0])
     for candidate in case["expected"]["candidates"]:
         candidate["verdict"] = "relevant" if candidate["verdict"] != "relevant" else "generic"
     result = relevance.score_case(case)
     assert result["agree"] < result["candidates"]
-    flipped = copy.deepcopy(PLAN[0])
+    flipped = copy.deepcopy(DEV_CORE[0])
     for candidate in flipped["expected"]["candidates"]:
         if candidate["verdict"] == "violates_constraint":
             candidate["verdict"] = "relevant"
@@ -156,28 +196,28 @@ def test_every_existing_extraction_score_is_unchanged() -> None:
 
 
 def test_a_group_below_three_cases_is_not_yet_measured() -> None:
-    two = [relevance.score_case(c) for c in PLAN[:2]]
+    two = [relevance.score_case(c) for c in DEV_CORE[:2]]
     assert relevance.aggregate(two)["measured"] is False
-    many = [relevance.score_case(c) for c in PLAN[:5]]
+    many = [relevance.score_case(c) for c in DEV_CORE[:5]]
     assert relevance.aggregate(many)["measured"] is True
 
 
 # ------------------------------------------------------------------ the report
-def test_the_report_is_headed_as_a_code_path_check_and_never_claims_ai_quality() -> None:
-    text, totals = relevance_report.build(PLAN)
+def test_the_report_is_headed_as_a_code_path_check_and_never_claims_ai_quality(workdir) -> None:
+    text, totals = relevance_report.build(PLAN, workdir / "a.jsonl", "lane E", "header check")
     assert "scripted code-path check" in text.casefold()
     assert "ai quality" not in text.casefold()
     assert "not yet measured" in text
     assert any(key.startswith("split:") for key in totals)
 
 
-def test_the_report_prints_held_out_as_totals_only() -> None:
-    text, _ = relevance_report.build(PLAN)
+def test_the_report_prints_held_out_as_totals_only(workdir) -> None:
+    text, _ = relevance_report.build(PLAN, workdir / "a.jsonl", "lane E", "totals check")
     assert HELD_IDS and not any(case_id in text for case_id in HELD_IDS)
 
 
-def test_the_report_groups_by_language_industry_and_kind() -> None:
-    text, totals = relevance_report.build(PLAN)
+def test_the_report_groups_by_language_industry_and_kind(workdir) -> None:
+    text, totals = relevance_report.build(PLAN, workdir / "a.jsonl", "lane E", "groups check")
     for key in ("language:en", "language:hi", "kind:constraint_violation"):
         assert key in totals
     assert "poultry_farms" in text
@@ -194,18 +234,40 @@ def test_the_access_log_is_append_only_and_records_who_why_and_when(workdir) -> 
     assert len(path.read_text(encoding="utf-8").splitlines()) == 2
 
 
-def test_a_report_that_reads_held_out_writes_one_log_entry_and_none_without_a_path(workdir) -> None:
+def test_the_report_fails_closed_without_a_log_path_who_and_why(workdir) -> None:
     path = workdir / "access.jsonl"
-    relevance_report.build(PLAN)
-    assert not path.exists()
-    relevance_report.build(PLAN, access_log_path=path, who="lane E", why="scripted check")
+    with pytest.raises(ValueError):
+        relevance_report.build(PLAN, None, "lane E", "no log path")
+    with pytest.raises(ValueError):
+        relevance_report.build(PLAN, path, "", "")
+    with pytest.raises(ValueError):
+        relevance_report.borderline_section(None, "lane E", "no log path")
+    with pytest.raises(ValueError):
+        relevance_report.borderline_section(path, "lane E", "")
+    assert not path.exists(), "nothing is read, so nothing is logged"
+
+
+def test_a_report_that_reads_held_out_writes_one_log_entry(workdir) -> None:
+    path = workdir / "access.jsonl"
+    relevance_report.build(PLAN, path, "lane E", "scripted check")
     rows = access_log.read(path)
     assert len(rows) == 1 and rows[0]["count"] == len(HELD_IDS)
+    assert rows[0]["who"] == "lane E" and rows[0]["split"] == splits.HELD_OUT
 
 
-def test_a_log_path_without_who_and_why_is_refused(workdir) -> None:
-    with pytest.raises(ValueError):
-        relevance_report.build(PLAN, access_log_path=workdir / "a.jsonl", who="", why="")
+def test_the_report_cannot_return_when_the_log_cannot_be_written(workdir) -> None:
+    blocked = workdir / "folder"
+    blocked.mkdir()  # a directory cannot be opened as the log file
+    with pytest.raises(OSError):
+        relevance_report.build(PLAN, blocked, "lane E", "log failure")
+
+
+def test_the_borderline_section_logs_the_held_out_candidates_it_counts(workdir) -> None:
+    path = workdir / "access.jsonl"
+    text = relevance_report.borderline_section(path, "lane E", "borderline count")
+    assert "not human labels" in text
+    rows = access_log.read(path)
+    assert len(rows) == 1 and rows[0]["count"] > 0
 
 
 # ------------------------------------------------------------------ calibration
@@ -232,30 +294,64 @@ def test_there_are_twenty_samples_spread_across_verdicts_and_languages() -> None
     assert languages == {"en", "roman_ur", "ur", "ar", "hi"}
 
 
+def test_the_core_calibration_samples_contain_no_held_out_case() -> None:
+    by_case = {c["id"]: c for c in ALL_PLAN}
+    assert all(splits.split_of(by_case[s["case_id"]]) != splits.HELD_OUT for s in SAMPLES)
+
+
 def test_agent_drafted_labels_are_a_separate_file_and_say_so() -> None:
     assert AGENT["label_source"] == "agent_drafted" and AGENT["human_confirmed"] is False
     assert set(AGENT["labels"]) == {s["sample_id"] for s in SAMPLES}
     assert all(not ({"label", "verdict"} & set(s)) for s in SAMPLES), "samples carry no labels"
 
 
-def test_human_labels_are_a_separate_input_and_agent_labels_are_refused_as_human(workdir) -> None:
+def write_human(path: Path, data: dict) -> Path:
+    path.write_text(json.dumps(data), encoding="utf-8")
+    return path
+
+
+def valid_human(reviewers=("Ana Reviewer", "Ben Reviewer"), n: int = 20) -> dict:
+    """A human labels dict that differs from the agent-drafted labels on every sample."""
+    agent = calibration.agent_labels_all()
+    order = list(relevance.VERDICTS)
+    ids = sorted(agent)[:n]
+    labels = {i: order[(order.index(agent[i]) + 1) % len(order)] for i in ids}
+    return {"label_source": "human", "reviewers": list(reviewers), "labels": labels}
+
+
+def test_human_labels_need_two_distinct_normalised_reviewers_and_known_ids(workdir) -> None:
     path = workdir / "human.json"
-    path.write_text(json.dumps({"label_source": "agent_drafted", "labels": {}}), encoding="utf-8")
+    ok = valid_human()
+    assert calibration.load_human_labels(write_human(path, ok))["reviewers"] == ok["reviewers"]
+    for reviewers in (["a", "a"], [""], ["a"], ["Ali", "ali  "], [" Ali", "ALI"], [], None):
+        bad = {**ok, "reviewers": reviewers}
+        with pytest.raises(ValueError):
+            calibration.load_human_labels(write_human(path, bad))
     with pytest.raises(ValueError):
-        calibration.load_human_labels(path)
-    path.write_text(
-        json.dumps(
-            {"label_source": "human", "reviewers": ["a", "b"], "labels": {"s01": "generic"}}
-        ),
-        encoding="utf-8",
-    )
-    assert calibration.load_human_labels(path)["labels"] == {"s01": "generic"}
+        calibration.load_human_labels(write_human(path, {**ok, "label_source": "agent_drafted"}))
+    with pytest.raises(ValueError):
+        calibration.load_human_labels(write_human(path, {**ok, "human_confirmed": True}))
+    unknown = {**ok, "labels": {**ok["labels"], "zz99": "relevant"}}
+    with pytest.raises(ValueError):
+        calibration.load_human_labels(write_human(path, unknown))
+    copy_of_agent = {**ok, "labels": dict(calibration.agent_labels_all())}
+    with pytest.raises(ValueError):
+        calibration.load_human_labels(write_human(path, copy_of_agent))
 
 
 def test_the_blind_sheet_has_no_label_score_or_hint() -> None:
-    sheet = calibration.blind_sheet(PLAN, SAMPLES)
-    assert len(sheet) == 20
-    allowed = {
+    blocked = [
+        *relevance.VERDICTS,
+        "verdict",
+        "label",
+        "reason",
+        "blocks",
+        "scorer",
+        "agent_drafted",
+        "human_confirmed",
+        "expected",
+    ]
+    allowed_keys = {
         "sample_id",
         "industry",
         "language",
@@ -265,18 +361,21 @@ def test_the_blind_sheet_has_no_label_score_or_hint() -> None:
         "candidate_idea",
         "allowed_verdicts",
     }
-    by_case = {c["id"]: c for c in PLAN}
-    for row in sheet:
-        assert set(row) <= allowed
-        assert row["allowed_verdicts"] == list(relevance.VERDICTS)
-        for constraint in row["constraints"]:
-            assert set(constraint) == {"kind", "text"}, "the blocking keywords are a hint"
-    texts = {c["text"] for case in by_case.values() for c in case["expected"]["candidates"]}
-    assert all(row["candidate_idea"] in texts for row in sheet)
-    for row in sheet:  # the only place a verdict word may appear is the list of allowed verdicts
-        rest = {k: v for k, v in row.items() if k != "allowed_verdicts"}
-        assert not any(v in json.dumps(rest["constraints"]) for v in ("relevant", "generic"))
-    assert "reason" not in {key for row in sheet for key in row}
+    for sheet in (
+        calibration.blind_sheet(PLAN, SAMPLES),
+        calibration.blind_sheet(ALL_PLAN, calibration.load_borderline_samples()),
+    ):
+        assert len(sheet) == 20
+        for row in sheet:
+            assert set(row) <= allowed_keys
+            assert row["allowed_verdicts"] == list(relevance.VERDICTS)
+            for constraint in row["constraints"]:
+                assert set(constraint) == {"kind", "text"}
+        # the allowed list names the verdicts by design; nothing else in the sheet may
+        stripped = [{k: v for k, v in row.items() if k != "allowed_verdicts"} for row in sheet]
+        blob = json.dumps(stripped, ensure_ascii=False).casefold()
+        for word in blocked:
+            assert word.casefold() not in blob, f"hint {word!r} appears in the blind sheet"
 
 
 def test_the_human_sheet_is_empty_to_fill_in_and_written_as_json_csv_and_markdown(workdir) -> None:
@@ -312,6 +411,12 @@ def test_agreement_percent_and_kappa_on_known_vectors() -> None:
     assert half["per_language"]["en"]["n"] == 2 and "x" in half["per_verdict"]
 
 
+def test_agreement_with_no_overlap_has_no_percent_and_formats_without_crashing() -> None:
+    nothing = calibration.agreement({"a": "x"}, {"b": "y"}, {})
+    assert nothing["n"] == 0 and nothing["percent"] is None and nothing["kappa"] is None
+    assert "n/a" in calibration._fmt("empty", nothing)[0]
+
+
 def test_compare_reports_three_ways_and_refuses_to_claim_the_human_test_without_human_labels() -> (
     None
 ):
@@ -323,10 +428,42 @@ def test_compare_reports_three_ways_and_refuses_to_claim_the_human_test_without_
     assert "hand-labelled" not in text.casefold() and "hand labelled" not in text.casefold()
 
 
-def test_compare_adds_the_human_comparisons_only_when_a_human_file_is_given() -> None:
+def test_compare_prints_human_lines_only_for_a_valid_human_file() -> None:
     grader = dict(AGENT["labels"])
-    human = {"label_source": "human", "reviewers": ["a", "b"], "labels": dict(AGENT["labels"])}
-    text = calibration.compare(grader, human)
-    assert (
-        "scorer vs human" in text and "grader vs human" in text and "agent_drafted vs human" in text
-    )
+    text = calibration.compare(grader, valid_human())
+    assert "scorer vs human" in text and "grader vs human" in text
+    assert "agent_drafted vs human" in text
+    assert "not valid" not in text
+
+
+@pytest.mark.parametrize(
+    "mutate",
+    [
+        lambda h: {**h, "reviewers": ["a", "a"]},
+        lambda h: {**h, "reviewers": [""]},
+        lambda h: {**h, "reviewers": ["a"]},
+        lambda h: {**h, "reviewers": ["Ali", "ali "]},
+        lambda h: {**h, "labels": dict(list(h["labels"].items())[:5])},
+        lambda h: {**h, "label_source": "agent_drafted"},
+        lambda h: {**h, "human_confirmed": True},
+        lambda h: {**h, "labels": {**h["labels"], "zz99": "relevant"}},
+        lambda h: {**h, "labels": dict(calibration.agent_labels_all())},
+    ],
+    ids=[
+        "same-name",
+        "blank-name",
+        "one-name",
+        "case-and-space",
+        "too-few-samples",
+        "agent-source",
+        "human-confirmed-set",
+        "unknown-id",
+        "copy-of-agent-labels",
+    ],
+)
+def test_compare_refuses_every_human_comparison_for_an_invalid_human_file(mutate) -> None:
+    grader = dict(AGENT["labels"])
+    text = calibration.compare(grader, mutate(valid_human()))
+    assert "human comparison is not valid" in text
+    assert "scorer vs human" not in text and "grader vs human" not in text
+    assert "agent_drafted vs human" not in text

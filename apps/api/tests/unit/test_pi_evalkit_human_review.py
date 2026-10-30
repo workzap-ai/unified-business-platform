@@ -46,8 +46,13 @@ def test_borderline_labels_are_agent_drafted_in_their_own_file() -> None:
     data = cal.load_borderline_agent_labels()
     assert data["label_source"] == "agent_drafted" and data["human_confirmed"] is False
     cases = [c for c in cal.load_cases() if c["kind"] == "borderline_relevance"]
-    keys = {f"{c['id']}/{x['id']}" for c in cases for x in c["expected"]["candidates"]}
-    assert set(data["labels"]) == keys
+    dev = [c for c in cases if splits.split_of(c) != splits.HELD_OUT]
+    held = {c["id"] for c in cases if splits.split_of(c) == splits.HELD_OUT}
+    keys = {f"{c['id']}/{x['id']}" for c in dev for x in c["expected"]["candidates"]}
+    assert set(data["labels"]) == keys, (
+        "Development candidates only: Held-out labels are not committed"
+    )
+    assert not any(key.split("/")[0] in held for key in {*data["labels"], *data["notes"]})
     assert set(data["labels"].values()) <= set(VERDICTS)
     core = cal.load_agent_labels()["labels"]
     assert set(core).isdisjoint(set(cal.borderline_agent_by_sample())), (
@@ -76,8 +81,8 @@ def test_the_borderline_comparison_lists_development_and_only_counts_held_out() 
     assert listed.isdisjoint(held), "Held-out borderline cases are counted, never listed"
 
 
-def test_the_report_has_a_borderline_section_and_names_no_held_out_case() -> None:
-    text = report.borderline_section()
+def test_the_report_has_a_borderline_section_and_names_no_held_out_case(workdir) -> None:
+    text = report.borderline_section(workdir / "access.jsonl", "lane E", "borderline section")
     assert "not human labels" in text
     held = {c["id"] for c in cal.load_cases() if splits.split_of(c) == splits.HELD_OUT}
     assert not any(case_id in text for case_id in held)
@@ -220,3 +225,101 @@ def test_agent_drafted_labels_are_never_an_input_of_the_human_process() -> None:
         cal.load_human_labels(cal.AGENT_PATH)
     with pytest.raises(ValueError):
         hr.load_reviewer_sheet(cal.AGENT_PATH)
+
+
+# ------------------------------------------------------------------ the guard cannot be bypassed
+def shifted(ids: list[str]) -> list[str]:
+    """Verdicts that differ from the agent-drafted labels, so a sheet is never a copy of them."""
+    agent = cal.agent_labels_all()
+    return [VERDICTS[(VERDICTS.index(agent[i]) + 1) % 5] for i in ids]
+
+
+def human(name: str, ids: list[str] | None = None) -> dict:
+    ids = ids if ids is not None else IDS[:20]
+    return reviewer(name, shifted(ids), ids)
+
+
+@pytest.mark.parametrize(
+    ("a", "b"),
+    [("Ali", "ali"), ("Ali", "Ali  "), (" ali", "ALI"), ("Ali  Khan", "ali khan")],
+)
+def test_the_same_reviewer_under_another_spelling_is_not_two_reviewers(a: str, b: str) -> None:
+    first, second = human(a), human(b)
+    assert hr.eligible_for_acceptance(first, second)[0] is False
+    assert "same reviewer" in hr.acceptance_problem(first, second)
+    assert "No 85% human-label result" in hr.process_report(first, second)
+    with pytest.raises(ValueError):
+        hr.disagreement_record(first, second)
+
+
+def test_the_adjudicator_must_differ_from_both_reviewers_after_normalisation() -> None:
+    a, b = human("Ana Reviewer"), reviewer("Ben Reviewer", shifted(IDS[:20])[::-1], IDS[:20])
+    record = hr.disagreement_record(a, b)
+    for name in ("ana reviewer", "ANA  REVIEWER", "Ben Reviewer ", "  ben reviewer"):
+        record["adjudicator"] = name
+        with pytest.raises(ValueError):
+            hr.adjudicated_labels(a, b, record)
+
+
+def test_reviewers_must_cover_the_same_samples_and_only_known_ids_count() -> None:
+    first = human("Ana Reviewer", IDS[:20])
+    other = human("Ben Reviewer", IDS[:21])
+    assert hr.eligible_for_acceptance(first, other)[0] is False
+    assert "same samples" in hr.acceptance_problem(first, other)
+    unknown = {**human("Ben Reviewer", IDS[:20])}
+    unknown["labels"] = {**unknown["labels"], "zz99": "relevant"}
+    with pytest.raises(ValueError):
+        hr.eligible_for_acceptance(first, unknown)
+    eligible, count = hr.eligible_for_acceptance(first, human("Ben Reviewer", IDS[:20]))
+    assert eligible and count == 20
+
+
+@pytest.mark.parametrize(
+    "bad",
+    [
+        {"label_source": "human", "reviewer": "", "labels": {"s01": "generic"}},
+        {"label_source": "human", "reviewer": "   ", "labels": {"s01": "generic"}},
+        {"label_source": "agent_drafted", "reviewer": "a", "labels": {"s01": "generic"}},
+        {
+            "label_source": "human",
+            "reviewer": "a",
+            "labels": {"s01": "generic"},
+            "human_confirmed": 1,
+        },
+        {"label_source": "human", "reviewer": "a", "labels": {"zz99": "generic"}},
+        {"label_source": "human", "reviewer": "a", "labels": {"s01": "good"}},
+        {"label_source": "human", "reviewer": "a", "labels": ["s01"]},
+    ],
+    ids=["no-name", "blank-name", "agent-source", "confirmed", "unknown-id", "bad-verdict", "list"],
+)
+def test_library_functions_validate_raw_dicts_like_the_loader(bad: dict) -> None:
+    good = human("Ben Reviewer")
+    for call in (
+        lambda: hr.eligible_for_acceptance(bad, good),
+        lambda: hr.eligible_for_acceptance(good, bad),
+        lambda: hr.process_report(bad, good),
+        lambda: hr.disagreement_record(bad, good),
+        lambda: hr.adjudicated_labels(bad, good, {"adjudicator": "Cy", "items": []}),
+    ):
+        with pytest.raises(ValueError):
+            call()
+
+
+def test_a_sheet_that_copies_the_agent_labels_is_rejected() -> None:
+    ids = IDS
+    agent = cal.agent_labels_all()
+    copied = reviewer("Ana Reviewer", [agent[i] for i in ids], ids)
+    with pytest.raises(ValueError):
+        hr.check_sheet(copied)
+    with pytest.raises(ValueError):
+        hr.eligible_for_acceptance(copied, human("Ben Reviewer", ids))
+
+
+def test_a_grader_file_with_no_matching_ids_reports_no_overlap_and_never_crashes() -> None:
+    ids = IDS[:20]
+    a, b = human("Ana Reviewer", ids), human("Ben Reviewer", ids)
+    adjudicated = {i: a["labels"][i] for i in ids}
+    text = hr.process_report(a, b, adjudicated, {"nothing": "relevant"})
+    assert "no overlap" in text.casefold()
+    assert "None" not in text and "Proposed 85% test" not in text
+    assert "No 85% comparison" in text

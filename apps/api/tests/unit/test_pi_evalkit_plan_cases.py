@@ -182,11 +182,37 @@ def test_there_are_constraint_cases_and_a_no_idea_case() -> None:
 
 @pytest.mark.parametrize("case", PLAN, ids=lambda c: c["id"])
 def test_no_personal_data_and_roles_are_not_names(case) -> None:
-    for text in texts(case):
+    for text in every_string(case):
         for pattern in PII:
             assert not pattern.search(text), f"pattern {pattern.pattern} found in {text!r}"
     for role in case["input"]["brief"]["roles"]:
         assert not re.fullmatch(r"[A-Z][a-z]+ [A-Z][a-z]+", role), "a role, never a name"
+
+
+def every_string(node):
+    """Every string a case or a calibration file holds (facts, words, systems, every candidate,
+    reasons, notes), except the creation and drafting dates, which look like a number run."""
+    if isinstance(node, str):
+        yield node
+    elif isinstance(node, dict):
+        for key, value in node.items():
+            if key not in {"created", "drafted"}:
+                yield from every_string(value)
+    elif isinstance(node, list):
+        for value in node:
+            yield from every_string(value)
+
+
+def test_the_calibration_files_hold_no_personal_data() -> None:
+    folder = CASES_DIR.parent / "calibration"
+    files = sorted(folder.glob("*.json"))
+    assert len(files) == 4
+    for path in files:
+        for text in every_string(json.loads(path.read_text(encoding="utf-8"))):
+            for pattern in PII:
+                assert not pattern.search(text), (
+                    f"{path.name}: pattern {pattern.pattern} in {text!r}"
+                )
 
 
 def test_the_split_is_still_the_hash_of_the_id() -> None:

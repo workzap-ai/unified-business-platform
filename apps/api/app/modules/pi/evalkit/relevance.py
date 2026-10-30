@@ -1,5 +1,15 @@
 """Scripted relevance scorer for candidate ideas (FT-A3). No model, deterministic.
 
+Not a quality gate and not a learning reward. Scorer agreed 55% with an independent grader on
+the borderline set; exact-token matching after crude stemming, no negation, no numbers, limit
+keywords are fixture data.
+
+Known limits, stated so nobody reads more into a verdict than it holds: words are matched as
+exact tokens after a crude stem (ASCII tokens lose a plural "s" and are cut to five letters;
+Arabic loses a leading "ال"), so inflected Urdu, Hindi and Arabic forms do not match; there is no
+negation ("do not hire" and "hire" look alike); a numeric limit ("not above 20000") cannot be
+expressed, and numbers are matched only as whole tokens ('20000' and '200000' stay distinct).
+
 A plan case carries the owner's brief and candidate ideas with an expected verdict. For each
 idea this module computes one of five verdicts from the text alone:
 
@@ -26,6 +36,11 @@ from typing import Any
 from app.modules.pi.evalkit import scorers
 
 VERDICTS = ("relevant", "irrelevant", "generic", "violates_constraint", "restates_owner")
+DISCLAIMER = (
+    "Not a quality gate and not a learning reward. Scorer agreed 55% with an independent grader "
+    "on the borderline set; exact-token matching after crude stemming, no negation, no numbers, "
+    "limit keywords are fixture data."
+)
 LINK_MIN = (
     2  # shared content words (problem plus facts) an idea needs, one of them from the problem
 )
@@ -78,6 +93,8 @@ def tokens(text: str) -> list[str]:
 
 
 def _stem(token: str) -> str:
+    if any(ch.isdigit() for ch in token):
+        return token  # a figure is never truncated: '20000' and '200000' stay distinct
     if token.isascii():
         if token.endswith("s") and len(token) > 3:
             token = token[:-1]

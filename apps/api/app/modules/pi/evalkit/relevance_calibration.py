@@ -32,6 +32,7 @@ BORDERLINE_SAMPLES_PATH = DIR / "relevance_samples_borderline.json"
 BORDERLINE_AGENT_PATH = DIR / "relevance_labels_agent_drafted_borderline.json"
 BLOCKS = ("core", "borderline")
 SEED = 20261030
+MIN_HUMAN_SAMPLES = 20  # independently human-labelled samples the 85% test needs
 DEFINITIONS = {
     "relevant": "links to the owner's stated problem, reuses its facts, breaks no stated limit",
     "irrelevant": "specific, but about something the owner did not raise",
@@ -82,12 +83,74 @@ def borderline_agent_by_sample() -> dict[str, str]:
     }
 
 
+def norm_name(name: Any) -> str:
+    """A reviewer name for comparison: case folded, whitespace collapsed ('Ali' == 'ali ' )."""
+    return " ".join(str(name or "").casefold().split())
+
+
+def known_sample_ids() -> set[str]:
+    return {s["sample_id"] for s in load_samples()} | {
+        s["sample_id"] for s in load_borderline_samples()
+    }
+
+
+def agent_labels_all() -> dict[str, str]:
+    """Every agent-drafted label, core and borderline (never an input of a human comparison)."""
+    return {**load_agent_labels()["labels"], **borderline_agent_by_sample()}
+
+
+def check_human_labels(data: dict[str, Any]) -> dict[str, str]:
+    """The checks every human label input passes, whether it is a file or a dict handed to a
+    library function: label_source human, no `human_confirmed` set by the sheet itself, only known
+    sample ids, only allowed verdicts, and not a copy of the agent-drafted labels."""
+    if data.get("label_source") != "human":
+        raise ValueError("a human labels input must say label_source: human")
+    if "human_confirmed" in data:
+        raise ValueError("a human labels input must not set human_confirmed itself")
+    labels = data.get("labels")
+    if not isinstance(labels, dict):
+        raise ValueError("a human labels input needs a labels mapping")
+    unknown = sorted(set(labels) - known_sample_ids())
+    if unknown:
+        raise ValueError(f"unknown sample ids: {unknown[:5]}")
+    bad = sorted({str(v) for v in labels.values() if v not in relevance.VERDICTS})
+    if bad:
+        raise ValueError(f"not allowed verdicts: {bad[:5]}")
+    agent = agent_labels_all()
+    if len(labels) >= MIN_HUMAN_SAMPLES and all(agent.get(i) == v for i, v in labels.items()):
+        raise ValueError("these labels are identical to the agent-drafted labels")
+    return dict(labels)
+
+
+def human_labels_problem(data: dict[str, Any]) -> str:
+    """Why a human labels file cannot back a human comparison, or an empty string when it can:
+    at least two DISTINCT normalised reviewer names, known ids, enough samples."""
+    reviewers = data.get("reviewers")
+    if not isinstance(reviewers, list):
+        return "the file must name its reviewers as a list"
+    names = [norm_name(r) for r in reviewers]
+    if not names or not all(names):
+        return "every reviewer must be named"
+    if len(set(names)) < 2:
+        return "at least two distinct reviewers are needed"
+    try:
+        labels = check_human_labels(data)
+    except ValueError as exc:
+        return str(exc)
+    if len(labels) < MIN_HUMAN_SAMPLES:
+        return f"at least {MIN_HUMAN_SAMPLES} labelled samples are needed (have {len(labels)})"
+    return ""
+
+
 def load_human_labels(path: str | Path) -> dict[str, Any]:
     data = dict(_load(Path(path)))
-    if data.get("label_source") != "human":
-        raise ValueError("a human labels file must say label_source: human")
-    if not data.get("reviewers"):
-        raise ValueError("a human labels file must name its reviewers")
+    reviewers = data.get("reviewers")
+    names = [norm_name(r) for r in reviewers] if isinstance(reviewers, list) else []
+    if not names or not all(names):
+        raise ValueError("a human labels file must name every reviewer")
+    if len(set(names)) < 2:
+        raise ValueError("a human labels file needs at least two distinct reviewers")
+    check_human_labels(data)
     return data
 
 
@@ -284,17 +347,21 @@ def scorer_labels(cases: list[dict[str, Any]], samples: list[dict[str, Any]]) ->
 
 
 def borderline_comparison() -> dict[str, Any]:
-    """Scorer verdict against the agent-drafted label for every borderline candidate. Development
-    samples are listed one by one; Held-out borderline candidates are counted, never listed. A
-    disagreement is a finding: neither the scorer nor the case is changed to remove it."""
+    """Scorer verdict against the agent-drafted label for the Development borderline candidates.
+    Held-out borderline candidates are only counted: they are not scored here and their labels are
+    not committed. A disagreement is a finding: neither the scorer nor the case is changed to
+    remove it."""
     cases = [c for c in load_cases() if c.get("kind") == "borderline_relevance"]
     labels = load_borderline_agent_labels()["labels"]
     sample_of = {
         f"{s['case_id']}/{s['candidate_id']}": s["sample_id"] for s in load_borderline_samples()
     }
     rows: list[dict[str, Any]] = []
-    held = held_diff = 0
+    held = 0
     for case in cases:
+        if splits.split_of(case) == splits.HELD_OUT:
+            held += len(case["expected"]["candidates"])
+            continue
         for cand in case["expected"]["candidates"]:
             key = f"{case['id']}/{cand['id']}"
             got = relevance.score_candidate(
@@ -304,10 +371,6 @@ def borderline_comparison() -> dict[str, Any]:
                 owner_text=" ".join(case["input"]["messages"]),
                 language=case["language"],
             )["verdict"]
-            if splits.split_of(case) == splits.HELD_OUT:
-                held += 1
-                held_diff += got != labels[key]
-                continue
             rows.append(
                 {
                     "sample_id": sample_of.get(key, ""),
@@ -320,7 +383,7 @@ def borderline_comparison() -> dict[str, Any]:
                     "text": cand["text"],
                 }
             )
-    return {"development": rows, "held_out_candidates": held, "held_out_disagreements": held_diff}
+    return {"development": rows, "held_out_candidates": held}
 
 
 def _fmt(name: str, result: dict[str, Any]) -> list[str]:
@@ -341,17 +404,21 @@ def _fmt(name: str, result: dict[str, Any]) -> list[str]:
 def compare(grader: dict[str, str], human: dict[str, Any] | None = None) -> str:
     """Agreement three ways without a human file (scorer, grader, agent_drafted), plus the human
     comparisons only when a human labels file is given. The label sources are never merged."""
-    cases, samples = load_cases(), load_samples()
+    cases = load_cases()
+    samples = load_samples() + load_borderline_samples()
     by_id = _index(cases)
     languages = {s["sample_id"]: by_id[s["case_id"]]["language"] for s in samples}
     scorer = scorer_labels(cases, samples)
-    agent = dict(load_agent_labels()["labels"])
+    agent = agent_labels_all()
     pairs = [
         ("scorer vs grader", scorer, grader),
         ("scorer vs agent_drafted", scorer, agent),
         ("grader vs agent_drafted", grader, agent),
     ]
-    lines = ["Agreement on the 20 calibration samples (code and drafts, not a model's quality)", ""]
+    lines = [
+        f"Agreement on the {len(samples)} calibration samples (code and drafts, not quality)",
+        "",
+    ]
     if human is None:
         lines += [
             "No human labels provided: the proposed 85% acceptance test is NOT evaluated here.",
@@ -359,13 +426,21 @@ def compare(grader: dict[str, str], human: dict[str, Any] | None = None) -> str:
             "",
         ]
     else:
-        labels = dict(human["labels"])
-        lines += [f"Human labels from {len(human.get('reviewers') or [])} reviewer(s).", ""]
-        pairs += [
-            ("scorer vs human", scorer, labels),
-            ("grader vs human", grader, labels),
-            ("agent_drafted vs human", agent, labels),
-        ]
+        problem = human_labels_problem(human)
+        if problem:
+            lines += [
+                f"The human comparison is not valid: {problem}. No scorer, grader or "
+                "agent_drafted comparison against human labels is printed.",
+                "",
+            ]
+        else:
+            labels = dict(human["labels"])
+            lines += [f"Human labels from {len(human.get('reviewers') or [])} reviewer(s).", ""]
+            pairs += [
+                ("scorer vs human", scorer, labels),
+                ("grader vs human", grader, labels),
+                ("agent_drafted vs human", agent, labels),
+            ]
     for name, one, two in pairs:
         lines += _fmt(name, agreement(one, two, languages)) + [""]
     return "\n".join(lines)

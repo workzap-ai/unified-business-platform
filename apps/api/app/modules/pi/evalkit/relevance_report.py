@@ -1,10 +1,15 @@
 """Relevance report for the plan cases: scripted code-path check, grouped by split, language,
 industry and case kind. A group under the evalkit minimum is "not yet measured". Held-out
-results are printed as totals only and must never be used for tuning; a run that reads them
-can write one line to the append-only access log.
+results are printed as totals only and must never be used for tuning.
 
-Run from apps/api:  python -m app.modules.pi.evalkit.relevance_report [--out FILE]
-        [--access-log FILE --who NAME --why REASON]
+Held-out discipline, fail closed: `build` and `borderline_section` read Held-out cases, so both
+require an access log path, who and why, and write one line to the append-only access log BEFORE
+they return anything. Without them (or when the log cannot be written) they raise and print
+nothing.
+
+Run from apps/api:
+    python -m app.modules.pi.evalkit.relevance_report --access-log FILE --who NAME --why REASON
+        [--out FILE]
 """
 
 import argparse
@@ -32,23 +37,30 @@ def line(name: str, agg: dict[str, Any]) -> str:
     )
 
 
+def _require_access(access_log_path: str | Path | None, who: str, why: str) -> Path:
+    if access_log_path is None or not str(access_log_path).strip():
+        raise ValueError("reading Held-out cases needs an access log path")
+    if not who.strip() or not why.strip():
+        raise ValueError("reading Held-out cases needs who and why")
+    return Path(access_log_path)
+
+
 def build(
     cases: list[dict[str, Any]],
-    access_log_path: str | Path | None = None,
-    who: str = "",
-    why: str = "",
+    access_log_path: str | Path | None,
+    who: str,
+    why: str,
 ) -> tuple[str, dict[str, Any]]:
-    if access_log_path is not None and not (who.strip() and why.strip()):
-        raise ValueError("an access log path needs who and why")
+    log = _require_access(access_log_path, who, why)
     cases = [c for c in cases if c.get("kind") != "borderline_relevance"]
     scored = []
     for case in cases:
         score = relevance.score_case(case) | {"split": splits.split_of(case)}
         scored.append(score)
     held = [s for s in scored if s["split"] == splits.HELD_OUT]
-    if access_log_path is not None and held:
+    if held:
         access_log.append(
-            access_log_path,
+            log,
             who=who,
             why=why,
             run_id=uuid.uuid4().hex[:12],
@@ -58,6 +70,8 @@ def build(
     out = [
         "# pi solution relevance: scripted code-path check",
         "",
+        relevance.DISCLAIMER,
+        "",
         "This tests the relevance scorer and the plan case files against labels written with the",
         "cases. No model is called, so it says nothing about how well pi solves problems. The",
         "check against a grader and against people is done separately (relevance_calibration).",
@@ -65,8 +79,9 @@ def build(
         "",
     ]
     head = (
-        "| group | cases | verdicts matching the labels | relevant by mistake "
-        "| relevant missed | limit breaks missed |\n|---|---|---|---|---|---|"
+        "| group | cases | verdicts matching the agent-drafted labels (not a score) "
+        "| relevant by mistake | relevant missed | limit breaks missed |\n"
+        "|---|---|---|---|---|---|"
     )
     totals: dict[str, Any] = {}
     for title, key in (
@@ -95,18 +110,28 @@ def build(
     return "\n".join(out) + "\n", totals
 
 
-def borderline_section() -> str:
+def borderline_section(access_log_path: str | Path | None, who: str, why: str) -> str:
     """The borderline set: the scorer against agent-drafted labels (not human labels). Held-out
-    borderline candidates are counted only."""
+    borderline candidates are only counted, and counting them is logged like any Held-out read."""
+    log = _require_access(access_log_path, who, why)
     found = relevance_calibration.borderline_comparison()
+    if found["held_out_candidates"]:
+        access_log.append(
+            log,
+            who=who,
+            why=f"{why} (borderline candidates counted only)",
+            run_id=uuid.uuid4().hex[:12],
+            split=splits.HELD_OUT,
+            count=found["held_out_candidates"],
+        )
     rows = found["development"]
     diff = [r for r in rows if not r["agree"]]
     out = [
         "## Borderline set: scorer against agent-drafted labels (not human labels)",
         "",
         f"Development: {len(rows)} candidates, the scorer differs on {len(diff)}. Held-out: "
-        f"{found['held_out_candidates']} candidates, differs on {found['held_out_disagreements']} "
-        "(counted only). A difference is a finding; neither side is changed to remove it.",
+        f"{found['held_out_candidates']} candidates counted only (not scored, no labels "
+        "committed). A difference is a finding; neither side is changed to remove it.",
         "",
     ]
     out += [
@@ -120,13 +145,13 @@ def borderline_section() -> str:
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--out", default="")
-    parser.add_argument("--access-log", default="")
-    parser.add_argument("--who", default="")
-    parser.add_argument("--why", default="")
+    parser.add_argument("--access-log", required=True, help="append-only Held-out access log")
+    parser.add_argument("--who", required=True)
+    parser.add_argument("--why", required=True)
     args = parser.parse_args()
     cases = json.loads(CASES.read_text(encoding="utf-8"))
-    text, totals = build(cases, args.access_log or None, args.who, args.why)
-    text += "\n" + borderline_section()
+    text, totals = build(cases, args.access_log, args.who, args.why)
+    text += "\n" + borderline_section(args.access_log, args.who, args.why)
     if args.out:
         Path(args.out).write_text(text, encoding="utf-8")
     print(text)
