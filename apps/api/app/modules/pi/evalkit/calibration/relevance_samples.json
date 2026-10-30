@@ -1,0 +1,102 @@
+[
+ {
+  "sample_id": "s01",
+  "case_id": "plan_saas_churn_en_10",
+  "candidate_id": "c1"
+ },
+ {
+  "sample_id": "s02",
+  "case_id": "plan_ecom_returns_en_07",
+  "candidate_id": "c4"
+ },
+ {
+  "sample_id": "s03",
+  "case_id": "plan_ecom_cod_roman_ur_08",
+  "candidate_id": "c1"
+ },
+ {
+  "sample_id": "s04",
+  "case_id": "plan_banquet_menu_en_13",
+  "candidate_id": "c1"
+ },
+ {
+  "sample_id": "s05",
+  "case_id": "plan_farmhouse_booking_roman_ur_02",
+  "candidate_id": "c2"
+ },
+ {
+  "sample_id": "s06",
+  "case_id": "plan_dairy_milkman_ar_30",
+  "candidate_id": "c2"
+ },
+ {
+  "sample_id": "s07",
+  "case_id": "plan_dairy_milk_en_29",
+  "candidate_id": "c3"
+ },
+ {
+  "sample_id": "s08",
+  "case_id": "plan_school_attendance_ur_22",
+  "candidate_id": "c1"
+ },
+ {
+  "sample_id": "s09",
+  "case_id": "plan_turf_booking_en_01",
+  "candidate_id": "c5"
+ },
+ {
+  "sample_id": "s10",
+  "case_id": "plan_property_rental_hi_06",
+  "candidate_id": "c1"
+ },
+ {
+  "sample_id": "s11",
+  "case_id": "plan_banquet_deposit_roman_ur_14",
+  "candidate_id": "c2"
+ },
+ {
+  "sample_id": "s12",
+  "case_id": "plan_dental_chair_ar_19",
+  "candidate_id": "c2"
+ },
+ {
+  "sample_id": "s13",
+  "case_id": "plan_car_rental_en_04",
+  "candidate_id": "c2"
+ },
+ {
+  "sample_id": "s14",
+  "case_id": "plan_farmhouse_booking_roman_ur_02",
+  "candidate_id": "c4"
+ },
+ {
+  "sample_id": "s15",
+  "case_id": "plan_turf_booking_en_01",
+  "candidate_id": "c3"
+ },
+ {
+  "sample_id": "s16",
+  "case_id": "plan_property_rental_hi_06",
+  "candidate_id": "c3"
+ },
+ {
+  "sample_id": "s17",
+  "case_id": "plan_property_rental_hi_06",
+  "candidate_id": "c2"
+ },
+ {
+  "sample_id": "s18",
+  "case_id": "plan_courier_cod_roman_ur_24",
+  "candidate_id": "c3"
+ },
+ {
+  "sample_id": "s19",
+  "case_id": "plan_crop_irrigation_ur_28",
+  "candidate_id": "c3"
+ },
+ {
+  "sample_id": "s20",
+  "case_id": "plan_clinic_records_roman_ur_17",
+  "candidate_id": "c4"
+ }
+]

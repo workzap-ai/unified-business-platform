@@ -89,4 +89,4 @@ per industry is therefore preliminary evidence only. Approval: PENDING.
 
 1. Approve, change or reject each row S1-S7, T1-T11, the language tiers and the industry standard.
 2. Which trades are regulated or safety-critical (S3)?
-3. Who may read Held-out results, and how is access logged (`evalkit.splits.held_out_access`)?
+3. Who may read Held-out results, and how is access logged (`evalkit.access_log.append`, the append-only writer; `splits.held_out_access` only builds a record)?
