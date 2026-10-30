@@ -73,6 +73,7 @@ from app.modules.pi import (
     solutions,
     spec_handbook,
     style,
+    system_ask,
     taxonomy,
     think_plan,
     think_prompt,
@@ -2817,6 +2818,7 @@ async def brain_expert_ideas(
                 ),
                 answered=owner[1:][-4:],
                 previous=stored,
+                tried_and_failed=system_ask.tried_and_failed(owner),
             ),
         ),
     )
@@ -3126,6 +3128,21 @@ def brain_no_ideas(turn: "ServiceTurn", context: dict[str, Any]) -> None:
     )
     if had_ideas or context.get("solution_why") in ("budget", "none_left"):
         line = NO_MORE_IDEAS.get(language, NO_MORE_IDEAS["en"])
+        if (
+            context.get("box_offer")
+            and (
+                system_ask.open_ask(context.get("brief"))
+                or box_signals.asks_who_or_how_long(str(context.get("latest_customer_message") or ""))
+            )
+            and box_offer_allowed(context)
+        ):
+            # the owner asked whether Workzap will do all of it: no "those are all the ideas" dead
+            # end; what was heard, then brain_offer adds the one question (the offer, R3)
+            turn.reply = with_disclosure(
+                system_ask.HEARD_LINES.get(language, system_ask.HEARD_LINES["en"]), context, language
+            )
+            turn.awaiting_customer = True
+            return
     told = [
         str(h.get("text") or "") for h in (context.get("history") or []) if h.get("role") == "ai"
     ]
@@ -3295,7 +3312,10 @@ def brain_offer(turn: "ServiceTurn", context: dict[str, Any]) -> None:
         # R3 (spec 5.4): who would do it, how long, can Workzap: answered in a line, then the offer
         or (
             context.get("box_offer")
-            and box_signals.asks_who_or_how_long(str(context.get("latest_customer_message") or ""))
+            and (
+                box_signals.asks_who_or_how_long(str(context.get("latest_customer_message") or ""))
+                or system_ask.open_ask(context.get("brief"))  # asked earlier, not lost since
+            )
         )
     ):
         return
@@ -6555,6 +6575,7 @@ async def save_service_turn(
                 [*(previous.get("asked_facts") or []), *memory_block.asked_keys(turn.reply)]
             )
         )[-12:]
+        brief = system_ask.note(brief, message.body or "")  # R3 ask kept until the offer is made
         # R-ASK-07: the question asked last turn is answered now (any answer closes it); the one
         # in this reply is the open one. Kept in the brief, so it survives sessions and languages.
         try:

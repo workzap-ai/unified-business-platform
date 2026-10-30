@@ -12,7 +12,7 @@ except `previous_ai_asked`.
 import re
 from typing import Any
 
-from app.modules.pi import dial_signals, dials
+from app.modules.pi import dial_signals, dials, system_ask
 
 RANK_PREFIX = "rank:"
 MAX_RANK = 9
@@ -78,7 +78,8 @@ def says_no_others(message: str) -> bool:
 
 def asks_who_or_how_long(message: str) -> bool:
     """R3: the owner asks who would do it, how long it takes, or whether Workzap can do it."""
-    return bool(ASKS_WHO_OR_HOW_LONG.search(" ".join((message or "").split())))
+    said = " ".join((message or "").split())
+    return bool(ASKS_WHO_OR_HOW_LONG.search(said)) or system_ask.asks_can_you_do(said)
 
 
 def just_corrected(message: str) -> bool:
