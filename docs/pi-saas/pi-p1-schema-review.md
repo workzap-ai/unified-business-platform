@@ -1,7 +1,10 @@
 # P-1 schema review: the complete field set before migration 0053 is written
 
-Status: PROPOSAL for owner review, 2026-10-30. **No migration, SQL file or code exists.** Migration `0053`
-stays reserved to lane U and is not written until the owner approves this document. Read from
+Status: A1 (the four `pi_problems` columns, `cause.source` dropped, `expected_outcome` added) is APPROVED by
+the owner delegating recommended decisions, 2026-10-31, and implemented as FT-B2a (migration `0053`, branch
+`pi/u-b2a-problem-fields`). A2, A3 and the business-level rows (section 2.2) are still PROPOSALS (S6, not B2a).
+Original text: PROPOSAL for owner review, 2026-10-30. Migration `0053`
+stays reserved to lane U. Read from
 `origin/main` (cc462c5), migration head `0052_pi_open_items`. Everything in the "D2 AMENDMENT FOR OWNER
 REVIEW" boxes changes what the owner approved as D2 (constraints, tried and cause as JSONB columns on
 `pi_problems`, one migration).

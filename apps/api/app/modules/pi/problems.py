@@ -14,7 +14,7 @@ from typing import Any, Literal
 from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field
-from sqlalchemy import func, select
+from sqlalchemy import func, inspect, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.modules.pi import business, figure_correction, problem_fields, taxonomy
@@ -33,6 +33,7 @@ SUMMARY_LINE_WORDS = 10
 SUMMARY_FULL_LIST = 12  # more than this and the summary shows two lines per group
 SUMMARY_TRIGGER = 7  # problems since the last summary that make pi offer one
 MAX_USER_WORDS = 6
+REQUIREMENT_COLUMNS = ("constraints", "tried", "cause", "expected_outcome")
 FIELD_LIMITS = {"summary": 400, "workaround": 400, "trigger": 200, "who_notices": 200}
 
 # Blame and judgement words never go in a title (R, spec 4.3).
@@ -109,6 +110,7 @@ class ProblemNote(BaseModel):
     staff: str = ""
     deadline: str = ""
     cannot_change: list[str] = Field(default_factory=list)
+    cannot_change_remove: list[str] = Field(default_factory=list)  # text, or "#2" (position)
     tried: list[dict[str, Any]] = Field(default_factory=list)  # {"what", "outcome"}
     cause_text: str = ""
     cause_said: bool = False  # True only when the owner said the cause in their own words
@@ -481,8 +483,30 @@ class ProblemBook:
         problem.severity_inferred = taxonomy.severity_band(score)
 
     @staticmethod
+    def carries_requirements(note: ProblemNote) -> bool:
+        return bool(
+            note.budget
+            or note.staff
+            or note.deadline
+            or note.cannot_change
+            or note.cannot_change_remove
+            or note.tried
+            or note.cause_text
+            or note.expected_outcome
+        )
+
+    async def load_requirements(self, problem: PiProblem) -> None:
+        """The four deferred columns, loaded now (an async session cannot lazy-load them)."""
+        unloaded = set(inspect(problem).unloaded) & set(REQUIREMENT_COLUMNS)
+        if unloaded:
+            await self.session.refresh(problem, sorted(unloaded))
+
+    @staticmethod
     def requirement_values(
-        note: ProblemNote, problem: PiProblem | None, message_id: UUID | None
+        note: ProblemNote,
+        problem: PiProblem | None,
+        message_id: UUID | None,
+        owner_text: str = "",
     ) -> tuple[dict[str, Any], bool]:
         """B2a: the new column values a note carries (only those it says), and whether the
         redactor changed any text. Nothing is returned for a note that carries none of them."""
@@ -496,6 +520,7 @@ class ProblemBook:
             note.deadline,
             note.cannot_change,
             msg,
+            note.cannot_change_remove,
         )
         changed = changed or was
         if constraints is not None:
@@ -510,6 +535,7 @@ class ProblemBook:
             note.cause_said,
             note.cause_words,
             msg,
+            " ".join([owner_text, *note.user_words, *(problem.user_words if problem else [])]),
         )
         changed = changed or was
         if cause is not None:
@@ -526,6 +552,7 @@ class ProblemBook:
     async def confirm_cause(self, problem: PiProblem) -> bool:
         """The owner agreed with the cause they said: `owner_said` becomes `confirmed`. A cause pi
         only guessed, or none, is never confirmed (returns False)."""
+        await self.load_requirements(problem)
         confirmed = problem_fields.confirmed_cause(problem.cause)
         if confirmed is None:
             return False
@@ -536,7 +563,11 @@ class ProblemBook:
         return True
 
     async def create(
-        self, note: ProblemNote, message_id: UUID | None, conversation_id: UUID | None
+        self,
+        note: ProblemNote,
+        message_id: UUID | None,
+        conversation_id: UUID | None,
+        owner_text: str = "",
     ) -> tuple[PiProblem, bool]:
         """A new problem, or (when the same title is already noted) its enrichment."""
         title = clean_title(note.title)
@@ -563,6 +594,7 @@ class ProblemBook:
                     note.model_copy(update={"title": "", "title_local": ""}),
                     "enrichment",
                     message_id,
+                    owner_text,
                 )
                 return existing, False
         words, redacted = _words(note.user_words)
@@ -571,7 +603,7 @@ class ProblemBook:
         if category == taxonomy.OTHER and "taxonomy_review" not in tags:
             tags.append("taxonomy_review")
         group = await self.group_for(category)
-        required, required_redacted = self.requirement_values(note, None, message_id)
+        required, required_redacted = self.requirement_values(note, None, message_id, owner_text)
         problem = self.problems.new(
             customer_id=self.customer_id,
             conversation_id=conversation_id,
@@ -630,7 +662,12 @@ class ProblemBook:
         return problem, True
 
     async def update(
-        self, problem: PiProblem, note: ProblemNote, reason: str, message_id: UUID | None
+        self,
+        problem: PiProblem,
+        note: ProblemNote,
+        reason: str,
+        message_id: UUID | None,
+        owner_text: str = "",
     ) -> bool:
         """Apply what the note says; returns whether anything changed."""
         diff: dict[str, Any] = {}
@@ -708,11 +745,15 @@ class ProblemBook:
             put("systems_mentioned", sorted({*problem.systems_mentioned, *note.systems[:8]}))
         if note.believes_cause.strip():
             put("person_believes_cause", redact(note.believes_cause.strip()[:300])[0])
-        required, required_redacted = self.requirement_values(note, problem, message_id)
-        for name, value in required.items():
-            put(name, value)
-        if required_redacted:
-            put("pii_redacted", True)
+        if self.carries_requirements(note):
+            await self.load_requirements(problem)
+            required, required_redacted = self.requirement_values(
+                note, problem, message_id, owner_text
+            )
+            for name, value in required.items():
+                put(name, value)
+            if required_redacted:
+                put("pii_redacted", True)
         if note.requested_solution.strip():
             put("requested_solution", redact(note.requested_solution.strip()[:300])[0])
         if message_id and str(message_id) not in problem.source_message_ids:
@@ -837,6 +878,7 @@ async def apply_ops(
     language: str,
     link_min: Decimal = Decimal(0),
     figure_fix: tuple[str, str] | None = None,
+    owner_text: str = "",
 ) -> Applied:
     """Apply the model's ops in order. Bad ones are skipped and listed, never raised.
 
@@ -849,7 +891,7 @@ async def apply_ops(
     for op in ops:
         try:
             if op.op == "create" and op.note and op.note.title.strip():
-                problem, fresh = await book.create(op.note, message_id, conversation_id)
+                problem, fresh = await book.create(op.note, message_id, conversation_id, owner_text)
                 (result.created if fresh else result.updated).append(problem)
                 refs[short_ref(problem.id)] = problem
                 if fresh and problem.category == taxonomy.OTHER:
@@ -862,6 +904,7 @@ async def apply_ops(
                     op.note,
                     "correction" if op.reason == "correction" else "enrichment",
                     message_id,
+                    owner_text,
                 )
                 if changed:
                     result.updated.append(refs[op.ref])
@@ -877,7 +920,7 @@ async def apply_ops(
                 original.revision += 1
                 await book._revise(original, {"status": ["draft", "split"]}, "split", "pi")
                 for note in op.notes:
-                    problem, _ = await book.create(note, message_id, conversation_id)
+                    problem, _ = await book.create(note, message_id, conversation_id, owner_text)
                     result.created.append(problem)
                     refs[short_ref(problem.id)] = problem
                 result.split.append(original)
