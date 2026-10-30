@@ -69,3 +69,34 @@ Full per-group tables: `pi-eval-baseline.md`.
 - A working OpenAI key and a budget for a real-model sample (30 cases first). Nothing has been spent.
 - More Held-out cases per language (Urdu script, Arabic) and a Hindi set if Hindi is in scope.
 - Who may read Held-out results, and how `evalkit.splits.held_out_access` is logged.
+
+## 6. Development set: coverage after FT-A1 (2026-10-30)
+
+Development grew from 39 to 69 cases (132 cases in all: 69 Development, 60 Held-out, 3 Regression). Gap 5
+above (Development smaller than Held-out) is closed by this. The Held-out facts in sections 1 to 5 are
+unchanged: no Held-out case was added, changed or read for this work.
+
+- 30 new cases, all new text for businesses written fresh; 30 industries that no earlier case used (49
+  industries in Development in all). Each id was given a number suffix until its hash fell in Development
+  (`oud_correction_ar_3`, `insure_rant_hi_6` ...); the number carries no meaning. No message of the new cases
+  appears in any other split, and ids are unique. The one message Development shares with another split is the
+  old pair of the `acc_correction_en` / `reg_correction_figure` conversation (Regression is a deliberate copy).
+- The 102 earlier cases are byte-identical (the diff of `extraction.json` is additions only).
+- Hindi (Devanagari) is data only: pi understands it but does not write it. The scorer splits words with the regex word class,
+  which breaks Devanagari at its vowel signs, so the Hindi reference notes are matched through the English words
+  of their titles (`any` keywords) and figures are kept by their number. That is a limit of the scorer, left as
+  it is.
+
+| axis | count |
+|---|---|
+| language | English 24, Roman Urdu 18, Urdu script 11, Arabic 8, Hindi 8 |
+| kind | single 21, list 17, correction 9, rant 7, multi-turn 6, constraints 5, mixed 4 |
+| expected problems / cases with two or more | 117 / 32 |
+| figures to keep | 47 |
+| corrections of a figure | 9 |
+| constraints labelled | 5 cases, 14 constraints |
+| industries | 49 |
+
+Scripted result for Development (reference notes, no model): problem recall 100%, precision 100%, figures
+kept 100%, corrections kept 100%, 0 unsupported causes. Every new reference note was checked to survive the
+real extraction path (titles at most 8 words, owner words and a valid category present).

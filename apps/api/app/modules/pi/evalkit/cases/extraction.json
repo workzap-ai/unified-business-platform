@@ -6725,5 +6725,1830 @@
     }
    ]
   }
+ },
+ {
+  "id": "pest_single_ar",
+  "industry": "pest_control",
+  "language": "ar",
+  "kind": "single",
+  "regression": false,
+  "messages": [
+   "نقوم بزيارات المتابعة بعد المعالجة لكن نصف العملاء يتصلون بنا لأن الحشرات عادت بعد أسبوعين."
+  ],
+  "expected": {
+   "problems": [
+    {
+     "id": "p1",
+     "any": [
+      "الحشرات",
+      "عادت",
+      "أسبوعين"
+     ],
+     "figures": []
+    }
+   ],
+   "stated": [
+    "نصف العملاء يتصلون بنا لأن الحشرات عادت بعد أسبوعين"
+   ],
+   "missing": [
+    "budget",
+    "cause",
+    "what has been tried"
+   ],
+   "hypothesis_only": [],
+   "corrections": []
+  },
+  "recorded": {
+   "origin": "reference output written by hand, not model output",
+   "notes": [
+    {
+     "title": "Pests return two weeks after treatment",
+     "title_local": "الحشرات تعود بعد أسبوعين من المعالجة",
+     "user_words": [
+      "نصف العملاء يتصلون بنا لأن الحشرات عادت بعد أسبوعين"
+     ],
+     "summary": "Pests return two weeks after treatment",
+     "category": "quality_complaints"
+    }
+   ]
+  }
+ },
+ {
+  "id": "guard_list_ar",
+  "industry": "security_guard_companies",
+  "language": "ar",
+  "kind": "list",
+  "regression": false,
+  "messages": [
+   "عندنا ثلاث مشاكل: الحراس يتأخرون عن الورديات، والعقود تنتهي دون أن نلاحظ، وفواتير العملاء ترسل متأخرة 10 أيام."
+  ],
+  "expected": {
+   "problems": [
+    {
+     "id": "p1",
+     "any": [
+      "الحراس",
+      "يتأخرون",
+      "الورديات"
+     ],
+     "figures": []
+    },
+    {
+     "id": "p2",
+     "any": [
+      "العقود",
+      "تنتهي",
+      "نلاحظ"
+     ],
+     "figures": []
+    },
+    {
+     "id": "p3",
+     "any": [
+      "فواتير",
+      "متأخرة"
+     ],
+     "figures": [
+      "10 أيام"
+     ]
+    }
+   ],
+   "stated": [
+    "الحراس يتأخرون عن الورديات",
+    "العقود تنتهي دون أن نلاحظ",
+    "فواتير العملاء ترسل متأخرة 10 أيام"
+   ],
+   "missing": [
+    "budget",
+    "cause",
+    "what has been tried"
+   ],
+   "hypothesis_only": [],
+   "corrections": []
+  },
+  "recorded": {
+   "origin": "reference output written by hand, not model output",
+   "notes": [
+    {
+     "title": "Guards arrive late for their shifts",
+     "title_local": "الحراس يتأخرون عن الورديات",
+     "user_words": [
+      "الحراس يتأخرون عن الورديات"
+     ],
+     "summary": "Guards arrive late for their shifts",
+     "category": "people_staff"
+    },
+    {
+     "title": "Client contracts expire without anyone noticing",
+     "title_local": "العقود تنتهي دون أن نلاحظ",
+     "user_words": [
+      "العقود تنتهي دون أن نلاحظ"
+     ],
+     "summary": "Client contracts expire without anyone noticing",
+     "category": "compliance_admin"
+    },
+    {
+     "title": "Client invoices go out 10 days late",
+     "title_local": "فواتير العملاء ترسل متأخرة 10 أيام",
+     "user_words": [
+      "فواتير العملاء ترسل متأخرة 10 أيام"
+     ],
+     "summary": "Client invoices go out 10 days late",
+     "category": "cash_collections"
+    }
+   ]
+  }
+ },
+ {
+  "id": "oud_correction_ar_3",
+  "industry": "perfumes_attar_and_oud",
+  "language": "ar",
+  "kind": "correction",
+  "regression": false,
+  "messages": [
+   "نبيع بالجملة وفي كل شهر يتلف عندنا حوالي 20 زجاجة عود بسبب سوء التخزين.",
+   "عذرا، ليس 20 بل 200 زجاجة."
+  ],
+  "expected": {
+   "problems": [
+    {
+     "id": "p1",
+     "any": [
+      "زجاجة",
+      "عود",
+      "يتلف"
+     ],
+     "figures": [
+      "200"
+     ]
+    }
+   ],
+   "stated": [
+    "يتلف عندنا حوالي 200 زجاجة عود في الشهر بسبب سوء التخزين"
+   ],
+   "missing": [
+    "budget",
+    "cause",
+    "what has been tried"
+   ],
+   "hypothesis_only": [],
+   "corrections": [
+    {
+     "wrong": "20",
+     "right": "200",
+     "problem": "p1"
+    }
+   ]
+  },
+  "recorded": {
+   "origin": "reference output written by hand, not model output",
+   "notes": [
+    {
+     "title": "About 200 oud bottles spoil each month",
+     "title_local": "يتلف حوالي 200 زجاجة عود كل شهر",
+     "user_words": [
+      "يتلف عندنا حوالي 200 زجاجة عود بسبب سوء التخزين"
+     ],
+     "summary": "About 200 oud bottles spoil each month",
+     "category": "stock_inventory"
+    }
+   ]
+  }
+ },
+ {
+  "id": "coldstore_multi_ar_2",
+  "industry": "cold_storage_operators",
+  "language": "ar",
+  "kind": "multi_turn",
+  "regression": false,
+  "messages": [
+   "نؤجر غرفا مبردة للتجار ولا نعرف كم بقي من المساحة الفارغة في أي وقت.",
+   "نحسبها يدويا على ورقة في المكتب وأحيانا نؤجر المساحة مرتين.",
+   "ومشكلة أخرى أن عطل المولد لا يصلنا خبره إلا من العمال في الصباح."
+  ],
+  "expected": {
+   "problems": [
+    {
+     "id": "p1",
+     "any": [
+      "المساحة",
+      "مرتين",
+      "نؤجر"
+     ],
+     "figures": []
+    },
+    {
+     "id": "p2",
+     "any": [
+      "المولد",
+      "عطل"
+     ],
+     "figures": []
+    }
+   ],
+   "stated": [
+    "أحيانا نؤجر المساحة مرتين",
+    "عطل المولد لا يصلنا خبره إلا من العمال في الصباح"
+   ],
+   "missing": [
+    "budget",
+    "cause",
+    "what has been tried"
+   ],
+   "hypothesis_only": [],
+   "corrections": []
+  },
+  "recorded": {
+   "origin": "reference output written by hand, not model output",
+   "notes": [
+    {
+     "title": "Free chamber space is rented out twice",
+     "title_local": "أحيانا نؤجر المساحة مرتين",
+     "user_words": [
+      "أحيانا نؤجر المساحة مرتين"
+     ],
+     "summary": "Free chamber space is rented out twice",
+     "category": "operations_process"
+    },
+    {
+     "title": "Generator faults are known only next morning",
+     "title_local": "عطل المولد لا يصلنا خبره إلا في الصباح",
+     "user_words": [
+      "عطل المولد لا يصلنا خبره إلا من العمال في الصباح"
+     ],
+     "summary": "Generator faults are known only next morning",
+     "category": "operations_process"
+    }
+   ]
+  }
+ },
+ {
+  "id": "clean_constraints_ar_2",
+  "industry": "cleaning_and_janitorial_companies",
+  "language": "ar",
+  "kind": "constraints",
+  "regression": false,
+  "messages": [
+   "فرق التنظيف عندنا تنسى بعض المواقع، وفي الأسبوع الماضي اشتكى 4 عملاء من مواقع لم تنظف. لدينا مشرفان فقط وميزانية لا تتجاوز 5000 ريال، ولا نستطيع تغيير شركة المواد."
+  ],
+  "expected": {
+   "problems": [
+    {
+     "id": "p1",
+     "any": [
+      "المواقع",
+      "تنسى"
+     ],
+     "figures": [
+      "4 عملاء"
+     ]
+    }
+   ],
+   "stated": [
+    "اشتكى 4 عملاء من مواقع لم تنظف"
+   ],
+   "missing": [
+    "cause",
+    "what has been tried"
+   ],
+   "hypothesis_only": [],
+   "corrections": [],
+   "constraints": [
+    "مشرفان فقط",
+    "ميزانية لا تتجاوز 5000 ريال",
+    "لا نستطيع تغيير شركة المواد"
+   ]
+  },
+  "recorded": {
+   "origin": "reference output written by hand, not model output",
+   "notes": [
+    {
+     "title": "Cleaning crews skip some client sites",
+     "title_local": "فرق التنظيف تنسى بعض المواقع",
+     "user_words": [
+      "فرق التنظيف عندنا تنسى بعض المواقع",
+      "اشتكى 4 عملاء من مواقع لم تنظف"
+     ],
+     "summary": "Cleaning crews skip some client sites",
+     "category": "operations_process"
+    }
+   ]
+  }
+ },
+ {
+  "id": "drive_rant_ar",
+  "industry": "driving_schools",
+  "language": "ar",
+  "kind": "rant",
+  "regression": false,
+  "messages": [
+   "تعبت من هذا الوضع! المتدربون يحجزون الدروس ثم لا يحضرون، والسيارة تبقى واقفة، ثم المدرب يطالبني بأجر اليوم كاملا."
+  ],
+  "expected": {
+   "problems": [
+    {
+     "id": "p1",
+     "any": [
+      "المتدربون",
+      "يحجزون",
+      "يحضرون"
+     ],
+     "figures": []
+    },
+    {
+     "id": "p2",
+     "any": [
+      "المدرب",
+      "أجر"
+     ],
+     "figures": []
+    }
+   ],
+   "stated": [
+    "المتدربون يحجزون الدروس ثم لا يحضرون",
+    "المدرب يطالبني بأجر اليوم كاملا"
+   ],
+   "missing": [
+    "budget",
+    "cause",
+    "what has been tried"
+   ],
+   "hypothesis_only": [],
+   "corrections": []
+  },
+  "recorded": {
+   "origin": "reference output written by hand, not model output",
+   "notes": [
+    {
+     "title": "Learners book lessons and do not come",
+     "title_local": "المتدربون يحجزون الدروس ثم لا يحضرون",
+     "user_words": [
+      "المتدربون يحجزون الدروس ثم لا يحضرون"
+     ],
+     "summary": "Learners book lessons and do not come",
+     "category": "customers_retention"
+    },
+    {
+     "title": "Instructor asks full day pay for idle car",
+     "title_local": "المدرب يطالبني بأجر اليوم كاملا",
+     "user_words": [
+      "المدرب يطالبني بأجر اليوم كاملا"
+     ],
+     "summary": "Instructor asks full day pay for idle car",
+     "category": "people_staff"
+    }
+   ]
+  }
+ },
+ {
+  "id": "flower_mixed_ar",
+  "industry": "florists_and_gifting",
+  "language": "ar",
+  "kind": "mixed",
+  "regression": false,
+  "messages": [
+   "مخزون الورد عندنا يذبل قبل البيع، وطلبات Instagram تضيع بين رسائل WhatsApp."
+  ],
+  "expected": {
+   "problems": [
+    {
+     "id": "p1",
+     "any": [
+      "الورد",
+      "يذبل"
+     ],
+     "figures": []
+    },
+    {
+     "id": "p2",
+     "any": [
+      "Instagram",
+      "طلبات",
+      "تضيع"
+     ],
+     "figures": []
+    }
+   ],
+   "stated": [
+    "مخزون الورد عندنا يذبل قبل البيع",
+    "طلبات Instagram تضيع بين رسائل WhatsApp"
+   ],
+   "missing": [
+    "budget",
+    "cause",
+    "what has been tried"
+   ],
+   "hypothesis_only": [],
+   "corrections": []
+  },
+  "recorded": {
+   "origin": "reference output written by hand, not model output",
+   "notes": [
+    {
+     "title": "Flower stock wilts before it sells",
+     "title_local": "مخزون الورد يذبل قبل البيع",
+     "user_words": [
+      "مخزون الورد عندنا يذبل قبل البيع"
+     ],
+     "summary": "Flower stock wilts before it sells",
+     "category": "stock_inventory"
+    },
+    {
+     "title": "Instagram orders get lost among messages",
+     "title_local": "طلبات Instagram تضيع بين الرسائل",
+     "user_words": [
+      "طلبات Instagram تضيع بين رسائل WhatsApp"
+     ],
+     "summary": "Instagram orders get lost among messages",
+     "category": "orders_fulfilment"
+    }
+   ]
+  }
+ },
+ {
+  "id": "laundry_single_ar",
+  "industry": "laundry_and_dry_cleaning",
+  "language": "ar",
+  "kind": "single",
+  "regression": false,
+  "messages": [
+   "بعض ملابس الزبائن تضيع بين الفروع الثلاثة ولا نعرف أين ذهبت، وندفع تعويضا كل شهر."
+  ],
+  "expected": {
+   "problems": [
+    {
+     "id": "p1",
+     "any": [
+      "ملابس",
+      "تضيع",
+      "الفروع"
+     ],
+     "figures": []
+    }
+   ],
+   "stated": [
+    "بعض ملابس الزبائن تضيع بين الفروع الثلاثة ولا نعرف أين ذهبت"
+   ],
+   "missing": [
+    "budget",
+    "cause",
+    "what has been tried"
+   ],
+   "hypothesis_only": [],
+   "corrections": []
+  },
+  "recorded": {
+   "origin": "reference output written by hand, not model output",
+   "notes": [
+    {
+     "title": "Customer garments get lost between branches",
+     "title_local": "ملابس الزبائن تضيع بين الفروع",
+     "user_words": [
+      "بعض ملابس الزبائن تضيع بين الفروع الثلاثة ولا نعرف أين ذهبت"
+     ],
+     "summary": "Customer garments get lost between branches",
+     "category": "stock_inventory"
+    }
+   ]
+  }
+ },
+ {
+  "id": "shoe_single_hi",
+  "industry": "footwear_retail",
+  "language": "hi",
+  "kind": "single",
+  "regression": false,
+  "messages": [
+   "हमारी दुकान में जूतों के साइज़ का हिसाब नहीं रहता, ग्राहक आता है तो 8 नंबर वाला जोड़ा मिलता ही नहीं।"
+  ],
+  "expected": {
+   "problems": [
+    {
+     "id": "p1",
+     "any": [
+      "shoe",
+      "size",
+      "stock"
+     ],
+     "figures": [
+      "8 नंबर"
+     ]
+    }
+   ],
+   "stated": [
+    "ग्राहक आता है तो 8 नंबर वाला जोड़ा मिलता ही नहीं"
+   ],
+   "missing": [
+    "budget",
+    "cause",
+    "what has been tried"
+   ],
+   "hypothesis_only": [],
+   "corrections": []
+  },
+  "recorded": {
+   "origin": "reference output written by hand, not model output",
+   "notes": [
+    {
+     "title": "Shoe size stock is not tracked",
+     "title_local": "जूतों के साइज़ का हिसाब नहीं रहता",
+     "user_words": [
+      "जूतों के साइज़ का हिसाब नहीं रहता",
+      "8 नंबर वाला जोड़ा मिलता ही नहीं"
+     ],
+     "summary": "Shoe size stock is not tracked",
+     "category": "stock_inventory"
+    }
+   ]
+  }
+ },
+ {
+  "id": "book_list_hi",
+  "industry": "books_stationery_and_school_supplies",
+  "language": "hi",
+  "kind": "list",
+  "regression": false,
+  "messages": [
+   "तीन परेशानियाँ हैं: स्कूल सीज़न में किताबें कम पड़ जाती हैं, उधार वाले अभिभावक पैसे देर से देते हैं, और रोज़ का cash गिनने में एक घंटा लग जाता है।"
+  ],
+  "expected": {
+   "problems": [
+    {
+     "id": "p1",
+     "any": [
+      "books",
+      "season",
+      "short"
+     ],
+     "figures": []
+    },
+    {
+     "id": "p2",
+     "any": [
+      "parents",
+      "credit",
+      "late"
+     ],
+     "figures": []
+    },
+    {
+     "id": "p3",
+     "any": [
+      "cash",
+      "counting"
+     ],
+     "figures": []
+    }
+   ],
+   "stated": [
+    "स्कूल सीज़न में किताबें कम पड़ जाती हैं",
+    "उधार वाले अभिभावक पैसे देर से देते हैं",
+    "रोज़ का cash गिनने में एक घंटा लग जाता है"
+   ],
+   "missing": [
+    "budget",
+    "cause",
+    "what has been tried"
+   ],
+   "hypothesis_only": [],
+   "corrections": []
+  },
+  "recorded": {
+   "origin": "reference output written by hand, not model output",
+   "notes": [
+    {
+     "title": "Books run short in school season",
+     "title_local": "स्कूल सीज़न में किताबें कम पड़ जाती हैं",
+     "user_words": [
+      "स्कूल सीज़न में किताबें कम पड़ जाती हैं"
+     ],
+     "summary": "Books run short in school season",
+     "category": "stock_inventory"
+    },
+    {
+     "title": "Parents on credit pay late",
+     "title_local": "उधार वाले अभिभावक पैसे देर से देते हैं",
+     "user_words": [
+      "उधार वाले अभिभावक पैसे देर से देते हैं"
+     ],
+     "summary": "Parents on credit pay late",
+     "category": "cash_collections"
+    },
+    {
+     "title": "Counting daily cash takes an hour",
+     "title_local": "रोज़ का cash गिनने में एक घंटा लग जाता है",
+     "user_words": [
+      "रोज़ का cash गिनने में एक घंटा लग जाता है"
+     ],
+     "summary": "Counting daily cash takes an hour",
+     "category": "cash_collections"
+    }
+   ]
+  }
+ },
+ {
+  "id": "orchard_correction_hi",
+  "industry": "orchards",
+  "language": "hi",
+  "kind": "correction",
+  "regression": false,
+  "messages": [
+   "हमारे बाग में हर सीज़न करीब 5 टन आम खराब हो जाते हैं क्योंकि तुड़ाई के बाद ठंडा स्टोर नहीं है।",
+   "माफ़ कीजिए, 5 नहीं, 50 टन।"
+  ],
+  "expected": {
+   "problems": [
+    {
+     "id": "p1",
+     "any": [
+      "mangoes",
+      "spoil"
+     ],
+     "figures": [
+      "50 टन"
+     ]
+    }
+   ],
+   "stated": [
+    "हर सीज़न करीब 50 टन आम खराब हो जाते हैं"
+   ],
+   "missing": [
+    "budget",
+    "cause",
+    "what has been tried"
+   ],
+   "hypothesis_only": [],
+   "corrections": [
+    {
+     "wrong": "5",
+     "right": "50",
+     "problem": "p1"
+    }
+   ]
+  },
+  "recorded": {
+   "origin": "reference output written by hand, not model output",
+   "notes": [
+    {
+     "title": "About 50 tonnes of mangoes spoil each season",
+     "title_local": "हर सीज़न करीब 50 टन आम खराब हो जाते हैं",
+     "user_words": [
+      "हर सीज़न करीब 50 टन आम खराब हो जाते हैं"
+     ],
+     "summary": "About 50 tonnes of mangoes spoil each season",
+     "category": "stock_inventory"
+    }
+   ]
+  }
+ },
+ {
+  "id": "seed_multi_hi",
+  "industry": "seed_fertiliser_and_pesticide_dealers",
+  "language": "hi",
+  "kind": "multi_turn",
+  "regression": false,
+  "messages": [
+   "किसान उधार पर खाद-बीज ले जाते हैं और फसल बिकने के बाद ही पैसे देते हैं।",
+   "कई बार तीन-चार महीने बाद भी हिसाब साफ़ नहीं होता, खाता बही में गड़बड़ रहती है।",
+   "इसके अलावा एक्सपायरी वाली दवाइयाँ पीछे पड़ी रहती हैं।"
+  ],
+  "expected": {
+   "problems": [
+    {
+     "id": "p1",
+     "any": [
+      "farmers",
+      "credit",
+      "ledger"
+     ],
+     "figures": []
+    },
+    {
+     "id": "p2",
+     "any": [
+      "expired",
+      "pesticides"
+     ],
+     "figures": []
+    }
+   ],
+   "stated": [
+    "खाता बही में गड़बड़ रहती है",
+    "एक्सपायरी वाली दवाइयाँ पीछे पड़ी रहती हैं"
+   ],
+   "missing": [
+    "budget",
+    "cause",
+    "what has been tried"
+   ],
+   "hypothesis_only": [],
+   "corrections": []
+  },
+  "recorded": {
+   "origin": "reference output written by hand, not model output",
+   "notes": [
+    {
+     "title": "Farmer credit ledger is unclear for months",
+     "title_local": "किसानों के उधार का हिसाब साफ़ नहीं होता",
+     "user_words": [
+      "कई बार तीन-चार महीने बाद भी हिसाब साफ़ नहीं होता, खाता बही में गड़बड़ रहती है"
+     ],
+     "summary": "Farmer credit ledger is unclear for months",
+     "category": "cash_collections"
+    },
+    {
+     "title": "Expired pesticides lie at the back",
+     "title_local": "एक्सपायरी वाली दवाइयाँ पीछे पड़ी रहती हैं",
+     "user_words": [
+      "एक्सपायरी वाली दवाइयाँ पीछे पड़ी रहती हैं"
+     ],
+     "summary": "Expired pesticides lie at the back",
+     "category": "stock_inventory"
+    }
+   ]
+  }
+ },
+ {
+  "id": "press_constraints_hi",
+  "industry": "printing_presses_and_print_on_demand",
+  "language": "hi",
+  "kind": "constraints",
+  "regression": false,
+  "messages": [
+   "हमारे प्रेस में छपाई के ऑर्डर अक्सर देर से निकलते हैं और हर हफ्ते 6 ऑर्डर वापस आ जाते हैं। हमारे पास सिर्फ 2 ऑपरेटर हैं, बजट 50,000 रुपये तक है, और हम मशीन नहीं बदल सकते।"
+  ],
+  "expected": {
+   "problems": [
+    {
+     "id": "p1",
+     "any": [
+      "orders",
+      "late",
+      "returned"
+     ],
+     "figures": [
+      "6 ऑर्डर"
+     ]
+    }
+   ],
+   "stated": [
+    "हर हफ्ते 6 ऑर्डर वापस आ जाते हैं"
+   ],
+   "missing": [
+    "cause",
+    "what has been tried"
+   ],
+   "hypothesis_only": [],
+   "corrections": [],
+   "constraints": [
+    "सिर्फ 2 ऑपरेटर",
+    "बजट 50,000 रुपये तक",
+    "मशीन नहीं बदल सकते"
+   ]
+  },
+  "recorded": {
+   "origin": "reference output written by hand, not model output",
+   "notes": [
+    {
+     "title": "Print orders go out late and come back",
+     "title_local": "छपाई के ऑर्डर देर से निकलते हैं और वापस आते हैं",
+     "user_words": [
+      "छपाई के ऑर्डर अक्सर देर से निकलते हैं",
+      "हर हफ्ते 6 ऑर्डर वापस आ जाते हैं"
+     ],
+     "summary": "Print orders go out late and come back",
+     "category": "orders_fulfilment"
+    }
+   ]
+  }
+ },
+ {
+  "id": "insure_rant_hi_6",
+  "industry": "insurance_agencies_and_brokers",
+  "language": "hi",
+  "kind": "rant",
+  "regression": false,
+  "messages": [
+   "मैं बहुत परेशान हूँ। पॉलिसी रिन्यूअल की तारीख़ याद नहीं रहती इसलिए हर महीने 15 ग्राहक दूसरी कंपनी में चले जाते हैं, और ऊपर से क्लेम के कागज़ात WhatsApp पर बिखरे पड़े हैं।"
+  ],
+  "expected": {
+   "problems": [
+    {
+     "id": "p1",
+     "any": [
+      "renewal",
+      "customers",
+      "lost"
+     ],
+     "figures": [
+      "15 ग्राहक"
+     ]
+    },
+    {
+     "id": "p2",
+     "any": [
+      "claim",
+      "papers",
+      "scattered"
+     ],
+     "figures": []
+    }
+   ],
+   "stated": [
+    "हर महीने 15 ग्राहक दूसरी कंपनी में चले जाते हैं",
+    "क्लेम के कागज़ात WhatsApp पर बिखरे पड़े हैं"
+   ],
+   "missing": [
+    "budget",
+    "cause",
+    "what has been tried"
+   ],
+   "hypothesis_only": [],
+   "corrections": []
+  },
+  "recorded": {
+   "origin": "reference output written by hand, not model output",
+   "notes": [
+    {
+     "title": "Missed renewal dates lose customers monthly",
+     "title_local": "रिन्यूअल की तारीख़ याद नहीं रहती",
+     "user_words": [
+      "पॉलिसी रिन्यूअल की तारीख़ याद नहीं रहती इसलिए हर महीने 15 ग्राहक दूसरी कंपनी में चले जाते हैं"
+     ],
+     "summary": "Missed renewal dates lose customers monthly",
+     "category": "customers_retention"
+    },
+    {
+     "title": "Claim papers are scattered on WhatsApp",
+     "title_local": "क्लेम के कागज़ात WhatsApp पर बिखरे पड़े हैं",
+     "user_words": [
+      "क्लेम के कागज़ात WhatsApp पर बिखरे पड़े हैं"
+     ],
+     "summary": "Claim papers are scattered on WhatsApp",
+     "category": "reporting_visibility"
+    }
+   ]
+  }
+ },
+ {
+  "id": "dhaba_mixed_hi_2",
+  "industry": "dhabas_food_trucks_chai_stalls_and_street_food",
+  "language": "hi",
+  "kind": "mixed",
+  "regression": false,
+  "messages": [
+   "भाई हमारे dhaba पर रात में gas cylinder कम हो जाते हैं और staff कहता है पता नहीं।"
+  ],
+  "expected": {
+   "problems": [
+    {
+     "id": "p1",
+     "any": [
+      "gas",
+      "cylinder",
+      "night"
+     ],
+     "figures": []
+    }
+   ],
+   "stated": [
+    "रात में gas cylinder कम हो जाते हैं"
+   ],
+   "missing": [
+    "budget",
+    "cause",
+    "what has been tried"
+   ],
+   "hypothesis_only": [],
+   "corrections": []
+  },
+  "recorded": {
+   "origin": "reference output written by hand, not model output",
+   "notes": [
+    {
+     "title": "Gas cylinders go missing at night",
+     "title_local": "रात में gas cylinder कम हो जाते हैं",
+     "user_words": [
+      "रात में gas cylinder कम हो जाते हैं और staff कहता है पता नहीं"
+     ],
+     "summary": "Gas cylinders go missing at night",
+     "category": "loss_security"
+    }
+   ]
+  }
+ },
+ {
+  "id": "elec_list_hi",
+  "industry": "electrical_goods",
+  "language": "hi",
+  "kind": "list",
+  "regression": false,
+  "messages": [
+   "दो दिक्कतें हैं: ब्रांड वाले supplier माल देर से भेजते हैं, और बिल बुक में हाथ से लिखने की वजह से GST की गलतियाँ होती हैं।"
+  ],
+  "expected": {
+   "problems": [
+    {
+     "id": "p1",
+     "any": [
+      "supplier",
+      "late"
+     ],
+     "figures": []
+    },
+    {
+     "id": "p2",
+     "any": [
+      "GST",
+      "handwritten",
+      "bills"
+     ],
+     "figures": []
+    }
+   ],
+   "stated": [
+    "ब्रांड वाले supplier माल देर से भेजते हैं",
+    "हाथ से लिखने की वजह से GST की गलतियाँ होती हैं"
+   ],
+   "missing": [
+    "budget",
+    "cause",
+    "what has been tried"
+   ],
+   "hypothesis_only": [],
+   "corrections": []
+  },
+  "recorded": {
+   "origin": "reference output written by hand, not model output",
+   "notes": [
+    {
+     "title": "Brand suppliers send stock late",
+     "title_local": "ब्रांड वाले supplier माल देर से भेजते हैं",
+     "user_words": [
+      "ब्रांड वाले supplier माल देर से भेजते हैं"
+     ],
+     "summary": "Brand suppliers send stock late",
+     "category": "suppliers_purchasing"
+    },
+    {
+     "title": "Handwritten bills cause GST mistakes",
+     "title_local": "हाथ से लिखने की वजह से GST की गलतियाँ होती हैं",
+     "user_words": [
+      "हाथ से लिखने की वजह से GST की गलतियाँ होती हैं"
+     ],
+     "summary": "Handwritten bills cause GST mistakes",
+     "category": "compliance_admin"
+    }
+   ]
+  }
+ },
+ {
+  "id": "photo_single_ur_2",
+  "industry": "photography_and_videography_studios",
+  "language": "ur",
+  "kind": "single",
+  "regression": false,
+  "messages": [
+   "شادیوں کی تصویریں ایڈٹ کر کے دینے میں ہمیں تین ہفتے لگ جاتے ہیں اور گاہک روز فون کرتے ہیں۔"
+  ],
+  "expected": {
+   "problems": [
+    {
+     "id": "p1",
+     "any": [
+      "تصویریں",
+      "ایڈٹ",
+      "گاہک"
+     ],
+     "figures": [
+      "تین ہفتے"
+     ]
+    }
+   ],
+   "stated": [
+    "شادیوں کی تصویریں ایڈٹ کر کے دینے میں ہمیں تین ہفتے لگ جاتے ہیں"
+   ],
+   "missing": [
+    "budget",
+    "cause",
+    "what has been tried"
+   ],
+   "hypothesis_only": [],
+   "corrections": []
+  },
+  "recorded": {
+   "origin": "reference output written by hand, not model output",
+   "notes": [
+    {
+     "title": "Wedding photos take three weeks to deliver",
+     "title_local": "شادیوں کی تصویریں دینے میں تین ہفتے لگتے ہیں",
+     "user_words": [
+      "شادیوں کی تصویریں ایڈٹ کر کے دینے میں ہمیں تین ہفتے لگ جاتے ہیں"
+     ],
+     "summary": "Wedding photos take three weeks to deliver",
+     "category": "orders_fulfilment"
+    }
+   ]
+  }
+ },
+ {
+  "id": "hajj_list_ur",
+  "industry": "hajj_and_umrah_operators",
+  "language": "ur",
+  "kind": "list",
+  "regression": false,
+  "messages": [
+   "ہمارے تین مسئلے ہیں: ویزا کی فائلیں دفتر میں بکھری رہتی ہیں، حاجیوں کی قسطیں یاد نہیں رہتیں، اور پروازوں کی تبدیلی کا پتا دیر سے چلتا ہے۔"
+  ],
+  "expected": {
+   "problems": [
+    {
+     "id": "p1",
+     "any": [
+      "ویزا",
+      "فائلیں",
+      "بکھری"
+     ],
+     "figures": []
+    },
+    {
+     "id": "p2",
+     "any": [
+      "قسطیں",
+      "حاجیوں"
+     ],
+     "figures": []
+    },
+    {
+     "id": "p3",
+     "any": [
+      "پروازوں",
+      "تبدیلی"
+     ],
+     "figures": []
+    }
+   ],
+   "stated": [
+    "ویزا کی فائلیں دفتر میں بکھری رہتی ہیں",
+    "حاجیوں کی قسطیں یاد نہیں رہتیں",
+    "پروازوں کی تبدیلی کا پتا دیر سے چلتا ہے"
+   ],
+   "missing": [
+    "budget",
+    "cause",
+    "what has been tried"
+   ],
+   "hypothesis_only": [],
+   "corrections": []
+  },
+  "recorded": {
+   "origin": "reference output written by hand, not model output",
+   "notes": [
+    {
+     "title": "Visa files are scattered around the office",
+     "title_local": "ویزا کی فائلیں دفتر میں بکھری رہتی ہیں",
+     "user_words": [
+      "ویزا کی فائلیں دفتر میں بکھری رہتی ہیں"
+     ],
+     "summary": "Visa files are scattered around the office",
+     "category": "reporting_visibility"
+    },
+    {
+     "title": "Pilgrims' instalments are forgotten",
+     "title_local": "حاجیوں کی قسطیں یاد نہیں رہتیں",
+     "user_words": [
+      "حاجیوں کی قسطیں یاد نہیں رہتیں"
+     ],
+     "summary": "Pilgrims' instalments are forgotten",
+     "category": "cash_collections"
+    },
+    {
+     "title": "Flight changes are known late",
+     "title_local": "پروازوں کی تبدیلی کا پتا دیر سے چلتا ہے",
+     "user_words": [
+      "پروازوں کی تبدیلی کا پتا دیر سے چلتا ہے"
+     ],
+     "summary": "Flight changes are known late",
+     "category": "communication_coordination"
+    }
+   ]
+  }
+ },
+ {
+  "id": "meat_correction_ur",
+  "industry": "meat_shops_and_butchers",
+  "language": "ur",
+  "kind": "correction",
+  "regression": false,
+  "messages": [
+   "روزانہ تقریباً 10 کلو گوشت بچ جاتا ہے اور فریزر میں خراب ہو جاتا ہے۔",
+   "معذرت، 10 نہیں، 30 کلو۔"
+  ],
+  "expected": {
+   "problems": [
+    {
+     "id": "p1",
+     "any": [
+      "گوشت",
+      "فریزر",
+      "خراب"
+     ],
+     "figures": [
+      "30 کلو"
+     ]
+    }
+   ],
+   "stated": [
+    "روزانہ تقریباً 30 کلو گوشت بچ جاتا ہے اور فریزر میں خراب ہو جاتا ہے"
+   ],
+   "missing": [
+    "budget",
+    "cause",
+    "what has been tried"
+   ],
+   "hypothesis_only": [],
+   "corrections": [
+    {
+     "wrong": "10",
+     "right": "30",
+     "problem": "p1"
+    }
+   ]
+  },
+  "recorded": {
+   "origin": "reference output written by hand, not model output",
+   "notes": [
+    {
+     "title": "About 30 kg of meat spoils every day",
+     "title_local": "روزانہ تقریباً 30 کلو گوشت خراب ہو جاتا ہے",
+     "user_words": [
+      "روزانہ تقریباً 30 کلو گوشت بچ جاتا ہے اور فریزر میں خراب ہو جاتا ہے"
+     ],
+     "summary": "About 30 kg of meat spoils every day",
+     "category": "stock_inventory"
+    }
+   ]
+  }
+ },
+ {
+  "id": "quran_multi_ur",
+  "industry": "quran_academies_and_madrassas",
+  "language": "ur",
+  "kind": "multi_turn",
+  "regression": false,
+  "messages": [
+   "ہمارے ادارے میں بچوں کی حاضری رجسٹر پر لگتی ہے۔",
+   "والدین کو غیر حاضری کا پتا ہی نہیں چلتا اور فیس کے لیے بھی ہر مہینے یاد دہانی کرنی پڑتی ہے۔",
+   "اساتذہ کی تنخواہ کا حساب بھی ہاتھ سے ہوتا ہے اور اکثر غلط نکلتا ہے۔"
+  ],
+  "expected": {
+   "problems": [
+    {
+     "id": "p1",
+     "any": [
+      "والدین",
+      "غیر",
+      "حاضری"
+     ],
+     "figures": []
+    },
+    {
+     "id": "p2",
+     "any": [
+      "تنخواہ",
+      "حساب",
+      "غلط"
+     ],
+     "figures": []
+    }
+   ],
+   "stated": [
+    "والدین کو غیر حاضری کا پتا ہی نہیں چلتا",
+    "تنخواہ کا حساب بھی ہاتھ سے ہوتا ہے اور اکثر غلط نکلتا ہے"
+   ],
+   "missing": [
+    "budget",
+    "cause",
+    "what has been tried"
+   ],
+   "hypothesis_only": [],
+   "corrections": []
+  },
+  "recorded": {
+   "origin": "reference output written by hand, not model output",
+   "notes": [
+    {
+     "title": "Parents are not told about absences",
+     "title_local": "والدین کو غیر حاضری کا پتا نہیں چلتا",
+     "user_words": [
+      "والدین کو غیر حاضری کا پتا ہی نہیں چلتا"
+     ],
+     "summary": "Parents are not told about absences",
+     "category": "communication_coordination"
+    },
+    {
+     "title": "Teachers' salary sums are often wrong",
+     "title_local": "اساتذہ کی تنخواہ کا حساب اکثر غلط نکلتا ہے",
+     "user_words": [
+      "اساتذہ کی تنخواہ کا حساب بھی ہاتھ سے ہوتا ہے اور اکثر غلط نکلتا ہے"
+     ],
+     "summary": "Teachers' salary sums are often wrong",
+     "category": "people_staff"
+    }
+   ]
+  }
+ },
+ {
+  "id": "carton_constraints_ur",
+  "industry": "packaging_and_corrugation",
+  "language": "ur",
+  "kind": "constraints",
+  "regression": false,
+  "messages": [
+   "ہماری فیکٹری میں کارٹن کی سائز کی غلطیوں سے ہر ہفتے 5 آرڈر واپس آ جاتے ہیں۔ بجٹ صرف 2 لاکھ روپے ہے، ہمارے پاس دو ہی سپروائزر ہیں اور ہم رات کی شفٹ بند نہیں کر سکتے۔"
+  ],
+  "expected": {
+   "problems": [
+    {
+     "id": "p1",
+     "any": [
+      "کارٹن",
+      "غلطیوں",
+      "آرڈر"
+     ],
+     "figures": [
+      "5 آرڈر"
+     ]
+    }
+   ],
+   "stated": [
+    "ہر ہفتے 5 آرڈر واپس آ جاتے ہیں"
+   ],
+   "missing": [
+    "cause",
+    "what has been tried"
+   ],
+   "hypothesis_only": [],
+   "corrections": [],
+   "constraints": [
+    "بجٹ صرف 2 لاکھ روپے",
+    "دو ہی سپروائزر",
+    "رات کی شفٹ بند نہیں کر سکتے"
+   ]
+  },
+  "recorded": {
+   "origin": "reference output written by hand, not model output",
+   "notes": [
+    {
+     "title": "Carton size errors send orders back",
+     "title_local": "کارٹن کی سائز کی غلطیوں سے آرڈر واپس آتے ہیں",
+     "user_words": [
+      "کارٹن کی سائز کی غلطیوں سے ہر ہفتے 5 آرڈر واپس آ جاتے ہیں"
+     ],
+     "summary": "Carton size errors send orders back",
+     "category": "orders_fulfilment"
+    }
+   ]
+  }
+ },
+ {
+  "id": "tyre_rant_ur_2",
+  "industry": "tyre_battery_and_auto_parts_shops",
+  "language": "ur",
+  "kind": "rant",
+  "regression": false,
+  "messages": [
+   "میں تنگ آ گیا ہوں! ہر ٹائر کا ریٹ روز بدلتا ہے مگر دکان پر پرانا ریٹ لگا رہتا ہے، اور ادھار والے گاہک مہینوں پیسے نہیں دیتے۔"
+  ],
+  "expected": {
+   "problems": [
+    {
+     "id": "p1",
+     "any": [
+      "ٹائر",
+      "ریٹ",
+      "پرانا"
+     ],
+     "figures": []
+    },
+    {
+     "id": "p2",
+     "any": [
+      "ادھار",
+      "گاہک",
+      "پیسے"
+     ],
+     "figures": []
+    }
+   ],
+   "stated": [
+    "دکان پر پرانا ریٹ لگا رہتا ہے",
+    "ادھار والے گاہک مہینوں پیسے نہیں دیتے"
+   ],
+   "missing": [
+    "budget",
+    "cause",
+    "what has been tried"
+   ],
+   "hypothesis_only": [],
+   "corrections": []
+  },
+  "recorded": {
+   "origin": "reference output written by hand, not model output",
+   "notes": [
+    {
+     "title": "Shop shows old tyre rates",
+     "title_local": "دکان پر پرانا ٹائر ریٹ لگا رہتا ہے",
+     "user_words": [
+      "ہر ٹائر کا ریٹ روز بدلتا ہے مگر دکان پر پرانا ریٹ لگا رہتا ہے"
+     ],
+     "summary": "Shop shows old tyre rates",
+     "category": "sales_revenue"
+    },
+    {
+     "title": "Credit customers do not pay for months",
+     "title_local": "ادھار والے گاہک مہینوں پیسے نہیں دیتے",
+     "user_words": [
+      "ادھار والے گاہک مہینوں پیسے نہیں دیتے"
+     ],
+     "summary": "Credit customers do not pay for months",
+     "category": "cash_collections"
+    }
+   ]
+  }
+ },
+ {
+  "id": "carpet_mixed_ur",
+  "industry": "carpets_handicrafts_and_artisan_workshops",
+  "language": "ur",
+  "kind": "mixed",
+  "regression": false,
+  "messages": [
+   "ہمارے carpet کے آرڈر کی tracking نہیں ہوتی، کاریگر کو کتنا کام ملا یہ بھی نوٹ نہیں ہوتا۔"
+  ],
+  "expected": {
+   "problems": [
+    {
+     "id": "p1",
+     "any": [
+      "carpet",
+      "orders",
+      "tracked"
+     ],
+     "figures": []
+    },
+    {
+     "id": "p2",
+     "any": [
+      "کاریگر",
+      "کام",
+      "نوٹ"
+     ],
+     "figures": []
+    }
+   ],
+   "stated": [
+    "ہمارے carpet کے آرڈر کی tracking نہیں ہوتی",
+    "کاریگر کو کتنا کام ملا یہ بھی نوٹ نہیں ہوتا"
+   ],
+   "missing": [
+    "budget",
+    "cause",
+    "what has been tried"
+   ],
+   "hypothesis_only": [],
+   "corrections": []
+  },
+  "recorded": {
+   "origin": "reference output written by hand, not model output",
+   "notes": [
+    {
+     "title": "Carpet orders are not tracked",
+     "title_local": "carpet کے آرڈر کی tracking نہیں ہوتی",
+     "user_words": [
+      "ہمارے carpet کے آرڈر کی tracking نہیں ہوتی"
+     ],
+     "summary": "Carpet orders are not tracked",
+     "category": "orders_fulfilment"
+    },
+    {
+     "title": "Work given to each artisan is unrecorded",
+     "title_local": "کاریگر کو کتنا کام ملا نوٹ نہیں ہوتا",
+     "user_words": [
+      "کاریگر کو کتنا کام ملا یہ بھی نوٹ نہیں ہوتا"
+     ],
+     "summary": "Work given to each artisan is unrecorded",
+     "category": "people_staff"
+    }
+   ]
+  }
+ },
+ {
+  "id": "optic_single_ur",
+  "industry": "watches_eyewear_and_opticians",
+  "language": "ur",
+  "kind": "single",
+  "regression": false,
+  "messages": [
+   "چشموں کے فریم کا اسٹاک گنتے نہیں، اس لیے مقبول ڈیزائن ختم ہو جاتے ہیں اور ہمیں پتا بعد میں چلتا ہے۔"
+  ],
+  "expected": {
+   "problems": [
+    {
+     "id": "p1",
+     "any": [
+      "فریم",
+      "اسٹاک",
+      "ختم"
+     ],
+     "figures": []
+    }
+   ],
+   "stated": [
+    "مقبول ڈیزائن ختم ہو جاتے ہیں اور ہمیں پتا بعد میں چلتا ہے"
+   ],
+   "missing": [
+    "budget",
+    "cause",
+    "what has been tried"
+   ],
+   "hypothesis_only": [],
+   "corrections": []
+  },
+  "recorded": {
+   "origin": "reference output written by hand, not model output",
+   "notes": [
+    {
+     "title": "Popular frame designs run out unnoticed",
+     "title_local": "مقبول فریم ڈیزائن ختم ہو جاتے ہیں",
+     "user_words": [
+      "چشموں کے فریم کا اسٹاک گنتے نہیں، اس لیے مقبول ڈیزائن ختم ہو جاتے ہیں"
+     ],
+     "summary": "Popular frame designs run out unnoticed",
+     "category": "stock_inventory"
+    }
+   ]
+  }
+ },
+ {
+  "id": "solar_constraints_en",
+  "industry": "solar_epc_and_installers",
+  "language": "en",
+  "kind": "constraints",
+  "regression": false,
+  "messages": [
+   "Our installation crews finish jobs but customers keep complaining that panels were left dirty and cables untidy, about 6 complaints a month. We have only 3 crews, no more than 150,000 rupees for this, and we cannot delay any installation."
+  ],
+  "expected": {
+   "problems": [
+    {
+     "id": "p1",
+     "any": [
+      "panels",
+      "cables",
+      "complaints"
+     ],
+     "figures": [
+      "6 complaints"
+     ]
+    }
+   ],
+   "stated": [
+    "customers keep complaining that panels were left dirty and cables untidy, about 6 complaints a month"
+   ],
+   "missing": [
+    "cause",
+    "what has been tried"
+   ],
+   "hypothesis_only": [],
+   "corrections": [],
+   "constraints": [
+    "only 3 crews",
+    "no more than 150,000 rupees",
+    "cannot delay any installation"
+   ]
+  },
+  "recorded": {
+   "origin": "reference output written by hand, not model output",
+   "notes": [
+    {
+     "title": "Customers complain of untidy finished installations",
+     "title_local": "Customers complain of untidy finished installations",
+     "user_words": [
+      "customers keep complaining that panels were left dirty and cables untidy, about 6 complaints a month"
+     ],
+     "summary": "Customers complain of untidy finished installations",
+     "category": "quality_complaints"
+    }
+   ]
+  }
+ },
+ {
+  "id": "milkc_constraints_ru",
+  "industry": "milk_collection_centres_and_chillers",
+  "language": "roman_ur",
+  "kind": "constraints",
+  "regression": false,
+  "messages": [
+   "Chiller mein doodh khatta ho jata hai, roz taqriban 80 litre zaya hota hai. Budget sirf 200,000 hai aur hum farmers ka time nahi badal sakte."
+  ],
+  "expected": {
+   "problems": [
+    {
+     "id": "p1",
+     "any": [
+      "doodh",
+      "khatta",
+      "zaya"
+     ],
+     "figures": [
+      "80 litre"
+     ]
+    }
+   ],
+   "stated": [
+    "roz taqriban 80 litre zaya hota hai"
+   ],
+   "missing": [
+    "cause",
+    "what has been tried"
+   ],
+   "hypothesis_only": [],
+   "corrections": [],
+   "constraints": [
+    "budget sirf 200,000",
+    "farmers ka time nahi badal sakte"
+   ]
+  },
+  "recorded": {
+   "origin": "reference output written by hand, not model output",
+   "notes": [
+    {
+     "title": "Milk turns sour in the chiller",
+     "title_local": "Chiller mein doodh khatta ho jata hai",
+     "user_words": [
+      "Chiller mein doodh khatta ho jata hai, roz taqriban 80 litre zaya hota hai"
+     ],
+     "summary": "Milk turns sour in the chiller",
+     "category": "stock_inventory"
+    }
+   ]
+  }
+ },
+ {
+  "id": "freight_correction_en_2",
+  "industry": "freight_forwarders",
+  "language": "en",
+  "kind": "correction",
+  "regression": false,
+  "messages": [
+   "Our clients wait about 2 days for shipment status updates and ring us all day.",
+   "Correction: not 2 days, 12 days for some sea shipments."
+  ],
+  "expected": {
+   "problems": [
+    {
+     "id": "p1",
+     "any": [
+      "clients",
+      "shipment",
+      "status"
+     ],
+     "figures": [
+      "12 days"
+     ]
+    }
+   ],
+   "stated": [
+    "clients wait about 12 days for shipment status updates and ring us all day"
+   ],
+   "missing": [
+    "budget",
+    "cause",
+    "what has been tried"
+   ],
+   "hypothesis_only": [],
+   "corrections": [
+    {
+     "wrong": "2",
+     "right": "12",
+     "problem": "p1"
+    }
+   ]
+  },
+  "recorded": {
+   "origin": "reference output written by hand, not model output",
+   "notes": [
+    {
+     "title": "Clients wait 12 days for shipment status",
+     "title_local": "Clients wait 12 days for shipment status",
+     "user_words": [
+      "clients wait about 12 days for shipment status updates and ring us all day"
+     ],
+     "summary": "Clients wait 12 days for shipment status",
+     "category": "communication_coordination"
+    }
+   ]
+  }
+ },
+ {
+  "id": "wholesale_list_ru",
+  "industry": "wholesale_market_traders",
+  "language": "roman_ur",
+  "kind": "list",
+  "regression": false,
+  "messages": [
+   "Teen cheezein pareshan karti hain: munshi bill mein rate ghalat likh deta hai, party ka udhaar yaad nahi rehta, aur mandi se maal late uthta hai."
+  ],
+  "expected": {
+   "problems": [
+    {
+     "id": "p1",
+     "any": [
+      "munshi",
+      "rate",
+      "ghalat"
+     ],
+     "figures": []
+    },
+    {
+     "id": "p2",
+     "any": [
+      "party",
+      "udhaar"
+     ],
+     "figures": []
+    },
+    {
+     "id": "p3",
+     "any": [
+      "mandi",
+      "maal",
+      "late"
+     ],
+     "figures": []
+    }
+   ],
+   "stated": [
+    "munshi bill mein rate ghalat likh deta hai",
+    "party ka udhaar yaad nahi rehta",
+    "mandi se maal late uthta hai"
+   ],
+   "missing": [
+    "budget",
+    "cause",
+    "what has been tried"
+   ],
+   "hypothesis_only": [],
+   "corrections": []
+  },
+  "recorded": {
+   "origin": "reference output written by hand, not model output",
+   "notes": [
+    {
+     "title": "Wrong rates written on bills",
+     "title_local": "Bill mein rate ghalat likha jata hai",
+     "user_words": [
+      "munshi bill mein rate ghalat likh deta hai"
+     ],
+     "summary": "Wrong rates written on bills",
+     "category": "sales_revenue"
+    },
+    {
+     "title": "Party credit is not remembered",
+     "title_local": "Party ka udhaar yaad nahi rehta",
+     "user_words": [
+      "party ka udhaar yaad nahi rehta"
+     ],
+     "summary": "Party credit is not remembered",
+     "category": "cash_collections"
+    },
+    {
+     "title": "Goods are collected late from the market",
+     "title_local": "Mandi se maal late uthta hai",
+     "user_words": [
+      "mandi se maal late uthta hai"
+     ],
+     "summary": "Goods are collected late from the market",
+     "category": "orders_fulfilment"
+    }
+   ]
+  }
+ },
+ {
+  "id": "pet_rant_en",
+  "industry": "pet_shops_and_pet_supplies",
+  "language": "en",
+  "kind": "rant",
+  "regression": false,
+  "messages": [
+   "Honestly I am fed up. Puppies' vaccination dates live in my head, so owners come back angry when we miss one, and the food supplier sends the wrong brands twice a month."
+  ],
+  "expected": {
+   "problems": [
+    {
+     "id": "p1",
+     "any": [
+      "vaccination",
+      "dates",
+      "owners"
+     ],
+     "figures": []
+    },
+    {
+     "id": "p2",
+     "any": [
+      "supplier",
+      "wrong",
+      "brands"
+     ],
+     "figures": [
+      "twice a month"
+     ]
+    }
+   ],
+   "stated": [
+    "Puppies' vaccination dates live in my head",
+    "the food supplier sends the wrong brands twice a month"
+   ],
+   "missing": [
+    "budget",
+    "cause",
+    "what has been tried"
+   ],
+   "hypothesis_only": [],
+   "corrections": []
+  },
+  "recorded": {
+   "origin": "reference output written by hand, not model output",
+   "notes": [
+    {
+     "title": "Puppy vaccination dates are missed",
+     "title_local": "Puppy vaccination dates are missed",
+     "user_words": [
+      "Puppies' vaccination dates live in my head, so owners come back angry when we miss one"
+     ],
+     "summary": "Puppy vaccination dates are missed",
+     "category": "customers_retention"
+    },
+    {
+     "title": "Food supplier sends wrong brands",
+     "title_local": "Food supplier sends wrong brands",
+     "user_words": [
+      "the food supplier sends the wrong brands twice a month"
+     ],
+     "summary": "Food supplier sends wrong brands",
+     "category": "suppliers_purchasing"
+    }
+   ]
+  }
+ },
+ {
+  "id": "spin_single_ru",
+  "industry": "textile_spinning_and_weaving_mills",
+  "language": "roman_ur",
+  "kind": "single",
+  "regression": false,
+  "messages": [
+   "Spinning mill mein bijli ka bill har mahine barhta ja raha hai, pichle 3 mahine mein 20 percent zyada aya."
+  ],
+  "expected": {
+   "problems": [
+    {
+     "id": "p1",
+     "any": [
+      "bijli",
+      "bill"
+     ],
+     "figures": [
+      "20 percent"
+     ]
+    }
+   ],
+   "stated": [
+    "pichle 3 mahine mein 20 percent zyada aya"
+   ],
+   "missing": [
+    "budget",
+    "cause",
+    "what has been tried"
+   ],
+   "hypothesis_only": [],
+   "corrections": []
+  },
+  "recorded": {
+   "origin": "reference output written by hand, not model output",
+   "notes": [
+    {
+     "title": "Electricity bill rises every month",
+     "title_local": "Bijli ka bill har mahine barh raha hai",
+     "user_words": [
+      "bijli ka bill har mahine barhta ja raha hai, pichle 3 mahine mein 20 percent zyada aya"
+     ],
+     "summary": "Electricity bill rises every month",
+     "category": "margin_cost"
+    }
+   ]
+  }
  }
 ]

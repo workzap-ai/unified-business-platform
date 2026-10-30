@@ -68,3 +68,36 @@ def test_the_split_is_still_the_hash_of_the_id_and_the_cases_file_is_valid_json(
     json.loads(PATH.read_text(encoding="utf-8"))
     assert all(splits.split_of({"id": c["id"]}) == splits.HELD_OUT for c in HELD)
     assert len(DEV) >= 39  # Development never shrinks below what the first round had
+
+
+DEV_FLOOR = 63
+
+
+def test_development_has_grown_to_its_floor_and_covers_the_languages() -> None:
+    assert len(DEV) >= DEV_FLOOR
+    languages = Counter(c["language"] for c in DEV)
+    # Hindi is data only: pi understands Devanagari but does not write it
+    assert languages["ar"] >= 8 and languages["hi"] >= 8 and languages["ur"] >= 8
+    assert languages["en"] >= 1 and languages["roman_ur"] >= 1
+    kinds = {c["kind"] for c in DEV}
+    assert kinds >= {"single", "list", "correction", "constraints", "mixed", "multi_turn", "rant"}
+
+
+def test_development_constraint_cases_are_labelled() -> None:
+    labelled = [c for c in DEV if c["kind"] == "constraints"]
+    assert len(labelled) >= 4
+    assert all(c["expected"]["constraints"] for c in labelled)
+
+
+def test_development_shares_nothing_with_held_out_and_one_pair_with_regression() -> None:
+    dev = {m for c in DEV for m in c["messages"]}
+    held = {m for c in HELD for m in c["messages"]}
+    regression = {
+        m for c in CASES if splits.split_of(c) == splits.REGRESSION for m in c["messages"]
+    }
+    assert dev & held == set()
+    # reg_correction_figure is, on purpose, a copy of the acc_correction_en conversation
+    assert dev & regression == {
+        "Sorry, not 10, it was 100 clients.",
+        "We lost about 10 clients last year because reports came late.",
+    }
