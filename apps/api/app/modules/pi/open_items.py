@@ -41,6 +41,9 @@ TEXT_CAP = 300
 # CARRY_DAYS is the one retention constant (subject to the P-4 retention decision).
 CARRY_DAYS = 30
 CARRY_MAX = 10
+# An item is only taken from a chat that has been quiet this long (the same gap as the return line),
+# so a chat that is still active is never raided.
+CARRY_IDLE_HOURS = RETURN_AFTER_HOURS
 CARRY_REASON = "carried_to_new_chat"
 
 HANDOFF_STATUS = {
@@ -219,41 +222,66 @@ async def carry_into(
     now: datetime | None = None,
 ) -> int:
     """Q6-1: an owner who returns in a NEW chat finds what is still open. The open items of the
-    same customer in this workspace, from other chats, are moved under this conversation: newest
-    first, at most CARRY_MAX, none older than CARRY_DAYS, none that is answered or dropped (erased
-    items no longer exist). The brief's `open_requests` get the same entries, from the same rows.
+    same customer in this workspace, from other chats that have been quiet for CARRY_IDLE_HOURS, are
+    moved under this conversation: newest first (ties by id), at most CARRY_MAX counting the items
+    this chat already holds, none older than CARRY_DAYS, none that is answered or dropped (erased
+    items no longer exist), none that duplicates a (kind, key) already held. The brief's
+    `open_requests` get the same entries, from the same rows.
 
-    The row keeps its creation time, so the age limit is counted from when the owner asked, not from
-    the carry. A moved row is one row, never a copy, and it is deleted by the existing erase of the
-    conversation (`brain_erase`); no source reference is kept, so nothing points back to an earlier
-    chat. Never crosses the tenant, the environment or the customer. Returns how many moved."""
+    The rows are read with FOR UPDATE SKIP LOCKED, so two chats starting at once cannot both move
+    (or double) the same row. A moved row is one row, never a copy, and it keeps its creation time, so
+    the age limit is counted from when the owner asked. It is deleted by the existing erase of the
+    conversation (`brain_erase`). What stays on the row: `ref_id` (the id of a staff request of this
+    workspace, no words); `source_message_id`, which pointed into an earlier chat, is cleared. Never
+    crosses the tenant, the environment or the customer. Returns how many moved."""
     if conversation.customer_id is None:
         return 0
     now = now or datetime.now(UTC)
+    quiet = list(
+        await session.scalars(
+            select(PiConversation.id).where(
+                PiConversation.tenant_id == scope.tenant_id,
+                PiConversation.environment_id == scope.environment_id,
+                PiConversation.customer_id == conversation.customer_id,
+                PiConversation.id != conversation.id,
+                PiConversation.last_message_at <= now - timedelta(hours=CARRY_IDLE_HOURS),
+            )
+        )
+    )
+    if not quiet:
+        return 0
+    held_rows = await _open_rows(session, scope, conversation.id)
+    room = CARRY_MAX - len(held_rows)
+    if room <= 0:
+        return 0
+    held = {(r.kind, r.key) for r in held_rows}
     rows = list(
         await session.scalars(
             select(PiOpenItem)
             .where(
                 *_mine(scope),
                 PiOpenItem.customer_id == conversation.customer_id,
-                PiOpenItem.conversation_id != conversation.id,
+                PiOpenItem.conversation_id.in_(quiet),
                 PiOpenItem.status == "open",
                 PiOpenItem.created_at >= now - timedelta(days=CARRY_DAYS),
             )
-            .order_by(PiOpenItem.created_at.desc())
-            .limit(CARRY_MAX)
+            .order_by(PiOpenItem.created_at.desc(), PiOpenItem.id.desc())
+            .limit(room + len(held))  # enough to still fill the room after the duplicates go
+            .with_for_update(skip_locked=True)
         )
     )
-    held = {(r.kind, r.key) for r in await _open_rows(session, scope, conversation.id)}
     moved: list[PiOpenItem] = []
     for row in rows:
+        if len(moved) >= room:
+            break
         if (row.kind, row.key) in held:
             continue
         held.add((row.kind, row.key))
         row.conversation_id = conversation.id
+        row.source_message_id = None
         moved.append(row)
     entries = [
-        {"kind": r.key, "turns": 0, "carried": True}
+        {"kind": r.key, "turns": 0}  # turns 0 marks a carried entry: named on return, not forced
         for r in moved
         if r.kind == "owner_request" and r.key in open_requests.ADDRESSES
     ]
@@ -267,17 +295,29 @@ async def carry_into(
 
 
 async def team_answered_after(
-    session: AsyncSession, scope: WorkspaceScope, conversation_id: UUID, since: datetime
+    session: AsyncSession,
+    scope: WorkspaceScope,
+    conversation_id: UUID,
+    since: datetime,
+    *,
+    customer_id: UUID | None = None,
 ) -> bool:
-    """The team answered a question of this chat from the request desk after `since`."""
+    """The team answered a question from the request desk after `since`. With `customer_id` it is
+    any question of that customer in this workspace (an item carried into a new chat keeps its
+    staff request under the old conversation id); without, only this chat's."""
     from app.modules.pi_saas.models import PiStaffRequest
 
+    whose = (
+        PiStaffRequest.customer_id == customer_id
+        if customer_id is not None
+        else PiStaffRequest.conversation_id == conversation_id
+    )
     found = await session.scalar(
         select(PiStaffRequest.id)
         .where(
             PiStaffRequest.tenant_id == scope.tenant_id,
             PiStaffRequest.environment_id == scope.environment_id,
-            PiStaffRequest.conversation_id == conversation_id,
+            whose,
             PiStaffRequest.kind == "question",
             PiStaffRequest.status != "open",
             PiStaffRequest.resolved_at >= since,
@@ -326,7 +366,11 @@ async def sync(
                 _close(row, "answered", "reply_addressed", now)
         elif row.kind == "owner_question" and not knowledge_gaps:
             if answers(row.text, reply) or await team_answered_after(
-                session, scope, conversation.id, row.created_at
+                session,
+                scope,
+                conversation.id,
+                row.created_at,
+                customer_id=conversation.customer_id,
             ):
                 _close(row, "answered", "reply_answered", now)
     if drops(said):

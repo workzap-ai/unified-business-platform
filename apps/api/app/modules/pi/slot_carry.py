@@ -6,11 +6,14 @@ asked again. This copies, once, into the new conversation only:
 * `closed_slots`: pi's own questions the owner answered (the question text, never the answer);
 * `asked_facts`: the facts pi asked for and got no answer to, for a short while only.
 
-Never copied: anything the owner wrote, the summary, requirements, the profile, the open question,
-the generic "anything else?" slot, a question that holds personal data, anything older than the
-window, anything from an erased chat, anything from another workspace or another customer. A
-copy is marked `carried`. `brain_erase.erase_customer` finds every conversation of the customer, so
-it erases the copies with the rest.
+The owner's open items (a question or request still open, redacted, up to 30 days old) are moved
+into the new chat by `open_items.carry_into`, called from here; see that function for the rules.
+
+Never copied: anything else the owner wrote, the summary, requirements, the profile, the open
+question, the generic "anything else?" slot, a question that holds personal data, anything older
+than the window, anything from an erased chat, anything from another workspace or another
+customer. A copy is marked `carried`. `brain_erase.erase_customer` finds every conversation of the
+customer, so it erases the copies with the rest.
 """
 
 import logging
@@ -120,11 +123,13 @@ async def carry_into(
         )
     ).all()
     found = carried([(earlier or {}, at) for earlier, at in rows], now or datetime.now(UTC))
-    brief[MARK] = True
     for key, value in found.items():
         brief.setdefault(key, value)  # what this chat already holds is never replaced
     conversation.service_brief = brief
-    await _carry_open_items(session, scope, conversation, now)
+    # The mark is set only once the open items came along too, so a failure there is tried again
+    # on the next turn (the slot copy above is safe to repeat: it never replaces anything).
+    if await _carry_open_items(session, scope, conversation, now):
+        conversation.service_brief = {**(conversation.service_brief or {}), MARK: True}
     return bool(found)
 
 
@@ -133,13 +138,22 @@ async def _carry_open_items(
     scope: WorkspaceScope,
     conversation: PiConversation,
     now: datetime | None,
-) -> None:
-    """Q6-1: the open items of the owner's earlier chats come along, once, with the rest. A failure
-    here never costs the owner their reply or the slot copy above."""
+) -> bool:
+    """Q6-1: the open items of the owner's earlier chats come along (`open_items.carry_into`).
+    True when it ran to the end. A failure never costs the owner their reply or the slot copy; it is
+    logged with ids and the error type only (never message text) and tried again next turn."""
     from app.modules.pi import open_items
 
     try:
         async with session.begin_nested():
             await open_items.carry_into(session, scope, conversation, now=now)
-    except Exception:  # noqa: BLE001
-        logger.warning("open items carry failed", exc_info=True)
+    except Exception as error:  # noqa: BLE001
+        logger.warning(
+            "open items carry failed: tenant=%s conversation=%s customer=%s error=%s",
+            scope.tenant_id,
+            conversation.id,
+            conversation.customer_id,
+            type(error).__name__,
+        )
+        return False
+    return True

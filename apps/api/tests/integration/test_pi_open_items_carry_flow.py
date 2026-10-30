@@ -1,8 +1,8 @@
 """Q-6 in real chats (database): open items carried into a new chat, the workspace wall, the erase.
 
 WRITTEN, NOT RUN when it was committed: integration tests need the disposable database and its
-lock was held by another run. Collect-only was checked. The unit file
-`test_pi_open_items_carry_scope.py` runs the same questions against a fake session.
+lock was held by another run; the integrator runs them under the mutex. Collect-only was checked.
+The unit file `test_pi_open_items_carry_scope.py` runs the same questions against a fake session.
 """
 
 from datetime import UTC, datetime, timedelta
@@ -14,15 +14,14 @@ from test_pi_slot_carry_flow import HELLO, chats, close_with, first_chat, talk
 
 from app.modules.pi import brain_erase, open_items
 from app.modules.pi.open_item_models import PiOpenItem
+from app.modules.pi_saas.models import PiStaffRequest
 
 pytestmark = pytest.mark.integration
 
 QUESTION = "how long will the delivery of my order take to Lahore"
 
 
-async def open_item(
-    db, pi, conversation, text=QUESTION, hours_old=6, kind="owner_question", key=None
-):
+async def open_item(db, pi, conversation, hours_old=6, kind="owner_question", key=None):
     row = PiOpenItem(
         tenant_id=pi.tenant_id,
         environment_id=pi.scope().environment_id,
@@ -30,7 +29,7 @@ async def open_item(
         customer_id=conversation.customer_id,
         kind=kind,
         key=key or f"q:written-by-test-{hours_old}",
-        text=text,
+        text=QUESTION,
         status="open",
         language="en",
     )
@@ -61,6 +60,7 @@ async def test_an_open_item_of_an_earlier_chat_is_carried_into_the_new_chat(
     assert new.id != one.id
     await business_db.refresh(row)
     assert row.conversation_id == new.id, "the open item was not carried into the new chat"
+    assert row.source_message_id is None
     found = await open_items.load_for_return(business_db, pi.scope(), new, hours_away=30)
     assert [f["id"] for f in found] == [str(row.id)]
     await pi.close()
@@ -76,7 +76,7 @@ async def test_a_carried_request_reaches_the_new_brief_and_an_old_item_does_not(
     await talk(pi, business_db, HELLO, "q6-2")
     new = (await chats(business_db, pi))[-1]
     entries = (new.service_brief or {}).get("open_requests") or []
-    assert [e["kind"] for e in entries] == ["timeline"] and entries[0].get("carried") is True
+    assert entries == [{"kind": "timeline", "turns": 0}]
     old = await business_db.scalar(
         select(PiOpenItem).where(
             PiOpenItem.key == "q:too-old", PiOpenItem.tenant_id == pi.tenant_id
@@ -86,44 +86,85 @@ async def test_a_carried_request_reaches_the_new_brief_and_an_old_item_does_not(
     await pi.close()
 
 
-async def test_an_item_of_another_workspace_is_never_carried_or_named_here(
+async def test_the_teams_answer_to_the_old_chat_closes_the_carried_question(
+    api, business_db, monkeypatch
+):
+    seen, pi, one = await first_chat(api, business_db, monkeypatch)
+    row = await open_item(business_db, pi, one, hours_old=5)
+    business_db.add(
+        PiStaffRequest(
+            tenant_id=pi.tenant_id,
+            environment_id=pi.scope().environment_id,
+            conversation_id=one.id,  # the staff request keeps the OLD conversation id
+            customer_id=one.customer_id,
+            question=QUESTION,
+            kind="question",
+            status="answered",
+            answer="Three days.",
+            resolved_at=datetime.now(UTC) - timedelta(hours=1),
+        )
+    )
+    await business_db.flush()
+    await close_with(business_db, one, {}, age_days=1)
+    await talk(pi, business_db, HELLO, "q6-3")
+    new = (await chats(business_db, pi))[-1]
+    await business_db.refresh(row)
+    assert row.conversation_id == new.id
+    since = row.created_at
+    scope = pi.scope()
+    assert await open_items.team_answered_after(business_db, scope, new.id, since) is False
+    assert await open_items.team_answered_after(
+        business_db, scope, new.id, since, customer_id=new.customer_id
+    )
+    await pi.close()
+
+
+async def test_an_item_of_another_workspace_with_the_same_phone_is_never_moved_or_named(
     api, business_db, monkeypatch
 ):
     seen, mine, one = await first_chat(api, business_db, monkeypatch)
     theirs = await pi_workspace(
         api, business_db, business_type="service_business", number="987654321"
     )
-    await theirs.process(HELLO, "q6-t0")
+    await theirs.process(HELLO, "q6-t0", sender=one.contact_wa_id)  # the very same customer phone
     await theirs.deliver_all()
     [other] = await chats(business_db, theirs)
-    await open_item(business_db, theirs, other)
+    assert other.contact_wa_id == one.contact_wa_id and other.tenant_id != one.tenant_id
+    foreign = await open_item(business_db, theirs, other)
     await close_with(business_db, one, {}, age_days=1)
     await talk(mine, business_db, HELLO, "q6-t1")
     new = (await chats(business_db, mine))[-1]
+    await business_db.refresh(foreign)
+    assert foreign.conversation_id == other.id, "another workspace's item was moved"
+    assert foreign.tenant_id == theirs.tenant_id
     assert await open_items.load_for_return(business_db, mine.scope(), new, hours_away=30) == []
-    assert await count(business_db, theirs) == 1
     await mine.close()
     await theirs.close()
 
 
-async def test_erasing_the_customer_removes_carried_items_and_not_another_workspaces(
+async def test_erasing_removes_the_carried_items_by_the_new_conversation_id_alone(
     api, business_db, monkeypatch
 ):
     seen, mine, one = await first_chat(api, business_db, monkeypatch)
     theirs = await pi_workspace(
         api, business_db, business_type="service_business", number="987654321"
     )
-    await theirs.process(HELLO, "q6-e0")
+    await theirs.process(HELLO, "q6-e0", sender=one.contact_wa_id)
     await theirs.deliver_all()
     [other] = await chats(business_db, theirs)
-    await open_item(business_db, mine, one, key="q:carried")
-    await open_item(business_db, mine, one, hours_old=7, key="q:stays")
+    first = await open_item(business_db, mine, one, key="q:carried")
+    second = await open_item(business_db, mine, one, hours_old=7, key="q:stays")
     await open_item(business_db, theirs, other)
     await close_with(business_db, one, {}, age_days=1)
     await talk(mine, business_db, HELLO, "q6-e1")  # both move to the new chat
+    new = (await chats(business_db, mine))[-1]
+    for row in (first, second):
+        await business_db.refresh(row)
+        assert row.conversation_id == new.id  # the move happened: not the old chat's rows any more
     assert await count(business_db, mine) == 2
-    await brain_erase.erase_customer(business_db, mine.scope(), one.customer_id)
-    await business_db.flush()
+    # erase by the NEW conversation id only: the old chat's id plays no part in the removal
+    removed = await brain_erase._erase_conversation_extras(business_db, mine.scope(), [new.id])
+    assert removed["open_items"] == 2
     assert await count(business_db, mine) == 0
     assert await count(business_db, theirs) == 1
     await mine.close()
