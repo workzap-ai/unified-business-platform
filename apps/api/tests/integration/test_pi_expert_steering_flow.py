@@ -273,7 +273,10 @@ async def test_a_business_that_had_eight_in_other_chats_gets_none_and_the_honest
     await sibling_chat(business_db, conversation, ideas_given=3)
     before = len(calls)
     [body] = await reply_after(pi, business_db, "solution do", "h-2")
-    assert "•" not in body and "saath kya hua" in body  # 19.6: never "itne hi ideas"
+    # 19.6: never "itne hi ideas"; D-2: the ideas are used up, so the Artwing hand-over to the offer
+    # (the one Solution Box question, last) takes the place of the "what happened" line
+    assert "•" not in body and "itne hi ideas" not in body
+    assert "Solution Box" in body and body.rstrip().endswith("?") and body.count("?") == 1
     assert calls[before:] == []  # no call spent on a business with nothing left
     await pi.close()
 
@@ -284,7 +287,10 @@ async def test_a_problem_that_got_two_ideas_in_another_chat_is_closed_here(
     pi, conversation, calls = await start(api, business_db, monkeypatch)
     await sibling_chat(business_db, conversation, ideas_given=2, expert_given={TITLE: 2})
     [body] = await reply_after(pi, business_db, "solution do", "h-2")
-    assert "•" not in body and "saath kya hua" in body  # 19.6: never "itne hi ideas"
+    # 19.6: never "itne hi ideas"; D-2: the ideas are used up, so the Artwing hand-over to the offer
+    # (the one Solution Box question, last) takes the place of the "what happened" line
+    assert "•" not in body and "itne hi ideas" not in body
+    assert "Solution Box" in body and body.rstrip().endswith("?") and body.count("?") == 1
     await pi.close()
 
 

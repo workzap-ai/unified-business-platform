@@ -3344,6 +3344,8 @@ def brain_offer(turn: "ServiceTurn", context: dict[str, Any]) -> None:
         return
     if not box_offer_allowed(context):
         return  # Book 5, 5.4 and 10.9: ideas were free, the offer waits for R1 to R3 or B1 to B7
+    if turn.reply.startswith(expert_advisor.NEED_FACT_PREFIX):
+        return  # Part 7 idea filter, G39: the "one more fact" question is the only one
     if not solution_ask.already_offers(turn.reply):
         if any(line in turn.reply for line in NO_IDEA_FIXED):
             heard = system_ask.HEARD_LINES.get(language, system_ask.HEARD_LINES["en"])
@@ -3393,7 +3395,11 @@ def brain_decision(turn: "ServiceTurn", context: dict[str, Any]) -> None:
     signal = part19.buying_signal(said_now, len(noted) + len(wants))
     # 19.2: R1 (quote or price asked) is the ask itself and starts the quote; R3 (ready to buy)
     # opens the offer (box_signals) and the owner's yes still starts it: no yes is skipped
-    facts["buying_signal"] = signal if signal == "R1" else None
+    # a price question is answered first and does not start the quote (D-1); only an explicit ask
+    # for the quote does
+    facts["buying_signal"] = (
+        "R1" if signal == "R1" and part19.asks_for_the_quote(said_now) else None
+    )
     decision = decisions.decide(
         state,
         str(context.get("latest_customer_message", "")),

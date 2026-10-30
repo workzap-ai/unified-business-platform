@@ -42,8 +42,8 @@ def summary_blocked(context: dict[str, Any], said: str, why: str) -> bool:
     """19.7: a summary never replaces an answer. An explicit ask for one ("list down all the
     problems", "show me", the map, "that's all") is always answered; nothing else is sent in reply
     to a number, a question or a quote request, and never twice inside ten messages."""
-    if buying_signal(said, 0) == "R1":
-        return True  # a price or quote ask goes to the quote (19.2), never to a summary
+    if asks_for_the_quote(said):
+        return True  # an explicit quote ask goes to the quote (19.2), never to a summary
     explicit = why in ("show", "map", "document_asked")
     sent_at = (context.get("brief") or {}).get("summary_at")
     if not explicit and isinstance(sent_at, int) and ai_count(context) - sent_at < SUMMARY_GAP:
@@ -233,6 +233,16 @@ def buying_signal(said: str, covers: int = 0) -> str | None:
     if R3_READY.search(text) and covers >= 2 and not NEGATED.search(text):
         return "R3"
     return None
+
+
+def asks_for_the_quote(said: str) -> bool:
+    """The owner explicitly asks for the quote itself ("send me the quote", "mujhay quote do abhi").
+    A price QUESTION ("how much would it cost?") is also an R1 signal for the offer, but it is
+    answered first (RSOL08) and does not start the quote at the decision gate (owner decision D-1)."""
+    from app.modules.pi import decisions
+
+    text = " ".join(decisions.OWN_MONEY.sub(" ", said or "").split())
+    return bool(R1_QUOTE.search(text)) and not NEGATED.search(text)
 
 
 def ready_to_buy(said: str) -> bool:
