@@ -24,8 +24,10 @@ Business-level keys are shared between contacts of one business that opted in (`
 A correction archives the old row (R-MEM-04).
 
 Erase: `brain_erase.erase_customer` deletes `PiProblem`, its revisions, links and groups by `customer_id`
-(`brain_erase.py:141-190`) and calls `memory_block.forget`, which deletes **every** `pi_memories` row of the
-customer with no kind filter (`memory_block.py:396`). So any new column on `pi_problems` and any new
+(`brain_erase.py:182-186`; revisions 175-181, links 164-174) and deletes **every** `pi_memories` row of the
+customer with no kind filter (`brain_erase.py:202-206`; correction: an earlier version of this line said it calls
+`memory_block.forget`, which I could not find in `brain_erase.py`; `memory_block.py:396-405` is an identical
+delete). So any new column on `pi_problems` and any new
 `pi_memories` row is erased with the customer without a change to `brain_erase.py`, provided a test proves it.
 
 Consequence: several requested items already have a place. The cause, the tried-before text, the systems and
