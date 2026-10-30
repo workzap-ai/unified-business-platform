@@ -2,17 +2,20 @@
 handbook and the operator guidance, so a change to any of them changes the version (Fast-Track plan
 FT-D3; platform spec A.2 #8).
 
-Design (changed after the audit): a list of constants can never be complete, so the whole source of
-every module under app/modules/pi is hashed (evalkit excluded) unless the module is named on
-`learning_audit.NON_PROMPT_MODULES` with a reason. A new module is hashed by default. Any edit to a
-hashed module, a comment included, changes the version; the drift check then reports `stale_prompt`
-once after the deploy, which is intended (docs/pi-saas/pi-prompt-version.md).
+Design: a list of constants can never be complete, so the whole source of every module under
+app/modules/pi is hashed (evalkit excluded) unless the module is named on
+`learning_audit.NON_PROMPT_MODULES` with a reason. A new module is hashed by default. An allowlisted
+module is checked by AST: it may not import from app.ai, reference a model client or gateway, call a
+model method or hold a module-level string constant over 80 characters. Any edit to a hashed module,
+a comment included, changes the version (docs/pi-saas/pi-prompt-version.md). An empty or frozen
+source folder gives a version starting with "!", never a silent constant.
 
 Not covered, stated plainly: behaviour driven by data outside the hashed files (database settings,
 learned lessons and examples) and the operator guidance except through its own optional hash.
 
 Scripted checks only: no model, no database."""
 
+import ast
 import asyncio
 import datetime
 import json
@@ -30,13 +33,78 @@ from types import SimpleNamespace
 
 import pytest
 
-from app.modules.pi import drift_check, learning_audit, spec_handbook
+from app.modules.pi import drift_check, learning_audit
 
 API_ROOT = Path(__file__).resolve().parents[2]
-MODEL_CALL = re.compile(
-    r"Message\.(system|user|assistant)\(|LLMManager|\.chat\(|\.complete\(|manager\.generate"
-    r"|generate_structured|\.structured\("
-)
+
+# The AST guard for an allowlisted module (a module that leaves the hash must not reach a model).
+FORBIDDEN_NAMES = {"Message", "LLMManager", "build_llm_manager", "Gateway", "route_message"}
+FORBIDDEN_CALLS = {
+    "system",
+    "complete",
+    "chat",
+    "structured",
+    "generate_structured",
+    "complete_with_images",
+}
+LONG_CONSTANT = 80  # characters of one module-level string before it counts as prompt-like text
+# A legitimate long module-level constant in an allowlisted module: (module, name) -> reason.
+ALLOWED_LONG_CONSTANTS = {
+    (
+        "drift_check.py",
+        "_LISTEN_ONLY",
+    ): "a regex that finds listen-only phrases in the prompt files",
+}
+
+
+def model_access_findings(source: str, label: str = "") -> list[str]:
+    """Why this source may not be allowlisted: an import from app.ai, a model client, gateway or
+    router name (aliased or not), a model-method call, or a long module-level text constant."""
+    tree = ast.parse(source)
+    found: set[str] = set()
+    for node in ast.walk(tree):
+        if isinstance(node, ast.ImportFrom):
+            if (node.module or "").split(".")[:2] == ["app", "ai"]:
+                found.add(f"import from {node.module}")
+            found.update(f"imports {a.name}" for a in node.names if a.name in FORBIDDEN_NAMES)
+        elif isinstance(node, ast.Import):
+            found.update(
+                f"import {a.name}" for a in node.names if a.name.split(".")[:2] == ["app", "ai"]
+            )
+        elif isinstance(node, ast.Name) and node.id in FORBIDDEN_NAMES:
+            found.add(f"name {node.id}")
+        elif isinstance(node, ast.Attribute) and node.attr in FORBIDDEN_NAMES:
+            found.add(f"attribute {node.attr}")
+        if (
+            isinstance(node, ast.Call)
+            and isinstance(node.func, ast.Attribute)
+            and node.func.attr in FORBIDDEN_CALLS
+        ):
+            found.add(f"call .{node.func.attr}()")
+    for node in tree.body:
+        if isinstance(node, ast.Assign | ast.AnnAssign) and node.value is not None:
+            target = node.targets[0] if isinstance(node, ast.Assign) else node.target
+            name = getattr(target, "id", "?")
+            if (label, name) in ALLOWED_LONG_CONSTANTS:
+                continue
+            for sub in ast.walk(node.value):
+                if (
+                    isinstance(sub, ast.Constant)
+                    and isinstance(sub.value, str)
+                    and len(sub.value) > LONG_CONSTANT
+                ):
+                    found.add(f"long constant {name}")
+                    break
+    return sorted(found)
+
+
+def allowlist_offenders(files: dict[str, Path], allowed) -> dict[str, list[str]]:
+    out: dict[str, list[str]] = {}
+    for label in allowed:
+        found = model_access_findings(files[label].read_text(encoding="utf-8"), label)
+        if found:
+            out[label] = found
+    return out
 
 
 @pytest.fixture(autouse=True)
@@ -55,12 +123,16 @@ def _tree(root: Path, files: dict[str, str | bytes]) -> Path:
 
 
 def _version(monkeypatch, pi_root: Path, packs: Path | None = None, **kwargs) -> str:
-    """The version of a temporary pi folder (and packs folder), with its own allowlist if given."""
+    """The version of a temporary pi folder (and packs folder), with its own allowlist if given.
+    A temporary folder is small, so the minimum module count is lowered unless `strict`."""
     monkeypatch.setattr(learning_audit, "PI_ROOT", pi_root)
     if packs is not None:
         monkeypatch.setattr(learning_audit, "PACKS_ROOT", packs)
     if "allow" in kwargs:
         monkeypatch.setattr(learning_audit, "NON_PROMPT_MODULES", kwargs.pop("allow"))
+    if not kwargs.pop("strict", False):
+        monkeypatch.setattr(learning_audit, "MIN_HASHED_MODULES", 1)
+        monkeypatch.setattr(learning_audit, "REQUIRED_MODULES", ())
     learning_audit.clear_prompt_cache()
     return learning_audit.prompt_version(kwargs.get("guidance"))
 
@@ -73,6 +145,9 @@ BASE = {
     "evalkit/cases.py": "CASES = []\n",
 }
 ALLOW = {"models.py": "table definitions, no prompt text"}
+ALIASED_MODEL_IMPORT = (
+    "from app.ai.messages import Message as M\n\n\ndef f():\n    return M.system('x')\n"
+)
 
 
 # ---- the guard over the real tree -------------------------------------------------------------
@@ -84,35 +159,125 @@ def test_the_version_is_a_short_deterministic_hash():
     assert version == learning_audit.prompt_version()
 
 
-def test_every_module_is_hashed_or_named_on_the_allowlist_with_a_reason():
-    """The guard: every .py file under app/modules/pi (evalkit aside) is either hashed or on the
-    allowlist with a reason, never both, never neither."""
+def test_the_allowlist_entries_exist_have_a_reason_and_the_core_modules_stay_hashed():
     every = set(learning_audit.all_module_files())
     hashed = {k for k in learning_audit.prompt_source_files() if not k.startswith("ext/")}
     allowed = set(learning_audit.NON_PROMPT_MODULES)
-    assert every == hashed | allowed
+    assert not allowed - every, sorted(allowed - every)  # a stale entry fails
     assert not hashed & allowed
     assert all(len(reason) >= 10 for reason in learning_audit.NON_PROMPT_MODULES.values())
+    assert set(learning_audit.REQUIRED_MODULES) <= hashed
+    assert len(hashed) >= learning_audit.MIN_HASHED_MODULES
     assert "service_conversation.py" in hashed and "tools/handlers.py" in hashed
+    assert "learning_audit.py" in hashed and "config_routes.py" in hashed
     assert not [k for k in every if k.startswith("evalkit/")]
-    assert "ext/app.ai.media" in learning_audit.prompt_source_files()
 
 
-def test_a_stale_allowlist_entry_fails():
-    missing = [
-        k for k in learning_audit.NON_PROMPT_MODULES if k not in learning_audit.all_module_files()
-    ]
-    assert not missing, missing
+def test_the_external_prompt_modules_are_hashed():
+    sources = learning_audit.prompt_source_files()
+    assert "ext/app.ai.media" in sources
+    assert "ext/app.modules.pi_saas.proposal_writer" in sources
+    assert all(path.is_file() for label, path in sources.items() if label.startswith("ext/"))
 
 
-def test_an_allowlisted_module_builds_no_model_message_and_calls_no_model():
-    offenders = []
-    files = learning_audit.all_module_files()
-    for label in learning_audit.NON_PROMPT_MODULES:
-        text = files[label].read_text(encoding="utf-8", errors="replace")
-        if MODEL_CALL.search(text):
-            offenders.append(label)
+def test_a_real_allowlisted_module_reaches_no_model_by_ast():
+    """The real allowlist passes the AST guard: no import from app.ai, no model client, gateway or
+    router, no model-method call, no long module-level text."""
+    offenders = allowlist_offenders(
+        learning_audit.all_module_files(), learning_audit.NON_PROMPT_MODULES
+    )
     assert not offenders, offenders
+
+
+@pytest.mark.parametrize(
+    "source",
+    [
+        "from app.ai.messages import Message as M\nM.system('x')\n",  # aliased message class
+        "from app.ai.messages import Message as M\nx = 1\n",  # import alone, from app.ai
+        "from somewhere import build_llm_manager as b\nb()\n",  # lower-case manager factory
+        "import x\nx.Gateway(1)\n",  # gateway through an attribute
+        "route_message(1)\n",  # router call
+        "async def f(m):\n    await m.complete_with_images(1)\n",
+        "def f(m):\n    m.generate_structured(1)\n",
+        "def f(m):\n    m.chat(1)\n",
+        "import app.ai.media\n",
+        "TEXT = '" + "x" * 100 + "'\n",  # a long module-level constant
+        "TEXTS = {'a': '" + "y" * 100 + "'}\n",  # long text inside a table
+    ],
+)
+def test_the_ast_guard_flags_every_way_a_module_can_reach_a_model(source):
+    assert model_access_findings(source)
+
+
+@pytest.mark.parametrize(
+    "source",
+    [
+        "class Row:\n    id = 1\n",
+        "NAME = 'short'\n",
+        "from fastapi import APIRouter\nrouter = APIRouter()\n",
+        "def f(x):\n    return x.name\n",
+    ],
+)
+def test_the_ast_guard_passes_a_plain_module(source):
+    assert model_access_findings(source) == []
+
+
+def test_an_aliased_model_import_in_an_allowlisted_temp_module_fails_the_guard():
+    with tempfile.TemporaryDirectory() as tmp:
+        root = _tree(
+            Path(tmp),
+            {
+                "models.py": "class Row: pass\n",
+                "routes.py": ALIASED_MODEL_IMPORT,
+            },
+        )
+        files = learning_audit.all_module_files(root)
+        assert allowlist_offenders(files, ["models.py"]) == {}
+        offenders = allowlist_offenders(files, ["models.py", "routes.py"])
+        assert list(offenders) == ["routes.py"]
+
+
+# ---- an empty or frozen source folder is marked, not a silent constant --------------------------
+
+
+def test_an_empty_source_folder_gives_a_marked_version_logged_once_and_never_cached(
+    monkeypatch, caplog
+):
+    with tempfile.TemporaryDirectory() as tmp:
+        root = Path(tmp)
+        packs = _tree(Path(tmp) / "packs", {"a.json": b"{}"})
+        monkeypatch.setattr(learning_audit, "PI_ROOT", root)
+        monkeypatch.setattr(learning_audit, "PACKS_ROOT", packs)
+        learning_audit.clear_prompt_cache()
+        with caplog.at_level(logging.WARNING, logger=learning_audit.logger.name):
+            first = learning_audit.prompt_version()
+            second = learning_audit.prompt_version()
+        assert first == second and first.startswith("!") and len(first) == 12
+        assert caplog.text.count("pi_prompt_version_sources_incomplete") == 1  # once
+        _tree(root, {f"m{i}.py": f"X = {i}\n" for i in range(120)})
+        _tree(root, {"service_conversation.py": "A = 1\n", "runtime.py": "B = 2\n"})
+        real_size = learning_audit.prompt_version()  # not cached: the failure was retried
+        assert not real_size.startswith("!") and real_size != first
+
+
+def test_a_source_folder_without_the_core_modules_is_marked_incomplete(monkeypatch):
+    with tempfile.TemporaryDirectory() as tmp:
+        root = _tree(Path(tmp), {f"m{i}.py": f"X = {i}\n" for i in range(120)})
+        marked = _version(monkeypatch, root, strict=True)
+        assert marked.startswith("!")
+        _tree(root, {"service_conversation.py": "A = 1\n", "runtime.py": "B = 2\n"})
+        assert not _version(monkeypatch, root, strict=True).startswith("!")
+
+
+def test_a_marked_version_stays_marked_with_guidance():
+    with tempfile.TemporaryDirectory() as tmp:
+        learning_audit.PI_ROOT, saved = Path(tmp), learning_audit.PI_ROOT
+        try:
+            learning_audit.clear_prompt_cache()
+            assert learning_audit.prompt_version("Be warm.").startswith("!")
+        finally:
+            learning_audit.PI_ROOT = saved
+            learning_audit.clear_prompt_cache()
 
 
 # ---- source files: every kind of edit to a hashed module ---------------------------------------
@@ -170,8 +335,12 @@ def test_a_module_leaves_the_hash_only_by_being_named_on_the_allowlist(monkeypat
         root = _tree(Path(tmp), BASE)
         before = _version(monkeypatch, root, allow={})
         (root / "models.py").write_text("class Row:\n    pass  # edited\n", encoding="utf-8")
-        assert _version(monkeypatch, root, allow={}) != before  # not named: hashed
-        assert _version(monkeypatch, root, allow=ALLOW) != before  # now left out: another digest
+        hashed = _version(monkeypatch, root, allow={})
+        assert hashed != before  # not named: its edit moves the version
+        left_out = _version(monkeypatch, root, allow=ALLOW)
+        assert left_out != hashed  # named: it is no longer part of the digest at all
+        (root / "models.py").write_text("class Row:\n    pass  # edited again\n", encoding="utf-8")
+        assert _version(monkeypatch, root, allow=ALLOW) == left_out  # and edits no longer count
 
 
 def test_renaming_or_removing_a_hashed_module_changes_the_version(monkeypatch):
@@ -205,40 +374,43 @@ def test_a_copy_of_the_real_tree_has_the_same_version_and_real_edits_move_it(mon
     with tempfile.TemporaryDirectory() as tmp:
         copy = Path(tmp) / "pi"
         shutil.copytree(learning_audit.PI_ROOT, copy, ignore=ignore)
-        same = _version(monkeypatch, copy)
-        assert same == real
+        assert _version(monkeypatch, copy, strict=True) == real
         with open(copy / "models.py", "a", encoding="utf-8") as handle:
             handle.write("\n# an edit to a named non-prompt module\n")
-        assert _version(monkeypatch, copy) == real
+        assert _version(monkeypatch, copy, strict=True) == real
         with open(copy / "service_conversation.py", "a", encoding="utf-8") as handle:
             handle.write("\n# an edit to a hashed module\n")
-        assert _version(monkeypatch, copy) != real
+        assert _version(monkeypatch, copy, strict=True) != real
 
 
-# ---- unreadable files: logged once, never cached as permanent ----------------------------------
+# ---- unreadable files: logged once, marked, never cached ---------------------------------------
 
 
-def test_an_unreadable_module_is_logged_once_and_retried_on_the_next_call(monkeypatch, caplog):
+def test_an_unreadable_module_is_logged_once_marked_and_retried_on_the_next_call(
+    monkeypatch, caplog
+):
     with tempfile.TemporaryDirectory() as tmp:
         root = _tree(Path(tmp), {"prompt.py": 'SYSTEM = "x"\n'})
         (root / "broken.py").mkdir()  # a folder named like a module: reading it raises OSError
         monkeypatch.setattr(learning_audit, "PI_ROOT", root)
         monkeypatch.setattr(learning_audit, "NON_PROMPT_MODULES", {})
+        monkeypatch.setattr(learning_audit, "MIN_HASHED_MODULES", 1)
+        monkeypatch.setattr(learning_audit, "REQUIRED_MODULES", ())
         learning_audit.clear_prompt_cache()
         with caplog.at_level(logging.WARNING, logger=learning_audit.logger.name):
             broken = learning_audit.prompt_version()
             again = learning_audit.prompt_version()
-        assert broken == again and re.fullmatch(r"[0-9a-f]{12}", broken)
+        assert broken == again and broken.startswith("!") and len(broken) == 12
         assert caplog.text.count("pi_prompt_version_unreadable broken.py") == 1  # once
         (root / "broken.py").rmdir()
         (root / "broken.py").write_text("FIXED = 1\n", encoding="utf-8")
         fixed = learning_audit.prompt_version()  # the failure was not cached
-        assert fixed != broken
+        assert fixed != broken and not fixed.startswith("!")
 
 
-def test_an_unreadable_pack_file_or_handbook_is_logged_and_never_breaks_the_version(
-    monkeypatch, caplog
-):
+def test_an_unreadable_pack_file_or_handbook_is_logged_and_marked(monkeypatch, caplog):
+    from app.modules.pi import spec_handbook
+
     with tempfile.TemporaryDirectory() as tmp:
         packs = Path(tmp) / "packs"
         packs.mkdir()
@@ -248,9 +420,29 @@ def test_an_unreadable_pack_file_or_handbook_is_logged_and_never_breaks_the_vers
         learning_audit.clear_prompt_cache()
         with caplog.at_level(logging.WARNING, logger=learning_audit.logger.name):
             version = learning_audit.prompt_version()
-        assert re.fullmatch(r"[0-9a-f]{12}", version)
+        assert version.startswith("!") and len(version) == 12
         assert "pi_prompt_version_unreadable x.json" in caplog.text
         assert "pi_prompt_version_unreadable spec/missing.json" in caplog.text
+
+
+def test_the_two_handbook_files_are_read_once_per_process_and_cleared_with_the_rest(monkeypatch):
+    reads: list[str] = []
+    real = learning_audit._read
+
+    def counting(path, label):
+        if label.startswith("spec/"):
+            reads.append(label)
+        return real(path, label)
+
+    monkeypatch.setattr(learning_audit, "_read", counting)
+    learning_audit.clear_prompt_cache()
+    learning_audit.prompt_version()
+    learning_audit.prompt_version("Be warm.")
+    learning_audit.prompt_version()
+    assert len(reads) == 2  # handbook and supersession, once
+    learning_audit.clear_prompt_cache()
+    learning_audit.prompt_version()
+    assert len(reads) == 4
 
 
 # ---- the pack files ---------------------------------------------------------------------------
@@ -422,18 +614,18 @@ def test_exactly_one_input_changes_the_version_and_the_other_two_do_not(monkeypa
         assert len({base, a, b, c}) == 4
 
 
-def test_a_changed_version_is_a_one_time_stale_prompt_finding_not_an_error():
-    """The documented consequence of hashing source: after a deploy that edited any hashed module,
-    replies stamped with the old version read as stale until a new reply is stamped."""
-    summary = drift_check.stamp_summary(
-        [{"prompt_version": "oldversion01", "pack_versions": {"build": "x"}}],
-        {"prompt": learning_audit.prompt_version()},
+def test_a_changed_version_keeps_stale_prompt_firing_until_a_reply_is_stamped():
+    """The documented consequence of hashing source: after a deploy that edited any hashed module
+    EVERY drift run reports `stale_prompt` until a reply is stamped with the new version (a quiet
+    workspace keeps it until its next reply); it is not a once-only finding."""
+    live = learning_audit.prompt_version()
+    stale = drift_check.stamp_summary(
+        [{"prompt_version": "oldversion01", "pack_versions": {"build": "x"}}], {"prompt": live}
     )
-    codes = [f.code for f in drift_check.stamp_findings(summary)]
-    assert codes == ["stale_prompt"]
+    for _run in range(3):  # three drift runs, no new reply in between
+        assert [f.code for f in drift_check.stamp_findings(stale)] == ["stale_prompt"]
     fresh = drift_check.stamp_summary(
-        [{"prompt_version": learning_audit.prompt_version(), "pack_versions": {"build": "x"}}],
-        {"prompt": learning_audit.prompt_version()},
+        [{"prompt_version": live, "pack_versions": {"build": "x"}}], {"prompt": live}
     )
     assert drift_check.stamp_findings(fresh) == []
 
@@ -490,6 +682,25 @@ def test_no_clock_host_name_working_directory_or_environment_enters_the_hash(mon
         got = learning_audit.prompt_version("Be warm.")
     assert reads == [], f"the version read: {reads}"
     assert got == expected
+
+
+def test_report_the_hashed_file_count_and_the_first_call_time(capsys):
+    """Printed, not asserted: how many files are hashed and how long the first call takes."""
+    sources = learning_audit.prompt_source_files()
+    packs = list(learning_audit.PACKS_ROOT.rglob("*.json"))
+    learning_audit.clear_prompt_cache()
+    start = time.perf_counter()
+    learning_audit.prompt_version()
+    first = time.perf_counter() - start
+    start = time.perf_counter()
+    learning_audit.prompt_version()
+    cached = time.perf_counter() - start
+    with capsys.disabled():
+        print(
+            f"\nFT-D3 hashed source files: {len(sources)}; pack files: {len(packs)}; "
+            f"first call {first * 1000:.1f} ms; cached call {cached * 1000:.3f} ms"
+        )
+    assert len(sources) > 0
 
 
 # ---- two fresh processes ----------------------------------------------------------------------

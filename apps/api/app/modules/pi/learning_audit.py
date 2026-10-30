@@ -17,12 +17,15 @@ default, and it can leave the hash only by being named there. The pack files, th
 the optional operator guidance are hashed as before.
 
 Consequence, intended and tolerated: ANY edit to a hashed module's source, a comment included,
-changes `prompt_version`, so the first replies after a deploy carry a new version and the drift
-check reports `stale_prompt` once (`drift_check.stamp_findings`, `drift_check.stamp_summary`)
-until the new version is the one stamped. Not covered: behaviour driven by data outside these files
-(database settings, learned lessons and examples; the operator guidance only through its own
-optional hash).
-See docs/pi-saas/pi-prompt-version.md.
+changes `prompt_version`. The drift check then reports TWO findings: `prompt_version` (the version
+differs from the previous run's baseline; the versions loop in `drift_check.py`) on the first run
+after the change, and `stale_prompt` (`drift_check.stamp_findings`) on EVERY drift run until a reply
+is stamped with the new version, so a quiet workspace keeps it until its next reply. Nearly every
+release that touches a hashed module triggers both. Not covered: behaviour driven by data outside
+these files (database settings, learned lessons and examples; the operator guidance only through its
+own optional hash). A digest that is incomplete (an unreadable file, an empty or frozen
+folder) makes the version start with "!" instead of being a silent constant. See
+docs/pi-saas/pi-prompt-version.md.
 """
 
 import hashlib
@@ -62,7 +65,15 @@ EXCLUDED_DIRS = ("evalkit", "__pycache__")
 
 # Source outside this folder that reaches the model (runtime.py imports IMAGE_INSTRUCTION from
 # there).
-EXTERNAL_PROMPT_MODULES: tuple[str, ...] = ("app.ai.media",)
+EXTERNAL_PROMPT_MODULES: tuple[str, ...] = (
+    "app.ai.media",
+    "app.modules.pi_saas.proposal_writer",
+)
+
+# A source set smaller than this, or without these modules, is a wrong folder or a frozen build, not
+# a real set: the version is then marked incomplete and not cached.
+MIN_HASHED_MODULES = 100
+REQUIRED_MODULES: tuple[str, ...] = ("service_conversation.py", "runtime.py")
 
 _R_MODELS = "SQLAlchemy table definitions: the shape of stored data, no text sent to a model"
 _R_ROUTES = "HTTP handlers and request bodies: no model message is built here"
@@ -80,10 +91,10 @@ NON_PROMPT_MODULES: dict[str, str] = {
     ),
     **dict.fromkeys(
         (
-            "brain_doc_routes.py brain_erase_routes.py brain_health_routes.py "
-            "brain_learning_routes.py brain_moderation_routes.py brain_visual_routes.py "
-            "business_profile_routes.py config_routes.py inbox_routes.py kapso_routes.py "
-            "open_items_routes.py read_routes.py routes.py solution_routes.py "
+            "brain_erase_routes.py brain_health_routes.py "
+            "brain_learning_routes.py brain_moderation_routes.py "
+            "business_profile_routes.py inbox_routes.py kapso_routes.py "
+            "open_items_routes.py routes.py solution_routes.py "
             "staff_review_routes.py"
         ).split(),
         _R_ROUTES,
@@ -91,7 +102,6 @@ NON_PROMPT_MODULES: dict[str, str] = {
     "schemas.py": "API request and response schemas: not sent to a model",
     "__init__.py": "package marker",
     "tools/__init__.py": "package marker",
-    "learning_audit.py": "this version machinery; it holds no prompt text",
     "drift_check.py": "the drift report: it reads the version and the prompt files, sends nothing",
     "latency.py": "per-turn timing log: no prompt text",
 }
@@ -139,14 +149,14 @@ def _hash_files(items: Sequence[tuple[str, Path]]) -> tuple[str, bool]:
     return digest.hexdigest(), complete
 
 
-def _cached(kind: str, root: str, build: Callable[[], tuple[str, bool]]) -> str:
+def _cached(kind: str, root: str, build: Callable[[], tuple[str, bool]]) -> tuple[str, bool]:
     key = (kind, root)
     if key in _CACHE:
-        return _CACHE[key]
+        return _CACHE[key], True
     value, complete = build()
     if complete:
         _CACHE[key] = value
-    return value
+    return value, complete
 
 
 def all_module_files(root: Path | None = None) -> dict[str, Path]:
@@ -176,19 +186,39 @@ def prompt_source_files(root: Path | None = None) -> dict[str, Path]:
     return files
 
 
-def _sources_digest(root: str) -> str:
-    return _cached(
-        "sources", root, lambda: _hash_files(list(prompt_source_files(Path(root)).items()))
-    )
+def _sources_build(root: str) -> tuple[str, bool]:
+    files = prompt_source_files(Path(root))
+    digest, complete = _hash_files(list(files.items()))
+    own = {k for k in files if not k.startswith("ext/")}
+    if len(own) < MIN_HASHED_MODULES or not set(REQUIRED_MODULES) <= own:
+        if "sources" not in _WARNED:
+            _WARNED.add("sources")
+            logger.warning("pi_prompt_version_sources_incomplete %d", len(own))
+        complete = False
+    return digest, complete
 
 
-def _packs_digest(root: str) -> str:
+def _sources_digest(root: str) -> tuple[str, bool]:
+    return _cached("sources", root, lambda: _sources_build(root))
+
+
+def _packs_digest(root: str) -> tuple[str, bool]:
     def build() -> tuple[str, bool]:
         base = Path(root)
         items = [(p.relative_to(base).as_posix(), p) for p in base.rglob("*.json")]
         return _hash_files(items)
 
     return _cached("packs", root, build)
+
+
+def _spec_digest() -> tuple[str, bool]:
+    """The two handbook files, read once per process, not on every reply (cleared with the rest)."""
+    paths = (spec_handbook.PATH, spec_handbook.SUPERSESSION)
+
+    def build() -> tuple[str, bool]:
+        return _hash_files([(f"spec/{p.name}", p) for p in paths])
+
+    return _cached("spec", "|".join(str(p) for p in paths), build)
 
 
 def clear_prompt_cache() -> None:
@@ -212,16 +242,22 @@ def prompt_version(operator_guidance: str | None = None) -> str:
     prompt-bearing module, every pack file and, when given, the business's own operator guidance.
     It changes only when one of those changes (an edit to a hashed module's source, a comment
     included, counts). Without guidance (the workspace-independent version, what the reply stamp and
-    the drift check compare) it stays the same for every workspace."""
+    the drift check compare) it stays the same for every workspace. When any part could not be read
+    or the source set is too small to be real, the version starts with "!" so it is visibly not a
+    normal hash, and it is not cached."""
     digest = hashlib.sha256()
-    for path in (spec_handbook.PATH, spec_handbook.SUPERSESSION):
-        data = _read(path, f"spec/{path.name}")
-        digest.update(_normal(data) if data is not None else b"-")
-    digest.update(b"|sources|" + _sources_digest(str(PI_ROOT)).encode())
-    digest.update(b"|packs|" + _packs_digest(str(PACKS_ROOT)).encode())
+    complete = True
+    for kind, (value, ok) in (
+        ("spec", _spec_digest()),
+        ("sources", _sources_digest(str(PI_ROOT))),
+        ("packs", _packs_digest(str(PACKS_ROOT))),
+    ):
+        complete = complete and ok
+        digest.update(f"|{kind}|{value}".encode())
     if guidance := operator_guidance_digest(operator_guidance):
         digest.update(b"|guidance|" + guidance.encode())
-    return digest.hexdigest()[:12]
+    hexed = digest.hexdigest()
+    return hexed[:12] if complete else "!" + hexed[:11]
 
 
 def build_id() -> str:
