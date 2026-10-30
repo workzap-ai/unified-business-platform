@@ -4992,6 +4992,8 @@ def part18_problem(reply: str, context: dict[str, Any]) -> str | None:
             if h.get("role") == "customer"
         ]
         found.append(reply_gates.fact_already_given(reply, [*said, *owner]))
+        # B6 S5: the problem record, which outlives the 20-message window and a closed chat
+        found.append(reply_gates.known_in_record(reply, context.get("noted_problems") or []))
     return "; ".join(f for f in found if f) or None
 
 

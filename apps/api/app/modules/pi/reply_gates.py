@@ -235,6 +235,27 @@ def _said(words: str) -> str:
     )
 
 
+def known_in_record(reply: str, noted: list[dict[str, Any]]) -> str | None:
+    """alreadyAnswered (18.5) from the problem record (B6 S5): the reply asks when it began or how
+    often, and every noted problem already holds that fact (its `missing` list does not name it).
+    The record belongs to the customer, so this holds after the 20-message window and in a new
+    chat. Conservative: no noted problem, a record without a `missing` list, or one problem still
+    missing the fact, and the question may go."""
+    if not noted or not all(isinstance(p.get("missing"), list) for p in noted):
+        return None
+    for question in _questions(reply):
+        for ask, key, what in (
+            (ASK_SINCE, "since", "when it began"),
+            (ASK_OFTEN, "how_often", "how often it happens"),
+        ):
+            if ask.search(question) and all(key not in p["missing"] for p in noted):
+                return (
+                    f"it asks {what}, but the noted problem already holds it: use it, ask what is "
+                    "unknown"
+                )
+    return None
+
+
 def opening_log(passed: bool, path: str, prompt_version: str) -> dict[str, str]:
     """What the openingGate log line carries (18.2 Logging): the result, which path wrote the
     opening (the model or the fixed fallback) and the prompt version in force. Never the text."""

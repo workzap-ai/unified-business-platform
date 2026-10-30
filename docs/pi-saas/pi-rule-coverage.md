@@ -127,7 +127,8 @@ Change a guard, change its row in `rule_index.json` (code and tests), run `pytes
 | B6 S2: the extractor note carries since, money, how many, how often and impact, so `missing` no longer lists what the owner said | `problem_extract.SimpleNote`, its prompt | done (`test_pi_extract_facts.py`, `test_pi_extract_gaps.py`) |
 | B6 S3: a short question asked again (under three content words) is the same question | `slots.same_question` | done (`test_pi_slots_short_questions.py`) |
 | B6 S4: a new conversation starts with what the owner's earlier chats closed (answered questions for 30 days, unanswered asked facts for 2 days), once, same workspace and customer only; never owner text, never personal data, never the generic closer; `brain_erase` erases the copies | `slot_carry.py`, called from `service_conversation.prepare_context` | done (`test_pi_slot_carry.py`, `test_pi_slot_carry_flow.py`), scripted models only |
-| B6 S5 and S6: facts outside the 10 memory keys have no store; the 20-message window; `fact_ask` ignores problem records and memory | | open, root causes in `pi-b6-root-causes.md`, needs owner approval |
+| B6 S5 (partly): with `brain.fact_ask` on, a question about when it began or how often is sent back when every noted problem already holds that fact; the record outlives the 20-message window and a closed chat | `reply_gates.known_in_record`, `part18_problem` | done for since and how often (`test_pi_fact_known_in_record.py`); cost, count of shops and staff are not covered from the record (the record cannot tell an amount from a bare impact type); opt-in, scripted only |
+| B6 S6: facts outside the 10 memory keys have no store; the 20-message window | | open, root causes in `pi-b6-root-causes.md`, needs owner approval (with B2) |
 | alreadyAnswered for map nodes the owner stated but pi never asked about; replays G54/G55 | | open |
 
 ## Red-team round 2 (2026-10-30)

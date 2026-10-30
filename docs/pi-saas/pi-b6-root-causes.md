@@ -53,8 +53,11 @@ pi's own questions, and the opt-in `fact_ask` gate (count, duration, frequency) 
   unanswered asked facts for 2 days; the generic "anything else?" slot, questions holding personal
   data, erased chats and any other key are never copied; copies are marked `carried`;
   `erase_customer` already clears every conversation of the customer, copies included.
-- S5: let `fact_already_given` also read problem records, memory and the summary, and cover
-  since, cost and staff count. Stays opt-in until measured with a real model.
+- S5 (partly done, `reply_gates.known_in_record`): with `brain.fact_ask` on, a question about when
+  it began or how often is sent back when every noted problem already holds that fact. Left out on
+  purpose: cost and where, because the record's gap list cannot tell an amount from a bare impact
+  type, or "2 of 4 shops" from which shops. Memory and the summary are not read (free text). Stays
+  opt-in until measured with a real model.
 - S6: a small stated-facts ledger (key, value, source message, date). It belongs with B2.
 - Not checked: how often live models leave `asked_slot` or `customer_profile` empty; two messages
   with a slow first reply (Audit Run 2, R3).
