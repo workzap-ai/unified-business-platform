@@ -144,7 +144,7 @@ async def test_how_exactly_gets_what_the_document_covers_and_the_offer_and_no_id
     await pi.close()
 
 
-async def test_a_workspace_without_solution_mode_still_gets_the_summary_for_a_push(
+async def test_a_push_for_a_fix_without_solution_mode_gets_the_no_idea_line_and_one_question(
     api, business_db, monkeypatch
 ):
     industry, problem = an_industry()

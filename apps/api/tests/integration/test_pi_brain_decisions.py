@@ -167,6 +167,29 @@ async def test_a_cost_question_at_the_offer_is_answered_not_gated(api, business_
     await pi.close()
 
 
+async def test_a_roman_urdu_cost_question_at_the_offer_does_not_start_the_quote(
+    api, business_db, monkeypatch
+):
+    # D-1 (engineering lead, awaiting owner approval): deviates from spec v1.6 19.2 BS1/BS6
+    pi, prompts = await to_the_offer(api, business_db, monkeypatch)
+    await say(pi, "kitna kharcha hoga yeh banane ka?", "cq-ur")
+    body = (await pi.reply_to("cq-ur")).body
+    assert body != decisions.text("preparing", "roman_ur") and body != decisions.text(
+        "preparing", "en"
+    )
+    assert (await state_of(business_db, pi)).flow_state != "S6_PREPARING"
+    assert (await business_db.scalars(select(PiStaffRequest))).all() == []
+    await pi.close()
+
+
+async def test_an_explicit_quote_ask_at_the_offer_starts_the_quote(api, business_db, monkeypatch):
+    pi, prompts = await to_the_offer(api, business_db, monkeypatch)
+    await say(pi, "send me the quote", "cq-ask")
+    await pi.reply_to("cq-ask")
+    assert (await state_of(business_db, pi)).flow_state == "S6_PREPARING"
+    await pi.close()
+
+
 async def test_approving_a_quote_takes_two_confirmations(api, business_db, monkeypatch):
     """The quote itself arrives in phase 4: here it is put on the table by hand."""
     from app.modules.pi import service_conversation as conversation_service

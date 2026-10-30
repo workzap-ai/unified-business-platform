@@ -103,21 +103,58 @@ def test_audit_a_signal_reply_never_carries_a_price_and_ends_with_no_question():
         assert banned not in reply
 
 
-def test_bs_a_signal_starts_the_quote_through_the_decision_gate():
-    facts = {
-        "can_approve": True,
-        "problem_count": 1,
-        "problem_refs": ["a"],
-        "brief": {},
-        "buying_signal": "R1",
-        "message_id": "m1",
-    }
-    decision = decisions.decide(
-        decisions.State.S3_NOTED, "kitna kharcha hoga yeh usb karnay ka?", "roman_ur", facts
+def _gate(said, covers=1):
+    """What production passes to the decision gate (service_conversation.brain_decision)."""
+    return decisions.decide(
+        decisions.State.S3_NOTED,
+        said,
+        "roman_ur",
+        {
+            "can_approve": True,
+            "problem_count": 1,
+            "problem_refs": ["a"],
+            "brief": {},
+            "buying_signal": part19.gate_signal(said, covers),
+            "message_id": "m1",
+        },
     )
+
+
+def test_bs_an_explicit_quote_ask_starts_the_quote_through_the_decision_gate():
+    decision = _gate("mujhay quote do abhi")
     assert decision is not None and decision.why == "R-OFFER-03"
     assert "request_solution" in decision.effects
     assert not any(c.isdigit() for c in decision.reply)  # BS4: no price number
+
+
+@pytest.mark.parametrize(
+    "said",
+    ["kitna kharcha hoga yeh usb karnay ka?", "how much will it cost?", "how much would it cost?"],
+)
+def test_bs1_a_price_question_is_an_offer_signal_but_does_not_start_the_quote(said):
+    # D-1 (engineering lead, awaiting owner approval): deviates from spec v1.6 19.2 BS1/BS6
+    assert part19.buying_signal(said, 1) == "R1"
+    assert part19.gate_signal(said, 1) is None
+    decision = _gate(said)
+    assert decision is None or "request_solution" not in decision.effects
+
+
+@pytest.mark.parametrize(
+    "said,expected",
+    [
+        ("send me the quote", True),
+        ("mujhay quote do abhi", True),
+        ("give me the quote", True),
+        ("how much will it cost?", False),
+        ("kitna kharcha hoga yeh usb karnay ka?", False),
+        ("I send the quote to customers late", False),
+        ("we give the quote after two days", False),
+        ("quote nahi chahiye", False),
+        ("send me the quote later", False),
+    ],
+)
+def test_asks_for_the_quote_is_an_explicit_ask_only(said, expected):
+    assert part19.asks_for_the_quote(said) is expected
 
 
 def test_bs5_a_thin_set_adds_the_one_line_to_widen_and_a_full_one_does_not():

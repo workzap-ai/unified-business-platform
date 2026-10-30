@@ -235,6 +235,14 @@ def buying_signal(said: str, covers: int = 0) -> str | None:
     return None
 
 
+# the owner (or someone else) doing the sending: a statement about their own practice
+STATES_OWN_PRACTICE = re.compile(
+    r"\b(?:i|we|they|he|she|staff|sales)\s+(?:\w+\s+){0,2}(?:send|sends|sent|give|gives|gave)\b"
+    r"|\b(?:maine|humne|hum|main)\s+(?:\w+\s+){0,2}(?:bheja|bhejta|bhejte|diya|deta|dete)\b",
+    re.IGNORECASE,
+)
+
+
 def asks_for_the_quote(said: str) -> bool:
     """The owner explicitly asks for the quote itself ("send me the quote", "mujhay quote do abhi").
     A price QUESTION ("how much would it cost?") is also an R1 signal for the offer, but it is
@@ -242,7 +250,15 @@ def asks_for_the_quote(said: str) -> bool:
     from app.modules.pi import decisions
 
     text = " ".join(decisions.OWN_MONEY.sub(" ", said or "").split())
+    if STATES_OWN_PRACTICE.search(text):
+        return False  # "I send the quote to customers late" is a statement, not a request
     return bool(R1_QUOTE.search(text)) and not NEGATED.search(text)
+
+
+def gate_signal(said: str, covers: int = 0) -> str | None:
+    """The signal the decision gate may act on: "R1" only for an explicit ask for the quote (D-1).
+    A price question stays an R1 signal for the offer (`buying_signal`) but starts nothing here."""
+    return "R1" if buying_signal(said, covers) == "R1" and asks_for_the_quote(said) else None
 
 
 def ready_to_buy(said: str) -> bool:

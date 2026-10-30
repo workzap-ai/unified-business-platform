@@ -11,7 +11,7 @@ from test_pi_brain_problems import adaptive, create, say, workspace
 from test_pi_service_conversations import turn
 
 from app.ai.manager import LLMManager
-from app.modules.pi import expert_advisor
+from app.modules.pi import decisions, expert_advisor
 from app.modules.pi.models import PiMessage
 
 pytestmark = pytest.mark.integration
@@ -177,6 +177,27 @@ async def test_when_every_idea_fails_pi_asks_the_footfall_question_and_gives_no_
     conversation = await pi.conversation()
     await business_db.refresh(conversation)
     assert conversation.service_brief.get("ideas_given", 0) == 0
+    await pi.close()
+
+
+async def test_a_price_question_with_the_fact_question_gets_one_question_and_no_number(
+    api, business_db, monkeypatch
+):
+    """Auditor residual risk: when no idea survives and the owner also asks the price, the reply
+    answers the price first in a statement, then the one-more-fact question (one question, last,
+    no figure, no quote started)."""
+    expert_model(monkeypatch, diagnosis([VIDEO_IDEA]), judged(1))
+    pi = await expert_chat(
+        api, business_db, monkeypatch, SHOWROOM, "Few walk-ins at the showroom", SHOWROOM
+    )
+    [body] = await reply_after(pi, business_db, "give me a solution, how much will it cost?", "x-2")
+    assert body.startswith(decisions.cost_answer("en"))  # the price question is answered first
+    assert "I need one more fact" in body and QUESTION in body
+    assert body.count("?") == 1 and body.rstrip().endswith("?")
+    assert not any(ch.isdigit() for ch in body)
+    conversation = await pi.conversation()
+    await business_db.refresh(conversation)
+    assert conversation.flow_state != "S6_PREPARING"
     await pi.close()
 
 
