@@ -10,11 +10,13 @@ stores identifiers only, never text. It is safe to call for every reply, learnin
 `send_whatsapp_message` calls `stamp_safely` once, after the reply message is saved (brain mode).
 """
 
+import enum
 import hashlib
 import importlib
 import json
 import logging
 import os
+import re
 from collections.abc import Sequence
 from functools import lru_cache
 from pathlib import Path
@@ -32,26 +34,40 @@ logger = logging.getLogger(__name__)
 
 
 def _digest(path: Path) -> str:
+    """A short hash of the file's raw bytes. This is the per-pack digest kept in audit rows and
+    compared by the drift check (`drift_check._digest`, the industry rows), so it is left as it was
+    on purpose; the combined `prompt_version` below normalises line endings instead."""
     try:
         return hashlib.sha256(path.read_bytes()).hexdigest()[:12]
     except OSError:
         return ""
 
 
-# The hardcoded prompt text that reaches the model: module -> constant names. A change to any of
-# these changes pi's behaviour, so it changes `prompt_version`. `test_pi_prompt_version_coverage`
-# fails when a long prompt constant is added to one of these modules without being listed here.
+# The hardcoded prompt text and prompt-selection tables that reach a model: module -> names. A
+# change to any of them changes pi's behaviour, so it changes `prompt_version`.
+# `test_pi_prompt_version_coverage` scans every module of this package and fails when a prompt-like
+# constant is neither listed here nor on its documented allowlist.
 PROMPT_CONSTANTS: tuple[tuple[str, tuple[str, ...]], ...] = (
     (
         "service_conversation",
-        ("SYSTEM", "BRAIN_SYSTEM", "BRAIN_PROBLEMS", "BRAIN_DECISIONS", "BRAIN_VOICE", "BRAIN_ASK"),
+        (
+            "SYSTEM",
+            "BRAIN_SYSTEM",
+            "BRAIN_PROBLEMS",
+            "BRAIN_DECISIONS",
+            "BRAIN_VOICE",
+            "BRAIN_ASK",
+            "UNCONFIRMED_TRADE",
+        ),
     ),
-    ("think_prompt", ("PLAN_FIELD_HINT", "MOVE_LINES", "BLOCK")),
+    ("think_prompt", ("PLAN_FIELD_HINT", "MOVE_LINES", "BLOCK", "MOVE_KEYS_TEXT")),
+    ("think_plan", ("MOVE_KEYS_TEXT",)),
     (
         "expert_advisor",
         (
             "PERSONA",
             "STEER_RULES",
+            "UNCONFIRMED_TRADE_RULE",
             "DIAGNOSE_RULES",
             "LIGHT_RULES",
             "JUDGE_RULES",
@@ -63,9 +79,46 @@ PROMPT_CONSTANTS: tuple[tuple[str, tuple[str, ...]], ...] = (
     ("solution_free", ("RULES",)),
     ("critique", ("SYSTEM",)),
     ("brain_docs", ("BOX_SYSTEM", "SYSTEM")),
+    ("brain_prompt", ("CUTS",)),
     ("learning_voice", ("SYSTEM",)),
+    ("learning_grader", ("SYSTEM", "RULE_BREAK_ITEMS", "QUALITY_ITEMS")),
+    ("learning_miner", ("SYSTEM",)),
+    ("learning_packs", ("SYSTEM",)),
+    ("learning_solutions_grow", ("SYSTEM", "ENTRY_SYSTEM", "LESSONS")),
     ("ask_classifier", ("SYSTEM",)),
-    ("flow", ("GUIDANCE",)),
+    ("graph", ("ROUTER_SYSTEM", "INTENTS", "AGENTS")),
+    ("links", ("SUMMARY_SYSTEM",)),
+    ("owner_intents", ("SYSTEM",)),
+    (
+        "owner_asks",
+        (
+            "NO_QUESTIONS_RULE",
+            "RECALL_RULE",
+            "SUGGEST_RULE",
+            "NO_RECORDS_RULE",
+            "PLAN_RULE",
+            "REPEAT_RULE",
+        ),
+    ),
+    ("memory_block", ("SYSTEM_LINE", "FACTS", "LABELS", "LABELS_UR", "FACT_KINDS")),
+    ("runtime", ("IMAGE_INSTRUCTION",)),
+    ("style", ("REPAIR",)),
+    ("golden_replies", ("GOLDEN",)),
+    ("flow", ("GUIDANCE", "NORMAL", "TRANSITIONS", "OPENING")),
+    # Which handbook sections each state and topic selects, and how many examples: moving a section
+    # between states changes the prompt without changing handbook.json.
+    (
+        "spec_handbook",
+        (
+            "CORE",
+            "BY_STATE",
+            "TOPICS",
+            "GOLDEN_BY_STATE",
+            "FRAME",
+            "MAX_GOLDEN",
+            "MAX_CHARS",
+        ),
+    ),
 )
 
 # Every pack file the prompt can draw on (industry, library, solutions, overlays, currency and the
@@ -79,13 +132,33 @@ def _normal(data: bytes) -> bytes:
     return data.replace(b"\r\n", b"\n")
 
 
+def _canon(value: Any) -> Any:
+    """A constant as plain JSON data, in an order that cannot depend on how a dict or set was built.
+    A pattern is its text and flags; an enum is its name. Anything else raises TypeError, so a
+    default repr (with a memory address) can never enter the hash."""
+    if value is None or isinstance(value, bool | int | float | str):
+        return value
+    if isinstance(value, bytes):
+        return {"bytes": value.hex()}
+    if isinstance(value, re.Pattern):
+        return {"re": value.pattern, "flags": int(value.flags)}
+    if isinstance(value, enum.Enum):
+        return {"enum": type(value).__name__, "name": value.name}
+    if isinstance(value, dict):
+        pairs = [[json.dumps(_canon(k), sort_keys=True), _canon(v)] for k, v in value.items()]
+        return {"dict": sorted(pairs, key=lambda pair: pair[0])}
+    if isinstance(value, set | frozenset):
+        return {"set": sorted(json.dumps(_canon(x), sort_keys=True) for x in value)}
+    if isinstance(value, list | tuple):
+        return [_canon(x) for x in value]
+    raise TypeError(type(value).__name__)
+
+
 def _text_of(value: Any) -> str:
-    """A constant as text, in an order that cannot depend on how a dict was built."""
+    """A constant as text: a string as it is, anything else as canonical JSON."""
     if isinstance(value, str):
         return value
-    if isinstance(value, dict):
-        return json.dumps({str(k): v for k, v in value.items()}, sort_keys=True, default=str)
-    return json.dumps(value, sort_keys=True, default=str)
+    return json.dumps(_canon(value), sort_keys=True, ensure_ascii=False)
 
 
 @lru_cache(maxsize=1)
@@ -94,13 +167,27 @@ def _constants_digest() -> str:
     for module, names in PROMPT_CONSTANTS:
         try:
             target: Any = importlib.import_module(f"app.modules.pi.{module}")
-        except Exception:  # noqa: BLE001 - a missing module never costs a reply its audit
+        except Exception as exc:  # noqa: BLE001 - a missing module never costs a reply its audit
+            logger.warning("pi_prompt_version_module_unreadable %s %s", module, type(exc).__name__)
             target = None
         for name in names:
-            value = getattr(target, name, None) if target is not None else None
-            body = "-" if value is None else _text_of(value)
+            marker = ""
+            body = ""
+            if target is None:
+                marker = "!module"
+            elif not hasattr(target, name):
+                marker = "!missing"
+                logger.warning("pi_prompt_version_constant_missing %s.%s", module, name)
+            else:
+                try:
+                    body = _text_of(getattr(target, name))
+                except TypeError as exc:
+                    marker = f"!unhashable:{exc}"
+                    logger.warning(
+                        "pi_prompt_version_constant_unhashable %s.%s %s", module, name, exc
+                    )
             digest.update(f"{module}.{name}\n".encode())
-            digest.update(_normal(body.encode("utf-8")))
+            digest.update(marker.encode() if marker else _normal(body.encode("utf-8")))
             digest.update(b"\x00")
     return digest.hexdigest()
 
@@ -166,12 +253,17 @@ def build_id() -> str:
 
 
 def pack_versions(
-    conversation: PiConversation, used: dict[str, Any], operator_guidance: str | None = None
+    conversation: PiConversation,
+    used: dict[str, Any],
+    operator_guidance: str | None = None,
+    *,
+    guidance_unread: bool = False,
 ) -> dict[str, str]:
     """The packs behind this reply, by key, with a short hash of each file. The industry pack is the
     customer's industry when one was stamped; a learned pack is named by its id. The business's
     operator guidance is recorded as a hash under `operator_guidance` (never its words), and only
-    when it wrote some, so a stored row without it keeps its old shape."""
+    when it wrote some, so a stored row without it keeps its old shape. `guidance_unread` marks a
+    reply whose guidance could not be read, so a missing hash is not mistaken for "none written"."""
     out: dict[str, str] = {}
     if key := str(used.get("industry") or ""):
         path = industry_packs.PACKS_DIR / f"{key}.json"
@@ -180,6 +272,8 @@ def pack_versions(
         out[f"learned:{learned}"] = "live"
     if guidance := operator_guidance_digest(operator_guidance):
         out["operator_guidance"] = guidance
+    if guidance_unread:
+        out["guidance_unread"] = "1"
     return out
 
 
@@ -193,9 +287,10 @@ def stamp_of(conversation: PiConversation, run: PiAgentRun | None) -> dict[str, 
     )
 
 
-async def operator_guidance_of(session: AsyncSession, scope: WorkspaceScope) -> str:
+async def operator_guidance_of(session: AsyncSession, scope: WorkspaceScope) -> str | None:
     """What this workspace wrote for pi in the Agents page (the current version of its requirement
-    agent), "" when there is none or it cannot be read. The same lookup the reply prompt uses."""
+    agent), "" when there is none and None when it could not be read. The same lookup the reply
+    prompt uses."""
     from app.modules.pi.models import PiAgent, PiAgentVersion
     from app.shared.workspace_repository import WorkspaceRepository
 
@@ -212,7 +307,7 @@ async def operator_guidance_of(session: AsyncSession, scope: WorkspaceScope) -> 
             )
     except Exception:  # noqa: BLE001 - the audit is an extra, never a reason to lose it
         logger.warning("pi_reply_audit_guidance_unread", exc_info=True)
-        return ""
+        return None
     return str(getattr(version, "instructions", "") or "")
 
 
@@ -245,8 +340,11 @@ async def stamp(
         )
     used = stamp_of(conversation, run)
     found = list(violations or [])
+    guidance_unread = False
     if operator_guidance is None:
-        operator_guidance = await operator_guidance_of(session, scope)
+        read = await operator_guidance_of(session, scope)
+        guidance_unread = read is None
+        operator_guidance = read or ""
     row = PiReplyAudit(
         tenant_id=scope.tenant_id,
         environment_id=scope.environment_id,
@@ -255,7 +353,7 @@ async def stamp(
         run_id=run.id if run is not None else None,
         prompt_version=prompt or prompt_version(),
         pack_versions={
-            **pack_versions(conversation, used, operator_guidance),
+            **pack_versions(conversation, used, operator_guidance, guidance_unread=guidance_unread),
             "build": build_id(),
         },
         lesson_ids=[str(x) for x in used.get("lessons") or []],
