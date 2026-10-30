@@ -154,3 +154,58 @@ Test recipe for any lane (same shell, never piped): `. "$MAIN/scripts/pi-test-en
 the lane's `apps/api` with `$MAIN/.venv/Scripts/python.exe`. Integration tests share one disposable
 database, so each run holds `mkdir $MAIN/.cache/test.lock` and removes it afterwards. Unit tests need
 neither.
+
+## 8. Owner-approved additions P-1 to P-6 (2026-10-30); Roadmap A to G stays the master
+
+Approved as mandatory acceptance requirements, with conditions. Nothing below is started; no API call,
+spending, production change or push to a shared branch is authorised by this approval. Status words:
+**planned** (task exists), **implemented** (merged), **scripted-tested** (automated tests, no model),
+**real-model-verified** (measured on a real model). Today nothing in P-1 to P-6 is real-model-verified.
+
+| ID | Task | Lane | Depends on | Acceptance | Tests | Status |
+|---|---|---|---|---|---|---|
+| P-1 | FT-SCHEMA: complete schema review (owner sees it before 0053 is written); FT-REQ and B2 carry workflows, entities (roles only, never third-party names), roles, existing systems, expected outcome | U | FT-02 integrated; owner D2 amended | one reviewed schema document; one migration 0053 (up and down on the disposable DB, single head); old rows unchanged; no field duplicated in two stores | extractor schema tests, two-tenant, erase, role-not-name redaction | planned |
+| P-2 | FT-A4: scorers for repetition, redundant question, requirement preservation, creativity | E | FT-A2, FT-A3; hand labels | creativity used for nothing until 85% agreement with human labels on 20 or more samples; scripted results labelled "scripted", never "AI quality" | negative controls fail; labelled-sample agreement test | planned |
+| P-3 | FT-A5: plan-completeness scorer (modules, steps, dependencies, next action); cases per industry | E, I | D5 (industry criteria); FT-A3 | an industry is "verified" only with the D5 minimum of representative cases and its acceptance criteria passed; otherwise "not yet measured" | scorer controls; per-industry count test | planned |
+| P-4 | FT-S7a read-only audit of deal, quote and conversation records; then FT-S7b privacy-safe decision ledger | U, S | S7a: none (read-only). S7b: S7a result, S6-a, erase decisions R1 to R6 | S7a: a table of what each record already holds. S7b: reuse existing records or `memory_block` first; a new table or migration only if S7a proves it necessary and the owner approves | two-tenant, erase, retention, redaction | planned (S7a not started) |
+| P-5 | Staged real-model plan: Stage 1 approved (extractor, Development, 30 calls, USD 0.50, model and key pending); Stage 2 and Stage 3 each need their own model verification, pricing, cap, scope and explicit run approval | E | D5, D6, grader agreement | proposal documents per stage, no run before approval | runner tests (no network) | Stage 1 runner scripted-tested, not run; Stages 2 and 3 planned (proposals only) |
+| P-6 | FT-X1: evidence-backed claims: no "done", "sent", "approved" or "booked" unless a record shows it; outcome check after delivery | S | FT-02; capability-map B1 (denied actions audit); after-payment records | the linter and a gate block a completion claim with no record; a test per claim type | final-text lint, two-tenant | planned |
+
+### Conflicts and open questions found while mapping (to resolve before implementation)
+
+1. **P-1 versus D2.** D2 approved constraints, tried and cause only. P-1 adds workflows, entities, systems
+   and expected outcome. Some of these are per business, not per problem. Proposal: per problem (on
+   `pi_problems`): constraints, tried, cause, expected outcome; per customer: workflows, roles, systems
+   through S6-a (`memory_block`) and the FT-REQ sheet, no new table. The owner reviews the full schema first.
+2. **Entities versus "roles, never third-party names".** Entities are stored as roles only; the
+   redaction and role-conversion fix on FT-02 (audit finding 2) must land first.
+3. **P-4 versus D3 (no new table).** The ledger must reuse deal and quote records or `memory_block`
+   unless the audit proves otherwise; a new migration (0054) is reserved only then.
+4. **P-4 and erase.** The ledger cannot ship before the retention decisions R1 to R6 and the G10
+   share-link fix, or it adds a fifteenth erase gap.
+5. **P-6 versus Part 19 wording.** "starts the quote" and "the quote will cover" are claims; the FT-02 fix
+   changes them to staff-review wording. P-6 must not be built on the old wording.
+6. **P-6 evidence source.** Denied actions are not audited (B1); the evidence for "done" must come from
+   existing records, otherwise P-6 can only block claims, not prove them.
+7. **P-2 labels.** The 85% test needs human-labelled samples; someone must label them (owner or a named
+   reviewer). The `grader` agent is a model, so it is not independent human truth.
+8. **P-3 versus D5.** "Sufficient representative cases" is undefined until D5 is approved; Held-out has
+   no industry with 10 cases.
+9. **P-5.** `gpt-4o-mini` is removed on 2027-01-14; the Stage 1 model needs your choice; Stages 2 and 3 have
+   no budget or scope yet.
+10. **Hot files.** P-6 and FT-REQ touch `service_conversation.py` and the linter; they follow FT-02 and
+    rebase on the integrated Part 19 hunks. Migration 0053 stays reserved to lane U.
+
+### Revised execution sequence
+
+1. **Now:** FT-02 blockers fixed by owner-os-49 (R3 offers only; final-text lint; redact then truncate and
+   roles; no problem words in the signed link, erase invalidates links; staff-review wording), then unit,
+   integration and rule-auditor gates, then fast-forward. B2a stays blocked until then.
+2. **In parallel, no code dependency on B2 or FT-02:** FT-S7a read-only record audit; FT-A4 and FT-A5
+   scorer design (lane E, scripted only); the Stage 2 and Stage 3 proposal documents; FT-REQ schema review
+   document (P-1). Erase fixes wait for retention decisions.
+3. **Owner reviews:** the P-1 schema; D5, D7, D8; erase retention R1 to R6; D6 model.
+4. **Then:** B2a (migration 0053 from the reviewed schema) -> B2b and S6 -> FT-REQ -> FT-C1 -> FT-ART2 ->
+   FT-S7b -> FT-X1.
+5. **Real-model evidence** (Stage 1, then 2 and 3 as separately approved) -> FT-E4 release gates ->
+   Workzap canary. Final acceptance: all six requirements work in real customer scenarios.
