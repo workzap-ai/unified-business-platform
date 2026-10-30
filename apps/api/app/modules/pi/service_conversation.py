@@ -328,6 +328,7 @@ class ServiceTurn(BaseModel):
     _summary: bool = PrivateAttr(default=False)
     _summary_at: int | None = PrivateAttr(default=None)
     _new_wants: list[str] = PrivateAttr(default_factory=list)
+    _cost_line: str = PrivateAttr(default="")  # the fixed cost answer, put in after any rewrite
     _english: bool = PrivateAttr(default=False)  # an English list was written: translate it
     _free: bool = PrivateAttr(default=False)  # the ideas were the model's own, vetted
     _ideas_rejected: bool = PrivateAttr(default=False)  # its idea lines were not owner actions
@@ -1978,6 +1979,15 @@ def with_disclosure(
     return f"{fixed_lines.line('opening', fixed_lines.code(context), opening)} {reply}"
 
 
+def put_cost_line(reply: str, line: str) -> str:
+    """The fixed cost answer in front of the reply, or right after pi's opening disclosure when the
+    reply starts with one (R-DISC-01: the first sentence of a first message says pi is an AI)."""
+    parts = re.split(r"(?<=[.!?])\s+", reply, maxsplit=1)
+    if len(parts) == 2 and SAYS_AI.search(parts[0]):
+        return f"{parts[0]} {line}\n\n{parts[1]}"
+    return f"{line}\n\n{reply}"
+
+
 def brain_safety(context: dict[str, Any]) -> "ServiceTurn | None":
     """What must be answered before any model call (spec Part 6): an emergency, a message that is
     only card or ID details, a "who are you" question, a request for advice pi cannot give. The
@@ -2843,8 +2853,10 @@ async def brain_expert_ideas(
         if question == advice.question:
             question = expert_advisor.need_fact_reply(question)
         said_now = str(context.get("latest_customer_message") or "")
-        if decisions.cost_asked(said_now):  # a price question is answered first, in a statement
-            question = f"{decisions.cost_answer(language, context)}\n\n{question}"
+        if decisions.cost_asked(said_now):
+            # a price question is answered first, in a statement; the fixed line is put in after
+            # the language step, so a model rewrite never sees it (no figure, no range)
+            turn._cost_line = decisions.cost_answer(language, context)
         turn.reply = with_disclosure(question, context, language)
         turn._english = True
         turn.awaiting_customer = True
@@ -3395,12 +3407,12 @@ def brain_decision(turn: "ServiceTurn", context: dict[str, Any]) -> None:
     }
     wants = [str(w) for w in known.get("wants") or []]
     said_now = str(context.get("latest_customer_message", ""))
-    signal = part19.buying_signal(said_now, len(noted) + len(wants))
     # 19.2: R1 (quote or price asked) is the ask itself and starts the quote; R3 (ready to buy)
     # opens the offer (box_signals) and the owner's yes still starts it: no yes is skipped
     # a price question is answered first and does not start the quote (D-1); only an explicit ask
     # for the quote does
-    facts["buying_signal"] = part19.gate_signal(said_now, len(noted) + len(wants))
+    gate = part19.gate_signal(said_now, len(noted) + len(wants))
+    facts["buying_signal"] = gate
     decision = decisions.decide(
         state,
         str(context.get("latest_customer_message", "")),
@@ -3412,7 +3424,7 @@ def brain_decision(turn: "ServiceTurn", context: dict[str, Any]) -> None:
     turn._decision = decision
     if decision.reply:
         turn.reply = decision.reply
-        if signal == "R1" and decision.why == "R-OFFER-03":
+        if gate == "R1" and decision.why == "R-OFFER-03":
             language = str(context.get("reply_language") or "en")
             own = "title_local" if language != "en" else "title"
             items = [str(p.get(own) or p.get("title") or "") for p in noted] + wants
@@ -6402,6 +6414,8 @@ async def compose_service_turn(
         )
     if expected == "roman_ur":
         turn.reply = roman_ideas_opener(roman_polish(turn.reply), context)
+    if turn._cost_line:
+        turn.reply = put_cost_line(turn.reply, turn._cost_line)
     latest_language = detect_language(str(context.get("latest_customer_message", "")))
     if latest_language == expected and (
         clearly_other(turn.reply, str(expected or ""))

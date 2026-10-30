@@ -44,6 +44,13 @@ def summary_blocked(context: dict[str, Any], said: str, why: str) -> bool:
     to a number, a question or a quote request, and never twice inside ten messages."""
     if asks_for_the_quote(said):
         return True  # an explicit quote ask goes to the quote (19.2), never to a summary
+    from app.modules.pi import decisions, problems
+
+    if decisions.cost_asked(said) and why != "map":
+        # a price answer is never replaced by a summary, whatever the wording ("show me the cost"),
+        # unless the owner also asks for the list or the summary itself
+        if not (problems.ASKS_LIST.search(said) or problems.ASKS_SUMMARY.search(said)):
+            return True
     explicit = why in ("show", "map", "document_asked")
     sent_at = (context.get("brief") or {}).get("summary_at")
     if not explicit and isinstance(sent_at, int) and ai_count(context) - sent_at < SUMMARY_GAP:
@@ -235,30 +242,37 @@ def buying_signal(said: str, covers: int = 0) -> str | None:
     return None
 
 
-# the owner (or someone else) doing the sending: a statement about their own practice
-STATES_OWN_PRACTICE = re.compile(
-    r"\b(?:i|we|they|he|she|staff|sales)\s+(?:\w+\s+){0,2}(?:send|sends|sent|give|gives|gave)\b"
-    r"|\b(?:maine|humne|hum|main)\s+(?:\w+\s+){0,2}(?:bheja|bhejta|bhejte|diya|deta|dete)\b",
+# A clause ends at punctuation or a joining word; an ask addressed to pi may follow a lead-in about
+# what the owner already said ("I said give me the quote", "maine bata diya, ab quote do").
+_CLAUSE_END = re.compile(r"[.,;!?؟\n]+|\s(?:but|and|aur|lekin|phir|so)\s", re.IGNORECASE)
+_SAID_LEAD = re.compile(
+    r"^\W*(?:i|we|maine|main ne|humne|hum ne)\s+(?:(?:already|just|have|had|did|sab)\s+)*"
+    r"(?:said|told you|asked|kaha|bola|bataya)\s+(?:that\s+|ke\s+)?",
     re.IGNORECASE,
 )
 
 
 def asks_for_the_quote(said: str) -> bool:
-    """The owner explicitly asks for the quote itself ("send me the quote", "mujhay quote do abhi").
-    A price QUESTION ("how much would it cost?") is also an R1 signal for the offer, but it is
-    answered first (RSOL08) and does not start the quote at the decision gate (owner decision D-1)."""
+    """The owner explicitly asks pi for the quote itself, as a request at the start of the message or
+    of a clause ("send me the quote", "mujhay quote do abhi", "can you send me the quote?"). It is
+    the same test as `decisions.asks_for_document` (an imperative or "I want/need", not a problem
+    that merely mentions quotes, and no "not", "later" or price word), applied clause by clause. A
+    price QUESTION ("how much would it cost?", "give me the price") is answered first (RSOL08) and
+    never starts the quote at the decision gate (owner decision D-1, awaiting approval)."""
     from app.modules.pi import decisions
 
-    text = " ".join(decisions.OWN_MONEY.sub(" ", said or "").split())
-    if STATES_OWN_PRACTICE.search(text):
-        return False  # "I send the quote to customers late" is a statement, not a request
-    return bool(R1_QUOTE.search(text)) and not NEGATED.search(text)
+    for clause in _CLAUSE_END.split(" ".join((said or "").split())):
+        clause = _SAID_LEAD.sub("", clause.strip())
+        if clause and decisions.asks_for_document(clause):
+            return True
+    return False
 
 
 def gate_signal(said: str, covers: int = 0) -> str | None:
     """The signal the decision gate may act on: "R1" only for an explicit ask for the quote (D-1).
-    A price question stays an R1 signal for the offer (`buying_signal`) but starts nothing here."""
-    return "R1" if buying_signal(said, covers) == "R1" and asks_for_the_quote(said) else None
+    A price question stays an R1 signal for the offer (`buying_signal`) but starts nothing here, and
+    R3 (ready to buy) only opens the offer."""
+    return "R1" if asks_for_the_quote(said) else None
 
 
 def ready_to_buy(said: str) -> bool:

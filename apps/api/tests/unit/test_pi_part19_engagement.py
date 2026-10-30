@@ -151,6 +151,22 @@ def test_bs1_a_price_question_is_an_offer_signal_but_does_not_start_the_quote(sa
         ("we give the quote after two days", False),
         ("quote nahi chahiye", False),
         ("send me the quote later", False),
+        # statements about the owner's own work, or about others: never a request (audit H1)
+        ("customers ask me to send the quote", False),
+        ("my team forgets to send the quote", False),
+        ("it takes me hours to send a quote", False),
+        ("customers ko quote chahiye hota hai, mujhe banane mein time lagta hai", False),
+        ("don't send the quote", False),
+        ("give me the price", False),  # D-1: a price ask does not start the quote
+        # real asks with a lead-in or a trailing remark (audit M1)
+        ("I sent you the details, send me the quote", True),
+        ("I said give me the quote", True),
+        ("maine bata diya, ab quote do", True),
+        ("main ne sab bata diya, mujhay quote do abhi", True),
+        ("humne sab bata diya, quote bhejo", True),
+        ("send me the quote, I am short of time", True),
+        ("We need a quote, send me the quote", True),
+        ("can you send me the quote?", True),
     ],
 )
 def test_asks_for_the_quote_is_an_explicit_ask_only(said, expected):
@@ -799,3 +815,37 @@ def test_a_disclosure_question_after_the_offer_text_is_not_lost_either(language)
     final = constitution.final_one_question(f"{protected}\n\n{later}\n\nAnd one more? Really?")
     assert f"{protected[:-1]}." in final
     assert part19.question_count(part19.normalise_question_marks(final)) <= 1
+
+
+@pytest.mark.parametrize(
+    "said,why",
+    [
+        ("show me the cost", "show"),
+        ("kitna kharcha hoga, dikhao", "show"),
+        ("send me the quote", "document_asked"),
+        ("how much will it cost?", "done"),
+    ],
+)
+def test_a_summary_never_replaces_a_price_answer_or_a_quote_ask(said, why):
+    assert part19.summary_blocked({"brief": {}, "history": []}, said, why)
+
+
+@pytest.mark.parametrize(
+    "said,why",
+    [("list down all the problems", "show"), ("show my problem map", "map")],
+)
+def test_a_genuine_list_ask_still_gets_the_summary(said, why):
+    assert not part19.summary_blocked({"brief": {}, "history": []}, said, why)
+
+
+def test_the_cost_line_goes_after_the_disclosure_and_never_carries_a_figure():
+    from app.modules.pi import service_conversation as sc
+
+    line = decisions.cost_answer("roman_ur")
+    plain = sc.put_cost_line("I need one more fact. Since when?", line)
+    assert plain.startswith(line)
+    first = sc.put_cost_line(
+        "Hi, it's pi, the AI from Workzap. I need one more fact. Since when?", line
+    )
+    assert first.startswith("Hi, it's pi, the AI from Workzap.") and line in first
+    assert not any(ch.isdigit() for ch in line)
