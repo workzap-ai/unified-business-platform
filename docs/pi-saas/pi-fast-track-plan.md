@@ -209,3 +209,28 @@ spending, production change or push to a shared branch is authorised by this app
    FT-S7b -> FT-X1.
 5. **Real-model evidence** (Stage 1, then 2 and 3 as separately approved) -> FT-E4 release gates ->
    Workzap canary. Final acceptance: all six requirements work in real customer scenarios.
+
+## 9. Implementation backlog: Q-1 to Q-11 added (owner approval 2026-10-30, with boundaries)
+
+Approved into the backlog. Roadmap A to G stays the master. No push, deployment, production migration or
+external API cost without separate approval. FT-02 (sixth commit) stays the immediate priority. Status:
+**planned** unless stated; nothing below is real-model-verified.
+
+| ID | Task | Owner lane | Depends on | Ready now? | Measurable acceptance (proposed, owner may amend) | Boundary from the approval |
+|---|---|---|---|---|---|---|
+| Q-1 | State (stated, assumed, unknown, recommended) on every fact | U | P-1 schema review decision, FT-02 | no | a fact never shows `recommended` as `stated`; unsupported cause confirmed = 0 on every split | reconcile with P-1 and 0053; schema amendment presented, never silent |
+| Q-2 | Rank missing information by effect on the solution | U | FT-REQ, B2a | no | asked question is the top-ranked missing item in the labelled cases; 0 questions that do not change the recommendation | impact on the recommended solution, not checklist completion |
+| Q-3 | Root-cause quality criteria and labelled causes | E | FT-A2 (merged), P-2 labels | partly (criteria and labelled cases are scripted work) | agreement with human labels meets the P-2 method before use | must improve solution quality, not add fields |
+| Q-4 | Options comparison in the plan format | S | FT-02, P-3 Q1 decision | no | each solution document compares at least two real options with benefit, cost source, limit, risk; reviewer approves | after the offer and the owner's yes; cost from staff, never priced by pi |
+| Q-5 | Blueprint schema (entities, APIs, automation, dashboards, security, phases, risks, success criteria) | S | FT-02, P-3 Q1, P-1 reconciliation | no | blueprint completeness scored on plan cases; reviewer sign-off | reconciled with P-1 and 0053 before implementation |
+| Q-6 | Verify `open_items.py` carry across chats | U | none | **yes** | a test shows unresolved questions and next steps carry to a new chat of the same customer and tenant, and are erased with the customer | preserve privacy, tenant isolation and erase rules |
+| Q-7 | Contradiction detection against the stored record | U | B2a, Q-1 | no | a new statement that contradicts a stored fact produces one clarification, not an overwrite, on labelled cases | preserve privacy, tenant isolation and erase rules |
+| Q-8 | Level 3: approved actions executed and verified, progress reported | S, owner scope | FT-02, P-4 decisions, P-6 | architecture and planning only | an action record exists before any "done" claim; every action has an approval and a rollback | no autonomous external actions, payments, bookings, messages, production changes or irreversible actions |
+| Q-9 | Runtime pre-presentation self-check | S | FT-02, P-6, FT-C1 | no | the check flags a seeded missing requirement, constraint violation and unsupported claim in 100% of scripted negatives; false positive rate on positives stays under the owner's limit | measurable criteria required |
+| Q-10 | Actionability and user-satisfaction measures | E | P-2, P-5 | no | each measure has a definition, a labelled sample and an agreement result; satisfaction comes from a real signal, not a model | measurable criteria required |
+| Q-11 | End-to-end scenarios for nine industries | E, I | case format decision, D5, P-5 approval | no | at least the owner's minimum of realistic scenarios per industry (booking, rental, e-commerce, SaaS, wedding and banquet, healthcare, education, logistics, agriculture), each reviewed by an independent human | real-model calls need separate explicit cost approval |
+
+### Dependency-ready work started in this round (approved tasks, no dependency on FT-02 or B2a)
+- **FT-D3** (lane S files `learning_audit.py` only): `prompt_version` covers hardcoded prompts, pack hashes and operator guidance. Unit tests first, no database.
+- **Q-6** (lane U, tests first, no production change in hot files): open-items carry audit with tests.
+- **Not started, waiting on a decision:** FT-A3 (relevance scorer and 30 scripted solution cases) needs the case-format decision (CF1, CF4, CF5); B2a and everything marked "no" waits for FT-02.
