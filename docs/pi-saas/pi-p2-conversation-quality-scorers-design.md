@@ -1,5 +1,7 @@
 # P-2: conversation-quality scorers, design and human-labelling method
 
+> **Field names (CF1, approved by the owner on 2026-10-30):** this design now uses the shared case-format vocabulary `record_after`, `answered_facts`, `legit_reasks`, `sinks` and the `fact` kind from `pi-eval-case-format-v1.md`. Earlier drafts called them `record_at`, `answered` and `reask_ok`.
+
 Status: DESIGN ONLY, 2026-10-30. No code, no case file, no model call, no spending. Written for the owner
 (review) and for lane E (who would build it after approval). The 85% agreement threshold is a
 **PROPOSAL** until the owner has reviewed the labelling method (section 7) and the labelled samples.
@@ -25,17 +27,17 @@ here). Same id, industry, language, kind and split rules as extraction cases, pl
 
 ```
 turns: [{"role": "owner", "text": "..."}, {"role": "pi", "text": "..."}, ...]
-record_at: {"<pi turn index>": [ {title, user_words, summary, money_text, cause, cause_status,
+record_after: {"<pi turn index>": [ {title, user_words, summary, money_text, cause, cause_status,
                                    constraints, missing:[since, how_often, ...]} ]}   # what pi had saved
 expected: {
   "requirements": [{"id","text","kind": "figure|constraint|fact|correction","sinks": ["record","summary","solution"]}],
-  "answered": [{"slot": "since|how_often|count|money|tool|place|who", "by_turn": 2}],   # facts the owner gave
-  "reask_ok": [pi turn indexes where asking again is legitimate]                          # e.g. owner said "?"
+  "answered_facts": [{"slot": "since|how_often|count|money|tool|place|who", "by_turn": 2}],   # facts the owner gave
+  "legit_reasks": [pi turn indexes where asking again is legitimate]                          # e.g. owner said "?"
 }
 origin: "reference transcript written by hand, not model output"   # same honesty label as today
 ```
 
-A real-model run (P-5, separate approval) fills `turns[pi]` and `record_at` from the live path and keeps the
+A real-model run (P-5, separate approval) fills `turns[pi]` and `record_after` from the live path and keeps the
 same `expected`; the scorers do not change.
 
 ## 1. What a scripted result may and may not claim
@@ -54,13 +56,13 @@ same `expected`; the scorers do not change.
 **Definition.** pi says the same thing again without being asked: the same question, the same idea, or the
 same opening or closing line, across its own turns.
 
-**Inputs.** pi turns only (plus `expected.reask_ok`). No record needed.
+**Inputs.** pi turns only (plus `expected.legit_reasks`). No record needed.
 
 **Algorithm (deterministic).**
 1. Split each pi turn into questions (`reply_gates._questions`) and statements (sentences ending in `.`,
    `!`, `۔`).
 2. Question repeat: for each question, compare with every earlier pi question using
-   `slots.same_question`. A hit counts unless its turn is in `reask_ok`.
+   `slots.same_question`. A hit counts unless its turn is in `legit_reasks`.
 3. Idea repeat: for statements of 4 or more content words, compare earlier pi statements by the same
    content-word Jaccard (`slots.words`), threshold `SAME = 0.6`. Greeting and disclosure lines are
    excluded (the first pi turn and any line containing "AI").
@@ -69,7 +71,7 @@ same opening or closing line, across its own turns.
    Per group: total repeats over total pi turns, with n.
 
 **Failure modes.** Paraphrase below 0.6 overlap is missed (under-count); a re-ask after the owner dodged
-is a false positive unless labelled `reask_ok`; very short questions are only caught by exact spelling
+is a false positive unless labelled `legit_reasks`; very short questions are only caught by exact spelling
 (`MIN_WORDS`); the cross-language rule needs 2 shared words, so a Roman Urdu question followed by the same
 question in Urdu script is **not** matched (the loan-word rule cannot see script changes).
 
@@ -79,7 +81,7 @@ pattern splits at vowel signs, so only exact-spelling repeats are reliable: "not
 tokeniser is chosen (an open point, not decided here).
 
 **Negative controls.** (a) a transcript where pi asks "Which shop is it?" in turns 2 and 4 with no owner
-answer between: must score 1 question repeat. (b) the same two questions but turn 4 is in `reask_ok`: 0.
+answer between: must score 1 question repeat. (b) the same two questions but turn 4 is in `legit_reasks`: 0.
 (c) two different questions: 0. (d) a transcript with no pi questions: `repeat_rate` 0, not "n/a pass".
 
 **Worked example (en).**
@@ -97,8 +99,8 @@ Expected: `questions=1, ideas=0, boilerplate=0, repeat_rate = 1/3` (three pi tur
 **Definition.** pi asks for a fact the owner already gave or the record already holds. Different from
 repetition: the earlier ask may never have been made by pi.
 
-**Inputs.** pi questions; owner turns before it; `record_at[turn]` (including each problem's `missing`
-list); `expected.answered` (the labelled facts and the turn that gave them).
+**Inputs.** pi questions; owner turns before it; `record_after[turn]` (including each problem's `missing`
+list); `expected.answered_facts` (the labelled facts and the turn that gave them).
 
 **Algorithm.**
 1. Classify each pi question into a slot with the existing patterns where they exist (`ASK_SINCE`,
@@ -106,8 +108,8 @@ list); `expected.answered` (the labelled facts and the turn that gave them).
    tool ("which app or software"), place, and who. A question with no recognised slot is **not scored**
    (counted separately as `unclassified`, never as "not redundant").
 2. The slot is filled when any of: (a) `known_in_record` says the record holds it (since, how often);
-   (b) the matching figure or tool appears in `record_at` text (`record_text`, `money_text`); (c) the
-   label `expected.answered` names the slot with `by_turn` earlier than this question.
+   (b) the matching figure or tool appears in `record_after` text (`record_text`, `money_text`); (c) the
+   label `expected.answered_facts` names the slot with `by_turn` earlier than this question.
 3. `redundant = filled slots asked / classified questions`.
 4. A question that **names** the known value ("You said evenings; is that every day?") is a confirmation,
    not a redundant ask: detected when the question contains the stored figure or word.
