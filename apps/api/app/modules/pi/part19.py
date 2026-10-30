@@ -196,7 +196,8 @@ R1_QUOTE = re.compile(
     re.IGNORECASE,
 )
 R1_PRICE = re.compile(
-    r"\bkitna\s+(?:kharcha|kharch|lagega|lagay\s?ga|paisa|cost)\b|\bkharcha\s+(?:kitna|hoga)\b"
+    r"\bkitna\s+(?:kharcha|kharch|lagega|lagay\s?ga|paisa|cost)\b(?!\s+(?:time|waqt|din|hafte|mahine))"
+    r"|\bkharcha\s+(?:kitna|hoga)\b"
     r"|\bkitne\s+(?:paise|rupay|rupees)\b|\bhow much (?:will|would|does|for)\b"
     r"|\bwhat(?:'s| is| will be) the (?:price|cost)\b|\b(?:price|rate|cost)\s+kya\b",
     re.IGNORECASE,
@@ -337,3 +338,15 @@ def replay(turn: Any, context: dict[str, Any]) -> None:
     if line:
         turn.reply = line
         turn.awaiting_customer = True
+
+
+def statement_only(reply: str) -> str:
+    """The reply without its questions (R-ASK-01): used before the offer is appended, so the offer
+    is the only question of the message and it is last."""
+    lines: list[str] = []
+    for line in (reply or "").splitlines():
+        parts = re.split(r"(?<=[.!?؟])\s+", line.strip())
+        kept = [p for p in parts if p and not p.endswith(("?", "؟"))]
+        if kept:
+            lines.append(" ".join(kept))
+    return "\n".join(lines).strip()

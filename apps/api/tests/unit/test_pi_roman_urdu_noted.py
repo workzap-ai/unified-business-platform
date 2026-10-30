@@ -265,7 +265,9 @@ def test_no_idea_for_the_problem_is_said_plainly() -> None:
             "history": [{"role": "ai", "text": "Hi, I am pi."}],
         },
     )
-    assert turn.reply.startswith("Ji. ") and "solution document" in turn.reply
+    # re-audit: no document is named while listening; the line asks what they tried (one question)
+    assert turn.reply.startswith("Ji. ") and "solution document" not in turn.reply
+    assert turn.reply.count("?") == 1 and turn.reply.rstrip().endswith("?")
 
 
 def test_short_roman_urdu_nothing_more_and_summary_asks() -> None:

@@ -93,7 +93,10 @@ async def visual(token: str, name: str, request: Request, session: Session) -> R
         png = brain_visuals.render_progress(claims["step"], language)
     else:
         png = await _stored_board_png(session, conversation, claims["message"], language)
-    if png is None:  # an older link, or no stored snapshot: drawn from the current problems
+        if png is None and claims["message"]:
+            # the board as sent is gone (an erase): never redrawn from whatever is recorded now
+            raise HTTPException(status_code=404)
+    if png is None:  # an older link with no message: drawn from the current problems
         rows = list(
             await session.scalars(
                 select(PiProblem)

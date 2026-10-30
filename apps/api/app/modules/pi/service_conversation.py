@@ -3086,9 +3086,9 @@ async def brain_expert_diagnosis(
 
 
 NO_IDEA_LINES = {  # noqa: E501
-    "en": "Yes. I don't have a quick idea for this one that I can give here. Workzap can set out what it would build in a solution document.",  # noqa: E501
-    "roman_ur": "Ji. Is ke liye mere paas abhi koi chhota idea nahi jo yahan de sakun. Workzap solution document mein likh sakta hai ke wo kya banayega.",  # noqa: E501
-    "ar": "نعم. ليست لدي فكرة سريعة لهذه المشكلة يمكنني تقديمها هنا. يمكن لـ Workzap أن يوضح في وثيقة الحل ما الذي سيبنيه.",  # noqa: E501
+    "en": "Yes. I don't have a quick idea for this one that I can give here. What have you tried so far?",  # noqa: E501
+    "roman_ur": "Ji. Is ke liye mere paas abhi koi chhota idea nahi jo yahan de sakun. Ab tak aap ne kya aazmaya hai?",  # noqa: E501
+    "ar": "نعم. ليست لدي فكرة سريعة لهذه المشكلة يمكنني تقديمها هنا. ما الذي جربته حتى الآن؟",  # noqa: E501
 }
 
 
@@ -3348,7 +3348,10 @@ def brain_offer(turn: "ServiceTurn", context: dict[str, Any]) -> None:
         if any(line in turn.reply for line in NO_IDEA_FIXED):
             heard = system_ask.HEARD_LINES.get(language, system_ask.HEARD_LINES["en"])
             turn.reply = with_disclosure(heard, context, language)
-        turn.reply = f"{turn.reply.rstrip()}\n\n{solution_ask.offer_line(language, context)}"
+        else:
+            turn.reply = part19.statement_only(turn.reply)  # the offer is the only question
+        offer = solution_ask.offer_line(language, context)
+        turn.reply = f"{turn.reply.rstrip()}\n\n{offer}" if turn.reply.strip() else offer
     turn.awaiting_customer = True
     turn._decision = decisions.Decision(
         None, flow.State.S5_READINESS, {"offer_asked": True}, why="R-OFFER-01"
@@ -6534,6 +6537,9 @@ async def compose_service_turn(
         await in_their_language(manager, scope, policy, conversation, turn, context)
     elif context.get("opening_by_model"):
         logger.info("openingGate pass", extra=reply_gates.opening_log(True, "model", version))
+    if context.get("pi_mode") == "brain":
+        # R-ASK-01 on the text that is sent: everything above may add a line after the last lint
+        turn.reply = constitution.final_one_question(turn.reply)
     return turn
 
 

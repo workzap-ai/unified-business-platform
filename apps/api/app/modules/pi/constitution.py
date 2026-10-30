@@ -2341,6 +2341,17 @@ def describe(violations: list[Violation]) -> str:
 FINAL_CHECKS = frozenset({"R-PAY-02", "R-PAY-03", "R-DISC-03", "R-BRAND-01"})
 
 
+def final_one_question(reply: str) -> str:
+    """R-ASK-01 on the FINAL reply, after the last line the application adds (a notice, the
+    disclosure, a welcome back, a handoff or open-items line, the offer): at most one question and
+    it is the last sentence. Nothing else is cut (no word limit here)."""
+    text = (reply or "").strip()
+    count = sum(text.count(mark) for mark in QUESTION_MARKS)
+    if count == 0 or (count == 1 and text.endswith(QUESTION_MARKS)):
+        return reply
+    return _one_question_last(text, 10**6)
+
+
 AI_ANSWER = {
     "en": "I'm an AI, not a person. I'm pi, from Workzap.",
     "roman_ur": "Main AI hoon, insaan nahi. Main pi hoon, Workzap se.",

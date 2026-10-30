@@ -103,7 +103,8 @@ OFFER_REQUEST = re.compile(
 )
 # A direct ask for the document or the quote ("dain solution document mujhay", "send me the quote")
 # is a yes from any listening state once something is noted (Live Audit 2, cause 4, G28), whether or
-# not the offer was ever made. Questions about price, refusals and "later" are not.
+# not the offer was ever made. Refusals and "later" are not. A price or quote ask is an explicit R1
+# signal (spec v1.6 19.2, `part19.buying_signal`), not this pattern.
 _LEAD = (
     r"^\W*(?:(?:yes|yeah|ok|okay|please|pls|plz|haan|han|ji|jee|theek hai|bilkul|zaroor|sure)\W+)*"
 )
@@ -229,13 +230,13 @@ TEXT: dict[str, dict[str, str]] = {
     "preparing": {
         "en": (
             "I've asked Workzap to prepare your solution document and quote. "
-            "I'll send them here once they're ready."
+            "The team reviews them first, and I'll send them here once they're approved."
         ),
         "roman_ur": (
             "Maine Workzap se aap ka solution document aur quote tayyar karne ko "
-            "keh diya hai. Tayyar hote hi yahin bhej diya jayega."
+            "keh diya hai. Team pehle review karti hai, aur manzoori ke baad yahin bhej diya jayega."
         ),
-        "ar": ("طلبت من Workzap تجهيز وثيقة الحل وعرض السعر. سأرسلهما هنا فور أن يصبحا جاهزين."),
+        "ar": ("طلبت من Workzap تجهيز وثيقة الحل وعرض السعر. يراجعهما الفريق أولاً، وسأرسلهما هنا بعد الموافقة."),
     },
     "declined": {
         "en": "No problem. Everything you've told me is kept here if you change your mind.",

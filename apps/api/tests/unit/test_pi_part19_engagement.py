@@ -447,3 +447,100 @@ def test_the_covers_lines_promise_nothing_in_any_language():
         lines = part19.covers_lines(language, ["ads"])
         for banned in ("build on this", "bana dete", "نبني", "will cover", "aaye ga"):
             assert banned not in lines
+
+
+# --- re-audit blockers: the FINAL text, and a model reply that already ends in a question -----------
+LATE_QUESTIONS = {
+    "en": "Welcome back. Shall we carry on?",
+    "roman_ur": "Wapis khush aamdeed. Kya baat jaari rakhein?",
+    "ar": "أهلاً بعودتك. هل نتابع؟",
+}
+MODEL_ENDS_IN_QUESTION = {
+    "en": "Count how many enquiries come each week. Which source brings most of them?",
+    "roman_ur": "Har hafte ki enquiries ginein. Sab se zyada kis source se aati hain?",
+    "ar": "احسب عدد الاستفسارات كل أسبوع. من أي مصدر يأتي معظمها؟",
+}
+
+
+def _offer_context(language):
+    return {
+        "latest_customer_message": "mujhay quote do abhi",
+        "flow": {"state": "S3_NOTED"},
+        "noted_problems": [{"ref": "a", "title": "x"}],
+        "brief": {},
+        "history": [],
+        "box_offer": True,
+        "solution_asked": True,
+        "reply_language": language,
+    }
+
+
+@pytest.mark.parametrize("language", ["en", "roman_ur", "ar"])
+def test_a_model_reply_ending_in_a_question_loses_it_before_the_offer(language):
+    from types import SimpleNamespace
+
+    from app.modules.pi import service_conversation as sc
+
+    turn = SimpleNamespace(
+        reply=MODEL_ENDS_IN_QUESTION[language],
+        _summary=False,
+        _decision=None,
+        awaiting_customer=False,
+        problem_ops=[],
+    )
+    sc.brain_offer(turn, _offer_context(language))
+    final = turn.reply.rstrip()
+    assert final.count("?") + final.count("؟") == 1, final
+    assert final.endswith(("?", "؟"))
+    assert MODEL_ENDS_IN_QUESTION[language].split(".")[0] in final  # the statements stay
+
+
+@pytest.mark.parametrize("language", ["en", "roman_ur", "ar"])
+def test_the_final_text_after_the_late_lines_has_one_question_and_it_is_last(language):
+    from types import SimpleNamespace
+
+    from app.modules.pi import constitution
+    from app.modules.pi import service_conversation as sc
+
+    turn = SimpleNamespace(
+        reply=MODEL_ENDS_IN_QUESTION[language],
+        _summary=False,
+        _decision=None,
+        awaiting_customer=False,
+        problem_ops=[],
+    )
+    sc.brain_offer(turn, _offer_context(language))
+    # the lines the pipeline prepends or appends after the last lint: a welcome back with a question,
+    # a handoff line, an open-items line, a notice
+    late = f"{LATE_QUESTIONS[language]} {turn.reply}\n\nPlease note one thing. Is that fine?"
+    final = constitution.final_one_question(late)
+    assert final.count("?") + final.count("؟") == 1, final
+    assert final.rstrip().endswith(("?", "؟")), final
+    assert constitution.final_one_question("A statement only.") == "A statement only."
+    assert constitution.final_one_question("One question?") == "One question?"
+
+
+def test_the_pipeline_runs_the_final_check_after_the_last_append():
+    import inspect
+
+    from app.modules.pi import service_conversation as sc
+
+    source = inspect.getsource(sc)
+    tail = source[source.rindex("openingGate pass") :]
+    assert "constitution.final_one_question(turn.reply)" in tail.split("return turn")[0]
+
+
+def test_the_cost_lines_name_the_review_and_listening_lines_name_no_document():
+    from app.modules.pi import decisions
+    from app.modules.pi import service_conversation as sc
+
+    for language in ("en", "roman_ur", "ar"):
+        text = decisions.text("preparing", language)
+        assert any(w in text for w in ("review", "review", "يراجع")), text
+        line = sc.NO_IDEA_LINES[language]
+        assert "document" not in line.lower() and "وثيقة" not in line  # no document while listening
+
+
+def test_kitna_lagega_for_time_is_not_a_price_ask():
+    assert part19.buying_signal("kitna lagega yeh usb karnay ka?", 1) == "R1"
+    assert part19.buying_signal("kitna lagega time is kaam mein", 1) is None
