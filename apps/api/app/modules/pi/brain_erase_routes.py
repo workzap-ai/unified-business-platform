@@ -41,7 +41,14 @@ async def erase(
         scope=scope,
         entity_type="customer",
         entity_id=customer_id,
-        details={"removed": result["removed"], "kept": result["kept"]},
+        details={
+            "removed": result["removed"],
+            "kept": result["kept"],
+            # the trail records what was left on purpose (share links: erase decision R1)
+            # and which steps could not run, so a 200 never hides a step that did not erase
+            "kept_reasons": result["kept_reasons"],
+            "skipped": result["removed"].get("_skipped", []),
+        },
     )
     await session.commit()
     return result

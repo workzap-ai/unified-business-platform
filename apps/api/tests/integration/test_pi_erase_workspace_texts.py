@@ -1,7 +1,9 @@
-"""Erase gaps G1 to G10 (docs/pi-saas/pi-erase-gaps-g1-g14.md): an erase in one workspace removes
+"""Erase gaps G1 to G10 (docs/pi-saas/pi-erase-gaps-g1-g14.md on origin/main): an erase in one
+workspace removes
 the customer's words from staff notes, tags, tickets, staff requests, handoffs, pending actions,
-bookings, tasks and deal documents, and takes the phone off the portal share links, while another
-workspace's rows (same phone, colliding ids) are untouched.
+bookings, tasks and deal documents, and deletes the portal share links scoped to the erased chats,
+while another workspace's rows (same phone, colliding ids) are untouched. Links to ALL of a
+customer's chats are left alone (erase decision R1 (share links) is open).
 
 Written to run on the disposable database (the integrator runs it under the DB mutex); the static
 twin is tests/unit/test_pi_erase_completeness.py."""
@@ -15,7 +17,7 @@ from test_pi_isolation_core import two_chats
 
 from app.modules.customers.models import Customer
 from app.modules.pi.brain_erase import ERASED, erase_customer
-from app.modules.pi.models import PiHandoff, PiPendingAction
+from app.modules.pi.models import PiConversation, PiHandoff, PiPendingAction
 from app.modules.pi_customer.models import CustomerShareLink
 from app.modules.pi_saas.deal_models import PiDocument
 from app.modules.pi_saas.models import (
@@ -190,7 +192,8 @@ async def test_share_links_of_the_erased_chats_go_and_all_chat_links_are_left_al
     api, business_db, monkeypatch
 ):
     """Only links scoped to the erased chats are deleted. A link to ALL of a customer's chats has no
-    workspace key and spans businesses (owner decision R1 open): it must stay untouched."""
+    workspace key and spans businesses (erase decision R1 (share links) open): it must stay
+    untouched."""
     db = business_db
     w = await two_chats(api, db, monkeypatch)
     cust_a = await db.get(Customer, w.cust_a)
@@ -207,7 +210,7 @@ async def test_share_links_of_the_erased_chats_go_and_all_chat_links_are_left_al
             CustomerShareLink(
                 phone=phone, token_hash="b" * 64, conversation_id=w.conv_b.id, expires_at=FUTURE
             ),
-            # all of the customer's chats (spans businesses): untouched, R1 is open
+            # all of the customer's chats (spans businesses): untouched, erase decision R1 is open
             CustomerShareLink(
                 phone=phone, token_hash="c" * 64, conversation_id=None, expires_at=FUTURE
             ),
@@ -225,7 +228,9 @@ async def test_share_links_of_the_erased_chats_go_and_all_chat_links_are_left_al
     links = {link.token_hash[0]: link for link in await db.scalars(select(CustomerShareLink))}
     assert "a" not in links  # the link to the erased chat is gone
     assert links["b"].phone == phone and links["b"].revoked_at is None  # B's chat link stays
-    assert links["c"].phone == phone and links["c"].revoked_at is None  # R1: left untouched
+    assert (
+        links["c"].phone == phone and links["c"].revoked_at is None
+    )  # erase decision R1: left untouched
     assert links["d"].phone == other_phone and links["d"].revoked_at is None
     assert result["removed"]["share_links_deleted"] == 1
     assert "share_links_revoked" not in result["removed"]
@@ -323,7 +328,8 @@ async def test_a_ticket_and_a_task_linked_only_by_customer_id_are_cleared(
 
     ta = w.conv_a.tenant_id
     assert await count(db, PiTicket, tenant_id=ta) == 1  # the row stays
-    assert await texts(db, PiTicket, ta, "subject", "summary") == [ERASED]
+    assert await texts(db, PiTicket, ta, "subject") == [ERASED]  # the title takes the marker
+    assert await texts(db, PiTicket, ta, "summary") == [""]  # free text is blanked
     assert [v for v in await texts(db, PiTask, ta, "title", "description") if WORDS in v] == []
     await w.a.close()
     await w.b.close()
@@ -338,11 +344,13 @@ async def test_erasing_twice_is_idempotent_and_skips_nothing(api, business_db, m
     first = await erase_customer(db, w.scope_a, w.cust_a)
     await db.flush()
     after_first = await texts(db, PiTicket, ta, "subject", "summary")
+    assert after_first == [ERASED, ""]  # subject: the marker, summary: blank
     second = await erase_customer(db, w.scope_a, w.cust_a)
     await db.flush()
 
     assert first["removed"]["_skipped"] == [] and second["removed"]["_skipped"] == []
-    assert await texts(db, PiTicket, ta, "subject", "summary") == after_first == [ERASED]
+    assert await texts(db, PiTicket, ta, "subject", "summary") == after_first
+    assert not [v for v in after_first if WORDS in v]
     assert second["removed"]["conversation_tags"] == 0  # nothing left to delete
     assert second["removed"]["pending_actions"] == 0
     await w.a.close()
@@ -393,5 +401,59 @@ async def test_a_confirmed_pending_action_keeps_its_row_with_blank_text(
     assert rows[0].payload == {} and rows[0].summary == ""  # the audit row stays, blanked
     assert result["removed"]["pending_actions"] == 1
     assert result["removed"]["pending_actions_cleared"] == 1
+    await w.a.close()
+    await w.b.close()
+
+
+async def test_another_customers_staff_requests_and_handoffs_in_the_same_workspace_are_untouched(
+    api, business_db, monkeypatch
+):
+    """Staff requests and handoffs are filtered by customer_id only: a second customer of the same
+    workspace, with its own chat, must keep both."""
+    db = business_db
+    w = await two_chats(api, db, monkeypatch)
+    await seed_rows(db, w.conv_a, "a")
+    await w.a.process("hello", "other-customer", sender="923001112233")
+    await w.a.deliver_all()
+    db.expire_all()
+    other_conv = await db.scalar(
+        select(PiConversation).where(
+            PiConversation.tenant_id == w.conv_a.tenant_id, PiConversation.id != w.conv_a.id
+        )
+    )
+    assert other_conv is not None and other_conv.customer_id != w.cust_a
+    where = {"tenant_id": other_conv.tenant_id, "environment_id": other_conv.environment_id}
+    db.add_all(
+        [
+            PiStaffRequest(
+                **where,
+                conversation_id=other_conv.id,
+                customer_id=other_conv.customer_id,
+                question="keep question",
+                context_summary="keep context",
+                answer="keep answer",
+            ),
+            PiHandoff(
+                **where,
+                conversation_id=other_conv.id,
+                customer_id=other_conv.customer_id,
+                reason="customer_request",
+                created_by_label="pi",
+                summary="keep summary",
+                resolution_note="keep note",
+            ),
+        ]
+    )
+    await db.flush()
+
+    await erase_customer(db, w.scope_a, w.cust_a)
+    await db.flush()
+
+    ta = w.conv_a.tenant_id
+    assert "keep question" in await texts(db, PiStaffRequest, ta, "question")
+    assert "keep answer" in await texts(db, PiStaffRequest, ta, "answer")
+    assert "keep summary" in await texts(db, PiHandoff, ta, "summary")
+    assert "keep note" in await texts(db, PiHandoff, ta, "resolution_note")
+    assert not [v for v in await texts(db, PiStaffRequest, ta, "question") if WORDS in v]
     await w.a.close()
     await w.b.close()

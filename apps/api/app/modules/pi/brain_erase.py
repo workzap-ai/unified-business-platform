@@ -8,11 +8,25 @@ and examples from their chats, and the text of their messages and pi's replies (
 counts and audit trails still add up, but the words go). Question-arm statistics are bare counts
 with no personal data, so they stay.
 
+Cleared in place (gaps G1 to G9, docs/pi-saas/pi-erase-gaps-g1-g14.md on origin/main): staff notes,
+tickets, staff requests, handoffs, bookings, tasks and deal documents keep their row (counts, SLAs
+and audit trails still add up) and lose the customer's words. Tags and the unresolved pending draft
+are deleted; a confirmed or cancelled draft keeps a blank audit row. Gap G10: portal share links
+scoped to the erased chats are deleted.
+
+Residual risk, erase decision R1 (share links) is open: `customer_share_links` has no workspace key,
+so a link to ALL of a customer's chats (it carries the phone and spans businesses) is NOT touched
+here. Gaps G11 to G14 (CRM notes, activities, files, leads) wait for the retention decision.
+
 Kept on purpose (platform spec 4.9 item 10, ST12: the box history follows the retention rules;
 here only the box's own words and history go, never a quote): quotes, solution documents and
 payments (business and financial records the company must be able to show), and the customer's
 contact record in the CRM, which the customer module owns. The result says what was kept
 (`kept`, `kept_reasons`), so staff can tell the person plainly.
+
+Every step runs in its own savepoint. A step that cannot run (a table missing in this database) is
+named in removed["_skipped"] and logged, computed at the very end from every step, so a successful
+response never hides a step that did not erase.
 """
 
 import logging
@@ -82,6 +96,7 @@ REMOVED_KEYS = (
     "box_transitions",
     "solution_boxes",
     "map_versions",
+    "box_links_cleared",
     "business_profiles",
     "conversation_notes_cleared",
     "conversation_tags",
@@ -103,37 +118,38 @@ def _n(result: Any) -> int:
 
 async def _erase_conversation_extras(
     session: AsyncSession, scope: WorkspaceScope, conversation_ids: list[UUID]
-) -> dict[str, int]:
+) -> tuple[dict[str, int], list[str]]:
     """Offer log and open items of these conversations (tables from migrations 0047 and 0052)."""
-    out: dict[str, int] = {}
+    steps: list[tuple[str, Any]] = []
     for key, model in (("offer_log", PiOfferLog), ("open_items", PiOpenItem)):
-        try:
-            async with session.begin_nested():
-                out[key] = _n(
-                    await session.execute(
-                        delete(model).where(
-                            model.tenant_id == scope.tenant_id,
-                            model.environment_id == scope.environment_id,
-                            model.conversation_id.in_(conversation_ids),
-                        )
-                    )
-                )
-        except ProgrammingError:
-            pass
-    return out
+        steps.append(
+            (
+                key,
+                delete(model).where(
+                    model.tenant_id == scope.tenant_id,
+                    model.environment_id == scope.environment_id,
+                    model.conversation_id.in_(conversation_ids),
+                ),
+            )
+        )
+    return await _run_steps(session, tuple(steps))
 
 
 async def _run_steps(
     session: AsyncSession, steps: tuple[tuple[str, Any], ...]
 ) -> tuple[dict[str, int], list[str]]:
-    """Run each statement in its own savepoint. A step that cannot run (a table that does not exist
+    """Run each step in its own savepoint. A step is a statement, or a function returning an
+    awaitable count (the profile store). A step that cannot run (a table that does not exist
     yet in this database) is named and logged, never dropped silently: the caller reports it."""
     counts = {key: 0 for key, _ in steps}
     skipped: list[str] = []
-    for key, statement in steps:
+    for key, step in steps:
         try:
             async with session.begin_nested():
-                counts[key] = _n(await session.execute(statement))
+                if hasattr(step, "compile"):
+                    counts[key] = _n(await session.execute(step))
+                else:
+                    counts[key] = int(await step())
         except ProgrammingError:
             skipped.append(key)
             logger.warning("pi_erase_step_skipped", extra={"step": key})
@@ -143,13 +159,13 @@ async def _run_steps(
 async def _erase_workspace_texts(
     session: AsyncSession, scope: WorkspaceScope, customer_id: UUID, conversation_ids: list[UUID]
 ) -> tuple[dict[str, int], list[str]]:
-    """Gaps G1 to G9 (docs/pi-saas/pi-erase-gaps-g1-g14.md): staff notes, tags, tickets, staff
-    requests, handoffs, pending drafts, bookings, tasks and deal documents. Rows that carry no
-    record value go (tags and the one unresolved pending draft); the others keep their row so
-    counts, SLAs and audit trails still add up, and lose the customer's words, the same shape as
-    the messages (a confirmed or cancelled draft keeps its small audit row, text blanked). Quotes,
-    invoices and payments are not touched, and neither is a Knowledge document made from a staff
-    answer."""
+    """Gaps G1 to G9 (docs/pi-saas/pi-erase-gaps-g1-g14.md on origin/main): staff notes, tags,
+    tickets, staff requests, handoffs, pending drafts, bookings, tasks and deal documents. Rows
+    that carry no record value go (tags and the one unresolved pending draft); the others keep
+    their row so counts, SLAs and audit trails still add up, and lose the customer's words, the
+    same shape as the messages (a confirmed or cancelled draft keeps its small audit row, text
+    blanked). Quotes, invoices and payments are not touched, and neither is a Knowledge document
+    made from a staff answer."""
 
     def mine(model: Any) -> tuple[Any, ...]:
         return (
@@ -238,11 +254,12 @@ async def _erase_share_links(
     deleted, and the statement can only match conversation ids of THIS workspace (a subquery on
     the conversations with the tenant and environment, on top of the ids already being ours).
 
-    Residual risk, owner decision R1 open: `customer_share_links` has no tenant, environment or
-    customer key. A link to ALL of the customer's chats (conversation_id empty) carries the
-    customer's phone and spans other businesses, so it is left untouched here; revoking it or
-    blanking its phone would act across businesses. Options: add tenant_id and environment_id by
-    a migration, revoke only, or a customer-initiated revoke in the pi Customer portal."""
+    Residual risk, erase decision R1 (share links) open: `customer_share_links` has no tenant,
+    environment or customer key. A link to ALL of the customer's chats (conversation_id empty)
+    carries the customer's phone and spans other businesses, so it is left untouched here;
+    revoking it or blanking its phone would act across businesses. Options: add tenant_id and
+    environment_id by a migration, revoke only, or a customer-initiated revoke in the pi
+    Customer portal."""
 
     ours = select(PiConversation.id).where(
         PiConversation.tenant_id == scope.tenant_id,
@@ -260,57 +277,47 @@ async def _erase_share_links(
 
 async def _erase_map_and_boxes(
     session: AsyncSession, scope: WorkspaceScope, customer_id: UUID
-) -> dict[str, int]:
+) -> tuple[dict[str, int], list[str]]:
     """The map (every version), the Solution Boxes and their move history (spec X5, ST12). A box
     points at a map version and at its parent box, so the order is: moves, links between boxes,
-    boxes, map versions."""
-    out: dict[str, int] = {}
-    try:  # the map and box tables arrive with migrations 0047 and 0051
-        async with session.begin_nested():
+    boxes, map versions. Tables from migrations 0047 and 0051; each step has its own savepoint."""
 
-            def mine(model: Any) -> tuple[Any, ...]:
-                return (
-                    model.tenant_id == scope.tenant_id,
-                    model.environment_id == scope.environment_id,
-                )
+    def mine(model: Any) -> tuple[Any, ...]:
+        return (
+            model.tenant_id == scope.tenant_id,
+            model.environment_id == scope.environment_id,
+        )
 
-            box_ids = list(
-                await session.scalars(
-                    select(PiSolutionBox.id).where(
-                        *mine(PiSolutionBox), PiSolutionBox.customer_id == customer_id
-                    )
-                )
-            )
-            if box_ids:
-                out["box_transitions"] = _n(
-                    await session.execute(
-                        delete(PiBoxTransition).where(
-                            *mine(PiBoxTransition), PiBoxTransition.box_id.in_(box_ids)
-                        )
-                    )
-                )
-                await session.execute(
-                    update(PiSolutionBox)
-                    .where(*mine(PiSolutionBox), PiSolutionBox.id.in_(box_ids))
-                    .values(parent_box_id=None, map_version_id=None)
-                )
-            out["solution_boxes"] = _n(
-                await session.execute(
-                    delete(PiSolutionBox).where(
-                        *mine(PiSolutionBox), PiSolutionBox.customer_id == customer_id
-                    )
-                )
-            )
-            out["map_versions"] = _n(
-                await session.execute(
-                    delete(PiMapVersion).where(
-                        *mine(PiMapVersion), PiMapVersion.customer_id == customer_id
-                    )
-                )
-            )
-    except ProgrammingError:
-        pass
-    return out
+    box_ids = select(PiSolutionBox.id).where(
+        *mine(PiSolutionBox), PiSolutionBox.customer_id == customer_id
+    )
+    steps = (
+        (
+            "box_transitions",
+            delete(PiBoxTransition).where(
+                *mine(PiBoxTransition), PiBoxTransition.box_id.in_(box_ids)
+            ),
+        ),
+        (
+            "box_links_cleared",
+            update(PiSolutionBox)
+            .where(*mine(PiSolutionBox), PiSolutionBox.id.in_(box_ids))
+            .values(parent_box_id=None, map_version_id=None),
+        ),
+        (
+            "solution_boxes",
+            delete(PiSolutionBox).where(
+                *mine(PiSolutionBox), PiSolutionBox.customer_id == customer_id
+            ),
+        ),
+        (
+            "map_versions",
+            delete(PiMapVersion).where(
+                *mine(PiMapVersion), PiMapVersion.customer_id == customer_id
+            ),
+        ),
+    )
+    return await _run_steps(session, steps)
 
 
 async def erase_customer(
@@ -330,24 +337,32 @@ async def erase_customer(
         )
     )
     removed: dict[str, Any] = {key: 0 for key in REMOVED_KEYS}
-    try:  # the solution tables arrive with migration 0043
-        async with session.begin_nested():
-            removed["solution_memory"] = _n(
-                await session.execute(
+    skipped: list[str] = []
+
+    def absorb(result: tuple[dict[str, int], list[str]]) -> None:
+        removed.update(result[0])
+        skipped.extend(result[1])
+
+    # the solution tables arrive with migration 0043
+    absorb(
+        await _run_steps(
+            session,
+            (
+                (
+                    "solution_memory",
                     delete(PiSolutionMemory).where(
                         *mine(PiSolutionMemory), PiSolutionMemory.customer_id == customer_id
-                    )
-                )
-            )
-            removed["idea_feedback"] = _n(
-                await session.execute(
+                    ),
+                ),
+                (
+                    "idea_feedback",
                     delete(PiIdeaFeedback).where(
                         *mine(PiIdeaFeedback), PiIdeaFeedback.customer_id == customer_id
-                    )
-                )
-            )
-    except ProgrammingError:
-        pass
+                    ),
+                ),
+            ),
+        )
+    )
     if problem_ids:
         removed["links"] = _n(
             await session.execute(
@@ -429,7 +444,7 @@ async def erase_customer(
                 )
             )
         )
-        removed.update(await _erase_conversation_extras(session, scope, conversation_ids))
+        absorb(await _erase_conversation_extras(session, scope, conversation_ids))
         removed["quarantine"] = _n(
             await session.execute(
                 delete(PiQuarantine).where(
@@ -456,26 +471,30 @@ async def erase_customer(
                 last_message_preview=ERASED,
             )
         )
-    removed.update(await _erase_map_and_boxes(session, scope, customer_id))
-    texts, skipped = await _erase_workspace_texts(session, scope, customer_id, conversation_ids)
-    removed.update(texts)
-    links, skipped_links = await _erase_share_links(session, scope, conversation_ids)
-    removed.update(links)
-    removed["_skipped"] = [*skipped, *skipped_links]
-    # the Business Profile (facts, page snapshots) is what the owner told pi about their business
-    try:  # the profile tables arrive with migration 0050
-        async with session.begin_nested():
-            removed["business_profiles"] = await business_profile_store.erase_for_customer(
-                session, scope, customer_id
-            )
-    except ProgrammingError:
-        pass
+    absorb(await _erase_map_and_boxes(session, scope, customer_id))
+    absorb(await _erase_workspace_texts(session, scope, customer_id, conversation_ids))
+    absorb(await _erase_share_links(session, scope, conversation_ids))
+    # the Business Profile (facts, page snapshots) is what the owner told pi about their business;
+    # its tables arrive with migration 0050
+    absorb(
+        await _run_steps(
+            session,
+            (
+                (
+                    "business_profiles",
+                    lambda: business_profile_store.erase_for_customer(session, scope, customer_id),
+                ),
+            ),
+        )
+    )
     # What pi inferred onto the customer record (industry) is brain data, not CRM contact data.
     await session.execute(
         update(Customer)
         .where(*mine(Customer), Customer.id == customer_id)
         .values(industry_primary=None, industry_secondary=[], industry_confidence=None)
     )
+    # computed last, from every step above: a success never hides a step that did not run
+    removed["_skipped"] = skipped
     kept = {
         "documents": len(
             list(
@@ -505,8 +524,8 @@ async def erase_customer(
             "customer_contact": "the CRM contact record belongs to the customer module",
             "message_rows": "the rows stay so counts and audit trails add up; the words are gone",
             "share_links_all_chats": (
-                "needs owner decision R1: links to all of a customer's chats carry no workspace "
-                "key, so they are left untouched"
+                "needs owner decision, erase decision R1 (share links): links to all of a "
+                "customer's chats carry no workspace key, so they are left untouched"
             ),
             "text_only_rows": (
                 "tickets, handoffs, staff requests, tasks, bookings, staff notes and deal "

@@ -48,7 +48,9 @@ ALLOWED: dict[str, str] = {
 
 # Real gaps: customer-held words or data that erase_customer does not remove. DO NOT add to
 # ALLOWED to make a test pass. G1 to G10 are fixed in brain_erase.py (branch pi/u-erase-g1-g10);
-# G11 to G14 wait for the owner's retention decision (docs/pi-saas/pi-erase-gaps-g1-g14.md).
+# G11 to G14 wait for the owner's retention decision (docs/pi-saas/pi-erase-gaps-g1-g14.md on
+# origin/main). A static check like this one cannot see a missing tenant filter: the unit tests
+# in test_pi_erase_step_reporting.py and the integration tests guard that.
 KNOWN_GAPS: dict[str, str] = {
     # TODO(FT-E2b finding G11): CRM notes written about the customer
     "customer_notes": "body: staff free text about the customer",
@@ -60,8 +62,9 @@ KNOWN_GAPS: dict[str, str] = {
     "sales_leads": "requirements, notes, title: what the owner said they need",
 }
 
-# G1 to G10 and the action the erase takes (spec: docs/pi-saas/pi-erase-gaps-g1-g14.md): rows with
-# no record value go, rows that are business records keep their shape and lose their words.
+# G1 to G10 and the action the erase takes (docs/pi-saas/pi-erase-gaps-g1-g14.md on origin/main):
+# rows with no record value go, rows that are business records keep their shape and lose
+# their words.
 DELETED_ROWS = {"pi_conversation_tags", "pi_pending_actions", "customer_share_links"}
 WORDS_BLANKED = {
     "pi_conversation_notes",
