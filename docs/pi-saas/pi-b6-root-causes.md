@@ -48,8 +48,11 @@ pi's own questions, and the opt-in `fact_ask` gate (count, duration, frequency) 
 
 ## Open, needs the owner
 
-- S4: copy `closed_slots` and `asked_facts` into a new conversation of the same customer (changes
-  behaviour across conversations; slots hold only pi's own question, never the owner's words).
+- S4 (done, `slot_carry.py`): `closed_slots` and `asked_facts` are copied once into a new
+  conversation of the same customer and workspace. Answered questions stay closed for 30 days,
+  unanswered asked facts for 2 days; the generic "anything else?" slot, questions holding personal
+  data, erased chats and any other key are never copied; copies are marked `carried`;
+  `erase_customer` already clears every conversation of the customer, copies included.
 - S5: let `fact_already_given` also read problem records, memory and the summary, and cover
   since, cost and staff count. Stays opt-in until measured with a real model.
 - S6: a small stated-facts ledger (key, value, source message, date). It belongs with B2.

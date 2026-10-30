@@ -61,6 +61,7 @@ from app.modules.pi import (
     reply_layout,
     reply_voice,
     safety,
+    slot_carry,
     slots,
     solution_ask,
     solution_context,
@@ -3850,6 +3851,14 @@ async def prepare_context(
     policy: PiSettings,
     embedder: Any = None,
 ) -> dict[str, Any]:
+    if flow.brain_mode(policy.response_rules) and conversation.customer_id is not None:
+        # S4: a new chat starts with what the owner's earlier chats closed, once, before the closed
+        # slots below are read. A failure never costs the owner their reply.
+        try:
+            async with session.begin_nested():
+                await slot_carry.carry_into(session, scope, conversation)
+        except Exception:  # noqa: BLE001
+            logger.warning("slot carry failed", exc_info=True)
     tools = await latency.timed(
         "ctx.tools", ToolRegistry(session).enabled_tools(scope, "requirement")
     )
@@ -4125,6 +4134,7 @@ async def prepare_context(
                     "ideas_elsewhere",
                     "owner_n",
                     "owner_n_id",
+                    "slot_carry_done",
                 )
             },
             # Requests left unanswered last turn, to answer first (R-ANS-03).

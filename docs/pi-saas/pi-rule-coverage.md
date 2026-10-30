@@ -126,7 +126,8 @@ Change a guard, change its row in `rule_index.json` (code and tests), run `pytes
 | B6 S1: a problem noted by the separate extractor survives a rewrite of the reply (before, the rewrite replaced the whole turn and the note was never saved) | `service_conversation.py` (`extracted_ops`) | done (`test_pi_extract_survives_rewrite.py`) |
 | B6 S2: the extractor note carries since, money, how many, how often and impact, so `missing` no longer lists what the owner said | `problem_extract.SimpleNote`, its prompt | done (`test_pi_extract_facts.py`, `test_pi_extract_gaps.py`) |
 | B6 S3: a short question asked again (under three content words) is the same question | `slots.same_question` | done (`test_pi_slots_short_questions.py`) |
-| B6 S4 to S6: closed slots and asked facts are not carried into a new conversation; facts outside the 10 memory keys have no store; the 20-message window; `fact_ask` ignores problem records and memory | | open, root causes in `pi-b6-root-causes.md`, needs owner approval |
+| B6 S4: a new conversation starts with what the owner's earlier chats closed (answered questions for 30 days, unanswered asked facts for 2 days), once, same workspace and customer only; never owner text, never personal data, never the generic closer; `brain_erase` erases the copies | `slot_carry.py`, called from `service_conversation.prepare_context` | done (`test_pi_slot_carry.py`, `test_pi_slot_carry_flow.py`), scripted models only |
+| B6 S5 and S6: facts outside the 10 memory keys have no store; the 20-message window; `fact_ask` ignores problem records and memory | | open, root causes in `pi-b6-root-causes.md`, needs owner approval |
 | alreadyAnswered for map nodes the owner stated but pi never asked about; replays G54/G55 | | open |
 
 ## Red-team round 2 (2026-10-30)
