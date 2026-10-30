@@ -124,4 +124,22 @@ async def carry_into(
     for key, value in found.items():
         brief.setdefault(key, value)  # what this chat already holds is never replaced
     conversation.service_brief = brief
+    await _carry_open_items(session, scope, conversation, now)
     return bool(found)
+
+
+async def _carry_open_items(
+    session: AsyncSession,
+    scope: WorkspaceScope,
+    conversation: PiConversation,
+    now: datetime | None,
+) -> None:
+    """Q6-1: the open items of the owner's earlier chats come along, once, with the rest. A failure
+    here never costs the owner their reply or the slot copy above."""
+    from app.modules.pi import open_items
+
+    try:
+        async with session.begin_nested():
+            await open_items.carry_into(session, scope, conversation, now=now)
+    except Exception:  # noqa: BLE001
+        logger.warning("open items carry failed", exc_info=True)

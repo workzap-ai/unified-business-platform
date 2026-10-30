@@ -20,7 +20,7 @@ from uuid import UUID
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.modules.pi import fixed_lines, open_requests, safety
+from app.modules.pi import fixed_lines, open_requests, safety, third_party
 from app.modules.pi.map_edit import PROBLEMISH
 from app.modules.pi.models import PiConversation, PiMessage
 from app.modules.pi.open_item_models import PiOpenItem
@@ -37,6 +37,11 @@ SLA_MINUTES = {
 RETURN_AFTER_HOURS = 4
 MAX_SURFACED = 2
 TEXT_CAP = 300
+# Q6-1: what an owner's earlier chats hand to a new chat (same workspace, same customer only).
+# CARRY_DAYS is the one retention constant (subject to the P-4 retention decision).
+CARRY_DAYS = 30
+CARRY_MAX = 10
+CARRY_REASON = "carried_to_new_chat"
 
 HANDOFF_STATUS = {
     "en": "Your message to the Workzap team has not been answered yet. I've asked again, and I'm "
@@ -104,8 +109,11 @@ QUESTION_MARKS = re.compile(r"[?？؟⁇⁈]")
 
 
 def clean(text: str) -> str:
-    """The owner's words as they are kept: redacted (roles, never contact details) and short."""
-    return " ".join(safety.redact_pii(text or "").text.split())[:TEXT_CAP]
+    """The owner's words as they are kept: redacted (roles, never contact details) and short. A
+    third party's name is taken out where the words around it give it away (`third_party`), which
+    is best effort and not a privacy boundary."""
+    redacted = safety.redact_pii(text or "").text
+    return " ".join(third_party.protect(redacted).split())[:TEXT_CAP]
 
 
 def sla_minutes(kind: str) -> int:
@@ -201,6 +209,61 @@ async def _open_rows(
             .order_by(PiOpenItem.created_at)
         )
     )
+
+
+async def carry_into(
+    session: AsyncSession,
+    scope: WorkspaceScope,
+    conversation: PiConversation,
+    *,
+    now: datetime | None = None,
+) -> int:
+    """Q6-1: an owner who returns in a NEW chat finds what is still open. The open items of the
+    same customer in this workspace, from other chats, are moved under this conversation: newest
+    first, at most CARRY_MAX, none older than CARRY_DAYS, none that is answered or dropped (erased
+    items no longer exist). The brief's `open_requests` get the same entries, from the same rows.
+
+    The row keeps its creation time, so the age limit is counted from when the owner asked, not from
+    the carry. A moved row is one row, never a copy, and it is deleted by the existing erase of the
+    conversation (`brain_erase`); no source reference is kept, so nothing points back to an earlier
+    chat. Never crosses the tenant, the environment or the customer. Returns how many moved."""
+    if conversation.customer_id is None:
+        return 0
+    now = now or datetime.now(UTC)
+    rows = list(
+        await session.scalars(
+            select(PiOpenItem)
+            .where(
+                *_mine(scope),
+                PiOpenItem.customer_id == conversation.customer_id,
+                PiOpenItem.conversation_id != conversation.id,
+                PiOpenItem.status == "open",
+                PiOpenItem.created_at >= now - timedelta(days=CARRY_DAYS),
+            )
+            .order_by(PiOpenItem.created_at.desc())
+            .limit(CARRY_MAX)
+        )
+    )
+    held = {(r.kind, r.key) for r in await _open_rows(session, scope, conversation.id)}
+    moved: list[PiOpenItem] = []
+    for row in rows:
+        if (row.kind, row.key) in held:
+            continue
+        held.add((row.kind, row.key))
+        row.conversation_id = conversation.id
+        moved.append(row)
+    entries = [
+        {"kind": r.key, "turns": 0, "carried": True}
+        for r in moved
+        if r.kind == "owner_request" and r.key in open_requests.ADDRESSES
+    ]
+    if entries:
+        brief = dict(conversation.service_brief or {})
+        have = [e for e in brief.get("open_requests") or [] if isinstance(e, dict)]
+        kinds = {str(e.get("kind")) for e in have}
+        brief["open_requests"] = [*have, *[e for e in entries if e["kind"] not in kinds]]
+        conversation.service_brief = brief
+    return len(moved)
 
 
 async def team_answered_after(

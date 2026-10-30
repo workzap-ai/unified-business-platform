@@ -91,8 +91,11 @@ def unanswered(
     open_requests: list[dict[str, Any]] | None, reply: str, *, request_human: bool = False
 ) -> list[str]:
     """The requests left open last turn that this reply still does not address."""
+    # An entry carried from an earlier chat (Q6-1) is named on the owner's return, not forced into
+    # the first reply of the new chat; the next turn tracks it like any other.
     return [
         str(e["kind"])
         for e in open_requests or []
-        if not addressed(str(e["kind"]), reply, request_human=request_human)
+        if not e.get("carried")
+        and not addressed(str(e["kind"]), reply, request_human=request_human)
     ]

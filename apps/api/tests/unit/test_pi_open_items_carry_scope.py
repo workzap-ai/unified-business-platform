@@ -4,9 +4,9 @@ What the tests pin, by running the real `open_items` functions against a recordi
 (no database): the scope of every query, whether an item reaches a NEW chat of the same customer,
 the tenant and environment walls, the erase of an item, and the redaction of the stored words.
 
-One test is an expected failure on purpose (strict xfail): an item opened in an earlier chat is not
-named when the same owner returns in a NEW chat (`open_items._open_rows` reads one conversation).
-It is the gap Q6-1; the proposed fix is in docs and in the test's reason, not in this change.
+Q6-1 (an item opened in an earlier chat reaches a NEW chat of the same customer) is implemented
+in `open_items.carry_into`, called from `slot_carry.carry_into`; its tests are here. One test stays
+an expected failure on purpose (strict xfail): a bare third-party name, nothing around it (Q6-2).
 """
 
 import operator
@@ -17,9 +17,9 @@ from typing import Any
 from uuid import UUID, uuid4
 
 import pytest
-from sqlalchemy.sql.operators import in_op
+from sqlalchemy.sql.operators import desc_op, in_op
 
-from app.modules.pi import brain_erase, open_items
+from app.modules.pi import brain_erase, open_items, open_requests, slot_carry, third_party
 from app.modules.pi.open_item_models import PiOpenItem
 from app.shared.scope import WorkspaceScope
 
@@ -40,6 +40,7 @@ def chat(scope_: WorkspaceScope, customer: UUID | None = None, chat_id: UUID | N
         customer_id=customer or uuid4(),
         tenant_id=scope_.tenant_id,
         environment_id=scope_.environment_id,
+        service_brief={},
     )
 
 
@@ -51,6 +52,7 @@ def item(
     status: str = "open",
     created: datetime = NOW - timedelta(hours=6),
     surfaced: datetime | None = None,
+    key: str | None = None,
 ) -> SimpleNamespace:
     return SimpleNamespace(
         id=uuid4(),
@@ -59,7 +61,7 @@ def item(
         conversation_id=chat_.id,
         customer_id=chat_.customer_id,
         kind=kind,
-        key=f"q:{uuid4()}",
+        key=key or f"q:{uuid4()}",
         text=text,
         status=status,
         created_at=created,
@@ -83,9 +85,13 @@ def _fits(row: Any, criteria: list[tuple[str, Any, Any]]) -> bool:
             return False
         if op is operator.eq and have != value:
             return False
+        if op is operator.ne and have == value:
+            return False
+        if op is operator.ge and not have >= value:
+            return False
         if op is in_op and have not in value:
             return False
-        if op not in (operator.eq, in_op):
+        if op not in (operator.eq, operator.ne, operator.ge, in_op):
             return False  # an operator this fake does not know must never pass silently
     return True
 
@@ -114,7 +120,15 @@ class FakeSession:
         name = statement.column_descriptions[0]["entity"].__tablename__
         criteria = _criteria(statement)
         self.seen.append(criteria)
-        return [r for r in self._rows(name) if _fits(r, criteria)]
+        found = [r for r in self._rows(name) if _fits(r, criteria)]
+        for clause in reversed(getattr(statement, "_order_by_clauses", ()) or ()):
+            column = getattr(clause, "element", clause)  # a plain column sorts ascending
+            found.sort(
+                key=lambda r, k=column.key: getattr(r, k),
+                reverse=getattr(clause, "modifier", None) is desc_op,
+            )
+        limit = getattr(statement, "_limit_clause", None)
+        return found[: int(limit.value)] if limit is not None else found
 
     async def scalar(self, statement: Any) -> None:
         return None
@@ -188,24 +202,176 @@ async def test_answered_and_dropped_items_are_never_named():
 # --- carry into a new chat (gap Q6-1) --------------------------------------------------------
 
 
-@pytest.mark.xfail(
-    strict=True,
-    reason=(
-        "GAP Q6-1: open_items._open_rows (open_items.py:190-203) reads one conversation, and "
-        "slot_carry copies only closed_slots and asked_facts, so an open question or request of "
-        "an earlier chat is not named when the same owner returns in a NEW chat. Proposed fix: "
-        "load_for_return also reads open items of the same customer in this workspace "
-        "(customer_id, tenant, environment, status open, newest chats first, capped) and the "
-        "owner decides the age limit (P-4 retention question). Remove this marker with the fix."
-    ),
-)
+async def carry(session: FakeSession, s: WorkspaceScope, new: Any) -> int:
+    return await open_items.carry_into(session, s, new, now=NOW)
+
+
 async def test_an_item_of_an_earlier_chat_of_the_same_customer_is_named_in_a_new_chat():
     s = scope()
     customer = uuid4()
     earlier = chat(s, customer)
     new = chat(s, customer)
     session = FakeSession(pi_open_items=[item(earlier)])
+    assert await carry(session, s, new) == 1
     assert len(await named(session, s, new)) == 1
+    assert await named(session, s, earlier) == []  # one row, moved: never a copy
+
+
+async def test_a_carried_item_is_stored_under_the_new_conversation_with_its_own_age():
+    s = scope()
+    customer = uuid4()
+    earlier, new = chat(s, customer), chat(s, customer)
+    row = item(earlier, created=NOW - timedelta(days=12))
+    session = FakeSession(pi_open_items=[row])
+    await carry(session, s, new)
+    assert row.conversation_id == new.id
+    assert row.created_at == NOW - timedelta(days=12)  # the age limit counts from the ask
+
+
+async def test_at_most_ten_are_carried_newest_first_and_the_rest_stay_behind():
+    s = scope()
+    customer = uuid4()
+    earlier, new = chat(s, customer), chat(s, customer)
+    rows = [item(earlier, created=NOW - timedelta(hours=h + 1)) for h in range(12)]
+    session = FakeSession(pi_open_items=list(rows))
+    assert open_items.CARRY_MAX == 10
+    assert await carry(session, s, new) == 10
+    moved = {r.id for r in rows if r.conversation_id == new.id}
+    assert moved == {r.id for r in rows[:10]}  # rows[0] is the newest
+    assert all(r.conversation_id == earlier.id for r in rows[10:])
+
+
+async def test_the_thirty_day_limit_is_one_constant_and_its_boundary_holds():
+    s = scope()
+    customer = uuid4()
+    earlier, new = chat(s, customer), chat(s, customer)
+    limit = timedelta(days=open_items.CARRY_DAYS)
+    on_it = item(earlier, created=NOW - limit)
+    past_it = item(earlier, created=NOW - limit - timedelta(seconds=1))
+    session = FakeSession(pi_open_items=[on_it, past_it])
+    assert open_items.CARRY_DAYS == 30
+    assert await carry(session, s, new) == 1
+    assert on_it.conversation_id == new.id and past_it.conversation_id == earlier.id
+
+
+async def test_answered_dropped_and_expired_items_are_not_carried():
+    s = scope()
+    customer = uuid4()
+    earlier, new = chat(s, customer), chat(s, customer)
+    rows = [
+        item(earlier, status="answered"),
+        item(earlier, status="dropped"),
+        item(earlier, created=NOW - timedelta(days=45)),
+    ]
+    session = FakeSession(pi_open_items=rows)
+    assert await carry(session, s, new) == 0
+    assert all(r.conversation_id == earlier.id for r in rows)
+
+
+async def test_an_erased_item_is_not_carried():
+    s = scope()
+    customer = uuid4()
+    earlier, new = chat(s, customer), chat(s, customer)
+    session = FakeSession(pi_open_items=[item(earlier)], pi_offer_log=[])
+    await brain_erase._erase_conversation_extras(session, s, [earlier.id])
+    assert await carry(session, s, new) == 0
+    assert session.tables["pi_open_items"] == []
+
+
+async def test_a_second_carry_moves_nothing_and_an_item_already_held_is_not_doubled():
+    s = scope()
+    customer = uuid4()
+    earlier, new = chat(s, customer), chat(s, customer)
+    same = item(earlier, key="q:same")
+    held = item(new, key="q:same")
+    other = item(earlier, key="q:other")
+    session = FakeSession(pi_open_items=[same, held, other])
+    assert await carry(session, s, new) == 1
+    assert same.conversation_id == earlier.id and other.conversation_id == new.id
+    assert await carry(session, s, new) == 0
+
+
+async def test_nothing_is_carried_without_a_customer():
+    s = scope()
+    new = chat(s)
+    new.customer_id = None
+    session = FakeSession(pi_open_items=[item(chat(s))])
+    assert await carry(session, s, new) == 0
+
+
+async def test_carried_requests_reach_the_brief_from_the_same_rows_and_are_not_doubled():
+    s = scope()
+    customer = uuid4()
+    earlier, new = chat(s, customer), chat(s, customer)
+    new.service_brief = {"open_requests": [{"kind": "human", "turns": 2}]}
+    rows = [
+        item(earlier, kind="owner_request", key="timeline"),
+        item(earlier, kind="owner_request", key="human"),  # already in the new brief
+        item(earlier, kind="owner_request", key="quote_price"),  # not a tracked request kind
+        item(earlier, kind="owner_question"),
+    ]
+    session = FakeSession(pi_open_items=rows)
+    assert await carry(session, s, new) == 4
+    kinds = [e["kind"] for e in new.service_brief["open_requests"]]
+    assert kinds == ["human", "timeline"]
+    assert new.service_brief["open_requests"][1] == {
+        "kind": "timeline",
+        "turns": 0,
+        "carried": True,
+    }
+
+
+async def test_a_carried_request_is_not_forced_into_the_first_reply_but_is_tracked_after():
+    entry = {"kind": "timeline", "turns": 0, "carried": True}
+    assert open_requests.unanswered([entry], "Hello again.") == []
+    assert open_requests.unanswered([{"kind": "timeline", "turns": 1}], "Hello again.") == [
+        "timeline"
+    ]
+    after = open_requests.update([entry], "ok", "Hmm.", persistent=True)
+    assert after == [{"kind": "timeline", "turns": 1}]  # the next turn tracks it like any other
+
+
+async def test_the_carry_never_crosses_tenant_environment_or_customer():
+    mine = scope()
+    customer = uuid4()
+    new = chat(mine, customer)
+    other_tenant = scope()
+    other_env = scope(mine.tenant_id)
+    rows = [
+        item(chat(other_tenant, customer)),  # same customer id value, another workspace
+        item(chat(other_env, customer)),  # same tenant, another environment
+        item(chat(mine)),  # another customer in this workspace
+    ]
+    session = FakeSession(pi_open_items=rows)
+    assert await carry(session, mine, new) == 0
+    assert all(r.conversation_id != new.id for r in rows)
+    wanted = {"tenant_id", "environment_id", "customer_id"}
+    assert wanted <= {name for name, _, _ in session.seen[0]}
+
+
+async def test_the_erase_of_the_new_conversation_removes_the_carried_items():
+    s = scope()
+    customer = uuid4()
+    earlier, new = chat(s, customer), chat(s, customer)
+    session = FakeSession(pi_open_items=[item(earlier), item(earlier)], pi_offer_log=[])
+    await carry(session, s, new)
+    removed = await brain_erase._erase_conversation_extras(session, s, [earlier.id, new.id])
+    assert removed["open_items"] == 2 and session.tables["pi_open_items"] == []
+
+
+async def test_slot_carry_brings_the_open_items_and_a_failure_costs_nothing():
+    s = scope()
+    customer = uuid4()
+    earlier, new = chat(s, customer), chat(s, customer)
+    session = FakeSession(pi_open_items=[item(earlier)])
+    await slot_carry._carry_open_items(session, s, new, NOW)
+    assert len(await named(session, s, new)) == 1
+
+    class Broken(FakeSession):
+        async def scalars(self, statement: Any) -> list[Any]:
+            raise RuntimeError("database trouble")
+
+    await slot_carry._carry_open_items(Broken(), s, new, NOW)  # no exception reaches the chat
 
 
 async def test_an_item_of_another_customer_is_never_named_here():
@@ -366,10 +532,10 @@ async def test_a_third_party_introduced_by_a_role_becomes_the_role():
 @pytest.mark.xfail(
     strict=True,
     reason=(
-        "KNOWN LIMIT Q6-2: safety.redact_pii turns a name into a role only after a role or title "
-        "word and a capitalised Latin-script name. A bare name ('Ahmed did not send the receipt'), "
-        "a lowercase Roman Urdu name or an Urdu or Arabic script name is stored as written in "
-        "the item text. Proposed: a prompt-level rule plus a name list per language (owner)."
+        "KNOWN LIMIT Q6-2: third_party.protect works from the words around a name (honorific, "
+        "relationship word, verb of reporting). A bare name with nothing around it ('Ahmed did "
+        "not send the receipt') cannot be told from a place, a brand or a word, so it is stored "
+        "as written. No name list is used; a prompt-level rule is not a privacy boundary."
     ),
 )
 async def test_a_bare_third_party_name_is_not_stored():
@@ -396,3 +562,107 @@ async def test_the_staff_view_text_of_a_handoff_is_redacted_too():
     handoffs = [r for r in rows if r["kind"] == "pending_handoff"]
     assert len(handoffs) == 1
     assert PHONE not in handoffs[0]["text"]
+
+
+# --- Q6-2: a third party's name, from the words around it ---------------------------------------
+
+
+def stored_text(text: str) -> str:
+    return open_items.clean(text)
+
+
+@pytest.mark.parametrize(
+    ("text", "gone", "kept"),
+    [
+        ("my brother Ahmed Khan took the stock", ["Ahmed", "Khan"], ["my brother"]),
+        ("Mr. Raza phoned me about the invoice", ["Raza"], ["phoned me"]),
+        ("Dr Sana told me the parcel is late", ["Sana"], ["told me"]),
+        ("Bilal said the parcel is late", ["Bilal"], ["said the parcel"]),
+        ("I called Sara about the price", ["Sara"], ["called"]),
+        ("our manager Hassan refused to pay", ["Hassan"], ["our manager", "refused"]),
+    ],
+)
+def test_english_names_next_to_a_role_or_a_verb_of_reporting_are_dropped(text, gone, kept):
+    out = stored_text(text)
+    assert not any(name in out for name in gone), out
+    assert all(word in out for word in kept), out
+
+
+@pytest.mark.parametrize(
+    ("text", "gone", "kept"),
+    [
+        ("Ahmed bhai ne kaha ke maal kal aayega", ["Ahmed"], ["bhai ne kaha"]),
+        ("Ayesha baji ko call karna hai", ["Ayesha"], ["baji ko call"]),
+        ("Ali ne kaha ke paise nahi hain", ["Ali"], ["ne kaha"]),
+        ("ahmed ne mana kar diya", ["ahmed"], ["ne mana"]),
+        ("Raza sahab ka phone nahi uthta", ["Raza"], ["sahab"]),
+    ],
+)
+def test_roman_urdu_names_before_an_honorific_or_ne_are_dropped(text, gone, kept):
+    out = stored_text(text)
+    assert not any(name in out for name in gone), out
+    assert all(word in out for word in kept), out
+
+
+@pytest.mark.parametrize(
+    ("text", "gone", "kept"),
+    [
+        ("احمد بھائی نے کہا کہ مال کل آئے گا", ["احمد"], ["بھائی نے کہا"]),
+        ("علی نے بتایا کہ پیسے نہیں ہیں", ["علی"], ["نے بتایا"]),
+        ("ڈاکٹر سلمان نے منع کیا", ["سلمان"], ["ڈاکٹر نے منع"]),
+        ("عائشہ باجی کو فون کرنا ہے", ["عائشہ"], ["باجی کو فون"]),
+    ],
+)
+def test_urdu_script_names_next_to_an_honorific_or_a_reporting_verb_are_dropped(text, gone, kept):
+    out = stored_text(text)
+    assert not any(name in out for name in gone), out
+    assert all(word in out for word in kept), out
+
+
+@pytest.mark.parametrize(
+    ("text", "gone", "kept"),
+    [
+        ("قال محمد إن البضاعة ستتأخر", ["محمد"], ["قال"]),
+        ("السيد خالد اتصل بي أمس", ["خالد"], ["السيد", "اتصل بي"]),
+        ("أخي سامر رفض الدفع", ["سامر"], ["أخي", "رفض الدفع"]),
+        ("الدكتورة ليلى أخبرتني بالموعد", ["ليلى"], ["الدكتورة"]),
+    ],
+)
+def test_arabic_names_next_to_a_title_a_relation_or_a_reporting_verb_are_dropped(text, gone, kept):
+    out = stored_text(text)
+    assert not any(name in out for name in gone), out
+    assert all(word in out for word in kept), out
+
+
+@pytest.mark.parametrize(
+    "text",
+    [
+        "Workzap said it will call me back",
+        "Customers said the price is too high",
+        "Karachi is far for the delivery",
+        "قال لي المدير إن الطلب جاهز",
+        "الزبون قال إن السعر مرتفع",
+        "اس نے کہا کہ ٹھیک ہے",
+        "main ne kaha ke theek hai",
+        "WhatsApp told me the message failed",
+    ],
+)
+def test_roles_pronouns_places_and_brands_are_left_as_written(text):
+    assert third_party.protect(text) == text
+
+
+def test_the_protection_is_idempotent_and_never_empties_a_text():
+    for text in (
+        "my brother Ahmed said he will pay",
+        "Ali ne kaha ke paise nahi hain",
+        "احمد بھائی نے کہا",
+        "قال محمد إن",
+    ):
+        once = third_party.protect(text)
+        assert once and third_party.protect(once) == once
+
+
+def test_the_owners_own_number_and_a_third_partys_contact_are_still_decided_by_redaction():
+    out = stored_text(f"call me on {PHONE}, and his number is {THEIRS}, mail {EMAIL}, card {CARD}")
+    assert PHONE in out  # given to be reached: kept by design (safety.OWN_NUMBER)
+    assert THEIRS not in out and EMAIL not in out and CARD not in out
