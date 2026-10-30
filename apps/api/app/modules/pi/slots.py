@@ -101,7 +101,17 @@ def _language_of(question: str) -> str | None:
     return detect_language(question)
 
 
+def _spelling(question: str) -> str:
+    """The question as plain lower-case words: case, spacing and punctuation do not count."""
+    letters = unicodedata.normalize("NFC", question).lower()
+    return " ".join(re.sub(r"[^\w\s]", " ", letters).split())
+
+
 def same_question(a: str, b: str) -> bool:
+    # A short question ("Which shop is it?") has too few content words to compare by them, but it is
+    # still the same question when it is asked again word for word (B6: it was never caught).
+    if (spelled := _spelling(a)) and spelled == _spelling(b):
+        return True
     left, right = words(a), words(b)
     if len(left) < MIN_WORDS or len(right) < MIN_WORDS:
         return False

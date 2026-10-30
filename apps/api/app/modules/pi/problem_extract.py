@@ -39,7 +39,11 @@ business problems in it, in the exact shape asked for. Rules:
   user_words, and when it is a separate pain make it a second problem. Never drop it because the
   first problem is already noted.
 - category and subtype: choose from the list given; leave subtype empty if none fits.
-- where, of_total, frequency, impact_types, money_text: only what they said; otherwise empty.
+- where, of_total, frequency, frequency_text, since_text, impact_types, money_text: only what they
+  said, in their words; otherwise empty, never a guess. since_text is when it began ("since March",
+  "pichle 2 mahine se"); money_text is the amount with its number ("4,000 rupees a day");
+  of_total is "2 of 4 shops"; frequency_text is how often ("every day"); impact_types are chosen
+  from lost_sales, lost_money, lost_time, customer_dissatisfaction, stress, other.
 - Never write a person's name; use roles. Do not repeat a problem already noted.
 Return the list of problems as the field "found"."""
 
@@ -57,6 +61,13 @@ class SimpleNote(BaseModel):
     subtype: str = ""
     where: list[str] = Field(default_factory=list)
     frequency: str = ""
+    # what the owner said about how many, how often, since when and how much it costs: carried to
+    # the problem record so it is not listed as missing and asked for again (B6)
+    of_total: str = ""
+    frequency_text: str = ""
+    since_text: str = ""
+    money_text: str = ""
+    impact_types: list[str] = Field(default_factory=list)
 
     def to_note(self) -> ProblemNote:
         return ProblemNote(**self.model_dump())

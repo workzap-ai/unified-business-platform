@@ -123,7 +123,11 @@ Change a guard, change its row in `rule_index.json` (code and tests), run `pytes
 | alreadyAnswered at fact level (a count, a duration, a frequency), opt-in by `response_rules.brain.fact_ask` | `reply_gates.fact_already_given`, `part18_problem` | built, off by default, not measured with a real model |
 | B1 no list item dropped: a bulleted, numbered or multi-line list is cut into items and each must be in a note of this turn or an earlier one; a dropped item goes back in the one rewrite. Opt-in by `response_rules.brain.list_guard` | `list_items.guard`, wired in `service_conversation.py` | built, off by default, scripted turn tested only (`test_pi_list_guard_flow.py`) |
 | the opt-in flags `idea_link`, `fact_ask`, `list_guard` are accepted by the settings API as booleans (before this they were refused, so they could not be turned on) | `policy.validate_section` | done (`test_pi_opt_in_flags.py`) |
-| alreadyAnswered for profile and map nodes the owner stated but pi never asked about; replays G54/G55 | | open |
+| B6 S1: a problem noted by the separate extractor survives a rewrite of the reply (before, the rewrite replaced the whole turn and the note was never saved) | `service_conversation.py` (`extracted_ops`) | done (`test_pi_extract_survives_rewrite.py`) |
+| B6 S2: the extractor note carries since, money, how many, how often and impact, so `missing` no longer lists what the owner said | `problem_extract.SimpleNote`, its prompt | done (`test_pi_extract_facts.py`, `test_pi_extract_gaps.py`) |
+| B6 S3: a short question asked again (under three content words) is the same question | `slots.same_question` | done (`test_pi_slots_short_questions.py`) |
+| B6 S4 to S6: closed slots and asked facts are not carried into a new conversation; facts outside the 10 memory keys have no store; the 20-message window; `fact_ask` ignores problem records and memory | | open, root causes in `pi-b6-root-causes.md`, needs owner approval |
+| alreadyAnswered for map nodes the owner stated but pi never asked about; replays G54/G55 | | open |
 
 ## Red-team round 2 (2026-10-30)
 
