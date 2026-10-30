@@ -1173,3 +1173,12 @@ def test_a_capitalised_unlisted_word_before_a_reporting_verb_is_replaced_a_state
 def test_given_names_that_are_on_no_list_are_replaced_where_a_pattern_fits(text):
     out = third_party.protect(text)
     assert out.startswith("someone ") and out != text, out  # also a loss when it is a common word
+
+
+def test_the_documented_limits_of_the_third_party_text_are_pinned():
+    """third_party.py states these as limits: a lower-case 'api' after a brand loses the brand, and
+    in Arabic and Urdu script (no capitals) an unlisted word after a reporting verb is replaced."""
+    assert third_party.protect("Twilio api") == "api"
+    assert third_party.protect("\u0642\u0627\u0644 \u0646\u0639\u0645") == (
+        "\u0642\u0627\u0644 \u0634\u062e\u0635"
+    )

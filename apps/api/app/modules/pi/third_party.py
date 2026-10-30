@@ -22,7 +22,12 @@ It is NOT a privacy boundary. Honest limits, in both directions:
   (mom, dad, brother, boss, friend, agent, tailor, rider, courier, cashier ...), places, well-known
   brands and technical words; a role or relative that is not in them is treated as a name
   ("Plumber said" is kept only because plumber is listed; "Glazier said" is not). All-capital
-  words (API, SB) are never read as an honorific.
+  words (API, SB) are never read as an honorific; a lower-case "api" after a brand is, so
+  "Twilio api" becomes "api" (the brand is lost).
+* Arabic and Urdu script have no capital letters, so the "capitalised word" test cannot apply:
+  any word of 2 to 15 letters that is not on a stop list, standing after a reporting verb or before
+  "نے", is replaced ("قال نعم" becomes "قال شخص"), and a role that is not listed (a spelling
+  variant such as "کورئیر") is dropped like a name. Real content can be lost in those scripts.
 * Words that are also given names. On a list, so a real name survives where a pattern fits (a
   false negative): Salam, Kal, Malik, Abu, Ami, Mai (and Beta, Dada, Nana, Ji, Good, Now). On no
   list, so they are replaced where a pattern fits (the intended effect for a name, a loss when it
