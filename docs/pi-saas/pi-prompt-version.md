@@ -19,13 +19,26 @@ is hashed **by default**; it can leave the hash only by being named on `NON_PROM
 
 ## The allowlist is checked by AST, not by a text search
 
-Every allowlisted module must pass an AST check in `test_pi_prompt_version_coverage.py`: no import from
-`app.ai`, no reference to `Message`, `LLMManager`, `build_llm_manager`, `Gateway` or `route_message` (aliased or
-not), no call to `.system`, `.complete`, `.chat`, `.structured`, `generate_structured` or
-`complete_with_images`, and no module-level string constant over 80 characters (one named exception:
-`drift_check._LISTEN_ONLY`, a detector regex). The first version of this guard was a text search and let six
-modules through: `brain_doc_routes.py`, `config_routes.py`, `brain_visual_routes.py`, `read_routes.py` and
-`learning_audit.py` are now hashed instead. An empty or stale allowlist entry fails the test.
+Every allowlisted module must pass an AST check in `test_pi_prompt_version_coverage.py`:
+
+- no import from `app.ai` in any form: `import app.ai...`, `from app.ai... import`, `from app import ai`, a
+  relative import of `ai`, `app.ai.<x>` attribute use, or a string naming `app.ai` (a dynamic import);
+- no reference to `Message`, `LLMManager`, `build_llm_manager`, `Gateway` or `route_message` (aliased or not);
+- no call to `.system`, `.complete`, `.chat`, `.structured`, `.stream`, `.generate`, `.generate_structured`,
+  `.complete_with_images`, `.run`, `.invoke`, `.ask`, `.respond` or `.embed`;
+- no string or f-string text over 80 characters anywhere (functions, classes and returns included; docstrings
+  excluded; one named exception: `drift_check._LISTEN_ONLY`, a detector regex).
+
+Running the guard on the real allowlist moved two more modules into the hash: `routes.py` (it calls
+`request.stream()`, an HTTP body read, which the new `.stream` rule flags) and `brain_erase_routes.py` (a long
+text). Earlier rounds moved `brain_doc_routes.py`, `config_routes.py`, `brain_visual_routes.py`, `read_routes.py`
+and `learning_audit.py`. An empty or stale allowlist entry fails the test.
+
+**The guard is direct-only.** It sees an import, a reference, a call or a long text written in that module's own
+source. A model reached through an object passed in as an argument, through another module's helper, or through a
+name built at run time is not seen. A second test fails when a prompt-like data file (`.txt`, `.md`, `.jinja`,
+`.j2`, `.yaml`, `.yml`, `.tmpl`, `.prompt`) appears under `app/modules/pi`, because only `.py` sources, the pack
+JSON and the handbook JSON are hashed (the one existing file is the font licence `fonts/OFL.txt`).
 
 ## What an edit costs (intended, tolerated, and not once-only)
 
@@ -50,7 +63,8 @@ not an error. Stored audit rows are never rewritten.
 ## An incomplete digest is marked, not constant
 
 If a file cannot be read, or the source set is too small to be real (fewer than `MIN_HASHED_MODULES` = 100
-modules, or `service_conversation.py` / `runtime.py` missing: an empty or frozen folder), the version starts with
+modules, or `service_conversation.py` / `runtime.py` missing: an empty or frozen folder; or the packs folder is
+empty, missing or holds no `industry/*.json` pack, `MIN_PACK_FILES` = 1), the version starts with
 `!` (for example `!3fa91c0b27d`), a warning is logged once (a count or a label, never a path or content), and the
 result is not cached, so the next call retries.
 

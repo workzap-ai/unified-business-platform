@@ -24,8 +24,8 @@ is stamped with the new version, so a quiet workspace keeps it until its next re
 release that touches a hashed module triggers both. Not covered: behaviour driven by data outside
 these files (database settings, learned lessons and examples; the operator guidance only through its
 own optional hash). A digest that is incomplete (an unreadable file, an empty or frozen
-folder) makes the version start with "!" instead of being a silent constant. See
-docs/pi-saas/pi-prompt-version.md.
+folder, a packs folder without an industry pack) makes the version start with "!" instead
+of being a silent constant. See docs/pi-saas/pi-prompt-version.md.
 """
 
 import hashlib
@@ -73,6 +73,8 @@ EXTERNAL_PROMPT_MODULES: tuple[str, ...] = (
 # A source set smaller than this, or without these modules, is a wrong folder or a frozen build, not
 # a real set: the version is then marked incomplete and not cached.
 MIN_HASHED_MODULES = 100
+# A packs folder without an industry pack is a wrong or frozen folder, not a real one.
+MIN_PACK_FILES = 1
 REQUIRED_MODULES: tuple[str, ...] = ("service_conversation.py", "runtime.py")
 
 _R_MODELS = "SQLAlchemy table definitions: the shape of stored data, no text sent to a model"
@@ -91,10 +93,10 @@ NON_PROMPT_MODULES: dict[str, str] = {
     ),
     **dict.fromkeys(
         (
-            "brain_erase_routes.py brain_health_routes.py "
+            "brain_health_routes.py "
             "brain_learning_routes.py brain_moderation_routes.py "
             "business_profile_routes.py inbox_routes.py kapso_routes.py "
-            "open_items_routes.py routes.py solution_routes.py "
+            "open_items_routes.py solution_routes.py "
             "staff_review_routes.py"
         ).split(),
         _R_ROUTES,
@@ -206,7 +208,14 @@ def _packs_digest(root: str) -> tuple[str, bool]:
     def build() -> tuple[str, bool]:
         base = Path(root)
         items = [(p.relative_to(base).as_posix(), p) for p in base.rglob("*.json")]
-        return _hash_files(items)
+        digest, complete = _hash_files(items)
+        industry = [label for label, _ in items if label.startswith("industry/")]
+        if len(industry) < MIN_PACK_FILES:
+            if "packs" not in _WARNED:
+                _WARNED.add("packs")
+                logger.warning("pi_prompt_version_packs_incomplete %d", len(industry))
+            complete = False
+        return digest, complete
 
     return _cached("packs", root, build)
 
@@ -322,8 +331,8 @@ async def operator_guidance_of(session: AsyncSession, scope: WorkspaceScope) -> 
                     )
                 )
             )
-    except Exception:  # noqa: BLE001 - the audit is an extra, never a reason to lose it
-        logger.warning("pi_reply_audit_guidance_unread", exc_info=True)
+    except Exception as exc:  # noqa: BLE001 - the audit is an extra, never a reason to lose it
+        logger.warning("pi_reply_audit_guidance_unread %s", type(exc).__name__)
         return None
     return str(getattr(version, "instructions", "") or "")
 

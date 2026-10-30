@@ -5,8 +5,9 @@ FT-D3; platform spec A.2 #8).
 Design: a list of constants can never be complete, so the whole source of every module under
 app/modules/pi is hashed (evalkit excluded) unless the module is named on
 `learning_audit.NON_PROMPT_MODULES` with a reason. A new module is hashed by default. An allowlisted
-module is checked by AST: it may not import from app.ai, reference a model client or gateway, call a
-model method or hold a module-level string constant over 80 characters. Any edit to a hashed module,
+module is checked by AST (direct use only): it may not import from app.ai in any form, reference a
+model client or gateway, call a model method or hold a string or f-string over 80 characters
+anywhere. Any edit to a hashed module,
 a comment included, changes the version (docs/pi-saas/pi-prompt-version.md). An empty or frozen
 source folder gives a version starting with "!", never a silent constant.
 
@@ -38,6 +39,9 @@ from app.modules.pi import drift_check, learning_audit
 API_ROOT = Path(__file__).resolve().parents[2]
 
 # The AST guard for an allowlisted module (a module that leaves the hash must not reach a model).
+# It is DIRECT-ONLY: it sees an import, a reference, a call or a long text written in that module's
+# own source. A model reached through an object passed in as an argument, through another module's
+# helper, or through a name built at run time is not seen.
 FORBIDDEN_NAMES = {"Message", "LLMManager", "build_llm_manager", "Gateway", "route_message"}
 FORBIDDEN_CALLS = {
     "system",
@@ -47,9 +51,13 @@ FORBIDDEN_CALLS = {
     "generate_structured",
     "complete_with_images",
 }
-LONG_CONSTANT = 80  # characters of one module-level string before it counts as prompt-like text
-# A legitimate long module-level constant in an allowlisted module: (module, name) -> reason.
-ALLOWED_LONG_CONSTANTS = {
+# More model-method names. Checked against the real allowlist: `stream` tripped routes.py
+# (`request.stream()`, an HTTP body read); that module is hashed instead of allowlisted.
+EXTRA_CALL_CANDIDATES = ("stream", "generate", "run", "invoke", "ask", "respond", "embed")
+FORBIDDEN_CALLS = FORBIDDEN_CALLS | set(EXTRA_CALL_CANDIDATES)
+LONG_TEXT = 80  # characters of one string (or f-string text) anywhere before it counts as a prompt
+# A legitimate long text in an allowlisted module: (module, module-level name) -> reason.
+ALLOWED_LONG_TEXT = {
     (
         "drift_check.py",
         "_LISTEN_ONLY",
@@ -57,15 +65,47 @@ ALLOWED_LONG_CONSTANTS = {
 }
 
 
-def model_access_findings(source: str, label: str = "") -> list[str]:
-    """Why this source may not be allowlisted: an import from app.ai, a model client, gateway or
-    router name (aliased or not), a model-method call, or a long module-level text constant."""
+def _docstring_ids(tree: ast.AST) -> set[int]:
+    ids: set[int] = set()
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Module | ast.ClassDef | ast.FunctionDef | ast.AsyncFunctionDef):
+            first = node.body[0] if node.body else None
+            if (
+                isinstance(first, ast.Expr)
+                and isinstance(first.value, ast.Constant)
+                and isinstance(first.value.value, str)
+            ):
+                ids.add(id(first.value))
+    return ids
+
+
+def model_access_findings(source: str, label: str = "", calls: set[str] | None = None) -> list[str]:
+    """Why this source may not be allowlisted (direct use only): an import from app.ai in any form
+    (absolute, `from app import ai`, relative, `app.ai.x` attribute use, a string naming app.ai), a
+    model client, gateway or router name (aliased or not), a model-method call, or any string or
+    f-string text over LONG_TEXT characters anywhere (docstrings and the named exception aside)."""
+    forbidden_calls = FORBIDDEN_CALLS if calls is None else calls
     tree = ast.parse(source)
     found: set[str] = set()
+    skip = _docstring_ids(tree)
+    for node in tree.body:  # the named long-text exceptions are module-level assignments
+        if isinstance(node, ast.Assign | ast.AnnAssign) and node.value is not None:
+            target = node.targets[0] if isinstance(node, ast.Assign) else node.target
+            if (label, getattr(target, "id", "?")) in ALLOWED_LONG_TEXT:
+                skip.update(id(sub) for sub in ast.walk(node.value))
     for node in ast.walk(tree):
         if isinstance(node, ast.ImportFrom):
-            if (node.module or "").split(".")[:2] == ["app", "ai"]:
-                found.add(f"import from {node.module}")
+            module = node.module or ""
+            if node.level == 0:
+                if module.split(".")[:2] == ["app", "ai"]:
+                    found.add(f"import from {module}")
+                if module == "app" and any(a.name == "ai" for a in node.names):
+                    found.add("from app import ai")
+            else:
+                if module.split(".")[0] == "ai" or (
+                    module == "" and any(a.name == "ai" for a in node.names)
+                ):
+                    found.add("relative import of ai")
             found.update(f"imports {a.name}" for a in node.names if a.name in FORBIDDEN_NAMES)
         elif isinstance(node, ast.Import):
             found.update(
@@ -73,28 +113,32 @@ def model_access_findings(source: str, label: str = "") -> list[str]:
             )
         elif isinstance(node, ast.Name) and node.id in FORBIDDEN_NAMES:
             found.add(f"name {node.id}")
-        elif isinstance(node, ast.Attribute) and node.attr in FORBIDDEN_NAMES:
-            found.add(f"attribute {node.attr}")
+        elif isinstance(node, ast.Attribute):
+            if node.attr in FORBIDDEN_NAMES:
+                found.add(f"attribute {node.attr}")
+            if node.attr == "ai" and isinstance(node.value, ast.Name) and node.value.id == "app":
+                found.add("app.ai attribute use")
         if (
             isinstance(node, ast.Call)
             and isinstance(node.func, ast.Attribute)
-            and node.func.attr in FORBIDDEN_CALLS
+            and node.func.attr in forbidden_calls
         ):
             found.add(f"call .{node.func.attr}()")
-    for node in tree.body:
-        if isinstance(node, ast.Assign | ast.AnnAssign) and node.value is not None:
-            target = node.targets[0] if isinstance(node, ast.Assign) else node.target
-            name = getattr(target, "id", "?")
-            if (label, name) in ALLOWED_LONG_CONSTANTS:
-                continue
-            for sub in ast.walk(node.value):
-                if (
-                    isinstance(sub, ast.Constant)
-                    and isinstance(sub.value, str)
-                    and len(sub.value) > LONG_CONSTANT
-                ):
-                    found.add(f"long constant {name}")
-                    break
+        if id(node) in skip:
+            continue
+        if isinstance(node, ast.Constant) and isinstance(node.value, str):
+            if node.value.startswith("app.ai"):
+                found.add("a string naming app.ai (dynamic import)")
+            if len(node.value) > LONG_TEXT:
+                found.add(f"long text (line {node.lineno})")
+        elif isinstance(node, ast.JoinedStr):
+            literal = sum(
+                len(v.value)
+                for v in node.values
+                if isinstance(v, ast.Constant) and isinstance(v.value, str)
+            )
+            if literal > LONG_TEXT:
+                found.add(f"long f-string (line {node.lineno})")
     return sorted(found)
 
 
@@ -170,6 +214,7 @@ def test_the_allowlist_entries_exist_have_a_reason_and_the_core_modules_stay_has
     assert len(hashed) >= learning_audit.MIN_HASHED_MODULES
     assert "service_conversation.py" in hashed and "tools/handlers.py" in hashed
     assert "learning_audit.py" in hashed and "config_routes.py" in hashed
+    assert "routes.py" in hashed and "brain_erase_routes.py" in hashed  # tripped the AST guard
     assert not [k for k in every if k.startswith("evalkit/")]
 
 
@@ -245,7 +290,7 @@ def test_an_empty_source_folder_gives_a_marked_version_logged_once_and_never_cac
 ):
     with tempfile.TemporaryDirectory() as tmp:
         root = Path(tmp)
-        packs = _tree(Path(tmp) / "packs", {"a.json": b"{}"})
+        packs = _tree(Path(tmp) / "packs", {"industry/a.json": b"{}"})
         monkeypatch.setattr(learning_audit, "PI_ROOT", root)
         monkeypatch.setattr(learning_audit, "PACKS_ROOT", packs)
         learning_audit.clear_prompt_cache()
@@ -571,7 +616,8 @@ def test_the_guidance_read_returns_none_when_it_fails(caplog):
     with caplog.at_level(logging.WARNING, logger=learning_audit.logger.name):
         result = asyncio.run(learning_audit.operator_guidance_of(session, scope))
     assert result is None  # unreadable is None; none written is ""
-    assert "pi_reply_audit_guidance_unread" in caplog.text
+    assert "pi_reply_audit_guidance_unread RuntimeError" in caplog.text  # the error type only
+    assert "database down" not in caplog.text and "Traceback" not in caplog.text
 
 
 def test_the_version_takes_no_message_or_customer_input():
@@ -753,3 +799,119 @@ def test_the_same_inputs_give_the_same_version_in_two_fresh_processes():
     assert first == second
     assert first[0] == learning_audit.prompt_version()
     assert first[1] == learning_audit.prompt_version("Be warm.")
+
+
+# ---- the AST guard: more ways round it, and plain modules that must pass ------------------------
+
+
+@pytest.mark.parametrize(
+    "source",
+    [
+        "from app import ai\n",
+        "import app\nclient = app.ai.manager\n",
+        "from .ai import manager\n",
+        "from ..ai.manager import build\n",
+        "from . import ai\n",
+        "import importlib\nmodule = importlib.import_module('app.ai.manager')\n",
+        "def f():\n    return '" + "z" * 100 + "'\n",  # a long text inside a function
+        "def f(x):\n    return f'" + "a" * 100 + "{x}'\n",  # a long f-string
+        "class C:\n    note = '" + "b" * 100 + "'\n",  # a long text in a class body
+        "def f(m):\n    return m.stream(1)\n",
+        "def f(m):\n    return m.generate(1)\n",
+        "def f(m):\n    return m.run(1)\n",
+        "def f(m):\n    return m.invoke(1)\n",
+        "def f(m):\n    return m.ask(1)\n",
+        "def f(m):\n    return m.respond(1)\n",
+        "def f(m):\n    return m.embed(1)\n",
+    ],
+)
+def test_the_ast_guard_flags_the_further_bypasses(source):
+    assert model_access_findings(source)
+
+
+@pytest.mark.parametrize(
+    "source",
+    [
+        "def f():\n    '''" + "d" * 120 + "'''\n    return 1\n",  # a long docstring
+        "'''" + "m" * 120 + "'''\nX = 1\n",  # a long module docstring
+        "class C:\n    '''" + "c" * 120 + "'''\n    x = 1\n",
+        "def f(x):\n    return f'short {x} text'\n",
+        "import os\n\n\ndef f(path):\n    return os.path.join(path, 'a')\n",
+    ],
+)
+def test_the_ast_guard_passes_docstrings_and_short_text(source):
+    assert model_access_findings(source) == []
+
+
+def test_the_named_long_text_exception_applies_only_to_that_module_and_name():
+    source = "_LISTEN_ONLY = '" + "r" * 120 + "'\n"
+    assert model_access_findings(source, "drift_check.py") == []
+    assert model_access_findings(source, "other.py")
+    assert model_access_findings(source.replace("_LISTEN_ONLY", "_OTHER"), "drift_check.py")
+    leaking = source + "def f():\n    return '" + "s" * 100 + "'\n"
+    assert model_access_findings(leaking, "drift_check.py")  # the exception is not a blanket
+
+
+def test_the_extra_model_method_names_are_in_force_and_the_real_allowlist_is_clean():
+    assert set(EXTRA_CALL_CANDIDATES) <= FORBIDDEN_CALLS
+    offenders = allowlist_offenders(
+        learning_audit.all_module_files(), learning_audit.NON_PROMPT_MODULES
+    )
+    assert not offenders, offenders
+
+
+# ---- an empty or missing packs folder is marked like a short source set ------------------------
+
+
+def test_an_empty_or_missing_packs_folder_is_marked_logged_once_and_never_cached(
+    monkeypatch, caplog
+):
+    with tempfile.TemporaryDirectory() as tmp:
+        empty = Path(tmp) / "empty"
+        empty.mkdir()
+        missing = Path(tmp) / "missing"
+        for label, packs in (("empty", empty), ("missing", missing)):
+            caplog.clear()
+            monkeypatch.setattr(learning_audit, "PACKS_ROOT", packs)
+            learning_audit.clear_prompt_cache()
+            with caplog.at_level(logging.WARNING, logger=learning_audit.logger.name):
+                first = learning_audit.prompt_version()
+                second = learning_audit.prompt_version()
+            assert first == second and first.startswith("!") and len(first) == 12, label
+            assert caplog.text.count("pi_prompt_version_packs_incomplete") == 1, label
+        _tree(empty, {"industry/a.json": b"{}"})
+        monkeypatch.setattr(learning_audit, "PACKS_ROOT", empty)
+        assert not learning_audit.prompt_version().startswith("!")  # retried, not cached
+
+
+def test_a_packs_folder_without_an_industry_pack_is_marked(monkeypatch):
+    with tempfile.TemporaryDirectory() as tmp:
+        packs = _tree(Path(tmp), {"library/x.json": b"{}"})
+        monkeypatch.setattr(learning_audit, "PACKS_ROOT", packs)
+        learning_audit.clear_prompt_cache()
+        assert learning_audit.prompt_version().startswith("!")
+        _tree(packs, {"industry/a.json": b"{}"})
+        assert not learning_audit.prompt_version().startswith("!")
+
+
+# ---- no new prompt-like data file can sit outside the hash --------------------------------------
+
+DATA_EXTENSIONS = {".txt", ".md", ".jinja", ".j2", ".yaml", ".yml", ".tmpl", ".prompt"}
+ALLOWED_DATA_FILES = {"fonts/OFL.txt": "the licence text of the bundled font, not a prompt"}
+
+
+def test_no_unhashed_prompt_like_data_file_appears_under_the_pi_folder():
+    """Only .py sources, packs/*.json and the handbook JSON are hashed; a text, markdown, template
+    or yaml file under the pi folder would reach the model (or not) without moving the version."""
+    root = learning_audit.PI_ROOT
+    found = sorted(
+        p.relative_to(root).as_posix()
+        for p in root.rglob("*")
+        if p.is_file()
+        and p.suffix.lower() in DATA_EXTENSIONS
+        and "__pycache__" not in p.parts
+        and "evalkit" not in p.relative_to(root).parts[:1]
+    )
+    unexplained = [f for f in found if f not in ALLOWED_DATA_FILES]
+    assert not unexplained, unexplained
+    assert not [f for f in ALLOWED_DATA_FILES if f not in found]  # no stale entry
