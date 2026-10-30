@@ -196,7 +196,8 @@ R1_QUOTE = re.compile(
     re.IGNORECASE,
 )
 R1_PRICE = re.compile(
-    r"\bkitna\s+(?:kharcha|kharch|lagega|lagay\s?ga|paisa|cost)\b(?!\s+(?:time|waqt|din|hafte|haftay|mahine|mahina|ghante|ghanta|ghantay|saal|sal|minute|minutes|mint|"
+    r"\bkitna\s+(?:kharcha|kharch|lagega|lagay\s?ga|paisa|cost)\b(?!\s+(?:\d+\s+)?(?:time|waqt|din|dinon|dino|hafte|haftay|hafton|haftoon|mahine|mahinay|mahinon|"
+    r"mahino|mahina|ghante|ghanta|ghantay|ghanton|saal|sal|saalon|minute|minutes|mint|"
     r"weeks?|months?|days?|hours?|years?)\b)"
     r"|\bkharcha\s+(?:kitna|hoga)\b"
     r"|\bkitne\s+(?:paise|rupay|rupees)\b|\bhow much (?:will|would|does|for)\b"
@@ -349,20 +350,27 @@ def statement_only(reply: str) -> str:
     lines: list[str] = []
     for line in (reply or "").splitlines():
         guarded, urls = protect_urls(line.strip())
-        parts = constitution._sentences(normalise_question_marks(guarded))
+        flat = protect_abbreviations(normalise_question_marks(guarded))
+        parts = constitution._sentences(flat)
         kept = [p for p in parts if p.strip() and not ends_in_question(p)]
         if kept:
-            lines.append(restore_urls(" ".join(kept), urls))
+            lines.append(restore_urls(restore_abbreviations(" ".join(kept)), urls))
     return "\n".join(lines).strip()
 
 
 # R-ASK-01 on the final text: what counts as a question mark and as the end of a question. A question
 # may be followed by a closing quote, a bracket, a WhatsApp bold or italic mark, or an emoji; a "?" in a
 # link is not a question; the full-width and double marks are question marks too.
-URL = re.compile(r"https?://\S+")
+URL = re.compile(r"https?://\S*[^\s?.!,;:)\]»]")
 QUESTION_MARK_VARIANTS = str.maketrans({"？": "?", "⁇": "?", "⁈": "?", "⁉": "?"})
-CLOSERS = re.compile(r"([?؟])([*_~\"'”’)\]»›]+)(?=\s|$)")
-TRAILING = re.compile(r"[\s*_~\"'”’)\]»›\U0001F000-\U0001FFFF☀-➿️]+$")
+CLOSERS = re.compile(r"([?؟.!۔।])([*_~\"'”’)\]»›]+)(?=\s|$)")
+SPLIT_AFTER = re.compile(
+    r"([?؟.!۔।])(?=[\U0001F000-\U0001FFFF\u2600-\u27bf\u200c-\u200f\u061c\ufe0f\u2066-\u2069])"
+)
+# a dot that is no sentence end: "e.g.", "Rs.", "Dr.", a list number ("1. Which one?")
+ABBREVIATION = re.compile(r"(?i:\b(?:e\.g|i\.e|vs|rs|mr|mrs|dr)\.)(?=\s)|(?<![\w.])\d+\.(?=\s)")
+DOT_LEADER = "\u2024"
+TRAILING = re.compile(r"[\s\u200c-\u200f\u061c*_~\"'”’)\]»›\U0001F000-\U0001FFFF☀-➿️]+$")
 
 
 def protect_urls(text: str) -> tuple[str, list[str]]:
@@ -383,7 +391,18 @@ def restore_urls(text: str, urls: list[str]) -> str:
 def normalise_question_marks(text: str) -> str:
     """Full-width and double question marks become "?", and a mark followed by a closing quote,
     bracket or bold mark moves outside it ("*Which one?*" -> "*Which one*?")."""
-    return CLOSERS.sub(lambda m: m.group(2) + m.group(1), text.translate(QUESTION_MARK_VARIANTS))
+    text = SPLIT_AFTER.sub(r"\1 ", text.translate(QUESTION_MARK_VARIANTS))
+    return CLOSERS.sub(lambda m: m.group(2) + m.group(1), text)
+
+
+def protect_abbreviations(text: str) -> str:
+    """The dot of an abbreviation or a list number becomes a dot leader, so no sentence split or
+    question count is made there; `restore_abbreviations` puts the dot back."""
+    return ABBREVIATION.sub(lambda m: m.group(0)[:-1] + DOT_LEADER, text)
+
+
+def restore_abbreviations(text: str) -> str:
+    return text.replace(DOT_LEADER, ".")
 
 
 def ends_in_question(text: str) -> bool:

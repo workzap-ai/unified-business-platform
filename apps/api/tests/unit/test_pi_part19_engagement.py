@@ -527,7 +527,9 @@ def test_the_pipeline_runs_the_final_check_after_the_last_append():
 
     source = inspect.getsource(sc)
     tail = source[source.rindex("openingGate pass") :]
-    assert "constitution.final_one_question(turn.reply)" in tail.split("return turn")[0]
+    before_return = tail.split("return turn")[0]
+    assert "constitution.final_one_question(" in before_return
+    assert 'keep=context.get("fixed_lines")' in before_return  # the fixed lines are protected
 
 
 def test_the_cost_lines_name_the_review_and_listening_lines_name_no_document():
@@ -596,3 +598,165 @@ def test_a_question_mark_in_a_link_is_not_a_question_and_is_never_rewritten():
     assert fixed.rstrip().endswith("?")
     bullets = f"Ideas:\n• see {link}\nWhich one? Or which other?"
     assert link in constitution.final_one_question(bullets)
+
+
+# --- fourth re-audit: marks glued to emoji, protected questions, abbreviations, links ----------------
+UNSPACED = [
+    "Is it A?😊 Is it B?",
+    "Is it A?\u200f Is it B?",
+    "هل هذا أ؟\u200fهل هذا ب؟",
+    "Is it A?\u200cIs it B?",
+    "Is it A?\u200dIs it B?",
+    "Is it A?😊Is it B?",
+    "*Noted.* Which one? Or which other?",
+    "Is it A？ Or B⁇ Or C?",
+]
+
+
+@pytest.mark.parametrize("text", UNSPACED)
+def test_the_final_text_never_keeps_more_than_one_question(text):
+    from app.modules.pi import constitution
+
+    final = constitution.final_one_question(text)
+    flat = part19.normalise_question_marks(part19.protect_urls(final)[0])
+    assert part19.question_count(flat) <= 1, final
+
+
+def test_a_question_sentence_that_discloses_the_ai_is_kept_as_a_statement():
+    from app.modules.pi import constitution
+
+    final = constitution.final_one_question(
+        "I'm pi, an AI, what does your business do? Shall I make the quote?"
+    )
+    assert "I'm pi, an AI, what does your business do." in final
+    assert final.rstrip().endswith("Shall I make the quote?")
+    assert part19.question_count(final) == 1
+
+
+def test_a_refusal_or_a_safety_line_is_kept_as_a_statement_too():
+    from app.modules.pi import constitution
+
+    refusal = constitution.final_one_question(
+        "I never ask for a card number or a password, is that clear? What is your business?"
+    )
+    assert "I never ask for a card number or a password, is that clear." in refusal
+    assert refusal.rstrip().endswith("What is your business?")
+    safety = constitution.final_one_question(
+        "Please call the emergency number 1122 and an ambulance now, is anyone hurt? Which city?"
+    )
+    assert "is anyone hurt." in safety and safety.rstrip().endswith("Which city?")
+
+
+def test_a_fixed_line_given_to_the_check_is_kept():
+    from app.modules.pi import constitution
+
+    final = constitution.final_one_question(
+        "Your reference is A1, is that right? What next?", keep=["Your reference is A1"]
+    )
+    assert "Your reference is A1, is that right." in final
+    assert final.rstrip().endswith("What next?")
+
+
+@pytest.mark.parametrize(
+    ("text", "left"),
+    [
+        ("Is it e.g. a van?", ""),
+        ("Rs. 500 kitna?", ""),
+        ("1. Which one?", ""),
+        ("*Noted.* Which one?", "Noted"),
+        ("Noted.😊 Which one?", "Noted."),
+        ("Is this your site https://x.com?", ""),
+        ("Noted. Is it e.g. a van?", "Noted."),
+    ],
+)
+def test_statement_only_splits_only_at_real_sentence_ends(text, left):
+    kept = part19.statement_only(text)
+    assert kept.replace("*", "").startswith(left) and (left or not kept)
+    assert part19.question_count(part19.normalise_question_marks(part19.protect_urls(kept)[0])) == 0
+
+
+def test_a_url_ending_the_question_is_still_a_question_and_the_link_is_intact():
+    from app.modules.pi import constitution
+
+    text = "Is this your site https://x.com? Or this one https://y.com/a?b=1?"
+    final = constitution.final_one_question(text)
+    assert "https://y.com/a?b=1" in final
+    flat = part19.normalise_question_marks(part19.protect_urls(final)[0])
+    assert part19.question_count(flat) == 1
+
+
+@pytest.mark.parametrize(
+    "said",
+    [
+        "kitna lagega mahinay",
+        "kitna lagega mahinon",
+        "kitna lagega dinon",
+        "kitna lagega 2 din",
+        "kitna lagega 3 hafte",
+        "kitna lagega haftoon",
+        "kitna lagega ghanton",
+    ],
+)
+def test_more_duration_forms_are_not_a_price_ask(said):
+    assert part19.buying_signal(said, 1) is None
+
+
+# --- the protected sentences, in every language (owner's list for the fourth commit) ----------------
+PROTECTED = {
+    "disclosure": {
+        "en": (
+            "I am pi, an AI from Workzap, what does your business do?",
+            "Shall I make the quote?",
+        ),
+        "roman_ur": (
+            "Main pi hoon, Workzap ka AI, aap ka business kya karta hai?",
+            "Kya main quote bana doon?",
+        ),
+        "ar": ("أنا pi، ذكاء اصطناعي من Workzap، ما هو عملك؟", "هل أجهز عرض السعر؟"),
+    },
+    "refusal": {
+        "en": (
+            "I never ask for a card number or a password, is that clear?",
+            "What is your business?",
+        ),
+        "roman_ur": (
+            "Main kabhi card number ya password nahi poochhta, theek hai?",
+            "Aap ka business kya hai?",
+        ),
+        "ar": ("لا أطلب أبدًا رقم البطاقة أو كلمة المرور، هل هذا واضح؟", "ما هو عملك؟"),
+    },
+    "safety": {
+        "en": (
+            "Please call the emergency number 1122 and an ambulance now, is anyone hurt?",
+            "Which city are you in?",
+        ),
+        "roman_ur": (
+            "Foran 1122 par call karein aur ambulance bulayein, kya koi zakhmi hai?",
+            "Aap kis shehar mein hain?",
+        ),
+        "ar": ("اتصل بالإسعاف على الرقم 1122 فورًا، هل هناك مصاب؟", "في أي مدينة أنت؟"),
+    },
+}
+
+
+@pytest.mark.parametrize("language", ["en", "roman_ur", "ar"])
+@pytest.mark.parametrize("kind", ["disclosure", "refusal", "safety"])
+def test_a_protected_question_sentence_is_kept_when_a_later_question_follows(kind, language):
+    from app.modules.pi import constitution
+
+    protected, later = PROTECTED[kind][language]
+    final = constitution.final_one_question(f"{protected} {later}")
+    stem = protected[:-1]  # the sentence without its question mark
+    assert f"{stem}." in final, final  # kept, as a statement
+    assert final.rstrip().endswith(later), final  # the later question is the one question
+    assert part19.question_count(part19.normalise_question_marks(final)) == 1, final
+
+
+@pytest.mark.parametrize("language", ["en", "roman_ur", "ar"])
+def test_a_disclosure_question_after_the_offer_text_is_not_lost_either(language):
+    from app.modules.pi import constitution
+
+    protected, later = PROTECTED["disclosure"][language]
+    final = constitution.final_one_question(f"{protected}\n\n{later}\n\nAnd one more? Really?")
+    assert f"{protected[:-1]}." in final
+    assert part19.question_count(part19.normalise_question_marks(final)) <= 1
