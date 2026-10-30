@@ -229,7 +229,9 @@ def test_two_mandatory_questions_both_become_statements(language):
 
 def test_a_mandatory_question_last_still_wins_over_an_earlier_ordinary_question():
     out = final("Which shop? I am pi, an AI from Workzap, what does your business do?")
-    assert "what does your business do." in out and questions(out) == 0 or questions(out) == 1
+    # the mandatory sentence wins: it is kept, as a statement; the ordinary question is the one left
+    assert "I am pi, an AI from Workzap, what does your business do." in out
+    assert out.rstrip().endswith("Which shop?") and questions(out) == 1
 
 
 def test_a_single_mandatory_question_is_left_exactly_as_it_is():
@@ -241,7 +243,7 @@ def test_a_single_mandatory_question_is_left_exactly_as_it_is():
 def test_urls_decimals_abbreviations_and_quotations_are_left_alone():
     text = (
         "The fee is 3.5 percent, see https://x.com/a?b=1&c=2 and e.g. Rs. 500. "
-        'He wrote "why does it fail? really?". Which one? Or this?'
+        'He wrote "why does it fail? really?" and left. Which one? Or this?'
     )
     out = final(text)
     assert "3.5 percent" in out and "https://x.com/a?b=1&c=2" in out
