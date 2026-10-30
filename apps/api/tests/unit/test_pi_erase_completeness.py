@@ -47,28 +47,9 @@ ALLOWED: dict[str, str] = {
 }
 
 # Real gaps: customer-held words or data that erase_customer does not remove. DO NOT add to
-# ALLOWED to make a test pass. Findings are numbered in the FT-E2b report (lane R).
+# ALLOWED to make a test pass. G1 to G10 are fixed in brain_erase.py (branch pi/u-erase-g1-g10);
+# G11 to G14 wait for the owner's retention decision (docs/pi-saas/pi-erase-gaps-g1-g14.md).
 KNOWN_GAPS: dict[str, str] = {
-    # TODO(FT-E2b finding G1): staff notes about the conversation (free text body)
-    "pi_conversation_notes": "body: staff free text about the customer",
-    # TODO(FT-E2b finding G2): staff tags on the conversation (label, 40 chars)
-    "pi_conversation_tags": "tag: staff label about the customer (low risk)",
-    # TODO(FT-E2b finding G3): tickets carry the customer's problem as subject and summary
-    "pi_tickets": "subject, summary: the customer's problem in words",
-    # TODO(FT-E2b finding G4): staff requests hold the owner's question and context summary
-    "pi_staff_requests": "question, context_summary, answer: the chat in words",
-    # TODO(FT-E2b finding G5): handoffs carry a summary of the chat and a resolution note
-    "pi_handoffs": "summary, resolution_note: the chat in words",
-    # TODO(FT-E2b finding G6): pending actions hold a JSON payload (draft order, details)
-    "pi_pending_actions": "payload, summary: what the customer asked pi to do",
-    # TODO(FT-E2b finding G7): bookings keep free-text notes
-    "pi_bookings": "notes: free text about the customer's booking",
-    # TODO(FT-E2b finding G8): tasks keep title, description and customer-visible status
-    "pi_tasks": "title, description, customer_visible_status: customer's request in words",
-    # TODO(FT-E2b finding G9): deal documents keep the sent message and the customer's response
-    "pi_documents": "message_text, response_note: words to and from the customer",
-    # TODO(FT-E2b finding G10): the portal share link stores the customer's phone number
-    "customer_share_links": "phone: the customer's phone number (plus the chat link)",
     # TODO(FT-E2b finding G11): CRM notes written about the customer
     "customer_notes": "body: staff free text about the customer",
     # TODO(FT-E2b finding G12): CRM activity lines about the customer
@@ -77,6 +58,19 @@ KNOWN_GAPS: dict[str, str] = {
     "customer_files": "data, name: documents and photos the customer sent",
     # TODO(FT-E2b finding G14): CRM leads keep requirements and notes the owner gave pi
     "sales_leads": "requirements, notes, title: what the owner said they need",
+}
+
+# G1 to G10 and the action the erase takes (spec: docs/pi-saas/pi-erase-gaps-g1-g14.md): rows with
+# no record value go, rows that are business records keep their shape and lose their words.
+DELETED_ROWS = {"pi_conversation_tags", "pi_pending_actions", "customer_share_links"}
+WORDS_BLANKED = {
+    "pi_conversation_notes",
+    "pi_tickets",
+    "pi_staff_requests",
+    "pi_handoffs",
+    "pi_bookings",
+    "pi_tasks",
+    "pi_documents",
 }
 
 
@@ -247,3 +241,31 @@ def test_the_lists_hold_only_real_uncovered_tables_with_reasons():
             )
             assert reason.strip() and "\n" not in reason
     assert not set(ALLOWED) & set(KNOWN_GAPS)
+
+
+def _targets(source: str, verb: str) -> set[str]:
+    """Class names that are the first argument of `verb(...)` in the source (a delete() or an
+    update() call)."""
+    found: set[str] = set()
+    for call in ast.walk(ast.parse(source)):
+        if (
+            isinstance(call, ast.Call)
+            and isinstance(call.func, ast.Name)
+            and call.func.id == verb
+            and call.args
+            and isinstance(call.args[0], ast.Name)
+        ):
+            found.add(call.args[0].id)
+    return found
+
+
+def test_g1_to_g10_are_fixed_by_the_documented_action():
+    tables, _ = current()
+    source = (PI / "brain_erase.py").read_text(encoding="utf-8")
+    deleted, updated = _targets(source, "delete"), _targets(source, "update")
+    for name in sorted(DELETED_ROWS):
+        assert tables[name][0] in deleted, f"{name}: rows of the customer must be deleted"
+    for name in sorted(WORDS_BLANKED):
+        assert tables[name][0] in updated, f"{name}: the words must be blanked, the row kept"
+        assert tables[name][0] not in deleted, f"{name}: the row must stay (counts, audit trail)"
+    assert not (DELETED_ROWS | WORDS_BLANKED) & set(KNOWN_GAPS)

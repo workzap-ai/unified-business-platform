@@ -15,10 +15,11 @@ contact record in the CRM, which the customer module owns. The result says what 
 (`kept`, `kept_reasons`), so staff can tell the person plainly.
 """
 
+from datetime import UTC, datetime
 from typing import Any
 from uuid import UUID
 
-from sqlalchemy import delete, or_, select, update
+from sqlalchemy import delete, func, or_, select, update
 from sqlalchemy.exc import ProgrammingError
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -28,7 +29,13 @@ from app.modules.pi.box_models import PiBoxTransition, PiMapVersion, PiOfferLog,
 from app.modules.pi.brain_docs_models import PiBrainDocument, PiBrainPayment
 from app.modules.pi.experience_models import PiExperience
 from app.modules.pi.learning_models import PiLearningExample
-from app.modules.pi.models import PiConversation, PiMemory, PiMessage
+from app.modules.pi.models import (
+    PiConversation,
+    PiHandoff,
+    PiMemory,
+    PiMessage,
+    PiPendingAction,
+)
 from app.modules.pi.open_item_models import PiOpenItem
 from app.modules.pi.problem_models import (
     PiProblem,
@@ -39,9 +46,21 @@ from app.modules.pi.problem_models import (
 from app.modules.pi.quarantine_models import PiQuarantine
 from app.modules.pi.solution_models import PiIdeaFeedback, PiSolutionMemory
 from app.modules.pi.think_models import PiHypothesis, PiMoveLog
+from app.modules.pi_customer.models import CustomerShareLink
+from app.modules.pi_saas.deal_models import PiDocument
+from app.modules.pi_saas.models import (
+    PiBooking,
+    PiConversationNote,
+    PiConversationTag,
+    PiStaffRequest,
+    PiTask,
+    PiTicket,
+)
 from app.shared.scope import WorkspaceScope
 
 ERASED = "[deleted at the customer's request]"
+# customer_share_links.phone is String(20): a marker, not a number (the column is not unique)
+PHONE_ERASED = "erased"
 
 
 def _n(result: Any) -> int:
@@ -67,6 +86,157 @@ async def _erase_conversation_extras(
                 )
         except ProgrammingError:
             pass
+    return out
+
+
+def _digits(value: str | None) -> str:
+    return "".join(ch for ch in value or "" if ch.isdigit())
+
+
+async def _erase_workspace_texts(
+    session: AsyncSession, scope: WorkspaceScope, customer_id: UUID, conversation_ids: list[UUID]
+) -> dict[str, int]:
+    """Gaps G1 to G9 (docs/pi-saas/pi-erase-gaps-g1-g14.md): staff notes, tags, tickets, staff
+    requests, handoffs, pending drafts, bookings, tasks and deal documents. Rows that carry no
+    record value go (tags, pending drafts); the others keep their row so counts, SLAs and audit
+    trails still add up, and lose the customer's words, the same shape as the messages. Quotes,
+    invoices and payments are not touched, and neither is a Knowledge document made from a staff
+    answer."""
+
+    def mine(model: Any) -> tuple[Any, ...]:
+        return (
+            model.tenant_id == scope.tenant_id,
+            model.environment_id == scope.environment_id,
+        )
+
+    def of_customer(model: Any) -> Any:
+        return or_(model.customer_id == customer_id, model.conversation_id.in_(conversation_ids))
+
+    steps = (
+        (
+            "conversation_notes_cleared",
+            update(PiConversationNote)
+            .where(
+                *mine(PiConversationNote), PiConversationNote.conversation_id.in_(conversation_ids)
+            )
+            .values(body=ERASED),
+        ),
+        (
+            "conversation_tags",
+            delete(PiConversationTag).where(
+                *mine(PiConversationTag), PiConversationTag.conversation_id.in_(conversation_ids)
+            ),
+        ),
+        (
+            "tickets_cleared",
+            update(PiTicket)
+            .where(*mine(PiTicket), of_customer(PiTicket))
+            .values(subject=ERASED, summary=""),
+        ),
+        (
+            "staff_requests_cleared",
+            update(PiStaffRequest)
+            .where(*mine(PiStaffRequest), PiStaffRequest.customer_id == customer_id)
+            .values(question=ERASED, context_summary="", answer=None),
+        ),
+        (
+            "handoffs_cleared",
+            update(PiHandoff)
+            .where(*mine(PiHandoff), PiHandoff.customer_id == customer_id)
+            .values(summary="", resolution_note=""),
+        ),
+        (
+            "pending_actions",
+            delete(PiPendingAction).where(
+                *mine(PiPendingAction), PiPendingAction.conversation_id.in_(conversation_ids)
+            ),
+        ),
+        (
+            "bookings_cleared",
+            update(PiBooking).where(*mine(PiBooking), of_customer(PiBooking)).values(notes=""),
+        ),
+        (
+            "tasks_cleared",
+            update(PiTask)
+            .where(*mine(PiTask), of_customer(PiTask))
+            .values(title=ERASED, description="", customer_visible_status=""),
+        ),
+        (
+            "documents_text_cleared",
+            update(PiDocument)
+            .where(*mine(PiDocument), of_customer(PiDocument))
+            .values(message_text="", response_note=""),
+        ),
+    )
+    out: dict[str, int] = {}
+    for key, statement in steps:
+        try:
+            async with session.begin_nested():
+                out[key] = _n(await session.execute(statement))
+        except ProgrammingError:
+            pass
+    return out
+
+
+async def _erase_share_links(
+    session: AsyncSession, scope: WorkspaceScope, customer_id: UUID, conversation_ids: list[UUID]
+) -> dict[str, int]:
+    """Gap G10: the portal share links keep the customer's phone number and have no workspace or
+    customer key. Links to the erased chats are deleted. A link to all of the customer's chats
+    spans other businesses too, so it is revoked and its phone removed instead (the customer can
+    make a new one): that ends sharing in the customer's other businesses as well, which is the
+    point."""
+
+    def mine(model: Any) -> tuple[Any, ...]:
+        return (
+            model.tenant_id == scope.tenant_id,
+            model.environment_id == scope.environment_id,
+        )
+
+    customer = await session.scalar(
+        select(Customer).where(*mine(Customer), Customer.id == customer_id)
+    )
+    numbers: set[str | None] = (
+        {customer.phone, customer.whatsapp_id} if customer is not None else set()
+    )
+    if conversation_ids:
+        numbers |= set(
+            await session.scalars(
+                select(PiConversation.contact_wa_id).where(
+                    *mine(PiConversation), PiConversation.id.in_(conversation_ids)
+                )
+            )
+        )
+    phones = {digits for digits in (_digits(number) for number in numbers) if digits}
+    out: dict[str, int] = {}
+    try:
+        async with session.begin_nested():
+            if conversation_ids:
+                out["share_links_deleted"] = _n(
+                    await session.execute(
+                        delete(CustomerShareLink).where(
+                            CustomerShareLink.conversation_id.in_(conversation_ids)
+                        )
+                    )
+                )
+            if phones:
+                out["share_links_revoked"] = _n(
+                    await session.execute(
+                        update(CustomerShareLink)
+                        .where(
+                            CustomerShareLink.conversation_id.is_(None),
+                            CustomerShareLink.phone.in_(phones),
+                        )
+                        .values(
+                            revoked_at=func.coalesce(
+                                CustomerShareLink.revoked_at, datetime.now(UTC)
+                            ),
+                            phone=PHONE_ERASED,
+                        )
+                    )
+                )
+    except ProgrammingError:
+        pass
     return out
 
 
@@ -269,6 +439,8 @@ async def erase_customer(
             )
         )
     removed.update(await _erase_map_and_boxes(session, scope, customer_id))
+    removed.update(await _erase_workspace_texts(session, scope, customer_id, conversation_ids))
+    removed.update(await _erase_share_links(session, scope, customer_id, conversation_ids))
     # the Business Profile (facts, page snapshots) is what the owner told pi about their business
     try:  # the profile tables arrive with migration 0050
         async with session.begin_nested():
@@ -311,6 +483,11 @@ async def erase_customer(
             "payments": "financial records the company must be able to show",
             "customer_contact": "the CRM contact record belongs to the customer module",
             "message_rows": "the rows stay so counts and audit trails add up; the words are gone",
+            "text_only_rows": (
+                "tickets, handoffs, staff requests, tasks, bookings, staff notes and deal "
+                "documents keep their rows for counts and audit trails; the customer's words "
+                "are gone"
+            ),
         },
         "conversations": len(conversation_ids),
     }
