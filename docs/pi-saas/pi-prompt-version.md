@@ -96,3 +96,6 @@ can be added to `EXTERNAL_PROMPT_MODULES` if the owner judges them in scope.
   compares it in that form; only the combined version normalises line endings.
 - The number of hashed files and the first-call time are printed by `test_report_the_hashed_file_count_and_the_first_call_time`
   (not asserted); the digest is cached per process afterwards.
+- Known guard gaps (re-audit advisories, not fixed): a prompt split into many short literals passes the long-text rule;
+  `import app as a; a.ai.x` and a bare-name call such as `run(m)` are not flagged; `MIN_PACK_FILES` is 1 against 211
+  packs; the data-file test lists only the extensions named above; `stamp_safely` still logs a traceback.
