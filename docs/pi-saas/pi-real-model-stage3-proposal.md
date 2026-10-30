@@ -64,10 +64,14 @@ HTTP error, malformed output or a different answering model, one result line per
 the key only in the environment, proxy and certificate variables ignored, no redirects. The Stage 1
 runner covers one call type only, so this is new code with its own tests.
 
-**Also required before approval, a measurement not an estimate:** the real assembled prompt size per
-step. A code comment (`problem_extract.py:7`) says the reply prompt is about 26,000 tokens; the
-static parts alone are 28 KB of text and the rest (history, packs, memory) varies. A dry run that
-renders the actual prompts with the scripted model and counts them replaces the assumptions below.
+**Prompt sizes now derived from the code** (2026-10-30, `pi-real-model-cost-verification.md` section 3,
+no prompt built, no database): the reply call sends a system text of 50,034 chars always (70,416 at most)
+and a context JSON of about 55,800 chars typically (about 102,700 at most), so about 26,800 input tokens
+typically (matching the "about 26,000 tokens" comment at `problem_extract.py:7`, not verified) and
+**86,618 at the worst-case rule** (2 characters per token plus 60). A measured dry run with the scripted
+model on the disposable database still replaces the remaining assumptions (unbounded context keys, judge
+candidates, diagnosis examples) and needs approval. The spend-guard design is in
+`pi-real-model-spend-guard-design.md`.
 
 ## 4. Datasets
 
@@ -82,35 +86,43 @@ ar 4, hi 0. Each result is reported per language with its n; a cell under 3 is "
 Held-out access uses `splits.held_out_access(log, who, why)`, once, no tuning afterwards, a re-run is a
 second access that needs approval.
 
-## 5. Calls, tokens and the hard budget cap
+## 5. Calls, tokens and the hard budget cap (PROPOSED, recomputed 2026-10-30 from the code sizes)
 
-Worst-case assumptions (per step, input at 2 characters per token on the stated size, plus the full
-`max_tokens`), all **assumed ceilings to be replaced by the measured values in section 3**:
+Worst-case rule per step: input at 2 characters per token plus 60 tokens, plus the full `max_tokens`;
+cost = (input x input rate + output max x output rate) / 1,000,000, cached discount ignored; prices as
+in section 2 (unchanged on re-verification). Sizes and arithmetic are in
+`pi-real-model-cost-verification.md` section 3.
 
-| Step | Model | Input tokens | Output max | Cost, worst |
+| Step | Model | Input tokens, worst | Output max | Cost, worst |
 |---|---|---|---|---|
 | extraction | `gpt-4o-mini` | 2,721 | 1,500 | USD 0.001308 |
-| reply, up to 3 attempts | `gpt-5.4-mini` | 52,000 (26,000 measured by comment, doubled) | 4,096 | 3 x USD 0.057432 = USD 0.172296 |
-| language rewrite | `gpt-5.4-mini` | 52,000 | 1,200 | USD 0.0444 |
-| expert diagnosis | `gpt-5.4-mini` | 40,000 (assumed) | 4,000 | USD 0.048 |
-| judge | `gpt-4o-mini` | 20,000 (assumed) | 1,500 | USD 0.0039 |
-| **one turn, worst** | | | | **USD 0.2699** |
+| reply, up to 3 attempts | `gpt-5.4-mini` | 86,618 | 4,096 | 3 x USD 0.0833955 = USD 0.2501865 |
+| language rewrite | `gpt-5.4-mini` | 2,560 (it sends only the reply) | 1,200 | USD 0.00732 |
+| expert diagnosis | `gpt-5.4-mini` | 25,690 | 4,000 | USD 0.0372675 |
+| judge | `gpt-4o-mini` | 7,207 | 1,500 | USD 0.001981 |
+| **one turn, worst, 7 logical calls** | | | | **USD 0.298063** (was 0.2699) |
 
-Per call = (input tokens x input rate + output tokens x output rate) / 1,000,000, cached discounts
-ignored. A typical turn (one reply attempt, no rewrite) is about USD 0.11 by the same arithmetic.
+A typical turn (one reply attempt, no rewrite) is about USD 0.033 (was 0.11). Two further paths exist in
+the code and were not counted before: the shape-fallback call (`service_conversation.py:5866-5896`,
+turn worst USD 0.5206015, 10 logical calls) and the default one-retry setting (`app/core/config.py:105`,
+up to double the HTTP attempts). The run therefore sets retries to 0 and failover off (see the spend-guard
+design); with that, one logical call is one HTTP attempt.
 
-| Variant | Conversations x turns | Worst case (turns x 0.2699) | Proposed hard cap | Calls, at most |
-|---|---|---|---|---|
-| Minimal | 6 x 3 = 18 turns | USD 4.86 | **USD 5.00** | 126 |
-| Lower | 10 x 4 = 40 turns | USD 10.80 | **USD 11.00** | 280 |
-| Full | 20 x 6 = 120 turns | USD 32.39 | USD 33.00 (not recommended first) | 840 |
+| Variant | Conversations x turns | Worst case (7 calls per turn) | Proposed hard cap | Calls, at most | Worst case with the shape fallback each attempt |
+|---|---|---|---|---|---|
+| Minimal | 6 x 3 = 18 turns | USD 5.3651 | **USD 5.50** (was 5.00) | 126 | USD 9.37, 180 calls |
+| Lower | 10 x 4 = 40 turns | USD 11.9225 | **USD 12.00** (was 11.00) | 280 | USD 20.82, 400 calls |
+| Full | 20 x 6 = 120 turns | USD 35.7676 | USD 36.00 (was 33.00; not recommended first) | 840 | USD 62.47, 1,200 calls |
 
-If the generator were `gpt-6-luna` the same turn costs about USD 0.026 worst case, but that measures a
-model production does not run. The cap is hard: the guard stops before a call that would pass it and
-spend is updated from the provider's `usage`; if the owner wants a smaller cap, conversations or turns
-are cut, never the cap raised. These caps are far above Stage 1 (USD 0.50) and need a deliberate yes. The
-earlier real-model sweeps charged the owner's auto-reload balance quickly (memory note 2026-10-26),
-which is why auto-reload must be off.
+The earlier caps are below the new worst case. Typical cost for the same variants is about USD 0.59, 1.31
+and 3.94. The owner chooses a cap at the worst-case bound (the run never stops early) or at a multiple of
+the typical cost (an unlucky run stops early and keeps its partial results). The cap is hard: the guard
+stops before a call that would pass it and spend is updated from the provider's `usage`; if the owner
+wants a smaller cap, conversations or turns are cut, never the cap raised. If the generator were
+`gpt-6-luna` the same turn costs a fraction, but that measures a model production does not run. These caps
+are far above Stage 1 (USD 0.50, the only approved cap) and need a deliberate yes. The earlier real-model
+sweeps charged the owner's auto-reload balance quickly (memory note 2026-10-26), which is why auto-reload
+must be off.
 
 ## 6. Key handling
 
@@ -158,8 +170,8 @@ labelled sample set for P-2; FT-02 integrated, so the replies tested are the rep
 1. Stages 1 and 2 reviewed.
 2. D5 thresholds, language scope and industry criteria approved.
 3. Generator and router model IDs chosen; availability checked by you; prices checked on the dashboard.
-4. Variant and hard cap chosen (minimal USD 5, lower USD 11, full USD 33), after the measured prompt
-   sizes replace the assumed ones and the arithmetic is redone.
+4. Variant and hard cap chosen (minimal USD 5.50, lower USD 12, full USD 36, from the recomputed worst
+   case), after a measured dry run replaces the remaining assumptions and the arithmetic is redone.
 5. The spend-guard code reviewed and merged by approval; tests show no call passes the cap.
 6. Held-out conversation cases written and sealed; access logged.
 7. Grader choice and the 85% labelling method reviewed.
