@@ -3,10 +3,10 @@ spec X5, ST12).
 
 Removed: the problems pi noted (with their revisions, links and groups), the problem map (every
 version), the Solution Boxes and their move history, the offer log, the Business Profile, pi's
-open items, the move log, pi's memory notes, the encrypted quarantine copies, the learning scores
-and examples from their chats, and the text of their messages and pi's replies (the rows stay so
-counts and audit trails still add up, but the words go). Question-arm statistics are bare counts
-with no personal data, so they stay.
+open items, the move log, the thinking step's hypotheses, pi's memory notes, the encrypted
+quarantine copies, the learning scores and examples from their chats, and the text of their
+messages and pi's replies (the rows stay so counts and audit trails still add up, but the words
+go). Question-arm statistics are bare counts with no personal data, so they stay.
 
 Cleared in place (gaps G1 to G9, docs/pi-saas/pi-erase-gaps-g1-g14.md on origin/main): staff notes,
 tickets, staff requests, handoffs, bookings, tasks and deal documents keep their row (counts, SLAs
@@ -26,7 +26,10 @@ contact record in the CRM, which the customer module owns. The result says what 
 
 Every step runs in its own savepoint. A step that cannot run (a table missing in this database) is
 named in removed["_skipped"] and logged, computed at the very end from every step, so a successful
-response never hides a step that did not erase.
+response never hides a step that did not erase. Only SQLSTATE 42P01 (undefined table) skips a step,
+and it is not specific to the step's own table: a missing table inside a guarded statement (for
+example pi_conversations in the share-link subquery) is reported as a skip of that step as well.
+Any other database error propagates and the request's transaction rolls back.
 """
 
 import logging
@@ -157,7 +160,9 @@ async def _run_steps(
     that creates it has not run in this database) skips a step: it is named and logged, never
     dropped silently, and the caller reports it. Any other error, including a ProgrammingError
     whose SQLSTATE is another code or cannot be read, propagates: the request's transaction rolls
-    back, nothing is committed and the caller sees a failure, never a partial erase."""
+    back, nothing is committed and the caller sees a failure, never a partial erase. 42P01 names
+    no table: a missing table inside a guarded statement (a subquery, say) is reported as a skip
+    of that step too."""
     counts = {key: 0 for key, _ in steps}
     skipped: list[str] = []
     for key, step in steps:

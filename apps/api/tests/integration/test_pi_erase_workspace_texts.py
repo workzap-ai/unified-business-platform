@@ -12,13 +12,15 @@ from datetime import UTC, datetime, timedelta
 from types import SimpleNamespace
 
 import pytest
-from sqlalchemy import func, select
+from sqlalchemy import func, select, text
 from sqlalchemy.exc import ProgrammingError
 from test_pi_isolation_core import two_chats
 
 from app.modules.customers.models import Customer
+from app.modules.pi import brain_erase
 from app.modules.pi.brain_erase import ERASED, erase_customer
 from app.modules.pi.models import PiConversation, PiHandoff, PiMessage, PiPendingAction
+from app.modules.pi.think_models import PiHypothesis
 from app.modules.pi_customer.models import CustomerShareLink
 from app.modules.pi_saas.deal_models import PiDocument
 from app.modules.pi_saas.models import (
@@ -55,6 +57,7 @@ async def seed_rows(db, conv, tag: str) -> SimpleNamespace:
                 **where, conversation_id=conv.id, author_label="staff", body=f"{WORDS} {tag}"
             ),
             PiConversationTag(**where, conversation_id=conv.id, tag=f"vip-{tag}"),
+            PiHypothesis(**where, conversation_id=conv.id, text=f"{WORDS} {tag}"),
             PiTicket(
                 **where,
                 customer_id=cid,
@@ -152,6 +155,9 @@ async def test_erasing_a_customer_clears_the_words_and_keeps_another_workspace(
     await db.flush()
     removed = result["removed"]
     assert removed["_skipped"] == []  # no step was skipped: success is never silent
+    # the thinking step's hypotheses: A's are removed and counted, B's survive
+    assert await count(db, PiHypothesis, tenant_id=ta) == 0 and removed["hypotheses"] >= 1
+    assert f"{WORDS} b" in await texts(db, PiHypothesis, tb, "text")
 
     # G2, G6: rows with no record value are deleted
     assert await count(db, PiConversationTag, tenant_id=ta) == 0
@@ -501,5 +507,63 @@ async def test_a_failing_step_rolls_every_earlier_step_back_with_the_request(
         )
     ]
     assert bodies and ERASED not in bodies
+    await w.a.close()
+    await w.b.close()
+
+
+async def test_a_real_undefined_table_skips_only_that_step_and_is_reported(
+    api, business_db, monkeypatch
+):
+    """The 42P01 path against a REAL database error: inside a savepoint a guarded table is renamed
+    (transactional DDL in Postgres), erase_customer runs, and the savepoint is rolled back in a
+    finally so the schema is restored whatever happens."""
+    db = business_db
+    w = await two_chats(api, db, monkeypatch)
+    await seed_rows(db, w.conv_a, "a")
+    ta, scope_a, cust_a = w.conv_a.tenant_id, w.scope_a, w.cust_a
+    savepoint = await db.begin_nested()
+    try:
+        await db.execute(
+            text("ALTER TABLE pi_conversation_tags RENAME TO pi_conversation_tags_tmp")
+        )
+        result = await erase_customer(db, scope_a, cust_a)
+        assert result["skipped"] == ["conversation_tags"] and result["complete"] is False
+        assert result["removed"]["_skipped"] == ["conversation_tags"]
+        assert result["removed"]["conversation_tags"] == 0
+        assert result["removed"]["tickets_cleared"] >= 1  # the other steps still ran
+        assert result["removed"]["pending_actions"] >= 1
+    finally:
+        await savepoint.rollback()  # restores the renamed table and undoes the erase
+    assert await count(db, PiConversationTag, tenant_id=ta) == 1  # the table is back
+    assert await texts(db, PiTicket, ta, "subject") == [f"{WORDS} a"]  # and the erase is undone
+    await w.a.close()
+    await w.b.close()
+
+
+async def test_a_real_undefined_column_makes_the_erase_raise_and_commits_nothing(
+    api, business_db, monkeypatch
+):
+    """A real 42703 (not 'undefined table') must NOT be skipped: erase_customer raises, so the
+    request's transaction would roll back. The column is renamed inside a savepoint that is always
+    rolled back, so the schema cannot stay altered."""
+    db = business_db
+    w = await two_chats(api, db, monkeypatch)
+    await seed_rows(db, w.conv_a, "a")
+    ta, scope_a, cust_a = w.conv_a.tenant_id, w.scope_a, w.cust_a
+    savepoint = await db.begin_nested()
+    try:
+        await db.execute(
+            text(
+                "ALTER TABLE pi_tasks RENAME COLUMN customer_visible_status "
+                "TO customer_visible_status_tmp"
+            )
+        )
+        with pytest.raises(ProgrammingError) as caught:
+            await erase_customer(db, scope_a, cust_a)
+        assert brain_erase._sqlstate(caught.value) == "42703"  # a real undefined column
+    finally:
+        await savepoint.rollback()
+    assert await texts(db, PiTicket, ta, "subject") == [f"{WORDS} a"]  # nothing was kept
+    assert await count(db, PiConversationTag, tenant_id=ta) == 1
     await w.a.close()
     await w.b.close()

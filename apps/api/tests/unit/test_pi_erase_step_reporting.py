@@ -258,21 +258,27 @@ def test_the_sqlstate_is_read_from_asyncpg_psycopg_and_a_chained_cause():
 
 
 @pytest.mark.parametrize(
-    "make",
+    ("make", "expected"),
     [
-        pytest.param(lambda sql: failure(sql, "42703"), id="undefined column"),
-        pytest.param(lambda sql: failure(sql, "42501"), id="permission denied"),
-        pytest.param(lambda sql: failure(sql, None), id="no readable sqlstate"),
-        pytest.param(lambda sql: IntegrityError(sql, {}, PgError("23503")), id="integrity"),
-        pytest.param(lambda sql: DataError(sql, {}, PgError("22001")), id="data"),
-        pytest.param(lambda sql: RuntimeError("boom"), id="any other exception"),
+        pytest.param(lambda sql: failure(sql, "42703"), ProgrammingError, id="undefined column"),
+        pytest.param(lambda sql: failure(sql, "42501"), ProgrammingError, id="permission denied"),
+        pytest.param(lambda sql: failure(sql, None), ProgrammingError, id="no readable sqlstate"),
+        pytest.param(
+            lambda sql: IntegrityError(sql, {}, PgError("23503")), IntegrityError, id="integrity"
+        ),
+        pytest.param(lambda sql: DataError(sql, {}, PgError("22001")), DataError, id="data"),
+        pytest.param(lambda sql: RuntimeError("boom"), RuntimeError, id="any other exception"),
     ],
 )
-async def test_any_other_error_propagates_so_nothing_is_committed(make):
-    session = WholeEraseSession(fail_on=("DELETE FROM pi_pending_actions",), raises=make)
-    with pytest.raises(Exception) as caught:
+async def test_any_other_error_propagates_so_nothing_is_committed(make, expected):
+    marker = "DELETE FROM pi_pending_actions"
+    session = WholeEraseSession(fail_on=(marker,), raises=make)
+    with pytest.raises(expected) as caught:
         await brain_erase.erase_customer(session, scope(), uuid4())
-    assert not isinstance(caught.value, AssertionError)
+    assert type(caught.value) is expected  # exactly this type: not wrapped, not swallowed
+    assert any(marker in sql for sql in session.statements)  # the failing step was reached
+    # and the erase stopped there: no later step ran
+    assert not any(sql.startswith("UPDATE pi_tasks") for sql in session.statements)
 
 
 async def test_a_step_runner_failure_that_is_not_a_missing_table_is_never_counted_as_skipped():
