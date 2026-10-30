@@ -21,7 +21,7 @@ EXTRACTION = replay.load_cases(str(EXTRACTION_PATH))
 # sha256 of extraction.json with CRLF folded to LF, taken before FT-A3 began: the file never changes
 EXTRACTION_SHA256 = "6b0f3cd6b6ed4851600e8bcb2082613b15b249b085389b89e41ef7a83befb570"
 VERDICTS = {"relevant", "irrelevant", "generic", "violates_constraint", "restates_owner"}
-KINDS = {"solution_relevance", "constraint_violation", "no_idea_valid"}
+KINDS = {"solution_relevance", "constraint_violation", "no_idea_valid", "borderline_relevance"}
 LANGUAGES = {"en", "roman_ur", "ur", "ar", "hi"}
 BUSINESS = {
     "booking": {"sports_clubs_academies_and_turf_court_rentals", "resorts_and_farmhouse_rentals"},
@@ -56,6 +56,8 @@ def split(case: dict) -> str:
     return splits.split_of(case)
 
 
+CORE = [c for c in PLAN if c["kind"] != "borderline_relevance"]
+BORDER = [c for c in PLAN if c["kind"] == "borderline_relevance"]
 HELD = [c for c in PLAN if split(c) == splits.HELD_OUT]
 OTHERS = [c for c in PLAN if split(c) != splits.HELD_OUT]
 
@@ -68,12 +70,12 @@ def texts(case: dict) -> list[str]:
     for problem in case["input"]["brief"]["problems"]:
         out += [problem["title"]]
         out += [c["text"] for c in problem["constraints"]]
-    out += [c["text"] for c in case["expected"]["candidates"] if c["verdict"] != "generic"]
+    out += [c["text"] for c in case["expected"]["candidates"] if c.get("verdict") != "generic"]
     return out
 
 
-def test_the_plan_file_has_thirty_cases() -> None:
-    assert isinstance(PLAN, list) and len(PLAN) == 30
+def test_the_plan_file_has_thirty_core_cases_and_twelve_borderline_cases() -> None:
+    assert isinstance(PLAN, list) and len(CORE) == 30 and len(BORDER) == 12
 
 
 def test_the_extraction_cases_are_untouched() -> None:
@@ -108,12 +110,14 @@ def test_every_expected_value_is_something_the_owner_said(case) -> None:
         for phrase in [*problem["figures"], *problem["user_words"]]:
             assert phrase.casefold() in said, f"{phrase!r} is not in the owner's message"
         for c in problem["constraints"]:
-            assert c["blocks"] and c["status"] in {"confirmed", "assumed"}
+            assert c["status"] in {"confirmed", "assumed"}
+            if case["kind"] != "borderline_relevance":
+                assert c["blocks"], "a core limit names the words that would break it"
             if c["status"] == "confirmed":
                 assert c["text"].casefold() in said, "a confirmed constraint must be stated"
 
 
-@pytest.mark.parametrize("case", PLAN, ids=lambda c: c["id"])
+@pytest.mark.parametrize("case", CORE, ids=lambda c: c["id"])
 def test_candidates_carry_allowed_verdicts_and_the_right_negative_controls(case) -> None:
     verdicts = [c["verdict"] for c in case["expected"]["candidates"]]
     assert verdicts and set(verdicts) <= VERDICTS
@@ -123,6 +127,28 @@ def test_candidates_carry_allowed_verdicts_and_the_right_negative_controls(case)
     assert "relevant" in verdicts and set(verdicts) - {"relevant"}
     if case["kind"] == "constraint_violation":
         assert "violates_constraint" in verdicts
+
+
+@pytest.mark.parametrize("case", BORDER, ids=lambda c: c["id"])
+def test_borderline_candidates_carry_no_label_in_the_case_file(case) -> None:
+    """Agent-drafted labels live in their own file, never in the case file."""
+    for candidate in case["expected"]["candidates"]:
+        assert set(candidate) == {"id", "text", "problem"}
+        assert candidate["text"].strip()
+
+
+def test_the_borderline_set_covers_the_requested_difficulties() -> None:
+    text = json.dumps(BORDER, ensure_ascii=False)
+    assert {c["language"] for c in BORDER} >= {"en", "roman_ur", "ur", "ar", "hi"}
+    assigned = [
+        p["constraints"]
+        for c in BORDER
+        for p in c["input"]["brief"]["problems"]
+        if p["constraints"]
+    ]
+    statuses = {k["status"] for constraints in assigned for k in constraints}
+    assert statuses == {"confirmed", "assumed"}, "an implied limit is assumed, never confirmed"
+    assert "implied" in text
 
 
 def test_no_text_is_shared_between_held_out_and_the_other_plan_cases() -> None:
@@ -150,7 +176,7 @@ def test_the_cases_cover_the_nine_business_types_and_five_languages() -> None:
 
 
 def test_there_are_constraint_cases_and_a_no_idea_case() -> None:
-    kinds = Counter(c["kind"] for c in PLAN)
+    kinds = Counter(c["kind"] for c in CORE)
     assert kinds["constraint_violation"] >= 4 and kinds["no_idea_valid"] >= 1
 
 

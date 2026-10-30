@@ -23,7 +23,8 @@ from app.modules.pi.evalkit import (
 )
 
 CASES_DIR = Path(replay.__file__).with_name("cases")
-PLAN = json.loads((CASES_DIR / "plan.json").read_text(encoding="utf-8"))
+ALL_PLAN = json.loads((CASES_DIR / "plan.json").read_text(encoding="utf-8"))
+PLAN = [c for c in ALL_PLAN if c["kind"] != "borderline_relevance"]  # the 30 core cases
 EXTRACTION = replay.load_cases(str(CASES_DIR / "extraction.json"))
 HELD_IDS = {c["id"] for c in PLAN if splits.split_of(c) == splits.HELD_OUT}
 
@@ -288,8 +289,11 @@ def test_the_human_sheet_is_empty_to_fill_in_and_written_as_json_csv_and_markdow
         "human_review_sheet.md",
     } <= names
     rows = json.loads((workdir / "human_review_sheet.json").read_text(encoding="utf-8"))["rows"]
-    assert len(rows) == 20 and all(r["verdict"] == "" and r["notes"] == "" for r in rows)
+    assert len(rows) == 40 and all(r["verdict"] == "" and r["notes"] == "" for r in rows)
+    assert {r["block"] for r in rows} == {"core", "borderline"}
+    assert (workdir / "blind_samples_borderline.json").exists()
     markdown = (workdir / "human_review_sheet.md").read_text(encoding="utf-8")
+    assert "Block 1: core samples" in markdown and "Block 2: borderline samples" in markdown
     for verdict in relevance.VERDICTS:
         assert verdict in markdown
     assert "relevant" in (workdir / "human_review_sheet.csv").read_text(encoding="utf-8")

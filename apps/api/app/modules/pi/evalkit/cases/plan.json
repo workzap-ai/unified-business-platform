@@ -2512,5 +2512,805 @@
     }
    ]
   }
+ },
+ {
+  "id": "plan_bl_clinic_implied_budget_en_01",
+  "case_type": "plan",
+  "format_version": 2,
+  "industry": "clinics_and_gp_practices",
+  "language": "en",
+  "kind": "borderline_relevance",
+  "regression": false,
+  "title": "Patients leave the full waiting room",
+  "synthetic": true,
+  "provenance": {
+   "author": "lane E",
+   "reviewer": null,
+   "created": "2026-10-30",
+   "origin": "hand_written"
+  },
+  "input": {
+   "messages": [
+    "Our waiting room is full at 6 pm and patients leave without seeing the doctor. We have 2 doctors and one receptionist. Money is tight this year."
+   ],
+   "brief": {
+    "problems": [
+     {
+      "id": "p1",
+      "title": "Patients leave before the doctor sees them",
+      "figures": [
+       "2 doctors"
+      ],
+      "user_words": [
+       "waiting room is full",
+       "6 pm",
+       "patients leave",
+       "one receptionist"
+      ],
+      "facts": [
+       "2 doctors",
+       "6 pm",
+       "receptionist"
+      ],
+      "constraints": [
+       {
+        "kind": "budget",
+        "text": "money is tight (implied, never stated as a limit)",
+        "blocks": [
+         "hire"
+        ],
+        "status": "assumed"
+       }
+      ]
+     }
+    ],
+    "roles": [
+     "receptionist",
+     "doctor"
+    ],
+    "systems": []
+   }
+  },
+  "expected": {
+   "candidates": [
+    {
+     "id": "c1",
+     "text": "Hire a second receptionist to register patients faster.",
+     "problem": "p1"
+    },
+    {
+     "id": "c2",
+     "text": "Give each patient a numbered token at the door so the receptionist can say how long the wait is.",
+     "problem": "p1"
+    },
+    {
+     "id": "c3",
+     "text": "Open a small pharmacy corner next to the waiting room.",
+     "problem": "p1"
+    }
+   ]
+  }
+ },
+ {
+  "id": "plan_bl_courier_generic_fact_en_02",
+  "case_type": "plan",
+  "format_version": 2,
+  "industry": "courier_and_last_mile_delivery_companies",
+  "language": "en",
+  "kind": "borderline_relevance",
+  "regression": false,
+  "title": "Parcels lost between hub and street",
+  "synthetic": true,
+  "provenance": {
+   "author": "lane E",
+   "reviewer": null,
+   "created": "2026-10-30",
+   "origin": "hand_written"
+  },
+  "input": {
+   "messages": [
+    "Riders lose parcels between the hub and the street. We run 8 riders and one hub clerk. The hub is small."
+   ],
+   "brief": {
+    "problems": [
+     {
+      "id": "p1",
+      "title": "Parcels lost between hub and street",
+      "figures": [
+       "8 riders"
+      ],
+      "user_words": [
+       "lose parcels",
+       "hub and the street",
+       "one hub clerk"
+      ],
+      "facts": [
+       "8 riders",
+       "hub clerk",
+       "small hub"
+      ],
+      "constraints": []
+     }
+    ],
+    "roles": [
+     "rider",
+     "hub clerk"
+    ],
+    "systems": []
+   }
+  },
+  "expected": {
+   "candidates": [
+    {
+     "id": "c1",
+     "text": "Have the hub clerk hand each rider a parcel list and sign for every parcel at the hub door.",
+     "problem": "p1"
+    },
+    {
+     "id": "c2",
+     "text": "Use better software to track your 8 riders.",
+     "problem": "p1"
+    },
+    {
+     "id": "c3",
+     "text": "Riders lose parcels between the hub and the street, so the hub clerk should add a Friday count of parcels still at the hub.",
+     "problem": "p1"
+    },
+    {
+     "id": "c4",
+     "text": "Tell the 8 riders to be more careful with parcels.",
+     "problem": "p1"
+    }
+   ]
+  }
+ },
+ {
+  "id": "plan_bl_poultry_limit_edge_en_03",
+  "case_type": "plan",
+  "format_version": 2,
+  "industry": "poultry_farms",
+  "language": "en",
+  "kind": "borderline_relevance",
+  "regression": false,
+  "title": "Feed bill grows every month",
+  "synthetic": true,
+  "provenance": {
+   "author": "lane E",
+   "reviewer": null,
+   "created": "2026-10-30",
+   "origin": "hand_written"
+  },
+  "input": {
+   "messages": [
+    "Feed costs 3 lakh a month and we have 4000 birds. We cannot buy a new feed mill this year."
+   ],
+   "brief": {
+    "problems": [
+     {
+      "id": "p1",
+      "title": "Feed bill grows every month",
+      "figures": [
+       "3 lakh",
+       "4000 birds"
+      ],
+      "user_words": [
+       "feed costs",
+       "3 lakh a month",
+       "4000 birds"
+      ],
+      "facts": [
+       "3 lakh",
+       "4000 birds",
+       "feed"
+      ],
+      "constraints": [
+       {
+        "kind": "budget",
+        "text": "cannot buy a new feed mill",
+        "blocks": [
+         "feed mill"
+        ],
+        "status": "confirmed"
+       }
+      ]
+     }
+    ],
+    "roles": [],
+    "systems": []
+   }
+  },
+  "expected": {
+   "candidates": [
+    {
+     "id": "c1",
+     "text": "Buy a small weighing scale for 8000 rupees to check the feed each morning.",
+     "problem": "p1"
+    },
+    {
+     "id": "c2",
+     "text": "Buy a second feed mill on a loan.",
+     "problem": "p1"
+    },
+    {
+     "id": "c3",
+     "text": "Rent a feed mill for the peak months only.",
+     "problem": "p1"
+    }
+   ]
+  }
+ },
+ {
+  "id": "plan_bl_ecom_half_fit_en_04",
+  "case_type": "plan",
+  "format_version": 2,
+  "industry": "e_commerce_and_d2c_brands",
+  "language": "en",
+  "kind": "borderline_relevance",
+  "regression": false,
+  "title": "Carts left at the payment page",
+  "synthetic": true,
+  "provenance": {
+   "author": "lane E",
+   "reviewer": null,
+   "created": "2026-10-30",
+   "origin": "hand_written"
+  },
+  "input": {
+   "messages": [
+    "Customers abandon their cart at the payment page. About 1 in 3 carts is left there. We use one payment provider."
+   ],
+   "brief": {
+    "problems": [
+     {
+      "id": "p1",
+      "title": "Carts left at the payment page",
+      "figures": [
+       "1 in 3"
+      ],
+      "user_words": [
+       "abandon their cart",
+       "payment page",
+       "one payment provider"
+      ],
+      "facts": [
+       "1 in 3",
+       "payment provider",
+       "cart"
+      ],
+      "constraints": []
+     }
+    ],
+    "roles": [],
+    "systems": [
+     "payment provider"
+    ]
+   }
+  },
+  "expected": {
+   "candidates": [
+    {
+     "id": "c1",
+     "text": "Add a cash on delivery option beside the payment provider on the payment page.",
+     "problem": "p1"
+    },
+    {
+     "id": "c2",
+     "text": "Send customers a discount code for their next order after they buy.",
+     "problem": "p1"
+    }
+   ]
+  }
+ },
+ {
+  "id": "plan_bl_crop_inflected_ur_05",
+  "case_type": "plan",
+  "format_version": 2,
+  "industry": "crop_farming",
+  "language": "ur",
+  "kind": "borderline_relevance",
+  "regression": false,
+  "title": "کھیت کو پانی غیر برابر ملتا ہے",
+  "synthetic": true,
+  "provenance": {
+   "author": "lane E",
+   "reviewer": null,
+   "created": "2026-10-30",
+   "origin": "hand_written"
+  },
+  "input": {
+   "messages": [
+    "ہمارے کھیت میں ٹیوب ویل کا پانی ایک طرف زیادہ پہنچتا ہے۔ ایک مزدور ہے۔"
+   ],
+   "brief": {
+    "problems": [
+     {
+      "id": "p1",
+      "title": "کھیت کو پانی غیر برابر ملتا ہے",
+      "figures": [],
+      "user_words": [
+       "ٹیوب ویل کا پانی",
+       "ایک طرف زیادہ",
+       "ایک مزدور"
+      ],
+      "facts": [
+       "ٹیوب ویل",
+       "مزدور"
+      ],
+      "constraints": []
+     }
+    ],
+    "roles": [
+     "مزدور"
+    ],
+    "systems": []
+   }
+  },
+  "expected": {
+   "candidates": [
+    {
+     "id": "c1",
+     "text": "مزدوروں کو ٹیوب ویلوں کے وقت کی فہرست دیں تاکہ ہر طرف برابر پانی جائے۔",
+     "problem": "p1"
+    },
+    {
+     "id": "c2",
+     "text": "نئی ٹیکنالوجی اور مارکیٹنگ۔",
+     "problem": "p1"
+    }
+   ]
+  }
+ },
+ {
+  "id": "plan_bl_turf_inflected_ar_06",
+  "case_type": "plan",
+  "format_version": 2,
+  "industry": "sports_clubs_academies_and_turf_court_rentals",
+  "language": "ar",
+  "kind": "borderline_relevance",
+  "regression": false,
+  "title": "حجز الملعب مرتين",
+  "synthetic": true,
+  "provenance": {
+   "author": "lane E",
+   "reviewer": null,
+   "created": "2026-10-30",
+   "origin": "hand_written"
+  },
+  "input": {
+   "messages": [
+    "نأخذ الحجوزات عبر واتساب وعندنا موظف استقبال واحد وتتكرر الحجوزات لنفس الساعة."
+   ],
+   "brief": {
+    "problems": [
+     {
+      "id": "p1",
+      "title": "الملعب محجوز لفريقين في وقت واحد",
+      "figures": [],
+      "user_words": [
+       "الحجوزات",
+       "واتساب",
+       "موظف استقبال"
+      ],
+      "facts": [
+       "واتساب",
+       "موظف استقبال"
+      ],
+      "constraints": []
+     }
+    ],
+    "roles": [
+     "موظف استقبال"
+    ],
+    "systems": [
+     "واتساب"
+    ]
+   }
+  },
+  "expected": {
+   "candidates": [
+    {
+     "id": "c1",
+     "text": "اطلب من الموظفين أن يكتبوا الحجز في جدول واحد قبل تأكيده للزبون بالواتساب.",
+     "problem": "p1"
+    },
+    {
+     "id": "c2",
+     "text": "اشتر سيارة جديدة للشركة.",
+     "problem": "p1"
+    }
+   ]
+  }
+ },
+ {
+  "id": "plan_bl_rent_inflected_hi_07",
+  "case_type": "plan",
+  "format_version": 2,
+  "industry": "property_management_and_rentals",
+  "language": "hi",
+  "kind": "borderline_relevance",
+  "regression": false,
+  "title": "किराया समय पर नहीं आता",
+  "synthetic": true,
+  "provenance": {
+   "author": "lane E",
+   "reviewer": null,
+   "created": "2026-10-30",
+   "origin": "hand_written"
+  },
+  "input": {
+   "messages": [
+    "हमारे किरायेदार किराया समय पर नहीं देते। हमारे पास एक मैनेजर है।"
+   ],
+   "brief": {
+    "problems": [
+     {
+      "id": "p1",
+      "title": "किराया समय पर नहीं आता",
+      "figures": [],
+      "user_words": [
+       "किरायेदार",
+       "किराया",
+       "एक मैनेजर"
+      ],
+      "facts": [
+       "मैनेजर"
+      ],
+      "constraints": []
+     }
+    ],
+    "roles": [
+     "मैनेजर"
+    ],
+    "systems": []
+   }
+  },
+  "expected": {
+   "candidates": [
+    {
+     "id": "c1",
+     "text": "किरायेदारों को हर महीने की तीन तारीख को किराए की याद दिलाएं।",
+     "problem": "p1"
+    },
+    {
+     "id": "c2",
+     "text": "छत पर बगीचा बनवाएं।",
+     "problem": "p1"
+    }
+   ]
+  }
+ },
+ {
+  "id": "plan_bl_saas_implied_team_en_08",
+  "case_type": "plan",
+  "format_version": 2,
+  "industry": "saas_companies",
+  "language": "en",
+  "kind": "borderline_relevance",
+  "regression": false,
+  "title": "Users stop after the free trial",
+  "synthetic": true,
+  "provenance": {
+   "author": "lane E",
+   "reviewer": null,
+   "created": "2026-10-30",
+   "origin": "hand_written"
+  },
+  "input": {
+   "messages": [
+    "Users stop using our app after the free trial. We have 500 trials a month. We are a very small team."
+   ],
+   "brief": {
+    "problems": [
+     {
+      "id": "p1",
+      "title": "Users stop after the free trial",
+      "figures": [
+       "500 trials"
+      ],
+      "user_words": [
+       "stop using our app",
+       "free trial",
+       "500 trials a month"
+      ],
+      "facts": [
+       "500 trials",
+       "app",
+       "small team"
+      ],
+      "constraints": [
+       {
+        "kind": "staff",
+        "text": "small team (implied, no number or limit stated)",
+        "blocks": [
+         "hire"
+        ],
+        "status": "assumed"
+       }
+      ]
+     }
+    ],
+    "roles": [],
+    "systems": []
+   }
+  },
+  "expected": {
+   "candidates": [
+    {
+     "id": "c1",
+     "text": "Hire two support agents to chase every trial.",
+     "problem": "p1"
+    },
+    {
+     "id": "c2",
+     "text": "Improve the onboarding with a new design for your app.",
+     "problem": "p1"
+    }
+   ]
+  }
+ },
+ {
+  "id": "plan_bl_banquet_numeric_limit_en_09",
+  "case_type": "plan",
+  "format_version": 2,
+  "industry": "banquet_halls_and_marquees",
+  "language": "en",
+  "kind": "borderline_relevance",
+  "regression": false,
+  "title": "Booking diary is full of mistakes",
+  "synthetic": true,
+  "provenance": {
+   "author": "lane E",
+   "reviewer": null,
+   "created": "2026-10-30",
+   "origin": "hand_written"
+  },
+  "input": {
+   "messages": [
+    "Our booking diary has mistakes and we double book the hall. We have 2 halls and one booking clerk. We cannot spend more than 20000 rupees on this."
+   ],
+   "brief": {
+    "problems": [
+     {
+      "id": "p1",
+      "title": "Booking diary is full of mistakes",
+      "figures": [
+       "2 halls",
+       "20000 rupees"
+      ],
+      "user_words": [
+       "booking diary",
+       "double book the hall",
+       "one booking clerk"
+      ],
+      "facts": [
+       "2 halls",
+       "booking clerk",
+       "diary"
+      ],
+      "constraints": [
+       {
+        "kind": "budget",
+        "text": "cannot spend more than 20000 rupees",
+        "blocks": [],
+        "status": "confirmed"
+       }
+      ]
+     }
+    ],
+    "roles": [
+     "booking clerk"
+    ],
+    "systems": []
+   }
+  },
+  "expected": {
+   "candidates": [
+    {
+     "id": "c1",
+     "text": "Buy a tablet for 15000 rupees so the booking clerk keeps one hall calendar instead of the diary.",
+     "problem": "p1"
+    },
+    {
+     "id": "c2",
+     "text": "Buy a booking system for 50000 rupees so the booking clerk stops double booking the hall.",
+     "problem": "p1"
+    }
+   ]
+  }
+ },
+ {
+  "id": "plan_bl_trucking_pause_edge_en_10",
+  "case_type": "plan",
+  "format_version": 2,
+  "industry": "trucking_and_goods_transport_companies",
+  "language": "en",
+  "kind": "borderline_relevance",
+  "regression": false,
+  "title": "Trucks leave late in the morning",
+  "synthetic": true,
+  "provenance": {
+   "author": "lane E",
+   "reviewer": null,
+   "created": "2026-10-30",
+   "origin": "hand_written"
+  },
+  "input": {
+   "messages": [
+    "Our 9 trucks leave late every morning because loading is slow. We have one dispatcher. We cannot pause deliveries while we change the process."
+   ],
+   "brief": {
+    "problems": [
+     {
+      "id": "p1",
+      "title": "Trucks leave late in the morning",
+      "figures": [
+       "9 trucks"
+      ],
+      "user_words": [
+       "trucks leave late",
+       "loading is slow",
+       "one dispatcher"
+      ],
+      "facts": [
+       "9 trucks",
+       "dispatcher",
+       "loading"
+      ],
+      "constraints": [
+       {
+        "kind": "cannot_change",
+        "text": "cannot pause deliveries while we change the process",
+        "blocks": [
+         "pause"
+        ],
+        "status": "confirmed"
+       }
+      ]
+     }
+    ],
+    "roles": [
+     "dispatcher"
+    ],
+    "systems": []
+   }
+  },
+  "expected": {
+   "candidates": [
+    {
+     "id": "c1",
+     "text": "Let the dispatcher start the new loading list on the evening trucks first, then the morning trucks next week.",
+     "problem": "p1"
+    },
+    {
+     "id": "c2",
+     "text": "Pause the morning trucks for one day so the dispatcher can retrain the loaders.",
+     "problem": "p1"
+    },
+    {
+     "id": "c3",
+     "text": "Retrain the loaders during the lunch hour, when trucks are paused anyway for rest.",
+     "problem": "p1"
+    }
+   ]
+  }
+ },
+ {
+  "id": "plan_bl_clinic_restate_step_roman_ur_11",
+  "case_type": "plan",
+  "format_version": 2,
+  "industry": "clinics_and_gp_practices",
+  "language": "roman_ur",
+  "kind": "borderline_relevance",
+  "regression": false,
+  "title": "Parchi dhoondne mein der",
+  "synthetic": true,
+  "provenance": {
+   "author": "lane E",
+   "reviewer": null,
+   "created": "2026-10-30",
+   "origin": "hand_written"
+  },
+  "input": {
+   "messages": [
+    "Mareez ki parchi dhoondne mein der lagti hai aur hamare paas ek compounder hai."
+   ],
+   "brief": {
+    "problems": [
+     {
+      "id": "p1",
+      "title": "Parchi dhoondne mein der",
+      "figures": [],
+      "user_words": [
+       "mareez ki parchi",
+       "dhoondne mein der",
+       "ek compounder"
+      ],
+      "facts": [
+       "compounder"
+      ],
+      "constraints": []
+     }
+    ],
+    "roles": [
+     "compounder"
+    ],
+    "systems": []
+   }
+  },
+  "expected": {
+   "candidates": [
+    {
+     "id": "c1",
+     "text": "Mareez ki parchi dhoondne mein der lagti hai, is liye compounder subah parchiyan number ke hisaab se rakhe.",
+     "problem": "p1"
+    },
+    {
+     "id": "c2",
+     "text": "Behtar software istemal karo.",
+     "problem": "p1"
+    }
+   ]
+  }
+ },
+ {
+  "id": "plan_bl_tuition_half_fit_en_12",
+  "case_type": "plan",
+  "format_version": 2,
+  "industry": "tuition_centres_and_academies",
+  "language": "en",
+  "kind": "borderline_relevance",
+  "regression": false,
+  "title": "Parents pay fees late",
+  "synthetic": true,
+  "provenance": {
+   "author": "lane E",
+   "reviewer": null,
+   "created": "2026-10-30",
+   "origin": "hand_written"
+  },
+  "input": {
+   "messages": [
+    "Parents pay the monthly fee late. We have 60 students and one office assistant."
+   ],
+   "brief": {
+    "problems": [
+     {
+      "id": "p1",
+      "title": "Fees arrive after the due date",
+      "figures": [
+       "60 students"
+      ],
+      "user_words": [
+       "pay the monthly fee late",
+       "one office assistant"
+      ],
+      "facts": [
+       "60 students",
+       "office assistant",
+       "monthly fee"
+      ],
+      "constraints": []
+     }
+    ],
+    "roles": [
+     "office assistant"
+    ],
+    "systems": []
+   }
+  },
+  "expected": {
+   "candidates": [
+    {
+     "id": "c1",
+     "text": "Offer a 10 percent discount to parents who pay the monthly fee by the 5th.",
+     "problem": "p1"
+    },
+    {
+     "id": "c2",
+     "text": "Start an after school sports club for the 60 students.",
+     "problem": "p1"
+    }
+   ]
+  }
  }
 ]

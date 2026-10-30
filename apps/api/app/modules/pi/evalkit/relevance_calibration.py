@@ -22,12 +22,15 @@ from collections import Counter
 from pathlib import Path
 from typing import Any
 
-from app.modules.pi.evalkit import relevance
+from app.modules.pi.evalkit import relevance, splits
 
 DIR = Path(__file__).with_name("calibration")
 CASES = Path(__file__).with_name("cases") / "plan.json"
 SAMPLES_PATH = DIR / "relevance_samples.json"
 AGENT_PATH = DIR / "relevance_labels_agent_drafted.json"
+BORDERLINE_SAMPLES_PATH = DIR / "relevance_samples_borderline.json"
+BORDERLINE_AGENT_PATH = DIR / "relevance_labels_agent_drafted_borderline.json"
+BLOCKS = ("core", "borderline")
 SEED = 20261030
 DEFINITIONS = {
     "relevant": "links to the owner's stated problem, reuses its facts, breaks no stated limit",
@@ -55,6 +58,28 @@ def load_agent_labels() -> dict[str, Any]:
     if data.get("label_source") != "agent_drafted" or data.get("human_confirmed") is not False:
         raise ValueError("the agent labels file must say agent_drafted and human_confirmed false")
     return data
+
+
+def load_borderline_samples() -> list[dict[str, Any]]:
+    return list(_load(BORDERLINE_SAMPLES_PATH))
+
+
+def load_borderline_agent_labels() -> dict[str, Any]:
+    """Agent-drafted labels of EVERY borderline candidate, keyed `case_id/candidate_id`."""
+    data = dict(_load(BORDERLINE_AGENT_PATH))
+    if data.get("label_source") != "agent_drafted" or data.get("human_confirmed") is not False:
+        raise ValueError(
+            "the borderline labels file must say agent_drafted and human_confirmed false"
+        )
+    return data
+
+
+def borderline_agent_by_sample() -> dict[str, str]:
+    labels = load_borderline_agent_labels()["labels"]
+    return {
+        s["sample_id"]: labels[f"{s['case_id']}/{s['candidate_id']}"]
+        for s in load_borderline_samples()
+    }
 
 
 def load_human_labels(path: str | Path) -> dict[str, Any]:
@@ -104,9 +129,10 @@ def blind_sheet(
     return rows
 
 
-def human_rows(sheet: list[dict[str, Any]]) -> list[dict[str, Any]]:
+def human_rows(sheet: list[dict[str, Any]], block: str = "core") -> list[dict[str, Any]]:
     return [
         {
+            "block": block,
             "sample_id": r["sample_id"],
             "language": r["language"],
             "owner_problem": r["owner_problem"],
@@ -132,33 +158,50 @@ def _markdown(rows: list[dict[str, Any]]) -> str:
         "",
     ]
     out += [f"- **{v}**: {DEFINITIONS[v]}" for v in relevance.VERDICTS]
-    out += [
-        "",
-        "| id | language | owner's words | facts | limits | candidate idea | verdict | notes |",
-        "|---|---|---|---|---|---|---|---|",
-    ]
-    for r in rows:
-        cells = [r[k].replace("|", "/") for k in (
-            "sample_id", "language", "owner_problem", "facts", "constraints", "candidate_idea"
-        )]  # fmt: skip
-        out.append("| " + " | ".join(cells) + " |  |  |")
+    titles = {"core": "Block 1: core samples", "borderline": "Block 2: borderline samples"}
+    for block in BLOCKS:
+        part = [r for r in rows if r["block"] == block]
+        if not part:
+            continue
+        out += [
+            "",
+            f"## {titles[block]}",
+            "",
+            "| id | language | owner's words | facts | limits | candidate idea | verdict | notes |",
+            "|---|---|---|---|---|---|---|---|",
+        ]
+        for r in part:
+            cells = [r[k].replace("|", "/") for k in (
+                "sample_id", "language", "owner_problem", "facts", "constraints", "candidate_idea"
+            )]  # fmt: skip
+            out.append("| " + " | ".join(cells) + " |  |  |")
     return "\n".join(out) + "\n"
 
 
+def all_rows() -> tuple[list[dict[str, Any]], list[dict[str, Any]], list[dict[str, Any]]]:
+    """(core blind rows, borderline blind rows, every human row with its block)."""
+    cases = load_cases()
+    core = blind_sheet(cases, load_samples())
+    border = blind_sheet(cases, load_borderline_samples())
+    return core, border, human_rows(core, "core") + human_rows(border, "borderline")
+
+
 def write_sheets(out_dir: str | Path) -> list[Path]:
-    """The blind grader sheet and the human review sheet (json, csv, markdown), side by side."""
+    """The blind grader sheets (core, borderline) and the human review sheet with both blocks
+    (json, csv, markdown), side by side. No label, no scorer output, an empty verdict column."""
     folder = Path(out_dir)
     folder.mkdir(parents=True, exist_ok=True)
-    sheet = blind_sheet(load_cases(), load_samples())
-    rows = human_rows(sheet)
+    core, border, rows = all_rows()
     paths = {
-        "blind_samples.json": json.dumps(sheet, ensure_ascii=False, indent=1),
+        "blind_samples.json": json.dumps(core, ensure_ascii=False, indent=1),
+        "blind_samples_borderline.json": json.dumps(border, ensure_ascii=False, indent=1),
         "human_review_sheet.json": json.dumps(
             {
                 "label_source": "human",
                 "reviewers": [],
                 "allowed_verdicts": list(relevance.VERDICTS),
                 "definitions": DEFINITIONS,
+                "blocks": list(BLOCKS),
                 "rows": rows,
             },
             ensure_ascii=False,
@@ -238,6 +281,46 @@ def scorer_labels(cases: list[dict[str, Any]], samples: list[dict[str, Any]]) ->
             language=case["language"],
         )["verdict"]
     return out
+
+
+def borderline_comparison() -> dict[str, Any]:
+    """Scorer verdict against the agent-drafted label for every borderline candidate. Development
+    samples are listed one by one; Held-out borderline candidates are counted, never listed. A
+    disagreement is a finding: neither the scorer nor the case is changed to remove it."""
+    cases = [c for c in load_cases() if c.get("kind") == "borderline_relevance"]
+    labels = load_borderline_agent_labels()["labels"]
+    sample_of = {
+        f"{s['case_id']}/{s['candidate_id']}": s["sample_id"] for s in load_borderline_samples()
+    }
+    rows: list[dict[str, Any]] = []
+    held = held_diff = 0
+    for case in cases:
+        for cand in case["expected"]["candidates"]:
+            key = f"{case['id']}/{cand['id']}"
+            got = relevance.score_candidate(
+                case["input"]["brief"],
+                cand["text"],
+                problem=cand.get("problem"),
+                owner_text=" ".join(case["input"]["messages"]),
+                language=case["language"],
+            )["verdict"]
+            if splits.split_of(case) == splits.HELD_OUT:
+                held += 1
+                held_diff += got != labels[key]
+                continue
+            rows.append(
+                {
+                    "sample_id": sample_of.get(key, ""),
+                    "case_id": case["id"],
+                    "candidate_id": cand["id"],
+                    "language": case["language"],
+                    "agent_drafted": labels[key],
+                    "scorer": got,
+                    "agree": got == labels[key],
+                    "text": cand["text"],
+                }
+            )
+    return {"development": rows, "held_out_candidates": held, "held_out_disagreements": held_diff}
 
 
 def _fmt(name: str, result: dict[str, Any]) -> list[str]:

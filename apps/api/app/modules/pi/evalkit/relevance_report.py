@@ -14,7 +14,7 @@ from collections import defaultdict
 from pathlib import Path
 from typing import Any
 
-from app.modules.pi.evalkit import access_log, relevance, scorers, splits
+from app.modules.pi.evalkit import access_log, relevance, relevance_calibration, scorers, splits
 
 CASES = Path(__file__).with_name("cases") / "plan.json"
 
@@ -40,6 +40,7 @@ def build(
 ) -> tuple[str, dict[str, Any]]:
     if access_log_path is not None and not (who.strip() and why.strip()):
         raise ValueError("an access log path needs who and why")
+    cases = [c for c in cases if c.get("kind") != "borderline_relevance"]
     scored = []
     for case in cases:
         score = relevance.score_case(case) | {"split": splits.split_of(case)}
@@ -94,6 +95,28 @@ def build(
     return "\n".join(out) + "\n", totals
 
 
+def borderline_section() -> str:
+    """The borderline set: the scorer against agent-drafted labels (not human labels). Held-out
+    borderline candidates are counted only."""
+    found = relevance_calibration.borderline_comparison()
+    rows = found["development"]
+    diff = [r for r in rows if not r["agree"]]
+    out = [
+        "## Borderline set: scorer against agent-drafted labels (not human labels)",
+        "",
+        f"Development: {len(rows)} candidates, the scorer differs on {len(diff)}. Held-out: "
+        f"{found['held_out_candidates']} candidates, differs on {found['held_out_disagreements']} "
+        "(counted only). A difference is a finding; neither side is changed to remove it.",
+        "",
+    ]
+    out += [
+        f"- {r['sample_id']} {r['case_id']}/{r['candidate_id']} ({r['language']}): label "
+        f"{r['agent_drafted']}, scorer {r['scorer']}"
+        for r in diff
+    ]
+    return "\n".join(out) + "\n"
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--out", default="")
@@ -103,6 +126,7 @@ def main() -> None:
     args = parser.parse_args()
     cases = json.loads(CASES.read_text(encoding="utf-8"))
     text, totals = build(cases, args.access_log or None, args.who, args.why)
+    text += "\n" + borderline_section()
     if args.out:
         Path(args.out).write_text(text, encoding="utf-8")
     print(text)
