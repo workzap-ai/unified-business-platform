@@ -10,27 +10,29 @@ Groups under 3 cases are reported as not yet measured.
 | group | cases | problem recall | precision | figures kept | corrections kept | unsupported causes |
 |---|---|---|---|---|---|---|
 | development | 39 | 100% | 100% | 100% | 100% | 0 |
-| held_out | 21 | 100% | 100% | 100% | 100% | 0 |
+| held_out | 60 | 100% | 100% | 100% | 100% | 0 |
 | regression | 3 | 100% | 100% | 100% | 100% | 0 |
 
 ## Language
 
 | group | cases | problem recall | precision | figures kept | corrections kept | unsupported causes |
 |---|---|---|---|---|---|---|
-| en | 34 | 100% | 100% | 100% | 100% | 0 |
-| roman_ur | 24 | 100% | 100% | 100% | 100% | 0 |
-| ur | 5 | 100% | 100% | n/a | n/a | 0 |
+| ar | 4 | 100% | 100% | 100% | 100% | 0 |
+| en | 49 | 100% | 100% | 100% | 100% | 0 |
+| roman_ur | 38 | 100% | 100% | 100% | 100% | 0 |
+| ur | 11 | 100% | 100% | 100% | 100% | 0 |
 
 ## Case kind
 
 | group | cases | problem recall | precision | figures kept | corrections kept | unsupported causes |
 |---|---|---|---|---|---|---|
-| correction | 8 | 100% | 100% | 100% | 100% | 0 |
-| list | 22 | 100% | 100% | 100% | n/a | 0 |
-| mixed | 2 | not yet measured | | | | |
-| multi_turn | 3 | 100% | 100% | 100% | n/a | 0 |
-| rant | 3 | 100% | 100% | 100% | n/a | 0 |
-| single | 25 | 100% | 100% | 100% | n/a | 0 |
+| constraints | 4 | 100% | 100% | 100% | n/a | 0 |
+| correction | 14 | 100% | 100% | 100% | 100% | 0 |
+| list | 32 | 100% | 100% | 100% | n/a | 0 |
+| mixed | 4 | 100% | 100% | 100% | n/a | 0 |
+| multi_turn | 6 | 100% | 100% | 100% | n/a | 0 |
+| rant | 6 | 100% | 100% | 100% | n/a | 0 |
+| single | 36 | 100% | 100% | 100% | n/a | 0 |
 
 ## Industry
 
@@ -38,25 +40,63 @@ Groups under 3 cases are reported as not yet measured.
 |---|---|---|---|---|---|---|
 | accounting_audit_and_tax_practices | 3 | 100% | 100% | 100% | 100% | 0 |
 | aesthetic_and_dermatology_clinics | 3 | 100% | 100% | 100% | n/a | 0 |
+| air_cargo_and_air_freight_agents | 1 | not yet measured | | | | |
+| auto_workshops_and_service_centres | 1 | not yet measured | | | | |
+| bakeries_mithai_and_confectionery | 1 | not yet measured | | | | |
+| banquet_halls_and_marquees | 1 | not yet measured | | | | |
 | beef_cattle_fattening_and_feedlots | 3 | 100% | 100% | 100% | 100% | 0 |
 | beekeeping_and_honey | 3 | 100% | 100% | 100% | n/a | 0 |
+| cafes_and_coffee_shops | 1 | not yet measured | | | | |
+| car_rental_and_chauffeur_services | 1 | not yet measured | | | | |
+| car_wash_and_detailing | 1 | not yet measured | | | | |
+| cattle_and_buffalo_dairy_farms | 1 | not yet measured | | | | |
+| cinemas_and_theatres | 1 | not yet measured | | | | |
 | clinics_and_gp_practices | 3 | 100% | 100% | 100% | n/a | 0 |
+| colleges_and_universities | 1 | not yet measured | | | | |
 | courier_and_last_mile_delivery_companies | 3 | 100% | 100% | 100% | n/a | 0 |
 | dairy_processing | 3 | 100% | 100% | 100% | n/a | 0 |
+| daycare_nurseries_and_preschools | 1 | not yet measured | | | | |
+| dental_clinics | 1 | not yet measured | | | | |
+| e_commerce_and_d2c_brands | 1 | not yet measured | | | | |
+| electronics_and_home_appliances_retail | 1 | not yet measured | | | | |
+| flour_rice_and_feed_mills | 1 | not yet measured | | | | |
+| fuel_stations_and_lpg_cng_distributors | 1 | not yet measured | | | | |
+| furniture_manufacturing_and_woodwork | 1 | not yet measured | | | | |
 | garment_and_knitwear_export_units | 3 | 100% | 100% | 100% | 100% | 0 |
+| general_contractors | 1 | not yet measured | | | | |
+| guest_houses_b_and_bs_and_holiday_home_hosts | 1 | not yet measured | | | | |
 | gyms_and_fitness_studios | 3 | 100% | 100% | 100% | n/a | 0 |
 | hardware_paint_sanitary_and_building_materials_shops | 3 | 100% | 100% | 100% | n/a | 0 |
+| hospitals | 1 | not yet measured | | | | |
+| hotels | 1 | not yet measured | | | | |
+| hr_and_recruitment_agencies | 1 | not yet measured | | | | |
 | internet_service_providers_and_cable_tv_operators | 3 | 100% | 100% | 100% | 100% | 0 |
+| jewellery | 1 | not yet measured | | | | |
 | kiryana_corner_shops_and_convenience_stores | 3 | 100% | 100% | 100% | n/a | 0 |
+| law_firms | 1 | not yet measured | | | | |
+| mobile_phones_and_accessories | 1 | not yet measured | | | | |
 | mosques_religious_trusts_and_community_institutions | 3 | 100% | 100% | 100% | n/a | 0 |
 | new_car_dealerships_and_showrooms | 3 | 100% | 100% | 100% | n/a | 0 |
 | pharmaceutical_manufacturing | 3 | 100% | 100% | 100% | n/a | 0 |
 | pharmacies_and_medical_stores | 3 | 100% | 100% | 100% | 100% | 0 |
+| poultry_farms | 1 | not yet measured | | | | |
+| private_schools_and_school_chains | 1 | not yet measured | | | | |
 | real_estate_agencies_and_brokers | 3 | 100% | 100% | 100% | 100% | 0 |
 | restaurants | 3 | 100% | 100% | 100% | 100% | 0 |
 | salons_and_barbers | 3 | 100% | 100% | 100% | n/a | 0 |
+| spices_dry_fruit_and_nuts_traders | 1 | not yet measured | | | | |
+| startups_and_early_stage_businesses | 1 | not yet measured | | | | |
+| tailoring_and_alteration_shops | 1 | not yet measured | | | | |
 | tiles_marble_and_bathroom_kitchen_showrooms | 3 | 100% | 100% | 100% | n/a | 0 |
-| unknown_business_owner | 3 | 100% | 100% | 100% | 100% | 0 |
+| tractor_and_farm_machinery_dealers_and_rental | 1 | not yet measured | | | | |
+| travel_agencies_and_ticketing | 1 | not yet measured | | | | |
+| trucking_and_goods_transport_companies | 1 | not yet measured | | | | |
+| tuition_centres_and_academies | 1 | not yet measured | | | | |
+| unknown_business_owner | 4 | 100% | 100% | 100% | 100% | 0 |
+| veterinary_clinics_and_animal_health_suppliers | 1 | not yet measured | | | | |
+| warehousing_and_3pl | 1 | not yet measured | | | | |
+| water_tanker_and_ro_filtration_plant_operators | 1 | not yet measured | | | | |
+| wedding_planners_and_event_management | 1 | not yet measured | | | | |
 
 ## Cases that missed something
 

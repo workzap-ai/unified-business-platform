@@ -96,7 +96,7 @@ def test_the_shipped_cases_replay_without_a_model_and_every_group_is_labelled() 
     assert totals["split:development"]["recall"] >= 0.95
 
 
-def test_the_dataset_has_three_cases_for_each_of_twenty_industries_and_a_stable_split() -> None:
+def test_the_dataset_keeps_twenty_industries_with_three_cases_and_a_stable_split() -> None:
     cases = replay.load_cases(str(report.CASES))
     ids = [c["id"] for c in cases]
     assert len(ids) == len(set(ids)) and len(cases) >= 60
@@ -104,7 +104,9 @@ def test_the_dataset_has_three_cases_for_each_of_twenty_industries_and_a_stable_
     for c in cases:
         by_industry[c["industry"]] = by_industry.get(c["industry"], 0) + 1
     real = {k: v for k, v in by_industry.items() if k != "unknown_business_owner"}
-    assert len(real) >= 20 and min(real.values()) >= 3
+    # The first round put three cases through each of 20 industries; the Held-out expansion added
+    # one case for each of many more industries, so only the original 20 are asked to have three.
+    assert len([k for k, v in real.items() if v >= 3]) >= 20
     sets = {c["id"]: splits.split_of(c) for c in cases}
     assert {s for s in sets.values()} == {splits.DEVELOPMENT, splits.REGRESSION, splits.HELD_OUT}
     assert all(sets[c["id"]] == splits.REGRESSION for c in cases if c.get("regression"))

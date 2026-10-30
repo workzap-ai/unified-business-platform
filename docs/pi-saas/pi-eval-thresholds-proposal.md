@@ -25,9 +25,14 @@ A group below its minimum is reported **"not yet measured"**, never "passing".
 | S6 | regression set | every past failure, never removed, no minimum | a guard, not a sample | PENDING |
 | S7 | held-out set | at least 25% of cases and never fewer than 60 in total | a smaller set cannot show a 10-point drop | PENDING |
 
-Today (scripted, 63 cases, 20 industries x 3, plus 3 unknown-business): en 34, Roman Urdu 24, Urdu script 5,
-mixed 2, Hindi 0, Arabic 0. So only English meets S4; Roman Urdu is near; the rest are "not yet measured".
-Held-out today: 21 cases, below the S7 floor of 60, so Held-out cannot gate a release yet.
+Today (scripted, 102 cases, updated 2026-10-30): en 49, Roman Urdu 38, Urdu script 11, Arabic 4, Hindi 0
+(mixed-language cases are counted under their main language). So English and Roman Urdu meet S4 on case
+count; Urdu script and Arabic are "not yet measured". By kind: list 32, single 36, correction 14, rant 6,
+multi-turn 6, mixed 4, constraints 4: only list and single meet S5 (15).
+Held-out today: 60 cases (en 25, Roman Urdu 23, Urdu script 8, Arabic 4), which reaches the S7 floor of 60 in
+total. It is not yet a release gate: no per-language or per-industry Held-out cell reaches its own minimum,
+and all results are still scripted (see `pi-eval-heldout-coverage.md`). The earlier figure was 63 cases, 21
+Held-out, from 2026-10-29.
 
 ## 2. Proposed release thresholds (Development tuned, confirmed once on Held-out)
 
