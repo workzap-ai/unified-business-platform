@@ -247,12 +247,15 @@ def opening_log(passed: bool, path: str, prompt_version: str) -> dict[str, str]:
 
 # 18.3: the offer never says the owner may refuse.
 SAY_NO = re.compile(
-    r"\s*(?:you\s+can\s+(?:always\s+)?say\s+no|no\s+pressure|you\s+can\s+decline)\s*[.!]?",
+    r"[,;]?\s*(?:(?:and|aur)\s+)?(?:you\s+can\s+(?:always\s+)?say\s+no(?:\s+to\s+it)?|no\s+pressure|"
+    r"you\s+can\s+decline|aap\s+(?:mana|inkaar|inkar)\s+(?:bhi\s+)?kar\s+sakte\s+hain)\s*[.!]?",
     re.IGNORECASE,
-)
+)  # English and Roman Urdu: "aur aap mana bhi kar sakte hain" is the same pressure (spec 18.3)
 
 
 def without_say_no(reply: str) -> str:
     """'You can say no' is pressure, not courtesy: removed from the reply (declining is easy)."""
     cleaned = SAY_NO.sub("", reply or "").rstrip()
+    if cleaned and cleaned != (reply or "").rstrip() and cleaned[-1] not in ".!?؟":
+        cleaned += "."  # the clause went, the sentence before it still needs its full stop
     return re.sub(r"[ \t]{2,}", " ", cleaned) or reply

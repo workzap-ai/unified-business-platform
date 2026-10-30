@@ -56,6 +56,20 @@ SCREENSHOT = {
     "en": "I can't read that page myself; a screenshot works too if you like.",
     "roman_ur": "Ye page main khud nahi parh sakta; chahein to screenshot bhej dein.",
 }
+KNOWS_NOT = {  # "Do you know anything about it?": answered first, then the business is asked
+    "en": "I don't know anything about it yet. What does the business do?",
+    "roman_ur": "Mujhe abhi iske baare mein kuch nahi pata. Ye karobar kya karta hai?",
+}
+ASK_WHAT = {  # only a name was given: the second half of the identity question, once
+    "en": "Thanks. And what does it do?",
+    "roman_ur": "Shukriya. Aur ye kis cheez ka kaam karta hai?",
+}
+KNOWS_QUESTION = re.compile(
+    r"\b(?:kuch|kucch)\s+pata\b|\bpata\s+hai\b|\bjaante\s+hain\b|"
+    r"\bdo\s+you\s+know\b|\bknow\s+(?:anything\s+)?about\b|\bheard\s+of\s+(?:it|us)\b",
+    re.IGNORECASE,
+)
+NAME_ONLY_WORDS = 4  # "Its artwing studios": a name, not yet what the business does
 ONLY_BUSINESS = {
     "en": "I only look at business pages; tell me about your business in your own words.",
     "roman_ur": "Main sirf karobar ke pages dekhta hoon; aap apne karobar ke baare mein khud bata dein.",
@@ -159,8 +173,17 @@ def plan(context: dict[str, Any]) -> Plan | None:
             # "Hi" again is not an answer (live 2026-10-27: the second "Hi" was taken as the
             # business and the page was asked for): ask the identity question once more.
             return Plan(IDENTITY[lang], state, profile, model_writes=True)
+        if KNOWS_QUESTION.search(said):
+            # A direct question comes first (live 2026-10-30: "Aap ko iske baray mai kuch pata hai?"
+            # was skipped and the page was asked for): answer it honestly, ask what the business does.
+            business_profile.add_fact(profile, "business_name", said[:120], business_profile.OWNER)
+            return Plan(KNOWS_NOT[lang], {**state, "asked_what": True}, profile)
+        url = link_in(said)
+        if not url and not state.get("asked_what") and len(said.split()) <= NAME_ONLY_WORDS:
+            business_profile.add_fact(profile, "business_name", said[:120], business_profile.OWNER)
+            return Plan(ASK_WHAT[lang], {**state, "asked_what": True}, profile)
         profile = _grow(profile, said)
-        if url := link_in(said):
+        if url:
             return Plan("", {**state, "step": PAGE_ASKED, "asked": 2}, profile, ask_page=url)
         return Plan(PAGE_ASK[lang], {**state, "step": PAGE_ASKED, "asked": 2}, profile)
     if step == PAGE_ASKED:

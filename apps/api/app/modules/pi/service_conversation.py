@@ -3085,14 +3085,14 @@ NO_IDEA_LINES = {  # noqa: E501
 
 
 NO_MORE_IDEAS = {  # noqa: E501
-    "en": "Those are the ideas I have for this here. The solution document goes further, and you can say no to it.",  # noqa: E501
-    "roman_ur": "Is masle ke liye yahan itne hi ideas hain. Solution document is se aage jata hai, aur aap mana bhi kar sakte hain.",  # noqa: E501
-    "ar": "هذه هي الأفكار التي لدي هنا لهذه المشكلة. وثيقة الحل تذهب أبعد، ويمكنك الرفض.",  # noqa: E501
+    "en": "Those are the ideas I have for this here. The solution document goes further. Which part matters most to you first?",  # noqa: E501
+    "roman_ur": "Is masle ke liye yahan itne hi ideas hain. Solution document is se aage jata hai. Aap ke liye pehle kaun sa hissa sab se zaroori hai?",  # noqa: E501
+    "ar": "هذه هي الأفكار التي لدي هنا لهذه المشكلة. وثيقة الحل تذهب أبعد. أي جزء هو الأهم لك أولاً؟",  # noqa: E501
 }
 NO_IDEA_AGAIN = {  # noqa: E501
-    "en": "That is all I can give here for now. The solution document is where Workzap sets out what it would build, and you can say no to it.",  # noqa: E501
-    "roman_ur": "Abhi yahan itna hi hai. Workzap kya banayega, ye solution document mein hota hai, aur aap mana bhi kar sakte hain.",  # noqa: E501
-    "ar": "هذا كل ما يمكنني تقديمه هنا الآن. تفاصيل ما ستبنيه Workzap في وثيقة الحل، ويمكنك الرفض.",  # noqa: E501
+    "en": "That is all I can give here for now. The solution document is where Workzap sets out what it would build. Which part matters most to you first?",  # noqa: E501
+    "roman_ur": "Abhi yahan itna hi hai. Workzap kya banayega, ye solution document mein hota hai. Aap ke liye pehle kaun sa hissa sab se zaroori hai?",  # noqa: E501
+    "ar": "هذا كل ما يمكنني تقديمه هنا الآن. تفاصيل ما ستبنيه Workzap في وثيقة الحل. أي جزء هو الأهم لك أولاً؟",  # noqa: E501
 }
 
 
