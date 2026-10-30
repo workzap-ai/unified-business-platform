@@ -316,3 +316,78 @@ def test_the_script_reads_no_settings_file_and_opens_no_database_connection() ->
         [sys.executable, "-c", probe], capture_output=True, text=True, cwd=str(SCRIPT.parents[1])
     )
     assert result.stdout.strip().endswith("False"), result.stderr[-300:]
+
+
+LUNA = ["--model", "gpt-6-luna", "--in-per-m", "0.10", "--out-per-m", "0.50"]
+LUNA_OK = {**OK, "model": "gpt-6-luna"}
+
+
+def test_the_default_model_is_the_one_the_fast_alias_uses() -> None:
+    assert mod.DEFAULT_MODEL == "gpt-4o-mini" and mod.DEFAULT_MODEL in mod.VERIFIED_MODELS
+
+
+def test_an_unknown_model_is_refused_even_with_prices() -> None:
+    code, text, seen = go(["--model", "gpt-9-imaginary", "--in-per-m", "5", "--out-per-m", "5"])
+    assert code == 2 and "not in the verified model table" in text and seen == []
+
+
+def test_each_verified_model_has_a_price_floor_of_its_own() -> None:
+    code, text, _ = go(["--model", "gpt-6-luna", "--in-per-m", "0.05", "--out-per-m", "0.50"])
+    assert code == 2 and "verified rates" in text and "gpt-6-luna" in text
+    code, text, _ = go(LUNA)
+    assert code == 0 and "model gpt-6-luna" in text
+    # a price that is right for one model is too low for another
+    code, text, _ = go(["--model", "gpt-5.4-mini", "--in-per-m", "0.15", "--out-per-m", "0.60"])
+    assert code == 2 and "verified rates" in text
+
+
+def test_the_stage_one_caps_hold_for_every_model() -> None:
+    for model, (price_in, price_out) in mod.VERIFIED_MODELS.items():
+        rates = ["--model", model, "--in-per-m", str(price_in), "--out-per-m", str(price_out)]
+        code, text, seen = go([*rates, "--max-calls", "31"])
+        assert code == 2 and seen == []
+        code, text, seen = go([*rates, "--max-usd", "0.51"])
+        assert code == 2 and seen == []
+        code, text, seen = go(rates)
+        assert code == 0 and "plan: " in text and seen == []
+        worst_run = float(text.split("worst case for the run: USD ")[1].split()[0])
+        assert worst_run <= 0.50
+
+
+def execute_with(tmp_path, argv, handler):
+    _, dry, _ = go([*argv, "--max-calls", "3"])
+    out = tmp_path / "run.jsonl"
+    full = [
+        *argv,
+        "--max-calls",
+        "3",
+        "--execute",
+        "--confirm-cap",
+        confirm(dry),
+        "--out",
+        str(out),
+    ]
+    code, text, seen = go(full, {"OPENAI_API_KEY": KEY}, handler)
+    return code, text, seen
+
+
+def test_the_configured_model_is_sent_and_a_reasoning_model_gets_its_own_token_field(
+    tmp_path,
+) -> None:
+    code, text, seen = execute_with(tmp_path, LUNA, answer(LUNA_OK))
+    assert code == 0 and len(seen) == 3
+    body = json.loads(seen[0].content)
+    assert body["model"] == "gpt-6-luna" and body["max_completion_tokens"] == 1500
+    assert "max_tokens" not in body and "temperature" not in body
+    assert body["response_format"] == {"type": "json_object"}
+
+
+def test_the_configured_model_not_answering_stops_the_run(tmp_path) -> None:
+    code, text, seen = execute_with(tmp_path, LUNA, answer(OK))  # gpt-4o-mini answers
+    assert code == 1 and len(seen) == 1 and "different model" in text and "gpt-6-luna" in text
+    assert spent(text) > 0.0005
+
+
+def test_the_report_names_the_configured_model(tmp_path) -> None:
+    _, text, _ = execute_with(tmp_path, LUNA, answer(LUNA_OK))
+    assert "model: gpt-6-luna" in text

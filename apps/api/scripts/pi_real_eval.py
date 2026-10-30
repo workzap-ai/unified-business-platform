@@ -52,9 +52,18 @@ MAX_CALLS = 30  # stage 1 hard limit (owner approval, 2026-10-30)
 MAX_USD = 0.50
 ALLOWED_SPLITS = (splits.DEVELOPMENT,)
 API_URL = "https://api.openai.com/v1/chat/completions"
-EXPECTED_MODEL = "gpt-4o-mini"  # what the registry's "fast" alias maps to; the answer must match
-VERIFIED_IN_PER_M = 0.15  # USD per 1M input tokens, from the provider's model page (2026-10-30)
-VERIFIED_OUT_PER_M = 0.60  # USD per 1M output tokens: the lowest rates the guard accepts
+DEFAULT_MODEL = "gpt-4o-mini"  # what the registry's "fast" alias maps to
+# Verified USD per 1M tokens (input, output), read from the provider's pricing page on
+# 2026-10-30: the lowest rates the guard accepts for that model. A model that is not here is
+# refused; add one only after checking its price and its request fields.
+VERIFIED_MODELS: dict[str, tuple[float, float]] = {
+    "gpt-4o-mini": (0.15, 0.60),  # deprecated, removal announced for 2027-01-14
+    "gpt-6-luna": (0.10, 0.50),  # the provider's named replacement for gpt-4o-mini
+    "gpt-5.6-luna": (0.20, 1.20),
+    "gpt-5.4-mini": (0.75, 4.50),  # what the registry uses for pi_brain
+}
+# Models that answer with reasoning tokens take `max_completion_tokens` and no temperature.
+CLASSIC_MODELS = ("gpt-4o-mini",)
 JSON_SUFFIX = "\nReply with a JSON object."  # the API's JSON mode needs the word JSON in the prompt
 INPUT_OVERHEAD_TOKENS = 60  # message framing the provider adds
 CHARS_PER_TOKEN_FLOOR = 2.0  # assume one token per 2 characters: far more than English or Urdu need
@@ -150,7 +159,9 @@ class RealManager:
         max_calls: int,
         max_usd: float,
         rates: tuple[float, float],
+        model: str = DEFAULT_MODEL,
     ) -> None:
+        self.model = model
         self.client = client
         self._key = key
         self.max_calls = max_calls
@@ -174,8 +185,8 @@ class RealManager:
             raise Stop(f"call cap reached ({self.max_calls})")
         if self.spent + worst > self.max_usd:
             raise Stop(f"the next call could pass the cap (spent {self.spent:.5f} + {worst:.5f})")
-        body = {
-            "model": EXPECTED_MODEL,
+        body: dict[str, Any] = {
+            "model": self.model,
             "messages": [
                 {
                     "role": m.role,
@@ -183,10 +194,13 @@ class RealManager:
                 }
                 for m in messages
             ],
-            "temperature": kwargs.get("temperature", 0.1),
-            "max_tokens": max_tokens,
             "response_format": {"type": "json_object"},
         }
+        if self.model in CLASSIC_MODELS:
+            body["temperature"] = kwargs.get("temperature", 0.1)
+            body["max_tokens"] = max_tokens
+        else:
+            body["max_completion_tokens"] = max_tokens  # bounds reasoning tokens too
         self.calls += 1  # counted before the send: a failed call counts too
         try:
             response = await self.client.post(
@@ -206,9 +220,9 @@ class RealManager:
         if not isinstance(data, dict):
             raise self._fail(worst, "the provider's answer was not a JSON object")
         served = str(data.get("model", ""))
-        if not served.startswith(EXPECTED_MODEL):
+        if not served.startswith(self.model):
             raise self._fail(
-                worst, f"a different model answered: {served!r}, expected {EXPECTED_MODEL}"
+                worst, f"a different model answered: {served!r}, expected {self.model}"
             )
         raw_usage = data.get("usage")
         usage: dict[str, Any] = raw_usage if isinstance(raw_usage, dict) else {}
@@ -310,16 +324,22 @@ def number_problem(args: argparse.Namespace) -> str:
         return f"--max-calls must be 1 to {MAX_CALLS} (stage 1)"
     if not (math.isfinite(args.max_usd) and 0 < args.max_usd <= MAX_USD):
         return f"--max-usd must be above 0 and at most {MAX_USD} (stage 1)"
+    if args.model not in VERIFIED_MODELS:
+        return (
+            f"model {args.model!r} is not in the verified model table "
+            f"({', '.join(VERIFIED_MODELS)})"
+        )
+    floor_in, floor_out = VERIFIED_MODELS[args.model]
     low = (
         not math.isfinite(args.in_per_m)
         or not math.isfinite(args.out_per_m)
-        or args.in_per_m < VERIFIED_IN_PER_M
-        or args.out_per_m < VERIFIED_OUT_PER_M
+        or args.in_per_m < floor_in
+        or args.out_per_m < floor_out
     )
     if low:
         return (
-            "the token prices must be finite and at least the verified rates "
-            f"({VERIFIED_IN_PER_M} in, {VERIFIED_OUT_PER_M} out, USD per 1M tokens)"
+            f"the token prices must be finite and at least the verified rates for {args.model} "
+            f"({floor_in} in, {floor_out} out, USD per 1M tokens)"
         )
     return ""
 
@@ -327,6 +347,7 @@ def number_problem(args: argparse.Namespace) -> str:
 def parser() -> argparse.ArgumentParser:
     ap = argparse.ArgumentParser(description="D6 stage 1 real-extractor run (dry run by default)")
     ap.add_argument("--split", choices=list(ALLOWED_SPLITS), default=splits.DEVELOPMENT)
+    ap.add_argument("--model", default=DEFAULT_MODEL, help="a model in the verified table")
     ap.add_argument("--max-calls", type=int, default=MAX_CALLS)
     ap.add_argument("--max-usd", type=float, default=MAX_USD)
     ap.add_argument("--in-per-m", type=float, required=True, help="USD per 1M input tokens")
@@ -355,7 +376,7 @@ async def run_async(
     languages: dict[str, int] = defaultdict(int)
     for case in chosen:
         languages[str(case.get("language", "en"))] += 1
-    out(f"plan: {len(chosen)} calls, split {args.split}, model {EXPECTED_MODEL}")
+    out(f"plan: {len(chosen)} calls, split {args.split}, model {args.model}")
     out(f"languages: {dict(sorted(languages.items()))}")
     out(f"worst case per call: USD {max(worst):.6f}; worst case for the run: USD {sum(worst):.6f}")
     out(
@@ -383,7 +404,7 @@ async def run_async(
     scored: list[dict[str, Any]] = []
     stopped = ""
     async with client_factory() as client:
-        manager = RealManager(client, key, len(chosen), args.max_usd, rates)
+        manager = RealManager(client, key, len(chosen), args.max_usd, rates, args.model)
         try:
             for case in chosen:
                 before = len(manager.raw)
@@ -410,7 +431,7 @@ async def run_async(
         except Exception as error:  # noqa: BLE001 - whatever happens, the report and file are kept
             stopped = f"unexpected error: {type(error).__name__}"
     meta = {
-        "model": EXPECTED_MODEL,
+        "model": args.model,
         "calls": manager.calls,
         "spent_usd": round(manager.spent, 6),
         "invalid_outputs": manager.invalid,
