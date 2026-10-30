@@ -283,9 +283,14 @@ class Steer:
     answered: list[str] = field(default_factory=list)
     previous: dict[str, Any] | None = None
     light: bool = False
+    tried_and_failed: list[str] = field(default_factory=list)
 
     def payload(self) -> dict[str, Any]:
         out: dict[str, Any] = {}
+        if self.tried_and_failed:
+            out["owner_already_does_or_says_did_not_help_never_suggest_these"] = [
+                t[:240] for t in self.tried_and_failed[-4:]
+            ]
         if self.asked:
             out["questions_pi_already_asked"] = [q[:160] for q in self.asked[-6:]]
         # a question the owner asked is not a fact they answered
