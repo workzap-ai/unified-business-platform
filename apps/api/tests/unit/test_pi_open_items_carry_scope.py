@@ -441,7 +441,9 @@ async def test_the_erase_of_the_new_conversation_alone_removes_the_carried_items
     session = world(rows, earlier, new)
     await carry(session, s, new)
     assert all(r.conversation_id == new.id for r in rows)
-    removed = await brain_erase._erase_conversation_extras(session, s, [new.id])  # not the old id
+    removed, _skipped = await brain_erase._erase_conversation_extras(
+        session, s, [new.id]
+    )  # not the old id
     assert removed["open_items"] == 2 and session.tables["pi_open_items"] == []
 
 
@@ -819,7 +821,7 @@ async def test_erasing_the_conversations_removes_their_open_items_in_this_worksp
     session = FakeSession(
         pi_open_items=[item(a), item(b), item(outsider), item(keep)], pi_offer_log=[]
     )
-    removed = await brain_erase._erase_conversation_extras(session, mine, [a.id, b.id])
+    removed, _skipped = await brain_erase._erase_conversation_extras(session, mine, [a.id, b.id])
     assert removed["open_items"] == 2
     left = session.tables["pi_open_items"]
     assert {r.conversation_id for r in left} == {outsider.id, keep.id}

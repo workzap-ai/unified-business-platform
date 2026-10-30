@@ -176,7 +176,9 @@ async def test_erasing_removes_the_carried_items_by_the_new_conversation_id_alon
         assert row.conversation_id == new.id  # the move happened: not the old chat's rows any more
     assert await count(business_db, mine) == 2
     # erase by the NEW conversation id only: the old chat's id plays no part in the removal
-    removed = await brain_erase._erase_conversation_extras(business_db, mine.scope(), [new.id])
+    removed, _skipped = await brain_erase._erase_conversation_extras(
+        business_db, mine.scope(), [new.id]
+    )
     assert removed["open_items"] == 2
     assert await count(business_db, mine) == 0
     assert await count(business_db, theirs) == 1
