@@ -88,6 +88,7 @@ REMOVED_KEYS = (
     "learning_examples",
     "memories",
     "experiences",
+    "hypotheses",
     "move_log",
     "offer_log",
     "open_items",
@@ -135,12 +136,28 @@ async def _erase_conversation_extras(
     return await _run_steps(session, tuple(steps))
 
 
+UNDEFINED_TABLE = "42P01"  # PostgreSQL SQLSTATE: the only error a step may be skipped for
+
+
+def _sqlstate(exc: ProgrammingError) -> str | None:
+    """The SQLSTATE of a database error (asyncpg and psycopg variants), or None if unreadable."""
+    for carrier in (exc.orig, getattr(exc.orig, "__cause__", None)):
+        for name in ("sqlstate", "pgcode"):
+            value = getattr(carrier, name, None)
+            if isinstance(value, str) and value:
+                return value
+    return None
+
+
 async def _run_steps(
     session: AsyncSession, steps: tuple[tuple[str, Any], ...]
 ) -> tuple[dict[str, int], list[str]]:
     """Run each step in its own savepoint. A step is a statement, or a function returning an
-    awaitable count (the profile store). A step that cannot run (a table that does not exist
-    yet in this database) is named and logged, never dropped silently: the caller reports it."""
+    awaitable count (the profile store). Only an undefined table (SQLSTATE 42P01: the migration
+    that creates it has not run in this database) skips a step: it is named and logged, never
+    dropped silently, and the caller reports it. Any other error, including a ProgrammingError
+    whose SQLSTATE is another code or cannot be read, propagates: the request's transaction rolls
+    back, nothing is committed and the caller sees a failure, never a partial erase."""
     counts = {key: 0 for key, _ in steps}
     skipped: list[str] = []
     for key, step in steps:
@@ -150,9 +167,12 @@ async def _run_steps(
                     counts[key] = _n(await session.execute(step))
                 else:
                     counts[key] = int(await step())
-        except ProgrammingError:
+        except ProgrammingError as exc:
+            sqlstate = _sqlstate(exc)
+            if sqlstate != UNDEFINED_TABLE:
+                raise  # not a missing table (or unreadable): fail the request, erase nothing
             skipped.append(key)
-            logger.warning("pi_erase_step_skipped", extra={"step": key})
+            logger.warning("pi_erase_step_skipped", extra={"step": key, "sqlstate": sqlstate})
     return counts, skipped
 
 
@@ -432,9 +452,11 @@ async def erase_customer(
             )
         )
         # the thinking step's notes about the chat (hypotheses hold the owner's own words)
-        await session.execute(
-            delete(PiHypothesis).where(
-                *mine(PiHypothesis), PiHypothesis.conversation_id.in_(conversation_ids)
+        removed["hypotheses"] = _n(
+            await session.execute(
+                delete(PiHypothesis).where(
+                    *mine(PiHypothesis), PiHypothesis.conversation_id.in_(conversation_ids)
+                )
             )
         )
         removed["move_log"] = _n(
@@ -534,4 +556,7 @@ async def erase_customer(
             ),
         },
         "conversations": len(conversation_ids),
+        # false when a step was skipped (its table is missing): the erase is INCOMPLETE
+        "complete": not skipped,
+        "skipped": skipped,
     }

@@ -35,6 +35,12 @@ async def erase(
             "CONFIRMATION_REQUIRED", "Send confirm: true to erase this customer's data", 422
         )
     result = await erase_customer(session, scope, customer_id)
+    if not result["complete"]:
+        # only an undefined table is ever skipped; any other error fails the request instead
+        result["warning"] = (
+            "INCOMPLETE: these steps did not run because their table is missing in this "
+            "database: " + ", ".join(result["skipped"])
+        )
     await record(
         session,
         "pi.brain_data_erased",
@@ -47,7 +53,8 @@ async def erase(
             # the trail records what was left on purpose (share links: erase decision R1)
             # and which steps could not run, so a 200 never hides a step that did not erase
             "kept_reasons": result["kept_reasons"],
-            "skipped": result["removed"].get("_skipped", []),
+            "skipped": result["skipped"],
+            "complete": result["complete"],
         },
     )
     await session.commit()

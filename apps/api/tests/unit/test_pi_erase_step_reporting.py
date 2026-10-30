@@ -7,10 +7,11 @@ these tests check the statements and the reporting, not the SQL result."""
 import logging
 from pathlib import Path
 from types import SimpleNamespace
+from typing import Any
 from uuid import uuid4
 
 import pytest
-from sqlalchemy.exc import ProgrammingError
+from sqlalchemy.exc import DataError, IntegrityError, ProgrammingError
 
 from app.modules.pi import brain_erase, brain_erase_routes
 from app.modules.pi.box_models import PiBoxTransition, PiMapVersion, PiOfferLog, PiSolutionBox
@@ -18,6 +19,28 @@ from app.modules.pi.business_profile_models import PiBusinessProfile
 from app.modules.pi.open_item_models import PiOpenItem
 from app.modules.pi.solution_models import PiIdeaFeedback, PiSolutionMemory
 from app.shared.scope import WorkspaceScope
+
+
+class PgError(Exception):
+    """A database driver error that carries its SQLSTATE (asyncpg: sqlstate)."""
+
+    def __init__(self, sqlstate: str) -> None:
+        super().__init__("db error")
+        self.sqlstate = sqlstate
+
+
+class PsycopgError(Exception):
+    """The psycopg variant: the SQLSTATE is called pgcode."""
+
+    def __init__(self, pgcode: str) -> None:
+        super().__init__("db error")
+        self.pgcode = pgcode
+
+
+def failure(sql: str, sqlstate: str | None = "42P01") -> ProgrammingError:
+    """A ProgrammingError whose driver error carries `sqlstate`; None means unreadable."""
+    orig = PgError(sqlstate) if sqlstate else Exception("db error")
+    return ProgrammingError(sql, {}, orig)
 
 
 class Savepoint:
@@ -32,8 +55,9 @@ class Savepoint:
 
 
 class FakeSession:
-    def __init__(self, fail_on: tuple[str, ...] = ()) -> None:
+    def __init__(self, fail_on: tuple[str, ...] = (), raises: Any = None) -> None:
         self.fail_on = fail_on
+        self.raises = raises or failure
         self.savepoints = 0
         self.statements: list[str] = []
 
@@ -45,7 +69,7 @@ class FakeSession:
         self.statements.append(sql)
         for marker in self.fail_on:
             if marker in sql:
-                raise ProgrammingError(sql, {}, Exception("relation does not exist"))
+                raise self.raises(sql)
         return SimpleNamespace(rowcount=2)
 
 
@@ -120,15 +144,15 @@ class WholeEraseSession(FakeSession):
     """What erase_customer needs from a session: selects return ids so the conversation steps run,
     and a marker raises ProgrammingError in the statement of one step (a missing table)."""
 
-    def __init__(self, fail_on: tuple[str, ...] = ()) -> None:
-        super().__init__(fail_on)
+    def __init__(self, fail_on: tuple[str, ...] = (), raises: Any = None) -> None:
+        super().__init__(fail_on, raises)
         self.conversation_id = uuid4()
 
     async def scalars(self, statement: object) -> list[object]:
         sql = " ".join(str(statement).split())
         for marker in self.fail_on:
             if marker in sql:
-                raise ProgrammingError(sql, {}, Exception("relation does not exist"))
+                raise self.raises(sql)
         if sql.startswith("SELECT pi_conversations.id"):
             return [self.conversation_id]
         if sql.startswith("SELECT pi_messages.id"):
@@ -182,6 +206,8 @@ async def test_the_audit_record_carries_kept_reasons_and_the_skipped_steps(monke
     async def fake_erase(session, scope, customer_id):
         return {
             "removed": {"problems": 1, "_skipped": ["offer_log"]},
+            "complete": False,
+            "skipped": ["offer_log"],
             "kept": {"documents": 0, "payments": 0},
             "kept_reasons": {"share_links_all_chats": "erase decision R1 (share links)"},
             "conversations": 1,
@@ -208,3 +234,136 @@ async def test_the_audit_record_carries_kept_reasons_and_the_skipped_steps(monke
     assert details["skipped"] == ["offer_log"]
     assert details["kept_reasons"]["share_links_all_chats"].startswith("erase decision R1")
     assert details["removed"]["problems"] == 1 and result["removed"]["_skipped"] == ["offer_log"]
+
+
+# ---- only an undefined table (SQLSTATE 42P01) may be skipped; everything else fails the request
+
+
+async def test_the_skip_log_carries_the_step_and_the_sqlstate_and_no_statement(caplog):
+    session = FakeSession(fail_on=("DELETE FROM pi_pending_actions",))
+    with caplog.at_level(logging.WARNING, logger=brain_erase.logger.name):
+        await texts(session)
+    (record,) = [r for r in caplog.records if r.getMessage() == "pi_erase_step_skipped"]
+    assert record.step == "pending_actions" and record.sqlstate == "42P01"
+    assert "DELETE" not in record.getMessage() and not hasattr(record, "statement")
+
+
+def test_the_sqlstate_is_read_from_asyncpg_psycopg_and_a_chained_cause():
+    assert brain_erase._sqlstate(ProgrammingError("x", {}, PgError("42P01"))) == "42P01"
+    assert brain_erase._sqlstate(ProgrammingError("x", {}, PsycopgError("42P01"))) == "42P01"
+    chained = Exception("wrapper")
+    chained.__cause__ = PgError("42P01")
+    assert brain_erase._sqlstate(ProgrammingError("x", {}, chained)) == "42P01"
+    assert brain_erase._sqlstate(ProgrammingError("x", {}, Exception("none"))) is None
+
+
+@pytest.mark.parametrize(
+    "make",
+    [
+        pytest.param(lambda sql: failure(sql, "42703"), id="undefined column"),
+        pytest.param(lambda sql: failure(sql, "42501"), id="permission denied"),
+        pytest.param(lambda sql: failure(sql, None), id="no readable sqlstate"),
+        pytest.param(lambda sql: IntegrityError(sql, {}, PgError("23503")), id="integrity"),
+        pytest.param(lambda sql: DataError(sql, {}, PgError("22001")), id="data"),
+        pytest.param(lambda sql: RuntimeError("boom"), id="any other exception"),
+    ],
+)
+async def test_any_other_error_propagates_so_nothing_is_committed(make):
+    session = WholeEraseSession(fail_on=("DELETE FROM pi_pending_actions",), raises=make)
+    with pytest.raises(Exception) as caught:
+        await brain_erase.erase_customer(session, scope(), uuid4())
+    assert not isinstance(caught.value, AssertionError)
+
+
+async def test_a_step_runner_failure_that_is_not_a_missing_table_is_never_counted_as_skipped():
+    session = FakeSession(
+        fail_on=("DELETE FROM pi_pending_actions",), raises=lambda sql: failure(sql, "42703")
+    )
+    with pytest.raises(ProgrammingError):
+        await texts(session)
+
+
+async def test_the_hypotheses_deletion_is_counted():
+    result = await brain_erase.erase_customer(WholeEraseSession(), scope(), uuid4())
+    assert "hypotheses" in brain_erase.REMOVED_KEYS and result["removed"]["hypotheses"] == 2
+
+
+async def test_erase_customer_says_complete_when_nothing_was_skipped_and_incomplete_otherwise():
+    clean = await brain_erase.erase_customer(WholeEraseSession(), scope(), uuid4())
+    assert clean["complete"] is True and clean["skipped"] == []
+    marker = f"DELETE FROM {PiOfferLog.__tablename__}"
+    partial = await brain_erase.erase_customer(
+        WholeEraseSession(fail_on=(marker,)), scope(), uuid4()
+    )
+    assert partial["complete"] is False and partial["skipped"] == ["offer_log"]
+
+
+async def route_run(monkeypatch, fake_erase):
+    seen: dict[str, object] = {}
+
+    async def fake_record(session, event, **kwargs):
+        seen["event"], seen["details"] = event, kwargs["details"]
+
+    async def fake_require(session, scope, permission):
+        return None
+
+    class Session:
+        async def commit(self) -> None:
+            seen["committed"] = True
+
+    monkeypatch.setattr(brain_erase_routes, "erase_customer", fake_erase)
+    monkeypatch.setattr(brain_erase_routes, "record", fake_record)
+    monkeypatch.setattr(brain_erase_routes, "require_pi", fake_require)
+    return seen, Session()
+
+
+async def test_the_response_says_incomplete_with_the_skipped_steps_and_still_commits(monkeypatch):
+    async def fake_erase(session, scope, customer_id):
+        return {
+            "removed": {"problems": 1, "_skipped": ["offer_log"]},
+            "kept": {"documents": 0, "payments": 0},
+            "kept_reasons": {},
+            "conversations": 1,
+            "complete": False,
+            "skipped": ["offer_log"],
+        }
+
+    seen, session = await route_run(monkeypatch, fake_erase)
+    result = await brain_erase_routes.erase(
+        uuid4(), brain_erase_routes.EraseInput(confirm=True), scope(), session
+    )
+    assert result["complete"] is False and result["skipped"] == ["offer_log"]
+    assert "INCOMPLETE" in result["warning"] and "offer_log" in result["warning"]
+    assert seen["details"]["complete"] is False and seen["details"]["skipped"] == ["offer_log"]
+    assert seen["committed"] is True  # only a missing table was skipped: the rest is erased
+
+
+async def test_a_complete_erase_has_no_warning(monkeypatch):
+    async def fake_erase(session, scope, customer_id):
+        return {
+            "removed": {"problems": 1, "_skipped": []},
+            "kept": {},
+            "kept_reasons": {},
+            "conversations": 1,
+            "complete": True,
+            "skipped": [],
+        }
+
+    seen, session = await route_run(monkeypatch, fake_erase)
+    result = await brain_erase_routes.erase(
+        uuid4(), brain_erase_routes.EraseInput(confirm=True), scope(), session
+    )
+    assert result["complete"] is True and "warning" not in result
+    assert seen["details"]["complete"] is True
+
+
+async def test_a_failing_erase_neither_records_nor_commits(monkeypatch):
+    async def fake_erase(session, scope, customer_id):
+        raise failure("UPDATE pi_tasks", "42703")
+
+    seen, session = await route_run(monkeypatch, fake_erase)
+    with pytest.raises(ProgrammingError):
+        await brain_erase_routes.erase(
+            uuid4(), brain_erase_routes.EraseInput(confirm=True), scope(), session
+        )
+    assert "event" not in seen and "committed" not in seen

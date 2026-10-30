@@ -13,11 +13,12 @@ from types import SimpleNamespace
 
 import pytest
 from sqlalchemy import func, select
+from sqlalchemy.exc import ProgrammingError
 from test_pi_isolation_core import two_chats
 
 from app.modules.customers.models import Customer
 from app.modules.pi.brain_erase import ERASED, erase_customer
-from app.modules.pi.models import PiConversation, PiHandoff, PiPendingAction
+from app.modules.pi.models import PiConversation, PiHandoff, PiMessage, PiPendingAction
 from app.modules.pi_customer.models import CustomerShareLink
 from app.modules.pi_saas.deal_models import PiDocument
 from app.modules.pi_saas.models import (
@@ -328,6 +329,7 @@ async def test_a_ticket_and_a_task_linked_only_by_customer_id_are_cleared(
 
     ta = w.conv_a.tenant_id
     assert await count(db, PiTicket, tenant_id=ta) == 1  # the row stays
+    assert await count(db, PiTask, tenant_id=ta) == 1  # the task row stays too, blanked
     assert await texts(db, PiTicket, ta, "subject") == [ERASED]  # the title takes the marker
     assert await texts(db, PiTicket, ta, "summary") == [""]  # free text is blanked
     assert [v for v in await texts(db, PiTask, ta, "title", "description") if WORDS in v] == []
@@ -413,13 +415,13 @@ async def test_another_customers_staff_requests_and_handoffs_in_the_same_workspa
     db = business_db
     w = await two_chats(api, db, monkeypatch)
     await seed_rows(db, w.conv_a, "a")
+    # read what is needed before the session expires its objects (no lazy load outside a greenlet)
+    ta, conv_a_id = w.conv_a.tenant_id, w.conv_a.id
     await w.a.process("hello", "other-customer", sender="923001112233")
     await w.a.deliver_all()
     db.expire_all()
     other_conv = await db.scalar(
-        select(PiConversation).where(
-            PiConversation.tenant_id == w.conv_a.tenant_id, PiConversation.id != w.conv_a.id
-        )
+        select(PiConversation).where(PiConversation.tenant_id == ta, PiConversation.id != conv_a_id)
     )
     assert other_conv is not None and other_conv.customer_id != w.cust_a
     where = {"tenant_id": other_conv.tenant_id, "environment_id": other_conv.environment_id}
@@ -449,11 +451,55 @@ async def test_another_customers_staff_requests_and_handoffs_in_the_same_workspa
     await erase_customer(db, w.scope_a, w.cust_a)
     await db.flush()
 
-    ta = w.conv_a.tenant_id
     assert "keep question" in await texts(db, PiStaffRequest, ta, "question")
     assert "keep answer" in await texts(db, PiStaffRequest, ta, "answer")
     assert "keep summary" in await texts(db, PiHandoff, ta, "summary")
     assert "keep note" in await texts(db, PiHandoff, ta, "resolution_note")
     assert not [v for v in await texts(db, PiStaffRequest, ta, "question") if WORDS in v]
+    await w.a.close()
+    await w.b.close()
+
+
+class PgError(Exception):
+    """A driver error carrying a SQLSTATE that is not 'undefined table'."""
+
+    def __init__(self, sqlstate: str) -> None:
+        super().__init__("db error")
+        self.sqlstate = sqlstate
+
+
+async def test_a_failing_step_rolls_every_earlier_step_back_with_the_request(
+    api, business_db, monkeypatch
+):
+    """Only an undefined table is skipped. Any other error propagates, so the request's transaction
+    rolls back and nothing is committed: no partial erase after a 'delete everything' request."""
+    db = business_db
+    w = await two_chats(api, db, monkeypatch)
+    await seed_rows(db, w.conv_a, "a")
+    # read what is needed before anything expires (no lazy load outside a greenlet)
+    ta, conv_a_id = w.conv_a.tenant_id, w.conv_a.id
+    real_execute = db.execute
+
+    async def failing(statement, *args, **kwargs):
+        if str(statement).lstrip().startswith("UPDATE pi_tasks"):
+            raise ProgrammingError(str(statement), {}, PgError("42703"))  # undefined column
+        return await real_execute(statement, *args, **kwargs)
+
+    monkeypatch.setattr(db, "execute", failing)
+    with pytest.raises(ProgrammingError):
+        async with db.begin_nested():  # stands for the request's transaction
+            await erase_customer(db, w.scope_a, w.cust_a)
+    monkeypatch.setattr(db, "execute", real_execute)
+
+    # nothing of the erase survived: the earlier steps were rolled back with the failing one
+    assert await texts(db, PiTicket, ta, "subject") == [f"{WORDS} a"]
+    assert await count(db, PiConversationTag, tenant_id=ta) == 1
+    bodies = [
+        row
+        for row in await db.scalars(
+            select(PiMessage.body).where(PiMessage.conversation_id == conv_a_id)
+        )
+    ]
+    assert bodies and ERASED not in bodies
     await w.a.close()
     await w.b.close()
