@@ -106,6 +106,11 @@ class PiProblem(WorkspaceRow):
     raised_voluntarily: Mapped[bool] = mapped_column(
         Boolean, default=False, server_default="false"
     )  # B5: raised on their own, not only as an answer
+    # B2a (migration 0053): nullable, NULL means "not said". Shapes in problem_fields.py.
+    constraints: Mapped[dict[str, Any] | None] = mapped_column(JSONB, nullable=True)
+    tried: Mapped[list[dict[str, Any]] | None] = mapped_column(JSONB, nullable=True)
+    cause: Mapped[dict[str, Any] | None] = mapped_column(JSONB, nullable=True)
+    expected_outcome: Mapped[str | None] = mapped_column(Text, nullable=True)
 
 
 class PiProblemRevision(WorkspaceRow):
