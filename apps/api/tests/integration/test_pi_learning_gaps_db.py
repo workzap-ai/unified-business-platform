@@ -377,7 +377,7 @@ async def test_every_reply_can_be_traced_to_what_it_used(api, business_db, monke
     assert row.frozen is True  # response_rules {} is frozen: the stamp says so
     again = await learning_audit.stamp(business_db, scope, conversation, reply)
     assert again.id == row.id  # one row per reply
-    assert (await learning_audit.trace(business_db, reply.id)).id == row.id
+    assert (await learning_audit.trace(business_db, scope, reply.id)).id == row.id
     assert (
         await business_db.scalar(select(PiReplyAudit.id).where(PiReplyAudit.message_id == reply.id))
     ) == row.id  # every sent reply has a row now: look up this one

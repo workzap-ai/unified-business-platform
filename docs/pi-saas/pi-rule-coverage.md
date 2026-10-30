@@ -118,7 +118,12 @@ Change a guard, change its row in `rule_index.json` (code and tests), run `pytes
 | "I already told you" blocks the offer for eight messages (18.3) | `box_signals.repeat_complaint_recent` | done |
 | owner turns, ideas tied to problems, correction, direct question (18.4 to 18.8) | `think_prompt.BLOCK` | prompt only, no code check yet |
 | map image v2 (18.7): margin 48, height from content, "No links yet", legend and footer only when used, caption asks if it is right | `map_render.py` | done except card size 45% and text 28 px |
-| G12 idea link (`problem_id` on every idea), full alreadyAnswered, replays G54/G55, openingGate log | | open |
+| openingGate log (18.2): result, path, prompt version, never the text | `reply_gates.opening_log`, logged in `service_conversation.py` | done (`test_pi_opening_log.py`) |
+| G12 idea link, opt-in by `response_rules.brain.idea_link` | `idea_filter.with_idea_link`, wired in `service_conversation.py` | built, off by default, not measured with a real model |
+| alreadyAnswered at fact level (a count, a duration, a frequency), opt-in by `response_rules.brain.fact_ask` | `reply_gates.fact_already_given`, `part18_problem` | built, off by default, not measured with a real model |
+| B1 no list item dropped: a bulleted, numbered or multi-line list is cut into items and each must be in a note of this turn or an earlier one; a dropped item goes back in the one rewrite. Opt-in by `response_rules.brain.list_guard` | `list_items.guard`, wired in `service_conversation.py` | built, off by default, scripted turn tested only (`test_pi_list_guard_flow.py`) |
+| the opt-in flags `idea_link`, `fact_ask`, `list_guard` are accepted by the settings API as booleans (before this they were refused, so they could not be turned on) | `policy.validate_section` | done (`test_pi_opt_in_flags.py`) |
+| alreadyAnswered for profile and map nodes the owner stated but pi never asked about; replays G54/G55 | | open |
 
 ## Red-team round 2 (2026-10-30)
 

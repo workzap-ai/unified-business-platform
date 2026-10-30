@@ -149,9 +149,16 @@ async def stamp_safely(
         logger.warning("pi_reply_audit_failed", exc_info=True)
 
 
-async def trace(session: AsyncSession, message_id: Any) -> PiReplyAudit | None:
-    """The audit row for a reply, for `/pi-trace` and the Brain screen."""
+async def trace(
+    session: AsyncSession, scope: WorkspaceScope, message_id: Any
+) -> PiReplyAudit | None:
+    """The audit row for a reply, for `/pi-trace` and the Brain screen. Only inside the workspace:
+    another workspace's message id finds nothing."""
     found: PiReplyAudit | None = await session.scalar(
-        select(PiReplyAudit).where(PiReplyAudit.message_id == message_id)
+        select(PiReplyAudit).where(
+            PiReplyAudit.tenant_id == scope.tenant_id,
+            PiReplyAudit.environment_id == scope.environment_id,
+            PiReplyAudit.message_id == message_id,
+        )
     )
     return found

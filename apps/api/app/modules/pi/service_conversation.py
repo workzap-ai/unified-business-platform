@@ -44,6 +44,7 @@ from app.modules.pi import (
     industry_packs,
     latency,
     learning_context,
+    list_items,
     map_builder,
     map_share,
     memory_block,
@@ -1486,6 +1487,8 @@ async def brain_problems(
         context["thinking"] = True
     if (policy.response_rules.get("brain") or {}).get("fact_ask") is True:  # 18.5, opt-in
         context["fact_ask"] = True
+    if (policy.response_rules.get("brain") or {}).get("list_guard") is True:  # B1, opt-in
+        context["list_guard"] = True
     if box.box_offer_enabled(policy.response_rules):  # Book 5: the Solution Box offer rule
         context["box_offer"] = True
         # B3 and B4 from the owner's words, kept in the brief like the other brief keys. The flag
@@ -6045,6 +6048,12 @@ async def compose_service_turn(
         # Spec v1.5, Part 18: openingGate, noEmptyOpener, closed list before the business is known.
         if problem_text := part18_problem(turn.reply, context):
             problem = f"{problem_text}, and also: {problem}" if problem else problem_text
+    if list_text := list_items.guard(context, turn.problem_ops):  # B1: no list item dropped
+        problem = f"{list_text}, and also: {problem}" if problem else list_text
+    if context.get("pi_mode") == "brain" and context.get("thinking"):
+        # Spec 17.3, 17.4 G10, 11.1 S_HOLD: topic switch, feasibility, no ideas while held
+        if text := turn_state.guard(turn.reply, context):
+            problem = f"{text}, and also: {problem}" if problem else text
     if (
         not problem
         and context.get("pi_mode") == "brain"
@@ -6343,15 +6352,22 @@ async def compose_service_turn(
         if (status := handoff_status_line(context)) and not turn.request_human:
             turn.reply = f"{status} {turn.reply}"
             turn._handoff_status = str((context.get("pending_handoff") or {}).get("id") or "")
+    if context.get("opening_by_model"):
+        from app.modules.pi import learning_audit
+
+        version = learning_audit.prompt_version()
     if context.get("opening_by_model") and reply_gates.opening_problem(turn.reply, context, False):
         # Failed openingGate twice: the safe fixed line, and a log for the audit (18.2 Logging).
-        logger.warning("openingGate fail, fallback sent", extra={"path": "template"})
+        logger.warning(
+            "openingGate fail, fallback sent",
+            extra=reply_gates.opening_log(False, "template", version),
+        )
         # The same turn the fixed line always made, so the script rule (one script per chat) holds.
         turn = ServiceTurn(reply=str(context["opening_fallback"]), language="en")
         turn._greeting_only = True
         await in_their_language(manager, scope, policy, conversation, turn, context)
     elif context.get("opening_by_model"):
-        logger.info("openingGate pass", extra={"path": "model"})
+        logger.info("openingGate pass", extra=reply_gates.opening_log(True, "model", version))
     return turn
 
 

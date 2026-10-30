@@ -110,7 +110,7 @@ EMPTY_OPENERS = re.compile(
     r"^\s*(?:(?:internal\s+(?:issues|problems),?\s+)?understood|noted|got\s+it|i\s+see|"
     r"that\s+covers\s+a\s+lot\s+of\s+ground|that['’]s\s+a\s+lot\s+of\s+ground|"
     r"here\s+are\s+some\s+(?:ideas|tips|suggestions)\s+for\s+you|okay|ok|sure|alright|"
-    r"note\s+kar\s+liya|samajh\s+gaya|samajh\s+gayi)\s*[.!:,\-–—]*(?:\s|$)",
+    r"(?:alag\s+)?note\s+kar\s+li(?:ya|a)?|samajh\s+gaya|samajh\s+gayi)\s*[.!:,\-–—]*(?:\s|$)",
     re.IGNORECASE,
 )
 _WORD = re.compile(r"[^\W\d_]{4,}", re.UNICODE)
@@ -233,6 +233,16 @@ def _said(words: str) -> str:
     return (
         f"it asks something the owner already said: '{words.strip()}'. Use it, ask what is unknown"
     )
+
+
+def opening_log(passed: bool, path: str, prompt_version: str) -> dict[str, str]:
+    """What the openingGate log line carries (18.2 Logging): the result, which path wrote the
+    opening (the model or the fixed fallback) and the prompt version in force. Never the text."""
+    return {
+        "result": "pass" if passed else "fail",
+        "path": path,
+        "prompt_version": prompt_version,
+    }
 
 
 # 18.3: the offer never says the owner may refuse.
