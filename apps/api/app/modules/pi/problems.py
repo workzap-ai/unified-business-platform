@@ -251,6 +251,37 @@ def thin_message(said: str) -> bool:
     )
 
 
+# A title that covers a whole message ("Internal business problems across several areas"): one
+# problem per owner line, in the owner's words (Live Audit 6, R6).
+UMBRELLA_TITLE = re.compile(
+    r"\b(?:several|multiple|various|many|numerous|different|assorted|general)\s+"
+    r"(?:areas?|issues?|problems?|things|matters|topics|parts|departments?)\b|"
+    r"\b(?:across|in)\s+(?:several|multiple|various|many|all)\s+areas?\b|"
+    r"\b(?:internal|business|operational|operations|general|overall|miscellaneous)\s+"
+    r"(?:business\s+)?(?:problems?|issues?|challenges?)\b",
+    re.IGNORECASE,
+)
+
+
+def umbrella_problem(title: str, user_words: list[str], said: str) -> str | None:
+    """Why a create covers several owner lines or is a catch-all title, or None."""
+    if UMBRELLA_TITLE.search(title):
+        return (
+            f'the title "{title}" is an umbrella: make one problem per line the owner wrote, '
+            "titled with their own words and figures (for example 10 crore, QB)"
+        )
+    lines = [ln for ln in (said or "").splitlines() if len(ln.split()) >= 2]
+    if len(lines) >= 2:
+        blob = " ".join(user_words or [])
+        hit = [ln for ln in lines if ln.strip()[:40].lower() in blob.lower()]
+        if len(hit) >= 2:
+            return (
+                f'"{title}" covers {len(hit)} separate lines of the owner message: '
+                "make one create per line"
+            )
+    return None
+
+
 def check_ops(
     ops: list[ProblemOp], known_refs: set[str], noted_in_reply: bool, said: str = ""
 ) -> str | None:
@@ -268,6 +299,10 @@ def check_ops(
                     "in it makes no problem record, so ask what is going wrong instead"
                 )
             if (why := title_problem(note.title)) is not None:
+                issues.append(why)
+            elif (
+                why := umbrella_problem(note.title, list(note.user_words or []), said)
+            ) is not None:
                 issues.append(why)
             if not note.user_words:
                 issues.append(f'"{note.title}" has no user_words (their own words, verbatim)')
@@ -287,6 +322,8 @@ def check_ops(
         elif op.op == "update" and op.note is not None and op.note.title.strip():
             if (why := title_problem(op.note.title)) is not None:
                 issues.append(why)
+            elif UMBRELLA_TITLE.search(op.note.title):
+                issues.append(umbrella_problem(op.note.title, [], said))
         elif op.op == "merge":
             if op.ref not in known_refs or not op.refs or any(r not in known_refs for r in op.refs):
                 issues.append("merge needs a kept ref and the duplicate refs, all known")
@@ -298,6 +335,8 @@ def check_ops(
             for part in op.notes:
                 if (why := title_problem(part.title)) is not None:
                     issues.append(why)
+                elif UMBRELLA_TITLE.search(part.title):
+                    issues.append(umbrella_problem(part.title, [], said))
                 elif not part.user_words:
                     issues.append(f'"{part.title}" has no user_words (their own words, verbatim)')
     return "; ".join(issues) if issues else None

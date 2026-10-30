@@ -45,6 +45,19 @@ LABELS: dict[str, dict[str, str]] = {
         "verify": "Bank details are only in this PDF. Before paying, verify them on",
         "never": "We never ask for payment details in chat.",
         "for": "For solution document",
+        "box_title": "Solution Box",
+        "box_problems": "1. Your problem map, in your words",
+        "box_happening": "2. What is happening",
+        "box_links": "How they may connect",
+        "box_hypothesis": "Our guess",
+        "box_ideas": "3. Two ideas for each problem",
+        "box_build": "4. What Workzap would build, in phases",
+        "box_order": "5. Order of work",
+        "box_needs": "6. What we'd need from you",
+        "box_assume": "7. Assumptions and open questions",
+        "box_quote": "8. Quote",
+        "box_quote_text": "Your quote comes with this box, phase by phase. Bank details are only in the quote PDF.",
+        "box_naya": "New since the last box",
     },
     "roman_ur": {
         "solution": "Solution document",
@@ -71,6 +84,19 @@ LABELS: dict[str, dict[str, str]] = {
         "verify": "Bank ki details sirf isi PDF mein hain. Payment se pehle in ko is number par verify karein",
         "never": "Hum chat mein kabhi payment ki details nahi maangte.",
         "for": "Solution document",
+        "box_title": "Solution Box",
+        "box_problems": "1. Aap ka naqsha, aap ke alfaz mein",
+        "box_happening": "2. Kya ho raha hai",
+        "box_links": "Ye kaise jude ho sakte hain",
+        "box_hypothesis": "Hamara andaza",
+        "box_ideas": "3. Har masle ke liye do ideas",
+        "box_build": "4. Workzap kya banayega, marhalon mein",
+        "box_order": "5. Kaam ki tarteeb",
+        "box_needs": "6. Hamein aap se kya chahiye",
+        "box_assume": "7. Farz kiye gaye nukte aur khule sawal",
+        "box_quote": "8. Quote",
+        "box_quote_text": "Aap ka quote is box ke saath hai, marhale ba marhale. Bank ki details sirf quote PDF mein hain.",
+        "box_naya": "Pichle box ke baad naya",
     },
 }
 PDF_LANGUAGES = frozenset(LABELS)
@@ -135,9 +161,75 @@ def _header(doc: Document, business: str, title: str, number: str, issued: date)
     return 140.0
 
 
+def render_box(
+    content: dict[str, Any], *, business: str, ref: str, issued: date, language: str
+) -> bytes:
+    """The Solution Box as the spec's eight sections (5.2). The quote itself is its own PDF."""
+    label = LABELS[drawn_language(language)]
+    doc = Document(title=f"{label['box_title']} {ref}")
+    page = _Page(doc, _header(doc, business, label["box_title"], ref, issued))
+    page.paragraph(f"{label['prepared']}: {ref}", 9)
+    if content.get("naya"):
+        page.paragraph(f"{label['box_naya']}: " + "; ".join(str(x) for x in content["naya"]), 9)
+    page.gap(12)
+    page.heading(label["box_problems"])
+    for problem in content.get("problems", []):
+        page.paragraph(str(problem.get("title", "")), 11, True)
+        for quote in problem.get("quotes", [])[:2]:
+            page.paragraph(f'"{quote}"', 10, indent=10)
+        page.gap(4)
+    page.heading(label["box_happening"])
+    for cluster in content.get("clusters", []):
+        page.paragraph(str(cluster.get("name", "")), 11, True)
+        for item in cluster.get("happening", []):
+            page.paragraph(str(item.get("title", "")), 10, indent=10)
+            if item.get("line"):
+                page.paragraph(str(item["line"]), 9, indent=20)
+        for guess in cluster.get("hypotheses", []):
+            page.bullet(f"{label['box_hypothesis']}: {guess}")
+        page.gap(4)
+    if content.get("links"):
+        page.paragraph(label["box_links"], 10, True)
+        for line in content["links"]:
+            page.bullet(str(line))
+    page.gap(6)
+    page.heading(label["box_ideas"])
+    for entry in content.get("ideas", []):
+        page.paragraph(str(entry.get("title", "")), 10, True)
+        for idea in entry.get("ideas", []):
+            page.bullet(str(idea))
+    page.gap(6)
+    page.heading(label["box_build"])
+    for phase in content.get("phases", []):
+        page.paragraph(str(phase.get("name", "")), 11, True)
+        for component in content.get("components", []):
+            if int(component.get("phase") or 1) == phase.get("phase"):
+                page.bullet(str(component.get("text", "")))
+    for item in content.get("wont_do", []):
+        page.bullet(f"{label['wont'][3:]}: {item.get('text', '')}")
+    page.gap(6)
+    page.heading(label["box_order"])
+    for number, step in enumerate(content.get("order", []), start=1):
+        page.bullet(f"{number}. {step.get('title', '')}: {step.get('why', '')}")
+    page.gap(6)
+    page.heading(label["box_needs"])
+    for item in content.get("needs", []):
+        page.bullet(str(item))
+    page.gap(6)
+    page.heading(label["box_assume"])
+    for item in content.get("assumptions", []):
+        page.bullet(str(item))
+    page.gap(6)
+    page.heading(label["box_quote"])
+    page.paragraph(label["box_quote_text"])
+    return doc.render()
+
+
 def render_solution(
     content: dict[str, Any], *, business: str, ref: str, issued: date, language: str
 ) -> bytes:
+    if content.get("box"):
+        return render_box(content, business=business, ref=ref, issued=issued, language=language)
     label = LABELS[drawn_language(language)]
     doc = Document(title=f"{label['solution']} {ref}")
     page = _Page(doc, _header(doc, business, label["solution"], ref, issued))
@@ -202,6 +294,11 @@ def render_quote(
     doc.text(RIGHT, page.y, money(total, currency), 14, True, INK, "right")
     page.y += 24
     cost = content.get("cost", {})
+    for phase in content.get("phases", []):  # Solution Box: the quote by phase (spec 5.2, 8)
+        doc.text(MARGIN, page.y, str(phase.get("name", "")), 10, False, MUTED)
+        priced = Decimal(str(phase["price"])) if phase.get("price") else None
+        doc.text(RIGHT, page.y, money(priced, currency), 10, True, INK, "right")
+        page.y += 16
     if cost.get("tax_text"):
         page.paragraph(str(cost["tax_text"]), 9)
     for step in cost.get("instalments", []):

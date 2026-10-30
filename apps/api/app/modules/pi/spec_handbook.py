@@ -40,7 +40,7 @@ BY_STATE: dict[str, tuple[str, ...]] = {
     "S2_CLARIFYING": ("3.3", "3.4", "3.5", "3.6", "3.11", "3.12", "4.1", "4.3"),
     "S3_NOTED": ("3.3", "3.5", "3.11", "3.12", "4.1", "4.3", "4.4"),
     "S4_SORTED_SUMMARY": ("3.7", "4.8", "3.11"),
-    "S_LISTEN_THINK": ("3.8", "3.7"),
+    "S_LISTEN_THINK": ("3.7",),  # a listening state: the offer rules (3.8) are not in the prompt
     "S5_READINESS": ("3.8", "3.7"),
     "S5b_DECLINED": ("3.8",),
     "S6_PREPARING": ("5.1", "5.2", "5.3"),

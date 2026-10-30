@@ -79,7 +79,7 @@ def test_the_free_rider_signal_never_needs_a_tone_change():
 BOX_READY = {
     "box_offer": True,
     "noted_problems": [
-        {"ref": "a", "since": "a year"},
+        {"ref": "a", "since": "a year", "cause": "price"},
         {"ref": "b", "impact": "cash"},
         {"ref": "c"},
     ],
@@ -97,9 +97,14 @@ def turn(reply="Do badlav foran karein. Workzap yahan seedha sa kaam kar sakta h
     return ServiceTurn(reply=reply)
 
 
-def test_without_the_box_the_offer_follows_the_ask_as_before():
+def test_without_the_box_the_offer_needs_the_owner_to_ask_for_the_quote():
+    # Audit R8: the legacy path has no readiness data, so only R1 (asked for a quote) passes.
     t = turn()
     brain_offer(t, {**LISTENING, "solution_asked": True, "reply_language": "en"})
+    assert t.reply == turn().reply and t._decision is None
+    t = turn()
+    ctx = {**LISTENING, "solution_asked": True, "reply_language": "en"}
+    brain_offer(t, {**ctx, "latest_customer_message": "send me a quote for this"})
     assert t.reply.endswith(solution_ask.offer_line("en"))
     assert t._decision.next_state == flow.State.S5_READINESS
 
@@ -113,7 +118,7 @@ def test_with_the_box_on_and_not_ready_the_offer_waits():
 def test_with_the_box_ready_the_application_makes_the_offer_after_ideas_and_moves_to_s5():
     t = turn()
     brain_offer(t, {**LISTENING, **BOX_READY, "solution_asked": True, "reply_language": "en"})
-    assert t.reply.endswith(solution_ask.offer_line("en"))
+    assert "Solution Box" in t.reply and "You can say no" not in t.reply  # box on: the box wording
     assert t._decision.next_state == flow.State.S5_READINESS
     assert t._decision.brief == {"offer_asked": True}
     assert t.awaiting_customer
@@ -144,7 +149,7 @@ def test_how_exactly_gets_the_offer_too():
         t,
         {**LISTENING, **BOX_READY, "solution_howto": {"covers": "x"}, "reply_language": "roman_ur"},
     )
-    assert t.reply.endswith(solution_ask.offer_line("roman_ur"))
+    assert "Solution Box" in t.reply  # box on: the box wording, in Roman Urdu
 
 
 def test_a_push_for_a_fix_gets_ideas_not_the_summary_when_solution_mode_handed_them():

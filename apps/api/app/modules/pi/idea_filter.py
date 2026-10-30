@@ -26,7 +26,7 @@ from collections.abc import Sequence
 from dataclasses import dataclass, replace
 from typing import Any
 
-from app.modules.pi import idea_vocabulary, solution_ideas, solution_library, taxonomy
+from app.modules.pi import feasibility, idea_vocabulary, solution_ideas, solution_library, taxonomy
 
 # A goal verb and the ideas that work against it.
 _AGAINST_CLEARING = re.compile(

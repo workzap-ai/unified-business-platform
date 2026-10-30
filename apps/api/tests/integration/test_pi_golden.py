@@ -308,8 +308,9 @@ async def test_g7_urdu_script_gets_an_urdu_script_reply_with_one_question(
     await say(pi, "میرا گودام میں مال کی گنتی کبھی پوری نہیں ہوتی", "g7-1")
     reply = (await pi.reply_to("g7-1")).body
     assert "کتنی بار" in reply and reply.count("؟") == 1  # RTL text intact, one question
-    # the fixed opening is Roman Urdu like the rest of an Urdu-script chat (one script per chat)
-    assert reply.startswith("Hi, main pi hoon")
+    # v1.5 18.2: the opening is written for the owner (no fixed Roman Urdu line), so an Urdu-script
+    # chat is greeted in Urdu script and says pi is an AI from Workzap in sentence one
+    assert reply.startswith("ہیلو، میں pi ہوں") and "Workzap" in reply.split("۔")[0]
     await pi.close()
 
 

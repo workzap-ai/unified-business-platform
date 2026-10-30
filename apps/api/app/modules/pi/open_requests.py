@@ -64,9 +64,17 @@ def update(
     reply: str,
     *,
     request_human: bool = False,
+    persistent: bool = False,
 ) -> list[dict[str, Any]]:
     """The open requests after this turn: the earlier ones and the ones in this message that the
-    reply did not address (each kept for at most `MAX_OPEN_TURNS` replies)."""
+    reply did not address. Each is kept for at most `MAX_OPEN_TURNS` replies, unless `persistent`
+    (brain mode, platform spec 17.7: an open item closes only when answered or dropped by the
+    owner; `open_items.py` closes it then)."""
+    if persistent:
+        from app.modules.pi import open_items
+
+        if open_items.drops(said):  # the owner let it go: nothing stays open
+            return []
     carried = {str(e.get("kind")): int(e.get("turns") or 0) for e in previous or []}
     wanted = [*carried, *[k for k in kinds(said) if k not in carried]]
     still: list[dict[str, Any]] = []
@@ -74,7 +82,7 @@ def update(
         if addressed(kind, reply, request_human=request_human):
             continue
         turns = carried.get(kind, -1) + 1 if kind in carried else 1
-        if turns <= MAX_OPEN_TURNS:
+        if persistent or turns <= MAX_OPEN_TURNS:
             still.append({"kind": kind, "turns": turns})
     return still
 

@@ -43,8 +43,8 @@ def test_labels_use_the_owners_words_then_the_english_title():
     )
     assert mb.label_of(problem(1, words=['"maal phansa hai"'])) == "maal phansa hai"
     assert mb.label_of(problem(1, title="Dead stock")) == "Dead stock"
-    long = problem(1, local="one two three four five six seven eight")
-    assert mb.label_of(long) == "one two three four five six"
+    long = problem(1, local="one two three four five six seven eight nine ten")
+    assert mb.label_of(long) == "one two three four five six seven eight nine"
 
 
 def test_labels_and_facts_are_redacted_and_facts_come_only_from_the_owner():

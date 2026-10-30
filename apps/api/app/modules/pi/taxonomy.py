@@ -110,7 +110,8 @@ LINK_STATUSES = ("suggested", "confirmed", "rejected")
 
 # Confidence under this means pi checks with the person before the note is confirmed.
 CONFIRM_BELOW = Decimal("0.6")
-# Links are only mentioned to the person at or above this confidence (spec 4.4).
+# Links are only mentioned to the person at or above this confidence (spec 4.4). The same number
+# as brain_config.LINK_DEFAULT (75 percent); a test pins them together.
 LINK_SHOWN_AT = Decimal("0.75")
 
 

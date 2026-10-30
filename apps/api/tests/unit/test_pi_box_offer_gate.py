@@ -1,3 +1,4 @@
+# ruff: noqa: E501  (long Roman Urdu and comment lines)
 """The Solution Box offer rule in the conversation (platform spec Book 5, 5.4): off by default
 (no offer of its own), and when on, pi's own offer waits for R1 to R3 or B1 to B7."""
 
@@ -11,11 +12,12 @@ def _facts(**more: object) -> dict[str, object]:
     return {"problem_count": 2, "group_count": 1, "problem_refs": ["P1", "P2"], **more}
 
 
-def test_with_the_box_off_the_summary_still_brings_the_whole_set_offer() -> None:
-    # Until the map flow that sets B3 and B4 is live the box stays off and the offer follows the
-    # accepted summary, for the whole set, so the chat never reaches a dead end.
+def test_with_the_box_off_the_summary_alone_brings_no_offer() -> None:
+    # Audit R8: with the box off there is no readiness data, so only R1 (the owner asked for the
+    # document or quote) starts the offer; an accepted summary is not enough.
     d = decisions.decide(State.S4_SORTED_SUMMARY, SUMMARY_OK, "roman_ur", _facts())
-    assert d is not None and d.next_state == State.S5_READINESS
+    assert d is not None and d.reply is None and d.next_state is None
+    assert d.why.startswith("R1-blocked")
 
 
 def test_with_the_box_on_two_problems_and_no_map_review_hold_the_offer_back() -> None:
@@ -29,7 +31,7 @@ def test_with_the_box_on_two_problems_and_no_map_review_hold_the_offer_back() ->
 
 def test_with_the_box_on_every_condition_met_the_offer_is_made() -> None:
     ctx = {
-        "noted_problems": [{"since": "a year"}, {"impact": "cash"}, {"cause": "price"}],
+        "noted_problems": [{"since": "a year", "cause": "price"}, {"impact": "cash"}, {"cause": "price"}],
         "brief": {"map_reviewed": True, "ranked": True, "voluntary_problems": 1},
         "history": [{"role": "ai"}] * 9,
     }

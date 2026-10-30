@@ -2319,7 +2319,15 @@ MORE_TRADE_PHRASES: dict[str, tuple[str, ...]] = {
     ),
     "camel_farms": ("oont", "oonton", "camel breeding"),
     "catering_and_event_food": ("catering business", "catering company", "caterer", "deg ka kaam"),
-    "clinics_and_gp_practices": ("medical centre", "polyclinic", "general practice", "gp clinic"),
+    "clinics_and_gp_practices": (
+        "medical centre",
+        "polyclinic",
+        "general practice",
+        "gp clinic",
+        "general practitioner",
+        "family doctor",
+        "family health clinic",
+    ),
     "cosmetics_and_personal_care_manufacturing": (
         "manufacture skincare",
         "skincare manufacturing",

@@ -183,14 +183,19 @@ def offer_facts(context: dict[str, Any], *, asked_for_document: bool = False) ->
     """The readiness facts from what the conversation already holds. B3 and B4 (`map_reviewed`,
     `ranked`) are brief keys the portal map edits and the owner's replies to a shared map set (see
     `box_signals`); B5 counts the noted problems the owner raised on their own; B7 (trust, upset)
-    comes from the dials when `brain.thinking` is on, else steady and not upset. Until a signal is
-    set the offer is held back, as the spec asks (R1 to R3 still go through)."""
+    comes from the dials when `brain.thinking` is on, else steady and not upset. R3, "just
+    corrected" and "in a hurry" come from the owner's latest words, "no other problems" from them
+    or from the brief (kept once said), and whether the main cause is known from the main problem
+    (see `box_signals`). Until a signal is set the offer is held back, as the spec asks (R1 to R3
+    still go through)."""
     from app.modules.pi import box_signals
 
     noted = context.get("noted_problems") or []
     brief = context.get("brief") or {}
     history = context.get("history") or []
     trust_trend, upset = box_signals.trust_and_upset(context)
+    signals = box_signals.message_signals(context)  # R3, "just corrected", "in a hurry"
+    latest = str(context.get("latest_customer_message") or "")
     return OfferFacts(
         problem_count=len(noted),
         understood_count=sum(1 for p in noted if any(p.get(k) for k in _UNDERSTOOD_KEYS)),
@@ -203,5 +208,10 @@ def offer_facts(context: dict[str, Any], *, asked_for_document: bool = False) ->
         declined_recently=bool(brief.get("declined_recently"))
         or _declined_within_quiet(brief, history),
         asked_for_document_or_price=asked_for_document,
-        no_other_problems=bool(brief.get("no_other_problems")),
+        asked_who_or_how_long=signals["asked_who_or_how_long"],
+        no_other_problems=bool(brief.get("no_other_problems"))
+        or box_signals.says_no_others(latest),
+        main_cause_known=box_signals.main_cause_known(context),
+        just_corrected=signals["just_corrected"],
+        in_a_hurry=signals["in_a_hurry"],
     )

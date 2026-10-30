@@ -401,7 +401,7 @@ def test_asking_for_changes_is_noted_confirmed_back_and_sent_to_workzap():
         S.S8B_CHANGES_REQUESTED, "cheaper please and add shop two", "en", facts
     )
     assert decision.reply == (
-        "Noted: Lower the cost; Add a second shop. I've sent this to Workzap. "
+        "I've sent this to Workzap: Lower the cost; Add a second shop. "
         "They'll send a revised version here."
     )
     assert decision.next_state is None and decision.effects == ["request_revision"]

@@ -428,20 +428,91 @@ def rejects_ideas(text: str | None) -> bool:
     return bool(reaction and reaction.signal in ("idea_generic", "idea_no_help"))
 
 
+# The Solution Box offer (platform spec Book 5, 5.4 wording), used only when `brain.box_offer` is
+# on; the older document-and-quote line above stays for every other workspace. The spec words the
+# soft decline before the question in its first example; the question is kept as the last sentence
+# (one question per message, CLAUDE.md), so the order of the sentences is the only change. {n} is
+# the number of problems. "A" needs three or more, "B" three or more and a reviewed map.
+BOX_OFFERS: dict[str, dict[str, str]] = {
+    "en": {
+        "A": "So far you've told me about {n} problems, and they've become one picture. It's fine if you don't want this yet, and new problems can keep joining the same box. Shall I write all of them into one Solution Box, in your order, and have Workzap prepare a quote?",
+        "B": "The map looks quite complete now. Shall I start writing it up, or is there anything else to look at alongside it?",
+        "C": "It's fine if you don't want this yet, and new problems can keep joining the same box. Shall I write all of this into one Solution Box and have Workzap prepare a quote?",
+    },
+    "roman_ur": {
+        "A": "Ab tak aap ne {n} masle bataye, aur wo ek hi tasveer ban gaye hain. Abhi nahi chahiye to bhi theek hai, aur naye masle isi box mein judte jayenge. In sab ko ek Solution Box mein, aap ki tarteeb se, likh dein, aur Workzap ki taraf se ek quote ban jaye?",
+        "B": "Naqsha ab kaafi mukammal lagta hai. Likhna shuru karein, ya koi aur baat saath dekhni hai?",
+        "C": "Abhi nahi chahiye to bhi theek hai, aur naye masle isi box mein judte jayenge. In sab ko ek Solution Box mein likh dein, aur Workzap ki taraf se ek quote ban jaye?",
+    },
+    # Other languages carry the neutral form only, written for review by a native speaker (spec
+    # decision 10).
+    "ur": {
+        "C": "اگر ابھی نہیں چاہیے تو بھی ٹھیک ہے، اور نئے مسائل اسی باکس میں جڑتے رہیں گے۔ کیا ان سب کو ایک Solution Box میں لکھ دیں، اور Workzap کی طرف سے ایک کوٹیشن بن جائے؟",
+    },
+    "ar": {
+        "C": "لا بأس إن لم تريد ذلك الآن، ويمكن للمشكلات الجديدة أن تنضم إلى الصندوق نفسه. هل أكتب كل هذا في Solution Box واحد وتجهّز Workzap عرض سعر؟",
+    },
+    "fr": {
+        "C": "Pas de souci si vous n'en voulez pas encore, et les nouveaux problèmes pourront rejoindre la même boîte. Souhaitez-vous que j'écrive tout cela dans une seule Solution Box et que Workzap prépare un devis ?",
+    },
+    "fa": {
+        "C": "اگر هنوز نمی‌خواهید مشکلی نیست، و مشکل‌های تازه می‌توانند به همین جعبه اضافه شوند. آیا همه این‌ها را در یک Solution Box بنویسم و Workzap یک پیش‌فاکتور آماده کند؟",
+    },
+    "es": {
+        "C": "No pasa nada si todavía no lo quiere, y los problemas nuevos podrán seguir sumándose a la misma caja. ¿Quiere que escriba todo esto en una sola Solution Box y que Workzap prepare un presupuesto?",
+    },
+}
+BOX_V2_OFFERS = {
+    "en": "{naya}. Shall I add these to a Box v2 and ask Workzap to update the quote?",
+    "roman_ur": "{naya}. Kya in ko Box v2 mein jod dein, aur Workzap se quote update karwa dein?",
+}
+
+
+def box_offer_line(context: dict[str, Any]) -> str:
+    """The Solution Box offer for this chat: the "A" or "B" wording when the map is rich enough to
+    say so (the choice alternates by message so one owner never sees a pattern), else the neutral
+    one. After a box was sent and a problem came in, the Box v2 offer with the "Naya:" list."""
+    from zlib import crc32
+
+    from app.modules.pi import box_doc, fixed_lines
+
+    code = fixed_lines.code(context)
+    key = "roman_ur" if code == "roman_ur" else "en"
+    brief = context.get("brief") or {}
+    if brief.get("box_naya"):
+        naya = box_doc.naya_line([str(t) for t in brief["box_naya"]], key)
+        if naya:
+            return BOX_V2_OFFERS[key].format(naya=naya)
+    count = len(context.get("noted_problems") or [])
+    table = BOX_OFFERS.get(code) or BOX_OFFERS[key]
+    kinds = [k for k in ("A", "B") if k in table and count >= 3]
+    if "B" in kinds and not brief.get("map_reviewed"):
+        kinds.remove("B")
+    if kinds:
+        pick = kinds[crc32(str(context.get("latest_message_id") or "").encode()) % len(kinds)]
+    else:
+        pick = "C"
+    return table[pick].format(n=count)
+
+
 def offer_line(language: str | None, context: dict[str, Any] | None = None) -> str:
     """The offer, in the person's language: one of the eight priority languages by the script and
-    words of their message, else the chat's language."""
+    words of their message, else the chat's language. With the Solution Box on (`box_offer`) it is
+    the Solution Box wording of the spec."""
     from app.modules.pi import fixed_lines
 
     base = OFFER_AFTER.get(language or "en", OFFER_AFTER["en"])
     if context is None:
         return base
+    if context.get("box_offer"):
+        return box_offer_line(context)
     return fixed_lines.line("offer", fixed_lines.code(context), base)
 
 
 OFFERS_DOCUMENT = re.compile(
     r"(?:solution document|document (?:and|aur|&) (?:a |an )?quote|quote (?:and|aur) (?:a )?document)"
-    r"[^.?!\n]{0,80}[?؟]\s*$",
+    r"[^.?!\n]{0,80}[?؟]\s*$"
+    r"|solution box[^.?!\n]{0,140}[?؟]\s*$",
     re.IGNORECASE,
 )
 

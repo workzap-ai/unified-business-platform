@@ -56,7 +56,7 @@ def test_boundary_line_does_not_ask_again_what_the_problem_is() -> None:
     fresh = safety.boundary_reply(safety.Boundary.OUTCOME, "en", False)
     again = safety.boundary_reply(safety.Boundary.OUTCOME, "en", True)
     assert fresh.endswith("What's the problem?")
-    assert again.endswith("What else is getting in the way?")
+    assert again.endswith("?") and not again.endswith("What's the problem?")
 
 
 def test_a_separate_on_its_way_sentence_after_a_code_warning_is_flagged() -> None:

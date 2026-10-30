@@ -9,6 +9,7 @@ model, so none of them can be talked out of the rule.
 """
 
 import re
+from collections.abc import Callable
 from dataclasses import dataclass, field
 from enum import StrEnum
 from typing import Any
@@ -504,18 +505,18 @@ EMERGENCY_TEXT = {
         ),
     },
     "roman_ur": {
-        Emergency.FIRE: "Main emergency mein madad nahi kar sakta. Meherbani karke abhi {fire} par call karein.",
-        Emergency.MEDICAL: "Main emergency mein madad nahi kar sakta. Meherbani karke abhi ambulance ke liye {ambulance} par call karein.",
-        Emergency.VIOLENCE: "Main emergency mein madad nahi kar sakta. Meherbani karke abhi {police} par call karein aur mehfooz jagah par chale jayein.",
-        Emergency.GENERIC: "Main emergency mein madad nahi kar sakta. Meherbani karke abhi {police} par call karein.",
+        Emergency.FIRE: "Emergency mein madad karna mere bas mein nahi. Meherbani karke abhi {fire} par call karein.",
+        Emergency.MEDICAL: "Emergency mein madad karna mere bas mein nahi. Meherbani karke abhi ambulance ke liye {ambulance} par call karein.",
+        Emergency.VIOLENCE: "Emergency mein madad karna mere bas mein nahi. Meherbani karke abhi {police} par call karein aur mehfooz jagah par chale jayein.",
+        Emergency.GENERIC: "Emergency mein madad karna mere bas mein nahi. Meherbani karke abhi {police} par call karein.",
         Emergency.SAFEGUARDING: (
-            "Mujhe afsos hai, is ke liye insaan chahiye, main madad nahi kar sakta. Agar kisi ko abhi khatra hai "
+            "Mujhe afsos hai, is ke liye insaan chahiye, ye mere bas mein nahi. Agar kisi ko abhi khatra hai "
             "to {police} par call karein. Warna aaj hi munasib idare se baat karein: apne safeguarding lead ya "
             "child protection se. Maine ye Workzap ki team ko bhej diya hai. Jab aap bataein ke masla sambhal "
             "liya gaya hai, tab business ki baat karenge."
         ),
         Emergency.SELF_HARM: (
-            "Mujhe afsos hai ke halaat itne bhaari hain. Main AI hoon aur is mein madad nahi kar sakta. "
+            "Mujhe afsos hai ke halaat itne bhaari hain. Main AI hoon aur is mein madad karna mere bas mein nahi. "
             "Kisi bharose ke insaan se baat karein, ya khatre mein hon to {police} par call karein. "
             "Business ki taraf main jab chahein haazir hoon."
         ),
@@ -592,6 +593,9 @@ class Pii(StrEnum):
     CONTACT = "contact"
     CHILD = "child"
     NAME = "name"  # a third party's name: kept as their role only (R-PRIV-01)
+    HEALTH = "health"  # health information about a named person (spec 6.3)
+    PAY = "pay"  # a named person's salary or disciplinary matter (spec 6.3)
+    FORWARDED = "forwarded"  # a forwarded customer complaint: the pattern, not the identity (6.10)
 
 
 @dataclass
@@ -612,6 +616,9 @@ PLACEHOLDER = {
     Pii.CONTACT: "[contact detail removed]",
     Pii.CHILD: "[child detail removed]",
     Pii.NAME: "[name removed]",
+    Pii.HEALTH: "[health detail removed]",
+    Pii.PAY: "[pay or discipline detail removed]",
+    Pii.FORWARDED: "[customer identity removed]",
 }
 
 CARD = re.compile(r"(?<![\d-])(?:\d[ -]?){13,19}(?![\d-])")
@@ -658,6 +665,94 @@ CHILD_NAME = re.compile(
 CHILD_MARKS = re.compile(
     r"\b(?i:grades?|marks|score[sd]?|got|result)\b[^.\n]{0,15}?(\d{1,3}\s?%|\d{1,3}/\d{2,3}|\b[A-F][+-]?(?=\s|[.,]|$))"
 )
+# --- health, pay and discipline of a named person, forwarded complaints (spec 6.3, 6.10) -----------
+_NAME = r"[A-Z][a-z]{2,}(?:\s[A-Z][a-z]{2,})?"
+_ROLES = (
+    r"cashier|driver|manager|staff|employee|worker|accountant|salesman|helper|guard|cook|nurse|"
+    r"teacher|assistant|supervisor|receptionist|partner|brother|sister|wife|husband|father|mother|"
+    r"son|daughter|boss|neighbour|neighbor|friend|cousin|uncle"
+)
+# who the sentence is about: an optional role ("my cashier") and a capitalised name
+_PERSON = rf"(?:(?i:my|our|his|her|the)\s+(?i:{_ROLES})\s+)?(?P<name>{_NAME})"
+_HEALTH_TERMS = (
+    r"diabet\w*|cancer|hiv|aids|tuberculosis|tb|epilep\w*|asthma|dialysis|chemotherapy|"
+    r"heart (?:attack|disease|condition|problem)|kidney (?:failure|disease|stones?)|stroke|"
+    r"depress\w*|anxiety|bipolar|schizophreni\w*|pregnan\w*|miscarriage|surgery|covid|hepatitis|"
+    r"thalassemia|blood pressure|mental (?:health|illness)|dil ki bimari|sugar ki bimari"
+)
+HEALTH_NAMED = re.compile(
+    rf"\b{_PERSON}(?:'s)?\b[^.!?\n]{{0,30}}?\b(?i:has|had|got|diagnosed with|suffers from|suffering from|"
+    rf"ko|ka|ki|ke)\b[^.!?\n]{{0,20}}?\b(?i:{_HEALTH_TERMS})\b"
+)
+PAY_NAMED = re.compile(
+    rf"\b{_PERSON}(?:'s|\s+ki|\s+ka|\s+ke)?\s+(?i:salary|pay|wages?|tankh?w[a]h|tankhah|pay ?slip|bonus|"
+    rf"increment)\b[^.!?\n]{{0,30}}?(?:\d[\d,.]*|(?i:lakh|hazar|thousand))"
+)
+PAY_EARNS = re.compile(
+    rf"\b{_PERSON}\s+(?i:earns|gets paid|is paid|makes|ko (?:milte|milti|milta) hain?)\b[^.!?\n]{{0,25}}?\d[\d,.]*"
+)
+DISCIPLINE_NAMED = re.compile(
+    rf"\b{_PERSON}\b[^.!?\n]{{0,25}}?\b(?i:suspended|fired|terminated|dismissed|sacked|demoted|"
+    rf"reprimanded|warned|arrested|nikaal diya|suspend kiya)\b"
+    rf"|\b(?i:warning letter|show[- ]cause notice|disciplinary (?:action|hearing|notice))\b"
+    rf"[^.!?\n]{{0,15}}?\b(?i:to|for|against)\s+(?P<name2>{_NAME})\b"
+)
+# Capitalised words that open a sentence without being anyone's name.
+_NOT_A_NAME = frozenset(
+    """
+    customers customer staff people patients patient clients client workers worker employees employee
+    everyone everybody someone somebody nobody many some most all both each every when if since because
+    also but and so then today yesterday tomorrow monday tuesday wednesday thursday friday saturday sunday
+    workzap this that there here they them their what which who while after before once please thanks
+    thank sorry hello hey dear sir madam team manager owner doctor driver cashier accountant supplier
+    suppliers vendors vendor drivers cashiers managers nurses teachers students pupils parents
+    """.split()
+)
+
+
+def _named_person(text: str, match: re.Match[str]) -> bool:
+    """Whether a capitalised word in the match is really a person: not a sentence opener such as
+    "Customers" or "When", and, at the start of a sentence, only with a role before it or an
+    explicit verb after ("Bilal has ...")."""
+    for group in ("name", "name2"):
+        name = match.groupdict().get(group)
+        if not name:
+            continue
+        if any(word.lower() in _NOT_A_NAME for word in name.split()):
+            return False
+        before = text[: match.start(group)].rstrip()
+        opens = not before or before[-1] in ".!?:" or before.endswith(chr(10))
+        if opens and match.start() == match.start(group):  # no role before the name
+            tail = text[match.end(group) :]
+            return bool(re.match(r"(?:'s)?\s+(?i:has|had|got|ko|ka|ki|ke|salary|pay|wages?|earns|gets|is|was|were|makes)\b", tail))
+        return True
+    return False
+
+
+FORWARD_MARK = re.compile(
+    r"^\s*(?:\[forwarded\]|forwarded(?: many times)?\b[:\s-]*|fwd?\s*:|-{3,}\s*forwarded message\s*-{3,})",
+    re.IGNORECASE,
+)
+COMPLAINT_WORDS = re.compile(
+    r"\b(?:complain\w*|shikay?aa?t\w*|not (?:happy|satisfied)|unhappy|refund|bad service|worst|"
+    r"never again|disappointed|wrong order|ghalat|kharab|late delivery|rude|cheated|dhoka)\b",
+    re.IGNORECASE,
+)
+# The identity part of a forwarded complaint: the sender in a chat export line, "From: Name",
+# a sign-off or "my name is Name".
+FORWARD_IDENTITY = re.compile(
+    r"^(?P<head>[ \t]*\[?\d{1,2}[:/.]\d{2}[^\]\n]{0,25}\]?[ \t]*(?:-[ \t]*)?)(?P<who>[^:\n]{2,40}):"
+    r"|^(?P<head2>[ \t]*(?i:from|name|customer(?: name)?|sender)[ \t]*[:-][ \t]*)(?P<who2>[^\n]{2,60})$"
+    r"|(?P<head3>\b(?i:regards|thanks|thank you|sincerely|best),?[ \t]*\n[ \t]*)(?P<who3>"
+    + _NAME
+    + r")\b"
+    r"|(?P<head4>\b(?i:my name is|i am|this is|mr\.?|mrs\.?|ms\.?|sir|madam)[ \t]+)(?P<who4>"
+    + _NAME
+    + r")\b",
+    re.MULTILINE,
+)
+
+
 # --- more personal data found by the trade audit (R-PRIV-01, R-PRIV-02) ----------------------------
 _ID_VALUE = r"(?=[A-Za-z0-9-]*\d)[A-Za-z0-9][A-Za-z0-9-]{4,24}[A-Za-z0-9]"
 _NUMBER_WORD = r"(?:no\.?|number|num|#|id)"
@@ -859,6 +954,24 @@ def redact_pii(text: str) -> Redaction:
 
     clean = DOOR_CODE.sub(code, clean)
 
+    # Health information, pay and discipline of a named person (spec 6.3): the whole clause goes.
+    def sensitive(kind: Pii) -> Callable[[re.Match[str]], str]:
+        def swap(match: re.Match[str]) -> str:
+            if not _named_person(match.string, match):
+                return match.group()
+            add(kind)
+            return PLACEHOLDER[kind]
+
+        return swap
+
+    for pattern, kind in (
+        (HEALTH_NAMED, Pii.HEALTH),
+        (PAY_NAMED, Pii.PAY),
+        (PAY_EARNS, Pii.PAY),
+        (DISCIPLINE_NAMED, Pii.PAY),
+    ):
+        clean = pattern.sub(sensitive(kind), clean)
+
     # A third party introduced by a role keeps only the role: "patient Ayesha Khan" -> "the patient".
     def named(match: re.Match[str]) -> str:
         add(Pii.NAME)
@@ -877,6 +990,19 @@ def redact_pii(text: str) -> Redaction:
         return f"{match.group('pre')}[name removed]"
 
     clean = ROMAN_ROLE_NAME.sub(roman_named, clean)
+
+    # A forwarded customer complaint (spec 6.10): the pattern stays, the customer's identity goes.
+    if FORWARD_MARK.match(clean) and COMPLAINT_WORDS.search(clean):
+
+        def identity(match: re.Match[str]) -> str:
+            for suffix in ("", "2", "3", "4"):
+                if match.group("who" + suffix) is not None:
+                    add(Pii.FORWARDED)
+                    tail = ":" if suffix == "" else ""
+                    return match.group("head" + suffix) + PLACEHOLDER[Pii.FORWARDED] + tail
+            return match.group()
+
+        clean = FORWARD_IDENTITY.sub(identity, clean)
     return Redaction(clean, kinds)
 
 
@@ -922,7 +1048,7 @@ def pii_notice(
     def said(kind: Pii) -> str:
         if kind in own and fixed in fixed_lines.LINES[own[kind]]:
             return fixed_lines.LINES[own[kind]][str(fixed)]
-        return table[kind]
+        return table.get(kind) or PII_TEXT["en"][kind]
 
     return " ".join(said(k) for k in fresh), [*told, *(k.value for k in fresh)]
 
@@ -1498,7 +1624,7 @@ IDENTITY_TEXT = {
     "roman_ur": {
         Identity.PERSON: "Main AI hoon, insaan nahi. Main pi hoon, Workzap ki taraf se.",
         Identity.GENDER: "Main pi hoon, Workzap ka AI. Meri koi jins nahi.",
-        Identity.SCAM: "Jayez sawal hai. Main Workzap ka AI hoon. Main yahan kabhi payment, card number ya password nahi maangta, aur aap par kuch kharidna zaroori nahi. Mazeed workzap.ai/pi/trust par.",
+        Identity.SCAM: "Jayez sawal hai. Main Workzap ka AI hoon. Yahan kabhi payment, card number ya password nahi manga jata, aur aap par kuch kharidna zaroori nahi. Mazeed workzap.ai/pi/trust par.",
         Identity.META: "Nahi. Mujhe Workzap ne banaya hai aur yahan WhatsApp ke business platform par chat hoti hai. Mujhe WhatsApp ya Meta ne nahi banaya, na chalata hai, na endorse karta hai.",
         Identity.MODEL: "Main pi hoon, Workzap ka AI. Main aap ke business ke masail note aur sort karne ke liye hoon.",
         Identity.RULES: "Kaam ka tareeqa ye hai: masail note aur sort kiye jate hain. Yahan kabhi payment nahi li jati, aur quote par faisla aap ka hota hai. Poori tafseel workzap.ai/pi/how-it-works par hai.",
@@ -2073,7 +2199,7 @@ BOUNDARY_TEXT = {
         Boundary.PAY_FOR_ME: "Payments mere bas mein nahi. Agar suppliers ko payment karna aap ke business ka masla hai to ise note kiya ja sakta hai.",
         Boundary.PRODUCT_REC: "Products recommend nahi kiye jate. Aap ke mojooda setup mein kya masla hai, ye note kiya ja sakta hai taake Workzap dekh sake.",
         Boundary.DECIDE_FOR_ME: "Ye aap ka faisla hai: aap ke liye faisla nahi kiya jata. Aap ne jo bataya wo sort karke dikhaya ja sakta hai taake dekhna aasan ho.",
-        Boundary.RIVAL: "Main doosre businesses par raaye nahi deta. Aap ki taraf kya masla chal raha hai?",
+        Boundary.RIVAL: "Doosre businesses par raaye nahi di jati. Aap ki taraf kya masla chal raha hai?",
         Boundary.WRONG_NUMBER: "Lagta hai aap ne galat number mila diya hai. Main pi hoon, Workzap ka AI, business ke masail ke liye.",
         Boundary.MEMORY_ASK: "Aap ke batae hue masail, aap ki di hui tafseel, aur documents aur quotes rakhe jate hain. Aap inhein delete karne ko keh sakte hain.",
         Boundary.QUOTE_ONLY: "Quote us cheez ka hota hai jo document mein likhi hai, isliye dono saath aate hain. Dono hi Workzap se manga ja sakte hain.",
@@ -2114,9 +2240,14 @@ def boundary_asked(text: str) -> Boundary | None:
 
 
 ASKS_WHAT_PROBLEM = {
-    "en": ("What's the problem?", "What else is getting in the way?"),
-    "roman_ur": ("Masla kya hai?", "Aur kya cheez rukawat bani hui hai?"),
-    "ar": ("ما المشكلة؟", "ما الذي يعيق عملك أيضًا؟"),
+    # Spec 9.0: "what else is getting in the way?" is only for a door. With problems already noted,
+    # the question asks which of them to start with.
+    "en": ("What's the problem?", "Which of these would you most like to see fixed first?"),
+    "roman_ur": (
+        "Masla kya hai?",
+        "In mein se aap sab se pehle kis cheez ko theek hota dekhna chahenge?",
+    ),
+    "ar": ("ما المشكلة؟", "أي هذه الأمور تودّ أن تراها تُحلّ أولاً؟"),
 }
 
 
@@ -2448,7 +2579,7 @@ ABUSE_TEXT = {
     "roman_ur": {
         "calm": "Main business ke masail mein madad ke liye hoon, jab aap tayyar hon.",
         "warn": "Main aap ke business mein madad karne ko tayyar hoon. Agar ye jari raha to mujhe ye chat Workzap ki team ko dena paray gi.",
-        "refuse": "Main is par aage nahi chal sakta. Main aap ke business ke masail ke liye hoon.",
+        "refuse": "Is par aage baat nahi ho sakti. Yahan aap ke business ke masail par baat hoti hai.",
         "spam": "Main aap ke business ke masail ke liye hoon.",
         "pass": "Ye chat Workzap ki team ko di ja rahi hai.",
     },
@@ -2535,7 +2666,7 @@ REGULATED_TRADES: dict[str, re.Pattern[str]] = {
 
 NOT_SERVED_TEXT = {
     "en": "Workzap doesn't take on work in this area, so I can't help with this one.",
-    "roman_ur": "Workzap is shobe mein kaam nahi leta, is liye main is mein madad nahi kar sakta.",
+    "roman_ur": "Workzap is shobe mein kaam nahi leta, is liye is mein madad nahi ki ja sakti.",
 }
 
 
@@ -2560,3 +2691,9 @@ def not_served(text: str, served: list[str] | None) -> str | None:
 
 def not_served_reply(language: str | None) -> str:
     return NOT_SERVED_TEXT.get(language or "en", NOT_SERVED_TEXT["en"])
+
+
+# The Urdu-script lines of the tables above, and the newer personal-data wording (safety_ur.py).
+from app.modules.pi import safety_ur as _safety_ur  # noqa: E402
+
+_safety_ur.install(globals())

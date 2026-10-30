@@ -39,6 +39,10 @@ class PatchInput(BaseModel):
     covers: list[str] | None = None
     wont_do: list[dict[str, Any]] | None = None
     needs: list[str] | None = None
+    # Solution Box (spec 5.2): section 7 and 3 edits, phase names (solution) or phase prices (quote)
+    assumptions: list[str] | None = None
+    ideas: list[dict[str, Any]] | None = None
+    phases: list[dict[str, Any]] | None = None
     included: list[str] | None = None
     not_included: list[str] | None = None
     payment: str | None = None

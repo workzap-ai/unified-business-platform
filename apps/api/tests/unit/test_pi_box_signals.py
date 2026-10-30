@@ -1,3 +1,4 @@
+# ruff: noqa: E501  (long Roman Urdu and comment lines)
 """The Solution Box readiness signals B3, B4, B5 and B7 (platform spec Book 5, 5.4), derived from
 the conversation, and that the offer rule then goes through, or stays shut when the box is off."""
 
@@ -7,7 +8,7 @@ from app.modules.pi import box, box_signals, decisions
 from app.modules.pi.flow import State
 
 THREE = [
-    {"since": "a year", "raised_voluntarily": True},
+    {"since": "a year", "raised_voluntarily": True, "cause": "price"},
     {"impact": "cash"},
     {"cause": "price"},
 ]
@@ -94,7 +95,10 @@ def test_the_box_off_gate_ignores_the_signals() -> None:
     from app.modules.pi import service_conversation as svc
 
     assert box.box_offer_enabled({"pi_mode": "brain"}) is False
-    assert svc.box_offer_allowed({"noted_problems": [], "brief": {}}) is True
+    # audit R8: with the box off there is no readiness data, so only R1 (asked for it) allows an offer
+    assert svc.box_offer_allowed({"noted_problems": [], "brief": {}}) is False
+    asked = {"noted_problems": [], "brief": {}, "latest_customer_message": "quote bhej dein"}
+    assert svc.box_offer_allowed(asked) is True
 
 
 @pytest.mark.parametrize(

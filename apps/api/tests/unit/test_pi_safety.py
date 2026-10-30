@@ -1,3 +1,4 @@
+# ruff: noqa: E501  (long Roman Urdu and comment lines)
 """Emergencies, personal data, advice limits and "who are you" (pi Brain spec Part 6)."""
 
 import pytest
@@ -79,7 +80,7 @@ def test_self_harm_is_answered_with_care_and_without_counselling():
     assert reply.startswith("I'm sorry things are this heavy. I'm an AI and can't help with this")
     assert "1122" in reply and "whenever you want" in reply
     roman = s.emergency_reply(Emergency.FIRE, "PK", "roman_ur")
-    assert roman.startswith("Main emergency mein madad nahi kar sakta.") and "16 (fire)" in roman
+    assert roman.startswith("Emergency mein madad karna mere bas mein nahi.") and "16 (fire)" in roman
 
 
 def test_a_card_number_is_removed_only_when_it_is_a_card():

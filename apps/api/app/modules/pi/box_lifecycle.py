@@ -287,6 +287,52 @@ async def _on(session: AsyncSession, scope: WorkspaceScope) -> bool:
     return enabled_for((await settings_row(session, scope)).response_rules)
 
 
+NAYA_KEY = "box_naya"  # brief key: titles of the problems added since the box was sent (5.6)
+MAX_NAYA = 8
+
+
+async def on_new_problems(
+    session: AsyncSession,
+    scope: WorkspaceScope,
+    conversation: Any,
+    titles: list[str],
+    *,
+    box_on: bool,
+) -> int | None:
+    """New problems were noted. After the box was sent (or accepted) this starts Box v2 and keeps
+    the short difference list ("Naya: ...") on the brief for the document and the offer (5.6); while
+    a later version is still being collected, further problems join that list. Returns the new box
+    version when one was started. The caller says whether the box is on (`box_on`, from
+    `box_offer_enabled`); off, nothing happens. Nothing is sent."""
+    if not box_on or conversation.customer_id is None:
+        return None
+    new = [t.strip() for t in titles if t and t.strip()]
+    if not new:
+        return None
+    row = await latest_box(session, scope, conversation.customer_id)
+    if row is None:
+        return None
+    brief = dict(conversation.service_brief or {})
+    started: int | None = None
+    if row.state in ("sent", "accepted"):
+        try:
+            fresh = await new_version(
+                session, scope, row, reason="new problem after the box was sent"
+            )
+        except BusinessRuleViolation as refused:
+            logger.info("pi_box_move_refused: %s", refused)
+            return None
+        brief[NAYA_KEY] = new[:MAX_NAYA]
+        started = fresh.version
+    elif row.parent_box_id is not None and row.state in ("collecting", "ready"):
+        kept = [str(t) for t in brief.get(NAYA_KEY) or []]
+        brief[NAYA_KEY] = [*kept, *[t for t in new if t not in kept]][:MAX_NAYA]
+    else:
+        return None
+    conversation.service_brief = brief
+    return started
+
+
 async def on_draft_ready(
     session: AsyncSession, scope: WorkspaceScope, customer_id: UUID | None
 ) -> None:

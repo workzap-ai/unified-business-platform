@@ -70,14 +70,14 @@ GOLDEN: tuple[tuple[str, str, str, str], ...] = (
         "S3_NOTED",
         "roman_ur",
         "meri bhains bimar hai koi dawai bata dein",
-        "Is ka dawai wala mashwara main nahi de sakta. Ye aap ke vet ka kaam hai. Agar halat serious "
+        "Is ka dawai wala mashwara yahan nahi diya ja sakta. Ye aap ke vet ka kaam hai. Agar halat serious "
         "hai to vet ko abhi bula lein.",
     ),
     (
         "S4_SORTED_SUMMARY",
         "roman_ur",
         "maine payment kar di, mil gayi?",
-        "Main payment receive hone ki tasdeeq yahan nahi kar sakta. Team transfer aate hi yahin "
+        "Payment mil jane ki tasdeeq yahan nahi ho sakti. Team transfer aate hi yahin "
         "confirm karegi.",
     ),
 )

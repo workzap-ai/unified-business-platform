@@ -63,6 +63,13 @@ helping the owner of one on WhatsApp through pi, an AI assistant. You know how t
 (today is {today}): what customers expect, where money and time leak, which practices are current in 2026 and which
 are outdated. You never give advice a licence is needed for (medical, veterinary, legal, tax, financial)."""
 
+NL2 = chr(10) * 2
+UNCONFIRMED_TRADE_RULE = (
+    "THE OWNER HAS NOT SAID WHAT TRADE THIS IS. Do not name a trade, a product, a machine, a "
+    "tool or a customer type, and do not assume any of them (spec G11). Use only the owner's own "
+    "nouns. If you need to know what they do, ask it openly, in one short question."
+)
+
 STEER_RULES = """- previous_diagnosis (when given) is what you concluded before the owner's latest answers. Update it: an
   owner's answer that supports a cause goes into that cause's evidence_for, one that contradicts it into
   evidence_against, and a cause the answers rule out drops from the list. Keep the cause names stable.
@@ -281,8 +288,10 @@ class Steer:
         out: dict[str, Any] = {}
         if self.asked:
             out["questions_pi_already_asked"] = [q[:160] for q in self.asked[-6:]]
-        if self.answered:
-            out["facts_owner_already_answered"] = [a[:300] for a in self.answered[-4:]]
+        # a question the owner asked is not a fact they answered
+        facts = [a for a in self.answered if a.strip() and not a.strip().endswith(("?", "؟"))]
+        if facts:
+            out["facts_owner_already_answered"] = [a[:300] for a in facts[-4:]]
         if self.previous:
             out["previous_diagnosis"] = {
                 "causes": [str(c)[:120] for c in self.previous.get("causes") or []][:MAX_CAUSES],
@@ -466,6 +475,7 @@ def vet(
     want: int,
     report: dict[str, Any] | None = None,
     trace: list[str] | None = None,
+    multi_problem: bool = False,
 ) -> list[str]:
     """The first `want` candidates, in order, that pass every guard (one at a time, so a failure is
     replaced by the next best)."""
@@ -480,6 +490,11 @@ def vet(
             break
         text = candidate.idea
         if "?" in text or "؟" in text:
+            continue
+        if multi_problem and not candidate.addresses:
+            # spec IL1: with several problems an idea that names none of them is dropped
+            if trace is not None:
+                trace.append(f"no_problem_ref: {text[:110]}")
             continue
         one = solution_free.vetted([text], owner_words, never_say, facts, ctx, report)
         if not one:
@@ -560,6 +575,7 @@ async def diagnose(
         PERSONA.format(industry=kind, country=country or "Pakistan, the UAE or Canada", today=today)
         + "\n\n"
         + (LIGHT_RULES if light else DIAGNOSE_RULES).replace("{industry}", kind)
+        + ("" if industry else NL2 + UNCONFIRMED_TRADE_RULE)
     )
     payload: dict[str, Any] = {
         "today": today,
@@ -712,6 +728,7 @@ async def _pipeline(
         want=want,
         report=report,
         trace=advice.drops,
+        multi_problem=len(problems) >= 2,
     )
     advice.dropped = len(diagnosis.candidates) - len(advice.ideas)
     return advice

@@ -158,6 +158,14 @@ def code(context: dict[str, Any], *, script: bool = False) -> str:
     return code_of_text(str(context.get("latest_customer_message") or ""), base, script=script)
 
 
+def gate_language(context: dict[str, Any]) -> str:
+    """The key the safety lines (safety.py tables) are chosen by: "ur" for a chat in Urdu script
+    (pi answers Urdu script in Urdu script, spec 2.5 and G7), else the chat's reply language."""
+    if str(context.get("reply_language_other") or "") == "Urdu":
+        return "ur"
+    return str(context.get("reply_language") or "en")
+
+
 def table_language(language: str | None, have: Any, *, persian: bool = False) -> str:
     """The key to use in a table that only has some languages. Urdu and Hindi chats are answered
     in Roman Urdu (`persian=True` adds Persian, for the follow-up tables); anything else the table

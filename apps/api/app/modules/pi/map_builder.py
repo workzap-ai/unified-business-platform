@@ -29,7 +29,7 @@ from app.modules.pi.problem_models import PiProblem, PiProblemLink
 from app.shared.scope import WorkspaceScope
 from app.shared.workspace_repository import WorkspaceRepository
 
-MAX_LABEL_WORDS = 6
+MAX_LABEL_WORDS = 9
 MAX_FACTS = 3
 LINK_MIN = Decimal("0.5")  # a pi_inferred link under this confidence is not drawn
 PARKED_TAG = "parked"  # the older way (before migration 0048); still read, never written
@@ -123,6 +123,15 @@ def _drawn_link(link: Any, number: dict[Any, int], link_min: Decimal) -> dict[st
     if evidence == "pi_inferred" and Decimal(str(link.confidence)) < link_min:
         return None
     return {"from": node_id(a), "to": node_id(b), "type": kind, "label": "", "evidence": evidence}
+
+
+def drawn_links(
+    problems: list[PiProblem], links: list[PiProblemLink], link_min: Decimal = LINK_MIN
+) -> list[PiProblemLink]:
+    """The stored links the map actually draws, in order: what the owner can see and so can
+    call wrong (a rejected link, or a weak guess under `link_min`, is not on the picture)."""
+    number = {p.id: p.number for p in problems}
+    return [link for link in links if _drawn_link(link, number, link_min) is not None]
 
 
 def clusters_of(nodes: list[dict[str, Any]], links: list[dict[str, Any]]) -> list[dict[str, Any]]:

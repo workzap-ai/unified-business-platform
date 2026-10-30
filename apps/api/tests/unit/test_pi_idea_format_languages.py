@@ -189,6 +189,7 @@ def test_the_document_is_never_promised_before_the_offer_was_accepted() -> None:
 
     noted = {
         "reply_language": "roman_ur",
+        "latest_customer_message": "send me the quote",  # R1: the legacy path offers only then
         "flow": {"state": "S2_CLARIFYING"},
         "noted_problems": [{"ref": "p1"}],
     }
@@ -198,7 +199,7 @@ def test_the_document_is_never_promised_before_the_offer_was_accepted() -> None:
     ready = {
         **noted,
         "box_offer": True,
-        "noted_problems": [{"ref": "a", "since": "x"}, {"ref": "b", "impact": "y"}, {"ref": "c"}],
+        "noted_problems": [{"ref": "a", "since": "x", "cause": "price"}, {"ref": "b", "impact": "y"}, {"ref": "c"}],
         "brief": {"map_reviewed": True, "ranked": True, "voluntary_problems": 1},
         "history": [{"role": "ai"}] * 9,
     }
@@ -411,7 +412,8 @@ def test_an_empty_reply_to_a_solution_ask_gets_the_honest_line_and_the_offer_not
     }
     brain_never_empty(turn, context)
     assert "once the problems are noted" not in turn.reply
-    assert "quick idea" in turn.reply and turn._decision is not None  # box off: whole-set offer
+    # box off, not asked for a quote (audit R8): the honest line, no offer
+    assert "quick idea" in turn.reply and turn._decision is None
     ready = SimpleNamespace(
         reply="", request_human=False, _decision=None, _summary=False, awaiting_customer=False
     )
@@ -421,7 +423,7 @@ def test_an_empty_reply_to_a_solution_ask_gets_the_honest_line_and_the_offer_not
             **context,
             "box_offer": True,
             "noted_problems": [
-                {"ref": "a", "since": "x"},
+                {"ref": "a", "since": "x", "cause": "price"},
                 {"ref": "b", "impact": "y"},
                 {"ref": "c"},
             ],

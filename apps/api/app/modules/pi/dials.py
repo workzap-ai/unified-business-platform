@@ -409,11 +409,18 @@ def update(
     return step(prev, signals)
 
 
-def estimate(messages: list[str], start: Dials | None = None) -> Dials:
-    """The dials after the customer's messages, oldest first (a replay: nothing is stored)."""
+def estimate(
+    messages: list[str],
+    start: Dials | None = None,
+    extras: "list[dict[str, object]] | None" = None,
+) -> Dials:
+    """The dials after the customer's messages, oldest first (a replay: nothing is stored).
+    `extras`: per message, the signals only the conversation can know (`dial_signals.extras`:
+    gap_hours, unasked_problem, repaired); missing or short, a message has none (spec X6)."""
     dials = start or Dials()
-    for text in messages:
-        dials = update(dials, text)
+    for i, text in enumerate(messages):
+        more = extras[i] if extras is not None and i < len(extras) else {}
+        dials = update(dials, text, **more)  # type: ignore[arg-type]
     return dials
 
 

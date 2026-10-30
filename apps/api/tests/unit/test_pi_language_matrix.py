@@ -27,7 +27,7 @@ LANGS = {
     "Urdu script": dict(
         normal="میرا ٹیکسٹائل کا کام ہے اور حساب میں غلطی ہوتی ہے",
         short="ہاں",
-        detect="roman_ur",
+        detect="ur",
         asks=["مجھے حل چاہیے", "کوئی حل بتائیں", "کیسے شروع کروں"],
     ),
     "Arabic": dict(
@@ -92,7 +92,7 @@ def test_a_normal_message_is_detected_in_its_language(name: str) -> None:
     spec = LANGS[name]
     detected = language.detect_language(spec["normal"])
     other = language.latin_other(spec["normal"]) or language.other_script(spec["normal"])
-    if "detect" in spec:  # English, Roman Urdu, Arabic; Urdu script and Hindi answer in Roman Urdu
+    if "detect" in spec:  # English, Roman Urdu, Arabic; Urdu script answers in Urdu script, Hindi in Roman Urdu
         assert detected == spec["detect"], (name, detected)
         assert other is None
     else:  # a language with no fixed notices: the model writes in it, and the fixed lines are rewritten

@@ -89,13 +89,15 @@ def go(state, said, **changes):
 
 @pytest.mark.parametrize("said", ["ok", "looks right", "theek hai", "that's all correct", "yes"])
 def test_after_the_summary_a_confirmation_brings_the_offer(said):
-    assert go(S.S4_SORTED_SUMMARY, said).next_state == S.S5_READINESS  # box off: whole-set offer
+    off = go(S.S4_SORTED_SUMMARY, said)  # box off: only R1 (asked for the quote) offers (audit R8)
+    assert off.next_state is None and off.why.startswith("R1-blocked")
     held = go(S.S4_SORTED_SUMMARY, said, box_offer=box.OfferFacts())  # box on, B1 to B7 not met
     assert held.next_state is None and held.why.startswith("B-blocked")
     decision = go(S.S4_SORTED_SUMMARY, said, box_offer=box.OfferFacts(said_yes=True))
-    assert decision.next_state == S.S5_READINESS and decision.reply == d.text("offer", "en")
-    # Spec v1.5, 18.3: "You can say no" is pressure and is not in the offer.
-    assert "You can say no" not in decision.reply and "an offer, not a charge" in decision.reply
+    # Box on: the one offer uses the Solution Box wording (spec 5.4). Spec v1.5, 18.3: "You can
+    # say no" is pressure and is not in the offer.
+    assert decision.next_state == S.S5_READINESS and "Solution Box" in decision.reply
+    assert "You can say no" not in decision.reply
     assert decision.why == "R-OFFER-01"
 
 
@@ -266,7 +268,7 @@ def test_replies_come_in_roman_urdu_too():
     offer = d.decide(
         S.S4_SORTED_SUMMARY, "theek hai", "roman_ur", facts(box_offer=box.OfferFacts(said_yes=True))
     )
-    assert offer.reply == d.TEXT["offer"]["roman_ur"]
+    assert "Solution Box" in offer.reply  # box on: the Solution Box wording, in Roman Urdu
     no = d.decide(S.S5_READINESS, "nahi shukriya", "roman_ur", facts())
     assert no.reply == d.TEXT["declined"]["roman_ur"]
     unknown = d.decide(S.S5_READINESS, "no", "fr", facts())

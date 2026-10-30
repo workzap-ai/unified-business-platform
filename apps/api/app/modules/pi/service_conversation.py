@@ -39,6 +39,7 @@ from app.modules.pi import (
     fixed_lines,
     flow,
     followup_policy,
+    hold,
     idea_filter,
     industry_overlap,
     industry_packs,
@@ -46,8 +47,10 @@ from app.modules.pi import (
     learning_context,
     list_items,
     map_builder,
+    map_edit,
     map_share,
     memory_block,
+    open_items,
     open_requests,
     owner_asks,
     owner_intents,
@@ -73,6 +76,7 @@ from app.modules.pi import (
     think_plan,
     think_prompt,
     turn_coverage,
+    turn_state,
     value_line,
     warmup,
 )
@@ -326,6 +330,7 @@ class ServiceTurn(BaseModel):
     _problem_capped: bool = PrivateAttr(default=False)  # the working problem's two ideas were given
     _board: bool = PrivateAttr(default=False)  # the notes were shown again, no state change
     _handoff_status: str = PrivateAttr(default="")  # the open request whose status was told
+    _open_said: list[str] = PrivateAttr(default_factory=list)  # open items named first (17.7)
     _asked_shape: bool = PrivateAttr(default=False)
     # Brain mode: a fixed reply and move chosen by the decision gates (pi/decisions.py).
     _decision: Any = PrivateAttr(default=None)
@@ -481,9 +486,10 @@ reply_language_name and set language to reply_language. The system detected it f
 customer's own latest words; it overrides earlier messages, the conversation summary, the
 business's language and knowledge passages. Without it, reply in the customer's CURRENT
 language and writing style, including English, Roman Urdu, code switching and any other
-language. When the customer writes Urdu or
-Hindi in Urdu (Arabic) or Devanagari script, reply in Roman Urdu/Hindi written in
-English letters (e.g. "Ji bilkul, note kar liya.") and set
+language. When the customer writes Urdu in Urdu
+(Arabic) script, reply in Urdu script (polite aap forms, no gendered first-person verbs, one
+script, never Roman letters) and set language="ur". When they write Hindi in Devanagari script,
+reply in Roman Urdu written in English letters (e.g. "Ji bilkul, note kar liya.") and set
 language="roman_ur". Use simple everyday words they would use themselves: in Roman Urdu
 keep the English business words people really use on WhatsApp (proposal, invoice,
 brief, price, payment, website, app, team, update, meeting), never formal Urdu for them
@@ -1438,6 +1444,10 @@ def brain_context(
             conversation.flow_state = state.value
             conversation.flow_state_since = datetime.now(UTC)
         context["pi_mode"] = "brain"
+        if message is not None and think_prompt.enabled(policy.response_rules):
+            # Spec 11.1 / 17.3: S_HOLD after a heavy disclosure, the active-topic pointer
+            owner_before = [m.body or "" for m in reversed(rows) if m.sender_type == "customer"]
+            state = turn_state.enter(conversation, state, message.body or "", owner_before, context)
         context["flow"] = flow.prompt_view(state)
     return context
 
@@ -1500,6 +1510,8 @@ async def brain_problems(
             seen["map_reviewed"] = True  # confirmed or corrected the map pi just showed
         if not brief.get("ranked") and noted and box_signals.says_start_here(said):
             seen["ranked"] = True  # said where to start
+        if not brief.get("no_other_problems") and noted and box_signals.says_no_others(said):
+            seen["no_other_problems"] = True  # B1: "there are no other problems", kept once said
         if seen or awaiting:
             brief = {k: v for k, v in brief.items() if k != "map_awaiting"} | seen
             conversation.service_brief = brief
@@ -1580,6 +1592,14 @@ async def brain_problems(
         context["hours_away"] = hours_away(message, rows or [], last_chat_at)
         if pending := await pending_handoff(session, conversation):
             context["pending_handoff"] = pending
+        try:  # spec 17.7: what is still open is said first on the owner's return (brain only)
+            async with session.begin_nested():
+                if left := await open_items.load_for_return(
+                    session, scope, conversation, hours_away=int(context["hours_away"])
+                ):
+                    context["open_items"] = left
+        except Exception:  # noqa: BLE001
+            logger.warning("pi_open_items_load_failed", exc_info=True)
     if message is not None:
         # What the owner says they do not have, and whether they ask to understand the plan or
         # complain that pi keeps asking (live 2026-10-28, a furniture maker): see owner_asks.
@@ -1750,7 +1770,7 @@ def handoff_status_line(context: dict[str, Any]) -> str:
     if (context.get("brief") or {}).get("handoff_status_said") == pending.get("id"):
         return ""
     language = str(context.get("reply_language") or "en")
-    return HANDOFF_STATUS.get(language, HANDOFF_STATUS["en"])
+    return open_items.handoff_line(language)
 
 
 def days_away(
@@ -2001,7 +2021,7 @@ def _brain_gate(
 ) -> "ServiceTurn | None":
     """One message through the pre-model gates. For an earlier message of a burst only the gates
     that raise something for the team or stop the flow apply (not greetings or identity)."""
-    language = str(context.get("reply_language") or "en")
+    language = fixed_lines.gate_language(context)
     country = context.get("customer_country")
     pii = context.get("pii") or {}
 
@@ -2041,7 +2061,9 @@ def _brain_gate(
             line = safety.greeting_reply(courtesy, language)
             if not opened:  # the AI disclosure comes first, whatever the greeting (R-DISC-01)
                 opening = flow.OPENING["roman_ur" if language == "roman_ur" else "en"]
-                line = f"{line.split('.')[0]}. {opening}"
+                if language == "ur":
+                    opening = f"{fixed_lines.LINES['opening']['ur']} آپ کا کاروبار کیا کام کرتا ہے؟"
+                line = f"{re.split('[.۔]', line)[0]}. {opening}"
             return fixed(line, None if opened else flow.State.S1_LISTENING, why="R-LANG-08")
     if chat_level and safety.unsupported_language(text):
         return fixed(safety.UNSUPPORTED_TEXT, why="RT19")
@@ -2686,7 +2708,10 @@ def trade_name(conversation: Any, keys: list[str]) -> str | None:
     still understood as that trade and not as "small"."""
     if keys:
         return (solutions.load(keys[0]) or {}).get("name")
-    profile = (getattr(conversation, "service_brief", None) or {}).get("customer_profile") or {}
+    brief = getattr(conversation, "service_brief", None) or {}
+    if not brief.get("industry_confirmed"):
+        return None  # a model-extracted business_type is a guess until confirmed (G11)
+    profile = brief.get("customer_profile") or {}
     said = " ".join(str(profile.get("business_type") or "").split())[:80]
     return said or None
 
@@ -3225,11 +3250,30 @@ IDEA_LINES = re.compile(r"(?mi)^\s*(?:(?:first|second|pehle|doosra|dusra)\b[,:]|
 
 def box_offer_allowed(context: dict[str, Any]) -> bool:
     """May pi start the whole-set offer now? With the Solution Box on (Book 5, 5.4 and 10.9) only
-    when R1 to R3 or B1 to B7 hold. With it off, the offer follows the request that already led to
-    it, as before, so a workspace without the map flow does not lose its offer."""
+    when R1 to R3 or B1 to B7 hold. With it off (the legacy path) there is no readiness data, so
+    only the exception R1 holds: the owner asked for the document, quote or price in this message
+    (audit R8: an unconditional offer came at the fourth problem with the map unreviewed)."""
+    asked = decisions.asks_for_document(str(context.get("latest_customer_message") or ""))
     if not context.get("box_offer"):
-        return True
-    return box.can_offer(box.offer_facts(context))[0]
+        return asked
+    return box.can_offer(box.offer_facts(context, asked_for_document=asked))[0]
+
+
+def strip_unallowed_offer(turn: "ServiceTurn", context: dict[str, Any]) -> None:
+    """canOffer decides what is written, not only what the application adds: an offer line a model
+    wrote itself (or one carried in the reply) is cut when R1 to R3 / B1 to B7 do not hold. The
+    offer is the last sentence or paragraph, so only that tail goes. "You can say no" is always
+    removed (18.3)."""
+    if turn._summary or turn._decision is not None or not turn.reply:
+        return
+    reply = reply_gates.without_say_no(turn.reply)
+    turn.reply = reply
+    if solution_ask.already_offers(reply) and not box_offer_allowed(context):
+        body = reply.rstrip()
+        cut = max((m.end() for m in re.finditer(r"[.!?؟]\s+|\n+", body)), default=0)
+        if cut and body[:cut].strip():
+            turn.reply = body[:cut].rstrip()
+    turn.reply = reply_gates.without_say_no(turn.reply)
 
 
 def brain_offer(turn: "ServiceTurn", context: dict[str, Any]) -> None:
@@ -3247,6 +3291,11 @@ def brain_offer(turn: "ServiceTurn", context: dict[str, Any]) -> None:
         or "solution_howto" in context
         or context.get("solution_asked_no_ideas")
         or context.get("open_ask")
+        # R3 (spec 5.4): who would do it, how long, can Workzap: answered in a line, then the offer
+        or (
+            context.get("box_offer")
+            and box_signals.asks_who_or_how_long(str(context.get("latest_customer_message") or ""))
+        )
     ):
         return
     created = [op for op in turn.problem_ops if op.op == "create"]
@@ -3507,6 +3556,14 @@ async def note_problems(
             figure_fix=fix,
         )
         noted = bool(applied.created)
+        if box_on and applied.created:
+            # Box v2 (spec 5.6): a problem after the box was sent starts a new version and the
+            # short "Naya:" list
+            from app.modules.pi import box_lifecycle
+
+            await box_lifecycle.on_new_problems(
+                session, scope, conversation, [str(c.title) for c in applied.created], box_on=True
+            )
         if (
             box_on
             and applied.created
@@ -3521,6 +3578,21 @@ async def note_problems(
         # They saw the noted lines and moved on without objecting: those are confirmed.
         book = problems.ProblemBook(session, scope, conversation.customer_id, turn.language)
         await book.confirm_drafts(set(), explicit=decisions.summary_ok(message.body or ""))
+    if turn._decision is None and not turn._summary and not turn.request_human:
+        # Spec 4.5 (G47): "ye jorr galat hai", "ye masla hal ho gaya", "pehle ye": done on the map
+        try:
+            async with session.begin_nested():
+                turn.reply, _ = await map_edit.apply(
+                    session,
+                    scope,
+                    conversation,
+                    message,
+                    turn.reply,
+                    str(turn.language or "en"),
+                    box_on=box_on,
+                )
+        except Exception:  # noqa: BLE001
+            logger.warning("pi_map_edit_failed", exc_info=True)
     brief = dict(conversation.service_brief or {})
     # Two replies in a row with nothing new noted also bring the summary (spec 3.7).
     # (counted only once something has been noted, so a vague opening never triggers it)
@@ -4014,105 +4086,108 @@ async def prepare_context(
                 said=message.body or "",
             ),
         )
-    return {
-        # First, so its place in the prompt never moves.
-        **({"what_i_know": known_block} if known_block else {}),
-        **industry,
-        **solution_lint_context(industry, policy, conversation),
-        **brain,
-        "bookable_services": bookable,
-        "customer_bookings": customer_bookings,
-        "work_tools": sorted(tools & {"create_ticket", "create_task", "request_payment"}),
-        "payment_methods": await latency.timed(
-            "ctx.payments", _payment_methods(session, scope, tools)
-        ),
-        "company": tenant.name if tenant else "",
-        "offerings": [p.name for p in offerings],  # Deliberately no catalog prices.
-        "customer_memory": [m.content for m in memories],
-        "customer_profile": profile,
-        "returning_customer": returning,
-        "approved_knowledge": knowledge,
-        "operator_guidance": version.instructions if version else "",
-        "brief": {
-            k: v
-            for k, v in (conversation.service_brief or {}).items()
-            if k
-            not in (
-                "free_rider",
-                "howto_asked",
-                "declines",
-                "asked_facts",
-                "closed_slots",
-                "last_question",
-                "open_requests",
-                "map_awaiting",
-                "expert_diag",
-                "expert_given",
-                "expert_given_elsewhere",
-                "ideas_elsewhere",
-                "owner_n",
-                "owner_n_id",
-            )
-        },
-        # Requests left unanswered last turn, to answer first (R-ANS-03).
-        **(
-            {"open_requests": open_left}
-            if (open_left := (conversation.service_brief or {}).get("open_requests"))
-            else {}
-        ),
-        # Questions already answered, kept across sessions and languages (R-ASK-07). The question
-        # asked last turn counts as answered by what they say now, before the turn is saved.
-        **(
-            {"closed_slots": closed_slots}
-            if (
-                closed_slots := slots.advance(
-                    conversation.service_brief or {}, message.body or "", "", ""
-                )[0]
-            )
-            else {}
-        ),
-        "conversation_summary": conversation.summary or "",
-        "history": [
-            {
-                "role": m.sender_type,
-                "kind": m.message_type,
-                "at": f"{m.created_at:%Y-%m-%d %H:%M}",
-                **({"move": move_of[str(m.id)]} if str(m.id) in move_of else {}),
-                "text": (
-                    m.body[:1500]
-                    + ("\n" + link_note(m.media["links"]) if m.media.get("links") else "")
-                ),
-            }
-            for m in reversed(rows)
-        ],
-        "hours_since_previous_message": (
-            round((message.created_at - rows[0].created_at).total_seconds() / 3600, 1)
-            if rows and message.created_at and rows[0].created_at
-            else None
-        ),
-        "latest_message_kind": message.message_type,
-        **await latency.timed("ctx.deals", _deal_context(session, scope, conversation)),
-        "team_members": team,
-        "latest_customer_message": message.body[:4000],
-        "shared_links": (message.media or {}).get("links") or [],
-        "shared_documents": shared_documents(message, rows),
-        "team_notes": team_notes,
-        **reply_language(conversation, message, rows, known_language),
-        "tone": policy.response_rules.get("tone", "friendly"),
-        **brain_context(policy, conversation, rows, message),
-        "now_local": _now_local(policy.timezone),
-        "feedback_for": ((conversation.service_brief or {}).get("awaiting_feedback") or {}).get(
-            "project", ""
-        ),
-        "meeting_over": meeting_over(
-            conversation.service_brief or {},
-            team_notes,
-            policy.timezone,
-            datetime.now(UTC),
-        ),
-        "google_meet_ready": await latency.timed("ctx.meet", _meet_ready(session, scope)),
-        "followups_enabled": policy.whatsapp_config.get("reminder_enabled", True),
-    }
+    return hold.clear_solutions(
+        {
+            # First, so its place in the prompt never moves.
+            **({"what_i_know": known_block} if known_block else {}),
+            **industry,
+            **solution_lint_context(industry, policy, conversation),
+            **brain,
+            "bookable_services": bookable,
+            "customer_bookings": customer_bookings,
+            "work_tools": sorted(tools & {"create_ticket", "create_task", "request_payment"}),
+            "payment_methods": await latency.timed(
+                "ctx.payments", _payment_methods(session, scope, tools)
+            ),
+            "company": tenant.name if tenant else "",
+            "offerings": [p.name for p in offerings],  # Deliberately no catalog prices.
+            "customer_memory": [m.content for m in memories],
+            "customer_profile": profile,
+            "returning_customer": returning,
+            "approved_knowledge": knowledge,
+            "operator_guidance": version.instructions if version else "",
+            "brief": {
+                k: v
+                for k, v in (conversation.service_brief or {}).items()
+                if k
+                not in (
+                    "free_rider",
+                    "howto_asked",
+                    "declines",
+                    "asked_facts",
+                    "closed_slots",
+                    "last_question",
+                    "open_requests",
+                    "map_awaiting",
+                    "expert_diag",
+                    "expert_given",
+                    "expert_given_elsewhere",
+                    "ideas_elsewhere",
+                    "owner_n",
+                    "owner_n_id",
+                )
+            },
+            # Requests left unanswered last turn, to answer first (R-ANS-03).
+            **(
+                {"open_requests": open_left}
+                if (open_left := (conversation.service_brief or {}).get("open_requests"))
+                else {}
+            ),
+            # Questions already answered, kept across sessions and languages (R-ASK-07). The
+            # question
+            # asked last turn counts as answered by what they say now, before the turn is saved.
+            **(
+                {"closed_slots": closed_slots}
+                if (
+                    closed_slots := slots.advance(
+                        conversation.service_brief or {}, message.body or "", "", ""
+                    )[0]
+                )
+                else {}
+            ),
+            "conversation_summary": conversation.summary or "",
+            "history": [
+                {
+                    "role": m.sender_type,
+                    "kind": m.message_type,
+                    "at": f"{m.created_at:%Y-%m-%d %H:%M}",
+                    **({"move": move_of[str(m.id)]} if str(m.id) in move_of else {}),
+                    "text": (
+                        m.body[:1500]
+                        + ("\n" + link_note(m.media["links"]) if m.media.get("links") else "")
+                    ),
+                }
+                for m in reversed(rows)
+            ],
+            "hours_since_previous_message": (
+                round((message.created_at - rows[0].created_at).total_seconds() / 3600, 1)
+                if rows and message.created_at and rows[0].created_at
+                else None
+            ),
+            "latest_message_kind": message.message_type,
+            **await latency.timed("ctx.deals", _deal_context(session, scope, conversation)),
+            "team_members": team,
+            "latest_customer_message": message.body[:4000],
+            "shared_links": (message.media or {}).get("links") or [],
+            "shared_documents": shared_documents(message, rows),
+            "team_notes": team_notes,
+            **reply_language(conversation, message, rows, known_language),
+            "tone": policy.response_rules.get("tone", "friendly"),
+            **brain_context(policy, conversation, rows, message),
+            "now_local": _now_local(policy.timezone),
+            "feedback_for": ((conversation.service_brief or {}).get("awaiting_feedback") or {}).get(
+                "project", ""
+            ),
+            "meeting_over": meeting_over(
+                conversation.service_brief or {},
+                team_notes,
+                policy.timezone,
+                datetime.now(UTC),
+            ),
+            "google_meet_ready": await latency.timed("ctx.meet", _meet_ready(session, scope)),
+            "followups_enabled": policy.whatsapp_config.get("reminder_enabled", True),
+        }
+    )
 
 
 # "I'll review the video and get back to you": a promise pi can't keep.
@@ -4403,6 +4478,8 @@ def reply_language(
         # pi never picks another language on its own.
         remembered if remembered in NAMES else "en",
     )
+    if language == "ur":  # Urdu script is answered in Urdu script (spec 2.5, G7)
+        return {"reply_language_other": "Urdu", "reply_language_name": NAMES["Urdu"]}
     return {"reply_language": language, "reply_language_name": NAMES[language]} if language else {}
 
 
@@ -5912,6 +5989,7 @@ async def compose_service_turn(
         problem = f"{later}, and also: {problem}" if problem else later
     if made_up := invented(turn.reply, context, turn.action == "booking"):
         problem = f"{made_up}, and also: {problem}" if problem else made_up
+    extracted_ops: list[Any] = []
     if (
         brain
         and not turn.problem_ops
@@ -5925,6 +6003,7 @@ async def compose_service_turn(
         latency.count("model_calls")
         if found:
             turn.problem_ops = found
+            extracted_ops = found  # kept across a rewrite, which replaces the whole turn
             latency.count("extracted_problems", len(found))
     if brain and (ghost := noted_without_problem(turn)):
         problem = f"{ghost}, and also: {problem}" if problem else ghost
@@ -6028,8 +6107,7 @@ async def compose_service_turn(
     if context.get("pi_mode") == "brain" and context.get("burst_texts"):
         # Spec v1.4, 17.2 (turnCoverage): a reply that skips the biggest message of a burst.
         owner_turn = [*context["burst_texts"], str(context.get("latest_customer_message") or "")]
-        if skipped := turn_coverage.skipped_topic(turn.reply, owner_turn):
-            text = turn_coverage.rewrite_reason(skipped)
+        if text := turn_coverage.coverage_problem(turn.reply, owner_turn):
             problem = f"{text}, and also: {problem}" if problem else text
     if context.get("pi_mode") == "brain" and (
         fix := figure_correction.numeric_correction(
@@ -6111,6 +6189,8 @@ async def compose_service_turn(
             ),
         )
         turn = retry.value
+        if extracted_ops and not turn.problem_ops:
+            turn.problem_ops = extracted_ops  # B6: the owner's facts are not lost in a rewrite
         turn._attempts = [*result.response.attempts, *retry.response.attempts]
         turn.reply = without_filler(tidy_list_numbers(turn.reply))
         turn.reply = voice_noted(turn.reply, context)
@@ -6207,6 +6287,7 @@ async def compose_service_turn(
         brain_no_early_promise(turn, context)
         brain_never_empty(turn, context)
         brain_offer(turn, context)
+        strip_unallowed_offer(turn, context)
     if context.get("handback_notice") and not turn.request_human and turn._decision is None:
         short = safety.handback_reply(str(context.get("reply_language") or "en"))
         turn.reply = f"{short.rsplit('. ', 1)[0]}. {turn.reply}"
@@ -6352,6 +6433,13 @@ async def compose_service_turn(
         if (status := handoff_status_line(context)) and not turn.request_human:
             turn.reply = f"{status} {turn.reply}"
             turn._handoff_status = str((context.get("pending_handoff") or {}).get("id") or "")
+        if context.get("open_items") and not turn.request_human:
+            line = open_items.return_line_for(
+                context["open_items"], str(context.get("reply_language") or "en")
+            )
+            if line:
+                turn.reply = f"{line} {turn.reply}"
+                turn._open_said = [str(i["id"]) for i in context["open_items"][:2]]
     if context.get("opening_by_model"):
         from app.modules.pi import learning_audit
 
@@ -6477,9 +6565,25 @@ async def save_service_turn(
                 message.body or "",
                 turn.reply,
                 request_human=turn.request_human,
+                persistent=True,  # 17.7: kept until answered or dropped by the owner
             )
         except Exception:  # noqa: BLE001
             logger.warning("pi_open_requests_failed", exc_info=True)
+        await guarded(
+            session,
+            "open_items",
+            open_items.sync(
+                session,
+                scope,
+                conversation,
+                message,
+                reply=turn.reply,
+                language=str(turn.language or "en"),
+                request_human=turn.request_human,
+                knowledge_gaps=list(turn.knowledge_gaps),
+                said_ids=turn._open_said,
+            ),
+        )
     known = list(previous.get("knowledge_gaps") or [])
     new_gaps = [g for g in dict.fromkeys(turn.knowledge_gaps) if g not in known]
     brief["knowledge_gaps"] = [*known, *new_gaps][-10:]

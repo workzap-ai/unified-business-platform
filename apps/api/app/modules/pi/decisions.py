@@ -10,7 +10,7 @@ the model should answer (a question, a correction, a cost question).
 """
 
 import re
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from datetime import date
 from enum import StrEnum
 from typing import Any
@@ -313,9 +313,9 @@ TEXT: dict[str, dict[str, str]] = {
         "ar": "ما الذي تودون تغييره؟",
     },
     "changes_noted": {
-        "en": "Noted: {changes}. I've sent this to Workzap. They'll send a revised version here.",
-        "roman_ur": "Note kar liya: {changes}. Maine ye Workzap ko bhej diya hai. Wo yahin nayi version bhejenge.",
-        "ar": "سجلت: {changes}. أرسلت هذا إلى Workzap وسترسل نسخة معدلة هنا.",
+        "en": "I've sent this to Workzap: {changes}. They'll send a revised version here.",
+        "roman_ur": "Ye Workzap ko bhej diya hai: {changes}. Wo yahin nayi version bhejenge.",
+        "ar": "أرسلت هذا إلى Workzap: {changes}. وسترسل نسخة معدلة هنا.",
     },
     "quote_declined": {
         "en": (
@@ -400,6 +400,11 @@ def buttons_for(body: str) -> list[str] | None:
         if ending.endswith(TEXT["confirm_go"][language]) or ending.endswith(
             TEXT["re_offer"][language]
         ):
+            return OFFER_BUTTONS[language]
+    from app.modules.pi import solution_ask  # the Solution Box offer wording (spec 5.4)
+
+    for language, lines in solution_ask.BOX_OFFERS.items():
+        if language in OFFER_BUTTONS and any(ending.endswith(t[-40:]) for t in lines.values()):
             return OFFER_BUTTONS[language]
     return None
 
@@ -528,12 +533,32 @@ def decide(
             # Solution Box on it also waits for R1 to R3 or B1 to B7; with it off (the default,
             # until the map flow that sets B3 and B4 is live) the summary being accepted is the
             # trigger, so the chat never reaches a dead end.
+            asked = asks_for_document(message)
             if facts.get("box_offer"):
-                allowed, rule, reason = box.can_offer(facts["box_offer"])
+                allowed, rule, reason = box.can_offer(
+                    replace(facts["box_offer"], asked_for_document_or_price=asked)
+                )
                 if not allowed:
                     return Decision(None, None, {}, [], why=f"{rule}-blocked: {reason}")
+            elif not asked:
+                # Audit R8: with the Solution Box off there is no readiness data, so only R1 (the
+                # owner asked for the document or quote) may start the offer.
+                return Decision(None, None, {}, [], why="R1-blocked: no readiness data, not asked")
+            offer_text = text("offer", language)
+            if facts.get("box_offer"):  # Solution Box wording (spec 5.4), the one offer
+                from app.modules.pi import solution_ask
+
+                offer_text = solution_ask.box_offer_line(
+                    {
+                        "brief": brief,
+                        "noted_problems": [{}] * int(facts.get("problem_count") or 0),
+                        "latest_message_id": facts.get("message_id"),
+                        "reply_language": language,
+                        "latest_customer_message": message,
+                    }
+                )
             return Decision(
-                text("offer", language),
+                offer_text,
                 State.S5_READINESS,
                 {"offer_asked": True},
                 why="R-OFFER-01",

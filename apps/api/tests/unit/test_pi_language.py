@@ -26,7 +26,7 @@ from app.modules.pi.language import (
         ("website design chahiye", "roman_ur"),
         ("Aap ka rate kya hai?", "roman_ur"),
         ("Assalamualaikum bhai", "roman_ur"),
-        ("مجھے ویب سائٹ چاہیے", "roman_ur"),
+        ("مجھے ویب سائٹ چاہیے", "ur"),  # Urdu script stays Urdu script (spec 2.5, G7)
         ("मुझे वेबसाइट चाहिए", "roman_ur"),
         ("أريد موقعا إلكترونيا", "ar"),
         ("ok", None),

@@ -60,6 +60,7 @@ from app.modules.pi.models import (
     WhatsAppConnection,
     WhatsAppWebhookEvent,
 )
+from app.modules.pi.open_item_models import PiOpenItem
 from app.modules.pi.problem_models import (
     PiProblem,
     PiProblemGroup,
@@ -164,6 +165,7 @@ __all__ = [
     "PiOfferLog",
     "PiMoveLog",
     "PiHypothesis",
+    "PiOpenItem",
     "PiSolutionBox",
     "PiProblem",
     "PiProblemGroup",

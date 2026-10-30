@@ -18,7 +18,7 @@ def test_every_section_the_selector_names_exists_in_the_handbook():
 
 def test_the_constitution_and_the_voice_are_always_there():
     text = h.guidance("S1_LISTENING", "hello")
-    for rule in ("R-DISC-01", "R-SELL-01", "R-PAY-01", "R-PRIV-01", "R-ADV-01", "R-EMER-01"):
+    for rule in ("R-DISC-01", "R-SELL-03", "R-PAY-01", "R-PRIV-01", "R-ADV-01", "R-EMER-01"):
         assert rule in text
     assert "talk like a human" in text.lower()
 

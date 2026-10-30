@@ -10,8 +10,8 @@ loosen a rule: it sits below the constitution and says so.
 
 from typing import Any
 
+from app.modules.pi import dial_signals, hypothesis_reply, moves, think_lint
 from app.modules.pi import dials as dials_mod
-from app.modules.pi import hypothesis_reply, moves, think_lint
 
 THINKING_FLAG = "thinking"
 
@@ -29,7 +29,9 @@ PLAN_FIELD_HINT = (
     f"move = one move key from [{MOVE_KEYS_TEXT}]; reason = one short line, why this move now; "
     "asks_question = true only when the reply ends in a question, and it must match the reply; "
     "hypothesis = {action: none | add | against | drop, text, confidence, evidence, test}, usually "
-    "none. Never mark a hypothesis confirmed: only the owner confirms."
+    "none. Never mark a hypothesis confirmed: only the owner confirms. "
+    "addresses = the topic this message works on: a topic id from the context's topics when it "
+    "lists them, else the word newest (spec 17.3: the plan names the node it addresses)."
 )
 
 MOVE_LINES = "\n".join(f"- {m.value}: {moves.INFO[m].does}" for m in moves.Move)
@@ -160,8 +162,8 @@ def suggested(context: dict[str, Any]) -> moves.Choice | None:
     texts = _customer_messages(context)
     if not texts:
         return None
-    state = dials_mod.estimate(texts)
-    latest = dials_mod.read_signals(texts[-1], first_message=len(texts) == 1)
+    state = dial_signals.estimate(context, texts)  # X6: gap, unasked problem, repair
+    latest = dial_signals.latest_signals(context, texts)
     figures = any(think_lint.NUMBER.search(t) for t in texts)
     latest_gave = bool(think_lint.NUMBER.search(texts[-1]) or think_lint.HALF.search(texts[-1]))
     fresh = latest_gave and any(think_lint.NUMBER.search(t) for t in texts[:-1])
@@ -184,7 +186,7 @@ def situation_note(context: dict[str, Any]) -> str:
     texts = _customer_messages(context)
     if not texts:
         return ""
-    state = dials_mod.estimate(texts)
+    state = dial_signals.estimate(context, texts)
     ai_texts = [
         str(h.get("text", "")) for h in context.get("history") or [] if h.get("role") == "ai"
     ]
@@ -212,6 +214,9 @@ def situation_note(context: dict[str, Any]) -> str:
     recent = [t.move.value for t in turns]
     if recent:
         lines.append("Your last moves, oldest first: " + ", ".join(recent) + ".")
+    for key in ("topic_note", "hold_note"):  # spec 17.3 / 11.1: a switch of topic, a heavy owner
+        if context.get(key):
+            lines.append(str(context[key]))
     if turns and turns[-1].landed is False:
         lines.append(
             f"Your last move ({turns[-1].move.value}) did not land: the owner's reply left it "

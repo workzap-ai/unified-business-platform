@@ -1,13 +1,18 @@
-"""Erase what pi keeps about one person (pi Brain spec R-PRIV-06, 8.8, learning eval L11).
+"""Erase what pi keeps about one person (pi Brain spec R-PRIV-06, 8.8, learning eval L11; platform
+spec X5, ST12).
 
-Removed: the problems pi noted (with their revisions, links and groups), pi's memory notes, the
-encrypted quarantine copies, the learning scores and examples from their chats, and the text of
-their messages and pi's replies (the rows stay so counts and audit trails still add up, but the
-words go). Question-arm statistics are bare counts with no personal data, so they stay.
+Removed: the problems pi noted (with their revisions, links and groups), the problem map (every
+version), the Solution Boxes and their move history, the offer log, the Business Profile, pi's
+open items, the move log, pi's memory notes, the encrypted quarantine copies, the learning scores
+and examples from their chats, and the text of their messages and pi's replies (the rows stay so
+counts and audit trails still add up, but the words go). Question-arm statistics are bare counts
+with no personal data, so they stay.
 
-Kept on purpose: quotes, solution documents and payments (business and financial records the
-company must be able to show), and the customer's contact record in the CRM, which the customer
-module owns. The result says what was kept, so staff can tell the person plainly.
+Kept on purpose (platform spec 4.9 item 10, ST12: the box history follows the retention rules;
+here only the box's own words and history go, never a quote): quotes, solution documents and
+payments (business and financial records the company must be able to show), and the customer's
+contact record in the CRM, which the customer module owns. The result says what was kept
+(`kept`, `kept_reasons`), so staff can tell the person plainly.
 """
 
 from typing import Any
@@ -19,10 +24,12 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.modules.customers.models import Customer
 from app.modules.pi import business_profile_store
+from app.modules.pi.box_models import PiBoxTransition, PiMapVersion, PiOfferLog, PiSolutionBox
 from app.modules.pi.brain_docs_models import PiBrainDocument, PiBrainPayment
 from app.modules.pi.experience_models import PiExperience
 from app.modules.pi.learning_models import PiLearningExample
 from app.modules.pi.models import PiConversation, PiMemory, PiMessage
+from app.modules.pi.open_item_models import PiOpenItem
 from app.modules.pi.problem_models import (
     PiProblem,
     PiProblemGroup,
@@ -39,6 +46,83 @@ ERASED = "[deleted at the customer's request]"
 
 def _n(result: Any) -> int:
     return int(getattr(result, "rowcount", 0) or 0)
+
+
+async def _erase_conversation_extras(
+    session: AsyncSession, scope: WorkspaceScope, conversation_ids: list[UUID]
+) -> dict[str, int]:
+    """Offer log and open items of these conversations (tables from migrations 0047 and 0052)."""
+    out: dict[str, int] = {}
+    for key, model in (("offer_log", PiOfferLog), ("open_items", PiOpenItem)):
+        try:
+            async with session.begin_nested():
+                out[key] = _n(
+                    await session.execute(
+                        delete(model).where(
+                            model.tenant_id == scope.tenant_id,
+                            model.environment_id == scope.environment_id,
+                            model.conversation_id.in_(conversation_ids),
+                        )
+                    )
+                )
+        except ProgrammingError:
+            pass
+    return out
+
+
+async def _erase_map_and_boxes(
+    session: AsyncSession, scope: WorkspaceScope, customer_id: UUID
+) -> dict[str, int]:
+    """The map (every version), the Solution Boxes and their move history (spec X5, ST12). A box
+    points at a map version and at its parent box, so the order is: moves, links between boxes,
+    boxes, map versions."""
+    out: dict[str, int] = {}
+    try:  # the map and box tables arrive with migrations 0047 and 0051
+        async with session.begin_nested():
+
+            def mine(model: Any) -> tuple[Any, ...]:
+                return (
+                    model.tenant_id == scope.tenant_id,
+                    model.environment_id == scope.environment_id,
+                )
+
+            box_ids = list(
+                await session.scalars(
+                    select(PiSolutionBox.id).where(
+                        *mine(PiSolutionBox), PiSolutionBox.customer_id == customer_id
+                    )
+                )
+            )
+            if box_ids:
+                out["box_transitions"] = _n(
+                    await session.execute(
+                        delete(PiBoxTransition).where(
+                            *mine(PiBoxTransition), PiBoxTransition.box_id.in_(box_ids)
+                        )
+                    )
+                )
+                await session.execute(
+                    update(PiSolutionBox)
+                    .where(*mine(PiSolutionBox), PiSolutionBox.id.in_(box_ids))
+                    .values(parent_box_id=None, map_version_id=None)
+                )
+            out["solution_boxes"] = _n(
+                await session.execute(
+                    delete(PiSolutionBox).where(
+                        *mine(PiSolutionBox), PiSolutionBox.customer_id == customer_id
+                    )
+                )
+            )
+            out["map_versions"] = _n(
+                await session.execute(
+                    delete(PiMapVersion).where(
+                        *mine(PiMapVersion), PiMapVersion.customer_id == customer_id
+                    )
+                )
+            )
+    except ProgrammingError:
+        pass
+    return out
 
 
 async def erase_customer(
@@ -150,11 +234,14 @@ async def erase_customer(
                 *mine(PiHypothesis), PiHypothesis.conversation_id.in_(conversation_ids)
             )
         )
-        await session.execute(
-            delete(PiMoveLog).where(
-                *mine(PiMoveLog), PiMoveLog.conversation_id.in_(conversation_ids)
+        removed["move_log"] = _n(
+            await session.execute(
+                delete(PiMoveLog).where(
+                    *mine(PiMoveLog), PiMoveLog.conversation_id.in_(conversation_ids)
+                )
             )
         )
+        removed.update(await _erase_conversation_extras(session, scope, conversation_ids))
         removed["quarantine"] = _n(
             await session.execute(
                 delete(PiQuarantine).where(
@@ -181,6 +268,7 @@ async def erase_customer(
                 last_message_preview=ERASED,
             )
         )
+    removed.update(await _erase_map_and_boxes(session, scope, customer_id))
     # the Business Profile (facts, page snapshots) is what the owner told pi about their business
     try:  # the profile tables arrive with migration 0050
         async with session.begin_nested():
@@ -215,4 +303,14 @@ async def erase_customer(
             )
         ),
     }
-    return {"removed": removed, "kept": kept, "conversations": len(conversation_ids)}
+    return {
+        "removed": removed,
+        "kept": kept,
+        "kept_reasons": {
+            "documents": "business records the company must be able to show",
+            "payments": "financial records the company must be able to show",
+            "customer_contact": "the CRM contact record belongs to the customer module",
+            "message_rows": "the rows stay so counts and audit trails add up; the words are gone",
+        },
+        "conversations": len(conversation_ids),
+    }

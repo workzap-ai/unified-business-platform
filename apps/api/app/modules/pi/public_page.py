@@ -19,6 +19,7 @@ No model call, no login, no form. A failure is a calm status, never an exception
 import asyncio
 import hashlib
 import html
+import ipaddress
 import re
 from dataclasses import dataclass, field
 from typing import Any
@@ -148,12 +149,31 @@ def untrusted_block(result: PageResult) -> str:
     )
 
 
+def is_internal_host(url: str) -> bool:
+    """True for a literal private, loopback, link-local or reserved IP, or an internal name.
+
+    No DNS lookup is made here (no network in this module); names that resolve to private
+    addresses are still refused by the outbound client."""
+    host = (urlsplit(url).hostname or "").strip().lower().rstrip(".")
+    if not host:
+        return True
+    if host == "localhost" or host.endswith((".localhost", ".local", ".internal", ".lan")):
+        return True
+    try:
+        addr = ipaddress.ip_address(host)
+    except ValueError:
+        return False
+    if isinstance(addr, ipaddress.IPv6Address) and addr.ipv4_mapped is not None:
+        addr = addr.ipv4_mapped
+    return not addr.is_global
+
+
 async def _get(outbound: Any, url: str) -> tuple[str, str, str] | None:
     """(final url, content type, text) or None; follows up to 3 redirects, each checked again."""
     from app.integrations.errors import IntegrationError
 
     for _ in range(4):
-        if urlsplit(url).scheme != "https":
+        if urlsplit(url).scheme != "https" or is_internal_host(url):
             return None
         try:
             response = await outbound.request(
@@ -269,6 +289,8 @@ async def quick_look(
         return PageResult("refused", url, "not_a_business_page")
     if kind == "needs_screenshot":
         return PageResult("needs_screenshot", url, "platform_page")
+    if is_internal_host(url):
+        return PageResult("failed", url, "unreachable")  # same answer as the client's refusal
     try:
         return await asyncio.wait_for(_look(outbound, url, max(1, max_pages)), total_seconds)
     except TimeoutError:

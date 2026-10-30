@@ -48,6 +48,8 @@ def opening_line(context: dict[str, Any]) -> str:
 
     language = context.get("reply_language")
     said = str(context.get("latest_customer_message", ""))
+    if context.get("reply_language_other") == "Urdu":
+        return fixed_lines.line("opening", "ur", OPENING["ur"])
     if language == "roman_ur":
         key = "ur" if ARABIC_SCRIPT.search(said) and URDU_LETTERS.search(said) else language
         base = OPENING[key]
@@ -518,6 +520,16 @@ GENDERED_URDU = re.compile(
     r"(?:kar|bhej|bata|bana|dikha|dekh|rakh|sun|likh|pooch|nikal|laga|ban|aa|ja|ho)(?:unga|ungi))\b",
     re.IGNORECASE,
 )
+# "Main yahan kabhi payment nahi maangta", "main nahi dekh sakta": a first-person masculine (or
+# feminine) verb gives pi a gender. The impersonal "nahi dekha ja sakta" is the neutral form.
+GENDERED_I = re.compile(
+    r"\bmain\b(?!\s+(?:problem|masla|masle|reason|wajah|issue|baat|cheez|point|cause|channel|gate|bazaar))"
+    r"[^.?!\n:;]{0,80}?(?<!ja )(?<!ho )\b(?:sak(?:ta|ti|a|i)|maang(?:ta|ti)|mang(?:ta|ti)|kar(?:ta|ti)|de(?:ta|ti)|"
+    r"le(?:ta|ti)|bhej(?:ta|ti)|dekh(?:ta|ti)|bata(?:ta|ti)|jaan(?:ta|ti)|jan(?:ta|ti)|"
+    r"samajh(?:ta|ti)|chah(?:ta|ti)|likh(?:ta|ti)|rakh(?:ta|ti)|sun(?:ta|ti)|keh(?:ta|ti)|"
+    r"bana(?:ta|ti)|(?:kar|bhej|bata|dekh|rakh|likh|sun)(?:unga|ungi))\b",
+    re.IGNORECASE,
+)
 INFORMAL_IMPERATIVE = re.compile(
     r"\b(?:karo|kro|rakho|bhejo|dekho|likho|batao|banao|uthao|lagao|nikalo|gino|poochho|pucho|"
     r"puchho|chalao|bulao)\b",
@@ -554,6 +566,17 @@ def roman_urdu_tone(reply: str, heard: str) -> list[Violation]:
                 f'pi has no gender: not "{gendered}" ("maine note kar liya", "bhej diya jayega")',
             )
         )
+    if not gendered:
+        gendered = next(
+            (m.group(0) for m in GENDERED_I.finditer(own) if m.group(0).lower() not in heard), None
+        )
+        if gendered:
+            found.append(
+                Violation(
+                    "R-GEN-01",
+                    f'pi has no gender: not "{gendered[-24:]}" (say it neutrally: "nahi dekha ja sakta")',
+                )
+            )
     informal = next(
         (m.group(0) for m in INFORMAL_IMPERATIVE.finditer(own) if m.group(0).lower() not in heard),
         None,
@@ -572,6 +595,38 @@ def roman_urdu_tone(reply: str, heard: str) -> list[Violation]:
     )
     if spelled:
         found.append(Violation("R-SPELL-01", f'spell it "{spelled[1]}", not "{spelled[0]}"'))
+    return found
+
+
+# Urdu script (spec 2.5, G7): first-person verbs that give pi a gender, and the informal "tum" forms.
+GENDERED_URDU_SCRIPT = re.compile(
+    r"\S*(?:تا|تی|رہا|رہی|گیا|گئی)\s+ہوں|(?:سکتا|سکتی)\s+ہوں|\S+وں\s+(?:گا|گی)\b"
+)
+INFORMAL_URDU_SCRIPT = re.compile(r"(?:^|\s)(?:کرو|بھیجو|دیکھو|لکھو|بتاؤ|بناؤ|رکھو)(?=[\s۔؟,.]|$)")
+
+
+def urdu_script_checks(reply: str) -> list[Violation]:
+    """The rules for a reply to a person who writes Urdu script: it is all in Urdu script (R-LANG-02,
+    one script per chat), polite (R-TONE-04) and gender-free in the first person (R-GEN-01). The
+    same rules every fixed Urdu line is held to (test_pi_fixed_lines_urdu_script)."""
+    from app.modules.pi.language import in_script
+
+    found: list[Violation] = []
+    if len(reply.split()) >= 4 and not in_script(reply, "Urdu"):
+        found.append(
+            Violation("R-LANG-02", "write the whole reply in Urdu script, not in English letters")
+        )
+    if match := GENDERED_URDU_SCRIPT.search(reply):
+        found.append(
+            Violation(
+                "R-GEN-01",
+                f'pi has no gender: not "{match.group(0)}" (use "کیا جا سکتا ہے", "میں نے ... لیا")',
+            )
+        )
+    if match := INFORMAL_URDU_SCRIPT.search(reply):
+        found.append(
+            Violation("R-TONE-04", f'use the "aap" form ("کریں"), not "{match.group(0).strip()}"')
+        )
     return found
 
 
@@ -611,7 +666,7 @@ YES_NO_QUESTION = re.compile(
     re.IGNORECASE,
 )
 ACK_OPENER = re.compile(
-    r"^\W*(?:thanks|thank\s+you|noted|got\s+it|shukriya|note\s+kar\s+liya|samajh\s+liya)\b"
+    r"^\W*(?:thanks|thank\s+you|noted|got\s+it|shukriya|(?:alag\s+)?note\s+kar\s+li(?:ya|a)?|samajh\s+liya)\b"
     + langs.ACK_OPENER,
     re.IGNORECASE,
 )
@@ -656,7 +711,7 @@ DOUBLE_OR = re.compile(
 # R-ECHO-04: a sentence that only says again what they said, with no "noted" frame.
 NOTED_START = re.compile(
     r"^\W*(?:thanks[.,]?\s+|thank\s+you[.,]?\s+|ji[,.]?\s+samajh\s+(?:aaya|gaya|gayi)[.,]?\s+)?"
-    r"(?:i(?:'ve|\s+have)\s+noted|noted|(?:(?:maine|ye|yeh|isay|ise)\s+)?note\s+kar\s+liya|likh\s+liya"
+    r"(?:i(?:'ve|\s+have)\s+noted|noted|(?:(?:maine|ye|yeh|isay|ise|alag)\s+)?note\s+kar\s+li(?:ya|a)?|likh\s+liya"
     + langs.NOTED_FRAME
     + r")",
     re.IGNORECASE,
@@ -966,7 +1021,7 @@ VALUE_LINE_STATES = frozenset({flow.State.S4_SORTED_SUMMARY, flow.State.S5_READI
 VALUE_LINE_STATES |= {flow.State.S5B_DECLINED}
 BEFORE_OFFER_STATES = frozenset(flow.LISTENING | {flow.State.S5_READINESS})
 LEADS_SOMEWHERE = re.compile(
-    r"\bworkzap\b|\bsolution documents?\b|\bquotes?\b|\bkya main\b|\bshall i\b|\bwant (?:me|a|the)\b",
+    r"\bworkzap\b|\bsolution (?:documents?|box)\b|\bquotes?\b|\bkya main\b|\bshall i\b|\bwant (?:me|a|the)\b",
     re.IGNORECASE,
 )
 SOFT_VALUE_WHYS = ("tool words", '"automatically"')
@@ -2186,6 +2241,8 @@ def lint(reply: str, context: dict[str, Any]) -> list[Violation]:
         )
     if str(context.get("reply_language") or "") == "roman_ur":
         found.extend(roman_urdu_tone(reply, heard))
+    if str(context.get("reply_language_other") or "") == "Urdu":
+        found.extend(urdu_script_checks(reply))
     if CODE_PROMISE.search(reply) or (
         ON_ITS_WAY.search(reply)
         and (SIGN_IN_WORDS.search(reply) or SIGN_IN_WORDS.search(_customer_words(context)))
@@ -2352,6 +2409,8 @@ def _language(context: dict[str, Any]) -> str:
 
     language = str(context.get("reply_language") or "en")
     said = str(context.get("latest_customer_message", ""))
+    if context.get("reply_language_other") == "Urdu":
+        return "ur"
     if language == "roman_ur" and ARABIC_SCRIPT.search(said) and URDU_LETTERS.search(said):
         return "ur"
     return language if language in OPENING else "en"
@@ -2382,7 +2441,7 @@ def safe_fallback(context: dict[str, Any]) -> str:
     first = not any(h.get("role") == "ai" for h in history)
     parts = []
     if first:
-        parts.append(f"{opening_line(context)} {FIRST_INVITE[language]}")
+        parts.append(f"{opening_line(context)} {FIRST_QUESTION[language]}")
     else:
         if ASKS_IF_AI.search(str(context.get("latest_customer_message", ""))):
             parts.append(_ai_answer(context, language))
@@ -2422,7 +2481,7 @@ def repair(reply: str, context: dict[str, Any]) -> str:
         if clearly_other(fixed, "roman_ur"):
             # English in a Roman Urdu chat that survived the rewrite: never sent as it is
             nxt = _next_question(context, "") if context.get("noted_problems") else ""
-            return f"Note kar liya. {nxt}" if nxt else safe_fallback(context)
+            return nxt or safe_fallback(context)  # spec 17.6: no "Note kar liya" announcement
     allowed = _allowed_bangs(context)
     if fixed.count("!") > allowed:
         kept = 0

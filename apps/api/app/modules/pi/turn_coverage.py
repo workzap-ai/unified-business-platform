@@ -45,6 +45,12 @@ def _content_words(text: str) -> set[str]:
     }
 
 
+def needed(topic_words: int) -> int:
+    """How many content words of a topic the reply must share to count as touching it. One common
+    word is chance, not coverage: four or more topic words need two (spec 17.2, A41/A42)."""
+    return 2 if topic_words >= 4 else 1
+
+
 def _weight(text: str) -> int:
     return len(text.split()) + STRAIN_WEIGHT * len(STRAIN.findall(text))
 
@@ -74,9 +80,94 @@ def skipped_topic(reply: str, texts: list[str]) -> str | None:
     words = _content_words(topic)
     if len(words) < MIN_CONTENT_WORDS:
         return None
-    if words & _content_words(reply):
+    if len(words & _content_words(reply)) >= needed(len(words)):
         return None
     return topic
+
+
+# --- strain first and direct questions (spec 17.2 "Feeling first", "Direct questions") ---------
+
+SENTENCE_END = re.compile(r"(?<=[.!?।۔؟])\s+|[\r\n]+")
+ACKNOWLEDGES = re.compile(
+    r"\b(?:sorry|understand|i hear|hear you|sounds|that must|must be|tough|hard|difficult|"
+    r"frustrat\w*|stress\w*|tired|exhaust\w*|worr\w*|upsetting|annoying|afsos|samajh\w*|"
+    r"maazrat|mushkil|dukh|pareshan\w*|tang|thak\w*|dil|saath hoon|here with you|with you)\b",
+    re.IGNORECASE,
+)
+QUESTION_START = re.compile(
+    r"^\W*(?:kya|kaise|kitna|kitni|kitne|kab|kyun|kyu|kahan|kaun|kon|what|how|when|why|where|"
+    r"who|which|can you|could you|do you|does it|is it|are you|will it)\b",
+    re.IGNORECASE,
+)
+MIN_QUESTION_WORDS = 2
+
+
+def first_sentence(reply: str) -> str:
+    parts = [p for p in SENTENCE_END.split(reply.strip()) if p.strip()]
+    return parts[0] if parts else ""
+
+
+def skipped_strain(reply: str, texts: list[str]) -> str | None:
+    """The owner message that showed strain when the reply's FIRST sentence does not acknowledge
+    it ("Feeling first"), else None. Strain anywhere in the turn counts, not only in the biggest
+    message; an acknowledgement is an empathy phrase or one of the owner's own strain words."""
+    texts = [t for t in texts if t and t.strip()]
+    if len(texts) < 2 or not reply.strip() or UNSPACED.search(reply):
+        return None
+    first = first_sentence(reply)
+    own = {
+        w[:STEM]
+        for t in texts
+        for m in STRAIN.finditer(t)
+        for w in WORD.findall(m.group(0).casefold())
+    }
+    heard = {w[:STEM] for w in WORD.findall(first.casefold())}
+    for text in texts:
+        if STRAIN.search(text) and not UNSPACED.search(text):
+            if ACKNOWLEDGES.search(first) or (own & heard):
+                return None
+            return text
+    return None
+
+
+def is_direct_question(text: str) -> bool:
+    return bool("?" in text or "؟" in text or QUESTION_START.search(text))
+
+
+def skipped_question(reply: str, texts: list[str]) -> str | None:
+    """A direct question of the turn that the reply does not touch (it shares fewer content words
+    with the question than `needed` asks for), else None. The newest message counts too."""
+    texts = [t for t in texts if t and t.strip()]
+    if len(texts) < 2 or not reply.strip() or UNSPACED.search(reply):
+        return None
+    mine = _content_words(reply)
+    for text in texts:
+        if UNSPACED.search(text) or not is_direct_question(text):
+            continue
+        words = _content_words(text)
+        if len(words) >= MIN_QUESTION_WORDS and len(words & mine) < needed(len(words)):
+            return text
+    return None
+
+
+def coverage_problem(reply: str, texts: list[str]) -> str | None:
+    """The rewrite reason for the first coverage failure of this turn (strain, then a direct
+    question, then the biggest topic), or None. One rewrite covers all of it."""
+    if strain := skipped_strain(reply, texts):
+        shown = " ".join(strain.split())[:160]
+        return (
+            f'the owner showed strain ("{shown}") and your first sentence does not acknowledge it. '
+            "Start with one plain sentence that names the feeling in their terms, then answer"
+        )
+    if question := skipped_question(reply, texts):
+        shown = " ".join(question.split())[:160]
+        return (
+            f'the owner asked a direct question ("{shown}") that the reply does not answer. '
+            "Answer it first, in one or two plain sentences, then the rest"
+        )
+    if topic := skipped_topic(reply, texts):
+        return rewrite_reason(topic)
+    return None
 
 
 def rewrite_reason(topic: str) -> str:

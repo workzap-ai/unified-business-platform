@@ -193,7 +193,7 @@ def test_right_to_left_scripts_are_drawn_with_size_determinism_and_no_overflow(l
 
 @pytest.mark.parametrize("lang", ["ur", "ar", "fa"])
 def test_right_to_left_layout_is_the_mirror_of_the_left_to_right_one(lang):
-    n = 3
+    n = 5  # five or more: the two-column grid (up to four problems use one wide column)
     left = m.render_map(latin_twin(n), "en").images[0]
     right = m.render_map(rtl_map(lang, n), lang).images[0]
     assert left.positions == right.positions  # the same slots: column 0 is the first card
@@ -216,12 +216,12 @@ def test_right_to_left_layout_is_the_mirror_of_the_left_to_right_one(lang):
 
 @pytest.mark.parametrize("lang", ["ur", "ar", "fa"])
 def test_right_to_left_picture_is_not_blank_and_differs_from_the_latin_one(lang):
-    right = decode(m.render_map(rtl_map(lang), lang).images[0].png).convert("RGB")
-    left = decode(m.render_map(latin_twin(), "en").images[0].png).convert("RGB")
+    right = decode(m.render_map(rtl_map(lang, 5), lang).images[0].png).convert("RGB")
+    left = decode(m.render_map(latin_twin(5), "en").images[0].png).convert("RGB")
     assert right.size[0] == left.size[0]
     colours = right.getcolors(maxcolors=1_000_000) or []
-    background = max(colours)[1]
-    assert background == m.BG
+    background = sum(c for c, rgb in colours if rgb == m.BG)
+    assert background > 0.1 * right.size[0] * right.size[1]  # the cards are white; BG shows too
     ink = sum(c for c, rgb in colours if sum(rgb) < 330)
     assert ink > 3000  # real glyphs were drawn
     assert right.size != left.size or right.tobytes() != left.tobytes()

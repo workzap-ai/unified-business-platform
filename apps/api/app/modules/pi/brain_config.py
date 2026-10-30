@@ -49,10 +49,11 @@ def describe(response_rules: dict[str, Any] | None) -> dict[str, dict[str, int]]
     }
 
 
-# The least confidence (percent) at which pi suggests that two problems share a root. It starts at
-# the default and moves per industry from what staff confirm and reject (`learning_links`).
-LINK_DEFAULT = 60
-LINK_RANGE = (50, 85)
+# The least confidence (percent) at which pi suggests that two problems share a root (spec 4.4:
+# 0.75; 9.10 tested range 0.6 to 0.9). It starts at the default and moves per industry from what
+# staff confirm and reject (`learning_links`).
+LINK_DEFAULT = 75  # spec 4.4 and 9.10: the one number; taxonomy.LINK_SHOWN_AT is the same value
+LINK_RANGE = (60, 90)  # spec 9.10 as written
 
 
 def link_pct(response_rules: dict[str, Any] | None, industry: str | None) -> int:

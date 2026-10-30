@@ -28,6 +28,8 @@ from app.core.config import Settings
 from app.modules.customers import files
 from app.modules.customers.models import Customer
 from app.modules.pi import (
+    box,
+    box_doc,
     brain_pdf,
     constitution,
     decisions,
@@ -35,6 +37,7 @@ from app.modules.pi import (
     flow,
     industry_packs,
     problems,
+    solutions,
 )
 from app.modules.pi.brain_docs_models import PiBrainDocument
 from app.modules.pi.models import PiConversation, PiMessage, WhatsAppConnection
@@ -83,6 +86,66 @@ class SolutionDraft(BaseModel):
     wont_do: list[WontDo] = Field(default_factory=list, max_length=8)
     needs: list[str] = Field(default_factory=list, max_length=6)
     needs_local: list[str] = Field(default_factory=list, max_length=6)
+
+
+class Line(BaseModel):
+    """One sentence of a Solution Box section, with the refs of the problems it is about."""
+
+    text: str = Field(max_length=300)
+    local: str = Field(default="", max_length=300)
+    refs: list[str] = Field(default_factory=list)
+
+
+class BoxComponent(BaseModel):
+    """A build from the approved catalogue, placed in a phase. The wording comes from the catalogue
+    in code, so the model chooses only the key, the phase and the problems it answers."""
+
+    key: str = ""
+    phase: int = Field(default=1, ge=1, le=box_doc.MAX_PHASE)
+    problems: list[str] = Field(default_factory=list)
+
+
+class BoxDraft(BaseModel):
+    """What the model writes for the eight-section Solution Box (spec 5.2). The problem list,
+    the clusters' numbers, the links, the order of work and the unconfirmed details are built in
+    code."""
+
+    components: list[BoxComponent] = Field(default_factory=list, max_length=8)
+    phases: list[Line] = Field(default_factory=list, max_length=box_doc.MAX_PHASE)  # names
+    hypotheses: list[Line] = Field(default_factory=list, max_length=8)
+    ideas: list[Line] = Field(default_factory=list, max_length=16)  # two per problem
+    assumptions: list[Line] = Field(default_factory=list, max_length=8)
+    covers: list[str] = Field(default_factory=list, max_length=8)
+    covers_local: list[str] = Field(default_factory=list, max_length=8)
+    wont_do: list[WontDo] = Field(default_factory=list, max_length=8)
+    needs: list[str] = Field(default_factory=list, max_length=6)
+    needs_local: list[str] = Field(default_factory=list, max_length=6)
+
+
+BOX_SYSTEM = """You write the Solution Box for a business owner who told pi, an AI on WhatsApp,
+what is going wrong. A Workzap reviewer reads it before the owner does. Plain words a
+twelve-year-old follows. No jargon. No price, no date, no promise of an outcome. Never "will".
+Return these parts:
+- "components": what Workzap would build. Each is only a catalogue "key" (one of catalogue_keys),
+  a "phase" (1 to 4: what comes first, then next) and the refs of the problems it answers in
+  "problems". Never write the wording and never use a key that is not in catalogue_keys. No
+  component without a problem: no upsell.
+- "phases": a short plain name for each phase you used, in order (for example "Get the numbers
+  you need each morning"), one entry per phase number, refs empty.
+- "hypotheses": per group of problems, what MAY be going on, as a guess. Say "may" or "could".
+  Only from the owner's words (their_words, where, impact, cause). Each names the refs it is about.
+- "ideas": exactly TWO per problem, each an entry whose refs holds that one problem. Each idea is
+  one short line the owner can do on their own: what to do and why. No how-to steps, no tool or
+  app names, no numbers, no promised result.
+- "assumptions": anything you had to assume or that is open. Never hide a gap.
+- "wont_do": never empty. Every problem is answered by a component or listed in wont_do with its
+  ref in "problem" and a plain reason in "text". Say what this does not change.
+- "covers": the parts of the business it touches. "needs": what Workzap would need from them (a
+  contact person, sample data). Never a password, code, OTP or payment detail.
+- text is English. When language is not English, "local" is the same sentence in that language
+  (Roman Urdu uses everyday English business words); otherwise leave local empty.
+- house_style (when present) are wording tips reviewers approved. Wording only; never the rules.
+Return only the structured result."""
 
 
 SYSTEM = """You write a solution document for a business owner who told pi, an AI on WhatsApp,
@@ -153,8 +216,10 @@ def doc_url(settings: Settings, doc: PiBrainDocument, english: bool = False) -> 
 # --- the rules (R-DOC-01..09) ------------------------------------------------------------------
 
 
-def check_solution(draft: SolutionDraft, refs: set[str]) -> list[str]:
-    """What breaks the document rules; empty means it is ready for a reviewer."""
+def check_solution(draft: SolutionDraft, refs: set[str], *, catalogue: bool = False) -> list[str]:
+    """What breaks the document rules; empty means it is ready for a reviewer. `catalogue` (the
+    Solution Box): the components are the approved catalogue's own wording, so they are not held to
+    the reading grade; the money, promise and length rules still read them."""
     issues: list[str] = []
     if not draft.components:
         issues.append("there are no components: say what Workzap would build")
@@ -188,7 +253,8 @@ def check_solution(draft: SolutionDraft, refs: set[str]) -> list[str]:
             if re.search(rf"\b{re.escape(term)}s?\b", text, re.IGNORECASE):
                 issues.append(f'"{text[:50]}" uses "{term}" (R-DOC-05)')
                 break
-    plain = " ".join(texts)
+    built_in = {c.text for c in draft.components} if catalogue else set()
+    plain = " ".join(t for t in texts if t not in built_in)
     grade = reading_grade(plain)
     if len(plain.split()) >= 30 and grade > MAX_READING_GRADE:
         issues.append(
@@ -232,7 +298,139 @@ def check_content(content: dict[str, Any], refs: set[str] | None = None) -> list
         needs=[str(x) for x in content.get("needs", [])],
     )
     known = refs if refs is not None else {p["ref"] for p in content.get("problems", [])}
-    return check_solution(draft, known)
+    issues = check_solution(draft, known, catalogue=bool(content.get("box")))
+    if content.get("box"):
+        issues += box_text_issues(content) + box_doc.structure_issues(content)
+    return issues
+
+
+def box_text_issues(content: dict[str, Any]) -> list[str]:
+    """The money, promise, "will" and jargon rules on the sections only the box has: hypotheses,
+    ideas, assumptions and phase names (the six-section texts are checked by check_solution)."""
+    guesses = [str(t) for c in content.get("clusters") or [] for t in c.get("hypotheses") or []]
+    guesses += [str(t) for t in content.get("assumptions") or []]
+    guesses += [str(p.get("name", "")) for p in content.get("phases") or []]
+    # an idea is an action for the owner ("when they will be late" is fine); only what Workzap
+    # would do is held to "would", so ideas skip that one rule
+    ideas = [str(i) for e in content.get("ideas") or [] for i in e.get("ideas") or []]
+    issues: list[str] = []
+    for text in [*guesses, *ideas]:
+        if MONEY_IN_TEXT.search(text):
+            issues.append(f'"{text[:50]}" has a price or amount: prices are only on the quote')
+        if constitution.PROMISE.search(text):
+            issues.append(f'"{text[:50]}" promises an outcome (R-DOC-06)')
+        if WILL.search(text) and text not in ideas:
+            issues.append(f'"{text[:50]}" says "will": use "would" (R-DOC-06)')
+        for term in constitution.JARGON:
+            if re.search(rf"\b{re.escape(term)}s?\b", text, re.IGNORECASE):
+                issues.append(f'"{text[:50]}" uses "{term}" (R-DOC-05)')
+                break
+    return issues
+
+
+def box_to_solution(
+    draft: BoxDraft, *, language: str, sector: str | None
+) -> tuple[SolutionDraft, list[str]]:
+    """The six-section draft the existing checks understand: each component's wording is the
+    approved catalogue's. Returns it with the issues that stop a component being built (a key that
+    is not in the catalogue, 5.7 catalogue)."""
+    issues: list[str] = []
+    components: list[Component] = []
+    for item in draft.components:
+        if item.key not in solutions.CATALOGUE:
+            issues.append(
+                f'component key "{item.key[:40]}" is not in the approved catalogue: use one of '
+                + ", ".join(box_doc.CATALOGUE_KEYS)
+            )
+            continue
+        english, local = box_doc.catalogue_text(item.key, language, sector)
+        components.append(Component(text=english, local=local, problems=item.problems))
+    return (
+        SolutionDraft(
+            components=components,
+            covers=draft.covers,
+            covers_local=draft.covers_local,
+            wont_do=draft.wont_do,
+            needs=draft.needs,
+            needs_local=draft.needs_local,
+        ),
+        issues,
+    )
+
+
+def _pick(line: Line, local: bool) -> str:
+    return line.local if local and line.local.strip() else line.text
+
+
+def apply_box(
+    content: dict[str, Any],
+    draft: BoxDraft,
+    *,
+    views: list[dict[str, Any]],
+    links: list[dict[str, Any]],
+    language: str,
+    local: bool,
+    sector: str | None,
+    renamed: dict[str, str] | None = None,
+) -> dict[str, Any]:
+    """Turn the stored six-section content into the eight-section box (spec 5.2). `views` are the
+    problems' facts (`box_doc.problem_view`), `links` their links as dicts (from, to, type,
+    confidence, status, evidence)."""
+    titles = {v["id"]: v["title"] for v in views}
+    kept = [c for c in draft.components if c.key in solutions.CATALOGUE]
+    components = box_doc.renumber(
+        [
+            {**stored, "key": item.key, "phase": item.phase}
+            for stored, item in zip(content.get("components", []), kept, strict=False)
+        ]
+    )
+    names = {i + 1: _pick(line, local) for i, line in enumerate(draft.phases)}
+    old_phases = sorted({c.phase for c in kept})
+    named = {n: names.get(old) for n, old in enumerate(old_phases, start=1)}
+    ideas: list[dict[str, Any]] = []
+    for view in views:
+        mine = [
+            _pick(line, local)
+            for line in draft.ideas
+            if view["ref"] in line.refs and (line.text or line.local).strip()
+        ]
+        ideas.append(
+            {
+                "ref": view["ref"],
+                "title": view["title"],
+                "ideas": mine[: box.IDEAS_PER_PROBLEM + 1],
+            }
+        )
+    hypotheses = [{"text": _pick(h, local), "refs": h.refs} for h in draft.hypotheses]
+    return {
+        **content,
+        "box": True,
+        "components": components,
+        "phases": box_doc.phase_table(components, {p: n for p, n in named.items() if n}),
+        "clusters": box_doc.clusters(views, hypotheses, language=language, renamed=renamed),
+        "links": box_doc.shown_links(links, titles),
+        "ideas": ideas,
+        "order": box_doc.order_of_work(views, links),
+        "assumptions": box_doc.unconfirmed(views, [_pick(a, local) for a in draft.assumptions]),
+    }
+
+
+def check_box_draft(draft: BoxDraft, refs: set[str]) -> list[str]:
+    """What breaks the box rules before anything is stored (the stored content is checked again by
+    `check_content`)."""
+    issues: list[str] = []
+    for item in draft.components:
+        if not [r for r in item.problems if r in refs]:
+            issues.append(f"component {item.key} names no known problem (R-DOC-02)")
+    ideas: dict[str, list[str]] = {ref: [] for ref in sorted(refs)}
+    for line in draft.ideas:
+        for ref in line.refs:
+            if ref in ideas and line.text.strip():
+                ideas[ref].append(line.text)
+    ok, why = box.value_line(ideas)
+    if not ok:
+        issues.extend(f"ideas: {reason} (5.7 valueLine)" for reason in why)
+    return issues
 
 
 # --- drafting ---------------------------------------------------------------------------------
@@ -307,8 +505,10 @@ def solution_content(
 def quote_content(solution: dict[str, Any], currency: str) -> dict[str, Any]:
     """The quote's skeleton: what is included and what is not come from the document; every price,
     date and duration is left for the reviewer (R-QUOTE-01)."""
+    by_phase = box_doc.quote_phases(solution) if solution.get("box") else []
     return {
         "solution_ref": solution["ref"],
+        **({"phases": by_phase} if by_phase else {}),  # Solution Box: the quote by phase (5.2)
         "included": [c["text"] for c in solution.get("components", [])],
         "cost": {"total": None, "currency": currency, "tax_text": "", "instalments": []},
         "time": {"estimate": "", "milestones": []},
@@ -347,6 +547,55 @@ async def _complete(
     )
     value: SolutionDraft = result.value
     return value
+
+
+async def _complete_box(
+    manager: LLMManager, scope: WorkspaceScope, payload: dict[str, Any], notes: list[str] | None
+) -> BoxDraft:
+    messages = [Message.system(BOX_SYSTEM), Message.user(json.dumps(payload, ensure_ascii=False))]
+    if notes:
+        messages.append(
+            Message.user("Fix these and return the whole result again: " + "; ".join(notes))
+        )
+    result = await manager.complete_structured(
+        scope,
+        BoxDraft,
+        alias="balanced",
+        purpose="pi_solution_box",
+        messages=messages,
+        temperature=0.2,
+        max_tokens=4096,
+    )
+    value: BoxDraft = result.value
+    return value
+
+
+async def _links_of(
+    session: AsyncSession, scope: WorkspaceScope, rows: list[PiProblem]
+) -> list[dict[str, Any]]:
+    """The links between these problems as plain dicts, for the box's section 2 and 5."""
+    from app.modules.pi.problem_models import PiProblemLink
+
+    ids = [p.id for p in rows]
+    found = await session.scalars(
+        select(PiProblemLink).where(
+            PiProblemLink.tenant_id == scope.tenant_id,
+            PiProblemLink.environment_id == scope.environment_id,
+            PiProblemLink.from_id.in_(ids),
+            PiProblemLink.to_id.in_(ids),
+        )
+    )
+    return [
+        {
+            "from": str(link.from_id),
+            "to": str(link.to_id),
+            "type": link.type,
+            "confidence": str(link.confidence),
+            "status": link.status,
+            "evidence": link.evidence,
+        }
+        for link in found
+    ]
 
 
 async def draft_offer(
@@ -399,17 +648,88 @@ async def draft_offer(
         if tips := await learning_docs.for_documents(session, scope):
             payload["house_style"] = tips
     refs = {problems.short_ref(p.id) for p in rows}
-    draft = await _complete(manager, scope, payload, None)
-    issues = check_solution(draft, refs)
-    if issues:
-        draft = await _complete(manager, scope, payload, issues)
+    rules = (await settings_row(session, scope)).response_rules
+    box_draft: BoxDraft | None = None
+    found_pack = solutions.load(customer.industry_primary or "") or {}
+    sector = str(found_pack.get("sector") or "") or None
+    if box_doc.document_enabled(rules):
+        # The Solution Box (spec 5.2): eight sections, catalogue only, two ideas per problem.
+        payload["catalogue_keys"] = list(box_doc.CATALOGUE_KEYS)
+        for item, row in zip(payload["problems"], rows, strict=True):
+            item["cause"] = row.person_believes_cause  # the owner's own belief, never pi's
+
+        async def attempt(notes: list[str] | None) -> tuple[BoxDraft, SolutionDraft, list[str]]:
+            made = await _complete_box(manager, scope, payload, notes)
+            plain, key_issues = box_to_solution(made, language=language, sector=sector)
+            found = (
+                key_issues
+                + check_box_draft(made, refs)
+                + check_solution(plain, refs, catalogue=True)
+            )
+            return made, plain, found
+
+        box_draft, draft, issues = await attempt(None)
+        if issues:
+            box_draft, draft, issues = await attempt(issues)
+    else:
+        draft = await _complete(manager, scope, payload, None)
         issues = check_solution(draft, refs)
+        if issues:
+            draft = await _complete(manager, scope, payload, issues)
+            issues = check_solution(draft, refs)
+    box_links: list[dict[str, Any]] = []
+    renamed: dict[str, str] = {}
+    if box_draft is not None:
+        from app.modules.pi.problem_models import PiProblemGroup
+
+        box_links = await _links_of(session, scope, rows)
+        renamed = {
+            g.category: g.name
+            for g in await session.scalars(
+                select(PiProblemGroup).where(
+                    PiProblemGroup.tenant_id == scope.tenant_id,
+                    PiProblemGroup.environment_id == scope.environment_id,
+                    PiProblemGroup.customer_id == customer.id,
+                    PiProblemGroup.created_by == "person",
+                )
+            )
+            if g.name
+        }
     offer_id = uuid4()
     number = await next_number(session, scope, "solution")
     q_number = await next_number(session, scope, "quote")
     local = language != "en"
     repo = WorkspaceRepository(session, PiBrainDocument, scope)
     sol_ref = f"SD-{number:04d}"
+
+    def build(as_local: bool) -> dict[str, Any]:
+        content = solution_content(
+            draft, rows, business=business, ref=sol_ref, language=language, local=as_local
+        )
+        if box_draft is None:
+            return content
+        views = [
+            box_doc.problem_view(
+                p,
+                problems.short_ref(p.id),
+                title=p.title_local if as_local and p.title_local else p.title,
+            )
+            for p in rows
+        ]
+        boxed = apply_box(
+            content,
+            box_draft,
+            views=views,
+            links=box_links,
+            language=language,
+            local=as_local,
+            sector=sector,
+            renamed=renamed,
+        )
+        if brief.get("box_naya"):  # Box v2: the short difference list of 5.6
+            boxed["naya"] = [str(x) for x in brief["box_naya"]][:8]
+        return boxed
+
     solution = await repo.add(
         repo.new(
             customer_id=customer.id,
@@ -419,14 +739,8 @@ async def draft_offer(
             number=number,
             problem_ids=[str(p.id) for p in rows],
             language=language,
-            content=solution_content(
-                draft, rows, business=business, ref=sol_ref, language=language, local=local
-            ),
-            content_en=solution_content(
-                draft, rows, business=business, ref=sol_ref, language=language, local=False
-            )
-            if local
-            else {},
+            content=build(local),
+            content_en=build(False) if local else {},
             status="in_review",
             drafted_by="pi",
             review_notes="; ".join(issues),
@@ -483,6 +797,10 @@ def _decimal(value: Any) -> Decimal | None:
     return number if number.is_finite() else None
 
 
+def titles_of(content: dict[str, Any]) -> dict[str, str]:
+    return {str(p.get("ref")): str(p.get("title", "")) for p in content.get("problems", [])}
+
+
 def edit(doc: PiBrainDocument, patch: dict[str, Any]) -> None:
     """A reviewer's edits to a draft. Solution: components, covers, wont_do, needs. Quote: included,
     not_included, cost (total, currency, tax_text, instalments), time (estimate, milestones),
@@ -501,9 +819,36 @@ def edit(doc: PiBrainDocument, patch: dict[str, Any]) -> None:
                     "text": str(c.get("text", ""))[:300],
                     "refs": [r for r in c.get("refs", []) if r in titles],
                     "problems": [titles[r] for r in c.get("refs", []) if r in titles],
+                    **(
+                        {  # Solution Box: a component keeps its catalogue key and its phase
+                            "key": str(c.get("key", ""))[:40],
+                            "phase": int(c.get("phase") or 1),
+                        }
+                        if content.get("box")
+                        else {}
+                    ),
                 }
                 for c in patch["components"]
             ][:8]
+        if content.get("box"):
+            if "assumptions" in patch:
+                content["assumptions"] = [str(x)[:300] for x in patch["assumptions"]][:12]
+            if "ideas" in patch:
+                content["ideas"] = [
+                    {
+                        "ref": str(e.get("ref", "")),
+                        "title": str(
+                            e.get("title") or titles_of(content).get(str(e.get("ref", "")), "")
+                        ),
+                        "ideas": [str(i)[:300] for i in e.get("ideas", [])][:4],
+                    }
+                    for e in patch["ideas"]
+                ][:16]
+            if "phases" in patch:  # names only; the prices belong to the quote
+                content["phases"] = [
+                    {"phase": int(p.get("phase") or 0), "name": str(p.get("name", ""))[:120]}
+                    for p in patch["phases"]
+                ][:box_doc.MAX_PHASE]
         if "wont_do" in patch:
             content["wont_do"] = [
                 {"text": str(w.get("text", ""))[:300], "problem": str(w.get("problem", ""))}
@@ -515,6 +860,16 @@ def edit(doc: PiBrainDocument, patch: dict[str, Any]) -> None:
                 content[key] = [str(x)[:300] for x in patch[key]][:12]
         if "payment" in patch:
             content["payment"] = str(patch["payment"])[:500]
+        if "phases" in patch and content.get("phases"):  # the reviewer prices each phase
+            prices = {int(p.get("phase") or 0): p.get("price") for p in patch["phases"]}
+            for phase in content["phases"]:
+                if phase["phase"] in prices:
+                    price = _decimal(prices[phase["phase"]])
+                    if price is None or price <= 0:
+                        raise BusinessRuleViolation(
+                            "INVALID_PRICE", "A phase price must be a positive amount"
+                        )
+                    phase["price"] = str(price.quantize(Decimal("0.01")))
         if "cost" in patch:
             cost = dict(content.get("cost") or {})
             for key in ("tax_text",):
@@ -590,6 +945,7 @@ async def blockers(session: AsyncSession, scope: WorkspaceScope, doc: PiBrainDoc
         )
     if cost.get("total") is None and doc.total is not None:
         issues.append("the total on the page and in the content differ")
+    issues += box_doc.phase_price_issues(doc.content, doc.total)
     return issues
 
 

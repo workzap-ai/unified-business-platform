@@ -42,6 +42,7 @@ class MovePlan(BaseModel):
     move: str = Field(default="", max_length=300)
     reason: str = Field(default="", max_length=300)
     asks_question: bool = False
+    addresses: str = Field(default="", max_length=300)  # spec 17.3: the topic this message works on
     hypothesis: HypothesisUpdate = Field(default_factory=HypothesisUpdate)
 
     @field_validator("hypothesis", mode="before")
@@ -61,7 +62,7 @@ class MovePlan(BaseModel):
             out["confidence"] = "low"
         return out
 
-    @field_validator("move", "reason", mode="before")
+    @field_validator("move", "reason", "addresses", mode="before")
     @classmethod
     def _clip(cls, value: Any) -> Any:
         return str(value)[:300] if value is not None else ""
@@ -96,6 +97,9 @@ def problems(plan: MovePlan, reply: str, context: dict[str, Any]) -> list[str]:
     move = moves.parse_move(plan.move)
     if move is not None and moves.question_free(move) and asked:
         out.append(f"the move {move.value} carries no question, but the reply asks one")
+    if context.get("topic_event") in ("second_business", "steered", "returned", "switch"):
+        if not plan.addresses.strip():  # topicPointer (spec 17.9): the plan must name its node
+            out.append("the plan does not say which topic it addresses (addresses)")
     h = plan.hypothesis
     if h.action in ("add", "against", "drop") and not h.text.strip():
         out.append("the hypothesis update names no hypothesis")
@@ -123,6 +127,7 @@ def fallback(context: dict[str, Any], reply: str) -> MovePlan:
             :300
         ],
         asks_question=ends_in_question(reply),
+        addresses=str(context.get("topic_active") or "newest"),
     )
 
 

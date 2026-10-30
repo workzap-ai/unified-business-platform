@@ -93,6 +93,8 @@ UNSAFE = frozenset(
         safety.Pii.ACCOUNT,
         safety.Pii.CONTACT,
         safety.Pii.CHILD,
+        safety.Pii.HEALTH,
+        safety.Pii.PAY,
     }
 )
 PLACEHOLDER = re.compile(

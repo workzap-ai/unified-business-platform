@@ -39,6 +39,7 @@ import hashlib
 import io
 import json
 import re
+import threading
 import zlib
 from dataclasses import dataclass, field
 from functools import lru_cache
@@ -57,7 +58,7 @@ MAX_BUBBLES = 12
 MAX_HUES = 5
 MIN_TEXT_PX = 24
 MAX_PNG_BYTES = 5 * 1024 * 1024
-MAX_LABEL_WORDS = 6
+MAX_LABEL_WORDS = 9
 MAX_LINK_WORDS = 3
 MAX_FACT_LINES = 3
 
@@ -675,6 +676,12 @@ PAD_TOP = 30
 OUTLINE_PAD = 14
 OUTLINE_TITLE = 44
 COLS = 2
+LABEL_PX = 30
+FACT_PX = MIN_TEXT_PX
+COMPACT_MAX_NODES = (
+    4  # up to this many problems: one wide column, so the picture is not mostly empty
+)
+_GEO_LOCK = threading.Lock()
 
 Slot = tuple[int, int]  # (row, column)
 
@@ -1102,15 +1109,20 @@ def _footer(
     lang: str = "en",
     has_links: bool = True,
     has_numbers: bool = True,
-) -> None:
-    """Spec v1.5, 18.7: the legend lists only what the image shows, and the footer line appears only
-    when a number is drawn."""
+    top: int | None = None,
+) -> int:
+    """Spec v1.5, 18.7: the legend lists every category the image shows (none is left out, none is
+    cut with an ellipsis) and the footer line appears only when a number is drawn.
+
+    With `top` the legend sits on a white panel starting there; returns the y below its last line.
+    """
     rtl = canvas.rtl
     # `step` is +1 left to right and -1 right to left; `edge` is where each row starts.
     step = -1 if rtl else 1
-    edge = WIDTH - MARGIN if rtl else MARGIN
+    inset = 20 if top is not None else 0
+    edge = WIDTH - MARGIN - inset if rtl else MARGIN + inset
     anchor = "ra" if rtl else "la"
-    y = canvas.height - 250
+    y = (canvas.height - 250) if top is None else top + 18
     x = edge
     arrows = ((words["legend_owner"], True), (words["legend_guess"], False)) if has_links else ()
     for text, solid in arrows:
@@ -1127,23 +1139,71 @@ def _footer(
         tag_w = _tag(canvas, x, y - 2, words["new"])
         label_x = x + step * (tag_w + 16)
         canvas.text((label_x, y), words["legend_new"], MIN_TEXT_PX, INK, anchor=anchor)
-    y += 50
+    if arrows or show_new:
+        y += 50
     x = edge
-    for category in categories[:MAX_HUES] if (len(categories) > 1 or has_links) else []:
-        label = category_name(category, lang) if rtl else category.replace("_", " ")
-        label = canvas.wrap(label, MIN_TEXT_PX, 210, 1)[0] if label else label
+    limit = WIDTH - 2 * MARGIN - 2 * inset - 60
+    # More categories than hues: the ones that share a colour share one legend entry, so none is
+    # left out and no colour means two things.
+    shared: dict[int, list[str]] = {}
+    for category in categories:
+        shared.setdefault(id(hue_of(category, hues)), []).append(category)
+    entries = [(grp[0], " / ".join(grp)) for grp in shared.values()]
+    for category, joined in entries if (len(categories) > 1 or has_links) else []:
+        label = (
+            " / ".join(category_name(c, lang) for c in joined.split(" / "))
+            if rtl
+            else joined.replace("_", " ")
+        )
+        parts = label.split()
+        while len(parts) > 1 and canvas.width_of(" ".join(parts), MIN_TEXT_PX) > limit:
+            parts.pop()  # whole words only: a legend label is never cut with an ellipsis
+        label = " ".join(parts)
         w = int(canvas.width_of(label, MIN_TEXT_PX))
-        if (x - 28 - w < MARGIN) if rtl else (x + 28 + w > WIDTH - MARGIN):
+        if (x - 28 - w < MARGIN + inset) if rtl else (x + 28 + w > WIDTH - MARGIN - inset):
             x, y = edge, y + 38
         swatch = x - 16 if rtl else x
         canvas.draw.rectangle([swatch, y + 3, swatch + 16, y + 27], fill=hue_of(category, hues))
         canvas.text((x + step * 26, y), label, MIN_TEXT_PX, INK, width=w + 2, anchor=anchor)
         x += step * (26 + w + 28)
-    y += 56
-    lines = canvas.wrap(words["foot"], MIN_TEXT_PX, WIDTH - 2 * MARGIN, 3) if has_numbers else []
+    if categories and (len(categories) > 1 or has_links):
+        y += 44 if top is not None else 56
+    lines = (
+        canvas.wrap(words["foot"], MIN_TEXT_PX, WIDTH - 2 * MARGIN - 2 * inset, 3)
+        if has_numbers
+        else []
+    )
     for line in lines:
         canvas.text((edge, y), line, MIN_TEXT_PX, MUTED, width=WIDTH - 2 * MARGIN, anchor=anchor)
         y += 32
+    return y
+
+
+def _footer_height(
+    words: dict[str, Any],
+    categories: list[str],
+    hues: dict[str, int],
+    show_new: bool,
+    lang: str,
+    has_links: bool,
+    has_numbers: bool,
+    rtl: bool,
+) -> int:
+    """How tall the legend panel must be: the footer is drawn once on a scratch canvas."""
+    scratch = Canvas(MAX_HEIGHT, rtl)
+    end = _footer(scratch, words, categories, hues, show_new, lang, has_links, has_numbers, top=0)
+    return max(end + 14, 60) if (categories or has_links or has_numbers or show_new) else 0
+
+
+def _footer_panel(canvas: Canvas, top: int, height: int) -> None:
+    if height > 0:
+        canvas.draw.rounded_rectangle(
+            [MARGIN, top, WIDTH - MARGIN, top + height],
+            radius=14,
+            fill=CARD,
+            outline=(203, 213, 225),
+            width=2,
+        )
 
 
 def _tag(canvas: Canvas, x: int, y: int, label: str) -> int:
@@ -1175,15 +1235,16 @@ def _card(
     tx = x + CARD_W - 32 if rtl else x + 32
     anchor = "ra" if rtl else "la"
     ty = y + 22
-    for line in canvas.wrap(node.label, 30, inner, 2, bold=rtl):
-        canvas.text((tx, ty), line, 30, ink, width=inner, anchor=anchor, bold=rtl)
-        ty += 36
-    ty = y + 22 + 2 * 36 + 4
+    lines = canvas.wrap(node.label, LABEL_PX, inner, 3, bold=rtl)
+    for line in lines:
+        canvas.text((tx, ty), line, LABEL_PX, ink, width=inner, anchor=anchor, bold=rtl)
+        ty += LABEL_PX + 6
+    ty = y + 22 + max(2, len(lines)) * (LABEL_PX + 6) + 4
     if node.facts:
         text = " · ".join(node.facts)
-        for line in canvas.wrap(text, MIN_TEXT_PX, inner, MAX_FACT_LINES):
-            canvas.text((tx, ty), line, MIN_TEXT_PX, MUTED, width=inner, anchor=anchor)
-            ty += 30
+        for line in canvas.wrap(text, FACT_PX, inner, MAX_FACT_LINES):
+            canvas.text((tx, ty), line, FACT_PX, MUTED, width=inner, anchor=anchor)
+            ty += FACT_PX + 6
     tag = words["new"] if node.is_new else (words["stale"] if node.stale else "")
     if tag:
         w = int(canvas.width_of(tag, MIN_TEXT_PX)) + 24
@@ -1345,14 +1406,71 @@ def _render_nodes(
         if len([i for i in c.node_ids if i in shown]) >= 1
     ]
     links = [lk for lk in links if lk.a in shown and lk.b in shown]
-    footer_h = 270
+    cats: list[str] = []
+    for node in nodes:
+        if node.category not in cats:
+            cats.append(node.category)
+    numbered = any(numbers_in(t) for n in nodes for t in (n.label, *n.facts))
+    show_new = any(n.is_new for n in nodes)
+    footer_h = _footer_height(words, cats, hues, show_new, lang, bool(links), numbered, rtl)
+    compact = 2 <= len(nodes) <= COMPACT_MAX_NODES and not any(
+        len(c.node_ids) >= 2 for c in clusters
+    )
+    with _GEO_LOCK:
+        if compact:
+            saved = _set_geo(
+                COLS=1,
+                CARD_W=WIDTH - 2 * MARGIN,
+                CARD_H=250,
+                GAP_Y=80 if links else 36,
+                PAD_TOP=24,
+                OUTLINE_TITLE=0,
+                LABEL_PX=40,
+                FACT_PX=30,
+            )
+        else:
+            saved = {}
+        try:
+            return _draw_nodes(
+                nodes, links, clusters, words, sub, previous, hues, title, rtl, lang,
+                cats, footer_h, show_new, numbered,
+            )  # fmt: skip
+        finally:
+            _set_geo(**saved)
+
+
+def _set_geo(**values: int) -> dict[str, int]:
+    """Swap the layout constants (compact mode); returns the ones replaced. Hold `_GEO_LOCK`."""
+    g = globals()
+    old = {k: g[k] for k in values}
+    g.update(values)
+    return old
+
+
+def _draw_nodes(
+    nodes: list[Node],
+    links: list[Link],
+    clusters: list[Cluster],
+    words: dict[str, Any],
+    sub: str,
+    previous: dict[str, Slot] | None,
+    hues: dict[str, int],
+    title: str | None,
+    rtl: bool,
+    lang: str,
+    cats: list[str],
+    footer_h: int,
+    show_new: bool,
+    numbered: bool,
+) -> tuple[Canvas, dict[str, Slot], dict[str, tuple[int, int]]]:
+    gap_below = 30
     slots = layout(nodes, links, clusters, previous, cluster_rows=True)
     pos, used = _geometry(slots, rtl)
-    height = HEADER_H + PAD_TOP + OUTLINE_TITLE + used + 40 + footer_h
+    height = HEADER_H + PAD_TOP + OUTLINE_TITLE + used + gap_below + footer_h + 24
     if height > MAX_HEIGHT:
         slots = layout(nodes, links, clusters, previous, cluster_rows=False)
         pos, used = _geometry(slots, rtl)
-        height = HEADER_H + PAD_TOP + OUTLINE_TITLE + used + 40 + footer_h
+        height = HEADER_H + PAD_TOP + OUTLINE_TITLE + used + gap_below + footer_h + 24
     canvas = Canvas(height, rtl)
     _header(canvas, words, sub, title)
     _outlines(canvas, clusters, pos, words)
@@ -1360,12 +1478,9 @@ def _render_nodes(
     for node in nodes:
         _card(canvas, node, pos[node.id], hues, words)
     _draw_labels(canvas, labels, words)
-    cats: list[str] = []
-    for node in nodes:
-        if node.category not in cats:
-            cats.append(node.category)
-    numbered = any(numbers_in(t) for n in nodes for t in (n.label, *n.facts))
-    _footer(canvas, words, cats, hues, any(n.is_new for n in nodes), lang, bool(links), numbered)
+    panel_top = HEADER_H + PAD_TOP + OUTLINE_TITLE + used + gap_below
+    _footer_panel(canvas, panel_top, footer_h)
+    _footer(canvas, words, cats, hues, show_new, lang, bool(links), numbered, top=panel_top)
     return canvas, slots, pos
 
 
@@ -1413,7 +1528,7 @@ def _bubbles(
         if link_count:
             tail = count_phrase(words, "link", link_count)
             canvas.text((far, y + 100), tail, 28, MUTED, anchor="la" if rtl else "ra", width=170)
-    _footer(canvas, words, cats, hues, False, lang)
+    _footer(canvas, words, cats, hues, False, lang, False, False)
     return canvas
 
 

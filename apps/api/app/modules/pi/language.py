@@ -55,6 +55,14 @@ PERSIAN_LETTERS = re.compile("[پچگژکی]")
 ARABIC_SCRIPT = re.compile(r"[؀-ۿݐ-ݿﭐ-﷿ﹰ-﻿]")
 DEVANAGARI = re.compile(r"[ऀ-ॿ]")
 LATIN_WORD = re.compile(r"[a-z]+(?:'[a-z]+)?")
+# Words only Urdu uses (Persian and Arabic do not), for Urdu written without any of the
+# Urdu-only letters.
+URDU_WORDS = frozenset("کیا آپ اور کو کے سے میں مجھے ہمیں نہیں کریں چاہیے".split())
+
+
+def urdu_words(text: str | None) -> bool:
+    return bool(set(re.findall(r"[؀-ۿ]+", text or "")) & URDU_WORDS)
+
 
 # Scripts pi has no fixed notices for: the reply is written by the model in the same language
 # (Chinese, Japanese, Korean, Russian...), never in the language the chat used before.
@@ -174,7 +182,7 @@ def asked_language(text: str | None) -> str | None:
 
 def in_script(text: str | None, name: str) -> bool:
     """The text is written mostly in that other language's script (a reply is checked with this)."""
-    pattern = dict(OTHER_SCRIPTS).get(name)
+    pattern = dict(OTHER_SCRIPTS).get(name) or (ARABIC_SCRIPT if name == "Urdu" else None)
     letters = len(re.findall(r"[^\W\d_]", text or ""))
     return pattern is not None and len(pattern.findall(text or "")) * 2 >= letters
 
@@ -183,6 +191,9 @@ NAMES = {
     "en": "English",
     "roman_ur": "Roman Urdu (Urdu/Hindi written in English letters)",
     "ar": "Arabic",
+    # Urdu script is answered in Urdu script: the chat's `reply_language_other` is "Urdu".
+    "Urdu": "Urdu written in Urdu script (never in English letters, polite aap forms, no gendered "
+    "first-person verbs)",
 }
 
 
@@ -290,9 +301,9 @@ def returning_greeting(text: str | None) -> bool:
 
 
 def detect_language(text: str | None) -> str | None:
-    """'en', 'roman_ur' or 'ar' when the text clearly shows one, otherwise None.
-    Urdu or Hindi written in its own script is 'roman_ur': pi answers those in Roman
-    Urdu/Hindi (see the service prompt)."""
+    """'en', 'roman_ur', 'ur' (Urdu script) or 'ar' when the text clearly shows one, otherwise None.
+    Urdu in its own script is 'ur': pi answers it in Urdu script, one script per chat (spec 2.5,
+    G7). Hindi in Devanagari is still 'roman_ur': pi answers it in Roman Urdu."""
     text = (text or "").strip()
     if not text:
         return None
@@ -302,10 +313,10 @@ def detect_language(text: str | None) -> str | None:
     devanagari = len(DEVANAGARI.findall(text))
     latin = len(re.findall(r"[A-Za-z]", text))
     if devanagari > latin and devanagari >= arabic:
-        return "roman_ur"
+        return "roman_ur"  # Hindi (Devanagari) is understood and answered in Roman Urdu
     if arabic > latin:
-        if URDU_LETTERS.search(text):
-            return "roman_ur"
+        if URDU_LETTERS.search(text) or urdu_words(text):
+            return "ur"  # Urdu script: answered in Urdu script, never in Roman letters (spec 2.5, G7)
         return None if PERSIAN_LETTERS.search(text) else "ar"
     words = LATIN_WORD.findall(text.lower())
     if len(words) <= 2 and set(words) <= BORROWED_ANSWERS:
@@ -402,9 +413,9 @@ VOICE_UNREADABLE_NOTICES = {
 }
 # A file pi couldn't open: ask for another way, keep the chat.
 MEDIA_UNREADABLE_NOTICES = {
-    "en": "Thanks. I couldn't open that file here, and I've passed it to the team. "
+    "en": "I couldn't open that file here, and I've passed it to the team. "
     "Could you describe it in a few words, or send it as a PDF or a screenshot?",
-    "roman_ur": "Shukriya. Yeh file yahan open nahi ho saki, aur maine team ko bhej di hai. "
+    "roman_ur": "Yeh file yahan open nahi ho saki, aur maine team ko bhej di hai. "
     "Kya aap thora sa likh kar bata sakte hain, ya PDF/screenshot bhej dein?",
     "ar": "شكرًا. لم أتمكن من فتح هذا الملف هنا، وقد أرسلته إلى الفريق. "
     "هل يمكنك وصفه باختصار أو إرساله كملف PDF أو لقطة شاشة؟",
@@ -509,4 +520,7 @@ for _lang, _lines in _MORE_NOTICES.items():
 
 
 def notice_in(notices: dict[str, str], language: str | None) -> str:
-    return notices.get(language or "en", notices["en"])
+    key = language or "en"
+    if key == "ur" and "ur" not in notices:
+        key = "roman_ur"  # a table with no Urdu-script line: Roman Urdu is closer than English
+    return notices.get(key, notices["en"])

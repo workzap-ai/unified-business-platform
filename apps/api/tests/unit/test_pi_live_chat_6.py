@@ -37,11 +37,10 @@ def test_reply_4_english_in_a_roman_urdu_chat_is_never_sent_and_has_no_dash():
     ctx = context("poore sets", [M2, "warehouse and outlets"], [R2, R3])
     fixed = constitution.repair(R4, ctx)
     assert "—" not in fixed and "anything else" not in fixed.lower()
-    assert fixed.startswith("Note kar liya.") and fixed.endswith("?")
+    # spec 17.6: no "Note kar liya" announcement, straight to the one question
+    assert not fixed.startswith("Note kar liya") and fixed.endswith("?")
     assert fixed.count("?") == 1
-    assert (
-        fixed == "Note kar liya. Ye har jagah hota hai, ya sirf kuch jagah?"
-    )  # the next open slot
+    assert fixed == "Ye har jagah hota hai, ya sirf kuch jagah?"  # the next open slot
 
 
 def test_english_in_a_roman_urdu_chat_without_anything_noted_gets_the_safe_localised_line():

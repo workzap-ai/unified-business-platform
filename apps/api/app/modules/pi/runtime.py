@@ -190,6 +190,13 @@ async def persist_inbound(
                     message.error_code = "WHATSAPP_REJECTED"
         event.status, event.processed_at = "processed", datetime.now(UTC)
         return None
+    if payload.get("signal"):  # a reaction, sticker, edit or deletion (spec 6.10)
+        from app.modules.pi import message_signals
+
+        replacement = await message_signals.resolve(session, service, event, payload)
+        if replacement is None:
+            return None
+        payload = replacement
     existing = await service.messages.find(PiMessage.provider_message_id == payload["message_id"])
     if existing:
         return existing
@@ -390,9 +397,9 @@ async def _name_project_document(
 # Brain mode: a file pi could not open (the shared notice in language.py has "Thanks!", which
 # breaks R-VOICE-07, and puts its question before the last sentence).
 BRAIN_MEDIA_UNREADABLE_NOTICES = {
-    "en": "Thanks. I couldn't open that file here, so I've passed it to the team. Could you "
+    "en": "I couldn't open that file here, so I've passed it to the team. Could you "
     "describe it in a few words, or send it as a PDF or a screenshot?",
-    "roman_ur": "Shukriya. Yeh file yahan open nahi ho saki, is liye maine team ko bhej di hai. "
+    "roman_ur": "Yeh file yahan open nahi ho saki, is liye maine team ko bhej di hai. "
     "Kya aap thora sa likh kar bata sakte hain, ya PDF/screenshot bhej dein?",
     "ar": "شكرًا. لم أتمكن من فتح هذا الملف هنا، لذلك أرسلته إلى الفريق. "
     "هل يمكنك وصفه باختصار أو إرساله كملف PDF أو لقطة شاشة؟",
@@ -1520,6 +1527,14 @@ async def process_pi_event(ctx: dict[str, Any], event_id: str) -> None:
             or conversation.last_inbound_at != inbound_snapshot
         ):
             message.status, event.status = "skipped", "processed"
+            if (
+                conversation.last_inbound_at != inbound_snapshot
+                and conversation.mode != "human"
+                and conversation.status == "open"
+            ):
+                # A newer inbound arrived while this one was being drafted: keep it for the burst
+                # so the newer message's reply covers it (a slow greeting is not silently lost).
+                message.error_code = "BURST_COALESCED"
             await session.commit()
             return
         existing = await session.scalar(

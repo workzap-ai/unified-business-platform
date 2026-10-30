@@ -20,6 +20,7 @@ import re
 from pathlib import Path
 
 import pymupdf
+from supersession_residue import PATCHES
 
 OUT = Path("app/modules/pi/spec/supersession.json")
 HANDBOOK = Path("app/modules/pi/spec/handbook.json")
@@ -32,13 +33,6 @@ EXCLUDED = {
     "(R-OFFER-04) on a plain yes, and a direct request for the document is confirmed at once",
 }
 # Brain v3 text replaced by the platform specification (old fragment -> governing fragment).
-REPLACE_0_2 = (
-    "P8 pi doesn't pitch while you're describing a problem.\nWhen problems are sorted, it asks "
-    "whether you'd like a solution document and a quote. You can say no.",
-    "P8 pi doesn't push a pitch while you're describing a problem, but if you ask for a solution "
-    "it answers (Book 2). When problems are sorted, it asks whether you'd like a solution "
-    "document and a quote. You can say no.",
-)
 REPLACE_3_2 = (
     "Acknowledge, ask 1 question\nSuggest, sell, summarise early",
     "Acknowledge, ask 1 question (a solution request moves to S_ADVISE: answer it, Book 2 Part 9)"
@@ -84,15 +78,16 @@ def main() -> None:
     old = old_section(book, "1.2")["text"].replace("R-SELL-05\n", "R-SELL-05 ")
     stand = [line for line in old.split("\n") if line.startswith(("R-SELL-03", "R-SELL-05"))]
     banner = (
-        "R-SELL-01, R-SELL-02 and R-SELL-04 of Brain v3 are SUPERSEDED by Book 2 (R-ANS / R-SOL): "
-        "if the person asks for a solution, pi answers with ideas in the first sentence. R-SELL-03 "
+        "The Brain v3 listen-only rules (no solution while the person is describing a problem, the "
+        "a document ahead of a request) are SUPERSEDED by Book 2 (R-ANS / R-SOL): if the "
+        "person asks for a solution, pi answers with ideas in the first sentence. R-SELL-03 "
         "and R-SELL-05 stand."
     )
     lines = [banner, *stand]
     lines += [f"{rule_id} {body}" for rule_id, body in kept.items()]
     section = {
         "id": "1.2",
-        "title": "Listening, and answering when asked (Book 2 replaces R-SELL-01, 02, 04)",
+        "title": "Listening, and answering when asked (Book 2 replaces the listen-only rules)",
         "part": "1",
         "text": "\n".join(lines),
     }
@@ -101,13 +96,14 @@ def main() -> None:
         "Part 3 (R-ANS, R-SOL, R-OFFER), Book 2 Part 9 (S_ADVISE)",
         "replace": [section],
         "patch": [
-            {"id": "0.2", "old": REPLACE_0_2[0], "new": REPLACE_0_2[1]},
             {"id": "3.2", "old": REPLACE_3_2[0], "new": REPLACE_3_2[1]},
             # Part 14 deletes the old opening; Brain v3 still prints it as the "canonical" first
             # message in 1.1 and in the 2.3 table, and a model copies a canonical line (live
             # 2026-10-28: "Tell me what's going wrong ... I'll start on it").
             {"id": "1.1", "old": OLD_OPENING_TAIL, "new": NEW_OPENING_TAIL},
             {"id": "2.3", "old": OLD_OPENING_TAIL, "new": NEW_OPENING_TAIL},
+            # Part 14 residue: noting openers, the old offer script, the R-SELL source tags
+            *PATCHES,
         ],
         "remove": [],
         "open_decision": "G4 (can you make an app for this? answered with the superseded R-SELL-04 "

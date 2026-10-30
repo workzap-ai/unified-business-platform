@@ -57,6 +57,7 @@ from app.modules.pi.business_profile_routes import router as pi_business_profile
 from app.modules.pi.config_routes import router as pi_config_router
 from app.modules.pi.inbox_routes import router as pi_inbox_router
 from app.modules.pi.kapso_routes import router as pi_kapso_router
+from app.modules.pi.open_items_routes import router as pi_open_items_router
 from app.modules.pi.read_routes import router as pi_read_router
 from app.modules.pi.routes import router as pi_router
 from app.modules.pi.routes import webhook_router
@@ -128,6 +129,7 @@ ROUTERS = [
     pi_solutions_router,
     pi_brain_moderation_router,
     pi_brain_health_router,
+    pi_open_items_router,
     pi_business_profile_router,
     pi_staff_review_router,
     payment_link_router,
@@ -221,6 +223,7 @@ PI_APP_ROUTERS = [
     pi_solutions_router,
     pi_brain_moderation_router,
     pi_brain_health_router,
+    pi_open_items_router,
     pi_business_profile_router,
     pi_staff_review_router,
     payment_link_router,

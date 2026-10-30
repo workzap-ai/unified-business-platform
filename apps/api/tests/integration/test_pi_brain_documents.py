@@ -1,3 +1,4 @@
+# ruff: noqa: E501  (long Roman Urdu and comment lines)
 """Brain mode: the yes becomes a drafted solution document and quote, a reviewer prices and approves
 them, pi sends two PDFs and the decision buttons, and the person decides. Real database/webhook/
 worker; the AI and WhatsApp are mocked."""
@@ -364,7 +365,7 @@ async def test_asking_for_changes_brings_a_revised_quote_that_replaces_the_old_o
     await say(pi, "Ask for changes", "ch-1")
     assert (await pi.reply_to("ch-1")).body == "What would you like changed?"
     await say(pi, "only 2 shops for now, not 3", "ch-2")
-    assert "Noted: Cover 2 shops instead of 3." in (await pi.reply_to("ch-2")).body
+    assert "I've sent this to Workzap: Cover 2 shops instead of 3." in (await pi.reply_to("ch-2")).body
     conversation = await pi.conversation()
     await business_db.refresh(conversation)
     assert conversation.flow_state == "S8b_CHANGES_REQUESTED"
