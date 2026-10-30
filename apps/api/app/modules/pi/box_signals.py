@@ -196,7 +196,9 @@ def customer_texts(context: dict[str, Any]) -> list[str]:
 REPEAT_COMPLAINT = re.compile(
     r"i\s+already\s+(?:told|said|gave|mentioned)|already\s+told\s+you|i\s+told\s+you|"
     r"maine\s+(?:to\s+)?(?:bataya|bata\s+diya|keh\s+diya)|phir\s+se\s+(?:puch|pooch)|"
-    r"bataya\s+to\s+hai|میں\s+نے\s+بتایا",
+    r"bataya\s+to\s+hai|میں\s+نے\s+بتایا|"
+    r"kitni\s+baar\s+(?:bata|puch|pooch)|baar\s+baar\s+(?:bata|puch|pooch)|"
+    r"how\s+many\s+times\s+(?:do\s+i|should\s+i|must\s+i)\s+(?:tell|say|repeat)",
     re.IGNORECASE,
 )
 FALLING_QUIET_MESSAGES = 8

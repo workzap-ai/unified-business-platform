@@ -254,7 +254,7 @@ def test_an_idea_already_said_is_not_said_again() -> None:
         awaiting_customer=False,
     )
     brain_no_repeat(same, context)
-    assert same.reply.startswith("Those are the ideas I have")
+    assert same.reply.startswith("Understood, those did not help")  # 19.6: no "those are all"
     mixed = SimpleNamespace(
         reply="Sure.\n" + first + "\nSecond, ask parents to pay by bank transfer on a fixed day.",
         _summary=False,

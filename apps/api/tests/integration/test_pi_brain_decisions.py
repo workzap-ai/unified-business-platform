@@ -65,7 +65,7 @@ async def state_of(db, pi):
 async def test_the_summary_then_the_fixed_offer_with_buttons(api, business_db, monkeypatch):
     pi, _ = await to_the_offer(api, business_db, monkeypatch)
     summary = (await pi.reply_to("of-2")).body
-    assert summary.startswith("Here's what I've noted and sorted so far.")
+    assert summary.startswith("Here is what you have told me so far.")
     offer = await pi.reply_to("of-3")
     assert offer.body == decisions.text("offer", "en")
     assert (await state_of(business_db, pi)).flow_state == "S5_READINESS"

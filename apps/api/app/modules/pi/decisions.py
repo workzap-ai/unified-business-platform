@@ -472,7 +472,7 @@ def decide(
     can_approve = facts.get("can_approve", True)
     answer = classify(message)
 
-    direct = asks_for_document(message)
+    direct = asks_for_document(message) or bool(facts.get("buying_signal"))  # R1/R3, 19.2
     if (
         not can_approve
         and (OFFER_REQUEST.search(message) or direct)

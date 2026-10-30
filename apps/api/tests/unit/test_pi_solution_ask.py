@@ -157,7 +157,7 @@ def test_a_push_for_a_fix_gets_ideas_not_the_summary_when_solution_mode_handed_t
     base = {**LISTENING, "latest_customer_message": said, "problems_since_summary": 1}
     plain = turn("Ji, batayiye.")
     brain_summary(plain, dict(base))
-    assert plain._summary  # without solution mode the push still shows the sorted summary
+    assert not plain._summary  # spec v1.6 19.7: a push for a fix is not an ask for the summary
     given = turn("Do badlav foran karein.")
     brain_summary(given, {**base, "solution_ideas": ["a", "b"], "solution_asked": True})
     assert not given._summary and given.reply == "Do badlav foran karein."
@@ -253,7 +253,7 @@ def test_a_cost_question_keeps_the_fixed_answer_even_when_ideas_were_handed_over
     base = {**LISTENING, "latest_customer_message": said, "problems_since_summary": 1}
     t = turn("A quote says it.")
     brain_summary(t, {**base, "solution_ideas": ["a"]})  # S4 and S5 hand ideas over unasked
-    assert t._summary  # the summary and the fixed cost answer, never the model's free answer
+    assert not t._summary  # 19.2 and 19.7: a price ask goes to the quote (R1), never to a summary
     assert not solution_ask.asked_for_ideas(said)
 
 

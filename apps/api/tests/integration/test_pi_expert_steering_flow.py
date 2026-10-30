@@ -273,7 +273,7 @@ async def test_a_business_that_had_eight_in_other_chats_gets_none_and_the_honest
     await sibling_chat(business_db, conversation, ideas_given=3)
     before = len(calls)
     [body] = await reply_after(pi, business_db, "solution do", "h-2")
-    assert "•" not in body and "itne hi ideas" in body
+    assert "•" not in body and "kaam nahi aaye" in body  # 19.6: never "itne hi ideas"
     assert calls[before:] == []  # no call spent on a business with nothing left
     await pi.close()
 
@@ -284,7 +284,7 @@ async def test_a_problem_that_got_two_ideas_in_another_chat_is_closed_here(
     pi, conversation, calls = await start(api, business_db, monkeypatch)
     await sibling_chat(business_db, conversation, ideas_given=2, expert_given={TITLE: 2})
     [body] = await reply_after(pi, business_db, "solution do", "h-2")
-    assert "•" not in body and "itne hi ideas" in body
+    assert "•" not in body and "kaam nahi aaye" in body  # 19.6: never "itne hi ideas"
     await pi.close()
 
 

@@ -151,3 +151,22 @@ was run, so how often a live model actually says these things is not measured.
 
 Open from this round: "kya ye jaiz hai?" is read as a religious question before a legal one (it
 still refuses to advise); the native pitch and discount lists are phrase lists, not a classifier.
+
+## Platform spec v1.6, Part 19 (2026-10-30)
+
+Evidence: Book 8, Live Audit 6 (the Artwing Studios chat). Code: `part19.py` (pure functions),
+`system_ask.py`, hooks in `service_conversation.py`. Tests: `test_pi_part19_engagement.py`,
+`test_pi_artwing_system_request.py`. Not yet run against the integration suite or a real model.
+
+| Rule | Where | Status |
+|---|---|---|
+| 19.2 buying signals: R1 (quote or price asked) and R3 (budget ready with two or more problems and wants) start the quote through `decisions.decide`; covers line and one line to widen on a thin set; no price | `part19.buying_signal`, `covers_lines`; `decisions.decide` (`facts["buying_signal"]`), `brain_decision`, `box_offer_allowed` | done; the "isi par bana dete hain" line is the spec's own wording and is a soft promise before review, owner to confirm |
+| 19.2 "aap ye sab kar denge" is R3 and stays open until the offer | `system_ask.py`, `box.offer_facts` | done (commit 4737bc3) |
+| 19.3 direct questions: "listen again" gets a playback of the stored problems and wants; one message with two questions must answer both | `part19.replay`, `turn_coverage.skipped_question` | done; the first-sentence rule for every direct question is still the Part 17.2 coverage gate (burst only) |
+| 19.4 what counts as a problem: a short price question, frustration with pi and a goal alone are dropped by `check_ops`; wants are extracted and kept apart, redacted | `part19.not_a_problem`, `problems.check_ops`, `problem_extract.extract_wants`, `brief["wants"]` | done; extractor prompt rules not measured with a real model (spec says so too); wants are not yet on the quote or the dashboard |
+| 19.5 the owner's number: a short answer with a number must be used by the reply | `part19.number_used`, `part18_problem` | done |
+| 19.6 no dead ends: "no more questions", "those are all the ideas", "none of it is solved", a blanket "it is all noted" are caught; the fixed no-more-ideas lines now ask what they tried; repair steps 4 and 5 own the miss and say the next step | `part19.dead_end`, `NO_MORE_IDEAS`, `NO_IDEA_AGAIN`, `NO_IDEA_THIRD`, `style.REPAIR` | done; repair replay of the owner's points is prompt guidance (no deterministic template) |
+| 19.7 summaries: only on an explicit ask, "that's all", or a checkpoint (3 problems, 8 messages since the last, owner not mid-question); never twice in 10; never for a number, question or quote request; every problem listed, wants apart, one question | `part19.checkpoint_due`, `summary_blocked`, `problems.summary_message`, `summary_due` | done |
+| 19.8 the board is what was sent: the groups are stored in the signed link and in the message media; the route draws from them | `brain_visuals.token(groups=)`, `brain_visual_queue.attach_board`, `brain_visual_routes` | done for the link (1 hour); the staff view reads the stored `board_snapshot` only if it is changed to (open); board and map categories are still the fixed area set |
+| 19.9 voice notes: a skipped voice note in a burst is read from its provider transcript | `runtime.burst_text` | done when the provider sends a transcript; a voice note skipped before it was transcribed by us stays empty (open) |
+| G56 replay of the whole chat with the scripted model | | open: needs the integration suite on the disposable database (the run was blocked in this session) |

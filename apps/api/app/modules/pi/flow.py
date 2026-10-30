@@ -146,8 +146,8 @@ GUIDANCE: dict[State, str] = {
     "second question in the same message.",
     S.S3_NOTED: "A problem was noted. Confirm it in their words, then ask if anything else is "
     "getting in the way. Do not repeat what you already know.",
-    S.S4_SORTED_SUMMARY: "Show what is noted and sorted, grouped, and say none of it is solved. "
-    "Invite corrections. Do not offer a document in this message.",
+    S.S4_SORTED_SUMMARY: "Show what is noted and sorted, grouped, with the wants apart, and ask "
+    "the one question. Never say none of it is solved. Do not offer a document in this message.",
     S.S_LISTEN_THINK: "They asked for a solution, or you are thinking about the next move. Answer "
     "in your first sentence if they asked, give the free ideas you were handed (two at most, none "
     "repeated), note any new problem, and let the application make any offer. No price, no "

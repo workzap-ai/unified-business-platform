@@ -54,6 +54,7 @@ from app.modules.pi import (
     open_requests,
     owner_asks,
     owner_intents,
+    part19,
     price_policy,
     problem_extract,
     problems,
@@ -325,6 +326,8 @@ class ServiceTurn(BaseModel):
     _ask_team: bool = PrivateAttr(default=False)
     # Brain mode: the sorted summary replaced the reply; the trade question was due.
     _summary: bool = PrivateAttr(default=False)
+    _summary_at: int | None = PrivateAttr(default=None)
+    _new_wants: list[str] = PrivateAttr(default_factory=list)
     _english: bool = PrivateAttr(default=False)  # an English list was written: translate it
     _free: bool = PrivateAttr(default=False)  # the ideas were the model's own, vetted
     _ideas_rejected: bool = PrivateAttr(default=False)  # its idea lines were not owner actions
@@ -2190,7 +2193,8 @@ def brain_summary(turn: "ServiceTurn", context: dict[str, Any]) -> None:
     quiet = int(context.get("quiet_replies") or 0)
     quiet_limit = int((context.get("brain_settings") or {}).get("quiet_before_summary") or 2)
     why = problems.summary_due(said, len(items), since, trigger, quiet, quiet_limit)
-    if not why:
+    why = why or part19.checkpoint_due(context, said, len(items))  # spec v1.6 19.7
+    if not why or part19.summary_blocked(context, said, why):
         return
     if why == "document_asked" and (
         not context.get("can_approve", True) or (context.get("brief") or {}).get("non_decider")
@@ -2206,9 +2210,10 @@ def brain_summary(turn: "ServiceTurn", context: dict[str, Any]) -> None:
     if solution_turn(context):
         return  # solution mode: they asked for a fix, so they get the ideas (Part 1.6)
     language = str(context.get("reply_language") or "en")
-    turn.reply = problems.summary_message(items, language)
-    if decisions.cost_asked(said):  # answer the cost question first, then the summary
-        turn.reply = f"{decisions.cost_answer(language, context)}\n\n{turn.reply}"
+    turn.reply = problems.summary_message(
+        items, language, [str(w) for w in (context.get("brief") or {}).get("wants") or []]
+    )
+    turn._summary_at = part19.ai_count(context)
     # The group counts are figures pi wrote itself: the no-digits rule must let them through.
     context["fixed_lines"] = [ln for ln in turn.reply.splitlines() if any(c.isdigit() for c in ln)]
     turn.awaiting_customer = True
@@ -3087,22 +3092,26 @@ NO_IDEA_LINES = {  # noqa: E501
 }
 
 
+# Spec v1.6 19.6: never "those are all the ideas" and never a promise to stop. When the ideas are
+# used up or were rejected, ask what they tried and what happened (or the one fact that finds the
+# cause);
+# the quote is offered only where R1 to R3 or B1 to B7 allow it (brain_offer).
 NO_MORE_IDEAS = {  # noqa: E501
-    "en": "Those are the ideas I have for this here. The solution document goes further, and you can say no to it.",  # noqa: E501
-    "roman_ur": "Is masle ke liye yahan itne hi ideas hain. Solution document is se aage jata hai, aur aap mana bhi kar sakte hain.",  # noqa: E501
-    "ar": "هذه هي الأفكار التي لدي هنا لهذه المشكلة. وثيقة الحل تذهب أبعد، ويمكنك الرفض.",  # noqa: E501
+    "en": "Understood, those did not help. What have you already tried, and what happened?",  # noqa: E501
+    "roman_ur": "Theek hai, ye ideas kaam nahi aaye. Ab tak aap ne kya kya aazmaya hai, aur kya hua?",  # noqa: E501
+    "ar": "مفهوم، هذه الأفكار لم تفد. ما الذي جربته حتى الآن وماذا حدث؟",  # noqa: E501
 }
 NO_IDEA_AGAIN = {  # noqa: E501
-    "en": "That is all I can give here for now. The solution document is where Workzap sets out what it would build, and you can say no to it.",  # noqa: E501
-    "roman_ur": "Abhi yahan itna hi hai. Workzap kya banayega, ye solution document mein hota hai, aur aap mana bhi kar sakte hain.",  # noqa: E501
-    "ar": "هذا كل ما يمكنني تقديمه هنا الآن. تفاصيل ما ستبنيه Workzap في وثيقة الحل، ويمكنك الرفض.",  # noqa: E501
+    "en": "Let me work from what you have told me. Which part of this costs you the most right now?",  # noqa: E501
+    "roman_ur": "Main aap ki baat se aage chalta hoon. Is mein se kaun sa hissa abhi aap ko sab se zyada nuksan de raha hai?",  # noqa: E501
+    "ar": "سأكمل مما أخبرتني به. أي جزء من هذا يكلفك أكثر الآن؟",  # noqa: E501
 }
 
 
 NO_IDEA_THIRD = {  # noqa: E501
-    "en": "I hear you asking for a solution. I have nothing more to give for free here, and the solution document is where Workzap works it out for your business.",  # noqa: E501
-    "roman_ur": "Main samajhta hoon ke aap solution chahte hain. Yahan muft dene ke liye mere paas aur kuch nahi, aur aap ke business ke liye poora hal solution document mein Workzap likhta hai.",  # noqa: E501
-    "ar": "أفهم أنك تطلب حلاً. ليس لدي المزيد لأقدمه مجاناً هنا، وتفاصيل الحل لعملك تجدها في وثيقة الحل التي تعدها Workzap.",  # noqa: E501
+    "en": "I hear you asking for a solution. What would a good result look like for you in three months?",  # noqa: E501
+    "roman_ur": "Main samajhta hoon ke aap hal chahte hain. Teen mahine baad aap ke liye acha nateeja kya hoga?",  # noqa: E501
+    "ar": "أفهم أنك تطلب حلاً. كيف تبدو النتيجة الجيدة بالنسبة لك بعد ثلاثة أشهر؟",  # noqa: E501
 }
 
 
@@ -3132,15 +3141,16 @@ def brain_no_ideas(turn: "ServiceTurn", context: dict[str, Any]) -> None:
             context.get("box_offer")
             and (
                 system_ask.open_ask(context.get("brief"))
-                or box_signals.asks_who_or_how_long(str(context.get("latest_customer_message") or ""))
+                or box_signals.asks_who_or_how_long(
+                    str(context.get("latest_customer_message") or "")
+                )
             )
             and box_offer_allowed(context)
         ):
             # the owner asked whether Workzap will do all of it: no "those are all the ideas" dead
             # end; what was heard, then brain_offer adds the one question (the offer, R3)
-            turn.reply = with_disclosure(
-                system_ask.HEARD_LINES.get(language, system_ask.HEARD_LINES["en"]), context, language
-            )
+            heard = system_ask.HEARD_LINES.get(language, system_ask.HEARD_LINES["en"])
+            turn.reply = with_disclosure(heard, context, language)
             turn.awaiting_customer = True
             return
     told = [
@@ -3271,7 +3281,10 @@ def box_offer_allowed(context: dict[str, Any]) -> bool:
     when R1 to R3 or B1 to B7 hold. With it off (the legacy path) there is no readiness data, so
     only the exception R1 holds: the owner asked for the document, quote or price in this message
     (audit R8: an unconditional offer came at the fourth problem with the map unreviewed)."""
-    asked = decisions.asks_for_document(str(context.get("latest_customer_message") or ""))
+    said = str(context.get("latest_customer_message") or "")
+    wants = (context.get("brief") or {}).get("wants") or []
+    covers = len(context.get("noted_problems") or []) + len(wants)
+    asked = decisions.asks_for_document(said) or part19.buying_signal(said, covers) == "R1"
     if not context.get("box_offer"):
         return asked
     return box.can_offer(box.offer_facts(context, asked_for_document=asked))[0]
@@ -3362,6 +3375,10 @@ def brain_decision(turn: "ServiceTurn", context: dict[str, Any]) -> None:
         # Book 5: set only when response_rules.brain.box_offer is exactly true.
         "box_offer": box.offer_facts(context) if context.get("box_offer") else None,
     }
+    wants = [str(w) for w in known.get("wants") or []]
+    said_now = str(context.get("latest_customer_message", ""))
+    signal = part19.buying_signal(said_now, len(noted) + len(wants))
+    facts["buying_signal"] = signal  # 19.2: R1 (quote or price asked) and R3 (ready to buy)
     decision = decisions.decide(
         state,
         str(context.get("latest_customer_message", "")),
@@ -3373,6 +3390,12 @@ def brain_decision(turn: "ServiceTurn", context: dict[str, Any]) -> None:
     turn._decision = decision
     if decision.reply:
         turn.reply = decision.reply
+        if signal and decision.why == "R-OFFER-03":
+            language = str(context.get("reply_language") or "en")
+            own = "title_local" if language != "en" else "title"
+            items = [str(p.get(own) or p.get("title") or "") for p in noted] + wants
+            more = part19.covers_lines(language, items)
+            turn.reply = f"{turn.reply}\n{more}" if more else turn.reply
         turn.awaiting_customer = decision.next_state not in (None, flow.State.S6_PREPARING)
         # Figures pi wrote itself (a quote's number and total) are not a new price.
         fixed = [ln for ln in decision.reply.splitlines() if any(c.isdigit() for c in ln)]
@@ -3632,6 +3655,8 @@ async def note_problems(
         brief["quiet_replies"] = 0
         book = problems.ProblemBook(session, scope, conversation.customer_id, turn.language)
         brief["summary_count"] = len(await book.active())
+        if getattr(turn, "_summary_at", None) is not None:
+            brief["summary_at"] = turn._summary_at  # 19.7: the clock for "never twice in 10"
     if turn._asked_shape:
         brief["industry_asked"] = True
     if solution_ask.free_rider(brief, message.body or "") and not brief.get("free_rider"):
@@ -5004,6 +5029,8 @@ def part18_problem(reply: str, context: dict[str, Any]) -> str | None:
         reply_gates.opening_problem(reply, context, known),
         reply_gates.empty_opener(reply),
         reply_gates.closed_list_early(reply, owner, known),
+        part19.dead_end(reply),  # spec v1.6 19.6
+        part19.number_used(reply, owner[-1] if owner else ""),  # spec v1.6 19.5
     ]
     if context.get("fact_ask"):  # off unless the workspace sets brain.fact_ask to true
         said = [
@@ -6294,6 +6321,7 @@ async def compose_service_turn(
         turn.ready_for_team = False  # no lead, proposal or team brief before the offer
         turn.projects = []
         brain_summary(turn, context)
+        part19.replay(turn, context)  # 19.3: "listen again" gets a playback of what was understood
         brain_decision(turn, context)
         strip_dangling_opener(turn)
         if context.get("expert_on"):
@@ -6312,6 +6340,12 @@ async def compose_service_turn(
                 "model.extract", problem_extract.extract(manager, scope, context)
             ):
                 turn.problem_ops = found
+        if part19.want_cue(str(context.get("latest_customer_message") or "")):
+            # 19.4: what the owner wants built or done is kept apart from their problems
+            latency.count("model_calls")
+            turn._new_wants = await latency.timed(
+                "model.wants", problem_extract.extract_wants(manager, scope, context)
+            )
         brain_prose_ideas(turn, context)
         brain_no_repeat(turn, context)
         brain_no_ideas(turn, context)
@@ -6576,6 +6610,7 @@ async def save_service_turn(
             )
         )[-12:]
         brief = system_ask.note(brief, message.body or "")  # R3 ask kept until the offer is made
+        brief = part19.merge_wants(brief, turn._new_wants)  # 19.4: the wants, apart from problems
         # R-ASK-07: the question asked last turn is answered now (any answer closes it); the one
         # in this reply is the open one. Kept in the brief, so it survives sessions and languages.
         try:

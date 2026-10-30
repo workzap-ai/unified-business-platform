@@ -326,7 +326,7 @@ def test_the_no_idea_line_is_not_repeated_word_for_word() -> None:
         {"role": "ai", "text": first.reply},
     ]
     brain_no_ideas(second, context)
-    assert second.reply != first.reply and "solution document" in second.reply
+    assert second.reply != first.reply and second.reply.count("?") == 1  # 19.6: one new question
 
 
 def test_a_reply_that_already_says_it_is_an_ai_is_not_given_the_line_twice() -> None:

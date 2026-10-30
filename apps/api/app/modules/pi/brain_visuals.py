@@ -90,6 +90,11 @@ class Group:
     words: list[str] = field(default_factory=list)
 
 
+def snapshot_of(groups: "list[Group]") -> list[list[Any]]:
+    """The board as stored with what was sent: [label, count, [words]] per area."""
+    return [[g.label[:40], int(g.count), [str(w)[:90] for w in g.words]] for g in groups]
+
+
 def token(
     settings: Settings,
     conversation_id: UUID,
@@ -98,19 +103,22 @@ def token(
     step: int = 0,
     version: int = 0,
     part: int = 0,
+    groups: "list[Group] | None" = None,
 ) -> str:
-    data = json.dumps(
-        {
-            "c": str(conversation_id),
-            "k": kind,
-            "l": language,
-            "s": step,
-            "v": version,
-            "n": part,
-            "e": int(time.time()) + VISUAL_SECONDS,
-        },
-        separators=(",", ":"),
-    ).encode()
+    """A signed link to a picture. A board link carries the groups it was drawn from (`groups`), so
+    the picture is what was sent and is never redrawn from today's data (spec v1.6, 19.8)."""
+    claims: dict[str, Any] = {
+        "c": str(conversation_id),
+        "k": kind,
+        "l": language,
+        "s": step,
+        "v": version,
+        "n": part,
+        "e": int(time.time()) + VISUAL_SECONDS,
+    }
+    if groups:
+        claims["g"] = snapshot_of(groups)
+    data = json.dumps(claims, separators=(",", ":")).encode()
     return f"{base64.urlsafe_b64encode(data).decode().rstrip('=')}.{_sign(settings, data)}"
 
 
@@ -134,6 +142,11 @@ def read(settings: Settings, value: str) -> dict[str, Any] | None:
             "step": max(0, min(3, int(claims.get("s") or 0))),
             "version": max(0, int(claims.get("v") or 0)),
             "part": max(0, min(MAX_MAP_PARTS - 1, int(claims.get("n") or 0))),
+            "groups": [
+                Group(str(g[0]), int(g[1]), [str(w) for w in g[2]])
+                for g in claims.get("g") or []
+                if isinstance(g, list) and len(g) == 3
+            ],
         }
     except (ValueError, KeyError, TypeError):
         return None

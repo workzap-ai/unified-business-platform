@@ -73,6 +73,9 @@ async def visual(token: str, name: str, request: Request, session: Session) -> R
         png = await _map_png(session, conversation, claims["version"], language, claims["part"])
     elif claims["kind"] == "progress":
         png = brain_visuals.render_progress(claims["step"], language)
+    elif claims["groups"]:
+        # 19.8: the picture sent is the picture shown, drawn from the groups stored in its link
+        png = brain_visuals.render_board(claims["groups"], language)
     else:
         rows = list(
             await session.scalars(

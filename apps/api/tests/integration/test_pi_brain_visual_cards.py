@@ -49,7 +49,7 @@ async def test_the_sorted_summary_comes_with_a_board_picture_and_a_list_to_corre
     ]
     assert len(lists) == 1
     body = lists[0]["interactive"]["body"]["text"]
-    assert body.startswith("Here's what I've noted and sorted so far")  # the text is always sent
+    assert body.startswith("Here is what you have told me so far")  # the text is always sent
     rows = lists[0]["interactive"]["action"]["sections"][0]["rows"]
     assert [r["title"] for r in rows] == ["Best-sellers run out in", "Cashiers late on weekend"]
     assert all(len(r["title"]) <= 24 for r in rows) and len(rows) <= 10

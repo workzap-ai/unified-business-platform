@@ -17,7 +17,7 @@ from pydantic import BaseModel, ConfigDict, Field
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.modules.pi import business, figure_correction, taxonomy
+from app.modules.pi import business, figure_correction, part19, taxonomy
 from app.modules.pi.language import amount_value, date_estimate
 from app.modules.pi.problem_models import (
     PiProblem,
@@ -30,7 +30,6 @@ from app.shared.workspace_repository import WorkspaceRepository
 
 TITLE_WORDS = 8
 SUMMARY_LINE_WORDS = 10
-SUMMARY_FULL_LIST = 12  # more than this and the summary shows two lines per group
 SUMMARY_TRIGGER = 7  # problems since the last summary that make pi offer one
 MAX_USER_WORDS = 6
 FIELD_LIMITS = {"summary": 400, "workaround": 400, "trigger": 200, "who_notices": 200}
@@ -308,6 +307,8 @@ def check_ops(
                 issues.append(f'"{note.title}" has no user_words (their own words, verbatim)')
             if not note.category.strip():
                 issues.append(f'"{note.title}" has no category')
+            if (why := part19.not_a_problem(list(note.user_words or []))) is not None:
+                issues.append(f'"{note.title}" {why}')
             if is_document_request(note.user_words):
                 issues.append(
                     f'"{note.title}" is their request for the document or quote, not a problem: '
@@ -944,32 +945,38 @@ ARABIC_SCRIPT = re.compile(r"[؀-ۿ]")
 
 SUMMARY_TEXT = {
     "en": (
-        "Here's what I've noted and sorted so far. None of it is solved yet.",
-        "…and {n} more. I can send the full list.",
-        "Is anything wrong or missing?",
+        "Here is what you have told me so far.",
+        "Which of these should we start with?",
     ),
     "roman_ur": (
-        "Ab tak jo maine note aur sort kiya hai, ye hai. Inme se abhi kuch bhi hal nahi hua.",
-        "…aur {n} aur hain. Poori list bhej di ja sakti hai.",
-        "Kuch ghalat hai ya reh gaya hai?",
+        "Ab tak aap ne jo bataya hai, wo ye hai.",
+        "In mein se pehle kis par kaam shuru karein?",
     ),
     "ur": (
-        "اب تک جو میں نے نوٹ اور ترتیب دیا ہے، یہ ہے۔ ان میں سے ابھی کچھ بھی حل نہیں ہوا۔",
-        "…اور {n} مزید ہیں۔ پوری فہرست بھیج سکتا ہوں۔",
-        "کیا کچھ غلط ہے یا رہ گیا ہے؟",
+        "اب تک آپ نے جو بتایا ہے، وہ یہ ہے۔",
+        "ان میں سے پہلے کس پر کام شروع کریں؟",
     ),
     "ar": (
-        "هذا ما سجلته ورتبته حتى الآن. لم يُحل أي منها بعد.",
-        "…و{n} أخرى. يمكنني إرسال القائمة كاملة.",
-        "هل هناك شيء خاطئ أو ناقص؟",
+        "هذا ما أخبرتني به حتى الآن.",
+        "بأي منها نبدأ أولاً؟",
     ),
 }  # fmt: skip
+# Spec v1.6 19.7: no "none of it is solved yet", no "is anything wrong or missing?", one question.
+WANTS_HEAD = {
+    "en": "What you want built:",
+    "roman_ur": "Jo aap banwana chahte hain:",
+    "ur": "جو آپ بنوانا چاہتے ہیں:",
+    "ar": "ما تريد بناءه:",
+}
 
 
-def summary_message(problems: list[dict[str, Any]], language: str = "en") -> str:
-    """The sorted list, grouped, biggest group first (spec 3.7). Each item is
-    {category, title, score?}. Over 12 problems it shows two lines per group."""
-    intro, more, close = SUMMARY_TEXT.get(language, SUMMARY_TEXT["en"])
+def summary_message(
+    problems: list[dict[str, Any]], language: str = "en", wants: list[str] | None = None
+) -> str:
+    """Every stored problem, grouped, biggest group first (spec 3.7, 19.7), then the wants apart,
+    then one question. Each item is {category, title, score?}. Nothing is cut: a list that hides
+    items is a list the owner cannot trust."""
+    intro, close = SUMMARY_TEXT.get(language, SUMMARY_TEXT["en"])
     groups: dict[str, list[dict[str, Any]]] = {}
     names: dict[str, str] = {}
     for item in problems:
@@ -977,24 +984,21 @@ def summary_message(problems: list[dict[str, Any]], language: str = "en") -> str
         if item.get("group_name"):
             names[item["category"]] = str(item["group_name"])
     order = sorted(groups, key=lambda key: (-len(groups[key]), taxonomy.OTHER == key, key))
-    long = len(problems) > SUMMARY_FULL_LIST
     lines = [intro, ""]
-    hidden = 0
     for key in order:
         items = sorted(groups[key], key=lambda i: -float(i.get("score") or 0))
         heading = names.get(key) if language == "en" else ""
         lines.append(f"*{heading or taxonomy.label(key, language)}* ({len(items)})")
-        shown = items[:2] if long else items
-        hidden += len(items) - len(shown)
-        for item in shown:
+        for item in items:
             own = str(item.get("title_local") or "") if language != "en" else ""
             if own and bool(ARABIC_SCRIPT.search(own)) != (language in ("ur", "ar")):
                 own = ""  # a title in another script than the chat's is not shown in it
             words = (own or str(item["title"])).split()[:SUMMARY_LINE_WORDS]
             lines.append("• " + " ".join(words))
         lines.append("")
-    if hidden:
-        lines.append(more.format(n=hidden))
+    if wants:
+        lines.append(f"*{WANTS_HEAD.get(language, WANTS_HEAD['en'])}*")
+        lines += [f"• {w}" for w in wants]
         lines.append("")
     lines.append(close)
     return "\n".join(lines)
@@ -1017,6 +1021,13 @@ DONE_SHORT = re.compile(
     re.IGNORECASE,
 )
 ASKS_SUMMARY = re.compile(r"\b(?:summary|khulasa|khulasah|summery)\b", re.IGNORECASE)
+# 19.7: "list down all the problems", "kya kya bataya": an explicit ask for the list
+ASKS_LIST = re.compile(
+    r"\b(?:list|show|tell|give)(?: me)?(?: down)?(?: all)?(?: of)?(?: the| my)? problems?\b(?! map)"
+    r"|\ball (?:the |my )?problems\b|\bkya kya (?:bataya|batai|bataye|likha|note)\b"
+    r"|\bsaare (?:masle|maslay|problems)\b",
+    re.IGNORECASE,
+)
 
 
 def what_now(text: str | None) -> bool:
@@ -1108,7 +1119,9 @@ def summary_due(
     quiet_replies: int = 0,
     quiet_limit: int = 2,
 ) -> str | None:
-    """Why pi should show the sorted summary now (spec 3.7), or None."""
+    """Why pi should show the sorted summary now: only because the owner asked or is done (spec
+    3.7, 19.7). `since_summary`, `trigger` and the quiet counters are kept for callers and no longer
+    start a summary on their own."""
     if noted < 1:
         return None
     if DONE.search(text):
@@ -1118,19 +1131,13 @@ def summary_due(
         return "done"  # "abh nh", "bas nh": the answer to "anything else?" in Roman Urdu
     if len((text or "").split()) <= 6 and ASKS_SUMMARY.search(text):
         return "show"  # "summary kosni", "summary dikhao"
-    if what_now(text):
-        return "what_now"
-    if SHOW_ME.search(text):
+    if SHOW_ME.search(text) or ASKS_LIST.search(text):
         return "show"
     if asks_for_map(text):
         return "map"  # "show my problem map": the sorted summary, with the board picture
     if ASKS_DOCUMENT.search(text):
         return "document_asked"  # the offer comes after a confirmed summary, never before
-    if since_summary >= trigger:
-        return "many"
-    if quiet_replies >= quiet_limit and since_summary >= 1:
-        return "quiet"
-    return None
+    return None  # spec v1.6 19.7: a checkpoint is `part19.checkpoint_due`, never a default reply
 
 
 def shape_question_due(noted: int, industry_known: bool, already_asked: bool) -> bool:

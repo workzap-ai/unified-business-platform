@@ -1,0 +1,291 @@
+# ruff: noqa: E501  (the owner's words are kept whole)
+"""Platform spec v1.6, Part 19 (Engagement Engine v2.5), from Live Audit 6: the Artwing Studios chat of
+30 October. Tests BS1-BS6 (buying signals), DQ (direct questions), PR1-PR8 (what counts as a problem),
+NU1 (the owner's number), DE1-DE3 (no dead ends), SM1-SM3 (summaries), BD (the board is what was sent)."""
+
+import pytest
+
+from app.modules.pi import brain_visuals, decisions, part19, problems, style, turn_coverage
+from app.modules.pi.service_conversation import (
+    NO_IDEA_AGAIN,
+    NO_IDEA_THIRD,
+    NO_MORE_IDEAS,
+)
+
+WANTS = [
+    "ads that bring customers",
+    "online payment",
+    "website with a link",
+    "sales manager follow-up",
+    "customer onboarding and service",
+]
+
+
+# --- 19.2 buying signals -------------------------------------------------------------------------
+@pytest.mark.parametrize(
+    "said",
+    [
+        "kitna kharcha hoga yeh usb karnay ka?",  # BS1
+        "bhai mujhay quote do abhi wohi pooch raha hoan",  # BS2
+        "How much will this cost?",  # BS6, English
+        "send me the quote",
+    ],
+)
+def test_bs_r1_price_and_quote_asks_are_signals(said):
+    assert part19.buying_signal(said, 1) == "R1"
+
+
+def test_bs3_budget_ready_is_r3_with_a_brief():
+    assert (
+        part19.buying_signal("Hum budget lagane ke liye ready hain", 5) == "R3"
+    )  # voice transcript
+    assert part19.buying_signal("kab shuru kar sakte hain", 3) == "R3"
+
+
+def test_bs3_budget_ready_needs_a_brief_and_a_plain_yes():
+    assert part19.buying_signal("Hum budget lagane ke liye ready hain", 1) is None
+    assert part19.buying_signal("budget nahi hai abhi", 5) is None
+
+
+@pytest.mark.parametrize(
+    "said", ["kitna nuksan hota hai hamara", "the cashiers come late", "quote nahi chahiye"]
+)
+def test_other_words_are_not_signals(said):
+    assert part19.buying_signal(said, 3) is None
+
+
+@pytest.mark.parametrize(
+    "said",
+    [
+        "mera budget kam hai",  # a small budget is not a buying signal
+        "budget tight hai abhi",
+        "kab shuru hota hai shift",  # when does the shift start
+        "the order is ready to go",
+        "kitne ka maal kharab hua is mahine",  # the owner's own waste
+        "I don't know how much is going out every month",
+        "kitna maal zaya hota hai",
+        "quote lagana do hafte mein",  # "do" is two here
+        "I need a quote from my supplier, please",
+    ],
+)
+def test_audit_false_positives_are_not_signals(said):
+    assert part19.buying_signal(said, 5) is None
+
+
+def test_audit_a_price_question_with_a_problem_in_it_is_not_dropped_as_a_problem():
+    said = (
+        "customers keep asking the price before they visit and then we lose them because nobody "
+        "answers on WhatsApp fast, what should I do?"
+    )
+    assert part19.not_a_problem([said]) is None
+
+
+def test_audit_wants_are_redacted_like_a_problem_note():
+    brief = part19.merge_wants({}, ["pay by card 4111 1111 1111 1111", "call me on 0300 1234567"])
+    assert not any(ch.isdigit() for want in brief["wants"] for ch in want)
+
+
+def test_audit_a_signal_reply_never_carries_a_price_and_ends_with_no_question():
+    facts = {
+        "can_approve": True,
+        "problem_count": 2,
+        "problem_refs": ["a", "b"],
+        "brief": {},
+        "buying_signal": "R3",
+        "message_id": "m1",
+    }
+    decision = decisions.decide(
+        decisions.State.S3_NOTED, "Hum budget lagane ke liye ready hain", "roman_ur", facts
+    )
+    assert decision is not None and decision.why == "R-OFFER-03"
+    reply = f"{decision.reply}\n{part19.covers_lines('roman_ur', ['ads', 'online payment'])}"
+    assert not any(ch.isdigit() for ch in reply)
+    assert "?" not in reply
+    for banned in ("price", "qeemat", "$", "Rs", "bank", "account"):
+        assert banned not in reply
+
+
+def test_bs_a_signal_starts_the_quote_through_the_decision_gate():
+    facts = {
+        "can_approve": True,
+        "problem_count": 1,
+        "problem_refs": ["a"],
+        "brief": {},
+        "buying_signal": "R1",
+        "message_id": "m1",
+    }
+    decision = decisions.decide(
+        decisions.State.S3_NOTED, "kitna kharcha hoga yeh usb karnay ka?", "roman_ur", facts
+    )
+    assert decision is not None and decision.why == "R-OFFER-03"
+    assert "request_solution" in decision.effects
+    assert not any(c.isdigit() for c in decision.reply)  # BS4: no price number
+
+
+def test_bs5_a_thin_set_adds_the_one_line_to_widen_and_a_full_one_does_not():
+    thin = part19.covers_lines("roman_ur", ["Sales kam hain"])
+    full = part19.covers_lines("roman_ur", ["ads", "payment"])
+    assert "shamil karni ho" in thin
+    assert "shamil karni ho" not in full
+    assert "ads" in full and "?" not in thin + full
+
+
+# --- 19.3 direct questions -----------------------------------------------------------------------
+def test_dq3_listen_again_gets_a_playback_of_what_was_understood():
+    assert part19.asks_replay("Yeh wapis sunay please")
+    line = part19.playback("roman_ur", ["Ideas pehle ho chuke", *WANTS[:2]])
+    assert line.startswith("Ji, jo maine suna") and "online payment" in line
+
+
+def test_dq4_one_message_with_two_questions_must_answer_both():
+    texts = ["Aap ko iskay baray mai kuch pata hai? Aap ye sab kaam kar denge hamein?"]
+    assert turn_coverage.skipped_question("Theek hai. Ab batayein.", texts)
+    covered = "Abhi nahi, link bhej dein. Haan, Workzap ye sab kaam kar sakta hai."
+    assert turn_coverage.skipped_question(covered, ["Salam"]) is None
+
+
+# --- 19.4 what counts as a problem ---------------------------------------------------------------
+def test_pr1_a_price_question_creates_no_problem():
+    assert part19.not_a_problem(["kitna kharcha hoga yeh usb karnay ka?"])
+
+
+def test_pr2_frustration_with_pi_creates_no_problem_and_is_a_repair_signal():
+    said = "bhai kitni baar bataon mai ik he baat"
+    assert part19.not_a_problem([said])
+    from app.modules.pi import box_signals
+
+    assert box_signals.REPEAT_COMPLAINT.search(said)  # trust falling
+
+
+def test_pr4_a_goal_alone_is_not_a_problem_but_a_problem_with_a_goal_is():
+    assert part19.not_a_problem(["apni sales badhani hai"])
+    assert part19.not_a_problem(["sales are low and we want to grow"]) is None
+
+
+def test_pr3_the_voice_note_problems_are_not_filtered():
+    for words in (
+        "ye hum already karte hain lekin isse koi faida nahi ho raha humey sales ka",
+        "Referring say sirf, teen mahine mein ek bhi paid kaam nahi bana",
+    ):
+        assert part19.not_a_problem([words]) is None
+
+
+def test_pr_check_ops_drops_a_price_question_made_into_a_problem():
+    note = problems.ProblemNote(
+        title="Cost of the USB",
+        user_words=["kitna kharcha hoga yeh usb karnay ka?"],
+        category="cash_collections",
+    )
+    issue = problems.check_ops([problems.ProblemOp(op="create", note=note)], set(), True)
+    assert issue and "question about price" in issue
+
+
+def test_pr_wants_are_kept_apart_without_repeats():
+    brief = part19.merge_wants({}, WANTS[:3])
+    brief = part19.merge_wants(brief, ["Online payment", "ads that bring customers", "onboarding"])
+    assert brief["wants"] == [*WANTS[:3], "onboarding"]
+
+
+def test_pr_wants_need_a_wording_that_says_so():
+    assert part19.want_cue(
+        "Hamein ads chalani hain aur customer ki payment online karvani hai website ke saath"
+    )
+    assert not part19.want_cue("Referring say sirf")
+
+
+# --- 19.5 the owner's number ---------------------------------------------------------------------
+def test_nu1_a_reply_to_zero_uses_the_number():
+    bad = "Here is what I have noted so far. Is anything wrong or missing?"
+    good = "Zero ka matlab hai ke referral hi ek source hai aur teen mahine mein ek bhi paid kaam nahi bana. Enquiries kam aati hain?"
+    assert part19.number_used(bad, "Zero")
+    assert part19.number_used(good, "Zero") is None
+    assert part19.number_used("ek bhi nahi bana", "Zero") is None
+    assert (
+        part19.number_used("anything", "How many referral enquiries became paid jobs?") is None
+    )  # a question
+
+
+# --- 19.6 no dead ends ---------------------------------------------------------------------------
+@pytest.mark.parametrize(
+    "reply",
+    [
+        "Wo sab yahan note hai. Ab main koi naya sawal nahi poochhunga.",  # DE1, DE2
+        "Is masle ke liye yahan itne hi ideas hain.",  # DE3
+        "Those are the ideas I have for this here.",
+        "Inme se abhi kuch bhi hal nahi hua.",
+        "Here is what I have noted. None of it is solved yet.",
+    ],
+)
+def test_de_dead_ends_and_false_claims_are_caught(reply):
+    assert part19.dead_end(reply)
+
+
+def test_de_the_fixed_lines_are_not_dead_ends_and_end_in_one_question():
+    for table in (NO_MORE_IDEAS, NO_IDEA_AGAIN, NO_IDEA_THIRD):
+        for language, line in table.items():
+            assert part19.dead_end(line) is None, (language, line)
+            assert line.count("?") + line.count("؟") == 1
+
+
+def test_de_the_repair_steps_never_promise_to_stop_asking():
+    for step in (4, 5):
+        assert (
+            "Never" in style.REPAIR[step]
+            and "stop asking" in style.REPAIR[step]
+            or "no more questions" in style.REPAIR[step]
+        )
+
+
+# --- 19.7 summaries ------------------------------------------------------------------------------
+def context(sent_at=None, ai=12):
+    return {
+        "brief": {"summary_at": sent_at} if sent_at is not None else {},
+        "history": [{"role": "ai", "text": "x"}] * ai,
+    }
+
+
+def test_sm1_a_quote_request_never_gets_a_summary():
+    ctx = context()
+    assert part19.summary_blocked(ctx, "mujhay quote do abhi", "document_asked")
+    assert part19.checkpoint_due(ctx, "kitna kharcha hoga?", 4) is None
+    assert part19.summary_blocked(ctx, "mujhay quote do abhi", "checkpoint")
+
+
+def test_sm2_no_repeat_within_ten_messages():
+    assert part19.summary_blocked(context(sent_at=5, ai=12), "ok theek hai", "done")
+    assert not part19.summary_blocked(context(sent_at=2, ai=12), "ok theek hai", "done")
+    assert part19.checkpoint_due(context(sent_at=8, ai=12), "ok", 4) is None  # fewer than 8 since
+    assert part19.checkpoint_due(context(sent_at=2, ai=12), "ok", 4) == "checkpoint"
+    assert part19.checkpoint_due(context(), "ok", 2) is None  # fewer than 3 problems
+    assert part19.checkpoint_due(context(), "kya hua?", 5) is None  # mid-question
+
+
+def test_sm_a_number_is_not_answered_with_a_summary():
+    assert part19.summary_blocked(context(), "Zero", "checkpoint")
+    assert problems.summary_due("Zero", 4, 4) is None
+
+
+def test_sm3_an_explicit_ask_lists_every_problem_and_the_wants_with_one_question():
+    assert problems.summary_due("List down all the problems i have discussed here", 3, 3) == "show"
+    items = [{"category": "sales_revenue", "title": f"Problem {n}"} for n in range(1, 16)]
+    text = problems.summary_message(items, "en", WANTS)
+    assert all(f"Problem {n}" in text for n in range(1, 16))  # none hidden, however many
+    assert all(w in text for w in WANTS)
+    assert text.count("?") == 1 and text.rstrip().endswith("?")
+    lowered = text.lower()
+    assert "none of it is solved" not in lowered and "wrong or missing" not in lowered
+
+
+def test_sm_the_old_summary_triggers_no_longer_fire_on_their_own():
+    assert problems.summary_due("hmm", 9, 9) is None
+    assert problems.summary_due("ok", 3, 3, quiet_replies=5) is None
+    assert problems.summary_due("that's all", 2, 0) == "done"  # an explicit end still shows it
+
+
+# --- 19.8 the board is what was sent -------------------------------------------------------------
+def test_bd_the_board_link_carries_the_groups_it_was_drawn_from():
+
+    groups = [brain_visuals.Group("Sales", 3, ["referral only", "no pipeline"])]
+    snap = brain_visuals.snapshot_of(groups)
+    assert snap == [["Sales", 3, ["referral only", "no pipeline"]]]
+    assert brain_visuals.snapshot_of([]) == []

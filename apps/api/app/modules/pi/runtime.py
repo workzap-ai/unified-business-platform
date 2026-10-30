@@ -610,6 +610,13 @@ async def burst_before(session: AsyncSession, message: PiMessage) -> list[PiMess
     return list(rows)
 
 
+def burst_text(message: PiMessage) -> str:
+    """What an earlier message of the burst said. A voice note skipped before it was understood has
+    no body, but the provider's transcript is on it: it is a message like any other (spec v1.6,
+    19.9, Live Audit 6 A61, where the richest voice note of the chat got no answer)."""
+    return message.body or str((message.media or {}).get("provider_transcript") or "").strip()
+
+
 def burst_pii(latest: dict[str, Any] | None, earlier: list[PiMessage]) -> dict[str, Any] | None:
     """The personal-data result for a whole burst: every kind found in any message, each reminder
     once, and "only" when nothing but removed details was said anywhere in it."""
@@ -1350,7 +1357,7 @@ async def process_pi_event(ctx: dict[str, Any], event_id: str) -> None:
                     escalation_question,
                 )
 
-                texts = [m.body or "" for m in earlier]
+                texts = [burst_text(m) for m in earlier]
                 service_context["burst_texts"] = texts
                 service_context["history"] = [
                     *service_context.get("history", []),
@@ -1359,7 +1366,7 @@ async def process_pi_event(ctx: dict[str, Any], event_id: str) -> None:
                             "role": "customer",
                             "kind": m.message_type,
                             "at": f"{m.created_at:%Y-%m-%d %H:%M}",
-                            "text": (m.body or "")[:1500],
+                            "text": burst_text(m)[:1500],
                         }
                         for m in earlier
                     ),
