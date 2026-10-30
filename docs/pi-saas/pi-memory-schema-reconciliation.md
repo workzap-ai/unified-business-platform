@@ -31,9 +31,14 @@ did) or the FT-02 commits (`pi/s-ft02`, still changing). Nothing was run.
    lint (constitution.py ~954-983) reads `profile.get(field) or block.get(field)` for those same keys only.
 4. **`known_in_record` (reply_gates.py:238) reads only the problem record's `missing` list** (`since`, `how_often`). It
    cannot see a budget, a staff count, a tool or a workflow; that is the gap S6 closes.
-5. **`erase_customer` calls `memory_block.forget`, which deletes every `pi_memories` row of the customer with no kind
-   filter** (`memory_block.py:396-405`). A new row of any kind is erased with the customer; a `pi_problems` column is
-   erased with its row (P-1 review, from `brain_erase.py:141-190`).
+5. **`erase_customer` deletes every `pi_memories` row of the customer, scoped to tenant and environment, with no kind
+   filter** (`brain_erase.py:202-206`, `delete(PiMemory).where(*mine(PiMemory), PiMemory.customer_id == customer_id)`).
+   A new row of any kind is erased with the customer. A `pi_problems` column is erased with its row
+   (`brain_erase.py:182-186`; revisions `175-181`, links `164-174`). **Correction to the P-1 review and to my first
+   commit of this file:** they said `erase_customer` calls `memory_block.forget`. In `brain_erase.py` I found no such
+   call (the delete above is inline); `memory_block.forget` (`memory_block.py:396-405`) is an identical delete that I
+   did not find a caller for in `brain_erase.py` (a search of the rest of `app/` timed out, so other callers are
+   unverified). The behaviour claimed (all kinds erased) is confirmed by lines 202-206.
 6. **`refresh()` archives the older value and prunes archived history to `MAX_ARCHIVED = 30` per customer, counted across
    all kinds** (lines 380-393). Requirement history would share that 30 with facts and preferences.
 7. **A memory row is `key: value`, content at most 500 characters, key `[a-z_]{2,20}`** (`ROW`, line 106; model line 461).
@@ -114,8 +119,8 @@ a decision copied by C does not. R1 to R6 in `pi-erase-gaps-g1-g14.md` decide wh
 
 | Store | Erase today | Retention proposal | Tenant and environment | Size caps |
 |---|---|---|---|---|
-| A. problem columns | row deleted by `erase_customer` | with the problem; revision diff keeps the old value (P-1 review) | row's `tenant_id`, `environment_id`, scoped customer FK; reads filter on both | `constraints`: 4 keys, 160 chars, 5 `cannot_change`; `tried`: 5 x (160 + 160); `cause` text 300 plus 3 x 120 evidence; `expected_outcome` 300 |
-| B. `requirement` rows | `forget` deletes all kinds | until erase (R1 to R6 may add a window); history pruned at 30 archived per customer | `WorkspaceRow` scope; peers only for business keys of opted-in contacts, same tenant and environment | `workflows` 240, `roles` 160, `systems` 160, `budget` 80 (content 500 incl. key); at most 40 active rows per customer |
+| A. problem columns | row deleted by `erase_customer` (`brain_erase.py:182-186`) | with the problem; revision diff keeps the old value (P-1 review) | row's `tenant_id`, `environment_id`, scoped customer FK; reads filter on both | `constraints`: 4 keys, 160 chars, 5 `cannot_change`; `tried`: 5 x (160 + 160); `cause` text 300 plus 3 x 120 evidence; `expected_outcome` 300 |
+| B. `requirement` rows | all kinds deleted by `erase_customer` (`brain_erase.py:202-206`) | until erase (R1 to R6 may add a window); history pruned at 30 archived per customer | `WorkspaceRow` scope; peers only for business keys of opted-in contacts, same tenant and environment | `workflows` 240, `roles` 160, `systems` 160, `budget` 80 (content 500 incl. key); at most 40 active rows per customer |
 | C. derived sheet | nothing stored | none | built from A and B only | proposed 600 characters in the prompt |
 | D. brief | brief set to erased; copies erased with every conversation | per conversation | conversation scope | as today |
 
@@ -194,3 +199,77 @@ to a lane in the plan: **owner to assign** (hot-file rule: a small hunk, rebased
 - **Remaining:** A1 to A12; the retention decisions R1 to R6; the prompt-size effect of A5; FT-02 must be integrated.
 - **Limits:** read from the code at `cc462c5`; nothing queried or run; the Part 19 `wants` behaviour is from its author's
   description, not read; caps are proposals, not measured.
+
+## 12. Check against the approved master roadmap (`pi-fast-track-plan.md`, sections 1 to 8)
+
+Status words: **APPROVED** = the owner approved it as written (D1 to D4, the lane table, the acceptance criteria of
+FT-B2a, FT-S6 and FT-REQ, and the P-1 to P-6 approval with its conditions). **PROPOSED** = this document, needs the
+owner. No existing acceptance criterion is changed; where this document differs from approved text it is a labelled
+amendment (A1 to A12, section 10).
+
+| Roadmap item | Approved text | Status in this design | Check |
+|---|---|---|---|
+| D2 | constraints, tried and cause as JSONB columns on `pi_problems`, one migration 0053 | APPROVED as written | A1 (four columns, `cause.source` dropped, `expected_outcome` added), A2 (budget, staff business-wide) are **PROPOSED amendments**; if the owner declines both, D2 stands unchanged and section 8 is the same |
+| D3 | S6-a: reuse `memory_block` rows with more keys and code-side extraction, no new table | APPROVED as written | A3 is a **PROPOSED amendment** (separate `REQUIREMENT_FACTS`, kind `requirement`, own reader, not `FACTS`); no new table either way |
+| FT-S6 acceptance | with `fact_ask` on, a fact said in message 1 is not asked again after 30 messages or in a new chat; two-tenant, erase, newer value archives the older, redactor applied, block cap kept | APPROVED, unchanged | met by design: customer-level rows (section 5), `refresh_requirements` archives the older value (`memory_block.py:354-356` pattern), `clean_value` redaction (`memory_block.py:118-136`), 700-character block untouched (`memory_block.py:44`) |
+| FT-S6 affected files | `memory_block.py`, `reply_gates.py`, `service_conversation.py` (small hunk) | APPROVED | same files; `reply_gates.py` has no lane in the plan's lane table (section 1): flagged as A11 |
+| FT-S6 "code-side extraction of a stated number or tool" | D3 wording | APPROVED | **Open:** section 3 writes requirement rows from the extractor's note. D3 says code-side extraction. Assumption: both are allowed (the note supplies the value, a code-side check supplies a stated number or tool). Not decided: see C-A below |
+| FT-B2a acceptance | 9 labelled constraints recorded at 90% on Development; a cause is `confirmed` only when the owner said it; old rows unchanged; migration up and down; two-tenant and erase tests | APPROVED, unchanged | met by the P-1 schema (store A) and section 7 tests; `expected_outcome` and the new business-level keys have **no labelled data** (conflict C11 of the consolidated review), so B2a's criterion does not cover them |
+| FT-B2b | `understood_count` becomes a quality score; write `goal_verb` | APPROVED | untouched here; it reads store A columns |
+| FT-REQ | read-only sheet per customer, completeness score, top 3 missing, ask only the top 1; files `requirements.py`, `brain_docs.py` (hook), `think_prompt.py` (one line) | APPROVED | store C is that sheet; **cross-lane:** `brain_docs.py` belongs to lane S in the plan's lane table, so the FT-REQ hook there is a lane-S hunk |
+| Lane table (section 1) | U owns `memory_block.py`, `slots.py`, `slot_carry.py`, migration 0053, `requirements.py` | APPROVED | section 9 follows it; decision history (P-4 option A) is placed in lane S (`box*.py`) |
+| Hot-file rule | small hunks (about 30 lines) into `service_conversation.py`, integrator rebases | APPROVED | the reader call and the sheet hook are two small hunks there; unchanged |
+| Migration rule | only lane U writes `0053`; others reserve the next number first | APPROVED | this design needs no second migration (section 8); `0054` stays unreserved |
+| Critical path | FT-02 then FT-B2a, no B2a before FT-02 integrates | APPROVED | unchanged; this document is design only |
+| P-1 (section 8) | workflows, entities, roles, systems, expected outcome in FT-REQ and B2; full schema reviewed before 0053 | APPROVED with conditions | this document and the P-1 review are that review; the owner has not approved the schema |
+| P-2, P-3 | case format shared by P-2, P-3, FT-A3 (lane E); no verification thresholds | APPROVED with conditions | this design only needs "labelled requirements" in cases (section 9, last data row); it defines no format and no threshold |
+| P-4 | read-only audit first; then a privacy-safe decision ledger; no table or 0054 | APPROVED with conditions | section 6 proposes A plus C, a derived record and a counter copy, **not a stored ledger**. Assumption: the owner's "ledger" can be satisfied by a derived read function. If a stored ledger is required, option D and migration 0054 return. PROPOSED |
+| P-5 | stages need separate approval | APPROVED | no model call, spending or run in this document |
+| P-6 | evidence-backed claims | APPROVED with conditions | P-6 would read the same append-only records section 6 reads (`pi_box_transitions`, documents, payments); not designed here |
+
+## 13. Unresolved conflicts and assumptions
+
+| # | Item | Kind | What is open |
+|---|---|---|---|
+| C-A | Write path for requirement rows: the extractor's note (P-1) versus code-side extraction (D3 wording) | conflict between approved D3 text and the P-1 design | choose one, or both with the code-side check winning on a stated number or tool |
+| C-B | P-4 "decision ledger" versus section 6 (derived read plus counter copy, no stored ledger) | assumption | owner confirms a derived record is enough |
+| C-C | `reply_gates.py` and `constitution.py` have no lane | gap in the lane table | owner assigns (A11) |
+| C-D | FT-REQ's `brain_docs.py` hook is in lane S's files | cross-lane hunk | integrator rebases; lane S agrees |
+| C-E | prompt size: the sheet adds about 600 characters to a prompt that already carries `spec_guidance` of tens of thousands of characters (a recorded run showed 46,096 for that key in a test log) | risk | measure on a dry run before A5 is approved |
+| C-F | `wants` (Part 19) lives in the brief, per conversation, while `expected_outcome` and `goal` are durable | overlap | A8 decides; I did not read the Part 19 code |
+| C-G | `refresh()` archives and prunes at 30 across kinds (`memory_block.py:380-393`), so requirement history can push facts out | behaviour change | A6 |
+| C-H | erase retention for decisions (documents kept, memory erased) is undecided | open decision | R1 to R6 and A9 |
+| C-I | B2a's 90% criterion covers only the 9 labelled constraints | gap | labelled cases for the new fields (lane E) before they can be accepted |
+| C-J | `forget` callers outside `brain_erase.py` unverified (search timed out) | unverified | confirm with a narrower search |
+| C-K | FT-02 is still changing `problem_extract.py` and `problems.py` on `pi/s-ft02` | dependency | lane U starts only after integration |
+| C-L | Whether business-level rows are shared with opted-in peers (privacy) | open decision | A7 |
+
+Assumptions made: (1) the new `requirement` keys fit the `key: value` row shape (`memory_block.py:106`, key at most 20
+characters, content at most 500, `models.py:461`); (2) a `requirement` kind row never reaches `load()` or `merge_profile()`
+(read from `memory_block.py:226,236,257`; true at `cc462c5`, not guaranteed if another change widens `load()`);
+(3) `Customer.business_id` and `shares_with_business` are the sharing rule for the new business-level keys
+(`memory_block.py:240-268`); (4) the P-1 review's column shapes are final enough to outline 0053.
+
+## 14. Source references used (path:line, at `cc462c5` in the worktree `.cache/lanes/sch`)
+
+Read by me for this document:
+- `apps/api/app/modules/pi/memory_block.py`: `BLOCK_CHARS` 44, `MAX_ARCHIVED` 45, `FACTS` 48-59, `FACT_CAP`/`BUSINESS_KEYS`
+  60-61, `LABELS`/`LABELS_UR` 63-86, `clean_value` 118-136 (cap default 40 at 121), `ROW`/`parse_row` 106/143-145,
+  `build` 179-194, `facts_of` 197-198, `merge_profile` 201-205, `load` 208-286 (kinds 226, `FACT_CAP` test 236, peers 240-268,
+  peer kind 257), `asked_keys` 300-309, `refresh` 312-377 (FACTS loop 327-329), `_prune_history` 380-393, `forget` 396-405,
+  `memory_reply` 423-441 (label lookup 429-430), `load_safely` 458-467.
+- `apps/api/app/modules/pi/slot_carry.py`: windows 30 and 2 days 30-31, `ASKED_KEYS` 37, `carried` 60-95, `carry_into` 98-127.
+- `apps/api/app/modules/pi/reply_gates.py`: `known_in_record` 238-256, `fact_already_given` 212-229.
+- `apps/api/app/modules/pi/constitution.py`: `REASK_FIELDS` 877ff, R-MEM-02 lint 962-983.
+- `apps/api/app/modules/pi/models.py`: `PiMemory` 441-462 (CHECK kinds 455, content 461).
+- `apps/api/app/modules/pi/brain_erase.py`: `erase_customer` 128ff; problems 182-186, revisions 175-181, links 164-174,
+  memories 202-206.
+- `apps/api/app/modules/pi/problems.py`: `noted_context` 871ff (the `missing` list begins 898).
+- `apps/api/app/modules/pi/service_conversation.py` (grep only, not read in full): memory load 4032-4036, `asked_facts`
+  write 6553-6555, `memory_reply` call 2132, `declines` increment 3371, `think_prompt.block` 1194.
+- `apps/api/app/modules/pi/solution_context.py`: `declines` read 83, 370, 656, 713; `solution_ask.py:406`.
+- `apps/api/app/modules/pi/brain_docs.py:1259` (`open_quote`, grep only).
+
+Carried from the P-1 review and the P-4 audit, **not re-read here**: the `pi_problems` columns (`problem_models.py`),
+`erase` of `pi_box_transitions` and documents kept (`brain_erase.py:287-300`), `slot_carry` call placement,
+`box_lifecycle.py:272-279`, the Part 19 `wants` behaviour, and everything about `pi/s-ft02`.
