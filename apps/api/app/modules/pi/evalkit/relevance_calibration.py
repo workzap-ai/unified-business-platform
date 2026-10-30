@@ -1,0 +1,317 @@
+"""Calibration helpers for the relevance scorer (FT-A3): sample sheets and agreement.
+
+Three label sources are kept strictly apart and never merged into one column:
+  scorer         the deterministic scorer (`relevance`)
+  agent_drafted  labels an agent drafted from the case design
+                 (`relevance_labels_agent_drafted.json`, `human_confirmed: false`)
+  human          labels from people reading the human review sheet (a separate file you supply)
+The grader agent's verdicts are a fourth, separate input. Agent-drafted labels are NOT human
+labels, and the proposed 85% agreement test is only evaluated when a human labels file is
+supplied.
+
+Usage from apps/api:
+  python -m app.modules.pi.evalkit.relevance_calibration --sheets OUT_DIR
+  python -m app.modules.pi.evalkit.relevance_calibration --grader GRADER.json [--human HUMAN.json]
+"""
+
+import argparse
+import csv
+import json
+import random
+from collections import Counter
+from pathlib import Path
+from typing import Any
+
+from app.modules.pi.evalkit import relevance
+
+DIR = Path(__file__).with_name("calibration")
+CASES = Path(__file__).with_name("cases") / "plan.json"
+SAMPLES_PATH = DIR / "relevance_samples.json"
+AGENT_PATH = DIR / "relevance_labels_agent_drafted.json"
+SEED = 20261030
+DEFINITIONS = {
+    "relevant": "links to the owner's stated problem, reuses its facts, breaks no stated limit",
+    "irrelevant": "specific, but about something the owner did not raise",
+    "generic": "would fit almost any business; no link to the stated problem",
+    "violates_constraint": "breaks a limit the owner stated",
+    "restates_owner": "only repeats what the owner already said, adds nothing",
+}
+
+
+def _load(path: Path) -> Any:
+    return json.loads(path.read_text(encoding="utf-8"))
+
+
+def load_cases() -> list[dict[str, Any]]:
+    return list(_load(CASES))
+
+
+def load_samples() -> list[dict[str, Any]]:
+    return list(_load(SAMPLES_PATH))
+
+
+def load_agent_labels() -> dict[str, Any]:
+    data = dict(_load(AGENT_PATH))
+    if data.get("label_source") != "agent_drafted" or data.get("human_confirmed") is not False:
+        raise ValueError("the agent labels file must say agent_drafted and human_confirmed false")
+    return data
+
+
+def load_human_labels(path: str | Path) -> dict[str, Any]:
+    data = dict(_load(Path(path)))
+    if data.get("label_source") != "human":
+        raise ValueError("a human labels file must say label_source: human")
+    if not data.get("reviewers"):
+        raise ValueError("a human labels file must name its reviewers")
+    return data
+
+
+def _index(cases: list[dict[str, Any]]) -> dict[str, dict[str, Any]]:
+    return {c["id"]: c for c in cases}
+
+
+def _candidate(case: dict[str, Any], candidate_id: str) -> dict[str, Any]:
+    return next(c for c in case["expected"]["candidates"] if c["id"] == candidate_id)
+
+
+def blind_sheet(
+    cases: list[dict[str, Any]], samples: list[dict[str, Any]], seed: int = SEED
+) -> list[dict[str, Any]]:
+    """What a reader sees: the owner's words, stated facts and limits, and one idea. No label, no
+    verdict, no reason, no scorer output and no blocking keyword. Order is shuffled, fixed seed."""
+    by_id = _index(cases)
+    rows = []
+    for sample in samples:
+        case = by_id[sample["case_id"]]
+        brief = case["input"]["brief"]
+        rows.append(
+            {
+                "sample_id": sample["sample_id"],
+                "industry": case["industry"],
+                "language": case["language"],
+                "owner_problem": " ".join(case["input"]["messages"]),
+                "facts": [f for p in brief["problems"] for f in p["facts"]],
+                "constraints": [
+                    {"kind": c["kind"], "text": c["text"]}
+                    for p in brief["problems"]
+                    for c in p["constraints"]
+                ],
+                "candidate_idea": _candidate(case, sample["candidate_id"])["text"],
+                "allowed_verdicts": list(relevance.VERDICTS),
+            }
+        )
+    random.Random(seed).shuffle(rows)
+    return rows
+
+
+def human_rows(sheet: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    return [
+        {
+            "sample_id": r["sample_id"],
+            "language": r["language"],
+            "owner_problem": r["owner_problem"],
+            "facts": "; ".join(r["facts"]),
+            "constraints": "; ".join(f"{c['kind']}: {c['text']}" for c in r["constraints"]),
+            "candidate_idea": r["candidate_idea"],
+            "allowed_verdicts": " / ".join(relevance.VERDICTS),
+            "verdict": "",
+            "notes": "",
+        }
+        for r in sheet
+    ]
+
+
+def _markdown(rows: list[dict[str, Any]]) -> str:
+    out = [
+        "# Human review sheet: candidate ideas",
+        "",
+        "For each row choose ONE verdict for the candidate idea, from the owner's words only.",
+        "Write it in the verdict column. Do not discuss with the other reviewer until both finish.",
+        "",
+        "Allowed verdicts:",
+        "",
+    ]
+    out += [f"- **{v}**: {DEFINITIONS[v]}" for v in relevance.VERDICTS]
+    out += [
+        "",
+        "| id | language | owner's words | facts | limits | candidate idea | verdict | notes |",
+        "|---|---|---|---|---|---|---|---|",
+    ]
+    for r in rows:
+        cells = [r[k].replace("|", "/") for k in (
+            "sample_id", "language", "owner_problem", "facts", "constraints", "candidate_idea"
+        )]  # fmt: skip
+        out.append("| " + " | ".join(cells) + " |  |  |")
+    return "\n".join(out) + "\n"
+
+
+def write_sheets(out_dir: str | Path) -> list[Path]:
+    """The blind grader sheet and the human review sheet (json, csv, markdown), side by side."""
+    folder = Path(out_dir)
+    folder.mkdir(parents=True, exist_ok=True)
+    sheet = blind_sheet(load_cases(), load_samples())
+    rows = human_rows(sheet)
+    paths = {
+        "blind_samples.json": json.dumps(sheet, ensure_ascii=False, indent=1),
+        "human_review_sheet.json": json.dumps(
+            {
+                "label_source": "human",
+                "reviewers": [],
+                "allowed_verdicts": list(relevance.VERDICTS),
+                "definitions": DEFINITIONS,
+                "rows": rows,
+            },
+            ensure_ascii=False,
+            indent=1,
+        ),
+        "human_review_sheet.md": _markdown(rows),
+    }
+    written = []
+    for name, body in paths.items():
+        target = folder / name
+        target.write_text(body, encoding="utf-8", newline="\n")
+        written.append(target)
+    csv_path = folder / "human_review_sheet.csv"
+    with open(csv_path, "w", encoding="utf-8-sig", newline="") as handle:
+        writer = csv.DictWriter(handle, fieldnames=list(rows[0]))
+        writer.writeheader()
+        writer.writerows(rows)
+    written.append(csv_path)
+    return written
+
+
+def _kappa(a: list[str], b: list[str]) -> float | None:
+    n = len(a)
+    if not n:
+        return None
+    observed = sum(1 for x, y in zip(a, b, strict=True) if x == y) / n
+    ca, cb = Counter(a), Counter(b)
+    expected = sum((ca[v] / n) * (cb[v] / n) for v in set(ca) | set(cb))
+    if expected == 1.0:
+        return 1.0 if observed == 1.0 else 0.0
+    return (observed - expected) / (1 - expected)
+
+
+def agreement(
+    first: dict[str, str], second: dict[str, str], languages: dict[str, str]
+) -> dict[str, Any]:
+    """Percent agreement and Cohen's kappa over the ids both sides labelled; per verdict (by the
+    second side's verdict) and per language."""
+    ids = sorted(set(first) & set(second))
+    a = [first[i] for i in ids]
+    b = [second[i] for i in ids]
+    same = [x == y for x, y in zip(a, b, strict=True)]
+    per_verdict = {}
+    for verdict in sorted(set(b)):
+        idx = [k for k, y in enumerate(b) if y == verdict]
+        per_verdict[verdict] = {
+            "n": len(idx),
+            "percent": 100.0 * sum(1 for k in idx if same[k]) / len(idx),
+        }
+    per_language = {}
+    for lang in sorted({languages.get(i, "?") for i in ids}):
+        idx = [k for k, i in enumerate(ids) if languages.get(i, "?") == lang]
+        per_language[lang] = {
+            "n": len(idx),
+            "percent": 100.0 * sum(1 for k in idx if same[k]) / len(idx),
+        }
+    return {
+        "n": len(ids),
+        "percent": 100.0 * sum(same) / len(ids) if ids else None,
+        "kappa": _kappa(a, b),
+        "per_verdict": per_verdict,
+        "per_language": per_language,
+    }
+
+
+def scorer_labels(cases: list[dict[str, Any]], samples: list[dict[str, Any]]) -> dict[str, str]:
+    by_id = _index(cases)
+    out = {}
+    for s in samples:
+        case = by_id[s["case_id"]]
+        cand = _candidate(case, s["candidate_id"])
+        out[s["sample_id"]] = relevance.score_candidate(
+            case["input"]["brief"],
+            cand["text"],
+            problem=cand.get("problem"),
+            owner_text=" ".join(case["input"]["messages"]),
+            language=case["language"],
+        )["verdict"]
+    return out
+
+
+def _fmt(name: str, result: dict[str, Any]) -> list[str]:
+    kappa = "n/a" if result["kappa"] is None else f"{result['kappa']:.2f}"
+    percent = "n/a" if result["percent"] is None else f"{result['percent']:.0f}%"
+    out = [f"{name}: {percent} agreement on {result['n']} samples, kappa {kappa}"]
+    out += [
+        f"    verdict {v}: {r['percent']:.0f}% of {r['n']}"
+        for v, r in result["per_verdict"].items()
+    ]
+    out += [
+        f"    language {k}: {r['percent']:.0f}% of {r['n']}"
+        for k, r in result["per_language"].items()
+    ]
+    return out
+
+
+def compare(grader: dict[str, str], human: dict[str, Any] | None = None) -> str:
+    """Agreement three ways without a human file (scorer, grader, agent_drafted), plus the human
+    comparisons only when a human labels file is given. The label sources are never merged."""
+    cases, samples = load_cases(), load_samples()
+    by_id = _index(cases)
+    languages = {s["sample_id"]: by_id[s["case_id"]]["language"] for s in samples}
+    scorer = scorer_labels(cases, samples)
+    agent = dict(load_agent_labels()["labels"])
+    pairs = [
+        ("scorer vs grader", scorer, grader),
+        ("scorer vs agent_drafted", scorer, agent),
+        ("grader vs agent_drafted", grader, agent),
+    ]
+    lines = ["Agreement on the 20 calibration samples (code and drafts, not a model's quality)", ""]
+    if human is None:
+        lines += [
+            "No human labels provided: the proposed 85% acceptance test is NOT evaluated here.",
+            "agent_drafted labels are drafts from the case design, not human labels.",
+            "",
+        ]
+    else:
+        labels = dict(human["labels"])
+        lines += [f"Human labels from {len(human.get('reviewers') or [])} reviewer(s).", ""]
+        pairs += [
+            ("scorer vs human", scorer, labels),
+            ("grader vs human", grader, labels),
+            ("agent_drafted vs human", agent, labels),
+        ]
+    for name, one, two in pairs:
+        lines += _fmt(name, agreement(one, two, languages)) + [""]
+    return "\n".join(lines)
+
+
+def _grader_map(raw: Any) -> dict[str, str]:
+    data = (
+        raw.get("results", raw)
+        if isinstance(raw, dict)
+        else {r["sample_id"]: r["verdict"] for r in raw}
+    )
+    return {str(k): str(v) for k, v in data.items()}
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "--sheets", default="", help="write the blind and human sheets to this folder"
+    )
+    parser.add_argument("--grader", default="", help="grader results JSON: id -> verdict")
+    parser.add_argument("--human", default="", help="human labels JSON (separate input)")
+    args = parser.parse_args()
+    if args.sheets:
+        for path in write_sheets(args.sheets):
+            print("wrote", path)
+    if args.grader:
+        human = load_human_labels(args.human) if args.human else None
+        print(compare(_grader_map(_load(Path(args.grader))), human))
+
+
+if __name__ == "__main__":
+    main()

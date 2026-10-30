@@ -1,0 +1,2516 @@
+[
+ {
+  "id": "plan_turf_booking_en_01",
+  "case_type": "plan",
+  "format_version": 2,
+  "industry": "sports_clubs_academies_and_turf_court_rentals",
+  "language": "en",
+  "kind": "solution_relevance",
+  "regression": false,
+  "title": "Double bookings on turf slots",
+  "synthetic": true,
+  "provenance": {
+   "author": "lane E",
+   "reviewer": null,
+   "created": "2026-10-30",
+   "origin": "hand_written"
+  },
+  "input": {
+   "messages": [
+    "Two teams turn up for the same turf slot almost every weekend. We take bookings on WhatsApp and write them in a paper diary. We have 3 courts and one receptionist."
+   ],
+   "brief": {
+    "problems": [
+     {
+      "id": "p1",
+      "title": "Double bookings on turf slots",
+      "figures": [
+       "3 courts"
+      ],
+      "user_words": [
+       "same turf slot",
+       "WhatsApp",
+       "paper diary",
+       "one receptionist"
+      ],
+      "facts": [
+       "WhatsApp",
+       "paper diary",
+       "3 courts",
+       "weekend"
+      ],
+      "constraints": [
+       {
+        "kind": "staff",
+        "text": "one receptionist",
+        "blocks": [
+         "hire",
+         "recruit"
+        ],
+        "status": "confirmed"
+       }
+      ]
+     }
+    ],
+    "roles": [
+     "receptionist"
+    ],
+    "systems": [
+     "WhatsApp",
+     "paper diary"
+    ]
+   }
+  },
+  "expected": {
+   "candidates": [
+    {
+     "id": "c1",
+     "text": "Keep one shared slot sheet per court, and let the receptionist fill it in as each WhatsApp booking is confirmed.",
+     "verdict": "relevant",
+     "problem": "p1",
+     "reason": "uses the receptionist, WhatsApp and the courts"
+    },
+    {
+     "id": "c2",
+     "text": "Hire two more receptionists to answer every booking.",
+     "verdict": "violates_constraint",
+     "problem": "p1",
+     "reason": "staff is fixed at one receptionist"
+    },
+    {
+     "id": "c3",
+     "text": "Use better software to improve your business.",
+     "verdict": "generic",
+     "problem": null,
+     "reason": "no link to the problem"
+    },
+    {
+     "id": "c4",
+     "text": "Offer a monthly loyalty card to regular clients.",
+     "verdict": "irrelevant",
+     "problem": null,
+     "reason": "unrelated to double bookings"
+    },
+    {
+     "id": "c5",
+     "text": "Two teams turn up for the same turf slot and bookings sit in WhatsApp and a paper diary.",
+     "verdict": "restates_owner",
+     "problem": "p1",
+     "reason": "repeats the owner"
+    }
+   ]
+  }
+ },
+ {
+  "id": "plan_farmhouse_booking_roman_ur_02",
+  "case_type": "plan",
+  "format_version": 2,
+  "industry": "resorts_and_farmhouse_rentals",
+  "language": "roman_ur",
+  "kind": "constraint_violation",
+  "regression": false,
+  "title": "Ek farmhouse do parties ko",
+  "synthetic": true,
+  "provenance": {
+   "author": "lane E",
+   "reviewer": null,
+   "created": "2026-10-30",
+   "origin": "hand_written"
+  },
+  "input": {
+   "messages": [
+    "Farmhouse ki booking WhatsApp aur phone par hoti hai. Eid weekend par do parties ko ek hi farmhouse de diya. Hamare paas 4 farmhouse hain aur ek manager. Eid weekend ki booking band nahi kar sakte."
+   ],
+   "brief": {
+    "problems": [
+     {
+      "id": "p1",
+      "title": "Ek farmhouse do parties ko",
+      "figures": [
+       "4 farmhouse"
+      ],
+      "user_words": [
+       "farmhouse ki booking",
+       "WhatsApp",
+       "Eid weekend",
+       "do parties",
+       "ek manager"
+      ],
+      "facts": [
+       "4 farmhouse",
+       "WhatsApp",
+       "Eid weekend"
+      ],
+      "constraints": [
+       {
+        "kind": "cannot_change",
+        "text": "Eid weekend ki booking band nahi kar sakte",
+        "blocks": [
+         "band"
+        ],
+        "status": "confirmed"
+       }
+      ]
+     }
+    ],
+    "roles": [
+     "manager"
+    ],
+    "systems": [
+     "WhatsApp"
+    ]
+   }
+  },
+  "expected": {
+   "candidates": [
+    {
+     "id": "c1",
+     "text": "Har farmhouse ki booking ek shared calendar mein likho, aur manager WhatsApp par confirm karne se pehle calendar dekhe.",
+     "verdict": "relevant",
+     "problem": "p1",
+     "reason": "farmhouse, booking, manager aur WhatsApp"
+    },
+    {
+     "id": "c2",
+     "text": "Eid weekend ki booking band kar do jab tak naya system na lage.",
+     "verdict": "violates_constraint",
+     "problem": "p1",
+     "reason": "Eid weekend ki booking band nahi ho sakti"
+    },
+    {
+     "id": "c3",
+     "text": "Behtar software istemal karo aur business behtar karo.",
+     "verdict": "generic",
+     "problem": null,
+     "reason": "kisi masle se link nahi"
+    },
+    {
+     "id": "c4",
+     "text": "Bachon ke liye jhoola lagwao.",
+     "verdict": "irrelevant",
+     "problem": null,
+     "reason": "masle se bilkul alag"
+    }
+   ]
+  }
+ },
+ {
+  "id": "plan_turf_booking_ar_03",
+  "case_type": "plan",
+  "format_version": 2,
+  "industry": "sports_clubs_academies_and_turf_court_rentals",
+  "language": "ar",
+  "kind": "solution_relevance",
+  "regression": false,
+  "title": "حجز الملعب مرتين",
+  "synthetic": true,
+  "provenance": {
+   "author": "lane E",
+   "reviewer": null,
+   "created": "2026-10-30",
+   "origin": "hand_written"
+  },
+  "input": {
+   "messages": [
+    "نأخذ حجوزات الملعب عبر واتساب ودفتر ورقي. أمس حجزنا نفس الساعة لفريقين. عندنا ملعبان وموظف استقبال واحد."
+   ],
+   "brief": {
+    "problems": [
+     {
+      "id": "p1",
+      "title": "حجز الملعب مرتين",
+      "figures": [
+       "ملعبان"
+      ],
+      "user_words": [
+       "حجوزات الملعب",
+       "واتساب",
+       "دفتر ورقي",
+       "نفس الساعة",
+       "موظف استقبال"
+      ],
+      "facts": [
+       "واتساب",
+       "دفتر ورقي",
+       "ملعبان"
+      ],
+      "constraints": [
+       {
+        "kind": "staff",
+        "text": "موظف استقبال واحد",
+        "blocks": [
+         "توظيف"
+        ],
+        "status": "confirmed"
+       }
+      ]
+     }
+    ],
+    "roles": [
+     "موظف استقبال"
+    ],
+    "systems": [
+     "واتساب",
+     "دفتر ورقي"
+    ]
+   }
+  },
+  "expected": {
+   "candidates": [
+    {
+     "id": "c1",
+     "text": "اجعل جدولا مشتركا لكل ملعب وليكتب موظف استقبال كل حجز بعد تأكيد واتساب.",
+     "verdict": "relevant",
+     "problem": "p1",
+     "reason": "يستخدم الملعب وواتساب وموظف الاستقبال"
+    },
+    {
+     "id": "c2",
+     "text": "برنامج أفضل لتحسين العمل.",
+     "verdict": "generic",
+     "problem": null,
+     "reason": "لا علاقة له بالمشكلة"
+    },
+    {
+     "id": "c3",
+     "text": "أضف مقهى صغيرا بجانب الأرض.",
+     "verdict": "irrelevant",
+     "problem": null,
+     "reason": "بعيد عن مشكلة الحجز"
+    },
+    {
+     "id": "c4",
+     "text": "نأخذ حجوزات الملعب عبر واتساب ودفتر ورقي وحجزنا نفس الساعة لفريقين.",
+     "verdict": "restates_owner",
+     "problem": "p1",
+     "reason": "يكرر كلام المالك"
+    }
+   ]
+  }
+ },
+ {
+  "id": "plan_car_rental_en_04",
+  "case_type": "plan",
+  "format_version": 2,
+  "industry": "car_rental_and_chauffeur_services",
+  "language": "en",
+  "kind": "constraint_violation",
+  "regression": false,
+  "title": "Cars returned late and damaged",
+  "synthetic": true,
+  "provenance": {
+   "author": "lane E",
+   "reviewer": null,
+   "created": "2026-10-30",
+   "origin": "hand_written"
+  },
+  "input": {
+   "messages": [
+    "Customers return our rental cars late and nobody checks the fuel or scratches at hand over. We have 12 cars and two drivers who do the hand over. We cannot raise our daily rate this season."
+   ],
+   "brief": {
+    "problems": [
+     {
+      "id": "p1",
+      "title": "Cars returned late and damaged",
+      "figures": [
+       "12 cars"
+      ],
+      "user_words": [
+       "return our rental cars late",
+       "fuel",
+       "scratches",
+       "hand over",
+       "two drivers"
+      ],
+      "facts": [
+       "12 cars",
+       "two drivers",
+       "fuel",
+       "scratches"
+      ],
+      "constraints": [
+       {
+        "kind": "price",
+        "text": "cannot raise our daily rate",
+        "blocks": [
+         "raise",
+         "increase"
+        ],
+        "status": "confirmed"
+       }
+      ]
+     }
+    ],
+    "roles": [
+     "driver"
+    ],
+    "systems": []
+   }
+  },
+  "expected": {
+   "candidates": [
+    {
+     "id": "c1",
+     "text": "Give each driver a one page hand over checklist for fuel and scratches, signed by the customer when the car goes out and comes back.",
+     "verdict": "relevant",
+     "problem": "p1",
+     "reason": "driver, hand over, fuel and scratches"
+    },
+    {
+     "id": "c2",
+     "text": "Raise the daily rate by 15 percent to cover late returns.",
+     "verdict": "violates_constraint",
+     "problem": "p1",
+     "reason": "the daily rate cannot be raised"
+    },
+    {
+     "id": "c3",
+     "text": "Grow your business with new technology.",
+     "verdict": "generic",
+     "problem": null,
+     "reason": "no link to the problem"
+    },
+    {
+     "id": "c4",
+     "text": "Paint the office wall in a brighter colour.",
+     "verdict": "irrelevant",
+     "problem": null,
+     "reason": "unrelated"
+    }
+   ]
+  }
+ },
+ {
+  "id": "plan_generator_rental_ur_05",
+  "case_type": "plan",
+  "format_version": 2,
+  "industry": "generator_sales_rental_and_service",
+  "language": "ur",
+  "kind": "solution_relevance",
+  "regression": false,
+  "title": "کرائے کا جنریٹر واپس نہیں آتا",
+  "synthetic": true,
+  "provenance": {
+   "author": "lane E",
+   "reviewer": null,
+   "created": "2026-10-30",
+   "origin": "hand_written"
+  },
+  "input": {
+   "messages": [
+    "ہمارے کرائے کے جنریٹر وقت پر واپس نہیں آتے اور کسی کو پتہ نہیں ہوتا کہ کون سا جنریٹر کس کے پاس ہے۔ ہمارے پاس 8 جنریٹر ہیں اور ایک منشی۔"
+   ],
+   "brief": {
+    "problems": [
+     {
+      "id": "p1",
+      "title": "کرائے کا جنریٹر واپس نہیں آتا",
+      "figures": [
+       "8 جنریٹر"
+      ],
+      "user_words": [
+       "کرائے کے جنریٹر",
+       "وقت پر واپس",
+       "کون سا جنریٹر",
+       "ایک منشی"
+      ],
+      "facts": [
+       "8 جنریٹر",
+       "منشی"
+      ],
+      "constraints": [
+       {
+        "kind": "staff",
+        "text": "ایک منشی",
+        "blocks": [
+         "نیا منشی"
+        ],
+        "status": "confirmed"
+       }
+      ]
+     }
+    ],
+    "roles": [
+     "منشی"
+    ],
+    "systems": []
+   }
+  },
+  "expected": {
+   "candidates": [
+    {
+     "id": "c1",
+     "text": "ہر جنریٹر کا ایک کارڈ بنائیں اور منشی ہر کرائے کے جنریٹر کی واپسی کی تاریخ اس پر لکھے۔",
+     "verdict": "relevant",
+     "problem": "p1",
+     "reason": "جنریٹر، منشی اور واپسی"
+    },
+    {
+     "id": "c2",
+     "text": "بہتر سافٹ ویئر استعمال کریں۔",
+     "verdict": "generic",
+     "problem": null,
+     "reason": "مسئلے سے کوئی تعلق نہیں"
+    },
+    {
+     "id": "c3",
+     "text": "دکان کے باہر نیا بورڈ لگائیں۔",
+     "verdict": "irrelevant",
+     "problem": null,
+     "reason": "غیر متعلق"
+    },
+    {
+     "id": "c4",
+     "text": "کرائے کے جنریٹر وقت پر واپس نہیں آتے اور کسی کو پتہ نہیں کون سا جنریٹر کس کے پاس ہے۔",
+     "verdict": "restates_owner",
+     "problem": "p1",
+     "reason": "مالک کی بات دہرائی"
+    }
+   ]
+  }
+ },
+ {
+  "id": "plan_property_rental_hi_06",
+  "case_type": "plan",
+  "format_version": 2,
+  "industry": "property_management_and_rentals",
+  "language": "hi",
+  "kind": "solution_relevance",
+  "regression": false,
+  "title": "किराया समय पर नहीं आता",
+  "synthetic": true,
+  "provenance": {
+   "author": "lane E",
+   "reviewer": null,
+   "created": "2026-10-30",
+   "origin": "hand_written"
+  },
+  "input": {
+   "messages": [
+    "हमारे किरायेदार किराया समय पर नहीं देते और हमें हर महीने याद दिलाना पड़ता है। हमारे पास 20 फ्लैट हैं और एक मैनेजर।"
+   ],
+   "brief": {
+    "problems": [
+     {
+      "id": "p1",
+      "title": "किराया समय पर नहीं आता",
+      "figures": [
+       "20 फ्लैट"
+      ],
+      "user_words": [
+       "किरायेदार",
+       "किराया",
+       "याद दिलाना",
+       "एक मैनेजर"
+      ],
+      "facts": [
+       "20 फ्लैट",
+       "मैनेजर"
+      ],
+      "constraints": [
+       {
+        "kind": "staff",
+        "text": "एक मैनेजर",
+        "blocks": [
+         "नया मैनेजर"
+        ],
+        "status": "confirmed"
+       }
+      ]
+     }
+    ],
+    "roles": [
+     "मैनेजर"
+    ],
+    "systems": []
+   }
+  },
+  "expected": {
+   "candidates": [
+    {
+     "id": "c1",
+     "text": "हर फ्लैट का किराया कैलेंडर बनाएं और मैनेजर किरायेदार को देय तारीख से तीन दिन पहले संदेश भेजे।",
+     "verdict": "relevant",
+     "problem": "p1",
+     "reason": "किरायेदार, किराया और मैनेजर"
+    },
+    {
+     "id": "c2",
+     "text": "बेहतर सॉफ्टवेयर और मार्केटिंग।",
+     "verdict": "generic",
+     "problem": null,
+     "reason": "समस्या से कोई संबंध नहीं"
+    },
+    {
+     "id": "c3",
+     "text": "छत पर बगीचा बनवाएं।",
+     "verdict": "irrelevant",
+     "problem": null,
+     "reason": "असंबंधित"
+    }
+   ]
+  }
+ },
+ {
+  "id": "plan_ecom_returns_en_07",
+  "case_type": "plan",
+  "format_version": 2,
+  "industry": "e_commerce_and_d2c_brands",
+  "language": "en",
+  "kind": "solution_relevance",
+  "regression": false,
+  "title": "Too many parcel returns",
+  "synthetic": true,
+  "provenance": {
+   "author": "lane E",
+   "reviewer": null,
+   "created": "2026-10-30",
+   "origin": "hand_written"
+  },
+  "input": {
+   "messages": [
+    "About 1 in 5 of our parcels comes back because the size is wrong. Customers choose the size from a photo only. We sell on our own website and ship with two couriers."
+   ],
+   "brief": {
+    "problems": [
+     {
+      "id": "p1",
+      "title": "Too many parcel returns",
+      "figures": [
+       "1 in 5"
+      ],
+      "user_words": [
+       "parcels comes back",
+       "size is wrong",
+       "photo only",
+       "two couriers"
+      ],
+      "facts": [
+       "1 in 5",
+       "website",
+       "two couriers",
+       "size"
+      ],
+      "constraints": []
+     }
+    ],
+    "roles": [],
+    "systems": [
+     "website"
+    ]
+   }
+  },
+  "expected": {
+   "candidates": [
+    {
+     "id": "c1",
+     "text": "Put a size chart with body measurements beside each photo on the website, so the size is chosen from numbers and not the photo only.",
+     "verdict": "relevant",
+     "problem": "p1",
+     "reason": "size, photo and website"
+    },
+    {
+     "id": "c2",
+     "text": "Use new technology and go digital.",
+     "verdict": "generic",
+     "problem": null,
+     "reason": "no link to the problem"
+    },
+    {
+     "id": "c3",
+     "text": "Start a podcast about the brand story.",
+     "verdict": "irrelevant",
+     "problem": null,
+     "reason": "unrelated"
+    },
+    {
+     "id": "c4",
+     "text": "Parcels come back because the size is wrong and customers pick size from a photo only.",
+     "verdict": "restates_owner",
+     "problem": "p1",
+     "reason": "repeats the owner"
+    }
+   ]
+  }
+ },
+ {
+  "id": "plan_ecom_cod_roman_ur_08",
+  "case_type": "plan",
+  "format_version": 2,
+  "industry": "e_commerce_and_d2c_brands",
+  "language": "roman_ur",
+  "kind": "constraint_violation",
+  "regression": false,
+  "title": "COD parcel wapas aate hain",
+  "synthetic": true,
+  "provenance": {
+   "author": "lane E",
+   "reviewer": null,
+   "created": "2026-10-30",
+   "origin": "hand_written"
+  },
+  "input": {
+   "messages": [
+    "Hamare COD parcel bohat wapas aate hain, 30 mein se 8 customer phone nahi uthate. Hum Instagram par bechte hain aur ek courier use karte hain. Hum customers se advance nahi maang sakte."
+   ],
+   "brief": {
+    "problems": [
+     {
+      "id": "p1",
+      "title": "COD parcel wapas aate hain",
+      "figures": [
+       "8 customer"
+      ],
+      "user_words": [
+       "COD parcel",
+       "wapas aate",
+       "phone nahi uthate",
+       "Instagram",
+       "ek courier"
+      ],
+      "facts": [
+       "COD",
+       "Instagram",
+       "30 mein se 8",
+       "ek courier"
+      ],
+      "constraints": [
+       {
+        "kind": "cannot_change",
+        "text": "customers se advance nahi maang sakte",
+        "blocks": [
+         "advance"
+        ],
+        "status": "confirmed"
+       }
+      ]
+     }
+    ],
+    "roles": [],
+    "systems": [
+     "Instagram"
+    ]
+   }
+  },
+  "expected": {
+   "candidates": [
+    {
+     "id": "c1",
+     "text": "Dispatch se pehle har COD customer ko Instagram par ek confirm message bhejo, aur jawab na aaye to parcel ruk jaye.",
+     "verdict": "relevant",
+     "problem": "p1",
+     "reason": "COD, Instagram, customer"
+    },
+    {
+     "id": "c2",
+     "text": "Har COD order par 500 rupay advance lo.",
+     "verdict": "violates_constraint",
+     "problem": "p1",
+     "reason": "advance nahi maang sakte"
+    },
+    {
+     "id": "c3",
+     "text": "Business barhao aur marketing karo.",
+     "verdict": "generic",
+     "problem": null,
+     "reason": "masle se link nahi"
+    },
+    {
+     "id": "c4",
+     "text": "Dukaan ka naam badal do.",
+     "verdict": "irrelevant",
+     "problem": null,
+     "reason": "alag baat"
+    }
+   ]
+  }
+ },
+ {
+  "id": "plan_ecom_stock_en_09",
+  "case_type": "plan",
+  "format_version": 2,
+  "industry": "e_commerce_and_d2c_brands",
+  "language": "en",
+  "kind": "no_idea_valid",
+  "regression": false,
+  "title": "Orders feel slow",
+  "synthetic": true,
+  "provenance": {
+   "author": "lane E",
+   "reviewer": null,
+   "created": "2026-10-30",
+   "origin": "hand_written"
+  },
+  "input": {
+   "messages": [
+    "Sales feel slow and I am not sure why. Please tell me what to do."
+   ],
+   "brief": {
+    "problems": [
+     {
+      "id": "p1",
+      "title": "Orders feel slow",
+      "figures": [],
+      "user_words": [
+       "sales feel slow",
+       "not sure why"
+      ],
+      "facts": [],
+      "constraints": []
+     }
+    ],
+    "roles": [],
+    "systems": []
+   }
+  },
+  "expected": {
+   "candidates": [
+    {
+     "id": "c1",
+     "text": "Use better software to improve your business.",
+     "verdict": "generic",
+     "problem": null,
+     "reason": "no stated fact to build on"
+    },
+    {
+     "id": "c2",
+     "text": "Launch a new product line this month.",
+     "verdict": "irrelevant",
+     "problem": null,
+     "reason": "no evidence in the brief"
+    }
+   ]
+  }
+ },
+ {
+  "id": "plan_saas_churn_en_10",
+  "case_type": "plan",
+  "format_version": 2,
+  "industry": "saas_companies",
+  "language": "en",
+  "kind": "solution_relevance",
+  "regression": false,
+  "title": "Trial users leave after day three",
+  "synthetic": true,
+  "provenance": {
+   "author": "lane E",
+   "reviewer": null,
+   "created": "2026-10-30",
+   "origin": "hand_written"
+  },
+  "input": {
+   "messages": [
+    "Most users who start our free trial leave after day 3 and never invite a teammate. We have 400 trials a month and one customer success person."
+   ],
+   "brief": {
+    "problems": [
+     {
+      "id": "p1",
+      "title": "Trial users leave after day three",
+      "figures": [
+       "400 trials",
+       "day 3"
+      ],
+      "user_words": [
+       "free trial",
+       "leave after day 3",
+       "invite a teammate",
+       "one customer success person"
+      ],
+      "facts": [
+       "400 trials",
+       "day 3",
+       "teammate",
+       "customer success"
+      ],
+      "constraints": [
+       {
+        "kind": "staff",
+        "text": "one customer success person",
+        "blocks": [
+         "hire",
+         "recruit"
+        ],
+        "status": "confirmed"
+       }
+      ]
+     }
+    ],
+    "roles": [
+     "customer success"
+    ],
+    "systems": []
+   }
+  },
+  "expected": {
+   "candidates": [
+    {
+     "id": "c1",
+     "text": "Send a trial user a short guide on day 2 that asks them to invite a teammate, and let the customer success person call only those who did not.",
+     "verdict": "relevant",
+     "problem": "p1",
+     "reason": "trial, teammate, customer success, day"
+    },
+    {
+     "id": "c2",
+     "text": "Hire three customer success people to call every trial.",
+     "verdict": "violates_constraint",
+     "problem": "p1",
+     "reason": "staff is fixed at one person"
+    },
+    {
+     "id": "c3",
+     "text": "Grow your business with marketing.",
+     "verdict": "generic",
+     "problem": null,
+     "reason": "no link to the problem"
+    },
+    {
+     "id": "c4",
+     "text": "Move the office to a bigger building.",
+     "verdict": "irrelevant",
+     "problem": null,
+     "reason": "unrelated"
+    }
+   ]
+  }
+ },
+ {
+  "id": "plan_saas_billing_roman_ur_11",
+  "case_type": "plan",
+  "format_version": 2,
+  "industry": "saas_companies",
+  "language": "roman_ur",
+  "kind": "solution_relevance",
+  "regression": false,
+  "title": "Invoice time par nahi bantay",
+  "synthetic": true,
+  "provenance": {
+   "author": "lane E",
+   "reviewer": null,
+   "created": "2026-10-30",
+   "origin": "hand_written"
+  },
+  "input": {
+   "messages": [
+    "Hamare 60 clients ko invoice har mahine hath se banta hai aur aksar late chala jata hai. Ek accountant hai aur hum Excel use karte hain."
+   ],
+   "brief": {
+    "problems": [
+     {
+      "id": "p1",
+      "title": "Invoice time par nahi bantay",
+      "figures": [
+       "60 clients"
+      ],
+      "user_words": [
+       "invoice har mahine",
+       "hath se",
+       "late chala jata",
+       "ek accountant",
+       "Excel"
+      ],
+      "facts": [
+       "60 clients",
+       "Excel",
+       "accountant"
+      ],
+      "constraints": []
+     }
+    ],
+    "roles": [
+     "accountant"
+    ],
+    "systems": [
+     "Excel"
+    ]
+   }
+  },
+  "expected": {
+   "candidates": [
+    {
+     "id": "c1",
+     "text": "Excel mein ek invoice sheet banao jahan har client ki tareekh likhi ho, aur accountant har mahine ki pehli tareekh ko sab invoice nikale.",
+     "verdict": "relevant",
+     "problem": "p1",
+     "reason": "invoice, Excel, client, accountant"
+    },
+    {
+     "id": "c2",
+     "text": "Naya software aur technology istemal karo.",
+     "verdict": "generic",
+     "problem": null,
+     "reason": "link nahi"
+    },
+    {
+     "id": "c3",
+     "text": "Staff ke liye naye jootay mangwao.",
+     "verdict": "irrelevant",
+     "problem": null,
+     "reason": "bilkul alag"
+    },
+    {
+     "id": "c4",
+     "text": "Invoice har mahine hath se banta hai aur aksar late chala jata hai.",
+     "verdict": "restates_owner",
+     "problem": "p1",
+     "reason": "owner ki baat dohrai"
+    }
+   ]
+  }
+ },
+ {
+  "id": "plan_banquet_menu_en_13",
+  "case_type": "plan",
+  "format_version": 2,
+  "industry": "banquet_halls_and_marquees",
+  "language": "en",
+  "kind": "solution_relevance",
+  "regression": false,
+  "title": "Guest count changes on the day",
+  "synthetic": true,
+  "provenance": {
+   "author": "lane E",
+   "reviewer": null,
+   "created": "2026-10-30",
+   "origin": "hand_written"
+  },
+  "input": {
+   "messages": [
+    "Families give us a guest count weeks ahead and then add 50 or more guests on the day, so the kitchen runs out of food. We have 2 halls and one catering head. We cannot refuse a family that adds guests."
+   ],
+   "brief": {
+    "problems": [
+     {
+      "id": "p1",
+      "title": "Guest count changes on the day",
+      "figures": [
+       "50 or more guests",
+       "2 halls"
+      ],
+      "user_words": [
+       "guest count",
+       "add 50 or more guests",
+       "kitchen runs out of food",
+       "one catering head"
+      ],
+      "facts": [
+       "2 halls",
+       "50",
+       "kitchen",
+       "catering head"
+      ],
+      "constraints": [
+       {
+        "kind": "cannot_change",
+        "text": "cannot refuse a family that adds guests",
+        "blocks": [
+         "refuse",
+         "reject"
+        ],
+        "status": "confirmed"
+       }
+      ]
+     }
+    ],
+    "roles": [
+     "catering head"
+    ],
+    "systems": []
+   }
+  },
+  "expected": {
+   "candidates": [
+    {
+     "id": "c1",
+     "text": "Agree a fixed extra guest buffer with each family in the booking, and let the catering head cook that buffer in the kitchen on the day.",
+     "verdict": "relevant",
+     "problem": "p1",
+     "reason": "guest, kitchen, catering head"
+    },
+    {
+     "id": "c2",
+     "text": "Refuse any family that adds guests after the booking.",
+     "verdict": "violates_constraint",
+     "problem": "p1",
+     "reason": "cannot refuse a family"
+    },
+    {
+     "id": "c3",
+     "text": "Improve your business with best practices.",
+     "verdict": "generic",
+     "problem": null,
+     "reason": "no link"
+    },
+    {
+     "id": "c4",
+     "text": "Buy a new sound system for the stage.",
+     "verdict": "irrelevant",
+     "problem": null,
+     "reason": "unrelated to the food shortage"
+    }
+   ]
+  }
+ },
+ {
+  "id": "plan_banquet_deposit_roman_ur_14",
+  "case_type": "plan",
+  "format_version": 2,
+  "industry": "banquet_halls_and_marquees",
+  "language": "roman_ur",
+  "kind": "constraint_violation",
+  "regression": false,
+  "title": "Booking cancel par paisa doob jata hai",
+  "synthetic": true,
+  "provenance": {
+   "author": "lane E",
+   "reviewer": null,
+   "created": "2026-10-30",
+   "origin": "hand_written"
+  },
+  "input": {
+   "messages": [
+    "Log booking cancel kar dete hain aakhri hafte aur hamari date khali reh jati hai. Hamare paas 1 marquee hai aur ek booking clerk. Hum purani booking ka advance wapas karne par majboor hain."
+   ],
+   "brief": {
+    "problems": [
+     {
+      "id": "p1",
+      "title": "Booking cancel par paisa doob jata hai",
+      "figures": [
+       "1 marquee"
+      ],
+      "user_words": [
+       "booking cancel",
+       "aakhri hafte",
+       "date khali",
+       "booking clerk",
+       "advance wapas"
+      ],
+      "facts": [
+       "1 marquee",
+       "booking clerk",
+       "advance"
+      ],
+      "constraints": [
+       {
+        "kind": "cannot_change",
+        "text": "advance wapas karne par majboor hain",
+        "blocks": [
+         "non refundable",
+         "wapas na"
+        ],
+        "status": "confirmed"
+       }
+      ]
+     }
+    ],
+    "roles": [
+     "booking clerk"
+    ],
+    "systems": []
+   }
+  },
+  "expected": {
+   "candidates": [
+    {
+     "id": "c1",
+     "text": "Booking clerk har booking par aakhri hafte se pehle ek confirm call kare, aur khali date ko waiting list wale ko de.",
+     "verdict": "relevant",
+     "problem": "p1",
+     "reason": "booking clerk, date, hafte"
+    },
+    {
+     "id": "c2",
+     "text": "Advance non refundable kar do aur wapas na karo.",
+     "verdict": "violates_constraint",
+     "problem": "p1",
+     "reason": "advance wapas karna zaroori hai"
+    },
+    {
+     "id": "c3",
+     "text": "Business behtar karo aur marketing karo.",
+     "verdict": "generic",
+     "problem": null,
+     "reason": "link nahi"
+    },
+    {
+     "id": "c4",
+     "text": "Hall ki deewar par naya paint karo.",
+     "verdict": "irrelevant",
+     "problem": null,
+     "reason": "alag baat"
+    }
+   ]
+  }
+ },
+ {
+  "id": "plan_wedding_vendor_ur_15",
+  "case_type": "plan",
+  "format_version": 2,
+  "industry": "wedding_planners_and_event_management",
+  "language": "ur",
+  "kind": "solution_relevance",
+  "regression": false,
+  "title": "شادی کے دن وینڈر دیر سے آتے ہیں",
+  "synthetic": true,
+  "provenance": {
+   "author": "lane E",
+   "reviewer": null,
+   "created": "2026-10-30",
+   "origin": "hand_written"
+  },
+  "input": {
+   "messages": [
+    "شادی کے دن کیٹرنگ اور سجاوٹ والے وینڈر دیر سے پہنچتے ہیں اور مہمان انتظار کرتے ہیں۔ ہم ایک مہینے میں 5 شادیاں کرتے ہیں اور ایک کوآرڈینیٹر ہے۔"
+   ],
+   "brief": {
+    "problems": [
+     {
+      "id": "p1",
+      "title": "شادی کے دن وینڈر دیر سے آتے ہیں",
+      "figures": [
+       "5 شادیاں"
+      ],
+      "user_words": [
+       "کیٹرنگ",
+       "سجاوٹ والے وینڈر",
+       "دیر سے پہنچتے",
+       "ایک کوآرڈینیٹر"
+      ],
+      "facts": [
+       "5 شادیاں",
+       "کوآرڈینیٹر"
+      ],
+      "constraints": []
+     }
+    ],
+    "roles": [
+     "کوآرڈینیٹر"
+    ],
+    "systems": []
+   }
+  },
+  "expected": {
+   "candidates": [
+    {
+     "id": "c1",
+     "text": "ہر شادی سے ایک دن پہلے کوآرڈینیٹر ہر سجاوٹ والے وینڈر اور کیٹرنگ کو پہنچنے کا وقت فون پر دوبارہ پکا کرے۔",
+     "verdict": "relevant",
+     "problem": "p1",
+     "reason": "کوآرڈینیٹر، وینڈر اور کیٹرنگ"
+    },
+    {
+     "id": "c2",
+     "text": "نئی ٹیکنالوجی اور مارکیٹنگ۔",
+     "verdict": "generic",
+     "problem": null,
+     "reason": "مسئلے سے تعلق نہیں"
+    },
+    {
+     "id": "c3",
+     "text": "دفتر کی کرسیاں بدلیں۔",
+     "verdict": "irrelevant",
+     "problem": null,
+     "reason": "غیر متعلق"
+    }
+   ]
+  }
+ },
+ {
+  "id": "plan_clinic_noshow_en_16",
+  "case_type": "plan",
+  "format_version": 2,
+  "industry": "clinics_and_gp_practices",
+  "language": "en",
+  "kind": "solution_relevance",
+  "regression": false,
+  "title": "Patients miss booked appointments",
+  "synthetic": true,
+  "provenance": {
+   "author": "lane E",
+   "reviewer": null,
+   "created": "2026-10-30",
+   "origin": "hand_written"
+  },
+  "input": {
+   "messages": [
+    "About 1 in 4 booked patients do not turn up and the doctor sits idle. We book by phone and have 2 doctors and only one receptionist."
+   ],
+   "brief": {
+    "problems": [
+     {
+      "id": "p1",
+      "title": "Patients miss booked appointments",
+      "figures": [
+       "1 in 4"
+      ],
+      "user_words": [
+       "booked patients",
+       "do not turn up",
+       "doctor sits idle",
+       "one receptionist"
+      ],
+      "facts": [
+       "1 in 4",
+       "phone",
+       "2 doctors",
+       "receptionist"
+      ],
+      "constraints": [
+       {
+        "kind": "staff",
+        "text": "only one receptionist",
+        "blocks": [
+         "hire",
+         "recruit"
+        ],
+        "status": "confirmed"
+       }
+      ]
+     }
+    ],
+    "roles": [
+     "receptionist",
+     "doctor"
+    ],
+    "systems": [
+     "phone"
+    ]
+   }
+  },
+  "expected": {
+   "candidates": [
+    {
+     "id": "c1",
+     "text": "Let the receptionist send each booked patient a reminder the day before and offer the freed slot to the next patient on the list.",
+     "verdict": "relevant",
+     "problem": "p1",
+     "reason": "receptionist, patient, slot"
+    },
+    {
+     "id": "c2",
+     "text": "Hire a second receptionist only to phone every patient.",
+     "verdict": "violates_constraint",
+     "problem": "p1",
+     "reason": "staff is fixed"
+    },
+    {
+     "id": "c3",
+     "text": "Use new technology to improve the clinic.",
+     "verdict": "generic",
+     "problem": null,
+     "reason": "no link"
+    },
+    {
+     "id": "c4",
+     "text": "Add a coffee machine to the waiting area.",
+     "verdict": "irrelevant",
+     "problem": null,
+     "reason": "unrelated"
+    }
+   ]
+  }
+ },
+ {
+  "id": "plan_clinic_records_roman_ur_17",
+  "case_type": "plan",
+  "format_version": 2,
+  "industry": "clinics_and_gp_practices",
+  "language": "roman_ur",
+  "kind": "solution_relevance",
+  "regression": false,
+  "title": "Purani parchi nahi milti",
+  "synthetic": true,
+  "provenance": {
+   "author": "lane E",
+   "reviewer": null,
+   "created": "2026-10-30",
+   "origin": "hand_written"
+  },
+  "input": {
+   "messages": [
+    "Mareez ki purani parchi dhoondne mein 10 minute lag jate hain kyunke sab file mein kaghaz ki parchiyan hain. Hamare paas 3 doctor aur ek compounder hai."
+   ],
+   "brief": {
+    "problems": [
+     {
+      "id": "p1",
+      "title": "Purani parchi nahi milti",
+      "figures": [
+       "10 minute"
+      ],
+      "user_words": [
+       "purani parchi",
+       "dhoondne mein",
+       "kaghaz ki parchiyan",
+       "ek compounder"
+      ],
+      "facts": [
+       "10 minute",
+       "3 doctor",
+       "compounder",
+       "file"
+      ],
+      "constraints": []
+     }
+    ],
+    "roles": [
+     "compounder",
+     "doctor"
+    ],
+    "systems": []
+   }
+  },
+  "expected": {
+   "candidates": [
+    {
+     "id": "c1",
+     "text": "Har mareez ki parchi ek file mein number ke hisaab se rakho, aur compounder subah us din ke mareezon ki purani parchi nikal de.",
+     "verdict": "relevant",
+     "problem": "p1",
+     "reason": "mareez, parchi, compounder"
+    },
+    {
+     "id": "c2",
+     "text": "Behtar software aur technology lagao.",
+     "verdict": "generic",
+     "problem": null,
+     "reason": "link nahi"
+    },
+    {
+     "id": "c3",
+     "text": "Clinic ke bahar bench lagwao.",
+     "verdict": "irrelevant",
+     "problem": null,
+     "reason": "alag baat"
+    },
+    {
+     "id": "c4",
+     "text": "Mareez ki purani parchi dhoondne mein 10 minute lagte hain kyunke kaghaz ki parchiyan hain.",
+     "verdict": "restates_owner",
+     "problem": "p1",
+     "reason": "owner ki baat dohrai"
+    }
+   ]
+  }
+ },
+ {
+  "id": "plan_pharmacy_expiry_hi_18",
+  "case_type": "plan",
+  "format_version": 2,
+  "industry": "pharmacies_and_medical_stores",
+  "language": "hi",
+  "kind": "solution_relevance",
+  "regression": false,
+  "title": "दवाइयाँ एक्सपायर हो जाती हैं",
+  "synthetic": true,
+  "provenance": {
+   "author": "lane E",
+   "reviewer": null,
+   "created": "2026-10-30",
+   "origin": "hand_written"
+  },
+  "input": {
+   "messages": [
+    "हमारी दुकान में हर महीने कई दवाइयाँ एक्सपायर हो जाती हैं क्योंकि हमें तारीख याद नहीं रहती। हमारे पास 500 तरह की दवाइयाँ हैं और एक सहायक।"
+   ],
+   "brief": {
+    "problems": [
+     {
+      "id": "p1",
+      "title": "दवाइयाँ एक्सपायर हो जाती हैं",
+      "figures": [
+       "500 तरह"
+      ],
+      "user_words": [
+       "दवाइयाँ एक्सपायर",
+       "तारीख याद नहीं",
+       "एक सहायक"
+      ],
+      "facts": [
+       "500 तरह",
+       "सहायक"
+      ],
+      "constraints": []
+     }
+    ],
+    "roles": [
+     "सहायक"
+    ],
+    "systems": []
+   }
+  },
+  "expected": {
+   "candidates": [
+    {
+     "id": "c1",
+     "text": "सहायक हर महीने की पहली तारीख को दवाइयाँ की एक्सपायर तारीख देखकर पास वाली दवाइयाँ आगे रखे।",
+     "verdict": "relevant",
+     "problem": "p1",
+     "reason": "सहायक, दवाइयाँ और तारीख"
+    },
+    {
+     "id": "c2",
+     "text": "बेहतर सॉफ्टवेयर और डिजिटल।",
+     "verdict": "generic",
+     "problem": null,
+     "reason": "कोई संबंध नहीं"
+    },
+    {
+     "id": "c3",
+     "text": "दुकान का रंग बदलें।",
+     "verdict": "irrelevant",
+     "problem": null,
+     "reason": "असंबंधित"
+    }
+   ]
+  }
+ },
+ {
+  "id": "plan_dental_chair_ar_19",
+  "case_type": "plan",
+  "format_version": 2,
+  "industry": "dental_clinics",
+  "language": "ar",
+  "kind": "constraint_violation",
+  "regression": false,
+  "title": "الكرسي فارغ بين المرضى",
+  "synthetic": true,
+  "provenance": {
+   "author": "lane E",
+   "reviewer": null,
+   "created": "2026-10-30",
+   "origin": "hand_written"
+  },
+  "input": {
+   "messages": [
+    "بين مريض وآخر يبقى كرسي الأسنان فارغا نصف ساعة لأننا ننتظر التعقيم. عندنا كرسيان وطبيب واحد. لا نستطيع تقليل وقت التعقيم."
+   ],
+   "brief": {
+    "problems": [
+     {
+      "id": "p1",
+      "title": "الكرسي فارغ بين المرضى",
+      "figures": [
+       "كرسيان"
+      ],
+      "user_words": [
+       "كرسي الأسنان فارغا",
+       "ننتظر التعقيم",
+       "طبيب واحد"
+      ],
+      "facts": [
+       "كرسيان",
+       "التعقيم",
+       "طبيب واحد"
+      ],
+      "constraints": [
+       {
+        "kind": "cannot_change",
+        "text": "لا نستطيع تقليل وقت التعقيم",
+        "blocks": [
+         "تقليل",
+         "اختصار"
+        ],
+        "status": "confirmed"
+       }
+      ]
+     }
+    ],
+    "roles": [
+     "طبيب"
+    ],
+    "systems": []
+   }
+  },
+  "expected": {
+   "candidates": [
+    {
+     "id": "c1",
+     "text": "جهز كرسي الأسنان الثاني بينما يعقم الأول، فينتقل طبيب واحد بين الكرسيين دون انتظار التعقيم.",
+     "verdict": "relevant",
+     "problem": "p1",
+     "reason": "كرسي الأسنان والتعقيم وطبيب"
+    },
+    {
+     "id": "c2",
+     "text": "اختصار وقت التعقيم إلى خمس دقائق.",
+     "verdict": "violates_constraint",
+     "problem": "p1",
+     "reason": "لا يمكن تقليل وقت التعقيم"
+    },
+    {
+     "id": "c3",
+     "text": "تحسين العمل بتكنولوجيا جديدة.",
+     "verdict": "generic",
+     "problem": null,
+     "reason": "لا علاقة"
+    }
+   ]
+  }
+ },
+ {
+  "id": "plan_tuition_fees_en_20",
+  "case_type": "plan",
+  "format_version": 2,
+  "industry": "tuition_centres_and_academies",
+  "language": "en",
+  "kind": "solution_relevance",
+  "regression": false,
+  "title": "Parents pay fees late",
+  "synthetic": true,
+  "provenance": {
+   "author": "lane E",
+   "reviewer": null,
+   "created": "2026-10-30",
+   "origin": "hand_written"
+  },
+  "input": {
+   "messages": [
+    "About 15 of our 60 students pay the monthly fee after the 15th and we keep chasing parents. We have two teachers and one office assistant."
+   ],
+   "brief": {
+    "problems": [
+     {
+      "id": "p1",
+      "title": "Parents pay fees late",
+      "figures": [
+       "15 of our 60",
+       "monthly fee"
+      ],
+      "user_words": [
+       "pay the monthly fee",
+       "after the 15th",
+       "chasing parents",
+       "one office assistant"
+      ],
+      "facts": [
+       "15 of our 60",
+       "monthly fee",
+       "office assistant"
+      ],
+      "constraints": []
+     }
+    ],
+    "roles": [
+     "office assistant",
+     "teacher"
+    ],
+    "systems": []
+   }
+  },
+  "expected": {
+   "candidates": [
+    {
+     "id": "c1",
+     "text": "Give parents a fee date of the 5th on the monthly fee slip, and let the office assistant message only the parents still unpaid on the 10th.",
+     "verdict": "relevant",
+     "problem": "p1",
+     "reason": "fee, parents, office assistant"
+    },
+    {
+     "id": "c2",
+     "text": "Grow your business with marketing.",
+     "verdict": "generic",
+     "problem": null,
+     "reason": "no link"
+    },
+    {
+     "id": "c3",
+     "text": "Buy new whiteboards for both classrooms.",
+     "verdict": "irrelevant",
+     "problem": null,
+     "reason": "unrelated"
+    },
+    {
+     "id": "c4",
+     "text": "Students pay the monthly fee after the 15th and we keep chasing parents.",
+     "verdict": "restates_owner",
+     "problem": "p1",
+     "reason": "repeats the owner"
+    }
+   ]
+  }
+ },
+ {
+  "id": "plan_tuition_marks_roman_ur_21",
+  "case_type": "plan",
+  "format_version": 2,
+  "industry": "tuition_centres_and_academies",
+  "language": "roman_ur",
+  "kind": "constraint_violation",
+  "regression": false,
+  "title": "Bachon ka result kam aa raha hai",
+  "synthetic": true,
+  "provenance": {
+   "author": "lane E",
+   "reviewer": null,
+   "created": "2026-10-30",
+   "origin": "hand_written"
+  },
+  "input": {
+   "messages": [
+    "Math ke 20 bachon mein se 7 test mein fail ho gaye. Class mein sab bachon ko ek hi speed se parhate hain. Class ka waqt 1 ghanta hai aur hum usay barha nahi sakte."
+   ],
+   "brief": {
+    "problems": [
+     {
+      "id": "p1",
+      "title": "Bachon ka result kam aa raha hai",
+      "figures": [
+       "7 test",
+       "20 bachon"
+      ],
+      "user_words": [
+       "Math",
+       "test mein fail",
+       "ek hi speed",
+       "1 ghanta"
+      ],
+      "facts": [
+       "Math",
+       "20 bachon",
+       "1 ghanta"
+      ],
+      "constraints": [
+       {
+        "kind": "cannot_change",
+        "text": "usay barha nahi sakte",
+        "blocks": [
+         "barhao",
+         "extra waqt"
+        ],
+        "status": "confirmed"
+       }
+      ]
+     }
+    ],
+    "roles": [
+     "teacher"
+    ],
+    "systems": []
+   }
+  },
+  "expected": {
+   "candidates": [
+    {
+     "id": "c1",
+     "text": "Math ki class ke pehle 10 minute mein pichle test ki ghaltiyan wapas samjhao, aur kamzor bachon ko alag chhoti list do.",
+     "verdict": "relevant",
+     "problem": "p1",
+     "reason": "Math, test, bachon"
+    },
+    {
+     "id": "c2",
+     "text": "Class ka waqt barhao aur extra waqt do.",
+     "verdict": "violates_constraint",
+     "problem": "p1",
+     "reason": "class ka waqt barha nahi sakte"
+    },
+    {
+     "id": "c3",
+     "text": "Business behtar karo.",
+     "verdict": "generic",
+     "problem": null,
+     "reason": "link nahi"
+    },
+    {
+     "id": "c4",
+     "text": "School ke bahar naya board lagao.",
+     "verdict": "irrelevant",
+     "problem": null,
+     "reason": "alag baat"
+    }
+   ]
+  }
+ },
+ {
+  "id": "plan_school_attendance_ur_22",
+  "case_type": "plan",
+  "format_version": 2,
+  "industry": "private_schools_and_school_chains",
+  "language": "ur",
+  "kind": "solution_relevance",
+  "regression": false,
+  "title": "بچے غیر حاضر ہوتے ہیں",
+  "synthetic": true,
+  "provenance": {
+   "author": "lane E",
+   "reviewer": null,
+   "created": "2026-10-30",
+   "origin": "hand_written"
+  },
+  "input": {
+   "messages": [
+    "ہمارے اسکول میں روزانہ 30 بچے غیر حاضر ہوتے ہیں اور والدین کو دو دن بعد پتہ چلتا ہے۔ حاضری کاغذ پر لگتی ہے اور ایک کلرک ہے۔"
+   ],
+   "brief": {
+    "problems": [
+     {
+      "id": "p1",
+      "title": "بچے غیر حاضر ہوتے ہیں",
+      "figures": [
+       "30 بچے"
+      ],
+      "user_words": [
+       "30 بچے غیر حاضر",
+       "والدین کو دو دن بعد",
+       "حاضری کاغذ پر",
+       "ایک کلرک"
+      ],
+      "facts": [
+       "30 بچے",
+       "کاغذ",
+       "کلرک"
+      ],
+      "constraints": []
+     }
+    ],
+    "roles": [
+     "کلرک"
+    ],
+    "systems": []
+   }
+  },
+  "expected": {
+   "candidates": [
+    {
+     "id": "c1",
+     "text": "حاضری لگنے کے بعد کلرک غیر حاضر بچے کے والدین کو اسی دن پیغام بھیجے۔",
+     "verdict": "relevant",
+     "problem": "p1",
+     "reason": "حاضری، کلرک، غیر حاضر اور والدین"
+    },
+    {
+     "id": "c2",
+     "text": "بہتر سافٹ ویئر اور مارکیٹنگ۔",
+     "verdict": "generic",
+     "problem": null,
+     "reason": "مسئلے سے تعلق نہیں"
+    },
+    {
+     "id": "c3",
+     "text": "کھیل کے میدان میں نئی گھاس لگائیں۔",
+     "verdict": "irrelevant",
+     "problem": null,
+     "reason": "غیر متعلق"
+    }
+   ]
+  }
+ },
+ {
+  "id": "plan_courier_lost_en_23",
+  "case_type": "plan",
+  "format_version": 2,
+  "industry": "courier_and_last_mile_delivery_companies",
+  "language": "en",
+  "kind": "solution_relevance",
+  "regression": false,
+  "title": "Customers ask where the parcel is",
+  "synthetic": true,
+  "provenance": {
+   "author": "lane E",
+   "reviewer": null,
+   "created": "2026-10-30",
+   "origin": "hand_written"
+  },
+  "input": {
+   "messages": [
+    "Customers call all day asking where their parcel is and our two dispatchers cannot answer. We deliver about 300 parcels a day with 10 riders and write status in a notebook."
+   ],
+   "brief": {
+    "problems": [
+     {
+      "id": "p1",
+      "title": "Customers ask where the parcel is",
+      "figures": [
+       "300 parcels",
+       "10 riders"
+      ],
+      "user_words": [
+       "asking where their parcel is",
+       "two dispatchers",
+       "status in a notebook"
+      ],
+      "facts": [
+       "300 parcels",
+       "10 riders",
+       "dispatchers",
+       "notebook"
+      ],
+      "constraints": []
+     }
+    ],
+    "roles": [
+     "dispatcher",
+     "rider"
+    ],
+    "systems": [
+     "notebook"
+    ]
+   }
+  },
+  "expected": {
+   "candidates": [
+    {
+     "id": "c1",
+     "text": "Ask each rider to message the dispatcher a one word status when a parcel is picked up and delivered, and let the dispatchers copy it into one shared sheet instead of the notebook.",
+     "verdict": "relevant",
+     "problem": "p1",
+     "reason": "rider, dispatcher, parcel, notebook"
+    },
+    {
+     "id": "c2",
+     "text": "Use better software and new technology.",
+     "verdict": "generic",
+     "problem": null,
+     "reason": "no link"
+    },
+    {
+     "id": "c3",
+     "text": "Buy a second office kettle.",
+     "verdict": "irrelevant",
+     "problem": null,
+     "reason": "unrelated"
+    },
+    {
+     "id": "c4",
+     "text": "Customers call all day asking where their parcel is and the dispatchers cannot answer.",
+     "verdict": "restates_owner",
+     "problem": "p1",
+     "reason": "repeats the owner"
+    }
+   ]
+  }
+ },
+ {
+  "id": "plan_courier_cod_roman_ur_24",
+  "case_type": "plan",
+  "format_version": 2,
+  "industry": "courier_and_last_mile_delivery_companies",
+  "language": "roman_ur",
+  "kind": "constraint_violation",
+  "regression": false,
+  "title": "COD ka paisa der se milta hai",
+  "synthetic": true,
+  "provenance": {
+   "author": "lane E",
+   "reviewer": null,
+   "created": "2026-10-30",
+   "origin": "hand_written"
+  },
+  "input": {
+   "messages": [
+    "Riders COD ka paisa 3 din baad jama karate hain aur hisab mein farq aata hai. Hamare 12 riders hain aur ek accountant. Hum riders ki tankhwa rok nahi sakte."
+   ],
+   "brief": {
+    "problems": [
+     {
+      "id": "p1",
+      "title": "COD ka paisa der se milta hai",
+      "figures": [
+       "12 riders",
+       "3 din"
+      ],
+      "user_words": [
+       "COD ka paisa",
+       "3 din baad jama",
+       "hisab mein farq",
+       "ek accountant"
+      ],
+      "facts": [
+       "12 riders",
+       "3 din",
+       "accountant"
+      ],
+      "constraints": [
+       {
+        "kind": "cannot_change",
+        "text": "riders ki tankhwa rok nahi sakte",
+        "blocks": [
+         "tankhwa rok",
+         "salary roko"
+        ],
+        "status": "confirmed"
+       }
+      ]
+     }
+    ],
+    "roles": [
+     "rider",
+     "accountant"
+    ],
+    "systems": []
+   }
+  },
+  "expected": {
+   "candidates": [
+    {
+     "id": "c1",
+     "text": "Har rider shaam ko COD ka paisa jama kare aur accountant usi din rider ka hisab likhe, 3 din intezar na kare.",
+     "verdict": "relevant",
+     "problem": "p1",
+     "reason": "rider, COD, accountant"
+    },
+    {
+     "id": "c2",
+     "text": "Jab tak paisa jama na ho riders ki tankhwa rok do.",
+     "verdict": "violates_constraint",
+     "problem": "p1",
+     "reason": "tankhwa rok nahi sakte"
+    },
+    {
+     "id": "c3",
+     "text": "Business barhao aur marketing karo.",
+     "verdict": "generic",
+     "problem": null,
+     "reason": "link nahi"
+    },
+    {
+     "id": "c4",
+     "text": "Office ki gaari ka rang badlo.",
+     "verdict": "irrelevant",
+     "problem": null,
+     "reason": "alag baat"
+    }
+   ]
+  }
+ },
+ {
+  "id": "plan_trucking_empty_hi_25",
+  "case_type": "plan",
+  "format_version": 2,
+  "industry": "trucking_and_goods_transport_companies",
+  "language": "hi",
+  "kind": "solution_relevance",
+  "regression": false,
+  "title": "ट्रक वापसी में खाली आते हैं",
+  "synthetic": true,
+  "provenance": {
+   "author": "lane E",
+   "reviewer": null,
+   "created": "2026-10-30",
+   "origin": "hand_written"
+  },
+  "input": {
+   "messages": [
+    "हमारे ट्रक माल पहुँचाकर वापसी में खाली आते हैं और डीज़ल का खर्चा निकलता नहीं। हमारे पास 9 ट्रक हैं और एक डिस्पैचर।"
+   ],
+   "brief": {
+    "problems": [
+     {
+      "id": "p1",
+      "title": "ट्रक वापसी में खाली आते हैं",
+      "figures": [
+       "9 ट्रक"
+      ],
+      "user_words": [
+       "ट्रक",
+       "वापसी में खाली",
+       "डीज़ल का खर्चा",
+       "एक डिस्पैचर"
+      ],
+      "facts": [
+       "9 ट्रक",
+       "डिस्पैचर"
+      ],
+      "constraints": []
+     }
+    ],
+    "roles": [
+     "डिस्पैचर"
+    ],
+    "systems": []
+   }
+  },
+  "expected": {
+   "candidates": [
+    {
+     "id": "c1",
+     "text": "डिस्पैचर हर ट्रक के रवाना होने से पहले वापसी का माल ढूँढकर ट्रक की वापसी में खाली जगह भरे।",
+     "verdict": "relevant",
+     "problem": "p1",
+     "reason": "ट्रक, वापसी और डिस्पैचर"
+    },
+    {
+     "id": "c2",
+     "text": "बेहतर सॉफ्टवेयर और डिजिटल।",
+     "verdict": "generic",
+     "problem": null,
+     "reason": "कोई संबंध नहीं"
+    },
+    {
+     "id": "c3",
+     "text": "ऑफिस की दीवार रंगवाएं।",
+     "verdict": "irrelevant",
+     "problem": null,
+     "reason": "असंबंधित"
+    }
+   ]
+  }
+ },
+ {
+  "id": "plan_poultry_mortality_en_26",
+  "case_type": "plan",
+  "format_version": 2,
+  "industry": "poultry_farms",
+  "language": "en",
+  "kind": "constraint_violation",
+  "regression": false,
+  "title": "Chicks die in the first week",
+  "synthetic": true,
+  "provenance": {
+   "author": "lane E",
+   "reviewer": null,
+   "created": "2026-10-30",
+   "origin": "hand_written"
+  },
+  "input": {
+   "messages": [
+    "About 40 of every 1000 chicks die in the first week and we do not know why. We have 2 sheds and one farm worker. We cannot buy a new heating system this year."
+   ],
+   "brief": {
+    "problems": [
+     {
+      "id": "p1",
+      "title": "Chicks die in the first week",
+      "figures": [
+       "40 of every 1000",
+       "2 sheds"
+      ],
+      "user_words": [
+       "chicks die",
+       "first week",
+       "one farm worker"
+      ],
+      "facts": [
+       "40 of every 1000",
+       "2 sheds",
+       "farm worker"
+      ],
+      "constraints": [
+       {
+        "kind": "budget",
+        "text": "cannot buy a new heating system",
+        "blocks": [
+         "buy",
+         "new heating"
+        ],
+        "status": "confirmed"
+       }
+      ]
+     }
+    ],
+    "roles": [
+     "farm worker"
+    ],
+    "systems": []
+   }
+  },
+  "expected": {
+   "candidates": [
+    {
+     "id": "c1",
+     "text": "Let the farm worker write down the shed temperature and the number of chicks that die each morning of the first week, so the pattern shows which shed and which day.",
+     "verdict": "relevant",
+     "problem": "p1",
+     "reason": "farm worker, shed, chicks, week"
+    },
+    {
+     "id": "c2",
+     "text": "Buy a new heating system for both sheds.",
+     "verdict": "violates_constraint",
+     "problem": "p1",
+     "reason": "cannot buy a new heating system"
+    },
+    {
+     "id": "c3",
+     "text": "Improve your farm with new technology.",
+     "verdict": "generic",
+     "problem": null,
+     "reason": "no link"
+    },
+    {
+     "id": "c4",
+     "text": "Start selling eggs in colourful boxes.",
+     "verdict": "irrelevant",
+     "problem": null,
+     "reason": "unrelated to the deaths"
+    }
+   ]
+  }
+ },
+ {
+  "id": "plan_poultry_feed_roman_ur_27",
+  "case_type": "plan",
+  "format_version": 2,
+  "industry": "poultry_farms",
+  "language": "roman_ur",
+  "kind": "solution_relevance",
+  "regression": false,
+  "title": "Feed ka kharcha barh gaya",
+  "synthetic": true,
+  "provenance": {
+   "author": "lane E",
+   "reviewer": null,
+   "created": "2026-10-30",
+   "origin": "hand_written"
+  },
+  "input": {
+   "messages": [
+    "Murghiyon ki feed ka kharcha har mahine barh raha hai, 3 lakh se 4 lakh ho gaya. Hamare paas 5000 murghiyan hain aur ek munshi hai jo hisab rakhta hai."
+   ],
+   "brief": {
+    "problems": [
+     {
+      "id": "p1",
+      "title": "Feed ka kharcha barh gaya",
+      "figures": [
+       "3 lakh",
+       "4 lakh",
+       "5000 murghiyan"
+      ],
+      "user_words": [
+       "feed ka kharcha",
+       "har mahine barh raha",
+       "ek munshi"
+      ],
+      "facts": [
+       "3 lakh",
+       "4 lakh",
+       "5000 murghiyan",
+       "munshi"
+      ],
+      "constraints": []
+     }
+    ],
+    "roles": [
+     "munshi"
+    ],
+    "systems": []
+   }
+  },
+  "expected": {
+   "candidates": [
+    {
+     "id": "c1",
+     "text": "Munshi har hafte ki feed ka wazan aur murghiyon ki tadaad likhe, taake pata chale kharcha kahan barh raha hai.",
+     "verdict": "relevant",
+     "problem": "p1",
+     "reason": "munshi, feed, murghiyon, kharcha"
+    },
+    {
+     "id": "c2",
+     "text": "Naya software aur technology istemal karo.",
+     "verdict": "generic",
+     "problem": null,
+     "reason": "link nahi"
+    },
+    {
+     "id": "c3",
+     "text": "Farm ke gate par naya rang karo.",
+     "verdict": "irrelevant",
+     "problem": null,
+     "reason": "alag baat"
+    },
+    {
+     "id": "c4",
+     "text": "Feed ka kharcha har mahine barh raha hai, 3 lakh se 4 lakh ho gaya.",
+     "verdict": "restates_owner",
+     "problem": "p1",
+     "reason": "owner ki baat dohrai"
+    }
+   ]
+  }
+ },
+ {
+  "id": "plan_crop_irrigation_ur_28",
+  "case_type": "plan",
+  "format_version": 2,
+  "industry": "crop_farming",
+  "language": "ur",
+  "kind": "solution_relevance",
+  "regression": false,
+  "title": "کھیت کو پانی غیر برابر ملتا ہے",
+  "synthetic": true,
+  "provenance": {
+   "author": "lane E",
+   "reviewer": null,
+   "created": "2026-10-30",
+   "origin": "hand_written"
+  },
+  "input": {
+   "messages": [
+    "ہمارے 20 ایکڑ کے کھیت میں ٹیوب ویل کا پانی ایک طرف زیادہ اور دوسری طرف کم پہنچتا ہے۔ ایک مزدور نالیاں کھولتا ہے۔"
+   ],
+   "brief": {
+    "problems": [
+     {
+      "id": "p1",
+      "title": "کھیت کو پانی غیر برابر ملتا ہے",
+      "figures": [
+       "20 ایکڑ"
+      ],
+      "user_words": [
+       "ٹیوب ویل کا پانی",
+       "ایک طرف زیادہ",
+       "ایک مزدور",
+       "نالیاں"
+      ],
+      "facts": [
+       "20 ایکڑ",
+       "ٹیوب ویل",
+       "مزدور"
+      ],
+      "constraints": []
+     }
+    ],
+    "roles": [
+     "مزدور"
+    ],
+    "systems": []
+   }
+  },
+  "expected": {
+   "candidates": [
+    {
+     "id": "c1",
+     "text": "مزدور ہر دن نالیاں کھولنے کا وقت لکھے اور ٹیوب ویل کا پانی ہر طرف برابر وقت کے لیے چھوڑے۔",
+     "verdict": "relevant",
+     "problem": "p1",
+     "reason": "مزدور، نالیاں اور ٹیوب ویل"
+    },
+    {
+     "id": "c2",
+     "text": "بہتر سافٹ ویئر استعمال کریں۔",
+     "verdict": "generic",
+     "problem": null,
+     "reason": "کوئی تعلق نہیں"
+    },
+    {
+     "id": "c3",
+     "text": "گھر کی چھت پر پنکھا لگائیں۔",
+     "verdict": "irrelevant",
+     "problem": null,
+     "reason": "غیر متعلق"
+    }
+   ]
+  }
+ },
+ {
+  "id": "plan_dairy_milk_en_29",
+  "case_type": "plan",
+  "format_version": 2,
+  "industry": "cattle_and_buffalo_dairy_farms",
+  "language": "en",
+  "kind": "solution_relevance",
+  "regression": false,
+  "title": "Milk yield drops in summer",
+  "synthetic": true,
+  "provenance": {
+   "author": "lane E",
+   "reviewer": null,
+   "created": "2026-10-30",
+   "origin": "hand_written"
+  },
+  "input": {
+   "messages": [
+    "Our 30 buffaloes give 20 percent less milk from May to August. We feed them the same fodder all year and we have one herdsman."
+   ],
+   "brief": {
+    "problems": [
+     {
+      "id": "p1",
+      "title": "Milk yield drops in summer",
+      "figures": [
+       "30 buffaloes",
+       "20 percent"
+      ],
+      "user_words": [
+       "less milk",
+       "May to August",
+       "same fodder",
+       "one herdsman"
+      ],
+      "facts": [
+       "30 buffaloes",
+       "20 percent",
+       "fodder",
+       "herdsman"
+      ],
+      "constraints": []
+     }
+    ],
+    "roles": [
+     "herdsman"
+    ],
+    "systems": []
+   }
+  },
+  "expected": {
+   "candidates": [
+    {
+     "id": "c1",
+     "text": "Let the herdsman give the buffaloes extra water and shade in the afternoon from May, and note the milk each day to compare with last summer.",
+     "verdict": "relevant",
+     "problem": "p1",
+     "reason": "herdsman, buffaloes, milk"
+    },
+    {
+     "id": "c2",
+     "text": "Grow your business with new technology.",
+     "verdict": "generic",
+     "problem": null,
+     "reason": "no link"
+    },
+    {
+     "id": "c3",
+     "text": "Paint the milk cans blue.",
+     "verdict": "irrelevant",
+     "problem": null,
+     "reason": "unrelated"
+    },
+    {
+     "id": "c4",
+     "text": "Our buffaloes give less milk from May to August and eat the same fodder all year.",
+     "verdict": "restates_owner",
+     "problem": "p1",
+     "reason": "repeats the owner"
+    }
+   ]
+  }
+ },
+ {
+  "id": "plan_dairy_milkman_ar_30",
+  "case_type": "plan",
+  "format_version": 2,
+  "industry": "cattle_and_buffalo_dairy_farms",
+  "language": "ar",
+  "kind": "solution_relevance",
+  "regression": false,
+  "title": "حساب بائعي الحليب غير واضح",
+  "synthetic": true,
+  "provenance": {
+   "author": "lane E",
+   "reviewer": null,
+   "created": "2026-10-30",
+   "origin": "hand_written"
+  },
+  "input": {
+   "messages": [
+    "نبيع الحليب لـ 25 بائعا ولا نعرف من دفع ومن لم يدفع. نكتب الحساب في دفتر واحد ولدينا محاسب واحد."
+   ],
+   "brief": {
+    "problems": [
+     {
+      "id": "p1",
+      "title": "حساب بائعي الحليب غير واضح",
+      "figures": [
+       "25 بائعا"
+      ],
+      "user_words": [
+       "نبيع الحليب",
+       "من دفع",
+       "دفتر واحد",
+       "محاسب واحد"
+      ],
+      "facts": [
+       "25 بائعا",
+       "دفتر واحد",
+       "محاسب"
+      ],
+      "constraints": []
+     }
+    ],
+    "roles": [
+     "محاسب"
+    ],
+    "systems": []
+   }
+  },
+  "expected": {
+   "candidates": [
+    {
+     "id": "c1",
+     "text": "اجعل لكل بائع صفحة في الدفتر ويكتب المحاسب كل يوم كمية الحليب ومن دفع.",
+     "verdict": "relevant",
+     "problem": "p1",
+     "reason": "بائع والدفتر والمحاسب والحليب"
+    },
+    {
+     "id": "c2",
+     "text": "برنامج أفضل وتسويق.",
+     "verdict": "generic",
+     "problem": null,
+     "reason": "لا علاقة"
+    },
+    {
+     "id": "c3",
+     "text": "اشتر سيارة جديدة للمزرعة.",
+     "verdict": "irrelevant",
+     "problem": null,
+     "reason": "غير متعلق"
+    }
+   ]
+  }
+ },
+ {
+  "id": "plan_clinic_vague_en_31",
+  "case_type": "plan",
+  "format_version": 2,
+  "industry": "clinics_and_gp_practices",
+  "language": "en",
+  "kind": "no_idea_valid",
+  "regression": false,
+  "title": "Something is wrong at the clinic",
+  "synthetic": true,
+  "provenance": {
+   "author": "lane E",
+   "reviewer": null,
+   "created": "2026-10-30",
+   "origin": "hand_written"
+  },
+  "input": {
+   "messages": [
+    "Something is wrong with the clinic lately. I cannot say what."
+   ],
+   "brief": {
+    "problems": [
+     {
+      "id": "p1",
+      "title": "Something is wrong at the clinic",
+      "figures": [],
+      "user_words": [
+       "something is wrong",
+       "cannot say what"
+      ],
+      "facts": [],
+      "constraints": []
+     }
+    ],
+    "roles": [],
+    "systems": []
+   }
+  },
+  "expected": {
+   "candidates": [
+    {
+     "id": "c1",
+     "text": "Improve your business with best practices.",
+     "verdict": "generic",
+     "problem": null,
+     "reason": "nothing stated to build on"
+    },
+    {
+     "id": "c2",
+     "text": "Open a second clinic.",
+     "verdict": "irrelevant",
+     "problem": null,
+     "reason": "no evidence in the brief"
+    }
+   ]
+  }
+ }
+]
