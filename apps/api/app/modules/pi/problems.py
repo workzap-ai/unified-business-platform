@@ -506,7 +506,7 @@ class ProblemBook:
         note: ProblemNote,
         problem: PiProblem | None,
         message_id: UUID | None,
-        owner_text: str = "",
+        owner_text: str | None = None,
     ) -> tuple[dict[str, Any], bool]:
         """B2a: the new column values a note carries (only those it says), and whether the
         redactor changed any text. Nothing is returned for a note that carries none of them."""
@@ -535,7 +535,7 @@ class ProblemBook:
             note.cause_said,
             note.cause_words,
             msg,
-            " ".join([owner_text, *note.user_words, *(problem.user_words if problem else [])]),
+            owner_text or "",  # only the owner's message: model-written words prove nothing
         )
         changed = changed or was
         if cause is not None:
@@ -551,7 +551,9 @@ class ProblemBook:
 
     async def confirm_cause(self, problem: PiProblem) -> bool:
         """The owner agreed with the cause they said: `owner_said` becomes `confirmed`. A cause pi
-        only guessed, or none, is never confirmed (returns False)."""
+        only guessed, or none, is never confirmed (returns False). No caller exists yet: a future
+        caller needs an explicit agreement (R-DEC style, the owner's own clear yes to this cause),
+        never "ok", "hmm", "maybe" or "let me think"."""
         await self.load_requirements(problem)
         confirmed = problem_fields.confirmed_cause(problem.cause)
         if confirmed is None:
@@ -567,7 +569,7 @@ class ProblemBook:
         note: ProblemNote,
         message_id: UUID | None,
         conversation_id: UUID | None,
-        owner_text: str = "",
+        owner_text: str | None = None,
     ) -> tuple[PiProblem, bool]:
         """A new problem, or (when the same title is already noted) its enrichment."""
         title = clean_title(note.title)
@@ -667,7 +669,7 @@ class ProblemBook:
         note: ProblemNote,
         reason: str,
         message_id: UUID | None,
-        owner_text: str = "",
+        owner_text: str | None = None,
     ) -> bool:
         """Apply what the note says; returns whether anything changed."""
         diff: dict[str, Any] = {}
@@ -878,7 +880,7 @@ async def apply_ops(
     language: str,
     link_min: Decimal = Decimal(0),
     figure_fix: tuple[str, str] | None = None,
-    owner_text: str = "",
+    owner_text: str | None = None,
 ) -> Applied:
     """Apply the model's ops in order. Bad ones are skipped and listed, never raised.
 

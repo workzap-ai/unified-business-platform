@@ -15,7 +15,7 @@ from test_pi_isolation_core import problem, two_chats
 from app.modules.customers.models import Customer
 from app.modules.pi import brain_erase, business, map_builder, problems
 from app.modules.pi.problem_models import PiProblem, PiProblemRevision
-from app.modules.pi.problems import ProblemBook, ProblemNote
+from app.modules.pi.problems import ProblemBook, ProblemNote, ProblemOp, apply_ops
 
 pytestmark = pytest.mark.integration
 
@@ -330,5 +330,79 @@ async def test_erasing_a_customer_removes_the_new_fields_and_only_theirs(
     assert await db.scalar(text(kept), {"t": "Same workspace, other customer"}) == "KEEP-SAME"
     assert await db.scalar(text(kept), {"t": "Other workspace"}) == "KEEP-OTHER"
     assert await db.scalar(text(rev), {"w": "%KEEP-SAME%"}) == 1
+    await w.a.close()
+    await w.b.close()
+
+
+async def test_apply_ops_a_cause_is_owner_said_only_with_the_owners_text(
+    api, business_db, monkeypatch
+):
+    db = business_db
+    await at_0053(db)
+    w = await two_chats(api, db, monkeypatch)
+    b = await book(db, w.scope_a, w.cust_a)
+    row, _ = await b.create(
+        ProblemNote(title="Stock runs out", category="stock_inventory"), None, None
+    )
+    ref = problems.short_ref(row.id)
+    fake = ProblemNote(
+        cause_text="no count at night",
+        cause_said=True,
+        cause_words=["we never count"],
+        user_words=["we never count"],  # model-written, so it proves nothing
+    )
+
+    async def run_op(note, owner_text=None):
+        op = ProblemOp(op="update", ref=ref, note=note)
+        await apply_ops(db, w.scope_a, w.cust_a, None, None, [op], "en", owner_text=owner_text)
+        await load(db, row)
+
+    await run_op(fake)  # no owner text
+    assert row.cause["status"] == "pi_inferred" and row.person_believes_cause == ""
+    await run_op(fake, "the stock is fine")  # owner text without the words
+    assert row.cause["status"] == "pi_inferred"
+    await run_op(fake, "honestly we never count at night")  # words present
+    assert row.cause["status"] == "owner_said" and row.person_believes_cause
+    await w.a.close()
+    await w.b.close()
+
+
+async def test_apply_ops_merge_split_withdraw_and_figure_fix_work_without_the_0053_columns(
+    api, business_db, monkeypatch
+):
+    db = business_db
+    await at_0052(db)
+    w = await two_chats(api, db, monkeypatch)
+    b = await book(db, w.scope_a, w.cust_a)
+    one, _ = await b.create(
+        ProblemNote(title="Stock runs out", category="stock_inventory", summary="10 clients"),
+        None,
+        None,
+    )
+    two, _ = await b.create(
+        ProblemNote(title="Cash does not match", category="cash_collections"), None, None
+    )
+    three, _ = await b.create(
+        ProblemNote(title="Rider late", category="delivery_logistics"), None, None
+    )
+    r1, r2, r3 = (problems.short_ref(p.id) for p in (one, two, three))
+
+    async def apply(ops, **kwargs):
+        return await apply_ops(db, w.scope_a, w.cust_a, None, None, ops, "en", **kwargs)
+
+    done = await apply([ProblemOp(op="withdraw", ref=r3)])
+    assert len(done.withdrawn) == 1
+    await apply([ProblemOp(op="merge", ref=r1, refs=[r2])])
+    await db.refresh(two)
+    assert two.status == "merged" and two.merged_into == one.id
+    parts = [
+        ProblemNote(title="Stock count is wrong", category="stock_inventory"),
+        ProblemNote(title="Stock arrives late", category="stock_inventory"),
+    ]
+    await apply([ProblemOp(op="split", ref=r1, notes=parts)])
+    await db.refresh(one)
+    assert one.status == "split"
+    await apply([], figure_fix=("10", "100"))  # the figure correction path reads the problems
+    assert await db.scalar(text("SELECT count(*) FROM pi_problems")) >= 4
     await w.a.close()
     await w.b.close()

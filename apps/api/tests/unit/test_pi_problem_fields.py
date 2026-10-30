@@ -15,7 +15,7 @@ MSG = str(uuid4())
 HEARD = "Honestly we never count stock at night"
 
 
-def values(note, problem=None, said=""):
+def values(note, problem=None, said=None):
     return ProblemBook.requirement_values(note, problem, uuid4(), said)
 
 
@@ -89,12 +89,14 @@ def test_a_guess_never_lowers_or_replaces_what_the_owner_said():
     said = {
         "text": "no stock count",
         "status": "owner_said",
-        "evidence": {"msgs": [], "words": ["a"]},
+        "evidence": {"msgs": [], "words": ["never count"]},
     }
     assert pf.merge_cause(said, "bad suppliers", False, [], None)[0] is None
     confirmed = {**said, "status": "confirmed"}
     assert pf.merge_cause(confirmed, "bad suppliers", False, [], None)[0] is None
-    assert pf.merge_cause(confirmed, "No stock count", True, ["a"], None, "a")[0] is None  # same
+    assert (
+        pf.merge_cause(confirmed, "No stock count", True, ["never count"], None, HEARD)[0] is None
+    )  # same
 
 
 def test_the_owner_changing_their_cause_replaces_it_and_resets_confirmed():
@@ -211,17 +213,28 @@ def test_an_empty_evidence_list_or_no_owner_text_is_a_guess():
     )
 
 
-def test_the_stored_user_words_count_as_the_owners_text():
+def test_model_written_words_never_prove_a_cause_only_the_owners_text_does():
+    """Fail closed: a note's user_words, the stored user_words and cause_words are model-written."""
     note = ProblemNote(
         cause_text="no count", cause_said=True, cause_words=["never count"], user_words=[HEARD]
     )
-    assert values(note)[0]["cause"]["status"] == pf.OWNER_SAID
+    assert values(note)[0]["cause"]["status"] == pf.PI_INFERRED  # no owner_text
     stored = SimpleNamespace(
         constraints=None, tried=None, cause=None, expected_outcome=None, user_words=[HEARD]
     )
-    bare = ProblemNote(cause_text="no count", cause_said=True, cause_words=["never count"])
-    assert values(bare, stored)[0]["cause"]["status"] == pf.OWNER_SAID
-    assert values(bare)[0]["cause"]["status"] == pf.PI_INFERRED
+    assert values(note, stored)[0]["cause"]["status"] == pf.PI_INFERRED
+    assert values(note, None, None)[0]["cause"]["evidence"]["words"] == []  # none kept as owner's
+    assert values(note, None, HEARD)[0]["cause"]["status"] == pf.OWNER_SAID
+
+
+def test_evidence_words_are_whole_words_of_at_least_three_characters():
+    ok = pf.merge_cause(None, "c", True, ["never count"], None, HEARD)[0]
+    assert ok["status"] == pf.OWNER_SAID
+    assert pf.merge_cause(None, "c", True, ["nev"], None, HEARD)[0]["status"] == pf.PI_INFERRED
+    assert pf.merge_cause(None, "c", True, ["we"], None, HEARD)[0]["status"] == pf.PI_INFERRED
+    assert pf.merge_cause(None, "c", True, ["a", "no"], None, "a no")[0]["status"] == pf.PI_INFERRED
+    mixed = pf.merge_cause(None, "c", True, ["at", "never count"], None, HEARD)[0]
+    assert mixed["status"] == pf.OWNER_SAID and mixed["evidence"]["words"] == ["never count"]
 
 
 def test_an_unchanged_constraint_is_not_replaced():

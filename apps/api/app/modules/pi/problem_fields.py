@@ -14,7 +14,9 @@ Shapes (docs/pi-saas/pi-p1-schema-review.md section 2.1; sizes are proposals, no
 A list past its cap keeps the newest entries and logs how many were dropped.
 
 A cause has a status. `owner_said` needs the owner's own words as evidence: at least one evidence
-word, and EVERY word must occur in what the owner wrote (the message text and the stored words).
+word of 3+ characters, and EVERY word must occur, as whole words, in the owner's own message
+(`owner_text`, nothing else: model-written user_words prove nothing; with no owner_text a cause
+can only be `pi_inferred`).
 A cause with no such proof is `pi_inferred`, pi's own guess. `confirmed` is reached only through
 `confirm_cause` from `owner_said`: an inferred cause is never treated as a confirmed fact, and a
 later guess never lowers or replaces what the owner said.
@@ -24,6 +26,7 @@ where the words around it give it away (best effort, see `third_party`), then cu
 """
 
 import logging
+import re
 from typing import Any
 
 from app.modules.pi import safety, third_party
@@ -160,16 +163,31 @@ def merge_tried(
     return (_keep_newest(kept, "tried") if touched else None), any(changed)
 
 
+MIN_WORD = 3  # an evidence word shorter than this proves nothing ("a", "no")
+
+
 def _squash(text: Any) -> str:
     return " ".join(str(text or "").casefold().split())
 
 
-def said_by_owner(words: list[str], corpus: str) -> bool:
-    """True only when there is at least one evidence word and EVERY one occurs in what the owner
-    wrote (case-insensitive substring of `corpus`). A word the owner never wrote is fabricated."""
+def _heard(word: str, heard: str) -> bool:
+    """`word` occurs in `heard` as whole words, not inside a longer word."""
+    return bool(word) and re.search(rf"(?<!\w){re.escape(word)}(?!\w)", heard) is not None
+
+
+def usable_words(words: list[str]) -> list[str]:
+    """The evidence words that can count: at most EVIDENCE_WORDS, at least MIN_WORD characters."""
+    return [w for w in words[:EVIDENCE_WORDS] if len(_squash(w)) >= MIN_WORD]
+
+
+def said_by_owner(words: list[str], corpus: str | None) -> bool:
+    """True only when there is at least one usable evidence word and EVERY one occurs, as whole
+    words and case-insensitively, in `corpus`, the owner's own message. Nothing else is evidence:
+    with no corpus the answer is always False (fail closed), and model-written words (a note's
+    user_words, stored user_words) are never a corpus."""
     heard = _squash(corpus)
-    used = [_squash(w) for w in words if _squash(w)]
-    return bool(used) and all(w in heard for w in used)
+    used = [_squash(w) for w in usable_words(words)]
+    return bool(heard) and bool(used) and all(_heard(w, heard) for w in used)
 
 
 def merge_cause(
@@ -178,22 +196,22 @@ def merge_cause(
     owner_said: bool,
     words: list[str],
     msg: str | None,
-    corpus: str = "",
+    corpus: str | None = None,
 ) -> tuple[dict[str, Any] | None, bool]:
     """The cause with what the note says. `owner_said` needs the owner's own words as evidence:
-    every evidence word must occur in `corpus` (the owner's message and stored words), otherwise
-    the cause is pi's guess and a word the owner never wrote is not stored. A guess never replaces
-    or lowers a cause the owner said; a different cause the owner says replaces it and starts
-    again at `owner_said`."""
+    every evidence word must occur, as whole words, in `corpus` (the owner's own message only),
+    otherwise the cause is pi's guess and a word the owner never wrote is not stored. A guess
+    never replaces or lowers a cause the owner said; a different cause the owner says replaces it
+    and starts again at `owner_said`."""
     value, changed = clean(text, CAUSE_CAP)
     if not value:
         return None, False
     heard = _squash(corpus)
-    candidates = [w for w in words[:EVIDENCE_WORDS] if _squash(w)]
+    candidates = usable_words(words)
     proven = said_by_owner(candidates, corpus)
     evidence_words: list[str] = []
     for word in candidates:
-        if _squash(word) not in heard:
+        if not _heard(_squash(word), heard):
             continue  # not in what the owner wrote: never stored as evidence
         cleaned, was = clean(word, EVIDENCE_WORD_CAP)
         changed = changed or was
