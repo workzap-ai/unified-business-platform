@@ -8,17 +8,28 @@ stores identifiers only, never text. It is safe to call for every reply, learnin
 (a frozen workspace simply shows no learned ids), and calling it twice for one reply is harmless.
 
 `send_whatsapp_message` calls `stamp_safely` once, after the reply message is saved (brain mode).
+
+`prompt_version` hashes the SOURCE FILES of every prompt-bearing module, not a list of constants (a
+list can never be complete: prompts are also inline literals, f-strings and selection logic). The
+set is every `.py` file under `app/modules/pi` (except `evalkit/`) that is not named on
+`NON_PROMPT_MODULES` with a reason, plus `EXTERNAL_PROMPT_MODULES`; a new module is hashed by
+default, and it can leave the hash only by being named there. The pack files, the handbook JSON and
+the optional operator guidance are hashed as before.
+
+Consequence, intended and tolerated: ANY edit to a hashed module's source, a comment included,
+changes `prompt_version`, so the first replies after a deploy carry a new version and the drift
+check reports `stale_prompt` once (`drift_check.stamp_findings`, `drift_check.stamp_summary`)
+until the new version is the one stamped. Not covered: behaviour driven by data outside these files
+(database settings, learned lessons and examples; the operator guidance only through its own
+optional hash).
+See docs/pi-saas/pi-prompt-version.md.
 """
 
-import enum
 import hashlib
-import importlib
-import json
+import importlib.util
 import logging
 import os
-import re
-from collections.abc import Sequence
-from functools import lru_cache
+from collections.abc import Callable, Sequence
 from pathlib import Path
 from typing import Any
 
@@ -43,87 +54,56 @@ def _digest(path: Path) -> str:
         return ""
 
 
-# The hardcoded prompt text and prompt-selection tables that reach a model: module -> names. A
-# change to any of them changes pi's behaviour, so it changes `prompt_version`.
-# `test_pi_prompt_version_coverage` scans every module of this package and fails when a prompt-like
-# constant is neither listed here nor on its documented allowlist.
-PROMPT_CONSTANTS: tuple[tuple[str, tuple[str, ...]], ...] = (
-    (
-        "service_conversation",
+# Where the prompt-bearing source lives: every .py file under this folder is hashed unless it is
+# named on NON_PROMPT_MODULES below (a new module is therefore hashed by default).
+PI_ROOT = Path(__file__).resolve().parent
+# The evaluation kit and bytecode are not shipped prompts.
+EXCLUDED_DIRS = ("evalkit", "__pycache__")
+
+# Source outside this folder that reaches the model (runtime.py imports IMAGE_INSTRUCTION from
+# there).
+EXTERNAL_PROMPT_MODULES: tuple[str, ...] = ("app.ai.media",)
+
+_R_MODELS = "SQLAlchemy table definitions: the shape of stored data, no text sent to a model"
+_R_ROUTES = "HTTP handlers and request bodies: no model message is built here"
+
+# Modules that leave the hash, each named with a reason. `test_pi_prompt_version_coverage` fails
+# on a stale entry and when an entry builds a model message or calls the model.
+NON_PROMPT_MODULES: dict[str, str] = {
+    **dict.fromkeys(
         (
-            "SYSTEM",
-            "BRAIN_SYSTEM",
-            "BRAIN_PROBLEMS",
-            "BRAIN_DECISIONS",
-            "BRAIN_VOICE",
-            "BRAIN_ASK",
-            "UNCONFIRMED_TRADE",
-        ),
+            "box_models.py brain_docs_models.py business_models.py business_profile_models.py "
+            "experience_models.py learning_models.py models.py open_item_models.py "
+            "problem_models.py quarantine_models.py solution_models.py think_models.py"
+        ).split(),
+        _R_MODELS,
     ),
-    ("think_prompt", ("PLAN_FIELD_HINT", "MOVE_LINES", "BLOCK", "MOVE_KEYS_TEXT")),
-    ("think_plan", ("MOVE_KEYS_TEXT",)),
-    (
-        "expert_advisor",
+    **dict.fromkeys(
         (
-            "PERSONA",
-            "STEER_RULES",
-            "UNCONFIRMED_TRADE_RULE",
-            "DIAGNOSE_RULES",
-            "LIGHT_RULES",
-            "JUDGE_RULES",
-            "PROMPT_RULE",
-            "VOICE_RULE",
-        ),
+            "brain_doc_routes.py brain_erase_routes.py brain_health_routes.py "
+            "brain_learning_routes.py brain_moderation_routes.py brain_visual_routes.py "
+            "business_profile_routes.py config_routes.py inbox_routes.py kapso_routes.py "
+            "open_items_routes.py read_routes.py routes.py solution_routes.py "
+            "staff_review_routes.py"
+        ).split(),
+        _R_ROUTES,
     ),
-    ("problem_extract", ("SYSTEM",)),
-    ("solution_free", ("RULES",)),
-    ("critique", ("SYSTEM",)),
-    ("brain_docs", ("BOX_SYSTEM", "SYSTEM")),
-    ("brain_prompt", ("CUTS",)),
-    ("learning_voice", ("SYSTEM",)),
-    ("learning_grader", ("SYSTEM", "RULE_BREAK_ITEMS", "QUALITY_ITEMS")),
-    ("learning_miner", ("SYSTEM",)),
-    ("learning_packs", ("SYSTEM",)),
-    ("learning_solutions_grow", ("SYSTEM", "ENTRY_SYSTEM", "LESSONS")),
-    ("ask_classifier", ("SYSTEM",)),
-    ("graph", ("ROUTER_SYSTEM", "INTENTS", "AGENTS")),
-    ("links", ("SUMMARY_SYSTEM",)),
-    ("owner_intents", ("SYSTEM",)),
-    (
-        "owner_asks",
-        (
-            "NO_QUESTIONS_RULE",
-            "RECALL_RULE",
-            "SUGGEST_RULE",
-            "NO_RECORDS_RULE",
-            "PLAN_RULE",
-            "REPEAT_RULE",
-        ),
-    ),
-    ("memory_block", ("SYSTEM_LINE", "FACTS", "LABELS", "LABELS_UR", "FACT_KINDS")),
-    ("runtime", ("IMAGE_INSTRUCTION",)),
-    ("style", ("REPAIR",)),
-    ("golden_replies", ("GOLDEN",)),
-    ("flow", ("GUIDANCE", "NORMAL", "TRANSITIONS", "OPENING")),
-    # Which handbook sections each state and topic selects, and how many examples: moving a section
-    # between states changes the prompt without changing handbook.json.
-    (
-        "spec_handbook",
-        (
-            "CORE",
-            "BY_STATE",
-            "TOPICS",
-            "GOLDEN_BY_STATE",
-            "FRAME",
-            "MAX_GOLDEN",
-            "MAX_CHARS",
-        ),
-    ),
-)
+    "schemas.py": "API request and response schemas: not sent to a model",
+    "__init__.py": "package marker",
+    "tools/__init__.py": "package marker",
+    "learning_audit.py": "this version machinery; it holds no prompt text",
+    "drift_check.py": "the drift report: it reads the version and the prompt files, sends nothing",
+    "latency.py": "per-turn timing log: no prompt text",
+}
 
 # Every pack file the prompt can draw on (industry, library, solutions, overlays, currency and the
 # sector rules): the whole tree under `packs/`.
 PACKS_ROOT = industry_packs.PACKS_DIR.parent
+
+# A digest is kept for the life of the process only when every file it needs could be read; a
+# failure is never cached, so the next call retries. A file that cannot be read is logged once.
+_CACHE: dict[tuple[str, str], str] = {}
+_WARNED: set[str] = set()
 
 
 def _normal(data: bytes) -> bytes:
@@ -132,87 +112,89 @@ def _normal(data: bytes) -> bytes:
     return data.replace(b"\r\n", b"\n")
 
 
-def _canon(value: Any) -> Any:
-    """A constant as plain JSON data, in an order that cannot depend on how a dict or set was built.
-    A pattern is its text and flags; an enum is its name. Anything else raises TypeError, so a
-    default repr (with a memory address) can never enter the hash."""
-    if value is None or isinstance(value, bool | int | float | str):
-        return value
-    if isinstance(value, bytes):
-        return {"bytes": value.hex()}
-    if isinstance(value, re.Pattern):
-        return {"re": value.pattern, "flags": int(value.flags)}
-    if isinstance(value, enum.Enum):
-        return {"enum": type(value).__name__, "name": value.name}
-    if isinstance(value, dict):
-        pairs = [[json.dumps(_canon(k), sort_keys=True), _canon(v)] for k, v in value.items()]
-        return {"dict": sorted(pairs, key=lambda pair: pair[0])}
-    if isinstance(value, set | frozenset):
-        return {"set": sorted(json.dumps(_canon(x), sort_keys=True) for x in value)}
-    if isinstance(value, list | tuple):
-        return [_canon(x) for x in value]
-    raise TypeError(type(value).__name__)
+def _read(path: Path, label: str) -> bytes | None:
+    """The file's bytes, or None after one warning per label (never the path, never the content)."""
+    try:
+        return path.read_bytes()
+    except OSError as exc:
+        if label not in _WARNED:
+            _WARNED.add(label)
+            logger.warning("pi_prompt_version_unreadable %s %s", label, type(exc).__name__)
+        return None
 
 
-def _text_of(value: Any) -> str:
-    """A constant as text: a string as it is, anything else as canonical JSON."""
-    if isinstance(value, str):
-        return value
-    return json.dumps(_canon(value), sort_keys=True, ensure_ascii=False)
-
-
-@lru_cache(maxsize=1)
-def _constants_digest() -> str:
+def _hash_files(items: Sequence[tuple[str, Path]]) -> tuple[str, bool]:
+    """Label and normalised bytes of each file in sorted label order: no absolute path, time or
+    machine name enters it. The flag is False when any file was unreadable (marked, not cached)."""
     digest = hashlib.sha256()
-    for module, names in PROMPT_CONSTANTS:
-        try:
-            target: Any = importlib.import_module(f"app.modules.pi.{module}")
-        except Exception as exc:  # noqa: BLE001 - a missing module never costs a reply its audit
-            logger.warning("pi_prompt_version_module_unreadable %s %s", module, type(exc).__name__)
-            target = None
-        for name in names:
-            marker = ""
-            body = ""
-            if target is None:
-                marker = "!module"
-            elif not hasattr(target, name):
-                marker = "!missing"
-                logger.warning("pi_prompt_version_constant_missing %s.%s", module, name)
-            else:
-                try:
-                    body = _text_of(getattr(target, name))
-                except TypeError as exc:
-                    marker = f"!unhashable:{exc}"
-                    logger.warning(
-                        "pi_prompt_version_constant_unhashable %s.%s %s", module, name, exc
-                    )
-            digest.update(f"{module}.{name}\n".encode())
-            digest.update(marker.encode() if marker else _normal(body.encode("utf-8")))
-            digest.update(b"\x00")
-    return digest.hexdigest()
-
-
-@lru_cache(maxsize=4)
-def _packs_digest(root: str) -> str:
-    """Relative path and (line-ending-normalised) bytes of every json file under the packs tree,
-    in sorted path order: no absolute path, time or machine name enters it."""
-    base = Path(root)
-    digest = hashlib.sha256()
-    for path in sorted(base.rglob("*.json"), key=lambda p: p.relative_to(base).as_posix()):
-        try:
-            data = path.read_bytes()
-        except OSError:
+    complete = True
+    for label, path in sorted(items, key=lambda item: item[0]):
+        data = _read(path, label)
+        if data is None:
+            complete = False
             data = b"-"
-        digest.update(path.relative_to(base).as_posix().encode("utf-8") + b"\x00")
+        digest.update(label.encode("utf-8") + b"\x00")
         digest.update(_normal(data))
         digest.update(b"\x00")
-    return digest.hexdigest()
+    return digest.hexdigest(), complete
+
+
+def _cached(kind: str, root: str, build: Callable[[], tuple[str, bool]]) -> str:
+    key = (kind, root)
+    if key in _CACHE:
+        return _CACHE[key]
+    value, complete = build()
+    if complete:
+        _CACHE[key] = value
+    return value
+
+
+def all_module_files(root: Path | None = None) -> dict[str, Path]:
+    """Every .py file under the pi folder (evalkit and bytecode folders excluded), by its path
+    relative to the folder, e.g. `service_conversation.py`, `tools/handlers.py`."""
+    base = PI_ROOT if root is None else root
+    found: dict[str, Path] = {}
+    for path in base.rglob("*.py"):
+        label = path.relative_to(base).as_posix()
+        if label.split("/")[0] in EXCLUDED_DIRS or "__pycache__" in label:
+            continue
+        found[label] = path
+    return found
+
+
+def prompt_source_files(root: Path | None = None) -> dict[str, Path]:
+    """The source files that make up the version: every module except those named on
+    NON_PROMPT_MODULES, and the external prompt modules (found without importing them)."""
+    files = {k: v for k, v in all_module_files(root).items() if k not in NON_PROMPT_MODULES}
+    for name in EXTERNAL_PROMPT_MODULES:
+        label = f"ext/{name}"
+        try:
+            spec = importlib.util.find_spec(name)
+        except (ImportError, ValueError):
+            spec = None
+        files[label] = Path(spec.origin) if spec is not None and spec.origin else Path(name)
+    return files
+
+
+def _sources_digest(root: str) -> str:
+    return _cached(
+        "sources", root, lambda: _hash_files(list(prompt_source_files(Path(root)).items()))
+    )
+
+
+def _packs_digest(root: str) -> str:
+    def build() -> tuple[str, bool]:
+        base = Path(root)
+        items = [(p.relative_to(base).as_posix(), p) for p in base.rglob("*.json")]
+        return _hash_files(items)
+
+    return _cached("packs", root, build)
 
 
 def clear_prompt_cache() -> None:
     """Forget the hashes held for this process (a deploy starts a new process; tests call this)."""
-    _constants_digest.cache_clear()
-    _packs_digest.cache_clear()
+    _CACHE.clear()
+    _WARNED.clear()
 
 
 def operator_guidance_digest(text: str | None) -> str:
@@ -226,17 +208,16 @@ def operator_guidance_digest(text: str | None) -> str:
 
 def prompt_version(operator_guidance: str | None = None) -> str:
     """Which prompt text was in force: a short hash of the specification handbook the model is
-    given every turn, what the platform specification replaced in it, the hardcoded prompt
-    constants, every pack file and, when given, the business's own operator guidance. It changes
-    only when one of those changes. Without guidance (the workspace-independent version, what the
-    reply stamp and the drift check compare) it stays the same for every workspace."""
+    given every turn, what the platform specification replaced in it, the source of every
+    prompt-bearing module, every pack file and, when given, the business's own operator guidance.
+    It changes only when one of those changes (an edit to a hashed module's source, a comment
+    included, counts). Without guidance (the workspace-independent version, what the reply stamp and
+    the drift check compare) it stays the same for every workspace."""
     digest = hashlib.sha256()
     for path in (spec_handbook.PATH, spec_handbook.SUPERSESSION):
-        try:
-            digest.update(_normal(path.read_bytes()))
-        except OSError:
-            digest.update(b"-")
-    digest.update(b"|prompts|" + _constants_digest().encode())
+        data = _read(path, f"spec/{path.name}")
+        digest.update(_normal(data) if data is not None else b"-")
+    digest.update(b"|sources|" + _sources_digest(str(PI_ROOT)).encode())
     digest.update(b"|packs|" + _packs_digest(str(PACKS_ROOT)).encode())
     if guidance := operator_guidance_digest(operator_guidance):
         digest.update(b"|guidance|" + guidance.encode())

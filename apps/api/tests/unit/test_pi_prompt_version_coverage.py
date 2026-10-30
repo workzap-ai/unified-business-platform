@@ -1,26 +1,23 @@
-"""FT-D3: `prompt_version` covers every hardcoded prompt and prompt-selection table, every pack file
-and the operator guidance, so a change to any of them changes the version (Fast-Track plan FT-D3;
-platform spec A.2 #8).
+"""FT-D3: `prompt_version` hashes the SOURCE of every prompt-bearing module, every pack file, the
+handbook and the operator guidance, so a change to any of them changes the version (Fast-Track plan
+FT-D3; platform spec A.2 #8).
 
-Scope of "prompt" (stated so the guard is not read as wider than it is): text and selection tables
-that are sent to a model as instructions, examples or context. Out of scope, listed with a reason
-in ALLOWED_MODULES / ALLOWED_NAMES below: customer-facing canned lines such as IDEAS_LEAD,
-DISCLOSURE_LINE, NO_IDEA_LINES, NO_MORE_IDEAS, the fixed lines, the language and outage notices and
-learning_voice.SEEDS / learning_arms.SEEDS (they are replies, not model prompts), and the rule
-banks of the reply linter, the safety detectors and the matchers (they decide what is allowed, they
-are not sent to a model). The scan fails when a new prompt-like constant is in neither the registry
-nor an allowlist. Code (as opposed to data tables) and prompts built inside f-strings are not
-hashed.
+Design (changed after the audit): a list of constants can never be complete, so the whole source of
+every module under app/modules/pi is hashed (evalkit excluded) unless the module is named on
+`learning_audit.NON_PROMPT_MODULES` with a reason. A new module is hashed by default. Any edit to a
+hashed module, a comment included, changes the version; the drift check then reports `stale_prompt`
+once after the deploy, which is intended (docs/pi-saas/pi-prompt-version.md).
+
+Not covered, stated plainly: behaviour driven by data outside the hashed files (database settings,
+learned lessons and examples) and the operator guidance except through its own optional hash.
 
 Scripted checks only: no model, no database."""
 
 import asyncio
 import datetime
-import importlib
 import json
 import logging
 import os
-import pkgutil
 import re
 import shutil
 import socket
@@ -28,85 +25,18 @@ import subprocess
 import sys
 import tempfile
 import time
-from functools import lru_cache
 from pathlib import Path
 from types import SimpleNamespace
-from typing import Any
 
 import pytest
 
-import app.modules.pi as pi_package
-from app.modules.pi import learning_audit, spec_handbook
+from app.modules.pi import drift_check, learning_audit, spec_handbook
 
 API_ROOT = Path(__file__).resolve().parents[2]
-CONSTANTS = [(m, n) for m, names in learning_audit.PROMPT_CONSTANTS for n in names]
-THRESHOLD = 120  # characters of text in a constant before it counts as prompt-like
-
-R_REPLY = "customer-facing canned line, notice or label: a reply, not a model prompt"
-R_RULES = (
-    "rule bank, detector, matcher or lookup table: decides what is allowed, not sent to a model"
+MODEL_CALL = re.compile(
+    r"Message\.(system|user|assistant)\(|LLMManager|\.chat\(|\.complete\(|manager\.generate"
+    r"|generate_structured|\.structured\("
 )
-
-# Modules with prompt-like constants that are NOT sent to a model (reasons by module group; the
-# grouping was made by name and by reading how the constants are used).
-ALLOWED_MODULES: dict[str, str] = {
-    **{
-        m: R_REPLY
-        for m in (
-            "brain_pdf brain_visuals business business_form business_profile buttons decisions "
-            "documents fixed_lines followup_policy hold language map_edit map_render map_share "
-            "open_items order_confirmation outage reply_voice solution_ask staff_review topics "
-            "warmup learning_feedback learning_arms whatsapp"
-        ).split()
-    },
-    **{
-        m: R_RULES
-        for m in (
-            "constitution constitution_langs safety safety_advice price_policy solution_lint "
-            "solution_rules solution_score think_lint slots knowledge list_items turn_coverage "
-            "feasibility idea_filter industry_overlap industry_packs industry_words solutions "
-            "solution_library solution_ideas taxonomy problems moves experience_scorer "
-            "currency_notes followups configuration box box_doc"
-        ).split()
-    },
-    "learning_audit": "this registry itself",
-}
-
-# Constants of a registered module that are NOT sent to a model.
-ALLOWED_NAMES: dict[tuple[str, str], str] = {
-    ("brain_docs", "COVER"): R_REPLY,
-    ("brain_docs", "REVISED"): R_REPLY,
-    ("graph", "INJECTION_MARKERS"): R_RULES,
-    ("learning_voice", "SEEDS"): R_REPLY,
-    ("learning_voice", "DROPPED"): R_RULES,
-    ("owner_intents", "ENGLISH_WORDS"): R_RULES,
-    ("owner_intents", "ROMAN_URDU_WORDS"): R_RULES,
-    ("runtime", "AGENTS"): "the same table as graph.AGENTS, hashed there",
-    ("runtime", "PI_RUNTIME_PERMISSIONS"): R_RULES,
-    ("runtime", "PI_PERMISSIONS"): R_RULES,
-    **{
-        ("runtime", n): R_REPLY
-        for n in (
-            "BRAIN_ACK_NOTICES BRAIN_HANDOFF_NOTICES HANDOFF_NOTICES MEDIA_NOTICES "
-            "MEDIA_UNREADABLE_NOTICES MEETING_NOTICES TEAM_CHECK_NOTICES TECH_DOWN_NOTICES "
-            "TOOL_FAIL_NOTICES VIDEO_UNREADABLE_NOTICES VOICE_UNREADABLE_NOTICES CLARIFY_REPLY "
-            "BRAIN_MEDIA_UNREADABLE_NOTICES"
-        ).split()
-    },
-    **{
-        ("service_conversation", n): R_RULES
-        for n in "ENGLISH NAMES ROMAN_URDU _SHORT_WORDS BOUNDARY_EFFECTS".split()
-    },
-    **{
-        ("service_conversation", n): R_REPLY
-        for n in (
-            "CHOICES HANDOFF_STATUS ESCALATION_TEXT ASK_AFTER_IDEAS ROMAN_OPENER NO_IDEA_LINES "
-            "NO_MORE_IDEAS NO_IDEA_AGAIN NO_IDEA_THIRD CONSENT_QUESTION SEND_QUESTION "
-            "INVOICES_COMING LINK_UNREAD BRIEF_SENT MEETING_ASKED RESCHEDULE_ASK "
-            "RESCHEDULE_ASKED WELCOME_BACK BRIEF_STATUS BRIEF_NEXT"
-        ).split()
-    },
-}
 
 
 @pytest.fixture(autouse=True)
@@ -116,51 +46,36 @@ def _fresh_cache():
     learning_audit.clear_prompt_cache()
 
 
-def _mutated(value: Any) -> Any:
-    if isinstance(value, str):
-        return value + " changed"
-    if isinstance(value, bool):
-        return not value
-    if isinstance(value, int):
-        return value + 1
-    if isinstance(value, dict):
-        return {**value, "_x": "changed"}
-    if isinstance(value, tuple):
-        return (*value, "changed")
-    if isinstance(value, list):
-        return [*value, "changed"]
-    if isinstance(value, frozenset | set):
-        return value | {"changed"}
-    raise AssertionError(type(value))
+def _tree(root: Path, files: dict[str, str | bytes]) -> Path:
+    for name, content in files.items():
+        target = root / name
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_bytes(content.encode("utf-8") if isinstance(content, str) else content)
+    return root
 
 
-def _leaves(value: Any):
-    if isinstance(value, str):
-        yield value
-    elif isinstance(value, dict):
-        for item in value.values():
-            yield from _leaves(item)
-    elif isinstance(value, list | tuple | set | frozenset):
-        for item in value:
-            yield from _leaves(item)
+def _version(monkeypatch, pi_root: Path, packs: Path | None = None, **kwargs) -> str:
+    """The version of a temporary pi folder (and packs folder), with its own allowlist if given."""
+    monkeypatch.setattr(learning_audit, "PI_ROOT", pi_root)
+    if packs is not None:
+        monkeypatch.setattr(learning_audit, "PACKS_ROOT", packs)
+    if "allow" in kwargs:
+        monkeypatch.setattr(learning_audit, "NON_PROMPT_MODULES", kwargs.pop("allow"))
+    learning_audit.clear_prompt_cache()
+    return learning_audit.prompt_version(kwargs.get("guidance"))
 
 
-@lru_cache(maxsize=1)
-def _candidates() -> dict[tuple[str, str], Any]:
-    """Every module-level UPPERCASE str, tuple, list, dict or set of a pi module that holds at least
-    THRESHOLD characters of text."""
-    found: dict[tuple[str, str], Any] = {}
-    for info in pkgutil.iter_modules(pi_package.__path__):
-        if info.ispkg:
-            continue
-        module = importlib.import_module(f"app.modules.pi.{info.name}")
-        for name, value in vars(module).items():
-            if not name.lstrip("_").isupper() or name.startswith("__"):
-                continue
-            if isinstance(value, str | tuple | list | dict | set | frozenset):
-                if sum(len(x) for x in _leaves(value)) >= THRESHOLD:
-                    found[(info.name, name)] = value
-    return found
+BASE = {
+    "prompt.py": 'SYSTEM = "You are pi."\n',
+    "other.py": "VALUE = 1\n",
+    "models.py": "class Row: pass\n",
+    "tools/handlers.py": 'DESC = "a tool"\n',
+    "evalkit/cases.py": "CASES = []\n",
+}
+ALLOW = {"models.py": "table definitions, no prompt text"}
+
+
+# ---- the guard over the real tree -------------------------------------------------------------
 
 
 def test_the_version_is_a_short_deterministic_hash():
@@ -169,135 +84,173 @@ def test_the_version_is_a_short_deterministic_hash():
     assert version == learning_audit.prompt_version()
 
 
-@pytest.mark.parametrize(("module", "name"), CONSTANTS)
-def test_changing_a_registered_prompt_constant_changes_the_version(monkeypatch, module, name):
-    target = importlib.import_module(f"app.modules.pi.{module}")
-    before = learning_audit.prompt_version()
-    monkeypatch.setattr(target, name, _mutated(getattr(target, name)))
-    learning_audit.clear_prompt_cache()
-    assert learning_audit.prompt_version() != before, f"{module}.{name} is not in the version"
+def test_every_module_is_hashed_or_named_on_the_allowlist_with_a_reason():
+    """The guard: every .py file under app/modules/pi (evalkit aside) is either hashed or on the
+    allowlist with a reason, never both, never neither."""
+    every = set(learning_audit.all_module_files())
+    hashed = {k for k in learning_audit.prompt_source_files() if not k.startswith("ext/")}
+    allowed = set(learning_audit.NON_PROMPT_MODULES)
+    assert every == hashed | allowed
+    assert not hashed & allowed
+    assert all(len(reason) >= 10 for reason in learning_audit.NON_PROMPT_MODULES.values())
+    assert "service_conversation.py" in hashed and "tools/handlers.py" in hashed
+    assert not [k for k in every if k.startswith("evalkit/")]
+    assert "ext/app.ai.media" in learning_audit.prompt_source_files()
 
 
-def test_every_prompt_like_constant_is_hashed_or_explained():
-    """The guard: scans EVERY module of the package, for str, tuple, list, dict and set constants of
-    120 characters or more. In a registered module a constant must be registered, be part of a
-    registered constant (_DIAGNOSE_BODY inside DIAGNOSE_RULES), or be on ALLOWED_NAMES; in any other
-    module the whole module must be on ALLOWED_MODULES."""
-    registry = {m: set(names) for m, names in learning_audit.PROMPT_CONSTANTS}
-    unexplained: list[str] = []
-    for (module, name), value in sorted(_candidates().items()):
-        if module in registry:
-            if name in registry[module] or (module, name) in ALLOWED_NAMES:
-                continue
-            target = importlib.import_module(f"app.modules.pi.{module}")
-            texts = [getattr(target, n) for n in registry[module] if hasattr(target, n)]
-            if isinstance(value, str) and any(isinstance(t, str) and value in t for t in texts):
-                continue
-            unexplained.append(f"{module}.{name}")
-        elif module not in ALLOWED_MODULES:
-            unexplained.append(f"{module}.{name}")
-    assert not unexplained, unexplained
-
-
-def test_the_allowlists_and_the_registry_have_no_stale_entries():
-    candidates = _candidates()
-    modules = {m for m, _ in candidates}
-    stale = [f"{m}.{n}" for (m, n) in ALLOWED_NAMES if (m, n) not in candidates]
-    stale += [m for m in ALLOWED_MODULES if m not in modules]
-    stale += [
-        f"{m}.{n}"
-        for m, n in CONSTANTS
-        if not hasattr(importlib.import_module(f"app.modules.pi.{m}"), n)
+def test_a_stale_allowlist_entry_fails():
+    missing = [
+        k for k in learning_audit.NON_PROMPT_MODULES if k not in learning_audit.all_module_files()
     ]
-    assert not stale, stale
-    assert not set(ALLOWED_MODULES) & {m for m, _ in learning_audit.PROMPT_CONSTANTS}
+    assert not missing, missing
 
 
-def test_moving_a_handbook_section_between_states_changes_the_version(monkeypatch):
-    states = [s for s, ids in spec_handbook.BY_STATE.items() if ids]
-    first, second = states[0], states[1]
-    moved = spec_handbook.BY_STATE[first][0]
-    changed = dict(spec_handbook.BY_STATE)
-    changed[first] = tuple(i for i in changed[first] if i != moved)
-    if moved not in changed[second]:
-        changed[second] = (*changed[second], moved)
-    before = learning_audit.prompt_version()
-    monkeypatch.setattr(spec_handbook, "BY_STATE", changed)
-    learning_audit.clear_prompt_cache()
-    assert learning_audit.prompt_version() != before
+def test_an_allowlisted_module_builds_no_model_message_and_calls_no_model():
+    offenders = []
+    files = learning_audit.all_module_files()
+    for label in learning_audit.NON_PROMPT_MODULES:
+        text = files[label].read_text(encoding="utf-8", errors="replace")
+        if MODEL_CALL.search(text):
+            offenders.append(label)
+    assert not offenders, offenders
 
 
-def test_changing_a_handbook_topic_pattern_changes_the_version(monkeypatch):
-    topics = spec_handbook.TOPICS
-    before = learning_audit.prompt_version()
-    first = topics[0]
-    edited = (re.compile(first[0].pattern + "|zzz", first[0].flags), first[1])
-    monkeypatch.setattr(spec_handbook, "TOPICS", (edited, *topics[1:]))
-    learning_audit.clear_prompt_cache()
-    assert learning_audit.prompt_version() != before
+# ---- source files: every kind of edit to a hashed module ---------------------------------------
 
 
-def test_a_customer_facing_line_is_out_of_scope_and_does_not_move_the_version(monkeypatch):
-    """The documented boundary: a canned reply is not a model prompt."""
-    from app.modules.pi import service_conversation
-
-    before = learning_audit.prompt_version()
-    monkeypatch.setattr(service_conversation, "NO_MORE_IDEAS", {"en": "something else?"})
-    learning_audit.clear_prompt_cache()
-    assert learning_audit.prompt_version() == before
+def test_a_new_module_is_hashed_by_default(monkeypatch):
+    with tempfile.TemporaryDirectory() as tmp:
+        root = _tree(Path(tmp), BASE)
+        before = _version(monkeypatch, root, allow=ALLOW)
+        _tree(root, {"brand_new.py": "x = 1\n"})
+        assert _version(monkeypatch, root, allow=ALLOW) != before
 
 
-# ---- the canonical form -----------------------------------------------------------------------
+def test_new_text_in_a_hashed_module_changes_the_version(monkeypatch):
+    with tempfile.TemporaryDirectory() as tmp:
+        root = _tree(Path(tmp), BASE)
+        before = _version(monkeypatch, root, allow=ALLOW)
+        new_constant = 'NEW_RULE = "' + ("never promise a date to the owner; " * 5) + '"\n'
+        assert len(new_constant) > 150
+        with open(root / "other.py", "a", encoding="utf-8") as handle:
+            handle.write(new_constant)
+        assert _version(monkeypatch, root, allow=ALLOW) != before
 
 
-def test_a_non_json_object_is_rejected_with_its_type_name_only():
-    with pytest.raises(TypeError) as error:
-        learning_audit._text_of(object())
-    assert str(error.value) == "object" and "0x" not in str(error.value)
+@pytest.mark.parametrize(
+    ("label", "edit"),
+    [
+        ("prompt.py", 'SYSTEM = "You are pi, say hello."\n'),  # a constant
+        ("prompt.py", 'SYSTEM = "You are pi."\n# a comment\n'),  # a comment counts, by design
+        ("prompt.py", 'SYSTEM = "You are pi."\nx = f"Say {1}"\n'),  # an inline f-string
+        ("tools/handlers.py", 'DESC = "a different tool"\n'),  # the tools folder is hashed
+    ],
+)
+def test_any_edit_to_a_hashed_module_changes_the_version(monkeypatch, label, edit):
+    with tempfile.TemporaryDirectory() as tmp:
+        root = _tree(Path(tmp), BASE)
+        before = _version(monkeypatch, root, allow=ALLOW)
+        (root / label).write_text(edit, encoding="utf-8")
+        assert _version(monkeypatch, root, allow=ALLOW) != before
 
 
-def test_the_canonical_text_does_not_depend_on_set_or_dict_order():
-    assert learning_audit._text_of({"b", "a", "c"}) == learning_audit._text_of({"c", "a", "b"})
-    assert learning_audit._text_of({"x": 1, "y": 2}) == learning_audit._text_of({"y": 2, "x": 1})
-    assert learning_audit._text_of(frozenset({("a", 1), ("b", 2)})) == learning_audit._text_of(
-        frozenset({("b", 2), ("a", 1)})
-    )
+def test_edits_to_a_named_non_prompt_module_or_to_evalkit_do_not_change_the_version(monkeypatch):
+    with tempfile.TemporaryDirectory() as tmp:
+        root = _tree(Path(tmp), BASE)
+        before = _version(monkeypatch, root, allow=ALLOW)
+        (root / "models.py").write_text("class Row:\n    # changed\n    pass\n", encoding="utf-8")
+        (root / "evalkit/cases.py").write_text("CASES = [1, 2, 3]\n", encoding="utf-8")
+        (root / "notes.txt").write_text("not python", encoding="utf-8")
+        os.utime(root / "prompt.py", (1_000_000_000, 1_000_000_000))  # another timestamp
+        assert _version(monkeypatch, root, allow=ALLOW) == before
 
 
-def test_a_pattern_is_hashed_as_its_text_and_flags():
-    same = learning_audit._text_of((re.compile("a|b", re.IGNORECASE),))
-    assert same == learning_audit._text_of((re.compile("a|b", re.IGNORECASE),))
-    assert same != learning_audit._text_of((re.compile("a|b"),))
-    assert same != learning_audit._text_of((re.compile("a|c", re.IGNORECASE),))
+def test_a_module_leaves_the_hash_only_by_being_named_on_the_allowlist(monkeypatch):
+    with tempfile.TemporaryDirectory() as tmp:
+        root = _tree(Path(tmp), BASE)
+        before = _version(monkeypatch, root, allow={})
+        (root / "models.py").write_text("class Row:\n    pass  # edited\n", encoding="utf-8")
+        assert _version(monkeypatch, root, allow={}) != before  # not named: hashed
+        assert _version(monkeypatch, root, allow=ALLOW) != before  # now left out: another digest
 
 
-def test_a_constant_that_cannot_be_hashed_is_marked_logged_and_leaks_no_address(
+def test_renaming_or_removing_a_hashed_module_changes_the_version(monkeypatch):
+    with tempfile.TemporaryDirectory() as tmp:
+        root = _tree(Path(tmp), BASE)
+        before = _version(monkeypatch, root, allow=ALLOW)
+        (root / "other.py").rename(root / "renamed.py")
+        renamed = _version(monkeypatch, root, allow=ALLOW)
+        assert renamed != before
+        (root / "renamed.py").unlink()
+        assert _version(monkeypatch, root, allow=ALLOW) not in (before, renamed)
+
+
+def test_line_endings_creation_order_and_location_cannot_change_the_version(monkeypatch):
+    crlf = {k: (v.replace("\n", "\r\n") if isinstance(v, str) else v) for k, v in BASE.items()}
+    with tempfile.TemporaryDirectory() as a, tempfile.TemporaryDirectory() as b:
+        with tempfile.TemporaryDirectory() as c:
+            one = _version(monkeypatch, _tree(Path(a), BASE), allow=ALLOW)
+            two = _version(monkeypatch, _tree(Path(b), crlf), allow=ALLOW)
+            reordered = dict(reversed(list(BASE.items())))
+            three = _version(monkeypatch, _tree(Path(c), reordered), allow=ALLOW)
+    assert one == two == three
+
+
+def test_a_copy_of_the_real_tree_has_the_same_version_and_real_edits_move_it(monkeypatch):
+    """The real source is what the version reads: a copy gives the SAME version from another place;
+    editing a hashed module of the copy moves it; editing a named non-prompt module does not. Repo
+    files are never edited."""
+    real = learning_audit.prompt_version()
+    ignore = shutil.ignore_patterns("__pycache__", "packs", "fonts", "spec")
+    with tempfile.TemporaryDirectory() as tmp:
+        copy = Path(tmp) / "pi"
+        shutil.copytree(learning_audit.PI_ROOT, copy, ignore=ignore)
+        same = _version(monkeypatch, copy)
+        assert same == real
+        with open(copy / "models.py", "a", encoding="utf-8") as handle:
+            handle.write("\n# an edit to a named non-prompt module\n")
+        assert _version(monkeypatch, copy) == real
+        with open(copy / "service_conversation.py", "a", encoding="utf-8") as handle:
+            handle.write("\n# an edit to a hashed module\n")
+        assert _version(monkeypatch, copy) != real
+
+
+# ---- unreadable files: logged once, never cached as permanent ----------------------------------
+
+
+def test_an_unreadable_module_is_logged_once_and_retried_on_the_next_call(monkeypatch, caplog):
+    with tempfile.TemporaryDirectory() as tmp:
+        root = _tree(Path(tmp), {"prompt.py": 'SYSTEM = "x"\n'})
+        (root / "broken.py").mkdir()  # a folder named like a module: reading it raises OSError
+        monkeypatch.setattr(learning_audit, "PI_ROOT", root)
+        monkeypatch.setattr(learning_audit, "NON_PROMPT_MODULES", {})
+        learning_audit.clear_prompt_cache()
+        with caplog.at_level(logging.WARNING, logger=learning_audit.logger.name):
+            broken = learning_audit.prompt_version()
+            again = learning_audit.prompt_version()
+        assert broken == again and re.fullmatch(r"[0-9a-f]{12}", broken)
+        assert caplog.text.count("pi_prompt_version_unreadable broken.py") == 1  # once
+        (root / "broken.py").rmdir()
+        (root / "broken.py").write_text("FIXED = 1\n", encoding="utf-8")
+        fixed = learning_audit.prompt_version()  # the failure was not cached
+        assert fixed != broken
+
+
+def test_an_unreadable_pack_file_or_handbook_is_logged_and_never_breaks_the_version(
     monkeypatch, caplog
 ):
-    from app.modules.pi import critique
-
-    monkeypatch.setattr(critique, "SYSTEM", object())
-    learning_audit.clear_prompt_cache()
-    with caplog.at_level(logging.WARNING, logger=learning_audit.logger.name):
-        first = learning_audit.prompt_version()
-    assert "pi_prompt_version_constant_unhashable critique.SYSTEM" in caplog.text
-    monkeypatch.setattr(critique, "SYSTEM", object())  # another object, another memory address
-    learning_audit.clear_prompt_cache()
-    assert learning_audit.prompt_version() == first
-
-
-def test_a_missing_module_or_constant_is_logged_and_never_breaks_the_version(monkeypatch, caplog):
-    monkeypatch.setattr(
-        learning_audit,
-        "PROMPT_CONSTANTS",
-        (("no_such_module_xyz", ("A",)), ("critique", ("NO_SUCH_NAME",))),
-    )
-    learning_audit.clear_prompt_cache()
-    with caplog.at_level(logging.WARNING, logger=learning_audit.logger.name):
-        version = learning_audit.prompt_version()
-    assert re.fullmatch(r"[0-9a-f]{12}", version)
-    assert "pi_prompt_version_module_unreadable no_such_module_xyz" in caplog.text
-    assert "pi_prompt_version_constant_missing critique.NO_SUCH_NAME" in caplog.text
+    with tempfile.TemporaryDirectory() as tmp:
+        packs = Path(tmp) / "packs"
+        packs.mkdir()
+        (packs / "x.json").mkdir()  # unreadable as a file
+        monkeypatch.setattr(learning_audit, "PACKS_ROOT", packs)
+        monkeypatch.setattr(spec_handbook, "SUPERSESSION", Path(tmp) / "missing.json")
+        learning_audit.clear_prompt_cache()
+        with caplog.at_level(logging.WARNING, logger=learning_audit.logger.name):
+            version = learning_audit.prompt_version()
+        assert re.fullmatch(r"[0-9a-f]{12}", version)
+        assert "pi_prompt_version_unreadable x.json" in caplog.text
+        assert "pi_prompt_version_unreadable spec/missing.json" in caplog.text
 
 
 # ---- the pack files ---------------------------------------------------------------------------
@@ -309,47 +262,25 @@ FILES = {
 }
 
 
-def _pack_tree(root: Path, files: dict[str, bytes], order: list[str] | None = None) -> None:
-    for name in order or list(files):
-        target = root / name
-        target.parent.mkdir(parents=True, exist_ok=True)
-        target.write_bytes(files[name])
-
-
-def _version_of(monkeypatch, root: Path, guidance: str | None = None) -> str:
-    monkeypatch.setattr(learning_audit, "PACKS_ROOT", root)
-    learning_audit.clear_prompt_cache()
-    return learning_audit.prompt_version(guidance)
-
-
-def test_a_pack_file_edit_add_or_removal_changes_the_version(monkeypatch):
-    with tempfile.TemporaryDirectory() as tmp:
-        root = Path(tmp)
-        _pack_tree(root, {"industry/a.json": b'{"k": 1}'})
-        base = _version_of(monkeypatch, root)
-        assert _version_of(monkeypatch, root) == base  # unchanged files, same version
-        (root / "industry/a.json").write_bytes(b'{"k": 2}')
-        edited = _version_of(monkeypatch, root)
+def test_a_pack_file_edit_add_removal_or_rename_changes_the_version(monkeypatch):
+    with tempfile.TemporaryDirectory() as pi, tempfile.TemporaryDirectory() as tmp:
+        root = _tree(Path(pi), BASE)
+        packs = _tree(Path(tmp), {"industry/a.json": b'{"k": 1}'})
+        base = _version(monkeypatch, root, packs, allow=ALLOW)
+        assert _version(monkeypatch, root, packs, allow=ALLOW) == base
+        (packs / "industry/a.json").write_bytes(b'{"k": 2}')
+        edited = _version(monkeypatch, root, packs, allow=ALLOW)
         assert edited != base
-        (root / "industry/b.json").write_bytes(b"{}")
-        added = _version_of(monkeypatch, root)
+        (packs / "industry/b.json").write_bytes(b"{}")
+        added = _version(monkeypatch, root, packs, allow=ALLOW)
         assert added not in (base, edited)
-        (root / "industry/b.json").unlink()
-        assert _version_of(monkeypatch, root) == edited
-
-
-def test_a_renamed_pack_file_changes_the_version(monkeypatch):
-    with tempfile.TemporaryDirectory() as tmp:
-        root = Path(tmp)
-        (root / "a.json").write_bytes(b"{}")
-        before = _version_of(monkeypatch, root)
-        (root / "a.json").rename(root / "b.json")
-        assert _version_of(monkeypatch, root) != before
+        (packs / "industry/b.json").unlink()
+        assert _version(monkeypatch, root, packs, allow=ALLOW) == edited
+        (packs / "industry/a.json").rename(packs / "industry/c.json")
+        assert _version(monkeypatch, root, packs, allow=ALLOW) != edited
 
 
 def test_changing_a_real_pack_file_changes_the_version_using_a_temp_copy(monkeypatch):
-    """The real tree is what the version reads: a copy of it gives the SAME version from another
-    location, and editing one file of the copy moves it. Repo files are never edited."""
     real = learning_audit.PACKS_ROOT
     assert real.is_dir() and any(real.rglob("*.json"))
     learning_audit.clear_prompt_cache()
@@ -357,49 +288,30 @@ def test_changing_a_real_pack_file_changes_the_version_using_a_temp_copy(monkeyp
     with tempfile.TemporaryDirectory() as tmp:
         copy = Path(tmp) / "packs"
         shutil.copytree(real, copy)
-        assert _version_of(monkeypatch, copy) == real_version
+        monkeypatch.setattr(learning_audit, "PACKS_ROOT", copy)
+        learning_audit.clear_prompt_cache()
+        assert learning_audit.prompt_version() == real_version
         target = sorted(copy.rglob("*.json"))[0]
         target.write_bytes(target.read_bytes() + b"\n ")
-        assert _version_of(monkeypatch, copy) != real_version
+        learning_audit.clear_prompt_cache()
+        assert learning_audit.prompt_version() != real_version
 
 
-def test_file_creation_order_and_absolute_location_cannot_change_the_version(monkeypatch):
-    with tempfile.TemporaryDirectory() as one, tempfile.TemporaryDirectory() as two:
-        _pack_tree(Path(one), FILES, list(FILES))
-        _pack_tree(Path(two), FILES, list(reversed(list(FILES))))
-        assert _version_of(monkeypatch, Path(one)) == _version_of(monkeypatch, Path(two))
-
-
-def test_line_endings_of_the_pack_files_cannot_change_the_version(monkeypatch):
+def test_pack_line_endings_order_location_and_non_json_files_cannot_change_the_version(
+    monkeypatch,
+):
     crlf = {k: v.replace(b"\n", b"\r\n") for k, v in FILES.items()}
-    with tempfile.TemporaryDirectory() as one, tempfile.TemporaryDirectory() as two:
-        _pack_tree(Path(one), FILES)
-        _pack_tree(Path(two), crlf)
-        assert _version_of(monkeypatch, Path(one)) == _version_of(monkeypatch, Path(two))
-
-
-def test_touching_a_pack_file_or_adding_a_non_json_file_does_not_change_the_version(monkeypatch):
-    with tempfile.TemporaryDirectory() as tmp:
-        root = Path(tmp)
-        _pack_tree(root, FILES)
-        base = _version_of(monkeypatch, root)
-        os.utime(root / "industry/a.json", (1_000_000_000, 1_000_000_000))  # another timestamp
-        (root / "industry/notes.txt").write_text("not a pack", encoding="utf-8")
-        assert _version_of(monkeypatch, root) == base
-
-
-def test_dictionary_order_of_a_prompt_constant_cannot_change_the_version(monkeypatch):
-    from app.modules.pi import flow
-
-    forward = dict(flow.GUIDANCE)
-    backward = dict(reversed(list(flow.GUIDANCE.items())))
-    assert list(forward) != list(backward)
-    monkeypatch.setattr(flow, "GUIDANCE", forward)
-    learning_audit.clear_prompt_cache()
-    first = learning_audit.prompt_version()
-    monkeypatch.setattr(flow, "GUIDANCE", backward)
-    learning_audit.clear_prompt_cache()
-    assert learning_audit.prompt_version() == first
+    with tempfile.TemporaryDirectory() as pi, tempfile.TemporaryDirectory() as a:
+        with tempfile.TemporaryDirectory() as b, tempfile.TemporaryDirectory() as c:
+            root = _tree(Path(pi), BASE)
+            one = _version(monkeypatch, root, _tree(Path(a), FILES), allow=ALLOW)
+            two = _version(monkeypatch, root, _tree(Path(b), crlf), allow=ALLOW)
+            rev = dict(reversed(list(FILES.items())))
+            three = _version(monkeypatch, root, _tree(Path(c), rev), allow=ALLOW)
+            assert one == two == three
+            (Path(a) / "industry/notes.txt").write_text("not a pack", encoding="utf-8")
+            os.utime(Path(a) / "industry/a.json", (1_000_000_000, 1_000_000_000))
+            assert _version(monkeypatch, root, Path(a), allow=ALLOW) == one
 
 
 # ---- the operator guidance --------------------------------------------------------------------
@@ -482,46 +394,48 @@ def test_the_version_takes_no_message_or_customer_input():
         )
 
 
-# ---- one input at a time, controls ------------------------------------------------------------
+# ---- one input at a time, and what the drift check does with a changed version -----------------
 
 
 def test_exactly_one_input_changes_the_version_and_the_other_two_do_not(monkeypatch):
-    """(a) hardcoded prompt, (b) pack file, (c) operator guidance: each alone moves the version,
-    and the version returns to the base when it is put back."""
-    from app.modules.pi import critique
+    """(a) a hardcoded prompt (module source), (b) a pack file, (c) the operator guidance: each
+    alone moves the version, and the version returns to the base when it is put back."""
+    with tempfile.TemporaryDirectory() as pi, tempfile.TemporaryDirectory() as tmp:
+        root = _tree(Path(pi), BASE)
+        packs = _tree(Path(tmp), FILES)
+        base = _version(monkeypatch, root, packs, allow=ALLOW)
 
-    with tempfile.TemporaryDirectory() as tmp:
-        root = Path(tmp)
-        _pack_tree(root, FILES)
-        base = _version_of(monkeypatch, root)
-
-        monkeypatch.setattr(critique, "SYSTEM", critique.SYSTEM + " changed")
-        a = _version_of(monkeypatch, root)
-        monkeypatch.undo()
+        (root / "prompt.py").write_text('SYSTEM = "You are pi, changed."\n', encoding="utf-8")
+        a = _version(monkeypatch, root, packs, allow=ALLOW)
+        (root / "prompt.py").write_text(BASE["prompt.py"], encoding="utf-8")
         assert a != base
-        assert _version_of(monkeypatch, root) == base
+        assert _version(monkeypatch, root, packs, allow=ALLOW) == base
 
-        (root / "industry/a.json").write_bytes(b'{"k": 99}\n')
-        b = _version_of(monkeypatch, root)
-        (root / "industry/a.json").write_bytes(FILES["industry/a.json"])
+        (packs / "industry/a.json").write_bytes(b'{"k": 99}\n')
+        b = _version(monkeypatch, root, packs, allow=ALLOW)
+        (packs / "industry/a.json").write_bytes(FILES["industry/a.json"])
         assert b != base
-        assert _version_of(monkeypatch, root) == base
+        assert _version(monkeypatch, root, packs, allow=ALLOW) == base
 
-        c = _version_of(monkeypatch, root, "Be warm and short.")
+        c = _version(monkeypatch, root, packs, allow=ALLOW, guidance="Be warm and short.")
         assert c != base
-        assert _version_of(monkeypatch, root, None) == base
-
         assert len({base, a, b, c}) == 4
 
 
-def test_unrelated_inputs_are_controls_that_do_not_move_the_version(monkeypatch):
-    from app.modules.pi import critique, service_conversation
-
-    base = learning_audit.prompt_version()
-    monkeypatch.setattr(critique, "NOT_A_PROMPT", "anything", raising=False)
-    monkeypatch.setattr(service_conversation, "_SHORT_WORDS", "changed", raising=False)
-    learning_audit.clear_prompt_cache()
-    assert learning_audit.prompt_version() == base
+def test_a_changed_version_is_a_one_time_stale_prompt_finding_not_an_error():
+    """The documented consequence of hashing source: after a deploy that edited any hashed module,
+    replies stamped with the old version read as stale until a new reply is stamped."""
+    summary = drift_check.stamp_summary(
+        [{"prompt_version": "oldversion01", "pack_versions": {"build": "x"}}],
+        {"prompt": learning_audit.prompt_version()},
+    )
+    codes = [f.code for f in drift_check.stamp_findings(summary)]
+    assert codes == ["stale_prompt"]
+    fresh = drift_check.stamp_summary(
+        [{"prompt_version": learning_audit.prompt_version(), "pack_versions": {"build": "x"}}],
+        {"prompt": learning_audit.prompt_version()},
+    )
+    assert drift_check.stamp_findings(fresh) == []
 
 
 # ---- nothing from the machine or the clock enters the hash ------------------------------------
