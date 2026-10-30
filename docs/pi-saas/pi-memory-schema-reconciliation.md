@@ -1,0 +1,196 @@
+# One memory design: P-1, D2, D3/S6 and P-4 reconciled (documentation only)
+
+Status: PROPOSAL for owner review, 2026-10-30. **No migration, SQL file or code exists.** Migration `0053` stays
+reserved to lane U. Everything labelled "D2 AMENDMENT" changes something the owner approved (D2: constraints, tried and
+cause as JSONB columns on `pi_problems`, one migration; D3: S6-a reuses `memory_block`, no new table).
+
+Resolves conflicts C1, C2, C3 and C12 of `pi-p1-p5-consolidated-review.md`. Inputs: `pi-p1-schema-review.md`
+(`02970b2`), `pi-fast-track-plan.md` (D2, D3, FT-B2a, FT-S6), `pi-decision-records-audit.md` (`7ad1df9`).
+
+Read for this document, from the worktree at `cc462c5` (= `origin/main`): `memory_block.py` (whole file),
+`slot_carry.py` (whole file), `reply_gates.known_in_record` (lines 238-256), `constitution.REASK_FIELDS` and its R-MEM-02
+use (lines ~877-983), the `PiMemory` model (`models.py:441-462`). I did not re-read `problems.py` (the P-1 review
+did) or the FT-02 commits (`pi/s-ft02`, still changing). Nothing was run.
+
+## 1. Facts found in the code that decide the design
+
+1. **`memory_block.load()` reads only kinds `context` and `preference`** (`memory_block.py:226`), and only keys in
+   `FACT_CAP` for `context` rows (line 236). The business-peer query reads only kind `context` (line 257). A `requirement`
+   row is therefore invisible to today's reader and never reaches the 700-character block. The `PiMemory` CHECK
+   already allows `requirement` (`models.py:455`), so no migration is needed for it.
+2. **Adding a key to `FACTS` has five side effects** (this is the "ASKED_KEYS side effect" of the P-4 audit, in full):
+   - `slot_carry.ASKED_KEYS = frozenset(FACTS keys)` (`slot_carry.py:37`): a new key becomes a carried "asked fact".
+   - `build()` puts every `FACTS` key into the prompt block in priority order (`memory_block.py:183-185`), so it competes
+     for the 700 characters.
+   - `refresh()` writes every `FACTS` key that `profile` holds as a `context` row (lines 327-329).
+   - `merge_profile()` fills it from the conversation profile (lines 201-205).
+   - `memory_reply()` indexes `LABELS[k]` and `LABELS_UR[k]` for every key in `facts_of(block)` (lines 429-430): a `FACTS`
+     key with no label is a `KeyError` in the answer to "what do you remember about me?".
+3. **`asked_facts` is written from `memory_block.asked_keys(reply)`** (service_conversation.py:6553-6555), which matches a
+   reply's question against `constitution.REASK_FIELDS`. Only keys with a pattern there can ever be "asked"; the R-MEM-02
+   lint (constitution.py ~954-983) reads `profile.get(field) or block.get(field)` for those same keys only.
+4. **`known_in_record` (reply_gates.py:238) reads only the problem record's `missing` list** (`since`, `how_often`). It
+   cannot see a budget, a staff count, a tool or a workflow; that is the gap S6 closes.
+5. **`erase_customer` calls `memory_block.forget`, which deletes every `pi_memories` row of the customer with no kind
+   filter** (`memory_block.py:396-405`). A new row of any kind is erased with the customer; a `pi_problems` column is
+   erased with its row (P-1 review, from `brain_erase.py:141-190`).
+6. **`refresh()` archives the older value and prunes archived history to `MAX_ARCHIVED = 30` per customer, counted across
+   all kinds** (lines 380-393). Requirement history would share that 30 with facts and preferences.
+7. **A memory row is `key: value`, content at most 500 characters, key `[a-z_]{2,20}`** (`ROW`, line 106; model line 461).
+   `clean_value()` takes its cap from `FACT_CAP` and defaults to 40 for an unknown key (line 121), so every new key must
+   be added to a cap table or its value is cut to 40 characters.
+
+## 2. The design (store by store)
+
+| Store | Holds | Why this store | Reader |
+|---|---|---|---|
+| **A. `pi_problems`, four new nullable columns** | per problem: `constraints` (JSONB), `tried` (JSONB list), `cause` (JSONB), `expected_outcome` (Text 300) | these facts belong to one problem; each problem can differ | `problems.noted_context()` (compact strings, `missing` gains `budget`, `cause` only when unsaid) |
+| **B. `pi_memories`, kind `requirement`** | per customer or business: `workflows`, `roles`, `systems`, `budget`; existing `FACTS` keys (`current_tools`, `goal`, `team_size`) stay where they are | one value for the whole business; a correction archives the old one; erase already covers it | new `memory_block.load_requirements()` (section 3), **not** `load()` |
+| **C. derived at read time** | the requirement sheet and its completeness score (FT-REQ, `requirements.py`) | nothing stored twice, nothing to drift | `requirements.sheet()` merges A (problem value) over B (business value) |
+| **D. conversation brief** | `wants` (Part 19, per conversation, as reported by its author; I did not read it), `asked_facts`, `closed_slots`, decision keys | per-conversation working state | unchanged; only `slot_carry` copies, and only what it copies today |
+
+Problem value wins over business value for budget and staff (D2 AMENDMENT A2 below); the sheet records which one it used.
+
+## 3. The reader S6 / `fact_ask` needs, without widening the prompt block
+
+- **Do not add the new keys to `FACTS`.** Add a separate `REQUIREMENT_FACTS` tuple (key, cap, level) beside it, with its
+  own labels. `FACTS`, `FACT_CAP`, `BUSINESS_KEYS`, `build()`, `facts_of()`, `merge_profile()`, `refresh()` and
+  `memory_reply()` keep their current inputs, so the 700-character block, the `ASKED_KEYS` carry and the label lookup are
+  untouched.
+- **New `load_requirements(session, scope, conversation, customer) -> dict[str, str]`** in `memory_block.py`: same scope
+  filter (tenant, environment, customer, `status == 'active'`), `kind == 'requirement'`, a limit, parse with `parse_row`,
+  business-level keys also read from opted-in peers of the same business (the same join `load()` uses for kind `context`,
+  with `kind == 'requirement'`). Same error discipline as `load_safely`: a savepoint, and on any error an empty dict.
+- **Its output goes to a new context key, `requirements_known`, not into `what_i_know`.** It reaches the model only as
+  part of the FT-REQ sheet (its own cap, proposed 600 characters, D2 AMENDMENT A5), and only when `fact_ask` is on or the
+  sheet is asked for. The existing 700-character block is not changed.
+- **Gate:** a new `reply_gates.known_requirement(reply, requirements, noted)` in the style of `known_in_record`: when the
+  reply asks about a budget, staff, tool, workflow or role and `requirements_known` (or the problem columns) already
+  holds it, the reply is sent back with "it asks X, but you already hold it: use it". Conservative in the same way:
+  no record, no block. Opt-in under the same `response_rules.brain` rule (read only when exactly `true`).
+- **Write path:** `refresh()` gets a sibling `refresh_requirements()` (also `begin_nested`), writing `requirement` rows
+  from the extractor's note. It uses the same `clean_value` rules (redact first, roles not names, phone/email rejected)
+  with the cap taken from `REQUIREMENT_FACTS`.
+- **Honesty (R-PRIV-06):** `memory_reply()` must also list the `requirement` rows ("what do you remember about me?"),
+  otherwise pi keeps facts it will not tell. This is part of S6, with its own label table (EN and Roman Urdu; Arabic
+  follows the existing `fallback (listed)` pattern).
+
+## 4. ASKED_KEYS: exact handling
+
+| Question | Decision |
+|---|---|
+| Do requirement keys enter `slot_carry.ASKED_KEYS`? | **No by default.** `ASKED_KEYS` stays `FACTS` keys. A requirement question that was asked and left unanswered would then not be carried to the next chat, which is today's behaviour for everything else. |
+| If the owner wants unanswered requirement questions carried too | add a second frozenset `REQUIREMENT_ASKED` in `slot_carry.py` and matching patterns in `constitution` (a new `REASK_REQUIREMENT` tuple, not an edit of `REASK_FIELDS`), then make `carried()` accept the union. Costs one more regex table and tests; **D2 AMENDMENT A4**. |
+| `memory_block.asked_keys(reply)` | unchanged (reads `REASK_FIELDS`). A sibling `asked_requirement_keys(reply)` reads `REASK_REQUIREMENT` only if A4 is approved. |
+| R-MEM-02 lint | unchanged; the new gate is `known_requirement`, a separate function, so the existing lint cannot regress. |
+| `memory_reply` label lookup | unchanged for `FACTS`; the requirement labels live in their own table, so no `KeyError` path is created. |
+
+## 5. Carry across conversations
+
+- Store A and B rows belong to the customer, so every later conversation reads them with no copy and no staleness
+  (unlike a brief copy). This is the S6 acceptance ("not asked again after 30 messages or in a new chat").
+- `slot_carry` stays as it is (closed slots 30 days, asked facts 2 days, marked `carried`, made once). It does not copy
+  requirements, decisions or wants.
+- **Decisions (P-4):** the gap found is `declines`, `box_declined_at`, `offer_declined`, `approval` and `revision_requested`
+  dying with the conversation. See section 6.
+- **`wants` (Part 19):** stay per conversation in the brief. S6 may later promote a durable want to a `requirement` row
+  (key `wants`, cap 160). Not in this migration; **D2 AMENDMENT A8**.
+
+## 6. How the P-4 decision-record options fit
+
+| Option | Fits this design? | Reason |
+|---|---|---|
+| **A** read-only function over `pi_box_transitions`, `pi_solution_boxes`, `pi_brain_documents`, `pi_brain_payments` | **Yes. Recommended first.** No store, no migration, no erase change (box and transitions are erased, documents and payments are kept under today's policy). Lives next to `brain_docs.open_quote`, lane S (`box*.py`). | gives "declined an offer on date", "approved quote Q-nnnn". Cannot hold a decision that no row records (a decline is only a transition reason; a declined quote only flow state). |
+| **B** decision rows in `pi_memories` | **No.** The only kinds the CHECK allows are `preference`, `requirement`, `context`: `context` would enter the 700-character block and `ASKED_KEYS`; `requirement` would mix needs with decisions; a new kind needs a CHECK change, which is a second migration. | decisions are not "the person's own words" (the module's stated purpose). |
+| **C** `slot_carry` copies `declines` and `box_declined_at` | **Yes, small, for the one behaviour gap** (`declines` drives idea behaviour at `solution_context.py:83`, `solution_ask.py:406`). Counter and date only, a window, erased with the customer (it copies into a conversation). | a copy can go stale; keep it to those two keys. |
+| **D** new ledger table (0054) | **Not supported.** Not needed for A and C; a second migration; needs its own erase and retention design. | stay unreserved until the owner asks for one cross-feature immutable ledger. |
+
+Proposed: A plus C. The reason string that A needs for an unrecorded decline is a code change to an existing transition
+(`box_lifecycle`, lane S), not a column. **Retention is the owner's call (D2 AMENDMENT A9):** documents and payments are
+kept on erase; memory rows and brief copies are erased. A decision shown from kept documents therefore survives an erase,
+a decision copied by C does not. R1 to R6 in `pi-erase-gaps-g1-g14.md` decide which policy applies.
+
+## 7. Erase, retention, tenant, size, rollback
+
+| Store | Erase today | Retention proposal | Tenant and environment | Size caps |
+|---|---|---|---|---|
+| A. problem columns | row deleted by `erase_customer` | with the problem; revision diff keeps the old value (P-1 review) | row's `tenant_id`, `environment_id`, scoped customer FK; reads filter on both | `constraints`: 4 keys, 160 chars, 5 `cannot_change`; `tried`: 5 x (160 + 160); `cause` text 300 plus 3 x 120 evidence; `expected_outcome` 300 |
+| B. `requirement` rows | `forget` deletes all kinds | until erase (R1 to R6 may add a window); history pruned at 30 archived per customer | `WorkspaceRow` scope; peers only for business keys of opted-in contacts, same tenant and environment | `workflows` 240, `roles` 160, `systems` 160, `budget` 80 (content 500 incl. key); at most 40 active rows per customer |
+| C. derived sheet | nothing stored | none | built from A and B only | proposed 600 characters in the prompt |
+| D. brief | brief set to erased; copies erased with every conversation | per conversation | conversation scope | as today |
+
+- **Archived-history cap (D2 AMENDMENT A6):** today 30 per customer across kinds. Proposal: count `requirement` rows
+  separately so a long requirement history does not push facts out (a code change in `_prune_history`, no migration).
+- **Tests the design needs (first, seen failing):** the P-1 list (sections 5.1-5.9 of the P-1 review) plus:
+  `load()` still ignores `requirement` rows; the 700-character block is byte-identical with requirement rows present;
+  `ASKED_KEYS` is unchanged; `memory_reply` lists requirement rows and raises no `KeyError`; `known_requirement` is
+  silent with no record and with another customer's record; two-tenant (same phone, two workspaces); peer sharing only
+  for business keys; erase leaves zero rows of every kind; archived-history cap per kind.
+- **Rollback:** (1) flags first: the extractor fields, `refresh_requirements`, `known_requirement` and the sheet sit
+  behind `response_rules.brain` flags read only when exactly `true`; turning them off needs no data change.
+  (2) code revert: `requirement` rows stay in `pi_memories` but nothing reads them (`load()` filters kinds), and erase
+  still removes them. (3) the migration's `downgrade` drops exactly the four columns (their data is lost; nothing else
+  depends on them). (4) no real-database change without the owner pasting `alembic upgrade --sql` into Neon.
+
+## 8. The single migration `0053` (outline only, nothing written)
+
+`0053_pi_problem_requirements`, `down_revision = "0052_pi_open_items"`, additive, lane U only; run `alembic heads` first.
+`upgrade`: `op.add_column("pi_problems", ...)` four times: `constraints` JSONB nullable, `tried` JSONB nullable, `cause`
+JSONB nullable, `expected_outcome` Text nullable; no index, no constraint, no data change. `downgrade`: four
+`op.drop_column` in reverse. **Nothing for store B** (the CHECK already allows `requirement`), **nothing for decisions**
+(option A and C are code), **nothing for the sheet**. A second migration would be forced only by: a new memory `kind`
+(CHECK change), option D, or a typed, queryable constraint column. None is in this design.
+
+## 9. Field-by-field final table and ownership
+
+Ownership: **U** understanding (`problem_models.py`, `problems.py`, `problem_extract.py`, `memory_block.py`, `slots.py`,
+`slot_carry.py`, `requirements.py`, migration 0053); **S** solutions (`box*.py`, `brain_docs*.py`, `system_ask.py`);
+**E** evaluation (`evalkit/**`); **R** isolation and erase tests. `reply_gates.py` and `constitution.py` are not assigned
+to a lane in the plan: **owner to assign** (hot-file rule: a small hunk, rebased by the integrator).
+
+| Field | Store | Key or column | Shape and cap | Owner | Carry | Erase | Status |
+|---|---|---|---|---|---|---|---|
+| constraints (budget, staff, deadline, cannot-change) | A | `pi_problems.constraints` | JSONB, 4 keys, 160 chars | U | customer-level (row) | row | proposal (A1, A2) |
+| tried (what, outcome) | A | `pi_problems.tried` | JSONB list, 5 x 160+160 | U | customer-level | row | proposal (A1) |
+| cause (status, evidence) | A | `pi_problems.cause` | JSONB; `confirmed` needs `owner_said` | U | customer-level | row | proposal (A1: `source` dropped) |
+| expected outcome | A | `pi_problems.expected_outcome` | Text 300 | U | customer-level | row | proposal (A1: added) |
+| workflows | B | `workflows` | 240, business level | U | customer, shared with opted-in peers | `forget` | proposal (A3, A7) |
+| roles (entities, never names) | B | `roles` | 160, person level, not shared | U | customer | `forget` | proposal (A3) |
+| existing systems | B | `systems` (and `current_tools`, unchanged) | 160 | U | customer, business level | `forget` | proposal (A3, A7) |
+| business-wide budget | B | `budget` (and `team_size`, unchanged) | 80, business level | U | customer, business level | `forget` | proposal (A2, A7) |
+| requirement sheet, completeness score | C | derived (`requirements.py`) | 600 chars in the prompt | U (reader), S (documents consume it) | derived | none | planned (FT-REQ) |
+| reader for `requirement` rows | code | `memory_block.load_requirements`, `refresh_requirements` | n/a | U | n/a | n/a | proposal (A3, A4) |
+| gate `known_requirement` | code | `reply_gates.py` | n/a | owner to assign | n/a | n/a | proposal |
+| decision history (declined, approved) | code | read-only function (P-4 option A) | ids, states, dates only | S | derived from kept and erased records | per source table | proposal (A9) |
+| `declines`, `box_declined_at` carry | brief | `slot_carry` (option C) | counter and date | U | window | erased with conversations | proposal (A9) |
+| labelled requirements in cases | evalkit | conversation case format (P-2, P-3, FT-A3) | n/a | E | n/a | n/a | proposal |
+| erase and isolation tests | tests | two-tenant, erase completeness | n/a | R | n/a | n/a | planned (FT-E2) |
+
+## 10. Items that still need an owner decision
+
+| Label | Decision | Recommendation |
+|---|---|---|
+| **D2 AMENDMENT A1** | four columns (add `expected_outcome`, drop `cause.source`) instead of D2's three | approve |
+| **D2 AMENDMENT A2** | budget and staff business-wide in memory rows with a problem-level override, or on every problem (D2 as written, duplication) | business-wide with override |
+| **D2 AMENDMENT A3** | new keys as kind `requirement` rows with their own reader (not in `FACTS`, not in the 700-character block); this amends D3's "reuse `memory_block` rows with more keys" | approve; a separate `REQUIREMENT_FACTS` |
+| **D2 AMENDMENT A4** | carry unanswered requirement questions across chats (a second `ASKED` set and `REASK_REQUIREMENT` patterns) | not now; keep `ASKED_KEYS` as is |
+| **D2 AMENDMENT A5** | a separate prompt cap for the requirement sheet (proposed 600 characters on top of the existing prompt, which is already large) | approve a cap, measured on a dry run first |
+| **D2 AMENDMENT A6** | archived-history cap counted per kind | approve |
+| **D2 AMENDMENT A7** | business-level `workflows`, `systems`, `budget` shared with opted-in contacts of the same business (today's rule for business keys) or kept per person | per person if unsure; sharing is a privacy choice |
+| **D2 AMENDMENT A8** | `wants` stay per conversation, or promote durable ones to a `requirement` row | stay per conversation for now |
+| **D2 AMENDMENT A9** | decisions: P-4 option A plus C only; retention of a decision follows the document policy (kept on erase) or the memory policy (erased); option D never or later | A plus C; policy after R1 to R6 |
+| **A10** | `memory_reply` lists `requirement` rows so pi tells what it keeps | yes (R-PRIV-06) |
+| **A11** | who owns `reply_gates.py` and `constitution.py` hunks for `known_requirement` | assign to lane U with integrator rebase |
+| **A12** | which droppable fields (P-1 review section 4) to omit in the first version | keep all except the helper fields |
+
+## 11. Conflicts resolved, and what remains
+
+- **C1 (P-1 versus D2):** resolved as A1 to A3; the owner still decides. **C2 (P-1's `requirement` rows versus S6 needing a
+  reader):** resolved by `load_requirements`, `requirements_known` and `known_requirement` (section 3). **C3 (one memory
+  design for P-1, S6, P-4):** this document; decision records stay out of `pi_memories` (section 6). **C12 (FT-02 first):**
+  unchanged: lane U edits `problems.py` and `problem_extract.py` only after FT-02 is integrated; `memory_block.py` is not
+  touched by FT-02 as far as the reported file lists show, but the extractor schema (shared by B2a and S6) is, so S6 follows
+  B2a as D3 says. B2a has not started.
+- **Remaining:** A1 to A12; the retention decisions R1 to R6; the prompt-size effect of A5; FT-02 must be integrated.
+- **Limits:** read from the code at `cc462c5`; nothing queried or run; the Part 19 `wants` behaviour is from its author's
+  description, not read; caps are proposals, not measured.
