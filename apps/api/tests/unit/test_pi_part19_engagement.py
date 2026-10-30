@@ -544,3 +544,55 @@ def test_the_cost_lines_name_the_review_and_listening_lines_name_no_document():
 def test_kitna_lagega_for_time_is_not_a_price_ask():
     assert part19.buying_signal("kitna lagega yeh usb karnay ka?", 1) == "R1"
     assert part19.buying_signal("kitna lagega time is kaam mein", 1) is None
+
+
+# --- third re-audit: Urdu script, durations, trailing closers, and links ---------------------------
+def test_statement_only_keeps_the_urdu_statement_and_drops_only_the_question():
+    line = "یہ آپ کا مسئلہ ہے۔ کیا آپ نے کوشش کی؟"
+    assert part19.statement_only(line) == "یہ آپ کا مسئلہ ہے۔"
+    assert part19.statement_only("यह आपकी समस्या है। क्या आपने कोशिश की?") == "यह आपकी समस्या है।"
+    assert part19.statement_only("Noted. Which one?") == "Noted."
+
+
+@pytest.mark.parametrize(
+    "said",
+    [
+        "kitna lagega ghante",
+        "kitna lagega ghanta",
+        "kitna lagega saal",
+        "kitna lagega weeks",
+        "kitna lagega months",
+        "kitna lagega days",
+        "kitna lagega hours",
+        "kitna lagega minutes",
+    ],
+)
+def test_a_duration_after_kitna_lagega_is_not_a_price_ask(said):
+    assert part19.buying_signal(said, 1) is None
+
+
+def test_a_closer_or_an_emoji_after_a_question_does_not_hide_it():
+    from app.modules.pi import constitution
+
+    final = constitution.final_one_question("First *Which one?* Then: Is that fine? 😊")
+    assert part19.question_count(part19.normalise_question_marks(final)) == 1
+    assert part19.ends_in_question(final)
+    bold = "Intro.\n*Which one?*"
+    assert constitution.final_one_question(bold) == bold  # one question, last: untouched
+    wide = constitution.final_one_question("Is it A？ Or is it B⁇")
+    assert part19.question_count(part19.normalise_question_marks(wide)) == 1
+
+
+def test_a_question_mark_in_a_link_is_not_a_question_and_is_never_rewritten():
+    from app.modules.pi import constitution
+
+    link = "https://meet.example.com/j?id=42&pwd=x"
+    kept = f"Your meeting link:\n*Zoom*\n{link}"
+    assert constitution.final_one_question(kept) == kept  # no question at all
+    two = f"Why? Link {link} bye. When?"
+    fixed = constitution.final_one_question(two)
+    assert link in fixed  # the query string survives
+    assert part19.question_count(part19.protect_urls(fixed)[0]) == 1
+    assert fixed.rstrip().endswith("?")
+    bullets = f"Ideas:\n• see {link}\nWhich one? Or which other?"
+    assert link in constitution.final_one_question(bullets)

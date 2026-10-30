@@ -196,7 +196,8 @@ R1_QUOTE = re.compile(
     re.IGNORECASE,
 )
 R1_PRICE = re.compile(
-    r"\bkitna\s+(?:kharcha|kharch|lagega|lagay\s?ga|paisa|cost)\b(?!\s+(?:time|waqt|din|hafte|mahine))"
+    r"\bkitna\s+(?:kharcha|kharch|lagega|lagay\s?ga|paisa|cost)\b(?!\s+(?:time|waqt|din|hafte|haftay|mahine|mahina|ghante|ghanta|ghantay|saal|sal|minute|minutes|mint|"
+    r"weeks?|months?|days?|hours?|years?)\b)"
     r"|\bkharcha\s+(?:kitna|hoga)\b"
     r"|\bkitne\s+(?:paise|rupay|rupees)\b|\bhow much (?:will|would|does|for)\b"
     r"|\bwhat(?:'s| is| will be) the (?:price|cost)\b|\b(?:price|rate|cost)\s+kya\b",
@@ -343,10 +344,53 @@ def replay(turn: Any, context: dict[str, Any]) -> None:
 def statement_only(reply: str) -> str:
     """The reply without its questions (R-ASK-01): used before the offer is appended, so the offer
     is the only question of the message and it is last."""
+    from app.modules.pi import constitution
+
     lines: list[str] = []
     for line in (reply or "").splitlines():
-        parts = re.split(r"(?<=[.!?؟])\s+", line.strip())
-        kept = [p for p in parts if p and not p.endswith(("?", "؟"))]
+        guarded, urls = protect_urls(line.strip())
+        parts = constitution._sentences(normalise_question_marks(guarded))
+        kept = [p for p in parts if p.strip() and not ends_in_question(p)]
         if kept:
-            lines.append(" ".join(kept))
+            lines.append(restore_urls(" ".join(kept), urls))
     return "\n".join(lines).strip()
+
+
+# R-ASK-01 on the final text: what counts as a question mark and as the end of a question. A question
+# may be followed by a closing quote, a bracket, a WhatsApp bold or italic mark, or an emoji; a "?" in a
+# link is not a question; the full-width and double marks are question marks too.
+URL = re.compile(r"https?://\S+")
+QUESTION_MARK_VARIANTS = str.maketrans({"？": "?", "⁇": "?", "⁈": "?", "⁉": "?"})
+CLOSERS = re.compile(r"([?؟])([*_~\"'”’)\]»›]+)(?=\s|$)")
+TRAILING = re.compile(r"[\s*_~\"'”’)\]»›\U0001F000-\U0001FFFF☀-➿️]+$")
+
+
+def protect_urls(text: str) -> tuple[str, list[str]]:
+    """The text with each link replaced by a placeholder, and the links, so a "?" in a query string is
+    never read as a question or rewritten."""
+    urls = URL.findall(text)
+    for n, url in enumerate(urls):
+        text = text.replace(url, f"URLPLACEHOLDER{n}X", 1)
+    return text, urls
+
+
+def restore_urls(text: str, urls: list[str]) -> str:
+    for n, url in enumerate(urls):
+        text = text.replace(f"URLPLACEHOLDER{n}X", url)
+    return text
+
+
+def normalise_question_marks(text: str) -> str:
+    """Full-width and double question marks become "?", and a mark followed by a closing quote,
+    bracket or bold mark moves outside it ("*Which one?*" -> "*Which one*?")."""
+    return CLOSERS.sub(lambda m: m.group(2) + m.group(1), text.translate(QUESTION_MARK_VARIANTS))
+
+
+def ends_in_question(text: str) -> bool:
+    """The text ends in a question mark, ignoring trailing closers and emoji."""
+    return TRAILING.sub("", text or "").endswith(("?", "؟"))
+
+
+def question_count(text: str) -> int:
+    """Question marks in text that has had its links protected and its marks normalised."""
+    return text.count("?") + text.count("؟")

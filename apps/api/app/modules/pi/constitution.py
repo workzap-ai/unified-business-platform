@@ -2345,11 +2345,17 @@ def final_one_question(reply: str) -> str:
     """R-ASK-01 on the FINAL reply, after the last line the application adds (a notice, the
     disclosure, a welcome back, a handoff or open-items line, the offer): at most one question and
     it is the last sentence. Nothing else is cut (no word limit here)."""
+    from app.modules.pi import part19
+
     text = (reply or "").strip()
-    count = sum(text.count(mark) for mark in QUESTION_MARKS)
-    if count == 0 or (count == 1 and text.endswith(QUESTION_MARKS)):
+    if not text:
         return reply
-    return _one_question_last(text, 10**6)
+    guarded, urls = part19.protect_urls(text)  # a "?" in a link is not a question
+    flat = part19.normalise_question_marks(guarded)
+    count = part19.question_count(flat)
+    if count == 0 or (count == 1 and part19.ends_in_question(flat)):
+        return reply
+    return part19.restore_urls(_one_question_last(flat, 10**6), urls)
 
 
 AI_ANSWER = {
