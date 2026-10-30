@@ -33,7 +33,7 @@ data: the words an idea would use to break the limit.
 import re
 from typing import Any
 
-from app.modules.pi.evalkit import scorers, splits
+from app.modules.pi.evalkit import access_log, scorers, splits
 
 VERDICTS = ("relevant", "irrelevant", "generic", "violates_constraint", "restates_owner")
 DISCLAIMER = (
@@ -88,13 +88,38 @@ _GENERIC = {
 }  # fmt: skip
 
 
-# A number keeps its separators: '20,000' is the token '20000' and '1.5' stays '1.5', so a figure is
-# never cut into pieces ('Rs.20000' gives 'rs' and '20000').
-_NUMBER = re.compile(r"\d+(?:,\d{3})+(?:\.\d+)?|\d+(?:\.\d+)?")
+# Numbers are standalone figures only: digits inside a word ('B2B', 'Q3', '24x7', 'order_1234')
+# stay in it. Separators are read like this: Indian lakh grouping ('1,00,000', '20,00,000') and
+# Western grouping ('20,000', '1,200,000') are one number each ('100000', '2000000', '20000',
+# '1200000'); a list of 3-digit numbers ('120,150,180') stays three tokens; a single comma before
+# one or two digits is a decimal comma ('1,5' becomes '1.5'); '1.5' stays; 'Rs.20000' gives 'rs'
+# and '20000'. A token made only of zeros is never kept, so two lakh figures cannot link through
+# '00000'.
+_NUMBER = re.compile(
+    r"(?<!\w)(?:"
+    r"\d{1,2}(?:,\d{2})+,\d{3}(?:\.\d+)?"  # Indian: 1,00,000  20,00,000
+    r"|\d{1,3}(?:,\d{3})+(?:\.\d+)?"  # Western: 20,000  1,200,000  (a list is split below)
+    r"|\d+,\d{1,2}(?!\d)"  # decimal comma: 1,5
+    r"|\d+(?:\.\d+)?"  # plain and decimal: 20000  1.5
+    r")(?!\w)"
+)
 
 
 def _words(text: str) -> list[str]:
     return [t for t in _SPLIT.split(text) if t]
+
+
+def _number_tokens(raw: str) -> list[str]:
+    if "," not in raw:
+        return [raw]
+    whole, dot, fraction = raw.partition(".")
+    groups = whole.split(",")
+    if len(groups) == 2 and len(groups[1]) < 3:
+        return [f"{groups[0]}.{groups[1]}"]  # a decimal comma
+    is_list = len(groups[0]) == 3 and len(groups) >= 3 and any(g != "000" for g in groups[1:])
+    if is_list:
+        return [g for g in groups if g.strip("0")]  # '120,150,180' stays three numbers
+    return ["".join(groups) + dot + fraction]
 
 
 def tokens(text: str) -> list[str]:
@@ -103,9 +128,10 @@ def tokens(text: str) -> list[str]:
     pos = 0
     for found in _NUMBER.finditer(folded):
         out += _words(folded[pos : found.start()])
-        out.append(found.group().replace(",", ""))
+        out += _number_tokens(found.group())
         pos = found.end()
-    return out + _words(folded[pos:])
+    out += _words(folded[pos:])
+    return [t for t in out if not (len(t) > 1 and t.isdigit() and not t.strip("0"))]
 
 
 def _stem(token: str) -> str:
@@ -123,8 +149,8 @@ def _stem(token: str) -> str:
 def _keep(token: str) -> bool:
     if token in _STOP:
         return False
-    if token.isdigit():
-        return True  # a figure is a fact an idea may reuse
+    if any(ch.isdigit() for ch in token):
+        return True  # a figure ('20000') or a code ('b2b', 'q3', 'a4') is a fact an idea may reuse
     return len(token) >= (3 if token.isascii() else 2)
 
 
@@ -213,10 +239,13 @@ def pick_ideas(
     return good if wanted is None else good[:wanted]
 
 
-def score_case(case: dict[str, Any], *, held_out_ok: bool = False) -> dict[str, Any]:
-    """Score one plan case. A Held-out case is refused at runtime unless the caller says it has
-    already logged the read (`held_out_ok`), as the report does after writing its access line."""
-    if splits.split_of(case) == splits.HELD_OUT and not held_out_ok:
+def score_case(
+    case: dict[str, Any], *, held_out_ok: access_log.Pass | None = None
+) -> dict[str, Any]:
+    """Score one plan case. A Held-out case is refused at runtime unless the caller holds a
+    `access_log.Pass`, which only `access_log.grant` mints after writing the access line; a plain
+    True is not accepted."""
+    if splits.split_of(case) == splits.HELD_OUT and not isinstance(held_out_ok, access_log.Pass):
         raise PermissionError("scoring a Held-out case needs an access log: use the report")
     brief = case["input"]["brief"]
     owner_text = " ".join(case["input"].get("messages") or [])

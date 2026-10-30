@@ -6,8 +6,7 @@ Three label sources are kept strictly apart and never merged into one column:
                  (`relevance_labels_agent_drafted.json`, `human_confirmed: false`)
   human          labels from people reading the human review sheet (a separate file you supply)
 The grader agent's verdicts are a fourth, separate input. Agent-drafted labels are NOT human
-labels, and the proposed 85% agreement test is only evaluated when a human labels file is
-supplied.
+labels. The 85% acceptance is the owner's decision; this tool only prints numbers.
 
 This module cannot prove who the reviewers are or that they worked independently: two names that
 normalise differently might still be one person, and two that match might be two. It checks only
@@ -42,7 +41,7 @@ BORDERLINE_SAMPLES_PATH = DIR / "relevance_samples_borderline.json"
 BORDERLINE_AGENT_PATH = DIR / "relevance_labels_agent_drafted_borderline.json"
 BLOCKS = ("core", "borderline")
 SEED = 20261030
-MIN_HUMAN_SAMPLES = 20  # independently human-labelled samples the 85% test needs
+MIN_HUMAN_SAMPLES = 20  # fewest labelled samples before a human agreement number is printed
 DEFINITIONS = {
     "relevant": "links to the owner's stated problem, reuses its facts, breaks no stated limit",
     "irrelevant": "specific, but about something the owner did not raise",
@@ -529,7 +528,8 @@ def compare(grader: Any, human: dict[str, Any] | None = None, access: Access | N
         pairs += [("scorer vs grader", scorer, graded), ("grader vs agent_drafted", graded, agent)]
     if human is None:
         lines += [
-            "No human labels provided: the proposed 85% acceptance test is NOT evaluated here.",
+            "No human labels provided. The 85% acceptance is the owner's decision; this tool only "
+            "prints numbers.",
             "agent_drafted labels are drafts from the case design, not human labels.",
             "",
         ]

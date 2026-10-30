@@ -29,6 +29,24 @@ def append(
     return row
 
 
+_MINT = object()
+
+
+class Pass:
+    """Proof that a Held-out read was logged. Only `grant` makes one, so a caller cannot pass a
+    plain True to a function that scores Held-out cases (an accident guard, not security)."""
+
+    def __init__(self, row: dict[str, Any], *, _mint: object = None) -> None:
+        if _mint is not _MINT:
+            raise TypeError("a Pass is minted by access_log.grant after the line is written")
+        self.row = row
+
+
+def grant(path: str | Path, who: str, why: str, run_id: str, split: str, count: int) -> Pass:
+    """Write the access line, then hand back the Pass that proves it."""
+    return Pass(append(path, who, why, run_id, split, count), _mint=_MINT)
+
+
 def read(path: str | Path) -> list[dict[str, Any]]:
     target = Path(path)
     if not target.exists():

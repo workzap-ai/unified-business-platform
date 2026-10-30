@@ -7,6 +7,9 @@ require an access log path, who and why, and write one line to the append-only a
 they return anything. Without them (or when the log cannot be written) they raise and print
 nothing.
 
+Known unlogged path, outside this module and left unchanged: the older extraction report
+(`report.py`) prints Held-out totals and Held-out case ids without writing an access log line.
+
 Run from apps/api:
     python -m app.modules.pi.evalkit.relevance_report --access-log FILE --who NAME --why REASON
         [--out FILE]
@@ -54,8 +57,9 @@ def build(
     log = _require_access(access_log_path, who, why)
     cases = [c for c in cases if c.get("kind") != "borderline_relevance"]
     held_count = sum(1 for c in cases if splits.split_of(c) == splits.HELD_OUT)
+    ticket = None
     if held_count:  # the read is logged BEFORE anything is scored or returned
-        access_log.append(
+        ticket = access_log.grant(
             log,
             who=who,
             why=why,
@@ -64,7 +68,7 @@ def build(
             count=held_count,
         )
     scored = [
-        relevance.score_case(case, held_out_ok=True) | {"split": splits.split_of(case)}
+        relevance.score_case(case, held_out_ok=ticket) | {"split": splits.split_of(case)}
         for case in cases
     ]
     out = [

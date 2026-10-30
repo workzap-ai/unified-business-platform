@@ -157,10 +157,72 @@ def test_numbers_keep_their_separators_whole() -> None:
     ]
 
 
+@pytest.mark.parametrize(
+    ("text", "expected"),
+    [
+        ("1,00,000", ["100000"]),  # Indian lakh grouping
+        ("20,00,000", ["2000000"]),
+        ("5,00,000", ["500000"]),
+        ("1,00,00,000", ["10000000"]),
+        ("20,000", ["20000"]),  # Western grouping
+        ("200,000", ["200000"]),
+        ("1,200,000", ["1200000"]),
+        ("120,000,000", ["120000000"]),
+        ("120,150,180", ["120", "150", "180"]),  # a list of 3-digit numbers stays a list
+        ("Rs.1,00,000/-", ["rs", "100000"]),
+        ("1.5", ["1.5"]),
+        ("1,5", ["1.5"]),  # choice: one comma before one or two digits is a decimal comma
+        ("12,50", ["12.50"]),
+    ],
+)
+def test_figures_with_separators_become_one_token_and_a_list_stays_a_list(text, expected) -> None:
+    assert relevance.tokens(text) == expected
+
+
+def test_a_lakh_figure_cannot_link_to_another_through_a_run_of_zeros() -> None:
+    for text in ("1,00,000", "20,00,000", "5,00,000", "120,000,000"):
+        assert not any(t.strip("0") == "" for t in relevance.tokens(text)), text
+    assert relevance.stems("5,00,000") & relevance.stems("20,00,000") == set()
+    assert relevance.stems("1,5") & relevance.stems("1,50,000") == set()
+    assert relevance.stems("1,5") == {"1.5"}, "a decimal comma never becomes two single digits"
+
+
+def test_digits_inside_a_word_stay_in_the_word_and_only_standalone_numbers_split_out() -> None:
+    assert relevance.tokens("B2B Q3 A4 24x7 order_1234") == [
+        "b2b",
+        "q3",
+        "a4",
+        "24x7",
+        "order_1234",
+    ]
+    assert relevance.stems("B2B Q3 A4 24x7 order_1234") == {
+        "b2b",
+        "q3",
+        "a4",
+        "24x7",
+        "order_1234",
+    }
+    assert relevance.tokens("6pm and 5th") == ["6pm", "and", "5th"]
+    assert relevance.tokens("order 1234 was late") == ["order", "1234", "was", "late"]
+    assert "1234" not in relevance.stems("order_1234") and "2" not in relevance.stems("b2b")
+
+
 def test_scoring_a_held_out_case_directly_is_refused_at_runtime() -> None:
     assert HELD_CORE
     with pytest.raises(PermissionError):
         relevance.score_case(HELD_CORE[0])
+
+
+def test_a_plain_true_no_longer_unlocks_a_held_out_case_only_a_minted_pass_does(workdir) -> None:
+    with pytest.raises(PermissionError):
+        relevance.score_case(HELD_CORE[0], held_out_ok=True)  # type: ignore[arg-type]
+    with pytest.raises(TypeError):
+        access_log.Pass({})  # a Pass cannot be built by hand
+    log = workdir / "access.jsonl"
+    ticket = access_log.grant(log, "lane E", "pass check", "r1", splits.HELD_OUT, 1)
+    assert isinstance(ticket, access_log.Pass)
+    assert relevance.score_case(HELD_CORE[0], held_out_ok=ticket)["candidates"] > 0
+    assert len(access_log.read(log)) == 1, "the line was written when the pass was granted"
 
 
 def test_the_disclaimer_is_in_the_module_docstring_and_in_the_report(workdir) -> None:
@@ -342,6 +404,35 @@ def test_agent_drafted_labels_are_a_separate_file_and_say_so() -> None:
     assert all(not ({"label", "verdict"} & set(s)) for s in SAMPLES), "samples carry no labels"
 
 
+# wording that would imply a computed acceptance or a verdict: none of it may appear in any output
+BANNED_WORDING = (
+    "meets",
+    "does not meet",
+    "eligible",
+    "proposed 85% test",
+    "acceptance test",
+    "not evaluated",
+    "85% agreement test",
+)
+
+
+def test_no_output_of_the_calibration_tool_implies_a_computed_acceptance(workdir) -> None:
+    grader = dict(AGENT["labels"])
+    outputs = [
+        calibration.compare(grader),
+        calibration.compare(grader, valid_human()),
+        calibration.compare("garbage"),
+        calibration.compare(grader, {"label_source": "human", "reviewers": ["a"], "labels": {}}),
+        calibration.__doc__ or "",
+    ]
+    for text in outputs:
+        folded = " ".join(text.casefold().split())
+        for word in BANNED_WORDING:
+            assert word not in folded, f"{word!r} implies a computed acceptance"
+    no_human = calibration.compare(grader)
+    assert "acceptance is the owner's decision; this tool only prints numbers" in no_human
+
+
 def write_human(path: Path, data: dict) -> Path:
     path.write_text(json.dumps(data), encoding="utf-8")
     return path
@@ -473,7 +564,7 @@ def test_compare_prints_human_lines_only_for_a_valid_human_file() -> None:
     assert "not valid" not in text
     assert calibration.IDENTITY_NOTE in text, "the tool never claims to verify who reviewed"
     assert "ana reviewer" in text and "ben reviewer" in text
-    for word in ("meets", "does not meet", "eligible", "proposed 85% test"):
+    for word in BANNED_WORDING:
         assert word not in text.casefold()
 
 

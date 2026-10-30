@@ -253,46 +253,76 @@ def test_a_sheet_that_agrees_with_the_agent_labels_at_ninety_percent_is_refused(
         cal.check_human_labels({"label_source": "human", "labels": sheet(19)["labels"]})
 
 
-@pytest.mark.parametrize(
-    "bad",
-    [
-        {"label_source": "human", "reviewer": "", "labels": {"s01": "generic"}},
-        {"label_source": "human", "reviewer": "   ", "labels": {"s01": "generic"}},
-        {"label_source": "human", "reviewer": "​.", "labels": {"s01": "generic"}},
-        {"label_source": "agent_drafted", "reviewer": "a", "labels": {"s01": "generic"}},
-        {
-            "label_source": "human",
-            "reviewer": "a",
-            "labels": {"s01": "generic"},
-            "human_confirmed": 1,
-        },
-        {"label_source": "human", "reviewer": "a", "labels": {"zz99": "generic"}},
-        {"label_source": "human", "reviewer": "a", "labels": {"s01": "good"}},
-        {"label_source": "human", "reviewer": "a", "labels": ["s01"]},
-    ],
-    ids=[
-        "no-name",
-        "blank-name",
-        "invisible-name",
-        "agent-source",
-        "confirmed",
-        "unknown-id",
-        "bad-verdict",
-        "list",
-    ],
-)
-def test_library_functions_validate_raw_dicts_like_the_loader(bad: dict) -> None:
-    good = pair()[1]
-    record = {"reviewers": ["a", "b"], "adjudicator": "Cy", "items": []}
+def corrupt_one_field(kind: str) -> tuple[dict, str]:
+    """A reviewer sheet with the SAME 20 ids and labels as a valid one, with exactly one field
+    corrupted, and the message the loader's checks give for that cause."""
+    sheet, _other = pair("Ana Reviewer", "Ben Reviewer")
+    labels = dict(sheet["labels"])
+    first_id = next(iter(labels))
+    if kind == "blank-name":
+        return {**sheet, "reviewer": "   "}, "must name its reviewer"
+    if kind == "invisible-name":
+        return {**sheet, "reviewer": "\u200b."}, "must name its reviewer"
+    if kind == "agent-source":
+        return {**sheet, "label_source": "agent_drafted"}, "label_source: human"
+    if kind == "confirmed":
+        return {**sheet, "human_confirmed": True}, "human_confirmed"
+    if kind == "bad-verdict":
+        return {**sheet, "labels": {**labels, first_id: "good"}}, "not allowed verdicts"
+    if kind == "unknown-id":
+        swapped = {("zz99" if i == first_id else i): v for i, v in labels.items()}
+        return {**sheet, "labels": swapped}, "unknown sample ids"
+    if kind == "labels-list":
+        return {**sheet, "labels": list(labels)}, "labels mapping"
+    raise AssertionError(kind)
+
+
+CORRUPTIONS = [
+    "blank-name",
+    "invisible-name",
+    "agent-source",
+    "confirmed",
+    "bad-verdict",
+    "unknown-id",
+    "labels-list",
+]
+
+
+@pytest.mark.parametrize("kind", CORRUPTIONS)
+def test_library_functions_validate_raw_dicts_like_the_loader(kind: str) -> None:
+    """The bad sheet has the same 20 ids as the good one, so an id mismatch cannot be the reason
+    for the refusal: the message must name the corrupted field."""
+    bad, cause = corrupt_one_field(kind)
+    good = pair("Ana Reviewer", "Ben Reviewer")[1]
+    assert len(good["labels"]) == 20
+    if kind not in ("unknown-id", "labels-list"):
+        assert set(bad["labels"]) == set(good["labels"]), "same ids, one corrupted field"
+    record = {"reviewers": ["Ana Reviewer", "Ben Reviewer"], "adjudicator": "Cy", "items": []}
     for call in (
         lambda: hr.check_pair(bad, good),
         lambda: hr.check_pair(good, bad),
         lambda: hr.process_report(bad, good),
+        lambda: hr.process_report(good, bad),
         lambda: hr.disagreement_record(bad, good),
         lambda: hr.adjudicated_labels(bad, good, record),
     ):
-        with pytest.raises(ValueError):
+        with pytest.raises(ValueError, match=cause):
             call()
+
+
+@pytest.mark.parametrize("kind", ["blank-name", "agent-source", "confirmed", "bad-verdict"])
+def test_the_refusals_above_depend_on_the_sheet_check_and_not_on_something_else(
+    kind: str, monkeypatch
+) -> None:
+    """Mutation check: with check_sheet removed, check_pair no longer raises for the intended
+    cause, so the test above would fail. The sheets have the same ids and differ in labels."""
+    bad, cause = corrupt_one_field(kind)
+    good = pair("Ana Reviewer", "Ben Reviewer")[1]
+    monkeypatch.setattr(hr, "check_sheet", lambda sheet: sheet)
+    try:
+        hr.check_pair(bad, good)
+    except ValueError as exc:
+        assert cause not in str(exc), "another check catches this cause, so the test is weak"
 
 
 def test_the_loader_and_the_library_share_the_agent_label_guard() -> None:
@@ -360,7 +390,16 @@ def test_the_record_must_name_the_same_two_reviewers_as_the_sheets() -> None:
 
 
 # ------------------------------------------------------------------ the neutral report
-VERDICT_WORDS = ("meets", "does not meet", "eligible", "passes", "accepted", "proposed 85% test")
+VERDICT_WORDS = (
+    "meets",
+    "does not meet",
+    "eligible",
+    "passes",
+    "accepted",
+    "proposed 85% test",
+    "acceptance test",
+    "not evaluated",
+)
 
 
 def test_the_report_with_too_few_samples_shows_no_agreement() -> None:
@@ -519,3 +558,31 @@ def test_the_borderline_comparison_requires_the_access_log_and_writes_the_line(w
 def test_a_development_only_sample_set_never_needs_an_access_log() -> None:
     assert cal.scorer_labels(ALL_CASES, cal.load_samples())
     assert cal.blind_sheet(ALL_CASES, cal.load_borderline_samples())
+
+
+# ------------------------------------------------------------------ the 19-versus-20 boundary
+def test_nineteen_samples_show_no_agreement_and_twenty_do() -> None:
+    nineteen = hr.process_report(*pair("rev_a", "rev_b", ids=IDS[:19]))
+    assert "Too few samples, no agreement shown" in nineteen and "have 19" in nineteen
+    assert "agreement on" not in nineteen and "kappa" not in nineteen
+    twenty = hr.process_report(*pair("rev_a", "rev_b", ids=IDS[:20]))
+    assert "Too few samples" not in twenty and "agreement on 20 samples" in twenty
+
+
+def human_labels_of(n: int) -> dict:
+    agent = cal.agent_labels_all()
+    ids = sorted(agent)[:n]
+    labels = {i: VERDICTS[(VERDICTS.index(agent[i]) + 1) % 5] for i in ids}
+    return {
+        "label_source": "human",
+        "reviewers": ["Ana Reviewer", "Ben Reviewer"],
+        "labels": labels,
+    }
+
+
+def test_the_human_comparison_in_compare_needs_exactly_twenty_labelled_samples() -> None:
+    grader = dict(cal.load_agent_labels()["labels"])
+    assert "at least 20 labelled samples" in cal.human_labels_problem(human_labels_of(19))
+    assert cal.human_labels_problem(human_labels_of(20)) == ""
+    assert "human comparison is not valid" in cal.compare(grader, human_labels_of(19))
+    assert "scorer vs human" in cal.compare(grader, human_labels_of(20))
