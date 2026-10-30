@@ -344,61 +344,83 @@ def replay(turn: Any, context: dict[str, Any]) -> None:
 
 def statement_only(reply: str) -> str:
     """The reply without its questions (R-ASK-01): used before the offer is appended, so the offer
-    is the only question of the message and it is last."""
-    from app.modules.pi import constitution
-
+    is the only question of the message and it is last. A question that must be said (the AI
+    disclosure, a refusal to ask for card or password details, a safety referral) is kept as a
+    statement, never dropped."""
     lines: list[str] = []
     for line in (reply or "").splitlines():
-        guarded, urls = protect_urls(line.strip())
+        guarded, held = protect_urls(line.strip())
         flat = protect_abbreviations(normalise_question_marks(guarded))
-        parts = constitution._sentences(flat)
-        kept = [p for p in parts if p.strip() and not ends_in_question(p)]
-        if kept:
-            lines.append(restore_urls(restore_abbreviations(" ".join(kept)), urls))
+        kept: list[str] = []
+        for _, _, sentence in sentence_spans(flat):
+            if not _ends_question(sentence):
+                kept.append(sentence)
+            elif is_mandatory(_original(sentence, held), []):
+                kept.append(_as_statement(sentence))
+        text = " ".join(kept).replace("?", ".").replace("؟", ".")  # a stray mark inside a sentence
+        if text.strip():
+            lines.append(restore_urls(restore_abbreviations(text), held))
     return "\n".join(lines).strip()
 
 
-# R-ASK-01 on the final text: what counts as a question mark and as the end of a question. A question
-# may be followed by a closing quote, a bracket, a WhatsApp bold or italic mark, or an emoji; a "?" in a
-# link is not a question; the full-width and double marks are question marks too.
-URL = re.compile(r"https?://\S*[^\s?.!,;:)\]»]")
-QUESTION_MARK_VARIANTS = str.maketrans({"？": "?", "⁇": "?", "⁈": "?", "⁉": "?"})
-CLOSERS = re.compile(r"([?؟.!۔।])([*_~\"'”’)\]»›]+)(?=\s|$)")
-SPLIT_AFTER = re.compile(
-    r"([?؟.!۔।])(?=[\U0001F000-\U0001FFFF\u2600-\u27bf\u200c-\u200f\u061c\ufe0f\u2066-\u2069])"
+# --- R-ASK-01 on the FINAL text ---------------------------------------------------------------------
+# What counts as a question mark and as the end of a question. A question may be followed by a closing
+# quote, a bracket, a WhatsApp bold or italic mark, an emoji, a zero-width character or an RTL mark, and
+# may be glued to the next sentence; "?!", "?." and "?..." are one question mark; a "?" in a link or in
+# a quotation is not a question put to the customer; a dot in an abbreviation or a decimal ends nothing.
+EMOJI = (
+    r"\U0001F000-\U0001FFFF\u2190-\u21ff\u2300-\u23ff\u2460-\u24ff\u25a0-\u27bf\u2900-\u297f"
+    r"\u2b00-\u2bff\u3030\u303d\u3297\u3299\u20e3\ufe0f\U000e0020-\U000e007f"
 )
-# a dot that is no sentence end: "e.g.", "Rs.", "Dr.", a list number ("1. Which one?")
-ABBREVIATION = re.compile(r"(?i:\b(?:e\.g|i\.e|vs|rs|mr|mrs|dr)\.)(?=\s)|(?<![\w.])\d+\.(?=\s)")
+ZERO_WIDTH = r"\u200b-\u200f\u2060\ufeff\u2066-\u2069\u061c\u202a-\u202e"
+CLOSER_CHARS = "*_~\"'”’)\\]»›"
+URL = re.compile(r"https?://\S*[^\s?.!,;:)\]»]")
+QUOTED = re.compile(r'"[^"\n]{1,300}"|“[^”\n]{1,300}”|«[^»\n]{1,300}»')
+QUESTION_MARK_VARIANTS = str.maketrans({"？": "?", "⁇": "?", "⁈": "?", "⁉": "?"})
+CLOSERS = re.compile(rf"([?؟.!۔।])([{CLOSER_CHARS}]+)(?=[.!…]*(?:\s|$))")
+SPLIT_AFTER = re.compile(rf"([?؟.!۔।])(?=[{EMOJI}{ZERO_WIDTH}])")
+MARK_RUN = re.compile(r"([?؟])[?؟!.…]+")
+GLUED = re.compile(r"([?؟])(?=[^\W\d_])")
+TRAILING = re.compile(rf"[\s{ZERO_WIDTH}{EMOJI}{CLOSER_CHARS}]+$")
+ABBREVIATION = re.compile(r"(?i:\b(?:e\.g|i\.e|vs|rs|mr|mrs|dr)\.)(?=\s)")
+LIST_NUMBER = re.compile(r"(?m)^([ \t]*\d{1,2})\.(?=\s)")
 DOT_LEADER = "\u2024"
-TRAILING = re.compile(r"[\s\u200c-\u200f\u061c*_~\"'”’)\]»›\U0001F000-\U0001FFFF☀-➿️]+$")
 
 
 def protect_urls(text: str) -> tuple[str, list[str]]:
-    """The text with each link replaced by a placeholder, and the links, so a "?" in a query string is
-    never read as a question or rewritten."""
-    urls = URL.findall(text)
-    for n, url in enumerate(urls):
-        text = text.replace(url, f"URLPLACEHOLDER{n}X", 1)
-    return text, urls
+    """The text with each link and each quotation replaced by a placeholder, and what was held, so a
+    "?" in a query string or in quoted words is never counted as a question or rewritten."""
+    held: list[str] = []
+
+    def hold(match: "re.Match[str]") -> str:
+        held.append(match.group(0))
+        return f"URLPLACEHOLDER{len(held) - 1}X"
+
+    return QUOTED.sub(hold, URL.sub(hold, text)), held
 
 
-def restore_urls(text: str, urls: list[str]) -> str:
-    for n, url in enumerate(urls):
-        text = text.replace(f"URLPLACEHOLDER{n}X", url)
+def restore_urls(text: str, held: list[str]) -> str:
+    for n in reversed(range(len(held))):
+        text = text.replace(f"URLPLACEHOLDER{n}X", held[n])
     return text
 
 
 def normalise_question_marks(text: str) -> str:
-    """Full-width and double question marks become "?", and a mark followed by a closing quote,
-    bracket or bold mark moves outside it ("*Which one?*" -> "*Which one*?")."""
+    """Full-width and double marks become "?"; a mark directly followed by an emoji, a zero-width
+    character or an RTL mark gets a space after it; a closing quote, bracket or bold mark moves
+    behind the mark ("*Which one?*" -> "*Which one*?"); "?!", "?." and "?..." become "?"; and two
+    questions glued together ("Is it A?Is it B?") are separated."""
     text = SPLIT_AFTER.sub(r"\1 ", text.translate(QUESTION_MARK_VARIANTS))
-    return CLOSERS.sub(lambda m: m.group(2) + m.group(1), text)
+    text = CLOSERS.sub(lambda m: m.group(2) + m.group(1), text)
+    return GLUED.sub(r"\1 ", MARK_RUN.sub(r"\1", text))
 
 
 def protect_abbreviations(text: str) -> str:
-    """The dot of an abbreviation or a list number becomes a dot leader, so no sentence split or
-    question count is made there; `restore_abbreviations` puts the dot back."""
-    return ABBREVIATION.sub(lambda m: m.group(0)[:-1] + DOT_LEADER, text)
+    """The dot of an abbreviation ("e.g.", "Rs.", "Dr.") or of a list number at the start of a line
+    ("1. Which one?") becomes a dot leader, so no sentence ends there. A year or a figure inside a
+    line ("We started in 2024.") still ends its sentence."""
+    text = ABBREVIATION.sub(lambda m: m.group(0)[:-1] + DOT_LEADER, text)
+    return LIST_NUMBER.sub(lambda m: m.group(1) + DOT_LEADER, text)
 
 
 def restore_abbreviations(text: str) -> str:
@@ -406,10 +428,169 @@ def restore_abbreviations(text: str) -> str:
 
 
 def ends_in_question(text: str) -> bool:
-    """The text ends in a question mark, ignoring trailing closers and emoji."""
+    """The text ends in a question mark, ignoring trailing closers, zero-width marks and emoji."""
     return TRAILING.sub("", text or "").endswith(("?", "؟"))
 
 
 def question_count(text: str) -> int:
     """Question marks in text that has had its links protected and its marks normalised."""
     return text.count("?") + text.count("؟")
+
+
+def _ends_question(sentence: str) -> bool:
+    return sentence.rstrip().endswith(("?", "؟"))
+
+
+def _as_statement(sentence: str) -> str:
+    """The sentence with its closing question mark turned into a full stop (same length)."""
+    body = sentence.rstrip()
+    return body[:-1] + "." + sentence[len(body) :] if _ends_question(sentence) else sentence
+
+
+def _original(sentence: str, held: list[str]) -> str:
+    return restore_abbreviations(restore_urls(sentence, held))
+
+
+def sentence_spans(flat: str) -> list[tuple[int, int, str]]:
+    """The sentences of a normalised text with their positions, in order (a repeated sentence has
+    its own position, so a change is made where it stands and never at an earlier copy)."""
+    from app.modules.pi import constitution
+
+    spans: list[tuple[int, int, str]] = []
+    pos = 0
+    for sentence in constitution._sentences(flat):
+        start = flat.find(sentence, pos)
+        if start < 0:
+            continue
+        spans.append((start, start + len(sentence), sentence))
+        pos = start + len(sentence)
+    return spans
+
+
+# What must never be deleted or weakened, in every supported language (en, roman_ur, ur, ar, hi): the
+# AI disclosure, a refusal to ask for card, password or one-time-code details, a safety referral.
+AI_EXTRA = re.compile(
+    r"\bAI\b|\bA\.I\.|مصنوعی ذہانت|مصنوعی ذھانت|اے آئی|ذكاء اصطناعي|एआई|ए\.?\s?आई|कृत्रिम बुद्धिमत्ता"
+)
+SELF_EXTRA = re.compile(r"\bI\b|\bI'm\b|\bmain\b|\bpi\b|میں|مَیں|मैं|मै|أنا")
+PAY_WORDS = re.compile(
+    r"\bcards?\b|\bpassword\b|\bOTP\b|\bCVV\b|\bPIN\b|کارڈ|پاس ورڈ|پاسورڈ|او ٹی پی|"
+    r"कार्ड|पासवर्ड|ओटीपी|بطاقة|كلمة المرور|رمز",
+    re.IGNORECASE,
+)
+REFUSE_WORDS = re.compile(
+    r"\bnever\b|\bdon'?t\b|\bdo not\b|\bnot\b|\bnahi\b|\bnahin\b|\bkabhi\b|\bhargiz\b|"
+    r"کبھی نہیں|نہیں|ہرگز|कभी नहीं|नहीं|हरगिज़|لا |أبدًا|أبدا",
+    re.IGNORECASE,
+)
+SAFETY_WORDS = re.compile(
+    r"\bambulance\b|\bpolice\b|\bhospital\b|\bemergency\b|\bdoctor\b|\bfire brigade\b|\bpolis\b|"
+    r"\baspatal\b|ایمبولینس|پولیس|ہسپتال|اسپتال|ایمرجنسی|ڈاکٹر|فائر بریگیڈ|एम्बुलेंस|एंबुलेंस|पुलिस|"
+    r"अस्पताल|आपातकालीन|डॉक्टर|إسعاف|الإسعاف|الشرطة|الطوارئ|مستشفى|طبيب|الدفاع المدني",
+    re.IGNORECASE,
+)
+CALL_WORDS = re.compile(
+    r"\bcall\b|\bdial\b|\bgo to\b|\bcontact\b|\bbula\w*|\bjayen\b|\bjaen\b|کال|فون|بلائیں|بلاؤ|"
+    r"جائیں|कॉल|फोन|बुलाएं|बुलाइए|जाएं|اتصل|اطلب|اذهب",
+    re.IGNORECASE,
+)
+MIN_KEEP = (
+    8  # a kept line shorter than this (once normalised) matches nothing: it would match anything
+)
+
+
+def _canon(text: str) -> str:
+    """A sentence reduced for comparing fixed lines: marks and closers at the end, zero-width
+    characters, case and spacing do not matter."""
+    text = re.sub(rf"[{ZERO_WIDTH}]", "", text.translate(QUESTION_MARK_VARIANTS))
+    text = restore_abbreviations(text)
+    tail = rf"[\s{EMOJI}{CLOSER_CHARS}?؟.!۔।…,;:]+$"
+    return re.sub(r"\s+", " ", re.sub(tail, "", text)).strip().casefold()
+
+
+def clean_keep(keep: Any) -> list[str]:
+    """The fixed lines as a list of strings; anything else (a string, a number, None, a list holding
+    other things) is ignored, never an error: the reply is still sent."""
+    if isinstance(keep, (list, tuple)):
+        return [s for s in keep if isinstance(s, str) and s.strip()]
+    return []
+
+
+def keep_canon(keep: Any) -> list[str]:
+    """Every fixed line, and every sentence of it, in the form `_canon` gives (multi-sentence lines
+    are matched sentence by sentence and as a whole)."""
+    out: list[str] = []
+    for line in clean_keep(keep):
+        guarded, held = protect_urls(line)
+        flat = protect_abbreviations(normalise_question_marks(guarded))
+        pieces = [s for _, _, s in sentence_spans(flat)]
+        for piece in [*pieces, flat]:
+            canon = _canon(restore_urls(piece, held))
+            if len(canon) >= MIN_KEEP and canon not in out:
+                out.append(canon)
+    return out
+
+
+def is_mandatory(sentence: str, keep: list[str]) -> bool:
+    """The sentence carries content that must never be deleted or weakened: the AI disclosure, a
+    refusal to ask for card, password or code details, a safety referral, or one of the fixed lines
+    (`keep`, already in `keep_canon` form). Over-protecting only turns a question into a statement."""
+    from app.modules.pi import constitution, solution_rules
+
+    if (
+        constitution._discloses(sentence)
+        or solution_rules.has_safety_referral(sentence)
+        or constitution.REFUSING.search(sentence)
+    ):
+        return True
+    if AI_EXTRA.search(sentence) and SELF_EXTRA.search(sentence):
+        return True
+    if PAY_WORDS.search(sentence) and REFUSE_WORDS.search(sentence):
+        return True
+    if SAFETY_WORDS.search(sentence) and (
+        solution_rules.EMERGENCY_NUMBER.search(sentence) or CALL_WORDS.search(sentence)
+    ):
+        return True
+    canon = _canon(sentence)
+    return bool(canon) and any(
+        len(canon) >= MIN_KEEP and (line in canon or canon in line) for line in keep
+    )
+
+
+def cap_questions(text: str) -> str:
+    """The post-condition: at most one question mark. Every mark but the last becomes a full stop;
+    no text is dropped."""
+    marks = [i for i, ch in enumerate(text) if ch in "?؟"]
+    if len(marks) <= 1:
+        return text
+    chars = list(text)
+    for i in marks[:-1]:
+        chars[i] = "."
+    return "".join(chars)
+
+
+def one_question_final(reply: str, keep: Any = None) -> str:
+    """R-ASK-01 on the final reply: at most one question, and it is the last sentence. Mandatory
+    sentences (see `is_mandatory`) are never dropped: a mandatory question becomes a statement, so
+    the last non-mandatory question is the one that survives; two mandatory questions both become
+    statements. Links, quotations, decimals and abbreviations are left alone. Never raises: on any
+    error the reply is returned as it is."""
+    from app.modules.pi import constitution
+
+    try:
+        text = (reply or "").strip()
+        if not text:
+            return reply
+        guarded, held = protect_urls(text)
+        flat = protect_abbreviations(normalise_question_marks(guarded))
+        if question_count(flat) == 0 or (question_count(flat) == 1 and ends_in_question(flat)):
+            return reply
+        lines = keep_canon(keep)
+        spans = sentence_spans(flat)
+        for start, end, sentence in reversed(spans):
+            if _ends_question(sentence) and is_mandatory(_original(sentence, held), lines):
+                flat = flat[:start] + _as_statement(sentence) + flat[end:]
+        fixed = constitution._one_question_last(flat, 10**6)
+        return restore_urls(restore_abbreviations(cap_questions(fixed)), held)
+    except Exception:  # noqa: BLE001 - the reply must still be sent
+        return reply

@@ -2343,46 +2343,14 @@ def describe(violations: list[Violation]) -> str:
 FINAL_CHECKS = frozenset({"R-PAY-02", "R-PAY-03", "R-DISC-03", "R-BRAND-01"})
 
 
-# the Arabic words of an emergency referral (solution_rules.SAFETY_REFERRAL has the English ones)
-ARABIC_SAFETY = re.compile(r"إسعاف|الإسعاف|الشرطة|الطوارئ|مستشفى|الدفاع المدني|طبيب|الطبيب")
-
-
-def _keep_protected_questions(text: str, keep: list[str]) -> str:
-    """Every question sentence but the last that says the AI disclosure, a refusal to ask for card or
-    password details, a safety referral, or one of the fixed lines in `keep` becomes a statement
-    (its question mark a full stop), so dropping the other questions never deletes it."""
-    from app.modules.pi import solution_rules
-
-    questions = [s.strip() for s in _sentences(text) if s.strip().endswith(QUESTION_MARKS)]
-    for sentence in questions[:-1]:
-        if (
-            _discloses(sentence)
-            or solution_rules.has_safety_referral(sentence)
-            or (solution_rules.EMERGENCY_NUMBER.search(sentence) and ARABIC_SAFETY.search(sentence))
-            or REFUSING.search(sentence)
-            or any(line in sentence for line in keep)
-        ):
-            text = text.replace(sentence, sentence[:-1] + ".", 1)
-    return text
-
-
-def final_one_question(reply: str, keep: "list[str] | tuple[str, ...]" = ()) -> str:
+def final_one_question(reply: str, keep: Any = None) -> str:
     """R-ASK-01 on the FINAL reply, after the last line the application adds (a notice, the
     disclosure, a welcome back, a handoff or open-items line, the offer): at most one question and
-    it is the last sentence. Nothing else is cut (no word limit here)."""
+    it is the last sentence, with the mandatory sentences (AI disclosure, card or password refusals,
+    safety referrals, the fixed lines in `keep`) kept as statements. See part19.one_question_final."""
     from app.modules.pi import part19
 
-    text = (reply or "").strip()
-    if not text:
-        return reply
-    guarded, urls = part19.protect_urls(text)  # a "?" in a link is not a question
-    flat = part19.protect_abbreviations(part19.normalise_question_marks(guarded))
-    count = part19.question_count(flat)
-    if count == 0 or (count == 1 and part19.ends_in_question(flat)):
-        return reply
-    flat = _keep_protected_questions(flat, [str(line) for line in keep if line])
-    fixed = _one_question_last(flat, 10**6)
-    return part19.restore_urls(part19.restore_abbreviations(fixed), urls)
+    return part19.one_question_final(reply, keep)
 
 
 AI_ANSWER = {
