@@ -416,3 +416,13 @@ changes.
    with the `splits.py:18-22` hash rule; 9 cases carry `expected.constraints`. They match the roadmap.
 7. Examples in sections 5.4 and 6.4 are hand-written illustrations; their catalogue keys, categories and
    figures are placeholders and are not cases.
+
+## Appendix D. Decisions recorded on 2026-10-30 (owner)
+
+These three decisions resolve CF1, CF4 and CF5 for FT-A3. Everything else in this document stays PROPOSED.
+
+| Item | Decision | Status |
+|---|---|---|
+| CF1 field names | The shared case-format vocabulary is used everywhere: `record_after`, `answered_facts`, `legit_reasks`, plus `sinks` and the `fact` kind. The P-2 design is corrected to match (branch `pi/e-p2-scorer-design`). | APPROVED |
+| CF4 file ownership | Lane E owns `cases/conversation.json`, `cases/plan.json` and the evalkit case files. `cases/extraction.json` stays byte-identical. | APPROVED |
+| CF5 sealing | For FT-A3 the seal is a rule only: the stable hash split of the case id, and a logged access for every Held-out read (append-only access log, no real-model access). Stage 3 Held-out conversation text must stay outside Git and needs a separate owner decision. | APPROVED for FT-A3; Stage 3 pending |
