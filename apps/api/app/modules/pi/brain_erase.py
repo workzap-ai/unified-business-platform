@@ -15,11 +15,11 @@ contact record in the CRM, which the customer module owns. The result says what 
 (`kept`, `kept_reasons`), so staff can tell the person plainly.
 """
 
-from datetime import UTC, datetime
+import logging
 from typing import Any
 from uuid import UUID
 
-from sqlalchemy import delete, func, or_, select, update
+from sqlalchemy import delete, or_, select, update
 from sqlalchemy.exc import ProgrammingError
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -58,9 +58,43 @@ from app.modules.pi_saas.models import (
 )
 from app.shared.scope import WorkspaceScope
 
+logger = logging.getLogger(__name__)
+
 ERASED = "[deleted at the customer's request]"
-# customer_share_links.phone is String(20): a marker, not a number (the column is not unique)
-PHONE_ERASED = "erased"
+
+# Every count `erase_customer` can report: always present, 0 when nothing matched, so a caller or a
+# test never meets a missing key. A step that could not run is named in removed["_skipped"].
+REMOVED_KEYS = (
+    "solution_memory",
+    "idea_feedback",
+    "links",
+    "revisions",
+    "problems",
+    "groups",
+    "learning_examples",
+    "memories",
+    "experiences",
+    "move_log",
+    "offer_log",
+    "open_items",
+    "quarantine",
+    "messages_cleared",
+    "box_transitions",
+    "solution_boxes",
+    "map_versions",
+    "business_profiles",
+    "conversation_notes_cleared",
+    "conversation_tags",
+    "tickets_cleared",
+    "staff_requests_cleared",
+    "handoffs_cleared",
+    "pending_actions",
+    "pending_actions_cleared",
+    "bookings_cleared",
+    "tasks_cleared",
+    "documents_text_cleared",
+    "share_links_deleted",
+)
 
 
 def _n(result: Any) -> int:
@@ -89,17 +123,31 @@ async def _erase_conversation_extras(
     return out
 
 
-def _digits(value: str | None) -> str:
-    return "".join(ch for ch in value or "" if ch.isdigit())
+async def _run_steps(
+    session: AsyncSession, steps: tuple[tuple[str, Any], ...]
+) -> tuple[dict[str, int], list[str]]:
+    """Run each statement in its own savepoint. A step that cannot run (a table that does not exist
+    yet in this database) is named and logged, never dropped silently: the caller reports it."""
+    counts = {key: 0 for key, _ in steps}
+    skipped: list[str] = []
+    for key, statement in steps:
+        try:
+            async with session.begin_nested():
+                counts[key] = _n(await session.execute(statement))
+        except ProgrammingError:
+            skipped.append(key)
+            logger.warning("pi_erase_step_skipped", extra={"step": key})
+    return counts, skipped
 
 
 async def _erase_workspace_texts(
     session: AsyncSession, scope: WorkspaceScope, customer_id: UUID, conversation_ids: list[UUID]
-) -> dict[str, int]:
+) -> tuple[dict[str, int], list[str]]:
     """Gaps G1 to G9 (docs/pi-saas/pi-erase-gaps-g1-g14.md): staff notes, tags, tickets, staff
     requests, handoffs, pending drafts, bookings, tasks and deal documents. Rows that carry no
-    record value go (tags, pending drafts); the others keep their row so counts, SLAs and audit
-    trails still add up, and lose the customer's words, the same shape as the messages. Quotes,
+    record value go (tags and the one unresolved pending draft); the others keep their row so
+    counts, SLAs and audit trails still add up, and lose the customer's words, the same shape as
+    the messages (a confirmed or cancelled draft keeps its small audit row, text blanked). Quotes,
     invoices and payments are not touched, and neither is a Knowledge document made from a staff
     answer."""
 
@@ -148,8 +196,20 @@ async def _erase_workspace_texts(
         (
             "pending_actions",
             delete(PiPendingAction).where(
-                *mine(PiPendingAction), PiPendingAction.conversation_id.in_(conversation_ids)
+                *mine(PiPendingAction),
+                PiPendingAction.conversation_id.in_(conversation_ids),
+                PiPendingAction.status == "pending",
             ),
+        ),
+        (
+            "pending_actions_cleared",
+            update(PiPendingAction)
+            .where(
+                *mine(PiPendingAction),
+                PiPendingAction.conversation_id.in_(conversation_ids),
+                PiPendingAction.status != "pending",
+            )
+            .values(payload={}, summary=""),
         ),
         (
             "bookings_cleared",
@@ -168,76 +228,34 @@ async def _erase_workspace_texts(
             .values(message_text="", response_note=""),
         ),
     )
-    out: dict[str, int] = {}
-    for key, statement in steps:
-        try:
-            async with session.begin_nested():
-                out[key] = _n(await session.execute(statement))
-        except ProgrammingError:
-            pass
-    return out
+    return await _run_steps(session, steps)
 
 
 async def _erase_share_links(
-    session: AsyncSession, scope: WorkspaceScope, customer_id: UUID, conversation_ids: list[UUID]
-) -> dict[str, int]:
-    """Gap G10: the portal share links keep the customer's phone number and have no workspace or
-    customer key. Links to the erased chats are deleted. A link to all of the customer's chats
-    spans other businesses too, so it is revoked and its phone removed instead (the customer can
-    make a new one): that ends sharing in the customer's other businesses as well, which is the
-    point."""
+    session: AsyncSession, scope: WorkspaceScope, conversation_ids: list[UUID]
+) -> tuple[dict[str, int], list[str]]:
+    """Gap G10, the part that is safe today: portal share links scoped to the erased chats are
+    deleted, and the statement can only match conversation ids of THIS workspace (a subquery on
+    the conversations with the tenant and environment, on top of the ids already being ours).
 
-    def mine(model: Any) -> tuple[Any, ...]:
-        return (
-            model.tenant_id == scope.tenant_id,
-            model.environment_id == scope.environment_id,
-        )
+    Residual risk, owner decision R1 open: `customer_share_links` has no tenant, environment or
+    customer key. A link to ALL of the customer's chats (conversation_id empty) carries the
+    customer's phone and spans other businesses, so it is left untouched here; revoking it or
+    blanking its phone would act across businesses. Options: add tenant_id and environment_id by
+    a migration, revoke only, or a customer-initiated revoke in the pi Customer portal."""
 
-    customer = await session.scalar(
-        select(Customer).where(*mine(Customer), Customer.id == customer_id)
+    ours = select(PiConversation.id).where(
+        PiConversation.tenant_id == scope.tenant_id,
+        PiConversation.environment_id == scope.environment_id,
+        PiConversation.id.in_(conversation_ids),
     )
-    numbers: set[str | None] = (
-        {customer.phone, customer.whatsapp_id} if customer is not None else set()
+    steps = (
+        (
+            "share_links_deleted",
+            delete(CustomerShareLink).where(CustomerShareLink.conversation_id.in_(ours)),
+        ),
     )
-    if conversation_ids:
-        numbers |= set(
-            await session.scalars(
-                select(PiConversation.contact_wa_id).where(
-                    *mine(PiConversation), PiConversation.id.in_(conversation_ids)
-                )
-            )
-        )
-    phones = {digits for digits in (_digits(number) for number in numbers) if digits}
-    out: dict[str, int] = {}
-    try:
-        async with session.begin_nested():
-            if conversation_ids:
-                out["share_links_deleted"] = _n(
-                    await session.execute(
-                        delete(CustomerShareLink).where(
-                            CustomerShareLink.conversation_id.in_(conversation_ids)
-                        )
-                    )
-                )
-            if phones:
-                out["share_links_revoked"] = _n(
-                    await session.execute(
-                        update(CustomerShareLink)
-                        .where(
-                            CustomerShareLink.conversation_id.is_(None),
-                            CustomerShareLink.phone.in_(phones),
-                        )
-                        .values(
-                            revoked_at=func.coalesce(
-                                CustomerShareLink.revoked_at, datetime.now(UTC)
-                            ),
-                            phone=PHONE_ERASED,
-                        )
-                    )
-                )
-    except ProgrammingError:
-        pass
-    return out
+    return await _run_steps(session, steps)
 
 
 async def _erase_map_and_boxes(
@@ -311,7 +329,7 @@ async def erase_customer(
             select(PiProblem.id).where(*mine(PiProblem), PiProblem.customer_id == customer_id)
         )
     )
-    removed: dict[str, int] = {}
+    removed: dict[str, Any] = {key: 0 for key in REMOVED_KEYS}
     try:  # the solution tables arrive with migration 0043
         async with session.begin_nested():
             removed["solution_memory"] = _n(
@@ -439,8 +457,11 @@ async def erase_customer(
             )
         )
     removed.update(await _erase_map_and_boxes(session, scope, customer_id))
-    removed.update(await _erase_workspace_texts(session, scope, customer_id, conversation_ids))
-    removed.update(await _erase_share_links(session, scope, customer_id, conversation_ids))
+    texts, skipped = await _erase_workspace_texts(session, scope, customer_id, conversation_ids)
+    removed.update(texts)
+    links, skipped_links = await _erase_share_links(session, scope, conversation_ids)
+    removed.update(links)
+    removed["_skipped"] = [*skipped, *skipped_links]
     # the Business Profile (facts, page snapshots) is what the owner told pi about their business
     try:  # the profile tables arrive with migration 0050
         async with session.begin_nested():
@@ -483,6 +504,10 @@ async def erase_customer(
             "payments": "financial records the company must be able to show",
             "customer_contact": "the CRM contact record belongs to the customer module",
             "message_rows": "the rows stay so counts and audit trails add up; the words are gone",
+            "share_links_all_chats": (
+                "needs owner decision R1: links to all of a customer's chats carry no workspace "
+                "key, so they are left untouched"
+            ),
             "text_only_rows": (
                 "tickets, handoffs, staff requests, tasks, bookings, staff notes and deal "
                 "documents keep their rows for counts and audit trails; the customer's words "

@@ -148,6 +148,7 @@ async def test_erasing_a_customer_clears_the_words_and_keeps_another_workspace(
     result = await erase_customer(db, w.scope_a, w.cust_a)
     await db.flush()
     removed = result["removed"]
+    assert removed["_skipped"] == []  # no step was skipped: success is never silent
 
     # G2, G6: rows with no record value are deleted
     assert await count(db, PiConversationTag, tenant_id=ta) == 0
@@ -185,9 +186,11 @@ async def test_erasing_a_customer_clears_the_words_and_keeps_another_workspace(
     await w.b.close()
 
 
-async def test_share_links_of_the_erased_chats_go_and_the_phone_leaves_all_chat_links(
+async def test_share_links_of_the_erased_chats_go_and_all_chat_links_are_left_alone(
     api, business_db, monkeypatch
 ):
+    """Only links scoped to the erased chats are deleted. A link to ALL of a customer's chats has no
+    workspace key and spans businesses (owner decision R1 open): it must stay untouched."""
     db = business_db
     w = await two_chats(api, db, monkeypatch)
     cust_a = await db.get(Customer, w.cust_a)
@@ -204,7 +207,7 @@ async def test_share_links_of_the_erased_chats_go_and_the_phone_leaves_all_chat_
             CustomerShareLink(
                 phone=phone, token_hash="b" * 64, conversation_id=w.conv_b.id, expires_at=FUTURE
             ),
-            # all of the customer's chats (spans businesses): revoked and the phone removed
+            # all of the customer's chats (spans businesses): untouched, R1 is open
             CustomerShareLink(
                 phone=phone, token_hash="c" * 64, conversation_id=None, expires_at=FUTURE
             ),
@@ -222,10 +225,173 @@ async def test_share_links_of_the_erased_chats_go_and_the_phone_leaves_all_chat_
     links = {link.token_hash[0]: link for link in await db.scalars(select(CustomerShareLink))}
     assert "a" not in links  # the link to the erased chat is gone
     assert links["b"].phone == phone and links["b"].revoked_at is None  # B's chat link stays
-    assert links["c"].phone != phone and links["c"].revoked_at is not None  # cross-business effect
+    assert links["c"].phone == phone and links["c"].revoked_at is None  # R1: left untouched
     assert links["d"].phone == other_phone and links["d"].revoked_at is None
     assert result["removed"]["share_links_deleted"] == 1
-    assert result["removed"]["share_links_revoked"] == 1
-    assert all(phone not in link.phone for link in links.values() if link.token_hash[0] == "c")
+    assert "share_links_revoked" not in result["removed"]
+    assert "share_links_all_chats" in result["kept_reasons"]
+    await w.a.close()
+    await w.b.close()
+
+
+async def other_customer_rows(db, conv, tag: str) -> Customer:
+    """A second customer of the same workspace with rows linked only by customer_id."""
+    where = {"tenant_id": conv.tenant_id, "environment_id": conv.environment_id}
+    other = Customer(**where, name=f"Other owner {tag}")
+    service = PiBookableService(**where, name=f"Other visit {tag}")
+    db.add_all([other, service])
+    await db.flush()
+    db.add_all(
+        [
+            PiTicket(**where, customer_id=other.id, subject=f"keep {tag}", summary=f"keep {tag}"),
+            PiTask(
+                **where,
+                title=f"keep {tag}",
+                description=f"keep {tag}",
+                customer_id=other.id,
+                idempotency_key=f"keep-task-{tag}",
+            ),
+            PiBooking(
+                **where,
+                service_id=service.id,
+                customer_id=other.id,
+                starts_at=FUTURE,
+                ends_at=FUTURE + timedelta(minutes=30),
+                timezone="Asia/Karachi",
+                notes=f"keep {tag}",
+                idempotency_key=f"keep-bk-{tag}",
+            ),
+            PiDocument(
+                **where,
+                kind="proposal",
+                customer_id=other.id,
+                token_hash=f"keep{tag}".ljust(64, "0"),
+                expires_at=FUTURE,
+                message_text=f"keep {tag}",
+            ),
+        ]
+    )
+    await db.flush()
+    return other
+
+
+async def test_another_customer_in_the_same_workspace_is_untouched(api, business_db, monkeypatch):
+    db = business_db
+    w = await two_chats(api, db, monkeypatch)
+    await seed_rows(db, w.conv_a, "a")
+    await other_customer_rows(db, w.conv_a, "x")
+    ta = w.conv_a.tenant_id
+
+    await erase_customer(db, w.scope_a, w.cust_a)
+    await db.flush()
+
+    for model, column in (
+        (PiTicket, "subject"),
+        (PiTask, "title"),
+        (PiBooking, "notes"),
+        (PiDocument, "message_text"),
+    ):
+        values = await texts(db, model, ta, column)
+        assert "keep x" in values, f"{model.__tablename__}: the other customer's words were erased"
+        assert not [v for v in values if WORDS in v], model.__tablename__
+    await w.a.close()
+    await w.b.close()
+
+
+async def test_a_ticket_and_a_task_linked_only_by_customer_id_are_cleared(
+    api, business_db, monkeypatch
+):
+    db = business_db
+    w = await two_chats(api, db, monkeypatch)
+    where = {"tenant_id": w.conv_a.tenant_id, "environment_id": w.conv_a.environment_id}
+    db.add_all(
+        [
+            PiTicket(**where, customer_id=w.cust_a, subject=WORDS, summary=WORDS),
+            PiTask(
+                **where,
+                title=WORDS,
+                description=WORDS,
+                customer_id=w.cust_a,
+                idempotency_key="only-by-customer",
+            ),
+        ]
+    )
+    await db.flush()
+
+    await erase_customer(db, w.scope_a, w.cust_a)
+    await db.flush()
+
+    ta = w.conv_a.tenant_id
+    assert await count(db, PiTicket, tenant_id=ta) == 1  # the row stays
+    assert await texts(db, PiTicket, ta, "subject", "summary") == [ERASED]
+    assert [v for v in await texts(db, PiTask, ta, "title", "description") if WORDS in v] == []
+    await w.a.close()
+    await w.b.close()
+
+
+async def test_erasing_twice_is_idempotent_and_skips_nothing(api, business_db, monkeypatch):
+    db = business_db
+    w = await two_chats(api, db, monkeypatch)
+    await seed_rows(db, w.conv_a, "a")
+    ta = w.conv_a.tenant_id
+
+    first = await erase_customer(db, w.scope_a, w.cust_a)
+    await db.flush()
+    after_first = await texts(db, PiTicket, ta, "subject", "summary")
+    second = await erase_customer(db, w.scope_a, w.cust_a)
+    await db.flush()
+
+    assert first["removed"]["_skipped"] == [] and second["removed"]["_skipped"] == []
+    assert await texts(db, PiTicket, ta, "subject", "summary") == after_first == [ERASED]
+    assert second["removed"]["conversation_tags"] == 0  # nothing left to delete
+    assert second["removed"]["pending_actions"] == 0
+    await w.a.close()
+    await w.b.close()
+
+
+async def test_a_confirmed_pending_action_keeps_its_row_with_blank_text(
+    api, business_db, monkeypatch
+):
+    db = business_db
+    w = await two_chats(api, db, monkeypatch)
+    where = {"tenant_id": w.conv_a.tenant_id, "environment_id": w.conv_a.environment_id}
+    db.add_all(
+        [
+            PiPendingAction(
+                **where,
+                conversation_id=w.conv_a.id,
+                kind="confirm_order",
+                status="confirmed",
+                payload={"text": WORDS},
+                summary=WORDS,
+                expires_at=FUTURE,
+                resolved_at=datetime.now(UTC),
+            ),
+            PiPendingAction(
+                **where,
+                conversation_id=w.conv_a.id,
+                kind="confirm_order",
+                status="pending",
+                payload={"text": WORDS},
+                summary=WORDS,
+                expires_at=FUTURE,
+            ),
+        ]
+    )
+    await db.flush()
+
+    result = await erase_customer(db, w.scope_a, w.cust_a)
+    await db.flush()
+    db.expire_all()
+
+    rows = list(
+        await db.scalars(
+            select(PiPendingAction).where(PiPendingAction.tenant_id == where["tenant_id"])
+        )
+    )
+    assert [r.status for r in rows] == ["confirmed"]  # the unresolved draft is deleted
+    assert rows[0].payload == {} and rows[0].summary == ""  # the audit row stays, blanked
+    assert result["removed"]["pending_actions"] == 1
+    assert result["removed"]["pending_actions_cleared"] == 1
     await w.a.close()
     await w.b.close()

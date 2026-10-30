@@ -265,6 +265,8 @@ def test_g1_to_g10_are_fixed_by_the_documented_action():
     deleted, updated = _targets(source, "delete"), _targets(source, "update")
     for name in sorted(DELETED_ROWS):
         assert tables[name][0] in deleted, f"{name}: rows of the customer must be deleted"
+    # a confirmed or cancelled pending draft keeps its small audit row, text blanked
+    assert tables["pi_pending_actions"][0] in updated
     for name in sorted(WORDS_BLANKED):
         assert tables[name][0] in updated, f"{name}: the words must be blanked, the row kept"
         assert tables[name][0] not in deleted, f"{name}: the row must stay (counts, audit trail)"
