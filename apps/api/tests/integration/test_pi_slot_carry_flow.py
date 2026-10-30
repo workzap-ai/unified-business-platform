@@ -130,7 +130,7 @@ async def test_the_copy_is_made_once_and_holds_only_the_allowed_keys(api, busine
     _, new = await chats(business_db, pi)
     brief = new.service_brief or {}
     assert [c["q"] for c in brief["closed_slots"]][:1] == [ASKED]
-    assert all(c.get("carried") is True for c in brief["closed_slots"][:1])
+    assert all("carried" not in c for c in brief["closed_slots"])  # no flag reaches the model
     text = json.dumps(brief)
     assert "Ali" not in text and "brother" not in text and "bank balance" not in text
     assert "requirements" not in brief and "customer_profile" not in brief

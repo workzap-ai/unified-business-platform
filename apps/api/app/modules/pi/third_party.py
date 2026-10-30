@@ -13,9 +13,16 @@ It is NOT a privacy boundary. Honest limits, in both directions:
   name next to a stop word ("Monday Ahmed said", "Yesterday Bilal said": every capitalised word of
   the match must be a non-stop word); a name with a verb that is not a reporting verb ("Ahmed took
   the stock"); a name in a language not listed here.
-* False positives (a word is replaced): a capitalised organisation or product that is not in the
-  stop list and stands before a reporting verb or after "called/told/asked" ("called Foodpanda")
-  becomes "someone". Roles, pronouns, possessives, places and the brands in the stop list are kept.
+* False positives (a word is replaced): a capitalised word that is neither a name nor in the stop
+  lists, standing before a reporting verb or after "called/told/asked/phoned/texted/messaged/
+  emailed/warned", becomes "someone" ("I called Careem", "Uber said"). The stop lists hold
+  pronouns, possessives, greetings, time words, relatives, trades and roles (mom, dad, brother,
+  boss, friend, agent, tailor, rider, courier, cashier ...), places and well-known brands and
+  technical words, in English, Roman Urdu, Urdu and Arabic; a role or relative that is not in them
+  is treated as a name ("Plumber said" is kept only because plumber is listed; "Glazier said" is
+  not). All-capital words (API, SB) are never read as an honorific.
+* A relative with a name keeps the relative and drops the name ("Uncle Ahmed said" becomes "Uncle
+  said"; "my uncle Ahmed" becomes "my uncle").
 What is stored is still the owner's own text, erased with the customer; this only lowers how much
 of a third party's identity sits in it. The owner's own contact details, given to be reached, are
 not touched here (`safety.OWN_NUMBER` decides that).
@@ -51,6 +58,21 @@ NOT_NAMES = frozenset(
         "facebook", "instagram", "google", "shopify", "tiktok", "youtube", "amazon", "daraz",
         "easypaisa", "jazzcash", "meezan", "hbl", "ubl", "alfalah", "foodpanda", "bykea", "tcs",
         "leopards", "trax", "postex",
+        # relatives and trades
+        "boss", "ustad", "mom", "mum", "dad", "mother", "father", "brother", "sister", "friend",
+        "agent", "tailor", "uncle", "aunt", "aunty", "auntie", "cousin", "neighbour", "neighbor",
+        "wife", "husband", "son", "daughter", "nephew", "niece", "grandfather", "grandmother",
+        "grandma", "grandpa", "teacher", "plumber", "electrician", "mechanic", "designer",
+        "developer", "engineer", "lawyer", "supervisor", "receptionist", "secretary", "waiter",
+        "chef", "guard", "worker", "representative", "assistant", "salesperson",
+        # greetings and time words
+        "assalam", "salam", "kal", "aaj", "shukriya", "jazakallah", "welcome", "good",
+        "morning", "evening", "night", "afternoon", "now", "later",
+        # technical words and products
+        "api", "rest", "stripe", "zapier", "sdk", "aws", "azure", "graphql", "webhook",
+        "wordpress", "woocommerce", "odoo", "quickbooks", "tally", "excel", "sheets", "zoom",
+        "slack", "github", "oauth", "json", "sql", "crm", "erp", "ai", "paypal", "visa",
+        "mastercard", "gmail", "outlook",
     }
 )  # fmt: skip
 # Roman Urdu: pronouns, possessives, function words, honorific words and roles (plus NOT_NAMES).
@@ -63,6 +85,9 @@ NOT_NAMES_RU = frozenset(
         "dukandar", "dukan", "malik", "log", "bhai", "bhaiya", "baji", "api", "apa", "sahab",
         "sahib", "saab", "khala", "chacha", "mamu", "uncle", "aunty", "madam", "bhabhi", "bhabi",
         "dost",
+        "ammi", "ami", "abbu", "abu", "behan", "bahan", "beta", "beti", "biwi", "shauhar",
+        "phuphi", "nana", "nani", "dada", "dadi", "darzi", "ustad", "assalam", "salam", "kal",
+        "aaj", "shukriya", "ji", "jee", "haan", "theek", "acha", "achha",
     }
 )  # fmt: skip
 NOT_NAMES_ARABIC_SCRIPT = frozenset(
@@ -87,6 +112,11 @@ NOT_NAMES_ARABIC_SCRIPT = frozenset(
         "أخي", "أختي", "صديقي", "صديقتي", "زميلي", "جاري", "مديري", "عمي", "خالي", "مندوب",
         "سائق", "كاشير", "دعم", "خدمة", "بنك", "مدير", "موظف", "مالك", "فريق", "شرطة",
         "مستشفى", "طبيب",
+        # Urdu and Arabic: relatives, trades, greetings, time words
+        "ماں", "امی", "ابو", "والد", "والدہ", "باس", "ایجنٹ", "درزی", "استاد", "پھوپھی",
+        "بیوی", "شوہر", "بیٹا", "بیٹی", "جی", "شکریہ", "کل", "آج", "سلام", "السلام", "ہاں",
+        "اچھا", "ٹھیک", "أمي", "أبي", "رئيسي", "وكيل", "خياط", "معلم", "شكرا", "أمس", "اليوم",
+        "غدا", "مرحبا",
         # Arabic: the reporting verbs themselves are never a name
         "قال", "قالت", "أخبرني", "اتصل", "كلمني", "أرسل", "رفض", "وعد", "سرق",
     }
@@ -108,6 +138,9 @@ REPORT_AFTER = (
 REPORT_BEFORE = r"told|asked|called|phoned|texted|messaged|emailed|warned"
 
 EN_HONORIFIC = re.compile(rf"\b({HONORIFIC})\s+({NAME})")
+EN_TITLE_RELATION = re.compile(
+    rf"\b(Uncle|Aunt|Aunty|Auntie|Brother|Sister|Cousin|Boss|Ustad|Teacher)\s+({NAME})"
+)
 EN_RELATION = re.compile(rf"\b((?i:my|our|his|her|their|the)\s+(?i:{RELATION}))\s+({NAME})")
 EN_NAME_THEN_VERB = re.compile(rf"\b({NAME})\s+(?=(?i:{REPORT_AFTER})\b)")
 EN_VERB_THEN_NAME = re.compile(rf"\b((?i:{REPORT_BEFORE}))\s+({NAME})")
@@ -171,6 +204,10 @@ def _relation(match: re.Match[str]) -> str:
     return match.group(1) if _is_name(match.group(2)) else match.group(0)
 
 
+def _title_relation(match: re.Match[str]) -> str:
+    return match.group(1) if _is_name(match.group(2)) else match.group(0)
+
+
 def _name_then_verb(match: re.Match[str]) -> str:
     return f"{SOMEONE['en']} " if _is_name(match.group(1)) else match.group(0)
 
@@ -180,6 +217,8 @@ def _verb_then_name(match: re.Match[str]) -> str:
 
 
 def _ru_honorific(match: re.Match[str]) -> str:
+    if match.group(2).isupper():  # API, SB: a technical word, not an honorific
+        return match.group(0)
     return match.group(2) if _is_name_ru(match.group(1)) else match.group(0)
 
 
@@ -204,6 +243,7 @@ def protect(text: str) -> str:
     out = text or ""
     out = EN_HONORIFIC.sub(_honorific, out)
     out = EN_RELATION.sub(_relation, out)
+    out = EN_TITLE_RELATION.sub(_title_relation, out)
     out = EN_NAME_THEN_VERB.sub(_name_then_verb, out)
     out = EN_VERB_THEN_NAME.sub(_verb_then_name, out)
     out = RU_NAME_HONORIFIC.sub(_ru_honorific, out)

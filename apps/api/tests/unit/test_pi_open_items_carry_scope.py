@@ -96,6 +96,8 @@ def _fits(row: Any, criteria: list[tuple[str, Any, Any]]) -> bool:
         have = getattr(row, name, NO_MATCH)
         if have is NO_MATCH:
             return False
+        if have is None and op in (operator.ge, operator.le):
+            return False  # SQL: NULL <= x is not true
         if op is operator.eq and have != value:
             return False
         if op is operator.ne and have == value:
@@ -427,7 +429,8 @@ async def test_the_carry_never_crosses_tenant_environment_or_customer():
     assert await carry(session, mine, new) == 0
     assert [(r.conversation_id, r.tenant_id, r.environment_id) for r in rows] == before
     wanted = {"tenant_id", "environment_id", "customer_id"}
-    assert all(wanted <= {name for name, _, _ in c} for c in session.seen[:1] + session.seen[1:2])
+    # the query for quiet chats and the final look at what is left both name all three walls
+    assert all(wanted <= {name for name, _, _ in c} for c in (session.seen[0], session.seen[-1]))
 
 
 async def test_the_erase_of_the_new_conversation_alone_removes_the_carried_items():
@@ -446,7 +449,13 @@ async def test_the_erase_of_the_new_conversation_alone_removes_the_carried_items
 
 
 def staff_request(
-    chat_: Any, *, status="answered", resolved=NOW - timedelta(hours=1), kind="question"
+    chat_: Any,
+    *,
+    status: str = "answered",
+    resolved: datetime = NOW - timedelta(hours=1),
+    created: datetime = NOW - timedelta(hours=5),  # raised in the same turn as the item
+    kind: str = "question",
+    question: str = QUESTION,
 ):
     return SimpleNamespace(
         id=uuid4(),
@@ -457,16 +466,17 @@ def staff_request(
         kind=kind,
         status=status,
         resolved_at=resolved,
+        created_at=created,
+        question=question,
     )
 
 
-async def settle(session: FakeSession, s: WorkspaceScope, new: Any, row: Any) -> None:
-    message = SimpleNamespace(id=uuid4(), body="ok")
+async def settle(session: FakeSession, s: WorkspaceScope, chat_: Any) -> None:
     await open_items.sync(
         session,
         s,
-        new,
-        message,
+        chat_,
+        SimpleNamespace(id=uuid4(), body="ok"),
         reply="Understood.",
         language="en",
         request_human=False,
@@ -476,39 +486,81 @@ async def settle(session: FakeSession, s: WorkspaceScope, new: Any, row: Any) ->
     )
 
 
-async def test_the_teams_answer_closes_a_question_that_was_carried_into_a_new_chat():
+async def carried_question(*requests: Any):
+    """A question opened 5 hours ago in an earlier chat, then carried into a new chat."""
     s = scope()
     customer = uuid4()
     earlier, new = chat(s, customer), chat(s, customer)
     row = item(earlier, created=NOW - timedelta(hours=5))
     session = world([row], earlier, new)
-    session.tables["pi_staff_requests"] = [staff_request(earlier)]  # under the OLD conversation id
-    await carry(session, s, new)
-    assert row.conversation_id == new.id
-    await settle(session, s, new, row)
+    session.tables["pi_staff_requests"] = [r(earlier, s, customer) for r in requests]
+    await open_items.carry_into(session, s, new, now=NOW)
+    assert row.conversation_id == new.id and row.source_message_id is None
+    return session, s, new, row
+
+
+def desk(**kwargs):
+    """A staff request to be built for the chat once it exists."""
+    return lambda earlier, s, customer: staff_request(earlier, **kwargs)
+
+
+async def test_the_teams_answer_closes_a_question_that_was_carried_into_a_new_chat():
+    session, s, new, row = await carried_question(desk())  # under the OLD conversation id
+    await settle(session, s, new)
     assert row.status == "answered" and row.closed_reason == "reply_answered"
 
 
+async def test_a_request_about_the_same_words_closes_it_even_when_raised_at_another_time():
+    session, s, new, row = await carried_question(desk(created=NOW - timedelta(hours=20)))
+    await settle(session, s, new)
+    assert row.status == "answered"
+
+
 @pytest.mark.parametrize(
-    "case", ["other_customer", "other_tenant", "still_open", "too_early", "other_kind"]
+    "request_args",
+    [
+        {"status": "open"},
+        {"status": "dismissed"},  # the team declined it: not an answer
+        {"resolved": NOW - timedelta(hours=9)},  # resolved before the item existed
+        {"kind": "document_review"},
+        # raised long before the item and about something else: not this question
+        {"created": NOW - timedelta(days=3), "question": "invoice for the March order"},
+        # raised long after the item and about something else
+        {"created": NOW - timedelta(hours=1), "question": "invoice for the March order"},
+    ],
 )
-async def test_a_staff_request_that_is_not_this_customers_answer_does_not_close_it(case):
+async def test_a_staff_request_that_is_not_the_answer_to_this_question_does_not_close_it(
+    request_args,
+):
+    session, s, new, row = await carried_question(desk(**request_args))
+    await settle(session, s, new)
+    assert row.status == "open", request_args
+
+
+@pytest.mark.parametrize("case", ["other_customer", "other_tenant"])
+async def test_a_staff_request_of_another_customer_or_workspace_does_not_close_it(case):
+    def foreign(earlier, s, customer):
+        if case == "other_customer":
+            return staff_request(chat(s))
+        return staff_request(chat(scope(), customer))
+
+    session, s, new, row = await carried_question(foreign)
+    await settle(session, s, new)
+    assert row.status == "open"
+
+
+async def test_a_row_that_was_not_carried_is_only_closed_by_a_request_of_its_own_chat():
     s = scope()
     customer = uuid4()
-    earlier, new = chat(s, customer), chat(s, customer)
-    row = item(earlier, created=NOW - timedelta(hours=5))
-    request = {
-        "other_customer": lambda: staff_request(chat(s)),
-        "other_tenant": lambda: staff_request(chat(scope(), customer)),
-        "still_open": lambda: staff_request(earlier, status="open"),
-        "too_early": lambda: staff_request(earlier, resolved=NOW - timedelta(hours=9)),
-        "other_kind": lambda: staff_request(earlier, kind="document_review"),
-    }[case]()
-    session = world([row], earlier, new)
-    session.tables["pi_staff_requests"] = [request]
-    await carry(session, s, new)
-    await settle(session, s, new, row)
+    here, other = chat(s, customer), chat(s, customer)
+    row = item(here, created=NOW - timedelta(hours=5))  # keeps its source message: not carried
+    session = world([row], here, other)
+    session.tables["pi_staff_requests"] = [staff_request(other)]  # the same customer, another chat
+    await settle(session, s, here)
     assert row.status == "open"
+    session.tables["pi_staff_requests"] = [staff_request(here)]  # the item's own chat
+    await settle(session, s, here)
+    assert row.status == "answered"
 
 
 # --- slot_carry itself ---------------------------------------------------------------------------
@@ -524,9 +576,74 @@ async def test_slot_carry_copies_the_slots_moves_the_items_and_sets_its_mark_onc
     session = world([row], earlier, new)
     assert await slot_carry.carry_into(session, s, new, NOW) is True
     brief = new.service_brief
-    assert brief[slot_carry.MARK] is True and brief["closed_slots"][0]["carried"] is True
+    assert brief[slot_carry.MARK] is True
+    assert brief["closed_slots"] == [{"slot": "shops.where", "q": "Which shop is it?"}]
     assert row.conversation_id == new.id
     assert await slot_carry.carry_into(session, s, new, NOW) is False  # made once
+
+
+async def test_the_mark_is_not_set_while_an_eligible_item_is_left_behind_and_a_later_turn_retries():
+    s = scope()
+    customer = uuid4()
+    gap = timedelta(hours=open_items.CARRY_IDLE_HOURS)
+    busy = chat(s, customer, quiet_for=gap - timedelta(minutes=1))  # not quiet yet
+    new = chat(s, customer)
+    row = item(busy)
+    session = world([row], busy, new)
+    await slot_carry.carry_into(session, s, new, NOW)
+    assert slot_carry.MARK not in new.service_brief and row.conversation_id == busy.id
+    busy.last_message_at = NOW - gap  # the next turn: the chat has gone quiet
+    await slot_carry.carry_into(session, s, new, NOW)
+    assert new.service_brief[slot_carry.MARK] is True and row.conversation_id == new.id
+
+
+async def test_the_mark_is_not_set_while_the_cap_leaves_items_behind():
+    s = scope()
+    customer = uuid4()
+    earlier, new = chat(s, customer), chat(s, customer)
+    rows = [item(earlier, created=NOW - timedelta(hours=h + 1)) for h in range(12)]
+    session = world(rows, earlier, new)
+    await slot_carry.carry_into(session, s, new, NOW)
+    assert slot_carry.MARK not in new.service_brief  # two are left behind
+    assert sum(r.conversation_id == new.id for r in rows) == 10
+
+
+async def test_the_mark_is_set_when_nothing_is_left_or_only_duplicates_are():
+    s = scope()
+    customer = uuid4()
+    earlier, new = chat(s, customer), chat(s, customer)
+    held = item(new, key="q:same")
+    twin = item(earlier, key="q:same")  # a duplicate of what the new chat holds: never moves
+    session = world([held, twin], earlier, new)
+    await slot_carry.carry_into(session, s, new, NOW)
+    assert new.service_brief[slot_carry.MARK] is True and twin.conversation_id == earlier.id
+
+
+async def test_a_chat_with_no_last_message_time_is_never_raided():
+    s = scope()
+    customer = uuid4()
+    earlier, new = chat(s, customer), chat(s, customer)
+    earlier.last_message_at = None
+    row = item(earlier)
+    session = world([row], earlier, new)
+    assert await open_items.carry_into(session, s, new, now=NOW) == 0
+    assert row.conversation_id == earlier.id
+
+
+async def test_the_same_request_open_in_two_old_chats_moves_once_and_the_cap_counts_after_it():
+    s = scope()
+    customer = uuid4()
+    one, two, new = chat(s, customer), chat(s, customer), chat(s, customer)
+    twins = [
+        item(one, kind="owner_request", key="timeline", created=NOW - timedelta(hours=7)),
+        item(two, kind="owner_request", key="timeline", created=NOW - timedelta(hours=8)),
+    ]
+    others = [item(one, created=NOW - timedelta(hours=h + 10)) for h in range(10)]
+    session = world([*twins, *others], one, two, new)
+    assert await open_items.carry_into(session, s, new, now=NOW) == 10
+    assert sum(t.conversation_id == new.id for t in twins) == 1  # the newest twin
+    assert twins[0].conversation_id == new.id
+    assert sum(o.conversation_id == new.id for o in others) == 9  # ten, once the twin took a place
 
 
 async def test_a_failed_item_carry_leaves_the_mark_unset_logs_ids_only_and_is_tried_again(caplog):
@@ -766,6 +883,8 @@ def stored_text(text: str) -> str:
     [
         ("my brother Ahmed Khan took the stock", ["Ahmed", "Khan"], ["my brother"]),
         ("my uncle Ahmed called yesterday", ["Ahmed"], ["my uncle"]),
+        ("Uncle Ahmed said the stock is low", ["Ahmed"], ["Uncle said the stock"]),
+        ("Brother Bilal told me to wait", ["Bilal"], ["Brother told me"]),
         ("Mr. Raza phoned me about the invoice", ["Raza"], ["a person phoned me"]),
         ("Dr Sana told me the parcel is late", ["Sana"], ["doctor told me"]),
         ("Bilal said the parcel is late", ["Bilal"], ["someone said the parcel"]),
@@ -841,12 +960,27 @@ LEFT_AS_WRITTEN = [
     "the partner Workzap sent the quote",
     "our supplier Daraz is slow",
     "the customer Support team replied",
+    # relatives and trades, with no name
+    "Mom said she will come",
+    "Dad told me to wait",
+    "Brother called me yesterday",
+    "Boss said the stock is low",
+    "Friend asked about the price",
+    "Agent said it is ready",
+    "Tailor told me it is late",
+    "I called Dad",
     # words that look like an honorific after a name
     "my uncle called",
     "the API is down",
+    "Stripe API stopped",
+    "REST API failed",
+    "Zapier API is slow",
     "Thank you sir",
+    "Assalam sir",
     "The API stopped",
     "Mera bhai aaya hai",
+    "Kal bhai ne kaha ke maal aayega",
+    "Agent ne kaha ke kal aayega",
     # Roman Urdu roles, lower-case words and pronouns
     "main ne kaha ke theek hai",
     "rider ne kaha ke kal aayega",
@@ -862,6 +996,11 @@ LEFT_AS_WRITTEN = [
     "میری بہن کل آئے گی",
     "میرا بھائی ٹھیک ہے",
     "ڈرائیور نے بتایا کہ دیر ہو گئی",
+    "جی سر",
+    "شکریہ سر",
+    "کل بہن آئی",
+    "آج بھائی نے کہا",
+    "ماں نے کہا کہ ٹھیک ہے",
     # Arabic
     "قال لي المدير إن الطلب جاهز",
     "الزبون قال إن السعر مرتفع",
@@ -912,3 +1051,8 @@ def test_the_owners_own_number_and_a_third_partys_contact_are_still_decided_by_r
     out = stored_text(f"call me on {PHONE}, and his number is {THEIRS}, mail {EMAIL}, card {CARD}")
     assert PHONE in out  # given to be reached: kept by design (safety.OWN_NUMBER)
     assert THEIRS not in out and EMAIL not in out and CARD not in out
+
+
+def test_a_capitalised_unlisted_word_before_a_reporting_verb_is_replaced_a_stated_false_positive():
+    assert third_party.protect("I called Careem") == "I called someone"
+    assert third_party.protect("Uber said it is late") == "someone said it is late"

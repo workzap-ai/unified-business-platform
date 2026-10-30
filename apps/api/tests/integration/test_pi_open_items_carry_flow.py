@@ -86,9 +86,8 @@ async def test_a_carried_request_reaches_the_new_brief_and_an_old_item_does_not(
     await pi.close()
 
 
-async def test_the_teams_answer_to_the_old_chat_closes_the_carried_question(
-    api, business_db, monkeypatch
-):
+async def staffed_chat(api, business_db, monkeypatch, status):
+    """An open question in chat one, a staff request about it under chat one, then a new chat."""
     seen, pi, one = await first_chat(api, business_db, monkeypatch)
     row = await open_item(business_db, pi, one, hours_old=5)
     business_db.add(
@@ -99,23 +98,37 @@ async def test_the_teams_answer_to_the_old_chat_closes_the_carried_question(
             customer_id=one.customer_id,
             question=QUESTION,
             kind="question",
-            status="answered",
-            answer="Three days.",
+            status=status,
+            answer="Three days." if status == "answered" else None,
             resolved_at=datetime.now(UTC) - timedelta(hours=1),
         )
     )
     await business_db.flush()
     await close_with(business_db, one, {}, age_days=1)
-    await talk(pi, business_db, HELLO, "q6-3")
+    await talk(pi, business_db, HELLO, "q6-3a")  # the new chat: the question is carried into it
     new = (await chats(business_db, pi))[-1]
     await business_db.refresh(row)
-    assert row.conversation_id == new.id
-    since = row.created_at
-    scope = pi.scope()
-    assert await open_items.team_answered_after(business_db, scope, new.id, since) is False
-    assert await open_items.team_answered_after(
-        business_db, scope, new.id, since, customer_id=new.customer_id
-    )
+    assert row.conversation_id == new.id and row.source_message_id is None
+    return pi, new, row
+
+
+async def test_the_teams_answer_to_the_old_chat_closes_the_carried_question_in_a_real_turn(
+    api, business_db, monkeypatch
+):
+    pi, new, row = await staffed_chat(api, business_db, monkeypatch, "answered")
+    await talk(pi, business_db, "ok thanks", "q6-3b")  # open_items.sync runs on this turn
+    await business_db.refresh(row)
+    assert row.status == "answered" and row.closed_reason == "reply_answered"
+    await pi.close()
+
+
+async def test_a_dismissed_request_does_not_close_the_carried_question_in_a_real_turn(
+    api, business_db, monkeypatch
+):
+    pi, new, row = await staffed_chat(api, business_db, monkeypatch, "dismissed")
+    await talk(pi, business_db, "ok thanks", "q6-3c")
+    await business_db.refresh(row)
+    assert row.status == "open"
     await pi.close()
 
 
@@ -136,7 +149,7 @@ async def test_an_item_of_another_workspace_with_the_same_phone_is_never_moved_o
     new = (await chats(business_db, mine))[-1]
     await business_db.refresh(foreign)
     assert foreign.conversation_id == other.id, "another workspace's item was moved"
-    assert foreign.tenant_id == theirs.tenant_id
+    assert str(foreign.tenant_id) == str(theirs.tenant_id)  # the helper holds a str, the row a UUID
     assert await open_items.load_for_return(business_db, mine.scope(), new, hours_away=30) == []
     await mine.close()
     await theirs.close()
