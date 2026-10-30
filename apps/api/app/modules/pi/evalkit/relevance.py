@@ -4,11 +4,15 @@ Not a quality gate and not a learning reward. Scorer agreed 55% with an independ
 the borderline set; exact-token matching after crude stemming, no negation, no numbers, limit
 keywords are fixture data.
 
-Known limits, stated so nobody reads more into a verdict than it holds: words are matched as
-exact tokens after a crude stem (ASCII tokens lose a plural "s" and are cut to five letters;
-Arabic loses a leading "ال"), so inflected Urdu, Hindi and Arabic forms do not match; there is no
-negation ("do not hire" and "hire" look alike); a numeric limit ("not above 20000") cannot be
-expressed, and numbers are matched only as whole tokens ('20000' and '200000' stay distinct).
+Known limits, stated so nobody reads more into a verdict than it holds: matching is by stem
+(`relevance_match`: English plural, -ing, -ed, -ly; Roman Urdu endings only when the case language
+is `roman_ur`; ASCII stems are cut to five letters; Arabic loses a leading "ال"), so inflected
+Urdu script, Hindi and Arabic forms still do not match and an irregular English form does not
+either. Figures such as '3 lakh', '3,00,000' and '300000' are one token. A numeric ceiling in a
+limit's text ('cannot spend more than 20000 rupees', 'up to 2 lakh') is compared as a number with
+the idea's money figures; 'cannot buy X' and 'tried X before and it failed' texts are read as verb
+plus object. Spelled-out numbers, floors ('at least'), negation inside an idea ("do not hire"
+still looks like "hire") and verbs outside the listed groups are not understood.
 
 A plan case carries the owner's brief and candidate ideas with an expected verdict. For each
 idea this module computes one of five verdicts from the text alone:
@@ -34,6 +38,7 @@ import re
 from typing import Any
 
 from app.modules.pi.evalkit import access_log, scorers, splits
+from app.modules.pi.evalkit import relevance_match as match
 
 VERDICTS = ("relevant", "irrelevant", "generic", "violates_constraint", "restates_owner")
 DISCLAIMER = (
@@ -134,13 +139,11 @@ def tokens(text: str) -> list[str]:
     return [t for t in out if not (len(t) > 1 and t.isdigit() and not t.strip("0"))]
 
 
-def _stem(token: str) -> str:
+def _stem(token: str, language: str | None = None) -> str:
     if any(ch.isdigit() for ch in token):
         return token  # a figure is never truncated: '20000' and '200000' stay distinct
     if token.isascii():
-        if token.endswith("s") and len(token) > 3:
-            token = token[:-1]
-        return token[:5]
+        return match.stem_ascii(token, language)
     if token.startswith("ال") and len(token) > 3:
         return token[2:]
     return token
@@ -154,39 +157,83 @@ def _keep(token: str) -> bool:
     return len(token) >= (3 if token.isascii() else 2)
 
 
-def stems(text: str) -> set[str]:
-    return {_stem(t) for t in tokens(text) if _keep(t)}
+def stems(text: str, language: str | None = None) -> set[str]:
+    """Content stems. Magnitude figures are folded first ('3 lakh', '3,00,000' and '300000' are
+    one token); English words lose plural, -ing, -ed and -ly, and with language 'roman_ur' the
+    common Roman Urdu endings go too."""
+    return {_stem(t, language) for t in tokens(match.fold_magnitudes(text)) if _keep(t)}
 
 
-def _vocab(brief: dict[str, Any], problem: str | None) -> tuple[set[str], set[str]]:
+def _vocab(
+    brief: dict[str, Any], problem: str | None, language: str | None = None
+) -> tuple[set[str], set[str]]:
     """(the owner's own words about the problem, the other stated facts)."""
     problems = brief.get("problems") or []
     chosen = [p for p in problems if p.get("id") == problem] or problems
     owner: set[str] = set()
     facts: set[str] = set()
     for p in chosen:
-        owner |= stems(" ".join([p.get("title", ""), *p.get("user_words", [])]))
-        facts |= stems(" ".join([*p.get("facts", []), *p.get("figures", [])]))
-    facts |= stems(" ".join([*brief.get("roles", []), *brief.get("systems", [])]))
+        owner |= stems(" ".join([p.get("title", ""), *p.get("user_words", [])]), language)
+        facts |= stems(" ".join([*p.get("facts", []), *p.get("figures", [])]), language)
+        for limit in p.get("constraints") or []:
+            if limit.get("status", "confirmed") == "confirmed":
+                # what the owner said they cannot do names things the owner raised
+                for rule in match.parse_rules(str(limit.get("text", "")), language, stems):
+                    if rule.kind == "neg":
+                        facts |= rule.objects
+    facts |= stems(" ".join([*brief.get("roles", []), *brief.get("systems", [])]), language)
     return owner, facts - owner
 
 
-def violated(brief: dict[str, Any], idea: set[str]) -> str | None:
-    """The first CONFIRMED limit the idea breaks; an assumed limit never rejects an idea."""
+def _said_amounts(brief: dict[str, Any], owner_text: str) -> set[tuple[float, float]]:
+    texts = [owner_text]
+    for p in brief.get("problems") or []:
+        texts += [p.get("title", ""), *p.get("user_words", []), *p.get("facts", [])]
+        texts += list(p.get("figures", []))
+    return match.said_amounts(texts)
+
+
+def violated(
+    brief: dict[str, Any],
+    idea: set[str],
+    language: str | None = None,
+    text: str = "",
+    owner_text: str = "",
+) -> str | None:
+    """The first CONFIRMED limit the idea breaks; an assumed limit never rejects an idea.
+
+    A limit is broken by (1) one of its `blocks` phrases, unless its own text says 'cannot VERB
+    OBJECT' and the idea uses a milder verb ('rent' against 'cannot buy'); (2) the verb group and
+    object of a 'cannot VERB OBJECT' text; (3) the object of a 'tried X before and it failed'
+    text; (4) a figure above a numeric ceiling in the limit's text. (2) to (4) need the idea's
+    raw `text`."""
+    said = _said_amounts(brief, owner_text)
     for problem in brief.get("problems") or []:
         for limit in problem.get("constraints") or []:
             if limit.get("status", "confirmed") != "confirmed":
                 continue
-            for phrase in limit.get("blocks") or []:
-                need = stems(phrase)
-                if need and need <= idea:
-                    return str(limit.get("text", ""))
+            reason = str(limit.get("text", ""))
+            rules = match.parse_rules(reason, language, stems)
+            if any(match.rule_hit(r, idea) for r in rules):
+                return reason
+            if not any(match.rule_alternative(r, idea) for r in rules):
+                for phrase in limit.get("blocks") or []:
+                    need = stems(phrase, language)
+                    if need and need <= idea:
+                        return reason
+            ceiling = match.ceiling_of(reason, str(limit.get("kind", "")))
+            if ceiling is not None and match.over_ceiling(text, ceiling, said):
+                return reason
     return None
 
 
 def _generic(language: str | None, idea: set[str]) -> bool:
-    banks = [_GENERIC[language]] if language in _GENERIC else list(_GENERIC.values())
-    return any((need := stems(marker)) and need <= idea for bank in banks for marker in bank)
+    keys = [language] if language in _GENERIC else list(_GENERIC)
+    return any(
+        (need := stems(marker, language)) and need <= idea
+        for key in keys
+        for marker in _GENERIC[key]
+    )
 
 
 def score_candidate(
@@ -196,12 +243,12 @@ def score_candidate(
     owner_text: str = "",
     language: str | None = None,
 ) -> dict[str, Any]:
-    idea = stems(text)
-    owner, facts = _vocab(brief, problem)
+    idea = stems(text, language)
+    owner, facts = _vocab(brief, problem, language)
     link = len(idea & owner)
     reuse = len(idea & facts)
-    broken = violated(brief, idea)
-    said = owner | facts | stems(owner_text)
+    broken = violated(brief, idea, language, text, owner_text)
+    said = owner | facts | stems(owner_text, language)
     repeats = len(idea) >= RESTATE_MIN_WORDS and len(idea & said) / len(idea) >= RESTATE_RATIO
     if broken is not None:
         verdict = "violates_constraint"
