@@ -139,11 +139,12 @@ def tokens(text: str) -> list[str]:
     return [t for t in out if not (len(t) > 1 and t.isdigit() and not t.strip("0"))]
 
 
-def _stem(token: str, language: str | None = None) -> str:
+def _stem(token: str, language: str | None = None, full: bool = False) -> str:
     if any(ch.isdigit() for ch in token):
         return token  # a figure is never truncated: '20000' and '200000' stay distinct
     if token.isascii():
-        return match.stem_ascii(token, language)
+        whole = match.stem_ascii(token, language, full)
+        return whole if full else whole[:5]
     if token.startswith("ال") and len(token) > 3:
         return token[2:]
     return token
@@ -157,17 +158,28 @@ def _keep(token: str) -> bool:
     return len(token) >= (3 if token.isascii() else 2)
 
 
-def stems(text: str, language: str | None = None) -> set[str]:
+def stems(text: str, language: str | None = None, full: bool = False) -> set[str]:
     """Content stems. Magnitude figures are folded first ('3 lakh', '3,00,000' and '300000' are
     one token); English words lose plural, -ing, -ed and -ly, and with language 'roman_ur' the
-    common Roman Urdu endings go too."""
-    return {_stem(t, language) for t in tokens(match.fold_magnitudes(text)) if _keep(t)}
+    common Roman Urdu endings go too. The default (soft) stem of an ASCII word is cut to five
+    letters and is used for overlap only; `full=True` keeps the whole stem and is the only space
+    in which an idea is rejected (`violated`)."""
+    return {_stem(t, language, full) for t in tokens(match.fold_magnitudes(text)) if _keep(t)}
+
+
+def _full_stems(text: str, language: str | None) -> set[str]:
+    return stems(text, language, True)
+
+
+def _soft(token: str) -> str:
+    return token if token.isdigit() or not token.isascii() else token[:5]
 
 
 def _vocab(
     brief: dict[str, Any], problem: str | None, language: str | None = None
 ) -> tuple[set[str], set[str]]:
-    """(the owner's own words about the problem, the other stated facts)."""
+    """(the owner's own words about the problem, the other stated facts). The objects of a
+    confirmed 'cannot VERB OBJECT' limit count as stated facts: the owner raised them."""
     problems = brief.get("problems") or []
     chosen = [p for p in problems if p.get("id") == problem] or problems
     owner: set[str] = set()
@@ -177,15 +189,16 @@ def _vocab(
         facts |= stems(" ".join([*p.get("facts", []), *p.get("figures", [])]), language)
         for limit in p.get("constraints") or []:
             if limit.get("status", "confirmed") == "confirmed":
-                # what the owner said they cannot do names things the owner raised
-                for rule in match.parse_rules(str(limit.get("text", "")), language, stems):
+                # the object of a confirmed 'cannot VERB OBJECT' limit is something the owner
+                # stated, so an idea that reuses it ('rent a feed mill') reuses a stated fact
+                for rule in match.parse_rules(str(limit.get("text", "")), language, _full_stems):
                     if rule.kind == "neg":
-                        facts |= rule.objects
+                        facts |= {_soft(o) for o in rule.objects}
     facts |= stems(" ".join([*brief.get("roles", []), *brief.get("systems", [])]), language)
     return owner, facts - owner
 
 
-def _said_amounts(brief: dict[str, Any], owner_text: str) -> set[tuple[float, float]]:
+def _said_amounts(brief: dict[str, Any], owner_text: str) -> set[tuple[float, float, str]]:
     texts = [owner_text]
     for p in brief.get("problems") or []:
         texts += [p.get("title", ""), *p.get("user_words", []), *p.get("facts", [])]
@@ -202,28 +215,33 @@ def violated(
 ) -> str | None:
     """The first CONFIRMED limit the idea breaks; an assumed limit never rejects an idea.
 
-    A limit is broken by (1) one of its `blocks` phrases, unless its own text says 'cannot VERB
-    OBJECT' and the idea uses a milder verb ('rent' against 'cannot buy'); (2) the verb group and
-    object of a 'cannot VERB OBJECT' text; (3) the object of a 'tried X before and it failed'
-    text; (4) a figure above a numeric ceiling in the limit's text. (2) to (4) need the idea's
-    raw `text`."""
+    A limit is broken by (1) one of its `blocks` phrases, unless the phrase is the object of the
+    limit's own 'cannot VERB OBJECT' text and the idea uses a milder verb ('rent' against 'cannot
+    buy'); (2) the verb group and object of a 'cannot VERB OBJECT' text; (3) the object of a
+    'tried X before and it failed' text; (4) a figure above a numeric ceiling in the limit's text.
+    All word matching here is in the full stem space of the idea's raw `text` (never the
+    five-letter prefix); `idea`, the soft stems, is used only when no text is given."""
+    full = _full_stems(text, language) if text else idea
     said = _said_amounts(brief, owner_text)
     for problem in brief.get("problems") or []:
         for limit in problem.get("constraints") or []:
             if limit.get("status", "confirmed") != "confirmed":
                 continue
             reason = str(limit.get("text", ""))
-            rules = match.parse_rules(reason, language, stems)
-            if any(match.rule_hit(r, idea) for r in rules):
+            rules = match.parse_rules(reason, language, _full_stems)
+            if any(match.rule_hit(r, full) for r in rules):
                 return reason
-            if not any(match.rule_alternative(r, idea) for r in rules):
-                for phrase in limit.get("blocks") or []:
-                    need = stems(phrase, language)
-                    if need and need <= idea:
+            for phrase in limit.get("blocks") or []:
+                need = _full_stems(phrase, language)
+                if need and need <= full:
+                    own = [
+                        r for r in rules if match.rule_alternative(r, full) and need <= r.objects
+                    ]
+                    if not own:
                         return reason
-            ceiling = match.ceiling_of(reason, str(limit.get("kind", "")))
-            if ceiling is not None and match.over_ceiling(text, ceiling, said):
-                return reason
+            for ceiling in match.ceilings_of(reason, str(limit.get("kind", ""))):
+                if match.over_ceiling(text, ceiling, said):
+                    return reason
     return None
 
 
