@@ -3097,9 +3097,9 @@ NO_IDEA_LINES = {  # noqa: E501
 # cause);
 # the quote is offered only where R1 to R3 or B1 to B7 allow it (brain_offer).
 NO_MORE_IDEAS = {  # noqa: E501
-    "en": "Understood, those did not help. What have you already tried, and what happened?",  # noqa: E501
-    "roman_ur": "Theek hai, ye ideas kaam nahi aaye. Ab tak aap ne kya kya aazmaya hai, aur kya hua?",  # noqa: E501
-    "ar": "مفهوم، هذه الأفكار لم تفد. ما الذي جربته حتى الآن وماذا حدث؟",  # noqa: E501
+    "en": "What happened with the ideas so far?",  # noqa: E501
+    "roman_ur": "Ab tak in ideas ke saath kya hua?",  # noqa: E501
+    "ar": "ماذا حدث مع هذه الأفكار حتى الآن؟",  # noqa: E501
 }
 NO_IDEA_AGAIN = {  # noqa: E501
     "en": "Let me work from what you have told me. Which part of this costs you the most right now?",  # noqa: E501
@@ -3113,6 +3113,13 @@ NO_IDEA_THIRD = {  # noqa: E501
     "roman_ur": "Main samajhta hoon ke aap hal chahte hain. Teen mahine baad aap ke liye acha nateeja kya hoga?",  # noqa: E501
     "ar": "أفهم أنك تطلب حلاً. كيف تبدو النتيجة الجيدة بالنسبة لك بعد ثلاثة أشهر؟",  # noqa: E501
 }
+
+
+# the three fixed lines above, to tell them apart from a reply the offer may follow (R-ASK: when the
+# offer is appended it is the only question, so a fixed line that asks one gives way to a statement)
+NO_IDEA_FIXED = tuple(
+    line for table in (NO_MORE_IDEAS, NO_IDEA_AGAIN, NO_IDEA_THIRD) for line in table.values()
+)
 
 
 def brain_no_ideas(turn: "ServiceTurn", context: dict[str, Any]) -> None:
@@ -3338,6 +3345,9 @@ def brain_offer(turn: "ServiceTurn", context: dict[str, Any]) -> None:
     if not box_offer_allowed(context):
         return  # Book 5, 5.4 and 10.9: ideas were free, the offer waits for R1 to R3 or B1 to B7
     if not solution_ask.already_offers(turn.reply):
+        if any(line in turn.reply for line in NO_IDEA_FIXED):
+            heard = system_ask.HEARD_LINES.get(language, system_ask.HEARD_LINES["en"])
+            turn.reply = with_disclosure(heard, context, language)
         turn.reply = f"{turn.reply.rstrip()}\n\n{solution_ask.offer_line(language, context)}"
     turn.awaiting_customer = True
     turn._decision = decisions.Decision(
@@ -3378,7 +3388,9 @@ def brain_decision(turn: "ServiceTurn", context: dict[str, Any]) -> None:
     wants = [str(w) for w in known.get("wants") or []]
     said_now = str(context.get("latest_customer_message", ""))
     signal = part19.buying_signal(said_now, len(noted) + len(wants))
-    facts["buying_signal"] = signal  # 19.2: R1 (quote or price asked) and R3 (ready to buy)
+    # 19.2: R1 (quote or price asked) is the ask itself and starts the quote; R3 (ready to buy)
+    # opens the offer (box_signals) and the owner's yes still starts it: no yes is skipped
+    facts["buying_signal"] = signal if signal == "R1" else None
     decision = decisions.decide(
         state,
         str(context.get("latest_customer_message", "")),
@@ -3390,7 +3402,7 @@ def brain_decision(turn: "ServiceTurn", context: dict[str, Any]) -> None:
     turn._decision = decision
     if decision.reply:
         turn.reply = decision.reply
-        if signal and decision.why == "R-OFFER-03":
+        if signal == "R1" and decision.why == "R-OFFER-03":
             language = str(context.get("reply_language") or "en")
             own = "title_local" if language != "en" else "title"
             items = [str(p.get(own) or p.get("title") or "") for p in noted] + wants

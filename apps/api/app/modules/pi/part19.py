@@ -86,6 +86,10 @@ DEAD_ENDS = (
         "do not say the ideas are used up: ask what they tried and what happened, then give different ideas or move to the quote",
     ),
     (
+        re.compile(r"کوئی نیا سوال نہیں|لن أطرح أي سؤال|لا مزيد من الأسئلة"),
+        "do not promise to stop asking: say the next step instead",
+    ),
+    (
         re.compile(
             r"\bnone of it is solved\b|\bnothing (?:here )?is solved yet\b|\binme se abhi kuch bhi hal nahi\b",
             re.IGNORECASE,
@@ -158,10 +162,14 @@ def merge_wants(brief: dict[str, Any], found: list[str] | None) -> dict[str, Any
         return brief
     have = [str(w) for w in brief.get("wants") or []]
     seen = {w.casefold() for w in have}
+    from app.modules.pi import safety
     from app.modules.pi.problems import redact
 
     for want in found:
-        want = redact(" ".join(str(want).split())[:120])[0]
+        # a third party introduced by a role keeps only the role (R-PRIV-01), then card, ID, phone and
+        # email go; both before the cut, so a number split at the boundary cannot escape
+        said = safety.redact_pii(" ".join(str(want).split())).text
+        want = redact(said)[0][:120]
         if want and want.casefold() not in seen and len(have) < MAX_WANTS:
             have.append(want)
             seen.add(want.casefold())
@@ -220,16 +228,25 @@ def buying_signal(said: str, covers: int = 0) -> str | None:
     return None
 
 
+def ready_to_buy(said: str) -> bool:
+    """The owner says they are ready to buy (R3 wording, 19.2); a plain yes only: "not", "tight" or
+    "low" cancels it."""
+    from app.modules.pi import decisions
+
+    text = " ".join(decisions.OWN_MONEY.sub(" ", said or "").split())
+    return bool(R3_READY.search(text)) and not NEGATED.search(text)
+
+
 COVERS_LINES = {
     "en": (
-        "The quote will cover: {items}.",
-        "If you want anything else added, tell me; otherwise we build on this.",
+        "I will note these for the document that the team reviews: {items}.",
+        "If you want anything else added, tell me.",
     ),
     "roman_ur": (
-        "Quote mein ye aaye ga: {items}.",
-        "Koi aur cheez shamil karni ho to bata dein, warna isi par bana dete hain.",
+        "Main ye us document ke liye note kar raha hoon jo team dekhti hai: {items}.",
+        "Koi aur cheez shamil karni ho to bata dein.",
     ),
-    "ar": ("سيشمل عرض السعر: {items}.", "إن أردت إضافة شيء آخر فأخبرني، وإلا نبني على هذا."),
+    "ar": ("سأدوّن هذه للوثيقة التي يراجعها الفريق: {items}.", "إن أردت إضافة شيء آخر فأخبرني."),
 }
 
 
@@ -307,6 +324,8 @@ def replay(turn: Any, context: dict[str, Any]) -> None:
     """ "Yeh wapis sunay please": the reply becomes a playback of what pi understood (19.3)."""
     if getattr(turn, "_summary", False) or getattr(turn, "_decision", None) is not None:
         return
+    if ai_count(context) == 0:
+        return  # a first message carries the AI disclosure and the opening, never a playback
     if not asks_replay(str(context.get("latest_customer_message") or "")):
         return
     language = str(context.get("reply_language") or "en")

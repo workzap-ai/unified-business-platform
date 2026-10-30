@@ -472,7 +472,9 @@ def decide(
     can_approve = facts.get("can_approve", True)
     answer = classify(message)
 
-    direct = asks_for_document(message) or bool(facts.get("buying_signal"))  # R1/R3, 19.2
+    # 19.2: only R1 (an explicit ask for the price or the quote) may start the quote; R3 (ready to
+    # buy) opens the offer and the owner's yes still starts it
+    direct = asks_for_document(message) or facts.get("buying_signal") == "R1"
     if (
         not can_approve
         and (OFFER_REQUEST.search(message) or direct)

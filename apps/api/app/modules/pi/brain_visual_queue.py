@@ -88,7 +88,9 @@ async def attach_board(
     groups = brain_visuals.groups_of(rows, language)  # the board as sent (spec v1.6, 19.8)
     link = brain_visuals.url(
         settings,
-        brain_visuals.token(settings, conversation.id, "board", language, groups=groups),
+        brain_visuals.token(
+            settings, conversation.id, "board", language, message=str(summary.id)
+        ),
         "board",
     )
     # Sent as pi's own reply, with the summary's inbound marker: it is held back exactly when the

@@ -87,7 +87,8 @@ WANTS_SYSTEM = """You read what a small-business owner told an assistant on What
 they WANT built or done, each as a short phrase in their own words and language (for example "ads
 that bring customers", "online payment", "website with a link", "sales manager follow-up by call and
 WhatsApp", "customer onboarding and service"). Not problems, not questions to the assistant, not
-complaints, not the budget. At most 8. An empty list when they want nothing built.
+complaints, not the budget. Never write a person's name; use roles (the sales manager, the
+supplier). At most 8. An empty list when they want nothing built.
 Return the list as the field "wants"."""
 
 

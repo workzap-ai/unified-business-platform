@@ -91,12 +91,10 @@ def test_audit_a_signal_reply_never_carries_a_price_and_ends_with_no_question():
         "problem_count": 2,
         "problem_refs": ["a", "b"],
         "brief": {},
-        "buying_signal": "R3",
+        "buying_signal": "R1",
         "message_id": "m1",
     }
-    decision = decisions.decide(
-        decisions.State.S3_NOTED, "Hum budget lagane ke liye ready hain", "roman_ur", facts
-    )
+    decision = decisions.decide(decisions.State.S3_NOTED, "mujhay quote do abhi", "roman_ur", facts)
     assert decision is not None and decision.why == "R-OFFER-03"
     reply = f"{decision.reply}\n{part19.covers_lines('roman_ur', ['ads', 'online payment'])}"
     assert not any(ch.isdigit() for ch in reply)
@@ -289,3 +287,163 @@ def test_bd_the_board_link_carries_the_groups_it_was_drawn_from():
     snap = brain_visuals.snapshot_of(groups)
     assert snap == [["Sales", 3, ["referral only", "no pipeline"]]]
     assert brain_visuals.snapshot_of([]) == []
+
+
+# --- the four blocking findings of the rule audit (2026-10-30) ----------------------------------------
+def test_audit_r3_opens_the_offer_and_never_starts_the_quote_without_the_yes():
+    from app.modules.pi import box, box_signals
+
+    said = "Hum budget lagane ke liye ready hain"
+    assert part19.ready_to_buy(said) and box_signals.asks_who_or_how_long(
+        said
+    )  # R3 opens the offer
+    allowed, rule, _ = box.can_offer(box.OfferFacts(asked_who_or_how_long=True))
+    assert allowed and rule == "R3"
+    # the production wiring passes only an R1 signal to the decision gate: with none, "budget ready"
+    # alone is no yes and starts nothing
+    facts = {"can_approve": True, "problem_count": 3, "problem_refs": ["a"], "brief": {}}
+    decision = decisions.decide(decisions.State.S3_NOTED, said, "roman_ur", facts)
+    assert decision is None or "request_solution" not in decision.effects
+    assert not part19.ready_to_buy("mera budget kam hai")
+
+
+def test_audit_one_question_per_message_when_the_offer_follows_a_fixed_no_ideas_line():
+    from types import SimpleNamespace
+
+    from app.modules.pi.service_conversation import NO_MORE_IDEAS, brain_offer
+
+    turn = SimpleNamespace(
+        reply=NO_MORE_IDEAS["roman_ur"],
+        _summary=False,
+        _decision=None,
+        awaiting_customer=False,
+        problem_ops=[],
+    )
+    ctx = {
+        "latest_customer_message": "mujhay quote do abhi",
+        "flow": {"state": "S3_NOTED"},
+        "noted_problems": [{"ref": "a", "title": "x"}],
+        "brief": {},
+        "history": [],
+        "box_offer": True,
+        "solution_asked": True,
+        "reply_language": "roman_ur",
+    }
+    brain_offer(turn, ctx)
+    assert turn.reply.count("?") + turn.reply.count("؟") == 1  # the offer is the only question
+    assert turn.reply.rstrip().endswith("?") and NO_MORE_IDEAS["roman_ur"] not in turn.reply
+
+
+def test_audit_the_fixed_no_ideas_lines_are_one_plain_question_and_claim_nothing_unsaid():
+    for table in (NO_MORE_IDEAS, NO_IDEA_AGAIN, NO_IDEA_THIRD):
+        for line in table.values():
+            assert line.count("?") + line.count("؟") == 1, line
+    assert "did not help" not in NO_MORE_IDEAS["en"]  # the owner may never have said so
+
+
+def test_audit_a_phone_number_cut_at_the_boundary_does_not_escape_the_redactor():
+    brief = part19.merge_wants({}, ["x" * 112 + " call 0300 1234567 now"])
+    assert not any(ch.isdigit() for ch in brief["wants"][0])
+
+
+def test_audit_the_wants_prompt_asks_for_roles_not_names():
+    from app.modules.pi import problem_extract
+
+    assert "Never write a person's name" in problem_extract.WANTS_SYSTEM
+
+
+def test_audit_the_board_link_carries_no_words_of_the_owner():
+    import base64
+    import json
+    import uuid
+    from types import SimpleNamespace
+
+    from pydantic import SecretStr
+
+    settings = SimpleNamespace(secrets_encryption_key=SecretStr("k" * 32))
+    link = brain_visuals.token(settings, uuid.uuid4(), "board", "en", message="m-1")
+    claims = json.loads(base64.urlsafe_b64decode(link.split(".")[0] + "=="))
+    assert claims["m"] == "m-1" and "g" not in claims
+    groups = brain_visuals.groups_from_snapshot([["Sales", 2, ["referral only"]], "bad"])
+    assert [(g.label, g.count) for g in groups] == [("Sales", 2)]
+
+
+def test_audit_a_playback_is_never_the_first_message_and_urdu_dead_ends_are_caught():
+    from types import SimpleNamespace
+
+    turn = SimpleNamespace(
+        reply="Hi, I'm pi.", _summary=False, _decision=None, awaiting_customer=False
+    )
+    part19.replay(turn, {"latest_customer_message": "Yeh wapis sunay please", "history": []})
+    assert turn.reply == "Hi, I'm pi."
+    assert part19.dead_end("میں کوئی نیا سوال نہیں پوچھوں گا")
+
+
+# --- owner decision on R3, and the final assembled text (2026-10-30) ------------------------------------
+def test_r3_never_goes_to_prepare_only_r1_does():
+    base = {"can_approve": True, "problem_count": 3, "problem_refs": ["a"], "brief": {}}
+    said = "Hum budget lagane ke liye ready hain"
+    r3 = decisions.decide(
+        decisions.State.S3_NOTED, said, "roman_ur", {**base, "buying_signal": "R3"}
+    )
+    assert r3 is None or "request_solution" not in r3.effects  # R3 gives no _prepare
+    r1 = decisions.decide(
+        decisions.State.S3_NOTED,
+        "mujhay quote do abhi",
+        "roman_ur",
+        {**base, "buying_signal": "R1", "message_id": "m1"},
+    )
+    assert r1 is not None and r1.why == "R-OFFER-03" and "request_solution" in r1.effects
+
+
+@pytest.mark.parametrize("said", ["ok", "hmm", "maybe", "let me think", "Ok.", "acha"])
+def test_an_acknowledgement_is_never_an_explicit_yes(said):
+    answer, sure = decisions.classify(said)
+    assert not (answer == decisions.Answer.YES and sure >= decisions.YES_AT)
+
+
+@pytest.mark.parametrize("table_name", ["NO_MORE_IDEAS", "NO_IDEA_AGAIN", "NO_IDEA_THIRD"])
+@pytest.mark.parametrize("language", ["en", "roman_ur", "ar"])
+def test_the_final_text_of_a_no_ideas_line_and_the_offer_has_one_question_and_it_is_last(
+    table_name, language
+):
+    from types import SimpleNamespace
+
+    from app.modules.pi import service_conversation as sc
+
+    line = getattr(sc, table_name)[language]
+    turn = SimpleNamespace(
+        reply=line, _summary=False, _decision=None, awaiting_customer=False, problem_ops=[]
+    )
+    ctx = {
+        "latest_customer_message": "mujhay quote do abhi",
+        "flow": {"state": "S3_NOTED"},
+        "noted_problems": [{"ref": "a", "title": "x"}],
+        "brief": {},
+        "history": [],
+        "box_offer": True,
+        "solution_asked": True,
+        "reply_language": language,
+    }
+    sc.brain_offer(turn, ctx)
+    final = turn.reply.rstrip()
+    assert final.count("?") + final.count("؟") == 1, final
+    assert final.endswith(("?", "؟")), final
+    assert line not in final  # the fixed question gave way: the offer is the only question
+    assert part19.dead_end(final) is None
+
+
+def test_a_third_party_in_a_want_is_kept_as_a_role_and_nothing_downstream_sees_the_name():
+    brief = part19.merge_wants({}, ["follow-up by my cashier Ahmed Khan on WhatsApp"])
+    assert "Ahmed" not in brief["wants"][0]
+    text = problems.summary_message([], "en", brief["wants"])
+    assert "Ahmed" not in text
+    assert "Ahmed" not in part19.playback("en", brief["wants"])
+    assert "Ahmed" not in part19.covers_lines("en", brief["wants"])
+
+
+def test_the_covers_lines_promise_nothing_in_any_language():
+    for language in ("en", "roman_ur", "ar"):
+        lines = part19.covers_lines(language, ["ads"])
+        for banned in ("build on this", "bana dete", "نبني", "will cover", "aaye ga"):
+            assert banned not in lines
