@@ -43,9 +43,9 @@ def final(text: str, keep=None) -> str:
 def test_b1_a_quotation_that_is_a_sentence_or_ends_one_counts_as_a_question(text):
     out = final(text)
     assert asked(out) == 1, out
-    assert (
-        "Which shop" not in out and "Is it A" not in out
-    )  # the last question survives, not the first
+    for earlier in ("Which shop", "Is it A"):
+        if earlier in text:
+            assert f"{earlier}." in out, out  # demoted to a statement, never dropped
 
 
 @pytest.mark.parametrize(
@@ -54,10 +54,9 @@ def test_b1_a_quotation_that_is_a_sentence_or_ends_one_counts_as_a_question(text
 def test_b1_the_words_inside_a_quotation_are_never_rewritten(quote):
     out = final(f"Is it A? Is it B? {quote}")
     assert quote in out and asked(out) == 1, out
-    out = final(
-        f"Noted. {quote} Which one?"
-    )  # the quotation is a sentence: it gives way as a sentence
+    out = final(f"Noted. {quote} Which one?")  # the quotation is a sentence: demoted, never dropped
     assert asked(out) == 1 and out.rstrip().endswith("Which one?"), out
+    assert quote.replace("?", ".") in out  # only its mark changed; its words are all there
 
 
 def test_b1_a_quotation_inside_a_sentence_is_still_left_alone():
@@ -107,9 +106,9 @@ def test_b2_an_ordinary_question_that_only_looks_mandatory_stays_a_question(sent
     assert not part19.is_mandatory(sentence, [])
     out = final(f"{sentence} Which city?")
     assert out.rstrip().endswith("Which city?") and asked(out) == 1, out
-    assert sentence[:-1] not in out  # it gave way as a question: it was not kept as a statement
+    assert f"{sentence[:-1]}." in out  # it gave way as a question: demoted, never dropped
     only = part19.statement_only(f"{sentence} Noted.")
-    assert only == "Noted." and asked(only) == 0, only
+    assert only == f"{sentence[:-1]}. Noted." and asked(only) == 0, only
 
 
 @pytest.mark.parametrize("sentence", ORDINARY)
@@ -168,13 +167,13 @@ def test_a_single_mandatory_question_that_is_not_last_is_kept_and_moved_not_remo
     assert asked(out) == 1 and "what do you do" in out, out
 
 
-def test_when_every_question_is_mandatory_they_all_become_statements():
-    # the one case with no question left: the mandatory text wins over the cap (reported as a limit)
+def test_when_every_question_is_mandatory_the_last_stays_a_question_and_nothing_is_lost():
+    # a question is only demoted, never dropped, so the last of them can stay the one question
     out = final(
         "I am pi, an AI from Workzap, what do you do? I never ask for a card number, is that clear?"
     )
-    assert asked(out) == 0
-    assert "what do you do." in out and "is that clear." in out
+    assert asked(out) == 1
+    assert "what do you do." in out and out.rstrip().endswith("is that clear?")
 
 
 def test_a_mandatory_question_last_still_wins_over_an_earlier_ordinary_question():
@@ -277,6 +276,10 @@ def build(rng: random.Random):
                 "decimal",
                 "abbr",
                 "keep",
+                "multiquote",
+                "multiquote_embedded",
+                "code",
+                "ternary",
             ]
         )
         mark = rng.choice(MARKS) + rng.choice(CLOSE) + rng.choice(GLUE)
@@ -288,6 +291,21 @@ def build(rng: random.Random):
             # a whole-sentence quotation: on a line of its own (words after it on the same line would
             # make it a quotation inside a sentence, which the rule leaves alone)
             pieces.append(f'\n"{rng.choice(PLAIN)}?"' + rng.choice(GLUE) + "\n")
+        elif kind == "multiquote":
+            # a quotation holding several questions: ordinary text, counted like any other
+            pieces.append(
+                f'\n"{rng.choice(PLAIN)}? {rng.choice(PLAIN)}?"' + rng.choice(GLUE) + "\n"
+            )
+        elif kind == "multiquote_embedded":
+            pieces.append(f'He quoted "{rng.choice(PLAIN)}? {rng.choice(PLAIN)}?" and left.')
+        elif kind == "code":
+            phrase = "Run `a ? b : c` now."
+            embedded.append(phrase)
+            pieces.append(phrase)
+        elif kind == "ternary":
+            phrase = "Compute x ? y : z today."
+            embedded.append(phrase)
+            pieces.append(phrase)
         elif kind == "embedded":
             quote = f'"{rng.choice(PLAIN)}?"'
             phrase = f"He noted {quote} for later."
@@ -329,9 +347,151 @@ def test_property_one_question_no_mandatory_or_fixed_line_lost_and_never_zero(se
         assert asked(out, embedded) <= 1, (text, out)
         for stem in [*must, *(k[:-1] for k in keeps)]:
             assert present(stem, out), (stem, text, out)
-        if asked(text, embedded) >= 1 and not must and not keeps:
-            assert asked(out, embedded) == 1, ("never zero", text, out)
+        if asked(text, embedded) >= 1:
+            assert asked(out, embedded) == 1, ("never zero, never two", text, out)
+        assert words(out) == words(text), ("a word was lost or invented", text, out)
         only = part19.statement_only(text)
         assert asked(only, embedded) == 0, (text, only)
+        assert words(only) == words(text), ("statement_only lost or invented a word", text, only)
         for stem in must:
             assert present(stem, only), (stem, text, only)
+
+
+def words(text: str):
+    """The words of a text, marks and order ignored: demoting a question must change no word."""
+    from collections import Counter
+
+    return Counter(re.findall(r"[^\W_]+", text))  # letters and digits only: a "_" is a closing mark
+
+
+# --- seventh commit: demote, never drop ------------------------------------------------------------------
+@pytest.mark.parametrize(
+    "text",
+    [
+        '"Which shop? Which city?"',
+        'Noted. "Which shop? Which city?"',
+        'Noted. "Which shop? Which city?" Thanks.',
+        'He said "Is it A? Is it B?" and left. Which one?',
+        "“Which shop? Which city?”",
+        "«Which shop? Which city?»",
+        '"هل هذا أ؟ هل هذا ب؟"',
+    ],
+)
+def test_a_quotation_holding_several_questions_is_counted_and_capped(text):
+    out = final(text)
+    assert asked(out) == 1, out
+    assert words(out) == words(text), out  # only marks changed
+
+
+@pytest.mark.parametrize(
+    "text",
+    [
+        "Which shop? Which city? Which area?",
+        "Is it A? Noted. Is it B? Thanks. Is it C?",
+        "هل هذا أ؟ شكراً. هل هذا ب؟",
+        "Kya hua? Theek hai. Kab hua?",
+    ],
+)
+def test_every_sentence_survives_and_only_the_marks_change(text):
+    out = final(text)
+    assert asked(out) == 1 and words(out) == words(text), out
+    only = part19.statement_only(text)
+    assert asked(only) == 0 and words(only) == words(text), only
+
+
+DISCLOSURES = {
+    "en": "I'm an AI assistant from Workzap, how can I help?",
+    "roman_ur": "Main ek AI assistant hoon, Workzap se, aap ki kya madad karun?",
+    "ur": "میں ایک اے آئی اسسٹنٹ ہوں، Workzap سے، میں آپ کی کیا مدد کروں؟",
+    "ar": "أنا مساعد ذكاء اصطناعي من Workzap، كيف أساعدك؟",
+    "hi": "मैं एक एआई सहायक हूँ, Workzap से, मैं आपकी क्या मदद करूँ?",
+}
+
+
+@pytest.mark.parametrize("language", sorted(DISCLOSURES))
+def test_the_real_disclosure_phrasings_are_mandatory_and_never_lost(language):
+    sentence = DISCLOSURES[language]
+    assert part19.is_mandatory(sentence, [])
+    out = final(f"{sentence} Which city?")
+    assert f"{sentence[:-1]}." in out and out.rstrip().endswith("Which city?"), out
+    only = part19.statement_only(f"{sentence} Noted.")
+    assert f"{sentence[:-1]}." in only and asked(only) == 0, only
+    # last in the reply: it stays the question, unchanged
+    assert final(f"Noted. {sentence}") == f"Noted. {sentence}"
+
+
+REFUSALS_AND_REFERRALS = [
+    "Please don't type your card number here, okay?",
+    "I can't take payment in chat, is that ok?",
+    "Please never write your password in this chat, understood?",
+    "ہسپتال جائیے، کیا کوئی زخمی ہے؟",
+    "अस्पताल जाइए, क्या कोई घायल है?",
+    "Foran hospital jaiye, kya koi zakhmi hai?",
+]
+
+
+@pytest.mark.parametrize("sentence", REFUSALS_AND_REFERRALS)
+def test_the_audit_refusal_and_referral_phrasings_are_mandatory_and_never_lost(sentence):
+    assert part19.is_mandatory(sentence, [])
+    out = final(f"{sentence} Which city?")
+    assert f"{sentence[:-1]}." in out and out.rstrip().endswith("Which city?"), out
+    only = part19.statement_only(f"{sentence} Noted.")
+    assert f"{sentence[:-1]}." in only and asked(only) == 0, only
+
+
+@pytest.mark.parametrize("sentence", ["अस्पताल जाइए", "جائیے", "ہسپتال جائیے۔", "Hospital jaiye."])
+def test_a_referral_without_a_question_is_left_exactly_as_it_is(sentence):
+    assert final(sentence) == sentence
+    assert part19.statement_only(sentence) == sentence
+    assert final(f"{sentence} Which city?") == f"{sentence} Which city?"
+
+
+# --- the size limit ---------------------------------------------------------------------------------------
+def test_a_reply_above_the_size_limit_is_capped_plainly_logged_and_never_returned_unchanged(caplog):
+    unit = "Is it A? Which one? See https://x.com/a?b=1 now. "
+    text = unit * (part19.MAX_CHARS // len(unit) + 5)
+    assert len(text) > part19.MAX_CHARS
+    with caplog.at_level(logging.WARNING, logger="app.modules.pi.part19"):
+        out = final(text)
+    assert out != text and asked(out) <= 1, asked(out)
+    assert out.count("https://x.com/a?b=1") == text.count("https://x.com/a?b=1")  # links intact
+    assert words(out) == words(text)  # nothing dropped
+    record = next(r for r in caplog.records if "oversize" in r.getMessage())
+    assert record.levelno == logging.WARNING and record.length == len(text.strip())
+    assert "Which one" not in caplog.text  # the length only, never the words
+    only = part19.statement_only(text)
+    assert asked(only) == 0 and only != text and words(only) == words(text)
+
+
+def test_a_reply_just_under_the_limit_still_gets_the_full_check():
+    unit = "Noted. Is it A? "
+    text = unit * ((part19.MAX_CHARS - 50) // len(unit))
+    assert len(text) < part19.MAX_CHARS
+    out = final(text)
+    assert asked(out) == 1 and out.rstrip().endswith("Is it A?")
+
+
+# --- code, operators, links, numbers, RTL ------------------------------------------------------------------
+def test_code_spans_ternaries_links_and_numbers_are_never_rewritten():
+    text = (
+        "Use `a ? b : c` or this: ```\nx = y ? 1 : 2\n``` and compute total ? 3.5 : 4.5 now. "
+        "Link https://x.com/p?id=1&q=2 costs 3.5 percent. Which shop? Which city?"
+    )
+    out = final(text)
+    for kept in (
+        "`a ? b : c`",
+        "x = y ? 1 : 2",
+        "total ? 3.5 : 4.5",
+        "https://x.com/p?id=1&q=2",
+        "3.5 percent",
+    ):
+        assert kept in out, out
+    assert out.rstrip().endswith("Which city?")
+    assert asked(out, ["`a ? b : c`", "x = y ? 1 : 2", "total ? 3.5 : 4.5"]) == 1
+
+
+def test_rtl_and_mixed_scripts_keep_one_question_and_every_word():
+    text = "هل هذا أ؟ Is it B? क्या यह सी? Kya yeh D? ہے یا نہیں؟"
+    out = final(text)
+    assert asked(out) == 1 and words(out) == words(text), out
+    assert out.rstrip().endswith("؟")

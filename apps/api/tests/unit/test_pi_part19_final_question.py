@@ -82,9 +82,11 @@ def test_v1_the_last_question_survives_and_only_it():
 
 # --- statements are never merged into the question; positions, not first occurrences -----------------
 def test_a_year_in_a_sentence_does_not_merge_the_statement_with_the_question():
-    assert part19.statement_only("We started in 2024. Which one?") == "We started in 2024."
     assert (
-        part19.statement_only("1. Which one?") == ""
+        part19.statement_only("We started in 2024. Which one?") == "We started in 2024. Which one."
+    )
+    assert (
+        part19.statement_only("1. Which one?") == "1. Which one."
     )  # a list number at the start is no sentence end
     out = final("We started in 2024. Which one? Or which other?")
     assert "We started in 2024." in out and questions(out) == 1
@@ -219,12 +221,12 @@ def test_statement_only_turns_a_mandatory_question_into_a_statement_and_drops_th
 
 
 @pytest.mark.parametrize("language", ["en", "roman_ur", "ur", "ar", "hi"])
-def test_two_mandatory_questions_both_become_statements(language):
+def test_two_mandatory_questions_lose_nothing_and_the_last_stays_the_question(language):
     first = MANDATORY["disclosure"][language][0]
     second = MANDATORY["refusal"][language][0]
     out = final(f"{first} {second}")
-    assert f"{first[:-1]}." in out and f"{second[:-1]}." in out, out
-    assert questions(out) == 0, out
+    assert f"{first[:-1]}." in out and out.rstrip().endswith(second), out
+    assert questions(out) == 1, out
 
 
 def test_a_mandatory_question_last_still_wins_over_an_earlier_ordinary_question():
@@ -243,12 +245,15 @@ def test_a_single_mandatory_question_is_left_exactly_as_it_is():
 def test_urls_decimals_abbreviations_and_quotations_are_left_alone():
     text = (
         "The fee is 3.5 percent, see https://x.com/a?b=1&c=2 and e.g. Rs. 500. "
-        'He wrote "why does it fail? really?" and left. Which one? Or this?'
+        'He wrote "why does it fail?" and left. Which one? Or this?'
     )
     out = final(text)
     assert "3.5 percent" in out and "https://x.com/a?b=1&c=2" in out
-    assert "e.g. Rs. 500" in out and '"why does it fail? really?"' in out
-    assert questions(out) == 1 and out.rstrip().endswith("Or this?")
+    assert (
+        "e.g. Rs. 500" in out and '"why does it fail?"' in out
+    )  # one mark, mid-sentence: untouched
+    assert questions(out.replace('"why does it fail?"', "")) == 1
+    assert out.rstrip().endswith("Or this?")
 
 
 def test_a_quotation_is_never_rewritten_even_when_its_sentence_is_a_dropped_question():

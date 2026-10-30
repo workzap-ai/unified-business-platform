@@ -549,11 +549,13 @@ def test_kitna_lagega_for_time_is_not_a_price_ask():
 
 
 # --- third re-audit: Urdu script, durations, trailing closers, and links ---------------------------
-def test_statement_only_keeps_the_urdu_statement_and_drops_only_the_question():
+def test_statement_only_keeps_every_sentence_and_turns_the_question_into_a_statement():
     line = "یہ آپ کا مسئلہ ہے۔ کیا آپ نے کوشش کی؟"
-    assert part19.statement_only(line) == "یہ آپ کا مسئلہ ہے۔"
-    assert part19.statement_only("यह आपकी समस्या है। क्या आपने कोशिश की?") == "यह आपकी समस्या है।"
-    assert part19.statement_only("Noted. Which one?") == "Noted."
+    assert part19.statement_only(line) == "یہ آپ کا مسئلہ ہے۔ کیا آپ نے کوشش کی."
+    assert part19.statement_only("यह आपकी समस्या है। क्या आपने कोशिश की?") == (
+        "यह आपकी समस्या है। क्या आपने कोशिश की."
+    )
+    assert part19.statement_only("Noted. Which one?") == "Noted. Which one."
 
 
 @pytest.mark.parametrize(
@@ -660,18 +662,18 @@ def test_a_fixed_line_given_to_the_check_is_kept():
 @pytest.mark.parametrize(
     ("text", "left"),
     [
-        ("Is it e.g. a van?", ""),
-        ("Rs. 500 kitna?", ""),
-        ("1. Which one?", ""),
+        ("Is it e.g. a van?", "Is it e.g. a van."),
+        ("Rs. 500 kitna?", "Rs. 500 kitna."),
+        ("1. Which one?", "1. Which one."),
         ("*Noted.* Which one?", "Noted"),
         ("Noted.😊 Which one?", "Noted."),
-        ("Is this your site https://x.com?", ""),
-        ("Noted. Is it e.g. a van?", "Noted."),
+        ("Is this your site https://x.com?", "Is this your site https://x.com."),
+        ("Noted. Is it e.g. a van?", "Noted. Is it e.g. a van."),
     ],
 )
 def test_statement_only_splits_only_at_real_sentence_ends(text, left):
     kept = part19.statement_only(text)
-    assert kept.replace("*", "").startswith(left) and (left or not kept)
+    assert kept.replace("*", "").startswith(left)  # every sentence stays; only the mark changes
     assert part19.question_count(part19.normalise_question_marks(part19.protect_urls(kept)[0])) == 0
 
 

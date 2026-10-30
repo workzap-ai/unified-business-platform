@@ -346,41 +346,53 @@ def replay(turn: Any, context: dict[str, Any]) -> None:
         turn.awaiting_customer = True
 
 
+MAX_CHARS = 20_000  # the check reads a reply up to this long; above it the plain cap is applied
+
+
 def statement_only(reply: str) -> str:
-    """The reply without its questions (R-ASK-01): used before the offer is appended, so the offer
-    is the only question of the message and it is last. A question that must be said (the AI
-    disclosure, a refusal to ask for card or password details, a safety referral) is kept as a
-    statement, never dropped."""
-    lines: list[str] = []
-    for line in (reply or "").splitlines():
-        guarded, held = protect_urls(line.strip())
+    """The reply with every question turned into a statement (R-ASK-01): used before the offer is
+    appended, so the offer is the only question of the message and it is last. A question is demoted,
+    never dropped: its mark becomes a full stop and the whole sentence stays, so a sentence that must
+    be said (the AI disclosure, a refusal to ask for card or password details, a safety referral) can
+    never be lost, whatever its language or wording."""
+    text = (reply or "").strip()
+    if not text:
+        return ""
+    if len(text) > MAX_CHARS:
+        return _oversize(text, keep_one=False)
+    try:
+        guarded, held = protect_urls(text)
         flat = protect_abbreviations(normalise_question_marks(guarded))
-        kept: list[str] = []
-        for _, _, sentence in sentence_spans(flat):
-            if not _ends_question(sentence):
-                kept.append(sentence)
-            elif is_mandatory(_original(sentence, held), []):
-                kept.append(_as_statement(sentence))
-        text = " ".join(kept).replace("?", ".").replace("؟", ".")  # a stray mark inside a sentence
-        if text.strip():
-            lines.append(restore_urls(restore_abbreviations(text), held))
-    return "\n".join(lines).strip()
+        return _demote(flat, held, [], keep_one=False).strip()
+    except Exception as error:  # noqa: BLE001 - the reply must still be sent, and still without questions
+        logger.warning("pi_statement_only_failed", extra={"error_type": type(error).__name__})
+        return _fallback(text, keep_one=False).strip()
 
 
 # --- R-ASK-01 on the FINAL text ---------------------------------------------------------------------
 # What counts as a question mark and as the end of a question. A question may be followed by a closing
 # quote, a bracket, a WhatsApp bold or italic mark, an emoji, a zero-width character or an RTL mark, and
-# may be glued to the next sentence; "?!", "?." and "?..." are one question mark; a "?" in a link or in
-# words quoted in the middle of a sentence is not a question put to the customer; a quotation that is a
-# whole sentence, or that ends a sentence, IS one (it is counted and capped, its words never rewritten);
-# a dot in an abbreviation or a decimal ends nothing; an inch mark (5") opens no quotation.
+# may be glued to the next sentence; "?!", "?." and "?..." are one question mark.
+# Never counted and never rewritten: a "?" in a link, in a code span (`...` or a fenced block), in a
+# "x ? y : z" expression, or in words quoted in the middle of a sentence that hold exactly one question
+# mark. A quotation that is a whole sentence with exactly one mark IS a question (counted, and demoted by
+# changing only its mark); a quotation holding several marks is ordinary text and is counted as such.
+# A dot in an abbreviation or a decimal ends nothing; an inch mark (5") opens no quotation.
+#
+# Known limits (documented, not hidden): a quotation embedded in a sentence with one mark is not
+# counted; a question written with no question mark at all (any script) cannot be told from a
+# statement; the Armenian mark sits inside the word and an ASCII ";" is a semicolon; the check runs
+# only in brain mode; a ternary is recognised only in its plain "a ? b : c" shape.
 EMOJI = (
     r"\U0001F000-\U0001FFFF\u2190-\u21ff\u2300-\u23ff\u2460-\u24ff\u25a0-\u27bf\u2900-\u297f"
     r"\u2b00-\u2bff\u3030\u303d\u3297\u3299\u20e3\ufe0f\U000e0020-\U000e007f"
 )
 ZERO_WIDTH = r"\u200b-\u200f\u2060\ufeff\u2066-\u2069\u061c\u202a-\u202e"
 CLOSER_CHARS = "*_~\"'”’)\\]»›"
+MARKS = "?؟？⁇⁈⁉\u037e⸮፧"  # every question mark the check knows
+CODE = re.compile(r"```.*?```|`[^`\n]+`", re.DOTALL)
 URL = re.compile(r"https?://\S*[^\s?.!,;:)\]»]")
+TERNARY = re.compile(r"\S+ \? [^?؟\n:]{1,80} : \S+")
 # A straight quotation opens after a space or a mark (never after a letter or digit: 5" is an inch mark)
 # and closes before one (never before a letter or digit); curly quotes and guillemets are unambiguous.
 QUOTED = re.compile(
@@ -391,6 +403,7 @@ SENTENCE_ENDS = ".!?؟۔।…\n\r"
 QUESTION_MARK_VARIANTS = str.maketrans(
     {"？": "?", "⁇": "?", "⁈": "?", "⁉": "?", "\u037e": "?", "⸮": "?", "፧": "?"}
 )
+ANY_MARK = re.compile(f"[{MARKS}]")
 CLOSERS = re.compile(rf"([?؟.!۔।])([{CLOSER_CHARS}]+)(?=[.!…]*(?:\s|$))")
 SPLIT_AFTER = re.compile(rf"([?؟.!۔।][{CLOSER_CHARS}]*)(?=[{EMOJI}{ZERO_WIDTH}])")
 MARK_RUN = re.compile(r"([?؟])[?؟!.…]+")
@@ -400,7 +413,7 @@ ABBREVIATION = re.compile(r"(?i:\b(?:e\.g|i\.e|vs|rs|mr|mrs|dr)\.)(?=\s)")
 LIST_NUMBER = re.compile(r"(?m)^([ \t]*\d{1,2})\.(?=\s)")
 DOT_LEADER = "\u2024"
 PLACEHOLDER = "URLPLACEHOLDER"
-HELD_QUESTION = re.compile(rf"{PLACEHOLDER}(\d+)Q[?.]?")
+HELD_TOKEN = re.compile(rf"{PLACEHOLDER}(\d+)([QX])([?.]?)")
 
 
 def _embedded(text: str, start: int, end: int) -> bool:
@@ -415,10 +428,11 @@ def _embedded(text: str, start: int, end: int) -> bool:
 
 
 def protect_urls(text: str) -> tuple[str, list[str]]:
-    """The text with each link and each embedded quotation replaced by a placeholder, and what was
-    held, so a "?" in a query string or in quoted words is never counted or rewritten. A quotation
-    that is a whole sentence or ends one is held too, but its question (if it has one) stays counted
-    as one question mark outside it, so the cap sees it and its words are never rewritten."""
+    """The text with each code span, link, ternary and quotation holding one question mark replaced by
+    a placeholder, and what was held, so a "?" there is never counted by accident or rewritten. A
+    quotation that is a whole sentence with one mark is held too, but its mark stays counted outside it
+    (a placeholder ending in "Q?"), so the cap sees it; a quotation with several marks is not held: it
+    is ordinary text, counted and capped like any other."""
     held: list[str] = []
 
     def hold(match: "re.Match[str]") -> str:
@@ -427,34 +441,41 @@ def protect_urls(text: str) -> tuple[str, list[str]]:
 
     def hold_quotation(match: "re.Match[str]") -> str:
         quoted = match.group(0)
-        asked = "?" in quoted.translate(QUESTION_MARK_VARIANTS) or "؟" in quoted
+        marks = len(ANY_MARK.findall(quoted))
+        if marks >= 2:
+            return quoted
         held.append(quoted)
         token = f"{PLACEHOLDER}{len(held) - 1}"
-        if _embedded(match.string, match.start(), match.end()) or not asked:
+        if marks == 0 or _embedded(match.string, match.start(), match.end()):
             return f"{token}X"
         # a quotation that is a sentence of its own stands apart from what is glued to it, so it can
-        # never be merged into a neighbouring sentence (a mandatory one, say) and rewrite it by accident
+        # never be merged into a neighbouring sentence and rewritten by accident
         before, after = match.string[: match.start()], match.string[match.end() :]
         lead = " " if before and not before[-1].isspace() else ""
         trail = " " if after and not after[0].isspace() else ""
         return f"{lead}{token}Q?{trail}"
 
-    return QUOTED.sub(hold_quotation, URL.sub(hold, text)), held
+    held_text = TERNARY.sub(hold, URL.sub(hold, CODE.sub(hold, text)))
+    return QUOTED.sub(hold_quotation, held_text), held
 
 
-def _literal(value: str) -> "Callable[[re.Match[str]], str]":
-    """A replacement that puts `value` back exactly as it is (a regex replacement string would read a
-    backslash in the words as an escape)."""
+def _quotation_back(value: str) -> "Callable[[re.Match[str]], str]":
+    """A replacement that puts a held quotation back exactly as it was (a regex replacement string
+    would read a backslash in the words as an escape). When the sentence's mark was turned into a full
+    stop (the placeholder ends in "."), only the quotation's own question marks become full stops."""
+    demoted = ANY_MARK.sub(".", value)
 
-    def put(_match: "re.Match[str]") -> str:
-        return value
+    def put(match: "re.Match[str]") -> str:
+        return demoted if match.group(1) == "." else value
 
     return put
 
 
 def restore_urls(text: str, held: list[str]) -> str:
+    """The held text put back. A whole-sentence quotation whose mark was turned into a full stop comes
+    back with its own mark turned into a full stop too (the words are untouched)."""
     for n in reversed(range(len(held))):
-        text = re.sub(rf"{PLACEHOLDER}{n}Q[?.]?", _literal(held[n]), text)
+        text = re.sub(rf"{PLACEHOLDER}{n}Q([?.]?)", _quotation_back(held[n]), text)
         text = text.replace(f"{PLACEHOLDER}{n}X", held[n])
     return text
 
@@ -523,7 +544,8 @@ def sentence_spans(flat: str) -> list[tuple[int, int, str]]:
 
 # What must never be deleted or weakened, in every supported language (en, roman_ur, ur, ar, hi): the
 # AI disclosure, a refusal to ask for card, password, code or identity details, a safety referral.
-# Each rule is narrow on purpose: a sentence that only looks like one stays an ordinary question.
+# A question is only ever demoted, never dropped, so nothing here can delete a sentence: these rules
+# choose which question survives when there are several (an ordinary one before a mandatory one).
 AI_ANY = re.compile(
     r"\bAI\b|\bA\.I\.|artificial intelligence|مصنوعی ذہانت|مصنوعی ذھانت|اے آئی|ذكاء اصطناعي|"
     r"एआई|ए\.?\s?आई|कृत्रिम बुद्धिमत्ता|आर्टिफिशियल इंटेलिजेंस|आर्टिफ़िशियल इंटेलिजेंस",
@@ -534,16 +556,18 @@ SELF_REF = re.compile(
     re.IGNORECASE,
 )
 NAMES_PI = re.compile(r"\bpi\b|\bWorkzap\b", re.IGNORECASE)
+AI_WORD = r"(?:\bAI\b|artificial intelligence|اے آئی|مصنوعی ذہانت|ذكاء اصطناعي|एआई|ए\.?\s?आई|आर्टिफिशियल|कृत्रिम बुद्धिमत्ता)"
 # pi or Workzap named right beside the AI word ("I am pi, an AI from Workzap", "Workzap ka AI"): that is
 # the disclosure itself, whatever else the same sentence says (a "your bot" later on does not undo it)
 PI_IS_AI = re.compile(
-    r"(?:\bpi\b|\bWorkzap\b).{0,25}(?:\bAI\b|اے آئی|एआई|ذكاء اصطناعي|مصنوعی ذہانت|आर्टिफिशियल)|"
-    r"(?:\bAI\b|اے آئی|एआई|ذكاء اصطناعي|مصنوعی ذہانت|आर्टिफिशियल).{0,25}(?:\bpi\b|\bWorkzap\b)",
+    rf"(?:\bpi\b|\bWorkzap\b).{{0,25}}{AI_WORD}|{AI_WORD}.{{0,25}}(?:\bpi\b|\bWorkzap\b)",
     re.IGNORECASE,
 )
 DIRECT_SELF_AI = re.compile(
-    r"\bI(?:'m|’m| am)\s+(?:an?\s+)?(?:AI|artificial)|\bmain\s+(?:ek\s+)?(?:AI|اے آئی)\s*(?:hoon|hun|hu)\b|"
-    r"میں\s+(?:ایک\s+)?(?:اے آئی|مصنوعی ذہانت)\s+ہوں|मैं\s+(?:एक\s+)?(?:एआई|ए\.?\s?आई)\s+(?:हूँ|हूं)|أنا\s+ذكاء",
+    rf"\bI(?:'m|’m| am)\s+(?:(?:an?|the)\s+(?:\w+\s+)?)?{AI_WORD}|"
+    rf"\bmain\s+(?:ek\s+)?{AI_WORD}(?:\s+\S+){{0,2}}\s*(?:hoon|hun|hu)\b|"
+    rf"میں\s+(?:ایک\s+)?{AI_WORD}(?:\s+\S+){{0,2}}\s+ہوں|"
+    rf"मैं\s+(?:एक\s+)?{AI_WORD}(?:\s+\S+){{0,2}}\s+(?:हूँ|हूं)|أنا\s+(?:(?:مساعد|برنامج|نظام|روبوت)\s+)?{AI_WORD}",
     re.IGNORECASE,
 )
 BUSINESS_BOT = re.compile(
@@ -553,19 +577,22 @@ BUSINESS_BOT = re.compile(
 )
 PAY_ID_WORDS = re.compile(
     r"\bcards?\b|\bpassword\b|\bOTP\b|\bCVV\b|\bPIN\b|\bID\b|\bCNIC\b|\bpassport\b|\bcredit\b|\bdebit\b|"
-    r"\bbank\b|\baccount number\b|\bIBAN\b|کارڈ|پاس ورڈ|پاسورڈ|او ٹی پی|شناختی|بینک|"
-    r"कार्ड|पासवर्ड|ओटीपी|आईडी|बैंक|क्रेडिट|डेबिट|بطاقة|كلمة المرور|رمز|بنك|هوية",
+    r"\bbank\b|\baccount number\b|\bIBAN\b|\bpayments?\b|\bpay\b|کارڈ|پاس ورڈ|پاسورڈ|او ٹی پی|شناختی|"
+    r"بینک|ادائیگی|कार्ड|पासवर्ड|ओटीपी|आईडी|बैंक|क्रेडिट|डेबिट|भुगतान|بطاقة|كلمة المرور|رمز|بنك|"
+    r"هوية|دفع",
     re.IGNORECASE,
 )
 REFUSE_WORDS = re.compile(
-    r"\bnever\b|\bdon'?t\b|\bdo not\b|\bnot\b|\bno need\b|\bwithout\b|\bnahi\b|\bnahin\b|\bkabhi\b|"
-    r"\bhargiz\b|\bmat\b|کبھی نہیں|نہیں|ہرگز|ضرورت نہیں|कभी नहीं|नहीं|हरगिज़|لا |أبدًا|أبدا",
+    r"\bnever\b|\bdon'?t\b|\bdo not\b|\bnot\b|\bno need\b|\bwithout\b|\bcan'?t\b|\bcannot\b|"
+    r"\bwon'?t\b|\bunable\b|\bnahi\b|\bnahin\b|\bkabhi\b|\bhargiz\b|\bmat\b|کبھی نہیں|نہیں|ہرگز|"
+    r"ضرورت نہیں|کر سکتا|کر سکتی|कभी नहीं|नहीं|हरगिज़|لا |أبدًا|أبدا",
     re.IGNORECASE,
 )
 ASK_VERBS = re.compile(
     r"\bask(?:s|ing)?\b|\brequest\b|\bneed\b|\bshare\b|\bsend\b|\bgive\b|\benter\b|\bprovide\b|\btell\b|"
-    r"maang|mang|poochh|puch|bhej|bata|مانگ|پوچھ|بھیج|دیں|بتا|مت|मांग|पूछ|भेज|बता|दें|"
-    r"أطلب|اطلب|أرسل|ترسل|تشارك|تعطي|أعطي",
+    r"\btype\b|\bwrite\b|\bput\b|\btake\b|\baccept\b|\bcollect\b|\btext\b|\bpaste\b|"
+    r"maang|mang|poochh|puch|bhej|bata|likh|le sak|مانگ|پوچھ|بھیج|دیں|بتا|مت|لکھ|لے سک|"
+    r"मांग|पूछ|भेज|बता|दें|लिख|ले सक|أطلب|اطلب|أرسل|ترسل|تشارك|تعطي|أعطي|أقبل|أكتب|اكتب",
     re.IGNORECASE,
 )
 SAFETY_WORDS = re.compile(
@@ -575,8 +602,9 @@ SAFETY_WORDS = re.compile(
     re.IGNORECASE,
 )
 CALL_WORDS = re.compile(
-    r"\bcall\b|\bdial\b|\bring\b|\bgo to\b|\bcontact\b|\bbula\w*|\bjayen\b|\bjaen\b|کال|فون|بلائیں|بلاؤ|"
-    r"جائیں|कॉल|फोन|बुलाएं|बुलाइए|जाएं|اتصل|اطلب|اذهب",
+    r"\bcall\b|\bdial\b|\bring\b|\bgo to\b|\bcontact\b|\bvisit\b|\bbula\w*|\bjayen\b|\bjaen\b|\bjaiye\b|"
+    r"\bjao\b|کال|فون|بلائیں|بلاؤ|جائیں|جائیے|جاؤ|جانا|کریں|कॉल|फोन|बुलाएं|बुलाइए|जाएं|जाइए|जाइये|"
+    r"जाओ|जाना|اتصل|اطلب|اذهب|زر",
     re.IGNORECASE,
 )
 MIN_KEEP = (
@@ -586,7 +614,8 @@ MIN_KEEP = (
 
 def discloses_ai(sentence: str) -> bool:
     """The sentence says, about pi itself, that it is an AI ("I am pi, an AI from Workzap", "Main pi
-    hoon, Workzap ka AI", "I'm an AI"). A question about someone's chatbot business is not one."""
+    hoon, Workzap ka AI", "I'm an AI assistant"). A question about someone's chatbot business is not
+    one."""
     if not AI_ANY.search(sentence) or not SELF_REF.search(sentence):
         return False
     if DIRECT_SELF_AI.search(sentence) or PI_IS_AI.search(sentence):
@@ -595,8 +624,8 @@ def discloses_ai(sentence: str) -> bool:
 
 
 def refuses_secrets(sentence: str) -> bool:
-    """A refusal to ask for card, password, code or identity details: a payment or identity word, a
-    refusal word and a verb of asking, together."""
+    """A refusal to ask for card, password, code or identity details, or to take payment in chat: a
+    payment or identity word, a refusal word and a verb of asking or taking, together."""
     from app.modules.pi import constitution
 
     return bool(
@@ -650,10 +679,9 @@ def keep_canon(keep: Any) -> list[str]:
 
 
 def is_mandatory(sentence: str, keep: list[str]) -> bool:
-    """The sentence carries content that must never be deleted or weakened: the AI disclosure, a
-    refusal to ask for card, password, code or identity details, a safety referral, or one of the
-    fixed lines (`keep`, already in `keep_canon` form). Over-protecting only turns a question into a
-    statement; the rules are narrow so that an ordinary question stays one."""
+    """The sentence carries content that must be said: the AI disclosure, a refusal to ask for card,
+    password, code or identity details, a safety referral, or one of the fixed lines (`keep`, already
+    in `keep_canon` form). It decides only which question survives when there are several."""
     if discloses_ai(sentence) or refuses_secrets(sentence) or refers_to_safety(sentence):
         return True
     canon = _canon(sentence)
@@ -674,65 +702,107 @@ def cap_questions(text: str) -> str:
     return "".join(chars)
 
 
-def _fallback(text: str) -> str:
+def _no_questions(text: str) -> str:
+    """Every question mark turned into a full stop; no text is dropped."""
+    return text.replace("?", ".").replace("؟", ".")
+
+
+def _survivor(
+    spans: list[tuple[int, int, str]], asking: list[int], held: list[str], lines: list[str]
+) -> int:
+    """The one question that stays a question. With a single question it is that one (never zero).
+    With several it is the last one that is not mandatory, so an ordinary question gives way to nothing
+    and a mandatory one is only ever demoted for an ordinary one that follows it; if every question is
+    mandatory, the last of them stays a question."""
+    if len(asking) == 1:
+        return asking[0]
+    ordinary = [i for i in asking if not is_mandatory(_original(spans[i][2], held), lines)]
+    return ordinary[-1] if ordinary else asking[-1]
+
+
+def _moved_last(text: str, spans: list[tuple[int, int, str]], survivor: int) -> str:
+    """The surviving question moved to the end of the reply when it is not already the last sentence
+    with words in it (moved, never removed)."""
+    real = [i for i, (_, _, s) in enumerate(spans) if re.search(r"\w", s)]
+    if not real or survivor >= real[-1]:
+        return text
+    start, end, sentence = spans[survivor]
+    left, right = text[:start].rstrip(" \t"), text[end:]
+    joined = left + (right if not right or right[0].isspace() else " " + right)
+    separator = "\n\n" if "\n" in text else " "
+    return joined.rstrip() + separator + sentence.strip()
+
+
+def _demote(flat: str, held: list[str], lines: list[str], keep_one: bool) -> str:
+    """The text with every question but the survivor turned into a statement. Nothing is dropped; the
+    survivor (when `keep_one`) is last. `flat` is normalised and its links held."""
+    if question_count(flat) == 0:
+        return restore_urls(restore_abbreviations(flat), held)
+    spans = sentence_spans(flat)
+    asking = [i for i, (_, _, s) in enumerate(spans) if _ends_question(s)]
+    survivor = _survivor(spans, asking, held, lines) if keep_one and asking else None
+    out = flat
+    for i in reversed(asking):
+        if i != survivor:
+            start, end, sentence = spans[i]
+            out = out[:start] + _as_statement(sentence) + out[end:]
+    if survivor is not None:
+        out = _moved_last(out, spans, survivor)
+    # a mark that sits inside a sentence, not at its end ("Which one?;"), is still a mark: with one
+    # question allowed the last mark stays (never zero), without one every mark becomes a full stop
+    out = cap_questions(out) if keep_one else _no_questions(out)
+    return restore_urls(restore_abbreviations(out), held)
+
+
+def _oversize(text: str, keep_one: bool) -> str:
+    """A reply above MAX_CHARS is not parsed: a warning is logged (the length only, never the words) and
+    the plain cap is applied with links held, nothing dropped. Never returned unchanged."""
+    logger.warning("pi_final_question_oversize", extra={"length": len(text)})
+    held: list[str] = []
+
+    def hold(match: "re.Match[str]") -> str:
+        held.append(match.group(0))
+        return f"{PLACEHOLDER}{len(held) - 1}X"
+
+    plain = URL.sub(hold, text.translate(QUESTION_MARK_VARIANTS))
+    return restore_urls(cap_questions(plain) if keep_one else _no_questions(plain), held)
+
+
+def _fallback(text: str, keep_one: bool) -> str:
     """When the full check fails: the question cap on the raw text (links and quotations held, so
     nothing inside them is rewritten), with nothing dropped. Never the unchanged reply."""
     try:
         guarded, held = protect_urls(text)
-        return restore_urls(cap_questions(normalise_question_marks(guarded)), held)
+        flat = normalise_question_marks(guarded)
+        return restore_urls(cap_questions(flat) if keep_one else _no_questions(flat), held)
     except Exception as error:  # noqa: BLE001
         logger.warning(
             "pi_final_question_fallback_failed", extra={"error_type": type(error).__name__}
         )
-        return cap_questions(text)
-
-
-HELD_TAIL = re.compile(rf"{PLACEHOLDER}\d+Q\?$")
-
-
-def _make_room(flat: str, held: list[str], lines: list[str]) -> str:
-    """With two or more questions: every mandatory question becomes a statement, so the last ordinary
-    question is the one left. A mandatory sentence that itself ends in a quoted question cannot become a
-    statement without rewriting the quotation: it is the question that stays, and the ordinary
-    questions give way to it (the only conflict that leaves a mandatory question standing)."""
-    spans = [(a, b, s) for a, b, s in sentence_spans(flat) if _ends_question(s)]
-    mandatory = [is_mandatory(_original(s, held), lines) for _, _, s in spans]
-    locked = [i for i, (_, _, s) in enumerate(spans) if mandatory[i] and HELD_TAIL.search(s)]
-    survivor = locked[-1] if locked else None
-    for i in reversed(range(len(spans))):
-        start, end, sentence = spans[i]
-        if i == survivor:
-            continue
-        if mandatory[i]:
-            flat = flat[:start] + _as_statement(sentence) + flat[end:]
-        elif survivor is not None:
-            flat = flat[:start] + flat[end:]
-    return flat
+        return cap_questions(text) if keep_one else _no_questions(text)
 
 
 def one_question_final(reply: str, keep: Any = None) -> str:
-    """R-ASK-01 on the final reply: at most one question, and it is the last sentence. A reply with
-    one question that is not last keeps it and moves it to the end (never zero). With two or more,
-    mandatory sentences (see `is_mandatory`) are never dropped: a mandatory question becomes a
-    statement, so the last non-mandatory question is the one that survives; if every question is
-    mandatory they all become statements (the one case with no question left). Links, quotations
-    embedded in a sentence, decimals and abbreviations are left alone. If the check itself fails, a
-    warning is logged (the error type only) and the question cap is applied to the raw text."""
-    from app.modules.pi import constitution
-
+    """R-ASK-01 on the final reply: at most one question, and it is the last sentence. A question is
+    demoted (its mark becomes a full stop), never dropped, so no sentence of the reply is ever lost.
+    A reply with one question that is not last keeps it and moves it to the end (never zero). With
+    several, the last question that is not mandatory (see `is_mandatory`) stays a question and the
+    others become statements; if every question is mandatory, the last of them stays one. Links, code
+    spans, "a ? b : c" expressions and quotations holding one mark are left alone. A reply longer than
+    MAX_CHARS is not parsed: a warning is logged and the plain cap is applied. If the check itself
+    fails, a warning is logged (the error type only) and the cap is applied to the raw text."""
     text = (reply or "").strip()
     if not text:
         return reply
+    if len(text) > MAX_CHARS:
+        return _oversize(text, keep_one=True)
     try:
         guarded, held = protect_urls(text)
         flat = protect_abbreviations(normalise_question_marks(guarded))
         marks = question_count(flat)
         if marks == 0 or (marks == 1 and ends_in_question(flat)):
             return reply
-        if marks >= 2:
-            flat = _make_room(flat, held, keep_canon(keep))
-        fixed = constitution._one_question_last(flat, 10**6)
-        return restore_urls(restore_abbreviations(cap_questions(fixed)), held)
+        return _demote(flat, held, keep_canon(keep), keep_one=True)
     except Exception as error:  # noqa: BLE001 - the reply must still be sent, and still capped
         logger.warning("pi_final_question_failed", extra={"error_type": type(error).__name__})
-        return _fallback(text)
+        return _fallback(text, keep_one=True)
