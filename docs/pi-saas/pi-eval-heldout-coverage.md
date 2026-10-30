@@ -40,6 +40,11 @@ Held-out grew from 21 to 60 cases (102 cases in all). The three kinds of stateme
 3. **Constraints are labelled but not scored.** The scorer measures recall, precision, kept figures, applied
    corrections and unsupported causes. Nothing reads `expected.constraints`, because pi has no constraints
    field yet (B2 has not started). The labels are there so the scorer can use them when B2 exists.
+   **Update (FT-A2, 2026-10-30):** a scorer now reads them. `constraints_kept` counts a labelled constraint as
+   kept when its words and numbers survive in the record's `constraints` list or its own words; the four
+   Held-out constraint cases gained a reference `constraints` list in their recorded notes (the only change to
+   existing cases), and the reference result is 9 of 9 kept for Held-out. This still measures the scripted
+   reference, not a model.
 4. **Unsupported-cause coverage is thin**: one hypothesis-only case and two cases with a stated cause, so the
    0 unsupported causes in the table means little.
 5. **Development is now smaller than Held-out** (39 against 60). Tuning data should not be the small side;

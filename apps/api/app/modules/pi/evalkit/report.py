@@ -22,11 +22,11 @@ def pct(value: float | None) -> str:
 
 def line(name: str, agg: dict[str, Any]) -> str:
     if not agg["measured"]:
-        return f"| {name} | {agg['cases']} | not yet measured | | | | |"
+        return f"| {name} | {agg['cases']} | not yet measured | | | | | |"
     return (
         f"| {name} | {agg['cases']} | {pct(agg['recall'])} | {pct(agg['precision'])} | "
         f"{pct(agg['figure_fidelity'])} | {pct(agg['correction_fidelity'])} | "
-        f"{agg['unsupported_cause_cases']} |"
+        f"{pct(agg['constraint_fidelity'])} | {agg['unsupported_cause_cases']} |"
     )
 
 
@@ -52,7 +52,7 @@ def build(cases: list[dict[str, Any]]) -> tuple[str, dict[str, Any]]:
     ]
     head = (
         "| group | cases | problem recall | precision | figures kept | corrections kept "
-        "| unsupported causes |\n|---|---|---|---|---|---|---|"
+        "| constraints kept | unsupported causes |\n|---|---|---|---|---|---|---|---|"
     )
     totals: dict[str, Any] = {}
     for title, key in (
@@ -78,11 +78,13 @@ def build(cases: list[dict[str, Any]]) -> tuple[str, dict[str, Any]]:
             or s["unsupported_causes"]
             or (s["figures_kept"] < s["figures"])
             or s["corrections_applied"] < s["corrections"]
+            or s["constraints_kept"] < s["constraints"]
         ):
             out.append(
                 f"- {s['id']} ({s['split']}): found {s['found']}/{s['expected']}, "
                 f"extra {s['extra']}, figures {s['figures_kept']}/{s['figures']}, "
                 f"corrections {s['corrections_applied']}/{s['corrections']}, "
+                f"constraints {s['constraints_kept']}/{s['constraints']}, "
                 f"unsupported {s['unsupported_causes']}"
             )
     return "\n".join(out) + "\n", totals

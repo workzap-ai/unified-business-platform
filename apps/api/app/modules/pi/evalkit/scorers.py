@@ -40,6 +40,21 @@ def figure_kept(figure: str, text: str) -> bool:
     return nums <= _numbers(text) and words <= _stems(text)
 
 
+def constraint_kept(constraint: str, text: str) -> bool:
+    """A stated limit ("only 2 supervisors", "cannot stop production") is kept when its content
+    words and numbers all survive. A limit with no content word the word pattern can see (Devanagari
+    is split at its vowel signs) must appear as written, so it is never kept vacuously."""
+    if _stems(constraint):
+        return figure_kept(constraint, text)
+    return " ".join(constraint.casefold().split()) in " ".join(text.casefold().split())
+
+
+def constraint_text(records: list[dict[str, Any]]) -> str:
+    """Everything the saved records say about limits: their constraints and their own words."""
+    parts = [" ".join(str(c) for c in r.get("constraints") or []) for r in records]
+    return " ".join([*parts, *(record_text(r) for r in records)])
+
+
 def score_case(case: dict[str, Any], records: list[dict[str, Any]]) -> dict[str, Any]:
     expected = case["expected"]
     specs = expected.get("problems") or []
@@ -78,6 +93,8 @@ def score_case(case: dict[str, Any], records: list[dict[str, Any]]) -> dict[str,
             for h in expected.get("hypothesis_only") or []
         )
     ]
+    labelled = expected.get("constraints") or []
+    pool = constraint_text(records)
     return {
         "id": case["id"],
         "expected": len(specs),
@@ -90,6 +107,8 @@ def score_case(case: dict[str, Any], records: list[dict[str, Any]]) -> dict[str,
         "corrections": len(corrections),
         "corrections_applied": applied,
         "unsupported_causes": sorted(set(bad_cause) | set(hypotheses)),
+        "constraints": len(labelled),
+        "constraints_kept": sum(1 for c in labelled if constraint_kept(str(c), pool)),
     }
 
 
@@ -101,6 +120,7 @@ def aggregate(scores: list[dict[str, Any]]) -> dict[str, Any]:
     recs = got + sum(s["extra"] for s in scores)
     fig = sum(s["figures"] for s in scores)
     cor = sum(s["corrections"] for s in scores)
+    con = sum(s["constraints"] for s in scores)
     return {
         "cases": n,
         "measured": n >= MIN_CASES,
@@ -109,4 +129,5 @@ def aggregate(scores: list[dict[str, Any]]) -> dict[str, Any]:
         "figure_fidelity": sum(s["figures_kept"] for s in scores) / fig if fig else None,
         "correction_fidelity": sum(s["corrections_applied"] for s in scores) / cor if cor else None,
         "unsupported_cause_cases": sum(1 for s in scores if s["unsupported_causes"]),
+        "constraint_fidelity": sum(s["constraints_kept"] for s in scores) / con if con else None,
     }

@@ -10,7 +10,7 @@ from typing import Any
 
 from app.modules.pi import problem_extract as pe
 
-EXTRA_FIELDS = ("cause", "cause_status", "money_text")
+EXTRA_FIELDS = ("cause", "cause_status", "money_text", "constraints")
 
 
 class ScriptedManager:

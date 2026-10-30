@@ -4409,7 +4409,12 @@
       "Delivery dates slip on our custom orders and customers get angry"
      ],
      "summary": "Delivery dates slip on custom orders",
-     "category": "orders_fulfilment"
+     "category": "orders_fulfilment",
+     "constraints": [
+      "2 supervisors",
+      "about 300,000 rupees to spend",
+      "cannot stop production for training"
+     ]
     }
    ]
   }
@@ -4750,7 +4755,11 @@
       "we overpaid one site by about 200,000 rupees last quarter"
      ],
      "summary": "Subcontractor payments tracked in a notebook",
-     "category": "margin_cost"
+     "category": "margin_cost",
+     "constraints": [
+      "accountant works only two days a week",
+      "the fix has to be simple"
+     ]
     }
    ]
   }
@@ -5496,7 +5505,11 @@
       "har shed mein 150 chicks mar jate hain"
      ],
      "summary": "Chick mortality is high in every shed",
-     "category": "quality_complaints"
+     "category": "quality_complaints",
+     "constraints": [
+      "budget sirf 100,000",
+      "feed supplier nahi badal sakte"
+     ]
     }
    ]
   }
@@ -6721,7 +6734,11 @@
       "نتلقى الحجوزات عبر واتساب وتتكرر الحجوزات المزدوجة"
      ],
      "summary": "Double bookings from WhatsApp reservations",
-     "category": "orders_fulfilment"
+     "category": "orders_fulfilment",
+     "constraints": [
+      "الميزانية لا تتجاوز 5000 دولار",
+      "لا نستطيع تغيير نظام الاستقبال الحالي"
+     ]
     }
    ]
   }
@@ -7030,7 +7047,12 @@
       "اشتكى 4 عملاء من مواقع لم تنظف"
      ],
      "summary": "Cleaning crews skip some client sites",
-     "category": "operations_process"
+     "category": "operations_process",
+     "constraints": [
+      "مشرفان فقط",
+      "ميزانية لا تتجاوز 5000 ريال",
+      "لا نستطيع تغيير شركة المواد"
+     ]
     }
    ]
   }
@@ -7517,7 +7539,12 @@
       "हर हफ्ते 6 ऑर्डर वापस आ जाते हैं"
      ],
      "summary": "Print orders go out late and come back",
-     "category": "orders_fulfilment"
+     "category": "orders_fulfilment",
+     "constraints": [
+      "सिर्फ 2 ऑपरेटर",
+      "बजट 50,000 रुपये तक",
+      "मशीन नहीं बदल सकते"
+     ]
     }
    ]
   }
@@ -8006,7 +8033,12 @@
       "کارٹن کی سائز کی غلطیوں سے ہر ہفتے 5 آرڈر واپس آ جاتے ہیں"
      ],
      "summary": "Carton size errors send orders back",
-     "category": "orders_fulfilment"
+     "category": "orders_fulfilment",
+     "constraints": [
+      "بجٹ صرف 2 لاکھ روپے",
+      "دو ہی سپروائزر",
+      "رات کی شفٹ بند نہیں کر سکتے"
+     ]
     }
    ]
   }
@@ -8238,7 +8270,12 @@
       "customers keep complaining that panels were left dirty and cables untidy, about 6 complaints a month"
      ],
      "summary": "Customers complain of untidy finished installations",
-     "category": "quality_complaints"
+     "category": "quality_complaints",
+     "constraints": [
+      "only 3 crews",
+      "no more than 150,000 rupees",
+      "cannot delay any installation"
+     ]
     }
    ]
   }
@@ -8290,7 +8327,11 @@
       "Chiller mein doodh khatta ho jata hai, roz taqriban 80 litre zaya hota hai"
      ],
      "summary": "Milk turns sour in the chiller",
-     "category": "stock_inventory"
+     "category": "stock_inventory",
+     "constraints": [
+      "budget sirf 200,000",
+      "farmers ka time nahi badal sakte"
+     ]
     }
    ]
   }
