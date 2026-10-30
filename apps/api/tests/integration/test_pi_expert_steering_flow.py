@@ -27,6 +27,8 @@ pytestmark = pytest.mark.integration
 OPENING = "Hi, main pi hoon, Workzap ka AI."
 FIRST = "Mere school mein parents fee late dete hain"
 TITLE = "Parents pay the school fee late"
+HELLO = "hello"
+IDENTITY = "Hi, main pi hoon, Workzap ka AI. Aap ke school ka naam kya hai?"
 WHY = "Wo late fee dete waqt kya wajah batate hain?"
 DRIFT = "Parents fee kaise jama karwate hain, challan, cash ya online?"
 FEE_QUESTIONS = (
@@ -61,7 +63,9 @@ def fee_models(monkeypatch):
         if kwargs.get("purpose") == "pi_problem_extract":
             return SimpleNamespace(value=output(), response=SimpleNamespace(attempts=[]))
         text = kwargs["messages"][-1].text()
-        if text.startswith("{"):
+        if text.startswith("{") and json.loads(text).get("latest_customer_message") == HELLO:
+            sent["last"] = turn(reply=IDENTITY, language="roman_ur")  # v1.5 18.2 opening
+        elif text.startswith("{"):
             sent["replies"].append(json.loads(text))
             n = len(sent["replies"])
             if n == 1:
@@ -125,6 +129,7 @@ async def expert_workspace(api, db):
 async def test_the_replay_does_not_drift_to_how_parents_pay(api, business_db, monkeypatch):
     sent = fee_models(monkeypatch)
     pi = await expert_workspace(api, business_db)
+    await say(pi, HELLO, "f-0")
     await say(pi, FIRST, "f-1")
     assert sent["replies"], "the reply model was not called"
     assert len(sent["diag"]) == 1, sent["replies"][0][
@@ -150,6 +155,7 @@ async def test_the_replay_does_not_drift_to_how_parents_pay(api, business_db, mo
 async def test_an_ok_does_not_pay_for_another_diagnosis(api, business_db, monkeypatch):
     sent = fee_models(monkeypatch)
     pi = await expert_workspace(api, business_db)
+    await say(pi, HELLO, "g-0")
     await say(pi, FIRST, "g-1")
     await say(pi, "ok", "g-2")
     assert len(sent["diag"]) == 1
@@ -166,6 +172,11 @@ def expert_diag_model(monkeypatch, ideas):
         if kwargs.get("purpose") == "pi_problem_extract":
             return SimpleNamespace(value=output(), response=SimpleNamespace(attempts=[]))
         text = kwargs["messages"][-1].text()
+        if text.startswith("{") and json.loads(text).get("latest_customer_message") == HELLO:
+            return SimpleNamespace(
+                value=turn(reply=IDENTITY, language="roman_ur"),
+                response=SimpleNamespace(attempts=[]),
+            )
         if text.startswith("{") and not calls:
             calls.append("reply")
             return SimpleNamespace(
@@ -237,6 +248,7 @@ async def sibling_chat(db, conversation, **brief):
 async def start(api, db, monkeypatch, ideas=FEE_IDEAS):
     calls = expert_diag_model(monkeypatch, ideas)
     pi = await expert_workspace(api, db)
+    await say(pi, HELLO, "h-0")
     await say(pi, FIRST, "h-1")
     conversation = await pi.conversation()
     return pi, conversation, calls

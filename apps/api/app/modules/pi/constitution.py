@@ -69,7 +69,9 @@ ASKS_IF_AI = re.compile(
     r"|\bkya (?:aap|ap|ye|yeh|tum|app)\b[^.?!؟]{0,20}\b(?:insaan|insan|bot|human|robot|machine)\b"
     r"|\b(?:insaan|insan|bot|robot) (?:ho|hai|hain)\b|هل أنت|هل هذا|کیا آپ[^؟?]{0,15}(?:انسان|بوٹ|روبوٹ)"
     r"|هل (?:انت|أنت) (?:إنسان|انسان|بشر|روبوت|بوت)|من (?:انت|أنت)\b|\baap kon (?:ho|hain)\b"
-    r"|\btum kaun ho\b|آپ کون ہیں|تم کون ہو" + langs.ASKS_IF_AI,
+    r"|\btum kaun ho\b|آپ کون ہیں|تم کون ہو"
+    r"|آپ\s*(?:انسان|بوٹ|روبوٹ|مشین)\s*ہیں|(?:انسان|مشین)\s*ہیں\s*یا\s*(?:انسان|مشین)"
+    + langs.ASKS_IF_AI,
     re.IGNORECASE,
 )
 
@@ -134,6 +136,12 @@ REFUSING = re.compile(
 IBAN = re.compile(r"\b[A-Z]{2}\d{2}[A-Z0-9]{4}\d{10,}\b")
 ACCOUNT_NUMBER = re.compile(r"\baccount\s*(?:number|no\.?|#)\s*[:\-]?\s*[\d\- ]{8,}", re.IGNORECASE)
 IBAN_LABEL = re.compile(r"\biban\b\s*[:\-]?\s*[A-Z0-9 ]{12,}", re.IGNORECASE)
+# "Meezan Bank account 0123456789 mein bhej dein", "حساب رقم 1234-5678901-03": a typed account number
+# without the word "number" (R-PAY-03). A long digit run right after the word for an account.
+ACCOUNT_TYPED = re.compile(
+    r"(?:\b(?:account|acct|khata|khaata)\b|حساب|اکاؤنٹ|کھاتہ)[^.\n?!؟\d]{0,25}\d[\d\- ]{8,}\d",
+    re.IGNORECASE,
+)
 
 PAYMENT_RECEIVED = re.compile(
     r"\b(?:payment|transfer|amount)\s+(?:has been |is |was |have been )?(?:received|confirmed|done)\b"
@@ -253,7 +261,12 @@ PITCH_WORDS = re.compile(
     r"\bnori\b|\b(?:we|workzap|i)(?: can| could| would| will|'ll|'d)(?: also)? "
     r"(?:build|make|create|set up|automate|fix|solve|install|develop)\b"
     r"|\bour (?:product|products|service|services|software|app|platform|system)\b"
-    r"|\bI(?:'d| would) recommend\b|\bworkzap can help\b",
+    r"|\bI(?:'d| would) recommend\b|\bworkzap can help\b"
+    # Roman Urdu, Urdu and Arabic: "hamara CRM le lein", "Workzap le lein", "hum bana denge"
+    r"|\bham?ar[ea]\s+(?:product|service|software|app|platform|system|crm)\b"
+    r"|\bworkzap(?:\s+\w+){0,2}\s+(?:le\s+lein|use\s+kar\w*|lagwa\w*)\b"
+    r"|\b(?:hum|main)\s+(?:aap\s+ke\s+liye\s+)?(?:ek\s+\w+\s+)?(?:bana|banwa|laga)\w*\b"
+    r"|ہمارا\s+(?:پروڈکٹ|سافٹ\s*ویئر|ایپ|سسٹم)|نظامنا|برنامجنا|منتجنا",
     re.IGNORECASE,
 )
 URGENCY = re.compile(
@@ -274,10 +287,20 @@ FLATTERY = re.compile(
     re.IGNORECASE,
 )
 # Offering a discount moves a decision; saying pi cannot give one does not.
-DISCOUNT = re.compile(r"\bdiscounts?\b", re.IGNORECASE)
-NEGATED_DISCOUNT = re.compile(
-    r"(?:can't|cannot|can not|won't|no|not|never|nahi|unable)\W+(?:\w+\W+){0,4}$", re.IGNORECASE
+DISCOUNT = re.compile(
+    r"\bdiscounts?\b|\b\d+\s*(?:%|percent|per cent)\s*off\b|\brebate\b"
+    # "chhoot jata hai" means "gets missed", so only the discount senses count
+    r"|\bchh?oot\s+(?:de|dein|dena|denge|dun|dunga|milegi|mil\s+(?:jayegi|jaye))\b"
+    r"|\b\d+\s*(?:%|percent|fisad)\s*chh?oot\b"
+    r"|خصم|تخفيض|رعایت|ڈسکاؤنٹ|چھوٹ\s*(?:دے|دیں|دینا|دی\s+جا|ملے|ملیں)|\d+\s*(?:%|فیصد)\s*چھوٹ",
+    re.IGNORECASE,
 )
+NEGATED_DISCOUNT = re.compile(
+    r"(?:can't|cannot|can not|won't|no|not|never|nahi|unable)\W+(?:\w+\W+){0,4}$"
+    r"|(?:^|\W)(?:لا|ليس|نہیں|نہ|مت)\W+(?:\w+\W+){0,4}$",
+    re.IGNORECASE,
+)
+NEGATED_AFTER = re.compile(r"^(?:\W+\w+){0,3}\W+(?:nahi|nahin|نہیں|مت|لا|ليس)(?:\W|$)", re.IGNORECASE)
 ASKED_FOR_HELP = re.compile(
     r"\b(?:solution|fix|solve|build|quote|price|pricing|cost|how much|proposal|what can you do|"
     r"can you help|can you fix|what would you build|(?:kya|kuch) kar sakte|"
@@ -340,8 +363,10 @@ def _offers_discount(reply: str, heard: str = "") -> bool:
         for match in DISCOUNT.finditer(sentence):
             if NEGATED_DISCOUNT.search(sentence[max(0, match.start() - 40) : match.start()]):
                 continue
+            if NEGATED_AFTER.search(sentence[match.end() : match.end() + 40]):
+                continue  # Urdu and Roman Urdu put the refusal after it: "discount nahi de sakta"
             if sentence.rstrip().endswith(QUESTION_MARKS) and (
-                "discount" in heard
+                DISCOUNT.search(heard)
                 or re.search(
                     r"\b(?:the|your|their|these|those)\s+$", sentence[: match.start()], re.I
                 )
@@ -1432,7 +1457,12 @@ ADVICE = re.compile(
     r"|\b(?:your|the) (?:[a-z]+ ){0,2}(?:is|are|must be|has been|probably is|are probably) "
     r"(?:stealing|lying|cheating|embezzling|skimming|a thief|thieves)\b"
     r"|\b(?-i:[A-Z][a-z]{2,}) (?:is|was|has been|must be|may be|might be|is probably|is likely) "
-    r"(?:stealing|a thief|lying|cheating|embezzling|skimming|a fraud|corrupt)\b" + langs.ADVICE,
+    r"(?:stealing|a thief|lying|cheating|embezzling|skimming|a fraud|corrupt)\b"
+    # legal assurance in Roman Urdu, Urdu and Arabic: "ye bilkul jaiz hai", "qanooni taur par theek"
+    r"|\b(?:ye|yeh)\s+(?:bilkul\s+)?(?:jaiz|qanooni|gair\s+qanooni|na\s*jaiz)\s+hai\b"
+    r"|\bqanooni\s+taur\s+par\s+(?:theek|sahi|jaiz|allowed)\b"
+    r"|قانونی\s+طور\s+پر\s+(?:ٹھیک|درست|جائز)|یہ\s+(?:بالکل\s+)?(?:جائز|ناجائز|غیر\s*قانونی)\s+ہے"
+    r"|(?:هذا|ذلك)\s+(?:قانوني|غير\s+قانوني)|يحق\s+لك\s+قانونيًّا?" + langs.ADVICE,
     re.IGNORECASE,
 )
 OPINION = re.compile(
@@ -1742,7 +1772,12 @@ def lint(reply: str, context: dict[str, Any]) -> list[Violation]:
             break
     _asks_for_what_it_never_asks(reply, heard, add)
     squashed = re.sub(r"(?<=\d) (?=\d)", "", reply)
-    if IBAN.search(squashed) or ACCOUNT_NUMBER.search(reply) or IBAN_LABEL.search(reply):
+    if (
+        IBAN.search(squashed)
+        or ACCOUNT_NUMBER.search(reply)
+        or ACCOUNT_TYPED.search(reply)
+        or IBAN_LABEL.search(reply)
+    ):
         add(
             Violation(
                 "R-PAY-03", "never type bank details: they are only on the approved quote", True

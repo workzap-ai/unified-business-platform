@@ -128,8 +128,12 @@ async def test_a_noted_line_the_person_does_not_object_to_becomes_confirmed(
 ):
     scripted(
         monkeypatch,
+        turn(  # the first reply to a new number asks who they are (spec v1.5, 18.2)
+            reply=f"{OPENING} What is your business called, and what do you make or sell?",
+            language="en",
+        ),
         turn(
-            reply=f"{OPENING} Noted: the cash does not match. Anything else?",
+            reply="Cash that does not match at day end, got it. How big is the gap on a day?",
             language="en",
             problem_ops=[
                 create(
@@ -137,9 +141,10 @@ async def test_a_noted_line_the_person_does_not_object_to_becomes_confirmed(
                 )
             ],
         ),
-        turn(reply="Noted. Anything else getting in the way?", language="en"),
+        turn(reply="Late cashiers, I see. What time do they usually arrive?", language="en"),
     )
     pi = await workspace(api, business_db)
+    await say(pi, "I need some help please", "pb-2-0")
     await say(pi, "Cash never matches at the end of the day", "pb-2a")
     assert (await problems_of(business_db, pi))[1][0].status == "draft"
     await say(pi, "The cashiers are also late", "pb-2b")

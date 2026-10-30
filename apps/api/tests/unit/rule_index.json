@@ -206,6 +206,7 @@
     "app/modules/pi/constitution.py::lint"
    ],
    "tests": [
+    "tests/unit/test_pi_redteam_round2.py::test_rt1_urdu_script_are_you_human_is_recognised_and_needs_the_ai_line",
     "tests/unit/test_pi_constitution.py::test_asked_if_it_is_a_person_the_first_sentence_says_ai",
     "tests/unit/test_pi_redteam.py::test_rt1_pi_always_says_it_is_an_ai",
     "tests/unit/test_pi_languages_gates.py::test_who_are_you_in_other_languages"
@@ -291,6 +292,7 @@
     "app/modules/pi/flow.py"
    ],
    "tests": [
+    "tests/unit/test_pi_redteam_round2.py::test_rt_early_pitch_in_any_language_is_caught_while_listening",
     "tests/unit/test_pi_constitution.py::test_no_pitching_while_listening",
     "tests/unit/test_pi_constitution.py::test_pitching_is_a_hard_break",
     "tests/unit/test_pi_constitution.py::test_a_direct_question_gets_one_honest_line_not_a_description",
@@ -335,6 +337,7 @@
     "app/modules/pi/constitution.py::_offers_discount"
    ],
    "tests": [
+    "tests/unit/test_pi_redteam_round2.py::test_rt3_a_discount_in_any_language_is_caught",
     "tests/unit/test_pi_constitution.py::test_no_urgency_scarcity_or_discounts_in_any_state",
     "tests/unit/test_pi_linter_hardening.py::test_flattery_is_soft",
     "tests/unit/test_pi_redteam.py::test_rt3_pi_never_gives_a_discount"
@@ -540,6 +543,7 @@
     "app/modules/pi/brain_pdf.py::render_quote"
    ],
    "tests": [
+    "tests/unit/test_pi_redteam_round2.py::test_rt8_typed_account_numbers_are_never_sent",
     "tests/unit/test_pi_constitution.py::test_pi_never_types_bank_details",
     "tests/unit/test_pi_constitution.py::test_bank_details_stay_on_the_quote",
     "tests/unit/test_pi_brain_docs.py::test_the_pdfs_carry_the_text_and_only_the_quote_carries_bank_details"
@@ -812,6 +816,7 @@
     "app/modules/pi/constitution_langs.py"
    ],
    "tests": [
+    "tests/unit/test_pi_redteam_round2.py::test_rt9_a_legal_assurance_in_any_language_is_caught",
     "tests/unit/test_pi_safety.py::test_advice_that_is_not_pis_to_give",
     "tests/unit/test_pi_linter_hardening.py::test_advice_in_the_reply_is_hard",
     "tests/unit/test_pi_safety_trades.py::test_advice_classes",
@@ -914,6 +919,7 @@
     "app/modules/pi/safety.py::emergency_reply"
    ],
    "tests": [
+    "tests/unit/test_pi_redteam_round2.py::test_rt10_self_harm_in_every_language_is_an_emergency",
     "tests/unit/test_pi_safety.py::test_an_emergency_is_recognised",
     "tests/unit/test_pi_safety.py::test_emergency_replies_carry_the_local_numbers",
     "tests/unit/test_pi_safety.py::test_the_country_comes_from_the_number",

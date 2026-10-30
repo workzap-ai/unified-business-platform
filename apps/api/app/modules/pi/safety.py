@@ -107,9 +107,12 @@ EMERGENCY_PATTERNS = EMERGENCY_PATTERNS + (
         Emergency.SELF_HARM,
         re.compile(
             r"(?:أقتل نفسي|اقتل نفسي|أنهي حياتي|انهي حياتي|لا أريد أن أعيش|لا اريد ان اعيش|"
-            r"اريد ان اموت|أبغى أموت|ابغى اموت|اپنی جان لے|مر جانا چاہتا|مر جانا چاہتی)"
+            r"اريد ان اموت|أبغى أموت|ابغى اموت|اپنی جان لے|مر جانا چاہتا|مر جانا چاہتی|"
+            r"خود کو ختم|خودکشی|اپنی جان دے|مرنا چاہتا|مرنا چاہتی|جینا نہیں چاہتا|جینا نہیں چاہتی)"
             r"|\b(?:mar jana chahta|mar jana chahti|apni jaan le (?:lun|loon|lunga|lungi)|"
-            r"zindagi se tang aa gaya|zindagi se tang aa gayi)\b",
+            r"zindagi se tang aa gaya|zindagi se tang aa gayi|khud ko khatam|khudkushi|khud kushi|"
+            r"apni jaan de (?:dun|doon|dunga|dungi)|marna chahta|marna chahti|jeena nahi chahta|"
+            r"jeena nahi chahti)\b",
             re.IGNORECASE,
         ),
     ),
@@ -635,6 +638,11 @@ SECRET = re.compile(
     rf"|\s+((?=[A-Za-z0-9@#$!%^&*._-]*\d){_TOKEN}))",
     re.IGNORECASE,
 )
+# The same in Arabic and Urdu script: "رمز التحقق 5521", "الرمز: 5521", "پاس ورڈ ہے 8832", "او ٹی پی 4421".
+SECRET_NATIVE = re.compile(
+    r"(?:رمز(?:\s+التحقق|\s+الدخول|\s+السري)?|كلمة\s+(?:ال)?(?:مرور|سر)|باسورد|پاس\s*ورڈ|پن\s*کوڈ|"
+    r"او\s*ٹی\s*پی|اوٹی\s*پی)\s*(?:هو|هي|ہے|:|=)?\s*[:=]?\s*(\d{3,8})(?!\d)"
+)
 THIRD_PARTY = re.compile(
     r"\b(?:his|her|their|customer'?s|supplier'?s|manager'?s|staff'?s|client'?s|my (?:manager|staff|brother|"
     r"sister|wife|husband|partner|customer|supplier|accountant|driver|cashier))\b[^.\n]{0,40}?"
@@ -783,6 +791,7 @@ def redact_pii(text: str) -> Redaction:
         return match.group().replace(value, PLACEHOLDER[Pii.SECRET])
 
     clean = SECRET.sub(secret, clean)
+    clean = SECRET_NATIVE.sub(secret, clean)
     for pattern, kind in (
         (CNIC, Pii.ID),
         (CNIC_LABELLED, Pii.ID),
@@ -992,8 +1001,9 @@ ADVICE_PATTERNS = ADVICE_PATTERNS + (
         Advice.TAX,
         re.compile(
             r"(?:كم (?:يجب|عليّ|علي) (?:أن )?أدفع ضريبة|كيف أتجنب الضريبة|نسبة (?:الضريبة|ضريبة)|"
-            r"ٹیکس (?:کتنا|کیسے بچا)|کتنا ٹیکس)"
-            r"|\b(?:tax kaise bach\w*|tax kitna (?:dun|doon|dena)|tax bachane ka)\b",
+            r"ٹیکس (?:کتنا|کیسے بچا)|کتنا ٹیکس|ٹیکس (?:چھپا|بچا|چوری|کم کر))"
+            r"|\b(?:tax kaise bach\w*|tax kitna (?:dun|doon|dena)|tax bachane ka|"
+            r"tax (?:chupa|chhupa|bacha|chori|kam kar)\w*)\b",
             re.IGNORECASE,
         ),
     ),

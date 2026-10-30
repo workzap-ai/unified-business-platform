@@ -62,7 +62,9 @@ async def test_the_first_map_is_sent_as_a_picture_with_caption_alt_and_one_quest
     await say(pi, FIRST, "ms-2")
     [shared] = await maps(business_db)
     assert shared.sender_type == "ai" and shared.media["visual"] == "map"
-    assert shared.body.endswith("Are the links right?") and shared.body.count("?") == 1
+    # v1.5 8: the caption's "Is this right?" is the one question, so no second one is added
+    assert shared.body.endswith("Is this right? Tell me what to change.")
+    assert shared.body.count("?") == 1
     assert shared.media["alt"] and shared.media["map_version"] == 1
     assert shared.media.get("service_inbound_at")
     [version] = (await business_db.scalars(select(PiMapVersion))).all()

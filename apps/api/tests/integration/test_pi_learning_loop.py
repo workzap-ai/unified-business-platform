@@ -37,7 +37,7 @@ def model(context, n):
             problem_ops=[create("Best-sellers run out", "stock runs out")],
         )
     if "Only two" in said:
-        return turn(reply="Noted. How often does that happen?", language="en")
+        return turn(reply="How often does that happen?", language="en")
     if "deliveries" in said:  # the second customer: pi follows the suggested wording
         return turn(reply=hint or "How often does that happen?", language="en")
     return turn(reply="Noted. Anything else getting in the way?", language="en")
@@ -161,7 +161,7 @@ async def test_an_example_that_holds_a_name_or_a_number_is_never_made(
             return turn(
                 reply="Thanks. I've noted it. Is it every shop, or only some?", language="en"
             )
-        return turn(reply="Noted. How often does that happen?", language="en")
+        return turn(reply="How often does that happen?", language="en")
 
     adaptive(monkeypatch, with_a_name)
     pi = await workspace(api, business_db)

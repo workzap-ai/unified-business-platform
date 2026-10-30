@@ -190,6 +190,23 @@ INJECTION = re.compile(
     r"you are now|system prompt|new instructions?:|override)\b",
     re.IGNORECASE,
 )
+# Text that tells pi to break a non-negotiable: yes on a "maybe", hiding that it is an AI, giving a
+# price or a discount when pushed. Never learned, whoever writes it, in any language.
+RULE_OVERRIDE = re.compile(
+    r"\b(?:always|every time|whenever|even if|hamesha)\b[^.?!]{0,40}\b(?:say|answer|treat|take|count|"
+    r"assume|read)\w*\b[^.?!]{0,30}\byes\b"
+    r"|\b(?:maybe|hmm|let me think|ok(?:ay)?|dekhte hain)\b[^.?!]{0,25}"
+    r"\b(?:as|means?|counts? as|is) (?:a )?(?:yes|approval|agreement)\b"
+    r"|\b(?:tell|say|claim|pretend|admit|insist)\b[^.?!]{0,30}\b(?:you(?:'re| are)|pi is|that you are)\b"
+    r"[^.?!]{0,12}\b(?:human|a person|a real person|not (?:an )?ai|not a bot)\b"
+    r"|\b(?:never|don'?t|do not|avoid)\b[^.?!]{0,15}\b(?:mention|say|admit|tell)\b[^.?!]{0,20}"
+    r"\b(?:ai|bot|robot)\b|\binsaan\b[^.?!]{0,20}\b(?:bata\w*|keh\w*|bol\w*)\b"
+    r"|\b(?:give|tell|share|state|quote)\b[^.?!]{0,25}\b(?:price|prices|range|ballpark|rate)\b"
+    r"[^.?!]{0,30}\b(?:insist\w*|persist\w*|anyway|pushes|pushed)\b"
+    r"|(?:قیمت|رعایت|چھوٹ|ڈسکاؤنٹ)\s*(?:بتا|دے|دیں|دینا|بتائیں)|انسان\s*(?:بتا|کہہ|بول)"
+    r"|(?:اذكر|أعطه|اعطه)\s+(?:السعر|خصم)|أخبره أنك (?:إنسان|بشر)",
+    re.IGNORECASE,
+)
 # Text that tries to loosen the value line (Addendum 2, Part 1 and 3.8): more ideas, the how for
 # free, step-by-step help. It is never learned, whoever writes it.
 VALUE_LINE_ATTEMPT = re.compile(
@@ -240,6 +257,8 @@ def never_learn(text: str) -> list[str]:
         why.append("social proof (R-SELL-03)")
     if INJECTION.search(said):
         why.append("tries to give pi instructions")
+    if RULE_OVERRIDE.search(said):
+        why.append("gives pi instructions that break a non-negotiable rule")
     if VALUE_LINE_ATTEMPT.search(said):
         why.append("instructions to change the value line (R-VAL, R-BUILD)")
     if safety.redact_pii(said).kinds:

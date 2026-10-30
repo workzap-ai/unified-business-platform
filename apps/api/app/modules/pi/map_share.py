@@ -10,6 +10,7 @@ review is still wanted for all of it (spec decision 10). Nothing here names an a
 person, and nothing asks for card, password, OTP or ID numbers.
 """
 
+import re
 from datetime import UTC, datetime, timedelta
 from typing import Any
 
@@ -134,6 +135,22 @@ def pick(table: dict[str, Any], language: str | None) -> Any:
 
 def question(language: str | None, shared_before: int = 0) -> str:
     return str(pick(QUESTIONS, language)[shared_before % 3])
+
+
+def caption_asks(caption: str) -> bool:
+    """The picture's own caption already asks (v1.5 8: 'Is this right? Tell me what to change.')."""
+    return "?" in caption or "؟" in caption
+
+
+def without_ask(caption: str) -> str:
+    """The caption's sentences before its first question, for when another line asks the one
+    question. A caption with no question, or nothing before it, is returned as it is."""
+    kept: list[str] = []
+    for sentence in re.split(r"(?<=[.!?؟])\s+", caption.strip()):
+        if sentence.endswith(("?", "؟")):
+            break
+        kept.append(sentence)
+    return " ".join(kept) if kept else caption
 
 
 def buttons(language: str | None) -> list[str]:

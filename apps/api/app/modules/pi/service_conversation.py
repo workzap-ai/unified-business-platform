@@ -1484,6 +1484,8 @@ async def brain_problems(
     context["served_industries"] = served if isinstance(served, list) else None
     if think_prompt.enabled(policy.response_rules):  # Book 5: absent unless exactly true
         context["thinking"] = True
+    if (policy.response_rules.get("brain") or {}).get("fact_ask") is True:  # 18.5, opt-in
+        context["fact_ask"] = True
     if box.box_offer_enabled(policy.response_rules):  # Book 5: the Solution Box offer rule
         context["box_offer"] = True
         # B3 and B4 from the owner's words, kept in the brief like the other brief keys. The flag
@@ -2882,6 +2884,10 @@ async def brain_free_ideas(
             keys[:1],
         )
     idea_ctx = idea_filter.with_grounding(idea_ctx, str(context.get("profile_grounding") or ""))
+    if context.get("thinking"):  # G10 (spec 17.4): the owner's stated size judges each idea
+        idea_ctx = idea_filter.with_resources(idea_ctx, " ".join([*customer, said]))
+    if (policy.response_rules.get("brain") or {}).get("idea_link") is True:  # G12, opt-in
+        idea_ctx = idea_filter.with_idea_link(idea_ctx)
     report: dict[str, Any] = {}
     if expert and await brain_expert_ideas(
         manager,
@@ -4889,6 +4895,13 @@ def part18_problem(reply: str, context: dict[str, Any]) -> str | None:
         reply_gates.empty_opener(reply),
         reply_gates.closed_list_early(reply, owner, known),
     ]
+    if context.get("fact_ask"):  # off unless the workspace sets brain.fact_ask to true
+        said = [
+            str(h.get("text") or "")
+            for h in context.get("history") or []
+            if h.get("role") == "customer"
+        ]
+        found.append(reply_gates.fact_already_given(reply, [*said, *owner]))
     return "; ".join(f for f in found if f) or None
 
 
@@ -6026,8 +6039,8 @@ async def compose_service_turn(
         )
     ):
         # B7.1/B7.3: a corrected figure is used in the reply, never the old one as a fact.
-        if text := figure_correction.reply_problem(turn.reply, *fix):
-            problem = f"{text}, and also: {problem}" if problem else text
+        if figure_text := figure_correction.reply_problem(turn.reply, *fix):
+            problem = f"{figure_text}, and also: {problem}" if problem else figure_text
     if context.get("pi_mode") == "brain":
         # Spec v1.5, Part 18: openingGate, noEmptyOpener, closed list before the business is known.
         if problem_text := part18_problem(turn.reply, context):

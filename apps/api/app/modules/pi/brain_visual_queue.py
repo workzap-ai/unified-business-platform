@@ -321,9 +321,14 @@ async def attach_map(
                 "alt": image.alt,
             }
             body = image.caption
-            if index == len(pictures) - 1 and closing:
-                body = f"{body}\n{closing}"
-                if buttons and len(body) <= LIST_BODY_LIMIT:
+            if index == len(pictures) - 1:
+                asks = map_share.caption_asks(body)
+                if asks and (why == "return" or at_the_offer):
+                    body = map_share.without_ask(body)  # the return or offer line asks instead
+                    asks = False
+                if closing and not asks:  # a caption that asks is already the one question
+                    body = f"{body}\n{closing}"
+                if buttons and (closing or asks) and len(body) <= LIST_BODY_LIMIT:
                     media["buttons"] = buttons
             part_key = key if index == 0 else f"{key}:{index}"
             ids.append(await _queue_reply(session, scope, conversation, body, part_key, media))

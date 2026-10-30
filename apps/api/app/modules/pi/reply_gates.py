@@ -186,6 +186,55 @@ def question_already_answered(reply: str, said: list[str], profile_text: str = "
     return None
 
 
+_NUMBER_WORDS = r"(?:one|two|three|four|five|six|seven|eight|nine|ten|ek|do|teen|char|paanch|panch)"
+_COUNT = rf"(?:\d+|{_NUMBER_WORDS})"
+_UNITS = r"(?:days?|weeks?|months?|years?|din|hafte|mahine|mahino|saal)"
+# A question about a count: "how many shops", "kitni dukaan" -> the noun it counts.
+ASK_COUNT = re.compile(r"(?:how\s+many|kitn[eiy]|kitna)\s+(?:of\s+)?([^\W\d_]{3,})", re.IGNORECASE)
+ASK_SINCE = re.compile(
+    r"since\s+when|how\s+long|kab\s+se|kitne\s+(?:din|hafte|mahine|saal|dino|mahino)\s+se",
+    re.IGNORECASE,
+)
+SAID_SINCE = re.compile(
+    rf"(?:since\s+(?!when\b)[a-z0-9]+|for\s+{_COUNT}\s+{_UNITS}|{_COUNT}\s+{_UNITS}\s+se|"
+    r"pichh?le\s+\w+\s+se)",
+    re.IGNORECASE,
+)
+ASK_OFTEN = re.compile(r"how\s+often|kitni\s+(?:baar|dafa|bar)", re.IGNORECASE)
+SAID_OFTEN = re.compile(
+    r"\b(?:every\s*(?:day|week|month|morning|evening|time)|daily|weekly|monthly|hamesha|always|"
+    r"har\s+(?:roz|din|hafta|mahine|baar)|roz)\b|"
+    rf"\b{_COUNT}\s+times?\s+(?:a|per)\s+\w+",
+    re.IGNORECASE,
+)
+
+
+def fact_already_given(reply: str, owner_texts: list[str]) -> str | None:
+    """alreadyAnswered (18.5) for a count, a duration or a frequency: when the reply asks it and the
+    owner already stated it, the reason (quoting their words) so the model can use it instead.
+    Narrow on purpose: an unstated fact, or a different thing asked, is never blocked."""
+    theirs = " ".join(owner_texts)
+    for q in _questions(reply):
+        for noun in ASK_COUNT.findall(q):
+            stem = noun.casefold()[:4]
+            hit = re.search(
+                rf"{_COUNT}\s+(?:\w+\s+)?[^\W\d_]*{re.escape(stem)}[^\W\d_]*", theirs, re.IGNORECASE
+            )
+            if hit:
+                return _said(hit.group(0))
+        if ASK_SINCE.search(q) and (hit := SAID_SINCE.search(theirs)):
+            return _said(hit.group(0))
+        if ASK_OFTEN.search(q) and (hit := SAID_OFTEN.search(theirs)):
+            return _said(hit.group(0))
+    return None
+
+
+def _said(words: str) -> str:
+    return (
+        f"it asks something the owner already said: '{words.strip()}'. Use it, ask what is unknown"
+    )
+
+
 # 18.3: the offer never says the owner may refuse.
 SAY_NO = re.compile(
     r"\s*(?:you\s+can\s+(?:always\s+)?say\s+no|no\s+pressure|you\s+can\s+decline)\s*[.!]?",

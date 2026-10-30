@@ -307,6 +307,12 @@ def with_resources(ctx: IdeaContext | None, owner_words: str) -> IdeaContext | N
     return replace(ctx or IdeaContext(), resources=owner_words.strip())
 
 
+def with_idea_link(ctx: IdeaContext | None) -> IdeaContext | None:
+    """The context with G12 on (spec v1.5, 18.4): an idea needs a problem the owner stated. Only a
+    workspace that sets `response_rules.brain.idea_link` to exactly true gets it."""
+    return replace(ctx or IdeaContext(), needs_problem=True)
+
+
 def failures(idea: str, owner_words: str, ctx: IdeaContext | None = None) -> list[str]:
     """Rule ids of the filter that the idea breaks (empty when it passes). G1 and G2 always; G3,
     G4, G7 and G8 only with an `IdeaContext` that holds data."""
