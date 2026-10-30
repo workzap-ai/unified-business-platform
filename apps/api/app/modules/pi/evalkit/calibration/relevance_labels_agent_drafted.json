@@ -1,0 +1,28 @@
+{
+ "label_source": "agent_drafted",
+ "human_confirmed": false,
+ "drafted": "2026-10-30",
+ "note": "Drafted by an agent from the case design. These are NOT human labels and must never be merged with them.",
+ "labels": {
+  "s01": "relevant",
+  "s02": "restates_owner",
+  "s03": "relevant",
+  "s04": "relevant",
+  "s05": "violates_constraint",
+  "s06": "generic",
+  "s07": "irrelevant",
+  "s08": "relevant",
+  "s09": "restates_owner",
+  "s10": "relevant",
+  "s11": "violates_constraint",
+  "s12": "violates_constraint",
+  "s13": "violates_constraint",
+  "s14": "irrelevant",
+  "s15": "generic",
+  "s16": "irrelevant",
+  "s17": "generic",
+  "s18": "generic",
+  "s19": "irrelevant",
+  "s20": "restates_owner"
+ }
+}

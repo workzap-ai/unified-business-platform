@@ -8,12 +8,31 @@ stores identifiers only, never text. It is safe to call for every reply, learnin
 (a frozen workspace simply shows no learned ids), and calling it twice for one reply is harmless.
 
 `send_whatsapp_message` calls `stamp_safely` once, after the reply message is saved (brain mode).
+
+`prompt_version` hashes the SOURCE FILES of every prompt-bearing module, not a list of constants (a
+list can never be complete: prompts are also inline literals, f-strings and selection logic). The
+set is every `.py` file under `app/modules/pi` (except `evalkit/`) that is not named on
+`NON_PROMPT_MODULES` with a reason, plus `EXTERNAL_PROMPT_MODULES`; a new module is hashed by
+default, and it can leave the hash only by being named there. The pack files, the handbook JSON and
+the optional operator guidance are hashed as before.
+
+Consequence, intended and tolerated: ANY edit to a hashed module's source, a comment included,
+changes `prompt_version`. The drift check then reports TWO findings: `prompt_version` (the version
+differs from the previous run's baseline; the versions loop in `drift_check.py`) on the first run
+after the change, and `stale_prompt` (`drift_check.stamp_findings`) on EVERY drift run until a reply
+is stamped with the new version, so a quiet workspace keeps it until its next reply. Nearly every
+release that touches a hashed module triggers both. Not covered: behaviour driven by data outside
+these files (database settings, learned lessons and examples; the operator guidance only through its
+own optional hash). A digest that is incomplete (an unreadable file, an empty or frozen
+folder, a packs folder without an industry pack) makes the version start with "!" instead
+of being a silent constant. See docs/pi-saas/pi-prompt-version.md.
 """
 
 import hashlib
+import importlib.util
 import logging
 import os
-from collections.abc import Sequence
+from collections.abc import Callable, Sequence
 from pathlib import Path
 from typing import Any
 
@@ -29,24 +48,225 @@ logger = logging.getLogger(__name__)
 
 
 def _digest(path: Path) -> str:
+    """A short hash of the file's raw bytes. This is the per-pack digest kept in audit rows and
+    compared by the drift check (`drift_check._digest`, the industry rows), so it is left as it was
+    on purpose; the combined `prompt_version` below normalises line endings instead."""
     try:
         return hashlib.sha256(path.read_bytes()).hexdigest()[:12]
     except OSError:
         return ""
 
 
-def prompt_version() -> str:
-    """Which prompt text was in force: a short hash of the specification handbook the model is
-    given every turn plus what the platform specification replaced in it (it changes only when
-    either file is rebuilt)."""
-    parts = [spec_handbook.PATH, spec_handbook.SUPERSESSION]
+# Where the prompt-bearing source lives: every .py file under this folder is hashed unless it is
+# named on NON_PROMPT_MODULES below (a new module is therefore hashed by default).
+PI_ROOT = Path(__file__).resolve().parent
+# The evaluation kit and bytecode are not shipped prompts.
+EXCLUDED_DIRS = ("evalkit", "__pycache__")
+
+# Source outside this folder that reaches the model (runtime.py imports IMAGE_INSTRUCTION from
+# there).
+EXTERNAL_PROMPT_MODULES: tuple[str, ...] = (
+    "app.ai.media",
+    "app.modules.pi_saas.proposal_writer",
+)
+
+# A source set smaller than this, or without these modules, is a wrong folder or a frozen build, not
+# a real set: the version is then marked incomplete and not cached.
+MIN_HASHED_MODULES = 100
+# A packs folder without an industry pack is a wrong or frozen folder, not a real one.
+MIN_PACK_FILES = 1
+REQUIRED_MODULES: tuple[str, ...] = ("service_conversation.py", "runtime.py")
+
+_R_MODELS = "SQLAlchemy table definitions: the shape of stored data, no text sent to a model"
+_R_ROUTES = "HTTP handlers and request bodies: no model message is built here"
+
+# Modules that leave the hash, each named with a reason. `test_pi_prompt_version_coverage` fails
+# on a stale entry and when an entry builds a model message or calls the model.
+NON_PROMPT_MODULES: dict[str, str] = {
+    **dict.fromkeys(
+        (
+            "box_models.py brain_docs_models.py business_models.py business_profile_models.py "
+            "experience_models.py learning_models.py models.py open_item_models.py "
+            "problem_models.py quarantine_models.py solution_models.py think_models.py"
+        ).split(),
+        _R_MODELS,
+    ),
+    **dict.fromkeys(
+        (
+            "brain_health_routes.py "
+            "brain_learning_routes.py brain_moderation_routes.py "
+            "business_profile_routes.py inbox_routes.py kapso_routes.py "
+            "open_items_routes.py solution_routes.py "
+            "staff_review_routes.py"
+        ).split(),
+        _R_ROUTES,
+    ),
+    "schemas.py": "API request and response schemas: not sent to a model",
+    "__init__.py": "package marker",
+    "tools/__init__.py": "package marker",
+    "drift_check.py": "the drift report: it reads the version and the prompt files, sends nothing",
+    "latency.py": "per-turn timing log: no prompt text",
+}
+
+# Every pack file the prompt can draw on (industry, library, solutions, overlays, currency and the
+# sector rules): the whole tree under `packs/`.
+PACKS_ROOT = industry_packs.PACKS_DIR.parent
+
+# A digest is kept for the life of the process only when every file it needs could be read; a
+# failure is never cached, so the next call retries. A file that cannot be read is logged once.
+_CACHE: dict[tuple[str, str], str] = {}
+_WARNED: set[str] = set()
+
+
+def _normal(data: bytes) -> bytes:
+    """The same bytes whatever the checkout's line endings (a Windows checkout with CRLF and a
+    Linux deploy with LF must give one version)."""
+    return data.replace(b"\r\n", b"\n")
+
+
+def _read(path: Path, label: str) -> bytes | None:
+    """The file's bytes, or None after one warning per label (never the path, never the content)."""
+    try:
+        return path.read_bytes()
+    except OSError as exc:
+        if label not in _WARNED:
+            _WARNED.add(label)
+            logger.warning("pi_prompt_version_unreadable %s %s", label, type(exc).__name__)
+        return None
+
+
+def _hash_files(items: Sequence[tuple[str, Path]]) -> tuple[str, bool]:
+    """Label and normalised bytes of each file in sorted label order: no absolute path, time or
+    machine name enters it. The flag is False when any file was unreadable (marked, not cached)."""
     digest = hashlib.sha256()
-    for path in parts:
+    complete = True
+    for label, path in sorted(items, key=lambda item: item[0]):
+        data = _read(path, label)
+        if data is None:
+            complete = False
+            data = b"-"
+        digest.update(label.encode("utf-8") + b"\x00")
+        digest.update(_normal(data))
+        digest.update(b"\x00")
+    return digest.hexdigest(), complete
+
+
+def _cached(kind: str, root: str, build: Callable[[], tuple[str, bool]]) -> tuple[str, bool]:
+    key = (kind, root)
+    if key in _CACHE:
+        return _CACHE[key], True
+    value, complete = build()
+    if complete:
+        _CACHE[key] = value
+    return value, complete
+
+
+def all_module_files(root: Path | None = None) -> dict[str, Path]:
+    """Every .py file under the pi folder (evalkit and bytecode folders excluded), by its path
+    relative to the folder, e.g. `service_conversation.py`, `tools/handlers.py`."""
+    base = PI_ROOT if root is None else root
+    found: dict[str, Path] = {}
+    for path in base.rglob("*.py"):
+        label = path.relative_to(base).as_posix()
+        if label.split("/")[0] in EXCLUDED_DIRS or "__pycache__" in label:
+            continue
+        found[label] = path
+    return found
+
+
+def prompt_source_files(root: Path | None = None) -> dict[str, Path]:
+    """The source files that make up the version: every module except those named on
+    NON_PROMPT_MODULES, and the external prompt modules (found without importing them)."""
+    files = {k: v for k, v in all_module_files(root).items() if k not in NON_PROMPT_MODULES}
+    for name in EXTERNAL_PROMPT_MODULES:
+        label = f"ext/{name}"
         try:
-            digest.update(path.read_bytes())
-        except OSError:
-            digest.update(b"-")
-    return digest.hexdigest()[:12]
+            spec = importlib.util.find_spec(name)
+        except (ImportError, ValueError):
+            spec = None
+        files[label] = Path(spec.origin) if spec is not None and spec.origin else Path(name)
+    return files
+
+
+def _sources_build(root: str) -> tuple[str, bool]:
+    files = prompt_source_files(Path(root))
+    digest, complete = _hash_files(list(files.items()))
+    own = {k for k in files if not k.startswith("ext/")}
+    if len(own) < MIN_HASHED_MODULES or not set(REQUIRED_MODULES) <= own:
+        if "sources" not in _WARNED:
+            _WARNED.add("sources")
+            logger.warning("pi_prompt_version_sources_incomplete %d", len(own))
+        complete = False
+    return digest, complete
+
+
+def _sources_digest(root: str) -> tuple[str, bool]:
+    return _cached("sources", root, lambda: _sources_build(root))
+
+
+def _packs_digest(root: str) -> tuple[str, bool]:
+    def build() -> tuple[str, bool]:
+        base = Path(root)
+        items = [(p.relative_to(base).as_posix(), p) for p in base.rglob("*.json")]
+        digest, complete = _hash_files(items)
+        industry = [label for label, _ in items if label.startswith("industry/")]
+        if len(industry) < MIN_PACK_FILES:
+            if "packs" not in _WARNED:
+                _WARNED.add("packs")
+                logger.warning("pi_prompt_version_packs_incomplete %d", len(industry))
+            complete = False
+        return digest, complete
+
+    return _cached("packs", root, build)
+
+
+def _spec_digest() -> tuple[str, bool]:
+    """The two handbook files, read once per process, not on every reply (cleared with the rest)."""
+    paths = (spec_handbook.PATH, spec_handbook.SUPERSESSION)
+
+    def build() -> tuple[str, bool]:
+        return _hash_files([(f"spec/{p.name}", p) for p in paths])
+
+    return _cached("spec", "|".join(str(p) for p in paths), build)
+
+
+def clear_prompt_cache() -> None:
+    """Forget the hashes held for this process (a deploy starts a new process; tests call this)."""
+    _CACHE.clear()
+    _WARNED.clear()
+
+
+def operator_guidance_digest(text: str | None) -> str:
+    """A short hash of what the business wrote for pi in the Agents page, "" when it wrote none.
+    Only the hash is ever kept, never the words (they can name people and numbers)."""
+    cleaned = (text or "").strip()
+    if not cleaned:
+        return ""
+    return hashlib.sha256(_normal(cleaned.encode("utf-8"))).hexdigest()[:12]
+
+
+def prompt_version(operator_guidance: str | None = None) -> str:
+    """Which prompt text was in force: a short hash of the specification handbook the model is
+    given every turn, what the platform specification replaced in it, the source of every
+    prompt-bearing module, every pack file and, when given, the business's own operator guidance.
+    It changes only when one of those changes (an edit to a hashed module's source, a comment
+    included, counts). Without guidance (the workspace-independent version, what the reply stamp and
+    the drift check compare) it stays the same for every workspace. When any part could not be read
+    or the source set is too small to be real, the version starts with "!" so it is visibly not a
+    normal hash, and it is not cached."""
+    digest = hashlib.sha256()
+    complete = True
+    for kind, (value, ok) in (
+        ("spec", _spec_digest()),
+        ("sources", _sources_digest(str(PI_ROOT))),
+        ("packs", _packs_digest(str(PACKS_ROOT))),
+    ):
+        complete = complete and ok
+        digest.update(f"|{kind}|{value}".encode())
+    if guidance := operator_guidance_digest(operator_guidance):
+        digest.update(b"|guidance|" + guidance.encode())
+    hexed = digest.hexdigest()
+    return hexed[:12] if complete else "!" + hexed[:11]
 
 
 def build_id() -> str:
@@ -58,15 +278,28 @@ def build_id() -> str:
     return "unknown"
 
 
-def pack_versions(conversation: PiConversation, used: dict[str, Any]) -> dict[str, str]:
+def pack_versions(
+    conversation: PiConversation,
+    used: dict[str, Any],
+    operator_guidance: str | None = None,
+    *,
+    guidance_unread: bool = False,
+) -> dict[str, str]:
     """The packs behind this reply, by key, with a short hash of each file. The industry pack is the
-    customer's industry when one was stamped; a learned pack is named by its id."""
+    customer's industry when one was stamped; a learned pack is named by its id. The business's
+    operator guidance is recorded as a hash under `operator_guidance` (never its words), and only
+    when it wrote some, so a stored row without it keeps its old shape. `guidance_unread` marks a
+    reply whose guidance could not be read, so a missing hash is not mistaken for "none written"."""
     out: dict[str, str] = {}
     if key := str(used.get("industry") or ""):
         path = industry_packs.PACKS_DIR / f"{key}.json"
         out[key] = _digest(path) or "unversioned"
     if learned := used.get("learned_pack"):
         out[f"learned:{learned}"] = "live"
+    if guidance := operator_guidance_digest(operator_guidance):
+        out["operator_guidance"] = guidance
+    if guidance_unread:
+        out["guidance_unread"] = "1"
     return out
 
 
@@ -80,6 +313,30 @@ def stamp_of(conversation: PiConversation, run: PiAgentRun | None) -> dict[str, 
     )
 
 
+async def operator_guidance_of(session: AsyncSession, scope: WorkspaceScope) -> str | None:
+    """What this workspace wrote for pi in the Agents page (the current version of its requirement
+    agent), "" when there is none and None when it could not be read. The same lookup the reply
+    prompt uses."""
+    from app.modules.pi.models import PiAgent, PiAgentVersion
+    from app.shared.workspace_repository import WorkspaceRepository
+
+    try:
+        async with session.begin_nested():  # a failed read must not poison the reply's transaction
+            version = await WorkspaceRepository(session, PiAgentVersion, scope).find(
+                PiAgentVersion.agent_id.in_(
+                    select(PiAgent.id).where(
+                        WorkspaceRepository(session, PiAgent, scope).predicate(),
+                        PiAgent.key == "requirement",
+                        PiAgent.current_version == PiAgentVersion.version,
+                    )
+                )
+            )
+    except Exception as exc:  # noqa: BLE001 - the audit is an extra, never a reason to lose it
+        logger.warning("pi_reply_audit_guidance_unread %s", type(exc).__name__)
+        return None
+    return str(getattr(version, "instructions", "") or "")
+
+
 async def stamp(
     session: AsyncSession,
     scope: WorkspaceScope,
@@ -90,6 +347,7 @@ async def stamp(
     response_rules: dict[str, Any] | None = None,
     run: PiAgentRun | None = None,
     prompt: str | None = None,
+    operator_guidance: str | None = None,
 ) -> PiReplyAudit:
     """Record why pi said this reply. `violations` are the linter's findings on the first draft
     (rule and message only are kept); an empty list means the draft passed."""
@@ -108,6 +366,11 @@ async def stamp(
         )
     used = stamp_of(conversation, run)
     found = list(violations or [])
+    guidance_unread = False
+    if operator_guidance is None:
+        read = await operator_guidance_of(session, scope)
+        guidance_unread = read is None
+        operator_guidance = read or ""
     row = PiReplyAudit(
         tenant_id=scope.tenant_id,
         environment_id=scope.environment_id,
@@ -115,7 +378,10 @@ async def stamp(
         conversation_id=conversation.id,
         run_id=run.id if run is not None else None,
         prompt_version=prompt or prompt_version(),
-        pack_versions={**pack_versions(conversation, used), "build": build_id()},
+        pack_versions={
+            **pack_versions(conversation, used, operator_guidance, guidance_unread=guidance_unread),
+            "build": build_id(),
+        },
         lesson_ids=[str(x) for x in used.get("lessons") or []],
         example_ids=[str(x) for x in used.get("examples") or []],
         arm_ids=[str(x) for x in (used.get("arm"), used.get("voice_arm")) if x],

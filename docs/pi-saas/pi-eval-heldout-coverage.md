@@ -73,7 +73,7 @@ Full per-group tables: `pi-eval-baseline.md`.
 - Owner approval of S1-S7 and T1-T11 in `pi-eval-thresholds-proposal.md` (all still PENDING).
 - A working OpenAI key and a budget for a real-model sample (30 cases first). Nothing has been spent.
 - More Held-out cases per language (Urdu script, Arabic) and a Hindi set if Hindi is in scope.
-- Who may read Held-out results, and how `evalkit.splits.held_out_access` is logged.
+- Who may read Held-out results, and how Held-out reads are logged (`evalkit.access_log.append`, the append-only writer; `splits.held_out_access` only builds a record).
 
 ## 6. Development set: coverage after FT-A1 (2026-10-30)
 

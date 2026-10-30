@@ -1,16 +1,20 @@
 """S4 (B6 root cause 1): what an owner's earlier chat hands to a new one.
 
-A new conversation starts with an empty brief, so a questions pi was answered in the last chat was
-asked again. This copies, once, into the new conversation only:
+A new conversation starts with an empty brief, so a question the owner had answered in the last
+chat was asked again. This copies, once, into the new conversation only:
 
 * `closed_slots`: pi's own questions the owner answered (the question text, never the answer);
 * `asked_facts`: the facts pi asked for and got no answer to, for a short while only.
 
-Never copied: anything the owner wrote, the summary, requirements, the profile, the open question,
-the generic "anything else?" slot, a question that holds personal data, anything older than the
-window, anything from an erased chat, anything from another workspace or another customer. A
-copy is marked `carried`. `brain_erase.erase_customer` finds every conversation of the customer, so
-it erases the copies with the rest.
+The owner's open items (a question or request still open, redacted, up to 30 days old) are moved
+into the new chat by `open_items.carry_into`, called from here; see that function for the rules.
+
+Never copied: anything else the owner wrote, the summary, requirements, the profile, the open
+question, the generic "anything else?" slot, a question that holds personal data, anything older
+than the window, anything from an erased chat, anything from another workspace or another
+customer. A copy carries no mark (the brief's `closed_slots` reaches the model, so a flag would
+too). `brain_erase.erase_customer` finds every conversation of the customer, so it erases the
+copies with the rest.
 """
 
 import logging
@@ -31,7 +35,10 @@ CARRY_SLOTS_DAYS = 30  # an answered question is not asked again for this long
 CARRY_ASKED_DAYS = 2  # a fact asked and left unanswered is asked again after this
 MAX_SLOTS = slots.KEEP
 LOOK_BACK = 3  # how many earlier chats are read, newest first
-MARK = "slot_carry_done"  # set once the copy was made (or found empty): it is made once
+MARK = "slot_carry_done"  # True once the copy was made (or found empty): it is made once
+# Until then it holds the number of turns tried so far (an integer), so a customer whose items sit
+# in a chat that never goes quiet costs at most this many extra rounds of queries.
+MAX_TRIES = 5
 PHONE = re.compile(r"(?<!\w)\+?\d[\d\s().-]{6,}\d")
 EMAIL = re.compile(r"[\w.+-]+@[\w-]+\.[\w.-]+")
 ASKED_KEYS = frozenset(key for key, _, _ in memory_block.FACTS)
@@ -82,7 +89,7 @@ def carried(
                     for c in closed
                 ):
                     continue  # the newest chat's entry stands
-                closed.append({"slot": slot[:60], "q": question[:160], "carried": True})
+                closed.append({"slot": slot[:60], "q": question[:160]})
         if age <= timedelta(days=CARRY_ASKED_DAYS):
             for key in brief.get("asked_facts") or []:
                 if isinstance(key, str) and key in ASKED_KEYS and key not in asked:
@@ -104,8 +111,10 @@ async def carry_into(
     """Copy, once, what the owner's earlier chats hand over into this conversation's brief. Only
     chats of the same customer in the same workspace are read. True when something was copied."""
     brief = dict(conversation.service_brief or {})
-    if brief.get(MARK) or conversation.customer_id is None:
+    state = brief.get(MARK)
+    if state is True or conversation.customer_id is None:
         return False
+    tries = state if isinstance(state, int) and not isinstance(state, bool) else 0
     rows = (
         await session.execute(
             select(PiConversation.service_brief, PiConversation.last_message_at)
@@ -120,8 +129,66 @@ async def carry_into(
         )
     ).all()
     found = carried([(earlier or {}, at) for earlier, at in rows], now or datetime.now(UTC))
-    brief[MARK] = True
     for key, value in found.items():
         brief.setdefault(key, value)  # what this chat already holds is never replaced
     conversation.service_brief = brief
+    # The mark is set to True only once the open items came along too, so a failure (or an eligible
+    # item left behind) is tried again on the next turn (the slot copy above is safe to repeat: it
+    # never replaces anything). The tries are counted in the mark itself, an integer until it is
+    # True, so no new brief key reaches the model; after MAX_TRIES turns the carry is given up.
+    done = await _carry_open_items(session, scope, conversation, now) or tries + 1 >= MAX_TRIES
+    mark: bool | int = True if done else tries + 1
+    conversation.service_brief = {**(conversation.service_brief or {}), MARK: mark}
     return bool(found)
+
+
+async def carry_safely(
+    session: AsyncSession, scope: WorkspaceScope, conversation: PiConversation
+) -> None:
+    """`carry_into` inside a savepoint, for the start of a turn: a failure never costs the owner
+    their reply. It is logged with ids and the error type only (no message text, no traceback, which
+    can hold SQL parameters); ids are read before the savepoint, because after a rollback an expired
+    attribute would reload (and, with an async session, raise) in the handler."""
+    tenant_id, conversation_id = scope.tenant_id, conversation.id
+    try:
+        async with session.begin_nested():
+            await carry_into(session, scope, conversation)
+    except Exception as error:  # noqa: BLE001
+        logger.warning(
+            "slot carry failed: tenant=%s conversation=%s error=%s",
+            tenant_id,
+            conversation_id,
+            type(error).__name__,
+        )
+
+
+async def _carry_open_items(
+    session: AsyncSession,
+    scope: WorkspaceScope,
+    conversation: PiConversation,
+    now: datetime | None,
+) -> bool:
+    """Q6-1: the open items of the owner's earlier chats come along (`open_items.carry_into`).
+    True when it ran to the end AND nothing eligible was left behind (a chat that is not quiet
+    yet, or a full cap), so the mark is not set and the next turn tries again. A failure never
+    costs the owner their reply or the slot copy; it is logged with ids and the error type only
+    (never message text, no traceback) and tried again next turn."""
+    from app.modules.pi import open_items
+
+    # Read before the savepoint: after a rollback an expired attribute would reload (and, with an
+    # async session, raise) inside the handler below.
+    tenant_id, conversation_id = scope.tenant_id, conversation.id
+    customer_id = conversation.customer_id
+    try:
+        async with session.begin_nested():
+            moved = await open_items.carry_into(session, scope, conversation, now=now)
+    except Exception as error:  # noqa: BLE001
+        logger.warning(
+            "open items carry failed: tenant=%s conversation=%s customer=%s error=%s",
+            tenant_id,
+            conversation_id,
+            customer_id,
+            type(error).__name__,
+        )
+        return False
+    return bool(getattr(moved, "complete", True))
