@@ -6,7 +6,7 @@ problems, and nothing prints or asserts an acceptance verdict.
 
 import pytest
 
-from app.modules.pi.evalkit import relevance, relevance_match
+from app.modules.pi.evalkit import relevance, relevance_match, relevance_report
 
 BANNED_WORDING = (
     "meets",
@@ -412,7 +412,7 @@ def test_a_ceiling_followed_by_a_comma_still_counts_and_a_figure_list_stays_a_li
     assert [(a.lo, a.unit) for a in listed] == [(180.0, "money")]
     assert relevance_match.fold_magnitudes("120,150,180 and 20,000") == "120 150 180 and 20,000"
     assert relevance.stems("120,150,180") == {"120", "150", "180"}
-    assert relevance_match.amounts("50,000, then 60,000. ", bare=True)[0].lo == 50000.0
+    assert relevance_match.amounts("50,000, then 60,000. ", context=True)[0].lo == 50000.0
 
 
 @pytest.mark.parametrize("kind", ["staff", "cannot_change", "deadline"])
@@ -503,3 +503,195 @@ def test_the_module_docstrings_have_no_verdict_wording_and_state_the_fact_rule()
         folded = " ".join((doc or "").casefold().split())
         for word in BANNED_WORDING:
             assert word not in folded, f"{word!r} implies a computed acceptance"
+
+
+# ------------------------------------------------ third round: money tails, homographs, stems
+
+MONEY_LIMITS = [
+    "cannot spend more than 20000 this month",
+    "cannot spend more than 20000 because cash is tight",
+    "budget under 20000 monthly",
+    "we cannot spend more than 20000, so keep it small",
+    "cannot spend more than 20000 rupees this month",
+]
+
+
+@pytest.mark.parametrize("text", MONEY_LIMITS)
+def test_a_money_ceiling_stays_money_when_words_follow_the_figure(text) -> None:
+    found = relevance_match.ceilings_of(text, "cannot_change")
+    assert found and found[0].unit == "money" and found[0].value == 20000.0, text
+    c = [limit(text, kind="cannot_change")]
+    assert verdict(c, "Buy a system for 50000 rupees") == "violates_constraint"
+    assert verdict(c, "Buy a system for 15000 rupees") != "violates_constraint"
+
+
+@pytest.mark.parametrize(
+    "idea",
+    [
+        "Buy a 50k tablet",
+        "Buy a system for 50000 then train the clerk",
+        "Buy a system for 50000 this month",
+        "Buy a system for 50000 because it is faster",
+        "Buy a tablet that costs 50000 monthly",
+        "Pay 50000 and train the clerk",
+    ],
+)
+def test_an_idea_money_figure_stays_money_when_words_follow_it(idea) -> None:
+    c = [limit("cannot spend more than 20000 rupees")]
+    assert verdict(c, idea) == "violates_constraint", idea
+    assert verdict(c, idea.replace("50000", "15000").replace("50k", "15k")) != (
+        "violates_constraint"
+    )
+
+
+def test_roman_urdu_money_with_a_tail_word_and_counted_nouns_stay_nouns() -> None:
+    ru = [limit("20 hazar se zyada kharch nahi kar sakte", kind="cannot_change")]
+    over = relevance.score_candidate(brief(ru), "Naya system 50 hazar mein lagao", "roman_ur")
+    under = relevance.score_candidate(brief(ru), "Naya system 15 hazar mein lagao", "roman_ur")
+    assert over["verdict"] == "violates_constraint"
+    assert under["verdict"] != "violates_constraint"
+    c = [limit("cannot spend more than 20000 rupees")]
+    assert verdict(c, "Hire 50 staff for the weekend") != "violates_constraint"
+    assert verdict(c, "Order 3 lakh birds") != "violates_constraint"
+    assert verdict(c, "Buy 50 chairs for the hall") != "violates_constraint"
+    assert [a.unit for a in relevance_match.amounts("for 50 chairs")] == ["chair"]
+
+
+def test_a_floor_clause_is_left_out_but_the_rest_of_the_limit_still_counts() -> None:
+    text = "we need at least 2 staff and cannot spend more than 20000 rupees"
+    found = relevance_match.ceilings_of(text, "budget")
+    assert found == [relevance_match.Ceiling(20000.0, "money", False)]
+    c = [limit(text)]
+    assert verdict(c, "Buy a system for 50000 rupees") == "violates_constraint"
+    assert relevance_match.ceilings_of("we need at least 2 staff", "staff") == []
+    first = "cannot spend more than 20000 rupees, but we need at least 5 staff"
+    assert [x.unit for x in relevance_match.ceilings_of(first, "budget")] == ["money"]
+
+
+@pytest.mark.parametrize(
+    "text,bad,good",
+    [
+        ("we cannot close", "Close the shop on Fridays", "Book a live band for the hall"),
+        ("we cannot close the shop", "Close the shop early", "Book a live band for the shop"),
+        ("we cannot fire anyone", "Fire the cleaner", "Install a fire alarm"),
+        ("we cannot fire anyone", "Ask them to fire a helper", "Check the fire exit each week"),
+        ("we cannot cut anything", "Cut the evening shift", "Add a cute mascot"),
+        ("we cannot cut anything", "Cutting hours helps", "Place the order at the door"),
+        ("we cannot change anything", "Change the route", "Add a stop on each route"),
+    ],
+)
+def test_a_verb_rule_is_not_fired_by_a_noun_that_looks_like_the_verb(text, bad, good) -> None:
+    c = [limit(text, kind="cannot_change")]
+    assert verdict(c, bad) == "violates_constraint", bad
+    assert verdict(c, good) != "violates_constraint", good
+
+
+@pytest.mark.parametrize(
+    "a,b",
+    [
+        ("button", "buttons"),
+        ("station", "stations"),
+        ("machine", "machines"),
+        ("coupon", "coupons"),
+        ("mazdooron", "mazdoor"),
+    ],
+)
+def test_roman_urdu_plural_goes_before_the_endings_in_the_full_space(a, b) -> None:
+    assert relevance.stems(a, "roman_ur", full=True) == relevance.stems(b, "roman_ur", full=True)
+
+
+@pytest.mark.parametrize("a,b", [("version", "verse"), ("lesson", "less"), ("coupon", "coup")])
+def test_roman_urdu_full_stems_keep_these_apart_too(a, b) -> None:
+    assert relevance.stems(a, "roman_ur", full=True) != relevance.stems(b, "roman_ur", full=True)
+
+
+@pytest.mark.parametrize(
+    "forms",
+    [
+        ("reply", "replied", "replies"),
+        ("supply", "supplied", "supplies"),
+        ("cancel", "cancelled", "cancelling", "cancels"),
+        ("hire", "hiring", "hired", "hires"),
+        ("create", "creating", "created"),
+        ("close", "closing", "closed"),
+        ("raise", "raising", "raised"),
+        ("rate", "rates"),
+        ("plan", "planning", "planned"),
+    ],
+)
+def test_full_stems_join_these_inflections(forms) -> None:
+    assert len({relevance.stems(f, full=True).pop() for f in forms}) == 1, forms
+
+
+@pytest.mark.parametrize(
+    "a,b", [("care", "car"), ("plane", "plan"), ("wine", "win"), ("rate", "rat"), ("cute", "cut")]
+)
+def test_full_stems_keep_these_apart(a, b) -> None:
+    assert relevance.stems(a, full=True) != relevance.stems(b, full=True)
+
+
+def test_verbs_on_the_stop_list_still_work_as_rule_verbs() -> None:
+    c = [limit("we cannot give discounts", kind="cannot_change")]
+    assert verdict(c, "Give discounts to regular clients") == "violates_constraint"
+    assert verdict(c, "Offer a discount to regular clients") == "violates_constraint"
+    assert verdict(c, "Send a reminder to regular clients") != "violates_constraint"
+    c = [limit("we cannot use cash", kind="cannot_change")]
+    assert verdict(c, "Use cash at the door") == "violates_constraint"
+    assert verdict(c, "Use a card at the door") != "violates_constraint"
+
+
+def test_curly_apostrophes_afford_and_the_passive_make_rules() -> None:
+    c = [limit("we can’t hire anyone", kind="staff")]
+    assert verdict(c, "Hire a helper") == "violates_constraint"
+    c = [limit("we don’t want to change the delivery route", kind="cannot_change")]
+    assert verdict(c, "Change the delivery route") == "violates_constraint"
+    c = [limit("we cannot afford a new feed mill", kind="cannot_change")]
+    assert verdict(c, "Buy a feed mill on a loan") == "violates_constraint"
+    assert verdict(c, "Rent a feed mill for the peak months") != "violates_constraint"
+    c = [limit("the delivery route cannot be changed", kind="cannot_change")]
+    assert verdict(c, "Change the delivery route") == "violates_constraint"
+    assert verdict(c, "Add a signed hand-over at each stop") != "violates_constraint"
+    c = [limit("we like it but the delivery route cannot be changed", kind="cannot_change")]
+    assert verdict(c, "Alter the delivery route") == "violates_constraint"
+
+
+def test_a_prohibition_without_a_modal_is_documented_as_not_handled() -> None:
+    assert relevance_match.parse_rules("no hiring this year", None, relevance._full_stems) == []
+    assert relevance_match.parse_rules("never hire anyone", None, relevance._full_stems) == []
+    assert "Not handled" in " ".join((relevance_match.parse_rules.__doc__ or "").split())
+
+
+def test_250_500_000_is_one_grouped_figure_and_a_list_ending_in_digits_stays_a_list() -> None:
+    assert relevance.tokens("250,500,000") == ["250500000"]
+    assert relevance.tokens("120,150,180") == ["120", "150", "180"]
+    assert relevance_match.amounts("Rs 250,500,000")[0].lo == 250500000.0
+    assert relevance_match.fold_magnitudes("250,500,000 and 120,150,180") == (
+        "250,500,000 and 120 150 180"
+    )
+
+
+def test_long_input_covers_the_roman_urdu_and_tried_paths_quickly() -> None:
+    import time
+
+    started = time.perf_counter()
+    long_ru = ("ek booking nahi " * 6000) + "x" * 40000
+    long_tried = ("tried " * 40000) + "failed"
+    long_mix = ("kharid nahi kar " * 5000) + ("did not work " * 5000)
+    for text in (long_ru, long_tried, long_mix):
+        c = [limit(text, kind="cannot_change")]
+        relevance.score_candidate(brief(c), text, language="roman_ur")
+        relevance.score_candidate(brief(c), "Buy a system for 50000 rupees")
+    assert time.perf_counter() - started < 10
+
+
+def test_the_standing_note_and_the_borderline_section_carry_no_verdict_wording() -> None:
+    import tempfile
+    from pathlib import Path
+
+    with tempfile.TemporaryDirectory() as tmp:
+        section = relevance_report.borderline_section(Path(tmp) / "a.jsonl", "lane E", "scan")
+    for text in (relevance.DISCLAIMER, section):
+        folded = " ".join(text.casefold().split())
+        for word in BANNED_WORDING:
+            assert word not in folded, f"{word!r} implies a computed acceptance"
+    assert "Current scorer:" in section

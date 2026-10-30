@@ -96,7 +96,8 @@ _GENERIC = {
 # Numbers are standalone figures only: digits inside a word ('B2B', 'Q3', '24x7', 'order_1234')
 # stay in it. Separators are read like this: Indian lakh grouping ('1,00,000', '20,00,000') and
 # Western grouping ('20,000', '1,200,000') are one number each ('100000', '2000000', '20000',
-# '1200000'); a list of 3-digit numbers ('120,150,180') stays three tokens; a single comma before
+# '1200000'); a list of 3-digit numbers ('120,150,180') stays three tokens,
+# but one ending in 000 ('250,500,000') is one grouped figure; a single comma before
 # one or two digits is a decimal comma ('1,5' becomes '1.5'); '1.5' stays; 'Rs.20000' gives 'rs'
 # and '20000'. A token made only of zeros is never kept, so two lakh figures cannot link through
 # '00000'.
@@ -121,7 +122,7 @@ def _number_tokens(raw: str) -> list[str]:
     groups = whole.split(",")
     if len(groups) == 2 and len(groups[1]) < 3:
         return [f"{groups[0]}.{groups[1]}"]  # a decimal comma
-    is_list = len(groups[0]) == 3 and len(groups) >= 3 and any(g != "000" for g in groups[1:])
+    is_list = len(groups[0]) == 3 and len(groups) >= 3 and groups[-1] != "000"
     if is_list:
         return [g for g in groups if g.strip("0")]  # '120,150,180' stays three numbers
     return ["".join(groups) + dot + fraction]
@@ -168,7 +169,12 @@ def stems(text: str, language: str | None = None, full: bool = False) -> set[str
 
 
 def _full_stems(text: str, language: str | None) -> set[str]:
-    return stems(text, language, True)
+    """Full stems for matching a rule; verbs the stop list drops ('give', 'use', 'make') stay."""
+    return {
+        _stem(t, language, True)
+        for t in tokens(match.fold_magnitudes(text))
+        if _keep(t) or t in match.RULE_VERBS
+    }
 
 
 def _soft(token: str) -> str:
@@ -222,6 +228,7 @@ def violated(
     All word matching here is in the full stem space of the idea's raw `text` (never the
     five-letter prefix); `idea`, the soft stems, is used only when no text is given."""
     full = _full_stems(text, language) if text else idea
+    verbs = _full_stems(match.drop_noun_homographs(text), language) if text else idea
     said = _said_amounts(brief, owner_text)
     for problem in brief.get("problems") or []:
         for limit in problem.get("constraints") or []:
@@ -229,7 +236,7 @@ def violated(
                 continue
             reason = str(limit.get("text", ""))
             rules = match.parse_rules(reason, language, _full_stems)
-            if any(match.rule_hit(r, full) for r in rules):
+            if any(match.rule_hit(r, full, verbs) for r in rules):
                 return reason
             for phrase in limit.get("blocks") or []:
                 need = _full_stems(phrase, language)
