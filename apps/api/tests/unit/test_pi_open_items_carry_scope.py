@@ -486,12 +486,12 @@ async def settle(session: FakeSession, s: WorkspaceScope, chat_: Any) -> None:
     )
 
 
-async def carried_question(*requests: Any):
+async def carried_question(*requests: Any, text: str = QUESTION):
     """A question opened 5 hours ago in an earlier chat, then carried into a new chat."""
     s = scope()
     customer = uuid4()
     earlier, new = chat(s, customer), chat(s, customer)
-    row = item(earlier, created=NOW - timedelta(hours=5))
+    row = item(earlier, text=text, created=NOW - timedelta(hours=5))
     session = world([row], earlier, new)
     session.tables["pi_staff_requests"] = [r(earlier, s, customer) for r in requests]
     await open_items.carry_into(session, s, new, now=NOW)
@@ -510,8 +510,8 @@ async def test_the_teams_answer_closes_a_question_that_was_carried_into_a_new_ch
     assert row.status == "answered" and row.closed_reason == "reply_answered"
 
 
-async def test_a_request_about_the_same_words_closes_it_even_when_raised_at_another_time():
-    session, s, new, row = await carried_question(desk(created=NOW - timedelta(hours=20)))
+async def test_a_request_about_the_same_words_raised_after_the_item_closes_it():
+    session, s, new, row = await carried_question(desk(created=NOW - timedelta(hours=2)))
     await settle(session, s, new)
     assert row.status == "answered"
 
@@ -523,10 +523,17 @@ async def test_a_request_about_the_same_words_closes_it_even_when_raised_at_anot
         {"status": "dismissed"},  # the team declined it: not an answer
         {"resolved": NOW - timedelta(hours=9)},  # resolved before the item existed
         {"kind": "document_review"},
-        # raised long before the item and about something else: not this question
+        # about the same words, but raised long BEFORE the item: it cannot be this question's
+        {"created": NOW - timedelta(days=3)},
+        # raised long before the item and about something else
         {"created": NOW - timedelta(days=3), "question": "invoice for the March order"},
         # raised long after the item and about something else
         {"created": NOW - timedelta(hours=1), "question": "invoice for the March order"},
+        # inside the 10-minute window, about something else: time alone never ties it
+        {"created": NOW - timedelta(hours=5), "question": "invoice for the March order"},
+        # inside the window and a real answer, but in other words: the question stays open
+        # (the chosen, safe behaviour: it is asked again rather than closed on a guess)
+        {"created": NOW - timedelta(hours=5), "question": "dispatch schedule and courier"},
     ],
 )
 async def test_a_staff_request_that_is_not_the_answer_to_this_question_does_not_close_it(
@@ -535,6 +542,23 @@ async def test_a_staff_request_that_is_not_the_answer_to_this_question_does_not_
     session, s, new, row = await carried_question(desk(**request_args))
     await settle(session, s, new)
     assert row.status == "open", request_args
+
+
+async def test_common_words_alone_never_tie_a_request_to_a_question():
+    session, s, new, row = await carried_question(
+        desk(question="what about this order status, your team"), text="what about the order"
+    )
+    await settle(session, s, new)
+    assert row.status == "open"  # they share "what", "about" and "order": only one word counts
+
+
+def test_the_tie_needs_two_shared_words_that_are_not_common_and_half_of_the_items_own():
+    item_text = "invoice payment delivery warehouse shipment customs"
+    assert open_items.tie_words("What about the order, your team") == {"order", "team"}
+    assert not open_items.tied(item_text, "invoice payment")  # 2 shared, but less than half of 6
+    assert open_items.tied(item_text, "invoice payment delivery")  # 3 of 6
+    assert not open_items.tied("what about the order", "what about this order")  # 1 word only
+    assert not open_items.tied("", "invoice payment delivery")
 
 
 @pytest.mark.parametrize("case", ["other_customer", "other_tenant"])
@@ -563,6 +587,37 @@ async def test_a_row_that_was_not_carried_is_only_closed_by_a_request_of_its_own
     assert row.status == "answered"
 
 
+# --- the carry writes the brief last -------------------------------------------------------------
+
+
+async def test_a_failure_in_the_last_query_leaves_the_conversation_brief_untouched():
+    s = scope()
+    customer = uuid4()
+    earlier, new = chat(s, customer), chat(s, customer)
+    new.service_brief = {"open_requests": [{"kind": "human", "turns": 2}]}
+    before = {"open_requests": [{"kind": "human", "turns": 2}]}
+    row = item(earlier, kind="owner_request", key="timeline")
+    calls = {"n": 0}
+
+    class FailsAtTheEnd(FakeSession):
+        async def scalars(self, statement: Any) -> list[Any]:
+            calls["n"] += 1
+            criteria = _criteria(statement)
+            looks_at_what_is_left = (
+                ("conversation_id", operator.ne, new.id) in criteria
+                and "in_op" not in str(criteria)
+                and any(name == "status" for name, _, _ in criteria)
+            )
+            if looks_at_what_is_left:
+                raise RuntimeError("database trouble")
+            return await super().scalars(statement)
+
+    session = FailsAtTheEnd(pi_open_items=[row], pi_conversations=[earlier, new], pi_offer_log=[])
+    with pytest.raises(RuntimeError):
+        await open_items.carry_into(session, s, new, now=NOW)
+    assert new.service_brief == before  # the brief is assigned only after the last query
+
+
 # --- slot_carry itself ---------------------------------------------------------------------------
 
 
@@ -582,7 +637,7 @@ async def test_slot_carry_copies_the_slots_moves_the_items_and_sets_its_mark_onc
     assert await slot_carry.carry_into(session, s, new, NOW) is False  # made once
 
 
-async def test_the_mark_is_not_set_while_an_eligible_item_is_left_behind_and_a_later_turn_retries():
+async def test_the_mark_counts_the_tries_while_an_eligible_item_is_left_behind_then_succeeds():
     s = scope()
     customer = uuid4()
     gap = timedelta(hours=open_items.CARRY_IDLE_HOURS)
@@ -591,20 +646,37 @@ async def test_the_mark_is_not_set_while_an_eligible_item_is_left_behind_and_a_l
     row = item(busy)
     session = world([row], busy, new)
     await slot_carry.carry_into(session, s, new, NOW)
-    assert slot_carry.MARK not in new.service_brief and row.conversation_id == busy.id
+    assert new.service_brief[slot_carry.MARK] == 1 and row.conversation_id == busy.id
+    assert new.service_brief[slot_carry.MARK] is not True
     busy.last_message_at = NOW - gap  # the next turn: the chat has gone quiet
     await slot_carry.carry_into(session, s, new, NOW)
     assert new.service_brief[slot_carry.MARK] is True and row.conversation_id == new.id
 
 
-async def test_the_mark_is_not_set_while_the_cap_leaves_items_behind():
+async def test_the_retries_are_bounded_and_then_cost_nothing_and_add_no_other_brief_key():
+    s = scope()
+    customer = uuid4()
+    gap = timedelta(hours=open_items.CARRY_IDLE_HOURS)
+    busy = chat(s, customer, quiet_for=gap - timedelta(minutes=1))  # never goes quiet
+    new = chat(s, customer)
+    session = world([item(busy)], busy, new)
+    for _turn in range(slot_carry.MAX_TRIES):
+        await slot_carry.carry_into(session, s, new, NOW)
+    assert new.service_brief[slot_carry.MARK] is True  # given up after MAX_TRIES turns
+    queries = len(session.seen)
+    await slot_carry.carry_into(session, s, new, NOW)
+    assert len(session.seen) == queries  # no query any more
+    assert set(new.service_brief) <= {slot_carry.MARK, "closed_slots", "asked_facts"}
+
+
+async def test_the_mark_is_not_final_while_the_cap_leaves_items_behind():
     s = scope()
     customer = uuid4()
     earlier, new = chat(s, customer), chat(s, customer)
     rows = [item(earlier, created=NOW - timedelta(hours=h + 1)) for h in range(12)]
     session = world(rows, earlier, new)
     await slot_carry.carry_into(session, s, new, NOW)
-    assert slot_carry.MARK not in new.service_brief  # two are left behind
+    assert new.service_brief[slot_carry.MARK] == 1  # two are left behind: tried again
     assert sum(r.conversation_id == new.id for r in rows) == 10
 
 
@@ -646,7 +718,7 @@ async def test_the_same_request_open_in_two_old_chats_moves_once_and_the_cap_cou
     assert sum(o.conversation_id == new.id for o in others) == 9  # ten, once the twin took a place
 
 
-async def test_a_failed_item_carry_leaves_the_mark_unset_logs_ids_only_and_is_tried_again(caplog):
+async def test_a_failed_item_carry_counts_a_try_logs_ids_only_and_is_tried_again(caplog):
     s = scope()
     customer = uuid4()
     earlier, new = chat(s, customer), chat(s, customer)
@@ -661,7 +733,7 @@ async def test_a_failed_item_carry_leaves_the_mark_unset_logs_ids_only_and_is_tr
     broken = Broken(pi_open_items=[row], pi_conversations=[earlier, new], pi_offer_log=[])
     with caplog.at_level(logging.WARNING):
         await slot_carry.carry_into(broken, s, new, NOW)
-    assert slot_carry.MARK not in (new.service_brief or {})
+    assert new.service_brief[slot_carry.MARK] == 1  # one try used, not final
     assert row.conversation_id == earlier.id
     text = " ".join(r.getMessage() for r in caplog.records)
     assert "RuntimeError" in text and str(new.id) in text and "Gulberg" not in text
@@ -679,6 +751,22 @@ async def test_a_failure_in_the_item_carry_never_reaches_the_chat():
             raise RuntimeError("database trouble")
 
     assert await slot_carry._carry_open_items(Broken(), s, new, NOW) is False
+
+
+async def test_the_turn_start_wrapper_logs_ids_and_the_error_type_only(caplog, monkeypatch):
+    s = scope()
+    new = chat(s)
+
+    async def boom(session: Any, scope_: Any, conversation: Any, now: Any = None) -> bool:
+        raise RuntimeError("secret text 0300-1234567")
+
+    monkeypatch.setattr(slot_carry, "carry_into", boom)
+    with caplog.at_level(logging.WARNING):
+        assert await slot_carry.carry_safely(FakeSession(), s, new) is None  # never raises
+    text = " ".join(r.getMessage() for r in caplog.records)
+    assert "secret text" not in text and "0300" not in text
+    assert "RuntimeError" in text and str(new.id) in text and str(s.tenant_id) in text
+    assert not any(r.exc_info for r in caplog.records)  # no traceback with parameters
 
 
 async def test_an_item_of_another_customer_is_never_named_here():
@@ -969,6 +1057,15 @@ LEFT_AS_WRITTEN = [
     "Agent said it is ready",
     "Tailor told me it is late",
     "I called Dad",
+    # Roman Urdu relatives and honorifics in English-shaped sentences (one merged stop list)
+    "Ammi said she will come",
+    "Bhai said the stock is low",
+    "Abbu called me yesterday",
+    "I told Baji about it",
+    "I called Sahab",
+    # words on a list that are also given names: a real name survives (stated limit)
+    "Salam said hello",
+    "Malik said the stock is low",
     # words that look like an honorific after a name
     "my uncle called",
     "the API is down",
@@ -1056,3 +1153,21 @@ def test_the_owners_own_number_and_a_third_partys_contact_are_still_decided_by_r
 def test_a_capitalised_unlisted_word_before_a_reporting_verb_is_replaced_a_stated_false_positive():
     assert third_party.protect("I called Careem") == "I called someone"
     assert third_party.protect("Uber said it is late") == "someone said it is late"
+
+
+@pytest.mark.parametrize(
+    "text",
+    [
+        "Mark said the stock is low",
+        "Will called me yesterday",
+        "Bill told me to wait",
+        "Rose asked about the price",
+        "Grace phoned me",
+        "May said it is late",
+        "Sunny texted me",
+        "Amber emailed the invoice",
+    ],
+)
+def test_given_names_that_are_on_no_list_are_replaced_where_a_pattern_fits(text):
+    out = third_party.protect(text)
+    assert out.startswith("someone ") and out != text, out  # also a loss when it is a common word

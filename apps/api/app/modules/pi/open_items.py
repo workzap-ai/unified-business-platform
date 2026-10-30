@@ -46,10 +46,33 @@ CARRY_MAX = 10
 CARRY_IDLE_HOURS = RETURN_AFTER_HOURS
 CARRY_CANDIDATES = 200  # the most rows one carry reads; the cap of CARRY_MAX applies after them
 # A staff request closes a carried question only when the team has dealt with it (never when it
-# was dismissed) and it belongs to this question: raised in the same turn as the item (within
-# TEAM_SLACK of it) or about the same words.
+# was dismissed) and it belongs to this question: it is about the same words (`tied`) and was not
+# raised before the item (at most TEAM_SLACK before it: it is raised in the same turn). Time alone
+# never ties it, and a request about different words does not close it even in that window: the
+# question then stays open, which is the safe side.
 TEAM_ANSWERED = ("answered", "published", "resolved")
 TEAM_SLACK = timedelta(minutes=10)
+TIE_MIN_SHARED = 2
+# Common words that do not tie a request to a question (English, Roman Urdu, Urdu, Arabic).
+TIE_STOP = frozenset(
+    {
+        "what", "your", "have", "this", "with", "about", "that", "from", "they", "them",
+        "will", "would", "could", "should", "there", "their", "then", "than", "when", "where",
+        "which", "while", "been", "being", "were", "just", "also", "some", "many", "much",
+        "more", "most", "very", "here", "into", "over", "only", "does", "doing", "after",
+        "before", "again", "still", "need", "want", "like", "make", "please", "thanks",
+        "kitna", "kitne", "kitni", "kaise", "kyun", "kyon", "kabhi", "abhi", "phir", "lekin",
+        "aapka", "aapki", "aapke", "mera", "meri", "mere", "hamare", "hamari", "hamara",
+        "kuch", "bahut", "bohat", "kyunki", "taake", "jaise", "agar", "hain", "hoga", "hogi",
+        "honge", "karna", "karne", "karen", "kijiye", "chahiye", "sakta", "sakte", "sakti",
+        "batayen", "bataye", "bataiye",
+        "کیا", "کیوں", "کہاں", "کون", "کتنا", "کتنی", "کتنے", "میرا", "میری", "میرے", "ہمارا",
+        "لیکن", "اگر", "بھی", "کچھ", "بہت", "ہوگا", "ہوگی", "کرنا", "چاہیے", "سکتا", "سکتے",
+        "بارے", "ساتھ", "لئے", "لیے",
+        "ماذا", "لماذا", "كيف", "متى", "هذا", "هذه", "ذلك", "التي", "الذي", "لكن", "أريد",
+        "يمكن", "بعد", "قبل", "كان", "يكون",
+    }
+)  # fmt: skip
 CARRY_REASON = "carried_to_new_chat"
 
 HANDOFF_STATUS = {
@@ -159,6 +182,19 @@ def answers(question: str, reply: str) -> bool:
         return False
     have = {w.lower() for w in WORDS.findall(reply or "")}
     return len(wanted & have) >= max(2, (len(wanted) + 1) // 2)
+
+
+def tie_words(text: str) -> set[str]:
+    """The words of a text that can tie it to another: 4 letters or more, none a common word."""
+    return {w.lower() for w in WORDS.findall(text or "")} - TIE_STOP
+
+
+def tied(text: str, question: str) -> bool:
+    """A staff question belongs to an item when they share at least TIE_MIN_SHARED words that are
+    not common words, and those are at least half of the item's own such words."""
+    wanted = tie_words(text)
+    shared = wanted & tie_words(question)
+    return len(shared) >= TIE_MIN_SHARED and len(shared) * 2 >= len(wanted)
 
 
 def return_line_for(items: list[dict[str, Any]], language: str | None) -> str:
@@ -305,12 +341,6 @@ async def carry_into(
         for r in moved
         if r.kind == "owner_request" and r.key in open_requests.ADDRESSES
     ]
-    if entries:
-        brief = dict(conversation.service_brief or {})
-        have = [e for e in brief.get("open_requests") or [] if isinstance(e, dict)]
-        kinds = {str(e.get("kind")) for e in have}
-        brief["open_requests"] = [*have, *[e for e in entries if e["kind"] not in kinds]]
-        conversation.service_brief = brief
     left = await session.scalars(
         select(PiOpenItem)
         .where(
@@ -323,6 +353,14 @@ async def carry_into(
         .limit(CARRY_CANDIDATES)
     )
     complete = all((r.kind, r.key) in held for r in left)
+    # Last: a failure above must leave the conversation untouched (a savepoint rollback does not
+    # undo an attribute set in Python, and an expired attribute reloads on the next read).
+    if entries:
+        brief = dict(conversation.service_brief or {})
+        have = [e for e in brief.get("open_requests") or [] if isinstance(e, dict)]
+        kinds = {str(e.get("kind")) for e in have}
+        brief["open_requests"] = [*have, *[e for e in entries if e["kind"] not in kinds]]
+        conversation.service_brief = brief
     return Carried(len(moved), complete)
 
 
@@ -340,8 +378,8 @@ async def team_answered_after(
 
     Without `customer_id` it is any question of this chat, as before. With it (an item carried into
     a new chat keeps its staff request under the old conversation id) it is a question of that
-    customer in this workspace that belongs to the item: raised within TEAM_SLACK of it, or about the
-    same words as `text`."""
+    customer in this workspace that belongs to the item: about the same words as `text` (`tied`)
+    and not raised before the item (more than TEAM_SLACK earlier)."""
     from app.modules.pi_saas.models import PiStaffRequest
 
     whose = (
@@ -365,7 +403,7 @@ async def team_answered_after(
     for request in requests:
         if customer_id is None:
             return True
-        if abs(request.created_at - since) <= TEAM_SLACK or answers(text, request.question):
+        if request.created_at >= since - TEAM_SLACK and tied(text, request.question):
             return True
     return False
 

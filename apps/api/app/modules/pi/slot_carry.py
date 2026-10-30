@@ -35,7 +35,10 @@ CARRY_SLOTS_DAYS = 30  # an answered question is not asked again for this long
 CARRY_ASKED_DAYS = 2  # a fact asked and left unanswered is asked again after this
 MAX_SLOTS = slots.KEEP
 LOOK_BACK = 3  # how many earlier chats are read, newest first
-MARK = "slot_carry_done"  # set once the copy was made (or found empty): it is made once
+MARK = "slot_carry_done"  # True once the copy was made (or found empty): it is made once
+# Until then it holds the number of turns tried so far (an integer), so a customer whose items sit
+# in a chat that never goes quiet costs at most this many extra rounds of queries.
+MAX_TRIES = 5
 PHONE = re.compile(r"(?<!\w)\+?\d[\d\s().-]{6,}\d")
 EMAIL = re.compile(r"[\w.+-]+@[\w-]+\.[\w.-]+")
 ASKED_KEYS = frozenset(key for key, _, _ in memory_block.FACTS)
@@ -108,8 +111,10 @@ async def carry_into(
     """Copy, once, what the owner's earlier chats hand over into this conversation's brief. Only
     chats of the same customer in the same workspace are read. True when something was copied."""
     brief = dict(conversation.service_brief or {})
-    if brief.get(MARK) or conversation.customer_id is None:
+    state = brief.get(MARK)
+    if state is True or conversation.customer_id is None:
         return False
+    tries = state if isinstance(state, int) and not isinstance(state, bool) else 0
     rows = (
         await session.execute(
             select(PiConversation.service_brief, PiConversation.last_message_at)
@@ -127,11 +132,34 @@ async def carry_into(
     for key, value in found.items():
         brief.setdefault(key, value)  # what this chat already holds is never replaced
     conversation.service_brief = brief
-    # The mark is set only once the open items came along too, so a failure there is tried again
-    # on the next turn (the slot copy above is safe to repeat: it never replaces anything).
-    if await _carry_open_items(session, scope, conversation, now):
-        conversation.service_brief = {**(conversation.service_brief or {}), MARK: True}
+    # The mark is set to True only once the open items came along too, so a failure (or an eligible
+    # item left behind) is tried again on the next turn (the slot copy above is safe to repeat: it
+    # never replaces anything). The tries are counted in the mark itself, an integer until it is
+    # True, so no new brief key reaches the model; after MAX_TRIES turns the carry is given up.
+    done = await _carry_open_items(session, scope, conversation, now) or tries + 1 >= MAX_TRIES
+    mark: bool | int = True if done else tries + 1
+    conversation.service_brief = {**(conversation.service_brief or {}), MARK: mark}
     return bool(found)
+
+
+async def carry_safely(
+    session: AsyncSession, scope: WorkspaceScope, conversation: PiConversation
+) -> None:
+    """`carry_into` inside a savepoint, for the start of a turn: a failure never costs the owner
+    their reply. It is logged with ids and the error type only (no message text, no traceback, which
+    can hold SQL parameters); ids are read before the savepoint, because after a rollback an expired
+    attribute would reload (and, with an async session, raise) in the handler."""
+    tenant_id, conversation_id = scope.tenant_id, conversation.id
+    try:
+        async with session.begin_nested():
+            await carry_into(session, scope, conversation)
+    except Exception as error:  # noqa: BLE001
+        logger.warning(
+            "slot carry failed: tenant=%s conversation=%s error=%s",
+            tenant_id,
+            conversation_id,
+            type(error).__name__,
+        )
 
 
 async def _carry_open_items(

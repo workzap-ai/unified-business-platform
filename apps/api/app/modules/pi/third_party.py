@@ -15,12 +15,18 @@ It is NOT a privacy boundary. Honest limits, in both directions:
   the stock"); a name in a language not listed here.
 * False positives (a word is replaced): a capitalised word that is neither a name nor in the stop
   lists, standing before a reporting verb or after "called/told/asked/phoned/texted/messaged/
-  emailed/warned", becomes "someone" ("I called Careem", "Uber said"). The stop lists hold
-  pronouns, possessives, greetings, time words, relatives, trades and roles (mom, dad, brother,
-  boss, friend, agent, tailor, rider, courier, cashier ...), places and well-known brands and
-  technical words, in English, Roman Urdu, Urdu and Arabic; a role or relative that is not in them
-  is treated as a name ("Plumber said" is kept only because plumber is listed; "Glazier said" is
-  not). All-capital words (API, SB) are never read as an honorific.
+  emailed/warned", becomes "someone" ("I called Careem", "Uber said"). The check is ONE merged
+  one: a word on any stop list (English, Roman Urdu, Urdu or Arabic) is never read as a name, in
+  any pattern, so "Ammi said", "Bhai said", "Abbu called", "told Baji" and "called Sahab" keep their
+  word. The lists hold pronouns, possessives, greetings, time words, relatives, trades and roles
+  (mom, dad, brother, boss, friend, agent, tailor, rider, courier, cashier ...), places, well-known
+  brands and technical words; a role or relative that is not in them is treated as a name
+  ("Plumber said" is kept only because plumber is listed; "Glazier said" is not). All-capital
+  words (API, SB) are never read as an honorific.
+* Words that are also given names. On a list, so a real name survives where a pattern fits (a
+  false negative): Salam, Kal, Malik, Abu, Ami, Mai (and Beta, Dada, Nana, Ji, Good, Now). On no
+  list, so they are replaced where a pattern fits (the intended effect for a name, a loss when it
+  is a common word): Mark, Will, Bill, Rose, Grace, May, Sunny, Amber.
 * A relative with a name keeps the relative and drops the name ("Uncle Ahmed said" becomes "Uncle
   said"; "my uncle Ahmed" becomes "my uncle").
 What is stored is still the owner's own text, erased with the customer; this only lowers how much
@@ -121,6 +127,7 @@ NOT_NAMES_ARABIC_SCRIPT = frozenset(
         "قال", "قالت", "أخبرني", "اتصل", "كلمني", "أرسل", "رفض", "وعد", "سرق",
     }
 )  # fmt: skip
+ALL_STOP = NOT_NAMES | NOT_NAMES_RU | NOT_NAMES_ARABIC_SCRIPT  # one check for every pattern
 
 NAME = r"[A-Z][a-z]{1,20}(?:\s+[A-Z][a-z]{1,20}){0,2}"
 HONORIFIC = r"(?:Mr|Mrs|Ms|Miss|Mister|Dr|Prof|Sir|Madam|Madame)\.?"
@@ -182,12 +189,12 @@ AR_NAME_VERB = re.compile(rf"{START}({TOKEN})\s+({AR_VERBS}){END}")
 
 
 def _is_name(token: str) -> bool:
-    """Every word of the match must be a possible name (none in the stop list)."""
-    return all(word.lower() not in NOT_NAMES for word in token.split())
+    """Every word of the match must be a possible name (none on any stop list)."""
+    return all(word.lower() not in ALL_STOP for word in token.split())
 
 
 def _is_name_ru(token: str) -> bool:
-    return _is_name(token) and token.lower() not in NOT_NAMES_RU
+    return _is_name(token)
 
 
 def _script_name(token: str) -> bool:
