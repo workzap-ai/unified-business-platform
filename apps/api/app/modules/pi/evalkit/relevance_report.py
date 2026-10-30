@@ -53,20 +53,20 @@ def build(
 ) -> tuple[str, dict[str, Any]]:
     log = _require_access(access_log_path, who, why)
     cases = [c for c in cases if c.get("kind") != "borderline_relevance"]
-    scored = []
-    for case in cases:
-        score = relevance.score_case(case) | {"split": splits.split_of(case)}
-        scored.append(score)
-    held = [s for s in scored if s["split"] == splits.HELD_OUT]
-    if held:
+    held_count = sum(1 for c in cases if splits.split_of(c) == splits.HELD_OUT)
+    if held_count:  # the read is logged BEFORE anything is scored or returned
         access_log.append(
             log,
             who=who,
             why=why,
             run_id=uuid.uuid4().hex[:12],
             split=splits.HELD_OUT,
-            count=len(held),
+            count=held_count,
         )
+    scored = [
+        relevance.score_case(case, held_out_ok=True) | {"split": splits.split_of(case)}
+        for case in cases
+    ]
     out = [
         "# pi solution relevance: scripted code-path check",
         "",
@@ -92,8 +92,12 @@ def build(
     ):
         groups: dict[str, list[dict[str, Any]]] = defaultdict(list)
         for s in scored:
-            groups[s[key]].append(s)
-        out += [f"## {title}", "", head]
+            # only the Split table shows Held-out; the other tables are Development and
+            # Regression, so the Held-out share cannot be derived by subtraction
+            if key == "split" or s["split"] != splits.HELD_OUT:
+                groups[s[key]].append(s)
+        note = "" if key == "split" else " (Development and Regression only)"
+        out += [f"## {title}{note}", "", head]
         for name in sorted(groups):
             agg = relevance.aggregate(groups[name])
             totals[f"{key}:{name}"] = agg
@@ -112,18 +116,10 @@ def build(
 
 def borderline_section(access_log_path: str | Path | None, who: str, why: str) -> str:
     """The borderline set: the scorer against agent-drafted labels (not human labels). Held-out
-    borderline candidates are only counted, and counting them is logged like any Held-out read."""
+    borderline candidates are only counted, and `borderline_comparison` itself requires the access
+    log and writes the line."""
     log = _require_access(access_log_path, who, why)
-    found = relevance_calibration.borderline_comparison()
-    if found["held_out_candidates"]:
-        access_log.append(
-            log,
-            who=who,
-            why=f"{why} (borderline candidates counted only)",
-            run_id=uuid.uuid4().hex[:12],
-            split=splits.HELD_OUT,
-            count=found["held_out_candidates"],
-        )
+    found = relevance_calibration.borderline_comparison(relevance_calibration.Access(log, who, why))
     rows = found["development"]
     diff = [r for r in rows if not r["agree"]]
     out = [

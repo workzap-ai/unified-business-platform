@@ -139,6 +139,30 @@ def test_numbers_are_never_truncated_so_a_figure_stays_distinct() -> None:
     )
 
 
+def test_numbers_keep_their_separators_whole() -> None:
+    assert relevance.tokens("Rs.20000") == ["rs", "20000"]
+    assert relevance.tokens("Budget 20,000 only") == ["budget", "20000", "only"]
+    assert relevance.tokens("about 1.5 hours") == ["about", "1.5", "hours"]
+    assert relevance.stems("20,000") == relevance.stems("20000") == {"20000"}
+    assert relevance.stems("1.5") == {"1.5"}
+    assert relevance.stems("Rs.20000") == {"20000"}, "'rs' is two letters and is dropped"
+    assert relevance.stems("200,000") != relevance.stems("20,000")
+    assert relevance.tokens("It started in 2024. Which one") == [
+        "it",
+        "started",
+        "in",
+        "2024",
+        "which",
+        "one",
+    ]
+
+
+def test_scoring_a_held_out_case_directly_is_refused_at_runtime() -> None:
+    assert HELD_CORE
+    with pytest.raises(PermissionError):
+        relevance.score_case(HELD_CORE[0])
+
+
 def test_the_disclaimer_is_in_the_module_docstring_and_in_the_report(workdir) -> None:
     assert " ".join(relevance.DISCLAIMER.split()) in " ".join((relevance.__doc__ or "").split())
     assert relevance.DISCLAIMER.startswith("Not a quality gate and not a learning reward.")
@@ -220,7 +244,20 @@ def test_the_report_groups_by_language_industry_and_kind(workdir) -> None:
     text, totals = relevance_report.build(PLAN, workdir / "a.jsonl", "lane E", "groups check")
     for key in ("language:en", "language:hi", "kind:constraint_violation"):
         assert key in totals
-    assert "poultry_farms" in text
+    assert "banquet_halls_and_marquees" in text
+
+
+def test_only_the_split_table_shows_held_out_so_its_share_cannot_be_subtracted(workdir) -> None:
+    text, totals = relevance_report.build(PLAN, workdir / "a.jsonl", "lane E", "tables check")
+    for key in ("language", "kind", "industry"):
+        cases = sum(v["cases"] for k, v in totals.items() if k.startswith(f"{key}:"))
+        assert cases == len(DEV_CORE), f"the {key} table leaves Held-out out"
+    held_only = {c["industry"] for c in HELD_CORE} - {c["industry"] for c in DEV_CORE}
+    assert held_only, "the fixture has an industry that only Held-out cases use"
+    assert not any(f"industry:{name}" in totals for name in held_only)
+    assert not any(name in text for name in held_only)
+    assert totals["split:held_out"]["cases"] == len(HELD_CORE)
+    assert text.count("(Development and Regression only)") == 3
 
 
 # ------------------------------------------------------------------ Held-out access log
@@ -434,11 +471,33 @@ def test_compare_prints_human_lines_only_for_a_valid_human_file() -> None:
     assert "scorer vs human" in text and "grader vs human" in text
     assert "agent_drafted vs human" in text
     assert "not valid" not in text
+    assert calibration.IDENTITY_NOTE in text, "the tool never claims to verify who reviewed"
+    assert "ana reviewer" in text and "ben reviewer" in text
+    for word in ("meets", "does not meet", "eligible", "proposed 85% test"):
+        assert word not in text.casefold()
+
+
+def mostly_agent(human: dict, same: int) -> dict:
+    """The same sheet, but `same` of its labels are replaced by the agent-drafted label."""
+    agent = calibration.agent_labels_all()
+    labels = {i: (agent[i] if k < same else v) for k, (i, v) in enumerate(human["labels"].items())}
+    return {**human, "labels": labels}
+
+
+def test_compare_flags_an_agent_copy_at_ninety_percent_but_not_below() -> None:
+    grader = dict(AGENT["labels"])
+    flagged = calibration.compare(grader, mostly_agent(valid_human(), 18))
+    assert "agent-copy suspected" in flagged and "scorer vs human" not in flagged
+    below = calibration.compare(grader, mostly_agent(valid_human(), 17))
+    assert "agent-copy suspected" not in below and "scorer vs human" in below
 
 
 @pytest.mark.parametrize(
     "mutate",
     [
+        lambda h: {**h, "reviewers": ["​", "Ben Reviewer"]},
+        lambda h: {**h, "reviewers": ["...", "Ben Reviewer"]},
+        lambda h: {**h, "reviewers": ["Ali​", "ali."]},
         lambda h: {**h, "reviewers": ["a", "a"]},
         lambda h: {**h, "reviewers": [""]},
         lambda h: {**h, "reviewers": ["a"]},
@@ -450,6 +509,9 @@ def test_compare_prints_human_lines_only_for_a_valid_human_file() -> None:
         lambda h: {**h, "labels": dict(calibration.agent_labels_all())},
     ],
     ids=[
+        "invisible-name",
+        "punctuation-name",
+        "normalised-twin",
         "same-name",
         "blank-name",
         "one-name",

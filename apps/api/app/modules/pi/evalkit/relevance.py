@@ -33,7 +33,7 @@ data: the words an idea would use to break the limit.
 import re
 from typing import Any
 
-from app.modules.pi.evalkit import scorers
+from app.modules.pi.evalkit import scorers, splits
 
 VERDICTS = ("relevant", "irrelevant", "generic", "violates_constraint", "restates_owner")
 DISCLAIMER = (
@@ -88,8 +88,24 @@ _GENERIC = {
 }  # fmt: skip
 
 
+# A number keeps its separators: '20,000' is the token '20000' and '1.5' stays '1.5', so a figure is
+# never cut into pieces ('Rs.20000' gives 'rs' and '20000').
+_NUMBER = re.compile(r"\d+(?:,\d{3})+(?:\.\d+)?|\d+(?:\.\d+)?")
+
+
+def _words(text: str) -> list[str]:
+    return [t for t in _SPLIT.split(text) if t]
+
+
 def tokens(text: str) -> list[str]:
-    return [t for t in _SPLIT.split((text or "").casefold()) if t]
+    folded = (text or "").casefold()
+    out: list[str] = []
+    pos = 0
+    for found in _NUMBER.finditer(folded):
+        out += _words(folded[pos : found.start()])
+        out.append(found.group().replace(",", ""))
+        pos = found.end()
+    return out + _words(folded[pos:])
 
 
 def _stem(token: str) -> str:
@@ -197,7 +213,11 @@ def pick_ideas(
     return good if wanted is None else good[:wanted]
 
 
-def score_case(case: dict[str, Any]) -> dict[str, Any]:
+def score_case(case: dict[str, Any], *, held_out_ok: bool = False) -> dict[str, Any]:
+    """Score one plan case. A Held-out case is refused at runtime unless the caller says it has
+    already logged the read (`held_out_ok`), as the report does after writing its access line."""
+    if splits.split_of(case) == splits.HELD_OUT and not held_out_ok:
+        raise PermissionError("scoring a Held-out case needs an access log: use the report")
     brief = case["input"]["brief"]
     owner_text = " ".join(case["input"].get("messages") or [])
     rows = []

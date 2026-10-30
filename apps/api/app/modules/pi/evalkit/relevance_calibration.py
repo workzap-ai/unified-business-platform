@@ -9,6 +9,14 @@ The grader agent's verdicts are a fourth, separate input. Agent-drafted labels a
 labels, and the proposed 85% agreement test is only evaluated when a human labels file is
 supplied.
 
+This module cannot prove who the reviewers are or that they worked independently: two names that
+normalise differently might still be one person, and two that match might be two. It checks only
+structure (known ids, enough samples, distinct normalised names, no copy of the agent-drafted
+labels) and never prints an acceptance verdict. The 85% acceptance is a decision the owner records.
+
+Held-out discipline: every function here that would score or print a Held-out case refuses
+(PermissionError) unless it is given an `Access` (log path, who, why), and then writes the log line.
+
 Usage from apps/api:
   python -m app.modules.pi.evalkit.relevance_calibration --sheets OUT_DIR
   python -m app.modules.pi.evalkit.relevance_calibration --grader GRADER.json [--human HUMAN.json]
@@ -18,11 +26,13 @@ import argparse
 import csv
 import json
 import random
+import unicodedata
+import uuid
 from collections import Counter
 from pathlib import Path
-from typing import Any
+from typing import Any, NamedTuple
 
-from app.modules.pi.evalkit import relevance, splits
+from app.modules.pi.evalkit import access_log, relevance, splits
 
 DIR = Path(__file__).with_name("calibration")
 CASES = Path(__file__).with_name("cases") / "plan.json"
@@ -40,6 +50,50 @@ DEFINITIONS = {
     "violates_constraint": "breaks a limit the owner stated",
     "restates_owner": "only repeats what the owner already said, adds nothing",
 }
+AGENT_COPY_LEVEL = 0.9  # a sheet agreeing with the agent-drafted labels this much is refused
+AGENT_COPY_MIN_SAMPLES = 10  # ... once it has at least this many labelled samples
+IDENTITY_NOTE = (
+    "Identity of reviewers and independence are NOT verified by this tool; the 85% acceptance is "
+    "a decision recorded by the owner, not computed here."
+)
+
+
+class Access(NamedTuple):
+    """Who reads Held-out cases, why, and where the append-only access log lives."""
+
+    path: str | Path
+    who: str
+    why: str
+
+
+def require_access(access: Access | None) -> Access:
+    if access is None or not str(access.path).strip():
+        raise ValueError("reading Held-out cases needs an access log path")
+    if not str(access.who).strip() or not str(access.why).strip():
+        raise ValueError("reading Held-out cases needs who and why")
+    return access
+
+
+def guard(cases: list[dict[str, Any]], access: Access | None, what: str) -> int:
+    """Refuse (PermissionError) to touch a Held-out case without an access log argument; when one
+    is given, write the log line first. Returns how many Held-out cases are involved."""
+    held = [c for c in cases if splits.split_of(c) == splits.HELD_OUT]
+    if not held:
+        return 0
+    if access is None:
+        raise PermissionError(
+            f"{what} would read {len(held)} Held-out case(s): pass an access log (path, who, why)"
+        )
+    log = require_access(access)
+    access_log.append(
+        log.path,
+        who=log.who,
+        why=f"{log.why} ({what})",
+        run_id=uuid.uuid4().hex[:12],
+        split=splits.HELD_OUT,
+        count=len(held),
+    )
+    return len(held)
 
 
 def _load(path: Path) -> Any:
@@ -84,8 +138,19 @@ def borderline_agent_by_sample() -> dict[str, str]:
 
 
 def norm_name(name: Any) -> str:
-    """A reviewer name for comparison: case folded, whitespace collapsed ('Ali' == 'ali ' )."""
-    return " ".join(str(name or "").casefold().split())
+    """A reviewer name reduced to a skeleton for comparison: NFKC (fullwidth and composed forms),
+    invisible format characters (zero-width space and joiner, BOM) and combining marks removed,
+    punctuation treated as a space, case folded, whitespace collapsed. 'Ali.' == 'ali' == 'Ali  ',
+    'Ali-Khan' == 'Ali Khan'. Code cannot prove two names are two people; this only stops the
+    obvious accidents."""
+    text = unicodedata.normalize("NFKC", str(name or ""))
+    kept = []
+    for ch in text:
+        category = unicodedata.category(ch)
+        if category in ("Cf", "Mn"):
+            continue
+        kept.append(" " if ch.isspace() or category.startswith(("P", "Z", "C")) else ch)
+    return " ".join("".join(kept).casefold().split())
 
 
 def known_sample_ids() -> set[str]:
@@ -117,8 +182,13 @@ def check_human_labels(data: dict[str, Any]) -> dict[str, str]:
     if bad:
         raise ValueError(f"not allowed verdicts: {bad[:5]}")
     agent = agent_labels_all()
-    if len(labels) >= MIN_HUMAN_SAMPLES and all(agent.get(i) == v for i, v in labels.items()):
-        raise ValueError("these labels are identical to the agent-drafted labels")
+    shared = [i for i in labels if i in agent]
+    if len(shared) >= AGENT_COPY_MIN_SAMPLES:
+        same = sum(1 for i in shared if agent[i] == labels[i])
+        if same / len(shared) >= AGENT_COPY_LEVEL:
+            raise ValueError(
+                f"agent-copy suspected: {same} of {len(shared)} labels equal the agent-drafted ones"
+            )
     return dict(labels)
 
 
@@ -142,6 +212,29 @@ def human_labels_problem(data: dict[str, Any]) -> str:
     return ""
 
 
+def validate_grader(raw: Any) -> dict[str, str]:
+    """A grader results mapping of sample id to an allowed verdict ('results' must be a mapping when
+    present). Raises ValueError('invalid grader file: ...') instead of letting a bad shape crash."""
+    data = raw
+    if isinstance(raw, dict) and "results" in raw:
+        data = raw["results"]
+        if not isinstance(data, dict):
+            raise ValueError("invalid grader file: 'results' must be a mapping of id to verdict")
+    if isinstance(data, list):
+        try:
+            data = {r["sample_id"]: r["verdict"] for r in data}
+        except (TypeError, KeyError) as exc:
+            raise ValueError("invalid grader file: a list needs sample_id and verdict") from exc
+    if not isinstance(data, dict) or not data:
+        raise ValueError("invalid grader file: expected a mapping of sample id to verdict")
+    bad = sorted(
+        str(k) for k, v in data.items() if not isinstance(k, str) or v not in relevance.VERDICTS
+    )
+    if bad:
+        raise ValueError(f"invalid grader file: not an allowed verdict for {bad[:5]}")
+    return dict(data)
+
+
 def load_human_labels(path: str | Path) -> dict[str, Any]:
     data = dict(_load(Path(path)))
     reviewers = data.get("reviewers")
@@ -163,11 +256,15 @@ def _candidate(case: dict[str, Any], candidate_id: str) -> dict[str, Any]:
 
 
 def blind_sheet(
-    cases: list[dict[str, Any]], samples: list[dict[str, Any]], seed: int = SEED
+    cases: list[dict[str, Any]],
+    samples: list[dict[str, Any]],
+    seed: int = SEED,
+    access: Access | None = None,
 ) -> list[dict[str, Any]]:
     """What a reader sees: the owner's words, stated facts and limits, and one idea. No label, no
     verdict, no reason, no scorer output and no blocking keyword. Order is shuffled, fixed seed."""
     by_id = _index(cases)
+    guard([by_id[s["case_id"]] for s in samples], access, "blind_sheet")
     rows = []
     for sample in samples:
         case = by_id[sample["case_id"]]
@@ -241,20 +338,22 @@ def _markdown(rows: list[dict[str, Any]]) -> str:
     return "\n".join(out) + "\n"
 
 
-def all_rows() -> tuple[list[dict[str, Any]], list[dict[str, Any]], list[dict[str, Any]]]:
+def all_rows(
+    access: Access | None = None,
+) -> tuple[list[dict[str, Any]], list[dict[str, Any]], list[dict[str, Any]]]:
     """(core blind rows, borderline blind rows, every human row with its block)."""
     cases = load_cases()
-    core = blind_sheet(cases, load_samples())
-    border = blind_sheet(cases, load_borderline_samples())
+    core = blind_sheet(cases, load_samples(), access=access)
+    border = blind_sheet(cases, load_borderline_samples(), access=access)
     return core, border, human_rows(core, "core") + human_rows(border, "borderline")
 
 
-def write_sheets(out_dir: str | Path) -> list[Path]:
+def write_sheets(out_dir: str | Path, access: Access | None = None) -> list[Path]:
     """The blind grader sheets (core, borderline) and the human review sheet with both blocks
     (json, csv, markdown), side by side. No label, no scorer output, an empty verdict column."""
     folder = Path(out_dir)
+    core, border, rows = all_rows(access)  # refuses before anything is written
     folder.mkdir(parents=True, exist_ok=True)
-    core, border, rows = all_rows()
     paths = {
         "blind_samples.json": json.dumps(core, ensure_ascii=False, indent=1),
         "blind_samples_borderline.json": json.dumps(border, ensure_ascii=False, indent=1),
@@ -330,8 +429,11 @@ def agreement(
     }
 
 
-def scorer_labels(cases: list[dict[str, Any]], samples: list[dict[str, Any]]) -> dict[str, str]:
+def scorer_labels(
+    cases: list[dict[str, Any]], samples: list[dict[str, Any]], access: Access | None = None
+) -> dict[str, str]:
     by_id = _index(cases)
+    guard([by_id[s["case_id"]] for s in samples], access, "scorer_labels")
     out = {}
     for s in samples:
         case = by_id[s["case_id"]]
@@ -346,12 +448,15 @@ def scorer_labels(cases: list[dict[str, Any]], samples: list[dict[str, Any]]) ->
     return out
 
 
-def borderline_comparison() -> dict[str, Any]:
+def borderline_comparison(access: Access) -> dict[str, Any]:
     """Scorer verdict against the agent-drafted label for the Development borderline candidates.
     Held-out borderline candidates are only counted: they are not scored here and their labels are
-    not committed. A disagreement is a finding: neither the scorer nor the case is changed to
-    remove it."""
+    not committed. Counting them is a Held-out read, so this itself requires the access log (path,
+    who, why) and writes the line. A disagreement is a finding: neither the scorer nor the case is
+    changed to remove it."""
+    log = require_access(access)
     cases = [c for c in load_cases() if c.get("kind") == "borderline_relevance"]
+    guard(cases, log, "borderline_comparison (candidates counted only)")
     labels = load_borderline_agent_labels()["labels"]
     sample_of = {
         f"{s['case_id']}/{s['candidate_id']}": s["sample_id"] for s in load_borderline_samples()
@@ -401,24 +506,27 @@ def _fmt(name: str, result: dict[str, Any]) -> list[str]:
     return out
 
 
-def compare(grader: dict[str, str], human: dict[str, Any] | None = None) -> str:
+def compare(grader: Any, human: dict[str, Any] | None = None, access: Access | None = None) -> str:
     """Agreement three ways without a human file (scorer, grader, agent_drafted), plus the human
     comparisons only when a human labels file is given. The label sources are never merged."""
     cases = load_cases()
     samples = load_samples() + load_borderline_samples()
     by_id = _index(cases)
     languages = {s["sample_id"]: by_id[s["case_id"]]["language"] for s in samples}
-    scorer = scorer_labels(cases, samples)
+    scorer = scorer_labels(cases, samples, access)
     agent = agent_labels_all()
-    pairs = [
-        ("scorer vs grader", scorer, grader),
-        ("scorer vs agent_drafted", scorer, agent),
-        ("grader vs agent_drafted", grader, agent),
-    ]
     lines = [
         f"Agreement on the {len(samples)} calibration samples (code and drafts, not quality)",
         "",
     ]
+    pairs = [("scorer vs agent_drafted", scorer, agent)]
+    try:
+        graded = validate_grader(grader)
+    except ValueError as exc:
+        graded = {}
+        lines += [f"{exc}; no grader comparison is shown.", ""]
+    else:
+        pairs += [("scorer vs grader", scorer, graded), ("grader vs agent_drafted", graded, agent)]
     if human is None:
         lines += [
             "No human labels provided: the proposed 85% acceptance test is NOT evaluated here.",
@@ -435,24 +543,17 @@ def compare(grader: dict[str, str], human: dict[str, Any] | None = None) -> str:
             ]
         else:
             labels = dict(human["labels"])
-            lines += [f"Human labels from {len(human.get('reviewers') or [])} reviewer(s).", ""]
+            names = [norm_name(r) for r in human.get("reviewers") or []]
+            lines += [f"Human labels from reviewers {names} (normalised names).", IDENTITY_NOTE, ""]
             pairs += [
                 ("scorer vs human", scorer, labels),
-                ("grader vs human", grader, labels),
                 ("agent_drafted vs human", agent, labels),
             ]
+            if graded:
+                pairs.append(("grader vs human", graded, labels))
     for name, one, two in pairs:
         lines += _fmt(name, agreement(one, two, languages)) + [""]
     return "\n".join(lines)
-
-
-def _grader_map(raw: Any) -> dict[str, str]:
-    data = (
-        raw.get("results", raw)
-        if isinstance(raw, dict)
-        else {r["sample_id"]: r["verdict"] for r in raw}
-    )
-    return {str(k): str(v) for k, v in data.items()}
 
 
 def main() -> None:
@@ -462,13 +563,17 @@ def main() -> None:
     )
     parser.add_argument("--grader", default="", help="grader results JSON: id -> verdict")
     parser.add_argument("--human", default="", help="human labels JSON (separate input)")
+    parser.add_argument("--access-log", default="", help="needed only if a Held-out case is read")
+    parser.add_argument("--who", default="")
+    parser.add_argument("--why", default="")
     args = parser.parse_args()
+    access = Access(args.access_log, args.who, args.why) if args.access_log else None
     if args.sheets:
-        for path in write_sheets(args.sheets):
+        for path in write_sheets(args.sheets, access):
             print("wrote", path)
     if args.grader:
         human = load_human_labels(args.human) if args.human else None
-        print(compare(_grader_map(_load(Path(args.grader))), human))
+        print(compare(_load(Path(args.grader)), human, access))
 
 
 if __name__ == "__main__":
