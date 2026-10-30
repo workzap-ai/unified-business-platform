@@ -76,3 +76,25 @@ until D5 is approved.
    your key.
 3. When you approve, you create a new dedicated key, auto-reload off, provider-side limit of USD 5,
    revoked after the run, and type it into the shell yourself; I never see or store it.
+
+## 6. Independent security review and what changed because of it
+
+A separate read-only reviewer examined the runner at commit 5f67625 without my conclusions. Its verdict:
+no way found to leak the key, open Held-out or Regression, or pass 30 calls or USD 0.50. It listed
+hardening gaps, all fixed in the second commit and each now covered by a test:
+
+| Finding | Fix |
+|---|---|
+| A proxy or certificate environment variable could redirect the key (the HTTP client trusted the environment) | the client ignores proxy and certificate variables and follows no redirects |
+| NaN or a mistyped low price switches the dollar guard off | prices and the cap must be finite; prices must be at least the verified rates (0.15 in, 0.60 out) |
+| A paid run could lose all its results (written only at the end; a malformed answer or an unwritable `--out` crashed it) | one line per case as it arrives; `--out` must be a new file under `.cache` or the temp directory, checked before any call; a malformed or non-object answer, bad `usage` or any unexpected error ends the run with the report and file kept |
+| The spend could be understated on a stop (a call that failed after it was sent) | every failure after a send is charged the worst case; negative usage cannot lower the spend |
+| Invalid model output looked like a miss | counted and printed as `invalid_outputs` |
+| The call-cap stop was unreachable in a normal run and untested | tested on the manager directly |
+| `--confirm-cap` is a typo guard, not an authorisation | stated: the owner's approval is the authorisation; a dead `if True` removed |
+
+Remaining limits, stated: token counts are an estimate (no tokenizer installed), so the spend guard
+relies on the provider's `usage` and the worst-case bound; the evaluation cases are text written for
+the evaluation but were not proven free of real identifiers beyond a pattern search; the provider's
+real behaviour (billing on a timeout, availability of `gpt-4o-mini`) is not verified. 40 tests, no
+network.
