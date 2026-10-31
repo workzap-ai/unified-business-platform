@@ -206,3 +206,19 @@ def is_hiring_freeze(text: str) -> bool:
 
 def take_on_as_hire(text: str) -> str:
     return _TAKE_ON.sub("hire", text)
+
+
+# ---------------------------------------------------------------------------------- channels
+
+CHANNEL_GROUPS = {
+    **dict.fromkeys(
+        "whatsapp phone phones mobile sms call calls instagram messenger message messages".split(),
+        "mobile",
+    ),
+    **dict.fromkeys(
+        "computer computers laptop laptops desktop pc website web excel spreadsheet dashboard "
+        "screen screens".split(),
+        "computer",
+    ),
+    **dict.fromkeys("paper print printed printout printouts notebook register".split(), "paper"),
+}

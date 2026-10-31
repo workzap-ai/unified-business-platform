@@ -243,7 +243,9 @@ def test_roman_urdu_limits_and_options():
 def test_other_scripts_are_unknown_never_ok():
     urdu_limit = ["ہم سسٹم تبدیل نہیں کر سکتے"]
     v = check("Replace the POS system", cannot=urdu_limit)
-    assert v.status == "unknown" and "script" in v.reason
+    assert v.status == "violates"  # an Urdu limit is read now: "we cannot change the system"
+    v = check("Use a paper register", cannot=["ہم کچھ ٹھیک نہیں کر سکتے"])
+    assert v.status == "unknown" and "read" in v.reason  # a limit it cannot read never clears
     v = cc.check_option(
         "نیا سسٹم خریدیں",
         reqs(cannot=["we cannot buy a new system"]),
@@ -422,8 +424,9 @@ def test_another_currency_than_the_budget_is_unknown():
 
 
 def test_a_figure_in_urdu_script_has_no_known_role_so_over_ceiling_is_unknown():
-    option = "ٹیبلیٹ 50000 روپے"
-    assert check(option, budget="Rs 20000").status == "unknown"
+    # a figure with a currency word is money; one with no word the tables know has no role
+    assert check("ٹیبلیٹ 50000 روپے", budget="Rs 20000").status == "violates"
+    assert check("کچھ 50000", budget="Rs 20000").status == "unknown"
     assert check("ٹیبلیٹ 5000 روپے", budget="Rs 20000").status == "ok"
 
 
@@ -689,12 +692,12 @@ def test_a_staff_limit_is_enforced_against_the_people_an_option_adds(option, sta
 
 
 def test_a_staff_limit_within_reach_is_ok_and_a_missing_count_is_unknown():
-    assert with_staff("Hire one cashier", "only 2 staff").status == "ok"
+    assert with_staff("Hire one cashier", "at most 2 staff").status == "ok"
     assert with_staff("Hire two cashiers", "up to two employees").status == "ok"
     assert with_staff("Use a paper register at the counter", "only 2 staff").status == "ok"
-    v = with_staff("Hire more staff", "only 2 staff")
+    v = with_staff("Hire more staff", "at most 2 staff")
     assert v.status == "unknown" and "count" in v.reason
-    assert with_staff("naye staff ko rakh lein", "only 2 staff").status == "unknown"
+    assert with_staff("naye staff ko rakh lein", "at most 2 staff").status == "unknown"
 
 
 @pytest.mark.parametrize("staff", ["blah blah", "at least 2 staff", "", "the team", "x"])
@@ -1175,8 +1178,8 @@ def test_the_reading_tables_turn_known_words_into_english_and_count_the_unknown(
             is_verb=lambda w: bool(cc.verb_families(w)),
         )[0]
         assert out == expected, text
-    assert cc._option("کچھ اور سوچیں").latin is False
-    assert cc._option("کچھ اور سوچیں").unread >= 1
+    assert cc._option("کچھ سوچیں").latin is False  # nothing in it is known
+    assert cc._option("کچھ اور سوچیں").unread == 2  # "اور" (and) is known, the rest is not
 
 
 def test_property_an_option_in_any_script_with_an_unrecognised_verb_is_never_ok():
@@ -1224,7 +1227,9 @@ def test_a_known_verb_with_an_unknown_word_is_unknown_not_ok_but_still_violates_
 def test_staff_caps_are_enforced_against_hires_in_urdu_arabic_and_hindi(option):
     v = with_staff(option, "only 1 staff")
     assert v.status == "violates" and v.rule == "staff", option
-    assert with_staff(option, "only 5 staff").status == "ok", option
+    assert with_staff(option, "at most 5 staff").status == "ok", option
+    # "only 5 staff" states the team: hiring any more breaks it
+    assert with_staff(option, "only 5 staff").status == "violates", option
 
 
 def test_staff_caps_in_the_docstring_and_in_the_gate_are_enforced():
@@ -1280,3 +1285,272 @@ def test_a_new_one_of_the_thing_that_cannot_change_violates():
     assert check("Ask the courier for a tracking link", cannot=limit).status == "ok"
     assert check("Use a new packing box", cannot=limit).status == "ok"
     assert check("Measure whether a new courier is worth it", cannot=limit).status == "ok"
+
+
+# ------------- round 4: LIMITS written in Urdu script, Arabic and Hindi are rules too
+
+LIMIT_GOLDEN = {
+    "urdu": {
+        "violates": [
+            ("نیا کلرک رکھیں", "ہم مزید عملہ نہیں رکھ سکتے"),
+            ("POS بدلیں", "ہم POS نہیں بدل سکتے"),
+            ("دکان بند کریں", "ہم دکان بند نہیں کر سکتے"),
+            ("ڈیلیوری شروع کریں", "ہم ڈیلیوری نہیں کر سکتے"),
+            ("ڈیلیوری کے دن کا وعدہ کریں", "ہم ڈیلیوری کے دنوں کا وعدہ نہیں کر سکتے"),
+            ("کمپیوٹر پر ڈیش بورڈ بنائیں", "یہ صرف فون پر چلنا چاہیے"),
+        ],
+        "ok": [
+            ("واٹس ایپ پر پیغام بھیجیں", "یہ صرف فون پر چلنا چاہیے"),
+            ("ایک نئی ٹیبلیٹ خریدیں", "ہم مزید عملہ نہیں رکھ سکتے"),
+        ],
+        "unknown": [
+            ("کاغذ رجسٹر رکھیں", "ہم POS نہیں بدل سکتے"),
+            ("POS بدلیں", "ہم کچھ ٹھیک نہیں کر سکتے"),
+            ("نیا سسٹم خریدیں", "ہمارے پاس سسٹم نہیں ہے"),
+        ],
+    },
+    "arabic": {
+        "violates": [
+            ("توظيف موظف جديد", "لا نستطيع توظيف موظفين جدد"),
+            ("استبدال نظام POS", "لا نستطيع تغيير نظام POS"),
+            ("إغلاق المتجر", "لا نستطيع إغلاق المتجر"),
+            ("افتح فرعا في لاهور", "نعمل فقط في كراتشي"),
+            ("وظفوا طباخين اثنين", "لا نستطيع توظيف المزيد"),
+        ],
+        "ok": [("فتح المتجر", "لا نستطيع إغلاق المتجر")],
+        "unknown": [
+            ("كورير جديد", "لا نستطيع وعد الزبائن بأيام التوصيل"),
+            ("فتح المتجر", "لا نستطيع شيئا"),
+        ],
+    },
+    "hindi": {
+        "violates": [
+            ("नया कर्मचारी रखें", "हम और कर्मचारी नहीं रख सकते"),
+            ("POS बदलें", "हम POS नहीं बदल सकते"),
+        ],
+        "ok": [("फोन पर संदेश भेजें", "यह केवल फ़ोन पर चलना चाहिए")],
+        "unknown": [("दुकान खोलें", "हम कुछ ठीक नहीं कर सकते")],
+    },
+}
+
+
+@pytest.mark.parametrize("language", sorted(LIMIT_GOLDEN))
+@pytest.mark.parametrize("expected", ["violates", "ok", "unknown"])
+def test_golden_limits_in_urdu_arabic_and_hindi_become_rules(language, expected):
+    for option, limit in LIMIT_GOLDEN[language][expected]:
+        v = check(option, cannot=[limit])
+        assert v.status == expected, (language, option, limit, v)
+
+
+def test_a_limit_in_another_script_is_localised_into_english_order():
+    for source, _verb, word in [
+        ("ہم POS نہیں بدل سکتے", "change", "pos"),
+        ("لا نستطيع تغيير نظام POS", "change", "pos"),
+        ("हम और कर्मचारी नहीं रख सकते", "hire", "employee"),
+    ]:
+        mapped = cc.localise_limit(source)[0].lower().split()
+        assert mapped[:3] == ["we", "cannot", mapped[2]] and cc.verb_families(mapped[2]), source
+        assert word in mapped, source
+    text, unread = cc.localise_limit("ہم POS نہیں بدل سکتے")
+    assert unread == 0
+    assert cc.localise_limit("ہم کچھ ٹھیک نہیں کر سکتے")[1] == 2  # two words are not read
+    assert cc.localise_limit("a plain English limit") == ("a plain English limit", 0)
+
+
+def test_property_limit_text_the_tables_do_not_understand_never_clears_an_option():
+    import random
+
+    rng = random.Random(41)
+    alphabets = {
+        "urdu": "ابتثجحخدرزسشصضطظعغفقلمنہوی",
+        "arabic": "ابتثجحخدذرزسشصضطظعغفقلمنهوي",
+        "hindi": "कखगघचछजझटठडढतथदधनपफबभमयरलवशसह",
+    }
+    known = set(cc.SCRIPT_TABLE) | set(cc.SCRIPT_STOP) | set(cc.SMALL_NUMBER_WORDS)
+    options = ["Hire a cashier", "Replace the POS system", "Use a paper register", "Open in Lahore"]
+    seen = 0
+    for _ in range(300):
+        alphabet = alphabets[rng.choice(sorted(alphabets))]
+        words = []
+        for _ in range(rng.randint(1, 5)):
+            word = "".join(rng.choice(alphabet) for _ in range(rng.randint(3, 6)))
+            if cc.norm(word) not in known:
+                words.append(word)
+        limit = " ".join(words)
+        for kind in ("cannot", "staff", "budget", "deadline"):
+            requirement = reqs(**{kind: [limit] if kind == "cannot" else limit})
+            for option in options:
+                v = cc._check_option(option, requirement, probe_budget=False)
+                assert v.status != "ok", (kind, limit, option, v)
+                seen += 1
+    assert seen == 300 * 4 * 4
+
+
+@pytest.mark.parametrize(
+    ("option", "staff"),
+    [
+        ("Hire a second receptionist", "only one receptionist"),
+        ("Hire two more drivers", "only 2 drivers"),
+        ("Add one more cook", "only two cooks"),
+        ("Hire another driver", "only 2 drivers"),
+        ("Recruit an additional accountant", "only 1 accountant"),
+        ("ek aur receptionist rakh lein", "ek hi receptionist"),
+        ("دو اور باورچی رکھیں", "صرف 2 باورچی"),
+        ("وظفوا طباخين اثنين", "فقط 2 طباخين"),
+        ("दो और रसोइया रखें", "केवल 2 रसोइया"),
+    ],
+)
+def test_a_cap_phrased_with_a_role_is_enforced_against_another_of_that_role(option, staff):
+    v = with_staff(option, staff)
+    assert v.status == "violates" and v.rule == "staff" and v.evidence, (option, staff, v)
+
+
+def test_a_role_cap_does_not_reject_what_adds_nobody_and_a_pure_cap_still_counts():
+    assert with_staff("Use a paper register", "only 2 drivers").status == "ok"
+    assert with_staff("Train the drivers", "only 2 drivers").status == "ok"
+    assert with_staff("Hire two cooks", "at most 2 cooks").status == "ok"
+    assert with_staff("Hire three cooks", "at most 2 cooks").status == "violates"
+    assert cc.staff_limit_form("only 2 cooks") == "total"
+    assert cc.staff_limit_form("at most 2 cooks") == "cap"
+    assert cc.staff_limit_form("hiring is frozen") == "cap"
+    assert with_staff("Hire some cooks", "hiring is frozen").status == "violates"  # no count needed
+
+
+def test_a_budget_in_urdu_arabic_and_hindi_is_a_ceiling_with_its_currency_and_digits():
+    cases = [
+        ("نیا سسٹم 80000 روپے میں خریدیں", "ہمارے پاس صرف 30,000 روپے کا بجٹ ہے"),
+        ("اشتر نظاما بـ 80000 ريال", "ميزانيتنا 30,000 ريال فقط"),
+        ("नया सिस्टम 80000 रुपये में खरीदें", "हमारे पास केवल 30,000 रुपये का बजट है"),
+    ]
+    for option, budget in cases:
+        assert check(option, budget=budget).status == "violates", (option, budget)
+    assert (
+        check(
+            "ٹیبلیٹ 10000 روپے میں خریدیں", budget="اس مہینے 20000 روپے سے زیادہ خرچ نہیں کر سکتے"
+        ).status
+        == "ok"
+    )
+    ceiling = cc.parse_ceiling(
+        cc.localise_limit("اس مہینے 20000 روپے سے زیادہ خرچ نہیں کر سکتے")[0]
+    )
+    assert ceiling.value == Decimal(20000)
+    assert cc.parse_ceiling(
+        cc.localise_limit("ہمارے پاس صرف 30,000 روپے کا بجٹ ہے")[0]
+    ).value == Decimal(30000)
+
+
+def test_no_money_for_a_thing_rejects_spending_on_that_thing_only():
+    assert check("نیا سسٹم خریدیں", budget="نئے سسٹم کے لیے پیسے نہیں ہیں").status == "violates"
+    v = check("Buy paper rolls for the counter", budget="no money for a new system")
+    assert v.status == "unknown" and "names something else" in v.reason
+    assert check("Buy a new system", budget="no money for a new system").status == "violates"
+    assert check("Buy paper", budget="no budget").status == "violates"  # no subject: any spending
+    assert check("Use a paper register", budget="no budget").status == "ok"
+
+
+def test_channel_limits_must_work_on_x_only():
+    limit = ["it must work on my phone only"]
+    assert check("Build a laptop dashboard", cannot=limit).status == "violates"
+    assert check("Print a paper sheet for the desk", cannot=limit).status == "violates"
+    assert check("Send a WhatsApp message", cannot=limit).status == "ok"
+    assert check("Send a message", cannot=["it must work on WhatsApp"]).status == "ok"
+    assert (
+        check("Build a laptop dashboard", cannot=["it must work on my phone"]).status == "unknown"
+    )
+    assert (
+        check("Send a message", cannot=["it must work on the phone only, without any print"]).status
+        == "ok"
+    )
+    assert (
+        check("Print a sheet", cannot=["it must work on the phone only, without any print"]).status
+        == "violates"
+    )
+    assert (
+        check(
+            "Use a paper register", cannot=["it must work on a printed sheet only, no screen"]
+        ).status
+        == "ok"
+    )
+    assert (
+        check("Open a phone app", cannot=["it must work on a printed sheet only, no screen"]).status
+        == "violates"
+    )
+
+
+def test_a_partner_word_is_not_what_has_to_match():
+    limit = ["we cannot change our caterer partner"]
+    assert check("Switch to another caterer", cannot=limit).status == "violates"
+    assert check("Ask the partner for a discount", cannot=limit).status != "violates"
+
+
+def test_costly_ideas_with_no_budget_are_unknown_in_every_language_and_say_why():
+    for option in ["Take a deposit through an app", "repair the screen at a paid shop",
+                   "naya system kharidein", "mehnga job tracking system",
+                   "نیا سسٹم خریدیں", "اشتر نظاما جديدا", "नया सिस्टम खरीदें"]:  # fmt: skip
+        v = cc.check_option(option, reqs(cannot=["we cannot hire more staff"]), "en")
+        assert (
+            v.status == "unknown" and v.rule == "budget" and "no budget was stated" in v.reason
+        ), option
+    assert cc.check_option("Ask customers for referrals", None, "en").status == "ok"
+
+
+def test_the_arabic_endings_and_comma_numbers_and_minutes():
+    assert cc.norm("30,000") == "30,000"
+    assert cc.parse_days("ایک منٹ", need_cue=False) is None  # not mapped here: no guessing
+    mapped = cc.localise_limit("ہر بکنگ ایک منٹ سے کم میں ہونی چاہیے")[0]
+    assert cc.parse_days(mapped, need_cue=False) == pytest.approx(1 / 1440)
+    for word, english in [("وظفوا", "hire"), ("طباخين", "cooks"), ("موظفي", "employee")]:
+        assert cc.scripts._lookup(cc.norm(word), cc.SCRIPT_TABLE) == english
+
+
+def test_a_limit_with_an_unread_word_can_reject_but_never_clears():
+    limit = ["ہم POS نہیں بدل سکتے اور کچھ"]
+    assert check("Replace the POS", cannot=limit).status == "violates"
+    v = check("Use a paper register", cannot=limit)
+    assert v.status == "unknown" and "stated limit were not read" in v.reason
+    # a bare object next to an unread word is not understood as a limit at all
+    assert check("Replace the POS system", cannot=["POS system"]).status == "violates"
+    assert check("Replace the POS system", cannot=["POS سسٹم ٹھیک"]).status == "unknown"
+
+
+def test_another_second_and_extra_are_each_one_more_person():
+    for option in [
+        "Hire another cook",
+        "Hire a second cook",
+        "Hire an extra cook",
+        "Hire an additional cook",
+    ]:
+        assert with_staff(option, "at most 1 cook").status == "ok", option
+        assert with_staff(option, "at most 0 cook").status == "violates", option
+    assert with_staff("Hire third cook", "at most 1 cook").status == "ok"
+
+
+def test_a_bare_partner_word_does_not_have_to_match():
+    limit = ["we cannot change our caterer partner"]
+    assert check("Switch the caterer", cannot=limit).status == "violates"
+    assert check("Switch the partner", cannot=limit).status != "violates"
+
+
+def test_a_limit_about_spending_rejects_buying_and_renting():
+    assert check("Buy a tablet", cannot=["we cannot spend"]).status == "violates"
+    assert check("Rent a hall", cannot=["we cannot spend"]).status == "violates"
+    assert check("Ask customers for referrals", cannot=["we cannot spend"]).status == "ok"
+
+
+def test_whole_phrases_in_three_scripts_are_read_as_ceilings_and_floors():
+    for source in ["پچاس ہزار روپے سے زیادہ نہیں", "50000 रुपये से ज़्यादा नहीं", "كحد اقصى 50000 ريال"]:
+        mapped = cc.localise_limit(source)[0]
+        assert "at most" in mapped, source
+        assert cc.parse_ceiling(mapped).value == Decimal(50000), source
+    floor = cc.localise_limit("کم از کم 2 لوگ")[0]
+    assert "at least" in floor and cc.parse_staff_limit(floor) is None
+    assert "because" in cc.localise_limit("معاہدے کی وجہ سے ہم کوریئر نہیں بدل سکتے")[0]
+    assert "per month" in cc.localise_limit("50,000 روپے مہینہ")[0]
+    assert "per month" in cc.localise_limit("لدينا 50,000 ريال في الشهر")[0]
+
+
+def test_an_arabic_no_more_than_spending_limit_is_a_ceiling():
+    budget = "لا نستطيع إنفاق أكثر من 20000 روبية"
+    assert check("اشتر نظاما 25000 روبية", budget=budget).status == "violates"
+    assert check("اشتر نظاما 15000 روبية", budget=budget).status == "ok"
+    assert "no more than" in cc.localise_limit(budget)[0]
