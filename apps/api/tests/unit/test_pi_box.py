@@ -132,3 +132,20 @@ def test_value_line_failures() -> None:
     ok, why = box.value_line({"P1": ["Count weekly", "Install a tool, step 1: open settings"]})
     assert not ok
     assert box.value_line({})[0] is False
+
+
+def test_a_problem_is_understood_from_the_shape_noted_context_really_emits():
+    from app.modules.pi.box import problem_understood
+
+    bare = {
+        "ref": "#1",
+        "title": "t",
+        "cause": "",
+        "missing": ["where", "how_often", "impact", "since"],
+    }
+    assert problem_understood(bare) is False
+    assert (
+        problem_understood({**bare, "missing": ["where", "how_often", "impact"]}) is True
+    )  # since known
+    assert problem_understood({**bare, "cause": "rent"}) is True
+    assert problem_understood({**bare, "cause_hypothesis": "rent"}) is False  # a guess never counts
