@@ -364,7 +364,9 @@ def sr08(d: DraftResult) -> CheckResult:
             continue
         ow = T.content_words(o.text)
         same = bool(ow) and any(
-            len(ow & tw) >= max(2, int(0.7 * min(len(ow), len(tw)))) for tw in tried_sets
+            len(ow & tw) >= max(2, int(0.7 * min(len(ow), len(tw))))
+            and 2 * len(ow & tw) >= len(ow | tw)
+            for tw in tried_sets
         )
         if _rel(o) == REPEATS_TRIED or same:
             bad.append(o)
