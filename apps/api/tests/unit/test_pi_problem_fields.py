@@ -186,7 +186,8 @@ def test_the_migration_is_additive_reversible_and_follows_0052():
         for p in (API / "migrations" / "versions").glob("*.py")
         if 'down_revision = "0053_pi_problem_requirements"' in p.read_text(encoding="utf-8")
     ]
-    assert followers == []  # nothing else follows 0053 (single head)
+    # 0054 is the payment idempotency key (BL-05), not a pi migration; the chain stays linear
+    assert followers == ["0054_payment_idempotency.py"]
 
 
 def test_a_fabricated_evidence_word_makes_the_cause_a_guess():

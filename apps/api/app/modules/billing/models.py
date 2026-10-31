@@ -98,6 +98,14 @@ class Payment(WorkspaceRow):
         CheckConstraint(
             "method IN (" + ", ".join(f"'{m}'" for m in PAYMENT_METHODS) + ")", name="method"
         ),
+        Index(
+            "uq_payments_idempotency",
+            "tenant_id",
+            "environment_id",
+            "idempotency_key",
+            unique=True,
+            postgresql_where=text("idempotency_key IS NOT NULL"),
+        ),
         Index("ix_payments_invoice", "tenant_id", "environment_id", "invoice_id"),
         Index("ix_payments_scope_received", "tenant_id", "environment_id", "received_on"),
     )
@@ -109,3 +117,7 @@ class Payment(WorkspaceRow):
     received_on: Mapped[date] = mapped_column(Date)
     reference: Mapped[str] = mapped_column(String(120), default="", server_default="")
     recorded_by_label: Mapped[str] = mapped_column(String(80))
+    # BL-05: the client's Idempotency-Key and a hash of the request it first came with; both NULL
+    # for a payment recorded without a key
+    idempotency_key: Mapped[str | None] = mapped_column(String(128), nullable=True)
+    request_hash: Mapped[str | None] = mapped_column(String(64), nullable=True)

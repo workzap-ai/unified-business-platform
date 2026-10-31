@@ -1,7 +1,7 @@
 from typing import Annotated, Literal
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, Query, status
+from fastapi import APIRouter, Depends, Header, Query, status
 
 from app.core.pagination import Page, Pagination
 from app.modules.access.dependencies import Session, require
@@ -72,8 +72,15 @@ async def act(
     response_model=PaymentView,
     status_code=status.HTTP_201_CREATED,
 )
-async def pay(invoice_id: UUID, data: PaymentCreate, scope: Write, session: Session) -> PaymentView:
-    payment = await BillingService(session, scope).record_payment(invoice_id, data)
+async def pay(
+    invoice_id: UUID,
+    data: PaymentCreate,
+    scope: Write,
+    session: Session,
+    idempotency_key: Annotated[str | None, Header(alias="Idempotency-Key")] = None,
+) -> PaymentView:
+    """An optional Idempotency-Key makes a repeat return the first payment and write nothing."""
+    payment = await BillingService(session, scope).record_payment(invoice_id, data, idempotency_key)
     await session.commit()
     return PaymentView.model_validate(payment)
 
