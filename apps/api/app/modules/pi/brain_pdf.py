@@ -239,6 +239,10 @@ def _blueprint(page: "_Page", blueprint: Any) -> None:
             page.bullet("Trade-off: " + str(t))
     elif rec.get("reason"):
         page.paragraph(str(rec["reason"]), 10)
+    if rec.get("why"):
+        page.paragraph("Why: " + str(rec["why"]), 10)
+    for item in rec.get("unknown") or []:
+        page.bullet("Unknown: " + str(item))
     for item in rec.get("rejected") or []:
         page.bullet(f"Left out: {item.get('option', '')}: {item.get('because', '')}")
     page.paragraph("Workflow", 10, True)

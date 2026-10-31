@@ -172,6 +172,15 @@ def build(
             "trade_offs": [t for t in top.trade_offs if t] if top else [],
             "reason": oset.no_recommendation_reason or oset.none_reason,
             "learn_first": bool(top and top.kind == bm.LEARN_FIRST),
+            "why": _why(top, oset, owner_messages),
+            "unknown": [
+                f"{o.what}: not yet checked against your limits"
+                for o in oset.options
+                if o.status != "rejected" and o.unknown_checks
+            ]
+            + list(unresolved),
+            "options_seen": len(oset.options) - 1,
+            "insufficient": len([o for o in oset.options if o.kind != bm.LEARN_FIRST]) < 2,
             "rejected": [
                 {"option": o.what, "because": o.rejected_because}
                 for o in oset.options
@@ -180,6 +189,25 @@ def build(
         },
         "unlinked_steps": [s["n"] for s in steps if not s["linked"]],
     }
+
+
+def _why(top: bm.Option | None, oset: bm.OptionSet, owner_messages: dict[str, str] | None) -> str:
+    """Why this option leads, from the record only: what it answers, how much of it the owner
+    said (verified messages), whether it is clear of the stated limits."""
+    if top is None:
+        return oset.no_recommendation_reason
+    if top.kind == bm.LEARN_FIRST:
+        return "Nothing you told us yet backs a build, so the first step is to learn more from you."
+    seen = br.strength(top, owner_messages)
+    clear = (
+        "clear of the limits you stated"
+        if not top.unknown_checks
+        else "not yet checked against all your limits"
+    )
+    return (
+        f"It answers {', '.join(top.addresses)}, rests on {seen} message(s) you wrote, "
+        f"and is {clear}."
+    )
 
 
 def options(

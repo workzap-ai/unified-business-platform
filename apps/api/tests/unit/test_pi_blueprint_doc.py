@@ -116,3 +116,19 @@ def test_pdf_renders_the_blueprint():
         content, business="B", ref="SD-1", issued=date.today(), language="en"
     )
     assert pdf.startswith(b"%PDF")
+
+
+def test_recommendation_says_why_and_what_is_unknown():
+    bp = bd.build(
+        [view("P1"), view("P2", msgs=[])],
+        [comp(["P1"]), comp(["P2"], 2)],
+        [],
+        [],
+        owner_messages={"m1": "we lose customers after three days"},
+    )
+    rec = bp["recommendation"]
+    assert rec["option"] and "message(s) you wrote" in rec["why"]
+    assert rec["insufficient"] is False and rec["options_seen"] == 2
+    assert any(
+        "no result you want" in u or "not said" in u or "result" in u for u in rec["unknown"]
+    )
