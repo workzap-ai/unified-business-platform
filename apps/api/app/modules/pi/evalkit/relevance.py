@@ -4,11 +4,15 @@ Not a quality gate and not a learning reward. Scorer agreed 55% with an independ
 the borderline set; exact-token matching after crude stemming, no negation, no numbers, limit
 keywords are fixture data.
 
-Known limits, stated so nobody reads more into a verdict than it holds: words are matched as
-exact tokens after a crude stem (ASCII tokens lose a plural "s" and are cut to five letters;
-Arabic loses a leading "ال"), so inflected Urdu, Hindi and Arabic forms do not match; there is no
-negation ("do not hire" and "hire" look alike); a numeric limit ("not above 20000") cannot be
-expressed, and numbers are matched only as whole tokens ('20000' and '200000' stay distinct).
+Known limits, stated so nobody reads more into a verdict than it holds: matching is by stem
+(`relevance_match`: English plural, -ing, -ed, -ly; Roman Urdu endings only when the case language
+is `roman_ur`; ASCII stems are cut to five letters; Arabic loses a leading "ال"), so inflected
+Urdu script, Hindi and Arabic forms still do not match and an irregular English form does not
+either. Figures such as '3 lakh', '3,00,000' and '300000' are one token. A numeric ceiling in a
+limit's text ('cannot spend more than 20000 rupees', 'up to 2 lakh') is compared as a number with
+the idea's money figures; 'cannot buy X' and 'tried X before and it failed' texts are read as verb
+plus object. Spelled-out numbers, floors ('at least'), negation inside an idea ("do not hire"
+still looks like "hire") and verbs outside the listed groups are not understood.
 
 A plan case carries the owner's brief and candidate ideas with an expected verdict. For each
 idea this module computes one of five verdicts from the text alone:
@@ -34,6 +38,7 @@ import re
 from typing import Any
 
 from app.modules.pi.evalkit import access_log, scorers, splits
+from app.modules.pi.evalkit import relevance_match as match
 
 VERDICTS = ("relevant", "irrelevant", "generic", "violates_constraint", "restates_owner")
 DISCLAIMER = (
@@ -91,7 +96,8 @@ _GENERIC = {
 # Numbers are standalone figures only: digits inside a word ('B2B', 'Q3', '24x7', 'order_1234')
 # stay in it. Separators are read like this: Indian lakh grouping ('1,00,000', '20,00,000') and
 # Western grouping ('20,000', '1,200,000') are one number each ('100000', '2000000', '20000',
-# '1200000'); a list of 3-digit numbers ('120,150,180') stays three tokens; a single comma before
+# '1200000'); a list of 3-digit numbers ('120,150,180') stays three tokens,
+# but one ending in 000 ('250,500,000') is one grouped figure; a single comma before
 # one or two digits is a decimal comma ('1,5' becomes '1.5'); '1.5' stays; 'Rs.20000' gives 'rs'
 # and '20000'. A token made only of zeros is never kept, so two lakh figures cannot link through
 # '00000'.
@@ -116,7 +122,7 @@ def _number_tokens(raw: str) -> list[str]:
     groups = whole.split(",")
     if len(groups) == 2 and len(groups[1]) < 3:
         return [f"{groups[0]}.{groups[1]}"]  # a decimal comma
-    is_list = len(groups[0]) == 3 and len(groups) >= 3 and any(g != "000" for g in groups[1:])
+    is_list = len(groups[0]) == 3 and len(groups) >= 3 and groups[-1] != "000"
     if is_list:
         return [g for g in groups if g.strip("0")]  # '120,150,180' stays three numbers
     return ["".join(groups) + dot + fraction]
@@ -134,13 +140,12 @@ def tokens(text: str) -> list[str]:
     return [t for t in out if not (len(t) > 1 and t.isdigit() and not t.strip("0"))]
 
 
-def _stem(token: str) -> str:
+def _stem(token: str, language: str | None = None, full: bool = False) -> str:
     if any(ch.isdigit() for ch in token):
         return token  # a figure is never truncated: '20000' and '200000' stay distinct
     if token.isascii():
-        if token.endswith("s") and len(token) > 3:
-            token = token[:-1]
-        return token[:5]
+        whole = match.stem_ascii(token, language, full)
+        return whole if full else whole[:5]
     if token.startswith("ال") and len(token) > 3:
         return token[2:]
     return token
@@ -154,39 +159,106 @@ def _keep(token: str) -> bool:
     return len(token) >= (3 if token.isascii() else 2)
 
 
-def stems(text: str) -> set[str]:
-    return {_stem(t) for t in tokens(text) if _keep(t)}
+def stems(text: str, language: str | None = None, full: bool = False) -> set[str]:
+    """Content stems. Magnitude figures are folded first ('3 lakh', '3,00,000' and '300000' are
+    one token); English words lose plural, -ing, -ed and -ly, and with language 'roman_ur' the
+    common Roman Urdu endings go too. The default (soft) stem of an ASCII word is cut to five
+    letters and is used for overlap only; `full=True` keeps the whole stem and is the only space
+    in which an idea is rejected (`violated`)."""
+    return {_stem(t, language, full) for t in tokens(match.fold_magnitudes(text)) if _keep(t)}
 
 
-def _vocab(brief: dict[str, Any], problem: str | None) -> tuple[set[str], set[str]]:
-    """(the owner's own words about the problem, the other stated facts)."""
+def _full_stems(text: str, language: str | None) -> set[str]:
+    """Full stems for matching a rule; verbs the stop list drops ('give', 'use', 'make') stay."""
+    return {
+        _stem(t, language, True)
+        for t in tokens(match.fold_magnitudes(text))
+        if _keep(t) or t in match.RULE_VERBS
+    }
+
+
+def _soft(token: str) -> str:
+    return token if token.isdigit() or not token.isascii() else token[:5]
+
+
+def _vocab(
+    brief: dict[str, Any], problem: str | None, language: str | None = None
+) -> tuple[set[str], set[str]]:
+    """(the owner's own words about the problem, the other stated facts). The objects of a
+    confirmed 'cannot VERB OBJECT' limit count as stated facts: the owner raised them."""
     problems = brief.get("problems") or []
     chosen = [p for p in problems if p.get("id") == problem] or problems
     owner: set[str] = set()
     facts: set[str] = set()
     for p in chosen:
-        owner |= stems(" ".join([p.get("title", ""), *p.get("user_words", [])]))
-        facts |= stems(" ".join([*p.get("facts", []), *p.get("figures", [])]))
-    facts |= stems(" ".join([*brief.get("roles", []), *brief.get("systems", [])]))
+        owner |= stems(" ".join([p.get("title", ""), *p.get("user_words", [])]), language)
+        facts |= stems(" ".join([*p.get("facts", []), *p.get("figures", [])]), language)
+        for limit in p.get("constraints") or []:
+            if limit.get("status", "confirmed") == "confirmed":
+                # the object of a confirmed 'cannot VERB OBJECT' limit is something the owner
+                # stated, so an idea that reuses it ('rent a feed mill') reuses a stated fact
+                for rule in match.parse_rules(str(limit.get("text", "")), language, _full_stems):
+                    if rule.kind == "neg":
+                        facts |= {_soft(o) for o in rule.objects}
+    facts |= stems(" ".join([*brief.get("roles", []), *brief.get("systems", [])]), language)
     return owner, facts - owner
 
 
-def violated(brief: dict[str, Any], idea: set[str]) -> str | None:
-    """The first CONFIRMED limit the idea breaks; an assumed limit never rejects an idea."""
+def _said_amounts(brief: dict[str, Any], owner_text: str) -> set[tuple[float, float, str]]:
+    texts = [owner_text]
+    for p in brief.get("problems") or []:
+        texts += [p.get("title", ""), *p.get("user_words", []), *p.get("facts", [])]
+        texts += list(p.get("figures", []))
+    return match.said_amounts(texts)
+
+
+def violated(
+    brief: dict[str, Any],
+    idea: set[str],
+    language: str | None = None,
+    text: str = "",
+    owner_text: str = "",
+) -> str | None:
+    """The first CONFIRMED limit the idea breaks; an assumed limit never rejects an idea.
+
+    A limit is broken by (1) one of its `blocks` phrases, unless the phrase is the object of the
+    limit's own 'cannot VERB OBJECT' text and the idea uses a milder verb ('rent' against 'cannot
+    buy'); (2) the verb group and object of a 'cannot VERB OBJECT' text; (3) the object of a
+    'tried X before and it failed' text; (4) a figure above a numeric ceiling in the limit's text.
+    All word matching here is in the full stem space of the idea's raw `text` (never the
+    five-letter prefix); `idea`, the soft stems, is used only when no text is given."""
+    full = _full_stems(text, language) if text else idea
+    verbs = _full_stems(match.drop_noun_homographs(text), language) if text else idea
+    said = _said_amounts(brief, owner_text)
     for problem in brief.get("problems") or []:
         for limit in problem.get("constraints") or []:
             if limit.get("status", "confirmed") != "confirmed":
                 continue
+            reason = str(limit.get("text", ""))
+            rules = match.parse_rules(reason, language, _full_stems)
+            if any(match.rule_hit(r, full, verbs) for r in rules):
+                return reason
             for phrase in limit.get("blocks") or []:
-                need = stems(phrase)
-                if need and need <= idea:
-                    return str(limit.get("text", ""))
+                need = _full_stems(phrase, language)
+                if need and need <= full:
+                    own = [
+                        r for r in rules if match.rule_alternative(r, full) and need <= r.objects
+                    ]
+                    if not own:
+                        return reason
+            for ceiling in match.ceilings_of(reason, str(limit.get("kind", ""))):
+                if match.over_ceiling(text, ceiling, said):
+                    return reason
     return None
 
 
 def _generic(language: str | None, idea: set[str]) -> bool:
-    banks = [_GENERIC[language]] if language in _GENERIC else list(_GENERIC.values())
-    return any((need := stems(marker)) and need <= idea for bank in banks for marker in bank)
+    keys = [language] if language in _GENERIC else list(_GENERIC)
+    return any(
+        (need := stems(marker, language)) and need <= idea
+        for key in keys
+        for marker in _GENERIC[key]
+    )
 
 
 def score_candidate(
@@ -196,12 +268,12 @@ def score_candidate(
     owner_text: str = "",
     language: str | None = None,
 ) -> dict[str, Any]:
-    idea = stems(text)
-    owner, facts = _vocab(brief, problem)
+    idea = stems(text, language)
+    owner, facts = _vocab(brief, problem, language)
     link = len(idea & owner)
     reuse = len(idea & facts)
-    broken = violated(brief, idea)
-    said = owner | facts | stems(owner_text)
+    broken = violated(brief, idea, language, text, owner_text)
+    said = owner | facts | stems(owner_text, language)
     repeats = len(idea) >= RESTATE_MIN_WORDS and len(idea & said) / len(idea) >= RESTATE_RATIO
     if broken is not None:
         verdict = "violates_constraint"

@@ -126,8 +126,14 @@ def borderline_section(access_log_path: str | Path | None, who: str, why: str) -
     found = relevance_calibration.borderline_comparison(relevance_calibration.Access(log, who, why))
     rows = found["development"]
     diff = [r for r in rows if not r["agree"]]
+    same = len(rows) - len(diff)
     out = [
         "## Borderline set: scorer against agent-drafted labels (not human labels)",
+        "",
+        f"Current scorer: {same} of {len(rows)} Development candidates carry the same verdict as "
+        "the agent-drafted label. The 55% in the standing note at the top of this report is the "
+        "figure measured on the earlier scorer and is kept as written; these labels are not "
+        "human labels and no threshold is applied here.",
         "",
         f"Development: {len(rows)} candidates, the scorer differs on {len(diff)}. Held-out: "
         f"{found['held_out_candidates']} candidates counted only (not scored, no labels "

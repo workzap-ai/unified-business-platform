@@ -185,3 +185,7 @@ still depart from the spec text named in the table; the revert points say how to
 Related test changes with their reasons: G9 no longer expects a summary after the cost answer (19.7:
 never as a reply to a question); the push-for-a-fix test without solution mode now expects the 19.6
 no-idea line, one question last (19.7 forbids the old summary fallback).
+
+## B2a (migration 0053) known gaps
+
+| B2a (migration 0053) | third-party names inside constraints, tried and cause text are best effort (`third_party.protect` has documented false negatives); `owner_said` for a cause is unreachable until `service_conversation.note_problems` passes the owner's message as `owner_text` (a 1-2 line follow-up there, once the lane that owns that file has merged): the evidence corpus is only `owner_text`, so today every cause is `pi_inferred` (fail closed) | `problem_fields.merge_cause`, `said_by_owner` | `test_pi_problem_fields.py`, `test_pi_problem_requirements_db.py` | open: wiring |

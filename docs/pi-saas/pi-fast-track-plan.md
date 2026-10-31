@@ -117,7 +117,7 @@ is reported to the owner at once (G3); nothing is changed in production by any a
 | # | Decision | Recommendation |
 |---|---|---|
 | D1 | Merge policy: one integrator, fast-forward only, in the order above | yes |
-| D2 | B2 field set: constraints (budget, staff, deadline, cannot-change), tried (what, outcome), cause (status, source, evidence) as JSONB columns on `pi_problems` | yes, one migration `0053` |
+| D2 | B2 field set: constraints (budget, staff, deadline, cannot-change), tried (what, outcome), cause (status, source, evidence) as JSONB columns on `pi_problems` | yes, one migration `0053`. Amendment A1 (four columns: `cause.source` dropped, `expected_outcome` added; evidence is `msgs` plus `words`) approved by the owner delegating recommended decisions, 2026-10-31. A2 (business-wide budget and staff) stays with S6, not B2a |
 | D3 | S6 as S6-a (reuse `memory_block`, no new table) first; a new table only if S6-a is not enough | S6-a |
 | D4 | Approve B4 and C4 to start after B2/S6/C1 merge | yes, later |
 | D5 | Thresholds S1 to S7, T1 to T11, language scope, industry standard | approve or change |

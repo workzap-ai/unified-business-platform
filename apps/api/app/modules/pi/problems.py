@@ -14,10 +14,10 @@ from typing import Any, Literal
 from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field
-from sqlalchemy import func, select
+from sqlalchemy import func, inspect, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.modules.pi import business, figure_correction, part19, taxonomy
+from app.modules.pi import business, figure_correction, part19, problem_fields, taxonomy
 from app.modules.pi.language import amount_value, date_estimate
 from app.modules.pi.problem_models import (
     PiProblem,
@@ -32,6 +32,7 @@ TITLE_WORDS = 8
 SUMMARY_LINE_WORDS = 10
 SUMMARY_TRIGGER = 7  # problems since the last summary that make pi offer one
 MAX_USER_WORDS = 6
+REQUIREMENT_COLUMNS = ("constraints", "tried", "cause", "expected_outcome")
 FIELD_LIMITS = {"summary": 400, "workaround": 400, "trigger": 200, "who_notices": 200}
 
 # Blame and judgement words never go in a title (R, spec 4.3).
@@ -103,6 +104,17 @@ class ProblemNote(BaseModel):
     who_notices: str = ""
     believes_cause: str = ""
     requested_solution: str = ""
+    # B2a: empty means not said. Only what the owner said; a guess is never written as said.
+    budget: str = ""
+    staff: str = ""
+    deadline: str = ""
+    cannot_change: list[str] = Field(default_factory=list)
+    cannot_change_remove: list[str] = Field(default_factory=list)  # text, or "#2" (position)
+    tried: list[dict[str, Any]] = Field(default_factory=list)  # {"what", "outcome"}
+    cause_text: str = ""
+    cause_said: bool = False  # True only when the owner said the cause in their own words
+    cause_words: list[str] = Field(default_factory=list)  # their words that say it (evidence)
+    expected_outcome: str = ""
     tags: list[str] = Field(default_factory=list)
     confidence: float = Field(default=0.8, ge=0, le=1)
 
@@ -471,8 +483,94 @@ class ProblemBook:
         problem.severity_score = score
         problem.severity_inferred = taxonomy.severity_band(score)
 
+    @staticmethod
+    def carries_requirements(note: ProblemNote) -> bool:
+        return bool(
+            note.budget
+            or note.staff
+            or note.deadline
+            or note.cannot_change
+            or note.cannot_change_remove
+            or note.tried
+            or note.cause_text
+            or note.expected_outcome
+        )
+
+    async def load_requirements(self, problem: PiProblem) -> None:
+        """The four deferred columns, loaded now (an async session cannot lazy-load them)."""
+        unloaded = set(inspect(problem).unloaded) & set(REQUIREMENT_COLUMNS)
+        if unloaded:
+            await self.session.refresh(problem, sorted(unloaded))
+
+    @staticmethod
+    def requirement_values(
+        note: ProblemNote,
+        problem: PiProblem | None,
+        message_id: UUID | None,
+        owner_text: str | None = None,
+    ) -> tuple[dict[str, Any], bool]:
+        """B2a: the new column values a note carries (only those it says), and whether the
+        redactor changed any text. Nothing is returned for a note that carries none of them."""
+        msg = str(message_id) if message_id else None
+        values: dict[str, Any] = {}
+        changed = False
+        constraints, was = problem_fields.merge_constraints(
+            problem.constraints if problem else None,
+            note.budget,
+            note.staff,
+            note.deadline,
+            note.cannot_change,
+            msg,
+            note.cannot_change_remove,
+        )
+        changed = changed or was
+        if constraints is not None:
+            values["constraints"] = constraints
+        tried, was = problem_fields.merge_tried(problem.tried if problem else None, note.tried, msg)
+        changed = changed or was
+        if tried is not None:
+            values["tried"] = tried
+        cause, was = problem_fields.merge_cause(
+            problem.cause if problem else None,
+            note.cause_text,
+            note.cause_said,
+            note.cause_words,
+            msg,
+            owner_text or "",  # only the owner's message: model-written words prove nothing
+        )
+        changed = changed or was
+        if cause is not None:
+            values["cause"] = cause
+            if cause["status"] in problem_fields.OWNER_STATUSES and not note.believes_cause.strip():
+                # the older column keeps the owner's belief only; a guess never goes there
+                values["person_believes_cause"] = redact(cause["text"][:300])[0]
+        outcome, was = problem_fields.clean(note.expected_outcome, problem_fields.OUTCOME_CAP)
+        changed = changed or was
+        if outcome and (problem is None or problem.expected_outcome != outcome):
+            values["expected_outcome"] = outcome
+        return values, changed
+
+    async def confirm_cause(self, problem: PiProblem) -> bool:
+        """The owner agreed with the cause they said: `owner_said` becomes `confirmed`. A cause pi
+        only guessed, or none, is never confirmed (returns False). No caller exists yet: a future
+        caller needs an explicit agreement (R-DEC style, the owner's own clear yes to this cause),
+        never "ok", "hmm", "maybe" or "let me think"."""
+        await self.load_requirements(problem)
+        confirmed = problem_fields.confirmed_cause(problem.cause)
+        if confirmed is None:
+            return False
+        diff = {"cause": [json_safe(problem.cause), json_safe(confirmed)]}
+        problem.cause = confirmed
+        problem.revision += 1
+        await self._revise(problem, diff, "cause_confirmed", "person")
+        return True
+
     async def create(
-        self, note: ProblemNote, message_id: UUID | None, conversation_id: UUID | None
+        self,
+        note: ProblemNote,
+        message_id: UUID | None,
+        conversation_id: UUID | None,
+        owner_text: str | None = None,
     ) -> tuple[PiProblem, bool]:
         """A new problem, or (when the same title is already noted) its enrichment."""
         title = clean_title(note.title)
@@ -499,6 +597,7 @@ class ProblemBook:
                     note.model_copy(update={"title": "", "title_local": ""}),
                     "enrichment",
                     message_id,
+                    owner_text,
                 )
                 return existing, False
         words, redacted = _words(note.user_words)
@@ -507,6 +606,7 @@ class ProblemBook:
         if category == taxonomy.OTHER and "taxonomy_review" not in tags:
             tags.append("taxonomy_review")
         group = await self.group_for(category)
+        required, required_redacted = self.requirement_values(note, None, message_id, owner_text)
         problem = self.problems.new(
             customer_id=self.customer_id,
             conversation_id=conversation_id,
@@ -548,14 +648,16 @@ class ProblemBook:
             current_workaround=note.workaround.strip()[: FIELD_LIMITS["workaround"]],
             systems_mentioned=[s[:60] for s in note.systems[:8]],
             who_notices=note.who_notices.strip()[: FIELD_LIMITS["who_notices"]],
-            person_believes_cause=redact(note.believes_cause.strip()[:300])[0],
+            person_believes_cause=required.pop("person_believes_cause", None)
+            or redact(note.believes_cause.strip()[:300])[0],
             requested_solution=redact(note.requested_solution.strip()[:300])[0],
             status="draft",
             confidence=Decimal(str(round(note.confidence, 2))),
             source_message_ids=[str(message_id)] if message_id else [],
             revision=1,
-            pii_redacted=redacted,
+            pii_redacted=redacted or required_redacted,
             language=self.language,
+            **required,
         )
         self._score(problem)
         await self.problems.add(problem)
@@ -563,7 +665,12 @@ class ProblemBook:
         return problem, True
 
     async def update(
-        self, problem: PiProblem, note: ProblemNote, reason: str, message_id: UUID | None
+        self,
+        problem: PiProblem,
+        note: ProblemNote,
+        reason: str,
+        message_id: UUID | None,
+        owner_text: str | None = None,
     ) -> bool:
         """Apply what the note says; returns whether anything changed."""
         diff: dict[str, Any] = {}
@@ -641,6 +748,15 @@ class ProblemBook:
             put("systems_mentioned", sorted({*problem.systems_mentioned, *note.systems[:8]}))
         if note.believes_cause.strip():
             put("person_believes_cause", redact(note.believes_cause.strip()[:300])[0])
+        if self.carries_requirements(note):
+            await self.load_requirements(problem)
+            required, required_redacted = self.requirement_values(
+                note, problem, message_id, owner_text
+            )
+            for name, value in required.items():
+                put(name, value)
+            if required_redacted:
+                put("pii_redacted", True)
         if note.requested_solution.strip():
             put("requested_solution", redact(note.requested_solution.strip()[:300])[0])
         if message_id and str(message_id) not in problem.source_message_ids:
@@ -765,6 +881,7 @@ async def apply_ops(
     language: str,
     link_min: Decimal = Decimal(0),
     figure_fix: tuple[str, str] | None = None,
+    owner_text: str | None = None,
 ) -> Applied:
     """Apply the model's ops in order. Bad ones are skipped and listed, never raised.
 
@@ -777,7 +894,7 @@ async def apply_ops(
     for op in ops:
         try:
             if op.op == "create" and op.note and op.note.title.strip():
-                problem, fresh = await book.create(op.note, message_id, conversation_id)
+                problem, fresh = await book.create(op.note, message_id, conversation_id, owner_text)
                 (result.created if fresh else result.updated).append(problem)
                 refs[short_ref(problem.id)] = problem
                 if fresh and problem.category == taxonomy.OTHER:
@@ -790,6 +907,7 @@ async def apply_ops(
                     op.note,
                     "correction" if op.reason == "correction" else "enrichment",
                     message_id,
+                    owner_text,
                 )
                 if changed:
                     result.updated.append(refs[op.ref])
@@ -805,7 +923,7 @@ async def apply_ops(
                 original.revision += 1
                 await book._revise(original, {"status": ["draft", "split"]}, "split", "pi")
                 for note in op.notes:
-                    problem, _ = await book.create(note, message_id, conversation_id)
+                    problem, _ = await book.create(note, message_id, conversation_id, owner_text)
                     result.created.append(problem)
                     refs[short_ref(problem.id)] = problem
                 result.split.append(original)
