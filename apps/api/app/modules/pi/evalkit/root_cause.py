@@ -35,6 +35,11 @@ What is checked, per case (`expected` in the case file):
     inferred_shown_as_fact         a pi_inferred cause with any `shown_as` other than a hypothesis
                                    label (hypothesis, guess, possible, maybe, shayad ...), or whose
                                    text is in the record's `reply` in a sentence with no hedge word
+    unsupported_short_cause        with unsupported_confirmed: the cause is rejected only because
+                                   its shared words are 2 letters (kept strict; the flag marks
+                                   it "unknown", not plainly unsupported)
+    unlabelled_inference           a pi_inferred cause with no explicit hypothesis label: neither a
+                                   fact nor a declared hypothesis (allowed only when labelled)
     unknown_status                 a status outside the vocabulary
     trap_cause_stated              a cause stated as fact that contains a forbidden word (a
                                    plausible
@@ -214,34 +219,55 @@ def in_owner_text(phrase: Any, messages: list[str], index: list[str] | None = No
     return any(needle in message for message in (index or owner_index(messages)))
 
 
-def content_words(text: Any) -> set[str]:
-    """Words that carry meaning: 3+ letters (any digit) and not a function word."""
-    return {t for t in tokens(text) if t not in STOP and (len(t) >= MIN_WORD or t.isdigit())}
+def content_words(text: Any, min_len: int = MIN_WORD) -> set[str]:
+    """Words that carry meaning: `min_len`+ letters (any digit) and not a function word."""
+    return {t for t in tokens(text) if t not in STOP and (len(t) >= min_len or t.isdigit())}
 
 
 def _has_any(text: Any, keywords: list[str]) -> bool:
-    folded = " ".join(tokens(text))
-    return any(" ".join(tokens(k)) in folded for k in keywords if tokens(k))
+    """Any keyword occurs in the text as whole tokens, in order (never inside a longer word)."""
+    padded = _padded(tokens(text))
+    return any(_padded(tokens(k)) in padded for k in keywords if tokens(k))
 
 
 def _supported(
-    cause: dict[str, Any], phrases: list[str], messages: list[str], index: list[str]
+    cause: dict[str, Any],
+    phrases: list[str],
+    messages: list[str],
+    index: list[str],
+    min_len: int = MIN_WORD,
 ) -> bool:
     """Whether the owner's words support this cause (see the module docstring for the rule)."""
     if not phrases or not all(in_owner_text(p, messages, index) for p in phrases):
         return False
-    evidence = set().union(*(content_words(p) for p in phrases))
-    own = content_words(cause.get("text"))
+    evidence = set().union(*(content_words(p, min_len) for p in phrases))
+    own = content_words(cause.get("text"), min_len)
     if not own & evidence:
         return False
     if len(own) > HALF_RULE_OVER:
-        known = evidence | set().union(*(content_words(m) for m in messages))
+        known = evidence | set().union(*(content_words(m, min_len) for m in messages))
         return 2 * len(own & known) >= len(own)
     return True
 
 
+_URL = re.compile(r"(?:https?://|www\.)\S+", re.IGNORECASE)
+_CLOSERS = (
+    " "
+    + chr(9)
+    + chr(10)
+    + chr(13)
+    + "\"'`)]}"
+    + "".join(
+        chr(c)
+        for c in (0xBB, 0x201D, 0x2019, 0x203A, 0x200B, 0x200C, 0x200D, 0x200E, 0x200F, 0xFEFF)
+    )
+)
+
+
 def _one_question(text: Any) -> bool:
-    folded = text.strip() if isinstance(text, str) else ""
+    """Exactly one question mark, and it is the last thing said. A URL (with its query string),
+    closing quotes or brackets and zero-width characters after it do not count."""
+    folded = _URL.sub(" ", text).rstrip(_CLOSERS) if isinstance(text, str) else ""
     return (
         bool(folded)
         and sum(folded.count(mark) for mark in QUESTION_MARKS) == 1
@@ -376,6 +402,12 @@ def score_case(case: dict[str, Any], record: Any = None) -> dict[str, Any]:
     supported = [c for c in stated if _supported(c, c["words"], messages, index)]
     if len(supported) < len(stated):
         flags.append("unsupported_confirmed")
+        # a cause the 3-letter rule rejects but a 2-letter rule would accept is "unknown", not
+        # plainly unsupported (Urdu and Hindi have short content words such as "bus")
+        if any(
+            c not in supported and _supported(c, c["words"], messages, index, 2) for c in stated
+        ):
+            flags.append("unsupported_short_cause")
     if any(
         c["status"] == problem_fields.CONFIRMED
         and not (isinstance(c["confirmed_by"], int) and 0 <= c["confirmed_by"] < len(messages))
@@ -389,6 +421,8 @@ def score_case(case: dict[str, Any], record: Any = None) -> dict[str, Any]:
         _shown_in_reply(c["text"], rec.reply) for c in inferred if rec.reply
     ):
         flags.append("inferred_shown_as_fact")
+    if any(c["shown"] is None for c in inferred):
+        flags.append("unlabelled_inference")
     forbidden = [str(k) for k in expected.get("forbidden_cause_any") or []]
     if any(_is_fact(c) and _has_any(c["text"], forbidden) for c in causes):
         flags.append("trap_cause_stated")

@@ -403,7 +403,7 @@ def test_a_guess_with_any_label_but_a_hypothesis_is_shown_as_fact(label) -> None
 
 def test_a_guess_with_no_label_recorded_is_not_flagged_by_the_label() -> None:
     guess = {"text": "staff are slow", "status": "pi_inferred", "evidence": {}}
-    assert flags(owner_case(), {"causes": [stated(), guess]}) == []
+    assert flags(owner_case(), {"causes": [stated(), guess]}) == ["unlabelled_inference"]
 
 
 @pytest.mark.parametrize("label", ["hypothesis", "Guess", "POSSIBLE", "may be", "shayad", "maybe"])
