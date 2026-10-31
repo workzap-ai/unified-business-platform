@@ -61,7 +61,7 @@ PARK = re.compile(
 )
 # Words that mean a link on the map, never a web link: needed when no problem is named.
 STRONG_LINK = re.compile(
-    r"(?:jor+|jarr|jarh|taalluq|taaluq|rishta|arrow|connection)|جوڑ|الرابط|الربط"
+    r"\b(?:jor+|jarr|jarh|taalluq|taaluq|rishta|arrow|connection)\b|جوڑ|الرابط|الربط"
 )
 # a problem, not an open question: the owner is talking about the problem
 PROBLEMISH = re.compile(
