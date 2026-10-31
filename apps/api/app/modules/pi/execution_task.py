@@ -10,6 +10,9 @@ Held here:
   check, a named human verifier. A model statement is never evidence.
 - A task cannot be approved without a rollback plan; a rolled-back task carries a recovery record.
 - `check_can_execute` is fail-closed and never raises.
+- Seals are keyed HMACs: PRODUCTION MUST set PI_EXECUTION_SEAL_KEY (see execution_scope). Callers MUST record
+  the id of every per-action approval as consumed after the action and pass `consumed_approvals` and `used`
+  to the gate; the gate itself keeps no state, so without them there is no replay or limit protection.
 """
 
 from __future__ import annotations
@@ -452,11 +455,6 @@ def _dependency_issues(task: Task, states: Any) -> list[str]:
 
 # ---- actions and bounded authority --------------------------------------------------------------
 
-_SECRET_KEY = re.compile(
-    r"card|cvv|cvc|passw|passcode|otp|pin_?code|iban|account_?n|cnic|national_?id|ssn|secret|token|expiry|routing|swift",
-    re.IGNORECASE,
-)
-
 
 @dataclass(frozen=True)
 class ActionRequest:
@@ -490,31 +488,50 @@ def action_sha(action: ActionRequest) -> str:
 
 
 def _param_issue(obj: Any) -> str | None:
-    """Bounded walk: no secrets, card numbers or oversize payloads in action parameters."""
+    """Bounded walk: no secrets, card numbers or oversize payloads in action parameters. Leaves are
+    collected in document order so a card split across two values (or a key and a value) is still seen:
+    the joined record is screened as one text, and the digits of all mostly-numeric leaves are summed."""
     stack: list[tuple[Any, int]] = [(obj, 0)]
     nodes = chars = 0
+    leaves: list[str] = []
     while stack:
         cur, depth = stack.pop()
         nodes += 1
         if nodes > MAX_PARAM_NODES or depth > MAX_PARAM_DEPTH:
             return "action parameters are too large or too deep"
         if isinstance(cur, Mapping):
-            for k, v in cur.items():
+            pairs = list(cur.items())
+            for k, _v in pairs:
                 if not isinstance(k, str):
                     return "parameter names must be text"
-                if _SECRET_KEY.search(k) or audit.looks_secret(k):
+                if audit.secret_key_name(k):
                     return "action parameters carry card, password or ID data"
+            for k, v in reversed(pairs):
                 stack.append((v, depth + 1))
+                stack.append((k, depth + 1))
         elif isinstance(cur, (list, tuple)):
-            stack.extend((v, depth + 1) for v in cur)
+            stack.extend((v, depth + 1) for v in reversed(cur))
         elif isinstance(cur, str):
             chars += len(cur)
             if chars > MAX_PARAM_CHARS:
                 return "action parameters are too large or too deep"
             if audit.has_card_like(cur, 13) or audit.looks_secret(cur):
                 return "action parameters carry card, password or ID data"
-        elif not isinstance(cur, (int, float, bool)) and cur is not None:
+            leaves.append(cur)
+        elif isinstance(cur, (int, float)) and not isinstance(cur, bool):
+            leaves.append(str(abs(cur)))
+        elif not isinstance(cur, bool) and cur is not None:
             return "action parameters must be plain data"
+    joined = " ".join(leaves)
+    if audit.has_card_like(joined, 13) or audit.looks_secret(joined):
+        return "action parameters carry card, password or ID data"
+    numeric_digits = 0
+    for leaf in leaves:
+        d = sum(1 for c in leaf if c.isdigit())
+        if d and d * 5 >= len(leaf) * 4:
+            numeric_digits += d
+    if numeric_digits >= 13:
+        return "action parameters carry card, password or ID data"
     return None
 
 

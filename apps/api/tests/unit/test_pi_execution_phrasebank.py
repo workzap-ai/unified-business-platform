@@ -251,7 +251,7 @@ TRUE_YES: dict[str, list[str]] = {
         "Yes I approve this scope",
         "ok, go ahead",
         "Proceed",
-        "Approve the plan",
+        "I approve the plan",
         "Confirmed, thanks",
         "We approve",
         "Go ahead sir",

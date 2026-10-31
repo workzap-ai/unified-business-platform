@@ -21,6 +21,8 @@ Forgery. An ApprovedScope carries a keyed HMAC seal. The key is `PI_EXECUTION_SE
 least 16 characters) or, when unset, a random per-process key. Only `create_scope` can produce a valid
 seal, so a directly constructed object fails `is_intact`. Anything that is stored and read back (a later
 persistence layer) needs the same key held on the server, otherwise stored scopes will not verify.
+PRODUCTION MUST set PI_EXECUTION_SEAL_KEY: with the per-process random fallback, seals do not survive a
+restart and differ between workers.
 """
 
 from __future__ import annotations
@@ -104,12 +106,13 @@ def _norm(text: str) -> str:
     out = []
     for ch in t:
         o = ord(ch)
-        if 0x064B <= o <= 0x065F or o in (0x0670, 0x0640, 0x200C, 0x200D, 0x200E, 0x200F):
+        if 0x064B <= o <= 0x065F or o in (0x0670, 0x0640, 0x200C, 0x200D, 0x200E, 0x200F, 0x093C):
             continue  # Arabic marks, tatweel, joiners
         out.append(ch)
     t = "".join(out)
     for a in "أإآٱ":
         t = t.replace(a, "ا")
+    t = t.replace("\u0901", "\u0902")
     return t.replace("ى", "ي").replace("ك", "ک").replace("ھ", "ہ")
 
 
@@ -162,21 +165,37 @@ _FORWARD = _words(
 )
 _QUOTE_CHARS = frozenset('"“”„‟«»‹›「」`´')
 _QUESTION = ("?", "؟", "？")
-_PUNCT_OK = frozenset(",.!،۔؛-")
+_PUNCT_OK = frozenset(",.!،۔؛-–—")
 
-_FILLERS = _words(
-    "please kindly yes yep yeah ok okay sure thanks thankyou it this that the scope plan task action sir madam bhai sahab sahib "
-    "ji jee haan han haa ha hanji ye yeh isko isay iske is ko "
-    "ہاں جی یہ اسے اس کو شکریہ "
-    "हाँ हां जी यह इसे इसको धन्यवाद "
-    "نعم هذا ذلك شكرا"
+# Object words are stripped before matching ("I approve this", "main ye approve karta hoon").
+_OBJECTS = _words(
+    "it this that ye yeh isko isay ise the plan scope task work action یہ اسے اس यह इसे इसको هذا ذلك"
 )
-_CORES = _phrases(
-    [
-        # English
+_FILLERS = _words(
+    "please kindly yes yep yeah ok okay sure hereby absolutely certainly sir madam bhai sahab sahib "
+    "thanks thankyou shukriya shukria meherbani mehrbani ji jee haan han haa ha hanji bilkul zaroor "
+    "ہاں جی شکریہ مہربانی بالکل "
+    "हाँ हां जी धन्यवाद शुक्रिया बिल्कुल "
+    "نعم شكرا بالتاكيد على"
+)
+_NAME_INTRO = _words("thanks regards from shukriya shukria")
+_AS_REF = _words("written shown described presented stated above attached")
+_DANGER = _words(
+    "delete remove erase wipe drop send email mail message pay payment refund transfer publish deploy cancel everything all more also "
+    "plus too bigger another other new extra production live database customers customer everyone"
+)
+
+
+def _strip_objects(toks: list[str]) -> tuple[str, ...]:
+    return tuple(t for t in toks if t not in _OBJECTS)
+
+
+_CORES = frozenset(
+    _strip_objects(_tokens(p))
+    for p in [
+        # English ("approve" alone is deliberately NOT here: it is also the command and the question word)
         "i approve",
         "we approve",
-        "approve",
         "approved",
         "go ahead",
         "go on",
@@ -194,10 +213,17 @@ _CORES = _phrases(
         "we authorize",
         "authorised",
         "authorized",
-        "do it",
         "i give my approval",
         "approval given",
         "go ahead and proceed",
+        "i hereby approve",
+        "we hereby approve",
+        "i hereby authorise",
+        "i hereby authorize",
+        "i authorise you to go ahead",
+        "i authorize you to go ahead",
+        "i authorise you to proceed",
+        "i authorize you to proceed",
         # Roman Urdu
         "kar do",
         "kar den",
@@ -220,6 +246,11 @@ _CORES = _phrases(
         "ijazat hai",
         "main manzoor karta hoon",
         "main manzoor karti hoon",
+        "mujhe manzoor hai",
+        "main ijazat deta hoon",
+        "main ijazat deti hoon",
+        "ijazat deta hoon",
+        "ijazat deti hoon",
         # Urdu
         "منظور ہے",
         "منظور",
@@ -233,6 +264,9 @@ _CORES = _phrases(
         "میں منظوری دیتی ہوں",
         "میں منظور کرتا ہوں",
         "میں منظور کرتی ہوں",
+        "میں اجازت دیتا ہوں",
+        "میں اجازت دیتی ہوں",
+        "مجھے منظور ہے",
         # Hindi
         "कर दो",
         "कर दीजिए",
@@ -246,12 +280,16 @@ _CORES = _phrases(
         "स्वीकृत है",
         "अनुमति है",
         "मैं मंज़ूरी देता हूँ",
+        "मैं मंजूरी देता हूं",
         "मैं मंजूरी देती हूं",
+        "मैं मंज़ूरी देती हूँ",
         "मैं स्वीकृति देता हूँ",
         "मैं स्वीकृति देती हूँ",
-        "मैं मंजूरी देता हूँ",
-        "मैं मंजूरी देता हूं",
-        "मैं मंजूरी देती हूँ",
+        "मैं अनुमति देता हूं",
+        "मैं अनुमति देती हूं",
+        "मैं मंज़ूर करता हूँ",
+        "मैं मंज़ूर करती हूँ",
+        "मुझे मंज़ूर है",
         # Arabic
         "اوافق",
         "انا اوافق",
@@ -263,8 +301,16 @@ _CORES = _phrases(
         "تفضل بالبدء",
         "اعتمد",
         "مصرح لك",
+        "اعطيك الموافقة",
+        "اصرح لك",
+        "اصرح لك بالبدء",
     ]
 )
+_CORE_WORDS = frozenset(w for c in _CORES for w in c)
+_KNOWN = (
+    _FILLERS | _OBJECTS | _NEGATIVE | _CONDITIONAL | _FORWARD | _DANGER | _CORE_WORDS | _NAME_INTRO
+)
+MAX_NAME_WORDS = 3
 
 
 def _has_quote(text: str) -> bool:
@@ -279,25 +325,74 @@ def _has_quote(text: str) -> bool:
     return False
 
 
-def _fold_thanks(tokens: list[str]) -> list[str]:
-    out: list[str] = []
-    for t in tokens:
-        if t == "you" and out and out[-1] == "thank":
-            out[-1] = "thanks"
-        else:
-            out.append(t)
-    return out
+def _items(text: str) -> list[tuple[str, str, int]]:
+    out: list[tuple[str, str, int]] = []
+    cur: list[str] = []
+    start = 0
+    for i, ch in enumerate(text):
+        if unicodedata.category(ch)[0] in "LMN":
+            if not cur:
+                start = i
+            cur.append(ch)
+        elif cur:
+            w = "".join(cur)
+            out.append((_norm(w), w, start))
+            cur = []
+    if cur:
+        w = "".join(cur)
+        out.append((_norm(w), w, start))
+    return [it for it in out if it[0]]
+
+
+def _is_name(norm: str, orig: str) -> bool:
+    return (
+        orig.isascii()
+        and orig.isalpha()
+        and 2 <= len(orig) <= 15
+        and orig[0].isupper()
+        and orig[1:].islower()
+        and norm not in _KNOWN
+    )
 
 
 def _is_grammar_approval(text: str, tokens: list[str]) -> bool:
+    """The whole message is: fillers, at most one name (1 to 3 capitalised Latin words, only after a dash,
+    a comma, 'thanks', 'regards' or 'from'), exactly one approval phrase, and nothing else."""
     if len(text) > MAX_CUE_GRAMMAR_CHARS:
         return False
     for ch in text:
         cat = unicodedata.category(ch)
         if not (cat[0] in "LM" or ch.isspace() or ch in _PUNCT_OK):
             return False  # digits, symbols, brackets, emoji, colons ...
-    toks = _fold_thanks(tokens)
-    if not toks or len(toks) > MAX_FILLERS + 6:
+    nfk = unicodedata.normalize("NFKC", text)
+    kept: list[str] = []
+    names = 0
+    prev = ""
+    prev_name = False
+    for norm, orig, start in _items(nfk):
+        if names < MAX_NAME_WORDS and _is_name(norm, orig):
+            before = nfk[:start].rstrip()[-1:]
+            if (before and before in "-,–—،") or prev in _NAME_INTRO or prev_name:
+                names += 1
+                prev_name = True
+                prev = norm
+                continue
+        prev_name = False
+        prev = norm
+        kept.append(norm)
+    folded: list[str] = []
+    for t in kept:
+        if t == "you" and folded and folded[-1] == "thank":
+            folded[-1] = "thanks"
+        elif t in _AS_REF and folded and folded[-1] == "as":
+            folded.pop()
+            if folded and folded[-1] in ("exactly", "precisely"):
+                folded.pop()
+        else:
+            folded.append(t)
+    toks = _strip_objects(folded)
+    fillers = _FILLERS | (_words("from regards") if names else frozenset())
+    if not toks or len(toks) > MAX_FILLERS + 8:
         return False
     for core in _CORES:
         n = len(core)
@@ -305,14 +400,17 @@ def _is_grammar_approval(text: str, tokens: list[str]) -> bool:
             if tuple(toks[i : i + n]) != core:
                 continue
             rest = toks[:i] + toks[i + n :]
-            if len(rest) <= MAX_FILLERS and all(t in _FILLERS for t in rest):
+            if len(rest) <= MAX_FILLERS and all(t in fillers for t in rest):
                 return True
     return False
 
 
 def classify_approval(text: Any) -> ApprovalCue:
     """Label one owner message. Only EXPLICIT_YES can create a scope; every other label is 'not approved'.
-    Never raises; a non-string, empty, or over-long input is UNKNOWN/VAGUE (fail closed)."""
+    Never raises; a non-string, empty, or over-long input is UNKNOWN/VAGUE (fail closed). A question mark
+    is a symbol, so it already fails the grammar's character check (no separate branch is needed); the
+    label below still reports such messages as CONDITIONAL. A bare 'approve' is VAGUE: it is also the
+    command and question word, so a subject is required ('I approve', 'approved', 'approve hai')."""
     if not isinstance(text, str):
         return ApprovalCue.UNKNOWN
     if len(text) > MAX_CUE_CHARS:
@@ -324,7 +422,7 @@ def classify_approval(text: Any) -> ApprovalCue:
     toks = _tokens(text)
     if not toks:
         return ApprovalCue.VAGUE
-    if not any(q in text for q in _QUESTION) and _is_grammar_approval(text, toks):
+    if _is_grammar_approval(text, toks):
         return ApprovalCue.EXPLICIT_YES
     if any(t in _FORWARD for t in toks):
         return ApprovalCue.QUOTED
