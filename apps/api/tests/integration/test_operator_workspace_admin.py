@@ -2,6 +2,7 @@
 manage its members. Only super admins touch owners, a workspace keeps one owner, nobody
 edits their own membership here, and other roles can't manage at all."""
 
+from datetime import UTC, datetime
 from uuid import UUID
 
 import httpx
@@ -12,6 +13,7 @@ from test_service_lifecycle import register
 from app.modules.audit.models import AuditEvent
 from app.modules.auth.models import AuthSession
 from app.modules.pi_saas.models import PiOperatorMember
+from app.modules.users.models import PlatformUser
 
 pytestmark = pytest.mark.integration
 
@@ -103,6 +105,28 @@ async def test_super_admin_creates_a_workspace_and_manages_owners(api, business_
     assert audited == 3
 
 
+async def test_operator_invite_of_an_unverified_account_requires_the_link(api, business_db):
+    # SEC-1: an unverified (possibly squatted) address is treated as a new account.
+    other = _client(api)
+    business = await register(other)
+    staff = _client(api)
+    squatter = await register(staff)
+    me = await register(api)
+    business_db.add(PiOperatorMember(user_id=UUID(me["user"]["id"]), role="operations_admin"))
+    await business_db.flush()
+    added = await api.post(
+        f"/api/v1/operator/workspaces/{business['tenant']['id']}/members",
+        json={"email": squatter["user"]["email"], "role": "viewer"},
+    )
+    assert added.status_code == 201 and added.json()["invite_link"]
+    assert (await staff.get("/api/v1/auth/session")).status_code == 401  # session revoked
+    refused = await _client(api).post(
+        "/api/v1/auth/login",
+        json={"email": squatter["user"]["email"], "password": "ServiceFlow!Secure234"},
+    )
+    assert refused.status_code == 401
+
+
 async def test_admin_manages_members_but_not_owners(api, business_db):
     other = _client(api)
     business = await register(other)  # someone else's workspace
@@ -113,6 +137,12 @@ async def test_admin_manages_members_but_not_owners(api, business_db):
     business_db.add(PiOperatorMember(user_id=UUID(me["user"]["id"]), role="operations_admin"))
     await business_db.flush()
 
+    # A verified mailbox keeps today's behaviour (plain sign-in); unverified is SEC-1.
+    await business_db.execute(
+        update(PlatformUser)
+        .where(PlatformUser.email == colleague["user"]["email"])
+        .values(email_verified_at=datetime.now(UTC))
+    )
     listed = (await _members(api, tenant_id)).json()
     [owner] = listed["members"]
     assert listed["can_manage"] is True and listed["can_manage_owners"] is False

@@ -15,6 +15,7 @@ from app.integrations.errors import IntegrationError
 from app.integrations.http import OutboundClient
 from app.modules.audit.service import record
 from app.modules.auth.crypto import digest, hash_password, needs_rehash, new_token, verify_password
+from app.modules.auth.invite_guard import revoke_sessions
 from app.modules.auth.models import (
     AuthSession,
     EmailVerificationToken,
@@ -459,6 +460,8 @@ class AuthService:
         credential.password_changed_at = current
         credential.failed_attempts = 0
         credential.locked_until = None
+        # Whatever signed in before the mailbox owner chose a password is cut off.
+        await revoke_sessions(self.session, user.id)
         if user.email_verified_at is None:
             # Clicking the emailed link already proves the mailbox is real.
             user.email_verified_at = current

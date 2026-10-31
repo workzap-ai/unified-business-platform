@@ -16,6 +16,7 @@ from app.modules.access.schemas import MemberCreate, MemberView
 from app.modules.access.service import assign_roles, membership_grants, owner_count
 from app.modules.audit.service import record
 from app.modules.auth.crypto import digest, hash_password, new_token
+from app.modules.auth.invite_guard import contain_unverified_account
 from app.modules.auth.models import AuthSession, MemberInviteToken, UserCredential
 from app.modules.memberships.models import Membership
 from app.modules.tenants.models import Tenant
@@ -101,6 +102,9 @@ class MemberService:
             select(PlatformUser).where(PlatformUser.email == data.email)
         )
         is_new_account = user is None
+        if user is not None:
+            # An address nobody has proved they own is handled like a new account.
+            is_new_account = await contain_unverified_account(self.session, user)
         if user is None:
             user = PlatformUser(email=data.email, display_name=data.display_name)
             self.session.add(user)
@@ -148,9 +152,10 @@ class MemberService:
         audience: Audience,
         is_new_account: bool,
     ) -> str | None:
-        """New accounts get a one-time link to set their first password; an existing
-        person added to another workspace already has one, so they just get pointed
-        at sign-in. Either way, a failed send never blocks adding the member."""
+        """New accounts (and existing ones whose email was never verified, see
+        invite_guard) get a one-time link to set their password; a verified person
+        added to another workspace already has one, so they just get pointed at sign-in.
+        Either way, a failed send never blocks adding the member."""
         base = settings.pi_app_public_url if audience == "pi" else settings.web_base
         invite_link: str | None = None
         if is_new_account:

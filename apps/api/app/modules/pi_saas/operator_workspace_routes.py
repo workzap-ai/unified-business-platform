@@ -29,6 +29,7 @@ from app.modules.access.models import MembershipRole, Role
 from app.modules.access.service import assign_roles, owner_count
 from app.modules.audit.service import record
 from app.modules.auth.crypto import digest, hash_password, new_token
+from app.modules.auth.invite_guard import contain_unverified_account
 from app.modules.auth.models import AuthSession, MemberInviteToken, UserCredential
 from app.modules.business_settings.models import BusinessSettings
 from app.modules.environments.models import Environment
@@ -315,7 +316,8 @@ async def _is_owner(session: AsyncSession, tenant_id: UUID, membership_id: UUID)
 async def _user_for(session: AsyncSession, email: str, name: str) -> tuple[PlatformUser, bool]:
     user = await session.scalar(select(PlatformUser).where(PlatformUser.email == email))
     if user is not None:
-        return user, False
+        # Unverified address: treat as new (credential reset, link required).
+        return user, await contain_unverified_account(session, user)
     user = PlatformUser(email=email, display_name=name or email.split("@")[0][:160])
     session.add(user)
     await session.flush()
