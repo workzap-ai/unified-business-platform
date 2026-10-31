@@ -182,21 +182,28 @@ _NEG = (
     r"no budget to|no money to|no plan to|stop|stopped|refuse to|no way to|must not|mustn't|"
     r"not willing to|not going to)"
 )
-_HIRE_V = r"(?:hire|hiring|recruit\w*|employ|employing|onboard\w*|engage|appoint\w*|take on)"
+_HIRE_V = (
+    r"(?:hire|hiring|recruit(?:s|ed|ing|ment)?|employ|employing|onboard(?:s|ed|ing)?|"
+    r"engage|appoint(?:s|ed|ing)?|take on)"
+)
 FREEZE = (
     re.compile(rf"\b{_NEG}\s+(?:\w+\s+){{0,3}}?{_HIRE_V}\b"),
     re.compile(
-        r"\b(?:hiring|recruit\w*|headcount|employment)\b.{0,25}\b(?:frozen|freeze|fixed|capped|"
+        r"\b(?:hiring|recruit(?:s|ed|ing|ment)?|headcount|employment)\b.{0,25}\b(?:frozen|freeze|fixed|capped|"
         r"not allowed|banned|stopped|on hold|paused|prohibited|closed)\b"
     ),
-    re.compile(r"\b(?:hiring|recruitment|headcount)\s+freeze\b|\bfreeze on (?:hiring|recruit\w*)"),
+    re.compile(
+        r"\b(?:hiring|recruitment|headcount)\s+freeze\b|\bfreeze on (?:hiring|recruit(?:ing|ment)?)"
+    ),
     re.compile(
         r"\bno (?:more|new|extra|additional) (?:staff|people|employees|workers|hires|headcount)\b"
         r"|\b(?:cannot|can't|cant|can not) afford (?:more |new |extra )?"
         r"(?:staff|people|employees|workers)\b"
     ),
 )
-_TAKE_ON = re.compile(r"\b(?:take|takes|taking|took|taken) on\b")
+_TAKE_ON = re.compile(
+    r"\b(?:(?:take|takes|taking|took|taken) on|(?:bring|brings|bringing|brought) in)\b"
+)
 
 
 def is_hiring_freeze(text: str) -> bool:
@@ -204,8 +211,11 @@ def is_hiring_freeze(text: str) -> bool:
     return any(p.search(t) for p in FREEZE)
 
 
+_NEW_PEOPLE = re.compile(r"\b(?:naye|naya|nayi) (?:log|banda|bande|bandey|aadmi|logon)\b")
+
+
 def take_on_as_hire(text: str) -> str:
-    return _TAKE_ON.sub("hire", text)
+    return _NEW_PEOPLE.sub("new staff", _TAKE_ON.sub("hire", text))
 
 
 # ---------------------------------------------------------------------------------- channels
