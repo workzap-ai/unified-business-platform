@@ -50,13 +50,27 @@ CAUSE_STATUSES = (PI_INFERRED, OWNER_SAID, CONFIRMED, WITHDRAWN)
 OWNER_STATUSES = (OWNER_SAID, CONFIRMED)
 
 
+# A phone number is never kept in a stored requirement, even the owner's own (the safety redactor
+# lets "call me on ..." through, and misses the grouped Pakistani forms): 0300-1234567,
+# 0300 123 4567, (0300) 1234567, +92 300 1234567, 0092-300-1234567, 042-35761234.
+_LOCAL_PHONE = re.compile(
+    r"(?<![\w+-])(?:(?:\+|00)?92[\s.-]*\(?3\d{2}\)?|\(?03\d{2}\)?)[\s.-]*\d{3}[\s.-]*\d{4}(?!\d)"
+    r"|(?<![\w+-])0[1-9]\d?[\s.-]\d{7,8}(?!\d)"
+)
+PHONE_REMOVED = "[contact detail removed]"
+
+
+def _redact_phones(text: str) -> str:
+    return _LOCAL_PHONE.sub(PHONE_REMOVED, safety.PHONE.sub(PHONE_REMOVED, text))
+
+
 def clean(text: Any, cap: int) -> tuple[str, bool]:
     """One text as it may be kept, and whether the redactor changed anything. Redact first, then
     cut, so a number cut in half is never left behind."""
     raw = " ".join(str(text or "").split())
     if not raw:
         return "", False
-    redacted = safety.redact_pii(raw).text
+    redacted = _redact_phones(safety.redact_pii(raw).text)
     protected = " ".join(third_party.protect(redacted).split())
     return protected[:cap].strip(), protected != raw
 
