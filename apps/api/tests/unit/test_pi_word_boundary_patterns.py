@@ -93,3 +93,40 @@ def test_the_same_idea_passes_when_the_owner_said_it() -> None:
         idea_filter.invented_context("Claim your google listing today", "people find me on google")
         is None
     )
+
+
+OWNER_WORDS = "I run a car showroom in Okara and sales are slow"
+
+
+@pytest.mark.parametrize(
+    "idea",
+    [
+        "Make sure people who search for you online find your showroom",
+        "People search for your shop on their phones, so check what they see",
+        "Check what comes up when customers search online for a showroom",
+        "When people searches nearby for cars, be the first they see",
+        "Claim your google listing and add three photos",
+        "Update your business listing with the new opening hours",
+        "Reply to your online reviews every Friday",
+        "Jab log search for you online karein, to listing update karein",
+        "Log aap ki dukaan online search for your shop karte hain, to listing update karein",
+    ],
+)
+def test_g2_flags_an_idea_that_assumes_an_online_presence(idea: str) -> None:
+    assert idea_filter.invented_context(idea, OWNER_WORDS) == "G2"
+
+
+@pytest.mark.parametrize(
+    "idea",
+    [
+        "Look at the showroom the way a stranger does when they search for it nearby, "
+        "so you see what puts them off.",
+        "Ask each of your last two buyers how they first heard of the showroom",
+        "Call the three customers who left and ask what stopped them",
+        "Gahak se poochain ke unhon ne dukaan kaise dhoondi",
+        "Tidy the counter and greet each visitor within a minute",
+        "Write down every price you quoted this week and the answer you got",
+    ],
+)
+def test_g2_leaves_look_at_and_ask_ideas_alone(idea: str) -> None:
+    assert idea_filter.invented_context(idea, OWNER_WORDS) is None

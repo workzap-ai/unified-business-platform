@@ -194,7 +194,7 @@ _ASSET_GROUPS: tuple[tuple[re.Pattern[str], re.Pattern[str]], ...] = (
     ),
     (  # an online listing, search result or map entry
         re.compile(
-            r"\b(?:search(?:es|ed|ing)? (?:online|nearby)|online (?:listing|presence|reviews?)|"
+            r"\b(?:search(?:es|ed|ing)? (?:for (?:you|your|them|us|an?)|online|nearby)|online (?:listing|presence|reviews?)|"
             r"(?:map|google|business) listing|listing|google)\b",
             re.I,
         ),
