@@ -168,6 +168,8 @@ def voice(
     owner_messages: Sequence[str] = (),
     asked: Sequence[str] = (),
     non_answers: Mapping[str, int] | None = None,
+    known_records: Sequence[Any] = (),
+    scope: Mapping[str, Any] | None = None,
 ) -> Voiced:
     """See the module docstring. Every listed idea gets PS-3's verdict (`evaluate_idea`) with the
     L2-1 gate plugged in (`gate_from_option_gate`), so one verdict path decides:
@@ -269,6 +271,8 @@ def voice(
                 owner_messages=list(owner_messages),
                 asked=list(asked),
                 non_answers=non_answers,
+                known_records=list(known_records),
+                scope=scope,
             )
             if asked_q is not None:
                 question = asked_q.text

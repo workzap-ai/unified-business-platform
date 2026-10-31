@@ -33,6 +33,8 @@ from app.modules.pi import (
     brain_prompt,
     business,
     constitution,
+    context_memory,
+    context_memory_types,
     decisions,
     expert_advisor,
     figure_correction,
@@ -1629,6 +1631,39 @@ async def brain_problems(
                 )
         if packed := option_wiring.requirements_context(reqs):
             context["requirements"] = packed
+        # PS-8: everything pi already knows about this owner, read once per turn (read only, scoped
+        # by tenant, environment and customer); it feeds the one question, the "we already have"
+        # line and the implementation status wording
+        memory = await context_memory.build_context(
+            session,
+            scope,
+            customer_id=conversation.customer_id,
+            conversation_id=conversation.id,
+            query_language=str(conversation.language or "en"),
+        )
+        if not memory.erased:
+            context["memory"] = {
+                "known": context_memory.known_records(memory)[:40],
+                "already_known": context_memory.what_is_already_known(
+                    memory, str(conversation.language or "en")
+                ),
+                "implementation": context_memory.implementation_summary(
+                    memory, str(conversation.language or "en")
+                ),
+                "scope": {
+                    "tenant_id": str(memory.tenant_id),
+                    "environment_id": str(memory.environment_id),
+                    "customer_id": str(memory.customer_id),
+                },
+            }
+            states = {x.implementation_status for x in memory.solutions}
+            context["implementation_status"] = (
+                "implemented"
+                if states & set(context_memory_types.IMPLEMENTED_STATES)
+                else "approved"
+                if states & set(context_memory_types.IN_PROGRESS_STATES)
+                else "proposed"
+            )
     context.update(matching_the_person(conversation, message, rows or []))
     if away := days_away(message, rows or [], last_chat_at):
         context["days_away"] = away
@@ -2077,7 +2112,12 @@ def brain_option_voice(turn: "ServiceTurn", context: dict[str, Any]) -> None:
         owner_messages=owner_said,
         asked=list(brief_now.get("resolution_asked") or []),
         non_answers=dict(brief_now.get("resolution_non_answers") or {}),
+        known_records=list((context.get("memory") or {}).get("known") or []),
+        scope=(context.get("memory") or {}).get("scope"),
     )
+    heard = str((context.get("memory") or {}).get("already_known") or "")
+    if heard and voiced.changed and (voiced.question or voiced.unknown):
+        voiced.block = f"{heard}{chr(10)}{voiced.block}".strip()
     turn._voice_pick = voiced.pick
     turn._voice_pending = voiced.pending
     if not voiced.changed:
