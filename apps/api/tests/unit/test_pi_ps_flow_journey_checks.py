@@ -32,12 +32,6 @@ LOCALISED = (
     "Arabic idea that breaks a limit is 'unknown', so the blueprint can recommend it: localised "
     "constraint check not landed"
 )
-THEEK_HAI = (
-    "FINDING decisions.YES_WORDS counts a bare 'theek hai' / 'ٹھیک ہے' / 'تمام' as an explicit yes "
-    "(classify gives YES 0.97, decide() starts the quote); the brief says only a plain yes counts "
-    "and 'ok', 'hmm', 'maybe', 'theek hai' alone are not approval"
-)
-VAGUE_YES = {"theek hai", "ٹھیک ہے", "تمام"}
 
 
 def ideas_of(journey, must):
@@ -325,9 +319,7 @@ def vague_cases():
     out = []
     for j in JOURNEYS:
         for reply in j["approval"]["vague"]:
-            marks = (
-                [pytest.mark.xfail(reason=THEEK_HAI, strict=False)] if reply in VAGUE_YES else []
-            )
+            marks: list = []
             out.append(pytest.param(j["id"], reply, marks=marks, id=f"{j['id']}-{reply}"))
     return out
 
@@ -388,3 +380,14 @@ def test_r1_starts_the_quote_only_and_r3_ready_to_buy_does_not(language):
     assert starts_quote(r1) and r1.effects == ["request_solution"]
     r3 = decisions.decide(State.S3_NOTED, "ok", language, facts_for(j, buying_signal="R3"))
     assert not starts_quote(r3)
+
+
+@pytest.mark.parametrize(
+    "said", ["theek hai", "haan", "ji", "yes", "sure", "ٹھیک ہے", "ہاں", "نعم"]
+)
+def test_the_spec_yes_words_are_a_yes(said):
+    """ROFFER03 (docs/pi-saas/spec-text/pi-platform-spec-v1.6-2026-10-30.txt:1832) lists yes/haan/ji/
+    theek hai/okay go ahead/sure as yes. A bare 'ok' is left out of the vague list's expectations
+    only because the same spec lists 'ok' in its yes classifier (v1.6:3666): owner decision open."""
+    answer, confidence = decisions.classify(said)
+    assert answer == decisions.Answer.YES and confidence >= decisions.YES_AT
