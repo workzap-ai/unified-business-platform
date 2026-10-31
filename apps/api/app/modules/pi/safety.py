@@ -490,6 +490,70 @@ _FLOOD = re.compile(
 )
 TRADE_EMERGENCY_PATTERNS = TRADE_EMERGENCY_PATTERNS + ((Emergency.GENERIC, _FLOOD),)
 
+# Self-harm, an ambulance asked for, and abuse said in the present, in Roman Urdu, Urdu, Hindi and
+# Arabic. Each needs the harm or the ask itself: "rate marna", "price gira marna", a death
+# certificate quote and an ambulance sales or service quote never match.
+_AMBULANCE_TRADE = (
+    r"quote|price|rate|sale|sales|sell|bech\w*|khareed\w*|service|fleet|business|lease|rent|kiraye|"
+    r"model|order|company|vendor|supplier|manufactur\w*|tender|catalog\w*|brochure"
+)
+TRADE_EMERGENCY_PATTERNS = TRADE_EMERGENCY_PATTERNS + (
+    (
+        Emergency.SELF_HARM,
+        _rx(
+            (
+                r"mujhe (?:ab )?(?:marna hai|mar jana hai|mar jaana hai)",
+                r"(?:main|mai) (?:khud ko |apni jaan |zindagi )?khatam kar (?:loon|lun|loongi|lungi|dunga|dungi)",
+                r"khud ko khatam|apni jaan le (?:lun|loon|loongi|lungi)|jaan de (?:dunga|dungi|doonga|doongi)",
+                r"jeena nahi chahta|jeena nahi chahti|jeene ka (?:dil|mann|maza) nahi|zindagi se tang aa gaya|"
+                r"zindagi se tang aa gayi|mar jana chahta|mar jana chahti",
+            ),
+            (
+                r"مجھے مرنا ہے|جان دے دوں|خود کو ختم|زندگی ختم|جینا نہیں چاہتا|جینا نہیں چاہتی|مر جانا چاہتا|مر جانا چاہتی",
+                r"मुझे मरना है|आत्महत्या|खुदकुशी|जान दे दूँगा|जान दे दूंगा|जान दे दूंगी|जीना नहीं चाहता|जीना नहीं चाहती|"
+                r"ज़िंदगी खत्म|जिंदगी खत्म|खुद को खत्म",
+                r"أنهي حياتي|أقتل نفسي|سأقتل نفسي|لا أريد أن أعيش|أريد الموت|أفكر في الانتحار",
+            ),
+        ),
+    ),
+    (
+        Emergency.MEDICAL,
+        re.compile(
+            r"(?:^|(?<=[.?!\n]))\s*(?![^.?!\n]*\b(?:" + _AMBULANCE_TRADE + r")\b)[^.?!\n]*?"
+            r"\b(?:(?:ambulance|ambulence)\s+(?:chahiye|chahie|bulao|bulwao|bhejo|bhej do|bula do|call karo)|"
+            r"(?:doctor|daktar|dr)\s+(?:chahiye|bulao|bulwao|bhejo|bula do)\b[^.?!\n]{0,20}\b"
+            r"(?:abhi|jaldi|foran|fauran|urgent|emergency)|"
+            r"(?:abhi|jaldi|foran|fauran|urgent)\b[^.?!\n]{0,20}\b(?:doctor|ambulance)\b[^.?!\n]{0,15}\b"
+            r"(?:chahiye|bulao|bhejo)|need (?:a )?doctor (?:now|urgently|immediately))\b"
+            r"|ایمبولینس\s+(?:چاہیے|چاہئے|بلاؤ|بھیجو)|एम्बुलेंस\s+(?:चाहिए|बुलाओ|भेजो)",
+            re.IGNORECASE,
+        ),
+    ),
+    (
+        Emergency.SAFEGUARDING,
+        _rx(
+            (
+                r"(?:i am|i'm|we are|she is|he is) (?:being |getting )?(?:abused|beaten|hit|harassed|assaulted|"
+                r"molested|raped|threatened|blackmailed|tortured)",
+                r"my (?:husband|father|mother|brother|boss|manager|uncle|in-laws?|stepfather|teacher) "
+                r"(?:is |keeps )?(?:beating|hitting|abusing|molesting|harassing|threatening|touching) "
+                r"(?:me|my (?:child|kids?|daughter|son|wife))",
+                r"(?:bachay|bachi|bachchay|bachche|bacchay|bachche|beti|beta|bachon) (?:ke|ki|ka) saath "
+                r"(?:zyadti|zulm|marpeet|badsaluki|zabardasti|galat harkat)",
+                r"mere saath (?:zyadti|zulm|marpeet|zabardasti|badsaluki) ho (?:rahi|raha)",
+                r"(?:shohar|miyan|sasural wale|abbu|bhai|teacher|boss|ustad) (?:mujhe|mujh ko|bachon ko|"
+                r"bachay ko|bachi ko) (?:maar|peet|marta|marti|tang)\w*",
+            ),
+            (
+                r"(?:بچے|بچی|بچوں)\s+کے ساتھ\s+(?:زیادتی|ظلم|مارپیٹ)|میرے ساتھ\s+(?:زیادتی|ظلم|مارپیٹ)",
+                r"(?:बच्चे|बच्ची|बच्चों)\s+के साथ\s+(?:ज़्यादती|ज्यादती|मारपीट|दुर्व्यवहार)|"
+                r"मेरे साथ\s+(?:मारपीट|ज़ुल्म|जुल्म|ज्यादती)",
+                r"أتعرض (?:ل)?(?:لل)?\w*(?:ضرب|تحرش|عنف|اعتداء)|(?:يتم|يتعرض) (?:ال)?(?:طفل|أطفال)\w* (?:ل)?(?:ل)?\w*(?:ضرب|تحرش|عنف|اعتداء)",
+            ),
+        ),
+    ),
+)
+
 # Self-harm and safeguarding are checked first (the person's safety before anything else); the rest
 # keep their order after the original patterns.
 _SAFE_FIRST = tuple(
