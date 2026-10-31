@@ -242,28 +242,70 @@ def buying_signal(said: str, covers: int = 0) -> str | None:
     return None
 
 
-# A clause ends at punctuation or a joining word; an ask addressed to pi may follow a lead-in about
-# what the owner already said ("I said give me the quote", "maine bata diya, ab quote do").
-_CLAUSE_END = re.compile(r"[.,;!?؟\n]+|\s(?:but|and|aur|lekin|phir|so)\s", re.IGNORECASE)
+# D-1 gate. FAIL CLOSED: a false negative (the owner asks again; R3 still opens the offer) is
+# acceptable, a quote starting on a statement is not (R-SELL, no quote while listening).
+# 1. vetoes (negation, "later", price, "only when", can't/don't, before/after/explain) apply to the
+#    WHOLE message, never per clause; a benign tail ("na", "no rush") is removed first;
+# 2. reported speech ("my customers say, send me the quote") blocks, except the narrow lead-in
+#    "I said / maine bataya / I already told you" directly before the ask;
+# 3. the ask is an IMPERATIVE addressed to pi, then the document noun, and it ENDS the clause. The
+#    bare "I/we want/need <noun>" is not an ask here ("we need a quote system that tracks orders").
+_CLAUSE_END = re.compile(r"[.,;!?؟؛\n]+|\s(?:but|and|aur|lekin|phir|so)\s", re.IGNORECASE)
+_CLAUSE_CONJ = re.compile(r"^\W*(?:so|but|and|aur|lekin|phir|toh)\s+", re.IGNORECASE)
+_BENIGN_TAIL = re.compile(
+    r"\b(?:no rush|no hurry|no worries)\b|\bna\b(?=\s*(?:[,.!?;]|$))", re.IGNORECASE
+)
+_ONLY_WHEN = re.compile(r"\bonly\s+when\b|\bsirf\s+jab\b|\bwhen\s+i\s+say\b", re.IGNORECASE)
 _SAID_LEAD = re.compile(
     r"^\W*(?:i|we|maine|main ne|humne|hum ne)\s+(?:(?:already|just|have|had|did|sab)\s+)*"
-    r"(?:said|told you|asked|kaha|bola|bataya)\s+(?:that\s+|ke\s+)?",
+    r"(?:said|told you|asked|kaha|bola|bataya|bata diya)\W+(?:(?:that|ke)\s+)?",
+    re.IGNORECASE,
+)
+_REPORTED = re.compile(
+    r"\b(?:say|says|said|told|tell|tells|asked|asks|kaha|kehte|kehta|kehti|bola|bolte|boli|bolta)\b",
+    re.IGNORECASE,
+)
+_NOUN = (
+    r"(?:(?:solution|full|final|rough|short|quick|proper)\s+)?(?:document|quote|quotation|proposal)"
+)
+_TAIL = r"(?:\s+(?:please|pls|plz|now|today|asap|na|abhi|jaldi|ab|do|dein|den))*"
+_ASK_EN = re.compile(
+    r"^(?:(?:yes|ok|okay|haan|ji)\W+)*(?:(?:can|could|would|will)\s+you\s+)?(?:please\s+)?"
+    r"(?:(?:i|we)\s+(?:want|need|would like)\s+you\s+to\s+)?(?:please\s+)?"
+    r"(?:send|give|prepare|make|create|share)(?:\s+(?:me|us))?(?:\s+(?:the|a|my|our))?\s+"
+    rf"{_NOUN}{_TAIL}\W*$",
+    re.IGNORECASE,
+)
+_ME = r"(?:(?:mujhe|mujhay|hamein|hamen|humein)\s+)?"
+_UR_VERB = r"(?:de|dein|den|dain|do|dedo|de do|dijiye|dijiyega|bhej\w*|bhij\w*|bana\w*|banwa\w*)"
+_ASK_UR = re.compile(
+    r"^(?:(?:yes|ok|okay|haan|ji|please)\W+)*(?:(?:ab|abhi|jaldi|please)\s+)*"
+    rf"{_ME}(?:(?:ab|abhi|jaldi|please)\s+)*{_NOUN}\s+{_ME}{_UR_VERB}{_TAIL}\W*$"
+    rf"|^(?:(?:yes|ok|okay|haan|ji|please)\W+)*(?:(?:ab|abhi|jaldi|please)\s+)*{_UR_VERB}\s+"
+    rf"{_ME}{_NOUN}{_TAIL}\W*$",
     re.IGNORECASE,
 )
 
 
 def asks_for_the_quote(said: str) -> bool:
-    """The owner explicitly asks pi for the quote itself, as a request at the start of the message or
-    of a clause ("send me the quote", "mujhay quote do abhi", "can you send me the quote?"). It is
-    the same test as `decisions.asks_for_document` (an imperative or "I want/need", not a problem
-    that merely mentions quotes, and no "not", "later" or price word), applied clause by clause. A
-    price QUESTION ("how much would it cost?", "give me the price") is answered first (RSOL08) and
-    never starts the quote at the decision gate (owner decision D-1, awaiting approval)."""
+    """The owner explicitly asks pi for the quote itself (see the rules above): "send me the quote",
+    "mujhay quote do abhi", "can you send me the quote?", "I said give me the quote". A price
+    QUESTION ("how much would it cost?", "give me the price") is answered first (RSOL08) and never
+    starts the quote at the decision gate (owner decision D-1)."""
     from app.modules.pi import decisions
 
-    for clause in _CLAUSE_END.split(" ".join((said or "").split())):
-        clause = _SAID_LEAD.sub("", clause.strip())
-        if clause and decisions.asks_for_document(clause):
+    whole = " ".join((said or "").split())
+    if not whole:
+        return False
+    plain = _BENIGN_TAIL.sub(" ", whole)
+    if decisions.NOT_A_REQUEST.search(plain) or _ONLY_WHEN.search(plain):
+        return False  # a refusal, "later", a price word or a condition anywhere vetoes the ask
+    body = _SAID_LEAD.sub("", whole, count=1)
+    if _REPORTED.search(body):
+        return False  # reported speech is not an ask addressed to pi
+    for clause in _CLAUSE_END.split(body):
+        clause = _CLAUSE_CONJ.sub("", clause.strip()).strip()
+        if clause and (_ASK_EN.match(clause) or _ASK_UR.match(clause)):
             return True
     return False
 

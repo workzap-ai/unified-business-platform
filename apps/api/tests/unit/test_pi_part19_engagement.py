@@ -167,6 +167,28 @@ def test_bs1_a_price_question_is_an_offer_signal_but_does_not_start_the_quote(sa
         ("send me the quote, I am short of time", True),
         ("We need a quote, send me the quote", True),
         ("can you send me the quote?", True),
+        # audit round 3: fail closed
+        ("Our orders get lost, we need a quote system that tracks them", False),
+        ("My staff is slow. We need a quote template for every customer", False),
+        ("Customers wait for days, so I need a quote tool", False),
+        ("We want a document scanner for the shop", False),
+        ("We told you we need a quote system", False),
+        ("Don't send me the quote now. I need a quote only when I say so", False),
+        ("I can't pay yet, I need a quote template", False),
+        ("Customers ask for the price, we need a quote each time", False),
+        ("My customers say, send me the quote", False),
+        ("no, don't send the quote", False),
+        ("catering ke liye quote bhej dein", False),  # GAP-2: accepted false negative
+        ("So send me the quote", True),
+        ("But send the quote", True),
+        ("aur quote bhej dein", True),
+        ("send me the rough quote", True),
+        ("send me the final proposal please", True),
+        ("quote bhej dein na", True),
+        ("send me the quote, no rush", True),
+        ("I already told you, send me the quote", True),
+        ("I want you to send me the quote", True),
+        ("please prepare the solution document now", True),
     ],
 )
 def test_asks_for_the_quote_is_an_explicit_ask_only(said, expected):
@@ -849,3 +871,45 @@ def test_the_cost_line_goes_after_the_disclosure_and_never_carries_a_figure():
     )
     assert first.startswith("Hi, it's pi, the AI from Workzap.") and line in first
     assert not any(ch.isdigit() for ch in line)
+
+
+@pytest.mark.parametrize("code", ["en", "roman_ur", "ur", "ar", "fr", "es", "fa"])
+def test_the_cost_line_follows_the_disclosure_in_every_language(code):
+    from app.modules.pi import constitution
+    from app.modules.pi import service_conversation as sc
+    from app.modules.pi.fixed_lines import LINES
+
+    opening, cost = LINES["opening"][code], LINES["cost"][code]
+    reply = sc.put_cost_line(f"{opening} Which team does it hit hardest?", cost)
+    assert reply.startswith(opening)  # R-DISC-01: the disclosure stays the first sentence
+    assert reply[len(opening) :].lstrip().startswith(cost)
+    assert not any(ch.isdigit() for ch in cost)
+    final = constitution.final_one_question(reply)
+    assert final.count("?") + final.count("؟") == 1
+
+
+def test_a_fixed_decision_reply_drops_a_stale_cost_line():
+    from app.modules.pi import service_conversation as sc
+
+    turn = sc.ServiceTurn(reply="the model reply")
+    turn._cost_line = "stale cost line"
+    context = {
+        "flow": {"state": "S3_NOTED"},
+        "latest_customer_message": "mujhay quote do abhi",
+        "latest_message_id": "m1",
+        "reply_language": "roman_ur",
+        "noted_problems": [{"ref": "a", "title": "t", "group": "g"}],
+        "brief": {},
+    }
+    sc.brain_decision(turn, context)
+    assert turn.reply != "the model reply"  # the gate replaced the reply
+    assert turn._cost_line == ""
+
+
+def test_a_first_sentence_that_only_asks_about_ai_does_not_get_the_cost_line_after_it():
+    from app.modules.pi import service_conversation as sc
+
+    line = decisions.cost_answer("en")
+    reply = sc.put_cost_line("Does AI help with quotes? Which team does it hit hardest?", line)
+    assert reply.startswith(line)
+    assert reply.rstrip().endswith("hardest?")

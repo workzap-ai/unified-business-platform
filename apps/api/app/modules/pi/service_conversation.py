@@ -1982,8 +1982,15 @@ def with_disclosure(
 def put_cost_line(reply: str, line: str) -> str:
     """The fixed cost answer in front of the reply, or right after pi's opening disclosure when the
     reply starts with one (R-DISC-01: the first sentence of a first message says pi is an AI)."""
-    parts = re.split(r"(?<=[.!?])\s+", reply, maxsplit=1)
-    if len(parts) == 2 and SAYS_AI.search(parts[0]):
+    parts = re.split(r"(?<=[.!?۔؟؛])\s+", reply, maxsplit=1)
+    first = parts[0]
+    # only a first sentence that really is the disclosure (a statement that says pi is an AI), not
+    # a question that merely mentions AI ("Does AI help with quotes?"), keeps the first place
+    if (
+        len(parts) == 2
+        and not re.search(r"[?؟]", first)
+        and (SAYS_AI.search(first) or constitution._discloses(first))
+    ):
         return f"{parts[0]} {line}\n\n{parts[1]}"
     return f"{line}\n\n{reply}"
 
@@ -3424,6 +3431,7 @@ def brain_decision(turn: "ServiceTurn", context: dict[str, Any]) -> None:
     turn._decision = decision
     if decision.reply:
         turn.reply = decision.reply
+        turn._cost_line = ""  # a fixed decision reply is not prefixed by a stale cost line
         if gate == "R1" and decision.why == "R-OFFER-03":
             language = str(context.get("reply_language") or "en")
             own = "title_local" if language != "en" else "title"

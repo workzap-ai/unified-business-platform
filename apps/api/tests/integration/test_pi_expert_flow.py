@@ -205,15 +205,14 @@ async def test_a_price_question_with_the_fact_question_gets_one_question_and_no_
 async def test_an_explicit_quote_ask_with_a_price_question_starts_the_quote_not_the_fact_question(
     api, business_db, monkeypatch
 ):
-    """Audit L1: with an explicit ask for the quote the gate starts it (R1); the cost line and the
+    """Audit L1: with an explicit ask for the quote the gate starts it (R1; a price word anywhere in the
+    message vetoes it, fail closed, so the ask is sent alone); the cost line and the
     one-more-fact question do not take its place or come out in the wrong order."""
     expert_model(monkeypatch, diagnosis([VIDEO_IDEA]), judged(1))
     pi = await expert_chat(
         api, business_db, monkeypatch, SHOWROOM, "Few walk-ins at the showroom", SHOWROOM
     )
-    [*bodies] = await reply_after(
-        pi, business_db, "how much will it cost? send me the quote", "x-2"
-    )
+    [*bodies] = await reply_after(pi, business_db, "send me the quote", "x-2")
     body = " ".join(bodies)
     conversation = await pi.conversation()
     await business_db.refresh(conversation)
