@@ -154,6 +154,11 @@ def code(context: dict[str, Any], *, script: bool = False) -> str:
     other = CODES.get(str(context.get("reply_language_other") or ""))
     if other:
         return other
+    decision = context.get("language_decision")
+    if isinstance(decision, dict) and not decision.get("uncertain"):
+        key = str(decision.get("key") or "")
+        if key in LINES["opening"]:  # PS-9: the turn's one language decision, script kept
+            return key
     base = str(context.get("reply_language") or "en")
     return code_of_text(str(context.get("latest_customer_message") or ""), base, script=script)
 

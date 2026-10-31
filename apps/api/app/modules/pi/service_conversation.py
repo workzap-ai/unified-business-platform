@@ -46,6 +46,7 @@ from app.modules.pi import (
     idea_filter,
     industry_overlap,
     industry_packs,
+    language_script,
     latency,
     learning_context,
     list_items,
@@ -71,7 +72,6 @@ from app.modules.pi import (
     resolution_flow,
     safety,
     self_review,
-    self_review_checks,
     self_review_types,
     slot_carry,
     slots,
@@ -1632,6 +1632,36 @@ async def brain_problems(
                 )
         if packed := option_wiring.requirements_context(reqs):
             context["requirements"] = packed
+        if message is not None:
+            # PS-9: ONE language decision per turn (spec 2.5, RLANG02 a switch is followed, RLANG09
+            # the pin follows the last substantive message and a short one never moves it); it feeds
+            # the fixed lines, the option voice, the blueprint and the SR-13 guard
+            owner_before = [
+                m.body or ""
+                for m in reversed(rows or [])
+                if m.sender_type == "customer" and m is not message
+            ]
+            pin = (conversation.service_brief or {}).get("language_pin")
+            pin_pair = (pin.get("code"), pin.get("script")) if isinstance(pin, dict) else None
+            d = language_script.detect_message_language(
+                message.body or "",
+                history=owner_before,
+                pinned=pin_pair,
+                voice=message.message_type == "audio",
+                asked=list((conversation.service_brief or {}).get("language_asked") or []),
+            )
+            code, script = language_script.reply_language_for(d, pin_pair, owner_before)
+            context["language_decision"] = {
+                "code": code,
+                "script": script,
+                "key": language_script.fixed_line_key(code, script),
+                "uncertain": d.uncertain,
+                "clarify": d.clarify_key if d.needs_clarification else None,
+            }
+            if not d.uncertain and code != "und":
+                kept = dict(conversation.service_brief or {})
+                kept["language_pin"] = {"code": code, "script": script}
+                conversation.service_brief = kept
         # PS-8: everything pi already knows about this owner, read once per turn (read only, scoped
         # by tenant, environment and customer); it feeds the one question, the "we already have"
         # line and the implementation status wording
@@ -2064,10 +2094,12 @@ def after_fixed_reply(turn: "ServiceTurn", context: dict[str, Any]) -> None:
 
 
 def pre_send_guard(turn: "ServiceTurn", context: dict[str, Any]) -> None:
-    """Two checks of the PS-10 self-review run on the final text, in brain mode: SR-13 (the reply is
-    in the owner's language and script) and SR-16 (a proposal is never worded as done). A reply that
-    fails is never sent: the owner-language fallback of the same gate goes instead, in their script.
-    The other checks need structure this flow does not yet hand over (unknown is not acted on)."""
+    """The PS-10 self-review runs on the final text in brain mode. Every check that has its input
+    decides (SR-13 the reply is in the owner's language and script, SR-15 one question and it is
+    last, SR-16 a proposal is never worded as done); a critical failure means the verdict is
+    INCOMPLETE and the reply is never sent: the gate's own owner-language fallback goes instead, in
+    the owner's script, and a first message still says pi is an AI. A check whose input the flow
+    does not hand over is UNKNOWN and is not acted on."""
     lang = fixed_lines.code(context, script=True)
     lang = lang if lang in self_review_types.LANGS else "en"
     draft = self_review_types.DraftResult(
@@ -2076,12 +2108,13 @@ def pre_send_guard(turn: "ServiceTurn", context: dict[str, Any]) -> None:
         reply_text=turn.reply,
         implementation_status=str(context.get("implementation_status") or "proposed"),
     )
-    templates = self_review.fallback_templates()
-    if self_review_checks.sr16(draft).status == self_review_types.FAIL:
-        fallback = templates["proposal"][lang]
-    elif self_review_checks.sr13(draft).status == self_review_types.FAIL:
-        fallback = templates["detail"][lang]
-    else:
+    report = self_review.review(draft)
+    if report.verdict != self_review_types.INCOMPLETE:
+        # COMPLETE is sent. BLOCKED (a critical check could not run: its input is not handed over
+        # yet) is not acted on here and is never read as complete by the checks that did run.
+        return
+    fallback = self_review.owner_safe_fallback(report, lang)
+    if not fallback:
         return
     turn.reply = with_disclosure(fallback, context, lang)  # a first message still says pi is an AI
     turn._voice_block = turn._voice_question = ""
