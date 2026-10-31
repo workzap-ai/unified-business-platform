@@ -252,27 +252,67 @@ def asks_for_the_quote(said: str) -> bool:
     return decisions.asks_for_document(said)
 
 
-# An imperative-led or "mujhe quote do"-led request that may carry extra words ("send me a quote for
-# this"): enough to OPEN the offer (never to start the quote, which needs `asks_for_the_quote`). A
-# statement about quotes ("it takes me hours to send a quote", "when I send the quote ...") does not
-# start with the request, so it does not match.
+# A request that LEADS a clause with the quote ask ("send me a quote for this", "mujhay quote abhi
+# chahiye", "hello, mujhay quote chahiye", "ok so I think we need an app. send me the quote"): enough
+# to OPEN the offer (never to start the quote, which needs `asks_for_the_quote`). A statement about
+# quotes ("it takes me hours to send a quote", "we send the quote late", "when I send the quote ...")
+# does not lead a clause with the request, so it does not match.
 QUOTE_PHRASE_LED = re.compile(
-    r"^\W*(?:(?:yes|ok|okay|please|pls|haan|ji)\W+)*(?:"
+    r"^\W*(?:(?:yes|ok|okay|please|pls|haan|ji|so|and|but|aur)\W+)*(?:"
     r"(?:send|give|share)\s+(?:me\s+|us\s+)?(?:the\s+|a\s+)?(?:quote|quotation)\b"
     r"|(?:(?:mujhay|mujhe|hamein|hamen)\s+)?(?:(?:ab|abhi|jaldi)\s+)?(?:quote|quotation)\s+"
-    r"(?:de|dein|den|dain|dijiye|do|bhej\w*|chahiye)\b)",
+    r"(?:(?:ab|abhi|jaldi)\s+)?(?:de|dein|den|dain|dijiye|do|bhej\w*|chahiye)\b"
+    r"|(?:mujhay|mujhe|hamein|hamen)\s+(?:(?:ab|abhi|jaldi)\s+)?(?:quote|quotation)\s+"
+    r"(?:(?:ab|abhi|jaldi)\s+)?(?:chahiye|chahie|chahiay)\b)",
     re.IGNORECASE,
 )
+# "give me the price" opens the offer (a price ask, D-1) and starts no quote
+PRICE_PHRASE_LED = re.compile(
+    r"^\W*(?:(?:yes|ok|okay|please|pls|haan|ji|so|and|but|aur)\W+)*"
+    r"(?:give|send|share|tell)\s+(?:me|us)\s+(?:the\s+|a\s+|your\s+)?(?:price|rate)\b",
+    re.IGNORECASE,
+)
+# after the noun: a verb of the owner's own work means a statement ("send the quote to my customer
+# takes hours")
+_STATEMENT_REST = re.compile(
+    r"\b(?:takes?|taking|took|lagta|lagte|lagti|parta|parti|padta|hota|hoti|hote|hai|hain|is|are|was)\b",
+    re.IGNORECASE,
+)
+LONG_MESSAGE_CHARS = 500
+_CLAUSE_SPLIT = re.compile(r"[.,;:!?؟\n]+")
+_SENTENCE_SPLIT = re.compile(r"[.!?؟\n]+")
 
 
 def opens_the_offer_by_quote_phrase(said: str) -> bool:
-    """A request that leads with the quote ask opens the offer even with words after it."""
+    """A request that leads a clause with the quote ask (or asks for the price) opens the offer, with
+    words before it ("hello, ...", "ok so I think we need an app. send me the quote") or after it.
+    A message over 500 characters (a long voice note) is tested on its LAST sentence only, so it opens
+    the offer but never starts the quote (`decisions.asks_for_document` refuses long messages)."""
     from app.modules.pi import decisions
 
     text = " ".join((said or "").split())
-    return bool(QUOTE_PHRASE_LED.match(text)) and not (
-        NEGATED.search(text) or decisions.NOT_A_REQUEST.search(text)
-    )
+    if len(text) > LONG_MESSAGE_CHARS:
+        sentences = [x.strip() for x in _SENTENCE_SPLIT.split(text) if x.strip()]
+        text = sentences[-1] if sentences else ""
+    if not text or NEGATED.search(text) or decisions._REPORTED.search(text):
+        return False
+    clauses = [c.strip() for c in _CLAUSE_SPLIT.split(text) if c.strip()]
+    for clause in clauses:
+        found = QUOTE_PHRASE_LED.match(clause)
+        if (
+            found
+            and not decisions.NOT_A_REQUEST.search(clause)
+            and not _STATEMENT_REST.search(clause[found.end() :])
+        ):
+            return True
+        priced = PRICE_PHRASE_LED.match(clause)
+        if (
+            priced
+            and not OWN_LOSS.search(clause)
+            and not _STATEMENT_REST.search(clause[priced.end() :])
+        ):
+            return True
+    return False
 
 
 def asks_price(said: str) -> bool:
