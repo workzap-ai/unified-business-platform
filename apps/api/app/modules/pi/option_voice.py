@@ -16,6 +16,7 @@ the reply composer's language step is not asked to translate them: the block is 
 step, like the cost line, and the reply linter still runs over the final text.
 """
 
+import dataclasses
 import re
 from collections import Counter
 from collections.abc import Mapping, Sequence
@@ -23,7 +24,7 @@ from dataclasses import dataclass
 from typing import Any
 
 from app.modules.pi import constraint_check as cc
-from app.modules.pi import idea_relevance, option_gate, option_rank
+from app.modules.pi import idea_relevance, option_gate, option_rank, unknown_resolution
 from app.modules.pi.requirements_types import Requirements
 
 BULLET = re.compile(r"^\s*(?:[•*-]|\d{1,2}[.)])\s+(.*)$")
@@ -106,6 +107,7 @@ class Voiced:
     question: str = ""  # the one targeted question, put last ("" when none is needed)
     changed: bool = False
     pick: str = ""  # the idea to start with (the chat's recommendation, stored for the document)
+    pending: dict[str, Any] | None = None  # the question asked, kept to read the answer
     unmarked: tuple[int, ...] = ()  # positions (among the listed ideas) of the not yet checked ones
     rejected: int = 0
     unknown: int = 0
@@ -163,6 +165,9 @@ def voice(
     reqs: Requirements,
     language: str | None,
     problems: Sequence[Mapping[str, Any]] = (),
+    owner_messages: Sequence[str] = (),
+    asked: Sequence[str] = (),
+    non_answers: Mapping[str, int] | None = None,
 ) -> Voiced:
     """See the module docstring. Every listed idea gets PS-3's verdict (`evaluate_idea`) with the
     L2-1 gate plugged in (`gate_from_option_gate`), so one verdict path decides:
@@ -241,6 +246,7 @@ def voice(
         block.append(tb["unknown"])
     new_reply = chr(10).join(keep).strip()
     question = ""
+    pending: dict[str, Any] | None = None
     if not QUESTION.search(new_reply):
         if not kept_ids:
             rules = Counter(
@@ -252,9 +258,21 @@ def voice(
             question = tb[key]
         elif not sure:
             texts = [t.rstrip(". ") for i, t in found if i in unknown_at]
-            held = option_gate.gate_options(texts, reqs, language).unknown
-            rules = Counter(g.verdict.rule for g in held if g.verdict.rule in BLOCKING)
-            question = tb[BLOCKING[rules.most_common(1)[0][0]]] if rules else ""
+            # PS-5: the one question that would settle the most unknown options, in the owner's
+            # language; the gate re-checks only the affected options after the answer
+            held = option_gate.gate_options(texts, reqs, language)
+            asked_q = unknown_resolution.choose_question(
+                held,
+                reqs,
+                texts,
+                language=language,
+                owner_messages=list(owner_messages),
+                asked=list(asked),
+                non_answers=non_answers,
+            )
+            if asked_q is not None:
+                question = asked_q.text
+                pending = dataclasses.asdict(asked_q)
     reordered = order != sorted(order)
     changed = bool(block or question or drop or unmarked or reordered)
     return Voiced(
@@ -263,6 +281,7 @@ def voice(
         question,
         changed,
         pick,
+        pending,
         unmarked,
         len(violated) + sum(v.kind in DROPPED[1:] for v in verdicts.values()),
         len(unknown_at),

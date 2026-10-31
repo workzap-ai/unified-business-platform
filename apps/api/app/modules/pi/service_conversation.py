@@ -64,6 +64,7 @@ from app.modules.pi import (
     reply_layout,
     reply_voice,
     requirements_read,
+    resolution_flow,
     safety,
     slot_carry,
     slots,
@@ -1614,6 +1615,14 @@ async def brain_problems(
         reqs = await requirements_read.read_requirements(
             session, scope, conversation_id=conversation.id
         )
+        if message is not None and (conversation.service_brief or {}).get("pending_question"):
+            # PS-5: the owner's answer to the one question about what could not be checked
+            if await resolution_flow.absorb_answer(
+                session, scope, conversation, message, reqs, str(conversation.language or "en")
+            ):
+                reqs = await requirements_read.read_requirements(
+                    session, scope, conversation_id=conversation.id
+                )
         if packed := option_wiring.requirements_context(reqs):
             context["requirements"] = packed
     context.update(matching_the_person(conversation, message, rows or []))
@@ -2024,8 +2033,23 @@ def brain_option_voice(turn: "ServiceTurn", context: dict[str, Any]) -> None:
     # gated on the reply as it stands (English ideas are read best); the labels, the fixed block and
     # the question are put in after the language step, in the reply's own language
     noted, _fresh = noted_with_turn(context, turn)  # includes a problem this message starts
-    voiced = option_voice.voice(turn.reply, reqs, language, noted)
+    brief_now = context.get("brief") or {}
+    owner_said = [
+        str(h.get("text") or "")
+        for h in context.get("history") or []
+        if h.get("role") in ("customer", "owner")
+    ]
+    voiced = option_voice.voice(
+        turn.reply,
+        reqs,
+        language,
+        noted,
+        owner_messages=owner_said,
+        asked=list(brief_now.get("resolution_asked") or []),
+        non_answers=dict(brief_now.get("resolution_non_answers") or {}),
+    )
     turn._voice_pick = voiced.pick
+    turn._voice_pending = voiced.pending
     if not voiced.changed:
         return
     turn.reply = voiced.reply
@@ -6504,9 +6528,16 @@ async def compose_service_turn(
         brain_offer(turn, context)
         strip_unallowed_offer(turn, context)
         brain_option_voice(turn, context)
-        if turn._voice_pick:  # the document recommends the same option (one ranking)
+        if turn._voice_pick or turn._voice_pending:
             kept = dict(conversation.service_brief or {})
-            kept["chat_pick"] = turn._voice_pick
+            if turn._voice_pick:  # the document recommends the same option (one ranking)
+                kept["chat_pick"] = turn._voice_pick
+            if turn._voice_pending:  # read the owner's answer next turn (PS-5)
+                kept["pending_question"] = turn._voice_pending
+                kept["resolution_asked"] = [
+                    *list(kept.get("resolution_asked") or []),
+                    str(turn._voice_pending.get("key") or ""),
+                ]
             conversation.service_brief = kept
     if context.get("handback_notice") and not turn.request_human and turn._decision is None:
         short = safety.handback_reply(str(context.get("reply_language") or "en"))
