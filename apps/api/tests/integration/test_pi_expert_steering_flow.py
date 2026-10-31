@@ -344,7 +344,7 @@ async def test_the_new_problem_gets_its_two_after_the_first_is_capped(
     monkeypatch.setattr(LLMManager, "complete_structured", structured)
     teacher_ideas = [
         "Ask each teacher who left what finally made them decide, so you hear the real reason before the next one goes.",
-        GOOD_TWO.replace("showroom", "school"),
+        "Ask each teacher who is still here what would make them stay another year, so you fix it before they hand in notice.",
     ]
 
     async def complete(self, scope, **kwargs):

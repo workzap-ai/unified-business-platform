@@ -2017,12 +2017,11 @@ def brain_option_voice(turn: "ServiceTurn", context: dict[str, Any]) -> None:
     idea to start with and why, what was left out and which of their own words ruled it out, and the
     one question that would settle what blocks. Brain mode, ideas listed, requirements known."""
     reqs = option_wiring.requirements_from(context.get("requirements"))
-    if reqs.empty and reqs.columns_available:
-        return
     language = fixed_lines.code(context, script=True)  # "ur" for Urdu script, "ar" for Arabic
     # gated on the reply as it stands (English ideas are read best); the labels, the fixed block and
     # the question are put in after the language step, in the reply's own language
-    voiced = option_voice.voice(turn.reply, reqs, language)
+    noted, _fresh = noted_with_turn(context, turn)  # includes a problem this message starts
+    voiced = option_voice.voice(turn.reply, reqs, language, noted)
     if not voiced.changed:
         return
     turn.reply = voiced.reply
@@ -3005,6 +3004,10 @@ async def brain_free_ideas(
             given_before,
             (solutions.load(keys[0]) or {}).get("problems") or [] if keys else [],
             keys[:1],
+            [
+                str(t.get("what") or "")
+                for t in (context.get("requirements") or {}).get("tried") or []
+            ],
         )
     idea_ctx = idea_filter.with_grounding(idea_ctx, str(context.get("profile_grounding") or ""))
     if context.get("thinking"):  # G10 (spec 17.4): the owner's stated size judges each idea

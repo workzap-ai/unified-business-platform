@@ -66,6 +66,7 @@ def expert_engine(monkeypatch, case):
     ordered = [c for c in cands if c["verdict"] == "violates_constraint"] + [
         c for c in cands if c["verdict"] == "relevant"
     ]
+    ordered += [c for c in cands if c["verdict"] in ("irrelevant", "generic")]
     diag = {
         "problem": case["title"],
         "causes": [{"cause": "unknown", "evidence_for": [], "evidence_against": []}],
@@ -268,15 +269,14 @@ async def test_problem_solving_flow(case_id, api, business_db, monkeypatch):
     again = option_wiring.requirements_from(packed)
     language = case["language"]
     for cand in exp["candidates"]:
-        wired = option_wiring.gate_ideas([cand["text"]], again, language)
+        listed = f"{chr(8226)} {cand['text']}"
+        voiced = option_voice.voice(listed, again, language, noted_records(rows))
         if cand["verdict"] == "violates_constraint":
-            assert not wired.accepted, (cand["text"], wired)
-            if language in ("en", "roman_ur"):
-                assert wired.rejected or wired.unknown
-        if wired.unknown:
-            assert option_wiring.NOT_CHECKED in wired.shown[0]  # unknown is never shown as checked
-        if wired.question:
-            assert wired.question.count("?") == 1 and wired.question.endswith("?")
+            assert voiced.accepted == 0, (cand["text"], voiced)
+        if voiced.unknown:  # unknown is never shown as checked
+            assert option_voice.label_ideas(voiced.reply, voiced.unmarked, language) != voiced.reply
+        if voiced.question:
+            assert len(re.findall(r"[?؟]", voiced.question)) == 1
 
     # the live turn context carried the stored requirements to the model (brain mode)
     last = len(owner_texts(case)) - 1
@@ -360,6 +360,9 @@ async def test_the_owner_reads_the_options_in_the_chat(case_id, api, business_db
     if shown_bad:  # a limit-breaking idea may stay only when it says it is not yet checked
         line = next(x for x in reply.splitlines() if bad["text"].rstrip(". ") in x)
         assert table["label"] in line, reply
+    for cand in case["expected"]["candidates"]:
+        if cand["verdict"] in ("irrelevant", "generic"):  # never silently relevant (PS-3)
+            assert cand["text"].rstrip(". ") not in reply, (cand["verdict"], reply)
     voiced = (
         table["unknown"] in reply
         or table["start"] in reply
@@ -368,6 +371,13 @@ async def test_the_owner_reads_the_options_in_the_chat(case_id, api, business_db
     assert voiced, ("the owner saw no statement about the options", reply)
     if table["left_out"].split("{")[0].strip() in reply:
         assert any(limit in reply for limit in option_voice_limits(case)), reply
+
+
+def noted_records(rows):
+    return [
+        {"title": r.title, "title_local": r.title_local, "user_words": list(r.user_words or [])}
+        for r in rows
+    ]
 
 
 def option_voice_limits(case):

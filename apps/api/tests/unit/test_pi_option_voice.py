@@ -1,4 +1,7 @@
 # ruff: noqa: E501
+"""The owner reads the options in the chat: PS-3's six verdicts, with the L2-1 gate plugged in, in
+four languages. One verdict path (`option_voice.voice`)."""
+
 import re
 
 import pytest
@@ -13,8 +16,22 @@ from app.modules.pi.requirements_types import (
     TriedItem,
 )
 
+BUL = "\u2022 "
+PROBLEMS = [
+    {
+        "title": "Late courier makes buyers refuse parcels",
+        "user_words": ["our courier delivers late"],
+        "group": "orders_fulfilment",
+    }
+]
+LINKED = "Message each buyer when the parcel leaves with the courier tracking line, so the buyer expects it."
+VIOLATING = "Change the courier to a faster one."
+UNLINKED = "Repaint the shop signboard in a brighter colour."
+GENERIC = "Use better software to improve your business."
+REPEAT = "Offer a discount to customers whose orders were late."
 
-def reqs(cannot=(), budget=None, tried=()):
+
+def reqs(cannot=(), tried=(), budget=None):
     c = Constraints(
         budget=Limit(budget) if budget else None, cannot_change=tuple(Limit(x) for x in cannot)
     )
@@ -23,27 +40,71 @@ def reqs(cannot=(), budget=None, tried=()):
     )
 
 
-BUL = "\u2022 "
+COURIER = reqs(cannot=["we cannot change courier because of the contract"])
 
 
-def test_nothing_stated_changes_nothing():
-    r = ov.voice(f"Here are some ideas:\n{BUL}Send a reminder.", Requirements(), "en")
-    assert not r.changed and r.block == "" and r.question == ""
+def run(*ideas, r=COURIER, lang="en", problems=PROBLEMS):
+    reply = "Here are some ideas:\n" + "\n".join(f"{BUL}{i}" for i in ideas)
+    return ov.voice(reply, r, lang, problems)
 
 
-def test_rejected_idea_removed_with_owner_words_and_one_question():
-    reply = f"Here are some ideas:\n{BUL}Change the courier company to a faster one."
-    r = ov.voice(reply, reqs(cannot=["we cannot change courier because of the contract"]), "en")
+def test_linked_idea_with_the_gate_ok_stays_and_is_recommended():
+    r = run(LINKED)
+    assert r.accepted == 1 and r.unknown == 0 and not r.unmarked
+    assert ov.T["en"]["start"] in r.block and LINKED in r.reply
+
+
+def test_violating_idea_is_removed_with_the_owners_words_and_one_question():
+    r = run(VIOLATING)
     assert "faster one" not in r.reply
     assert 'you said: "we cannot change courier because of the contract"' in r.block
     assert r.question == ov.T["en"]["q_cannot_change"]
-    assert len(re.findall(r"[?\u061f]", r.question)) == 1
 
 
-def test_accepted_idea_is_recommended_and_no_question_added():
-    reply = f"Here are some ideas:\n{BUL}Keep a list of refused parcels with the reason."
-    r = ov.voice(reply, reqs(cannot=["we cannot change courier because of the contract"]), "en")
-    assert r.accepted == 1 and ov.T["en"]["start"] in r.block and r.question == ""
+def test_violation_wins_even_over_a_linked_idea():
+    r = run(VIOLATING, LINKED)
+    assert VIOLATING not in r.reply and LINKED in r.reply
+
+
+def test_unlinked_idea_is_removed_and_said_so():
+    r = run(UNLINKED, LINKED)
+    assert UNLINKED not in r.reply and ov.T["en"]["off_topic"] in r.block
+
+
+def test_generic_idea_is_removed_and_said_so():
+    r = run(GENERIC, LINKED)
+    assert GENERIC not in r.reply and ov.T["en"]["generic"] in r.block
+
+
+def test_repeated_idea_is_removed_with_the_owners_words():
+    r = run(REPEAT, LINKED, r=reqs(tried=["I tried a discount on late orders"]))
+    assert REPEAT not in r.reply
+    assert 'you already tried: "I tried a discount on late orders"' in r.block
+
+
+def test_nothing_linked_never_pads_and_asks_one_question():
+    r = run(UNLINKED, GENERIC)
+    assert not [x for x in r.reply.splitlines() if x.startswith(BUL)]
+    assert r.question == ov.T["en"]["q_default"]
+
+
+def test_unknown_is_labelled_never_linked():
+    # no noted problem to judge by: relevance is UNKNOWN, so the idea stays only as "not yet checked"
+    r = run(LINKED, problems=())
+    assert r.unknown == 1 and r.accepted == 0
+    assert ov.T["en"]["label"] in ov.label_ideas(r.reply, r.unmarked, "en")
+    assert ov.T["en"]["start"] not in r.block
+
+
+def test_unreadable_requirements_are_unknown_not_confirmed():
+    r = run(LINKED, r=Requirements(columns_available=False))
+    assert r.accepted == 0 and r.unknown == 1
+
+
+def test_reply_that_already_asks_keeps_its_one_question():
+    reply = f"{BUL}{UNLINKED}\nWhat result do you want?"
+    r = ov.voice(reply, COURIER, "en", PROBLEMS)
+    assert r.question == "" and r.reply.count("?") == 1
 
 
 @pytest.mark.parametrize("lang", ["en", "roman_ur", "ur", "ar"])
@@ -51,51 +112,32 @@ def test_templates_are_complete_and_clean(lang):
     t = ov.T[lang]
     assert set(t) == set(ov.T["en"])
     for key, text in t.items():
-        assert not re.search(r"\b(will|guarantee|price|rs\b)", text, re.I) or lang != "en", key
+        if lang == "en":
+            assert not re.search(r"\b(will|guarantee|price)\b", text, re.I), key
         if key.startswith("q_"):
             assert len(re.findall(r"[?\u061f]", text)) == 1 and text.rstrip().endswith(
                 ("?", "\u061f")
             )
         else:
             assert not re.search(r"[?\u061f]", text.replace("{words}", "")), key
-    assert "{words}" in t["left_out"]
+    assert "{words}" in t["left_out"] and "{words}" in t["repeat"]
 
 
-@pytest.mark.parametrize("lang", ["ur", "ar"])
-def test_non_latin_or_unreadable_ideas_are_labelled_not_confirmed(lang):
-    idea = {
-        "ur": "\u067e\u0631\u0627\u0646\u0627 \u0645\u0627\u0644 \u067e\u06c1\u0644\u06d2 \u0628\u06cc\u0686\u06cc\u06ba\u06d4",
-        "ar": "\u0627\u0628\u062f\u0623 \u0628\u0627\u0644\u0645\u062e\u0632\u0648\u0646 \u0627\u0644\u0642\u062f\u064a\u0645.",
-        "roman_ur": "Purana maal pehle becheen.",
-    }[lang]
-    r = ov.voice(f"{BUL}{idea}", reqs(cannot=["we cannot change courier"]), lang)
+URDU_LINKED = "پارسل کے ساتھ خریدار کو ڈیلیوری کی ٹریکنگ بھیجیں۔"
+ARABIC_LINKED = "أرسل للمشتري تتبع التوصيل عند خروج الطرد."
+
+
+@pytest.mark.parametrize(("lang", "idea"), [("ur", URDU_LINKED), ("ar", ARABIC_LINKED)])
+def test_urdu_and_arabic_linked_ideas_are_kept_and_unchecked_ones_are_labelled(lang, idea):
+    r = run(idea, lang=lang)
+    # the L2-1 gate reads English and Roman Urdu only, so the idea stays labelled as not yet checked
+    assert r.accepted == 0 and r.unknown == 1
     assert ov.T[lang]["label"] in ov.label_ideas(r.reply, r.unmarked, lang)
     assert ov.T[lang]["unknown"] in r.block
-    assert r.accepted == 0
-
-
-def test_unknown_only_asks_the_blocking_limit_once():
-    r = ov.voice(
-        f"{BUL}ابدأ بالمخزون القديم.",
-        reqs(budget="my budget is 50,000 rupees a month"),
-        "ar",
-    )
-    assert r.unknown == 1 and r.accepted == 0
-    assert r.question in ov.T["ar"].values()
-
-
-def test_reply_that_already_asks_keeps_its_one_question():
-    reply = f"{BUL}Change the courier company to a faster one.\nWhat result do you want?"
-    r = ov.voice(reply, reqs(cannot=["we cannot change courier"]), "en")
-    assert r.question == "" and r.reply.count("?") == 1
 
 
 def test_block_is_not_linted_as_a_promise():
-    r = ov.voice(
-        f"{BUL}Change the courier company to a faster one.",
-        reqs(cannot=["we cannot change courier"]),
-        "en",
-    )
+    r = run(VIOLATING)
     text = f"{r.block}\n\n{r.reply}\n\n{r.question}"
     assert [
         v for v in constitution.hard(constitution.lint(text, {})) if v.rule != "R-DISC-01"

@@ -8,8 +8,10 @@ vetting covers "uses something the person said". This module adds the rest, from
 - G2 grounded: "online launches" or "a website shop" for a business that never mentioned either.
 - G3 sub-type: a stock-sync idea for a stock-clearing problem.
 - G4 cause-fit: an idea that assumes a cause the owner did not give (or one other than theirs).
-- G7 new: an idea that repeats one already given in the conversation.
-- G8 on the map: an idea for a problem the owner never raised.
+- G7 new: an idea that repeats one already given in the conversation, or one the owner already tried.
+- G8 on the map: an idea for a problem the owner never raised, judged by meaning (PS-3
+  `idea_relevance.evaluate_idea`, English, Roman Urdu, Urdu, Arabic, Hindi), not by shared words.
+- G13 boilerplate (PS-flow, from PS-3's GENERIC): an idea that would fit any business.
 - G9 vocabulary: an idea in another trade's words (`idea_vocabulary`), when the trade is known.
 - G12 idea link (v1.5, 18.4): with no problem on the map there is nothing for an idea to answer.
 - G10 feasible: an idea the owner's stated size cannot carry (`feasibility`), when `resources` is set.
@@ -26,7 +28,14 @@ from collections.abc import Sequence
 from dataclasses import dataclass, replace
 from typing import Any
 
-from app.modules.pi import feasibility, idea_vocabulary, solution_ideas, solution_library, taxonomy
+from app.modules.pi import (
+    feasibility,
+    idea_relevance,
+    idea_vocabulary,
+    solution_ideas,
+    solution_library,
+    taxonomy,
+)
 
 # A goal verb and the ideas that work against it.
 _AGAINST_CLEARING = re.compile(
@@ -128,17 +137,8 @@ _ROBUST = re.compile(
 # --- G7: the idea is new ---------------------------------------------------------------------------
 SAME_IDEA = 0.7  # share of the idea's content words found in one idea already given
 
+
 # --- G8: the idea relates to a node on the map -------------------------------------------------------
-# Words that belong to a goal even when the owner's own words for the node do not repeat them.
-_GOAL_VOCAB: dict[str, str] = {
-    "sell_clear": "sell clear sale offer oldest bundle outlet clearance",
-    "know_track": "count record track list tally know",
-    "avoid_running_out": "reorder running low stock supplier level fast sellers",
-    "bring_back": "repeat return regular message remind",
-    "collect_cash": "collect payment owed reminder dues credit",
-}
-
-
 @dataclass(frozen=True)
 class IdeaContext:
     """What the conversation holds that G3, G4, G7 and G8 judge an idea against."""
@@ -153,6 +153,9 @@ class IdeaContext:
     node_categories: tuple[str, ...] = ()  # the category of each node
     grounded: str = ""  # words of the CONFIRMED business-profile facts: they ground G2 (OT13)
     resources: str = ""  # the owner's own words about their size (people, shops): G10 (spec 17.4)
+
+    problems: tuple[dict[str, Any], ...] = ()  # the noted problems' records, for G8 and G13 (PS-3)
+    tried: tuple[str, ...] = ()  # what the owner already tried (G7: never offer it again)
 
     needs_problem: bool = False  # G12 (spec v1.5, 18.4): no problem known, no idea at all
 
@@ -269,41 +272,21 @@ def repeats(idea: str, given: Sequence[str]) -> str | None:
     return None
 
 
-def _non_latin(text: str) -> bool:
-    """True when the text holds letters outside the Latin script (Urdu, Arabic, ...)."""
-    return any(ch.isalpha() and ord(ch) > 0x024F for ch in text)
-
-
-def off_the_map(
-    idea: str,
-    nodes: Sequence[str],
-    categories: Sequence[str] = (),
-    goal_verb: str = "",
-    entry_ideas: Sequence[str] = (),
-) -> str | None:
-    """G8: the rule id when the idea shares nothing with any problem on the map. It relates when it
-    shares a content word with a node's words, or with the vocabulary of a node's category or of the
-    owner's goal; no nodes means no map to judge by."""
-    if not nodes:
+def relevance(idea: str, ctx: IdeaContext, language: str | None = None) -> str | None:
+    """G8, G13 and the tried half of G7, from PS-3's `evaluate_idea` (meaning, not word overlap, in
+    English, Roman Urdu, Urdu, Arabic and Hindi): "G8" when the idea is off the map (UNLINKED),
+    "G13" when it is boilerplate that fits any business (GENERIC), "G7" when it repeats what the
+    owner already tried. LINKED passes. UNKNOWN is not a failure here and is never read as linked:
+    the reply labels it "not yet checked" (option_voice). No map to judge by means no judgement."""
+    records = ctx.problems or tuple({"title": n} for n in ctx.nodes if n.strip())
+    if not records:
         return None
-    # STOPGAP until PS-3 evaluate_idea lands: a word-overlap test cannot judge another script, so
-    # G8 never rejects an idea or a map written in non-Latin script (unknown stays unknown).
-    if _non_latin(idea) or any(_non_latin(n) for n in nodes):
-        return None
-    mine = solution_ideas._evidence(idea)
-    weak = solution_ideas.WEAK
-    theirs = solution_ideas._evidence(" ".join(nodes))
-    shared = mine & theirs
-    if shared - weak or len(shared & weak) >= 2:
-        return None
-    cues = " ".join(solution_library.CUES.get(c, "") for c in categories)
-    if mine & (solution_ideas._evidence(cues) - weak):
-        return None
-    if mine & solution_ideas._evidence(_GOAL_VOCAB.get(goal_verb, "")):
-        return None  # the goal's own words ("sale", "oldest"), not only the node's
-    if entry_ideas and mine & solution_ideas._evidence(" ".join(entry_ideas)) - weak:
-        return None  # it matches the concepts of the noted problem's sub-type entry
-    return "G8"
+    verdict = idea_relevance.evaluate_idea(idea, records, tried=ctx.tried, language=language)
+    return {
+        idea_relevance.IdeaKind.UNLINKED: "G8",
+        idea_relevance.IdeaKind.GENERIC: "G13",
+        idea_relevance.IdeaKind.REPEATS_TRIED: "G7",
+    }.get(verdict.kind)
 
 
 def with_grounding(ctx: IdeaContext | None, grounded: str) -> IdeaContext | None:
@@ -346,9 +329,7 @@ def failures(idea: str, owner_words: str, ctx: IdeaContext | None = None) -> lis
             wrong_subtype(idea, ctx.subtype, ctx.entry_ideas),
             cause_misfit(idea, ctx.cause),
             repeats(idea, ctx.given),
-            off_the_map(
-                idea, ctx.nodes, ctx.node_categories, ctx.goal_verb, ctx.entry_ideas
-            ),
+            relevance(idea, ctx),
         ]
     return [rule for rule in found if rule]
 
@@ -359,6 +340,7 @@ def context_from(
     given: Sequence[str] = (),
     entries: Sequence[dict[str, Any]] = (),
     industries: Sequence[str] = (),
+    tried: Sequence[str] = (),
 ) -> IdeaContext:
     """The context from the noted problems (what `problems.noted_context` returns), the owner's
     words, the ideas already given and the industry's entries. The latest noted problem that has a
@@ -400,6 +382,8 @@ def context_from(
         nodes=nodes,
         node_categories=tuple(str(n.get("group") or "") for n in noted),
         industries=tuple(industries),
+        problems=tuple({**n, "category": n.get("group", "")} for n in noted if isinstance(n, dict)),
+        tried=tuple(str(t) for t in tried if str(t).strip()),
     )
 
 
