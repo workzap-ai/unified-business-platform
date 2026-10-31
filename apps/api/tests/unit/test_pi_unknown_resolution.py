@@ -215,9 +215,10 @@ def test_explain_skips_ok_and_violating_options() -> None:
     r = reqs(staff="only 2 people")
     opts = ["Hire 5 new staff", "Use a shared sheet", "Hire 1 new assistant"]
     g = gate(opts, r)
-    assert [x.option for x in g.rejected] == ["Hire 5 new staff"]
+    # L2-1 round 4: "only N people" is the team size, so any hire (5 or 1) is rejected
+    assert [x.option for x in g.rejected] == ["Hire 5 new staff", "Hire 1 new assistant"]
     ex = ur.explain_unknowns(g, r, opts)
-    assert all(e.option != "Hire 5 new staff" for e in ex)
+    assert all(e.option not in ("Hire 5 new staff", "Hire 1 new assistant") for e in ex)
 
 
 def test_explain_from_aligned_verdict_list() -> None:

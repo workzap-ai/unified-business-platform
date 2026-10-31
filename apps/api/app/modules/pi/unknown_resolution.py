@@ -151,6 +151,10 @@ _REASON_CODES: tuple[tuple[str, Code], ...] = (
     ("a thing the owner tried is not in a script", Code.TRIED_SCRIPT),
     ("overlaps with something that failed", Code.TRIED_OVERLAP),
     ("is not in a script this check can read", Code.OPTION_SCRIPT),
+    ("in a script this check does not read fully", Code.OPTION_SCRIPT),  # L2-1 round 4
+    ("no-budget limit names something else", Code.LIMIT_VAGUE),  # L2-1 round 4
+    ("the limit does not say only", Code.LIMIT_VAGUE),  # L2-1 round 4
+    ("of the stated limit were not read", Code.LIMIT_VAGUE),  # L2-1 round 4
     ("too long to be read", Code.OPTION_TOO_LONG),
     ("the option text is empty", Code.OPTION_EMPTY),
     ("the option is not text", Code.OPTION_NOT_TEXT),
