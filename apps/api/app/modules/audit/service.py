@@ -46,6 +46,7 @@ async def record(
     details: dict[str, Any] | None = None,
     request_id: str | None = None,
     include_environment: bool = True,
+    actor_label: str | None = None,
 ) -> None:
     """Append an audit event inside the caller's transaction."""
     if scope is not None:
@@ -57,7 +58,7 @@ async def record(
         request_id = request_id or scope.request_id
     else:
         actor_type = "user" if actor_user_id else "anonymous"
-        actor_label = "user" if actor_user_id else "anonymous"
+        actor_label = actor_label or ("user" if actor_user_id else "anonymous")
     session.add(
         AuditEvent(
             tenant_id=tenant_id,

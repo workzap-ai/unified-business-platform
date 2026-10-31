@@ -5,6 +5,7 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from starlette.exceptions import HTTPException
 
+from app.modules.audit.denials import audit_denial
 from app.shared.errors import (
     BusinessRuleViolation,
     Conflict,
@@ -82,6 +83,8 @@ async def unauthenticated_error(request: Request, exc: Exception) -> JSONRespons
 async def forbidden_error(request: Request, exc: Exception) -> JSONResponse:
     if isinstance(exc, CsrfFailed):
         return error_response(request, 403, "CSRF_FAILED", "Security check failed. Reload.")
+    if isinstance(exc, PermissionDenied):
+        await audit_denial(request, exc)
     return error_response(request, 403, "FORBIDDEN", "Access denied")
 
 

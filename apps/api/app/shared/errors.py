@@ -1,5 +1,7 @@
 """Domain errors with fixed public codes. Messages are safe to show to operators."""
 
+from uuid import UUID
+
 from app.modules.tenants.errors import OrganizationConflict, ResourceNotFound
 
 __all__ = [
@@ -19,7 +21,29 @@ class Unauthenticated(Exception):
 
 
 class PermissionDenied(Exception):
-    """Authenticated but not authorized for the requested action."""
+    """Authenticated but not authorized for the requested action.
+
+    A failed workspace permission check also carries who and where (ids and the missing
+    permission keys only), so the 403 handler can audit it. Other raises carry nothing.
+    """
+
+    def __init__(
+        self,
+        *,
+        tenant_id: UUID | None = None,
+        environment_id: UUID | None = None,
+        user_id: UUID | None = None,
+        actor_label: str | None = None,
+        request_id: str | None = None,
+        missing: tuple[str, ...] = (),
+    ) -> None:
+        super().__init__()
+        self.tenant_id = tenant_id
+        self.environment_id = environment_id
+        self.user_id = user_id
+        self.actor_label = actor_label
+        self.request_id = request_id
+        self.missing = missing
 
 
 class Conflict(OrganizationConflict):
