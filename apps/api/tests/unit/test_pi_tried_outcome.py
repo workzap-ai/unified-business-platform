@@ -103,3 +103,19 @@ def test_a_mixed_message_marks_each_attempt_correctly():
 def test_an_unrelated_tried_item_stays_unset():
     note = ProblemNote(title="Files", tried=[{"what": "ads", "outcome": ""}])
     assert values(note, ROMAN)["tried"][0]["outcome"] == ""
+
+
+def test_a_repeat_check_skips_attempts_the_owner_said_worked():
+    stored = [
+        {"what": "rang wale folder", "outcome": "failed"},
+        {"what": "whatsapp reminders", "outcome": "worked"},
+        {"what": "ads", "outcome": ""},
+        "plain",
+    ]
+    kept = to.not_worked(stored)
+    assert [t["what"] if isinstance(t, dict) else t for t in kept] == [
+        "rang wale folder",
+        "ads",
+        "plain",
+    ]
+    assert to.not_worked(None) == []

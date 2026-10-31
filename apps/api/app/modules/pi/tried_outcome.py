@@ -111,3 +111,16 @@ def outcome_of(text: str | None) -> str:
     if WORKED.search(said):
         return "worked"
     return "unclear"
+
+
+def not_worked(tried: object) -> list[object]:
+    """The stored `tried` entries an idea may be checked against as a repeat: those the owner said
+    failed, and those with no outcome said; never one the owner said worked (a repeat of a
+    successful attempt is not a failed repeat). Plain strings and unknown shapes pass through."""
+    if not isinstance(tried, list | tuple):
+        return []
+    return [
+        t
+        for t in tried
+        if not (isinstance(t, dict) and str(t.get("outcome") or "").casefold() == "worked")
+    ]
