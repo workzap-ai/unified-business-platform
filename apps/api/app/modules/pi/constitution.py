@@ -2445,6 +2445,46 @@ def _fresh_question(context: dict[str, Any], language: str) -> str:
     return _next_question(context, "") or FALLBACK_LISTENING[language]
 
 
+# The question after the acknowledgement of a draft that was not sent, in the languages that have
+# an acknowledgement but no safe line above (same meaning as FALLBACK_LISTENING and FALLBACK_OTHER).
+ACK_QUESTION_MORE = {
+    "fr": {
+        "listening": "Quelle partie de cela vous coûte le plus en ce moment ?",
+        "other": "Lequel de ces points aimeriez-vous voir réglé en premier ?",
+    },
+    "es": {
+        "listening": "¿Qué parte de esto le cuesta más ahora mismo?",
+        "other": "¿Cuál de estos puntos le gustaría ver resuelto primero?",
+    },
+    "fa": {
+        "listening": "کدام بخش این موضوع الان بیشترین هزینه را برای شما دارد؟",
+        "other": "کدام یک از این موارد را دوست دارید اول حل شود؟",
+    },
+}
+
+
+def ack_with_question(ack: str, context: dict[str, Any], language: str | None = None) -> str:
+    """The acknowledgement of a draft that was not sent, with the next question after it: a
+    notice alone ("Thanks, I've got that.") leaves the owner with nothing to answer. The question
+    is the safe one for the state (the same choice as safe_fallback): it asks, never offers, never
+    names a price, and is not one pi already asked in this chat. One question, the last sentence."""
+    if ack.rstrip().endswith(QUESTION_MARKS):
+        return ack
+    state = flow.parse((context.get("flow") or {}).get("state"))
+    listening = state in flow.LISTENING or state in (
+        None,
+        flow.State.S5B_DECLINED,
+        flow.State.S_RETURN,
+        flow.State.S_MAP_SHARE,
+    )
+    if language in ACK_QUESTION_MORE:
+        question = ACK_QUESTION_MORE[language]["listening" if listening else "other"]
+    else:
+        lang = language if language in FALLBACK_LISTENING else _language(context)
+        question = _fresh_question(context, lang) if listening else FALLBACK_OTHER[lang]
+    return f"{ack.rstrip()} {question}"
+
+
 def safe_fallback(context: dict[str, Any]) -> str:
     """The safe line for the state, in the person's language (spec 9.5)."""
     language = _language(context)
@@ -2765,7 +2805,12 @@ def _ensure_next_step(reply: str, context: dict[str, Any]) -> str:
         or context.get("solution_asked")
         or context.get("handback_notice")
         or "•" in reply
-        or re.search(r"document|quote", reply, re.IGNORECASE)
+        # a reply about a document or quote that already asks keeps its own question; one that
+        # asks nothing is a dead end and gets the next question like any other
+        or (
+            re.search(r"document|quote", reply, re.IGNORECASE)
+            and reply.rstrip().endswith(QUESTION_MARKS)
+        )
         or ASKS_IF_AI.search(latest)
         or DIRECT_QUESTION.search(latest)
     ):
@@ -2778,6 +2823,9 @@ def _ensure_next_step(reply: str, context: dict[str, Any]) -> str:
     if closer and not (_generic_closers_before(context) >= 1 or _bare_fragment(latest)):
         return reply  # the first generic closer, after a real answer: allowed once
     nxt = _next_question(context, reply)
+    if not nxt and not asked:
+        # no next-slot question left (or the chat is in another language): never end on a statement
+        nxt = _fresh_question(context, _language(context))
     if not nxt:
         return reply
     kept = [x for x in sentences if x != closer]

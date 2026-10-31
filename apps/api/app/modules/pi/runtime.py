@@ -31,7 +31,7 @@ from app.ai.types import Message, TextPart, VideoPart
 from app.modules.business_settings.capabilities import business_permissions
 from app.modules.customers.service import CustomerService
 from app.modules.environments.models import Environment
-from app.modules.pi import latency, outage, price_policy
+from app.modules.pi import constitution, latency, outage, price_policy
 from app.modules.pi.agents import AgentContext, run_specialists
 from app.modules.pi.configuration import seed_agents, settings_cache_for_turn, settings_row
 from app.modules.pi.graph import AGENTS, RouteState, keyword_intent, route_message
@@ -1830,6 +1830,16 @@ async def process_pi_event(ctx: dict[str, Any], event_id: str) -> None:
                         "tool_failure": TOOL_FAIL_NOTICES,
                     }.get(handoff_reason, BRAIN_ACK_NOTICES)
                 text = _localized(notices, typed, conversation.language)
+                if (
+                    notices is BRAIN_ACK_NOTICES
+                    and (service_context or {}).get("pi_mode") == "brain"
+                ):
+                    # Never a dead end: the acknowledgement carries the next question.
+                    text = constitution.ack_with_question(
+                        text,
+                        service_context or {},
+                        detect_language(typed) or conversation.language,
+                    )
                 sent = await agent_ctx.tool("router", "send_whatsapp_message", {"body": text})
                 if sent.ok and sent.data is not None:
                     outbound.append(str(sent.data["message_id"]))
