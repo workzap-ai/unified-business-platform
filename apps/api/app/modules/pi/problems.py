@@ -6,6 +6,7 @@ and builds the S4 summary (`summary_message`). Records keep the person's own wor
 names or card, phone or ID numbers (redacted first), and every change is a revision.
 """
 
+import logging
 import re
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
@@ -15,6 +16,7 @@ from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field
 from sqlalchemy import func, inspect, select
+from sqlalchemy.exc import DBAPIError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.modules.pi import business, figure_correction, part19, problem_fields, taxonomy
@@ -27,6 +29,8 @@ from app.modules.pi.problem_models import (
 )
 from app.shared.scope import WorkspaceScope
 from app.shared.workspace_repository import WorkspaceRepository
+
+logger = logging.getLogger(__name__)
 
 TITLE_WORDS = 8
 SUMMARY_LINE_WORDS = 10
@@ -493,8 +497,21 @@ class ProblemBook:
             or note.cannot_change_remove
             or note.tried
             or note.cause_text
+            or note.believes_cause.strip()
             or note.expected_outcome
         )
+
+    @staticmethod
+    def cause_candidate(note: ProblemNote) -> tuple[str, bool, list[str]]:
+        """(text, said, evidence words) of the cause a note carries. The B2a cause fields win; the
+        older `believes_cause` is the same claim ("the owner said it") with no evidence of its own,
+        so its own first words are the evidence and must occur in the owner's own text, or the
+        cause is pi's guess (L1-3): the model writing believes_cause proves nothing."""
+        if note.cause_text.strip():
+            return note.cause_text, note.cause_said, note.cause_words
+        text = note.believes_cause.strip()
+        words = [w for w in re.findall(r"\w+", text.casefold()) if len(w) >= 3][:3]
+        return text, True, words
 
     async def load_requirements(self, problem: PiProblem) -> None:
         """The four deferred columns, loaded now (an async session cannot lazy-load them)."""
@@ -530,18 +547,19 @@ class ProblemBook:
         changed = changed or was
         if tried is not None:
             values["tried"] = tried
+        cause_text, cause_said, cause_words = ProblemBook.cause_candidate(note)
         cause, was = problem_fields.merge_cause(
             problem.cause if problem else None,
-            note.cause_text,
-            note.cause_said,
-            note.cause_words,
+            cause_text,
+            cause_said,
+            cause_words,
             msg,
             owner_text or "",  # only the owner's message: model-written words prove nothing
         )
         changed = changed or was
         if cause is not None:
             values["cause"] = cause
-            if cause["status"] in problem_fields.OWNER_STATUSES and not note.believes_cause.strip():
+            if cause["status"] in problem_fields.OWNER_STATUSES:
                 # the older column keeps the owner's belief only; a guess never goes there
                 values["person_believes_cause"] = redact(cause["text"][:300])[0]
         outcome, was = problem_fields.clean(note.expected_outcome, problem_fields.OUTCOME_CAP)
@@ -648,8 +666,7 @@ class ProblemBook:
             current_workaround=note.workaround.strip()[: FIELD_LIMITS["workaround"]],
             systems_mentioned=[s[:60] for s in note.systems[:8]],
             who_notices=note.who_notices.strip()[: FIELD_LIMITS["who_notices"]],
-            person_believes_cause=required.pop("person_believes_cause", None)
-            or redact(note.believes_cause.strip()[:300])[0],
+            person_believes_cause=required.pop("person_believes_cause", None) or "",
             requested_solution=redact(note.requested_solution.strip()[:300])[0],
             status="draft",
             confidence=Decimal(str(round(note.confidence, 2))),
@@ -746,8 +763,6 @@ class ProblemBook:
                 put(name, value.strip()[:400])
         if note.systems:
             put("systems_mentioned", sorted({*problem.systems_mentioned, *note.systems[:8]}))
-        if note.believes_cause.strip():
-            put("person_believes_cause", redact(note.believes_cause.strip()[:300])[0])
         if self.carries_requirements(note):
             await self.load_requirements(problem)
             required, required_redacted = self.requirement_values(
@@ -987,6 +1002,45 @@ async def apply_ops(
     return result
 
 
+async def cause_records(
+    session: AsyncSession, ids: list[UUID]
+) -> dict[UUID, dict[str, Any] | None] | None:
+    """The `cause` record (text, status, evidence) of each problem, or None when the column cannot
+    be read (a database before 0053: then the older column is all there is, and it is only
+    written from the owner's own words)."""
+    if not ids:
+        return {}
+    try:
+        async with session.begin_nested():
+            rows = await session.execute(
+                select(PiProblem.id, PiProblem.cause).where(PiProblem.id.in_(ids))
+            )
+            return {row[0]: row[1] for row in rows}
+    except DBAPIError:
+        logger.warning("pi_cause_records_unreadable", exc_info=True)
+        return None
+
+
+def owner_cause(
+    problem: PiProblem, records: dict[UUID, dict[str, Any] | None] | None
+) -> tuple[str, str, str]:
+    """(the owner's cause, pi's hypothesis, the status) of a problem. The owner's cause is text only
+    when its record says `owner_said` or `confirmed`. A record that is pi's guess, and an older
+    value with no record (written before the evidence rule, so of unknown origin), are a
+    hypothesis, never the owner's."""
+    older = (problem.person_believes_cause or "").strip()
+    if records is None:
+        return older, "", ""  # the record cannot be read: the older column, owner-only on write
+    record = records.get(problem.id)
+    if record:
+        stated = problem_fields.stated_cause(record)
+        status = str(record.get("status") or "")
+        if stated:
+            return stated, "", status
+        return "", str(record.get("text") or ""), status
+    return "", older, problem_fields.PI_INFERRED if older else ""
+
+
 async def noted_context(
     session: AsyncSession,
     scope: WorkspaceScope,
@@ -1013,7 +1067,10 @@ async def noted_context(
         )
         if g.name
     }
-    for problem in (await book.active())[:limit]:
+    active = (await book.active())[:limit]
+    records = await cause_records(session, [p.id for p in active])
+    for problem in active:
+        said_cause, hypothesis, cause_status = owner_cause(problem, records)
         missing = [
             name
             for name, known in (
@@ -1047,7 +1104,10 @@ async def noted_context(
                 "group": problem.category,
                 "subtype": problem.subtype or "",
                 "goal_verb": problem.goal_verb or "",
-                "cause": problem.person_believes_cause or "",
+                # L1-3: `cause` is only what the owner said; pi's guess is `cause_hypothesis`
+                "cause": said_cause,
+                "cause_status": cause_status,
+                **({"cause_hypothesis": hypothesis} if hypothesis else {}),
                 "group_name": renamed.get(problem.category, ""),
                 "score": float(problem.severity_score) if problem.severity_score else None,
                 "status": problem.status,
