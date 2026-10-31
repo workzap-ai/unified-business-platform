@@ -37,6 +37,7 @@ from app.modules.pi.blueprint_checks import (
     has_money,
     has_promise,
     numbers_in,
+    owner_field,
     section_report,
 )
 from app.modules.pi.blueprint_types import (
@@ -323,7 +324,7 @@ def test_golden_constraint_table(bp: Blueprint) -> None:
         ("budget", "budget", "unknown"),
         ("tried#1", "tried", "unknown"),
     ]
-    assert bp.constraints[1].text == "The owner gave a budget limit. Staff read the exact words."
+    assert bp.constraints[1].text == "budget 50000"
     assert all(c.reason == "Not checked against this option yet." for c in bp.constraints)
 
 
@@ -487,10 +488,43 @@ def test_credential_sentence_is_removed() -> None:
     assert "A sentence asking for private details was removed from the option text." in out.unknowns
 
 
-def test_budget_words_are_never_repeated() -> None:
+def test_the_owners_budget_is_printed_as_the_owner_said_it_never_as_pi_money() -> None:
     out = build()
-    assert "50000" not in render_blueprint(out)
-    assert "50000" in out.known_numbers  # it is the owner's number, only not repeated
+    text = render_blueprint(out)
+    assert "budget: budget 50000." in text
+    assert ("", "constraint", "budget 50000") in [(f.problem, f.kind, f.text) for f in out.facts]
+    assert "50000" in out.known_numbers
+    assert issues_of(out) == ()
+
+
+def test_money_in_option_text_is_still_masked_but_not_in_the_owners_words() -> None:
+    opt = option(steps=(StepIn("Build a tracker for Rs 5 lakh"),))
+    out = build(opt)
+    assert "lakh" not in [s.text for s in out.steps if s.kind == "action"][0]
+    assert any(c.text == "budget 50000" for c in out.constraints)
+    forged = replace_step(out, "S1", text="Pay Rs 400 for it")
+    assert "BP-MONEY" in codes(forged)
+
+
+def test_owner_figures_with_currency_survive_in_every_language() -> None:
+    cases = (
+        ("en", "Rs 50,000"),
+        ("roman_ur", "Rs 40,000"),
+        ("ur", "25,000 روپے"),
+        ("ar", "10,000 ريال"),
+    )
+    for lang, budget in cases:
+        req = {
+            "constraints": [
+                {"kind": "budget", "text": budget},
+                {"kind": "cannot_change", "text": f"cap {budget}"},
+            ]
+        }
+        facts = [f"My budget is {budget}. cap {budget}"]
+        out = build(lang=lang, req=req, facts=facts)
+        text = render_blueprint(out)
+        assert out.status == READY and text.count(budget) >= 3  # facts, constraints, both
+        assert blueprint_issues(out, facts, PROBLEMS, req, STAFF) == ()
 
 
 def test_staff_input_without_a_source_or_a_valid_amount_is_dropped() -> None:
@@ -1214,7 +1248,7 @@ def test_property_ready_blueprints_are_complete_and_honest(seed: int) -> None:
     assert found == (), found
     text = render_blueprint(out)
     assert not re.search(r"[|*#`~]", text)
-    if out.status != READY:
+    if out.status in (INSUFFICIENT, REFUSED):
         assert out.steps == ()
         if out.status == INSUFFICIENT:
             assert out.missing
@@ -1242,7 +1276,9 @@ def test_property_ready_blueprints_are_complete_and_honest(seed: int) -> None:
     assert any(s.kind == "rollback" for s in out.steps)
     assert all(k.result != "ok" or k.reason for k in out.constraints)
     assert all(c_.amount is None or c_.source for c_ in out.costs)
-    assert not any(has_money(t) for _, t in free_texts(out) if not t.startswith("Setup"))
+    assert not any(
+        has_money(t) for w, t in free_texts(out) if not owner_field(w) and not w.startswith("cost")
+    )
     assert all(set(m.steps) <= ids and m.steps for m in out.milestones)
     for s in out.success:
         assert (s.baseline and s.baseline_source == "owner") or s.baseline_source.startswith(
