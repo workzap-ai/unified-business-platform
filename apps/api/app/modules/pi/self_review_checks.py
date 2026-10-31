@@ -128,6 +128,8 @@ def _known_numbers(d: DraftResult) -> set[str]:
         nums |= T.numbers(t)
     for c in _seq(d.root_causes):
         nums |= T.numbers(getattr(c, "text", ""))
+    for a in _seq(d.known_amounts):
+        nums |= T.numbers(a)
     return nums
 
 

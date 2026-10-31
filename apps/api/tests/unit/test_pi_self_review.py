@@ -673,3 +673,129 @@ def test_adversarial_regex_backtracking():
 def test_review_is_deterministic():
     d = m_sr09(base("ar"), "ar", 7)
     assert review(d) == review(d)
+
+
+# ---------------------------------------------------------------- application-written text must pass clean
+
+APP_TEXTS = {
+    "en": (
+        "Please confirm: you approve quote Q-0001 for PKR 450,000. Is that right?",
+        "The quote is free of charge. Shall I send it?",
+    ),
+    "roman_ur": (
+        "Tasdeeq karein: aap quote Q-0001 ko PKR 450,000 ke liye manzoor karte hain. Kya yeh theek hai?",
+        "Yeh quote bilkul muft hai. Kya main isay bhej doon?",
+    ),
+    "ur": (
+        "تصدیق کریں: آپ کوٹیشن Q-0001 کو PKR 450,000 کے لیے منظور کرتے ہیں۔ کیا یہ درست ہے؟",
+        "یہ کوٹیشن بالکل مفت ہے۔ کیا میں اسے بھیج دوں؟",
+    ),
+    "ar": (
+        "يرجى التأكيد: أنت توافق على عرض السعر Q-0001 بمبلغ PKR 450,000. هل هذا صحيح؟",
+        "عرض السعر مجاني تماما. هل أرسله لك؟",
+    ),
+    "hi": (
+        "कृपया पुष्टि करें: आप कोटेशन Q-0001 को PKR 450,000 के लिए मंज़ूर करते हैं। क्या यह सही है?",
+        "यह कोटेशन बिल्कुल निःशुल्क है। क्या मैं इसे भेज दूँ?",
+    ),
+}
+APP_CASES = [
+    (lang, i, status)
+    for lang in APP_TEXTS
+    for i in (0, 1)
+    for status in ("", "proposed", "approved", "in_progress")
+]
+
+
+@pytest.mark.parametrize("lang,i,status", APP_CASES)
+def test_application_written_text_is_clean(lang, i, status):
+    d = DraftResult(
+        owner_language=lang,
+        reply_text=APP_TEXTS[lang][i],
+        implementation_status=status,
+        known_amounts=("PKR 450,000", "Q-0001"),
+    )
+    r = review(d)
+    assert st(r, "SR-16") == PASS, r.by_id("SR-16").evidence
+    assert st(r, "SR-14") == PASS, r.by_id("SR-14").evidence
+    assert st(r, "SR-15") == PASS
+    assert r.verdict == COMPLETE, r.reasons
+
+
+def test_quote_reference_alone_is_not_money_and_unlisted_price_still_flagged():
+    ok = DraftResult(
+        owner_language="en", reply_text="Quote Q-0001 is ready for your approval. Shall I send it?"
+    )
+    assert review(ok).verdict == COMPLETE
+    # SR-16 is never the one to object to a price: SR-14 is, and only for a figure nobody supplied
+    bad = DraftResult(owner_language="en", reply_text=APP_TEXTS["en"][0])
+    r = review(bad)
+    assert st(r, "SR-16") == PASS and st(r, "SR-14") == FAIL and r.by_id("SR-14").tag == "claim"
+
+
+@pytest.mark.parametrize("lang", LANGS)
+@pytest.mark.parametrize("status", ["", "proposed", "approved", "in_progress"])
+def test_work_reported_as_done_is_still_flagged_for_every_unfinished_status(lang, status):
+    for phrase in DONE[lang]:
+        d = DraftResult(
+            owner_language=lang,
+            reply_text=f"{phrase} {QUESTION[lang]}",
+            implementation_status=status,
+        )
+        assert st(review(d), "SR-16") == FAIL, (lang, status, phrase)
+
+
+def test_hindi_done_wording_flagged_and_guarded():
+    d = DraftResult(owner_language="hi", reply_text="यह काम पूरा हो गया है। क्या आप देखना चाहेंगे?")
+    assert st(review(d), "SR-16") == FAIL
+    d = DraftResult(owner_language="hi", reply_text="जब यह हो गया तो हम जाँच करेंगे। क्या ठीक है?")
+    assert st(review(d), "SR-16") == PASS
+
+
+# ---------------------------------------------------------------- tests added for mutation survivors
+
+
+def test_warnings_hold_only_noncritical_failures_and_reasons_only_blocking():
+    d = replace(m_sr03(base("en"), "en", 3), reply_text=f"{DONE['en'][0]} {QUESTION['en']}")
+    r = review(d)
+    assert any(w.startswith("SR-03") for w in r.warnings)
+    assert not any(w.startswith("SR-16") for w in r.warnings)
+    assert all(not x.startswith("SR-03") for x in r.reasons)
+
+
+def test_next_action_names_the_option_only_for_drop_and_rewrite():
+    r = review(m_sr10(base("en"), "en", 0))
+    assert r.repair_code == "drop_option" and "(o1)" in r.next_actions[0]
+    r = review(m_sr09(base("en"), "en", 4))
+    assert r.repair_code == "label_unknown" and "(" not in r.next_actions[0]
+    r = review(m_sr13(base("en"), "en", 0))
+    assert r.repair_code == "rewrite_reply" and r.next_actions[0].startswith(
+        "rewrite the reply in "
+    )
+
+
+def test_fallback_group_default_depends_on_verdict():
+    from app.modules.pi.self_review_types import ReviewReport
+
+    blocked = ReviewReport((), BLOCKED, (), ())
+    incomplete = ReviewReport((), INCOMPLETE, (), ())
+    assert owner_safe_fallback(blocked, "en") == fallback_templates()["constraints"]["en"]
+    assert owner_safe_fallback(incomplete, "en") == fallback_templates()["detail"]["en"]
+
+
+def test_declared_reply_language_is_never_trusted_alone():
+    d = DraftResult(owner_language="en", reply_text="ok 123", reply_language="ur")
+    assert st(review(d), "SR-13") == FAIL
+    d = DraftResult(owner_language="en", reply_text="ok 123", reply_language="en")
+    assert st(review(d), "SR-13") == UNKNOWN
+
+
+def test_jargon_threshold_is_two_words():
+    one = DraftResult(
+        owner_language="en", reply_text="We can track the kpi with you. Is that fine?"
+    )
+    two = DraftResult(
+        owner_language="en", reply_text="We can track the kpi and roi with you. Is that fine?"
+    )
+    assert st(review(one), "SR-14") == PASS
+    assert st(review(two), "SR-14") == FAIL
