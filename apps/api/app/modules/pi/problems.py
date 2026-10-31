@@ -567,16 +567,21 @@ class ProblemBook:
         return kept
 
     @staticmethod
-    def cause_candidate(note: ProblemNote) -> tuple[str, bool, list[str]]:
+    def cause_candidate(
+        note: ProblemNote, owner_text: str | None = None
+    ) -> tuple[str, bool, list[str]]:
         """(text, said, evidence words) of the cause a note carries. The B2a cause fields win; the
-        older `believes_cause` is the same claim ("the owner said it") with no evidence of its own,
-        so its own first words are the evidence and must occur in the owner's own text, or the
-        cause is pi's guess (L1-3): the model writing believes_cause proves nothing."""
+        older `believes_cause` is the same claim ("the owner said it") with no evidence of its own.
+        Its evidence is its first three CONTENT words (function words prove nothing), and it counts
+        as the owner's only when at least 60% of its content words are in the owner's own claim
+        (not a question, a hypothetical or someone else's opinion), or the cause is pi's guess
+        (L1-3): the model writing believes_cause proves nothing."""
         if note.cause_text.strip():
             return note.cause_text, note.cause_said, note.cause_words
         text = note.believes_cause.strip()
-        words = [w for w in re.findall(r"\w+", text.casefold()) if len(w) >= 3][:3]
-        return text, True, words
+        words = problem_fields.content_words(text)
+        backed = problem_fields.support_share(words, owner_text) >= 0.6
+        return text, backed, words[: problem_fields.EVIDENCE_WORDS]
 
     async def load_requirements(self, problem: PiProblem) -> None:
         """The four deferred columns, loaded now (an async session cannot lazy-load them)."""
@@ -613,7 +618,7 @@ class ProblemBook:
         changed = changed or was
         if tried is not None:
             values["tried"] = tried
-        cause_text, cause_said, cause_words = ProblemBook.cause_candidate(note)
+        cause_text, cause_said, cause_words = ProblemBook.cause_candidate(note, owner_text)
         cause, was = problem_fields.merge_cause(
             problem.cause if problem else None,
             cause_text,
@@ -621,6 +626,7 @@ class ProblemBook:
             cause_words,
             msg,
             owner_text or "",  # only the owner's message: model-written words prove nothing
+            datetime.now(UTC).isoformat(timespec="seconds"),
         )
         changed = changed or was
         if cause is not None:

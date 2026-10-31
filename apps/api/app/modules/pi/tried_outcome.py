@@ -164,7 +164,7 @@ def _failure(said: str) -> re.Match[str] | None:
 
 def _worked(said: str) -> bool:
     found = WORKED.search(said)
-    return bool(found) and not _NEG_BEFORE.search(said[: found.start()])
+    return found is not None and not _NEG_BEFORE.search(said[: found.start()])
 
 
 def clause_outcome(said: str) -> str:
