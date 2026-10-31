@@ -513,8 +513,9 @@ class ProblemBook:
         """The note's `tried` entries with the outcome the OWNER's words give them (L1 follow-up).
         An entry whose outcome is empty or unclear becomes "failed" when the owner's own text says
         that attempt failed ("worked" when they say it helped): the owner's clause that mentions
-        the same words, or a failed attempt the owner described that shares a word with this problem. `what` keeps the owner's wording
-        so PS-3's idea check can match it. Only the owner's text counts (never the model's)."""
+        the same words, or a failed attempt the owner described that shares a word with this
+        problem. `what` keeps the owner's wording so PS-3's idea check can
+        match it. Only the owner's text counts (never the model's)."""
         items = [dict(t) for t in note.tried if isinstance(t, dict)]
         clauses = [c for c in re.split(r"[.!?;]+|\n+", owner_text or "") if c.strip()]
         for item in items:

@@ -270,3 +270,29 @@ async def test_a_failed_attempt_in_the_owners_words_is_stored_as_failed(
     assert stored.tried[0]["outcome"] == "failed"
     await w.a.close()
     await w.b.close()
+
+
+async def test_a_successful_attempt_is_stored_as_worked_not_failed(api, business_db, monkeypatch):
+    db = business_db
+    await at_0053(db)
+    w = await two_chats(api, db, monkeypatch)
+    note = ProblemNote(
+        title="Customer files get mixed up",
+        category="operations_process",
+        tried=[{"what": "rang wale folder", "outcome": ""}],
+    )
+    await apply_ops(
+        db,
+        w.scope_a,
+        w.cust_a,
+        w.conv_a.id,
+        None,
+        [ProblemOp(op="create", note=note)],
+        "roman_ur",
+        owner_text="rang wale folder try kiye aur bahut kaam aaya",
+    )
+    stored = (await db.scalars(select(PiProblem).where(PiProblem.customer_id == w.cust_a))).one()
+    await db.refresh(stored, ["tried"])
+    assert stored.tried[0]["outcome"] == "worked"
+    await w.a.close()
+    await w.b.close()
