@@ -1525,3 +1525,65 @@ def test_normalisation_unifies_scripts_and_digits() -> None:
     assert safety_lexicon.normalise("‏آگَ") == "اگ"
     assert safety_lexicon.normalise("١١٢٢") == "1122"
     assert safety_lexicon.normalise("aaaag") == "aag"
+
+
+BRAND_QUIET = [
+    "heart attack grill ka logo chahiye",
+    "Heart Attack Grill logo",
+    "Heart Attack Grill restaurant logo design",
+    "fire extinguisher ki dukan hai",
+    "ambulance service ka business hai",
+    "ambulance service company ke liye logo",
+]
+
+
+@pytest.mark.parametrize("phrase", BRAND_QUIET)
+def test_trade_statements_and_brand_names_stay_quiet(phrase: str) -> None:
+    assert safety.emergency(phrase) is None, phrase
+
+
+def test_a_real_emergency_next_to_the_brand_name_still_fires() -> None:
+    assert safety.emergency("heart attack grill mein abbu ko heart attack aa gaya") is not None
+
+
+ADVICE_LANGS = [
+    "how much tax should i pay on my income",
+    "how to file my tax return",
+    "should i take paracetamol for fever",
+    "can i sue my landlord",
+    "kya mujhe tax dena chahiye",
+    "income tax return kaise bharun",
+    "kya main ye dawai le sakta hoon",
+    "mere ko vakeel chahiye ya nahi case ke liye",
+    "क्या मुझे टैक्स देना चाहिए",
+    "मुझे बुखार है कौन सी दवा लूं",
+    "क्या मुझे वकील से केस करना चाहिए",
+    "क्या मैं यह शेयर खरीदूं",
+    "کیا مجھے ٹیکس دینا چاہیے",
+    "مجھے بخار ہے کون سی دوا لوں",
+    "کیا مجھے وکیل سے کیس کرنا چاہیے",
+    "هل يجب أن أدفع الضريبة",
+    "هل آخذ دواء للحمى",
+    "هل يجب أن أرفع دعوى على شريكي",
+    "هل أشتري هذه الأسهم",
+]
+
+
+@pytest.mark.parametrize("phrase", ADVICE_LANGS)
+def test_advice_is_caught_in_five_languages(phrase: str) -> None:
+    assert safety.advice_asked(phrase) is not None, phrase
+
+
+@pytest.mark.parametrize(
+    "phrase",
+    [
+        "tax software banana hai",
+        "tax consultant ki website chahiye",
+        "tax invoice template chahiye",
+        "lawyer ke liye website chahiye",
+        "paracetamol ka stock chahiye",
+        "medicine ka rate batao",
+    ],
+)
+def test_advice_trade_statements_are_not_advice_asks(phrase: str) -> None:
+    assert safety.advice_asked(phrase) is None, phrase

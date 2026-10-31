@@ -378,7 +378,7 @@ W(
 )
 W("POLICE_N", "police pulis thana thaane rescue پولیس")
 W("SUMMON", "bulao bulaao bulaye bulalo bula call karo kro bhejo bhej send bhejna")
-W("BEHOSH", "behosh behoshi unconscious fainted faint collapsed بیهوش بے ہوش बेहोश बेहोशी")
+W("BEHOSH", "behosh behoshi unconscious fainted faint بیهوش بے ہوش बेहोश बेहोशी")
 W("HOSH", "hosh ہوش होश")
 W("ACC", "accident accidents aksident exident ایکسیڈنٹ एक्सीडेंट حادث حادثه تصادم")
 W("ACC_HOG", "ho hua hui hogaya hogayi hogya gaya gayi zakhmi हो हुआ हुई गया गई ہو ہوا ہوئی گیا گئی")
@@ -387,7 +387,7 @@ PH("HEART_ATK", "ازمه قلبیه/ہارٹ اٹیک/हार्ट अटै
 W("AMBU", "ambulance ambulances ambulence ambulans ایمبولینس एम्बुलेंस एंबुलेंस اسعاف")
 W(
     "AMBU_NEED",
-    "chahiye chahie chaye zaroorat zarurat hire bhej bhejo bhijwao bulao bulaao bula call send need needed kab aayegi aa aayegi aarahi pohanch pahunch late der kahan where service karni karna book chahyie",
+    "chahiye chahie chaye zaroorat zarurat hire bhej bhejo bhijwao bulao bulaao bula call send need needed kab aayegi aa aayegi aarahi pohanch pahunch chahyie",
 )
 W("OVERDOSE", "overdose overdosed")
 W("ULTI", "ulti dast vomit vomiting vomited diarrhoea diarrhea qay")
@@ -491,6 +491,8 @@ W(
     "bandooq bandook bandoq pistol gun guns talwar chaaku chaku knife knives chhuri churi rifle kalashnikov revolver ak47 hathyar hathiyar weapon tamancha",
 )
 W("PAAS", "paas")
+W("WENTER", "entered entering aaya aaye le leke dikha dikhaya tan tana point pointed")
+PH("WENTER", "le kar/aa gaya/aa gaye")
 W("THEM", "unke uske unki unhon unhone usne woh wo log koi")
 
 # --- CHILD_SAFEGUARDING / KIDNAP_ROBBERY -------------------------------------------------------
@@ -606,6 +608,32 @@ W("AGWA", "خطف اختطاف خطفوا")
 PH("TRAP_PH", "احد ما بالداخل/احد بالداخل/شخص بالداخل/اطفال بالداخل")
 
 
+# --- advice: tax, legal, medicine, money in five languages ------------------------------------
+W("ASKQ", "how much क्या कौन कैसे कितना کیا کون کیسے کتنا هل ماذا kaise kitna")
+W("SELFQ", "मुझे मैं मेरा मेरे میں مجھے میرا ادفع اشتري ارفع اتناول اخذ")
+W("TAX_N", "tax taxes टैक्स ٹیکس ضریبه ضريبه الضریبه الضريبه")
+W(
+    "TAXACT",
+    "chahiye dena dun doon bharun bharna bachana lagega lagta hoga file pay return deduct claim चाहिए देना भरूं دینا دینی دون ادفع yes",
+)
+W("LAW", "वकील केस مقدمه وکیل دعوی دعوى قضیه محام محامی")
+W("INVEST_N", "शेयर سهام اسهم الاسهم الأسهم")
+W("INVEST_ACT", "खरीदूं खरीदूँ خریدون خریدوں اشتری اشتري")
+W("MEDS", "paracetamol antibiotic antibiotics دواء الدواء")
+W("CHAHIYE", "चाहिए چاہیے چاہئے يجب ينبغي")
+PH("ASKQ", "ya nahi/या नहीं/یا نہیں")
+W("TAKEV", "le lun loon khaun take lena leni sakta sakti ले लूं لوں لون")
+W("HEALTH", "बुखार दर्द بخار درد حمى الحمى سعال")
+W("KHAUN", "कौन दवा کون دوا دواء اتناول")
+
+
+W("PASTM", "thi tha the pichle pichla pichli saal last ago earlier before pehle")
+W(
+    "TRADE",
+    "runs run vehicles billing licence license renewal permit operate operates system systems bujhane bujhana bujha extinguishing fighting payment cheque quote",
+)
+W("IDIOMD", "quote quotes price bhej bata dein")
+
 # --- rules -----------------------------------------------------------------------------------
 
 
@@ -616,7 +644,7 @@ class Rule:
     needs: tuple[tuple[int, int], ...]
     win: int
     avoid: int
-    trade: bool
+    trade: bool | str
     name: str
 
 
@@ -629,7 +657,7 @@ def R(
     needs: Iterable[str | tuple[str, int]] = (),
     win: int = 5,
     avoid: str = "",
-    trade: bool = False,
+    trade: bool | str = False,
     name: str = "",
     kind: str | None = None,
 ) -> None:
@@ -674,7 +702,7 @@ R("SELF_HARM", "MAR", ["JAUN"], win=2, avoid="IDIOMD", name="mar jaunga")
 # FIRE_SMOKE ---------------------------------------------------------------------------------
 R("FIRE_SMOKE", "FIRE_N", ["OCC"], win=5, trade=True, name="fire + happening")
 R("FIRE_SMOKE", "FIRE_N", ["DANGER"], win=6, name="fire + help")
-R("FIRE_SMOKE", "FIRE_N", ["PLACE_OBJ"], win=5, trade=True, name="fire + place")
+R("FIRE_SMOKE", "FIRE_N", ["PLACE_OBJ"], win=5, trade="msg", name="fire + place")
 R("FIRE_SMOKE", "FIRE_N", ["COPULA"], win=2, trade=True, name="fire hai")
 R("FIRE_SMOKE", "FIRE_N", ["FIRE_N"], win=3, name="fire twice")
 R("FIRE_SMOKE", "BURN_V", ["PROG"], win=2, avoid="LIGHT_ON", trade=True, name="jal raha hai")
@@ -698,14 +726,8 @@ R(
 R("FIRE_SMOKE", "BLAST_N", ["HOGAYA", "PLACE_BIG"], win=4, avoid="SALE_MKT", name="blast ho gaya")
 
 # TRAPPED ------------------------------------------------------------------------------------
-R(
-    "TRAPPED",
-    "STRONG_TRAP",
-    ["PERSON|CHILD|INSIDE"],
-    win=5,
-    avoid="TRAFFIC",
-    name="people stuck inside",
-)
+R("TRAPPED", "STRONG_TRAP", ["PERSON|CHILD"], win=5, avoid="TRAFFIC", name="people stuck")
+R("TRAPPED", "STRONG_TRAP", ["INSIDE"], win=5, avoid="TRAFFIC", trade="msg", name="stuck inside")
 R("TRAPPED", "DAB", ["PERSON|CHILD", "INSIDE|DEBRIS"], win=4, name="people buried")
 R("TRAPPED", "DOOR", ["NEG", "OPEN_V"], win=4, name="door will not open")
 R("TRAPPED", "ANYONE", ["INSIDE_STRICT", "COPULA|STRONG_TRAP"], win=4, name="koi andar hai")
@@ -749,7 +771,7 @@ R("MEDICAL_RESCUE", "BEHOSH", name="behosh")
 R("MEDICAL_RESCUE", "HOSH", ["NEGB"], win=2, name="hosh nahi")
 R("MEDICAL_RESCUE", "ACC", ["ACC_HOG"], win=3, trade=True, name="accident ho gaya")
 R("MEDICAL_RESCUE", "HEART_ATK", trade=True, name="heart attack script")
-R("MEDICAL_RESCUE", "AMBU", ["AMBU_NEED"], win=4, trade=True, name="ambulance needed")
+R("MEDICAL_RESCUE", "AMBU", ["AMBU_NEED"], win=4, trade="msg", name="ambulance needed")
 
 # VIOLENCE_ABUSE -----------------------------------------------------------------------------
 R("VIOLENCE_ABUSE", "HIT", ["FAMILYACT"], win=4, avoid="IDIOM_H", name="family hits")
@@ -766,7 +788,7 @@ R(
 )
 R("VIOLENCE_ABUSE", "THIEF", ["ENTER"], win=5, avoid="SALE_MKT", trade=True, name="robbers")
 R("VIOLENCE_ABUSE", "WEAPON", ["PAAS", "THEM"], win=4, trade=True, name="they have a weapon")
-R("VIOLENCE_ABUSE", "WEAPON", ["ENTER"], win=4, trade=True, name="weapon at the door")
+R("VIOLENCE_ABUSE", "WEAPON", ["WENTER"], win=4, trade=True, name="weapon at the door")
 R("VIOLENCE_ABUSE", "THREAT_N", ["KILLW"], win=4, name="death threat")
 R("VIOLENCE_ABUSE", "POLICE_N", ["SUMMON"], win=3, name="call police")
 R("VIOLENCE_ABUSE", "BACHAO", ["BACHAO"], win=3, name="bachao bachao")
@@ -851,11 +873,14 @@ def _advice(kind: str, anchor: str, needs: Iterable[str], win: int = 6, avoid: s
 _advice("legal", "LAW", ["ASKQ", "SELFQ", "CHAHIYE"])
 _advice("financial", "INVEST_N", ["ASKQ", "SELFQ", "INVEST_ACT"])
 _advice("medical", "HEALTH", ["ASKQ", "KHAUN"], avoid="TRADE")
+_advice("tax", "TAX_N", ["ASKQ", "TAXACT|SELFQ"], avoid="TRADE")
+_advice("medical", "MEDS", ["ASKQ", "TAKEV|SELFQ"], avoid="TRADE")
 _advice("medical", "DIAGNOSE", ["MY", "HEALTH"], win=5)
 _advice("medical", "HEALTH", ["SERIOUS", "ASKQ"], avoid="TRADE")
 
 _DANGER = _mask("DANGER")
 _TRADE = _mask("TRADE")
+_PASTM = _mask("PASTM")
 
 
 # --- matching --------------------------------------------------------------------------------
@@ -871,8 +896,18 @@ class _Doc:
     near_cache: dict[int, list[int]]
 
 
+_FIRE_PROTECT = re.compile(r"(?:aag|ag|fire|dhuan|smoke)\s+se\s+bach\w*")
+_TRADEISH = re.compile(
+    r"quote|rate|price|extinguisher|system|alarm|sprinkler|insurance|bechn|chahiye"
+)
+
+
 def _analyse(text: str) -> _Doc | None:
     said = _PRECLEAN.sub(" ", normalise(text))
+    if _FIRE_PROTECT.search(said) and _TRADEISH.search(said):
+        said = _FIRE_PROTECT.sub(
+            " fireprotection ", said
+        )  # protect-from-fire in a trade sentence, not a cry for help
     tokens: list[str] = []
     clause: list[int] = []
     cid = 0
@@ -895,7 +930,11 @@ def _analyse(text: str) -> _Doc | None:
     n = len(tokens)
     masks = [0] * n
     for i, tok in enumerate(tokens):
-        m = _LEX.get(tok, 0) | _LEX_COLLAPSED.get(_collapse(tok), 0)
+        m = _LEX.get(tok, 0)
+        if len(tok) >= 3:
+            c = _collapse(tok)
+            if c != tok:
+                m |= _LEX_COLLAPSED.get(c, 0)
         if tok.isdigit() and len(tok) <= 18:
             m |= _LEX.get(tok, 0) | _BIT["NUMERIC"]
         cands = _PHRASES.get(tok)
@@ -949,7 +988,12 @@ def _anchor_positions(doc: _Doc, anchor: int) -> list[int]:
 
 
 def _first_hit(
-    doc: _Doc, anchor: int, needs: tuple[tuple[int, int], ...], win: int, avoid: int, trade: bool
+    doc: _Doc,
+    anchor: int,
+    needs: tuple[tuple[int, int], ...],
+    win: int,
+    avoid: int,
+    trade: bool | str,
 ) -> bool:
     if not anchor & doc.gor:
         return False
@@ -967,8 +1011,13 @@ def _first_hit(
             continue
         if avoid and not danger_anywhere and _near(doc, 10)[i] & avoid:
             continue
-        if trade and not danger_anywhere and doc.clause_or.get(doc.clause[i], 0) & _TRADE:
-            continue
+        if trade and not danger_anywhere:
+            cor = doc.clause_or.get(doc.clause[i], 0)
+            if trade == "msg":
+                if doc.gor & _TRADE:
+                    continue
+            elif cor & _TRADE or (cor & _PASTM and doc.gor & _TRADE):
+                continue  # same clause, or a past-tense fire clause with a trade word elsewhere
         return True
     return False
 

@@ -760,9 +760,14 @@ def _roman_fire(said: str) -> Emergency | None:
     return None
 
 
+_BRAND_NAMES = re.compile(r"\bheart\s+attack\s+grill\b", re.IGNORECASE)
+
+
 def emergency(text: str) -> Emergency | None:
     """The kind of emergency the message describes, or None. Self-harm is checked first."""
     said = " ".join((text or "").split())
+    # "Heart Attack Grill" is a restaurant name, not an emergency: take the name out and look at the rest.
+    said = _BRAND_NAMES.sub(" ", said)
     for kind, pattern in EMERGENCY_PATTERNS:
         if pattern.search(said):
             return kind
