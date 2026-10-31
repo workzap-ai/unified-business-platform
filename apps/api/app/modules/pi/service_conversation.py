@@ -1403,7 +1403,8 @@ def validate_service_reply(
     for text in sorted(allowed or [], key=len, reverse=True):
         checked = checked.replace(text, " ")  # exact offered labels only
     if mode in price_policy.NO_DISCLOSURE and any(
-        ch.isdecimal() or unicodedata.category(ch) == "Sc" for ch in checked
+        ch.isdecimal() or unicodedata.category(ch) == "Sc"
+        for ch in unicodedata.normalize("NFKC", checked)  # superscript and circled digits too
     ):
         raise ReplyRejected("SERVICE_PRICE_BLOCKED")
     if (code := price_policy.check(checked, mode)) is not None:

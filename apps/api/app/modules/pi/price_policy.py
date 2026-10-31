@@ -23,6 +23,8 @@ import re
 import unicodedata
 from typing import Any, Literal
 
+from app.modules.pi import number_words
+
 PriceMode = Literal["exact", "starting", "quote", "ask_team", "hidden"]
 PRICE_MODES: tuple[str, ...] = ("exact", "starting", "quote", "ask_team", "hidden")
 NO_DISCLOSURE: frozenset[str] = frozenset({"quote", "ask_team", "hidden"})
@@ -166,6 +168,8 @@ def disclosures(text: str) -> list[str]:
         reasons.append("magnitude")
     if _near(t, PRICE_TERM, DIGITS) or _near(counted, PRICE_TERM, NUMBER_WORD_AMOUNT):
         reasons.append("priced_number")
+    if number_words.has_amount(text) or number_words.variant_digits(text):
+        reasons.append("number_words")  # "five hundred rupees", "panch sau", "a grand"
     return reasons
 
 
@@ -173,11 +177,15 @@ def written_amounts(text: str) -> bool:
     """True when an amount is expressed in words, which cannot be checked against evidence
     (for example "fifty thousand rupees" or "pachaas hazaar")."""
     t = normalize(text)
-    return bool(
-        _near(t, MAGNITUDE, CURRENCY)
-        or _near(t, NUMBER_WORD, CURRENCY)
-        or _near(t, MAGNITUDE, PRICE_TERM)
-        or _near(t, MAGNITUDE, NUMBER_WORD)
+    return (
+        number_words.has_amount(text)
+        or number_words.variant_digits(text)
+        or bool(
+            _near(t, MAGNITUDE, CURRENCY)
+            or _near(t, NUMBER_WORD, CURRENCY)
+            or _near(t, MAGNITUDE, PRICE_TERM)
+            or _near(t, MAGNITUDE, NUMBER_WORD)
+        )
     )
 
 
