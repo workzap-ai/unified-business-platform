@@ -34,6 +34,7 @@ class PermissionDenied(Exception):
         environment_id: UUID | None = None,
         user_id: UUID | None = None,
         actor_label: str | None = None,
+        actor_type: str | None = None,
         request_id: str | None = None,
         missing: tuple[str, ...] = (),
     ) -> None:
@@ -42,6 +43,7 @@ class PermissionDenied(Exception):
         self.environment_id = environment_id
         self.user_id = user_id
         self.actor_label = actor_label
+        self.actor_type = actor_type
         self.request_id = request_id
         self.missing = missing
 

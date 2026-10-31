@@ -36,6 +36,7 @@ class WorkspaceScope:
                 environment_id=self.environment_id,
                 user_id=self.user_id,
                 actor_label=self.actor_label,
+                actor_type=self.actor_type,
                 request_id=self.request_id,
                 missing=missing,
             )
