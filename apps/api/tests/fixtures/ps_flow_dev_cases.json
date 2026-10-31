@@ -1,0 +1,3299 @@
+[
+ {
+  "id": "ps_rental_mgmt_roman_ur",
+  "case_type": "conversation",
+  "format_version": 2,
+  "industry": "property_management_and_rentals",
+  "language": "roman_ur",
+  "kind": "problem_solving",
+  "regression": false,
+  "title": "Late rent and lost repair reports",
+  "synthetic": true,
+  "provenance": {
+   "author": "PS-0 agent",
+   "reviewer": null,
+   "created": "2026-10-31",
+   "origin": "hand_written"
+  },
+  "scenario": "rental_mgmt",
+  "messages": [
+   "Har mahine kiraya late aata hai. Taqreeban 8 kirayedar due date ke baad dete hain aur main ek ek ko chase karta hoon.",
+   "Pichle saal se, zyada tar doosri manzil ke flats. Kirayedar toote nal aur lights ki shikayat bhi karte rehte hain aur mujhe yaad nahi rehta kis ne kya bataya. Mere paas sirf ek assistant hai aur main aur koi hire nahi kar sakta. Maine kaghaz ka register try kiya tha lekin kho gaya. Mera khayal hai mujhe isliye yaad nahi rehta ke sab kuch mere zehan mein hota hai.",
+   "Sorry, 8 nahi 80 kirayedar late dete hain, 200 flats mein se. Ab hum kya kar sakte hain?",
+   "Nahi, ek assistant 200 flats ko phone nahi kar sakta. Aur yeh sirf mere phone par chalna chahiye, mere paas computer nahi hai."
+  ],
+  "turns": [
+   {
+    "role": "owner",
+    "text": "Har mahine kiraya late aata hai. Taqreeban 8 kirayedar due date ke baad dete hain aur main ek ek ko chase karta hoon."
+   },
+   {
+    "role": "pi",
+    "reply_source": "reference",
+    "text": "Ek ek ko chase karna thaka deta hai. Yeh masla kab se chal raha hai?"
+   },
+   {
+    "role": "owner",
+    "text": "Pichle saal se, zyada tar doosri manzil ke flats. Kirayedar toote nal aur lights ki shikayat bhi karte rehte hain aur mujhe yaad nahi rehta kis ne kya bataya. Mere paas sirf ek assistant hai aur main aur koi hire nahi kar sakta. Maine kaghaz ka register try kiya tha lekin kho gaya. Mera khayal hai mujhe isliye yaad nahi rehta ke sab kuch mere zehan mein hota hai."
+   },
+   {
+    "role": "pi",
+    "reply_source": "reference",
+    "text": "Shukriya, baat saaf hai. Aam mahine mein taqreeban kitna kiraya late hota hai?"
+   },
+   {
+    "role": "owner",
+    "text": "Sorry, 8 nahi 80 kirayedar late dete hain, 200 flats mein se. Ab hum kya kar sakte hain?",
+    "asks_idea": true
+   },
+   {
+    "role": "pi",
+    "reply_source": "reference",
+    "text": "Ek khayal yeh hai ke assistant har kirayedar ko due date se do din pehle phone kare, taake kisi ko yaad rahe. Aap ke liye achha mahina kaisa hoga?"
+   },
+   {
+    "role": "owner",
+    "text": "Nahi, ek assistant 200 flats ko phone nahi kar sakta. Aur yeh sirf mere phone par chalna chahiye, mere paas computer nahi hai."
+   }
+  ],
+  "expected": {
+   "problems": [
+    {
+     "id": "p1",
+     "any": [
+      "kiraya",
+      "kirayedar",
+      "due date"
+     ],
+     "figures": [
+      "80"
+     ]
+    },
+    {
+     "id": "p2",
+     "any": [
+      "nal",
+      "shikayat",
+      "yaad nahi"
+     ],
+     "figures": []
+    }
+   ],
+   "stated": [
+    "Har mahine kiraya late aata hai",
+    "80 kirayedar late dete hain",
+    "200 flats",
+    "mujhe yaad nahi rehta kis ne kya bataya"
+   ],
+   "missing": [
+    "since",
+    "money",
+    "outcome"
+   ],
+   "constraints": [
+    {
+     "kind": "staff",
+     "text": "Mere paas sirf ek assistant hai aur main aur koi hire nahi kar sakta",
+     "blocks": [
+      "hire",
+      "naya assistant",
+      "mazeed staff",
+      "aur assistant"
+     ],
+     "status": "confirmed",
+     "said_in_turn": 1,
+     "problem": "p2"
+    },
+    {
+     "kind": "cannot_change",
+     "text": "ek assistant 200 flats ko phone nahi kar sakta",
+     "blocks": [
+      "har kirayedar ko phone",
+      "sab ko phone",
+      "ek ek ko phone"
+     ],
+     "status": "confirmed",
+     "said_in_turn": 3,
+     "problem": "p1"
+    },
+    {
+     "kind": "cannot_change",
+     "text": "yeh sirf mere phone par chalna chahiye",
+     "blocks": [
+      "computer",
+      "laptop",
+      "website",
+      "desktop"
+     ],
+     "status": "confirmed",
+     "said_in_turn": 3,
+     "problem": null
+    }
+   ],
+   "tried": [
+    {
+     "what": "kaghaz ka register try kiya",
+     "outcome": "kho gaya",
+     "said_in_turn": 1
+    }
+   ],
+   "cause": {
+    "text": "sab kuch mere zehan mein hota hai",
+    "status": "owner_said",
+    "evidence_words": [
+     "mere zehan mein"
+    ],
+    "problem": "p2"
+   },
+   "hypothesis_only": [
+    "tenants cannot afford the rent",
+    "no reminder system"
+   ],
+   "corrections": [
+    {
+     "wrong": "8",
+     "right": "80",
+     "problem": "p1",
+     "turn": 2
+    }
+   ],
+   "requirement_change": {
+    "turn": 3,
+    "text": "yeh sirf mere phone par chalna chahiye",
+    "kind": "scope"
+   },
+   "rejected_solution": {
+    "idea_turn": 2,
+    "turn": 3,
+    "reason_words": [
+     "ek assistant 200 flats ko phone nahi kar sakta"
+    ]
+   },
+   "answered_facts": [
+    {
+     "slot": "count",
+     "value_words": [
+      "8",
+      "kirayedar"
+     ],
+     "said_in_turn": 0
+    },
+    {
+     "slot": "how_often",
+     "value_words": [
+      "Har mahine"
+     ],
+     "said_in_turn": 0
+    },
+    {
+     "slot": "since",
+     "value_words": [
+      "Pichle saal se"
+     ],
+     "said_in_turn": 1
+    },
+    {
+     "slot": "where",
+     "value_words": [
+      "doosri manzil"
+     ],
+     "said_in_turn": 1
+    },
+    {
+     "slot": "who",
+     "value_words": [
+      "ek assistant"
+     ],
+     "said_in_turn": 1
+    },
+    {
+     "slot": "constraint",
+     "value_words": [
+      "hire nahi kar sakta"
+     ],
+     "said_in_turn": 1
+    },
+    {
+     "slot": "tried",
+     "value_words": [
+      "kaghaz ka register"
+     ],
+     "said_in_turn": 1
+    },
+    {
+     "slot": "cause",
+     "value_words": [
+      "mere zehan mein"
+     ],
+     "said_in_turn": 1
+    }
+   ],
+   "questions": [
+    {
+     "after_turn": 0,
+     "slot": "since"
+    },
+    {
+     "after_turn": 1,
+     "slot": "money"
+    },
+    {
+     "after_turn": 2,
+     "slot": "outcome"
+    }
+   ],
+   "candidates": [
+    {
+     "id": "c1",
+     "text": "Ek shared list rakhein jis mein har toote nal ya light ki shikayat ka status flat ke saath likha ho, taake kirayedar ki baat kho na jaye.",
+     "verdict": "relevant",
+     "problem": "p2",
+     "reason": "answers the lost reports and needs no hire"
+    },
+    {
+     "id": "c2",
+     "text": "Har kirayedar ko due date se pehle ek reminder message bhejein aur simple sheet par likhein kis ne kiraya diya, taake late kirayedar pehle nazar aayen.",
+     "verdict": "relevant",
+     "problem": "p1",
+     "reason": "targets late rent with the same assistant"
+    },
+    {
+     "id": "c3",
+     "text": "Do aur assistant hire karein jo har mahine late kirayedar ke peeche jayen.",
+     "verdict": "violates_constraint",
+     "problem": "p1",
+     "reason": "owner cannot hire"
+    },
+    {
+     "id": "c4",
+     "text": "Daakhli hall ko dobara rang karwayen taake mehmaan khush hon.",
+     "verdict": "irrelevant",
+     "problem": null,
+     "reason": "unrelated to rent or reports"
+    },
+    {
+     "id": "c5",
+     "text": "Behtar software istemal karein taake business behtar ho.",
+     "verdict": "generic",
+     "problem": null,
+     "reason": "fits any business"
+    }
+   ],
+   "blueprint": {
+    "steps": [
+     {
+      "id": "s1",
+      "text": "Har flat ki due date aur late dene wale kirayedar ki list banayen",
+      "any": [
+       "flat",
+       "due date"
+      ]
+     },
+     {
+      "id": "s2",
+      "text": "Due date se pehle har kirayedar ko owner ke phone se reminder bhejein",
+      "any": [
+       "reminder",
+       "kirayedar"
+      ]
+     },
+     {
+      "id": "s3",
+      "text": "Har toote nal ya light ki shikayat ek shared list mein status ke saath likhein",
+      "any": [
+       "shikayat",
+       "list"
+      ]
+     },
+     {
+      "id": "s4",
+      "text": "Har hafte late payers aur khuli shikayatein dekhein",
+      "any": [
+       "hafte",
+       "shikayatein"
+      ]
+     }
+    ],
+    "dependencies": [
+     {
+      "from": "s1",
+      "to": "s2"
+     },
+     {
+      "from": "s1",
+      "to": "s3"
+     },
+     {
+      "from": "s2",
+      "to": "s4"
+     },
+     {
+      "from": "s3",
+      "to": "s4"
+     }
+    ],
+    "resources": [
+     {
+      "text": "Ek assistant aur owner ka phone",
+      "any": [
+       "assistant",
+       "phone"
+      ]
+     }
+    ],
+    "success_criteria": [
+     {
+      "text": "Har mahine late kirayedar gine jayen aur abhi ke 80 se compare hon",
+      "any": [
+       "80",
+       "mahine"
+      ]
+     }
+    ]
+   }
+  },
+  "recorded": {
+   "origin": "hand_written reference output written by hand, not model output",
+   "notes_by_turn": {
+    "0": [
+     {
+      "title": "Rent arrives late every month",
+      "title_local": "Har mahine kiraya late aata hai",
+      "user_words": [
+       "Taqreeban 8 kirayedar due date ke baad dete hain"
+      ],
+      "summary": "Some tenants pay rent after the due date and the owner chases them one by one.",
+      "category": "cash_collections",
+      "subtype": "",
+      "where": [],
+      "frequency_text": "Har mahine",
+      "since_text": "",
+      "money_text": "",
+      "of_total": "8 kirayedar",
+      "impact_types": [],
+      "constraints": [],
+      "tried": [],
+      "cause": "",
+      "cause_status": "",
+      "expected_outcome": ""
+     }
+    ],
+    "1": [
+     {
+      "title": "Tenant repair reports get lost",
+      "title_local": "Kirayedar ki shikayat yaad nahi rehti",
+      "user_words": [
+       "mujhe yaad nahi rehta kis ne kya bataya"
+      ],
+      "summary": "Reports about broken taps and lights are not tracked.",
+      "category": "operations_process",
+      "subtype": "",
+      "where": [],
+      "frequency_text": "",
+      "since_text": "",
+      "money_text": "",
+      "of_total": "",
+      "impact_types": [],
+      "constraints": [
+       "Mere paas sirf ek assistant hai aur main aur koi hire nahi kar sakta"
+      ],
+      "tried": [
+       "Maine kaghaz ka register try kiya tha lekin kho gaya"
+      ],
+      "cause": "sab kuch mere zehan mein hota hai",
+      "cause_status": "owner_said",
+      "expected_outcome": ""
+     }
+    ]
+   }
+  }
+ },
+ {
+  "id": "ps_ecommerce_en",
+  "case_type": "conversation",
+  "format_version": 2,
+  "industry": "e_commerce_and_d2c_brands",
+  "language": "en",
+  "kind": "problem_solving",
+  "regression": false,
+  "title": "Returned parcels and late courier",
+  "synthetic": true,
+  "provenance": {
+   "author": "PS-0 agent",
+   "reviewer": null,
+   "created": "2026-10-31",
+   "origin": "hand_written"
+  },
+  "scenario": "ecommerce",
+  "messages": [
+   "Many customers return their orders after delivery. About 20 parcels come back every month and each one costs us delivery money twice.",
+   "It started last spring, mostly dresses and shoes. Our courier also delivers late, so people refuse the parcel at the door. We have a tight budget of 50,000 rupees a month for any change, and we cannot change courier because of the contract. We tried free returns last month but returns went up. I think the courier is slow because it sends everything through one depot.",
+   "Sorry, not 20, it was 200 parcels coming back every month. What can we do?",
+   "No, we cannot promise delivery days when the courier is unreliable. And it must work on WhatsApp only, our buyers do not open the website."
+  ],
+  "turns": [
+   {
+    "role": "owner",
+    "text": "Many customers return their orders after delivery. About 20 parcels come back every month and each one costs us delivery money twice."
+   },
+   {
+    "role": "pi",
+    "reply_source": "reference",
+    "text": "Paying delivery twice hurts. When did you first notice it?"
+   },
+   {
+    "role": "owner",
+    "text": "It started last spring, mostly dresses and shoes. Our courier also delivers late, so people refuse the parcel at the door. We have a tight budget of 50,000 rupees a month for any change, and we cannot change courier because of the contract. We tried free returns last month but returns went up. I think the courier is slow because it sends everything through one depot."
+   },
+   {
+    "role": "pi",
+    "reply_source": "reference",
+    "text": "That helps. Roughly how much do the returns cost you in a month?"
+   },
+   {
+    "role": "owner",
+    "text": "Sorry, not 20, it was 200 parcels coming back every month. What can we do?",
+    "asks_idea": true
+   },
+   {
+    "role": "pi",
+    "reply_source": "reference",
+    "text": "One idea is to tell each buyer a delivery day range on the order confirmation, so they expect the parcel. What result do you want to see?"
+   },
+   {
+    "role": "owner",
+    "text": "No, we cannot promise delivery days when the courier is unreliable. And it must work on WhatsApp only, our buyers do not open the website."
+   }
+  ],
+  "expected": {
+   "problems": [
+    {
+     "id": "p1",
+     "any": [
+      "return",
+      "parcels",
+      "orders"
+     ],
+     "figures": [
+      "200"
+     ]
+    },
+    {
+     "id": "p2",
+     "any": [
+      "courier",
+      "late",
+      "refuse"
+     ],
+     "figures": []
+    }
+   ],
+   "stated": [
+    "Many customers return their orders after delivery",
+    "200 parcels coming back every month",
+    "mostly dresses and shoes",
+    "50,000 rupees"
+   ],
+   "missing": [
+    "since_cost",
+    "outcome"
+   ],
+   "constraints": [
+    {
+     "kind": "budget",
+     "text": "tight budget of 50,000 rupees a month for any change",
+     "blocks": [
+      "50,000",
+      "expensive",
+      "costly tool",
+      "pay for"
+     ],
+     "status": "confirmed",
+     "said_in_turn": 1,
+     "problem": null
+    },
+    {
+     "kind": "cannot_change",
+     "text": "we cannot change courier because of the contract",
+     "blocks": [
+      "switch courier",
+      "new courier",
+      "change courier",
+      "faster courier"
+     ],
+     "status": "confirmed",
+     "said_in_turn": 1,
+     "problem": "p2"
+    },
+    {
+     "kind": "cannot_change",
+     "text": "we cannot promise delivery days",
+     "blocks": [
+      "promise delivery",
+      "guaranteed delivery",
+      "delivery date"
+     ],
+     "status": "confirmed",
+     "said_in_turn": 3,
+     "problem": "p2"
+    },
+    {
+     "kind": "cannot_change",
+     "text": "it must work on WhatsApp only",
+     "blocks": [
+      "website",
+      "app",
+      "portal",
+      "email"
+     ],
+     "status": "confirmed",
+     "said_in_turn": 3,
+     "problem": null
+    }
+   ],
+   "tried": [
+    {
+     "what": "We tried free returns last month",
+     "outcome": "returns went up",
+     "said_in_turn": 1
+    }
+   ],
+   "cause": {
+    "text": "it sends everything through one depot",
+    "status": "owner_said",
+    "evidence_words": [
+     "one depot"
+    ],
+    "problem": "p2"
+   },
+   "hypothesis_only": [
+    "poor product photos",
+    "damaged packaging"
+   ],
+   "corrections": [
+    {
+     "wrong": "20",
+     "right": "200",
+     "problem": "p1",
+     "turn": 2
+    }
+   ],
+   "requirement_change": {
+    "turn": 3,
+    "text": "it must work on WhatsApp only",
+    "kind": "scope"
+   },
+   "rejected_solution": {
+    "idea_turn": 2,
+    "turn": 3,
+    "reason_words": [
+     "we cannot promise delivery days when the courier is unreliable"
+    ]
+   },
+   "answered_facts": [
+    {
+     "slot": "count",
+     "value_words": [
+      "20",
+      "parcels"
+     ],
+     "said_in_turn": 0
+    },
+    {
+     "slot": "how_often",
+     "value_words": [
+      "every month"
+     ],
+     "said_in_turn": 0
+    },
+    {
+     "slot": "since",
+     "value_words": [
+      "last spring"
+     ],
+     "said_in_turn": 1
+    },
+    {
+     "slot": "where",
+     "value_words": [
+      "dresses and shoes"
+     ],
+     "said_in_turn": 1
+    },
+    {
+     "slot": "constraint",
+     "value_words": [
+      "cannot change courier"
+     ],
+     "said_in_turn": 1
+    },
+    {
+     "slot": "tried",
+     "value_words": [
+      "free returns"
+     ],
+     "said_in_turn": 1
+    },
+    {
+     "slot": "cause",
+     "value_words": [
+      "one depot"
+     ],
+     "said_in_turn": 1
+    }
+   ],
+   "questions": [
+    {
+     "after_turn": 0,
+     "slot": "since"
+    },
+    {
+     "after_turn": 1,
+     "slot": "money"
+    },
+    {
+     "after_turn": 2,
+     "slot": "outcome"
+    }
+   ],
+   "candidates": [
+    {
+     "id": "c1",
+     "text": "Message each buyer when the parcel leaves with the courier tracking line, so the buyer expects it and is at home.",
+     "verdict": "relevant",
+     "problem": "p2",
+     "reason": "uses the courier and parcels, needs no new courier"
+    },
+    {
+     "id": "c2",
+     "text": "Keep a list of refused parcels with the courier delay for each, to show the courier at the next contract review.",
+     "verdict": "relevant",
+     "problem": "p2",
+     "reason": "builds evidence about late deliveries"
+    },
+    {
+     "id": "c3",
+     "text": "Switch to a faster courier company for every order.",
+     "verdict": "violates_constraint",
+     "problem": "p2",
+     "reason": "contract forbids changing courier"
+    },
+    {
+     "id": "c4",
+     "text": "Add a gift wrapping option at checkout for festival buyers.",
+     "verdict": "irrelevant",
+     "problem": null,
+     "reason": "unrelated to returns or lateness"
+    },
+    {
+     "id": "c5",
+     "text": "Use better software to improve your business.",
+     "verdict": "generic",
+     "problem": null,
+     "reason": "fits any business"
+    }
+   ],
+   "blueprint": {
+    "steps": [
+     {
+      "id": "s1",
+      "text": "List every returned or refused parcel with the reason and the courier delay",
+      "any": [
+       "parcel",
+       "reason"
+      ]
+     },
+     {
+      "id": "s2",
+      "text": "Message each buyer on WhatsApp when the parcel leaves with the courier",
+      "any": [
+       "message",
+       "buyer"
+      ]
+     },
+     {
+      "id": "s3",
+      "text": "Share the refused parcel list with the courier at the contract review",
+      "any": [
+       "courier",
+       "review"
+      ]
+     },
+     {
+      "id": "s4",
+      "text": "Compare monthly returns with the 200 parcels now",
+      "any": [
+       "compare",
+       "200"
+      ]
+     }
+    ],
+    "dependencies": [
+     {
+      "from": "s1",
+      "to": "s2"
+     },
+     {
+      "from": "s1",
+      "to": "s3"
+     },
+     {
+      "from": "s2",
+      "to": "s4"
+     },
+     {
+      "from": "s3",
+      "to": "s4"
+     }
+    ],
+    "resources": [
+     {
+      "text": "The owner's WhatsApp number and one team member to send messages",
+      "any": [
+       "whatsapp",
+       "team"
+      ]
+     }
+    ],
+    "success_criteria": [
+     {
+      "text": "Monthly returned parcels counted and compared with the 200 parcels now",
+      "any": [
+       "200",
+       "monthly"
+      ]
+     }
+    ]
+   }
+  },
+  "recorded": {
+   "origin": "hand_written reference output written by hand, not model output",
+   "notes_by_turn": {
+    "0": [
+     {
+      "title": "Customers return many delivered orders",
+      "title_local": "Customers return many delivered orders",
+      "user_words": [
+       "About 20 parcels come back every month"
+      ],
+      "summary": "Parcels come back after delivery and delivery is paid twice.",
+      "category": "orders_fulfilment",
+      "subtype": "",
+      "where": [],
+      "frequency_text": "every month",
+      "since_text": "",
+      "money_text": "",
+      "of_total": "20 parcels",
+      "impact_types": [],
+      "constraints": [],
+      "tried": [],
+      "cause": "",
+      "cause_status": "",
+      "expected_outcome": ""
+     }
+    ],
+    "1": [
+     {
+      "title": "Late courier makes buyers refuse parcels",
+      "title_local": "Late courier makes buyers refuse parcels",
+      "user_words": [
+       "Our courier also delivers late"
+      ],
+      "summary": "Late deliveries lead buyers to refuse parcels at the door.",
+      "category": "orders_fulfilment",
+      "subtype": "",
+      "where": [],
+      "frequency_text": "",
+      "since_text": "",
+      "money_text": "",
+      "of_total": "",
+      "impact_types": [],
+      "constraints": [
+       "we cannot change courier because of the contract",
+       "tight budget of 50,000 rupees a month"
+      ],
+      "tried": [
+       "We tried free returns last month but returns went up"
+      ],
+      "cause": "it sends everything through one depot",
+      "cause_status": "owner_said",
+      "expected_outcome": ""
+     }
+    ]
+   }
+  }
+ },
+ {
+  "id": "ps_bookings_en",
+  "case_type": "conversation",
+  "format_version": 2,
+  "industry": "sports_clubs_academies_and_turf_court_rentals",
+  "language": "en",
+  "kind": "problem_solving",
+  "regression": false,
+  "title": "Double bookings on turf slots",
+  "synthetic": true,
+  "provenance": {
+   "author": "PS-0 agent",
+   "reviewer": null,
+   "created": "2026-10-31",
+   "origin": "hand_written"
+  },
+  "scenario": "bookings",
+  "messages": [
+   "Two teams show up for the same turf slot. About 5 double bookings happen every month and the teams get angry.",
+   "It began after we added the evening slots. Bookings come on WhatsApp and our one receptionist writes them in a paper diary. We have no money for new systems this year and we cannot stop taking WhatsApp bookings. We tried a shared whiteboard but people kept rubbing it out. I think the receptionist mixes up the courts when it is busy.",
+   "Sorry, not 5, it was 50 double bookings a month. What can we do?",
+   "No, one receptionist cannot write long replies to every booking. And it must take under one minute per booking."
+  ],
+  "turns": [
+   {
+    "role": "owner",
+    "text": "Two teams show up for the same turf slot. About 5 double bookings happen every month and the teams get angry."
+   },
+   {
+    "role": "pi",
+    "reply_source": "reference",
+    "text": "Angry teams are a real problem. When did the double bookings start?"
+   },
+   {
+    "role": "owner",
+    "text": "It began after we added the evening slots. Bookings come on WhatsApp and our one receptionist writes them in a paper diary. We have no money for new systems this year and we cannot stop taking WhatsApp bookings. We tried a shared whiteboard but people kept rubbing it out. I think the receptionist mixes up the courts when it is busy."
+   },
+   {
+    "role": "pi",
+    "reply_source": "reference",
+    "text": "Thanks. Does it happen mostly on weekends or on weekdays?"
+   },
+   {
+    "role": "owner",
+    "text": "Sorry, not 5, it was 50 double bookings a month. What can we do?",
+    "asks_idea": true
+   },
+   {
+    "role": "pi",
+    "reply_source": "reference",
+    "text": "One idea is to confirm each booking back in the same chat with the court and time, so mistakes show at once. What result do you want to see?"
+   },
+   {
+    "role": "owner",
+    "text": "No, one receptionist cannot write long replies to every booking. And it must take under one minute per booking."
+   }
+  ],
+  "expected": {
+   "problems": [
+    {
+     "id": "p1",
+     "any": [
+      "double bookings",
+      "turf slot",
+      "teams"
+     ],
+     "figures": [
+      "50"
+     ]
+    },
+    {
+     "id": "p2",
+     "any": [
+      "receptionist",
+      "paper diary",
+      "courts"
+     ],
+     "figures": []
+    }
+   ],
+   "stated": [
+    "Two teams show up for the same turf slot",
+    "50 double bookings a month",
+    "evening slots",
+    "Bookings come on WhatsApp"
+   ],
+   "missing": [
+    "which_days",
+    "outcome",
+    "court_count"
+   ],
+   "constraints": [
+    {
+     "kind": "budget",
+     "text": "no money for new systems this year",
+     "blocks": [
+      "buy",
+      "new system",
+      "purchase",
+      "software"
+     ],
+     "status": "confirmed",
+     "said_in_turn": 1,
+     "problem": null
+    },
+    {
+     "kind": "cannot_change",
+     "text": "we cannot stop taking WhatsApp bookings",
+     "blocks": [
+      "stop taking",
+      "phone only",
+      "walk-in only",
+      "drop whatsapp"
+     ],
+     "status": "confirmed",
+     "said_in_turn": 1,
+     "problem": "p2"
+    },
+    {
+     "kind": "cannot_change",
+     "text": "one receptionist cannot write long replies to every booking",
+     "blocks": [
+      "long reply",
+      "long replies",
+      "detailed reply",
+      "form for every"
+     ],
+     "status": "confirmed",
+     "said_in_turn": 3,
+     "problem": "p2"
+    },
+    {
+     "kind": "deadline",
+     "text": "it must take under one minute per booking",
+     "blocks": [
+      "long form",
+      "several steps",
+      "lengthy",
+      "detailed form"
+     ],
+     "status": "confirmed",
+     "said_in_turn": 3,
+     "problem": null
+    }
+   ],
+   "tried": [
+    {
+     "what": "We tried a shared whiteboard",
+     "outcome": "people kept rubbing it out",
+     "said_in_turn": 1
+    }
+   ],
+   "cause": {
+    "text": "the receptionist mixes up the courts when it is busy",
+    "status": "owner_said",
+    "evidence_words": [
+     "mixes up the courts"
+    ],
+    "problem": "p2"
+   },
+   "hypothesis_only": [
+    "customers forget their slot",
+    "no deposit taken"
+   ],
+   "corrections": [
+    {
+     "wrong": "5",
+     "right": "50",
+     "problem": "p1",
+     "turn": 2
+    }
+   ],
+   "requirement_change": {
+    "turn": 3,
+    "text": "it must take under one minute per booking",
+    "kind": "constraint"
+   },
+   "rejected_solution": {
+    "idea_turn": 2,
+    "turn": 3,
+    "reason_words": [
+     "one receptionist cannot write long replies to every booking"
+    ]
+   },
+   "answered_facts": [
+    {
+     "slot": "count",
+     "value_words": [
+      "5",
+      "double bookings"
+     ],
+     "said_in_turn": 0
+    },
+    {
+     "slot": "how_often",
+     "value_words": [
+      "every month"
+     ],
+     "said_in_turn": 0
+    },
+    {
+     "slot": "since",
+     "value_words": [
+      "after we added the evening slots"
+     ],
+     "said_in_turn": 1
+    },
+    {
+     "slot": "who",
+     "value_words": [
+      "one receptionist"
+     ],
+     "said_in_turn": 1
+    },
+    {
+     "slot": "constraint",
+     "value_words": [
+      "no money for new systems"
+     ],
+     "said_in_turn": 1
+    },
+    {
+     "slot": "tried",
+     "value_words": [
+      "shared whiteboard"
+     ],
+     "said_in_turn": 1
+    },
+    {
+     "slot": "cause",
+     "value_words": [
+      "mixes up the courts"
+     ],
+     "said_in_turn": 1
+    }
+   ],
+   "questions": [
+    {
+     "after_turn": 0,
+     "slot": "since"
+    },
+    {
+     "after_turn": 1,
+     "slot": "when"
+    },
+    {
+     "after_turn": 2,
+     "slot": "outcome"
+    }
+   ],
+   "candidates": [
+    {
+     "id": "c1",
+     "text": "Give each court its own page in the diary and tick every slot as soon as a booking is confirmed on WhatsApp.",
+     "verdict": "relevant",
+     "problem": "p2",
+     "reason": "uses courts, diary and WhatsApp, no spend"
+    },
+    {
+     "id": "c2",
+     "text": "Keep a printed slot sheet at the desk for each court so the receptionist sees at once which teams hold which slot.",
+     "verdict": "relevant",
+     "problem": "p1",
+     "reason": "prevents two teams for one slot without new systems"
+    },
+    {
+     "id": "c3",
+     "text": "Buy a new booking system with online payments for all courts.",
+     "verdict": "violates_constraint",
+     "problem": "p1",
+     "reason": "no money for new systems"
+    },
+    {
+     "id": "c4",
+     "text": "Sell team shirts and cold drinks at the front desk.",
+     "verdict": "irrelevant",
+     "problem": null,
+     "reason": "unrelated to booking clashes"
+    },
+    {
+     "id": "c5",
+     "text": "Use better software to improve the club.",
+     "verdict": "generic",
+     "problem": null,
+     "reason": "fits any business"
+    }
+   ],
+   "blueprint": {
+    "steps": [
+     {
+      "id": "s1",
+      "text": "Make one slot sheet per court for each day",
+      "any": [
+       "slot",
+       "court"
+      ]
+     },
+     {
+      "id": "s2",
+      "text": "Write each WhatsApp booking on the court sheet the moment it is confirmed",
+      "any": [
+       "booking",
+       "sheet"
+      ]
+     },
+     {
+      "id": "s3",
+      "text": "Reply to each booking with one short line naming the court and time",
+      "any": [
+       "reply",
+       "court"
+      ]
+     },
+     {
+      "id": "s4",
+      "text": "Check the sheets against the diary at the end of each day",
+      "any": [
+       "check",
+       "diary"
+      ]
+     }
+    ],
+    "dependencies": [
+     {
+      "from": "s1",
+      "to": "s2"
+     },
+     {
+      "from": "s1",
+      "to": "s3"
+     },
+     {
+      "from": "s2",
+      "to": "s4"
+     },
+     {
+      "from": "s3",
+      "to": "s4"
+     }
+    ],
+    "resources": [
+     {
+      "text": "The receptionist and a printed sheet for each court",
+      "any": [
+       "receptionist",
+       "sheet"
+      ]
+     }
+    ],
+    "success_criteria": [
+     {
+      "text": "Double bookings counted each month and compared with the 50 now",
+      "any": [
+       "50",
+       "month"
+      ]
+     }
+    ]
+   }
+  },
+  "recorded": {
+   "origin": "hand_written reference output written by hand, not model output",
+   "notes_by_turn": {
+    "0": [
+     {
+      "title": "Two teams booked for one turf slot",
+      "title_local": "Two teams booked for one turf slot",
+      "user_words": [
+       "About 5 double bookings happen every month"
+      ],
+      "summary": "Double bookings put two teams on the same slot and make them angry.",
+      "category": "operations_process",
+      "subtype": "",
+      "where": [],
+      "frequency_text": "every month",
+      "since_text": "",
+      "money_text": "",
+      "of_total": "5 double bookings",
+      "impact_types": [],
+      "constraints": [],
+      "tried": [],
+      "cause": "",
+      "cause_status": "",
+      "expected_outcome": ""
+     }
+    ],
+    "1": [
+     {
+      "title": "Courts mixed up in the paper diary",
+      "title_local": "Courts mixed up in the paper diary",
+      "user_words": [
+       "our one receptionist writes them in a paper diary"
+      ],
+      "summary": "Bookings arrive on WhatsApp and are copied by hand into a diary.",
+      "category": "operations_process",
+      "subtype": "",
+      "where": [],
+      "frequency_text": "",
+      "since_text": "",
+      "money_text": "",
+      "of_total": "",
+      "impact_types": [],
+      "constraints": [
+       "no money for new systems this year",
+       "we cannot stop taking WhatsApp bookings"
+      ],
+      "tried": [
+       "We tried a shared whiteboard but people kept rubbing it out"
+      ],
+      "cause": "the receptionist mixes up the courts when it is busy",
+      "cause_status": "owner_said",
+      "expected_outcome": ""
+     }
+    ]
+   }
+  }
+ },
+ {
+  "id": "ps_bookings_ur",
+  "case_type": "conversation",
+  "format_version": 2,
+  "industry": "sports_clubs_academies_and_turf_court_rentals",
+  "language": "ur",
+  "kind": "problem_solving",
+  "regression": false,
+  "title": "Double bookings on turf slots",
+  "synthetic": true,
+  "provenance": {
+   "author": "PS-0 agent",
+   "reviewer": null,
+   "created": "2026-10-31",
+   "origin": "hand_written"
+  },
+  "scenario": "bookings",
+  "messages": [
+   "دو ٹیمیں ایک ہی ٹرف سلاٹ پر آ جاتی ہیں۔ ہر مہینے تقریباً 5 ڈبل بکنگ ہوتی ہیں اور ٹیمیں ناراض ہوتی ہیں۔",
+   "یہ شام کے سلاٹ شامل کرنے کے بعد شروع ہوا۔ بکنگ واٹس ایپ پر آتی ہیں اور ہماری ایک ریسپشنسٹ انہیں کاغذی ڈائری میں لکھتی ہے۔ اس سال نئے سسٹم کے لیے پیسے نہیں ہیں اور ہم واٹس ایپ بکنگ لینا بند نہیں کر سکتے۔ ہم نے مشترکہ وائٹ بورڈ آزمایا تھا مگر لوگ مٹا دیتے تھے۔ میرا خیال ہے رش میں ریسپشنسٹ کورٹس کو آپس میں ملا دیتی ہے۔",
+   "معذرت، 5 نہیں 50 ڈبل بکنگ ہر مہینے ہوتی ہیں۔ اب ہم کیا کر سکتے ہیں؟",
+   "نہیں، ایک ریسپشنسٹ ہر بکنگ پر لمبے جواب نہیں لکھ سکتی۔ اور ہر بکنگ ایک منٹ سے کم میں ہونی چاہیے۔"
+  ],
+  "turns": [
+   {
+    "role": "owner",
+    "text": "دو ٹیمیں ایک ہی ٹرف سلاٹ پر آ جاتی ہیں۔ ہر مہینے تقریباً 5 ڈبل بکنگ ہوتی ہیں اور ٹیمیں ناراض ہوتی ہیں۔"
+   },
+   {
+    "role": "pi",
+    "reply_source": "reference",
+    "text": "ناراض ٹیمیں واقعی مسئلہ ہیں۔ ڈبل بکنگ کب سے شروع ہوئی؟"
+   },
+   {
+    "role": "owner",
+    "text": "یہ شام کے سلاٹ شامل کرنے کے بعد شروع ہوا۔ بکنگ واٹس ایپ پر آتی ہیں اور ہماری ایک ریسپشنسٹ انہیں کاغذی ڈائری میں لکھتی ہے۔ اس سال نئے سسٹم کے لیے پیسے نہیں ہیں اور ہم واٹس ایپ بکنگ لینا بند نہیں کر سکتے۔ ہم نے مشترکہ وائٹ بورڈ آزمایا تھا مگر لوگ مٹا دیتے تھے۔ میرا خیال ہے رش میں ریسپشنسٹ کورٹس کو آپس میں ملا دیتی ہے۔"
+   },
+   {
+    "role": "pi",
+    "reply_source": "reference",
+    "text": "شکریہ۔ یہ زیادہ تر ویک اینڈ پر ہوتا ہے یا عام دنوں میں؟"
+   },
+   {
+    "role": "owner",
+    "text": "معذرت، 5 نہیں 50 ڈبل بکنگ ہر مہینے ہوتی ہیں۔ اب ہم کیا کر سکتے ہیں؟",
+    "asks_idea": true
+   },
+   {
+    "role": "pi",
+    "reply_source": "reference",
+    "text": "ایک خیال یہ ہے کہ ہر بکنگ کی تصدیق اسی چیٹ میں کورٹ اور وقت کے ساتھ واپس بھیجیں تاکہ غلطی فوراً نظر آئے۔ آپ کیا نتیجہ چاہتے ہیں؟"
+   },
+   {
+    "role": "owner",
+    "text": "نہیں، ایک ریسپشنسٹ ہر بکنگ پر لمبے جواب نہیں لکھ سکتی۔ اور ہر بکنگ ایک منٹ سے کم میں ہونی چاہیے۔"
+   }
+  ],
+  "expected": {
+   "problems": [
+    {
+     "id": "p1",
+     "any": [
+      "ڈبل",
+      "ٹرف",
+      "ٹیمیں"
+     ],
+     "figures": [
+      "50"
+     ]
+    },
+    {
+     "id": "p2",
+     "any": [
+      "ریسپشنسٹ",
+      "ڈائری",
+      "کورٹس"
+     ],
+     "figures": []
+    }
+   ],
+   "stated": [
+    "دو ٹیمیں ایک ہی ٹرف سلاٹ پر آ جاتی ہیں",
+    "50 ڈبل بکنگ ہر مہینے",
+    "شام کے سلاٹ",
+    "بکنگ واٹس ایپ پر آتی ہیں"
+   ],
+   "missing": [
+    "which_days",
+    "outcome",
+    "court_count"
+   ],
+   "constraints": [
+    {
+     "kind": "budget",
+     "text": "نئے سسٹم کے لیے پیسے نہیں ہیں",
+     "blocks": [
+      "خریدیں",
+      "نیا سسٹم",
+      "سافٹ ویئر",
+      "خرید"
+     ],
+     "status": "confirmed",
+     "said_in_turn": 1,
+     "problem": null
+    },
+    {
+     "kind": "cannot_change",
+     "text": "ہم واٹس ایپ بکنگ لینا بند نہیں کر سکتے",
+     "blocks": [
+      "بند کریں",
+      "صرف فون",
+      "واک ان",
+      "واٹس ایپ چھوڑ"
+     ],
+     "status": "confirmed",
+     "said_in_turn": 1,
+     "problem": "p2"
+    },
+    {
+     "kind": "cannot_change",
+     "text": "ایک ریسپشنسٹ ہر بکنگ پر لمبے جواب نہیں لکھ سکتی",
+     "blocks": [
+      "لمبے جواب",
+      "لمبا جواب",
+      "تفصیلی جواب",
+      "فارم بھروا"
+     ],
+     "status": "confirmed",
+     "said_in_turn": 3,
+     "problem": "p2"
+    },
+    {
+     "kind": "deadline",
+     "text": "ہر بکنگ ایک منٹ سے کم میں ہونی چاہیے",
+     "blocks": [
+      "لمبا فارم",
+      "کئی مراحل",
+      "تفصیلی فارم"
+     ],
+     "status": "confirmed",
+     "said_in_turn": 3,
+     "problem": null
+    }
+   ],
+   "tried": [
+    {
+     "what": "مشترکہ وائٹ بورڈ آزمایا",
+     "outcome": "لوگ مٹا دیتے تھے",
+     "said_in_turn": 1
+    }
+   ],
+   "cause": {
+    "text": "رش میں ریسپشنسٹ کورٹس کو آپس میں ملا دیتی ہے",
+    "status": "owner_said",
+    "evidence_words": [
+     "کورٹس کو آپس میں ملا"
+    ],
+    "problem": "p2"
+   },
+   "hypothesis_only": [
+    "customers forget their slot",
+    "no deposit taken"
+   ],
+   "corrections": [
+    {
+     "wrong": "5",
+     "right": "50",
+     "problem": "p1",
+     "turn": 2
+    }
+   ],
+   "requirement_change": {
+    "turn": 3,
+    "text": "ہر بکنگ ایک منٹ سے کم میں ہونی چاہیے",
+    "kind": "constraint"
+   },
+   "rejected_solution": {
+    "idea_turn": 2,
+    "turn": 3,
+    "reason_words": [
+     "ایک ریسپشنسٹ ہر بکنگ پر لمبے جواب نہیں لکھ سکتی"
+    ]
+   },
+   "answered_facts": [
+    {
+     "slot": "count",
+     "value_words": [
+      "5",
+      "ڈبل بکنگ"
+     ],
+     "said_in_turn": 0
+    },
+    {
+     "slot": "how_often",
+     "value_words": [
+      "ہر مہینے"
+     ],
+     "said_in_turn": 0
+    },
+    {
+     "slot": "since",
+     "value_words": [
+      "شام کے سلاٹ شامل کرنے کے بعد"
+     ],
+     "said_in_turn": 1
+    },
+    {
+     "slot": "who",
+     "value_words": [
+      "ایک ریسپشنسٹ"
+     ],
+     "said_in_turn": 1
+    },
+    {
+     "slot": "constraint",
+     "value_words": [
+      "نئے سسٹم کے لیے پیسے نہیں"
+     ],
+     "said_in_turn": 1
+    },
+    {
+     "slot": "tried",
+     "value_words": [
+      "مشترکہ وائٹ بورڈ"
+     ],
+     "said_in_turn": 1
+    },
+    {
+     "slot": "cause",
+     "value_words": [
+      "کورٹس کو آپس میں ملا"
+     ],
+     "said_in_turn": 1
+    }
+   ],
+   "questions": [
+    {
+     "after_turn": 0,
+     "slot": "since"
+    },
+    {
+     "after_turn": 1,
+     "slot": "when"
+    },
+    {
+     "after_turn": 2,
+     "slot": "outcome"
+    }
+   ],
+   "candidates": [
+    {
+     "id": "c1",
+     "text": "ہر کورٹ کا ڈائری میں الگ صفحہ بنائیں اور واٹس ایپ پر بکنگ کنفرم ہوتے ہی ہر سلاٹ پر ٹک لگائیں۔",
+     "verdict": "relevant",
+     "problem": "p2",
+     "reason": "uses courts, diary and WhatsApp, no spend"
+    },
+    {
+     "id": "c2",
+     "text": "ڈیسک پر ہر کورٹ کی چھپی ہوئی سلاٹ شیٹ رکھیں تاکہ ریسپشنسٹ کو فوراً پتا ہو کس ٹیم کے پاس کون سا سلاٹ ہے۔",
+     "verdict": "relevant",
+     "problem": "p1",
+     "reason": "prevents two teams for one slot without new systems"
+    },
+    {
+     "id": "c3",
+     "text": "تمام کورٹس کے لیے آن لائن ادائیگی والا نیا سسٹم خریدیں۔",
+     "verdict": "violates_constraint",
+     "problem": "p1",
+     "reason": "no money for new systems"
+    },
+    {
+     "id": "c4",
+     "text": "فرنٹ ڈیسک پر ٹیم کی شرٹس اور ٹھنڈے مشروبات بیچیں۔",
+     "verdict": "irrelevant",
+     "problem": null,
+     "reason": "unrelated to booking clashes"
+    },
+    {
+     "id": "c5",
+     "text": "بہتر سافٹ ویئر استعمال کریں تاکہ کلب بہتر ہو۔",
+     "verdict": "generic",
+     "problem": null,
+     "reason": "fits any business"
+    }
+   ],
+   "blueprint": {
+    "steps": [
+     {
+      "id": "s1",
+      "text": "ہر دن کے لیے ہر کورٹ کی ایک سلاٹ شیٹ بنائیں",
+      "any": [
+       "سلاٹ",
+       "کورٹ"
+      ]
+     },
+     {
+      "id": "s2",
+      "text": "ہر واٹس ایپ بکنگ کنفرم ہوتے ہی کورٹ کی شیٹ پر لکھیں",
+      "any": [
+       "بکنگ",
+       "شیٹ"
+      ]
+     },
+     {
+      "id": "s3",
+      "text": "ہر بکنگ کا جواب ایک چھوٹی لائن میں کورٹ اور وقت کے ساتھ دیں",
+      "any": [
+       "جواب",
+       "کورٹ"
+      ]
+     },
+     {
+      "id": "s4",
+      "text": "دن کے آخر میں شیٹس کو ڈائری سے ملائیں",
+      "any": [
+       "شیٹس",
+       "ڈائری"
+      ]
+     }
+    ],
+    "dependencies": [
+     {
+      "from": "s1",
+      "to": "s2"
+     },
+     {
+      "from": "s1",
+      "to": "s3"
+     },
+     {
+      "from": "s2",
+      "to": "s4"
+     },
+     {
+      "from": "s3",
+      "to": "s4"
+     }
+    ],
+    "resources": [
+     {
+      "text": "ریسپشنسٹ اور ہر کورٹ کے لیے ایک چھپی ہوئی شیٹ",
+      "any": [
+       "ریسپشنسٹ",
+       "شیٹ"
+      ]
+     }
+    ],
+    "success_criteria": [
+     {
+      "text": "ہر مہینے ڈبل بکنگ گنیں اور ابھی کے 50 سے موازنہ کریں",
+      "any": [
+       "50",
+       "مہینے"
+      ]
+     }
+    ]
+   }
+  },
+  "recorded": {
+   "origin": "hand_written reference output written by hand, not model output",
+   "notes_by_turn": {
+    "0": [
+     {
+      "title": "Two teams booked for one turf slot",
+      "title_local": "دو ٹیمیں ایک ہی سلاٹ پر",
+      "user_words": [
+       "ہر مہینے تقریباً 5 ڈبل بکنگ ہوتی ہیں"
+      ],
+      "summary": "Double bookings put two teams on the same slot and make them angry.",
+      "category": "operations_process",
+      "subtype": "",
+      "where": [],
+      "frequency_text": "ہر مہینے",
+      "since_text": "",
+      "money_text": "",
+      "of_total": "5 ڈبل بکنگ",
+      "impact_types": [],
+      "constraints": [],
+      "tried": [],
+      "cause": "",
+      "cause_status": "",
+      "expected_outcome": ""
+     }
+    ],
+    "1": [
+     {
+      "title": "Courts mixed up in the paper diary",
+      "title_local": "ڈائری میں کورٹس ملا دیے جاتے ہیں",
+      "user_words": [
+       "ہماری ایک ریسپشنسٹ انہیں کاغذی ڈائری میں لکھتی ہے"
+      ],
+      "summary": "Bookings arrive on WhatsApp and are copied by hand into a diary.",
+      "category": "operations_process",
+      "subtype": "",
+      "where": [],
+      "frequency_text": "",
+      "since_text": "",
+      "money_text": "",
+      "of_total": "",
+      "impact_types": [],
+      "constraints": [
+       "نئے سسٹم کے لیے پیسے نہیں ہیں",
+       "ہم واٹس ایپ بکنگ لینا بند نہیں کر سکتے"
+      ],
+      "tried": [
+       "ہم نے مشترکہ وائٹ بورڈ آزمایا تھا مگر لوگ مٹا دیتے تھے"
+      ],
+      "cause": "رش میں ریسپشنسٹ کورٹس کو آپس میں ملا دیتی ہے",
+      "cause_status": "owner_said",
+      "expected_outcome": ""
+     }
+    ]
+   }
+  }
+ },
+ {
+  "id": "ps_banquet_ar",
+  "case_type": "conversation",
+  "format_version": 2,
+  "industry": "banquet_halls_and_marquees",
+  "language": "ar",
+  "kind": "problem_solving",
+  "regression": false,
+  "title": "Slow hall quotes lose customers",
+  "synthetic": true,
+  "provenance": {
+   "author": "PS-0 agent",
+   "reviewer": null,
+   "created": "2026-10-31",
+   "origin": "hand_written"
+  },
+  "scenario": "banquet",
+  "messages": [
+   "العملاء يطلبون عرض سعر للقاعة وينتظرون أياما للرد. حوالي 3 عملاء كل شهر يذهبون إلى قاعة أخرى بسبب بطئنا.",
+   "بدأ ذلك منذ أضفنا القاعة الثانية في مارس. مديرنا يعد كل عرض يدويا في جدول إكسل وأسعار القائمة تتغير مع المتعهد. ميزانيتنا 30,000 ريال فقط لأي حل، ولا نستطيع تغيير شركاء المتعهدين. جربنا قائمة أسعار ثابتة لكن المتعهدين غيروا الأسعار مرة أخرى. أظن أن المدير مشغول جدا بفعاليات نفس الأيام.",
+   "عذرا، ليس 3 بل 30 عميلا كل شهر يذهبون إلى قاعات أخرى. ماذا نفعل الآن؟",
+   "لا، المدير لا يستطيع الرد على كل استفسار خلال ساعة وهو يدير فعالية. ويجب أن يعمل على هاتف المدير، لا يوجد كمبيوتر في المكتب."
+  ],
+  "turns": [
+   {
+    "role": "owner",
+    "text": "العملاء يطلبون عرض سعر للقاعة وينتظرون أياما للرد. حوالي 3 عملاء كل شهر يذهبون إلى قاعة أخرى بسبب بطئنا."
+   },
+   {
+    "role": "pi",
+    "reply_source": "reference",
+    "text": "خسارة العملاء بسبب البطء صعبة. متى بدأ التأخر في عروض الأسعار؟"
+   },
+   {
+    "role": "owner",
+    "text": "بدأ ذلك منذ أضفنا القاعة الثانية في مارس. مديرنا يعد كل عرض يدويا في جدول إكسل وأسعار القائمة تتغير مع المتعهد. ميزانيتنا 30,000 ريال فقط لأي حل، ولا نستطيع تغيير شركاء المتعهدين. جربنا قائمة أسعار ثابتة لكن المتعهدين غيروا الأسعار مرة أخرى. أظن أن المدير مشغول جدا بفعاليات نفس الأيام."
+   },
+   {
+    "role": "pi",
+    "reply_source": "reference",
+    "text": "شكرا. كم يدر حجز القاعة الواحد تقريبا؟"
+   },
+   {
+    "role": "owner",
+    "text": "عذرا، ليس 3 بل 30 عميلا كل شهر يذهبون إلى قاعات أخرى. ماذا نفعل الآن؟",
+    "asks_idea": true
+   },
+   {
+    "role": "pi",
+    "reply_source": "reference",
+    "text": "فكرة واحدة أن نرد على كل استفسار خلال ساعة بالتواريخ الخالية، ثم العرض الكامل لاحقا. ما النتيجة التي تريدونها؟"
+   },
+   {
+    "role": "owner",
+    "text": "لا، المدير لا يستطيع الرد على كل استفسار خلال ساعة وهو يدير فعالية. ويجب أن يعمل على هاتف المدير، لا يوجد كمبيوتر في المكتب."
+   }
+  ],
+  "expected": {
+   "problems": [
+    {
+     "id": "p1",
+     "any": [
+      "عرض",
+      "العملاء",
+      "قاعة"
+     ],
+     "figures": [
+      "30"
+     ]
+    },
+    {
+     "id": "p2",
+     "any": [
+      "مديرنا",
+      "جدول",
+      "المتعهد"
+     ],
+     "figures": []
+    }
+   ],
+   "stated": [
+    "العملاء يطلبون عرض سعر للقاعة",
+    "30 عميلا كل شهر",
+    "القاعة الثانية في مارس",
+    "30,000 ريال"
+   ],
+   "missing": [
+    "money",
+    "outcome",
+    "events_per_month"
+   ],
+   "constraints": [
+    {
+     "kind": "budget",
+     "text": "ميزانيتنا 30,000 ريال فقط لأي حل",
+     "blocks": [
+      "30,000",
+      "مكلف",
+      "اشتر نظاما"
+     ],
+     "status": "confirmed",
+     "said_in_turn": 1,
+     "problem": null
+    },
+    {
+     "kind": "cannot_change",
+     "text": "لا نستطيع تغيير شركاء المتعهدين",
+     "blocks": [
+      "تغيير المتعهد",
+      "متعهد جديد",
+      "متعهد آخر",
+      "انتقل"
+     ],
+     "status": "confirmed",
+     "said_in_turn": 1,
+     "problem": "p2"
+    },
+    {
+     "kind": "cannot_change",
+     "text": "المدير لا يستطيع الرد على كل استفسار خلال ساعة وهو يدير فعالية",
+     "blocks": [
+      "خلال ساعة",
+      "كل استفسار",
+      "الرد على الجميع"
+     ],
+     "status": "confirmed",
+     "said_in_turn": 3,
+     "problem": "p1"
+    },
+    {
+     "kind": "cannot_change",
+     "text": "يجب أن يعمل على هاتف المدير",
+     "blocks": [
+      "كمبيوتر المكتب",
+      "حاسوب مكتبي",
+      "لابتوب",
+      "خادم"
+     ],
+     "status": "confirmed",
+     "said_in_turn": 3,
+     "problem": null
+    }
+   ],
+   "tried": [
+    {
+     "what": "جربنا قائمة أسعار ثابتة",
+     "outcome": "المتعهدون غيروا الأسعار مرة أخرى",
+     "said_in_turn": 1
+    }
+   ],
+   "cause": {
+    "text": "المدير مشغول جدا بفعاليات نفس الأيام",
+    "status": "owner_said",
+    "evidence_words": [
+     "مشغول جدا بفعاليات"
+    ],
+    "problem": "p2"
+   },
+   "hypothesis_only": [
+    "prices are too high",
+    "customers prefer online booking"
+   ],
+   "corrections": [
+    {
+     "wrong": "3",
+     "right": "30",
+     "problem": "p1",
+     "turn": 2
+    }
+   ],
+   "requirement_change": {
+    "turn": 3,
+    "text": "يجب أن يعمل على هاتف المدير",
+    "kind": "scope"
+   },
+   "rejected_solution": {
+    "idea_turn": 2,
+    "turn": 3,
+    "reason_words": [
+     "المدير لا يستطيع الرد على كل استفسار خلال ساعة وهو يدير فعالية"
+    ]
+   },
+   "answered_facts": [
+    {
+     "slot": "count",
+     "value_words": [
+      "3",
+      "عملاء"
+     ],
+     "said_in_turn": 0
+    },
+    {
+     "slot": "how_often",
+     "value_words": [
+      "كل شهر"
+     ],
+     "said_in_turn": 0
+    },
+    {
+     "slot": "since",
+     "value_words": [
+      "منذ أضفنا القاعة الثانية في مارس"
+     ],
+     "said_in_turn": 1
+    },
+    {
+     "slot": "who",
+     "value_words": [
+      "مديرنا"
+     ],
+     "said_in_turn": 1
+    },
+    {
+     "slot": "constraint",
+     "value_words": [
+      "لا نستطيع تغيير شركاء المتعهدين"
+     ],
+     "said_in_turn": 1
+    },
+    {
+     "slot": "tried",
+     "value_words": [
+      "قائمة أسعار ثابتة"
+     ],
+     "said_in_turn": 1
+    },
+    {
+     "slot": "cause",
+     "value_words": [
+      "مشغول جدا بفعاليات"
+     ],
+     "said_in_turn": 1
+    }
+   ],
+   "questions": [
+    {
+     "after_turn": 0,
+     "slot": "since"
+    },
+    {
+     "after_turn": 1,
+     "slot": "money"
+    },
+    {
+     "after_turn": 2,
+     "slot": "outcome"
+    }
+   ],
+   "candidates": [
+    {
+     "id": "c1",
+     "text": "احتفظ بتقويم واحد للتواريخ الخالية في القاعتين يراجعه المدير قبل الرد، وأرسل جواب التاريخ أولا حتى لا ينتظر العميل.",
+     "verdict": "relevant",
+     "problem": "p1",
+     "reason": "speeds the first answer within the manager's time"
+    },
+    {
+     "id": "c2",
+     "text": "سجل كل طلب عرض بتاريخه واسم من رد عليه، ثم تابع العروض التي لم يأتها رد بعد يومين.",
+     "verdict": "relevant",
+     "problem": "p2",
+     "reason": "tracks quotes without new spend"
+    },
+    {
+     "id": "c3",
+     "text": "انتقل إلى متعهد آخر بأسعار ثابتة.",
+     "verdict": "violates_constraint",
+     "problem": "p2",
+     "reason": "caterer partners cannot change"
+    },
+    {
+     "id": "c4",
+     "text": "ضع أضواء ملونة عند مدخل القاعة.",
+     "verdict": "irrelevant",
+     "problem": null,
+     "reason": "unrelated to quotes"
+    },
+    {
+     "id": "c5",
+     "text": "استخدم برنامجا أفضل لتحسين العمل.",
+     "verdict": "generic",
+     "problem": null,
+     "reason": "fits any business"
+    }
+   ],
+   "blueprint": {
+    "steps": [
+     {
+      "id": "s1",
+      "text": "احتفظ بتقويم واحد للتواريخ الخالية في القاعتين",
+      "any": [
+       "تقويم",
+       "الخالية"
+      ]
+     },
+     {
+      "id": "s2",
+      "text": "أرسل لكل استفسار من هاتف المدير جوابا أول بالتواريخ الخالية",
+      "any": [
+       "جوابا",
+       "استفسار"
+      ]
+     },
+     {
+      "id": "s3",
+      "text": "اكتب كل طلب عرض بتاريخه واسم من رد عليه في قائمة واحدة",
+      "any": [
+       "عرض",
+       "قائمة"
+      ]
+     },
+     {
+      "id": "s4",
+      "text": "تابع العروض التي لم يأتها رد بعد يومين",
+      "any": [
+       "تابع",
+       "العروض"
+      ]
+     }
+    ],
+    "dependencies": [
+     {
+      "from": "s1",
+      "to": "s2"
+     },
+     {
+      "from": "s1",
+      "to": "s3"
+     },
+     {
+      "from": "s2",
+      "to": "s4"
+     },
+     {
+      "from": "s3",
+      "to": "s4"
+     }
+    ],
+    "resources": [
+     {
+      "text": "هاتف المدير وقائمة مشتركة واحدة",
+      "any": [
+       "المدير",
+       "قائمة"
+      ]
+     }
+    ],
+    "success_criteria": [
+     {
+      "text": "عدد العملاء الذاهبين لقاعات أخرى كل شهر يقارن بالـ 30 الآن",
+      "any": [
+       "30",
+       "شهر"
+      ]
+     }
+    ]
+   }
+  },
+  "recorded": {
+   "origin": "hand_written reference output written by hand, not model output",
+   "notes_by_turn": {
+    "0": [
+     {
+      "title": "Hall quotes take days so customers leave",
+      "title_local": "عروض الأسعار تتأخر فيذهب العملاء",
+      "user_words": [
+       "حوالي 3 عملاء كل شهر يذهبون إلى قاعة أخرى بسبب بطئنا"
+      ],
+      "summary": "Customers wait days for a quote and book another hall.",
+      "category": "sales_revenue",
+      "subtype": "",
+      "where": [],
+      "frequency_text": "كل شهر",
+      "since_text": "",
+      "money_text": "",
+      "of_total": "3 عملاء",
+      "impact_types": [],
+      "constraints": [],
+      "tried": [],
+      "cause": "",
+      "cause_status": "",
+      "expected_outcome": ""
+     }
+    ],
+    "1": [
+     {
+      "title": "Quotes made by hand take days",
+      "title_local": "العروض اليدوية تستغرق أياما",
+      "user_words": [
+       "مديرنا يعد كل عرض يدويا في جدول إكسل"
+      ],
+      "summary": "Quotes are built by hand and menu prices keep changing.",
+      "category": "operations_process",
+      "subtype": "",
+      "where": [],
+      "frequency_text": "",
+      "since_text": "",
+      "money_text": "",
+      "of_total": "",
+      "impact_types": [],
+      "constraints": [
+       "ميزانيتنا 30,000 ريال فقط لأي حل",
+       "لا نستطيع تغيير شركاء المتعهدين"
+      ],
+      "tried": [
+       "جربنا قائمة أسعار ثابتة لكن المتعهدين غيروا الأسعار مرة أخرى"
+      ],
+      "cause": "المدير مشغول جدا بفعاليات نفس الأيام",
+      "cause_status": "owner_said",
+      "expected_outcome": ""
+     }
+    ]
+   }
+  }
+ },
+ {
+  "id": "ps_salon_ur",
+  "case_type": "conversation",
+  "format_version": 2,
+  "industry": "salons_and_barbers",
+  "language": "ur",
+  "kind": "problem_solving",
+  "regression": false,
+  "title": "Salon walk-outs and clashing bookings",
+  "synthetic": true,
+  "provenance": {
+   "author": "PS-0 agent",
+   "reviewer": null,
+   "created": "2026-10-31",
+   "origin": "hand_written"
+  },
+  "scenario": "salon",
+  "messages": [
+   "ہمارے سیلون میں انتظار بہت لمبا ہے اس لیے گاہک واپس چلے جاتے ہیں۔ روزانہ تقریباً 6 گاہک بغیر بال کٹوائے چلے جاتے ہیں۔",
+   "پچھلے مہینے سے۔ بکنگ بھی کاغذی ڈائری میں گڈمڈ ہو جاتی ہے، اس لیے دو لوگ ایک ہی کرسی کے لیے آ جاتے ہیں۔ ہمارے پاس صرف 3 اسٹائلسٹ ہیں اور کسی کو بھرتی نہیں کر سکتے۔ ہم نے ٹوکن سسٹم آزمایا لیکن عملے نے نظر انداز کر دیا۔ میرا خیال ہے ایسا اس لیے ہوتا ہے کہ ریسپشن اور اسٹائلسٹ دونوں ایک ہی ڈائری میں لکھتے ہیں۔",
+   "معذرت، 6 نہیں، 60 گاہک روزانہ جاتے ہیں۔ اب ہم کیا کر سکتے ہیں؟",
+   "نہیں، دروازے کے پاس بورڈ لگانے کی جگہ نہیں ہے۔ اور یہ صرف فون پر چلنا چاہیے، کچھ پرنٹ نہیں۔"
+  ],
+  "turns": [
+   {
+    "role": "owner",
+    "text": "ہمارے سیلون میں انتظار بہت لمبا ہے اس لیے گاہک واپس چلے جاتے ہیں۔ روزانہ تقریباً 6 گاہک بغیر بال کٹوائے چلے جاتے ہیں۔"
+   },
+   {
+    "role": "pi",
+    "reply_source": "reference",
+    "text": "یہ تو بہت نقصان ہے۔ یہ سب کب سے ہو رہا ہے؟"
+   },
+   {
+    "role": "owner",
+    "text": "پچھلے مہینے سے۔ بکنگ بھی کاغذی ڈائری میں گڈمڈ ہو جاتی ہے، اس لیے دو لوگ ایک ہی کرسی کے لیے آ جاتے ہیں۔ ہمارے پاس صرف 3 اسٹائلسٹ ہیں اور کسی کو بھرتی نہیں کر سکتے۔ ہم نے ٹوکن سسٹم آزمایا لیکن عملے نے نظر انداز کر دیا۔ میرا خیال ہے ایسا اس لیے ہوتا ہے کہ ریسپشن اور اسٹائلسٹ دونوں ایک ہی ڈائری میں لکھتے ہیں۔"
+   },
+   {
+    "role": "pi",
+    "reply_source": "reference",
+    "text": "ایک کرسی پر دو لوگ آنا مشکل ہے۔ گاہک بکنگ کیسے کرتے ہیں، فون، واٹس ایپ یا کاؤنٹر پر؟"
+   },
+   {
+    "role": "owner",
+    "text": "معذرت، 6 نہیں، 60 گاہک روزانہ جاتے ہیں۔ اب ہم کیا کر سکتے ہیں؟",
+    "asks_idea": true
+   },
+   {
+    "role": "pi",
+    "reply_source": "reference",
+    "text": "ایک خیال یہ ہے کہ دروازے کے پاس بورڈ پر ہر کرسی کا اگلا خالی وقت لکھا ہو، تاکہ انتظار کرنے والے رکنے کا فیصلہ کر سکیں۔ آپ سب سے پہلے کیا بدلنا چاہتے ہیں؟"
+   },
+   {
+    "role": "owner",
+    "text": "نہیں، دروازے کے پاس بورڈ لگانے کی جگہ نہیں ہے۔ اور یہ صرف فون پر چلنا چاہیے، کچھ پرنٹ نہیں۔"
+   }
+  ],
+  "expected": {
+   "problems": [
+    {
+     "id": "p1",
+     "any": [
+      "انتظار",
+      "گاہک",
+      "کٹوائے"
+     ],
+     "figures": [
+      "60"
+     ]
+    },
+    {
+     "id": "p2",
+     "any": [
+      "بکنگ",
+      "ڈائری",
+      "کرسی"
+     ],
+     "figures": []
+    }
+   ],
+   "stated": [
+    "انتظار بہت لمبا ہے",
+    "کاغذی ڈائری",
+    "صرف 3 اسٹائلسٹ ہیں اور کسی کو بھرتی نہیں کر سکتے"
+   ],
+   "missing": [
+    "where",
+    "money",
+    "outcome"
+   ],
+   "constraints": [
+    {
+     "kind": "staff",
+     "text": "صرف 3 اسٹائلسٹ ہیں اور کسی کو بھرتی نہیں کر سکتے",
+     "blocks": [
+      "بھرتی",
+      "نئے",
+      "مزید اسٹائلسٹ"
+     ],
+     "status": "confirmed",
+     "said_in_turn": 1,
+     "problem": "p1"
+    },
+    {
+     "kind": "cannot_change",
+     "text": "دروازے کے پاس بورڈ لگانے کی جگہ نہیں ہے",
+     "blocks": [
+      "بورڈ",
+      "اسکرین",
+      "دروازے"
+     ],
+     "status": "confirmed",
+     "said_in_turn": 3,
+     "problem": "p1"
+    },
+    {
+     "kind": "cannot_change",
+     "text": "یہ صرف فون پر چلنا چاہیے، کچھ پرنٹ نہیں",
+     "blocks": [
+      "کاغذ",
+      "پرنٹ",
+      "ڈائری"
+     ],
+     "status": "confirmed",
+     "said_in_turn": 3,
+     "problem": null
+    }
+   ],
+   "tried": [
+    {
+     "what": "ہم نے ٹوکن سسٹم آزمایا لیکن عملے نے نظر انداز کر دیا",
+     "outcome": "failed because staff ignored it",
+     "said_in_turn": 1
+    }
+   ],
+   "cause": {
+    "text": "ریسپشن اور اسٹائلسٹ دونوں ایک ہی ڈائری میں لکھتے ہیں",
+    "status": "owner_said",
+    "evidence_words": [
+     "ریسپشن",
+     "اسٹائلسٹ",
+     "ڈائری"
+    ],
+    "problem": "p2"
+   },
+   "hypothesis_only": [
+    "not enough stylists",
+    "slow haircuts"
+   ],
+   "corrections": [
+    {
+     "wrong": "6",
+     "right": "60",
+     "problem": "p1",
+     "turn": 2
+    }
+   ],
+   "requirement_change": {
+    "turn": 3,
+    "text": "یہ صرف فون پر چلنا چاہیے، کچھ پرنٹ نہیں",
+    "kind": "scope"
+   },
+   "rejected_solution": {
+    "idea_turn": 2,
+    "turn": 3,
+    "reason_words": [
+     "دروازے",
+     "بورڈ",
+     "جگہ",
+     "نہیں"
+    ]
+   },
+   "answered_facts": [
+    {
+     "slot": "count",
+     "value_words": [
+      "گاہک",
+      "روزانہ"
+     ],
+     "said_in_turn": 0
+    },
+    {
+     "slot": "since",
+     "value_words": [
+      "پچھلے",
+      "مہینے"
+     ],
+     "said_in_turn": 1
+    },
+    {
+     "slot": "count",
+     "value_words": [
+      "3",
+      "اسٹائلسٹ"
+     ],
+     "said_in_turn": 1
+    },
+    {
+     "slot": "tried",
+     "value_words": [
+      "ٹوکن",
+      "سسٹم"
+     ],
+     "said_in_turn": 1
+    },
+    {
+     "slot": "constraint",
+     "value_words": [
+      "بھرتی",
+      "نہیں"
+     ],
+     "said_in_turn": 1
+    },
+    {
+     "slot": "cause",
+     "value_words": [
+      "ایک",
+      "ڈائری"
+     ],
+     "said_in_turn": 1
+    }
+   ],
+   "questions": [
+    {
+     "after_turn": 0,
+     "slot": "since"
+    },
+    {
+     "after_turn": 1,
+     "slot": "where"
+    },
+    {
+     "after_turn": 2,
+     "slot": "outcome"
+    }
+   ],
+   "candidates": [
+    {
+     "id": "c1",
+     "text": "دو کرسیاں صرف بکنگ والوں کے لیے رکھیں اور ایک کرسی واک اِن گاہکوں کے لیے، تاکہ ہر گروہ کا انتظار واضح ہو۔",
+     "verdict": "relevant",
+     "problem": "p1",
+     "reason": "fits the stated problem and every limit"
+    },
+    {
+     "id": "c2",
+     "text": "ہر بکنگ کرسی اور وقت کے ساتھ ریسپشن کے فون پر ایک ہی فہرست میں لکھیں تاکہ ایک کرسی دو لوگوں کو نہ ملے۔",
+     "verdict": "relevant",
+     "problem": "p2",
+     "reason": "fits the second problem and every limit"
+    },
+    {
+     "id": "c3",
+     "text": "دو مزید اسٹائلسٹ بھرتی کریں تاکہ ہر واک اِن گاہک فوراً دیکھا جائے۔",
+     "verdict": "violates_constraint",
+     "problem": "p1",
+     "reason": "breaks a confirmed limit"
+    },
+    {
+     "id": "c4",
+     "text": "ہر دسویں بال کٹوانے پر مفت والا لائلٹی کارڈ شروع کریں۔",
+     "verdict": "irrelevant",
+     "problem": null,
+     "reason": "specific but unrelated to the problems"
+    },
+    {
+     "id": "c5",
+     "text": "بہتر سافٹ ویئر استعمال کریں تاکہ کاروبار بہتر ہو۔",
+     "verdict": "generic",
+     "problem": null,
+     "reason": "would fit any business"
+    }
+   ],
+   "blueprint": {
+    "steps": [
+     {
+      "id": "s1",
+      "text": "ایک ہفتے کی کرسیوں اور بکنگ کے اوقات کی فہرست بنائیں",
+      "any": [
+       "کرسیوں",
+       "بکنگ"
+      ]
+     },
+     {
+      "id": "s2",
+      "text": "مصروف گھنٹوں میں ایک کرسی واک اِن کے لیے الگ رکھیں",
+      "any": [
+       "کرسی",
+       "واک"
+      ]
+     },
+     {
+      "id": "s3",
+      "text": "ہر بکنگ ریسپشن کے فون پر ایک ہی فہرست میں لکھیں",
+      "any": [
+       "بکنگ",
+       "فہرست"
+      ]
+     },
+     {
+      "id": "s4",
+      "text": "دو ہفتے بعد دیکھیں کہ اب بھی کتنے گاہک چلے جاتے ہیں",
+      "any": [
+       "گاہک",
+       "دیکھیں"
+      ]
+     }
+    ],
+    "dependencies": [
+     {
+      "from": "s1",
+      "to": "s2"
+     },
+     {
+      "from": "s1",
+      "to": "s3"
+     },
+     {
+      "from": "s2",
+      "to": "s4"
+     },
+     {
+      "from": "s3",
+      "to": "s4"
+     }
+    ],
+    "resources": [
+     {
+      "text": "ریسپشن پر ایک شخص جو فہرست سنبھالے",
+      "any": [
+       "ریسپشن"
+      ]
+     }
+    ],
+    "success_criteria": [
+     {
+      "text": "روزانہ بغیر بال کٹوائے جانے والے گاہک، جو ابھی 60 روزانہ ہیں، ان سے موازنہ",
+      "any": [
+       "گاہک",
+       "60"
+      ]
+     }
+    ]
+   }
+  },
+  "recorded": {
+   "origin": "hand_written reference output written by hand, not model output",
+   "notes_by_turn": {
+    "0": [
+     {
+      "title": "Customers leave because of long wait",
+      "title_local": "انتظار لمبا ہونے سے گاہک چلے جاتے ہیں",
+      "user_words": [
+       "انتظار بہت لمبا ہے",
+       "6 گاہک بغیر بال کٹوائے چلے جاتے ہیں"
+      ],
+      "summary": "Customers leave unserved because the wait is long.",
+      "category": "customers_retention",
+      "subtype": "",
+      "where": [],
+      "frequency_text": "روزانہ",
+      "since_text": "",
+      "money_text": "",
+      "of_total": "",
+      "impact_types": [
+       "lost_sales"
+      ],
+      "constraints": [],
+      "tried": [],
+      "cause": "",
+      "cause_status": "",
+      "expected_outcome": ""
+     }
+    ],
+    "1": [
+     {
+      "title": "Bookings get mixed up in diary",
+      "title_local": "بکنگ ڈائری میں گڈمڈ ہو جاتی ہے",
+      "user_words": [
+       "بکنگ بھی کاغذی ڈائری میں گڈمڈ ہو جاتی ہے، اس لیے دو لوگ ایک ہی کرسی کے لیے آ جاتے ہیں"
+      ],
+      "summary": "Bookings clash so two customers get one chair.",
+      "category": "operations_process",
+      "subtype": "",
+      "where": [],
+      "frequency_text": "",
+      "since_text": "پچھلے مہینے سے",
+      "money_text": "",
+      "of_total": "",
+      "impact_types": [
+       "lost_sales"
+      ],
+      "constraints": [
+       "صرف 3 اسٹائلسٹ ہیں اور کسی کو بھرتی نہیں کر سکتے"
+      ],
+      "tried": [
+       "ہم نے ٹوکن سسٹم آزمایا لیکن عملے نے نظر انداز کر دیا"
+      ],
+      "cause": "ریسپشن اور اسٹائلسٹ دونوں ایک ہی ڈائری میں لکھتے ہیں",
+      "cause_status": "owner_said",
+      "expected_outcome": ""
+     }
+    ]
+   }
+  }
+ },
+ {
+  "id": "ps_clinic_reception_roman_ur",
+  "case_type": "conversation",
+  "format_version": 2,
+  "industry": "clinics_and_gp_practices",
+  "language": "roman_ur",
+  "kind": "problem_solving",
+  "regression": false,
+  "title": "Clinic queue and double appointments",
+  "synthetic": true,
+  "provenance": {
+   "author": "PS-0 agent",
+   "reviewer": null,
+   "created": "2026-10-31",
+   "origin": "hand_written"
+  },
+  "scenario": "clinic_reception",
+  "messages": [
+   "Hamare clinic mein reception par line bohat bekaar hai, is liye mareez naraz hote hain. Roz taqriban 15 mareez aate hain aur zyada tar ko bohat intezar karna parta hai.",
+   "Takriban do mahine se. Appointments bhi double ho jati hain, to do mareez ek hi slot par aa jate hain. Hamare paas sirf 2 receptionists hain aur extra staff ka budget nahi hai. Humne numbered ticket try kiya lekin mareezon ne ignore kiya. Mera khayal hai yeh is liye hota hai kyun ke doctor aur receptionist alag alag list rakhte hain.",
+   "Sorry, 15 nahi, 150 mareez roz aate hain. Ab hum kya kar sakte hain?",
+   "Nahi, yahan mareez message istemal nahi karte, bohat se parh nahi sakte. Aur yeh sirf ek print kiye hue kagaz par chalna chahiye, koi screen nahi."
+  ],
+  "turns": [
+   {
+    "role": "owner",
+    "text": "Hamare clinic mein reception par line bohat bekaar hai, is liye mareez naraz hote hain. Roz taqriban 15 mareez aate hain aur zyada tar ko bohat intezar karna parta hai."
+   },
+   {
+    "role": "pi",
+    "reply_source": "reference",
+    "text": "Reception team ke liye yeh mushkil hoga. Line aisi kab se hai?"
+   },
+   {
+    "role": "owner",
+    "text": "Takriban do mahine se. Appointments bhi double ho jati hain, to do mareez ek hi slot par aa jate hain. Hamare paas sirf 2 receptionists hain aur extra staff ka budget nahi hai. Humne numbered ticket try kiya lekin mareezon ne ignore kiya. Mera khayal hai yeh is liye hota hai kyun ke doctor aur receptionist alag alag list rakhte hain."
+   },
+   {
+    "role": "pi",
+    "reply_source": "reference",
+    "text": "Double appointment mareezon ke liye mushkil hai. Mareez aam tor par kaise book karte hain, phone, WhatsApp ya desk par?"
+   },
+   {
+    "role": "owner",
+    "text": "Sorry, 15 nahi, 150 mareez roz aate hain. Ab hum kya kar sakte hain?",
+    "asks_idea": true
+   },
+   {
+    "role": "pi",
+    "reply_source": "reference",
+    "text": "Ek idea yeh hai ke har mareez ko message par ek waqt ki khirki di jaye, taake intezar gah mein ek waqt mein kam log hon. Aap sab se pehle kya behtar karna chahte hain?"
+   },
+   {
+    "role": "owner",
+    "text": "Nahi, yahan mareez message istemal nahi karte, bohat se parh nahi sakte. Aur yeh sirf ek print kiye hue kagaz par chalna chahiye, koi screen nahi."
+   }
+  ],
+  "expected": {
+   "problems": [
+    {
+     "id": "p1",
+     "any": [
+      "reception",
+      "line",
+      "mareez"
+     ],
+     "figures": [
+      "150"
+     ]
+    },
+    {
+     "id": "p2",
+     "any": [
+      "Appointments",
+      "double",
+      "slot"
+     ],
+     "figures": []
+    }
+   ],
+   "stated": [
+    "reception par line bohat bekaar hai",
+    "sirf 2 receptionists hain aur extra staff ka budget nahi hai",
+    "numbered ticket"
+   ],
+   "missing": [
+    "where",
+    "money",
+    "outcome"
+   ],
+   "constraints": [
+    {
+     "kind": "staff",
+     "text": "sirf 2 receptionists hain aur extra staff ka budget nahi hai",
+     "blocks": [
+      "hire",
+      "extra staff",
+      "mazeed receptionists",
+      "bharti"
+     ],
+     "status": "confirmed",
+     "said_in_turn": 1,
+     "problem": "p1"
+    },
+    {
+     "kind": "cannot_change",
+     "text": "yahan mareez message istemal nahi karte",
+     "blocks": [
+      "message",
+      "messages",
+      "sms",
+      "whatsapp",
+      "app"
+     ],
+     "status": "confirmed",
+     "said_in_turn": 3,
+     "problem": "p1"
+    },
+    {
+     "kind": "cannot_change",
+     "text": "yeh sirf ek print kiye hue kagaz par chalna chahiye, koi screen nahi",
+     "blocks": [
+      "screen",
+      "tablet",
+      "software"
+     ],
+     "status": "confirmed",
+     "said_in_turn": 3,
+     "problem": null
+    }
+   ],
+   "tried": [
+    {
+     "what": "Humne numbered ticket try kiya lekin mareezon ne ignore kiya",
+     "outcome": "failed because patients ignored it",
+     "said_in_turn": 1
+    }
+   ],
+   "cause": {
+    "text": "doctor aur receptionist alag alag list rakhte hain",
+    "status": "owner_said",
+    "evidence_words": [
+     "doctor",
+     "receptionist",
+     "alag alag list"
+    ],
+    "problem": "p2"
+   },
+   "hypothesis_only": [
+    "too few doctors",
+    "patients arriving late"
+   ],
+   "corrections": [
+    {
+     "wrong": "15",
+     "right": "150",
+     "problem": "p1",
+     "turn": 2
+    }
+   ],
+   "requirement_change": {
+    "turn": 3,
+    "text": "yeh sirf ek print kiye hue kagaz par chalna chahiye, koi screen nahi",
+    "kind": "scope"
+   },
+   "rejected_solution": {
+    "idea_turn": 2,
+    "turn": 3,
+    "reason_words": [
+     "mareez",
+     "message",
+     "istemal",
+     "parh"
+    ]
+   },
+   "answered_facts": [
+    {
+     "slot": "count",
+     "value_words": [
+      "mareez",
+      "Roz"
+     ],
+     "said_in_turn": 0
+    },
+    {
+     "slot": "since",
+     "value_words": [
+      "do",
+      "mahine"
+     ],
+     "said_in_turn": 1
+    },
+    {
+     "slot": "count",
+     "value_words": [
+      "2",
+      "receptionists"
+     ],
+     "said_in_turn": 1
+    },
+    {
+     "slot": "tried",
+     "value_words": [
+      "numbered",
+      "ticket"
+     ],
+     "said_in_turn": 1
+    },
+    {
+     "slot": "constraint",
+     "value_words": [
+      "budget",
+      "nahi"
+     ],
+     "said_in_turn": 1
+    },
+    {
+     "slot": "cause",
+     "value_words": [
+      "alag",
+      "list"
+     ],
+     "said_in_turn": 1
+    }
+   ],
+   "questions": [
+    {
+     "after_turn": 0,
+     "slot": "since"
+    },
+    {
+     "after_turn": 1,
+     "slot": "where"
+    },
+    {
+     "after_turn": 2,
+     "slot": "outcome"
+    }
+   ],
+   "candidates": [
+    {
+     "id": "c1",
+     "text": "Har mareez ke aane ka waqt reception par ek print kiye hue kagaz par likho, taake line ki tarteeb mareezon aur staff ko saaf ho.",
+     "verdict": "relevant",
+     "problem": "p1",
+     "reason": "fits the stated problem and every limit"
+    },
+    {
+     "id": "c2",
+     "text": "Doctor aur receptionist ke liye appointment slots ki ek hi list rakho taake koi slot do baar na diya jaye.",
+     "verdict": "relevant",
+     "problem": "p2",
+     "reason": "fits the second problem and every limit"
+    },
+    {
+     "id": "c3",
+     "text": "Line sambhalne ke liye do mazeed receptionists hire karo.",
+     "verdict": "violates_constraint",
+     "problem": "p1",
+     "reason": "breaks a confirmed limit"
+    },
+    {
+     "id": "c4",
+     "text": "Intezar gah ki deewaron ke liye mahana sehat ke mashware ka parcha chhapo.",
+     "verdict": "irrelevant",
+     "problem": null,
+     "reason": "specific but unrelated to the problems"
+    },
+    {
+     "id": "c5",
+     "text": "Behtar software istemal karo taake business behtar ho.",
+     "verdict": "generic",
+     "problem": null,
+     "reason": "would fit any business"
+    }
+   ],
+   "blueprint": {
+    "steps": [
+     {
+      "id": "s1",
+      "text": "Ek hafte tak har ghante mein aane wale mareezon ko gino",
+      "any": [
+       "mareezon",
+       "ghante"
+      ]
+     },
+     {
+      "id": "s2",
+      "text": "Doctor aur receptionist ko appointment ki ek hi list do",
+      "any": [
+       "appointment",
+       "list"
+      ]
+     },
+     {
+      "id": "s3",
+      "text": "Aane ka waqt reception par ek print kiye hue kagaz par likho",
+      "any": [
+       "print",
+       "kagaz"
+      ]
+     },
+     {
+      "id": "s4",
+      "text": "Do hafte baad intezar ke waqt ko dekho",
+      "any": [
+       "intezar",
+       "dekho"
+      ]
+     }
+    ],
+    "dependencies": [
+     {
+      "from": "s1",
+      "to": "s2"
+     },
+     {
+      "from": "s1",
+      "to": "s3"
+     },
+     {
+      "from": "s2",
+      "to": "s4"
+     },
+     {
+      "from": "s3",
+      "to": "s4"
+     }
+    ],
+    "resources": [
+     {
+      "text": "Ek receptionist jo kagaz aur list sambhale",
+      "any": [
+       "receptionist"
+      ]
+     }
+    ],
+    "success_criteria": [
+     {
+      "text": "Roz bohat intezar karne wale mareez, jo abhi 150 roz aate hain, un se muqabla",
+      "any": [
+       "mareez",
+       "150"
+      ]
+     }
+    ]
+   }
+  },
+  "recorded": {
+   "origin": "hand_written reference output written by hand, not model output",
+   "notes_by_turn": {
+    "0": [
+     {
+      "title": "Patients wait too long in reception queue",
+      "title_local": "Reception par mareezon ko bohat intezar",
+      "user_words": [
+       "reception par line bohat bekaar hai",
+       "15 mareez aate hain aur zyada tar ko bohat intezar karna parta hai"
+      ],
+      "summary": "The reception queue is chaotic and patients wait too long.",
+      "category": "customer_experience_digital",
+      "subtype": "",
+      "where": [],
+      "frequency_text": "Roz",
+      "since_text": "",
+      "money_text": "",
+      "of_total": "",
+      "impact_types": [
+       "customer_dissatisfaction"
+      ],
+      "constraints": [],
+      "tried": [],
+      "cause": "",
+      "cause_status": "",
+      "expected_outcome": ""
+     }
+    ],
+    "1": [
+     {
+      "title": "Appointments double booked for same slot",
+      "title_local": "Appointments double ho jati hain",
+      "user_words": [
+       "Appointments bhi double ho jati hain, to do mareez ek hi slot par aa jate hain"
+      ],
+      "summary": "Appointments clash so two patients get one slot.",
+      "category": "operations_process",
+      "subtype": "",
+      "where": [],
+      "frequency_text": "",
+      "since_text": "Takriban do mahine se",
+      "money_text": "",
+      "of_total": "",
+      "impact_types": [
+       "customer_dissatisfaction"
+      ],
+      "constraints": [
+       "sirf 2 receptionists hain aur extra staff ka budget nahi hai"
+      ],
+      "tried": [
+       "Humne numbered ticket try kiya lekin mareezon ne ignore kiya"
+      ],
+      "cause": "doctor aur receptionist alag alag list rakhte hain",
+      "cause_status": "owner_said",
+      "expected_outcome": ""
+     }
+    ]
+   }
+  }
+ },
+ {
+  "id": "ps_repair_shop_roman_ur",
+  "case_type": "conversation",
+  "format_version": 2,
+  "industry": "auto_workshops_and_service_centres",
+  "language": "roman_ur",
+  "kind": "problem_solving",
+  "regression": false,
+  "title": "Repair shop status calls",
+  "synthetic": true,
+  "provenance": {
+   "author": "PS-0 agent",
+   "reviewer": null,
+   "created": "2026-10-31",
+   "origin": "hand_written"
+  },
+  "scenario": "repair_shop",
+  "messages": [
+   "Customers baar baar phone karke poochte hain ke unki gaari kab tayyar hogi, aur is se hamare repair shop ki subah zaya hoti hai. Roz taqriban 4 customers update ke liye phone karte hain.",
+   "Saal ke shuru se. Parts bhi der se aate hain aur customer ko koi nahi batata, to woh dobara phone karte hain. Hamare paas sirf 5 mechanics hain aur kaam rok kar kisi ko training nahi de sakte. Humne jobs ka whiteboard try kiya lekin woh kabhi update nahi hua. Mera khayal hai yeh is liye hota hai kyun ke mechanics job ka status likhte nahi.",
+   "Sorry, 4 nahi, 40 customers roz phone karte hain. Ab hum kya kar sakte hain?",
+   "Nahi, mechanics message type nahi kar sakte, un ke haath hamesha gande rehte hain. Aur yeh un customers ke liye bhi chalna chahiye jin ka phone number nahi hota."
+  ],
+  "turns": [
+   {
+    "role": "owner",
+    "text": "Customers baar baar phone karke poochte hain ke unki gaari kab tayyar hogi, aur is se hamare repair shop ki subah zaya hoti hai. Roz taqriban 4 customers update ke liye phone karte hain."
+   },
+   {
+    "role": "pi",
+    "reply_source": "reference",
+    "text": "Is se kaam ka waqt kam ho jata hoga. Yeh sab kab se ho raha hai?"
+   },
+   {
+    "role": "owner",
+    "text": "Saal ke shuru se. Parts bhi der se aate hain aur customer ko koi nahi batata, to woh dobara phone karte hain. Hamare paas sirf 5 mechanics hain aur kaam rok kar kisi ko training nahi de sakte. Humne jobs ka whiteboard try kiya lekin woh kabhi update nahi hua. Mera khayal hai yeh is liye hota hai kyun ke mechanics job ka status likhte nahi."
+   },
+   {
+    "role": "pi",
+    "reply_source": "reference",
+    "text": "Parts ki der aur koi khabar nahi, yeh mushkil hai. Customers ka phone kaun uthata hai?"
+   },
+   {
+    "role": "owner",
+    "text": "Sorry, 4 nahi, 40 customers roz phone karte hain. Ab hum kya kar sakte hain?",
+    "asks_idea": true
+   },
+   {
+    "role": "pi",
+    "reply_source": "reference",
+    "text": "Ek idea yeh hai ke jab bhi kaam ka marhala badle to customer ko chota message jaye, taake kam log phone karen. Aap sab se pehle kya behtar karna chahte hain?"
+   },
+   {
+    "role": "owner",
+    "text": "Nahi, mechanics message type nahi kar sakte, un ke haath hamesha gande rehte hain. Aur yeh un customers ke liye bhi chalna chahiye jin ka phone number nahi hota."
+   }
+  ],
+  "expected": {
+   "problems": [
+    {
+     "id": "p1",
+     "any": [
+      "Customers",
+      "phone",
+      "gaari"
+     ],
+     "figures": [
+      "40"
+     ]
+    },
+    {
+     "id": "p2",
+     "any": [
+      "Parts",
+      "der",
+      "customer"
+     ],
+     "figures": []
+    }
+   ],
+   "stated": [
+    "hamare repair shop ki subah zaya hoti hai",
+    "sirf 5 mechanics hain aur kaam rok kar kisi ko training nahi de sakte",
+    "jobs ka whiteboard"
+   ],
+   "missing": [
+    "where",
+    "money",
+    "outcome"
+   ],
+   "constraints": [
+    {
+     "kind": "staff",
+     "text": "sirf 5 mechanics hain aur kaam rok kar kisi ko training nahi de sakte",
+     "blocks": [
+      "training",
+      "course",
+      "hire",
+      "bharti"
+     ],
+     "status": "confirmed",
+     "said_in_turn": 1,
+     "problem": "p1"
+    },
+    {
+     "kind": "cannot_change",
+     "text": "mechanics message type nahi kar sakte",
+     "blocks": [
+      "type",
+      "message",
+      "messages",
+      "typing"
+     ],
+     "status": "confirmed",
+     "said_in_turn": 3,
+     "problem": "p1"
+    },
+    {
+     "kind": "cannot_change",
+     "text": "yeh un customers ke liye bhi chalna chahiye jin ka phone number nahi hota",
+     "blocks": [
+      "sms",
+      "whatsapp",
+      "phone number",
+      "message"
+     ],
+     "status": "confirmed",
+     "said_in_turn": 3,
+     "problem": null
+    }
+   ],
+   "tried": [
+    {
+     "what": "Humne jobs ka whiteboard try kiya lekin woh kabhi update nahi hua",
+     "outcome": "failed because it was never updated",
+     "said_in_turn": 1
+    }
+   ],
+   "cause": {
+    "text": "mechanics job ka status likhte nahi",
+    "status": "owner_said",
+    "evidence_words": [
+     "mechanics",
+     "job ka status",
+     "likhte nahi"
+    ],
+    "problem": "p2"
+   },
+   "hypothesis_only": [
+    "mechanics are too slow",
+    "customers are impatient"
+   ],
+   "corrections": [
+    {
+     "wrong": "4",
+     "right": "40",
+     "problem": "p1",
+     "turn": 2
+    }
+   ],
+   "requirement_change": {
+    "turn": 3,
+    "text": "yeh un customers ke liye bhi chalna chahiye jin ka phone number nahi hota",
+    "kind": "scope"
+   },
+   "rejected_solution": {
+    "idea_turn": 2,
+    "turn": 3,
+    "reason_words": [
+     "mechanics",
+     "message",
+     "type",
+     "haath",
+     "gande"
+    ]
+   },
+   "answered_facts": [
+    {
+     "slot": "count",
+     "value_words": [
+      "customers",
+      "Roz"
+     ],
+     "said_in_turn": 0
+    },
+    {
+     "slot": "since",
+     "value_words": [
+      "Saal",
+      "shuru"
+     ],
+     "said_in_turn": 1
+    },
+    {
+     "slot": "count",
+     "value_words": [
+      "5",
+      "mechanics"
+     ],
+     "said_in_turn": 1
+    },
+    {
+     "slot": "tried",
+     "value_words": [
+      "jobs",
+      "whiteboard"
+     ],
+     "said_in_turn": 1
+    },
+    {
+     "slot": "constraint",
+     "value_words": [
+      "training",
+      "nahi"
+     ],
+     "said_in_turn": 1
+    },
+    {
+     "slot": "cause",
+     "value_words": [
+      "job",
+      "status"
+     ],
+     "said_in_turn": 1
+    }
+   ],
+   "questions": [
+    {
+     "after_turn": 0,
+     "slot": "since"
+    },
+    {
+     "after_turn": 1,
+     "slot": "who"
+    },
+    {
+     "after_turn": 2,
+     "slot": "outcome"
+    }
+   ],
+   "candidates": [
+    {
+     "id": "c1",
+     "text": "Har customer ko gaari aate hi chhapi hui job slip do, jis mein kaam ka marhala aur kis se poochna hai likha ho, taake kam customers phone karen.",
+     "verdict": "relevant",
+     "problem": "p1",
+     "reason": "fits the stated problem and every limit"
+    },
+    {
+     "id": "c2",
+     "text": "Jab part order ho to customers ko bata do ke woh kis din tak aayega, taake woh dobara phone na karen.",
+     "verdict": "relevant",
+     "problem": "p2",
+     "reason": "fits the second problem and every limit"
+    },
+    {
+     "id": "c3",
+     "text": "Har mechanic ko customer updates ke baare mein training course par bhejo.",
+     "verdict": "violates_constraint",
+     "problem": "p1",
+     "reason": "breaks a confirmed limit"
+    },
+    {
+     "id": "c4",
+     "text": "Apne sab se wafadar logon ke liye saalana lucky draw rakho.",
+     "verdict": "irrelevant",
+     "problem": null,
+     "reason": "specific but unrelated to the problems"
+    },
+    {
+     "id": "c5",
+     "text": "Behtar software istemal karo taake business behtar ho.",
+     "verdict": "generic",
+     "problem": null,
+     "reason": "would fit any business"
+    }
+   ],
+   "blueprint": {
+    "steps": [
+     {
+      "id": "s1",
+      "text": "Ek hafte tak likho ke customers kin wajah se phone karte hain",
+      "any": [
+       "customers",
+       "phone"
+      ]
+     },
+     {
+      "id": "s2",
+      "text": "Counter par maujood shakhs har subah aur dopahar har job ka marhala likhe",
+      "any": [
+       "counter",
+       "marhala"
+      ]
+     },
+     {
+      "id": "s3",
+      "text": "Jab part order ho to customers ko uske aane ka din batao",
+      "any": [
+       "customers",
+       "part"
+      ]
+     },
+     {
+      "id": "s4",
+      "text": "Do hafte baad phone ki tadad dekho",
+      "any": [
+       "phone",
+       "dekho"
+      ]
+     }
+    ],
+    "dependencies": [
+     {
+      "from": "s1",
+      "to": "s2"
+     },
+     {
+      "from": "s1",
+      "to": "s3"
+     },
+     {
+      "from": "s2",
+      "to": "s4"
+     },
+     {
+      "from": "s3",
+      "to": "s4"
+     }
+    ],
+    "resources": [
+     {
+      "text": "Jo bhi counter par kaam karta hai",
+      "any": [
+       "counter"
+      ]
+     }
+    ],
+    "success_criteria": [
+     {
+      "text": "Roz update ke liye phone karne wale customers, jo abhi 40 roz hain, un se muqabla",
+      "any": [
+       "customers",
+       "40"
+      ]
+     }
+    ]
+   }
+  },
+  "recorded": {
+   "origin": "hand_written reference output written by hand, not model output",
+   "notes_by_turn": {
+    "0": [
+     {
+      "title": "Customers call often for car updates",
+      "title_local": "Customers gaari ke update ke liye baar baar phone karte hain",
+      "user_words": [
+       "Customers baar baar phone karke poochte hain ke unki gaari kab tayyar hogi",
+       "4 customers update ke liye phone karte hain"
+      ],
+      "summary": "Customers keep phoning for updates and it wastes the mornings.",
+      "category": "communication_coordination",
+      "subtype": "",
+      "where": [],
+      "frequency_text": "Roz",
+      "since_text": "",
+      "money_text": "",
+      "of_total": "",
+      "impact_types": [
+       "lost_time"
+      ],
+      "constraints": [],
+      "tried": [],
+      "cause": "",
+      "cause_status": "",
+      "expected_outcome": ""
+     }
+    ],
+    "1": [
+     {
+      "title": "Parts arrive late without customer notice",
+      "title_local": "Parts der se aate hain aur customer ko khabar nahi",
+      "user_words": [
+       "Parts bhi der se aate hain aur customer ko koi nahi batata, to woh dobara phone karte hain"
+      ],
+      "summary": "Late parts are not reported to customers, who call again.",
+      "category": "suppliers_purchasing",
+      "subtype": "",
+      "where": [],
+      "frequency_text": "",
+      "since_text": "Saal ke shuru se",
+      "money_text": "",
+      "of_total": "",
+      "impact_types": [
+       "lost_time"
+      ],
+      "constraints": [
+       "sirf 5 mechanics hain aur kaam rok kar kisi ko training nahi de sakte"
+      ],
+      "tried": [
+       "Humne jobs ka whiteboard try kiya lekin woh kabhi update nahi hua"
+      ],
+      "cause": "mechanics job ka status likhte nahi",
+      "cause_status": "owner_said",
+      "expected_outcome": ""
+     }
+    ]
+   }
+  }
+ }
+]

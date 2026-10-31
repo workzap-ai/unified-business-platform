@@ -60,11 +60,17 @@ def problem_view(
     }
 
 
+def _loaded(problem: Any, name: str) -> Any:
+    """A value that is already loaded on the row. The four B2a columns are deferred: an async
+    session cannot lazy-load them, so an unloaded one reads as not said (the caller loads them)."""
+    return getattr(problem, "__dict__", {}).get(name)
+
+
 def requirement_view(problem: Any) -> dict[str, Any]:
     """The stored B2a fields of one problem, as plain data for the blueprint: the owner's limits,
     what they tried, the cause with its status (pi's guess stays `pi_inferred`) and the outcome
     they want. A row from before the columns existed reads as empty."""
-    stated = getattr(problem, "constraints", None)
+    stated = _loaded(problem, "constraints")
     stated = stated if isinstance(stated, dict) else {}
 
     def text(entry: Any) -> str:
@@ -74,10 +80,10 @@ def requirement_view(problem: Any) -> dict[str, Any]:
     cannot = [text(e) for e in stated.get("cannot_change") or [] if text(e).strip()]
     tried = [
         {"what": str(t.get("what") or ""), "outcome": str(t.get("outcome") or "")}
-        for t in (getattr(problem, "tried", None) or [])
+        for t in (_loaded(problem, "tried") or [])
         if isinstance(t, dict) and str(t.get("what") or "").strip()
     ]
-    cause = getattr(problem, "cause", None)
+    cause = _loaded(problem, "cause")
     cause = cause if isinstance(cause, dict) else {}
     return {
         "limits": {k: v for k, v in limits.items() if v.strip()},
@@ -85,8 +91,8 @@ def requirement_view(problem: Any) -> dict[str, Any]:
         "tried": tried,
         "cause_text": str(cause.get("text") or ""),
         "cause_status": str(cause.get("status") or "") if cause.get("text") else "",
-        "expected_outcome": str(getattr(problem, "expected_outcome", None) or ""),
-        "msgs": [str(m) for m in (getattr(problem, "source_message_ids", None) or [])],
+        "expected_outcome": str(_loaded(problem, "expected_outcome") or ""),
+        "msgs": [str(m) for m in (_loaded(problem, "source_message_ids") or [])],
     }
 
 

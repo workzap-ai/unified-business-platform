@@ -613,6 +613,21 @@ async def _links_of(
     ]
 
 
+async def _load_requirements(
+    session: AsyncSession, book: "problems.ProblemBook", rows: list[PiProblem]
+) -> None:
+    """Load the deferred B2a columns so the blueprint can read them. A database before migration
+    0053 has none: the rows then read as "not said" and the document is drafted as before."""
+    from sqlalchemy.exc import ProgrammingError
+
+    try:
+        async with session.begin_nested():
+            for row in rows:
+                await book.load_requirements(row)
+    except ProgrammingError:
+        logger.warning("pi_blueprint_requirements_missing")
+
+
 async def draft_offer(
     session: AsyncSession,
     scope: WorkspaceScope,
@@ -632,6 +647,7 @@ async def draft_offer(
     rows = [p for p in await book.active() if not wanted or problems.short_ref(p.id) in wanted]
     if not rows:
         return None
+    await _load_requirements(session, book, rows)
     language = conversation.language or "en"
     business = (
         (brief.get("customer_profile") or {}).get("business_name")
@@ -878,7 +894,7 @@ def edit(doc: PiBrainDocument, patch: dict[str, Any]) -> None:
                 content["phases"] = [
                     {"phase": int(p.get("phase") or 0), "name": str(p.get("name", ""))[:120]}
                     for p in patch["phases"]
-                ][:box_doc.MAX_PHASE]
+                ][: box_doc.MAX_PHASE]
         if "wont_do" in patch:
             content["wont_do"] = [
                 {"text": str(w.get("text", ""))[:300], "problem": str(w.get("problem", ""))}

@@ -1601,7 +1601,7 @@ async def brain_problems(
         )
         if quote is not None:
             context["open_quote"] = quote
-    if conversation.customer_id is not None and context.get("pi_mode") == "brain":
+    if conversation.customer_id is not None and flow.brain_mode(policy.response_rules):
         # once per turn: what the owner said they cannot do or already tried (L2-1 hard gate input)
         reqs = await requirements_read.read_requirements(
             session, scope, conversation_id=conversation.id
