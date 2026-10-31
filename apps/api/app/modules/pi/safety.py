@@ -157,6 +157,12 @@ def _rx(latin: tuple[str, ...] = (), native: tuple[str, ...] = ()) -> re.Pattern
     return re.compile("|".join(parts), re.IGNORECASE)
 
 
+# Retail and catalogue verbs: a "which supplement/medicine ..." question that carries one is a
+# question about the shop's range, not a personal health ask.
+_RETAIL = (
+    r"(?:stock|sell|order|carry|import|supply|buy|display|keep|shop|store|catalog\w*|recommend|"
+    r"give away|promote|list|put|shelf|sample|free)"
+)
 _PERSON = (
     r"(?:guest|patient|member|student|customer|child|kid|worker|staff|player|passenger|driver|cook|chef|"
     r"someone|man|woman|boy|girl|person|he|she|resident|trainee|athlete|swimmer|labou?rer|employee|"
@@ -540,26 +546,54 @@ EMERGENCY_TEXT = {
 
 
 # Roman Urdu fire: the verb must follow "aag" ("aag se bachao", "aag bujhane", "aag alarm lagwana"
-# are fire-safety trade talk). A past or hypothetical clause is not an emergency unless the fire is
-# said in the present ("lag gayi hai"): when unsure, the emergency still fires.
+# are fire-safety trade talk). The message is quiet only when it is clearly past or hypothetical:
+# a past/hypothetical marker in the SAME clause as the "aag lag" match, and no danger or present
+# marker anywhere in the message. When unsure, the emergency fires.
 _ROMAN_FIRE = re.compile(
-    r"\b(?:aag|ag)\s+lag{1,2}(?:i|\s*(?:gayi|gai|gaya|gayee|gaye|rahi|raha|ayi))\b", re.IGNORECASE
+    r"\b(?:a{1,3}g{1,2})\s+(?:lag{1,2}(?:i|\s*(?:gayi|gai|gaee|gya|gyi|gaya|gayee|gaye|rahi|raha|ayi|"
+    r"chuki|chuka|jayegi|jayega|jaye|jaega|jaegi))|lagne\s+wal[ia])\b",
+    re.IGNORECASE,
 )
 _ROMAN_FIRE_NOT_NOW = re.compile(
-    r"\b(?:pichle|pichhle|pehle|agar|kabhi|jab|thi|tha|claim|insurance|bima)\b", re.IGNORECASE
+    r"\b(?:pichle|pichhle|pehle|agar|kabhi|jab|thi|tha|the|to|claim|insurance|bima)\b",
+    re.IGNORECASE,
 )
-_ROMAN_FIRE_PRESENT = re.compile(r"\s*(?:hai|hain|he)\b", re.IGNORECASE)
+_ROMAN_FIRE_PRESENT = re.compile(r"\s*(?:hai|hain|he|h)\b", re.IGNORECASE)
+_ROMAN_FIRE_DANGER = re.compile(
+    r"\b(?:log\s+andar|andar\s+phans\w*|bachao|madad|abhi|ab|phir|dhuan\w*|jal\s+(?:raha|rahi|rahe)|"
+    r"fire\s*brigade|ambulance|chhalaang|bacha|bachay|bachi|bachaye|bachayen)\b",
+    re.IGNORECASE,
+)
+_ROMAN_FIRE_CLAUSE = re.compile(r"[,.;:!?\n]|\b(?:aur|ab|phir|lekin)\b", re.IGNORECASE)
 _ROMAN_FIRE_IS = re.compile(
     r"\b(?:shop|godown|factory|dukan|dukaan|showroom|gaari|gadi) mein aag (?:hai|hain)\b",
     re.IGNORECASE,
 )
 
 
+def _clause_of(said: str, start: int, end: int) -> str:
+    lo, hi = 0, len(said)
+    for b in _ROMAN_FIRE_CLAUSE.finditer(said):
+        if b.end() <= start:
+            lo = b.end()
+        elif b.start() >= end:
+            hi = b.start()
+            break
+    return said[lo:hi]
+
+
 def _roman_fire(said: str) -> bool:
     if _ROMAN_FIRE_IS.search(said):
         return True
-    for m in _ROMAN_FIRE.finditer(said):
-        if _ROMAN_FIRE_PRESENT.match(said, m.end()) or not _ROMAN_FIRE_NOT_NOW.search(said):
+    matches = list(_ROMAN_FIRE.finditer(said))
+    if not matches:
+        return False
+    if _ROMAN_FIRE_DANGER.search(said):
+        return True
+    for m in matches:
+        if _ROMAN_FIRE_PRESENT.match(said, m.end()):
+            return True
+        if not _ROMAN_FIRE_NOT_NOW.search(_clause_of(said, m.start(), m.end())):
             return True
     return False
 
@@ -1117,7 +1151,11 @@ ADVICE_PATTERNS: tuple[tuple[Advice, re.Pattern[str]], ...] = (
     (
         Advice.MEDICAL,
         re.compile(
-            r"\b(?:what (?:dose|dosage)|which (?:medicine|tablet|drug|antibiotic)|how many (?:tablets|pills)|"
+            r"\b(?:what (?:dose|dosage)|"
+            r"which (?:medicine|tablet|drug|antibiotic)s?\s+(?:should|can|shall|could|do) (?:i|he|she|we|they|my \w+)\b"
+            r"(?![^.?!]*\b" + _RETAIL + r"\b)|"
+            r"which (?:medicine|tablet|drug|antibiotic)s?\s+(?:is|are) (?:best|good|safe) (?:for|to take)|"
+            r"how many (?:tablets|pills)|"
             r"dose (?:kitni|kya)|dawai (?:kaun|konsi)|can i give (?:my |the )?(?:child|baby|kid))\b",
             re.IGNORECASE,
         ),
@@ -1161,7 +1199,7 @@ ADVICE_PATTERNS = ADVICE_PATTERNS + (
             r"(?:am|are|is|do|does) (?:i|we|it|this|that)\b[^.?!]{0,40}\blegally (?:allowed|permitted|required|entitled|bound)|"
             r"kya\b[^.?!]{0,40}\blegally|tell me (?:whether|if)\b[^.?!]{0,40}\blegal|"
             r"tell me what the (?:law|act|regulations?) says?|what does the (?:law|act) say|"
-            r"is (?:this|that) (?:legal|illegal)\b(?!\s+(?:entity|name|document|paper|notice))|"
+            r"is (?:this|that) (?:legal|illegal)\b(?!\s+(?:entity|name|document|paper|notice|size|pad|envelopes?|letter|ruled|tender|stamp|a4))|"
             r"can i take (?:him|her|them) to court)\b",
             re.IGNORECASE,
         ),
@@ -1171,7 +1209,7 @@ ADVICE_PATTERNS = ADVICE_PATTERNS + (
         re.compile(
             r"\b(?:which|what) (?:supplements?|vitamins?|protein powders?|painkillers?|medicines?)\s+"
             r"(?:should|can|shall|could) (?:i|he|she|we|they)\b"
-            r"(?:(?!\b(?:stock|sell|order|carry|import|supply|buy|display|keep|shop|store|catalog\w*)\b)[^.?!]){0,60}?"
+            r"(?![^.?!]*\b" + _RETAIL + r"\b)[^.?!]{0,60}?"
             r"\b(?:take|taking|give|giving|for (?:me|him|her|my \w+))\b",
             re.IGNORECASE,
         ),
