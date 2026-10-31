@@ -11,6 +11,7 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, File, Response, UploadFile, status
 
 from app.modules.access.dependencies import Session, require
+from app.modules.audit.service import record
 from app.modules.customers import files
 from app.modules.customers.models import CustomerFile
 from app.modules.customers.service import CustomerService, log_activity
@@ -52,6 +53,14 @@ async def upload_file(
     await log_activity(
         session, scope, customer_id, "file", f"File added: {row.name}", "customer_file", row.id
     )
+    await record(
+        session,
+        "customer.file_added",
+        scope=scope,
+        entity_type="customer_file",
+        entity_id=row.id,
+        details={"customer_id": str(customer_id), "name": row.name, "size": row.size},
+    )
     await session.commit()
     return files.view(row)
 
@@ -79,9 +88,17 @@ async def delete_file(file_id: UUID, scope: Write, session: Session) -> Response
     row = await WorkspaceRepository(session, CustomerFile, scope).get(file_id)
     if row.source == "receipt":
         raise BusinessRuleViolation("RECEIPT_KEPT", "Receipts are kept for the record", 409)
-    name, customer_id = row.name, row.customer_id
+    name, customer_id, size = row.name, row.customer_id, row.size
     await session.delete(row)
     await log_activity(session, scope, customer_id, "file", f"File removed: {name}")
+    await record(
+        session,
+        "customer.file_removed",
+        scope=scope,
+        entity_type="customer_file",
+        entity_id=file_id,
+        details={"customer_id": str(customer_id), "name": name, "size": size},
+    )
     await session.commit()
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
