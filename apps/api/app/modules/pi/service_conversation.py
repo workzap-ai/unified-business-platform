@@ -41,6 +41,7 @@ from app.modules.pi import (
     fixed_lines,
     flow,
     followup_policy,
+    graph_voice,
     hold,
     idea_filter,
     industry_overlap,
@@ -2118,6 +2119,14 @@ def brain_option_voice(turn: "ServiceTurn", context: dict[str, Any]) -> None:
     heard = str((context.get("memory") or {}).get("already_known") or "")
     if heard and voiced.changed and (voiced.question or voiced.unknown):
         voiced.block = f"{heard}{chr(10)}{voiced.block}".strip()
+    if option_voice.has_ideas(turn.reply) and len(noted) >= 2:
+        # PS-7: how the problems may connect (guesses stay guesses), what to find out first, and
+        # whether the owner's own figures give an order; once per turn, no question
+        graph = graph_voice.graph_of(noted, owner_said, language)
+        extra = graph_voice.lines(graph, language, want_first=voiced.accepted == 0)
+        if extra:
+            voiced.block = chr(10).join([x for x in (voiced.block, *extra) if x])
+            voiced.changed = True
     turn._voice_pick = voiced.pick
     turn._voice_pending = voiced.pending
     if not voiced.changed:

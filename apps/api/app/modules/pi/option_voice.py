@@ -135,6 +135,11 @@ def _bullets(lines: list[str]) -> list[tuple[int, str]]:
     return [(i, m.group(1)) for i, line in enumerate(lines) if (m := BULLET.match(line))]
 
 
+def has_ideas(reply: str) -> bool:
+    """Whether the reply lists ideas (bullets)."""
+    return bool(_bullets((reply or "").splitlines()))
+
+
 def label_ideas(reply: str, positions: tuple[int, ...], language: str | None) -> str:
     """The not yet checked label after the listed ideas at these positions, in the reply's language."""
     if not positions:
