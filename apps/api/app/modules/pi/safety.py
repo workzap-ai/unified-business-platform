@@ -761,6 +761,8 @@ def _roman_fire(said: str) -> Emergency | None:
 
 
 _BRAND_NAMES = re.compile(r"\bheart\s+attack\s+grill\b", re.IGNORECASE)
+# Arabic trade nouns that contain a fire word (fire extinguishers, fire alarm devices): things sold, not a fire.
+_TRADE_NOUNS_AR = re.compile(r"(?:طفايات|طفاية|أجهزة إنذار|اجهزة انذار|إنذار|انذار)\s+(?:ال)?حريق")
 
 
 def emergency(text: str) -> Emergency | None:
@@ -768,6 +770,7 @@ def emergency(text: str) -> Emergency | None:
     said = " ".join((text or "").split())
     # "Heart Attack Grill" is a restaurant name, not an emergency: take the name out and look at the rest.
     said = _BRAND_NAMES.sub(" ", said)
+    said = _TRADE_NOUNS_AR.sub(" ", said)
     for kind, pattern in EMERGENCY_PATTERNS:
         if pattern.search(said):
             return kind

@@ -627,12 +627,139 @@ W("HEALTH", "बुखार दर्द بخار درد حمى الحمى سع
 W("KHAUN", "कौन दवा کون دوا دواء اتناول")
 
 
-W("PASTM", "thi tha the pichle pichla pichli saal last ago earlier before pehle")
+W("PASTM", "thi tha pichle pichla pichli saal last ago earlier before pehle")
 W(
     "TRADE",
     "runs run vehicles billing licence license renewal permit operate operates system systems bujhane bujhana bujha extinguishing fighting payment cheque quote",
 )
 W("IDIOMD", "quote quotes price bhej bata dein")
+
+
+# --- second recall wave (burning things, falls, choking, swallowing, threats, doubt, advice) ---
+W("BURN_V", "burning burn burns burnt يحترق تحترق احترق يشتعل تشتعل اشتعل يحرق")
+W(
+    "PLACE_OBJ",
+    "roof stockroom بیت بيت منزل مطبخ غرفه محل متجر مصنع مخزن مستودع شقه سياره مبنی مبنى छत",
+)
+W("STRONG_TRAP", "محاصرون محاصرین محاصر عالقون عالقین")
+W("PERSON", "نحن ناس احنا")
+W("TRADE", "نبيع نبیع طفايات طفایات طفايه اجهزه انذار")
+W(
+    "HEIGHT",
+    "height roof scaffolding ladder balcony chhat unchai unchaai seerhi seerhiyon upar اونچائی ऊंचाई छत مرتفع سقف سلم",
+)
+W("FELL", "fell fall fallen falls gir gira gire giri سقط گر गिर गिरा गिरी")
+W("CHOKE_V", "choking choked choke chokes يختنق اختناق दमघुट")
+W("SWALLOW", "swallowed swallow swallowing nigal nigla nigli ابتلع بلع نگل")
+W("FOREIGN", "بطاریه بطارية batteries")
+W("TECH", "cursor mouse page screen website app scroll order shipment stock sales cart")
+PH(
+    "NOMOVE",
+    "not moving/isnt moving/is not moving/does not move/doesnt move/not responding/unresponsive/no pulse/wont wake up/not waking up/hilta nahi/hil nahi raha/hil nahi rahi/nahi hil raha/ہلتا نہیں/ہل نہیں رہا/हिल नहीं रहा/नहीं हिल रहा/हिलता नहीं/لا يتحرك/لا تتحرك/لا يستجيب/لا نبض",
+)
+W("STROKE_N", "stroke falij falaj faalij فالج लकवा paralysis paralyzed")
+W(
+    "STROKE_V",
+    "ho hua attack have having had think thinks looks lagta aaya aaye gaya hone may signs",
+)
+W("AMBU_NEED", "بھیجیں بھیجو भेजें भेजो ارسلوا ارسل bhejen bhejain bhejiye")
+W("THREAT_P", "kill murder shoot stab strangle قتل")
+PH(
+    "THREAT_P",
+    "kill me/kill you/kill us/murder me/shoot me/stab me/beat me up/hurt me/kill my/will kill/maar dunga/maar dalunga/maar dalenge/maar dungi/jaan se maar",
+)
+W("YOU2", "tujhe tumhe tumhein tujhko usay usko")
+W("HIT", "مار मार")
+W("HITME", "يضربني ضربني يضربنی ضربنی")
+W("THREAT_AR", "يهددني يهدد هددني تهديد بالقتل القتل يهدد")
+W("LE_DE", "le de لے دے")
+W("FUTV", "loonga lunga loon doonga dunga dungi lungi lun dun looga")
+W("UNSURE", "sure unsure maybe might perhaps shayad lagta ")
+PH(
+    "UNSURE",
+    "not sure/dont know/do not know/i think/may have/pata nahi/ya nahi/ya nhi/mujhe lagta/not certain/could be",
+)
+W("QTY", "many too much extra")
+W("DOOB_E", "drown drowned drowning")
+W("HEALTH", "صداع الصداع")
+W("KHAUN", "اخذ")
+W("LAW", "کیس")
+W("CHAHIYE", "کروں کرون کردوں करूं करूँ करूं")
+W("TAXACT", "parega padega parhega paray padhega bharna bharun")
+
+
+# --- third wave: child safeguarding, kidnap, robbery -------------------------------------------
+W(
+    "SEXUAL_V",
+    "chhedta chhedti chhedte chhedtay chhuta chhuti chhute chhoo छूता छूती छूते छेड़ता छेड़ती چھیڑتا چھیڑتی چھوتا چھوتی تحرش اعتداء",
+)
+W("HIT", "पीटा पीटती पीटते पीटना पीटा")
+W("AGWA", "अगवा")
+W("GUM", "گم")
+W("CHILD", "ابني ابنتي بنتي ابنی")
+W("FEMALE_V", "bhanji bhatiji niece ladki girl")
+W("KISI", "kisi کسی किसी")
+W("TAKEN", "took taken takes grabbed snatched")
+W("CARAWAY", "car van vehicle gaari away truck")
+
+
+# --- fourth wave: live fire cues, hedged fire, abuse, confinement, ransom, gunpoint, robbery ---
+W("LIVE", "ringing rang baj beeping siren flames dikh dikhai dikhi smell smelling")
+PH(
+    "LIVE",
+    "can see/full of/right now/dikh raha/dikh rahi/bhar gaya/bhar gayi/aa rahi hai/aa raha hai/الآن/بالداخل",
+)
+W("BURN_AR", "يحترق تحترق احترق احترقت يشتعل تشتعل اشتعل اشتعلت")
+W("PLACE_OBJ", "شاحنه شاحنة حافله حافلة باص bus highway sadak")
+W(
+    "RELATIVE",
+    "bhai bhaiya brother sister behn bahen shohar husband biwi wife abbu ammi papa mama dost friend cashier son daughter اخي اختي ابني بنتي",
+)
+W(
+    "CHILD",
+    "son daughter niece nephew bhanji bhatija bhatiji bhanja ladki girl little طفله طفلة الصغير الصغيره صغير صغيره ابنه بنت ولد اخي اختی लड़की लडकी بیٹی لڑکی",
+)
+for _n in range(1, 18):
+    PH(
+        "CHILD",
+        f"{_n} year old/{_n} years old/{_n} saal ki/{_n} saal ka/{_n} saal ke/{_n} sal ki/{_n} sal ka",
+    )
+W(
+    "ADULT",
+    "teacher tutor driver uncle chacha mamu tayya ustad master neighbour padosi cousin relative stepfather stepmother maalik boss watchman guard doctor ڈرائیور استاد चाचा ड्राइवर عمها خاله",
+)
+W("BEATV", "beat beats beating beaten hits hit")
+W(
+    "SEXUAL_V",
+    "touches touched touching sexually assault assaulted balatkar बलात्कार بلاتکار اغتصاب جنسي جنسی badtameezi badtamizi بدتمیزی dirty obscene gandi gandy گندی",
+)
+PH(
+    "SEXUAL_V",
+    "bad way/wrong way/ghalat tareeke se/ghalat tareeqe se/غلط طریقے سے/गलत तरीके से/dirty pictures/dirty photos/gandi tasveer/gandi tasveerein/obscene pictures/forced my/forced her/sexual assault/الاعتداء الجنسي",
+)
+PH(
+    "TANGK",
+    "tang karta/tang karti/tang kar raha/tang kar rahi/تنگ کرتا/تنگ کرتی/तंग करता/तंग करती/harass karta/harass karti",
+)
+PH("HABS", "حبس الطفل/حبسوا/حبست")
+W("HABS", "حبس")
+W("LOCKED", "locked lock band bandh bandhe habs حبس بند")
+W("FOODLESS", "bhookha bhooka bhukha بھوکا भूखा جوع")
+PH("FOODLESS", "without food/khana nahi/khana nahin/no food/کھانا نہیں/खाना नहीं/بدون طعام")
+W("RANSOM", "ransom fidya fidyah firauti फिरौती فدیہ فدية bhatta بھتہ extortion")
+W("HOSTAGE", "hostage hostages yarghamal yerghamal yarghamaal یرغمال यरगमाल बंधक رهينه رهينة رهائن")
+PH(
+    "GUNPOINT",
+    "gunpoint/knifepoint/bandooq ki nok/bandook ki nok/بندوق کی نوک/बंदूक की नोक/pistol dikha/pistol dikhakar/pistol dikha kar/पिस्तौल दिखाकर/holding a gun/pointed a gun/pointing a gun/gun to my head/hathyar dikha/تحت تهديد السلاح/هددوني بالسلاح/تحت تهديد",
+)
+W("ROB_STRONG", "mugged mugging robbing robbed snatched snatching looting looted lutera")
+W("ROB_WEAK", "loot lut lutna cheen cheena cheen-liya chheen छीन लूट لوٹ لٹ سرقوا يسرقون نهب")
+W("BAGMOB", "bag mobile phone purse wallet cash chain handbag dukan shop ghar house")
+W("MONEYASK", "want demand demanding maang maange mang مانگ مانگا طلبوا طلب मांग")
+W("MONEYN", "money paise paisa rupay پیسے پیسه पैसे ransom")
+W("THIEF", "daaka daka dakaiti dacoity")
+W("ENTER", "pad")
+W("LIYA", "लिया ली")
 
 # --- rules -----------------------------------------------------------------------------------
 
@@ -795,12 +922,12 @@ R("VIOLENCE_ABUSE", "BACHAO", ["BACHAO"], win=3, name="bachao bachao")
 R("VIOLENCE_ABUSE", "SOS_AR", name="arabic sos")
 
 # CHILD_SAFEGUARDING -------------------------------------------------------------------------
-R("CHILD_SAFEGUARDING", "HIT", ["CHILD"], win=4, avoid="IDIOM_H", name="child hit")
-R("CHILD_SAFEGUARDING", "SEXUAL_V", ["FEMALE_V"], win=5, name="sexual abuse")
-R("CHILD_SAFEGUARDING", "WRONGPLACE", ["FEMALE_V"], win=5, name="touched wrongly")
+R("CHILD_SAFEGUARDING", "HIT", ["CHILD"], win=8, avoid="IDIOM_H", name="child hit")
+R("CHILD_SAFEGUARDING", "SEXUAL_V", ["FEMALE_V"], win=8, name="sexual abuse")
+R("CHILD_SAFEGUARDING", "WRONGPLACE", ["FEMALE_V"], win=10, name="touched wrongly")
 R("CHILD_SAFEGUARDING", "GHALATK", ["CHILD", "SAATH", "HOGAYA"], win=4, name="ghalat kaam hua")
 R("CHILD_SAFEGUARDING", "ZABARDASTI", ["SHAADI", "FEMALE_V"], win=5, name="forced marriage")
-R("CHILD_SAFEGUARDING", "BECH", ["CHILD", "PARENTS"], win=4, avoid="TRADE", name="child sold")
+R("CHILD_SAFEGUARDING", "BECH", ["CHILD", "PARENTS"], win=8, avoid="TRADE", name="child sold")
 
 # KIDNAP_ROBBERY -----------------------------------------------------------------------------
 R(
@@ -817,25 +944,27 @@ R(
     "KIDNAP_ROBBERY",
     "GUM",
     ["CHILD", "HOGAYA"],
-    win=3,
+    win=6,
     avoid="OBJ",
     kind="SAFEGUARDING",
     name="child missing",
+    trade="msg",
 )
 R(
     "KIDNAP_ROBBERY",
     "LE",
     ["CHILD", "ANYONE", "GAYA"],
-    win=4,
+    win=10,
     avoid="NORMALPLACE",
     kind="SAFEGUARDING",
     name="child taken",
+    trade="msg",
 )
 R(
     "KIDNAP_ROBBERY",
     "LE",
     ["CHILD", "DAL", "GAYA"],
-    win=7,
+    win=10,
     avoid="NORMALPLACE",
     kind="SAFEGUARDING",
     name="child bundled away",
@@ -845,7 +974,7 @@ R(
     "KIDNAP_ROBBERY",
     "UTHA",
     ["CHILD", "LIYA|LE"],
-    win=3,
+    win=10,
     avoid="GODE|NORMALPLACE",
     kind="SAFEGUARDING",
     name="child picked up",
@@ -853,6 +982,121 @@ R(
 
 # `GOLI_N` needs a tag of its own (the word is also a tablet).
 W("GOLI_N", "goli golee گولی گولی")
+
+
+# second recall wave ---------------------------------------------------------------------------
+R(
+    "FIRE_SMOKE",
+    "BURN_V",
+    ["PLACE_OBJ|PLACE_BIG|PERSON"],
+    win=4,
+    avoid="LIGHT_ON|MONEYY|FOODY",
+    trade="msg",
+    name="something is burning",
+)
+R("MEDICAL_RESCUE", "FELL", ["HEIGHT"], win=5, avoid="BIZ", trade="msg", name="fell from a height")
+R("MEDICAL_RESCUE", "NOMOVE", avoid="TECH", name="not moving")
+R("MEDICAL_RESCUE", "CHOKE_V", trade="msg", name="choking")
+R("MEDICAL_RESCUE", "STROKE_N", ["STROKE_V"], win=4, avoid="FILMY", name="stroke")
+R("MEDICAL_RESCUE", "DOOB_E", avoid="WORKY", name="drowning (english)")
+R("MEDICAL_RESCUE", "DOOB", ["PROG"], win=2, avoid="WORKY|MONEYY|BIZ", name="doob raha")
+R("MEDICAL_RESCUE", "BREATHE", ["UNSURE"], win=6, name="doubt about breathing")
+R("MEDICAL_RESCUE", "SANS", ["UNSURE"], win=6, name="doubt about saans")
+R("POISONING", "SWALLOW", ["MEDS|FOREIGN|TOXIC"], win=4, trade="msg", name="swallowed something")
+R(
+    "VIOLENCE_ABUSE",
+    "THREAT_P",
+    ["ME|YOU2|VICTIM"],
+    win=4,
+    avoid="IDIOM_H",
+    name="threat to kill me",
+)
+R("VIOLENCE_ABUSE", "HITME", name="beats me (arabic)")
+R("VIOLENCE_ABUSE", "THREAT_AR", name="threatens me (arabic)")
+R("VIOLENCE_ABUSE", "HIT", ["DANGER"], win=4, name="beating and help")
+R("SELF_HARM", "SELFW", ["LE_DE", "FUTV"], win=4, avoid="WORKY2|IDIOMD", name="jaan le loonga")
+
+R(
+    "KIDNAP_ROBBERY",
+    "UTHA",
+    ["CHILD", "LIYA|LE", "KISI|ANYONE"],
+    win=10,
+    kind="SAFEGUARDING",
+    trade="msg",
+    name="someone picked the child up",
+)
+R(
+    "KIDNAP_ROBBERY",
+    "TAKEN",
+    ["CHILD", "CARAWAY"],
+    win=6,
+    avoid="NORMALPLACE",
+    kind="SAFEGUARDING",
+    name="child taken in a car",
+)
+
+# fourth wave rules ------------------------------------------------------------------------------
+R("FIRE_SMOKE", "FIRE_N", ["UNSURE"], win=6, trade="msg", name="hedged fire")
+R("FIRE_SMOKE", "FIRE_N", ["LIVE"], win=8, name="fire with live cues")
+R(
+    "FIRE_SMOKE",
+    "BURN_V",
+    ["PAST_GO|PROG", "DANGER|INSIDE|PERSON"],
+    win=6,
+    avoid="LIGHT_ON|MONEYY|FOODY",
+    name="burnt with people or urgency",
+)
+R("FIRE_SMOKE", "BURN_AR", trade="msg", name="arabic burning")
+R("CHILD_SAFEGUARDING", "SEXUAL_V", ["CHILD"], win=10, name="abuse of a child (wide)")
+R("CHILD_SAFEGUARDING", "TANGK", ["CHILD", "ADULT"], win=10, name="adult harasses a child")
+R(
+    "CHILD_SAFEGUARDING",
+    "LOCKED",
+    ["CHILD", "FOODLESS"],
+    win=10,
+    name="child locked up without food",
+)
+R("CHILD_SAFEGUARDING", "HABS", ["CHILD"], win=6, name="child confined (arabic)")
+R("CHILD_SAFEGUARDING", "BEATV", ["CHILD"], win=10, avoid="IDIOM_H", name="child beaten (wide)")
+R("KIDNAP_ROBBERY", "RANSOM", name="ransom or extortion")
+R("KIDNAP_ROBBERY", "HOSTAGE", avoid="MEDIA", name="hostage")
+R("KIDNAP_ROBBERY", "GUNPOINT", name="gunpoint")
+R("KIDNAP_ROBBERY", "AGWA", avoid="MEDIA", trade="msg", name="kidnap word alone")
+R("KIDNAP_ROBBERY", "ROB_STRONG", avoid="SALE_MKT|TECH", trade="msg", name="mugged or robbing")
+R(
+    "KIDNAP_ROBBERY",
+    "ROB_WEAK",
+    ["PROG|BAGMOB|ME|VICTIM|COPULA|DANGER"],
+    win=6,
+    avoid="SALE_MKT",
+    trade="msg",
+    name="looting or snatching",
+)
+R(
+    "KIDNAP_ROBBERY",
+    "TAKEN|UTHA|LE",
+    ["CHILD|RELATIVE", "MONEYASK|MONEYN"],
+    win=10,
+    kind="SAFEGUARDING",
+    name="taken and money asked",
+)
+R(
+    "KIDNAP_ROBBERY",
+    "MONEYASK",
+    ["MONEYN", "CHILD|RELATIVE"],
+    win=8,
+    kind="SAFEGUARDING",
+    name="money asked for a person",
+)
+R("KIDNAP_ROBBERY", "UTHA", ["RELATIVE", "LIYA|LE"], win=6, trade="msg", name="relative picked up")
+R(
+    "KIDNAP_ROBBERY",
+    "TAKEN",
+    ["CHILD|RELATIVE", "UNSURE"],
+    win=8,
+    kind="SAFEGUARDING",
+    name="maybe someone took",
+)
 
 _ENUMERATED = tuple(_RULES)
 _ADVICE_RULES: list[tuple[str, int, tuple[tuple[int, int], ...], int, int]] = []
@@ -880,6 +1124,7 @@ _advice("medical", "HEALTH", ["SERIOUS", "ASKQ"], avoid="TRADE")
 
 _DANGER = _mask("DANGER")
 _TRADE = _mask("TRADE")
+_LIVE = _mask("LIVE")
 _PASTM = _mask("PASTM")
 
 
@@ -931,6 +1176,10 @@ def _analyse(text: str) -> _Doc | None:
     masks = [0] * n
     for i, tok in enumerate(tokens):
         m = _LEX.get(tok, 0)
+        if len(tok) > 4 and tok.startswith("\u0627\u0644"):
+            m |= _LEX.get(tok[2:], 0)
+        if len(tok) > 4 and tok.startswith("\u0644\u0644"):  # la + al, as in "for the headache"
+            m |= _LEX.get("\u0627\u0644" + tok[2:], 0) | _LEX.get(tok[2:], 0)
         if len(tok) >= 3:
             c = _collapse(tok)
             if c != tok:
@@ -1000,7 +1249,7 @@ def _first_hit(
     for need, _w in needs:
         if not need & doc.gor:
             return False
-    danger_anywhere = bool(doc.gor & _DANGER)
+    danger_anywhere = bool(doc.gor & (_DANGER | _LIVE))
     for i in _anchor_positions(doc, anchor):
         ok = True
         for need, w in needs:
