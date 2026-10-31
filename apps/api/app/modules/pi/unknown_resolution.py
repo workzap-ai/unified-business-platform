@@ -81,6 +81,7 @@ class Code(StrEnum):
     """Why one option is unknown, as a typed code (the gate's own words are kept in `reason`)."""
 
     BUDGET_NO_FIGURE = "budget_no_figure"
+    BUDGET_NOT_STATED = "budget_not_stated"  # L2-1 round 3: a costly option and no budget stored
     BUDGET_FLOOR_ONLY = "budget_floor_only"
     STAFF_LIMIT_UNREADABLE = "staff_limit_unreadable"
     DEADLINE_UNREADABLE = "deadline_unreadable"
@@ -128,6 +129,7 @@ class Resolution(StrEnum):
 # first
 _REASON_CODES: tuple[tuple[str, Code], ...] = (
     ("the budget states only a minimum", Code.BUDGET_FLOOR_ONLY),
+    ("no budget was stated", Code.BUDGET_NOT_STATED),
     ("no figure in the budget text", Code.BUDGET_NO_FIGURE),
     ("staff limit could not be read", Code.STAFF_LIMIT_UNREADABLE),
     ("the deadline is not a duration", Code.DEADLINE_UNREADABLE),
@@ -166,6 +168,7 @@ _REASON_CODES: tuple[tuple[str, Code], ...] = (
 # code -> (resolution, fact key that would resolve it)
 _CODE_FACT: dict[Code, tuple[Resolution, str | None]] = {
     Code.BUDGET_NO_FIGURE: (Resolution.ASK_OWNER, "budget_ceiling"),
+    Code.BUDGET_NOT_STATED: (Resolution.ASK_OWNER, "budget_ceiling"),
     Code.BUDGET_FLOOR_ONLY: (Resolution.ASK_OWNER, "budget_ceiling"),
     Code.STAFF_LIMIT_UNREADABLE: (Resolution.ASK_OWNER, "staff_headcount"),
     Code.DEADLINE_UNREADABLE: (Resolution.ASK_OWNER, "deadline_duration"),
