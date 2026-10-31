@@ -10,7 +10,7 @@ from app.modules.pi import brain_docs, constitution
 from app.modules.pi import problem_fields as pf
 
 PROBLEMS = {"P1", "P2"}
-OWNER = "Honestly we never count stock at night and the evening count is skipped"
+OWNER = "I think we skip the stock count at night and the evening count is skipped"
 
 
 def option(**over) -> bm.Option:
@@ -359,7 +359,7 @@ def test_the_ranking_order_is_documented():
 
 
 def test_a_cause_the_owner_said_needs_the_owners_own_words():
-    proof = (verified("m1", ("never", "count")),)
+    proof = (verified("m1", ("count", "stock")),)
     said = bm.RootCause("we never count", status=pf.OWNER_SAID, evidence_for=proof)
     assert br.cause_issues(said, OWNER) == []
     bare = bm.RootCause("we never count", status=pf.OWNER_SAID)
@@ -383,7 +383,7 @@ def test_a_cause_with_an_unknown_status_is_refused():
 
 
 def test_may_state_as_fact_needs_an_owner_status_and_proof():
-    proof = (verified("m1", ("never", "count")),)
+    proof = (verified("m1", ("count", "stock")),)
     assert br.may_state_as_fact(bm.RootCause("c", pf.OWNER_SAID, evidence_for=proof), OWNER)
     assert not br.may_state_as_fact(bm.RootCause("c", pf.OWNER_SAID), OWNER)
     assert not br.may_state_as_fact(bm.RootCause("c", pf.OWNER_SAID, evidence_for=proof), "")

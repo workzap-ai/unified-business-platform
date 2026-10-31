@@ -11,7 +11,7 @@ from app.modules.pi import problem_fields as pf
 
 P = {"P1", "P2"}
 OWNER_MSGS = {
-    "m1": "Honestly we never count stock at night",
+    "m1": "I think we skip the stock count at night",
     "m2": "the evening count is skipped",
 }
 
@@ -114,7 +114,7 @@ def test_a_recommended_option_with_unverified_evidence_is_refused():
 
 
 def test_a_cause_proof_must_name_an_owner_message():
-    proof = (ev("m1", ("never", "count")),)
+    proof = (ev("m1", ("count", "stock")),)
     said = bm.RootCause("we never count", status=pf.OWNER_SAID, evidence_for=proof)
     assert br.cause_issues(said, "", OWNER_MSGS) == []
     stray = bm.RootCause("x", status=pf.OWNER_SAID, evidence_for=(ev("assistant-5", ("never",)),))
