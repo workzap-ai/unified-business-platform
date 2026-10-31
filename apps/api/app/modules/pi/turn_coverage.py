@@ -138,7 +138,9 @@ def skipped_question(reply: str, texts: list[str]) -> str | None:
     """A direct question of the turn that the reply does not touch (it shares fewer content words
     with the question than `needed` asks for), else None. The newest message counts too."""
     texts = [t for t in texts if t and t.strip()]
-    if len(texts) < 2 or not reply.strip() or UNSPACED.search(reply):
+    # a burst, or (spec v1.6 19.3, DQ4) one message that asks two questions: both must be answered
+    two_in_one = len(texts) == 1 and (texts[0].count("?") + texts[0].count("؟")) >= 2
+    if (len(texts) < 2 and not two_in_one) or not reply.strip() or UNSPACED.search(reply):
         return None
     mine = _content_words(reply)
     for text in texts:

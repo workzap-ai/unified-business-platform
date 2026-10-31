@@ -29,6 +29,9 @@ business problems in it, in the exact shape asked for. Rules:
 - Only problems the person actually describes: something costly, slow, lost, manual, unclear or
   broken in their business. A greeting, thanks, a yes or no, a question about the assistant, or
   a request with no problem in it gives an empty list.
+- A question (about price, about the assistant), a complaint about the assistant or the chat
+  ("how many times do I tell you"), and a goal on its own ("I want to grow my sales") are never
+  problems: leave them out. What the person wants built or done goes to the wants list instead.
 - A request for software or a service still has a problem behind it (a cost, a delay, a manual
   job): note that problem, never the product.
 - title: English, at most 8 words, starts with the subject, no names, no blame, no solution words.
@@ -38,7 +41,9 @@ business problems in it, in the exact shape asked for. Rules:
   feel bad when we call", "we only collect in the first week") is a detail of it: keep it in
   user_words, and when it is a separate pain make it a second problem. Never drop it because the
   first problem is already noted.
-- category and subtype: choose from the list given; leave subtype empty if none fits.
+- category and subtype: choose from the list given only when their words fit it; if none fits use
+  "other". Never force a problem into an area it does not belong to. Leave subtype empty if none
+  fits.
 - where, of_total, frequency, frequency_text, since_text, impact_types, money_text: only what they
   said, in their words; otherwise empty, never a guess. since_text is when it began ("since March",
   "pichle 2 mahine se"); money_text is the amount with its number ("4,000 rupees a day");
@@ -76,6 +81,53 @@ class SimpleNote(BaseModel):
 class Extracted(BaseModel):
     model_config = ConfigDict(extra="ignore")
     found: list[SimpleNote] = Field(default_factory=list, max_length=MAX_NOTES)
+
+
+WANTS_SYSTEM = """You read what a small-business owner told an assistant on WhatsApp and list what
+they WANT built or done, each as a short phrase in their own words and language (for example "ads
+that bring customers", "online payment", "website with a link", "sales manager follow-up by call and
+WhatsApp", "customer onboarding and service"). Not problems, not questions to the assistant, not
+complaints, not the budget. Never write a person's name; use roles (the sales manager, the
+supplier). At most 8. An empty list when they want nothing built.
+Return the list as the field "wants"."""
+
+
+class Wants(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    wants: list[str] = Field(default_factory=list, max_length=8)
+
+
+async def extract_wants(manager: Any, scope: Any, context: dict[str, Any]) -> list[str]:
+    """What the owner wants built or done in their latest words (19.4), or [] (never raises)."""
+    said = str(context.get("latest_customer_message", ""))
+    try:
+        from app.ai.types import Message
+
+        result = await manager.complete_structured(
+            scope,
+            Wants,
+            alias="fast",
+            purpose="pi_wants_extract",
+            messages=[
+                Message.system(WANTS_SYSTEM),
+                Message.user(
+                    json.dumps(
+                        {
+                            "latest": said[:MAX_MESSAGE_CHARS],
+                            "language": context.get("reply_language"),
+                        },
+                        ensure_ascii=False,
+                    )
+                ),
+            ],
+            temperature=0.1,
+            max_tokens=600,
+        )
+    except Exception:  # noqa: BLE001 - an extra call must never fail the reply
+        logger.warning("pi_wants_extract_failed", exc_info=True)
+        return []
+    value = result.value
+    return [str(w) for w in value.wants] if isinstance(value, Wants) else []
 
 
 def category_list() -> str:

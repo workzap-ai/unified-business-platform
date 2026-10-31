@@ -103,29 +103,70 @@ OFFER_REQUEST = re.compile(
 )
 # A direct ask for the document or the quote ("dain solution document mujhay", "send me the quote")
 # is a yes from any listening state once something is noted (Live Audit 2, cause 4, G28), whether or
-# not the offer was ever made. Questions about price, refusals and "later" are not.
-_LEAD = (
-    r"^\W*(?:(?:yes|yeah|ok|okay|please|pls|plz|haan|han|ji|jee|theek hai|bilkul|zaroor|sure)\W+)*"
+# not the offer was ever made. Refusals and "later" are not. A price or quote ask is an explicit R1
+# signal (spec v1.6 19.2, `part19.buying_signal`), not this pattern.
+_LEAD = r"^\W*(?:(?:yes|yeah|ok|okay|please|pls|plz|haan|han|ji|jee|theek hai|bilkul|zaroor|sure)\W+){0,5}"
+_ONE = (
+    r"(?:(?:solution|full|final|rough|short|quick|proper)\s+)?"
+    r"(?:document|quote|quotation|proposal)"
 )
-_ONE = r"(?:(?:solution|full|final)\s+)?(?:document|documents|quote|quotation|proposal)"
 _NOUN = rf"{_ONE}(?:\s+(?:and|aur|or|&)\s+(?:the\s+)?{_ONE})?"
 _ME = r"(?:mujhe\s+|mujhay\s+|hamein\s+|hamen\s+)?"
-_UR_VERB = (
-    r"(?:de(?:in|n)?|dain|do|dedo|de do|dijiye|dijiyega|bhej\w*|bhij\w*|bana\w*|banwa\w*|"
-    r"chahiye|chahie|chahiay|tayyar\w*)"
+# Roman Urdu: IMPERATIVE forms only ("bhej do", "bana dein", "kar do", "dijiye"). An infinitive or a
+# continuous form ("quote banana", "quote bhejna", "banane mein", "bhejte hain") is not an ask.
+_UR_IMP = (
+    r"(?:de|dein|den|dain|do|dedo|de do|dijiye|dijiyega|"
+    r"bhejo|bhejiye|bhejein|bhejen|bhejain|bhej\s+(?:do|dein|den|dijiye|dijiyega)|bhijwa\s+(?:do|dein|den)|"
+    r"banao|banaiye|bana\s+(?:do|dein|den|dijiye|dijiyega)|banwa\s+(?:do|dein|den)|"
+    r"(?:tayyar\s+)?kar\s+(?:do|dein|den|dijiye)|tayyar\s+karo)"
 )
-# The ask must be addressed to pi and start the message (after a yes or a please): a problem that
-# merely mentions quotes or documents ("it takes me two hours to prepare a quote") is not one.
+# the ask may only be followed by a polite or time word, then the message ends
+_TAIL = (
+    r"(?:\s+(?:please|pls|plz|now|today|asap|abhi|jaldi|ab|do|dein|den|na))*"
+    rf"(?:\W+{_ONE}\s+ke\s+saath)?\W*$"
+)
+_YOU_TO = r"(?:(?:i|we)\s+(?:do\s+|really\s+)?(?:want|need|would like)\s+you\s+to\s+)?"
+# Arabic: an explicit imperative (no prefix match on the verb), the noun, a short polite or time tail,
+# and the end of the message. "أريد/نريد <noun>" is accepted only when it ends the message (a plain
+# wish addressed to pi); "أحتاج" and a noun followed by more words are not asks.
+_AR_NOUN = r"(?:ال)?(?:مستند|وثيقة|عرض\s+(?:ال)?سعر|عرض\s+(?:ال)?أسعار)"
+_AR_NOUNS = rf"{_AR_NOUN}(?:\s+و?{_AR_NOUN})?"
+_AR_TAIL = r"(?:\s+(?:من فضلك|من فضلكم|الآن|الان|رجاء|شكرا|شكراً|لي|لنا))*\W*$"
+# Unambiguous imperatives; "أرسل" and "جهز" are also the past tense ("he sent", "he prepared") and
+# WhatsApp Arabic often drops the hamza, so they count only with a polite word (من فضلك, رجاء, الآن).
+_AR_IMP = r"(?:ابعث|اعمل|أعطني|اعطني|أعطنا|اعطنا|أنشئ|انشئ)(?:\s+(?:لي|لنا))?"
+_AR_AMBIG = r"(?:أرسل|ارسل|أرسلوا|ارسلوا|جهز|جهزوا)(?:\s+(?:لي|لنا))?"
+_AR_POLITE = r"(?:من فضلك|من فضلكم|رجاء|الآن|الان)"
+_AR_WISH = r"(?:أريد|اريد|نريد)"
+# Urdu script: explicit imperative forms (no بنا prefix match: "بنانے" is an infinitive), same tail.
+_UR_NOUN = r"(?:دستاویز|کوٹیشن)"
+_UR_SCRIPT_IMP = (
+    r"(?:بھیج دیں|بھیج دیجئے|بھیج دیجیے|بھیجیں|بھیجیے|بھیجئے|بنا دیں|بنا دیجئے|بنا دیجیے|"
+    r"بنائیں|دے دیں|دیں|دیجئے|دیجیے)"
+)
+_UR_SCRIPT_TAIL = r"(?:\s+(?:براہ کرم|پلیز|ابھی|جلدی|اب|شکریہ))*\W*$"
+_UR_SCRIPT_PRE = r"(?:(?:براہ کرم|پلیز)\s+)*(?:مجھے\s+|ہمیں\s+)?"
+# The ask must be an IMPERATIVE addressed to pi (or "I want you to send ...", "can I have ..."), then
+# the document noun, and it must END the message: a problem that merely mentions quotes or documents
+# ("it takes me two hours to prepare a quote", "we need a quote system that tracks orders", "hamein
+# quote chahiye hota hai") is not a request. The bare "I/we need <noun>" is not an ask (D-1).
 DIRECT_DOCUMENT = re.compile(
-    rf"{_LEAD}(?:(?:can|could|would)\s+you\s+)?(?:please\s+)?(?:send|give|prepare|make|create|share)"
-    rf"(?:\s+(?:me|us))?(?:\s+(?:the|a|my|our))?\s+{_NOUN}\b"
-    rf"|{_LEAD}(?:i|we)\s+(?:do\s+|really\s+)?(?:want|need|would like)\s+(?:(?:the|a|my|our)\s+)?{_NOUN}\b"
-    rf"|{_LEAD}(?:can|could|may)\s+(?:i|we)\s+(?:get|have)\s+(?:(?:the|a)\s+)?{_NOUN}\b"
-    rf"|{_LEAD}{_ME}(?:(?:ab|abhi|jaldi|please)\s+)?{_NOUN}\s+{_ME}{_UR_VERB}\b"
-    rf"|{_LEAD}(?:de(?:in|n)?|dain|dijiye|bhej\w*|bana\w*|banwa\w*)\s+{_ME}{_NOUN}\b"
-    r"|^\W*(?:نعم\W+)?(?:جهز|أرسل|ارسل|ابعث|أعطن|اعطن|أريد|اريد|نريد|أحتاج)\w*\s+"
-    r"(?:ال)?(?:المستند|مستند|وثيقة|عرض (?:ال)?سعر|عرض أسعار)"
-    r"|^\W*(?:جی\W+|ہاں\W+)?(?:مجھے\s+)?(?:دستاویز|کوٹیشن)\s+(?:بھیج|بنا|دیں|دیجئے|دیجیے|چاہیے|چاہئے)",
+    rf"{_LEAD}(?:(?:can|could|would)\s+you\s+)?{_YOU_TO}(?:please\s+)?"
+    rf"(?:send|give|prepare|make|create|share)(?:\s+(?:me|us))?(?:\s+(?:the|a|my|our))?\s+"
+    rf"{_NOUN}{_TAIL}"
+    rf"|{_LEAD}(?:can|could|may)\s+(?:i|we)\s+(?:get|have)\s+(?:(?:the|a)\s+)?{_NOUN}{_TAIL}"
+    rf"|{_LEAD}{_ME}(?:(?:ab|abhi|jaldi|please)\s+)*{_NOUN}\s+{_ME}{_UR_IMP}{_TAIL}"
+    rf"|{_LEAD}(?:mujhe|mujhay)\s+{_NOUN}\s+(?:chahiye|chahie|chahiay){_TAIL}"
+    rf"|{_LEAD}(?:(?:ab|abhi|jaldi|please)\s+)*"
+    r"(?:de(?:in|n)?|dain|dijiye|dijiyega|bhejo|bhejiye|bhejein|bhejen|bhejain|bhej\s+(?:do|dein|den|dijiye)|banao|banaiye|"
+    r"bana\s+(?:do|dein|den|dijiye)|banwa\s+(?:do|dein|den))"
+    rf"\s+{_ME}{_NOUN}(?:\s+(?:mujhe|mujhay|hamein|hamen))?{_TAIL}"
+    rf"|^\W*(?:نعم\W+)?(?:{_AR_IMP}|{_AR_WISH})\s+{_AR_NOUNS}{_AR_TAIL}"
+    rf"|^\W*(?:نعم\W+)?{_AR_POLITE}\s+{_AR_AMBIG}\s+{_AR_NOUNS}{_AR_TAIL}"
+    rf"|^\W*(?:نعم\W+)?{_AR_AMBIG}\s+{_AR_NOUNS}(?:\s+(?:شكرا|شكراً|لي|لنا))*"
+    rf"\s+{_AR_POLITE}(?:\s+(?:{_AR_POLITE}|شكرا|شكراً))*\W*$"
+    rf"|^\W*(?:جی\W+|ہاں\W+)?{_UR_SCRIPT_PRE}{_UR_NOUN}\s+{_UR_SCRIPT_IMP}{_UR_SCRIPT_TAIL}"
+    rf"|^\W*(?:جی\W+|ہاں\W+)?(?:مجھے\s+){_UR_NOUN}\s+(?:چاہیے|چاہئے){_UR_SCRIPT_TAIL}",
     re.IGNORECASE,
 )
 NOT_A_REQUEST = re.compile(
@@ -152,14 +193,65 @@ DIRECT_FROM = (
 )
 
 
+# Fail closed: a false negative (the owner asks again) is acceptable, a quote starting on a statement
+# is not (R-SELL). Vetoes apply to the WHOLE message; a benign tail ("na", "no rush") or a short remark
+# about time after the ask is removed first; reported speech blocks; conditions block.
+_BENIGN_TAIL = re.compile(
+    r"\b(?:no rush|no hurry|no worries)\b|\bna\b(?=\s*(?:[,.!?;]|$))", re.IGNORECASE
+)
+_TIME_REMARK = re.compile(
+    r"[,;]\s*(?:(?:i am|i'm|we are|we're|main|hum)\s+(?:short of time|in a hurry|busy)"
+    r"|(?:it is |it's )?urgent|jaldi hai)\W*$",
+    re.IGNORECASE,
+)
+_CONDITIONAL = re.compile(
+    r"\b(?:if|once|when|whenever|unless|until|after|agar|jab|tab|jaise hi|jaisay hi|warna|only when|sirf jab)\b",
+    re.IGNORECASE,
+)
+# the same vetoes in Arabic and Urdu script: conditions, later or after, reported speech, price or cost
+# words, "only when" and negation (the noun "سعر" itself, as in "عرض سعر", is not a price word)
+_SCRIPT_VETO = re.compile(
+    r"(?<!\w)(?:إذا|اذا|إن|لو|اگر|جب|جیسے|تب|ورنہ|"
+    r"لاحقا|لاحقاً|بعد|قبل|پہلے|بعدازاں|"
+    r"قال|قالوا|قالت|کہا|کہتے|کہتا|کہتی|بولا|بولتے|"
+    r"كم|تكلفة|كلفة|تكاليف|قیمت|کتنا|کتنی|کتنے|خرچ|خرچہ|لاگت|ریٹ|"
+    r"فقط|صرف|"
+    r"عندما|حينما|متى|کب|جس وقت|پھر|سوچ کر|مستقبل|"
+    r"لا|ليس|لن|بدون|نہیں|نہ|مت|بغیر)(?!\w)",
+)
+_REPORTED = re.compile(
+    r"\b(?:say|says|said|told|tell|tells|asked|asks|kaha|kehte|kehta|kehti|bola|bolte|boli|bolta)\b",
+    re.IGNORECASE,
+)
+# the narrow lead-ins that may come directly before the ask
+_SAID_LEAD = re.compile(
+    r"^\W*(?:i|we|maine|main ne|humne|hum ne)\s+(?:(?:already|just|have|had|did|sab|sab kuch)\s+)*"
+    r"(?:said|told you|kaha|bola|bataya|bata diya|sent you (?:the details|everything|all the details)"
+    r"|gave you (?:everything|the details|all the details))\W+(?:(?:that|ke)\s+)?",
+    re.IGNORECASE,
+)
+_CONJ = re.compile(r"^\W*(?:so|but|and|aur|lekin|phir|toh)\s+", re.IGNORECASE)
+
+
+MAX_ASK_CHARS = 500
+
+
 def asks_for_document(message: str) -> bool:
-    """The message itself asks for the solution document or the quote."""
+    """The message itself asks pi for the solution document or the quote: one imperative clause
+    (after the allowed lead-ins), no veto word anywhere in the message, no reported speech."""
     said = " ".join((message or "").split())
-    if not said or NOT_A_REQUEST.search(said):
+    if not said or len(said) > MAX_ASK_CHARS:
+        return False  # an ask is short; a long message is a story (also bounds the regex work)
+    plain = _TIME_REMARK.sub("", _BENIGN_TAIL.sub(" ", said)).strip()
+    if NOT_A_REQUEST.search(plain) or _CONDITIONAL.search(plain) or _SCRIPT_VETO.search(plain):
         return False
-    if ("?" in said or "؟" in said) and not _POLITE_QUESTION.match(said):
+    body = _SAID_LEAD.sub("", plain, count=1)
+    if _REPORTED.search(body):
+        return False  # "my customers say, send me the quote" is not an ask addressed to pi
+    body = _CONJ.sub("", body.strip(), count=1).strip()
+    if ("?" in body or "؟" in body) and not _POLITE_QUESTION.match(body):
         return False  # "which document do you mean?" is a question, not a request
-    return bool(DIRECT_DOCUMENT.match(said))
+    return bool(DIRECT_DOCUMENT.match(body))
 
 
 APPROVE = re.compile(
@@ -229,13 +321,15 @@ TEXT: dict[str, dict[str, str]] = {
     "preparing": {
         "en": (
             "I've asked Workzap to prepare your solution document and quote. "
-            "I'll send them here once they're ready."
+            "The team reviews them first, and I'll send them here once they're approved."
         ),
         "roman_ur": (
             "Maine Workzap se aap ka solution document aur quote tayyar karne ko "
-            "keh diya hai. Tayyar hote hi yahin bhej diya jayega."
+            "keh diya hai. Team pehle review karti hai, aur manzoori ke baad yahin bhej diya jayega."
         ),
-        "ar": ("طلبت من Workzap تجهيز وثيقة الحل وعرض السعر. سأرسلهما هنا فور أن يصبحا جاهزين."),
+        "ar": (
+            "طلبت من Workzap تجهيز وثيقة الحل وعرض السعر. يراجعهما الفريق أولاً، وسأرسلهما هنا بعد الموافقة."
+        ),
     },
     "declined": {
         "en": "No problem. Everything you've told me is kept here if you change your mind.",
@@ -472,7 +566,9 @@ def decide(
     can_approve = facts.get("can_approve", True)
     answer = classify(message)
 
-    direct = asks_for_document(message)
+    # 19.2: only R1 (an explicit ask for the price or the quote) may start the quote; R3 (ready to
+    # buy) opens the offer and the owner's yes still starts it
+    direct = asks_for_document(message) or facts.get("buying_signal") == "R1"
     if (
         not can_approve
         and (OFFER_REQUEST.search(message) or direct)

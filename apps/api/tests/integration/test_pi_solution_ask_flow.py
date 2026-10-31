@@ -144,7 +144,7 @@ async def test_how_exactly_gets_what_the_document_covers_and_the_offer_and_no_id
     await pi.close()
 
 
-async def test_a_workspace_without_solution_mode_still_gets_the_summary_for_a_push(
+async def test_a_push_for_a_fix_without_solution_mode_gets_the_no_idea_line_and_one_question(
     api, business_db, monkeypatch
 ):
     industry, problem = an_industry()
@@ -152,7 +152,12 @@ async def test_a_workspace_without_solution_mode_still_gets_the_summary_for_a_pu
     pi = await workspace(api, business_db)
     await say(pi, "my shop loses sales when stock runs out", "ask-1")
     body = " ".join(await reply_after(pi, business_db, "Aap jaldi solution do na mujhe", "ask-2"))
-    assert "noted" in body.lower() or "note" in body.lower()
+    # spec v1.6 19.7: a summary is never the reply to a push for a fix, and 19.6: never a dead end.
+    # The honest no-idea line with its one question, last, is the reply; no offer, no summary.
+    from app.modules.pi.service_conversation import NO_IDEA_LINES
+
+    assert NO_IDEA_LINES["roman_ur"] in body
+    assert body.rstrip().endswith("?") and body.count("?") == 1
     assert solution_ask.offer_line("en") not in body
     await pi.close()
 

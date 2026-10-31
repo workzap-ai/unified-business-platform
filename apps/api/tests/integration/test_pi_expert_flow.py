@@ -11,7 +11,7 @@ from test_pi_brain_problems import adaptive, create, say, workspace
 from test_pi_service_conversations import turn
 
 from app.ai.manager import LLMManager
-from app.modules.pi import expert_advisor
+from app.modules.pi import decisions, expert_advisor
 from app.modules.pi.models import PiMessage
 
 pytestmark = pytest.mark.integration
@@ -23,6 +23,7 @@ VIDEO_IDEA = (
 )
 GOOD_ONE = "Ask each recent buyer how they first heard of the showroom, so you see which way people really find you."
 GOOD_TWO = "Stand outside the showroom as a passer-by would and note what you see first, so you spot what keeps people walking past."
+ROMAN = "Mere car showroom mein pehle se kam log aa rahe hain, footfall bohat kam hai"
 QUESTION = "Has footfall dropped everywhere, or only since a new showroom opened nearby?"
 TRACKING = "Ask each salesperson to say aloud at the end of the day who they sold to, so the sheet and the sales match."
 
@@ -177,6 +178,97 @@ async def test_when_every_idea_fails_pi_asks_the_footfall_question_and_gives_no_
     conversation = await pi.conversation()
     await business_db.refresh(conversation)
     assert conversation.service_brief.get("ideas_given", 0) == 0
+    await pi.close()
+
+
+async def test_a_price_question_with_the_fact_question_gets_one_question_and_no_number(
+    api, business_db, monkeypatch
+):
+    """Auditor residual risk: when no idea survives and the owner also asks the price, the reply
+    answers the price first in a statement, then the one-more-fact question (one question, last,
+    no figure, no quote started)."""
+    expert_model(monkeypatch, diagnosis([VIDEO_IDEA]), judged(1))
+    pi = await expert_chat(
+        api, business_db, monkeypatch, SHOWROOM, "Few walk-ins at the showroom", SHOWROOM
+    )
+    [body] = await reply_after(pi, business_db, "give me a solution, how much will it cost?", "x-2")
+    assert body.startswith(decisions.cost_answer("en"))  # the price question is answered first
+    assert "I need one more fact" in body and QUESTION in body
+    assert body.count("?") == 1 and body.rstrip().endswith("?")
+    assert not any(ch.isdigit() for ch in body)
+    conversation = await pi.conversation()
+    await business_db.refresh(conversation)
+    assert conversation.flow_state != "S6_PREPARING"
+    await pi.close()
+
+
+async def test_an_explicit_quote_ask_with_a_price_question_starts_the_quote_not_the_fact_question(
+    api, business_db, monkeypatch
+):
+    """Audit L1: with an explicit ask for the quote the gate starts it (R1; a price word anywhere in the
+    message vetoes it, fail closed, so the ask is sent alone); the cost line and the
+    one-more-fact question do not take its place or come out in the wrong order."""
+    expert_model(monkeypatch, diagnosis([VIDEO_IDEA]), judged(1))
+    pi = await expert_chat(
+        api, business_db, monkeypatch, SHOWROOM, "Few walk-ins at the showroom", SHOWROOM
+    )
+    [*bodies] = await reply_after(pi, business_db, "send me the quote", "x-2")
+    body = " ".join(bodies)
+    conversation = await pi.conversation()
+    await business_db.refresh(conversation)
+    assert conversation.flow_state == "S6_PREPARING"
+    assert "I need one more fact" not in body
+    assert not any(ch.isdigit() for ch in body)
+    await pi.close()
+
+
+async def test_the_cost_line_is_kept_out_of_the_language_rewrite(api, business_db, monkeypatch):
+    """The fixed cost answer promises no figure and no range; a model rewrite of the English
+    question must never see it, so a figure the rewrite invents cannot reach the cost line."""
+    from app.modules.pi import service_conversation as conversation_service
+
+    seen: list[str] = []
+
+    async def rewrite(manager, scope, policy, conversation, text, language):
+        seen.append(text)
+        return f"{text} (Rs 5000)"  # a rewrite that invents a figure
+
+    monkeypatch.setattr(conversation_service, "in_one_language", rewrite)
+    expert_model(monkeypatch, diagnosis([VIDEO_IDEA]), judged(1))
+    pi = await expert_chat(
+        api, business_db, monkeypatch, ROMAN, "Few walk-ins at the showroom", SHOWROOM
+    )
+    bodies = await reply_after(pi, business_db, "give me a solution, kitna kharcha hoga?", "x-2")
+    body = " ".join(bodies)
+    cost = decisions.cost_answer("roman_ur")
+    assert seen, "the rewrite path must run"
+    if seen:  # the rewrite ran: it never saw the cost line, and the line is in the reply intact
+        assert all(cost not in text for text in seen)
+        assert cost in body
+        assert not any(ch.isdigit() for ch in cost)
+    await pi.close()
+
+
+async def test_a_roman_urdu_owner_gets_the_fact_question_without_the_offer_after_it(
+    api, business_db, monkeypatch
+):
+    """The one-more-fact question is flagged on the turn (not found by its English text), so the
+    offer question is never appended after it, whatever the reply language."""
+    from app.modules.pi import service_conversation as conversation_service
+
+    async def translate(manager, scope, policy, conversation, text, language):
+        return text.replace(expert_advisor.NEED_FACT_PREFIX, "Mujhe ek aur baat chahiye.")
+
+    monkeypatch.setattr(conversation_service, "in_one_language", translate)
+    expert_model(monkeypatch, diagnosis([VIDEO_IDEA]), judged(1))
+    pi = await expert_chat(
+        api, business_db, monkeypatch, ROMAN, "Few walk-ins at the showroom", SHOWROOM
+    )
+    bodies = await reply_after(pi, business_db, "give me a solution", "x-2")
+    body = " ".join(bodies)
+    assert QUESTION in body or "footfall" in body.lower()
+    assert body.count("?") == 1 and body.rstrip().endswith("?")
+    assert "Solution Box" not in body
     await pi.close()
 
 

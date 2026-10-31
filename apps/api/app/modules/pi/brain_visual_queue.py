@@ -85,8 +85,13 @@ async def attach_board(
     if not rows:
         return outbound
     words = brain_visuals.TEXT[language]
+    groups = brain_visuals.groups_of(rows, language)  # the board as sent (spec v1.6, 19.8)
     link = brain_visuals.url(
-        settings, brain_visuals.token(settings, conversation.id, "board", language), "board"
+        settings,
+        brain_visuals.token(
+            settings, conversation.id, "board", language, message=str(summary.id)
+        ),
+        "board",
     )
     # Sent as pi's own reply, with the summary's inbound marker: it is held back exactly when the
     # summary is (auto-reply off, a person took over, the customer wrote again meanwhile).
@@ -97,7 +102,12 @@ async def attach_board(
         conversation,
         words["caption"],
         f"pi-board:{conversation.id}:{summary.id}",
-        {"image": link, "visual": "board", **({"service_inbound_at": inbound} if inbound else {})},
+        {
+            "image": link,
+            "visual": "board",
+            "board_snapshot": brain_visuals.snapshot_of(groups),
+            **({"service_inbound_at": inbound} if inbound else {}),
+        },
     )
     options = brain_visuals.list_rows(rows)
     keeps_buttons = bool((summary.media or {}).get("buttons"))  # a list would replace them

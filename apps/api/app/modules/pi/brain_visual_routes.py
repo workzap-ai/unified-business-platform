@@ -9,7 +9,7 @@ from app.core import rate_limit
 from app.modules.access.dependencies import Session
 from app.modules.pi import brain_visuals, map_builder, map_render, taxonomy
 from app.modules.pi.box_models import PiMapVersion
-from app.modules.pi.models import PiConversation
+from app.modules.pi.models import PiConversation, PiMessage
 from app.modules.pi.problem_models import PiProblem
 from app.shared.scope import WorkspaceScope
 
@@ -55,6 +55,23 @@ async def _map_png(
     return drawn.images[part].png
 
 
+async def _stored_board_png(
+    session: AsyncSession, conversation: PiConversation, summary_id: str, language: str
+) -> bytes | None:
+    """19.8: the board exactly as sent, drawn from the snapshot stored on the queued image."""
+    if not summary_id:
+        return None
+    sent = await session.scalar(
+        select(PiMessage).where(
+            PiMessage.conversation_id == conversation.id,
+            PiMessage.idempotency_key == f"pi-board:{conversation.id}:{summary_id}",
+        )
+    )
+    snapshot = (sent.media or {}).get("board_snapshot") if sent else None
+    groups = brain_visuals.groups_from_snapshot(snapshot)
+    return brain_visuals.render_board(groups, language) if groups else None
+
+
 @public_router.get("/{token}/{name}")
 async def visual(token: str, name: str, request: Request, session: Session) -> Response:
     ip = rate_limit.client_ip(request)
@@ -69,11 +86,17 @@ async def visual(token: str, name: str, request: Request, session: Session) -> R
     if conversation is None or conversation.customer_id is None:
         raise HTTPException(status_code=404)
     language = claims["language"]
+    png: bytes | None
     if claims["kind"] == "map":
         png = await _map_png(session, conversation, claims["version"], language, claims["part"])
     elif claims["kind"] == "progress":
         png = brain_visuals.render_progress(claims["step"], language)
     else:
+        png = await _stored_board_png(session, conversation, claims["message"], language)
+        if png is None and claims["message"]:
+            # the board as sent is gone (an erase): never redrawn from whatever is recorded now
+            raise HTTPException(status_code=404)
+    if png is None:  # an older link with no message: drawn from the current problems
         rows = list(
             await session.scalars(
                 select(PiProblem)

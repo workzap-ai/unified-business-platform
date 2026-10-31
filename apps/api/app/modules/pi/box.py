@@ -188,7 +188,7 @@ def offer_facts(context: dict[str, Any], *, asked_for_document: bool = False) ->
     or from the brief (kept once said), and whether the main cause is known from the main problem
     (see `box_signals`). Until a signal is set the offer is held back, as the spec asks (R1 to R3
     still go through)."""
-    from app.modules.pi import box_signals
+    from app.modules.pi import box_signals, system_ask
 
     noted = context.get("noted_problems") or []
     brief = context.get("brief") or {}
@@ -208,7 +208,7 @@ def offer_facts(context: dict[str, Any], *, asked_for_document: bool = False) ->
         declined_recently=bool(brief.get("declined_recently"))
         or _declined_within_quiet(brief, history),
         asked_for_document_or_price=asked_for_document,
-        asked_who_or_how_long=signals["asked_who_or_how_long"],
+        asked_who_or_how_long=signals["asked_who_or_how_long"] or system_ask.open_ask(brief),
         no_other_problems=bool(brief.get("no_other_problems"))
         or box_signals.says_no_others(latest),
         main_cause_known=box_signals.main_cause_known(context),

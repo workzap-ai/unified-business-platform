@@ -7947,9 +7947,9 @@
    "tests": [
     "tests/unit/test_pi_problem_model.py::test_when_the_summary_is_due",
     "tests/unit/test_pi_problem_model.py::test_the_summary_groups_counts_and_ends_with_one_question",
-    "tests/unit/test_pi_problem_model.py::test_a_long_summary_shows_two_lines_a_group",
+    "tests/unit/test_pi_problem_model.py::test_a_long_summary_lists_every_problem",
     "tests/unit/test_pi_problem_model.py::test_a_summary_line_is_ten_words_at_most",
-    "tests/unit/test_pi_problem_model.py::test_the_summary_waits_for_a_noted_problem_or_seven_new_ones",
+    "tests/unit/test_pi_problem_model.py::test_the_summary_waits_for_a_noted_problem_and_never_starts_on_a_count",
     "tests/integration/test_pi_brain_problems.py::test_that_is_all_shows_the_sorted_summary_and_moves_to_sorted"
    ],
    "gap": "",

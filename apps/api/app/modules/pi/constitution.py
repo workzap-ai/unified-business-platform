@@ -302,7 +302,9 @@ NEGATED_DISCOUNT = re.compile(
     r"|(?:^|\W)(?:لا|ليس|نہیں|نہ|مت)\W+(?:\w+\W+){0,4}$",
     re.IGNORECASE,
 )
-NEGATED_AFTER = re.compile(r"^(?:\W+\w+){0,3}\W+(?:nahi|nahin|نہیں|مت|لا|ليس)(?:\W|$)", re.IGNORECASE)
+NEGATED_AFTER = re.compile(
+    r"^(?:\W+\w+){0,3}\W+(?:nahi|nahin|نہیں|مت|لا|ليس)(?:\W|$)", re.IGNORECASE
+)
 ASKED_FOR_HELP = re.compile(
     r"\b(?:solution|fix|solve|build|quote|price|pricing|cost|how much|proposal|what can you do|"
     r"can you help|can you fix|what would you build|(?:kya|kuch) kar sakte|"
@@ -2339,6 +2341,16 @@ def describe(violations: list[Violation]) -> str:
 # may be made: the application's own fixed lines (a document confirmation, the offer) are meant to
 # say "document" and "quote" in a listening state.
 FINAL_CHECKS = frozenset({"R-PAY-02", "R-PAY-03", "R-DISC-03", "R-BRAND-01"})
+
+
+def final_one_question(reply: str, keep: Any = None) -> str:
+    """R-ASK-01 on the FINAL reply, after the last line the application adds (a notice, the
+    disclosure, a welcome back, a handoff or open-items line, the offer): at most one question and
+    it is the last sentence, with the mandatory sentences (AI disclosure, card or password refusals,
+    safety referrals, the fixed lines in `keep`) kept as statements. See part19.one_question_final."""
+    from app.modules.pi import part19
+
+    return part19.one_question_final(reply, keep)
 
 
 AI_ANSWER = {

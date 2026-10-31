@@ -12,7 +12,7 @@ except `previous_ai_asked`.
 import re
 from typing import Any
 
-from app.modules.pi import dial_signals, dials
+from app.modules.pi import dial_signals, dials, part19, system_ask
 
 RANK_PREFIX = "rank:"
 MAX_RANK = 9
@@ -78,7 +78,12 @@ def says_no_others(message: str) -> bool:
 
 def asks_who_or_how_long(message: str) -> bool:
     """R3: the owner asks who would do it, how long it takes, or whether Workzap can do it."""
-    return bool(ASKS_WHO_OR_HOW_LONG.search(" ".join((message or "").split())))
+    said = " ".join((message or "").split())
+    return (
+        bool(ASKS_WHO_OR_HOW_LONG.search(said))
+        or system_ask.asks_can_you_do(said)
+        or part19.ready_to_buy(said)
+    )
 
 
 def just_corrected(message: str) -> bool:
@@ -195,7 +200,9 @@ def customer_texts(context: dict[str, Any]) -> list[str]:
 REPEAT_COMPLAINT = re.compile(
     r"i\s+already\s+(?:told|said|gave|mentioned)|already\s+told\s+you|i\s+told\s+you|"
     r"maine\s+(?:to\s+)?(?:bataya|bata\s+diya|keh\s+diya)|phir\s+se\s+(?:puch|pooch)|"
-    r"bataya\s+to\s+hai|میں\s+نے\s+بتایا",
+    r"bataya\s+to\s+hai|میں\s+نے\s+بتایا|"
+    r"kitni\s+baar\s+(?:bata|puch|pooch)|baar\s+baar\s+(?:bata|puch|pooch)|"
+    r"how\s+many\s+times\s+(?:do\s+i|should\s+i|must\s+i)\s+(?:tell|say|repeat)",
     re.IGNORECASE,
 )
 FALLING_QUIET_MESSAGES = 8

@@ -54,6 +54,7 @@ from app.modules.pi import (
     open_requests,
     owner_asks,
     owner_intents,
+    part19,
     price_policy,
     problem_extract,
     problems,
@@ -73,6 +74,7 @@ from app.modules.pi import (
     solutions,
     spec_handbook,
     style,
+    system_ask,
     taxonomy,
     think_plan,
     think_prompt,
@@ -324,6 +326,10 @@ class ServiceTurn(BaseModel):
     _ask_team: bool = PrivateAttr(default=False)
     # Brain mode: the sorted summary replaced the reply; the trade question was due.
     _summary: bool = PrivateAttr(default=False)
+    _summary_at: int | None = PrivateAttr(default=None)
+    _new_wants: list[str] = PrivateAttr(default_factory=list)
+    _need_fact: bool = PrivateAttr(default=False)  # the reply is the one-more-fact question
+    _cost_line: str = PrivateAttr(default="")  # the fixed cost answer, put in after any rewrite
     _english: bool = PrivateAttr(default=False)  # an English list was written: translate it
     _free: bool = PrivateAttr(default=False)  # the ideas were the model's own, vetted
     _ideas_rejected: bool = PrivateAttr(default=False)  # its idea lines were not owner actions
@@ -1974,6 +1980,32 @@ def with_disclosure(
     return f"{fixed_lines.line('opening', fixed_lines.code(context), opening)} {reply}"
 
 
+def after_fixed_reply(turn: "ServiceTurn", context: dict[str, Any]) -> None:
+    """A fixed reply just replaced the whole reply: the one-more-fact flag goes, and a price
+    question asked THIS turn is still answered first (spec 19.2, RSOL08) by the fixed cost line, a
+    statement that adds no question; any other cost line is stale and goes."""
+    turn._need_fact = False
+    said = str(context.get("latest_customer_message") or "")
+    language = str(context.get("reply_language") or "en")
+    turn._cost_line = decisions.cost_answer(language, context) if decisions.cost_asked(said) else ""
+
+
+def put_cost_line(reply: str, line: str) -> str:
+    """The fixed cost answer in front of the reply, or right after pi's opening disclosure when the
+    reply starts with one (R-DISC-01: the first sentence of a first message says pi is an AI)."""
+    parts = re.split(r"(?<=[.!?۔؟؛])\s+", reply, maxsplit=1)
+    first = parts[0]
+    # only a first sentence that really is the disclosure (a statement that says pi is an AI), not
+    # a question that merely mentions AI ("Does AI help with quotes?"), keeps the first place
+    if (
+        len(parts) == 2
+        and not re.search(r"[?؟]", first)
+        and (SAYS_AI.search(first) or constitution._discloses(first))
+    ):
+        return f"{parts[0]} {line}\n\n{parts[1]}"
+    return f"{line}\n\n{reply}"
+
+
 def brain_safety(context: dict[str, Any]) -> "ServiceTurn | None":
     """What must be answered before any model call (spec Part 6): an emergency, a message that is
     only card or ID details, a "who are you" question, a request for advice pi cannot give. The
@@ -2189,7 +2221,8 @@ def brain_summary(turn: "ServiceTurn", context: dict[str, Any]) -> None:
     quiet = int(context.get("quiet_replies") or 0)
     quiet_limit = int((context.get("brain_settings") or {}).get("quiet_before_summary") or 2)
     why = problems.summary_due(said, len(items), since, trigger, quiet, quiet_limit)
-    if not why:
+    why = why or part19.checkpoint_due(context, said, len(items))  # spec v1.6 19.7
+    if not why or part19.summary_blocked(context, said, why):
         return
     if why == "document_asked" and (
         not context.get("can_approve", True) or (context.get("brief") or {}).get("non_decider")
@@ -2205,9 +2238,10 @@ def brain_summary(turn: "ServiceTurn", context: dict[str, Any]) -> None:
     if solution_turn(context):
         return  # solution mode: they asked for a fix, so they get the ideas (Part 1.6)
     language = str(context.get("reply_language") or "en")
-    turn.reply = problems.summary_message(items, language)
-    if decisions.cost_asked(said):  # answer the cost question first, then the summary
-        turn.reply = f"{decisions.cost_answer(language, context)}\n\n{turn.reply}"
+    turn.reply = problems.summary_message(
+        items, language, [str(w) for w in (context.get("brief") or {}).get("wants") or []]
+    )
+    turn._summary_at = part19.ai_count(context)
     # The group counts are figures pi wrote itself: the no-digits rule must let them through.
     context["fixed_lines"] = [ln for ln in turn.reply.splitlines() if any(c.isdigit() for c in ln)]
     turn.awaiting_customer = True
@@ -2817,6 +2851,7 @@ async def brain_expert_ideas(
                 ),
                 answered=owner[1:][-4:],
                 previous=stored,
+                tried_and_failed=system_ask.tried_and_failed(owner),
             ),
         ),
     )
@@ -2835,7 +2870,13 @@ async def brain_expert_ideas(
             return False
         if question == advice.question:
             question = expert_advisor.need_fact_reply(question)
+        said_now = str(context.get("latest_customer_message") or "")
+        if decisions.cost_asked(said_now):
+            # a price question is answered first, in a statement; the fixed line is put in after
+            # the language step, so a model rewrite never sees it (no figure, no range)
+            turn._cost_line = decisions.cost_answer(language, context)
         turn.reply = with_disclosure(question, context, language)
+        turn._need_fact = True
         turn._english = True
         turn.awaiting_customer = True
         turn._free = True
@@ -2964,6 +3005,7 @@ async def brain_free_ideas(
             # question, last. Not counted as ideas given.
             language = str(context.get("reply_language") or "en")
             turn.reply = with_disclosure(idea_filter.need_fact_line(idea_ctx), context, language)
+            turn._need_fact = True
             turn._english = True
             turn.awaiting_customer = True
             turn._free = True
@@ -3079,29 +3121,40 @@ async def brain_expert_diagnosis(
 
 
 NO_IDEA_LINES = {  # noqa: E501
-    "en": "Yes. I don't have a quick idea for this one that I can give here. Workzap can set out what it would build in a solution document.",  # noqa: E501
-    "roman_ur": "Ji. Is ke liye mere paas abhi koi chhota idea nahi jo yahan de sakun. Workzap solution document mein likh sakta hai ke wo kya banayega.",  # noqa: E501
-    "ar": "نعم. ليست لدي فكرة سريعة لهذه المشكلة يمكنني تقديمها هنا. يمكن لـ Workzap أن يوضح في وثيقة الحل ما الذي سيبنيه.",  # noqa: E501
+    "en": "Yes. I don't have a quick idea for this one that I can give here. What have you tried so far?",  # noqa: E501
+    "roman_ur": "Ji. Is ke liye mere paas abhi koi chhota idea nahi jo yahan de sakun. Ab tak aap ne kya aazmaya hai?",  # noqa: E501
+    "ar": "نعم. ليست لدي فكرة سريعة لهذه المشكلة يمكنني تقديمها هنا. ما الذي جربته حتى الآن؟",  # noqa: E501
 }
 
 
+# Spec v1.6 19.6: never "those are all the ideas" and never a promise to stop. When the ideas are
+# used up or were rejected, ask what they tried and what happened (or the one fact that finds the
+# cause);
+# the quote is offered only where R1 to R3 or B1 to B7 allow it (brain_offer).
 NO_MORE_IDEAS = {  # noqa: E501
-    "en": "Those are the ideas I have for this here. The solution document goes further, and you can say no to it.",  # noqa: E501
-    "roman_ur": "Is masle ke liye yahan itne hi ideas hain. Solution document is se aage jata hai, aur aap mana bhi kar sakte hain.",  # noqa: E501
-    "ar": "هذه هي الأفكار التي لدي هنا لهذه المشكلة. وثيقة الحل تذهب أبعد، ويمكنك الرفض.",  # noqa: E501
+    "en": "What happened with the ideas so far?",  # noqa: E501
+    "roman_ur": "Ab tak in ideas ke saath kya hua?",  # noqa: E501
+    "ar": "ماذا حدث مع هذه الأفكار حتى الآن؟",  # noqa: E501
 }
 NO_IDEA_AGAIN = {  # noqa: E501
-    "en": "That is all I can give here for now. The solution document is where Workzap sets out what it would build, and you can say no to it.",  # noqa: E501
-    "roman_ur": "Abhi yahan itna hi hai. Workzap kya banayega, ye solution document mein hota hai, aur aap mana bhi kar sakte hain.",  # noqa: E501
-    "ar": "هذا كل ما يمكنني تقديمه هنا الآن. تفاصيل ما ستبنيه Workzap في وثيقة الحل، ويمكنك الرفض.",  # noqa: E501
+    "en": "Let me work from what you have told me. Which part of this costs you the most right now?",  # noqa: E501
+    "roman_ur": "Main aap ki baat se aage chalta hoon. Is mein se kaun sa hissa abhi aap ko sab se zyada nuksan de raha hai?",  # noqa: E501
+    "ar": "سأكمل مما أخبرتني به. أي جزء من هذا يكلفك أكثر الآن؟",  # noqa: E501
 }
 
 
 NO_IDEA_THIRD = {  # noqa: E501
-    "en": "I hear you asking for a solution. I have nothing more to give for free here, and the solution document is where Workzap works it out for your business.",  # noqa: E501
-    "roman_ur": "Main samajhta hoon ke aap solution chahte hain. Yahan muft dene ke liye mere paas aur kuch nahi, aur aap ke business ke liye poora hal solution document mein Workzap likhta hai.",  # noqa: E501
-    "ar": "أفهم أنك تطلب حلاً. ليس لدي المزيد لأقدمه مجاناً هنا، وتفاصيل الحل لعملك تجدها في وثيقة الحل التي تعدها Workzap.",  # noqa: E501
+    "en": "I hear you asking for a solution. What would a good result look like for you in three months?",  # noqa: E501
+    "roman_ur": "Main samajhta hoon ke aap hal chahte hain. Teen mahine baad aap ke liye acha nateeja kya hoga?",  # noqa: E501
+    "ar": "أفهم أنك تطلب حلاً. كيف تبدو النتيجة الجيدة بالنسبة لك بعد ثلاثة أشهر؟",  # noqa: E501
 }
+
+
+# the three fixed lines above, to tell them apart from a reply the offer may follow (R-ASK: when the
+# offer is appended it is the only question, so a fixed line that asks one gives way to a statement)
+NO_IDEA_FIXED = tuple(
+    line for table in (NO_MORE_IDEAS, NO_IDEA_AGAIN, NO_IDEA_THIRD) for line in table.values()
+)
 
 
 def brain_no_ideas(turn: "ServiceTurn", context: dict[str, Any]) -> None:
@@ -3126,6 +3179,23 @@ def brain_no_ideas(turn: "ServiceTurn", context: dict[str, Any]) -> None:
     )
     if had_ideas or context.get("solution_why") in ("budget", "none_left"):
         line = NO_MORE_IDEAS.get(language, NO_MORE_IDEAS["en"])
+        if (
+            context.get("box_offer")
+            and (
+                system_ask.open_ask(context.get("brief"))
+                or box_signals.asks_who_or_how_long(
+                    str(context.get("latest_customer_message") or "")
+                )
+            )
+            and box_offer_allowed(context)
+        ):
+            # the owner asked whether Workzap will do all of it: no "those are all the ideas" dead
+            # end; what was heard, then brain_offer adds the one question (the offer, R3)
+            heard = system_ask.HEARD_LINES.get(language, system_ask.HEARD_LINES["en"])
+            turn.reply = with_disclosure(heard, context, language)
+            after_fixed_reply(turn, context)
+            turn.awaiting_customer = True
+            return
     told = [
         str(h.get("text") or "") for h in (context.get("history") or []) if h.get("role") == "ai"
     ]
@@ -3134,6 +3204,7 @@ def brain_no_ideas(turn: "ServiceTurn", context: dict[str, Any]) -> None:
         if any(line in said for said in told[-6:]):
             line = NO_IDEA_THIRD.get(language, NO_IDEA_THIRD["en"])
     turn.reply = with_disclosure(line, context, language)
+    after_fixed_reply(turn, context)
     turn.awaiting_customer = True
 
 
@@ -3170,6 +3241,7 @@ def brain_howto(turn: "ServiceTurn", context: dict[str, Any]) -> None:
     if howto.get("which_app"):
         line = f"{NO_APP_LINES.get(language, NO_APP_LINES['en'])} {line}"
     turn.reply = with_disclosure(line, context, language)
+    after_fixed_reply(turn, context)
     # written in the person's own language where there is a line for it: an English line next to the
     # Roman Urdu offer is a mixed reply the language check refuses (a real-model run lost the turn)
     turn._english = language not in HOWTO_LINES
@@ -3209,14 +3281,16 @@ def brain_no_early_promise(turn: "ServiceTurn", context: dict[str, Any]) -> None
     language = str(context.get("reply_language") or "en")
     created = [op for op in turn.problem_ops if op.op == "create"]
     if (context.get("noted_problems") or created) and box_offer_allowed(context):
-        turn.reply = solution_ask.offer_line(language, context)
+        turn.reply = with_disclosure(solution_ask.offer_line(language, context), context, language)
+        after_fixed_reply(turn, context)
         turn._decision = decisions.Decision(
             None, flow.State.S5_READINESS, {"offer_asked": True}, why="R-OFFER-01"
         )
     else:
         invite = constitution.FIRST_INVITE if not context.get("noted_problems") else None
         table = invite or constitution.FALLBACK_LISTENING
-        turn.reply = table.get(language, table["en"])
+        turn.reply = with_disclosure(table.get(language, table["en"]), context, language)
+        after_fixed_reply(turn, context)
     turn.awaiting_customer = True
 
 
@@ -3239,7 +3313,8 @@ def brain_never_empty(turn: "ServiceTurn", context: dict[str, Any]) -> None:
             turn._decision = decisions.Decision(
                 None, flow.State.S5_READINESS, {"offer_asked": True}, why="R-OFFER-01"
             )
-    turn.reply = line
+    turn.reply = with_disclosure(line, context, language)
+    after_fixed_reply(turn, context)
     turn.awaiting_customer = True
     turn._english = language not in ("en", "roman_ur", "ar")
 
@@ -3254,7 +3329,12 @@ def box_offer_allowed(context: dict[str, Any]) -> bool:
     when R1 to R3 or B1 to B7 hold. With it off (the legacy path) there is no readiness data, so
     only the exception R1 holds: the owner asked for the document, quote or price in this message
     (audit R8: an unconditional offer came at the fourth problem with the map unreviewed)."""
-    asked = decisions.asks_for_document(str(context.get("latest_customer_message") or ""))
+    said = str(context.get("latest_customer_message") or "")
+    asked = (
+        decisions.asks_for_document(said)
+        or part19.opens_the_offer_by_quote_phrase(said)
+        or part19.asks_price(said)
+    )
     if not context.get("box_offer"):
         return asked
     return box.can_offer(box.offer_facts(context, asked_for_document=asked))[0]
@@ -3295,7 +3375,10 @@ def brain_offer(turn: "ServiceTurn", context: dict[str, Any]) -> None:
         # R3 (spec 5.4): who would do it, how long, can Workzap: answered in a line, then the offer
         or (
             context.get("box_offer")
-            and box_signals.asks_who_or_how_long(str(context.get("latest_customer_message") or ""))
+            and (
+                box_signals.asks_who_or_how_long(str(context.get("latest_customer_message") or ""))
+                or system_ask.open_ask(context.get("brief"))  # asked earlier, not lost since
+            )
         )
     ):
         return
@@ -3304,8 +3387,17 @@ def brain_offer(turn: "ServiceTurn", context: dict[str, Any]) -> None:
         return
     if not box_offer_allowed(context):
         return  # Book 5, 5.4 and 10.9: ideas were free, the offer waits for R1 to R3 or B1 to B7
+    if getattr(turn, "_need_fact", False):
+        return  # Part 7 idea filter, G39: the "one more fact" question is the only one
     if not solution_ask.already_offers(turn.reply):
-        turn.reply = f"{turn.reply.rstrip()}\n\n{solution_ask.offer_line(language, context)}"
+        if any(line in turn.reply for line in NO_IDEA_FIXED):
+            heard = system_ask.HEARD_LINES.get(language, system_ask.HEARD_LINES["en"])
+            turn.reply = with_disclosure(heard, context, language)
+            after_fixed_reply(turn, context)
+        else:
+            turn.reply = part19.statement_only(turn.reply)  # the offer is the only question
+        offer = solution_ask.offer_line(language, context)
+        turn.reply = f"{turn.reply.rstrip()}\n\n{offer}" if turn.reply.strip() else offer
     turn.awaiting_customer = True
     turn._decision = decisions.Decision(
         None, flow.State.S5_READINESS, {"offer_asked": True}, why="R-OFFER-01"
@@ -3342,6 +3434,14 @@ def brain_decision(turn: "ServiceTurn", context: dict[str, Any]) -> None:
         # Book 5: set only when response_rules.brain.box_offer is exactly true.
         "box_offer": box.offer_facts(context) if context.get("box_offer") else None,
     }
+    wants = [str(w) for w in known.get("wants") or []]
+    said_now = str(context.get("latest_customer_message", ""))
+    # 19.2: R1 (quote or price asked) is the ask itself and starts the quote; R3 (ready to buy)
+    # opens the offer (box_signals) and the owner's yes still starts it: no yes is skipped
+    # a price question is answered first and does not start the quote (D-1); only an explicit ask
+    # for the quote does
+    gate = part19.gate_signal(said_now, len(noted) + len(wants))
+    facts["buying_signal"] = gate
     decision = decisions.decide(
         state,
         str(context.get("latest_customer_message", "")),
@@ -3353,6 +3453,13 @@ def brain_decision(turn: "ServiceTurn", context: dict[str, Any]) -> None:
     turn._decision = decision
     if decision.reply:
         turn.reply = decision.reply
+        after_fixed_reply(turn, context)
+        if gate == "R1" and decision.why == "R-OFFER-03":
+            language = str(context.get("reply_language") or "en")
+            own = "title_local" if language != "en" else "title"
+            items = [str(p.get(own) or p.get("title") or "") for p in noted] + wants
+            more = part19.covers_lines(language, items)
+            turn.reply = f"{turn.reply}\n{more}" if more else turn.reply
         turn.awaiting_customer = decision.next_state not in (None, flow.State.S6_PREPARING)
         # Figures pi wrote itself (a quote's number and total) are not a new price.
         fixed = [ln for ln in decision.reply.splitlines() if any(c.isdigit() for c in ln)]
@@ -3612,6 +3719,8 @@ async def note_problems(
         brief["quiet_replies"] = 0
         book = problems.ProblemBook(session, scope, conversation.customer_id, turn.language)
         brief["summary_count"] = len(await book.active())
+        if getattr(turn, "_summary_at", None) is not None:
+            brief["summary_at"] = turn._summary_at  # 19.7: the clock for "never twice in 10"
     if turn._asked_shape:
         brief["industry_asked"] = True
     if solution_ask.free_rider(brief, message.body or "") and not brief.get("free_rider"):
@@ -4980,6 +5089,8 @@ def part18_problem(reply: str, context: dict[str, Any]) -> str | None:
         reply_gates.opening_problem(reply, context, known),
         reply_gates.empty_opener(reply),
         reply_gates.closed_list_early(reply, owner, known),
+        part19.dead_end(reply),  # spec v1.6 19.6
+        part19.number_used(reply, owner[-1] if owner else ""),  # spec v1.6 19.5
     ]
     if context.get("fact_ask"):  # off unless the workspace sets brain.fact_ask to true
         said = [
@@ -6270,6 +6381,7 @@ async def compose_service_turn(
         turn.ready_for_team = False  # no lead, proposal or team brief before the offer
         turn.projects = []
         brain_summary(turn, context)
+        part19.replay(turn, context)  # 19.3: "listen again" gets a playback of what was understood
         brain_decision(turn, context)
         strip_dangling_opener(turn)
         if context.get("expert_on"):
@@ -6288,6 +6400,12 @@ async def compose_service_turn(
                 "model.extract", problem_extract.extract(manager, scope, context)
             ):
                 turn.problem_ops = found
+        if part19.want_cue(str(context.get("latest_customer_message") or "")):
+            # 19.4: what the owner wants built or done is kept apart from their problems
+            latency.count("model_calls")
+            turn._new_wants = await latency.timed(
+                "model.wants", problem_extract.extract_wants(manager, scope, context)
+            )
         brain_prose_ideas(turn, context)
         brain_no_repeat(turn, context)
         brain_no_ideas(turn, context)
@@ -6326,6 +6444,8 @@ async def compose_service_turn(
         )
     if expected == "roman_ur":
         turn.reply = roman_ideas_opener(roman_polish(turn.reply), context)
+    if turn._cost_line:
+        turn.reply = put_cost_line(turn.reply, turn._cost_line)
     latest_language = detect_language(str(context.get("latest_customer_message", "")))
     if latest_language == expected and (
         clearly_other(turn.reply, str(expected or ""))
@@ -6464,6 +6584,9 @@ async def compose_service_turn(
         await in_their_language(manager, scope, policy, conversation, turn, context)
     elif context.get("opening_by_model"):
         logger.info("openingGate pass", extra=reply_gates.opening_log(True, "model", version))
+    if context.get("pi_mode") == "brain":
+        # R-ASK-01 on the text that is sent: everything above may add a line after the last lint
+        turn.reply = constitution.final_one_question(turn.reply, keep=context.get("fixed_lines"))
     return turn
 
 
@@ -6551,6 +6674,8 @@ async def save_service_turn(
                 [*(previous.get("asked_facts") or []), *memory_block.asked_keys(turn.reply)]
             )
         )[-12:]
+        brief = system_ask.note(brief, message.body or "")  # R3 ask kept until the offer is made
+        brief = part19.merge_wants(brief, turn._new_wants)  # 19.4: the wants, apart from problems
         # R-ASK-07: the question asked last turn is answered now (any answer closes it); the one
         # in this reply is the open one. Kept in the brief, so it survives sessions and languages.
         try:

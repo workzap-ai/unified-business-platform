@@ -286,9 +286,9 @@ async def test_that_is_all_shows_the_sorted_summary_and_moves_to_sorted(
     await say(pi, "Best-sellers run out and cashiers are late on weekends", "pb-5a")
     await say(pi, "That's all", "pb-5b")
     body = (await pi.reply_to("pb-5b")).body
-    assert body.startswith("Here's what I've noted and sorted so far. None of it is solved yet.")
+    assert body.startswith("Here is what you have told me so far.")  # spec v1.6 19.7
     assert "*Stock* (1)" in body and "*Staff* (1)" in body
-    assert body.endswith("Is anything wrong or missing?")
+    assert body.endswith("Which of these should we start with?")
     conversation, _ = await problems_of(business_db, pi)
     assert conversation.flow_state == "S4_SORTED_SUMMARY"
     assert conversation.service_brief["summary_count"] == 2
