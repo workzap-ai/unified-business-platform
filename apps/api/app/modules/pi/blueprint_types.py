@@ -59,6 +59,7 @@ class StepIn:
     after: tuple[str, ...] = ()
     phase: int = 0
     id: str = ""
+    problems: tuple[str, ...] = ()  # the stated problems this step answers; empty means all tied
 
 
 @dataclass(frozen=True)
@@ -98,6 +99,11 @@ class OptionIn:
     checks: tuple[CheckIn, ...] = ()
     expected_outcome: str = ""
     status: str = ""  # recommended | alternative | rejected (empty when not stated)
+    reversibility: str = ""
+    rejected_because: str = ""
+    entities: tuple[str, ...] = ()  # data records the option names (never invented by pi)
+    integrations: tuple[str, ...] = ()  # connections the option names
+    permissions: tuple[tuple[str, str], ...] = ()  # (role, what that role may do)
 
 
 @dataclass(frozen=True)
@@ -124,6 +130,27 @@ class ConstraintIn:
 class TriedIn:
     what: str
     outcome: str = ""
+
+
+@dataclass(frozen=True)
+class CauseIn:
+    problem: str
+    text: str
+    status: str = "pi_inferred"  # pi_inferred | owner_said | confirmed
+    evidence: tuple[str, ...] = ()  # the owner's own words
+    verified: bool = False
+
+
+@dataclass(frozen=True)
+class AltIn:
+    id: str
+    what: str
+    status: str = "alternative"
+    why_not: str = ""
+    violated: tuple[str, ...] = ()  # "label: why" of violated constraint checks
+    unknown: tuple[str, ...] = ()  # labels of constraint checks nobody could make
+    blocked_by: tuple[str, ...] = ()  # texts of blocking dependencies
+    addresses: tuple[str, ...] = ()
 
 
 @dataclass(frozen=True)
@@ -160,6 +187,59 @@ class Summary:
 
 
 @dataclass(frozen=True)
+class ProblemRow:
+    id: str
+    title: str
+    words: tuple[str, ...] = ()
+
+
+@dataclass(frozen=True)
+class FactRow:
+    problem: str  # problem id, or "" for a fact about the whole business
+    kind: str  # figure | frequency | since | constraint | tried | outcome | correction
+    text: str  # the owner's words
+    was: str = ""  # for a correction: what the owner said first
+
+
+@dataclass(frozen=True)
+class CauseRow:
+    problem: str
+    text: str
+    status: str  # pi_inferred | owner_said | confirmed
+    evidence: tuple[str, ...] = ()
+
+
+@dataclass(frozen=True)
+class ReasonRow:
+    text: str
+    problems: tuple[str, ...]
+
+
+@dataclass(frozen=True)
+class AlternativeRow:
+    id: str
+    what: str
+    status: str
+    why_not: str
+    problems: tuple[str, ...] = ()
+
+
+@dataclass(frozen=True)
+class DataRow:
+    kind: str  # entity | integration
+    name: str
+    status: str  # named (by the option) | unknown
+    problems: tuple[str, ...] = ()
+
+
+@dataclass(frozen=True)
+class OpenItem:
+    kind: str  # missing | decision
+    text: str
+    problems: tuple[str, ...] = ()
+
+
+@dataclass(frozen=True)
 class Module:
     id: str
     name: str
@@ -193,12 +273,14 @@ class ExternalDep:
     text: str
     status: str = UNKNOWN  # unknown until the owner supplies it
     blocking: bool = False
+    problems: tuple[str, ...] = ()
 
 
 @dataclass(frozen=True)
 class Responsibility:
     role: str
     steps: tuple[str, ...]
+    permissions: tuple[str, ...] = ()  # what the option says this role may do; empty = not stated
 
 
 @dataclass(frozen=True)
@@ -223,6 +305,7 @@ class RiskLine:
     text: str
     level: str = "low"
     source: str = "option"  # option | missing_fact
+    problems: tuple[str, ...] = ()
 
 
 @dataclass(frozen=True)
@@ -275,7 +358,14 @@ class Blueprint:
     status: str
     language: str
     summary: Summary | None = None
+    problems: tuple[ProblemRow, ...] = ()
+    facts: tuple[FactRow, ...] = ()
+    causes: tuple[CauseRow, ...] = ()
+    reasons: tuple[ReasonRow, ...] = ()
+    alternatives: tuple[AlternativeRow, ...] = ()
     modules: tuple[Module, ...] = ()
+    data: tuple[DataRow, ...] = ()
+    open_items: tuple[OpenItem, ...] = ()
     steps: tuple[Step, ...] = ()
     edges: tuple[Edge, ...] = ()
     external: tuple[ExternalDep, ...] = ()

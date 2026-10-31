@@ -855,7 +855,7 @@ def test_check_never_raises_on_a_malformed_record() -> None:
 
 def test_section_report_separates_present_from_grounded(bp: Blueprint) -> None:
     rep = section_report(bp)
-    assert set(rep) == set(SECTIONS) and len(SECTIONS) == 15
+    assert set(rep) == set(SECTIONS) and len(SECTIONS) == 22
     assert all(present for present, _ in rep.values())
     assert rep["costs"] == (True, True) and rep["timeline"] == (True, True)
     bare = section_report(build(staff=None))
@@ -1001,8 +1001,8 @@ def test_render_golden_english_costs_timeline_and_gates(bp: Blueprint) -> None:
     lines = render_blueprint(bp).splitlines()
     assert "Setup: 1200 PKR (staff: quote QX)" in lines
     assert "S1: 4 days (from: staff estimate)" in lines
-    assert "S2: To be estimated by staff." in lines
-    assert "plan: To be estimated by staff." in lines
+    assert "S2: To be estimated by staff. Requires staff confirmation." in lines
+    assert "plan: To be estimated by staff. Requires staff confirmation." in lines
     assert (
         "G3: Owner checkpoint: nothing in the next phase starts until the owner says yes in chat."
         in lines
@@ -1030,7 +1030,7 @@ def test_render_unknown_cost_and_target_say_so() -> None:
     probs = [{"id": "p1", "title": "Late rent", "user_words": ["late"]}]
     out = build(problems=probs, req={}, facts=["late"], staff=None)
     lines = render_blueprint(out).splitlines()
-    assert "plan: To be quoted by staff." in lines
+    assert "plan: To be quoted by staff. Requires staff confirmation." in lines
     assert "  Target: To be agreed with the owner." in lines
     assert "  Starting figure: Not known yet. Recorded first in B1." in lines
 

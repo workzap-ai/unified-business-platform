@@ -252,6 +252,13 @@ class Issue:
 
 SECTIONS = (
     "summary",
+    "problems",
+    "facts",
+    "causes",
+    "reasons",
+    "alternatives",
+    "data",
+    "open",
     "architecture",
     "workflow",
     "dependencies",
@@ -273,6 +280,29 @@ def free_texts(bp: Blueprint) -> Iterator[tuple[str, str]]:
     """Every free-text field of a blueprint with a name for where it is (ids and enums excluded)."""
     if bp.summary is not None:
         yield "summary", bp.summary.text
+    for pr in bp.problems:
+        yield f"problem {pr.id}", pr.title
+        for w in pr.words:
+            yield f"problem {pr.id} words", w
+    for f in bp.facts:
+        yield f"fact {f.kind}", f.text
+        yield f"fact {f.kind} was", f.was
+    for ca in bp.causes:
+        yield f"cause {ca.problem}", ca.text
+        for w in ca.evidence:
+            yield f"cause {ca.problem} evidence", w
+    for i, rs in enumerate(bp.reasons):
+        yield f"reason {i + 1}", rs.text
+    for al in bp.alternatives:
+        yield f"alternative {al.id}", al.what
+        yield f"alternative {al.id} why not", al.why_not
+    for d in bp.data:
+        yield f"data {d.kind}", d.name
+    for i, oi in enumerate(bp.open_items):
+        yield f"open item {i + 1}", oi.text
+    for r0 in bp.responsibilities:
+        for pm in r0.permissions:
+            yield f"permission {r0.role}", pm
     for m in bp.modules:
         yield f"module {m.id}", m.name
         for n in m.not_changed:
@@ -319,6 +349,31 @@ def section_report(bp: Blueprint) -> dict[str, tuple[bool, bool]]:
     rollback = [s for s in bp.steps if s.kind == "rollback"]
     option_steps = [s for s in bp.steps if s.source == "option"]
     return {
+        "problems": (
+            any(p.title.strip() for p in bp.problems),
+            any(p.title.strip() for p in bp.problems),
+        ),
+        "facts": (any(f.text.strip() for f in bp.facts), any(f.text.strip() for f in bp.facts)),
+        "causes": (
+            any(c.text.strip() for c in bp.causes),
+            any(c.status in ("owner_said", "confirmed", "pi_inferred") for c in bp.causes),
+        ),
+        "reasons": (
+            any(r.text.strip() for r in bp.reasons),
+            any(r.text.strip() for r in bp.reasons),
+        ),
+        "alternatives": (
+            any(a.what.strip() for a in bp.alternatives),
+            any(a.id for a in bp.alternatives),
+        ),
+        "data": (
+            any(d.name.strip() for d in bp.data),
+            any(d.kind in ("entity", "integration") for d in bp.data),
+        ),
+        "open": (
+            any(o.text.strip() for o in bp.open_items),
+            any(o.text.strip() for o in bp.open_items),
+        ),
         "summary": (
             bool(bp.summary and bp.summary.text.strip()),
             bool(bp.summary and bp.summary.problem_ids),
@@ -443,6 +498,32 @@ def _check(bp: Blueprint, known: frozenset[str]) -> tuple[Issue, ...]:
             add(Issue(f"BP-SEC-{name.upper()}", name, f"section {name} is missing or empty"))
     if bp.summary is not None and not set(bp.summary.problem_ids) & set(bp.problem_ids):
         add(Issue("BP-PROB", "summary", "the summary is not tied to a stated problem"))
+    known_ids = set(bp.problem_ids)
+    linked: list[tuple[str, tuple[str, ...]]] = (
+        [(f"step {s.id}", s.problems) for s in bp.steps]
+        + [(f"module {m.id}", m.problems) for m in bp.modules]
+        + [(f"risk {i + 1}", r.problems) for i, r in enumerate(bp.risks)]
+        + [(f"external {e.id}", e.problems) for e in bp.external]
+        + [(f"acceptance {c.id}", c.problems) for c in bp.acceptance]
+        + [(f"reason {i + 1}", r.problems) for i, r in enumerate(bp.reasons)]
+        + [(f"alternative {a.id}", a.problems) for a in bp.alternatives]
+        + [(f"data {d.kind}", d.problems) for d in bp.data]
+        + [(f"open item {i + 1}", o.problems) for i, o in enumerate(bp.open_items)]
+        + [(f"measure {m.id}", (m.problem,)) for m in bp.success]
+    )
+    for where, probs in linked:
+        if not probs or not set(probs) <= known_ids:
+            add(Issue("BP-UNLINKED", where, "an item is not linked to a stated problem id"))
+    for ca in bp.causes:
+        if ca.status not in ("pi_inferred", "owner_said", "confirmed", "unknown"):
+            add(Issue("BP-CAUSE", f"cause {ca.problem}", "unknown cause status"))
+        if ca.status in ("owner_said", "confirmed") and not ca.evidence:
+            add(Issue("BP-CAUSE", f"cause {ca.problem}", "an owner cause needs the owner's words"))
+        if ca.problem not in known_ids:
+            add(Issue("BP-UNLINKED", f"cause {ca.problem}", "a cause names no stated problem"))
+    for f in bp.facts:
+        if f.problem and f.problem not in known_ids:
+            add(Issue("BP-UNLINKED", f"fact {f.kind}", "a fact names no stated problem"))
     ids = [s.id for s in bp.steps]
     if len(set(ids)) != len(ids):
         add(Issue("BP-STEP-ID", "steps", "duplicate step id"))

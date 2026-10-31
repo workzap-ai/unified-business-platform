@@ -27,6 +27,7 @@ once the owner has said yes and stores `render_blueprint` output in the reviewer
 
 from __future__ import annotations
 
+import dataclasses
 import math
 import re
 from collections.abc import Callable, Mapping
@@ -46,6 +47,21 @@ from app.modules.pi.blueprint_checks import (
     section_report,
     tidy,
 )
+from app.modules.pi.blueprint_extra import (
+    alternative_rows,
+    alternatives_from,
+    cause_rows,
+    causes_from,
+    data_rows,
+    fact_rows,
+    open_items,
+    parse_corrections,
+    reason_rows,
+)
+from app.modules.pi.blueprint_extra import get_attr as _get
+from app.modules.pi.blueprint_extra import seq_of as _seq
+from app.modules.pi.blueprint_extra import short as _text
+from app.modules.pi.blueprint_extra import shorts as _texts
 from app.modules.pi.blueprint_render import render_blueprint
 from app.modules.pi.blueprint_types import (
     INSUFFICIENT,
@@ -72,12 +88,14 @@ from app.modules.pi.blueprint_types import (
     DepIn,
     Edge,
     ExternalDep,
+    FactRow,
     Measure,
     Milestone,
     Missing,
     Module,
     OptionIn,
     ProblemIn,
+    ProblemRow,
     Responsibility,
     RiskIn,
     RiskLine,
@@ -117,30 +135,6 @@ _STOP = ".!?؟۔ "
 # ---- reading loose input -----------------------------------------------------------------------
 
 
-def _get(obj: Any, name: str, default: Any = None) -> Any:
-    if isinstance(obj, Mapping):
-        return obj.get(name, default)
-    try:
-        return getattr(obj, name, default)
-    except Exception:  # a property that raises reads as absent
-        return default
-
-
-def _seq(value: Any, cap: int) -> tuple[Any, ...]:
-    """The first `cap` items of a list or tuple; anything else is empty."""
-    if isinstance(value, list | tuple):
-        return tuple(islice(value, cap))
-    return ()
-
-
-def _text(value: Any, cap: int = 300) -> str:
-    return tidy(value, cap) if isinstance(value, str) else ""
-
-
-def _texts(value: Any, n: int, cap: int = 300) -> tuple[str, ...]:
-    return tuple(t for t in (_text(v, cap) for v in _seq(value, n)) if t)
-
-
 def option_from(option: Any) -> OptionIn | None:
     """THE adapter from an L2-3 `blueprint_models.Option` (or any mapping or object with the same
     attribute names) to this module's `OptionIn`. Attributes read by name and tolerated absent:
@@ -169,6 +163,7 @@ def option_from(option: Any) -> OptionIn | None:
                 after=after,
                 phase=phase if isinstance(phase, int) and not isinstance(phase, bool) else 0,
                 id=_text(_get(s, "id"), 40),
+                problems=_texts(_get(s, "problems"), MAX_PROBLEMS, 40),
             )
         )
     deps = tuple(
@@ -212,6 +207,14 @@ def option_from(option: Any) -> OptionIn | None:
         checks=checks,
         expected_outcome=_text(_get(option, "expected_outcome")),
         status=_text(_get(option, "status"), 20),
+        reversibility=_text(_get(option, "reversibility"), 20),
+        rejected_because=_text(_get(option, "rejected_because")),
+        entities=_texts(_get(option, "entities"), 8, 120),
+        integrations=_texts(_get(option, "integrations"), 8, 120),
+        permissions=tuple(
+            (_text(_get(x, "role"), 20).casefold(), _text(_get(x, "what")))
+            for x in _seq(_get(option, "permissions"), 8)
+        ),
     )
 
 
@@ -390,8 +393,9 @@ def _corpus(
     constraints: tuple[ConstraintIn, ...],
     tried: tuple[TriedIn, ...],
     outcome: str,
+    extra: list[str] | None = None,
 ) -> list[str]:
-    out = list(facts)
+    out = list(facts) + list(extra or ())
     for p in problems:
         out += [p.title, *p.words, p.figure, p.frequency, p.since, p.expected_outcome]
     for c in constraints:
@@ -400,6 +404,15 @@ def _corpus(
         out += [t.what, t.outcome]
     out.append(outcome)
     return [t for t in out if t]
+
+
+def _extra_corpus(causes: Any, corrections: Any) -> list[str]:
+    out: list[str] = []
+    for c in causes:
+        out += [c.text, *c.evidence]
+    for wrong, right, _ in corrections:
+        out += [wrong, right]
+    return out
 
 
 # ---- the builder -------------------------------------------------------------------------------
@@ -412,6 +425,9 @@ def build_blueprint(
     owner_facts: Any,
     language: Any = "en",
     staff_inputs: Any = None,
+    *,
+    root_causes: Any = None,
+    options: Any = None,
 ) -> Blueprint:
     """The blueprint for the recommended option. Never raises: an input that cannot be read gives
     `insufficient_information`.
@@ -425,11 +441,24 @@ def build_blueprint(
     owner_facts         the owner's own messages: a string, a list, or a mapping of them
     staff_inputs        {"costs": [{item, amount, currency, source}], "durations": [{text, source,
                         step}], "roles": [{step, role}]}; step ids are the ids this blueprint
-                        makes (S1...)
+                        makes (S1...); requirements may also carry "corrections":
+                        [{wrong, right, problem}], kept only when both sides are in the owner facts
+    root_causes         causes by problem id (L2-3 RootCause via `cause_from`), or None
+    options             the OptionSet the recommendation came from: its other options become the
+                        alternatives and why not (also read from recommended_option if it is a set)
     """
     lang = bs.norm_language(language)
     try:
-        return _build(recommended_option, problems, requirements, owner_facts, lang, staff_inputs)
+        return _build(
+            recommended_option,
+            problems,
+            requirements,
+            owner_facts,
+            lang,
+            staff_inputs,
+            root_causes,
+            options,
+        )
     except Exception:  # the contract is "never raises"; an unreadable input is missing information
         return Blueprint(
             INSUFFICIENT, lang, missing=(Missing("unreadable", bs.tr(lang, "unreadable")),)
@@ -456,7 +485,14 @@ def _insufficient(lang: str, codes: list[tuple[str, str]], known: frozenset[str]
 
 
 def _build(
-    option_raw: Any, problems_raw: Any, req_raw: Any, facts_raw: Any, lang: str, staff_raw: Any
+    option_raw: Any,
+    problems_raw: Any,
+    req_raw: Any,
+    facts_raw: Any,
+    lang: str,
+    staff_raw: Any,
+    causes_raw: Any = None,
+    options_raw: Any = None,
 ) -> Blueprint:
     t = bs.tr
     option: OptionIn | None
@@ -468,6 +504,7 @@ def _build(
         and _get(option_raw, "what") is None
     ):
         option, _ = recommended_from(option_raw)
+        options_raw = options_raw if options_raw is not None else option_raw
     else:
         option = option_from(option_raw)
 
@@ -483,6 +520,8 @@ def _build(
     )
     facts = _facts(facts_raw)
     staff = _staff(staff_raw)
+    causes = causes_from(causes_raw)
+    corrections = parse_corrections(_get(req_raw, "corrections"), " ".join(facts))
     known = _known(
         _corpus(
             facts,
@@ -490,6 +529,7 @@ def _build(
             constraints,
             tried,
             global_outcome + " " + " ".join(per_problem_outcome.values()),
+            _extra_corpus(causes, corrections),
         ),
         staff,
     )
@@ -528,10 +568,15 @@ def _build(
 
     # --- option content, cleaned ---
     raw_steps: list[tuple[StepIn, str]] = []
+    unlinked = False
     for s in option.steps[:MAX_STEPS]:
         text = clean(s.text)
-        if text:
-            raw_steps.append((s, text))
+        if not text:
+            continue
+        if s.problems and not set(s.problems) & set(tied_ids):
+            unlinked = True  # a step that answers none of the stated problems is not built
+            continue
+        raw_steps.append((s, text))
     no_steps = not raw_steps
     if no_steps:
         raw_steps = [(StepIn(text=what), what)]
@@ -623,7 +668,8 @@ def _build(
             role = "owner" if option.kind in _OWNER_KINDS else "staff"
             defaulted = True
         done = clean(s.done_check) or t(lang, "action_done", text=tidy(text, 100))
-        work.append(Step(sid, "action", text, role, done, phase, tied_ids, "option"))
+        linked = tuple(x for x in s.problems if x in tied_ids) or tied_ids
+        work.append(Step(sid, "action", text, role, done, phase, linked, "option"))
         if phase not in phases_used:
             phases_used.append(phase)
         refs = []
@@ -906,11 +952,65 @@ def _build(
         tied_ids,
         option.id,
     )
+    # --- what explains and links the plan ---
+    if unlinked:
+        unknowns.append(t(lang, "unk_unlinked"))
+    steps = [dataclasses.replace(x, problems=x.problems or tied_ids) for x in steps]
+    risks = [dataclasses.replace(r, problems=r.problems or tied_ids) for r in risks]
+    external = [dataclasses.replace(e, problems=e.problems or tied_ids) for e in external]
+    alts = alternatives_from(options_raw, option.id) if options_raw is not None else ()
+    problem_rows = tuple(
+        ProblemRow(
+            p.id,
+            clean(p.title or " ".join(p.words), 120) or p.id,
+            tuple(w for w in (clean(x) for x in p.words[:2]) if w),
+        )
+        for p in usable
+    )
+    cause_tuple, cause_items = cause_rows(lang, causes, tied, clean)
+    reason_tuple = reason_rows(lang, option, rows, titles, tied_ids, clean)
+    alt_tuple = alternative_rows(lang, alts, tied_ids, clean)
+    fact_tuple = fact_rows(
+        lang, tied, constraints, tried, corrections, outcomes, figures, clean, tied_ids
+    )
+    if not fact_tuple:  # whatever was cut, the problem the owner stated is still a fact
+        first = next((r for r in problem_rows if r.id in tied_ids), problem_rows[0])
+        fact_tuple = (FactRow(first.id, "said", first.title),)
+    data_tuple = data_rows(lang, option, tied_ids, clean)
+    perms = dict(option.permissions)
+    resp = tuple(
+        dataclasses.replace(
+            r,
+            permissions=(clean(perms[r.role]),)
+            if perms.get(r.role) and clean(perms[r.role])
+            else (),
+        )
+        for r in resp
+    )
+    open_tuple = open_items(
+        lang,
+        tied_ids,
+        cause_items,
+        rows,
+        tuple(external),
+        tuple(risks),
+        tuple(costs),
+        tuple(timeline),
+        alt_tuple,
+        tuple(measures),
+    )
     return Blueprint(
         status=READY,
         language=lang,
         summary=summary,
+        problems=problem_rows,
+        facts=fact_tuple,
+        causes=cause_tuple,
+        reasons=reason_tuple,
+        alternatives=alt_tuple,
         modules=modules,
+        data=data_tuple,
+        open_items=open_tuple,
         steps=tuple(steps),
         edges=tuple(edges),
         external=tuple(external),
@@ -1016,6 +1116,7 @@ def blueprint_issues(
     problems: Any = None,
     requirements: Any = None,
     staff_inputs: Any = None,
+    root_causes: Any = None,
 ) -> tuple[Issue, ...]:
     """Completeness and honesty issues of a blueprint (empty means clean). Never raises.
 
@@ -1025,7 +1126,7 @@ def blueprint_issues(
     its own list).
     The one-question rule is the caller's, not checked here."""
     try:
-        if all(x is None for x in (owner_facts, problems, requirements, staff_inputs)):
+        if all(x is None for x in (owner_facts, problems, requirements, staff_inputs, root_causes)):
             known: frozenset[str] = frozenset(getattr(blueprint, "known_numbers", ()) or ())
         else:
             probs = _problems(problems)
@@ -1039,9 +1140,12 @@ def blueprint_issues(
                 if isinstance(oc, Mapping)
                 else []
             )
-            known = _known(
-                _corpus(_facts(owner_facts), probs, cons, trd, oc_text), _staff(staff_inputs)
+            facts = _facts(owner_facts)
+            extra = _extra_corpus(
+                causes_from(root_causes),
+                parse_corrections(_get(requirements, "corrections"), " ".join(facts)),
             )
+            known = _known(_corpus(facts, probs, cons, trd, oc_text, extra), _staff(staff_inputs))
         return check_blueprint(blueprint, known)
     except Exception:
         return (Issue("BP-MALFORMED", "blueprint", "could not check the blueprint"),)

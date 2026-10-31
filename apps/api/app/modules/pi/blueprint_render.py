@@ -70,6 +70,36 @@ def _render(bp: Blueprint, lang: str) -> str:
     if bp.summary:
         out.append(_line(bp.summary.text))
 
+    head("sec_problems")
+    for pr in bp.problems:
+        out.append(f"{pr.id}: {_sent(pr.title)}")
+        out += [f"  {t(lang, 'lbl_evidence')}: {_line(w)}" for w in pr.words]
+
+    head("sec_facts")
+    for f in bp.facts:
+        who = f"{f.problem}: " if f.problem else ""
+        label = t(lang, f"fact_{f.kind}")
+        if f.kind == "correction":
+            was, now = t(lang, "lbl_was"), t(lang, "lbl_now")
+            out.append(f"{who}{label}. {was}: {_sent(f.was)}. {now}: {_sent(f.text)}")
+        else:
+            out.append(f"{who}{label}: {_line(f.text)}")
+
+    head("sec_causes")
+    for c in bp.causes:
+        status = t(lang, f"cause_{c.status}") if c.status != "unknown" else ""
+        line = f"{c.problem}: {_sent(c.text)}" + (f" ({status})" if status else "")
+        out.append(line)
+        out += [f"  {t(lang, 'lbl_evidence')}: {_line(w)}" for w in c.evidence]
+
+    head("sec_reasons")
+    out += [_line(r.text) for r in bp.reasons]
+
+    head("sec_alternatives")
+    for a in bp.alternatives:
+        out.append(f"{a.id}: {_sent(a.what)}" if a.id else _line(a.what))
+        out += [f"  {_line(x)}" for x in a.why_not.split("\n") if x.strip()]
+
     head("sec_architecture")
     for m in bp.modules:
         out.append(f"{m.id}: {_line(m.name)}")
@@ -98,17 +128,28 @@ def _render(bp: Blueprint, lang: str) -> str:
         flag = f" {t(lang, 'lbl_blocking')}." if x.blocking else ""
         out.append(f"{x.id}: {_sent(x.text)} ({t(lang, 'lbl_status_unknown')}).{flag}")
 
+    head("sec_data")
+    for d in bp.data:
+        if d.kind == "integration":
+            out.append(t(lang, "data_integration", name=_sent(d.name)))
+        elif d.kind == "entity":
+            out.append(t(lang, "data_entity", name=_sent(d.name)))
+        else:
+            out.append(_line(d.name))
+
     head("sec_responsibilities")
     for r in bp.responsibilities:
         out.append(f"{role(r.role)}: {', '.join(r.steps)}")
+        perms = [_line(x) for x in r.permissions] or [t(lang, "perm_none")]
+        out.append(f"  {t(lang, 'lbl_permissions')}: {' '.join(perms)}")
 
     head("sec_costs")
-    for c in bp.costs:
-        if c.amount is None:
-            out.append(f"{_line(c.item)}: {t(lang, 'costs_unknown')}")
+    for cl in bp.costs:
+        if cl.amount is None:
+            out.append(f"{_line(cl.item)}: {t(lang, 'costs_unknown')}")
         else:
-            amount = f"{canon_number(str(c.amount))} {c.currency}".strip()
-            out.append(f"{_line(c.item)}: {amount} ({t(lang, 'src_staff')}: {_line(c.source)})")
+            amount = f"{canon_number(str(cl.amount))} {cl.currency}".strip()
+            out.append(f"{_line(cl.item)}: {amount} ({t(lang, 'src_staff')}: {_line(cl.source)})")
 
     head("sec_timeline")
     for tl in bp.timeline:
@@ -122,6 +163,9 @@ def _render(bp: Blueprint, lang: str) -> str:
     head("sec_risks")
     out += [_line(r.text) for r in bp.risks]
     out += [_line(u) for u in bp.unknowns]
+
+    head("sec_open")
+    out += [_line(o.text) for o in bp.open_items]
 
     head("sec_milestones")
     for m2 in bp.milestones:
