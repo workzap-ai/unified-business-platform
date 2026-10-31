@@ -110,7 +110,7 @@ def test_owner_stated_cause_is_not_offered_again_as_a_guess():
         },
     )
     hs = g.hypotheses_for(
-        p, {"owner_messages": ["Orders cancelled because we are out of stock."]}, "en"
+        p, {"owner_messages": ["I think orders cancelled because we are out of stock."]}, "en"
     )
     assert "stock_unavailable" not in [h.key for h in hs]
 
@@ -161,17 +161,17 @@ def test_owner_said_cause_with_words_in_owner_text_stays_owner_said_and_confirme
         "late rent",
         ["rent late"],
         category="cash_collections",
-        cause={"text": "tenants forget", "status": "owner_said", "evidence": {"words": ["forget"]}},
+        cause={"text": "tenants delay", "status": "owner_said", "evidence": {"words": ["delay"]}},
     )
     p2 = rec(
         "p2",
         "late repairs",
         ["repairs late"],
         category="operations_process",
-        cause={"text": "tenants forget", "status": "confirmed", "evidence": {"words": ["forget"]}},
+        cause={"text": "tenants delay", "status": "confirmed", "evidence": {"words": ["delay"]}},
     )
     gr = g.build_problem_graph(
-        [p1, p2], ["Tenants forget the due date. Repairs late too."], None, "en"
+        [p1, p2], ["I think our tenants delay the payment. Repairs late too."], None, "en"
     )
     st = {s.problem_id: s.status for s in gr.statements if s.reason == "cause_record"}
     assert st == {"p1": g.OWNER_SAID, "p2": g.CONFIRMED}
@@ -243,7 +243,7 @@ def test_shared_cause_and_shared_resource_edges():
         ),
     ]
     gr = g.build_problem_graph(
-        ps, ["The courier is slow. Deliveries late and parcels come back."], None, "en"
+        ps, ["I think our courier is slow. Deliveries late and parcels come back."], None, "en"
     )
     kinds = {e.kind for e in gr.edges}
     assert g.EdgeKind.SHARED_CAUSE in kinds
