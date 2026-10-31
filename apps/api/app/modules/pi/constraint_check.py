@@ -257,7 +257,8 @@ FAMILIES: dict[str, frozenset[str]] = {
     "CHANGE": frozenset(
         "change replace switch swap alter modify migrate upgrade overhaul scrap abandon ditch "
         "discard retire remove convert rebuild restructure reorganise reorganize rework "
-        "badal badlen badalna tabdeel".split()
+        "update adjust revise redesign amend tweak edit revamp refresh reprice transform "
+        "badal badlen badlein badlo badle badalna badla tabdeel tabdil tabdili".split()
     ),
     "BUY": frozenset(
         "buy purchase acquire order procure get obtain invest bought kharid khareed kharidna "
@@ -286,7 +287,7 @@ FAMILIES: dict[str, frozenset[str]] = {
 # Words that are also common nouns: after a determiner they are the noun, not the verb.
 NOUN_TOO = frozenset(
     "change order market cut offer increase raise rent lease share drop switch move end stop "
-    "close sale open build use fire".split()
+    "close sale open build use fire update edit refresh adjust".split()
 )
 DETERMINERS = frozenset(
     "the a an our your their my his her its this that these those each every any some "
@@ -319,7 +320,7 @@ STAFF_WORDS = frozenset(
     "cashier driver salesman salesperson team hand labour labor manager".split()
 )
 SHOP_WORDS = frozenset(
-    "shop store branch outlet site location office warehouse premise showroom".split()
+    "shop store branch outlet site location office warehouse premise showroom dukan dukaan".split()
 )
 GENERIC = frozenset(
     """system software tool app application machine equipment thing process solution setup platform
@@ -340,8 +341,21 @@ STOPWORDS = frozenset(
 STOPWORDS = STOPWORDS | frozenset(_canon(w) for w in STOPWORDS)
 
 
+SYNONYM_GROUPS = {
+    "PRICE": "price prices pricing rate rates tariff fee fees charge charging",
+    "TIME": "time timing timetable waqt hour schedule opening",
+    "MENU": "menu",
+    "AD": "ad ads advert adverts advertising advertisement advertisements campaign campaigns",
+}
+SYNONYM_KEY = {w: key for key, words in SYNONYM_GROUPS.items() for w in words.split()}
+# a droppable word: when the limit names something else as well, it need not match
+DROPPABLE_OBJECTS = frozenset({"SHOP"})
+
+
 def object_key(word: str) -> str:
     stem = noun_stem(word)
+    if stem in SYNONYM_KEY:
+        return SYNONYM_KEY[stem]
     if stem in STAFF_WORDS:
         return "STAFF"
     if stem in SHOP_WORDS:
@@ -1025,7 +1039,9 @@ def _has_content(ws: list[str]) -> bool:
 
 
 def _concrete(objs: tuple[str, ...]) -> tuple[str, ...]:
-    return tuple(o for o in objs if o not in GENERIC and noun_stem(o) not in GENERIC)
+    return tuple(
+        o for o in objs if o.isupper() or (o not in GENERIC and noun_stem(o) not in GENERIC)
+    )
 
 
 def _action(fams: frozenset[str], after: list[str], verb: str, final: bool = False) -> _Lim:
@@ -1143,7 +1159,7 @@ def parse_limit(text: str) -> _Lim:
 
 
 def _generic_only(objs: tuple[str, ...]) -> bool:
-    return all(o in GENERIC or noun_stem(o) in GENERIC for o in objs)
+    return all(not o.isupper() and (o in GENERIC or noun_stem(o) in GENERIC) for o in objs)
 
 
 _CLAUSE_SPLIT = re.compile(
@@ -1361,6 +1377,36 @@ def _check_channel(option: _Option, lim: _Lim, limit_text: str) -> Verdict:
     return _ok(rule, "the option stays on the channels the owner named")
 
 
+BENIGN_VERBS = frozenset(
+    """keep retain maintain continue preserve use utilise utilize ask tell message send call phone
+    text track monitor train teach coach check measure record log write list review audit report
+    remind share show give inform notify thank explain compare test pilot survey read count tag
+    label sort note""".split()
+)
+
+
+def _unresolved_subject(toks: list[Tok], subjects: tuple[str, ...]) -> str | None:
+    """A word of the limit's subject the option names where no verb this check knows is at work:
+    no verb family, no keeping/checking/telling verb, no negation, no learn-first word."""
+    keys = set(subjects)
+    if not keys:
+        return None
+    for tok in toks:
+        if object_key(tok.word) not in keys and tok.word not in keys:
+            continue
+        clause = [t.word for t in toks if t.clause == tok.clause]
+        benign = any(
+            (verb_stems(w) & BENIGN_VERBS)
+            or verb_families(w)  # a verb this check understands was weighed against the limit
+            or w in NEGATIONS
+            or w in INVESTIGATE
+            for w in clause
+        )
+        if not benign:
+            return tok.word
+    return None
+
+
 def _check_lim(option: _Option, lim: _Lim, limit_text: str) -> Verdict:
     rule = RULE_CANNOT_CHANGE
     if lim.kind == "unreadable":
@@ -1398,8 +1444,10 @@ def _check_lim(option: _Option, lim: _Lim, limit_text: str) -> Verdict:
         families |= {"BUY", "RENT"}  # buying and renting are spending
     hire_any = "HIRE" in lim.families and set(lim.objects) <= {"STAFF"}
     spend_like = {"BUY", "RENT"} if "SPEND" in lim.families else set()
-    wanted = tuple(o for o in lim.objects if o not in GENERIC and noun_stem(o) not in GENERIC)
-    core = tuple(o for o in wanted if o not in PARTNER_WORDS)
+    wanted = tuple(
+        o for o in lim.objects if o.isupper() or (o not in GENERIC and noun_stem(o) not in GENERIC)
+    )
+    core = tuple(o for o in wanted if o not in PARTNER_WORDS and o not in DROPPABLE_OBJECTS)
     if core and len(core) < len(wanted):
         wanted = core  # "caterer partner": the partner word is not what has to match
     generic = tuple(o for o in lim.objects if o not in wanted)
@@ -1517,6 +1565,16 @@ def _check_lim(option: _Option, lim: _Lim, limit_text: str) -> Verdict:
         )
     if unknown_hit:
         return unknown_hit
+    mentioned = (
+        _unresolved_subject(toks, wanted or generic) if lim.kind != "afford_object" else None
+    )
+    if mentioned:
+        return _unknown(
+            rule,
+            "the option names what the owner cannot change and no verb it recognises leaves it as "
+            "it is",
+            (mentioned,),
+        )
     return _ok(rule, "the option does not do what the owner said they cannot do")
 
 
@@ -1559,10 +1617,16 @@ def _tried_words(text: str) -> list[frozenset[str]]:
     out: list[frozenset[str]] = []
     seen: set[frozenset[str]] = set()
     for w in _WORD.findall(norm(text)):
-        if w in STOPWORDS or w in DETERMINERS or noun_stem(w) in GENERIC or len(w) < 3:
+        if w in STOPWORDS or w in DETERMINERS or noun_stem(w) in GENERIC:
             continue
         key = object_key(w)
-        forms = frozenset({key}) if key in {"STAFF", "SHOP"} else frozenset(verb_stems(w))
+        if len(w) < 3 and key not in SYNONYM_GROUPS:
+            continue
+        forms = (
+            frozenset({key})
+            if key in {"STAFF", "SHOP", *SYNONYM_GROUPS}
+            else frozenset(verb_stems(w))
+        )
         if forms not in seen:
             seen.add(forms)
             out.append(forms)
@@ -1596,7 +1660,7 @@ def _check_tried(option: _Option, item: TriedItem) -> Verdict:
     shared = sorted(min(w, key=len) for w in mine if any(w & t for t in theirs))
     need = max(1, -(-len(mine) * 6 // 10))
     repeated = len(shared) >= need and (len(mine) > 1 or len(shared) == 1)
-    partial = len(shared) >= 2 and not repeated
+    partial = len(shared) >= 1 and not repeated
     if not (repeated or partial):
         return _ok(rule, "the option does not repeat what the owner tried")
     if DIFFERENT.search(kept):
@@ -1666,6 +1730,7 @@ def parse_staff_limit(text: str) -> int | None:
     return min(nums) if cue else None
 
 
+_KEEP_OR_HIRE = frozenset("rakh rakhna rakhein".split())
 HIRE_STEMS = frozenset(
     "hire recruit employ onboard engage appoint bring rakh rakhna rakhein bharti".split()
 )
@@ -1711,6 +1776,10 @@ def added_people_events(text: str) -> list[tuple[str, int | None, str]]:
             if clause[j] == clause[i]
         ):
             continue
+        if w in _KEEP_OR_HIRE and any(
+            t in scripts.NON_PERSON_OBJECTS for k, t in enumerate(toks) if clause[k] == clause[i]
+        ):
+            continue  # "rakhein" with a list, a register: keeping a thing, not taking someone on
         found = None
         for j in range(i + 1, min(len(toks), i + 8)):
             if clause[j] != clause[i] or (j > i + 1 and verb_stems(toks[j]) & ADD_PEOPLE):

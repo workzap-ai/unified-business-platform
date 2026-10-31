@@ -19,6 +19,11 @@ from collections.abc import Callable
 
 from app.modules.pi import constraint_scripts_more as more
 
+# things a person "keeps" (a list, a register): "to keep" next to one of these is not hiring
+NON_PERSON_OBJECTS = frozenset(
+    "list lists register sheet sheets record records file files calendar reminder reminders diary "
+    "note notes chart log copy copies form forms paper spreadsheet".split()
+)
 HIRE_OR_KEEP = "@keep"  # Urdu and Hindi "to keep / to put in a job"
 HIRE_OR_USE = "@use"  # Arabic "استخدام": hiring a person or using a thing
 
@@ -150,7 +155,7 @@ def to_english(
         else:
             out.append(piece)
             unread += 1
-    person = any(is_person(w) for w in out)
+    person = any(is_person(w) for w in out) and not any(w in NON_PERSON_OBJECTS for w in out)
     out = [("hire" if person else "keep") if w == HIRE_OR_KEEP else w for w in out]
     out = [("hire" if person else "use") if w == HIRE_OR_USE else w for w in out]
     # "رکھنا نہیں": the negation follows the verb in these languages; English puts it before

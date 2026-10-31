@@ -22,6 +22,9 @@ URDU = """
 شفٹ=shift رات=night لگا=add فیس=fee منٹ=minute گھنٹے=hours گھنٹہ=hours ہفتے=weeks ہفتہ=weeks
 مہینے=months مہینہ=per_month ماہانہ=monthly سالانہ=yearly کل=tomorrow آج=today اندر=within تک=tak
 مفت=free ادھار=loan اٹھا=afford ممکن=possible
+اپڈیٹ=update ایڈجسٹ=adjust ریٹ=rate ریٹس=rates مینو=menu وقت=time ٹائمنگ=timing اشتہار=ad
+اسسٹنٹ=assistant فہرست=list رجسٹر=register شیٹ=sheet ریکارڈ=record فائل=file کیلنڈر=calendar
+ریمائنڈر=reminder کسی=anyone
 اضافی=extra عملے=staff سوئچ=switch شروع=start بنائیں=make بنانا=make بھیجیں=send
 """
 ARABIC = """
@@ -34,6 +37,8 @@ ARABIC = """
 يوجد=have توقف=stop قبول=accept وردية=shift ليلية=night مطبخ=kitchen تدريب=training تمديد=extend
 ساعات=hours ساعة=hour اسبوع=weeks شهر=months غدا=tomorrow اليوم=today خلال=within تحمل=afford
 شهريا=monthly سنويا=yearly مجانا=free طباخ=cook موظف=employee مصفف=stylist عامل=worker
+تحديث=update تعديل=adjust سعر=price المنيو=menu قائمه=menu وقت=time اعلان=ad حمله=campaign
+مساعد=assistant سجل=register ملف=file تقويم=calendar تذكير=reminder احد=anyone
 اضافي=extra اضافيين=extra تبديل=change انتقل=switch ابدا=start ابدأ=start ارسل=send
 """
 HINDI = """
@@ -43,6 +48,9 @@ HINDI = """
 पैसे=money पैसा=money वादा=promise दिन=days दिनों=days हफ्ते=weeks हफ़्ते=weeks सप्ताह=weeks
 महीने=months महीना=per_month मासिक=monthly वार्षिक=yearly आज=today कल=tomorrow अंदर=within
 तक=tak अनुबंध=contract कॉन्ट्रैक्ट=contract बुकिंग=booking कूरियर=courier उठा=afford मुफ्त=free
+अपडेट=update एडजस्ट=adjust रेट=rate मेन्यू=menu समय=time विज्ञापन=ad
+असिस्टेंट=assistant सूची=list रजिस्टर=register शीट=sheet रिकॉर्ड=record फ़ाइल=file
+कैलेंडर=calendar रिमाइंडर=reminder किसी=anyone
 अतिरिक्त=extra स्विच=switch शुरू=start बनाएं=make भेजें=send
 रिसेप्शनिस्ट=receptionist मैकेनिक=mechanic मजदूर=worker रसोइया=cook स्टाइलिस्ट=stylist
 """

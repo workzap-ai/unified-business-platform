@@ -991,7 +991,9 @@ def test_deadline_comparisons_and_their_cue():
 
 def test_tried_items_with_nothing_to_compare_or_in_another_script_are_unknown():
     assert check("Call the customers", tried=[("the", "failed")]).status == "unknown"
-    assert check("Call the customers", tried=[("reminder calls", "")]).status == "ok"
+    # it overlaps with something tried whose outcome is not stated: never a free ok
+    assert check("Call the customers", tried=[("reminder calls", "")]).status == "unknown"
+    assert check("Post a notice on the door", tried=[("reminder calls", "")]).status == "ok"
     assert check("Call the customers", tried=[("اشتہار", "failed")]).status == "unknown"
     assert check("Send reminder calls", tried=[("reminder calls", "failed")]).status == "violates"
     # most of the tried words must be repeated before it counts as repeated (60 percent)
@@ -1302,9 +1304,12 @@ LIMIT_GOLDEN = {
         "ok": [
             ("واٹس ایپ پر پیغام بھیجیں", "یہ صرف فون پر چلنا چاہیے"),
             ("ایک نئی ٹیبلیٹ خریدیں", "ہم مزید عملہ نہیں رکھ سکتے"),
+            (
+                "کاغذ رجسٹر رکھیں",
+                "ہم POS نہیں بدل سکتے",
+            ),  # all of it is understood: keeping a register
         ],
         "unknown": [
-            ("کاغذ رجسٹر رکھیں", "ہم POS نہیں بدل سکتے"),
             ("POS بدلیں", "ہم کچھ ٹھیک نہیں کر سکتے"),
             ("نیا سسٹم خریدیں", "ہمارے پاس سسٹم نہیں ہے"),
         ],
@@ -1554,3 +1559,216 @@ def test_an_arabic_no_more_than_spending_limit_is_a_ceiling():
     assert check("اشتر نظاما 25000 روبية", budget=budget).status == "violates"
     assert check("اشتر نظاما 15000 روبية", budget=budget).status == "ok"
     assert "no more than" in cc.localise_limit(budget)[0]
+
+
+# ----- round 5 audit: a limit whose subject the option names is never a free ok -----
+
+PRICE_EN = "we cannot change prices"
+MENU_EN = "I cannot change the menu"
+SHOP_TIME_RU = "dukan ka waqt nahi badal sakta"
+RATE_RU = "rate nahi badal sakte"
+SHOP_TIME_UR = "ہم دکان کا وقت نہیں بدل سکتے"
+SHOP_TIME_AR = "لا نستطيع تغيير وقت المتجر"
+SHOP_TIME_HI = "हम दुकान का समय नहीं बदल सकते"
+PRICE_UR = "ہم قیمتیں نہیں بدل سکتے"
+PRICE_AR = "لا نستطيع تغيير الأسعار"
+PRICE_HI = "हम कीमतें नहीं बदल सकते"
+
+SYNONYM_VIOLATIONS = [
+    # English: synonyms of change, and of the object
+    ("Update the prices", PRICE_EN),
+    ("Adjust prices", PRICE_EN),
+    ("Revise pricing", PRICE_EN),
+    ("Alter the prices", PRICE_EN),
+    ("Modify prices for lunch", PRICE_EN),
+    ("Raise prices by five percent", PRICE_EN),
+    ("Lower prices on weekdays", PRICE_EN),
+    ("Rework how you charge customers", PRICE_EN),
+    ("Revamp the rate card", PRICE_EN),
+    ("Redesign the menu", MENU_EN),
+    ("Update the menu", MENU_EN),
+    ("Rework the menu", MENU_EN),
+    ("Swap the menu for a shorter one", MENU_EN),
+    ("Replace the menu", MENU_EN),
+    ("Revise the menu", MENU_EN),
+    ("Edit the menu every week", MENU_EN),
+    ("Amend the menu", MENU_EN),
+    ("Tweak the menu", MENU_EN),
+    # Roman Urdu limits and options
+    ("dukan ka waqt badlein", SHOP_TIME_RU),
+    ("dukan ka time badlein", SHOP_TIME_RU),
+    ("Shop timing badal dein", SHOP_TIME_RU),
+    ("opening hours change karein", SHOP_TIME_RU),
+    ("change shop timing", SHOP_TIME_RU),
+    ("shop timing tabdeel karein", SHOP_TIME_RU),
+    ("dukan ka waqt change karna", SHOP_TIME_RU),
+    ("Change the price of biryani", RATE_RU),
+    ("Increase the price of biryani", RATE_RU),
+    ("rate badlein", RATE_RU),
+    ("price badal dein", RATE_RU),
+    ("rate tabdeel karein", RATE_RU),
+    ("Lower the pricing", RATE_RU),
+    # Urdu script
+    ("دکان کا وقت بدلیں", SHOP_TIME_UR),
+    ("دکان کا وقت تبدیل کریں", SHOP_TIME_UR),
+    ("ٹائمنگ اپڈیٹ کریں", SHOP_TIME_UR),
+    ("قیمتیں بڑھائیں", PRICE_UR),
+    ("ریٹ اپڈیٹ کریں", PRICE_UR),
+    # Arabic
+    ("تغيير وقت المتجر", SHOP_TIME_AR),
+    ("تعديل وقت المتجر", SHOP_TIME_AR),
+    ("تحديث وقت المتجر", SHOP_TIME_AR),
+    ("رفع الأسعار", PRICE_AR),
+    ("تعديل السعر", PRICE_AR),
+    # Hindi
+    ("दुकान का समय बदलें", SHOP_TIME_HI),
+    ("समय अपडेट करें", SHOP_TIME_HI),
+    ("समय एडजस्ट करें", SHOP_TIME_HI),
+    ("कीमतें बढ़ाएं", PRICE_HI),
+    ("रेट अपडेट करें", PRICE_HI),
+]
+
+
+@pytest.mark.parametrize(("option", "limit"), SYNONYM_VIOLATIONS)
+def test_every_way_of_changing_what_cannot_change_is_rejected(option, limit):
+    v = check(option, cannot=[limit])
+    assert v.status == "violates", (option, limit, v)
+
+
+TRIED_VIOLATIONS = [
+    "Try a facebook ad",
+    "Try facebook ad",
+    "Use Facebook advertising",
+    "Run a facebook ad campaign",
+    "Post a Facebook advert",
+    "Start facebook ads again",
+]
+
+
+@pytest.mark.parametrize("option", TRIED_VIOLATIONS)
+def test_a_failed_thing_is_matched_on_its_stems_in_both_directions(option):
+    v = check(option, tried=[("facebook ads", "did not work")])
+    assert v.status == "violates", (option, v)
+    assert (
+        check("Try facebook ads", tried=[("a facebook ad campaign", "failed")]).status == "violates"
+    )
+    assert (
+        check("Use advertising on facebook", tried=[("facebook ad", "no luck")]).status
+        == "violates"
+    )
+
+
+def test_a_different_approach_or_an_unrelated_option_is_not_matched_to_a_failed_thing():
+    tried = [("facebook ads", "did not work")]
+    assert check("Ask customers for referrals", tried=tried).status == "ok"
+    assert check("Instead of facebook ads, ask customers for referrals", tried=tried).status == "ok"
+    assert check("Try a different approach to facebook ads", tried=tried).status == "ok"
+    assert check("Post in neighbourhood groups", tried=tried).status == "ok"
+    # overlap on one of the two words is never a free ok
+    assert check("Post on Facebook groups", tried=tried).status == "unknown"
+
+
+@pytest.mark.parametrize(
+    ("option", "limit"),
+    [
+        ("Print the menu on cards", MENU_EN),
+        ("Photograph the menu for the wall", MENU_EN),
+        ("Laminate the menu", MENU_EN),
+        ("Cook the menu items in bulk", MENU_EN),
+        ("Frame the prices for the wall", PRICE_EN),
+        ("Charge customers a delivery fee on Fridays", PRICE_EN),
+        ("dukan ka waqt dekhein aur likhein", SHOP_TIME_RU),
+        ("dukan ka waqt likh kar lagayein", SHOP_TIME_RU),
+    ],
+)
+def test_naming_the_subject_with_no_verb_the_check_knows_is_unknown_never_ok(option, limit):
+    v = check(option, cannot=[limit])
+    assert v.status == "unknown", (option, limit, v)
+    assert (
+        "no verb it recognises" in v.reason or "not read" in v.reason or "shares only" in v.reason
+    )
+
+
+@pytest.mark.parametrize(
+    ("option", "limit"),
+    [
+        ("Keep the menu and add a daily special card", MENU_EN),
+        ("Measure which menu items sell best", MENU_EN),
+        ("Ask customers which dish they like", MENU_EN),
+        ("Tell customers the prices on WhatsApp", PRICE_EN),
+        ("Check the prices every Monday", PRICE_EN),
+        ("Send the menu to regulars", MENU_EN),
+        ("Use a paper register at the counter", MENU_EN),
+        ("Train staff on the prices", PRICE_EN),
+    ],
+)
+def test_options_that_keep_check_or_tell_the_subject_are_not_blocked(option, limit):
+    assert check(option, cannot=[limit]).status == "ok", (option, limit)
+
+
+def test_the_staff_check_has_a_guard_for_an_option_it_cannot_read():
+    from app.modules.pi.requirements_types import Limit as _Limit
+
+    unreadable = cc._option("کچھ سوچیں")
+    assert unreadable.latin is False
+    v = cc._check_staff(unreadable, _Limit("only 2 staff"))
+    assert v.status == "unknown" and "script" in v.reason
+    assert with_staff("کچھ سوچیں", "only 2 staff").status == "unknown"
+    assert with_staff("کچھ سوچیں", "hiring is frozen").status == "unknown"
+
+
+# ----- keeping a list is not hiring a clerk (journeys: rakhein / رکھیں) -----
+
+
+@pytest.mark.parametrize(
+    "option",
+    [
+        "Fees ki list clerk ke phone par rakhein",
+        "Fees ki list clerk ke phone par rakhna",
+        "Register clerk ke paas rakhein",
+        "Booking sheet receptionist ke desk par rakhein",
+        "Reminder list manager ke phone par rakhein",
+    ],
+)
+def test_keeping_a_list_with_a_person_is_not_hiring_that_person(option):
+    v = with_staff(option, "ek clerk")
+    assert v.status != "violates", (option, v)
+    assert with_staff(option, "only 1 clerk").status != "violates"
+
+
+def test_the_urdu_journey_keeping_a_shared_list_is_not_a_hire():
+    option = "بکنگ کے لیے ایک ہی مشترکہ فہرست رکھیں"
+    limit = "ہم کسی کو بھرتی نہیں کر سکتے"
+    v = check(option, cannot=[limit])
+    assert v.status != "violates", v
+    for other in ["رجسٹر رکھیں", "کیلنڈر رکھیں", "فائل کلرک کے فون پر رکھیں"]:
+        assert check(other, cannot=[limit]).status != "violates", other
+    assert cc.localise_limit(limit)[0] == "we cannot hire anyone"
+
+
+@pytest.mark.parametrize(
+    ("option", "limit"),
+    [
+        ("clerk rakhein", "ek clerk"),
+        ("naya clerk rakh lein", "ek clerk"),
+        ("Hire a clerk", "ek clerk"),
+        ("Fees ki list banayein aur ek aur clerk rakhein", "ek clerk"),
+    ],
+)
+def test_hiring_a_person_still_breaks_a_one_person_team(option, limit):
+    assert with_staff(option, limit).status == "violates", (option, limit)
+
+
+@pytest.mark.parametrize(
+    "option", ["نیا کلرک رکھیں", "नया क्लर्क रखें", "توظيف موظف جديد", "ایک اور اسسٹنٹ رکھیں"]
+)
+def test_hiring_a_person_still_breaks_a_no_hire_limit_in_every_script(option):
+    limits = ["ہم کسی کو بھرتی نہیں کر سکتے", "لا نستطيع توظيف احد", "हम किसी को भर्ती नहीं कर सकते"]
+    assert any(check(option, cannot=[limit]).status == "violates" for limit in limits), option
+    assert check(option, cannot=["we cannot hire anyone"]).status == "violates"
+
+
+def test_a_bare_limit_that_names_only_time_is_a_real_subject_not_a_generic_word():
+    assert check("Change the timing", cannot=["the timing"]).status == "violates"
+    assert check("Change the timing", cannot=["the thing"]).status == "unknown"
+    assert cc.parse_limit("the timing").kind == "object_only"
