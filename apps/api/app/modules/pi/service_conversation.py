@@ -52,6 +52,7 @@ from app.modules.pi import (
     memory_block,
     open_items,
     open_requests,
+    option_wiring,
     owner_asks,
     owner_intents,
     part19,
@@ -61,6 +62,7 @@ from app.modules.pi import (
     reply_gates,
     reply_layout,
     reply_voice,
+    requirements_read,
     safety,
     slot_carry,
     slots,
@@ -1599,6 +1601,13 @@ async def brain_problems(
         )
         if quote is not None:
             context["open_quote"] = quote
+    if conversation.customer_id is not None and context.get("pi_mode") == "brain":
+        # once per turn: what the owner said they cannot do or already tried (L2-1 hard gate input)
+        reqs = await requirements_read.read_requirements(
+            session, scope, conversation_id=conversation.id
+        )
+        if packed := option_wiring.requirements_context(reqs):
+            context["requirements"] = packed
     context.update(matching_the_person(conversation, message, rows or []))
     if away := days_away(message, rows or [], last_chat_at):
         context["days_away"] = away
@@ -2869,13 +2878,25 @@ async def brain_expert_ideas(
     brief = expert_advisor.remember(
         brief, main, advice, int(brief.get("owner_n") or len(owner)) if owner else None
     )
+    wired = None
+    if advice.ideas and context.get("pi_mode") == "brain":
+        # L2-1: drop ideas that break a stated limit (with the reason), label the unchecked ones,
+        # and when nothing is left ask one targeted question instead of padding to the cap
+        reqs_now = option_wiring.requirements_from(context.get("requirements"))
+        wired = option_wiring.gate_ideas(list(advice.ideas), reqs_now, language)
+        if wired.changed:
+            advice.ideas = list(wired.shown)
+            if wired.question:
+                advice.question = wired.question
     if not advice.ideas:
         question = advice.question or (
             idea_filter.need_fact_line(idea_ctx) if idea_ctx is not None else ""
         )
         if not question:
             return False
-        if question == advice.question:
+        if wired is not None and wired.notice and wired.question:
+            question = f"{wired.notice} {question}"
+        elif question == advice.question:
             question = expert_advisor.need_fact_reply(question)
         said_now = str(context.get("latest_customer_message") or "")
         if decisions.cost_asked(said_now):
@@ -2889,8 +2910,9 @@ async def brain_expert_ideas(
         turn._free = True
         conversation.service_brief = brief
         return True
+    notice = f"{wired.notice} " if wired is not None and wired.notice else ""
     turn.reply = with_disclosure(
-        ideas_opener(context) + solution_rules.idea_lines(advice.ideas), context, language
+        notice + ideas_opener(context) + solution_rules.idea_lines(advice.ideas), context, language
     )
     turn._english = True
     turn.awaiting_customer = True
