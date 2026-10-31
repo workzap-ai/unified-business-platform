@@ -84,15 +84,6 @@ def replay(case: dict[str, Any]) -> list[dict[str, Any]]:
         if values.get("cause"):
             record["cause"] = values["cause"]["text"]
             record["cause_status"] = STATUS_OUT.get(values["cause"]["status"], "hypothesis")
-        # the real save logic (problems.ProblemBook.requirement_values) over the owner's own words
-        values, _ = ProblemBook.requirement_values(note, None, None, " ".join(case["messages"]))
-        if values.get("constraints"):
-            record["constraints"] = constraint_list(values["constraints"])
-        if values.get("tried"):
-            record["tried"] = [dict(t) for t in values["tried"]]
-        if values.get("cause"):
-            record["cause"] = values["cause"]["text"]
-            record["cause_status"] = STATUS_OUT.get(values["cause"]["status"], "hypothesis")
         for key in EXTRA_FIELDS:
             if key in extra.get(note.title.lower(), {}):
                 record[key] = extra[note.title.lower()][key]
