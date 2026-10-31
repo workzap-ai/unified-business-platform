@@ -11,6 +11,7 @@ from test_pi_brain_documents import (
     DOCS,
     approved_and_waiting_for_payment,
     roomy_limits,  # noqa: F401  (an autouse fixture the journey tests need)
+    the_offer_is_open,  # noqa: F401  (autouse: holds the offer gate open, as the journey needs)
 )
 from test_pi_brain_problems import adaptive, create, say, workspace
 from test_pi_service_conversations import turn
