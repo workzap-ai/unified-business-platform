@@ -44,7 +44,8 @@ SCALAR_KEYS = ("budget", "staff", "deadline")
 PI_INFERRED = "pi_inferred"
 OWNER_SAID = "owner_said"
 CONFIRMED = "confirmed"
-CAUSE_STATUSES = (PI_INFERRED, OWNER_SAID, CONFIRMED)
+WITHDRAWN = "withdrawn"  # the owner took their cause back: no reader may state it
+CAUSE_STATUSES = (PI_INFERRED, OWNER_SAID, CONFIRMED, WITHDRAWN)
 # Statuses that mean the owner said it (or agreed to it): the only causes a reader may state.
 OWNER_STATUSES = (OWNER_SAID, CONFIRMED)
 
@@ -170,9 +171,29 @@ def _squash(text: Any) -> str:
     return " ".join(str(text or "").casefold().split())
 
 
+ARABIC_LETTER = re.compile(r"[\u0600-\u06FF]")
+_ARABIC_CLITICS = re.compile(r"^(?:[\u0648\u0641])?(?:[\u0628\u0644\u0643])?(?:\u0627\u0644)?")
+
+
+def _arabic_stem(word: str) -> str:
+    """An Arabic word without its attached conjunction, preposition and article (waw, fa, ba, lam,
+    kaf, alif-lam), so a word with "wa" glued to it and the bare word are the same word. At least
+    three letters are always kept."""
+    stem = _ARABIC_CLITICS.sub("", word, count=1)
+    return stem if len(stem) >= 3 else word
+
+
 def _heard(word: str, heard: str) -> bool:
-    """`word` occurs in `heard` as whole words, not inside a longer word."""
-    return bool(word) and re.search(rf"(?<!\w){re.escape(word)}(?!\w)", heard) is not None
+    """`word` occurs in `heard` as whole words, not inside a longer word. An Arabic word also
+    matches the same word with a clitic attached or removed."""
+    if not word:
+        return False
+    if re.search(rf"(?<!\w){re.escape(word)}(?!\w)", heard) is not None:
+        return True
+    if not ARABIC_LETTER.search(word):
+        return False
+    target = _arabic_stem(word)
+    return any(_arabic_stem(t) == target for t in re.findall(r"\w+", heard))
 
 
 def usable_words(words: list[str]) -> list[str]:
@@ -221,6 +242,10 @@ def merge_cause(
     previous = old or {}
     prior_status = previous.get("status")
     prior_text = str(previous.get("text") or "")
+    if prior_status == WITHDRAWN and any(
+        _same(str(h.get("text") or ""), value) for h in previous.get("history") or []
+    ):
+        return None, changed  # a cause the owner took back is not brought back by a later note
     if status == PI_INFERRED and prior_status in OWNER_STATUSES:
         return None, changed  # a guess does not touch what the owner said
     if previous and _same(prior_text, value):
@@ -230,11 +255,14 @@ def merge_cause(
     if previous and _same(prior_text, value):
         msgs = [*previous.get("evidence", {}).get("msgs", []), *msgs]
         evidence_words = [*previous.get("evidence", {}).get("words", []), *evidence_words]
-    evidence: dict[str, list[str]] = {
+    evidence: dict[str, Any] = {
         "msgs": list(dict.fromkeys(msgs))[-EVIDENCE_WORDS:],
         "words": list(dict.fromkeys(evidence_words))[:EVIDENCE_WORDS],
     }
-    return {"text": value, "status": status, "evidence": evidence}, changed
+    result: dict[str, Any] = {"text": value, "status": status, "evidence": evidence}
+    if previous.get("history"):
+        result["history"] = previous["history"]  # a withdrawn cause stays on record
+    return result, changed
 
 
 def confirmed_cause(cause: dict[str, Any] | None) -> dict[str, Any] | None:
@@ -252,3 +280,45 @@ def stated_cause(cause: dict[str, Any] | None) -> str:
     if not cause or cause.get("status") not in OWNER_STATUSES:
         return ""
     return str(cause.get("text") or "")
+
+
+# The owner takes their cause back. Phrases, not a model's say-so: the code reads the owner's own
+# latest message. English, Roman Urdu, Urdu, Arabic, Hindi.
+WITHDRAWAL = re.compile(
+    r"\b(?:i take (?:that|it) back|take that back|i was wrong about (?:the|that) (?:cause|reason)|"
+    r"that (?:was not|wasn'?t|is not|isn'?t) (?:the|really the) (?:cause|reason)|"
+    r"not the (?:real )?(?:cause|reason) after all|"
+    r"maine (?:galat|ghalat) kaha|(?:wo|woh|yeh|ye) wajah nahi (?:thi|hai)|"
+    r"(?:wo|woh|yeh|ye) (?:sabab|wajah|reason) (?:sahi )?nahi (?:thi|hai))\b"
+    r"|(?:یہ|وہ)\s+وجہ\s+نہیں\s+(?:تھی|ہے)|میں\s+نے\s+غلط\s+کہا"
+    r"|ليس\s+هذا\s+(?:هو\s+)?السبب|لم\s+يكن\s+هذا\s+(?:هو\s+)?السبب|قلت\s+(?:ذلك\s+)?(?:خطأ|غلط)"
+    r"|(?:यह|ये|वो|वह)\s+वजह\s+नहीं\s+(?:थी|है)|मैंने\s+गलत\s+कहा",
+    re.IGNORECASE,
+)
+
+
+def withdrawal_said(text: str | None) -> bool:
+    """True when the owner's message takes back the cause they gave ("I take that back", "maine
+    galat kaha", "wo wajah nahi thi", Urdu, Arabic and Hindi forms)."""
+    return bool(text) and WITHDRAWAL.search(" ".join(str(text).casefold().split())) is not None
+
+
+def withdraw_cause(old: dict[str, Any] | None, msg: str | None, when: str) -> dict[str, Any] | None:
+    """The cause after the owner took it back, or None when there is no owner cause to take back.
+    The text is cleared and the status is `withdrawn`; the earlier cause (text, status, evidence,
+    the message that withdrew it, when) goes to `history`. Nothing is deleted."""
+    if not old or old.get("status") not in OWNER_STATUSES:
+        return None
+    entry: dict[str, Any] = {
+        "text": old.get("text", ""),
+        "status": old.get("status"),
+        "evidence": old.get("evidence") or {},
+        "withdrawn_msg": msg or "",
+        "withdrawn_at": when,
+    }
+    return {
+        "text": "",
+        "status": WITHDRAWN,
+        "evidence": {"msgs": [], "words": []},
+        "history": [*(old.get("history") or []), entry],
+    }

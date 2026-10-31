@@ -59,6 +59,7 @@ from app.modules.pi import (
     part19,
     price_policy,
     problem_extract,
+    problem_fields,
     problems,
     reply_gates,
     reply_layout,
@@ -3798,6 +3799,12 @@ async def note_problems(
     """Save the turn's problem ops (brain mode) and move the conversation's state. `box_on`: the
     Solution Box offer is on, so a problem the owner raised unasked is marked (B5)."""
     noted = False
+    if conversation.customer_id is not None and problem_fields.withdrawal_said(message.body):
+        # The owner took their cause back: clear it (kept in history) before this turn's
+        # notes are applied, so a new cause in the same message starts fresh.
+        await problems.ProblemBook(
+            session, scope, conversation.customer_id, turn.language
+        ).withdraw_owner_cause(message.id)
     fix = await figure_fix_for(session, scope, conversation, message)
     if (turn.problem_ops or fix) and conversation.customer_id is not None:
         applied = await problems.apply_ops(

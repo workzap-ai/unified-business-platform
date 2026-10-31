@@ -1872,3 +1872,55 @@ def test_emptying_the_vague_list_changes_a_verdict(monkeypatch) -> None:
         assert relevance.score_candidate(b, idea)["verdict"] != "unknown"
     finally:
         relevance_match._rules_cached.cache_clear()
+
+
+# --- Level 1 follow-ups (a31d57dd): failure cues in four languages
+
+
+@pytest.mark.parametrize(
+    "text",
+    [
+        "rang wale folder try kiye lekin mix ho gaye",
+        "rang wale folder pehle istemal kiye, kaam nahi aaya",
+        "rang wale folder aazmaye, fayda nahi hua",
+    ],
+)
+def test_a_roman_urdu_failed_attempt_is_read_as_tried_and_failed(text) -> None:
+    c = [limit(text, kind="cannot_change")]
+    again = relevance.score_candidate(
+        brief(c), "Rang wale folder istemal karo", language="roman_ur"
+    )
+    other = relevance.score_candidate(brief(c), "Grahak ko call karo", language="roman_ur")
+    assert again["verdict"] == "violates_constraint"
+    assert other["verdict"] != "violates_constraint"
+
+
+@pytest.mark.parametrize(
+    "text",
+    ["ghalat nikla", "bekaar raha", "mix ho gaye", "kaam nahi aaya", "fayda nahi hua"],
+)
+def test_failure_cues_are_found_in_roman_urdu(text) -> None:
+    strong = relevance_match._FAIL_STRONG.search(text)
+    weak = relevance_match._FAIL_WEAK.search(text)
+    assert strong or weak
+
+
+@pytest.mark.parametrize(
+    "text",
+    [
+        "ناکام رہا",
+        "کوئی فائدہ نہیں",
+        "لم ينجح",
+        "لم يفد",
+        "काम नहीं आया",
+        "ناکام",
+    ],
+)
+def test_failure_cues_are_found_in_urdu_arabic_and_hindi(text) -> None:
+    assert relevance_match._FAIL_STRONG.search(text)
+
+
+def test_a_plain_statement_without_failure_is_not_a_failed_attempt() -> None:
+    for text in ("kaam bohat hai", "folder rakhe hain", "the colour folders are on the shelf"):
+        assert not relevance_match._FAIL_STRONG.search(text)
+        assert not relevance_match._FAIL_WEAK.search(text)
