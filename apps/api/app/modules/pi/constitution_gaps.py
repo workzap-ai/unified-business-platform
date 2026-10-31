@@ -268,27 +268,41 @@ CONFUSED = _rx(
     r"what\s+do\s+you\s+mean|don'?t\s+understand|do\s+not\s+understand|not\s+sure\s+what\s+you|\bhuh\b|\bpardon\b|come\s+again|say\s+that\s+again|\brepeat\b"
     r"|samajh\s+nahi|\bmatlab\b|dobara|phir\s+se\s+bol|سمجھ\s+نہیں|مطلب|دوبارہ|ماذا\s+تعني|لم\s+أفهم|لا\s+أفهم|समझ\s+नहीं|मतलब|दोबारा"
 )
-SHORT_ANSWER_WORDS = 3
+
+
+def _shape(question: str) -> str:
+    """count ("how many"), choice ("A, or B?"), yes_no or open: a follow-up of another shape is not a re-ask."""
+    if _count_noun(question):
+        return "count"
+    if CHOICE.search(question):
+        return "choice"
+    if _asked_yes_no(question):
+        return "yes_no"
+    return "open"
 
 
 def _reasks_a_skipped_question(reply: str, context: dict[str, Any]) -> list[Finding]:
     latest = _latest(context)
-    mine = [_stems(s) for s in _sentences(reply) if _is_question(s)]
-    questions = [_last_question(t) for t in _pi_texts(context)[-2:]]
-    asked = [_stems(q) for q in questions if q]
+    if IDENTITY_ANSWER.search(reply):
+        return []  # an identity answer ("I'm an AI") may repeat the opening question: never retry it
+    asked_before = [_last_question(t) for t in _pi_texts(context)[1:][-2:]]  # not the opening turn
+    asked_before = [q for q in asked_before if q]
+    mine = [(_shape(s), _stems(s)) for s in _sentences(reply) if _is_question(s)]
+    asked = [(_shape(q), _stems(q)) for q in asked_before]
     if not latest or not mine or not asked:
         return []
-    skipped = bool(SKIPS.search(latest))
-    if not skipped:
-        if (
-            CONFUSED.search(latest)
-            or _is_question(latest)
-            or len(_tokens(latest)) <= SHORT_ANSWER_WORDS
-        ):
-            return []  # a clarification, or a short answer to it
-    threshold = 0.5 if skipped else 0.75
-    for new in mine:
-        for old in asked:
+    # Only an explicit skip ("skip", "pata nahi", "I don't know") counts. Guessing that a question was
+    # "ignored" proved noisy in the audit, and a second customer message in a row answers it already.
+    history = _history(context)
+    if not SKIPS.search(latest) or CONFUSED.search(latest):
+        return []
+    if history and history[-1].get("role") == "customer":
+        return []
+    threshold = 0.5
+    for new_shape, new in mine:
+        for old_shape, old in asked:
+            if new_shape != old_shape:
+                continue  # a narrower or differently shaped follow-up is a new question
             if len(new) >= 3 and len(old) >= 3 and _overlap(new, old) >= threshold:
                 return [
                     (
@@ -326,9 +340,6 @@ NEXT_STEP = _rx(
 )
 
 
-LATE_LIMIT = 2  # the index of the sentence from which a limit counts as buried
-
-
 def _refusals(reply: str) -> list[int]:
     return [
         i
@@ -343,17 +354,8 @@ def _limits(reply: str) -> list[Finding]:
     refused = _refusals(reply)
     if not refused:
         return found
-    # The limit may be the first sentence, follow a pleasantry or a scope sentence ("Thank you. I can't
-    # confirm payment myself."): only a limit buried after two or more other statements is sent back.
-    if refused[0] >= LATE_LIMIT and not any(_is_question(x) for x in sentences[: refused[0]]):
-        found.append(
-            (
-                "R-CANT-01",
-                'when you cannot help, say so plainly in the first sentence ("I can\'t do that."), '
-                "before anything else",
-                False,
-            )
-        )
+    # R-CANT-01 (the limit in the first sentence) is not checked: the audit found the check noisy
+    # (emergency and scope replies) and blind to real buried limits. It stays in the prompt.
     rest = REFUSAL.sub(" ", reply)
     if (
         not any(_is_question(s) for s in sentences)
@@ -565,6 +567,7 @@ ADVICE_DOMAINS: tuple[tuple[re.Pattern[str], re.Pattern[str]], ...] = (
     # agronomy: a chemical named next to the verb that applies it ("apply urea twice")
     (
         _rx(
+            r"(?=.*\b(?:soil|crops?|fields?|plants?|seeds?|feed|tank|acres?|hectares?|sowing|wheat|rice|cotton|maize|sugarcane|orchard|irrigation|dose|litres?|liters?)\b)"
             r"\b(?:apply|spray|mix|dose)\s+(?:\w+\s+){0,3}(?:urea|dap|npk|fertili[sz]ers?|pesticides?|insecticides?|herbicides?|fungicides?)\b"
         ),
         _directive(r"apply|spray|mix|dose"),
@@ -645,7 +648,7 @@ def _regulated_advice(reply: str, context: dict[str, Any]) -> list[Finding]:
                         "R-SOL-09",
                         f'no legal, tax, medical, financial, veterinary or agronomy advice ("{m.group(0)}"): '
                         "keep ideas operational",
-                        True,
+                        False,
                     )
                 ]
     return []
@@ -768,6 +771,8 @@ NOTED_LINE = _rx(
     + langs.NOTED_FRAME
     + r")\s*[:：]\s*([^.?!\n۔؟।]+)"
 )
+# "Here is what I have noted: ..." is a recap, not a second noted line
+RECAP = _rx(r"what\s+i(?:'ve|\s+have)\s+noted\b")
 CORRECTING = _rx(
     r"\bi\s+meant\b|\bactually\b|\bcorrect(?:ion)?\b|\bgalat\b|mera\s+matlab|أقصد|मेरा\s+मतलब"
 )
@@ -776,13 +781,15 @@ CORRECTING = _rx(
 def _noted_twice(reply: str, context: dict[str, Any]) -> list[Finding]:
     if context.get("said_wrong") or CORRECTING.search(_latest(context)):
         return []
-    mine = [_stems(t) for t in NOTED_LINE.findall(reply)]
+    mine = [_stems(t) for t in NOTED_LINE.findall(RECAP.sub(" ", reply))]
     if not mine:
         return []
     before = [_stems(t) for text in _pi_texts(context) for t in NOTED_LINE.findall(text)]
     for new in mine:
         for old in before:
-            if len(new) >= 2 and len(old) >= 2 and _overlap(new, old) >= 0.6:
+            # a repeat adds no new fact: a refinement ("the Gulberg branch running out") or another
+            # problem has words the earlier line did not
+            if len(new) >= 2 and len(old) >= 2 and new <= old:
                 return [
                     (
                         "R-ECHO-01",
@@ -859,13 +866,23 @@ def _count_noun(question: str) -> str:
     return ""
 
 
+OWNING = frozenset(
+    unicodedata.normalize("NFC", w)
+    for w in (
+        "have has own run operate our my hamari hamare mere meri apni "
+        "ہماری ہمارے میری میرے ہمارا عندنا لدينا عندي لدي عندك हमारी हमारे मेरी मेरे हमारा"
+    ).split()
+)
+
+
 def _has_number_next_to(noun: str, said: list[str]) -> bool:
     for i, w in enumerate(said):
         if not _same(w, noun):
             continue
         near = said[max(0, i - 2) : i] + said[i + 1 : i + 2]
-        if any(x.isdigit() or x in NUMBER_WORDS for x in near):
-            return True
+        wide = said[max(0, i - 4) : i + 3]
+        if any(x.isdigit() or x in NUMBER_WORDS for x in near) and any(x in OWNING for x in wide):
+            return True  # a total they own ("we have 4 shops"), not how many are affected ("in two shops")
     return False
 
 
