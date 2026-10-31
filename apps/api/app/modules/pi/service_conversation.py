@@ -950,6 +950,11 @@ problem: ask what it would fix and note that; keep the wish in requested_solutio
   category from the list below, subtype (snake_case), where, of_total, frequency, since_text,
   impact_types, severity_stated (only if they said it), workaround, systems, believes_cause
   (what they think the cause is: never a judgement about a named person), confidence 0 to 1.
+  Only when the owner STATED them (never invent, unknown stays empty): budget, staff, deadline,
+  cannot_change (a list of things they said they cannot change), tried (a list of {what, outcome}
+  they already tried), cause_text with cause_said=true and cause_words (their own words, verbatim,
+  that say the cause) only when they said the cause themselves, expected_outcome (what they hope
+  to see). A cause you worked out yourself is never cause_said.
 - One message with several problems with different symptoms: one create each. One symptom with
   several facets (stock out in shop B and D) is one problem. "Kabhi A, kabhi B" or "A, aur B bhi"
   names two things going wrong: two creates. What the owner feels as the result (orders arrive

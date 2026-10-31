@@ -150,3 +150,40 @@ async def test_owner_text_is_the_owners_earlier_and_latest_words_only(
         ["mera competitor sasta hai", "bikri kam ho gayi hai"]
     )
     await pi.close()
+
+
+async def test_the_extractor_fields_are_saved_by_apply_ops(api, business_db, monkeypatch):
+    db = business_db
+    await at_0053(db)
+    w = await two_chats(api, db, monkeypatch)
+    note = ProblemNote(
+        title="Sales are down",
+        category="sales_leads",
+        budget="50,000 rupees",
+        cannot_change=["close the second shop"],
+        tried=[{"what": "Facebook ads", "outcome": "brought nobody"}],
+        cause_text="the competitor is cheaper",
+        cause_said=True,
+        cause_words=["competitor", "cheaper"],
+        expected_outcome="back to last year",
+    )
+    await apply_ops(
+        db,
+        w.scope_a,
+        w.cust_a,
+        w.conv_a.id,
+        None,
+        [ProblemOp(op="create", note=note)],
+        "en",
+        owner_text="the competitor is cheaper and sales fell",
+    )
+    (row,) = await problems.noted_context(db, w.scope_a, w.cust_a)
+    assert row["cause_status"] == "owner_said"
+    stored = (await db.scalars(select(PiProblem).where(PiProblem.customer_id == w.cust_a))).one()
+    await db.refresh(stored, ["constraints", "tried", "expected_outcome"])
+    assert stored.constraints["budget"]["text"] == "50,000 rupees"
+    assert stored.constraints["cannot_change"][0]["text"] == "close the second shop"
+    assert stored.tried[0]["what"] == "Facebook ads"
+    assert stored.expected_outcome == "back to last year"
+    await w.a.close()
+    await w.b.close()
