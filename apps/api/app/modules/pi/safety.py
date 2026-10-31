@@ -771,16 +771,21 @@ def emergency(text: str) -> Emergency | None:
     # "Heart Attack Grill" is a restaurant name, not an emergency: take the name out and look at the rest.
     said = _BRAND_NAMES.sub(" ", said)
     said = _TRADE_NOUNS_AR.sub(" ", said)
+    from app.modules.pi import safety_lexicon
+
     for kind, pattern in EMERGENCY_PATTERNS:
         if pattern.search(said):
+            # a novel, script, poster or campaign about it, naming nobody: not an emergency
+            if kind is not Emergency.FIRE and safety_lexicon.media_only(
+                said, trade=kind is not Emergency.SELF_HARM
+            ):
+                return None
             return kind
     found = _roman_fire(said)
     if found is not None:
         return found
     # Second layer: the structured, high-recall lexicon. It runs only when the patterns above say
     # nothing, so it can only add a detection (quoted, forwarded and unsure messages fire).
-    from app.modules.pi import safety_lexicon
-
     name = safety_lexicon.detect(said)
     return Emergency[name] if name else None
 
