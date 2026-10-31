@@ -38,7 +38,7 @@ T: dict[str, dict[str, str]] = {
         "generic": "I left out one idea that would fit any business.",
         "repeat": 'I left out one idea, because you already tried: "{words}".',
         "left_out": 'I left out one idea, because you said: "{words}".',
-        "start": "I would start with the first idea below: it does not break anything you told me.",
+        "start": "As far as I understood what you told me, nothing in the first idea clashes with it; please tell me if I missed a limit.",
         "unknown": "The ideas marked as not yet checked are not yet compared with everything you told me.",
         "q_budget": "What is the most you can spend on this, in one figure?",
         "q_cannot_change": "Which part of how you work could you change?",
@@ -53,7 +53,7 @@ T: dict[str, dict[str, str]] = {
         "generic": "Maine ek idea chhor diya jo har karobar par lagu ho jata hai.",
         "repeat": 'Maine ek idea chhor diya, kyunki aap pehle hi aazma chuke hain: "{words}".',
         "left_out": 'Maine ek idea chhor diya, kyunki aap ne kaha: "{words}".',
-        "start": "Neeche pehle idea se shuru karna theek rahega: ismein aap ki batayi hui koi baat nahi tootti.",
+        "start": "Jitna aap ki baat se samajh aaya, pehle idea mein kuch bhi us se nahi takraata; agar koi hadd reh gayi ho to bata dijiye.",
         "unknown": "Jin ideas par abhi check nahi hua likha hai, unhein aap ki saari baton se abhi nahi milaya gaya.",
         "q_budget": "Is par aap zyada se zyada kitna kharch kar sakte hain, ek raqam mein?",
         "q_cannot_change": "Aap apne kaam ka kaun sa hissa badal sakte hain?",
@@ -68,7 +68,7 @@ T: dict[str, dict[str, str]] = {
         "generic": "میں نے ایک خیال چھوڑ دیا جو ہر کاروبار پر لگ جاتا ہے۔",
         "repeat": 'میں نے ایک خیال چھوڑ دیا، کیونکہ آپ پہلے ہی آزما چکے ہیں: "{words}"۔',
         "left_out": 'میں نے ایک خیال چھوڑ دیا، کیونکہ آپ نے کہا: "{words}"۔',
-        "start": "نیچے پہلے خیال سے آغاز بہتر رہے گا: اس سے آپ کی بتائی ہوئی کوئی بات نہیں ٹوٹتی۔",
+        "start": "جتنا آپ کی بات سے سمجھ آیا، پہلے خیال میں کوئی چیز اس سے نہیں ٹکراتی؛ اگر کوئی حد رہ گئی ہو تو بتا دیجیے۔",
         "unknown": "جن خیالات پر ابھی جانچ نہیں ہوئی لکھا ہے، انہیں آپ کی تمام باتوں کے ساتھ ابھی نہیں ملایا گیا۔",
         "q_budget": "اس پر آپ زیادہ سے زیادہ کتنا خرچ کر سکتے ہیں، ایک رقم میں؟",
         "q_cannot_change": "آپ اپنے کام کا کون سا حصہ بدل سکتے ہیں؟",
@@ -83,7 +83,7 @@ T: dict[str, dict[str, str]] = {
         "generic": "تركت فكرة عامة تناسب أي عمل.",
         "repeat": 'تركت فكرة لأنك جرّبتها من قبل: "{words}".',
         "left_out": 'تركت فكرة واحدة لأنك قلت: "{words}".',
-        "start": "الأفضل البدء بالفكرة الأولى أدناه: فهي لا تخالف شيئاً ذكرته.",
+        "start": "بحسب ما فهمته مما قلته، لا شيء في الفكرة الأولى يتعارض معه؛ أخبرني إن فاتتني أي حدود.",
         "unknown": "الأفكار المكتوب عليها لم يُفحص بعد لم تُقارن بعد بكل ما قلته.",
         "q_budget": "ما أكثر مبلغ يمكنك إنفاقه على هذا، برقم واحد؟",
         "q_cannot_change": "ما الجزء من طريقة عملك الذي يمكنك تغييره؟",
@@ -259,12 +259,12 @@ def voice(
         block.append(tb["off_topic"])
     if any(v.kind is K.GENERIC for v in verdicts.values()):
         block.append(tb["generic"])
-    sure = [
+    no_rule_broken = [  # the gate recognised no rule that is broken: not a guarantee
         i
         for i in kept_ids
         if i not in unknown_at and verdicts[i].constraint_status == "ok" and not reqs.empty
     ]
-    if sure:
+    if no_rule_broken:
         block.append(tb["start"])
     if unknown_at:
         block.append(tb["unknown"])
@@ -280,7 +280,7 @@ def voice(
             )
             key = BLOCKING[rules.most_common(1)[0][0]] if rules else "q_default"
             question = tb[key]
-        elif not sure:
+        elif not no_rule_broken:
             texts = [t.rstrip(". ") for i, t in found if i in unknown_at]
             # PS-5: the one question that would settle the most unknown options, in the owner's
             # language; the gate re-checks only the affected options after the answer
@@ -326,5 +326,5 @@ def voice(
         unmarked,
         len(violated) + sum(v.kind in DROPPED[1:] for v in verdicts.values()),
         len(unknown_at),
-        len(sure),
+        len(no_rule_broken),
     )

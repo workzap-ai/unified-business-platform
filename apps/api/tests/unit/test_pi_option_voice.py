@@ -213,3 +213,39 @@ def test_an_uncertain_language_asks_the_language_question_first():
         language_certain=False,
     )
     assert r.pending and r.pending["key"] == "language_clarify"
+
+
+GUARANTEE = re.compile(
+    r"does not break anything|doesn't break anything|guarantee|safe for sure|for sure|\bsure\b|"
+    r"100 ?%|nahi tootti|koi baat nahi tootti|pakka|yaqeen|zaroor|"
+    r"نہیں ٹوٹتی|یقین|ضرور|پکا|لا تخالف شيئا|لا تخالف شيئاً|بالتأكيد|مضمون|ضمان|"
+    r"नहीं टूटती|पक्का|गारंटी",
+    re.IGNORECASE,
+)
+
+
+def test_no_owner_facing_text_claims_a_guarantee_for_a_gate_ok_idea():
+    from app.modules.pi import graph_voice
+
+    for tables in (ov.T, graph_voice.T):
+        for lang, table in tables.items():
+            for key, text in table.items():
+                assert not GUARANTEE.search(text), (lang, key, text)
+    for lang in ("en", "roman_ur", "ur", "ar"):
+        start = ov.T[lang]["start"]
+        assert not re.search(
+            r"[?\u061f]", start
+        )  # a hedge, never a question: the one question stays last
+        assert not re.search(r"\b(?:price|offer|quote)\b", start, re.I)
+    assert (
+        "missed a limit" in ov.T["en"]["start"]
+    )  # as far as I understood, tell me if I missed one
+
+
+def test_an_ok_idea_ranks_first_only_when_linked_and_not_a_repeat_of_what_failed():
+    unlinked = "Repaint the shop signboard in a brighter colour."
+    reply = f"{BUL}{UNLINKED}\n{BUL}{LINKED}"
+    r = ov.voice(reply, COURIER, "en", PROBLEMS)
+    kept = [x for x in r.reply.splitlines() if x.startswith(BUL)]
+    assert kept and kept[0].endswith(LINKED) and unlinked not in r.reply
+    assert [i["relevance"] for i in r.items][0] == "LINKED"
