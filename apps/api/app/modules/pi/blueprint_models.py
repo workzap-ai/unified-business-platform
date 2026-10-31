@@ -14,6 +14,9 @@ wired into the conversation or the document yet.
                  `problem_fields`: constraints, tried, cause), read into one typed view
 
 The cost of an option always comes from staff: `Cost.amount` is None in every record pi writes.
+
+Records are built from stored JSON, so every reader here tolerates the wrong type (None, a string
+where a list belongs): it reads as empty and the rules report it as MALFORMED, it never raises.
 """
 
 from __future__ import annotations
@@ -38,12 +41,35 @@ EVIDENCE_CAP = 3  # evidence strength is a small count, never a score to game
 COST_SOURCE = "staff"
 
 
+def seq(value: Any) -> tuple[Any, ...]:
+    """The items of a list, tuple or set. Anything else (None, a string, a number) is empty."""
+    if isinstance(value, tuple | list | set | frozenset):
+        return tuple(value)
+    return ()
+
+
+def text_of(value: Any) -> str:
+    """A string as it is; anything else is empty."""
+    return value if isinstance(value, str) else ""
+
+
 @dataclass(frozen=True)
 class Evidence:
-    """Where the owner said it: a message id and the owner's own words from it."""
+    """Where the owner said it: a message id and the owner's own words from it. `role` must be
+    "owner". `verified` is set only by `blueprint_rules.verify_option`, after the words were found
+    in that owner message; only a verified reference counts toward an option's strength."""
 
     msg: str
     words: tuple[str, ...] = ()
+    role: str = "owner"
+    verified: bool = False
+
+    @property
+    def claimed(self) -> bool:
+        """The ref names a message and carries at least one word. Whether the words are really in
+        that owner message is checked by `blueprint_rules`, never here."""
+        words = [w for w in seq(self.words) if isinstance(w, str) and w.strip()]
+        return bool(text_of(self.msg).strip()) and bool(words)
 
 
 @dataclass(frozen=True)
@@ -111,22 +137,32 @@ class Option:
 
     @property
     def blocking_dependencies(self) -> tuple[Dependency, ...]:
-        return tuple(d for d in self.dependencies if d.blocking)
+        return tuple(d for d in seq(self.dependencies) if getattr(d, "blocking", False) is True)
 
     @property
     def violated(self) -> tuple[ConstraintCheck, ...]:
-        return tuple(c for c in self.constraint_checks if c.result == "violates")
+        return tuple(
+            c for c in seq(self.constraint_checks) if getattr(c, "result", "") == "violates"
+        )
 
     @property
     def unknown_checks(self) -> tuple[ConstraintCheck, ...]:
-        return tuple(c for c in self.constraint_checks if c.result == "unknown")
+        return tuple(
+            c for c in seq(self.constraint_checks) if getattr(c, "result", "") == "unknown"
+        )
 
     @property
     def evidence_strength(self) -> int:
-        """How many distinct owner messages back this option: refs that carry words, plus reused
-        facts, each message once, capped at EVIDENCE_CAP. A ref with no words proves nothing."""
-        said = {e.msg for e in self.evidence if e.words}
-        return min(len(said | set(self.fit.facts_reused)), EVIDENCE_CAP)
+        """How many distinct owner messages back this option: VERIFIED owner references that name a
+        message and carry words, each message once, capped at EVIDENCE_CAP. A reference that is not
+        verified, has no message id or no words, or is not the owner's proves nothing. Reused facts
+        add nothing by themselves: they are only ids."""
+        said = {
+            e.msg
+            for e in seq(self.evidence)
+            if isinstance(e, Evidence) and e.claimed and e.verified is True and e.role == "owner"
+        }
+        return min(len(said), EVIDENCE_CAP)
 
     def to_dict(self) -> dict[str, Any]:
         data: dict[str, Any] = _plain(asdict(self))
@@ -136,13 +172,15 @@ class Option:
 @dataclass(frozen=True)
 class OptionSet:
     """The options compared for one offer. `single_option` is the honest flag for "the evidence
-    supports only one"; `none_reason` is the honest reason when no option fits."""
+    supports only one"; `none_reason` is the honest reason when no option fits;
+    `no_recommendation_reason` is why nothing is recommended although an option could be."""
 
     options: tuple[Option, ...]
     recommended_id: str | None = None
     single_option: bool = False
     single_reason: str = ""
     none_reason: str = ""
+    no_recommendation_reason: str = ""
 
 
 @dataclass(frozen=True)
@@ -161,18 +199,22 @@ class RootCause:
         return self.status in OWNER_STATUSES
 
     @classmethod
-    def from_b2a(cls, stored: dict[str, Any] | None) -> RootCause | None:
-        """Read the stored `problem.cause` ({"text", "status", "evidence": {"msgs", "words"}})."""
-        if not stored or not str(stored.get("text") or "").strip():
+    def from_b2a(cls, stored: Any) -> RootCause | None:
+        """Read the stored `problem.cause` ({"text", "status", "evidence": {"msgs", "words"}}).
+        A stored owner status with no evidence is not trusted: it reads as pi_inferred."""
+        if not isinstance(stored, dict) or not str(stored.get("text") or "").strip():
             return None
-        status = str(stored.get("status") or "")
+        proof = stored.get("evidence")
+        proof = proof if isinstance(proof, dict) else {}
+        words = tuple(str(w) for w in seq(proof.get("words")) if isinstance(w, str))
+        msgs = [str(m) for m in seq(proof.get("msgs")) if isinstance(m, str)]
+        refs = tuple(Evidence(m, words) for m in msgs) or ((Evidence("", words),) if words else ())
+        status = stored.get("status")
         if status not in CAUSE_STATUSES:
             status = pf.PI_INFERRED  # an unknown status is never trusted
-        proof = stored.get("evidence") or {}
-        words = tuple(str(w) for w in proof.get("words") or [])
-        msgs = [str(m) for m in proof.get("msgs") or []]
-        refs = tuple(Evidence(m, words) for m in msgs) or ((Evidence("", words),) if words else ())
-        return cls(text=str(stored["text"]).strip(), status=status, evidence_for=refs)
+        if status in OWNER_STATUSES and not any(r.words for r in refs):
+            status = pf.PI_INFERRED  # an owner status needs the owner's words stored with it
+        return cls(text=str(stored["text"]).strip(), status=str(status), evidence_for=refs)
 
 
 @dataclass(frozen=True)
@@ -194,29 +236,28 @@ class ConstraintsView:
     cause: RootCause | None = None
 
     @classmethod
-    def from_b2a(
-        cls,
-        constraints: dict[str, Any] | None,
-        tried: list[dict[str, Any]] | None,
-        cause: dict[str, Any] | None,
-    ) -> ConstraintsView:
-        said = constraints or {}
+    def from_b2a(cls, constraints: Any, tried: Any, cause: Any) -> ConstraintsView:
+        said = constraints if isinstance(constraints, dict) else {}
 
-        def scalar(key: str) -> str:
-            return str((said.get(key) or {}).get("text") or "").strip()
+        def entry(value: Any) -> str:
+            """An entry is {"text": ...}; a bare string is read as its own text."""
+            if isinstance(value, dict):
+                return text_of(value.get("text")).strip()
+            return text_of(value).strip()
 
+        def tried_entry(value: Any) -> Tried | None:
+            if not isinstance(value, dict):
+                return None
+            what = text_of(value.get("what")).strip()
+            return Tried(what, text_of(value.get("outcome")).strip()) if what else None
+
+        tried_all = (tried_entry(e) for e in seq(tried))
         return cls(
-            budget=scalar("budget"),
-            staff=scalar("staff"),
-            deadline=scalar("deadline"),
-            cannot_change=tuple(
-                str(e.get("text")).strip() for e in said.get("cannot_change") or [] if e.get("text")
-            ),
-            tried=tuple(
-                Tried(str(e["what"]).strip(), str(e.get("outcome") or "").strip())
-                for e in tried or []
-                if e.get("what")
-            ),
+            budget=entry(said.get("budget")),
+            staff=entry(said.get("staff")),
+            deadline=entry(said.get("deadline")),
+            cannot_change=tuple(t for t in (entry(e) for e in seq(said.get("cannot_change"))) if t),
+            tried=tuple(t for t in tried_all if t is not None),
             cause=RootCause.from_b2a(cause),
         )
 

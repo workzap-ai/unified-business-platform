@@ -67,19 +67,75 @@ def test_derived_properties_come_from_the_record_not_from_a_score():
             bm.ConstraintCheck("staff", "unknown", "cannot parse"),
             bm.ConstraintCheck("cannot_change#1", "violates", "touches the till"),
         ),
-        evidence=(bm.Evidence("m1", ("count",)), bm.Evidence("m2", ()), bm.Evidence("m3", ("x",))),
-        fit=bm.Fit(facts_reused=("m1", "m1", "m4")),
     )
     assert [d.text for d in option.blocking_dependencies] == ["last year's sheet"]
     assert [c.constraint for c in option.violated] == ["cannot_change#1"]
     assert [c.constraint for c in option.unknown_checks] == ["staff"]
-    # an evidence ref with no words proves nothing; reused facts count once each
-    assert option.evidence_strength == 3
+
+
+def verified(msg, words=(), **over):
+    return bm.Evidence(msg, tuple(words), verified=True, **over)
+
+
+def test_a_ref_with_no_words_counts_for_nothing():
+    refs = (verified("m1", ("count",)), verified("m2"))
+    assert make_option(evidence=refs).evidence_strength == 1
+    assert make_option(evidence=(verified("m2"),)).evidence_strength == 0
+
+
+def test_a_ref_with_no_message_id_counts_for_nothing():
+    assert make_option(evidence=(verified("", ("count",)),)).evidence_strength == 0
+    assert make_option(evidence=(verified("  ", ("count",)),)).evidence_strength == 0
+
+
+def test_only_a_verified_owner_ref_counts():
+    unverified = bm.Evidence("m1", ("count",))
+    assert make_option(evidence=(unverified,)).evidence_strength == 0
+    assert make_option(evidence=(verified("m1", ("count",)),)).evidence_strength == 1
+    assistant = verified("m1", ("count",), role="assistant")
+    assert make_option(evidence=(assistant,)).evidence_strength == 0
+
+
+def test_each_message_counts_once_and_reused_facts_add_nothing():
+    refs = (verified("m1", ("count",)), verified("m1", ("stock",)))
+    assert make_option(evidence=refs).evidence_strength == 1
+    reused = make_option(evidence=refs, fit=bm.Fit(facts_reused=("m1", "m1", "m2")))
+    assert reused.evidence_strength == 1
+    assert make_option(fit=bm.Fit(facts_reused=("m1",))).evidence_strength == 0
 
 
 def test_evidence_strength_is_capped():
-    refs = tuple(bm.Evidence(f"m{i}", ("word",)) for i in range(9))
+    refs = tuple(verified(f"m{i}", ("word",)) for i in range(9))
     assert make_option(evidence=refs).evidence_strength == bm.EVIDENCE_CAP
+
+
+def test_a_stored_owner_cause_without_evidence_reads_as_pi_inferred():
+    bare = {"text": "no owner", "status": "owner_said", "evidence": {"msgs": [], "words": []}}
+    assert bm.RootCause.from_b2a(bare).status == "pi_inferred"
+    proven = {
+        "text": "no owner",
+        "status": "owner_said",
+        "evidence": {"msgs": ["m1"], "words": ["owner"]},
+    }
+    assert bm.RootCause.from_b2a(proven).status == "owner_said"
+    confirmed = {"text": "x cause", "status": "confirmed", "evidence": {}}
+    assert bm.RootCause.from_b2a(confirmed).status == "pi_inferred"
+
+
+def test_the_readers_tolerate_the_wrong_type():
+    for stored in (
+        "abc",
+        5,
+        ["x"],
+        {"text": "x", "evidence": "abc"},
+        {"text": "x", "evidence": {"msgs": 5}},
+    ):
+        bm.RootCause.from_b2a(stored)
+    for budget in ("5000", 5, ["x"]):
+        bm.ConstraintsView.from_b2a(
+            {"budget": budget, "cannot_change": ["a", 5, None]}, ["t", {"what": 3}], 7
+        )
+    assert bm.seq(None) == () and bm.seq("abc") == () and bm.seq([1]) == (1,)
 
 
 def test_the_option_set_flags_a_single_option_honestly():
@@ -93,7 +149,9 @@ def test_option_to_dict_is_plain_and_language_neutral():
     data = option.to_dict()
     assert data["id"] == "O1" and data["kind"] == "process_change"
     assert data["cost"] == {"source": "staff", "amount": None}
-    assert data["evidence"] == [{"msg": "m1", "words": ["count"]}]
+    assert data["evidence"] == [
+        {"msg": "m1", "words": ["count"], "role": "owner", "verified": False}
+    ]
     assert data["addresses"] == ["P1"]
 
 

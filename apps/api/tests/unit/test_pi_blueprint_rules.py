@@ -22,10 +22,19 @@ def option(**over) -> bm.Option:
         "benefit": "The owner would see the same numbers every morning",
         "effort": "small",
         "reversibility": "reversible",
-        "evidence": (bm.Evidence("m1", ("count", "stock")),),
+        "evidence": (verified("m1", ("count", "stock")),),
     }
     base.update(over)
     return bm.Option(**base)
+
+
+def verified(msg, words=()):
+    """An evidence ref that `verify_option` has already marked verified."""
+    return bm.Evidence(msg, tuple(words), verified=True)
+
+
+def ev(msg, words=()):
+    return verified(msg, words)
 
 
 def codes(issues) -> list[str]:
@@ -172,9 +181,9 @@ def test_an_unconfirmed_cause_is_never_rendered_as_a_fact():
 
 def test_evidence_words_must_be_in_the_owners_own_message():
     assert "OPT-EVIDENCE" not in codes(br.option_issues(option(), PROBLEMS, owner_text=OWNER))
-    bad = option(evidence=(bm.Evidence("m1", ("refund", "policy")),))
+    bad = option(evidence=(verified("m1", ("refund", "policy")),))
     assert "OPT-EVIDENCE" in codes(br.option_issues(bad, PROBLEMS, owner_text=OWNER))
-    empty = option(evidence=(bm.Evidence("m1", ()),))
+    empty = option(evidence=(verified("m1", ()),))
     assert "OPT-EVIDENCE" in codes(br.option_issues(empty, PROBLEMS, owner_text=OWNER))
     assert "OPT-EVIDENCE" in codes(br.option_issues(bad, PROBLEMS, owner_text=""))
 
@@ -265,10 +274,10 @@ def test_reversible_comes_before_hard_at_the_same_effort():
 
 
 def test_stronger_evidence_comes_first_at_the_same_effort_and_reversibility():
-    weak = option(id="weak", evidence=(bm.Evidence("m1", ("count",)),))
-    two = (bm.Evidence("m1", ("count",)), bm.Evidence("m2", ("night",)))
-    strong = option(id="strong", evidence=two)
-    assert ids(br.rank_options((weak, strong))) == ["strong", "weak"]
+    weak = option(id="a", evidence=(verified("m1", ("count",)),))
+    two = (verified("m1", ("count",)), verified("m2", ("night",)))
+    strong = option(id="b", evidence=two)
+    assert ids(br.rank_options((weak, strong))) == ["b", "a"]
 
 
 def test_effort_outranks_reversibility_which_outranks_evidence():
@@ -289,7 +298,7 @@ def test_a_violating_or_rejected_option_goes_last_whatever_its_score():
     violates = option(
         id="violates",
         effort="none",
-        evidence=tuple(bm.Evidence(f"m{i}", ("count",)) for i in range(5)),
+        evidence=tuple(verified(f"m{i}", ("count",)) for i in range(5)),
         constraint_checks=(bm.ConstraintCheck("cannot_change#1", "violates"),),
     )
     rejected = option(id="rejected", effort="none", status="rejected", rejected_because="no")
@@ -350,12 +359,12 @@ def test_the_ranking_order_is_documented():
 
 
 def test_a_cause_the_owner_said_needs_the_owners_own_words():
-    proof = (bm.Evidence("m1", ("never", "count")),)
+    proof = (verified("m1", ("never", "count")),)
     said = bm.RootCause("we never count", status=pf.OWNER_SAID, evidence_for=proof)
     assert br.cause_issues(said, OWNER) == []
     bare = bm.RootCause("we never count", status=pf.OWNER_SAID)
     assert "CAUSE-UNSUPPORTED" in codes(br.cause_issues(bare, OWNER))
-    wrong_proof = (bm.Evidence("m1", ("refund",)),)
+    wrong_proof = (verified("m1", ("refund",)),)
     wrong = bm.RootCause("x", status=pf.OWNER_SAID, evidence_for=wrong_proof)
     assert "CAUSE-UNSUPPORTED" in codes(br.cause_issues(wrong, OWNER))
     assert "CAUSE-UNSUPPORTED" in codes(br.cause_issues(said, ""))
@@ -374,21 +383,21 @@ def test_a_cause_with_an_unknown_status_is_refused():
 
 
 def test_may_state_as_fact_needs_an_owner_status_and_proof():
-    proof = (bm.Evidence("m1", ("never", "count")),)
+    proof = (verified("m1", ("never", "count")),)
     assert br.may_state_as_fact(bm.RootCause("c", pf.OWNER_SAID, evidence_for=proof), OWNER)
     assert not br.may_state_as_fact(bm.RootCause("c", pf.OWNER_SAID), OWNER)
     assert not br.may_state_as_fact(bm.RootCause("c", pf.OWNER_SAID, evidence_for=proof), "")
 
 
 def test_a_status_is_never_raised_without_the_owner_and_never_lowered():
-    assert br.advance_status(pf.PI_INFERRED, pf.OWNER_SAID, by_owner=False) == pf.PI_INFERRED
-    assert br.advance_status(pf.PI_INFERRED, pf.CONFIRMED, by_owner=True) == pf.OWNER_SAID
-    assert br.advance_status(pf.PI_INFERRED, pf.OWNER_SAID, by_owner=True) == pf.OWNER_SAID
-    assert br.advance_status(pf.OWNER_SAID, pf.CONFIRMED, by_owner=False) == pf.OWNER_SAID
-    assert br.advance_status(pf.OWNER_SAID, pf.CONFIRMED, by_owner=True) == pf.CONFIRMED
-    assert br.advance_status(pf.OWNER_SAID, pf.PI_INFERRED, by_owner=False) == pf.OWNER_SAID
-    assert br.advance_status(pf.CONFIRMED, pf.PI_INFERRED, by_owner=True) == pf.CONFIRMED
-    assert br.advance_status(pf.PI_INFERRED, "certain", by_owner=True) == pf.PI_INFERRED
+    assert br.advance_status(pf.PI_INFERRED, pf.OWNER_SAID, owner_msg=None) == pf.PI_INFERRED
+    assert br.advance_status(pf.PI_INFERRED, pf.CONFIRMED, owner_msg="m1") == pf.OWNER_SAID
+    assert br.advance_status(pf.PI_INFERRED, pf.OWNER_SAID, owner_msg="m1") == pf.OWNER_SAID
+    assert br.advance_status(pf.OWNER_SAID, pf.CONFIRMED, owner_msg=None) == pf.OWNER_SAID
+    assert br.advance_status(pf.OWNER_SAID, pf.CONFIRMED, owner_msg="m1") == pf.CONFIRMED
+    assert br.advance_status(pf.OWNER_SAID, pf.PI_INFERRED, owner_msg=None) == pf.OWNER_SAID
+    assert br.advance_status(pf.CONFIRMED, pf.PI_INFERRED, owner_msg="m1") == pf.CONFIRMED
+    assert br.advance_status(pf.PI_INFERRED, "certain", owner_msg="m1") == pf.PI_INFERRED
 
 
 # --- the patterns follow the production ones ---
