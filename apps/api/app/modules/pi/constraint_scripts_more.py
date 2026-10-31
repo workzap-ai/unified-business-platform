@@ -25,6 +25,9 @@ URDU = """
 اپڈیٹ=update ایڈجسٹ=adjust ریٹ=rate ریٹس=rates مینو=menu وقت=time ٹائمنگ=timing اشتہار=ad
 اسسٹنٹ=assistant فہرست=list رجسٹر=register شیٹ=sheet ریکارڈ=record فائل=file کیلنڈر=calendar
 ریمائنڈر=reminder کسی=anyone
+ہٹا=remove ہٹائیں=remove توسیع=expand منتقل=move علاقہ=area سپلائر=supplier
+سپلائرز=suppliers
+بندہ=person بندے=people
 اضافی=extra عملے=staff سوئچ=switch شروع=start بنائیں=make بنانا=make بھیجیں=send
 """
 ARABIC = """
@@ -39,6 +42,9 @@ ARABIC = """
 شهريا=monthly سنويا=yearly مجانا=free طباخ=cook موظف=employee مصفف=stylist عامل=worker
 تحديث=update تعديل=adjust سعر=price المنيو=menu قائمه=menu وقت=time اعلان=ad حمله=campaign
 مساعد=assistant سجل=register ملف=file تقويم=calendar تذكير=reminder احد=anyone
+توسيع=expand نقل=move الغاء=cancel حذف=remove منطقة=area مناطق=area مورد=supplier
+موردين=suppliers
+عين=hire احتفظ=keep تتبع=track
 اضافي=extra اضافيين=extra تبديل=change انتقل=switch ابدا=start ابدأ=start ارسل=send
 """
 HINDI = """
@@ -51,6 +57,7 @@ HINDI = """
 अपडेट=update एडजस्ट=adjust रेट=rate मेन्यू=menu समय=time विज्ञापन=ad
 असिस्टेंट=assistant सूची=list रजिस्टर=register शीट=sheet रिकॉर्ड=record फ़ाइल=file
 कैलेंडर=calendar रिमाइंडर=reminder किसी=anyone
+हटाएं=remove विस्तार=expand स्थानांतरित=move रद्द=cancel क्षेत्र=area सप्लायर=supplier
 अतिरिक्त=extra स्विच=switch शुरू=start बनाएं=make भेजें=send
 रिसेप्शनिस्ट=receptionist मैकेनिक=mechanic मजदूर=worker रसोइया=cook स्टाइलिस्ट=stylist
 """

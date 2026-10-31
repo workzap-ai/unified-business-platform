@@ -196,7 +196,9 @@ FREEZE = (
         r"(?:staff|people|employees|workers)\b"
     ),
 )
-_TAKE_ON = re.compile(r"\b(?:take|takes|taking|took|taken) on\b")
+_TAKE_ON = re.compile(
+    r"\b(?:(?:take|takes|taking|took|taken) on|(?:bring|brings|bringing|brought) in)\b"
+)
 
 
 def is_hiring_freeze(text: str) -> bool:

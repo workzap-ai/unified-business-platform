@@ -265,7 +265,9 @@ FAMILIES: dict[str, frozenset[str]] = {
         "kharidein kharidain kharidenge".split()
     ),
     "RENT": frozenset("rent lease borrow subscribe share outsource kiraya kiraye kiray".split()),
-    "HIRE": frozenset("hire recruit employ onboard appoint engage bharti".split()),
+    "HIRE": frozenset(
+        "hire recruit employ onboard appoint engage bharti rakh rakhna rakhein rakhen".split()
+    ),
     "ADD": frozenset("add increase expand extend grow barha barhana izafa".split()),
     "CLOSE": frozenset("close shut".split()),
     "STOP": frozenset(
@@ -317,7 +319,8 @@ STAFF_WORDS = frozenset(
     engineer technician supervisor secretary bookkeeper trainer dispatcher stylist""".split()
 ) | frozenset(
     "staff employee worker person people anyone anybody someone somebody clerk assistant helper "
-    "cashier driver salesman salesperson team hand labour labor manager".split()
+    "cashier driver salesman salesperson team hand labour labor manager banda bande bandey "
+    "aadmi".split()
 )
 SHOP_WORDS = frozenset(
     "shop store branch outlet site location office warehouse premise showroom dukan dukaan".split()
@@ -342,9 +345,11 @@ STOPWORDS = STOPWORDS | frozenset(_canon(w) for w in STOPWORDS)
 
 
 SYNONYM_GROUPS = {
-    "PRICE": "price prices pricing rate rates tariff fee fees charge charging",
-    "TIME": "time timing timetable waqt hour schedule opening",
-    "MENU": "menu",
+    "PRICE": "price prices pricing rate rates tariff fee fees charge charging qeemat qeematein "
+    "keemat daam reprice repricing discount discounts discounting discounted",
+    "TIME": "time timing timetable waqt hour schedule opening night evening midnight morning "
+    "weekend friday saturday sunday monday tuesday wednesday thursday",
+    "MENU": "menu special dish dishes item items",
     "AD": "ad ads advert adverts advertising advertisement advertisements campaign campaigns",
 }
 SYNONYM_KEY = {w: key for key, words in SYNONYM_GROUPS.items() for w in words.split()}
@@ -934,6 +939,10 @@ def _is_verb_at(tokens: list[Tok], i: int, families: frozenset[str]) -> frozense
     following = [t.word for t in tokens[i + 1 : i + 6] if t.clause == clause]
     if any(t.word in RU_VERB_FINAL for t in tokens if t.clause == clause):
         following += [t.word for t in tokens[max(0, i - 3) : i] if t.clause == clause]
+    if w in _KEEP_OR_HIRE:  # "rakhein": keeping a thing, unless a person is what is kept
+        around = [t.word for t in tokens[max(0, i - 3) : i] if t.clause == clause] + following
+        if not any(object_key(x) == "STAFF" for x in around):
+            found = found - {"HIRE"}
     if "FIRE" in found and not any(object_key(x) == "STAFF" for x in following):
         found = found - {"FIRE"}  # a fire drill, an alarm: only "fire <a person>" is dismissing
     if "CLOSE" in found and following[:1] and following[0] in CLOSE_ADVERB_NEXT:
@@ -1018,13 +1027,21 @@ VAGUE = frozenset(
     """thing things stuff etc see above below discussed same before know what say said whatever
     anything something someone x y z it that this""".split()
 )
+_STATE_WORDS = frozenset("fixed frozen permanent constant stable settled".split())
 _FILLER_AFTER = frozenset({"more", "new", "any", "afford", "to"})
 
 
 def _content_objects(ws: list[str]) -> tuple[str, ...]:
     keys: list[str] = []
     for w in ws:
-        if w in STOPWORDS or w in DETERMINERS or w in _FILLER_AFTER or w in VAGUE or len(w) < 2:
+        if (
+            w in STOPWORDS
+            or w in DETERMINERS
+            or w in _FILLER_AFTER
+            or w in VAGUE
+            or w in _STATE_WORDS
+            or len(w) < 2
+        ):
             continue
         if verb_families(w) and w not in NOUN_TOO and noun_stem(w) not in STAFF_WORDS:
             continue  # "stop taking cash": taking is a verb, cash is the object
@@ -1218,6 +1235,8 @@ def _rewrite_segment(words: list[str]) -> list[str]:
         rest = [w for w in rest if w != "spend"]
     if "money" in rest and not any(verb_families(w) for w in rest):
         return ["no", "money", *[w for w in rest if w != "money"]]
+    if "budget" in rest and not any(verb_families(w) for w in rest):
+        return ["no", "budget", *[w for w in rest if w != "budget"]]
     anchor = next(
         (i for i, w in enumerate(rest) if verb_families(w) or w in {"afford", "promise", "have"}),
         None,
@@ -1378,11 +1397,114 @@ def _check_channel(option: _Option, lim: _Lim, limit_text: str) -> Verdict:
 
 
 BENIGN_VERBS = frozenset(
-    """keep retain maintain continue preserve use utilise utilize ask tell message send call phone
+    """keep retain maintain continue preserve hold freeze post publish announce display use utilise
+    utilize ask tell message send call phone
     text track monitor train teach coach check measure record log write list review audit report
     remind share show give inform notify thank explain compare test pilot survey read count tag
     label sort note""".split()
 )
+
+
+CHANGE_LIKE = (
+    frozenset(
+        """extend shift move cancel drop stop scrap switch add close open fire expand reduce raise
+        lower reprice discount introduce start bring cut increase decrease shorten lengthen delay
+        postpone reschedule remove stay launch begin hire recruit employ onboard badha barha badhao
+        badhana kam band shuru hata hatao nikal""".split()
+    )
+    | FAMILIES["CHANGE"]
+    | FAMILIES["STOP"]
+    | FAMILIES["CLOSE"]
+    | FAMILIES["OPEN"]
+    | FAMILIES["CUT"]
+    | FAMILIES["RAISE"]
+    | FAMILIES["MOVE"]
+    | FAMILIES["ADD"]
+    | FAMILIES["FIRE"]
+    | FAMILIES["HIRE"]
+)
+PREPOSITIONS = frozenset(
+    "to on at in from with by of about near for into onto over under around across through".split()
+)
+# prepositions that still leave the subject being changed: "add TO the menu", "drop FROM it"
+CHANGE_PREPOSITIONS = frozenset(
+    "about for of with by through over under near next beside alongside".split()
+)
+# Roman Urdu puts the verb after its object: "qeemat hata do"
+RU_VERBS = frozenset(
+    "hata hatao nikal badha barha badhao badhana kam band shuru badal badlo".split()
+)
+_WH_WORDS = frozenset("who whom where what how when which everything anything all".split())
+
+
+def _verb_category(toks: list[Tok], k: int) -> str | None:
+    """ "safe" (a verb that leaves its object alone), "change" (a verb that alters it), "other" (a
+    verb this check knows but that is neither), or None (not a verb here)."""
+    w = toks[k].word
+    stems = verb_stems(w)
+    previous = toks[k - 1].word if k > 0 and toks[k - 1].clause == toks[k].clause else ""
+    if previous in DETERMINERS and (w.endswith("ing") or w in NOUN_TOO):
+        return None  # "the opening hours", "the change": a noun or a modifier
+    if stems & BENIGN_VERBS:
+        return "safe"
+    if stems & CHANGE_LIKE:
+        return "change"
+    if verb_families(w):
+        return "other"
+    return None
+
+
+def _subject_verdict(
+    toks: list[Tok], subjects: tuple[str, ...], either_side: bool
+) -> tuple[str, str] | None:
+    """For a limit that says its subject cannot change: ("violates" | "unknown", the subject word)
+    when the verb acting on the subject is a change, or is not known; None when every mention is
+    only kept, checked, told, negated, or sits in a clause about something else."""
+    keys = set(subjects)
+    if not keys:
+        return None
+    need = len(keys) if len(keys) <= 2 else (len(keys) + 1) // 2
+    found: tuple[str, str] | None = None
+    for i, tok in enumerate(toks):
+        if object_key(tok.word) not in keys and tok.word not in keys:
+            continue
+        clause = [k for k, t in enumerate(toks) if t.clause == tok.clause]
+        named = {
+            key for k in clause for key in (object_key(toks[k].word), toks[k].word) if key in keys
+        }
+        if any(toks[k].word in NEGATIONS or toks[k].word in INVESTIGATE for k in clause):
+            continue
+        best, best_distance, weighed = None, 99, False
+        follows_subject = i + 1 < len(toks) and (
+            object_key(toks[i + 1].word) in keys or toks[i + 1].word in keys
+        )
+        modifier = tok.word.endswith("ing") and follows_subject  # "opening hours"
+        if _verb_category(toks, i) == "change" and not modifier:
+            best, best_distance, weighed = "change", 0, True  # "Reprice", "Discount"
+        for k in clause:
+            if k == i:
+                continue
+            if k == i - 1 and toks[k].word.endswith("ing"):
+                continue  # "closing time", "opening hours": a modifier, not an act
+            category = _verb_category(toks, k)
+            if not category:
+                continue
+            weighed = True
+            low, high = sorted((k, i))
+            barriers = CHANGE_PREPOSITIONS if category == "change" else PREPOSITIONS
+            if object_key(tok.word) != "TIME" and any(
+                toks[m].word in barriers for m in range(low + 1, high)
+            ):
+                continue  # "Buy paper for the POS": the POS is context; "Drop items from the menu"
+            if k > i and not either_side:
+                continue
+            if abs(k - i) < best_distance:
+                best, best_distance = category, abs(k - i)
+        if best == "change" and len(named) >= need:
+            return "violates", tok.word
+        if best == "change" or best == "other" or (best is None and not weighed):
+            found = found or ("unknown", tok.word)
+    return found
 
 
 def _unresolved_subject(toks: list[Tok], subjects: tuple[str, ...]) -> str | None:
@@ -1444,6 +1566,9 @@ def _check_lim(option: _Option, lim: _Lim, limit_text: str) -> Verdict:
         families |= {"BUY", "RENT"}  # buying and renting are spending
     hire_any = "HIRE" in lim.families and set(lim.objects) <= {"STAFF"}
     spend_like = {"BUY", "RENT"} if "SPEND" in lim.families else set()
+    change_limit = lim.kind == "object_only" or (
+        lim.kind == "action" and "CHANGE" in lim.families and bool(lim.objects)
+    )
     wanted = tuple(
         o for o in lim.objects if o.isupper() or (o not in GENERIC and noun_stem(o) not in GENERIC)
     )
@@ -1521,6 +1646,11 @@ def _check_lim(option: _Option, lim: _Lim, limit_text: str) -> Verdict:
                     f"the option does what the owner said they cannot do ({limit_text})",
                     evidence,
                 )
+            if change_limit and "CHANGE" in fams and (not window or window[0].word in _WH_WORDS):
+                unknown_hit = unknown_hit or _unknown(
+                    rule, "the option changes something this check cannot identify", (tok.word,)
+                )
+                continue
             if shared or (generic and any(g in wkeys or noun_stem(g) in wkeys for g in generic)):
                 unknown_hit = unknown_hit or _unknown(
                     rule,
@@ -1563,6 +1693,26 @@ def _check_lim(option: _Option, lim: _Lim, limit_text: str) -> Verdict:
             f"the option does what the owner said they cannot do ({limit_text})",
             (tok.word,),
         )
+    if change_limit:
+        subject = _subject_verdict(
+            toks, wanted or generic, _ru_option(toks) or any(t.word in RU_VERBS for t in toks)
+        )
+        if subject and subject[0] == "violates":
+            return _violates(
+                rule,
+                f"the option changes what the owner said cannot change ({limit_text})",
+                (subject[1],),
+            )
+        if unknown_hit:
+            return unknown_hit
+        if subject:
+            return _unknown(
+                rule,
+                "the option names what the owner cannot change and no verb it recognises as safe "
+                "acts on it",
+                (subject[1],),
+            )
+        return _ok(rule, "the option does not do what the owner said they cannot do")
     if unknown_hit:
         return unknown_hit
     mentioned = (
@@ -1907,13 +2057,15 @@ def _check_no_budget(option: _Option) -> Verdict | None:
 
 SPEND_VERBS = frozenset(
     "buy purchase invest subscribe lease rent hire recruit upgrade outsource order acquire "
-    "pay kharid khareed kharidein kharidain kharidna khareedna khareedein lena lagwa lagwana "
+    "spend pay kharid khareed kharidein kharidain kharidna khareedna khareedein lena lagwa lagwana "
     "lagwayen".split()
 )
 
 
 _ZERO_SKIP = frozenset(
-    "no money budget not have do for we new any free only zero nothing nil is are the our".split()
+    "no money budget not have do for we new any free only zero nothing nil is are the our bilkul "
+    "nahi nahin hai hain ka ki ko "
+    "koi".split()
 )
 
 
@@ -1933,7 +2085,8 @@ def _check_zero_budget(option: _Option, limit: Limit) -> Verdict:
     spend = [
         t.word
         for i, t in enumerate(option.tokens)
-        if verb_stems(t.word) & SPEND_VERBS and _is_spend_verb(option.tokens, i)
+        if (verb_stems(t.word) & SPEND_VERBS and _is_spend_verb(option.tokens, i))
+        or (noun_stem(t.word) in COSTLY_WORDS and _proposed(option.tokens, i))
     ]
     if not option.latin and not amounts:
         return _unknown(rule, "the option is not in a script this check can read")
@@ -2091,7 +2244,7 @@ def _check_option(
     if not isinstance(reqs, Requirements):
         return _unreadable("the requirements are not in a form this check reads")
     text = option_text.strip()
-    if not text:
+    if not norm(text).strip():
         return _unknown(RULE_UNREADABLE, "the option text is empty")
     if not reqs.columns_available:
         return _unknown(
