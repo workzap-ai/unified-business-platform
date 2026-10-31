@@ -13,7 +13,7 @@ import logging
 import re
 from typing import Any
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 from app.modules.pi import taxonomy
 from app.modules.pi.problems import ProblemNote, ProblemOp, check_ops
@@ -89,6 +89,14 @@ class SimpleNote(BaseModel):
     cause_said: bool = False
     cause_words: list[str] = Field(default_factory=list)
     expected_outcome: str = ""
+
+    @field_validator("tried", mode="before")
+    @classmethod
+    def _tried_entries(cls, value: Any) -> Any:
+        """A model may list what was tried as plain strings: each becomes {"what": ...}."""
+        if not isinstance(value, list):
+            return []
+        return [{"what": v} if isinstance(v, str) else v for v in value if v]
 
     def to_note(self) -> ProblemNote:
         return ProblemNote(**self.model_dump())

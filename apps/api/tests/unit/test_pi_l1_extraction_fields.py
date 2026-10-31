@@ -92,3 +92,8 @@ def test_no_split_has_an_unsupported_cause():
         for c in json.loads((folder / name).read_text(encoding="utf-8")):
             records = replay.replay(c)
             assert scorers.score_case(c, records)["unsupported_causes"] == [], c["id"]
+
+
+def test_tried_may_arrive_as_plain_strings():
+    note = SimpleNote(title="t", tried=["a paper register"]).to_note()  # type: ignore[list-item]
+    assert note.tried == [{"what": "a paper register"}]
