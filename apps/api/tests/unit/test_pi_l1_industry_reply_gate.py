@@ -207,7 +207,9 @@ def test_mutation_without_the_detector_the_tables_fail(monkeypatch) -> None:
     assert [r for _l, r, o, _n in POSITIVES if _found(r, o, "en") is not None] == []
     assert irg.nouns_in("AC units ya spare parts?") == []
     monkeypatch.setattr(
-        irg, "nouns_in", lambda text: [("anything", frozenset({"hotels"}))] if text else []
+        irg,
+        "nouns_in",
+        lambda text, need_context=True: [("anything", frozenset({"hotels"}))] if text else [],
     )
     fired = [r for _l, r in ORDINARY if _found(r, "", "en") is not None]
     assert len(fired) == len(ORDINARY)

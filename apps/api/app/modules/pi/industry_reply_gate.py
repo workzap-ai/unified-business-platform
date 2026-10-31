@@ -305,6 +305,8 @@ TRADE_NOUNS: dict[str, tuple[str, ...]] = {
         "dairy",
         "buffalo",
         "milk",
+        "डेयरी",
+        "ڈیری",
         "دودھ",
         "بھینس",
         "दूध",
@@ -439,6 +441,29 @@ TRADE_NOUNS: dict[str, tuple[str, ...]] = {
         "غزل",
         "نسيج",
     ),
+    "general_factories_and_workshops": (
+        "factory",
+        "mill",
+        "workshop",
+        "karkhana",
+        "karkhane",
+        "کارخانہ",
+        "کارخانے",
+        "फैक्ट्री",
+        "कारखाना",
+        "कारखाने",
+        "مصنع",
+        "مصانع",
+        "ورشة",
+    ),
+    "garment_and_knitwear_export_units": (
+        "garment",
+        "knitwear",
+        "hosiery",
+        "گارمنٹس",
+        "गारमेंट्स",
+        "ملابس جاهزة",
+    ),
     "pest_control": ("pest control", "termite", "fumigation", "دیمک", "दीमक", "مكافحة الحشرات"),
 }
 
@@ -482,6 +507,22 @@ class Finding:
     reason: str  # the sentence for the rewrite request
 
 
+# Words that are plain talk when they stand alone ("Do you have an accountant?", "Is the fabric
+# woven or knitted?") and name a trade only next to a trade word. surface -> context words.
+_ACCOUNTING_CONTEXT = (
+    "firm practice audit tax taxes return returns bookkeeping ٹیکس آڈٹ ضريبة ضرائب تدقيق ऑडिट"
+).split()
+_FABRIC_CONTEXT = (
+    "stitch stitching stitched unstitched lawn tailor tailors yards suit suits boutique "
+    "سلائی لان درزی सिलाई خياطة"
+).split()
+CONTEXTUAL: dict[str, tuple[str, ...]] = {
+    **{w: tuple(_ACCOUNTING_CONTEXT) for w in ("accountant", "اکاؤنٹنٹ", "अकाउंटेंट", "محاسب")},
+    **{w: tuple(_FABRIC_CONTEXT) for w in ("fabric", "کپڑا", "कपड़ा", "قماش", "اقمشة")},
+}
+_ARABIC_SUFFIXES = ("كم", "نا", "ها", "هم", "ك", "ي", "ه")  # your, our, her, their, my, his
+
+
 @lru_cache(maxsize=1)
 def _lexicon() -> dict[tuple[str, ...], frozenset[str]]:
     """stem tuple -> the pack keys the noun belongs to."""
@@ -506,10 +547,40 @@ def _lexicon() -> dict[tuple[str, ...], frozenset[str]]:
     return {stems: frozenset(keys) for stems, keys in found.items()}
 
 
+@lru_cache(maxsize=1)
+def _context() -> dict[tuple[str, ...], frozenset[str]]:
+    """stem tuple of a contextual noun -> the stems of the words that make it a trade noun."""
+    return {
+        tuple(tokens(word)): frozenset(t for c in words for t in tokens(c))
+        for word, words in CONTEXTUAL.items()
+    }
+
+
+@lru_cache(maxsize=1)
+def _lexicon_tokens() -> frozenset[str]:
+    return frozenset(t for stems in _lexicon() for t in stems)
+
+
+def _canon(token: str) -> str:
+    """An Arabic noun with a possessive suffix ("مخبزك", "your bakery") as the bare noun."""
+    known = _lexicon_tokens()
+    if token in known or not any("\u0600" <= c <= "\u06ff" for c in token):
+        return token
+    for suffix in _ARABIC_SUFFIXES:
+        if not token.endswith(suffix):
+            continue
+        bare = token[: -len(suffix)]
+        taa = bare[:-1] + "ه" if bare.endswith("ت") else bare
+        for candidate in (bare, taa, "و" + bare, "و" + taa):  # a leading و was cut by the stem
+            if candidate in known:  # a taa marbuta turns into ت before a suffix
+                return candidate
+    return token
+
+
 def _spans(text: str) -> list[tuple[tuple[str, ...], str]]:
     """Every word and short phrase of a text as (stems, words as written), in text order."""
-    raw = [m.group(0) for m in WORD.finditer(text or "")]
-    stems = tokens(text)
+    raw = [m.group(0) for m in WORD.finditer(text)]
+    stems = [_canon(t) for t in tokens(text)]
     return [
         (tuple(stems[i : i + size]), " ".join(raw[i : i + size]))
         for i in range(len(stems))
@@ -518,15 +589,24 @@ def _spans(text: str) -> list[tuple[tuple[str, ...], str]]:
     ]
 
 
-def nouns_in(text: str) -> list[tuple[str, frozenset[str]]]:
-    """The trade nouns a text uses: (words as written, pack keys), first occurrence order."""
+def nouns_in(text: str, need_context: bool = True) -> list[tuple[str, frozenset[str]]]:
+    """The trade nouns a text uses: (words as written, pack keys), first occurrence order. A
+    contextual noun ("accountant", "fabric") counts only next to a trade word unless
+    `need_context` is false (the owner's own words)."""
+    if not isinstance(text, str):
+        return []
     lexicon = _lexicon()
+    contextual = _context()
+    present = {_canon(t) for t in tokens(text)}
     seen: set[tuple[str, ...]] = set()
     found: list[tuple[str, frozenset[str]]] = []
     for stems, written in _spans(text):
-        if stems in lexicon and stems not in seen:
-            seen.add(stems)
-            found.append((written, lexicon[stems]))
+        if stems not in lexicon or stems in seen:
+            continue
+        if need_context and stems in contextual and not (contextual[stems] & present):
+            continue
+        seen.add(stems)
+        found.append((written, lexicon[stems]))
     return found
 
 
@@ -537,15 +617,22 @@ def unconfirmed_industry_noun(
     language: str = "",
 ) -> Finding | None:
     """A Finding when the trade is not confirmed and the reply uses a trade noun the owner did not
-    say; None otherwise. See the module docstring for the rules and the call site."""
-    if trade_confirmed:
+    say; None otherwise. See the module docstring for the rules and the call site. Never raises:
+    input that is not text (None, numbers, bytes, dicts) gives None."""
+    if trade_confirmed or not isinstance(reply, str):
         return None
-    said = owner_words if isinstance(owner_words, str) else " ".join(owner_words)
-    spoken = nouns_in(said)
-    spoken_stems = {tuple(tokens(written)) for written, _ in spoken}
+    if isinstance(owner_words, str):
+        said = owner_words
+    elif isinstance(owner_words, (list, tuple)):
+        said = " ".join(w for w in owner_words if isinstance(w, str))
+    else:
+        said = ""
+    language = language if isinstance(language, str) else ""
+    spoken = nouns_in(said, need_context=False)
+    spoken_stems = {tuple(_canon(t) for t in tokens(written)) for written, _ in spoken}
     spoken_trades = set().union(*(keys for _, keys in spoken)) if spoken else set()
     for written, keys in nouns_in(reply):
-        if tuple(tokens(written)) in spoken_stems or keys & spoken_trades:
+        if tuple(_canon(t) for t in tokens(written)) in spoken_stems or keys & spoken_trades:
             continue
         return Finding(
             noun=written,

@@ -25,7 +25,7 @@ CORRECTIONS: list[tuple[str, str, list[str], tuple[str, str] | None]] = [
     ("en", "Sorry, not 10, it was 100 clients.", ["We lost about 10 clients."], ("10", "100")),
     ("en", "100, not 10", [], ("10", "100")),
     ("en", "Actually 15 kg, I checked.", ["We waste about 5 kg of rice."], ("5", "15")),
-    ("en", "No wait, it is 5 lakh", ["We spend 2 lakh a month"], None),  # other words: no guess
+    ("en", "No wait, it is 5 lakh", ["We spend 2 lakh a month"], ("200000", "500000")),
     ("en", "Not 2 lakh, 5 lakh", [], ("200000", "500000")),
     ("en", "No, I have 3 shops.", ["We lost about 10 clients."], None),
     ("en", "We have 100 clients.", ["We lost about 10 clients."], None),

@@ -326,7 +326,13 @@ def fact_already_given(reply: str, owner_texts: list[str]) -> str | None:
     """alreadyAnswered (18.5) for a count, a duration or a frequency: when the reply asks it and the
     owner already stated it, the reason (quoting their words) so the model can use it instead.
     Narrow on purpose: an unstated fact, or a different thing asked, is never blocked."""
-    theirs = " ".join(owner_texts)
+    if not isinstance(reply, str):
+        return None
+    if isinstance(owner_texts, str):
+        owner_texts = [owner_texts]
+    elif not isinstance(owner_texts, (list, tuple)):
+        return None
+    theirs = " ".join(t for t in owner_texts if isinstance(t, str))
     for q in _questions(reply):
         if hit_text := _script_fact(q, theirs):
             return _said(hit_text)

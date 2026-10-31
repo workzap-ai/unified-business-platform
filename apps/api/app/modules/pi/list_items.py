@@ -11,7 +11,7 @@ import re
 from dataclasses import dataclass
 from typing import Any
 
-from app.modules.pi.figure_correction import expand
+from app.modules.pi.figure_correction import numbers_in
 from app.modules.pi.script_words import WORD, arabic_stem, fold, hindi_stem, is_latin
 
 MIN_ITEM_WORDS = 3  # a shorter line is a heading or an aside, not an item
@@ -20,7 +20,6 @@ MAX_REPORTED = 4
 STEM = 5
 BULLET = re.compile(r"^\s*(?:[-•*–—▪●◦·✓✔►]|\d{1,2}\s*[.)]|[a-zA-Z]\s*[.)])\s+")
 INLINE_NUMBER = re.compile(r"(?:(?<=\s)|^)(\d{1,2})\s*[.)]\s+(?=\S)")
-FIGURE = re.compile(r"\d[\d,]*(?:\.\d+)?")
 UNSPACED = re.compile(r"[぀-ヿ㐀-鿿가-힯฀-๿]")
 STOPWORDS = frozenset(
     """about after again also because been before being could does doing from have having here
@@ -78,7 +77,7 @@ def _words(text: str) -> set[str]:
 
 def _figures(text: str) -> tuple[str, ...]:
     """The figures of a text as plain digits, in any digit system, scale words written out."""
-    return tuple(dict.fromkeys(f.replace(",", "") for f in FIGURE.findall(expand(text))))
+    return tuple(dict.fromkeys(numbers_in(text)))
 
 
 def _enough(text: str) -> bool:
@@ -100,12 +99,43 @@ def _split(message: str) -> list[str]:
             for i, start in enumerate(starts[:-1])
         ]
     long_lines = [ln.strip() for ln in lines if _enough(ln)]
-    return long_lines if len(lines) >= 3 and len(long_lines) >= 3 else []
+    if len(lines) < 3 or len(long_lines) < 3:
+        return []
+    if _is_intro(long_lines[0], len(long_lines)):
+        long_lines = long_lines[1:]  # "I have three problems:" is not one of the problems
+    return long_lines
+
+
+INTRO_COUNT = re.compile(
+    r"(?:\b(?:\d+|one|two|three|four|five|six|teen|char|paanch|chaar)|तीन|चार|पांच|पाँच|छह|"
+    r"تین|چار|پانچ|ثلاث|ثلاثة|أربع|أربعة|خمس|خمسة)\s+"
+    r"(?:\w+\s+)?(?:problems?|issues?|things?|points?|matters?|masail|masle|masla|baatein|"
+    r"समस्या\w*|बातें|मुद्दे|مسائل|مسئلے|مشاكل|مشكلات|باتیں|نقاط|أمور)",
+    re.IGNORECASE,
+)
+PROBLEM_HINT = re.compile(
+    r"\b(?:lose|losing|lost|waste|wasting|late|delay\w*|low|slow|drop\w*|fall\w*|broken|problem\w*|"
+    r"issue\w*|loss|cost\w*|expensive|high|stuck|fail\w*|less|unpaid|shortage|kam|nahi|nahin|"
+    r"nuksan|masla|masle|deri|dair|kharab|mehnga|mehngi|bohat|bahut|zyada|ziada)\b"
+    r"|कम|नहीं|देर|नुकसान|समस्या|कमी|खराब|महंगा|ज्यादा|ज़्यादा|घाटा"
+    r"|خراب|نقصان|مسئلہ|دیر|کم|نہیں|مہنگا|زیادہ|گھاٹا"
+    r"|مشكلة|مشاكل|نقص|تأخير|تاخير|خسارة|قليل|غالي|بطيء|متأخر|لا\s",
+    re.IGNORECASE,
+)
+
+
+def _is_intro(line: str, line_count: int) -> bool:
+    """The first line of an unbulleted list that only introduces it: it ends with a colon, says how
+    many problems follow, or (with four or more lines) has no figure and no word of trouble."""
+    stripped = line.rstrip()
+    if stripped.endswith((":", "：")) or INTRO_COUNT.search(line):
+        return True
+    return line_count >= 4 and not numbers_in(line) and not PROBLEM_HINT.search(line)
 
 
 def items(message: str) -> list[Item]:
     """The candidate items of a message that is a list, oldest first; [] when it is not a list."""
-    if UNSPACED.search(message or ""):
+    if not isinstance(message, str) or UNSPACED.search(message):
         return []  # words cannot be compared in these scripts: stay out of it
     found = [part for part in _split(message) if _enough(part)]
     if len(found) < MIN_ITEMS:
@@ -116,7 +146,7 @@ def items(message: str) -> list[Item]:
 def covered(item: Item, notes: list[str]) -> bool:
     """A note mentions the item: it carries one of its figures, or shares enough content words."""
     said = " ".join(notes)
-    if item.figures and any(f in expand(said).replace(",", "") for f in item.figures):
+    if item.figures and set(item.figures) & set(numbers_in(said)):
         return True
     wanted = _words(item.text)
     if not wanted:
