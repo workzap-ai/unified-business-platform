@@ -225,9 +225,10 @@ async def score_new(session: AsyncSession, now: datetime | None = None, limit: i
         if slipped(conversation, run):
             signals = [*signals, "rule_break"]
         arm_id, example_ids, lesson_ids = await attribution(session, conversation, reply)
-        industry = await learning_situation.industry_of(session, conversation)
+        # the reply names the workspace the experience is written for
+        industry = await learning_situation.industry_of(session, conversation, scope=reply)
         category = await learning_situation.category_of(
-            session, reply.conversation_id, reply.created_at
+            session, reply.conversation_id, reply.created_at, scope=reply
         )
         session.add(
             PiExperience(
