@@ -54,14 +54,25 @@ OWNER_STATUSES = (OWNER_SAID, CONFIRMED)
 # lets "call me on ..." through, and misses the grouped Pakistani forms): 0300-1234567,
 # 0300 123 4567, (0300) 1234567, +92 300 1234567, 0092-300-1234567, 042-35761234.
 _LOCAL_PHONE = re.compile(
-    r"(?<![\w+-])(?:(?:\+|00)?92[\s.-]*\(?3\d{2}\)?|\(?03\d{2}\)?)[\s.-]*\d{3}[\s.-]*\d{4}(?!\d)"
+    r"(?<![\w+-])(?:(?:\+|00)?92[\s.-]*\(?3(?:[\s.-]?\d){2}\)?|\(?03(?:[\s.-]?\d){2}\)?)"
+    r"(?:[\s.-]*\d){7}(?!\d)"
     r"|(?<![\w+-])0[1-9]\d?[\s.-]\d{7,8}(?!\d)"
 )
+# a landline written in groups: 042-111-222-333 (nine to thirteen digits, so a date is not one)
+_GROUPED_LANDLINE = re.compile(r"(?<![\w+-])0[1-9]\d?(?:[\s.-]\d{2,4}){2,4}(?!\d)")
+
+
+def _grouped(match: re.Match[str]) -> str:
+    digits = sum(ch.isdigit() for ch in match.group(0))
+    return PHONE_REMOVED if 9 <= digits <= 13 else match.group(0)
+
+
 PHONE_REMOVED = "[contact detail removed]"
 
 
 def _redact_phones(text: str) -> str:
-    return _LOCAL_PHONE.sub(PHONE_REMOVED, safety.PHONE.sub(PHONE_REMOVED, text))
+    text = _LOCAL_PHONE.sub(PHONE_REMOVED, safety.PHONE.sub(PHONE_REMOVED, text))
+    return _GROUPED_LANDLINE.sub(_grouped, text)
 
 
 def clean(text: Any, cap: int) -> tuple[str, bool]:
@@ -266,41 +277,21 @@ _FILLER = frozenset(
     وجہ سبب ہے ہیں تھی تھا هو هي هذا السبب
     वजह कारण है थी था की का""".split()
 )
-_QUESTION_START = re.compile(
-    r"^\s*(?:are|is|do|does|did|can|could|will|would|why|kya|کیا|هل|क्या)\b"
-    r"|^\s*(?:کیا|هل|क्या)\s"
-)
-# pi's question said back, not the owner's claim
-_ECHO = re.compile(
-    r"\byou(?:'re| are)? (?:saying|asking|suggesting|claiming|telling)\b|\baap keh rahe\b"
-    r"|آپ کہہ رہے|هل تقصد|आप कह रहे"
-)
-# someone else's opinion ("my partner thinks it is the rent")
-_OPINION = re.compile(
-    r"\b(?:partner|wife|husband|brother|sister|friend|manager|accountant|uncle|aunt|father|"
-    r"mother|cousin|neighbou?r)\b"
-    r"[^.?!]{0,30}\b(?:thinks?|says?|said|believes?|feels?|claims?|told|tells)\b"
-    r"|\b(?:kehta|kehte|kehti|manta|mante|samajhta|samajhte|samajhti|sochta|sochte|sochti)\b"
-    r"|\bne kaha\b|کہتے ہیں|کہتا|کہتی|بھائی کا خیال"
-    r"|يقول|تقول|يعتقد|يرى|कहता|कहते|कहती|मानता|मानते|सोचता"
-)
 
 
 def _endorsing_clauses(corpus: str | None) -> list[str]:
-    """The squashed clauses of the owner's text that can be their own claim about a cause: not a
-    question (or pi's question said back), not a hypothetical, not someone else's opinion."""
+    """The squashed clauses of the owner's text that are their OWN plain claim (owner_claim): not
+    a question, a hypothetical, an attribution to anyone else, pi's words said back, doubt, a
+    hedge or sarcasm. The default is no."""
+    from app.modules.pi import owner_claim
     from app.modules.pi import tried_outcome as clauses
 
     out: list[str] = []
     for clause, is_question in clauses.split_clauses(corpus):
         said = _squash(clause)
-        if is_question or _QUESTION_START.search(said) or _ECHO.search(said):
-            continue
-        if clauses._HYPOTHETICAL.search(said):
-            continue
-        if _OPINION.search(said) and not clauses._FIRST_PERSON.search(said):
-            continue
-        out.append(said)
+        hypothetical = clauses._HYPOTHETICAL.search(said) is not None
+        if owner_claim.owner_claim(said, is_question, hypothetical):
+            out.append(said)
     return out
 
 
@@ -344,12 +335,15 @@ def content_words(text: str, limit: int = 6) -> list[str]:
     return [w for w in _TOKEN.findall(_squash(text)) if _content(w)][:limit]
 
 
+def endorsed_words(words: list[str], corpus: str | None) -> list[str]:
+    """The `words` that the owner's own plain claims in `corpus` carry, in order."""
+    clauses = _endorsing_clauses(corpus)
+    return [w for w in words if clauses and _endorsed(_squash(w), clauses)]
+
+
 def support_share(words: list[str], corpus: str | None) -> float:
     """The share (0 to 1) of `words` that the owner's own claims in `corpus` carry."""
-    clauses = _endorsing_clauses(corpus)
-    if not words or not clauses:
-        return 0.0
-    return sum(1 for w in words if _endorsed(_squash(w), clauses)) / len(words)
+    return len(endorsed_words(words, corpus)) / len(words) if words else 0.0
 
 
 def said_by_owner(words: list[str], corpus: str | None) -> bool:
@@ -462,9 +456,7 @@ WITHDRAWAL = re.compile(
 
 
 _WITHDRAWAL_NEGATED = re.compile(
-    r"(?:\b(?:not|never|won't|don't|didn't|can't|cannot|nahi|nahin|nhi|kabhi)\b|\u0646\u06c1\u06cc\u06ba|"
-    r"\u0928\u0939\u0940\u0902|"
-    r"\u0644\u0646|\u0644\u0627)[\s,]*(?:\S+\s+){0,2}$"
+    r"\b(?:not|never|won't|don't|didn't|can't|cannot|refuse to|will not)\b[\s,]*(?:\S+\s+){0,2}\S*$"
 )
 _WITHDRAWAL_REPORTED = re.compile(
     r"\b(?:you (?:said|told|mentioned|claimed|wrote)|aap ne kaha|aapne kaha|tum ne kaha|"
@@ -475,19 +467,23 @@ _WITHDRAWAL_REPORTED = re.compile(
 
 
 def withdrawal_said(text: str | None) -> bool:
-    """True when the owner's message takes back the cause they gave ("I take that back", "maine
+    """True when the OWNER's message takes back the cause they gave ("I take that back", "maine
     galat kaha", "wo wajah nahi thi", Urdu, Arabic and Hindi forms). Not a question ("kya wo
-    wajah nahi thi?"), not a refusal ("I do not take that back", "won't take that back"), and not
-    someone's words said back ("you said that wasn't the cause but it is")."""
+    wajah nahi thi?"), not a refusal ("I do not take that back", "won't take that back"), not
+    someone's words said back ("you said that wasn't the cause but it is") and not a third party's
+    statement ("my partner says that wasn't the cause")."""
+    from app.modules.pi import owner_claim
     from app.modules.pi import tried_outcome as clauses
 
     for clause, is_question in clauses.split_clauses(text):
         said = _squash(clause)
         found = WITHDRAWAL.search(said)
-        if not found or is_question or _QUESTION_START.search(said):
+        if not found or is_question or owner_claim.question_start(said):
             continue
         before = said[: found.start()]
         if _WITHDRAWAL_NEGATED.search(before) or _WITHDRAWAL_REPORTED.search(before):
+            continue
+        if owner_claim.attributed(before) or owner_claim.echoes_pi(before):
             continue
         return True
     return False

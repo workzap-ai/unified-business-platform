@@ -39,6 +39,9 @@ FAIL_STRONG = re.compile(
     r"|ناکام|(?:فائدہ|فایدہ|اثر|نتیجہ)\s+(?:نہیں|نھیں)|کام\s+نہیں\s+(?:آیا|کیا)"
     r"|لم\s+[يت](?:نجح|فد|نفع)|ما\s+(?:نفع|نجح|أفاد|افاد)|و?فشل|دون\s+جدوى|بدون\s+فائدة"
     r"|काम\s+नहीं\s+आया|(?:फायदा|फ़ायदा|असर|नतीजा)\s+नहीं|असफल|नाकाम"
+    r"|\b(?:stopped working|then (?:it )?(?:stopped|failed|died|dropped|faded)|wore off|fizzled"
+    r"|petered out|worked (?:only )?(?:at first|initially|for a (?:week|while|few days|bit)))\b"
+    r"|\bphir band\b|\bbaad mein (?:kaam )?nahi\b|\bkuch din (?:chala|kaam kiya) phir\b"
 )
 # 'failed', 'useless' and the like count only beside an attempt word that comes before them, and
 # never as "failed to ..." (something that did not happen, not an outcome).
@@ -62,7 +65,7 @@ _OWN_NEGATION = re.compile(
 _NEG_BEFORE = re.compile(
     r"(?:\b(?:not|never|no|hasn't|haven't|hadn't|isn't|wasn't|aren't|weren't|didn't|doesn't|"
     r"don't|won't|cannot|can't|nahi|nahin|nhi|kabhi)\b|نہیں|نھیں|नहीं|\bلم\b|\bلا\b|\bليس\b)"
-    r"[\s,]*(?:\S+\s+){0,2}$"
+    r"[\s,]*(?:\S+\s+){0,2}\S*$"
 )
 # 'nakam nahi hue', 'ناکام نہیں ہوا', 'असफल नहीं हुआ': a negation right after the cue
 _NEG_AFTER = re.compile(r"^\s*(?:\S+\s+)?(?:nahi|nahin|nhi|نہیں|نھیں|नहीं)(?:\s|$)")
@@ -87,7 +90,7 @@ _THIRD_PARTY = re.compile(
 )
 # The owner says they did it too
 _FIRST_PERSON = re.compile(
-    r"\b(?:i|we|me|maine|humne|mene|main ne|hum ne|mein ne)\b"
+    r"\b(?:i|we|maine|humne|mene|main ne|hum ne|mein ne)\b"
     r"|میں نے|ہم نے|جربت|جربنا|حاولت|حاولنا|मैंने|हमने"
 )
 
@@ -128,11 +131,57 @@ def split_clauses(text: str | None) -> list[tuple[str, bool]]:
     return out
 
 
-def _owner_attempt(said: str, is_question: bool) -> bool:
-    """Whether a squashed clause can be the owner's own statement of what happened."""
-    if is_question or _HYPOTHETICAL.search(said):
+# Said as not done, or not yet done: no attempt happened.
+_NOT_TRIED = re.compile(
+    r"\b(?:never|haven't|hasn't|hadn't|have not|has not|had not|did not|didn't|do not|don't|"
+    r"not yet|yet to|plan(?:s|ned|ning)? to|going to|want(?:ed)? to|hope(?:fully)?|intend(?:ed)? to"
+    r"|will|would|may|might|should)\b(?:\s+\w+){0,3}?\s+(?:try|tried|trying)\b"
+    r"|\bnot (?:tried|try)\b|\bnot yet\b|\bhope(?:fully)?\b|\bhaven't\b.{0,12}\byet\b"
+    r"|\btry (?:nahi|nahin|nhi)\b|\baazma\w* (?:nahi|nahin|nhi)\b"
+    r"|\bkabhi (?:\w+ ){0,3}(?:nahi|nahin|nhi)\b|\b(?:nahi|nahin|nhi) (?:kiye|kiya|try|aazma\w*)\b"
+    r"|\babhi (?:tak )?(?:nahi|nahin)\b|\bsuna hai\b|\bsocha hai\b|\bkarenge\b|\bkaren ge\b"
+    r"|\bkaroonga\b|\bkarungi\b|\bkarun\b|\bkarna chahte\b"
+    r"|نہیں آزما|آزما\w* نہیں|کبھی نہیں|ابھی نہیں|سنا ہے|ارادہ|کوشش نہیں"
+    r"|لم (?:أ|ن|ا)?جرب|لم (?:أ|ن|ا)?حاول|لا (?:أ|ن)جرب|سأجرب|سنجرب|سمعت|لن (?:أ|ن)جرب"
+    r"|नहीं आज़माया|नहीं आजमाया|आज़माया नहीं|कभी नहीं|अभी नहीं|सुना है|इरादा|करेंगे"
+)
+_URDU_LETTER = re.compile(r"[ٹڈڑںھہےکگچپژی]")
+_ARABIC_SCRIPT = re.compile(r"[؀-ۿ]")
+_DEVANAGARI = re.compile(r"[ऀ-ॿ]")
+_ROMAN_URDU = re.compile(
+    r"\b(?:kiye|kiya|kiyay|aazma\w*|hain|nahi|nahin|lekin|pehle|gaye|gayi|raha|rahi|rahe|istemal"
+    r"|kaam|aur|mein|humne|maine|mene)\b"
+)
+_NE = re.compile(r"(\S+) (?:ne|نے|ने)(?=\s|$)")
+_OWN_NE = frozenset({"hum", "main", "mein", "mai", "ہم", "میں", "मैं", "हम"})
+
+
+def _dropped_subject_ok(said: str) -> bool:
+    """No first-person word in the clause: Roman Urdu, Urdu and Hindi leave the subject out
+    ("folder try kiye lekin mix ho gaye") and that is read as the owner's, unless another subject
+    is named. English and Arabic need the owner as a named subject."""
+    if any(m.group(1) not in _OWN_NE for m in _NE.finditer(said)):
+        return False  # "padosi ne ...": someone else did it
+    if _THIRD_PARTY.search(said):
         return False
-    return not (_THIRD_PARTY.search(said) and not _FIRST_PERSON.search(said))
+    if _ARABIC_SCRIPT.search(said):
+        return _URDU_LETTER.search(said) is not None
+    if _DEVANAGARI.search(said):
+        return True
+    return _ROMAN_URDU.search(said) is not None
+
+
+def _owner_attempt(said: str, is_question: bool) -> bool:
+    """Whether a squashed clause is the OWNER saying they tried something: the owner is the
+    subject (a first-person word, or no named subject in a language that drops it), an attempt
+    word is there, and it is not a question, a hypothetical, a plan or a "never tried"."""
+    if is_question or _HYPOTHETICAL.search(said) or not ATTEMPT.search(said):
+        return False
+    if _NOT_TRIED.search(said):
+        return False
+    if _FIRST_PERSON.search(said):
+        return True
+    return _dropped_subject_ok(said)
 
 
 def owner_clauses(text: str | None) -> list[str]:

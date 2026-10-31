@@ -7,7 +7,7 @@ from app.modules.pi import tried_outcome as to
 
 FAILED = [
     "we tried ads and it did not work",
-    "ads: it never worked",
+    "we tried ads: it never worked",
     "we tried flyers, it did not help",
     "we tried flyers, not helped at all",
     "I tried discounts before but it failed",
@@ -94,11 +94,11 @@ def test_a_hypothetical_or_a_question_is_not_an_attempt(text):
 
 
 def test_not_helped_is_never_worked_and_did_not_help_is_failed():
-    assert to.outcome_of("not helped") == "failed"
-    assert to.outcome_of("it never worked") == "failed"
-    assert to.outcome_of("did not help") == "failed"
-    assert to.outcome_of("the ads helped a lot") == "worked"
-    assert to.outcome_of("the ads never helped") == "failed"
+    assert to.outcome_of("we tried it, not helped") == "failed"
+    assert to.outcome_of("we tried it, it never worked") == "failed"
+    assert to.outcome_of("we tried it, did not help") == "failed"
+    assert to.outcome_of("we tried ads and they helped a lot") == "worked"
+    assert to.outcome_of("we tried ads, they never helped") == "failed"
 
 
 def test_the_owner_who_also_did_it_is_kept_with_a_third_party():

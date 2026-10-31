@@ -96,7 +96,7 @@ def test_the_derived_failed_attempt_ignores_third_parties_and_hypotheticals():
 
 
 def test_a_mixed_message_marks_each_attempt_by_its_own_clause():
-    text = "facebook ads try kiye lekin kaam nahi aaya. flyers it worked well"
+    text = "facebook ads try kiye lekin kaam nahi aaya. we tried flyers and it worked well"
     got = {
         e["what"]: e["outcome"]
         for e in stored([{"what": "facebook ads"}, {"what": "flyers"}], text)

@@ -580,8 +580,9 @@ class ProblemBook:
             return note.cause_text, note.cause_said, note.cause_words
         text = note.believes_cause.strip()
         words = problem_fields.content_words(text)
-        backed = problem_fields.support_share(words, owner_text) >= 0.6
-        return text, backed, words[: problem_fields.EVIDENCE_WORDS]
+        carried = problem_fields.endorsed_words(words, owner_text)
+        backed = bool(words) and len(carried) / len(words) >= 0.6
+        return text, backed, carried[: problem_fields.EVIDENCE_WORDS]
 
     async def load_requirements(self, problem: PiProblem) -> None:
         """The four deferred columns, loaded now (an async session cannot lazy-load them)."""
