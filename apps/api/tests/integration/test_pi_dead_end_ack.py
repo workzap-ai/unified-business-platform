@@ -4,10 +4,12 @@ flow; the AI and WhatsApp are mocked."""
 
 import pytest
 from test_pi_brain_problems import adaptive, create, say, workspace
+from test_pi_pipeline import pi_workspace
 from test_pi_service_conversations import turn
 
 from app.modules.pi import runtime
 from app.modules.pi.guard import ReplyRejected
+from app.modules.pi.language import TEAM_CHECK_NOTICES
 
 pytestmark = pytest.mark.integration
 
@@ -55,4 +57,24 @@ async def test_a_rejected_draft_is_acknowledged_and_the_next_question_follows(
         "What else" not in reply
     )  # the rejected draft is not sent  # the rejected draft is not sent
     assert reply.count("?") == 1 and reply.rstrip().endswith("?"), reply
+    await pi.close()
+
+
+async def test_outside_brain_mode_a_rejected_draft_keeps_the_old_team_check_notice(
+    api, business_db, monkeypatch
+):
+    adaptive(monkeypatch, script)
+    pi = await pi_workspace(api, business_db, business_type="service_business")  # brain mode off
+    await say(pi, "Best-sellers run out", "nb-1")
+    real = runtime.validate_service_reply
+
+    def reject_the_second_draft(reply, *args, **kwargs):
+        if "What else" in reply:
+            raise ReplyRejected("SERVICE_PRICE_BLOCKED")
+        return real(reply, *args, **kwargs)
+
+    monkeypatch.setattr(runtime, "validate_service_reply", reject_the_second_draft)
+    await say(pi, "the cashiers are late too", "nb-2")
+    reply = last_reply(pi)
+    assert reply == TEAM_CHECK_NOTICES["en"], reply  # untouched: no question added
     await pi.close()

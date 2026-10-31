@@ -157,6 +157,17 @@ def wants(said: str) -> str | None:
     return None
 
 
+# The question lines that carry a problem label ("P2") as an example. pi wrote them, so the reply
+# check lets exactly these sentences through (the same way as `fixed_lines`); the price guard itself
+# is not loosened.
+LABEL_LINES: tuple[str, ...] = tuple(
+    text
+    for key in ("which_link", "which_problem")
+    for text in LINES[key].values()
+    if any(ch.isdigit() for ch in text)
+)
+
+
 def line(action: str, language: str | None, **names: str) -> str:
     table = LINES[action]
     return table[fixed_lines.table_language(language, table)].format(**names)

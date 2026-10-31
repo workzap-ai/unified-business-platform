@@ -1391,9 +1391,6 @@ def brief_words(brief: dict[str, Any] | None) -> str:
     return " ".join(w for w in words if w)[:300]
 
 
-PROBLEM_LABEL = re.compile(r"(?<![\w.])P\d{1,2}(?![\w.,]*\d)")
-
-
 def validate_service_reply(
     reply: str, max_chars: int = 4000, mode: str = "quote", allowed: list[str] | None = None
 ) -> str:
@@ -1405,8 +1402,6 @@ def validate_service_reply(
     # part of a longer allowed line (a quote's number and total) before that line is matched.
     for text in sorted(allowed or [], key=len, reverse=True):
         checked = checked.replace(text, " ")  # exact offered labels only
-    # A problem label pi writes itself ("P2") is a name, not a figure (the map-edit question).
-    checked = PROBLEM_LABEL.sub(" ", checked)
     if mode in price_policy.NO_DISCLOSURE and any(
         ch.isdecimal() or unicodedata.category(ch) == "Sc" for ch in checked
     ):

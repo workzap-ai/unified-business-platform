@@ -2445,29 +2445,92 @@ def _fresh_question(context: dict[str, Any], language: str) -> str:
     return _next_question(context, "") or FALLBACK_LISTENING[language]
 
 
-# The question after the acknowledgement of a draft that was not sent, in the languages that have
-# an acknowledgement but no safe line above (same meaning as FALLBACK_LISTENING and FALLBACK_OTHER).
-ACK_QUESTION_MORE = {
+# The question after the acknowledgement of a draft that was not sent: safe questions per language
+# and group. "listening" asks about the problem, "other" asks which one to fix first. No digits and
+# no word about a quote, document, price, payment or offer. Several per group so one is not asked
+# twice in a chat (the same line sent twice was a live complaint, 2026-10-27).
+ACK_QUESTIONS: dict[str, dict[str, list[str]]] = {
+    "en": {
+        "listening": [FALLBACK_LISTENING["en"], *FALLBACK_LISTENING_MORE["en"]],
+        "other": [
+            FALLBACK_OTHER["en"],
+            "Which of these hurts the business most right now?",
+            "Which one would you like to start with?",
+        ],
+    },
+    "roman_ur": {
+        "listening": [FALLBACK_LISTENING["roman_ur"], *FALLBACK_LISTENING_MORE["roman_ur"]],
+        "other": [
+            FALLBACK_OTHER["roman_ur"],
+            "In mein se kaun sa masla business ko abhi sab se zyada nuqsan de raha hai?",
+            "Aap kis se shuru karna chahenge?",
+        ],
+    },
+    "ur": {
+        "listening": [FALLBACK_LISTENING["ur"], *FALLBACK_LISTENING_MORE["ur"]],
+        "other": [
+            FALLBACK_OTHER["ur"],
+            "ان میں سے کون سا مسئلہ کاروبار کو اس وقت سب سے زیادہ نقصان دے رہا ہے؟",
+            "آپ کس سے شروع کرنا چاہیں گے؟",
+        ],
+    },
+    "ar": {
+        "listening": [FALLBACK_LISTENING["ar"], *FALLBACK_LISTENING_MORE["ar"]],
+        "other": [
+            FALLBACK_OTHER["ar"],
+            "أي هذه المشاكل تؤذي عملك أكثر الآن؟",
+            "بأيها تودّ أن نبدأ؟",
+        ],
+    },
     "fr": {
-        "listening": "Quelle partie de cela vous coûte le plus en ce moment ?",
-        "other": "Lequel de ces points aimeriez-vous voir réglé en premier ?",
+        "listening": [
+            "Quelle partie de cela vous coûte le plus en ce moment ?",
+            "Où ou quand remarquez-vous cela en premier ?",
+            "Qu'avez-vous déjà essayé pour cela ?",
+        ],
+        "other": [
+            "Lequel de ces points aimeriez-vous voir réglé en premier ?",
+            "Lequel de ces points pèse le plus sur votre activité en ce moment ?",
+            "Par lequel aimeriez-vous commencer ?",
+        ],
     },
     "es": {
-        "listening": "¿Qué parte de esto le cuesta más ahora mismo?",
-        "other": "¿Cuál de estos puntos le gustaría ver resuelto primero?",
+        "listening": [
+            "¿Qué parte de esto le cuesta más ahora mismo?",
+            "¿Dónde o cuándo lo nota primero?",
+            "¿Qué ha probado hasta ahora para esto?",
+        ],
+        "other": [
+            "¿Cuál de estos puntos le gustaría ver resuelto primero?",
+            "¿Cuál de estos puntos pesa más en su negocio ahora mismo?",
+            "¿Por cuál le gustaría empezar?",
+        ],
     },
     "fa": {
-        "listening": "کدام بخش این موضوع الان بیشترین هزینه را برای شما دارد؟",
-        "other": "کدام یک از این موارد را دوست دارید اول حل شود؟",
+        "listening": [
+            "کدام بخش این موضوع الان بیشترین هزینه را برای شما دارد؟",
+            "اول کجا یا کی متوجه این موضوع می‌شوید؟",
+            "تا حالا برای این چه کاری امتحان کرده‌اید؟",
+        ],
+        "other": [
+            "کدام یک از این موارد را دوست دارید اول حل شود؟",
+            "کدام یک از این موارد الان بیشتر به کسب‌وکار شما فشار می‌آورد؟",
+            "از کدام یک شروع کنیم؟",
+        ],
     },
 }
+
+
+def _asked_key(question: str) -> str:
+    return question.lower().rstrip(" ?؟")
 
 
 def ack_with_question(ack: str, context: dict[str, Any], language: str | None = None) -> str:
     """The acknowledgement of a draft that was not sent, with the next question after it: a
     notice alone ("Thanks, I've got that.") leaves the owner with nothing to answer. The question
-    is the safe one for the state (the same choice as safe_fallback): it asks, never offers, never
-    names a price, and is not one pi already asked in this chat. One question, the last sentence."""
+    is a safe one for the state (listening: about the problem; otherwise: which to fix first) that
+    pi has not asked in this chat; both groups are tried before one is repeated, and then the one
+    asked longest ago. It asks, never offers, never names a price, one question, the last sentence."""
     if ack.rstrip().endswith(QUESTION_MARKS):
         return ack
     state = flow.parse((context.get("flow") or {}).get("state"))
@@ -2477,12 +2540,16 @@ def ack_with_question(ack: str, context: dict[str, Any], language: str | None = 
         flow.State.S_RETURN,
         flow.State.S_MAP_SHARE,
     )
-    if language in ACK_QUESTION_MORE:
-        question = ACK_QUESTION_MORE[language]["listening" if listening else "other"]
-    else:
-        lang = language if language in FALLBACK_LISTENING else _language(context)
-        question = _fresh_question(context, lang) if listening else FALLBACK_OTHER[lang]
-    return f"{ack.rstrip()} {question}"
+    lang = language if language in ACK_QUESTIONS else _language(context)
+    pools = ACK_QUESTIONS[lang]
+    first, second = ("listening", "other") if listening else ("other", "listening")
+    candidates = [*pools[first], *pools[second]]
+    said = " ".join(_pi_replies(context)).lower()
+    for question in candidates:
+        if _asked_key(question) not in said:
+            return f"{ack.rstrip()} {question}"
+    oldest = min(candidates, key=lambda q: said.rfind(_asked_key(q)))
+    return f"{ack.rstrip()} {oldest}"
 
 
 def safe_fallback(context: dict[str, Any]) -> str:

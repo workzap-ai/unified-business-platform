@@ -2,12 +2,19 @@
 ends without a next step. Each test reproduces one path that used to send a statement alone:
 the rejected-draft acknowledgement, the "document|quote" exemption of the progress rule, a progress
 rule with no next-slot question left, and a pi-written problem label ("P2") that the digit check
-mistook for a price and so rejected the map-edit question."""
+mistook for a price and so rejected the map-edit question (fixed by letting exactly those lines
+through, never by loosening the price guard)."""
 
 import pytest
 
-from app.modules.pi import constitution, flow
-from app.modules.pi.language import BRAIN_ACK_NOTICES, notice_in
+from app.modules.pi import constitution, flow, map_edit, runtime
+from app.modules.pi.language import (
+    BRAIN_ACK_NOTICES,
+    TEAM_CHECK_NOTICES,
+    TECH_DOWN_NOTICES,
+    TOOL_FAIL_NOTICES,
+    notice_in,
+)
 from app.modules.pi.service_conversation import ReplyRejected, validate_service_reply
 
 QUESTION_MARKS = ("?", "؟")
@@ -92,15 +99,133 @@ def test_the_states_that_own_their_question_are_untouched():
     assert constitution._ensure_next_step(offer, at_the_offer) == offer
 
 
-@pytest.mark.parametrize("mode", ["hidden", "quote", "ask_team", "starting", "exact"])
-def test_a_problem_label_in_a_pi_written_question_is_not_a_price(mode):
-    reply = "I want to change the right one. Which problem do you mean, for example P2?"
-    assert validate_service_reply(reply, 4000, mode, []) == reply
+BANNED = ("quote", "document", "price", "pay", "offer", "box", "rs ", "solution")
 
 
-@pytest.mark.parametrize(
-    "reply", ["It would cost P2000.", "It is Rs 500.", "Which problem, P2 at 500 rupees?"]
-)
-def test_a_real_figure_next_to_a_label_is_still_blocked(reply):
+def pool(language, group):
+    return constitution.ACK_QUESTIONS[language][group]
+
+
+def test_every_safe_question_is_clean_and_every_group_has_variants():
+    assert set(constitution.ACK_QUESTIONS) == set(LANGUAGES)
+    for language, groups in constitution.ACK_QUESTIONS.items():
+        for group, questions in groups.items():
+            assert len(set(questions)) >= 2, (language, group)
+            for question in questions:
+                assert question.endswith(QUESTION_MARKS) and marks(question) == 1
+                assert not any(ch.isdigit() for ch in question)
+                assert not any(word in question.lower() for word in BANNED), question
+
+
+@pytest.mark.parametrize("language", LANGUAGES)
+def test_a_listening_chat_gets_the_listening_question_and_other_states_the_other_group(language):
+    ack = notice_in(BRAIN_ACK_NOTICES, language)
+    listening = constitution.ack_with_question(ack, context("S1_LISTENING", language), language)
+    other = constitution.ack_with_question(ack, context("S5_READINESS", language), language)
+    assert listening == f"{ack} {pool(language, 'listening')[0]}"
+    assert other == f"{ack} {pool(language, 'other')[0]}"
+
+
+@pytest.mark.parametrize("language", LANGUAGES)
+@pytest.mark.parametrize("state", ["S1_LISTENING", "S6_PREPARING"])
+def test_a_question_asked_before_is_never_asked_again(language, state):
+    ack = notice_in(BRAIN_ACK_NOTICES, language)
+    replies = []
+    seen = set()
+    total = len(pool(language, "listening")) + len(pool(language, "other"))
+    for _ in range(total):
+        text = constitution.ack_with_question(
+            ack, context(state, language, replies=replies), language
+        )
+        question = text[len(ack) :].strip()
+        assert question not in seen, (language, state, question)
+        assert text.rstrip().endswith(QUESTION_MARKS) and marks(text) == 1
+        seen.add(question)
+        replies.append(text)
+    assert len(seen) == total
+    # everything asked once: still one question, last, and the one asked longest ago
+    again = constitution.ack_with_question(ack, context(state, language, replies=replies), language)
+    assert marks(again) == 1 and again.rstrip().endswith(QUESTION_MARKS)
+    assert again[len(ack) :].strip() == replies[0][len(ack) :].strip()
+
+
+def test_the_language_of_the_chat_is_used_when_none_is_given():
+    text = constitution.ack_with_question("Shukriya.", context(language="roman_ur"), None)
+    assert text == f"Shukriya. {pool('roman_ur', 'listening')[0]}"
+
+
+BRAIN = {"pi_mode": "brain", "flow": {"state": "S1_LISTENING"}, "history": []}
+
+
+@pytest.mark.parametrize("reason", ["low_confidence", "reply_rejected"])
+def test_in_brain_mode_a_rejected_or_unsure_draft_gets_the_ack_and_a_question(reason):
+    text = runtime.soft_notice(reason, BRAIN, "hello there", "en")
+    assert text == f"{BRAIN_ACK_NOTICES['en']} {pool('en', 'listening')[0]}"
+
+
+def test_in_brain_mode_a_failure_keeps_its_own_notice_untouched():
+    assert (
+        runtime.soft_notice("provider_failure", BRAIN, "hello there", "en")
+        == (TECH_DOWN_NOTICES["en"])
+    )
+    assert (
+        runtime.soft_notice("tool_failure", BRAIN, "hello there", "en") == TOOL_FAIL_NOTICES["en"]
+    )
+
+
+@pytest.mark.parametrize("mode", [None, "", "legacy"])
+@pytest.mark.parametrize("reason", ["low_confidence", "reply_rejected", "provider_failure"])
+def test_outside_brain_mode_the_old_team_check_notice_is_untouched(mode, reason):
+    context_ = {"pi_mode": mode, "flow": {"state": "S1_LISTENING"}}
+    assert runtime.soft_notice(reason, context_, "hello there", "en") == TEAM_CHECK_NOTICES["en"]
+    assert runtime.soft_notice(reason, None, "hello there", "en") == TEAM_CHECK_NOTICES["en"]
+
+
+@pytest.mark.parametrize("mode", ["quote", "hidden", "ask_team"])
+def test_the_map_edit_label_lines_pass_when_they_are_the_exempt_lines(mode):
+    assert map_edit.LABEL_LINES
+    for language in ("en", "roman_ur", "ar", "fr", "fa", "es"):
+        for key in ("which_problem", "which_link"):
+            line = map_edit.LINES[key][language]
+            assert validate_service_reply(line, 4000, mode, list(map_edit.LABEL_LINES)) == line
+
+
+PROBES = [
+    "It would cost P2000.",
+    "It is Rs 500.",
+    "Which problem, P2 at 500 rupees?",
+    "P2k",
+    "P5k",
+    "P2K",
+    "P12k",
+    "P99k",
+    "P2m",
+    "P2L",
+    "P50",
+    "P99",
+    "P0",
+    "P2%",
+    "P2x",
+    "Rs P2",
+    "PKR P2",
+    "Rs. P12",
+    "P٢k",
+    "P2 five hundred",
+    "P2 grand",
+    "P2 per month",
+    "P2 پانچ سو",
+]
+
+
+@pytest.mark.parametrize("mode", ["quote", "hidden", "ask_team"])
+@pytest.mark.parametrize("probe", PROBES)
+def test_price_figures_next_to_a_label_stay_blocked(mode, probe):
     with pytest.raises(ReplyRejected):
-        validate_service_reply(reply, 4000, "quote", [])
+        validate_service_reply(probe, 4000, mode, list(map_edit.LABEL_LINES))
+
+
+def test_a_label_line_with_a_price_added_is_still_blocked():
+    line = map_edit.LINES["which_problem"]["en"]
+    for extra in (" It costs P2k.", " Rs 500."):
+        with pytest.raises(ReplyRejected):
+            validate_service_reply(line + extra, 4000, "quote", list(map_edit.LABEL_LINES))
