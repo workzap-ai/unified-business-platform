@@ -108,7 +108,7 @@ OFFER_REQUEST = re.compile(
 _LEAD = r"^\W*(?:(?:yes|yeah|ok|okay|please|pls|plz|haan|han|ji|jee|theek hai|bilkul|zaroor|sure)\W+){0,5}"
 _ONE = (
     r"(?:(?:solution|full|final|rough|short|quick|proper)\s+)?"
-    r"(?:document|documents|quote|quotation|proposal)"
+    r"(?:document|quote|quotation|proposal)"
 )
 _NOUN = rf"{_ONE}(?:\s+(?:and|aur|or|&)\s+(?:the\s+)?{_ONE})?"
 _ME = r"(?:mujhe\s+|mujhay\s+|hamein\s+|hamen\s+)?"
@@ -132,10 +132,11 @@ _YOU_TO = r"(?:(?:i|we)\s+(?:do\s+|really\s+)?(?:want|need|would like)\s+you\s+t
 _AR_NOUN = r"(?:ال)?(?:مستند|وثيقة|عرض\s+(?:ال)?سعر|عرض\s+(?:ال)?أسعار)"
 _AR_NOUNS = rf"{_AR_NOUN}(?:\s+و?{_AR_NOUN})?"
 _AR_TAIL = r"(?:\s+(?:من فضلك|من فضلكم|الآن|الان|رجاء|شكرا|شكراً|لي|لنا))*\W*$"
-_AR_IMP = (
-    r"(?:أرسل|ارسل|أرسلوا|ارسلوا|ابعث|جهز|جهزوا|اعمل|أعطني|اعطني|أعطنا|اعطنا|أنشئ|انشئ)"
-    r"(?:\s+(?:لي|لنا))?"
-)
+# Unambiguous imperatives; "أرسل" and "جهز" are also the past tense ("he sent", "he prepared") and
+# WhatsApp Arabic often drops the hamza, so they count only with a polite word (من فضلك, رجاء, الآن).
+_AR_IMP = r"(?:ابعث|اعمل|أعطني|اعطني|أعطنا|اعطنا|أنشئ|انشئ)(?:\s+(?:لي|لنا))?"
+_AR_AMBIG = r"(?:أرسل|ارسل|أرسلوا|ارسلوا|جهز|جهزوا)(?:\s+(?:لي|لنا))?"
+_AR_POLITE = r"(?:من فضلك|من فضلكم|رجاء|الآن|الان)"
 _AR_WISH = r"(?:أريد|اريد|نريد)"
 # Urdu script: explicit imperative forms (no بنا prefix match: "بنانے" is an infinitive), same tail.
 _UR_NOUN = r"(?:دستاویز|کوٹیشن)"
@@ -161,6 +162,9 @@ DIRECT_DOCUMENT = re.compile(
     r"bana\s+(?:do|dein|den|dijiye)|banwa\s+(?:do|dein|den))"
     rf"\s+{_ME}{_NOUN}(?:\s+(?:mujhe|mujhay|hamein|hamen))?{_TAIL}"
     rf"|^\W*(?:نعم\W+)?(?:{_AR_IMP}|{_AR_WISH})\s+{_AR_NOUNS}{_AR_TAIL}"
+    rf"|^\W*(?:نعم\W+)?{_AR_POLITE}\s+{_AR_AMBIG}\s+{_AR_NOUNS}{_AR_TAIL}"
+    rf"|^\W*(?:نعم\W+)?{_AR_AMBIG}\s+{_AR_NOUNS}(?:\s+(?:شكرا|شكراً|لي|لنا))*"
+    rf"\s+{_AR_POLITE}(?:\s+(?:{_AR_POLITE}|شكرا|شكراً))*\W*$"
     rf"|^\W*(?:جی\W+|ہاں\W+)?{_UR_SCRIPT_PRE}{_UR_NOUN}\s+{_UR_SCRIPT_IMP}{_UR_SCRIPT_TAIL}"
     rf"|^\W*(?:جی\W+|ہاں\W+)?(?:مجھے\s+){_UR_NOUN}\s+(?:چاہیے|چاہئے){_UR_SCRIPT_TAIL}",
     re.IGNORECASE,
@@ -201,7 +205,7 @@ _TIME_REMARK = re.compile(
     re.IGNORECASE,
 )
 _CONDITIONAL = re.compile(
-    r"\b(?:if|once|when|whenever|unless|until|after|agar|jab|tab|jaise hi|warna|only when|sirf jab)\b",
+    r"\b(?:if|once|when|whenever|unless|until|after|agar|jab|tab|jaise hi|jaisay hi|warna|only when|sirf jab)\b",
     re.IGNORECASE,
 )
 # the same vetoes in Arabic and Urdu script: conditions, later or after, reported speech, price or cost
@@ -212,6 +216,7 @@ _SCRIPT_VETO = re.compile(
     r"قال|قالوا|قالت|کہا|کہتے|کہتا|کہتی|بولا|بولتے|"
     r"كم|تكلفة|كلفة|تكاليف|قیمت|کتنا|کتنی|کتنے|خرچ|خرچہ|لاگت|ریٹ|"
     r"فقط|صرف|"
+    r"عندما|حينما|متى|کب|جس وقت|پھر|سوچ کر|مستقبل|"
     r"لا|ليس|لن|بدون|نہیں|نہ|مت|بغیر)(?!\w)",
 )
 _REPORTED = re.compile(

@@ -982,7 +982,9 @@ DECIDE_STATEMENTS += [
 ]
 DECIDE_ASKS = [
     "can I get the quote",
-    "أرسل عرض سعر",
+    "ابعث عرض سعر",
+    "أرسل عرض سعر من فضلك",
+    "من فضلك أرسل عرض السعر",
     "أرسل عرض السعر من فضلك",
     "کوٹیشن بھیج دیں",
     "براہ کرم کوٹیشن بھیج دیں",
@@ -1069,3 +1071,147 @@ def test_a_fixed_reply_clears_the_need_fact_flag_and_the_cost_line():
     }
     sc.brain_never_empty(turn, context)
     assert turn._need_fact is False and turn._cost_line == ""
+
+
+# --- round 6: Arabic homographs, the offer gate, script vetoes, fixed-reply clearing, disclosure -----
+ROUND6_FALSE = [
+    "أرسل لي عرض سعر",  # "he sent me a quote" (past tense) without a polite word
+    "أرسل المستند",
+    "جهز عرض سعر",
+    "ارسل عرض سعر",
+    "أرسل عرض سعر عندما أقرر",
+    "حينما أقرر ابعث عرض سعر",
+    "کوٹیشن بھیج دیں کب",
+    "کوٹیشن بھیج دیں پھر",
+    "کوٹیشن بھیج دیں سوچ کر",
+    "jaisay hi theek ho quote bhej do",
+    "هل ترسل عرض سعر؟",
+    "کیا آپ کوٹیشن بھیجتے ہیں؟",
+    "نريد وثيقة لكل طلب",
+    "Can you send documents?",
+    "send me the documents",
+]
+ROUND6_TRUE = [
+    "أرسل لي عرض سعر الآن",
+    "من فضلك جهز عرض سعر",
+    "جهز عرض سعر من فضلك",
+    "ابعث عرض سعر",
+    "اعمل عرض سعر",
+    "أريد عرض سعر",
+    "نريد عرض سعر من فضلك",
+    "مجھے کوٹیشن چاہیے",
+    "send me the document",
+    "Can you send the document?",
+]
+
+
+@pytest.mark.parametrize("said", ROUND6_FALSE)
+def test_round6_these_do_not_ask_for_the_quote(said):
+    assert part19.asks_for_the_quote(said) is False
+    decision = _decide(said)
+    assert decision is None or "request_solution" not in decision.effects
+
+
+@pytest.mark.parametrize("said", ROUND6_TRUE)
+def test_round6_these_ask_for_the_quote(said):
+    assert part19.asks_for_the_quote(said) is True
+    decision = _decide(said)
+    assert decision is not None and "request_solution" in decision.effects
+
+
+@pytest.mark.parametrize(
+    "said,allowed",
+    [
+        ("It takes me hours to send a quote to customers", False),
+        ("Mujhe quote banane mein bahut time lagta hai", False),
+        ("when I send the quote customers complain", False),
+        ("how much will it cost?", True),  # a genuine price question still opens the offer (D-1)
+        ("kitna kharcha hoga yeh usb karnay ka?", True),
+        ("send me a quote for this", True),
+        ("mujhay quote do abhi", True),
+    ],
+)
+def test_the_offer_opens_on_a_quote_ask_or_a_price_question_not_on_a_statement(said, allowed):
+    from app.modules.pi import service_conversation as sc
+
+    context = {"latest_customer_message": said, "noted_problems": [{}, {}]}
+    assert sc.box_offer_allowed(context) is allowed
+
+
+def test_a_price_question_with_a_fixed_reply_keeps_the_cost_line_and_adds_no_question():
+    from app.modules.pi import service_conversation as sc
+
+    turn = sc.ServiceTurn(reply="x")
+    turn._need_fact = True
+    turn._cost_line = "stale"
+    sc.after_fixed_reply(turn, {"latest_customer_message": "how much will it cost?"})
+    assert turn._need_fact is False
+    assert turn._cost_line == decisions.cost_answer("en", {"latest_customer_message": "x"})
+    assert "?" not in turn._cost_line
+    sc.after_fixed_reply(turn, {"latest_customer_message": "ok thanks"})
+    assert turn._cost_line == ""
+
+
+def _first_message_context(**extra):
+    return {
+        "latest_customer_message": "hello",
+        "flow": {"state": "S3_NOTED"},
+        "noted_problems": [{"ref": "a", "title": "x"}],
+        "brief": {},
+        "history": [],
+        "reply_language": "en",
+        **extra,
+    }
+
+
+def _says_ai_first(reply):
+    from app.modules.pi import constitution
+    from app.modules.pi import service_conversation as sc
+
+    first = reply.split(".")[0]
+    return bool(sc.SAYS_AI.search(first) or constitution._discloses(first))
+
+
+def test_every_fixed_reply_path_keeps_the_ai_disclosure_on_a_first_message():
+    from app.modules.pi import service_conversation as sc
+
+    # the safe listening line (no offer allowed)
+    turn = sc.ServiceTurn(reply="The document will be prepared.")
+    sc.brain_no_early_promise(turn, _first_message_context())
+    assert _says_ai_first(turn.reply), turn.reply
+    # the offer line (the owner asked for the quote)
+    turn = sc.ServiceTurn(reply="The document will be prepared.")
+    sc.brain_no_early_promise(
+        turn,
+        _first_message_context(
+            latest_customer_message="mujhay quote do abhi", box_offer=True, solution_asked=True
+        ),
+    )
+    assert _says_ai_first(turn.reply), turn.reply
+    # never empty
+    turn = sc.ServiceTurn(reply="x")
+    turn.reply = ""
+    sc.brain_never_empty(turn, _first_message_context())
+    assert _says_ai_first(turn.reply), turn.reply
+    # how exactly
+    turn = sc.ServiceTurn(reply="steps")
+    sc.brain_howto(turn, _first_message_context(solution_howto={"which_app": False}))
+    assert _says_ai_first(turn.reply), turn.reply
+
+
+def test_the_fixed_replace_paths_clear_the_flags():
+    from app.modules.pi import service_conversation as sc
+
+    stale = {"_need_fact": True, "_cost_line": "stale"}
+    turn = sc.ServiceTurn(reply="The document will be prepared.")
+    turn._need_fact, turn._cost_line = True, "stale"
+    sc.brain_no_early_promise(turn, _first_message_context())
+    assert turn._need_fact is False and turn._cost_line == "", stale
+    turn = sc.ServiceTurn(reply="steps")
+    turn._need_fact, turn._cost_line = True, "stale"
+    sc.brain_howto(turn, _first_message_context(solution_howto={"which_app": False}))
+    assert turn._need_fact is False and turn._cost_line == ""
+    turn = sc.ServiceTurn(reply=sc.NO_MORE_IDEAS["en"])
+    turn._cost_line = "stale"
+    sc.brain_offer(turn, _offer_context("en"))
+    assert turn._cost_line == ""

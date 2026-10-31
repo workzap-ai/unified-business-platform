@@ -252,6 +252,41 @@ def asks_for_the_quote(said: str) -> bool:
     return decisions.asks_for_document(said)
 
 
+# An imperative-led or "mujhe quote do"-led request that may carry extra words ("send me a quote for
+# this"): enough to OPEN the offer (never to start the quote, which needs `asks_for_the_quote`). A
+# statement about quotes ("it takes me hours to send a quote", "when I send the quote ...") does not
+# start with the request, so it does not match.
+QUOTE_PHRASE_LED = re.compile(
+    r"^\W*(?:(?:yes|ok|okay|please|pls|haan|ji)\W+)*(?:"
+    r"(?:send|give|share)\s+(?:me\s+|us\s+)?(?:the\s+|a\s+)?(?:quote|quotation)\b"
+    r"|(?:(?:mujhay|mujhe|hamein|hamen)\s+)?(?:(?:ab|abhi|jaldi)\s+)?(?:quote|quotation)\s+"
+    r"(?:de|dein|den|dain|dijiye|do|bhej\w*|chahiye)\b)",
+    re.IGNORECASE,
+)
+
+
+def opens_the_offer_by_quote_phrase(said: str) -> bool:
+    """A request that leads with the quote ask opens the offer even with words after it."""
+    from app.modules.pi import decisions
+
+    text = " ".join((said or "").split())
+    return bool(QUOTE_PHRASE_LED.match(text)) and not (
+        NEGATED.search(text) or decisions.NOT_A_REQUEST.search(text)
+    )
+
+
+def asks_price(said: str) -> bool:
+    """A genuine price or cost QUESTION about the thing discussed ("how much will it cost?",
+    "kitna kharcha hoga yeh usb karnay ka?"): it opens the offer (R1, D-1) but starts no quote. The
+    owner's own loss or spend, a refusal and a statement about quotes are not one."""
+    from app.modules.pi import decisions
+
+    text = " ".join(decisions.OWN_MONEY.sub(" ", said or "").split())
+    if not text or not R1_PRICE.search(text):
+        return False
+    return not (NEGATED.search(text) or OWN_LOSS.search(text))
+
+
 def gate_signal(said: str, covers: int = 0) -> str | None:
     """The signal the decision gate may act on: "R1" only for an explicit ask for the quote (D-1).
     A price question stays an R1 signal for the offer (`buying_signal`) but starts nothing here, and

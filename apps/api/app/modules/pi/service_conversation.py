@@ -1980,6 +1980,16 @@ def with_disclosure(
     return f"{fixed_lines.line('opening', fixed_lines.code(context), opening)} {reply}"
 
 
+def after_fixed_reply(turn: "ServiceTurn", context: dict[str, Any]) -> None:
+    """A fixed reply just replaced the whole reply: the one-more-fact flag goes, and a price
+    question asked THIS turn is still answered first (spec 19.2, RSOL08) by the fixed cost line, a
+    statement that adds no question; any other cost line is stale and goes."""
+    turn._need_fact = False
+    said = str(context.get("latest_customer_message") or "")
+    language = str(context.get("reply_language") or "en")
+    turn._cost_line = decisions.cost_answer(language, context) if decisions.cost_asked(said) else ""
+
+
 def put_cost_line(reply: str, line: str) -> str:
     """The fixed cost answer in front of the reply, or right after pi's opening disclosure when the
     reply starts with one (R-DISC-01: the first sentence of a first message says pi is an AI)."""
@@ -3183,8 +3193,7 @@ def brain_no_ideas(turn: "ServiceTurn", context: dict[str, Any]) -> None:
             # end; what was heard, then brain_offer adds the one question (the offer, R3)
             heard = system_ask.HEARD_LINES.get(language, system_ask.HEARD_LINES["en"])
             turn.reply = with_disclosure(heard, context, language)
-            turn._need_fact = False  # a fixed reply replaced the one-more-fact question
-            turn._cost_line = ""
+            after_fixed_reply(turn, context)
             turn.awaiting_customer = True
             return
     told = [
@@ -3195,8 +3204,7 @@ def brain_no_ideas(turn: "ServiceTurn", context: dict[str, Any]) -> None:
         if any(line in said for said in told[-6:]):
             line = NO_IDEA_THIRD.get(language, NO_IDEA_THIRD["en"])
     turn.reply = with_disclosure(line, context, language)
-    turn._need_fact = False  # a fixed reply replaced the one-more-fact question
-    turn._cost_line = ""
+    after_fixed_reply(turn, context)
     turn.awaiting_customer = True
 
 
@@ -3233,8 +3241,7 @@ def brain_howto(turn: "ServiceTurn", context: dict[str, Any]) -> None:
     if howto.get("which_app"):
         line = f"{NO_APP_LINES.get(language, NO_APP_LINES['en'])} {line}"
     turn.reply = with_disclosure(line, context, language)
-    turn._need_fact = False  # a fixed reply replaced the one-more-fact question
-    turn._cost_line = ""
+    after_fixed_reply(turn, context)
     # written in the person's own language where there is a line for it: an English line next to the
     # Roman Urdu offer is a mixed reply the language check refuses (a real-model run lost the turn)
     turn._english = language not in HOWTO_LINES
@@ -3274,18 +3281,16 @@ def brain_no_early_promise(turn: "ServiceTurn", context: dict[str, Any]) -> None
     language = str(context.get("reply_language") or "en")
     created = [op for op in turn.problem_ops if op.op == "create"]
     if (context.get("noted_problems") or created) and box_offer_allowed(context):
-        turn.reply = solution_ask.offer_line(language, context)
-        turn._need_fact = False  # a fixed reply replaced the one-more-fact question
-        turn._cost_line = ""
+        turn.reply = with_disclosure(solution_ask.offer_line(language, context), context, language)
+        after_fixed_reply(turn, context)
         turn._decision = decisions.Decision(
             None, flow.State.S5_READINESS, {"offer_asked": True}, why="R-OFFER-01"
         )
     else:
         invite = constitution.FIRST_INVITE if not context.get("noted_problems") else None
         table = invite or constitution.FALLBACK_LISTENING
-        turn.reply = table.get(language, table["en"])
-        turn._need_fact = False  # a fixed reply replaced the one-more-fact question
-        turn._cost_line = ""
+        turn.reply = with_disclosure(table.get(language, table["en"]), context, language)
+        after_fixed_reply(turn, context)
     turn.awaiting_customer = True
 
 
@@ -3308,9 +3313,8 @@ def brain_never_empty(turn: "ServiceTurn", context: dict[str, Any]) -> None:
             turn._decision = decisions.Decision(
                 None, flow.State.S5_READINESS, {"offer_asked": True}, why="R-OFFER-01"
             )
-    turn.reply = line
-    turn._need_fact = False  # a fixed reply replaced the one-more-fact question
-    turn._cost_line = ""
+    turn.reply = with_disclosure(line, context, language)
+    after_fixed_reply(turn, context)
     turn.awaiting_customer = True
     turn._english = language not in ("en", "roman_ur", "ar")
 
@@ -3326,9 +3330,11 @@ def box_offer_allowed(context: dict[str, Any]) -> bool:
     only the exception R1 holds: the owner asked for the document, quote or price in this message
     (audit R8: an unconditional offer came at the fourth problem with the map unreviewed)."""
     said = str(context.get("latest_customer_message") or "")
-    wants = (context.get("brief") or {}).get("wants") or []
-    covers = len(context.get("noted_problems") or []) + len(wants)
-    asked = decisions.asks_for_document(said) or part19.buying_signal(said, covers) == "R1"
+    asked = (
+        decisions.asks_for_document(said)
+        or part19.opens_the_offer_by_quote_phrase(said)
+        or part19.asks_price(said)
+    )
     if not context.get("box_offer"):
         return asked
     return box.can_offer(box.offer_facts(context, asked_for_document=asked))[0]
@@ -3387,8 +3393,7 @@ def brain_offer(turn: "ServiceTurn", context: dict[str, Any]) -> None:
         if any(line in turn.reply for line in NO_IDEA_FIXED):
             heard = system_ask.HEARD_LINES.get(language, system_ask.HEARD_LINES["en"])
             turn.reply = with_disclosure(heard, context, language)
-            turn._need_fact = False  # a fixed reply replaced the one-more-fact question
-            turn._cost_line = ""
+            after_fixed_reply(turn, context)
         else:
             turn.reply = part19.statement_only(turn.reply)  # the offer is the only question
         offer = solution_ask.offer_line(language, context)
@@ -3448,7 +3453,7 @@ def brain_decision(turn: "ServiceTurn", context: dict[str, Any]) -> None:
     turn._decision = decision
     if decision.reply:
         turn.reply = decision.reply
-        turn._cost_line = ""  # a fixed decision reply is not prefixed by a stale cost line
+        after_fixed_reply(turn, context)
         if gate == "R1" and decision.why == "R-OFFER-03":
             language = str(context.get("reply_language") or "en")
             own = "title_local" if language != "en" else "title"
