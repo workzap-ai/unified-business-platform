@@ -760,30 +760,35 @@ def _roman_fire(said: str) -> Emergency | None:
     return None
 
 
+_FIGURATIVE = re.compile(
+    r"\b(?:burning hot|burning up|burning desire|burning issue|burning question|red hot)\b",
+    re.IGNORECASE,
+)
 _BRAND_NAMES = re.compile(r"\bheart\s+attack\s+grill\b", re.IGNORECASE)
 # Arabic trade nouns that contain a fire word (fire extinguishers, fire alarm devices): things sold, not a fire.
-_TRADE_NOUNS_AR = re.compile(r"(?:طفايات|طفاية|أجهزة إنذار|اجهزة انذار|إنذار|انذار)\s+(?:ال)?حريق")
+_TRADE_NOUNS_AR = re.compile(
+    r"(?:طفايات|طفاية|أجهزة إنذار|اجهزة انذار|إنذار|انذار|أبواب|ابواب|السلامة من|سلامة من)\s+(?:ال)?حريق"
+)
 
 
 def emergency(text: str) -> Emergency | None:
     """The kind of emergency the message describes, or None. Self-harm is checked first."""
     said = " ".join((text or "").split())
     # "Heart Attack Grill" is a restaurant name, not an emergency: take the name out and look at the rest.
-    said = _BRAND_NAMES.sub(" ", said)
+    said = _FIGURATIVE.sub(" ", _BRAND_NAMES.sub(" ", said))
     said = _TRADE_NOUNS_AR.sub(" ", said)
     from app.modules.pi import safety_lexicon
 
+    found: Emergency | None = None
     for kind, pattern in EMERGENCY_PATTERNS:
         if pattern.search(said):
-            # a novel, script, poster or campaign about it, naming nobody: not an emergency
-            if kind is not Emergency.FIRE and safety_lexicon.media_only(
-                said, trade=kind is not Emergency.SELF_HARM
-            ):
-                return None
-            return kind
-    found = _roman_fire(said)
+            found = kind
+            break
+    if found is None:
+        found = _roman_fire(said)
     if found is not None:
-        return found
+        # a creative, campaign, sale or trade statement naming nobody, with no live cue: not an emergency
+        return None if safety_lexicon.media_only(said, found.name.upper()) else found
     # Second layer: the structured, high-recall lexicon. It runs only when the patterns above say
     # nothing, so it can only add a detection (quoted, forwarded and unsure messages fire).
     name = safety_lexicon.detect(said)

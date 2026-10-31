@@ -25,6 +25,14 @@ How it works
    the message. Nothing else ever suppresses. Quoted, forwarded and reported speech ("forwarded:",
    "bhai ne bola", "she said") fires, because the matching ignores who is speaking.
 
+LIMITS (read before trusting it). This is a deterministic lexicon and grammar, not understanding. On
+text its authors have not seen it catches roughly three in four emergency messages (measured by
+independent audits, 64 to 75 percent), and it misses events phrased in ways no word list anticipates.
+It leans toward firing: a hedged, quoted or ambiguous report fires, and a first-person intent or a
+live cue (tonight, right now, people inside) can never be suppressed by trade, media or sale words.
+It will also fire on some trade and idiom text it does not recognise as one. A model-based layer
+behind it would raise recall; none is used here by design.
+
 The eight classes are FIRE_SMOKE, TRAPPED, POISONING, MEDICAL_RESCUE, SELF_HARM, VIOLENCE_ABUSE,
 CHILD_SAFEGUARDING and KIDNAP_ROBBERY (English, Roman Urdu with its spelling variants, Urdu, Hindi,
 Arabic). `DISABLED` lets a test switch one class off to prove the tests depend on it.
@@ -99,7 +107,9 @@ _REPEAT3 = re.compile(r"(.)\1{2,}")
 _REPEAT = re.compile(r"(.)\1+")
 _CLAUSE_SPLIT = re.compile(r"[.!?;,،؛؟।॥|:\n…]+")
 _TOKEN_SPLIT = re.compile(r"[\s\-/\\\"()\[\]{}<>*+=~^_@#$%&“”«»]+")
-_PRECLEAN = re.compile(r"\b(?:bleeding edge|chor bazar|chor bazaar|fire sale|fire wall|firewall)\b")
+_PRECLEAN = re.compile(
+    r"\b(?:bleeding edge|chor bazar|chor bazaar|fire sale|fire wall|firewall|burning hot|burning up|burning desire|burning issue|burning question|red hot)\b"
+)
 
 
 def normalise(text: str) -> str:
@@ -112,6 +122,15 @@ def normalise(text: str) -> str:
 
 def _collapse(token: str) -> str:
     return _REPEAT.sub(lambda m: m.group(1), token)
+
+
+_PESTICIDE = re.compile(
+    r"(?:keede|keeday|keeray|kida|kide|chuhe|chuhay|choohe|chooha)\s+maar\w*(?:\s+dawa\w*)?|"
+    + "|".join(
+        re.escape(normalise(x)) + r"(?:\s+" + re.escape(normalise("دوا")) + ")?"
+        for x in ("کیڑے مار", "چوہے مار", "कीड़े मार", "चूहे मार")
+    )
+)
 
 
 # --- the lexicon -----------------------------------------------------------------------------
@@ -778,7 +797,7 @@ def INFL(tag: str, stems: str, suffixes: tuple[str, ...] = _SUF) -> None:
 # who: pronouns, groups, weapons and cues shared by several classes
 W(
     "PRON",
-    "he she they him her them us me my our woh wo usne unhon unhone unko usay usko unhein humein hamein hum ہمیں مجھے उन्हें हमें उसने वो وہ انہوں هم هو هي هما",
+    "he she they him her them us me my woh wo usne unhon unhone unko usay usko unhein humein hamein hum ہمیں مجھے उन्हें हमें उसने वो وہ انہوں هم هما",
 )
 W(
     "GROUP",
@@ -1090,7 +1109,7 @@ PH(
 # poisoning bag
 W(
     "HARM_POIS",
-    "foaming froth unlabeled unlabelled unknown-liquid pellets pellet killer chewed chaba chabaa chabali chaba-li biryani feast وليمة تسمم تسممت سم الفئران عصير",
+    "foaming froth unlabeled unlabelled unknown-liquid pellets pellet chewed chaba chabaa chabali chaba-li biryani feast وليمة تسمم تسممت سم الفئران عصير",
 )
 PH(
     "HARM_POIS",
@@ -1352,6 +1371,283 @@ W(
 W("BIZ", "quarter year month target targets")
 W("WORKY", "quarter strong target targets")
 
+
+# === wave 5: first person, now, business-object idiom guard, self-harm grammar, weapons, children, abduction ===
+W(
+    "FIRSTP",
+    "i me my mine myself we our ourselves main mein mujhe mera meri mere hum humein hamein hamara hamari hamare apni apne میں مجھے میرا میری میرے ہم ہمیں ہمارا ہماری मैं मुझे मेरा मेरी मेरे हम हमें हमारा हमारी أنا انا اني نفسي",
+)
+W("NOW", "now tonight abhi الآن الان الليلة الليله اس-وقت")
+PH(
+    "NOW",
+    "right now/this minute/at this moment/aaj raat/آج رات/आज रात/is waqt/اس وقت/इस वक्त/इस वक़्त/in this moment/ابھی/अभी/اس لمحے",
+)
+W("NOW", "ابھی अभी")
+W(
+    "BIZOBJ",
+    "sales sale prices price rates brand launch discount discounts expenses expense kharcha kharche money work task tasks tracker project profit margins margin marketing deadlines deadline ad ads revenue budget cost costs inflation mehngai bills bill مبيعات مبيعاتنا المبيعات الاسعار اسعار الخصم خصم تخفيض ارباح تكاليف مصاريف",
+)
+W(
+    "IDIOM_H",
+    "kharcha kharche expense expenses cost costs inflation mehngai bill tax loss nuksan karza work task tracker project email report proposal idea sales prices brand launch discount",
+)
+W(
+    "MEDIA",
+    "novel script poster banner campaign awareness movie film drama thriller book story helpline trailer screenplay documentary seminar invitation card play staged stage theatre theater skit merchandise merch tshirt mug",
+)
+W(
+    "TRADE",
+    "نصنع ابواب موقع موقعا نحتاج ملصق ملصقا السلامه سلامه مصنع-ابواب fireworks pyrotechnics firecrackers samosas samosa funeral first-aid selfdefence self-defence pest-control pestcontrol",
+)
+W("ASKQ", "ما هو kis kitna ماهو")
+W("CHAHIYE", "sign signing contract agreement")
+W("ABLE", "can could able sakta sakti sakte استطيع اقدر سكتا سکتا سکتی सकता सकती")
+W("LAW", "مقاضاه مقاضاة قاضي")
+W("EMPLOYEE_N", "कर्मचारी employee employees staff mulazim mulazims ملازم موظف عامل worker")
+W(
+    "TERMINATE",
+    "निकाल निकालना निकालने nikal nikalna nikalne fire firing sack terminate dismiss ابرطرف برطرف اطرد",
+)
+# self-harm grammar
+W(
+    "MATLAB",
+    "matlab meaning point faida fayda mazaa فائدہ فایدہ फायदा فائده معنی معنى मतलब مطلب मायना",
+)
+W("NEG", "لم لن مش")
+W("LIFE", "zinda zindah alive زنده زندہ जिंदा जीवित जिंदगी حیاة")
+W("QTY", "ساری سب سارے सारी सारे सब كل جميع كامل كامله")
+PH(
+    "ALLATONCE",
+    "ek saath/ایک ساتھ/एक साथ/دفعة واحدة/دفعه واحده/all at once/all together/sab ek saath",
+)
+W("MEDS", "دوائیں دوائیاں दवाइयां दवाइयाँ الأدوية الادوية ادويه ادویات گولیاں")
+W("NIKAL", "nikal nikaal nikali nikaali نکال نکالی निकाल निकाली")
+PH(
+    "SH_PHRASE",
+    "if i disappeared/if i was gone/if i were gone/if i wasnt here/if i wasn't here/if i was not here/without me around/everyone would be fine/everyone will be fine without/no one will miss me/nobody will miss me/no one would miss me/nobody would miss me/nobody would care if i/no one would care if i/koi miss nahi karega/koi yaad nahi karega/کوئی یاد نہیں کرے گا/कोई याद नहीं करेगा/nahi bachunga/nahi bachungi/wont survive tonight/won't survive tonight/wont make it through the night/میں نہیں بچوں گا/मैं नहीं बचूंगा/मैं नहीं बचूंगी/nothing left to live for/nothing to live for/no reason left to live/jeene ki koi wajah nahi/جینے کی کوئی وجہ نہیں/जीने की कोई वजह नहीं/leave this world/this world chhod/duniya chhod/دنیا چھوڑ/दुनिया छोड़/اغادر هذا العالم/ساغادر هذا العالم/سأغادر هذا العالم/maut ke baad sab ko aaram/مرنے کے بعد سب کو سکون/मरने के बाद सबको आराम/بعد موتي سيرتاح/free from this life/azaad hona chahta/آزاد ہونا چاہتا/आज़ाद होना चाहता/swallowed everything/swallowed all the/swallowed all my/ek saath kha li/ایک ساتھ کھا لی/एक साथ खा ली/دفعة واحدة",
+)
+PH(
+    "LEAVE_FOREVER",
+    "hamesha ke liye jaana/hamesha ke liye chala jaun/hamesha ke liye chhor/hamesha ke liye ja raha/hamesha ke liye ja rahi/for good leave/leave forever/leaving forever/go away forever/ہمیشہ کے لیے چلا جاؤں/ہمیشہ کے لیے جانا/ہمیشہ کے لیے چھوڑ/ہمیشہ کے لیے سب/हमेशा के लिए जाना/हमेशा के लिए छोड़/हमेशा के लिए सब/للأبد/للابد/إلى الأبد/الى الابد/وارحل للأبد/وارحل للابد",
+)
+W("LEAVE_FOREVER", "للابد للأبد")
+# weapons: draw, chase, point, drag, stone
+W(
+    "WEAPON",
+    "blade blades chhuri چھری چاقو चाकू छुरी سكيناً سكينا مسدساً مسدسا مطرقة hathora hathoda hammer हथौड़ा ہتھوڑا",
+)
+W(
+    "DRAWV",
+    "drew draws drawn brandish brandished brandishing nikal nikaal نکال نکال-کر निकालकर निकाल-कर أخرج اخرج اخرجت",
+)
+PH(
+    "DRAWV",
+    "pulled out/took out/nikal kar/nikaal kar/نکال کر/निकालकर/निकाल कर/pulled a/whipped out",
+)
+W(
+    "CHASEV",
+    "chasing chased chases peecha pichha pichhe daud dauda daud-raha پیچھے دوڑ دوڑ رہا पीछा يطارد يلاحق طارد",
+)
+PH(
+    "CHASEV",
+    "peecha kar raha/pichhe bhaag/pichhe daud/running at/running towards/running after/runs at/پیچھے دوڑ/پیچھے بھاگ/پیچھا کر/पीछा कर/पीछे भाग/نحو/يجري نحو",
+)
+W("POINTV", "pointing pointed aimed aiming tane taan taane tan تانے تان ताने तान يوجه وجه")
+PH("POINTV", "pistol tane/pistol taane/pistol taan/پستول تانے/पिस्तौल ताने/يوجه مسدس/يوجه مسدساً")
+W("DRAGV", "گھسیٹ घसीट يسحبان يسحب سحب")
+W("FEMALE_V", "عورت महिला امرأة امراه مراة")
+W("PERSON", "عورت महिला امرأة امراه")
+W("VIOL_STRONG", "يرجمون يرجم ارجم")
+W("HITV", "يرجمون")
+# children: sweets, filming, burning servants, marriage, locking, touching
+W(
+    "SWEETS",
+    "sweets sweet mithai toffee toffees chocolate chocolates candy candies tofi مٹھائی ٹافی मिठाई टॉफी حلوى حلويات",
+)
+PH(
+    "VOYEUR",
+    "films the kids/films the children/filming the kids/filming the children/films kids/films the girls/films the boys/films my kids/films my son/films my daughter",
+)
+W(
+    "SHAADI",
+    "shaadi shadi nikah rishta vida شادی نکاح رشتہ शादी निकाह रिश्ता زواج تزويج تزوج يزوجون زواجها",
+)
+PH(
+    "SEXUAL_V",
+    "haath lagata/haath lagate/haath lagaya/haath lagati/hath lagata/hath lagate/ہاتھ لگاتا/ہاتھ لگاتے/ہاتھ لگاتی/हाथ लगाता/हाथ लगाते/हाथ लगाती",
+)
+W("FORCEDM", "قسرا قسراً")
+W("JALATA", "احرق أحرق حرق يحرق تحرق")
+PH(
+    "JALATA",
+    "jala deta/jala deti/jala dete/جلا دیتا/جلا دیتی/जला देता/जला देती/جلا دیا/جلا دیے/जला दिए/जला दिया",
+)
+# kidnap / ransom / hostage
+PH(
+    "ABDUCT",
+    "bag over his head/bag over her head/bag over my head/bag over the head/sack over/hood over/cloth over his face/cloth over her face/cloth over my sons face/kapda daal kar/munh par kapda/pushed into a van/pushed into a car/thrown into a van/dragged into a van/forced into a van/forced into a car/bundled into a van/bundled into a car/gaari mein dhakel/gaari mein dal kar/van mein dhakel/وین میں ڈال/گاڑی میں ڈال کر/منہ پر کپڑا/गाड़ी में डाल/वैन में धकेल/मुंह पर कपड़ा/دفعوه في سيارة/دفعوها في سيارة/وضعوا قماشا على وجه/في سيارة وأخذوه",
+)
+W("CHILD", "ابنك ابنتك زوجك اخوك ابوك")
+W("RELATIVE", "ابنك ابنتك زوجك اخوك ابوك")
+W("PAYORELSE", "والا وإلا والّا")
+W("TIEV", "بندھا بندھے बंधा बंधे مربوط مربوطا مقيد")
+W("MONEYN", "مبلغ مالي مالا اموال")
+PH("KEPT", "ابنك عندنا ادفع/ابنك عندنا/زوجك عندنا/is with us pay/we have your")
+W("STOPV", "stopped stop rok rokh roka rok-kar روک रोक")
+# medical
+PH(
+    "INLABOUR",
+    "head showing/babys head/baby's head/head is showing/crowning/bachay ka sar nazar/بچے کا سر نظر/बच्चे का सिर दिख/يخرج راسه/راس الطفل",
+)
+PH(
+    "NOMOVE",
+    "nabz nahi/nabz ruk gayi/نبض نہیں/नब्ज नहीं/لا نبض/no pulse/pulse feels very faint/nabz bohat kamzor",
+)
+PH(
+    "SPEECHLOSS",
+    "tongue heavy/tongue feels heavy/zubaan bhaari/zuban bhari/زبان بھاری/जीभ भारी/لسانه ثقيل/وجهه مائل/وجه مائل/face is crooked/muh tedha/चेहरा टेढ़ा/mooh tedha",
+)
+PH(
+    "HARM_MED",
+    "eyes rolling/eyes rolled back/eyes roll back/aankhein palat/آنکھیں پلٹ/आंखें पलट/عيناه تنقلبان/عيناه تنقلب/عينيه/skin peeling/skin came off/jild utar/جلد اتر/چمڑی اتر/vomited blood/vomiting blood/khoon ki ulti/خون کی الٹی/خون الٹی/खून की उल्टी/खून उल्टी/تقيأ دما",
+)
+# poison / gas
+W("INGEST_ANY", "चबा चबाया چبا چبایا chaba chabaya chewed chewing")
+PH(
+    "TOXIC",
+    "चूहे मारने की दवा/چوہے مارنے کی دوا/फर्श साफ करने वाला/फ़र्श साफ़ करने वाला/फर्श क्लीनर/فرش صاف کرنے والا/سائل تنظيف الأرضيات/سائل تنظيف الارضيات/سائل تنظيف/مسحوق الغسيل/detergent powder/सर्फ/कपड़े धोने का पाउडर/کپڑے دھونے کا پاؤڈر/bathroom cleaner/باتھ روم کلینر/منظف الحمام/toilet cleaner/washing liquid/dish soap",
+)
+PH(
+    "LEAK",
+    "pipe whistling/pipe is whistling/gas pipe whistling/hissing/sisak raha/sisak rahi/sisakna/seeti/أنبوب الغاز يصفر/يصفر/يفح/pipe se awaaz",
+)
+W("SPRAYV", "spray sprayed spraying chhidka chhirka chhirak چھڑکا چھڑک छिड़का छिड़क رش")
+W("CHOKE_V", "يخنقنا يخنقني يخنق")
+W("FUMES", "")
+
+W("KEEDE", "pesticideword")
+W("MEDIA_STRICT", "seminar invitation card play staged theatre skit")
+
+
+# === wave 5b: cues for the gate, more child, birth, poison and weapon forms ===
+W(
+    "PRON2",
+    "he she they him her them us me woh wo usne unhon unhone unko usay usko unhein humein hamein hum ہمیں مجھے उन्हें हमें उसने वो وہ انہوں هم هما",
+)
+W("ME", "me")
+W("RELATIVE", "زوجي زوجی")
+W("FIRSTP", "maine mene mainey hamne humne مینے ہم-نے")
+W("WANT", "اريد أريد ارید")
+W("INGEST_FP", "ابتلعت تناولت بلعت nigal-li نگل-لی")
+PH(
+    "INGEST_FP",
+    "maine kha li/maine pi li/main ne kha li/maine nigal li/میں نے کھا لی/میں نے نگل لی/मैंने खा ली/मैंने निगल ली",
+)
+PH(
+    "GROOM",
+    "keep secrets/keep it secret/keep a secret/dont tell anyone/don't tell anyone/raaz rakhne/raaz rakhna/raaz rakho/راز رکھ/राज रख/لا تخبر احدا/سر بيننا",
+)
+W("SHAADI", "marriage married engaged engagement منگنی सगाई زوجوها زوجوه زوجت")
+W("CLOSEDPLACE", "قبو cellar basement tehkhana tehkhane تہ-خانہ तहखाने तहखाना shed storeroom")
+W("LOCKUP", "محبوس محبوسون محبوسه محبوسين")
+W("TAKEN", "ghayab gayab vanished disappeared غاب اختفى")
+W("ARMED", "bandooq bandook bandooq-wale")
+PH(
+    "CHILD",
+    "small girl/small boy/chhoti bachi/chhota bachcha/chhoti naukrani/چھوٹی ملازمہ/چھوٹی بچی/छोटी नौकरानी/छोटी बच्ची/ثلاثة عشر عاما/اربعة عشر عاما/خمسة عشر عاما/ستة عشر عاما/سبعة عشر عاما/احدى عشرة سنة/اثني عشر عاما/عشر سنوات/تسع سنوات/ثماني سنوات/سبع سنوات/is thirteen/is fourteen/is fifteen/is sixteen/is seventeen/is twelve/is eleven",
+)
+PH(
+    "BIRTH",
+    "head showing/head is showing/babys head/baby's head/crowning/already crowning/water broke/waters broke/baby is coming/bachay ka sar nazar/بچے کا سر نظر/सिर दिख रहा/बच्चे का सिर दिख/يخرج راسه/راس الطفل/پانی ٹوٹ گیا/पानी टूट गया/paani toot gaya",
+)
+PH(
+    "SKINPEEL",
+    "skin is peeling/skin peeling/skin came off/skin is coming off/jild utar/جلد اتر/چمڑی اتر/त्वचा उतर",
+)
+PH(
+    "EYESROLL",
+    "eyes rolling/eyes rolled back/eyes roll back/aankhein palat/آنکھیں پلٹ/आंखें पलट/عيناه تنقلبان/عيناه تنقلب",
+)
+PH("NOMOVE", "نبضها ضعيف/نبضه ضعيف/pulse is weak/pulse is faint/nabz kamzor/نبض کمزور/नब्ज कमजोर")
+W("DROOL", "drooling drool laar لعاب")
+PH("DROOL", "munh se laar/mooh se laar/منہ سے رال/मुंह से लार/foaming at the mouth")
+W("KEEDE", "الكيميائية كيميائية chemical chemicals kimiyayi kemikal کیمیائی कैमिकल केमिकल")
+W("FELL", "سقطوا سقطت سقطن")
+W("PERSON", "عمال العمال")
+W("PLACE_OBJ", "canopy")
+W("OCC", "يتصاعد تتصاعد")
+W("TIEV", "बंधी بندھی")
+W("THROAT", "رقبتها رقبته")
+PH("WEAPON", "broken bottle/toota hua shisha/ٹوٹی ہوئی بوتل/टूटी हुई बोतल/زجاجة مكسورة/زجاجه مكسوره")
+W("WEAPON", "پستول पिस्तौल")
+PH("CHASEV", "taraf bhaag/taraf bhag/taraf daud/طرف بھاگ/طرف دوڑ/तरफ भाग/तरफ दौड़")
+
+W(
+    "FIRST1",
+    "i me my mine myself main mujhe mera meri mere maine mene mainey میں مجھے میرا میری میرے مینے मैं मुझे मेरा मेरी मेरे मैंने أنا انا اني نفسي",
+)
+
+
+# === wave 5c: concepts from the sixth fresh set ===
+W("TOMORROW", "kal tomorrow غدا کل कल subah morning صبح सुबह")
+W("LIFE", "حيا حیا")
+PH(
+    "SH_PHRASE",
+    "cant stand being alive/can't stand being alive/cannot stand being alive/cant stand living/hate being alive/tired of being alive/sick of being alive/dont want to be alive/do not want to be alive/not wake up tomorrow/will not wake up tomorrow/wont wake up tomorrow/meri maut se sab/meri maut ke baad/after my death/after i am gone/after i die/mere marne se sab/میری موت سے/میری موت کے بعد/मेरी मौत से/मेरी मौत के बाद/بموتي/everyone is better off with me dead/better off with me dead/sab ko sukoon milega/سب کو سکون ملے گا/सबको सुकून मिलेगा",
+)
+PH("ONPURPOSE", "on purpose/jaan bujh kar/jaan boojh kar/جان بوجھ کر/जानबूझकर/عمدا/عن قصد")
+W("DOSE", "dose doses double-dose overdose")
+W("OPENV", "khol khola kholi khol-li open opened کھول کھولی खोल खोली فتحت")
+W("POSS", "uski uska uske usse اس کی اس کے उसकी उसका उसके")
+PH("DRAWV", "pulling out/pulling a/pulling the/nikaal rahe/nikal rahe/نکال رہے/निकाल रहे")
+W("WEAPON", "sword swords talwaar تلوار तलवार tawa tawe belan chimta ہتھوڑے")
+W("VIOL_OBJ", "tawa tawe توے तवे pan belan chimta بیلن چمٹا मोटा")
+W("HITV", "pitai peetai peeti پٹائی पिटाई kicks kicked")
+PH(
+    "THREAT_P",
+    "goli maar dega/goli maar dunga/goli maar denge/goli maar dungi/گولی مار دے گا/گولی مار دوں گا/گولی مار دیں گے/गोली मार देगा/गोली मार दूंगा/गोली मार देंगे/will shoot/going to shoot/threatens to shoot/threatened to shoot/shoot us/shoot you/shoot me/بإطلاق النار علينا/بإطلاق النار عليك/سيطلق النار",
+)
+PH(
+    "SEXUAL_V",
+    "private parts/private part/private jagah/نجی اعضا/پرائیویٹ پارٹ/प्राइवेट पार्ट/اعضاءه الخاصة/اعضاء خاصة/showed him his/showed her his/showed me his/apne private",
+)
+W("CASHTAKE", "jewellery jewelry zevar ज़ेवर जेवर جیولری زیور مجوهرات")
+PH(
+    "HOLDUP",
+    "emptying the/emptying a/khaali kar rahe/khali kar rahe/خالی کر رہے/खाली कर रहे/يفرغون/تفرغ",
+)
+PH("BOIL", "hot kettle/garam kettle/pulled a hot/گرم کیتلی/गरम केतली")
+W("CHEST_V", "दर्द درد ألم सुन्न سن numb numbness")
+PH(
+    "NOMOVE",
+    "dhadkan nahi/dhadkan nahin/cant feel heartbeat/cant feel his heartbeat/can't feel his heartbeat/no heartbeat/دھڑکن نہیں/धड़कन नहीं/بنبضه/بنبضها/لا احد يشعر",
+)
+W("DOWN", "انهار انهارت")
+W("PERSON", "painter plumber welder carpenter mason mistri electrician")
+W("FUMES", "dhuen dhuyen dhuyan dhooen")
+W("KEEDE", "كيروسين الكيروسين كیروسین")
+W("INGEST_ANY", "شربت شربوا اكل اكلت اكلوا ابتلعت")
+W("FIRE_N", "लपटें लपट لپٹیں لپٹ")
+W(
+    "BIZOBJ",
+    "سیل سیلز सेल ऑफर آفر ڈسکاؤنٹ डिस्काउंट مہم कैंपेन presentation reel reels",
+)
+W("MEDIA", "match game score innings cricket football reel")
+
+
+# wave 5d: explicit Arabic future and with-prefix forms (the prefix is not stripped for Urdu safety)
+W("JUMPV", "ساقفز ساقفز")
+W("CUTV", "ساقطع")
+W("THREAT_P", "سيحرق سيطلق سيقتل سيقتلني")
+W("WEAPON", "بفاس بسكين بمسدس بالسكين بالمسدس")
+W("GROUP", "آدمی")
+
+W("US", "علينا لنا بنا")
+W("RELATIVE", "باپ")
+W("ADULT", "سوتیلا")
+
+W("BIZOBJ", "offers offer")
+
 # --- rules -----------------------------------------------------------------------------------
 
 
@@ -1367,6 +1663,15 @@ class Rule:
 
 
 _RULES: list[Rule] = []
+
+
+_IDIOM_CLASSES = (
+    "FIRE_SMOKE",
+    "VIOLENCE_ABUSE",
+    "MEDICAL_RESCUE",
+    "POISONING",
+    "CHILD_SAFEGUARDING",
+)
 
 
 def R(
@@ -1389,7 +1694,7 @@ def R(
             _mask(anchor),
             tuple(ns),
             win,
-            _mask(avoid) if avoid else 0,
+            (_mask(avoid) if avoid else 0) | (_mask("BIZOBJ") if cls in _IDIOM_CLASSES else 0),
             trade,
             name or anchor,
         )
@@ -1837,7 +2142,7 @@ R(
 R(
     "VIOLENCE_ABUSE",
     "JALATA",
-    ["ME|VICTIM|US|PRON|PERSON|CHILD|RELATIVE|FAMILYACT"],
+    ["ME|VICTIM|US|PRON|PERSON|CHILD|RELATIVE|FAMILYACT|SERVANT"],
     win=6,
     avoid="LIGHT_ON|FOODY|MONEYY",
     trade="msg",
@@ -2168,7 +2473,7 @@ R(
 R(
     "KIDNAP_ROBBERY",
     "ESCAPEV",
-    ["BAGMOB|CASHTAKE|GROUP|ARMED"],
+    ["GROUP|ARMED|THIEF|WEAPON"],
     win=10,
     avoid="SALE_MKT",
     trade="msg",
@@ -2328,11 +2633,226 @@ R(
     name="money or else, for a relative (long range)",
 )
 
+# === wave 5 rules ====================================================================================
+# self-harm grammar: hopelessness, leaving, quantity ingestion, plans
+R(
+    "SELF_HARM",
+    "LIFE",
+    ["MATLAB", "NEG"],
+    win=6,
+    avoid="INSURANCE|TRADE",
+    name="no meaning or point in living",
+)
+R(
+    "SELF_HARM",
+    "JEENA",
+    ["MATLAB", "NEG"],
+    win=6,
+    avoid="INSURANCE|TRADE",
+    name="no point in living (jeena)",
+)
+R(
+    "SELF_HARM",
+    "LEAVE_FOREVER",
+    ["FIRSTP|WANT"],
+    win=10,
+    avoid="SALE_MKT",
+    name="wants to leave forever",
+)
+R(
+    "SELF_HARM",
+    "MEDS",
+    ["INGEST_P|INGEST_ANY|INGEST_DONE", "QTY|ALLATONCE", "FIRSTP|NOW"],
+    win=10,
+    name="first person took medicines in quantity",
+)
+R("SELF_HARM", "MEDS", ["NIKAL", "FIRSTP|NOW"], win=6, name="first person took the pills out")
+R("SELF_HARM", "ALLATONCE", ["MEDS|TOXIC"], win=8, name="took everything at once")
+# weapons: draw, chase, point, drag
+R(
+    "VIOLENCE_ABUSE",
+    "WEAPON",
+    ["DRAWV|CHASEV|POINTV"],
+    win=8,
+    avoid="TRADE|MEDIA",
+    trade="msg",
+    name="weapon drawn, pointed or used in a chase",
+)
+R(
+    "VIOLENCE_ABUSE",
+    "DRAWV",
+    ["WEAPON", "CHASEV|PERSON|CHILD|PRON|RELATIVE"],
+    win=10,
+    name="a weapon is drawn on someone",
+)
+R("VIOLENCE_ABUSE", "POINTV", ["WEAPON"], win=5, name="weapon pointed")
+R(
+    "VIOLENCE_ABUSE",
+    "DRAGV",
+    ["FEMALE_V|PERSON", "CARV"],
+    win=8,
+    avoid="TRADE",
+    name="dragging a woman into a vehicle",
+)
+# children
+R(
+    "CHILD_SAFEGUARDING",
+    "SWEETS",
+    ["CHILD", "ADULT|PRON|KISI|ALONEW|VOYEUR"],
+    win=10,
+    avoid="TRADE|MEDIA|BIZOBJ",
+    name="sweets offered to a child by an adult",
+)
+R(
+    "CHILD_SAFEGUARDING",
+    "SHAADI",
+    ["CHILD"],
+    win=14,
+    avoid="TRADE|MEDIA",
+    name="marriage of a child",
+)
+R(
+    "CHILD_SAFEGUARDING",
+    "LOCKUP",
+    ["CHILD", "CLOSEDPLACE|INSIDE"],
+    win=8,
+    avoid="SCHOOLY|TRADE",
+    name="child locked in a room",
+)
+# kidnap
+R(
+    "KIDNAP_ROBBERY",
+    "ABDUCT",
+    avoid="MEDIA|TRADE",
+    trade="msg",
+    name="forced into a vehicle or bag over the head",
+)
+R(
+    "KIDNAP_ROBBERY",
+    "STOPV",
+    ["CARV|GUARD", "TAKEN|UTHA|LE"],
+    win=10,
+    avoid="TRADE",
+    trade="msg",
+    name="vehicle stopped and driver taken",
+)
+R(
+    "KIDNAP_ROBBERY",
+    "TAKEN",
+    ["GUARD|RELATIVE|PERSON", "CARV"],
+    win=10,
+    avoid="TRADE",
+    trade="msg",
+    name="driver taken away",
+)
+R(
+    "KIDNAP_ROBBERY",
+    "TIEV",
+    ["RELATIVE|CHILD", "MONEYASK|MONEYN|DEMANDMONEY|PAYORELSE"],
+    win=14,
+    name="tied relative and a money demand",
+)
+# medical and poison additions
+R(
+    "MEDICAL_RESCUE",
+    "INGEST_ANY",
+    ["CHILD", "NOMOVE"],
+    win=10,
+    trade="msg",
+    name="child ate something and is not waking",
+)
+R(
+    "POISONING",
+    "KEEDE",
+    ["FELL|FAINTED|DOWN|NOMOVE", "PERSON|CHILD|PRON"],
+    win=10,
+    trade="msg",
+    name="pesticide and people falling",
+)
+R("FIRE_SMOKE", "FIRE_N", ["CHOKE_V"], win=8, name="smoke choking us")
+# hedged and reported emergencies are never silent
+R(
+    "MEDICAL_RESCUE",
+    "UNSURE",
+    ["FELL|TAKEN|HITV|UTHA|ROB_WEAK|INJ|DOWN|HOLDUP", "PERSON|CHILD|RELATIVE|PRON"],
+    win=10,
+    avoid="TECH|MEDIA|BIZOBJ|TRADE",
+    trade="msg",
+    name="hedged report about a person",
+)
+
+# wave 5b rules
+R(
+    "CHILD_SAFEGUARDING",
+    "GROOM",
+    ["CHILD"],
+    win=10,
+    avoid="TRADE|MEDIA",
+    name="a child asked to keep secrets",
+)
+R("MEDICAL_RESCUE", "BIRTH", trade="msg", name="birth in progress")
+R("MEDICAL_RESCUE", "SKINPEEL", trade="msg", name="skin peeling")
+R("MEDICAL_RESCUE", "EYESROLL", trade="msg", name="eyes rolling back")
+R(
+    "POISONING",
+    "KEEDE",
+    ["SHAKE|DROOL|FAINTED|SICK|VOMIT"],
+    win=12,
+    trade="msg",
+    name="chemical and symptoms",
+)
+R("VIOLENCE_ABUSE", "WEAPON", ["THROAT"], win=6, avoid="TRADE", name="weapon at a throat")
+R(
+    "SELF_HARM",
+    "MEDS",
+    ["INGEST_FP", "QTY|ALLATONCE"],
+    win=8,
+    name="first person swallowed medicines in quantity (verb)",
+)
+R("SELF_HARM", "INGEST_FP", ["MEDS|TOXIC"], win=6, name="first person swallowed pills or poison")
+
+# wave 5c rules
+R(
+    "SELF_HARM",
+    "LIFE",
+    ["NEG", "TOMORROW"],
+    win=6,
+    avoid="INSURANCE|TRADE",
+    name="will not be alive tomorrow",
+)
+R(
+    "SELF_HARM",
+    "ONPURPOSE",
+    ["MEDS|TOXIC|DOSE|INGEST_ANY|INGEST_P|INGEST_DONE"],
+    win=8,
+    name="took it on purpose",
+)
+R("SELF_HARM", "TOXIC", ["OPENV", "FIRST1|NOW"], win=6, name="opened the poison bottle")
+R(
+    "VIOLENCE_ABUSE",
+    "HITV",
+    ["POSS|PRON2|PRON"],
+    win=4,
+    avoid="IDIOM_H|SALE_MKT|TECH|TRADE",
+    trade="msg",
+    name="hits a person (possessive)",
+)
+R(
+    "VIOLENCE_ABUSE",
+    "WEAPON",
+    ["CASHTAKE"],
+    win=10,
+    avoid="TRADE",
+    trade="msg",
+    name="weapons and the till",
+)
+
+_RULES.sort(key=lambda r: CLASSES.index(r.cls.split(":")[0]))
 _ENUMERATED = tuple(_RULES)
 _ADVICE_RULES: list[tuple[str, int, tuple[tuple[int, int], ...], int, int]] = []
 
 
-def _advice(kind: str, anchor: str, needs: Iterable[str], win: int = 6, avoid: str = "") -> None:
+def _advice(kind: str, anchor: str, needs: Iterable[str], win: int = 10, avoid: str = "") -> None:
     _ADVICE_RULES.append(
         (
             kind,
@@ -2361,6 +2881,7 @@ _EV_BIT = _bit("EVENT")
 _DANGER = _mask("DANGER")
 _TRADE = _mask("TRADE")
 _LIVE = _mask("LIVE")
+_NOW = _mask("NOW")
 _PASTM = _mask("PASTM")
 
 
@@ -2384,7 +2905,7 @@ _TRADEISH = re.compile(
 
 
 def _analyse(text: str) -> _Doc | None:
-    said = _PRECLEAN.sub(" ", normalise(text))
+    said = _PESTICIDE.sub(" pesticideword ", _PRECLEAN.sub(" ", normalise(text)))
     if _FIRE_PROTECT.search(said) and _TRADEISH.search(said):
         said = _FIRE_PROTECT.sub(
             " fireprotection ", said
@@ -2415,7 +2936,7 @@ def _analyse(text: str) -> _Doc | None:
         if (
             len(tok) > 3
             and "\u0621" <= tok[0] <= "\u064a"
-            and tok[0] in "\u0648\u0641\u0633\u0628\u0644"
+            and (tok[0] in "\u0648\u0641" or tok.startswith("\u0628\u0627\u0644"))
         ):
             m |= _LEX.get(tok[1:], 0)
         if len(tok) > 4 and tok.startswith("\u0627\u0644"):
@@ -2493,7 +3014,7 @@ def _first_hit(
     for need, _w in needs:
         if not need & doc.gor:
             return False
-    danger_anywhere = bool(doc.gor & (_DANGER | _LIVE))
+    danger_anywhere = bool(doc.gor & (_DANGER | _LIVE | _NOW))
     for i in _anchor_positions(doc, anchor):
         ok = True
         for need, w in needs:
@@ -2555,16 +3076,33 @@ W(
     "merchandise merch tshirt mug novel script poster banner campaign awareness movie film drama thriller book story helpline trailer screenplay documentary",
 )
 _MEDIA_STRICT = _mask("MEDIA_STRICT")
-_VICTIMISH = _mask("DANGER|LIVE|PERSON|CHILD|RELATIVE|ME|VICTIM|INSIDE|PRON|US")
+_VICTIMISH = _mask("DANGER|LIVE|PERSON|CHILD|RELATIVE|ME|PRON2|US")
 
 
-def media_only(text: str, trade: bool = True) -> bool:
-    """True for a creative, campaign or trade statement (novel, poster, quote, rate ...) that names no person and has no live cue."""
+def media_only(text: str, kind: str = "") -> bool:
+    """True when an older-pattern hit is only a creative, campaign, sale or trade statement.
+
+    It names no person and has no live cue (right now, tonight, people inside). Self-harm is gated only
+    by media and sale words, and never when a first-person word is present. Fire is gated only by
+    sale, media and business-object words (a stock "on fire" at a discount)."""
     doc = _analyse(text)
     if doc is None:
         return False
-    words = _MEDIA_STRICT | _mask("SALE_MKT") | (_TRADE if trade else 0)
-    cues = _VICTIMISH | (
-        _mask("AMBU|SUMMON|SANS|BREATHE|CALLV|NEGE|NEGB|HOSH|BEHOSH|KHOON|NOMOVE") if trade else 0
-    )
+    sale = _mask("SALE_MKT")
+    cues = _VICTIMISH | _NOW
+    if kind == "SAFEGUARDING":
+        cues = (cues & ~_mask("CHILD")) | _mask("FIRST1")
+    if kind == "SELF_HARM":
+        words, cues = _MEDIA_STRICT | sale, cues | _mask("FIRST1")
+    elif kind == "FIRE":
+        words = _MEDIA_STRICT | sale | _mask("BIZOBJ|MEDIA")
+    else:
+        words = _MEDIA_STRICT | sale | _TRADE | _mask("BIZOBJ|MEDIA")
+        cues |= _mask(
+            "AMBU|SANS|BREATHE|NEGE|NEGB|HOSH|BEHOSH|KHOON|NOMOVE|PERSON_ANY|STRONG_TRAP|DAB"
+        )
     return bool(doc.gor & words) and not doc.gor & cues
+
+
+_advice("legal", "LAW", ["ASKQ", "ABLE"], avoid="TRADE")
+_advice("legal", "EMPLOYEE_N", ["ASKQ", "TERMINATE"], avoid="TRADE")
