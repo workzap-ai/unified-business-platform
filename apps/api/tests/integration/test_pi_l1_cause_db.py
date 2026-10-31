@@ -18,7 +18,7 @@ pytestmark = pytest.mark.integration
 
 def create(**note):
     base = {"title": "Sales are down", "category": "sales_leads"}
-    return ProblemOp(op="create", note=ProblemNote(**base, **note))
+    return ProblemOp(op="create", note=ProblemNote(**{**base, **note}))
 
 
 async def run(db, w, ops, owner_text):
@@ -185,5 +185,24 @@ async def test_the_extractor_fields_are_saved_by_apply_ops(api, business_db, mon
     assert stored.constraints["cannot_change"][0]["text"] == "close the second shop"
     assert stored.tried[0]["what"] == "Facebook ads"
     assert stored.expected_outcome == "back to last year"
+    await w.a.close()
+    await w.b.close()
+
+
+async def test_understood_count_reads_the_real_noted_context(api, business_db, monkeypatch):
+    from app.modules.pi import box
+
+    db = business_db
+    await at_0053(db)
+    w = await two_chats(api, db, monkeypatch)
+
+    async def understood(**note):
+        ops = [create(**note)]
+        await apply_ops(db, w.scope_a, w.cust_a, w.conv_a.id, None, ops, "en")
+        noted = await problems.noted_context(db, w.scope_a, w.cust_a)
+        return box.offer_facts({"noted_problems": noted}).understood_count
+
+    assert await understood() == 0  # a title alone: nothing known
+    assert await understood(title="Orders are late", since_text="since March") == 1
     await w.a.close()
     await w.b.close()
