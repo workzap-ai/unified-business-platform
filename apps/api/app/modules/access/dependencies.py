@@ -79,7 +79,14 @@ async def workspace_scope(request: Request, auth: Auth, session: Session) -> Wor
         )
     ).first()
     if row is None:
-        raise PermissionDenied
+        raise PermissionDenied(
+            tenant_id=tenant_id,
+            environment_id=environment_id,
+            user_id=auth.user.id,
+            actor_label=auth.user.display_name[:80],
+            request_id=getattr(request.state, "request_id", None),
+            missing=("workspace.membership",),
+        )
     membership_id, environment, business_type, granted = row
     if environment is None:
         raise BusinessRuleViolation(
@@ -93,7 +100,14 @@ async def workspace_scope(request: Request, auth: Auth, session: Session) -> Wor
             select(PiBusinessAccount.status).where(PiBusinessAccount.tenant_id == tenant_id)
         )
         if status is None or status == "closed":
-            raise PermissionDenied
+            raise PermissionDenied(
+                tenant_id=tenant_id,
+                environment_id=environment,
+                user_id=auth.user.id,
+                actor_label=auth.user.display_name[:80],
+                request_id=getattr(request.state, "request_id", None),
+                missing=("pi.account.open",),
+            )
     permissions = apply_business_type(business_type, frozenset(granted or ()))
     return WorkspaceScope(
         tenant_id=tenant_id,
