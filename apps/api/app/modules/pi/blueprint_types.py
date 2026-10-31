@@ -30,7 +30,8 @@ ROLES = ("owner", "staff", "pi", "reviewer")
 READY = "ready"
 INSUFFICIENT = "insufficient_information"
 REFUSED = "refused"
-STATUSES = (READY, INSUFFICIENT, REFUSED)
+NEEDS_REVIEW = "needs_review"  # built, but a person must look: a step answers no stated problem
+STATUSES = (READY, INSUFFICIENT, REFUSED, NEEDS_REVIEW)
 STEP_KINDS = ("measure", "approval", "action", "review", "rollback")
 RESULTS = ("ok", "violates", "unknown")
 GROUNDED = "grounded"  # the element comes from the owner, the option or staff
@@ -59,7 +60,9 @@ class StepIn:
     after: tuple[str, ...] = ()
     phase: int = 0
     id: str = ""
-    problems: tuple[str, ...] = ()  # the stated problems this step answers; empty means all tied
+    # None: not stated, the step answers what the option answers. A tuple: the stated problems it
+    # answers; an empty tuple or only unknown ids means it answers NONE (unlinked, needs review).
+    problems: tuple[str, ...] | None = None
 
 
 @dataclass(frozen=True)
@@ -184,6 +187,7 @@ class Summary:
     text: str
     problem_ids: tuple[str, ...]
     option_id: str = ""
+    option_words: str = ""  # the recommended option's own words, as written in the option
 
 
 @dataclass(frozen=True)

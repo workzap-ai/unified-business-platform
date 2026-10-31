@@ -25,6 +25,7 @@ from typing import Any
 
 from app.modules.pi.blueprint_types import (
     INSUFFICIENT,
+    NEEDS_REVIEW,
     READY,
     REFUSED,
     ROLES,
@@ -169,7 +170,9 @@ def has_promise(text: Any) -> bool:
     return "guarantee" in re.sub(r"[^a-z]", "", t)  # "g u a r a n t e e" and "guar-antee"
 
 
-def clean_text(text: Any, known: frozenset[str], cap: int = 300) -> tuple[str, tuple[str, ...]]:
+def clean_text(
+    text: Any, known: frozenset[str], cap: int = 300, keep_money: bool = False
+) -> tuple[str, tuple[str, ...]]:
     """Make an option's or an owner's text safe to place in a blueprint.
 
     Returns (text, notes). Sentences with a promise or a credential are removed; money and a number
@@ -190,7 +193,7 @@ def clean_text(text: Any, known: frozenset[str], cap: int = 300) -> tuple[str, t
             continue
         kept.append(s)
     out = " ".join(kept)
-    out, n_money = _mask_money(out)
+    out, n_money = (out, 0) if keep_money else _mask_money(out)
     if n_money:
         notes.append("money")
     out, n_num = _mask_numbers(out, known)
@@ -274,6 +277,15 @@ SECTIONS = (
     "approvals",
     "constraints",
 )
+
+
+OWNER_FIELDS = ("problem", "fact", "constraint", "cause", "measure", "acceptance", "refusal")
+
+
+def owner_field(where: str) -> bool:
+    """A field that quotes the owner's own words (and so may carry the owner's own figures, a budget
+    included). Money is only forbidden where pi or the option speaks."""
+    return where.startswith(OWNER_FIELDS) and not where.endswith("reason")
 
 
 def free_texts(bp: Blueprint) -> Iterator[tuple[str, str]]:
@@ -438,7 +450,7 @@ def _check(bp: Blueprint, known: frozenset[str]) -> tuple[Issue, ...]:
     add = out.append
     if not isinstance(bp, Blueprint):
         return (Issue("BP-MALFORMED", "blueprint", "not a blueprint"),)
-    if bp.status not in (READY, INSUFFICIENT, REFUSED):
+    if bp.status not in (READY, INSUFFICIENT, REFUSED, NEEDS_REVIEW):
         add(Issue("BP-STATUS", "status", "unknown status"))
     if bp.executes_nothing is not True:
         add(Issue("BP-EXEC", "executes_nothing", "a blueprint must never execute anything"))
@@ -456,7 +468,7 @@ def _check(bp: Blueprint, known: frozenset[str]) -> tuple[Issue, ...]:
                         f"the number {n} is not in the owner's facts or staff inputs",
                     )
                 )
-        if has_money(text):
+        if has_money(text) and not owner_field(where):
             add(
                 Issue(
                     "BP-MONEY", where, "money in a text; only staff cost lines may carry an amount"
@@ -480,7 +492,7 @@ def _check(bp: Blueprint, known: frozenset[str]) -> tuple[Issue, ...]:
                 Issue("BP-TIME", f"timeline {t.item}", "a duration needs a source (staff or owner)")
             )
 
-    if bp.status != READY:
+    if bp.status not in (READY, NEEDS_REVIEW):
         if bp.status == INSUFFICIENT and not bp.missing:
             add(
                 Issue("BP-MISSING", "missing", "insufficient information must list what is missing")

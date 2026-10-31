@@ -185,7 +185,11 @@ def parse_corrections(raw: Any, corpus: str) -> tuple[tuple[str, str, str], ...]
 
 
 def cause_rows(
-    lang: str, causes: tuple[CauseIn, ...], tied: tuple[ProblemIn, ...], clean: Clean
+    lang: str,
+    causes: tuple[CauseIn, ...],
+    tied: tuple[ProblemIn, ...],
+    clean: Clean,
+    owner_text: str = "",
 ) -> tuple[tuple[CauseRow, ...], list[OpenItem]]:
     rows: list[CauseRow] = []
     items: list[OpenItem] = []
@@ -202,7 +206,14 @@ def cause_rows(
             text = clean(c.text)
             if not text:
                 continue
-            ev = tuple(e for e in (clean(w, 200) for w in c.evidence) if e)
+            # evidence counts only if the owner really said it, in ANY owner message (the
+            # first message is not special: a later correction or fuller answer counts too)
+            hay = fold(owner_text)
+            ev = tuple(
+                e
+                for e in (clean(w, 200) for w in c.evidence if not owner_text or fold(w) in hay)
+                if e
+            )
             status = c.status if (c.status not in OWNER_CAUSE or ev) else "pi_inferred"
             rows.append(CauseRow(p.id, text, status, ev))
             if status != "confirmed":
@@ -322,7 +333,7 @@ def fact_rows(
             if c:
                 rows.append(FactRow(p.id, kind, c))
     for k in constraints:
-        text = bs.tr(lang, "cons_hidden") if k.kind == "budget" else clean(k.text, 200)
+        text = clean(k.text, 200)
         if text:
             rows.append(FactRow("", "constraint", text))
     for tr_ in tried:
@@ -358,7 +369,7 @@ def open_items(
         if r.source == "missing_fact"
     ]
     items += [
-        OpenItem("decision", t(lang, "open_constraint", text=c.text), tied_ids)
+        OpenItem("decision", t(lang, "open_constraint", text=c.label.replace("#", "_")), tied_ids)
         for c in constraint_rows
         if c.result == "unknown"
     ]

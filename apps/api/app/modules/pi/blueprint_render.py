@@ -13,7 +13,7 @@ from typing import Any
 
 from app.modules.pi import blueprint_strings as bs
 from app.modules.pi.blueprint_checks import canon_number
-from app.modules.pi.blueprint_types import INSUFFICIENT, READY, REFUSED, Blueprint
+from app.modules.pi.blueprint_types import INSUFFICIENT, NEEDS_REVIEW, READY, REFUSED, Blueprint
 
 _MARKDOWN = re.compile(r"[|*#`~<>]|^[-=_]{3,}", re.M)
 _WS = re.compile(r"[ \t\r\f\v]+")
@@ -50,7 +50,7 @@ def _render(bp: Blueprint, lang: str) -> str:
     def role(r: str) -> str:
         return t(lang, f"role_{r}") if r in ("owner", "staff", "pi", "reviewer") else r
 
-    if bp.status != READY:
+    if bp.status not in (READY, NEEDS_REVIEW):
         if bp.status == REFUSED:
             head("sec_refusal")
             out += [_line(x) for x in bp.refusal]
@@ -66,9 +66,14 @@ def _render(bp: Blueprint, lang: str) -> str:
         return "\n".join(out)
 
     out.append(t(lang, "nothing_starts"))
+    if bp.status == NEEDS_REVIEW:
+        out.append(t(lang, "needs_review"))
     head("sec_summary")
     if bp.summary:
         out.append(_line(bp.summary.text))
+        if bp.summary.option_words:
+            tag = f"{t(lang, 'lbl_recommended')} {bp.summary.option_id}".strip()
+            out.append(f"{tag}: {_line(bp.summary.option_words)}")
 
     head("sec_problems")
     for pr in bp.problems:
