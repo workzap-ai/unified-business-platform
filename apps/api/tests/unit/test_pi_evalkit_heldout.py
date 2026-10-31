@@ -70,14 +70,15 @@ def test_the_split_is_still_the_hash_of_the_id_and_the_cases_file_is_valid_json(
     assert len(DEV) >= 39  # Development never shrinks below what the first round had
 
 
-DEV_FLOOR = 63
+DEV_FLOOR = 92
 
 
 def test_development_has_grown_to_its_floor_and_covers_the_languages() -> None:
     assert len(DEV) >= DEV_FLOOR
     languages = Counter(c["language"] for c in DEV)
     # Hindi is data only: pi understands Devanagari but does not write it
-    assert languages["ar"] >= 8 and languages["hi"] >= 8 and languages["ur"] >= 8
+    # FT-A1 round 2: Hindi 15, Arabic 15, Urdu script 20 (agent-drafted, not human-reviewed)
+    assert languages["ar"] >= 15 and languages["hi"] >= 15 and languages["ur"] >= 20
     assert languages["en"] >= 1 and languages["roman_ur"] >= 1
     kinds = {c["kind"] for c in DEV}
     assert kinds >= {"single", "list", "correction", "constraints", "mixed", "multi_turn", "rant"}
@@ -101,3 +102,25 @@ def test_development_shares_nothing_with_held_out_and_one_pair_with_regression()
         "Sorry, not 10, it was 100 clients.",
         "We lost about 10 clients last year because reports came late.",
     }
+
+
+def test_the_second_round_of_development_cases_says_it_is_unreviewed_and_has_all_label_kinds() -> (
+    None
+):
+    drafted = [c for c in DEV if "unreviewed" in c["recorded"]["origin"]]
+    assert len(drafted) >= 29
+    assert {c["language"] for c in drafted} >= {"hi", "ar", "ur", "roman_ur"}
+    assert {c["kind"] for c in drafted} >= {
+        "single",
+        "list",
+        "correction",
+        "rant",
+        "mixed",
+        "multi_turn",
+        "constraints",
+    }
+    assert all(c["expected"]["corrections"] for c in drafted if c["kind"] == "correction")
+    assert all(c["expected"]["constraints"] for c in drafted if c["kind"] == "constraints")
+    # a figure with a local magnitude word (lakh, crore, hazar and their scripts) is labelled
+    figures = " ".join(f for c in drafted for p in c["expected"]["problems"] for f in p["figures"])
+    assert "لاکھ" in figures and "کروڑ" in figures and "हज़ार" in figures
