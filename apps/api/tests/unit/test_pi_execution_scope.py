@@ -31,6 +31,7 @@ def make(**over):
         approval_text="I approve this",
         referenced_sha=scope_sha(TEXT, frozenset(TOOLS), LIMITS),
         task_owner="Ali (staff)",
+        task_creator="Zed (staff)",
         now=NOW,
     )
     args.update(over)

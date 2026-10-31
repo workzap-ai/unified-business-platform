@@ -15,6 +15,7 @@ Held here:
 from __future__ import annotations
 
 import hashlib
+import hmac
 import json
 import re
 from collections.abc import Mapping
@@ -25,13 +26,15 @@ from typing import Any
 
 from app.modules.pi import execution_audit as audit
 from app.modules.pi.execution_scope import (
-    FORBIDDEN_APPROVERS,
     NEEDS_OWN_APPROVAL,
     NEVER_SCOPED,
     TOOL_CLASSES,
     ApprovalCue,
     ApprovedScope,
     classify_approval,
+    ident,
+    named_person,
+    seal_mac,
 )
 
 MAX_ID = 120
@@ -71,12 +74,7 @@ EVIDENCE_KINDS = frozenset(
 
 
 def _named(v: Any) -> bool:
-    return (
-        isinstance(v, str)
-        and bool(v.strip())
-        and len(v) <= MAX_ID
-        and v.strip().casefold() not in FORBIDDEN_APPROVERS
-    )
+    return named_person(v)
 
 
 def _text(v: Any, limit: int = MAX_TEXT) -> bool:
@@ -127,6 +125,48 @@ class Task:
     verification: Verification | None = None
     recovery: RecoveryRecord | None = None
     failure_reason: str = ""
+    approved_by: str = ""
+    seal: str = ""  # keyed HMAC set by the task functions only; a hand-built Task fails the gate
+
+
+def _task_mac(t: Task) -> str:
+    return seal_mac(
+        [
+            "task",
+            t.id,
+            t.title,
+            t.owner,
+            t.creator,
+            t.scope_sha,
+            list(t.depends_on),
+            str(getattr(t.state, "value", t.state)),
+            repr(t.rollback),
+            repr(t.verification),
+            repr(t.recovery),
+            t.failure_reason,
+            t.approved_by,
+        ]
+    )
+
+
+def _sealed(t: Task) -> Task:
+    return replace(t, seal=_task_mac(t))
+
+
+def _next(t: Task, **changes: Any) -> Task:
+    return _sealed(replace(t, **changes))
+
+
+def task_is_genuine(t: Any) -> bool:
+    """True only for a Task made by new_task or moved by the transition functions, with its fields untouched."""
+    try:
+        return (
+            isinstance(t, Task)
+            and isinstance(t.state, TaskState)
+            and hmac.compare_digest(t.seal, _task_mac(t))
+        )
+    except Exception:  # noqa: BLE001
+        return False
 
 
 @dataclass(frozen=True)
@@ -174,15 +214,17 @@ def new_task(
             return _no(None, *r)
         return TaskResult(
             True,
-            Task(
-                str(id),
-                str(title),
-                str(owner),
-                str(creator),
-                str(scope_sha),
-                deps,
-                TaskState.PROPOSED,
-                rollback,
+            _sealed(
+                Task(
+                    str(id),
+                    str(title),
+                    str(owner),
+                    str(creator),
+                    str(scope_sha),
+                    deps,
+                    TaskState.PROPOSED,
+                    rollback,
+                )
             ),
             (),
         )
@@ -212,8 +254,8 @@ def rollback_issues(plan: Any) -> list[str]:
 
 
 def _move(task: Task, to: TaskState) -> str | None:
-    if not isinstance(task, Task) or not isinstance(task.state, TaskState):
-        return "not a task"
+    if not task_is_genuine(task):
+        return "not a genuine task record (not issued by the task functions, or altered)"
     if to not in LEGAL_MOVES.get(task.state, frozenset()):
         return f"illegal move {getattr(task.state, 'value', '?')} to {to.value}"
     return None
@@ -224,13 +266,20 @@ def _scope_issues(task: Task, scope: Any, now: Any) -> list[str]:
         return ["now must be a timezone-aware datetime"]
     if not isinstance(scope, ApprovedScope):
         return ["no approved scope"]
+    bad = scope.issues()
+    if bad:
+        return bad
     out: list[str] = []
-    if not scope.is_intact():
-        out.append("scope record was altered")
-    elif scope.scope_sha != task.scope_sha:
+    if scope.scope_sha != task.scope_sha:
         out.append("scope changed since the task was written, a new approval is needed")
+    if ident(scope.task_owner) != ident(task.owner) or ident(scope.task_creator) != ident(
+        task.creator
+    ):
+        out.append("scope was approved for a different owner or creator")
+    if ident(scope.approver) in {ident(task.owner), ident(task.creator)}:
+        out.append("approver must differ from the task owner and creator")
     if not scope.is_live(now):
-        out.append("scope has expired")
+        out.append("scope has expired or is not yet valid")
     return out
 
 
@@ -241,14 +290,11 @@ def approve_task(task: Task, scope: Any, now: Any) -> TaskResult:
             return _no(task, bad)
         r = _scope_issues(task, scope, now)
         r += rollback_issues(task.rollback)
-        if not r and scope.approver.strip().casefold() in {
-            task.owner.strip().casefold(),
-            task.creator.strip().casefold(),
-        }:
-            r.append("approver must differ from the task owner and creator")
         if r:
             return _no(task, *r)
-        return TaskResult(True, replace(task, state=TaskState.APPROVED), ())
+        return TaskResult(
+            True, _next(task, state=TaskState.APPROVED, approved_by=scope.approver), ()
+        )
     except Exception:  # noqa: BLE001
         return _no(task, "malformed input")
 
@@ -261,7 +307,7 @@ def start_task(task: Task, scope: Any, now: Any, dependency_states: Any = None) 
         r = _scope_issues(task, scope, now) + _dependency_issues(task, dependency_states)
         if r:
             return _no(task, *r)
-        return TaskResult(True, replace(task, state=TaskState.RUNNING), ())
+        return TaskResult(True, _next(task, state=TaskState.RUNNING), ())
     except Exception:  # noqa: BLE001
         return _no(task, "malformed input")
 
@@ -273,7 +319,7 @@ def mark_performed(task: Task, performed_note: Any) -> TaskResult:
         return _no(task, bad)
     if not _text(performed_note):
         return _no(task, "a note of what was performed is required")
-    return TaskResult(True, replace(task, state=TaskState.VERIFYING), ())
+    return TaskResult(True, _next(task, state=TaskState.VERIFYING), ())
 
 
 def verification_issues(task: Task, v: Any) -> list[str]:
@@ -284,7 +330,7 @@ def verification_issues(task: Task, v: Any) -> list[str]:
         out.append("acceptance check is missing")
     if v.passed is not True:
         out.append("the acceptance check did not pass")
-    if not _named(v.verifier) or v.verifier.strip().casefold() == task.owner.strip().casefold():
+    if not _named(v.verifier) or ident(v.verifier) == ident(task.owner):
         out.append("verifier must be a named person other than the task owner")
     if not isinstance(v.evidence, tuple) or not v.evidence or len(v.evidence) > MAX_EVIDENCE:
         out.append("evidence is missing")
@@ -310,7 +356,7 @@ def complete_task(task: Task, verification: Any) -> TaskResult:
         r = verification_issues(task, verification)
         if r:
             return _no(task, *r)
-        return TaskResult(True, replace(task, state=TaskState.DONE, verification=verification), ())
+        return TaskResult(True, _next(task, state=TaskState.DONE, verification=verification), ())
     except Exception:  # noqa: BLE001
         return _no(task, "malformed input")
 
@@ -321,7 +367,7 @@ def fail_task(task: Task, reason: Any) -> TaskResult:
         return _no(task, bad)
     if not _text(reason):
         return _no(task, "a reason is required")
-    return TaskResult(True, replace(task, state=TaskState.FAILED, failure_reason=str(reason)), ())
+    return TaskResult(True, _next(task, state=TaskState.FAILED, failure_reason=str(reason)), ())
 
 
 def rollback_task(task: Task, recovery: Any) -> TaskResult:
@@ -350,7 +396,7 @@ def rollback_task(task: Task, recovery: Any) -> TaskResult:
                 r.append("recovery has no evidence")
         if r:
             return _no(task, *r)
-        return TaskResult(True, replace(task, state=TaskState.ROLLED_BACK, recovery=recovery), ())
+        return TaskResult(True, _next(task, state=TaskState.ROLLED_BACK, recovery=recovery), ())
     except Exception:  # noqa: BLE001
         return _no(task, "malformed input")
 
@@ -410,7 +456,6 @@ _SECRET_KEY = re.compile(
     r"card|cvv|cvc|passw|passcode|otp|pin_?code|iban|account_?n|cnic|national_?id|ssn|secret|token|expiry|routing|swift",
     re.IGNORECASE,
 )
-_CARD_DIGITS = re.compile(r"\d(?:[ -]?\d){12,18}")
 
 
 @dataclass(frozen=True)
@@ -428,6 +473,9 @@ class ActionApproval:
     approver: str
     approval_text: str
     approved_at: datetime
+    approval_id: str = (
+        ""  # unique per approval; the caller records it as consumed (see check_can_execute)
+    )
 
 
 def action_sha(action: ActionRequest) -> str:
@@ -454,7 +502,7 @@ def _param_issue(obj: Any) -> str | None:
             for k, v in cur.items():
                 if not isinstance(k, str):
                     return "parameter names must be text"
-                if _SECRET_KEY.search(k):
+                if _SECRET_KEY.search(k) or audit.looks_secret(k):
                     return "action parameters carry card, password or ID data"
                 stack.append((v, depth + 1))
         elif isinstance(cur, (list, tuple)):
@@ -463,7 +511,7 @@ def _param_issue(obj: Any) -> str | None:
             chars += len(cur)
             if chars > MAX_PARAM_CHARS:
                 return "action parameters are too large or too deep"
-            if _CARD_DIGITS.search(cur):
+            if audit.has_card_like(cur, 13) or audit.looks_secret(cur):
                 return "action parameters carry card, password or ID data"
         elif not isinstance(cur, (int, float, bool)) and cur is not None:
             return "action parameters must be plain data"
@@ -490,15 +538,26 @@ def check_can_execute(
     action_approval: Any = None,
     dependency_states: Any = None,
     used: Any = None,
+    consumed_approvals: Any = None,
 ) -> ExecDecision:
     """Pre-execution gate (dry run: it never performs anything). Fail closed on anything unknown or
     malformed; never raises. With no `action` it answers "may this task proceed at all"; with an action
-    it also checks tool authority, limits and the separate approval."""
+    it also checks tool authority, limits and the separate approval.
+
+    The gate is pure: it consumes nothing. Callers own the state and must pass it in: `used` (counters of
+    actions, units and messages already done) and `consumed_approvals` (ids of per-action approvals
+    already spent). After an action is really performed the caller records its approval id as consumed;
+    a replayed approval id is then refused. A caller that passes nothing gets no replay protection."""
     try:
-        if not isinstance(task, Task) or not isinstance(task.state, TaskState):
-            return _deny("malformed", "not a task")
+        if not task_is_genuine(task):
+            return _deny(
+                "malformed",
+                "not a genuine task record (not issued by the task functions, or altered)",
+            )
         if task.state not in (TaskState.APPROVED, TaskState.RUNNING):
             return _deny("state", f"task is {task.state.value}, not approved or running")
+        if isinstance(scope, ApprovedScope) and ident(task.approved_by) != ident(scope.approver):
+            return _deny("scope_or_plan", "the task was approved under a different scope approval")
         reasons = (
             _scope_issues(task, scope, now)
             + rollback_issues(task.rollback)
@@ -550,7 +609,9 @@ def check_can_execute(
             if so_far + add > cap:
                 return _deny("limits", f"{lim_name} would be exceeded")
         if cls in NEEDS_OWN_APPROVAL:
-            ap_issue = _action_approval_issue(action, action_approval, task, now)
+            ap_issue = _action_approval_issue(
+                action, action_approval, task, now, consumed_approvals
+            )
             if ap_issue:
                 return _deny("needs_approval", ap_issue)
         return ExecDecision(True, "ok", ())
@@ -558,15 +619,29 @@ def check_can_execute(
         return _deny("malformed", "unreadable input")
 
 
-def _action_approval_issue(action: ActionRequest, ap: Any, task: Task, now: datetime) -> str | None:
+def _action_approval_issue(
+    action: ActionRequest, ap: Any, task: Task, now: datetime, consumed: Any
+) -> str | None:
     if not isinstance(ap, ActionApproval):
         return "this kind of action needs its own explicit approval"
+    if (
+        not isinstance(ap.approval_id, str)
+        or not ap.approval_id.strip()
+        or len(ap.approval_id) > MAX_ID
+    ):
+        return "the action approval has no id"
+    if consumed is not None:
+        try:
+            if ap.approval_id in consumed:
+                return "this action approval was already used"
+        except TypeError:
+            return "consumed approvals are malformed"
     if classify_approval(ap.approval_text) is not ApprovalCue.EXPLICIT_YES:
         return "the action approval is not an explicit yes"
     if ap.action_sha != action_sha(action):
         return "the action approval refers to a different action"
-    if not _named(ap.approver) or ap.approver.strip().casefold() == task.owner.strip().casefold():
-        return "the action approver must be a named person other than the task owner"
+    if not _named(ap.approver) or ident(ap.approver) in {ident(task.owner), ident(task.creator)}:
+        return "the action approver must be a named person other than the task owner and creator"
     if not isinstance(ap.approved_at, datetime) or ap.approved_at.tzinfo is None:
         return "the action approval has no valid time"
     if not (timedelta(0) <= now - ap.approved_at <= ACTION_APPROVAL_TTL):

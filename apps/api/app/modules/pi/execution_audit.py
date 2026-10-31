@@ -13,6 +13,7 @@ from __future__ import annotations
 import hashlib
 import json
 import re
+import unicodedata
 from dataclasses import dataclass
 from datetime import datetime
 from typing import Any
@@ -35,16 +36,117 @@ KINDS = frozenset(
     }
 )
 
-_CARD = re.compile(r"\d(?:[ -]?\d){12,18}")
-_EMAIL = re.compile(r"[^\s@]{1,64}@[^\s@]{1,255}")
+_EMAIL = re.compile(
+    r"[\w.+-]{1,64}\s{0,3}(?:@|\(at\)|\[at\])\s{0,3}[\w-]{1,63}(?:\s{0,3}(?:\.|\(dot\)|\[dot\])\s{0,3}[\w-]{1,63})+",
+    re.IGNORECASE,
+)
+MAX_GAP = 3  # separators tolerated between digits of one number: ". ", " - ", zero-width, nbsp ...
+
+# Words that announce a secret. Any value containing one is treated as secret-bearing (fail closed).
+SECRET_WORDS = frozenset(
+    "password passwd passcode pwd otp cvv cvc pin iban cnic ssn "
+    "پاسورڈ پاس ورڈ اوٹی پی پن "
+    "पासवर्ड ओटीपी पिन सीवीवी "
+    "كلمه المرور السر الرقم السري رمز".split()
+)
+SECRET_PHRASES = (
+    "one time",
+    "verification code",
+    "security code",
+    "card number",
+    "secret code",
+    "كلمة المرور",
+    "كلمة السر",
+    "الرقم السري",
+    "رمز التحقق",
+    "او ٹی پی",
+    "کارڈ نمبر",
+    "कार्ड नंबर",
+)
+
+
+_ASCII_WORD = re.compile(r"[a-z0-9]+")
+_HAS_DIGIT = re.compile(r"\d")
+
+
+def _words(text: str) -> list[str]:
+    if text.isascii():
+        return _ASCII_WORD.findall(text.casefold())
+    out: list[str] = []
+    cur: list[str] = []
+    for ch in unicodedata.normalize("NFKC", text).casefold():
+        if unicodedata.category(ch)[0] in "LMN":
+            cur.append(ch)
+        elif cur:
+            out.append("".join(cur))
+            cur = []
+    if cur:
+        out.append("".join(cur))
+    return out
+
+
+def looks_secret(text: str) -> bool:
+    """A secret keyword in any of the five languages (password, OTP, CVV, PIN, card number ...)."""
+    words = _words(text)
+    if any(w in SECRET_WORDS for w in words):
+        return True
+    joined = " " + " ".join(words) + " "
+    return any(f" {' '.join(_words(p))} " in joined for p in SECRET_PHRASES)
+
+
+def digit_spans(text: str, min_digits: int) -> list[tuple[int, int]]:
+    """Spans holding at least `min_digits` digits where separators between digits are at most MAX_GAP
+    characters of any kind. Any Unicode decimal digit counts. Linear time."""
+    if not _HAS_DIGIT.search(text):
+        return []
+    spans: list[tuple[int, int]] = []
+    start = last = -1
+    count = gap = 0
+    for i, ch in enumerate(text):
+        if unicodedata.category(ch) == "Nd":
+            if count == 0:
+                start = i
+            count += 1
+            last = i
+            gap = 0
+        elif count:
+            gap += 1
+            if gap > MAX_GAP:
+                if count >= min_digits:
+                    spans.append((start, last + 1))
+                count = gap = 0
+    if count >= min_digits:
+        spans.append((start, last + 1))
+    return spans
+
+
+def has_card_like(text: str, min_digits: int = 13) -> bool:
+    return bool(digit_spans(text, min_digits))
 
 
 def _clean(value: Any, limit: int) -> str:
-    """Bounded, redacted text: card-like digit runs and emails never enter the trail."""
+    """Bounded, redacted text: numbers (7+ digits in any separator style), emails (also 'a @ b . com') and
+    secret statements (password, OTP, CVV, PIN ...) never enter the trail."""
     text = value if isinstance(value, str) else str(value)
     text = text[: limit * 4]
-    text = _CARD.sub("[number]", text)
+    spans = digit_spans(text, 7)
+    if spans:
+        out: list[str] = []
+        pos = 0
+        for a, b in spans:
+            out.append(text[pos:a])
+            out.append("[number]")
+            pos = b
+        out.append(text[pos:])
+        text = "".join(out)
     text = _EMAIL.sub("[email]", text)
+    if looks_secret(text):
+        for m in re.finditer(r"\S+", text):
+            if looks_secret(m.group()):
+                text = text[: m.start()] + "[secret]"  # the secret word and all that follows it
+                break
+        else:
+            text = "[secret]"
     return text[:limit]
 
 
@@ -92,7 +194,12 @@ class AuditLog:
         self, *, at: datetime, kind: str, actor: str, task_id: str, detail: str = ""
     ) -> AuditEntry | None:
         """Returns the entry, or None when the input is malformed or the log is full (fail closed)."""
-        if kind not in KINDS or not isinstance(at, datetime) or at.tzinfo is None:
+        if (
+            not isinstance(kind, str)
+            or kind not in KINDS
+            or not isinstance(at, datetime)
+            or at.tzinfo is None
+        ):
             return None
         if len(self._entries) >= MAX_ENTRIES:
             return None
