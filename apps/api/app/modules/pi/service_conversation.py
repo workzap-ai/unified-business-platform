@@ -6280,7 +6280,8 @@ async def compose_service_turn(
                     f"{context.get('owner_turn_note') or ''} This is the first reply to a new "
                     "number: greet in half a sentence, say you are pi, an AI from Workzap, then "
                     "ask one question: the business name and what it makes or sells. No problem "
-                    "question, no list of areas, no guess about the business."
+                    "question, no list of areas, no guess about the business. "
+                    f"{reply_gates.referral_note(context)}"
                 ).strip()
             elif warm.reply:
                 turn = ServiceTurn(reply=warm.reply, language="en")
