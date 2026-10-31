@@ -23,6 +23,17 @@ real-model spend. Every row says how to reverse it. The owner can overrule any r
 | 12 | Failing "known" tests | Stale tests are updated deliberately with a written reason; real production bugs are listed, not hidden. | Honest baseline. | n/a |
 | 13 | Merge policy | Docs and test-only: merge after review. Live-path code: only after an independent PASS audit, fast-forward, full unit run, no new failures against the clean baseline. | The owner's safeguards. | n/a |
 
+## Decided later (2026-11-01), engineering and process, reversible
+
+| # | Question | Decision | Why | Reverse by |
+|---|---|---|---|---|
+| 14 | What does "ok" from the L2-1 constraint gate mean? | "No recognised rule was violated and every stated limit was read." It is NOT proof of safety. Owner-facing text never claims a guarantee; it is hedged ("as far as I understood..."). The reviewer's approval of every document and quote stays the final control. | Four independent audits show a lexical gate cannot reach zero unsafe ok on unbounded phrasing; the honest contract plus a hedged consumer plus reviewer approval is defence in depth. | Owner asks for stricter: never ok when subject stems overlap. |
+| 15 | Merge bar for the lexical gates (L2-1, Level 1 cause/tried) | PASS needs: (a) zero unsafe ok in every NUMERIC class (budget, staff cap, deadline, totals); (b) every BLOCKING family named by an audit closed and covered by a generated matrix test; (c) fail-safe default (unknown / pi_inferred / unset), never ok / owner_said by default; (d) the contract documented honestly in code; (e) any residual limited to obscure synonyms with no shared stem, documented. A fresh auditor probing with a new matrix still reports BLOCKING items separately from RESIDUAL. | Zero on an unbounded phrase space cannot be proven; this bar is measurable and keeps the unsafe direction closed. | Owner raises the bar. |
+| 16 | Merge slicing for `pi/ps-flow` (90+ commits) | Do not audit or merge it as one block. Cut it into small, flag-gated slices that each get an independent audit and a fast-forward merge in this order: PS-10 self-review module + pre-send guard; PS-9 language decision; PS-3/PS-4/PS-5 wiring; PS-8 context; PS-7 graph voice; L1 and L2-1 only after their own PASS. Each slice must be revertable alone. | One giant audit is slow and hides regressions; small slices land value earlier and keep rollback trivial. | n/a |
+| 17 | Test lock hygiene | One lock directory `.cache/test.lock`; create with `mkdir` only; never chain `mkdir ; rmdir`; remove only a lock you created; if a lock is older than 90 minutes and its owner is not a running agent, the coordinator removes it after checking. | A chained rmdir removed another agent's lock once. | n/a |
+| 18 | Linter rules that are noisy and blind | Remove them (R-CANT-01) rather than tune; all new linter rules start SOFT; a rule becomes hard only after a clean precision run on at least three independent corpora and an owner-visible note. | A hard false positive replaces a good reply with the safe fallback; precision beats recall. | n/a |
+| 19 | Price-guard amount words ("five hundred", "panch sau", "a grand" pass in quote/hidden modes on main) | Fix in its own lane with failing tests first (word-number detection in five languages, no loosening), then audit. | A real gap found by the dead-end audit, not caused by that change. | n/a |
+
 ## Not mine to decide (still waiting for the owner)
 
 - SEC-1 design and `quotes.approve`.
