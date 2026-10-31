@@ -2177,8 +2177,9 @@ async def pre_send_guard(
     still says pi is an AI. A check whose input the flow does not hand over is UNKNOWN and is not
     acted on."""
     if turn._decision is not None or turn._cost_line or turn._summary:
-        # fixed, application-written replies (a decision's confirmation of a quote, the cost
-        # answer, the sorted summary) legitimately say "approve", "free of charge" and the like
+        # Application-written replies (a decision's confirmation "you approve quote Q-0001 for PKR
+        # 450,000", the cost answer, the sorted summary) are skipped: tried without this skip, SR-16
+        # (PS-10 2de7abb9) still reads "approve quote" in the confirmation as worded-as-done
         return
     lang = fixed_lines.code(context, script=True)
     lang = lang if lang in self_review_types.LANGS else "en"
