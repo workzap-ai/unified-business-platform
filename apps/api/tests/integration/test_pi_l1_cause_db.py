@@ -175,7 +175,9 @@ async def test_the_extractor_fields_are_saved_by_apply_ops(api, business_db, mon
         None,
         [ProblemOp(op="create", note=note)],
         "en",
-        owner_text="the competitor is cheaper and sales fell",
+        owner_text=(
+            "the competitor is cheaper and sales fell, we tried Facebook ads, they brought nobody"
+        ),
     )
     (row,) = await problems.noted_context(db, w.scope_a, w.cust_a)
     assert row["cause_status"] == "owner_said"

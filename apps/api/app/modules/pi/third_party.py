@@ -154,6 +154,21 @@ EN_TITLE_RELATION = re.compile(
     rf"\b(Uncle|Aunt|Aunty|Auntie|Brother|Sister|Cousin|Boss|Ustad|Teacher)\s+({NAME})"
 )
 EN_RELATION = re.compile(rf"\b((?i:my|our|his|her|their|the)\s+(?i:{RELATION}))\s+({NAME})")
+EN_ROLE_NAMED = re.compile(
+    r"\b((?i:employee|worker|staff member|partner|manager|supplier|customer|client|driver"
+    r"|accountant|neighbou?r|person|man|woman|guy|girl|boy|friend|cashier|salesman))"
+    rf"\s+(?i:named|called)\s+({NAME})"
+)
+RU_RELATIVE = (
+    r"(?i:biwi|shauhar|bhai|behan|bahan|beta|beti|dost|abbu|ammi|chacha|mamu|khala|phuphi|saas"
+    r"|susar|dewar|jeth|bhabhi|padosi|manager|staff|supplier|partner|employee|accountant|munshi"
+    r"|nokar)"
+)
+RU_POSSESSIVE_NAME = re.compile(
+    rf"\b((?i:meri|mera|mere|hamari|hamara|hamare|uski|uska|unki|unka)\s+{RU_RELATIVE})\s+"
+    r"([A-Z][A-Za-z']{1,15})\b"
+)
+RU_NAME_SAYS = re.compile(r"\b([A-Z][A-Za-z']{1,15})\s+(?=(?i:kehta|kehti|kehte|keh)\b)")
 EN_NAME_THEN_VERB = re.compile(rf"\b({NAME})\s+(?=(?i:{REPORT_AFTER})\b)")
 EN_VERB_THEN_NAME = re.compile(rf"\b((?i:{REPORT_BEFORE}))\s+({NAME})")
 HONORIFIC_ROLE = {"dr": "a doctor", "prof": "a professor"}
@@ -256,6 +271,11 @@ def protect(text: str) -> str:
     out = EN_HONORIFIC.sub(_honorific, out)
     out = EN_RELATION.sub(_relation, out)
     out = EN_TITLE_RELATION.sub(_title_relation, out)
+    out = EN_ROLE_NAMED.sub(lambda m: m.group(1) if _is_name(m.group(2)) else m.group(0), out)
+    out = RU_POSSESSIVE_NAME.sub(lambda m: m.group(1) if _is_name(m.group(2)) else m.group(0), out)
+    out = RU_NAME_SAYS.sub(
+        lambda m: f"{SOMEONE['roman_ur']} " if _is_name(m.group(1)) else m.group(0), out
+    )
     out = EN_NAME_THEN_VERB.sub(_name_then_verb, out)
     out = EN_VERB_THEN_NAME.sub(_verb_then_name, out)
     out = RU_NAME_HONORIFIC.sub(_ru_honorific, out)

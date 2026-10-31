@@ -421,6 +421,20 @@ class Applied:
         return {p.id for p in every}
 
 
+# a word character, including Devanagari and Arabic vowel marks (not in \w)
+_WORD = r"[\wऀ-ॿً-ٰٟ]"
+
+
+def _stems(text: str, size: int = 3) -> set[str]:
+    """First five letters of every word of `size`+ letters: a cheap, language-free word match."""
+    return {w[:5] for w in re.findall(rf"{_WORD}{{{size},}}", text.casefold())}
+
+
+def _backed(words: set[str], heard: set[str]) -> bool:
+    """At least 60% of `words` (and one word) occur in `heard`."""
+    return bool(words) and len(words & heard) / len(words) >= 0.6
+
+
 class ProblemBook:
     """The problems of one customer's business, for one conversation turn."""
 
@@ -510,60 +524,65 @@ class ProblemBook:
 
     @staticmethod
     def tried_items(note: ProblemNote, owner_text: str | None) -> list[dict[str, Any]]:
-        """The note's `tried` entries with the outcome the OWNER's words give them (L1 follow-up).
-        An entry whose outcome is empty or unclear becomes "failed" when the owner's own text says
-        that attempt failed ("worked" when they say it helped): the owner's clause that mentions
-        the same words, or a failed attempt the owner described that shares a word with this
-        problem. `what` keeps the owner's wording so PS-3's idea check can
-        match it. Only the owner's text counts (never the model's)."""
+        """The note's `tried` entries, kept only as far as the OWNER's own words back them (L1).
+
+        With no owner text (an older caller) the entries are returned as given. With it: an entry
+        is stored only when an owner clause (not a question, a hypothetical or a third party's
+        attempt) mentions what was tried; its outcome is "failed" or "worked" when that clause
+        says so, else the model's own outcome words only when the owner's text backs them, else
+        unset. A failed attempt the owner described is added when the model wrote none and it
+        shares a word with this problem. `what` keeps the owner's wording (PS-3 matches on it)."""
         items = [dict(t) for t in note.tried if isinstance(t, dict)]
-        clauses = [c for c in re.split(r"[.!?;]+|\n+", owner_text or "") if c.strip()]
+        if owner_text is None:
+            return items
+        clauses = tried_outcome.owner_clauses(owner_text)
+        heard = [_stems(c) for c in clauses]
+        everything = set().union(*heard) if heard else set()
+        kept: list[dict[str, Any]] = []
         for item in items:
-            if tried_outcome.outcome_of(str(item.get("outcome") or "")) == "failed":
+            what = _stems(str(item.get("what") or ""))
+            support = [c for c, h in zip(clauses, heard, strict=True) if _backed(what, h)]
+            if not support:
+                continue  # nothing the owner said backs this attempt
+            outcomes = {tried_outcome.clause_outcome(c) for c in support}
+            given = str(item.get("outcome") or "")
+            if "failed" in outcomes:
                 item["outcome"] = "failed"
-                continue
-            if str(item.get("outcome") or "").strip():
-                continue  # the owner's outcome is kept as it is
-            words = {w[:5] for w in re.findall(r"\w{3,}", str(item.get("what") or "").casefold())}
-            for clause in clauses:
-                heard = {w[:5] for w in re.findall(r"\w{3,}", clause.casefold())}
-                if not words or not words <= heard:
-                    continue
-                if tried_outcome.failed_attempt(clause):
-                    item["outcome"] = "failed"
-                    break
-                if tried_outcome.outcome_of(clause) == "worked":
-                    item["outcome"] = "worked"  # a successful attempt is never a failed one
-        known = [str(i.get("what") or "").casefold() for i in items]
-        about = {
-            w[:5]
-            for w in re.findall(
-                r"\w{4,}", " ".join([note.title, note.summary, *note.user_words]).casefold()
-            )
-        }
+            elif "worked" in outcomes:
+                item["outcome"] = "worked"
+            elif not _backed(_stems(given), everything):
+                item["outcome"] = ""  # the model's outcome words are not the owner's
+            kept.append(item)
+        known = [str(i.get("what") or "").casefold() for i in kept]
+        about = _stems(" ".join([note.title, note.summary, *note.user_words]), 4)
         for clause in clauses:
             found = tried_outcome.failed_attempt(clause)
             if not found or not found.what or found.what.casefold() in known:
                 continue
             if any(found.what.casefold() in k or k in found.what.casefold() for k in known if k):
                 continue
-            heard = {w[:5] for w in re.findall(r"\w{4,}", clause.casefold())}
-            if about & heard:
-                items.append({"what": found.what, "outcome": "failed"})
+            if about & _stems(clause, 4):
+                kept.append({"what": found.what, "outcome": "failed"})
                 known.append(found.what.casefold())
-        return items
+        return kept
 
     @staticmethod
-    def cause_candidate(note: ProblemNote) -> tuple[str, bool, list[str]]:
+    def cause_candidate(
+        note: ProblemNote, owner_text: str | None = None
+    ) -> tuple[str, bool, list[str]]:
         """(text, said, evidence words) of the cause a note carries. The B2a cause fields win; the
-        older `believes_cause` is the same claim ("the owner said it") with no evidence of its own,
-        so its own first words are the evidence and must occur in the owner's own text, or the
-        cause is pi's guess (L1-3): the model writing believes_cause proves nothing."""
+        older `believes_cause` is the same claim ("the owner said it") with no evidence of its own.
+        Its evidence is its first three CONTENT words (function words prove nothing), and it counts
+        as the owner's only when at least 60% of its content words are in the owner's own claim
+        (not a question, a hypothetical or someone else's opinion), or the cause is pi's guess
+        (L1-3): the model writing believes_cause proves nothing."""
         if note.cause_text.strip():
             return note.cause_text, note.cause_said, note.cause_words
         text = note.believes_cause.strip()
-        words = [w for w in re.findall(r"\w+", text.casefold()) if len(w) >= 3][:3]
-        return text, True, words
+        words = problem_fields.content_words(text)
+        carried = problem_fields.endorsed_words(words, owner_text)
+        backed = bool(words) and len(carried) / len(words) >= 0.6
+        return text, backed, carried[: problem_fields.EVIDENCE_WORDS]
 
     async def load_requirements(self, problem: PiProblem) -> None:
         """The four deferred columns, loaded now (an async session cannot lazy-load them)."""
@@ -600,7 +619,7 @@ class ProblemBook:
         changed = changed or was
         if tried is not None:
             values["tried"] = tried
-        cause_text, cause_said, cause_words = ProblemBook.cause_candidate(note)
+        cause_text, cause_said, cause_words = ProblemBook.cause_candidate(note, owner_text)
         cause, was = problem_fields.merge_cause(
             problem.cause if problem else None,
             cause_text,
@@ -608,6 +627,7 @@ class ProblemBook:
             cause_words,
             msg,
             owner_text or "",  # only the owner's message: model-written words prove nothing
+            datetime.now(UTC).isoformat(timespec="seconds"),
         )
         changed = changed or was
         if cause is not None:

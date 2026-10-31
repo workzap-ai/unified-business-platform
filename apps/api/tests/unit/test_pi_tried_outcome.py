@@ -22,11 +22,11 @@ def test_the_roman_urdu_failed_attempt_is_read_with_the_owners_wording():
         "rang wale folder pehle istemal kiye, kaam nahi aaya",
         "folder aazmaye, fayda nahi hua",
         "ghalat nikla",  # a weak cue alone is not enough...
-        "ناکام رہا",
-        "کوئی فائدہ نہیں",
-        "لم ينجح",
-        "لم يفد",
-        "काम नहीं आया",
+        "ہم نے آزمایا لیکن ناکام رہا",
+        "ہم نے آزمایا، کوئی فائدہ نہیں",
+        "جربنا ذلك لكن لم ينجح",
+        "جربنا ذلك ولم يفد",
+        "मैंने आजमाया पर काम नहीं आया",
     ],
 )
 def test_failure_cues_in_five_languages(text):
@@ -45,8 +45,8 @@ def test_weak_cues_need_an_attempt_word():
 def test_a_plain_statement_is_unclear_and_a_good_result_is_worked():
     for text in ("kaam bohat hai", "the folders are on the shelf", ""):
         assert to.outcome_of(text) == "unclear"
-    assert to.outcome_of("it worked well") == "worked"
-    assert to.outcome_of("it did not work") == "failed"  # failure wins
+    assert to.outcome_of("we tried it and it worked well") == "worked"
+    assert to.outcome_of("we tried it and it did not work") == "failed"  # failure wins
 
 
 def values(note, owner_text):
@@ -73,16 +73,16 @@ def test_an_unrelated_failed_attempt_is_not_attached_to_this_problem():
     assert "tried" not in values(note, ROMAN)
 
 
-def test_an_outcome_the_owner_gave_is_kept_and_a_model_only_text_proves_nothing():
+def test_an_outcome_the_owner_words_back_is_kept_and_a_model_only_text_proves_nothing():
     kept = ProblemNote(title="t", tried=[{"what": "ads", "outcome": "some leads"}])
-    assert values(kept, "ads did not work")["tried"][0]["outcome"] == "some leads"
+    assert values(kept, "we tried ads and got some leads")["tried"][0]["outcome"] == "some leads"
     guess = ProblemNote(title="t", tried=[{"what": "ads", "outcome": ""}])
-    assert values(guess, "bikri kam hai")["tried"][0]["outcome"] == ""  # no owner words, no outcome
+    assert "tried" not in values(guess, "bikri kam hai")  # no owner words, no entry at all
 
 
 def test_a_successful_attempt_is_stored_as_worked_never_failed():
     note = ProblemNote(title="Files", tried=[{"what": "folders", "outcome": ""}])
-    for text in ("folders try kiye aur bahut kaam aaya", "we used folders and it worked well"):
+    for text in ("folders try kiye aur bahut kaam aaya", "we tried folders and it worked well"):
         (entry,) = values(note, text)["tried"]
         assert entry["outcome"] == "worked", text
 
@@ -95,14 +95,14 @@ def test_a_mixed_message_marks_each_attempt_correctly():
             {"what": "whatsapp reminders", "outcome": ""},
         ],
     )
-    text = "rang wale folder try kiye lekin mix ho gaye. whatsapp reminders it worked well"
+    text = "rang wale folder try kiye lekin mix ho gaye. we tried whatsapp reminders, worked well"
     got = {e["what"]: e["outcome"] for e in values(note, text)["tried"]}
     assert got == {"rang wale folder": "failed", "whatsapp reminders": "worked"}
 
 
-def test_an_unrelated_tried_item_stays_unset():
+def test_an_unrelated_tried_item_is_not_stored_from_other_attempts():
     note = ProblemNote(title="Files", tried=[{"what": "ads", "outcome": ""}])
-    assert values(note, ROMAN)["tried"][0]["outcome"] == ""
+    assert "tried" not in values(note, ROMAN)
 
 
 def test_a_repeat_check_skips_attempts_the_owner_said_worked():
