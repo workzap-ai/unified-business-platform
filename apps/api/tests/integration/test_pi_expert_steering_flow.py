@@ -332,7 +332,7 @@ async def test_the_new_problem_gets_its_two_after_the_first_is_capped(
                 problem_ops=[
                     create(
                         "Teachers leave in the middle of the year",
-                        "teachers chhod jate hain, solution do",
+                        "teachers keep leaving in the middle of the year, give me a solution",
                         category="people_staff",
                         confidence=0.9,
                     )
@@ -344,7 +344,7 @@ async def test_the_new_problem_gets_its_two_after_the_first_is_capped(
     monkeypatch.setattr(LLMManager, "complete_structured", structured)
     teacher_ideas = [
         "Ask each teacher who left what finally made them decide, so you hear the real reason before the next one goes.",
-        GOOD_TWO.replace("showroom", "school"),
+        "Ask each teacher who is still here what would make them stay another year, so you fix it before they hand in notice.",
     ]
 
     async def complete(self, scope, **kwargs):
@@ -368,7 +368,7 @@ async def test_the_new_problem_gets_its_two_after_the_first_is_capped(
         return SimpleNamespace(text=json.dumps(judged(2)))
 
     monkeypatch.setattr(LLMManager, "complete", complete)
-    [body] = await reply_after(pi, business_db, "teachers chhod jate hain, solution do", "h-2")
+    [body] = await reply_after(pi, business_db, "teachers keep leaving in the middle of the year, give me a solution", "h-2")
     assert body.count("•") == 2 and "teacher" in body.lower()
     assert GOOD_ONE not in body
     await business_db.refresh(row)

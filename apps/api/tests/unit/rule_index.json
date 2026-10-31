@@ -462,13 +462,19 @@
    "status": "PARTIAL",
    "code": [
     "app/modules/pi/safety.py::boundary_asked",
-    "app/modules/pi/constitution.py::LECTURE"
+    "app/modules/pi/constitution.py::LECTURE",
+    "app/modules/pi/constitution_gaps.py::_decides"
    ],
    "tests": [
     "tests/unit/test_pi_languages_gates.py::test_the_specs_money_and_advice_cases_have_fixed_answers",
-    "tests/unit/test_pi_constitution.py::test_no_lecturing"
+    "tests/unit/test_pi_constitution.py::test_no_lecturing",
+    "tests/unit/test_pi_constitution_gaps.py::test_a_reply_that_breaks_the_rule_is_caught",
+    "tests/unit/test_pi_constitution_gaps.py::test_a_normal_reply_passes_clean",
+    "tests/unit/test_pi_constitution_gaps_precision.py::test_normal_replies_raise_no_gap_rule",
+    "tests/unit/test_pi_constitution_gaps_audit.py::test_a_recommendation_is_allowed",
+    "tests/unit/test_pi_constitution_gaps_fresh.py::test_fresh_normal_replies_flag_nothing_hard_and_at_most_one_percent_soft"
    ],
-   "gap": "Only an explicit 'what would you do?' (A8) and 'you should' / 'best practice' phrasing are caught; a decision phrased any other way is left to the prompt.",
+   "gap": "Added in code (soft): deciding for them ('I've decided', 'you must/need to close, fire, sell...' and the Roman Urdu, Urdu, Arabic and Hindi equivalents). A recommendation ('my suggestion is...') is allowed by the spec and is not flagged. Still open: other decision phrasing, and safety.boundary_asked catches only explicit asks.",
    "owner": "linter hardening session",
    "unit_tested": true
   },
@@ -480,12 +486,18 @@
    "statement": "pi never forecasts outcomes of the person's business",
    "status": "PARTIAL",
    "code": [
-    "app/modules/pi/constitution.py::PROMISE"
+    "app/modules/pi/constitution.py::PROMISE",
+    "app/modules/pi/constitution_gaps.py::_forecasts"
    ],
    "tests": [
-    "tests/unit/test_pi_constitution.py::test_pi_never_promises_a_result"
+    "tests/unit/test_pi_constitution.py::test_pi_never_promises_a_result",
+    "tests/unit/test_pi_constitution_gaps.py::test_a_reply_that_breaks_the_rule_is_caught",
+    "tests/unit/test_pi_constitution_gaps.py::test_a_normal_reply_passes_clean",
+    "tests/unit/test_pi_constitution_gaps_precision.py::test_normal_replies_raise_no_gap_rule",
+    "tests/unit/test_pi_constitution_gaps_audit.py::test_generic_seasonality_is_not_a_forecast",
+    "tests/unit/test_pi_constitution_gaps_fresh.py::test_fresh_normal_replies_flag_nothing_hard_and_at_most_one_percent_soft"
    ],
-   "gap": "PROMISE catches 'will increase/boost/grow/double/improve' and 'you'll save/earn' only; other forecast wording ('sales will rise', 'next year you'll be') is prompt-only.",
+   "gap": "Added in code (soft): 'your sales will drop', 'you'll be out of business', Roman Urdu 'sales barh jayengi', Urdu, Arabic, Hindi equivalents; conditional, echoed and generic seasonality sentences ('Demand will increase before Eid') are exempt. PROMISE still catches the original promises (hard). Still open: forecasts phrased outside these lists.",
    "owner": "linter hardening session",
    "unit_tested": true
   },
@@ -789,16 +801,20 @@
    "page": 13,
    "area": "constitution",
    "statement": "Never pressures the person for detail they hesitate to give",
-   "status": "PROMPT-ONLY",
+   "status": "PARTIAL",
    "code": [
-    "app/modules/pi/spec_handbook.py"
+    "app/modules/pi/spec_handbook.py",
+    "app/modules/pi/constitution_gaps.py::_pressure"
    ],
    "tests": [
     "tests/unit/test_pi_spec_handbook.py::test_the_constitution_and_the_voice_are_always_there",
-    "tests/unit/test_pi_rule_gaps.py::test_a_prompt_only_rule_is_in_the_text_pi_reads_while_listening"
+    "tests/unit/test_pi_rule_gaps.py::test_a_prompt_only_rule_is_in_the_text_pi_reads_while_listening",
+    "tests/unit/test_pi_constitution_gaps.py::test_a_reply_that_breaks_the_rule_is_caught",
+    "tests/unit/test_pi_constitution_gaps.py::test_a_normal_reply_passes_clean",
+    "tests/unit/test_pi_constitution_gaps_precision.py::test_normal_replies_raise_no_gap_rule"
    ],
-   "gap": "Only the handbook text (always in the prompt) carries it; nothing detects pressure.",
-   "owner": "prompt owner (not in scope for code)",
+   "gap": "Caught in code (EN, Roman Urdu, Urdu, Arabic, Hindi): a push ('you have to tell me', 'just tell me', 'come on', 'batana hoga') in a reply that follows a message where the person hesitated to share. Not caught: pressure that is only a repeated question, and hesitation shown only in earlier messages.",
+   "owner": "linter hardening session",
    "unit_tested": true
   },
   {
@@ -1376,16 +1392,22 @@
    "page": 16,
    "area": "voice",
    "statement": "Names things the way the person names them ('the Gulberg branch', not 'Location 2')",
-   "status": "PROMPT-ONLY",
+   "status": "PARTIAL",
    "code": [
-    "app/modules/pi/spec_handbook.py"
+    "app/modules/pi/spec_handbook.py",
+    "app/modules/pi/constitution_gaps.py::_their_names"
    ],
    "tests": [
     "tests/unit/test_pi_spec_handbook.py::test_the_constitution_and_the_voice_are_always_there",
-    "tests/unit/test_pi_rule_gaps.py::test_a_prompt_only_rule_is_in_the_text_pi_reads_while_listening"
+    "tests/unit/test_pi_rule_gaps.py::test_a_prompt_only_rule_is_in_the_text_pi_reads_while_listening",
+    "tests/unit/test_pi_constitution_gaps.py::test_a_reply_that_breaks_the_rule_is_caught",
+    "tests/unit/test_pi_constitution_gaps.py::test_a_normal_reply_passes_clean",
+    "tests/unit/test_pi_constitution_gaps_precision.py::test_normal_replies_raise_no_gap_rule",
+    "tests/unit/test_pi_constitution_gaps_audit.py::test_structural_labels_are_not_invented_names",
+    "tests/unit/test_pi_constitution_gaps_fresh.py::test_fresh_normal_replies_flag_nothing_hard_and_at_most_one_percent_soft"
    ],
-   "gap": "Carried only by the handbook text in the prompt; no check compares pi's names for things with the person's.",
-   "owner": "prompt owner (not in scope for code)",
+   "gap": "Caught in code: Location, Shop, Store, Outlet, Site, Warehouse, Godown with a number or capital letter (and the Urdu, Arabic, Hindi equivalents) that the person never used; 'Branch N' only where the owner talks about branches. Exempt: list and document labels (Item, Unit, Step, Point, Option, Customer) and quote or document states. Not caught: other invented names.",
+   "owner": "linter hardening session",
    "unit_tested": true
   },
   {
@@ -1714,13 +1736,17 @@
    "statement": "Never asks what the person already said (checks memory first)",
    "status": "PARTIAL",
    "code": [
-    "app/modules/pi/constitution.py::_reasks_known_profile"
+    "app/modules/pi/constitution.py::_reasks_known_profile",
+    "app/modules/pi/constitution_gaps.py::_asks_what_they_said"
    ],
    "tests": [
     "tests/unit/test_pi_constitution.py::test_never_re_asks_a_known_profile_fact",
-    "tests/unit/test_pi_constitution.py::test_profile_reask_check_does_not_flag_unrelated_or_unknown_questions"
+    "tests/unit/test_pi_constitution.py::test_profile_reask_check_does_not_flag_unrelated_or_unknown_questions",
+    "tests/unit/test_pi_constitution_gaps.py::test_a_reply_that_breaks_the_rule_is_caught",
+    "tests/unit/test_pi_constitution_gaps.py::test_a_normal_reply_passes_clean",
+    "tests/unit/test_pi_constitution_gaps_precision.py::test_normal_replies_raise_no_gap_rule"
    ],
-   "gap": "The linter catches a re-ask of name, business name, business type and location only; other known facts (branches, systems, a problem's detail) are prompt-only.",
+   "gap": "Added in code: a 'how many X' question when they already gave a number for X, and a question whose content words are all in what they said. Still open: other known facts and paraphrased questions.",
    "owner": "linter hardening session",
    "unit_tested": true
   },
@@ -1730,16 +1756,20 @@
    "page": 20,
    "area": "conversation",
    "statement": "Closed or choice questions for brief writers, open questions for long writers",
-   "status": "PROMPT-ONLY",
+   "status": "PARTIAL",
    "code": [
-    "app/modules/pi/style.py"
+    "app/modules/pi/style.py",
+    "app/modules/pi/constitution_gaps.py::_brief_writer_open_question"
    ],
    "tests": [
     "tests/unit/test_pi_style.py::test_a_short_writer_gets_a_short_answer_but_never_too_short_to_hold_a_note",
-    "tests/unit/test_pi_rule_gaps.py::test_a_prompt_only_rule_is_in_the_text_pi_reads_while_listening"
+    "tests/unit/test_pi_rule_gaps.py::test_a_prompt_only_rule_is_in_the_text_pi_reads_while_listening",
+    "tests/unit/test_pi_constitution_gaps.py::test_a_reply_that_breaks_the_rule_is_caught",
+    "tests/unit/test_pi_constitution_gaps.py::test_a_normal_reply_passes_clean",
+    "tests/unit/test_pi_constitution_gaps_precision.py::test_normal_replies_raise_no_gap_rule"
    ],
-   "gap": "Style profile sets the length; the closed-versus-open choice is prompt-only (question style per person is not tracked as an input).",
-   "owner": "learning session",
+   "gap": "Caught in code: an open how/why/describe question to someone who has written five words or fewer in their last two messages. Not enforced: 'open questions for long writers' (a preference, and a bare yes/no is not detected as 'closed').",
+   "owner": "linter hardening session",
    "unit_tested": true
   },
   {
@@ -1748,17 +1778,23 @@
    "page": 20,
    "area": "conversation",
    "statement": "A skipped or ignored question is not re-asked; the field is marked unknown",
-   "status": "PROMPT-ONLY",
+   "status": "PARTIAL",
    "code": [
     "app/modules/pi/spec_handbook.py",
-    "app/modules/pi/constitution_langs.py"
+    "app/modules/pi/constitution_langs.py",
+    "app/modules/pi/constitution_gaps.py::_reasks_a_skipped_question"
    ],
    "tests": [
     "tests/unit/test_pi_spec_handbook.py::test_the_guidance_follows_the_stage_and_the_topic",
     "tests/unit/test_pi_rule_gaps.py::test_a_prompt_only_rule_is_in_the_text_pi_reads_while_listening",
-    "tests/unit/test_pi_multilingual_rules.py::test_the_rule_catches_its_reply_in_every_language"
+    "tests/unit/test_pi_multilingual_rules.py::test_the_rule_catches_its_reply_in_every_language",
+    "tests/unit/test_pi_constitution_gaps.py::test_a_reply_that_breaks_the_rule_is_caught",
+    "tests/unit/test_pi_constitution_gaps.py::test_a_normal_reply_passes_clean",
+    "tests/unit/test_pi_constitution_gaps_precision.py::test_normal_replies_raise_no_gap_rule",
+    "tests/unit/test_pi_constitution_gaps_audit.py::test_the_skipped_question_check_has_its_own_id_and_the_old_closer_keeps_r_ask_05",
+    "tests/unit/test_pi_constitution_gaps_fresh.py::test_fresh_normal_replies_flag_nothing_hard_and_at_most_one_percent_soft"
    ],
-   "gap": "Nothing compares a new question with questions already ignored; the exact-repeat check (reply_quality) only catches an identical message.",
+   "gap": "Caught in code under its own id R-ASK-05R (R-ASK-05 stays the older generic-closer check in constitution.py): a near-repeat of a question from pi's last two turns (half of its content words after a skip phrase such as 'skip' or 'pata nahi', three quarters otherwise); a clarification request or a short answer is exempt. Not caught: a re-ask in clearly different words; the unknown field is not stored by this check.",
    "owner": "linter hardening session",
    "unit_tested": true
   },
@@ -2235,13 +2271,17 @@
    "statement": "Checks memory before asking; never asks a question already answered in any earlier conversation",
    "status": "PARTIAL",
    "code": [
-    "app/modules/pi/constitution.py::_reasks_known_profile"
+    "app/modules/pi/constitution.py::_reasks_known_profile",
+    "app/modules/pi/constitution_gaps.py::_asks_a_known_fact"
    ],
    "tests": [
     "tests/unit/test_pi_constitution.py::test_never_re_asks_a_known_profile_fact",
-    "tests/unit/test_pi_constitution.py::test_profile_reask_check_does_not_flag_unrelated_or_unknown_questions"
+    "tests/unit/test_pi_constitution.py::test_profile_reask_check_does_not_flag_unrelated_or_unknown_questions",
+    "tests/unit/test_pi_constitution_gaps.py::test_a_reply_that_breaks_the_rule_is_caught",
+    "tests/unit/test_pi_constitution_gaps.py::test_a_normal_reply_passes_clean",
+    "tests/unit/test_pi_constitution_gaps_precision.py::test_normal_replies_raise_no_gap_rule"
    ],
-   "gap": "Bounded to name, business name, business type and location (EN and Roman Urdu); the other profile fields are not checked.",
+   "gap": "Added in code: channels, website, goal, and every profile fact in Urdu, Arabic and Hindi. Still open: French and Spanish phrasing, and facts with no profile field.",
    "owner": "linter hardening session",
    "unit_tested": true
   },
@@ -2410,16 +2450,22 @@
    "page": 22,
    "area": "conversation",
    "statement": "When it cannot help it says so plainly in the first sentence ('I can't do that.')",
-   "status": "PROMPT-ONLY",
+   "status": "PARTIAL",
    "code": [
-    "app/modules/pi/spec_handbook.py"
+    "app/modules/pi/spec_handbook.py",
+    "app/modules/pi/constitution_gaps.py::_limits"
    ],
    "tests": [
     "tests/unit/test_pi_spec_handbook.py::test_the_guidance_follows_the_stage_and_the_topic",
-    "tests/unit/test_pi_rule_gaps.py::test_a_prompt_only_rule_is_in_the_text_pi_reads_while_listening"
+    "tests/unit/test_pi_rule_gaps.py::test_a_prompt_only_rule_is_in_the_text_pi_reads_while_listening",
+    "tests/unit/test_pi_constitution_gaps.py::test_a_reply_that_breaks_the_rule_is_caught",
+    "tests/unit/test_pi_constitution_gaps.py::test_a_normal_reply_passes_clean",
+    "tests/unit/test_pi_constitution_gaps_precision.py::test_normal_replies_raise_no_gap_rule",
+    "tests/unit/test_pi_constitution_gaps_audit.py::test_a_limit_after_a_pleasantry_or_as_the_first_sentence_is_fine",
+    "tests/unit/test_pi_constitution_gaps_fresh.py::test_fresh_normal_replies_flag_nothing_hard_and_at_most_one_percent_soft"
    ],
-   "gap": "Only the handbook carries it; the fixed boundary replies follow the pattern but no check enforces it on model replies.",
-   "owner": "prompt owner",
+   "gap": "Caught in code: a limit buried after two or more other statements. A limit as the first sentence, after a pleasantry or after one scope sentence passes (the approved golden reply and 'Thank you. I can't confirm payment myself' do this). Not caught: a limit in sentence two.",
+   "owner": "linter hardening session",
    "unit_tested": true
   },
   {
@@ -2428,16 +2474,22 @@
    "page": 22,
    "area": "conversation",
    "statement": "Says what happens next or what pi can do instead",
-   "status": "PROMPT-ONLY",
+   "status": "PARTIAL",
    "code": [
-    "app/modules/pi/spec_handbook.py"
+    "app/modules/pi/spec_handbook.py",
+    "app/modules/pi/constitution_gaps.py::_limits"
    ],
    "tests": [
     "tests/unit/test_pi_spec_handbook.py::test_the_guidance_follows_the_stage_and_the_topic",
-    "tests/unit/test_pi_rule_gaps.py::test_a_prompt_only_rule_is_in_the_text_pi_reads_while_listening"
+    "tests/unit/test_pi_rule_gaps.py::test_a_prompt_only_rule_is_in_the_text_pi_reads_while_listening",
+    "tests/unit/test_pi_constitution_gaps.py::test_a_reply_that_breaks_the_rule_is_caught",
+    "tests/unit/test_pi_constitution_gaps.py::test_a_normal_reply_passes_clean",
+    "tests/unit/test_pi_constitution_gaps_precision.py::test_normal_replies_raise_no_gap_rule",
+    "tests/unit/test_pi_constitution_gaps_audit.py::test_cant_02_is_exempt_with_emergency_numbers_or_a_next_step",
+    "tests/unit/test_pi_constitution_gaps_fresh.py::test_fresh_normal_replies_flag_nothing_hard_and_at_most_one_percent_soft"
    ],
-   "gap": "As R-CANT-01.",
-   "owner": "prompt owner",
+   "gap": "Caught in code: a refusal with no question, no alternative and no next step (staff, a reviewer, the team count as next steps); emergency replies with emergency numbers are exempt. Not checked: whether the next step is a good one.",
+   "owner": "linter hardening session",
    "unit_tested": true
   },
   {
@@ -3599,16 +3651,22 @@
    "page": 32,
    "area": "edge cases (Part 6)",
    "statement": "Business distress without danger ('I'm going bankrupt') is not an emergency: acknowledged, then noted as a problem",
-   "status": "PROMPT-ONLY",
+   "status": "PARTIAL",
    "code": [
     "app/modules/pi/spec_handbook.py",
-    "app/modules/pi/safety.py::emergency"
+    "app/modules/pi/safety.py::emergency",
+    "app/modules/pi/constitution_gaps.py::_distress"
    ],
    "tests": [
-    "tests/unit/test_pi_rule_gaps.py::test_business_distress_is_not_an_emergency_and_brings_the_distress_guidance"
+    "tests/unit/test_pi_rule_gaps.py::test_business_distress_is_not_an_emergency_and_brings_the_distress_guidance",
+    "tests/unit/test_pi_constitution_gaps.py::test_a_reply_that_breaks_the_rule_is_caught",
+    "tests/unit/test_pi_constitution_gaps.py::test_a_normal_reply_passes_clean",
+    "tests/unit/test_pi_constitution_gaps_precision.py::test_normal_replies_raise_no_gap_rule",
+    "tests/unit/test_pi_constitution_gaps_audit.py::test_ordinary_empathy_is_an_acknowledgement",
+    "tests/unit/test_pi_constitution_gaps_fresh.py::test_fresh_normal_replies_flag_nothing_hard_and_at_most_one_percent_soft"
    ],
-   "gap": "Code only keeps the flow open and puts the distress guidance (7.N.distress, 6.5) in the prompt; the acknowledgement wording is the model's.",
-   "owner": "prompt owner",
+   "gap": "Caught in code (five languages): for business distress without danger, a reply with emergency numbers or a crisis redirect, advice to borrow, invest, take a loan, file for bankruptcy or sell assets (a sentence that declines to advise is fine), or no acknowledgement in the first two sentences (ordinary empathy phrases count). Not checked: that the distress is then noted as a problem.",
+   "owner": "linter hardening session",
    "unit_tested": true
   },
   {
@@ -9219,14 +9277,20 @@
    "code": [
     "app/modules/pi/constitution.py::YES_NO_QUESTION",
     "app/modules/pi/constitution.py::ACK_OPENER",
-    "app/modules/pi/constitution_langs.py"
+    "app/modules/pi/constitution_langs.py",
+    "app/modules/pi/constitution_gaps.py::_answers_yes_no"
    ],
    "tests": [
     "tests/unit/test_pi_answer_first_and_tone.py::test_a_yes_no_question_is_not_answered_with_thanks_noted",
     "tests/unit/test_pi_multilingual_rules.py::test_the_rule_catches_its_reply_in_every_language",
-    "tests/unit/test_pi_multilingual_rules.py::test_a_thank_you_is_not_the_answer_to_a_yes_no_question"
+    "tests/unit/test_pi_multilingual_rules.py::test_a_thank_you_is_not_the_answer_to_a_yes_no_question",
+    "tests/unit/test_pi_constitution_gaps.py::test_a_reply_that_breaks_the_rule_is_caught",
+    "tests/unit/test_pi_constitution_gaps.py::test_a_normal_reply_passes_clean",
+    "tests/unit/test_pi_constitution_gaps_precision.py::test_normal_replies_raise_no_gap_rule",
+    "tests/unit/test_pi_constitution_gaps_audit.py::test_the_ai_disclosure_rule_is_never_blocked_by_ans_02",
+    "tests/unit/test_pi_constitution_gaps_fresh.py::test_fresh_normal_replies_flag_nothing_hard_and_at_most_one_percent_soft"
    ],
-   "gap": "A yes/no question answered with an acknowledgement ('Thanks, noted') is sent back; a reply that opens with something else but neither yes nor no is not caught, and yes/no questions are found by a pattern list.",
+   "gap": "Added in code: a yes/no question (EN, Roman Urdu, Urdu, Arabic, Hindi, French, Spanish) whose reply opens with neither a yes nor a no word is sent back. 'I'm an AI' answers 'are you human?' in every language (never blocks the AI disclosure) and a Workzap statement answers 'can you fix this?'. Still open: yes/no questions phrased outside the pattern list, and an implicit yes or no is not recognised.",
    "owner": "linter hardening session",
    "unit_tested": true
   },
@@ -9264,14 +9328,18 @@
    "code": [
     "app/modules/pi/constitution.py::NOTED_TITLE",
     "app/modules/pi/constitution.py::echo_overlap",
-    "app/modules/pi/constitution_langs.py"
+    "app/modules/pi/constitution_langs.py",
+    "app/modules/pi/constitution_gaps.py::_noted_twice"
    ],
    "tests": [
     "tests/unit/test_pi_answer_first_and_tone.py::test_the_noted_line_names_the_problem_in_at_most_twelve_words",
     "tests/unit/test_pi_echo_and_tone.py::test_a_reply_that_restates_the_message_is_flagged_as_an_echo",
-    "tests/unit/test_pi_multilingual_rules.py::test_the_rule_catches_its_reply_in_every_language"
+    "tests/unit/test_pi_multilingual_rules.py::test_the_rule_catches_its_reply_in_every_language",
+    "tests/unit/test_pi_constitution_gaps.py::test_a_reply_that_breaks_the_rule_is_caught",
+    "tests/unit/test_pi_constitution_gaps.py::test_a_normal_reply_passes_clean",
+    "tests/unit/test_pi_constitution_gaps_precision.py::test_normal_replies_raise_no_gap_rule"
    ],
-   "gap": "The noted line is held to 12 words and a long echo is caught; 'once per problem' (no second noted line for the same problem) is not counted.",
+   "gap": "Added in code: a second 'noted' line for the same problem (60% of content words) is sent back; a correction is exempt. Still open: problems recognised only by word overlap, not by problem record.",
    "owner": "linter hardening session",
    "unit_tested": true
   },
@@ -9283,12 +9351,16 @@
    "statement": "Bulleted restatements only in the summary S4 (or when confirming 3 new problems from one message)",
    "status": "PARTIAL",
    "code": [
-    "app/modules/pi/constitution.py::lint"
+    "app/modules/pi/constitution.py::lint",
+    "app/modules/pi/constitution_gaps.py::_bullets_restate"
    ],
    "tests": [
-    "tests/unit/test_pi_constitution.py::test_while_listening_pi_does_not_list_back_what_it_already_confirmed"
+    "tests/unit/test_pi_constitution.py::test_while_listening_pi_does_not_list_back_what_it_already_confirmed",
+    "tests/unit/test_pi_constitution_gaps.py::test_a_reply_that_breaks_the_rule_is_caught",
+    "tests/unit/test_pi_constitution_gaps.py::test_a_normal_reply_passes_clean",
+    "tests/unit/test_pi_constitution_gaps_precision.py::test_normal_replies_raise_no_gap_rule"
    ],
-   "gap": "Bullets are allowed only in summaries (R-VOICE-09); the exception for confirming three new problems from one message is not built.",
+   "gap": "Added in code: two or more bullets outside the summary that restate earlier messages (not the latest one) are sent back. Still open: the exemption for confirming three new problems from one message is only implicit (bullets from the latest message pass).",
    "owner": "linter hardening session",
    "unit_tested": true
   },
@@ -9440,13 +9512,19 @@
    "status": "PARTIAL",
    "code": [
     "app/modules/pi/safety.py::advice_reply",
-    "app/modules/pi/constitution.py::lint"
+    "app/modules/pi/constitution.py::lint",
+    "app/modules/pi/constitution_gaps.py::_regulated_advice"
    ],
    "tests": [
-    "tests/unit/test_pi_safety.py::test_advice_is_turned_down_in_plain_words_with_who_to_ask"
+    "tests/unit/test_pi_safety.py::test_advice_is_turned_down_in_plain_words_with_who_to_ask",
+    "tests/unit/test_pi_constitution_gaps.py::test_a_reply_that_breaks_the_rule_is_caught",
+    "tests/unit/test_pi_constitution_gaps.py::test_a_normal_reply_passes_clean",
+    "tests/unit/test_pi_constitution_gaps_precision.py::test_normal_replies_raise_no_gap_rule",
+    "tests/unit/test_pi_constitution_gaps_audit.py::test_quantities_and_units_are_not_regulated_advice",
+    "tests/unit/test_pi_constitution_gaps_fresh.py::test_fresh_normal_replies_flag_nothing_hard_and_at_most_one_percent_soft"
    ],
-   "gap": "Advice asks are turned down by the safety gate and the linter; the free-idea guard (check_idea) does not itself reject a stored idea that is regulated advice, and no test feeds one through solution mode.",
-   "owner": "solutions session",
+   "gap": "Added in code (hard): imperative or 'you can/should' advice naming a drug taken, a prescription, a dose with a frequency, animal treatment, a chemical applied to crops, tax avoidance, a loan or investment, or a lawsuit, in English, Roman Urdu, Urdu, Arabic and Hindi, in any reply. Quantities and units (5 ml, 250 mg of perfume), retail wording and paperwork ideas pass. Still open: advice phrased as a statement of fact, and topics outside these lists.",
+   "owner": "linter hardening session",
    "unit_tested": true
   },
   {

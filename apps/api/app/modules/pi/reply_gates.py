@@ -49,6 +49,40 @@ PROBLEM_QUESTION = re.compile(
 )
 
 
+# 18.2 Referral: the owner says a friend gave them the number. Narrow on purpose: the person says
+# who passed the number on (friend, colleague, dost), not any mention of a recommendation.
+REFERRAL = re.compile(
+    r"\b(?:(?:my|a|our)\s+(?:friend|colleague|cousin|neighbou?r|brother|relative)\b[^.?!]{0,40}"
+    r"\b(?:shared|gave|sent|passed|told)\b|(?:shared|gave\s+me|passed\s+on)\s+(?:your\s+)?"
+    r"(?:number|contact)\b|(?:dost|doost|friend)\s+ne\s+(?:aap\s+ka\s+|apka\s+)?(?:number|bataya|diya))",
+    re.IGNORECASE,
+)
+# The acknowledgement the opening must carry: it names the friend or the passing on of the number.
+REFERRAL_ACK = re.compile(
+    r"\b(?:friend|dost|doost|colleague|passed\s+(?:the\s+|your\s+)?number\s+on|recommend\w*|"
+    r"referr\w*|shared\s+(?:the|my)\s+number|number\s+(?:diya|share))\b|دوست|صديق",
+    re.IGNORECASE,
+)
+
+
+def referral_said(context: dict[str, Any]) -> bool:
+    owner = [
+        *(str(t) for t in context.get("burst_texts") or []),
+    ]
+    owner.append(str(context.get("latest_customer_message") or ""))
+    return any(REFERRAL.search(t) for t in owner)
+
+
+def referral_note(context: dict[str, Any]) -> str:
+    """The extra instruction for the opening when a friend shared the number (18.2)."""
+    if not referral_said(context):
+        return ""
+    return (
+        "The owner said a friend shared your number: acknowledge that in half a sentence "
+        "(for example: glad your friend passed the number on), then ask the identity question."
+    )
+
+
 def _questions(reply: str) -> list[str]:
     parts = re.split(r"(?<=[?؟])\s+", reply.strip())
     return [p for p in parts if p.endswith(("?", "؟"))]
@@ -101,6 +135,11 @@ def opening_problem(
     elif not business_known and not any(IDENTITY_QUESTION.search(q) for q in questions):
         problems.append(
             "it must ask one identity question: the business name and what it makes or sells"
+        )
+    if referral_said(context) and not REFERRAL_ACK.search(text):
+        problems.append(
+            "the owner said a friend shared the number: acknowledge it in half a sentence "
+            "(the friend passing the number on), then ask the identity question"
         )
     if not problems:
         return None

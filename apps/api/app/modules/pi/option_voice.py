@@ -1,0 +1,330 @@
+# ruff: noqa: E501  (one fixed line per row reads better than wrapped text)
+"""PS-flow group A: what the owner sees in the chat about the options (brain mode only).
+
+`voice` reads the ideas a reply lists (bullets), runs the L2-1 gate over them against what the owner
+stated, and returns the reply with the rejected ideas removed and the unchecked ones labelled, plus:
+
+  * a short block of fixed statements (which idea to start with and why, which one was left out and
+    the owner's own words that ruled it out, what is not yet checked), put in front of the reply;
+  * one targeted question, last, when the owner has to settle something (nothing was accepted, or
+    the unknowns share one blocking limit) and the reply does not already ask one.
+
+Pure and deterministic. The statements are FIXED templates in English, Roman Urdu, Urdu and Arabic
+(British spelling in English; no price, no promise, no "will"; nothing that claims a result). The
+owner's own words are quoted as they were stored. Another language gets the English templates and
+the reply composer's language step is not asked to translate them: the block is put in after that
+step, like the cost line, and the reply linter still runs over the final text.
+"""
+
+import dataclasses
+import re
+from collections import Counter
+from collections.abc import Mapping, Sequence
+from dataclasses import dataclass
+from typing import Any
+
+from app.modules.pi import constraint_check as cc
+from app.modules.pi import idea_relevance, option_gate, option_rank, unknown_resolution
+from app.modules.pi.requirements_types import Requirements
+
+BULLET = re.compile(r"^\s*(?:[•*-]|\d{1,2}[.)])\s+(.*)$")
+QUESTION = re.compile(r"[?؟]")
+
+T: dict[str, dict[str, str]] = {
+    "en": {
+        "label": "(not yet checked against what you told me)",
+        "known": 'From before we already have: "{clause}".',
+        "off_topic": "I left out one idea that does not address what you told me.",
+        "generic": "I left out one idea that would fit any business.",
+        "repeat": 'I left out one idea, because you already tried: "{words}".',
+        "left_out": 'I left out one idea, because you said: "{words}".',
+        "start": "As far as I understood what you told me, nothing in the first idea clashes with it; please tell me if I missed a limit.",
+        "unknown": "The ideas marked as not yet checked are not yet compared with everything you told me.",
+        "q_budget": "What is the most you can spend on this, in one figure?",
+        "q_cannot_change": "Which part of how you work could you change?",
+        "q_tried_failed": "What did you try before, and what happened?",
+        "q_deadline": "By when do you need this to start working?",
+        "q_default": "What would a workable fix look like for you?",
+    },
+    "roman_ur": {
+        "label": "(abhi aap ki baton se check nahi hua)",
+        "known": 'Pehle se hamare paas yeh hai: "{clause}".',
+        "off_topic": "Maine ek idea chhor diya jo aap ki batayi hui baat se nahi judta.",
+        "generic": "Maine ek idea chhor diya jo har karobar par lagu ho jata hai.",
+        "repeat": 'Maine ek idea chhor diya, kyunki aap pehle hi aazma chuke hain: "{words}".',
+        "left_out": 'Maine ek idea chhor diya, kyunki aap ne kaha: "{words}".',
+        "start": "Jitna aap ki baat se samajh aaya, pehle idea mein kuch bhi us se nahi takraata; agar koi hadd reh gayi ho to bata dijiye.",
+        "unknown": "Jin ideas par abhi check nahi hua likha hai, unhein aap ki saari baton se abhi nahi milaya gaya.",
+        "q_budget": "Is par aap zyada se zyada kitna kharch kar sakte hain, ek raqam mein?",
+        "q_cannot_change": "Aap apne kaam ka kaun sa hissa badal sakte hain?",
+        "q_tried_failed": "Pehle aap ne kya try kiya, aur kya hua?",
+        "q_deadline": "Aap ko yeh kab tak chalna chahiye?",
+        "q_default": "Aap ke liye kaam karne wala hal kaisa hoga?",
+    },
+    "ur": {
+        "label": "(ابھی آپ کی باتوں سے جانچ نہیں ہوئی)",
+        "known": 'پہلے سے ہمارے پاس یہ ہے: "{clause}"۔',
+        "off_topic": "میں نے ایک خیال چھوڑ دیا جو آپ کی بتائی ہوئی بات سے نہیں جڑتا۔",
+        "generic": "میں نے ایک خیال چھوڑ دیا جو ہر کاروبار پر لگ جاتا ہے۔",
+        "repeat": 'میں نے ایک خیال چھوڑ دیا، کیونکہ آپ پہلے ہی آزما چکے ہیں: "{words}"۔',
+        "left_out": 'میں نے ایک خیال چھوڑ دیا، کیونکہ آپ نے کہا: "{words}"۔',
+        "start": "جتنا آپ کی بات سے سمجھ آیا، پہلے خیال میں کوئی چیز اس سے نہیں ٹکراتی؛ اگر کوئی حد رہ گئی ہو تو بتا دیجیے۔",
+        "unknown": "جن خیالات پر ابھی جانچ نہیں ہوئی لکھا ہے، انہیں آپ کی تمام باتوں کے ساتھ ابھی نہیں ملایا گیا۔",
+        "q_budget": "اس پر آپ زیادہ سے زیادہ کتنا خرچ کر سکتے ہیں، ایک رقم میں؟",
+        "q_cannot_change": "آپ اپنے کام کا کون سا حصہ بدل سکتے ہیں؟",
+        "q_tried_failed": "پہلے آپ نے کیا آزمایا، اور کیا ہوا؟",
+        "q_deadline": "آپ کو یہ کب تک چلنا چاہیے؟",
+        "q_default": "آپ کے لیے کارآمد حل کیسا ہوگا؟",
+    },
+    "ar": {
+        "label": "(لم يُفحص بعد مع ما قلته)",
+        "known": 'لدينا من قبل: "{clause}".',
+        "off_topic": "تركت فكرة لا تتعلق بما ذكرته.",
+        "generic": "تركت فكرة عامة تناسب أي عمل.",
+        "repeat": 'تركت فكرة لأنك جرّبتها من قبل: "{words}".',
+        "left_out": 'تركت فكرة واحدة لأنك قلت: "{words}".',
+        "start": "بحسب ما فهمته مما قلته، لا شيء في الفكرة الأولى يتعارض معه؛ أخبرني إن فاتتني أي حدود.",
+        "unknown": "الأفكار المكتوب عليها لم يُفحص بعد لم تُقارن بعد بكل ما قلته.",
+        "q_budget": "ما أكثر مبلغ يمكنك إنفاقه على هذا، برقم واحد؟",
+        "q_cannot_change": "ما الجزء من طريقة عملك الذي يمكنك تغييره؟",
+        "q_tried_failed": "ماذا جرّبت من قبل، وماذا حدث؟",
+        "q_deadline": "متى تحتاج أن يبدأ هذا بالعمل؟",
+        "q_default": "كيف سيبدو الحل المناسب لك؟",
+    },
+}
+BLOCKING = {
+    cc.RULE_BUDGET: "q_budget",
+    cc.RULE_CANNOT_CHANGE: "q_cannot_change",
+    cc.RULE_TRIED: "q_tried_failed",
+    cc.RULE_DEADLINE: "q_deadline",
+}
+
+
+def table(language: str | None) -> dict[str, str]:
+    return T.get(language or "en") or T["en"]
+
+
+@dataclass
+class Voiced:
+    reply: str  # the reply with rejected ideas removed and unchecked ones labelled
+    block: str = ""  # fixed statements, put in front of the reply after the language step
+    question: str = ""  # the one targeted question, put last ("" when none is needed)
+    changed: bool = False
+    pick: str = ""  # the idea to start with (the chat's recommendation, stored for the document)
+    pending: dict[str, Any] | None = None  # the question asked, kept to read the answer
+    items: tuple[dict[str, Any], ...] = ()  # the ideas that stay: text, gate, relevance, unchecked
+    unmarked: tuple[int, ...] = ()  # positions (among the listed ideas) of the not yet checked ones
+    rejected: int = 0
+    unknown: int = 0
+    accepted: int = 0
+
+
+def _limit_text(reqs: Requirements, rule: str, evidence: tuple[str, ...]) -> str:
+    """The owner's own words for the limit that ruled an idea out: the stated limit that shares a
+    word with the evidence, else the first limit of that kind, else the matched words."""
+    texts = {
+        cc.RULE_CANNOT_CHANGE: [x.text for x in reqs.cannot_change],
+        cc.RULE_TRIED: [t.what for t in reqs.tried],
+        cc.RULE_BUDGET: [x.text for x in reqs.budgets],
+        cc.RULE_DEADLINE: [x.text for x in reqs.deadlines],
+    }
+    pool = texts.get(rule) or [t for ts in texts.values() for t in ts]
+    words = {w.casefold() for w in evidence if w}
+    for text in pool:
+        if words & {w.casefold() for w in re.findall(r"\w+", text)}:
+            return text
+    return pool[0] if pool else ", ".join(evidence)
+
+
+def _bullets(lines: list[str]) -> list[tuple[int, str]]:
+    return [(i, m.group(1)) for i, line in enumerate(lines) if (m := BULLET.match(line))]
+
+
+def has_ideas(reply: str) -> bool:
+    """Whether the reply lists ideas (bullets)."""
+    return bool(_bullets((reply or "").splitlines()))
+
+
+def label_ideas(reply: str, positions: tuple[int, ...], language: str | None) -> str:
+    """The not yet checked label after the listed ideas at these positions, in the reply's language."""
+    if not positions:
+        return reply
+    label = table(language)["label"]
+    out: list[str] = []
+    n = -1
+    for line in (reply or "").splitlines():
+        if BULLET.match(line):
+            n += 1
+            if n in positions:
+                line = f"{line.rstrip()} {label}"
+        out.append(line)
+    return chr(10).join(out)
+
+
+K = idea_relevance.IdeaKind
+DROPPED = (K.VIOLATES_CONSTRAINT, K.UNLINKED, K.GENERIC, K.REPEATS_TRIED)
+
+
+def _records(problems: Sequence[Mapping[str, Any]]) -> list[dict[str, Any]]:
+    """The noted problems as `evaluate_idea` reads them (the book's `group` is its category)."""
+    return [{**p, "category": p.get("category") or p.get("group", "")} for p in problems]
+
+
+def voice(
+    reply: str,
+    reqs: Requirements,
+    language: str | None,
+    problems: Sequence[Mapping[str, Any]] = (),
+    owner_messages: Sequence[str] = (),
+    asked: Sequence[str] = (),
+    non_answers: Mapping[str, int] | None = None,
+    known_records: Sequence[Any] = (),
+    scope: Mapping[str, Any] | None = None,
+    language_certain: bool = True,
+) -> Voiced:
+    """See the module docstring. Every listed idea gets PS-3's verdict (`evaluate_idea`) with the
+    L2-1 gate plugged in (`gate_from_option_gate`), so one verdict path decides:
+
+      LINKED and the gate said ok       the idea stays;
+      LINKED and the gate cannot tell,
+      or UNKNOWN                        the idea stays, labelled "not yet checked", never as linked;
+      VIOLATES_CONSTRAINT               removed, the owner's own words for the limit are quoted;
+      UNLINKED / GENERIC / REPEATS_TRIED removed, with one plain statement each.
+    """
+    lines = (reply or "").splitlines()
+    found = _bullets(lines)
+    if not found:
+        return Voiced(reply)
+    tb = table(language)
+    gate = idea_relevance.gate_from_option_gate(option_gate.gate_options, lambda c: c)
+    records = _records(problems)
+    # PS-3 reads the outcome: a repeat of an attempt that worked is not a failed repeat
+    tried = [{"what": t.what, "outcome": t.outcome} for t in reqs.tried]
+    verdicts: dict[int, idea_relevance.IdeaVerdict] = {}
+    for i, text in found:
+        verdicts[i] = idea_relevance.evaluate_idea(
+            text.rstrip(". "),
+            records,
+            constraints=reqs,
+            tried=tried,
+            language=language,
+            constraint_gate=gate,
+        )
+    drop = {i for i, v in verdicts.items() if v.kind in DROPPED}
+    found_text = dict(found)
+    kept_ids = [i for i, _ in found if i not in drop]
+    unknown_at = {
+        i
+        for i in kept_ids
+        if verdicts[i].kind is K.UNKNOWN or verdicts[i].constraint_status != "ok"
+    }
+    # positions among the ideas that stay (the label is put in after the language step, in the
+    # reply's own language, so a translation of the reply never garbles it)
+    # one ranking for the chat and the document (`option_rank`, the L2-3 rules): the ideas that
+    # stay are shown best first, a clear idea before one the gate could not check
+    checks = [(found_text[i], "unknown" if i in unknown_at else "ok") for i in kept_ids]
+    order = option_rank.rank_ideas(checks)
+    pick = option_rank.recommended_text(checks)
+    ranked_ids = [kept_ids[o] for o in order]
+    shown = list(lines)
+    for slot, src in zip(kept_ids, ranked_ids, strict=True):
+        shown[slot] = lines[src]
+    lines = shown
+    unmarked = tuple(n for n, i in enumerate(ranked_ids) if i in unknown_at)
+    items = tuple(
+        {
+            "text": found_text[i].rstrip(". "),
+            "gate": "unknown" if i in unknown_at else "satisfied",
+            "relevance": verdicts[i].kind.name.replace("VIOLATES_CONSTRAINT", "VIOLATES"),
+            "unchecked": i in unknown_at,
+        }
+        for i in ranked_ids
+    )
+    keep = [line for i, line in enumerate(lines) if i not in drop]
+    if not _bullets(keep):  # no idea left: the opener line that introduced them goes too
+        while keep and (not keep[-1].strip() or keep[-1].rstrip().endswith((":", "："))):
+            keep.pop()
+    block: list[str] = []
+    violated = [v for i, v in verdicts.items() if v.kind is K.VIOLATES_CONSTRAINT]
+    if violated:
+        rule = violated[0].reason.partition(":")[2]
+        words = _limit_text(reqs, rule, violated[0].evidence_words)
+        # an idea the gate rejected because the owner already tried it says so ("you already tried")
+        block.append(tb["repeat" if rule == cc.RULE_TRIED else "left_out"].format(words=words))
+    if any(v.kind is K.REPEATS_TRIED for v in verdicts.values()) and tried:
+        again = next(v for v in verdicts.values() if v.kind is K.REPEATS_TRIED)
+        words = _limit_text(reqs, cc.RULE_TRIED, again.evidence_words)
+        block.append(tb["repeat"].format(words=words))
+    if any(v.kind is K.UNLINKED for v in verdicts.values()):
+        block.append(tb["off_topic"])
+    if any(v.kind is K.GENERIC for v in verdicts.values()):
+        block.append(tb["generic"])
+    no_rule_broken = [  # the gate recognised no rule that is broken: not a guarantee
+        i
+        for i in kept_ids
+        if i not in unknown_at and verdicts[i].constraint_status == "ok" and not reqs.empty
+    ]
+    if no_rule_broken:
+        block.append(tb["start"])
+    if unknown_at:
+        block.append(tb["unknown"])
+    new_reply = chr(10).join(keep).strip()
+    question = ""
+    pending: dict[str, Any] | None = None
+    if not QUESTION.search(new_reply):
+        if not kept_ids:
+            rules = Counter(
+                v.reason.partition(":")[2]
+                for v in violated
+                if v.reason.partition(":")[2] in BLOCKING
+            )
+            key = BLOCKING[rules.most_common(1)[0][0]] if rules else "q_default"
+            question = tb[key]
+        elif not no_rule_broken:
+            texts = [t.rstrip(". ") for i, t in found if i in unknown_at]
+            # PS-5: the one question that would settle the most unknown options, in the owner's
+            # language; the gate re-checks only the affected options after the answer
+            held = option_gate.gate_options(texts, reqs, language)
+            asked_q = unknown_resolution.choose_question(
+                held,
+                reqs,
+                texts,
+                language=language if language_certain else None,
+                owner_messages=list(owner_messages),
+                asked=list(asked),
+                non_answers=non_answers,
+                known_records=list(known_records),
+                scope=scope,
+            )
+            if asked_q is not None:
+                question = asked_q.text
+                pending = dataclasses.asdict(asked_q)
+    if unknown_at and known_records:
+        # PS-5 `resolve_from_records`: a fact an earlier record already answers is shown, not asked
+        texts_u = [t.rstrip(". ") for i, t in found if i in unknown_at]
+        held_u = option_gate.gate_options(texts_u, reqs, language)
+        for answer in unknown_resolution.resolve_from_records(
+            held_u,
+            reqs,
+            texts_u,
+            known_records=list(known_records),
+            scope=scope,
+            owner_messages=list(owner_messages),
+        )[:2]:
+            if answer.clause:
+                block.append(tb["known"].format(clause=answer.clause))
+    reordered = order != sorted(order)
+    changed = bool(block or question or drop or unmarked or reordered)
+    return Voiced(
+        new_reply,
+        chr(10).join(block),
+        question,
+        changed,
+        pick,
+        pending,
+        items,
+        unmarked,
+        len(violated) + sum(v.kind in DROPPED[1:] for v in verdicts.values()),
+        len(unknown_at),
+        len(no_rule_broken),
+    )

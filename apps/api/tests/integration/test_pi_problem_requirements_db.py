@@ -177,7 +177,8 @@ async def test_fields_persist_old_value_goes_to_history_and_old_rows_still_updat
         cause_words=["we never count at night"],
         expected_outcome="orders never lost",
     )
-    assert await b.update(old, note, "enrichment", None, "we never count at night") is True
+    said = "I think we never count at night. we tried a WhatsApp group and orders got lost"
+    assert await b.update(old, note, "enrichment", None, said) is True
     await load(db, old)
     assert old.constraints["budget"]["text"] == "ready, about 5 lakh"
     assert old.tried[0]["outcome"] == "orders got lost"
@@ -361,7 +362,7 @@ async def test_apply_ops_a_cause_is_owner_said_only_with_the_owners_text(
     assert row.cause["status"] == "pi_inferred" and row.person_believes_cause == ""
     await run_op(fake, "the stock is fine")  # owner text without the words
     assert row.cause["status"] == "pi_inferred"
-    await run_op(fake, "honestly we never count at night")  # words present
+    await run_op(fake, "I honestly think we never count at night")  # words present
     assert row.cause["status"] == "owner_said" and row.person_believes_cause
     await w.a.close()
     await w.b.close()

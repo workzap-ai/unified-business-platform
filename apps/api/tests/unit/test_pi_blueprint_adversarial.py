@@ -227,7 +227,7 @@ def test_a_number_word_nobody_gave_is_masked_and_one_the_owner_gave_is_kept(
 ) -> None:
     masked = case(lang, [f"Call {word} tenants first"], facts=["many tenants are late"])
     assert MASK in action_texts(masked)[0]
-    assert not re.search(rf"{word}", action_texts(masked)[0], re.I)
+    assert not re.search(rf"\b{word}\b", action_texts(masked)[0], re.I)
     kept = case(lang, [f"Call {word} tenants first"], facts=[f"{word} tenants are late"])
     assert word in action_texts(kept)[0]
 

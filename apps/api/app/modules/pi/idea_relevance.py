@@ -32,7 +32,7 @@ import re
 import unicodedata
 from collections import Counter
 from collections.abc import Callable, Iterable, Mapping, Sequence
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from enum import StrEnum
 from typing import Any, Protocol
 
@@ -76,6 +76,7 @@ class IdeaVerdict:
     detail: str = ""  # the gate's own text for a violation (capped); otherwise ""
     concepts: tuple[str, ...] = ()  # topic concepts found in the idea
     score: int = 0  # the best problem's link points
+    tried_note: str = ""  # "already_tried_worked": the idea repeats an attempt that helped
 
 
 # ----- the constraint gate (L2-1's gate_options plugs in through `gate_from_option_gate`) ---------
@@ -216,23 +217,18 @@ def _is_arabic_token(tok: str) -> bool:
     return bool(tok) and _script_of(tok[0]) == "arabic"
 
 
-_ARABIC_PREFIXES = "وبلفک"
+_ARABIC_ARTICLE = re.compile(r"^[وف]?(?:[بلک]?ال|لل)(.{3,})$")
 
 
 def _core(tok: str) -> str:
-    """The token with the Arabic definite article and a one-letter prefix peeled off (Arabic script
-    only; at least three letters stay). Latin and Devanagari tokens are returned as they are."""
+    """The token with an Arabic definite article, and the conjunction and preposition glued before
+    it, peeled off ("بالفواتير" -> "فواتير"); at least three letters stay. A word without an article
+    is left alone (a lone prefix letter is often a root letter). Latin and Devanagari tokens are
+    returned as they are."""
     if not _is_arabic_token(tok):
         return tok
-    s = tok
-    for _ in range(3):
-        if len(s) > 4 and s[:2] == "ال":
-            s = s[2:]
-        elif len(s) > 4 and s[0] in _ARABIC_PREFIXES:
-            s = s[1:]
-        else:
-            break
-    return s
+    m = _ARABIC_ARTICLE.match(tok)
+    return m.group(1) if m else tok
 
 
 _LATIN_SUFFIXES = ("ing", "ed", "es", "s", "ly")
@@ -327,7 +323,8 @@ class _Index:
     `_core` forms, and a text is looked up the same two ways, so an Arabic prefix is neither required
     nor a reason to miss. A trailing `*` makes the last word a prefix."""
 
-    def __init__(self, concepts: Sequence[lex.Concept]) -> None:
+    def __init__(self, concepts: Sequence[lex.Concept], drop_setting: bool = True) -> None:
+        self.drop_setting = drop_setting
         self.keys = [c.key for c in concepts]
         self.weak = [c.weak for c in concepts]
         self.context = [c.context for c in concepts]
@@ -357,18 +354,28 @@ class _Index:
         self.prefix_lens = sorted({len(p) for d in self.prefix.values() for p in d})
 
     def scan(self, words: Sequence[str]) -> list[tuple[int, str]]:
-        """(concept index, surface) for every match in the text (given as its words)."""
+        """(concept index, surface) for every match in the text (given as its words). The longest
+        match wins over a shorter one of another concept that it contains ("facebook" over "fee"),
+        and a match made only of business-setting words (shop, desk, staff) is dropped."""
         hits: list[tuple[int, str]] = []
         cores = [_core(w) for w in words]
-        for seq in (words,) if cores == list(words) else (words, cores):
+        bare = [
+            c[1:] if _is_arabic_token(c) and len(c) >= 5 and c[0] in "وبلفک" else c for c in cores
+        ]
+        forms: list[Sequence[str]] = [words]
+        for variant in (cores, bare):
+            if all(variant != f for f in forms):
+                forms.append(variant)
+        for seq in forms:
             n = len(seq)
+            found: list[tuple[int, int, int]] = []  # (start, end, concept)
             for i in range(n):
                 for length in range(1, MAX_NGRAM + 1):
                     if i + length > n:
                         break
                     key = tuple(seq[i : i + length])
                     for idx in self.exact.get(key, ()):
-                        hits.append((idx, " ".join(key)))
+                        found.append((i, i + length, idx))
                 for lead in range(0, self.max_lead + 1):
                     if i + lead >= n:
                         break
@@ -379,18 +386,37 @@ class _Index:
                     for plen in self.prefix_lens:
                         if len(last) >= plen:
                             for idx in table.get(last[:plen], ()):
-                                hits.append((idx, " ".join(seq[i : i + lead + 1])))
+                                found.append((i, i + lead + 1, idx))
+            by_start: dict[int, list[tuple[int, int]]] = {}
+            for s, e, idx in found:
+                by_start.setdefault(s, []).append((e, idx))
+            for s, e, idx in found:
+                if self.drop_setting and all(w in _SETTING for w in seq[s:e]):
+                    continue
+                beaten = False
+                for s2 in range(max(0, s - MAX_NGRAM), s + 1):
+                    for e2, idx2 in by_start.get(s2, ()):
+                        if idx2 != idx and e2 >= e and (e2 - s2) > (e - s):
+                            beaten = True
+                            break
+                    if beaten:
+                        break
+                if not beaten:
+                    hits.append((idx, " ".join(seq[s:e])))
         return hits
 
 
 _CONCEPTS = lex.CONCEPTS
 _OFF = lex.OFF_TOPIC
 _MAIN = _Index(_CONCEPTS)
-_OFF_INDEX = _Index(_OFF)
+_OFF_INDEX = _Index([*_OFF, lex.Concept("novelty", (), (), lex.NOVELTY_TERMS)], drop_setting=False)
 _GENERIC = _Index([lex.Concept("generic", (), (), lex.GENERIC_PHRASES)])
-_REMEDY_KEYS = list(lex.REMEDIES)
-_REMEDY = _Index([lex.Concept(k, (), (), v) for k, v in lex.REMEDIES.items()])
+_TRIED_KEYS = list(lex.TRIED_CONCEPTS)
+_TRIED = _Index(
+    [lex.Concept(k, (), (), v) for k, v in lex.TRIED_CONCEPTS.items()], drop_setting=False
+)
 
+_SETTING = frozenset(normalize_text(lex.SETTING_WORDS).split())
 _STOP = frozenset(normalize_text(lex.STOPWORDS + " tried try trying kiya kia").split())
 _WEAK = frozenset(normalize_text(lex.WEAK_TOKENS).split())
 
@@ -494,15 +520,15 @@ def _tokens(text: Any) -> list[str]:
 def _content_stems(words: Iterable[str]) -> set[str]:
     out: set[str] = set()
     for word in words:
-        if word in _STOP or word in _WEAK or word.isdigit():
+        if word in _STOP or word in _WEAK or word in _SETTING or word.isdigit():
             continue
         tok = _core(word)
-        if tok in _STOP or tok in _WEAK:
+        if tok in _STOP or tok in _WEAK or tok in _SETTING:
             continue
         if len(tok) < (4 if tok.isascii() else 3):
             continue
         stem = _stem(tok)
-        if stem in _STOP or stem in _WEAK:
+        if stem in _STOP or stem in _WEAK or stem in _SETTING:
             continue
         out.add(stem)
     return out
@@ -584,7 +610,24 @@ def _run_gate(
 # ----- tried -----------------------------------------------------------------------------------------------
 
 
-def _tried_texts(tried: Any) -> list[str]:
+def _outcome_of(raw: Any) -> str:
+    """ "failed", "worked" or "unclear" from what the owner said happened (a stored "failed" or "worked",
+    or free text in any of the five languages); nothing readable is "unclear"."""
+    if not isinstance(raw, str):
+        return "unclear"
+    text = " " + normalize_text(raw[:MAX_TRIED_CHARS]) + " "
+    for status, phrases in (("failed", _OUTCOME_FAILED), ("worked", _OUTCOME_WORKED)):
+        if any(f" {ph} " in text for ph in phrases):
+            return status
+    return "unclear"
+
+
+_OUTCOME_FAILED = tuple(normalize_text(x) for x in lex.OUTCOME_FAILED.split("|"))
+_OUTCOME_WORKED = tuple(normalize_text(x) for x in lex.OUTCOME_WORKED.split("|"))
+
+
+def _tried_entries(tried: Any) -> list[tuple[str, str]]:
+    """(what, outcome) for each tried item: `{"what", "outcome"}` or a plain string (outcome unclear)."""
     if isinstance(tried, (str, bytes)):
         items: list[Any] = [tried] if isinstance(tried, str) else []
     elif isinstance(tried, Mapping) or tried is None:
@@ -594,31 +637,57 @@ def _tried_texts(tried: Any) -> list[str]:
             items = list(tried)[:MAX_TRIED]
         except TypeError:
             items = []
-    out: list[str] = []
+    out: list[tuple[str, str]] = []
     for item in items[:MAX_TRIED]:
-        text = item if isinstance(item, str) else _get(item, "what") if item is not None else None
+        if isinstance(item, str):
+            text, outcome = item, "unclear"
+        elif item is None:
+            continue
+        else:
+            text, outcome = _get(item, "what"), _outcome_of(_get(item, "outcome"))
         if isinstance(text, str) and text.strip():
-            out.append(text[:MAX_TRIED_CHARS])
+            out.append((text[:MAX_TRIED_CHARS], outcome))
     return out
 
 
-def _repeats_tried(
-    idea_cores: list[str], idea_stems: set[str], tried: Any
-) -> tuple[str, str] | None:
-    """(reason, evidence) when the idea repeats something the owner already tried."""
-    idea_rem = {_REMEDY_KEYS[i]: s for i, s in _REMEDY.scan(idea_cores)}
-    for text in _tried_texts(tried):
-        cores = _tokens(text)
-        rem = {_REMEDY_KEYS[i] for i, _ in _REMEDY.scan(cores)}
-        shared_rem = rem & set(idea_rem)
-        if shared_rem:
-            key = sorted(shared_rem)[0]
-            return f"tried_remedy:{key}", idea_rem[key]
-        stems = _content_stems(cores)
-        common = stems & idea_stems
-        if len(common) >= 2 and len(common) / max(len(stems), 1) >= 0.6:
-            return "tried_words", sorted(common)[0]
+def _same_attempt(
+    tried_words: list[str], tried_concepts: set[int], idea_concepts: set[int], idea_stems: set[str]
+) -> str | None:
+    """The evidence word when the idea is the tried attempt again: it names all of the tried item's
+    concepts (one if it has one, two if it has more), or shares most of its content words."""
+    channel = _TRIED_KEYS.index(
+        "channel"
+    )  # where it was done (WhatsApp, Facebook) is not what was done
+    tried_concepts = tried_concepts - {channel}
+    idea_concepts = idea_concepts - {channel}
+    need = min(2, len(tried_concepts))
+    shared = tried_concepts & idea_concepts
+    if need and len(shared) >= need:
+        return _TRIED_KEYS[sorted(shared)[0]]
+    stems = _content_stems(tried_words)
+    common = stems & idea_stems
+    if len(common) >= 2 and len(common) / max(len(stems), 1) >= 0.6:
+        return sorted(common)[0]
     return None
+
+
+def _repeats_tried(
+    idea_words: list[str], idea_stems: set[str], tried: Any
+) -> tuple[str, str] | None:
+    """(status, evidence) when the idea repeats an attempt: status "tried_failed" (the owner said it did
+    not help), "tried_unclear" (no outcome: ask) or "worked" (it helped: not a failed repeat). A failed
+    match beats an unclear one, which beats a worked one."""
+    idea_concepts = {i for i, _ in _TRIED.scan(idea_words)}
+    best: tuple[int, str, str] | None = None
+    rank = {"failed": 3, "unclear": 2, "worked": 1}
+    for text, outcome in _tried_entries(tried):
+        words = _tokens(text)
+        found = _same_attempt(words, {i for i, _ in _TRIED.scan(words)}, idea_concepts, idea_stems)
+        if found is not None and (best is None or rank[outcome] > best[0]):
+            best = (rank[outcome], outcome, found)
+    if best is None:
+        return None
+    return ("worked" if best[1] == "worked" else f"tried_{best[1]}", best[2])
 
 
 # ----- the verdict -----------------------------------------------------------------------------------------
@@ -707,7 +776,10 @@ def _analyse(
         shared = sorted(
             (stems & prof.stems) - said
         )  # a word a concept already explains counts once
-        score += min(len(shared), 2) * 2
+        if (
+            score >= 1 or len(shared) >= 2
+        ):  # a shared word is evidence only beside a concept, or twice
+            score += min(len(shared), 2) * 2
         evidence += shared[:2]
         if off_hits and score < STRONG:
             score = 0  # a decor, merchandise or contest idea needs real evidence to count
@@ -718,7 +790,8 @@ def _analyse(
     linked.sort(key=lambda t: -t[0])
     ids = tuple(pid for _, pid in linked)
 
-    if repeat is not None:
+    worked = repeat is not None and repeat[0] == "worked"
+    if repeat is not None and not worked:
         return IdeaVerdict(
             IdeaKind.REPEATS_TRIED,
             repeat[0],
@@ -796,6 +869,15 @@ def evaluate_idea(
         verdict = _analyse(text, problems, tried, known_facts)
     except Exception:
         verdict = IdeaVerdict(IdeaKind.UNKNOWN, "internal_error")
+    note = ""
+    if verdict.kind is not IdeaKind.REPEATS_TRIED:
+        try:
+            words = normalize_text(text).split()
+            rep = _repeats_tried(words, _content_stems(words), tried)
+            note = "already_tried_worked" if rep is not None and rep[0] == "worked" else ""
+        except Exception:
+            note = ""
+    verdict = replace(verdict, tried_note=note)
     if status == "violated":
         return IdeaVerdict(
             IdeaKind.VIOLATES_CONSTRAINT,
@@ -806,6 +888,7 @@ def evaluate_idea(
             detail,
             verdict.concepts,
             verdict.score,
+            verdict.tried_note,
         )
     return IdeaVerdict(
         verdict.kind,
@@ -816,4 +899,5 @@ def evaluate_idea(
         "",
         verdict.concepts,
         verdict.score,
+        verdict.tried_note,
     )

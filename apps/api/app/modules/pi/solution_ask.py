@@ -259,10 +259,10 @@ EXTRA_STRONG = re.compile(
     r"|(?:मुझे|अब) क्या करना"
     r"|कैसे (?:ठीक|हल|सुलझ)|कोई (?:हल|उपाय|तरीका|समाधान|रास्ता)\s+(?:बताओ|बताइए|बताएं|दो|दीजिए|चाहिए)"
     r"|कुछ (?:करो|कीजिए|कीजिये|कर दो)"
-    r"|کیا\s+(?:کروں|کریں|کرنا\s+چاہیے|کرنا\s+چاہئے|کرنا\s+ہوگا|کیا\s+جائے)"
+    r"|کیا\s+(?:کروں|کریں|کر\s+سکتے\s+ہیں|کرنا\s+چاہیے|کرنا\s+چاہئے|کرنا\s+ہوگا|کیا\s+جائے)"
     r"|کیسے\s+(?:ٹھیک|حل|درست)|کچھ\s+(?:کریں|کرو|کیجیے|کیجئے)"
     r"|(?:کوئی\s+)?(?:طریقہ|راستہ|علاج|ترکیب)\s+(?:بتائیں|بتاؤ|بتاو|بتائیے|دیں|دو|چاہیے|چاہئے)"
-    r"|ماذا\s+(?:أفعل|افعل|أعمل|اعمل|يجب\s+أن\s+أفعل)|ما\s+العمل\b|كيف\s+(?:أحل|احل|أصلح|اصلح|أعالج|اعالج|أتصرف|اتصرف|أتعامل|اتعامل)"
+    r"|ماذا\s+(?:أفعل|افعل|أعمل|اعمل|نفعل|نعمل|يجب\s+أن\s+أفعل|(?:نستطيع|يمكننا|يمكن)\s+أن\s+(?:نفعل|نعمل))|ما\s+العمل\b|كيف\s+(?:أحل|احل|أصلح|اصلح|أعالج|اعالج|أتصرف|اتصرف|أتعامل|اتعامل)"
     r"|(?:شو|وش|ايش|إيش|شنو|شلون)\s+(?:أسوي|اسوي|أعمل|اعمل|أسوّي)"
     r"|(?:أحتاج|احتاج|محتاج)\s+(?:إلى\s+)?(?:حل|نصيحة|اقتراح)|(?:أعطني|اعطني|عطني)\s+(?:نصيحة|اقتراح|اقتراحا)",
     re.IGNORECASE,
@@ -282,10 +282,15 @@ EXTRA_WEAK_WORDS = 6  # a longer message is a story that happens to hold the phr
 def asked_in_other_ways(text: str) -> bool:
     """The extra common asks above ("ab kya karun", "koi hal", "kya kiya jaye", "ماذا أفعل")."""
     said = " ".join((text or "").split())
-    if not said or EXTRA_REFUSAL.search(said):
+    if not said:
         return False
-    if EXTRA_STRONG.search(said):
-        return True
+    # a refusal counts in the sentence that holds it: "sorry, not 20, it was 200. What do we do
+    # now?" corrects a figure and then asks (the correction's "not" is not a refusal to be helped)
+    for part in re.split(r"(?<=[.!?؟۔])\s+", said):
+        if EXTRA_STRONG.search(part) and not EXTRA_REFUSAL.search(part):
+            return True
+    if EXTRA_REFUSAL.search(said):
+        return False
     return len(said.split()) <= EXTRA_WEAK_WORDS and bool(EXTRA_WEAK.search(said))
 
 

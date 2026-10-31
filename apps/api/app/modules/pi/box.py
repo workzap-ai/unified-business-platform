@@ -167,6 +167,17 @@ def value_line(ideas_by_problem: dict[str, list[str]]) -> tuple[bool, list[str]]
 
 
 _UNDERSTOOD_KEYS = ("since", "impact", "scope", "cause", "person_believes_cause")
+_UNDERSTOOD_GAPS = ("since", "impact", "where")  # what noted_context lists under "missing"
+
+
+def problem_understood(problem: dict[str, Any]) -> bool:
+    """B2: pi knows something of this problem beyond its title: an owner-said cause, or, in the
+    shape noted_context really emits (no since/impact/scope keys, a `missing` list), at least one
+    of since, impact and where is NOT missing. pi's own guess (`cause_hypothesis`) never counts."""
+    if any(problem.get(k) for k in _UNDERSTOOD_KEYS):
+        return True
+    missing = problem.get("missing")
+    return isinstance(missing, list) and any(k not in missing for k in _UNDERSTOOD_GAPS)
 
 
 def _declined_within_quiet(brief: dict[str, Any], history: list[dict[str, Any]]) -> bool:
@@ -198,7 +209,7 @@ def offer_facts(context: dict[str, Any], *, asked_for_document: bool = False) ->
     latest = str(context.get("latest_customer_message") or "")
     return OfferFacts(
         problem_count=len(noted),
-        understood_count=sum(1 for p in noted if any(p.get(k) for k in _UNDERSTOOD_KEYS)),
+        understood_count=sum(1 for p in noted if problem_understood(p)),
         map_reviewed=bool(brief.get("map_reviewed")),
         ranked=bool(brief.get("ranked")) or any(p.get("rank") for p in noted),
         voluntary_count=box_signals.voluntary_count(context),

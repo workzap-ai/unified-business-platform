@@ -118,7 +118,7 @@ def test_the_cause_of_the_main_problem_is_known_or_not():
     # nothing noted: nothing to be unsure about; pi's own diagnosis counts with no open question
     assert box_signals.main_cause_known(context())
     diag = {"expert_diag": {"causes": ["late supplier"], "question": ""}}
-    assert box_signals.main_cause_known(context(noted=unknown, brief=diag))
+    assert not box_signals.main_cause_known(context(noted=unknown, brief=diag))  # pi's guess alone
     asking = {"expert_diag": {"causes": ["late supplier"], "question": "Which supplier?"}}
     assert not box_signals.main_cause_known(context(noted=unknown, brief=asking))
     assert box_signals.main_cause_known(context(noted=unknown, brief={"main_cause_known": True}))

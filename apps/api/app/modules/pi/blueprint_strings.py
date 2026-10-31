@@ -104,7 +104,7 @@ EN: dict[str, str] = {
     "open_decision": "Owner decides: approve each checkpoint before work starts.",
     "open_cause_missing": "No cause is recorded for this problem yet.",
     "open_alt": "Options with an unchecked limit need a person to look: {text}",
-    "unk_unlinked": "A step that answers none of the stated problems was removed.",
+    "unk_unlinked": "A step answers none of the problems you stated. A person must look at it.",
     "miss_problem": "No problem stated by the owner yet.",
     "miss_option": "There is no recommended option to build from.",
     "miss_not_tied": "The option does not answer any problem the owner stated.",
@@ -159,6 +159,8 @@ EN: dict[str, str] = {
     "deps_none": "No step depends on another.",
     "src_owner": "owner",
     "src_staff": "staff",
+    "needs_review": "A person must check this blueprint first: some steps do not answer a problem you stated.",
+    "lbl_recommended": "Recommended option",
 }
 
 RU: dict[str, str] = {
@@ -251,7 +253,7 @@ RU: dict[str, str] = {
     "open_decision": "Owner faisla karta hai: kaam se pehle har checkpoint manzoor karein.",
     "open_cause_missing": "Is masle ki abhi koi wajah likhi nahi gayi.",
     "open_alt": "Jin options ki had check nahi hui un ko kisi insaan ko dekhna hai: {text}",
-    "unk_unlinked": "Wo qadam hata diya gaya jo bataye hue kisi masle ka jawab nahi tha.",
+    "unk_unlinked": "Ek qadam aap ke bataye hue kisi masle ka jawab nahi. Kisi insaan ko dekhna hai.",
     "miss_problem": "Owner ne abhi tak koi masla nahi bataya.",
     "miss_option": "Banane ke liye koi tajweez shuda option nahi hai.",
     "miss_not_tied": "Yeh option owner ke bataye hue kisi masle ka jawab nahi hai.",
@@ -305,6 +307,8 @@ RU: dict[str, str] = {
     "deps_none": "Koi qadam kisi doosre par mawqoof nahi.",
     "src_owner": "owner",
     "src_staff": "staff",
+    "needs_review": "Pehle kisi insaan ko yeh blueprint dekhna hai: kuch qadam aap ke bataye hue kisi masle ka jawab nahi.",
+    "lbl_recommended": "Tajweez shuda option",
 }
 
 UR: dict[str, str] = {
@@ -397,7 +401,7 @@ UR: dict[str, str] = {
     "open_decision": "مالک فیصلہ کرتا ہے: کام سے پہلے ہر چیک پوائنٹ منظور کریں۔",
     "open_cause_missing": "اس مسئلے کی ابھی کوئی وجہ لکھی نہیں گئی۔",
     "open_alt": "جن آپشنز کی حد جانچی نہیں گئی انہیں کسی انسان کو دیکھنا ہے: {text}",
-    "unk_unlinked": "وہ قدم ہٹا دیا گیا جو بتائے ہوئے کسی مسئلے کا جواب نہیں تھا۔",
+    "unk_unlinked": "ایک قدم آپ کے بتائے ہوئے کسی مسئلے کا جواب نہیں۔ کسی انسان کو دیکھنا ہے۔",
     "miss_problem": "مالک نے ابھی تک کوئی مسئلہ نہیں بتایا۔",
     "miss_option": "بنانے کے لیے کوئی تجویز شدہ آپشن نہیں ہے۔",
     "miss_not_tied": "یہ آپشن مالک کے بتائے ہوئے کسی مسئلے کا جواب نہیں ہے۔",
@@ -451,6 +455,8 @@ UR: dict[str, str] = {
     "deps_none": "کوئی قدم کسی دوسرے پر منحصر نہیں۔",
     "src_owner": "مالک",
     "src_staff": "اسٹاف",
+    "needs_review": "پہلے کسی انسان کو یہ بلیو پرنٹ دیکھنا ہے: کچھ قدم آپ کے بتائے ہوئے کسی مسئلے کا جواب نہیں۔",
+    "lbl_recommended": "تجویز شدہ آپشن",
 }
 
 AR: dict[str, str] = {
@@ -543,7 +549,7 @@ AR: dict[str, str] = {
     "open_decision": "يقرر المالك: يوافق على كل نقطة تحقق قبل بدء العمل.",
     "open_cause_missing": "لم يُسجَّل سبب لهذه المشكلة بعد.",
     "open_alt": "الخيارات ذات الحد غير المفحوص يحتاج شخص لمراجعتها: {text}",
-    "unk_unlinked": "حُذفت خطوة لا تجيب عن أي مشكلة مذكورة.",
+    "unk_unlinked": "خطوة لا تجيب عن أي مشكلة ذكرتها. يجب أن يراجعها شخص.",
     "miss_problem": "لم يذكر المالك أي مشكلة بعد.",
     "miss_option": "لا يوجد خيار موصى به للبناء عليه.",
     "miss_not_tied": "لا يجيب الخيار عن أي مشكلة ذكرها المالك.",
@@ -597,6 +603,8 @@ AR: dict[str, str] = {
     "deps_none": "لا تعتمد أي خطوة على غيرها.",
     "src_owner": "المالك",
     "src_staff": "الموظفون",
+    "needs_review": "يجب أن يراجع شخص هذا المخطط أولًا: بعض الخطوات لا تجيب عن مشكلة ذكرتها.",
+    "lbl_recommended": "الخيار الموصى به",
 }
 
 TABLES: dict[str, dict[str, str]] = {"en": EN, "roman_ur": RU, "ur": UR, "ar": AR}

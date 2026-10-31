@@ -41,9 +41,9 @@ CONCEPTS: tuple[Concept, ...] = (
         "cash_collections",
         "receivables_late credit_customers deposit_delays",
         "late payment*|pay late|paying late|paid late|unpaid|overdue|outstanding|dues|due date|receivable*|invoice*|collect*|collection*|arrears|owed|rent|rents|fees|tenant*|landlord*|instalment*|installment*|chase*|payment reminder*|bill*|balance due|credit sales|on credit|debtor*",
-        "udhaar|udhar|wusooli|wasooli|vasooli|recovery|kiraya|kiraye|kirayedar*|fees|fee|bakaya|baqaya|adaigi|adayegi|payment|payments|invoice*|kist|qist|qarz|dues|paise wapis|paisay wapis|paise nahi",
+        "udhaar|udhar|wusooli|wasooli|vasooli|recovery|kiraya|kiraye|kirayedar*|fees|fee|bakaya|baqaya|adaigi|adayegi|payment|payments|invoice*|kist|qist|qarz|dues|na dene wale|na dene walon|nahi dene wale|paise wapis|paisay wapis|paise nahi",
         "ادھار|وصولی|واجبات|بقایا|کرایہ|کرایے|کرایہ دار*|فیس|فیسیں|ادائیگی*|بل|بلز|انوائس*|قسط|اقساط|قرض|دیر سے ادا*|تاخیر سے ادا*|واجب الادا*",
-        "دفع|مدفوع*|مستحقات|تحصيل|فواتير|فاتورة|ايجار|إيجارات|رسوم|قسط|اقساط|مديون*|متأخرات|سداد|ديون|دين|مستاجر*|المستأجر*|مبالغ متأخرة|تأخر السداد|تأخر الدفع|الدفعات",
+        "دفع|مدفوع*|مستحقات|تحصيل|فواتير|فاتورة|ايجار|إيجارات|رسوم|قسط|اقساط|مديون*|متأخرات|سداد|ديون|دين العميل|مستاجر*|المستأجر*|مبالغ متأخرة|تأخر السداد|تأخر الدفع|الدفعات",
         "बकाया|वसूली|किराया|किरायेदार*|फीस|भुगतान|उधार|बिल|किस्त|चालान|देर से भुगतान|देर से पैसे",
     ),
     _c(
@@ -194,7 +194,7 @@ CONCEPTS: tuple[Concept, ...] = (
         "delivery|deliveries|dair se|der se pohanch|late delivery|late orders|courier|rider|riders|driver|driver*|parcel|parcels|tracking|tracking number|shipment|shipping|logistics|route|checkpoint|trip|dispatcher|truck|trucks|load|loads|rto|wapis aane wale parcel|order kahan hai|kahan hai",
         "ڈیلیوری|دیر سے پہنچ|دیر سے پہنچتی|دیر سے آ|کوریئر|کورئیر|رائیڈر|ڈرائیور*|پارسل*|ٹریکنگ|ٹریکنگ نمبر|شپمنٹ|شپنگ|لاجسٹکس|روٹ|چیک پوائنٹ*|ٹرپ|ڈسپیچر*|ٹرک*|لوڈ|واپس آنے والے پارسل|آرڈر کہاں",
         "توصيل|توصيلات|التوصيل|تأخر التوصيل|تاخر التوصيل|تصل متأخرة|تصل متاخرة|توصيل*|شركة الشحن|شركة شحن|الشحن|شحن|شحنة|شحنات|مندوب التوصيل|سائق*|سواق|طرد|طرود|التتبع|رقم التتبع|لوجستي*|مسار|نقطة تفتيش|نقاط|رحلة|رحلات|شاحنة|شاحنات|مرسل|مرتجعات الشحن|اين طلبي",
-        "डिलीवरी|देर से पहुँच|देर से पहुंच|देर से|कूरियर|राइडर|ड्राइवर*|पार्सल*|ट्रैकिंग|ट्रैकिंग नंबर|शिपमेंट|शिपिंग|लॉजिस्टिक्स|रूट|चेकपॉइंट|ट्रिप|डिस्पैचर|ट्रक*|लोड|ऑर्डर कहाँ",
+        "डिलीवरी|देर से पहुँच|देर से पहुंच|कूरियर|राइडर|ड्राइवर*|पार्सल*|ट्रैकिंग|ट्रैकिंग नंबर|शिपमेंट|शिपिंग|लॉजिस्टिक्स|रूट|चेकपॉइंट|ट्रिप|डिस्पैचर|ट्रक*|लोड|ऑर्डर कहाँ",
     ),
     _c(
         "suppliers",
@@ -346,7 +346,6 @@ CONCEPTS: tuple[Concept, ...] = (
         "طلبہ|طالب علم|والدین|اسکول|کلاس|استاد|امتحان|داخلہ|ٹیوشن|اکیڈمی",
         "طلاب|طالب|اولياء الامور|مدرسة|صف|فصل|معلم|امتحان|قبول|دروس خصوصية|اكاديمية",
         "छात्र|विद्यार्थी|अभिभावक|स्कूल|कक्षा|शिक्षक|परीक्षा|दाखिला|ट्यूशन|अकादमी",
-        context=True,
     ),
     _c(
         "health_clinic",
@@ -357,7 +356,6 @@ CONCEPTS: tuple[Concept, ...] = (
         "مریض|مریضوں|ڈاکٹر|کلینک|نسخہ|نسخے|پریسکرپشن|دوا|دوائی|ادویات|فارمیسی|نرس|علاج",
         "مريض|مرضى|طبيب|دكتور|عيادة|وصفة|وصفات|دواء|ادوية|صيدلية|ممرضة|علاج",
         "मरीज|डॉक्टर|क्लिनिक|पर्ची|दवा|दवाइयां|फार्मेसी|नर्स|इलाज",
-        context=True,
     ),
     _c(
         "food_service",
@@ -368,7 +366,6 @@ CONCEPTS: tuple[Concept, ...] = (
         "ریسٹورنٹ|مینو|ڈش|ڈشز|شیف|کچن|باورچی|کھانا|لنچ|ڈنر|ٹیبل|ویٹر|فوڈ کاسٹ|بینکوئٹ|کیٹرنگ|کیٹرر|دیگ",
         "مطعم|قائمة الطعام|طبق|اطباق|طاه|مطبخ|طباخ|طعام|غداء|عشاء|طاولة|نادل|تكلفة الطعام|قاعة|تموين|متعهد",
         "रेस्टोरेंट|मेन्यू|डिश|शेफ|किचन|रसोइया|खाना|लंच|डिनर|टेबल|वेटर|फूड कॉस्ट|बैंक्वेट|कैटरिंग",
-        context=True,
     ),
     _c(
         "livestock_farm",
@@ -379,7 +376,6 @@ CONCEPTS: tuple[Concept, ...] = (
         "پرندے|پرندہ|مرغی|مرغیاں|چوزے|شیڈ|چارہ|چارے|انڈے|انڈا|ویکسین|جانور|گائے|بھینس|دودھ|فارم|مر جاتے|مر رہے|مر گئے",
         "طيور|طائر|طيور الدواجن|دواجن|دجاج|فراخ|كتاكيت|عنبر|علف|بيض|نفوق|لقاح|تطعيم|ماشية|ابقار|بقر|جاموس|حليب|مزرعة|تموت|يموت|ماتت",
         "पक्षी|मुर्गी|मुर्गियां|चूजे|शेड|चारा|अंडे|मृत्यु|टीका|पशु|गाय|भैंस|दूध|फार्म|मर जाते|मर रहे",
-        context=True,
     ),
     _c(
         "fitness_beauty",
@@ -390,7 +386,6 @@ CONCEPTS: tuple[Concept, ...] = (
         "جم|فٹنس|ٹرینر|ورزش|کلاس|کلاسز|ممبر|ممبرز|ممبرشپ|سیلون|اسٹائلسٹ|بال|بیوٹی|فیشل|سپا|مساج",
         "نادي رياضي|لياقة|مدرب|تمرين|حصة|حصص|عضو|اعضاء|عضوية|صالون|مصفف|شعر|تجميل|سبا|مساج",
         "जिम|फिटनेस|ट्रेनर|वर्कआउट|क्लास|सदस्य|मेंबरशिप|सैलून|स्टाइलिस्ट|बाल|ब्यूटी|फेशियल|स्पा|मसाज",
-        context=True,
     ),
     _c(
         "property_rentals",
@@ -401,7 +396,26 @@ CONCEPTS: tuple[Concept, ...] = (
         "فلیٹ|فلیٹس|کرایہ دار|مکان|پراپرٹی|لیز|مرمت کی درخواست|نلکا|ٹونٹی|پلمبر|الیکٹریشن|عمارت",
         "شقة|شقق|مستأجر|مستأجرون|مالك|عقار|عقارات|عقد ايجار|طلب صيانة|حنفية|سباك|كهربائي|مبنى",
         "फ्लैट|किरायेदार|मकान|प्रॉपर्टी|लीज|मरम्मत अनुरोध|नल|प्लंबर|इलेक्ट्रीशियन|इमारत",
-        context=True,
+    ),
+    _c(
+        "heat_climate",
+        "loss_security stock_inventory operations_process",
+        "maintenance_downtime expiry_wastage",
+        "heat*|hot|too hot|very hot|hottest|cooling|cool down|cool air|ventilat*|airflow|air flow|air moves|fresh air|fans?|exhaust|shade|shading|curtains?|blinds?|windows?|wet sacks?|wet jute|sprinkl*|mist*|summer|temperature|thermometer|chiller|cold room|ice",
+        "garmi|garmiyon|garmiyan|garam|thanda|thandi|thande|thanda karne|hawa|hawadar|pankha|pankhe|parde|parda|saya|khidki|khidkiyon|geela|geelay|geeli|bore|cooling|ventilation|temperature|chiller|baraf",
+        "گرمی|گرمیوں|گرم|ٹھنڈا|ٹھنڈی|ٹھنڈے|ٹھنڈا کرنے|ہوا|پنکھا|پنکھے|پردے|پردہ|سایہ|کھڑکی|کھڑکیوں|گیلی|گیلے|درجہ حرارت|چلر|برف",
+        "حر|حرارة|حار|حارة|ساخن|تبريد|مبرد|مبردة|تهوية|هواء|مراوح|مروحة|ظل|ستائر|ستارة|نوافذ|نافذة|مبلل*|رش|صيف|الصيف|درجة الحرارة|ثلج|يبرد",
+        "गर्मी|गर्मियों|गर्म|ठंडा|ठंडी|ठंडे|हवा|हवादार|पंखा|पंखे|पर्दे|पर्दा|छाया|खिड़की|खिड़कियों|गीली|गीले|तापमान|चिलर|बर्फ",
+    ),
+    _c(
+        "irrigation",
+        "margin_cost operations_process stock_inventory",
+        "utility_costs",
+        "irrigat*|water|watering|tube ?well|pumps?|canal|crops?|wheat|rice|field|fields|acres?|harvest*|fertili[sz]er*|sowing|seeds?|tractor|farmland|waterlogg*",
+        "pani|paani|tube ?well|tubewell|pump|nehar|khet|khait|fasal|fasl|gandum|chawal|acre|kisan|zameen|bijai|khad",
+        "پانی|ٹیوب ویل|پمپ|نہر|کھیت|فصل|گندم|چاول|ایکڑ|کسان|زمین|آبپاشی|بیج|کھاد",
+        "ري|الري|سقي|نسقي|اسقوا|السقي|مضخة|المضخة|بئر|محصول|محاصيل|حقل|حقول|قمح|ارز|فدان|فدادين|مياه|الماء|ماء|مزارع|سماد|بذور",
+        "सिंचाई|पानी|ट्यूबवेल|पंप|नहर|खेत|फसल|गेहूं|चावल|एकड़|किसान|जमीन|बीज|खाद",
     ),
     _c(
         "returns_refunds",
@@ -430,7 +444,7 @@ CONCEPTS: tuple[Concept, ...] = (
 # read-only data: `tests/unit/test_pi_idea_relevance_matrix.py` pins how many phrases get a concept
 # that agrees with their labelled category). Merged into the concepts above.
 EXTRA_TERMS: dict[str, str] = {
-    "pay_collect": "cash|advance*|claim*|pays later|pay later|paid later|later payment|cheque*|repay*|never repay|money owed|payout*|cash flow|advances to|client pays|customers pay|pay on time|paid on time|late fee*|نقد|سداد|دفعة|شيك*|سلف*|قسط|paise|paisa|paisay|پیسے|پیسہ|पैसे",
+    "pay_collect": "cash|advance*|claim*|pays later|pay later|paid later|later payment|cheque*|repay*|never repay|money owed|payout*|cash flow|advances to|client pays|customers pay|pay on time|paid on time|late fee*|نقد|سداد|دفعة|شيك|شيكات|سلف*|قسط|paise|paisa|paisay|پیسے|پیسہ|पैसे",
     "cash_handling": "cash register|physical cash|cash in hand|cash box|handwritten cash|daily cash|cash book|card machine|pos cash|short in cash|cash ends up",
     "stock_count": "stock|stocks|godown|warehouse*|raw materials?|count never matches|doesnt match|does not match|on paper|physical count|spares|parts list|stock says|system says|book stock|stock sheet|اسٹاک|گودام|مستودع|مخزن|المخازن|गोदाम|स्टॉक",
     "stock_shortage": "ran out of|out of|finish early|finishes early|not in stock|no stock|stock finish*|short supply|backorder*|waiting for stock|parts shortage|missing parts",
@@ -486,11 +500,11 @@ OFF_TOPIC: tuple[Concept, ...] = (
         "decor_brand",
         "",
         "",
-        "paint*|repaint*|decorat*|interior*|furniture|wallpaper|logo*|signboard*|sign board*|signage|banner*|business card*|visiting card*|branding|uniform*|renovat*|plants?|perfume|incense|music|playlist|aroma|lighting|curtains?|carpet*|wall(s)?|mural|gift wrap*|gift card*|souvenir*|mug*|t-?shirts?|shirts?|merch*|coloured lights|colored lights|decorative lights|fairy lights|neon",
-        "paint|rang wali|rangon mein|decor|decoration|interior|furniture|logo|signboard|banner|visiting card|branding|uniform|colour|color|renovation|perfume|music|lighting|parde|carpet|deewar|deewaron|gift wrapping|gift wrap|souvenir|mug|shirt|shirts|merch|rangeen batti|rangeen lights|corner",
-        "پینٹ|سجاوٹ|ڈیکور|فرنیچر|لوگو|سائن بورڈ|بینر|وزٹنگ کارڈ|برانڈنگ|یونیفارم|مرمت و تزئین|پرفیوم|موسیقی|لائٹنگ|پردے|قالین|دیوار|دیواروں|گفٹ ریپنگ|تحفہ|تحائف|مگ|شرٹ|شرٹس|رنگین بتیاں|رنگین لائٹس|رنگین بتی|کارنر",
-        "طلاء|اصبغ*|دهان|ديكور|زخرفة|اثاث|شعار|لافتة|لوحة|لافتات|بطاقة عمل|بطاقات زيارة|هوية بصرية|زي موحد|لون|تجديد|عطر|موسيقى|اضاءة|ستائر|سجاد|جدار|جدران|تغليف الهدايا|هدية|هدايا|قمصان|قميص|اضواء ملونة|اضاءة ملونة|انوار ملونة",
-        "पेंट|सजावट|डेकोर|फर्नीचर|लोगो|साइनबोर्ड|बैनर|विजिटिंग कार्ड|ब्रांडिंग|यूनिफॉर्म|इत्र|संगीत|लाइटिंग|पर्दे|कालीन|दीवार|दीवारों|गिफ्ट रैपिंग|उपहार|शर्ट|रंगीन बत्तियां|रंगीन लाइट",
+        "paint*|repaint*|decorat*|interior*|furniture|wallpaper|logo*|signboard*|sign board*|signage|banner*|business card*|visiting card*|branding|uniform*|renovat*|plants?|perfume|incense|music|playlist|aroma|lighting|carpet*|wall(s)?|mural|gift wrap*|gift card*|souvenir*|mug*|t-?shirts?|shirts?|merch*|coloured lights|colored lights|decorative lights|fairy lights|neon",
+        "paint|rang wali|rangon mein|decor|decoration|interior|furniture|logo|signboard|banner|visiting card|branding|uniform|colour|color|renovation|perfume|music|lighting|carpet|deewar|deewaron|gift wrapping|gift wrap|souvenir|mug|shirt|shirts|merch|rangeen batti|rangeen lights|corner",
+        "پینٹ|سجاوٹ|ڈیکور|فرنیچر|لوگو|سائن بورڈ|بینر|وزٹنگ کارڈ|برانڈنگ|یونیفارم|مرمت و تزئین|پرفیوم|موسیقی|لائٹنگ|قالین|دیوار|دیواروں|گفٹ ریپنگ|تحفہ|تحائف|مگ|شرٹ|شرٹس|رنگین بتیاں|رنگین لائٹس|رنگین بتی|کارنر",
+        "طلاء|اصبغ*|دهان|ديكور|زخرفة|اثاث|شعار*|لافتة|لوحة|لافتات|بطاقة عمل|بطاقات زيارة|هوية بصرية|زي موحد|لون|تجديد|عطر|عطور|ركن عطور|موسيقى|اضاءة|سجاد|جدار|جدران|تغليف الهدايا|هدية|هدايا|قمصان|قميص|اضواء ملونة|اضاءة ملونة|انوار ملونة",
+        "पेंट|सजावट|डेकोर|फर्नीचर|लोगो|साइनबोर्ड|बैनर|विजिटिंग कार्ड|ब्रांडिंग|यूनिफॉर्म|इत्र|परफ्यूम|कॉर्नर|संगीत|लाइटिंग|कालीन|दीवार|दीवारों|गिफ्ट रैपिंग|उपहार|शर्ट|रंगीन बत्तियां|रंगीन लाइट",
     ),
     _c(
         "events_contests",
@@ -499,7 +513,7 @@ OFF_TOPIC: tuple[Concept, ...] = (
         "lucky draw*|prize*|contest*|competition*|raffle*|sports day|annual day|celebrity|charity|donat*|award*|trophy|trophies|snack*|drinks?|protein bars?|cold drinks?|water cooler|tips leaflet|leaflet*|newsletter|mascot",
         "lucky draw|inam|inaam|muqabla|sports day|annual day|celebrity|charity|donate|award|trophy|snacks|drinks|thande drinks|protein bar|leaflet|parcha|newsletter|mascot|mashware",
         "لکی ڈرا|انعام|انعامات|مقابلہ|اسپورٹس ڈے|سالانہ|مشہور شخصیت|خیرات|عطیہ|ایوارڈ|ٹرافی|اسنیکس|مشروبات|ٹھنڈے مشروبات|پروٹین بار|پرچہ|نیوز لیٹر|مشورے",
-        "سحب|جائزة|جوائز|مسابقة|يوم رياضي|يوم سنوي|مشهور|خيرية|تبرع|كأس|وجبات خفيفة|مشروبات|مشروبات باردة|مشروبات|قطع بروتين|الواح بروتين|ألواح بروتين|نشرة|تميمة|نصائح صحية",
+        "سحب|جائزة|جوائز|مسابقة|يوم رياضي|يوما رياضيا|رياضيا|يوم سنوي|مشهور|خيرية|تبرع|كأس|وجبات خفيفة|مشروبات|مشروبات باردة|مشروبات|قطع بروتين|الواح بروتين|ألواح بروتين|نشرة|تميمة|نصائح صحية",
         "लकी ड्रा|इनाम|प्रतियोगिता|स्पोर्ट्स डे|वार्षिक|सेलिब्रिटी|दान|पुरस्कार|ट्रॉफी|स्नैक्स|ठंडे पेय|प्रोटीन बार|पर्चा|न्यूज़लेटर|सलाह",
     ),
 )
@@ -552,17 +566,98 @@ WEAK_TOKENS = (
     "ग्राहक लोग आदमी रोज रोजाना हफ्ता हफ्ते महीना महीने साल समय सूची काम समस्या बेहतर नया नए पुराना छोटा व्यवसाय"
 )
 
-# Remedies a tried entry can repeat. Narrow on purpose: a remedy shared by many ideas ("a list") is
-# not a repeat. concept -> terms (same syntax as above).
-REMEDIES: dict[str, str] = {
-    "discount": "discount*|price cut*|cheaper|sale offer|offer a sale|ڈسکاؤنٹ|رعایت|خصم|تخفيض|ڈسکاونٹ|छूट|डिस्काउंट|discount dena|discount do|mark ?down",
-    "hire": "hire|hiring|recruit*|extra staff|more staff|new staff|بھرتی|توظيف|وظّف*|भर्ती|bharti|naya banda|ایک اور آدمی|مزید عملہ",
-    "ads": "ads|advertis*|boost|sponsored|campaign*|اشتہار|اشتہارات|اعلان*|विज्ञापन|ishtehaar|ishtihar|paid promotion",
-    "software": "new software|software|app|crm|pos system|erp|system|سافٹ ویئر|برنامج|نظام|सॉफ्टवेयर|ایپ|تطبيق|ऐप",
-    "training": "training|train the|course|workshop|ٹریننگ|تربیت|تدريب|ट्रेनिंग|प्रशिक्षण",
-    "reminder": "reminder*|remind*|ریمائنڈر|یاد دہانی|تذكير|تذكير*|रिमाइंडर|याद दिला*|yaad dehani|yaad dilana",
-    "loyalty": "loyalty|loyalty card|points|reward*|ویلیو کارڈ|وفادار*|ولاء|لائلٹی|इनाम कार्ड|rewards program",
-    "register": "register|ledger|notebook|diary|khata|رجسٹر|کھاتہ|دفتر|سجل|رجسٹر|रजिस्टर|खाता|डायरी|ڈائری|دفتر",
-    "supplier_change": "new supplier|change (the )?supplier|another supplier|switch (the )?(courier|supplier)|نیا سپلائر|مورد جديد|نیا کوریئر|شركة شحن اخرى|नया सप्लायर|nayi courier|naya supplier",
-    "raise_price": "raise (the )?prices?|increase (the )?prices?|price increase|قیمت بڑھا|رفع الاسعار|कीमत बढ़ा|qeemat barha|price barha",
+
+# Round 2: remedy and rewording vocabulary added to existing concepts (causal or remedy phrasing that
+# carries none of the owner's topic words). Merged after EXTRA_TERMS.
+EXTRA_TERMS2: dict[str, str] = {
+    "process_manual": "check in|checking in|check-in|checkin|check patients in|desktop|token*|numbered list|number list|appointment time|چیک اِن|چیک ان|ڈیسک ٹاپ|ٹوکن|نمبر والی فہرست|واک اِن|واک ان|تسجيل وصول|حاسوب مكتبي|قائمة مرقمة|ارقام الدور|चेक इन|डेस्कटॉप|टोकन|नंबर वाली सूची|वॉक-इन|वॉक इन",
+    "bookings": "check in|check-in|checkin|appointment time|time table|timetable|ٹائم ٹیبل|جدول مواعيد|टाइम टेबल|appointment ke waqt|اپائنٹمنٹ کے وقت|حسب موعدهم|अपॉइंटमेंट के समय",
+    "delivery": "van|vans|gaadi|gaadiyan|gari|pohanch*|pohanche|pohanchti|first van|گاڑی|گاڑیاں|پہنچ*|سيارة|السيارة|سيارات|ليصل|يصل|تصل|गाड़ी|गाड़ियां|पहुंच*|पहुँच*|trip|trips|ٹرپ|رحلة|ट्रिप",
+    "job_tracking": "trip record|trip log|record each trip|ہر ٹرپ کا|سجل لكل رحلة|ट्रिप का रिकॉर्ड|trip ka record|ready|tayyar|تیار|جاهزة|तैयार|job slip|جاب سلپ|بطاقة عمل|जॉब स्लिप",
+    "receipts_records": "receipt|receipts|photograph*|photo of|picture of|tasveer|تصویر|صوروا|تصوير|तस्वीर|diary|ڈائری|डायरी|note the hours|ghantay|گھنٹے|الساعات|घंटे",
+    "whatsapp_messages": "map location|share location|location share|google map|confirm the address|confirm address|address confirm|address|ایڈریس|میپ لوکیشن|لوکیشن|العنوان|الموقع|الخريطة|پتہ|पता|मैप लोकेशन|لوکیشن شیئر|موقعه",
+    "orders": "address|shipping|ship|ایڈریس|شپنگ|الشحن|العنوان|पता|शिपिंग",
+    "pay_collect": "unpaid|na dene wale|fees ki tareekh|fee date|fees date|فیس کی تاریخ|فیس نہ دینے|غير المسددين|موعد الرسوم|फीस की तारीख|फीस न देने",
+    "expiry_waste": "kharab hoti|kharab hota|kharab hoti hain|jaldi kharab|خراب ہوتی|خراب ہوتا|جلد خراب|expiry month|expiry date|near expiry|close to expiry|qareeb expiry|expiry ke qareeb|میعاد کا مہینہ|میعاد کے قریب|شهر انتهاء|القريبة من انتهاء|एक्सपायरी का महीना|एक्सपायरी के करीब|front shelf|samne wali shelf|سامنے والی شیلف|الرف الأمامي|आगे वाली शेल्फ|sell first|pehle bikein|پہلے بکیں|تباع أولا|पहले बिकें",
+    "stock_shortage": "shelf|shelves|shelf par|شیلف|الرف|शेल्फ",
+    "retention": "reminder message|reminder messages|booking confirmation|confirm the booking|confirm booking|یاد دہانی کا پیغام|رسالة تذكير|تأكيد الحجز|रिमाइंडर संदेश|बुकिंग कन्फर्म|booking confirm",
+    "capacity_idle": "chairs sit empty|empty chairs|kursiyan khali|کرسیاں خالی|الكراسي فارغة|कुर्सियां खाली",
+    "cost_control": "diesel|ڈیزل|الديزل|डीजल|power rate|bijli sasti|بجلی سستی|الكهرباء أقل|tariff|تعرفة|बिजली सस्ती",
 }
+CONCEPTS = tuple(
+    Concept(c.key, c.cats, c.subs, c.terms + "|" + EXTRA_TERMS2[c.key], c.weak, c.context)
+    if EXTRA_TERMS2.get(c.key)
+    else c
+    for c in CONCEPTS
+)
+
+# New things that answer no problem: names, logos, slogans, games, juice bars, mirrors, tea, celebrity
+# visits, colour changes. An idea whose topics are only these is UNLINKED, never LINKED by a setting word.
+NOVELTY_TERMS = (
+    "new board|board outside|board at the|board lagayein|board lagwayen|board lagwayein|naya board|naye board|bahar board|put up a board|put a board|install a board|new sign|put up a sign|new banner|hang a banner|hang a poster|signboards?|sign boards?|nameplates?|name plates?|banners?|posters?|hoardings?|billboards?|flex board|neon signs?|signage|banner lagwayen|banner lagayein|poster lagayein|signboard|nameplate|hoarding|flex|بورڈ لگائیں|بورڈ لگوائیں|نیا بورڈ|نئے بورڈ|باہر بورڈ|بینر|بینرز|پوسٹر|سائن بورڈ|نیم پلیٹ|ہورڈنگ|فلیکس|لافتة|لافتات|لوحة جديدة|لوحة اسم|لوحة اعلانية|يافطة|بانر|بانرا|بوستر|ملصقات|لوحة خارجية|बोर्ड लगाएं|बोर्ड लगवाएं|नया बोर्ड|बाहर बोर्ड|बैनर|पोस्टर|साइनबोर्ड|नेमप्लेट|होर्डिंग|फ्लेक्स|menu design|menu card design|design a new menu|new menu design|مینو ڈیزائن|تصميم القائمة|मेन्यू डिजाइन|new name|rename|renaming|change the name|name for the|slogan*|tagline|mobile game|game for|games?|juice bar|protein shakes?|shakes?|mirrors?|tea and biscuits|tea|biscuits?|"
+    "celebrity|famous person|hire a celebrity|colour of|color of|change the colou?r|new colou?rs?|in colou?rs|company colou?rs|brighter colou?rs|gold frames?|loud music|soft music|t-?shirts?|"
+    "naya naam|naam rakhein|naam badal|naam badlein|naye naam|game banayein|mobile game banayein|juice bar|protein shakes?|aaine|aaina|chai aur biscuit|chai|mashhoor|rang badal|rang badlein|naya rang|rang mein|rangon mein|tez music|halki music|"
+    "نیا نام|نام رکھیں|نام بدل|گیم بنائیں|موبائل گیم|جوس بار|پروٹین شیک|شیکس|شیکز|آئینے|آئینہ|چائے اور بسکٹ|چائے|مشہور|رنگ بدل|نیا رنگ|رنگ میں|رنگوں میں|تیز موسیقی|ہلکی موسیقی|"
+    "اسما جديدا|اسم جديد|اسم جديدا|غيروا اسم|لعبة|لعبة على الجوال|ركن عصير|مشروبات البروتين|مرايا|مرآة|الشاي والبسكويت|شاي|شخصية مشهورة|غيروا لون|لون جدران|لون المكتب|بألوان|موسيقى عالية|موسيقى هادئة|"
+    "नया नाम|नाम रखें|नाम बदल|गेम बनाएं|मोबाइल गेम|जूस बार|प्रोटीन शेक|आइने|चाय और बिस्कुट|चाय|मशहूर|रंग बदल|नया रंग|रंग में|रंगों में|तेज संगीत|हल्का संगीत"
+)
+
+# Business-setting words: they name WHERE the owner works, not WHAT is wrong. Never evidence by
+# themselves (not even as a shared word).
+SETTING_WORDS = (
+    "shop shops store stores office offices desk desks front reception receptionist receptionists staff team owner name names logo logos wall walls roof door doors gate floor room building buildings "
+    "pharmacy dairy ڈیری فارمیسی ریسٹورنٹ مطعم صيدلية रेस्टोरेंट फार्मेसी डेयरी "
+    "farm farms shed sheds workshop clinic school club gym restaurant kitchen warehouse yard hall branch outlet counter premises "
+    "dukaan dukan dafter daftar farm shed workshop clinic school club gym kitchen godown naam logo deewar chhat darwaza gate floor kamra imarat building "
+    "دکان دفتر ڈیسک فرنٹ ریسپشن ریسپشنسٹ عملہ عملے ٹیم مالک نام لوگو دیوار چھت دروازہ گیٹ فلور کمرہ عمارت بلڈنگ فارم شیڈ ورکشاپ کلینک اسکول کلب جم کچن گودام "
+    "متجر محل مكتب مكاتب استقبال موظف موظفين موظفون فريق اسم شعار جدار جدران سقف باب بوابة غرفة مبنى مزرعة عنبر ورشة عيادة مدرسة نادي مطبخ مستودع قاعة فرع "
+    "दुकान ऑफिस डेस्क फ्रंट रिसेप्शन स्टाफ टीम मालिक नाम लोगो दीवार छत दरवाजा गेट फ्लोर कमरा इमारत बिल्डिंग फार्म शेड वर्कशॉप क्लिनिक स्कूल क्लब जिम किचन गोदाम"
+)
+
+
+# What the owner TRIED, as object and remedy concepts. A tried item and an idea are the same attempt
+# when the idea names all of the tried item's concepts (one if it has one, two if it has more), in any
+# of the five languages, so "rang wale folder" and "colour-coded folders per customer" meet.
+# concept -> terms (same syntax as above).
+TRIED_CONCEPTS: dict[str, str] = {
+    "colour": "colou?rs?|colou?red|colou?r wale|rang|rangeen|rangin|rang wale|rangon|لون|ألوان|ملونة|ملون|ملونا|رنگ|رنگین|رنگوں|رنگ والے|رنگ والی|रंग|रंगीन|रंगों|रंग वाले|रंग वाली",
+    "folder": "files?|folders?|binders?|فائل|فائلیں|فائلوں|فولڈر|فولڈرز|ملف|ملفات|مجلد|مجلدات|फाइल|फाइलें|फोल्डर",
+    "label": "labels?|labell?ing|tags?|tagging|stickers?|ملصق*|الصقوا|لیبل|ٹیگ|ٹیگز|لصاق|लेबल|टैग|स्टिकर",
+    "reminder": "remind*|reminders?|yaad dihani|yaad dila*|یاد دہانی|یاد دلا*|تذكير*|ذكروا|ذكّروا|رِمائنڈر|रिमाइंडर|याद दिला*|याद दिलाएं",
+    "discount": "discount*|price cuts?|cheaper|sale offer|chhoot|chhut|chut|رعایت|ڈسکاؤنٹ|ڈسکاونٹ|خصم|خصما|تخفيض*|छूट|डिस्काउंट|mark ?down",
+    "ads": "ads|adverts?|advertis*|ishtihar|ishtehaar|اشتہار*|إعلان*|اعلان*|विज्ञापन|campaigns?|boost*|sponsored",
+    "hire": "hire|hired|hiring|recruit*|extra staff|more staff|new staff|extra assistant|bharti|banda hire|ek aur banda|بھرتی|وظف*|توظيف|भर्ती|مزید عملہ|ایک اور بندہ|ایک اور آدمی|मजीद स्टाफ|एक और आदमी",
+    "software": "apps?|software|تطبیق*|تطبيق*|crm|erp|booking app|ایپ|ایپلیکیشن|سافٹ ویئر|برنامج|تطبيق|ऐप|सॉफ्टवेयर",
+    "training": "train*|training|courses?|workshops?|ٹریننگ|تربیت|کورس|تدريب*|دورة|دورات|ट्रेनिंग|प्रशिक्षण|कोर्स",
+    "loyalty": "loyalty|points?|loyalty cards?|لائلٹی|پوائنٹ*|بطاقة ولاء|ولاء|نقاط|نقاطا|लॉयल्टी|पॉइंट",
+    "register": "registers?|ledgers?|ledger books?|notebook|khata|khaata|کھاتہ|کھاتے|رجسٹر|دفتر الحسابات|سجل|سجلات|रजिस्टर|खाता|खाते",
+    "group_chat": "groups?|group chats?|گروپ|گروپس|مجموعة|مجموعات|ग्रुप",
+    "camera": "cameras?|cctv|surveillance|کیمرہ|کیمرے|سی سی ٹی وی|كاميرا|كاميرات|مراقبة|कैमरा|कैमरे|सीसीटीवी",
+    "checklist": "check ?lists?|tick lists?|ticklist|tick off|چیک لسٹ|ٹک لسٹ|قائمة تحقق|चेकलिस्ट|टिक लिस्ट",
+    "roster": "rosters?|rota|time ?tables?|shift schedules?|duty rosters?|روسٹر|ٹائم ٹیبل|جدول ورديات|جدول مناوبات|रोस्टर|टाइम टेबल",
+    "token": "tokens?|queue numbers?|line numbers?|queue|ٹوکن|قطار|لائن نمبر|أرقام الدور|رقم دور|الدور|टोकन|कतार|लाइन नंबर",
+    "bonus": "bonus*|incentives?|incentive dein|بونس|ترغیبی|انسنٹو|انسینٹیو|حوافز|مكافأة|مكافآت|बोनस|प्रोत्साहन",
+    "courier_change": "(change|changed|switch|switched) (the |to )?(another |a new |other )?(courier|delivery company|supplier)|another (courier|delivery company|supplier)|new (courier|supplier)|courier badal|courier badla|naya courier|doosri delivery company|dusri delivery company|کوریئر بدل|دوسری ڈیلیوری کمپنی|غيرنا شركة الشحن|شركة توصيل أخرى|شركة شحن أخرى|कूरियर बदल|दूसरी डिलीवरी कंपनी|नया कूरियर",
+    "price_raise": "(rates?|prices?|qeemat|qeematein|rate|daam) (thoda |thodi |kuch |zara )?barha*|(ریٹ|ریٹس|قیمت|قیمتیں) (تھوڑا |تھوڑی |کچھ |ذرا )?بڑھا*|(रेट|कीमत|कीमतें|दाम) (थोड़ा |थोड़ी |कुछ |जरा )?बढ़ा*|raise[sd]? (the )?prices?|raise[sd]? (the )?rates?|increase[sd]? (the )?(prices?|rates?)|price increase|qeemat barha*|rates? barha*|prices? barha*|قیمت بڑھا*|ریٹ بڑھا*|قیمتیں بڑھا*|رفع الاسعار|ارفعوا الاسعار|رفعنا الأسعار|कीमत बढ़ा*|रेट बढ़ा*|कीमतें बढ़ा*",
+    "meeting": "meetings?|huddles?|میٹنگ*|اجتماع*|اجتماعا|मीटिंग*|बैठक",
+    "text_message": "sms|text messages?|text each|text the|texting|ایس ایم ایس|ٹیکسٹ پیغام|رسالة نصية|رسائل نصية|एसएमएस|टेक्स्ट संदेश",
+    "receipt_photo": "receipts?|photo*|photograph*|pictures?|tasveer|raseed|رسید|تصویر|إيصال|ايصال|صوروا|रसीद|तस्वीर",
+    "channel": "whatsapp|واٹس ایپ|واتساب|व्हाट्सएप|facebook|فیس بک|فیسبک|फेसबुक|instagram|انسٹاگرام|انستغرام|इंस्टाग्राम|tiktok|youtube",
+    "list_sheet": "lists?|sheets?|fehrist|فہرست|فهرست|قائمة|सूची|शीट|شیٹ|ورقة",
+}
+
+# How an outcome the owner gave in their own words reads. Failed is checked first ("did not work").
+OUTCOME_FAILED = (
+    "failed|fail|no effect|did not help|didnt help|not helped|did not work|didnt work|not work|no use|useless|lost|got lost|abandoned|ignored|no result|nothing changed|"
+    "kaam nahi kiya|kaam nahi|fayda nahi|faida nahi|nakam|nakaam|farq nahi|kuch nahi hua|kho gaya|"
+    "فائدہ نہیں|کام نہیں کیا|ناکام|کوئی فرق نہیں|کھو گیا|بے فائدہ|"
+    "لم ينجح|لم تنجح|فشل|فشلت|بلا فائدة|لا فائدة|ضاع|ضاعت|لم يفد|لم ينفع|تجاهلوها|"
+    "काम नहीं किया|फायदा नहीं|असफल|कोई फर्क नहीं|खो गया|बेकार"
+)
+OUTCOME_WORKED = (
+    "worked|it worked|works|helped|helps|success|successful|fixed|improved|"
+    "kaam kiya|kaam kar gaya|fayda hua|faida hua|kamyab|theek ho gaya|"
+    "کام کیا|فائدہ ہوا|کامیاب|ٹھیک ہو گیا|بہتر ہوا|"
+    "نجح|نجحت|ساعد|ساعدت|استفدنا|تحسن|"
+    "काम किया|फायदा हुआ|सफल|ठीक हो गया"
+)

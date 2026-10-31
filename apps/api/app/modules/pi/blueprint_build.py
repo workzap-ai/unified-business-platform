@@ -75,6 +75,7 @@ from app.modules.pi.blueprint_types import (
     MAX_STAFF,
     MAX_STEPS,
     MAX_TRIED,
+    NEEDS_REVIEW,
     READY,
     REFUSED,
     ROLES,
@@ -163,7 +164,11 @@ def option_from(option: Any) -> OptionIn | None:
                 after=after,
                 phase=phase if isinstance(phase, int) and not isinstance(phase, bool) else 0,
                 id=_text(_get(s, "id"), 40),
-                problems=_texts(_get(s, "problems"), MAX_PROBLEMS, 40),
+                problems=(
+                    _texts(_get(s, "problems"), MAX_PROBLEMS, 40)
+                    if isinstance(_get(s, "problems"), list | tuple)
+                    else None
+                ),
             )
         )
     deps = tuple(
@@ -534,6 +539,8 @@ def _build(
         staff,
     )
 
+    probs = tuple(_latest(p, corrections) for p in probs)
+
     # --- is there enough to build from? ---
     gaps: list[tuple[str, str]] = []
     usable = [p for p in probs if p.title or p.words]
@@ -564,6 +571,13 @@ def _build(
         notes.extend(n)
         return out
 
+    def own(text: str, cap: int = 300) -> str:
+        """The owner's own words: promise and credential sentences still go, but the owner's own
+        figures, a budget included, stay as the owner said them."""
+        out, n = clean_text(text, known, cap, keep_money=True)
+        notes.extend(x for x in n if x != "money")
+        return out
+
     tied_ids = tuple(p.id for p in tied)
 
     # --- option content, cleaned ---
@@ -573,9 +587,8 @@ def _build(
         text = clean(s.text)
         if not text:
             continue
-        if s.problems and not set(s.problems) & set(tied_ids):
-            unlinked = True  # a step that answers none of the stated problems is not built
-            continue
+        if s.problems is not None and not set(s.problems) & set(tied_ids):
+            unlinked = True  # answers no stated problem: kept, flagged, needs a person
         raw_steps.append((s, text))
     no_steps = not raw_steps
     if no_steps:
@@ -585,7 +598,7 @@ def _build(
 
     # --- constraints; a violated hard constraint refuses ---
     step_texts = [txt for _, txt in raw_steps] + module_names + [what]
-    rows = _constraint_rows(lang, constraints, tried, option, step_texts, clean)
+    rows = _constraint_rows(lang, constraints, tried, option, step_texts, clean, own)
     violated = [r for r in rows if r.result == "violates" and r.hard]
     if violated:
         return Blueprint(
@@ -620,7 +633,7 @@ def _build(
     tail = ["A1"]
     base_ids: dict[str, str] = {}
     figures = {
-        p.id: clean(" ".join(x for x in (p.figure, p.frequency) if x), 160) if p.figure else ""
+        p.id: own(" ".join(x for x in (p.figure, p.frequency) if x), 160) if p.figure else ""
         for p in tied
     }
     for p in tied:
@@ -668,7 +681,7 @@ def _build(
             role = "owner" if option.kind in _OWNER_KINDS else "staff"
             defaulted = True
         done = clean(s.done_check) or t(lang, "action_done", text=tidy(text, 100))
-        linked = tuple(x for x in s.problems if x in tied_ids) or tied_ids
+        linked = tied_ids if s.problems is None else tuple(x for x in s.problems if x in tied_ids)
         work.append(Step(sid, "action", text, role, done, phase, linked, "option"))
         if phase not in phases_used:
             phases_used.append(phase)
@@ -826,7 +839,7 @@ def _build(
             )
     outcomes: dict[str, str] = {}
     for p in tied:
-        o = clean(
+        o = own(
             p.expected_outcome
             or per_problem_outcome.get(p.id, "")
             or global_outcome
@@ -951,27 +964,31 @@ def _build(
         tidy(t(lang, "summary", titles=titles.rstrip(_STOP), what=what.rstrip(_STOP)), 600),
         tied_ids,
         option.id,
+        what,
     )
     # --- what explains and links the plan ---
     if unlinked:
         unknowns.append(t(lang, "unk_unlinked"))
-    steps = [dataclasses.replace(x, problems=x.problems or tied_ids) for x in steps]
+    steps = [
+        dataclasses.replace(x, problems=x.problems or tied_ids) if x.source == "scaffold" else x
+        for x in steps
+    ]
     risks = [dataclasses.replace(r, problems=r.problems or tied_ids) for r in risks]
     external = [dataclasses.replace(e, problems=e.problems or tied_ids) for e in external]
     alts = alternatives_from(options_raw, option.id) if options_raw is not None else ()
     problem_rows = tuple(
         ProblemRow(
             p.id,
-            clean(p.title or " ".join(p.words), 120) or p.id,
-            tuple(w for w in (clean(x) for x in p.words[:2]) if w),
+            own(p.title or " ".join(p.words), 120) or p.id,
+            tuple(w for w in (own(x) for x in p.words[:2]) if w),
         )
         for p in usable
     )
-    cause_tuple, cause_items = cause_rows(lang, causes, tied, clean)
+    cause_tuple, cause_items = cause_rows(lang, causes, tied, own, " ".join(facts))
     reason_tuple = reason_rows(lang, option, rows, titles, tied_ids, clean)
     alt_tuple = alternative_rows(lang, alts, tied_ids, clean)
     fact_tuple = fact_rows(
-        lang, tied, constraints, tried, corrections, outcomes, figures, clean, tied_ids
+        lang, tied, constraints, tried, corrections, outcomes, figures, own, tied_ids
     )
     if not fact_tuple:  # whatever was cut, the problem the owner stated is still a fact
         first = next((r for r in problem_rows if r.id in tied_ids), problem_rows[0])
@@ -1000,7 +1017,7 @@ def _build(
         tuple(measures),
     )
     return Blueprint(
-        status=READY,
+        status=NEEDS_REVIEW if unlinked else READY,
         language=lang,
         summary=summary,
         problems=problem_rows,
@@ -1028,6 +1045,26 @@ def _build(
     )
 
 
+def _latest(p: ProblemIn, corrections: tuple[tuple[str, str, str], ...]) -> ProblemIn:
+    """The owner's latest value: where a stored figure still carries a value the owner corrected
+    ("8 no 12"), it is shown with the corrected one. Only corrections found in the owner's words."""
+    mine = [(w, r) for w, r, pid in corrections if pid in ("", p.id)]
+    if not mine:
+        return p
+
+    def fix(text: str) -> str:
+        for wrong, right in mine:
+            text = re.sub(r"(?<![\w.,])" + re.escape(wrong) + r"(?![\w])", right, text)
+        return text
+
+    return dataclasses.replace(
+        p,
+        figure=fix(p.figure),
+        frequency=fix(p.frequency),
+        expected_outcome=fix(p.expected_outcome),
+    )
+
+
 def _reduce_number(outcome: str) -> str:
     """The first number of an owner's outcome asking for fewer ("kam se kam 5"), else ''.
     The number is the owner's own; nothing here sets a target."""
@@ -1044,6 +1081,7 @@ def _constraint_rows(
     option: OptionIn,
     step_texts: list[str],
     clean: Callable[..., str],
+    own: Callable[..., str],
 ) -> tuple[ConstraintRow, ...]:
     t = bs.tr
     checks = {c.constraint: c for c in option.checks if c.constraint}
@@ -1052,7 +1090,7 @@ def _constraint_rows(
     for c in constraints:
         hit = next((b for b in c.blocks if _contains(hay, b)), None)
         chk = checks.get(c.label) or (checks.get(c.kind) if c.kind in _SCALAR_KINDS else None)
-        text = t(lang, "cons_hidden") if c.kind == "budget" else clean(c.text, 200)
+        text = own(c.text, 200)
         if hit is not None:
             result, reason = "violates", t(lang, "cons_block", phrase=clean(hit, 60))
         elif chk is not None and chk.result == "violates":

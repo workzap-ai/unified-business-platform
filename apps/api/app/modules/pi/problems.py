@@ -6,6 +6,7 @@ and builds the S4 summary (`summary_message`). Records keep the person's own wor
 names or card, phone or ID numbers (redacted first), and every change is a revision.
 """
 
+import logging
 import re
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
@@ -15,9 +16,17 @@ from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field
 from sqlalchemy import func, inspect, select
+from sqlalchemy.exc import DBAPIError
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.modules.pi import business, figure_correction, part19, problem_fields, taxonomy
+from app.modules.pi import (
+    business,
+    figure_correction,
+    part19,
+    problem_fields,
+    taxonomy,
+    tried_outcome,
+)
 from app.modules.pi.language import amount_value, date_estimate
 from app.modules.pi.problem_models import (
     PiProblem,
@@ -27,6 +36,8 @@ from app.modules.pi.problem_models import (
 )
 from app.shared.scope import WorkspaceScope
 from app.shared.workspace_repository import WorkspaceRepository
+
+logger = logging.getLogger(__name__)
 
 TITLE_WORDS = 8
 SUMMARY_LINE_WORDS = 10
@@ -410,6 +421,20 @@ class Applied:
         return {p.id for p in every}
 
 
+# a word character, including Devanagari and Arabic vowel marks (not in \w)
+_WORD = r"[\wऀ-ॿً-ٰٟ]"
+
+
+def _stems(text: str, size: int = 3) -> set[str]:
+    """First five letters of every word of `size`+ letters: a cheap, language-free word match."""
+    return {w[:5] for w in re.findall(rf"{_WORD}{{{size},}}", text.casefold())}
+
+
+def _backed(words: set[str], heard: set[str]) -> bool:
+    """At least 60% of `words` (and one word) occur in `heard`."""
+    return bool(words) and len(words & heard) / len(words) >= 0.6
+
+
 class ProblemBook:
     """The problems of one customer's business, for one conversation turn."""
 
@@ -493,8 +518,77 @@ class ProblemBook:
             or note.cannot_change_remove
             or note.tried
             or note.cause_text
+            or note.believes_cause.strip()
             or note.expected_outcome
         )
+
+    @staticmethod
+    def tried_items(note: ProblemNote, owner_text: str | None) -> list[dict[str, Any]]:
+        """The note's `tried` entries, kept only as far as the OWNER's own words back them (L1).
+
+        With no owner text (an older caller) the entries are returned as given. With it: an entry
+        is stored only when an owner clause (not a question, a hypothetical or a third party's
+        attempt) mentions what was tried; its outcome is "failed" or "worked" when that clause
+        says so, else the model's own outcome words only when the owner's text backs them, else
+        unset. A failed attempt the owner described is added when the model wrote none and it
+        shares a word with this problem. `what` keeps the owner's wording (PS-3 matches on it)."""
+        items = [dict(t) for t in note.tried if isinstance(t, dict)]
+        if owner_text is None:
+            return items
+        clauses = tried_outcome.owner_clauses(owner_text)
+        heard = [_stems(c) for c in clauses]
+        everything = set().union(*heard) if heard else set()
+        kept: list[dict[str, Any]] = []
+        whats = [_stems(str(item.get("what") or "")) for item in items]
+        mentions = [lambda text, w=w: _backed(w, _stems(text)) for w in whats]
+        reading = tried_outcome.owner_clauses_with_followups(owner_text)
+        per_reading = [tried_outcome.item_outcomes(c, mentions) for c in reading]
+        per_clause = [tried_outcome.item_outcomes(c, mentions) for c in clauses]
+        for index, item in enumerate(items):
+            what = whats[index]
+            support = [n for n, h in enumerate(heard) if _backed(what, h)]
+            if not support:
+                continue  # nothing the owner said backs this attempt
+            # one outcome per attempt, from the owner's clauses that name THIS attempt
+            outcomes = {per_clause[n][index] for n in support} | {r[index] for r in per_reading}
+            given = str(item.get("outcome") or "")
+            if "failed" in outcomes:
+                item["outcome"] = "failed"
+            elif "worked" in outcomes:
+                item["outcome"] = "worked"
+            elif not _backed(_stems(given), everything):
+                item["outcome"] = ""  # the model's outcome words are not the owner's
+            kept.append(item)
+        known = [str(i.get("what") or "").casefold() for i in kept]
+        about = _stems(" ".join([note.title, note.summary, *note.user_words]), 4)
+        for clause in clauses:
+            found = tried_outcome.failed_attempt(clause)
+            if not found or not found.what or found.what.casefold() in known:
+                continue
+            if any(found.what.casefold() in k or k in found.what.casefold() for k in known if k):
+                continue
+            if about & _stems(clause, 4):
+                kept.append({"what": found.what, "outcome": "failed"})
+                known.append(found.what.casefold())
+        return kept
+
+    @staticmethod
+    def cause_candidate(
+        note: ProblemNote, owner_text: str | None = None
+    ) -> tuple[str, bool, list[str]]:
+        """(text, said, evidence words) of the cause a note carries. The B2a cause fields win; the
+        older `believes_cause` is the same claim ("the owner said it") with no evidence of its own.
+        Its evidence is its first three CONTENT words (function words prove nothing), and it counts
+        as the owner's only when at least 60% of its content words are in the owner's own claim
+        (not a question, a hypothetical or someone else's opinion), or the cause is pi's guess
+        (L1-3): the model writing believes_cause proves nothing."""
+        if note.cause_text.strip():
+            return note.cause_text, note.cause_said, note.cause_words
+        text = note.believes_cause.strip()
+        words = problem_fields.content_words(text)
+        carried = problem_fields.endorsed_words(words, owner_text)
+        backed = bool(words) and len(carried) / len(words) >= 0.6
+        return text, backed, carried[: problem_fields.EVIDENCE_WORDS]
 
     async def load_requirements(self, problem: PiProblem) -> None:
         """The four deferred columns, loaded now (an async session cannot lazy-load them)."""
@@ -526,22 +620,25 @@ class ProblemBook:
         changed = changed or was
         if constraints is not None:
             values["constraints"] = constraints
-        tried, was = problem_fields.merge_tried(problem.tried if problem else None, note.tried, msg)
+        said_tried = ProblemBook.tried_items(note, owner_text)
+        tried, was = problem_fields.merge_tried(problem.tried if problem else None, said_tried, msg)
         changed = changed or was
         if tried is not None:
             values["tried"] = tried
+        cause_text, cause_said, cause_words = ProblemBook.cause_candidate(note, owner_text)
         cause, was = problem_fields.merge_cause(
             problem.cause if problem else None,
-            note.cause_text,
-            note.cause_said,
-            note.cause_words,
+            cause_text,
+            cause_said,
+            cause_words,
             msg,
             owner_text or "",  # only the owner's message: model-written words prove nothing
+            datetime.now(UTC).isoformat(timespec="seconds"),
         )
         changed = changed or was
         if cause is not None:
             values["cause"] = cause
-            if cause["status"] in problem_fields.OWNER_STATUSES and not note.believes_cause.strip():
+            if cause["status"] in problem_fields.OWNER_STATUSES:
                 # the older column keeps the owner's belief only; a guess never goes there
                 values["person_believes_cause"] = redact(cause["text"][:300])[0]
         outcome, was = problem_fields.clean(note.expected_outcome, problem_fields.OUTCOME_CAP)
@@ -549,6 +646,34 @@ class ProblemBook:
         if outcome and (problem is None or problem.expected_outcome != outcome):
             values["expected_outcome"] = outcome
         return values, changed
+
+    async def withdraw_owner_cause(self, message_id: UUID | None, ref: str | None = None) -> bool:
+        """The owner took their cause back. Clears the owner cause of one problem (the one `ref`
+        names, else the only one with an owner cause, else the most revised), keeps the old cause
+        in its history and clears the older person_believes_cause column, so no reader (offer
+        gate, idea context, documents) sees it. Returns whether something was withdrawn."""
+        candidates = []
+        for problem in await self.active():
+            await self.load_requirements(problem)
+            if (problem.cause or {}).get("status") in problem_fields.OWNER_STATUSES:
+                candidates.append(problem)
+        if ref:
+            candidates = [p for p in candidates if short_ref(p.id) == ref]
+        if not candidates:
+            return False
+        problem = max(candidates, key=lambda p: (p.revision, p.number))
+        when = datetime.now(UTC).isoformat(timespec="seconds")
+        new = problem_fields.withdraw_cause(
+            problem.cause, str(message_id) if message_id else None, when
+        )
+        if new is None:
+            return False
+        diff = {"cause": [json_safe(problem.cause), json_safe(new)]}
+        problem.cause = new
+        problem.person_believes_cause = ""
+        problem.revision += 1
+        await self._revise(problem, diff, "cause_withdrawn", "person")
+        return True
 
     async def confirm_cause(self, problem: PiProblem) -> bool:
         """The owner agreed with the cause they said: `owner_said` becomes `confirmed`. A cause pi
@@ -648,8 +773,7 @@ class ProblemBook:
             current_workaround=note.workaround.strip()[: FIELD_LIMITS["workaround"]],
             systems_mentioned=[s[:60] for s in note.systems[:8]],
             who_notices=note.who_notices.strip()[: FIELD_LIMITS["who_notices"]],
-            person_believes_cause=required.pop("person_believes_cause", None)
-            or redact(note.believes_cause.strip()[:300])[0],
+            person_believes_cause=required.pop("person_believes_cause", None) or "",
             requested_solution=redact(note.requested_solution.strip()[:300])[0],
             status="draft",
             confidence=Decimal(str(round(note.confidence, 2))),
@@ -746,8 +870,6 @@ class ProblemBook:
                 put(name, value.strip()[:400])
         if note.systems:
             put("systems_mentioned", sorted({*problem.systems_mentioned, *note.systems[:8]}))
-        if note.believes_cause.strip():
-            put("person_believes_cause", redact(note.believes_cause.strip()[:300])[0])
         if self.carries_requirements(note):
             await self.load_requirements(problem)
             required, required_redacted = self.requirement_values(
@@ -987,6 +1109,45 @@ async def apply_ops(
     return result
 
 
+async def cause_records(
+    session: AsyncSession, ids: list[UUID]
+) -> dict[UUID, dict[str, Any] | None] | None:
+    """The `cause` record (text, status, evidence) of each problem, or None when the column cannot
+    be read (a database before 0053: then the older column is all there is, and it is only
+    written from the owner's own words)."""
+    if not ids:
+        return {}
+    try:
+        async with session.begin_nested():
+            rows = await session.execute(
+                select(PiProblem.id, PiProblem.cause).where(PiProblem.id.in_(ids))
+            )
+            return {row[0]: row[1] for row in rows}
+    except DBAPIError:
+        logger.warning("pi_cause_records_unreadable", exc_info=True)
+        return None
+
+
+def owner_cause(
+    problem: PiProblem, records: dict[UUID, dict[str, Any] | None] | None
+) -> tuple[str, str, str]:
+    """(the owner's cause, pi's hypothesis, the status) of a problem. The owner's cause is text only
+    when its record says `owner_said` or `confirmed`. A record that is pi's guess, and an older
+    value with no record (written before the evidence rule, so of unknown origin), are a
+    hypothesis, never the owner's."""
+    older = (problem.person_believes_cause or "").strip()
+    if records is None:
+        return older, "", ""  # the record cannot be read: the older column, owner-only on write
+    record = records.get(problem.id)
+    if record:
+        stated = problem_fields.stated_cause(record)
+        status = str(record.get("status") or "")
+        if stated:
+            return stated, "", status
+        return "", str(record.get("text") or ""), status
+    return "", older, problem_fields.PI_INFERRED if older else ""
+
+
 async def noted_context(
     session: AsyncSession,
     scope: WorkspaceScope,
@@ -1013,7 +1174,10 @@ async def noted_context(
         )
         if g.name
     }
-    for problem in (await book.active())[:limit]:
+    active = (await book.active())[:limit]
+    records = await cause_records(session, [p.id for p in active])
+    for problem in active:
+        said_cause, hypothesis, cause_status = owner_cause(problem, records)
         missing = [
             name
             for name, known in (
@@ -1047,7 +1211,10 @@ async def noted_context(
                 "group": problem.category,
                 "subtype": problem.subtype or "",
                 "goal_verb": problem.goal_verb or "",
-                "cause": problem.person_believes_cause or "",
+                # L1-3: `cause` is only what the owner said; pi's guess is `cause_hypothesis`
+                "cause": said_cause,
+                "cause_status": cause_status,
+                **({"cause_hypothesis": hypothesis} if hypothesis else {}),
                 "group_name": renamed.get(problem.category, ""),
                 "score": float(problem.severity_score) if problem.severity_score else None,
                 "status": problem.status,

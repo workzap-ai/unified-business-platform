@@ -11,7 +11,12 @@ from typing import Any
 import pytest
 
 from app.modules.pi import blueprint_strings as bs
-from app.modules.pi.blueprint_build import blueprint_issues, build_blueprint, render_blueprint
+from app.modules.pi.blueprint_build import (
+    blueprint_issues,
+    build_blueprint,
+    option_from,
+    render_blueprint,
+)
 from app.modules.pi.blueprint_checks import SECTIONS, check_blueprint, section_report
 from app.modules.pi.blueprint_extra import (
     alternatives_from,
@@ -20,6 +25,7 @@ from app.modules.pi.blueprint_extra import (
     parse_corrections,
 )
 from app.modules.pi.blueprint_types import (
+    NEEDS_REVIEW,
     READY,
     AlternativeRow,
     Blueprint,
@@ -337,20 +343,126 @@ def test_every_item_links_to_a_stated_problem(bp: Blueprint) -> None:
     assert all(m.problem in ids for m in bp.success)
 
 
-def test_a_step_that_answers_no_stated_problem_is_not_built() -> None:
+def _opt(steps: tuple[StepIn, ...]) -> OptionIn:
+    return OptionIn(
+        id="O1", kind="process_change", what="Keep one sheet", addresses=("p1", "p2"), steps=steps
+    )
+
+
+def test_a_step_that_answers_no_stated_problem_makes_the_blueprint_need_review() -> None:
     steps = (
         StepIn("Fix the roof", problems=("p9",)),
+        StepIn("Repaint the hall", problems=()),
         StepIn("Keep one sheet", problems=("p2",)),
         StepIn("Check weekly"),
     )
-    opt = OptionIn(
-        id="O1", kind="process_change", what="Keep one sheet", addresses=("p1", "p2"), steps=steps
-    )
-    out = build_blueprint(opt, PROBS, REQ, FACTS, "en")
+    out = build_blueprint(_opt(steps), PROBS, REQ, FACTS, "en")
+    assert out.status == NEEDS_REVIEW and not out.ready
     acts = [(s.text, s.problems) for s in out.steps if s.kind == "action"]
-    assert acts == [("Keep one sheet", ("p2",)), ("Check weekly", ("p1", "p2"))]
-    assert "A step that answers none of the stated problems was removed." in out.unknowns
-    assert blueprint_issues(out, FACTS, PROBS, REQ) == ()
+    assert acts == [
+        ("Fix the roof", ()),
+        ("Repaint the hall", ()),
+        ("Keep one sheet", ("p2",)),
+        ("Check weekly", ("p1", "p2")),
+    ]
+    found = blueprint_issues(out, FACTS, PROBS, REQ)
+    assert sorted(i.where for i in found if i.code == "BP-UNLINKED") == ["step S1", "step S2"]
+    assert (
+        "A step answers none of the problems you stated. A person must look at it." in out.unknowns
+    )
+    text = render_blueprint(out)
+    assert bs.EN["needs_review"] in text.splitlines()
+
+
+def test_ready_means_every_step_links_to_a_stated_problem() -> None:
+    ok = build_blueprint(
+        _opt((StepIn("A", problems=("p1",)), StepIn("B"))), PROBS, REQ, FACTS, "en"
+    )
+    assert ok.status == READY and blueprint_issues(ok, FACTS, PROBS, REQ) == ()
+    assert all(s.problems for s in ok.steps)
+
+
+@pytest.mark.parametrize("lang", ["en", "roman_ur", "ur", "ar"])
+def test_needs_review_is_stated_in_every_language(lang: str) -> None:
+    out = build_blueprint(_opt((StepIn("x", problems=()),)), PROBS, REQ, FACTS, lang)
+    assert out.status == NEEDS_REVIEW
+    assert bs.TABLES[lang]["needs_review"] in render_blueprint(out).splitlines()
+
+
+def test_step_problem_links_through_the_adapter() -> None:
+    o = option_from(
+        {
+            "what": "w",
+            "addresses": ["p1"],
+            "steps": [
+                {"text": "a", "problems": []},
+                {"text": "b"},
+                {"text": "c", "problems": ["p1"]},
+            ],
+        }
+    )
+    assert o is not None and [s.problems for s in o.steps] == [(), None, ("p1",)]
+
+
+def test_evidence_is_checked_against_every_owner_message() -> None:
+    later = NS(
+        text="the shared diary gets lost",
+        status="owner_said",
+        evidence_for=(evid(("shared diary gets lost",)),),
+    )
+    facts = ["Two teams booked the same court", "Later: the shared diary gets lost every week"]
+    out = build_blueprint(l2(), PROBS, REQ, facts, "en", root_causes={"p1": later})
+    assert out.causes[0].status == "owner_said" and out.causes[0].evidence == (
+        "shared diary gets lost",
+    )
+    made_up = NS(
+        text="the shared diary gets lost",
+        status="owner_said",
+        evidence_for=(evid(("never said this",)),),
+    )
+    out2 = build_blueprint(l2(), PROBS, REQ, facts, "en", root_causes={"p1": made_up})
+    assert out2.causes[0].status == "pi_inferred" and out2.causes[0].evidence == ()
+    assert blueprint_issues(out2, facts, PROBS, REQ, None, {"p1": made_up}) == ()
+
+
+def test_the_latest_value_after_a_correction_is_the_one_shown() -> None:
+    probs = [dict(PROBS[0], of_total="about 8 clashes", expected_outcome="under 80 clashes")]
+    facts = ["About 8 clashes. Sorry, 8 no 12, I mean 12. under 80 clashes"]
+    req = dict(REQ, corrections=[{"wrong": "8", "right": "12", "problem": "p1"}])
+    out = build_blueprint(l2(addresses=("p1",)), probs, req, facts, "en")
+    figure = [f.text for f in out.facts if f.kind == "figure"]
+    assert figure == ["about 12 clashes"]  # 80 is a different number and is left alone
+    outcome = [f.text for f in out.facts if f.kind == "outcome"]
+    assert outcome == ["under 80 clashes"]
+    assert out.success[0].baseline == "about 12 clashes"
+    assert [(f.was, f.text) for f in out.facts if f.kind == "correction"] == [("8", "12")]
+    assert blueprint_issues(out, facts, probs, req) == ()
+
+
+@pytest.mark.parametrize("lang", ["en", "roman_ur", "ur", "ar"])
+def test_the_recommended_options_own_words_are_printed_in_every_language(lang: str) -> None:
+    words = {
+        "en": "Confirm each address on WhatsApp",
+        "roman_ur": "Har address WhatsApp par confirm karein",
+        "ur": "ہر پتہ واٹس ایپ پر تصدیق کریں",
+        "ar": "أكد كل عنوان عبر واتساب",
+    }[lang]
+    pick = l2(id="CHAT1", what=words, addresses=("p1",))
+    box = l2(id="BOX", what="A different box")
+    oset = NS(
+        options=(box, pick), recommended_id="CHAT1", none_reason="", no_recommendation_reason=""
+    )
+    out = build_blueprint(oset, PROBS, REQ, FACTS, lang)
+    assert (
+        out.summary is not None
+        and out.summary.option_id == "CHAT1"
+        and out.summary.option_words == words
+    )
+    lines = render_blueprint(out).splitlines()
+    assert f"{bs.TABLES[lang]['lbl_recommended']} CHAT1: {words}" in lines
+    assert [a.id for a in out.alternatives] == [
+        "BOX"
+    ]  # the other option is named as an alternative
 
 
 def test_check_flags_unlinked_items_and_bad_causes(bp: Blueprint) -> None:
@@ -424,3 +536,20 @@ def test_unreviewed_translations_have_no_untranslated_placeholders() -> None:
     for lang, table in bs.TABLES.items():
         for key, value in table.items():
             assert value.count("{") == value.count("}"), (lang, key)
+
+
+@pytest.mark.parametrize("seed", range(120))
+def test_property_ready_iff_every_step_is_linked(seed: int) -> None:
+    import random
+
+    r = random.Random(seed)
+    pool: list[tuple[str, ...] | None] = [None, (), ("p1",), ("p2",), ("p9",), ("p1", "p9")]
+    steps = tuple(StepIn(f"Do thing {i}", problems=r.choice(pool)) for i in range(r.randint(1, 6)))
+    out = build_blueprint(_opt(steps), PROBS, REQ, FACTS, r.choice(["en", "roman_ur", "ur", "ar"]))
+    found = blueprint_issues(out, FACTS, PROBS, REQ)
+    acts = [s for s in out.steps if s.kind == "action"]
+    unlinked = [s for s in acts if not s.problems]
+    assert (out.status == READY) == (not unlinked)
+    assert (out.status == NEEDS_REVIEW) == bool(unlinked)
+    assert bool([i for i in found if i.code == "BP-UNLINKED"]) == bool(unlinked)
+    assert all(set(s.problems) <= {"p1", "p2"} for s in out.steps)
