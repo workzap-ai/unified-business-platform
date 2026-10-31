@@ -7,15 +7,12 @@ ideas and the Workzap line, and moves the state to the offer only on request —
 model would phrase it this well.
 """
 
-import json
-
 import pytest
-from sqlalchemy import select
+from offer_expect import assert_offer_ends
 from test_pi_brain_problems import adaptive, create, problems_of, say, workspace
 from test_pi_service_conversations import turn
 
-from app.modules.pi import solution_ask, solution_ideas
-from app.modules.pi.models import PiMessage
+from app.modules.pi import solution_ideas
 
 pytestmark = pytest.mark.integration
 
@@ -33,12 +30,6 @@ def the_offer_is_open(monkeypatch):
 
 OPENING = "Hi, I'm pi, an AI from Workzap."
 INDUSTRY = "kiryana_corner_shops_and_convenience_stores"
-REPORT_PATH = (
-    "C:/Users/USER/AppData/Local/Temp/claude/"
-    "E--COMPANY-ENGINEERING-HQ-05-COMPANY-SYSTEM-Owner-OS/"
-    "3d189fbd-1f8c-4234-ab94-7afcfa2c60bd/scratchpad/kiryana_sim.json"
-)
-
 TRACE: list[dict] = []
 
 
@@ -140,13 +131,9 @@ async def test_simulated_kiryana_owner_gets_matched_ideas_and_the_offer(
         await business_db.refresh(conversation)
         states.append(conversation.flow_state)
 
-    rows = list(
-        await business_db.scalars(
-            select(PiMessage)
-            .where(PiMessage.conversation_id == conversation.id, PiMessage.direction == "outbound")
-            .order_by(PiMessage.created_at)
-        )
-    )
+    # The reply to each turn, found through the agent run of its inbound message: created_at is
+    # the transaction start and not an order, and ids are random.
+    rows = [await pi.reply_to(mid) for _text, mid in turns]
     _conversation, problems = await problems_of(business_db, pi)
 
     transcript: list[dict[str, str]] = []
@@ -164,9 +151,6 @@ async def test_simulated_kiryana_owner_gets_matched_ideas_and_the_offer(
         "last_reply": rows[-1].body if rows else None,
         "industry_matched": TRACE[-1].get("industry") if TRACE else None,
     }
-    with open(REPORT_PATH, "w", encoding="utf-8") as f:  # noqa: ASYNC230 (test diagnostics only)
-        json.dump(report, f, ensure_ascii=False, indent=2, default=str)
-
     with capsys.disabled():
         print("\n===== TRANSCRIPT =====")
         for i, (text, _mid) in enumerate(turns):
@@ -177,7 +161,6 @@ async def test_simulated_kiryana_owner_gets_matched_ideas_and_the_offer(
         print("industry_matched on push turn:", report["industry_matched"])
         print("ideas handed over on push turn:", TRACE[-1].get("solution_ideas"))
         print("workzap line on push turn:", TRACE[-1].get("solution_build"))
-        print("saved to:", REPORT_PATH)
 
     # The real assertions: did the pipeline actually do its job, independent of the scripted model.
     assert report["problems_noted"], "no problem was noted at all"
@@ -190,5 +173,5 @@ async def test_simulated_kiryana_owner_gets_matched_ideas_and_the_offer(
     assert TRACE[-1]["industry_keys"] == [INDUSTRY]
     assert TRACE[-1]["solution_build"], "no Workzap line was handed over"
     assert conversation.flow_state == "S5_READINESS", conversation.flow_state
-    assert solution_ask.offer_line("roman_ur") in rows[-1].body
+    assert_offer_ends(rows[-1].body, "roman_ur")
     await pi.close()

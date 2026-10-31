@@ -23,8 +23,11 @@ async def test_the_brain_prompt_carries_the_spec_and_the_emergency_numbers(
     first = contexts[0]
     guide = first["spec_guidance"]
     assert "pi-brain specification" in guide
-    for rule in ("R-DISC-01", "R-SELL-01", "R-PAY-01", "R-VOICE-01"):
+    # R-SELL-01 is Brain v3's superseded wording: the handbook carries the platform spec's
+    # R-SELL-03 instead (28dc4fb5, spec/supersession.json), so it must not come back.
+    for rule in ("R-DISC-01", "R-SELL-03", "R-PAY-01", "R-VOICE-01"):
         assert rule in guide
+    assert "R-SELL-01" not in guide
     assert "3.3 The listening loop" in guide  # the stage guidance for listening
     assert "G1" in guide  # a worked example close to the situation
     assert "Pakistan" in str(first["emergency_numbers"]) or isinstance(
