@@ -23,7 +23,7 @@ it prints no verdict of its own, `relevance` uses these helpers. Limits, stated 
     compared. An idea figure is not counted as a cost when it directly follows a benefit word
     (save, earn, profit, revenue, sales of, loss of) or equals, in the same unit, a figure the
     owner already stated.
-  * a limit text such as 'cannot buy a new feed mill' is read as a verb group plus an object, and
+  * a limit text such as 'cannot buy a new oven' is read as a verb group plus an object, and
     'tried a discount before and it failed' as a repeated failed attempt. Only modal prohibitions
     ('cannot', 'must not', 'unable to', 'do not want to') count; a descriptive 'never' or
     'fails to' is not a prohibition. Only the listed verb groups are known; any other verb
@@ -59,6 +59,7 @@ it prints no verdict of its own, `relevance` uses these helpers. Limits, stated 
 import math
 import re
 from collections.abc import Callable
+from functools import lru_cache
 from typing import NamedTuple
 
 MAGNITUDES = {
@@ -236,6 +237,7 @@ class Amount(NamedTuple):
     unit: str  # "money", or the stem of the word that follows ('staff', 'guest'), or ""
     start: int
     end: int
+    unclear: bool = False  # '10000 each' with no quantity before it
 
 
 _AMOUNT = re.compile(
@@ -280,13 +282,18 @@ _BUY_BEFORE = re.compile(
     r"rent|lease|acquire)\b(?:\s+(?:a|an|the|one|new|another|our|your))*\s*$"
 )
 _AT_BEFORE = re.compile(r"\bat\s*(?:rs\.?\s*)?$")
+_EACH = re.compile(r"^\s*(?:each|apiece|per (?:piece|unit|item))\b")
+_X_BEFORE = re.compile(r"(\d+(?:\.\d+)?)\s*[x×]\s*$")
+_QTY_BEFORE = re.compile(
+    r"(\d+(?:\.\d+)?)\s*(?:x\s*)?(?:[a-z-]+\s+){0,2}(?:at|for|@)\s*(?:rs\.?\s*)?$|(\d+)\s*x\s*$"
+)
 
 
 def _is_plural_noun(word: str) -> bool:
     return len(word) > 3 and word.endswith("s") and not word.endswith(("ss", "us", "is"))
 
 
-def amounts(text: str, context: bool = False) -> list[Amount]:
+def _amounts(text: str, context: bool) -> tuple[Amount, ...]:
     """Quantities in `text`: a number with an optional currency marker, magnitude word, unit word
     and range.
       * a currency marker (Rs, PKR, rupees, $) or 'worth' after it makes it money;
@@ -304,7 +311,7 @@ def amounts(text: str, context: bool = False) -> list[Amount]:
     folded = re.sub(
         rf"between\s+({_NUM}(?:\s?(?:{_MAG}))?)\s+and\s+({_NUM})",
         r"\1 to \2",
-        _unlist((text or "").casefold()),
+        _unlist(collapse(text).casefold()[:_MAX_AMOUNT_TEXT]),
     )
     out: list[Amount] = []
     for m in _AMOUNT.finditer(folded):
@@ -351,8 +358,53 @@ def amounts(text: str, context: bool = False) -> list[Amount]:
             unit = "money"
         else:
             continue
-        out.append(Amount(lo, hi, unit, m.start(), end))
-    return out
+        unclear = False
+        times = (
+            _X_BEFORE.search(folded[max(0, m.start() - 24) : m.start()])
+            if unit == "money"
+            else None
+        )
+        if times:
+            lo, hi = lo * float(times.group(1)), hi * float(times.group(1))
+        elif unit == "money" and _EACH.search(folded[end : end + 24]):
+            found_qty = _QTY_BEFORE.search(folded[max(0, m.start() - 40) : m.start()])
+            qty = found_qty and (found_qty.group(1) or found_qty.group(2))
+            if qty:
+                lo, hi = lo * float(qty), hi * float(qty)
+            else:
+                unclear = True
+        out.append(Amount(lo, hi, unit, m.start(), end, unclear))
+    return tuple(out)
+
+
+_SPELLED = re.compile(
+    r"\b(?:one|two|three|four|five|six|seven|eight|nine|ten|twenty|thirty|forty|fifty|sixty|"
+    r"seventy|eighty|ninety|hundred|do|teen|char|paanch|das|bees|pachas)\s+"
+    r"(?:hundred|thousand|lakh|lac|crore|million|hazar|hazaar)\b",
+    re.IGNORECASE,
+)
+
+
+def spelled_number(text: str) -> bool:
+    """The text writes an amount in words ('five thousand'); such a figure is not read."""
+    return bool(_SPELLED.search(collapse(text)[:MAX_IDEA_TEXT]))
+
+
+def unclear_quantity(text: str) -> bool:
+    """A price per piece ('10000 each') with no quantity before it."""
+    return any(a.unclear for a in amounts(text))
+
+
+def non_latin(text: str) -> bool:
+    """The text has letters in Arabic/Urdu or Devanagari script, which the scorer does not read."""
+    return any(
+        "\u0600" <= ch <= "\u06ff"
+        or "\u0750" <= ch <= "\u077f"
+        or "\u0900" <= ch <= "\u097f"
+        or "\ufb50" <= ch <= "\ufdff"
+        or "\ufe70" <= ch <= "\ufeff"
+        for ch in text or ""
+    )
 
 
 _CEILING_BEFORE = re.compile(
@@ -383,6 +435,8 @@ _BENEFIT_BEFORE = re.compile(
 )
 # selling or charging anywhere earlier in the clause makes the figure income, unless it also buys
 _INCOME_CLAUSE = re.compile(r"\b(?:sell|sells|sold|selling|resell|charge|charges|charging)\b")
+# 'rent out the hall' is letting, not renting: income, never a purchase
+_PHRASAL_OUT = re.compile(r"\b(?:rent|lease|hire|let)s?(?:ed|ing)?\s+out\b")
 _BUY_VERBS = re.compile(
     r"\b(?:buy|buys|buying|purchase|purchasing|invest|investing|order|install|rent|lease|hire|"
     r"pay|paying|spend|spending)\b"
@@ -423,12 +477,12 @@ def _floor_spans(text: str) -> list[tuple[int, int]]:
     return spans
 
 
-def ceilings_of(limit_text: str, kind: str = "") -> list[Ceiling]:
+def _ceilings_of(limit_text: str, kind: str) -> tuple[Ceiling, ...]:
     """The numeric ceilings a limit text states. Each figure the words call a ceiling is one;
     under a budget kind the first MONEY figure is one too when nothing else gave a money ceiling,
     so '2 staff, budget 20000 rupees' compares money, not staff. A clause that states a floor
     ('at least 2 staff') is skipped, the rest of the limit still counts."""
-    text = (limit_text or "").casefold()[:4000]
+    text = collapse(limit_text).casefold()[:MAX_LIMIT_TEXT]
     money_context = kind == "budget" or bool(_MONEY_WORDS.search(text))
     spans = _floor_spans(text)
     found = [
@@ -455,7 +509,7 @@ def ceilings_of(limit_text: str, kind: str = "") -> list[Ceiling]:
         money = [a for a in found if a.unit == "money" and not _income_role(text, a)]
         if money:
             out.append(Ceiling(money[0].hi, "money", False))
-    return out
+    return tuple(out)
 
 
 def _benefit(text: str, found: Amount) -> bool:
@@ -464,7 +518,9 @@ def _benefit(text: str, found: Amount) -> bool:
     if _BENEFIT_BEFORE.search(text[max(0, found.start - 40) : found.start]):
         return True
     clause = _clause_before(text, found.start)
-    return bool(_INCOME_CLAUSE.search(clause) and not _BUY_VERBS.search(clause))
+    plain = _PHRASAL_OUT.sub(" ", clause)
+    income = _INCOME_CLAUSE.search(clause) or _PHRASAL_OUT.search(clause)
+    return bool(income and not _BUY_VERBS.search(plain))
 
 
 def _income_role(text: str, found: Amount) -> bool:
@@ -513,7 +569,35 @@ _FAMILIES = [
     {"use", "accept"},
 ]
 # Roman Urdu verb roots, added to a group only when the case language is roman_ur
-_RU_EXTRA = {"buy": {"kharid"}, "change": {"badal"}, "close": {"band"}, "sell": {"bech"}}
+_RU_EXTRA = {
+    "buy": {"kharid", "kharido", "kharidna", "kharidne", "kharidein", "kharidiye", "kharidlo",
+            "khareed", "khareedna", "khareedein", "khareedo"},
+    "change": {"badal", "badalna", "badlein", "badlo"},
+    "close": {"band"},
+    "sell": {"bech", "bechna", "bechein", "becho", "bechiye"},
+    "hire": {"rakh", "rakhna", "rakhne", "rakhein", "rakho", "rakhiye", "rakhen"},
+    "use": {"le", "lena", "lein", "lo", "lijiye", "leta", "lete", "liya", "len"},
+    "give": {"de", "dena", "dein", "do", "dijiye", "dete", "diya", "den"},
+}  # fmt: skip
+# Roman Urdu verbs the scorer knows; a limit with any other verb is 'unknown', never scored
+RU_RULE_VERBS = {"le", "lo", "de", "do", "len", "den"}
+_RU_INSTALL = {"install", "lagana", "lagao", "lagayein", "lagaye", "lagaiye", "lagane", "lagayen"}
+# 'run a discount week' is offering one; only a rule whose own verb is give/offer/grant adds these
+_OFFER_ALSO = {"run", "start", "launch", "host", "promote", "announce"}
+# 'cannot afford equipment' covers the things that are equipment
+_HYPERNYMS = {
+    "equipment": {"oven", "fridge", "freezer", "machine", "mixer", "grinder", "printer", "scanner",
+                  "generator", "tractor", "scale", "camera", "tool", "tablet", "computer", "laptop",
+                  "mill", "van", "truck", "vehicle", "pos"},
+    "software": {"app", "system", "platform", "tool", "program", "crm", "website"},
+    "staff": {"employee", "worker", "helper", "clerk", "cleaner", "cook", "driver", "assistant",
+              "cashier", "receptionist", "manager", "rider", "guard", "accountant", "waiter"},
+    "machinery": {"machine", "mill", "tractor", "mixer", "grinder", "oven"},
+}  # fmt: skip
+# an idea that does one of these to the goal's subject breaks 'cannot afford X' / 'cannot lose X'
+_GOAL_ACTIONS = {"cause", "create", "increase", "allow", "accept", "risk", "invite", "lose",
+                 "miss", "waste", "delay", "harm", "trigger"}  # fmt: skip
+_NEGATORS = {"not", "dont", "never", "avoid", "avoiding", "without", "cannot", "wont"}
 _ALTERNATIVES = {"buy": {"rent", "lease", "borrow", "share"}}
 # verbs that are also nouns: in a noun position ('a fire alarm', 'each stop') they are not the verb
 _HOMOGRAPHS = {"hire", "hires", "band", "bands", "fire", "fires", "cut", "cuts", "raise", "raises",
@@ -538,13 +622,25 @@ _FAMILY_CACHE: dict[str | None, tuple[list[set[str]], dict[str, frozenset[str]]]
 
 
 def drop_noun_homographs(text: str) -> str:
-    """The idea text without a verb-looking word that sits in a noun position: after a determiner
+    """The idea text without a verb that is negated ('do not buy', 'avoid losing'), without
+    'hire out' and its kind, and without a verb-looking word that sits in a noun position: after a
+    determiner
     or a preposition ('a fire alarm', 'each stop', 'a new hire'), before a noun it modifies
     ('fire extinguishers', 'fire safety'), or in 'close to'. A verb rule is then not fired by it."""
-    words = [w for w in re.split(r"[\s-]+", text or "") if w]
+    words = [w for w in re.split(r"[\s-]+", collapse(text)[:MAX_IDEA_TEXT]) if w]
     bare = [re.sub(r"[^a-z]", "", w.casefold()) for w in words]
     keep = []
     for i, w in enumerate(words):
+        prev1 = bare[i - 1] if i else ""
+        prev2 = bare[i - 2] if i > 1 else ""
+        if prev1 in _NEGATORS or (prev1 == "of" and prev2 == "instead"):
+            continue  # 'do not buy', 'avoid losing', 'never causes': the verb is negated
+        if (
+            bare[i] in {"hire", "rent", "lease", "let"}
+            and i + 1 < len(words)
+            and bare[i + 1] == "out"
+        ):
+            continue  # 'hire out the room' is letting, not hiring
         if bare[i] in _HOMOGRAPHS:
             prev = bare[i - 1] if i else ""
             nxt = bare[i + 1] if i + 1 < len(words) else ""
@@ -569,6 +665,8 @@ def _family_stems(language: str | None) -> tuple[list[set[str]], dict[str, froze
                 if key in g:
                     words |= more
             groups.append({stem_ascii(w, language, True) for w in words})
+        if language == "roman_ur":
+            groups.append({stem_ascii(w, language, True) for w in _RU_INSTALL})
         alts = {
             stem_ascii(k, language, True): frozenset(stem_ascii(w, language, True) for w in v)
             for k, v in _ALTERNATIVES.items()
@@ -583,12 +681,9 @@ _NEG = re.compile(
     r"(?:do not|don't|dont|will not|won't)\s+(?:want|wish|intend|plan)\s+to)\s+"
     r"(?:(?:afford|be able|be allowed)\s+to\s+)?(?P<verb>[a-z']+)\s*(?P<obj>[^,;.:!?()]*)"
 )
-_NEG_PASSIVE = re.compile(
-    r"(?P<obj>[^,;.:!?()]+?)\s+(?:cannot|can't|can not|cant|must not|may not)\s+be\s+"
-    r"(?P<verb>[a-z]+)"
-)
-_NEG_RU_TAIL = re.compile(r"\s(?:nahi|nahin)\s+(?:kar\s+)?sakt[a-z]*")
-_NEG_RU_VERB = re.compile(r"\s(?:nahi|nahin)\s+(?P<verb>badal|kharid|bech|band|hata)[a-z]*\s+sakt")
+_PASSIVE_MARKERS = (" cannot be ", " can't be ", " can not be ", " must not be ", " may not be ")
+_NEG_RU_SPLIT = re.compile(r" (?:nahi|nahin) ")
+_RU_SAKT = re.compile(r"^(?P<mid>(?:[a-z]+ ){0,2})sakt[a-z]*")
 _CUT = re.compile(r"\b(?:because|as|so|since|but|when|while|if|taake|kyunke)\b")
 _TIME = re.compile(
     r"\b(?:this|next|last|is|iss|agle) (?:year|month|week|season|quarter|saal|mahine)\b"
@@ -641,16 +736,28 @@ _PURCHASABLE = {"money", "cash", "equipment", "machine", "machinery", "generator
                 "fridge", "camera", "staff", "employee", "worker", "helper", "clerk", "assistant",
                 "manager", "consultant", "course", "training", "license", "ads", "advertising",
                 "stock", "inventory", "hall", "shop", "land", "furniture", "building",
-                "premises"}  # fmt: skip
-_MAX_LIMIT = 4000  # characters of a limit text read for rules; keeps parsing linear
+                "premises", "loan", "credit", "debt", "pos"}  # fmt: skip
+# Every text is collapsed to single spaces first and read only up to these lengths; a longer
+# limit or idea is reported as 'unknown' with a flag, never scored. Keeps all parsing linear.
+MAX_LIMIT_TEXT = 600
+MAX_IDEA_TEXT = 1500
+_MAX_AMOUNT_TEXT = 4000  # owner text read for stated figures
+
+
+def collapse(text: str | None) -> str:
+    """Whitespace runs become one space (also removes the blow-up of regexes on long runs)."""
+    return " ".join((text or "").split())
 
 
 class Rule(NamedTuple):
-    kind: str  # "neg" (cannot VERB OBJECT) or "tried" (OBJECT failed before)
+    kind: str  # "neg" (cannot VERB OBJECT), "goal" (cannot lose/afford X) or "tried"
     verbs: frozenset[str]  # full stems of the verb group; empty for "tried"
     alternatives: frozenset[str]  # full stems of verbs that do not break the limit
     objects: frozenset[str]  # full stems of the object's content words
     need: int  # how many object stems an idea must contain
+    aliases: frozenset[str] = (
+        frozenset()
+    )  # things that count as the object ('oven' for 'equipment')
 
 
 def _need(count: int) -> int:
@@ -669,58 +776,99 @@ def _object_stems(
     return frozenset(stems_of(cut, language))
 
 
-def parse_rules(limit_text: str, language: str | None, stems_of: StemsOf) -> list[Rule]:
-    """Verb and tried rules read from a limit's own text. `stems_of(text, language)` must return
-    FULL stems, so a rule and an idea are always compared in the strict space.
+def _last_clause(text: str) -> str:
+    return re.split(r"[,;.:!?()]", text)[-1][-160:]
 
-    Read: 'cannot|must not|unable to VERB OBJECT' (also with the curly apostrophe, and 'cannot
-    afford OBJECT' as buy or spend only when OBJECT is something a business buys; 'cannot afford
-    downtime' and 'cannot lose customers' are stated goals and make no rule),
-    'OBJECT cannot be VERBed', 'we do not want to VERB OBJECT',
-    Roman Urdu 'OBJECT VERB nahi kar sakte', and a tried-and-failed text. Not handled: a
-    prohibition without a modal ('no hiring'), 'never VERB', and a verb whose object is a figure
-    (that is compared as a number)."""
-    text = (limit_text or "").casefold().replace("’", "'").replace("‘", "'")
-    text = text[:_MAX_LIMIT]
+
+def _parse_rules(limit_text: str, language: str | None, stems_of: StemsOf) -> tuple[Rule, ...]:
+    """Verb, goal and tried rules read from a limit's own text. `stems_of(text, language)` must
+    return FULL stems, so a rule and an idea are always compared in the strict space. A limit
+    longer than `MAX_LIMIT_TEXT` after whitespace is collapsed makes no rule (the caller reports it
+    as truncated).
+
+    Read: 'cannot|must not|unable to VERB OBJECT' (also with the curly apostrophe), 'cannot afford
+    OBJECT' as buy, spend, hire or borrow when OBJECT is something a business buys (equipment,
+    software, staff, a loan ...), 'OBJECT cannot be VERBed', 'we do not want to VERB OBJECT',
+    Roman Urdu 'OBJECT VERB nahi kar sakte' and 'OBJECT nahi VERB sakte' for the listed Roman Urdu
+    verbs only, and a tried-and-failed text. A stated goal ('cannot afford downtime', 'cannot lose
+    customers') is a goal rule: an idea breaks it only with a verb such as cause, create, lose or
+    risk on that subject, and not when the verb is negated ('avoid losing'). Not handled: a
+    prohibition without a modal ('no hiring', 'never open', "won't change"), a verb whose object
+    is a figure or a time ('cannot work after 6pm', compared as a number or not at all), and
+    Roman Urdu verbs outside the list; a limit with no rule, ceiling or blocks is 'unknown'."""
+    text = collapse(limit_text).casefold().replace("\u2019", "'").replace("\u2018", "'")
     rules: list[Rule] = []
+    if len(text) > MAX_LIMIT_TEXT:
+        return ()
     seen: set[tuple[str, str]] = set()
     groups, alts = _family_stems(language)
     afford = stem_ascii("afford", language, True)
-    money_verbs = {stem_ascii(w, language, True) for w in ("buy", "spend", "hire")}
+    buyish = {stem_ascii(w, language, True) for w in ("buy", "spend", "hire")}
     goal = {stem_ascii(w, language, True) for w in _GOAL_VERBS}
     purchasable = {stem_ascii(w, language, True) for w in _PURCHASABLE}
+    give = {stem_ascii(w, language, True) for w in ("give", "offer", "grant")}
+    offer_also = {stem_ascii(w, language, True) for w in _OFFER_ALSO}
+    actions = {stem_ascii(w, language, True) for w in _GOAL_ACTIONS}
+    ru_known = set().union(*groups) if language == "roman_ur" else set()
+    hyper = {
+        stem_ascii(k, language, True): {stem_ascii(v, language, True) for v in vs}
+        for k, vs in _HYPERNYMS.items()
+    }
 
-    def add_neg(verb: str, obj: str, last: bool = False) -> None:
+    def add_neg(verb: str, obj: str, last: bool = False, ru: bool = False) -> None:
         if verb in _NOT_A_VERB:
             return
         stem = stem_ascii(verb, language, True)
+        if ru and stem not in ru_known:
+            return  # a Roman Urdu verb the scorer does not know: the limit stays 'unknown'
         objects = _object_stems(obj, language, stems_of, last)
-        if stem in goal and not (stem == afford and objects & purchasable):
-            return  # a stated goal ('cannot afford downtime'), not a prohibition
-        if stem == afford:
-            group = {stem}.union(*(g for g in groups if g & money_verbs))
-        else:
-            group = next((g for g in groups if stem in g), {stem})
-        alt = frozenset().union(*(alts.get(s, frozenset()) for s in group))
         if any(any(ch.isdigit() for ch in o) for o in objects):
             return  # a figure in the limit is compared as a number, not as a word
+        aliases = frozenset().union(*(hyper.get(o, set()) for o in objects))
+        if stem in goal and not (stem == afford and objects & (purchasable | set(hyper))):
+            if not objects:
+                return
+            verbs = frozenset(actions | ({stem} - {afford}))
+            key = ("goal", ",".join(sorted(objects)))
+            if key not in seen:
+                seen.add(key)
+                rules.append(
+                    Rule("goal", verbs, frozenset(), objects, _need(len(objects)), aliases)
+                )
+            return
+        if stem == afford:
+            group = {stem}.union(*(g for g in groups if g & buyish))
+            group |= {stem_ascii("take", language, True), stem_ascii("borrow", language, True)}
+        else:
+            group = next((g for g in groups if stem in g), {stem})
+            if group & give:
+                group = group | offer_also
+        alt = frozenset().union(*(alts.get(x, frozenset()) for x in group))
         key = (stem, ",".join(sorted(objects)))
         if key not in seen:
             seen.add(key)
-            rules.append(Rule("neg", frozenset(group), alt, objects, _need(len(objects))))
+            rules.append(Rule("neg", frozenset(group), alt, objects, _need(len(objects)), aliases))
 
     for m in _NEG.finditer(text):
         add_neg(m.group("verb"), m.group("obj"))
-    for m in _NEG_PASSIVE.finditer(text):
-        add_neg(m.group("verb"), m.group("obj"), last=True)
+    for marker in _PASSIVE_MARKERS:
+        at = text.find(marker)
+        while at != -1:
+            tail = text[at + len(marker) :].split(" ", 1)[0]
+            add_neg(re.sub(r"[^a-z]", "", tail), _last_clause(text[:at]), last=True)
+            at = text.find(marker, at + 1)
     if language == "roman_ur":
-        for m in _NEG_RU_TAIL.finditer(text):
-            head = re.split(r"[,;.:!?()]", text[: m.start()])[-1][-160:].split()
-            if len(head) >= 2:
-                add_neg(head[-1], " ".join(head[:-1]))
-        for m in _NEG_RU_VERB.finditer(text):
-            head = re.split(r"[,;.:!?()]", text[: m.start()])[-1][-160:]
-            add_neg(m.group("verb"), head)
+        pieces = _NEG_RU_SPLIT.split(text)
+        for i in range(len(pieces) - 1):
+            head = _last_clause(pieces[i]).split()
+            sakt = _RU_SAKT.match(pieces[i + 1])
+            if not sakt:
+                continue
+            mid = sakt.group("mid").split()
+            if len(mid) == 1 and mid[0] != "kar":  # 'staff nahi rakh sakte': verb after nahi
+                add_neg(mid[0], " ".join(head), ru=True)
+            elif len(mid) <= 1 and len(head) >= 2:  # 'discount de nahi sakte', '... kar sakte'
+                add_neg(head[-1], " ".join(head[:-1]), ru=True)
     fail = _FAIL_ALONE.search(text) or (_TRIED_MARK.search(text) and _FAIL_TRIED.search(text))
     if fail:
         before = text[: fail.start()]
@@ -732,18 +880,48 @@ def parse_rules(limit_text: str, language: str | None, stems_of: StemsOf) -> lis
         objects = _object_stems(before, language, stems_of) - {"tried", "try"}
         if objects:
             rules.append(Rule("tried", frozenset(), frozenset(), objects, _need(len(objects))))
-    return rules
+    return tuple(rules)
 
 
 def rule_hit(rule: Rule, idea: set[str], idea_verbs: set[str] | None = None) -> bool:
     """The idea does what the rule forbids: the verb group (for 'cannot') and enough of the
-    object. A 'cannot VERB' with no object words is broken by the verb alone. `idea` is the idea's
-    FULL stem set; `idea_verbs` is the same without nouns that look like verbs ('a fire alarm')."""
-    if rule.kind == "neg" and not (rule.verbs & (idea if idea_verbs is None else idea_verbs)):
+    object, or an alias of it ('oven' for 'equipment'). A 'cannot VERB' with no object words is
+    broken by the verb alone. A goal rule needs a goal-breaking verb that is not itself the
+    subject ('waste' in 'reduce waste'). `idea` is the idea's FULL stem set; `idea_verbs` is the
+    same without negated verbs and nouns that look like verbs ('a fire alarm')."""
+    verbs = idea if idea_verbs is None else idea_verbs
+    if rule.kind == "goal":
+        if not ((rule.verbs & verbs) - rule.objects):
+            return False
+    elif rule.kind == "neg" and not (rule.verbs & verbs):
         return False
-    return len(rule.objects & idea) >= rule.need
+    return len(rule.objects & idea) >= rule.need or bool(rule.aliases & idea)
 
 
 def rule_alternative(rule: Rule, idea: set[str]) -> bool:
     """The idea uses a milder verb the limit does not cover ('rent' against 'cannot buy')."""
     return rule.kind == "neg" and bool(rule.alternatives & idea) and not (rule.verbs & idea)
+
+
+# The scorer reads the same limit and idea text several times per candidate; the readers are
+# pure, so their results are kept (and handed out as fresh lists).
+_amounts_cached = lru_cache(maxsize=2048)(_amounts)
+_ceilings_cached = lru_cache(maxsize=1024)(_ceilings_of)
+_rules_cached = lru_cache(maxsize=1024)(_parse_rules)
+
+
+def amounts(text: str, context: bool = False) -> list[Amount]:
+    return list(_amounts_cached(text, context))
+
+
+def ceilings_of(limit_text: str, kind: str = "") -> list[Ceiling]:
+    return list(_ceilings_cached(limit_text, kind))
+
+
+def parse_rules(limit_text: str, language: str | None, stems_of: StemsOf) -> list[Rule]:
+    return list(_rules_cached(limit_text, language, stems_of))
+
+
+amounts.__doc__ = _amounts.__doc__
+ceilings_of.__doc__ = _ceilings_of.__doc__
+parse_rules.__doc__ = _parse_rules.__doc__

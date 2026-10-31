@@ -33,10 +33,10 @@ def pct(value: float | None) -> str:
 
 def line(name: str, agg: dict[str, Any]) -> str:
     if not agg["measured"]:
-        return f"| {name} | {agg['cases']} | not yet measured | | | |"
+        return f"| {name} | {agg['cases']} | not yet measured | | | | |"
     return (
         f"| {name} | {agg['cases']} | {pct(agg['accuracy'])} | {agg['false_relevant']} | "
-        f"{agg['missed_relevant']} | {agg['hard_misses']} |"
+        f"{agg['missed_relevant']} | {agg['hard_misses']} | {agg.get('unknown', 0)} |"
     )
 
 
@@ -89,8 +89,9 @@ def build(
     ]
     head = (
         "| group | cases | verdicts matching the agent-drafted labels (not a score) "
-        "| relevant by mistake | relevant missed | limit breaks missed |\n"
-        "|---|---|---|---|---|---|"
+        "| relevant by mistake | relevant missed | limit breaks missed "
+        "| not read (unknown, counted apart) |\n"
+        "|---|---|---|---|---|---|---|"
     )
     totals: dict[str, Any] = {}
     for title, key in (

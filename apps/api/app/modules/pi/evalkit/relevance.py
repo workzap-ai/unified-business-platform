@@ -5,8 +5,10 @@ gate. The 55% agreement (11 of 20) with an independent grader on the borderline 
 on the earlier scorer (exact tokens after crude stemming, no numbers, no negation). The current
 scorer matches stemmed words, folds magnitude figures, compares numeric ceilings and reads modal
 negation ('cannot buy X'); its current agreement with the agent-drafted labels is printed beside
-this note. Negation inside an idea, spelled-out numbers and several languages are not
-understood; limit keywords are fixture data.
+this note. Text in Urdu, Hindi and Arabic script, Roman Urdu verbs outside the supported list, a
+limit it cannot read and a text that is too long are reported as 'unknown' and counted apart,
+never scored as relevant or irrelevant. Negation inside an idea, spelled-out numbers and several
+languages are not understood; limit keywords are fixture data.
 
 Known limits, stated so nobody reads more into a verdict than it holds: matching is by stem
 (`relevance_match`: English plural, -ing, -ed, -ly; Roman Urdu endings only when the case language
@@ -45,14 +47,20 @@ from app.modules.pi.evalkit import access_log, scorers, splits
 from app.modules.pi.evalkit import relevance_match as match
 
 VERDICTS = ("relevant", "irrelevant", "generic", "violates_constraint", "restates_owner")
+# The scorer's own extra output, never a label: a limit it cannot read (needs a human), or a text
+# it will not score (too long, in a script it does not read, a figure written in words).
+UNKNOWN = "unknown"
 DISCLAIMER = (
     "Not a quality gate and not a learning reward; an offline measurement, connected to no live "
     "gate. The 55% agreement (11 of 20) with an independent grader on the borderline set was "
     "measured on the earlier scorer (exact tokens after crude stemming, no numbers, no negation). "
     "The current scorer matches stemmed words, folds magnitude figures, compares numeric ceilings "
     "and reads modal negation ('cannot buy X'); its current agreement with the agent-drafted "
-    "labels is printed beside this note. Negation inside an idea, spelled-out numbers and "
-    "several languages are not understood; limit keywords are fixture data."
+    "labels is printed beside this note. Text in Urdu, Hindi and Arabic script, Roman Urdu "
+    "verbs outside the supported list, a limit it cannot read and a text that is too long are "
+    "reported as 'unknown' and counted apart, never scored as relevant or irrelevant. Negation "
+    "inside an idea, spelled-out numbers and several languages are not understood; limit "
+    "keywords are fixture data."
 )
 LINK_MIN = (
     2  # shared content words (problem plus facts) an idea needs, one of them from the problem
@@ -181,7 +189,9 @@ def _full_stems(text: str, language: str | None) -> set[str]:
     return {
         _stem(t, language, True)
         for t in tokens(match.fold_magnitudes(text))
-        if _keep(t) or t in match.RULE_VERBS
+        if _keep(t)
+        or t in match.RULE_VERBS
+        or (language == "roman_ur" and t in match.RU_RULE_VERBS)
     }
 
 
@@ -190,7 +200,7 @@ def _soft(token: str) -> str:
 
 
 def _vocab(
-    brief: dict[str, Any], problem: str | None, language: str | None = None
+    brief: dict[str, Any], problem: str | None, language: str | None = None, full: bool = True
 ) -> tuple[set[str], set[str]]:
     """(the owner's own words about the problem, the other stated facts). The objects of a
     confirmed 'cannot VERB OBJECT' limit count as stated facts: the owner raised them."""
@@ -199,16 +209,16 @@ def _vocab(
     owner: set[str] = set()
     facts: set[str] = set()
     for p in chosen:
-        owner |= stems(" ".join([p.get("title", ""), *p.get("user_words", [])]), language)
-        facts |= stems(" ".join([*p.get("facts", []), *p.get("figures", [])]), language)
+        owner |= stems(" ".join([p.get("title", ""), *p.get("user_words", [])]), language, full)
+        facts |= stems(" ".join([*p.get("facts", []), *p.get("figures", [])]), language, full)
         for limit in p.get("constraints") or []:
             if limit.get("status", "confirmed") == "confirmed":
                 # the object of a confirmed 'cannot VERB OBJECT' limit is something the owner
-                # stated, so an idea that reuses it ('rent a feed mill') reuses a stated fact
+                # stated, so an idea that reuses it ('rent a barn') reuses a stated fact
                 for rule in match.parse_rules(str(limit.get("text", "")), language, _full_stems):
-                    if rule.kind == "neg":
-                        facts |= {_soft(o) for o in rule.objects}
-    facts |= stems(" ".join([*brief.get("roles", []), *brief.get("systems", [])]), language)
+                    if rule.kind in ("neg", "goal"):
+                        facts |= set(rule.objects) if full else {_soft(o) for o in rule.objects}
+    facts |= stems(" ".join([*brief.get("roles", []), *brief.get("systems", [])]), language, full)
     return owner, facts - owner
 
 
@@ -235,6 +245,7 @@ def violated(
     'tried X before and it failed' text; (4) a figure above a numeric ceiling in the limit's text.
     All word matching here is in the full stem space of the idea's raw `text` (never the
     five-letter prefix); `idea`, the soft stems, is used only when no text is given."""
+    text = match.collapse(text)[: match.MAX_IDEA_TEXT]
     full = _full_stems(text, language) if text else idea
     verbs = _full_stems(match.drop_noun_homographs(text), language) if text else idea
     said = _said_amounts(brief, owner_text)
@@ -243,7 +254,11 @@ def violated(
             if limit.get("status", "confirmed") != "confirmed":
                 continue
             reason = str(limit.get("text", ""))
-            rules = match.parse_rules(reason, language, _full_stems)
+            if len(match.collapse(reason)) > match.MAX_LIMIT_TEXT:
+                reason_cut = True  # too long to read: blocks still apply, nothing else does
+            else:
+                reason_cut = False
+            rules = [] if reason_cut else match.parse_rules(reason, language, _full_stems)
             if any(match.rule_hit(r, full, verbs) for r in rules):
                 return reason
             for phrase in limit.get("blocks") or []:
@@ -256,10 +271,55 @@ def violated(
                     ]
                     if not own:
                         return reason
+            if reason_cut:
+                continue
             for ceiling in match.ceilings_of(reason, str(limit.get("kind", ""))):
                 if match.over_ceiling(text, ceiling, said):
                     return reason
     return None
+
+
+def _limit_status(limit: dict[str, Any], language: str | None) -> tuple[str | None, bool]:
+    """(reason the limit cannot be read, relies on rules or ceilings). A confirmed limit is
+    understood when it has `blocks` (fixture words), a rule, or a numeric ceiling; otherwise it
+    needs a human."""
+    reason = str(limit.get("text", ""))
+    if len(match.collapse(reason)) > match.MAX_LIMIT_TEXT:
+        return "limit_text_truncated", False
+    rules = match.parse_rules(reason, language, _full_stems)
+    ceilings = match.ceilings_of(reason, str(limit.get("kind", "")))
+    if rules or ceilings:
+        return None, True
+    return (None, False) if limit.get("blocks") else ("limit_not_understood", False)
+
+
+def unknown_reason(brief: dict[str, Any], text: str, language: str | None = None) -> str | None:
+    """Why the scorer will not call this idea relevant or irrelevant, or None. A confirmed limit
+    it cannot read (a kind it has no rule for, a Roman Urdu verb outside its list, any limit in
+    Urdu, Hindi or Arabic script without `blocks`), a text it will not read (too long, in another
+    script while a limit is read from rules or numbers, a figure in words, a price each with no
+    quantity). Numbers only: this is never an acceptance verdict."""
+    if len(match.collapse(text)) > match.MAX_IDEA_TEXT:
+        return "text_truncated"
+    found: str | None = None
+    for problem in brief.get("problems") or []:
+        for limit in problem.get("constraints") or []:
+            if limit.get("status", "confirmed") != "confirmed":
+                continue
+            status, relies = _limit_status(limit, language)
+            if status == "limit_text_truncated":
+                return status
+            if status and not found:
+                found = status
+            if relies and not found:
+                ceilings = match.ceilings_of(str(limit.get("text", "")), str(limit.get("kind", "")))
+                if match.non_latin(text):
+                    found = "script_not_read"
+                elif ceilings and match.spelled_number(text):
+                    found = "spelled_number"
+                elif ceilings and match.unclear_quantity(text):
+                    found = "quantity_unclear"
+    return found
 
 
 def _generic(language: str | None, idea: set[str]) -> bool:
@@ -278,29 +338,48 @@ def score_candidate(
     owner_text: str = "",
     language: str | None = None,
 ) -> dict[str, Any]:
-    idea = stems(text, language)
-    owner, facts = _vocab(brief, problem, language)
+    """One verdict from the text alone. `unknown` is returned instead of `relevant` or
+    `irrelevant` when `unknown_reason` says the scorer cannot read a stated limit or the text;
+    a broken limit, a restatement and a generic idea keep their verdicts."""
+    flags = {"limit_text_truncated": False, "text_truncated": False}
+    why = unknown_reason(brief, text, language)
+    if why == "text_truncated":
+        flags["text_truncated"] = True
+        return {
+            "verdict": UNKNOWN,
+            "problem_link": 0,
+            "fact_reuse": 0,
+            "violated": None,
+            "restates": False,
+            "unknown_reason": why,
+            **flags,
+        }
+    flags["limit_text_truncated"] = why == "limit_text_truncated"
+    idea = stems(text, language, True)
+    owner, facts = _vocab(brief, problem, language, True)
     link = len(idea & owner)
     reuse = len(idea & facts)
     broken = violated(brief, idea, language, text, owner_text)
-    said = owner | facts | stems(owner_text, language)
+    said = owner | facts | stems(owner_text, language, True)
     repeats = len(idea) >= RESTATE_MIN_WORDS and len(idea & said) / len(idea) >= RESTATE_RATIO
     if broken is not None:
         verdict = "violates_constraint"
     elif repeats:
         verdict = "restates_owner"
     elif link >= 1 and link + reuse >= LINK_MIN:
-        verdict = "relevant"
-    elif _generic(language, idea):
+        verdict = UNKNOWN if why else "relevant"
+    elif _generic(language, stems(text, language)):
         verdict = "generic"
     else:
-        verdict = "irrelevant"
+        verdict = UNKNOWN if why else "irrelevant"
     return {
         "verdict": verdict,
         "problem_link": link,
         "fact_reuse": reuse,
         "violated": broken,
         "restates": repeats,
+        "unknown_reason": why if verdict == UNKNOWN else None,
+        **flags,
     }
 
 
@@ -367,6 +446,7 @@ def score_case(
             for r in rows
             if r["expected"] == "violates_constraint" and r["got"] != "violates_constraint"
         ),
+        "unknown": sum(1 for r in rows if r["got"] == UNKNOWN),
         "results": rows,
     }
 
@@ -383,4 +463,5 @@ def aggregate(scores: list[dict[str, Any]]) -> dict[str, Any]:
         "false_relevant": sum(s["false_relevant"] for s in scores),
         "missed_relevant": sum(s["missed_relevant"] for s in scores),
         "hard_misses": sum(s["hard_misses"] for s in scores),
+        "unknown": sum(s.get("unknown", 0) for s in scores),
     }

@@ -715,7 +715,8 @@ def test_the_standing_note_and_the_borderline_section_carry_no_verdict_wording()
     ],
 )
 def test_a_stated_goal_is_not_a_prohibition_on_ideas_that_name_it(text, good) -> None:
-    assert relevance_match.parse_rules(text, None, relevance._full_stems) == [], text
+    rules = relevance_match.parse_rules(text, None, relevance._full_stems)
+    assert all(r.kind == "goal" for r in rules), text
     assert verdict([limit(text, kind="cannot_change")], good) != "violates_constraint"
 
 
@@ -915,29 +916,6 @@ def test_the_budget_fallback_never_turns_income_into_a_ceiling() -> None:
     assert [c.value for c in sales] == [20000.0]
 
 
-def test_long_input_under_the_cap_runs_every_path_quickly() -> None:
-    import time
-
-    limits = {
-        "ru": "ek booking kharid nahi kar sakte " * 110,
-        "tried": "we tried a discount " + ("before and " * 300) + "it failed",
-        "mix": ("kharid nahi kar sakt " * 60) + ("did not work " * 60),
-        "floor": ("at least 2 staff and " * 100) + "cannot spend more than 20000 rupees",
-        "numbers": "budget under 20000 rupees " + ("1," * 1500),
-    }
-    for name, text in limits.items():
-        assert len(text) < relevance_match._MAX_LIMIT, name
-        started = time.perf_counter()
-        c = [limit(text, kind="cannot_change")]
-        relevance.score_candidate(brief(c), "Buy a system for 50000 rupees", language="roman_ur")
-        relevance.score_candidate(brief(c), "x " * 30000, language="roman_ur")
-        assert time.perf_counter() - started < 3, name
-    rules = relevance_match.parse_rules(limits["tried"], None, relevance._full_stems)
-    assert any(r.kind == "tried" for r in rules)
-    rules = relevance_match.parse_rules(limits["ru"], "roman_ur", relevance._full_stems)
-    assert any(r.kind == "neg" for r in rules)
-
-
 TOOL_BANNED = re.compile(
     r"\b(?:pass|passed|passes|fail|failed|fails|accepted|accept|threshold met|meets|"
     r"does not meet|eligible|acceptance test|not evaluated)\b|85%",
@@ -961,3 +939,419 @@ def test_the_report_output_carries_no_verdict_wording_for_the_tool_itself() -> N
         assert not TOOL_BANNED.search(source), TOOL_BANNED.search(source).group()
     assert "Current scorer, Development borderline set:" in text
     assert "earlier scorer" in text
+
+
+# ------------------------------------------------------------- fifth round: fail safe
+
+
+def full(limit_text, idea, kind="cannot_change", language=None):
+    return relevance.score_candidate(brief([limit(limit_text, kind=kind)]), idea, language=language)
+
+
+@pytest.mark.parametrize(
+    "text,kind,idea",
+    [
+        ("we dont have money to buy a van", "budget", "Buy a van"),
+        ("we won't change the menu", "cannot_change", "Change the menu"),
+        ("never open on Sundays", "cannot_change", "Open on Sundays"),
+        ("we cannot work after 6pm", "deadline", "Add an evening shift"),
+        ("we cannot work after 6pm", "deadline", "Add a morning shift"),
+        ("we have only 2 staff", "staff", "Hire 3 more staff"),
+        ("we have only 2 staff", "staff", "Train your 2 staff"),
+        ("deadline is Friday", "deadline", "Finish by Monday"),
+    ],
+)
+def test_a_limit_the_scorer_cannot_read_makes_the_verdict_unknown(text, kind, idea) -> None:
+    got = full(text, idea, kind)
+    assert got["verdict"] == "unknown", (text, idea, got["verdict"])
+    assert got["unknown_reason"] == "limit_not_understood"
+    assert relevance.score_candidate(brief([limit(text, kind=kind)]), idea)["verdict"] not in (
+        "relevant",
+        "irrelevant",
+    )
+
+
+def test_a_limit_with_blocks_is_still_understood_and_an_assumed_one_is_ignored() -> None:
+    c = [limit("one receptionist", blocks=["hire"], kind="staff")]
+    assert verdict(c, "Train the receptionist on a shared sheet") != "unknown"
+    soft = [limit("we have only 2 staff", kind="staff", status="assumed")]
+    assert verdict(soft, "Train your staff on the sheet") != "unknown"
+
+
+URDU_LIMIT = "بجٹ 20000 سے زیادہ نہیں"
+URDU_IDEA = "نیا سسٹم 50000 روپے میں خریدیں"
+HINDI_LIMIT = "हम नया मिल नहीं खरीद सकते"
+ARABIC_LIMIT = "لا نستطيع شراء مطحنة جديدة"
+
+
+@pytest.mark.parametrize("language", ["ur", None, "hi", "ar"])
+@pytest.mark.parametrize(
+    "text,idea",
+    [
+        (URDU_LIMIT, URDU_IDEA),
+        (HINDI_LIMIT, "नया मिल खरीदें"),
+        (ARABIC_LIMIT, "اشتر مطحنة جديدة"),
+    ],
+)
+def test_a_limit_in_urdu_hindi_or_arabic_script_is_unknown(text, idea, language) -> None:
+    got = full(text, idea, "budget", language)
+    assert got["verdict"] == "unknown"
+    # a budget kind with a figure in it is read as a ceiling, but the idea's script is not read
+    assert got["unknown_reason"] in ("limit_not_understood", "script_not_read")
+
+
+def test_an_idea_in_another_script_is_unknown_when_the_limit_is_read_from_words_or_numbers() -> (
+    None
+):
+    got = full("cannot spend more than 20000 rupees", URDU_IDEA, "budget", "ur")
+    assert got["verdict"] == "unknown" and got["unknown_reason"] == "script_not_read"
+    c = [limit("one receptionist", blocks=["hire"], kind="staff")]
+    got = relevance.score_candidate(brief(c), URDU_IDEA, language="ur")
+    assert got["verdict"] != "unknown", "a limit given as fixture blocks still works in any script"
+
+
+def test_roman_urdu_under_a_unread_limit_in_the_scorers_own_example_is_unknown_not_relevant() -> (
+    None
+):
+    b = brief([limit("hum staff nahi rakh sakte", kind="staff")], words=("late orders",))
+    got = relevance.score_candidate(b, "naya staff rakhein late orders ke liye")
+    assert got["verdict"] == "unknown"
+
+
+@pytest.mark.parametrize(
+    "text,bad,good",
+    [
+        (
+            "hum staff nahi rakh sakte",
+            "naya staff rakhein late orders ke liye",
+            "staff ko train karo",
+        ),
+        ("hum cash nahi le sakte", "cash mein payment lein", "card se payment lein"),
+        ("hum discount nahi de sakte", "regular grahak ko discount dein", "grahak ko call karein"),
+        (
+            "hum naya system install nahi kar sakte",
+            "naya system lagayein",
+            "purana system theek karo",
+        ),
+        ("hum naya mill kharid nahi sakte", "naya mill kharido", "mill kiraye par lein"),
+        ("hum naya mill kharid nahi kar sakte", "naya mill kharidein", "mill kiraye par lein"),
+    ],
+)
+def test_roman_urdu_verbs_the_scorer_knows_make_working_rules(text, bad, good) -> None:
+    assert full(text, bad, language="roman_ur")["verdict"] == "violates_constraint", bad
+    assert full(text, good, language="roman_ur")["verdict"] != "violates_constraint", good
+
+
+def test_a_roman_urdu_verb_outside_the_list_makes_the_limit_unknown() -> None:
+    got = full("hum mill nahi ugaa sakte", "naya mill lagayein", language="roman_ur")
+    assert got["verdict"] == "unknown"
+
+
+@pytest.mark.parametrize(
+    "text,idea,broken",
+    [
+        ("we cannot hire anyone", "Hire out the spare room", False),
+        ("we cannot hire anyone", "Rent out the spare room and hire out the hall", False),
+        ("we cannot hire anyone", "Hire a rider", True),
+        ("we cannot buy a van", "Rent out the van to a neighbour", False),
+        ("we cannot buy a van", "Buy a van", True),
+    ],
+)
+def test_phrasal_out_is_letting_not_hiring_or_buying(text, idea, broken) -> None:
+    assert (full(text, idea)["verdict"] == "violates_constraint") is broken, idea
+
+
+def test_renting_out_is_income_not_a_cost() -> None:
+    c = [limit("cannot spend more than 20000")]
+    assert verdict(c, "Rent out the hall for 80000") != "violates_constraint"
+    assert verdict(c, "Lease out the old van for Rs 90000") != "violates_constraint"
+    assert verdict(c, "Rent the hall for 80000") == "violates_constraint"
+
+
+@pytest.mark.parametrize(
+    "text,idea",
+    [
+        ("we cannot offer discounts", "Run a discount week"),
+        ("we cannot offer discounts", "Offer a discount code"),
+        ("we cannot give discounts", "Offer a discount code"),
+        ("we cannot give discounts", "Launch a discount for new clients"),
+        ("we cannot give discounts", "Start a discount day"),
+    ],
+)
+def test_running_or_offering_the_blocked_object_is_a_violation(text, idea) -> None:
+    assert full(text, idea)["verdict"] == "violates_constraint", idea
+
+
+def test_run_does_not_fire_a_rule_about_something_else() -> None:
+    assert full("we cannot offer discounts", "Run a reminder week")["verdict"] != (
+        "violates_constraint"
+    )
+    assert full("we cannot close", "Run a reminder week")["verdict"] != "violates_constraint"
+
+
+@pytest.mark.parametrize(
+    "text,bad,good",
+    [
+        ("we cannot afford a loan", "Take a loan for the shop", "Repay the old loan early"),
+        ("cannot afford new equipment", "Buy a new oven", "Repair the old oven"),
+        ("cannot afford new equipment", "Purchase a mixer", "Clean the mixer daily"),
+        ("we cannot afford software", "Buy a booking app", "Use a paper sheet"),
+        ("we cannot hire staff", "Hire a rider", "Train the rider we have"),
+    ],
+)
+def test_equipment_software_and_staff_cover_what_they_are(text, bad, good) -> None:
+    assert full(text, bad)["verdict"] == "violates_constraint", bad
+    assert full(text, good)["verdict"] != "violates_constraint", good
+
+
+@pytest.mark.parametrize(
+    "text,bad,good",
+    [
+        ("we cannot lose any customers", "Lose the unhappy customers", "Call quiet customers"),
+        ("we cannot lose any customers", "Let customers lose interest", "Thank each customer"),
+        ("we cannot afford downtime", "Cause downtime by switching systems", "Add a spare router"),
+        ("we cannot miss deadlines", "Miss the deadline if it is tight", "Plan each deadline"),
+    ],
+)
+def test_a_goal_is_broken_by_an_idea_that_does_the_loss(text, bad, good) -> None:
+    assert full(text, bad)["verdict"] == "violates_constraint", bad
+    assert full(text, good)["verdict"] != "violates_constraint", good
+
+
+@pytest.mark.parametrize(
+    "text,idea",
+    [
+        ("we cannot lose any customers", "Call quiet customers so you avoid losing them"),
+        (
+            "we cannot afford downtime",
+            "Buy a backup generator so a power cut never causes downtime",
+        ),
+        ("we cannot miss deadlines", "Add a checklist so you never miss a deadline"),
+        ("we cannot afford waste", "Track stock to reduce waste"),
+        ("we cannot buy a printer", "Do not buy a printer, print at a shop"),
+        ("we cannot buy a printer", "Avoid buying a printer and print at a shop"),
+        ("we cannot buy a printer", "Print at a shop instead of buying a printer"),
+    ],
+)
+def test_a_negated_verb_in_the_idea_does_not_break_the_limit(text, idea) -> None:
+    assert full(text, idea)["verdict"] != "violates_constraint", idea
+
+
+@pytest.mark.parametrize(
+    "idea,broken",
+    [
+        ("Buy 3 machines at 10000 each", True),
+        ("Buy 3 machines for 10000 rupees each", True),
+        ("Buy 2 machines at 5000 each", False),
+        ("Buy 3 x 10000 rupees of stock", True),
+    ],
+)
+def test_a_price_each_is_multiplied_by_its_quantity(idea, broken) -> None:
+    c = [limit("cannot spend more than 20000")]
+    assert (verdict(c, idea) == "violates_constraint") is broken, idea
+
+
+def test_a_price_each_with_no_quantity_and_a_spelled_number_are_unknown() -> None:
+    c = [limit("cannot spend more than 20000")]
+    got = relevance.score_candidate(brief(c), "Buy a machine at 10000 each")
+    assert got["verdict"] == "unknown" and got["unknown_reason"] == "quantity_unclear"
+    got = relevance.score_candidate(brief(c), "Buy a machine for five thousand")
+    assert got["verdict"] == "unknown" and got["unknown_reason"] == "spelled_number"
+
+
+SIZES = (200, 800, 1600, 4000, 50000)
+SHAPES = {
+    "spaces": " ",
+    "newlines": "\n",
+    "five": "5 ",
+    "nahi": "nahi ",
+    "tried": "tried ",
+    "failed": "failed ",
+    "digits": "1",
+    "sakt": "kharid nahi kar sakte ",
+}
+
+
+def best_of(fn, runs=3) -> float:
+    import time
+
+    best = 1e9
+    for i in range(runs):
+        started = time.perf_counter()
+        fn(i)
+        best = min(best, time.perf_counter() - started)
+    return best
+
+
+@pytest.mark.parametrize("shape", sorted(SHAPES))
+@pytest.mark.parametrize("size", SIZES)
+def test_limit_parsing_is_linear_and_flags_a_limit_that_is_too_long(shape, size) -> None:
+    unit = SHAPES[shape]
+    for lang in (None, "roman_ur"):
+
+        def once(i, unit=unit, size=size, lang=lang):
+            text = (unit * (size // len(unit) + 1))[:size] + "x" * i  # i defeats the caches
+            return relevance.score_candidate(
+                brief([limit(text, kind="cannot_change")]),
+                "Buy a system for 50000 rupees",
+                language=lang,
+            )
+
+        assert best_of(once) < 0.1, (shape, size, lang)
+    text = (unit * (size // len(unit) + 1))[:size]
+    got = relevance.score_candidate(brief([limit(text, kind="cannot_change")]), "Buy a van")
+    if len(relevance_match.collapse(text)) > relevance_match.MAX_LIMIT_TEXT:
+        assert got["limit_text_truncated"] is True and got["verdict"] == "unknown"
+        assert got["unknown_reason"] == "limit_text_truncated"
+
+
+@pytest.mark.parametrize("shape", sorted(SHAPES))
+@pytest.mark.parametrize("size", SIZES)
+def test_idea_parsing_is_linear_and_flags_an_idea_that_is_too_long(shape, size) -> None:
+    unit = SHAPES[shape]
+    c = [limit("cannot spend more than 20000 rupees")]
+
+    def once(i):
+        text = (unit * (size // len(unit) + 1))[:size] + "x" * i
+        return relevance.score_candidate(brief(c), text, language="roman_ur")
+
+    assert best_of(once) < 0.1, (shape, size)
+    text = (unit * (size // len(unit) + 1))[:size]
+    got = relevance.score_candidate(brief(c), text)
+    if len(relevance_match.collapse(text)) > relevance_match.MAX_IDEA_TEXT:
+        assert got["text_truncated"] is True and got["verdict"] == "unknown"
+
+
+def test_the_soft_prefix_no_longer_inflates_relevance() -> None:
+    b = brief(words=("employee morale low",), facts=("discount codes",))
+    got = relevance.score_candidate(b, "Discover how to employ the right tool")
+    assert got["problem_link"] == 0 and got["verdict"] != "relevant"
+    got = relevance.score_candidate(b, "Raise employee morale with discount codes")
+    assert got["problem_link"] >= 1
+
+
+def test_the_disclaimer_says_what_is_reported_as_unknown() -> None:
+    note = " ".join(relevance.DISCLAIMER.split())
+    assert "Urdu, Hindi and Arabic script" in note
+    assert "Roman Urdu verbs outside the supported list" in note
+    assert "'unknown'" in note and "never scored as relevant or irrelevant" in note
+    assert "unknown" in " ".join((relevance.__doc__ or "").split())
+
+
+def test_the_report_counts_unknown_in_its_own_column() -> None:
+    import tempfile
+    from pathlib import Path
+
+    from app.modules.pi.evalkit import relevance_calibration, splits
+
+    cases = [
+        c for c in relevance_calibration.load_cases() if c.get("kind") != "borderline_relevance"
+    ]
+    dev = [c for c in cases if splits.split_of(c) != splits.HELD_OUT]
+    with tempfile.TemporaryDirectory() as tmp:
+        text, totals = relevance_report.build(
+            dev, Path(tmp) / "a.jsonl", "lane E", "unknown column"
+        )
+    assert "not read (unknown, counted apart)" in text
+    assert all("unknown" in v for k, v in totals.items() if k.startswith("split:"))
+    agg = relevance.aggregate(
+        [
+            {
+                "candidates": 2,
+                "agree": 1,
+                "false_relevant": 0,
+                "missed_relevant": 0,
+                "hard_misses": 0,
+                "unknown": 1,
+            }
+        ]
+        * 3
+    )
+    assert agg["unknown"] == 3
+
+
+def test_no_source_text_names_a_fixture_case() -> None:
+    from pathlib import Path
+
+    here = Path(relevance.__file__).parent
+    for name in ("relevance.py", "relevance_match.py"):
+        assert "feed mill" not in (here / name).read_text(encoding="utf-8"), name
+
+
+def test_fuzz_500_strings_never_raise_and_always_give_a_known_verdict() -> None:
+    import random
+
+    rng = random.Random(20261031)
+    words = [
+        "buy",
+        "hire",
+        "cannot",
+        "never",
+        "5k",
+        "20000",
+        "rupees",
+        "each",
+        "at",
+        "for",
+        "nahi",
+        "sakte",
+        "kar",
+        "staff",
+        "oven",
+        "loan",
+        "discount",
+        "out",
+        "rent",
+        "not",
+        "avoid",
+        "lose",
+        "customers",
+        "afford",
+        "downtime",
+        "tried",
+        "failed",
+        "before",
+        "and",
+        "so",
+        "at least",
+        "budget",
+        "lakh",
+        "2.5m",
+        "five thousand",
+        "بجٹ",
+        "हम",
+        "شراء",
+        "kharid",
+        "rakh",
+        "le",
+        "de",
+        "do",
+        "x",
+        "",
+        "  ",
+        "\n",
+        "-",
+        ",",
+        "1,2,3",
+        "120,150,180",
+        "250,500,000",
+        "$",
+        "Rs.",
+        "’",
+        "can't",
+        "won't",
+    ]
+    allowed = set(relevance.VERDICTS) | {relevance.UNKNOWN}
+    for n in range(500):
+
+        def piece(k):
+            return " ".join(rng.choice(words) for _ in range(rng.randint(0, k)))
+
+        limit_text, idea = piece(14), piece(14)
+        kind = rng.choice(["budget", "staff", "deadline", "cannot_change", ""])
+        lang = rng.choice([None, "roman_ur", "ur", "hi", "ar", "en"])
+        status = rng.choice(["confirmed", "confirmed", "assumed"])
+        blocks = [piece(3)] if rng.random() < 0.3 else []
+        b = brief([limit(limit_text, blocks=blocks, kind=kind, status=status)])
+        got = relevance.score_candidate(b, idea, owner_text=piece(10), language=lang)
+        assert got["verdict"] in allowed, (n, limit_text, idea, got)
