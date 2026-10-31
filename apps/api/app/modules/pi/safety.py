@@ -766,7 +766,15 @@ def emergency(text: str) -> Emergency | None:
     for kind, pattern in EMERGENCY_PATTERNS:
         if pattern.search(said):
             return kind
-    return _roman_fire(said)
+    found = _roman_fire(said)
+    if found is not None:
+        return found
+    # Second layer: the structured, high-recall lexicon. It runs only when the patterns above say
+    # nothing, so it can only add a detection (quoted, forwarded and unsure messages fire).
+    from app.modules.pi import safety_lexicon
+
+    name = safety_lexicon.detect(said)
+    return Emergency[name] if name else None
 
 
 # Where someone in distress should call (spec X4): Rescue 1122 in Pakistan, 999, 911.
@@ -1719,7 +1727,12 @@ def advice_asked(text: str) -> Advice | None:
     for kind, pattern in ADVICE_PATTERNS:
         if pattern.search(said):
             return kind
-    return treated
+    if treated is not None:
+        return treated
+    from app.modules.pi import safety_lexicon
+
+    name = safety_lexicon.advice_kind(said)
+    return Advice[name.upper()] if name else None
 
 
 def advice_reply(kind: Advice, language: str | None) -> str:
