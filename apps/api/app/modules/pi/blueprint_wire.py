@@ -8,6 +8,7 @@ evidence cannot be recommended, so a thin record recommends learning first, not 
 status, the one next question, and the checked issues (any issue blocks approval).
 """
 
+import re
 from collections.abc import Mapping
 from typing import Any
 
@@ -16,6 +17,7 @@ from app.modules.pi import blueprint_rules as br
 from app.modules.pi import blueprint_text as bt
 from app.modules.pi import constraint_check as cc
 from app.modules.pi import option_rank, option_wiring
+from app.modules.pi import problem_fields as pf
 from app.modules.pi.blueprint_build import (
     blueprint_issues,
     build_blueprint,
@@ -43,13 +45,39 @@ def _words(quote: str) -> tuple[str, ...]:
     return tuple(w for w in quote.replace(",", " ").split() if len(w) >= 3)[:3]
 
 
-def _evidence(views: list[dict[str, Any]]) -> tuple[bm.Evidence, ...]:
-    return tuple(
-        bm.Evidence(msg, _words(v["quotes"][0]))
-        for v in views
-        for msg in (v.get("msgs") or [])[:1]
-        if v.get("quotes")
-    )
+def _evidence(
+    views: list[dict[str, Any]], owner_messages: dict[str, str] | None = None
+) -> tuple[bm.Evidence, ...]:
+    """The owner's own words for each problem, tied to the message that holds them. Checked against
+    ALL the owner's messages, not only the problem's first source: after a corrected figure the
+    stored quote holds the new figure, which only a later message has. Words that no owner message
+    holds give no evidence (it stays unverified, never invented)."""
+    out: list[bm.Evidence] = []
+    for v in views:
+        if not v.get("quotes"):
+            continue
+        tokens = [w for w in re.findall(r"\w+", v["quotes"][0]) if len(w) >= 3]
+        windows = [tuple(tokens[i : i + 3]) for i in range(max(1, len(tokens) - 2))][:8]
+        windows += [tuple(tokens[i : i + 2]) for i in range(max(1, len(tokens) - 1))][:8]
+        if len(tokens) == 1:  # one word is evidence only when that is all the owner said
+            windows = [(tokens[0],)]
+        first = [m for m in (v.get("msgs") or []) if m in (owner_messages or {})]
+        order = first + [m for m in (owner_messages or {}) if m not in first]
+        found: tuple[str, tuple[str, ...]] | None = None
+        for mid in order:
+            text = (owner_messages or {}).get(mid, "")
+            for window in windows:
+                if window and pf.said_by_owner(list(window), text):
+                    found = (mid, window)
+                    break
+            if found:
+                break
+        if found:
+            out.append(bm.Evidence(found[0], found[1]))
+        elif owner_messages is None:  # no owner record to check against: the old claim, unverified
+            for msg in (v.get("msgs") or [])[:1]:
+                out.append(bm.Evidence(msg, _words(v["quotes"][0])))
+    return tuple(out)
 
 
 def _aggregate(checks: list[cc.Verdict]) -> tuple[str, str]:
@@ -98,7 +126,7 @@ def option_set(
         reversibility="partly",
         status="rejected" if status == "violates" else "alternative",
         catalogue_key="solution_box",
-        evidence=_evidence(views),
+        evidence=_evidence(views, owner_messages),
         constraint_checks=(bm.ConstraintCheck("stated limits", status, reason),),
         rejected_because=reason if status == "violates" else "",
     )
@@ -112,7 +140,7 @@ def option_set(
                 v.status,
                 v.reason,
                 addresses=refs,
-                evidence=_evidence(views),
+                evidence=_evidence(views, owner_messages),
                 prefix="CHAT",
             )
         )

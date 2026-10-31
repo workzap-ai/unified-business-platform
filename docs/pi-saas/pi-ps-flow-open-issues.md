@@ -69,3 +69,17 @@ unreadable (unknown). Kept below for the record, with the original inputs.
   tests call `option_wiring.gate_ideas` and `blueprint_doc`, both removed when PS-3 and PS-4 landed
   (one verdict path in `option_voice.voice`, one blueprint in `blueprint_wire.build`). It needs to be
   ported to those two entry points before it can run here.
+
+## L2-1 round 4: "rakhein / رکھیں" (keep or hire) read as hire (found by the PS-6 journeys)
+
+- Roman Urdu: stored staff limit `ek clerk` (one clerk), idea `Fees ki list clerk ke phone par rakhein`
+  (keep the fees list on the clerk's phone). Observed: `violates` rule `staff`. Expected: not `violates`
+  (the object of "rakhein" is the list, not a person). Journey: `school_roman_ur`.
+- Urdu: stored limit `ہم کسی کو بھرتی نہیں کر سکتے` (we cannot hire anyone), idea
+  `بکنگ کے لیے ایک ہی مشترکہ فہرست رکھیں` (keep one shared list for bookings). Observed: `violates`
+  rule `cannot_change`. Expected: not `violates`. Journey: `salon_ur`.
+- Effect: a valid idea is removed from the owner's chat, and a blueprint that contains it is rejected as a
+  whole, so `recommended` becomes `LEARN` ("learn more first") although the problem is clear. The failure
+  is in the safe direction (nothing unsafe is recommended) but it hides valid ideas. Owner: `pi/l2-hard-gate`.
+- Not weakened here: the verb "رکھیں / rakhein" means hire only when its object is a person or a role;
+  the gate has to read the object (list, register, sheet, phone) before it can call it a hire.

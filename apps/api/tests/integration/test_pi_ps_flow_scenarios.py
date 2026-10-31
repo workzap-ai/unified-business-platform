@@ -384,7 +384,11 @@ def noted_records(rows):
 
 
 def option_voice_limits(case):
-    return [c["text"] for c in case["expected"].get("constraints") or []]
+    exp = case["expected"]
+    # the owner's own words that can rule an idea out: a stated limit, or what they already tried
+    return [c["text"] for c in exp.get("constraints") or []] + [
+        t["what"] for t in exp.get("tried") or []
+    ]
 
 
 def option_voice_language(case):

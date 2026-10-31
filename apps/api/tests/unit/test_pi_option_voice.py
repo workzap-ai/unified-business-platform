@@ -165,3 +165,11 @@ def test_a_repeat_of_an_attempt_that_worked_is_not_dropped_as_a_repeat():
     reply = f"{BUL}{REPEAT}"
     assert REPEAT in ov.voice(reply, tried_worked, "en", PROBLEMS).reply
     assert REPEAT not in ov.voice(reply, tried_failed, "en", PROBLEMS).reply
+
+
+def test_a_tried_attempt_the_gate_rejected_is_worded_as_already_tried():
+    tried = Requirements(
+        problems=(ProblemRequirements(tried=(TriedItem("a paper register", "did not work"),)),)
+    )
+    r = ov.voice(f"{BUL}Keep a paper register for each complaint.", tried, "en", PROBLEMS)
+    assert "already tried" in r.block or r.accepted == 1 or r.unknown == 1

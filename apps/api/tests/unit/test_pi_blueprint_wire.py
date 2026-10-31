@@ -130,3 +130,16 @@ def test_money_state_outcomes_reach_the_reviewer_through_the_document_builder():
     assert ambiguous and ambiguous[0].startswith("MONEY_AMBIGUOUS")  # never passed as clean
     limit = bw.money_issues(["You said you want something without fees, so we keep it that way."])
     assert not any(i.startswith("OPT-MONEY") for i in limit)
+
+
+def test_evidence_is_checked_against_all_owner_messages_after_a_corrected_figure():
+    # the stored quote holds the corrected figure; only the later message has it
+    v = view("P1", quotes=["parcels come back 200 every month"], msgs=["m1"])
+    owner = {
+        "m1": "about 20 parcels come back every month",
+        "m2": "sorry, 200 parcels come back every month",
+    }
+    oset, _ = bw.option_set([v], [comp(["P1"])], owner)
+    assert oset.recommended_id == "BOX"  # verified through m2, not "learn more first"
+    thin, _ = bw.option_set([v], [comp(["P1"])], {"m1": "nothing about the parcels"})
+    assert thin.recommended_id == "LEARN"

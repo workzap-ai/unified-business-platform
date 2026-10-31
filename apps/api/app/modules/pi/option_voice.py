@@ -229,7 +229,8 @@ def voice(
     if violated:
         rule = violated[0].reason.partition(":")[2]
         words = _limit_text(reqs, rule, violated[0].evidence_words)
-        block.append(tb["left_out"].format(words=words))
+        # an idea the gate rejected because the owner already tried it says so ("you already tried")
+        block.append(tb["repeat" if rule == cc.RULE_TRIED else "left_out"].format(words=words))
     if any(v.kind is K.REPEATS_TRIED for v in verdicts.values()) and tried:
         again = next(v for v in verdicts.values() if v.kind is K.REPEATS_TRIED)
         words = _limit_text(reqs, cc.RULE_TRIED, again.evidence_words)
