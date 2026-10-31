@@ -3641,6 +3641,34 @@ async def figure_fix_for(
     return figure_correction.numeric_correction(body, [str(t) for t in reversed(list(earlier))])
 
 
+async def owner_text_for(
+    session: AsyncSession, scope: WorkspaceScope, conversation: PiConversation, message: PiMessage
+) -> str:
+    """The owner's own words for judging a cause (L1-1): this message and the earlier customer
+    messages of the chat (a burst is stored message by message, so its earlier parts are here;
+    a voice note's body is its transcript, which is what the owner said). Only text and voice
+    bodies count: image and file descriptions are system English, and pi's own replies never do.
+    Newest 30 at most, oldest first."""
+    stmt = select(PiMessage.body).where(
+        PiMessage.tenant_id == scope.tenant_id,
+        PiMessage.environment_id == scope.environment_id,
+        PiMessage.conversation_id == conversation.id,
+        PiMessage.direction == "inbound",
+        PiMessage.message_type.in_(("text", "audio")),
+    )
+    if message.created_at is not None:
+        stmt = stmt.where(PiMessage.created_at <= message.created_at)
+    rows = [
+        str(t)
+        for t in await session.scalars(stmt.order_by(PiMessage.created_at.desc()).limit(30))
+        if t
+    ]
+    own = message.body if message.message_type in ("text", "audio") and message.body else ""
+    if own and own not in rows:
+        rows.insert(0, str(own))
+    return chr(10).join(reversed(rows))
+
+
 async def note_problems(
     session: AsyncSession,
     scope: WorkspaceScope,
@@ -3664,6 +3692,7 @@ async def note_problems(
             turn.language,
             await link_floor(session, scope, conversation.customer_id),
             figure_fix=fix,
+            owner_text=await owner_text_for(session, scope, conversation, message),
         )
         noted = bool(applied.created)
         if box_on and applied.created:
