@@ -140,7 +140,7 @@ def _ref_verified(ref: Any, owner_messages: OwnerMessages | None) -> bool:
     if not isinstance(ref, bm.Evidence) or not ref.claimed or ref.role != "owner":
         return False
     if owner_messages is None:
-        return ref.verified is True and ref.seal == bm.SEAL
+        return ref.verified is True and bm.is_sealed(ref)
     try:
         said = owner_messages.get(ref.msg)
         return isinstance(said, str) and pf.said_by_owner(list(bm.seq(ref.words)), said)
@@ -167,11 +167,9 @@ def _verified(option: Any, owner_messages: OwnerMessages | None) -> Any:
         changes["id"] = _name(option)
     if owner_messages is not None:
         changes["evidence"] = tuple(
-            dataclasses.replace(
-                e,
-                verified=_ref_verified(e, owner_messages),
-                seal=bm.SEAL if _ref_verified(e, owner_messages) else "",
-            )
+            bm.mark_verified(e)
+            if _ref_verified(e, owner_messages)
+            else dataclasses.replace(e, verified=False, seal=None)
             for e in bm.seq(option.evidence)
             if isinstance(e, bm.Evidence)
         )
@@ -362,7 +360,6 @@ def _bad_fields(option: bm.Option) -> list[str]:
         and isinstance(e.msg, str)
         and isinstance(e.role, str)
         and isinstance(e.verified, bool)
-        and isinstance(e.seal, str)
         and isinstance(e.words, tuple | list)
         and all(isinstance(w, str) for w in e.words)
         for e in refs

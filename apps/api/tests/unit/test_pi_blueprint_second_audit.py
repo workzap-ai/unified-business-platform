@@ -2,6 +2,8 @@
 verified flags, speaker ids, ranking ties and four mutants that had survived. Each test fails
 against the previous commit (5ec43a6)."""
 
+import dataclasses
+
 import pytest
 
 from app.modules.pi import blueprint_models as bm
@@ -14,7 +16,7 @@ OWNER = "Honestly we never count stock at night"
 
 
 def sealed(msg="m1", words=("count", "stock")):
-    return bm.Evidence(msg, tuple(words), verified=True, seal=bm.SEAL)
+    return bm.mark_verified(bm.Evidence(msg, tuple(words)))
 
 
 def option(**over) -> bm.Option:
@@ -340,7 +342,7 @@ def test_a_rule_that_raises_is_reported_as_malformed(monkeypatch):
 
 
 def test_a_seal_without_the_verified_flag_counts_for_nothing():
-    unmarked = bm.Evidence("m1", ("count",), verified=False, seal=bm.SEAL)
+    unmarked = dataclasses.replace(bm.mark_verified(bm.Evidence("m1", ("count",))), verified=False)
     assert option(evidence=(unmarked,)).evidence_strength == 0
 
 

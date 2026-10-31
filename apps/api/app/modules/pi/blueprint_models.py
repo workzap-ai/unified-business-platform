@@ -21,7 +21,7 @@ where a list belongs): it reads as empty and the rules report it as MALFORMED, i
 
 from __future__ import annotations
 
-from dataclasses import asdict, dataclass, field
+from dataclasses import asdict, dataclass, field, replace
 from typing import Any
 
 from app.modules.pi import problem_fields as pf
@@ -39,9 +39,10 @@ CAUSE_STATUSES = pf.CAUSE_STATUSES
 OWNER_STATUSES = pf.OWNER_STATUSES
 EVIDENCE_CAP = 3  # evidence strength is a small count, never a score to game
 COST_SOURCE = "staff"
-# `blueprint_rules.verify_option` stamps a ref it verified with this seal. A ref built by
-# hand with `verified=True` has no seal and counts for nothing.
-SEAL = "blueprint-rules-verified"
+# `blueprint_rules.verify_option` stamps a ref it verified with this private object. It is not
+# a string and not a constant anyone can import, so no stored or JSON dict can equal it: a ref
+# built by hand with `verified=True` carries no seal and counts for nothing.
+_SEAL: object = object()
 
 
 def seq(value: Any) -> tuple[Any, ...]:
@@ -66,7 +67,7 @@ class Evidence:
     words: tuple[str, ...] = ()
     role: str = "owner"
     verified: bool = False
-    seal: str = field(default="", compare=False, repr=False)
+    seal: object = field(default=None, compare=False, repr=False)
 
     @property
     def claimed(self) -> bool:
@@ -74,6 +75,16 @@ class Evidence:
         that owner message is checked by `blueprint_rules`, never here."""
         words = [w for w in seq(self.words) if isinstance(w, str) and w.strip()]
         return bool(text_of(self.msg).strip()) and bool(words)
+
+
+def mark_verified(ref: Evidence) -> Evidence:
+    """The ref marked verified and sealed. Only `blueprint_rules` calls this, after it checked
+    the ref against the owner's own message."""
+    return replace(ref, verified=True, seal=_SEAL)
+
+
+def is_sealed(ref: Evidence) -> bool:
+    return ref.seal is _SEAL
 
 
 @dataclass(frozen=True)
@@ -167,7 +178,7 @@ class Option:
             if isinstance(e, Evidence)
             and e.claimed
             and e.verified is True
-            and e.seal == SEAL
+            and e.seal is _SEAL
             and e.role == "owner"
         }
         return min(len(said), EVIDENCE_CAP)

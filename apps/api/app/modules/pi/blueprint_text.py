@@ -208,29 +208,35 @@ PROMISE_EXTRA = re.compile(
 )
 
 # A guarantee that is denied is not a promise: "I can't guarantee anything", "not guaranteed",
-# "guarantee nahi de sakta". These spans are cut out before the promise patterns run, so the rest
-# of the sentence is still read.
+# "no guarantee it will work", "guarantee nahi de sakta", "یقینی نہیں ہے". The denial and the rest
+# of its clause are cut out before the promise patterns run (the clause ends at a comma, a full
+# stop, or "but", "however", "and"), so "no guarantee, but it will definitely work" still flags.
 _NEG_LEAD = (
     r"(?:\w+n't|cannot|can\s+not|will\s+not|do\s+not|does\s+not|did\s+not|could\s+not|would\s+not"
-    r"|is\s+not|are\s+not|was\s+not|not|never|no|without|nor)"
+    r"|is\s+not|are\s+not|was\s+not|not|never|no|nothing|none|nobody|hardly|without|nor)"
 )
 _NEG_TERM = (
     r"(?:guarantee|guaranteed|guarantees|guaranty|promise|promised|promises|assure|assured"
-    r"|assurance|ensure|ensured|certain|certainty)"
+    r"|assurance|ensure|ensured|certain|certainty|certainly|sure|definite|definitely|proven)"
 )
+_NEG_GAP = r"(?:(?!(?:risk|doubt|chance|fail\w*)\b)\w+\s+){0,3}?"
+_REST = r"(?:(?!\s(?:but|however|yet|though|although|still|and)\b)[^.;!?,\n])*"
+_REST_X = r"(?:(?!\s(?:lekin|magar|par|aur|لیکن|مگر|اور|लेकिन|मगर|और|لكن|لكنه))[^.;!?,،؟۔\n])*"
 _NEG_OTHER = (
-    r"(?:guarantee|zamanat|yaqeen|yakeen|promise|wada|waada)\s+nahi\w*"
-    r"(?:\s+de\s+sak\w*|\s+dete|\s+deta|\s+dun|\s+dunga)?",
-    r"(?:ضمانت|ضمان|یقین|وعده|وعدہ)\s+نہیں(?:\s+(?:دے|دیتا|دیتی|سکتا|سکتی))*",
-    r"(?:गारंटी|वादा|यकीन)\s+नहीं(?:\s+(?:दे|देता|सकता|सकती))*",
-    r"لا\s+(?:[اأ]ضمن|يمكنني\s+ضمان|استطيع\s+ضمان|اعد|اعدك|اوعد)\w*",
-    r"(?:بدون|بلا|لا)\s+ضمان\w*",
+    r"(?:guarantee|zamanat|yaqeen|yakeen|yaqeeni|yakini|pakka|pakki|promise|wada|waada|certain)"
+    rf"\s+(?:\w+\s+){{0,2}}?nahi\w*{_REST_X}",
+    r"(?:ضمانت|ضمان|یقین|یقینی|پکا|پکی|وعدہ|وعده)\s+(?:\w+\s+){0,2}?نہیں" + _REST_X,
+    r"(?:गारंटी|वादा|यकीन|पक्का|पक्की|निश्चित)\s+(?:\w+\s+){0,2}?नहीं" + _REST_X,
+    r"(?:لا|ليس|غير|بدون|بلا)\s+(?:\w+\s+){0,2}?"
+    r"(?:نضمن|[اأ]ضمن|يضمن|تضمن|ضمان\w*|مضمون\w*|مؤكد\w*|اكيد\w*|مؤكدا)" + _REST_X,
+    r"لا\s+(?:يمكنني\s+ضمان|استطيع\s+ضمان|اعد|اعدك|اوعد)\w*" + _REST_X,
 )
 _NEGATED = re.compile(
     "|".join(
-        [rf"(?<![^\W\d_]){_NEG_LEAD}\s+(?:\w+\s+){{0,2}}?{_NEG_TERM}(?![^\W\d_])"]
+        [rf"(?<![^\W\d_]){_NEG_LEAD}\s+{_NEG_GAP}{_NEG_TERM}(?![^\W\d_]){_REST}"]
         + [q for p in _NEG_OTHER for q in (p, fold(p))]
-    )
+    ),
+    re.IGNORECASE,
 )
 
 
@@ -357,12 +363,44 @@ _COST_CLAIMS = (
     r"رخيص\w*",
     r"تكلف[ةه]\s+منخفض\w*",
 )
-COST_CLAIM = re.compile("|".join(rf"(?<![^\W\d_]){fold(p)}(?![^\W\d_])" for p in _COST_CLAIMS))
+_COST_CLAIMS_MORE = (
+    # English: "Free for the first year", "It is free of cost", "Costs less than a clerk"
+    r"(?<!feel\s)free(?![-\w])(?!\s+(?:up|from|time|space|hand|to\s+(?:say|choose|decline"
+    r"|leave|stop|cancel|ask|change|skip)))",
+    r"costs?\s+(?:much\s+|far\s+|a\s+lot\s+)?(?:less|lower|fewer)\s+than",
+    r"cheaper|less\s+expensive|more\s+affordable|lower\s+(?:cost|price)",
+    r"(?:less|lower)\s+(?:cost|price|fee)\w*",
+    # Roman Urdu
+    r"(?:kharch\w*|fees?|charge\w*)\s+(?:\w+\s+){0,2}?nahi\s+(?:ho|lag|aay)\w*",
+    r"nahi\s+lagega",
+    r"(?:paisa|paise|paisay)\s+wasool",
+    r"free\s+(?:hai|hoga|me|mein)",
+    # Urdu
+    r"(?:خرچ|خرچہ|فیس|چارج)\w*\s+(?:\w+\s+){0,2}?نہیں\s+(?:ہو|لگ|آئ)\w*",
+    r"پیس[ہے]\s+وصول",
+    r"(?:بغیر|بنا)\s+(?:کسی\s+)?(?:فیس|چارج|خرچ)\w*",
+    # Hindi
+    r"(?:खर्च|शुल्क|फीस|चार्ज)\w*\s+(?:\w+\s+){0,2}?नहीं\s+(?:हो|लग|आ)\w*",
+    r"पैस[ाे]\s+वसूल",
+    r"बिना\s+(?:किसी\s+)?(?:फीस|चार्ज|खर्च|शुल्क)",
+    # Arabic
+    r"لا\s+(?:تكلف\w+|رسوم|يوجد\s+رسوم|مقابل)",
+    r"(?:بدون|بلا)\s+(?:رسوم|اي\s+رسوم|مقابل|اي\s+تكلف\w+)",
+    r"(?:اقل|ارخص)\s+(?:تكلف\w+|سعرا|من)",
+    r"تكلف[ةه]\s+اقل",
+)
+COST_CLAIM = re.compile(
+    "|".join(rf"(?<![^\W\d_]){fold(p)}(?![^\W\d_])" for p in (*_COST_CLAIMS, *_COST_CLAIMS_MORE)),
+    re.IGNORECASE,
+)
 
 _UNITS = (
     r"(?:hours?|hrs?|minutes?|mins?|days?|weeks?|months?|years?|%|percent|per\s?cent|times|fold)"
 )
-_QTY = rf"(?:(?:\d[\d.,]*|{_N})\s?-?\s?{_UNITS}(?![^\W\d_])|half(?![^\W\d_])|twice(?![^\W\d_])|%)"
+_QTY = (
+    rf"(?:(?:\d[\d.,]*|{_N})\s?-?\s?{_UNITS}(?![^\W\d_])|half(?![^\W\d_])|twice(?![^\W\d_])"
+    r"|(?:a\s+)?(?:third|quarter|fifth)(?![^\W\d_])|%)"
+)
 _OUTCOMES = (
     # saves two hours a day, cuts your costs in half, reduce missed orders by 30%
     rf"(?:sav(?:e|es|ed|ing|ings)|cut|cuts|cutting|reduc(?:e|es|ed|ing)|halv(?:e|es|ed|ing)"
@@ -372,6 +410,9 @@ _OUTCOMES = (
     r"(?:double|doubles|doubled|doubling|triple|triples|tripled|tripling|quadruple\w*"
     r"|multipl(?:y|ies|ied|ying))\s+(?:your|the|our|its|their|my|sales|revenue|profits?|orders"
     r"|customers|income|growth|turnover|bookings|leads)(?![^\W\d_])",
+    # halves your costs
+    r"(?:halve|halves|halved|halving)\s+(?:your|the|our)\s+(?:costs?|time|wait\w*|expenses|workload"
+    r"|bills?)(?![^\W\d_])",
     # 10x your revenue, five times more
     r"\d+(?:\.\d+)?\s?x(?![^\W\d_])(?!\d)",
     rf"(?:{_N})\s+times\s+(?:more|as|your|the|higher|faster|better|bigger)(?![^\W\d_])",
@@ -386,7 +427,89 @@ _OUTCOMES = (
     r"|our\s+)?(?:sales|revenue|profits?|income|orders|conversions|bookings|growth|turnover"
     r"|customers)(?![^\W\d_])",
 )
-OUTCOME_CLAIM = re.compile("|".join(rf"(?<![^\W\d_]){p}" for p in _OUTCOMES))
+
+
+def _fx(pattern: str) -> str:
+    """Fold the literal parts of a pattern, never its escapes: `fold` would lower-case `\\W`."""
+    return re.sub(
+        r"(\\.)|([^\\]+)",
+        lambda m: m.group(1) or (fold(m.group(2)) if m.group(2).strip() else m.group(2)),
+        pattern,
+    )
+
+
+# Roman Urdu, Urdu, Hindi and Arabic: the same classes as above, built from word lists, so a
+# saving, a rise, a doubling or a "free" is caught in any of the five languages.
+_SAVE_X = _alt(
+    "bachat bachte bachta bachti bachega bachegi bachenge bachayega bachayegi "
+    "بچت بچتے بچتا بچتی بچیں बचत बचते बचता बचती बचेगा बचेंगे "
+    "يوفر توفر وفر توفير يختصر تختصر اختصار يقلل تقلل تقليل يخفض تخفض خفض تخفيض يقلص تقلص"
+)
+_UNITS_X = _alt(
+    "ghanta ghante ghantay ghanton minute minutes din dinon hafta haftay hafte mahina mahine "
+    "mahinay saal roz rozana waqt "
+    "گھنٹے گھنٹہ گھنٹا گھنٹوں منٹ دن ہفتہ ہفتے مہینہ مہینے سال روزانہ وقت "
+    "रोज़ रोज रोजाना घंटे घंटा घंटों मिनट दिन हफ्ता हफ्ते महीना महीने साल समय "
+    "ساعة ساعات ساعتين دقيقة دقائق يوم يوميا ايام اسبوع اسبوعيا شهر شهريا سنة الوقت"
+)
+_COSTN_X = _alt(
+    "kharcha kharch kharche lagat qeemat keemat paisa paise paisay rupay rupaye "
+    "خرچ خرچہ لاگت قیمت پیسے روپے खर्च लागत कीमत पैसे रुपये التكلفة تكلفة المصاريف المال"
+)
+_HALF_X = _alt("aadha aadhi adha adhi aadhe adhe نصف آدھا آدھی आधा आधी आधे النصف")
+_MORE_X = _alt("zyada ziyada zyadah izafa اضافہ زیادہ مزید ज़्यादा ज्यादा अधिक")
+_BIZ_X = _alt(
+    "order orders sales sale customers customer munafa profit income revenue gahak bikri "
+    "آرڈر آرڈرز سیلز گاہک منافع آمدنی बिक्री ऑर्डर ग्राहक मुनाफ़ा मुनाफा आमदनी "
+    "الطلبات المبيعات العملاء الارباح الايرادات"
+)
+_DOUBLE_X = _alt(
+    "dugna dugni dugne tigna دگنا دگنی دوگنا دوگنی تگنا दोगुना दोगुनी दुगना दुगनी तिगुना "
+    "مضاعفة يضاعف تضاعف ضاعف"
+)
+_DO = r"(?:ho|kar|hojaye|ہو|کر|हो|कर)"
+_PCT_X = (
+    r"(?:%|fisad|feesad|fi\s?sad|percent|per\s?cent|فیصد|فی\s?صد|پرسنٹ|प्रतिशत|फीसदी"
+    r"|بالمئة|في\s+المئة)"
+)
+_QTY_X = rf"(?:\d[\d.,]*|{_N})\s?-?\s?(?:{_UNITS_X}|{_PCT_X})(?![^\W\d_])"
+_OUTCOMES_X = (
+    # is se roz do ghante bachte hain, يوفر ساعتين يوميا (a saving verb with a quantity or unit)
+    rf"(?:{_SAVE_X})(?![^\W\d_])[^.;!?]{{0,40}}?(?:{_QTY_X}|{_UNITS_X}|{_COSTN_X}|{_HALF_X}|%)",
+    # اس سے روزانہ دو گھنٹے بچتے ہیں (the quantity first)
+    rf"(?:{_QTY_X}|{_HALF_X})[^.;!?]{{0,25}}?(?:{_SAVE_X})(?![^\W\d_])",
+    # waqt bachega, paise bachenge, وقت بچے گا, समय बचेगा (the thing saved first)
+    rf"(?:{_UNITS_X}|{_COSTN_X})[^\s.;!?,]*\s+(?:[^\s.;!?,]+\s+){{0,2}}?"
+    rf"(?:{_SAVE_X}|بچے\s+گ[اےی])",
+    # orders barh jayenge, sales बढ़ेंगी
+    rf"(?:{_BIZ_X})[^\s.;!?,]*\s+(?:[^\s.;!?,]+\s+){{0,3}}?(?:barh|badh|بڑھ|बढ़|बढ)[^\s.;!?,]*",
+    # لا توجد اي رسوم
+    r"لا\s+(?:توجد|يوجد)\s+(?:اي\s+)?(?:رسوم|تكلف\w+)",
+    # bachat hogi
+    r"(?:bachat|بچت|बचत)\s+(?:hogi|hoga|hoti|ho\s+gi|ہوگی|ہو\s+گی|ہوتی|होगी|होगा|होती)",
+    # kharcha aadha ho jayega, خرچ آدھا ہو جائے گا, खर्च आधा हो जाएगा
+    rf"(?:{_COSTN_X}|{_UNITS_X})[^\s.;!?,]*\s+(?:[^\s.;!?,]+\s+){{0,3}}?"
+    rf"(?:{_HALF_X}|(?:kam|کم|कम)\s+{_DO}[^\s.;!?,]*)",
+    rf"(?:{_HALF_X})\s+{_DO}[^\s.;!?,]*",
+    # 20 fisad zyada orders, بیس فیصد زیادہ, बीस प्रतिशत ज़्यादा
+    rf"(?:\d[\d.,]*|{_N})\s?(?:{_PCT_X})\s+(?:{_MORE_X})",
+    # zyada orders milenge, ज़्यादा ऑर्डर मिलेंगे
+    rf"(?:{_MORE_X})\s+(?:{_BIZ_X})[^\s.;!?,]*(?:\s+[^\s.;!?,]+){{0,2}}?\s+(?:mil|ho|aa|مل|ہو|मिल|हो)[^\s.;!?,]*",
+    # زيادة الطلبات بنسبة عشرين بالمئة
+    rf"(?:زيادة|ارتفاع|نمو|تحسن)\s+(?:[^\s.;!?,]+\s+){{0,4}}?(?:بنسبة|\d|{_N}|%)",
+    # sales double ho jayegi, دگنا, दोगुना, يضاعف
+    rf"(?:{_DOUBLE_X})[^\s.;!?,]*",
+    rf"double\s+{_DO}[^\s.;!?,]*",
+    rf"(?:{_BIZ_X})[^\s.;!?,]*\s+(?:[^\s.;!?,]+\s+){{0,2}}?(?:double|ضعف|ضعفين)(?![^\W\d_])",
+    # paisa wasool, عائد الاستثمار
+    r"(?:paisa|paise|paisay|پیسہ|پیسے|पैसा|पैसे)\s+(?:wasool|وصول|वसूल)",
+    r"عائد\s+(?:على\s+)?الاستثمار|(?:يسترد|تسترد)[^\s.;!?,]*",
+)
+OUTCOME_CLAIM = re.compile(
+    "|".join(
+        [rf"(?<![^\W\d_]){p}" for p in _OUTCOMES] + [rf"(?<![^\W\d_]){_fx(p)}" for p in _OUTCOMES_X]
+    )
+)
 
 # Phone numbers and reference numbers are not amounts: "+92 300 1234567", "0300-1234567",
 # "order #12345", "ref 40213".
@@ -428,6 +551,7 @@ def money_in(text: str) -> bool:
             MONEY_IN_TEXT.search(kept)
             or MONEY_EXTRA.search(kept)
             or COST_CLAIM.search(kept)
+            or OUTCOME_CLAIM.search(kept)
             or _bare_figure(kept)
         ):
             return True
