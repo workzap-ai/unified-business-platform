@@ -328,6 +328,7 @@ class ServiceTurn(BaseModel):
     _summary: bool = PrivateAttr(default=False)
     _summary_at: int | None = PrivateAttr(default=None)
     _new_wants: list[str] = PrivateAttr(default_factory=list)
+    _need_fact: bool = PrivateAttr(default=False)  # the reply is the one-more-fact question
     _cost_line: str = PrivateAttr(default="")  # the fixed cost answer, put in after any rewrite
     _english: bool = PrivateAttr(default=False)  # an English list was written: translate it
     _free: bool = PrivateAttr(default=False)  # the ideas were the model's own, vetted
@@ -2865,6 +2866,7 @@ async def brain_expert_ideas(
             # the language step, so a model rewrite never sees it (no figure, no range)
             turn._cost_line = decisions.cost_answer(language, context)
         turn.reply = with_disclosure(question, context, language)
+        turn._need_fact = True
         turn._english = True
         turn.awaiting_customer = True
         turn._free = True
@@ -3366,7 +3368,7 @@ def brain_offer(turn: "ServiceTurn", context: dict[str, Any]) -> None:
         return
     if not box_offer_allowed(context):
         return  # Book 5, 5.4 and 10.9: ideas were free, the offer waits for R1 to R3 or B1 to B7
-    if expert_advisor.NEED_FACT_PREFIX in turn.reply:
+    if getattr(turn, "_need_fact", False):
         return  # Part 7 idea filter, G39: the "one more fact" question is the only one
     if not solution_ask.already_offers(turn.reply):
         if any(line in turn.reply for line in NO_IDEA_FIXED):

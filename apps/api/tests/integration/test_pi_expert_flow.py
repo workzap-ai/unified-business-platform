@@ -249,6 +249,29 @@ async def test_the_cost_line_is_kept_out_of_the_language_rewrite(api, business_d
     await pi.close()
 
 
+async def test_a_roman_urdu_owner_gets_the_fact_question_without_the_offer_after_it(
+    api, business_db, monkeypatch
+):
+    """The one-more-fact question is flagged on the turn (not found by its English text), so the
+    offer question is never appended after it, whatever the reply language."""
+    from app.modules.pi import service_conversation as conversation_service
+
+    async def translate(manager, scope, policy, conversation, text, language):
+        return text.replace(expert_advisor.NEED_FACT_PREFIX, "Mujhe ek aur baat chahiye.")
+
+    monkeypatch.setattr(conversation_service, "in_one_language", translate)
+    expert_model(monkeypatch, diagnosis([VIDEO_IDEA]), judged(1))
+    pi = await expert_chat(
+        api, business_db, monkeypatch, ROMAN, "Few walk-ins at the showroom", SHOWROOM
+    )
+    bodies = await reply_after(pi, business_db, "give me a solution", "x-2")
+    body = " ".join(bodies)
+    assert QUESTION in body or "footfall" in body.lower()
+    assert body.count("?") == 1 and body.rstrip().endswith("?")
+    assert "Solution Box" not in body
+    await pi.close()
+
+
 async def test_sales_tracking_gets_an_idea_not_no_quick_idea(api, business_db, monkeypatch):
     owner = "My sales team does not update the sheet, so I never know who sold what"
     expert_model(

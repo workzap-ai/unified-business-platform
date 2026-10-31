@@ -132,7 +132,7 @@ def test_bs_an_explicit_quote_ask_starts_the_quote_through_the_decision_gate():
     ["kitna kharcha hoga yeh usb karnay ka?", "how much will it cost?", "how much would it cost?"],
 )
 def test_bs1_a_price_question_is_an_offer_signal_but_does_not_start_the_quote(said):
-    # D-1 (engineering lead, awaiting owner approval): deviates from spec v1.6 19.2 BS1/BS6
+    # D-1 (approved by the owner, delegated recommended decisions 2026-10-31): deviates from spec v1.6 19.2 BS1/BS6
     assert part19.buying_signal(said, 1) == "R1"
     assert part19.gate_signal(said, 1) is None
     decision = _gate(said)
@@ -165,7 +165,7 @@ def test_bs1_a_price_question_is_an_offer_signal_but_does_not_start_the_quote(sa
         ("main ne sab bata diya, mujhay quote do abhi", True),
         ("humne sab bata diya, quote bhejo", True),
         ("send me the quote, I am short of time", True),
-        ("We need a quote, send me the quote", True),
+        ("We need a quote, send me the quote", False),  # fail closed: not one imperative clause
         ("can you send me the quote?", True),
         # audit round 3: fail closed
         ("Our orders get lost, we need a quote system that tracks them", False),
@@ -189,6 +189,23 @@ def test_bs1_a_price_question_is_an_offer_signal_but_does_not_start_the_quote(sa
         ("I already told you, send me the quote", True),
         ("I want you to send me the quote", True),
         ("please prepare the solution document now", True),
+        # audit round 4: process statements and conditionals fail closed
+        ("Every morning I check the orders and make a quote", False),
+        ("Customer calls, I note the details, prepare the quote", False),
+        ("We take the order and send the quote", False),
+        ("If I like the idea, send me the quote", False),
+        ("Once I decide, send me the quote", False),
+        ("When I'm ready, send me the quote", False),
+        ("jab main kahoon, quote bhej do", False),
+        ("agar theek laga, quote bhej do", False),
+        ("I need a quote system that tracks orders", False),
+        ("We need a quote template for every customer", False),
+        ("Quote banane mein bohat time lagta hai", False),
+        ("Hamein quote chahiye hota hai", False),
+        ("I gave you everything, send me the quote", True),
+        ("maine sab bata diya, quote bhej do", True),
+        ("please send me the quote", True),
+        ("mujhay quote do abhi", True),
     ],
 )
 def test_asks_for_the_quote_is_an_explicit_ask_only(said, expected):
@@ -913,3 +930,80 @@ def test_a_first_sentence_that_only_asks_about_ai_does_not_get_the_cost_line_aft
     reply = sc.put_cost_line("Does AI help with quotes? Which team does it hit hardest?", line)
     assert reply.startswith(line)
     assert reply.rstrip().endswith("hardest?")
+
+
+# the REAL gate: decisions.decide with a problem noted and a listening state (audit round 4)
+DECIDE_STATEMENTS = [
+    "I need a quote system that tracks orders",
+    "We need a quote template for every customer",
+    "Quote banane mein bohat time lagta hai",
+    "Hamein quote chahiye hota hai",
+    "Our orders get lost, we need a quote system that tracks them",
+    "My staff is slow. We need a quote template for every customer",
+    "Customers wait for days, so I need a quote tool",
+    "We want a document scanner for the shop",
+    "We told you we need a quote system",
+    "My customers say, send me the quote",
+    "customers ask me to send the quote",
+    "my team forgets to send the quote",
+    "it takes me hours to send a quote",
+    "customers ko quote chahiye hota hai, mujhe banane mein time lagta hai",
+    "I send the quote to customers late",
+    "Every morning I check the orders and make a quote",
+    "Customer calls, I note the details, prepare the quote",
+    "We take the order and send the quote",
+    "If I like the idea, send me the quote",
+    "Once I decide, send me the quote",
+    "When I'm ready, send me the quote",
+    "jab main kahoon, quote bhej do",
+    "agar theek laga, quote bhej do",
+    "Don't send me the quote now. I need a quote only when I say so",
+    "send me the quote later",
+    "give me the price",
+    "how much will it cost?",
+]
+DECIDE_ASKS = [
+    "send me the quote",
+    "please send me the quote",
+    "mujhay quote do abhi",
+    "quote bhej dein",
+    "quote bhej dein na",
+    "I said give me the quote",
+    "maine bata diya, ab quote do",
+    "I sent you the details, send me the quote",
+    "send me the quote, no rush",
+    "can you send me the quote?",
+]
+
+
+def _decide(said, state=None):
+    from app.modules.pi import part19
+
+    return decisions.decide(
+        state or decisions.State.S3_NOTED,
+        said,
+        "en",
+        {
+            "can_approve": True,
+            "problem_count": 2,
+            "problem_refs": ["a", "b"],
+            "brief": {},
+            "buying_signal": part19.gate_signal(said, 2),
+            "message_id": "m1",
+        },
+    )
+
+
+@pytest.mark.parametrize("state", list(decisions.DIRECT_FROM))
+@pytest.mark.parametrize("said", DECIDE_STATEMENTS)
+def test_decide_never_starts_the_quote_on_a_statement(said, state):
+    decision = _decide(said, state)
+    assert decision is None or "request_solution" not in decision.effects
+    assert decision is None or decision.next_state != decisions.State.S6_PREPARING
+
+
+@pytest.mark.parametrize("said", DECIDE_ASKS)
+def test_decide_starts_the_quote_on_an_explicit_imperative_ask(said):
+    decision = _decide(said)
+    assert decision is not None and "request_solution" in decision.effects
+    assert decision.next_state == decisions.State.S6_PREPARING

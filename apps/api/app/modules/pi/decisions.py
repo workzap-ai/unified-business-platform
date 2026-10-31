@@ -108,22 +108,31 @@ OFFER_REQUEST = re.compile(
 _LEAD = (
     r"^\W*(?:(?:yes|yeah|ok|okay|please|pls|plz|haan|han|ji|jee|theek hai|bilkul|zaroor|sure)\W+)*"
 )
-_ONE = r"(?:(?:solution|full|final)\s+)?(?:document|documents|quote|quotation|proposal)"
+_ONE = (
+    r"(?:(?:solution|full|final|rough|short|quick|proper)\s+)?"
+    r"(?:document|documents|quote|quotation|proposal)"
+)
 _NOUN = rf"{_ONE}(?:\s+(?:and|aur|or|&)\s+(?:the\s+)?{_ONE})?"
 _ME = r"(?:mujhe\s+|mujhay\s+|hamein\s+|hamen\s+)?"
 _UR_VERB = (
     r"(?:de(?:in|n)?|dain|do|dedo|de do|dijiye|dijiyega|bhej\w*|bhij\w*|bana\w*|banwa\w*|"
     r"chahiye|chahie|chahiay|tayyar\w*)"
 )
-# The ask must be addressed to pi and start the message (after a yes or a please): a problem that
-# merely mentions quotes or documents ("it takes me two hours to prepare a quote") is not one.
+# the ask may only be followed by a polite or time word, then the message ends
+_TAIL = rf"(?:\s+(?:please|pls|plz|now|today|asap|abhi|jaldi|ab|do|dein|den|na))*(?:\W+{_ONE}\s+ke\s+saath)?\W*$"
+_YOU_TO = r"(?:(?:i|we)\s+(?:do\s+|really\s+)?(?:want|need|would like)\s+you\s+to\s+)?"
+# The ask must be an IMPERATIVE addressed to pi (or "I want you to send ...", "can I have ..."), then
+# the document noun, and it must END the message: a problem that merely mentions quotes or documents
+# ("it takes me two hours to prepare a quote", "we need a quote system that tracks orders", "hamein
+# quote chahiye hota hai") is not a request. The bare "I/we need <noun>" is not an ask (D-1).
 DIRECT_DOCUMENT = re.compile(
-    rf"{_LEAD}(?:(?:can|could|would)\s+you\s+)?(?:please\s+)?(?:send|give|prepare|make|create|share)"
-    rf"(?:\s+(?:me|us))?(?:\s+(?:the|a|my|our))?\s+{_NOUN}\b"
-    rf"|{_LEAD}(?:i|we)\s+(?:do\s+|really\s+)?(?:want|need|would like)\s+(?:(?:the|a|my|our)\s+)?{_NOUN}\b"
-    rf"|{_LEAD}(?:can|could|may)\s+(?:i|we)\s+(?:get|have)\s+(?:(?:the|a)\s+)?{_NOUN}\b"
-    rf"|{_LEAD}{_ME}(?:(?:ab|abhi|jaldi|please)\s+)?{_NOUN}\s+{_ME}{_UR_VERB}\b"
-    rf"|{_LEAD}(?:de(?:in|n)?|dain|dijiye|bhej\w*|bana\w*|banwa\w*)\s+{_ME}{_NOUN}\b"
+    rf"{_LEAD}(?:(?:can|could|would)\s+you\s+)?{_YOU_TO}(?:please\s+)?"
+    rf"(?:send|give|prepare|make|create|share)(?:\s+(?:me|us))?(?:\s+(?:the|a|my|our))?\s+"
+    rf"{_NOUN}{_TAIL}"
+    rf"|{_LEAD}(?:can|could|may)\s+(?:i|we)\s+(?:get|have)\s+(?:(?:the|a)\s+)?{_NOUN}{_TAIL}"
+    rf"|{_LEAD}{_ME}(?:(?:ab|abhi|jaldi|please)\s+)*{_NOUN}\s+{_ME}{_UR_VERB}{_TAIL}"
+    rf"|{_LEAD}(?:(?:ab|abhi|jaldi|please)\s+)*(?:de(?:in|n)?|dain|dijiye|bhej\w*|bana\w*|banwa\w*)"
+    rf"\s+{_ME}{_NOUN}(?:\s+(?:mujhe|mujhay|hamein|hamen))?{_TAIL}"
     r"|^\W*(?:نعم\W+)?(?:جهز|أرسل|ارسل|ابعث|أعطن|اعطن|أريد|اريد|نريد|أحتاج)\w*\s+"
     r"(?:ال)?(?:المستند|مستند|وثيقة|عرض (?:ال)?سعر|عرض أسعار)"
     r"|^\W*(?:جی\W+|ہاں\W+)?(?:مجھے\s+)?(?:دستاویز|کوٹیشن)\s+(?:بھیج|بنا|دیں|دیجئے|دیجیے|چاہیے|چاہئے)",
@@ -153,14 +162,51 @@ DIRECT_FROM = (
 )
 
 
+# Fail closed: a false negative (the owner asks again) is acceptable, a quote starting on a statement
+# is not (R-SELL). Vetoes apply to the WHOLE message; a benign tail ("na", "no rush") or a short remark
+# about time after the ask is removed first; reported speech blocks; conditions block.
+_BENIGN_TAIL = re.compile(
+    r"\b(?:no rush|no hurry|no worries)\b|\bna\b(?=\s*(?:[,.!?;]|$))", re.IGNORECASE
+)
+_TIME_REMARK = re.compile(
+    r"[,;]\s*(?:(?:i am|i'm|we are|we're|main|hum)\s+(?:short of time|in a hurry|busy)"
+    r"|(?:it is |it's )?urgent|jaldi hai)\W*$",
+    re.IGNORECASE,
+)
+_CONDITIONAL = re.compile(
+    r"\b(?:if|once|when|whenever|unless|until|after|agar|jab|tab|jaise hi|warna|only when|sirf jab)\b",
+    re.IGNORECASE,
+)
+_REPORTED = re.compile(
+    r"\b(?:say|says|said|told|tell|tells|asked|asks|kaha|kehte|kehta|kehti|bola|bolte|boli|bolta)\b",
+    re.IGNORECASE,
+)
+# the narrow lead-ins that may come directly before the ask
+_SAID_LEAD = re.compile(
+    r"^\W*(?:i|we|maine|main ne|humne|hum ne)\s+(?:(?:already|just|have|had|did|sab|sab kuch)\s+)*"
+    r"(?:said|told you|kaha|bola|bataya|bata diya|sent you (?:the details|everything|all the details)"
+    r"|gave you (?:everything|the details|all the details))\W+(?:(?:that|ke)\s+)?",
+    re.IGNORECASE,
+)
+_CONJ = re.compile(r"^\W*(?:so|but|and|aur|lekin|phir|toh)\s+", re.IGNORECASE)
+
+
 def asks_for_document(message: str) -> bool:
-    """The message itself asks for the solution document or the quote."""
+    """The message itself asks pi for the solution document or the quote: one imperative clause
+    (after the allowed lead-ins), no veto word anywhere in the message, no reported speech."""
     said = " ".join((message or "").split())
-    if not said or NOT_A_REQUEST.search(said):
+    if not said:
         return False
-    if ("?" in said or "؟" in said) and not _POLITE_QUESTION.match(said):
+    plain = _TIME_REMARK.sub("", _BENIGN_TAIL.sub(" ", said)).strip()
+    if NOT_A_REQUEST.search(plain) or _CONDITIONAL.search(plain):
+        return False
+    body = _SAID_LEAD.sub("", plain, count=1)
+    if _REPORTED.search(body):
+        return False  # "my customers say, send me the quote" is not an ask addressed to pi
+    body = _CONJ.sub("", body.strip(), count=1).strip()
+    if ("?" in body or "؟" in body) and not _POLITE_QUESTION.match(body):
         return False  # "which document do you mean?" is a question, not a request
-    return bool(DIRECT_DOCUMENT.match(said))
+    return bool(DIRECT_DOCUMENT.match(body))
 
 
 APPROVE = re.compile(
@@ -236,7 +282,9 @@ TEXT: dict[str, dict[str, str]] = {
             "Maine Workzap se aap ka solution document aur quote tayyar karne ko "
             "keh diya hai. Team pehle review karti hai, aur manzoori ke baad yahin bhej diya jayega."
         ),
-        "ar": ("طلبت من Workzap تجهيز وثيقة الحل وعرض السعر. يراجعهما الفريق أولاً، وسأرسلهما هنا بعد الموافقة."),
+        "ar": (
+            "طلبت من Workzap تجهيز وثيقة الحل وعرض السعر. يراجعهما الفريق أولاً، وسأرسلهما هنا بعد الموافقة."
+        ),
     },
     "declined": {
         "en": "No problem. Everything you've told me is kept here if you change your mind.",
