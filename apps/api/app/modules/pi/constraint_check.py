@@ -1101,15 +1101,24 @@ def limit_clauses(text: str) -> list[str]:
     With no limit wording at all the whole text is the one clause ("POS system")."""
     t = lex.take_on_as_hire(norm(text))
     clauses: list[str] = []
-    for part in _CLAUSE_SPLIT.split(t):
+    after_connector = False
+    pos = 0
+    pieces: list[tuple[str, bool]] = []
+    for sep in _CLAUSE_SPLIT.finditer(t):
+        pieces.append((t[pos : sep.start()], after_connector))
+        after_connector = sep.group(0).isalpha()  # "because", "but", "so": a word, not a comma
+        pos = sep.end()
+    pieces.append((t[pos:], after_connector))
+    for part, joined_by_word in pieces:
         part = part.strip()
         if not part:
             continue
         words = _WORD.findall(part)
-        if clauses and not (set(words) & _SUBJECTS) and not any(verb_families(w) for w in words):
+        listed = not (set(words) & _SUBJECTS) and not any(verb_families(w) for w in words)
+        if clauses and listed and not joined_by_word:
             clauses[-1] += " " + part  # a list item: "the POS, the printer"
         else:
-            clauses.append(part)
+            clauses.append(part)  # a reason ("because of the contract") never joins the limit
     found = [c for c in clauses if _is_limit_clause(c)]
     return found or [t]
 

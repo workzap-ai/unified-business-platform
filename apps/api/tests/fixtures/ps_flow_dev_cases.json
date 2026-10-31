@@ -824,6 +824,834 @@
   }
  },
  {
+  "id": "ps_ecommerce_ur",
+  "case_type": "conversation",
+  "format_version": 2,
+  "industry": "e_commerce_and_d2c_brands",
+  "language": "ur",
+  "kind": "problem_solving",
+  "regression": false,
+  "title": "Returned parcels and late courier",
+  "synthetic": true,
+  "provenance": {
+   "author": "PS-0 agent",
+   "reviewer": null,
+   "created": "2026-10-31",
+   "origin": "hand_written"
+  },
+  "scenario": "ecommerce",
+  "messages": [
+   "بہت سے گاہک ڈیلیوری کے بعد اپنا آرڈر واپس کر دیتے ہیں۔ ہر مہینے تقریباً 20 پارسل واپس آتے ہیں اور ہر ایک پر ہمارا ڈیلیوری کا خرچ دو بار لگتا ہے۔",
+   "یہ پچھلی بہار سے شروع ہوا، زیادہ تر ڈریس اور جوتے۔ ہمارا کوریئر دیر سے بھی ڈیلیور کرتا ہے، اس لیے لوگ دروازے پر پارسل لیتے ہی نہیں۔ کسی بھی تبدیلی کے لیے ہمارا تنگ بجٹ 50,000 روپے مہینہ ہے، اور معاہدے کی وجہ سے ہم کوریئر نہیں بدل سکتے۔ پچھلے مہینے مفت واپسی آزمائی تھی مگر واپسیاں اور بڑھ گئیں۔ میرا خیال ہے کوریئر اس لیے سست ہے کہ وہ سب کچھ ایک ڈپو سے بھیجتا ہے۔",
+   "معذرت، 20 نہیں 200 پارسل ہر مہینے واپس آتے ہیں۔ اب ہم کیا کریں؟",
+   "نہیں، کوریئر قابل اعتماد نہ ہو تو ہم ڈیلیوری کے دنوں کا وعدہ نہیں کر سکتے۔ اور یہ صرف واٹس ایپ پر چلنا چاہیے، ہمارے خریدار ویب سائٹ نہیں کھولتے۔"
+  ],
+  "turns": [
+   {
+    "role": "owner",
+    "text": "بہت سے گاہک ڈیلیوری کے بعد اپنا آرڈر واپس کر دیتے ہیں۔ ہر مہینے تقریباً 20 پارسل واپس آتے ہیں اور ہر ایک پر ہمارا ڈیلیوری کا خرچ دو بار لگتا ہے۔"
+   },
+   {
+    "role": "pi",
+    "reply_source": "reference",
+    "text": "دو بار ڈیلیوری بھرنا تکلیف دیتا ہے۔ یہ پہلی بار کب نظر آیا؟"
+   },
+   {
+    "role": "owner",
+    "text": "یہ پچھلی بہار سے شروع ہوا، زیادہ تر ڈریس اور جوتے۔ ہمارا کوریئر دیر سے بھی ڈیلیور کرتا ہے، اس لیے لوگ دروازے پر پارسل لیتے ہی نہیں۔ کسی بھی تبدیلی کے لیے ہمارا تنگ بجٹ 50,000 روپے مہینہ ہے، اور معاہدے کی وجہ سے ہم کوریئر نہیں بدل سکتے۔ پچھلے مہینے مفت واپسی آزمائی تھی مگر واپسیاں اور بڑھ گئیں۔ میرا خیال ہے کوریئر اس لیے سست ہے کہ وہ سب کچھ ایک ڈپو سے بھیجتا ہے۔"
+   },
+   {
+    "role": "pi",
+    "reply_source": "reference",
+    "text": "ٹھیک ہے۔ مہینے میں واپسیوں پر آپ کا تقریباً کتنا خرچ ہوتا ہے؟"
+   },
+   {
+    "role": "owner",
+    "text": "معذرت، 20 نہیں 200 پارسل ہر مہینے واپس آتے ہیں۔ اب ہم کیا کریں؟",
+    "asks_idea": true
+   },
+   {
+    "role": "pi",
+    "reply_source": "reference",
+    "text": "ایک خیال یہ ہے کہ آرڈر کی تصدیق میں ہر خریدار کو ڈیلیوری کے دنوں کی حد بتائیں تاکہ وہ پارسل کا انتظار کرے۔ آپ کیا نتیجہ چاہتے ہیں؟"
+   },
+   {
+    "role": "owner",
+    "text": "نہیں، کوریئر قابل اعتماد نہ ہو تو ہم ڈیلیوری کے دنوں کا وعدہ نہیں کر سکتے۔ اور یہ صرف واٹس ایپ پر چلنا چاہیے، ہمارے خریدار ویب سائٹ نہیں کھولتے۔"
+   }
+  ],
+  "expected": {
+   "problems": [
+    {
+     "id": "p1",
+     "any": [
+      "ڈیلیوری",
+      "پارسل",
+      "آرڈر"
+     ],
+     "figures": [
+      "200"
+     ]
+    },
+    {
+     "id": "p2",
+     "any": [
+      "کوریئر",
+      "دیر",
+      "دروازے"
+     ],
+     "figures": []
+    }
+   ],
+   "stated": [
+    "بہت سے گاہک ڈیلیوری کے بعد اپنا آرڈر واپس کر دیتے ہیں",
+    "200 پارسل ہر مہینے واپس آتے ہیں",
+    "زیادہ تر ڈریس اور جوتے",
+    "50,000 روپے"
+   ],
+   "missing": [
+    "since_cost",
+    "outcome"
+   ],
+   "constraints": [
+    {
+     "kind": "budget",
+     "text": "تنگ بجٹ 50,000 روپے مہینہ ہے",
+     "blocks": [
+      "50,000",
+      "مہنگا",
+      "خرچ کرنا"
+     ],
+     "status": "confirmed",
+     "said_in_turn": 1,
+     "problem": null
+    },
+    {
+     "kind": "cannot_change",
+     "text": "معاہدے کی وجہ سے ہم کوریئر نہیں بدل سکتے",
+     "blocks": [
+      "کوریئر بدل",
+      "نیا کوریئر",
+      "تیز کوریئر",
+      "دوسرا کوریئر"
+     ],
+     "status": "confirmed",
+     "said_in_turn": 1,
+     "problem": "p2"
+    },
+    {
+     "kind": "cannot_change",
+     "text": "ہم ڈیلیوری کے دنوں کا وعدہ نہیں کر سکتے",
+     "blocks": [
+      "وعدہ",
+      "ڈیلیوری کے دن",
+      "تاریخ کا وعدہ"
+     ],
+     "status": "confirmed",
+     "said_in_turn": 3,
+     "problem": "p2"
+    },
+    {
+     "kind": "cannot_change",
+     "text": "یہ صرف واٹس ایپ پر چلنا چاہیے",
+     "blocks": [
+      "ویب سائٹ",
+      "ایپ",
+      "پورٹل",
+      "ای میل"
+     ],
+     "status": "confirmed",
+     "said_in_turn": 3,
+     "problem": null
+    }
+   ],
+   "tried": [
+    {
+     "what": "مفت واپسی آزمائی",
+     "outcome": "واپسیاں اور بڑھ گئیں",
+     "said_in_turn": 1
+    }
+   ],
+   "cause": {
+    "text": "وہ سب کچھ ایک ڈپو سے بھیجتا ہے",
+    "status": "owner_said",
+    "evidence_words": [
+     "ایک ڈپو"
+    ],
+    "problem": "p2"
+   },
+   "hypothesis_only": [
+    "poor product photos",
+    "damaged packaging"
+   ],
+   "corrections": [
+    {
+     "wrong": "20",
+     "right": "200",
+     "problem": "p1",
+     "turn": 2
+    }
+   ],
+   "requirement_change": {
+    "turn": 3,
+    "text": "یہ صرف واٹس ایپ پر چلنا چاہیے",
+    "kind": "scope"
+   },
+   "rejected_solution": {
+    "idea_turn": 2,
+    "turn": 3,
+    "reason_words": [
+     "کوریئر قابل اعتماد نہ ہو تو ہم ڈیلیوری کے دنوں کا وعدہ نہیں کر سکتے"
+    ]
+   },
+   "answered_facts": [
+    {
+     "slot": "count",
+     "value_words": [
+      "20",
+      "پارسل"
+     ],
+     "said_in_turn": 0
+    },
+    {
+     "slot": "how_often",
+     "value_words": [
+      "ہر مہینے"
+     ],
+     "said_in_turn": 0
+    },
+    {
+     "slot": "since",
+     "value_words": [
+      "پچھلی بہار سے"
+     ],
+     "said_in_turn": 1
+    },
+    {
+     "slot": "where",
+     "value_words": [
+      "ڈریس اور جوتے"
+     ],
+     "said_in_turn": 1
+    },
+    {
+     "slot": "constraint",
+     "value_words": [
+      "کوریئر نہیں بدل سکتے"
+     ],
+     "said_in_turn": 1
+    },
+    {
+     "slot": "tried",
+     "value_words": [
+      "مفت واپسی"
+     ],
+     "said_in_turn": 1
+    },
+    {
+     "slot": "cause",
+     "value_words": [
+      "ایک ڈپو"
+     ],
+     "said_in_turn": 1
+    }
+   ],
+   "questions": [
+    {
+     "after_turn": 0,
+     "slot": "since"
+    },
+    {
+     "after_turn": 1,
+     "slot": "money"
+    },
+    {
+     "after_turn": 2,
+     "slot": "outcome"
+    }
+   ],
+   "candidates": [
+    {
+     "id": "c1",
+     "text": "پارسل کوریئر کے ساتھ نکلتے ہی ہر خریدار کو ٹریکنگ کے ساتھ پیغام بھیجیں تاکہ خریدار کو پتا ہو اور وہ گھر پر ہو۔",
+     "verdict": "relevant",
+     "problem": "p2",
+     "reason": "uses the courier and parcels, needs no new courier"
+    },
+    {
+     "id": "c2",
+     "text": "واپس کیے گئے پارسل کی فہرست رکھیں اور ہر ایک کے ساتھ کوریئر کی دیر لکھیں تاکہ اگلے معاہدے کے جائزے میں کوریئر کو دکھائی جا سکے۔",
+     "verdict": "relevant",
+     "problem": "p2",
+     "reason": "builds evidence about late deliveries"
+    },
+    {
+     "id": "c3",
+     "text": "ہر آرڈر کے لیے تیز کوریئر کمپنی پر جائیں اور کوریئر بدل دیں۔",
+     "verdict": "violates_constraint",
+     "problem": "p2",
+     "reason": "contract forbids changing courier"
+    },
+    {
+     "id": "c4",
+     "text": "چیک آؤٹ پر تہوار کے خریداروں کے لیے گفٹ ریپنگ کا اختیار شامل کریں۔",
+     "verdict": "irrelevant",
+     "problem": null,
+     "reason": "unrelated to returns or lateness"
+    },
+    {
+     "id": "c5",
+     "text": "بہتر سافٹ ویئر استعمال کریں تاکہ کاروبار بہتر ہو۔",
+     "verdict": "generic",
+     "problem": null,
+     "reason": "fits any business"
+    }
+   ],
+   "blueprint": {
+    "steps": [
+     {
+      "id": "s1",
+      "text": "ہر واپس یا مسترد پارسل کی وجہ اور کوریئر کی دیر کی فہرست بنائیں",
+      "any": [
+       "پارسل",
+       "وجہ"
+      ]
+     },
+     {
+      "id": "s2",
+      "text": "پارسل نکلتے ہی ہر خریدار کو واٹس ایپ پر پیغام بھیجیں",
+      "any": [
+       "پیغام",
+       "خریدار"
+      ]
+     },
+     {
+      "id": "s3",
+      "text": "مسترد پارسل کی فہرست کوریئر کو معاہدے کے جائزے میں دکھائیں",
+      "any": [
+       "کوریئر",
+       "جائزے"
+      ]
+     },
+     {
+      "id": "s4",
+      "text": "ماہانہ واپسیوں کا ابھی کے 200 پارسل سے موازنہ کریں",
+      "any": [
+       "موازنہ",
+       "200"
+      ]
+     }
+    ],
+    "dependencies": [
+     {
+      "from": "s1",
+      "to": "s2"
+     },
+     {
+      "from": "s1",
+      "to": "s3"
+     },
+     {
+      "from": "s2",
+      "to": "s4"
+     },
+     {
+      "from": "s3",
+      "to": "s4"
+     }
+    ],
+    "resources": [
+     {
+      "text": "مالک کا واٹس ایپ نمبر اور پیغام بھیجنے کے لیے ٹیم کا ایک فرد",
+      "any": [
+       "واٹس ایپ",
+       "ٹیم"
+      ]
+     }
+    ],
+    "success_criteria": [
+     {
+      "text": "ماہانہ واپس آنے والے پارسل گنیں اور ابھی کے 200 پارسل سے موازنہ کریں",
+      "any": [
+       "200",
+       "ماہانہ"
+      ]
+     }
+    ]
+   }
+  },
+  "recorded": {
+   "origin": "hand_written reference output written by hand, not model output",
+   "notes_by_turn": {
+    "0": [
+     {
+      "title": "Customers return many delivered orders",
+      "title_local": "گاہک ڈیلیوری کے بعد آرڈر واپس کرتے ہیں",
+      "user_words": [
+       "ہر مہینے تقریباً 20 پارسل واپس آتے ہیں"
+      ],
+      "summary": "Parcels come back after delivery and delivery is paid twice.",
+      "category": "orders_fulfilment",
+      "subtype": "",
+      "where": [],
+      "frequency_text": "ہر مہینے",
+      "since_text": "",
+      "money_text": "",
+      "of_total": "20 پارسل",
+      "impact_types": [],
+      "constraints": [],
+      "tried": [],
+      "cause": "",
+      "cause_status": "",
+      "expected_outcome": ""
+     }
+    ],
+    "1": [
+     {
+      "title": "Late courier makes buyers refuse parcels",
+      "title_local": "کوریئر کی دیر سے لوگ پارسل نہیں لیتے",
+      "user_words": [
+       "ہمارا کوریئر دیر سے بھی ڈیلیور کرتا ہے"
+      ],
+      "summary": "Late deliveries lead buyers to refuse parcels at the door.",
+      "category": "orders_fulfilment",
+      "subtype": "",
+      "where": [],
+      "frequency_text": "",
+      "since_text": "",
+      "money_text": "",
+      "of_total": "",
+      "impact_types": [],
+      "constraints": [
+       "معاہدے کی وجہ سے ہم کوریئر نہیں بدل سکتے",
+       "تنگ بجٹ 50,000 روپے مہینہ"
+      ],
+      "tried": [
+       "پچھلے مہینے مفت واپسی آزمائی تھی مگر واپسیاں اور بڑھ گئیں"
+      ],
+      "cause": "وہ سب کچھ ایک ڈپو سے بھیجتا ہے",
+      "cause_status": "owner_said",
+      "expected_outcome": ""
+     }
+    ]
+   }
+  }
+ },
+ {
+  "id": "ps_ecommerce_ar",
+  "case_type": "conversation",
+  "format_version": 2,
+  "industry": "e_commerce_and_d2c_brands",
+  "language": "ar",
+  "kind": "problem_solving",
+  "regression": false,
+  "title": "Returned parcels and late courier",
+  "synthetic": true,
+  "provenance": {
+   "author": "PS-0 agent",
+   "reviewer": null,
+   "created": "2026-10-31",
+   "origin": "hand_written"
+  },
+  "scenario": "ecommerce",
+  "messages": [
+   "كثير من العملاء يعيدون طلباتهم بعد التوصيل. حوالي 20 طردا يعود كل شهر وكل واحد يكلفنا أجرة التوصيل مرتين.",
+   "بدأ ذلك في الربيع الماضي، وأغلبها فساتين وأحذية. شركة الشحن تتأخر أيضا، فيرفض الناس الطرد عند الباب. ميزانيتنا ضيقة، لدينا 50,000 ريال في الشهر لأي تغيير، ولا نستطيع تغيير شركة الشحن بسبب العقد. جربنا الإرجاع المجاني الشهر الماضي لكن الإرجاع زاد. أظن أن شركة الشحن بطيئة لأنها ترسل كل شيء عبر مستودع واحد.",
+   "عذرا، ليس 20 بل 200 طرد يعود كل شهر. ماذا نفعل الآن؟",
+   "لا، لا نستطيع وعد الزبائن بأيام التوصيل ما دامت شركة الشحن غير موثوقة. ويجب أن يعمل على واتساب فقط، لأن زبائننا لا يفتحون الموقع."
+  ],
+  "turns": [
+   {
+    "role": "owner",
+    "text": "كثير من العملاء يعيدون طلباتهم بعد التوصيل. حوالي 20 طردا يعود كل شهر وكل واحد يكلفنا أجرة التوصيل مرتين."
+   },
+   {
+    "role": "pi",
+    "reply_source": "reference",
+    "text": "دفع التوصيل مرتين مؤلم. متى لاحظتم ذلك لأول مرة؟"
+   },
+   {
+    "role": "owner",
+    "text": "بدأ ذلك في الربيع الماضي، وأغلبها فساتين وأحذية. شركة الشحن تتأخر أيضا، فيرفض الناس الطرد عند الباب. ميزانيتنا ضيقة، لدينا 50,000 ريال في الشهر لأي تغيير، ولا نستطيع تغيير شركة الشحن بسبب العقد. جربنا الإرجاع المجاني الشهر الماضي لكن الإرجاع زاد. أظن أن شركة الشحن بطيئة لأنها ترسل كل شيء عبر مستودع واحد."
+   },
+   {
+    "role": "pi",
+    "reply_source": "reference",
+    "text": "هذا يفيد. كم تكلفكم المرتجعات في الشهر تقريبا؟"
+   },
+   {
+    "role": "owner",
+    "text": "عذرا، ليس 20 بل 200 طرد يعود كل شهر. ماذا نفعل الآن؟",
+    "asks_idea": true
+   },
+   {
+    "role": "pi",
+    "reply_source": "reference",
+    "text": "فكرة واحدة أن نخبر كل مشتر بمدى أيام التوصيل في تأكيد الطلب حتى ينتظر الطرد. ما النتيجة التي تريدونها؟"
+   },
+   {
+    "role": "owner",
+    "text": "لا، لا نستطيع وعد الزبائن بأيام التوصيل ما دامت شركة الشحن غير موثوقة. ويجب أن يعمل على واتساب فقط، لأن زبائننا لا يفتحون الموقع."
+   }
+  ],
+  "expected": {
+   "problems": [
+    {
+     "id": "p1",
+     "any": [
+      "التوصيل",
+      "طرد",
+      "طلباتهم"
+     ],
+     "figures": [
+      "200"
+     ]
+    },
+    {
+     "id": "p2",
+     "any": [
+      "الشحن",
+      "تتأخر",
+      "الطرد"
+     ],
+     "figures": []
+    }
+   ],
+   "stated": [
+    "كثير من العملاء يعيدون طلباتهم بعد التوصيل",
+    "200 طرد يعود كل شهر",
+    "فساتين وأحذية",
+    "50,000 ريال"
+   ],
+   "missing": [
+    "since_cost",
+    "outcome"
+   ],
+   "constraints": [
+    {
+     "kind": "budget",
+     "text": "لدينا 50,000 ريال في الشهر لأي تغيير",
+     "blocks": [
+      "50,000",
+      "مكلف",
+      "أداة مدفوعة"
+     ],
+     "status": "confirmed",
+     "said_in_turn": 1,
+     "problem": null
+    },
+    {
+     "kind": "cannot_change",
+     "text": "لا نستطيع تغيير شركة الشحن بسبب العقد",
+     "blocks": [
+      "تغيير شركة الشحن",
+      "شركة شحن جديدة",
+      "شركة شحن أسرع",
+      "بدل شركة"
+     ],
+     "status": "confirmed",
+     "said_in_turn": 1,
+     "problem": "p2"
+    },
+    {
+     "kind": "cannot_change",
+     "text": "لا نستطيع وعد الزبائن بأيام التوصيل",
+     "blocks": [
+      "وعد",
+      "أيام التوصيل",
+      "موعد محدد"
+     ],
+     "status": "confirmed",
+     "said_in_turn": 3,
+     "problem": "p2"
+    },
+    {
+     "kind": "cannot_change",
+     "text": "يجب أن يعمل على واتساب فقط",
+     "blocks": [
+      "الموقع",
+      "تطبيق",
+      "بوابة",
+      "بريد"
+     ],
+     "status": "confirmed",
+     "said_in_turn": 3,
+     "problem": null
+    }
+   ],
+   "tried": [
+    {
+     "what": "جربنا الإرجاع المجاني",
+     "outcome": "الإرجاع زاد",
+     "said_in_turn": 1
+    }
+   ],
+   "cause": {
+    "text": "ترسل كل شيء عبر مستودع واحد",
+    "status": "owner_said",
+    "evidence_words": [
+     "مستودع واحد"
+    ],
+    "problem": "p2"
+   },
+   "hypothesis_only": [
+    "poor product photos",
+    "damaged packaging"
+   ],
+   "corrections": [
+    {
+     "wrong": "20",
+     "right": "200",
+     "problem": "p1",
+     "turn": 2
+    }
+   ],
+   "requirement_change": {
+    "turn": 3,
+    "text": "يجب أن يعمل على واتساب فقط",
+    "kind": "scope"
+   },
+   "rejected_solution": {
+    "idea_turn": 2,
+    "turn": 3,
+    "reason_words": [
+     "لا نستطيع وعد الزبائن بأيام التوصيل ما دامت شركة الشحن غير موثوقة"
+    ]
+   },
+   "answered_facts": [
+    {
+     "slot": "count",
+     "value_words": [
+      "20",
+      "طردا"
+     ],
+     "said_in_turn": 0
+    },
+    {
+     "slot": "how_often",
+     "value_words": [
+      "كل شهر"
+     ],
+     "said_in_turn": 0
+    },
+    {
+     "slot": "since",
+     "value_words": [
+      "في الربيع الماضي"
+     ],
+     "said_in_turn": 1
+    },
+    {
+     "slot": "where",
+     "value_words": [
+      "فساتين وأحذية"
+     ],
+     "said_in_turn": 1
+    },
+    {
+     "slot": "constraint",
+     "value_words": [
+      "لا نستطيع تغيير شركة الشحن"
+     ],
+     "said_in_turn": 1
+    },
+    {
+     "slot": "tried",
+     "value_words": [
+      "الإرجاع المجاني"
+     ],
+     "said_in_turn": 1
+    },
+    {
+     "slot": "cause",
+     "value_words": [
+      "مستودع واحد"
+     ],
+     "said_in_turn": 1
+    }
+   ],
+   "questions": [
+    {
+     "after_turn": 0,
+     "slot": "since"
+    },
+    {
+     "after_turn": 1,
+     "slot": "money"
+    },
+    {
+     "after_turn": 2,
+     "slot": "outcome"
+    }
+   ],
+   "candidates": [
+    {
+     "id": "c1",
+     "text": "أرسل لكل مشتر رسالة عند خروج الطرد مع رقم التتبع حتى يعرف المشتري ويكون في البيت.",
+     "verdict": "relevant",
+     "problem": "p2",
+     "reason": "uses the courier and parcels, needs no new courier"
+    },
+    {
+     "id": "c2",
+     "text": "احتفظ بقائمة الطرود المرفوضة مع تأخر شركة الشحن لكل منها لتعرضها على الشركة عند مراجعة العقد القادمة.",
+     "verdict": "relevant",
+     "problem": "p2",
+     "reason": "builds evidence about late deliveries"
+    },
+    {
+     "id": "c3",
+     "text": "انتقل إلى شركة شحن أسرع لكل طلب وبدل شركة الشحن.",
+     "verdict": "violates_constraint",
+     "problem": "p2",
+     "reason": "contract forbids changing courier"
+    },
+    {
+     "id": "c4",
+     "text": "أضف خيار تغليف الهدايا عند الدفع لمشتري الأعياد.",
+     "verdict": "irrelevant",
+     "problem": null,
+     "reason": "unrelated to returns or lateness"
+    },
+    {
+     "id": "c5",
+     "text": "استخدم برنامجا أفضل لتحسين العمل.",
+     "verdict": "generic",
+     "problem": null,
+     "reason": "fits any business"
+    }
+   ],
+   "blueprint": {
+    "steps": [
+     {
+      "id": "s1",
+      "text": "اكتب قائمة بكل طرد معاد أو مرفوض مع السبب وتأخر شركة الشحن",
+      "any": [
+       "طرد",
+       "السبب"
+      ]
+     },
+     {
+      "id": "s2",
+      "text": "أرسل لكل مشتر رسالة على واتساب عند خروج الطرد",
+      "any": [
+       "رسالة",
+       "مشتر"
+      ]
+     },
+     {
+      "id": "s3",
+      "text": "اعرض قائمة الطرود المرفوضة على شركة الشحن عند مراجعة العقد",
+      "any": [
+       "شركة الشحن",
+       "مراجعة"
+      ]
+     },
+     {
+      "id": "s4",
+      "text": "قارن المرتجعات الشهرية بالـ 200 طرد الآن",
+      "any": [
+       "قارن",
+       "200"
+      ]
+     }
+    ],
+    "dependencies": [
+     {
+      "from": "s1",
+      "to": "s2"
+     },
+     {
+      "from": "s1",
+      "to": "s3"
+     },
+     {
+      "from": "s2",
+      "to": "s4"
+     },
+     {
+      "from": "s3",
+      "to": "s4"
+     }
+    ],
+    "resources": [
+     {
+      "text": "رقم واتساب المالك وفرد من الفريق لإرسال الرسائل",
+      "any": [
+       "واتساب",
+       "الفريق"
+      ]
+     }
+    ],
+    "success_criteria": [
+     {
+      "text": "عدد الطرود العائدة شهريا يقارن بالـ 200 طرد الآن",
+      "any": [
+       "200",
+       "شهريا"
+      ]
+     }
+    ]
+   }
+  },
+  "recorded": {
+   "origin": "hand_written reference output written by hand, not model output",
+   "notes_by_turn": {
+    "0": [
+     {
+      "title": "Customers return many delivered orders",
+      "title_local": "العملاء يعيدون كثيرا من الطلبات",
+      "user_words": [
+       "حوالي 20 طردا يعود كل شهر"
+      ],
+      "summary": "Parcels come back after delivery and delivery is paid twice.",
+      "category": "orders_fulfilment",
+      "subtype": "",
+      "where": [],
+      "frequency_text": "كل شهر",
+      "since_text": "",
+      "money_text": "",
+      "of_total": "20 طردا",
+      "impact_types": [],
+      "constraints": [],
+      "tried": [],
+      "cause": "",
+      "cause_status": "",
+      "expected_outcome": ""
+     }
+    ],
+    "1": [
+     {
+      "title": "Late courier makes buyers refuse parcels",
+      "title_local": "تأخر الشحن يجعل الناس يرفضون الطرد",
+      "user_words": [
+       "شركة الشحن تتأخر أيضا"
+      ],
+      "summary": "Late deliveries lead buyers to refuse parcels at the door.",
+      "category": "orders_fulfilment",
+      "subtype": "",
+      "where": [],
+      "frequency_text": "",
+      "since_text": "",
+      "money_text": "",
+      "of_total": "",
+      "impact_types": [],
+      "constraints": [
+       "لا نستطيع تغيير شركة الشحن بسبب العقد",
+       "50,000 ريال في الشهر لأي تغيير"
+      ],
+      "tried": [
+       "جربنا الإرجاع المجاني الشهر الماضي لكن الإرجاع زاد"
+      ],
+      "cause": "ترسل كل شيء عبر مستودع واحد",
+      "cause_status": "owner_said",
+      "expected_outcome": ""
+     }
+    ]
+   }
+  }
+ },
+ {
   "id": "ps_bookings_en",
   "case_type": "conversation",
   "format_version": 2,
@@ -1233,6 +2061,422 @@
        "We tried a shared whiteboard but people kept rubbing it out"
       ],
       "cause": "the receptionist mixes up the courts when it is busy",
+      "cause_status": "owner_said",
+      "expected_outcome": ""
+     }
+    ]
+   }
+  }
+ },
+ {
+  "id": "ps_bookings_roman_ur",
+  "case_type": "conversation",
+  "format_version": 2,
+  "industry": "sports_clubs_academies_and_turf_court_rentals",
+  "language": "roman_ur",
+  "kind": "problem_solving",
+  "regression": false,
+  "title": "Double bookings on turf slots",
+  "synthetic": true,
+  "provenance": {
+   "author": "PS-0 agent",
+   "reviewer": null,
+   "created": "2026-10-31",
+   "origin": "hand_written"
+  },
+  "scenario": "bookings",
+  "messages": [
+   "Do teams ek hi turf slot par aa jati hain. Har mahine taqreeban 5 double booking hoti hain aur teams naraz hoti hain.",
+   "Yeh shaam ke slots shamil karne ke baad shuru hua. Bookings WhatsApp par aati hain aur humari ek receptionist unhe kaghaz ki diary mein likhti hai. Is saal naye system ke liye paisa nahi hai aur hum WhatsApp bookings lena band nahi kar sakte. Hum ne shared whiteboard try kiya tha lekin log mita dete the. Mera khayal hai jab rush hota hai to receptionist courts ko ghalat mila deti hai.",
+   "Sorry, 5 nahi 50 double booking har mahine hoti hain. Ab hum kya kar sakte hain?",
+   "Nahi, ek receptionist har booking par lambe jawab nahi likh sakti. Aur har booking ek minute se kam mein honi chahiye."
+  ],
+  "turns": [
+   {
+    "role": "owner",
+    "text": "Do teams ek hi turf slot par aa jati hain. Har mahine taqreeban 5 double booking hoti hain aur teams naraz hoti hain."
+   },
+   {
+    "role": "pi",
+    "reply_source": "reference",
+    "text": "Naraz teams waqai masla hain. Double booking kab se shuru hui?"
+   },
+   {
+    "role": "owner",
+    "text": "Yeh shaam ke slots shamil karne ke baad shuru hua. Bookings WhatsApp par aati hain aur humari ek receptionist unhe kaghaz ki diary mein likhti hai. Is saal naye system ke liye paisa nahi hai aur hum WhatsApp bookings lena band nahi kar sakte. Hum ne shared whiteboard try kiya tha lekin log mita dete the. Mera khayal hai jab rush hota hai to receptionist courts ko ghalat mila deti hai."
+   },
+   {
+    "role": "pi",
+    "reply_source": "reference",
+    "text": "Shukriya. Yeh zyada tar weekend par hota hai ya aam dinon mein?"
+   },
+   {
+    "role": "owner",
+    "text": "Sorry, 5 nahi 50 double booking har mahine hoti hain. Ab hum kya kar sakte hain?",
+    "asks_idea": true
+   },
+   {
+    "role": "pi",
+    "reply_source": "reference",
+    "text": "Ek khayal yeh hai ke har booking ki tasdeeq usi chat mein court aur waqt ke saath wapas bhejein, taake ghalti foran nazar aaye. Aap kya nateeja chahte hain?"
+   },
+   {
+    "role": "owner",
+    "text": "Nahi, ek receptionist har booking par lambe jawab nahi likh sakti. Aur har booking ek minute se kam mein honi chahiye."
+   }
+  ],
+  "expected": {
+   "problems": [
+    {
+     "id": "p1",
+     "any": [
+      "double",
+      "turf",
+      "teams"
+     ],
+     "figures": [
+      "50"
+     ]
+    },
+    {
+     "id": "p2",
+     "any": [
+      "receptionist",
+      "diary",
+      "courts"
+     ],
+     "figures": []
+    }
+   ],
+   "stated": [
+    "Do teams ek hi turf slot par aa jati hain",
+    "50 double booking har mahine",
+    "shaam ke slots",
+    "Bookings WhatsApp par aati hain"
+   ],
+   "missing": [
+    "which_days",
+    "outcome",
+    "court_count"
+   ],
+   "constraints": [
+    {
+     "kind": "budget",
+     "text": "naye system ke liye paisa nahi hai",
+     "blocks": [
+      "kharidein",
+      "naya system",
+      "software",
+      "kharid"
+     ],
+     "status": "confirmed",
+     "said_in_turn": 1,
+     "problem": null
+    },
+    {
+     "kind": "cannot_change",
+     "text": "hum WhatsApp bookings lena band nahi kar sakte",
+     "blocks": [
+      "band karein",
+      "sirf phone",
+      "walk-in",
+      "whatsapp chhor"
+     ],
+     "status": "confirmed",
+     "said_in_turn": 1,
+     "problem": "p2"
+    },
+    {
+     "kind": "cannot_change",
+     "text": "ek receptionist har booking par lambe jawab nahi likh sakti",
+     "blocks": [
+      "lambe jawab",
+      "lamba jawab",
+      "tafseeli jawab",
+      "form bharwa"
+     ],
+     "status": "confirmed",
+     "said_in_turn": 3,
+     "problem": "p2"
+    },
+    {
+     "kind": "deadline",
+     "text": "har booking ek minute se kam mein honi chahiye",
+     "blocks": [
+      "lamba form",
+      "kai steps",
+      "tafseeli form"
+     ],
+     "status": "confirmed",
+     "said_in_turn": 3,
+     "problem": null
+    }
+   ],
+   "tried": [
+    {
+     "what": "shared whiteboard try kiya",
+     "outcome": "log mita dete the",
+     "said_in_turn": 1
+    }
+   ],
+   "cause": {
+    "text": "receptionist courts ko ghalat mila deti hai",
+    "status": "owner_said",
+    "evidence_words": [
+     "courts ko ghalat mila"
+    ],
+    "problem": "p2"
+   },
+   "hypothesis_only": [
+    "customers forget their slot",
+    "no deposit taken"
+   ],
+   "corrections": [
+    {
+     "wrong": "5",
+     "right": "50",
+     "problem": "p1",
+     "turn": 2
+    }
+   ],
+   "requirement_change": {
+    "turn": 3,
+    "text": "har booking ek minute se kam mein honi chahiye",
+    "kind": "constraint"
+   },
+   "rejected_solution": {
+    "idea_turn": 2,
+    "turn": 3,
+    "reason_words": [
+     "ek receptionist har booking par lambe jawab nahi likh sakti"
+    ]
+   },
+   "answered_facts": [
+    {
+     "slot": "count",
+     "value_words": [
+      "5",
+      "double booking"
+     ],
+     "said_in_turn": 0
+    },
+    {
+     "slot": "how_often",
+     "value_words": [
+      "Har mahine"
+     ],
+     "said_in_turn": 0
+    },
+    {
+     "slot": "since",
+     "value_words": [
+      "shaam ke slots shamil karne ke baad"
+     ],
+     "said_in_turn": 1
+    },
+    {
+     "slot": "who",
+     "value_words": [
+      "ek receptionist"
+     ],
+     "said_in_turn": 1
+    },
+    {
+     "slot": "constraint",
+     "value_words": [
+      "naye system ke liye paisa nahi"
+     ],
+     "said_in_turn": 1
+    },
+    {
+     "slot": "tried",
+     "value_words": [
+      "shared whiteboard"
+     ],
+     "said_in_turn": 1
+    },
+    {
+     "slot": "cause",
+     "value_words": [
+      "courts ko ghalat mila"
+     ],
+     "said_in_turn": 1
+    }
+   ],
+   "questions": [
+    {
+     "after_turn": 0,
+     "slot": "since"
+    },
+    {
+     "after_turn": 1,
+     "slot": "when"
+    },
+    {
+     "after_turn": 2,
+     "slot": "outcome"
+    }
+   ],
+   "candidates": [
+    {
+     "id": "c1",
+     "text": "Har court ka diary mein alag page banayen aur WhatsApp par booking confirm hote hi har slot par tick lagayen.",
+     "verdict": "relevant",
+     "problem": "p2",
+     "reason": "uses courts, diary and WhatsApp, no spend"
+    },
+    {
+     "id": "c2",
+     "text": "Desk par har court ki chhapi hui slot sheet rakhein taake receptionist ko foran pata ho kis team ke paas kaun sa slot hai.",
+     "verdict": "relevant",
+     "problem": "p1",
+     "reason": "prevents two teams for one slot without new systems"
+    },
+    {
+     "id": "c3",
+     "text": "Sab courts ke liye online payment wala naya system kharidein.",
+     "verdict": "violates_constraint",
+     "problem": "p1",
+     "reason": "no money for new systems"
+    },
+    {
+     "id": "c4",
+     "text": "Front desk par team ki shirts aur thande drinks bechein.",
+     "verdict": "irrelevant",
+     "problem": null,
+     "reason": "unrelated to booking clashes"
+    },
+    {
+     "id": "c5",
+     "text": "Behtar software istemal karein taake club behtar ho.",
+     "verdict": "generic",
+     "problem": null,
+     "reason": "fits any business"
+    }
+   ],
+   "blueprint": {
+    "steps": [
+     {
+      "id": "s1",
+      "text": "Har din ke liye har court ki ek slot sheet banayen",
+      "any": [
+       "slot",
+       "court"
+      ]
+     },
+     {
+      "id": "s2",
+      "text": "Har WhatsApp booking confirm hote hi court ki sheet par likhein",
+      "any": [
+       "booking",
+       "sheet"
+      ]
+     },
+     {
+      "id": "s3",
+      "text": "Har booking ka jawab ek chhoti line mein court aur waqt ke saath dein",
+      "any": [
+       "jawab",
+       "court"
+      ]
+     },
+     {
+      "id": "s4",
+      "text": "Din ke aakhir mein sheets ko diary se milayen",
+      "any": [
+       "sheets",
+       "diary"
+      ]
+     }
+    ],
+    "dependencies": [
+     {
+      "from": "s1",
+      "to": "s2"
+     },
+     {
+      "from": "s1",
+      "to": "s3"
+     },
+     {
+      "from": "s2",
+      "to": "s4"
+     },
+     {
+      "from": "s3",
+      "to": "s4"
+     }
+    ],
+    "resources": [
+     {
+      "text": "Receptionist aur har court ke liye ek chhapi hui sheet",
+      "any": [
+       "receptionist",
+       "sheet"
+      ]
+     }
+    ],
+    "success_criteria": [
+     {
+      "text": "Har mahine double booking gine jayen aur abhi ke 50 se compare hon",
+      "any": [
+       "50",
+       "mahine"
+      ]
+     }
+    ]
+   }
+  },
+  "recorded": {
+   "origin": "hand_written reference output written by hand, not model output",
+   "notes_by_turn": {
+    "0": [
+     {
+      "title": "Two teams booked for one turf slot",
+      "title_local": "Do teams ek hi slot par",
+      "user_words": [
+       "Har mahine taqreeban 5 double booking hoti hain"
+      ],
+      "summary": "Double bookings put two teams on the same slot and make them angry.",
+      "category": "operations_process",
+      "subtype": "",
+      "where": [],
+      "frequency_text": "Har mahine",
+      "since_text": "",
+      "money_text": "",
+      "of_total": "5 double booking",
+      "impact_types": [],
+      "constraints": [],
+      "tried": [],
+      "cause": "",
+      "cause_status": "",
+      "expected_outcome": ""
+     }
+    ],
+    "1": [
+     {
+      "title": "Courts mixed up in the paper diary",
+      "title_local": "Diary mein courts mil jate hain",
+      "user_words": [
+       "humari ek receptionist unhe kaghaz ki diary mein likhti hai"
+      ],
+      "summary": "Bookings arrive on WhatsApp and are copied by hand into a diary.",
+      "category": "operations_process",
+      "subtype": "",
+      "where": [],
+      "frequency_text": "",
+      "since_text": "",
+      "money_text": "",
+      "of_total": "",
+      "impact_types": [],
+      "constraints": [
+       "naye system ke liye paisa nahi hai",
+       "hum WhatsApp bookings lena band nahi kar sakte"
+      ],
+      "tried": [
+       "Hum ne shared whiteboard try kiya tha lekin log mita dete the"
+      ],
+      "cause": "receptionist courts ko ghalat mila deti hai",
       "cause_status": "owner_said",
       "expected_outcome": ""
      }
@@ -2470,6 +3714,413 @@
        "ہم نے ٹوکن سسٹم آزمایا لیکن عملے نے نظر انداز کر دیا"
       ],
       "cause": "ریسپشن اور اسٹائلسٹ دونوں ایک ہی ڈائری میں لکھتے ہیں",
+      "cause_status": "owner_said",
+      "expected_outcome": ""
+     }
+    ]
+   }
+  }
+ },
+ {
+  "id": "ps_salon_ar",
+  "case_type": "conversation",
+  "format_version": 2,
+  "industry": "salons_and_barbers",
+  "language": "ar",
+  "kind": "problem_solving",
+  "regression": false,
+  "title": "Salon walk-outs and clashing bookings",
+  "synthetic": true,
+  "provenance": {
+   "author": "PS-0 agent",
+   "reviewer": null,
+   "created": "2026-10-31",
+   "origin": "hand_written"
+  },
+  "scenario": "salon",
+  "messages": [
+   "الزبائن يغادرون لأن الانتظار في صالوننا طويل جداً. حوالي 6 زبائن في اليوم يغادرون دون قص الشعر.",
+   "منذ الشهر الماضي. كما أن الحجوزات تختلط في الدفتر الورقي، فيأتي شخصان لنفس الكرسي. لدينا 3 مصففين فقط ولا نستطيع توظيف أحد. جربنا نظام أرقام لكن الموظفين تجاهلوه. أعتقد أن السبب أن الاستقبال والمصففين يكتبون معاً في نفس الدفتر.",
+   "آسف، ليس 6 بل 60 زبوناً في اليوم. ماذا نستطيع أن نفعل؟",
+   "لا، لا توجد مساحة عند الباب للوحة. ويجب أن يعمل على الهاتف فقط، دون أي طباعة."
+  ],
+  "turns": [
+   {
+    "role": "owner",
+    "text": "الزبائن يغادرون لأن الانتظار في صالوننا طويل جداً. حوالي 6 زبائن في اليوم يغادرون دون قص الشعر."
+   },
+   {
+    "role": "pi",
+    "reply_source": "reference",
+    "text": "هذه خسارة كبيرة. منذ متى يحدث هذا؟"
+   },
+   {
+    "role": "owner",
+    "text": "منذ الشهر الماضي. كما أن الحجوزات تختلط في الدفتر الورقي، فيأتي شخصان لنفس الكرسي. لدينا 3 مصففين فقط ولا نستطيع توظيف أحد. جربنا نظام أرقام لكن الموظفين تجاهلوه. أعتقد أن السبب أن الاستقبال والمصففين يكتبون معاً في نفس الدفتر."
+   },
+   {
+    "role": "pi",
+    "reply_source": "reference",
+    "text": "حجز شخصين لكرسي واحد أمر مزعج. كيف يحجز الزبائن، بالهاتف أم واتساب أم عند الاستقبال؟"
+   },
+   {
+    "role": "owner",
+    "text": "آسف، ليس 6 بل 60 زبوناً في اليوم. ماذا نستطيع أن نفعل؟",
+    "asks_idea": true
+   },
+   {
+    "role": "pi",
+    "reply_source": "reference",
+    "text": "فكرة واحدة هي لوحة عند الباب تعرض أقرب وقت فارغ لكل كرسي، ليقرر المنتظرون البقاء. ما الذي تريد تغييره أولاً؟"
+   },
+   {
+    "role": "owner",
+    "text": "لا، لا توجد مساحة عند الباب للوحة. ويجب أن يعمل على الهاتف فقط، دون أي طباعة."
+   }
+  ],
+  "expected": {
+   "problems": [
+    {
+     "id": "p1",
+     "any": [
+      "الانتظار",
+      "الزبائن",
+      "الشعر"
+     ],
+     "figures": [
+      "60"
+     ]
+    },
+    {
+     "id": "p2",
+     "any": [
+      "الحجوزات",
+      "الدفتر",
+      "الكرسي"
+     ],
+     "figures": []
+    }
+   ],
+   "stated": [
+    "الانتظار في صالوننا طويل جداً",
+    "الدفتر الورقي",
+    "3 مصففين فقط ولا نستطيع توظيف أحد"
+   ],
+   "missing": [
+    "where",
+    "money",
+    "outcome"
+   ],
+   "constraints": [
+    {
+     "kind": "staff",
+     "text": "3 مصففين فقط ولا نستطيع توظيف أحد",
+     "blocks": [
+      "توظيف",
+      "وظفوا",
+      "إضافيين"
+     ],
+     "status": "confirmed",
+     "said_in_turn": 1,
+     "problem": "p1"
+    },
+    {
+     "kind": "cannot_change",
+     "text": "لا توجد مساحة عند الباب للوحة",
+     "blocks": [
+      "لوحة",
+      "شاشة",
+      "الباب"
+     ],
+     "status": "confirmed",
+     "said_in_turn": 3,
+     "problem": "p1"
+    },
+    {
+     "kind": "cannot_change",
+     "text": "يجب أن يعمل على الهاتف فقط، دون أي طباعة",
+     "blocks": [
+      "ورقة",
+      "طباعة",
+      "الدفتر"
+     ],
+     "status": "confirmed",
+     "said_in_turn": 3,
+     "problem": null
+    }
+   ],
+   "tried": [
+    {
+     "what": "جربنا نظام أرقام لكن الموظفين تجاهلوه",
+     "outcome": "failed because staff ignored it",
+     "said_in_turn": 1
+    }
+   ],
+   "cause": {
+    "text": "الاستقبال والمصففين يكتبون معاً في نفس الدفتر",
+    "status": "owner_said",
+    "evidence_words": [
+     "الاستقبال",
+     "المصففين",
+     "الدفتر"
+    ],
+    "problem": "p2"
+   },
+   "hypothesis_only": [
+    "not enough stylists",
+    "slow haircuts"
+   ],
+   "corrections": [
+    {
+     "wrong": "6",
+     "right": "60",
+     "problem": "p1",
+     "turn": 2
+    }
+   ],
+   "requirement_change": {
+    "turn": 3,
+    "text": "يجب أن يعمل على الهاتف فقط، دون أي طباعة",
+    "kind": "scope"
+   },
+   "rejected_solution": {
+    "idea_turn": 2,
+    "turn": 3,
+    "reason_words": [
+     "لا",
+     "توجد",
+     "مساحة",
+     "الباب",
+     "للوحة"
+    ]
+   },
+   "answered_facts": [
+    {
+     "slot": "count",
+     "value_words": [
+      "زبائن",
+      "اليوم"
+     ],
+     "said_in_turn": 0
+    },
+    {
+     "slot": "since",
+     "value_words": [
+      "الشهر",
+      "الماضي"
+     ],
+     "said_in_turn": 1
+    },
+    {
+     "slot": "count",
+     "value_words": [
+      "3",
+      "مصففين"
+     ],
+     "said_in_turn": 1
+    },
+    {
+     "slot": "tried",
+     "value_words": [
+      "نظام",
+      "أرقام"
+     ],
+     "said_in_turn": 1
+    },
+    {
+     "slot": "constraint",
+     "value_words": [
+      "نستطيع",
+      "توظيف"
+     ],
+     "said_in_turn": 1
+    },
+    {
+     "slot": "cause",
+     "value_words": [
+      "نفس",
+      "الدفتر"
+     ],
+     "said_in_turn": 1
+    }
+   ],
+   "questions": [
+    {
+     "after_turn": 0,
+     "slot": "since"
+    },
+    {
+     "after_turn": 1,
+     "slot": "where"
+    },
+    {
+     "after_turn": 2,
+     "slot": "outcome"
+    }
+   ],
+   "candidates": [
+    {
+     "id": "c1",
+     "text": "خصصوا كرسيين للحجوزات وكرسياً واحداً للزبائن بدون حجز، ليتضح الانتظار لكل مجموعة.",
+     "verdict": "relevant",
+     "problem": "p1",
+     "reason": "fits the stated problem and every limit"
+    },
+    {
+     "id": "c2",
+     "text": "سجلوا كل حجز مع الكرسي والوقت في قائمة واحدة على هاتف الاستقبال حتى لا يحصل شخصان على كرسي واحد.",
+     "verdict": "relevant",
+     "problem": "p2",
+     "reason": "fits the second problem and every limit"
+    },
+    {
+     "id": "c3",
+     "text": "وظفوا مصففين إضافيين ليُخدم كل زبون فوراً.",
+     "verdict": "violates_constraint",
+     "problem": "p1",
+     "reason": "breaks a confirmed limit"
+    },
+    {
+     "id": "c4",
+     "text": "ابدؤوا بطاقة ولاء تمنح قصة شعر مجانية كل عاشر مرة.",
+     "verdict": "irrelevant",
+     "problem": null,
+     "reason": "specific but unrelated to the problems"
+    },
+    {
+     "id": "c5",
+     "text": "استخدموا برنامج أفضل لتحسين العمل.",
+     "verdict": "generic",
+     "problem": null,
+     "reason": "would fit any business"
+    }
+   ],
+   "blueprint": {
+    "steps": [
+     {
+      "id": "s1",
+      "text": "اكتبوا قائمة بالكراسي وأوقات الحجز لأسبوع واحد",
+      "any": [
+       "الكراسي",
+       "الحجز"
+      ]
+     },
+     {
+      "id": "s2",
+      "text": "خصصوا كرسياً واحداً للزبائن بدون حجز في ساعات الذروة",
+      "any": [
+       "كرسياً",
+       "بدون"
+      ]
+     },
+     {
+      "id": "s3",
+      "text": "انقلوا كل حجز إلى قائمة واحدة على هاتف الاستقبال",
+      "any": [
+       "حجز",
+       "قائمة"
+      ]
+     },
+     {
+      "id": "s4",
+      "text": "راجعوا بعد أسبوعين كم زبوناً ما زال يغادر",
+      "any": [
+       "زبوناً",
+       "راجعوا"
+      ]
+     }
+    ],
+    "dependencies": [
+     {
+      "from": "s1",
+      "to": "s2"
+     },
+     {
+      "from": "s1",
+      "to": "s3"
+     },
+     {
+      "from": "s2",
+      "to": "s4"
+     },
+     {
+      "from": "s3",
+      "to": "s4"
+     }
+    ],
+    "resources": [
+     {
+      "text": "شخص عند الاستقبال يحفظ القائمة",
+      "any": [
+       "الاستقبال"
+      ]
+     }
+    ],
+    "success_criteria": [
+     {
+      "text": "عدد الزبائن الذين يغادرون يومياً دون قص الشعر مقارنة بالرقم 60 الآن",
+      "any": [
+       "الزبائن",
+       "60"
+      ]
+     }
+    ]
+   }
+  },
+  "recorded": {
+   "origin": "hand_written reference output written by hand, not model output",
+   "notes_by_turn": {
+    "0": [
+     {
+      "title": "Customers leave because of long wait",
+      "title_local": "الزبائن يغادرون بسبب طول الانتظار",
+      "user_words": [
+       "الانتظار في صالوننا طويل جداً",
+       "6 زبائن في اليوم يغادرون دون قص الشعر"
+      ],
+      "summary": "Customers leave unserved because the wait is long.",
+      "category": "customers_retention",
+      "subtype": "",
+      "where": [],
+      "frequency_text": "في اليوم",
+      "since_text": "",
+      "money_text": "",
+      "of_total": "",
+      "impact_types": [
+       "lost_sales"
+      ],
+      "constraints": [],
+      "tried": [],
+      "cause": "",
+      "cause_status": "",
+      "expected_outcome": ""
+     }
+    ],
+    "1": [
+     {
+      "title": "Bookings get mixed up in diary",
+      "title_local": "الحجوزات تختلط في الدفتر",
+      "user_words": [
+       "الحجوزات تختلط في الدفتر الورقي، فيأتي شخصان لنفس الكرسي"
+      ],
+      "summary": "Bookings clash so two customers get one chair.",
+      "category": "operations_process",
+      "subtype": "",
+      "where": [],
+      "frequency_text": "",
+      "since_text": "منذ الشهر الماضي",
+      "money_text": "",
+      "of_total": "",
+      "impact_types": [
+       "lost_sales"
+      ],
+      "constraints": [
+       "3 مصففين فقط ولا نستطيع توظيف أحد"
+      ],
+      "tried": [
+       "جربنا نظام أرقام لكن الموظفين تجاهلوه"
+      ],
+      "cause": "الاستقبال والمصففين يكتبون معاً في نفس الدفتر",
       "cause_status": "owner_said",
       "expected_outcome": ""
      }

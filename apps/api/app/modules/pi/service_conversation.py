@@ -52,6 +52,7 @@ from app.modules.pi import (
     memory_block,
     open_items,
     open_requests,
+    option_voice,
     option_wiring,
     owner_asks,
     owner_intents,
@@ -332,6 +333,10 @@ class ServiceTurn(BaseModel):
     _new_wants: list[str] = PrivateAttr(default_factory=list)
     _need_fact: bool = PrivateAttr(default=False)  # the reply is the one-more-fact question
     _cost_line: str = PrivateAttr(default="")  # the fixed cost answer, put in after any rewrite
+    _voice_block: str = PrivateAttr(default="")  # fixed option statements, put in after any rewrite
+    _voice_question: str = PrivateAttr(default="")  # the one targeted question, put last
+    _voice_unmarked: tuple[int, ...] = PrivateAttr(default=())  # ideas not yet checked
+    _voice_language: str = PrivateAttr(default="en")
     _english: bool = PrivateAttr(default=False)  # an English list was written: translate it
     _free: bool = PrivateAttr(default=False)  # the ideas were the model's own, vetted
     _ideas_rejected: bool = PrivateAttr(default=False)  # its idea lines were not owner actions
@@ -2006,6 +2011,38 @@ def after_fixed_reply(turn: "ServiceTurn", context: dict[str, Any]) -> None:
     turn._cost_line = decisions.cost_answer(language, context) if decisions.cost_asked(said) else ""
 
 
+def brain_option_voice(turn: "ServiceTurn", context: dict[str, Any]) -> None:
+    """Group A: the ideas the reply lists are gated against what the owner stated (L2-1), rejected
+    ones are removed, unchecked ones are labelled, and the owner reads, in their language, which
+    idea to start with and why, what was left out and which of their own words ruled it out, and the
+    one question that would settle what blocks. Brain mode, ideas listed, requirements known."""
+    reqs = option_wiring.requirements_from(context.get("requirements"))
+    if reqs.empty and reqs.columns_available:
+        return
+    language = fixed_lines.code(context, script=True)  # "ur" for Urdu script, "ar" for Arabic
+    # gated on the reply as it stands (English ideas are read best); the labels, the fixed block and
+    # the question are put in after the language step, in the reply's own language
+    voiced = option_voice.voice(turn.reply, reqs, language)
+    if not voiced.changed:
+        return
+    turn.reply = voiced.reply
+    turn._voice_block = voiced.block
+    turn._voice_question = voiced.question
+    turn._voice_unmarked = voiced.unmarked
+    turn._voice_language = language
+    if voiced.question or voiced.block:
+        turn.awaiting_customer = True
+
+
+def put_option_voice(reply: str, block: str, question: str) -> str:
+    """The option statements in front of the reply (after the AI disclosure of a first message), the
+    one question last."""
+    text = put_cost_line(reply, block) if block else reply
+    if question:
+        text = f"{text.rstrip()}{chr(10) * 2}{question}" if text.strip() else question
+    return text
+
+
 def put_cost_line(reply: str, line: str) -> str:
     """The fixed cost answer in front of the reply, or right after pi's opening disclosure when the
     reply starts with one (R-DISC-01: the first sentence of a first message says pi is an AI)."""
@@ -2878,25 +2915,13 @@ async def brain_expert_ideas(
     brief = expert_advisor.remember(
         brief, main, advice, int(brief.get("owner_n") or len(owner)) if owner else None
     )
-    wired = None
-    if advice.ideas and context.get("pi_mode") == "brain":
-        # L2-1: drop ideas that break a stated limit (with the reason), label the unchecked ones,
-        # and when nothing is left ask one targeted question instead of padding to the cap
-        reqs_now = option_wiring.requirements_from(context.get("requirements"))
-        wired = option_wiring.gate_ideas(list(advice.ideas), reqs_now, language)
-        if wired.changed:
-            advice.ideas = list(wired.shown)
-            if wired.question:
-                advice.question = wired.question
     if not advice.ideas:
         question = advice.question or (
             idea_filter.need_fact_line(idea_ctx) if idea_ctx is not None else ""
         )
         if not question:
             return False
-        if wired is not None and wired.notice and wired.question:
-            question = f"{wired.notice} {question}"
-        elif question == advice.question:
+        if question == advice.question:
             question = expert_advisor.need_fact_reply(question)
         said_now = str(context.get("latest_customer_message") or "")
         if decisions.cost_asked(said_now):
@@ -2910,9 +2935,8 @@ async def brain_expert_ideas(
         turn._free = True
         conversation.service_brief = brief
         return True
-    notice = f"{wired.notice} " if wired is not None and wired.notice else ""
     turn.reply = with_disclosure(
-        notice + ideas_opener(context) + solution_rules.idea_lines(advice.ideas), context, language
+        ideas_opener(context) + solution_rules.idea_lines(advice.ideas), context, language
     )
     turn._english = True
     turn.awaiting_customer = True
@@ -6472,6 +6496,7 @@ async def compose_service_turn(
         brain_never_empty(turn, context)
         brain_offer(turn, context)
         strip_unallowed_offer(turn, context)
+        brain_option_voice(turn, context)
     if context.get("handback_notice") and not turn.request_human and turn._decision is None:
         short = safety.handback_reply(str(context.get("reply_language") or "en"))
         turn.reply = f"{short.rsplit('. ', 1)[0]}. {turn.reply}"
@@ -6504,6 +6529,11 @@ async def compose_service_turn(
         turn.reply = roman_ideas_opener(roman_polish(turn.reply), context)
     if turn._cost_line:
         turn.reply = put_cost_line(turn.reply, turn._cost_line)
+    if turn._voice_block or turn._voice_question or turn._voice_unmarked:
+        turn.reply = option_voice.label_ideas(
+            turn.reply, turn._voice_unmarked, turn._voice_language
+        )
+        turn.reply = put_option_voice(turn.reply, turn._voice_block, turn._voice_question)
     latest_language = detect_language(str(context.get("latest_customer_message", "")))
     if latest_language == expected and (
         clearly_other(turn.reply, str(expected or ""))
