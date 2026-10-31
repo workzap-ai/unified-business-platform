@@ -846,6 +846,17 @@ _CONCRETE_GROUPS = {
         accident injury fraud breakage sale profit income loss""",
 }
 _CONCRETE = frozenset(w for group in _CONCRETE_GROUPS.values() for w in group.split())
+# things nobody buys: an outcome ('downtime'), a piece of operations ('menu', 'shift') or a time
+_OUTCOME_WORDS = frozenset(_CONCRETE_GROUPS["outcomes"].split())
+_NONTHING = _OUTCOME_WORDS | frozenset(
+    w for g in ("operations", "time") for w in _CONCRETE_GROUPS[g].split()
+)
+# verbs 'cannot afford X' forbids when X is a thing: every way of getting it
+_AFFORD_VERBS = (
+    "buy", "purchase", "acquire", "procure", "order", "hire", "recruit", "employ", "appoint",
+    "spend", "pay", "invest", "take", "borrow", "lease", "rent", "subscribe", "licence", "license",
+    "install", "get",
+)  # fmt: skip
 
 
 def _denied(word: str) -> bool:
@@ -869,6 +880,16 @@ def _concrete(word: str, known: frozenset[str] = frozenset()) -> bool:
     return (word in known or one in known) and not _denied(word)
 
 
+def _is_in(word: str, words: frozenset[str]) -> bool:
+    return word in words or english_plural(word) in words
+
+
+def _thing(word: str, known: frozenset[str] = frozenset()) -> bool:
+    """A concrete word that is something one can buy, hire, lease or subscribe to: in the lexicon
+    outside the outcome, operations and time groups, or a case word that is not in the lexicon."""
+    return _concrete(word, known) and not _is_in(word, _NONTHING)
+
+
 def _non_concrete(word: str, known: frozenset[str] = frozenset()) -> bool:
     return not _concrete(word, known)
 
@@ -876,14 +897,6 @@ def _non_concrete(word: str, known: frozenset[str] = frozenset()) -> bool:
 _NOT_A_VERB = {"be", "have", "do", "go", "get"}
 # 'cannot lose X', 'cannot risk X': a stated goal, not a prohibition on ideas that name X
 _GOAL_VERBS = {"lose", "miss", "risk", "waste", "delay", "harm", "afford"}
-# things a business buys; 'cannot afford X' is a buy or spend limit only for these
-_PURCHASABLE = {"money", "cash", "equipment", "machine", "machinery", "generator", "system",
-                "software", "app", "tool", "tablet", "computer", "laptop", "phone", "printer",
-                "scanner", "vehicle", "car", "bike", "truck", "van", "mill", "tractor", "oven",
-                "fridge", "camera", "staff", "employee", "worker", "helper", "clerk", "assistant",
-                "manager", "consultant", "course", "training", "license", "ads", "advertising",
-                "stock", "inventory", "hall", "shop", "land", "furniture", "building",
-                "premises", "loan", "credit", "debt", "pos"}  # fmt: skip
 # Every text is collapsed to single spaces first and read only up to these lengths; a longer
 # limit or idea is reported as 'unknown' with a flag, never scored. Keeps all parsing linear.
 MAX_LIMIT_TEXT = 600
@@ -974,9 +987,7 @@ def _parse_rules(
     seen: set[tuple[str, str]] = set()
     groups, alts = _family_stems(language)
     afford = stem_ascii("afford", language, True)
-    buyish = {stem_ascii(w, language, True) for w in ("buy", "spend", "hire")}
     goal = {stem_ascii(w, language, True) for w in _GOAL_VERBS}
-    purchasable = {stem_ascii(w, language, True) for w in _PURCHASABLE}
     money_only = {stem_ascii(w, language, True) for w in ("afford", "spend", "pay")}
     give = {stem_ascii(w, language, True) for w in ("give", "offer", "grant")}
     offer_also = {stem_ascii(w, language, True) for w in _OFFER_ALSO}
@@ -986,8 +997,6 @@ def _parse_rules(
         stem_ascii(k, language, True): {stem_ascii(v, language, True) for v in vs}
         for k, vs in _HYPERNYMS.items()
     }
-
-    hyponyms = set().union(*hyper.values())
 
     def add_neg(verb: str, obj: str, last: bool = False, ru: bool = False) -> None:
         if verb in _NOT_A_VERB:
@@ -1017,12 +1026,37 @@ def _parse_rules(
         concrete = [w for w in words if _concrete(w, known)]
         if concrete:  # only the concrete nouns are matched: 'big staff costs' is 'staff'
             objects = frozenset(stems_of(" ".join(concrete), language))
+        if stem == afford:
+            # 'cannot afford X': a thing is enforced with every way of getting it; an outcome is
+            # a goal; anything else is not a rule, so the limit stays unreadable. Never inert.
+            things = [w for w in concrete if _thing(w, known)]
+            outs = [w for w in concrete if _is_in(w, _OUTCOME_WORDS)]
+            if things:
+                objects = frozenset(stems_of(" ".join(things), language))
+                if not objects:
+                    return  # a word too short to match ('ad'): no rule, the limit stays unknown
+                aliases = frozenset().union(*(hyper.get(o, set()) for o in objects))
+                group = {stem_ascii(w, language, True) for w in _AFFORD_VERBS} | {stem}
+                key = ("afford", ",".join(sorted(objects)))
+                if key not in seen:
+                    seen.add(key)
+                    rules.append(
+                        Rule("neg", frozenset(group), frozenset(), objects, 1, aliases, particle)
+                    )
+            elif outs:
+                objects = frozenset(stems_of(" ".join(outs), language))
+                key = ("goal", ",".join(sorted(objects)))
+                if key not in seen:
+                    seen.add(key)
+                    rules.append(
+                        Rule("goal", frozenset(actions), frozenset(), objects, _need(len(objects)))
+                    )
+            return
         aliases = frozenset().union(*(hyper.get(o, set()) for o in objects))
-        buyable = purchasable | set(hyper) | hyponyms
-        if stem in goal and not (stem == afford and objects & buyable):
+        if stem in goal:
             if not objects:
                 return
-            verbs = frozenset(actions | ({stem} - {afford}))
+            verbs = frozenset(actions | {stem})
             key = ("goal", ",".join(sorted(objects)))
             if key not in seen:
                 seen.add(key)
@@ -1030,13 +1064,9 @@ def _parse_rules(
                     Rule("goal", verbs, frozenset(), objects, _need(len(objects)), aliases)
                 )
             return
-        if stem == afford:
-            group = {stem}.union(*(g for g in groups if g & buyish))
-            group |= {stem_ascii("take", language, True), stem_ascii("borrow", language, True)}
-        else:
-            group = next((g for g in groups if stem in g), {stem})
-            if group & give:
-                group = group | offer_also
+        group = next((g for g in groups if stem in g), {stem})
+        if group & give:
+            group = group | offer_also
         alt = frozenset().union(*(alts.get(x, frozenset()) for x in group))
         key = (f"{stem} {particle}".strip(), ",".join(sorted(objects)))
         if key not in seen:

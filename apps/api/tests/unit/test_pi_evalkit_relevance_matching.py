@@ -687,7 +687,7 @@ def test_curly_apostrophes_afford_and_the_passive_make_rules() -> None:
     assert verdict(c, "Change the delivery route") == "violates_constraint"
     c = [limit("we cannot afford a new feed mill", kind="cannot_change")]
     assert verdict(c, "Buy a feed mill on a loan") == "violates_constraint"
-    assert verdict(c, "Rent a feed mill for the peak months") != "violates_constraint"
+    assert verdict(c, "Service the old feed mill") != "violates_constraint"
     c = [limit("the delivery route cannot be changed", kind="cannot_change")]
     assert verdict(c, "Change the delivery route") == "violates_constraint"
     assert verdict(c, "Add a signed hand-over at each stop") != "violates_constraint"
@@ -749,10 +749,14 @@ def test_a_stated_goal_is_not_a_prohibition_on_ideas_that_name_it(text, good) ->
 @pytest.mark.parametrize(
     "text,bad,good",
     [
-        ("we cannot afford a new feed mill", "Buy a feed mill on a loan", "Rent a feed mill"),
+        (
+            "we cannot afford a new feed mill",
+            "Buy a feed mill on a loan",
+            "Service the old feed mill",
+        ),
         ("we cannot afford booking software", "Buy booking software", "Use a paper sheet"),
         ("we cannot afford more staff", "Hire two helpers as staff", "Train the staff we have"),
-        ("we cannot afford a generator", "Purchase a generator", "Rent a generator"),
+        ("we cannot afford a generator", "Purchase a generator", "Repair the old generator"),
     ],
 )
 def test_cannot_afford_a_purchasable_thing_still_blocks_buying_it(text, bad, good) -> None:
@@ -1765,3 +1769,106 @@ def test_mutation_without_the_lexicon_the_positive_controls_become_unknown(monke
 def test_a_new_hire_is_a_concrete_noun_so_its_limit_is_still_a_rule() -> None:
     assert full("we cannot hire a new hire", "Hire a new hire")["verdict"] == "violates_constraint"
     assert full("we cannot hire a new hire", "Train a new hire")["verdict"] != "unknown"
+
+
+# ------------------------------------------------------------- ninth round: never inert
+
+THING_GROUPS = ("people", "equipment", "premises", "materials", "digital", "money")
+
+
+def lexicon_words(*groups):
+    return sorted(w for g in groups for w in relevance_match._CONCRETE_GROUPS[g].split())
+
+
+def noun_phrase(noun):
+    return noun
+
+
+@pytest.mark.parametrize("noun", lexicon_words(*THING_GROUPS))
+def test_cannot_afford_any_lexicon_thing_is_enforced_or_unknown_never_inert(noun) -> None:
+    text = f"we cannot afford a {noun}"
+    ideas = [
+        f"Buy a {noun}",
+        f"Hire a {noun}",
+        f"Purchase a second-hand {noun}",
+        f"Subscribe to a {noun}",
+        f"Buy a {noun} so the two supervisors can clear late orders faster",
+        f"Lease a {noun} for the warehouse team",
+    ]
+    got0 = full(text, ideas[0], "budget")
+    if got0["verdict"] == "unknown":
+        return  # the limit is unreadable: allowed, never silently inert
+    for idea in ideas:
+        got = full(text, idea, "budget")
+        assert got["verdict"] == "violates_constraint", (text, idea, got["verdict"])
+
+
+@pytest.mark.parametrize(
+    "text,idea",
+    [
+        (
+            "cannot afford a forklift",
+            "buy a forklift so the two supervisors can clear late orders faster",
+        ),
+        ("cannot afford a forklift", "buy a forklift for the warehouse team to clear late orders"),
+        ("cannot afford a forklift", "buy a forklift for late orders"),
+        ("cannot afford a forklift", "purchase a second-hand forklift"),
+        ("cannot afford a lawyer", "hire a lawyer so the two supervisors stop chasing late orders"),
+        ("cannot afford a subscription", "buy a monthly subscription to a tracking service"),
+        ("cannot afford licences", "buy software licences"),
+        ("cannot afford subscriptions", "take out a subscription for the tracker"),
+        ("cannot afford a generator", "buy a generator"),
+        ("cannot afford an accountant", "hire an accountant for late orders"),
+    ],
+)
+def test_the_audit_inert_afford_cases_are_now_violations(text, idea) -> None:
+    assert full(text, idea, "budget")["verdict"] == "violates_constraint", (text, idea)
+
+
+@pytest.mark.parametrize(
+    "text", ["cannot afford subscriptions", "cannot afford licences", "cannot afford a crane"]
+)
+def test_an_unrelated_idea_is_never_relevant_under_an_afford_limit_on_a_thing(text) -> None:
+    got = full(text, "ask each rider to confirm the order by phone", "budget")
+    assert got["verdict"] in ("unknown", "irrelevant", "generic"), got["verdict"]
+    assert got["verdict"] != "relevant"
+
+
+@pytest.mark.parametrize("noun", lexicon_words("outcomes"))
+def test_cannot_afford_an_outcome_is_a_goal_enforced_by_a_loss_verb(noun) -> None:
+    text = f"we cannot afford {noun}"
+    got = full(text, f"Cause {noun} by switching systems", "budget")
+    assert got["verdict"] in ("violates_constraint", "unknown"), (noun, got["verdict"])
+    assert full(text, f"Reduce {noun} with a checklist", "budget")["verdict"] != (
+        "violates_constraint"
+    )
+
+
+@pytest.mark.parametrize("noun", lexicon_words("operations", "time"))
+def test_cannot_afford_an_operations_or_time_noun_is_unknown(noun) -> None:
+    assert full(f"we cannot afford a {noun}", "Buy a tablet", "budget")["verdict"] == "unknown"
+
+
+def test_emptying_the_adjective_list_changes_a_verdict(monkeypatch) -> None:
+    facts = ("our tracker is expensive and big",)
+    b = brief([limit("we cannot afford anything expensive", kind="budget")], facts=facts)
+    idea = "ask each rider to confirm the order by phone"
+    assert relevance.score_candidate(b, idea)["verdict"] == "unknown"
+    relevance_match._rules_cached.cache_clear()
+    monkeypatch.setattr(relevance_match, "_ADJECTIVES", set())
+    try:
+        assert relevance.score_candidate(b, idea)["verdict"] != "unknown"
+    finally:
+        relevance_match._rules_cached.cache_clear()
+
+
+def test_emptying_the_vague_list_changes_a_verdict(monkeypatch) -> None:
+    b = brief([limit("we cannot afford zyada", kind="budget")], facts=("hum zyada bechte hain",))
+    idea = "ask each rider to confirm the order by phone"
+    assert relevance.score_candidate(b, idea)["verdict"] == "unknown"
+    relevance_match._rules_cached.cache_clear()
+    monkeypatch.setattr(relevance_match, "_VAGUE", set())
+    try:
+        assert relevance.score_candidate(b, idea)["verdict"] != "unknown"
+    finally:
+        relevance_match._rules_cached.cache_clear()
