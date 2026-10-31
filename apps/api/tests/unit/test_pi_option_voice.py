@@ -153,3 +153,15 @@ def test_ideas_are_shown_best_first_and_the_pick_is_the_clear_one():
     r2 = ov.voice(reply, COURIER, "en", PROBLEMS)
     lines = [x for x in r2.reply.splitlines() if x.startswith(BUL)]
     assert r2.pick in (unknown, LINKED) and lines[0].endswith((unknown, LINKED))
+
+
+def test_a_repeat_of_an_attempt_that_worked_is_not_dropped_as_a_repeat():
+    tried_worked = Requirements(
+        problems=(ProblemRequirements(tried=(TriedItem("a discount on late orders", "worked"),)),)
+    )
+    tried_failed = Requirements(
+        problems=(ProblemRequirements(tried=(TriedItem("a discount on late orders", "failed"),)),)
+    )
+    reply = f"{BUL}{REPEAT}"
+    assert REPEAT in ov.voice(reply, tried_worked, "en", PROBLEMS).reply
+    assert REPEAT not in ov.voice(reply, tried_failed, "en", PROBLEMS).reply

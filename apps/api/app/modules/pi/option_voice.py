@@ -187,7 +187,8 @@ def voice(
     tb = table(language)
     gate = idea_relevance.gate_from_option_gate(option_gate.gate_options, lambda c: c)
     records = _records(problems)
-    tried = [t.what for t in reqs.tried]
+    # a repeat of an attempt that worked is not a failed repeat (L1 `tried_outcome.not_worked`)
+    tried = [t.what for t in reqs.tried if (t.outcome or "").casefold() != "worked"]
     verdicts: dict[int, idea_relevance.IdeaVerdict] = {}
     for i, text in found:
         verdicts[i] = idea_relevance.evaluate_idea(

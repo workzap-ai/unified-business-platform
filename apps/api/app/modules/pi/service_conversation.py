@@ -88,6 +88,7 @@ from app.modules.pi import (
     taxonomy,
     think_plan,
     think_prompt,
+    tried_outcome,
     turn_coverage,
     turn_state,
     value_line,
@@ -3104,7 +3105,8 @@ async def brain_free_ideas(
             keys[:1],
             [
                 str(t.get("what") or "")
-                for t in (context.get("requirements") or {}).get("tried") or []
+                for t in tried_outcome.not_worked((context.get("requirements") or {}).get("tried"))
+                if isinstance(t, dict)
             ],
         )
     idea_ctx = idea_filter.with_grounding(idea_ctx, str(context.get("profile_grounding") or ""))
