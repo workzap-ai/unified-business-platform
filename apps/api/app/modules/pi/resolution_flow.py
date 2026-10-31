@@ -68,7 +68,32 @@ async def absorb_answer(
     body = str(getattr(message, "body", "") or "")
     proposal = unknown_resolution.apply_answer(reqs, question, body, language)
     brief.pop("pending_question", None)  # one question at a time; it is asked again only if needed
-    if proposal.status is unknown_resolution.Status.FILLED and proposal.updates:
+    # PS-5 `record_outcome`: the key counts as asked, an answer that stays unknown as a non-answer
+    state = unknown_resolution.record_outcome(
+        unknown_resolution.ResolutionState(
+            tuple(str(k) for k in brief.get("resolution_asked") or []),
+            tuple(
+                sorted(
+                    (str(k), int(v))
+                    for k, v in dict(brief.get("resolution_non_answers") or {}).items()
+                )
+            ),
+        ),
+        question,
+        proposal,
+    )
+    brief["resolution_asked"] = list(state.asked)
+    brief["resolution_non_answers"] = state.non_answer_map
+    filled = proposal.status is unknown_resolution.Status.FILLED and bool(proposal.updates)
+    if filled and question.key == unknown_resolution.LANGUAGE_KEY:
+        code = str(proposal.updates[0].value)
+        brief["language_pin"] = {
+            "code": code,
+            "script": "arabic" if code in ("ur", "ar") else "latin",
+        }
+        conversation.service_brief = brief
+        return False  # the language is settled; the requirement question is asked next time
+    if filled:
         book = problems.ProblemBook(session, scope, conversation.customer_id, "en")
         active = await book.active()
         by_number = {p.number: p for p in active}
@@ -95,9 +120,5 @@ async def absorb_answer(
             )
         conversation.service_brief = brief
         return True
-    if proposal.non_answer:
-        counts = dict(brief.get("resolution_non_answers") or {})
-        counts[question.key] = int(counts.get(question.key) or 0) + 1
-        brief["resolution_non_answers"] = counts
     conversation.service_brief = brief
     return False

@@ -33,6 +33,7 @@ QUESTION = re.compile(r"[?؟]")
 T: dict[str, dict[str, str]] = {
     "en": {
         "label": "(not yet checked against what you told me)",
+        "known": 'From before we already have: "{clause}".',
         "off_topic": "I left out one idea that does not address what you told me.",
         "generic": "I left out one idea that would fit any business.",
         "repeat": 'I left out one idea, because you already tried: "{words}".',
@@ -47,6 +48,7 @@ T: dict[str, dict[str, str]] = {
     },
     "roman_ur": {
         "label": "(abhi aap ki baton se check nahi hua)",
+        "known": 'Pehle se hamare paas yeh hai: "{clause}".',
         "off_topic": "Maine ek idea chhor diya jo aap ki batayi hui baat se nahi judta.",
         "generic": "Maine ek idea chhor diya jo har karobar par lagu ho jata hai.",
         "repeat": 'Maine ek idea chhor diya, kyunki aap pehle hi aazma chuke hain: "{words}".',
@@ -61,6 +63,7 @@ T: dict[str, dict[str, str]] = {
     },
     "ur": {
         "label": "(ابھی آپ کی باتوں سے جانچ نہیں ہوئی)",
+        "known": 'پہلے سے ہمارے پاس یہ ہے: "{clause}"۔',
         "off_topic": "میں نے ایک خیال چھوڑ دیا جو آپ کی بتائی ہوئی بات سے نہیں جڑتا۔",
         "generic": "میں نے ایک خیال چھوڑ دیا جو ہر کاروبار پر لگ جاتا ہے۔",
         "repeat": 'میں نے ایک خیال چھوڑ دیا، کیونکہ آپ پہلے ہی آزما چکے ہیں: "{words}"۔',
@@ -75,6 +78,7 @@ T: dict[str, dict[str, str]] = {
     },
     "ar": {
         "label": "(لم يُفحص بعد مع ما قلته)",
+        "known": 'لدينا من قبل: "{clause}".',
         "off_topic": "تركت فكرة لا تتعلق بما ذكرته.",
         "generic": "تركت فكرة عامة تناسب أي عمل.",
         "repeat": 'تركت فكرة لأنك جرّبتها من قبل: "{words}".',
@@ -108,6 +112,7 @@ class Voiced:
     changed: bool = False
     pick: str = ""  # the idea to start with (the chat's recommendation, stored for the document)
     pending: dict[str, Any] | None = None  # the question asked, kept to read the answer
+    items: tuple[dict[str, Any], ...] = ()  # the ideas that stay: text, gate, relevance, unchecked
     unmarked: tuple[int, ...] = ()  # positions (among the listed ideas) of the not yet checked ones
     rejected: int = 0
     unknown: int = 0
@@ -175,6 +180,7 @@ def voice(
     non_answers: Mapping[str, int] | None = None,
     known_records: Sequence[Any] = (),
     scope: Mapping[str, Any] | None = None,
+    language_certain: bool = True,
 ) -> Voiced:
     """See the module docstring. Every listed idea gets PS-3's verdict (`evaluate_idea`) with the
     L2-1 gate plugged in (`gate_from_option_gate`), so one verdict path decides:
@@ -225,6 +231,15 @@ def voice(
         shown[slot] = lines[src]
     lines = shown
     unmarked = tuple(n for n, i in enumerate(ranked_ids) if i in unknown_at)
+    items = tuple(
+        {
+            "text": found_text[i].rstrip(". "),
+            "gate": "unknown" if i in unknown_at else "satisfied",
+            "relevance": verdicts[i].kind.name.replace("VIOLATES_CONSTRAINT", "VIOLATES"),
+            "unchecked": i in unknown_at,
+        }
+        for i in ranked_ids
+    )
     keep = [line for i, line in enumerate(lines) if i not in drop]
     if not _bullets(keep):  # no idea left: the opener line that introduced them goes too
         while keep and (not keep[-1].strip() or keep[-1].rstrip().endswith((":", "："))):
@@ -274,7 +289,7 @@ def voice(
                 held,
                 reqs,
                 texts,
-                language=language,
+                language=language if language_certain else None,
                 owner_messages=list(owner_messages),
                 asked=list(asked),
                 non_answers=non_answers,
@@ -284,6 +299,20 @@ def voice(
             if asked_q is not None:
                 question = asked_q.text
                 pending = dataclasses.asdict(asked_q)
+    if unknown_at and known_records:
+        # PS-5 `resolve_from_records`: a fact an earlier record already answers is shown, not asked
+        texts_u = [t.rstrip(". ") for i, t in found if i in unknown_at]
+        held_u = option_gate.gate_options(texts_u, reqs, language)
+        for answer in unknown_resolution.resolve_from_records(
+            held_u,
+            reqs,
+            texts_u,
+            known_records=list(known_records),
+            scope=scope,
+            owner_messages=list(owner_messages),
+        )[:2]:
+            if answer.clause:
+                block.append(tb["known"].format(clause=answer.clause))
     reordered = order != sorted(order)
     changed = bool(block or question or drop or unmarked or reordered)
     return Voiced(
@@ -293,6 +322,7 @@ def voice(
         changed,
         pick,
         pending,
+        items,
         unmarked,
         len(violated) + sum(v.kind in DROPPED[1:] for v in verdicts.values()),
         len(unknown_at),

@@ -173,3 +173,43 @@ def test_a_tried_attempt_the_gate_rejected_is_worded_as_already_tried():
     )
     r = ov.voice(f"{BUL}Keep a paper register for each complaint.", tried, "en", PROBLEMS)
     assert "already tried" in r.block or r.accepted == 1 or r.unknown == 1
+
+
+def test_a_fact_an_earlier_record_answers_is_shown_not_asked():
+    vague = Requirements(
+        problems=(ProblemRequirements(constraints=Constraints(budget=Limit("tight budget"))),)
+    )
+    known = [
+        {
+            "source": "owner_message:c1:m1",
+            "text": "my budget is 50,000 rupees a month",
+            "scope": {"tenant_id": "t", "environment_id": "e", "customer_id": "c"},
+        }
+    ]
+    scope = {"tenant_id": "t", "environment_id": "e", "customer_id": "c"}
+    reply = f"{BUL}Buy a new tracking system for late orders."
+    r = ov.voice(reply, vague, "en", PROBLEMS, known_records=known, scope=scope)
+    assert r.unknown == 1 and "50,000" in r.block and r.pending is None
+    other = dict(scope, customer_id="someone-else")
+    leak = ov.voice(reply, vague, "en", PROBLEMS, known_records=known, scope=other)
+    assert "50,000" not in leak.block  # never another customer's record (fail closed)
+
+
+def test_the_items_that_stay_carry_gate_and_relevance_for_the_review():
+    r = ov.voice(f"{BUL}{LINKED}\n{BUL}{UNLINKED}", COURIER, "en", PROBLEMS)
+    kinds = {i["relevance"] for i in r.items}
+    assert "UNLINKED" not in kinds and all(i["gate"] in ("satisfied", "unknown") for i in r.items)
+
+
+def test_an_uncertain_language_asks_the_language_question_first():
+    vague = Requirements(
+        problems=(ProblemRequirements(constraints=Constraints(budget=Limit("tight budget"))),)
+    )
+    r = ov.voice(
+        f"{BUL}Buy a new tracking system for late orders.",
+        vague,
+        "en",
+        PROBLEMS,
+        language_certain=False,
+    )
+    assert r.pending and r.pending["key"] == "language_clarify"

@@ -345,6 +345,7 @@ class ServiceTurn(BaseModel):
     _voice_question: str = PrivateAttr(default="")  # the one targeted question, put last
     _voice_unmarked: tuple[int, ...] = PrivateAttr(default=())  # ideas not yet checked
     _voice_language: str = PrivateAttr(default="en")
+    _voice_items: tuple[dict[str, Any], ...] = PrivateAttr(default=())
     _voice_pick: str = PrivateAttr(
         default=""
     )  # the idea the chat recommends (kept for the document)
@@ -1662,6 +1663,18 @@ async def brain_problems(
                 kept = dict(conversation.service_brief or {})
                 kept["language_pin"] = {"code": code, "script": script}
                 conversation.service_brief = kept
+        if message is not None:
+            # PS-9: a correction or a withdrawal updates the current state and keeps the history;
+            # the withdrawal path is L1's (`withdraw_owner_cause`), not a second one
+            cue = language_script.has_correction_or_withdrawal_cue(
+                message.body or "", context.get("language_decision", {}).get("code")
+            )
+            if cue.found:
+                context["correction_cue"] = {"kind": cue.kind, "kinds": list(cue.kinds)}
+                if cue.kind == "withdrawal" and conversation.customer_id is not None:
+                    book = problems.ProblemBook(session, scope, conversation.customer_id, "en")
+                    if await book.withdraw_owner_cause(message.id):
+                        context["cause_withdrawn"] = True
         # PS-8: everything pi already knows about this owner, read once per turn (read only, scoped
         # by tenant, environment and customer); it feeds the one question, the "we already have"
         # line and the implementation status wording
@@ -1674,7 +1687,19 @@ async def brain_problems(
         )
         if not memory.erased:
             context["memory"] = {
-                "known": context_memory.known_records(memory)[:40],
+                # PS-8's records in the shape PS-5 reads: the ids it carries become its `scope`
+                "known": [
+                    {
+                        "source": r["source"],
+                        "text": r["text"],
+                        "scope": {
+                            k: r[k]
+                            for k in ("tenant_id", "environment_id", "customer_id")
+                            if r.get(k)
+                        },
+                    }
+                    for r in context_memory.known_records(memory)[:40]
+                ],
                 "already_known": context_memory.what_is_already_known(
                     memory, str(conversation.language or "en")
                 ),
@@ -2093,30 +2118,93 @@ def after_fixed_reply(turn: "ServiceTurn", context: dict[str, Any]) -> None:
     turn._cost_line = decisions.cost_answer(language, context) if decisions.cost_asked(said) else ""
 
 
-def pre_send_guard(turn: "ServiceTurn", context: dict[str, Any]) -> None:
+def review_draft(
+    turn: "ServiceTurn", context: dict[str, Any], lang: str, reply: str
+) -> "self_review_types.DraftResult":
+    """The PS-10 draft with every input the flow really holds: the retrieved context, the question
+    the reply asks, what the owner already tried, the ideas that stay with their gate and relevance
+    verdicts, the implementation status. What the flow does not hold stays None (UNKNOWN)."""
+    memory = context.get("memory") or {}
+    known = list(memory.get("known") or [])
+    sources = tuple(sorted({str(r.get("source") or "") for r in known if r.get("source")}))
+    parts = [x for x in re.split(r"(?<=[.!?؟۔])\s+", reply.strip()) if x]
+    tried = tuple(
+        str(t.get("what") or "")
+        for t in (context.get("requirements") or {}).get("tried") or []
+        if isinstance(t, dict)
+    )
+    options = tuple(
+        self_review_types.OptionIn(
+            id=f"I{n}",
+            text=str(item.get("text") or ""),
+            gate=str(item.get("gate") or ""),
+            relevance=str(item.get("relevance") or ""),
+            rank=n + 1,
+            labelled_unchecked=bool(item.get("unchecked")),
+        )
+        for n, item in enumerate(turn._voice_items)
+    )
+    return self_review_types.DraftResult(
+        owner_language=lang,
+        owner_text=str(context.get("latest_customer_message") or ""),
+        reply_text=reply,
+        context=self_review_types.ContextIn(
+            retrieved=bool(memory), sources=sources, records_exist=bool(known) if memory else None
+        ),
+        tried_solutions=tried if (context.get("requirements") is not None or memory) else None,
+        options=options,
+        questions=self_review_types.QuestionsIn(
+            count=len(re.findall(r"[?؟]", reply)), last_sentence=parts[-1] if parts else ""
+        ),
+        implementation_status=str(context.get("implementation_status") or "proposed"),
+    )
+
+
+async def pre_send_guard(
+    turn: "ServiceTurn",
+    context: dict[str, Any],
+    manager: Any = None,
+    scope: Any = None,
+    policy: Any = None,
+    conversation: Any = None,
+) -> None:
     """The PS-10 self-review runs on the final text in brain mode. Every check that has its input
     decides (SR-13 the reply is in the owner's language and script, SR-15 one question and it is
-    last, SR-16 a proposal is never worded as done); a critical failure means the verdict is
-    INCOMPLETE and the reply is never sent: the gate's own owner-language fallback goes instead, in
-    the owner's script, and a first message still says pi is an AI. A check whose input the flow
-    does not hand over is UNKNOWN and is not acted on."""
+    last, SR-16 a proposal is never worded as done, and the checks the typed draft feeds); a
+    critical failure means the verdict is INCOMPLETE and the reply is never sent as it is. A wrong
+    language is written again ONCE in the owner's language and checked again; whatever still fails
+    gets the gate's owner-language fallback instead, in the owner's script, and a first message
+    still says pi is an AI. A check whose input the flow does not hand over is UNKNOWN and is not
+    acted on."""
     if turn._decision is not None or turn._cost_line or turn._summary:
         # fixed, application-written replies (a decision's confirmation of a quote, the cost
         # answer, the sorted summary) legitimately say "approve", "free of charge" and the like
         return
     lang = fixed_lines.code(context, script=True)
     lang = lang if lang in self_review_types.LANGS else "en"
-    draft = self_review_types.DraftResult(
-        owner_language=lang,
-        owner_text=str(context.get("latest_customer_message") or ""),
-        reply_text=turn.reply,
-        implementation_status=str(context.get("implementation_status") or "proposed"),
-    )
-    report = self_review.review(draft)
+    report = self_review.review(review_draft(turn, context, lang, turn.reply))
     if report.verdict != self_review_types.INCOMPLETE:
         # COMPLETE is sent. BLOCKED (a critical check could not run: its input is not handed over
         # yet) is not acted on here and is never read as complete by the checks that did run.
         return
+    if (
+        manager is not None
+        and report.repair_code == "rewrite_reply"
+        and report.repair_arg in self_review.LANG_NAMES
+    ):
+        written = await in_one_language(
+            manager,
+            scope,
+            policy,
+            conversation,
+            turn.reply,
+            self_review.LANG_NAMES[report.repair_arg],
+        )
+        again = self_review.review(review_draft(turn, context, lang, written))
+        if again.verdict != self_review_types.INCOMPLETE:
+            turn.reply = written
+            return
+        report = again
     fallback = self_review.owner_safe_fallback(report, lang)
     if not fallback:
         return
@@ -2151,6 +2239,10 @@ def brain_option_voice(turn: "ServiceTurn", context: dict[str, Any]) -> None:
         asked=list(brief_now.get("resolution_asked") or []),
         non_answers=dict(brief_now.get("resolution_non_answers") or {}),
         known_records=list((context.get("memory") or {}).get("known") or []),
+        language_certain=not (
+            (context.get("language_decision") or {}).get("uncertain")
+            and not (context.get("brief") or {}).get("language_pin")
+        ),
         scope=(context.get("memory") or {}).get("scope"),
     )
     heard = str((context.get("memory") or {}).get("already_known") or "")
@@ -2166,6 +2258,7 @@ def brain_option_voice(turn: "ServiceTurn", context: dict[str, Any]) -> None:
             voiced.changed = True
     turn._voice_pick = voiced.pick
     turn._voice_pending = voiced.pending
+    turn._voice_items = voiced.items
     if not voiced.changed:
         return
     turn.reply = voiced.reply
@@ -6663,11 +6756,7 @@ async def compose_service_turn(
             if turn._voice_pick:  # the document recommends the same option (one ranking)
                 kept["chat_pick"] = turn._voice_pick
             if turn._voice_pending:  # read the owner's answer next turn (PS-5)
-                kept["pending_question"] = turn._voice_pending
-                kept["resolution_asked"] = [
-                    *list(kept.get("resolution_asked") or []),
-                    str(turn._voice_pending.get("key") or ""),
-                ]
+                kept["pending_question"] = turn._voice_pending  # counted asked when it is answered
             conversation.service_brief = kept
     if context.get("handback_notice") and not turn.request_human and turn._decision is None:
         short = safety.handback_reply(str(context.get("reply_language") or "en"))
@@ -6707,7 +6796,7 @@ async def compose_service_turn(
         )
         turn.reply = put_option_voice(turn.reply, turn._voice_block, turn._voice_question)
     if context.get("pi_mode") == "brain":
-        pre_send_guard(turn, context)
+        await pre_send_guard(turn, context, manager, scope, policy, conversation)
     latest_language = detect_language(str(context.get("latest_customer_message", "")))
     if latest_language == expected and (
         clearly_other(turn.reply, str(expected or ""))
