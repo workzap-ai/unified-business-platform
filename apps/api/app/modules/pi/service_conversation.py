@@ -2163,6 +2163,13 @@ def review_draft(
             count=len(re.findall(r"[?؟]", reply)), last_sentence=parts[-1] if parts else ""
         ),
         implementation_status=str(context.get("implementation_status") or "proposed"),
+        # what the application itself wrote (a quote confirmation, the cost answer, the sorted
+        # summary) carries its own amounts and references: they are known figures, not invented
+        known_amounts=(
+            tuple(re.findall(r"[A-Z]{2,5}-\d+(?:-v\d+)?|\d[\d,.]*\d|\d", reply))
+            if (turn._decision is not None or turn._cost_line or turn._summary)
+            else ()
+        ),
     )
 
 
