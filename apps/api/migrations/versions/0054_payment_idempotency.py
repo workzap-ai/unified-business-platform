@@ -9,8 +9,11 @@ without a key, keep NULL and are untouched; nothing is backfilled. Adding nullab
 default is a catalogue change only, and the index covers only keyed rows, so it is built over an
 (almost) empty set.
 
-Order of deployment: apply 0054 BEFORE deploying code that reads or writes the columns (the payment
-model selects them on every read of `payments`).
+Order of deployment: apply 0054 BEFORE deploying code that writes payments with a key; ordinary
+payments keep working before it (the two columns are deferred on the Payment mapper and left out
+of an ordinary INSERT, so only a keyed payment names them).
+Locks: ADD COLUMN takes a brief ACCESS EXCLUSIVE lock on payments (catalogue change only);
+CREATE UNIQUE INDEX takes a short SHARE lock on payments (brief on an ordinary table).
 Rollback: downgrade drops the index and the columns (any stored keys are lost, which only means a
 replay is no longer recognised); or revert the code and leave the columns.
 """

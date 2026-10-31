@@ -10,6 +10,7 @@ from uuid import UUID
 from sqlalchemy import func, select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import undefer
 
 from app.core.pagination import Page, Pagination
 from app.integrations.outbox import EntityRef, emit
@@ -364,7 +365,12 @@ class BillingService:
     async def _replayed(self, key: str, fingerprint: str) -> Payment | None:
         """The payment this key already recorded in this workspace, if any. The same request
         returns it; the key with another request is refused (409)."""
-        found = await self.payments.find(Payment.idempotency_key == key)
+        found: Payment | None = await self.session.scalar(
+            self.payments.select()
+            .where(Payment.idempotency_key == key)
+            .options(undefer(Payment.idempotency_key), undefer(Payment.request_hash))
+            .limit(1)
+        )
         if found is None:
             return None
         if found.request_hash != fingerprint:
@@ -406,10 +412,13 @@ class BillingService:
                         received_on=data.received_on or date.today(),
                         reference=data.reference,
                         recorded_by_label=self.scope.actor_label[:80],
-                        idempotency_key=key,
-                        request_hash=fingerprint,
+                        # only a keyed payment touches the columns added by 0054
+                        **({"idempotency_key": key, "request_hash": fingerprint} if key else {}),
                     )
                 )
+                # eager_defaults is off on Payment (its RETURNING would name the 0054 columns):
+                # read the other server-set values (created_at) back; deferred columns stay out
+                await self.session.refresh(payment)
         except IntegrityError:
             if not (key and fingerprint):
                 raise
@@ -467,9 +476,14 @@ class BillingService:
         return payment
 
     async def payments_page(self, page: Pagination) -> Page[PaymentView]:
+        # not payments.page(): its count wraps the statement in a subquery, which lists every
+        # column, deferred ones too, so it would need the 0054 columns
+        total = await self.session.scalar(
+            select(func.count()).select_from(Payment).where(self.payments.predicate())
+        )
         statement = self.payments.select().order_by(Payment.received_on.desc(), Payment.id)
-        rows, total = await self.payments.page(statement, page)
-        return to_page(PaymentView, rows, total, page)
+        rows = await self.session.scalars(statement.offset(page.offset).limit(page.page_size))
+        return to_page(PaymentView, rows.all(), int(total or 0), page)
 
     async def customer_balance(self, customer_id: UUID) -> Decimal:
         value = await self.session.scalar(

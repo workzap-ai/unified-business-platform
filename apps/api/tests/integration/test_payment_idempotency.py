@@ -7,6 +7,7 @@ same key with another body is refused; keys are per workspace; no key keeps toda
 import asyncio
 
 import pytest
+from sqlalchemy import text
 
 from tests.integration.test_domain_events import events
 from tests.support.workspace import Actor, error_code
@@ -169,3 +170,70 @@ async def test_concurrent_submits_with_one_key_on_two_invoices_record_one_paymen
         ]
         states = [await invoice_state(owner, first), await invoice_state(owner, second)]
         assert sorted(s[2] for s in states) == [0, 1]
+
+
+async def drop_0054(stack) -> None:
+    """Put the schema back to before 0054, inside the test's rolled-back transaction."""
+    connection = stack.app.state.test_connection
+    await connection.execute(text("DROP INDEX uq_payments_idempotency"))
+    await connection.execute(text("ALTER TABLE payments DROP COLUMN idempotency_key"))
+    await connection.execute(text("ALTER TABLE payments DROP COLUMN request_hash"))
+
+
+async def test_code_deployed_before_0054_keeps_every_payment_path_working(stack):
+    async with stack.browser() as browser:
+        owner = await stack.register(browser)
+        iid = await issued_invoice(owner)
+        customer_id = (await owner.get(f"billing/invoices/{iid}")).json()["customer_id"]
+        await drop_0054(stack)
+        first = await pay(owner, iid, BODY)  # create, no key: record, receipt, audit, event
+        assert first.status_code == 201, first.text
+        assert set(first.json()) == {
+            "id",
+            "invoice_id",
+            "number",
+            "amount",
+            "currency",
+            "method",
+            "received_on",
+            "reference",
+            "recorded_by_label",
+            "created_at",
+        }  # neither new column is exposed
+        assert (await pay(owner, iid, {"amount": "10.00", "method": "card"})).status_code == 201
+        listing = await owner.get("billing/payments")
+        assert listing.status_code == 200 and len(listing.json()["items"]) == 2
+        for path in (
+            f"billing/invoices/{iid}",
+            "billing/invoices",
+            "billing/summary",
+            "finance/summary",
+            "overview",
+            "reports/revenue",
+            f"customers/{customer_id}",
+            f"customers/{customer_id}/activities",
+        ):
+            response = await owner.get(path)
+            assert response.status_code == 200, (path, response.text[:200])
+        analytics = await owner.get(
+            "workspace-agent/analytics",
+            headers={
+                "x-workspace-tenant": owner.tenant_id,
+                "x-workspace-environment": owner.environment_id,
+            },
+        )
+        assert analytics.status_code == 200, analytics.text[:200]
+        assert await invoice_state(owner, iid) == ("partially_paid", "50.00", 2)
+
+
+async def test_only_a_keyed_payment_needs_the_0054_columns(stack):
+    async with stack.browser() as browser:
+        owner = await stack.register(browser)
+        iid = await issued_invoice(owner)
+        await drop_0054(stack)
+        # the keyed request cannot work without the columns: it fails, and does not half-record
+        try:
+            keyed = await pay(owner, iid, BODY, KEY)
+        except Exception:  # noqa: BLE001 - the app error reaches the test client
+            return
+        assert keyed.status_code >= 500

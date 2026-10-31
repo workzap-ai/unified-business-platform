@@ -90,6 +90,8 @@ class InvoiceLine(WorkspaceRow):
 
 class Payment(WorkspaceRow):
     __tablename__ = "payments"
+    # never read a server default back after INSERT: the RETURNING list would name the 0054 columns
+    __mapper_args__ = {"eager_defaults": False}
     __table_args__ = workspace_args(
         "payments",
         scoped_fk("payments", "invoice_id", "invoices"),
@@ -118,6 +120,12 @@ class Payment(WorkspaceRow):
     reference: Mapped[str] = mapped_column(String(120), default="", server_default="")
     recorded_by_label: Mapped[str] = mapped_column(String(80))
     # BL-05: the client's Idempotency-Key and a hash of the request it first came with; both NULL
-    # for a payment recorded without a key
-    idempotency_key: Mapped[str | None] = mapped_column(String(128), nullable=True)
-    request_hash: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    # for a payment recorded without a key. Deferred, so no ordinary read names them, and with a
+    # (NULL) server default so the ORM leaves them out of an ordinary INSERT too: code deployed
+    # before migration 0054 keeps working, only a keyed payment needs the columns.
+    idempotency_key: Mapped[str | None] = mapped_column(
+        String(128), nullable=True, deferred=True, server_default=text("NULL")
+    )
+    request_hash: Mapped[str | None] = mapped_column(
+        String(64), nullable=True, deferred=True, server_default=text("NULL")
+    )

@@ -1,3 +1,9 @@
+-- 0054_payment_idempotency (BL-05). Apply 0054 BEFORE deploying code that writes payments with a
+-- key; ordinary payments keep working before it.
+-- ADD COLUMN takes a brief ACCESS EXCLUSIVE lock on payments; CREATE UNIQUE INDEX takes a short
+-- SHARE lock on payments (brief on an ordinary table). Generated with:
+--   alembic upgrade 0053_pi_problem_requirements:0054_payment_idempotency --sql
+
 BEGIN;
 
 -- Running upgrade 0053_pi_problem_requirements -> 0054_payment_idempotency

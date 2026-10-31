@@ -181,13 +181,13 @@ def test_the_migration_is_additive_reversible_and_follows_0052():
     forbidden = r"create_table|drop_table|alter_column|execute|create_index|server_default"
     assert not re.search(forbidden, source)
     assert source.count("nullable=True") == 4
-    followers = [
-        p.name
-        for p in (API / "migrations" / "versions").glob("*.py")
-        if 'down_revision = "0053_pi_problem_requirements"' in p.read_text(encoding="utf-8")
-    ]
-    # 0054 is the payment idempotency key (BL-05), not a pi migration; the chain stays linear
-    assert followers == ["0054_payment_idempotency.py"]
+    # the chain stays linear: no two migrations share a down_revision, whatever follows 0053
+    revisions: dict[str, list[str]] = {}
+    for p in (API / "migrations" / "versions").glob("*.py"):
+        found = re.search(r'^down_revision = "([^"]+)"', p.read_text(encoding="utf-8"), re.M)
+        if found:
+            revisions.setdefault(found.group(1), []).append(p.name)
+    assert {k: v for k, v in revisions.items() if len(v) > 1} == {}
 
 
 def test_a_fabricated_evidence_word_makes_the_cause_a_guess():
