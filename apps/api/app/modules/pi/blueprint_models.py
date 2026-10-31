@@ -39,6 +39,9 @@ CAUSE_STATUSES = pf.CAUSE_STATUSES
 OWNER_STATUSES = pf.OWNER_STATUSES
 EVIDENCE_CAP = 3  # evidence strength is a small count, never a score to game
 COST_SOURCE = "staff"
+# `blueprint_rules.verify_option` stamps a ref it verified with this seal. A ref built by
+# hand with `verified=True` has no seal and counts for nothing.
+SEAL = "blueprint-rules-verified"
 
 
 def seq(value: Any) -> tuple[Any, ...]:
@@ -63,6 +66,7 @@ class Evidence:
     words: tuple[str, ...] = ()
     role: str = "owner"
     verified: bool = False
+    seal: str = field(default="", compare=False, repr=False)
 
     @property
     def claimed(self) -> bool:
@@ -160,12 +164,19 @@ class Option:
         said = {
             e.msg
             for e in seq(self.evidence)
-            if isinstance(e, Evidence) and e.claimed and e.verified is True and e.role == "owner"
+            if isinstance(e, Evidence)
+            and e.claimed
+            and e.verified is True
+            and e.seal == SEAL
+            and e.role == "owner"
         }
         return min(len(said), EVIDENCE_CAP)
 
     def to_dict(self) -> dict[str, Any]:
         data: dict[str, Any] = _plain(asdict(self))
+        for ref in data.get("evidence") or ():
+            if isinstance(ref, dict):
+                ref.pop("seal", None)  # the seal never leaves the process
         return data
 
 

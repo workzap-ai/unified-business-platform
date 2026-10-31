@@ -52,9 +52,12 @@ _LOOKALIKE = str.maketrans(
 )  # fmt: skip
 # combining marks: Latin accents, Arabic points, the Devanagari nukta
 _MARKS = re.compile("[̀-ًͯ-ٰٟـۖ-़ۭ]")
-_SPACED_LETTERS = re.compile(r"(?<![^\W\d_])(?:[^\W\d_][ \-_.*]){3,}[^\W\d_](?![^\W\d_])")
-_SPACED_DIGITS = re.compile(r"(?<!\d)\d(?: \d){3,}(?!\d)")
+_LOOKALIKE[0x066A] = "%"  # the Arabic percent sign
+_SPACED_RUN = re.compile(r"(?<![^\W_])(?:[^\W_][ \-_.*]){2,}[^\W_](?![^\W_])")
 _SEPARATOR = re.compile(r"[ \-_.*]")
+_HYPHEN_BREAK = re.compile(r"-[ \t]*[\r\n]+[ \t]*")
+_CONTROL = re.compile(r"[\x00-\x09\x0b-\x1f\x7f]")
+_ZERO_AS_O = re.compile(r"(?<![^\W_])\d[\do]{2,}(?![^\W_])")
 
 
 def _ascii_digits(text: str) -> str:
@@ -68,23 +71,32 @@ def fold(text: str) -> str:
     """The text as plain lower-case: compatibility forms, invisible and bidi marks, accents and
     Arabic points, other-script digits and look-alike letters all folded away."""
     s = unicodedata.normalize("NFKD", str(text))
+    s = _HYPHEN_BREAK.sub("", s)  # a word broken across lines: "guaran-\nteed"
     s = s.translate(_INVISIBLE)
     s = _ascii_digits(s)
     s = s.casefold().translate(_LOOKALIKE)
+    s = s.replace("\u2019", "'").replace("\u2018", "'")
     s = _MARKS.sub("", s)
+    s = _ZERO_AS_O.sub(lambda m: m.group(0).replace("o", "0"), s)  # 5OOOO
     return " ".join(s.split())
 
 
+def _join_runs(folded: str) -> str:
+    """Letters or digits spaced out one by one ("g u a r a n t e e d", "5 0 0 0 0", "r s 5 0 0 0")
+    are joined."""
+    return _SPACED_RUN.sub(lambda m: _SEPARATOR.sub("", m.group(0)), folded)
+
+
 def views(text: str) -> tuple[str, ...]:
-    """The text as written, folded, and folded with spaced-out letters and digits joined."""
+    """The text as written, folded, and folded with spaced-out letters and digits joined; the same
+    again with tabs and control characters taken out ("guar<tab>anteed")."""
     raw = str(text)[:MAX_TEXT]
-    folded = fold(raw)
-    joined = _SPACED_LETTERS.sub(lambda m: _SEPARATOR.sub("", m.group(0)), folded)
-    joined = _SPACED_DIGITS.sub(lambda m: m.group(0).replace(" ", ""), joined)
     seen: list[str] = []
-    for view in (raw, folded, joined):
-        if view not in seen:
-            seen.append(view)
+    for base in (raw, _CONTROL.sub("", raw)):
+        folded = fold(base)
+        for view in (base, folded, _join_runs(folded)):
+            if view not in seen:
+                seen.append(view)
     return tuple(seen)
 
 
@@ -102,15 +114,17 @@ def _word(body: str) -> re.Pattern[str]:
 
 _PROMISE_WORDS = (
     # English
-    "guarantee guarantees guaranteed guaranteeing guaranty assure assures assured assurance "
-    "certainly definitely surely unfailing foolproof infallible"
+    "guarantee guarantees guaranteed guaranteeing guaranty promise promises promised promising "
+    "assure assures assured assurance swear swore sworn ensures certainly definitely surely "
+    "undoubtedly doubtless certainty unfailing foolproof infallible "
     # Roman Urdu / Hindi in Latin letters
-    " zaroor zarur zaror pakka pakki pukka yaqeen yaqeeni yakeen yakini yaqini zamanat "
+    "zaroor zarur zaror jarur jaroor lazmi lazmy pakka pakki pukka yaqeen yaqeeni yakeen yakini "
+    "yaqini yaqeenan yaqinan yakinan zamanat shartiya shartia shartiyah bilashuba bilashak "
     # Hindi
-    "गारंटी गारण्टी पक्का पक्की ज़रूर जरूर यकीनन निश्चित निश्चय"
+    "गारंटी गारण्टी पक्का पक्की ज़रूर जरूर यकीनन निश्चित निश्चय अवश्य शर्तिया हमेशा सुनिश्चित"
 )
 _PROMISE_ARABIC = (
-    "ضمان ضمانت ضمانة مضمون مضمونة یقینی یقین ضرور پکا پکی حتما حتماً "
+    "ضمان ضمانت ضمانة مضمون مضمونة یقینی یقین یقیناً ضرور پکا پکی ہمیشہ شرطیہ حتما حتماً "
     "بالتاکید بالتأكيد مؤكد مؤكدة اكيد أكيد"
 )
 _PROMISE_PHRASES = (
@@ -122,19 +136,63 @@ _PROMISE_PHRASES = (
     r"without\s+(?:any\s+)?fail",
     r"(?:works?|work)\s+every\s+(?:single\s+)?time",
     r"every\s+single\s+time",
-    r"always\s+work",
-    r"100\s?(?:%|percent|per\s?cent)",
+    r"always\s+(?:work|works|deliver|delivers|succeed|succeeds|help|helps|fix|fixes)",
+    r"(?:100|hundred|one\s+hundred|a\s+hundred)\s?(?:%|percent|per\s?cent)",
     r"no\s+risk",
     r"risk\s?-?\s?free",
+    r"zero\s+(?:risk|chance|doubt)",
     r"bina\s+kisi\s+risk",
     r"koi\s+risk\s+nahi",
     r"zaroor\s+\w+",
     r"pakka\s+\w+",
+    # never fails, cannot fail, won't fail, you can't lose, no chance of failure
+    r"(?:never|cannot|can't|can\s+not|can\s+never|will\s+never|won't|wont|will\s+not|doesn't"
+    r"|does\s+not)\s+(?:possibly\s+)?(?:fail|fails|failed|failing|go\s+wrong|goes\s+wrong|backfire"
+    r"|let\s+you\s+down)",
+    r"(?:never|cannot|can't|can\s+not|can\s+never|won't)\s+lose",
+    r"no\s+(?:chance|possibility|way)\s+(?:of|to)\s+(?:fail\w*|los\w+|go\w*\s+wrong)",
+    r"bound\s+to\b",
+    r"proven\s+to\b",
+    r"proven\s+(?:results|track\s+record)",
+    r"sure\s+(?:thing|bet|win|fire)",
+    r"without\s+(?:a\s+)?doubt",
+    r"beyond\s+(?:a\s+)?(?:doubt|question)",
+    r"absolutely\s+(?:work|works|will|safe|certain|sure|no|nothing|everything)",
+    r"trust\s+me",
+    r"i\s+swear",
+    r"(?:mark|believe)\s+my\s+words?",
+    r"(?:going\s+to|gonna)\s+(?:boost|increase|double|triple|grow|improve|fix|raise|cut|save|reduce"
+    r"|bring|solve|transform|multiply|skyrocket|work|help|succeed)",
+    r"expect\s+(?:\w+\s+){0,2}to\s+(?:double|triple|quadruple|increase|grow|boost|save|cut|reduce"
+    r"|multiply|gain)",
+    # Roman Urdu / Hindi in Latin letters
+    r"kabhi\s+(?:bhi\s+)?(?:fail|nakam|nakaam|ghalat)\w*",
+    r"hamesha\s+(?:kaam|chal|theek|sahi|kamyab|work|successful|safe)\w*",
+    r"bina\s+(?:kisi\s+)?(?:shak|shuba|shubah|risk|khatra|dar)\b",
+    r"(?:sau|100)\s?(?:percent|per\s?cent|fisad|feesad|fi\s?sad|%)",
+    r"(?:koi\s+)?(?:khatra|risk)\s+nahi(?:n)?",
+    # Urdu
     r"بلا\s+شبه",
-    r"بغیر\s+کسی\s+خطر",
+    r"بغیر\s+کسی\s+(?:خطر\w*|شک|شبہ|رسک)",
+    r"(?:کوئی\s+)?خطر[ہے]\s+نہیں",
+    r"سو\s+(?:فیصد|فی\s?صد|پرسنٹ)",
+    r"کبھی\s+(?:بھی\s+)?(?:ناکام|فیل|ناکامی)\w*\s+نہیں",
+    r"ہر\s+بار\s+(?:کام|کامیاب)\w*",
+    # Hindi
+    r"जोखिम\s+नहीं",
+    r"बिना\s+(?:किसी\s+)?(?:जोखिम|शक|संदेह)",
+    r"(?:सौ|100)\s?प्रतिशत",
+    r"कभी\s+(?:भी\s+)?(?:फेल|असफल|नाकाम)\s+नहीं",
+    # Arabic
     r"من\s+دون\s+مخاطر",
     r"بدون\s+مخاطر",
-    r"जोखिम\s+नहीं",
+    r"لا\s+مخاطر\w*",
+    r"(?:مئة|مائة)\s+(?:بال|في\s+ال)(?:مئة|مائة)",
+    r"لن\s+(?:يفشل|تفشل)",
+    r"(?:دائما|دايما|دوما)\s+(?:ينجح|تنجح|يعمل|تعمل|نجاح|مضمون)",
+    r"(?:بلا|بدون)\s+شك",
+    r"بكل\s+تأكيد",
+    r"س(?:وف\s+)?(?:يزيد|يرفع|يضاعف|يحسن|يوفر|ينجح|تزيد|ترفع|تضاعف|تحسن|توفر|تنجح)\w*",
 )
 _ARABIC_PREFIX = "|".join(
     fold(p) for p in ("وال", "بال", "فال", "كال", "لل", "ال", "و", "ب", "ف", "ك", "ل")
@@ -149,10 +207,41 @@ PROMISE_EXTRA = re.compile(
     )
 )
 
+# A guarantee that is denied is not a promise: "I can't guarantee anything", "not guaranteed",
+# "guarantee nahi de sakta". These spans are cut out before the promise patterns run, so the rest
+# of the sentence is still read.
+_NEG_LEAD = (
+    r"(?:\w+n't|cannot|can\s+not|will\s+not|do\s+not|does\s+not|did\s+not|could\s+not|would\s+not"
+    r"|is\s+not|are\s+not|was\s+not|not|never|no|without|nor)"
+)
+_NEG_TERM = (
+    r"(?:guarantee|guaranteed|guarantees|guaranty|promise|promised|promises|assure|assured"
+    r"|assurance|ensure|ensured|certain|certainty)"
+)
+_NEG_OTHER = (
+    r"(?:guarantee|zamanat|yaqeen|yakeen|promise|wada|waada)\s+nahi\w*"
+    r"(?:\s+de\s+sak\w*|\s+dete|\s+deta|\s+dun|\s+dunga)?",
+    r"(?:ضمانت|ضمان|یقین|وعده|وعدہ)\s+نہیں(?:\s+(?:دے|دیتا|دیتی|سکتا|سکتی))*",
+    r"(?:गारंटी|वादा|यकीन)\s+नहीं(?:\s+(?:दे|देता|सकता|सकती))*",
+    r"لا\s+(?:[اأ]ضمن|يمكنني\s+ضمان|استطيع\s+ضمان|اعد|اعدك|اوعد)\w*",
+    r"(?:بدون|بلا|لا)\s+ضمان\w*",
+)
+_NEGATED = re.compile(
+    "|".join(
+        [rf"(?<![^\W\d_]){_NEG_LEAD}\s+(?:\w+\s+){{0,2}}?{_NEG_TERM}(?![^\W\d_])"]
+        + [q for p in _NEG_OTHER for q in (p, fold(p))]
+    )
+)
+
 
 def promise_in(text: str, *patterns: re.Pattern[str]) -> bool:
-    """True when any view of the text matches the extra patterns or any of `patterns`."""
-    return any(rx.search(v) for v in views(text) for rx in (PROMISE_EXTRA, *patterns))
+    """True when any view of the text, with denied guarantees cut out, matches the extra promise
+    patterns, an invented outcome or saving, or any of `patterns`."""
+    for view in views(text):
+        kept = _NEGATED.sub(" ", view)
+        if any(rx.search(kept) for rx in (PROMISE_EXTRA, OUTCOME_CLAIM, *patterns)):
+            return True
+    return False
 
 
 # --- money ---------------------------------------------------------------------------------------
@@ -166,10 +255,10 @@ _CURRENCY_WORDS = (
 )
 _SYMBOLS = "[$€£₹¥₨]"
 _MAGNITUDES = (
-    "thousand thousands lakh lakhs lac lacs crore crores karor million millions billion "
-    "hazar hazaar hajar hajaar "
-    "لاکھ ہزار کروڑ ملین الف ألف مليون مليار "
-    "लाख हज़ार हजार करोड़ करोड मिलियन"
+    "thousand thousands lakh lakhs lac lacs lak laak laakh laakhs crore crores karor million "
+    "millions billion grand hundred hundreds sau sou hazar hazaar hajar hajaar "
+    "لاکھ ہزار کروڑ ملین الف ألف آلاف الاف ألاف مليون مليار مئة مائة "
+    "लाख हज़ार हजार करोड़ करोड मिलियन सौ"
 )
 _NUMBER_WORDS = (
     # English
@@ -177,8 +266,8 @@ _NUMBER_WORDS = (
     "sixteen seventeen eighteen nineteen twenty thirty forty fifty sixty seventy eighty ninety "
     "hundred "
     # Roman Urdu
-    "ek aik do teen char chaar paanch panch paanchh chhe chay saat aath nau das gyarah barah "
-    "pandrah bees pachis tees chalis pachas pachaas saath sattar assi nabbe sau "
+    "ek aik do teen char chaar paanch panch paanchh chhe chay saat aath nau das dus gyarah barah "
+    "pandrah bees pachis pachees tees chalis pachas pachaas saath sattar assi nabbe sau "
     # Urdu
     "ایک دو تین چار پانچ چھ سات آٹھ نو دس بیس تیس چالیس پچاس ساٹھ ستر اسی نوے سو "
     # Hindi
@@ -207,43 +296,142 @@ MONEY_EXTRA = re.compile(
     rf"|(?<![^\W\d_])(?:{_CUR})\.?\s*\d"
     # symbols
     rf"|{_SYMBOLS}"
-    # a figure with a magnitude: "5L", "5 lakh", "1.5m", "5 cr", "3 hazar"
+    # a figure with a magnitude: "5L", "5 lakh", "1.5m", "5 cr", "3 hazar", "5 lak"
     rf"|(?<![^\W\d_])(?<!\d)\d+(?:\.\d+)?\s?(?:k|l|m|cr|{_MAG})(?![^\W\d_])"
     # number words with a magnitude: "five hundred thousand", "fifty-thousand", "half a million",
-    # "paanch hazaar", "پانچ لاکھ", "पाँच लाख"
+    # "paanch hazaar", "two hundred", "five grand", "پانچ لاکھ", "पाँच लाख", "خمسة آلاف"
     rf"|(?<![^\W\d_])(?:{_N})(?:[\s-]+(?:{_N}|and)){{0,4}}[\s-]+(?:{_MAG})(?![^\W\d_])"
+    # a magnitude with a currency word: "thousand rupees", "ألف ريال"
+    rf"|(?<![^\W\d_])(?:{_MAG})[\s-]+(?:{_CUR})(?![^\W\d_])"
     # a number word with a currency word: "paanch sau rupay"
     rf"|(?<![^\W\d_])(?:{_N})[\s-]+(?:{_CUR})(?![^\W\d_])"
+    # an amount followed by the old "/-": "3000/-"
+    r"|(?<!\d)\d[\d,]*\s?/-"
     # grouped figures: 5,00,000 and 50 000
     r"|(?<![\d,.])\d{1,3}(?:,\d{2,3})+(?![\d])|(?<![\d,.])\d{1,3}(?: \d{3})+(?![\d])"
     # a figure of three or more digits near a price word
     rf"|(?<![^\W\d_])(?:{_alt(_PRICE_WORDS)})\w*\D{{0,15}}\d{{3,}}"
+)
+
+# A cost claim is money talk too: only staff says what a thing costs or that it is free.
+_COST_CLAIMS = (
+    r"free\s+of\s+charge",
+    r"(?:at|for)\s+no\s+(?:cost|charge|extra|fee)\w*",
+    r"no\s+(?:cost|charge|fee|fees|extra\s+(?:cost|charge))",
+    r"zero\s+(?:cost|fee|fees|charge|charges)",
+    r"costs?\s+nothing",
+    r"for\s+free",
+    r"(?:completely|totally|absolutely|entirely|100\s?%)\s+free",
+    r"free\s+(?:forever|for\s+life)",
+    r"without\s+(?:any\s+)?(?:cost|charge|fee)",
+    r"gratis",
+    r"low[\s-]?cost",
+    r"cheap\w*",
+    r"inexpensive",
+    r"affordabl\w+",
+    r"cost[\s-]?effective",
+    r"budget[\s-]?friendly",
+    # Roman Urdu
+    r"(?:bilkul\s+)?(?:muft|mufat)",
+    r"kam\s+(?:kharcha|kharch|qeemat|keemat|paisay|paise|lagat)",
+    r"sast[aiey]\w*",
+    r"bina\s+(?:kisi\s+)?(?:kharch\w*|paisay|paise)",
+    r"koi\s+(?:kharch\w*|fees?)\s+nahi\w*",
+    # Urdu
+    r"مفت",
+    r"کم\s+خرچ\w*",
+    r"سست[ای]",
+    r"بغیر\s+خرچ\w*",
+    r"کوئی\s+(?:خرچ|فیس)\w*\s+نہیں",
+    # Hindi
+    r"मुफ़्त",
+    r"मुफ्त",
+    r"बिना\s+(?:खर्च|पैसे|शुल्क)",
+    r"कम\s+खर्च",
+    r"सस्त[ाी]",
+    r"कोई\s+खर्च\s+नहीं",
+    # Arabic
+    r"مجان\w+",
+    r"بدون\s+تكلف\w+",
+    r"بلا\s+(?:مقابل|تكلف\w+)",
+    r"رخيص\w*",
+    r"تكلف[ةه]\s+منخفض\w*",
+)
+COST_CLAIM = re.compile("|".join(rf"(?<![^\W\d_]){fold(p)}(?![^\W\d_])" for p in _COST_CLAIMS))
+
+_UNITS = (
+    r"(?:hours?|hrs?|minutes?|mins?|days?|weeks?|months?|years?|%|percent|per\s?cent|times|fold)"
+)
+_QTY = rf"(?:(?:\d[\d.,]*|{_N})\s?-?\s?{_UNITS}(?![^\W\d_])|half(?![^\W\d_])|twice(?![^\W\d_])|%)"
+_OUTCOMES = (
+    # saves two hours a day, cuts your costs in half, reduce missed orders by 30%
+    rf"(?:sav(?:e|es|ed|ing|ings)|cut|cuts|cutting|reduc(?:e|es|ed|ing)|halv(?:e|es|ed|ing)"
+    rf"|slash(?:es|ed|ing)?|trim(?:s|med|ming)?|lower(?:s|ed|ing)?|shrink(?:s|ing)?"
+    rf"|speed(?:s|ed|ing)?\s+up)(?![^\W\d_])[^.;!?]{{0,40}}?{_QTY}",
+    # double your sales, triple your revenue
+    r"(?:double|doubles|doubled|doubling|triple|triples|tripled|tripling|quadruple\w*"
+    r"|multipl(?:y|ies|ied|ying))\s+(?:your|the|our|its|their|my|sales|revenue|profits?|orders"
+    r"|customers|income|growth|turnover|bookings|leads)(?![^\W\d_])",
+    # 10x your revenue, five times more
+    r"\d+(?:\.\d+)?\s?x(?![^\W\d_])(?!\d)",
+    rf"(?:{_N})\s+times\s+(?:more|as|your|the|higher|faster|better|bigger)(?![^\W\d_])",
+    # 20% more orders
+    r"(?:%|percent|per\s?cent)\s+(?:more|fewer|less|higher|lower|faster|better|extra|bigger"
+    r"|growth|increase|decrease|boost|uplift|reduction|savings?)(?![^\W\d_])",
+    # ROI within a month, pays for itself
+    r"(?:roi|return\s+on\s+investment|pay(?:s|ing)?\s+(?:back\s+)?for\s+itself|pay\s?back"
+    r"|break[\s-]?even|recoup\w*)(?![^\W\d_])",
+    # boosts sales
+    r"(?:increase|increases|boost|boosts|grow|grows|raise|raises|lift|lifts)\s+(?:your\s+|the\s+"
+    r"|our\s+)?(?:sales|revenue|profits?|income|orders|conversions|bookings|growth|turnover"
+    r"|customers)(?![^\W\d_])",
+)
+OUTCOME_CLAIM = re.compile("|".join(rf"(?<![^\W\d_]){p}" for p in _OUTCOMES))
+
+# Phone numbers and reference numbers are not amounts: "+92 300 1234567", "0300-1234567",
+# "order #12345", "ref 40213".
+_ID_LIKE = re.compile(
+    r"\+\d[\d \-()]{6,}\d"
+    r"|(?<!\d)0\d{2,3}[ \-]\d{6,8}(?!\d)"
+    r"|(?<![^\W\d_])(?:order|ref|reference|invoice|ticket|booking|tracking|case|id|receipt)"
+    r"(?![^\W\d_])\.?\s*(?:no\.?|number)?\s*[:#-]?\s*\d+"
+    r"|#\s*\d+"
+    r"|(?<![^\W\d_])no\.\s*\d+"
 )
 _DIGIT_RUN = re.compile(r"(?<![\d.,+])(\d+)(?![\d]*[%.,]\d)")
 
 
 def _bare_figure(view: str) -> bool:
     """A bare run of five to nine digits ("50000") is a figure, not a count of people or a year.
-    Ten or more digits, a "+" or a leading zero on nine or more digits is a phone number, and a
-    figure followed by "%" is a percentage."""
+    Ten or more digits, a "+" or a leading zero on nine digits is a phone number, and a figure
+    followed by "%" or "percent" is a percentage."""
     for m in _DIGIT_RUN.finditer(view):
         run, end = m.group(1), m.end(1)
         if not 5 <= len(run) <= 9:
             continue
         if run.startswith("0") and len(run) >= 9:
             continue
-        if view[end : end + 1] == "%":
+        rest = view[end:].lstrip()
+        if rest[:1] == "%" or rest.startswith(("percent", "per cent")):
             continue
         return True
     return False
 
 
 def money_in(text: str) -> bool:
-    """True when any view of the text holds an amount: the old pattern, the extra patterns, or a
-    bare figure of five to nine digits."""
-    return any(
-        MONEY_IN_TEXT.search(v) or MONEY_EXTRA.search(v) or _bare_figure(v) for v in views(text)
-    )
+    """True when any view of the text holds an amount or a cost claim: the old pattern, the extra
+    patterns, a free or cheap claim, or a bare figure of five to nine digits. Phone numbers and
+    reference numbers are cut out first."""
+    for view in views(text):
+        kept = _ID_LIKE.sub(" ", view)
+        if (
+            MONEY_IN_TEXT.search(kept)
+            or MONEY_EXTRA.search(kept)
+            or COST_CLAIM.search(kept)
+            or _bare_figure(kept)
+        ):
+            return True
+    return False
 
 
 # --- a guessed cause worded as a fact -------------------------------------------------------------
@@ -288,6 +476,8 @@ def states_as_fact(cause: str, text: str) -> bool:
     """True when `text` words the guessed `cause` as a fact: a sentence that holds most of the
     cause's content words (or the cause itself when it has fewer than two) with no hedge word in
     the same clause as those words. A hedge in another sentence or clause does not count."""
+    if not isinstance(cause, str) or not isinstance(text, str):
+        return False
     stems = content_stems(cause)
     if not stems:
         return False

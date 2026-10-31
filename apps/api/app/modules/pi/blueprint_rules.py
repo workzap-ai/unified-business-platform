@@ -140,9 +140,20 @@ def _ref_verified(ref: Any, owner_messages: OwnerMessages | None) -> bool:
     if not isinstance(ref, bm.Evidence) or not ref.claimed or ref.role != "owner":
         return False
     if owner_messages is None:
-        return ref.verified is True
-    said = owner_messages.get(ref.msg)
-    return isinstance(said, str) and pf.said_by_owner(list(bm.seq(ref.words)), said)
+        return ref.verified is True and ref.seal == bm.SEAL
+    try:
+        said = owner_messages.get(ref.msg)
+        return isinstance(said, str) and pf.said_by_owner(list(bm.seq(ref.words)), said)
+    except Exception:  # an owner_messages that is not a usable mapping proves nothing
+        return False
+
+
+def _owner_map(owner_messages: Any) -> OwnerMessages | None:
+    """None stays None; a mapping is used as it is; anything else is an owner record that proves
+    nothing (an empty mapping), never an error."""
+    if owner_messages is None or isinstance(owner_messages, Mapping):
+        return owner_messages
+    return {}
 
 
 def _verified(option: Any, owner_messages: OwnerMessages | None) -> Any:
@@ -150,12 +161,17 @@ def _verified(option: Any, owner_messages: OwnerMessages | None) -> Any:
     ref's `verified` flag recomputed from them (a flag set by hand is not trusted)."""
     if not isinstance(option, bm.Option):
         return option
+    owner_messages = _owner_map(owner_messages)
     changes: dict[str, Any] = {}
     if not isinstance(option.id, str):
         changes["id"] = _name(option)
     if owner_messages is not None:
         changes["evidence"] = tuple(
-            dataclasses.replace(e, verified=_ref_verified(e, owner_messages))
+            dataclasses.replace(
+                e,
+                verified=_ref_verified(e, owner_messages),
+                seal=bm.SEAL if _ref_verified(e, owner_messages) else "",
+            )
             for e in bm.seq(option.evidence)
             if isinstance(e, bm.Evidence)
         )
@@ -173,7 +189,8 @@ def verify_option(option: bm.Option, owner_messages: OwnerMessages) -> bm.Option
 def strength(option: bm.Option, owner_messages: OwnerMessages | None = None) -> int:
     """How many distinct owner messages verifiably back the option (see `verify_option`). Without
     the owner's messages only refs already marked verified count."""
-    return int(_verified(option, owner_messages).evidence_strength)
+    checked = _verified(option, owner_messages)
+    return int(checked.evidence_strength) if _is_option(checked) else 0
 
 
 # --- recommendable and ranking -------------------------------------------------------------------
@@ -254,6 +271,16 @@ def _tier(option: bm.Option) -> int:
     return 1
 
 
+def _presort_key(option: bm.Option) -> tuple[str, str, str, str]:
+    """A total order over options, so ties never depend on the order they came in: id, wording,
+    then the whole record (risks, dependencies, trade-offs and the rest)."""
+    try:
+        rest = repr(option)
+    except Exception:
+        rest = ""
+    return (_name(option), str(option.what), str(option.benefit), rest)
+
+
 def rank_options(
     options: Iterable[bm.Option] | None, owner_messages: OwnerMessages | None = None
 ) -> tuple[bm.Option, ...]:
@@ -276,7 +303,7 @@ def rank_options(
          never depend on the order the options came in.
     """
     items = _only_options(options)
-    items.sort(key=lambda o: (_name(o), str(o.what), str(o.benefit)))
+    items.sort(key=_presort_key)
     checked = [(_verified(o, owner_messages), o) for o in items]
     originals = {id(v): o for v, o in checked}
     ranked = sorted(
@@ -335,6 +362,7 @@ def _bad_fields(option: bm.Option) -> list[str]:
         and isinstance(e.msg, str)
         and isinstance(e.role, str)
         and isinstance(e.verified, bool)
+        and isinstance(e.seal, str)
         and isinstance(e.words, tuple | list)
         and all(isinstance(w, str) for w in e.words)
         for e in refs
@@ -440,26 +468,30 @@ def _rule_cause_fact(option: bm.Option, ctx: _Ctx) -> list[Issue]:
     ]
 
 
-_NON_OWNER_PREFIX = ("assistant", "pi", "bot", "system", "agent", "model", "staff", "reviewer")
+# Owner message ids have no fixed form (a counter, a uuid, "m1"), so there is no clean pattern to
+# allow; the ids that name another speaker are refused instead. This list is a floor, not the
+# proof: the strict check is `owner_messages` by id.
+_NON_OWNER_WORDS = frozenset(
+    "assistant chatbot pi ai llm bot system agent model staff reviewer workzap gpt claude".split()
+)
 
 
 def _non_owner_id(msg: str) -> bool:
-    """Without the owner's messages by id, a message id that names another speaker ("assistant-5",
-    "pi:3") is not the owner's."""
-    head = re.split(r"[-_:#./ ]", msg.strip().lower(), maxsplit=1)[0]
-    return head in _NON_OWNER_PREFIX
+    """Without the owner's messages by id, a message id with a letter group that names another
+    speaker ("assistant-5", "assistant5", "ai-1", "llm_2", "workzap-pi-1") is not the owner's."""
+    return any(t in _NON_OWNER_WORDS for t in re.findall(r"[a-z]+", msg.lower()))
 
 
 def _rule_evidence(option: bm.Option, ctx: _Ctx) -> list[Issue]:
     """With the owner's messages by id: every ref names one of them and its words are in it. With
     only the owner's text: the words are in it. A ref that names no message or has no words fails
     either way."""
-    if ctx.owner_messages is None and ctx.owner_text is None:
-        return []
     bad: list[Issue] = []
     for ref in option.evidence:
         if ctx.owner_messages is not None:
             ok = _ref_verified(ref, ctx.owner_messages)
+        elif ctx.owner_text is None:
+            ok = _ref_verified(ref, None)  # nothing to check against: only a verified ref passes
         else:
             ok = (
                 ref.claimed

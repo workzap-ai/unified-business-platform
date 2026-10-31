@@ -21,7 +21,7 @@ def ev(msg="m1", words=("count", "stock"), **over):
 
 
 def good_ev(msg="m1", words=("count", "stock")):
-    return bm.Evidence(msg, tuple(words), verified=True)
+    return bm.Evidence(msg, tuple(words), verified=True, seal=bm.SEAL)
 
 
 def option(**over) -> bm.Option:
