@@ -566,21 +566,6 @@ WEAK_TOKENS = (
     "ग्राहक लोग आदमी रोज रोजाना हफ्ता हफ्ते महीना महीने साल समय सूची काम समस्या बेहतर नया नए पुराना छोटा व्यवसाय"
 )
 
-# Remedies a tried entry can repeat. Narrow on purpose: a remedy shared by many ideas ("a list") is
-# not a repeat. concept -> terms (same syntax as above).
-REMEDIES: dict[str, str] = {
-    "discount": "discount*|price cut*|cheaper|sale offer|offer a sale|ڈسکاؤنٹ|رعایت|خصم|تخفيض|ڈسکاونٹ|छूट|डिस्काउंट|discount dena|discount do|mark ?down",
-    "hire": "hire|hiring|recruit*|extra staff|more staff|new staff|بھرتی|توظيف|وظّف*|भर्ती|bharti|naya banda|ایک اور آدمی|مزید عملہ",
-    "ads": "ads|advertis*|boost|sponsored|campaign*|اشتہار|اشتہارات|اعلان*|विज्ञापन|ishtehaar|ishtihar|paid promotion",
-    "software": "new software|software|app|crm|pos system|erp|system|سافٹ ویئر|برنامج|نظام|सॉफ्टवेयर|ایپ|تطبيق|ऐप",
-    "training": "training|train the|course|workshop|ٹریننگ|تربیت|تدريب|ट्रेनिंग|प्रशिक्षण",
-    "reminder": "reminder*|remind*|ریمائنڈر|یاد دہانی|تذكير|تذكير*|रिमाइंडर|याद दिला*|yaad dehani|yaad dilana",
-    "loyalty": "loyalty|loyalty card|points|reward*|ویلیو کارڈ|وفادار*|ولاء|لائلٹی|इनाम कार्ड|rewards program",
-    "register": "register|ledger|notebook|diary|khata|رجسٹر|کھاتہ|دفتر|سجل|رجسٹر|रजिस्टर|खाता|डायरी|ڈائری|دفتر",
-    "supplier_change": "new supplier|change (the )?supplier|another supplier|switch (the )?(courier|supplier)|نیا سپلائر|مورد جديد|نیا کوریئر|شركة شحن اخرى|नया सप्लायर|nayi courier|naya supplier",
-    "raise_price": "raise (the )?prices?|increase (the )?prices?|price increase|قیمت بڑھا|رفع الاسعار|कीमत बढ़ा|qeemat barha|price barha",
-}
-
 
 # Round 2: remedy and rewording vocabulary added to existing concepts (causal or remedy phrasing that
 # carries none of the owner's topic words). Merged after EXTRA_TERMS.
@@ -627,4 +612,52 @@ SETTING_WORDS = (
     "دکان دفتر ڈیسک فرنٹ ریسپشن ریسپشنسٹ عملہ عملے ٹیم مالک نام لوگو دیوار چھت دروازہ گیٹ فلور کمرہ عمارت بلڈنگ فارم شیڈ ورکشاپ کلینک اسکول کلب جم کچن گودام "
     "متجر محل مكتب مكاتب استقبال موظف موظفين موظفون فريق اسم شعار جدار جدران سقف باب بوابة غرفة مبنى مزرعة عنبر ورشة عيادة مدرسة نادي مطبخ مستودع قاعة فرع "
     "दुकान ऑफिस डेस्क फ्रंट रिसेप्शन स्टाफ टीम मालिक नाम लोगो दीवार छत दरवाजा गेट फ्लोर कमरा इमारत बिल्डिंग फार्म शेड वर्कशॉप क्लिनिक स्कूल क्लब जिम किचन गोदाम"
+)
+
+
+# What the owner TRIED, as object and remedy concepts. A tried item and an idea are the same attempt
+# when the idea names all of the tried item's concepts (one if it has one, two if it has more), in any
+# of the five languages, so "rang wale folder" and "colour-coded folders per customer" meet.
+# concept -> terms (same syntax as above).
+TRIED_CONCEPTS: dict[str, str] = {
+    "colour": "colou?rs?|colou?red|colou?r wale|rang|rangeen|rangin|rang wale|rangon|لون|ألوان|ملونة|ملون|ملونا|رنگ|رنگین|رنگوں|رنگ والے|رنگ والی|रंग|रंगीन|रंगों|रंग वाले|रंग वाली",
+    "folder": "files?|folders?|binders?|فائل|فائلیں|فائلوں|فولڈر|فولڈرز|ملف|ملفات|مجلد|مجلدات|फाइल|फाइलें|फोल्डर",
+    "label": "labels?|labell?ing|tags?|tagging|stickers?|ملصق*|الصقوا|لیبل|ٹیگ|ٹیگز|لصاق|लेबल|टैग|स्टिकर",
+    "reminder": "remind*|reminders?|yaad dihani|yaad dila*|یاد دہانی|یاد دلا*|تذكير*|ذكروا|ذكّروا|رِمائنڈر|रिमाइंडर|याद दिला*|याद दिलाएं",
+    "discount": "discount*|price cuts?|cheaper|sale offer|chhoot|chhut|chut|رعایت|ڈسکاؤنٹ|ڈسکاونٹ|خصم|خصما|تخفيض*|छूट|डिस्काउंट|mark ?down",
+    "ads": "ads|adverts?|advertis*|ishtihar|ishtehaar|اشتہار*|إعلان*|اعلان*|विज्ञापन|campaigns?|boost*|sponsored",
+    "hire": "hire|hired|hiring|recruit*|extra staff|more staff|new staff|extra assistant|bharti|banda hire|ek aur banda|بھرتی|وظف*|توظيف|भर्ती|مزید عملہ|ایک اور بندہ|ایک اور آدمی|मजीद स्टाफ|एक और आदमी",
+    "software": "apps?|software|تطبیق*|تطبيق*|crm|erp|booking app|ایپ|ایپلیکیشن|سافٹ ویئر|برنامج|تطبيق|ऐप|सॉफ्टवेयर",
+    "training": "train*|training|courses?|workshops?|ٹریننگ|تربیت|کورس|تدريب*|دورة|دورات|ट्रेनिंग|प्रशिक्षण|कोर्स",
+    "loyalty": "loyalty|points?|loyalty cards?|لائلٹی|پوائنٹ*|بطاقة ولاء|ولاء|نقاط|نقاطا|लॉयल्टी|पॉइंट",
+    "register": "registers?|ledgers?|ledger books?|notebook|khata|khaata|کھاتہ|کھاتے|رجسٹر|دفتر الحسابات|سجل|سجلات|रजिस्टर|खाता|खाते",
+    "group_chat": "groups?|group chats?|گروپ|گروپس|مجموعة|مجموعات|ग्रुप",
+    "camera": "cameras?|cctv|surveillance|کیمرہ|کیمرے|سی سی ٹی وی|كاميرا|كاميرات|مراقبة|कैमरा|कैमरे|सीसीटीवी",
+    "checklist": "check ?lists?|tick lists?|ticklist|tick off|چیک لسٹ|ٹک لسٹ|قائمة تحقق|चेकलिस्ट|टिक लिस्ट",
+    "roster": "rosters?|rota|time ?tables?|shift schedules?|duty rosters?|روسٹر|ٹائم ٹیبل|جدول ورديات|جدول مناوبات|रोस्टर|टाइम टेबल",
+    "token": "tokens?|queue numbers?|line numbers?|queue|ٹوکن|قطار|لائن نمبر|أرقام الدور|رقم دور|الدور|टोकन|कतार|लाइन नंबर",
+    "bonus": "bonus*|incentives?|incentive dein|بونس|ترغیبی|انسنٹو|انسینٹیو|حوافز|مكافأة|مكافآت|बोनस|प्रोत्साहन",
+    "courier_change": "(change|changed|switch|switched) (the |to )?(another |a new |other )?(courier|delivery company|supplier)|another (courier|delivery company|supplier)|new (courier|supplier)|courier badal|courier badla|naya courier|doosri delivery company|dusri delivery company|کوریئر بدل|دوسری ڈیلیوری کمپنی|غيرنا شركة الشحن|شركة توصيل أخرى|شركة شحن أخرى|कूरियर बदल|दूसरी डिलीवरी कंपनी|नया कूरियर",
+    "price_raise": "(rates?|prices?|qeemat|qeematein|rate|daam) (thoda |thodi |kuch |zara )?barha*|(ریٹ|ریٹس|قیمت|قیمتیں) (تھوڑا |تھوڑی |کچھ |ذرا )?بڑھا*|(रेट|कीमत|कीमतें|दाम) (थोड़ा |थोड़ी |कुछ |जरा )?बढ़ा*|raise[sd]? (the )?prices?|raise[sd]? (the )?rates?|increase[sd]? (the )?(prices?|rates?)|price increase|qeemat barha*|rates? barha*|prices? barha*|قیمت بڑھا*|ریٹ بڑھا*|قیمتیں بڑھا*|رفع الاسعار|ارفعوا الاسعار|رفعنا الأسعار|कीमत बढ़ा*|रेट बढ़ा*|कीमतें बढ़ा*",
+    "meeting": "meetings?|huddles?|میٹنگ*|اجتماع*|اجتماعا|मीटिंग*|बैठक",
+    "text_message": "sms|text messages?|text each|text the|texting|ایس ایم ایس|ٹیکسٹ پیغام|رسالة نصية|رسائل نصية|एसएमएस|टेक्स्ट संदेश",
+    "receipt_photo": "receipts?|photo*|photograph*|pictures?|tasveer|raseed|رسید|تصویر|إيصال|ايصال|صوروا|रसीद|तस्वीर",
+    "channel": "whatsapp|واٹس ایپ|واتساب|व्हाट्सएप|facebook|فیس بک|فیسبک|फेसबुक|instagram|انسٹاگرام|انستغرام|इंस्टाग्राम|tiktok|youtube",
+    "list_sheet": "lists?|sheets?|fehrist|فہرست|فهرست|قائمة|सूची|शीट|شیٹ|ورقة",
+}
+
+# How an outcome the owner gave in their own words reads. Failed is checked first ("did not work").
+OUTCOME_FAILED = (
+    "failed|fail|no effect|did not help|didnt help|not helped|did not work|didnt work|not work|no use|useless|lost|got lost|abandoned|ignored|no result|nothing changed|"
+    "kaam nahi kiya|kaam nahi|fayda nahi|faida nahi|nakam|nakaam|farq nahi|kuch nahi hua|kho gaya|"
+    "فائدہ نہیں|کام نہیں کیا|ناکام|کوئی فرق نہیں|کھو گیا|بے فائدہ|"
+    "لم ينجح|لم تنجح|فشل|فشلت|بلا فائدة|لا فائدة|ضاع|ضاعت|لم يفد|لم ينفع|تجاهلوها|"
+    "काम नहीं किया|फायदा नहीं|असफल|कोई फर्क नहीं|खो गया|बेकार"
+)
+OUTCOME_WORKED = (
+    "worked|it worked|works|helped|helps|success|successful|fixed|improved|"
+    "kaam kiya|kaam kar gaya|fayda hua|faida hua|kamyab|theek ho gaya|"
+    "کام کیا|فائدہ ہوا|کامیاب|ٹھیک ہو گیا|بہتر ہوا|"
+    "نجح|نجحت|ساعد|ساعدت|استفدنا|تحسن|"
+    "काम किया|फायदा हुआ|सफल|ठीक हो गया"
 )
