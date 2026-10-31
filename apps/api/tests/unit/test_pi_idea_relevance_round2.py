@@ -558,3 +558,79 @@ def test_integrated_journey_errors(
 ) -> None:
     v = evaluate_idea(idea, _wide(title, owner, cat))
     assert v.kind is kind, (v.kind, v.reason, v.evidence_words, v.concepts)
+
+
+# ----- signage and branding: a concrete new object that answers no stated problem is UNLINKED ----------
+
+SIGNAGE = {
+    "en": [
+        "Put a new board outside the school gate.",
+        "Hang a colourful banner above the entrance.",
+        "Put up a new nameplate at the front.",
+    ],
+    "roman_ur": [
+        "School ke bahar naya board lagayein",
+        "Darwaze ke upar rangeen banner lagwayein.",
+        "Naya signboard aur nameplate banwayen.",
+    ],
+    "ur": [
+        "اسکول کے باہر نیا بورڈ لگائیں۔",
+        "دروازے کے اوپر رنگین بینر لگوائیں۔",
+        "نیا سائن بورڈ اور نیم پلیٹ بنوائیں۔",
+    ],
+    "ar": [
+        "ضعوا لافتة جديدة خارج المدرسة.",
+        "علقوا بانرا ملونا فوق المدخل.",
+        "اصنعوا لوحة اسم جديدة.",
+    ],
+    "hi": [
+        "स्कूल के बाहर नया बोर्ड लगाएं।",
+        "दरवाजे के ऊपर रंगीन बैनर लगवाएं।",
+        "नया साइनबोर्ड और नेमप्लेट बनवाएं।",
+    ],
+}
+SIGN_CASES = [
+    (k, lang, n, w)
+    for k in ("clinic_wait", "heat_shed", "gym_fees")
+    for lang in LANGS
+    for n in range(3)
+    for w in (False, True)
+]
+
+
+@pytest.mark.parametrize(
+    ("key", "lang", "n", "wide"),
+    SIGN_CASES,
+    ids=[f"{c[0]}-{c[1]}-s{c[2]}-{'wide' if c[3] else 'narrow'}" for c in SIGN_CASES],
+)
+def test_signage_is_unlinked_not_unknown(key: str, lang: str, n: int, wide: bool) -> None:
+    v = evaluate_idea(SIGNAGE[lang][n], _problem(key, lang, wide), None, None, lang)
+    assert v.kind is IdeaKind.UNLINKED, (v.kind, v.reason, v.concepts)
+
+
+def test_the_exact_idea_from_the_school_journey() -> None:
+    probs = [
+        {
+            "id": "p1",
+            "title": "School fee arrives late",
+            "user_words": ["Bohat se parents fees der se dete hain"],
+            "category": "cash_collections",
+        }
+    ]
+    v = evaluate_idea("School ke bahar naya board lagayein", probs, None, None, "roman_ur")
+    assert v.kind is IdeaKind.UNLINKED
+
+
+def test_a_task_board_for_the_problem_is_still_linked() -> None:
+    probs = [
+        {
+            "id": "p1",
+            "title": "Customers phone for the repair status",
+            "user_words": ["customers keep calling to ask if the car is ready"],
+            "category": "communication_coordination",
+        }
+    ]
+    v = evaluate_idea(
+        "Keep a job slip on every car and message the customer when it is ready.", probs
+    )
+    assert v.kind is IdeaKind.LINKED
