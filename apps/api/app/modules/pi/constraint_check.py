@@ -5,9 +5,24 @@ findings and must not feed production logic). `check_option(option_text, require
 returns a `Verdict`: status `ok`, `violates` or `unknown`, the rule that fired, the matched
 evidence words and a reason.
 
+WHAT `ok` MEANS, AND WHAT IT DOES NOT
+  * `ok` means: no rule this module recognises was violated, and every limit the owner stated was
+    read. It is NOT a proof that the option is safe or within the limits, and a consumer must not
+    present it to the owner as a guarantee ("clear of your limits" is more than this module knows).
+  * `violates` means a recognised rule was positively broken. `unknown` means it could not be
+    checked: an unread word, an unreadable or vague limit, a verb that is not known, a figure that
+    cannot be attributed, no budget stated for a costly option.
+  * KNOWN RESIDUAL. The check matches words (stems, plurals, and a few synonym groups). An option
+    that touches a limit's subject only through a synonym that shares no stem and is in no group
+    ("rota", "roster", "slots", "zones", "catchment", "fares", "dues", "remuneration",
+    "assortment", "offerings") shares nothing with it and gets `ok`. Neither the word lists nor
+    the verb lists can be made complete, so this residual is not zero; reviewers (Level 2 steps
+    that follow) and the owner's own confirmation are the backstop, not this gate.
+
 THE LIMITS (what this module does and does not read), stated once
   * Rejecting is fail-safe for the owner's stated hard limits; accepting is not. `ok` means every
-    stated limit was read, compared, and not broken. A limit that cannot be read or compared gives
+    stated limit was read, compared, and not broken by a rule it knows. A limit that cannot be
+    read or compared gives
     `unknown`, never `ok` (no requirements at all is `ok`: there is nothing to break; requirements
     that could not be read from the database, `columns_available=False`, are `unknown`).
   * Languages: English and Roman Urdu word lists (verb families, cost and income words, units,
@@ -284,7 +299,7 @@ FAMILIES: dict[str, frozenset[str]] = {
     "ADD": frozenset("add increase expand extend grow barha barhana izafa".split()),
     "CLOSE": frozenset("close shut".split()),
     "STOP": frozenset(
-        "stop halt cease discontinue quit cancel end drop suspend pause band".split()
+        "stop halt cease discontinue quit cancel end drop suspend pause band rok rokna roko".split()
     ),
     "USE": frozenset("use adopt rely install deploy operate istemal istamal".split()),
     "CUT": frozenset("cut reduce lower slash decrease trim shrink kam ghata ghatana".split()),
@@ -333,7 +348,7 @@ STAFF_WORDS = frozenset(
 ) | frozenset(
     "staff employee worker person people anyone anybody someone somebody clerk assistant helper "
     "cashier driver salesman salesperson team hand labour labor manager banda bande bandey "
-    "aadmi".split()
+    "aadmi crew workforce headcount manpower personnel boy rider trainee timer relative".split()
 )
 SHOP_WORDS = frozenset(
     "shop store branch outlet site location office warehouse premise showroom dukan dukaan".split()
@@ -359,11 +374,19 @@ STOPWORDS = STOPWORDS | frozenset(_canon(w) for w in STOPWORDS)
 
 SYNONYM_GROUPS = {
     "PRICE": "price prices pricing rate rates tariff fee fees charge charging qeemat qeematein "
-    "keemat daam reprice repricing discount discounts discounting discounted",
+    "keemat daam dam reprice repricing discount discounts discounting discounted surcharge "
+    "markup levy premium cost costs fare fares sasta sasti offer offers off deal deals combo "
+    "combos cheaper free bundle bundles promo promos promotion promotions coupon coupons waive "
+    "markdown sale sales voucher vouchers cashback rebate rebates clearance flash",
     "TIME": "time timing timetable waqt hour schedule opening night evening midnight morning "
     "weekend friday saturday sunday monday tuesday wednesday thursday",
     "MENU": "menu special dish dishes item items",
     "AD": "ad ads advert adverts advertising advertisement advertisements campaign campaigns",
+    "SOCIAL": "facebook fb meta instagram insta tiktok social",
+    "DELIVERY": "deliver delivers delivery deliveries delivering shipping shipment dispatch "
+    "courier",
+    "SUPPLIER": "supplier suppliers vendor vendors wholesaler wholesalers distributor distributors "
+    "provider providers stockist stockists dealer dealers",
 }
 SYNONYM_KEY = {w: key for key, words in SYNONYM_GROUPS.items() for w in words.split()}
 # a droppable word: when the limit names something else as well, it need not match
@@ -894,7 +917,7 @@ class _Option:
 
 def _option(text: str) -> _Option:
     if not _OTHER_LETTER.search(text):  # no Urdu, Arabic, Hindi or other script letter at all
-        return _Option(text, tokens_of(lex.take_on_as_hire(norm(text))), True)
+        return _Option(text, tokens_of(lex.strip_leads(lex.take_on_as_hire(norm(text)))), True)
     mapped, recognised, unread = scripts.to_english(
         norm(text),
         SCRIPT_TABLE,
@@ -909,14 +932,16 @@ def _option(text: str) -> _Option:
     readable = recognised > 0
     # these languages put the verb last: the marker makes every verb read the words before it
     marked = re.sub(r"([;:!?.\n])", r" karein \1", mapped) + " karein"
-    return _Option(mapped, tokens_of(lex.take_on_as_hire(marked)), readable, unread)
+    return _Option(
+        mapped, tokens_of(lex.strip_leads(lex.take_on_as_hire(marked))), readable, unread
+    )
 
 
 CLOSE_ADVERB_NEXT = frozenset({"to", "by", "enough", "together", "friends", "friend"})
 INVESTIGATE = frozenset(
     """measure measuring check checking investigate investigating evaluate evaluating assess
-    assessing review reviewing audit auditing consider considering whether study studying explore
-    exploring compare comparing worth research researching""".split()
+    assessing review reviewing audit auditing whether study studying compare comparing worth
+    research researching""".split()
 )
 NOT_AN_OPTION = frozenset(
     "option possible worth needed necessary allowed advisable wise required viable".split()
@@ -928,10 +953,14 @@ def _proposed(tokens: list[Tok], i: int) -> bool:
     """False when tokens[i] is negated, only investigated ("measure whether replacing..."), or
     called "not an option / not possible" after it: it is named, not proposed."""
     clause = tokens[i].clause
-    for j in range(max(0, i - 4), i):
+    for j in range(max(0, i - 6), i):
         if tokens[j].clause != clause:
             continue
-        if tokens[j].word in INVESTIGATE or (i - j <= 3 and tokens[j].word in NEGATIONS):
+        if (
+            tokens[j].word in INVESTIGATE
+            or tokens[j].word == "before"
+            or (i - j <= 3 and tokens[j].word in NEGATIONS)
+        ):
             return False
     after = [t.word for t in tokens[i + 1 : i + 7] if t.clause == clause]
     for k, word in enumerate(after):
@@ -1360,15 +1389,12 @@ LIMIT_FILLER = frozenset(
     frozen stay stays remain remains same unchanged jaisay jaise waisay waise rahenge rahega
     rahegi rahe tabdeeli tabdili badlav ho hogi hoga gi ga ge koi nahi nahin hain hai hota
     hoti sakta sakte sakti honi rahna non negotiable permanent owner allow allowed permit
-    permitted wont won't kar karna karein karo dein lein badal badlo badlein tabdeel tabdil sakte
+    permitted wont won't open always kar karna karein karo dein lein badal badlo badlein tabdeel
+    tabdil sakte
     sakta sakti""".split()
 )
 PRONOUNS = frozenset("them it they ye yeh inhe inko unhe isse ise unko wo woh".split())
 CONTEXT_PREPS = frozenset("for near next beside alongside".split())
-TOUCH_WORDS = frozenset(
-    """discount offer off deal combo cheaper free bundle promo promotion coupon waive markdown
-    sale voucher cashback rebate""".split()
-)
 SPLIT_WORDS = frozenset("then and but just only also aur phir lekin so while because".split())
 RU_MARKERS = RU_VERB_FINAL | {"do", "dena", "lena", "karna"}
 
@@ -1399,7 +1425,11 @@ def subject_stems(clause: str) -> list[set[str]]:
             or len(w) < 3
         ):
             continue
-        is_verb = bool(verb_families(w)) and w not in NOUN_TOO and noun_stem(w) not in STAFF_WORDS
+        is_verb = (
+            bool(verb_families(w))
+            and (w not in NOUN_TOO or (modal_seen and not verb_seen))
+            and noun_stem(w) not in STAFF_WORDS
+        )
         followed = idx + 1 < len(ws) and ws[idx + 1] not in STOPWORDS
         if is_verb and modal_seen and not verb_seen and not (w.endswith("ing") and followed):
             verb_seen = True
@@ -1408,8 +1438,16 @@ def subject_stems(clause: str) -> list[set[str]]:
     droppable = [
         k for k in out if k & DROPPABLE_OBJECTS or (k & PARTNER_WORDS)
     ]  # "caterer partner", "dukan ka waqt": the generic word need not match
-    kept = [k for k in out if k not in droppable]
-    return kept or out
+    kept = [k for k in out if k not in droppable] or out
+    merged: list[set[str]] = []
+    for keys in kept:
+        for other in merged:
+            if {x for x in keys if x.isupper()} & {x for x in other if x.isupper()}:
+                other |= keys
+                break
+        else:
+            merged.append(set(keys))
+    return merged
 
 
 _MODALS = frozenset({"can", "could", "must", "should", "will", "would", "may", "won't", "wont"})
@@ -1465,6 +1503,17 @@ def _content(clause: list[Tok], skip: set[int]) -> list[Tok]:
     ]
 
 
+def _ruled_out_after(clause: list[Tok], k: int) -> bool:
+    """ "replacing the POS is not an option": the verb is named and then ruled out."""
+    after = [t.word for t in clause[k + 1 : k + 8]]
+    for j, word in enumerate(after):
+        if word in {"not", "isnt", "isn't", "never"} and any(
+            x in NOT_AN_OPTION for x in after[j + 1 : j + 3]
+        ):
+            return True
+    return False
+
+
 def _is_object_of_earlier_verb(clause: list[Tok], k: int) -> bool:
     """True when a known verb comes before clause[k] with only determiners, adverbs and
     adjectives-of-nothing between: the word at k is then the verb's object, not a second verb."""
@@ -1477,13 +1526,15 @@ def _is_object_of_earlier_verb(clause: list[Tok], k: int) -> bool:
     return False
 
 
-def _verbs_of(clause: list[Tok], hits: set[int]) -> tuple[bool, list[Tok]]:
+def _verbs_of(
+    clause: list[Tok], hits: set[int], change_set: frozenset[str] | None = None
+) -> tuple[bool, list[Tok]]:
     """(a known change verb is in the clause, the words that may be its verb)."""
     foreign = _ru_option(clause) or any(t.word in RU_VERBS or t.word in RU_SAFE for t in clause)
     for k, t in enumerate(clause):
         if (
             k + 1 < len(clause)
-            and t.word.endswith("ing")
+            and t.word in MODIFIER_ING
             and (k + 1) in hits  # "opening hours": a modifier
         ):
             continue
@@ -1494,43 +1545,47 @@ def _verbs_of(clause: list[Tok], hits: set[int]) -> tuple[bool, list[Tok]]:
             foreign or (k > 0 and clause[k - 1].word not in {"to", "will", "should", "must", "can"})
         ):
             continue  # a subject word that is also a verb ("the shifts") is a noun unless it leads
-        if verb_stems(t.word) & CHANGE_LIKE:
+        if verb_stems(t.word) & (change_set or CHANGE_LIKE):
             if _is_object_of_earlier_verb(clause, k):
                 continue  # "keep shifts": "shifts" is what is kept
+            before = [w.word for w in clause[max(0, k - 6) : k]]
+            if (
+                any(w in SUBJECT_NEGATIONS for w in before[-4:])
+                or any(w in INVESTIGATE or w == "before" for w in before)
+                or _ruled_out_after(clause, k)
+            ):
+                continue  # "do not raise", "check with the owner before raising": not proposed
             return True, []
     words = _content(clause, hits)
     candidates = words[:1] + (words[-1:] if foreign and len(words) > 1 else [])
     return False, candidates
 
 
-def _subject_rule(option: _Option, clause_text: str) -> Verdict:
+def _subject_rule(option: _Option, clause_text: str, closure: bool = False) -> Verdict:
     rule = RULE_CANNOT_CHANGE
     words_of_subject = subject_stems(clause_text)
     if not words_of_subject:
         return _unknown(rule, "the limit names no subject this check can read")
     subject = set().union(*words_of_subject)
     need = len(words_of_subject) if len(words_of_subject) <= 2 else (len(words_of_subject) + 1) // 2
-    price = "PRICE" in subject
+    change_set = CLOSURE_VERBS if closure else None
+    safe_set = BENIGN_VERBS | (CLOSURE_SAFE if closure else frozenset())
     previous_involved = False
     previous_decision: str | None = None  # "safe", "change", "unknown" of the clause before
     answer: Verdict | None = None
     for clause in _action_clauses(option.tokens):
-        hits = {
-            k
-            for k, t in enumerate(clause)
-            if _keys(t.word) & subject or (price and verb_stems(t.word) & TOUCH_WORDS)
-        }
+        hits = {k for k, t in enumerate(clause) if _keys(t.word) & subject}
         words = [t.word for t in clause]
         carried = not hits and previous_involved and any(w in PRONOUNS for w in words)
         involved = bool(hits) or carried
-        changed, candidates = _verbs_of(clause, hits)
-        if any(w in SUBJECT_NEGATIONS or w in INVESTIGATE for w in words):
-            decision: str | None = "safe"
-        elif changed:
-            decision = "change"
+        changed, candidates = _verbs_of(clause, hits, change_set)
+        if changed:
+            decision: str | None = "change"
+        elif any(w in SUBJECT_NEGATIONS or w in INVESTIGATE for w in words):
+            decision = "safe"
         elif candidates:
             decision = (
-                "safe" if all(verb_stems(c.word) & BENIGN_VERBS for c in candidates) else "unknown"
+                "safe" if all(verb_stems(c.word) & safe_set for c in candidates) else "unknown"
             )
         else:
             decision = previous_decision  # "Keep shifts and commission": no verb of its own
@@ -1546,8 +1601,6 @@ def _subject_rule(option: _Option, clause_text: str) -> Verdict:
             if any(w in CONTEXT_PREPS for w in before) and len(_content(clause[:first], set())) > 1:
                 continue  # "Buy paper for the POS": the subject is only context
         clause_keys = set().union(*(_keys(t.word) for t in clause))
-        if price and any(verb_stems(t.word) & TOUCH_WORDS for t in clause):
-            clause_keys.add("PRICE")
         covered = need if carried else sum(1 for k in words_of_subject if k & clause_keys)
         shown = tuple(t.word for k, t in enumerate(clause) if k in hits)[:3] or (words[0],)
         if decision == "change" and covered >= need:
@@ -1582,16 +1635,38 @@ def _check_cannot(option: _Option, limit: Limit, partial: bool = False) -> Verdi
     results = []
     for c in limit_clauses(limit.text):
         lim = _partial(parse_limit(c), partial)
+        closure = bool(_KEEP_STATE.search(c))
         general = (
-            lim.kind in {"object_only", "unknown_verb"}
-            or (lim.kind == "unreadable" and not partial)
+            closure
             or (
-                lim.kind == "action"
-                and (not lim.families or lim.families & GENERAL_FAMILIES or _STATE_CUE.search(c))
+                lim.kind in {"object_only", "unknown_verb"}
+                or (lim.kind == "unreadable" and not partial)
+                or (
+                    lim.kind == "action"
+                    and (
+                        not lim.families or lim.families & GENERAL_FAMILIES or _STATE_CUE.search(c)
+                    )
+                )
             )
-        ) and (_restrictive(c) or lim.kind == "object_only")
+            and (_restrictive(c) or lim.kind == "object_only")
+        )
         old = _check_lim(option, lim, limit.text)
-        if not general:
+        if lim.kind == "action" and "HIRE" in lim.families and set(lim.objects) <= {"STAFF"}:
+            events = added_people_events(option.text)
+            if events:  # any way of taking someone on breaks a hiring freeze
+                results.append(
+                    _violates(
+                        RULE_CANNOT_CHANGE,
+                        f"the option takes people on, which the owner said they cannot do ({c})",
+                        tuple(w for _, _, w in events)[:3],
+                    )
+                )
+                continue
+        if closure and subject_stems(c):
+            results.append(_merge(old, _subject_rule(option, c, closure=True)))
+        elif closure:
+            results.append(old)
+        elif not general:
             results.append(old)
         elif lim.kind == "unreadable" or (
             _STATE_CUE.search(c) and not lim.families & SPECIFIC_FAMILIES
@@ -1696,6 +1771,16 @@ BENIGN_VERBS = frozenset(
 )
 
 
+CLOSURE_SAFE = frozenset("open reopen start continue".split())
+CLOSURE_VERBS = frozenset(
+    """close shut scrap sell abandon liquidate suspend pause stop cancel discontinue drop terminate
+    remove wind""".split()
+)
+_KEEP_STATE = re.compile(
+    r"\b(?:must|has to|have to|needs to|always)\s+(?:stay|remain|be|keep)?\s*"
+    r"(?:open|running|operating)\b|\b(?:must|has to|have to|needs to) (?:stay|remain)\b|"
+    r"\b(?:cannot|can't|can not|not allowed to) close\b|\bnot close\b"
+)
 CHANGE_LIKE = (
     frozenset(
         """extend shift move cancel drop stop scrap switch add close open fire expand reduce raise
@@ -1703,7 +1788,8 @@ CHANGE_LIKE = (
         postpone reschedule remove stay launch begin hire recruit employ onboard badha barha badhao
         badhana kam band shuru hata hatao nikal trim slash relax loosen tighten rotate relocate
         double halve rebrand rename merge split rearrange reorganise reorganize reorder rebuild
-        automate sponsor""".split()
+        automate sponsor sell abandon liquidate suspend pause wind shut terminate discontinue rok
+        roko zyada""".split()
     )
     | FAMILIES["CHANGE"]
     | FAMILIES["STOP"]
@@ -1983,6 +2069,12 @@ _NEGATED_TAIL = re.compile(
 _RU_INSTEAD = re.compile(r"\b(?:ki jagah|ke bajaye|ke bajay|ki bajaye|ke badle)\b")
 
 
+def _price_surface(text: str) -> set[str]:
+    return {
+        noun_stem(w) for w in _WORD.findall(norm(text)) if SYNONYM_KEY.get(noun_stem(w)) == "PRICE"
+    }
+
+
 def _tried_words(text: str) -> list[frozenset[str]]:
     """The comparable words of a text, each as its set of whole-word base forms."""
     out: list[frozenset[str]] = []
@@ -2031,6 +2123,10 @@ def _check_tried(option: _Option, item: TriedItem) -> Verdict:
     shared = sorted(min(w, key=len) for w in mine if any(w & t for t in theirs))
     need = max(1, -(-len(mine) * 6 // 10))
     repeated = len(shared) >= need and (len(mine) > 1 or len(shared) == 1)
+    if repeated and set(shared) <= {"PRICE"}:
+        # a "sale" is not "discounts" unless a price word of the same kind is in both
+        if not (_price_surface(item.what) & _price_surface(kept)):
+            repeated = False
     partial = len(shared) >= 1 and not repeated
     if not (repeated or partial):
         return _ok(rule, "the option does not repeat what the owner tried")
@@ -2054,7 +2150,7 @@ def _check_tried(option: _Option, item: TriedItem) -> Verdict:
 RULE_STAFF = "staff"
 ADD_PEOPLE = frozenset(
     "hire recruit employ onboard engage appoint add assign allocate deploy bring rakh rakhna "
-    "rakhein bharti".split()
+    "rakhein bharti take get put give grow increase expand".split()
 )
 _STAFF_MARKS = "ऀ-ःऺ-ॏ॑-ॗॢॣ"  # Devanagari vowel signs
 _STAFF_TOKEN = re.compile(rf"\d+|(?:[^\W\d_]|[{_STAFF_MARKS}]|')+|[;:!?\n]|\.(?=\s|$)")
@@ -2103,8 +2199,10 @@ def parse_staff_limit(text: str) -> int | None:
 
 _KEEP_OR_HIRE = frozenset("rakh rakhna rakhein".split())
 HIRE_STEMS = frozenset(
-    "hire recruit employ onboard engage appoint bring rakh rakhna rakhein bharti".split()
+    "hire recruit employ onboard engage appoint bring rakh rakhna rakhein bharti take get put "
+    "give grow increase expand".split()
 )
+_COLLECTIVE = frozenset("team crew workforce headcount manpower staff personnel".split())
 _GENERIC_PEOPLE = frozenset("people person staff team hand".split())
 _EXTRA_COUNT = frozenset({"second", "third", "fourth", "another", "additional", "extra"})
 _EXPLICIT_CAP = re.compile(
@@ -2168,6 +2266,9 @@ def added_people_events(text: str) -> list[tuple[str, int | None, str]]:
                     break
         if found is None:
             continue
+        stems = verb_stems(w)
+        if stems & {"grow", "increase", "expand"} and noun_stem(toks[found]) not in _COLLECTIVE:
+            continue  # "increase the prices": only a team, crew or headcount is grown
         count = None
         scan = range(found - 1, max(-1, found - 4), -1) if backward else range(i + 1, found)
         for k in scan:
@@ -2191,13 +2292,20 @@ def added_people_events(text: str) -> list[tuple[str, int | None, str]]:
                 count = SMALL_NUMBER_WORDS[after]
         if count is None and toks[found] in {"someone", "somebody", "anyone"}:
             count = 1
-        hire = bool(verb_stems(w) & HIRE_STEMS) or (
-            w == "add"
-            and (
-                noun_stem(toks[found]) not in _GENERIC_PEOPLE
-                or "new" in toks[min(i, found) + 1 : max(i, found)]
-            )
-        )
+        for offset in (1, 2):  # "increase the team BY 3", "a crew OF 4"
+            k = found + offset
+            if k + 1 < len(toks) and toks[k] in {"by", "of"} and clause[k] == clause[i]:
+                number = toks[k + 1]
+                if number.isdigit():
+                    count = min(int(number), 10**6)
+                elif number in SMALL_NUMBER_WORDS and number != "do":
+                    count = SMALL_NUMBER_WORDS[number]
+        if stems & {"take", "get", "put", "give"} and count is None:
+            if "new" in toks[i + 1 : found]:
+                count = 1
+            else:
+                continue  # "take the cashier through training": no one is added
+        hire = bool(stems & HIRE_STEMS) or w == "add"
         events.append(("hire" if hire else "assign", count, toks[found]))
     return events
 
@@ -2360,6 +2468,7 @@ def _check_budget(option: _Option, limit: Limit) -> Verdict:
         if a.role in {"cost", "ambiguous", "unclear"}
     ]
     over_unknown: Verdict | None = None
+    counted: list[Amount] = []
     for a in amounts:
         if (ceiling.currency and a.currency and ceiling.currency != a.currency) or (
             ceiling.currency in (None, "RS") and a.currency not in (None, "RS")
@@ -2375,6 +2484,7 @@ def _check_budget(option: _Option, limit: Limit) -> Verdict:
                 (a.raw,),
             )
             continue
+        counted.append(a)
         if a.value > ceiling.value:
             if a.role == "cost":
                 return _violates(
@@ -2385,6 +2495,23 @@ def _check_budget(option: _Option, limit: Limit) -> Verdict:
             over_unknown = over_unknown or _unknown(
                 rule, "a figure above the budget could not be attributed (cost or income)", (a.raw,)
             )
+    total = sum((a.value for a in counted), Decimal(0))
+    if len(counted) > 1 and total > ceiling.value:
+        has_cost = any(a.role == "cost" for a in counted)
+        income = any(verb_stems(t.word) & INCOME_CUES for t in option.tokens)
+        if all(
+            a.role == "cost" or (a.role == "unclear" and has_cost and not income) for a in counted
+        ):
+            return _violates(
+                rule,
+                f"the option's figures add up to {total:,}, above the budget ({limit.text})",
+                tuple(a.raw for a in counted)[:4],
+            )
+        over_unknown = over_unknown or _unknown(
+            rule,
+            "the figures add up above the budget and not all could be attributed",
+            (str(total),),
+        )
     if over_unknown:
         return over_unknown
     if amounts:

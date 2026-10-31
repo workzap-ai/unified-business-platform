@@ -26,10 +26,15 @@ async def seed(db, scope, customer_id):
     rich.constraints, rich.tried, rich.cause = CONSTRAINTS, TRIED, CAUSE
     rich.expected_outcome = "no lost orders"
     bare = problem(scope, customer_id, 2, "Stock runs out")
-    merged = problem(scope, customer_id, 3, "Merged away")
-    merged.status = "merged"
-    merged.constraints = {"budget": {"text": "Rs 1"}}
-    db.add_all([merged, bare, rich])  # inserted out of number order on purpose
+    closed = []
+    for number, status in enumerate(
+        ("merged", "split", "resolved", "withdrawn", "parked"), start=3
+    ):
+        row = problem(scope, customer_id, number, f"Not active: {status}")
+        row.status = status  # every status that is not in play must stay out of the read
+        row.constraints = {"budget": {"text": "Rs 1"}}
+        closed.append(row)
+    db.add_all([*closed, bare, rich])  # inserted out of number order on purpose
     await db.flush()
     return rich, bare
 
@@ -116,7 +121,7 @@ async def test_a_database_without_the_0053_columns_gives_empty_requirements_and_
         result = await read_requirements(db, w.scope_a, customer_id=w.cust_a)
         assert result.problems == () and result.columns_available is False
         # the failed select did not poison the transaction: ordinary work still runs
-        assert await db.scalar(text("SELECT count(*) FROM pi_problems")) == 3
+        assert await db.scalar(text("SELECT count(*) FROM pi_problems")) == 7
         again = await read_requirements(db, w.scope_a, conversation_id=conv_a_id)
         assert again.columns_available is False
     finally:

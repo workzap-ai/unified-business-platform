@@ -214,8 +214,37 @@ def is_hiring_freeze(text: str) -> bool:
 _NEW_PEOPLE = re.compile(r"\b(?:naye|naya|nayi) (?:log|banda|bande|bandey|aadmi|logon)\b")
 
 
+_PHRASES = (
+    (re.compile(r"\b(?:lay|lays|laid|laying) off\b|\blet(?:s|ting)? go of\b"), "fire"),
+    (re.compile(r"\bshut(?:s|ting)? down\b|\bclos(?:e|es|ed|ing) down\b"), "shut"),
+    (re.compile(r"\bwind(?:s|ing)? up\b"), "liquidate"),
+    (re.compile(r"\bgive(?:s)? (?:a )?job to\b"), "hire"),
+    (re.compile(r"\bbring(?:s|ing)? on\b"), "hire"),
+    (
+        re.compile(
+            r"\b(?:the )?(?:people|folks|guys|ones) we (?:buy|source|order) (?:from|with)\b"
+        ),
+        "suppliers",
+    ),
+)
+
+
 def take_on_as_hire(text: str) -> str:
-    return _NEW_PEOPLE.sub("new staff", _TAKE_ON.sub("hire", text))
+    out = _NEW_PEOPLE.sub("new staff", _TAKE_ON.sub("hire", text))
+    for pattern, word in _PHRASES:
+        out = pattern.sub(word, out)
+    return out
+
+
+# the openers of advice: the verb after them is PROPOSED, so they neither negate nor investigate
+_LEADS = re.compile(
+    r"\b(?:why not|how about(?: we)?|what if(?: we)?|maybe|perhaps|we could|you could|let's|lets|"
+    r"think about|consider(?: to)?|explore)\b"
+)
+
+
+def strip_leads(text: str) -> str:
+    return _LEADS.sub(" ", text)
 
 
 # ---------------------------------------------------------------------------------- channels

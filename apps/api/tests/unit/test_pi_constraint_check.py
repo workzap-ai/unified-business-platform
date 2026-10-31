@@ -2170,8 +2170,8 @@ def test_an_option_in_a_script_it_cannot_read_is_unknown_for_a_cannot_limit():
 # ---- a generated matrix of verbs and nouns that are in no table ----
 
 NOUNS_25 = ["packages", "plans", "commission", "margins", "shifts", "rosters", "uniforms", "signage",  # noqa: E501
-            "packaging", "invoices", "contracts", "warranties", "deposits", "receipts", "vouchers",
-            "memberships", "subscriptions", "tiers", "bundles", "rebates", "appointments", "classes",  # noqa: E501
+            "packaging", "invoices", "contracts", "warranties", "deposits", "receipts", "tickets",
+            "memberships", "subscriptions", "tiers", "stickers", "magnets", "appointments", "classes",  # noqa: E501
             "routes", "zones", "recipes"]  # fmt: skip
 VERBS_150 = """abolish accelerate adapt amplify anchor arrange assemble auction balance bargain bend
 blend boost broaden burn calibrate cap carve centralise chop circulate clone combine compress
@@ -2294,3 +2294,316 @@ def test_a_noun_that_starts_like_a_hiring_verb_is_not_a_hiring_freeze():
     assert (
         check("Abolish the appointments", cannot=["We cannot change appointments"]).status != "ok"
     )
+
+
+# ---- round 8: advice lead-ins, state preservation, sums, crew and vendor groups, tried closure ----  # noqa: E501
+
+ADVICE_VERBS = {  # base form -> gerund
+    "raise": "raising", "lower": "lowering", "cut": "cutting", "increase": "increasing",
+    "reduce": "reducing", "replace": "replacing", "switch": "switching", "swap": "swapping",
+    "change": "changing", "drop": "dropping", "cancel": "cancelling", "extend": "extending",
+    "shift": "shifting", "move": "moving", "close": "closing", "scrap": "scrapping",
+    "add": "adding", "remove": "removing", "expand": "expanding", "stop": "stopping",
+}  # fmt: skip
+ADVICE_SUBJECTS = [
+    ("We cannot change our prices", "prices"), ("I cannot change the menu", "menu"),
+    ("We cannot change our opening hours", "opening hours"), ("Our staff is fixed", "staff"),
+    ("We cannot change our shop", "shop"), ("suppliers stay as is", "suppliers"),
+    ("No changes to packages", "packages"), ("We cannot change commission", "commission"),
+    ("shifts are fixed", "shifts"), ("branch are fixed", "branch"),
+]  # fmt: skip
+
+
+@pytest.mark.parametrize(
+    ("option", "limit"),
+    [
+        ("Consider raising prices", "We cannot change our prices"),
+        ("Consider cutting prices by 10%", "We cannot change our prices"),
+        ("Why not raise prices?", "We cannot change our prices"),
+        ("Why not lower prices for a week?", "We cannot change our prices"),
+        ("Explore increasing prices", "We cannot change our prices"),
+        ("Consider offering a 10% discount", "We cannot change our prices"),
+        ("Why not replace the menu?", "I cannot change the menu"),
+        ("Consider switching suppliers", "suppliers stay as is"),
+        ("Why not stay open till midnight?", "We cannot change our opening hours"),
+        ("Why not open earlier?", "We cannot change our opening hours"),
+        ("Why not swap the shifts?", "shifts are fixed"),
+        ("How about we raise prices", "We cannot change our prices"),
+        ("What if we cut prices", "We cannot change our prices"),
+        ("Maybe change the menu", "I cannot change the menu"),
+        ("We could replace the suppliers", "suppliers stay as is"),
+        ("You could extend the opening hours", "We cannot change our opening hours"),
+        ("Let's move the shifts", "shifts are fixed"),
+    ],
+)
+def test_advice_and_lead_in_forms_propose_the_verb_after_them(option, limit):
+    v = check(option, cannot=[limit])
+    assert v.status in {"violates", "unknown"}, (option, limit, v)
+    if "discount" not in option:
+        assert v.status == "violates", (option, limit, v)
+
+
+def test_true_negation_and_learn_first_still_protect():
+    limit = ["We cannot change our prices"]
+    for option in ["Do not raise prices", "Never cut prices", "Don't change the prices",
+                   "Keep prices without any change", "First find out whether prices matter",
+                   "Check with the owner before changing prices", "Avoid changing prices"]:  # fmt: skip  # noqa: E501
+        assert check(option, cannot=limit).status == "ok", option
+
+
+def test_matrix_advice_lead_ins_times_change_verbs_times_subjects_are_never_ok():
+    leads = ["Why not {v} the {n}", "How about we {v} the {n}", "What if we {v} the {n}",
+             "Maybe {v} the {n}", "We could {v} the {n}", "You could {v} the {n}",
+             "Let's {v} the {n}", "Consider {g} the {n}", "Explore {g} the {n}",
+             "Think about {g} the {n}"]  # fmt: skip
+    total = unsafe = violates = 0
+    for limit, noun in ADVICE_SUBJECTS:
+        for verb, gerund in ADVICE_VERBS.items():
+            for lead in leads:
+                total += 1
+                status = check(lead.format(v=verb, g=gerund, n=noun), cannot=[limit]).status
+                unsafe += status == "ok"
+                violates += status == "violates"
+    assert total == 10 * 20 * 10
+    assert unsafe == 0, (unsafe, total)
+    assert violates >= 0.8 * total, (violates, total)
+
+
+STATE_LIMITS = ["The shop must stay open", "The branch has to remain open", "We cannot close the shop",  # noqa: E501
+                "The shop is always open", "The shop must stay", "The stall must remain open"]  # fmt: skip  # noqa: E501
+CLOSURE_VERBS = ["close", "shut", "scrap", "sell", "abandon", "wind up", "liquidate", "suspend",
+                 "pause", "stop"]  # fmt: skip
+
+
+def test_matrix_closure_verbs_against_state_preservation_limits_violate():
+    total = bad = 0
+    for limit in STATE_LIMITS:
+        noun = "stall" if "stall" in limit else "branch" if "branch" in limit else "shop"
+        for verb in CLOSURE_VERBS:
+            for option in (f"{verb.capitalize()} the {noun}", f"Just {verb} the {noun}",
+                           f"{verb.capitalize()} the {noun} on Sundays",
+                           f"{verb.capitalize()} the {noun} for two weeks and renovate",
+                           f"Why not {verb} the {noun}?"):  # fmt: skip
+                total += 1
+                status = check(option, cannot=[limit]).status
+                bad += status != "violates"
+    assert total == 6 * 10 * 5
+    assert bad == 0, (bad, total)
+    for option in ["Shut down the branch", "Close the shop", "Just scrap the shop", "Just sell the shop",  # noqa: E501
+                   "Just abandon the shop"]:  # fmt: skip
+        assert check(option, cannot=["The shop must stay open"]).status == "violates", option
+    for option in ["Keep the shop open", "Open the shop earlier", "Keep the shop and track sales"]:
+        assert check(option, cannot=["The shop must stay open"]).status != "violates", option
+
+
+@pytest.mark.parametrize(
+    ("option", "budget", "expected"),
+    [
+        ("Spend 49,000 on ads and 49,000 on posters", "Rs 50000", "violates"),
+        ("Buy a mixer for 30k and a grinder for 30k", "50k", "violates"),
+        ("Ads cost 30,000 and printing costs 25,000", "budget 50,000", "violates"),
+        ("Pay Rs 20,000 for ads and Rs 20,000 for flyers and Rs 20,000 for posters", "Rs 50000", "violates"),  # noqa: E501
+        ("Buy a mixer for 20k and a grinder for 20k", "50k", "ok"),
+        ("Ads cost 10,000 and printing costs 5,000", "budget 50,000", "ok"),
+        ("Spend 30,000 on ads and $400 on tools", "Rs 50000", "unknown"),
+        ("Ads cost 30,000 per month and printing costs 25,000", "Rs 50000", "unknown"),
+    ],
+)  # fmt: skip
+def test_the_amounts_in_an_option_are_added_up_before_comparing(option, budget, expected):
+    assert check(option, budget=budget).status == expected, (option, budget)
+
+
+STAFF_LIMITS = [
+    "only 2 staff",
+    "ek hi banda",
+    "hiring is frozen",
+    "staff is fixed",
+    "just 3 employees",
+]
+
+
+@pytest.mark.parametrize(
+    "option",
+    ["Add three delivery boys", "Put two new waiters on the floor", "Increase the team by 3",
+     "Grow headcount", "Expand the crew", "Add to the workforce", "Take a trainee",
+     "Get a part timer", "Grow the sales team", "Add a second shift crew of 4",
+     "Give a job to a relative", "Add two people", "Bring on two riders", "Recruit a rider"],
+)  # fmt: skip
+def test_every_way_of_adding_people_breaks_a_staff_cap_or_freeze(option):
+    for limit in ["only 2 staff", "hiring is frozen", "just 3 employees"]:
+        assert with_staff(option, limit).status == "violates", (option, limit)
+    assert check(option, cannot=["hiring is frozen"]).status in {"violates", "unknown"}, option
+
+
+@pytest.mark.parametrize(
+    "option",
+    ["Reduce headcount by two", "Cut the workforce", "Lay off the weekend crew", "Lay off the crew",
+     "Sack the crew", "Dismiss the crew", "Fire two riders", "Let go of the helpers",
+     "Shift the team to nights", "Move the cashiers to another shop"],
+)  # fmt: skip
+def test_cutting_or_moving_people_breaks_a_staff_is_fixed_limit(option):
+    for limit in ["staff is fixed", "We cannot change our staff", "headcount is fixed"]:
+        assert check(option, cannot=[limit]).status in {"violates", "unknown"}, (option, limit)
+        assert check(option, cannot=[limit]).status != "ok"
+    assert check("Lay off the crew", cannot=["staff is fixed"]).status == "violates"
+    assert check("Reduce headcount by two", cannot=["staff is fixed"]).status == "violates"
+
+
+def test_matrix_staff_words_are_one_group():
+    words = ["staff", "team", "crew", "workforce", "headcount", "manpower", "personnel", "employees",  # noqa: E501
+             "workers", "people", "helpers", "boys", "waiters", "cashiers", "clerks", "drivers", "riders"]  # fmt: skip  # noqa: E501
+    for noun in words:
+        for verb in ["Cut", "Reduce", "Move", "Shift", "Lay off", "Dismiss", "Sack"]:
+            option = f"{verb} the {noun}"
+            v = check(option, cannot=["staff is fixed"])
+            assert v.status in {"violates", "unknown"}, (option, v)
+        assert check(f"Keep the {noun}", cannot=["staff is fixed"]).status == "ok", noun
+
+
+@pytest.mark.parametrize(
+    "option",
+    ["Replace vendors with cheaper ones", "Switch to a new wholesaler", "Move to different distributors",  # noqa: E501
+     "Change the providers", "Drop our stockists", "Replace the dealers",
+     "Replace the people we buy from"],
+)  # fmt: skip
+def test_vendor_words_are_one_group_with_suppliers(option):
+    v = check(option, cannot=["suppliers stay as is"])
+    assert v.status in {"violates", "unknown"}, (option, v)
+    assert check(option, cannot=["We cannot change our vendors"]).status != "ok", option
+    assert check("Keep the vendors", cannot=["suppliers stay as is"]).status == "ok"
+
+
+@pytest.mark.parametrize(
+    "option",
+    ["dam barha den", "sasta kar dein", "qeemat kam karein", "qeemat zyada karein", "daam barha dein",  # noqa: E501
+     "Introduce a surcharge", "Lower the cost for customers", "Add a markup", "Raise the fares"],
+)  # fmt: skip
+def test_price_synonyms_in_roman_urdu_and_english_touch_a_price_limit(option):
+    for limit in ["We cannot change our prices", "qeemat nahi badal sakte", "prices are fixed"]:
+        assert check(option, cannot=[limit]).status in {"violates", "unknown"}, (option, limit)
+
+
+def test_withholding_pay_is_a_change_of_the_pay_the_limit_names():
+    limit = ["riders ki tankhwa rok nahi sakte"]
+    assert (
+        check("Jab tak paisa jama na ho riders ki tankhwa rok do.", cannot=limit).status
+        == "violates"
+    )
+    for option in [
+        "riders ki tankhwa rok dein",
+        "riders ki tankhwa rok lo",
+        "riders ki tankhwa rok dena",
+    ]:
+        assert check(option, cannot=limit).status == "violates", option
+    assert check("riders ki tankhwa ka record rakhein", cannot=limit).status == "ok"
+
+
+@pytest.mark.parametrize(
+    ("what", "outcome", "option"),
+    [("we gave discounts", "no change in sales", o) for o in [
+        "Run a markdown sale", "Give a coupon", "Promo codes for returning customers",
+        "Do a clearance sale", "Offer a voucher", "Give a rebate", "Flash sale",
+        "Percentage off for new buyers", "Offer a deal", "Bundle offer", "Combo offer", "Cashback"]]
+    + [("posted on Facebook daily", "no response", o) for o in [
+        "Share offers on Meta", "Publish content on FB", "Post on Instagram every day"]]
+    + [("offered free delivery", "did not help", o) for o in [
+        "Deliver at no cost", "Free shipping for everyone", "Zero delivery fee"]],
+)  # fmt: skip
+def test_a_failed_thing_is_closed_over_its_synonym_groups(what, outcome, option):
+    v = check(option, tried=[(what, outcome)])
+    assert v.status in {"violates", "unknown"}, (what, option, v)
+
+
+def test_a_failed_thing_does_not_block_an_unrelated_option():
+    for what, outcome in [
+        ("we gave discounts", "no change"),
+        ("posted on Facebook daily", "no response"),
+    ]:
+        assert check("Ask loyal customers for a review", tried=[(what, outcome)]).status == "ok"
+        assert (
+            check("Instead of discounts, call lapsed customers", tried=[(what, outcome)]).status
+            == "ok"
+        )
+
+
+# ---- survivors of the round-seven audit ----
+
+
+def test_a_discount_or_an_offer_touches_a_price_even_without_a_change_verb():
+    limit = ["prices are fixed"]
+    for option in ["Customers get a discount on Fridays", "Our offer for Fridays is generous",
+                   "A deal for regulars", "Everything is free on Monday"]:  # fmt: skip
+        assert check(option, cannot=limit).status != "ok", option
+
+
+def test_to_and_of_are_not_context_prepositions():
+    limit = ["prices are fixed"]
+    for option in [
+        "Change the prices to 50",
+        "Add a surcharge to the prices",
+        "Raise the level of prices",
+    ]:
+        assert check(option, cannot=limit).status in {"violates", "unknown"}, option
+    assert check("Buy paper for the prices board", cannot=limit).status == "ok"  # context only
+    assert "to" not in cc.CONTEXT_PREPS and "of" not in cc.CONTEXT_PREPS
+
+
+def test_every_candidate_verb_must_be_safe_not_just_one():
+    limit = ["prices nahi badal sakte"]
+    assert check("prices record rakhein", cannot=limit).status == "ok"
+    assert check("prices pilot rakhein", cannot=limit).status != "ok"
+    assert check("prices rebrand rakhein", cannot=limit).status != "ok"
+
+
+def test_a_touch_word_covers_the_price_word_of_the_limit():
+    assert check("Scrap the combo deal", cannot=["prices are fixed"]).status == "violates"
+    assert check("Scrap the voucher", cannot=["prices are fixed"]).status == "violates"
+    assert check("Stop the coupon", cannot=["prices are fixed"]).status == "violates"
+
+
+def test_the_contract_says_ok_is_not_a_proof_and_names_the_residual():
+    from app.modules.pi import option_gate
+
+    doc = " ".join((cc.__doc__ or "").split())
+    assert "NOT a proof" in doc and "KNOWN RESIDUAL" in doc and "must not present it" in doc
+    for word in ["rota", "roster", "catchment", "fares", "remuneration"]:
+        assert word in doc
+    gate_doc = " ".join((option_gate.__doc__ or "").split())
+    assert "NOT a guarantee" in gate_doc and "must not tell the owner" in gate_doc
+    import inspect
+
+    assert "not a proof" in inspect.getsource(option_gate.NextStep)
+
+
+def test_a_count_after_the_noun_by_n_or_of_n_is_the_number_added():
+    assert with_staff("Increase the team by 3", "at most 2 staff").status == "violates"
+    assert with_staff("Increase the team by 1", "at most 2 staff").status == "ok"
+    assert with_staff("Add a second shift crew of 4", "at most 3 staff").status == "violates"
+    assert with_staff("Add a second shift crew of 2", "at most 3 staff").status == "ok"
+    assert cc.added_people("Increase the team by 3")[0] == 3
+    assert cc.added_people("Grow the crew of 5")[0] == 5
+
+
+def test_a_loose_price_word_is_unknown_and_the_same_price_word_is_violates():
+    tried = [("we gave discounts", "no change in sales")]
+    for option in [
+        "Run a markdown sale",
+        "Do a clearance sale again",
+        "Offer a voucher",
+        "Bundle offer",
+    ]:
+        assert check(option, tried=tried).status == "unknown", option
+    plain = [("discounts", "no change in sales")]
+    for option in ["Give discounts again", "Try a discount next month"]:
+        assert check(option, tried=plain).status == "violates", option
+    for option in ["Run a markdown sale", "Offer a voucher"]:
+        assert check(option, tried=plain).status == "unknown", option
+    assert check("Do not repeat discount offers; test a bundle instead",
+                 tried=[("discount offers", "did not work")]).status != "violates"  # fmt: skip
+
+
+def test_the_touch_words_are_the_price_group_and_cover_it_in_a_longer_limit():
+    assert cc.object_key("coupon") == "PRICE" and cc.object_key("combo") == "PRICE"
+    assert check("Scrap the combo deal", cannot=["prices are fixed"]).status == "violates"
+    assert check("Scrap the combo deal", cannot=["our menu prices are fixed"]).status == "unknown"
+    assert not hasattr(cc, "TOUCH_WORDS")

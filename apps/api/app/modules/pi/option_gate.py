@@ -9,6 +9,12 @@ When no option is left (nothing accepted and nothing unknown) the result says so
 `next_step`, `ASK_TARGETED_QUESTION`, and names what to ask about in `ask_about`. It never fills
 a quota with options the owner said they cannot do, and it carries no text for the owner: the
 caller words the one question.
+
+What "accepted" means: the options in `accepted` broke no rule `constraint_check` recognises and
+every stated limit was read. That is NOT a guarantee that they respect the owner's limits: an
+option can touch a limit's subject through a word the check does not know (see "KNOWN RESIDUAL" in
+`constraint_check`). A consumer must not tell the owner that an accepted option is "clear of" or
+"within" their limits; say that nothing the check knows was broken, and keep the option reviewable.
 """
 
 from collections import Counter
@@ -22,7 +28,7 @@ from app.modules.pi.requirements_types import Requirements
 
 
 class NextStep(StrEnum):
-    USE_ACCEPTED = "use_accepted"  # at least one option passed every stated limit
+    USE_ACCEPTED = "use_accepted"  # at least one option broke no recognised rule: not a proof
     CHECK_UNKNOWN = "check_unknown"  # none passed; some could not be checked (show with a flag)
     ASK_TARGETED_QUESTION = "ask_targeted_question"  # none left: ask one question, do not pad
 
