@@ -4,6 +4,7 @@ The model is mocked; the webhook, the worker, the gates and the database are rea
 import json
 
 import pytest
+from offer_expect import assert_offer_ends
 from sqlalchemy import select
 from test_pi_brain_problems import adaptive, create, say, workspace
 from test_pi_service_conversations import turn
@@ -114,7 +115,7 @@ async def test_a_push_for_a_fix_gets_two_ideas_then_the_applications_offer(
     await business_db.refresh(conversation)
     bullets = [line for line in body.splitlines() if line.startswith(("First,", "Second,", "•"))]
     assert 1 <= len(bullets) <= 2  # R-VAL-01
-    assert body.rstrip().endswith(solution_ask.offer_line("en"))
+    assert_offer_ends(body, "en")
     assert conversation.flow_state == "S5_READINESS"
     assert conversation.service_brief["ideas_given"] == len(bullets)
     assert conversation.service_brief["offer_asked"] is True
@@ -132,7 +133,7 @@ async def test_how_exactly_gets_what_the_document_covers_and_the_offer_and_no_id
     [body] = await reply_after(pi, business_db, "how exactly would that work?", "ask-2")
     await business_db.refresh(conversation)
     assert "solution document" in body
-    assert body.rstrip().endswith(solution_ask.offer_line("en"))
+    assert_offer_ends(body, "en")
     assert not [line for line in body.splitlines() if line.startswith("•")]
     assert conversation.service_brief.get("howto_asked") == 1
     assert conversation.service_brief.get("ideas_given", 0) == 0
