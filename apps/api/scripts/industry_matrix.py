@@ -4,10 +4,11 @@ Usage (from apps/api, repo .venv):
     python scripts/industry_matrix.py --cases-ref pi/ps0-baseline \
         --out-csv ../../docs/pi-saas/pi-industry-matrix.csv
 
-It reads packs/industry/<key>.json, packs/solutions/<key>.json, docs/pi-saas/pi-211-industry-check.csv
-and, through `git show <ref>:<path>`, the three evalkit case files. From the case files it reads ONLY
-the `industry` field, the `id` (for the stable split hash) and `provenance.reviewer`; it never reads,
-prints or stores case text, so no Held-out case content is touched. No model call, no database.
+It reads packs/industry/<key>.json, packs/solutions/<key>.json,
+docs/pi-saas/pi-211-industry-check.csv and, through `git show <ref>:<path>`, the three evalkit
+case files. From the case files it reads ONLY the `industry` field, the `id` (for the stable
+split hash) and `provenance.reviewer`; it never reads, prints or stores case text, so no
+Held-out case content is touched. No model call, no database.
 
 Verification rule (stated, not inferred): Verified needs independent labelled cases for the industry
 AND owner-set thresholds, both met. Thresholds are not set yet and independent cases are 0, so no
