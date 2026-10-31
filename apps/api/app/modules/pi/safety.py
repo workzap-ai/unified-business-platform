@@ -1885,7 +1885,12 @@ BOUNDARY_PATTERNS = BOUNDARY_PATTERNS + (
         re.compile(
             r"\b(?:what|which)\s+(?:data|information|details|records?)\s+(?:do|does|will)\s+(?:you|pi)\s+"
             r"(?:keep|store|save|have|hold|know)\b|\bwhat do you (?:keep|store|save|remember) about me\b"
-            r"|\bkya\s+(?:data|record|information)\s+(?:rakhte|rakhta|save|store)\b|\bmera\s+kya\s+(?:data|record)\b",
+            r"|\bkya\s+(?:data|record|information)\s+(?:rakhte|rakhta|save|store)\b|\bmera\s+kya\s+(?:data|record)\b"
+            # RMEM05: "what do you remember / know about me", "show me what you keep"
+            r"|\bwhat\s+(?:do|did|have)\s+you\s+(?:remember|know)\s+(?:about|on)\s+(?:me|my\s+business)\b"
+            r"|\bshow\s+me\s+(?:what|everything|all)\s+(?:that\s+)?(?:you|pi)\s+(?:keep|have|store|know|remember)\b"
+            r"|\bmere\s+baare\s+mein\s+(?:kya|kitna)\s+(?:kuch\s+)?(?:yaad|jaante|pata|rakha)\b"
+            r"|\bkya\s+(?:kya\s+)?(?:yaad|rakha)\s+(?:hai|hua\s+hai)\b",
             re.IGNORECASE,
         ),
     ),

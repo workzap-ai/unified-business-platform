@@ -53,6 +53,7 @@ from app.modules.pi import (
     map_builder,
     map_edit,
     map_share,
+    memory_answer,
     memory_block,
     open_items,
     open_requests,
@@ -2356,9 +2357,7 @@ def _brain_gate(
             said_back = safety.boundary_reply(limit, language, bool(context.get("noted_problems")))
             if limit == safety.Boundary.MEMORY_ASK:
                 # R-PRIV-06: what pi keeps, from the very block the model reads.
-                said_back = memory_block.memory_reply(
-                    context.get("what_i_know") or {}, language, said_back
-                )
+                said_back = memory_answer.answer(context, language, said_back)
             return fixed(
                 said_back,
                 move,
