@@ -173,26 +173,45 @@ def _pressure(reply: str, context: dict[str, Any]) -> list[Finding]:
 # --- R-VOICE-11: name things the way the person names them -------------------------------------
 GENERIC_LABEL = (
     _rx(
-        r"\b(?:location|branch|shop|store|outlet|site|warehouse|godown|unit|item|product|client|customer|employee|department|office|premises|dukaan|dukan|dukaanein)\s*#?\d{1,2}\b(?!\s*(?:%|am\b|pm\b|hours?|hrs?|days?|years?|months?|weeks?|minutes?|min\b|kg\b|pcs\b|pieces))"
+        r"\b(?:location|branch|shop|store|outlet|site|warehouse|godown|office|premises|dukaan|dukan|dukaanein)\s*#?\d{1,2}\b(?!\s*(?:%|am\b|pm\b|hours?|hrs?|days?|years?|months?|weeks?|minutes?|min\b|kg\b|pcs\b|pieces))"
     ),
     _rx(
-        r"\b(?-i:Location|Branch|Shop|Store|Outlet|Site|Warehouse|Godown|Unit|Item|Product|Client|Customer|Employee|Department)\s+(?-i:[A-H])\b(?!['-]|\s*\.\w)",
+        r"\b(?-i:Location|Branch|Shop|Store|Outlet|Site|Warehouse|Godown)\s+(?-i:[A-H])\b(?!['-]|\s*\.\w)",
         0,
     ),
-    _rx(r"(?:دکان|برانچ|شاخہ|گودام|آؤٹ\s*لیٹ|کسٹمر|گاہک)\s*#?\d{1,2}(?!\d)"),
-    _rx(
-        r"(?:الفرع|فرع|الموقع|موقع|المتجر|متجر|المحل|محل|المستودع|العميل|عميل)\s*#?[\d٠-٩]{1,2}(?![\d٠-٩])"
-    ),
-    _rx(r"(?:दुकान|शाखा|ब्रांच|गोदाम|ग्राहक|स्थान)\s*#?[\d०-९]{1,2}(?![\d०-९])"),
+    _rx(r"(?:دکان|برانچ|شاخہ|گودام|آؤٹ\s*لیٹ)\s*#?\d{1,2}(?!\d)"),
+    _rx(r"(?:الفرع|فرع|الموقع|موقع|المتجر|متجر|المحل|محل|المستودع)\s*#?[\d٠-٩]{1,2}(?![\d٠-٩])"),
+    _rx(r"(?:दुकान|शाखा|ब्रांच|गोदाम|स्थान)\s*#?[\d०-९]{1,2}(?![\d०-९])"),
+)
+# "Branch 2" is a label only where the owner talks about branches; "Item 1", "Step 2", "Option A",
+# "Customer 2" and the like are structure (lists, quotes, documents), not names for their things.
+BRANCH_WORDS = _rx(r"branch|برانچ|شاخ|فرع|ब्रांच|शाखा")
+DOCUMENT_STATES = frozenset(
+    {
+        flow.State.S6_PREPARING,
+        flow.State.S7_DELIVERED,
+        flow.State.S8_REVIEW,
+        flow.State.S8B_CHANGES_REQUESTED,
+        flow.State.S9_APPROVED,
+        flow.State.S9B_DECLINED_QUOTE,
+        flow.State.S10_AWAITING_PAYMENT,
+        flow.State.S11_PAYMENT_CONFIRMED,
+        flow.State.S12_KICKOFF,
+        flow.State.S13_IN_BUILD,
+    }
 )
 
 
 def _their_names(reply: str, context: dict[str, Any]) -> list[Finding]:
     heard = _heard(context)
+    if _state(context) in DOCUMENT_STATES:
+        return []
     for pattern in GENERIC_LABEL:
         for m in pattern.finditer(reply):
             label = " ".join(m.group(0).lower().split())
             if label in heard or label.replace(" ", "") in heard.replace(" ", ""):
+                continue
+            if BRANCH_WORDS.search(m.group(0)) and not BRANCH_WORDS.search(heard):
                 continue
             return [
                 (
@@ -273,7 +292,7 @@ def _reasks_a_skipped_question(reply: str, context: dict[str, Any]) -> list[Find
             if len(new) >= 3 and len(old) >= 3 and _overlap(new, old) >= threshold:
                 return [
                     (
-                        "R-ASK-05",
+                        "R-ASK-05R",  # R-ASK-05 is the older generic-closer check in constitution.py
                         "they skipped or ignored that question: do not ask it again in other words, "
                         "mark it unknown and ask about something else",
                         False,
@@ -301,10 +320,13 @@ NEXT_STEP = _rx(
     r"|يمكنني|يمكننا|أستطيع|بدلاً|بدلا|فريق|التالي|ساعد"
     r"|सक(?:ता|ती|ते)\s+(?:हूँ|हूं|हैं|है)|बजाय|टीम|आगे|अगर\s+आप|मदद"
     r"|\bje\s+peux\b|à\s+la\s+place|équipe|nous\s+pouvons|\bpuedo\b|en\s+su\s+lugar|equipo|podemos"
+    # who or what picks it up next: staff, a reviewer, the Workzap team
+    r"|\b(?:staff|reviewer|someone|they\s+will|will\s+confirm|will\s+check|will\s+review)\b|\bconfirm\s+karega\b|\bstaff\b"
+    r"|عملہ|اسٹاف|الموظفين|الموظف|मौजूद\s+स्टाफ|स्टाफ|कर्मचारी"
 )
 
 
-OPENER_WORDS = 6  # "Thanks for asking about that.": a pleasantry before the limit, not a scope line
+LATE_LIMIT = 2  # the index of the sentence from which a limit counts as buried
 
 
 def _refusals(reply: str) -> list[int]:
@@ -321,10 +343,9 @@ def _limits(reply: str) -> list[Finding]:
     refused = _refusals(reply)
     if not refused:
         return found
-    openers = sentences[: refused[0]]
-    if 0 not in refused and all(
-        len(_tokens(x)) <= OPENER_WORDS and not _is_question(x) for x in openers
-    ):
+    # The limit may be the first sentence, follow a pleasantry or a scope sentence ("Thank you. I can't
+    # confirm payment myself."): only a limit buried after two or more other statements is sent back.
+    if refused[0] >= LATE_LIMIT and not any(_is_question(x) for x in sentences[: refused[0]]):
         found.append(
             (
                 "R-CANT-01",
@@ -334,7 +355,11 @@ def _limits(reply: str) -> list[Finding]:
             )
         )
     rest = REFUSAL.sub(" ", reply)
-    if not any(_is_question(s) for s in sentences) and not NEXT_STEP.search(rest):
+    if (
+        not any(_is_question(s) for s in sentences)
+        and not NEXT_STEP.search(rest)
+        and not CRISIS_REDIRECT.search(reply)
+    ):
         found.append(
             (
                 "R-CANT-02",
@@ -364,9 +389,15 @@ CRISIS_REDIRECT = _rx(
     r"|ایمرجنسی|ہیلپ\s*لائن|طوارئ|الإسعاف|आपातकालीन|हेल्पलाइन"
 )
 MONEY_ADVICE = _rx(
-    r"\b(?:take|get|apply\s+for|try)\s+(?:a\s+|an\s+)?(?:bank\s+|business\s+|personal\s+)?loan\b|\b(?:declare|file\s+for)\s+(?:bankruptcy|insolvency)\b"
-    r"|\bsell\s+(?:your\s+)?(?:assets|stock|shop|property|equipment)\b|\bborrow\b|\binvest\b|\brestructur\w+\b"
+    r"\b(?:take|get|apply\s+for|try)\s+(?:out\s+)?(?:a\s+|an\s+)?(?:bank\s+|business\s+|personal\s+)?loan\b|\b(?:declare|file\s+for)\s+(?:bankruptcy|insolvency)\b"
+    r"|\bsell\s+(?:your\s+)?(?:assets|stock|shop|property|equipment)\b|\byou\s+(?:should|could|can|ought\s+to|need\s+to|must|might\s+want\s+to)\s+(?:borrow|invest)\b"
+    r"|\bborrow\s+(?:money|from)\b|\binvest\s+in\b|\brestructure\s+your\b"
     r"|قرض\s+(?:لیں|لے)|दिवालिया\s+घोषित|कर्ज\s+लें|اقترض"
+)
+# A sentence that says pi will NOT advise ("I can't advise on whether to borrow") is the opposite of advice.
+DECLINES = _rx(
+    r"\bwhether\b|\bwon'?t\b|\bcan'?t\b|\bcannot\b|\bnot\s+going\s+to\b|\bdon'?t\b|\bdo\s+not\b|\bnever\b|\bnot\s+(?:able|here)\b"
+    r"|\bnahi\b|\bnahin\b|نہیں|لا\s|لن\s|नहीं"
 )
 ACKNOWLEDGES = _rx(
     r"a\s+lot\s+to\s+carry|\bheavy\b|\bhard\b|\btough\b|\bdifficult\b|\bstress\w*|\bworr\w+|\bsorry\b|\bunderstand\b|\bmust\s+be\b|\bcarry\b|\bpainful\b|\bscary\b|\boverwhelm\w*"
@@ -375,6 +406,12 @@ ACKNOWLEDGES = _rx(
     r"|آسف|صعب|متعب|أتفهم|اتفهم|ثقيل|مؤسف|قلق|ضغط|أفهم"
     r"|मुश्किल|परेशान|अफ़सोस|अफसोस|दुख|भारी|समझ\s+सक|क्षमा|तनाव|कठिन"
     r"|désolé|difficile|\bdur\b|comprends|lo\s+siento|difícil|\bduro\b|entiendo"
+    # ordinary empathy
+    r"|here\s+with\s+you|here\s+for\s+you|sounds\s+(?:hard|rough|heavy|tough|like)|sorry\s+to\s+hear|\bi\s+hear\s+you\b|\brough\b|not\s+easy|takes\s+courage|thank(?:s|\s+you)\s+for\s+(?:telling|sharing|trusting)|\bcare\b"
+    r"|main\s+aap\s+ke\s+saath|saath\s+hoon|aap\s+akele\s+nahi|asaan\s+nahi|bataane\s+ka\s+shukriya|batane\s+ka\s+shukriya|dil\s+se"
+    r"|آپ\s+کے\s+ساتھ\s+ہوں|سن\s+کر\s+افسوس|آسان\s+نہیں|اکیلے\s+نہیں|بتانے\s+کا\s+شکریہ|حوصلہ"
+    r"|معك|أنا\s+هنا|يؤسفني|ليس\s+سهل|شكراً\s+لإخبار|شكرا\s+لإخبار|أقدر\s+ثقتك"
+    r"|आपके\s+साथ\s+हूँ|आपके\s+साथ\s+हूं|सुनकर\s+(?:दुख|अफ़सोस|अफसोस)|आसान\s+नहीं|अकेले\s+नहीं|बताने\s+के\s+लिए\s+शुक्रिया|हिम्मत"
 )
 
 
@@ -387,7 +424,7 @@ def _distress(reply: str, context: dict[str, Any]) -> list[Finding]:
     sentences = _sentences(reply)
     if CRISIS_REDIRECT.search(reply):
         why = "this is business distress, not an emergency: no emergency numbers or crisis redirect"
-    elif MONEY_ADVICE.search(reply):
+    elif any(MONEY_ADVICE.search(s) and not DECLINES.search(s) for s in sentences):
         why = "no financial advice for business distress: listen, do not tell them what to do with money"
     elif not ACKNOWLEDGES.search(" ".join(sentences[:2])):
         why = 'acknowledge it first, in a few words ("That\'s a lot to carry."), then note it as a problem'
@@ -399,16 +436,15 @@ def _distress(reply: str, context: dict[str, Any]) -> list[Finding]:
 # --- R-PROM-02: pi never decides for the person ------------------------------------------------
 DECIDES = _rx(
     r"\bi(?:'ve|\s+have)\s+decided\b|\bi(?:'ll|\s+will)\s+(?:decide|choose|pick)\b|\blet\s+me\s+decide\b"
-    r"|\bmy\s+(?:recommendation|advice|suggestion|pick|choice|verdict)\s+is\b|\b(?:the\s+)?best\s+(?:option|choice|move|way)\s+(?:is|would\s+be)\s+to\b"
-    r"|\bi(?:'d|\s+would)\s+(?:go\s+with|choose|pick)\b"
-    r"|\byou\s+(?:need|have|must|ought)\s+to\s+(?:hire|fire|close|sell|stop|switch|choose|buy|cancel|replace|expand|quit|sack|shut)\b"
+    # Deciding for them, not recommending (a recommendation is allowed: "my suggestion is ...").
+    r"|\byou\s+(?:(?:need|have|ought)\s+to|must)\s+(?:hire|fire|close|sell|stop|switch|choose|buy|cancel|replace|expand|quit|sack|shut)\b"
     r"|\bgo\s+with\s+(?:option|the\s+(?:first|second|third|cheaper))\b"
-    r"|\bmera\s+mashwara\b|\bmeri\s+raye?\b|\bmain\s+ne\s+faisla\s+(?:kar\s+liya|kiya)\b"
+    r"|\bmain\s+ne\s+faisla\s+(?:kar\s+liya|kiya)\b"
     r"|\baap\s+ko\b[^.?!\n]{0,40}\b(?:nikal|band\s+kar|badal|bech|replace|chun)\w*\s+(?:dena|lena|karna)?\s*(?:chahiye|hoga|parega)\b"
-    r"|میرا\s+مشورہ|میری\s+رائے\s+(?:میں|ہے)|میں\s+نے\s+فیصلہ\s+کر\s+لیا"
+    r"|میں\s+نے\s+فیصلہ\s+کر\s+لیا"
     r"|آپ\s+کو\b[^۔؟\n]{0,40}(?:نکال|بند\s+کر|بدل|بیچ)\S*\s+(?:دینا|لینا|کرنا)?\s*(?:چاہیے|ہوگا|پڑے\s+گا)"
-    r"|نصيحتي|أنصحك|قررت|يجب\s+عليك\s+أن\s+(?:تبيع|تغلق|تطرد|تغير|تلغي|تشتري)"
-    r"|मेरी\s+सलाह|मैंने\s+फैसला|मैंने\s+फ़ैसला"
+    r"|قررت|يجب\s+عليك\s+أن\s+(?:تبيع|تغلق|تطرد|تغير|تلغي|تشتري)"
+    r"|मैंने\s+फैसला|मैंने\s+फ़ैसला"
     r"|आपको\b[^।?\n]{0,40}(?:निकाल|बंद\s+कर|बदल|बेच)\S*\s+(?:देना|लेना|करना)?\s*(?:चाहिए|होगा|पड़ेगा)"
 )
 
@@ -475,10 +511,19 @@ FORECASTS = (
 )
 
 
+# A generic statement about seasons or the market ("Demand will increase before Eid", "Sales will rise
+# and fall through the year") is not a forecast of THIS owner's results.
+GENERIC = _rx(
+    r"\b(?:eid|ramadan|ramzan|diwali|christmas|black\s+friday|winter|summer|monsoon|season\w*|holidays?|festiv\w+|every\s+year|each\s+year|through(?:out)?\s+the\s+year|usually|typically|generally|often|normally|rise\s+and\s+fall|ups\s+and\s+downs)\b"
+    r"|\bhar\s+saal\b|\baam\s+tor\s+par\b|\bmausam\b|\bramzan\b|\beid\b|عید|رمضان|ہر\s+سال|عموماً|عموما|موسم"
+    r"|عيد|كل\s+عام|عادة|عادةً|موسم|ईद|रमज़ान|हर\s+साल|आमतौर|मौसम|दिवाली"
+)
+
+
 def _forecasts(reply: str, context: dict[str, Any]) -> list[Finding]:
     heard = _heard(context)
     for sentence in _sentences(reply):
-        if _is_question(sentence) or CONDITIONAL.search(sentence):
+        if _is_question(sentence) or CONDITIONAL.search(sentence) or GENERIC.search(sentence):
             continue
         for pattern, future in FORECASTS:
             for m in pattern.finditer(sentence):
@@ -490,7 +535,7 @@ def _forecasts(reply: str, context: dict[str, Any]) -> list[Finding]:
                     (
                         "R-PROM-03",
                         f'never forecast their business ("{m.group(0)}"): say what you noted, not what will happen',
-                        True,
+                        False,
                     )
                 ]
     return []
@@ -510,40 +555,47 @@ def _directive(verbs: str) -> re.Pattern[str]:
 ADVICE_DOMAINS: tuple[tuple[re.Pattern[str], re.Pattern[str]], ...] = (
     # veterinary
     (
+        # the treatment words sit next to the verb that gives them: "give the cows an antibiotic"
         _rx(
-            r"\b(?:antibiotics?|dewormers?|vaccin(?:e|es|ate|ation)s?|steroids?|hormone\s+injections?|foot[- ]and[- ]mouth|withdrawal\s+period|drench\w*)\b"
+            r"\b(?:inject|administer|drench|deworm|vaccinate)\s+(?:\w+\s+){0,3}(?:cows?|cattle|buffalo\w*|goats?|sheep|calves|calf|chickens?|poultry|animals?|livestock|herd|flock|them|it)\b"
+            r"|\bgive\s+(?:\w+\s+){0,3}(?:antibiotics?|dewormers?|vaccines?|steroids?|hormone\s+injections?|an?\s+injection)\b"
         ),
-        _directive(r"give|inject|administer|dose|treat|start|try|switch\s+to"),
+        _directive(r"inject|administer|drench|deworm|vaccinate|give"),
     ),
-    # agronomy
+    # agronomy: a chemical named next to the verb that applies it ("apply urea twice")
     (
         _rx(
-            r"\b(?:urea|dap|npk|fertili[sz]ers?|pesticides?|insecticides?|herbicides?|fungicides?|seed\s+rate|sowing\s+(?:date|time)|irrigat\w+|crop\s+rotation|feed\s+ration)\b"
+            r"\b(?:apply|spray|mix|dose)\s+(?:\w+\s+){0,3}(?:urea|dap|npk|fertili[sz]ers?|pesticides?|insecticides?|herbicides?|fungicides?)\b"
         ),
-        _directive(r"apply|spray|sow|plant|irrigate|increase|reduce|dose|mix"),
+        _directive(r"apply|spray|mix|dose"),
     ),
     # tax
     (
         _rx(r"\b(?:tax|vat|gst|ntn|withholding|deductions?)\b"),
         _directive(
-            r"claim|deduct|write\s+off|declare|file|register\s+for|pay\s+less|avoid|reduce\s+your|evade|minimi[sz]e"
+            r"claim|deduct|write\s+off|declare|register\s+for|pay\s+less|avoid|reduce\s+your|evade|minimi[sz]e"
         ),
     ),
-    # financial
+    # financial: the act itself ("invest in", "take out a loan", "refinance"), not a mention of rates
     (
         _rx(
-            r"\b(?:refinanc\w+|mutual\s+funds?|overdrafts?|credit\s+lines?|bonds?|fixed\s+deposits?|savings\s+accounts?|interest\s+rates?|crypto\w*|forex)\b"
+            r"\b(?:refinanc\w+|invest\s+in|take\s+(?:out\s+)?(?:a\s+|an\s+)?(?:bank\s+|business\s+)?(?:loan|overdraft)|borrow\s+(?:money|from)|buy\s+(?:shares|bonds|crypto\w*|gold)|put\s+your\s+(?:money|savings)\s+in)\b"
         ),
-        _directive(
-            r"take|get|open|buy|sell|invest|move|put|switch|negotiate|choose|try|apply|renew|refinanc\w+"
-        ),
+        _directive(r"take|buy|invest|put|borrow|refinanc\w+"),
     ),
-    # medical
+    # medical: a named drug taken, or a prescription. Quantities and units alone (5 ml, 250 mg of
+    # perfume) are never medicine.
     (
         _rx(
-            r"\b(?:paracetamol|panadol|ibuprofen|painkillers?|insulin|antibiotics?|dosage|\d+\s?(?:mg|mcg|ml))\b"
+            r"\btake\s+(?:\w+\s+){0,2}(?:paracetamol|panadol|ibuprofen|painkillers?|antibiotics?|insulin)\b"
         ),
-        _directive(r"take|give|try|start|stop|prescribe|drink"),
+        _directive(r"take"),
+    ),
+    (
+        _rx(
+            r"\byou\s+(?:should|can|could|may|must)\s+prescribe\b|\b\d+\s?(?:mg|mcg)\s+(?:of\s+\w+\s+)?(?:twice|daily|a\s+day|every|three\s+times)\b"
+        ),
+        _rx(r"."),
     ),
     # legal
     (
@@ -554,8 +606,8 @@ ADVICE_DOMAINS: tuple[tuple[re.Pattern[str], re.Pattern[str]], ...] = (
     ),
     # Roman Urdu
     (
-        _rx(r"\b(?:urea|khaad|antibiotic|teeka|spray)\b"),
-        _rx(r"\b(?:dalen|dalein|daalein|lagayen|lagayein|chhirken|dein)\b"),
+        _rx(r"\b(?:urea|khaad|antibiotic|teeka)\b"),
+        _rx(r"\b(?:dalen|dalein|daalein|chhirken)\b"),
     ),
     (_rx(r"\bdawai\b"), _rx(r"\b(?:khayen|khaiye|piyen)\b")),
     (
@@ -566,8 +618,8 @@ ADVICE_DOMAINS: tuple[tuple[re.Pattern[str], re.Pattern[str]], ...] = (
     ),
     # Urdu, Arabic, Hindi
     (
-        _rx(r"یوریا|کھاد|سپرے|ٹیکہ|ویکسین|اینٹی\s*بائیوٹک"),
-        _rx(r"ڈالیں|ڈال\s+دیں|لگائیں|چھڑکیں|پلائیں"),
+        _rx(r"یوریا|کھاد|ٹیکہ|ویکسین|اینٹی\s*بائیوٹک"),
+        _rx(r"ڈالیں|ڈال\s+دیں|چھڑکیں|پلائیں"),
     ),
     (
         _rx(r"اليوريا|يوريا|سماد|مبيد|لقاح|مضاد\s+حيوي|باراسيتامول"),
@@ -575,7 +627,7 @@ ADVICE_DOMAINS: tuple[tuple[re.Pattern[str], re.Pattern[str]], ...] = (
     ),
     (
         _rx(r"यूरिया|खाद|कीटनाशक|टीका|वैक्सीन|एंटीबायोटिक|पैरासिटामोल"),
-        _rx(r"डालें|डाल\s+दें|लगाएं|लगाएँ|छिड़कें|पिलाएं|खाएं"),
+        _rx(r"डालें|डाल\s+दें|छिड़कें|पिलाएं|खाएं"),
     ),
 )
 
@@ -672,6 +724,15 @@ POLARITY_PHRASES = tuple(
 )
 
 
+# Saying what pi or Workzap is, in any language, is an answer to "are you human?" or "can you help?"
+# and must never be sent back: it is also the AI-disclosure non-negotiable.
+IDENTITY_ANSWER = _rx(
+    r"\b(?:i'?m|i\s+am)\s+(?:an?\s+)?(?:ai|pi|artificial)\b|\bai\s+(?:from|of)\s+workzap\b|\bworkzap\b|\bmain\s+(?:ek\s+)?(?:ai|pi)\b|\b(?:ai|pi)\s+hoon\b|\bmain\s+insaan\s+nahi\b"
+    r"|اے\s*آئی|مصنوعی\s+ذہانت|ورک\s*زیپ|ذكاء\s+اصطناعي|الذكاء\s+الاصطناعي|أنا\s+(?:pi|ذكاء)|ورك\s*زاب"
+    r"|एआई|ए\.?\s*आई|कृत्रिम|वर्कज़ैप|\bje\s+suis\s+(?:une?\s+)?(?:ia|pi)\b|\bsoy\s+(?:una?\s+)?(?:ia|pi)\b|inteligencia\s+artificial|intelligence\s+artificielle"
+)
+
+
 def _asked_yes_no(latest: str) -> bool:
     last = (_sentences(latest) or [""])[-1]
     if YES_NO_EXPLICIT.search(last):
@@ -684,6 +745,8 @@ def _answers_yes_no(reply: str, context: dict[str, Any]) -> list[Finding]:
     first = (_sentences(reply) or [""])[0]
     if not latest or not first or not _asked_yes_no(latest):
         return []
+    if IDENTITY_ANSWER.search(first):
+        return []  # "I'm an AI" answers "are you human?"; a Workzap statement answers "can you fix this?"
     words = _tokens(first)
     padded = " " + " ".join(words) + " "
     if any(w in POLARITY_TOKENS for w in words) or any(

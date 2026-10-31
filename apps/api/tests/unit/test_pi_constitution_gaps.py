@@ -94,13 +94,13 @@ CASES: dict[str, dict[str, list]] = {
                 ctx("Gulberg wali dukaan mein stock khatam hota hai"),
             ),
             (
-                "برانچ 2 میں اسٹاک ختم ہوتا ہے۔ کیا روز ہوتا ہے؟",
+                "دکان 2 میں اسٹاک ختم ہوتا ہے۔ کیا روز ہوتا ہے؟",
                 ctx("گلبرگ والی دکان میں اسٹاک ختم ہوتا ہے"),
             ),
             ("الفرع 2 يعاني من نقص المخزون. هل يحدث يومياً؟", ctx("فرع الجلبرغ ينقصه المخزون")),
             ("दुकान 2 में स्टॉक खत्म होता है। क्या रोज़ होता है?", ctx("गुलबर्ग वाली दुकान में स्टॉक खत्म होता है")),
             (
-                "Customer A keeps returning items. Is it every week?",
+                "Store C keeps running out of change. Is it every week?",
                 ctx("one regular keeps returning items"),
             ),
         ],
@@ -155,7 +155,7 @@ CASES: dict[str, dict[str, list]] = {
             ("What is going on?", ctx("hi", ())),
         ],
     },
-    "R-ASK-05": {
+    "R-ASK-05R": {
         "bad": [
             (
                 "How many staff are on the evening shift?",
@@ -234,21 +234,27 @@ CASES: dict[str, dict[str, list]] = {
     "R-CANT-01": {
         "bad": [
             (
-                "Thanks for asking about that. I can't give tax advice. Which shop loses stock?",
+                "Noted. We looked at the stock together. I can't give tax advice. Which shop loses stock?",
                 ctx("how much tax should I pay"),
             ),
             (
-                "Samajh gaya. Ye main nahi kar sakta. Kaunsi dukaan se shuru karein?",
+                "Samajh gaya. Stock par baat hui. Ye main nahi kar sakta. Kaunsi dukaan se shuru karein?",
                 ctx("tax kitna dena chahiye"),
             ),
-            ("ٹھیک ہے۔ میں یہ نہیں کر سکتا۔ آپ کی کون سی دکان ہے؟", ctx("ٹیکس کتنا دوں")),
-            ("حسناً. لا أستطيع فعل ذلك. أي فرع؟", ctx("كم الضريبة التي أدفعها")),
-            ("ठीक है। मैं यह नहीं कर सकता। कौन सी दुकान?", ctx("टैक्स कितना दूँ")),
             (
-                "D'accord. Je ne peux pas faire cela. Quel magasin ?",
+                "ٹھیک ہے۔ اسٹاک پر بات ہوئی۔ میں یہ نہیں کر سکتا۔ آپ کی کون سی دکان ہے؟",
+                ctx("ٹیکس کتنا دوں"),
+            ),
+            ("حسناً. تحدثنا عن المخزون. لا أستطيع فعل ذلك. أي فرع؟", ctx("كم الضريبة التي أدفعها")),
+            ("ठीक है। स्टॉक पर बात हुई। मैं यह नहीं कर सकता। कौन सी दुकान?", ctx("टैक्स कितना दूँ")),
+            (
+                "D'accord. Nous avons parlé du stock. Je ne peux pas faire cela. Quel magasin ?",
                 ctx("combien d'impôt dois-je payer"),
             ),
-            ("Entiendo. No puedo hacer eso. ¿Qué tienda?", ctx("cuánto impuesto debo pagar")),
+            (
+                "Entiendo. Hablamos del stock. No puedo hacer eso. ¿Qué tienda?",
+                ctx("cuánto impuesto debo pagar"),
+            ),
         ],
         "good": [
             ("I can't do that. Which shop loses stock?", ctx("how much tax should I pay")),
@@ -335,18 +341,18 @@ CASES: dict[str, dict[str, list]] = {
                 "I've decided: go with the cheaper supplier. Is that fine?",
                 ctx("two suppliers are offering"),
             ),
-            ("My recommendation is to fire the manager. Which shop?", ctx("the manager is slow")),
             (
                 "You need to close the second shop. Which one is weaker?",
                 ctx("two shops lose money"),
             ),
+            ("You must fire the manager today. Which shop?", ctx("the manager is slow")),
             (
-                "Mera mashwara hai ke aap manager ko nikal dein. Kaunsi dukaan?",
+                "Main ne faisla kar liya ke manager hatana hai. Kaunsi dukaan?",
                 ctx("manager sust hai"),
             ),
-            ("میرا مشورہ ہے کہ آپ مینیجر کو نکال دیں۔ کون سی دکان؟", ctx("مینیجر سست ہے")),
-            ("نصيحتي أن تغلق الفرع الثاني. أي فرع؟", ctx("فرعان يخسران")),
-            ("मेरी सलाह है कि आप मैनेजर को निकाल दें। कौन सी दुकान?", ctx("मैनेजर सुस्त है")),
+            ("میں نے فیصلہ کر لیا کہ مینیجر کو ہٹانا ہے۔ کون سی دکان؟", ctx("مینیجر سست ہے")),
+            ("قررت أن تغلق الفرع الثاني. أي فرع؟", ctx("فرعان يخسران")),
+            ("मैंने फैसला कर लिया कि मैनेजर को हटाना है। कौन सी दुकान?", ctx("मैनेजर सुस्त है")),
         ],
         "good": [
             (
@@ -795,7 +801,7 @@ def test_the_linter_reports_it_through_lint(rule, reply, context):
 
 
 def test_hard_rules_are_hard_and_style_rules_soft():
-    hard = {"R-PROM-03", "R-SOL-09"}
+    hard = {"R-SOL-09"}
     for rule, sides in CASES.items():
         reply, context = sides["bad"][0]
         found = [f for f in gaps.check(reply, context) if f[0] == rule]
@@ -804,7 +810,7 @@ def test_hard_rules_are_hard_and_style_rules_soft():
 
 
 def test_check_is_pure_and_does_not_change_the_context():
-    reply, context = CASES["R-ASK-05"]["bad"][0]
+    reply, context = CASES["R-ASK-05R"]["bad"][0]
     before = repr(context)
     assert gaps.check(reply, context) == gaps.check(reply, context)
     assert repr(context) == before
