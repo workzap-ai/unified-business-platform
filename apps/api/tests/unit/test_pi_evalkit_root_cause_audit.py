@@ -180,3 +180,39 @@ def test_a_question_may_be_followed_by_quotes_brackets_marks_or_a_link(question)
 )
 def test_other_questions_are_still_refused(question) -> None:
     assert root_cause._one_question(question) is False
+
+
+def test_one_letter_words_are_never_support_not_even_for_the_short_flag() -> None:
+    """The bound is 2 letters: 1-letter words are not support and do not raise the short flag."""
+    case = make_case(["Line x is slow and line q is slower. الخط س بطيء"])
+    for text, words in (("x", ["line x is"]), ("q", ["line q is"]), ("س", ["الخط س"])):
+        cause = {"text": text, "status": "owner_said", "evidence": {"words": words}}
+        got = flags(case, {"causes": [cause]})
+        assert "unsupported_confirmed" in got, text
+        assert "unsupported_short_cause" not in got, text
+
+
+def test_two_letter_words_are_short_cause_flagged() -> None:
+    case = make_case(["The pc is old and the tv is broken. Our ac is off."])
+    for text, words in (("pc", ["the pc is"]), ("tv", ["the tv is broken"]), ("ac", ["our ac is"])):
+        cause = {"text": text, "status": "owner_said", "evidence": {"words": words}}
+        got = flags(case, {"causes": [cause]})
+        assert "unsupported_confirmed" in got and "unsupported_short_cause" in got, text
+
+
+def test_keyword_tokens_must_match_in_order() -> None:
+    """Rule: a keyword is a run of whole tokens in the order written; a reordered run misses."""
+    assert root_cause._has_any("the oven bread queue", ["oven bread"]) is True
+    assert root_cause._has_any("the bread oven queue", ["oven bread"]) is False
+    assert root_cause._has_any("oven and bread", ["oven bread"]) is False
+    case = make_case(["The bread oven is shared."], cause_any=["oven bread"])
+    cause = {"text": "bread oven", "status": "owner_said", "evidence": {"words": ["bread oven"]}}
+    assert root_cause.score_case(case, {"causes": [cause]})["cause_found"] is False
+
+
+def test_the_status_guard_holds_if_the_status_sets_become_sets(monkeypatch) -> None:
+    monkeypatch.setattr(root_cause, "STATUSES", set(root_cause.STATUSES))
+    monkeypatch.setattr(root_cause, "OWNER_STATUSES", set(root_cause.OWNER_STATUSES))
+    for status in ([], {}, ["owner_said"], {"a": 1}, 5, None):
+        record = {"causes": [{"text": "oven", "status": status}]}
+        assert "unknown_status" in flags(make_case(), record)
