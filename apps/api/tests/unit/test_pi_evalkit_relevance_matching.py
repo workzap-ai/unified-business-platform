@@ -498,13 +498,39 @@ def test_a_milder_verb_skips_only_its_own_block_not_the_whole_check() -> None:
 
 
 def test_long_input_with_no_punctuation_finishes_quickly() -> None:
-    import time
-
-    started = time.perf_counter()
     text = ("word " * 20000) + ("1," * 5000) + ("x" * 50000) + (" " * 20000) + "tried"
-    relevance.score_candidate(brief([limit(text, kind="cannot_change")]), text)
-    relevance.score_candidate(brief([limit("cannot spend more than 20000 rupees")]), text)
-    assert time.perf_counter() - started < 5
+
+    def once(i):
+        t = text + "z" * i  # i defeats the caches
+        relevance.score_candidate(brief([limit(t, kind="cannot_change")]), t)
+        relevance.score_candidate(brief([limit("cannot spend more than 20000 rupees")]), t)
+
+    # measured against a trivial candidate at this moment, best of several runs: a loaded
+    # machine moves both, a growth with the input size moves only the long one
+    assert best_of(once, 5) < 5 * time_budget()
+
+
+@pytest.mark.parametrize("unit", ["tried ", "word ", "failed ", "nahi "])
+def test_a_very_long_repeated_word_string_is_flagged_and_fast(unit) -> None:
+    text = unit * 40000
+
+    def once(i):
+        t = text + "z" * i
+        return relevance.score_candidate(
+            brief([limit(t, kind="cannot_change")]), "Buy a van", language="roman_ur"
+        ), relevance.score_candidate(brief([limit("cannot buy a van")]), t)
+
+    assert best_of(once, 5) < 5 * time_budget(), unit
+    flagged, _ = once(0)
+    assert flagged["limit_text_truncated"] is True and flagged["verdict"] == "unknown"
+
+
+def test_the_growth_check_fails_on_a_quadratic_mutant() -> None:
+    def quadratic(i):
+        n = 4000 + i
+        return sum(1 for _ in range(n) for _ in range(n))  # the cost of a quadratic parser
+
+    assert best_of(quadratic, 2) > 5 * time_budget()
 
 
 def test_the_module_docstrings_have_no_verdict_wording_and_state_the_fact_rule() -> None:
@@ -1431,17 +1457,6 @@ def test_a_real_object_after_a_money_verb_is_still_a_rule() -> None:
     assert full("we cannot close", "Close the second shop")["verdict"] == "violates_constraint"
 
 
-def test_mutation_without_the_vague_list_the_vague_limit_would_be_a_rule(monkeypatch) -> None:
-    relevance_match._rules_cached.cache_clear()
-    monkeypatch.setattr(relevance_match, "_VAGUE", set())
-    monkeypatch.setattr(relevance_match, "_GENERIC_NOUNS", set())
-    try:
-        rules = relevance_match.parse_rules("cannot afford much", None, relevance._full_stems)
-        assert rules, "the vague-object guard is what stops this rule"
-    finally:
-        relevance_match._rules_cached.cache_clear()
-
-
 @pytest.mark.parametrize(
     "text,idea,broken",
     [
@@ -1567,24 +1582,6 @@ def test_a_concrete_noun_keeps_the_rule_working(text, bad, good) -> None:
     assert full(text, good)["verdict"] != "violates_constraint", good
 
 
-def test_mutation_without_the_class_lists_the_vague_limits_would_be_rules(monkeypatch) -> None:
-    relevance_match._rules_cached.cache_clear()
-    monkeypatch.setattr(relevance_match, "_ADJECTIVES", set())
-    monkeypatch.setattr(relevance_match, "_GENERIC_NOUNS", set())
-    monkeypatch.setattr(relevance_match, "_ADJECTIVE_ENDINGS", ("zzzz",))
-    try:
-        for text in (
-            "cannot afford anything expensive",
-            "cannot take on more work",
-            "cannot handle complex tools",
-            "can't spend a lot of money",
-        ):
-            relevance_match._rules_cached.cache_clear()
-            assert relevance_match.parse_rules(text, None, relevance._full_stems), text
-    finally:
-        relevance_match._rules_cached.cache_clear()
-
-
 @pytest.mark.parametrize(
     "word,kind",
     [
@@ -1619,3 +1616,152 @@ def test_non_concrete_classes_are_matched_by_class_not_only_by_string(word, kind
 )
 def test_concrete_nouns_are_not_in_the_non_concrete_classes(word) -> None:
     assert not relevance_match._non_concrete(word), word
+
+
+# ------------------------------------------------------------- eighth round: the lexicon decides
+
+# Written before the lexicon, not taken from any audit list.
+FRESH_ADJECTIVES = [
+    "ornate", "opulent", "glossy", "swanky", "snazzy", "elegant", "stylish", "futuristic",
+    "innovative", "bespoke", "robust", "scalable", "versatile", "flexible", "powerful",
+    "intelligent", "smart", "seamless", "comprehensive", "ambitious", "aggressive", "radical",
+    "drastic", "dramatic", "substantial", "considerable", "significant", "hefty", "massive",
+    "enormous", "colossal", "immense", "bulky", "sophisticated", "gigantic", "deluxe", "trendy",
+    "flashy", "elaborate", "shiny",
+]  # fmt: skip
+FRESH_GENERIC_NOUNS = [
+    "enhancements", "adjustments", "modifications", "transformations", "overhauls", "strategies",
+    "approaches", "methods", "techniques", "plans", "schemes", "ventures", "endeavours",
+    "undertakings", "arrangements", "mechanisms", "frameworks", "capabilities", "functionalities",
+    "innovations", "developments", "expansions", "reforms", "tweaks", "fixes", "remedies",
+    "efforts", "commitments", "obligations", "expenditures", "outlays", "extravagances",
+    "improvements", "upgrades", "solutions", "experiments", "projects", "ideas", "services",
+    "measures", "programs", "initiatives", "features",
+]  # fmt: skip
+
+
+@pytest.mark.parametrize("adjective", FRESH_ADJECTIVES)
+def test_a_fresh_adjective_before_anything_leaves_the_limit_unknown(adjective) -> None:
+    for text in (f"we cannot afford anything {adjective}", f"cannot buy {adjective} things"):
+        assert relevance_match.parse_rules(text, None, relevance._full_stems) == [], text
+        got = full(text, ANY_IDEA, "budget")
+        assert got["verdict"] == "unknown" and got["unknown_reason"] == "limit_not_understood"
+
+
+@pytest.mark.parametrize("noun", FRESH_GENERIC_NOUNS)
+def test_a_fresh_generic_noun_alone_or_with_an_adjective_leaves_the_limit_unknown(noun) -> None:
+    for text in (f"we cannot afford {noun}", f"cannot afford big {noun}", f"cannot buy any {noun}"):
+        assert relevance_match.parse_rules(text, None, relevance._full_stems) == [], text
+        assert full(text, ANY_IDEA, "budget")["verdict"] == "unknown", text
+
+
+def test_the_fresh_sets_are_big_enough_and_all_unknown() -> None:
+    assert len(FRESH_ADJECTIVES) >= 30 and len(FRESH_GENERIC_NOUNS) >= 30
+    unknown = sum(
+        1
+        for w in FRESH_ADJECTIVES + FRESH_GENERIC_NOUNS
+        if full(f"we cannot afford {w}", ANY_IDEA, "budget")["verdict"] == "unknown"
+    )
+    assert unknown == len(FRESH_ADJECTIVES) + len(FRESH_GENERIC_NOUNS)
+
+
+@pytest.mark.parametrize(
+    "text,bad",
+    [
+        ("we cannot stock varnish", "Stock varnish for the winter"),
+        ("we cannot use adhesive", "Use adhesive on the shelves"),
+        ("we cannot buy polish", "Buy polish in bulk"),
+        ("we cannot stock radish", "Stock radish at the stall"),
+        ("we cannot hire a representative", "Hire a representative for late orders"),
+        ("we cannot buy a convertible", "Buy a convertible for the owner"),
+        ("we cannot hire executives", "Hire executives to cut late orders"),
+        ("we cannot sell explosives", "Sell explosives to the quarry"),
+        ("we cannot buy vegetable oil", "Buy vegetable oil in drums"),
+        ("we cannot afford a driver", "Hire a driver for late orders"),
+        ("we cannot afford a lot of staff", "Hire three staff for the weekend"),
+        ("we cannot afford big staff costs", "Hire three more staff"),
+    ],
+)
+def test_a_listed_concrete_noun_with_an_ending_like_ive_or_ish_is_a_rule_again(text, bad) -> None:
+    got = full(text, bad)
+    assert got["verdict"] == "violates_constraint", (text, got["verdict"])
+
+
+@pytest.mark.parametrize(
+    "text",
+    [
+        "cannot afford tools",
+        "cannot afford any changes",
+        "cannot afford heavy investments",
+        "cannot afford anything big",
+        "we cannot afford much",
+        "we cannot afford improvements",
+    ],
+)
+def test_the_audit_cases_that_must_stay_unknown_do(text) -> None:
+    assert full(text, ANY_IDEA, "budget")["verdict"] == "unknown", text
+
+
+def test_a_word_from_the_cases_own_blocks_or_facts_makes_an_object_concrete() -> None:
+    text = "we cannot buy widgets"
+    assert full(text, "Buy two widgets", "budget")["verdict"] == "unknown"
+    c = [limit(text, blocks=["widget"], kind="budget")]
+    got = relevance.score_candidate(brief(c), "Buy two widgets")
+    assert got["verdict"] == "violates_constraint"
+    c = [limit(text, kind="budget")]
+    got = relevance.score_candidate(brief(c, facts=("we sell widgets",)), "Buy two widgets")
+    assert got["verdict"] == "violates_constraint"
+    # a stated fact never turns an adjective or a generic noun into a concrete one
+    got = relevance.score_candidate(
+        brief([limit("we cannot buy upgrades", kind="budget")], facts=("big upgrades",)),
+        "Buy two upgrades",
+    )
+    assert got["verdict"] == "unknown"
+
+
+def test_mutation_the_lexicon_decides_what_is_a_rule(monkeypatch) -> None:
+    relevance_match._rules_cached.cache_clear()
+    try:
+        assert (
+            relevance_match.parse_rules(
+                "cannot afford anything expensive", None, relevance._full_stems
+            )
+            == []
+        )
+        monkeypatch.setattr(
+            relevance_match,
+            "_CONCRETE",
+            relevance_match._CONCRETE | {"expensive", "work", "tools", "money", "much", "upgrade"},
+        )
+        for text in (
+            "cannot afford anything expensive",
+            "cannot take on more work",
+            "cannot handle complex tools",
+            "can't spend a lot of money",
+            "cannot afford much",
+            "cannot afford upgrades",
+        ):
+            relevance_match._rules_cached.cache_clear()
+            assert relevance_match.parse_rules(text, None, relevance._full_stems), text
+    finally:
+        relevance_match._rules_cached.cache_clear()
+
+
+def test_mutation_without_the_lexicon_the_positive_controls_become_unknown(monkeypatch) -> None:
+    relevance_match._rules_cached.cache_clear()
+    monkeypatch.setattr(relevance_match, "_CONCRETE", frozenset())
+    try:
+        for text, idea in (
+            ("we cannot afford a booking app", "Buy a booking app"),
+            ("we cannot hire new staff", "Hire a part-time clerk"),
+            ("we cannot close on Sundays", "Close early on Sunday"),
+        ):
+            relevance_match._rules_cached.cache_clear()
+            assert full(text, idea)["verdict"] == "unknown", text
+    finally:
+        relevance_match._rules_cached.cache_clear()
+
+
+def test_a_new_hire_is_a_concrete_noun_so_its_limit_is_still_a_rule() -> None:
+    assert full("we cannot hire a new hire", "Hire a new hire")["verdict"] == "violates_constraint"
+    assert full("we cannot hire a new hire", "Train a new hire")["verdict"] != "unknown"

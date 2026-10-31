@@ -199,6 +199,20 @@ def _soft(token: str) -> str:
     return token if token.isdigit() or not token.isascii() else token[:5]
 
 
+def known_words(brief: dict[str, Any]) -> frozenset[str]:
+    """Words the case itself uses for things: its limits' `blocks` and its stated problem words,
+    facts, roles and systems. A 'cannot ...' object holding one of them is concrete for this case
+    (quantifiers, adjectives and generic nouns never are)."""
+    texts: list[str] = []
+    for p in brief.get("problems") or []:
+        texts += [p.get("title", ""), *p.get("user_words", []), *p.get("facts", [])]
+        for limit in p.get("constraints") or []:
+            texts += list(limit.get("blocks") or [])
+    texts += [*brief.get("roles", []), *brief.get("systems", [])]
+    words = re.findall(r"[^\W\d_]{3,}", match.collapse(" ".join(texts)).casefold()[:4000])
+    return frozenset(words)
+
+
 def _vocab(
     brief: dict[str, Any], problem: str | None, language: str | None = None, full: bool = True
 ) -> tuple[set[str], set[str]]:
@@ -215,7 +229,9 @@ def _vocab(
             if limit.get("status", "confirmed") == "confirmed":
                 # the object of a confirmed 'cannot VERB OBJECT' limit is something the owner
                 # stated, so an idea that reuses it ('rent a barn') reuses a stated fact
-                for rule in match.parse_rules(str(limit.get("text", "")), language, _full_stems):
+                for rule in match.parse_rules(
+                    str(limit.get("text", "")), language, _full_stems, known_words(brief)
+                ):
                     if rule.kind in ("neg", "goal"):
                         facts |= set(rule.objects) if full else {_soft(o) for o in rule.objects}
     facts |= stems(" ".join([*brief.get("roles", []), *brief.get("systems", [])]), language, full)
@@ -259,7 +275,11 @@ def violated(
                 reason_cut = True  # too long to read: blocks still apply, nothing else does
             else:
                 reason_cut = False
-            rules = [] if reason_cut else match.parse_rules(reason, language, _full_stems)
+            rules = (
+                []
+                if reason_cut
+                else match.parse_rules(reason, language, _full_stems, known_words(brief))
+            )
             if any(match.rule_hit(r, full, verbs, phrasal) for r in rules):
                 return reason
             for phrase in limit.get("blocks") or []:
@@ -280,14 +300,16 @@ def violated(
     return None
 
 
-def _limit_status(limit: dict[str, Any], language: str | None) -> tuple[str | None, bool]:
+def _limit_status(
+    limit: dict[str, Any], language: str | None, known: frozenset[str] = frozenset()
+) -> tuple[str | None, bool]:
     """(reason the limit cannot be read, relies on rules or ceilings). A confirmed limit is
     understood when it has `blocks` (fixture words), a rule, or a numeric ceiling; otherwise it
     needs a human."""
     reason = str(limit.get("text", ""))
     if len(match.collapse(reason)) > match.MAX_LIMIT_TEXT:
         return "limit_text_truncated", False
-    rules = match.parse_rules(reason, language, _full_stems)
+    rules = match.parse_rules(reason, language, _full_stems, known)
     ceilings = match.ceilings_of(reason, str(limit.get("kind", "")))
     if rules or ceilings:
         return None, True
@@ -307,7 +329,7 @@ def unknown_reason(brief: dict[str, Any], text: str, language: str | None = None
         for limit in problem.get("constraints") or []:
             if limit.get("status", "confirmed") != "confirmed":
                 continue
-            status, relies = _limit_status(limit, language)
+            status, relies = _limit_status(limit, language, known_words(brief))
             if status == "limit_text_truncated":
                 return status
             if status and not found:

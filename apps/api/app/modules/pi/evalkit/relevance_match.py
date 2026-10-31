@@ -752,9 +752,15 @@ _UNIVERSAL = {"anything", "anyone", "anybody", "everything", "everyone", "everyb
               "someone", "something", "somebody"}  # fmt: skip
 # adjectives and determiners: they describe a thing but name none
 _ADJECTIVES = {
+    "ornate", "opulent", "glossy", "swanky", "snazzy", "elegant", "stylish", "futuristic",
+    "innovative", "bespoke", "robust", "scalable", "versatile", "flexible", "powerful",
+    "intelligent", "smart", "seamless", "comprehensive", "ambitious", "aggressive", "radical",
+    "drastic", "dramatic", "substantial", "considerable", "significant", "hefty", "massive",
+    "enormous", "colossal", "immense", "bulky", "sophisticated", "gigantic", "deluxe", "trendy",
+    "flashy", "elaborate", "shiny", "lavish", "fashionable", "wonderful", "heavy",
     "expensive", "costly", "cheap", "pricey", "big", "small", "large", "huge", "tiny", "fancy",
     "premium", "luxurious", "new", "old", "complex", "complicated", "simple", "modern",
-    "advanced", "good", "better", "best", "bad", "poor", "high", "low", "heavy", "light",
+    "advanced", "good", "better", "best", "bad", "poor", "high", "low", "light",
     "extra", "additional", "other", "another", "same", "different", "special", "major", "minor",
     "various", "certain", "whole", "entire", "such", "own", "free", "full", "real", "fresh",
     "mehnga", "mehngi", "mehnge", "sasta", "sasti", "saste", "bara", "bari", "bare", "chota",
@@ -769,6 +775,15 @@ _ADJECTIVES = {
 }  # fmt: skip
 # nouns that name no particular thing: what a limit about them can say is not matchable
 _GENERIC_NOUNS = {
+    "enhancements", "adjustments", "modifications", "transformations", "overhauls", "strategies",
+    "approaches", "methods", "techniques", "plans", "schemes", "ventures", "endeavours",
+    "undertakings", "arrangements", "mechanisms", "frameworks", "capabilities",
+    "functionalities", "innovations", "developments", "expansions", "reforms", "tweaks",
+    "fixes", "remedies", "commitments", "obligations", "expenditures", "outlays",
+    "extravagances", "improvements", "upgrades", "solutions", "experiments", "projects", "ideas",
+    "services", "measures", "programs", "initiatives", "features", "enhancement", "upgrade",
+    "improvement", "solution", "experiment", "project", "idea", "service", "measure", "program",
+    "initiative", "feature",
     "work", "works", "job", "jobs", "money", "funds", "fund", "cost", "costs", "expense",
     "expenses", "spending", "change", "changes", "tool", "tools", "thing", "things", "item",
     "items", "resource", "resources", "time", "effort", "efforts", "way", "ways", "option",
@@ -784,19 +799,78 @@ _GENERIC_NOUNS = {
     "\u0639\u0645\u0644", "\u0645\u0627\u0644", "\u0623\u0634\u064a\u0627\u0621",
     "\u062a\u063a\u064a\u064a\u0631",
 }  # fmt: skip
-_ADJECTIVE_ENDINGS = ("ive", "ous", "ful", "able", "ible", "ish", "less")
+
+# --- The concrete-noun lexicon. A 'cannot ...' object makes a rule only when it holds a word the
+# scorer positively knows as a thing an idea can name (or a word from the case's own blocks and
+# stated facts). Everything else leaves the limit unreadable. Singular forms; plurals are matched.
+_CONCRETE_GROUPS = {
+    "people": """staff employee worker helper clerk assistant manager supervisor director executive
+        representative agent driver rider cook chef cleaner cashier receptionist accountant guard
+        waiter nurse doctor teacher technician electrician plumber carpenter mechanic consultant
+        contractor freelancer intern trainee apprentice salesperson salesman tailor painter
+        labourer laborer porter courier secretary engineer developer designer programmer
+        architect lawyer pharmacist barber farmer vet coach trainer instructor tutor person
+        people team crew customer client patient guest tenant student member visitor family
+        supplier vendor partner owner landlord neighbour neighbor boss foreman
+        hire""",
+    "equipment": """equipment machine machinery generator oven fridge freezer mixer grinder printer
+        scanner camera tablet computer laptop phone mobile router server screen monitor projector
+        scale till terminal pos kiosk mill tractor pump motor engine boiler heater fan cooler
+        lamp battery solar panel ladder drill saw hammer shelf shelves rack counter desk chair
+        table bed furniture cabinet locker crate bin box bag bottle jar container tank truck van
+        car bus bike motorcycle scooter vehicle convertible trolley cart forklift boat trailer
+        rickshaw gaari gari gaddi""",
+    "premises": """shop store hall room office warehouse hub kitchen factory plant farm field land
+        building premises branch outlet stall court pitch ground turf garage yard site space floor
+        roof gate parking studio clinic pharmacy restaurant cafe hotel school marquee tent dukan
+        kamra""",
+    "materials": """paint varnish adhesive glue polish cement brick steel wood timber fabric cloth
+        paper plastic glass fuel petrol diesel gas oil grease feed fodder seed fertiliser
+        fertilizer pesticide medicine drug vaccine food meal vegetable fruit radish rice flour
+        sugar salt milk egg meat chicken fish bread tea coffee water ice flower soap detergent
+        explosive chemical stock inventory goods product parcel package packaging uniform clothes
+        shoe toy jewellery
+        bird cattle ghee tel chai doodh cheeni namak gandum chawal gosht khana""",
+    "digital": """software app application website system crm database spreadsheet portal
+        dashboard chatbot email sms whatsapp facebook instagram tiktok youtube google ad advert
+        advertising flyer poster banner signboard sign brochure catalogue newsletter""",
+    "money": """cash card cheque wallet jazzcash easypaisa bank loan credit debt insurance licence
+        license permit subscription contract lease rent salary wage bonus fee price discount
+        coupon voucher refund deposit advance invoice receipt bill tax""",
+    "operations": """menu route schedule shift rota timetable booking reservation appointment order
+        delivery queue token ticket diary calendar sheet form checklist list record report policy
+        rule name logo brand""",
+    "time": """monday tuesday wednesday thursday friday saturday sunday weekend weekday morning
+        evening night holiday season summer winter ramadan eid""",
+    "outcomes": """downtime mistake error delay waste deadline complaint shortage theft damage
+        accident injury fraud breakage sale profit income loss""",
+}
+_CONCRETE = frozenset(w for group in _CONCRETE_GROUPS.values() for w in group.split())
 
 
-def _non_concrete(word: str) -> bool:
-    """The word is a quantifier, determiner, adjective or generic noun, not a thing an idea could
-    name. Plurals and the endings -ive, -ous, -ful, -able, -ible, -ish, -less count as their
-    kind."""
-    if word in _VAGUE or word in _UNIVERSAL or word in _ADJECTIVES or word in _GENERIC_NOUNS:
-        return True
+def _denied(word: str) -> bool:
+    return (
+        word in _VAGUE
+        or word in _UNIVERSAL
+        or word in _ADJECTIVES
+        or word in _GENERIC_NOUNS
+        or english_plural(word) in _ADJECTIVES
+        or english_plural(word) in _GENERIC_NOUNS
+    )
+
+
+def _concrete(word: str, known: frozenset[str] = frozenset()) -> bool:
+    """The scorer positively knows this word as a thing an idea can name: it is in the lexicon
+    (singular or plural) or it is a word of the case's own blocks and stated facts (`known`),
+    unless it is a quantifier, adjective or generic noun. Everything else is not concrete."""
     one = english_plural(word)
-    if one in _ADJECTIVES or one in _GENERIC_NOUNS:
+    if word in _CONCRETE or one in _CONCRETE:
         return True
-    return len(word) > 5 and word.endswith(_ADJECTIVE_ENDINGS)
+    return (word in known or one in known) and not _denied(word)
+
+
+def _non_concrete(word: str, known: frozenset[str] = frozenset()) -> bool:
+    return not _concrete(word, known)
 
 
 _NOT_A_VERB = {"be", "have", "do", "go", "get"}
@@ -872,7 +946,12 @@ def _last_clause(text: str) -> str:
     return re.split(r"[,;.:!?()]", text)[-1][-160:]
 
 
-def _parse_rules(limit_text: str, language: str | None, stems_of: StemsOf) -> tuple[Rule, ...]:
+def _parse_rules(
+    limit_text: str,
+    language: str | None,
+    stems_of: StemsOf,
+    known: frozenset[str] = frozenset(),
+) -> tuple[Rule, ...]:
     """Verb, goal and tried rules read from a limit's own text. `stems_of(text, language)` must
     return FULL stems, so a rule and an idea are always compared in the strict space. A limit
     longer than `MAX_LIMIT_TEXT` after whitespace is collapsed makes no rule (the caller reports it
@@ -908,6 +987,8 @@ def _parse_rules(limit_text: str, language: str | None, stems_of: StemsOf) -> tu
         for k, vs in _HYPERNYMS.items()
     }
 
+    hyponyms = set().union(*hyper.values())
+
     def add_neg(verb: str, obj: str, last: bool = False, ru: bool = False) -> None:
         if verb in _NOT_A_VERB:
             return
@@ -919,7 +1000,7 @@ def _parse_rules(limit_text: str, language: str | None, stems_of: StemsOf) -> tu
         if not ru and not last and first and first[0] in _PARTICLES:
             particle, obj = first[0], (first[1] if len(first) > 1 else "")
         words = _object_words(obj, last)
-        if not any(not _non_concrete(w) for w in words):
+        if not any(_concrete(w, known) for w in words):
             # No concrete noun in the object. 'cannot hire anyone' and 'we cannot close' forbid the
             # verb itself and stay rules; 'cannot afford much', 'unable to spend more', 'cannot
             # afford anything expensive', 'cannot take on more work' name nothing an idea could
@@ -933,11 +1014,12 @@ def _parse_rules(limit_text: str, language: str | None, stems_of: StemsOf) -> tu
         objects = _object_stems(obj, language, stems_of, last)
         if any(any(ch.isdigit() for ch in o) for o in objects):
             return  # a figure in the limit is compared as a number, not as a word
-        concrete = [w for w in words if not _non_concrete(w)]
+        concrete = [w for w in words if _concrete(w, known)]
         if concrete:  # only the concrete nouns are matched: 'big staff costs' is 'staff'
             objects = frozenset(stems_of(" ".join(concrete), language))
         aliases = frozenset().union(*(hyper.get(o, set()) for o in objects))
-        if stem in goal and not (stem == afford and objects & (purchasable | set(hyper))):
+        buyable = purchasable | set(hyper) | hyponyms
+        if stem in goal and not (stem == afford and objects & buyable):
             if not objects:
                 return
             verbs = frozenset(actions | ({stem} - {afford}))
@@ -1040,8 +1122,13 @@ def ceilings_of(limit_text: str, kind: str = "") -> list[Ceiling]:
     return list(_ceilings_cached(limit_text, kind))
 
 
-def parse_rules(limit_text: str, language: str | None, stems_of: StemsOf) -> list[Rule]:
-    return list(_rules_cached(limit_text, language, stems_of))
+def parse_rules(
+    limit_text: str,
+    language: str | None,
+    stems_of: StemsOf,
+    known: frozenset[str] = frozenset(),
+) -> list[Rule]:
+    return list(_rules_cached(limit_text, language, stems_of, known))
 
 
 amounts.__doc__ = _amounts.__doc__
