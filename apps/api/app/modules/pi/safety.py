@@ -62,9 +62,7 @@ EMERGENCY_PATTERNS: tuple[tuple[Emergency, re.Pattern[str]], ...] = (
         Emergency.FIRE,
         re.compile(
             r"\b(?:there(?:'s| is) (?:a )?fire|(?:caught|catching|(?<!sales are )(?<!business is )(?<!sales is )on) fire(?!\s+sales?)|fire (?:in|at|broke out in) "
-            r"(?:my|the|our)\b|(?:building|shop|godown|factory|warehouse) is (?:burning|on fire)|"
-            r"aag lag(?:i|gayi|gai|ayi)|aag lag (?:gayi|gai|gaya|gayee|rahi|raha|ayi)|"
-            r"(?:shop|godown|factory|dukan|dukaan|showroom|gaari|gadi) mein aag)\b|حريق|حریق|آگ لگ|आग\s+(?:लग|लगी)",
+            r"(?:my|the|our)\b|(?:building|shop|godown|factory|warehouse) is (?:burning|on fire))\b|حريق|حریق|آگ لگ|आग\s+(?:लग|लगी)",
             re.IGNORECASE,
         ),
     ),
@@ -541,12 +539,39 @@ EMERGENCY_TEXT = {
 }
 
 
+# Roman Urdu fire: the verb must follow "aag" ("aag se bachao", "aag bujhane", "aag alarm lagwana"
+# are fire-safety trade talk). A past or hypothetical clause is not an emergency unless the fire is
+# said in the present ("lag gayi hai"): when unsure, the emergency still fires.
+_ROMAN_FIRE = re.compile(
+    r"\b(?:aag|ag)\s+lag{1,2}(?:i|\s*(?:gayi|gai|gaya|gayee|gaye|rahi|raha|ayi))\b", re.IGNORECASE
+)
+_ROMAN_FIRE_NOT_NOW = re.compile(
+    r"\b(?:pichle|pichhle|pehle|agar|kabhi|jab|thi|tha|claim|insurance|bima)\b", re.IGNORECASE
+)
+_ROMAN_FIRE_PRESENT = re.compile(r"\s*(?:hai|hain|he)\b", re.IGNORECASE)
+_ROMAN_FIRE_IS = re.compile(
+    r"\b(?:shop|godown|factory|dukan|dukaan|showroom|gaari|gadi) mein aag (?:hai|hain)\b",
+    re.IGNORECASE,
+)
+
+
+def _roman_fire(said: str) -> bool:
+    if _ROMAN_FIRE_IS.search(said):
+        return True
+    for m in _ROMAN_FIRE.finditer(said):
+        if _ROMAN_FIRE_PRESENT.match(said, m.end()) or not _ROMAN_FIRE_NOT_NOW.search(said):
+            return True
+    return False
+
+
 def emergency(text: str) -> Emergency | None:
     """The kind of emergency the message describes, or None. Self-harm is checked first."""
     said = " ".join((text or "").split())
     for kind, pattern in EMERGENCY_PATTERNS:
         if pattern.search(said):
             return kind
+    if _roman_fire(said):
+        return Emergency.FIRE
     return None
 
 
@@ -1132,15 +1157,22 @@ ADVICE_PATTERNS = ADVICE_PATTERNS + (
     (
         Advice.LEGAL,
         re.compile(
-            r"\b(?:can (?:i|we) legally|legally (?:allowed|permitted|required|entitled|binding)|"
-            r"tell me what the (?:law|rules|act|regulations?) says?|what does the (?:law|act) say)\b",
+            r"\b(?:(?:can|could|may) (?:i|we) legally|"
+            r"(?:am|are|is|do|does) (?:i|we|it|this|that)\b[^.?!]{0,40}\blegally (?:allowed|permitted|required|entitled|bound)|"
+            r"kya\b[^.?!]{0,40}\blegally|tell me (?:whether|if)\b[^.?!]{0,40}\blegal|"
+            r"tell me what the (?:law|act|regulations?) says?|what does the (?:law|act) say|"
+            r"is (?:this|that) (?:legal|illegal)\b(?!\s+(?:entity|name|document|paper|notice))|"
+            r"can i take (?:him|her|them) to court)\b",
             re.IGNORECASE,
         ),
     ),
     (
         Advice.MEDICAL,
         re.compile(
-            r"\b(?:which|what) (?:supplements?|vitamins?|protein powders?|painkillers?)\s+(?:should|do|can|shall|to)\b",
+            r"\b(?:which|what) (?:supplements?|vitamins?|protein powders?|painkillers?|medicines?)\s+"
+            r"(?:should|can|shall|could) (?:i|he|she|we|they)\b"
+            r"(?:(?!\b(?:stock|sell|order|carry|import|supply|buy|display|keep|shop|store|catalog\w*)\b)[^.?!]){0,60}?"
+            r"\b(?:take|taking|give|giving|for (?:me|him|her|my \w+))\b",
             re.IGNORECASE,
         ),
     ),
