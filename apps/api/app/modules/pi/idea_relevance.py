@@ -216,23 +216,18 @@ def _is_arabic_token(tok: str) -> bool:
     return bool(tok) and _script_of(tok[0]) == "arabic"
 
 
-_ARABIC_PREFIXES = "وبلفک"
+_ARABIC_ARTICLE = re.compile(r"^[وف]?(?:[بلک]?ال|لل)(.{3,})$")
 
 
 def _core(tok: str) -> str:
-    """The token with the Arabic definite article and a one-letter prefix peeled off (Arabic script
-    only; at least three letters stay). Latin and Devanagari tokens are returned as they are."""
+    """The token with an Arabic definite article, and the conjunction and preposition glued before
+    it, peeled off ("بالفواتير" -> "فواتير"); at least three letters stay. A word without an article
+    is left alone (a lone prefix letter is often a root letter). Latin and Devanagari tokens are
+    returned as they are."""
     if not _is_arabic_token(tok):
         return tok
-    s = tok
-    for _ in range(3):
-        if len(s) > 4 and s[:2] == "ال":
-            s = s[2:]
-        elif len(s) > 4 and s[0] in _ARABIC_PREFIXES:
-            s = s[1:]
-        else:
-            break
-    return s
+    m = _ARABIC_ARTICLE.match(tok)
+    return m.group(1) if m else tok
 
 
 _LATIN_SUFFIXES = ("ing", "ed", "es", "s", "ly")
@@ -327,7 +322,8 @@ class _Index:
     `_core` forms, and a text is looked up the same two ways, so an Arabic prefix is neither required
     nor a reason to miss. A trailing `*` makes the last word a prefix."""
 
-    def __init__(self, concepts: Sequence[lex.Concept]) -> None:
+    def __init__(self, concepts: Sequence[lex.Concept], drop_setting: bool = True) -> None:
+        self.drop_setting = drop_setting
         self.keys = [c.key for c in concepts]
         self.weak = [c.weak for c in concepts]
         self.context = [c.context for c in concepts]
@@ -357,18 +353,28 @@ class _Index:
         self.prefix_lens = sorted({len(p) for d in self.prefix.values() for p in d})
 
     def scan(self, words: Sequence[str]) -> list[tuple[int, str]]:
-        """(concept index, surface) for every match in the text (given as its words)."""
+        """(concept index, surface) for every match in the text (given as its words). The longest
+        match wins over a shorter one of another concept that it contains ("facebook" over "fee"),
+        and a match made only of business-setting words (shop, desk, staff) is dropped."""
         hits: list[tuple[int, str]] = []
         cores = [_core(w) for w in words]
-        for seq in (words,) if cores == list(words) else (words, cores):
+        bare = [
+            c[1:] if _is_arabic_token(c) and len(c) >= 5 and c[0] in "وبلفک" else c for c in cores
+        ]
+        forms: list[Sequence[str]] = [words]
+        for variant in (cores, bare):
+            if all(variant != f for f in forms):
+                forms.append(variant)
+        for seq in forms:
             n = len(seq)
+            found: list[tuple[int, int, int]] = []  # (start, end, concept)
             for i in range(n):
                 for length in range(1, MAX_NGRAM + 1):
                     if i + length > n:
                         break
                     key = tuple(seq[i : i + length])
                     for idx in self.exact.get(key, ()):
-                        hits.append((idx, " ".join(key)))
+                        found.append((i, i + length, idx))
                 for lead in range(0, self.max_lead + 1):
                     if i + lead >= n:
                         break
@@ -379,18 +385,35 @@ class _Index:
                     for plen in self.prefix_lens:
                         if len(last) >= plen:
                             for idx in table.get(last[:plen], ()):
-                                hits.append((idx, " ".join(seq[i : i + lead + 1])))
+                                found.append((i, i + lead + 1, idx))
+            by_start: dict[int, list[tuple[int, int]]] = {}
+            for s, e, idx in found:
+                by_start.setdefault(s, []).append((e, idx))
+            for s, e, idx in found:
+                if self.drop_setting and all(w in _SETTING for w in seq[s:e]):
+                    continue
+                beaten = False
+                for s2 in range(max(0, s - MAX_NGRAM), s + 1):
+                    for e2, idx2 in by_start.get(s2, ()):
+                        if idx2 != idx and e2 >= e and (e2 - s2) > (e - s):
+                            beaten = True
+                            break
+                    if beaten:
+                        break
+                if not beaten:
+                    hits.append((idx, " ".join(seq[s:e])))
         return hits
 
 
 _CONCEPTS = lex.CONCEPTS
 _OFF = lex.OFF_TOPIC
 _MAIN = _Index(_CONCEPTS)
-_OFF_INDEX = _Index(_OFF)
+_OFF_INDEX = _Index([*_OFF, lex.Concept("novelty", (), (), lex.NOVELTY_TERMS)], drop_setting=False)
 _GENERIC = _Index([lex.Concept("generic", (), (), lex.GENERIC_PHRASES)])
 _REMEDY_KEYS = list(lex.REMEDIES)
 _REMEDY = _Index([lex.Concept(k, (), (), v) for k, v in lex.REMEDIES.items()])
 
+_SETTING = frozenset(normalize_text(lex.SETTING_WORDS).split())
 _STOP = frozenset(normalize_text(lex.STOPWORDS + " tried try trying kiya kia").split())
 _WEAK = frozenset(normalize_text(lex.WEAK_TOKENS).split())
 
@@ -494,15 +517,15 @@ def _tokens(text: Any) -> list[str]:
 def _content_stems(words: Iterable[str]) -> set[str]:
     out: set[str] = set()
     for word in words:
-        if word in _STOP or word in _WEAK or word.isdigit():
+        if word in _STOP or word in _WEAK or word in _SETTING or word.isdigit():
             continue
         tok = _core(word)
-        if tok in _STOP or tok in _WEAK:
+        if tok in _STOP or tok in _WEAK or tok in _SETTING:
             continue
         if len(tok) < (4 if tok.isascii() else 3):
             continue
         stem = _stem(tok)
-        if stem in _STOP or stem in _WEAK:
+        if stem in _STOP or stem in _WEAK or stem in _SETTING:
             continue
         out.add(stem)
     return out
@@ -707,7 +730,10 @@ def _analyse(
         shared = sorted(
             (stems & prof.stems) - said
         )  # a word a concept already explains counts once
-        score += min(len(shared), 2) * 2
+        if (
+            score >= 1 or len(shared) >= 2
+        ):  # a shared word is evidence only beside a concept, or twice
+            score += min(len(shared), 2) * 2
         evidence += shared[:2]
         if off_hits and score < STRONG:
             score = 0  # a decor, merchandise or contest idea needs real evidence to count
