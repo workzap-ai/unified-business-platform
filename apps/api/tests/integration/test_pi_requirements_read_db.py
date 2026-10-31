@@ -29,7 +29,7 @@ async def seed(db, scope, customer_id):
     merged = problem(scope, customer_id, 3, "Merged away")
     merged.status = "merged"
     merged.constraints = {"budget": {"text": "Rs 1"}}
-    db.add_all([rich, bare, merged])
+    db.add_all([merged, bare, rich])  # inserted out of number order on purpose
     await db.flush()
     return rich, bare
 

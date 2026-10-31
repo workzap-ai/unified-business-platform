@@ -126,3 +126,35 @@ def test_a_malformed_option_is_unknown_with_a_reason_never_accepted():
     result = gate_options([None, 5, "Use a paper register"], reqs(budget="Rs 20000"), "en")
     assert [g.option for g in result.accepted] == ["Use a paper register"]
     assert len(result.unknown) == 2 and all(g.verdict.reason for g in result.unknown)
+
+
+def test_ask_about_names_the_rule_that_rejected_most_and_buckets_hold_exactly_their_options():
+    options = [
+        "Replace the POS system",  # cannot_change
+        "Switch the POS system to a cloud one",  # cannot_change
+        "Buy a tablet for Rs 90000",  # budget
+        "Use a paper register at the counter",  # accepted
+        "Buy a tablet for each cashier",  # unknown
+    ]
+    requirement = reqs(budget="Rs 20000", cannot=["we cannot change our POS system"])
+    result = gate_options(options, requirement, "en")
+    assert [g.option for g in result.accepted] == [options[3]]
+    assert [g.option for g in result.rejected] == options[:3]
+    assert [g.option for g in result.unknown] == [options[4]]
+    only_rejected = gate_options(options[:3], requirement, "en")
+    assert only_rejected.ask_about == "cannot_change"  # two rejections against one
+    assert gate_options(options[2:3], requirement, "en").ask_about == "budget"
+    assert gate_options(options[:3], requirement, "en").no_option_left
+
+
+def test_a_staff_limit_rejects_through_the_gate_and_a_vague_limit_accepts_nothing():
+    staff = Requirements(
+        problems=(ProblemRequirements(constraints=Constraints(staff=Limit("only 2 staff"))),)
+    )
+    result = gate_options(["Hire 5 more staff", "Use a paper register"], staff, "en")
+    assert [g.verdict.rule for g in result.rejected] == ["staff"]
+    assert result.accepted_options == ("Use a paper register",)
+    vague = reqs(cannot=["the thing"])
+    result = gate_options(["Replace the POS", "Use a paper register"], vague, "en")
+    assert result.accepted == () and len(result.unknown) == 2
+    assert result.next_step is NextStep.CHECK_UNKNOWN

@@ -183,3 +183,57 @@ async def test_logs_carry_counts_only_never_the_owners_words(caplog):
         )
     text = " ".join(f"{r.getMessage()} {r.__dict__}" for r in caplog.records)
     assert caplog.records and "Ahmed" not in text and "Gulberg" not in text
+
+
+async def test_the_select_keeps_active_problems_only_in_number_order_with_the_four_columns():
+    session = FakeSession(rows=[row(number=2), row(number=1)])
+    await rr.read_requirements(session, SCOPE, customer_id=CUSTOMER)
+    sql = str(session.statements[-1].compile(compile_kwargs={"literal_binds": False})).lower()
+    assert "pi_problems.status in" in sql
+    assert "order by pi_problems.number" in sql
+    for column in ("constraints", "tried", "cause", "expected_outcome"):
+        assert f"pi_problems.{column}" in sql
+
+
+async def test_the_rows_come_back_in_the_order_the_database_gave_them():
+    session = FakeSession(rows=[row(number=1, title="first"), row(number=2, title="second")])
+    result = await rr.read_requirements(session, SCOPE, customer_id=CUSTOMER)
+    assert [p.title for p in result.problems] == ["first", "second"]
+
+
+async def test_a_cause_with_no_status_is_a_guess_and_the_log_counts_are_exact(caplog):
+    caplog.set_level(logging.INFO, logger="app.modules.pi.requirements_read")
+    session = FakeSession(
+        rows=[
+            row(cause={"text": "staff are lazy"}),
+            row(number=2),
+            row(number=3, tried=[{"what": "x"}]),
+        ]
+    )
+    result = await rr.read_requirements(session, SCOPE, customer_id=CUSTOMER)
+    cause = result.problems[0].cause
+    assert cause.status == "pi_inferred" and not cause.owner_said
+    record = next(r for r in caplog.records if r.getMessage() == "pi_requirements_read")
+    assert (record.problems, record.with_requirements) == (3, 2)
+    assert "lazy" not in caplog.text
+
+
+def test_empty_requirements_are_empty_and_one_stated_thing_is_not():
+    from app.modules.pi.requirements_types import (
+        Constraints,
+        Limit,
+        ProblemRequirements,
+        Requirements,
+        TriedItem,
+    )
+
+    assert Requirements().empty and ProblemRequirements().empty and Constraints().empty
+    for stated in (
+        ProblemRequirements(constraints=Constraints(budget=Limit("Rs 1"))),
+        ProblemRequirements(constraints=Constraints(staff=Limit("only 2"))),
+        ProblemRequirements(constraints=Constraints(deadline=Limit("soon"))),
+        ProblemRequirements(constraints=Constraints(cannot_change=(Limit("POS"),))),
+        ProblemRequirements(tried=(TriedItem("calls"),)),
+        ProblemRequirements(expected_outcome="fewer lost orders"),
+    ):
+        assert not stated.empty and not Requirements(problems=(stated,)).empty
