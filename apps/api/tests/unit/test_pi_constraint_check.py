@@ -35,7 +35,9 @@ def reqs(budget=None, deadline=None, cannot=(), tried=(), staff=None):
 
 
 def check(option, **kw):
-    return cc.check_option(option, reqs(**kw), "en")
+    """The verdict of the limits the test states. With no budget stated the "no budget, looks
+    costly" probe is left out so each test reads one rule; it has its own tests below."""
+    return cc._check_option(option, reqs(**kw), probe_budget="budget" in kw)
 
 
 # ------------------------------------------------------------------------------ purity
@@ -247,7 +249,7 @@ def test_other_scripts_are_unknown_never_ok():
         reqs(cannot=["we cannot buy a new system"]),
         "ur",
     )
-    assert v.status == "unknown"
+    assert v.status == "violates"  # an Urdu option is read now: buying a new system is buying
     hindi = "हम सिस्टम नहीं बदल सकते"
     assert check("Replace the POS", cannot=[hindi]).status == "unknown"
 
@@ -451,8 +453,8 @@ def test_roman_urdu_durations():
 
 
 def test_no_requirements_is_ok_but_unreadable_requirements_are_unknown():
-    assert cc.check_option("Buy a tablet", Requirements(), "en").status == "ok"
-    assert cc.check_option("Buy a tablet", None, "en").rule == "none"
+    assert cc.check_option("Use a paper register", Requirements(), "en").status == "ok"
+    assert cc.check_option("Use a paper register", None, "en").rule == "none"
     v = cc.check_option("Buy a tablet", Requirements(columns_available=False), "en")
     assert v.status == "unknown" and v.rule == "unreadable"
     assert cc.check_option("  ", reqs(budget="Rs 5"), "en").status == "unknown"
@@ -658,7 +660,7 @@ def test_the_cost_of_a_long_input_grows_roughly_with_its_length():
 
 
 def with_staff(option, staff):
-    return cc.check_option(option, reqs_with_staff(staff), "en")
+    return cc._check_option(option, reqs_with_staff(staff), probe_budget=False)
 
 
 def reqs_with_staff(staff):
@@ -826,7 +828,7 @@ def test_spaced_split_and_multiplied_figures_are_read_as_money(option):
 @pytest.mark.parametrize(
     "option",
     ["price: 90000", "software 1 lakh", "laptop 100000 ka", "ek lakh ka software",
-     "scanner खरीदें 80 हज़ार में", "scanner 80000 mein", "Pay Rs 30,000 per month",
+     "scanner 80000 mein", "Pay Rs 30,000 per month",
      "Buy a scanner for 90000 ريال", "Buy a scanner for 90000 USD", "naya scanner kharidein"],
 )  # fmt: skip
 def test_a_figure_that_cannot_be_attributed_is_unknown_never_a_free_ok(option):
@@ -958,8 +960,8 @@ def test_a_limit_text_is_clipped_so_a_huge_one_is_not_scanned():
 
 def test_an_option_in_another_script_is_unknown_for_every_rule():
     assert check("ٹیبلیٹ خریدیں", budget="Rs 20000").status == "unknown"
-    assert check("ٹیبلیٹ خریدیں", cannot=["we cannot change the POS"]).status == "unknown"
-    assert check("ٹیبلیٹ خریدیں", tried=[("reminder calls", "failed")]).status == "unknown"
+    assert check("کچھ اور سوچیں", cannot=["we cannot change the POS"]).status == "unknown"
+    assert check("کچھ اور سوچیں", tried=[("reminder calls", "failed")]).status == "unknown"
 
 
 def test_two_ceilings_choose_the_lower_and_figures_that_are_not_money_are_ignored():
@@ -1065,3 +1067,216 @@ def test_a_roman_urdu_hiring_limit_rejects_a_hire_of_any_role():
     limit = ["hum staff bharti nahi kar sakte"]
     assert check("Hire a welder", cannot=limit).status == "violates"
     assert check("Use a paper register", cannot=limit).status == "ok"
+
+
+def test_a_hindi_buy_with_a_cost_above_the_budget_violates():
+    assert check("scanner खरीदें 80 हज़ार में", budget="Rs 50000").status == "violates"
+
+
+# ------------------------------- round 3: options in Urdu script, Arabic and Hindi are read
+
+HIRE_LIMIT = ["we cannot hire more staff"]
+POS_LIMIT = ["we cannot change the POS"]
+PRICE_LIMIT = ["we cannot change our prices"]
+CLOSE_LIMIT = ["we cannot close the shop"]
+
+GOLDEN = {
+    "urdu": {
+        "violates": [
+            ("نیا کلرک رکھیں", HIRE_LIMIT),
+            ("POS بدلیں", POS_LIMIT),
+            ("نیا POS خریدیں", POS_LIMIT),
+            ("قیمتیں بڑھائیں", PRICE_LIMIT),
+            ("دکان بند کریں", CLOSE_LIMIT),
+            ("اسٹاف کو نکالیں", ["we cannot fire anyone"]),
+        ],
+        "ok": [
+            ("نیا کلرک نہ رکھیں", HIRE_LIMIT),
+            ("نیا کلرک رکھنا نہیں", HIRE_LIMIT),
+            ("جانچیں کہ POS بدلیں", POS_LIMIT),
+            ("POS رکھیں", POS_LIMIT),
+            ("دکان کھولیں", CLOSE_LIMIT),
+        ],
+        "unknown": [
+            ("کچھ اور سوچیں", HIRE_LIMIT),
+            ("نیا کلرک رکھیں اور میز سجائیں", ["we cannot change the POS"]),
+        ],
+    },
+    "arabic": {
+        "violates": [
+            ("توظيف موظف جديد", HIRE_LIMIT),
+            ("استبدال نظام POS", POS_LIMIT),
+            ("رفع الأسعار", PRICE_LIMIT),
+            ("إغلاق المتجر", CLOSE_LIMIT),
+            ("فصل الموظفين", ["we cannot fire anyone"]),
+        ],
+        "ok": [
+            ("لا نوظف موظف جديد", HIRE_LIMIT),
+            ("تحقق من تغيير نظام POS", POS_LIMIT),
+            ("فتح المتجر", CLOSE_LIMIT),
+        ],
+        "unknown": [
+            ("فكر في شيء آخر", HIRE_LIMIT),
+            ("توظيف موظف جديد مع طاولة", POS_LIMIT),
+        ],
+    },
+    "hindi": {
+        "violates": [
+            ("नया कर्मचारी रखें", HIRE_LIMIT),
+            ("नया क्लर्क भर्ती करें", HIRE_LIMIT),
+            ("POS बदलें", POS_LIMIT),
+            ("नया POS खरीदें", POS_LIMIT),
+            ("कीमतें बढ़ाएं", PRICE_LIMIT),
+            ("दुकान बंद करें", CLOSE_LIMIT),
+        ],
+        "ok": [
+            ("नया कर्मचारी न रखें", HIRE_LIMIT),
+            ("जाँचें कि POS बदलें", POS_LIMIT),
+            ("दुकान खोलें", CLOSE_LIMIT),
+        ],
+        "unknown": [
+            ("कुछ और सोचें", HIRE_LIMIT),
+            ("नया कर्मचारी रखें और मेज़ सजाएं", POS_LIMIT),
+        ],
+    },
+}
+
+
+@pytest.mark.parametrize("language", sorted(GOLDEN))
+@pytest.mark.parametrize("expected", ["violates", "ok", "unknown"])
+def test_golden_options_in_urdu_arabic_and_hindi_meet_the_same_limits(language, expected):
+    for option, limit in GOLDEN[language][expected]:
+        v = check(option, cannot=limit)
+        assert v.status == expected, (language, option, limit, v)
+
+
+def test_a_violation_in_another_script_names_the_limit_and_the_words():
+    v = check("نیا کلرک رکھیں", cannot=HIRE_LIMIT)
+    assert v.status == "violates" and v.rule == "cannot_change" and v.evidence
+
+
+def test_the_reading_tables_turn_known_words_into_english_and_count_the_unknown():
+    mapped, read, unread = cc.scripts.to_english(
+        cc.norm("نیا کلرک رکھیں"),
+        cc.SCRIPT_TABLE,
+        cc.SCRIPT_STOP,
+        is_known=lambda w: False,
+        is_person=lambda w: cc.object_key(w) == "STAFF",
+        is_verb=lambda w: bool(cc.verb_families(w)),
+    )
+    assert mapped == "new clerk hire" and read == 3 and unread == 0
+    for text, expected in [("POS رکھیں", "pos keep"), ("نیا کلرک نہ رکھیں", "new clerk not hire")]:
+        out = cc.scripts.to_english(
+            cc.norm(text),
+            cc.SCRIPT_TABLE,
+            cc.SCRIPT_STOP,
+            is_known=lambda w: False,
+            is_person=lambda w: cc.object_key(w) == "STAFF",
+            is_verb=lambda w: bool(cc.verb_families(w)),
+        )[0]
+        assert out == expected, text
+    assert cc._option("کچھ اور سوچیں").latin is False
+    assert cc._option("کچھ اور سوچیں").unread >= 1
+
+
+def test_property_an_option_in_any_script_with_an_unrecognised_verb_is_never_ok():
+    import random
+
+    rng = random.Random(23)
+    alphabets = {
+        "urdu": "ابتثجحخدرزسشصضطظعغفقلمنہوی",
+        "arabic": "ابتثجحخدذرزسشصضطظعغفقلمنهوي",
+        "hindi": "कखगघचछजझटठडढतथदधनपफबभमयरलवशसह",
+    }
+    known = set(cc.SCRIPT_TABLE) | set(cc.SCRIPT_STOP) | set(cc.SMALL_NUMBER_WORDS)
+    limits = [
+        HIRE_LIMIT, POS_LIMIT, PRICE_LIMIT, CLOSE_LIMIT, ["we cannot fire anyone"],
+        ["we cannot afford a new oven"], ["we cannot deliver"], ["only Karachi"],
+    ]  # fmt: skip
+    nouns = ["کلرک", "نظام", "قیمتیں", "दुकान", "المتجر", "POS", "staff"]  # known nouns, no verb
+    seen = 0
+    for _ in range(400):
+        alphabet = alphabets[rng.choice(sorted(alphabets))]
+        words = []
+        for _ in range(rng.randint(1, 5)):
+            word = "".join(rng.choice(alphabet) for _ in range(rng.randint(3, 6)))
+            if cc.norm(word) not in known:
+                words.append(word)
+        if rng.random() < 0.5:
+            words.insert(rng.randint(0, len(words)), rng.choice(nouns))
+        option = " ".join(words)
+        for requirement in (reqs(cannot=rng.choice(limits)), reqs(staff="only 2 staff")):
+            v = cc._check_option(option, requirement, probe_budget=False)
+            assert v.status != "ok", (option, v)
+            seen += 1
+    assert seen == 800
+
+
+def test_a_known_verb_with_an_unknown_word_is_unknown_not_ok_but_still_violates_when_it_does():
+    assert check("نیا کلرک رکھیں اور میز سجائیں", cannot=POS_LIMIT).status == "unknown"
+    assert check("نیا کلرک رکھیں اور میز سجائیں", cannot=HIRE_LIMIT).status == "violates"
+
+
+@pytest.mark.parametrize(
+    "option",
+    ["دو اور کلرک رکھیں", "توظيف موظفين اثنين", "दो और क्लर्क रखें", "ہم دو کلرک رکھیں"],
+)
+def test_staff_caps_are_enforced_against_hires_in_urdu_arabic_and_hindi(option):
+    v = with_staff(option, "only 1 staff")
+    assert v.status == "violates" and v.rule == "staff", option
+    assert with_staff(option, "only 5 staff").status == "ok", option
+
+
+def test_staff_caps_in_the_docstring_and_in_the_gate_are_enforced():
+    assert "not enforced (no rule for them yet)" not in " ".join((cc.__doc__ or "").split())
+    assert "ceiling on the people" in (cc.__doc__ or "")
+    assert with_staff("Hire 3 more staff", "at most 2 employees").status == "violates"
+    assert with_staff("Assign 2 people to stock", "at most 2 employees").status == "ok"
+
+
+@pytest.mark.parametrize(
+    "option", ["Take a deposit through an app", "mehnga job tracking system", "Buy a tablet",
+               "Install a new system", "Subscribe to a software tool"],
+)  # fmt: skip
+def test_with_no_budget_stated_a_costly_idea_is_unknown_never_clear(option):
+    for requirement in (None, Requirements(), reqs(cannot=["we cannot change the POS"])):
+        v = cc.check_option(option, requirement, "en")
+        assert v.status == "unknown" and v.rule == "budget", (option, requirement, v)
+        assert "no budget" in v.reason
+
+
+def test_with_no_budget_stated_a_free_idea_is_clear_and_a_stated_budget_is_compared():
+    assert cc.check_option("Ask customers for referrals", None, "en").status == "ok"
+    assert cc.check_option("Use a paper register", reqs(cannot=POS_LIMIT), "en").status == "ok"
+    assert cc.check_option("Buy a tablet for Rs 5000", reqs(budget="Rs 20000"), "en").status == "ok"
+    assert (
+        cc.check_option("Buy a tablet for Rs 50000", reqs(budget="Rs 20000"), "en").status
+        == "violates"
+    )
+    # an option in another script that costs money with no budget stated is unknown too
+    assert cc.check_option("نیا ٹیبلیٹ خریدیں", None, "en").status == "unknown"
+
+
+def test_a_limit_about_promising_a_topic_is_not_a_limit_on_the_topic():
+    limit = ["we cannot promise delivery days"]
+    for fine in ["Ask the courier for a tracking link", "Use the courier's own delivery estimate",
+                 "Tell customers the courier will message them"]:  # fmt: skip
+        assert check(fine, cannot=limit).status == "ok", fine
+    for promise in [
+        "Promise delivery in 2 days",
+        "Guarantee next-day delivery",
+        "We assure delivery by Friday",
+    ]:
+        assert check(promise, cannot=limit).status == "violates", promise
+    assert check("Never promise delivery days", cannot=limit).status == "ok"
+    assert cc.parse_limit("we cannot promise delivery days").kind == "promise"
+
+
+def test_a_new_one_of_the_thing_that_cannot_change_violates():
+    limit = ["we cannot change courier"]
+    assert check("Use a new courier", cannot=limit).status == "violates"
+    assert check("Switch to another courier", cannot=limit).status == "violates"
+    assert check("Try a new courier for Lahore", cannot=limit).status == "violates"
+    assert check("Ask the courier for a tracking link", cannot=limit).status == "ok"
+    assert check("Use a new packing box", cannot=limit).status == "ok"
+    assert check("Measure whether a new courier is worth it", cannot=limit).status == "ok"

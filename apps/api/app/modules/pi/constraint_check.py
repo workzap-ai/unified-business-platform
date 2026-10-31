@@ -21,8 +21,12 @@ THE LIMITS (what this module does and does not read), stated once
     "POS") are not known: a matching verb with a different object is `ok` only when the objects
     share nothing, and `unknown` when they share only a generic word (system, machine, tool).
   * Budget: figures are compared as stated (a monthly figure against a total ceiling, Rs against
-    INR, are not converted); another currency than the ceiling's is `unknown`. Staff limits are
-    not enforced (no rule for them yet). A cause is not a limit and is ignored here.
+    INR, are not converted); another currency than the ceiling's is `unknown`. A staff limit
+    ("only 2 staff", "hiring is frozen") is a ceiling on the people an option adds. A cause is
+    not a limit and is ignored here. With NO budget stated, an option that looks like it costs
+    money is `unknown` (never "clear of the limits"). Options in Urdu script, Arabic and Hindi are
+    read through `constraint_scripts` (verbs and objects as English concepts); a word it does not
+    know makes the option `unknown`, never `ok`.
   * A deadline: a date needs a calendar and this module has no clock, so only durations ("in 2
     weeks", "kal tak") are compared. An option that states no timeframe, or one longer than the
     deadline, is `unknown`: it never silently passes and it is never rejected for time alone.
@@ -42,6 +46,7 @@ from functools import lru_cache
 from typing import Literal
 
 from app.modules.pi import constraint_lexicon as lex
+from app.modules.pi import constraint_scripts as scripts
 from app.modules.pi.requirements_types import (
     Limit,
     Requirements,
@@ -173,6 +178,9 @@ def spaced_runs(text: str) -> list[str]:
         return []
     canon = _ANY_WORD.sub(_fold_homoglyphs, _canon(text)).lower()
     return [m.group(0).replace(" ", "") for m in _SPACED.finditer(canon)]
+
+
+SCRIPT_TABLE, SCRIPT_STOP = scripts.build(_canon)
 
 
 def mostly_latin(text: str) -> bool:
@@ -616,12 +624,14 @@ def _number_words_to_digits(t: str) -> str:
     return "".join(out)
 
 
-def parse_amounts(text: str, *, assume_money: bool = False) -> list[Amount]:
+def parse_amounts(
+    text: str, *, assume_money: bool = False, latin: bool | None = None
+) -> list[Amount]:
     """The money figures in `text`. With `assume_money` (a budget text) every figure counts except
     counts of things and percentages; otherwise a figure needs a currency marker or a cost/income
     word in its own clause, and a number with neither is ignored."""
     t = _number_words_to_digits(norm(text))
-    latin = mostly_latin(t)
+    latin = mostly_latin(t) if latin is None else latin
     raw_matches = list(_AMOUNT.finditer(t))
     spans: list[tuple[int, int, Decimal, str | None, str, bool]] = []
     i = 0
@@ -842,10 +852,27 @@ class _Option:
     text: str
     tokens: list[Tok]
     latin: bool
+    unread: int = 0  # words in another script that the reading tables do not know
 
 
 def _option(text: str) -> _Option:
-    return _Option(text, tokens_of(lex.take_on_as_hire(norm(text))), mostly_latin(text))
+    if not _OTHER_LETTER.search(text):  # no Urdu, Arabic, Hindi or other script letter at all
+        return _Option(text, tokens_of(lex.take_on_as_hire(norm(text))), True)
+    mapped, _, unread = scripts.to_english(
+        norm(text),
+        SCRIPT_TABLE,
+        SCRIPT_STOP,
+        is_known=lambda w: (
+            w in SMALL_NUMBER_WORDS or w in MAGNITUDE_WORDS or bool(re.fullmatch(_CUR_WORDS, w))
+        ),
+        is_person=lambda w: object_key(w) == "STAFF",
+        is_verb=lambda w: bool(verb_families(w)),
+    )
+    english = [w for w in _WORD.findall(mapped) if w.isascii()]
+    readable = any(verb_families(w) or w == "keep" for w in english)  # a verb was recognised
+    # these languages put the verb last: the marker makes every verb read the words before it
+    marked = re.sub(r"([;:!?.\n])", r" karein \1", mapped) + " karein"
+    return _Option(mapped, tokens_of(lex.take_on_as_hire(marked)), readable, unread)
 
 
 CLOSE_ADVERB_NEXT = frozenset({"to", "by", "enough", "together", "friends", "friend"})
@@ -1003,6 +1030,13 @@ def _action(fams: frozenset[str], after: list[str], verb: str, final: bool = Fal
     return _Lim("action", fams, objs, verb=verb, verb_final=final)
 
 
+_PROMISE = re.compile(r"\b(?:promise|promises|guarantee|guarantees|assure|ensure|pledge)\b")
+PROMISE_WORDS = frozenset(
+    "promise promises promised promising guarantee guarantees guaranteed guaranteeing assure "
+    "assured ensure ensures pledge pledged".split()
+)
+
+
 def parse_limit(text: str) -> _Lim:
     """Read one cannot_change clause. See the module docstring for the semantics."""
     if not mostly_latin(text):
@@ -1019,6 +1053,10 @@ def parse_limit(text: str) -> _Lim:
     size = lex.size_limit(t)
     if size:
         return _Lim("size", payload=(size.value, size.unit))
+    promise = _PROMISE.search(t)
+    if promise and _MODAL.search(t):  # "we cannot promise delivery days": about the promise
+        objs = _content_objects(_WORD.findall(t[promise.end() :]))
+        return _Lim("promise", objects=objs) if objs else _Lim("unreadable")
     topic = lex.topic_limit(t)
     if topic:
         return _Lim("topic", verb=topic)
@@ -1183,6 +1221,22 @@ def _check_lim(option: _Option, lim: _Lim, limit_text: str) -> Verdict:
         return _unknown(rule, "the stated limit could not be read (script, wording or too vague)")
     if lim.kind in {"location", "size", "topic"}:
         return _check_special(option, lim, limit_text)
+    if lim.kind == "promise":
+        for i, tok in enumerate(option.tokens):
+            if tok.word in PROMISE_WORDS and _proposed(option.tokens, i):
+                near = [
+                    object_key(t.word)
+                    for t in option.tokens[i + 1 : i + 8]
+                    if t.clause == tok.clause
+                ]
+                shared = [o for o in lim.objects if o in near]
+                if shared:
+                    return _violates(
+                        rule,
+                        f"the option promises what the owner ruled out ({limit_text})",
+                        (tok.word, *shared),
+                    )
+        return _ok(rule, "the option makes no promise the owner ruled out")
     toks = option.tokens
     keys = [object_key(t.word) for t in toks]
     if lim.kind == "avoid_outcome":
@@ -1196,6 +1250,17 @@ def _check_lim(option: _Option, lim: _Lim, limit_text: str) -> Verdict:
     wanted = tuple(o for o in lim.objects if o not in GENERIC and noun_stem(o) not in GENERIC)
     generic = tuple(o for o in lim.objects if o not in wanted)
     unknown_hit: Verdict | None = None
+    if "CHANGE" in lim.families and wanted:
+        for i, tok in enumerate(toks):  # "a new courier" replaces the one that cannot change
+            if tok.word in NEW_WORDS and _proposed(toks, i):
+                near = [object_key(t.word) for t in toks[i + 1 : i + 4] if t.clause == tok.clause]
+                shared = [w for w in wanted if w in near]
+                if shared:
+                    return _violates(
+                        rule,
+                        f"the option brings in a new one of what cannot change ({limit_text})",
+                        (tok.word, *shared),
+                    )
     if lim.kind == "unknown_verb":
         hit = [w for w in wanted if w in keys]
         if hit:
@@ -1469,10 +1534,21 @@ def added_people(text: str) -> tuple[int, bool, tuple[str, ...]]:
             if object_key(toks[j]) == "STAFF":
                 found = j
                 break
+        backward = False
+        if found is None:  # Urdu, Hindi: "دو اور کلرک رکھیں" puts the people before the verb
+            for j in range(i - 1, max(-1, i - 6), -1):
+                if clause[j] != clause[i]:
+                    break
+                if object_key(toks[j]) == "STAFF":
+                    found, backward = j, True
+                    break
         if found is None:
             continue
         count = None
-        for k in range(i + 1, found):
+        scan = range(found - 1, max(-1, found - 4), -1) if backward else range(i + 1, found)
+        for k in scan:
+            if clause[k] != clause[i]:
+                break
             v = toks[k]
             if v.isdigit():
                 count = min(int(v), 10**6)
@@ -1483,6 +1559,12 @@ def added_people(text: str) -> tuple[int, bool, tuple[str, ...]]:
             if v in {"a", "an", "another"}:
                 count = 1
                 break
+        if count is None and found + 1 < len(toks) and clause[found + 1] == clause[i]:
+            after = toks[found + 1]  # Arabic: "موظفين اثنين" puts the number after the noun
+            if after.isdigit():
+                count = min(int(after), 10**6)
+            elif after in SMALL_NUMBER_WORDS and after != "do":
+                count = SMALL_NUMBER_WORDS[after]
         if count is None and toks[found] in {"someone", "somebody", "anyone"}:
             count = 1
         if count is None:
@@ -1509,9 +1591,49 @@ def _check_staff(option: _Option, limit: Limit) -> Verdict:
         )
     if unclear:
         return _unknown(rule, "the option adds people and names no count")
-    if _ru_option(option.tokens) and any(object_key(t.word) == "STAFF" for t in option.tokens):
+    if (
+        not evidence
+        and _ru_option(option.tokens)
+        and any(object_key(t.word) == "STAFF" for t in option.tokens)
+    ):
         return _unknown(rule, "the option mentions people and its count cannot be read")
     return _ok(rule, "the option adds no more people than the owner allows")
+
+
+COSTLY_WORDS = frozenset(
+    """app apps software system platform tool tools subscription gateway terminal machine equipment
+    device devices tablet scanner printer hardware installation mehnga mehenga mehngi expensive
+    costly premium""".split()
+)
+
+
+def _check_no_budget(option: _Option) -> Verdict | None:
+    """No budget was stated: an option that looks like it costs money cannot be called clear."""
+    rule = RULE_BUDGET
+    costly = [
+        a.raw
+        for a in parse_amounts(option.text, latin=option.latin)
+        if a.role in {"cost", "ambiguous", "unclear"}
+    ]
+    if not costly:
+        costly = [
+            t.word
+            for i, t in enumerate(option.tokens)
+            if _proposed(option.tokens, i)
+            and (
+                (verb_stems(t.word) & SPEND_VERBS and _is_spend_verb(option.tokens, i))
+                or noun_stem(t.word) in COSTLY_WORDS
+                or t.word in COSTLY_WORDS
+            )
+        ]
+    if not costly:
+        return None
+    return _unknown(
+        rule,
+        "no budget was stated and the option looks like it costs money, so its cost could "
+        "not be checked",
+        tuple(costly[:3]),
+    )
 
 
 # ------------------------------------------------------------------------------ budget check
@@ -1533,7 +1655,11 @@ def _check_budget(option: _Option, limit: Limit) -> Verdict:
             else "no figure in the budget text"
         )
         return _unknown(rule, why)
-    amounts = [a for a in parse_amounts(option.text) if a.role in {"cost", "ambiguous", "unclear"}]
+    amounts = [
+        a
+        for a in parse_amounts(option.text, latin=option.latin)
+        if a.role in {"cost", "ambiguous", "unclear"}
+    ]
     over_unknown: Verdict | None = None
     for a in amounts:
         if (ceiling.currency and a.currency and ceiling.currency != a.currency) or (
@@ -1645,7 +1771,9 @@ def check_option(
         return _unreadable("the option or the requirements could not be read")
 
 
-def _check_option(option_text: str, requirements: Requirements | None) -> Verdict:
+def _check_option(
+    option_text: str, requirements: Requirements | None, probe_budget: bool = True
+) -> Verdict:
     reqs = as_requirements(requirements)
     if not isinstance(reqs, Requirements):
         return _unreadable("the requirements are not in a form this check reads")
@@ -1668,6 +1796,10 @@ def _check_option(option_text: str, requirements: Requirements | None) -> Verdic
         results.append(_check_budget(option, _clip(limit)))
     for limit in reqs.deadlines:
         results.append(_check_deadline(option, _clip(limit)))
+    if probe_budget and not reqs.budgets:
+        no_budget = _check_no_budget(option)
+        if no_budget:
+            results.append(no_budget)
     if not results:
         return _ok(RULE_NONE, "the owner stated no limit to check")
     for verdict in results:
@@ -1679,6 +1811,11 @@ def _check_option(option_text: str, requirements: Requirements | None) -> Verdic
     for verdict in results:
         if verdict.status == "unknown":
             return verdict
+    if option.unread:
+        return _unknown(
+            results[0].rule,
+            f"{option.unread} word(s) of the option are in a script this check does not read fully",
+        )
     return _ok(results[0].rule, f"{len(results)} stated limit(s) read and none broken")
 
 

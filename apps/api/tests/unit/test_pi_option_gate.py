@@ -77,7 +77,10 @@ def test_only_unknown_left_is_not_accepted_and_not_a_question():
 
 
 def test_no_limits_accepts_everything_and_unreadable_limits_accept_nothing():
-    assert gate_options(OPTIONS, Requirements(), "en").accepted_options == tuple(OPTIONS)
+    result = gate_options(OPTIONS, Requirements(), "en")
+    # nothing stated, so a free option is clear; one that costs money (no budget stated) is unknown
+    assert result.accepted_options == (OPTIONS[1],)
+    assert [g.option for g in result.unknown] == [OPTIONS[0], OPTIONS[2], OPTIONS[3]]
     result = gate_options(OPTIONS, Requirements(columns_available=False), "en")
     assert result.accepted == () and len(result.unknown) == len(OPTIONS)
 
