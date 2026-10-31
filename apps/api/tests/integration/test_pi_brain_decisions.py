@@ -2,6 +2,7 @@
 worker; the AI and WhatsApp are mocked (the model's own reply is overridden at the gates)."""
 
 import pytest
+from offer_expect import assert_offer_ends, expected_offer
 from sqlalchemy import select
 from test_pi_brain_problems import adaptive, create, problems_of, say, workspace
 from test_pi_service_conversations import turn
@@ -67,7 +68,9 @@ async def test_the_summary_then_the_fixed_offer_with_buttons(api, business_db, m
     summary = (await pi.reply_to("of-2")).body
     assert summary.startswith("Here is what you have told me so far.")
     offer = await pi.reply_to("of-3")
-    assert offer.body == decisions.text("offer", "en")
+    assert offer.body == expected_offer("en", problems=2)  # the Solution Box wording (box on)
+    assert offer.body != decisions.text("offer", "en")  # not the legacy text
+    assert_offer_ends(offer.body, "en", problems=2)
     assert (await state_of(business_db, pi)).flow_state == "S5_READINESS"
     assert (offer.media or {}).get("buttons") == decisions.OFFER_BUTTONS["en"]
     await pi.close()

@@ -12,6 +12,7 @@ from test_pi_pipeline import pi_workspace
 from test_pi_service_conversations import turn
 
 from app.ai.manager import LLMManager
+from app.modules.pi import brain_config
 from app.modules.pi.problem_models import (
     PiProblem,
     PiProblemGroup,
@@ -209,7 +210,11 @@ async def test_merge_split_link_withdraw_and_rename_a_group(api, business_db, mo
             ops = [
                 ProblemOp(op="merge", ref=a, refs=[b]),
                 ProblemOp(
-                    op="link", ref=refs["Cashiers late on weekends"], to=a, link_type="same_area"
+                    op="link",
+                    ref=refs["Cashiers late on weekends"],
+                    to=a,
+                    link_type="same_area",
+                    confidence=brain_config.LINK_DEFAULT / 100,  # the floor a link must meet
                 ),
                 ProblemOp(
                     op="split",

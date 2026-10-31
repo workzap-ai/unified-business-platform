@@ -31,7 +31,7 @@ from app.ai.types import Message, TextPart, VideoPart
 from app.modules.business_settings.capabilities import business_permissions
 from app.modules.customers.service import CustomerService
 from app.modules.environments.models import Environment
-from app.modules.pi import latency, outage, price_policy
+from app.modules.pi import constitution, latency, map_edit, outage, price_policy
 from app.modules.pi.agents import AgentContext, run_specialists
 from app.modules.pi.configuration import seed_agents, settings_cache_for_turn, settings_row
 from app.modules.pi.graph import AGENTS, RouteState, keyword_intent, route_message
@@ -116,6 +116,30 @@ ADDRESSES_PI = re.compile(
     r"\b(?:you|your|you're|youre|workzap|pi)\b|\b(?:aap|aapki|aapka|aapke|tum|tumhari|tumhara)\b",
     re.IGNORECASE,
 )
+
+
+def soft_notice(
+    handoff_reason: str,
+    service_context: dict[str, Any] | None,
+    typed: str | None,
+    known: str | None,
+) -> str:
+    """The line the owner gets when a draft was not sent. Outside brain mode: the old team-check
+    notice. In brain mode: no promise that the team will confirm; a failure keeps its own notice,
+    a rejected or unsure draft is acknowledged and followed by the next question (no dead end)."""
+    if (service_context or {}).get("pi_mode") != "brain":
+        return _localized(TEAM_CHECK_NOTICES, typed, known)
+    notices = {
+        "provider_failure": TECH_DOWN_NOTICES,
+        "tool_failure": TOOL_FAIL_NOTICES,
+    }.get(handoff_reason)
+    if notices is not None:
+        return _localized(notices, typed, known)
+    return constitution.ack_with_question(
+        _localized(BRAIN_ACK_NOTICES, typed, known),
+        service_context or {},
+        detect_language(typed) or known,
+    )
 
 
 def _localized(notices: dict[str, str], body: str | None, known: str | None) -> str:
@@ -1709,7 +1733,10 @@ async def process_pi_event(ctx: dict[str, Any], event_id: str) -> None:
                 mode = price_policy.price_mode(policy.response_rules, service_turn is not None)
                 if service_turn is not None:
                     reply = validate_service_reply(
-                        reply, max_chars, mode, allowed_text(service_context)
+                        reply,
+                        max_chars,
+                        mode,
+                        [*allowed_text(service_context), *map_edit.LABEL_LINES],
                     )
                 elif (code := price_policy.check(reply, mode)) is not None:
                     raise ReplyRejected(code)
@@ -1821,15 +1848,7 @@ async def process_pi_event(ctx: dict[str, Any], event_id: str) -> None:
                 message.body,
             )
             if not outbound:
-                notices = TEAM_CHECK_NOTICES
-                if (service_context or {}).get("pi_mode") == "brain":
-                    # A rejected or unsure draft is not a reason to promise that the team will
-                    # confirm: pi only acknowledges (the team question is raised either way).
-                    notices = {
-                        "provider_failure": TECH_DOWN_NOTICES,
-                        "tool_failure": TOOL_FAIL_NOTICES,
-                    }.get(handoff_reason, BRAIN_ACK_NOTICES)
-                text = _localized(notices, typed, conversation.language)
+                text = soft_notice(handoff_reason, service_context, typed, conversation.language)
                 sent = await agent_ctx.tool("router", "send_whatsapp_message", {"body": text})
                 if sent.ok and sent.data is not None:
                     outbound.append(str(sent.data["message_id"]))
