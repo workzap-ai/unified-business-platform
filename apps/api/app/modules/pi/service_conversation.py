@@ -65,6 +65,7 @@ from app.modules.pi import (
     problem_extract,
     problem_fields,
     problems,
+    quote_facts,
     reply_gates,
     reply_layout,
     reply_voice,
@@ -1529,6 +1530,8 @@ async def brain_problems(
         context["thinking"] = True
     if (policy.response_rules.get("brain") or {}).get("fact_ask") is True:  # 18.5, opt-in
         context["fact_ask"] = True
+    if (policy.response_rules.get("brain") or {}).get("quote_facts") is True:  # ROFFER07, opt-in
+        context["quote_facts"] = True
     if (policy.response_rules.get("brain") or {}).get("list_guard") is True:  # B1, opt-in
         context["list_guard"] = True
     if box.box_offer_enabled(policy.response_rules):  # Book 5: the Solution Box offer rule
@@ -3637,6 +3640,8 @@ def brain_decision(turn: "ServiceTurn", context: dict[str, Any]) -> None:
         "open_quote": context.get("open_quote"),
         # Book 5: set only when response_rules.brain.box_offer is exactly true.
         "box_offer": box.offer_facts(context) if context.get("box_offer") else None,
+        # ROFFER07: the quote facts still missing; only when brain.quote_facts is exactly true
+        "quote_missing": quote_facts.missing(context) if context.get("quote_facts") else [],
     }
     wants = [str(w) for w in known.get("wants") or []]
     said_now = str(context.get("latest_customer_message", ""))
