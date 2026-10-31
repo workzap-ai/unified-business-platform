@@ -275,3 +275,20 @@ STAFF_FILLER = frozenset(
     """people person persons log aadmi banda bande staff extra more additional employees members
     workers aur hands""".split()
 )
+
+
+# asked when the flow does not know the owner's language (one question mark, English only)
+LANGUAGE_QUESTION = (
+    "Which language would you like me to use: English, Roman Urdu, Urdu script or Arabic?"
+)
+
+# words that name a reply language; checked in this order ("roman urdu" before "urdu")
+LANGUAGE_WORDS = (
+    ("roman_ur", ("roman urdu", "roman", "urdu roman", "رومن", "رومن اردو", "رومن اردو")),
+    ("ur", ("urdu", "اردو", "اردو")),
+    ("ar", ("arabic", "arabi", "عربی", "عربي", "العربية", "عربى")),
+    (
+        "en",
+        ("english", "angrezi", "انگریزی", "انگلش", "انگلیسی", "إنجليزي", "انجليزي", "الانجليزية"),
+    ),
+)
