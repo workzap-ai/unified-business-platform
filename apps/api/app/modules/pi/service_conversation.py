@@ -66,6 +66,9 @@ from app.modules.pi import (
     requirements_read,
     resolution_flow,
     safety,
+    self_review,
+    self_review_checks,
+    self_review_types,
     slot_carry,
     slots,
     solution_ask,
@@ -2021,6 +2024,32 @@ def after_fixed_reply(turn: "ServiceTurn", context: dict[str, Any]) -> None:
     said = str(context.get("latest_customer_message") or "")
     language = str(context.get("reply_language") or "en")
     turn._cost_line = decisions.cost_answer(language, context) if decisions.cost_asked(said) else ""
+
+
+def pre_send_guard(turn: "ServiceTurn", context: dict[str, Any]) -> None:
+    """Two checks of the PS-10 self-review run on the final text, in brain mode: SR-13 (the reply is
+    in the owner's language and script) and SR-16 (a proposal is never worded as done). A reply that
+    fails is never sent: the owner-language fallback of the same gate goes instead, in their script.
+    The other checks need structure this flow does not yet hand over (unknown is not acted on)."""
+    lang = fixed_lines.code(context, script=True)
+    lang = lang if lang in self_review_types.LANGS else "en"
+    draft = self_review_types.DraftResult(
+        owner_language=lang,
+        owner_text=str(context.get("latest_customer_message") or ""),
+        reply_text=turn.reply,
+        implementation_status=str(context.get("implementation_status") or "proposed"),
+    )
+    templates = self_review.fallback_templates()
+    if self_review_checks.sr16(draft).status == self_review_types.FAIL:
+        fallback = templates["proposal"][lang]
+    elif self_review_checks.sr13(draft).status == self_review_types.FAIL:
+        fallback = templates["detail"][lang]
+    else:
+        return
+    turn.reply = with_disclosure(fallback, context, lang)  # a first message still says pi is an AI
+    turn._voice_block = turn._voice_question = ""
+    turn._voice_unmarked = ()
+    turn.awaiting_customer = True
 
 
 def brain_option_voice(turn: "ServiceTurn", context: dict[str, Any]) -> None:
@@ -6583,6 +6612,8 @@ async def compose_service_turn(
             turn.reply, turn._voice_unmarked, turn._voice_language
         )
         turn.reply = put_option_voice(turn.reply, turn._voice_block, turn._voice_question)
+    if context.get("pi_mode") == "brain":
+        pre_send_guard(turn, context)
     latest_language = detect_language(str(context.get("latest_customer_message", "")))
     if latest_language == expected and (
         clearly_other(turn.reply, str(expected or ""))
