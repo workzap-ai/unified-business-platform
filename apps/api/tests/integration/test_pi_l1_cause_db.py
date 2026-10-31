@@ -206,3 +206,38 @@ async def test_understood_count_reads_the_real_noted_context(api, business_db, m
     assert await understood(title="Orders are late", since_text="since March") == 1
     await w.a.close()
     await w.b.close()
+
+
+async def test_the_owner_takes_a_cause_back_through_the_turn(api, business_db, monkeypatch):
+    db = business_db
+    await at_0053(db)
+    pi = await bp.workspace(api, db)
+    ops = [bp.create("Sales are down", "sales", "sales_leads", believes_cause="competitor")]
+    scripted(
+        monkeypatch,
+        turn(
+            reply="Hi, I'm pi, an AI from Workzap. Noted. Anything else?",
+            language="en",
+            problem_ops=ops,
+        ),
+    )
+    await bp.say(pi, "mera competitor sasta hai aur bikri kam hai", "wd-0")
+    conv = await pi.conversation()
+    await db.refresh(conv)
+    scope = pi.scope()
+    (row,) = await problems.noted_context(db, scope, conv.customer_id)
+    assert row["cause_status"] == "owner_said"
+    # the model sends the same note again; the owner takes the cause back
+    await bp.say(pi, "maine galat kaha, wo wajah nahi thi", "wd-1")
+    (row,) = await problems.noted_context(db, scope, conv.customer_id)
+    assert row["cause"] == "" and row["cause_status"] == "withdrawn"
+    assert "cause_hypothesis" not in row
+    assert box_signals.main_cause_known({"noted_problems": [row]}) is False
+    stored = (
+        await db.scalars(select(PiProblem).where(PiProblem.customer_id == conv.customer_id))
+    ).one()
+    await db.refresh(stored, ["cause"])
+    assert stored.cause["status"] == "withdrawn"
+    assert stored.cause["history"][0]["text"] == "competitor"
+    assert stored.person_believes_cause == ""
+    await pi.close()

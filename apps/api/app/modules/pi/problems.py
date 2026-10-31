@@ -568,6 +568,34 @@ class ProblemBook:
             values["expected_outcome"] = outcome
         return values, changed
 
+    async def withdraw_owner_cause(self, message_id: UUID | None, ref: str | None = None) -> bool:
+        """The owner took their cause back. Clears the owner cause of one problem (the one `ref`
+        names, else the only one with an owner cause, else the most revised), keeps the old cause
+        in its history and clears the older person_believes_cause column, so no reader (offer
+        gate, idea context, documents) sees it. Returns whether something was withdrawn."""
+        candidates = []
+        for problem in await self.active():
+            await self.load_requirements(problem)
+            if (problem.cause or {}).get("status") in problem_fields.OWNER_STATUSES:
+                candidates.append(problem)
+        if ref:
+            candidates = [p for p in candidates if short_ref(p.id) == ref]
+        if not candidates:
+            return False
+        problem = max(candidates, key=lambda p: (p.revision, p.number))
+        when = datetime.now(UTC).isoformat(timespec="seconds")
+        new = problem_fields.withdraw_cause(
+            problem.cause, str(message_id) if message_id else None, when
+        )
+        if new is None:
+            return False
+        diff = {"cause": [json_safe(problem.cause), json_safe(new)]}
+        problem.cause = new
+        problem.person_believes_cause = ""
+        problem.revision += 1
+        await self._revise(problem, diff, "cause_withdrawn", "person")
+        return True
+
     async def confirm_cause(self, problem: PiProblem) -> bool:
         """The owner agreed with the cause they said: `owner_said` becomes `confirmed`. A cause pi
         only guessed, or none, is never confirmed (returns False). No caller exists yet: a future
