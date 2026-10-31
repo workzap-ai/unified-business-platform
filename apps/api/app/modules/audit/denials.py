@@ -10,14 +10,17 @@ Covered: `WorkspaceScope.require` denials and the two identity checks in
 Not covered (bare `raise PermissionDenied`, no workspace context): the operator console,
 payment routes, workflows and workspace_agent checks.
 
-Bounds: per workspace, one row per (user, permission, method, route) a minute (200 keys, least
-recently used evicted) and 60 rows a minute, so a workspace can only exhaust its own budget. At
-most MAX_CONCURRENT_WRITES run at once (a saturated moment skips the audit, never the 403). A key
-counts as seen only after its write succeeded, so a failed write is retried by the next denial.
+Bounds: per workspace, one row per (user, permission, method, route) a minute (50 keys, expired
+then least recently used evicted, held as 8-byte digests) and 60 rows a minute, so a workspace can
+only exhaust its own budget. At most MAX_CONCURRENT_WRITES run at once (a saturated moment
+skips the audit, never the 403). A key counts as seen only after its write succeeded,
+so a failed write is retried by the next denial.
 """
 
 import asyncio
+import hashlib
 import logging
+import re
 import time
 from collections import OrderedDict
 from uuid import UUID
@@ -30,11 +33,11 @@ from app.shared.errors import PermissionDenied
 logger = logging.getLogger("platform")
 
 WINDOW_SECONDS = 60.0
-KEYS_PER_TENANT = 200
+KEYS_PER_TENANT = 50
 PER_TENANT_PER_WINDOW = 60
 MAX_TENANTS = 2000  # the least recently active workspace is forgotten (it only loses its throttle)
 MAX_CONCURRENT_WRITES = 4
-WRITE_TIMEOUT_SECONDS = 2.0
+WRITE_TIMEOUT_SECONDS = 1.0
 
 Key = tuple[UUID | None, str, str, str]
 
@@ -45,7 +48,7 @@ class _Tenant:
     def __init__(self, now: float) -> None:
         self.start = now
         self.count = 0
-        self.keys: OrderedDict[Key, float] = OrderedDict()
+        self.keys: OrderedDict[bytes, float] = OrderedDict()
 
 
 _tenants: OrderedDict[UUID, _Tenant] = OrderedDict()
@@ -55,6 +58,11 @@ _in_flight: set[tuple[UUID, Key]] = set()
 def _reset() -> None:
     _tenants.clear()
     _in_flight.clear()
+
+
+def _digest(key: Key) -> bytes:
+    """An 8-byte digest stands in for the key: the table stays small at any route length."""
+    return hashlib.blake2b(repr(key).encode(), digest_size=8).digest()
 
 
 def _state(tenant_id: UUID, now: float) -> _Tenant:
@@ -73,7 +81,7 @@ def _state(tenant_id: UUID, now: float) -> _Tenant:
 def _allow(tenant_id: UUID, key: Key, now: float) -> bool:
     """Whether a denial may be written now. Marks nothing: see `_mark_written`."""
     state = _state(tenant_id, now)
-    seen_at = state.keys.get(key)
+    seen_at = state.keys.get(_digest(key))
     if seen_at is not None and now - seen_at < WINDOW_SECONDS:
         return False
     return state.count < PER_TENANT_PER_WINDOW and (tenant_id, key) not in _in_flight
@@ -82,16 +90,25 @@ def _allow(tenant_id: UUID, key: Key, now: float) -> bool:
 def _mark_written(tenant_id: UUID, key: Key, now: float) -> None:
     state = _state(tenant_id, now)
     state.count += 1
-    state.keys[key] = now
-    state.keys.move_to_end(key)
+    digest = _digest(key)
+    state.keys[digest] = now
+    state.keys.move_to_end(digest)
+    while state.keys and now - next(iter(state.keys.values())) >= WINDOW_SECONDS:
+        state.keys.popitem(last=False)  # oldest first: a key older than the window is spent
     while len(state.keys) > KEYS_PER_TENANT:
         state.keys.popitem(last=False)
+
+
+_DIGITS = re.compile(r"\d{6,}")
+_PHONEISH = re.compile(r"\d(?:[\s().-]*\d){6,}")
 
 
 def _safe_label(label: str | None) -> str | None:
     """display_name is free text the user typed (never defaulted to the email), but it may be
     an address: such a label is replaced, so no email lands in the audit row."""
-    if label and "@" in label:
+    if label is None:
+        return None
+    if not label or "@" in label or _DIGITS.search(label) or _PHONEISH.search(label):
         return "user"
     return label
 

@@ -290,3 +290,43 @@ def test_email_like_actor_label_is_redacted():
     assert _safe_label("jo@example.com") == "user"
     assert _safe_label("Jo Smith") == "Jo Smith"
     assert _safe_label(None) is None
+
+
+def test_phone_or_id_like_labels_are_redacted():
+    from app.modules.audit.denials import _safe_label
+
+    for bad in ("+92 300 1234567", "0300-1234567", "(042) 111 222 333", "id 4210112345671", ""):
+        assert _safe_label(bad) == "user", bad
+    assert _safe_label("Room 12 Team") == "Room 12 Team"
+
+
+def test_throttle_memory_is_bounded_at_realistic_key_lengths():
+    import tracemalloc
+
+    denials._reset()
+    route = "/api/v1/workspaces/{workspace_id}/integrations/{provider}/connections/{id}/sync"
+    tracemalloc.start()
+    before = tracemalloc.get_traced_memory()[0]
+    for t in range(denials.MAX_TENANTS):
+        tenant = UUID(int=t + 1)
+        for i in range(denials.KEYS_PER_TENANT):
+            k = (
+                UUID(int=i + 1),
+                f"customers.write, orders.write, billing.manage{i}",
+                "POST",
+                route,
+            )
+            denials._mark_written(tenant, k, 100.0)
+    used = tracemalloc.get_traced_memory()[0] - before
+    tracemalloc.stop()
+    denials._reset()
+    assert used < 40 * 1024 * 1024, used
+
+
+def test_stale_keys_age_out_within_a_tenant():
+    denials._reset()
+    tenant = UUID(int=7)
+    for i in range(10):
+        denials._mark_written(tenant, key(i), 100.0)
+    denials._mark_written(tenant, key(99), 100.0 + denials.WINDOW_SECONDS + 1)
+    assert len(denials._tenants[tenant].keys) == 1
