@@ -13,7 +13,7 @@ import logging
 import re
 from typing import Any
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 from app.modules.pi import taxonomy
 from app.modules.pi.problems import ProblemNote, ProblemOp, check_ops
@@ -49,6 +49,11 @@ business problems in it, in the exact shape asked for. Rules:
   "pichle 2 mahine se"); money_text is the amount with its number ("4,000 rupees a day");
   of_total is "2 of 4 shops"; frequency_text is how often ("every day"); impact_types are chosen
   from lost_sales, lost_money, lost_time, customer_dissatisfaction, stress, other.
+- budget, staff, deadline, cannot_change (things they said they cannot change), tried (a list of
+  what they already tried, each {"what", "outcome"}), cause_text and cause_words, expected_outcome:
+  only when the person STATED them, in their words; never invent, unknown stays empty. cause_text
+  is a cause the person gave themselves, with cause_said true and cause_words their own words,
+  verbatim, that say it. A cause you worked out yourself is never written here.
 - Never write a person's name; use roles. Do not repeat a problem already noted.
 Return the list of problems as the field "found"."""
 
@@ -73,6 +78,25 @@ class SimpleNote(BaseModel):
     since_text: str = ""
     money_text: str = ""
     impact_types: list[str] = Field(default_factory=list)
+    # B2a (L1-2): only what the owner stated; empty means not said. The cause is the owner's only
+    # when cause_said and cause_words (their own words) are backed by their text at save time.
+    budget: str = ""
+    staff: str = ""
+    deadline: str = ""
+    cannot_change: list[str] = Field(default_factory=list)
+    tried: list[dict[str, Any]] = Field(default_factory=list)
+    cause_text: str = ""
+    cause_said: bool = False
+    cause_words: list[str] = Field(default_factory=list)
+    expected_outcome: str = ""
+
+    @field_validator("tried", mode="before")
+    @classmethod
+    def _tried_entries(cls, value: Any) -> Any:
+        """A model may list what was tried as plain strings: each becomes {"what": ...}."""
+        if not isinstance(value, list):
+            return []
+        return [{"what": v} if isinstance(v, str) else v for v in value if v]
 
     def to_note(self) -> ProblemNote:
         return ProblemNote(**self.model_dump())

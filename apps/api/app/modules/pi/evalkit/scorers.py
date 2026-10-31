@@ -1,7 +1,7 @@
 """Code scorers for understanding (no model). A `record` is what pi saved for one problem:
 {"title", "user_words": [..], "summary", "money_text", "cause", "cause_status"}.
-`cause_status` is "owner_said", "hypothesis" or "confirmed"; a confirmed cause that the owner never
-said is the unsupported-cause failure.
+`cause_status` is "owner_said", "hypothesis" or "confirmed"; an owner_said or confirmed cause
+that the owner never said is the unsupported-cause failure.
 """
 
 import re
@@ -81,7 +81,7 @@ def score_case(case: dict[str, Any], records: list[dict[str, Any]]) -> dict[str,
     bad_cause = [
         r.get("title", "")
         for r in records
-        if r.get("cause_status") == "confirmed"
+        if r.get("cause_status") in ("confirmed", "owner_said")
         and not _stems(r.get("cause", "")) <= _stems(owner_words)
     ]
     hypotheses = [

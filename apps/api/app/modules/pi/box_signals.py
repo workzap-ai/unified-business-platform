@@ -102,10 +102,19 @@ def in_a_hurry(message: str) -> bool:
     return bool(IN_A_HURRY.search(" ".join((message or "").split())))
 
 
+def owner_stated(problem: dict[str, Any]) -> bool:
+    """A noted cause counts only when the owner said it: its status is owner_said or confirmed.
+    A pi_inferred cause (the model's guess) never counts. No `cause_status` (or an empty one) is a
+    problem dict from before the status existed (and the older database column, which is only
+    written from the owner's own words), so the text decides."""
+    status = problem.get("cause_status")
+    return not status or status in ("owner_said", "confirmed")
+
+
 def main_cause_known(context: dict[str, Any]) -> bool:
     """Whether the cause of the main problem is known (spec 5.4, "never offer when it is unknown").
     The main problem is the one the owner ranked first, else the first noted. Known when the owner
-    gave their own cause for it, or pi's diagnosis of it has causes and no open question. With
+    said their own cause for it (owner_said or confirmed, never pi's guess), or pi's diagnosis of it has causes and no open question. With
     nothing noted there is no main problem to be unsure of, so it does not hold the offer back.
     A `main_cause_known` key in the brief, when present, overrides."""
     brief = context.get("brief") or {}
@@ -116,7 +125,7 @@ def main_cause_known(context: dict[str, Any]) -> bool:
         return True
     ranked = sorted((p for p in noted if p.get("rank")), key=lambda p: int(p["rank"]))
     main = (ranked or noted)[0]
-    if str(main.get("cause") or "").strip():
+    if str(main.get("cause") or "").strip() and owner_stated(main):
         return True
     diag = brief.get("expert_diag")
     return bool(isinstance(diag, dict) and diag.get("causes") and not diag.get("question"))

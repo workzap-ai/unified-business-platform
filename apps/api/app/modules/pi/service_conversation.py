@@ -950,6 +950,11 @@ problem: ask what it would fix and note that; keep the wish in requested_solutio
   category from the list below, subtype (snake_case), where, of_total, frequency, since_text,
   impact_types, severity_stated (only if they said it), workaround, systems, believes_cause
   (what they think the cause is: never a judgement about a named person), confidence 0 to 1.
+  Only when the owner STATED them (never invent, unknown stays empty): budget, staff, deadline,
+  cannot_change (a list of things they said they cannot change), tried (a list of {what, outcome}
+  they already tried), cause_text with cause_said=true and cause_words (their own words, verbatim,
+  that say the cause) only when they said the cause themselves, expected_outcome (what they hope
+  to see). A cause you worked out yourself is never cause_said.
 - One message with several problems with different symptoms: one create each. One symptom with
   several facets (stock out in shop B and D) is one problem. "Kabhi A, kabhi B" or "A, aur B bhi"
   names two things going wrong: two creates. What the owner feels as the result (orders arrive
@@ -972,6 +977,8 @@ problem: ask what it would fix and note that; keep the wish in requested_solutio
   in problem_ops; never announce that you noted it.
 - noted_problems lists what is already noted (ref, title, group, status, missing). Never ask
   for anything not in "missing" of the problem you are on, and never re-note a problem.
+- In noted_problems, "cause" is only what the owner said. "cause_hypothesis" is pi's own guess,
+  never theirs: never state it as their words or as a known cause, never build on it as fact.
 - If shape_question_due is true, this reply's ONE question must be that one, asked once, naturally
   and in their language ("What kind of business is it?", "Aap ka business kis tarah ka hai?"):
   it is how pi learns the trade, and everything the trade teaches (the right ideas, scope and
@@ -3639,6 +3646,34 @@ async def figure_fix_for(
     return figure_correction.numeric_correction(body, [str(t) for t in reversed(list(earlier))])
 
 
+async def owner_text_for(
+    session: AsyncSession, scope: WorkspaceScope, conversation: PiConversation, message: PiMessage
+) -> str:
+    """The owner's own words for judging a cause (L1-1): this message and the earlier customer
+    messages of the chat (a burst is stored message by message, so its earlier parts are here;
+    a voice note's body is its transcript, which is what the owner said). Only text and voice
+    bodies count: image and file descriptions are system English, and pi's own replies never do.
+    Newest 30 at most, oldest first."""
+    stmt = select(PiMessage.body).where(
+        PiMessage.tenant_id == scope.tenant_id,
+        PiMessage.environment_id == scope.environment_id,
+        PiMessage.conversation_id == conversation.id,
+        PiMessage.direction == "inbound",
+        PiMessage.message_type.in_(("text", "audio")),
+    )
+    if message.created_at is not None:
+        stmt = stmt.where(PiMessage.created_at <= message.created_at)
+    rows = [
+        str(t)
+        for t in await session.scalars(stmt.order_by(PiMessage.created_at.desc()).limit(30))
+        if t
+    ]
+    own = message.body if message.message_type in ("text", "audio") and message.body else ""
+    if own and own not in rows:
+        rows.insert(0, str(own))
+    return chr(10).join(reversed(rows))
+
+
 async def note_problems(
     session: AsyncSession,
     scope: WorkspaceScope,
@@ -3662,6 +3697,7 @@ async def note_problems(
             turn.language,
             await link_floor(session, scope, conversation.customer_id),
             figure_fix=fix,
+            owner_text=await owner_text_for(session, scope, conversation, message),
         )
         noted = bool(applied.created)
         if box_on and applied.created:
