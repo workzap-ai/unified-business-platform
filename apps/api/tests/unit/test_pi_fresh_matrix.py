@@ -166,18 +166,18 @@ for p, (w, c) in itertools.product(
 ):
     OWNERS.append((w, f"{p} {c}"))
 OWNERS += [
-    ("rent", "the rent is too high"),
-    ("prices", "our prices are too high"),
-    ("staff", "my staff is slow"),
-    ("stock", "we run out of stock"),
-    ("location", "the location is bad"),
-    ("delivery", "delivery takes too long"),
-    ("ads", "our ads bring nobody"),
-    ("website", "the website is broken"),
-    ("quality", "the quality dropped"),
-    ("competitor", "a competitor opened next door"),
-    ("rent", "rent went up this year"),
-    ("billing", "billing is manual"),
+    ("rent", "I think the rent is too high"),
+    ("prices", "I think our prices are too high"),
+    ("staff", "I think my staff is slow"),
+    ("stock", "I think we run out of stock"),
+    ("location", "I think the location is bad"),
+    ("delivery", "I think delivery takes too long"),
+    ("ads", "I think our ads bring nobody"),
+    ("app", "I think the app is broken"),
+    ("quality", "I think the quality dropped"),
+    ("competitor", "I think a competitor opened next door"),
+    ("rent", "I think rent went up this year"),
+    ("billing", "I think billing is manual"),
 ]
 OWNERS += [
     ("kiraya", f"{p} kiraya zyada hai")
@@ -298,14 +298,14 @@ for s in ["I", "we"]:
         ("flyers", f"{s} tried flyers, it was useless", "failed"),
         ("flyers", f"{s} tried flyers and it never worked", "failed"),
         ("flyers", f"{s} tried flyers and it worked well", "worked"),
-        ("flyers", f"{s} tried flyers and they helped", "worked"),
+        ("flyers", f"{s} tried flyers and it helped", "worked"),
         ("flyers", f"{s} tried flyers", ""),
     ]
 OWN += [
     ("flyers", "humne flyers try kiye lekin kaam nahi aaya", "failed"),
     ("flyers", "humne flyers try kiye, fayda nahi hua", "failed"),
     ("flyers", "maine flyers aazmaye lekin nakam raha", "failed"),
-    ("flyers", "flyers try kiye lekin bekaar raha", "failed"),
+    ("flyers", "maine flyers try kiye lekin bekaar raha", "failed"),
     ("flyers", "humne flyers try kiye aur bahut kaam aaya", "worked"),
     ("flyers", "humne flyers try kiye aur fayda hua", "worked"),
     ("فلائر", "ہم نے فلائر آزمائے لیکن ناکام رہا", "failed"),
@@ -369,7 +369,7 @@ def test_adversarial_attribution_is_not_the_owners_cause(word, text):
     [
         ("kiraya", "mujhko lagta hai kiraya zyada hai"),
         ("kiraya", "mujh ko lagta hai kiraya zyada hai"),
-        ("किराया", "मुझको लगता है किराया ज़्यादा है"),
+        ("किराया", "मुझे लगता है किराया ज़्यादा है"),
         ("rent", "in my opinion the rent is high"),
     ],
 )

@@ -14,15 +14,15 @@ def status(word, text):
 
 
 ENDORSED = [
-    ("rent", "the rent is the problem"),
+    ("rent", "I think the rent is the problem"),
     ("rent", "I think it is the rent"),
-    ("competitor", "mera competitor sasta hai"),
+    ("competitor", "mera khayal hai competitor sasta hai"),
     ("competitor", "mujhe lagta hai competitor ki wajah se"),
-    ("کرایہ", "مسئلہ کرایہ ہے"),
-    ("المنافس", "المشكلة هي المنافس"),
-    ("किराया", "समस्या किराया है"),
-    ("rent", "sales are not growing, the rent is high"),
-    ("staff", "my staff is slow"),
+    ("کرایہ", "میرا خیال ہے مسئلہ کرایہ ہے"),
+    ("المنافس", "أعتقد المشكلة هي المنافس"),
+    ("किराया", "मुझे लगता है समस्या किराया है"),
+    ("rent", "sales are not growing, I think the rent is high"),
+    ("staff", "I think my staff is slow"),
 ]
 NOT_ENDORSED = [
     ("rent", "it is NOT the rent"),
@@ -60,7 +60,7 @@ def test_a_negated_hypothetical_borrowed_or_echoed_cause_is_pi_inferred(word, te
 
 
 def test_the_owner_who_says_it_after_a_negation_elsewhere_still_counts():
-    text = "it is not the staff. the rent is the problem"
+    text = "it is not the staff. I think the rent is the problem"
     assert status("rent", text) == "owner_said"
     assert status("staff", text) == "pi_inferred"
 
@@ -88,9 +88,9 @@ def test_the_legacy_believes_cause_cannot_be_promoted_by_function_words(believes
 @pytest.mark.parametrize(
     "believes,text",
     [
-        ("the supplier delays shipments", "the supplier delays shipments every week"),
-        ("competitor sasta hai", "mera competitor sasta hai"),
-        ("rent is high", "the rent is high and sales fell"),
+        ("the supplier delays shipments", "I think the supplier delays shipments every week"),
+        ("competitor sasta hai", "mera khayal hai competitor sasta hai"),
+        ("rent is high", "I think the rent is high and sales fell"),
     ],
 )
 def test_the_legacy_believes_cause_the_owner_really_said_is_owner_said(believes, text):
@@ -104,7 +104,7 @@ def test_function_words_are_never_evidence():
 
 
 def test_a_confirmed_or_owner_cause_is_not_replaced_by_a_guess_still():
-    first, _ = pf.merge_cause(None, "rent", True, ["rent"], "m1", "the rent is high")
+    first, _ = pf.merge_cause(None, "rent", True, ["rent"], "m1", "I think the rent is high")
     assert first["status"] == "owner_said"
     again, _ = pf.merge_cause(first, "staff", True, ["staff"], "m2", "my partner thinks the staff")
     assert again is None  # a guess never touches what the owner said

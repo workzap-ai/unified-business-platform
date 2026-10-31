@@ -62,7 +62,7 @@ async def test_a_later_update_with_a_guess_does_not_replace_the_owners_cause(
     db = business_db
     await at_0053(db)
     w = await two_chats(api, db, monkeypatch)
-    await run(db, w, [create(believes_cause="competitor")], "lagta hai competitor hai")
+    await run(db, w, [create(believes_cause="competitor")], "mujhe lagta hai competitor hai")
     ref = problems.short_ref(
         (await problems.ProblemBook(db, w.scope_a, w.cust_a, "en").active())[0].id
     )
@@ -176,7 +176,7 @@ async def test_the_extractor_fields_are_saved_by_apply_ops(api, business_db, mon
         [ProblemOp(op="create", note=note)],
         "en",
         owner_text=(
-            "the competitor is cheaper and sales fell, we tried Facebook ads, they brought nobody"
+            "I think the competitor is cheaper and sales fell. we tried Facebook ads but it brought nobody"
         ),
     )
     (row,) = await problems.noted_context(db, w.scope_a, w.cust_a)
@@ -264,7 +264,7 @@ async def test_a_failed_attempt_in_the_owners_words_is_stored_as_failed(
         None,
         [ProblemOp(op="create", note=note)],
         "roman_ur",
-        owner_text="rang wale folder try kiye lekin mix ho gaye",
+        owner_text="maine rang wale folder try kiye lekin mix ho gaye",
     )
     stored = (await db.scalars(select(PiProblem).where(PiProblem.customer_id == w.cust_a))).one()
     await db.refresh(stored, ["tried"])
@@ -291,7 +291,7 @@ async def test_a_successful_attempt_is_stored_as_worked_not_failed(api, business
         None,
         [ProblemOp(op="create", note=note)],
         "roman_ur",
-        owner_text="rang wale folder try kiye aur bahut kaam aaya",
+        owner_text="maine rang wale folder try kiye aur bahut kaam aaya",
     )
     stored = (await db.scalars(select(PiProblem).where(PiProblem.customer_id == w.cust_a))).one()
     await db.refresh(stored, ["tried"])

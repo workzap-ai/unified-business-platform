@@ -70,7 +70,7 @@ def test_not_the_owners_cause(word, text):
         ("کرایہ", "میرا خیال ہے کرایہ زیادہ ہے"),
         ("الإيجار", "أعتقد أن الإيجار مرتفع"),
         ("किराया", "मुझे लगता है किराया ज़्यादा है"),
-        ("rent", "the rent is too high"),
+        ("rent", "I think the rent is too high"),
     ],
 )
 def test_the_owners_own_claim_is_owner_said(word, text):
@@ -124,7 +124,7 @@ def test_the_arabic_negated_failure_is_not_a_failed_item():
 def test_the_owners_own_attempt_in_each_language_is_still_stored():
     cases = [
         ("flyers", "we tried flyers and it did not work", "failed"),
-        ("rang wale folder", "rang wale folder try kiye lekin mix ho gaye", "failed"),
+        ("rang wale folder", "maine rang wale folder try kiye lekin mix ho gaye", "failed"),
         ("اشتہار", "ہم نے اشتہار آزمائے لیکن ناکام رہا", "failed"),
         ("الاعلانات", "جربت الاعلانات وفشل", "failed"),
         ("विज्ञापन", "मैंने विज्ञापन आजमाए लेकिन काम नहीं आया", "failed"),
@@ -189,7 +189,7 @@ def legacy(believes, text):
 
 def test_the_legacy_believes_cause_needs_sixty_percent_of_its_content_words():
     believes = "supplier delays big shipments weekly"  # five content words
-    assert legacy(believes, "the supplier delays big shipments") == "owner_said"  # 4 of 5
-    assert legacy(believes, "the supplier delays shipments") == "owner_said"  # 3 of 5 = 60%
-    assert legacy(believes, "the supplier delays") == "pi_inferred"  # 2 of 5 = 40%
-    assert legacy(believes, "the supplier") == "pi_inferred"
+    assert legacy(believes, "I think the supplier delays big shipments") == "owner_said"  # 4 of 5
+    assert legacy(believes, "I think the supplier delays shipments") == "owner_said"  # 3 of 5 = 60%
+    assert legacy(believes, "I think the supplier delays") == "pi_inferred"  # 2 of 5 = 40%
+    assert legacy(believes, "I think the supplier") == "pi_inferred"

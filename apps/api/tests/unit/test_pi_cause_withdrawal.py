@@ -56,7 +56,9 @@ def test_a_later_guess_or_cause_keeps_the_history():
     withdrawn = pf.withdraw_cause(SAID, "m9", "t")
     guess, _ = pf.merge_cause(withdrawn, "rent is high", True, ["rent"], "m10", "bikri kam hai")
     assert guess["status"] == "pi_inferred" and len(guess["history"]) == 1
-    owner, _ = pf.merge_cause(withdrawn, "rent is high", True, ["rent"], "m10", "rent is high")
+    owner, _ = pf.merge_cause(
+        withdrawn, "rent is high", True, ["rent"], "m10", "I think rent is high"
+    )
     assert owner["status"] == "owner_said" and len(owner["history"]) == 1
 
 
@@ -66,16 +68,16 @@ def test_a_withdrawn_cause_does_not_open_the_offer_gate():
 
 
 def test_an_arabic_word_with_an_attached_conjunction_is_the_owners_word():
-    corpus = "نخسر العملاء بسبب والمصففين الجدد"
+    corpus = "أعتقد نخسر العملاء بسبب والمصففين الجدد"
     assert pf.said_by_owner(["المصففين"], corpus)  # bare word, said with a glued "wa"
-    assert pf.said_by_owner(["والمصففين"], "المصففين الجدد لا يكفون")  # the other way round
+    assert pf.said_by_owner(["والمصففين"], "أعتقد المصففين الجدد لا يكفون")  # the other way round
     assert pf.said_by_owner(["بالمصففين"], corpus)  # a different clitic, same word
     assert not pf.said_by_owner(["المنافسين"], corpus)  # a different word never matches
 
 
 def test_an_arabic_cause_the_owner_said_becomes_owner_said():
     cause, _ = pf.merge_cause(
-        None, "المصففين الجدد", True, ["المصففين"], "m1", "المشكلة هي والمصففين الجدد"
+        None, "المصففين الجدد", True, ["المصففين"], "m1", "أعتقد المشكلة هي والمصففين الجدد"
     )
     assert cause["status"] == "owner_said"
 

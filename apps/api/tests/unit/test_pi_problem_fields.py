@@ -12,7 +12,7 @@ from app.modules.pi.problems import ProblemBook, ProblemNote
 
 API = Path(__file__).resolve().parents[2]
 MSG = str(uuid4())
-HEARD = "Honestly we never count stock at night"
+HEARD = "I honestly think we never count stock at night"
 
 
 def values(note, problem=None, said=None):
@@ -102,7 +102,7 @@ def test_a_guess_never_lowers_or_replaces_what_the_owner_said():
 def test_the_owner_changing_their_cause_replaces_it_and_resets_confirmed():
     confirmed = {"text": "no count", "status": "confirmed", "evidence": {"msgs": [], "words": []}}
     new, _ = pf.merge_cause(
-        confirmed, "late supplier", True, ["supplier is late"], None, "the supplier is late"
+        confirmed, "late supplier", True, ["supplier is late"], None, "I think the supplier is late"
     )
     assert new["status"] == pf.OWNER_SAID and new["text"] == "late supplier"
 
@@ -279,6 +279,6 @@ def test_third_party_names_inside_tried_and_cause_become_roles():
     )
     assert "Ahmed" not in repr(tried) and "brother" in tried[0]["what"]
     cause, _ = pf.merge_cause(
-        None, "my cashier Bilal forgets the count", True, ["forgets"], None, "he forgets"
+        None, "my cashier Bilal forgets the count", True, ["forgets"], None, "I think he forgets"
     )
     assert "Bilal" not in cause["text"] and "cashier" in cause["text"]

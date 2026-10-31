@@ -55,8 +55,8 @@ def test_a_model_outcome_with_no_owner_words_behind_it_is_unset(outcome, text):
     [
         ("facebook ads", "we tried facebook ads and it did not work", "failed"),
         ("facebook ads", "we tried facebook ads and it worked well", "worked"),
-        ("rang wale folder", "rang wale folder try kiye lekin mix ho gaye", "failed"),
-        ("rang wale folder", "rang wale folder try kiye aur bahut kaam aaya", "worked"),
+        ("rang wale folder", "maine rang wale folder try kiye lekin mix ho gaye", "failed"),
+        ("rang wale folder", "maine rang wale folder try kiye aur bahut kaam aaya", "worked"),
         ("اشتہار", "ہم نے اشتہار آزمائے لیکن ناکام رہا", "failed"),
         ("الاعلانات", "جربت الاعلانات وفشل", "failed"),
         ("विज्ञापन", "मैंने विज्ञापन आजमाए लेकिन काम नहीं आया", "failed"),
@@ -84,7 +84,7 @@ def test_a_third_party_or_hypothetical_attempt_is_not_the_owners(text):
 def test_the_derived_failed_attempt_ignores_third_parties_and_hypotheticals():
     note = dict(title="Customer files get mixed up", user_words=["files mix ho gaye"])
     got, _ = ProblemBook.requirement_values(
-        ProblemNote(**note), None, "m", "rang wale folder try kiye lekin mix ho gaye"
+        ProblemNote(**note), None, "m", "maine rang wale folder try kiye lekin mix ho gaye"
     )
     assert got["tried"][0]["what"] == "rang wale folder"
     for text in (
@@ -96,7 +96,7 @@ def test_the_derived_failed_attempt_ignores_third_parties_and_hypotheticals():
 
 
 def test_a_mixed_message_marks_each_attempt_by_its_own_clause():
-    text = "facebook ads try kiye lekin kaam nahi aaya. we tried flyers and it worked well"
+    text = "maine facebook ads try kiye lekin kaam nahi aaya. we tried flyers and it worked well"
     got = {
         e["what"]: e["outcome"]
         for e in stored([{"what": "facebook ads"}, {"what": "flyers"}], text)

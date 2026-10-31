@@ -42,9 +42,11 @@ FAIL_STRONG = re.compile(
     r"|ناکام|(?:فائدہ|فایدہ|اثر|نتیجہ)\s+(?:نہیں|نھیں)|کام\s+نہیں\s+(?:آیا|کیا)"
     r"|لم\s+[يت](?:نجح|فد|نفع)|ما\s+(?:نفع|نجح|أفاد|افاد)|و?فشل|دون\s+جدوى|بدون\s+فائدة"
     r"|काम\s+नहीं\s+आया|(?:फायदा|फ़ायदा|असर|नतीजा)\s+नहीं|असफल|नाकाम"
-    r"|\b(?:stopped working|then it stopped|then (?:it )?(?:failed|died|dropped|faded)|wore off|fizzled"
+    r"|\b(?:stopped working|then it stopped|then (?:it )?(?:failed|died|dropped|faded)|wore off"
+    r"|fizzled"
     r"|petered out|worked (?:only )?(?:at first|initially|for a (?:week|while|few days|bit)))\b"
-    r"|\bphir band ho (?:gaya|gayi|gaye)\b|\bbaad mein (?:kaam )?nahi\b|\bkuch din (?:chala|kaam kiya) phir\b"
+    r"|\bphir band ho (?:gaya|gayi|gaye)\b|\bbaad mein (?:kaam )?nahi\b"
+    r"|\bkuch din (?:chala|kaam kiya) phir\b"
 )
 # 'failed', 'useless' and the like count only beside an attempt word that comes before them, and
 # never as "failed to ..." (something that did not happen, not an outcome).
@@ -56,7 +58,9 @@ FAIL_BESIDE_ATTEMPT = re.compile(
     r"|बेकार\s+(?:रहा|निकला)|गलत\s+निकला|मिक्स\s+हो\s+गए"
 )
 WORKED = re.compile(
-    r"\b(?:it worked|worked well|that worked|worked|which did|that did|helped|brought (?:in )?(?:some |more )?(?:customers|sales|orders)|kaam aaya|kaam aaye|faida hua|fayda hua|asar hua|chal gaye|chal gaya|chal gayi|chale|chala|kaam kar gaye|kaam kar gaya)\b"
+    r"\b(?:it worked|worked well|that worked|worked|which did|that did|helped"
+    r"|brought (?:in )?(?:some |more )?(?:customers|sales|orders)|kaam aaya|kaam aaye|faida hua"
+    r"|fayda hua|asar hua|chal gaye|chal gaya|chal gayi|chale|chala|kaam kar gaye|kaam kar gaya)\b"
     r"|چل گئے|چل گیا|چل گئی|کام کر گئے|کام کر گیا|चल गए|चल गया|चले|काम कर गए|काम आए|نجحت"
     r"|فائدہ\s+ہوا|بہت\s+فائدہ|نفع|نجح|काम\s+आया|फायदा\s+हुआ"
 )
@@ -355,10 +359,12 @@ _SEGMENT = re.compile(
     r"(?<![؀-ۿऀ-ॿ])(?:مگر|لکن|لیکن|لكن|ثم|पर|लेकिन|मगर|फिर)(?![؀-ۿऀ-ॿ])"
 )
 _ALL = re.compile(
-    r"\b(?:both|neither|none of (?:them|these)|all of them|dono|donon|sab)\b|دونوں|كلاهما|كلتاهما|दोनों"
+    r"\b(?:both|neither|none of (?:them|these)|all of them|dono|donon|sab)\b"
+    r"|دونوں|كلاهما|كلتاهما|दोनों"
 )
 _ELLIPSIS_NO = re.compile(
-    r"\b(?:did not|didn't|didnt|do not|don't|could not|couldn't|nahi|nahin|nhi)\s*$|نہیں\s*$|नहीं\s*$"
+    r"\b(?:did not|didn't|didnt|do not|don't|could not|couldn't|nahi|nahin|nhi)\s*$"
+    r"|نہیں\s*$|नहीं\s*$"
 )
 
 
