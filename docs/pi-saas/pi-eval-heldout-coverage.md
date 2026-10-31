@@ -105,3 +105,50 @@ unchanged: no Held-out case was added, changed or read for this work.
 Scripted result for Development (reference notes, no model): problem recall 100%, precision 100%, figures
 kept 100%, corrections kept 100%, 0 unsupported causes. Every new reference note was checked to survive the
 real extraction path (titles at most 8 words, owner words and a valid category present).
+
+## 7. Development set: second FT-A1 round (2026-10-31)
+
+Development grew from 69 to 98 cases (161 cases in all: 98 Development, 60 Held-out, 3 Regression). Target
+of the round: Hindi 15, Arabic 15, Urdu script 20; result Hindi 16, Arabic 16, Urdu script 21, plus 3 Roman
+Urdu cases. No Held-out case was added, changed, read or printed. The 132 earlier cases are byte-identical
+(the diff of `extraction.json` is additions only, checked by comparing the parsed list with the one in git).
+
+**Honest limits.** These 29 cases are **agent-drafted, unreviewed**: one author (an AI agent), no native
+speaker or human reviewer has read them, and the reference notes were written by that same author. Each new
+case says so in `recorded.origin`. A human reviewer must still check the wording, the labels and the
+category of every case before any number from them is quoted outside the team (checklist below).
+
+- 29 new cases, new text, 29 industries from the 211-industry list that no earlier case used (one case each), written as realistic owner messages: single problems, lists of 3 to
+  6, rants, a voice-transcript style message without punctuation (Hindi and Urdu), corrections in each
+  language ("10 nahi, 100" style), figures with local magnitude words (lakh, crore, hazar and their scripts),
+  English words mixed into Hindi, Arabic and Urdu, constraint cases (budget, staff, "cannot change X"), one
+  multi-turn case per script language, and one Arabic case that uses Arabic-Indic digits (٢٠ to ٢٠٠), which no case
+  had before.
+- Ids that hashed into Held-out got a number suffix (`genset_correction_hi_4`, `bus_single_ar_2` ...); the rule
+  is unchanged and the number carries no meaning. All 29 are Development by `splits.split_of`.
+
+| axis (Development, 98 cases) | count |
+|---|---|
+| language | English 24, Roman Urdu 21, Urdu script 21, Arabic 16, Hindi 16 |
+| kind | single 26, list 24, correction 13, rant 11, multi-turn 9, constraints 8, mixed 7 |
+| expected problems / cases with two or more | 182 / 49 |
+| figures to keep / corrections of a figure | 71 / 13 |
+| constraints labelled | 8 cases, 23 constraints |
+| industries | 78 |
+
+Scripted replay of the 29 new cases (reference notes through the real extraction path, no model, no
+network, no database): n = Hindi 8, Arabic 8, Urdu script 10, Roman Urdu 3; problem recall 100%, precision
+100%, figures kept 100%, corrections kept 100%, constraints kept 100% in each, 0 unsupported causes. **This is
+a check of the code and the scorers, not of any extractor**: the replay returns the author's own notes, so a
+language cannot fail it. Nothing in the extraction path is a non-model fallback (`problem_extract.extract`
+returns [] when the model call fails), so there is no extractor to fail a language without a model; the weak
+non-Latin extraction the plan expects can only be shown by the real-model sample (FT-REPLAY). The one
+language-dependent code gate in the path was run on the new messages: `wants_extraction` (5 or more words)
+is true for 29 of 29, and `thin_message` is true for 0 of 29.
+
+What a human reviewer must check: (1) the wording reads as a native owner would write it, in particular the
+Hindi spelling with nukta and the Arabic and Urdu mixed-language forms; (2) each `any` keyword and each
+labelled figure matches what the owner really said; (3) the category of each note; (4) the constraint
+strings are the owner's words; (5) that the cases with a cause (`juice_single_hi`, `fishmkt_single_ur`,
+`aircon_correction_ru`) are labelled correctly as owner-said or hypothesis only; (6) that Devanagari
+figures are only checked by their number because the scorer splits Devanagari at its vowel signs (unchanged).

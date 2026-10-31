@@ -9,7 +9,7 @@ Groups under 3 cases are reported as not yet measured.
 
 | group | cases | problem recall | precision | figures kept | corrections kept | constraints kept | unsupported causes |
 |---|---|---|---|---|---|---|---|
-| development | 69 | 100% | 100% | 100% | 100% | 100% | 0 |
+| development | 98 | 100% | 100% | 100% | 100% | 100% | 0 |
 | held_out | 60 | 100% | 100% | 100% | 100% | 100% | 0 |
 | regression | 3 | 100% | 100% | 100% | 100% | n/a | 0 |
 
@@ -17,23 +17,23 @@ Groups under 3 cases are reported as not yet measured.
 
 | group | cases | problem recall | precision | figures kept | corrections kept | constraints kept | unsupported causes |
 |---|---|---|---|---|---|---|---|
-| ar | 12 | 100% | 100% | 100% | 100% | 100% | 0 |
+| ar | 20 | 100% | 100% | 100% | 100% | 100% | 0 |
 | en | 52 | 100% | 100% | 100% | 100% | 100% | 0 |
-| hi | 8 | 100% | 100% | 100% | 100% | 100% | 0 |
-| roman_ur | 41 | 100% | 100% | 100% | 100% | 100% | 0 |
-| ur | 19 | 100% | 100% | 100% | 100% | 100% | 0 |
+| hi | 16 | 100% | 100% | 100% | 100% | 100% | 0 |
+| roman_ur | 44 | 100% | 100% | 100% | 100% | 100% | 0 |
+| ur | 29 | 100% | 100% | 100% | 100% | 100% | 0 |
 
 ## Case kind
 
 | group | cases | problem recall | precision | figures kept | corrections kept | constraints kept | unsupported causes |
 |---|---|---|---|---|---|---|---|
-| constraints | 9 | 100% | 100% | 100% | n/a | 100% | 0 |
-| correction | 18 | 100% | 100% | 100% | 100% | n/a | 0 |
-| list | 37 | 100% | 100% | 100% | n/a | n/a | 0 |
-| mixed | 7 | 100% | 100% | 100% | n/a | n/a | 0 |
-| multi_turn | 9 | 100% | 100% | 100% | n/a | n/a | 0 |
-| rant | 10 | 100% | 100% | 100% | n/a | n/a | 0 |
-| single | 42 | 100% | 100% | 100% | n/a | n/a | 0 |
+| constraints | 12 | 100% | 100% | 100% | n/a | 100% | 0 |
+| correction | 22 | 100% | 100% | 100% | 100% | n/a | 0 |
+| list | 44 | 100% | 100% | 100% | n/a | n/a | 0 |
+| mixed | 10 | 100% | 100% | 100% | n/a | n/a | 0 |
+| multi_turn | 12 | 100% | 100% | 100% | n/a | n/a | 0 |
+| rant | 14 | 100% | 100% | 100% | n/a | n/a | 0 |
+| single | 47 | 100% | 100% | 100% | n/a | n/a | 0 |
 
 ## Industry
 
@@ -48,7 +48,9 @@ Groups under 3 cases are reported as not yet measured.
 | beef_cattle_fattening_and_feedlots | 3 | 100% | 100% | 100% | 100% | n/a | 0 |
 | beekeeping_and_honey | 3 | 100% | 100% | 100% | n/a | n/a | 0 |
 | books_stationery_and_school_supplies | 1 | not yet measured | | | | | |
+| bus_coach_and_school_transport_operators | 1 | not yet measured | | | | | |
 | cafes_and_coffee_shops | 1 | not yet measured | | | | | |
+| call_centres_and_bpos | 1 | not yet measured | | | | | |
 | car_rental_and_chauffeur_services | 1 | not yet measured | | | | | |
 | car_wash_and_detailing | 1 | not yet measured | | | | | |
 | carpets_handicrafts_and_artisan_workshops | 1 | not yet measured | | | | | |
@@ -56,25 +58,34 @@ Groups under 3 cases are reported as not yet measured.
 | cinemas_and_theatres | 1 | not yet measured | | | | | |
 | cleaning_and_janitorial_companies | 1 | not yet measured | | | | | |
 | clinics_and_gp_practices | 3 | 100% | 100% | 100% | n/a | n/a | 0 |
+| cloud_kitchens_and_virtual_brands | 1 | not yet measured | | | | | |
 | cold_storage_operators | 1 | not yet measured | | | | | |
 | colleges_and_universities | 1 | not yet measured | | | | | |
+| commission_agents_in_grain_fruit_and_vegetable_mandis | 1 | not yet measured | | | | | |
 | courier_and_last_mile_delivery_companies | 3 | 100% | 100% | 100% | n/a | n/a | 0 |
 | dairy_processing | 3 | 100% | 100% | 100% | n/a | n/a | 0 |
 | daycare_nurseries_and_preschools | 1 | not yet measured | | | | | |
 | dental_clinics | 1 | not yet measured | | | | | |
 | dhabas_food_trucks_chai_stalls_and_street_food | 1 | not yet measured | | | | | |
+| diagnostic_labs_and_sample_collection_centres | 1 | not yet measured | | | | | |
 | driving_schools | 1 | not yet measured | | | | | |
 | e_commerce_and_d2c_brands | 1 | not yet measured | | | | | |
+| edtech_and_online_course_businesses | 1 | not yet measured | | | | | |
+| elderly_care_homes | 1 | not yet measured | | | | | |
 | electrical_goods | 1 | not yet measured | | | | | |
 | electronics_and_home_appliances_retail | 1 | not yet measured | | | | | |
 | florists_and_gifting | 1 | not yet measured | | | | | |
 | flour_rice_and_feed_mills | 1 | not yet measured | | | | | |
+| fmcg_distributors_and_sub_distributors | 1 | not yet measured | | | | | |
 | footwear_retail | 1 | not yet measured | | | | | |
 | freight_forwarders | 1 | not yet measured | | | | | |
 | fuel_stations_and_lpg_cng_distributors | 1 | not yet measured | | | | | |
+| furniture_and_home_decor_retail | 1 | not yet measured | | | | | |
 | furniture_manufacturing_and_woodwork | 1 | not yet measured | | | | | |
 | garment_and_knitwear_export_units | 3 | 100% | 100% | 100% | 100% | n/a | 0 |
 | general_contractors | 1 | not yet measured | | | | | |
+| generator_sales_rental_and_service | 1 | not yet measured | | | | | |
+| government_contractors_and_public_sector_suppliers | 1 | not yet measured | | | | | |
 | guest_houses_b_and_bs_and_holiday_home_hosts | 1 | not yet measured | | | | | |
 | gyms_and_fitness_studios | 3 | 100% | 100% | 100% | n/a | n/a | 0 |
 | hajj_and_umrah_operators | 1 | not yet measured | | | | | |
@@ -82,17 +93,27 @@ Groups under 3 cases are reported as not yet measured.
 | hospitals | 1 | not yet measured | | | | | |
 | hotels | 1 | not yet measured | | | | | |
 | hr_and_recruitment_agencies | 1 | not yet measured | | | | | |
+| hvac_ac_sales_installation_and_service | 1 | not yet measured | | | | | |
 | insurance_agencies_and_brokers | 1 | not yet measured | | | | | |
 | internet_service_providers_and_cable_tv_operators | 3 | 100% | 100% | 100% | 100% | n/a | 0 |
+| it_services_and_software_houses | 1 | not yet measured | | | | | |
 | jewellery | 1 | not yet measured | | | | | |
+| juice_shakes_dessert_and_ice_cream_parlours | 1 | not yet measured | | | | | |
+| kids_wear_toys_and_baby_stores | 1 | not yet measured | | | | | |
 | kiryana_corner_shops_and_convenience_stores | 3 | 100% | 100% | 100% | n/a | n/a | 0 |
 | laundry_and_dry_cleaning | 1 | not yet measured | | | | | |
 | law_firms | 1 | not yet measured | | | | | |
+| livestock_traders_and_mandis | 1 | not yet measured | | | | | |
+| marketing_creative_and_digital_agencies | 1 | not yet measured | | | | | |
 | meat_shops_and_butchers | 1 | not yet measured | | | | | |
+| microfinance_field_operations | 1 | not yet measured | | | | | |
 | milk_collection_centres_and_chillers | 1 | not yet measured | | | | | |
 | mobile_phones_and_accessories | 1 | not yet measured | | | | | |
+| mobile_wallet_and_payment_agents | 1 | not yet measured | | | | | |
 | mosques_religious_trusts_and_community_institutions | 3 | 100% | 100% | 100% | n/a | n/a | 0 |
+| movers_and_relocation_companies | 1 | not yet measured | | | | | |
 | new_car_dealerships_and_showrooms | 3 | 100% | 100% | 100% | n/a | n/a | 0 |
+| ngos_charities_and_trusts | 1 | not yet measured | | | | | |
 | orchards | 1 | not yet measured | | | | | |
 | packaging_and_corrugation | 1 | not yet measured | | | | | |
 | perfumes_attar_and_oud | 1 | not yet measured | | | | | |
@@ -101,18 +122,25 @@ Groups under 3 cases are reported as not yet measured.
 | pharmaceutical_manufacturing | 3 | 100% | 100% | 100% | n/a | n/a | 0 |
 | pharmacies_and_medical_stores | 3 | 100% | 100% | 100% | 100% | n/a | 0 |
 | photography_and_videography_studios | 1 | not yet measured | | | | | |
+| plastics_and_injection_moulding | 1 | not yet measured | | | | | |
 | poultry_farms | 1 | not yet measured | | | | | |
 | printing_presses_and_print_on_demand | 1 | not yet measured | | | | | |
 | private_schools_and_school_chains | 1 | not yet measured | | | | | |
+| property_developers | 1 | not yet measured | | | | | |
+| property_management_and_rentals | 1 | not yet measured | | | | | |
 | quran_academies_and_madrassas | 1 | not yet measured | | | | | |
 | real_estate_agencies_and_brokers | 3 | 100% | 100% | 100% | 100% | n/a | 0 |
 | restaurants | 3 | 100% | 100% | 100% | 100% | n/a | 0 |
+| ride_hailing_fleet_owners_and_taxi_operators | 1 | not yet measured | | | | | |
 | salons_and_barbers | 3 | 100% | 100% | 100% | n/a | n/a | 0 |
+| scrap_recycling_and_waste_management | 1 | not yet measured | | | | | |
+| seafood_and_fish_markets | 1 | not yet measured | | | | | |
 | security_guard_companies | 1 | not yet measured | | | | | |
 | seed_fertiliser_and_pesticide_dealers | 1 | not yet measured | | | | | |
 | solar_epc_and_installers | 1 | not yet measured | | | | | |
 | spices_dry_fruit_and_nuts_traders | 1 | not yet measured | | | | | |
 | startups_and_early_stage_businesses | 1 | not yet measured | | | | | |
+| supermarkets_and_hypermarkets | 1 | not yet measured | | | | | |
 | tailoring_and_alteration_shops | 1 | not yet measured | | | | | |
 | textile_spinning_and_weaving_mills | 1 | not yet measured | | | | | |
 | tiles_marble_and_bathroom_kitchen_showrooms | 3 | 100% | 100% | 100% | n/a | n/a | 0 |
@@ -120,6 +148,7 @@ Groups under 3 cases are reported as not yet measured.
 | travel_agencies_and_ticketing | 1 | not yet measured | | | | | |
 | trucking_and_goods_transport_companies | 1 | not yet measured | | | | | |
 | tuition_centres_and_academies | 1 | not yet measured | | | | | |
+| typing_translation_and_attestation_centres | 1 | not yet measured | | | | | |
 | tyre_battery_and_auto_parts_shops | 1 | not yet measured | | | | | |
 | unknown_business_owner | 4 | 100% | 100% | 100% | 100% | n/a | 0 |
 | veterinary_clinics_and_animal_health_suppliers | 1 | not yet measured | | | | | |
