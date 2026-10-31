@@ -75,7 +75,13 @@ def words(text: object) -> list[str]:
 
 
 def content_words(text: object) -> set[str]:
-    return {w for w in words(text) if len(w) >= 3 or not w.isascii() and len(w) >= 2}
+    return {
+        w
+        for w in words(text)
+        if (len(w) >= 3 or not w.isascii() and len(w) >= 2)
+        and w not in ENGLISH
+        and w not in ROMAN_URDU
+    }
 
 
 def sentences(text: object) -> list[str]:
@@ -170,8 +176,8 @@ CLAIM_WORD = rx(
     r"will (?:definitely|certainly|surely|save|earn|double|triple|boost|increase|grow|cut|reduce))(?!\w)",
     r"(?<!\w)(?:guarantee|pakka|yaqeen(?:i|an)?|zaroor (?:barh|bach|faida)|faida (?:hoga|zaroor)|"
     r"bachat (?:hogi|hoga)|waada|wada|paisay bach(?:en|enge)|double ho)(?!\w)",
-    r"ضمانت|یقینی|یقیناً|یقینا|پکا|وعدہ|فائدہ ہوگا|بچت ہوگی|دگنا|ضرور (?:بڑھ|بچ)",
-    r"ضمان|نضمن|اضمن|أضمن|مضمون|وعد|حتما|بالتأكيد سي|توفير|سيزيد|ستزيد|سيوفر|ستوفر|مضاعف",
+    r"(?<!\w)(?:ضمانت|یقینی|یقیناً|یقینا|پکا|وعدہ|فائدہ ہوگا|بچت ہوگی|دگنا|ضرور (?:بڑھ|بچ))(?!\w)",
+    r"(?<!\w)[وفب]?(?:ضمان|نضمن|اضمن|أضمن|مضمون|وعد|حتما|بالتأكيد سي|توفير|سيزيد|ستزيد|سيوفر|ستوفر|مضاعف)(?!\w)",
 )
 
 PERCENT = re.compile(fold(r"(\d+(?:\.\d+)?)\s*(?:%|percent|per cent|فیصد|في المئة|بالمئة)"))
