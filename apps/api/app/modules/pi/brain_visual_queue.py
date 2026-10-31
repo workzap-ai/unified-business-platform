@@ -74,7 +74,7 @@ async def attach_board(
         return outbound
     summary = None
     for message_id in outbound:
-        row = await session.scalar(select(PiMessage).where(PiMessage.id == message_id))
+        row = await WorkspaceRepository(session, PiMessage, scope).find(PiMessage.id == message_id)
         if row is not None and row.sender_type == "ai" and row.status == "queued":
             summary = row
             break
