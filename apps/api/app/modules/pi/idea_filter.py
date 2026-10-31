@@ -155,7 +155,7 @@ class IdeaContext:
     resources: str = ""  # the owner's own words about their size (people, shops): G10 (spec 17.4)
 
     problems: tuple[dict[str, Any], ...] = ()  # the noted problems' records, for G8 and G13 (PS-3)
-    tried: tuple[str, ...] = ()  # what the owner already tried (G7: never offer it again)
+    tried: tuple[Any, ...] = ()  # what the owner already tried, with its outcome (PS-3 decides)
 
     needs_problem: bool = False  # G12 (spec v1.5, 18.4): no problem known, no idea at all
 
@@ -340,7 +340,7 @@ def context_from(
     given: Sequence[str] = (),
     entries: Sequence[dict[str, Any]] = (),
     industries: Sequence[str] = (),
-    tried: Sequence[str] = (),
+    tried: Sequence[Any] = (),
 ) -> IdeaContext:
     """The context from the noted problems (what `problems.noted_context` returns), the owner's
     words, the ideas already given and the industry's entries. The latest noted problem that has a
@@ -383,7 +383,12 @@ def context_from(
         node_categories=tuple(str(n.get("group") or "") for n in noted),
         industries=tuple(industries),
         problems=tuple({**n, "category": n.get("group", "")} for n in noted if isinstance(n, dict)),
-        tried=tuple(str(t) for t in tried if str(t).strip()),
+        tried=tuple(
+            t
+            for t in tried
+            if (isinstance(t, dict) and str(t.get("what") or "").strip())
+            or (isinstance(t, str) and t.strip())
+        ),
     )
 
 

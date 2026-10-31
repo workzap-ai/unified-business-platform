@@ -88,7 +88,6 @@ from app.modules.pi import (
     taxonomy,
     think_plan,
     think_prompt,
-    tried_outcome,
     turn_coverage,
     turn_state,
     value_line,
@@ -3103,9 +3102,9 @@ async def brain_free_ideas(
             given_before,
             (solutions.load(keys[0]) or {}).get("problems") or [] if keys else [],
             keys[:1],
-            [
-                str(t.get("what") or "")
-                for t in tried_outcome.not_worked((context.get("requirements") or {}).get("tried"))
+            [  # with their outcome: PS-3 does not call a repeat of what worked a repeat
+                t
+                for t in (context.get("requirements") or {}).get("tried") or []
                 if isinstance(t, dict)
             ],
         )
