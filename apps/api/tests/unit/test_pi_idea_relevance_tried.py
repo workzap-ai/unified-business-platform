@@ -432,3 +432,113 @@ def test_gate_violation_still_beats_a_repeat() -> None:
         constraint_gate=gate,
     )
     assert v.kind is IdeaKind.VIOLATES_CONSTRAINT
+
+
+# ----- precedence, shapes and thresholds (found by the mutation pass) ----------------------------------------
+
+IDEA = "Use colour-coded folders for each customer."
+
+
+@pytest.mark.parametrize(
+    ("outcomes", "reason"),
+    [
+        (("failed", "unclear"), "tried_failed"),
+        (("unclear", "failed"), "tried_failed"),
+        (("failed", "worked"), "tried_failed"),
+        (("worked", "failed"), "tried_failed"),
+        (("unclear", "worked"), "tried_unclear"),
+        (("worked", "unclear"), "tried_unclear"),
+    ],
+)
+def test_precedence_does_not_depend_on_order(outcomes: tuple[str, str], reason: str) -> None:
+    tried = [{"what": "colour coded folders", "outcome": o} for o in outcomes]
+    v = evaluate_idea(IDEA, PROBLEM, None, tried)
+    assert v.kind is IdeaKind.REPEATS_TRIED and v.reason == reason
+
+
+def test_worked_only_gives_a_note_and_normal_relevance() -> None:
+    probs = [
+        {
+            "id": "p1",
+            "title": "Customer files get mixed up",
+            "user_words": ["files get mixed up"],
+            "category": "operations_process",
+        }
+    ]
+    v = evaluate_idea(IDEA, probs, None, [{"what": "colour coded folders", "outcome": "worked"}])
+    assert v.kind is not IdeaKind.REPEATS_TRIED and v.tried_note == "already_tried_worked"
+    v = evaluate_idea(
+        "Send a reminder.", probs, None, [{"what": "colour coded folders", "outcome": "worked"}]
+    )
+    assert v.tried_note == ""
+
+
+def test_tried_shapes_never_break_and_a_blank_item_is_skipped() -> None:
+    for tried in (
+        {"what": "colour coded folders"},
+        5,
+        [None, 5, {"what": 7}, {"what": "  "}, {"outcome": "failed"}],
+    ):
+        v = evaluate_idea(IDEA, PROBLEM, None, tried)
+        assert v.kind is not IdeaKind.REPEATS_TRIED
+    v = evaluate_idea(
+        IDEA,
+        PROBLEM,
+        None,
+        [None, {"what": ""}, {"what": "colour coded folders", "outcome": "failed"}],
+    )
+    assert v.reason == "tried_failed"
+
+
+def test_the_channel_a_thing_was_done_in_is_not_the_thing() -> None:
+    tried = _tried("a WhatsApp group")
+    assert (
+        evaluate_idea("Send the customer a WhatsApp message.", PROBLEM, None, tried).kind
+        is not IdeaKind.REPEATS_TRIED
+    )
+    assert (
+        evaluate_idea("Create a group chat for the team.", PROBLEM, None, tried).kind
+        is IdeaKind.REPEATS_TRIED
+    )
+    tried = _tried("ads on Facebook")
+    assert (
+        evaluate_idea("Post on Facebook every day.", PROBLEM, None, tried).kind
+        is not IdeaKind.REPEATS_TRIED
+    )
+
+
+def test_word_overlap_fallback_needs_two_words_and_most_of_the_tried_item() -> None:
+    tried = _tried("phoned every overdue customer personally")
+    assert (
+        evaluate_idea("Phone every overdue customer personally.", PROBLEM, None, tried).kind
+        is IdeaKind.REPEATS_TRIED
+    )
+    assert (
+        evaluate_idea("Phone the supplier.", PROBLEM, None, tried).kind
+        is not IdeaKind.REPEATS_TRIED
+    )
+    assert (
+        evaluate_idea(
+            "Phone every overdue account and every supplier and every agent.",
+            PROBLEM,
+            None,
+            _tried("phoned overdue accounts suppliers agents drivers dealers"),
+        ).kind
+        is not IdeaKind.REPEATS_TRIED
+    )
+
+
+def test_a_three_concept_tried_item_needs_two_of_them() -> None:
+    tried = _tried("colour coded folders with labels")
+    assert (
+        evaluate_idea("Put a tag on each file.", PROBLEM, None, tried).kind
+        is IdeaKind.REPEATS_TRIED
+    )
+    assert (
+        evaluate_idea("Put colours on the folders.", PROBLEM, None, tried).kind
+        is IdeaKind.REPEATS_TRIED
+    )
+    assert (
+        evaluate_idea("Give each customer a folder.", PROBLEM, None, tried).kind
+        is not IdeaKind.REPEATS_TRIED
+    )
