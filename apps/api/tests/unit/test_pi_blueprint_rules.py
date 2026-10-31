@@ -30,7 +30,7 @@ def option(**over) -> bm.Option:
 
 def verified(msg, words=()):
     """An evidence ref that `verify_option` has already marked verified."""
-    return bm.Evidence(msg, tuple(words), verified=True, seal=bm.SEAL)
+    return bm.mark_verified(bm.Evidence(msg, tuple(words)))
 
 
 def ev(msg, words=()):

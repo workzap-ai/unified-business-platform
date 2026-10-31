@@ -74,7 +74,7 @@ def test_derived_properties_come_from_the_record_not_from_a_score():
 
 
 def verified(msg, words=(), **over):
-    return bm.Evidence(msg, tuple(words), verified=True, seal=bm.SEAL, **over)
+    return bm.mark_verified(bm.Evidence(msg, tuple(words), **over))
 
 
 def test_a_ref_with_no_words_counts_for_nothing():
