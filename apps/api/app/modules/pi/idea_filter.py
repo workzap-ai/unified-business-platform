@@ -269,13 +269,26 @@ def repeats(idea: str, given: Sequence[str]) -> str | None:
     return None
 
 
+def _non_latin(text: str) -> bool:
+    """True when the text holds letters outside the Latin script (Urdu, Arabic, ...)."""
+    return any(ch.isalpha() and ord(ch) > 0x024F for ch in text)
+
+
 def off_the_map(
-    idea: str, nodes: Sequence[str], categories: Sequence[str] = (), goal_verb: str = ""
+    idea: str,
+    nodes: Sequence[str],
+    categories: Sequence[str] = (),
+    goal_verb: str = "",
+    entry_ideas: Sequence[str] = (),
 ) -> str | None:
     """G8: the rule id when the idea shares nothing with any problem on the map. It relates when it
     shares a content word with a node's words, or with the vocabulary of a node's category or of the
     owner's goal; no nodes means no map to judge by."""
     if not nodes:
+        return None
+    # STOPGAP until PS-3 evaluate_idea lands: a word-overlap test cannot judge another script, so
+    # G8 never rejects an idea or a map written in non-Latin script (unknown stays unknown).
+    if _non_latin(idea) or any(_non_latin(n) for n in nodes):
         return None
     mine = solution_ideas._evidence(idea)
     weak = solution_ideas.WEAK
@@ -288,6 +301,8 @@ def off_the_map(
         return None
     if mine & solution_ideas._evidence(_GOAL_VOCAB.get(goal_verb, "")):
         return None  # the goal's own words ("sale", "oldest"), not only the node's
+    if entry_ideas and mine & solution_ideas._evidence(" ".join(entry_ideas)) - weak:
+        return None  # it matches the concepts of the noted problem's sub-type entry
     return "G8"
 
 
@@ -331,7 +346,9 @@ def failures(idea: str, owner_words: str, ctx: IdeaContext | None = None) -> lis
             wrong_subtype(idea, ctx.subtype, ctx.entry_ideas),
             cause_misfit(idea, ctx.cause),
             repeats(idea, ctx.given),
-            off_the_map(idea, ctx.nodes, ctx.node_categories, ctx.goal_verb),
+            off_the_map(
+                idea, ctx.nodes, ctx.node_categories, ctx.goal_verb, ctx.entry_ideas
+            ),
         ]
     return [rule for rule in found if rule]
 

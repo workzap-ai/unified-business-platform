@@ -114,7 +114,7 @@ def owner_stated(problem: dict[str, Any]) -> bool:
 def main_cause_known(context: dict[str, Any]) -> bool:
     """Whether the cause of the main problem is known (spec 5.4, "never offer when it is unknown").
     The main problem is the one the owner ranked first, else the first noted. Known when the owner
-    said their own cause for it (owner_said or confirmed, never pi's guess), or pi's diagnosis of it has causes and no open question. With
+    said their own cause for it (owner_said or confirmed, never pi's guess, never pi's own diagnosis). With
     nothing noted there is no main problem to be unsure of, so it does not hold the offer back.
     A `main_cause_known` key in the brief, when present, overrides."""
     brief = context.get("brief") or {}
@@ -127,8 +127,9 @@ def main_cause_known(context: dict[str, Any]) -> bool:
     main = (ranked or noted)[0]
     if str(main.get("cause") or "").strip() and owner_stated(main):
         return True
-    diag = brief.get("expert_diag")
-    return bool(isinstance(diag, dict) and diag.get("causes") and not diag.get("question"))
+    # pi's own diagnosis (brief["expert_diag"]) is a labelled hypothesis (pi_inferred): it never
+    # makes the cause known and never unlocks the offer (PS-flow, spec 5.4).
+    return False
 
 
 def message_signals(context: dict[str, Any]) -> dict[str, bool]:
