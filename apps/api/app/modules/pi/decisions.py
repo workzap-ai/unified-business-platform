@@ -105,22 +105,46 @@ OFFER_REQUEST = re.compile(
 # is a yes from any listening state once something is noted (Live Audit 2, cause 4, G28), whether or
 # not the offer was ever made. Refusals and "later" are not. A price or quote ask is an explicit R1
 # signal (spec v1.6 19.2, `part19.buying_signal`), not this pattern.
-_LEAD = (
-    r"^\W*(?:(?:yes|yeah|ok|okay|please|pls|plz|haan|han|ji|jee|theek hai|bilkul|zaroor|sure)\W+)*"
-)
+_LEAD = r"^\W*(?:(?:yes|yeah|ok|okay|please|pls|plz|haan|han|ji|jee|theek hai|bilkul|zaroor|sure)\W+){0,5}"
 _ONE = (
     r"(?:(?:solution|full|final|rough|short|quick|proper)\s+)?"
     r"(?:document|documents|quote|quotation|proposal)"
 )
 _NOUN = rf"{_ONE}(?:\s+(?:and|aur|or|&)\s+(?:the\s+)?{_ONE})?"
 _ME = r"(?:mujhe\s+|mujhay\s+|hamein\s+|hamen\s+)?"
-_UR_VERB = (
-    r"(?:de(?:in|n)?|dain|do|dedo|de do|dijiye|dijiyega|bhej\w*|bhij\w*|bana\w*|banwa\w*|"
-    r"chahiye|chahie|chahiay|tayyar\w*)"
+# Roman Urdu: IMPERATIVE forms only ("bhej do", "bana dein", "kar do", "dijiye"). An infinitive or a
+# continuous form ("quote banana", "quote bhejna", "banane mein", "bhejte hain") is not an ask.
+_UR_IMP = (
+    r"(?:de|dein|den|dain|do|dedo|de do|dijiye|dijiyega|"
+    r"bhejo|bhejiye|bhejein|bhejen|bhejain|bhej\s+(?:do|dein|den|dijiye|dijiyega)|bhijwa\s+(?:do|dein|den)|"
+    r"banao|banaiye|bana\s+(?:do|dein|den|dijiye|dijiyega)|banwa\s+(?:do|dein|den)|"
+    r"(?:tayyar\s+)?kar\s+(?:do|dein|den|dijiye)|tayyar\s+karo)"
 )
 # the ask may only be followed by a polite or time word, then the message ends
-_TAIL = rf"(?:\s+(?:please|pls|plz|now|today|asap|abhi|jaldi|ab|do|dein|den|na))*(?:\W+{_ONE}\s+ke\s+saath)?\W*$"
+_TAIL = (
+    r"(?:\s+(?:please|pls|plz|now|today|asap|abhi|jaldi|ab|do|dein|den|na))*"
+    rf"(?:\W+{_ONE}\s+ke\s+saath)?\W*$"
+)
 _YOU_TO = r"(?:(?:i|we)\s+(?:do\s+|really\s+)?(?:want|need|would like)\s+you\s+to\s+)?"
+# Arabic: an explicit imperative (no prefix match on the verb), the noun, a short polite or time tail,
+# and the end of the message. "أريد/نريد <noun>" is accepted only when it ends the message (a plain
+# wish addressed to pi); "أحتاج" and a noun followed by more words are not asks.
+_AR_NOUN = r"(?:ال)?(?:مستند|وثيقة|عرض\s+(?:ال)?سعر|عرض\s+(?:ال)?أسعار)"
+_AR_NOUNS = rf"{_AR_NOUN}(?:\s+و?{_AR_NOUN})?"
+_AR_TAIL = r"(?:\s+(?:من فضلك|من فضلكم|الآن|الان|رجاء|شكرا|شكراً|لي|لنا))*\W*$"
+_AR_IMP = (
+    r"(?:أرسل|ارسل|أرسلوا|ارسلوا|ابعث|جهز|جهزوا|اعمل|أعطني|اعطني|أعطنا|اعطنا|أنشئ|انشئ)"
+    r"(?:\s+(?:لي|لنا))?"
+)
+_AR_WISH = r"(?:أريد|اريد|نريد)"
+# Urdu script: explicit imperative forms (no بنا prefix match: "بنانے" is an infinitive), same tail.
+_UR_NOUN = r"(?:دستاویز|کوٹیشن)"
+_UR_SCRIPT_IMP = (
+    r"(?:بھیج دیں|بھیج دیجئے|بھیج دیجیے|بھیجیں|بھیجیے|بھیجئے|بنا دیں|بنا دیجئے|بنا دیجیے|"
+    r"بنائیں|دے دیں|دیں|دیجئے|دیجیے)"
+)
+_UR_SCRIPT_TAIL = r"(?:\s+(?:براہ کرم|پلیز|ابھی|جلدی|اب|شکریہ))*\W*$"
+_UR_SCRIPT_PRE = r"(?:(?:براہ کرم|پلیز)\s+)*(?:مجھے\s+|ہمیں\s+)?"
 # The ask must be an IMPERATIVE addressed to pi (or "I want you to send ...", "can I have ..."), then
 # the document noun, and it must END the message: a problem that merely mentions quotes or documents
 # ("it takes me two hours to prepare a quote", "we need a quote system that tracks orders", "hamein
@@ -130,12 +154,15 @@ DIRECT_DOCUMENT = re.compile(
     rf"(?:send|give|prepare|make|create|share)(?:\s+(?:me|us))?(?:\s+(?:the|a|my|our))?\s+"
     rf"{_NOUN}{_TAIL}"
     rf"|{_LEAD}(?:can|could|may)\s+(?:i|we)\s+(?:get|have)\s+(?:(?:the|a)\s+)?{_NOUN}{_TAIL}"
-    rf"|{_LEAD}{_ME}(?:(?:ab|abhi|jaldi|please)\s+)*{_NOUN}\s+{_ME}{_UR_VERB}{_TAIL}"
-    rf"|{_LEAD}(?:(?:ab|abhi|jaldi|please)\s+)*(?:de(?:in|n)?|dain|dijiye|bhej\w*|bana\w*|banwa\w*)"
+    rf"|{_LEAD}{_ME}(?:(?:ab|abhi|jaldi|please)\s+)*{_NOUN}\s+{_ME}{_UR_IMP}{_TAIL}"
+    rf"|{_LEAD}(?:mujhe|mujhay)\s+{_NOUN}\s+(?:chahiye|chahie|chahiay){_TAIL}"
+    rf"|{_LEAD}(?:(?:ab|abhi|jaldi|please)\s+)*"
+    r"(?:de(?:in|n)?|dain|dijiye|dijiyega|bhejo|bhejiye|bhejein|bhejen|bhejain|bhej\s+(?:do|dein|den|dijiye)|banao|banaiye|"
+    r"bana\s+(?:do|dein|den|dijiye)|banwa\s+(?:do|dein|den))"
     rf"\s+{_ME}{_NOUN}(?:\s+(?:mujhe|mujhay|hamein|hamen))?{_TAIL}"
-    r"|^\W*(?:نعم\W+)?(?:جهز|أرسل|ارسل|ابعث|أعطن|اعطن|أريد|اريد|نريد|أحتاج)\w*\s+"
-    r"(?:ال)?(?:المستند|مستند|وثيقة|عرض (?:ال)?سعر|عرض أسعار)"
-    r"|^\W*(?:جی\W+|ہاں\W+)?(?:مجھے\s+)?(?:دستاویز|کوٹیشن)\s+(?:بھیج|بنا|دیں|دیجئے|دیجیے|چاہیے|چاہئے)",
+    rf"|^\W*(?:نعم\W+)?(?:{_AR_IMP}|{_AR_WISH})\s+{_AR_NOUNS}{_AR_TAIL}"
+    rf"|^\W*(?:جی\W+|ہاں\W+)?{_UR_SCRIPT_PRE}{_UR_NOUN}\s+{_UR_SCRIPT_IMP}{_UR_SCRIPT_TAIL}"
+    rf"|^\W*(?:جی\W+|ہاں\W+)?(?:مجھے\s+){_UR_NOUN}\s+(?:چاہیے|چاہئے){_UR_SCRIPT_TAIL}",
     re.IGNORECASE,
 )
 NOT_A_REQUEST = re.compile(
@@ -177,6 +204,16 @@ _CONDITIONAL = re.compile(
     r"\b(?:if|once|when|whenever|unless|until|after|agar|jab|tab|jaise hi|warna|only when|sirf jab)\b",
     re.IGNORECASE,
 )
+# the same vetoes in Arabic and Urdu script: conditions, later or after, reported speech, price or cost
+# words, "only when" and negation (the noun "سعر" itself, as in "عرض سعر", is not a price word)
+_SCRIPT_VETO = re.compile(
+    r"(?<!\w)(?:إذا|اذا|إن|لو|اگر|جب|جیسے|تب|ورنہ|"
+    r"لاحقا|لاحقاً|بعد|قبل|پہلے|بعدازاں|"
+    r"قال|قالوا|قالت|کہا|کہتے|کہتا|کہتی|بولا|بولتے|"
+    r"كم|تكلفة|كلفة|تكاليف|قیمت|کتنا|کتنی|کتنے|خرچ|خرچہ|لاگت|ریٹ|"
+    r"فقط|صرف|"
+    r"لا|ليس|لن|بدون|نہیں|نہ|مت|بغیر)(?!\w)",
+)
 _REPORTED = re.compile(
     r"\b(?:say|says|said|told|tell|tells|asked|asks|kaha|kehte|kehta|kehti|bola|bolte|boli|bolta)\b",
     re.IGNORECASE,
@@ -191,14 +228,17 @@ _SAID_LEAD = re.compile(
 _CONJ = re.compile(r"^\W*(?:so|but|and|aur|lekin|phir|toh)\s+", re.IGNORECASE)
 
 
+MAX_ASK_CHARS = 500
+
+
 def asks_for_document(message: str) -> bool:
     """The message itself asks pi for the solution document or the quote: one imperative clause
     (after the allowed lead-ins), no veto word anywhere in the message, no reported speech."""
     said = " ".join((message or "").split())
-    if not said:
-        return False
+    if not said or len(said) > MAX_ASK_CHARS:
+        return False  # an ask is short; a long message is a story (also bounds the regex work)
     plain = _TIME_REMARK.sub("", _BENIGN_TAIL.sub(" ", said)).strip()
-    if NOT_A_REQUEST.search(plain) or _CONDITIONAL.search(plain):
+    if NOT_A_REQUEST.search(plain) or _CONDITIONAL.search(plain) or _SCRIPT_VETO.search(plain):
         return False
     body = _SAID_LEAD.sub("", plain, count=1)
     if _REPORTED.search(body):

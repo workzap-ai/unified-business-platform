@@ -962,7 +962,33 @@ DECIDE_STATEMENTS = [
     "give me the price",
     "how much will it cost?",
 ]
+DECIDE_STATEMENTS += [
+    # Arabic and Urdu script statements, conditionals and "later" (audit round 5)
+    "أرسل عرض سعر إذا أعجبتني الفكرة",
+    "أرسل عرض سعر لاحقا",
+    "أرسل عرض سعر بعد الاجتماع",
+    "نريد وثيقة لكل طلب",
+    "أحتاج مستند يتتبع الطلبات",
+    "مجھے کوٹیشن بنانے میں بہت وقت لگتا ہے",
+    "کوٹیشن بھیجنے میں دیر ہوتی ہے",
+    "دستاویز چاہیے ہوتی ہے",
+    "کوٹیشن بھیج دیں اگر پسند آئے",
+    # Roman Urdu infinitive fragments and statements
+    "Quote banana",
+    "Quote banane",
+    "Quote bhejna",
+    "Quote bhejna parta hai",
+    "Hamein quote chahiye hota hai",
+]
 DECIDE_ASKS = [
+    "can I get the quote",
+    "أرسل عرض سعر",
+    "أرسل عرض السعر من فضلك",
+    "کوٹیشن بھیج دیں",
+    "براہ کرم کوٹیشن بھیج دیں",
+    "bhej do quote",
+    "quote bana do",
+    "mujhay quote chahiye",
     "send me the quote",
     "please send me the quote",
     "mujhay quote do abhi",
@@ -1007,3 +1033,39 @@ def test_decide_starts_the_quote_on_an_explicit_imperative_ask(said):
     decision = _decide(said)
     assert decision is not None and "request_solution" in decision.effects
     assert decision.next_state == decisions.State.S6_PREPARING
+
+
+@pytest.mark.parametrize(
+    "unit",
+    ["please ", "haan ji ", "yes ok ", "من فضلك ", "براہ کرم ", "quote bhej do "],
+)
+def test_a_long_run_of_lead_in_words_is_not_quadratic(unit):
+    import time
+
+    for text in (unit * 1000, unit * 3000 + "x"):  # a 7 KB message
+        start = time.perf_counter()
+        assert decisions.asks_for_document(text) is False
+        assert time.perf_counter() - start < 0.1
+    short = unit * 70  # under the length cap: the regex itself must stay fast
+    start = time.perf_counter()
+    decisions.asks_for_document(short + "x")
+    decisions.DIRECT_DOCUMENT.match(short + "x")
+    assert time.perf_counter() - start < 0.1
+
+
+def test_a_fixed_reply_clears_the_need_fact_flag_and_the_cost_line():
+    from app.modules.pi import service_conversation as sc
+
+    turn = sc.ServiceTurn(reply="x")
+    turn.reply = ""  # emptied by an earlier step
+    turn._need_fact = True
+    turn._cost_line = "cost line"
+    context = {
+        "reply_language": "en",
+        "noted_problems": [{"ref": "a", "title": "t", "group": "g"}],
+        "brief": {},
+        "history": [],
+        "latest_customer_message": "hmm",
+    }
+    sc.brain_never_empty(turn, context)
+    assert turn._need_fact is False and turn._cost_line == ""
