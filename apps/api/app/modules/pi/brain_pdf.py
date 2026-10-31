@@ -220,9 +220,47 @@ def render_box(
     for item in content.get("assumptions", []):
         page.bullet(str(item))
     page.gap(6)
+    _blueprint(page, content.get("blueprint"))
     page.heading(label["box_quote"])
     page.paragraph(label["box_quote_text"])
     return doc.render()
+
+
+def _blueprint(page: "_Page", blueprint: Any) -> None:
+    """The blueprint for the reviewer: recommendation, workflow with dependencies and roles,
+    risks, milestones, acceptance criteria, what is unresolved. English; nothing priced."""
+    if not isinstance(blueprint, dict) or not blueprint.get("steps"):
+        return
+    page.heading("Blueprint")
+    rec = blueprint.get("recommendation") or {}
+    if rec.get("option"):
+        page.paragraph("Recommended: " + str(rec["option"]), 10, True)
+        for t in rec.get("trade_offs") or []:
+            page.bullet("Trade-off: " + str(t))
+    elif rec.get("reason"):
+        page.paragraph(str(rec["reason"]), 10)
+    for item in rec.get("rejected") or []:
+        page.bullet(f"Left out: {item.get('option', '')}: {item.get('because', '')}")
+    page.paragraph("Workflow", 10, True)
+    for step in blueprint.get("steps") or []:
+        after = ", ".join(str(n) for n in step.get("depends_on") or [])
+        tail = f" (after step {after})" if after else ""
+        link = ", ".join(step.get("problems") or []) or "NOT LINKED to a problem"
+        page.bullet(f"Step {step.get('n')}: {step.get('text', '')}{tail}. Answers: {link}.")
+    page.paragraph("Milestones", 10, True)
+    for m in blueprint.get("milestones") or []:
+        page.bullet(f"{m.get('name', '')}: steps {', '.join(str(n) for n in m.get('steps') or [])}")
+    page.paragraph("How we will know it worked", 10, True)
+    for a in blueprint.get("acceptance") or []:
+        base = f" Today, in your words: {a['baseline']}." if a.get("baseline") else ""
+        page.bullet(f"{a.get('ref', '')}: {a.get('criterion', '')}.{base}")
+    page.paragraph("Risks", 10, True)
+    for r in blueprint.get("risks") or []:
+        page.bullet(str(r.get("text", "")))
+    page.paragraph("Still unresolved", 10, True)
+    for u in blueprint.get("unresolved") or []:
+        page.bullet(str(u))
+    page.gap(6)
 
 
 def render_solution(

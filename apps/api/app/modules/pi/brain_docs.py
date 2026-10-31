@@ -28,6 +28,7 @@ from app.core.config import Settings
 from app.modules.customers import files
 from app.modules.customers.models import Customer
 from app.modules.pi import (
+    blueprint_doc,
     box,
     box_doc,
     brain_pdf,
@@ -301,6 +302,8 @@ def check_content(content: dict[str, Any], refs: set[str] | None = None) -> list
     issues = check_solution(draft, known, catalogue=bool(content.get("box")))
     if content.get("box"):
         issues += box_text_issues(content) + box_doc.structure_issues(content)
+        if isinstance(content.get("blueprint"), dict):
+            issues += blueprint_doc.issues(content["blueprint"])
     return issues
 
 
@@ -372,6 +375,7 @@ def apply_box(
     local: bool,
     sector: str | None,
     renamed: dict[str, str] | None = None,
+    owner_messages: dict[str, str] | None = None,
 ) -> dict[str, Any]:
     """Turn the stored six-section content into the eight-section box (spec 5.2). `views` are the
     problems' facts (`box_doc.problem_view`), `links` their links as dicts (from, to, type,
@@ -402,11 +406,22 @@ def apply_box(
             }
         )
     hypotheses = [{"text": _pick(h, local), "refs": h.refs} for h in draft.hypotheses]
+    phase_rows = box_doc.phase_table(components, {p: n for p, n in named.items() if n})
+    # PS-flow: the blueprint (steps with dependencies and roles, risks, milestones, acceptance
+    # criteria, the recommendation, what is unresolved), built in code from the owner's own record
+    blueprint = blueprint_doc.build(
+        views,
+        components,
+        phase_rows,
+        [str(n) for n in content.get("needs") or []],
+        owner_messages=owner_messages,
+    )
     return {
         **content,
         "box": True,
+        "blueprint": blueprint,
         "components": components,
-        "phases": box_doc.phase_table(components, {p: n for p, n in named.items() if n}),
+        "phases": phase_rows,
         "clusters": box_doc.clusters(views, hypotheses, language=language, renamed=renamed),
         "links": box_doc.shown_links(links, titles),
         "ideas": ideas,
@@ -702,6 +717,20 @@ async def draft_offer(
     repo = WorkspaceRepository(session, PiBrainDocument, scope)
     sol_ref = f"SD-{number:04d}"
 
+    owner_texts: dict[str, str] = {}
+    if box_draft is not None:
+        ids = {m for p in rows for m in (p.source_message_ids or [])}
+        if ids:
+            stored = await session.scalars(
+                select(PiMessage).where(
+                    PiMessage.tenant_id == scope.tenant_id,
+                    PiMessage.environment_id == scope.environment_id,
+                    PiMessage.conversation_id == conversation_id,
+                    PiMessage.sender_type == "customer",
+                )
+            )
+            owner_texts = {str(m.id): m.body or "" for m in stored if str(m.id) in ids}
+
     def build(as_local: bool) -> dict[str, Any]:
         content = solution_content(
             draft, rows, business=business, ref=sol_ref, language=language, local=as_local
@@ -725,6 +754,7 @@ async def draft_offer(
             local=as_local,
             sector=sector,
             renamed=renamed,
+            owner_messages=owner_texts,
         )
         if brief.get("box_naya"):  # Box v2: the short difference list of 5.6
             boxed["naya"] = [str(x) for x in brief["box_naya"]][:8]

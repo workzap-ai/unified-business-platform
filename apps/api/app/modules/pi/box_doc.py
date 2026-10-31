@@ -56,6 +56,37 @@ def problem_view(
         "impact": list((problem.impact or {}).get("types") or []),
         "cause": str(problem.person_believes_cause or ""),
         "rank": box_signals.rank_of(problem.tags),
+        **requirement_view(problem),
+    }
+
+
+def requirement_view(problem: Any) -> dict[str, Any]:
+    """The stored B2a fields of one problem, as plain data for the blueprint: the owner's limits,
+    what they tried, the cause with its status (pi's guess stays `pi_inferred`) and the outcome
+    they want. A row from before the columns existed reads as empty."""
+    stated = getattr(problem, "constraints", None)
+    stated = stated if isinstance(stated, dict) else {}
+
+    def text(entry: Any) -> str:
+        return str(entry.get("text") or "") if isinstance(entry, dict) else str(entry or "")
+
+    limits = {k: text(stated.get(k)) for k in ("budget", "staff", "deadline")}
+    cannot = [text(e) for e in stated.get("cannot_change") or [] if text(e).strip()]
+    tried = [
+        {"what": str(t.get("what") or ""), "outcome": str(t.get("outcome") or "")}
+        for t in (getattr(problem, "tried", None) or [])
+        if isinstance(t, dict) and str(t.get("what") or "").strip()
+    ]
+    cause = getattr(problem, "cause", None)
+    cause = cause if isinstance(cause, dict) else {}
+    return {
+        "limits": {k: v for k, v in limits.items() if v.strip()},
+        "cannot_change": cannot,
+        "tried": tried,
+        "cause_text": str(cause.get("text") or ""),
+        "cause_status": str(cause.get("status") or "") if cause.get("text") else "",
+        "expected_outcome": str(getattr(problem, "expected_outcome", None) or ""),
+        "msgs": [str(m) for m in (getattr(problem, "source_message_ids", None) or [])],
     }
 
 
