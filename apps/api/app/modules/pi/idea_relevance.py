@@ -685,7 +685,6 @@ def _analyse(
     best_score = 0
     best_evidence: list[str] = []
     linked: list[tuple[int, str]] = []
-    strong_text = False
     for prof in profiles:
         score = 0
         evidence: list[str] = []
@@ -714,7 +713,6 @@ def _analyse(
             score = 0  # a decor, merchandise or contest idea needs real evidence to count
         if score >= LINK_MIN:
             linked.append((score, prof.pid))
-            strong_text = strong_text or text_hit
         if score > best_score:
             best_score, best_evidence = score, evidence
     linked.sort(key=lambda t: -t[0])

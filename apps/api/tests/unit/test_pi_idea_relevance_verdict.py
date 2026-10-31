@@ -540,3 +540,33 @@ def test_expand_and_split_helpers() -> None:
     assert sorted(ir._expand("(a |b )?c")) == ["a c", "b c", "c"]
     assert sorted(ir._expand("[ae]x")) == ["ax", "ex"]
     assert len(ir._expand("(a|b)(c|d)(e|f)(g|h)(i|j)(k|l)(m|n)(o|p)", limit=64)) <= 64
+
+
+def _p(title, uw=(), cat="", sub=""):  # type: ignore[no-untyped-def]
+    return [{"id": "p", "title": title, "user_words": list(uw), "category": cat, "subtype": sub}]
+
+
+@pytest.mark.parametrize(
+    ("idea", "problem", "kind", "score"),
+    [
+        (
+            "Ask the courier for a tracking number.",
+            _p("Parcels reach customers late"),
+            IdeaKind.LINKED,
+            3,
+        ),
+        ("Keep a stock register.", _p("We run out of stock of fast items"), IdeaKind.LINKED, 3),
+        (
+            "Ask the courier for a tracking number.",
+            _p("", (), "orders_fulfilment"),
+            IdeaKind.LINKED,
+            2,
+        ),
+        ("Birds crowd in the hottest shed hours.", _p("Birds die in the shed"), IdeaKind.LINKED, 3),
+        ("Use better software.", _p("Our software keeps crashing"), IdeaKind.GENERIC, 0),
+        ("Walk the shed daily.", _p("Birds die in the shed"), IdeaKind.UNLINKED, 0),
+    ],
+)
+def test_golden_scores(idea, problem, kind, score) -> None:  # type: ignore[no-untyped-def]
+    v = evaluate_idea(idea, problem)
+    assert (v.kind, v.score) == (kind, score)
