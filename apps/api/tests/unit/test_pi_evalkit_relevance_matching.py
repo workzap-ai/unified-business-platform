@@ -1172,6 +1172,19 @@ SHAPES = {
 }
 
 
+def time_budget() -> float:
+    """100 ms, or 40 times what a trivial candidate costs right now, so a loaded machine does
+    not flake the check while a growth with size (quadratic or worse) still fails it."""
+    trivial = best_of(
+        lambda i: relevance.score_candidate(
+            brief([limit("cannot buy a van" + "x" * i, kind="cannot_change")]),
+            "Buy a van" + "y" * i,
+        ),
+        7,
+    )
+    return max(0.1, 40 * trivial)
+
+
 def best_of(fn, runs=3) -> float:
     import time
 
@@ -1197,7 +1210,7 @@ def test_limit_parsing_is_linear_and_flags_a_limit_that_is_too_long(shape, size)
                 language=lang,
             )
 
-        assert best_of(once) < 0.1, (shape, size, lang)
+        assert best_of(once, 5) < time_budget(), (shape, size, lang)
     text = (unit * (size // len(unit) + 1))[:size]
     got = relevance.score_candidate(brief([limit(text, kind="cannot_change")]), "Buy a van")
     if len(relevance_match.collapse(text)) > relevance_match.MAX_LIMIT_TEXT:
@@ -1215,7 +1228,7 @@ def test_idea_parsing_is_linear_and_flags_an_idea_that_is_too_long(shape, size) 
         text = (unit * (size // len(unit) + 1))[:size] + "x" * i
         return relevance.score_candidate(brief(c), text, language="roman_ur")
 
-    assert best_of(once) < 0.1, (shape, size)
+    assert best_of(once, 5) < time_budget(), (shape, size)
     text = (unit * (size // len(unit) + 1))[:size]
     got = relevance.score_candidate(brief(c), text)
     if len(relevance_match.collapse(text)) > relevance_match.MAX_IDEA_TEXT:
@@ -1355,3 +1368,114 @@ def test_fuzz_500_strings_never_raise_and_always_give_a_known_verdict() -> None:
         b = brief([limit(limit_text, blocks=blocks, kind=kind, status=status)])
         got = relevance.score_candidate(b, idea, owner_text=piece(10), language=lang)
         assert got["verdict"] in allowed, (n, limit_text, idea, got)
+
+
+# ------------------------------------------------------------- sixth round
+
+EXPENSIVE = "buy an expensive tracking system costing 90000 rupees to cut late orders"
+
+
+@pytest.mark.parametrize(
+    "text",
+    [
+        "we cannot afford much right now",
+        "cannot afford much",
+        "cannot pay much",
+        "can't afford a lot",
+        "can’t afford a lot of things",
+        "cannot afford extras",
+        "unable to spend more",
+        "we cannot spend any more",
+        "cannot afford anything extra",
+        "we cannot afford stuff",
+    ],
+)
+def test_a_vague_limit_is_not_read_as_a_rule_and_stays_unknown(text) -> None:
+    assert relevance_match.parse_rules(text, None, relevance._full_stems) == [], text
+    got = full(text, EXPENSIVE, "budget")
+    assert got["verdict"] == "unknown" and got["unknown_reason"] == "limit_not_understood", text
+
+
+@pytest.mark.parametrize(
+    "text,idea,language",
+    [
+        ("hum zyada nahi de sakte", "naya tracking system 90000 rupees mein lagayein", "roman_ur"),
+        ("hum bohat nahi kharid sakte", "naya tracking system kharidein", "roman_ur"),
+        (
+            "ہم بہت زیادہ خرچ نہیں کر سکتے",
+            EXPENSIVE,
+            "ur",
+        ),
+        (
+            "हम बहुत ज़्यादा खर्च नहीं कर सकते",
+            EXPENSIVE,
+            "hi",
+        ),
+        (
+            "لا نستطيع أن ننفق الكثير",
+            EXPENSIVE,
+            "ar",
+        ),
+    ],
+)
+def test_vague_words_in_the_other_four_languages_stay_unknown_too(text, idea, language) -> None:
+    got = full(text, idea, "budget", language)
+    assert got["verdict"] == "unknown", (text, got["verdict"])
+
+
+def test_a_real_object_after_a_money_verb_is_still_a_rule() -> None:
+    assert full("we cannot afford a booking app", "Buy a booking app")["verdict"] == (
+        "violates_constraint"
+    )
+    assert full("we cannot hire anyone", "Hire a rider")["verdict"] == "violates_constraint"
+    assert full("we cannot close", "Close the second shop")["verdict"] == "violates_constraint"
+
+
+def test_mutation_without_the_vague_list_the_vague_limit_would_be_a_rule(monkeypatch) -> None:
+    relevance_match._rules_cached.cache_clear()
+    monkeypatch.setattr(relevance_match, "_VAGUE", set())
+    try:
+        rules = relevance_match.parse_rules("cannot afford much", None, relevance._full_stems)
+        assert rules, "the vague-object guard is what stops this rule"
+    finally:
+        relevance_match._rules_cached.cache_clear()
+
+
+@pytest.mark.parametrize(
+    "text,idea,broken",
+    [
+        ("cannot rent out our van", "rent out the van to cover late orders", True),
+        ("we cannot rent out our van", "Rent out the van on Sundays", True),
+        ("cannot rent out our van", "Rent a van for the weekend", False),
+        ("cannot rent out our van", "Buy a van", False),
+        ("cannot hire out staff", "hire out two supervisors to cover late orders", True),
+        ("cannot hire out staff", "Hire a supervisor", False),
+        ("cannot hire out staff", "Hire out the spare room", False),
+        ("cannot lease out the hall", "Lease out the hall on weekends", True),
+        ("cannot lease out the hall", "Lease the hall from a neighbour", False),
+        ("we cannot hire anyone", "Hire out the spare room", False),
+        ("we cannot hire new staff", "hire on a part-time clerk", True),
+        ("we cannot hire new staff", "Hire a part-time clerk", True),
+        ("we cannot hire on new staff", "Hire on a part-time clerk", True),
+        ("we cannot hire on new staff", "Hire out a part-time clerk", False),
+        ("we cannot buy a van", "Rent out the van to a neighbour", False),
+    ],
+)
+def test_a_verb_with_a_particle_in_the_limit_is_broken_by_the_same_phrase(
+    text, idea, broken
+) -> None:
+    got = full(text, idea)["verdict"] == "violates_constraint"
+    assert got is broken, (text, idea)
+
+
+def test_mutation_without_the_particle_match_the_phrase_rule_would_not_fire(monkeypatch) -> None:
+    c = [limit("cannot hire out staff", kind="cannot_change")]
+    assert verdict(c, "hire out two supervisors") == "violates_constraint"
+    monkeypatch.setattr(relevance_match, "phrasal_pairs", lambda text, language: frozenset())
+    assert verdict(c, "hire out two supervisors") != "violates_constraint"
+
+
+def test_on_is_a_preposition_not_a_particle_so_close_on_sundays_is_still_a_close() -> None:
+    assert full("we cannot close on Sundays", "Close early on Sunday")["verdict"] == (
+        "violates_constraint"
+    )

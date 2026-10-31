@@ -249,6 +249,7 @@ def violated(
     full = _full_stems(text, language) if text else idea
     verbs = _full_stems(match.drop_noun_homographs(text), language) if text else idea
     said = _said_amounts(brief, owner_text)
+    phrasal = match.phrasal_pairs(text, language) if text else frozenset()
     for problem in brief.get("problems") or []:
         for limit in problem.get("constraints") or []:
             if limit.get("status", "confirmed") != "confirmed":
@@ -259,7 +260,7 @@ def violated(
             else:
                 reason_cut = False
             rules = [] if reason_cut else match.parse_rules(reason, language, _full_stems)
-            if any(match.rule_hit(r, full, verbs) for r in rules):
+            if any(match.rule_hit(r, full, verbs, phrasal) for r in rules):
                 return reason
             for phrase in limit.get("blocks") or []:
                 need = stems(

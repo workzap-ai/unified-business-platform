@@ -591,7 +591,8 @@ _HYPERNYMS = {
                   "mill", "van", "truck", "vehicle", "pos"},
     "software": {"app", "system", "platform", "tool", "program", "crm", "website"},
     "staff": {"employee", "worker", "helper", "clerk", "cleaner", "cook", "driver", "assistant",
-              "cashier", "receptionist", "manager", "rider", "guard", "accountant", "waiter"},
+              "cashier", "receptionist", "manager", "rider", "guard", "accountant", "waiter",
+              "supervisor", "technician", "electrician", "plumber", "nurse", "teacher"},
     "machinery": {"machine", "mill", "tractor", "mixer", "grinder", "oven"},
 }  # fmt: skip
 # an idea that does one of these to the goal's subject breaks 'cannot afford X' / 'cannot lose X'
@@ -726,6 +727,24 @@ def _strip_tried_tail(text: str) -> str:
     return " ".join(words)
 
 
+# a verb's particle: 'hire out' and 'hire on' are not 'hire'; a limit that names one is broken
+# by the same verb and particle, and by nothing else
+# ('on' and 'down' are left out: 'close on Sundays' is a preposition, 'hire on' stays 'hire')
+_PARTICLES = {"out", "up", "off", "away"}
+# a limit object made only of these says nothing ('cannot afford much'); no rule is made from it
+_VAGUE = {
+    "much", "lot", "lots", "alot", "more", "many", "any", "anything", "something", "stuff",
+    "things", "thing", "extra", "extras", "enough", "little", "less", "anymore",
+    "zyada", "ziada", "bohat", "bahut", "bohot", "kuch", "sab", "har", "cheez", "cheezein",
+    "\u0628\u06c1\u062a", "\u0632\u06cc\u0627\u062f\u06c1", "\u06a9\u0686\u06be",
+    "\u0633\u0628", "\u092c\u0939\u0941\u0924", "\u091c\u093c\u094d\u092f\u093e\u0926\u093e",
+    "\u091c\u094d\u092f\u093e\u0926\u093e", "\u0915\u0941\u091b", "\u0938\u092c",
+    "\u0643\u062b\u064a\u0631", "\u0627\u0644\u0643\u062b\u064a\u0631",
+    "\u0643\u062b\u064a\u0631\u0627", "\u0627\u0644\u0645\u0632\u064a\u062f",
+    "\u0634\u064a\u0621", "\u0634\u064a\u0626\u0627", "\u0643\u0644",
+}  # fmt: skip
+_OBJECT_SMALL = {"a", "an", "the", "of", "to", "for", "it", "this", "that", "so", "very", "too",
+                 "our", "my", "we", "at", "all", "hum", "ko"}  # fmt: skip
 _NOT_A_VERB = {"be", "have", "do", "go", "get"}
 # 'cannot lose X', 'cannot risk X': a stated goal, not a prohibition on ideas that name X
 _GOAL_VERBS = {"lose", "miss", "risk", "waste", "delay", "harm", "afford"}
@@ -758,6 +777,7 @@ class Rule(NamedTuple):
     aliases: frozenset[str] = (
         frozenset()
     )  # things that count as the object ('oven' for 'equipment')
+    particle: str = ""  # 'out' in 'cannot rent out X': same verb and particle
 
 
 def _need(count: int) -> int:
@@ -774,6 +794,24 @@ def _object_stems(
     cut = parts[-1] if last else parts[0]
     cut = re.sub(r"\b(?:" + "|".join(sorted(_FILLER)) + r")\b", " ", cut)
     return frozenset(stems_of(cut, language))
+
+
+def _object_words(text: str, last: bool = False) -> list[str]:
+    """The words of a limit's object, before any stemming or filler removal."""
+    parts = _CUT.split(_TIME.sub(" ", text))
+    cut = parts[-1] if last else parts[0]
+    return [w for w in re.findall(r"[^\W\d_]+", cut.casefold()) if w not in _OBJECT_SMALL]
+
+
+def phrasal_pairs(text: str, language: str | None) -> frozenset[tuple[str, str]]:
+    """(verb stem, particle) for each 'rent out', 'hire on' ... in an idea text."""
+    pieces = re.split(r"[\s-]+", collapse(text)[:MAX_IDEA_TEXT])
+    words = [re.sub(r"[^a-z]", "", w.casefold()) for w in pieces]
+    return frozenset(
+        (stem_ascii(words[i], language, True), words[i + 1])
+        for i in range(len(words) - 1)
+        if words[i] and words[i + 1] in _PARTICLES
+    )
 
 
 def _last_clause(text: str) -> str:
@@ -806,6 +844,7 @@ def _parse_rules(limit_text: str, language: str | None, stems_of: StemsOf) -> tu
     buyish = {stem_ascii(w, language, True) for w in ("buy", "spend", "hire")}
     goal = {stem_ascii(w, language, True) for w in _GOAL_VERBS}
     purchasable = {stem_ascii(w, language, True) for w in _PURCHASABLE}
+    money_only = {stem_ascii(w, language, True) for w in ("afford", "spend", "pay")}
     give = {stem_ascii(w, language, True) for w in ("give", "offer", "grant")}
     offer_also = {stem_ascii(w, language, True) for w in _OFFER_ALSO}
     actions = {stem_ascii(w, language, True) for w in _GOAL_ACTIONS}
@@ -821,6 +860,17 @@ def _parse_rules(limit_text: str, language: str | None, stems_of: StemsOf) -> tu
         stem = stem_ascii(verb, language, True)
         if ru and stem not in ru_known:
             return  # a Roman Urdu verb the scorer does not know: the limit stays 'unknown'
+        particle = ""
+        first = obj.split(" ", 1)
+        if not ru and not last and first and first[0] in _PARTICLES:
+            particle, obj = first[0], (first[1] if len(first) > 1 else "")
+        words = _object_words(obj, last)
+        vague_words = bool(words) and all(w in _VAGUE for w in words)
+        empty_money = not words and (stem in money_only or stem in goal)
+        if empty_money or (vague_words and (ru or stem in money_only or stem in goal)):
+            # 'cannot afford much', 'unable to spend more', 'cannot lose much': nothing to match
+            # ('cannot buy anything' is different: it forbids the verb, so it stays a rule)
+            return
         objects = _object_stems(obj, language, stems_of, last)
         if any(any(ch.isdigit() for ch in o) for o in objects):
             return  # a figure in the limit is compared as a number, not as a word
@@ -844,10 +894,12 @@ def _parse_rules(limit_text: str, language: str | None, stems_of: StemsOf) -> tu
             if group & give:
                 group = group | offer_also
         alt = frozenset().union(*(alts.get(x, frozenset()) for x in group))
-        key = (stem, ",".join(sorted(objects)))
+        key = (f"{stem} {particle}".strip(), ",".join(sorted(objects)))
         if key not in seen:
             seen.add(key)
-            rules.append(Rule("neg", frozenset(group), alt, objects, _need(len(objects)), aliases))
+            rules.append(
+                Rule("neg", frozenset(group), alt, objects, _need(len(objects)), aliases, particle)
+            )
 
     for m in _NEG.finditer(text):
         add_neg(m.group("verb"), m.group("obj"))
@@ -883,14 +935,22 @@ def _parse_rules(limit_text: str, language: str | None, stems_of: StemsOf) -> tu
     return tuple(rules)
 
 
-def rule_hit(rule: Rule, idea: set[str], idea_verbs: set[str] | None = None) -> bool:
+def rule_hit(
+    rule: Rule,
+    idea: set[str],
+    idea_verbs: set[str] | None = None,
+    phrasal: frozenset[tuple[str, str]] = frozenset(),
+) -> bool:
     """The idea does what the rule forbids: the verb group (for 'cannot') and enough of the
     object, or an alias of it ('oven' for 'equipment'). A 'cannot VERB' with no object words is
     broken by the verb alone. A goal rule needs a goal-breaking verb that is not itself the
     subject ('waste' in 'reduce waste'). `idea` is the idea's FULL stem set; `idea_verbs` is the
     same without negated verbs and nouns that look like verbs ('a fire alarm')."""
     verbs = idea if idea_verbs is None else idea_verbs
-    if rule.kind == "goal":
+    if rule.particle:  # 'cannot rent out X': only 'rent out' breaks it
+        if not any((v, rule.particle) in phrasal for v in rule.verbs):
+            return False
+    elif rule.kind == "goal":
         if not ((rule.verbs & verbs) - rule.objects):
             return False
     elif rule.kind == "neg" and not (rule.verbs & verbs):
