@@ -13,6 +13,7 @@ from typing import Any
 
 from app.modules.pi import blueprint_models as bm
 from app.modules.pi import blueprint_rules as br
+from app.modules.pi import blueprint_text as bt
 from app.modules.pi import constraint_check as cc
 from app.modules.pi import option_rank, option_wiring
 from app.modules.pi.blueprint_build import (
@@ -169,6 +170,23 @@ def _recommended(oset: bm.OptionSet, steps: list[dict[str, Any]]) -> Any:
     }
 
 
+def money_issues(texts: list[str]) -> list[str]:
+    """What pi itself wrote must hold no amount, cost claim or invented saving (L2-3 `money_state`):
+    "money" blocks approval; "ambiguous" (an absence-of-fee phrase with nothing saying it is the
+    owner's limit) is never passed as clean: the reviewer must settle whether it is a limit or a
+    promise."""
+    found: list[str] = []
+    for text in texts:
+        state = bt.money_state(text)
+        if state == "money":
+            found.append(f"OPT-MONEY: holds a price, cost claim or saving: {text[:60]}")
+        elif state == "ambiguous":
+            found.append(
+                f"MONEY_AMBIGUOUS: is this a limit or a promise? Reviewer to settle: {text[:60]}"
+            )
+    return found
+
+
 def build(
     views: list[dict[str, Any]],
     components: list[dict[str, Any]],
@@ -216,7 +234,11 @@ def build(
         root_causes=causes or None,
         options=oset,
     )
-    issues = blueprint_issues(bp, facts, problems, requirements, staff_inputs, causes or None)
+    issues = [
+        f"{i.code}: {i.text}"
+        for i in blueprint_issues(bp, facts, problems, requirements, staff_inputs, causes or None)
+    ]
+    issues += money_issues([s["text"] for s in steps] + ([chat_pick] if chat_pick else []))
     return {
         "status": bp.status,
         "language": bp.language,
@@ -224,5 +246,5 @@ def build(
         "next_question": bp.next_question,
         "refusal": list(bp.refusal),
         "recommended": oset.recommended_id or "",
-        "issues": [f"{i.code}: {i.text}" for i in issues],
+        "issues": issues,
     }

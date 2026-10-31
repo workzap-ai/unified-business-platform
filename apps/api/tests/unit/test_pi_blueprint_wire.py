@@ -119,3 +119,14 @@ def test_l2_3_option_contract_with_real_option_and_sealed_evidence():
     assert top is not None and top.id == "O1"
     forged = dataclasses.replace(option, evidence=(dataclasses.replace(ev, verified=True),))
     assert forged.evidence_strength == 0
+
+
+def test_money_state_outcomes_reach_the_reviewer_through_the_document_builder():
+    clean = bw.money_issues(["Ask each lost customer why they left."])
+    assert clean == []
+    money = bw.money_issues(["This costs Rs 50,000 and is free of charge."])
+    assert money and money[0].startswith("OPT-MONEY")
+    ambiguous = bw.money_issues(["A reminder tool without any fees."])
+    assert ambiguous and ambiguous[0].startswith("MONEY_AMBIGUOUS")  # never passed as clean
+    limit = bw.money_issues(["You said you want something without fees, so we keep it that way."])
+    assert not any(i.startswith("OPT-MONEY") for i in limit)
