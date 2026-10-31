@@ -1734,7 +1734,14 @@ BOUNDARY_PATTERNS: tuple[tuple[Boundary, re.Pattern[str]], ...] = (
             r"\b(?:delete (?:everything|all|my (?:data|chats?|records?|information))|"
             r"erase (?:everything|all|my (?:data|chats?|records?))|forget (?:everything|all about me)|"
             r"remove (?:all )?my (?:data|information)|mera (?:sab )?(?:data|record) (?:delete|mita)|"
-            r"sab (?:kuch )?delete kar do)\b",
+            r"sab (?:kuch )?delete kar do|"
+            # RPRIV06 more ways to ask: Roman Urdu ("mere data delete karo", "sab kuch mita do"),
+            # "delete my account" (ST12), Urdu script and Arabic
+            r"mer[ei] (?:sab )?(?:data|records?|information|chats?) (?:ko )?(?:delete|mita|hata)|"
+            r"(?:data|records?|information) (?:delete|mita|hata) (?:kar ?do|karo|do)|"
+            r"sab (?:kuch )?(?:mita|hata) do|delete my account)\b"
+            r"|(?:ڈیٹا|ریکارڈ|معلومات)\s+(?:کو\s+)?(?:حذف|ڈیلیٹ|مٹا)|"
+            r"(?:احذف|امسح)\s+(?:كل\s+)?(?:بياناتي|معلوماتي)",
             re.IGNORECASE,
         ),
     ),

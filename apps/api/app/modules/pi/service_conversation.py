@@ -1988,7 +1988,9 @@ ESCALATION_TEXT.update(
         ),
         "deletion_request": (
             "DELETE MY DATA: the customer asked pi to delete everything it knows about them. "
-            "Confirm to them in the chat once it is done."
+            "Nothing has been erased: pi never erases from the chat. A staff member approves it "
+            "in the conversation review (erase, with confirmation), then confirm to them in the "
+            "chat once it is done."
         ),
         "human_requested": (
             "HUMAN REQUESTED: the customer asked for a person. pi told them the team will reply "
