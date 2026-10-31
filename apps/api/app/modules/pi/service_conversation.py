@@ -2100,6 +2100,10 @@ def pre_send_guard(turn: "ServiceTurn", context: dict[str, Any]) -> None:
     INCOMPLETE and the reply is never sent: the gate's own owner-language fallback goes instead, in
     the owner's script, and a first message still says pi is an AI. A check whose input the flow
     does not hand over is UNKNOWN and is not acted on."""
+    if turn._decision is not None or turn._cost_line or turn._summary:
+        # fixed, application-written replies (a decision's confirmation of a quote, the cost
+        # answer, the sorted summary) legitimately say "approve", "free of charge" and the like
+        return
     lang = fixed_lines.code(context, script=True)
     lang = lang if lang in self_review_types.LANGS else "en"
     draft = self_review_types.DraftResult(
