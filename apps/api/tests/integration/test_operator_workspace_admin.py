@@ -12,8 +12,10 @@ from test_service_lifecycle import register
 
 from app.modules.audit.models import AuditEvent
 from app.modules.auth.models import AuthSession
+from app.modules.memberships.models import Membership
 from app.modules.pi_saas.models import PiOperatorMember
 from app.modules.users.models import PlatformUser
+from tests.support.outbox import invite_token
 
 pytestmark = pytest.mark.integration
 
@@ -57,7 +59,7 @@ async def test_super_admin_creates_a_workspace_and_manages_owners(api, business_
     )
     assert created.status_code == 201, created.text
     tenant_id = created.json()["id"]
-    assert created.json()["invite_link"].startswith("http")  # a new person is invited
+    assert created.json()["invite_link"] is None  # never returned: emailed to the address only
     listed = (await _members(api, tenant_id)).json()
     [owner] = listed["members"]
     assert owner["email"] == "founder@crescent.example" and owner["roles"] == ["owner"]
@@ -105,26 +107,40 @@ async def test_super_admin_creates_a_workspace_and_manages_owners(api, business_
     assert audited == 3
 
 
-async def test_operator_invite_of_an_unverified_account_requires_the_link(api, business_db):
-    # SEC-1: an unverified (possibly squatted) address is treated as a new account.
+async def test_operator_invite_of_an_unverified_account_is_pending_until_the_link(api, business_db):
+    # SEC-1: an unverified (possibly squatted) address gets a pending membership, no link in
+    # the response, and its credential and sessions are left alone until the mailbox owner
+    # follows the emailed link.
     other = _client(api)
     business = await register(other)
+    tenant_id = business["tenant"]["id"]
     staff = _client(api)
     squatter = await register(staff)
     me = await register(api)
     business_db.add(PiOperatorMember(user_id=UUID(me["user"]["id"]), role="operations_admin"))
     await business_db.flush()
+    email = squatter["user"]["email"]
     added = await api.post(
-        f"/api/v1/operator/workspaces/{business['tenant']['id']}/members",
-        json={"email": squatter["user"]["email"], "role": "viewer"},
+        f"/api/v1/operator/workspaces/{tenant_id}/members",
+        json={"email": email, "role": "viewer"},
     )
-    assert added.status_code == 201 and added.json()["invite_link"]
-    assert (await staff.get("/api/v1/auth/session")).status_code == 401  # session revoked
-    refused = await _client(api).post(
-        "/api/v1/auth/login",
-        json={"email": squatter["user"]["email"], "password": "ServiceFlow!Secure234"},
+    assert added.status_code == 201 and added.json()["invite_link"] is None
+    membership = await business_db.scalar(
+        select(Membership.status).where(Membership.id == UUID(added.json()["id"]))
     )
-    assert refused.status_code == 401
+    assert membership == "revoked"  # pending: grants nothing
+    assert (await staff.get("/api/v1/auth/session")).status_code == 200  # untouched
+    token = invite_token(email)
+    mailbox_owner = _client(api)
+    accepted = await mailbox_owner.post(
+        "/api/v1/auth/accept-invite", json={"token": token, "new_password": "Mailbox-Own-77x"}
+    )
+    assert accepted.status_code == 201, accepted.text
+    assert (await staff.get("/api/v1/auth/session")).status_code == 401  # squatter cut off
+    activated = await business_db.scalar(
+        select(Membership.status).where(Membership.id == UUID(added.json()["id"]))
+    )
+    assert activated == "active"
 
 
 async def test_admin_manages_members_but_not_owners(api, business_db):

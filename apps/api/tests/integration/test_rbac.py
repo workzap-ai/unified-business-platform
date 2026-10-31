@@ -7,6 +7,7 @@ from uuid import uuid4
 import pytest
 
 from app.modules.access.permissions import SYSTEM_ROLES
+from tests.support.outbox import invite_token
 from tests.support.workspace import (
     Actor,
     add_member,
@@ -236,7 +237,7 @@ async def test_hr_writer_without_sensitive_access_cannot_set_salary(stack):
                 "role_ids": [role["id"]],
             },
         )
-        token = created["invite_link"].split("token=")[1]
+        token = invite_token(email)
         accepted = await mb.post(
             "/api/v1/auth/accept-invite",
             json={"token": token, "new_password": "Clerk-Password-123"},
@@ -273,7 +274,7 @@ async def test_custom_roles_cannot_escalate_beyond_their_creator(stack):
             },
         )
         email = f"{unique('delegate')}@example.com"
-        created = await owner.create(
+        await owner.create(
             "members",
             {
                 "email": email,
@@ -281,7 +282,7 @@ async def test_custom_roles_cannot_escalate_beyond_their_creator(stack):
                 "role_ids": [delegated["id"]],
             },
         )
-        token = created["invite_link"].split("token=")[1]
+        token = invite_token(email)
         accepted = await db.post(
             "/api/v1/auth/accept-invite",
             json={"token": token, "new_password": "Delegate-Pass-123"},
@@ -341,7 +342,7 @@ async def test_custom_roles_cannot_escalate_beyond_their_creator(stack):
         # A role still assigned to someone cannot be deleted.
         assert (await delegate.delete(f"roles/{reader['id']}")).status_code == 409
 
-        victim_token = viewer["invite_link"].split("token=")[1]
+        victim_token = invite_token(new_member["email"])
         accepted = await vb.post(
             "/api/v1/auth/accept-invite",
             json={"token": victim_token, "new_password": "Victim-Password-1"},

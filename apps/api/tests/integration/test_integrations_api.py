@@ -49,6 +49,7 @@ from app.modules.integrations.models import (
 )
 from app.shared.errors import Unauthenticated
 from app.shared.scope import WorkspaceScope
+from tests.support.outbox import invite_token
 
 pytestmark = pytest.mark.integration
 
@@ -406,7 +407,7 @@ async def test_rbac_denies_without_permissions(env):
     )
     for role, email_prefix in ((reader_role, "reader"), (nobody_role, "nobody")):
         email = f"{email_prefix}-{uuid4().hex}@example.com"
-        created = await create(
+        await create(
             api,
             "members",
             {
@@ -415,7 +416,7 @@ async def test_rbac_denies_without_permissions(env):
                 "role_ids": [role["id"]],
             },
         )
-        token = created["invite_link"].split("token=")[1]
+        token = invite_token(email)
         async with httpx.AsyncClient(
             transport=api._transport,
             base_url="http://testserver",

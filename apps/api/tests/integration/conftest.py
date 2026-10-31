@@ -9,6 +9,24 @@ from app.core.database import get_session
 from app.main import create_app
 
 
+@pytest.fixture(autouse=True)
+def _capture_platform_email(monkeypatch):
+    """Record platform emails (invitation links are never in API responses)."""
+    from app.integrations import email as email_module
+    from tests.support import outbox
+
+    outbox.MESSAGES.clear()
+    original = email_module.send_platform_email
+
+    async def recording(settings, http, message, request_id=None):
+        outbox.MESSAGES.append(message)
+        return await original(settings, http, message, request_id)
+
+    monkeypatch.setattr(email_module, "send_platform_email", recording)
+    yield
+    outbox.MESSAGES.clear()
+
+
 @pytest.fixture
 async def business_db():
     url = os.getenv("TEST_DATABASE_URL")

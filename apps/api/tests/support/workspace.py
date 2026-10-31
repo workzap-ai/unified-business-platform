@@ -15,6 +15,8 @@ import httpx
 from fastapi import FastAPI
 from sqlalchemy.engine import make_url
 
+from tests.support.outbox import invite_token
+
 ORIGIN = "http://localhost:3000"
 PASSWORD = "Correct-Horse-Battery-9"
 
@@ -190,7 +192,7 @@ async def add_member(owner: Actor, role_keys: list[str], password: str = PASSWOR
     overwriting them with the new member's session)."""
     roles = {r["key"]: r["id"] for r in (await owner.get("roles")).json()}
     email = f"{unique('member')}@example.com"
-    created = await owner.create(
+    await owner.create(
         "members",
         {
             "email": email,
@@ -198,7 +200,7 @@ async def add_member(owner: Actor, role_keys: list[str], password: str = PASSWOR
             "role_ids": [roles[k] for k in role_keys],
         },
     )
-    token = created["invite_link"].split("token=")[1]
+    token = invite_token(email)
     saved_cookies = dict(owner.client.cookies)
     accepted = await owner.post("auth/accept-invite", {"token": token, "new_password": password})
     assert accepted.status_code == 201, accepted.text

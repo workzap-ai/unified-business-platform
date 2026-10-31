@@ -13,6 +13,7 @@ from app.modules.audit.models import AuditEvent
 from app.modules.pi.models import PiHandoff, PiMessage
 from app.modules.pi.runtime import send_pi_message
 from app.modules.products.models import EnvironmentProductInstallation
+from tests.support.outbox import invite_token
 
 pytestmark = pytest.mark.integration
 
@@ -59,7 +60,7 @@ async def test_pi_requires_installation_enablement_and_features(
 async def member_client(api: httpx.AsyncClient, role: str) -> httpx.AsyncClient:
     roles = {r["key"]: r["id"] for r in (await api.get("/api/v1/roles")).json()}
     email = f"{role}-{uuid4().hex[:8]}@example.com"
-    created = await create(
+    await create(
         api,
         "members",
         {
@@ -68,7 +69,7 @@ async def member_client(api: httpx.AsyncClient, role: str) -> httpx.AsyncClient:
             "role_ids": [roles[role]],
         },
     )
-    token = created["invite_link"].split("token=")[1]
+    token = invite_token(email)
     client = httpx.AsyncClient(
         transport=httpx.ASGITransport(app=api._transport.app),  # type: ignore[attr-defined]
         base_url="http://testserver",

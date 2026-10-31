@@ -5,12 +5,21 @@ from datetime import UTC, datetime, timedelta
 from uuid import uuid4
 
 import pytest
-from sqlalchemy import String, cast, func, select, update
+from sqlalchemy import func, select, update
 
 from app.modules.audit.models import AuditEvent
-from app.modules.auth.crypto import digest
-from app.modules.auth.models import AuthSession, PasswordResetToken, UserCredential
+from app.modules.auth.crypto import digest, hash_password
+from app.modules.auth.models import (
+    AuthSession,
+    MemberInviteToken,
+    PasswordResetToken,
+    UserCredential,
+    UserFace,
+    UserPasskey,
+)
+from app.modules.memberships.models import Membership
 from app.modules.users.models import PlatformUser
+from tests.support.outbox import invite_token, sent_to
 from tests.support.workspace import PASSWORD, add_member, error_code, unique
 
 pytestmark = pytest.mark.integration
@@ -479,12 +488,12 @@ async def test_member_invite_sets_a_placeholder_credential_nobody_knows(stack):
             "members",
             {"email": email, "display_name": "Member", "role_ids": [roles["viewer"]]},
         )
-        assert created["invite_link"] and "token=" in created["invite_link"]
+        assert created["invite_link"] is None  # the link goes to the mailbox only
     async with stack.browser() as anon:
         # Nobody can sign in until the invite is accepted; there is no password to guess.
         guess = await anon.post("/api/v1/auth/login", json={"email": email, "password": PASSWORD})
         assert guess.status_code == 401
-        token = created["invite_link"].split("token=")[1]
+        token = invite_token(email)
         accepted = await anon.post(
             "/api/v1/auth/accept-invite", json={"token": token, "new_password": PASSWORD}
         )
@@ -506,6 +515,42 @@ async def verify_email_in_db(stack, email):
     )
 
 
+async def invite(admin, email, role="viewer", name="Invitee"):
+    roles = {r["key"]: r["id"] for r in (await admin.get("roles")).json()}
+    return await admin.create(
+        "members", {"email": email, "display_name": name, "role_ids": [roles[role]]}
+    )
+
+
+async def enrol_factors(stack, user_id):
+    """What a squatter could have set up on the account before the real owner arrives."""
+    await db_execute(
+        stack,
+        UserPasskey.__table__.insert().values(
+            user_id=user_id,
+            credential_id=f"cred-{uuid4().hex}",
+            public_key=b"k",
+            name="Squatter key",
+        ),
+    )
+    await db_execute(
+        stack,
+        UserFace.__table__.insert().values(
+            user_id=user_id, name="Squatter face", code_encrypted="x"
+        ),
+    )
+    await db_execute(
+        stack,
+        update(UserCredential)
+        .where(UserCredential.user_id == user_id)
+        .values(second_factor_pin_hash=hash_password("482913")),
+    )
+
+
+async def count_rows(stack, model, *conditions):
+    return await db_scalar(stack, select(func.count()).select_from(model).where(*conditions))
+
+
 async def test_adding_a_verified_existing_user_as_a_member_never_touches_their_password(stack):
     # Verified accounts only: their mailbox is proven, so the plain "sign in" link is safe.
     # Unverified accounts are handled by the squatting tests below (SEC-1).
@@ -513,129 +558,215 @@ async def test_adding_a_verified_existing_user_as_a_member_never_touches_their_p
         alice = await stack.register(first)
         await verify_email_in_db(stack, alice.email)
         bob = await stack.register(second)
-        roles = {r["key"]: r["id"] for r in (await bob.get("roles")).json()}
-        created = await bob.create(
-            "members",
-            {
-                "email": alice.email,
-                "display_name": "Alice",
-                "role_ids": [roles["viewer"]],
-            },
-        )
-        # Alice already has a verified account: no invite token, nothing new to accept.
+        created = await invite(bob, alice.email, name="Alice")
         assert created["invite_link"] is None
         assert (await first.get("/api/v1/auth/session")).status_code == 200  # her session lives
+        # Active at once, no link needed.
+        switched = await alice.switch(bob.tenant_id, bob.environment_id)
+        assert switched["roles"] == ["viewer"]
     async with stack.browser() as browser:
         await stack.login(browser, alice.email)  # her original password still works
 
 
-async def test_invite_to_an_unverified_squatted_address_does_not_hand_roles_to_the_squatter(
+async def test_invite_to_a_squatted_address_gives_the_squatter_nothing_and_the_owner_everything(
     stack,
 ):
-    squatter_password = "Squatter-Pass-11"
-    victim_password = "Victim-Pass-22"
+    new_password = "Mailbox-Owner-22"
     async with stack.browser() as squat_browser, stack.browser() as admin_browser:
-        email = f"{unique('cfo')}@example.com"
-        registered = await squat_browser.post(
-            "/api/v1/auth/register",
-            json={
-                "email": email,
-                "password": squatter_password,
-                "display_name": "Squatter",
-                "organization_name": unique("SquatOrg"),
-            },
-        )
-        assert registered.status_code == 201
-        squat_user_id = registered.json()["user"]["id"]
-        assert (await squat_browser.get("/api/v1/auth/session")).status_code == 200
-
+        squatter = await stack.register(squat_browser)  # registers an address it does not own
+        squat_id = squatter.session["user"]["id"]
+        await enrol_factors(stack, squat_id)
         admin = await stack.register(admin_browser)
-        roles = {r["key"]: r["id"] for r in (await admin.get("roles")).json()}
-        created = await admin.create(
-            "members",
-            {"email": email, "display_name": "CFO", "role_ids": [roles["viewer"]]},
-        )
-        # The unverified account is treated as new: a set-password link is required.
-        assert created["invite_link"] and "token=" in created["invite_link"]
+        mails_before = len(sent_to(squatter.email))  # the sign-up confirmation
+        created = await invite(admin, squatter.email)
 
-        # The squatter's session is dead and the squatter's password no longer signs in.
-        assert (await squat_browser.get("/api/v1/auth/session")).status_code == 401
-    async with stack.browser() as anon:
-        stale = await anon.post(
-            "/api/v1/auth/login", json={"email": email, "password": squatter_password}
-        )
-        assert stale.status_code == 401
+        # The admin gets no link and no token, so cannot take the account over.
+        assert created["invite_link"] is None and "token" not in str(created).lower()
+        assert len(sent_to(squatter.email)) == mails_before + 1  # the link went to the mailbox only
 
-        # The real owner of the mailbox follows the link and gets in with the roles.
-        token = created["invite_link"].split("token=")[1]
-        accepted = await anon.post(
-            "/api/v1/auth/accept-invite", json={"token": token, "new_password": victim_password}
+        # The squatter's credential is untouched but the roles are NOT usable: pending.
+        assert (await squat_browser.get("/api/v1/auth/session")).status_code == 200
+        denied = await squatter.put(
+            "auth/session/workspace", {"tenant_id": admin.tenant_id, "environment_id": None}
+        )
+        assert denied.status_code == 404
+        row = await db_scalar(
+            stack,
+            select(Membership.status).where(
+                Membership.tenant_id == admin.tenant_id, Membership.user_id == squat_id
+            ),
+        )
+        assert row == "revoked"  # pending: grants nothing anywhere
+        squatter_cookies = dict(squat_browser.cookies)
+
+    # The real owner of the mailbox follows the emailed link.
+    async with stack.browser() as owner_browser:
+        accepted = await owner_browser.post(
+            "/api/v1/auth/accept-invite",
+            json={"token": invite_token(squatter.email), "new_password": new_password},
         )
         assert accepted.status_code == 201, accepted.text
-        assert accepted.json()["user"]["id"] == squat_user_id
-    async with stack.browser() as again:
-        signed_in = await stack.login(again, email, victim_password)
-        assert signed_in.session["user"]["id"] == squat_user_id
-        switched = await signed_in.switch(admin.tenant_id, admin.environment_id)
-        assert switched["roles"] == ["viewer"]  # exactly the invited role, in the inviting tenant
-        # Still refused with the squatter's old password.
-        refused = await again.post(
-            "/api/v1/auth/login", json={"email": email, "password": squatter_password}
+    # The squatter is cut off: session, password, passkey, face, PIN.
+    async with stack.browser() as late:
+        late.cookies.update(squatter_cookies)
+        assert (await late.get("/api/v1/auth/session")).status_code == 401
+        late.cookies.clear()
+        old = await late.post(
+            "/api/v1/auth/login", json={"email": squatter.email, "password": PASSWORD}
         )
-        assert refused.status_code == 401
-    assert await db_scalar(
-        stack, select(PlatformUser.email_verified_at).where(PlatformUser.email == email)
-    )
-    # Audit trail: the reset and the invite acceptance are recorded, with no secret or email.
-    reset_count = await db_scalar(
-        stack,
-        select(func.count())
-        .select_from(AuditEvent)
-        .where(
-            AuditEvent.action == "auth.unverified_account_invited_reset",
-            AuditEvent.entity_id == squat_user_id,
-        ),
-    )
-    assert reset_count == 1
-    leaked = await db_scalar(
-        stack,
-        select(func.count())
-        .select_from(AuditEvent)
-        .where(
-            AuditEvent.entity_id == squat_user_id,
-            cast(AuditEvent.details, String).contains(email),
-        ),
-    )
-    assert leaked == 0
-    assert await db_scalar(
-        stack,
-        select(AuditEvent.id).where(
-            AuditEvent.action == "member.added", AuditEvent.tenant_id == admin.tenant_id
-        ),
+        assert old.status_code == 401
+    assert await count_rows(stack, UserPasskey, UserPasskey.user_id == squat_id) == 0
+    assert await count_rows(stack, UserFace, UserFace.user_id == squat_id) == 0
+    assert (
+        await db_scalar(
+            stack,
+            select(UserCredential.second_factor_pin_hash).where(UserCredential.user_id == squat_id),
+        )
+        is None
     )
     assert await db_scalar(
-        stack,
-        select(AuditEvent.id).where(
-            AuditEvent.action == "auth.invite_accepted", AuditEvent.entity_id == squat_user_id
-        ),
+        stack, select(PlatformUser.email_verified_at).where(PlatformUser.id == squat_id)
     )
+    async with stack.browser() as real:
+        actor = await stack.login(real, squatter.email, new_password)
+        assert actor.session["user"]["id"] == squat_id
+        switched = await actor.switch(admin.tenant_id, admin.environment_id)
+        assert switched["roles"] == ["viewer"]
+        # Single use.
+        replay = await real.post(
+            "/api/v1/auth/accept-invite",
+            json={"token": invite_token(squatter.email), "new_password": "Other-Pass-33"},
+        )
+        assert replay.status_code == 422 and error_code(replay) == "INVALID_INVITE_TOKEN"
+
+    # Audit: actor and tenant on the invite, target user id, no email or secret.
+    event = (
+        await stack.app.state.test_connection.execute(
+            select(AuditEvent.actor_user_id, AuditEvent.tenant_id, AuditEvent.details).where(
+                AuditEvent.action == "member.added", AuditEvent.tenant_id == admin.tenant_id
+            )
+        )
+    ).first()
+    assert str(event.actor_user_id) == admin.session["user"]["id"]
+    assert event.details["user_id"] == squat_id and event.details["pending"] is True
+    assert squatter.email not in str(event.details)
+    assert await count_rows(
+        stack,
+        AuditEvent,
+        AuditEvent.action == "auth.invite_accepted",
+        AuditEvent.entity_id == squat_id,
+    )
+
+
+async def test_a_second_step_begun_before_the_takeover_is_void(stack):
+    async with stack.browser() as squat_browser, stack.browser() as admin_browser:
+        squatter = await stack.register(squat_browser)
+        squat_id = squatter.session["user"]["id"]
+        await enrol_factors(stack, squat_id)
+        async with stack.browser() as step_one:
+            ticket = (
+                await step_one.post(
+                    "/api/v1/auth/login", json={"email": squatter.email, "password": PASSWORD}
+                )
+            ).json()["ticket"]
+        admin = await stack.register(admin_browser)
+        await invite(admin, squatter.email)
+    async with stack.browser() as owner:
+        accepted = await owner.post(
+            "/api/v1/auth/accept-invite",
+            json={"token": invite_token(squatter.email), "new_password": "Owner-Pass-44"},
+        )
+        assert accepted.status_code == 201
+    # Even if the squatter somehow still held a working factor, the old ticket is void.
+    await db_execute(
+        stack,
+        update(UserCredential)
+        .where(UserCredential.user_id == squat_id)
+        .values(second_factor_pin_hash=hash_password("482913")),
+    )
+    async with stack.browser() as squat:
+        finish = await squat.post("/api/v1/auth/mfa/pin", json={"ticket": ticket, "pin": "482913"})
+        assert error_code(finish) == "SIGN_IN_EXPIRED"
+
+
+async def test_invite_answers_look_the_same_for_new_unverified_and_verified_accounts(stack):
+    async with stack.browser() as a, stack.browser() as b, stack.browser() as c:
+        verified = await stack.register(a)
+        await verify_email_in_db(stack, verified.email)
+        unverified = await stack.register(b)
+        admin = await stack.register(c)
+        fresh = f"{unique('fresh')}@example.com"
+        answers = [await invite(admin, e) for e in (verified.email, unverified.email, fresh)]
+        assert len({tuple(sorted(x)) for x in answers}) == 1
+        assert all(x["status"] == "active" and x["invite_link"] is None for x in answers)
+        assert all(x["roles"] == ["viewer"] for x in answers)
+
+
+async def test_two_pending_invites_activate_together_when_the_mailbox_owner_accepts(stack):
+    async with stack.browser() as sq, stack.browser() as a, stack.browser() as b:
+        squatter = await stack.register(sq)
+        admin_a, admin_b = await stack.register(a), await stack.register(b)
+        await invite(admin_a, squatter.email)
+        await invite(admin_b, squatter.email, role="manager")
+    async with stack.browser() as owner:
+        accepted = await owner.post(
+            "/api/v1/auth/accept-invite",
+            json={"token": invite_token(squatter.email), "new_password": "Both-Pass-55"},
+        )
+        assert accepted.status_code == 201
+    async with stack.browser() as real:
+        actor = await stack.login(real, squatter.email, "Both-Pass-55")
+        a_roles = (await actor.switch(admin_a.tenant_id, admin_a.environment_id))["roles"]
+        b_roles = (await actor.switch(admin_b.tenant_id, admin_b.environment_id))["roles"]
+        assert a_roles == ["viewer"] and b_roles == ["manager"]
+
+
+async def test_a_refused_invite_changes_nothing(stack):
+    async with stack.browser() as sq, stack.browser() as o, stack.browser() as v:
+        squatter = await stack.register(sq)
+        squat_id = squatter.session["user"]["id"]
+        mails_before = len(sent_to(squatter.email))
+        owner = await stack.register(o)
+        viewer_email = await add_member(owner, ["viewer"])
+        viewer = await stack.login(v, viewer_email)
+        roles = {r["key"]: r["id"] for r in (await owner.get("roles")).json()}
+        refused = await viewer.post(
+            "members",
+            {"email": squatter.email, "display_name": "X", "role_ids": [roles["viewer"]]},
+        )
+        assert refused.status_code == 403
+    assert await count_rows(stack, Membership, Membership.user_id == squat_id) == 1  # own only
+    assert await count_rows(stack, MemberInviteToken, MemberInviteToken.user_id == squat_id) == 0
+    assert len(sent_to(squatter.email)) == mails_before  # no invitation went out
+    async with stack.browser() as again:
+        await stack.login(again, squatter.email)  # password untouched
+
+
+async def test_an_admin_cancelling_a_pending_invite_kills_its_link(stack):
+    async with stack.browser() as sq, stack.browser() as a:
+        squatter = await stack.register(sq)
+        admin = await stack.register(a)
+        created = await invite(admin, squatter.email)
+        assert (await admin.delete(f"members/{created['membership_id']}")).status_code == 204
+    async with stack.browser() as owner:
+        accepted = await owner.post(
+            "/api/v1/auth/accept-invite",
+            json={"token": invite_token(squatter.email), "new_password": "Late-Pass-66"},
+        )
+        assert accepted.status_code == 422 and error_code(accepted) == "INVALID_INVITE_TOKEN"
 
 
 async def test_unverified_invitee_keeps_only_the_invited_workspace_roles(stack):
     # Scoping is unchanged: the invitee ends up a member of the inviting workspace with
-    # exactly the granted role, and is not given anything in the admin's other places.
+    # exactly the granted role and nothing else, and their own workspace is untouched.
     async with stack.browser() as other, stack.browser() as admin_browser:
         invitee = await stack.register(other)
         admin = await stack.register(admin_browser)
-        roles = {r["key"]: r["id"] for r in (await admin.get("roles")).json()}
-        created = await admin.create(
-            "members",
-            {"email": invitee.email, "display_name": "I", "role_ids": [roles["viewer"]]},
-        )
-    token = created["invite_link"].split("token=")[1]
+        await invite(admin, invitee.email)
     async with stack.browser() as anon:
         accepted = await anon.post(
-            "/api/v1/auth/accept-invite", json={"token": token, "new_password": PASSWORD}
+            "/api/v1/auth/accept-invite",
+            json={"token": invite_token(invitee.email), "new_password": PASSWORD},
         )
         assert accepted.status_code == 201
     async with stack.browser() as again:

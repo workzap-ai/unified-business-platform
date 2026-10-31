@@ -12,7 +12,7 @@ membership from here (they use the workspace's own Team page).
 """
 
 import logging
-from datetime import UTC, datetime, timedelta
+from datetime import UTC, datetime
 from typing import Any, Literal
 from uuid import UUID
 
@@ -28,9 +28,14 @@ from app.modules.access.dependencies import Session
 from app.modules.access.models import MembershipRole, Role
 from app.modules.access.service import assign_roles, owner_count
 from app.modules.audit.service import record
-from app.modules.auth.crypto import digest, hash_password, new_token
-from app.modules.auth.invite_guard import contain_unverified_account
-from app.modules.auth.models import AuthSession, MemberInviteToken, UserCredential
+from app.modules.auth.crypto import hash_password, new_token
+from app.modules.auth.invite_guard import (
+    burn_hash,
+    issue_invite_token,
+    needs_proof,
+    withdraw_invites,
+)
+from app.modules.auth.models import AuthSession, UserCredential
 from app.modules.business_settings.models import BusinessSettings
 from app.modules.environments.models import Environment
 from app.modules.memberships.models import Membership
@@ -316,8 +321,8 @@ async def _is_owner(session: AsyncSession, tenant_id: UUID, membership_id: UUID)
 async def _user_for(session: AsyncSession, email: str, name: str) -> tuple[PlatformUser, bool]:
     user = await session.scalar(select(PlatformUser).where(PlatformUser.email == email))
     if user is not None:
-        # Unverified address: treat as new (credential reset, link required).
-        return user, await contain_unverified_account(session, user)
+        await burn_hash()  # same work as a new account: no timing oracle
+        return user, False
     user = PlatformUser(email=email, display_name=name or email.split("@")[0][:160])
     session.add(user)
     await session.flush()
@@ -338,22 +343,17 @@ async def _invite(
     user: PlatformUser,
     tenant: Tenant,
     inviter: str,
-    is_new: bool,
-) -> str | None:
-    """New people get a one-time link to set their password; existing people are told
-    where to sign in. A failed email never blocks the change."""
+    needs_link: bool,
+) -> None:
+    """New people and people whose mailbox was never verified (SEC-1) get a one-time
+    link to set their password, emailed to the address only and never returned to the
+    operator; verified people are told where to sign in. A failed email never blocks
+    the change."""
     settings = request.app.state.settings
     link: str | None = None
-    if is_new:
-        token = new_token()
-        session.add(
-            MemberInviteToken(
-                user_id=user.id,
-                tenant_id=tenant.id,
-                token_hash=digest(token),
-                expires_at=datetime.now(UTC)
-                + timedelta(minutes=settings.member_invite_ttl_minutes),
-            )
+    if needs_link:
+        token = await issue_invite_token(
+            session, user.id, tenant.id, settings.member_invite_ttl_minutes
         )
         link = f"{settings.web_base}/accept-invite?token={token}"
     try:
@@ -371,7 +371,6 @@ async def _invite(
         )
     except (BusinessRuleViolation, IntegrationError):
         logger.warning("invitation_email_failed", extra={"user_id": str(user.id)})
-    return link
 
 
 async def _audit(
@@ -402,22 +401,27 @@ async def create_workspace(
     owner, is_new = await _user_for(session, data.owner_email, data.owner_name)
     if owner.status != "active":
         raise BusinessRuleViolation("USER_DISABLED", "This account is disabled")
-    tenant, environment, _ = await provision_tenant(session, owner, data.name)
+    tenant, environment, owner_membership = await provision_tenant(session, owner, data.name)
+    # An existing account with an unverified mailbox is not made owner until the emailed
+    # link is used: its membership stays pending (grants nothing).
+    pending = not is_new and needs_proof(owner)
+    if pending:
+        owner_membership.status = "revoked"
     session.add(
         BusinessSettings(
             tenant_id=tenant.id, environment_id=environment.id, business_type=data.business_type
         )
     )
-    link = await _invite(request, session, owner, tenant, operator.label, is_new)
+    await _invite(request, session, owner, tenant, operator.label, is_new or pending)
     await _audit(
         session,
         operator,
         "workspace_created",
         tenant.id,
-        {"owner": str(owner.id), "new_account": is_new},
+        {"owner": str(owner.id), "new_account": is_new, "pending": pending},
     )
     await session.commit()
-    return {"id": tenant.id, "name": tenant.name, "slug": tenant.slug, "invite_link": link}
+    return {"id": tenant.id, "name": tenant.name, "slug": tenant.slug, "invite_link": None}
 
 
 @router.get("/{tenant_id}/members")
@@ -499,19 +503,26 @@ async def add_member(
     if membership is None:
         membership = Membership(tenant_id=tenant_id, user_id=user.id)
         session.add(membership)
-    membership.status = "active"
+    pending = not is_new and needs_proof(user)  # unverified mailbox: grants nothing yet
+    membership.status = "revoked" if pending else "active"
     await session.flush()
     await assign_roles(session, tenant_id, membership.id, [role.id])
-    link = await _invite(request, session, user, tenant, operator.label, is_new)
+    await _invite(request, session, user, tenant, operator.label, is_new or pending)
     await _audit(
         session,
         operator,
         "workspace_member_added",
         tenant_id,
-        {"membership": str(membership.id), "new_role": role.key, "new_account": is_new},
+        {
+            "membership": str(membership.id),
+            "new_role": role.key,
+            "new_account": is_new,
+            "pending": pending,
+            "user": str(user.id),
+        },
     )
     await session.commit()
-    return {"id": membership.id, "role": role.key, "invite_link": link}
+    return {"id": membership.id, "role": role.key, "invite_link": None}
 
 
 async def _target(
@@ -579,6 +590,7 @@ async def remove_member(
         if await owner_count(session, tenant_id, exclude=membership.id) == 0:
             raise BusinessRuleViolation("LAST_OWNER", "A workspace needs at least one owner")
     membership.status = "revoked"
+    await withdraw_invites(session, membership.user_id, tenant_id)  # a pending link dies too
     # Their sessions lose this workspace straight away.
     await session.execute(
         update(AuthSession)

@@ -4,6 +4,8 @@ import httpx
 import pytest
 from test_service_lifecycle import create, register
 
+from tests.support.outbox import invite_token
+
 pytestmark = pytest.mark.integration
 
 
@@ -88,7 +90,7 @@ async def test_member_permissions_revocation_and_foreign_roles(api):
             "role_ids": [role["id"]],
         },
     )
-    token = member["invite_link"].split("token=")[1]
+    token = invite_token(email)
     async with httpx.AsyncClient(
         transport=api._transport,
         base_url="http://testserver",

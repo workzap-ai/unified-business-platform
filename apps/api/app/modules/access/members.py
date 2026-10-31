@@ -1,5 +1,5 @@
 import logging
-from datetime import UTC, datetime, timedelta
+from datetime import UTC, datetime
 from uuid import UUID
 
 from sqlalchemy import func, select, update
@@ -15,9 +15,14 @@ from app.modules.access.models import MembershipRole, Role, RolePermission
 from app.modules.access.schemas import MemberCreate, MemberView
 from app.modules.access.service import assign_roles, membership_grants, owner_count
 from app.modules.audit.service import record
-from app.modules.auth.crypto import digest, hash_password, new_token
-from app.modules.auth.invite_guard import contain_unverified_account
-from app.modules.auth.models import AuthSession, MemberInviteToken, UserCredential
+from app.modules.auth.crypto import hash_password, new_token
+from app.modules.auth.invite_guard import (
+    burn_hash,
+    issue_invite_token,
+    needs_proof,
+    withdraw_invites,
+)
+from app.modules.auth.models import AuthSession, UserCredential
 from app.modules.memberships.models import Membership
 from app.modules.tenants.models import Tenant
 from app.modules.users.models import PlatformUser
@@ -102,9 +107,6 @@ class MemberService:
             select(PlatformUser).where(PlatformUser.email == data.email)
         )
         is_new_account = user is None
-        if user is not None:
-            # An address nobody has proved they own is handled like a new account.
-            is_new_account = await contain_unverified_account(self.session, user)
         if user is None:
             user = PlatformUser(email=data.email, display_name=data.display_name)
             self.session.add(user)
@@ -118,6 +120,11 @@ class MemberService:
                     password_changed_at=datetime.now(UTC),
                 )
             )
+        else:
+            await burn_hash()  # same work as a new account: no timing oracle
+        # An existing account whose mailbox was never verified may belong to a squatter:
+        # its membership stays pending (grants nothing) until the emailed link is used.
+        pending = not is_new_account and needs_proof(user)
         existing = await self.session.scalar(
             select(Membership).where(
                 Membership.tenant_id == self.scope.tenant_id, Membership.user_id == user.id
@@ -128,7 +135,9 @@ class MemberService:
         if existing is None:
             existing = Membership(tenant_id=self.scope.tenant_id, user_id=user.id)
             self.session.add(existing)
-        else:
+            if pending:
+                existing.status = "revoked"
+        elif not pending:
             existing.status = "active"
         await self.session.flush()
         await self._assign(existing.id, data.role_ids)
@@ -138,11 +147,13 @@ class MemberService:
             scope=self.scope,
             entity_type="membership",
             entity_id=existing.id,
+            details={"user_id": str(user.id), "pending": pending},
             include_environment=False,
         )
-        invite_link = await self._invite(user, http, settings, audience, is_new_account)
+        await self._invite(user, http, settings, audience, is_new_account or pending)
         view = await self._view(existing, user)
-        return view.model_copy(update={"invite_link": invite_link})
+        # The same answer for a new, a pending and a verified account, and never a link.
+        return view.model_copy(update={"status": "active", "invite_link": None})
 
     async def _invite(
         self,
@@ -150,27 +161,18 @@ class MemberService:
         http: OutboundClient,
         settings: Settings,
         audience: Audience,
-        is_new_account: bool,
-    ) -> str | None:
-        """New accounts (and existing ones whose email was never verified, see
-        invite_guard) get a one-time link to set their password; a verified person
-        added to another workspace already has one, so they just get pointed at sign-in.
-        Either way, a failed send never blocks adding the member."""
+        needs_link: bool,
+    ) -> None:
+        """New and not-yet-verified accounts get a one-time link to set their password,
+        emailed to the address only (never returned to the inviting admin). A verified
+        person added to another workspace already has a password, so they are pointed
+        at sign-in. A failed send never blocks adding the member."""
         base = settings.pi_app_public_url if audience == "pi" else settings.web_base
-        invite_link: str | None = None
-        if is_new_account:
-            current = datetime.now(UTC)
-            token = new_token()
-            self.session.add(
-                MemberInviteToken(
-                    user_id=user.id,
-                    tenant_id=self.scope.tenant_id,
-                    token_hash=digest(token),
-                    expires_at=current + timedelta(minutes=settings.member_invite_ttl_minutes),
-                )
+        if needs_link:
+            token = await issue_invite_token(
+                self.session, user.id, self.scope.tenant_id, settings.member_invite_ttl_minutes
             )
-            invite_link = f"{base}/accept-invite?token={token}"
-            link = invite_link
+            link = f"{base}/accept-invite?token={token}"
         else:
             link = f"{base}/{'sign-in' if audience == 'pi' else 'login'}"
         tenant_name = await self.session.scalar(
@@ -191,7 +193,6 @@ class MemberService:
             )
         except (BusinessRuleViolation, IntegrationError):
             logger.warning("invitation_email_failed", extra={"user_id": str(user.id)})
-        return invite_link
 
     async def _assign(self, membership_id: UUID, role_ids: list[UUID]) -> None:
         roles = (
@@ -305,6 +306,8 @@ class MemberService:
         if await owner_count(self.session, self.scope.tenant_id, exclude=membership.id) == 0:
             raise BusinessRuleViolation("LAST_OWNER", "A workspace needs at least one owner")
         membership.status = "revoked"
+        # Also cancels a pending invitation: its emailed link stops working.
+        await withdraw_invites(self.session, membership.user_id, self.scope.tenant_id)
         # Sessions pointing at this tenant lose their workspace selection immediately.
         await self.session.execute(
             update(AuthSession)

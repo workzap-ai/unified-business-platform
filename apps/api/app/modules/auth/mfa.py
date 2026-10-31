@@ -186,7 +186,12 @@ async def open_ticket(
     ticket = secrets.token_urlsafe(24)
     await _store(request).put(
         f"mfa:{ticket}",
-        {"user": str(user.id), "methods": methods, "audience": audience},
+        {
+            "user": str(user.id),
+            "methods": methods,
+            "audience": audience,
+            "issued": datetime.now(UTC).timestamp(),
+        },
         TICKET_SECONDS,
     )
     return {
@@ -273,9 +278,18 @@ async def _success(
     method: str,
     audience: Audience,
 ) -> Any:
+    ticket_data = await _store(request).get(f"mfa:{ticket}")
+    await _store(request).delete(f"mfa:{ticket}")
+    # A second step begun before the password was last changed (for instance by the
+    # previous holder of an account whose mailbox owner just took it over) is void.
+    if (
+        ticket_data is not None
+        and "issued" in ticket_data
+        and float(ticket_data["issued"]) < credential.password_changed_at.timestamp()
+    ):
+        raise BusinessRuleViolation("SIGN_IN_EXPIRED", "Enter your password again.")
     credential.second_factor_failures = 0
     credential.second_factor_locked_until = None
-    await _store(request).delete(f"mfa:{ticket}")
     user = await session.get(PlatformUser, credential.user_id)
     if user is None or user.status != "active":
         raise BusinessRuleViolation("SIGN_IN_EXPIRED", "Enter your password again.")

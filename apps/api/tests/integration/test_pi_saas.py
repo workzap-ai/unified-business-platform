@@ -46,6 +46,7 @@ from app.modules.pi_saas.models import (
 )
 from app.modules.products.service import enabled_products
 from app.shared.scope import WorkspaceScope
+from tests.support.outbox import invite_token
 
 pytestmark = pytest.mark.integration
 
@@ -555,7 +556,7 @@ async def _member_client(app, owner, role: str):
         json={"email": email, "display_name": role.title(), "role": role},
     )
     assert response.status_code == 201, response.text
-    token = response.json()["invite_link"].split("token=")[1]
+    token = invite_token(email)
     client = pi_client(app)
     accepted = await client.post(
         "/api/v1/pi-app/auth/accept-invite", json={"token": token, "new_password": PASSWORD}

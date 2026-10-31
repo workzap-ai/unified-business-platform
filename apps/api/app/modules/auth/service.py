@@ -15,7 +15,11 @@ from app.integrations.errors import IntegrationError
 from app.integrations.http import OutboundClient
 from app.modules.audit.service import record
 from app.modules.auth.crypto import digest, hash_password, needs_rehash, new_token, verify_password
-from app.modules.auth.invite_guard import revoke_sessions
+from app.modules.auth.invite_guard import (
+    activate_pending,
+    cut_off_previous_holder,
+    revoke_sessions,
+)
 from app.modules.auth.models import (
     AuthSession,
     EmailVerificationToken,
@@ -455,16 +459,21 @@ class AuthService:
             raise BusinessRuleViolation(
                 "INVALID_INVITE_TOKEN", "This invitation link is invalid or has expired"
             )
-        invite.used_at = current
+        was_unverified = user.email_verified_at is None
         credential.password_hash = hash_password(new_password)
         credential.password_changed_at = current
         credential.failed_attempts = 0
         credential.locked_until = None
-        # Whatever signed in before the mailbox owner chose a password is cut off.
+        # Following the emailed link proves the mailbox, so whoever held the account
+        # before (a squatter) is cut off: sessions always, enrolled factors when the
+        # mailbox was unproven until now.
         await revoke_sessions(self.session, user.id)
-        if user.email_verified_at is None:
-            # Clicking the emailed link already proves the mailbox is real.
+        if was_unverified:
+            await cut_off_previous_holder(self.session, credential)
             user.email_verified_at = current
+        # This invitation (and any other live one for this person) is used up and
+        # their pending memberships switch on.
+        await activate_pending(self.session, user.id, current)
         issued = await self._issue(user, user_agent, audience)
         await record(
             self.session,
@@ -473,6 +482,7 @@ class AuthService:
             tenant_id=invite.tenant_id,
             entity_type="user",
             entity_id=user.id,
+            details={"cut_off_previous_holder": was_unverified},
         )
         return issued
 
