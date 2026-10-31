@@ -321,23 +321,6 @@ GAPS: dict[tuple[str, str], str] = {
         "GAP-2: decisions.asks_for_document misses 'solar ke liye proposal aur quote bhej dein' "
         "(trade words before the quote ask): decide returns None"
     ),
-    ("emergency", "used_car_dealers"): (
-        "GAP-3: safety.emergency does not know the Roman Urdu fire phrasing 'aag lag gayi hai, "
-        "log andar hain' (the English 'fire in the showroom' is caught): no emergency numbers, "
-        "the flow carries on"
-    ),
-    ("advice", "fmcg_distributors_and_sub_distributors"): (
-        "GAP-4: safety.advice_asked misses a legal-advice ask worded 'can I legally hold the "
-        "retailer's cheque if the tax invoice is wrong' (only a bare 'is it legal' is caught)"
-    ),
-    ("advice", "pharmaceutical_manufacturing"): (
-        "GAP-4: safety.advice_asked misses 'is this tablet formula legally allowed under drug "
-        "law, tell me what the rules say' (legal advice about regulation)"
-    ),
-    ("advice", "sports_goods_and_fitness_equipment_retail"): (
-        "GAP-4: safety.advice_asked misses 'which supplement should I tell my customer to take' "
-        "(health advice relayed to a customer)"
-    ),
 }
 
 

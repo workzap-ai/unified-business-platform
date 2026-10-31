@@ -63,7 +63,8 @@ EMERGENCY_PATTERNS: tuple[tuple[Emergency, re.Pattern[str]], ...] = (
         re.compile(
             r"\b(?:there(?:'s| is) (?:a )?fire|(?:caught|catching|(?<!sales are )(?<!business is )(?<!sales is )on) fire(?!\s+sales?)|fire (?:in|at|broke out in) "
             r"(?:my|the|our)\b|(?:building|shop|godown|factory|warehouse) is (?:burning|on fire)|"
-            r"aag lag(?:i|gayi|gai|ayi)|(?:shop|godown|factory|dukan|dukaan) mein aag)\b|حريق|حریق|آگ لگ",
+            r"aag lag(?:i|gayi|gai|ayi)|aag lag (?:gayi|gai|gaya|gayee|rahi|raha|ayi)|"
+            r"(?:shop|godown|factory|dukan|dukaan|showroom|gaari|gadi) mein aag)\b|حريق|حریق|آگ لگ|आग\s+(?:लग|लगी)",
             re.IGNORECASE,
         ),
     ),
@@ -724,7 +725,12 @@ def _named_person(text: str, match: re.Match[str]) -> bool:
         opens = not before or before[-1] in ".!?:" or before.endswith(chr(10))
         if opens and match.start() == match.start(group):  # no role before the name
             tail = text[match.end(group) :]
-            return bool(re.match(r"(?:'s)?\s+(?i:has|had|got|ko|ka|ki|ke|salary|pay|wages?|earns|gets|is|was|were|makes)\b", tail))
+            return bool(
+                re.match(
+                    r"(?:'s)?\s+(?i:has|had|got|ko|ka|ki|ke|salary|pay|wages?|earns|gets|is|was|were|makes)\b",
+                    tail,
+                )
+            )
         return True
     return False
 
@@ -1123,6 +1129,21 @@ ADVICE_PATTERNS: tuple[tuple[Advice, re.Pattern[str]], ...] = (
 
 # Advice questions asked in Arabic, Urdu and Roman Urdu (R-ADV-01, spec 10.2 RT9).
 ADVICE_PATTERNS = ADVICE_PATTERNS + (
+    (
+        Advice.LEGAL,
+        re.compile(
+            r"\b(?:can (?:i|we) legally|legally (?:allowed|permitted|required|entitled|binding)|"
+            r"tell me what the (?:law|rules|act|regulations?) says?|what does the (?:law|act) say)\b",
+            re.IGNORECASE,
+        ),
+    ),
+    (
+        Advice.MEDICAL,
+        re.compile(
+            r"\b(?:which|what) (?:supplements?|vitamins?|protein powders?|painkillers?)\s+(?:should|do|can|shall|to)\b",
+            re.IGNORECASE,
+        ),
+    ),
     (
         Advice.TAX,
         re.compile(
