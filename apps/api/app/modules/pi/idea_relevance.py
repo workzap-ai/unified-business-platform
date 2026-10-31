@@ -32,7 +32,7 @@ import re
 import unicodedata
 from collections import Counter
 from collections.abc import Callable, Iterable, Mapping, Sequence
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from enum import StrEnum
 from typing import Any, Protocol
 
@@ -76,6 +76,7 @@ class IdeaVerdict:
     detail: str = ""  # the gate's own text for a violation (capped); otherwise ""
     concepts: tuple[str, ...] = ()  # topic concepts found in the idea
     score: int = 0  # the best problem's link points
+    tried_note: str = ""  # "already_tried_worked": the idea repeats an attempt that helped
 
 
 # ----- the constraint gate (L2-1's gate_options plugs in through `gate_from_option_gate`) ---------
@@ -410,8 +411,10 @@ _OFF = lex.OFF_TOPIC
 _MAIN = _Index(_CONCEPTS)
 _OFF_INDEX = _Index([*_OFF, lex.Concept("novelty", (), (), lex.NOVELTY_TERMS)], drop_setting=False)
 _GENERIC = _Index([lex.Concept("generic", (), (), lex.GENERIC_PHRASES)])
-_REMEDY_KEYS = list(lex.REMEDIES)
-_REMEDY = _Index([lex.Concept(k, (), (), v) for k, v in lex.REMEDIES.items()])
+_TRIED_KEYS = list(lex.TRIED_CONCEPTS)
+_TRIED = _Index(
+    [lex.Concept(k, (), (), v) for k, v in lex.TRIED_CONCEPTS.items()], drop_setting=False
+)
 
 _SETTING = frozenset(normalize_text(lex.SETTING_WORDS).split())
 _STOP = frozenset(normalize_text(lex.STOPWORDS + " tried try trying kiya kia").split())
@@ -607,7 +610,24 @@ def _run_gate(
 # ----- tried -----------------------------------------------------------------------------------------------
 
 
-def _tried_texts(tried: Any) -> list[str]:
+def _outcome_of(raw: Any) -> str:
+    """ "failed", "worked" or "unclear" from what the owner said happened (a stored "failed" or "worked",
+    or free text in any of the five languages); nothing readable is "unclear"."""
+    if not isinstance(raw, str):
+        return "unclear"
+    text = " " + normalize_text(raw[:MAX_TRIED_CHARS]) + " "
+    for status, phrases in (("failed", _OUTCOME_FAILED), ("worked", _OUTCOME_WORKED)):
+        if any(f" {ph} " in text for ph in phrases):
+            return status
+    return "unclear"
+
+
+_OUTCOME_FAILED = tuple(normalize_text(x) for x in lex.OUTCOME_FAILED.split("|"))
+_OUTCOME_WORKED = tuple(normalize_text(x) for x in lex.OUTCOME_WORKED.split("|"))
+
+
+def _tried_entries(tried: Any) -> list[tuple[str, str]]:
+    """(what, outcome) for each tried item: `{"what", "outcome"}` or a plain string (outcome unclear)."""
     if isinstance(tried, (str, bytes)):
         items: list[Any] = [tried] if isinstance(tried, str) else []
     elif isinstance(tried, Mapping) or tried is None:
@@ -617,31 +637,57 @@ def _tried_texts(tried: Any) -> list[str]:
             items = list(tried)[:MAX_TRIED]
         except TypeError:
             items = []
-    out: list[str] = []
+    out: list[tuple[str, str]] = []
     for item in items[:MAX_TRIED]:
-        text = item if isinstance(item, str) else _get(item, "what") if item is not None else None
+        if isinstance(item, str):
+            text, outcome = item, "unclear"
+        elif item is None:
+            continue
+        else:
+            text, outcome = _get(item, "what"), _outcome_of(_get(item, "outcome"))
         if isinstance(text, str) and text.strip():
-            out.append(text[:MAX_TRIED_CHARS])
+            out.append((text[:MAX_TRIED_CHARS], outcome))
     return out
 
 
-def _repeats_tried(
-    idea_cores: list[str], idea_stems: set[str], tried: Any
-) -> tuple[str, str] | None:
-    """(reason, evidence) when the idea repeats something the owner already tried."""
-    idea_rem = {_REMEDY_KEYS[i]: s for i, s in _REMEDY.scan(idea_cores)}
-    for text in _tried_texts(tried):
-        cores = _tokens(text)
-        rem = {_REMEDY_KEYS[i] for i, _ in _REMEDY.scan(cores)}
-        shared_rem = rem & set(idea_rem)
-        if shared_rem:
-            key = sorted(shared_rem)[0]
-            return f"tried_remedy:{key}", idea_rem[key]
-        stems = _content_stems(cores)
-        common = stems & idea_stems
-        if len(common) >= 2 and len(common) / max(len(stems), 1) >= 0.6:
-            return "tried_words", sorted(common)[0]
+def _same_attempt(
+    tried_words: list[str], tried_concepts: set[int], idea_concepts: set[int], idea_stems: set[str]
+) -> str | None:
+    """The evidence word when the idea is the tried attempt again: it names all of the tried item's
+    concepts (one if it has one, two if it has more), or shares most of its content words."""
+    channel = _TRIED_KEYS.index(
+        "channel"
+    )  # where it was done (WhatsApp, Facebook) is not what was done
+    tried_concepts = tried_concepts - {channel}
+    idea_concepts = idea_concepts - {channel}
+    need = min(2, len(tried_concepts))
+    shared = tried_concepts & idea_concepts
+    if need and len(shared) >= need:
+        return _TRIED_KEYS[sorted(shared)[0]]
+    stems = _content_stems(tried_words)
+    common = stems & idea_stems
+    if len(common) >= 2 and len(common) / max(len(stems), 1) >= 0.6:
+        return sorted(common)[0]
     return None
+
+
+def _repeats_tried(
+    idea_words: list[str], idea_stems: set[str], tried: Any
+) -> tuple[str, str] | None:
+    """(status, evidence) when the idea repeats an attempt: status "tried_failed" (the owner said it did
+    not help), "tried_unclear" (no outcome: ask) or "worked" (it helped: not a failed repeat). A failed
+    match beats an unclear one, which beats a worked one."""
+    idea_concepts = {i for i, _ in _TRIED.scan(idea_words)}
+    best: tuple[int, str, str] | None = None
+    rank = {"failed": 3, "unclear": 2, "worked": 1}
+    for text, outcome in _tried_entries(tried):
+        words = _tokens(text)
+        found = _same_attempt(words, {i for i, _ in _TRIED.scan(words)}, idea_concepts, idea_stems)
+        if found is not None and (best is None or rank[outcome] > best[0]):
+            best = (rank[outcome], outcome, found)
+    if best is None:
+        return None
+    return ("worked" if best[1] == "worked" else f"tried_{best[1]}", best[2])
 
 
 # ----- the verdict -----------------------------------------------------------------------------------------
@@ -744,7 +790,8 @@ def _analyse(
     linked.sort(key=lambda t: -t[0])
     ids = tuple(pid for _, pid in linked)
 
-    if repeat is not None:
+    worked = repeat is not None and repeat[0] == "worked"
+    if repeat is not None and not worked:
         return IdeaVerdict(
             IdeaKind.REPEATS_TRIED,
             repeat[0],
@@ -822,6 +869,15 @@ def evaluate_idea(
         verdict = _analyse(text, problems, tried, known_facts)
     except Exception:
         verdict = IdeaVerdict(IdeaKind.UNKNOWN, "internal_error")
+    note = ""
+    if verdict.kind is not IdeaKind.REPEATS_TRIED:
+        try:
+            words = normalize_text(text).split()
+            rep = _repeats_tried(words, _content_stems(words), tried)
+            note = "already_tried_worked" if rep is not None and rep[0] == "worked" else ""
+        except Exception:
+            note = ""
+    verdict = replace(verdict, tried_note=note)
     if status == "violated":
         return IdeaVerdict(
             IdeaKind.VIOLATES_CONSTRAINT,
@@ -832,6 +888,7 @@ def evaluate_idea(
             detail,
             verdict.concepts,
             verdict.score,
+            verdict.tried_note,
         )
     return IdeaVerdict(
         verdict.kind,
@@ -842,4 +899,5 @@ def evaluate_idea(
         "",
         verdict.concepts,
         verdict.score,
+        verdict.tried_note,
     )

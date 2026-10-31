@@ -455,7 +455,7 @@ def test_known_facts_explain_an_unlinked_idea() -> None:
 def test_tried_by_words_without_a_named_remedy() -> None:
     tried = [{"what": "phoned every late customer personally", "outcome": "no time"}]
     v = evaluate_idea("Phone every late customer personally each week.", LATE_ORDERS, None, tried)
-    assert v.kind is IdeaKind.REPEATS_TRIED and v.reason == "tried_words"
+    assert v.kind is IdeaKind.REPEATS_TRIED and v.reason == "tried_unclear"
 
 
 def test_one_shared_word_with_a_tried_entry_is_not_a_repeat() -> None:
