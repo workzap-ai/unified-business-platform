@@ -3207,6 +3207,7 @@ async def brain_expert_diagnosis(
 NO_IDEA_LINES = {  # noqa: E501
     "en": "Yes. I don't have a quick idea for this one that I can give here. What have you tried so far?",  # noqa: E501
     "roman_ur": "Ji. Is ke liye mere paas abhi koi chhota idea nahi jo yahan de sakun. Ab tak aap ne kya aazmaya hai?",  # noqa: E501
+    "ur": "جی۔ اس کے لیے میرے پاس ابھی کوئی مختصر خیال نہیں جو یہاں دے سکوں۔ اب تک آپ نے کیا آزمایا ہے؟",  # noqa: E501
     "ar": "نعم. ليست لدي فكرة سريعة لهذه المشكلة يمكنني تقديمها هنا. ما الذي جربته حتى الآن؟",  # noqa: E501
 }
 
@@ -3218,11 +3219,13 @@ NO_IDEA_LINES = {  # noqa: E501
 NO_MORE_IDEAS = {  # noqa: E501
     "en": "What happened with the ideas so far?",  # noqa: E501
     "roman_ur": "Ab tak in ideas ke saath kya hua?",  # noqa: E501
+    "ur": "اب تک ان خیالات کے ساتھ کیا ہوا؟",  # noqa: E501
     "ar": "ماذا حدث مع هذه الأفكار حتى الآن؟",  # noqa: E501
 }
 NO_IDEA_AGAIN = {  # noqa: E501
     "en": "Let me work from what you have told me. Which part of this costs you the most right now?",  # noqa: E501
     "roman_ur": "Main aap ki baat se aage chalta hoon. Is mein se kaun sa hissa abhi aap ko sab se zyada nuksan de raha hai?",  # noqa: E501
+    "ur": "آپ کی بتائی ہوئی بات کو سامنے رکھتے ہوئے: اس میں سے کون سا حصہ اس وقت آپ کو سب سے زیادہ نقصان دے رہا ہے؟",  # noqa: E501
     "ar": "سأكمل مما أخبرتني به. أي جزء من هذا يكلفك أكثر الآن؟",  # noqa: E501
 }
 
@@ -3230,6 +3233,7 @@ NO_IDEA_AGAIN = {  # noqa: E501
 NO_IDEA_THIRD = {  # noqa: E501
     "en": "I hear you asking for a solution. What would a good result look like for you in three months?",  # noqa: E501
     "roman_ur": "Main samajhta hoon ke aap hal chahte hain. Teen mahine baad aap ke liye acha nateeja kya hoga?",  # noqa: E501
+    "ur": "آپ حل چاہتے ہیں، یہ بات سمجھ آ گئی۔ تین مہینے بعد آپ کے لیے اچھا نتیجہ کیا ہوگا؟",  # noqa: E501
     "ar": "أفهم أنك تطلب حلاً. كيف تبدو النتيجة الجيدة بالنسبة لك بعد ثلاثة أشهر؟",  # noqa: E501
 }
 
@@ -3251,8 +3255,11 @@ def brain_no_ideas(turn: "ServiceTurn", context: dict[str, Any]) -> None:
         return
     if solution_rules.has_safety_referral(turn.reply):
         return
-    language = str(context.get("reply_language") or "en")
+    language = fixed_lines.code(context, script=True)  # Urdu script and Arabic have their own lines
     line = NO_IDEA_LINES.get(language, NO_IDEA_LINES["en"])
+    if (context.get("requirements") or {}).get("tried"):
+        # the record already holds what they tried: never ask it again
+        line = NO_IDEA_AGAIN.get(language, NO_IDEA_AGAIN["en"])
     # Ideas were already handed over: "I have no quick idea" would be untrue. With the expert
     # advisor that is per problem: a different problem the owner has just started is not "those
     # are all the ideas" because another problem used up its two (the business's eight still are).
