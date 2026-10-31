@@ -4,6 +4,8 @@ Scripted code-path checks of the matching only. Nothing here measures how well p
 problems, and nothing prints or asserts an acceptance verdict.
 """
 
+import re
+
 import pytest
 
 from app.modules.pi.evalkit import relevance, relevance_match, relevance_report
@@ -447,14 +449,22 @@ def test_a_ceiling_cue_must_sit_right_before_its_figure() -> None:
     assert [x.unit for x in found] == [relevance_match.english_stem("staff")]
 
 
-def test_a_stated_figure_is_exempt_only_in_its_own_unit() -> None:
+def test_a_stated_figure_is_exempt_only_when_restated_not_when_bought() -> None:
     c = [limit("cannot spend more than 2 lakh")]
-    same_unit = brief(c, figures=("3 lakh",))
-    got = relevance.score_candidate(same_unit, "A new mill costs Rs 3 lakh")["verdict"]
-    assert got != "violates_constraint"
+    said = brief(c, figures=("3 lakh",))
+    restated = relevance.score_candidate(said, "Your 3 lakh feed bill is the real cost")
+    assert restated["verdict"] != "violates_constraint"
+    bought = relevance.score_candidate(said, "A new mill costs Rs 3 lakh")
+    assert bought["verdict"] == "violates_constraint", "same value, but written as a new cost"
     staff_said = brief(c, figures=("300000 staff",))
-    got = relevance.score_candidate(staff_said, "A new mill costs Rs 3 lakh")["verdict"]
-    assert got == "violates_constraint"
+    got = relevance.score_candidate(staff_said, "Your 3 lakh feed bill is the real cost")
+    assert got["verdict"] == "violates_constraint", "another unit is not the same figure"
+    past = brief(
+        [limit("cannot spend more than 20000 rupees")],
+        facts=("I paid 50000 for the old diary software",),
+    )
+    got = relevance.score_candidate(past, "Buy new software for Rs 50000")
+    assert got["verdict"] == "violates_constraint"
 
 
 def test_benefit_words_exempt_a_figure_only_when_tied_to_it() -> None:
@@ -488,13 +498,39 @@ def test_a_milder_verb_skips_only_its_own_block_not_the_whole_check() -> None:
 
 
 def test_long_input_with_no_punctuation_finishes_quickly() -> None:
-    import time
-
-    started = time.perf_counter()
     text = ("word " * 20000) + ("1," * 5000) + ("x" * 50000) + (" " * 20000) + "tried"
-    relevance.score_candidate(brief([limit(text, kind="cannot_change")]), text)
-    relevance.score_candidate(brief([limit("cannot spend more than 20000 rupees")]), text)
-    assert time.perf_counter() - started < 5
+
+    def once(i):
+        t = text + "z" * i  # i defeats the caches
+        relevance.score_candidate(brief([limit(t, kind="cannot_change")]), t)
+        relevance.score_candidate(brief([limit("cannot spend more than 20000 rupees")]), t)
+
+    # measured against a trivial candidate at this moment, best of several runs: a loaded
+    # machine moves both, a growth with the input size moves only the long one
+    assert best_of(once, 5) < 5 * time_budget()
+
+
+@pytest.mark.parametrize("unit", ["tried ", "word ", "failed ", "nahi "])
+def test_a_very_long_repeated_word_string_is_flagged_and_fast(unit) -> None:
+    text = unit * 40000
+
+    def once(i):
+        t = text + "z" * i
+        return relevance.score_candidate(
+            brief([limit(t, kind="cannot_change")]), "Buy a van", language="roman_ur"
+        ), relevance.score_candidate(brief([limit("cannot buy a van")]), t)
+
+    assert best_of(once, 5) < 5 * time_budget(), unit
+    flagged, _ = once(0)
+    assert flagged["limit_text_truncated"] is True and flagged["verdict"] == "unknown"
+
+
+def test_the_growth_check_fails_on_a_quadratic_mutant() -> None:
+    def quadratic(i):
+        n = 4000 + i
+        return sum(1 for _ in range(n) for _ in range(n))  # the cost of a quadratic parser
+
+    assert best_of(quadratic, 2) > 5 * time_budget()
 
 
 def test_the_module_docstrings_have_no_verdict_wording_and_state_the_fact_rule() -> None:
@@ -546,8 +582,12 @@ def test_an_idea_money_figure_stays_money_when_words_follow_it(idea) -> None:
 
 def test_roman_urdu_money_with_a_tail_word_and_counted_nouns_stay_nouns() -> None:
     ru = [limit("20 hazar se zyada kharch nahi kar sakte", kind="cannot_change")]
-    over = relevance.score_candidate(brief(ru), "Naya system 50 hazar mein lagao", "roman_ur")
-    under = relevance.score_candidate(brief(ru), "Naya system 15 hazar mein lagao", "roman_ur")
+    over = relevance.score_candidate(
+        brief(ru), "Naya system 50 hazar mein lagao", language="roman_ur"
+    )
+    under = relevance.score_candidate(
+        brief(ru), "Naya system 15 hazar mein lagao", language="roman_ur"
+    )
     assert over["verdict"] == "violates_constraint"
     assert under["verdict"] != "violates_constraint"
     c = [limit("cannot spend more than 20000 rupees")]
@@ -647,7 +687,7 @@ def test_curly_apostrophes_afford_and_the_passive_make_rules() -> None:
     assert verdict(c, "Change the delivery route") == "violates_constraint"
     c = [limit("we cannot afford a new feed mill", kind="cannot_change")]
     assert verdict(c, "Buy a feed mill on a loan") == "violates_constraint"
-    assert verdict(c, "Rent a feed mill for the peak months") != "violates_constraint"
+    assert verdict(c, "Service the old feed mill") != "violates_constraint"
     c = [limit("the delivery route cannot be changed", kind="cannot_change")]
     assert verdict(c, "Change the delivery route") == "violates_constraint"
     assert verdict(c, "Add a signed hand-over at each stop") != "violates_constraint"
@@ -670,20 +710,6 @@ def test_250_500_000_is_one_grouped_figure_and_a_list_ending_in_digits_stays_a_l
     )
 
 
-def test_long_input_covers_the_roman_urdu_and_tried_paths_quickly() -> None:
-    import time
-
-    started = time.perf_counter()
-    long_ru = ("ek booking nahi " * 6000) + "x" * 40000
-    long_tried = ("tried " * 40000) + "failed"
-    long_mix = ("kharid nahi kar " * 5000) + ("did not work " * 5000)
-    for text in (long_ru, long_tried, long_mix):
-        c = [limit(text, kind="cannot_change")]
-        relevance.score_candidate(brief(c), text, language="roman_ur")
-        relevance.score_candidate(brief(c), "Buy a system for 50000 rupees")
-    assert time.perf_counter() - started < 10
-
-
 def test_the_standing_note_and_the_borderline_section_carry_no_verdict_wording() -> None:
     import tempfile
     from pathlib import Path
@@ -695,3 +721,1154 @@ def test_the_standing_note_and_the_borderline_section_carry_no_verdict_wording()
         for word in BANNED_WORDING:
             assert word not in folded, f"{word!r} implies a computed acceptance"
     assert "Current scorer:" in section
+
+
+# ------------------------------------------------------------- fourth round
+
+
+@pytest.mark.parametrize(
+    "text,good",
+    [
+        (
+            "we cannot afford downtime",
+            "Buy a backup generator so a power cut never causes downtime",
+        ),
+        ("we cannot afford mistakes", "Pay a clerk to catch mistakes before they reach the client"),
+        ("we cannot afford delays", "Pay a courier to avoid delays on Fridays"),
+        ("we cannot lose any customers", "Call quiet customers so you avoid losing them"),
+        ("we cannot afford to lose customers", "Buy a till that flags customers who go quiet"),
+        ("we cannot risk late deliveries", "Pay a rider to cut late deliveries"),
+    ],
+)
+def test_a_stated_goal_is_not_a_prohibition_on_ideas_that_name_it(text, good) -> None:
+    rules = relevance_match.parse_rules(text, None, relevance._full_stems)
+    assert all(r.kind == "goal" for r in rules), text
+    assert verdict([limit(text, kind="cannot_change")], good) != "violates_constraint"
+
+
+@pytest.mark.parametrize(
+    "text,bad,good",
+    [
+        (
+            "we cannot afford a new feed mill",
+            "Buy a feed mill on a loan",
+            "Service the old feed mill",
+        ),
+        ("we cannot afford booking software", "Buy booking software", "Use a paper sheet"),
+        ("we cannot afford more staff", "Hire two helpers as staff", "Train the staff we have"),
+        ("we cannot afford a generator", "Purchase a generator", "Repair the old generator"),
+    ],
+)
+def test_cannot_afford_a_purchasable_thing_still_blocks_buying_it(text, bad, good) -> None:
+    c = [limit(text, kind="cannot_change")]
+    assert verdict(c, bad) == "violates_constraint", bad
+    assert verdict(c, good) != "violates_constraint", good
+
+
+@pytest.mark.parametrize(
+    "text",
+    [
+        "we need at least 2 staff so we cannot spend more than 20000 rupees",
+        "need at least 2 staff with a budget under 20000",
+        "we need at least 2 staff because we cannot spend more than 20000 rupees",
+        "at least 2 staff while spending no more than 20000 rupees",
+        "we need at least 2 staff, aur 20000 rupees se zyada kharch nahi kar sakte",
+    ],
+)
+def test_a_floor_clause_ends_at_its_conjunction(text) -> None:
+    found = relevance_match.ceilings_of(text, "cannot_change")
+    assert [c for c in found if c.unit == "money"], text
+    c = [limit(text, kind="cannot_change")]
+    assert verdict(c, "Buy a system for 50000 rupees") == "violates_constraint"
+    assert verdict(c, "Buy a system for 15000 rupees") != "violates_constraint"
+
+
+@pytest.mark.parametrize(
+    "forms",
+    [
+        ("use", "using", "used", "uses"),
+        ("type", "typed", "typing", "types"),
+        ("style", "styled", "styles", "styling"),
+        ("free", "freed", "frees"),
+        ("size", "sized", "sizes"),
+    ],
+)
+def test_short_stems_agree_across_their_forms(forms) -> None:
+    assert len({relevance._full_stems(f, None).pop() for f in forms}) == 1, forms
+    assert relevance._full_stems("used", None) != relevance._full_stems("user", None)
+
+
+def test_use_as_a_rule_verb_matches_using_and_used() -> None:
+    c = [limit("we cannot use cash", kind="cannot_change")]
+    for idea in ("Use cash at the door", "Using cash at the door", "Used cash is accepted here"):
+        assert verdict(c, idea) == "violates_constraint", idea
+    assert verdict(c, "Use a card at the door") != "violates_constraint"
+
+
+def test_blocks_phrases_are_not_narrowed_by_the_rule_verbs() -> None:
+    c = [limit("no discounts", blocks=["give discount"], kind="cannot_change")]
+    assert verdict(c, "Offer a discount to regular clients") == "violates_constraint"
+    assert verdict(c, "Discounts for the weekend slots") == "violates_constraint"
+    assert verdict(c, "Send a reminder to regular clients") != "violates_constraint"
+
+
+def test_every_development_blocks_phrase_still_matches_itself() -> None:
+    from app.modules.pi.evalkit import relevance_calibration, splits
+
+    checked = 0
+    for case in relevance_calibration.load_cases():
+        if splits.split_of(case) == splits.HELD_OUT:
+            continue
+        b = case["input"]["brief"]
+        for problem in b.get("problems") or []:
+            for lim in problem.get("constraints") or []:
+                if lim.get("status", "confirmed") != "confirmed":
+                    continue
+                for phrase in lim.get("blocks") or []:
+                    got = relevance.violated(b, set(), case["language"], phrase)
+                    assert got, (case["id"], phrase)
+                    checked += 1
+    assert checked >= 10
+
+
+@pytest.mark.parametrize(
+    "text,good",
+    [
+        ("we cannot fire anyone", "Run a monthly fire drill"),
+        ("we cannot fire anyone", "Add fire extinguishers to the hall"),
+        ("we cannot fire anyone", "Run a fire-safety walk each week"),
+        ("we cannot close", "Book a hall close to the station"),
+        ("we cannot hire anyone", "Ask the new hire to keep the sheet"),
+        ("we cannot hire anyone", "Give the new hire a checklist"),
+    ],
+)
+def test_more_noun_positions_do_not_fire_a_verb_rule(text, good) -> None:
+    c = [limit(text, kind="cannot_change")]
+    assert verdict(c, good) != "violates_constraint", good
+
+
+def test_band_is_a_homograph_in_roman_urdu_too() -> None:
+    c = [limit("hum band nahi kar sakte", kind="cannot_change")]
+    got = relevance.score_candidate(
+        brief(c), "Live band book karo for the shop", language="roman_ur"
+    )
+    assert got["verdict"] != "violates_constraint"
+    got = relevance.score_candidate(brief(c), "Dukan band karo", language="roman_ur")
+    assert got["verdict"] == "violates_constraint"
+
+
+@pytest.mark.parametrize(
+    "idea",
+    [
+        "Buy a 50000 tablet",
+        "Buy 50000 worth of stock",
+        "Buy a 50000-rupee tablet",
+        "Get a system at 50000",
+        "Invest 50000 in a new system",
+        "Buy a 2.5m machine",
+        "Buy a 1m generator",
+        "Buy a 50 k tablet",
+        "Buy a 50k tablet",
+        "Pay 50k tablets",
+    ],
+)
+def test_bare_and_new_figure_forms_are_money_costs(idea) -> None:
+    c = [limit("cannot spend more than 20000 rupees")]
+    assert verdict(c, idea) == "violates_constraint", idea
+
+
+@pytest.mark.parametrize(
+    "idea",
+    ["Buy 50 chairs", "Sell 50k eggs", "Message your 50k followers", "Hire 5 staff", "Open at 6"],
+)
+def test_counts_and_times_are_not_money(idea) -> None:
+    c = [limit("cannot spend more than 20000 rupees")]
+    assert verdict(c, idea) != "violates_constraint", idea
+
+
+def test_a_budget_of_gives_a_ceiling_for_any_kind_and_millions_are_read() -> None:
+    for kind in ("cannot_change", "deadline", "staff"):
+        found = relevance_match.ceilings_of("a budget of 20000 for this", kind)
+        assert [(c.value, c.unit) for c in found] == [(20000.0, "money")], kind
+    assert relevance_match.amounts("a 2.5m machine")[0].lo == 2500000.0
+    assert relevance_match.amounts("1m generator")[0].lo == 1000000.0
+    assert relevance_match.amounts("a 5 k fee")[0].lo == 5000.0
+    assert "2500000" in relevance.stems("2.5m")
+
+
+@pytest.mark.parametrize(
+    "idea",
+    [
+        "Sell the old mill for Rs 80000",
+        "Charge Rs 50000 for a premium package",
+        "Collect Rs 50000 from late payers",
+        "Raise Rs 50000 from donors",
+        "Get Rs 50000 from the bank grant",
+        "Make Rs 50000 a month from a stall",
+        "Receive Rs 50000 up front",
+    ],
+)
+def test_income_verbs_make_a_figure_income_not_a_cost(idea) -> None:
+    c = [limit("cannot spend more than 20000 rupees")]
+    assert verdict(c, idea) != "violates_constraint", idea
+
+
+def test_buying_next_to_selling_is_still_a_cost() -> None:
+    c = [limit("cannot spend more than 20000 rupees")]
+    assert verdict(c, "Sell the old mill and buy a new one for Rs 80000") == "violates_constraint"
+
+
+@pytest.mark.parametrize(
+    "text",
+    [
+        "20000 at most",
+        "20000 rupees or less",
+        "we should not cross 20000 rupees",
+        "keep it to 20000 rupees at most",
+        "maximum 20000 rupees",
+    ],
+)
+def test_a_ceiling_cue_after_the_figure_or_cross_counts(text) -> None:
+    found = relevance_match.ceilings_of(text, "cannot_change")
+    assert found and found[0].value == 20000.0, text
+    assert verdict([limit(text, kind="cannot_change")], "Buy it for 50000 rupees") == (
+        "violates_constraint"
+    )
+
+
+def test_the_budget_fallback_never_turns_income_into_a_ceiling() -> None:
+    text = "we earn 80000 a month, cannot buy a mill"
+    assert relevance_match.ceilings_of(text, "budget") == []
+    c = [limit(text, kind="budget")]
+    assert verdict(c, "Pay 30000 rupees for a scale") != "violates_constraint"
+    assert verdict(c, "Buy a feed mill") == "violates_constraint"
+    sales = relevance_match.ceilings_of("sales are 90000 monthly; spending max 20000", "budget")
+    assert [c.value for c in sales] == [20000.0]
+
+
+TOOL_BANNED = re.compile(
+    r"\b(?:pass|passed|passes|fail|failed|fails|accepted|accept|threshold met|meets|"
+    r"does not meet|eligible|acceptance test|not evaluated)\b|85%",
+    re.IGNORECASE,
+)
+
+
+def test_the_report_output_carries_no_verdict_wording_for_the_tool_itself() -> None:
+    import tempfile
+    from pathlib import Path
+
+    from app.modules.pi.evalkit import relevance_calibration, splits
+
+    cases = [
+        c for c in relevance_calibration.load_cases() if c.get("kind") != "borderline_relevance"
+    ]
+    dev = [c for c in cases if splits.split_of(c) != splits.HELD_OUT]
+    with tempfile.TemporaryDirectory() as tmp:
+        text, _ = relevance_report.build(dev, Path(tmp) / "a.jsonl", "lane E", "wording scan")
+    for source in (text, relevance.DISCLAIMER):
+        assert not TOOL_BANNED.search(source), TOOL_BANNED.search(source).group()
+    assert "Current scorer, Development borderline set:" in text
+    assert "earlier scorer" in text
+
+
+# ------------------------------------------------------------- fifth round: fail safe
+
+
+def full(limit_text, idea, kind="cannot_change", language=None):
+    return relevance.score_candidate(brief([limit(limit_text, kind=kind)]), idea, language=language)
+
+
+@pytest.mark.parametrize(
+    "text,kind,idea",
+    [
+        ("we dont have money to buy a van", "budget", "Buy a van"),
+        ("we won't change the menu", "cannot_change", "Change the menu"),
+        ("never open on Sundays", "cannot_change", "Open on Sundays"),
+        ("we cannot work after 6pm", "deadline", "Add an evening shift"),
+        ("we cannot work after 6pm", "deadline", "Add a morning shift"),
+        ("we have only 2 staff", "staff", "Hire 3 more staff"),
+        ("we have only 2 staff", "staff", "Train your 2 staff"),
+        ("deadline is Friday", "deadline", "Finish by Monday"),
+    ],
+)
+def test_a_limit_the_scorer_cannot_read_makes_the_verdict_unknown(text, kind, idea) -> None:
+    got = full(text, idea, kind)
+    assert got["verdict"] == "unknown", (text, idea, got["verdict"])
+    assert got["unknown_reason"] == "limit_not_understood"
+    assert relevance.score_candidate(brief([limit(text, kind=kind)]), idea)["verdict"] not in (
+        "relevant",
+        "irrelevant",
+    )
+
+
+def test_a_limit_with_blocks_is_still_understood_and_an_assumed_one_is_ignored() -> None:
+    c = [limit("one receptionist", blocks=["hire"], kind="staff")]
+    assert verdict(c, "Train the receptionist on a shared sheet") != "unknown"
+    soft = [limit("we have only 2 staff", kind="staff", status="assumed")]
+    assert verdict(soft, "Train your staff on the sheet") != "unknown"
+
+
+URDU_LIMIT = "بجٹ 20000 سے زیادہ نہیں"
+URDU_IDEA = "نیا سسٹم 50000 روپے میں خریدیں"
+HINDI_LIMIT = "हम नया मिल नहीं खरीद सकते"
+ARABIC_LIMIT = "لا نستطيع شراء مطحنة جديدة"
+
+
+@pytest.mark.parametrize("language", ["ur", None, "hi", "ar"])
+@pytest.mark.parametrize(
+    "text,idea",
+    [
+        (URDU_LIMIT, URDU_IDEA),
+        (HINDI_LIMIT, "नया मिल खरीदें"),
+        (ARABIC_LIMIT, "اشتر مطحنة جديدة"),
+    ],
+)
+def test_a_limit_in_urdu_hindi_or_arabic_script_is_unknown(text, idea, language) -> None:
+    got = full(text, idea, "budget", language)
+    assert got["verdict"] == "unknown"
+    # a budget kind with a figure in it is read as a ceiling, but the idea's script is not read
+    assert got["unknown_reason"] in ("limit_not_understood", "script_not_read")
+
+
+def test_an_idea_in_another_script_is_unknown_when_the_limit_is_read_from_words_or_numbers() -> (
+    None
+):
+    got = full("cannot spend more than 20000 rupees", URDU_IDEA, "budget", "ur")
+    assert got["verdict"] == "unknown" and got["unknown_reason"] == "script_not_read"
+    c = [limit("one receptionist", blocks=["hire"], kind="staff")]
+    got = relevance.score_candidate(brief(c), URDU_IDEA, language="ur")
+    assert got["verdict"] != "unknown", "a limit given as fixture blocks still works in any script"
+
+
+def test_roman_urdu_under_a_unread_limit_in_the_scorers_own_example_is_unknown_not_relevant() -> (
+    None
+):
+    b = brief([limit("hum staff nahi rakh sakte", kind="staff")], words=("late orders",))
+    got = relevance.score_candidate(b, "naya staff rakhein late orders ke liye")
+    assert got["verdict"] == "unknown"
+
+
+@pytest.mark.parametrize(
+    "text,bad,good",
+    [
+        (
+            "hum staff nahi rakh sakte",
+            "naya staff rakhein late orders ke liye",
+            "staff ko train karo",
+        ),
+        ("hum cash nahi le sakte", "cash mein payment lein", "card se payment lein"),
+        ("hum discount nahi de sakte", "regular grahak ko discount dein", "grahak ko call karein"),
+        (
+            "hum naya system install nahi kar sakte",
+            "naya system lagayein",
+            "purana system theek karo",
+        ),
+        ("hum naya mill kharid nahi sakte", "naya mill kharido", "mill kiraye par lein"),
+        ("hum naya mill kharid nahi kar sakte", "naya mill kharidein", "mill kiraye par lein"),
+    ],
+)
+def test_roman_urdu_verbs_the_scorer_knows_make_working_rules(text, bad, good) -> None:
+    assert full(text, bad, language="roman_ur")["verdict"] == "violates_constraint", bad
+    assert full(text, good, language="roman_ur")["verdict"] != "violates_constraint", good
+
+
+def test_a_roman_urdu_verb_outside_the_list_makes_the_limit_unknown() -> None:
+    got = full("hum mill nahi ugaa sakte", "naya mill lagayein", language="roman_ur")
+    assert got["verdict"] == "unknown"
+
+
+@pytest.mark.parametrize(
+    "text,idea,broken",
+    [
+        ("we cannot hire anyone", "Hire out the spare room", False),
+        ("we cannot hire anyone", "Rent out the spare room and hire out the hall", False),
+        ("we cannot hire anyone", "Hire a rider", True),
+        ("we cannot buy a van", "Rent out the van to a neighbour", False),
+        ("we cannot buy a van", "Buy a van", True),
+    ],
+)
+def test_phrasal_out_is_letting_not_hiring_or_buying(text, idea, broken) -> None:
+    assert (full(text, idea)["verdict"] == "violates_constraint") is broken, idea
+
+
+def test_renting_out_is_income_not_a_cost() -> None:
+    c = [limit("cannot spend more than 20000")]
+    assert verdict(c, "Rent out the hall for 80000") != "violates_constraint"
+    assert verdict(c, "Lease out the old van for Rs 90000") != "violates_constraint"
+    assert verdict(c, "Rent the hall for 80000") == "violates_constraint"
+
+
+@pytest.mark.parametrize(
+    "text,idea",
+    [
+        ("we cannot offer discounts", "Run a discount week"),
+        ("we cannot offer discounts", "Offer a discount code"),
+        ("we cannot give discounts", "Offer a discount code"),
+        ("we cannot give discounts", "Launch a discount for new clients"),
+        ("we cannot give discounts", "Start a discount day"),
+    ],
+)
+def test_running_or_offering_the_blocked_object_is_a_violation(text, idea) -> None:
+    assert full(text, idea)["verdict"] == "violates_constraint", idea
+
+
+def test_run_does_not_fire_a_rule_about_something_else() -> None:
+    assert full("we cannot offer discounts", "Run a reminder week")["verdict"] != (
+        "violates_constraint"
+    )
+    assert full("we cannot close", "Run a reminder week")["verdict"] != "violates_constraint"
+
+
+@pytest.mark.parametrize(
+    "text,bad,good",
+    [
+        ("we cannot afford a loan", "Take a loan for the shop", "Repay the old loan early"),
+        ("cannot afford new equipment", "Buy a new oven", "Repair the old oven"),
+        ("cannot afford new equipment", "Purchase a mixer", "Clean the mixer daily"),
+        ("we cannot afford software", "Buy a booking app", "Use a paper sheet"),
+        ("we cannot hire staff", "Hire a rider", "Train the rider we have"),
+    ],
+)
+def test_equipment_software_and_staff_cover_what_they_are(text, bad, good) -> None:
+    assert full(text, bad)["verdict"] == "violates_constraint", bad
+    assert full(text, good)["verdict"] != "violates_constraint", good
+
+
+@pytest.mark.parametrize(
+    "text,bad,good",
+    [
+        ("we cannot lose any customers", "Lose the unhappy customers", "Call quiet customers"),
+        ("we cannot lose any customers", "Let customers lose interest", "Thank each customer"),
+        ("we cannot afford downtime", "Cause downtime by switching systems", "Add a spare router"),
+        ("we cannot miss deadlines", "Miss the deadline if it is tight", "Plan each deadline"),
+    ],
+)
+def test_a_goal_is_broken_by_an_idea_that_does_the_loss(text, bad, good) -> None:
+    assert full(text, bad)["verdict"] == "violates_constraint", bad
+    assert full(text, good)["verdict"] != "violates_constraint", good
+
+
+@pytest.mark.parametrize(
+    "text,idea",
+    [
+        ("we cannot lose any customers", "Call quiet customers so you avoid losing them"),
+        (
+            "we cannot afford downtime",
+            "Buy a backup generator so a power cut never causes downtime",
+        ),
+        ("we cannot miss deadlines", "Add a checklist so you never miss a deadline"),
+        ("we cannot afford waste", "Track stock to reduce waste"),
+        ("we cannot buy a printer", "Do not buy a printer, print at a shop"),
+        ("we cannot buy a printer", "Avoid buying a printer and print at a shop"),
+        ("we cannot buy a printer", "Print at a shop instead of buying a printer"),
+    ],
+)
+def test_a_negated_verb_in_the_idea_does_not_break_the_limit(text, idea) -> None:
+    assert full(text, idea)["verdict"] != "violates_constraint", idea
+
+
+@pytest.mark.parametrize(
+    "idea,broken",
+    [
+        ("Buy 3 machines at 10000 each", True),
+        ("Buy 3 machines for 10000 rupees each", True),
+        ("Buy 2 machines at 5000 each", False),
+        ("Buy 3 x 10000 rupees of stock", True),
+    ],
+)
+def test_a_price_each_is_multiplied_by_its_quantity(idea, broken) -> None:
+    c = [limit("cannot spend more than 20000")]
+    assert (verdict(c, idea) == "violates_constraint") is broken, idea
+
+
+def test_a_price_each_with_no_quantity_and_a_spelled_number_are_unknown() -> None:
+    c = [limit("cannot spend more than 20000")]
+    got = relevance.score_candidate(brief(c), "Buy a machine at 10000 each")
+    assert got["verdict"] == "unknown" and got["unknown_reason"] == "quantity_unclear"
+    got = relevance.score_candidate(brief(c), "Buy a machine for five thousand")
+    assert got["verdict"] == "unknown" and got["unknown_reason"] == "spelled_number"
+
+
+SIZES = (200, 800, 1600, 4000, 50000)
+SHAPES = {
+    "spaces": " ",
+    "newlines": "\n",
+    "five": "5 ",
+    "nahi": "nahi ",
+    "tried": "tried ",
+    "failed": "failed ",
+    "digits": "1",
+    "sakt": "kharid nahi kar sakte ",
+}
+
+
+def time_budget() -> float:
+    """100 ms, or 40 times what a trivial candidate costs right now, so a loaded machine does
+    not flake the check while a growth with size (quadratic or worse) still fails it."""
+    trivial = best_of(
+        lambda i: relevance.score_candidate(
+            brief([limit("cannot buy a van" + "x" * i, kind="cannot_change")]),
+            "Buy a van" + "y" * i,
+        ),
+        7,
+    )
+    return max(0.1, 40 * trivial)
+
+
+def best_of(fn, runs=3) -> float:
+    import time
+
+    best = 1e9
+    for i in range(runs):
+        started = time.perf_counter()
+        fn(i)
+        best = min(best, time.perf_counter() - started)
+    return best
+
+
+@pytest.mark.parametrize("shape", sorted(SHAPES))
+@pytest.mark.parametrize("size", SIZES)
+def test_limit_parsing_is_linear_and_flags_a_limit_that_is_too_long(shape, size) -> None:
+    unit = SHAPES[shape]
+    for lang in (None, "roman_ur"):
+
+        def once(i, unit=unit, size=size, lang=lang):
+            text = (unit * (size // len(unit) + 1))[:size] + "x" * i  # i defeats the caches
+            return relevance.score_candidate(
+                brief([limit(text, kind="cannot_change")]),
+                "Buy a system for 50000 rupees",
+                language=lang,
+            )
+
+        assert best_of(once, 5) < time_budget(), (shape, size, lang)
+    text = (unit * (size // len(unit) + 1))[:size]
+    got = relevance.score_candidate(brief([limit(text, kind="cannot_change")]), "Buy a van")
+    if len(relevance_match.collapse(text)) > relevance_match.MAX_LIMIT_TEXT:
+        assert got["limit_text_truncated"] is True and got["verdict"] == "unknown"
+        assert got["unknown_reason"] == "limit_text_truncated"
+
+
+@pytest.mark.parametrize("shape", sorted(SHAPES))
+@pytest.mark.parametrize("size", SIZES)
+def test_idea_parsing_is_linear_and_flags_an_idea_that_is_too_long(shape, size) -> None:
+    unit = SHAPES[shape]
+    c = [limit("cannot spend more than 20000 rupees")]
+
+    def once(i):
+        text = (unit * (size // len(unit) + 1))[:size] + "x" * i
+        return relevance.score_candidate(brief(c), text, language="roman_ur")
+
+    assert best_of(once, 5) < time_budget(), (shape, size)
+    text = (unit * (size // len(unit) + 1))[:size]
+    got = relevance.score_candidate(brief(c), text)
+    if len(relevance_match.collapse(text)) > relevance_match.MAX_IDEA_TEXT:
+        assert got["text_truncated"] is True and got["verdict"] == "unknown"
+
+
+def test_the_soft_prefix_no_longer_inflates_relevance() -> None:
+    b = brief(words=("employee morale low",), facts=("discount codes",))
+    got = relevance.score_candidate(b, "Discover how to employ the right tool")
+    assert got["problem_link"] == 0 and got["verdict"] != "relevant"
+    got = relevance.score_candidate(b, "Raise employee morale with discount codes")
+    assert got["problem_link"] >= 1
+
+
+def test_the_disclaimer_says_what_is_reported_as_unknown() -> None:
+    note = " ".join(relevance.DISCLAIMER.split())
+    assert "Urdu, Hindi and Arabic script" in note
+    assert "Roman Urdu verbs outside the supported list" in note
+    assert "'unknown'" in note and "never scored as relevant or irrelevant" in note
+    assert "unknown" in " ".join((relevance.__doc__ or "").split())
+
+
+def test_the_report_counts_unknown_in_its_own_column() -> None:
+    import tempfile
+    from pathlib import Path
+
+    from app.modules.pi.evalkit import relevance_calibration, splits
+
+    cases = [
+        c for c in relevance_calibration.load_cases() if c.get("kind") != "borderline_relevance"
+    ]
+    dev = [c for c in cases if splits.split_of(c) != splits.HELD_OUT]
+    with tempfile.TemporaryDirectory() as tmp:
+        text, totals = relevance_report.build(
+            dev, Path(tmp) / "a.jsonl", "lane E", "unknown column"
+        )
+    assert "not read (unknown, counted apart)" in text
+    assert all("unknown" in v for k, v in totals.items() if k.startswith("split:"))
+    agg = relevance.aggregate(
+        [
+            {
+                "candidates": 2,
+                "agree": 1,
+                "false_relevant": 0,
+                "missed_relevant": 0,
+                "hard_misses": 0,
+                "unknown": 1,
+            }
+        ]
+        * 3
+    )
+    assert agg["unknown"] == 3
+
+
+def test_no_source_text_names_a_fixture_case() -> None:
+    from pathlib import Path
+
+    here = Path(relevance.__file__).parent
+    for name in ("relevance.py", "relevance_match.py"):
+        assert "feed mill" not in (here / name).read_text(encoding="utf-8"), name
+
+
+def test_fuzz_500_strings_never_raise_and_always_give_a_known_verdict() -> None:
+    import random
+
+    rng = random.Random(20261031)
+    words = [
+        "buy",
+        "hire",
+        "cannot",
+        "never",
+        "5k",
+        "20000",
+        "rupees",
+        "each",
+        "at",
+        "for",
+        "nahi",
+        "sakte",
+        "kar",
+        "staff",
+        "oven",
+        "loan",
+        "discount",
+        "out",
+        "rent",
+        "not",
+        "avoid",
+        "lose",
+        "customers",
+        "afford",
+        "downtime",
+        "tried",
+        "failed",
+        "before",
+        "and",
+        "so",
+        "at least",
+        "budget",
+        "lakh",
+        "2.5m",
+        "five thousand",
+        "بجٹ",
+        "हम",
+        "شراء",
+        "kharid",
+        "rakh",
+        "le",
+        "de",
+        "do",
+        "x",
+        "",
+        "  ",
+        "\n",
+        "-",
+        ",",
+        "1,2,3",
+        "120,150,180",
+        "250,500,000",
+        "$",
+        "Rs.",
+        "’",
+        "can't",
+        "won't",
+    ]
+    allowed = set(relevance.VERDICTS) | {relevance.UNKNOWN}
+    for n in range(500):
+
+        def piece(k):
+            return " ".join(rng.choice(words) for _ in range(rng.randint(0, k)))
+
+        limit_text, idea = piece(14), piece(14)
+        kind = rng.choice(["budget", "staff", "deadline", "cannot_change", ""])
+        lang = rng.choice([None, "roman_ur", "ur", "hi", "ar", "en"])
+        status = rng.choice(["confirmed", "confirmed", "assumed"])
+        blocks = [piece(3)] if rng.random() < 0.3 else []
+        b = brief([limit(limit_text, blocks=blocks, kind=kind, status=status)])
+        got = relevance.score_candidate(b, idea, owner_text=piece(10), language=lang)
+        assert got["verdict"] in allowed, (n, limit_text, idea, got)
+
+
+# ------------------------------------------------------------- sixth round
+
+EXPENSIVE = "buy an expensive tracking system costing 90000 rupees to cut late orders"
+
+
+@pytest.mark.parametrize(
+    "text",
+    [
+        "we cannot afford much right now",
+        "cannot afford much",
+        "cannot pay much",
+        "can't afford a lot",
+        "can’t afford a lot of things",
+        "cannot afford extras",
+        "unable to spend more",
+        "we cannot spend any more",
+        "cannot afford anything extra",
+        "we cannot afford stuff",
+    ],
+)
+def test_a_vague_limit_is_not_read_as_a_rule_and_stays_unknown(text) -> None:
+    assert relevance_match.parse_rules(text, None, relevance._full_stems) == [], text
+    got = full(text, EXPENSIVE, "budget")
+    assert got["verdict"] == "unknown" and got["unknown_reason"] == "limit_not_understood", text
+
+
+@pytest.mark.parametrize(
+    "text,idea,language",
+    [
+        ("hum zyada nahi de sakte", "naya tracking system 90000 rupees mein lagayein", "roman_ur"),
+        ("hum bohat nahi kharid sakte", "naya tracking system kharidein", "roman_ur"),
+        (
+            "ہم بہت زیادہ خرچ نہیں کر سکتے",
+            EXPENSIVE,
+            "ur",
+        ),
+        (
+            "हम बहुत ज़्यादा खर्च नहीं कर सकते",
+            EXPENSIVE,
+            "hi",
+        ),
+        (
+            "لا نستطيع أن ننفق الكثير",
+            EXPENSIVE,
+            "ar",
+        ),
+    ],
+)
+def test_vague_words_in_the_other_four_languages_stay_unknown_too(text, idea, language) -> None:
+    got = full(text, idea, "budget", language)
+    assert got["verdict"] == "unknown", (text, got["verdict"])
+
+
+def test_a_real_object_after_a_money_verb_is_still_a_rule() -> None:
+    assert full("we cannot afford a booking app", "Buy a booking app")["verdict"] == (
+        "violates_constraint"
+    )
+    assert full("we cannot hire anyone", "Hire a rider")["verdict"] == "violates_constraint"
+    assert full("we cannot close", "Close the second shop")["verdict"] == "violates_constraint"
+
+
+@pytest.mark.parametrize(
+    "text,idea,broken",
+    [
+        ("cannot rent out our van", "rent out the van to cover late orders", True),
+        ("we cannot rent out our van", "Rent out the van on Sundays", True),
+        ("cannot rent out our van", "Rent a van for the weekend", False),
+        ("cannot rent out our van", "Buy a van", False),
+        ("cannot hire out staff", "hire out two supervisors to cover late orders", True),
+        ("cannot hire out staff", "Hire a supervisor", False),
+        ("cannot hire out staff", "Hire out the spare room", False),
+        ("cannot lease out the hall", "Lease out the hall on weekends", True),
+        ("cannot lease out the hall", "Lease the hall from a neighbour", False),
+        ("we cannot hire anyone", "Hire out the spare room", False),
+        ("we cannot hire new staff", "hire on a part-time clerk", True),
+        ("we cannot hire new staff", "Hire a part-time clerk", True),
+        ("we cannot hire on new staff", "Hire on a part-time clerk", True),
+        ("we cannot hire on new staff", "Hire out a part-time clerk", False),
+        ("we cannot buy a van", "Rent out the van to a neighbour", False),
+    ],
+)
+def test_a_verb_with_a_particle_in_the_limit_is_broken_by_the_same_phrase(
+    text, idea, broken
+) -> None:
+    got = full(text, idea)["verdict"] == "violates_constraint"
+    assert got is broken, (text, idea)
+
+
+def test_mutation_without_the_particle_match_the_phrase_rule_would_not_fire(monkeypatch) -> None:
+    c = [limit("cannot hire out staff", kind="cannot_change")]
+    assert verdict(c, "hire out two supervisors") == "violates_constraint"
+    monkeypatch.setattr(relevance_match, "phrasal_pairs", lambda text, language: frozenset())
+    assert verdict(c, "hire out two supervisors") != "violates_constraint"
+
+
+def test_on_is_a_preposition_not_a_particle_so_close_on_sundays_is_still_a_close() -> None:
+    assert full("we cannot close on Sundays", "Close early on Sunday")["verdict"] == (
+        "violates_constraint"
+    )
+
+
+# ------------------------------------------------------------- seventh round
+
+ANY_IDEA = "buy a tracking system costing 90000 rupees to cut late orders"
+
+
+@pytest.mark.parametrize(
+    "text",
+    [
+        "we cannot afford anything expensive",
+        "cannot afford anything big",
+        "cannot afford anything fancy",
+        "cannot afford anything costly",
+        "cannot afford anything premium",
+        "cannot buy anything expensive",
+        "cannot afford luxuries",
+        "cannot afford big changes",
+        "cannot handle complex tools",
+        "cannot use anything new",
+        "cannot change much",
+        "can't spend a lot of money",
+        "cannot take on more work",
+        "cannot afford more",
+        "cannot spend extra",
+        "we cannot afford cheap stuff",
+        "we cannot buy new things",
+        "cannot afford small items",
+        "cannot afford luxurious things",
+        "cannot handle complicated work",
+        "cannot afford anything old",
+    ],
+)
+def test_an_object_with_no_concrete_noun_leaves_the_limit_unreadable(text) -> None:
+    assert relevance_match.parse_rules(text, None, relevance._full_stems) == [], text
+    got = full(text, ANY_IDEA, "budget")
+    assert got["verdict"] == "unknown" and got["unknown_reason"] == "limit_not_understood", text
+
+
+@pytest.mark.parametrize(
+    "text,language",
+    [
+        ("hum mehnga kuch nahi kharid sakte", "roman_ur"),
+        ("hum naya kaam nahi le sakte", "roman_ur"),
+        ("hum bohat paisa nahi de sakte", "roman_ur"),
+        ("hum bari tabdeeli nahi kar sakte", "roman_ur"),
+    ],
+)
+def test_roman_urdu_objects_of_the_same_classes_stay_unreadable(text, language) -> None:
+    got = full(text, "naya tracking system 90000 rupees mein lagayein", "budget", language)
+    assert got["verdict"] == "unknown", text
+
+
+@pytest.mark.parametrize(
+    "text",
+    [
+        "ہم مہنگا کچھ نہیں خرید سکتے",
+        "हम महंगा कुछ नहीं खरीद सकते",
+        "لا نستطيع شراء شيء غالي",
+    ],
+)
+def test_urdu_hindi_and_arabic_limits_of_those_classes_are_unknown(text) -> None:
+    for language in ("ur", "hi", "ar", None):
+        assert full(text, ANY_IDEA, "budget", language)["verdict"] == "unknown", text
+
+
+@pytest.mark.parametrize(
+    "text,bad,good",
+    [
+        ("we cannot afford a booking app", "Buy a booking app", "Use a paper sheet"),
+        ("we cannot hire new staff", "Hire a part-time clerk", "Train the staff we have"),
+        ("we cannot close on Sundays", "Close early on Sunday", "Open a stall on Sunday"),
+        ("we cannot hire anyone", "Hire a rider", "Train the rider we have"),
+        ("we cannot buy anything", "Buy a tablet", "Rent a tablet"),
+        ("we cannot cut anything", "Cut the evening shift", "Add a cute mascot"),
+        ("we cannot afford new equipment", "Buy a new oven", "Repair the old oven"),
+        ("we cannot use cash", "Use cash at the door", "Use a card"),
+        ("we cannot afford big staff costs", "Hire three more staff", "Train the staff"),
+        ("we cannot change the delivery route", "Change the delivery route", "Add a stop"),
+        ("we cannot lose any customers", "Lose the unhappy customers", "Call quiet customers"),
+    ],
+)
+def test_a_concrete_noun_keeps_the_rule_working(text, bad, good) -> None:
+    assert full(text, bad)["verdict"] == "violates_constraint", bad
+    assert full(text, good)["verdict"] != "violates_constraint", good
+
+
+@pytest.mark.parametrize(
+    "word,kind",
+    [
+        ("expensive", "adj"),
+        ("costly", "adj"),
+        ("premium", "adj"),
+        ("fancy", "adj"),
+        ("luxuries", "generic"),
+        ("changes", "generic"),
+        ("tools", "generic"),
+        ("work", "generic"),
+        ("money", "generic"),
+        ("things", "generic"),
+        ("stuff", "generic"),
+        ("anything", "universal"),
+        ("much", "generic"),
+        ("lots", "generic"),
+        ("destructive", "ending"),
+        ("wonderful", "ending"),
+        ("reliable", "ending"),
+        ("careless", "ending"),
+        ("famous", "ending"),
+        ("childish", "ending"),
+    ],
+)
+def test_non_concrete_classes_are_matched_by_class_not_only_by_string(word, kind) -> None:
+    assert relevance_match._non_concrete(word), (word, kind)
+
+
+@pytest.mark.parametrize(
+    "word", ["staff", "app", "oven", "cash", "equipment", "sundays", "family", "prices", "van"]
+)
+def test_concrete_nouns_are_not_in_the_non_concrete_classes(word) -> None:
+    assert not relevance_match._non_concrete(word), word
+
+
+# ------------------------------------------------------------- eighth round: the lexicon decides
+
+# Written before the lexicon, not taken from any audit list.
+FRESH_ADJECTIVES = [
+    "ornate", "opulent", "glossy", "swanky", "snazzy", "elegant", "stylish", "futuristic",
+    "innovative", "bespoke", "robust", "scalable", "versatile", "flexible", "powerful",
+    "intelligent", "smart", "seamless", "comprehensive", "ambitious", "aggressive", "radical",
+    "drastic", "dramatic", "substantial", "considerable", "significant", "hefty", "massive",
+    "enormous", "colossal", "immense", "bulky", "sophisticated", "gigantic", "deluxe", "trendy",
+    "flashy", "elaborate", "shiny",
+]  # fmt: skip
+FRESH_GENERIC_NOUNS = [
+    "enhancements", "adjustments", "modifications", "transformations", "overhauls", "strategies",
+    "approaches", "methods", "techniques", "plans", "schemes", "ventures", "endeavours",
+    "undertakings", "arrangements", "mechanisms", "frameworks", "capabilities", "functionalities",
+    "innovations", "developments", "expansions", "reforms", "tweaks", "fixes", "remedies",
+    "efforts", "commitments", "obligations", "expenditures", "outlays", "extravagances",
+    "improvements", "upgrades", "solutions", "experiments", "projects", "ideas", "services",
+    "measures", "programs", "initiatives", "features",
+]  # fmt: skip
+
+
+@pytest.mark.parametrize("adjective", FRESH_ADJECTIVES)
+def test_a_fresh_adjective_before_anything_leaves_the_limit_unknown(adjective) -> None:
+    for text in (f"we cannot afford anything {adjective}", f"cannot buy {adjective} things"):
+        assert relevance_match.parse_rules(text, None, relevance._full_stems) == [], text
+        got = full(text, ANY_IDEA, "budget")
+        assert got["verdict"] == "unknown" and got["unknown_reason"] == "limit_not_understood"
+
+
+@pytest.mark.parametrize("noun", FRESH_GENERIC_NOUNS)
+def test_a_fresh_generic_noun_alone_or_with_an_adjective_leaves_the_limit_unknown(noun) -> None:
+    for text in (f"we cannot afford {noun}", f"cannot afford big {noun}", f"cannot buy any {noun}"):
+        assert relevance_match.parse_rules(text, None, relevance._full_stems) == [], text
+        assert full(text, ANY_IDEA, "budget")["verdict"] == "unknown", text
+
+
+def test_the_fresh_sets_are_big_enough_and_all_unknown() -> None:
+    assert len(FRESH_ADJECTIVES) >= 30 and len(FRESH_GENERIC_NOUNS) >= 30
+    unknown = sum(
+        1
+        for w in FRESH_ADJECTIVES + FRESH_GENERIC_NOUNS
+        if full(f"we cannot afford {w}", ANY_IDEA, "budget")["verdict"] == "unknown"
+    )
+    assert unknown == len(FRESH_ADJECTIVES) + len(FRESH_GENERIC_NOUNS)
+
+
+@pytest.mark.parametrize(
+    "text,bad",
+    [
+        ("we cannot stock varnish", "Stock varnish for the winter"),
+        ("we cannot use adhesive", "Use adhesive on the shelves"),
+        ("we cannot buy polish", "Buy polish in bulk"),
+        ("we cannot stock radish", "Stock radish at the stall"),
+        ("we cannot hire a representative", "Hire a representative for late orders"),
+        ("we cannot buy a convertible", "Buy a convertible for the owner"),
+        ("we cannot hire executives", "Hire executives to cut late orders"),
+        ("we cannot sell explosives", "Sell explosives to the quarry"),
+        ("we cannot buy vegetable oil", "Buy vegetable oil in drums"),
+        ("we cannot afford a driver", "Hire a driver for late orders"),
+        ("we cannot afford a lot of staff", "Hire three staff for the weekend"),
+        ("we cannot afford big staff costs", "Hire three more staff"),
+    ],
+)
+def test_a_listed_concrete_noun_with_an_ending_like_ive_or_ish_is_a_rule_again(text, bad) -> None:
+    got = full(text, bad)
+    assert got["verdict"] == "violates_constraint", (text, got["verdict"])
+
+
+@pytest.mark.parametrize(
+    "text",
+    [
+        "cannot afford tools",
+        "cannot afford any changes",
+        "cannot afford heavy investments",
+        "cannot afford anything big",
+        "we cannot afford much",
+        "we cannot afford improvements",
+    ],
+)
+def test_the_audit_cases_that_must_stay_unknown_do(text) -> None:
+    assert full(text, ANY_IDEA, "budget")["verdict"] == "unknown", text
+
+
+def test_a_word_from_the_cases_own_blocks_or_facts_makes_an_object_concrete() -> None:
+    text = "we cannot buy widgets"
+    assert full(text, "Buy two widgets", "budget")["verdict"] == "unknown"
+    c = [limit(text, blocks=["widget"], kind="budget")]
+    got = relevance.score_candidate(brief(c), "Buy two widgets")
+    assert got["verdict"] == "violates_constraint"
+    c = [limit(text, kind="budget")]
+    got = relevance.score_candidate(brief(c, facts=("we sell widgets",)), "Buy two widgets")
+    assert got["verdict"] == "violates_constraint"
+    # a stated fact never turns an adjective or a generic noun into a concrete one
+    got = relevance.score_candidate(
+        brief([limit("we cannot buy upgrades", kind="budget")], facts=("big upgrades",)),
+        "Buy two upgrades",
+    )
+    assert got["verdict"] == "unknown"
+
+
+def test_mutation_the_lexicon_decides_what_is_a_rule(monkeypatch) -> None:
+    relevance_match._rules_cached.cache_clear()
+    try:
+        assert (
+            relevance_match.parse_rules(
+                "cannot afford anything expensive", None, relevance._full_stems
+            )
+            == []
+        )
+        monkeypatch.setattr(
+            relevance_match,
+            "_CONCRETE",
+            relevance_match._CONCRETE | {"expensive", "work", "tools", "money", "much", "upgrade"},
+        )
+        for text in (
+            "cannot afford anything expensive",
+            "cannot take on more work",
+            "cannot handle complex tools",
+            "can't spend a lot of money",
+            "cannot afford much",
+            "cannot afford upgrades",
+        ):
+            relevance_match._rules_cached.cache_clear()
+            assert relevance_match.parse_rules(text, None, relevance._full_stems), text
+    finally:
+        relevance_match._rules_cached.cache_clear()
+
+
+def test_mutation_without_the_lexicon_the_positive_controls_become_unknown(monkeypatch) -> None:
+    relevance_match._rules_cached.cache_clear()
+    monkeypatch.setattr(relevance_match, "_CONCRETE", frozenset())
+    try:
+        for text, idea in (
+            ("we cannot afford a booking app", "Buy a booking app"),
+            ("we cannot hire new staff", "Hire a part-time clerk"),
+            ("we cannot close on Sundays", "Close early on Sunday"),
+        ):
+            relevance_match._rules_cached.cache_clear()
+            assert full(text, idea)["verdict"] == "unknown", text
+    finally:
+        relevance_match._rules_cached.cache_clear()
+
+
+def test_a_new_hire_is_a_concrete_noun_so_its_limit_is_still_a_rule() -> None:
+    assert full("we cannot hire a new hire", "Hire a new hire")["verdict"] == "violates_constraint"
+    assert full("we cannot hire a new hire", "Train a new hire")["verdict"] != "unknown"
+
+
+# ------------------------------------------------------------- ninth round: never inert
+
+THING_GROUPS = ("people", "equipment", "premises", "materials", "digital", "money")
+
+
+def lexicon_words(*groups):
+    return sorted(w for g in groups for w in relevance_match._CONCRETE_GROUPS[g].split())
+
+
+def noun_phrase(noun):
+    return noun
+
+
+@pytest.mark.parametrize("noun", lexicon_words(*THING_GROUPS))
+def test_cannot_afford_any_lexicon_thing_is_enforced_or_unknown_never_inert(noun) -> None:
+    text = f"we cannot afford a {noun}"
+    ideas = [
+        f"Buy a {noun}",
+        f"Hire a {noun}",
+        f"Purchase a second-hand {noun}",
+        f"Subscribe to a {noun}",
+        f"Buy a {noun} so the two supervisors can clear late orders faster",
+        f"Lease a {noun} for the warehouse team",
+    ]
+    got0 = full(text, ideas[0], "budget")
+    if got0["verdict"] == "unknown":
+        return  # the limit is unreadable: allowed, never silently inert
+    for idea in ideas:
+        got = full(text, idea, "budget")
+        assert got["verdict"] == "violates_constraint", (text, idea, got["verdict"])
+
+
+@pytest.mark.parametrize(
+    "text,idea",
+    [
+        (
+            "cannot afford a forklift",
+            "buy a forklift so the two supervisors can clear late orders faster",
+        ),
+        ("cannot afford a forklift", "buy a forklift for the warehouse team to clear late orders"),
+        ("cannot afford a forklift", "buy a forklift for late orders"),
+        ("cannot afford a forklift", "purchase a second-hand forklift"),
+        ("cannot afford a lawyer", "hire a lawyer so the two supervisors stop chasing late orders"),
+        ("cannot afford a subscription", "buy a monthly subscription to a tracking service"),
+        ("cannot afford licences", "buy software licences"),
+        ("cannot afford subscriptions", "take out a subscription for the tracker"),
+        ("cannot afford a generator", "buy a generator"),
+        ("cannot afford an accountant", "hire an accountant for late orders"),
+    ],
+)
+def test_the_audit_inert_afford_cases_are_now_violations(text, idea) -> None:
+    assert full(text, idea, "budget")["verdict"] == "violates_constraint", (text, idea)
+
+
+@pytest.mark.parametrize(
+    "text", ["cannot afford subscriptions", "cannot afford licences", "cannot afford a crane"]
+)
+def test_an_unrelated_idea_is_never_relevant_under_an_afford_limit_on_a_thing(text) -> None:
+    got = full(text, "ask each rider to confirm the order by phone", "budget")
+    assert got["verdict"] in ("unknown", "irrelevant", "generic"), got["verdict"]
+    assert got["verdict"] != "relevant"
+
+
+@pytest.mark.parametrize("noun", lexicon_words("outcomes"))
+def test_cannot_afford_an_outcome_is_a_goal_enforced_by_a_loss_verb(noun) -> None:
+    text = f"we cannot afford {noun}"
+    got = full(text, f"Cause {noun} by switching systems", "budget")
+    assert got["verdict"] in ("violates_constraint", "unknown"), (noun, got["verdict"])
+    assert full(text, f"Reduce {noun} with a checklist", "budget")["verdict"] != (
+        "violates_constraint"
+    )
+
+
+@pytest.mark.parametrize("noun", lexicon_words("operations", "time"))
+def test_cannot_afford_an_operations_or_time_noun_is_unknown(noun) -> None:
+    assert full(f"we cannot afford a {noun}", "Buy a tablet", "budget")["verdict"] == "unknown"
+
+
+def test_emptying_the_adjective_list_changes_a_verdict(monkeypatch) -> None:
+    facts = ("our tracker is expensive and big",)
+    b = brief([limit("we cannot afford anything expensive", kind="budget")], facts=facts)
+    idea = "ask each rider to confirm the order by phone"
+    assert relevance.score_candidate(b, idea)["verdict"] == "unknown"
+    relevance_match._rules_cached.cache_clear()
+    monkeypatch.setattr(relevance_match, "_ADJECTIVES", set())
+    try:
+        assert relevance.score_candidate(b, idea)["verdict"] != "unknown"
+    finally:
+        relevance_match._rules_cached.cache_clear()
+
+
+def test_emptying_the_vague_list_changes_a_verdict(monkeypatch) -> None:
+    b = brief([limit("we cannot afford zyada", kind="budget")], facts=("hum zyada bechte hain",))
+    idea = "ask each rider to confirm the order by phone"
+    assert relevance.score_candidate(b, idea)["verdict"] == "unknown"
+    relevance_match._rules_cached.cache_clear()
+    monkeypatch.setattr(relevance_match, "_VAGUE", set())
+    try:
+        assert relevance.score_candidate(b, idea)["verdict"] != "unknown"
+    finally:
+        relevance_match._rules_cached.cache_clear()

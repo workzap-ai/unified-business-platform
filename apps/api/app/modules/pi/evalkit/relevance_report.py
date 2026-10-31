@@ -33,10 +33,10 @@ def pct(value: float | None) -> str:
 
 def line(name: str, agg: dict[str, Any]) -> str:
     if not agg["measured"]:
-        return f"| {name} | {agg['cases']} | not yet measured | | | |"
+        return f"| {name} | {agg['cases']} | not yet measured | | | | |"
     return (
         f"| {name} | {agg['cases']} | {pct(agg['accuracy'])} | {agg['false_relevant']} | "
-        f"{agg['missed_relevant']} | {agg['hard_misses']} |"
+        f"{agg['missed_relevant']} | {agg['hard_misses']} | {agg.get('unknown', 0)} |"
     )
 
 
@@ -67,6 +67,7 @@ def build(
             split=splits.HELD_OUT,
             count=held_count,
         )
+    same, total = relevance_calibration.development_agreement()
     scored = [
         relevance.score_case(case, held_out_ok=ticket) | {"split": splits.split_of(case)}
         for case in cases
@@ -76,6 +77,10 @@ def build(
         "",
         relevance.DISCLAIMER,
         "",
+        f"Current scorer, Development borderline set: {same} of {total} candidates carry the "
+        "same verdict as the agent-drafted label (numbers only; these labels are not human "
+        "labels).",
+        "",
         "This tests the relevance scorer and the plan case files against labels written with the",
         "cases. No model is called, so it says nothing about how well pi solves problems. The",
         "check against a grader and against people is done separately (relevance_calibration).",
@@ -84,8 +89,9 @@ def build(
     ]
     head = (
         "| group | cases | verdicts matching the agent-drafted labels (not a score) "
-        "| relevant by mistake | relevant missed | limit breaks missed |\n"
-        "|---|---|---|---|---|---|"
+        "| relevant by mistake | relevant missed | limit breaks missed "
+        "| not read (unknown, counted apart) |\n"
+        "|---|---|---|---|---|---|---|"
     )
     totals: dict[str, Any] = {}
     for title, key in (
@@ -131,13 +137,16 @@ def borderline_section(access_log_path: str | Path | None, who: str, why: str) -
         "## Borderline set: scorer against agent-drafted labels (not human labels)",
         "",
         f"Current scorer: {same} of {len(rows)} Development candidates carry the same verdict as "
-        "the agent-drafted label. The 55% in the standing note at the top of this report is the "
-        "figure measured on the earlier scorer and is kept as written; these labels are not "
-        "human labels and no threshold is applied here.",
+        "the agent-drafted label. The standing note at the top of this report gives the figure "
+        "of the earlier scorer; these labels are not human labels and no threshold is applied "
+        "here.",
         "",
         f"Development: {len(rows)} candidates, the scorer differs on {len(diff)}. Held-out: "
         f"{found['held_out_candidates']} candidates counted only (not scored, no labels "
-        "committed). A difference is a finding; neither side is changed to remove it.",
+        "committed). A difference is a finding. The scorer was changed after the first "
+        "comparison (FT-A3b) with general features, which moved two Development verdicts "
+        "(plan_bl_poultry_limit_edge_en_03/c3 and plan_bl_banquet_numeric_limit_en_09/c2); no "
+        "rule names a case or a label.",
         "",
     ]
     out += [

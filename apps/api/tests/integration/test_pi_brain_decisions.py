@@ -170,7 +170,8 @@ async def test_a_cost_question_at_the_offer_is_answered_not_gated(api, business_
 async def test_a_roman_urdu_cost_question_at_the_offer_does_not_start_the_quote(
     api, business_db, monkeypatch
 ):
-    # D-1 (approved by the owner, delegated recommended decisions 2026-10-31): deviates from spec v1.6 19.2 BS1/BS6
+    # D-1 (approved by the owner, delegated recommended decisions 2026-10-31):
+    # deviates from spec v1.6 19.2 BS1/BS6
     pi, prompts = await to_the_offer(api, business_db, monkeypatch)
     await say(pi, "kitna kharcha hoga yeh banane ka?", "cq-ur")
     body = (await pi.reply_to("cq-ur")).body
