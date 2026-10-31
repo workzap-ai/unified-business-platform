@@ -1215,3 +1215,59 @@ def test_the_fixed_replace_paths_clear_the_flags():
     turn._cost_line = "stale"
     sc.brain_offer(turn, _offer_context("en"))
     assert turn._cost_line == ""
+
+
+# --- round 7: the offer gate keeps its recall (explicit asks) and stays closed on statements ------
+LONG_VOICE_NOTE = "we sell tiles and the stock is a mess " * 20 + "so what now. send me the quote"
+OFFER_OPEN = [
+    "give me the price",
+    "give me a price please",
+    "hello, mujhay quote chahiye",
+    "ok so I think we need an app. send me the quote",
+    "quote abhi do",
+    "mujhay quote abhi chahiye",
+    "send me a quote for this",
+    "mujhay quote do abhi",
+    LONG_VOICE_NOTE,
+]
+OFFER_CLOSED = [
+    "we send the quote to customers late",
+    "it takes me hours to send a quote",
+    "when I send the quote customers complain",
+    "the price is too high for me",
+    "send the quote to my customer takes hours",
+    "Mujhe quote banane mein bahut time lagta hai",
+    "I don't want the quote",
+    "send me the quote later",
+    "my customers say, send me the quote",
+    "kitna nuksan hota hai hamara",
+]
+
+
+@pytest.mark.parametrize("said", OFFER_OPEN)
+def test_round7_these_open_the_offer(said):
+    from app.modules.pi import service_conversation as sc
+
+    assert sc.box_offer_allowed({"latest_customer_message": said, "noted_problems": [{}, {}]})
+
+
+@pytest.mark.parametrize("said", OFFER_CLOSED)
+def test_round7_these_do_not_open_the_offer(said):
+    from app.modules.pi import service_conversation as sc
+
+    assert not sc.box_offer_allowed({"latest_customer_message": said, "noted_problems": [{}, {}]})
+
+
+def test_round7_a_long_voice_note_opens_the_offer_but_never_starts_the_quote():
+    assert len(LONG_VOICE_NOTE) > 500
+    assert part19.opens_the_offer_by_quote_phrase(LONG_VOICE_NOTE)
+    assert decisions.asks_for_document(LONG_VOICE_NOTE) is False
+    decision = _decide(LONG_VOICE_NOTE)
+    assert decision is None or "request_solution" not in decision.effects
+
+
+@pytest.mark.parametrize("said", ["give me the price", "give me a price please", "quote abhi do"])
+def test_round7_the_phrase_gate_never_starts_a_quote_on_a_price_ask(said):
+    if "price" in said:
+        decision = _decide(said)
+        assert decision is None or "request_solution" not in decision.effects
