@@ -76,6 +76,13 @@ def unknown(rule: str, reason: str) -> cc.Verdict:
 REASONS = [
     ("the budget states only a minimum", ur.Code.BUDGET_FLOOR_ONLY),
     ("no figure in the budget text", ur.Code.BUDGET_NO_FIGURE),
+    (
+        (
+            "no budget was stated and the option looks like it costs money, "
+            "so its cost could not be checked"
+        ),
+        ur.Code.BUDGET_NOT_STATED,
+    ),
     ("the staff limit could not be read as a number of people", ur.Code.STAFF_LIMIT_UNREADABLE),
     (
         "the deadline is not a duration this check can read (a date needs a calendar)",
@@ -2012,3 +2019,23 @@ def test_records_scan_is_linear() -> None:
     c = run(5000)  # capped at MAX_RECORDS
     assert c < max(b, 0.002) * 6 + 0.1
     assert b < max(a, 0.002) * 30 + 0.1
+
+
+def test_budget_not_stated_asks_the_budget_question_and_rechecks() -> None:
+    r = reqs()
+    v = [
+        unknown(
+            cc.RULE_BUDGET,
+            (
+                "no budget was stated and the option looks like it costs money, "
+                "so its cost could not be checked"
+            ),
+        )
+    ] * 2
+    ex = ur.explain_unknowns(v, r, ["Buy a tool", "Rent a unit"])
+    assert all(e.code is ur.Code.BUDGET_NOT_STATED and e.owner_answerable for e in ex)
+    q = cq(v, r, ["Buy a tool", "Rent a unit"])
+    assert q is not None and q.key == "budget_ceiling" and q.options == (0, 1)
+    p = ur.apply_answer(r, q, "50k PKR per month", "en")
+    assert p.status is F and p.recheck_options == ("Buy a tool", "Rent a unit")
+    assert p.updates[0].replaces is None and not p.satisfied
