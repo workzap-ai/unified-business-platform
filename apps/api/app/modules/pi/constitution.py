@@ -15,8 +15,8 @@ import unicodedata
 from dataclasses import dataclass
 from typing import Any
 
+from app.modules.pi import constitution_gaps, flow, owner_asks, think_lint
 from app.modules.pi import constitution_langs as langs
-from app.modules.pi import flow, owner_asks, think_lint
 
 logger = logging.getLogger(__name__)
 
@@ -2319,6 +2319,8 @@ def lint(reply: str, context: dict[str, Any]) -> list[Violation]:
         if phrase in lowered and sum(phrase in p.lower() for p in _pi_replies(context)) >= 2:
             add(Violation("R-VOICE-04", f'say "{phrase}" in different words: it was used twice'))
             break
+    for rule, message, is_hard in constitution_gaps.check(reply, context):
+        add(Violation(rule, message, is_hard))
     # The thinking checks (Book 5, spec 3.9): soft, and only behind response_rules.brain.thinking.
     if context.get("thinking"):
         for flag in think_lint.think_flags(reply, context):
