@@ -13,6 +13,8 @@ Rules (codes are stable; each has a test that fails when the rule is removed):
   OPT-ADDR        every option links to at least one stated problem id, and only known ones
   OPT-MONEY       no money in any text pi wrote (what, benefit, limits, trade-offs, risks,
                   dependencies, check reasons, rejection reason), in any script or as words
+  MONEY_AMBIGUOUS an absence-of-fee phrase ("without a fee") that is neither plainly the owner's
+                  limit nor plainly a claim: flagged for the reviewer, never passed
   OPT-COST        the cost source is staff and the amount is never filled by pi
   OPT-PROMISE     no promised result in any text pi wrote (the constitution's promise rule, "will"
                   without "not", and the wider patterns of `blueprint_text`)
@@ -61,6 +63,7 @@ RULE_CODES = (
     "MALFORMED",
     "OPT-ADDR",
     "OPT-MONEY",
+    "MONEY_AMBIGUOUS",
     "OPT-COST",
     "OPT-PROMISE",
     "OPT-CATALOGUE",
@@ -388,7 +391,14 @@ def _rule_addr(option: bm.Option, ctx: _Ctx) -> list[Issue]:
 
 
 def _rule_money(option: bm.Option, ctx: _Ctx) -> list[Issue]:
-    return [Issue("OPT-MONEY", option.id, t[:60]) for t in _own_texts(option) if bt.money_in(t)]
+    found: list[Issue] = []
+    for text in _own_texts(option):
+        state = bt.money_state(text)
+        if state == "money":
+            found.append(Issue("OPT-MONEY", option.id, text[:60]))
+        elif state == "ambiguous":
+            found.append(Issue("MONEY_AMBIGUOUS", option.id, text[:60]))
+    return found
 
 
 def _rule_cost(option: bm.Option, ctx: _Ctx) -> list[Issue]:

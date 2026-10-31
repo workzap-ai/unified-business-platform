@@ -55,7 +55,6 @@ CLAIMS = [
     "يوفر ساعتين يوميا",
     "يخفض التكلفة إلى النصف",
     "زيادة الطلبات بنسبة عشرين بالمئة",
-    "بدون رسوم",
     # English
     "Free for the first year",
     "It is free of cost",
@@ -197,7 +196,6 @@ EXTRA_CLAIMS = [
     "يضاعف مبيعاتك",
     "سيوفر وقتك",
     "مجاني تماما",
-    "لا توجد اي رسوم",
     "saves five hours every week",
     "halves your costs",
     "doubles your orders",
@@ -205,7 +203,6 @@ EXTRA_CLAIMS = [
     "It is completely free",
     "free trial",
     "costs nothing",
-    "no charge",
     "reduces costs by a third",
 ]
 EXTRA_CLEAN = [

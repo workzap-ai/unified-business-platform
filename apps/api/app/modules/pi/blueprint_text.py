@@ -323,13 +323,13 @@ MONEY_EXTRA = re.compile(
 _COST_CLAIMS = (
     r"free\s+of\s+charge",
     r"(?:at|for)\s+no\s+(?:cost|charge|extra|fee)\w*",
-    r"no\s+(?:cost|charge|fee|fees|extra\s+(?:cost|charge))",
+    r"no\s+(?:cost|extra\s+(?:cost|charge))",
     r"zero\s+(?:cost|fee|fees|charge|charges)",
     r"costs?\s+nothing",
     r"for\s+free",
     r"(?:completely|totally|absolutely|entirely|100\s?%)\s+free",
     r"free\s+(?:forever|for\s+life)",
-    r"without\s+(?:any\s+)?(?:cost|charge|fee)",
+    r"without\s+(?:any\s+)?cost",
     r"gratis",
     r"low[\s-]?cost",
     r"cheap\w*",
@@ -342,17 +342,17 @@ _COST_CLAIMS = (
     r"kam\s+(?:kharcha|kharch|qeemat|keemat|paisay|paise|lagat)",
     r"sast[aiey]\w*",
     r"bina\s+(?:kisi\s+)?(?:kharch\w*|paisay|paise)",
-    r"koi\s+(?:kharch\w*|fees?)\s+nahi\w*",
+    r"koi\s+kharch\w*\s+nahi\w*",
     # Urdu
     r"مفت",
     r"کم\s+خرچ\w*",
     r"سست[ای]",
     r"بغیر\s+خرچ\w*",
-    r"کوئی\s+(?:خرچ|فیس)\w*\s+نہیں",
+    r"کوئی\s+خرچ\w*\s+نہیں",
     # Hindi
     r"मुफ़्त",
     r"मुफ्त",
-    r"बिना\s+(?:खर्च|पैसे|शुल्क)",
+    r"बिना\s+(?:खर्च|पैसे)",
     r"कम\s+खर्च",
     r"सस्त[ाी]",
     r"कोई\s+खर्च\s+नहीं",
@@ -378,14 +378,14 @@ _COST_CLAIMS_MORE = (
     # Urdu
     r"(?:خرچ|خرچہ|فیس|چارج)\w*\s+(?:\w+\s+){0,2}?نہیں\s+(?:ہو|لگ|آئ)\w*",
     r"پیس[ہے]\s+وصول",
-    r"(?:بغیر|بنا)\s+(?:کسی\s+)?(?:فیس|چارج|خرچ)\w*",
+    r"(?:بغیر|بنا)\s+(?:کسی\s+)?خرچ\w*",
     # Hindi
     r"(?:खर्च|शुल्क|फीस|चार्ज)\w*\s+(?:\w+\s+){0,2}?नहीं\s+(?:हो|लग|आ)\w*",
     r"पैस[ाे]\s+वसूल",
-    r"बिना\s+(?:किसी\s+)?(?:फीस|चार्ज|खर्च|शुल्क)",
+    r"बिना\s+(?:किसी\s+)?खर्च",
     # Arabic
-    r"لا\s+(?:تكلف\w+|رسوم|يوجد\s+رسوم|مقابل)",
-    r"(?:بدون|بلا)\s+(?:رسوم|اي\s+رسوم|مقابل|اي\s+تكلف\w+)",
+    r"لا\s+(?:تكلف\w+|مقابل)",
+    r"(?:بدون|بلا)\s+(?:مقابل|اي\s+تكلف\w+)",
     r"(?:اقل|ارخص)\s+(?:تكلف\w+|سعرا|من)",
     r"تكلف[ةه]\s+اقل",
 )
@@ -484,7 +484,7 @@ _OUTCOMES_X = (
     # orders barh jayenge, sales बढ़ेंगी
     rf"(?:{_BIZ_X})[^\s.;!?,]*\s+(?:[^\s.;!?,]+\s+){{0,3}}?(?:barh|badh|بڑھ|बढ़|बढ)[^\s.;!?,]*",
     # لا توجد اي رسوم
-    r"لا\s+(?:توجد|يوجد)\s+(?:اي\s+)?(?:رسوم|تكلف\w+)",
+    r"لا\s+(?:توجد|يوجد)\s+(?:اي\s+)?تكلف\w+",
     # bachat hogi
     r"(?:bachat|بچت|बचत)\s+(?:hogi|hoga|hoti|ho\s+gi|ہوگی|ہو\s+گی|ہوتی|होगी|होगा|होती)",
     # kharcha aadha ho jayega, خرچ آدھا ہو جائے گا, खर्च आधा हो जाएगा
@@ -541,10 +541,49 @@ def _bare_figure(view: str) -> bool:
     return False
 
 
-def money_in(text: str) -> bool:
-    """True when any view of the text holds an amount or a cost claim: the old pattern, the extra
-    patterns, a free or cheap claim, or a bare figure of five to nine digits. Phone numbers and
-    reference numbers are cut out first."""
+# "Without a fee" is two different things. "The solution is free" is a claim only staff may make.
+# "Options without a fee" or "the owner needs no fee for the first month" is the owner's limit. An
+# absence-of-fee phrase is a limit when its clause also says who wants it or what it limits; with
+# no such word it could be either, and it is flagged as ambiguous (fail closed), not passed.
+_ABSENCE_OF_FEE = (
+    r"(?:without|no|zero|minus)\s+(?:any\s+)?(?:fee|fees|charge|charges)",
+    r"(?:bina|bagair|baghair)\s+(?:kisi\s+)?(?:fees?|charges?)\w*",
+    r"(?:fees?|charges?)\s+ke\s+(?:bina|bagair|baghair)",
+    r"koi\s+(?:fees?|charges?)\s+nahi\w*",
+    r"(?:بغیر|بنا)\s+(?:کسی\s+)?(?:فیس|فیسوں|چارج|چارجز|رسوم)\w*",
+    r"(?:فیس|فیسوں|چارج|رسوم)\w*\s+کے\s+(?:بغیر|بنا)",
+    r"کوئی\s+(?:فیس|چارج)\w*\s+نہیں",
+    r"बिना\s+(?:किसी\s+)?(?:फीस|फ़ीस|चार्ज|शुल्क)",
+    r"(?:फीस|चार्ज|शुल्क)\s+के\s+बिना",
+    r"कोई\s+(?:फीस|चार्ज|शुल्क)\s+नहीं",
+    r"(?:بدون|بلا|بغير|دون)\s+(?:اي\s+)?(?:رسوم|رسم|عموله|اجور|فيس)",
+    r"لا\s+(?:توجد\s+|يوجد\s+)?(?:اي\s+)?(?:رسوم|رسم)",
+)
+ABSENCE_OF_FEE = re.compile(
+    "|".join(rf"(?<![^\W\d_]){fold(p)}(?![^\W\d_])" for p in _ABSENCE_OF_FEE), re.IGNORECASE
+)
+_LIMIT_WORDS = _alt(
+    "only must need needs needed require requires required requirement requirements want wants "
+    "wanted prefer prefers should avoid afford cannot can't won't unable limit limits restriction "
+    "constraint constraints "
+    "wale wali wala sirf chahiye chahta chahte chahti shart sharat zaroori talash dhoond "
+    "والے والی والا صرف چاہیے چاہتے چاہتا چاہتی شرط ضروری تلاش "
+    "वाले वाली वाला सिर्फ केवल चाहिए चाहते चाहता चाहती शर्त ज़रूरी जरूरी तलाश "
+    "فقط يجب نريد نحتاج اريد شرط خيار خيارات حلول مطلوب يرغب ترغب"
+)
+LIMIT_MARKER = re.compile(
+    rf"(?<![^\W\d_])(?:{_LIMIT_WORDS}|has\s+to|have\s+to|looking\s+for|asked?\s+for)"
+    r"(?![^\W\d_])",
+    re.IGNORECASE,
+)
+_CLAUSE_END = re.compile(r"[.;!?,\n\u060c\u061f\u06d4]+")
+
+
+def money_state(text: str) -> str:
+    """ "money" when the text holds an amount, a cost claim or an invented saving; "ambiguous" when
+    its only money word is an absence-of-fee phrase with nothing in its clause that says it is
+    the owner's limit; "clean" otherwise (an absence-of-fee phrase used as a limit is clean)."""
+    ambiguous = False
     for view in views(text):
         kept = _ID_LIKE.sub(" ", view)
         if (
@@ -554,8 +593,17 @@ def money_in(text: str) -> bool:
             or OUTCOME_CLAIM.search(kept)
             or _bare_figure(kept)
         ):
-            return True
-    return False
+            return "money"
+        for clause in _CLAUSE_END.split(kept):
+            if ABSENCE_OF_FEE.search(clause) and not LIMIT_MARKER.search(clause):
+                ambiguous = True
+    return "ambiguous" if ambiguous else "clean"
+
+
+def money_in(text: str) -> bool:
+    """True when the text holds an amount, a cost claim or an invented saving. Phone numbers and
+    reference numbers are cut out first; an absence-of-fee limit is not money (`money_state`)."""
+    return money_state(text) == "money"
 
 
 # --- a guessed cause worded as a fact -------------------------------------------------------------
