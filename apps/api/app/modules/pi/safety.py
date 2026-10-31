@@ -554,14 +554,14 @@ EMERGENCY_TEXT = {
 }
 
 
-# Roman Urdu fire. The default is that a fire phrase FIRES. It is quiet only when its own clause is
-# plainly a past event or a hypothetical AND carries a strong non-emergency marker (insurance,
-# claim, a past period, a fire-safety trade word), AND the message has no danger or urgency word,
-# AND the fire is not said in the present ("lag gayi hai"). An unpunctuated WhatsApp message is one
-# clause, so a danger word anywhere wins. Deliberate trade-off: with a past event and a claim
-# ("pichle mahine aag lag gayi thi, ab claim file karna hai") the flow stays quiet, while a past
-# fire with no such marker ("kal aag lag gayi thi, bacha hua maal bechna hai") still gets the
-# emergency reply: when in doubt the emergency fires.
+# Roman Urdu, Hindi, Urdu and Arabic fire. The default is that a fire phrase FIRES. It is quiet only
+# when ALL of these hold: the clause of the match has a past or hypothetical word (thi, tha,
+# pichle, kabhi, agar, "lag gayi to"), the message has a separate insurance/claim/extinguisher
+# word, and there is no danger, urgency or present marker anywhere (help, jaldi, log andar, abhi,
+# ab, phir, "raha hai"). An unpunctuated WhatsApp message is one clause, so a danger word anywhere
+# wins. Accepted false positives, pinned by tests: "pichle mahine aag lag gayi thi, ab claim file
+# karna hai" (the "ab") and "kal aag lag gayi thi, bacha hua maal bechna hai" get the emergency
+# reply. When in doubt the emergency fires.
 _FIRE_VERB = (
     r"(?:lag{1,2}|lg)(?:a|i|\s*(?:gayi|gai|gaii|gaee|geyi|gya|gyi|gaya|gayee|gaye|gye|ga|rahi|raha|"
     r"ayi|chuki|chuka|jayegi|jayega|jaye|jaega|jaegi))"
@@ -582,33 +582,31 @@ _ROMAN_FIRE = re.compile(
     + _FIRE_VERB
     + r"|ho\s+(?:gayi|gaya|gai|gya|gyi|rahi|raha|hui))\b"
     r"|\baag\s+lagne\s+wal[ia]\s+(?:hai|hain)\b"
-    r"|\b" + _FIRE_PLACE + r"\s+(?:jal|jalne)\s*(?:raha|rahi|rahe|laga|lagi|gaya|gayi|gaye)\b"
-    r"|\bjalne\s+(?:laga|lagi)\b|\bjal\s+(?:gaya|gayi|gaye)\b",
+    # "jal gaya" alone is a bulb, a meal or a motor; it needs a building or "everything" as subject
+    r"|\b(?:" + _FIRE_PLACE + r"|sab|sab\s+kuch|poora|pura|puri)\s+(?:jal|jalne)\s*"
+    r"(?:raha|rahi|rahe|laga|lagi|gaya|gayi|gaye)\b",
     re.IGNORECASE,
 )
-# said in the present, or a place with a fire in it: always an emergency
+# a place with a fire in it, said in the present: always an emergency
 _ROMAN_FIRE_NOW = re.compile(
-    r"\b(?:mein|me|yahan|wahan|idhar|udhar)\s+aag\s+(?:hai|hain)\b", re.IGNORECASE
+    r"\b(?:mein|me|yahan|wahan|idhar|udhar)\s+aag\s*(?:(?:hai|hain)\b|[!.?]*$)", re.IGNORECASE
 )
 _ROMAN_FIRE_PRESENT = re.compile(r"\s*(?:hai|hain|he|h)\b", re.IGNORECASE)
 _ROMAN_FIRE_STRONG = re.compile(
-    r"\b(?:insurance|claim|bima|pichle|pichhle|pichla|kabhi|extinguisher|alarm|sprinkler|hydrant|"
-    r"quote|installation)\b",
-    re.IGNORECASE,
+    r"\b(?:insurance|claim|bima|extinguisher|sprinkler|hydrant)\b", re.IGNORECASE
 )
 _ROMAN_FIRE_PAST = re.compile(
     r"\b(?:thi|tha|pehle|pichle|pichhle|pichla|kabhi|agar)\b", re.IGNORECASE
 )
-_ROMAN_FIRE_TO = re.compile(
-    r"\s*to\b", re.IGNORECASE
-)  # "lag gayi to ..." (if it catches fire, then)
+_ROMAN_FIRE_TO = re.compile(r"\s*to\b", re.IGNORECASE)  # "lag gayi to ..." (if it catches fire)
 _ROMAN_PERSON = (
     r"(?:log|logon|bhai|ammi|abu|bacch\w*|bachch\w*|bachon|mazdoor|staff|family|workers?|insaan|"
     r"aurat|admi|beta|beti|biwi|maa|baap)"
 )
 _ROMAN_FIRE_DANGER = re.compile(
     r"\b(?:help|urgent|jaldi|emergency|bachao|nikalo|madad|ambulance|fire\s*brigade|dhuan\w*|"
-    r"cylinder|blast|phat\w*|jal\s+(?:gaya|gayi|gaye|jayega|jayegi|jaye)|jalne\s+lag\w*)\b"
+    r"cylinder|blast|phat\w*|abhi|ab|phir|(?:raha|rahi|rahe)\s+(?:hai|hain|he)|"
+    r"jal\s+(?:gaya|gayi|gaye|jayega|jayegi|jaye)|jalne\s+lag\w*)\b"
     r"|\b"
     + _ROMAN_PERSON
     + r"\b[^.?!\n]{0,20}\bandar\b|\bandar\b[^.?!\n]{0,12}\b"
@@ -616,16 +614,46 @@ _ROMAN_FIRE_DANGER = re.compile(
     + r"\b",
     re.IGNORECASE,
 )
-_ROMAN_TRAPPED = re.compile(
-    r"\bandar\s+(?:phas|fas|phans|fans)\w*|\b"
+_PHAS = r"(?:phas|fas|phans|fans)"
+# people trapped: always an emergency, even when the message also talks about money or orders
+_ROMAN_TRAPPED_PEOPLE = re.compile(
+    r"\b"
     + _ROMAN_PERSON
-    + r"\s+(?:andar\s+)?(?:phas|fas|phans|fans)\w*",
+    + r"\b[^.?!\n]{0,30}\bandar\s+"
+    + _PHAS
+    + r"\w*"
+    + r"|\b"
+    + _ROMAN_PERSON
+    + r"\s+(?:andar\s+)?"
+    + _PHAS
+    + r"\w*\s+(?:gaye|gae|gaee|gye|hain|rahe)\b"
+    + r"|\bandar\s+"
+    + _PHAS
+    + r"\w*\s+(?:gaye|gae|gaee|gye|rahe)\b",
     re.IGNORECASE,
 )
+# one object stuck inside: only when the message is not about money or stock
+_ROMAN_TRAPPED_ONE = re.compile(r"\bandar\s+" + _PHAS + r"\w*", re.IGNORECASE)
 _ROMAN_TRAPPED_NOT = re.compile(
     r"\b(?:paise|payment|rupay\w*|cheque|order|maal|stock|invoice)\b", re.IGNORECASE
 )
 _ROMAN_FIRE_CLAUSE = re.compile(r"[,.;:!?\n]|\b(?:aur|ab|phir|lekin)\b", re.IGNORECASE)
+# Hindi, Urdu script and Arabic: a fire or smoke word alone, or smoke that has filled a place.
+# A trade phrase ("आग बुझाने का यंत्र") has more words and does not match.
+_FIRE_WORD_NATIVE = r"(?:आग|धुआं|धुँआ|धुवां|आग\s+आग|آگ|دھواں|دھوان|دخان|نار|النار|حريق|حریق|الحريق)"
+_NATIVE_FIRE_BARE = re.compile(r"(?:\s*" + _FIRE_WORD_NATIVE + r"\s*[!.?،؟]*)+", re.IGNORECASE)
+_NATIVE_SMOKE_FILLED = re.compile(
+    r"(?:धुआं|धुँआ|धुवां)\s+(?:भर|फैल|निकल)|(?:दुकान|घर|गोदाम|फैक्ट्री|कमरे|कमरा)\s+(?:में\s+)?आग|"
+    r"آگ\s+لگی|دھواں\s+(?:بھر|پھیل|نکل)|(?:دکان|گودام|گھر|فیکٹری|کمرے)\s+(?:میں\s+)?آگ|"
+    r"(?:ملأ|امتلأ|امتلأت|يملأ)\w*\s+(?:ال)?دخان|امتلأ\w*\s+ب(?:ال)?دخان|دخان\s+كثيف|"
+    r"النار\s+(?:في|تشتعل)",
+    re.IGNORECASE,
+)
+# a message that is only "aag", "fire", "dhuan" or "jal gaya" (repeated any number of times)
+_ROMAN_FIRE_BARE = re.compile(
+    r"(?:\s*(?:aag|ag|aaag|fire|dhuan|dhuaan|jal\s+gaya|jal\s+gayi|jalne\s+laga)\s*[!.?]*)+",
+    re.IGNORECASE,
+)
 
 
 def _clause_of(said: str, start: int, end: int) -> str:
@@ -639,12 +667,13 @@ def _clause_of(said: str, start: int, end: int) -> str:
     return said[lo:hi]
 
 
-# A message that is only "aag", "fire" or "dhuan" (up to three times) is a cry, not trade talk.
-_ROMAN_FIRE_BARE = re.compile(r"(?:\s*(?:aag|ag|fire|dhuan|dhuaan)\s*[!.?]*){1,3}", re.IGNORECASE)
-
-
 def _roman_fire(said: str) -> Emergency | None:
-    if _ROMAN_FIRE_BARE.fullmatch(said) or _ROMAN_FIRE_NOW.search(said):
+    if (
+        _ROMAN_FIRE_BARE.fullmatch(said)
+        or _NATIVE_FIRE_BARE.fullmatch(said)
+        or _NATIVE_SMOKE_FILLED.search(said)
+        or _ROMAN_FIRE_NOW.search(said)
+    ):
         return Emergency.FIRE
     matches = list(_ROMAN_FIRE.finditer(said))
     if matches:
@@ -656,11 +685,13 @@ def _roman_fire(said: str) -> Emergency | None:
             clause = _clause_of(said, m.start(), m.end())
             hypothetical = bool(_ROMAN_FIRE_TO.match(said, m.end()))
             if not (
-                _ROMAN_FIRE_STRONG.search(clause)
+                _ROMAN_FIRE_STRONG.search(said)
                 and (hypothetical or _ROMAN_FIRE_PAST.search(clause))
             ):
                 return Emergency.FIRE
-    if _ROMAN_TRAPPED.search(said) and not _ROMAN_TRAPPED_NOT.search(said):
+    if _ROMAN_TRAPPED_PEOPLE.search(said):
+        return Emergency.GENERIC
+    if _ROMAN_TRAPPED_ONE.search(said) and not _ROMAN_TRAPPED_NOT.search(said):
         return Emergency.GENERIC
     return None
 
@@ -1262,7 +1293,7 @@ ADVICE_PATTERNS = ADVICE_PATTERNS + (
         re.compile(
             r"\b(?:(?:can|could|may) (?:i|we) legally|"
             r"(?:am|are|is|do|does) (?:i|we|it|this|that)\b[^.?!]{0,40}\blegally (?:allowed|permitted|required|entitled|bound)|"
-            r"kya\b[^.?!]{0,40}\blegally|tell me (?:whether|if)\b[^.?!]{0,40}\blegal|"
+            r"kya\b[^.?!]{0,40}\blegally|tell me (?:whether|if)\b[^.?!]{0,40}\blegal(?:ly)?\b|"
             r"tell me what the (?:law|act|regulations?) says?|what does the (?:law|act) say|"
             r"is (?:this|that) (?:legal|illegal)\b(?!\s+"
             r"(?:size|pad|ruled|a4|envelopes?|tender|stamp|entity|letter[- ]size)\b)|"

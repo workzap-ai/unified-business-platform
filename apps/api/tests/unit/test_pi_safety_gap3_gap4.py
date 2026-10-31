@@ -68,19 +68,24 @@ def test_past_hypothetical_and_trade_text_is_not_an_emergency(text):
     assert safety.emergency(text) is None
 
 
-def test_a_past_marker_hides_a_fire_only_in_its_own_clause():
-    # same clause: quiet
-    assert safety.emergency("pichle saal dukan mein aag lag gayi thi") is None
-    # the marker sits in another clause: the fire clause has none, so it fires
+def test_two_distinct_markers_are_needed_to_hide_a_fire():
+    # a past word alone, or an insurance word alone, never hides a fire
+    assert safety.emergency("pichle saal dukan mein aag lag gayi thi") is not None
+    assert safety.emergency("insurance wale aaye hain, dukan mein aag lag gayi") is not None
+    # past word in the fire clause + a separate insurance word, nothing urgent: quiet
     assert (
-        safety.emergency("pichle saal claim kiya tha, dukan mein aag lag gayi")
-        is safety.Emergency.FIRE
+        safety.emergency("pichle saal showroom mein aag lag gayi thi, insurance claim karna hai")
+        is None
     )
-    # a danger word anywhere in the message wins over a marker in the fire clause
-    assert (
-        safety.emergency("pichle saal showroom mein aag lag gayi thi, madad chahiye")
-        is safety.Emergency.FIRE
-    )
+    # the past word sits in another clause: the fire clause has none, so it fires
+    assert safety.emergency("pichle saal claim kiya tha, dukan mein aag lag gayi") is not None
+    # a danger or present word anywhere wins over both markers
+    for text in (
+        "pichle saal showroom mein aag lag gayi thi, insurance claim, madad chahiye",
+        "insurance wale aaye aag lag gayi thi abhi",
+        "alarm baj raha hai aag lag gayi thi",
+    ):
+        assert safety.emergency(text) is safety.Emergency.FIRE
 
 
 ADVICE = [
@@ -179,7 +184,6 @@ AUDIT_FIRE_YES = [
 
 AUDIT_FIRE_NO = [
     "aag lagne wali cheezein ka quote chahiye",
-    "pichle mahine aag lag gayi thi, ab claim file karna hai",
     "pichle saal showroom mein aag lag gayi thi, insurance claim karna hai",
     "agar aag lag gayi to claim milega?",
     "aag lag gayi to extinguisher kaam karega?",
@@ -242,7 +246,9 @@ def test_a_salvage_message_after_a_fire_still_gets_the_emergency_reply():
     # decided: with no insurance/claim/period marker a past fire is treated as an emergency
     # ("when in doubt it fires"); with a claim marker the flow stays quiet.
     assert safety.emergency("kal aag lag gayi thi, bacha hua maal bechna hai") is not None
-    assert safety.emergency("pichle mahine aag lag gayi thi, ab claim file karna hai") is None
+    assert (
+        safety.emergency("pichle mahine aag lag gayi thi, ab claim file karna hai") is not None
+    )  # accepted false positive: "ab"
 
 
 def test_to_and_the_in_a_mixed_language_message_do_not_hide_a_fire():
@@ -282,3 +288,102 @@ def test_ambiguous_fire_messages_are_never_quiet(text):
 )
 def test_a_trade_phrase_with_a_fire_word_is_not_a_bare_cry(text):
     assert safety.emergency(text) is None
+
+
+# Round 2: phrases the integrator executed against 2b722b0, with the result after the fix.
+ROUND2 = [
+    ("cheque ke paise nikaal lo log andar phas gaye", "GENERIC"),
+    ("order ka maal godown mein hai log andar phas gaye", "GENERIC"),
+    ("log andar phas gaye, order jaldi bhejo", "GENERIC"),
+    ("maal ke godown mein log andar phas gaye", "GENERIC"),
+    ("alarm baj raha hai aag lag gayi thi", "FIRE"),
+    ("pichle hafte wali aag phir lag gayi thi", "FIRE"),
+    ("aag aag aag aag", "FIRE"),
+    ("fire fire fire fire", "FIRE"),
+    ("dukan mein aag", "FIRE"),
+    ("aag lagi hui hai", "FIRE"),
+    ("aag lagi he", "FIRE"),
+    ("aaag lag gayi", "FIRE"),
+    ("bulb jal gaya, replace karna hai", None),
+    ("stove par khana jal gaya", None),
+    ("khana jal gaya", None),
+    ("bulb jal gaya", None),
+    ("quote chahiye aag lag gayi thi aur log andar hain", "FIRE"),
+    ("installation ke baad aag lag gayi thi", "FIRE"),
+    ("claim karna hai aag lag gayi", "FIRE"),
+    ("insurance wale aaye aag lag gayi thi abhi", "FIRE"),
+    ("agar madad na mili aag lag gayi thi", "FIRE"),
+    ("आग लग गई है लोग अंदर हैं", "FIRE"),
+    ("आग लगी है", "FIRE"),
+    ("आग", "FIRE"),
+    ("धुआं भर गया है", "FIRE"),
+    ("आग लगी थी बीमा क्लेम करना है", "FIRE"),
+    ("آگ لگ گئی ہے لوگ اندر ہیں", "FIRE"),
+    ("آگ", "FIRE"),
+    ("دھواں", "FIRE"),
+    ("آگ لگی تھی انشورنس کا کلیم", "FIRE"),
+    ("حريق", "FIRE"),
+    ("هناك حريق والناس بالداخل", "FIRE"),
+    ("اشتعلت النار في المخزن", "FIRE"),
+    ("نار", "FIRE"),
+    ("gas leak ho rahi hai", "MEDICAL"),
+    ("cylinder se gas nikal rahi hai", "MEDICAL"),
+    ("bijli ka jhatka laga hai", "MEDICAL"),
+    ("I want to kill myself", "SELF_HARM"),
+    ("someone is drowning", "MEDICAL"),
+    ("chhat gir gayi log dab gaye", "MEDICAL"),
+    ("building collapse ho gayi", "MEDICAL"),
+    ("bachay ko choot lagi hai khoon beh raha hai", "MEDICAL"),
+    ("heart attack aaya hai", "MEDICAL"),
+    ("fire extinguisher ka quote", None),
+    ("aag lagane wala lighter", None),
+    ("agarbatti dhuan wali", None),
+    ("hookah dhuan", None),
+    ("vape shop", None),
+]
+
+
+@pytest.mark.parametrize(("text", "name"), ROUND2)
+def test_round2_phrases(text, name):
+    got = safety.emergency(text)
+    assert (got.name if got else None) == name
+
+
+def test_people_trapped_are_an_emergency_even_with_money_words():
+    for text in (
+        "cheque ke paise nikaal lo log andar phas gaye",
+        "order ka maal godown mein hai log andar phas gaye",
+        "log andar phas gaye, order jaldi bhejo",
+    ):
+        assert safety.emergency(text) is safety.Emergency.GENERIC
+    # one object stuck, with money words: ordinary trade
+    assert safety.emergency("payment andar phas gaya hai") is None
+
+
+def test_one_marker_is_not_enough_to_hide_a_fire():
+    # decided: a repair job on a burnt motor is ordinary flow; a bulb or a meal is too
+    assert safety.emergency("motor jal gayi, repair chahiye") is None
+    assert safety.emergency("chai jal gayi") is None
+    # but a building or "everything" burning is a fire
+    assert safety.emergency("sab kuch jal gaya") is safety.Emergency.FIRE
+    assert safety.emergency("godown jal gaya") is safety.Emergency.FIRE
+
+
+@pytest.mark.parametrize(
+    "text",
+    ["धुआं", "आग!", "دھواں", "آگ آگ", "حريق", "دخان", "aag aag aag aag aag aag", "dukan mein aag"],
+)
+def test_bare_cries_in_any_script_and_any_repeat_fire(text):
+    assert safety.emergency(text) is not None
+
+
+@pytest.mark.parametrize(
+    "text",
+    ["आग बुझाने का यंत्र", "آگ بجھانے کا آلہ", "فاير اكستنغويشر", "आग बुझाने के यंत्र का कोटेशन चाहिए"],
+)
+def test_script_trade_phrases_stay_quiet(text):
+    assert safety.emergency(text) is None
+
+
+def test_legal_ask_with_legally_after_whether():
+    assert safety.advice_asked("tell me whether this is legally allowed") is safety.Advice.LEGAL
