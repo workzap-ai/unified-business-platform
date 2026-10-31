@@ -1,6 +1,7 @@
 """The plan case file (FT-A3, case format v2) keeps its promises: 30 synthetic cases, an envelope
 the loader can trust, no text shared between splits or with the extraction cases, every expected
-value traceable to what the owner said, and the 132 extraction cases untouched. These check the
+value traceable to what the owner said, and the first 132 extraction cases
+untouched. These check the
 data, not a model, and none of them is a measure of how well pi solves problems."""
 
 import hashlib
@@ -19,7 +20,8 @@ EXTRACTION_PATH = CASES_DIR / "extraction.json"
 PLAN = json.loads(PLAN_PATH.read_text(encoding="utf-8"))
 EXTRACTION = replay.load_cases(str(EXTRACTION_PATH))
 # sha256 of extraction.json with CRLF folded to LF, taken before FT-A3 began: the file never changes
-EXTRACTION_SHA256 = "6b0f3cd6b6ed4851600e8bcb2082613b15b249b085389b89e41ef7a83befb570"
+# the first 132 cases (parsed, canonical JSON): FT-A1 round 2 only appends after them
+EARLIER_132_SHA256 = "c3a86aaa4a39a6f229e946c7b6d084181bb81ac9fd5ebe7fba8c149c6375ec59"
 VERDICTS = {"relevant", "irrelevant", "generic", "violates_constraint", "restates_owner"}
 KINDS = {"solution_relevance", "constraint_violation", "no_idea_valid", "borderline_relevance"}
 LANGUAGES = {"en", "roman_ur", "ur", "ar", "hi"}
@@ -79,11 +81,11 @@ def test_the_plan_file_has_thirty_core_cases_and_twelve_borderline_cases() -> No
 
 
 def test_the_extraction_cases_are_untouched() -> None:
-    raw = EXTRACTION_PATH.read_bytes().replace(b"\r\n", b"\n")
-    assert hashlib.sha256(raw).hexdigest() == EXTRACTION_SHA256
-    assert len(EXTRACTION) == 132
+    earlier = json.dumps(EXTRACTION[:132], sort_keys=True, ensure_ascii=False).encode("utf-8")
+    assert hashlib.sha256(earlier).hexdigest() == EARLIER_132_SHA256
+    assert len(EXTRACTION) == 161
     by_split = Counter(split(c) for c in EXTRACTION)
-    assert by_split == {splits.HELD_OUT: 60, splits.DEVELOPMENT: 69, splits.REGRESSION: 3}
+    assert by_split == {splits.HELD_OUT: 60, splits.DEVELOPMENT: 98, splits.REGRESSION: 3}
 
 
 def test_ids_are_unique_across_both_case_files() -> None:

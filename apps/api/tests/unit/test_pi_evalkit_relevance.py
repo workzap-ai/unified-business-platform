@@ -270,7 +270,7 @@ def test_negative_controls_fail_when_a_label_is_wrong() -> None:
 def test_every_existing_extraction_score_is_unchanged() -> None:
     scores = [scorers.score_case(c, replay.replay(c)) for c in EXTRACTION]
     total = scorers.aggregate(scores)
-    assert total["cases"] == 132 and total["unsupported_cause_cases"] == 0
+    assert total["cases"] == 161 and total["unsupported_cause_cases"] == 0
     for key in (
         "recall",
         "precision",
