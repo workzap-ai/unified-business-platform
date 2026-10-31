@@ -573,7 +573,7 @@ def test_number_words_make_a_cost_and_do_not_turn_a_count_into_money():
 
 
 def test_a_common_word_in_any_of_five_languages_is_never_support():
-    shared = ["the", "we", "hum", "aap", "hai", "के", "है", "हम", "کے", "ہے", "ہم", "في", "من", "نحن"]
+    shared = ["the", "we", "hum", "aap", "hai", "के", "है", "हम", "کے", "ہے", "ہم", "في", "من", "نحن"]  # noqa: E501
     for word in shared:
         assert word in cc.STOPWORDS, word
     for common in [
@@ -1551,7 +1551,7 @@ def test_a_limit_about_spending_rejects_buying_and_renting():
 
 
 def test_whole_phrases_in_three_scripts_are_read_as_ceilings_and_floors():
-    for source in ["پچاس ہزار روپے سے زیادہ نہیں", "50000 रुपये से ज़्यादा नहीं", "كحد اقصى 50000 ريال"]:
+    for source in ["پچاس ہزار روپے سے زیادہ نہیں", "50000 रुपये से ज़्यादा नहीं", "كحد اقصى 50000 ريال"]:  # noqa: E501
         mapped = cc.localise_limit(source)[0]
         assert "at most" in mapped, source
         assert cc.parse_ceiling(mapped).value == Decimal(50000), source
@@ -1685,7 +1685,7 @@ def test_a_different_approach_or_an_unrelated_option_is_not_matched_to_a_failed_
         ("Cook the menu items in bulk", MENU_EN),
         ("Frame the prices for the wall", PRICE_EN),
         ("Charge customers a delivery fee on Fridays", PRICE_EN),
-        ("dukan ka waqt dekhein aur likhein", SHOP_TIME_RU),
+        ("dukan ka waqt ko behtar banane ka sochein", SHOP_TIME_RU),
         ("dukan ka waqt likh kar lagayein", SHOP_TIME_RU),
     ],
 )
@@ -1771,7 +1771,7 @@ def test_hiring_a_person_still_breaks_a_one_person_team(option, limit):
     "option", ["نیا کلرک رکھیں", "नया क्लर्क रखें", "توظيف موظف جديد", "ایک اور اسسٹنٹ رکھیں"]
 )
 def test_hiring_a_person_still_breaks_a_no_hire_limit_in_every_script(option):
-    limits = ["ہم کسی کو بھرتی نہیں کر سکتے", "لا نستطيع توظيف احد", "हम किसी को भर्ती नहीं कर सकते"]
+    limits = ["ہم کسی کو بھرتی نہیں کر سکتے", "لا نستطيع توظيف احد", "हम किसी को भर्ती नहीं कर सकते"]  # noqa: E501
     assert any(check(option, cannot=[limit]).status == "violates" for limit in limits), option
     assert check(option, cannot=["we cannot hire anyone"]).status == "violates"
 
@@ -1978,9 +1978,9 @@ def test_an_ing_word_before_the_subject_is_a_modifier_and_a_verb_after_it_is_no_
     assert check("Keep the same opening hours and remind customers", cannot=hours).status == "ok"
     assert check("Send a reminder at closing time", cannot=hours).status == "ok"
     assert check("Post your hours on Google", cannot=hours).status == "ok"
-    assert check("Buy a poster for the opening hours", cannot=hours).status == "unknown"
-    assert check("Opening hours update", cannot=hours).status == "unknown"
-    assert check("Menu update", cannot=["We cannot change the menu"]).status == "unknown"
+    assert check("Buy a poster for the opening hours", cannot=hours).status == "ok"  # context only
+    assert check("Opening hours update", cannot=hours).status == "violates"
+    assert check("Menu update", cannot=["We cannot change the menu"]).status == "violates"
     assert check("Stop opening hours", cannot=hours).status != "ok"
 
 
@@ -1995,3 +1995,302 @@ def test_rakhein_keeps_a_thing_in_every_path_and_hires_only_a_person():
 def test_a_costly_urdu_option_under_a_no_budget_limit_violates():
     assert check("پیسے خرچ کریں", budget="بجٹ نہیں ہے").status == "violates"
     assert cc.localise_limit("بجٹ نہیں ہے")[0] == "no budget"
+
+
+# ---- round 7: ok needs positive evidence; the subject comes from the limit's own words ----
+
+SUBJECT_LIMITS = [
+    ("No changes to packages", "packages"),
+    ("branch are fixed", "branch"),
+    ("suppliers stay as is", "suppliers"),
+    ("commission", "commission"),
+    ("working hours are fixed", "working hours"),
+    ("shifts jaisay hain waisay rahenge", "shifts"),
+    ("branch mein koi tabdeeli nahi ho gi", "branch"),
+    ("rates are non-negotiable", "rates"),
+    ("Owner won't allow changes to shifts", "shifts"),
+]
+
+
+@pytest.mark.parametrize(("limit", "noun"), SUBJECT_LIMITS)
+def test_a_limit_yields_a_subject_stem_from_its_own_words(limit, noun):
+    stems = cc.subject_stems(cc.limit_clauses(limit)[0])
+    assert stems, limit
+    flat = set().union(*stems)
+    assert any(word in flat or word.rstrip("s") in flat for word in noun.split()), (limit, flat)
+
+
+@pytest.mark.parametrize(("limit", "noun"), SUBJECT_LIMITS)
+def test_unlisted_verbs_on_the_subject_are_never_ok_but_safe_ones_are(limit, noun):
+    first = noun.split()[0]
+    for verb in ["pilot", "test-run", "rebrand", "automate", "relax", "loosen", "slash", "trim",
+                 "rotate", "resume", "sponsor", "double", "relocate", "unbundle", "hike"]:  # fmt: skip  # noqa: E501
+        for option in [f"{verb.capitalize()} the {noun} next month", f"Just {verb} the {noun}",
+                       f"Review the {noun}, then {verb} them", f"Keep the {noun} and {verb} them"]:  # fmt: skip  # noqa: E501
+            assert check(option, cannot=[limit]).status != "ok", (limit, option)
+    for option in [f"Keep the {noun} as they are", f"Check the {noun} every Monday",
+                   f"Tell customers about the {noun}", f"Track the {noun} weekly",
+                   f"Keep the {first} and post a notice"]:  # fmt: skip
+        assert check(option, cannot=[limit]).status == "ok", (limit, option)
+    assert check("Ask customers for referrals", cannot=[limit]).status == "ok"  # shares no stem
+
+
+def test_a_pronoun_after_then_and_just_is_the_last_named_subject():
+    limit = ["We cannot change our prices"]
+    assert check("Review prices, then trim them", cannot=limit).status != "ok"
+    assert check("Keep prices and just slash them", cannot=limit).status != "ok"
+    assert check("Check the prices, then tell customers about them", cannot=limit).status == "ok"
+    assert check("Review prices, then hike it", cannot=limit).status == "violates"
+
+
+@pytest.mark.parametrize(
+    "option",
+    ["Offer a discount on lunch", "Create a combo deal", "Make it cheaper for regulars",
+     "Give 10% off", "Run a promo", "Waive the fee", "Bundle the meals", "Hand out a coupon",
+     "Free delivery for orders", "Markdown the old stock", "Introduce a voucher",
+     "Cut the prıces", "Offer a dıscount", "Offer a díscount", "Ｏffer a discount"],
+)  # fmt: skip
+def test_a_discount_or_offer_touches_a_price_even_with_odd_letters(option):
+    v = check(option, cannot=["prices are fixed"])
+    assert v.status in {"violates", "unknown"}, (option, v)
+
+
+def test_dotless_i_and_accents_are_plain_letters_before_matching():
+    assert cc.norm("prıces") == "prices"
+    assert cc.norm("díscount") == "discount"
+    assert cc.norm("Ｆree") == "free"
+    assert cc.norm("نیا") == cc.norm("نیا")  # other scripts keep their own marks
+    assert cc.norm("é") == "e"
+
+
+def test_ok_still_holds_for_unrelated_and_safe_only_options():
+    for limit in ["prices are fixed", "We cannot change our opening hours", "branch are fixed"]:
+        for option in ["Ask customers for referrals", "Send WhatsApp reminders to regulars",
+                       "Train the cashier on the new greeting"]:  # fmt: skip
+            assert check(option, cannot=[limit]).status == "ok", (limit, option)
+    assert check("Keep the opening days as they are and post a notice",
+                 cannot=["opening days are fixed"]).status == "ok"  # fmt: skip
+    assert (
+        check("Remind customers about the opening days", cannot=["opening days are fixed"]).status
+        == "ok"
+    )
+    assert (
+        check("opening days ka record rakhein", cannot=["opening days fixed hain"]).status == "ok"
+    )
+    assert check("Keep shifts and commission, track sales weekly",
+                 cannot=["shifts are fixed", "We cannot change commission"]).status == "ok"  # fmt: skip  # noqa: E501
+
+
+@pytest.mark.parametrize(
+    "option",
+    ["rakhein helper", "helper rakhein", "naya banda rakh lein", "naye log rakhein", "naye log bharti karein",  # noqa: E501
+     "ek aur clerk rakh lein", "naya banda bharti karein", "Add 3 new staff to the shift"],
+)  # fmt: skip
+def test_roman_urdu_hiring_phrases_with_a_person_are_a_hire(option):
+    assert with_staff(option, "just 3 employees").status == "violates", option
+    assert with_staff(option, "only one receptionist").status == "violates", option
+
+
+def test_a_hire_with_a_person_breaks_a_roman_urdu_no_hire_limit_and_a_list_does_not():
+    limit = ["hum naya banda nahi rakh sakte"]
+    for hire in [
+        "helper rakhein",
+        "naye log rakhein",
+        "clerk rakh lein",
+        "naya banda bharti karein",
+    ]:
+        assert check(hire, cannot=limit).status == "violates", hire
+    for keep in ["list rakhein", "register rakh lein", "fees ki sheet rakhein"]:
+        assert check(keep, cannot=limit).status != "violates", keep
+
+
+@pytest.mark.parametrize(
+    "option",
+    ["Sponsor a local match", "Buy a banner", "Pay an influencer", "Rent a stall", "Hire a helper",
+     "Run ads", "Print flyers", "Order brochures", "Install a camera", "Subscribe to a tool",
+     "Upgrade the phone", "Automate the reminders", "Launch a loyalty app", "Set up a website",
+     "Do something creative", "Boost posts", "Run paid ads", "Make a video"],
+)  # fmt: skip
+def test_nothing_that_is_not_clearly_free_is_ok_under_no_budget(option):
+    for limit in ["no budget", "zero budget", "bilkul budget nahi", "budget nahi hai"]:
+        assert check(option, budget=limit).status in {"violates", "unknown"}, (limit, option)
+
+
+def test_clearly_free_options_are_ok_under_no_budget():
+    for option in ["Keep a list of regulars", "Ask customers to share on WhatsApp",
+                   "Tell customers about the offer", "Call the regulars", "Track sales weekly",
+                   "Check stock every morning"]:  # fmt: skip
+        assert check(option, budget="no budget").status == "ok", option
+
+
+def test_the_false_violations_of_the_round_six_audit_are_ok():
+    assert check("Keep the opening days as they are and post a notice",
+                 cannot=["opening days are fixed"]).status == "ok"  # fmt: skip
+    assert (
+        check("Remind customers about the opening days", cannot=["opening days are fixed"]).status
+        == "ok"
+    )
+    assert (
+        check("opening days ka record rakhein", cannot=["opening days fixed hain"]).status == "ok"
+    )
+    assert check("Keep shifts and commission, track sales weekly",
+                 cannot=["shifts are fixed", "We cannot change commission"]).status == "ok"  # fmt: skip  # noqa: E501
+
+
+# ---- survivors of the round-six audit ----
+
+
+def test_an_unresolved_subject_is_named_when_no_known_verb_is_at_work():
+    toks = cc._option("The menu board").tokens
+    assert cc._unresolved_subject(toks, ("menu",)) == "menu"
+    assert cc._unresolved_subject(toks, ()) is None
+    assert cc._unresolved_subject(cc._option("Keep the menu board").tokens, ("menu",)) is None
+    assert cc._unresolved_subject(cc._option("The staff room").tokens, ("kitchen",)) is None
+    v = check("Photograph the shop", cannot=["we cannot close the shop"])
+    assert v.status == "unknown" and "recognises" in v.reason
+
+
+def test_a_negated_spend_verb_is_not_a_spend():
+    toks = cc._option("do not buy a tablet").tokens
+    index = next(i for i, t in enumerate(toks) if t.word == "buy")
+    assert cc._is_spend_verb(toks, index) is False
+    plain = cc._option("buy a tablet").tokens
+    assert cc._is_spend_verb(plain, 0) is True
+    v = check("Do not buy a tablet, ask customers to bring theirs", budget="Rs 20000")
+    assert v.status == "ok"
+
+
+def test_an_option_in_a_script_it_cannot_read_is_unknown_for_a_cannot_limit():
+    option = cc._option("کچھ سوچیں")
+    assert option.latin is False
+    v = cc._check_cannot(option, Limit("we cannot change prices"))
+    assert v.status == "unknown" and "script" in v.reason
+
+
+# ---- a generated matrix of verbs and nouns that are in no table ----
+
+NOUNS_25 = ["packages", "plans", "commission", "margins", "shifts", "rosters", "uniforms", "signage",  # noqa: E501
+            "packaging", "invoices", "contracts", "warranties", "deposits", "receipts", "vouchers",
+            "memberships", "subscriptions", "tiers", "bundles", "rebates", "appointments", "classes",  # noqa: E501
+            "routes", "zones", "recipes"]  # fmt: skip
+VERBS_150 = """abolish accelerate adapt amplify anchor arrange assemble auction balance bargain bend
+blend boost broaden burn calibrate cap carve centralise chop circulate clone combine compress
+concentrate condense convert coordinate crank curtail customise decrease delete demolish deploy
+devalue dilute diminish disband discontinue dismantle dissolve distribute diversify divide double
+downsize downgrade duplicate elevate eliminate enhance enlarge enrich equalise erase escalate
+exchange expedite flatten flip fold forbid forge formalise fuse gamify grow halve hasten heighten
+hike ignore improve inflate inject innovate insert intensify invert lengthen level liberalise limit
+liquidate localise magnify mandate mark mask maximise minimise mix mobilise modernise multiply mute
+narrow negotiate neutralise normalise optimise outsource overhaul pad patch peg phase pilot pivot
+pool prune push quadruple quicken ration rearrange reboot recalibrate reconfigure redefine redirect
+refine reform reinvent relax relocate remodel renegotiate reroute reset reshape resize retire retool
+revamp reverse revolutionise rewrite rework roll rotate scale seal shave shorten shrink simplify
+skip slash soften sponsor squeeze standardise stretch strip subsidise substitute suspend sweeten
+swap tailor tame taper terminate tighten toggle transfer transform translate triple tune twist
+unbundle undo unify unlock upgrade upscale vary widen withdraw withhold""".split()
+
+
+def test_the_matrix_verbs_and_nouns_are_outside_the_tables():
+    assert len(VERBS_150) >= 150 and len(NOUNS_25) >= 25
+    assert not set(VERBS_150) & cc.BENIGN_VERBS
+    flat = {w for stems in map(cc.object_key, NOUNS_25) for w in [stems]}
+    assert not flat & {"STAFF", "SHOP", "PRICE", "TIME", "MENU", "AD"}
+
+
+def test_matrix_english_no_verb_outside_the_safe_set_is_ever_ok_on_a_fixed_subject():
+    unsafe = 0
+    total = 0
+    for noun in NOUNS_25:
+        for limit in [f"{noun} are fixed", f"We cannot change {noun}", f"No changes to {noun}"]:
+            for verb in VERBS_150:
+                for option in (f"{verb.capitalize()} the {noun}", f"Just {verb} the {noun}",
+                               f"Review the {noun}, then {verb} them"):  # fmt: skip
+                    total += 1
+                    if check(option, cannot=[limit]).status == "ok":
+                        unsafe += 1
+    assert total >= 3 * 25 * 150 * 3 * 0.9
+    assert unsafe == 0, (unsafe, total)
+
+
+def test_matrix_roman_urdu_no_unlisted_verb_is_ever_ok_on_a_fixed_subject():
+    unsafe = 0
+    for noun in NOUNS_25:
+        for limit in [f"{noun} nahi badal sakte", f"{noun} jaisay hain waisay rahenge",
+                      f"{noun} mein koi tabdeeli nahi ho gi"]:  # fmt: skip
+            for verb in VERBS_150[:60]:
+                option = f"{noun} ko {verb} karein"
+                if check(option, cannot=[limit]).status == "ok":
+                    unsafe += 1
+    assert unsafe == 0, unsafe
+
+
+def test_matrix_safe_verbs_on_a_fixed_subject_never_violate_and_are_mostly_ok():
+    safe = ["keep", "check", "track", "record", "remind customers about", "tell customers about",
+            "review", "explain", "post", "compare"]  # fmt: skip
+    ok = total = 0
+    for noun in NOUNS_25:
+        for limit in [f"{noun} are fixed", f"We cannot change {noun}"]:
+            for verb in safe:
+                v = check(f"{verb.capitalize()} the {noun}", cannot=[limit])
+                total += 1
+                ok += v.status == "ok"
+                assert v.status != "violates", (limit, verb, noun, v)
+    assert ok >= 0.9 * total, (ok, total)
+
+
+def test_matrix_more_phrasings_of_limits_and_options_never_give_an_unsafe_ok():
+    limits = ["{n} stay as is", "{n} are non-negotiable", "{n} nahi badal sakte",
+              "{n} jaisay hain waisay rahenge", "{n} mein koi tabdeeli nahi ho gi"]  # fmt: skip
+    options = ["We should {v} our {n}", "Let's {v} {n} soon", "{n} ko {v} karein",
+               "Please {v} the {n} and tell customers", "Keep the {n} and {v} them"]  # fmt: skip
+    unsafe = total = 0
+    for n in NOUNS_25[::2]:
+        for lim in limits:
+            for v in VERBS_150[::2]:
+                for o in options:
+                    total += 1
+                    status = check(o.format(v=v, n=n), cannot=[lim.format(n=n)]).status
+                    unsafe += status == "ok"
+    assert total >= 13 * 5 * 75 * 5 * 0.95
+    assert unsafe == 0, (unsafe, total)
+
+
+def test_a_limit_with_no_cannot_wording_still_has_a_subject():
+    for limit in ["commission", "suppliers", "working hours"]:
+        assert check("Rebrand the " + limit, cannot=[limit]).status != "ok", limit
+        assert check("Keep the " + limit, cannot=[limit]).status == "ok", limit
+
+
+def test_skip_takes_an_object_and_is_not_a_blanket_negation():
+    assert check("Skip the packages", cannot=["packages are fixed"]).status != "ok"
+    assert (
+        check("Review the packages, then skip them", cannot=["packages are fixed"]).status != "ok"
+    )
+    assert check("Avoid changing the packages", cannot=["packages are fixed"]).status == "ok"
+
+
+def test_an_ing_word_before_a_noun_is_not_the_verb_of_a_limit():
+    assert cc.parse_limit("opening days nahi badal sakte").families == {"CHANGE"}
+    assert (
+        check("opening days tabdeel karein", cannot=["opening days nahi badal sakte"]).status
+        == "violates"
+    )
+    assert (
+        check("Keep the opening days", cannot=["opening days mein koi tabdeeli nahi ho gi"]).status
+        == "ok"
+    )
+    assert (
+        check(
+            "opening days extend karein", cannot=["opening days mein koi tabdeeli nahi ho gi"]
+        ).status
+        == "violates"
+    )
+
+
+def test_a_noun_that_starts_like_a_hiring_verb_is_not_a_hiring_freeze():
+    for noun in ["appointments", "engagements", "recruitments", "employment terms"]:
+        assert cc.parse_limit(f"we cannot change {noun}").families == {"CHANGE"}, noun
+    assert cc.parse_limit("we cannot appoint anyone").families == {"HIRE"}
+    assert (
+        check("Abolish the appointments", cannot=["We cannot change appointments"]).status != "ok"
+    )
