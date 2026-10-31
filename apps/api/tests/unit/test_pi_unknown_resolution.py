@@ -8,6 +8,7 @@ changed: every test that needs verdicts gets them from the real `option_gate.gat
 
 import ast
 import random
+import re
 import time
 from pathlib import Path
 
@@ -49,6 +50,17 @@ def reqs(
         tried=tuple(TriedItem(w, o) for w, o in tried),
     )
     return Requirements(problems=(p, *extra))
+
+
+def cq(*args, **kwargs):  # type: ignore[no-untyped-def]
+    """choose_question with the flow's language decision defaulted to English."""
+    kwargs.setdefault("language", "en")
+    return ur.choose_question(*args, **kwargs)
+
+
+def pr(*args, **kwargs):  # type: ignore[no-untyped-def]
+    kwargs.setdefault("language", "en")
+    return ur.plan_resolution(*args, **kwargs)
 
 
 def gate(options: list[str], r: Requirements, language: str = "en") -> og.GateResult:
@@ -392,7 +404,7 @@ def test_choose_golden_english_budget() -> None:
     r = reqs(budget="as little as possible")
     opts = ["Buy a booking tool", "Run a promotion on slow days"]
     g = gate(opts, r)
-    q = ur.choose_question(g, r, opts, language="en")
+    q = cq(g, r, opts, language="en")
     assert q is not None
     assert q.key == "budget_ceiling"
     assert q.text == "What is the most you could put towards this?"
@@ -444,8 +456,8 @@ def test_choose_returns_none_when_every_unknown_is_option_side() -> None:
     r = reqs(budget="50000 PKR per month")
     opts = ["Buy a new oven for the kitchen"]
     g = gate(opts, r)
-    assert ur.choose_question(g, r, opts, language="en") is None
-    plan = ur.plan_resolution(g, r, opts, language="en")
+    assert cq(g, r, opts, language="en") is None
+    plan = pr(g, r, opts, language="en")
     assert plan.question is None and plan.learn_first and plan.unresolvable == 1
 
 
@@ -453,24 +465,22 @@ def test_choose_returns_none_for_urdu_and_arabic_options() -> None:
     r = reqs(cannot=("we cannot hire anyone",))
     opts = ["ہر کرایہ دار کو پیغام بھیجیں", "أرسل رسالة تذكير لكل مستأجر"]
     g = gate(opts, r, "ur")
-    assert ur.choose_question(g, r, opts, language="ur") is None
-    assert ur.choose_question(g, r, opts, language="ar") is None
+    assert cq(g, r, opts, language="ur") is None
+    assert cq(g, r, opts, language="ar") is None
 
 
 def test_choose_nothing_unknown_gives_none_and_no_learn_first() -> None:
     r = reqs(budget="50000 PKR per month")
     opts = ["Use a shared sheet"]
     g = gate(opts, r)
-    plan = ur.plan_resolution(g, r, opts, language="en")
+    plan = pr(g, r, opts, language="en")
     assert plan.question is None and not plan.learn_first and plan.counts == {}
 
 
 def test_choose_reask_uses_prefix_and_flag() -> None:
     r = reqs(budget="not much")
     v = [unknown(cc.RULE_BUDGET, "no figure in the budget text")]
-    q = ur.choose_question(
-        v, r, ["a"], language="en", asked=["budget_ceiling"], non_answers={"budget_ceiling": 1}
-    )
+    q = cq(v, r, ["a"], language="en", asked=["budget_ceiling"], non_answers={"budget_ceiling": 1})
     assert q is not None and q.reask
     assert q.text == "A rough answer is fine. What is the most you could put towards this?"
 
@@ -483,15 +493,13 @@ def test_choose_moves_on_to_next_fact_after_non_answers() -> None:
         unknown(cc.RULE_STAFF, "the staff limit could not be read as a number of people"),
     ]
     opts = ["a", "b", "c"]
-    q1 = ur.choose_question(v, r, opts)
+    q1 = cq(v, r, opts)
     assert q1 is not None and q1.key == "budget_ceiling"
-    q2 = ur.choose_question(v, r, opts, asked=["budget_ceiling"], non_answers={"budget_ceiling": 1})
+    q2 = cq(v, r, opts, asked=["budget_ceiling"], non_answers={"budget_ceiling": 1})
     assert q2 is not None and q2.key == "budget_ceiling" and q2.reask
-    q3 = ur.choose_question(
-        v, r, opts, asked=["budget_ceiling"] * 2, non_answers={"budget_ceiling": 2}
-    )
+    q3 = cq(v, r, opts, asked=["budget_ceiling"] * 2, non_answers={"budget_ceiling": 2})
     assert q3 is not None and q3.key == "staff_headcount"
-    q4 = ur.choose_question(
+    q4 = cq(
         v,
         r,
         opts,
@@ -507,7 +515,7 @@ def test_choose_tried_outcome_names_what_was_tried() -> None:
     g = gate(opts, r)
     ex = ur.explain_unknowns(g, r, opts)
     if ex and ex[0].fact == "tried_outcome":
-        q = ur.choose_question(g, r, opts)
+        q = cq(g, r, opts)
         assert q is not None and "paper register" in q.text
     else:  # "got lost" reads as a failure: the gate already knows
         assert all(e.fact != "tried_outcome" for e in ex)
@@ -521,7 +529,7 @@ def test_choose_tried_outcome_unclear_outcome() -> None:
             "the option repeats something the owner tried, and how it went is not clear",
         )
     ]
-    q = ur.choose_question(v, r, ["Keep a paper register"], language="en")
+    q = cq(v, r, ["Keep a paper register"], language="en")
     assert q is not None and q.key == "tried_outcome"
     assert q.text == 'When you tried "a paper register" before, did it help or not?'
     assert q.slot == "a paper register"
@@ -530,7 +538,7 @@ def test_choose_tried_outcome_unclear_outcome() -> None:
 def test_choose_language_texts_differ_and_are_fixed() -> None:
     r = reqs(staff="a few")
     v = [unknown(cc.RULE_STAFF, "the staff limit could not be read as a number of people")]
-    texts = {lang: ur.choose_question(v, r, ["a"], language=lang).text for lang in LANGS}  # type: ignore[union-attr]
+    texts = {lang: cq(v, r, ["a"], language=lang).text for lang in LANGS}  # type: ignore[union-attr]
     assert len(set(texts.values())) == 4
     assert texts["ur"].endswith("؟") and texts["ar"].endswith("؟")
     assert texts["en"].endswith("?") and texts["roman_ur"].endswith("?")
@@ -541,7 +549,7 @@ def test_choose_language_texts_differ_and_are_fixed() -> None:
 
 def question_for(key: str, r: Requirements, reason: str, rule: str, n: int = 2) -> ur.Question:
     v = [unknown(rule, reason)] * n
-    q = ur.choose_question(v, r, [f"option {i}" for i in range(n)], language="en")
+    q = cq(v, r, [f"option {i}" for i in range(n)], language="en")
     assert q is not None and q.key == key
     return q
 
@@ -731,7 +739,7 @@ def test_state_after_two_non_answers_moves_on() -> None:
     state = ur.ResolutionState()
     keys: list[str] = []
     for _ in range(10):
-        q = ur.choose_question(v, r, opts, asked=state.asked, non_answers=state.non_answer_map)
+        q = cq(v, r, opts, asked=state.asked, non_answers=state.non_answer_map)
         if q is None:
             break
         keys.append(q.key)
@@ -742,13 +750,11 @@ def test_state_after_two_non_answers_moves_on() -> None:
 def test_filled_answer_is_not_a_non_answer_and_is_not_asked_again() -> None:
     r = reqs(budget="not much")
     v = [unknown(cc.RULE_BUDGET, "no figure in the budget text")]
-    q = ur.choose_question(v, r, ["a"])
+    q = cq(v, r, ["a"])
     assert q is not None
     state = ur.record_outcome(None, q, ur.apply_answer(r, q, "50k", "en"))
     assert state.asked == ("budget_ceiling",) and state.non_answers == ()
-    assert (
-        ur.choose_question(v, r, ["a"], asked=state.asked, non_answers=state.non_answer_map) is None
-    )
+    assert cq(v, r, ["a"], asked=state.asked, non_answers=state.non_answer_map) is None
 
 
 def test_apply_answer_only_lists_affected_options() -> None:
@@ -758,7 +764,7 @@ def test_apply_answer_only_lists_affected_options() -> None:
         unknown(cc.RULE_BUDGET, "no figure in the budget text"),
         unknown(cc.RULE_BUDGET, "no figure in the budget text"),
     ]
-    q = ur.choose_question(v, r, ["x", "y", "z"])
+    q = cq(v, r, ["x", "y", "z"])
     assert q is not None and q.key == "budget_ceiling"
     p = ur.apply_answer(r, q, "40000 PKR", "en")
     assert p.recheck_indices == (1, 2) and p.recheck_options == ("y", "z")
@@ -769,7 +775,7 @@ def test_proposal_then_real_gate_recheck_decides() -> None:
     r = reqs(budget="not much")
     opts = ["Buy a booking tool for 20000 PKR", "Ask regulars to rebook"]
     g = gate(opts, r)
-    q = ur.choose_question(g, r, opts)
+    q = cq(g, r, opts)
     assert q is not None and q.key == "budget_ceiling"
     p = ur.apply_answer(r, q, "50000 PKR", "en")
     assert p.status is ur.Status.FILLED and not p.satisfied
@@ -879,7 +885,7 @@ def test_property_chosen_question_is_sound() -> None:
             ["I can spend 30k PKR", "only one assistant", "within 2 weeks", "hello"],
             rnd.randint(0, 3),
         )
-        q = ur.choose_question(g, r, opts, language=lang, owner_messages=msgs)
+        q = cq(g, r, opts, language=lang, owner_messages=msgs)
         if q is None:
             asked_none += 1
             continue
@@ -906,9 +912,7 @@ def test_property_never_repeats_a_question() -> None:
         state = ur.ResolutionState()
         counts: dict[str, int] = {}
         for _ in range(12):
-            q = ur.choose_question(
-                g, r, opts, language=lang, asked=state.asked, non_answers=state.non_answer_map
-            )
+            q = cq(g, r, opts, language=lang, asked=state.asked, non_answers=state.non_answer_map)
             if q is None:
                 break
             counts[q.key] = counts.get(q.key, 0) + 1
@@ -939,9 +943,7 @@ def test_property_unrepeated_when_answers_are_firm() -> None:
         state = ur.ResolutionState()
         seen: list[str] = []
         for _ in range(12):
-            q = ur.choose_question(
-                g, r, opts, language=lang, asked=state.asked, non_answers=state.non_answer_map
-            )
+            q = cq(g, r, opts, language=lang, asked=state.asked, non_answers=state.non_answer_map)
             if q is None:
                 break
             seen.append(q.key)
@@ -964,7 +966,7 @@ def test_property_proposal_never_satisfies_and_only_rechecks_listed_options() ->
     for _ in range(200):
         r, opts, lang = _random_case(rnd)
         g = gate(opts, r, lang)
-        q = ur.choose_question(g, r, opts, language=lang)
+        q = cq(g, r, opts, language=lang)
         if q is None:
             continue
         p = ur.apply_answer(r, q, rnd.choice(answers), lang)
@@ -988,7 +990,7 @@ def test_property_updates_round_trip_through_the_gate_readers() -> None:
     for _ in range(200):
         r, opts, lang = _random_case(rnd)
         g = gate(opts, r, lang)
-        q = ur.choose_question(g, r, opts, language=lang)
+        q = cq(g, r, opts, language=lang)
         if q is None:
             continue
         p = ur.apply_answer(r, q, rnd.choice(answers), lang)
@@ -1049,17 +1051,15 @@ def test_fuzz_never_raises_1000() -> None:
         a, b, c, d = _junk(rnd), _junk(rnd), _junk(rnd), _junk(rnd)
         ur.explain_unknowns(a, b, c)  # type: ignore[arg-type]
         ur.rank_missing_information(a, b, c, owner_messages=d, asked=d, non_answers=d)  # type: ignore[arg-type]
-        ur.choose_question(a, b, c, language=d, owner_messages=d, asked=d, non_answers=d)  # type: ignore[arg-type]
-        ur.plan_resolution(a, b, c, language=d, owner_messages=d, asked=d, non_answers=d)  # type: ignore[arg-type]
+        cq(a, b, c, language=d, owner_messages=d, asked=d, non_answers=d)  # type: ignore[arg-type]
+        pr(a, b, c, language=d, owner_messages=d, asked=d, non_answers=d)  # type: ignore[arg-type]
         ur.answered_in_messages(str(a), d)
         ur.is_non_answer(d)
         ur.render_question(str(a), d, what=d)  # type: ignore[arg-type]
         ur.lint_question(d, d)
         ur.classify_reason(d, d)
         ur.apply_answer(b, a, c, d)  # type: ignore[arg-type]
-        q = ur.choose_question(
-            [unknown(cc.RULE_BUDGET, "no figure in the budget text")], r_ok, ["o"]
-        )
+        q = cq([unknown(cc.RULE_BUDGET, "no figure in the budget text")], r_ok, ["o"])
         assert q is not None
         p = ur.apply_answer(r_ok, q, d)  # type: ignore[arg-type]
         assert p.satisfied is False
@@ -1085,7 +1085,7 @@ def test_linear_in_the_number_of_options() -> None:
     def run(n: int) -> float:
         verdicts = [v] * n
         opts = [f"option {i}" for i in range(n)]
-        return _best(lambda: ur.choose_question(verdicts, r, opts))
+        return _best(lambda: cq(verdicts, r, opts))
 
     small, big = run(200), run(1000)  # inputs are capped at 500: the ratio must stay flat after
     huge = run(5000)
@@ -1095,7 +1095,7 @@ def test_linear_in_the_number_of_options() -> None:
 
 def test_linear_in_answer_length() -> None:
     r = reqs(budget="not much")
-    q = ur.choose_question([unknown(cc.RULE_BUDGET, "no figure in the budget text")], r, ["a"])
+    q = cq([unknown(cc.RULE_BUDGET, "no figure in the budget text")], r, ["a"])
     assert q is not None
     t1 = _best(lambda: ur.apply_answer(r, q, "50k PKR " + "word " * 100))
     t10 = _best(lambda: ur.apply_answer(r, q, "50k PKR " + "word " * 1000))
@@ -1110,7 +1110,7 @@ def test_linear_in_owner_messages() -> None:
 
     def run(n: int) -> float:
         msgs = ["hello there, rent is late" * 5] * n
-        return _best(lambda: ur.choose_question(v, r, ["a"], owner_messages=msgs))
+        return _best(lambda: cq(v, r, ["a"], owner_messages=msgs))
 
     a, b, c = run(10), run(100), run(10_000)
     assert c < max(b, 0.002) * 10 + 0.05
@@ -1119,7 +1119,7 @@ def test_linear_in_owner_messages() -> None:
 
 def test_pathological_answers_are_fast() -> None:
     r = reqs(budget="not much")
-    q = ur.choose_question([unknown(cc.RULE_BUDGET, "no figure in the budget text")], r, ["a"])
+    q = cq([unknown(cc.RULE_BUDGET, "no figure in the budget text")], r, ["a"])
     assert q is not None
     start = time.perf_counter()
     for text in ("1 " * 900, "," * 1900, "9" * 1900, "k " * 900, "٠ " * 900, "a" * 1900):
@@ -1487,8 +1487,528 @@ def test_unreadable_unknown_stays_unknown_in_the_real_gate_after_a_vague_answer(
     opts = ["Hire two more staff"]
     g = gate(opts, r)
     assert g.unknown
-    q = ur.choose_question(g, r, opts)
+    q = cq(g, r, opts)
     assert q is not None
     p = ur.apply_answer(r, q, "that thing, you know", "en")
     assert p.status is S
     assert gate(opts, r).accepted_options == ()  # nothing changed, nothing passes
+
+
+def _bare_question(key: str) -> ur.Question:
+    return ur.Question(
+        key=key,
+        fact=key,
+        field="",
+        text=ur.render_question(key),
+        language="en",
+        why=(),
+        options=(0,),
+        option_texts=("Open a branch",),
+        problems=(),
+        codes=(),
+    )
+
+
+# ------------------------------------------------- tests added after the mutation pass
+
+
+def test_why_is_capped_and_clipped() -> None:
+    r = reqs(budget="not much")
+    opts = [f"option number {i} " + "x" * 300 for i in range(9)]
+    q = cq([unknown(cc.RULE_BUDGET, "no figure in the budget text")] * 9, r, opts)
+    assert q is not None
+    assert len(q.why) == ur.MAX_WHY == 3
+    assert all(len(w) <= ur.MAX_WHY_CHARS for w in q.why)
+    assert len(q.options) == 9
+
+
+def test_stored_facts_are_detected_per_key() -> None:
+    r = reqs(
+        budget="50000 PKR per month",
+        staff="only 2 people",
+        deadline="within 2 weeks",
+        cannot=("only in Lahore",),
+        tried=(("a paper register", "it failed"),),
+    )
+    for key in (
+        "budget_ceiling",
+        "budget_currency_period",
+        "staff_headcount",
+        "deadline_duration",
+        "tried_outcome",
+        "tried_detail",
+        "place_allowed",
+    ):
+        assert ur._is_stored(key, r), key
+    assert not ur._is_stored("cannot_change_detail", r)
+    assert not ur._is_stored("tools_resources", r)
+    assert not ur._is_stored("expected_outcome", r)
+    empty = reqs()
+    for key in ur.FACTS:
+        assert not ur._is_stored(key, empty), key
+
+
+def test_expected_outcome_stored_when_a_problem_has_one() -> None:
+    p = ProblemRequirements(number=1, expected_outcome="fewer late payers")
+    assert ur._is_stored("expected_outcome", Requirements(problems=(p,)))
+
+
+def test_unreadable_stored_facts_are_not_stored() -> None:
+    r = reqs(
+        budget="at least 5000",
+        staff="a few",
+        deadline="soonish",
+        tried=(("a register", "hmm"),),
+    )
+    assert not ur._is_stored("budget_ceiling", r)
+    assert not ur._is_stored("staff_headcount", r)
+    assert not ur._is_stored("deadline_duration", r)
+    assert not ur._is_stored("tried_outcome", r)
+    assert not ur._is_stored("budget_currency_period", reqs(budget="50000"))
+    assert not ur._is_stored("budget_currency_period", reqs(budget="50000 PKR"))
+    assert ur._is_stored("budget_currency_period", reqs(budget="50000 PKR in total"))
+
+
+def test_facts_without_a_gate_unknown_have_no_problems_behind_them() -> None:
+    ranked = ur.rank_missing_information([], reqs(budget="x"), [], include_zero=True)
+    out = {m.key: m for m in ranked}
+    assert out["tools_resources"].problems == () and out["expected_outcome"].problems == ()
+
+
+def test_deadline_priority_beats_alphabet_on_a_tie() -> None:
+    r = reqs(deadline="soonish", cannot=("that thing",))
+    v = [
+        unknown(cc.RULE_DEADLINE, "the deadline is not a duration this check can read"),
+        unknown(
+            cc.RULE_CANNOT_CHANGE,
+            "the stated limit could not be read (script, wording or too vague)",
+        ),
+    ]
+    ranked = ur.rank_missing_information(v, r, ["a", "b"])
+    assert [m.key for m in ranked] == ["deadline_duration", "cannot_change_detail"]
+
+
+def test_asked_and_messages_mappings_are_not_collections_of_keys() -> None:
+    r = reqs(budget="not much")
+    v = [unknown(cc.RULE_BUDGET, "no figure in the budget text")]
+    out = ur.rank_missing_information(
+        v, r, ["a"], asked={"budget_ceiling": 5}, owner_messages={"my budget is 40k PKR": 1}
+    )
+    assert out[0].askable and not out[0].reask
+    assert ur.rank_missing_information(v, r, ["a"], asked=b"budget_ceiling")[0].askable
+    assert ur.rank_missing_information(v, r, ["a"], owner_messages=b"my budget is 40k")[0].askable
+
+
+def test_non_answers_mapping_ignores_bad_counts() -> None:
+    r = reqs(budget="not much")
+    v = [unknown(cc.RULE_BUDGET, "no figure in the budget text")]
+    for bad in ({"budget_ceiling": True}, {"budget_ceiling": "1"}, {1: 1}, [("budget_ceiling", 1)]):
+        out = ur.rank_missing_information(
+            v,
+            r,
+            ["a"],
+            asked=["budget_ceiling"],
+            non_answers=bad,  # type: ignore[arg-type]
+        )
+        assert out[0].status == "exhausted"
+
+
+def test_a_template_that_fails_the_lint_is_never_asked(monkeypatch: pytest.MonkeyPatch) -> None:
+    bad = {lang: "What is the price? Or the cost?" for lang in LANGS}
+    monkeypatch.setitem(lx.QUESTIONS, "budget_ceiling", bad)
+    r = reqs(budget="not much")
+    assert cq([unknown(cc.RULE_BUDGET, "no figure in the budget text")], r, ["a"]) is None
+
+
+def test_answered_in_messages_cues() -> None:
+    assert ur.answered_in_messages("budget_ceiling", ["budget 50000"])
+    assert ur.answered_in_messages("budget_ceiling", ["بجٹ 50000"])
+    assert not ur.answered_in_messages("budget_ceiling", ["we have 50000 customers"])
+    assert ur.answered_in_messages("deadline_duration", ["it must be done within 2 weeks"])
+    assert not ur.answered_in_messages("deadline_duration", ["we waited 2 weeks"])
+    assert not ur.answered_in_messages("expected_outcome", ["anything"])
+
+
+def test_currency_period_reads_each_half_alone() -> None:
+    r = reqs(budget="50000 PKR")
+    q = question_for(CURRENCY_Q[0], r, CURRENCY_Q[2], CURRENCY_Q[1])
+    monthly = ur.apply_answer(r, q, "monthly", "en")
+    assert monthly.status is F
+    assert dict(monthly.updates[0].parsed) == {"currency": "RS", "period": "month"}
+    once = ur.apply_answer(r, q, "once", "en")
+    assert once.status is F and dict(once.updates[0].parsed)["period"] == "one_off"
+    r2 = reqs(budget="50000")
+    q2 = question_for(CURRENCY_Q[0], r2, CURRENCY_Q[2], CURRENCY_Q[1])
+    only_cur = ur.apply_answer(r2, q2, "USD", "en")
+    assert only_cur.status is S and only_cur.reason == "no_period"
+    only_per = ur.apply_answer(r2, q2, "monthly", "en")
+    assert only_per.status is S and only_per.reason == "no_currency"
+    assert ur.apply_answer(r2, q2, "xyz", "en").reason == "no_currency_or_period"
+    both = ur.apply_answer(r2, q2, "monthly, once", "en")
+    assert both.status is S and both.reason == "ambiguous"
+
+
+def test_currency_and_period_contradictions() -> None:
+    r = reqs(budget="50000 USD per month")
+    q = _bare_question("budget_currency_period")
+    cur = ur.apply_answer(r, q, "PKR, per month", "en")
+    assert cur.status is C and cur.updates[0].is_correction
+    per = ur.apply_answer(r, q, "USD, per year", "en")
+    assert per.status is C
+    same = ur.apply_answer(r, q, "USD, per month", "en")
+    assert same.status is F and not same.updates[0].is_correction
+
+
+def test_deadline_and_staff_contradictions_use_their_own_stored_limit() -> None:
+    r = reqs(deadline="soonish")
+    q = question_for(DEADLINE_Q[0], r, DEADLINE_Q[2], DEADLINE_Q[1])
+    changed = ur.apply_answer(reqs(deadline="within 2 weeks"), q, "within 3 days", "en")
+    assert changed.status is C and changed.updates[0].replaces == "within 2 weeks"
+    same = ur.apply_answer(reqs(deadline="within 2 weeks"), q, "in 14 days", "en")
+    assert same.status is F
+    # a stored budget or staff limit is not the deadline's stored value
+    other = ur.apply_answer(
+        reqs(budget="100000 PKR", staff="only 1 person"), q, "within 3 days", "en"
+    )
+    assert other.status is F and other.updates[0].replaces is None
+    rs = reqs(staff="a few")
+    qs = question_for(STAFF_Q[0], rs, STAFF_Q[2], STAFF_Q[1])
+    other_s = ur.apply_answer(
+        reqs(budget="100000 PKR", deadline="within 2 weeks"), qs, "only 2", "en"
+    )
+    assert other_s.status is F and other_s.updates[0].replaces is None
+    rb = reqs(budget="not much")
+    qb = question_for(BUDGET_Q[0], rb, BUDGET_Q[2], BUDGET_Q[1])
+    other_b = ur.apply_answer(
+        reqs(staff="only 1 person", deadline="within 2 weeks"), qb, "50k PKR", "en"
+    )
+    assert other_b.status is F and other_b.updates[0].replaces is None
+
+
+def test_tried_outcome_proposal_targets_one_item() -> None:
+    r = reqs(tried=(("a paper register", "hmm"), ("flyers", "ok")))
+    v = [
+        unknown(
+            cc.RULE_TRIED,
+            "the option repeats something the owner tried, and how it went is not clear",
+        )
+    ]
+    q = cq(v, r, ["Keep a register"])
+    assert q is not None and len(q.target_limits) == 2
+    p = ur.apply_answer(r, q, "it did not work", "en")
+    assert len(p.updates) == 1 and p.updates[0].replaces == "a paper register"
+
+
+def test_place_answer_is_read_by_the_gate_place_reader() -> None:
+    q = _bare_question("place_allowed")
+    ok = ur.apply_answer(reqs(), q, "Lahore", "en")
+    assert ok.status is F and ok.updates[0].value.lower().startswith("only in")
+    unreadable = ur.apply_answer(reqs(), q, "لاہور", "ur")
+    assert unreadable.status is S and unreadable.reason == "script_unreadable"
+    assert ur.apply_answer(reqs(), q, "xqzv", "en").status is S
+
+
+def test_tools_resources_has_no_reading_and_stays_unknown() -> None:
+    p = ur.apply_answer(reqs(), _bare_question("tools_resources"), "a laptop and a phone", "en")
+    assert p.status is S and p.reason == "not_enforced_by_gate"
+
+
+def test_why_options_never_repeat_and_follow_option_order() -> None:
+    r = reqs(budget="not much")
+    v = [unknown(cc.RULE_BUDGET, "no figure in the budget text")] * 3
+    q = cq(v, r, ["third", "first", "second"])
+    assert q is not None and q.option_texts == ("third", "first", "second")
+    assert q.options == (0, 1, 2)
+
+
+# ------------------------------------------- known records, answered keys, language decision
+
+BUDGET_V = [unknown(cc.RULE_BUDGET, "no figure in the budget text")] * 2
+BUDGET_OPTS = ["option 0", "option 1"]
+
+
+def rec(source: str, text: str, **scope: str) -> dict[str, object]:
+    return {"source": source, "text": text, "scope": scope}
+
+
+def test_record_answers_the_budget_instead_of_asking() -> None:
+    r = reqs(budget="not much")
+    records = [
+        rec("owner_message:c1:m4", "Hello. My budget is 50k PKR per month. Thanks", customer="u1")
+    ]
+    q = cq(BUDGET_V, r, BUDGET_OPTS, known_records=records)
+    assert q is None
+    found = ur.resolve_from_records(BUDGET_V, r, BUDGET_OPTS, known_records=records)
+    assert len(found) == 1
+    a = found[0]
+    assert a.key == "budget_ceiling" and a.source == "owner_message:c1:m4"
+    assert a.clause == "My budget is 50k PKR per month"
+    p = a.proposal
+    assert p.status is F and p.source == "owner_message:c1:m4" and p.satisfied is False
+    assert p.updates[0].source == "owner_message:c1:m4"
+    assert dict(p.updates[0].parsed)["value"] == "50000"
+    assert p.recheck_indices == (0, 1) and p.recheck_options == ("option 0", "option 1")
+
+
+def test_plan_reports_records_and_does_not_say_learn_first() -> None:
+    r = reqs(budget="not much")
+    records = [rec("document:d9", "Approved quote note: the owner can spend 40000 rupees monthly")]
+    plan = pr(BUDGET_V, r, BUDGET_OPTS, known_records=records)
+    assert plan.question is None and not plan.learn_first
+    assert [x.key for x in plan.from_records] == ["budget_ceiling"]
+    assert all(e.record_source == "document:d9" for e in plan.explanations)
+    assert [m.status for m in plan.ranked] == ["answerable_from_records"]
+
+
+@pytest.mark.parametrize(
+    ("key", "reason", "rule", "stored", "text", "field"),
+    [
+        (
+            "staff_headcount",
+            STAFF_Q[2],
+            cc.RULE_STAFF,
+            {"staff": "a few"},
+            "We only have 2 staff",
+            "staff",
+        ),
+        (
+            "deadline_duration",
+            DEADLINE_Q[2],
+            cc.RULE_DEADLINE,
+            {"deadline": "soon"},
+            "It must be live within 3 weeks",
+            "deadline",
+        ),
+    ],
+)
+def test_records_answer_staff_and_deadline(
+    key: str, reason: str, rule: str, stored: dict[str, str], text: str, field: str
+) -> None:
+    r = reqs(**stored)
+    v = [unknown(rule, reason)]
+    found = ur.resolve_from_records(v, r, ["a"], known_records=[rec("msg:1", text)])
+    assert found and found[0].key == key and found[0].proposal.updates[0].field == field
+
+
+def test_record_that_does_not_answer_is_ignored_and_the_question_is_asked() -> None:
+    r = reqs(budget="not much")
+    records = [
+        rec("msg:1", "We have 50 tenants and 200 flats"),
+        rec("msg:2", "maybe 50k"),
+        rec("msg:3", "50k or 100k"),
+    ]
+    assert ur.resolve_from_records(BUDGET_V, r, BUDGET_OPTS, known_records=records) == ()
+    q = cq(BUDGET_V, r, BUDGET_OPTS, known_records=records)
+    assert q is not None and q.key == "budget_ceiling"
+
+
+def test_record_contradicting_stored_value_is_a_correction_candidate() -> None:
+    # the stored budget is unreadable for the gate (a floor), so a ceiling in a record is a fill
+    r = reqs(budget="at least 5000")
+    found = ur.resolve_from_records(
+        BUDGET_V, r, BUDGET_OPTS, known_records=[rec("m", "I can spend 30000 PKR")]
+    )
+    assert found and found[0].proposal.status in {F, C}
+
+
+def test_records_are_limited_to_the_scope_given() -> None:
+    r = reqs(budget="not much")
+    records = [
+        rec("mine", "My budget is 50k PKR", customer="u1", tenant="t1"),
+        rec("other", "My budget is 90k PKR", customer="u2", tenant="t1"),
+        {"source": "noscope", "text": "My budget is 70k PKR"},
+    ]
+    scoped = ur.resolve_from_records(
+        BUDGET_V, r, BUDGET_OPTS, known_records=records, scope={"customer": "u1", "tenant": "t1"}
+    )
+    assert [a.source for a in scoped] == ["mine"]
+    unscoped = ur.resolve_from_records(BUDGET_V, r, BUDGET_OPTS, known_records=[records[1]])
+    assert [a.source for a in unscoped] == ["other"]
+    none = ur.resolve_from_records(
+        BUDGET_V, r, BUDGET_OPTS, known_records=[records[2]], scope={"customer": "u1"}
+    )
+    assert none == ()
+
+
+def test_known_record_dataclass_and_junk_records() -> None:
+    r = reqs(budget="not much")
+    rk = ur.KnownRecord("kr", "my budget is 20000 PKR")
+    assert ur.resolve_from_records(BUDGET_V, r, BUDGET_OPTS, known_records=[rk])[0].source == "kr"
+    for junk in (
+        None,
+        5,
+        "budget 50k",
+        b"x",
+        {"a": 1},
+        [None, 3, "x", {"text": 5}, {"text": ""}],
+        [object()],
+    ):
+        assert ur.resolve_from_records(BUDGET_V, r, BUDGET_OPTS, known_records=junk) == ()
+    assert len(ur._clean_records([rec("s", "t")] * 1000)) == ur.MAX_RECORDS
+    long = ur._clean_records([rec("s" * 500, "x" * 99999)])[0]
+    assert len(long.text) == ur.MAX_RECORD_CHARS and len(long.source) <= ur.MAX_SOURCE_CHARS
+
+
+def test_stored_fact_beats_records() -> None:
+    r = reqs(budget="50000 PKR per month")
+    out = ur.rank_missing_information(
+        BUDGET_V, r, BUDGET_OPTS, known_records=[rec("m", "my budget is 1000 PKR")]
+    )
+    assert out[0].status == "stored" and out[0].record is None
+
+
+def test_answered_keys_are_never_asked() -> None:
+    r = reqs(budget="not much", staff="a few")
+    v = [
+        unknown(cc.RULE_BUDGET, "no figure in the budget text"),
+        unknown(cc.RULE_STAFF, "the staff limit could not be read as a number of people"),
+    ]
+    q = cq(v, r, ["a", "b"], answered=["budget_ceiling"])
+    assert q is not None and q.key == "staff_headcount"
+    out = ur.rank_missing_information(v, r, ["a", "b"], answered={"budget_ceiling"})
+    assert {m.key: m.status for m in out}["budget_ceiling"] == "answered"
+    assert cq(v, r, ["a", "b"], answered=["budget_ceiling", "staff_headcount"]) is None
+
+
+def test_asked_earlier_in_the_conversation_is_not_asked_again() -> None:
+    r = reqs(budget="not much")
+    assert cq(BUDGET_V, r, BUDGET_OPTS, asked=["budget_ceiling"]) is None
+
+
+@pytest.mark.parametrize("bad", [None, "", "unknown", "xx", 7, ["en"], "EN"])
+def test_uncertain_language_gives_the_language_question(bad: object) -> None:
+    r = reqs(budget="not much")
+    q = ur.choose_question(BUDGET_V, r, BUDGET_OPTS, language=bad)  # type: ignore[arg-type]
+    assert q is not None and q.key == ur.LANGUAGE_KEY
+    assert q.options == () and q.pending_key == "budget_ceiling" and q.field == "language"
+    assert q.text == lx.LANGUAGE_QUESTION
+    assert ur.lint_question(q.text) == ()
+    plan = ur.plan_resolution(BUDGET_V, r, BUDGET_OPTS, language=bad)  # type: ignore[arg-type]
+    assert plan.language_needed and not plan.learn_first
+
+
+def test_no_language_question_when_nothing_is_askable() -> None:
+    r = reqs(budget="50000 PKR per month")
+    assert ur.choose_question(BUDGET_V, r, BUDGET_OPTS, language=None) is None
+    assert ur.choose_question([], r, [], language=None) is None
+
+
+def test_language_question_is_asked_once_then_once_more_then_never() -> None:
+    r = reqs(budget="not much")
+    kw = {"language": None}
+    q1 = ur.choose_question(BUDGET_V, r, BUDGET_OPTS, **kw)  # type: ignore[arg-type]
+    assert q1 is not None and not q1.reask
+    assert ur.choose_question(BUDGET_V, r, BUDGET_OPTS, asked=[ur.LANGUAGE_KEY], **kw) is None  # type: ignore[arg-type]
+    q2 = ur.choose_question(
+        BUDGET_V,
+        r,
+        BUDGET_OPTS,
+        asked=[ur.LANGUAGE_KEY],
+        non_answers={ur.LANGUAGE_KEY: 1},
+        **kw,  # type: ignore[arg-type]
+    )
+    assert q2 is not None and q2.reask and q2.text.startswith("A rough answer is fine. ")
+    assert (
+        ur.choose_question(
+            BUDGET_V,
+            r,
+            BUDGET_OPTS,
+            asked=[ur.LANGUAGE_KEY] * 2,
+            non_answers={ur.LANGUAGE_KEY: 2},
+            **kw,  # type: ignore[arg-type]
+        )
+        is None
+    )
+
+
+@pytest.mark.parametrize(
+    ("text", "code"),
+    [
+        ("English", "en"),
+        ("english please", "en"),
+        ("angrezi", "en"),
+        ("Roman Urdu", "roman_ur"),
+        ("roman urdu mein", "roman_ur"),
+        ("Urdu", "ur"),
+        ("اردو", "ur"),
+        ("Arabic", "ar"),
+        ("عربي", "ar"),
+        ("العربية", "ar"),
+        ("انگریزی", "en"),
+    ],
+)
+def test_language_answer_is_read(text: str, code: str) -> None:
+    q = ur.choose_question(BUDGET_V, reqs(budget="x"), BUDGET_OPTS, language=None)
+    assert q is not None
+    p = ur.apply_answer(reqs(budget="x"), q, text)
+    assert p.status is F and p.updates[0].field == "language" and p.updates[0].value == code
+    assert p.recheck_indices == () and p.satisfied is False
+
+
+@pytest.mark.parametrize(
+    "text", ["English and Urdu", "French", "maybe", "I don't know", "", "50k", "ok", 5, None]
+)
+def test_language_answer_unclear_stays_unknown(text: object) -> None:
+    q = ur.choose_question(BUDGET_V, reqs(budget="x"), BUDGET_OPTS, language=None)
+    assert q is not None
+    p = ur.apply_answer(reqs(budget="x"), q, text)  # type: ignore[arg-type]
+    assert p.status is S and p.updates == ()
+
+
+def test_language_flow_end_to_end() -> None:
+    r = reqs(budget="not much")
+    q = ur.choose_question(BUDGET_V, r, BUDGET_OPTS, language=None)
+    assert q is not None
+    p = ur.apply_answer(r, q, "Urdu")
+    state = ur.record_outcome(None, q, p)
+    lang = p.updates[0].value
+    q2 = ur.choose_question(
+        BUDGET_V, r, BUDGET_OPTS, language=lang, asked=state.asked, non_answers=state.non_answer_map
+    )
+    assert q2 is not None and q2.key == "budget_ceiling" and q2.language == "ur"
+    assert q2.text.endswith("؟")
+
+
+@pytest.mark.parametrize(
+    ("lang", "mark"), [("en", "?"), ("roman_ur", "?"), ("ur", "؟"), ("ar", "؟")]
+)
+def test_question_stays_in_the_owners_language_and_script(lang: str, mark: str) -> None:
+    r = reqs(budget="not much")
+    q = ur.choose_question(BUDGET_V, r, BUDGET_OPTS, language=lang)
+    assert q is not None and q.language == lang and q.text.endswith(mark)
+    if lang in {"ur", "ar"}:
+        assert not re.search("[0600-06ff]", q.text)
+    else:
+        assert not re.search("[0600-06ff]", q.text)
+    assert ur.lint_question(q.text, lang) == ()
+
+
+def test_hindi_code_is_certain_and_falls_back_to_english_text() -> None:
+    q = ur.choose_question(BUDGET_V, reqs(budget="x"), BUDGET_OPTS, language="hi")
+    assert q is not None and q.key == "budget_ceiling" and q.language == "en"
+
+
+def test_fuzz_new_arguments_never_raise() -> None:
+    rnd = random.Random(99)
+    for _ in range(300):
+        a, b, c = _junk(rnd), _junk(rnd), _junk(rnd)
+        ur.rank_missing_information(a, b, c, known_records=a, answered=b, scope=c)  # type: ignore[arg-type]
+        ur.choose_question(a, b, c, known_records=b, answered=c, scope=a, language=c)  # type: ignore[arg-type]
+        ur.plan_resolution(a, b, c, known_records=c, answered=a, scope=b, language=a)  # type: ignore[arg-type]
+        ur.resolve_from_records(a, b, c, known_records=a, scope=b, answered=c)  # type: ignore[arg-type]
+        ur.apply_answer(
+            b, ur.choose_question(BUDGET_V, reqs(budget="x"), BUDGET_OPTS, language=None), a
+        )
+
+
+def test_records_scan_is_linear() -> None:
+    r = reqs(budget="not much")
+
+    def run(n: int) -> float:
+        recs = [rec(f"m{i}", "hello there, rent is late. " * 20) for i in range(n)]
+        return _best(lambda: ur.resolve_from_records(BUDGET_V, r, BUDGET_OPTS, known_records=recs))
+
+    a, b = run(20), run(200)
+    c = run(5000)  # capped at MAX_RECORDS
+    assert c < max(b, 0.002) * 6 + 0.1
+    assert b < max(a, 0.002) * 30 + 0.1

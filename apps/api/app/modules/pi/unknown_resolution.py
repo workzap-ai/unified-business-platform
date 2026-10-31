@@ -38,7 +38,7 @@ import re
 import unicodedata
 from collections import Counter
 from collections.abc import Iterable, Mapping, Sequence
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from enum import StrEnum
 from typing import Any
 
@@ -57,6 +57,17 @@ MAX_WHY = 3
 MAX_WHY_CHARS = 90
 MAX_SLOT_CHARS = 40
 MAX_PROBLEM_TARGETS = 8
+MAX_RECORDS = 200
+MAX_RECORD_CHARS = 5000
+MAX_CLAUSES = 60
+MAX_SOURCE_CHARS = 120
+LANGUAGE_KEY = "language_clarify"
+RECORD_KEYS = (
+    "budget_ceiling",
+    "budget_currency_period",
+    "staff_headcount",
+    "deadline_duration",
+)
 
 _SURROGATES = re.compile("[\ud800-\udfff]")
 _SPACED_NUMBERS = re.compile(r"\d+(?: \d+){2,}")
@@ -317,6 +328,7 @@ class UnknownExplanation:
     resolution: Resolution
     fact: str | None  # the missing-fact key that one owner answer would fill, else None
     problems: tuple[int, ...]  # problem numbers whose stored data is behind it
+    record_source: str | None = None  # a known record answers the fact behind it
 
     @property
     def owner_answerable(self) -> bool:
@@ -563,15 +575,137 @@ def answered_in_messages(key: str, messages: Any) -> bool:
 
 
 @dataclass(frozen=True, slots=True)
+class KnownRecord:
+    """One existing record the flow retrieved (stored requirements text, an earlier owner message of
+    this customer, a noted problem, a solution document or quote, any stored document text). The
+    selector never opens a database: it reads only the records it is given.
+
+    `source` is a reference the flow can show or log ("owner_message:<conversation>:<message>",
+    "document:<id>"). `scope` holds the ids the record belongs to (tenant, customer,
+    conversation)."""
+
+    source: str
+    text: str
+    scope: tuple[tuple[str, str], ...] = ()
+
+
+@dataclass(frozen=True, slots=True)
+class RecordAnswer:
+    """A fact an existing record already answers: the update proposal built from that record, with
+    its source. The flow shows or applies it instead of asking, and re-checks only the listed
+    options through the real gate."""
+
+    key: str
+    source: str
+    scope: tuple[tuple[str, str], ...]
+    clause: str  # the sentence of the record that answers it
+    proposal: "AnswerProposal"
+
+
+def _scope_pairs(raw: Any) -> tuple[tuple[str, str], ...]:
+    items: Any
+    if isinstance(raw, Mapping):
+        items = raw.items()
+    elif isinstance(raw, (list, tuple)):
+        items = [x for x in raw if isinstance(x, (list, tuple)) and len(x) == 2]
+    else:
+        return ()
+    out = []
+    for k, v in items:
+        if isinstance(k, str) and isinstance(v, (str, int)) and not isinstance(v, bool):
+            out.append((_text(k)[:40], _text(str(v))[:80]))
+    return tuple(sorted(out)[:10])
+
+
+def _clean_records(records: Any, scope: Any = None) -> list[KnownRecord]:
+    """The usable records: text only, capped, and inside `scope` when one is given (a record whose
+    scope names a key of `scope` with another value is dropped; with a `scope` given, a record that
+    carries no scope at all is dropped too)."""
+    if isinstance(records, (str, bytes, Mapping)) or not isinstance(records, Iterable):
+        return []
+    want = dict(_scope_pairs(scope)) if scope else {}
+    out: list[KnownRecord] = []
+    for item in records:
+        if len(out) >= MAX_RECORDS:
+            break
+        source: Any
+        text: Any
+        if isinstance(item, KnownRecord):
+            source, text, sc = item.source, item.text, _scope_pairs(item.scope)
+        elif isinstance(item, Mapping):
+            source, text, sc = item.get("source"), item.get("text"), _scope_pairs(item.get("scope"))
+        else:
+            continue
+        text = _text(text)[:MAX_RECORD_CHARS]
+        if not text.strip():
+            continue
+        if want:
+            if not sc or any(k in want and want[k] != v for k, v in sc):
+                continue
+        out.append(KnownRecord(_clip(_text(source), MAX_SOURCE_CHARS) or "record", text, sc))
+    return out
+
+
+_CLAUSES = re.compile(r"[.;!?\u061f\u06d4\n]+")
+
+
+def _record_answer(
+    key: str,
+    reqs: Requirements,
+    records: Sequence[KnownRecord],
+    idxs: tuple[int, ...],
+    texts: tuple[str, ...],
+    problems: tuple[int, ...],
+    codes: tuple[str, ...],
+) -> RecordAnswer | None:
+    """The first record clause that answers `key`, read by the same conservative reader as an owner
+    answer. Only the facts the gate reads from a sentence (budget, currency and period, staff
+    number, deadline) are looked for in records."""
+    if key not in RECORD_KEYS or not idxs:
+        return None
+    q = Question(
+        key=key,
+        fact=FACTS[key].label,
+        field=FACTS[key].field,
+        text=render_question(key, "en"),
+        language="en",
+        why=_why(texts),
+        options=idxs,
+        option_texts=texts,
+        problems=problems,
+        codes=codes,
+        target_limits=_target_limits(key, reqs),
+    )
+    for rec in records:
+        for clause in _CLAUSES.split(rec.text)[:MAX_CLAUSES]:
+            clause = clause.strip()
+            if not clause or len(clause) > MAX_MESSAGE_CHARS:
+                continue
+            if not answered_in_messages(key, [clause]):
+                continue
+            p = apply_answer(reqs, q, clause)
+            if p.status is Status.STILL_UNKNOWN:
+                continue
+            tagged = replace(
+                p,
+                source=rec.source,
+                updates=tuple(replace(u, source=rec.source) for u in p.updates),
+            )
+            return RecordAnswer(key, rec.source, rec.scope, _clip(clause, 200), tagged)
+    return None
+
+
+@dataclass(frozen=True, slots=True)
 class MissingFact:
     key: str
     label: str
-    status: str  # askable, stored, answered_in_chat, exhausted
+    status: str  # askable, stored, answerable_from_records, answered_in_chat, answered, exhausted
     options: tuple[int, ...]  # indices of the unknown options it would address
     option_texts: tuple[str, ...]
     problems: tuple[int, ...]
     codes: tuple[str, ...]
     reask: bool = False
+    record: RecordAnswer | None = None  # set when status is answerable_from_records
 
     @property
     def n_options(self) -> int:
@@ -613,17 +747,21 @@ def rank_missing_information(
     asked: Any = (),
     non_answers: Mapping[str, int] | None = None,
     include_zero: bool = False,
+    known_records: Any = (),
+    answered: Any = (),
+    scope: Mapping[str, Any] | None = None,
 ) -> tuple[MissingFact, ...]:
     """The facts that would address unknown decisions, best first (askable ones before the rest).
 
     Score: options addressed (more first), then problems behind it (more first), then a fixed
-    priority, then the key. A fact stored in the requirements, answered in `owner_messages`, or
-    asked
-    out (asked once with no non-answer, or twice) is listed with its status and never `askable`.
-    `asked` is a collection of keys (a key listed twice was asked twice); `non_answers` maps a key
-    to
-    the number of replies that gave nothing. Facts addressing no unknown option are left out unless
-    `include_zero`. Never raises."""
+    priority, then the key. Status, in this order: `stored` (the requirements already hold it),
+    `answerable_from_records` (a record in `known_records` answers it: `record` holds the proposal
+    and its source), `answered_in_chat` (an earlier owner message in `owner_messages`), `answered`
+    (its key is in `answered`), `askable`, or `exhausted` (asked once with no non-answer, or twice).
+    Only `askable` facts are ever asked. `asked` is a collection of keys (a key listed twice was
+    asked twice); `non_answers` maps a key to the number of replies that gave nothing. `scope`
+    limits `known_records` to the ids of this customer and conversation. Facts addressing no unknown
+    option are left out unless `include_zero`. Never raises."""
     try:
         reqs = as_requirements(requirements) if requirements is not None else Requirements()
         if not isinstance(reqs, Requirements):
@@ -635,6 +773,8 @@ def rank_missing_information(
                 by_fact.setdefault(e.fact, []).append(e)
         times = _asked_counts(asked)
         quiet = _non_answer_counts(non_answers)
+        done = set(_asked_counts(answered))
+        records = _clean_records(known_records, scope)
         rows: list[MissingFact] = []
         for key, spec in FACTS.items():
             items = by_fact.get(key, [])
@@ -649,10 +789,17 @@ def rank_missing_information(
                     texts.append(e.option)
             problems = _problem_numbers(reqs, key)
             codes = tuple(sorted({e.code.value for e in items}))
+            found = None
             if _is_stored(key, reqs):
                 status, reask = "stored", False
+            elif items and (
+                found := _record_answer(key, reqs, records, idxs, tuple(texts), problems, codes)
+            ):
+                status, reask = "answerable_from_records", False
             elif answered_in_messages(key, owner_messages):
                 status, reask = "answered_in_chat", False
+            elif key in done:
+                status, reask = "answered", False
             elif times[key] == 0:
                 status, reask = "askable", False
             elif times[key] == 1 and quiet.get(key, 0) >= 1:
@@ -660,7 +807,9 @@ def rank_missing_information(
             else:
                 status, reask = "exhausted", False
             rows.append(
-                MissingFact(key, spec.label, status, idxs, tuple(texts), problems, codes, reask)
+                MissingFact(
+                    key, spec.label, status, idxs, tuple(texts), problems, codes, reask, found
+                )
             )
         rows.sort(
             key=lambda r: (
@@ -697,6 +846,7 @@ class Question:
     slot: str = ""  # the owner's own words put in the question ("what was tried"), else ""
     target_limits: tuple[str, ...] = ()  # the stored limit texts the answer clarifies
     owner_answerable: bool = True
+    pending_key: str = ""  # language question only: the fact to ask once the language is known
 
     @property
     def n_unblocked(self) -> int:
@@ -782,6 +932,38 @@ def _target_limits(key: str, reqs: Requirements) -> tuple[str, ...]:
     return ()
 
 
+def _language_certain(language: Any) -> bool:
+    """Hindi has no templates and falls back to English; None or anything unknown is uncertain."""
+    return isinstance(language, str) and (language in lx.LANGUAGES or language == "hi")
+
+
+def _language_question(
+    fact: MissingFact, times: Counter[str], quiet: Mapping[str, int]
+) -> Question | None:
+    """The question that asks which language to use, under the same ask-once, re-ask-once rule."""
+    n = times[LANGUAGE_KEY]
+    reask = n == 1 and quiet.get(LANGUAGE_KEY, 0) >= 1
+    if n > 0 and not reask:
+        return None
+    text = (lx.REASK_PREFIX["en"] if reask else "") + lx.LANGUAGE_QUESTION
+    if lint_question(text, "en"):
+        return None
+    return Question(
+        key=LANGUAGE_KEY,
+        fact="reply language",
+        field="language",
+        text=text,
+        language="und",
+        why=_why(fact.option_texts),
+        options=(),
+        option_texts=(),
+        problems=(),
+        codes=fact.codes,
+        reask=reask,
+        pending_key=fact.key,
+    )
+
+
 def choose_question(
     verdicts: Any,
     requirements: Requirements | None = None,
@@ -791,14 +973,20 @@ def choose_question(
     owner_messages: Any = (),
     asked: Any = (),
     non_answers: Mapping[str, int] | None = None,
+    known_records: Any = (),
+    answered: Any = (),
+    scope: Mapping[str, Any] | None = None,
 ) -> Question | None:
     """ONE question, or None.
 
     None means: nothing owner-answerable is left (every unknown is the option's, the gate's or a
-    script it cannot read, or every askable fact is stored, answered, or asked out). The flow then
-    says what is unknown and offers to learn first. A returned question always addresses at least
-    one
-    unknown option. Never raises."""
+    script it cannot read, or every askable fact is stored, answered, answerable from
+    `known_records`, or asked out). The flow then says what is unknown and offers to learn first
+    (and shows `resolve_from_records` proposals, if any). A returned question always addresses at
+    least one unknown option, with one exception: when `language` is None or not one the flow can
+    use, the question is the language question (`key == LANGUAGE_KEY`, `options == ()`,
+    `pending_key` is the fact it will ask next). The language is never guessed here: the flow
+    decides it. Never raises."""
     try:
         reqs = as_requirements(requirements) if requirements is not None else Requirements()
         if not isinstance(reqs, Requirements):
@@ -810,7 +998,11 @@ def choose_question(
             owner_messages=owner_messages,
             asked=asked,
             non_answers=non_answers,
+            known_records=known_records,
+            answered=answered,
+            scope=scope,
         )
+        certain = _language_certain(language)
         for fact in ranked:
             if not fact.askable or not fact.options:
                 continue
@@ -821,6 +1013,10 @@ def choose_question(
             text = render_question(fact.key, language, what=what, reask=fact.reask)
             if not text or lint_question(text, language):
                 continue
+            if not certain:
+                return _language_question(
+                    fact, _asked_counts(asked), _non_answer_counts(non_answers)
+                )
             slot = safe_slot(what) if text.find('"') >= 0 else ""
             return Question(
                 key=fact.key,
@@ -842,18 +1038,48 @@ def choose_question(
         return None
 
 
+def resolve_from_records(
+    verdicts: Any,
+    requirements: Requirements | None = None,
+    options: Sequence[str] | None = None,
+    *,
+    known_records: Any = (),
+    scope: Mapping[str, Any] | None = None,
+    owner_messages: Any = (),
+    answered: Any = (),
+) -> tuple[RecordAnswer, ...]:
+    """The facts the passed `known_records` already answer, as update proposals with their source.
+    Nothing is asked for them. Only budget, budget currency and period, staff headcount and
+    deadline are read from records (the facts the gate reads from one sentence). The proposal never
+    marks anything satisfied; it lists the options to check again. Never raises."""
+    try:
+        ranked = rank_missing_information(
+            verdicts,
+            requirements,
+            options,
+            owner_messages=owner_messages,
+            known_records=known_records,
+            answered=answered,
+            scope=scope,
+        )
+        return tuple(f.record for f in ranked if f.record is not None)
+    except Exception:  # noqa: BLE001
+        return ()
+
+
 @dataclass(frozen=True, slots=True)
 class ResolutionPlan:
-    """The whole picture for the flow: the question (or None), every explanation, the ranking, and
-    what
-        stays unknown whatever the owner says."""
+    """The whole picture for the flow: the question (or None), the facts existing records already
+    answer, every explanation, the ranking, and what stays unknown whatever the owner says."""
 
     question: Question | None
     explanations: tuple[UnknownExplanation, ...]
     ranked: tuple[MissingFact, ...]
     counts: Mapping[str, int]  # unknown options per Code value
     unresolvable: int  # unknown options no owner answer can fix
-    learn_first: bool  # True when there is no question and something is unknown
+    learn_first: bool  # no question, no record answer, and something is unknown
+    from_records: tuple[RecordAnswer, ...] = ()  # proposals read from `known_records`
+    language_needed: bool = False  # the question is the language question
 
 
 def plan_resolution(
@@ -865,25 +1091,23 @@ def plan_resolution(
     owner_messages: Any = (),
     asked: Any = (),
     non_answers: Mapping[str, int] | None = None,
+    known_records: Any = (),
+    answered: Any = (),
+    scope: Mapping[str, Any] | None = None,
 ) -> ResolutionPlan:
     expl = explain_unknowns(verdicts, requirements, options)
-    ranked = rank_missing_information(
-        verdicts,
-        requirements,
-        options,
-        owner_messages=owner_messages,
-        asked=asked,
-        non_answers=non_answers,
-    )
-    q = choose_question(
-        verdicts,
-        requirements,
-        options,
-        language=language,
-        owner_messages=owner_messages,
-        asked=asked,
-        non_answers=non_answers,
-    )
+    shared: dict[str, Any] = {
+        "owner_messages": owner_messages,
+        "non_answers": non_answers,
+        "known_records": known_records,
+        "answered": answered,
+        "scope": scope,
+    }
+    ranked = rank_missing_information(verdicts, requirements, options, asked=asked, **shared)
+    q = choose_question(verdicts, requirements, options, language=language, asked=asked, **shared)
+    sources = {f.key: f.record.source for f in ranked if f.record is not None}
+    expl = tuple(replace(e, record_source=sources.get(e.fact or "")) for e in expl)
+    from_records = tuple(f.record for f in ranked if f.record is not None)
     counts = Counter(e.code.value for e in expl)
     return ResolutionPlan(
         question=q,
@@ -891,7 +1115,9 @@ def plan_resolution(
         ranked=ranked,
         counts=dict(counts),
         unresolvable=sum(not e.owner_answerable for e in expl),
-        learn_first=q is None and bool(expl),
+        learn_first=q is None and not from_records and bool(expl),
+        from_records=from_records,
+        language_needed=q is not None and q.key == LANGUAGE_KEY,
     )
 
 
@@ -916,6 +1142,7 @@ class FieldUpdate:
     replaces: str | None  # the stored text it clarifies or contradicts
     parsed: tuple[tuple[str, str], ...]
     is_correction: bool = False
+    source: str | None = None  # the record it was read from, when it came from a record
 
 
 @dataclass(frozen=True, slots=True)
@@ -928,6 +1155,7 @@ class AnswerProposal:
     recheck_options: tuple[str, ...] = ()
     non_answer: bool = False
     satisfied: bool = False  # always False: only the gate can say an option now passes
+    source: str | None = None  # the record it was read from, else None (an owner answer)
 
 
 def _unknown_answer(key: str, reason: str, *, non_answer: bool = False) -> AnswerProposal:
@@ -1093,12 +1321,12 @@ def apply_answer(
     """Read the owner's answer to `question` into an update proposal. Conservative: a non-answer, a
     hedge, two values, or a value the gate's own readers cannot read gives `still_unknown` with a
     reason, never a guess. A value that contradicts a stored one is a `correction_candidate`, never
-    a
-    silent overwrite. The proposal never marks anything satisfied: it lists the options the gate
-    must
-    check again and nothing else. Never raises."""
+    a silent overwrite. The proposal never marks anything satisfied: it lists the options the gate
+    must check again and nothing else. Never raises."""
     key = getattr(question, "key", "") if isinstance(question, Question) else ""
     try:
+        if isinstance(question, Question) and key == LANGUAGE_KEY:
+            return _read_language_answer(owner_text)
         if not isinstance(question, Question) or key not in FACTS:
             return _unknown_answer(key, "bad_question")
         reqs = as_requirements(requirements) if requirements is not None else Requirements()
@@ -1166,6 +1394,37 @@ def apply_answer(
         return _unknown_answer(key, "unreadable")
 
 
+def _read_language_answer(owner_text: Any) -> AnswerProposal:
+    """The reply language the owner names. One language only; anything else stays unknown."""
+    key = LANGUAGE_KEY
+    if not isinstance(owner_text, str):
+        return _unknown_answer(key, "not_text", non_answer=True)
+    if len(owner_text) > MAX_ANSWER_CHARS:
+        return _unknown_answer(key, "too_long")
+    text = _text(owner_text).strip()
+    if is_non_answer(text):
+        return _unknown_answer(key, "non_answer", non_answer=True)
+    t = _norm(text)
+    found: list[str] = []
+    for code, words in lx.LANGUAGE_WORDS:
+        for w in words:
+            w = _norm(w)
+            if re.search(rf"(?<!\w){re.escape(w)}(?!\w)", t):
+                if code == "ur" and "roman_ur" in found:
+                    continue  # "roman urdu" names one language
+                if code not in found:
+                    found.append(code)
+                break
+    if len(found) != 1:
+        return _unknown_answer(key, "ambiguous" if found else "no_language")
+    code = found[0]
+    return AnswerProposal(
+        Status.FILLED,
+        key,
+        (FieldUpdate("language", None, code, None, (("language", code),)),),
+    )
+
+
 def _contradicts(
     key: str, stored: str | None, value: str, parsed: tuple[tuple[str, str], ...]
 ) -> bool:
@@ -1207,8 +1466,7 @@ def record_outcome(
     state: ResolutionState | None, question: Question, proposal: AnswerProposal
 ) -> ResolutionState:
     """The state after one question and its answer: the key counts as asked, and an answer that
-    stays
-        unknown counts as a non-answer for it."""
+    stays unknown counts as a non-answer for it."""
     s = state if isinstance(state, ResolutionState) else ResolutionState()
     quiet = s.non_answer_map
     if proposal.status is Status.STILL_UNKNOWN:
@@ -1222,7 +1480,10 @@ __all__ = [
     "Code",
     "FieldUpdate",
     "MissingFact",
+    "KnownRecord",
+    "LANGUAGE_KEY",
     "Question",
+    "RecordAnswer",
     "Resolution",
     "ResolutionPlan",
     "ResolutionState",
@@ -1238,6 +1499,7 @@ __all__ = [
     "plan_resolution",
     "rank_missing_information",
     "record_outcome",
+    "resolve_from_records",
     "render_question",
     "safe_slot",
 ]
