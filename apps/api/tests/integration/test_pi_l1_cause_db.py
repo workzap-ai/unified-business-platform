@@ -241,3 +241,32 @@ async def test_the_owner_takes_a_cause_back_through_the_turn(api, business_db, m
     assert stored.cause["history"][0]["text"] == "competitor"
     assert stored.person_believes_cause == ""
     await pi.close()
+
+
+async def test_a_failed_attempt_in_the_owners_words_is_stored_as_failed(
+    api, business_db, monkeypatch
+):
+    db = business_db
+    await at_0053(db)
+    w = await two_chats(api, db, monkeypatch)
+    note = ProblemNote(
+        title="Customer files get mixed up",
+        category="operations_process",
+        tried=[{"what": "rang wale folder", "outcome": ""}],
+    )
+    await apply_ops(
+        db,
+        w.scope_a,
+        w.cust_a,
+        w.conv_a.id,
+        None,
+        [ProblemOp(op="create", note=note)],
+        "roman_ur",
+        owner_text="rang wale folder try kiye lekin mix ho gaye",
+    )
+    stored = (await db.scalars(select(PiProblem).where(PiProblem.customer_id == w.cust_a))).one()
+    await db.refresh(stored, ["tried"])
+    assert stored.tried[0]["what"] == "rang wale folder"
+    assert stored.tried[0]["outcome"] == "failed"
+    await w.a.close()
+    await w.b.close()

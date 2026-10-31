@@ -692,9 +692,7 @@ _TIME = re.compile(
 )
 _FILLER = {"new", "more", "another", "second", "extra", "any", "additional", "other", "anyone",
            "anybody", "anything", "someone", "people", "ones", "naya", "naye", "nayi"}  # fmt: skip
-_TRIED_MARK = re.compile(r"\b(?:tried|try|aazma\w*|pehle|kiya tha|rakha tha|kiye|kiya)\b")
-# An attempt word in Urdu, Arabic or Hindi script
-_TRIED_MARK_SCRIPT = re.compile(r"آزما|کوشش|پہلے|جرب|حاول|سابق|आज़मा|आजमा|कोशिश|पहले")
+_TRIED_MARK = re.compile(r"\b(?:tried|try|aazma\w*|pehle)\b")
 # 'did not work' is an outcome on its own; 'failed' and the like count only beside 'tried'
 _FAIL_ALONE = re.compile(
     r"\b(?:did not work|didn't work|didnt work|does not work|doesn't work|not worked|"
@@ -702,25 +700,6 @@ _FAIL_ALONE = re.compile(
 )
 _FAIL_TRIED = re.compile(
     r"\b(?:failed|useless|flopped|no use|no result|kaam nahi|nakam|faida nahi|fayda nahi)\b"
-)
-# A failed attempt said structurally: negation + effect / benefit / work word. Strong: an outcome on
-# its own, like 'did not work'. Roman Urdu 'kaam|faida|fayda|asar nahi (aaya|hua|kiya)', 'nakam';
-# Urdu 'کوئی فائدہ نہیں', 'کام نہیں آیا', 'ناکام'; Arabic 'لم ينجح', 'لم يفد', 'لم ينفع';
-# Hindi 'काम नहीं आया', 'फायदा नहीं'. No \b around script words (marks are not word characters).
-_FAIL_STRONG = re.compile(
-    r"\b(?:kaam|faida|fayda|faeda|asar|nateeja|natija)\s+(?:nahi|nahin|nhi)"
-    r"(?:\s+(?:aaya|aya|hua|kiya|diya|kia|raha))?\b"
-    r"|\bnakam\b|\bbe-?asar\b"
-    r"|ناکام|(?:فائدہ|فایدہ|اثر|نتیجہ)\s+(?:نہیں|نھیں)|کام\s+نہیں\s+(?:آیا|کیا)"
-    r"|لم\s+[يت](?:نجح|فد|نفع)|ما\s+(?:نفع|نجح|أفاد|افاد)|\bفشل|دون\s+جدوى|بدون\s+فائدة"
-    r"|काम\s+नहीं\s+आया|(?:फायदा|फ़ायदा|असर|नतीजा)\s+नहीं|असफल|नाकाम"
-)
-# Weak: 'got mixed up', 'came out wrong', 'was useless' say failure only beside an attempt word
-_FAIL_WEAK = re.compile(
-    r"\bmix\s+ho\s+gay[ei]\b|\bghalat\s+nikl(?:a|i|e)\b"
-    r"|\bbekaar\s+(?:raha|rahi|nikla|nikli|gaya)\b"
-    r"|بیکار\s+(?:رہا|رہی|نکلا|نکلی)|غلط\s+نکل|گڈ\s+مڈ\s+ہو|اختلط"
-    r"|बेकार\s+(?:रहा|निकला)|गलत\s+निकला|मिक्स\s+हो\s+गए"
 )
 _TRIED_LEAD = re.compile(
     r"^(?:(?:we|i|hum|humne|already|have|had|previously|once|maine)\s+)*"
@@ -1116,15 +1095,10 @@ def _parse_rules(
                 add_neg(mid[0], " ".join(head), ru=True)
             elif len(mid) <= 1 and len(head) >= 2:  # 'discount de nahi sakte', '... kar sakte'
                 add_neg(head[-1], " ".join(head[:-1]), ru=True)
-    marked = _TRIED_MARK.search(text) or _TRIED_MARK_SCRIPT.search(text)
-    fail = (
-        _FAIL_ALONE.search(text)
-        or _FAIL_STRONG.search(text)
-        or (marked and (_FAIL_TRIED.search(text) or _FAIL_WEAK.search(text)))
-    )
+    fail = _FAIL_ALONE.search(text) or (_TRIED_MARK.search(text) and _FAIL_TRIED.search(text))
     if fail:
         before = text[: fail.start()]
-        for marker in ("pehle", "try ", "aazma", "kiya tha", "rakha tha"):
+        for marker in ("pehle", "try ", "aazma"):
             at = before.find(marker)
             if at > 0:
                 before = before[:at]

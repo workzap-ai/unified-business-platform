@@ -19,7 +19,14 @@ from sqlalchemy import func, inspect, select
 from sqlalchemy.exc import DBAPIError
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.modules.pi import business, figure_correction, part19, problem_fields, taxonomy
+from app.modules.pi import (
+    business,
+    figure_correction,
+    part19,
+    problem_fields,
+    taxonomy,
+    tried_outcome,
+)
 from app.modules.pi.language import amount_value, date_estimate
 from app.modules.pi.problem_models import (
     PiProblem,
@@ -502,6 +509,50 @@ class ProblemBook:
         )
 
     @staticmethod
+    def tried_items(note: ProblemNote, owner_text: str | None) -> list[dict[str, Any]]:
+        """The note's `tried` entries with the outcome the OWNER's words give them (L1 follow-up).
+        An entry whose outcome is empty or unclear becomes "failed" when the owner's own text says
+        that attempt failed ("worked" when they say it helped): the owner's clause that mentions
+        the same words, or a failed attempt the owner described that shares a word with this problem. `what` keeps the owner's wording
+        so PS-3's idea check can match it. Only the owner's text counts (never the model's)."""
+        items = [dict(t) for t in note.tried if isinstance(t, dict)]
+        clauses = [c for c in re.split(r"[.!?;]+|\n+", owner_text or "") if c.strip()]
+        for item in items:
+            if tried_outcome.outcome_of(str(item.get("outcome") or "")) == "failed":
+                item["outcome"] = "failed"
+                continue
+            if str(item.get("outcome") or "").strip():
+                continue  # the owner's outcome is kept as it is
+            words = {w[:5] for w in re.findall(r"\w{3,}", str(item.get("what") or "").casefold())}
+            for clause in clauses:
+                heard = {w[:5] for w in re.findall(r"\w{3,}", clause.casefold())}
+                if not words or not words <= heard:
+                    continue
+                if tried_outcome.failed_attempt(clause):
+                    item["outcome"] = "failed"
+                    break
+                if tried_outcome.outcome_of(clause) == "worked":
+                    item["outcome"] = "worked"  # a successful attempt is never a failed one
+        known = [str(i.get("what") or "").casefold() for i in items]
+        about = {
+            w[:5]
+            for w in re.findall(
+                r"\w{4,}", " ".join([note.title, note.summary, *note.user_words]).casefold()
+            )
+        }
+        for clause in clauses:
+            found = tried_outcome.failed_attempt(clause)
+            if not found or not found.what or found.what.casefold() in known:
+                continue
+            if any(found.what.casefold() in k or k in found.what.casefold() for k in known if k):
+                continue
+            heard = {w[:5] for w in re.findall(r"\w{4,}", clause.casefold())}
+            if about & heard:
+                items.append({"what": found.what, "outcome": "failed"})
+                known.append(found.what.casefold())
+        return items
+
+    @staticmethod
     def cause_candidate(note: ProblemNote) -> tuple[str, bool, list[str]]:
         """(text, said, evidence words) of the cause a note carries. The B2a cause fields win; the
         older `believes_cause` is the same claim ("the owner said it") with no evidence of its own,
@@ -543,7 +594,8 @@ class ProblemBook:
         changed = changed or was
         if constraints is not None:
             values["constraints"] = constraints
-        tried, was = problem_fields.merge_tried(problem.tried if problem else None, note.tried, msg)
+        said_tried = ProblemBook.tried_items(note, owner_text)
+        tried, was = problem_fields.merge_tried(problem.tried if problem else None, said_tried, msg)
         changed = changed or was
         if tried is not None:
             values["tried"] = tried
