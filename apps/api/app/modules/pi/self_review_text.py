@@ -161,6 +161,7 @@ def script_of_language(lang: str) -> str:
 # ---- lexicons ----
 
 HEDGE = rx(
+    r"शायद|हो सकता|लगता|संभव|अगर",
     r"(?<!\w)(?:may|might|could|perhaps|maybe|possibly|probably|likely|seems?|appears?|"
     r"guess|assum\w*|hypothes\w*|not sure|i think|i suspect|if|"
     r"shayad|hosakta|ho sakta|ho sakti|lagta|lagti|mumkin|andaza|andaaza|agar|meri samajh|"
@@ -171,6 +172,7 @@ HEDGE = rx(
 )
 
 CLAIM_WORD = rx(
+    r"गारंटी|वादा|पक्का|फायदा होगा|बचत होगी",
     r"(?<!\w)(?:guarantee[sd]?|guaranteed|promise[sd]?|risk[- ]free|roi|return on investment|"
     r"100 ?%|for sure|"
     r"will (?:definitely|certainly|surely|save|earn|double|triple|boost|increase|grow|cut|reduce))(?!\w)",
@@ -183,17 +185,19 @@ CLAIM_WORD = rx(
 PERCENT = re.compile(fold(r"(\d+(?:\.\d+)?)\s*(?:%|percent|per cent|فیصد|في المئة|بالمئة)"))
 MONEY = re.compile(
     fold(
-        r"(?:rs\.?|pkr|usd|aed|sar|\$|€|£|rupees?|dollars?|روپے|ریال|درہم|دولار|ريال|درهم)\s*(\d[\d,]*)"
-        r"|(\d[\d,]*)\s*(?:rs\.?|pkr|usd|aed|sar|rupees?|dollars?|روپے|ریال|درہم|دولار|ريال|درهم)"
+        r"(?:rs\.?|pkr|usd|aed|sar|\$|€|£|rupees?|dollars?|روپے|ریال|درہم|دولار|ريال|درهم|रुपये|रुपए|डॉलर)\s*(\d[\d,]*)"
+        r"|(?<![\w-])(\d[\d,]*)\s*(?:rs\.?|pkr|usd|aed|sar|rupees?|dollars?|روپے|ریال|درہم|دولار|ريال|درهم|रुपये|रुपए|डॉलर)"
     )
 )
 
 NEGATION = rx(
+    r"नहीं|बिना",
     r"(?<!\w)(?:no|not|never|cannot|can't|cant|without|nahi|nahin|nai|nahi|can not)(?!\w)",
     r"نہیں|نہ ",
     r"لا |لن |لم |ليس|بدون|بغیر|بلا ",
 )
 CONDITIONAL = rx(
+    r"जब|अगर|बाद",
     r"(?<!\w)(?:when|once|after|if|until|before|to be|will be|would be|should be|can be)(?!\w)",
     r"(?<!\w)(?:jab|agar|jaise hi|baad)(?!\w)",
     r"جب|اگر|بعد",
@@ -206,6 +210,7 @@ JARGON = frozenset(
 )
 
 IMPLEMENTED = rx(
+    r"हो गया|हो चुका|हो चुकी|कर दिया|कर दी|लगा दिया|पूरा हो|बन गया",
     r"(?<!\w)(?:has|have|had|is|are|was|were)(?: all)?(?: been)? "
     r"(?:implemented|delivered|completed|installed|deployed|launched|finished|done|live|set up|built)(?!\w)",
     r"(?<!\w)(?:we|i)(?:'ve| have| had)? (?:already )?"

@@ -163,7 +163,10 @@ class DraftResult:
     blueprint: BlueprintIn | None = None
     questions: QuestionsIn | None = None
     next_steps: int | None = None  # how many next steps the draft gives the owner
-    implementation_status: str = ""  # proposed / approved / implemented / "" (= proposed)
+    implementation_status: str = (
+        ""  # proposed / approved / in_progress / implemented / "" (= proposed)
+    )
+    known_amounts: tuple[str, ...] = ()  # figures the application wrote (quote amount, reference)
 
 
 @dataclass(frozen=True)
