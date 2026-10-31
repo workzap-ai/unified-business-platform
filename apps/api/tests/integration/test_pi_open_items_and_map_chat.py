@@ -208,15 +208,11 @@ async def linked(api, db, monkeypatch):
     return pi, conversation, rows, link.id
 
 
-@pytest.mark.xfail(
-    strict=True,
-    reason="production bug, docs/pi-saas/pi-existing-failures.md #1: map_edit.STRONG_LINK holds "
-    "backspace characters instead of word boundaries, so 'connection' never matches",
-)
 async def test_a_wrong_link_is_removed_and_pi_asks_the_real_connection(
     api, business_db, monkeypatch
 ):
     pi, conversation, rows, link_id = await linked(api, business_db, monkeypatch)
+    scope, customer_id = _scope(conversation), rows[0].customer_id  # before expire_all
     await say(pi, "this connection is wrong", "me-1")
     business_db.expire_all()
     link = await business_db.get(PiProblemLink, link_id)
@@ -225,9 +221,7 @@ async def test_a_wrong_link_is_removed_and_pi_asks_the_real_connection(
     assert "What is the real connection between" in reply and reply.rstrip().endswith("?")
     assert reply.count("?") == 1 and "noted" not in reply.lower()
     assert not reply.startswith("Thanks")
-    problems, links = await map_builder.current_inputs(
-        business_db, _scope(conversation), rows[0].customer_id
-    )
+    problems, links = await map_builder.current_inputs(business_db, scope, customer_id)
     assert map_builder.drawn_links(problems, links) == []
     reasons = (await business_db.scalars(select(PiProblemRevision.reason))).all()
     assert reasons.count("link_rejected") == 2
