@@ -44,29 +44,66 @@ MAX_GAP = 3  # separators tolerated between digits of one number: ". ", " - ", z
 _HAS_DIGIT = re.compile(r"\d")
 
 # ---- secret screening: used on action parameters (refuse) and on audit details (redact) ----------
-# Key names: strict. Normalised (casefold, letters and digits only) then matched against a closed list.
-_KEY_EXACT = frozenset("pin otp pwd ssn cvv cvc pincode pinnumber otpcode".split())
+# Key names: strict. Normalised (casefold, letters and digits only) then matched against closed families.
+_KEY_EXACT = frozenset(
+    "pin otp pwd ssn cvv cvc ccv cvv2 sid nic cnic pincode pinnumber pinno otpcode ccnum ccno ccnumber cardnum session cookie".split()
+)
 _KEY_CONTAINS = (
     "password passwd passcode passphrase apikey accesstoken refreshtoken authtoken bearer authorization secret privatekey "
-    "token creditcard cardnumber cardno card cvv cvc routing accountnumber accountno iban cnic nationalid credential expiry swift "
+    "token creditcard cardnumber cardnum cardno card ccnumber ccnum cvv cvc securitycode onetimecode onetimepassword "
+    "cookie sessionid sessiontoken maidenname socialsecurity nationalid cnic ssn routing accountnumber accountno iban "
+    "credential expiry swift "
     "پاسورڈ पासवर्ड كلمةالمرور كلمةالسر الرقمالسري رمزالتحقق اوٹیپی ओटीपी"
 ).split()
+_AUTHISH = (
+    "access",
+    "refresh",
+    "auth",
+    "api",
+    "bearer",
+    "secret",
+    "private",
+    "session",
+    "jwt",
+    "csrf",
+)
 
 
-def secret_key_name(key: Any) -> bool:
-    if not isinstance(key, str):
-        return True
-    k = "".join(
+def _alnum(text: str) -> str:
+    return "".join(
         ch
-        for ch in unicodedata.normalize("NFKC", key).casefold()
+        for ch in unicodedata.normalize("NFKC", text).casefold()
         if unicodedata.category(ch)[0] in "LMN"
     )
-    return k in _KEY_EXACT or any(w in k for w in _KEY_CONTAINS)
+
+
+def _is_count(value: Any) -> bool:
+    return (
+        isinstance(value, (int, float)) and not isinstance(value, bool) and 0 <= value <= 10_000_000
+    )
+
+
+def secret_key_name(key: Any, value: Any = None) -> bool:
+    """True when a parameter name announces a secret. A usage counter such as tokens_used with a small
+    number as its value is not a secret."""
+    if not isinstance(key, str):
+        return True
+    k = _alnum(key)
+    if (
+        _is_count(value)
+        and ("tokens" in k or "tokencount" in k)
+        and not any(a in k for a in _AUTHISH)
+    ):
+        return False
+    if k in _KEY_EXACT or k.startswith("otp") or k.endswith("otp"):
+        return True
+    return any(w in k for w in _KEY_CONTAINS)
 
 
 # Values: DISCLOSURE patterns, not bare keywords.
 _TRIGGERS = frozenset(
-    "password passwd passcode pwd otp cvv cvc pin iban cnic ssn پاسورڈ पासवर्ड ओटीपी पिन सीवीवी پن".split()
+    "password passwd passcode pwd otp cvv cvc ccv pin iban cnic ssn secret sid jsessionid phpsessid "
+    "پاسورڈ पासवर्ड ओटीपी पिन सीवीवी پن".split()
 )
 _TRIGGER_PHRASES = (
     ("پاس", "ورڈ"),
@@ -85,17 +122,23 @@ _TRIGGER_PHRASES = (
     ("कार्ड", "नंबर"),
     ("पास", "वर्ड"),
     ("credit", "card"),
+    ("maiden", "name"),
+    ("social", "security"),
+)
+_POSSESSIVE = frozenset(
+    "my your mera meri apka apki the a an their his her میرا میری मेरा मेरी".split()
 )
 _GLUE = frozenset(
     "is are number no code password hai hy hain ka ki ke ہے ہیں کا کی है हैं का की नंबर هو هي رقم نمبر : =".split()
 )
-_POSSESSIVE = frozenset("my your mera meri apka apki میرا میری मेरा मेरी".split())
 _CONNECTORS = frozenset("is are hai hy hain ہے ہیں है हैं هو هي : =".split())
 _STOP_VALUES = frozenset(
     "required not never optional shown sent secret hidden ok okay the a an your my our to on in by for via at valid invalid wrong "
     "correct expired reset changed strong weak safe private confidential mandatory needed ready also and or with from that this it "
+    "what which where who how why when whose "
     "zaroori nahi nahin mat ضروری نہیں जरूरी नहीं ضروري ليس لا".split()
 )
+_CONTEXT = frozenset("code otp pin cvv cvc ccv passcode password pwd".split())
 
 _DIGIT_WORDS = frozenset(
     (
@@ -121,6 +164,13 @@ _TOKEN_PATTERNS = (
     ),
 )
 _LONG_TOKEN = re.compile(r"[A-Za-z0-9_-]{24,}")
+_UUID = re.compile(r"[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}")
+_ENCODED = re.compile(r"[A-Za-z0-9+/_-]{12,}={0,2}")
+_DIGIT_RUN = re.compile(r"\d+(?:[\s.\-]{1,3}\d+)*")
+_SPACED = re.compile(r"(?<![A-Za-z0-9])(?:[A-Za-z][ .\-]){1,5}[A-Za-z](?![A-Za-z0-9])")
+_SPACED_WORDS = frozenset("otp pin cvv cvc ccv ssn cnic pwd sid".split())
+_VALUE_RUN = re.compile(r"[^\s,;!?]+")
+MAX_ENCODED_CANDIDATES = 20
 
 
 def _norm_word(w: str) -> str:
@@ -128,6 +178,16 @@ def _norm_word(w: str) -> str:
     for a in "أإآٱ":
         w = w.replace(a, "ا")
     return w.replace("़", "").replace("ة", "ه")
+
+
+def collapse_spaced(text: str) -> str:
+    """'o t p', 'p-i-n', 'c v v' become 'otp', 'pin', 'cvv' so letter-spacing does not hide a secret word."""
+
+    def fix(m: re.Match[str]) -> str:
+        joined = re.sub(r"[ .\-]", "", m.group())
+        return joined if joined.casefold() in _SPACED_WORDS else m.group()
+
+    return _SPACED.sub(fix, text)
 
 
 def _scan(text: str) -> list[tuple[str, str, int]]:
@@ -167,46 +227,107 @@ def _has_secret_shape(token: str) -> bool:
     return digits >= 3 and letters >= 3
 
 
-def secret_start(text: str, digit_words: bool = True) -> int | None:
-    """Earliest character index where a secret is disclosed, or None. Detects: token-looking values
-    (API keys, JWTs, bearer headers, URL secret parameters, long mixed base64/hex strings), spelled-out
-    card digits (five languages), and disclosure patterns (a secret word followed by 'is/:/=' and a value,
-    or adjacent to a digit run or a value-like token). Bare mentions of the words are not disclosures."""
-    if not isinstance(text, str):
-        return 0
-    found: list[int] = []
+def is_uuid(text: str) -> bool:
+    return bool(_UUID.fullmatch(text.strip()))
+
+
+def _value_span(text: str, start: int) -> tuple[int, int]:
+    if text[start : start + 1].isdigit():
+        dm = _DIGIT_RUN.match(text, start)
+        if dm and dm.end() > start:
+            return start, dm.end()
+    m = _VALUE_RUN.match(text, start)
+    end = m.end() if m else start + 1
+    while end > start + 1 and text[end - 1] in ".)]}\"'":
+        end -= 1
+    return start, end
+
+
+def _decoded_hides_secret(token: str) -> bool:
+    """Base64 or hex that decodes to readable text holding a card number or a secret statement."""
+    import base64
+    import binascii
+
+    candidates: list[bytes] = []
+    try:
+        b = token.replace("-", "+").replace("_", "/").rstrip("=")
+        b += "=" * (-len(b) % 4)
+        candidates.append(base64.b64decode(b, validate=True))
+    except (binascii.Error, ValueError):
+        pass
+    if len(token) % 2 == 0 and re.fullmatch(r"[0-9a-fA-F]+", token):
+        try:
+            candidates.append(bytes.fromhex(token))
+        except ValueError:
+            pass
+    for raw in candidates:
+        try:
+            text = raw.decode("utf-8")
+        except UnicodeDecodeError:
+            continue
+        if not text or not all(ch.isprintable() for ch in text):
+            continue
+        if has_card_like(text, 13) or _spans(text, decode=False):
+            return True
+    return False
+
+
+def _spans(text: str, digit_words: bool = True, decode: bool = True) -> list[tuple[int, int]]:
+    """Character spans of secret VALUES (the value only, not the word announcing it). The text must
+    already be collapse_spaced()."""
+    spans: list[tuple[int, int]] = []
     for pat in _TOKEN_PATTERNS:
-        m = pat.search(text)
-        if m:
-            found.append(m.start())
+        for m in pat.finditer(text):
+            spans.append(m.span())
     for m in _LONG_TOKEN.finditer(text):
-        if _has_secret_shape(m.group()):
-            found.append(m.start())
-            break
+        if _UUID.fullmatch(m.group()) or not _has_secret_shape(m.group()):
+            continue
+        spans.append(m.span())
+    if decode:
+        for count, m in enumerate(_ENCODED.finditer(text)):
+            if count >= MAX_ENCODED_CANDIDATES:
+                break
+            if _decoded_hides_secret(m.group()):
+                spans.append(m.span())
     toks = _scan(text)
     n = len(toks)
-    # spelled-out or mixed digit runs of 13 or more
-    run = 0
-    run_start = 0
-    for norm, _o, st in toks:
-        k = (
-            1
-            if norm in _DIGIT_WORDS and not norm.isdigit()
-            else (len(norm) if norm.isdigit() else 0)
-        )
-        if k:
-            if run == 0:
-                run_start = st
-            run += k
-            if digit_words and run >= 13:
-                found.append(run_start)
-                break
-        else:
-            run = 0
-    # disclosure patterns
+    if digit_words:
+        run = 0
+        run_start = 0
+        last_end = 0
+        last_ctx = -100
+        run_ctx = False
+        has_word = False
+        for idx, (norm, orig, st) in enumerate(toks):
+            if norm in _CONTEXT:
+                last_ctx = idx
+            k = (
+                1
+                if norm in _DIGIT_WORDS and not norm.isdigit()
+                else (len(norm) if norm.isdigit() else 0)
+            )
+            if k:
+                if run == 0:
+                    run_start = st
+                    run_ctx = idx - last_ctx <= 8
+                    has_word = False
+                has_word = has_word or not norm.isdigit()
+                run += k
+                last_end = st + len(orig)
+                if run >= 13 or (run >= 4 and run_ctx and has_word):
+                    spans.append((run_start, last_end))
+            else:
+                run = 0
     for i in range(n):
         end = None
         if toks[i][0] in _TRIGGERS:
+            st0 = toks[i][2]
+            if (
+                st0 > 0
+                and text[st0 - 1] == "["
+                and text[st0 + len(toks[i][1]) : st0 + len(toks[i][1]) + 1] == "]"
+            ):
+                continue  # our own [secret] marker
             end = i
         else:
             for ph in _TRIGGER_PHRASES:
@@ -216,7 +337,6 @@ def secret_start(text: str, digit_words: bool = True) -> int | None:
                     break
         if end is None:
             continue
-        trig_start = toks[i][2]
         j = end + 1
         conn = False
         skipped = 0
@@ -225,18 +345,48 @@ def secret_start(text: str, digit_words: bool = True) -> int | None:
             j += 1
             skipped += 1
         if j < n:
-            norm, orig, _st = toks[j]
+            norm, orig, st = toks[j]
             if (conn and norm not in _STOP_VALUES and norm not in _TRIGGERS) or _value_like(
                 norm, orig
             ):
-                found.append(trig_start)
+                spans.append(_value_span(text, st))
+                continue
+        # reversed: "<value> is my password", "<digits> otp"
+        k = i - 1
+        while k >= 0 and k > i - 4 and toks[k][0] in _POSSESSIVE:
+            k -= 1
+        if k >= 1 and toks[k][0] in _CONNECTORS and toks[k][0] not in (":", "="):
+            v = k - 1
+            norm, orig, st = toks[v]
+            if (
+                norm not in _STOP_VALUES
+                and norm not in _TRIGGERS
+                and (_value_like(norm, orig) or len(norm) >= 5)
+            ):
+                spans.append(_value_span(text, st))
                 continue
         k = i - 1
         while k >= 0 and k > i - 4 and (toks[k][0] in _GLUE or toks[k][0] in _POSSESSIVE):
             k -= 1
         if k >= 0 and sum(1 for c in toks[k][0] if c.isdigit()) >= 3:
-            found.append(toks[k][2])
-    return min(found) if found else None
+            spans.append(_value_span(text, toks[k][2]))
+    return spans
+
+
+def secret_spans(text: str, digit_words: bool = True) -> list[tuple[int, int]]:
+    if not isinstance(text, str):
+        return [(0, 0)]
+    return sorted(set(_spans(collapse_spaced(text), digit_words)))
+
+
+def secret_start(text: str, digit_words: bool = True) -> int | None:
+    """Earliest character index of a secret value (in the letter-spacing-collapsed text), or None.
+    Detects token-looking values (API keys, JWTs, bearer headers, URL secret parameters, long mixed
+    base64/hex strings), encoded card numbers, spelled-out card digits (five languages), and disclosure
+    patterns: a secret word followed by 'is/:/=' and a value, adjacent to a digit run or value-like token,
+    or the reversed form '<value> is my password'. Bare mentions of the words are not disclosures."""
+    sp = secret_spans(text, digit_words)
+    return sp[0][0] if sp else None
 
 
 def looks_secret(text: str) -> bool:
@@ -273,30 +423,41 @@ def has_card_like(text: str, min_digits: int = 13) -> bool:
     return bool(digit_spans(text, min_digits))
 
 
+def _replace(text: str, spans: list[tuple[int, int]], marker: str) -> str:
+    merged: list[list[int]] = []
+    for a, b in sorted(spans):
+        if merged and a <= merged[-1][1]:
+            merged[-1][1] = max(merged[-1][1], b)
+        else:
+            merged.append([a, b])
+    out: list[str] = []
+    pos = 0
+    for a, b in merged:
+        out.append(text[pos:a])
+        out.append(marker)
+        pos = b
+    out.append(text[pos:])
+    return "".join(out)
+
+
 def _clean(value: Any, limit: int) -> str:
-    """Bounded, redacted text: numbers (7+ digits in any separator style), emails (also 'a @ b . com') and
-    secret statements (passwords, OTPs, CVVs, API keys, tokens ...) never enter the trail."""
+    """Bounded, redacted text. Only the secret VALUE is replaced (the rest of the sentence stays): numbers
+    (7+ digits in any separator style), emails (also 'a @ b . com'), and secret values (passwords, OTPs, CVVs,
+    API keys, tokens, encoded or spelled-out card digits)."""
     text = value if isinstance(value, str) else str(value)
-    text = text[: limit * 4]
-    cut = secret_start(
+    text = collapse_spaced(text[: limit * 4])
+    spans = _spans(
         text, digit_words=False
     )  # tokens and disclosures first, while they are still intact
-    if cut is not None:
-        text = text[:cut] + "[secret]"
+    if spans:
+        text = _replace(text, spans, "[secret]")
     spans = digit_spans(text, 7)
     if spans:
-        out: list[str] = []
-        pos = 0
-        for a, b in spans:
-            out.append(text[pos:a])
-            out.append("[number]")
-            pos = b
-        out.append(text[pos:])
-        text = "".join(out)
+        text = _replace(text, spans, "[number]")
     text = _EMAIL.sub("[email]", text)
-    cut = secret_start(text)  # spelled-out digits
-    if cut is not None:
-        text = text[:cut] + "[secret]"
+    spans = _spans(text, digit_words=True, decode=False)  # spelled-out digits
+    if spans:
+        text = _replace(text, spans, "[secret]")
     return text[:limit]
 
 

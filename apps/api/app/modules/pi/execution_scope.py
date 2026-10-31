@@ -186,6 +186,13 @@ _DANGER = _words(
 )
 
 
+def name_parts(person: Any) -> frozenset[str]:
+    """The words of a person's name (the part before any bracket), normalised for comparison."""
+    if not isinstance(person, str):
+        return frozenset()
+    return frozenset(_tokens(person.split("(")[0]))
+
+
 def _strip_objects(toks: list[str]) -> tuple[str, ...]:
     return tuple(t for t in toks if t not in _OBJECTS)
 
@@ -307,8 +314,27 @@ _CORES = frozenset(
     ]
 )
 _CORE_WORDS = frozenset(w for c in _CORES for w in c)
+_LEXICON = _words(
+    "disable enable overwrite reset close open wire update add buy sell hire fire sign order upload download grant revoke access auth login "
+    "logout backup backups password passwords account accounts money funds cash price prices discount discounts stock staff contract "
+    "invoice invoices inventory photo photos file files data database records record customers user users admin root server servers site "
+    "website page pages config settings key keys token tokens card cards bank salary payroll shipment shipping delivery orders product "
+    "products item items list lists report reports text sms whatsapp notify notification share merge push pull commit run execute start "
+    "restart install uninstall create make build write read edit change modify rename move copy migrate sync import export decline "
+    "reject block unblock ban unban lock unlock charge bill billing subscription plan plans quote quotes offer offers coupon coupons "
+    "refunds rollback revert restore rotate renew extend raise lower increase decrease set unset apply remove delete erase wipe "
+    "transfer withdraw deposit invest spend pay paise rupees dollars bhejo karo dena lena"
+)
 _KNOWN = (
-    _FILLERS | _OBJECTS | _NEGATIVE | _CONDITIONAL | _FORWARD | _DANGER | _CORE_WORDS | _NAME_INTRO
+    _LEXICON
+    | _FILLERS
+    | _OBJECTS
+    | _NEGATIVE
+    | _CONDITIONAL
+    | _FORWARD
+    | _DANGER
+    | _CORE_WORDS
+    | _NAME_INTRO
 )
 MAX_NAME_WORDS = 3
 
@@ -355,9 +381,12 @@ def _is_name(norm: str, orig: str) -> bool:
     )
 
 
-def _is_grammar_approval(text: str, tokens: list[str]) -> bool:
-    """The whole message is: fillers, at most one name (1 to 3 capitalised Latin words, only after a dash,
-    a comma, 'thanks', 'regards' or 'from'), exactly one approval phrase, and nothing else."""
+def _is_grammar_approval(text: str, tokens: list[str], known: frozenset[str] = frozenset()) -> bool:
+    """The whole message is: fillers, an optional name, exactly one approval phrase, and nothing else.
+    The name slot (only after a dash, a comma, 'thanks', 'regards' or 'from') holds EITHER words of the known
+    approver's own name (up to 3), OR exactly one capitalised Latin word that is in no action, scope or
+    resource lexicon. Two unknown words, or any word that could be an instruction, make the whole message
+    not an approval."""
     if len(text) > MAX_CUE_GRAMMAR_CHARS:
         return False
     for ch in text:
@@ -369,17 +398,25 @@ def _is_grammar_approval(text: str, tokens: list[str]) -> bool:
     names = 0
     prev = ""
     prev_name = False
+    unknown_names = 0
     for norm, orig, start in _items(nfk):
-        if names < MAX_NAME_WORDS and _is_name(norm, orig):
+        is_known = norm in known and orig.isalpha()
+        if names < MAX_NAME_WORDS and (is_known or _is_name(norm, orig)):
             before = nfk[:start].rstrip()[-1:]
             if (before and before in "-,–—،") or prev in _NAME_INTRO or prev_name:
                 names += 1
+                if not is_known:
+                    unknown_names += 1
+                    if unknown_names > 1:
+                        return False
                 prev_name = True
                 prev = norm
                 continue
         prev_name = False
-        prev = norm
+        prev = "thanks" if (norm == "you" and prev == "thank") else norm
         kept.append(norm)
+    if unknown_names and names > 1:
+        return False  # an unknown word may only stand alone as the name
     folded: list[str] = []
     for t in kept:
         if t == "you" and folded and folded[-1] == "thank":
@@ -405,7 +442,7 @@ def _is_grammar_approval(text: str, tokens: list[str]) -> bool:
     return False
 
 
-def classify_approval(text: Any) -> ApprovalCue:
+def classify_approval(text: Any, known_names: Any = None) -> ApprovalCue:
     """Label one owner message. Only EXPLICIT_YES can create a scope; every other label is 'not approved'.
     Never raises; a non-string, empty, or over-long input is UNKNOWN/VAGUE (fail closed). A question mark
     is a symbol, so it already fails the grammar's character check (no separate branch is needed); the
@@ -422,7 +459,12 @@ def classify_approval(text: Any) -> ApprovalCue:
     toks = _tokens(text)
     if not toks:
         return ApprovalCue.VAGUE
-    if _is_grammar_approval(text, toks):
+    known = (
+        frozenset(known_names)
+        if isinstance(known_names, (set, frozenset, list, tuple))
+        else frozenset()
+    )
+    if _is_grammar_approval(text, toks, known):
         return ApprovalCue.EXPLICIT_YES
     if any(t in _FORWARD for t in toks):
         return ApprovalCue.QUOTED
@@ -627,7 +669,7 @@ def create_scope(
             reasons.append("approver must differ from the task owner and creator")
         if approval_source not in APPROVAL_SOURCES:
             reasons.append("approval source is not an accepted channel")
-        cue = classify_approval(approval_text)
+        cue = classify_approval(approval_text, name_parts(approver))
         if cue is not ApprovalCue.EXPLICIT_YES:
             reasons.append(f"approval is not an explicit yes ({cue.value})")
         if reasons:

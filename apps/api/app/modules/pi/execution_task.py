@@ -36,6 +36,7 @@ from app.modules.pi.execution_scope import (
     ApprovedScope,
     classify_approval,
     ident,
+    name_parts,
     named_person,
     seal_mac,
 )
@@ -487,13 +488,67 @@ def action_sha(action: ActionRequest) -> str:
     return hashlib.sha256(body.encode("utf-8")).hexdigest()
 
 
+def _luhn(digits: str) -> bool:
+    total = 0
+    for i, ch in enumerate(reversed(digits)):
+        d = int(ch)
+        if i % 2:
+            d *= 2
+            if d > 9:
+                d -= 9
+        total += d
+    return total % 10 == 0
+
+
+def _card_shaped(d: str) -> bool:
+    """13 to 19 digits that look like a payment card: a known network prefix with its length, or a valid Luhn sum."""
+    n = len(d)
+    if not 13 <= n <= 19 or not d.isascii() or not d.isdigit():
+        return False
+    p2, p4 = int(d[:2]), int(d[:4])
+    if d[0] == "4" and n in (13, 16, 19):
+        return True
+    if (51 <= p2 <= 55 or 2221 <= p4 <= 2720) and n == 16:
+        return True
+    if p2 in (34, 37) and n == 15:
+        return True
+    if (
+        d.startswith("6011")
+        or p2 == 65
+        or 644 <= int(d[:3]) <= 649
+        or p2 == 62
+        or 3528 <= p4 <= 3589
+    ) and n >= 16:
+        return True
+    return _luhn(d)
+
+
+def _split_card(chunks: list[str]) -> bool:
+    """A card number spread over adjacent numeric values: windows of up to 6 neighbouring chunks of 4 or
+    more digits whose joined digits are 13 to 19 long and card-shaped. Unrelated small numbers do not count."""
+    for i in range(len(chunks)):
+        joined = ""
+        for j in range(i, min(i + 6, len(chunks))):
+            if len(chunks[j]) < 4:
+                break
+            joined += chunks[j]
+            if len(joined) > 19:
+                break
+            if 13 <= len(joined) and _card_shaped(joined):
+                return True
+    return False
+
+
 def _param_issue(obj: Any) -> str | None:
     """Bounded walk: no secrets, card numbers or oversize payloads in action parameters. Leaves are
-    collected in document order so a card split across two values (or a key and a value) is still seen:
-    the joined record is screened as one text, and the digits of all mostly-numeric leaves are summed."""
+    collected in document order. String leaves are screened one by one for card digit runs (any separators)
+    and, joined, for secret disclosures that straddle values; mostly-numeric leaves (text or numbers) are
+    checked for a card number split across neighbours. A sibling of a value that is itself a secret word
+    ({'label': 'password', 'value': 'x'}) is treated as secret."""
     stack: list[tuple[Any, int]] = [(obj, 0)]
     nodes = chars = 0
-    leaves: list[str] = []
+    strings: list[str] = []
+    numeric: list[str] = []
     while stack:
         cur, depth = stack.pop()
         nodes += 1
@@ -501,10 +556,23 @@ def _param_issue(obj: Any) -> str | None:
             return "action parameters are too large or too deep"
         if isinstance(cur, Mapping):
             pairs = list(cur.items())
-            for k, _v in pairs:
+            for k, v in pairs:
                 if not isinstance(k, str):
                     return "parameter names must be text"
-                if audit.secret_key_name(k):
+                if audit.secret_key_name(k, v):
+                    return "action parameters carry card, password or ID data"
+            scalars = [
+                v
+                for _k, v in pairs
+                if isinstance(v, (str, int, float)) and not isinstance(v, bool) and str(v).strip()
+            ]
+            for _k, v in pairs:
+                if (
+                    isinstance(v, str)
+                    and len(v) <= 40
+                    and audit.secret_key_name(v)
+                    and len(scalars) > 1
+                ):
                     return "action parameters carry card, password or ID data"
             for k, v in reversed(pairs):
                 stack.append((v, depth + 1))
@@ -515,22 +583,19 @@ def _param_issue(obj: Any) -> str | None:
             chars += len(cur)
             if chars > MAX_PARAM_CHARS:
                 return "action parameters are too large or too deep"
-            if audit.has_card_like(cur, 13) or audit.looks_secret(cur):
+            if audit.has_card_like(cur, 13) and not audit.is_uuid(cur):
                 return "action parameters carry card, password or ID data"
-            leaves.append(cur)
+            strings.append(cur)
+            digits = "".join(c for c in cur if c.isdigit())
+            if digits and len(digits) * 5 >= len(cur) * 4:
+                numeric.append(digits)
         elif isinstance(cur, (int, float)) and not isinstance(cur, bool):
-            leaves.append(str(abs(cur)))
+            numeric.append("".join(c for c in str(abs(cur)) if c.isdigit()))
         elif not isinstance(cur, bool) and cur is not None:
             return "action parameters must be plain data"
-    joined = " ".join(leaves)
-    if audit.has_card_like(joined, 13) or audit.looks_secret(joined):
+    if audit.looks_secret(" ".join(strings)):
         return "action parameters carry card, password or ID data"
-    numeric_digits = 0
-    for leaf in leaves:
-        d = sum(1 for c in leaf if c.isdigit())
-        if d and d * 5 >= len(leaf) * 4:
-            numeric_digits += d
-    if numeric_digits >= 13:
+    if _split_card(numeric):
         return "action parameters carry card, password or ID data"
     return None
 
@@ -653,7 +718,7 @@ def _action_approval_issue(
                 return "this action approval was already used"
         except TypeError:
             return "consumed approvals are malformed"
-    if classify_approval(ap.approval_text) is not ApprovalCue.EXPLICIT_YES:
+    if classify_approval(ap.approval_text, name_parts(ap.approver)) is not ApprovalCue.EXPLICIT_YES:
         return "the action approval is not an explicit yes"
     if ap.action_sha != action_sha(action):
         return "the action approval refers to a different action"

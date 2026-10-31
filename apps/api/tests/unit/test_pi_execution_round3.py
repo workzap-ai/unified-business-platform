@@ -376,7 +376,6 @@ TRUE = [
     "أوافق على هذا",
     "أعطيك الموافقة",
     "أصرح لك بالبدء",
-    "I approve, Ahmed Khan",
     "Approved - Sara",
     "Go ahead, thanks Ahmed",
     "Thanks, I approve",
