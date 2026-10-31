@@ -1434,6 +1434,7 @@ def test_a_real_object_after_a_money_verb_is_still_a_rule() -> None:
 def test_mutation_without_the_vague_list_the_vague_limit_would_be_a_rule(monkeypatch) -> None:
     relevance_match._rules_cached.cache_clear()
     monkeypatch.setattr(relevance_match, "_VAGUE", set())
+    monkeypatch.setattr(relevance_match, "_GENERIC_NOUNS", set())
     try:
         rules = relevance_match.parse_rules("cannot afford much", None, relevance._full_stems)
         assert rules, "the vague-object guard is what stops this rule"
@@ -1479,3 +1480,142 @@ def test_on_is_a_preposition_not_a_particle_so_close_on_sundays_is_still_a_close
     assert full("we cannot close on Sundays", "Close early on Sunday")["verdict"] == (
         "violates_constraint"
     )
+
+
+# ------------------------------------------------------------- seventh round
+
+ANY_IDEA = "buy a tracking system costing 90000 rupees to cut late orders"
+
+
+@pytest.mark.parametrize(
+    "text",
+    [
+        "we cannot afford anything expensive",
+        "cannot afford anything big",
+        "cannot afford anything fancy",
+        "cannot afford anything costly",
+        "cannot afford anything premium",
+        "cannot buy anything expensive",
+        "cannot afford luxuries",
+        "cannot afford big changes",
+        "cannot handle complex tools",
+        "cannot use anything new",
+        "cannot change much",
+        "can't spend a lot of money",
+        "cannot take on more work",
+        "cannot afford more",
+        "cannot spend extra",
+        "we cannot afford cheap stuff",
+        "we cannot buy new things",
+        "cannot afford small items",
+        "cannot afford luxurious things",
+        "cannot handle complicated work",
+        "cannot afford anything old",
+    ],
+)
+def test_an_object_with_no_concrete_noun_leaves_the_limit_unreadable(text) -> None:
+    assert relevance_match.parse_rules(text, None, relevance._full_stems) == [], text
+    got = full(text, ANY_IDEA, "budget")
+    assert got["verdict"] == "unknown" and got["unknown_reason"] == "limit_not_understood", text
+
+
+@pytest.mark.parametrize(
+    "text,language",
+    [
+        ("hum mehnga kuch nahi kharid sakte", "roman_ur"),
+        ("hum naya kaam nahi le sakte", "roman_ur"),
+        ("hum bohat paisa nahi de sakte", "roman_ur"),
+        ("hum bari tabdeeli nahi kar sakte", "roman_ur"),
+    ],
+)
+def test_roman_urdu_objects_of_the_same_classes_stay_unreadable(text, language) -> None:
+    got = full(text, "naya tracking system 90000 rupees mein lagayein", "budget", language)
+    assert got["verdict"] == "unknown", text
+
+
+@pytest.mark.parametrize(
+    "text",
+    [
+        "ہم مہنگا کچھ نہیں خرید سکتے",
+        "हम महंगा कुछ नहीं खरीद सकते",
+        "لا نستطيع شراء شيء غالي",
+    ],
+)
+def test_urdu_hindi_and_arabic_limits_of_those_classes_are_unknown(text) -> None:
+    for language in ("ur", "hi", "ar", None):
+        assert full(text, ANY_IDEA, "budget", language)["verdict"] == "unknown", text
+
+
+@pytest.mark.parametrize(
+    "text,bad,good",
+    [
+        ("we cannot afford a booking app", "Buy a booking app", "Use a paper sheet"),
+        ("we cannot hire new staff", "Hire a part-time clerk", "Train the staff we have"),
+        ("we cannot close on Sundays", "Close early on Sunday", "Open a stall on Sunday"),
+        ("we cannot hire anyone", "Hire a rider", "Train the rider we have"),
+        ("we cannot buy anything", "Buy a tablet", "Rent a tablet"),
+        ("we cannot cut anything", "Cut the evening shift", "Add a cute mascot"),
+        ("we cannot afford new equipment", "Buy a new oven", "Repair the old oven"),
+        ("we cannot use cash", "Use cash at the door", "Use a card"),
+        ("we cannot afford big staff costs", "Hire three more staff", "Train the staff"),
+        ("we cannot change the delivery route", "Change the delivery route", "Add a stop"),
+        ("we cannot lose any customers", "Lose the unhappy customers", "Call quiet customers"),
+    ],
+)
+def test_a_concrete_noun_keeps_the_rule_working(text, bad, good) -> None:
+    assert full(text, bad)["verdict"] == "violates_constraint", bad
+    assert full(text, good)["verdict"] != "violates_constraint", good
+
+
+def test_mutation_without_the_class_lists_the_vague_limits_would_be_rules(monkeypatch) -> None:
+    relevance_match._rules_cached.cache_clear()
+    monkeypatch.setattr(relevance_match, "_ADJECTIVES", set())
+    monkeypatch.setattr(relevance_match, "_GENERIC_NOUNS", set())
+    monkeypatch.setattr(relevance_match, "_ADJECTIVE_ENDINGS", ("zzzz",))
+    try:
+        for text in (
+            "cannot afford anything expensive",
+            "cannot take on more work",
+            "cannot handle complex tools",
+            "can't spend a lot of money",
+        ):
+            relevance_match._rules_cached.cache_clear()
+            assert relevance_match.parse_rules(text, None, relevance._full_stems), text
+    finally:
+        relevance_match._rules_cached.cache_clear()
+
+
+@pytest.mark.parametrize(
+    "word,kind",
+    [
+        ("expensive", "adj"),
+        ("costly", "adj"),
+        ("premium", "adj"),
+        ("fancy", "adj"),
+        ("luxuries", "generic"),
+        ("changes", "generic"),
+        ("tools", "generic"),
+        ("work", "generic"),
+        ("money", "generic"),
+        ("things", "generic"),
+        ("stuff", "generic"),
+        ("anything", "universal"),
+        ("much", "generic"),
+        ("lots", "generic"),
+        ("destructive", "ending"),
+        ("wonderful", "ending"),
+        ("reliable", "ending"),
+        ("careless", "ending"),
+        ("famous", "ending"),
+        ("childish", "ending"),
+    ],
+)
+def test_non_concrete_classes_are_matched_by_class_not_only_by_string(word, kind) -> None:
+    assert relevance_match._non_concrete(word), (word, kind)
+
+
+@pytest.mark.parametrize(
+    "word", ["staff", "app", "oven", "cash", "equipment", "sundays", "family", "prices", "van"]
+)
+def test_concrete_nouns_are_not_in_the_non_concrete_classes(word) -> None:
+    assert not relevance_match._non_concrete(word), word

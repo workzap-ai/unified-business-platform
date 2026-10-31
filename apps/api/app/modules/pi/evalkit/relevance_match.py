@@ -744,7 +744,61 @@ _VAGUE = {
     "\u0634\u064a\u0621", "\u0634\u064a\u0626\u0627", "\u0643\u0644",
 }  # fmt: skip
 _OBJECT_SMALL = {"a", "an", "the", "of", "to", "for", "it", "this", "that", "so", "very", "too",
-                 "our", "my", "we", "at", "all", "hum", "ko"}  # fmt: skip
+                 "our", "my", "we", "at", "all", "hum", "ko", "on", "in", "with", "by", "from",
+                 "than", "and", "or", "is", "are", "be"}  # fmt: skip
+# 'anything', 'anyone': a universal object. 'cannot hire anyone' forbids the verb, so it stays a
+# rule; with an adjective or a generic noun after it ('anything expensive') it says nothing.
+_UNIVERSAL = {"anything", "anyone", "anybody", "everything", "everyone", "everybody", "any",
+              "someone", "something", "somebody"}  # fmt: skip
+# adjectives and determiners: they describe a thing but name none
+_ADJECTIVES = {
+    "expensive", "costly", "cheap", "pricey", "big", "small", "large", "huge", "tiny", "fancy",
+    "premium", "luxurious", "new", "old", "complex", "complicated", "simple", "modern",
+    "advanced", "good", "better", "best", "bad", "poor", "high", "low", "heavy", "light",
+    "extra", "additional", "other", "another", "same", "different", "special", "major", "minor",
+    "various", "certain", "whole", "entire", "such", "own", "free", "full", "real", "fresh",
+    "mehnga", "mehngi", "mehnge", "sasta", "sasti", "saste", "bara", "bari", "bare", "chota",
+    "chhota", "choti", "chhoti", "naya", "nayi", "naye", "purana", "purani", "purane",
+    "mushkil", "khaas", "alag",
+    "\u0645\u06c1\u0646\u06af\u0627", "\u0633\u062a\u0627", "\u0628\u0691\u0627",
+    "\u0686\u06be\u0648\u0679\u0627", "\u0646\u06cc\u0627", "\u067e\u0631\u0627\u0646\u0627",
+    "\u092e\u0939\u0902\u0917\u093e", "\u0938\u0938\u094d\u0924\u093e", "\u092c\u095c\u093e",
+    "\u091b\u094b\u091f\u093e", "\u0928\u092f\u093e", "\u092a\u0941\u0930\u093e\u0928\u093e",
+    "\u063a\u0627\u0644\u064a", "\u0643\u0628\u064a\u0631", "\u0635\u063a\u064a\u0631",
+    "\u062c\u062f\u064a\u062f", "\u0642\u062f\u064a\u0645", "\u0631\u062e\u064a\u0635",
+}  # fmt: skip
+# nouns that name no particular thing: what a limit about them can say is not matchable
+_GENERIC_NOUNS = {
+    "work", "works", "job", "jobs", "money", "funds", "fund", "cost", "costs", "expense",
+    "expenses", "spending", "change", "changes", "tool", "tools", "thing", "things", "item",
+    "items", "resource", "resources", "time", "effort", "efforts", "way", "ways", "option",
+    "options", "luxury", "luxuries", "amount", "amounts", "investment", "investments",
+    "purchase", "purchases", "activity", "activities", "task", "tasks", "process", "processes",
+    "stuff", "lot", "lots", "alot", "much", "more", "many", "less", "little", "enough",
+    "anymore", "extras", "problem", "problems", "issue", "issues", "situation", "matter",
+    "kaam", "paisa", "paise", "paisay", "tabdeeli", "kharcha", "kharch", "mushkilat",
+    "\u06a9\u0627\u0645", "\u067e\u06cc\u0633\u06d2", "\u0686\u06cc\u0632",
+    "\u0686\u06cc\u0632\u06cc\u06ba", "\u062a\u0628\u062f\u06cc\u0644\u06cc",
+    "\u0915\u093e\u092e", "\u092a\u0948\u0938\u093e", "\u092a\u0948\u0938\u0947",
+    "\u091a\u0940\u091c\u093c", "\u091a\u0940\u091c\u0947\u0902", "\u092c\u0926\u0932\u093e\u0935",
+    "\u0639\u0645\u0644", "\u0645\u0627\u0644", "\u0623\u0634\u064a\u0627\u0621",
+    "\u062a\u063a\u064a\u064a\u0631",
+}  # fmt: skip
+_ADJECTIVE_ENDINGS = ("ive", "ous", "ful", "able", "ible", "ish", "less")
+
+
+def _non_concrete(word: str) -> bool:
+    """The word is a quantifier, determiner, adjective or generic noun, not a thing an idea could
+    name. Plurals and the endings -ive, -ous, -ful, -able, -ible, -ish, -less count as their
+    kind."""
+    if word in _VAGUE or word in _UNIVERSAL or word in _ADJECTIVES or word in _GENERIC_NOUNS:
+        return True
+    one = english_plural(word)
+    if one in _ADJECTIVES or one in _GENERIC_NOUNS:
+        return True
+    return len(word) > 5 and word.endswith(_ADJECTIVE_ENDINGS)
+
+
 _NOT_A_VERB = {"be", "have", "do", "go", "get"}
 # 'cannot lose X', 'cannot risk X': a stated goal, not a prohibition on ideas that name X
 _GOAL_VERBS = {"lose", "miss", "risk", "waste", "delay", "harm", "afford"}
@@ -865,15 +919,23 @@ def _parse_rules(limit_text: str, language: str | None, stems_of: StemsOf) -> tu
         if not ru and not last and first and first[0] in _PARTICLES:
             particle, obj = first[0], (first[1] if len(first) > 1 else "")
         words = _object_words(obj, last)
-        vague_words = bool(words) and all(w in _VAGUE for w in words)
-        empty_money = not words and (stem in money_only or stem in goal)
-        if empty_money or (vague_words and (ru or stem in money_only or stem in goal)):
-            # 'cannot afford much', 'unable to spend more', 'cannot lose much': nothing to match
-            # ('cannot buy anything' is different: it forbids the verb, so it stays a rule)
-            return
+        if not any(not _non_concrete(w) for w in words):
+            # No concrete noun in the object. 'cannot hire anyone' and 'we cannot close' forbid the
+            # verb itself and stay rules; 'cannot afford much', 'unable to spend more', 'cannot
+            # afford anything expensive', 'cannot take on more work' name nothing an idea could
+            # use, so the limit stays unreadable ('unknown').
+            plain_verb = stem not in money_only and stem not in goal
+            verb_only = plain_verb and (
+                not words or (not ru and all(w in _UNIVERSAL for w in words))
+            )
+            if not verb_only:
+                return
         objects = _object_stems(obj, language, stems_of, last)
         if any(any(ch.isdigit() for ch in o) for o in objects):
             return  # a figure in the limit is compared as a number, not as a word
+        concrete = [w for w in words if not _non_concrete(w)]
+        if concrete:  # only the concrete nouns are matched: 'big staff costs' is 'staff'
+            objects = frozenset(stems_of(" ".join(concrete), language))
         aliases = frozenset().union(*(hyper.get(o, set()) for o in objects))
         if stem in goal and not (stem == afford and objects & (purchasable | set(hyper))):
             if not objects:
