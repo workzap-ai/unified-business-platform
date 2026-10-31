@@ -750,3 +750,52 @@ def test_hindi_done_wording_flagged_and_guarded():
     assert st(review(d), "SR-16") == FAIL
     d = DraftResult(owner_language="hi", reply_text="जब यह हो गया तो हम जाँच करेंगे। क्या ठीक है?")
     assert st(review(d), "SR-16") == PASS
+
+
+# ---------------------------------------------------------------- tests added for mutation survivors
+
+
+def test_warnings_hold_only_noncritical_failures_and_reasons_only_blocking():
+    d = replace(m_sr03(base("en"), "en", 3), reply_text=f"{DONE['en'][0]} {QUESTION['en']}")
+    r = review(d)
+    assert any(w.startswith("SR-03") for w in r.warnings)
+    assert not any(w.startswith("SR-16") for w in r.warnings)
+    assert all(not x.startswith("SR-03") for x in r.reasons)
+
+
+def test_next_action_names_the_option_only_for_drop_and_rewrite():
+    r = review(m_sr10(base("en"), "en", 0))
+    assert r.repair_code == "drop_option" and "(o1)" in r.next_actions[0]
+    r = review(m_sr09(base("en"), "en", 4))
+    assert r.repair_code == "label_unknown" and "(" not in r.next_actions[0]
+    r = review(m_sr13(base("en"), "en", 0))
+    assert r.repair_code == "rewrite_reply" and r.next_actions[0].startswith(
+        "rewrite the reply in "
+    )
+
+
+def test_fallback_group_default_depends_on_verdict():
+    from app.modules.pi.self_review_types import ReviewReport
+
+    blocked = ReviewReport((), BLOCKED, (), ())
+    incomplete = ReviewReport((), INCOMPLETE, (), ())
+    assert owner_safe_fallback(blocked, "en") == fallback_templates()["constraints"]["en"]
+    assert owner_safe_fallback(incomplete, "en") == fallback_templates()["detail"]["en"]
+
+
+def test_declared_reply_language_is_never_trusted_alone():
+    d = DraftResult(owner_language="en", reply_text="ok 123", reply_language="ur")
+    assert st(review(d), "SR-13") == FAIL
+    d = DraftResult(owner_language="en", reply_text="ok 123", reply_language="en")
+    assert st(review(d), "SR-13") == UNKNOWN
+
+
+def test_jargon_threshold_is_two_words():
+    one = DraftResult(
+        owner_language="en", reply_text="We can track the kpi with you. Is that fine?"
+    )
+    two = DraftResult(
+        owner_language="en", reply_text="We can track the kpi and roi with you. Is that fine?"
+    )
+    assert st(review(one), "SR-14") == PASS
+    assert st(review(two), "SR-14") == FAIL
