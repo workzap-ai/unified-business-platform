@@ -3420,10 +3420,12 @@ async def brain_expert_diagnosis(
 
 
 NO_IDEA_LINES = {  # noqa: E501
-    "en": "Yes. I don't have a quick idea for this one that I can give here. What have you tried so far?",  # noqa: E501
-    "roman_ur": "Ji. Is ke liye mere paas abhi koi chhota idea nahi jo yahan de sakun. Ab tak aap ne kya aazmaya hai?",  # noqa: E501
-    "ur": "جی۔ اس کے لیے میرے پاس ابھی کوئی مختصر خیال نہیں جو یہاں دے سکوں۔ اب تک آپ نے کیا آزمایا ہے؟",  # noqa: E501
-    "ar": "نعم. ليست لدي فكرة سريعة لهذه المشكلة يمكنني تقديمها هنا. ما الذي جربته حتى الآن؟",  # noqa: E501
+    # Sentence one answers a direct "what can you do about it?" (spec 17.5, EO3, v1.6 19.3): pi can
+    # work on it with them, and honestly has no quick idea yet; then at most one question.
+    "en": "I can work through this with you, though I have no quick idea to give yet. What have you tried so far?",  # noqa: E501
+    "roman_ur": "Is par saath mil kar kaam ho sakta hai, lekin abhi mere paas koi chhota idea nahi. Ab tak aap ne kya aazmaya hai?",  # noqa: E501
+    "ur": "اس پر مل کر کام ہو سکتا ہے، لیکن ابھی میرے پاس کوئی مختصر خیال نہیں۔ اب تک آپ نے کیا آزمایا ہے؟",  # noqa: E501
+    "ar": "يمكننا العمل على هذا معا، لكن ليست لدي فكرة سريعة الآن. ما الذي جربته حتى الآن؟",  # noqa: E501
 }
 
 
