@@ -155,6 +155,11 @@ _REASON_CODES: tuple[tuple[str, Code], ...] = (
     ("no-budget limit names something else", Code.LIMIT_VAGUE),  # L2-1 round 4
     ("the limit does not say only", Code.LIMIT_VAGUE),  # L2-1 round 4
     ("of the stated limit were not read", Code.LIMIT_VAGUE),  # L2-1 round 4
+    ("the limit names no subject this check can read", Code.LIMIT_VAGUE),  # L2-1 round 8
+    ("the option changes something this check cannot identify", Code.OPTION_EXPANDS),
+    ("no safe verb is what acts on it", Code.VERB_UNENFORCED),
+    ("no verb it recognises leaves it as it is", Code.VERB_UNENFORCED),
+    ("the owner has no budget and nothing shows", Code.BUDGET_NOT_STATED),
     ("too long to be read", Code.OPTION_TOO_LONG),
     ("the option text is empty", Code.OPTION_EMPTY),
     ("the option is not text", Code.OPTION_NOT_TEXT),

@@ -357,6 +357,16 @@ def said_by_owner(words: list[str], corpus: str | None) -> bool:
     return bool(clauses) and bool(used) and all(_endorsed(w, clauses) for w in used)
 
 
+def words_in_owner_message(words: list[str], corpus: str | None) -> bool:
+    """True only when there is at least one usable word and EVERY one occurs, as whole words, in
+    `corpus`, the owner's own message. This is the plain "the owner wrote these words" check an
+    option's evidence needs (L2-3); a CAUSE needs the stricter `said_by_owner` (the owner's own
+    claim, not a question or a hypothetical). No corpus: always False (fail closed)."""
+    heard = _squash(corpus)
+    used = [_squash(w) for w in usable_words(words)]
+    return bool(heard) and bool(used) and all(_heard(w, heard) for w in used)
+
+
 def merge_cause(
     old: dict[str, Any] | None,
     text: str,

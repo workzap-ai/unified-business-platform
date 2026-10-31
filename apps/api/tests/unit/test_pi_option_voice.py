@@ -24,7 +24,7 @@ PROBLEMS = [
         "group": "orders_fulfilment",
     }
 ]
-LINKED = "Message each buyer when the parcel leaves with the courier tracking line, so the buyer expects it."
+LINKED = "Keep a list of refused parcels with the reason, so you see why they come back."
 VIOLATING = "Change the courier to a faster one."
 UNLINKED = "Repaint the shop signboard in a brighter colour."
 GENERIC = "Use better software to improve your business."

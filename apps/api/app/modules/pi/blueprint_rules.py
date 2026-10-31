@@ -136,7 +136,7 @@ def _claims(option: bm.Option) -> list[str]:
 # --- owner evidence ------------------------------------------------------------------------------
 
 
-def _ref_verified(ref: Any, owner_messages: OwnerMessages | None) -> bool:
+def _ref_verified(ref: Any, owner_messages: OwnerMessages | None, *, strict: bool = False) -> bool:
     """The ref is the owner's, names a message and carries words and, when the owner's messages are
     known by id, that message is one of them and the words are whole words of it. Without the
     owner's messages only the `verified` flag set by `verify_option` can stand in for the check."""
@@ -146,7 +146,8 @@ def _ref_verified(ref: Any, owner_messages: OwnerMessages | None) -> bool:
         return ref.verified is True and bm.is_sealed(ref)
     try:
         said = owner_messages.get(ref.msg)
-        return isinstance(said, str) and pf.said_by_owner(list(bm.seq(ref.words)), said)
+        check = pf.said_by_owner if strict else pf.words_in_owner_message  # a cause needs the claim
+        return isinstance(said, str) and check(list(bm.seq(ref.words)), said)
     except Exception:  # an owner_messages that is not a usable mapping proves nothing
         return False
 
@@ -504,7 +505,7 @@ def _rule_evidence(option: bm.Option, ctx: _Ctx) -> list[Issue]:
                 ref.claimed
                 and ref.role == "owner"
                 and not _non_owner_id(ref.msg)
-                and pf.said_by_owner(list(ref.words), ctx.owner_text)
+                and pf.words_in_owner_message(list(ref.words), ctx.owner_text)
             )
         if not ok:
             bad.append(Issue("OPT-EVIDENCE", option.id, ref.msg))
@@ -749,7 +750,7 @@ def _cause_unsupported(
         return []
     proof = list(bm.seq(cause.evidence_for))
     if owner is not None:
-        proven = bool(proof) and all(_ref_verified(e, owner) for e in proof)
+        proven = bool(proof) and all(_ref_verified(e, owner, strict=True) for e in proof)
     else:
         proven = bool(proof) and all(
             isinstance(e, bm.Evidence) and pf.said_by_owner(list(bm.seq(e.words)), owner_text)

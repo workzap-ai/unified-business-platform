@@ -56,18 +56,24 @@ def _evidence(
     for v in views:
         if not v.get("quotes"):
             continue
-        tokens = [w for w in re.findall(r"\w+", v["quotes"][0]) if len(w) >= 3]
-        windows = [tuple(tokens[i : i + 3]) for i in range(max(1, len(tokens) - 2))][:8]
-        windows += [tuple(tokens[i : i + 2]) for i in range(max(1, len(tokens) - 1))][:8]
-        if len(tokens) == 1:  # one word is evidence only when that is all the owner said
-            windows = [(tokens[0],)]
+
+        def windows_of(text: str) -> list[tuple[str, ...]]:
+            tokens = [w for w in re.findall(r"\w+", text) if len(w) >= 3]
+            if len(tokens) == 1:  # one word is evidence only when that is all there is
+                return [(tokens[0],)]
+            wide = [tuple(tokens[i : i + 3]) for i in range(max(1, len(tokens) - 2))][:8]
+            return wide + [tuple(tokens[i : i + 2]) for i in range(max(1, len(tokens) - 1))][:8]
+
+        # the stored words first; a quote that is only a figure ("About 25 of them") has no word
+        # that counts, so the problem's own title words are tried against the owner's messages
+        windows = windows_of(v["quotes"][0]) + windows_of(str(v.get("title") or ""))
         first = [m for m in (v.get("msgs") or []) if m in (owner_messages or {})]
         order = first + [m for m in (owner_messages or {}) if m not in first]
         found: tuple[str, tuple[str, ...]] | None = None
         for mid in order:
             text = (owner_messages or {}).get(mid, "")
             for window in windows:
-                if window and pf.said_by_owner(list(window), text):
+                if window and pf.words_in_owner_message(list(window), text):
                     found = (mid, window)
                     break
             if found:
