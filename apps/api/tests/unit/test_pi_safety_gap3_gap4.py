@@ -4,10 +4,6 @@ ordinary business text that must not trip them (retailers, fire-safety trade, st
 Fire is life-safety: when unsure, the emergency must fire. Quiet is only for text that is clearly
 past, hypothetical or an insurance claim."""
 
-import importlib.util
-import subprocess
-from pathlib import Path
-
 import pytest
 
 from app.modules.pi import safety
@@ -145,33 +141,144 @@ def test_ordinary_text_is_not_advice(text):
     assert safety.advice_asked(text) is None
 
 
-def _parent_safety():
-    """safety.py as committed in 7ea978f (before the life-safety audit fixes)."""
-    root = Path(__file__).resolve().parents[2]
-    try:
-        src = subprocess.run(
-            ["git", "show", "7ea978f:apps/api/app/modules/pi/safety.py"],
-            cwd=root,
-            capture_output=True,
-            check=True,
-        ).stdout.decode("utf-8")
-    except (OSError, subprocess.CalledProcessError):
-        pytest.skip("commit 7ea978f is not available here")
-    spec = importlib.util.spec_from_loader("safety_parent", loader=None)
-    module = importlib.util.module_from_spec(spec)
-    exec(compile(src, "safety_parent.py", "exec"), module.__dict__)
-    return module
+# Strings from the third audit, with the result verified by running them.
+AUDIT_FIRE_YES = [
+    ("please come, aag lag gayi in the shop", "fire"),
+    ("aag lag gayi in our godown we need to leave", "fire"),
+    ("the godown mein aag lag gayi", "fire"),
+    ("godown mein aag lag gayi please come to help", "fire"),
+    ("mere ghar mein aag lag gayi thi, bacchay andar hain", "fire"),
+    ("godown mein aag lag gayi thi bhai andar hai", "fire"),
+    ("godown mein aag lag gayi thi aur mazdoor andar hain", "fire"),
+    ("emergency hai, godown mein aag lag gayi thi", "fire"),
+    ("help! godown mein aag lag gayi thi", "fire"),
+    ("aag lag gayi agar jaldi na aaye to sab jal jayega", "fire"),
+    ("log andar phas gaye", "generic"),
+    ("andar fas gaye", "generic"),
+    ("aag laga hai", "fire"),
+    ("aag laga", "fire"),
+    ("aag lg gayi", "fire"),
+    ("aag lag gaii", "fire"),
+    ("aag lag geyi", "fire"),
+    ("aag lag gye", "fire"),
+    ("aag lag ga", "fire"),
+    ("aag achanak lag gayi", "fire"),
+    ("aag dukan mein lag gayi hai", "fire"),
+    ("aag to lag gayi", "fire"),
+    ("fire lag gayi hai", "fire"),
+    ("fire ho gayi hai", "fire"),
+    ("dukan jal rahi hai", "fire"),
+    ("jalne laga", "fire"),
+    ("jal gaya", "fire"),
+    ("ghar mein aag hai", "fire"),
+    ("kitchen mein aag hai", "fire"),
+    ("mill mein aag hai", "fire"),
+    ("yahan aag hai", "fire"),
+    ("kal aag lag gayi thi, bacha hua maal bechna hai", "fire"),
+]
+
+AUDIT_FIRE_NO = [
+    "aag lagne wali cheezein ka quote chahiye",
+    "pichle mahine aag lag gayi thi, ab claim file karna hai",
+    "pichle saal showroom mein aag lag gayi thi, insurance claim karna hai",
+    "agar aag lag gayi to claim milega?",
+    "aag lag gayi to extinguisher kaam karega?",
+    "agar aag lag jaye to insurance cover karegi?",
+    "dukan mein aag se bachao ka extinguisher quote chahiye",
+    "gaari mein aag bujhane ka system chahiye",
+    "godown mein aag alarm lagwana hai",
+    "aag par chulha rakhna hai, stove ka quote chahiye",
+]
+
+AUDIT_ADVICE_YES = [
+    ("which medicine should I buy for my headache", "medical"),
+    ("which tablet should I take, I keep getting fever", "medical"),
+    ("which medicine should I take for my back pain from standing in the shop all day", "medical"),
+    ("which tablet should I take, I put on weight", "medical"),
+    ("is this legal notice valid", "legal"),
+    ("is this legal document enforceable", "legal"),
+    ("is that legal paper binding in court", "legal"),
+    ("which tablet should I take", "medical"),
+    ("which medicine should my child take", "medical"),
+]
+
+AUDIT_ADVICE_NO = [
+    "is it legal size paper?",
+    "is this legal size paper in stock",
+    "is this legal pad ruled",
+    "which medicine do you stock",
+    "which tablet do you sell",
+    "which drug do you recommend for the pharmacy",
+    "which medicine should we stock for the pharmacy",
+    "which supplement should I stock for my gym members to take",
+    "which vitamins can I give my customers as a free sample",
+    "which protein powder should we recommend for my customers",
+    "what supplement should we put on the shelf for my gym members",
+    "which supplements do you stock",
+]
 
 
-def test_the_audit_cases_were_wrong_on_the_previous_commit():
-    parent = _parent_safety()
-    # live fires the whole-message marker search hid
-    for text in (
-        "jab main wahan pohcha aag lag gayi thi aur log andar hain",
-        "insurance wale aaye hain, godown mein aag lag rahi",
-        "dukan mein aag lag gya",
-    ):
-        assert parent.emergency(text) is None, text
-    # retailer questions the old medicine pattern turned into a refusal
-    assert parent.advice_asked("which medicine do you stock").value == "medical"
-    assert parent.advice_asked("which tablet do you sell").value == "medical"
+@pytest.mark.parametrize(("text", "kind"), AUDIT_FIRE_YES)
+def test_audit_fire_fires(text, kind):
+    assert safety.emergency(text).value == kind
+
+
+@pytest.mark.parametrize("text", AUDIT_FIRE_NO)
+def test_audit_fire_text_stays_quiet(text):
+    assert safety.emergency(text) is None
+
+
+@pytest.mark.parametrize(("text", "kind"), AUDIT_ADVICE_YES)
+def test_audit_advice_asked(text, kind):
+    assert safety.advice_asked(text).value == kind
+
+
+@pytest.mark.parametrize("text", AUDIT_ADVICE_NO)
+def test_audit_advice_not_asked(text):
+    assert safety.advice_asked(text) is None
+
+
+def test_a_salvage_message_after_a_fire_still_gets_the_emergency_reply():
+    # decided: with no insurance/claim/period marker a past fire is treated as an emergency
+    # ("when in doubt it fires"); with a claim marker the flow stays quiet.
+    assert safety.emergency("kal aag lag gayi thi, bacha hua maal bechna hai") is not None
+    assert safety.emergency("pichle mahine aag lag gayi thi, ab claim file karna hai") is None
+
+
+def test_to_and_the_in_a_mixed_language_message_do_not_hide_a_fire():
+    assert safety.emergency("godown mein aag lag gayi please come to help") is not None
+    assert safety.emergency("the godown mein aag lag gayi") is not None
+
+
+@pytest.mark.parametrize(
+    "text",
+    [
+        "aag lag gayi",
+        "aag",
+        "Aag!",
+        "aag aag",
+        "fire",
+        "fire!",
+        "dhuan",
+        "dhuan dhuan",
+        "jal gaya",
+        "aag lagi thi",
+        "aag lag gayi thi",
+        "kal aag lag gayi",
+        "agar aag lag jaye",
+    ],
+)
+def test_ambiguous_fire_messages_are_never_quiet(text):
+    assert safety.emergency(text) is not None
+
+
+@pytest.mark.parametrize(
+    "text",
+    [
+        "fire extinguisher",
+        "fire insurance",
+        "dhuan nikalne ka pankha chahiye",
+    ],
+)
+def test_a_trade_phrase_with_a_fire_word_is_not_a_bare_cry(text):
+    assert safety.emergency(text) is None
