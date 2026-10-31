@@ -539,12 +539,18 @@ class ProblemBook:
         heard = [_stems(c) for c in clauses]
         everything = set().union(*heard) if heard else set()
         kept: list[dict[str, Any]] = []
-        for item in items:
-            what = _stems(str(item.get("what") or ""))
-            support = [c for c, h in zip(clauses, heard, strict=True) if _backed(what, h)]
+        whats = [_stems(str(item.get("what") or "")) for item in items]
+        mentions = [lambda text, w=w: _backed(w, _stems(text)) for w in whats]
+        reading = tried_outcome.owner_clauses_with_followups(owner_text)
+        per_reading = [tried_outcome.item_outcomes(c, mentions) for c in reading]
+        per_clause = [tried_outcome.item_outcomes(c, mentions) for c in clauses]
+        for index, item in enumerate(items):
+            what = whats[index]
+            support = [n for n, h in enumerate(heard) if _backed(what, h)]
             if not support:
                 continue  # nothing the owner said backs this attempt
-            outcomes = {tried_outcome.clause_outcome(c) for c in support}
+            # one outcome per attempt, from the owner's clauses that name THIS attempt
+            outcomes = {per_clause[n][index] for n in support} | {r[index] for r in per_reading}
             given = str(item.get("outcome") or "")
             if "failed" in outcomes:
                 item["outcome"] = "failed"

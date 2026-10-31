@@ -14,7 +14,7 @@ FAILED = [
     "humne ads try kiye lekin kaam nahi aaya",
     "humne flyers try kiye, fayda nahi hua",
     "humne discount try kiya lekin nakam raha",
-    "folder try kiye lekin mix ho gaye",
+    "maine folder try kiye lekin mix ho gaye",
     "humne offer try kiya, bekaar raha",
     "ہم نے اشتہار آزمائے لیکن ناکام رہا",
     "ہم نے پوسٹر آزمائے، کوئی فائدہ نہیں",
@@ -97,13 +97,15 @@ def test_not_helped_is_never_worked_and_did_not_help_is_failed():
     assert to.outcome_of("we tried it, not helped") == "failed"
     assert to.outcome_of("we tried it, it never worked") == "failed"
     assert to.outcome_of("we tried it, did not help") == "failed"
-    assert to.outcome_of("we tried ads and they helped a lot") == "worked"
-    assert to.outcome_of("we tried ads, they never helped") == "failed"
+    assert to.outcome_of("we tried ads and it helped a lot") == "worked"
+    assert to.outcome_of("we tried ads, it never helped") == "failed"
 
 
-def test_the_owner_who_also_did_it_is_kept_with_a_third_party():
+def test_an_attempt_sharing_its_clause_with_a_third_party_is_not_read_as_the_owners():
+    # allowlist: a clause that names someone else is unclear (safe direction)
     text = "we tried what my competitor did, it did not work"
-    assert to.outcome_of(text) == "failed"
+    assert to.outcome_of(text) == "unclear"
+    assert to.outcome_of("we tried it too, it did not work") == "failed"
 
 
 def test_the_arabic_wa_failed_gives_what_was_tried():

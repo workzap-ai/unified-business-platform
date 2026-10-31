@@ -6,7 +6,7 @@ import pytest
 from app.modules.pi import tried_outcome as to
 from app.modules.pi.problems import ProblemBook, ProblemNote
 
-ROMAN = "rang wale folder try kiye lekin mix ho gaye"
+ROMAN = "maine rang wale folder try kiye lekin mix ho gaye"
 
 
 def test_the_roman_urdu_failed_attempt_is_read_with_the_owners_wording():
@@ -19,8 +19,8 @@ def test_the_roman_urdu_failed_attempt_is_read_with_the_owners_wording():
     "text",
     [
         "we tried a discount before and it did not work",
-        "rang wale folder pehle istemal kiye, kaam nahi aaya",
-        "folder aazmaye, fayda nahi hua",
+        "maine rang wale folder pehle aazmaye, kaam nahi aaya",
+        "maine folder aazmaye, fayda nahi hua",
         "ghalat nikla",  # a weak cue alone is not enough...
         "ہم نے آزمایا لیکن ناکام رہا",
         "ہم نے آزمایا، کوئی فائدہ نہیں",
@@ -39,7 +39,7 @@ def test_failure_cues_in_five_languages(text):
 
 def test_weak_cues_need_an_attempt_word():
     assert to.failed_attempt("bekaar raha") is None
-    assert to.failed_attempt("folder try kiye, bekaar raha") is not None
+    assert to.failed_attempt("maine folder try kiye, bekaar raha") is not None
 
 
 def test_a_plain_statement_is_unclear_and_a_good_result_is_worked():
@@ -82,7 +82,10 @@ def test_an_outcome_the_owner_words_back_is_kept_and_a_model_only_text_proves_no
 
 def test_a_successful_attempt_is_stored_as_worked_never_failed():
     note = ProblemNote(title="Files", tried=[{"what": "folders", "outcome": ""}])
-    for text in ("folders try kiye aur bahut kaam aaya", "we tried folders and it worked well"):
+    for text in (
+        "maine folders try kiye aur bahut kaam aaya",
+        "we tried folders and it worked well",
+    ):
         (entry,) = values(note, text)["tried"]
         assert entry["outcome"] == "worked", text
 
@@ -95,7 +98,10 @@ def test_a_mixed_message_marks_each_attempt_correctly():
             {"what": "whatsapp reminders", "outcome": ""},
         ],
     )
-    text = "rang wale folder try kiye lekin mix ho gaye. we tried whatsapp reminders, worked well"
+    text = (
+        "maine rang wale folder try kiye lekin mix ho gaye. "
+        "we tried whatsapp reminders, worked well"
+    )
     got = {e["what"]: e["outcome"] for e in values(note, text)["tried"]}
     assert got == {"rang wale folder": "failed", "whatsapp reminders": "worked"}
 

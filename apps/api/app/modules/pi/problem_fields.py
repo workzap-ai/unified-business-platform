@@ -279,10 +279,59 @@ _FILLER = frozenset(
 )
 
 
+class OwnerWords(str):
+    """The owner's own words, with the question pi asked just before when the owner's very next
+    message affirmed it ("do you think the rent is the reason?" / "yes"). Behaves as the plain
+    string everywhere; `asked` is the squashed question, "" when there is none."""
+
+    asked: str = ""
+
+    def __new__(cls, text: str, asked: str = "") -> "OwnerWords":
+        obj = super().__new__(cls, text)
+        obj.asked = asked
+        return obj
+
+
+_YES = re.compile(
+    r"^\s*(?:yes|yeah|yep|yup|correct|right|exactly|indeed|that'?s (?:right|true|it)|haan|han|"
+    r"ji haan|ji|jee|bilkul|sahi|ha|ہاں|جی|بالکل|"
+    r"صحیح|نعم|أجل|صح|ايوه|"
+    r"हाँ|हां|जी|बिल्कुल|सही)"
+    r"(?:[\s,.!]+(?:it is|it's|that is|that's|the )?\w*)?[\s.!]*$",
+    re.IGNORECASE,
+)
+_CAUSE_QUESTION = re.compile(
+    r"\b(?:reason|cause|problem|why|issue|wajah|masla|sabab)\b|وجہ|مسئلہ|"
+    r"السبب|سبب|वजह|कारण|समस्या"
+)
+
+
+def is_affirmation(text: str | None) -> bool:
+    """A short "yes" with nothing doubtful or negated in it ("yes", "haan ji", "نعم", "हाँ")."""
+    from app.modules.pi import owner_claim
+
+    said = _squash(text)
+    if not said or len(said.split()) > 6:
+        return False
+    if owner_claim.doubtful(said) or owner_claim.sarcastic(said) or _has_negation(said):
+        return False
+    return _YES.search(said) is not None
+
+
+def _has_negation(said: str) -> bool:
+    return any(t in _NEGATION for t in _TOKEN.findall(said))
+
+
+def asks_cause(pi_text: str | None) -> bool:
+    """pi's message asked whether something is the reason or cause."""
+    said = _squash(pi_text)
+    return (said.rstrip().endswith(("?", "؟"))) and _CAUSE_QUESTION.search(said) is not None
+
+
 def _endorsing_clauses(corpus: str | None) -> list[str]:
-    """The squashed clauses of the owner's text that are their OWN plain claim (owner_claim): not
-    a question, a hypothetical, an attribution to anyone else, pi's words said back, doubt, a
-    hedge or sarcasm. The default is no."""
+    """What the owner can be taken to have claimed as a cause (owner_claim): the TAIL, after the
+    owner's own-voice marker, of each clause that is their marked claim, and the question pi asked
+    when the owner's next message affirmed it. Everything else is not: the default is no."""
     from app.modules.pi import owner_claim
     from app.modules.pi import tried_outcome as clauses
 
@@ -290,8 +339,12 @@ def _endorsing_clauses(corpus: str | None) -> list[str]:
     for clause, is_question in clauses.split_clauses(corpus):
         said = _squash(clause)
         hypothetical = clauses._HYPOTHETICAL.search(said) is not None
-        if owner_claim.owner_claim(said, is_question, hypothetical):
-            out.append(said)
+        tail = owner_claim.claim_tail(said, is_question, hypothetical)
+        if tail:
+            out.append(tail)
+    asked = _squash(getattr(corpus, "asked", ""))
+    if asked:
+        out.append(asked)
     return out
 
 

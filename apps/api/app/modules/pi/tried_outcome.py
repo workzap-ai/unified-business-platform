@@ -19,6 +19,7 @@ attempt words, nothing more.
 """
 
 import re
+from collections.abc import Callable
 from typing import NamedTuple
 
 # An attempt word: tried / before / experiment, in the five languages. Not "used" or "started":
@@ -35,13 +36,17 @@ FAIL_STRONG = re.compile(
     r"not helped|never helped|has not helped|hasn't helped|no help|nothing helped)\b"
     r"|\b(?:kaam|faida|fayda|faeda|asar|nateeja|natija)\s+(?:nahi|nahin|nhi)"
     r"(?:\s+(?:aaya|aya|hua|kiya|diya|kia|raha))?\b"
-    r"|\bnakam\b|\bbe-?asar\b"
+    r"|\bnothing came of (?:it|them)\b|\bno luck\b|\bkuch(?:h)? nahi hua\b|\bbek(?:a)?ar gaye\b"
+    r"|\bnakam\b|\bbe-?asar\b|\b(?:nahi|nahin|nhi) chal(?:a|e|i)\b"
+    r"|نہیں چل(?:ا|ے|ی)|नहीं चल(?:ा|े|ी)|لم (?:يعمل|تعمل|تنفع)"
     r"|ناکام|(?:فائدہ|فایدہ|اثر|نتیجہ)\s+(?:نہیں|نھیں)|کام\s+نہیں\s+(?:آیا|کیا)"
     r"|لم\s+[يت](?:نجح|فد|نفع)|ما\s+(?:نفع|نجح|أفاد|افاد)|و?فشل|دون\s+جدوى|بدون\s+فائدة"
     r"|काम\s+नहीं\s+आया|(?:फायदा|फ़ायदा|असर|नतीजा)\s+नहीं|असफल|नाकाम"
-    r"|\b(?:stopped working|then (?:it )?(?:stopped|failed|died|dropped|faded)|wore off|fizzled"
+    r"|\b(?:stopped working|then it stopped|then (?:it )?(?:failed|died|dropped|faded)|wore off"
+    r"|fizzled"
     r"|petered out|worked (?:only )?(?:at first|initially|for a (?:week|while|few days|bit)))\b"
-    r"|\bphir band\b|\bbaad mein (?:kaam )?nahi\b|\bkuch din (?:chala|kaam kiya) phir\b"
+    r"|\bphir band ho (?:gaya|gayi|gaye)\b|\bbaad mein (?:kaam )?nahi\b"
+    r"|\bkuch din (?:chala|kaam kiya) phir\b"
 )
 # 'failed', 'useless' and the like count only beside an attempt word that comes before them, and
 # never as "failed to ..." (something that did not happen, not an outcome).
@@ -53,7 +58,10 @@ FAIL_BESIDE_ATTEMPT = re.compile(
     r"|बेकार\s+(?:रहा|निकला)|गलत\s+निकला|मिक्स\s+हो\s+गए"
 )
 WORKED = re.compile(
-    r"\b(?:it worked|worked well|that worked|helped|kaam aaya|faida hua|fayda hua|asar hua)\b"
+    r"\b(?:it worked|worked well|that worked|worked|which did|that did|helped"
+    r"|brought (?:in )?(?:some |more )?(?:customers|sales|orders)|kaam aaya|kaam aaye|faida hua"
+    r"|fayda hua|asar hua|chal gaye|chal gaya|chal gayi|chale|chala|kaam kar gaye|kaam kar gaya)\b"
+    r"|چل گئے|چل گیا|چل گئی|کام کر گئے|کام کر گیا|चल गए|चल गया|चले|काम कर गए|काम आए|نجحت"
     r"|فائدہ\s+ہوا|بہت\s+فائدہ|نفع|نجح|काम\s+आया|फायदा\s+हुआ"
 )
 
@@ -171,17 +179,87 @@ def _dropped_subject_ok(said: str) -> bool:
     return _ROMAN_URDU.search(said) is not None
 
 
+_AUX_EN = (
+    r"(?:(?:have|had|did|do|really|already|also|even|just|then|first|once|previously|personally"
+    r"|actually|finally|both|all|ourselves|myself|definitely|certainly|honestly)\s+)*"
+)
+# The ALLOWLIST (L1 round 4): the owner is the grammatical subject of the attempt verb, said in
+# their own first person. Anything else (a passive "were tried", a noun subject, "I know ... tried",
+# a verb with no subject, a bare "tried flyers") is not read as the owner's attempt.
+_OWN_ATTEMPT = re.compile(
+    r"\b(?:i|we)(?:'ve|'d)?\s+" + _AUX_EN + r"(?:tried|try|trying)\b"
+    r"|\b(?:maine|mene|main ne|humne|hum ne|mein ne|hamne|ham ne)\b(?:\s+\S+){0,4}?"
+    r"\s+(?:try|aazma\w*|koshish)\b"
+    r"|(?<![؀-ۿ])(?:میں نے|ہم نے)(?![؀-ۿ])(?:\s+\S+){0,4}?\s+(?:آزما\S*|کوشش\S*)"
+    r"|^\s*(?:(?:و|ف)?(?:أنا|انا|نحن)\s+|(?:و|ف|ثم|لقد|قد)\s*)?"
+    r"(?:جربت|جربنا|حاولت|حاولنا)(?![؀-ۿ])"
+    r"|(?<![ऀ-ॿ])(?:मैंने|हमने)(?![ऀ-ॿ])(?:\s+\S+){0,4}?\s+(?:आज़मा\S*|आजमा\S*|कोशिश\S*)"
+)
+# "I used / ran / put up X" is an attempt only when it comes with a failure cue in the same clause.
+_OWN_USE = re.compile(
+    r"\b(?:i|we)(?:'ve|'d)?\s+"
+    + _AUX_EN
+    + r"(?:ran|used|launched|printed|distributed|gave\s+\S+\s+a go)\b"
+    r"|\b(?:maine|mene|main ne|humne|hum ne|mein ne|hamne|ham ne)\b(?:\s+\S+){0,4}?"
+    r"\s+(?:lagaye|lagaya|lagai|laga diye|chalaye|chalaya|istemal kiya|istamal kiya)\b"
+    r"|(?<![؀-ۿ])(?:میں نے|ہم نے)(?![؀-ۿ])(?:\s+\S+){0,4}?\s+(?:لگائے|لگایا|چلائے|استعمال)"
+    r"|^\s*(?:(?:و|ف)?(?:أنا|انا|نحن)\s+|(?:و|ف|ثم|لقد|قد)\s*)?(?:استخدمت|استخدمنا)(?![؀-ۿ])"
+    r"|(?<![ऀ-ॿ])(?:मैंने|हमने)(?![ऀ-ॿ])(?:\s+\S+){0,4}?\s+(?:लगाए|लगाया|चलाए|इस्तेमाल)"
+)
+# Even with the owner as subject, these say it was not an attempt of theirs or not an attempt to
+# solve the problem (avoid, whether, instead of), or not theirs (took over, was away, I know).
+_NOT_THEIRS = re.compile(
+    r"\b(?:to avoid|to stop|not to|whether|instead of|rather than|took over|take over|joined|"
+    r"was away|were away|wasn't here|i know|i heard|i was told|they say|people say|"
+    r"suna|suni|kehte hain|logon ne|log kehte|bachne)\b"
+    r"|سنا|سنی|لوگوں نے|سمعت|قيل|सुना|लोगों ने|बचने के"
+)
+
+
 def _owner_attempt(said: str, is_question: bool) -> bool:
-    """Whether a squashed clause is the OWNER saying they tried something: the owner is the
-    subject (a first-person word, or no named subject in a language that drops it), an attempt
-    word is there, and it is not a question, a hypothetical, a plan or a "never tried"."""
-    if is_question or _HYPOTHETICAL.search(said) or not ATTEMPT.search(said):
+    """Whether a squashed clause is the OWNER saying they tried something: an allowlist, not a
+    blocklist. The owner is the subject in their first person (`_OWN_ATTEMPT`: "I/we tried",
+    "maine/humne ... try/aazmaya", "میں نے/ہم نے ... آزمایا", "جربت/جربنا", "मैंने/हमने ... आज़माया"),
+    and the clause is not a question, a hypothetical, a plan, a "never tried", a source ("I heard",
+    "maine suna"), another subject's ("log ne", "padosi ne") or someone else's attempt."""
+    if is_question or _HYPOTHETICAL.search(said):
         return False
-    if _NOT_TRIED.search(said):
+    used = _OWN_USE.search(said) is not None and FAIL_STRONG.search(said) is not None
+    if not (ATTEMPT.search(said) or used):
         return False
-    if _FIRST_PERSON.search(said):
-        return True
-    return _dropped_subject_ok(said)
+    if _NOT_TRIED.search(said) or _NOT_THEIRS.search(said) or _THIRD_PARTY.search(said):
+        return False
+    if any(m.group(1) not in _OWN_NE for m in _NE.finditer(said)):
+        return False  # "padosi ne ...": someone else did it
+    return _OWN_ATTEMPT.search(said) is not None or used
+
+
+def owner_clauses_with_followups(text: str | None) -> list[str]:
+    """Each owner attempt clause with the plain clauses right after it ("I tried flyers and ads;
+    flyers did nothing, ads brought customers"): only for reading an outcome, never for finding an
+    attempt. A follow-up that is a question, a hypothetical, a source or someone else's is cut."""
+    parts = split_clauses(text)
+    out: list[str] = []
+    for n, (clause, is_question) in enumerate(parts):
+        said = _squash(clause)
+        if not _owner_attempt(said, is_question):
+            continue
+        joined = [said]
+        for follow, follow_question in parts[n + 1 :]:
+            f = _squash(follow)
+            if (
+                follow_question
+                or _owner_attempt(f, False)
+                or _HYPOTHETICAL.search(f)
+                or _THIRD_PARTY.search(f)
+                or _NOT_THEIRS.search(f)
+                or _NOT_TRIED.search(f)
+                or any(m.group(1) not in _OWN_NE for m in _NE.finditer(f))
+            ):
+                break
+            joined.append(f)
+        out.append(" ; ".join(joined))
+    return out
 
 
 def owner_clauses(text: str | None) -> list[str]:
@@ -211,9 +289,18 @@ def _failure(said: str) -> re.Match[str] | None:
     return None
 
 
+_PARTLY = re.compile(
+    r"\b(?:half|partly|partially|somewhat|barely|hardly|kind of|sort of|a bit)\s+(?:\w+\s+)?$"
+)
+_NONE_WORKED = re.compile(r"\b(?:neither|none of (?:them|these)|nothing)\b.*\bworked\b")
+
+
 def _worked(said: str) -> bool:
     found = WORKED.search(said)
-    return found is not None and not _NEG_BEFORE.search(said[: found.start()])
+    if found is None or _NONE_WORKED.search(said):
+        return False
+    before = said[: found.start()]
+    return not _NEG_BEFORE.search(before) and not _PARTLY.search(before)
 
 
 def clause_outcome(said: str) -> str:
@@ -264,3 +351,59 @@ def not_worked(tried: object) -> list[object]:
         for t in tried
         if not (isinstance(t, dict) and str(t.get("outcome") or "").casefold() == "worked")
     ]
+
+
+# --- one outcome per attempt (L1 round 4) -------------------------------------------------------
+_SEGMENT = re.compile(
+    r"[,;:،؛]|(?:^|\s)(?:but|while|whereas|then|lekin|magar|par|jabke|phir)(?=\s)|"
+    r"(?<![؀-ۿऀ-ॿ])(?:مگر|لکن|لیکن|لكن|ثم|पर|लेकिन|मगर|फिर)(?![؀-ۿऀ-ॿ])"
+)
+_ALL = re.compile(
+    r"\b(?:both|neither|none of (?:them|these)|all of them|dono|donon|sab)\b"
+    r"|دونوں|كلاهما|كلتاهما|दोनों"
+)
+_ELLIPSIS_NO = re.compile(
+    r"\b(?:did not|didn't|didnt|do not|don't|could not|couldn't|nahi|nahin|nhi)\s*$"
+    r"|نہیں\s*$|नहीं\s*$"
+)
+
+
+def _segment_outcome(seg: str) -> str:
+    """failed, worked or "" for one segment, with no attempt word needed ("flyers failed",
+    "ads worked", "flyers did not", "kuch nahi hua")."""
+    strong = FAIL_STRONG.search(seg)
+    if strong and not _negated(seg, strong):
+        return "failed"
+    weak = FAIL_BESIDE_ATTEMPT.search(seg)
+    if weak and not _negated(seg, weak):
+        return "failed"
+    if _ELLIPSIS_NO.search(seg) or _NONE_WORKED.search(seg):
+        return "failed"
+    return "worked" if _worked(seg) else ""
+
+
+def item_outcomes(said: str, mentions: list[Callable[[str], bool]]) -> list[str]:
+    """The outcome of EACH attempt named in one squashed owner clause ("failed", "worked" or "" for
+    not said). The clause is cut into segments; a cue applies to the attempts named in its own
+    segment, a cue with no attempt named ("it did not work") to the attempts named just before it,
+    and "both" / "neither" to every attempt named so far. A clause that names one attempt only reads
+    as a whole. Two cues for one attempt: failed wins (a repeat of a failure is the unsafe one)."""
+    named = [i for i, m in enumerate(mentions) if m(said)]
+    if len(named) <= 1:
+        result = clause_outcome(said)
+        return [result if i in named and result != "unclear" else "" for i in range(len(mentions))]
+    segments = [t.strip() for t in _SEGMENT.split(said) if t and t.strip()]
+    out = [""] * len(mentions)
+    seen: list[int] = []
+    last: list[int] = []
+    for seg in segments:
+        here = [i for i, m in enumerate(mentions) if m(seg)]
+        cue = _segment_outcome(seg)
+        if here:
+            seen = list(dict.fromkeys([*seen, *here]))
+            last = here
+        targets = here or (seen if _ALL.search(seg) else last)
+        if cue:
+            for i in targets:
+                out[i] = "failed" if "failed" in (out[i], cue) else cue
+    return out

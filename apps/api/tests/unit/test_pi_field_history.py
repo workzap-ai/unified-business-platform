@@ -9,9 +9,9 @@ from app.modules.pi import problem_fields as pf
 
 # ------------------------------------------------------------------ G: history
 def test_a_corrected_cause_keeps_the_old_one():
-    first, _ = pf.merge_cause(None, "rent", True, ["rent"], "m1", "the rent is high", "t1")
+    first, _ = pf.merge_cause(None, "rent", True, ["rent"], "m1", "I think the rent is high", "t1")
     second, _ = pf.merge_cause(
-        first, "supplier", True, ["supplier"], "m2", "the supplier is late", "t2"
+        first, "supplier", True, ["supplier"], "m2", "I think the supplier is late", "t2"
     )
     assert second["text"] == "supplier" and second["status"] == "owner_said"
     (old,) = second["history"]
@@ -21,9 +21,9 @@ def test_a_corrected_cause_keeps_the_old_one():
 
 
 def test_history_survives_a_third_correction():
-    a, _ = pf.merge_cause(None, "rent", True, ["rent"], "m1", "the rent", "t1")
-    b, _ = pf.merge_cause(a, "supplier", True, ["supplier"], "m2", "the supplier", "t2")
-    c, _ = pf.merge_cause(b, "staff", True, ["staff"], "m3", "the staff", "t3")
+    a, _ = pf.merge_cause(None, "rent", True, ["rent"], "m1", "I think the rent", "t1")
+    b, _ = pf.merge_cause(a, "supplier", True, ["supplier"], "m2", "I think the supplier", "t2")
+    c, _ = pf.merge_cause(b, "staff", True, ["staff"], "m3", "I think the staff", "t3")
     assert [h["text"] for h in c["history"]] == ["rent", "supplier"]
 
 

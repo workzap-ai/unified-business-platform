@@ -8,8 +8,8 @@ from app.modules.pi.evalkit import replay, scorers
 from app.modules.pi.problem_extract import SimpleNote
 
 MESSAGE = (
-    "Sales fell since March because the competitor is cheaper. We tried Facebook ads, they brought "
-    "nobody. Budget is 50,000 rupees, we cannot close the second shop."
+    "Sales fell since March and I think the competitor is cheaper. We tried Facebook ads but it "
+    "brought nobody. Budget is 50,000 rupees, we cannot close the second shop."
 )
 
 
