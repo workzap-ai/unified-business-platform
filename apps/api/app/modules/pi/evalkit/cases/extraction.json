@@ -8591,5 +8591,2129 @@
     }
    ]
   }
+ },
+ {
+  "id": "juice_single_hi",
+  "industry": "juice_shakes_dessert_and_ice_cream_parlours",
+  "language": "hi",
+  "kind": "single",
+  "regression": false,
+  "messages": [
+   "हमारे जूस की दुकान में गर्मियों में रोज़ करीब 12 किलो फल सड़ जाते हैं क्योंकि कितना मंगाना है, अंदाज़ा नहीं लगता।"
+  ],
+  "expected": {
+   "problems": [
+    {
+     "id": "p1",
+     "any": [
+      "fruit",
+      "rots"
+     ],
+     "figures": [
+      "12 किलो"
+     ]
+    }
+   ],
+   "stated": [
+    "रोज़ करीब 12 किलो फल सड़ जाते हैं"
+   ],
+   "missing": [
+    "budget",
+    "what has been tried"
+   ],
+   "hypothesis_only": [],
+   "corrections": []
+  },
+  "recorded": {
+   "origin": "reference output written by hand, not model output; agent-drafted, unreviewed (single author, no human review yet)",
+   "notes": [
+    {
+     "title": "About 12 kg of fruit rots daily",
+     "title_local": "गर्मियों में रोज़ करीब 12 किलो फल सड़ जाते हैं",
+     "user_words": [
+      "रोज़ करीब 12 किलो फल सड़ जाते हैं",
+      "कितना मंगाना है, अंदाज़ा नहीं लगता"
+     ],
+     "summary": "About 12 kg of fruit rots daily",
+     "category": "stock_inventory",
+     "cause": "the owner cannot estimate how much to order",
+     "cause_status": "owner_said"
+    }
+   ]
+  }
+ },
+ {
+  "id": "furnish_list_hi",
+  "industry": "furniture_and_home_decor_retail",
+  "language": "hi",
+  "kind": "list",
+  "regression": false,
+  "messages": [
+   "मेरे शोरूम की दिक्कतें सुनिए। पहली, डिलीवरी में देरी होती है, ग्राहक रोज़ फ़ोन करते हैं। दूसरी, कौन सा सोफ़ा बचा है, पता नहीं चलता। तीसरी, सेल्समैन अलग-अलग भाव बता देते हैं। चौथी, उधार की किश्तें समय पर नहीं आतीं। पाँचवीं, गोदाम में माल टूट जाता है।"
+  ],
+  "expected": {
+   "problems": [
+    {
+     "id": "p1",
+     "any": [
+      "deliveries",
+      "late"
+     ],
+     "figures": []
+    },
+    {
+     "id": "p2",
+     "any": [
+      "sofas",
+      "unknown"
+     ],
+     "figures": []
+    },
+    {
+     "id": "p3",
+     "any": [
+      "salesmen",
+      "prices"
+     ],
+     "figures": []
+    },
+    {
+     "id": "p4",
+     "any": [
+      "instalments",
+      "overdue"
+     ],
+     "figures": []
+    },
+    {
+     "id": "p5",
+     "any": [
+      "warehouse",
+      "break"
+     ],
+     "figures": []
+    }
+   ],
+   "stated": [
+    "डिलीवरी में देरी होती है",
+    "कौन सा सोफ़ा बचा है, पता नहीं चलता",
+    "सेल्समैन अलग-अलग भाव बता देते हैं",
+    "उधार की किश्तें समय पर नहीं आतीं",
+    "गोदाम में माल टूट जाता है"
+   ],
+   "missing": [
+    "budget",
+    "cause",
+    "what has been tried"
+   ],
+   "hypothesis_only": [],
+   "corrections": []
+  },
+  "recorded": {
+   "origin": "reference output written by hand, not model output; agent-drafted, unreviewed (single author, no human review yet)",
+   "notes": [
+    {
+     "title": "Furniture deliveries are late and customers call daily",
+     "title_local": "डिलीवरी में देरी होती है",
+     "user_words": [
+      "डिलीवरी में देरी होती है, ग्राहक रोज़ फ़ोन करते हैं"
+     ],
+     "summary": "Furniture deliveries are late and customers call daily",
+     "category": "orders_fulfilment"
+    },
+    {
+     "title": "Which sofas are left is unknown",
+     "title_local": "कौन सा सोफ़ा बचा है, पता नहीं चलता",
+     "user_words": [
+      "कौन सा सोफ़ा बचा है, पता नहीं चलता"
+     ],
+     "summary": "Which sofas are left is unknown",
+     "category": "reporting_visibility"
+    },
+    {
+     "title": "Salesmen quote different prices for one item",
+     "title_local": "सेल्समैन अलग-अलग भाव बताते हैं",
+     "user_words": [
+      "सेल्समैन अलग-अलग भाव बता देते हैं"
+     ],
+     "summary": "Salesmen quote different prices for one item",
+     "category": "people_staff"
+    },
+    {
+     "title": "Customer instalments arrive overdue",
+     "title_local": "उधार की किश्तें समय पर नहीं आतीं",
+     "user_words": [
+      "उधार की किश्तें समय पर नहीं आतीं"
+     ],
+     "summary": "Customer instalments arrive overdue",
+     "category": "cash_collections"
+    },
+    {
+     "title": "Goods break in the warehouse",
+     "title_local": "गोदाम में माल टूट जाता है",
+     "user_words": [
+      "गोदाम में माल टूट जाता है"
+     ],
+     "summary": "Goods break in the warehouse",
+     "category": "stock_inventory"
+    }
+   ]
+  }
+ },
+ {
+  "id": "genset_correction_hi_4",
+  "industry": "generator_sales_rental_and_service",
+  "language": "hi",
+  "kind": "correction",
+  "regression": false,
+  "messages": [
+   "हमारे किराए पर गए जनरेटरों में से हर महीने करीब 10 वापस देर से आते हैं।",
+   "रुकिए, 10 नहीं, 100 जनरेटर देर से आते हैं।"
+  ],
+  "expected": {
+   "problems": [
+    {
+     "id": "p1",
+     "any": [
+      "generators",
+      "late"
+     ],
+     "figures": [
+      "100 जनरेटर"
+     ]
+    }
+   ],
+   "stated": [
+    "हर महीने करीब 100 जनरेटर वापस देर से आते हैं"
+   ],
+   "missing": [
+    "budget",
+    "cause",
+    "what has been tried"
+   ],
+   "hypothesis_only": [],
+   "corrections": [
+    {
+     "wrong": "10",
+     "right": "100",
+     "problem": "p1"
+    }
+   ]
+  },
+  "recorded": {
+   "origin": "reference output written by hand, not model output; agent-drafted, unreviewed (single author, no human review yet)",
+   "notes": [
+    {
+     "title": "About 100 rented generators return late monthly",
+     "title_local": "हर महीने 100 जनरेटर वापस देर से आते हैं",
+     "user_words": [
+      "100 जनरेटर देर से आते हैं"
+     ],
+     "summary": "About 100 rented generators return late monthly",
+     "category": "operations_process"
+    }
+   ]
+  }
+ },
+ {
+  "id": "taxi_rant_hi",
+  "industry": "ride_hailing_fleet_owners_and_taxi_operators",
+  "language": "hi",
+  "kind": "rant",
+  "regression": false,
+  "messages": [
+   "यार मैं तंग आ गया हूँ! गाड़ियाँ चलती हैं पर ड्राइवर पूरा हिसाब नहीं देते, हर हफ़्ते करीब 15 हज़ार रुपये कम पड़ते हैं, मरम्मत का ख़र्चा अलग से बढ़ता जा रहा है, और कौन सी गाड़ी कब सर्विस पर जानी है किसी को याद नहीं रहता। बस अब और नहीं होता!"
+  ],
+  "expected": {
+   "problems": [
+    {
+     "id": "p1",
+     "any": [
+      "drivers",
+      "takings"
+     ],
+     "figures": [
+      "15 हज़ार रुपये"
+     ]
+    },
+    {
+     "id": "p2",
+     "any": [
+      "repair",
+      "costs"
+     ],
+     "figures": []
+    },
+    {
+     "id": "p3",
+     "any": [
+      "service",
+      "due"
+     ],
+     "figures": []
+    }
+   ],
+   "stated": [
+    "ड्राइवर पूरा हिसाब नहीं देते",
+    "मरम्मत का ख़र्चा अलग से बढ़ता जा रहा है",
+    "कौन सी गाड़ी कब सर्विस पर जानी है किसी को याद नहीं रहता"
+   ],
+   "missing": [
+    "budget",
+    "cause",
+    "what has been tried"
+   ],
+   "hypothesis_only": [],
+   "corrections": []
+  },
+  "recorded": {
+   "origin": "reference output written by hand, not model output; agent-drafted, unreviewed (single author, no human review yet)",
+   "notes": [
+    {
+     "title": "Drivers hand over less than the full takings",
+     "title_local": "ड्राइवर पूरा हिसाब नहीं देते",
+     "user_words": [
+      "ड्राइवर पूरा हिसाब नहीं देते",
+      "हर हफ़्ते करीब 15 हज़ार रुपये कम पड़ते हैं"
+     ],
+     "summary": "Drivers hand over less than the full takings",
+     "category": "cash_collections",
+     "money_text": "15 हज़ार रुपये हर हफ़्ते"
+    },
+    {
+     "title": "Repair costs keep rising",
+     "title_local": "मरम्मत का ख़र्चा बढ़ रहा है",
+     "user_words": [
+      "मरम्मत का ख़र्चा अलग से बढ़ता जा रहा है"
+     ],
+     "summary": "Repair costs keep rising",
+     "category": "margin_cost"
+    },
+    {
+     "title": "Car service dates are not tracked",
+     "title_local": "सर्विस की तारीख़ किसी को याद नहीं",
+     "user_words": [
+      "कौन सी गाड़ी कब सर्विस पर जानी है किसी को याद नहीं रहता"
+     ],
+     "summary": "Car service dates are not tracked",
+     "category": "operations_process"
+    }
+   ]
+  }
+ },
+ {
+  "id": "cloudk_mixed_hi",
+  "industry": "cloud_kitchens_and_virtual_brands",
+  "language": "hi",
+  "kind": "mixed",
+  "regression": false,
+  "messages": [
+   "हमारे cloud kitchen में delivery app के order आते हैं लेकिन rider देर से आता है और खाना ठंडा हो जाता है, review भी गिर रहे हैं।"
+  ],
+  "expected": {
+   "problems": [
+    {
+     "id": "p1",
+     "any": [
+      "riders",
+      "cold"
+     ],
+     "figures": []
+    },
+    {
+     "id": "p2",
+     "any": [
+      "reviews",
+      "falling"
+     ],
+     "figures": []
+    }
+   ],
+   "stated": [
+    "rider देर से आता है और खाना ठंडा हो जाता है",
+    "review भी गिर रहे हैं"
+   ],
+   "missing": [
+    "budget",
+    "cause",
+    "what has been tried"
+   ],
+   "hypothesis_only": [],
+   "corrections": []
+  },
+  "recorded": {
+   "origin": "reference output written by hand, not model output; agent-drafted, unreviewed (single author, no human review yet)",
+   "notes": [
+    {
+     "title": "Riders arrive late and food goes cold",
+     "title_local": "rider देर से आता है और खाना ठंडा हो जाता है",
+     "user_words": [
+      "rider देर से आता है और खाना ठंडा हो जाता है"
+     ],
+     "summary": "Riders arrive late and food goes cold",
+     "category": "orders_fulfilment"
+    },
+    {
+     "title": "Customer reviews are falling",
+     "title_local": "review गिर रहे हैं",
+     "user_words": [
+      "review भी गिर रहे हैं"
+     ],
+     "summary": "Customer reviews are falling",
+     "category": "quality_complaints"
+    }
+   ]
+  }
+ },
+ {
+  "id": "wallet_multi_hi_5",
+  "industry": "mobile_wallet_and_payment_agents",
+  "language": "hi",
+  "kind": "multi_turn",
+  "regression": false,
+  "messages": [
+   "मैं गाँव में मोबाइल वॉलेट एजेंट हूँ और दिन भर कैश खत्म होता रहता है।",
+   "सुबह 40 हज़ार रुपये होते हैं, दोपहर तक बिल्कुल नहीं बचते, फिर ग्राहक वापस चले जाते हैं।",
+   "और हाँ, रोज़ का हिसाब कॉपी में लिखता हूँ, कई बार गलती हो जाती है।"
+  ],
+  "expected": {
+   "problems": [
+    {
+     "id": "p1",
+     "any": [
+      "float",
+      "cash"
+     ],
+     "figures": [
+      "40 हज़ार रुपये"
+     ]
+    },
+    {
+     "id": "p2",
+     "any": [
+      "ledger",
+      "notebook"
+     ],
+     "figures": []
+    }
+   ],
+   "stated": [
+    "दोपहर तक बिल्कुल नहीं बचते",
+    "रोज़ का हिसाब कॉपी में लिखता हूँ, कई बार गलती हो जाती है"
+   ],
+   "missing": [
+    "budget",
+    "cause",
+    "what has been tried"
+   ],
+   "hypothesis_only": [],
+   "corrections": []
+  },
+  "recorded": {
+   "origin": "reference output written by hand, not model output; agent-drafted, unreviewed (single author, no human review yet)",
+   "notes": [
+    {
+     "title": "Float cash runs out by afternoon",
+     "title_local": "दोपहर तक कैश खत्म हो जाता है",
+     "user_words": [
+      "सुबह 40 हज़ार रुपये होते हैं, दोपहर तक बिल्कुल नहीं बचते"
+     ],
+     "summary": "Float cash runs out by afternoon",
+     "category": "cash_collections"
+    },
+    {
+     "title": "Daily ledger in a notebook has mistakes",
+     "title_local": "कॉपी में रोज़ के हिसाब में गलती",
+     "user_words": [
+      "रोज़ का हिसाब कॉपी में लिखता हूँ, कई बार गलती हो जाती है"
+     ],
+     "summary": "Daily ledger in a notebook has mistakes",
+     "category": "reporting_visibility"
+    }
+   ]
+  }
+ },
+ {
+  "id": "microfin_constraints_hi",
+  "industry": "microfinance_field_operations",
+  "language": "hi",
+  "kind": "constraints",
+  "regression": false,
+  "messages": [
+   "हमारे फील्ड स्टाफ किश्तें वसूलने जाते हैं पर रिकॉर्ड देर से अपडेट होता है, पिछले महीने 30 खातों की एंट्री छूट गई। हमारे पास सिर्फ़ 3 फील्ड अफ़सर हैं, बजट 2 लाख रुपये से ऊपर नहीं जा सकता, और पुराना सॉफ़्टवेयर हम बदल नहीं सकते।"
+  ],
+  "expected": {
+   "problems": [
+    {
+     "id": "p1",
+     "any": [
+      "records",
+      "entries"
+     ],
+     "figures": [
+      "30 खातों"
+     ]
+    }
+   ],
+   "stated": [
+    "पिछले महीने 30 खातों की एंट्री छूट गई"
+   ],
+   "missing": [
+    "cause",
+    "what has been tried"
+   ],
+   "hypothesis_only": [],
+   "corrections": [],
+   "constraints": [
+    "सिर्फ़ 3 फील्ड अफ़सर",
+    "बजट 2 लाख रुपये से ऊपर नहीं जा सकता",
+    "पुराना सॉफ़्टवेयर हम बदल नहीं सकते"
+   ]
+  },
+  "recorded": {
+   "origin": "reference output written by hand, not model output; agent-drafted, unreviewed (single author, no human review yet)",
+   "notes": [
+    {
+     "title": "Field records update late and entries are missed",
+     "title_local": "रिकॉर्ड देर से अपडेट होता है",
+     "user_words": [
+      "रिकॉर्ड देर से अपडेट होता है",
+      "पिछले महीने 30 खातों की एंट्री छूट गई"
+     ],
+     "summary": "Field records update late and entries are missed",
+     "category": "reporting_visibility",
+     "constraints": [
+      "सिर्फ़ 3 फील्ड अफ़सर",
+      "बजट 2 लाख रुपये से ऊपर नहीं जा सकता",
+      "पुराना सॉफ़्टवेयर हम बदल नहीं सकते"
+     ]
+    }
+   ]
+  }
+ },
+ {
+  "id": "mandi_voice_hi_3",
+  "industry": "commission_agents_in_grain_fruit_and_vegetable_mandis",
+  "language": "hi",
+  "kind": "list",
+  "regression": false,
+  "messages": [
+   "हाँ जी सुनिए मैं मंडी में आढ़ती हूँ तो देखिए किसान का माल आता है उसके तौल में झगड़ा होता है फिर पेमेंट देने में दस दिन लग जाते हैं क्योंकि खरीदार से पैसे देर से आते हैं और तीसरी बात बारिश में माल भीग जाता है कोई शेड नहीं है"
+  ],
+  "expected": {
+   "problems": [
+    {
+     "id": "p1",
+     "any": [
+      "weighing",
+      "disputes"
+     ],
+     "figures": []
+    },
+    {
+     "id": "p2",
+     "any": [
+      "paying",
+      "farmers"
+     ],
+     "figures": [
+      "दस दिन"
+     ]
+    },
+    {
+     "id": "p3",
+     "any": [
+      "rain",
+      "wet"
+     ],
+     "figures": []
+    }
+   ],
+   "stated": [
+    "किसान का माल आता है उसके तौल में झगड़ा होता है",
+    "पेमेंट देने में दस दिन लग जाते हैं",
+    "बारिश में माल भीग जाता है कोई शेड नहीं है"
+   ],
+   "missing": [
+    "budget",
+    "cause",
+    "what has been tried"
+   ],
+   "hypothesis_only": [],
+   "corrections": []
+  },
+  "recorded": {
+   "origin": "reference output written by hand, not model output; agent-drafted, unreviewed (single author, no human review yet)",
+   "notes": [
+    {
+     "title": "Weighing of farmers' produce causes disputes",
+     "title_local": "तौल में झगड़ा होता है",
+     "user_words": [
+      "उसके तौल में झगड़ा होता है"
+     ],
+     "summary": "Weighing of farmers' produce causes disputes",
+     "category": "quality_complaints"
+    },
+    {
+     "title": "Paying farmers takes ten days",
+     "title_local": "किसान को पेमेंट देने में दस दिन लगते हैं",
+     "user_words": [
+      "पेमेंट देने में दस दिन लग जाते हैं",
+      "खरीदार से पैसे देर से आते हैं"
+     ],
+     "summary": "Paying farmers takes ten days",
+     "category": "cash_collections"
+    },
+    {
+     "title": "Produce gets wet in rain with no shed",
+     "title_local": "बारिश में माल भीग जाता है",
+     "user_words": [
+      "बारिश में माल भीग जाता है कोई शेड नहीं है"
+     ],
+     "summary": "Produce gets wet in rain with no shed",
+     "category": "loss_security"
+    }
+   ]
+  }
+ },
+ {
+  "id": "bus_single_ar_2",
+  "industry": "bus_coach_and_school_transport_operators",
+  "language": "ar",
+  "kind": "single",
+  "regression": false,
+  "messages": [
+   "حافلاتنا المدرسية تتأخر عن موعدها حوالي 20 دقيقة كل صباح والأهالي يتصلون بنا باستمرار."
+  ],
+  "expected": {
+   "problems": [
+    {
+     "id": "p1",
+     "any": [
+      "buses",
+      "late"
+     ],
+     "figures": [
+      "20 دقيقة"
+     ]
+    }
+   ],
+   "stated": [
+    "تتأخر عن موعدها حوالي 20 دقيقة كل صباح"
+   ],
+   "missing": [
+    "budget",
+    "cause",
+    "what has been tried"
+   ],
+   "hypothesis_only": [],
+   "corrections": []
+  },
+  "recorded": {
+   "origin": "reference output written by hand, not model output; agent-drafted, unreviewed (single author, no human review yet)",
+   "notes": [
+    {
+     "title": "School buses run 20 minutes late daily",
+     "title_local": "الحافلات تتأخر حوالي 20 دقيقة كل صباح",
+     "user_words": [
+      "حافلاتنا المدرسية تتأخر عن موعدها حوالي 20 دقيقة كل صباح",
+      "الأهالي يتصلون بنا باستمرار"
+     ],
+     "summary": "School buses run 20 minutes late daily",
+     "category": "operations_process"
+    }
+   ]
+  }
+ },
+ {
+  "id": "rental_list_ar",
+  "industry": "property_management_and_rentals",
+  "language": "ar",
+  "kind": "list",
+  "regression": false,
+  "messages": [
+   "مشاكلنا في إدارة العقارات: أولاً المستأجرون يتأخرون في دفع الإيجار، ثانياً طلبات الصيانة تضيع بين الموظفين، ثالثاً لا نعرف أي الشقق فارغة اليوم، ورابعاً العقود تنتهي دون أن ننتبه."
+  ],
+  "expected": {
+   "problems": [
+    {
+     "id": "p1",
+     "any": [
+      "tenants",
+      "rent"
+     ],
+     "figures": []
+    },
+    {
+     "id": "p2",
+     "any": [
+      "maintenance",
+      "requests"
+     ],
+     "figures": []
+    },
+    {
+     "id": "p3",
+     "any": [
+      "vacant",
+      "flats"
+     ],
+     "figures": []
+    },
+    {
+     "id": "p4",
+     "any": [
+      "contracts",
+      "expire"
+     ],
+     "figures": []
+    }
+   ],
+   "stated": [
+    "المستأجرون يتأخرون في دفع الإيجار",
+    "طلبات الصيانة تضيع بين الموظفين",
+    "لا نعرف أي الشقق فارغة اليوم",
+    "العقود تنتهي دون أن ننتبه"
+   ],
+   "missing": [
+    "budget",
+    "cause",
+    "what has been tried"
+   ],
+   "hypothesis_only": [],
+   "corrections": []
+  },
+  "recorded": {
+   "origin": "reference output written by hand, not model output; agent-drafted, unreviewed (single author, no human review yet)",
+   "notes": [
+    {
+     "title": "Tenants pay rent late",
+     "title_local": "المستأجرون يتأخرون في دفع الإيجار",
+     "user_words": [
+      "المستأجرون يتأخرون في دفع الإيجار"
+     ],
+     "summary": "Tenants pay rent late",
+     "category": "cash_collections"
+    },
+    {
+     "title": "Maintenance requests get lost between staff",
+     "title_local": "طلبات الصيانة تضيع بين الموظفين",
+     "user_words": [
+      "طلبات الصيانة تضيع بين الموظفين"
+     ],
+     "summary": "Maintenance requests get lost between staff",
+     "category": "communication_coordination"
+    },
+    {
+     "title": "Vacant flats today are unknown",
+     "title_local": "لا نعرف أي الشقق فارغة اليوم",
+     "user_words": [
+      "لا نعرف أي الشقق فارغة اليوم"
+     ],
+     "summary": "Vacant flats today are unknown",
+     "category": "reporting_visibility"
+    },
+    {
+     "title": "Contracts expire without anyone noticing",
+     "title_local": "العقود تنتهي دون أن ننتبه",
+     "user_words": [
+      "العقود تنتهي دون أن ننتبه"
+     ],
+     "summary": "Contracts expire without anyone noticing",
+     "category": "compliance_admin"
+    }
+   ]
+  }
+ },
+ {
+  "id": "charity_correction_ar",
+  "industry": "ngos_charities_and_trusts",
+  "language": "ar",
+  "kind": "correction",
+  "regression": false,
+  "messages": [
+   "نوزع حوالي ٢٠ سلة غذائية كل أسبوع ولا نسجل من استلمها.",
+   "عذراً، ليس ٢٠ بل ٢٠٠ سلة."
+  ],
+  "expected": {
+   "problems": [
+    {
+     "id": "p1",
+     "any": [
+      "food",
+      "baskets"
+     ],
+     "figures": [
+      "٢٠٠ سلة"
+     ]
+    }
+   ],
+   "stated": [
+    "نوزع حوالي ٢٠٠ سلة غذائية كل أسبوع ولا نسجل من استلمها"
+   ],
+   "missing": [
+    "budget",
+    "cause",
+    "what has been tried"
+   ],
+   "hypothesis_only": [],
+   "corrections": [
+    {
+     "wrong": "٢٠",
+     "right": "٢٠٠",
+     "problem": "p1"
+    }
+   ]
+  },
+  "recorded": {
+   "origin": "reference output written by hand, not model output; agent-drafted, unreviewed (single author, no human review yet)",
+   "notes": [
+    {
+     "title": "About ٢٠٠ food baskets go out unrecorded",
+     "title_local": "نوزع ٢٠٠ سلة غذائية ولا نسجل من استلمها",
+     "user_words": [
+      "٢٠٠ سلة",
+      "ولا نسجل من استلمها"
+     ],
+     "summary": "About ٢٠٠ food baskets go out unrecorded",
+     "category": "reporting_visibility"
+    }
+   ]
+  }
+ },
+ {
+  "id": "callcentre_rant_ar_5",
+  "industry": "call_centres_and_bpos",
+  "language": "ar",
+  "kind": "rant",
+  "regression": false,
+  "messages": [
+   "ما عاد أتحمل! الموظفون يتغيبون كل أسبوع، ومعدل ترك العمل وصل 30 بالمئة في الشهر، والتقارير اليومية تتأخر حتى المساء، والعملاء يشتكون من الانتظار الطويل على الخط."
+  ],
+  "expected": {
+   "problems": [
+    {
+     "id": "p1",
+     "any": [
+      "agents",
+      "absent"
+     ],
+     "figures": []
+    },
+    {
+     "id": "p2",
+     "any": [
+      "turnover",
+      "percent"
+     ],
+     "figures": [
+      "30 بالمئة"
+     ]
+    },
+    {
+     "id": "p3",
+     "any": [
+      "reports",
+      "evening"
+     ],
+     "figures": []
+    },
+    {
+     "id": "p4",
+     "any": [
+      "callers",
+      "waits"
+     ],
+     "figures": []
+    }
+   ],
+   "stated": [
+    "الموظفون يتغيبون كل أسبوع",
+    "معدل ترك العمل وصل 30 بالمئة في الشهر",
+    "التقارير اليومية تتأخر حتى المساء",
+    "العملاء يشتكون من الانتظار الطويل على الخط"
+   ],
+   "missing": [
+    "budget",
+    "cause",
+    "what has been tried"
+   ],
+   "hypothesis_only": [],
+   "corrections": []
+  },
+  "recorded": {
+   "origin": "reference output written by hand, not model output; agent-drafted, unreviewed (single author, no human review yet)",
+   "notes": [
+    {
+     "title": "Agents are absent every week",
+     "title_local": "الموظفون يتغيبون كل أسبوع",
+     "user_words": [
+      "الموظفون يتغيبون كل أسبوع"
+     ],
+     "summary": "Agents are absent every week",
+     "category": "people_staff"
+    },
+    {
+     "title": "Staff turnover reached 30 percent a month",
+     "title_local": "معدل ترك العمل 30 بالمئة في الشهر",
+     "user_words": [
+      "معدل ترك العمل وصل 30 بالمئة في الشهر"
+     ],
+     "summary": "Staff turnover reached 30 percent a month",
+     "category": "people_staff"
+    },
+    {
+     "title": "Daily reports are ready only by evening",
+     "title_local": "التقارير اليومية تتأخر حتى المساء",
+     "user_words": [
+      "التقارير اليومية تتأخر حتى المساء"
+     ],
+     "summary": "Daily reports are ready only by evening",
+     "category": "reporting_visibility"
+    },
+    {
+     "title": "Callers complain about long waits on the line",
+     "title_local": "العملاء يشتكون من الانتظار الطويل",
+     "user_words": [
+      "العملاء يشتكون من الانتظار الطويل على الخط"
+     ],
+     "summary": "Callers complain about long waits on the line",
+     "category": "customer_experience_digital"
+    }
+   ]
+  }
+ },
+ {
+  "id": "agency_mixed_ar",
+  "industry": "marketing_creative_and_digital_agencies",
+  "language": "ar",
+  "kind": "mixed",
+  "regression": false,
+  "messages": [
+   "عندنا agency صغيرة والـ clients يغيّرون الـ brief في آخر لحظة، وبعدها الـ invoice يتأخر شهرين."
+  ],
+  "expected": {
+   "problems": [
+    {
+     "id": "p1",
+     "any": [
+      "clients",
+      "brief"
+     ],
+     "figures": []
+    },
+    {
+     "id": "p2",
+     "any": [
+      "invoices",
+      "months"
+     ],
+     "figures": [
+      "شهرين"
+     ]
+    }
+   ],
+   "stated": [
+    "الـ clients يغيّرون الـ brief في آخر لحظة",
+    "الـ invoice يتأخر شهرين"
+   ],
+   "missing": [
+    "budget",
+    "cause",
+    "what has been tried"
+   ],
+   "hypothesis_only": [],
+   "corrections": []
+  },
+  "recorded": {
+   "origin": "reference output written by hand, not model output; agent-drafted, unreviewed (single author, no human review yet)",
+   "notes": [
+    {
+     "title": "Clients change the brief at the last moment",
+     "title_local": "العملاء يغيّرون الـ brief في آخر لحظة",
+     "user_words": [
+      "الـ clients يغيّرون الـ brief في آخر لحظة"
+     ],
+     "summary": "Clients change the brief at the last moment",
+     "category": "customers_retention"
+    },
+    {
+     "title": "Invoices are paid two months late",
+     "title_local": "الـ invoice يتأخر شهرين",
+     "user_words": [
+      "الـ invoice يتأخر شهرين"
+     ],
+     "summary": "Invoices are paid two months late",
+     "category": "cash_collections"
+    }
+   ]
+  }
+ },
+ {
+  "id": "lab_multi_ar",
+  "industry": "diagnostic_labs_and_sample_collection_centres",
+  "language": "ar",
+  "kind": "multi_turn",
+  "regression": false,
+  "messages": [
+   "المختبر عندنا يستقبل عينات من عدة فروع.",
+   "بعض النتائج تتأخر يومين عن الموعد المحدد، والمرضى يغضبون.",
+   "وأيضاً العينات أحياناً تصل بدون اسم واضح على الأنبوب."
+  ],
+  "expected": {
+   "problems": [
+    {
+     "id": "p1",
+     "any": [
+      "results",
+      "days"
+     ],
+     "figures": [
+      "يومين"
+     ]
+    },
+    {
+     "id": "p2",
+     "any": [
+      "samples",
+      "tube"
+     ],
+     "figures": []
+    }
+   ],
+   "stated": [
+    "بعض النتائج تتأخر يومين عن الموعد المحدد",
+    "العينات أحياناً تصل بدون اسم واضح على الأنبوب"
+   ],
+   "missing": [
+    "budget",
+    "cause",
+    "what has been tried"
+   ],
+   "hypothesis_only": [],
+   "corrections": []
+  },
+  "recorded": {
+   "origin": "reference output written by hand, not model output; agent-drafted, unreviewed (single author, no human review yet)",
+   "notes": [
+    {
+     "title": "Some results are two days late",
+     "title_local": "بعض النتائج تتأخر يومين",
+     "user_words": [
+      "بعض النتائج تتأخر يومين عن الموعد المحدد",
+      "المرضى يغضبون"
+     ],
+     "summary": "Some results are two days late",
+     "category": "orders_fulfilment"
+    },
+    {
+     "title": "Samples arrive with no name on the tube",
+     "title_local": "العينات تصل بدون اسم واضح",
+     "user_words": [
+      "العينات أحياناً تصل بدون اسم واضح على الأنبوب"
+     ],
+     "summary": "Samples arrive with no name on the tube",
+     "category": "quality_complaints"
+    }
+   ]
+  }
+ },
+ {
+  "id": "eldercare_constraints_ar",
+  "industry": "elderly_care_homes",
+  "language": "ar",
+  "kind": "constraints",
+  "regression": false,
+  "messages": [
+   "الأدوية في دار الرعاية تُعطى في أوقات مختلفة ولا يوجد سجل موحد، وفي الشهر الماضي نسينا جرعة لـ 3 نزلاء. عندنا ممرضتان فقط في الليل، والميزانية لا تزيد عن 8000 ريال، ولا يمكننا تغيير نظام الأدوية الحالي."
+  ],
+  "expected": {
+   "problems": [
+    {
+     "id": "p1",
+     "any": [
+      "medication",
+      "record"
+     ],
+     "figures": [
+      "3 نزلاء"
+     ]
+    }
+   ],
+   "stated": [
+    "نسينا جرعة لـ 3 نزلاء"
+   ],
+   "missing": [
+    "cause",
+    "what has been tried"
+   ],
+   "hypothesis_only": [],
+   "corrections": [],
+   "constraints": [
+    "ممرضتان فقط في الليل",
+    "الميزانية لا تزيد عن 8000 ريال",
+    "لا يمكننا تغيير نظام الأدوية الحالي"
+   ]
+  },
+  "recorded": {
+   "origin": "reference output written by hand, not model output; agent-drafted, unreviewed (single author, no human review yet)",
+   "notes": [
+    {
+     "title": "Medication times vary and no single record exists",
+     "title_local": "الأدوية تُعطى في أوقات مختلفة بلا سجل موحد",
+     "user_words": [
+      "الأدوية في دار الرعاية تُعطى في أوقات مختلفة ولا يوجد سجل موحد",
+      "نسينا جرعة لـ 3 نزلاء"
+     ],
+     "summary": "Medication times vary and no single record exists",
+     "category": "operations_process",
+     "constraints": [
+      "ممرضتان فقط في الليل",
+      "الميزانية لا تزيد عن 8000 ريال",
+      "لا يمكننا تغيير نظام الأدوية الحالي"
+     ]
+    }
+   ]
+  }
+ },
+ {
+  "id": "scrap_single_ar",
+  "industry": "scrap_recycling_and_waste_management",
+  "language": "ar",
+  "kind": "single",
+  "regression": false,
+  "messages": [
+   "نخسر نحو 15 ألف ريال كل شهر لأن الحديد القديم يُوزن بشكل خاطئ عند الشراء."
+  ],
+  "expected": {
+   "problems": [
+    {
+     "id": "p1",
+     "any": [
+      "scrap",
+      "weighed"
+     ],
+     "figures": [
+      "15 ألف ريال"
+     ]
+    }
+   ],
+   "stated": [
+    "نخسر نحو 15 ألف ريال كل شهر"
+   ],
+   "missing": [
+    "budget",
+    "cause",
+    "what has been tried"
+   ],
+   "hypothesis_only": [],
+   "corrections": []
+  },
+  "recorded": {
+   "origin": "reference output written by hand, not model output; agent-drafted, unreviewed (single author, no human review yet)",
+   "notes": [
+    {
+     "title": "Scrap iron is weighed wrongly when bought",
+     "title_local": "الحديد القديم يُوزن بشكل خاطئ عند الشراء",
+     "user_words": [
+      "نخسر نحو 15 ألف ريال كل شهر",
+      "الحديد القديم يُوزن بشكل خاطئ عند الشراء"
+     ],
+     "summary": "Scrap iron is weighed wrongly when bought",
+     "category": "margin_cost",
+     "money_text": "15 ألف ريال كل شهر"
+    }
+   ]
+  }
+ },
+ {
+  "id": "course_single_ur_2",
+  "industry": "edtech_and_online_course_businesses",
+  "language": "ur",
+  "kind": "single",
+  "regression": false,
+  "messages": [
+   "ہمارے آن لائن کورس کے تقریباً 40 فیصد طلبہ پہلے ہفتے کے بعد کلاس چھوڑ دیتے ہیں۔"
+  ],
+  "expected": {
+   "problems": [
+    {
+     "id": "p1",
+     "any": [
+      "students",
+      "leave"
+     ],
+     "figures": [
+      "40 فیصد"
+     ]
+    }
+   ],
+   "stated": [
+    "تقریباً 40 فیصد طلبہ پہلے ہفتے کے بعد کلاس چھوڑ دیتے ہیں"
+   ],
+   "missing": [
+    "budget",
+    "cause",
+    "what has been tried"
+   ],
+   "hypothesis_only": [],
+   "corrections": []
+  },
+  "recorded": {
+   "origin": "reference output written by hand, not model output; agent-drafted, unreviewed (single author, no human review yet)",
+   "notes": [
+    {
+     "title": "40 percent of students quit after week one",
+     "title_local": "40 فیصد طلبہ پہلے ہفتے کے بعد کلاس چھوڑ دیتے ہیں",
+     "user_words": [
+      "تقریباً 40 فیصد طلبہ پہلے ہفتے کے بعد کلاس چھوڑ دیتے ہیں"
+     ],
+     "summary": "40 percent of students quit after week one",
+     "category": "customers_retention"
+    }
+   ]
+  }
+ },
+ {
+  "id": "hyper_list_ur_2",
+  "industry": "supermarkets_and_hypermarkets",
+  "language": "ur",
+  "kind": "list",
+  "regression": false,
+  "messages": [
+   "ہمارے سپر مارکیٹ کے مسائل: ایک، کیشیئر کے بل میں غلطیاں ہوتی ہیں۔ دو، شیلف پر مال ختم ہو جاتا ہے مگر گودام میں پڑا رہتا ہے۔ تین، ایکسپائری والا مال دیر سے پتا چلتا ہے۔ چار، سپلائر کی ادائیگی کی تاریخیں یاد نہیں رہتیں۔ پانچ، چوری کے واقعات بڑھ رہے ہیں۔ چھ، رش کے وقت کاؤنٹر کم پڑ جاتے ہیں۔"
+  ],
+  "expected": {
+   "problems": [
+    {
+     "id": "p1",
+     "any": [
+      "cashier",
+      "bills"
+     ],
+     "figures": []
+    },
+    {
+     "id": "p2",
+     "any": [
+      "shelves",
+      "warehouse"
+     ],
+     "figures": []
+    },
+    {
+     "id": "p3",
+     "any": [
+      "expiry",
+      "found"
+     ],
+     "figures": []
+    },
+    {
+     "id": "p4",
+     "any": [
+      "supplier",
+      "dates"
+     ],
+     "figures": []
+    },
+    {
+     "id": "p5",
+     "any": [
+      "theft",
+      "rising"
+     ],
+     "figures": []
+    },
+    {
+     "id": "p6",
+     "any": [
+      "counters",
+      "rush"
+     ],
+     "figures": []
+    }
+   ],
+   "stated": [
+    "کیشیئر کے بل میں غلطیاں ہوتی ہیں",
+    "شیلف پر مال ختم ہو جاتا ہے مگر گودام میں پڑا رہتا ہے",
+    "ایکسپائری والا مال دیر سے پتا چلتا ہے",
+    "سپلائر کی ادائیگی کی تاریخیں یاد نہیں رہتیں",
+    "چوری کے واقعات بڑھ رہے ہیں",
+    "رش کے وقت کاؤنٹر کم پڑ جاتے ہیں"
+   ],
+   "missing": [
+    "budget",
+    "cause",
+    "what has been tried"
+   ],
+   "hypothesis_only": [],
+   "corrections": []
+  },
+  "recorded": {
+   "origin": "reference output written by hand, not model output; agent-drafted, unreviewed (single author, no human review yet)",
+   "notes": [
+    {
+     "title": "Cashier bills contain errors",
+     "title_local": "کیشیئر کے بل میں غلطیاں",
+     "user_words": [
+      "کیشیئر کے بل میں غلطیاں ہوتی ہیں"
+     ],
+     "summary": "Cashier bills contain errors",
+     "category": "operations_process"
+    },
+    {
+     "title": "Shelves empty while stock sits in the warehouse",
+     "title_local": "شیلف خالی گودام میں مال",
+     "user_words": [
+      "شیلف پر مال ختم ہو جاتا ہے مگر گودام میں پڑا رہتا ہے"
+     ],
+     "summary": "Shelves empty while stock sits in the warehouse",
+     "category": "stock_inventory"
+    },
+    {
+     "title": "Expiry stock is found late",
+     "title_local": "ایکسپائری والا مال دیر سے پتا چلتا ہے",
+     "user_words": [
+      "ایکسپائری والا مال دیر سے پتا چلتا ہے"
+     ],
+     "summary": "Expiry stock is found late",
+     "category": "stock_inventory"
+    },
+    {
+     "title": "Supplier payment dates are forgotten",
+     "title_local": "سپلائر کی ادائیگی کی تاریخیں یاد نہیں رہتیں",
+     "user_words": [
+      "سپلائر کی ادائیگی کی تاریخیں یاد نہیں رہتیں"
+     ],
+     "summary": "Supplier payment dates are forgotten",
+     "category": "suppliers_purchasing"
+    },
+    {
+     "title": "Theft incidents are rising",
+     "title_local": "چوری کے واقعات بڑھ رہے ہیں",
+     "user_words": [
+      "چوری کے واقعات بڑھ رہے ہیں"
+     ],
+     "summary": "Theft incidents are rising",
+     "category": "loss_security"
+    },
+    {
+     "title": "Too few counters at rush hour",
+     "title_local": "رش کے وقت کاؤنٹر کم پڑ جاتے ہیں",
+     "user_words": [
+      "رش کے وقت کاؤنٹر کم پڑ جاتے ہیں"
+     ],
+     "summary": "Too few counters at rush hour",
+     "category": "customer_experience_digital"
+    }
+   ]
+  }
+ },
+ {
+  "id": "livestock_correction_ur",
+  "industry": "livestock_traders_and_mandis",
+  "language": "ur",
+  "kind": "correction",
+  "regression": false,
+  "messages": [
+   "ہم ہر ہفتے تقریباً 10 جانور خریدتے ہیں اور ان کے بیمار نکلنے کا پتا بعد میں چلتا ہے۔",
+   "نہیں، 10 نہیں، 100 جانور۔"
+  ],
+  "expected": {
+   "problems": [
+    {
+     "id": "p1",
+     "any": [
+      "animals",
+      "illness"
+     ],
+     "figures": [
+      "100 جانور"
+     ]
+    }
+   ],
+   "stated": [
+    "ہر ہفتے تقریباً 100 جانور خریدتے ہیں"
+   ],
+   "missing": [
+    "budget",
+    "cause",
+    "what has been tried"
+   ],
+   "hypothesis_only": [],
+   "corrections": [
+    {
+     "wrong": "10",
+     "right": "100",
+     "problem": "p1"
+    }
+   ]
+  },
+  "recorded": {
+   "origin": "reference output written by hand, not model output; agent-drafted, unreviewed (single author, no human review yet)",
+   "notes": [
+    {
+     "title": "About 100 animals weekly, illness found late",
+     "title_local": "100 جانور ہفتے میں، بیماری کا دیر سے پتا",
+     "user_words": [
+      "100 جانور",
+      "بیمار نکلنے کا پتا بعد میں چلتا ہے"
+     ],
+     "summary": "About 100 animals weekly, illness found late",
+     "category": "quality_complaints"
+    }
+   ]
+  }
+ },
+ {
+  "id": "tender_rant_ur",
+  "industry": "government_contractors_and_public_sector_suppliers",
+  "language": "ur",
+  "kind": "rant",
+  "regression": false,
+  "messages": [
+   "بس اب تو حد ہو گئی! ٹینڈر کی فائلیں بنانے میں ہفتہ لگ جاتا ہے، سرکاری ادارے بل کی ادائیگی چھ چھ مہینے روکے رکھتے ہیں، تقریباً 25 لاکھ روپے پھنسے ہوئے ہیں، اور عملے کو کوئی پتا ہی نہیں ہوتا کہ کون سا کاغذ کس کے پاس ہے۔"
+  ],
+  "expected": {
+   "problems": [
+    {
+     "id": "p1",
+     "any": [
+      "tender",
+      "files"
+     ],
+     "figures": []
+    },
+    {
+     "id": "p2",
+     "any": [
+      "payments",
+      "stuck"
+     ],
+     "figures": [
+      "25 لاکھ روپے"
+     ]
+    },
+    {
+     "id": "p3",
+     "any": [
+      "paper",
+      "whom"
+     ],
+     "figures": []
+    }
+   ],
+   "stated": [
+    "ٹینڈر کی فائلیں بنانے میں ہفتہ لگ جاتا ہے",
+    "تقریباً 25 لاکھ روپے پھنسے ہوئے ہیں",
+    "کون سا کاغذ کس کے پاس ہے"
+   ],
+   "missing": [
+    "budget",
+    "cause",
+    "what has been tried"
+   ],
+   "hypothesis_only": [],
+   "corrections": []
+  },
+  "recorded": {
+   "origin": "reference output written by hand, not model output; agent-drafted, unreviewed (single author, no human review yet)",
+   "notes": [
+    {
+     "title": "Tender files take a week to prepare",
+     "title_local": "ٹینڈر کی فائلیں بنانے میں ہفتہ لگ جاتا ہے",
+     "user_words": [
+      "ٹینڈر کی فائلیں بنانے میں ہفتہ لگ جاتا ہے"
+     ],
+     "summary": "Tender files take a week to prepare",
+     "category": "compliance_admin"
+    },
+    {
+     "title": "About 25 lakh rupees stuck in unpaid bills",
+     "title_local": "تقریباً 25 لاکھ روپے پھنسے ہوئے ہیں",
+     "user_words": [
+      "سرکاری ادارے بل کی ادائیگی چھ چھ مہینے روکے رکھتے ہیں",
+      "تقریباً 25 لاکھ روپے پھنسے ہوئے ہیں"
+     ],
+     "summary": "About 25 lakh rupees stuck in unpaid bills",
+     "category": "cash_collections",
+     "money_text": "25 لاکھ روپے"
+    },
+    {
+     "title": "Nobody knows which paper is with whom",
+     "title_local": "کون سا کاغذ کس کے پاس ہے",
+     "user_words": [
+      "عملے کو کوئی پتا ہی نہیں ہوتا کہ کون سا کاغذ کس کے پاس ہے"
+     ],
+     "summary": "Nobody knows which paper is with whom",
+     "category": "reporting_visibility"
+    }
+   ]
+  }
+ },
+ {
+  "id": "softhouse_mixed_ur",
+  "industry": "it_services_and_software_houses",
+  "language": "ur",
+  "kind": "mixed",
+  "regression": false,
+  "messages": [
+   "ہمارے software house میں clients کی requirements بار بار بدلتی ہیں اور project کی deadline نکل جاتی ہے، پھر developers پر دباؤ بڑھ جاتا ہے۔"
+  ],
+  "expected": {
+   "problems": [
+    {
+     "id": "p1",
+     "any": [
+      "requirements",
+      "deadlines"
+     ],
+     "figures": []
+    },
+    {
+     "id": "p2",
+     "any": [
+      "developers",
+      "pressure"
+     ],
+     "figures": []
+    }
+   ],
+   "stated": [
+    "clients کی requirements بار بار بدلتی ہیں",
+    "developers پر دباؤ بڑھ جاتا ہے"
+   ],
+   "missing": [
+    "budget",
+    "cause",
+    "what has been tried"
+   ],
+   "hypothesis_only": [],
+   "corrections": []
+  },
+  "recorded": {
+   "origin": "reference output written by hand, not model output; agent-drafted, unreviewed (single author, no human review yet)",
+   "notes": [
+    {
+     "title": "Client requirements keep changing and deadlines are missed",
+     "title_local": "requirements بار بار بدلتی ہیں اور deadline نکل جاتی ہے",
+     "user_words": [
+      "clients کی requirements بار بار بدلتی ہیں",
+      "project کی deadline نکل جاتی ہے"
+     ],
+     "summary": "Client requirements keep changing and deadlines are missed",
+     "category": "operations_process"
+    },
+    {
+     "title": "Developers are under rising pressure",
+     "title_local": "developers پر دباؤ بڑھ جاتا ہے",
+     "user_words": [
+      "developers پر دباؤ بڑھ جاتا ہے"
+     ],
+     "summary": "Developers are under rising pressure",
+     "category": "people_staff"
+    }
+   ]
+  }
+ },
+ {
+  "id": "movers_multi_ur",
+  "industry": "movers_and_relocation_companies",
+  "language": "ur",
+  "kind": "multi_turn",
+  "regression": false,
+  "messages": [
+   "ہم گھروں کا سامان شفٹ کرتے ہیں۔",
+   "ہر ہفتے کم از کم 3 گاہکوں کا سامان ٹوٹ جاتا ہے۔",
+   "دوسرا مسئلہ یہ کہ ٹرک ڈرائیور وقت پر پہنچتے نہیں، گاہک ناراض ہو جاتے ہیں۔"
+  ],
+  "expected": {
+   "problems": [
+    {
+     "id": "p1",
+     "any": [
+      "goods",
+      "break"
+     ],
+     "figures": [
+      "3 گاہکوں"
+     ]
+    },
+    {
+     "id": "p2",
+     "any": [
+      "drivers",
+      "time"
+     ],
+     "figures": []
+    }
+   ],
+   "stated": [
+    "ہر ہفتے کم از کم 3 گاہکوں کا سامان ٹوٹ جاتا ہے",
+    "ٹرک ڈرائیور وقت پر پہنچتے نہیں"
+   ],
+   "missing": [
+    "budget",
+    "cause",
+    "what has been tried"
+   ],
+   "hypothesis_only": [],
+   "corrections": []
+  },
+  "recorded": {
+   "origin": "reference output written by hand, not model output; agent-drafted, unreviewed (single author, no human review yet)",
+   "notes": [
+    {
+     "title": "Customers' goods break in moves every week",
+     "title_local": "ہر ہفتے سامان ٹوٹ جاتا ہے",
+     "user_words": [
+      "ہر ہفتے کم از کم 3 گاہکوں کا سامان ٹوٹ جاتا ہے"
+     ],
+     "summary": "Customers' goods break in moves every week",
+     "category": "quality_complaints"
+    },
+    {
+     "title": "Truck drivers do not arrive on time",
+     "title_local": "ٹرک ڈرائیور وقت پر پہنچتے نہیں",
+     "user_words": [
+      "ٹرک ڈرائیور وقت پر پہنچتے نہیں",
+      "گاہک ناراض ہو جاتے ہیں"
+     ],
+     "summary": "Truck drivers do not arrive on time",
+     "category": "orders_fulfilment"
+    }
+   ]
+  }
+ },
+ {
+  "id": "kidswear_constraints_ur",
+  "industry": "kids_wear_toys_and_baby_stores",
+  "language": "ur",
+  "kind": "constraints",
+  "regression": false,
+  "messages": [
+   "ہماری بچوں کی دکان میں سائز کے حساب سے مال کا ریکارڈ نہیں رکھا جاتا، ہر ماہ 50 جوڑے کپڑے بغیر بکے رہ جاتے ہیں۔ ہمارے پاس صرف 2 سیلز مین ہیں، بجٹ 1 لاکھ روپے سے زیادہ نہیں اور ہم دکان کا لے آؤٹ نہیں بدل سکتے۔"
+  ],
+  "expected": {
+   "problems": [
+    {
+     "id": "p1",
+     "any": [
+      "sizes",
+      "unsold"
+     ],
+     "figures": [
+      "50 جوڑے"
+     ]
+    }
+   ],
+   "stated": [
+    "ہر ماہ 50 جوڑے کپڑے بغیر بکے رہ جاتے ہیں"
+   ],
+   "missing": [
+    "cause",
+    "what has been tried"
+   ],
+   "hypothesis_only": [],
+   "corrections": [],
+   "constraints": [
+    "صرف 2 سیلز مین",
+    "بجٹ 1 لاکھ روپے سے زیادہ نہیں",
+    "دکان کا لے آؤٹ نہیں بدل سکتے"
+   ]
+  },
+  "recorded": {
+   "origin": "reference output written by hand, not model output; agent-drafted, unreviewed (single author, no human review yet)",
+   "notes": [
+    {
+     "title": "No size-wise stock record, clothes stay unsold",
+     "title_local": "سائز کے حساب سے ریکارڈ نہیں، کپڑے بغیر بکے",
+     "user_words": [
+      "سائز کے حساب سے مال کا ریکارڈ نہیں رکھا جاتا",
+      "ہر ماہ 50 جوڑے کپڑے بغیر بکے رہ جاتے ہیں"
+     ],
+     "summary": "No size-wise stock record, clothes stay unsold",
+     "category": "stock_inventory",
+     "constraints": [
+      "صرف 2 سیلز مین",
+      "بجٹ 1 لاکھ روپے سے زیادہ نہیں",
+      "دکان کا لے آؤٹ نہیں بدل سکتے"
+     ]
+    }
+   ]
+  }
+ },
+ {
+  "id": "developer_list_ur_2",
+  "industry": "property_developers",
+  "language": "ur",
+  "kind": "list",
+  "regression": false,
+  "messages": [
+   "ہمارے پراجیکٹ میں ٹھیکیداروں کو ادائیگی میں تاخیر ہوتی ہے، تقریباً 1 کروڑ روپے کی ادائیگیاں رکی ہوئی ہیں۔ بکنگ کی قسطیں 8 لاکھ روپے ہر ماہ وصول ہونی ہیں مگر آدھی آتی ہیں۔ اور خریداروں کو تعمیر کی پیش رفت کی اطلاع نہیں ملتی۔"
+  ],
+  "expected": {
+   "problems": [
+    {
+     "id": "p1",
+     "any": [
+      "contractor",
+      "payments"
+     ],
+     "figures": [
+      "1 کروڑ روپے"
+     ]
+    },
+    {
+     "id": "p2",
+     "any": [
+      "booking",
+      "instalments"
+     ],
+     "figures": [
+      "8 لاکھ روپے"
+     ]
+    },
+    {
+     "id": "p3",
+     "any": [
+      "buyers",
+      "updates"
+     ],
+     "figures": []
+    }
+   ],
+   "stated": [
+    "تقریباً 1 کروڑ روپے کی ادائیگیاں رکی ہوئی ہیں",
+    "بکنگ کی قسطیں 8 لاکھ روپے ہر ماہ وصول ہونی ہیں مگر آدھی آتی ہیں",
+    "خریداروں کو تعمیر کی پیش رفت کی اطلاع نہیں ملتی"
+   ],
+   "missing": [
+    "budget",
+    "cause",
+    "what has been tried"
+   ],
+   "hypothesis_only": [],
+   "corrections": []
+  },
+  "recorded": {
+   "origin": "reference output written by hand, not model output; agent-drafted, unreviewed (single author, no human review yet)",
+   "notes": [
+    {
+     "title": "About 1 crore rupees of contractor payments held",
+     "title_local": "ٹھیکیداروں کی 1 کروڑ روپے کی ادائیگیاں رکی ہیں",
+     "user_words": [
+      "ٹھیکیداروں کو ادائیگی میں تاخیر ہوتی ہے",
+      "تقریباً 1 کروڑ روپے کی ادائیگیاں رکی ہوئی ہیں"
+     ],
+     "summary": "About 1 crore rupees of contractor payments held",
+     "category": "suppliers_purchasing",
+     "money_text": "1 کروڑ روپے"
+    },
+    {
+     "title": "Only half of 8 lakh monthly instalments arrive",
+     "title_local": "8 لاکھ روپے کی قسطوں میں سے آدھی آتی ہیں",
+     "user_words": [
+      "بکنگ کی قسطیں 8 لاکھ روپے ہر ماہ وصول ہونی ہیں مگر آدھی آتی ہیں"
+     ],
+     "summary": "Only half of 8 lakh monthly instalments arrive",
+     "category": "cash_collections",
+     "money_text": "8 لاکھ روپے ہر ماہ"
+    },
+    {
+     "title": "Buyers get no updates on construction progress",
+     "title_local": "خریداروں کو تعمیر کی پیش رفت کی اطلاع نہیں ملتی",
+     "user_words": [
+      "خریداروں کو تعمیر کی پیش رفت کی اطلاع نہیں ملتی"
+     ],
+     "summary": "Buyers get no updates on construction progress",
+     "category": "communication_coordination"
+    }
+   ]
+  }
+ },
+ {
+  "id": "typing_voice_ur",
+  "industry": "typing_translation_and_attestation_centres",
+  "language": "ur",
+  "kind": "list",
+  "regression": false,
+  "messages": [
+   "جی بھائی ایسا ہے کہ ہمارے سینٹر پر لوگ دستاویز دے جاتے ہیں تو ترجمہ تیار ہونے میں تین دن لگ جاتے ہیں اور کسٹمر روز فون کرتا ہے پھر مہر لگوانے کے لیے دفتر کے چکر لگانے پڑتے ہیں اور فیس کا حساب بھی کاپی میں لکھتے ہیں اکثر بھول جاتے ہیں"
+  ],
+  "expected": {
+   "problems": [
+    {
+     "id": "p1",
+     "any": [
+      "translation",
+      "days"
+     ],
+     "figures": [
+      "تین دن"
+     ]
+    },
+    {
+     "id": "p2",
+     "any": [
+      "attestation",
+      "trips"
+     ],
+     "figures": []
+    },
+    {
+     "id": "p3",
+     "any": [
+      "fee",
+      "forgotten"
+     ],
+     "figures": []
+    }
+   ],
+   "stated": [
+    "ترجمہ تیار ہونے میں تین دن لگ جاتے ہیں",
+    "مہر لگوانے کے لیے دفتر کے چکر لگانے پڑتے ہیں",
+    "فیس کا حساب بھی کاپی میں لکھتے ہیں اکثر بھول جاتے ہیں"
+   ],
+   "missing": [
+    "budget",
+    "cause",
+    "what has been tried"
+   ],
+   "hypothesis_only": [],
+   "corrections": []
+  },
+  "recorded": {
+   "origin": "reference output written by hand, not model output; agent-drafted, unreviewed (single author, no human review yet)",
+   "notes": [
+    {
+     "title": "Translation takes three days and customers call daily",
+     "title_local": "ترجمہ تیار ہونے میں تین دن لگ جاتے ہیں",
+     "user_words": [
+      "ترجمہ تیار ہونے میں تین دن لگ جاتے ہیں",
+      "کسٹمر روز فون کرتا ہے"
+     ],
+     "summary": "Translation takes three days and customers call daily",
+     "category": "orders_fulfilment"
+    },
+    {
+     "title": "Attestation needs repeated office trips",
+     "title_local": "مہر لگوانے کے لیے دفتر کے چکر",
+     "user_words": [
+      "مہر لگوانے کے لیے دفتر کے چکر لگانے پڑتے ہیں"
+     ],
+     "summary": "Attestation needs repeated office trips",
+     "category": "operations_process"
+    },
+    {
+     "title": "Fee records in a notebook are often forgotten",
+     "title_local": "فیس کا حساب کاپی میں اکثر بھول جاتے ہیں",
+     "user_words": [
+      "فیس کا حساب بھی کاپی میں لکھتے ہیں اکثر بھول جاتے ہیں"
+     ],
+     "summary": "Fee records in a notebook are often forgotten",
+     "category": "reporting_visibility"
+    }
+   ]
+  }
+ },
+ {
+  "id": "fishmkt_single_ur",
+  "industry": "seafood_and_fish_markets",
+  "language": "ur",
+  "kind": "single",
+  "regression": false,
+  "messages": [
+   "ہماری مچھلی کی دکان پر برف کا خرچ روز کا 3 ہزار روپے ہے اور پھر بھی گرمی میں مال خراب ہو جاتا ہے۔"
+  ],
+  "expected": {
+   "problems": [
+    {
+     "id": "p1",
+     "any": [
+      "fish",
+      "spoils"
+     ],
+     "figures": [
+      "3 ہزار روپے"
+     ]
+    }
+   ],
+   "stated": [
+    "برف کا خرچ روز کا 3 ہزار روپے ہے",
+    "گرمی میں مال خراب ہو جاتا ہے"
+   ],
+   "missing": [
+    "budget",
+    "what has been tried"
+   ],
+   "hypothesis_only": [
+    "ice may be too little",
+    "too little for the heat"
+   ],
+   "corrections": []
+  },
+  "recorded": {
+   "origin": "reference output written by hand, not model output; agent-drafted, unreviewed (single author, no human review yet)",
+   "notes": [
+    {
+     "title": "Fish spoils in summer despite daily ice cost",
+     "title_local": "برف کے خرچ کے باوجود گرمی میں مال خراب",
+     "user_words": [
+      "برف کا خرچ روز کا 3 ہزار روپے ہے",
+      "گرمی میں مال خراب ہو جاتا ہے"
+     ],
+     "summary": "Fish spoils in summer despite daily ice cost",
+     "category": "stock_inventory",
+     "money_text": "3 ہزار روپے روز",
+     "cause": "the ice may be too little for the heat",
+     "cause_status": "hypothesis"
+    }
+   ]
+  }
+ },
+ {
+  "id": "plastic_list_ru_4",
+  "industry": "plastics_and_injection_moulding",
+  "language": "roman_ur",
+  "kind": "list",
+  "regression": false,
+  "messages": [
+   "Hamari factory mein 4 masle hain: mold change mein bohat time lagta hai, raw material ka hisaab theek nahi milta, machine operator bina bataye chutti kar lete hain, aur customer ko maal dair se jata hai."
+  ],
+  "expected": {
+   "problems": [
+    {
+     "id": "p1",
+     "any": [
+      "mould",
+      "changes"
+     ],
+     "figures": []
+    },
+    {
+     "id": "p2",
+     "any": [
+      "raw",
+      "material"
+     ],
+     "figures": []
+    },
+    {
+     "id": "p3",
+     "any": [
+      "operators",
+      "leave"
+     ],
+     "figures": []
+    },
+    {
+     "id": "p4",
+     "any": [
+      "deliveries",
+      "customers"
+     ],
+     "figures": []
+    }
+   ],
+   "stated": [
+    "mold change mein bohat time lagta hai",
+    "raw material ka hisaab theek nahi milta",
+    "machine operator bina bataye chutti kar lete hain",
+    "customer ko maal dair se jata hai"
+   ],
+   "missing": [
+    "budget",
+    "cause",
+    "what has been tried"
+   ],
+   "hypothesis_only": [],
+   "corrections": []
+  },
+  "recorded": {
+   "origin": "reference output written by hand, not model output; agent-drafted, unreviewed (single author, no human review yet)",
+   "notes": [
+    {
+     "title": "Mould changes take a long time",
+     "title_local": "mold change mein bohat time lagta hai",
+     "user_words": [
+      "mold change mein bohat time lagta hai"
+     ],
+     "summary": "Mould changes take a long time",
+     "category": "operations_process"
+    },
+    {
+     "title": "Raw material records are not reliable",
+     "title_local": "raw material ka hisaab theek nahi milta",
+     "user_words": [
+      "raw material ka hisaab theek nahi milta"
+     ],
+     "summary": "Raw material records are not reliable",
+     "category": "stock_inventory"
+    },
+    {
+     "title": "Operators take leave without telling",
+     "title_local": "operator bina bataye chutti kar lete hain",
+     "user_words": [
+      "machine operator bina bataye chutti kar lete hain"
+     ],
+     "summary": "Operators take leave without telling",
+     "category": "people_staff"
+    },
+    {
+     "title": "Deliveries to customers are late",
+     "title_local": "customer ko maal dair se jata hai",
+     "user_words": [
+      "customer ko maal dair se jata hai"
+     ],
+     "summary": "Deliveries to customers are late",
+     "category": "orders_fulfilment"
+    }
+   ]
+  }
+ },
+ {
+  "id": "aircon_correction_ru_3",
+  "industry": "hvac_ac_sales_installation_and_service",
+  "language": "roman_ur",
+  "kind": "correction",
+  "regression": false,
+  "messages": [
+   "Garmiyon mein hamare 10 customers rozana service ke liye wait karte hain.",
+   "Sorry, 10 nahi, 100 customers rozana wait karte hain, technician kam hain."
+  ],
+  "expected": {
+   "problems": [
+    {
+     "id": "p1",
+     "any": [
+      "customers",
+      "service"
+     ],
+     "figures": [
+      "100 customers"
+     ]
+    }
+   ],
+   "stated": [
+    "100 customers rozana service ke liye wait karte hain"
+   ],
+   "missing": [
+    "budget",
+    "what has been tried"
+   ],
+   "hypothesis_only": [],
+   "corrections": [
+    {
+     "wrong": "10",
+     "right": "100",
+     "problem": "p1"
+    }
+   ]
+  },
+  "recorded": {
+   "origin": "reference output written by hand, not model output; agent-drafted, unreviewed (single author, no human review yet)",
+   "notes": [
+    {
+     "title": "About 100 customers wait daily for AC service",
+     "title_local": "100 customers rozana service ke liye wait karte hain",
+     "user_words": [
+      "100 customers rozana wait karte hain",
+      "technician kam hain"
+     ],
+     "summary": "About 100 customers wait daily for AC service",
+     "category": "orders_fulfilment",
+     "cause": "there are too few technicians",
+     "cause_status": "owner_said"
+    }
+   ]
+  }
+ },
+ {
+  "id": "distrib_rant_ru_2",
+  "industry": "fmcg_distributors_and_sub_distributors",
+  "language": "roman_ur",
+  "kind": "rant",
+  "regression": false,
+  "messages": [
+   "Yaar tang aa gaya hoon! Dukandaaron se 12 lakh rupay wasool karne hain magar koi phone nahi uthata, gaari ka diesel roz barh raha hai, aur salesman ke orders ki entry mein ghalti hoti hai."
+  ],
+  "expected": {
+   "problems": [
+    {
+     "id": "p1",
+     "any": [
+      "shopkeepers",
+      "owe"
+     ],
+     "figures": [
+      "12 lakh rupay"
+     ]
+    },
+    {
+     "id": "p2",
+     "any": [
+      "diesel",
+      "costs"
+     ],
+     "figures": []
+    },
+    {
+     "id": "p3",
+     "any": [
+      "order",
+      "entry"
+     ],
+     "figures": []
+    }
+   ],
+   "stated": [
+    "Dukandaaron se 12 lakh rupay wasool karne hain",
+    "gaari ka diesel roz barh raha hai",
+    "salesman ke orders ki entry mein ghalti hoti hai"
+   ],
+   "missing": [
+    "budget",
+    "cause",
+    "what has been tried"
+   ],
+   "hypothesis_only": [],
+   "corrections": []
+  },
+  "recorded": {
+   "origin": "reference output written by hand, not model output; agent-drafted, unreviewed (single author, no human review yet)",
+   "notes": [
+    {
+     "title": "Shopkeepers owe 12 lakh rupees and avoid calls",
+     "title_local": "dukandaaron se 12 lakh rupay wasool karne hain",
+     "user_words": [
+      "Dukandaaron se 12 lakh rupay wasool karne hain",
+      "koi phone nahi uthata"
+     ],
+     "summary": "Shopkeepers owe 12 lakh rupees and avoid calls",
+     "category": "cash_collections",
+     "money_text": "12 lakh rupay"
+    },
+    {
+     "title": "Vehicle diesel costs rise every day",
+     "title_local": "gaari ka diesel roz barh raha hai",
+     "user_words": [
+      "gaari ka diesel roz barh raha hai"
+     ],
+     "summary": "Vehicle diesel costs rise every day",
+     "category": "margin_cost"
+    },
+    {
+     "title": "Mistakes in salesmen's order entry",
+     "title_local": "salesman ke orders ki entry mein ghalti",
+     "user_words": [
+      "salesman ke orders ki entry mein ghalti hoti hai"
+     ],
+     "summary": "Mistakes in salesmen's order entry",
+     "category": "orders_fulfilment"
+    }
+   ]
+  }
  }
 ]

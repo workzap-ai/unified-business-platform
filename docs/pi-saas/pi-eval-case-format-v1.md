@@ -23,7 +23,7 @@ Vocabulary: **documented** (this file), **implemented** (none), **scripted-teste
   notes: `title`, `title_local`, `user_words`, `summary`, `category`, optionally `cause`, `cause_status`,
   `constraints`, `money_text`).
 - No case stores its split. `splits.split_of`: `regression` true gives Regression; otherwise
-  `sha256(id)[0] % 100 < 25` gives Held-out, else Development. Today: Development 69, Held-out 60,
+  `sha256(id)[0] % 100 < 25` gives Held-out, else Development. Today (original text; FT-A1 round 2 later made it 161 cases, Development 98, see `pi-eval-heldout-coverage.md` section 7): Development 69, Held-out 60,
   Regression 3. `held_out_access(log, who, why)` builds an append-only record but nothing stores it.
 - `scorers.MIN_CASES = 3`: a group with fewer labelled cases is "not yet measured", never "passing".
 - `replay` runs the recorded notes through the real extraction path with `ScriptedManager`; no model call.
