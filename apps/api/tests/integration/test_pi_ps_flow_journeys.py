@@ -113,24 +113,9 @@ def record_findings(journey, run, reqs):
 
 def gate_findings_from(journey, reqs):
     packed = option_wiring.requirements_context(reqs)
-    again = option_wiring.requirements_from(packed)
     found = fl.gate_findings(journey, packed)
-    # every idea through the live gate in one go: unknown is labelled, a question is one question
-    wired = option_wiring.gate_ideas(
-        [i["text"] for i in journey["ideas"]], again, journey["language"]
-    )
-    found.setdefault("gate_live", [])
-    for text in wired.unknown:
-        if not any(option_wiring.NOT_CHECKED in s for s in wired.shown if text.rstrip(". ") in s):
-            found["gate_live"].append(f"unknown shown as checked: {text[:50]}")
-    if wired.question and not (wired.question.count("?") == 1 and wired.question.endswith("?")):
-        found["gate_live"].append(wired.question)
+    found.update(fl.voice_findings_for(journey, option_wiring.requirements_from(packed)))
     return found
-
-
-def blueprint_for(journey, views, owner_messages):
-    bp = fl.build_blueprint(journey, views, owner_messages)
-    return views, bp
 
 
 def settle(found, pending, run=None):
@@ -164,27 +149,7 @@ async def test_journey_end_to_end(journey_id, api, business_db, monkeypatch):
     found = record_findings(journey, run, reqs)
     found.update(gate_findings_from(journey, reqs))
     views = views_of(run.rows)
-    views, bp = blueprint_for(journey, views, run.owner_messages)
-    found.update(fl.blueprint_findings(journey, bp, views))
-    again = blueprint_for(journey, views, run.owner_messages)[1]
-    found["deterministic"] = (
-        []
-        if json.dumps(bp, sort_keys=True, ensure_ascii=False)
-        == json.dumps(again, sort_keys=True, ensure_ascii=False)
-        else ["two runs gave different blueprints"]
-    )
-    found["rerank"] = []
-    if journey["rerank"] and run.snapshot:
-        rr = journey["rerank"]
-        before = blueprint_for(journey, run.snapshot, run.owner_messages)[1]
-        idea = journey["ideas"][rr["idea"]]["text"]
-        if idea in [r["option"] for r in before["recommendation"]["rejected"]]:
-            found["rerank"].append("rejected before the owner changed the requirement")
-        if idea not in [r["option"] for r in bp["recommendation"]["rejected"]]:
-            found["rerank"].append("not rejected after the owner changed the requirement")
-        if fl.recommended_idea(journey, bp) == rr["idea"]:
-            found["rerank"].append("the rejected idea is still the recommendation")
-    # brain mode carried what the owner stated to the model on the next turn
+    found.update(fl.blueprint_findings(journey, views, run.owner_messages))
     found["context_requirements"] = []
     if fl.requirements_data(fl.fold_record(journey)) and not any(
         c.get("requirements") for c in run.contexts[1:]

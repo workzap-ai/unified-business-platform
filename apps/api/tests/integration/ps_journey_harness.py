@@ -71,7 +71,11 @@ def script(monkeypatch, journey, upto: int | None = None) -> list[dict[str, Any]
             elif op["problem"] < len(noted):
                 ref = noted[op["problem"]]["ref"]
                 ops.append(ProblemOp(op="update", ref=ref, note=note, reason=op.get("reason", "")))
-        value = make_turn(reply=turns[n]["pi"], language=journey["language"], problem_ops=ops)
+        value = make_turn(
+            reply=turns[n]["pi"],
+            language=turns[n].get("lang", journey["language"]),
+            problem_ops=ops,
+        )
         seen["last"] = value
         return SimpleNamespace(value=value, response=SimpleNamespace(attempts=[]))
 

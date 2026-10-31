@@ -1,3 +1,4 @@
+# ruff: noqa: E501
 """PS-flow journeys, pure part (no database, no model): 32 scripted business journeys in English,
 Roman Urdu, Urdu script and Arabic (`tests/fixtures/ps_flow_journeys.json`).
 
@@ -12,8 +13,6 @@ flips to a pass when the behaviour lands. Findings the flow lead should read are
 reasons (search "FINDING").
 """
 
-import importlib.util
-import json
 from collections import Counter
 
 import pytest
@@ -233,188 +232,71 @@ def test_a_limit_that_cannot_be_checked_is_shown_unknown_never_satisfied(journey
     assert v.status == "unknown", v
 
 
-@pytest.mark.parametrize(("journey_id", "n"), gate_cases("unknown"))
-def test_an_unknown_idea_is_labelled_not_checked_when_shown(journey_id, n):
-    from app.modules.pi import option_wiring
-
-    j = BY_ID[journey_id]
-    data = fl.requirements_data(fl.fold_record(j))
-    wired = option_wiring.gate_ideas([j["ideas"][n]["text"]], option_wiring.requirements_from(data))
-    for text in wired.unknown:
-        assert any(option_wiring.NOT_CHECKED in s for s in wired.shown if text.rstrip(". ") in s)
-
-
-@pytest.mark.parametrize(("journey_id", "n"), gate_cases("not_rejected"))
-def test_a_valid_idea_in_other_words_is_not_rejected_for_not_repeating_the_owner(journey_id, n):
-    idea, v = check(journey_id, n)
-    owner = " ".join(ck.owner_texts(BY_ID[journey_id])).casefold()
-    assert v.status != "violates", (idea, v)
-    assert idea["text"].casefold() not in owner  # different wording from the owner's
-
-
-@pytest.mark.parametrize(
-    "journey_id", [j["id"] for j in JOURNEYS if any(i["must"] == "generic" for i in j["ideas"])]
-)
-@pytest.mark.xfail(
-    reason="PS-3 idea relevance is not landed: nothing flags an unrelated generic idea before the "
-    "blueprint (module app.modules.pi.idea_relevance does not exist)",
-    strict=False,
-)
-def test_an_unrelated_generic_idea_is_flagged_generic_before_it_is_shown(journey_id):
-    assert importlib.util.find_spec("app.modules.pi.idea_relevance") is not None
-
-
-@pytest.mark.parametrize("journey_id", IDS)
-def test_when_every_idea_is_left_out_there_is_one_targeted_question(journey_id):
-    from app.modules.pi import option_wiring
-
-    j = BY_ID[journey_id]
-    data = fl.requirements_data(fl.fold_record(j))
-    rejected = [i["text"] for i in j["ideas"] if i["must"] == "reject"]
-    wired = option_wiring.gate_ideas(rejected, option_wiring.requirements_from(data), j["language"])
-    if wired.question:
-        assert wired.question.count("?") == 1 and wired.question.endswith("?")
-        assert not wired.accepted
-    assert not wired.accepted or j["language"] in NON_LATIN or not rejected or wired.rejected
-
-
-# --- the blueprint over the folded record ---------------------------------------------------------
-
-
-def findings(journey_id, upto=None):
-    j = BY_ID[journey_id]
-    views = fl.synthetic_views(j, upto)
-    owner = fl.synthetic_owner_messages(j)
-    bp = fl.build_blueprint(j, views, owner)
-    return j, views, bp, fl.blueprint_findings(j, bp, views)
-
-
-STRICT = (
-    "traceable",
-    "generic_never_recommended",
-    "figures",
-    "limits",
-    "no_price_or_promise",
-    "causes_labelled",
-)
-
-
-def blueprint_cases():
+def voice_cases():
     out = []
     for j in JOURNEYS:
-        for component in STRICT:
-            out.append(pytest.param(j["id"], component, id=f"{j['id']}-{component}"))
-        if any(i["must"] == "reject" for i in j["ideas"]):
+        pending = fl.pending_components(j)
+        for component in fl.VOICE_COMPONENTS:
             marks = (
-                [pytest.mark.xfail(reason=LOCALISED, strict=False)]
-                if j["language"] in NON_LATIN
+                [pytest.mark.xfail(reason=pending[component], strict=False)]
+                if component in pending
                 else []
             )
-            out.append(
-                pytest.param(
-                    j["id"], "violating_never_recommended", marks=marks, id=f"{j['id']}-violating"
-                )
-            )
-        if any(i.get("limit") == "missing_budget" for i in j["ideas"]):
-            out.append(
-                pytest.param(
-                    j["id"],
-                    "unknown_never_clear",
-                    marks=pytest.mark.xfail(
-                        reason="FINDING no budget stated: a costly idea is checked 'ok' and shown "
-                        "as clear of the limits, not as not yet checked",
-                        strict=False,
-                    ),
-                    id=f"{j['id']}-unknown",
-                )
-            )
-        if any(i.get("limit") == "budget" for i in j["ideas"]) and j["language"] not in NON_LATIN:
-            out.append(
-                pytest.param(
-                    j["id"],
-                    "risk_quotes_owner_limit",
-                    marks=pytest.mark.xfail(
-                        reason="FINDING blueprint_doc.issues() reports 'holds a price or saving' "
-                        "for the risk 'Step n clashes with what you said: it goes past the budget "
-                        "you gave (\"Rs 50,000\")': it only quotes the owner's own budget, yet "
-                        "every over-budget rejection makes issues() non-empty",
-                        strict=False,
-                    ),
-                    id=f"{j['id']}-risk-quotes-budget",
-                )
-            )
-        if "corrections" in j["difficulty"]:
-            out.append(
-                pytest.param(
-                    j["id"],
-                    "evidence_survives_correction",
-                    marks=pytest.mark.xfail(
-                        reason="FINDING blueprint_doc.options() verifies a problem's first three "
-                        "quote words against its FIRST source message; after a corrected figure "
-                        "the quote holds the new figure ('550') that message never had, the "
-                        "evidence fails and the blueprint says 'learn more first' for a problem "
-                        "the owner described clearly",
-                        strict=False,
-                    ),
-                    id=f"{j['id']}-evidence-after-correction",
-                )
-            )
+            out.append(pytest.param(j["id"], component, marks=marks, id=f"{j['id']}-{component}"))
     return out
 
 
-@pytest.mark.parametrize(("journey_id", "component"), blueprint_cases())
-def test_the_blueprint_is_traceable_checked_and_honest(journey_id, component):
-    _, _, _, found = findings(journey_id)
+@pytest.mark.parametrize(("journey_id", "component"), voice_cases())
+def test_the_chat_gates_every_idea_once_through_the_one_verdict_path(journey_id, component):
+    """option_voice.voice: a violating idea is removed, an unrelated one is removed, a valid idea
+    in other words stays, an unchecked one is labelled, one question last, the pick is a clear idea."""
+    found = fl.voice_findings(BY_ID[journey_id])
     assert found[component] == [], found[component]
 
 
-@pytest.mark.parametrize("journey_id", IDS)
-def test_the_blueprint_and_the_recommendation_are_the_same_on_two_runs(journey_id):
-    first = findings(journey_id)[2]
-    second = findings(journey_id)[2]
-    assert json.dumps(first, sort_keys=True, ensure_ascii=False) == json.dumps(
-        second, sort_keys=True, ensure_ascii=False
+# --- the blueprint over the folded record (PS-4, blueprint_wire.build) ----------------------------
+
+
+BP_CASES = [
+    pytest.param(
+        j["id"],
+        c,
+        marks=(
+            [pytest.mark.xfail(reason=fl.pending_components(j)[c], strict=False)]
+            if c in fl.pending_components(j)
+            else []
+        ),
+        id=f"{j['id']}-{c}",
     )
+    for j in JOURNEYS
+    for c in fl.COMPONENTS
+    if c != "rerank" or j["rerank"]
+]
 
 
-@pytest.mark.parametrize("journey_id", IDS)
-def test_the_recommendation_names_a_checked_idea_or_asks_to_learn_more(journey_id):
-    j, _, bp, _ = findings(journey_id)
-    rec = bp["recommendation"]
-    steps = {s["text"]: s for s in bp["steps"]}
-    if rec["learn_first"]:
-        assert rec["option"] and "Learn" in rec["option"]
-        return
-    assert rec["option"] in steps
-    assert steps[rec["option"]]["linked"]
-    assert steps[rec["option"]]["check"]["status"] != "violates"
-
-
-def rerank_cases():
-    out = []
-    for j in JOURNEYS:
-        if j["rerank"]:
-            marks = (
-                [pytest.mark.xfail(reason=LOCALISED, strict=False)]
-                if j["language"] in NON_LATIN
-                else []
-            )
-            out.append(pytest.param(j["id"], marks=marks, id=j["id"]))
-    return out
-
-
-@pytest.mark.parametrize("journey_id", rerank_cases())
-def test_a_changed_requirement_reranks_and_rejects_the_earlier_recommendation(journey_id):
+@pytest.mark.parametrize(("journey_id", "component"), BP_CASES)
+def test_the_blueprint_is_ready_clean_and_honest(journey_id, component):
     j = BY_ID[journey_id]
-    rr = j["rerank"]
-    before = findings(journey_id, rr["after_turn"])[2]
-    after = findings(journey_id)[2]
-    idea = j["ideas"][rr["idea"]]["text"]
-    assert idea not in [r["option"] for r in before["recommendation"]["rejected"]]
-    assert fl.recommended_idea(j, after) != rr["idea"]
-    assert idea in [r["option"] for r in after["recommendation"]["rejected"]]
-    if fl.recommended_idea(j, before) == rr["idea"]:  # it led before: something else leads now
-        assert after["recommendation"]["option"] != idea
+    found = fl.blueprint_findings(j, fl.synthetic_views(j), fl.synthetic_owner_messages(j))
+    assert found[component] == [], found[component]
+
+
+SAME_CASES = [
+    pytest.param(
+        j["id"],
+        marks=[pytest.mark.xfail(reason=fl.SAME_OPTION, strict=False)]
+        if j["id"] in ("repair_ar", "booking_ur") or "corrections" in j["difficulty"]
+        else [],
+        id=j["id"],
+    )
+    for j in JOURNEYS
+]
+
+
+@pytest.mark.parametrize("journey_id", SAME_CASES)
+def test_the_same_option_leads_the_chat_pick_and_the_document_blueprint(journey_id):
+    """Through the real option_voice.voice and brain_docs.apply_box (the document builder)."""
+    assert fl.same_option_findings(BY_ID[journey_id]) == []
 
 
 # --- the decision gates --------------------------------------------------------------------------

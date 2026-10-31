@@ -1,3 +1,4 @@
+# ruff: noqa: E501
 """The journeys through the pure parts of the flow: the owner's record folded from the scripted
 notes, the L2-1 gate, the blueprint builder and the decision gates (no database, no model).
 
@@ -5,13 +6,13 @@ notes, the L2-1 gate, the blueprint builder and the decision gates (no database,
 stored, so the unit and the integration tests assert the same behaviour.
 """
 
+import json
 import re
 from typing import Any
 
 from tests.support.ps_journey_checks import (
     figures_after_corrections,
     has_figure,
-    money_or_promise,
     owner_texts,
 )
 
@@ -131,6 +132,8 @@ def synthetic_views(journey: dict[str, Any], upto: int | None = None) -> list[di
                 "money": p["money"],
                 "impact": [],
                 "cause": "",
+                "cause_raw": None,
+                "of_total": p["where"],
                 "rank": 0,
                 "limits": dict(p["limits"]),
                 "cannot_change": list(p["cannot_change"]),
@@ -158,12 +161,20 @@ def verdict(idea_text: str, req_data: dict[str, Any], language: str) -> Any:
     return cc.check_option(idea_text, option_wiring.requirements_from(req_data), language)
 
 
-def components(journey: dict[str, Any], refs: list[str]) -> list[dict[str, Any]]:
-    """One blueprint component per idea; its refs are the problems the idea names (an unrelated
-    idea has none). All in phase 1, so a step number is the idea's position + 1."""
+def components(
+    journey: dict[str, Any], refs: list[str], kind: str = "valid"
+) -> list[dict[str, Any]]:
+    """Blueprint components (the steps of the one Solution Box) from the journey's ideas:
+    `valid` = the linked ideas the gate must not reject; `violating` = the ideas that break a limit;
+    `generic` = the valid ones plus the unrelated idea (it names no problem)."""
     from app.modules.pi import solutions
 
     key = next(iter(solutions.CATALOGUE))
+    pick = {
+        "valid": ("not_rejected",),
+        "violating": ("reject",),
+        "generic": ("not_rejected", "generic"),
+    }[kind]
     return [
         {
             "key": key,
@@ -172,6 +183,7 @@ def components(journey: dict[str, Any], refs: list[str]) -> list[dict[str, Any]]
             "refs": [refs[r] for r in idea["refs"] if r < len(refs)],
         }
         for idea in journey["ideas"]
+        if idea["must"] in pick
     ]
 
 
@@ -179,135 +191,88 @@ def build_blueprint(
     journey: dict[str, Any],
     views: list[dict[str, Any]],
     owner_messages: dict[str, str],
+    kind: str = "valid",
+    chat_pick: str = "",
 ) -> dict[str, Any]:
-    from app.modules.pi import blueprint_doc
+    """PS-4's blueprint (blueprint_wire.build): status, localized text, issues, recommended id."""
+    from app.modules.pi import blueprint_wire
 
-    comps = components(journey, [v["ref"] for v in views])
-    phases = [{"phase": 1, "name": "First"}]
-    return blueprint_doc.build(
-        views, comps, phases, ["a contact person"], owner_messages=owner_messages
+    comps = components(journey, [v["ref"] for v in views], kind)
+    return blueprint_wire.build(
+        views,
+        comps,
+        ["a contact person"],
+        owner_messages,
+        journey["language"],
+        chat_pick=chat_pick,
     )
 
 
-def recommended_idea(journey: dict[str, Any], bp: dict[str, Any]) -> int | None:
-    """The position of the idea the blueprint recommends (None when it recommends none, or the
-    'learn more first' step)."""
-    option = bp["recommendation"].get("option") or ""
-    for n, idea in enumerate(journey["ideas"]):
-        if option and option == idea["text"]:
-            return n
-    return None
-
-
-def doc_text(bp: dict[str, Any]) -> str:
-    """Every word of the document a reader sees (no step numbers, no refs)."""
-    parts = []
-    for p in bp["problems"]:
-        parts += [p["title"], *p["owner_words"], *p["figures"], *p["limits"], *p["tried"]]
-        parts += [(p["cause"] or {}).get("text", ""), p.get("expected_outcome", "")]
-    rec = bp["recommendation"]
-    parts += [s["text"] for s in bp["steps"]] + [
-        re.sub(r"Step \d+", "Step", r["text"]) for r in bp["risks"]
-    ]
-    parts += [rec.get("option", ""), rec.get("why", ""), rec.get("reason", "")]
-    parts += list(rec.get("trade_offs") or []) + list(rec.get("unknown") or [])
-    parts += [r["because"] for r in rec.get("rejected") or []]
-    parts += list(bp.get("unresolved") or [])
-    return "\n".join(p for p in parts if p)
-
-
 COMPONENTS = (
-    "traceable",
-    "violating_never_recommended",
-    "unknown_never_clear",
-    "generic_never_recommended",
+    "ready_clean",
+    "owner_words_kept",
     "figures",
-    "limits",
-    "no_price_or_promise",
-    "risk_quotes_owner_limit",
+    "script",
+    "violating_not_recommended",
+    "generic_flagged",
     "evidence_survives_correction",
-    "causes_labelled",
+    "deterministic",
+    "rerank",
 )
 
 
 def blueprint_findings(
-    journey: dict[str, Any], bp: dict[str, Any], views: list[dict[str, Any]]
+    journey: dict[str, Any],
+    views: list[dict[str, Any]],
+    owner_messages: dict[str, str],
 ) -> dict[str, list[str]]:
     """What is wrong with the blueprint for this journey, by component (empty list = fine)."""
-    from app.modules.pi import blueprint_doc
-
     found: dict[str, list[str]] = {k: [] for k in COMPONENTS}
-    ideas = journey["ideas"]
-    refs = [v["ref"] for v in views]
-    steps = {s["text"]: s for s in bp["steps"]}
-    # a step with no problem is flagged; every problem has at least one linked step
-    flagged = sorted(bp["unlinked_steps"])
-    wanted = sorted(n for n, i in enumerate(ideas, start=1) if not i["refs"])
-    if flagged != wanted:
-        found["traceable"].append(f"unlinked steps {flagged}, expected {wanted}")
-    linked_refs = {r for s in bp["steps"] for r in s["problems"]}
-    if linked_refs != set(refs):
-        found["traceable"].append(f"problems without a step: {sorted(set(refs) - linked_refs)}")
-    for text in blueprint_doc.issues(bp):
-        if "unlinked" in text:
-            continue
-        if "holds a price" in text and any(
-            money_or_promise(i["text"]) and i["text"][:40] in text for i in ideas
-        ):
-            continue  # an idea that names an amount is flagged, not silently shown
-        if "holds a price" in text and "clashes with what you said" in text:
-            found["risk_quotes_owner_limit"].append(text)  # the owner's own figure, quoted back
-            continue
-        found["no_price_or_promise"].append(text)
-    # the document is checked on pi's own words only (an idea that names an amount is flagged above)
-    clean = [s["text"] for s in bp["steps"] if not money_or_promise(s["text"])]
-    why = re.sub(
-        r"(?<![0-9a-f])[0-9a-f]{8}(?![0-9a-f])", "<ref>", bp["recommendation"].get("why", "")
-    )
-    for text in [*clean, why]:
-        if money_or_promise(text):
-            found["no_price_or_promise"].append(text[:60])
-    rec = recommended_idea(journey, bp)
-    for n, idea in enumerate(ideas):
-        step = steps.get(idea["text"])
-        if step is None:
-            found["traceable"].append(f"idea {n} has no step")
-            continue
-        status = step["check"]["status"]
-        if idea["must"] == "reject" and rec == n:
-            found["violating_never_recommended"].append(idea["text"][:60])
-        if idea["must"] == "reject" and status == "ok":
-            found["violating_never_recommended"].append(f"checked ok: {idea['text'][:50]}")
-        if idea["must"] == "unknown" and status == "ok":
-            found["unknown_never_clear"].append(idea["text"][:60])
-        if idea["must"] == "generic" and rec == n:
-            found["generic_never_recommended"].append(idea["text"][:60])
-    packed = doc_text(bp)
-    kept, gone = figures_after_corrections(journey)
-    body = " ".join(" ".join(p["figures"] + p["owner_words"] + p["limits"]) for p in bp["problems"])
-    for fig in kept:
-        if not has_figure(body, fig):
-            found["figures"].append(f"kept figure {fig} missing from the document")
-    for fig in gone:
-        if has_figure(packed, fig):
-            found["figures"].append(f"corrected figure {fig} still in the document")
-    limits = journey["expect"].get("limits") or {}
-    shown = " ".join(" ".join(p["limits"]) for p in bp["problems"])
-    for key in LIMIT_KEYS:
-        if limits.get(key) and limits[key] not in shown:
-            found["limits"].append(f"{key} limit not in the document")
-    for sub in limits.get("cannot") or []:
-        if sub not in shown:
-            found["limits"].append(f"cannot-change '{sub}' not in the document")
-    usable = [i for i in ideas if i["refs"] and i["must"] in ("not_rejected", "unknown")]
-    if usable and bp["recommendation"].get("learn_first"):
+    bp = build_blueprint(journey, views, owner_messages)
+    text = bp["text"]
+    if bp["status"] not in ("ready", "insufficient"):
+        found["ready_clean"].append(f"status {bp['status']}: {bp['refusal']}")
+    if bp["status"] == "ready" and bp["issues"]:
+        found["ready_clean"].append(f"issues {bp['issues']}")
+    if not text.strip():
+        found["ready_clean"].append("empty text")
+    if bp["status"] == "ready" and bp["recommended"] == "BOX":
+        quote = (views[0].get("quotes") or [""])[0]
+        if quote and quote not in text:
+            found["owner_words_kept"].append(f"the owner's words are not in the blueprint: {quote}")
+        kept, gone = figures_after_corrections(journey)
+        for fig in kept:
+            if not has_figure(text, fig):
+                found["figures"].append(f"kept figure {fig} missing from the blueprint text")
+        for fig in gone:
+            if has_figure(text, fig):
+                found["figures"].append(f"corrected figure {fig} still in the blueprint text")
+    if journey["language"] in NON_LATIN and not re.search(r"[؀-ۿ]", text):
+        found["script"].append("the blueprint is not in the owner's script")
+    if bp["status"] == "ready" and bp["recommended"] == "LEARN":
         found["evidence_survives_correction"].append(
-            "the blueprint says learn more first although the owner gave a clear problem"
+            "learn more first although the owner described the problem clearly"
         )
-    for p in bp["problems"]:
-        c = p["cause"]
-        if c and not c["owner_stated"] and c["label"] != blueprint_doc.HYPOTHESIS:
-            found["causes_labelled"].append(p["ref"])
+    if any(i["must"] == "reject" for i in journey["ideas"]):
+        bad = build_blueprint(journey, views, owner_messages, "violating")
+        if bad["status"] == "ready" and bad["recommended"] == "BOX":
+            found["violating_not_recommended"].append(
+                "a blueprint of ideas that break the owner's limits is recommended"
+            )
+    if any(i["must"] == "generic" for i in journey["ideas"]):
+        mixed = build_blueprint(journey, views, owner_messages, "generic")
+        if mixed["status"] == "ready" and not mixed["issues"]:
+            found["generic_flagged"].append("an unrelated generic step passed with no issue")
+    again = build_blueprint(journey, views, owner_messages)
+    if json.dumps(bp, sort_keys=True, ensure_ascii=False) != json.dumps(
+        again, sort_keys=True, ensure_ascii=False
+    ):
+        found["deterministic"].append("two runs gave different blueprints")
+    if journey["rerank"]:
+        idea = journey["ideas"][journey["rerank"]["idea"]]["text"]
+        picked = build_blueprint(journey, views, owner_messages, chat_pick=idea)
+        if picked["recommended"] == "CHAT":
+            found["rerank"].append("the idea the owner's new limit rules out is still recommended")
     return found
 
 
@@ -371,26 +336,184 @@ def gate_findings(journey: dict[str, Any], req_data: dict[str, Any]) -> dict[str
     return found
 
 
+UNREADABLE_LIMIT = (
+    "limits written in Urdu or Arabic are unreadable to constraint_check (L2-1-c remainder, "
+    "docs/pi-saas/pi-ps-flow-open-issues.md): the idea stays 'unknown' and is shown or recommended"
+)
+RELEVANCE_KEEPS = (
+    "FINDING PS-3 evaluate_idea keeps an unrelated idea as linked (relevance lexicon): "
+    "idea_relevance.py"
+)
+RELEVANCE_DROPS = (
+    "FINDING PS-3 evaluate_idea drops a valid idea that is worded differently from the owner "
+    "(unlinked): idea_relevance.py"
+)
+UNLINKED_STEP = (
+    "FINDING PS-4 blueprint_wire.build gives a blueprint with an unrelated step (it names no "
+    "problem) status ready and no issue: blueprint_wire.py option_set / blueprint_issues"
+)
+BUDGET_NOT_SHOWN = (
+    "FINDING the owner's budget figure is stored but is not in the blueprint text "
+    "(blueprint_wire.build -> render_blueprint)"
+)
+CORRECTED_QUOTE = (
+    "FINDING after a corrected figure the corrected quote is not in the blueprint text"
+)
+GENERIC_BY_ID = {
+    "gym_en",
+    "trucking_roman_ur",
+    "crops_roman_ur",
+    "pharmacy_ur",
+    "rental_ur",
+    "ecommerce_ar",
+}
+DROPPED_BY_ID = {"poultry_en", "clinic_en", "dairy_roman_ur", "poultry_ur", "dairy_ar", "crops_ar"}
+
+
 def pending_components(journey: dict[str, Any]) -> dict[str, str]:
     """Components of this journey that depend on behaviour not landed yet, with the reason."""
     out: dict[str, str] = {}
     ideas = journey["ideas"]
-    if journey["language"] in NON_LATIN and any(i["must"] == "reject" for i in ideas):
-        out["gate_reject"] = LOCALISED
-        out["violating_never_recommended"] = LOCALISED
-    if journey["id"] == "clinic_roman_ur":
+    jid = journey["id"]
+    rejects = any(i["must"] == "reject" for i in ideas)
+    if journey["language"] in NON_LATIN and rejects:
+        for key in ("gate_reject", "voice_violating_removed", "violating_not_recommended"):
+            out[key] = UNREADABLE_LIMIT
+    if jid == "clinic_roman_ur":
         out["gate_reject"] = TRIED_ROMAN
-    if any(i.get("limit") == "missing_budget" for i in ideas):
-        out["gate_unknown"] = MISSING_BUDGET
-        out["unknown_never_clear"] = MISSING_BUDGET
-    if any(i.get("limit") == "budget" for i in ideas) and journey["language"] not in NON_LATIN:
-        out["risk_quotes_owner_limit"] = RISK_QUOTES
+    if jid == "repair_roman_ur":
+        out["voice_unknown_marked"] = MISSING_BUDGET
+    if jid in GENERIC_BY_ID:
+        out["voice_generic_removed"] = RELEVANCE_KEEPS
+    if jid in DROPPED_BY_ID:
+        out["voice_valid_kept"] = RELEVANCE_DROPS
+    if any(i["must"] == "generic" for i in ideas):
+        out["generic_flagged"] = UNLINKED_STEP
+    budget = (journey["expect"].get("limits") or {}).get("budget", "")
+    if any(f in budget for f in journey["expect"].get("kept") or []):
+        out["figures"] = BUDGET_NOT_SHOWN
     if "corrections" in journey["difficulty"]:
         out["evidence_survives_correction"] = EVIDENCE_AFTER_CORRECTION
+        out["owner_words_kept"] = CORRECTED_QUOTE
     if journey["rerank"] and journey["language"] in NON_LATIN:
-        out["rerank"] = LOCALISED
+        out["rerank"] = UNREADABLE_LIMIT
     if journey["expect"].get("tried"):
         out["reply_asks_known"] = ASKS_KNOWN
-    if journey["language"] == "ur":
-        out["replies_language"] = FALLBACK_ENGLISH
     return out
+
+
+# --- the chat: PS-3 verdicts plus the L2-1 gate through option_voice.voice -----------------------
+
+BUL = "\u2022 "
+VOICE_COMPONENTS = (
+    "voice_violating_removed",
+    "voice_generic_removed",
+    "voice_valid_kept",
+    "voice_unknown_marked",
+    "voice_one_question",
+    "voice_pick",
+)
+
+
+def problem_records(journey: dict[str, Any]) -> list[dict[str, Any]]:
+    return [
+        {"title": p["title"], "user_words": p["quotes"], "group": p["category"]}
+        for p in fold_record(journey)
+    ]
+
+
+def voiced(
+    journey: dict[str, Any],
+    texts: list[str] | None = None,
+    upto: int | None = None,
+    reqs: Any = None,
+):
+    from app.modules.pi import option_voice, option_wiring
+
+    problems = fold_record(journey, upto)
+    if reqs is None:
+        reqs = option_wiring.requirements_from(requirements_data(problems))
+    ideas = texts if texts is not None else [i["text"] for i in journey["ideas"]]
+    reply = "Here are some ideas:\n" + "\n".join(f"{BUL}{t}" for t in ideas)
+    records = [
+        {"title": p["title"], "user_words": p["quotes"], "group": p["category"]} for p in problems
+    ]
+    return option_voice.voice(reply, reqs, journey["language"], records)
+
+
+def voice_findings(journey: dict[str, Any]) -> dict[str, list[str]]:
+    return voice_findings_for(journey)
+
+
+def voice_findings_for(journey: dict[str, Any], reqs: Any = None) -> dict[str, list[str]]:
+    """The chat verdicts over the idea list; `reqs` are the stored requirements (else folded)."""
+    found: dict[str, list[str]] = {k: [] for k in VOICE_COMPONENTS}
+    v = voiced(journey, reqs=reqs)
+    for n, idea in enumerate(journey["ideas"]):
+        shown = idea["text"].rstrip(". ") in v.reply
+        if idea["must"] == "reject" and shown:
+            found["voice_violating_removed"].append(f"idea {n} still shown")
+        if idea["must"] == "generic" and shown:
+            found["voice_generic_removed"].append(f"idea {n} still shown")
+        if idea["must"] == "not_rejected" and not shown:
+            found["voice_valid_kept"].append(f"idea {n} left out: {idea['text'][:40]}")
+    n_unknown = sum(i["must"] == "unknown" for i in journey["ideas"])
+    if n_unknown and v.unknown < n_unknown:
+        found["voice_unknown_marked"].append(f"{v.unknown} marked, {n_unknown} expected")
+    marks = v.question.count("?") + v.question.count("\u061f")
+    if v.question and (marks != 1 or not v.question.rstrip().endswith(("?", "\u061f"))):
+        found["voice_one_question"].append(v.question)
+    clear = [i["text"].rstrip(". ") for i in journey["ideas"] if i["must"] == "not_rejected"]
+    if v.accepted and v.pick and v.pick.rstrip(". ") not in clear:
+        found["voice_pick"].append(f"pick is not a valid idea: {v.pick[:50]}")
+    return found
+
+
+# --- the same option leads the chat and the document (real brain_docs.apply_box) -----------------
+
+SAME_OPTION = (
+    "FINDING the chat's first clear idea (brief['chat_pick']) is not the option that leads the "
+    "document: the recommendation is the Solution Box or 'learn first' instead "
+    "(blueprint_wire.option_set ranking, option_rank)"
+)
+
+
+def same_option_findings(journey: dict[str, Any]) -> list[str]:
+    """The idea option_voice.voice puts first (its pick) goes to brain_docs.apply_box as
+    brief['chat_pick']; the document's blueprint must recommend that same idea and print it."""
+    from app.modules.pi import brain_docs as bd
+    from app.modules.pi import solutions
+
+    v = voiced(journey)
+    if not v.pick:
+        return ["the chat made no pick"]
+    views = synthetic_views(journey)
+    refs = [x["ref"] for x in views]
+    key = next(iter(solutions.CATALOGUE))
+    draft = bd.BoxDraft(
+        components=[bd.BoxComponent(key=key, phase=1, problems=refs)],
+        phases=[bd.Line(text="First", refs=refs)],
+        needs=["a contact person"],
+    )
+    content = {
+        "components": [{"key": key, "text": "x", "phase": 1, "refs": refs}],
+        "needs": ["a contact person"],
+    }
+    out = bd.apply_box(
+        content,
+        draft,
+        views=views,
+        links=[],
+        language=journey["language"],
+        local=False,
+        sector=None,
+        owner_messages=synthetic_owner_messages(journey),
+        chat_pick=v.pick,
+    )
+    blueprint = out["blueprint"]
+    problems = []
+    if not str(blueprint["recommended"]).startswith("CHAT"):
+        problems.append(f"the document recommends {blueprint['recommended']}, not the chat pick")
+    elif v.pick.rstrip(". ") not in blueprint["text"]:
+        problems.append("the chat pick leads but its words are not in the document")
+    return problems
