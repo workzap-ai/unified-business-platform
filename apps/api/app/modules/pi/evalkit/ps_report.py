@@ -8,7 +8,7 @@ Run from apps/api:  python -m app.modules.pi.evalkit.ps_report [--out PATH]
 """
 
 import argparse
-from collections import defaultdict
+from collections import Counter, defaultdict
 from pathlib import Path
 from typing import Any
 
@@ -104,6 +104,17 @@ KEY = (
 )  # fmt: skip
 
 
+def rule_section(cases: list[dict[str, Any]]) -> list[str]:
+    counts: Counter[tuple[str, str]] = Counter()
+    for case in cases:
+        if splits.split_of(case) == splits.DEVELOPMENT:
+            counts.update(ps_scorers.filter_rules(case))
+    out = ["## Live idea filter: rule ids fired per candidate label (Development)", "",
+           "| label | rule | count |", "|---|---|---|"]  # fmt: skip
+    out += [f"| {v} | {r} | {n} |" for (v, r), n in sorted(counts.items())]
+    return [*out, ""]
+
+
 def build(cases: list[dict[str, Any]]) -> str:
     rows = score_all(cases)
     reg = regression_rows()
@@ -125,7 +136,7 @@ def build(cases: list[dict[str, Any]]) -> str:
         *table({"regression (extraction)": reg}, ("recall", "precision", "figure_fidelity",
                                                    "correction_applied")), "",
     ]  # fmt: skip
-    return "\n".join(out) + "\n"
+    return "\n".join([*out, *rule_section(cases)]) + "\n"
 
 
 def main() -> None:

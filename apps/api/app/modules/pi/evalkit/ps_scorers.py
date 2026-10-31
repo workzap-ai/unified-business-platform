@@ -303,6 +303,22 @@ def idea_scores(case: dict[str, Any]) -> dict[str, dict[str, int]]:
     }
 
 
+def filter_rules(case: dict[str, Any]) -> list[tuple[str, str]]:
+    """(label verdict, live filter rule id or "pass") for every candidate idea of a case."""
+    brief = brief_of(case)
+    owner_text = " ".join(t["text"] for t in ps_replay.owner_turns(case))
+    noted = [
+        {"ref": p["id"], "title": p["title"], "user_words": p["user_words"]}
+        for p in brief["problems"]
+    ]
+    ctx = live_filter.context_from(noted, owner_text)
+    out: list[tuple[str, str]] = []
+    for cand in case["expected"]["candidates"]:
+        found = live_filter.failures(cand["text"], owner_text, ctx)
+        out += [(cand["verdict"], rule) for rule in found] or [(cand["verdict"], "pass")]
+    return out
+
+
 # --- blueprint ---------------------------------------------------------------------------------
 
 BLUEPRINT_KINDS = ("steps", "dependencies", "resources", "success_criteria")
