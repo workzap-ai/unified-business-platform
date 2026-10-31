@@ -11,14 +11,16 @@ import re
 from dataclasses import dataclass
 from typing import Any
 
+from app.modules.pi.figure_correction import expand
+from app.modules.pi.script_words import WORD, arabic_stem, fold, hindi_stem, is_latin
+
 MIN_ITEM_WORDS = 3  # a shorter line is a heading or an aside, not an item
 MIN_ITEMS = 2  # one line is a sentence, not a list
 MAX_REPORTED = 4
 STEM = 5
-BULLET = re.compile(r"^\s*(?:[-•*–—▪●]|\d{1,2}\s*[.)]|[a-zA-Z]\s*[.)])\s+")
+BULLET = re.compile(r"^\s*(?:[-•*–—▪●◦·✓✔►]|\d{1,2}\s*[.)]|[a-zA-Z]\s*[.)])\s+")
 INLINE_NUMBER = re.compile(r"(?:(?<=\s)|^)(\d{1,2})\s*[.)]\s+(?=\S)")
 FIGURE = re.compile(r"\d[\d,]*(?:\.\d+)?")
-WORD = re.compile(r"\w+", re.UNICODE)
 UNSPACED = re.compile(r"[぀-ヿ㐀-鿿가-힯฀-๿]")
 STOPWORDS = frozenset(
     """about after again also because been before being could does doing from have having here
@@ -28,6 +30,21 @@ STOPWORDS = frozenset(
     kya kyun kyunke lekin mera meri mere mujhe nahi phir sab thi thha unka unki unke wala wali
     wale yeh woh aur bas bohat bahut abhi jab tak toh agar""".split()
 )
+# Hindi (Devanagari), Urdu script and Arabic function words, folded like the words they meet.
+_SCRIPT_STOPWORDS = frozenset(
+    fold(w)
+    for w in """
+    और है हैं था थी थे का की के को में से पर यह ये वह वो भी तो कि कर करना करते करता करती रहा रही
+    रहे लेकिन बहुत अभी जब तक अगर मेरा मेरी मेरे हमारा हमारी हमारे आप अपना अपनी अपने क्या कैसे
+    क्यों नहीं कुछ सब बस फिर मुझे उनका उनकी उनके वाला वाली वाले होता होती होते हुआ हुई हुए
+    اور ہے ہیں تھا تھی تھے کا کی کے کو میں سے پر یہ وہ بھی تو کہ کر کرنا کرتے کرتا کرتی لیکن بہت
+    ابھی جب تک اگر میرا میری میرے ہمارا ہماری ہمارے آپ اپنا اپنی اپنے کیا کیسے کیوں نہیں کچھ سب
+    بس پھر مجھے والا والی والے ہوتا ہوتی ہوتے ہوا ہوئی ہوئے
+    في من على إلى الى عن مع هذا هذه ذلك تلك التي الذي كان كانت يكون لكن أيضا ايضا إذا اذا عندي
+    عندنا لدي لدينا أنا انا نحن هو هي كل بعض جدا فقط الآن الان ثم أو او قد لا ما لم لن هناك
+    """.split()
+)
+STOPWORDS = STOPWORDS | _SCRIPT_STOPWORDS
 
 
 @dataclass(frozen=True)
@@ -37,16 +54,31 @@ class Item:
     figures: tuple[str, ...]
 
 
+def _content_word(raw: str) -> str | None:
+    """The comparable stem of a word, or None for a number, a stop word or a word too short.
+    Latin words keep the old rule (4 letters, first 5). In Devanagari, Urdu and Arabic script the
+    marks stay in the word, the Arabic article and the Hindi plural ending are cut, and 3 letters
+    are enough (a Hindi word is short in letters, long in code points)."""
+    word = raw.casefold()
+    if word.isdigit():
+        return None
+    if is_latin(word):
+        return word[:STEM] if len(word) >= 4 and word not in STOPWORDS else None
+    folded = fold(word)
+    cut = hindi_stem(arabic_stem(folded))
+    if len(cut) < 3 or {folded, cut} & STOPWORDS:
+        return None
+    return cut[:STEM]
+
+
 def _words(text: str) -> set[str]:
-    return {
-        w[:STEM]
-        for w in (m.group(0).casefold() for m in WORD.finditer(text))
-        if len(w) >= 4 and not w.isdigit() and w not in STOPWORDS
-    }
+    found = (_content_word(m.group(0)) for m in WORD.finditer(text))
+    return {w for w in found if w}
 
 
 def _figures(text: str) -> tuple[str, ...]:
-    return tuple(dict.fromkeys(f.replace(",", "") for f in FIGURE.findall(text)))
+    """The figures of a text as plain digits, in any digit system, scale words written out."""
+    return tuple(dict.fromkeys(f.replace(",", "") for f in FIGURE.findall(expand(text))))
 
 
 def _enough(text: str) -> bool:
@@ -59,7 +91,7 @@ def _split(message: str) -> list[str]:
     if len(marked) >= MIN_ITEMS:
         return marked
     inline = list(INLINE_NUMBER.finditer(message or ""))
-    if len(inline) >= MIN_ITEMS and [m.group(1) for m in inline][:2] == ["1", "2"]:
+    if len(inline) >= MIN_ITEMS and [int(m.group(1)) for m in inline][:2] == [1, 2]:
         starts = [m.end() for m in inline] + [len(message)]
         return [
             message[
@@ -84,7 +116,7 @@ def items(message: str) -> list[Item]:
 def covered(item: Item, notes: list[str]) -> bool:
     """A note mentions the item: it carries one of its figures, or shares enough content words."""
     said = " ".join(notes)
-    if item.figures and any(f in said.replace(",", "") for f in item.figures):
+    if item.figures and any(f in expand(said).replace(",", "") for f in item.figures):
         return True
     wanted = _words(item.text)
     if not wanted:

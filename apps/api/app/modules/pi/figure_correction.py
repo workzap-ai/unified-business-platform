@@ -7,33 +7,100 @@ Pure functions. `numeric_correction` finds (wrong, right) from the latest messag
 earlier ones; it is deliberately strict (an explicit "not X, Y" pair, or a correction cue plus
 an old number followed by the same word as the new one),
 so an unrelated number is never swapped.
+
+Languages (L1-7a): English, Roman Urdu, Urdu script, Hindi (Devanagari) and Arabic. Figures may be
+written in Western, Arabic-Indic, Persian or Devanagari digits (mixed in one message too), with
+lakh, crore, hazar, thousand, million or k after them in Latin, Devanagari, Urdu or Arabic script
+("5 lakh" is 500000). Written by one author, not reviewed by a native speaker of Hindi, Urdu or
+Arabic: tests/unit/test_pi_l1_cues_hindi_arabic.py measures recall and precision with its n.
 """
 
 import re
+from decimal import Decimal
 
-_DIGITS = str.maketrans("٠١٢٣٤٥٦٧٨٩۰۱۲۳۴۵۶۷۸۹", "01234567890123456789")
+from app.modules.pi.script_words import WORD, arabic_stem, fold
+
+_DIGITS = str.maketrans(
+    {
+        **{ord(c): str(i) for i, c in enumerate("٠١٢٣٤٥٦٧٨٩")},  # Arabic-Indic
+        **{ord(c): str(i) for i, c in enumerate("۰۱۲۳۴۵۶۷۸۹")},  # Persian and Urdu
+        **{ord(c): str(i) for i, c in enumerate("०१२३४५६७८९")},  # Devanagari
+        ord("٫"): ".",  # Arabic decimal separator
+        ord("٬"): ",",  # Arabic thousands separator
+    }
+)
 NUM = r"(\d[\d,]*(?:\.\d+)?)(?!\d)"
 _NUMBER = re.compile(NUM)
-NO = r"(?:nahi|nahin|nhi|nai|نہیں|نہی)"
+NO = r"(?:nahi|nahin|nhi|nai|نہیں|نہی|नहीं|नही|नहि)"
+# Arabic "not": لا, ليس, مش, مو (and with the joining و)
+AR_NO = r"(?<!\w)(?:و?ليس|و?لا|مش|مو)(?!\w)"
+# What may sit between the wrong and the right figure: "it was", "but", "बल्कि", "بلکہ", "بل".
+_LINK = (
+    r"(?:(?:it\s+(?:was|is)|its|it's|but|woh|wo|ye|yeh|balki|balkay|"
+    r"बल्कि|वो|वह|ये|यह|दरअसल|असल\s+में|बजाय|بلکہ|وہ|یہ|اصل\s+میں|دراصل)\s+)?"
+)
+_AR_LINK = r"(?:(?:بل|لكن|ولكن|إنما|وإنما|بالعكس|هو|هي|كان|كانت|الصحيح|الرقم|في\s+الحقيقة)\s+)?"
+_SEP = r"\s*[,;:.،؛-]?\s*"
 CUE = re.compile(
-    r"\b(?:not|no|sorry|correction|actually|wait|wrong|instead|rather|nahi|nahin|nhi|galat|ghalat)\b"
-    r"|نہیں|غلط",
+    r"\b(?:not|no|sorry|correction|actually|wait|wrong|instead|rather|nahi|nahin|nhi|galat|ghalat|"
+    r"darasal|asal|matlab|balki)\b"
+    r"|نہیں|غلط|دراصل|اصل\s+میں|معاف|بلکہ|مطلب"
+    r"|नहीं|नही|गलत|दरअसल|असल\s+में|माफ|सॉरी|मतलब|बल्कि|रुकिए|ठहरिए"
+    r"|(?<!\w)(?:لا|ليس|مش|بل|خطأ|خطا|تصحيح|اقصد|أقصد|آسف|عفوا|الصحيح|في\s+الحقيقة)(?!\w)",
     re.IGNORECASE,
+)
+# A figure with a scale word after it: "5 lakh", "10 हज़ार", "2 کروڑ", "3 ملايين", "10k".
+_SCALE = (
+    r"(?:\s*(?:lakhs?|lacs?|crores?|karors?|haz+aar|hazar|hajar|thousand|million|"
+    r"लाख|करोड|हजार|لاکھ|کروڑ|ہزار|ألف|الف|آلاف|ألاف|مليون|ملايين|ملیون|ملین)|k)"
+)
+_SCALE_END = r"(?![\wऀ-ॿً-ٟ])"
+_FIGURE = re.compile(NUM + rf"(?:({_SCALE}){_SCALE_END})?", re.IGNORECASE)
+_MULTIPLIER = (
+    (("lakh", "lac", "لاکھ", "लाख"), Decimal(100000)),
+    (("crore", "karor", "کروڑ", "करोड"), Decimal(10000000)),
+    (("million", "مليون", "ملايين", "ملیون", "ملین"), Decimal(1000000)),
 )
 # "not 10, 100" / "not 10, it was 100" / "not 10 but 100"
-NOT_THEN = re.compile(
-    rf"\bnot\s+{NUM}\s*[,;:.،؛-]?\s*(?:but\s+|it\s+(?:was|is)\s+|its\s+|it's\s+)?{NUM}",
-    re.IGNORECASE,
-)
+NOT_THEN = re.compile(rf"\bnot\s+{NUM}{_SEP}{_LINK}{NUM}", re.IGNORECASE)
+# "nahi 10 balki 100" / "नहीं 10 बल्कि 100" / "نہیں 10 بلکہ 100" (a leading "no")
+NO_NUM_THEN = re.compile(rf"{NO}\s+{NUM}{_SEP}{_LINK}{NUM}", re.IGNORECASE)
+# Arabic: "لا 10 بل 100" / "ليس 10 بل 100" / "مش 10، 100"
+AR_NOT_THEN = re.compile(rf"{AR_NO}\s+{NUM}{_SEP}{_AR_LINK}{NUM}")
 # "100, not 10"
 THEN_NOT = re.compile(rf"{NUM}\s*[,;:.،؛-]?\s*not\s+{NUM}", re.IGNORECASE)
-# "10 nahi, 100" / "nahi 20 nahi, 12" / "20 nahi 12 hain"
-NUM_NAHI = re.compile(
-    rf"{NUM}\s*{NO}\s*[,;:.،؛-]?\s*(?:it\s+(?:was|is)\s+|woh\s+|wo\s+|ye\s+|yeh\s+)?{NUM}",
-    re.IGNORECASE,
+# Arabic: "100 وليس 10" / "100، لا 10"
+AR_THEN_NOT = re.compile(rf"{NUM}{_SEP}{AR_NO}\s+{NUM}")
+# "10 nahi, 100" / "nahi 20 nahi, 12" / "20 nahi 12 hain" / "10 नहीं, 100"
+NUM_NAHI = re.compile(rf"{NUM}\s*{NO}{_SEP}{_LINK}{NUM}", re.IGNORECASE)
+# "100 hai, 10 nahi" / "100 है, 10 नहीं" / "100 ہے، 10 نہیں" (the right figure first)
+THEN_NAHI = re.compile(
+    rf"{NUM}\s*(?:hai|hain|है|हैं|ہے|ہیں)?\s*[,;:.،؛-]?\s*{NUM}\s*{NO}", re.IGNORECASE
 )
-_WORD = re.compile(r"[^\W\d_]+", re.UNICODE)
 STOP = frozenset("the and was are for with that this have has had not but its our their".split())
+
+
+def _plain(value: Decimal) -> str:
+    return str(int(value)) if value == value.to_integral() else format(value.normalize(), "f")
+
+
+def _value(match: re.Match[str]) -> Decimal:
+    """The figure of a match with its scale word applied ("5 lakh" is 500000)."""
+    base = Decimal(match.group(1).replace(",", ""))
+    scale = (match.group(2) or "").strip().casefold()
+    if not scale:
+        return base
+    for names, multiplier in _MULTIPLIER:
+        if any(scale.startswith(n) for n in names):
+            return base * multiplier
+    return base * 1000  # hazar, thousand, k, ألف
+
+
+def expand(text: str) -> str:
+    """The text with Eastern digits as 0-9, nukta dropped, and every scaled figure written out
+    ("5 lakh" gives "500000"). Matching runs on this, so one rule covers every script."""
+    text = (text or "").translate(_DIGITS).replace("़", "")
+    return _FIGURE.sub(lambda m: _plain(_value(m)) if m.group(2) else m.group(0), text)
 
 
 def norm(token: str) -> str:
@@ -45,25 +112,34 @@ def norm(token: str) -> str:
 
 
 def numbers_in(text: str) -> list[str]:
-    return [norm(m) for m in _NUMBER.findall((text or "").translate(_DIGITS))]
+    return [norm(m) for m in _NUMBER.findall(expand(text))]
 
 
 def _following_word(text: str, number: str) -> str:
     """The first word after the number ("10 clients" gives "client"): the same fact?"""
-    for m in _NUMBER.finditer((text or "").translate(_DIGITS)):
+    plain = expand(text)
+    for m in _NUMBER.finditer(plain):
         if norm(m.group(1)) == number:
-            tail = [w.casefold() for w in _WORD.findall(text.translate(_DIGITS)[m.end() :])]
-            tail = [w for w in tail if w not in STOP]
+            tail = [fold(w) for w in WORD.findall(plain[m.end() :]) if not w[0].isdigit()]
+            tail = [arabic_stem(w) for w in tail if w not in STOP]
             return tail[0][:5] if tail else ""
     return ""
 
 
 def numeric_correction(latest: str, earlier: list[str]) -> tuple[str, str] | None:
     """(wrong, right) when the latest message corrects a number, else None."""
-    text = " ".join((latest or "").translate(_DIGITS).split())
+    text = " ".join(expand(latest).split())
     if not text:
         return None
-    for pattern, order in ((NOT_THEN, (0, 1)), (NUM_NAHI, (0, 1)), (THEN_NOT, (1, 0))):
+    for pattern, order in (
+        (NOT_THEN, (0, 1)),
+        (NUM_NAHI, (0, 1)),
+        (NO_NUM_THEN, (0, 1)),
+        (AR_NOT_THEN, (0, 1)),
+        (THEN_NOT, (1, 0)),
+        (THEN_NAHI, (1, 0)),
+        (AR_THEN_NOT, (1, 0)),
+    ):
         m = pattern.search(text)
         if m:
             wrong, right = norm(m.group(order[0] + 1)), norm(m.group(order[1] + 1))
@@ -104,11 +180,12 @@ def has_figure(text: str, number: str) -> bool:
 
 
 def replace_figure(text: str, wrong: str, right: str) -> str:
-    """The text with every standalone `wrong` figure (any comma style) written as `right`."""
+    """The text with every standalone `wrong` figure (any comma style, any scale word) written as
+    `right`."""
     out, last = [], 0
     source = text or ""
-    for m in _NUMBER.finditer(source):
-        if norm(m.group(1)) == wrong:
+    for m in _FIGURE.finditer(source.translate(_DIGITS)):  # translate keeps the length
+        if norm(_plain(_value(m))) == wrong:
             out.append(source[last : m.start()])
             out.append(right)
             last = m.end()
@@ -117,10 +194,12 @@ def replace_figure(text: str, wrong: str, right: str) -> str:
 
 
 _ACK = re.compile(
-    r"(?:\bnot\b|\binstead of\b|\brather than\b|\bnahi\b|\bnahin\b|\bnhi\b|\bnot\s+the\b)"
+    r"(?:\bnot\b|\binstead of\b|\brather than\b|\bnahi\b|\bnahin\b|\bnhi\b|\bnot\s+the\b|"
+    r"के\s+बजाय|की\s+जगह|نہیں|کی\s+جگہ|ليس|بدل[اً]*\s+من|ولا|وليس)"
     r"[^.?!\n]{0,12}$",
     re.IGNORECASE,
 )
+_ACK_AFTER = re.compile(r"\s*(?:nahi|nahin|nhi|नहीं|नही|نہیں|نہی)(?!\w)", re.IGNORECASE)
 
 
 def reply_problem(reply: str, wrong: str, right: str) -> str | None:
@@ -131,13 +210,13 @@ def reply_problem(reply: str, wrong: str, right: str) -> str | None:
             f"the owner just corrected a figure to {right} (not {wrong}): the reply must use "
             f"{right}"
         )
-    plain = reply.translate(_DIGITS)
+    plain = expand(reply)
     for m in _NUMBER.finditer(plain):
         if norm(m.group(1)) != wrong:
             continue
         before = plain[max(0, m.start() - 14) : m.start()]
         after = plain[m.end() : m.end() + 8]
-        if _ACK.search(before) or re.match(r"\s*(?:nahi|nahin|nhi)\b", after, re.IGNORECASE):
+        if _ACK.search(before) or _ACK_AFTER.match(after):
             continue
         return (
             f"the owner corrected {wrong} to {right}, but the reply still gives {wrong} as a "
@@ -156,6 +235,6 @@ def superseded(old_word: str, new_texts: list[str], correction: bool) -> bool:
     new = {n for t in new_texts for n in numbers_in(t)}
     if not old or not new or old & new:
         return False
-    stems = {w.casefold()[:5] for w in _WORD.findall(old_word) if len(w) >= 4} - STOP
-    fresh = {w.casefold()[:5] for t in new_texts for w in _WORD.findall(t) if len(w) >= 4}
+    stems = {w.casefold()[:5] for w in WORD.findall(old_word) if len(w) >= 4} - STOP
+    fresh = {w.casefold()[:5] for t in new_texts for w in WORD.findall(t) if len(w) >= 4}
     return bool(stems & fresh)
