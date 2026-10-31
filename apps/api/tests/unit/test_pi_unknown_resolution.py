@@ -1492,3 +1492,233 @@ def test_unreadable_unknown_stays_unknown_in_the_real_gate_after_a_vague_answer(
     p = ur.apply_answer(r, q, "that thing, you know", "en")
     assert p.status is S
     assert gate(opts, r).accepted_options == ()  # nothing changed, nothing passes
+
+
+def _bare_question(key: str) -> ur.Question:
+    return ur.Question(
+        key=key,
+        fact=key,
+        field="",
+        text=ur.render_question(key),
+        language="en",
+        why=(),
+        options=(0,),
+        option_texts=("Open a branch",),
+        problems=(),
+        codes=(),
+    )
+
+
+# ------------------------------------------------- tests added after the mutation pass
+
+
+def test_why_is_capped_and_clipped() -> None:
+    r = reqs(budget="not much")
+    opts = [f"option number {i} " + "x" * 300 for i in range(9)]
+    q = ur.choose_question([unknown(cc.RULE_BUDGET, "no figure in the budget text")] * 9, r, opts)
+    assert q is not None
+    assert len(q.why) == ur.MAX_WHY == 3
+    assert all(len(w) <= ur.MAX_WHY_CHARS for w in q.why)
+    assert len(q.options) == 9
+
+
+def test_stored_facts_are_detected_per_key() -> None:
+    r = reqs(
+        budget="50000 PKR per month",
+        staff="only 2 people",
+        deadline="within 2 weeks",
+        cannot=("only in Lahore",),
+        tried=(("a paper register", "it failed"),),
+    )
+    for key in (
+        "budget_ceiling",
+        "budget_currency_period",
+        "staff_headcount",
+        "deadline_duration",
+        "tried_outcome",
+        "tried_detail",
+        "place_allowed",
+    ):
+        assert ur._is_stored(key, r), key
+    assert not ur._is_stored("cannot_change_detail", r)
+    assert not ur._is_stored("tools_resources", r)
+    assert not ur._is_stored("expected_outcome", r)
+    empty = reqs()
+    for key in ur.FACTS:
+        assert not ur._is_stored(key, empty), key
+
+
+def test_expected_outcome_stored_when_a_problem_has_one() -> None:
+    p = ProblemRequirements(number=1, expected_outcome="fewer late payers")
+    assert ur._is_stored("expected_outcome", Requirements(problems=(p,)))
+
+
+def test_unreadable_stored_facts_are_not_stored() -> None:
+    r = reqs(
+        budget="at least 5000",
+        staff="a few",
+        deadline="soonish",
+        tried=(("a register", "hmm"),),
+    )
+    assert not ur._is_stored("budget_ceiling", r)
+    assert not ur._is_stored("staff_headcount", r)
+    assert not ur._is_stored("deadline_duration", r)
+    assert not ur._is_stored("tried_outcome", r)
+    assert not ur._is_stored("budget_currency_period", reqs(budget="50000"))
+    assert not ur._is_stored("budget_currency_period", reqs(budget="50000 PKR"))
+    assert ur._is_stored("budget_currency_period", reqs(budget="50000 PKR in total"))
+
+
+def test_facts_without_a_gate_unknown_have_no_problems_behind_them() -> None:
+    ranked = ur.rank_missing_information([], reqs(budget="x"), [], include_zero=True)
+    out = {m.key: m for m in ranked}
+    assert out["tools_resources"].problems == () and out["expected_outcome"].problems == ()
+
+
+def test_deadline_priority_beats_alphabet_on_a_tie() -> None:
+    r = reqs(deadline="soonish", cannot=("that thing",))
+    v = [
+        unknown(cc.RULE_DEADLINE, "the deadline is not a duration this check can read"),
+        unknown(
+            cc.RULE_CANNOT_CHANGE,
+            "the stated limit could not be read (script, wording or too vague)",
+        ),
+    ]
+    ranked = ur.rank_missing_information(v, r, ["a", "b"])
+    assert [m.key for m in ranked] == ["deadline_duration", "cannot_change_detail"]
+
+
+def test_asked_and_messages_mappings_are_not_collections_of_keys() -> None:
+    r = reqs(budget="not much")
+    v = [unknown(cc.RULE_BUDGET, "no figure in the budget text")]
+    out = ur.rank_missing_information(
+        v, r, ["a"], asked={"budget_ceiling": 5}, owner_messages={"my budget is 40k PKR": 1}
+    )
+    assert out[0].askable and not out[0].reask
+    assert ur.rank_missing_information(v, r, ["a"], asked=b"budget_ceiling")[0].askable
+    assert ur.rank_missing_information(v, r, ["a"], owner_messages=b"my budget is 40k")[0].askable
+
+
+def test_non_answers_mapping_ignores_bad_counts() -> None:
+    r = reqs(budget="not much")
+    v = [unknown(cc.RULE_BUDGET, "no figure in the budget text")]
+    for bad in ({"budget_ceiling": True}, {"budget_ceiling": "1"}, {1: 1}, [("budget_ceiling", 1)]):
+        out = ur.rank_missing_information(
+            v,
+            r,
+            ["a"],
+            asked=["budget_ceiling"],
+            non_answers=bad,  # type: ignore[arg-type]
+        )
+        assert out[0].status == "exhausted"
+
+
+def test_a_template_that_fails_the_lint_is_never_asked(monkeypatch: pytest.MonkeyPatch) -> None:
+    bad = {lang: "What is the price? Or the cost?" for lang in LANGS}
+    monkeypatch.setitem(lx.QUESTIONS, "budget_ceiling", bad)
+    r = reqs(budget="not much")
+    assert (
+        ur.choose_question([unknown(cc.RULE_BUDGET, "no figure in the budget text")], r, ["a"])
+        is None
+    )
+
+
+def test_answered_in_messages_cues() -> None:
+    assert ur.answered_in_messages("budget_ceiling", ["budget 50000"])
+    assert ur.answered_in_messages("budget_ceiling", ["بجٹ 50000"])
+    assert not ur.answered_in_messages("budget_ceiling", ["we have 50000 customers"])
+    assert ur.answered_in_messages("deadline_duration", ["it must be done within 2 weeks"])
+    assert not ur.answered_in_messages("deadline_duration", ["we waited 2 weeks"])
+    assert not ur.answered_in_messages("expected_outcome", ["anything"])
+
+
+def test_currency_period_reads_each_half_alone() -> None:
+    r = reqs(budget="50000 PKR")
+    q = question_for(CURRENCY_Q[0], r, CURRENCY_Q[2], CURRENCY_Q[1])
+    monthly = ur.apply_answer(r, q, "monthly", "en")
+    assert monthly.status is F
+    assert dict(monthly.updates[0].parsed) == {"currency": "RS", "period": "month"}
+    once = ur.apply_answer(r, q, "once", "en")
+    assert once.status is F and dict(once.updates[0].parsed)["period"] == "one_off"
+    r2 = reqs(budget="50000")
+    q2 = question_for(CURRENCY_Q[0], r2, CURRENCY_Q[2], CURRENCY_Q[1])
+    only_cur = ur.apply_answer(r2, q2, "USD", "en")
+    assert only_cur.status is S and only_cur.reason == "no_period"
+    only_per = ur.apply_answer(r2, q2, "monthly", "en")
+    assert only_per.status is S and only_per.reason == "no_currency"
+    assert ur.apply_answer(r2, q2, "xyz", "en").reason == "no_currency_or_period"
+    both = ur.apply_answer(r2, q2, "monthly, once", "en")
+    assert both.status is S and both.reason == "ambiguous"
+
+
+def test_currency_and_period_contradictions() -> None:
+    r = reqs(budget="50000 USD per month")
+    q = _bare_question("budget_currency_period")
+    cur = ur.apply_answer(r, q, "PKR, per month", "en")
+    assert cur.status is C and cur.updates[0].is_correction
+    per = ur.apply_answer(r, q, "USD, per year", "en")
+    assert per.status is C
+    same = ur.apply_answer(r, q, "USD, per month", "en")
+    assert same.status is F and not same.updates[0].is_correction
+
+
+def test_deadline_and_staff_contradictions_use_their_own_stored_limit() -> None:
+    r = reqs(deadline="soonish")
+    q = question_for(DEADLINE_Q[0], r, DEADLINE_Q[2], DEADLINE_Q[1])
+    changed = ur.apply_answer(reqs(deadline="within 2 weeks"), q, "within 3 days", "en")
+    assert changed.status is C and changed.updates[0].replaces == "within 2 weeks"
+    same = ur.apply_answer(reqs(deadline="within 2 weeks"), q, "in 14 days", "en")
+    assert same.status is F
+    # a stored budget or staff limit is not the deadline's stored value
+    other = ur.apply_answer(
+        reqs(budget="100000 PKR", staff="only 1 person"), q, "within 3 days", "en"
+    )
+    assert other.status is F and other.updates[0].replaces is None
+    rs = reqs(staff="a few")
+    qs = question_for(STAFF_Q[0], rs, STAFF_Q[2], STAFF_Q[1])
+    other_s = ur.apply_answer(
+        reqs(budget="100000 PKR", deadline="within 2 weeks"), qs, "only 2", "en"
+    )
+    assert other_s.status is F and other_s.updates[0].replaces is None
+    rb = reqs(budget="not much")
+    qb = question_for(BUDGET_Q[0], rb, BUDGET_Q[2], BUDGET_Q[1])
+    other_b = ur.apply_answer(
+        reqs(staff="only 1 person", deadline="within 2 weeks"), qb, "50k PKR", "en"
+    )
+    assert other_b.status is F and other_b.updates[0].replaces is None
+
+
+def test_tried_outcome_proposal_targets_one_item() -> None:
+    r = reqs(tried=(("a paper register", "hmm"), ("flyers", "ok")))
+    v = [
+        unknown(
+            cc.RULE_TRIED,
+            "the option repeats something the owner tried, and how it went is not clear",
+        )
+    ]
+    q = ur.choose_question(v, r, ["Keep a register"])
+    assert q is not None and len(q.target_limits) == 2
+    p = ur.apply_answer(r, q, "it did not work", "en")
+    assert len(p.updates) == 1 and p.updates[0].replaces == "a paper register"
+
+
+def test_place_answer_is_read_by_the_gate_place_reader() -> None:
+    q = _bare_question("place_allowed")
+    ok = ur.apply_answer(reqs(), q, "Lahore", "en")
+    assert ok.status is F and ok.updates[0].value.lower().startswith("only in")
+    unreadable = ur.apply_answer(reqs(), q, "لاہور", "ur")
+    assert unreadable.status is S and unreadable.reason == "script_unreadable"
+    assert ur.apply_answer(reqs(), q, "xqzv", "en").status is S
+
+
+def test_tools_resources_has_no_reading_and_stays_unknown() -> None:
+    p = ur.apply_answer(reqs(), _bare_question("tools_resources"), "a laptop and a phone", "en")
+    assert p.status is S and p.reason == "not_enforced_by_gate"
+
+
+def test_why_options_never_repeat_and_follow_option_order() -> None:
+    r = reqs(budget="not much")
+    v = [unknown(cc.RULE_BUDGET, "no figure in the budget text")] * 3
+    q = ur.choose_question(v, r, ["third", "first", "second"])
+    assert q is not None and q.option_texts == ("third", "first", "second")
+    assert q.options == (0, 1, 2)
