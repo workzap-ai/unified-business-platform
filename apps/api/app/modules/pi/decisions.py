@@ -687,9 +687,31 @@ def decide(
                 {"paused_from": State.S5_READINESS.value},
                 why="later",
             )
+        asked_facts = bool(brief.get("quote_facts_asked") and not brief.get("quote_facts_done"))
+        if asked_facts and can_approve and "?" not in message and "؟" not in message:
+            # ROFFER07: the owner answered the quote-facts question; that answer starts the quote
+            # (the facts reach the extractor with the message), and pi does not ask a second time.
+            return _prepare(
+                language,
+                facts,
+                list(facts.get("problem_refs") or []),
+                {"quote_facts_done": True},
+                brief.get("offer_yes_id"),
+            )
         if _ok(answer, Answer.YES):
             if not can_approve:
                 return _member(language, facts, brief)
+            if facts.get("quote_missing") and not brief.get("quote_facts_asked"):
+                # ROFFER07 (v1.6): a yes, but the quote lacks facts: ask only those, at most two,
+                # in one question that says why. Nothing is prepared until they answer.
+                from app.modules.pi import quote_facts
+
+                return Decision(
+                    quote_facts.ask_line(list(facts["quote_missing"]), language),
+                    None,
+                    {"quote_facts_asked": True, "offer_yes_id": facts.get("message_id")},
+                    why="ROFFER07",
+                )
             if int(facts.get("group_count") or 0) >= 2 and not brief.get("scope_asked"):
                 return Decision(
                     text("ask_all_or_some", language),

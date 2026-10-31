@@ -18,7 +18,7 @@ import re
 from dataclasses import dataclass
 from typing import Any
 
-from app.modules.pi import business_profile, public_page
+from app.modules.pi import business_profile, public_page, reply_gates
 
 IDENTITY_ASKED = "identity_asked"
 PAGE_ASKED = "page_asked"
@@ -32,6 +32,14 @@ IDENTITY = {
     "and what does it do?",
     "roman_ur": "Hi, main pi hoon, Workzap ka AI. Pehle thora aap ke karobar ke baare mein: naam "
     "kya hai, aur kis cheez ka hai?",
+}
+REFERRED = {
+    # 18.2 Referral: acknowledged in half a sentence, then the identity question (the fallback line;
+    # the model writes the real opening).
+    "en": "Hi, I'm pi, an AI from Workzap, and I'm glad your friend passed the number on. First, a "
+    "little about your business: what is it called, and what does it do?",
+    "roman_ur": "Hi, main pi hoon, Workzap ka AI, aur khushi hui ke aap ke dost ne number diya. "
+    "Pehle thora aap ke karobar ke baare mein: naam kya hai, aur kis cheez ka hai?",
 }
 PAGE_ASK = {
     "en": "If you have a website or an Instagram page, send the link and I'll take a look so I "
@@ -149,9 +157,8 @@ def plan(context: dict[str, Any]) -> Plan | None:
             return None  # not a first-time owner: use the profile, no opening (16.7)
         if not (context.get("greeting_only") or social_opener(said)):
             return Plan("", {"step": SKIPPED}, profile)  # a first message with content: no warm-up
-        return Plan(
-            IDENTITY[lang], {"step": IDENTITY_ASKED, "asked": 1}, profile, model_writes=True
-        )
+        opening = REFERRED[lang] if reply_gates.referral_said(context) else IDENTITY[lang]
+        return Plan(opening, {"step": IDENTITY_ASKED, "asked": 1}, profile, model_writes=True)
     if states_problem(said):
         return Plan("", {**state, "step": SKIPPED}, profile)  # they went straight to the problem
     if step == IDENTITY_ASKED:
