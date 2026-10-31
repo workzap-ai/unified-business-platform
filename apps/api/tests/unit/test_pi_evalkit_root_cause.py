@@ -8,8 +8,11 @@ Git. Nothing here asserts or prints an acceptance decision: the tool prints numb
 import csv
 import hashlib
 import json
+import random
 import re
 import tempfile
+import time
+import unicodedata
 from pathlib import Path
 
 import pytest
@@ -261,7 +264,7 @@ def test_insufficient_evidence_means_one_question_and_no_cause() -> None:
     right = root_cause.score_case(case, {"causes": [], "question": "What changed on weekdays?"})
     assert right["hard_flags"] == [] and right["insufficient_ok"] is True
     assert right["question_ok"] is True and right["checks_all_true"] is True
-    invented = {"causes": [{"text": "Prices", "status": "pi_inferred", "shown_as": "guess"}]}
+    invented = {"causes": [{"text": "Prices", "status": "pi_inferred", "shown_as": "fact"}]}
     out = root_cause.score_case(case, {**invented, "question": "Why?"})
     assert "cause_invented_without_facts" in out["hard_flags"]
     assert out["insufficient_ok"] is False
@@ -284,6 +287,291 @@ def test_matching_is_by_whole_tokens_in_every_script() -> None:
     assert not root_cause.in_owner_text("गाड़ी है और वह सुबह तीन", owner)
     assert root_cause.in_owner_text("ایک ہی بس", ["نہیں، ایک ہی بس تین راستوں پر چلتی ہے۔"])
     assert not root_cause.in_owner_text("ایک بس", ["نہیں، ایک ہی بس تین راستوں پر چلتی ہے۔"])
+
+
+# ------------------------------------------------------------------ audit round 1 (a4b9ccc)
+
+OVEN = "Orders go out late because we have one oven shared with bread."
+
+
+def with_cause(text, words, status="owner_said", **extra):
+    cause = {"text": text, "status": status, "evidence": {"words": words}, **extra}
+    return {"causes": [cause]}
+
+
+def flags(case, record):
+    return root_cause.score_case(case, record)["hard_flags"]
+
+
+@pytest.mark.parametrize(
+    "record",
+    [
+        [],
+        "text",
+        7,
+        {"causes": "x"},
+        {"causes": {"text": "x"}},
+        {"causes": ["plain string"]},
+        {"causes": [{"text": 5, "status": "owner_said"}]},
+        {"causes": [{"text": "x", "status": "owner_said", "evidence": "oven"}]},
+        {"causes": [{"text": "x", "status": "owner_said", "evidence": ["oven"]}]},
+        {"causes": [{"text": "x", "status": "owner_said", "evidence": {"words": 5}}]},
+        {"causes": [{"text": "x", "status": "owner_said", "evidence": {"words": [1, None]}}]},
+        {"causes": [{"text": "x", "status": "pi_inferred", "shown_as": 3}]},
+        {"evidence_for": 5},
+        {"evidence_for": [1]},
+        {"evidence_against": {"a": 1}},
+        {"factors": 5},
+        {"factors": [None]},
+        {"question": 5},
+        {"reply": ["x"]},
+    ],
+)
+def test_a_malformed_record_is_flagged_and_never_raises(record) -> None:
+    out = root_cause.score_case(owner_case(), record)
+    assert "malformed_record" in out["hard_flags"] and out["malformed_fields"]
+    assert out["checks_all_true"] is False
+
+
+def test_a_status_that_is_not_text_is_an_unknown_status() -> None:
+    record = {"causes": [{"text": "x", "status": ["owner_said"]}]}
+    assert "unknown_status" in flags(owner_case(), record)
+
+
+def test_malformed_fields_are_named() -> None:
+    record = {"causes": [{"text": "x", "status": "owner_said", "evidence": {"words": 5}}]}
+    out = root_cause.score_case(owner_case(), record)
+    assert "causes[0].evidence.words" in out["malformed_fields"]
+    named = root_cause.score_case(owner_case(), {"evidence_for": 5})
+    assert "evidence_for" in named["malformed_fields"]
+
+
+def test_no_record_and_no_reference_is_a_malformed_record_not_a_crash() -> None:
+    out = root_cause.score_case(owner_case())
+    assert "malformed_record" in out["hard_flags"] and "record" in out["malformed_fields"]
+
+
+def test_a_malformed_cause_container_can_not_hide_in_an_insufficient_case() -> None:
+    case = insufficient_case()
+    for causes in ("a cause", {"text": "price"}, ["price"]):
+        out = root_cause.score_case(case, {"causes": causes, "question": "What changed?"})
+        assert "malformed_record" in out["hard_flags"]
+        assert out["insufficient_ok"] is False and out["checks_all_true"] is False
+
+
+@pytest.mark.parametrize(
+    ("text", "words"),
+    [
+        ("the staff attitude", "the oven"),
+        ("the manager is rude", "because of the weather"),
+        ("one manager quit", "one"),
+        ("staff lazy hai", "aik gaari hai"),
+        ("manager quit", "orders go out late"),
+    ],
+)
+def test_a_shared_function_word_is_not_support(text, words) -> None:
+    owner = f"{OVEN} {words}. aik gaari hai. The manager is rude."
+    case = owner_case(input={"messages": [owner]})
+    assert "unsupported_confirmed" in flags(case, with_cause(text, [words]))
+
+
+def test_a_long_cause_needs_half_of_its_content_words_supported() -> None:
+    owner = ["Orders go out late. The oven is shared with bread."]
+    case = owner_case(input={"messages": owner})
+    long_cause = "the oven makes careless rushed staff ignore dirty tickets"
+    assert "unsupported_confirmed" in flags(case, with_cause(long_cause, ["the oven"]))
+    short = "the oven shared with bread"
+    assert flags(case, with_cause(short, ["the oven is shared with bread"])) == []
+
+
+def test_content_words_ignore_function_words_in_every_language() -> None:
+    for word in ("the", "hai", "aur", "ہی", "है", "في", "one", "because"):
+        assert root_cause.content_words(word) == set(), word
+    assert root_cause.content_words("oven 6 gaari") == {"oven", "6", "gaari"}
+
+
+def test_min_word_length_is_three() -> None:
+    case = owner_case(input={"messages": ["Orders wait because pc xx is down."]})
+    assert "unsupported_confirmed" in flags(case, with_cause("xx", ["pc xx"]))
+
+
+@pytest.mark.parametrize("label", ["Fact", " stated ", "certain", "confirmed", "the reason is"])
+def test_a_guess_with_any_label_but_a_hypothesis_is_shown_as_fact(label) -> None:
+    guess = {"text": "staff are slow", "status": "pi_inferred", "evidence": {}, "shown_as": label}
+    assert "inferred_shown_as_fact" in flags(owner_case(), {"causes": [stated(), guess]})
+
+
+def test_a_guess_with_no_label_recorded_is_not_flagged_by_the_label() -> None:
+    guess = {"text": "staff are slow", "status": "pi_inferred", "evidence": {}}
+    assert flags(owner_case(), {"causes": [stated(), guess]}) == []
+
+
+@pytest.mark.parametrize("label", ["hypothesis", "Guess", "POSSIBLE", "may be", "shayad", "maybe"])
+def test_hypothesis_labels_are_read_whatever_the_case(label) -> None:
+    guess = {"text": "staff are slow", "status": "pi_inferred", "shown_as": label}
+    assert flags(owner_case(), {"causes": [stated(), guess]}) == []
+
+
+def test_a_guess_in_the_reply_without_a_hedge_is_shown_as_fact() -> None:
+    guess = {"text": "Staff are slow at the counter", "status": "pi_inferred"}
+    record = {"causes": [stated(), guess]}
+    bare = {**record, "reply": "Thanks. Staff are slow at the counter. What else?"}
+    assert "inferred_shown_as_fact" in flags(owner_case(), bare)
+    hedged = {**record, "reply": "Staff may be slow at the counter, I am not sure. What else?"}
+    assert "inferred_shown_as_fact" not in flags(owner_case(), hedged)
+    other = {**record, "reply": "Thanks, noted the oven. What else?"}
+    assert "inferred_shown_as_fact" not in flags(owner_case(), other)
+
+
+def test_a_labelled_hypothesis_is_allowed_when_the_facts_are_too_few() -> None:
+    case = insufficient_case()
+    hypothesis = {"text": "Prices", "status": "pi_inferred", "shown_as": "hypothesis"}
+    out = root_cause.score_case(case, {"causes": [hypothesis], "question": "What changed?"})
+    assert out["hard_flags"] == [] and out["insufficient_ok"] is True
+    for bad in (
+        {"text": "Prices", "status": "pi_inferred", "shown_as": "fact"},
+        {"text": "Prices", "status": "pi_inferred"},
+        {"text": "Prices", "status": "owner_said", "shown_as": "hypothesis"},
+    ):
+        out = root_cause.score_case(case, {"causes": [bad], "question": "What changed?"})
+        assert "cause_invented_without_facts" in out["hard_flags"], bad
+        assert out["insufficient_ok"] is False
+
+
+def test_a_labelled_guess_is_not_a_stated_trap_cause() -> None:
+    case = owner_case(
+        expected={
+            "outcome": "cause_stated",
+            "cause_any": ["oven"],
+            "forbidden_cause_any": ["bread"],
+            "both_sides": False,
+            "factors": [],
+        }
+    )
+    guess = {"text": "Bread orders", "status": "pi_inferred", "shown_as": "guess"}
+    assert flags(case, {"causes": [stated("Only one oven"), guess]}) == []
+
+
+def test_a_confirmed_cause_needs_an_owner_message_index() -> None:
+    case = owner_case()
+    base = dict(stated()) | {"status": "confirmed"}
+    assert "confirmed_without_owner" in flags(case, {"causes": [base]})
+    for bad in (True, -1, 1, "0", None, 0.0):
+        record = {"causes": [{**base, "confirmed_by": bad}]}
+        assert "confirmed_without_owner" in flags(case, record)
+    assert flags(case, {"causes": [{**base, "confirmed_by": 0}]}) == []
+    assert "confirmed_without_owner" not in flags(case, {"causes": [stated()]})
+
+
+def test_the_question_must_be_the_last_character() -> None:
+    case = insufficient_case()
+    for question in ("Why? Tell me.", "What changed? ok"):
+        out = root_cause.score_case(case, {"causes": [], "question": question})
+        assert out["question_ok"] is False
+
+
+def test_evidence_order_matters() -> None:
+    case = owner_case()
+    flipped = with_cause("One oven shared with bread", ["shared with bread one oven"])
+    assert "unsupported_confirmed" in flags(case, flipped)
+    reordered = with_cause("One oven shared with bread", ["bread with shared oven one"])
+    assert "unsupported_confirmed" in flags(case, reordered)
+
+
+def test_cause_found_needs_a_supported_cause() -> None:
+    case = owner_case()
+    out = root_cause.score_case(case, with_cause("The oven is broken", ["a thing nobody said"]))
+    assert out["cause_found"] is False and "unsupported_confirmed" in out["hard_flags"]
+
+
+def test_a_decomposed_unicode_spelling_still_matches() -> None:
+    owner = ["हमारी फ़ीस ज़्यादा है और ग्राहक कम हैं"]  # U+095E decomposes under NFD
+    decomposed = unicodedata.normalize("NFD", owner[0])
+    assert decomposed != owner[0]
+    assert root_cause.in_owner_text(decomposed, owner)
+    assert root_cause.in_owner_text("फीस ज्यादा", owner)  # without the nukta
+    assert root_cause.in_owner_text("ﬁsh", ["a fish"])  # a compatibility ligature, NFKC only
+
+
+def test_arabic_marks_and_letter_forms_do_not_make_support_unsupported() -> None:
+    owner = ["السيارات تتأخر لأن عندنا موظف واحد في مدرسة الكتاب أخطاء"]
+    for phrase in (
+        "عَندنا مُوَظَّف واحد",  # tashkeel
+        "عندنا موظف واحد",
+        "في مدرسه الكتاب",  # teh marbuta written as heh
+        "في مدرسة الكتاب",
+        "اخطاء",  # bare alef for hamza alef
+        "أخطاء",
+    ):
+        assert root_cause.in_owner_text(phrase, owner), phrase
+    assert root_cause.in_owner_text("كتاب", ["هذا کتاب"])  # Persian kaf
+    assert root_cause.in_owner_text("مدرسی", ["مدرسي"])  # Persian yeh
+    assert root_cause.in_owner_text("٣ سيارات", ["3 سيارات"])  # Arabic-Indic digit
+
+
+def test_matching_is_fast_on_large_inputs() -> None:
+    big = " ".join(f"w{n % 50}" for n in range(20000))
+    case = owner_case(input={"messages": [big]})
+    phrase = " ".join(f"w{n % 50}" for n in range(1000))
+    record = {
+        "causes": [
+            {"text": "w1 w2 w3", "status": "owner_said", "evidence": {"words": [phrase]}}
+            for _ in range(15)
+        ],
+        "evidence_for": [phrase] * 40,
+    }
+    started = time.perf_counter()
+    root_cause.score_case(case, record)
+    assert time.perf_counter() - started < 5
+
+
+def test_an_oversized_record_is_cut_and_flagged() -> None:
+    too_many = {"causes": [stated()] * (root_cause.MAX_CAUSES + 1)}
+    assert "oversized_record" in flags(owner_case(), too_many)
+    long_list = {"evidence_for": ["one oven"] * (root_cause.MAX_ITEMS + 1)}
+    assert "oversized_record" in flags(owner_case(), long_list)
+    long_text = {"question": "x" * (root_cause.MAX_CHARS + 1)}
+    assert "oversized_record" in flags(owner_case(), long_text)
+    started = time.perf_counter()
+    huge = {"causes": [stated(words=("oven " * 100000,))] * 20}
+    assert "oversized_record" in flags(owner_case(), huge)
+    assert time.perf_counter() - started < 5
+
+
+def random_value(rng, depth=0):
+    kinds = ["none", "bool", "int", "float", "str", "list", "dict", "text"]
+    kind = rng.choice(kinds if depth < 3 else kinds[:5])
+    if kind == "none":
+        return None
+    if kind == "bool":
+        return rng.random() < 0.5
+    if kind == "int":
+        return rng.randint(-5, 10**6)
+    if kind == "float":
+        return rng.random() * 1e9
+    if kind == "str":
+        return rng.choice(["", "oven", "owner_said", "fact", "?", "\x00", "شاید", "فِي", "a b c"])
+    if kind == "text":
+        return rng.choice([OVEN, "one oven shared with bread", "ٱلسَّلَام", "\ud800"])
+    if kind == "list":
+        return [random_value(rng, depth + 1) for _ in range(rng.randint(0, 4))]
+    keys = ["causes", "text", "status", "evidence", "words", "shown_as", "confirmed_by"]
+    return {rng.choice(keys): random_value(rng, depth + 1) for _ in range(rng.randint(0, 4))}
+
+
+def test_five_hundred_random_malformed_records_never_raise() -> None:
+    rng = random.Random(20261031)
+    fields = ["causes", "evidence_for", "evidence_against", "factors", "question", "reply"]
+    cases = [owner_case(), insufficient_case()]
+    for n in range(500):
+        record = (
+            random_value(rng)
+            if n % 5 == 0
+            else {f: random_value(rng) for f in rng.sample(fields, rng.randint(1, 6))}
+        )
+        out = root_cause.score_case(cases[n % 2], record)
+        assert isinstance(out["hard_flags"], list)
+        assert isinstance(out["checks_all_true"], bool)
 
 
 # ------------------------------------------------------------------ negative controls

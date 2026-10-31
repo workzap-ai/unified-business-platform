@@ -118,7 +118,7 @@ actually said.
 |---|---|---|
 | `constraints` | list; each item is a **string** (legacy, as the 9 existing cases) or `{kind, text}` with `kind` in `budget`, `staff`, `deadline`, `cannot_change` | a scorer treats a string as kind-less; no existing case changes |
 | `tried` | list of `{what, outcome}` | new |
-| `cause` | `{text, status, evidence_words}`; `status` is `owner_said`, `pi_inferred` or `confirmed`; an unsupported cause may never be `confirmed` | new; `hypothesis_only` stays for causes the owner did not state |
+| `cause` | `{text, status, evidence: {words}, shown_as, confirmed_by}`; `status` is `owner_said`, `pi_inferred` or `confirmed`; an unsupported cause may never be `confirmed`, and `confirmed` needs `confirmed_by` (an owner message index) | new; `hypothesis_only` stays for causes the owner did not state |
 | `expected_outcome` | string, at most 300 characters, in the owner's words | new |
 | `workflows` | list of short strings, owner's words | new (per customer in P-1, per case here) |
 | `roles` | list of **roles only**, never names (for example `cashier`, `supervisor`) | new |
