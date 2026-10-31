@@ -1,8 +1,12 @@
 """Scripted relevance scorer for candidate ideas (FT-A3). No model, deterministic.
 
-Not a quality gate and not a learning reward. Scorer agreed 55% with an independent grader on
-the borderline set; exact-token matching after crude stemming, no negation, no numbers, limit
-keywords are fixture data.
+Not a quality gate and not a learning reward; an offline measurement, connected to no live
+gate. The 55% agreement (11 of 20) with an independent grader on the borderline set was measured
+on the earlier scorer (exact tokens after crude stemming, no numbers, no negation). The current
+scorer matches stemmed words, folds magnitude figures, compares numeric ceilings and reads modal
+negation ('cannot buy X'); its current agreement with the agent-drafted labels is printed beside
+this note. Negation inside an idea, spelled-out numbers and several languages are not
+understood; limit keywords are fixture data.
 
 Known limits, stated so nobody reads more into a verdict than it holds: matching is by stem
 (`relevance_match`: English plural, -ing, -ed, -ly; Roman Urdu endings only when the case language
@@ -42,9 +46,13 @@ from app.modules.pi.evalkit import relevance_match as match
 
 VERDICTS = ("relevant", "irrelevant", "generic", "violates_constraint", "restates_owner")
 DISCLAIMER = (
-    "Not a quality gate and not a learning reward. Scorer agreed 55% with an independent grader "
-    "on the borderline set; exact-token matching after crude stemming, no negation, no numbers, "
-    "limit keywords are fixture data."
+    "Not a quality gate and not a learning reward; an offline measurement, connected to no live "
+    "gate. The 55% agreement (11 of 20) with an independent grader on the borderline set was "
+    "measured on the earlier scorer (exact tokens after crude stemming, no numbers, no negation). "
+    "The current scorer matches stemmed words, folds magnitude figures, compares numeric ceilings "
+    "and reads modal negation ('cannot buy X'); its current agreement with the agent-drafted "
+    "labels is printed beside this note. Negation inside an idea, spelled-out numbers and "
+    "several languages are not understood; limit keywords are fixture data."
 )
 LINK_MIN = (
     2  # shared content words (problem plus facts) an idea needs, one of them from the problem
@@ -239,7 +247,9 @@ def violated(
             if any(match.rule_hit(r, full, verbs) for r in rules):
                 return reason
             for phrase in limit.get("blocks") or []:
-                need = _full_stems(phrase, language)
+                need = stems(
+                    phrase, language, True
+                )  # stop-list verbs ('give') are not required: as before
                 if need and need <= full:
                     own = [
                         r for r in rules if match.rule_alternative(r, full) and need <= r.objects

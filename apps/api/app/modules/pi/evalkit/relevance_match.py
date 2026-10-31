@@ -28,12 +28,23 @@ it prints no verdict of its own, `relevance` uses these helpers. Limits, stated 
     ('cannot', 'must not', 'unable to', 'do not want to') count; a descriptive 'never' or
     'fails to' is not a prohibition. Only the listed verb groups are known; any other verb
     stands for itself.
-  * money versus counted nouns: a figure with a currency marker or magnitude word is money unless
-    the next word is in a short list of counted nouns (staff, days, guests, birds ...); a bare
-    figure is money only in a money context (a budget limit, or 'for', 'costs', 'pay' before it)
-    and a following 'then', 'because', 'this month' is not a unit. A counted noun outside that
-    list after a magnitude word ('3 lakh goats') is read as money. In an idea, a bare figure with
-    no price cue before it is ignored.
+  * money versus counted nouns: a figure with a currency marker (or 'worth') is money. A figure
+    with a magnitude word is money, except that a plural noun right after it ('50k eggs', 'your
+    50k followers') is a count unless a price word (for, costs, pay, spend, worth, budget) comes
+    before it; a singular noun ('a 50k tablet') stays money by decision, and a counted noun from
+    a short list (staff, days, guests, birds ...) is always a count. A bare figure is money in a
+    money context (a limit that talks about spending, or a budget kind), after a price word or a
+    buying verb ('buy a 50000 tablet', 'invest 50000', 'get a system at 50000'; a noun after it
+    needs 1000 or more to be read as a product), and a following 'then', 'because', 'this month'
+    is not a unit. An idea's bare figure with none of that is ignored. '2.5m', '1m' and '5 k'
+    are read.
+  * not costs: an idea figure written as income or a saving (sell, charge, earn, collect, raise,
+    receive, make, save, profit ...) and a figure the owner stated, with the same value and unit,
+    that the idea only restates; the same figure written as something bought or paid ('buy new
+    software for Rs 50000') is a new cost.
+  * a stated goal is not a prohibition: 'cannot afford downtime', 'cannot lose customers' and
+    'cannot risk X' make no rule; 'cannot afford X' blocks buying, spending or hiring only when X
+    is something a business buys (equipment, software, staff, money ...).
   * a verb that is also a noun ('fire', 'cut', 'close', 'stop', 'use', 'order') is dropped from
     an idea's verbs when it follows a determiner or preposition ('a fire alarm', 'each stop'); a
     noun used without one ('fire drills') still looks like the verb. Roman Urdu verb roots are
@@ -54,9 +65,9 @@ MAGNITUDES = {
     "k": 1e3, "thousand": 1e3, "thousands": 1e3, "hazar": 1e3, "hazaar": 1e3, "hazaro": 1e3,
     "lakh": 1e5, "lakhs": 1e5, "lac": 1e5, "lacs": 1e5, "lakhon": 1e5,
     "crore": 1e7, "crores": 1e7, "karor": 1e7, "karore": 1e7,
-    "million": 1e6, "millions": 1e6, "mn": 1e6, "billion": 1e9, "arab": 1e9,
+    "million": 1e6, "millions": 1e6, "mn": 1e6, "m": 1e6, "billion": 1e9, "arab": 1e9,
 }  # fmt: skip
-_MAG = r"k|mn|thousands?|haz+aro?|lakhs?|lacs?|lakhon|crores?|karore?|millions?|billion|arab"
+_MAG = r"k|mn|m|thousands?|haz+aro?|lakhs?|lacs?|lakhon|crores?|karore?|millions?|billion|arab"
 _NUM = r"\d+(?:,\d+)*(?:\.\d+)?"  # a comma is part of a figure only when digits follow it
 _CURRENCY = {"rs", "pkr", "inr", "usd", "aed", "rupee", "rupees", "rupay", "rupaye", "dollar",
              "dollars", "$", "₹"}  # fmt: skip
@@ -72,9 +83,10 @@ _NOT_ING = {"evening", "morning", "ceiling", "during", "nothing", "something",
 
 
 def _has_vowel(word: str) -> bool:
-    return any(ch in _VOWELS for ch in word)
+    return any(ch in _VOWELS + "y" for ch in word)
 
 
+_IRREGULAR = {"using": "use", "used": "use", "dying": "die", "lying": "lie", "tying": "tie"}
 _DOUBLE_L = {"cancell", "travell", "labell", "modell", "fuell", "levell", "signall"}
 _KEEP_E = {"plane"}
 
@@ -87,7 +99,7 @@ def _cvc(word: str) -> bool:
     return (
         len(word) >= 3
         and _consonant(word[-3])
-        and word[-2] in _VOWELS
+        and word[-2] in _VOWELS + "y"
         and _consonant(word[-1])
         and word[-1] not in "wxy"
     )
@@ -97,7 +109,7 @@ def english_plural(token: str) -> str:
     """Strip an English plural: -ies, -sses/-shes/-ches/-xes/-zes, -s (not -ss, -us, -is)."""
     if len(token) > 4 and token.endswith("ies"):
         return token[:-3] + "y"
-    if len(token) > 4 and token.endswith(("sses", "shes", "ches", "xes", "zes")):
+    if len(token) > 4 and token.endswith(("sses", "shes", "ches", "xes")):
         return token[:-2]
     if len(token) > 3 and token.endswith("s") and not token.endswith(("ss", "us", "is")):
         return token[:-1]
@@ -109,12 +121,16 @@ def english_stem(token: str) -> str:
     is returned; the soft space cuts it to five letters (`relevance`). A short stem keeps its e
     ('care', 'rate', 'cute' stay apart from 'car', 'rat', 'cut') and a short stem left by -ing or
     -ed gets it back ('hiring' and 'hire' agree)."""
+    if token in _IRREGULAR:
+        return _IRREGULAR[token]
     t = english_plural(token)
     stripped = False
     if len(t) > 5 and t.endswith("ing") and t not in _NOT_ING and _has_vowel(t[:-3]):
         t, stripped = t[:-3], True
     elif len(t) > 4 and t.endswith("ied"):
         t = t[:-3] + "y"
+    elif len(t) > 4 and t.endswith("eed"):
+        t = t[:-1]  # 'freed' and 'agreed' end in a word that already ends in e
     elif len(t) > 4 and t.endswith("ed") and _has_vowel(t[:-2]):
         t, stripped = t[:-2], True
     if len(t) > 5 and t.endswith("ly"):
@@ -183,14 +199,13 @@ def _digits(value: float) -> str:
     return str(int(round(value))) if abs(value - round(value)) < 1e-9 else f"{value:g}"
 
 
+_WORDS = r"thousands?|haz+aro?|lakhs?|lacs?|lakhon|crores?|karore?|millions?|billion|arab"
 _RANGE_FOLD = re.compile(
-    rf"(?<![\w.,])({_NUM})\s?(?:-|–|—|to)\s?({_NUM})(?:(k|mn)|\s*(thousands?|haz+aro?|lakhs?|lacs?|"
-    rf"lakhon|crores?|karore?|millions?|billion|arab))\b",
+    rf"(?<![\w.,])({_NUM})\s?(?:-|–|—|to)\s?({_NUM})(?:(mn|m)\b|\s?(k)\b|\s*({_WORDS})\b)",
     re.IGNORECASE,
 )
 _FOLD = re.compile(
-    rf"(?<![\w.,])({_NUM})(?:(k|mn)|\s*(thousands?|haz+aro?|lakhs?|lacs?|lakhon|crores?|karore?|"
-    rf"millions?|billion|arab))\b",
+    rf"(?<![\w.,])({_NUM})(?:(mn|m)\b|\s?(k)\b|\s*({_WORDS})\b)",
     re.IGNORECASE,
 )
 
@@ -204,12 +219,12 @@ def fold_magnitudes(text: str) -> str:
         return None if number is None else _digits(number * MAGNITUDES[mag.casefold()])
 
     def range_sub(m: re.Match[str]) -> str:
-        mag = (m.group(3) or m.group(4)).casefold()
+        mag = (m.group(3) or m.group(4) or m.group(5)).casefold()
         lo, hi = one(m.group(1), mag), one(m.group(2), mag)
         return m.group(0) if lo is None or hi is None else f"{lo} {hi}"
 
     def sub(m: re.Match[str]) -> str:
-        done = one(m.group(1), (m.group(2) or m.group(3)).casefold())
+        done = one(m.group(1), (m.group(2) or m.group(3) or m.group(4)).casefold())
         return m.group(0) if done is None else done
 
     return _FOLD.sub(sub, _RANGE_FOLD.sub(range_sub, _unlist(text or "")))
@@ -225,12 +240,10 @@ class Amount(NamedTuple):
 
 _AMOUNT = re.compile(
     rf"(?<![\w.,])(?P<pre>(?:rs\.?|pkr|inr|usd|aed)\s?|[$₹]\s?)?(?P<n1>{_NUM})"
-    rf"(?:(?P<m1>k|mn)\b|\s*(?P<w1>thousands?|haz+aro?|lakhs?|lacs?|lakhon|crores?|karore?|"
-    rf"millions?|billion|arab)\b)?"
+    rf"(?:(?P<m1>mn|m)\b|\s?(?P<k1>k)\b|\s*(?P<w1>{_WORDS})\b)?"
     rf"(?:\s?(?:-|–|—|to)\s?(?:rs\.?\s?|pkr\s?|[$₹]\s?)?(?P<n2>{_NUM})"
-    rf"(?:(?P<m2>k|mn)\b|\s*(?P<w2>thousands?|haz+aro?|lakhs?|lacs?|lakhon|crores?|karore?|"
-    rf"millions?|billion|arab)\b)?)?"
-    rf"(?:\s+(?P<unit>[a-z$₹]+))?",
+    rf"(?:(?P<m2>mn|m)\b|\s?(?P<k2>k)\b|\s*(?P<w2>{_WORDS})\b)?)?"
+    rf"(?:[\s-]+(?P<unit>[a-z$₹]+))?",
     re.IGNORECASE,
 )
 _UNIT_SKIP = {"to", "for", "a", "an", "the", "and", "or", "of", "on", "in", "at", "so", "per",
@@ -256,22 +269,37 @@ _COUNTED = {"staff", "people", "persons", "person", "units", "unit", "days", "da
             "halls", "courts", "doctors", "patients", "trials", "users", "families", "kg",
             "litres", "liters", "pieces", "bookings", "parcels", "chairs", "tables"}  # fmt: skip
 _COUNTED_STEMS = {english_stem(w) for w in _COUNTED}
+# a price word right before a figure: the figure is what something costs
 _PRICE_BEFORE = re.compile(
     r"(?:\bfor|\bcosts?|\bcosting|\bprice[sd]?(?: at| of)?|\bpay(?:ing)?|"
     r"\bspend(?:ing)?|\bworth|\bbudget(?: of)?|\bkeemat)\s*$"
 )
+# a buying verb before a figure, at most a determiner or adjective between ('buy a 50000 tablet')
+_BUY_BEFORE = re.compile(
+    r"\b(?:buy|buys|buying|purchase|purchasing|get|gets|getting|invest|investing|order|install|"
+    r"rent|lease|acquire)\b(?:\s+(?:a|an|the|one|new|another|our|your))*\s*$"
+)
+_AT_BEFORE = re.compile(r"\bat\s*(?:rs\.?\s*)?$")
+
+
+def _is_plural_noun(word: str) -> bool:
+    return len(word) > 3 and word.endswith("s") and not word.endswith(("ss", "us", "is"))
 
 
 def amounts(text: str, context: bool = False) -> list[Amount]:
     """Quantities in `text`: a number with an optional currency marker, magnitude word, unit word
     and range.
-      * a currency marker (Rs, PKR, rupees, $) makes it money;
-      * a magnitude word (k, lakh, hazar ...) makes it money unless the next word is a counted
-        noun ('3 lakh birds');
-      * a bare number is money when `context` says the text is about money (a budget limit) or
-        the words before it are a price cue ('for', 'costs', 'pay'), and the next word is not a
-        noun that is counted; a following word such as 'then', 'because', 'this month' does not
-        make it a unit; any other noun word is the unit ('5 staff', '50 chairs');
+      * a currency marker (Rs, PKR, rupees, $) or 'worth' after it makes it money;
+      * a magnitude word (k, m, lakh, hazar ...) makes it money, except that a plural noun right
+        after it ('50k eggs', 'your 50k followers') is a COUNT unless a price word (for, costs,
+        pay, spend, worth, budget) comes before it; a counted noun from the list is always a
+        count; '50k tablet' (singular) stays money;
+      * a bare number is money when `context` says the text is about money (a limit that talks
+        about spending or a budget kind), or a price word or a buying verb ('buy a', 'invest',
+        'get a ... at') comes before it, and it has no counted noun after it; a noun after a bare
+        figure under such a cue is a product ('a 50000 tablet') only from 1000 up; 'then',
+        'because', 'this month' after a figure are not a unit; any other noun word is the unit
+        ('5 staff', '50 chairs');
       * a bare number with none of that is not returned."""
     folded = re.sub(
         rf"between\s+({_NUM}(?:\s?(?:{_MAG}))?)\s+and\s+({_NUM})",
@@ -283,7 +311,8 @@ def amounts(text: str, context: bool = False) -> list[Amount]:
         n1, n2 = _plain(m.group("n1")), _plain(m.group("n2")) if m.group("n2") else None
         if n1 is None or (m.group("n2") and n2 is None):
             continue
-        m1, m2 = _mult(m.group("m1"), m.group("w1")), _mult(m.group("m2"), m.group("w2"))
+        m1 = _mult(m.group("m1") or m.group("k1"), m.group("w1"))
+        m2 = _mult(m.group("m2") or m.group("k2"), m.group("w2"))
         has_mag = m1 != 1.0 or m2 != 1.0
         if n2 is None:
             lo = hi = n1 * m1
@@ -297,18 +326,28 @@ def amounts(text: str, context: bool = False) -> list[Amount]:
         if unit_word in _TAIL or not unit_word:
             unit_word = ""
             # the figure ends where its last numeric piece ends, not after a skipped word
-            end = max(m.end(g) for g in ("n1", "m1", "w1", "n2", "m2", "w2") if m.group(g))
+            end = max(
+                m.end(g) for g in ("n1", "m1", "k1", "w1", "n2", "m2", "k2", "w2") if m.group(g)
+            )
         else:
             end = m.end()
         counted = unit_word in _COUNTED or english_stem(unit_word) in _COUNTED_STEMS
-        priced = bool(_PRICE_BEFORE.search(folded[max(0, m.start() - 24) : m.start()]))
-        if pre or unit_word in _CURRENCY:
+        cut = folded[max(0, m.start() - 40) : m.start()]
+        strict = bool(_PRICE_BEFORE.search(cut))
+        buying = bool(_BUY_BEFORE.search(cut))
+        weak = bool(_AT_BEFORE.search(cut))
+        big = hi >= 1000
+        if pre or unit_word in _CURRENCY or unit_word == "worth":
             unit = "money"
         elif has_mag and not counted:
-            unit = "money"  # '50k tablet', '50 hazar mein': a sum
-        elif unit_word:
+            plural = _is_plural_noun(unit_word)
+            unit = english_stem(unit_word) if plural and not strict else "money"
+        elif unit_word and counted:
             unit = english_stem(unit_word)  # '5 staff', '50 chairs': what is counted
-        elif context or priced:
+        elif unit_word:
+            product = (context or strict or buying) and big
+            unit = "money" if product else english_stem(unit_word)
+        elif context or strict or buying or (weak and big):
             unit = "money"
         else:
             continue
@@ -318,23 +357,48 @@ def amounts(text: str, context: bool = False) -> list[Amount]:
 
 _CEILING_BEFORE = re.compile(
     r"(?:\b(?:not|no|never|cannot|can't|can not|cant|won't|must not)\s+(?:[a-z']+\s+){0,3}?"
-    r"(?:more than|above|over|beyond|exceed\w*|higher than|greater than|upto|up to)"
+    r"(?:more than|above|over|beyond|exceed\w*|higher than|greater than|upto|up to|cross|"
+    r"surpass|go over)"
     r"|\b(?:under|below|less than|at most|at the most|up to|upto|max(?:imum)?(?: of)?|within"
     r"|limit(?:ed)? (?:to|of)|cap(?:ped)?(?: at)?|not exceed\w*|no more than"
+    r"|budget(?: of| is| limit(?: of| is)?)?|spending limit(?: of| is)?"
     r"|(?:not|no)\s+(?:above|over|beyond)))\s*$"
 )
 _CEILING_AFTER = re.compile(
-    r"^\s*(?:rupay\w*|rupees?|rs|pkr)?\s*(?:se|say)\s+(?:zyada|ziada|zyadah|upar|oopar|barh)"
+    r"^\s*(?:rupay\w*|rupees?|rs|pkr)?\s*"
+    r"(?:(?:se|say)\s+(?:zyada|ziada|zyadah|upar|oopar|barh)|at most|or less|or under|or below"
+    r"|and below|maximum|max|tops)\b"
 )
 _FLOOR = re.compile(r"\b(?:at least|minimum|not less|no less|no fewer|not fewer|kam se kam)\b")
 _STRICT = re.compile(r"\b(?:under|below|less than)\s*$")
 _MONEY_WORDS = re.compile(r"\b(?:spend|spent|pay|cost|costs|budget|afford|kharch|kharcha)\b")
-# a benefit word directly in front of the figure: 'save 50000', 'profit of', 'sales of'
+# a benefit or income word directly in front of the figure: 'save 50000', 'profit of', 'earn',
+# 'get Rs 50000', 'collect', 'raise'
 _BENEFIT_BEFORE = re.compile(
     r"\b(?:sav(?:e|es|ed|ing|ings)|earn(?:s|ed|ing)?|revenue|profit|sales|loss|lose|lost|losing"
-    r"|bachat|kamai|munafa|nuqsan)(?:\s+(?:you|us|them|clients?|customers?|the business))?"
-    r"(?:\s+(?:of|about|around|up to|an extra|extra|another))?\s*$"
+    r"|income|turnover|make|makes|made|get|gets|collect(?:s|ed|ing)?|receiv(?:e|es|ed|ing)"
+    r"|rais(?:e|es|ed|ing)|bachat|kamai|munafa|nuqsan)"
+    r"(?:\s+(?:you|us|them|clients?|customers?|the business))?"
+    r"(?:\s+(?:of|about|around|up to|an extra|extra|another|over))?\s*$"
 )
+# selling or charging anywhere earlier in the clause makes the figure income, unless it also buys
+_INCOME_CLAUSE = re.compile(r"\b(?:sell|sells|sold|selling|resell|charge|charges|charging)\b")
+_BUY_VERBS = re.compile(
+    r"\b(?:buy|buys|buying|purchase|purchasing|invest|investing|order|install|rent|lease|hire|"
+    r"pay|paying|spend|spending)\b"
+)
+_INCOME_ANY = re.compile(
+    r"\b(?:earn|earns|earned|earning|income|revenue|profit|sales|turnover|make|makes|salary|"
+    r"collect|collects|receive|receives|sell|sells|sold|kamai|munafa)\b"
+)
+_SPEND_ROLE = re.compile(
+    r"\b(?:buy|buys|buying|purchase|purchasing|get|gets|invest|investing|order|install|rent|lease|"
+    r"hire|pay|paying|spend|spending|cost|costs|costing|price|priced|at|for)\b"
+)
+
+
+def _clause_before(text: str, pos: int) -> str:
+    return _IDEA_BREAK.split(text[:pos])[-1][-120:]
 
 
 class Ceiling(NamedTuple):
@@ -343,7 +407,10 @@ class Ceiling(NamedTuple):
     strict: bool
 
 
-_CLAUSE_BREAK = re.compile(r"[,;.:]|\band\b|\bbut\b|\baur\b|\blekin\b")
+_CLAUSE_BREAK = re.compile(
+    r"[,;.:]|\b(?:since|because|while|as|so|with|but|and|aur|lekin|taake|kyunke)\b"
+)
+_IDEA_BREAK = re.compile(r"[,;.:]|\b(?:and|but|so|because|while|then)\b")
 
 
 def _floor_spans(text: str) -> list[tuple[int, int]]:
@@ -369,31 +436,56 @@ def ceilings_of(limit_text: str, kind: str = "") -> list[Ceiling]:
         for a in amounts(text, context=money_context)
         if not any(lo <= a.start < hi for lo, hi in spans)
     ]
+    # a bare figure of 1000 or more beside an explicit ceiling cue ('20000 at most') is a sum
+    seen = {a.start for a in found}
+    found += [
+        a
+        for a in amounts(text, context=True)
+        if a.start not in seen
+        and a.unit == "money"
+        and a.hi >= 1000
+        and not any(lo <= a.start < hi for lo, hi in spans)
+    ]
     out: list[Ceiling] = []
     for a in found:
         before, after = text[: a.start], text[a.end :]
         if _CEILING_BEFORE.search(before) or _CEILING_AFTER.search(after):
             out.append(Ceiling(a.hi, a.unit, bool(_STRICT.search(before))))
     if kind == "budget" and not any(c.unit == "money" for c in out):
-        money = [a for a in found if a.unit == "money"]
+        money = [a for a in found if a.unit == "money" and not _income_role(text, a)]
         if money:
             out.append(Ceiling(money[0].hi, "money", False))
     return out
 
 
 def _benefit(text: str, found: Amount) -> bool:
-    return bool(_BENEFIT_BEFORE.search(text[max(0, found.start - 40) : found.start]))
+    """The figure is income or a saving, not a cost: a benefit word right before it, or selling or
+    charging earlier in its clause with no buying verb there."""
+    if _BENEFIT_BEFORE.search(text[max(0, found.start - 40) : found.start]):
+        return True
+    clause = _clause_before(text, found.start)
+    return bool(_INCOME_CLAUSE.search(clause) and not _BUY_VERBS.search(clause))
+
+
+def _income_role(text: str, found: Amount) -> bool:
+    return _benefit(text, found) or bool(_INCOME_ANY.search(_clause_before(text, found.start)))
+
+
+def _spend_role(text: str, found: Amount) -> bool:
+    """The figure is written as something bought or paid ('buy ... for', 'costs', 'at')."""
+    return bool(_SPEND_ROLE.search(_clause_before(text, found.start)))
 
 
 def over_ceiling(idea_text: str, ceiling: Ceiling, said: set[tuple[float, float, str]]) -> bool:
-    """True when an idea figure of the same kind is plainly above the ceiling. A figure the owner
-    already stated (same unit), a benefit, and a range that reaches down to the ceiling are not
-    costs."""
+    """True when an idea figure of the same kind is plainly above the ceiling. Not costs: a
+    benefit or income figure; a figure the owner already stated (same value and unit) when the
+    idea only restates it and does not buy or pay it ('your 50000 diary software' is restated,
+    'buy new software for Rs 50000' is a new cost); a range that reaches down to the ceiling."""
     text = (idea_text or "").casefold()
     for found in amounts(text):
         if found.unit != ceiling.unit or _benefit(text, found):
             continue
-        if (found.lo, found.hi, found.unit) in said:
+        if (found.lo, found.hi, found.unit) in said and not _spend_role(text, found):
             continue
         if found.lo > ceiling.value or (ceiling.strict and found.lo >= ceiling.value):
             return True
@@ -424,29 +516,44 @@ _FAMILIES = [
 _RU_EXTRA = {"buy": {"kharid"}, "change": {"badal"}, "close": {"band"}, "sell": {"bech"}}
 _ALTERNATIVES = {"buy": {"rent", "lease", "borrow", "share"}}
 # verbs that are also nouns: in a noun position ('a fire alarm', 'each stop') they are not the verb
-_HOMOGRAPHS = {"fire", "fires", "cut", "cuts", "raise", "raises", "close", "stop", "stops",
+_HOMOGRAPHS = {"hire", "hires", "band", "bands", "fire", "fires", "cut", "cuts", "raise", "raises",
+               "close", "stop", "stops",
                "change", "changes", "switch", "switches", "lower", "swap", "swaps", "order",
                "orders", "pay", "offer", "offers", "use", "uses", "sale", "hike", "hikes",
                "decline", "halt", "reject", "grant", "grants"}  # fmt: skip
 _NOUN_LEAD = {"a", "an", "the", "this", "that", "these", "those", "our", "your", "their", "my",
               "his", "her", "its", "each", "every", "any", "some", "no", "of", "in", "on", "with",
               "for", "per", "new", "live", "big", "small", "free", "one", "two", "three", "last",
-              "next", "another", "same", "first", "second", "daily", "weekly"}  # fmt: skip
+              "next", "another", "same", "first", "second", "daily", "weekly", "monthly", "yearly",
+              "annual", "safety", "extra"}  # fmt: skip
+# a noun that follows a verb-looking word: 'fire extinguisher', 'fire safety'
+_NOUN_FOLLOW = {"alarm", "alarms", "drill", "drills", "extinguisher", "extinguishers", "exit",
+                "exits", "safety", "truck", "trucks", "department", "hazard", "hazards", "door",
+                "doors", "fighter", "fighters", "code", "insurance", "marshal", "escape",
+                "station", "stations", "sale", "sales"}  # fmt: skip
+_NOT_VERB_NEXT = {"to", "by", "enough", "together"}
 # verbs that the scorer's stop list drops from ordinary matching; still matchable as rule verbs
 RULE_VERBS = {"give", "use", "make", "get", "put", "keep", "let"}
 _FAMILY_CACHE: dict[str | None, tuple[list[set[str]], dict[str, frozenset[str]]]] = {}
 
 
 def drop_noun_homographs(text: str) -> str:
-    """The idea text without a verb-looking word that sits in a noun position ('a fire alarm',
-    'each stop'), so a verb rule is not fired by a noun."""
-    words = (text or "").split()
+    """The idea text without a verb-looking word that sits in a noun position: after a determiner
+    or a preposition ('a fire alarm', 'each stop', 'a new hire'), before a noun it modifies
+    ('fire extinguishers', 'fire safety'), or in 'close to'. A verb rule is then not fired by it."""
+    words = [w for w in re.split(r"[\s-]+", text or "") if w]
+    bare = [re.sub(r"[^a-z]", "", w.casefold()) for w in words]
     keep = []
     for i, w in enumerate(words):
-        bare = re.sub(r"[^a-z]", "", w.casefold())
-        prev = re.sub(r"[^a-z]", "", words[i - 1].casefold()) if i else ""
-        if bare in _HOMOGRAPHS and prev in _NOUN_LEAD:
-            continue
+        if bare[i] in _HOMOGRAPHS:
+            prev = bare[i - 1] if i else ""
+            nxt = bare[i + 1] if i + 1 < len(words) else ""
+            if (
+                prev in _NOUN_LEAD
+                or nxt in _NOUN_FOLLOW
+                or (bare[i] == "close" and nxt in _NOT_VERB_NEXT)
+            ):
+                continue
         keep.append(w)
     return " ".join(keep)
 
@@ -502,12 +609,39 @@ _TRIED_LEAD = re.compile(
     r"^(?:(?:we|i|hum|humne|already|have|had|previously|once|maine)\s+)*"
     r"(?:(?:tried|try|aazmaya)\s+)?"
 )
-_TRIED_TAIL = re.compile(
-    r"(?:\s*(?:,|\band\b|\bbut\b|\blekin\b|\bpar\b|\bmagar\b|\bit\b|\bthat\b|\bthey\b|\bwhich\b|"
-    r"\bbefore\b|\bearlier\b|\balready\b|\bpehle\b|\btry\b|\btried\b|\blast (?:year|month|week)\b|"
-    r"\bin the past\b|\bpreviously\b|\bkiya\b|\btha\b|\baazmaya\b|\bonce\b))*\s*$"
-)
+_TRIED_TAIL_WORDS = {",", "and", "but", "lekin", "par", "magar", "it", "that", "they", "which",
+                     "before", "earlier", "already", "pehle", "try", "tried", "previously", "kiya",
+                     "tha", "aazmaya", "once"}  # fmt: skip
+
+
+def _strip_tried_tail(text: str) -> str:
+    """Drop the words that close a 'tried X before and it failed' text, one from the end at a
+    time (linear, unlike a repeated regex group)."""
+    words = text.replace(",", " , ").split()
+    while words:
+        last = words[-1]
+        if last in _TRIED_TAIL_WORDS:
+            words.pop()
+        elif len(words) >= 2 and words[-2] == "last" and last in {"year", "month", "week"}:
+            del words[-2:]
+        elif words[-3:] == ["in", "the", "past"]:
+            del words[-3:]
+        else:
+            break
+    return " ".join(words)
+
+
 _NOT_A_VERB = {"be", "have", "do", "go", "get"}
+# 'cannot lose X', 'cannot risk X': a stated goal, not a prohibition on ideas that name X
+_GOAL_VERBS = {"lose", "miss", "risk", "waste", "delay", "harm", "afford"}
+# things a business buys; 'cannot afford X' is a buy or spend limit only for these
+_PURCHASABLE = {"money", "cash", "equipment", "machine", "machinery", "generator", "system",
+                "software", "app", "tool", "tablet", "computer", "laptop", "phone", "printer",
+                "scanner", "vehicle", "car", "bike", "truck", "van", "mill", "tractor", "oven",
+                "fridge", "camera", "staff", "employee", "worker", "helper", "clerk", "assistant",
+                "manager", "consultant", "course", "training", "license", "ads", "advertising",
+                "stock", "inventory", "hall", "shop", "land", "furniture", "building",
+                "premises"}  # fmt: skip
 _MAX_LIMIT = 4000  # characters of a limit text read for rules; keeps parsing linear
 
 
@@ -540,7 +674,9 @@ def parse_rules(limit_text: str, language: str | None, stems_of: StemsOf) -> lis
     FULL stems, so a rule and an idea are always compared in the strict space.
 
     Read: 'cannot|must not|unable to VERB OBJECT' (also with the curly apostrophe, and 'cannot
-    afford OBJECT' as buy or spend), 'OBJECT cannot be VERBed', 'we do not want to VERB OBJECT',
+    afford OBJECT' as buy or spend only when OBJECT is something a business buys; 'cannot afford
+    downtime' and 'cannot lose customers' are stated goals and make no rule),
+    'OBJECT cannot be VERBed', 'we do not want to VERB OBJECT',
     Roman Urdu 'OBJECT VERB nahi kar sakte', and a tried-and-failed text. Not handled: a
     prohibition without a modal ('no hiring'), 'never VERB', and a verb whose object is a figure
     (that is compared as a number)."""
@@ -550,18 +686,22 @@ def parse_rules(limit_text: str, language: str | None, stems_of: StemsOf) -> lis
     seen: set[tuple[str, str]] = set()
     groups, alts = _family_stems(language)
     afford = stem_ascii("afford", language, True)
-    money_verbs = {stem_ascii("buy", language, True), stem_ascii("spend", language, True)}
+    money_verbs = {stem_ascii(w, language, True) for w in ("buy", "spend", "hire")}
+    goal = {stem_ascii(w, language, True) for w in _GOAL_VERBS}
+    purchasable = {stem_ascii(w, language, True) for w in _PURCHASABLE}
 
     def add_neg(verb: str, obj: str, last: bool = False) -> None:
         if verb in _NOT_A_VERB:
             return
         stem = stem_ascii(verb, language, True)
+        objects = _object_stems(obj, language, stems_of, last)
+        if stem in goal and not (stem == afford and objects & purchasable):
+            return  # a stated goal ('cannot afford downtime'), not a prohibition
         if stem == afford:
             group = {stem}.union(*(g for g in groups if g & money_verbs))
         else:
             group = next((g for g in groups if stem in g), {stem})
         alt = frozenset().union(*(alts.get(s, frozenset()) for s in group))
-        objects = _object_stems(obj, language, stems_of, last)
         if any(any(ch.isdigit() for ch in o) for o in objects):
             return  # a figure in the limit is compared as a number, not as a word
         key = (stem, ",".join(sorted(objects)))
@@ -588,7 +728,7 @@ def parse_rules(limit_text: str, language: str | None, stems_of: StemsOf) -> lis
             at = before.find(marker)
             if at > 0:
                 before = before[:at]
-        before = _TRIED_TAIL.sub("", _TRIED_LEAD.sub("", before.strip()[-240:]))
+        before = _strip_tried_tail(_TRIED_LEAD.sub("", before.strip()))
         objects = _object_stems(before, language, stems_of) - {"tried", "try"}
         if objects:
             rules.append(Rule("tried", frozenset(), frozenset(), objects, _need(len(objects))))
