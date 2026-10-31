@@ -17,6 +17,8 @@ nothing; "رکھیں / रखें" is "hire" next to a person word and "keep" 
 import re
 from collections.abc import Callable
 
+from app.modules.pi import constraint_scripts_more as more
+
 HIRE_OR_KEEP = "@keep"  # Urdu and Hindi "to keep / to put in a job"
 HIRE_OR_USE = "@use"  # Arabic "استخدام": hiring a person or using a thing
 
@@ -73,17 +75,26 @@ _STOP = """
 """
 _PUNCT = {"۔": ".", "،": ",", "؟": "?", "؛": ";", "।": "."}
 _PREFIXES = ("وال", "بال", "لل", "ال", "و", "ب", "ل", "ف")
+_SUFFIXES = ("وا", "ون", "ین", "ان", "ات", "ی", "ها", "نا", "ا")
 _MARKS = "ऀ-ःऺ-ॏ॑-ॗॢॣ"
-_PIECE = re.compile(rf"\d+(?:\.\d+)?|(?:[^\W\d_]|[{_MARKS}]|')+|[;:!?.,\n]|\S")
+_PIECE = re.compile(rf"\d+(?:[.,]\d+)*|(?:[^\W\d_]|[{_MARKS}]|')+|[;:!?.,\n]|\S")
+
+
+_PHRASES: list[tuple[re.Pattern[str], str]] = []  # filled by build, longest phrase first
 
 
 def build(canon: Callable[[str], str]) -> tuple[dict[str, str], frozenset[str]]:
     table: dict[str, str] = {}
-    for spec in (_URDU, _ARABIC, _HINDI):
+    for spec in (_URDU, _ARABIC, _HINDI, more.URDU, more.ARABIC, more.HINDI, more.PLACES):
         for pair in spec.split():
             word, _, token = pair.partition("=")
             table[canon(word)] = token.strip('"').replace("_", " ")
     stop = frozenset(canon(w) for w in _STOP.split())
+    phrases = sorted(((canon(src), dst) for src, dst in more.PHRASES), key=lambda p: -len(p[0]))
+    _PHRASES[:] = [
+        (re.compile(r"(?<![^\W\d_])" + re.escape(src) + r"(?![^\W\d_])"), dst)
+        for src, dst in phrases
+    ]
     return table, stop
 
 
@@ -95,6 +106,14 @@ def _lookup(word: str, table: dict[str, str]) -> str | None:
             rest = word[len(prefix) :]
             if rest in table:
                 return table[rest]
+    for suffix in _SUFFIXES:  # Arabic plural, dual and imperative endings: وظفوا, طباخين, موظفي
+        if word.endswith(suffix) and len(word) > len(suffix) + 2:
+            stem = word[: -len(suffix)]
+            if stem in table:
+                return table[stem]
+            for prefix in _PREFIXES:
+                if stem.startswith(prefix) and stem[len(prefix) :] in table:
+                    return table[stem[len(prefix) :]]
     return None
 
 
@@ -113,6 +132,8 @@ def to_english(
     currency word); every other word that is not in the tables is unread."""
     for src, dst in _PUNCT.items():
         text = text.replace(src, dst)
+    for pattern, dst in _PHRASES:
+        text = pattern.sub(f" {dst} ", text)
     out: list[str] = []
     recognised = unread = 0
     for piece in _PIECE.findall(text):
