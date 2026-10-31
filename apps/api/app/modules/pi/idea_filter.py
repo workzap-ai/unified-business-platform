@@ -175,6 +175,18 @@ def goal_conflict(idea: str, owner_words: str) -> str | None:
 # car showroom owner who never said "video" or "page" is not told to "pin a short video on your page"
 # (seen live, 2026-10-27). Telling the owner to ASK customers, LOOK at what a customer sees, or use
 # what they said they have (their manager, their records, their showroom) needs no such word.
+# What counts as the owner having mentioned the web, a listing or a map: plurals and verb forms
+# ("listings", "googled", "searching"), roman spellings of Google, Maps and the like, and the same
+# words in Urdu, Arabic and Hindi script.
+_WEB_WORDS_OWNER = re.compile(
+    r"\b(?:(?:listing|map|page|app)s?|search(?:es|ed|ing)?|review(?:s|ed|ing)?|googl\w*|gugal|"
+    r"gogle|gogal|jugal|g-?maps?|websit\w*|online|internet|facebook|fb|insta\w*|"
+    r"whatsapp business)\b"
+    r"|گوگل|گوگول|میپس|ویب\s*سائٹ|آن\s*لائن|انٹرنیٹ|جوجل|قوقل|موقع|الإنترنت|الانترنت"
+    r"|गूगल|वेबसाइट|ऑनलाइन|इंटरनेट",
+    re.I,
+)
+
 _ASSET_GROUPS: tuple[tuple[re.Pattern[str], re.Pattern[str]], ...] = (
     (  # videos
         re.compile(r"\b(?:videos?|reels?|shorts|clips?|captions?|vlogs?|tiktok|youtube)\b", re.I),
@@ -194,14 +206,11 @@ _ASSET_GROUPS: tuple[tuple[re.Pattern[str], re.Pattern[str]], ...] = (
     ),
     (  # an online listing, search result or map entry
         re.compile(
-            r"\b(?:search(?:es|ed|ing)? (?:for (?:you|your|them|us|an?)|online|nearby)|online (?:listing|presence|reviews?)|"
+            r"\b(?:search(?:es|ed|ing)? (?:for (?:you|your|them|us|an? (?:(?:[a-z]+) )?(?:shop|store|showroom|business|dealer|clinic|salon|restaurant)s?)|online|nearby)|online (?:listing|presence|reviews?)|"
             r"(?:map|google|business) listing|listing|google)\b",
             re.I,
         ),
-        re.compile(
-            r"\b(?:search|online|google|listing|map|website|facebook|instagram|page|app|reviews?)\b",
-            re.I,
-        ),
+        _WEB_WORDS_OWNER,
     ),
     (  # paid adverts
         re.compile(

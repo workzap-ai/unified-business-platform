@@ -1,22 +1,23 @@
-"""Guard: no stray control byte in any apps/api Python source.
+"""Guard: no stray control byte in any Python source in the repository.
 
 A literal backspace (0x08) where a regex word boundary was meant made patterns that never match
 (map_edit.STRONG_LINK, three idea_filter asset patterns). Tab, newline and carriage return are the
-only C0 bytes allowed.
+only C0 bytes allowed. The scan covers every .py file in the repo (apps, scripts, tests), not only
+apps/api.
 """
 
 from pathlib import Path
 
-API_ROOT = Path(__file__).resolve().parents[2]
+REPO_ROOT = Path(__file__).resolve().parents[4]
 ALLOWED = {9, 10, 13}
-SKIP_DIRS = {".venv", "venv", "node_modules", "__pycache__", ".git", ".cache"}
+SKIP_DIRS = {".venv", "venv", "node_modules", "__pycache__", ".git", ".cache", "site-packages"}
 
 
 def _sources() -> list[Path]:
     return [
         p
-        for p in API_ROOT.rglob("*.py")
-        if not SKIP_DIRS.intersection(p.relative_to(API_ROOT).parts)
+        for p in REPO_ROOT.rglob("*.py")
+        if not SKIP_DIRS.intersection(p.relative_to(REPO_ROOT).parts)
     ]
 
 
@@ -28,12 +29,14 @@ def _hits(data: bytes) -> list[tuple[int, int]]:
 
 
 def test_the_scan_finds_the_source_tree() -> None:
+    names = {p.relative_to(REPO_ROOT).parts[:2] for p in _sources()}
     assert len(_sources()) > 50
+    assert ("apps", "api") in names
 
 
 def test_no_python_source_holds_a_control_byte() -> None:
     found = [
-        f"{p.relative_to(API_ROOT)}:{line} byte 0x{byte:02x}"
+        f"{p.relative_to(REPO_ROOT)}:{line} byte 0x{byte:02x}"
         for p in _sources()
         for line, byte in _hits(p.read_bytes())
     ]
