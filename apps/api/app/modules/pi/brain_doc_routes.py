@@ -221,7 +221,7 @@ async def quote_outcome(
 @router.post("/{doc_id}/approve")
 async def approve_document(doc_id: UUID, scope: Scope, session: Session) -> dict[str, Any]:
     """The reviewer's approval. Refused (409) while a rule is broken or a price is missing."""
-    await require_pi(session, scope, "quotes.write")
+    await require_pi(session, scope, "quotes.approve")
     doc = await _doc(session, scope, doc_id)
     await brain_docs.approve(session, scope, doc, scope.user_id)
     await box_lifecycle.on_approved(session, scope, doc.customer_id, str(scope.user_id or ""))
