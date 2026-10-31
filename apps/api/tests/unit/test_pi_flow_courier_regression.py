@@ -28,21 +28,11 @@ def test_limit_clauses_keep_the_limit_and_drop_the_bare_reason():
     ]
 
 
-@pytest.mark.xfail(
-    reason="L2-1 finding, not fixed here: 'we cannot promise delivery days' is read as an avoid-topic "
-    "limit on 'delivery', so an idea that merely mentions the courier is rejected",
-    strict=False,
-)
 def test_idea_that_only_mentions_the_courier_is_not_rejected_by_a_promise_limit():
     idea = "Message each buyer when the parcel leaves with the courier tracking line."
     assert cc.check_option(idea, reqs("we cannot promise delivery days")).status != "violates"
 
 
-@pytest.mark.xfail(
-    reason="L2-1 finding (docs/pi-saas/pi-ps-flow-open-issues.md, L2-1-b): the verb 'use' is not in "
-    "the families a CHANGE limit widens to, so a new courier passes 'we cannot change courier'",
-    strict=False,
-)
 def test_use_a_new_courier_breaks_we_cannot_change_courier():
     assert (
         cc.check_option(

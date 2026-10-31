@@ -4,7 +4,11 @@ Written on branch `pi/ps-flow` (single writer). Everything here is observed on t
 inferred. File:line refer to `apps/api/app/modules/pi/` at the commit that introduced this note.
 Nothing below is fixed by weakening the L2-1 gate: unknown stays unknown and is never approved.
 
-## Open L2-1 issues (owner of `pi/l2-hard-gate`)
+## L2-1 issues
+
+L2-1-a and L2-1-b were FIXED by `pi/l2-hard-gate` round 3 (d5313f16, merged here); their regression tests now
+pass without xfail. L2-1-c is fixed for options in Urdu, Arabic and Hindi; limits written in those scripts are still
+unreadable (unknown). Kept below for the record, with the original inputs.
 
 ### L2-1-a. "we cannot promise delivery days" is read as an avoid-topic limit on "delivery"
 
