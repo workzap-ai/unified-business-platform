@@ -1,11 +1,16 @@
+import hashlib
+import json
 import logging
+import re
 from collections.abc import Sequence
 from datetime import UTC, date, datetime, timedelta
 from decimal import Decimal
 from uuid import UUID
 
 from sqlalchemy import func, select
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import undefer
 
 from app.core.pagination import Page, Pagination
 from app.integrations.outbox import EntityRef, emit
@@ -89,6 +94,35 @@ def _invoice_payload(invoice: Invoice) -> dict[str, str | None]:
         "amount_paid": str(invoice.amount_paid),
         "currency": invoice.currency,
     }
+
+
+IDEMPOTENCY_KEY = re.compile(r"[A-Za-z0-9._:-]{8,128}")
+
+
+def valid_idempotency_key(key: str | None) -> str | None:
+    """None when no key was sent; otherwise 8 to 128 letters, digits and . _ : -"""
+    if key is None:
+        return None
+    if not IDEMPOTENCY_KEY.fullmatch(key):
+        raise BusinessRuleViolation(
+            "INVALID_IDEMPOTENCY_KEY",
+            "Idempotency-Key must be 8 to 128 characters: letters, digits, . _ : -",
+        )
+    return key
+
+
+def payment_fingerprint(invoice_id: UUID, data: PaymentCreate) -> str:
+    """A hash of what the request asks for, so a key can be replayed but not reused."""
+    canonical = json.dumps(
+        [
+            str(invoice_id),
+            str(quantize(data.amount)),
+            data.method,
+            data.received_on.isoformat() if data.received_on else None,
+            data.reference,
+        ]
+    )
+    return hashlib.sha256(canonical.encode()).hexdigest()
 
 
 class BillingService:
@@ -328,26 +362,70 @@ class BillingService:
             return
         await self.act(invoice.id, "void")
 
-    async def record_payment(self, invoice_id: UUID, data: PaymentCreate) -> Payment:
+    async def _replayed(self, key: str, fingerprint: str) -> Payment | None:
+        """The payment this key already recorded in this workspace, if any. The same request
+        returns it; the key with another request is refused (409)."""
+        found: Payment | None = await self.session.scalar(
+            self.payments.select()
+            .where(Payment.idempotency_key == key)
+            .options(undefer(Payment.idempotency_key), undefer(Payment.request_hash))
+            .limit(1)
+        )
+        if found is None:
+            return None
+        if found.request_hash != fingerprint:
+            raise BusinessRuleViolation(
+                "IDEMPOTENCY_KEY_REUSED",
+                "This Idempotency-Key was used for a different payment request",
+                409,
+            )
+        return found
+
+    async def record_payment(
+        self, invoice_id: UUID, data: PaymentCreate, idempotency_key: str | None = None
+    ) -> Payment:
         self.scope.require("billing.write")
+        key = valid_idempotency_key(idempotency_key)
         invoice = await self.invoices.get(invoice_id, for_update=True)
+        fingerprint = payment_fingerprint(invoice_id, data) if key else None
+        if key and fingerprint:
+            # after the invoice lock, so a concurrent twin has finished before this looks
+            replay = await self._replayed(key, fingerprint)
+            if replay is not None:
+                return replay
         if invoice.status not in OPEN_STATUSES:
             raise BusinessRuleViolation("INVOICE_NOT_OPEN", "Payments need an issued invoice")
         amount = quantize(data.amount)
         if amount > balance(invoice):
             raise BusinessRuleViolation("OVERPAYMENT", "Payment exceeds the balance due")
-        payment = await self.payments.add(
-            self.payments.new(
-                invoice_id=invoice.id,
-                number=await next_number(self.session, self.scope, "payment"),
-                amount=amount,
-                currency=invoice.currency,
-                method=data.method,
-                received_on=data.received_on or date.today(),
-                reference=data.reference,
-                recorded_by_label=self.scope.actor_label[:80],
-            )
-        )
+        try:
+            # a savepoint: the same key racing on another invoice hits the unique index, and only
+            # this insert is undone
+            async with self.session.begin_nested():
+                payment = await self.payments.add(
+                    self.payments.new(
+                        invoice_id=invoice.id,
+                        number=await next_number(self.session, self.scope, "payment"),
+                        amount=amount,
+                        currency=invoice.currency,
+                        method=data.method,
+                        received_on=data.received_on or date.today(),
+                        reference=data.reference,
+                        recorded_by_label=self.scope.actor_label[:80],
+                        # only a keyed payment touches the columns added by 0054
+                        **({"idempotency_key": key, "request_hash": fingerprint} if key else {}),
+                    )
+                )
+                # eager_defaults is off on Payment (its RETURNING would name the 0054 columns):
+                # read the other server-set values (created_at) back; deferred columns stay out
+                await self.session.refresh(payment)
+        except IntegrityError:
+            if not (key and fingerprint):
+                raise
+            replay = await self._replayed(key, fingerprint)
+            if replay is None:
+                raise
+            return replay
         invoice.amount_paid = quantize(invoice.amount_paid + amount)
         target = "paid" if invoice.amount_paid == invoice.total else "partially_paid"
         if target != invoice.status:
@@ -398,9 +476,14 @@ class BillingService:
         return payment
 
     async def payments_page(self, page: Pagination) -> Page[PaymentView]:
+        # not payments.page(): its count wraps the statement in a subquery, which lists every
+        # column, deferred ones too, so it would need the 0054 columns
+        total = await self.session.scalar(
+            select(func.count()).select_from(Payment).where(self.payments.predicate())
+        )
         statement = self.payments.select().order_by(Payment.received_on.desc(), Payment.id)
-        rows, total = await self.payments.page(statement, page)
-        return to_page(PaymentView, rows, total, page)
+        rows = await self.session.scalars(statement.offset(page.offset).limit(page.page_size))
+        return to_page(PaymentView, rows.all(), int(total or 0), page)
 
     async def customer_balance(self, customer_id: UUID) -> Decimal:
         value = await self.session.scalar(
