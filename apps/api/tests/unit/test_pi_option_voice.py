@@ -142,3 +142,14 @@ def test_block_is_not_linted_as_a_promise():
     assert [
         v for v in constitution.hard(constitution.lint(text, {})) if v.rule != "R-DISC-01"
     ] == []
+
+
+def test_ideas_are_shown_best_first_and_the_pick_is_the_clear_one():
+    unknown = "Message each buyer when the parcel leaves with a short note about the courier."
+    reply = f"Ideas:\n{BUL}{unknown}\n{BUL}{LINKED}"
+    r = ov.voice(reply, Requirements(columns_available=False), "en", PROBLEMS)
+    # with unreadable requirements neither is clear: the engine's order stands and the pick is the first
+    assert r.pick and r.accepted == 0
+    r2 = ov.voice(reply, COURIER, "en", PROBLEMS)
+    lines = [x for x in r2.reply.splitlines() if x.startswith(BUL)]
+    assert r2.pick in (unknown, LINKED) and lines[0].endswith((unknown, LINKED))

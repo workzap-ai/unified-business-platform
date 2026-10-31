@@ -337,6 +337,9 @@ class ServiceTurn(BaseModel):
     _voice_question: str = PrivateAttr(default="")  # the one targeted question, put last
     _voice_unmarked: tuple[int, ...] = PrivateAttr(default=())  # ideas not yet checked
     _voice_language: str = PrivateAttr(default="en")
+    _voice_pick: str = PrivateAttr(
+        default=""
+    )  # the idea the chat recommends (kept for the document)
     _english: bool = PrivateAttr(default=False)  # an English list was written: translate it
     _free: bool = PrivateAttr(default=False)  # the ideas were the model's own, vetted
     _ideas_rejected: bool = PrivateAttr(default=False)  # its idea lines were not owner actions
@@ -2022,6 +2025,7 @@ def brain_option_voice(turn: "ServiceTurn", context: dict[str, Any]) -> None:
     # the question are put in after the language step, in the reply's own language
     noted, _fresh = noted_with_turn(context, turn)  # includes a problem this message starts
     voiced = option_voice.voice(turn.reply, reqs, language, noted)
+    turn._voice_pick = voiced.pick
     if not voiced.changed:
         return
     turn.reply = voiced.reply
@@ -6500,6 +6504,10 @@ async def compose_service_turn(
         brain_offer(turn, context)
         strip_unallowed_offer(turn, context)
         brain_option_voice(turn, context)
+        if turn._voice_pick:  # the document recommends the same option (one ranking)
+            kept = dict(conversation.service_brief or {})
+            kept["chat_pick"] = turn._voice_pick
+            conversation.service_brief = kept
     if context.get("handback_notice") and not turn.request_human and turn._decision is None:
         short = safety.handback_reply(str(context.get("reply_language") or "en"))
         turn.reply = f"{short.rsplit('. ', 1)[0]}. {turn.reply}"

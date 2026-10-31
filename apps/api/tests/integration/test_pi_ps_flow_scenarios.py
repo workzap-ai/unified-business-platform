@@ -18,7 +18,7 @@ from test_pi_brain_problems import problems_of, say, workspace
 
 from app.ai.manager import LLMManager
 from app.modules.pi import (
-    blueprint_doc,
+    blueprint_wire,
     box_doc,
     expert_advisor,
     option_voice,
@@ -304,21 +304,24 @@ async def test_problem_solving_flow(case_id, api, business_db, monkeypatch):
         {"key": key, "text": text, "phase": 1 + i % 2, "refs": [v["ref"]]}
         for i, v in enumerate(views)
     ]
-    phases = [{"phase": 1, "name": "First"}, {"phase": 2, "name": "Then"}]
     owner_msgs = {
         str(m): t for m, t in zip(rows[0].source_message_ids, owner_texts(case), strict=False)
     }
-    bp = blueprint_doc.build(views, comps, phases, ["a contact person"], owner_messages=owner_msgs)
-    assert blueprint_doc.issues(bp) == []
-    assert bp["unlinked_steps"] == []
-    assert {r for s in bp["steps"] for r in s["problems"]} == {v["ref"] for v in views}
-    assert bp["problems"] and all(p["owner_words"] for p in bp["problems"])
-    assert bp["milestones"] and bp["recommendation"]["why"]
-    assert any(p["limits"] for p in bp["problems"]), "constraints reach the document"
-    assert any(p["tried"] for p in bp["problems"]), "tried-before reaches the document"
-    for p in bp["problems"]:
-        if p["cause"] and not p["cause"]["owner_stated"]:
-            assert p["cause"]["label"] == blueprint_doc.HYPOTHESIS
+    bp = blueprint_wire.build(views, comps, ["a contact person"], owner_msgs, case["language"])
+    assert bp["text"].strip()
+    if bp["status"] == "ready":
+        assert bp["issues"] == [], bp["issues"]
+        assert views[0]["quotes"][0] in bp["text"], "the owner's own words are in the blueprint"
+    elif bp["status"] == "refused":
+        assert bp["refusal"], "a refusal names the hard limit it breaks"
+    else:
+        assert bp["next_question"].count("?") + bp["next_question"].count("؟") == 1
+    if case["language"] in ("ur", "ar"):
+        assert re.search(r"[؀-ۿ]", bp["text"]), "the blueprint is in the owner's script"
+    BLUEPRINT_STATUS.append((case_id, bp["status"], bp["recommended"]))
+
+
+BLUEPRINT_STATUS: list = []
 
 
 @pytest.mark.parametrize("case_id", sorted(CASES))

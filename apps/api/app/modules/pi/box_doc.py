@@ -52,6 +52,7 @@ def problem_view(
         "where": str(where),
         "how_often": str((problem.frequency or {}).get("text") or ""),
         "since": str((problem.since or {}).get("text") or ""),
+        "of_total": str(scope.get("of_total") or ""),
         "money": str((problem.impact or {}).get("money_text") or ""),
         "impact": list((problem.impact or {}).get("types") or []),
         "cause": str(problem.person_believes_cause or ""),
@@ -93,6 +94,7 @@ def requirement_view(problem: Any) -> dict[str, Any]:
         "cause_status": str(cause.get("status") or "") if cause.get("text") else "",
         "expected_outcome": str(_loaded(problem, "expected_outcome") or ""),
         "msgs": [str(m) for m in (_loaded(problem, "source_message_ids") or [])],
+        "cause_raw": cause if cause.get("text") else None,
     }
 
 

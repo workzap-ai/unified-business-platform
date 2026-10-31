@@ -227,43 +227,17 @@ def render_box(
 
 
 def _blueprint(page: "_Page", blueprint: Any) -> None:
-    """The blueprint for the reviewer: recommendation, workflow with dependencies and roles,
-    risks, milestones, acceptance criteria, what is unresolved. English; nothing priced."""
-    if not isinstance(blueprint, dict) or not blueprint.get("steps"):
+    """The blueprint for the reviewer, as PS-4 rendered it in the owner's language (plain text, one
+    line per fact, the owner's own words kept); a refused or incomplete one shows what is missing."""
+    if not isinstance(blueprint, dict) or not str(blueprint.get("text") or "").strip():
         return
-    page.heading("Blueprint")
-    rec = blueprint.get("recommendation") or {}
-    if rec.get("option"):
-        page.paragraph("Recommended: " + str(rec["option"]), 10, True)
-        for t in rec.get("trade_offs") or []:
-            page.bullet("Trade-off: " + str(t))
-    elif rec.get("reason"):
-        page.paragraph(str(rec["reason"]), 10)
-    if rec.get("why"):
-        page.paragraph("Why: " + str(rec["why"]), 10)
-    for item in rec.get("unknown") or []:
-        page.bullet("Unknown: " + str(item))
-    for item in rec.get("rejected") or []:
-        page.bullet(f"Left out: {item.get('option', '')}: {item.get('because', '')}")
-    page.paragraph("Workflow", 10, True)
-    for step in blueprint.get("steps") or []:
-        after = ", ".join(str(n) for n in step.get("depends_on") or [])
-        tail = f" (after step {after})" if after else ""
-        link = ", ".join(step.get("problems") or []) or "NOT LINKED to a problem"
-        page.bullet(f"Step {step.get('n')}: {step.get('text', '')}{tail}. Answers: {link}.")
-    page.paragraph("Milestones", 10, True)
-    for m in blueprint.get("milestones") or []:
-        page.bullet(f"{m.get('name', '')}: steps {', '.join(str(n) for n in m.get('steps') or [])}")
-    page.paragraph("How we will know it worked", 10, True)
-    for a in blueprint.get("acceptance") or []:
-        base = f" Today, in your words: {a['baseline']}." if a.get("baseline") else ""
-        page.bullet(f"{a.get('ref', '')}: {a.get('criterion', '')}.{base}")
-    page.paragraph("Risks", 10, True)
-    for r in blueprint.get("risks") or []:
-        page.bullet(str(r.get("text", "")))
-    page.paragraph("Still unresolved", 10, True)
-    for u in blueprint.get("unresolved") or []:
-        page.bullet(str(u))
+    lines = str(blueprint["text"]).splitlines()
+    page.heading(lines[0] if lines else "Blueprint")
+    for line in lines[1:]:
+        if not line.strip():
+            page.gap(3)
+        else:
+            page.paragraph(line, 9)
     page.gap(6)
 
 

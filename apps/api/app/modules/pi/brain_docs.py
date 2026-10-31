@@ -28,7 +28,7 @@ from app.core.config import Settings
 from app.modules.customers import files
 from app.modules.customers.models import Customer
 from app.modules.pi import (
-    blueprint_doc,
+    blueprint_wire,
     box,
     box_doc,
     brain_pdf,
@@ -302,8 +302,9 @@ def check_content(content: dict[str, Any], refs: set[str] | None = None) -> list
     issues = check_solution(draft, known, catalogue=bool(content.get("box")))
     if content.get("box"):
         issues += box_text_issues(content) + box_doc.structure_issues(content)
-        if isinstance(content.get("blueprint"), dict):
-            issues += blueprint_doc.issues(content["blueprint"])
+        stored = content.get("blueprint")
+        if isinstance(stored, dict):  # PS-4's checks: any issue blocks approval
+            issues += [f"blueprint {i}" for i in stored.get("issues") or []]
     return issues
 
 
@@ -376,6 +377,7 @@ def apply_box(
     sector: str | None,
     renamed: dict[str, str] | None = None,
     owner_messages: dict[str, str] | None = None,
+    chat_pick: str = "",
 ) -> dict[str, Any]:
     """Turn the stored six-section content into the eight-section box (spec 5.2). `views` are the
     problems' facts (`box_doc.problem_view`), `links` their links as dicts (from, to, type,
@@ -407,14 +409,15 @@ def apply_box(
         )
     hypotheses = [{"text": _pick(h, local), "refs": h.refs} for h in draft.hypotheses]
     phase_rows = box_doc.phase_table(components, {p: n for p, n in named.items() if n})
-    # PS-flow: the blueprint (steps with dependencies and roles, risks, milestones, acceptance
-    # criteria, the recommendation, what is unresolved), built in code from the owner's own record
-    blueprint = blueprint_doc.build(
+    # PS-flow: the blueprint, built by PS-4 from the owner's own record; the recommendation is the
+    # L2-3 ranking the chat uses too (the idea the chat recommended is one of the candidates)
+    blueprint = blueprint_wire.build(
         views,
         components,
-        phase_rows,
         [str(n) for n in content.get("needs") or []],
-        owner_messages=owner_messages,
+        owner_messages,
+        language if local else "en",
+        chat_pick,
     )
     return {
         **content,
@@ -771,6 +774,7 @@ async def draft_offer(
             sector=sector,
             renamed=renamed,
             owner_messages=owner_texts,
+            chat_pick=str(brief.get("chat_pick") or ""),
         )
         if brief.get("box_naya"):  # Box v2: the short difference list of 5.6
             boxed["naya"] = [str(x) for x in brief["box_naya"]][:8]

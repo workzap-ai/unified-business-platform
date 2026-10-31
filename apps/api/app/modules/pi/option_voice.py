@@ -23,7 +23,7 @@ from dataclasses import dataclass
 from typing import Any
 
 from app.modules.pi import constraint_check as cc
-from app.modules.pi import idea_relevance, option_gate
+from app.modules.pi import idea_relevance, option_gate, option_rank
 from app.modules.pi.requirements_types import Requirements
 
 BULLET = re.compile(r"^\s*(?:[•*-]|\d{1,2}[.)])\s+(.*)$")
@@ -105,6 +105,7 @@ class Voiced:
     block: str = ""  # fixed statements, put in front of the reply after the language step
     question: str = ""  # the one targeted question, put last ("" when none is needed)
     changed: bool = False
+    pick: str = ""  # the idea to start with (the chat's recommendation, stored for the document)
     unmarked: tuple[int, ...] = ()  # positions (among the listed ideas) of the not yet checked ones
     rejected: int = 0
     unknown: int = 0
@@ -191,6 +192,7 @@ def voice(
             constraint_gate=gate,
         )
     drop = {i for i, v in verdicts.items() if v.kind in DROPPED}
+    found_text = dict(found)
     kept_ids = [i for i, _ in found if i not in drop]
     unknown_at = {
         i
@@ -199,7 +201,17 @@ def voice(
     }
     # positions among the ideas that stay (the label is put in after the language step, in the
     # reply's own language, so a translation of the reply never garbles it)
-    unmarked = tuple(n for n, i in enumerate(kept_ids) if i in unknown_at)
+    # one ranking for the chat and the document (`option_rank`, the L2-3 rules): the ideas that
+    # stay are shown best first, a clear idea before one the gate could not check
+    checks = [(found_text[i], "unknown" if i in unknown_at else "ok") for i in kept_ids]
+    order = option_rank.rank_ideas(checks)
+    pick = option_rank.recommended_text(checks)
+    ranked_ids = [kept_ids[o] for o in order]
+    shown = list(lines)
+    for slot, src in zip(kept_ids, ranked_ids, strict=True):
+        shown[slot] = lines[src]
+    lines = shown
+    unmarked = tuple(n for n, i in enumerate(ranked_ids) if i in unknown_at)
     keep = [line for i, line in enumerate(lines) if i not in drop]
     if not _bullets(keep):  # no idea left: the opener line that introduced them goes too
         while keep and (not keep[-1].strip() or keep[-1].rstrip().endswith((":", "："))):
@@ -243,12 +255,14 @@ def voice(
             held = option_gate.gate_options(texts, reqs, language).unknown
             rules = Counter(g.verdict.rule for g in held if g.verdict.rule in BLOCKING)
             question = tb[BLOCKING[rules.most_common(1)[0][0]]] if rules else ""
-    changed = bool(block or question or drop or unmarked)
+    reordered = order != sorted(order)
+    changed = bool(block or question or drop or unmarked or reordered)
     return Voiced(
         new_reply,
         chr(10).join(block),
         question,
         changed,
+        pick,
         unmarked,
         len(violated) + sum(v.kind in DROPPED[1:] for v in verdicts.values()),
         len(unknown_at),
