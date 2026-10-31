@@ -447,12 +447,36 @@ def scorer_labels(
     return out
 
 
+def development_agreement() -> tuple[int, int]:
+    """(candidates whose scorer verdict equals the agent-drafted label, candidates) over the
+    Development borderline cases only. Held-out cases are neither scored nor counted here."""
+    labels = load_borderline_agent_labels()["labels"]
+    same = total = 0
+    for case in load_cases():
+        if case.get("kind") != "borderline_relevance" or splits.split_of(case) == splits.HELD_OUT:
+            continue
+        for cand in case["expected"]["candidates"]:
+            got = relevance.score_candidate(
+                case["input"]["brief"],
+                cand["text"],
+                problem=cand.get("problem"),
+                owner_text=" ".join(case["input"]["messages"]),
+                language=case["language"],
+            )["verdict"]
+            total += 1
+            same += got == labels[f"{case['id']}/{cand['id']}"]
+    return same, total
+
+
 def borderline_comparison(access: Access) -> dict[str, Any]:
     """Scorer verdict against the agent-drafted label for the Development borderline candidates.
     Held-out borderline candidates are only counted: they are not scored here and their labels are
     not committed. Counting them is a Held-out read, so this itself requires the access log (path,
-    who, why) and writes the line. A disagreement is a finding: neither the scorer nor the case is
-    changed to remove it."""
+    who, why) and writes the line. A disagreement is a finding about the scorer. The scorer WAS
+    changed after the first comparison (FT-A3b, three rounds) with general features only
+    (inflection, magnitude figures and numeric ceilings, verb and tried-and-failed limit texts);
+    two Development verdicts moved because of that, plan_bl_poultry_limit_edge_en_03/c3 and
+    plan_bl_banquet_numeric_limit_en_09/c2, and no rule names a case, a label or a candidate."""
     log = require_access(access)
     cases = [c for c in load_cases() if c.get("kind") == "borderline_relevance"]
     guard(cases, log, "borderline_comparison (candidates counted only)")
