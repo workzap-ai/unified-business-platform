@@ -86,3 +86,56 @@ def test_a_note_cannot_bring_back_a_cause_the_owner_took_back():
         withdrawn, "the competitor is cheaper", True, ["competitor"], "m10", SAID["text"]
     )
     assert again is None  # unchanged: the withdrawn record stands
+
+
+# ---------------------------------------------------------------- L: the two surviving mutants
+def test_owner_cause_never_treats_a_guess_as_the_owners_cause():
+    from types import SimpleNamespace
+    from uuid import uuid4
+
+    from app.modules.pi import problems
+
+    pid = uuid4()
+    problem = SimpleNamespace(id=pid, person_believes_cause="")
+    guess = {"text": "rent is high", "status": "pi_inferred", "evidence": {}}
+    said, hypothesis, status = problems.owner_cause(problem, {pid: guess})  # type: ignore[arg-type]
+    assert said == "" and hypothesis == "rent is high" and status == "pi_inferred"
+    withdrawn = {"text": "", "status": "withdrawn", "evidence": {}}
+    assert problems.owner_cause(problem, {pid: withdrawn})[0] == ""  # type: ignore[arg-type]
+    owner = {"text": "rent", "status": "owner_said", "evidence": {}}
+    assert problems.owner_cause(problem, {pid: owner})[0] == "rent"  # type: ignore[arg-type]
+
+
+async def test_withdrawing_clears_the_older_person_believes_cause_column():
+    from types import SimpleNamespace
+    from uuid import uuid4
+
+    from app.modules.pi import problems
+
+    problem = SimpleNamespace(
+        id=uuid4(),
+        number=1,
+        revision=1,
+        person_believes_cause="the competitor is cheaper",
+        cause={"text": "the competitor is cheaper", "status": "owner_said", "evidence": {}},
+    )
+    book = problems.ProblemBook.__new__(problems.ProblemBook)
+
+    async def active():
+        return [problem]
+
+    async def load(_problem):
+        return None
+
+    revisions = []
+
+    async def revise(_problem, diff, reason, by):
+        revisions.append(reason)
+
+    book.active = active  # type: ignore[method-assign]
+    book.load_requirements = load  # type: ignore[method-assign]
+    book._revise = revise  # type: ignore[method-assign]
+    assert await book.withdraw_owner_cause(None) is True
+    assert problem.person_believes_cause == ""
+    assert problem.cause["status"] == "withdrawn" and problem.cause["history"][0]["text"]
+    assert problem.revision == 2 and revisions == ["cause_withdrawn"]
