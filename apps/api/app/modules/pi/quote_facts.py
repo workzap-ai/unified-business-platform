@@ -32,8 +32,8 @@ _PLACES_SAID = re.compile(
 )
 
 _FACT_KEYS = {
-    "shops": ("size",),
-    "locations": ("places",),
+    "shops": ("size", "shops", "branches", "outlets"),
+    "locations": ("places", "locations", "cities", "city"),
     "systems": ("systems", "tools", "channels"),
 }
 
@@ -136,3 +136,15 @@ def question_count(reply: str) -> int:
 def too_many_questions(reply: str) -> bool:
     """ROFFER07: a message asking for the quote's facts holds at most two questions."""
     return question_count(reply) > MAX_FACTS
+
+
+def cap(reply: str, limit: int = MAX_FACTS) -> str:
+    """ROFFER07 in code: at most `limit` questions in a reply. Every question mark but the last
+    `limit` becomes a full stop (the sentence stays). Never adds or drops text."""
+    marks = [i for i, ch in enumerate(reply or "") if ch in "?؟"]
+    if len(marks) <= limit:
+        return reply
+    chars = list(reply)
+    for i in marks[: len(marks) - limit]:
+        chars[i] = "." if chars[i] == "?" else "۔"
+    return "".join(chars)

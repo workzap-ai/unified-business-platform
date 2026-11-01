@@ -43,7 +43,16 @@ def _texts(context: Mapping[str, Any]) -> list[str]:
 def assumed_industry(reply: str, context: Mapping[str, Any]) -> str | None:
     """The rewrite reason when a reply names a trade the owner never said and the business is not
     confirmed (`industry_unconfirmed` is set where the knowledge is blanked); else None."""
-    if not context.get("industry_unconfirmed"):
+    unconfirmed = context.get("industry_unconfirmed")
+    if unconfirmed is None and context.get("pi_mode") == "brain":
+        # Industry packs off (or no pack fits): nothing set the flag, but the model can still guess
+        # a trade of its own (Chat A, "AC units, spare parts and gas"). Unconfirmed until the
+        # brief or the stored profile holds the trade; the owner's own words always clear a noun.
+        brief = context.get("brief") or {}
+        profile = brief.get("business_profile") or {}
+        keys = {str(f.get("key")) for f in profile.get("facts") or [] if isinstance(f, Mapping)}
+        unconfirmed = not (brief.get("industry_confirmed") or keys & {"business_type", "industry"})
+    if not unconfirmed:
         return None
     found = industry_reply_gate.unconfirmed_industry_noun(
         reply,

@@ -231,6 +231,14 @@ _SAID_LEAD = re.compile(
     re.IGNORECASE,
 )
 _CONJ = re.compile(r"^\W*(?:so|but|and|aur|lekin|phir|toh)\s+", re.IGNORECASE)
+# G56 (11:38): "bhai mujhay quote do abhi wohi pooch raha hoan": a vocative before the ask and the
+# owner's "that is what I am asking" after it are not a condition, a story or reported speech.
+_VOCATIVE = re.compile(r"^\W*(?:bhai|bhaiya|bhaijan|yaar|yar|sir|boss|bro)\b\W*", re.IGNORECASE)
+_ASKING_REMARK = re.compile(
+    r"[,;\s]+(?:wohi|wahi|yehi|yahi|that'?s what)\s+(?:pooch|puch|poochh|ask)\w*"
+    r"(?:\s+(?:raha|rahi|rha|rahe|ing))?(?:\s+(?:hoon|hoan|hun|hu|am i))?\W*$",
+    re.IGNORECASE,
+)
 
 
 MAX_ASK_CHARS = 500
@@ -243,6 +251,7 @@ def asks_for_document(message: str) -> bool:
     if not said or len(said) > MAX_ASK_CHARS:
         return False  # an ask is short; a long message is a story (also bounds the regex work)
     plain = _TIME_REMARK.sub("", _BENIGN_TAIL.sub(" ", said)).strip()
+    plain = _ASKING_REMARK.sub("", _VOCATIVE.sub("", plain, count=1)).strip()
     if NOT_A_REQUEST.search(plain) or _CONDITIONAL.search(plain) or _SCRIPT_VETO.search(plain):
         return False
     body = _SAID_LEAD.sub("", plain, count=1)

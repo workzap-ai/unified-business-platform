@@ -91,3 +91,38 @@ def test_roffer07_the_flag_is_opt_in_and_only_a_boolean() -> None:
     validate_section("response_rules", {**base, "brain": {"quote_facts": True}})
     with pytest.raises(BusinessRuleViolation):
         validate_section("response_rules", {**base, "brain": {"quote_facts": "true"}})
+
+
+def test_roffer07_cap_demotes_extra_questions_and_keeps_every_sentence() -> None:
+    text = "Kitni shops hain? Kahan hain? Kya Excel use karte hain?"
+    capped = quote_facts.cap(text)
+    assert quote_facts.question_count(capped) == 2
+    assert capped.endswith("Kahan hain? Kya Excel use karte hain?")
+    assert capped.startswith("Kitni shops hain.")
+    assert len(capped) == len(text)
+    arabic = quote_facts.cap("كم؟ أين؟ ماذا؟")
+    assert quote_facts.question_count(arabic) == 2
+    assert quote_facts.cap("One? Two?") == "One? Two?"
+    assert quote_facts.cap("") == ""
+
+
+def test_roffer07_the_ask_line_is_always_inside_the_cap() -> None:
+    for language in ("en", "roman_ur", "ur", "ar"):
+        line = quote_facts.ask_line(["shops", "locations", "systems"], language)
+        assert quote_facts.cap(line) == line
+
+
+def test_roffer07_facts_in_the_stored_profile_are_not_asked_again() -> None:
+    ctx = {
+        "history": [],
+        "noted_problems": [],
+        "brief": {
+            "business_profile": {
+                "facts": [
+                    {"key": "branches", "value": "4"},
+                    {"key": "cities", "value": "Lahore"},
+                ]
+            }
+        },
+    }
+    assert quote_facts.missing(ctx) == ["systems"]

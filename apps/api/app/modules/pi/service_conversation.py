@@ -7282,6 +7282,8 @@ async def compose_service_turn_inner(
     if context.get("pi_mode") == "brain":
         # R-ASK-01 on the text that is sent: everything above may add a line after the last lint
         turn.reply = constitution.final_one_question(turn.reply, keep=context.get("fixed_lines"))
+        if context.get("quote_facts"):
+            turn.reply = quote_facts.cap(turn.reply)  # ROFFER07: never more than two questions
     return turn
 
 

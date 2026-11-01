@@ -62,7 +62,9 @@ _THANKS = (
 NOTED_SENTENCE = re.compile(
     r"(?:^|(?<=[.!?]\s))"
     + _THANKS
-    + r"(?:(?:i(?:'ve| have)\s+)?noted\s*:|i(?:'ve| have)\s+noted\s+it\b|noted\s*[.!]|"
+    + r"(?:[^.?!\n:]{0,60}\balag\s+note\s+kar\s+li(?:ya|a)?\b|"
+    r"[^.?!\n:]{0,60}\bnoted\s+separately\b|"
+    r"(?:i(?:'ve| have)\s+)?noted\s*:|i(?:'ve| have)\s+noted\s+it\b|noted\s*[.!]|"
     r"(?:(?:maine|ye|yeh|isay|ise)\s+)?note\s+kar\s+li(?:ya|a)(?:\s+hai)?\b|likh\s+liya(?:\s+hai)?\b|"
     r"maine\s+(?:\w+\s+){0,3}(?:masle|masla|problems?|baatein|baat)\s+"
     r"note\s+kar\s+li(?:ye|ya)(?:\s+hain?)?\b)\s*:?[^.?!\n:]*[.?!]?[ \t]*",
