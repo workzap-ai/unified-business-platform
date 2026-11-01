@@ -105,7 +105,64 @@ async def store(
 ) -> int:
     """Store the redacted segments of one file; returns how many rows were added (0 when the file
     was stored before, is unreadable, or the table is missing). Never raises."""
-    found = segments(raw)[:MAX_SEGMENTS]
+    return await _write(session, scope, customer_id, file_id, segments(raw)[:MAX_SEGMENTS])
+
+
+PICTURE_MARK = " (read from a picture)"
+
+
+async def store_scanned(
+    session: AsyncSession,
+    scope: WorkspaceScope,
+    *,
+    customer_id: UUID,
+    file_id: UUID,
+    pages: list[tuple[int, str]],
+    total: int,
+) -> int:
+    """Store the vision-read text of a scanned PDF, one row per page. The reference says it was
+    read from a picture (never exact). When pages were not read, a last row says so. Same redaction
+    and idempotence as `store`. Never raises."""
+    from app.modules.pi import documents
+
+    found = [(f"page {n}{PICTURE_MARK}", t) for n, t in pages if t.strip()]
+    if not found:
+        return 0
+    if total > documents.MAX_SCANNED_PAGES:
+        found.append(("pages not read", documents.not_read_note(len(pages), total)))
+    return await _write(session, scope, customer_id, file_id, found[:MAX_SEGMENTS])
+
+
+async def store_staff_file(
+    session: AsyncSession,
+    scope: WorkspaceScope,
+    *,
+    customer_id: UUID,
+    file_id: UUID,
+    raw: bytes,
+    response_rules: dict[str, Any] | None,
+) -> int:
+    """A file staff attached to a customer: the same local readers, off the event loop. Brain mode
+    only; best effort; a file that cannot be read stores nothing and never blocks the upload."""
+    import asyncio
+
+    if not memory_ledger.brain_on(response_rules):
+        return 0
+    try:
+        found = (await asyncio.to_thread(segments, raw))[:MAX_SEGMENTS]
+        return await _write(session, scope, customer_id, file_id, found)
+    except Exception:  # noqa: BLE001
+        logger.warning("pi_staff_file_text_not_stored", exc_info=True)
+        return 0
+
+
+async def _write(
+    session: AsyncSession,
+    scope: WorkspaceScope,
+    customer_id: UUID,
+    file_id: UUID,
+    found: list[tuple[str, str]],
+) -> int:
     if not found:
         return 0
     try:

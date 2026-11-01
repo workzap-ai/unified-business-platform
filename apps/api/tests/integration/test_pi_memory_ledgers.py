@@ -555,4 +555,63 @@ async def test_an_approved_scope_and_price_are_decisions_that_supersede_the_last
         business_db, scope, quote(3, None, ["stock sheet"]), {"pi_mode": "standard"}
     )
     assert len(await rows(business_db, PiDecision, scope, cid)) == len(every)
+
+
+# --------------------------------------------------------------------------- scanned and staff
+async def test_scanned_pages_and_a_staff_upload_are_stored_scoped_and_erased(api, business_db):
+    pi, conv, scope, _ = await workspace(api, business_db, "999999993")
+    cid = conv.customer_id
+    scan = await save_file(business_db, scope, cid, b"%PDF-1.4 scan", "scan.pdf", "whatsapp")
+    added = await document_texts.store_scanned(
+        business_db,
+        scope,
+        customer_id=cid,
+        file_id=scan.id,
+        pages=[(1, "Invoice for Ali, call 0311 2546598"), (3, "Total due 900")],
+        total=7,
+    )
+    assert added == 3
+    stored = await rows(business_db, PiDocumentText, scope, cid)
+    refs = sorted(r.ref for r in stored)
+    assert refs == [
+        "page 1 (read from a picture)",
+        "page 3 (read from a picture)",
+        "pages not read",
+    ]
+    assert all("2546598" not in r.text for r in stored)
+
+    raw = ("Staff note: the delivery is Monday. " * 120).encode()
+    staff = await save_file(business_db, scope, cid, raw, "plan.txt", "upload")
+    assert (
+        await document_texts.store_staff_file(
+            business_db,
+            scope,
+            customer_id=cid,
+            file_id=staff.id,
+            raw=raw,
+            response_rules={"pi_mode": "standard"},
+        )
+        == 0
+    )
+    n = await document_texts.store_staff_file(
+        business_db, scope, customer_id=cid, file_id=staff.id, raw=raw, response_rules=BRAIN
+    )
+    assert n >= 1
+    junk = await save_file(business_db, scope, cid, b"%PDF-1.4 broken", "x.pdf", "upload")
+    assert (
+        await document_texts.store_staff_file(
+            business_db,
+            scope,
+            customer_id=cid,
+            file_id=junk.id,
+            raw=b"%PDF-1.4 broken",
+            response_rules=BRAIN,
+        )
+        == 0
+    )
+    bundle = await context_memory.build_context(business_db, scope, customer_id=cid)
+    assert [f for f in bundle.files if f.id == staff.id][0].text_available
+    removed = (await brain_erase.erase_customer(business_db, scope, cid))["removed"]
+    assert removed["document_texts"] == added + n
+    assert await rows(business_db, PiDocumentText, scope, cid) == []
     await pi.close()

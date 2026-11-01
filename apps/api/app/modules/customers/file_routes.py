@@ -4,6 +4,7 @@ Downloads are served as attachments with ``nosniff``, ``no-store`` and a sandbox
 so a stored file can never run in the app's origin.
 """
 
+import logging
 from typing import Annotated, Any
 from urllib.parse import quote
 from uuid import UUID
@@ -19,6 +20,7 @@ from app.shared.errors import BusinessRuleViolation
 from app.shared.scope import WorkspaceScope
 from app.shared.workspace_repository import WorkspaceRepository
 
+logger = logging.getLogger(__name__)
 router = APIRouter(tags=["customer-files"])
 Read = Annotated[WorkspaceScope, Depends(require("customers.read"))]
 Write = Annotated[WorkspaceScope, Depends(require("customers.write"))]
@@ -37,6 +39,26 @@ async def customer_files(customer_id: UUID, scope: Read, session: Session) -> li
     return [files.view(row) for row in rows]
 
 
+async def _keep_text(
+    session: Any, scope: WorkspaceScope, customer_id: UUID, file_id: UUID, data: bytes
+) -> None:
+    """Pi's document memory: the text of a staff upload (brain mode only). Never blocks it."""
+    try:
+        from app.modules.pi import document_texts
+        from app.modules.pi.configuration import settings_row
+
+        await document_texts.store_staff_file(
+            session,
+            scope,
+            customer_id=customer_id,
+            file_id=file_id,
+            raw=data,
+            response_rules=(await settings_row(session, scope)).response_rules,
+        )
+    except Exception:  # noqa: BLE001
+        logger.warning("staff_file_text_not_stored", exc_info=True)
+
+
 @router.post("/customers/{customer_id}/files", status_code=status.HTTP_201_CREATED)
 async def upload_file(
     customer_id: UUID,
@@ -50,6 +72,7 @@ async def upload_file(
     finally:
         await file.close()
     row = await files.save(session, scope, customer_id, data, file.filename or "file", "upload")
+    await _keep_text(session, scope, customer_id, row.id, data)
     await log_activity(
         session, scope, customer_id, "file", f"File added: {row.name}", "customer_file", row.id
     )

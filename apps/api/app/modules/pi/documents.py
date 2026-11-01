@@ -135,6 +135,25 @@ def pdf_pictures(raw: bytes) -> list[tuple[bytes, str]]:
     return found
 
 
+def pdf_page_pictures(raw: bytes) -> tuple[list[tuple[int, bytes, str]], int]:
+    """([(page number, image, mime)] of the first MAX_SCANNED_PAGES pages that hold a picture,
+    the PDF's total page count). ([], 0) for a broken PDF."""
+    from pypdf import PdfReader
+
+    found: list[tuple[int, bytes, str]] = []
+    try:
+        pages = list(PdfReader(io.BytesIO(raw)).pages)
+        for number, page in enumerate(pages[:MAX_SCANNED_PAGES], start=1):
+            for image in list(page.images)[:1]:
+                name = image.name.lower()
+                mime = "image/png" if name.endswith(".png") else "image/jpeg"
+                if name.endswith((".png", ".jpg", ".jpeg")):
+                    found.append((number, image.data, mime))
+        return found, len(pages)
+    except Exception:  # noqa: BLE001 - a broken PDF just has no pictures
+        return [], 0
+
+
 # Documents that belong to a project, and the name they're kept under.
 PROJECT_LABEL = {
     "proposal": "Project proposal",
@@ -215,8 +234,12 @@ async def read_document(
     conversation_id: UUID,
     *,
     alias: str = "fast",
+    scanned_out: dict[str, Any] | None = None,
 ) -> str:
-    """One description of the document for the conversation (summary + key points)."""
+    """One description of the document for the conversation (summary + key points).
+
+    `scanned_out`, when given, receives {"pages": [(page number, text)], "total": n} for a scanned
+    PDF, so the caller can keep each page's text (document_texts.store_scanned)."""
     name = filename.strip() or "document"
     try:
         label, text = document_text(raw)
@@ -228,7 +251,12 @@ async def read_document(
             if kind == "image":
                 pictures = [(raw, mime)]
         elif exc.code == "FILE_UNREADABLE" and raw.startswith(b"%PDF-"):
-            pictures = pdf_pictures(raw)
+            numbered, total = pdf_page_pictures(raw)
+            if not numbered:
+                raise
+            return await _read_scanned_pdf(
+                manager, scope, numbered, total, name, conversation_id, scanned_out
+            )
         if not pictures:
             raise
         seen = await manager.vision(
@@ -246,3 +274,33 @@ async def read_document(
     )
     summary = str(response.text or "").strip()
     return f"Document {name} ({label}): {summary}"[:4000]
+
+
+def not_read_note(read: int, total: int) -> str:
+    """The honest line when a scanned PDF has pages that were never read."""
+    return f"Only the first {read} of {total} pages were read; the other pages were not read."
+
+
+async def _read_scanned_pdf(
+    manager: Any,
+    scope: WorkspaceScope,
+    numbered: list[tuple[int, bytes, str]],
+    total: int,
+    name: str,
+    conversation_id: UUID,
+    scanned_out: dict[str, Any] | None,
+) -> str:
+    """Each scanned page is read on its own, so its text keeps its page number."""
+    pages: list[tuple[int, str]] = []
+    for number, data, mime in numbered:
+        seen = await manager.vision(
+            scope, PICTURE, [(data, mime)], max_tokens=1500, conversation_id=conversation_id
+        )
+        if text := str(seen.text or "").strip():
+            pages.append((number, text))
+    if scanned_out is not None:
+        scanned_out["pages"], scanned_out["total"] = pages, total
+    body = "\n".join(f"Page {n}: {t}" for n, t in pages)
+    if total > len(numbered):
+        body += f"\n{not_read_note(len(numbered), total)}"
+    return f"Document {name} (scanned PDF): {body}"[:4000]

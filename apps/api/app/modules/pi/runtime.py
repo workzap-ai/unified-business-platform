@@ -321,6 +321,37 @@ async def roman_transcript(
     return roman[:4000] if roman and not SOUTH_ASIAN_SCRIPT.search(roman) else text
 
 
+async def _keep_scanned_pages(
+    session: AsyncSession,
+    scope: WorkspaceScope,
+    conversation: PiConversation,
+    message: PiMessage,
+    scanned: dict[str, Any],
+) -> None:
+    """The vision-read pages of a scanned PDF, kept page by page (brain mode only, best effort)."""
+    file_id = str((message.media or {}).get("file_id") or "")
+    if not scanned.get("pages") or not file_id or conversation.customer_id is None:
+        return
+    try:
+        from uuid import UUID as _UUID
+
+        from app.modules.pi import document_texts, memory_ledger
+        from app.modules.pi.configuration import settings_row
+
+        if not memory_ledger.brain_on((await settings_row(session, scope)).response_rules):
+            return
+        await document_texts.store_scanned(
+            session,
+            scope,
+            customer_id=conversation.customer_id,
+            file_id=_UUID(file_id),
+            pages=scanned["pages"],
+            total=int(scanned.get("total") or 0),
+        )
+    except Exception:  # noqa: BLE001 - never stops the chat
+        logger.warning("pi_scanned_pages_not_stored", exc_info=True)
+
+
 async def _keep_file(
     session: AsyncSession,
     scope: WorkspaceScope,
@@ -1098,6 +1129,7 @@ async def process_pi_event(ctx: dict[str, Any], event_id: str) -> None:
                 if document:
                     from app.modules.pi.documents import read_document
 
+                    scanned: dict[str, Any] = {}
                     description = await read_document(
                         manager,
                         scope,
@@ -1105,7 +1137,9 @@ async def process_pi_event(ctx: dict[str, Any], event_id: str) -> None:
                         str(message.media.get("filename") or ""),
                         conversation_id,
                         alias=str(policy.ai_config.get("router_alias", "fast")),
+                        scanned_out=scanned,
                     )
+                    await _keep_scanned_pages(session, scope, conversation, message, scanned)
                     from app.modules.pi.documents import IMPORTANT_KINDS, document_kind
 
                     doc_kind = document_kind(description)
