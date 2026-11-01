@@ -147,7 +147,7 @@ async def test_owner_text_is_the_owners_earlier_and_latest_words_only(
     ).first()
     text = await sc.owner_text_for(business_db, pi.scope(), conv, last)
     assert sorted(text.splitlines()) == sorted(
-        ["mera khayal hai ke mera competitor sasta hai", "bikri kam ho gayi hai"]
+        ["mera competitor sasta hai", "bikri kam ho gayi hai"]
     )
     await pi.close()
 
