@@ -3,6 +3,7 @@ read by the idea filter, document texts, the staff-only delivered marker, tenant
 single reader (`build_context`), the customer export and the erase. Brain mode only; with empty
 tables the bundle is as before."""
 
+from decimal import Decimal
 from types import SimpleNamespace
 from uuid import uuid4
 
@@ -503,4 +504,55 @@ async def test_counts_in_the_new_tables_are_zero_for_a_fresh_workspace(api, busi
             select(func.count()).select_from(model).where(model.tenant_id == scope.tenant_id)
         )
         assert n == 0
+    await pi.close()
+
+
+# --------------------------------------------------------------------------- scope and price
+async def test_an_approved_scope_and_price_are_decisions_that_supersede_the_last(api, business_db):
+    pi, conv, scope, _ = await workspace(api, business_db, "577777777")
+    cid = conv.customer_id
+    staff = uuid4()
+
+    def quote(version, total, included):
+        return SimpleNamespace(
+            customer_id=cid,
+            ref="Q-0001" if version == 1 else f"Q-0001-v{version}",
+            version=version,
+            kind="quote",
+            total=total,
+            currency="PKR",
+            approved_by=staff,
+            content={"included": included},
+        )
+
+    await memory_ledger.on_document_approved(
+        business_db, scope, quote(1, Decimal("15000.00"), ["stock sheet", "reorder alerts"]), BRAIN
+    )
+    await memory_ledger.on_document_approved(
+        business_db, scope, quote(2, Decimal("1250000.50"), ["stock sheet"]), BRAIN
+    )
+    # the same approval again changes nothing
+    await memory_ledger.on_document_approved(
+        business_db, scope, quote(2, Decimal("1250000.50"), ["stock sheet"]), BRAIN
+    )
+    every = await rows(business_db, PiDecision, scope, cid)
+    for subject in ("scope", "price"):
+        mine = [r for r in every if r.subject_ref == subject]
+        live = [r for r in mine if r.status == "active"]
+        assert len(mine) == 2 and len(live) == 1
+        assert live[0].actor == "staff" and live[0].supersedes_id is not None
+        (old,) = [r for r in mine if r.status == "superseded"]
+        assert old.valid_to is not None and live[0].supersedes_id == old.id
+    price = next(r for r in every if r.subject_ref == "price" and r.status == "active")
+    assert price.owner_words.startswith("1250000.50 PKR (Q-0001-v2, version 2")
+    assert str(staff) in price.owner_words
+    # the single reader shows both, newest first, with their original wording
+    bundle = await context_memory.build_context(business_db, scope, customer_id=cid)
+    shown = {d.kind: d for d in bundle.decisions if d.status == "active"}
+    assert "stock sheet" in shown["scope"].text and "1250000.50" in shown["price"].text
+    # a draft (no total) records no price, and other workspaces record nothing
+    await memory_ledger.on_document_approved(
+        business_db, scope, quote(3, None, ["stock sheet"]), {"pi_mode": "standard"}
+    )
+    assert len(await rows(business_db, PiDecision, scope, cid)) == len(every)
     await pi.close()

@@ -39,6 +39,8 @@ _KIND_SOURCE = {
     "decline": "decision",
     "revision_request": "decision",
     "document_approval": "decision",
+    "scope": "decision",
+    "price": "decision",
     "box_move": "decision",
     "open_item": "decision",
 }

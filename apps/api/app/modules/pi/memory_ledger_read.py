@@ -52,7 +52,11 @@ async def read_decisions(
     ).all()
     return [
         DecisionItem(
-            kind=str(r.kind),
+            kind=(
+                str(r.subject_ref)
+                if r.kind == "other" and r.subject_ref in ("scope", "price")
+                else str(r.kind)
+            ),
             ref=str(r.subject_ref),
             status=str(r.status),
             text=str(r.owner_words or ""),

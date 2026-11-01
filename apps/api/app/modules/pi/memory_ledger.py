@@ -36,6 +36,10 @@ from app.shared.scope import WorkspaceScope
 logger = logging.getLogger(__name__)
 
 OFFER_SUBJECT = "box:offer"
+# A scope or a price agreed on a document is stored as kind "other" (the table's kind constraint
+# is fixed in production) under one subject per customer; the reader shows the subject as the kind.
+SCOPE_SUBJECT = "scope"
+PRICE_SUBJECT = "price"
 WORDS_CAP = 300
 IDEA_CAP = 500
 
@@ -122,10 +126,17 @@ async def record_decision(
     source_message_id: UUID | None = None,
     problem_id: UUID | None = None,
     now: datetime | None = None,
+    verbatim: bool = False,
 ) -> PiDecision | None:
-    """Write one decision, or return the one that already says the same. Never raises."""
+    """Write one decision, or return the one that already says the same. Never raises.
+    `verbatim` is for words the code itself built from staff-entered figures (a price): they are
+    stored as they are, not redacted (redaction would mangle a large amount), and cut to the cap."""
     stamp = now or datetime.now(UTC)
-    words = redacted(owner_words)
+    words = (
+        " ".join(str(owner_words or "").split())[: WORDS_CAP * 2]
+        if verbatim
+        else redacted(owner_words)
+    )
     try:
         async with session.begin_nested():
             return await _write_decision(
@@ -484,8 +495,61 @@ async def on_document_approved(
             actor="staff",
             owner_words="",
         )
+        await _record_scope_and_price(session, scope, doc)
     except Exception:  # noqa: BLE001
         logger.warning("pi_ledger_doc_hook_failed", exc_info=True)
+
+
+def scope_words(doc: Any) -> str:
+    """What the approved document includes: a quote's `included` list, a solution document's
+    component texts. Empty when the document says nothing."""
+    content = getattr(doc, "content", None) or {}
+    items = content.get("included")
+    if not items:
+        items = [c.get("text", "") for c in content.get("components") or [] if isinstance(c, dict)]
+    return "; ".join(str(i).strip() for i in items or [] if str(i).strip())
+
+
+def price_words(doc: Any) -> str:
+    """The figure exactly as staff set it, with the document, its version and the approver."""
+    total = getattr(doc, "total", None)
+    if total is None or total <= 0:
+        return ""
+    figure = f"{format(total, 'f')} {getattr(doc, 'currency', '') or ''}".strip()
+    approver = getattr(doc, "approved_by", None)
+    return (
+        f"{figure} ({doc.ref}, version {getattr(doc, 'version', 1)}, "
+        f"approved by {approver if approver else 'staff'})"
+    )
+
+
+async def _record_scope_and_price(session: AsyncSession, scope: WorkspaceScope, doc: Any) -> None:
+    """Staff approved a document: its scope and its price are now decisions, each superseding the
+    last one for this customer. Only figures staff entered are recorded; pi never prices."""
+    ref = str(doc.ref)
+    words = scope_words(doc)
+    if words:
+        await record_decision(
+            session,
+            scope,
+            customer_id=doc.customer_id,
+            kind="other",
+            subject_ref=SCOPE_SUBJECT,
+            actor="staff",
+            owner_words=f"{ref} v{getattr(doc, 'version', 1)}: {words}",
+        )
+    figure = price_words(doc)
+    if figure:
+        await record_decision(
+            session,
+            scope,
+            customer_id=doc.customer_id,
+            kind="other",
+            subject_ref=PRICE_SUBJECT,
+            actor="staff",
+            owner_words=figure,
+            verbatim=True,
+        )
 
 
 async def on_idea_reaction(
