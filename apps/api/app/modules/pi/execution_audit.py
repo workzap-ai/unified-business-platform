@@ -493,6 +493,16 @@ class AuditLog:
     def __init__(self) -> None:
         self._entries: list[AuditEntry] = []
 
+    @classmethod
+    def restore(cls, entries: Any) -> AuditLog | None:
+        """Rebuild a stored log; None unless the whole hash chain verifies (tampering fails closed)."""
+        items = list(entries)
+        if not verify_chain(items).ok:
+            return None
+        log = cls()
+        log._entries = items
+        return log
+
     @property
     def entries(self) -> tuple[AuditEntry, ...]:
         return tuple(self._entries)

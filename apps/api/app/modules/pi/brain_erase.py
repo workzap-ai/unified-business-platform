@@ -44,6 +44,7 @@ from app.modules.customers.models import Customer
 from app.modules.pi import business_profile_store
 from app.modules.pi.box_models import PiBoxTransition, PiMapVersion, PiOfferLog, PiSolutionBox
 from app.modules.pi.brain_docs_models import PiBrainDocument, PiBrainPayment
+from app.modules.pi.execution_models import PiExecutionRun
 from app.modules.pi.experience_models import PiExperience
 from app.modules.pi.learning_models import PiLearningExample
 from app.modules.pi.models import (
@@ -339,6 +340,12 @@ async def _erase_map_and_boxes(
             "map_versions",
             delete(PiMapVersion).where(
                 *mine(PiMapVersion), PiMapVersion.customer_id == customer_id
+            ),
+        ),
+        (  # Level 3 execution runs (migration 0055); the run is the customer's execution trail
+            "execution_runs",
+            delete(PiExecutionRun).where(
+                *mine(PiExecutionRun), PiExecutionRun.customer_id == customer_id
             ),
         ),
     )

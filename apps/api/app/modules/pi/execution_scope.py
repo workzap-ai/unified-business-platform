@@ -57,6 +57,9 @@ TOOL_CLASSES: dict[str, str] = {
     "write_note": "write_reversible",
     "update_task_status": "write_reversible",
     "create_draft_document": "write_reversible",
+    "create_staff_task": "write_reversible",
+    "schedule_followup": "write_reversible",
+    "update_problem_status": "write_reversible",
     "send_message": "outbound_message",
     "send_email": "outbound_message",
     "delete_record": "destructive",
@@ -493,6 +496,12 @@ def _load_key() -> bytes:
 
 
 _KEY = _load_key()
+
+
+def seal_key_configured() -> bool:
+    """True when the server holds a real PI_EXECUTION_SEAL_KEY (16+ characters). Level 3 stays inert
+    in production without it, because a per-process random key cannot verify a stored seal."""
+    return len(os.environ.get("PI_EXECUTION_SEAL_KEY", "")) >= 16
 
 
 def seal_mac(parts: Any) -> str:

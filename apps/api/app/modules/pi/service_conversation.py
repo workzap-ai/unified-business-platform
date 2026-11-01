@@ -36,6 +36,7 @@ from app.modules.pi import (
     context_memory,
     context_memory_types,
     decisions,
+    execution_hooks,
     expert_advisor,
     figure_correction,
     fixed_lines,
@@ -1727,6 +1728,14 @@ async def brain_problems(
                 else "approved"
                 if states & set(context_memory_types.IN_PROGRESS_STATES)
                 else "proposed"
+            )
+            # Level 3 (off by default): only a fully verified execution run can raise it
+            context["implementation_status"] = await execution_hooks.capped_status(
+                session,
+                scope,
+                conversation.customer_id,
+                policy.response_rules,
+                context["implementation_status"],
             )
     context.update(matching_the_person(conversation, message, rows or []))
     if away := days_away(message, rows or [], last_chat_at):

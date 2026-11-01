@@ -55,6 +55,7 @@ from app.modules.pi.brain_moderation_routes import router as pi_brain_moderation
 from app.modules.pi.brain_visual_routes import public_router as pi_brain_visuals_router
 from app.modules.pi.business_profile_routes import router as pi_business_profile_router
 from app.modules.pi.config_routes import router as pi_config_router
+from app.modules.pi.execution_routes import router as pi_execution_router
 from app.modules.pi.inbox_routes import router as pi_inbox_router
 from app.modules.pi.kapso_routes import router as pi_kapso_router
 from app.modules.pi.open_items_routes import router as pi_open_items_router
@@ -132,6 +133,7 @@ ROUTERS = [
     pi_open_items_router,
     pi_business_profile_router,
     pi_staff_review_router,
+    pi_execution_router,
     payment_link_router,
     customer_files_router,
     pi_requests_router,
@@ -226,6 +228,7 @@ PI_APP_ROUTERS = [
     pi_open_items_router,
     pi_business_profile_router,
     pi_staff_review_router,
+    pi_execution_router,
     payment_link_router,
     customer_files_router,
     pi_requests_router,
