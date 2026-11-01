@@ -191,7 +191,7 @@ def text_for(kind: str, language: str | None, *, n: int = 0, when: str = "") -> 
     table = MESSAGES[kind]
     code = (language or "en").split("-")[0]
     # an Arabic-script owner gets Urdu or Persian script where the table has it, never English
-    key = code if code in ("ur", "fa") and code in table else None
+    key = code[:2] if code in ("ur_script", "fa_script") and code[:2] in table else None
     template = table[key or fixed_lines.table_language(language, table, persian=True)]
     return template.format(n=n, when=when)
 
@@ -205,5 +205,5 @@ def owner_language(conversation_language: str | None, last_owner_text: str | Non
     Persian, never English by default)."""
     code = (conversation_language or "en").split("-")[0]
     if _ARABIC_SCRIPT.search(last_owner_text or ""):
-        return code if code in ("ur", "fa", "ar") else "ur"
+        return "fa_script" if code == "fa" else "ar" if code == "ar" else "ur_script"
     return conversation_language

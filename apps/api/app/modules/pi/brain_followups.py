@@ -226,7 +226,7 @@ async def send_one(
         conversation.service_brief = marked_sent(brief, kind)
         return None  # one nudge per quiet spell, never the same line twice
     language = followup_policy.owner_language(conversation.language, owner_text) or "en"
-    if language not in ("ur", "fa"):
+    if language not in ("ur_script", "fa_script", "ar"):
         language = language_of(conversation)
     when = ""
     if kind.startswith("kickoff") and chat.kickoff_at is not None:
