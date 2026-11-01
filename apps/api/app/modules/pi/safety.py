@@ -724,7 +724,12 @@ def _named_person(text: str, match: re.Match[str]) -> bool:
         opens = not before or before[-1] in ".!?:" or before.endswith(chr(10))
         if opens and match.start() == match.start(group):  # no role before the name
             tail = text[match.end(group) :]
-            return bool(re.match(r"(?:'s)?\s+(?i:has|had|got|ko|ka|ki|ke|salary|pay|wages?|earns|gets|is|was|were|makes)\b", tail))
+            return bool(
+                re.match(
+                    r"(?:'s)?\s+(?i:has|had|got|ko|ka|ki|ke|salary|pay|wages?|earns|gets|is|was|were|makes)\b",
+                    tail,
+                )
+            )
         return True
     return False
 
@@ -1530,6 +1535,8 @@ class Identity(StrEnum):
     RULES = "rules"
     COMPANY = "company"
     OFFER = "offer"
+    ABOUT = "about"  # "are you a chatbot", "tell me about yourself", "what can you do for me"
+    ABOUT_AGAIN = "about_again"  # the same question asked again: a shorter answer
 
 
 IDENTITY_PATTERNS: tuple[tuple[Identity, re.Pattern[str]], ...] = (
@@ -1610,6 +1617,51 @@ IDENTITY_PATTERNS = (
     ),
 ) + IDENTITY_PATTERNS
 
+# G54 / spec 17.5 EO3 / v1.6 19.3: a question about pi itself is answered in sentence one. Appended last,
+# so the specific kinds above (a person, a scam, the rules, what Workzap sells) keep their own answer.
+IDENTITY_PATTERNS = IDENTITY_PATTERNS + (
+    (
+        Identity.ABOUT,
+        _rx(
+            (
+                r"(?:are|r) (?:you|u) (?:a |an )?(?:chat ?bots?|bots?|ai|assistant)(?: or [\w ]{1,20})?",
+                r"(?:you(?:'re| are)|considering you are|i think you are) (?:a |an )?chat ?bots?",
+                r"tell me about (?:yourself|your ?self)|about yourself|who are you|what are you",
+                # "what can you do" about pi itself; "what can you do about it" asks for a fix
+                r"what (?:can|could|do|does) (?:you|pi) do(?!\s+(?:about|with|to|if|when)\b)",
+                r"(?:can|could) (?:you|pi) do for (?:me|us|my business)",
+                r"how (?:can|could) (?:you|pi) help(?: me| us)?(?! with (?:it|this|that))",
+                r"aap kya (?:kar sakte|kar sakti|karte|kar skte)(?: hain| ho)?",
+                r"apne (?:baare|bare) mein (?:bata|btao|bataiye|bataen)\w*",
+                r"tum kya kar sakte",
+            ),
+            (
+                r"آپ کیا کر سکتے ہیں|آپ کیا کرتے ہیں|اپنے بارے میں بتا",
+                r"ماذا (?:يمكنك|تستطيع|تقدر) (?:أن )?(?:تفعل|تعمل)|ماذا تفعل|أخبرني عن نفسك|حدثني عن نفسك|هل أنت (?:شات ?بوت|بوت)",
+            ),
+        ),
+    ),
+)
+
+ABOUT_TEXT = {
+    "en": {
+        Identity.ABOUT: "I'm pi, an AI from Workzap. I listen to the problem in your business, look for the cause and suggest ideas, and Workzap's team can build it if you want. What is the biggest problem in your business right now?",
+        Identity.ABOUT_AGAIN: "In short: I note your problem, look for the cause and suggest ideas. What is the biggest problem in your business right now?",
+    },
+    "roman_ur": {
+        Identity.ABOUT: "Main pi hoon, Workzap ka AI. Yahan aap ke business ka masla suna jata hai, wajah dhoondi jati hai aur ideas diye jate hain, aur chahein to Workzap ki team woh bana bhi sakti hai. Aap ke business ka sab se bada masla kya hai?",
+        Identity.ABOUT_AGAIN: "Mukhtasar: masla note hota hai, wajah dhoondi jati hai aur ideas milte hain. Aap ke business ka sab se bada masla kya hai?",
+    },
+    "ur": {
+        Identity.ABOUT: "میں pi ہوں، Workzap کی طرف سے ایک مصنوعی ذہانت۔ یہاں آپ کے کاروبار کا مسئلہ سنا جاتا ہے، اس کی وجہ ڈھونڈی جاتی ہے اور خیالات دیے جاتے ہیں، اور چاہیں تو Workzap کی ٹیم اسے بنا بھی سکتی ہے۔ آپ کے کاروبار کا سب سے بڑا مسئلہ کیا ہے؟",
+        Identity.ABOUT_AGAIN: "مختصر یہ کہ مسئلہ نوٹ ہوتا ہے، وجہ ڈھونڈی جاتی ہے اور خیالات ملتے ہیں۔ آپ کے کاروبار کا سب سے بڑا مسئلہ کیا ہے؟",
+    },
+    "ar": {
+        Identity.ABOUT: "أنا pi، ذكاء اصطناعي من Workzap. أستمع إلى مشكلة عملك وأبحث عن سببها وأقترح أفكارا، ويمكن لفريق Workzap تنفيذها إن أردت. ما أكبر مشكلة في عملك الآن؟",
+        Identity.ABOUT_AGAIN: "باختصار: أسجل مشكلتك وأبحث عن سببها وأقترح أفكارا. ما أكبر مشكلة في عملك الآن؟",
+    },
+}
+
 IDENTITY_TEXT = {
     "en": {
         Identity.PERSON: "I'm an AI, not a person. I'm pi, from Workzap.",
@@ -1644,19 +1696,33 @@ IDENTITY_TEXT = {
 }
 
 
+ABOUT_FIX = re.compile(r"\s+(?:about|with|to|if|when)\b", re.IGNORECASE)
+
+
+def _asks_for_a_fix(said: str, found: re.Match[str]) -> bool:
+    """The ABOUT match is "what can you do" and the words after it point at a problem."""
+    return found.group(0).lower().startswith("what") and bool(ABOUT_FIX.match(said[found.end() :]))
+
+
 def identity_asked(text: str, asks_if_ai: re.Pattern[str]) -> Identity | None:
     """Which "who are you" question this is. `asks_if_ai` is the linter's pattern, so the check that a
     reply says "AI" and the check that decides pi must say it can never disagree."""
     said = " ".join((text or "").split())
     for kind, pattern in IDENTITY_PATTERNS:
-        if pattern.search(said):
-            return kind
+        found = pattern.search(said)
+        if not found:
+            continue
+        if kind is Identity.ABOUT and _asks_for_a_fix(said, found):
+            continue  # "what can you do about it" asks for a fix for a problem, not who pi is
+        return kind
     if asks_if_ai.search(said):
         return Identity.PERSON
     return None
 
 
 def identity_reply(kind: Identity, language: str | None) -> str:
+    if kind in (Identity.ABOUT, Identity.ABOUT_AGAIN):
+        return (ABOUT_TEXT.get(language or "en") or ABOUT_TEXT["en"])[kind]
     table = IDENTITY_TEXT.get(language or "en", IDENTITY_TEXT["en"])
     return table[kind]
 

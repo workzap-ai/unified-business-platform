@@ -103,13 +103,6 @@ async def test_g54_wiring_only_no_scripted_industry_noun_reaches_the_owner_early
     await pi.close()
 
 
-@pytest.mark.xfail(
-    reason="FOUND IN THE REPLAY: to 'What can you do about it?' the application replaced the "
-    "scripted answer with 'Yes. I don't have a quick idea for this one that I can give here. "
-    "What have you tried so far?', whose first sentence does not answer the owner's question "
-    "(spec 18.8 EO3, 17.5). Open for the flow lead",
-    strict=False,
-)
 async def test_g54_first_sentence_answers_the_direct_question(api, business_db, monkeypatch):
     pi = await replay(api, business_db, monkeypatch)
     first = re.split(r"(?<=[.!?])\s+", (await pi.reply_to("g54-4")).body)[0]

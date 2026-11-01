@@ -33,6 +33,7 @@ QUESTION = re.compile(r"[?؟]")
 T: dict[str, dict[str, str]] = {
     "en": {
         "label": "(not yet checked against what you told me)",
+        "q_problem": "What is the biggest problem in your business right now?",
         "known": 'From before we already have: "{clause}".',
         "off_topic": "I left out one idea that does not address what you told me.",
         "generic": "I left out one idea that would fit any business.",
@@ -48,6 +49,7 @@ T: dict[str, dict[str, str]] = {
     },
     "roman_ur": {
         "label": "(abhi aap ki baton se check nahi hua)",
+        "q_problem": "Aap ke business ka sab se bada masla kya hai?",
         "known": 'Pehle se hamare paas yeh hai: "{clause}".',
         "off_topic": "Maine ek idea chhor diya jo aap ki batayi hui baat se nahi judta.",
         "generic": "Maine ek idea chhor diya jo har karobar par lagu ho jata hai.",
@@ -63,6 +65,7 @@ T: dict[str, dict[str, str]] = {
     },
     "ur": {
         "label": "(ابھی آپ کی باتوں سے جانچ نہیں ہوئی)",
+        "q_problem": "آپ کے کاروبار کا سب سے بڑا مسئلہ کیا ہے؟",
         "known": 'پہلے سے ہمارے پاس یہ ہے: "{clause}"۔',
         "off_topic": "میں نے ایک خیال چھوڑ دیا جو آپ کی بتائی ہوئی بات سے نہیں جڑتا۔",
         "generic": "میں نے ایک خیال چھوڑ دیا جو ہر کاروبار پر لگ جاتا ہے۔",
@@ -78,6 +81,7 @@ T: dict[str, dict[str, str]] = {
     },
     "ar": {
         "label": "(لم يُفحص بعد مع ما قلته)",
+        "q_problem": "ما أكبر مشكلة في عملك الآن؟",
         "known": 'لدينا من قبل: "{clause}".',
         "off_topic": "تركت فكرة لا تتعلق بما ذكرته.",
         "generic": "تركت فكرة عامة تناسب أي عمل.",
@@ -108,6 +112,7 @@ def table(language: str | None) -> dict[str, str]:
 class Voiced:
     reply: str  # the reply with rejected ideas removed and unchecked ones labelled
     block: str = ""  # fixed statements, put in front of the reply after the language step
+    after: str = ""  # the unchecked-ideas caveat, put after the ideas (never first)
     question: str = ""  # the one targeted question, put last ("" when none is needed)
     changed: bool = False
     pick: str = ""  # the idea to start with (the chat's recommendation, stored for the document)
@@ -266,8 +271,7 @@ def voice(
     ]
     if no_rule_broken:
         block.append(tb["start"])
-    if unknown_at:
-        block.append(tb["unknown"])
+    after = tb["unknown"] if unknown_at else ""  # the caveat follows the ideas, never leads
     new_reply = chr(10).join(keep).strip()
     question = ""
     pending: dict[str, Any] | None = None
@@ -318,6 +322,7 @@ def voice(
     return Voiced(
         new_reply,
         chr(10).join(block),
+        after,
         question,
         changed,
         pick,

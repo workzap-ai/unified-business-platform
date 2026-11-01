@@ -345,6 +345,7 @@ class ServiceTurn(BaseModel):
     _cost_line: str = PrivateAttr(default="")  # the fixed cost answer, put in after any rewrite
     _voice_block: str = PrivateAttr(default="")  # fixed option statements, put in after any rewrite
     _voice_question: str = PrivateAttr(default="")  # the one targeted question, put last
+    _voice_after: str = PrivateAttr(default="")  # the unchecked-ideas caveat, after the ideas
     _voice_unmarked: tuple[int, ...] = PrivateAttr(default=())  # ideas not yet checked
     _voice_language: str = PrivateAttr(default="en")
     _voice_items: tuple[dict[str, Any], ...] = PrivateAttr(default=())
@@ -2225,7 +2226,7 @@ async def pre_send_guard(
     if not fallback:
         return
     turn.reply = with_disclosure(fallback, context, lang)  # a first message still says pi is an AI
-    turn._voice_block = turn._voice_question = ""
+    turn._voice_block = turn._voice_question = turn._voice_after = ""
     turn._voice_unmarked = ()
     turn.awaiting_customer = True
 
@@ -2237,6 +2238,18 @@ def brain_option_voice(turn: "ServiceTurn", context: dict[str, Any]) -> None:
     one question that would settle what blocks. Brain mode, ideas listed, requirements known."""
     if turn._summary or turn._decision is not None:
         return  # the sorted summary lists the owner's problems (bullets), not ideas: it leads alone
+    noted_now, _fresh = noted_with_turn(context, turn)
+    if not noted_now and option_voice.has_ideas(turn.reply):
+        # G12 / ideaLink: no problem is noted yet, so there is nothing for an idea to answer: no
+        # ideas at all, the one question about the biggest problem instead
+        language_now = fixed_lines.code(context, script=True)
+        turn.reply = with_disclosure(
+            option_voice.table(language_now)["q_problem"], context, language_now
+        )
+        turn._voice_block = turn._voice_question = turn._voice_after = ""
+        turn._voice_unmarked = ()
+        turn.awaiting_customer = True
+        return
     reqs = option_wiring.requirements_from(context.get("requirements"))
     language = fixed_lines.code(context, script=True)  # "ur" for Urdu script, "ar" for Arabic
     # gated on the reply as it stands (English ideas are read best); the labels, the fixed block and
@@ -2281,6 +2294,7 @@ def brain_option_voice(turn: "ServiceTurn", context: dict[str, Any]) -> None:
         return
     turn.reply = voiced.reply
     turn._voice_block = voiced.block
+    turn._voice_after = voiced.after
     turn._voice_question = voiced.question
     turn._voice_unmarked = voiced.unmarked
     turn._voice_language = language
@@ -2288,10 +2302,12 @@ def brain_option_voice(turn: "ServiceTurn", context: dict[str, Any]) -> None:
         turn.awaiting_customer = True
 
 
-def put_option_voice(reply: str, block: str, question: str) -> str:
+def put_option_voice(reply: str, block: str, question: str, after: str = "") -> str:
     """The option statements in front of the reply (after the AI disclosure of a first message), the
-    one question last."""
+    caveat about unchecked ideas after the ideas, the one question last."""
     text = put_cost_line(reply, block) if block else reply
+    if after and text.strip():
+        text = f"{text.rstrip()}{chr(10) * 2}{after}"
     if question:
         text = f"{text.rstrip()}{chr(10) * 2}{question}" if text.strip() else question
     return text
@@ -2443,6 +2459,16 @@ def _brain_gate(
                 {"escalate": "company_info"},
                 "R-HONEST-01",
             )
+        if who == safety.Identity.ABOUT:
+            told = [
+                str(h.get("text") or "")
+                for h in (context.get("history") or [])
+                if h.get("role") == "ai"
+            ][-6:]
+            full = safety.identity_reply(who, language)
+            mid = full[len(full) // 3 : len(full) // 3 + 40]  # not the opening disclosure
+            if any(mid in said for said in told):  # asked again: shorter, then the one question
+                who = safety.Identity.ABOUT_AGAIN
         return fixed(safety.identity_reply(who, language), why="R-DISC")
     if chat_level and (advice := safety.advice_asked(text)) is not None:
         if advice == safety.Advice.LEGAL and LEGAL_THREAT.search(text):
@@ -2751,7 +2777,7 @@ def ideas_opener(context: dict[str, Any]) -> str:
     if solution_ask.churn_risk(said):
         return "No pressure at all. Here are two ideas:" + chr(10)  # G18
     if solution_ask.impatient(said):
-        return "Sorry about the wait. Here are two ideas:" + chr(10)  # Book 4 G27: "Maazrat"
+        return "Here are two ideas:" + chr(10)  # no "sorry about the wait" unless a delay is known
     return "Here are some ideas for you:" + chr(10)
 
 
@@ -2932,7 +2958,7 @@ def roman_polish(reply: str) -> str:
 
 ROMAN_OPENER = {
     "normal": "Ji, ye do ideas abhi aazma sakte hain:",
-    "impatient": "Maazrat. Ye do ideas hain:",
+    "impatient": "Ye do ideas hain:",
     "churn": "Koi dabao nahi. Ye do ideas hain:",
     "wrong": "Maazrat, wo aap ke masle se mel nahi khate. Ye do naye ideas hain:",
 }
@@ -6812,11 +6838,13 @@ async def compose_service_turn(
         turn.reply = roman_ideas_opener(roman_polish(turn.reply), context)
     if turn._cost_line:
         turn.reply = put_cost_line(turn.reply, turn._cost_line)
-    if turn._voice_block or turn._voice_question or turn._voice_unmarked:
+    if turn._voice_block or turn._voice_question or turn._voice_unmarked or turn._voice_after:
         turn.reply = option_voice.label_ideas(
             turn.reply, turn._voice_unmarked, turn._voice_language
         )
-        turn.reply = put_option_voice(turn.reply, turn._voice_block, turn._voice_question)
+        turn.reply = put_option_voice(
+            turn.reply, turn._voice_block, turn._voice_question, turn._voice_after
+        )
     if context.get("pi_mode") == "brain":
         await pre_send_guard(turn, context, manager, scope, policy, conversation)
     latest_language = detect_language(str(context.get("latest_customer_message", "")))
