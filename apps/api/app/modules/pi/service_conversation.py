@@ -76,6 +76,7 @@ from app.modules.pi import (
     resolution_flow,
     safety,
     safety_scope,
+    scope_first,
     self_review,
     self_review_types,
     slot_carry,
@@ -354,6 +355,7 @@ class ServiceTurn(BaseModel):
     _voice_language: str = PrivateAttr(default="en")
     _voice_items: tuple[dict[str, Any], ...] = PrivateAttr(default=())
     _voice_pending: dict[str, Any] | None = PrivateAttr(default=None)  # the question asked
+    _scope_asked: bool = PrivateAttr(default=False)  # scope question replaced a money one
     _voice_pick: str = PrivateAttr(
         default=""
     )  # the idea the chat recommends (kept for the document)
@@ -2309,6 +2311,15 @@ def brain_option_voice(turn: "ServiceTurn", context: dict[str, Any]) -> None:
         ),
         scope=(context.get("memory") or {}).get("scope"),
     )
+    if voiced.question and voiced.pending:
+        if scope_q := scope_first.scope_question(
+            str(voiced.pending.get("key") or ""),
+            owner_said,
+            bool(brief_now.get("scope_asked")),
+            language,
+        ):
+            voiced.question, voiced.pending, voiced.changed = scope_q, None, True
+            turn._scope_asked = True
     heard = str((context.get("memory") or {}).get("already_known") or "")
     if heard and voiced.changed and (voiced.question or voiced.unknown):
         voiced.block = f"{heard}{chr(10)}{voiced.block}".strip()
@@ -6857,8 +6868,10 @@ async def compose_service_turn(
         brain_offer(turn, context)
         strip_unallowed_offer(turn, context)
         brain_option_voice(turn, context)
-        if turn._voice_pick or turn._voice_pending:
+        if turn._voice_pick or turn._voice_pending or turn._scope_asked:
             kept = dict(conversation.service_brief or {})
+            if turn._scope_asked:
+                kept["scope_asked"] = True  # the scope question is asked once per chat
             if turn._voice_pick:  # the document recommends the same option (one ranking)
                 kept["chat_pick"] = turn._voice_pick
             if turn._voice_pending:  # read the owner's answer next turn (PS-5)

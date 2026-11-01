@@ -91,8 +91,11 @@ def lines(
         shown += 1
     if want_first and graph.learn_first:
         item = graph.learn_first[0]
-        key = "first_said" if item.status == pg.OWNER_SAID else "first_guess"
-        out.append(tb[key].format(text=item.text))
+        # a guess with nothing the owner said behind it ("customers or staff not told" for a rent
+        # chat) is noise, not a lead: it is not voiced
+        if item.status == pg.OWNER_SAID or item.supports > 0:
+            key = "first_said" if item.status == pg.OWNER_SAID else "first_guess"
+            out.append(tb[key].format(text=item.text))
     if len(graph.problems) >= 2 and graph.priority is not None:
         if graph.priority.complete and graph.priority.ranked:
             order = ", ".join(
