@@ -19,6 +19,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.modules.pi import (
     learning,
+    memory_ledger,
     solution_lint,
     solution_rules,
     solution_score,
@@ -501,6 +502,14 @@ async def react(
             value = solution_score.reaction_of_memory(reaction.signal)
             if value != "none":
                 row.reaction = value
+                await memory_ledger.on_idea_reaction(
+                    session,
+                    scope,
+                    customer_id=customer_id,
+                    arm=arm,
+                    memory_reaction=value,
+                    message_id=message_id,
+                )
             row.said_will_try = row.said_will_try or reaction.signal == "idea_will_try"
             if reaction.signal == "idea_worked":
                 row.reported_result = "worked"

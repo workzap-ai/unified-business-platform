@@ -46,6 +46,7 @@ from app.modules.pi.box_models import PiBoxTransition, PiMapVersion, PiOfferLog,
 from app.modules.pi.brain_docs_models import PiBrainDocument, PiBrainPayment
 from app.modules.pi.experience_models import PiExperience
 from app.modules.pi.learning_models import PiLearningExample
+from app.modules.pi.memory_models import PiDecision, PiDocumentText, PiRejection
 from app.modules.pi.models import (
     PiConversation,
     PiHandoff,
@@ -113,6 +114,9 @@ REMOVED_KEYS = (
     "tasks_cleared",
     "documents_text_cleared",
     "share_links_deleted",
+    "decisions",
+    "rejections",
+    "document_texts",
 )
 
 
@@ -345,6 +349,28 @@ async def _erase_map_and_boxes(
     return await _run_steps(session, steps)
 
 
+async def _erase_memory_ledgers(
+    session: AsyncSession, scope: WorkspaceScope, customer_id: UUID
+) -> tuple[dict[str, int], list[str]]:
+    """The decision and rejection ledgers and the stored text of the customer's documents
+    (migration 0055). They hold the owner's words and what their files say, so they go with the
+    customer; the files themselves follow the retention decision (G13) and are not touched here."""
+
+    def mine(model: Any) -> tuple[Any, ...]:
+        return (
+            model.tenant_id == scope.tenant_id,
+            model.environment_id == scope.environment_id,
+            model.customer_id == customer_id,
+        )
+
+    steps = (
+        ("decisions", delete(PiDecision).where(*mine(PiDecision))),
+        ("rejections", delete(PiRejection).where(*mine(PiRejection))),
+        ("document_texts", delete(PiDocumentText).where(*mine(PiDocumentText))),
+    )
+    return await _run_steps(session, steps)
+
+
 async def erase_customer(
     session: AsyncSession, scope: WorkspaceScope, customer_id: UUID
 ) -> dict[str, Any]:
@@ -498,6 +524,7 @@ async def erase_customer(
                 last_message_preview=ERASED,
             )
         )
+    absorb(await _erase_memory_ledgers(session, scope, customer_id))
     absorb(await _erase_map_and_boxes(session, scope, customer_id))
     absorb(await _erase_workspace_texts(session, scope, customer_id, conversation_ids))
     absorb(await _erase_share_links(session, scope, conversation_ids))

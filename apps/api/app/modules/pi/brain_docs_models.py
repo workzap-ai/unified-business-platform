@@ -80,6 +80,16 @@ class PiBrainDocument(WorkspaceRow):
     review_notes: Mapped[str] = mapped_column(Text, default="", server_default="")
     # The rendered PDF kept as one of the customer's files, once approved.
     file_id: Mapped[UUID | None] = mapped_column(Uuid, nullable=True)
+    # Delivered and verified markers (migration 0055). Set ONLY by staff through
+    # `delivery_marker`, never by the model or the chat. Deferred: no ordinary read or write names
+    # them, so code deployed before 0055 keeps working.
+    delivered_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True), nullable=True, deferred=True
+    )
+    verified_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True), nullable=True, deferred=True
+    )
+    verified_by: Mapped[UUID | None] = mapped_column(Uuid, nullable=True, deferred=True)
 
     @property
     def ref(self) -> str:

@@ -67,6 +67,10 @@ class MessageItem:
 class LimitItem:
     text: str
     msg: str | None = None
+    status: str = ""  # "" or active: in force; superseded / withdrawn: history only
+    valid_from: str = ""
+    valid_to: str = ""
+    key: str = ""
 
 
 @dataclass(frozen=True, slots=True)
@@ -114,6 +118,8 @@ class ProblemItem:
     cause_text: str = ""
     cause_status: str = ""  # owner_said | confirmed | pi_inferred | "" (no cause)
     expected_outcome: str = ""
+    # constraints that stopped being true (superseded or withdrawn), with their validity
+    constraint_history: tuple[LimitItem, ...] = ()
 
     @property
     def ref(self) -> str:
@@ -152,6 +158,8 @@ class SolutionItem:
     currency: str = ""
     conversation_id: UUID | None = None
     reviewer_approved: bool = False
+    delivered_at: str = ""  # set only by staff (delivery_marker)
+    verified_at: str = ""
 
     @property
     def implemented(self) -> bool:
@@ -174,6 +182,8 @@ class FileItem:
     # empty; it is filled only when a text source is added later.
     text: str = ""
     text_available: bool = False
+    # references of the stored text ("page 3", "Sheet 2"), from pi_document_texts (E1)
+    text_refs: tuple[str, ...] = ()
 
 
 @dataclass(frozen=True, slots=True)
@@ -183,6 +193,9 @@ class RejectionItem:
     derived: bool  # True: found by a scan of owner messages (a reading, not a stored decision)
     problem_ref: str = ""
     at: str = ""
+    status: str = ""  # stored rejections: active | reversed | expired; "" for the older sources
+    source: str = ""  # the message the owner said it in ("msg:<id>"), when stored
+    reason: str = ""
 
 
 @dataclass(frozen=True, slots=True)
@@ -192,6 +205,9 @@ class DecisionItem:
     status: str  # pending | approved | declined | allowed | blocked | open | answered ...
     text: str = ""
     at: str = ""
+    source: str = ""  # the message the decision came from ("msg:<id>"), when stored
+    actor: str = ""  # owner | staff | pi, for a ledger decision
+    valid_to: str = ""  # set when superseded or withdrawn
 
 
 @dataclass(frozen=True, slots=True)

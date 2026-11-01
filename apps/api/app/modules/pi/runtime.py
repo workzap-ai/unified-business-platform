@@ -362,6 +362,18 @@ async def _keep_file(
     if saved is None:
         return
     message.media = {**message.media, "file_id": str(saved.id)}
+    if document:  # E1: the text of the document, with page references (brain mode only)
+        from app.modules.pi import document_texts
+        from app.modules.pi.configuration import settings_row
+
+        await document_texts.on_file_saved(
+            session,
+            scope,
+            customer_id=conversation.customer_id,
+            file_id=saved.id,
+            raw=content,
+            response_rules=(await settings_row(session, scope)).response_rules,
+        )
     await log_activity(
         session,
         scope,

@@ -55,6 +55,7 @@ from app.modules.pi import (
     map_share,
     memory_answer,
     memory_block,
+    memory_ledger,
     open_items,
     open_requests,
     option_voice,
@@ -1700,6 +1701,8 @@ async def brain_problems(
                     {
                         "source": r["source"],
                         "text": r["text"],
+                        "kind": r.get("kind", ""),  # what the chat listing needs to label it
+                        "status": r.get("status", ""),
                         "scope": {
                             k: r[k]
                             for k in ("tenant_id", "environment_id", "customer_id")
@@ -1720,6 +1723,10 @@ async def brain_problems(
                     "customer_id": str(memory.customer_id),
                 },
             }
+            # ideas the owner rejected and has not taken back: the idea filter never offers them
+            context["rejected_ideas"] = [
+                r.text for r in memory.rejections if not r.derived and r.ref.startswith("rej:")
+            ]
             states = {x.implementation_status for x in memory.solutions}
             context["implementation_status"] = (
                 "implemented"
@@ -3307,6 +3314,7 @@ async def brain_free_ideas(
             ],
         )
     idea_ctx = idea_filter.with_grounding(idea_ctx, str(context.get("profile_grounding") or ""))
+    idea_ctx = idea_filter.with_rejections(idea_ctx, context.get("rejected_ideas") or ())
     if context.get("thinking"):  # G10 (spec 17.4): the owner's stated size judges each idea
         idea_ctx = idea_filter.with_resources(idea_ctx, " ".join([*customer, said]))
     if (policy.response_rules.get("brain") or {}).get("idea_link") is True:  # G12, opt-in
@@ -3851,6 +3859,7 @@ async def apply_decision(
 
     box_rules = (await _box_rules(session, scope)).response_rules
     await box_lifecycle.on_decision(session, scope, conversation, decision, brief, box_rules)
+    await memory_ledger.on_decision(session, scope, conversation, decision, box_rules)
     now = datetime.now(UTC).isoformat()
     if "request_solution" in decision.effects and conversation.customer_id is not None:
         book = problems.ProblemBook(session, scope, conversation.customer_id, "en")

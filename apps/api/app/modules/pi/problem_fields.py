@@ -27,6 +27,7 @@ where the words around it give it away (best effort, see `third_party`), then cu
 
 import logging
 import re
+from datetime import UTC, datetime
 from typing import Any
 
 from app.modules.pi import safety, third_party
@@ -116,6 +117,18 @@ def _entry(text: Any, msg: str | None, changed: list[bool]) -> dict[str, str] | 
     return {"text": value, "msg": msg} if msg else {"text": value}
 
 
+def _ended(key: str, entry: dict[str, Any], msg: str | None, status: str) -> dict[str, Any]:
+    """A constraint that stopped being true, kept in the history with its validity: `superseded`
+    (a newer value replaced it) or `withdrawn` (the owner took it out), and when (`valid_to`)."""
+    return {
+        "key": key,
+        **entry,
+        "replaced_msg": msg or "",
+        "status": status,
+        "valid_to": datetime.now(UTC).isoformat(timespec="seconds"),
+    }
+
+
 def _same(a: str, b: str) -> bool:
     return a.casefold() == b.casefold()
 
@@ -153,7 +166,7 @@ def merge_constraints(
         entry = _entry(text, msg, changed)
         if entry and not _same(entry["text"], str((new.get(key) or {}).get("text", ""))):
             if (new.get(key) or {}).get("text"):  # a corrected value: the old one stays (G)
-                history.append({"key": key, **(new[key]), "replaced_msg": msg or ""})
+                history.append(_ended(key, new[key], msg, "superseded"))
             new[key] = entry
             touched = True
     kept: list[dict[str, str]] = [dict(e) for e in new.get("cannot_change") or [] if e.get("text")]
@@ -162,7 +175,7 @@ def merge_constraints(
         if ref.startswith("#") and ref[1:].isdigit():
             index = int(ref[1:]) - 1
             if 0 <= index < len(kept):
-                history.append({"key": "cannot_change", **kept[index], "replaced_msg": msg or ""})
+                history.append(_ended("cannot_change", kept[index], msg, "withdrawn"))
                 del kept[index]
                 touched = True
             continue
@@ -171,9 +184,7 @@ def merge_constraints(
         left = [e for e in kept if not _same(e["text"], text)]
         if text and len(left) != len(kept):
             history += [
-                {"key": "cannot_change", **e, "replaced_msg": msg or ""}
-                for e in kept
-                if _same(e["text"], text)
+                _ended("cannot_change", e, msg, "withdrawn") for e in kept if _same(e["text"], text)
             ]
             kept = left
             touched = True

@@ -158,6 +158,8 @@ class IdeaContext:
     tried: tuple[Any, ...] = ()  # what the owner already tried, with its outcome (PS-3 decides)
 
     needs_problem: bool = False  # G12 (spec v1.5, 18.4): no problem known, no idea at all
+    # ideas this owner rejected and has not taken back (pi_rejections): never offered again
+    rejected: tuple[str, ...] = ()
 
     def active(self) -> bool:
         return bool(self.subtype or self.cause or self.given or self.nodes)
@@ -320,6 +322,26 @@ def with_idea_link(ctx: IdeaContext | None) -> IdeaContext | None:
     return replace(ctx or IdeaContext(), needs_problem=True)
 
 
+def rejected_again(idea: str, rejected: Sequence[str]) -> str | None:
+    """"G7" when the idea is one the owner already rejected: the same wording, or most of its
+    content words found in a rejected idea. Memory, not a guess: the rejection is a stored row."""
+    from app.modules.pi import memory_ledger
+
+    mine = memory_ledger.idea_hash(idea)
+    if any(memory_ledger.idea_hash(old) == mine for old in rejected if old):
+        return "G7"
+    return repeats(idea, [old for old in rejected if old])
+
+
+def with_rejections(ctx: IdeaContext | None, rejected: Sequence[str]) -> IdeaContext | None:
+    """The context with the ideas the owner rejected (from `context["rejected_ideas"]`, read from
+    the ledger). With none, nothing changes."""
+    texts = tuple(t for t in (str(r).strip() for r in rejected or ()) if t)
+    if not texts:
+        return ctx
+    return replace(ctx or IdeaContext(), rejected=texts)
+
+
 def failures(idea: str, owner_words: str, ctx: IdeaContext | None = None) -> list[str]:
     """Rule ids of the filter that the idea breaks (empty when it passes). G1 and G2 always; G3,
     G4, G7 and G8 only with an `IdeaContext` that holds data."""
@@ -329,6 +351,8 @@ def failures(idea: str, owner_words: str, ctx: IdeaContext | None = None) -> lis
     found = [goal_conflict(idea, owner_words), invented_context(idea, grounded_words)]
     if ctx is not None and ctx.needs_problem and not any(n.strip() for n in ctx.nodes):
         found.append("G12")  # an idea must name a problem the owner stated; none is known yet
+    if ctx is not None and ctx.rejected:
+        found.append(rejected_again(idea, ctx.rejected))  # G7 on what the owner said no to
     if ctx is not None and ctx.resources:
         found.append(feasibility.check(idea, ctx.resources))  # G10
     if ctx is not None and ctx.industries:
