@@ -113,8 +113,12 @@ from app.modules.pi.language import (
     LATIN_WORD,
     NAMES,
     ROMAN_URDU,
+    UNWRITABLE,
     asked_language,
+    asks_for_english,
+    can_check,
     clearly_other,
+    declared_languages,
     detect_language,
     english_greeting,
     festival_wish,
@@ -2176,7 +2180,7 @@ def after_fixed_reply(turn: "ServiceTurn", context: dict[str, Any]) -> None:
 
 
 def review_draft(
-    turn: "ServiceTurn", context: dict[str, Any], lang: str, reply: str
+    turn: "ServiceTurn", context: dict[str, Any], lang: str, reply: str, owner_known: bool = True
 ) -> "self_review_types.DraftResult":
     """The PS-10 draft with every input the flow really holds: the retrieved context, the question
     the reply asks, what the owner already tried, the ideas that stay with their gate and relevance
@@ -2202,8 +2206,8 @@ def review_draft(
         for n, item in enumerate(turn._voice_items)
     )
     return self_review_types.DraftResult(
-        owner_language=lang,
-        owner_text=str(context.get("latest_customer_message") or ""),
+        owner_language=lang if owner_known else "",
+        owner_text=str(context.get("latest_customer_message") or "") if owner_known else "",
         reply_text=reply,
         context=self_review_types.ContextIn(
             retrieved=bool(memory), sources=sources, records_exist=bool(known) if memory else None
@@ -2240,6 +2244,11 @@ async def pre_send_guard(
     gets the gate's owner-language fallback instead, in the owner's script, and a first message
     still says pi is an AI. A check whose input the flow does not hand over is UNKNOWN and is not
     acted on."""
+    other_chat = str(context.get("reply_language_other") or "")
+    if other_chat and other_chat != "Urdu" and manager is not None:
+        # every reply of the turn is in the language the owner asked for or wrote, whoever wrote
+        # it (the model, a fixed line, a decision confirmation)
+        await ensure_requested_language(manager, scope, policy, conversation, turn, context)
     if turn._decision is not None or turn._cost_line or turn._summary:
         # Application-written replies (a decision's confirmation "you approve quote Q-0001 for PKR
         # 450,000", the cost answer, the sorted summary) are skipped: tried without this skip, SR-16
@@ -2247,7 +2256,12 @@ async def pre_send_guard(
         return
     lang = fixed_lines.code(context, script=True)
     lang = lang if lang in self_review_types.LANGS else "en"
-    report = self_review.review(review_draft(turn, context, lang, turn.reply))
+    # A language the self-review has no table for (Persian, Italian ...): its language check cannot
+    # tell, so it is UNKNOWN (never "English"), and the net above has already written the reply
+    foreign = bool(other_chat) and other_chat != "Urdu"
+    report = self_review.review(
+        review_draft(turn, context, lang, turn.reply, owner_known=not foreign)
+    )
     if report.verdict != self_review_types.INCOMPLETE:
         # COMPLETE is sent. BLOCKED (a critical check could not run: its input is not handed over
         # yet) is not acted on here and is never read as complete by the checks that did run.
@@ -2265,7 +2279,9 @@ async def pre_send_guard(
             turn.reply,
             self_review.LANG_NAMES[report.repair_arg],
         )
-        again = self_review.review(review_draft(turn, context, lang, written))
+        again = self_review.review(
+            review_draft(turn, context, lang, written, owner_known=not foreign)
+        )
         if again.verdict != self_review_types.INCOMPLETE:
             turn.reply = written
             return
@@ -2274,6 +2290,8 @@ async def pre_send_guard(
     if not fallback:
         return
     turn.reply = with_disclosure(fallback, context, lang)  # a first message still says pi is an AI
+    if foreign and manager is not None:
+        await ensure_requested_language(manager, scope, policy, conversation, turn, context)
     turn._voice_block = turn._voice_question = turn._voice_after = ""
     turn._voice_unmarked = ()
     turn.awaiting_customer = True
@@ -5037,6 +5055,49 @@ def _code_mixed(text: str) -> bool:
     return urdu >= 1 and english - urdu <= 1
 
 
+def requested_language(conversation: Any, ask: str | None, declared: list[str]) -> dict[str, str]:
+    """What the owner asked for ("talk in Italian", "فارسی بگو", "go back to English") or said they
+    can read ("just pashto and dari"). A language pi can write is remembered for the chat and drives
+    every reply, fixed lines included. A language it cannot write well (Pashto) is never claimed:
+    the context says so (`language_unsupported`) and pi answers in the first language it can write
+    that the owner named, else in English with an honest line."""
+    names = [ask] if ask else declared
+    brief = dict(getattr(conversation, "service_brief", None) or {})
+
+    def keep(name: str | None) -> None:
+        if conversation is None:
+            return
+        if name:
+            brief["requested_language"] = name
+        else:
+            brief.pop("requested_language", None)
+        conversation.service_brief = brief
+
+    if ask == "English":
+        keep(None)
+        return {"reply_language": "en", "reply_language_name": NAMES["en"]}
+    unsupported = next((n for n in names if n in UNWRITABLE), "")
+    writable = next((n for n in names if n not in UNWRITABLE), "")
+    result: dict[str, str] = {}
+    if writable:
+        keep(writable)
+        result["reply_language_other"] = writable
+    else:
+        result.update({"reply_language": "en", "reply_language_name": NAMES["en"]})
+    if unsupported:
+        result["language_unsupported"] = unsupported
+    return result
+
+
+def requested_still_holds(text: str, requested: str) -> bool:
+    """The remembered request still drives this message unless it is plainly written in another
+    script the owner switched to (Urdu, Arabic, Persian letters when Italian was asked for)."""
+    own = other_script(text)
+    if own and own != requested:
+        return False
+    return detect_language(text) not in ("ur", "ar") or requested == "Urdu"
+
+
 def reply_language(
     conversation: PiConversation,
     message: PiMessage,
@@ -5046,8 +5107,20 @@ def reply_language(
     """The language pi must answer in, from the customer's own latest words. Image and
     file descriptions are system English, so those fall back to the customer's last text."""
     texts = [message.body] if message.message_type in ("text", "audio") else []
-    if texts and (asked := asked_language(texts[0])):
-        return {"reply_language_other": asked}  # "Pakai bahasa Indonesia", "reply in French"
+    brief = getattr(conversation, "service_brief", None) or {}
+    requested = str(brief.get("requested_language") or "")
+    if texts:
+        ask = asked_language(texts[0])
+        if not ask and asks_for_english(texts[0]):
+            ask = "English"
+        declared = [] if ask else declared_languages(texts[0])
+        if ask or declared:
+            return requested_language(conversation, ask, declared)
+        if requested and requested_still_holds(texts[0], requested):
+            # one request drives every later reply of the chat until another language is asked for
+            return {"reply_language_other": requested}
+        if (other := latin_other(texts[0])) and other not in UNWRITABLE:
+            return {"reply_language_other": other}  # evident Latin-script language (Italian ...)
     if (
         texts
         and not detect_language(texts[0])
@@ -6431,6 +6504,58 @@ def greeting_reply(context: dict[str, Any]) -> str:
     return f"{hello} How can I help you today?"
 
 
+ASCII_DIGITS = str.maketrans("٠١٢٣٤٥٦٧٨٩۰۱۲۳۴۵۶۷۸۹", "01234567890123456789")
+
+LANGUAGE_FAILED_NOTE = (
+    "I could not write this in {language} just now, so this message is in English."
+)
+LANGUAGE_UNSUPPORTED_NOTE = {
+    "en": "I can't write {language} well enough to use it with you, so I won't pretend to. "
+    "I can write Persian (Dari), Urdu, Arabic, Hindi, French and Spanish, or English, "
+    "whichever suits you.",
+    "fa": "من پشتو را به اندازه کافی خوب نمی‌توانم بنویسم، پس وانمود نمی‌کنم. "
+    "به فارسی (دری) برایتان می‌نویسم.",
+}
+
+
+def digits_of(text: str) -> list[str]:
+    return re.findall(r"\d+", text.translate(ASCII_DIGITS))
+
+
+async def ensure_requested_language(
+    manager: Any,
+    scope: WorkspaceScope,
+    policy: Any,
+    conversation: PiConversation,
+    turn: "ServiceTurn",
+    context: dict[str, Any],
+    *,
+    strict: bool = True,
+) -> None:
+    """The language the owner asked for or wrote drives EVERY reply of the turn, fixed lines
+    included. A line that exists only in English (a notice, a question, a fallback) is written in
+    that language by the model; a rewrite that loses or changes a number (an emergency number) is
+    thrown away. When it still is not in their language, the reply says so honestly in English
+    rather than silently answering in an unrelated language."""
+    other = str(context.get("reply_language_other") or "")
+    if not other or not turn.reply.strip() or in_language(turn.reply, other):
+        return
+    if manager is not None:
+        fixed = await in_one_language(manager, scope, policy, conversation, turn.reply, other)
+        if (
+            fixed
+            and fixed != turn.reply
+            and digits_of(fixed) == digits_of(turn.reply)
+            and (not strict or in_language(fixed, other) or not can_check(other))
+        ):
+            turn.reply = fixed
+            return
+    if strict and can_check(other) and not in_language(turn.reply, other):
+        note = LANGUAGE_FAILED_NOTE.format(language=other)
+        if not turn.reply.startswith(note):
+            turn.reply = f"{note}\n\n{turn.reply}"
+
+
 async def in_their_language(
     manager: Any,
     scope: WorkspaceScope,
@@ -6440,15 +6565,25 @@ async def in_their_language(
     context: dict[str, Any],
 ) -> None:
     """A fixed line (an emergency, the PII reminder, a boundary, the greeting) that went out early
-    exists in English, Roman Urdu and Arabic only. For a person writing another language it is
-    rewritten into theirs, so it never stays in English unannounced. A rewrite that loses or changes
-    a number (an emergency number) is thrown away and the original stays."""
-    other = str(context.get("reply_language_other") or "")
-    if not other or not turn.reply.strip() or in_language(turn.reply, other):
+    exists in English, Roman Urdu and Arabic only (plus the eight fixed-line languages). For a
+    person writing another language it is rewritten into theirs, so it never stays in English
+    unannounced."""
+    await ensure_requested_language(
+        manager, scope, policy, conversation, turn, context, strict=False
+    )
+
+
+def language_notice(turn: "ServiceTurn", context: dict[str, Any]) -> None:
+    """A language the owner asked for that pi cannot write well (Pashto) is said honestly, in the
+    language the reply is written in, once, on the turn it was asked for."""
+    unsupported = str(context.get("language_unsupported") or "")
+    if not unsupported or not turn.reply.strip():
         return
-    fixed = await in_one_language(manager, scope, policy, conversation, turn.reply, other)
-    if re.findall(r"\d+", fixed) == re.findall(r"\d+", turn.reply):
-        turn.reply = fixed
+    persian = str(context.get("reply_language_other") or "") == "Persian"
+    table = LANGUAGE_UNSUPPORTED_NOTE["fa" if persian else "en"]
+    note = table.format(language=unsupported)
+    if note not in turn.reply:
+        turn.reply = f"{note}\n\n{turn.reply}"
 
 
 class ReplyOnlyTurn(BaseModel):
@@ -6538,6 +6673,18 @@ async def structured_turn(
 
 
 async def compose_service_turn(
+    manager: LLMManager,
+    scope: WorkspaceScope,
+    conversation: PiConversation,
+    policy: PiSettings,
+    context: dict[str, Any],
+) -> ServiceTurn:
+    turn = await compose_service_turn_inner(manager, scope, conversation, policy, context)
+    language_notice(turn, context)
+    return turn
+
+
+async def compose_service_turn_inner(
     manager: LLMManager,
     scope: WorkspaceScope,
     conversation: PiConversation,

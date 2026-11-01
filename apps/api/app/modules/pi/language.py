@@ -113,6 +113,16 @@ LATIN_OTHER: dict[str, frozenset[str]] = {
     "Spanish": frozenset(
         "ayuda cada clientes como con cómo de el en favor frecuencia gracias hola la las los mes mi mis muy necesito negocio no para pedidos pero por problema que quiero qué sí tengo tienda un una vale y".split()
     ),
+    "Italian": frozenset(
+        "che cosa come sono sei siamo non per con una uno il lo gli le della dello di da su mi ti ci aiuti aiuto"
+        " aiutare quale quali attivita attività lavoro grazie ciao buongiorno vorrei voglio devo fare compiti"
+        " va bene tutto anche ma molto perche perché sì negozio clienti problema italiano parli parlo"
+        " parlare puoi puo può dove quando quanto ordini".split()
+    ),
+    "Portuguese": frozenset(
+        "não nao você voce uma um os as do da dos das com para por que como obrigado obrigada olá ola bom dia"
+        " preciso quero tenho loja clientes pedidos problema ajuda mas muito também tambem sim estou está".split()
+    ),
     "German": frozenset(
         "aber bestellungen bin bitte danke das der die ein eine einen geschäft gut habe hallo hilfe ich ist ja kunden laden mein meine nein nicht oft problem sehr sie sind und verwechselt wie wir".split()
     ),
@@ -152,6 +162,40 @@ ASKED_LANGUAGE = re.compile(
     r"pashto|swahili|portuguese|italian|russian|chinese|japanese|korean)\b",
     re.IGNORECASE,
 )
+# "say it in Persian" in the person's own script, and the bare "<language> please" forms
+ASKED_NATIVE = re.compile(
+    "(?<![\u0600-\u06ff])(فارسی|فارسي|پارسی|دری|پشتو|پښتو|ایتالیایی)(?![\u0600-\u06ff])"
+)
+ASKED_NATIVE_NAMES = {
+    "فارسی": "Persian",
+    "فارسي": "Persian",
+    "پارسی": "Persian",
+    "دری": "Persian",
+    "پشتو": "Pashto",
+    "پښتو": "Pashto",
+    "ایتالیایی": "Italian",
+}
+ASKED_BARE = re.compile(
+    r"\b(indonesian?|malay|turkish|french|spanish|german|persian|farsi|dari|pashto|swahili|"
+    r"portuguese|italian|russian|chinese|japanese|korean)\s+(?:please|plz|pls|bolo|bol|boliye|bolein)\b",
+    re.IGNORECASE,
+)
+ASKED_ENGLISH = re.compile(
+    r"\b(?:(?:speak|talk|reply|write|answer|chat|switch|go back)\s+(?:to me\s+)?(?:back\s+)?(?:in|to)\s+english"
+    r"|english\s+(?:please|plz|pls))\b",
+    re.IGNORECASE,
+)
+# Languages the model cannot write well enough to be trusted with: pi says so and never claims to
+# write them (spec: never reply in a language it cannot write well, and say so honestly).
+UNWRITABLE = frozenset({"Pashto"})
+# A statement of what the person can read ("just pashto and dari", "I only know Urdu")
+DECLARES = re.compile(
+    r"(?:\b(?:just|only)\b|\bi\s+(?:can\s+)?(?:speak|know|understand|read|write)\b"
+    r"|\b(?:can\s*not|con\s+not|cannot|can't|cant|don't|dont|do not)\s+(?:\w+\s+)?"
+    r"(?:speak|speaking|know|understand|read|english)\b"
+    r"|\bmy language\b)",
+    re.IGNORECASE,
+)
 ASKED_NAMES = {
     "indonesian": "Indonesian",
     "indonesia": "Indonesian",
@@ -175,16 +219,47 @@ ASKED_NAMES = {
 
 
 def asked_language(text: str | None) -> str | None:
-    """A language the person asks pi to use ("Pakai bahasa Indonesia", "reply in French")."""
-    found = ASKED_LANGUAGE.search(text or "")
-    return ASKED_NAMES.get(found.group(1).lower()) if found else None
+    """A language the person asks pi to use ("Pakai bahasa Indonesia", "reply in French", "farsi
+    please", "فارسی بگو")."""
+    text = text or ""
+    found = ASKED_LANGUAGE.search(text) or ASKED_BARE.search(text)
+    if found:
+        return ASKED_NAMES.get(found.group(1).lower())
+    native = ASKED_NATIVE.search(text)
+    return ASKED_NATIVE_NAMES.get(native.group(1)) if native else None
+
+
+def asks_for_english(text: str | None) -> bool:
+    """ "Talk in English please", "go back to English": ends an earlier request for another language."""
+    return bool(ASKED_ENGLISH.search(text or ""))
+
+
+def declared_languages(text: str | None) -> list[str]:
+    """The languages a person says they speak or read, in the order named ("I con not English
+    speaking. just pashto and dari" gives Pashto, Persian). Empty when the text declares nothing."""
+    text = text or ""
+    if not DECLARES.search(text):
+        return []
+    names: list[str] = []
+    for word in re.findall(r"[a-z]+", text.lower()):
+        name = ASKED_NAMES.get(word)
+        if name and name not in names:
+            names.append(name)
+    return names
 
 
 def in_script(text: str | None, name: str) -> bool:
     """The text is written mostly in that other language's script (a reply is checked with this)."""
-    pattern = dict(OTHER_SCRIPTS).get(name) or (ARABIC_SCRIPT if name == "Urdu" else None)
+    pattern = dict(OTHER_SCRIPTS).get(name) or (
+        ARABIC_SCRIPT if name in ("Urdu", "Persian") else None
+    )
     letters = len(re.findall(r"[^\W\d_]", text or ""))
     return pattern is not None and len(pattern.findall(text or "")) * 2 >= letters
+
+
+def can_check(name: str) -> bool:
+    """pi can tell whether a text is written in that language (a script or word list exists)."""
+    return name in LATIN_OTHER or name == "Urdu" or name in dict(OTHER_SCRIPTS) or name == "Persian"
 
 
 NAMES = {
@@ -316,7 +391,9 @@ def detect_language(text: str | None) -> str | None:
         return "roman_ur"  # Hindi (Devanagari) is understood and answered in Roman Urdu
     if arabic > latin:
         if URDU_LETTERS.search(text) or urdu_words(text):
-            return "ur"  # Urdu script: answered in Urdu script, never in Roman letters (spec 2.5, G7)
+            return (
+                "ur"  # Urdu script: answered in Urdu script, never in Roman letters (spec 2.5, G7)
+            )
         return None if PERSIAN_LETTERS.search(text) else "ar"
     words = LATIN_WORD.findall(text.lower())
     if len(words) <= 2 and set(words) <= BORROWED_ANSWERS:

@@ -154,6 +154,12 @@ def code(context: dict[str, Any], *, script: bool = False) -> str:
     other = CODES.get(str(context.get("reply_language_other") or ""))
     if other:
         return other
+    if context.get("reply_language_other"):
+        # A language the owner asked for or wrote that has no fixed line here (Italian, German,
+        # Korean ...): the English line is the base text and the turn's language net writes it in
+        # their language (service_conversation.ensure_requested_language). Never the language
+        # detector's guess, which would answer Italian in Roman Urdu.
+        return "en"
     decision = context.get("language_decision")
     if isinstance(decision, dict) and not decision.get("uncertain"):
         key = str(decision.get("key") or "")
