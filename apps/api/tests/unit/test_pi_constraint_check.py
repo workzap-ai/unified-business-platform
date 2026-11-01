@@ -2607,3 +2607,42 @@ def test_the_touch_words_are_the_price_group_and_cover_it_in_a_longer_limit():
     assert check("Scrap the combo deal", cannot=["prices are fixed"]).status == "violates"
     assert check("Scrap the combo deal", cannot=["our menu prices are fixed"]).status == "unknown"
     assert not hasattr(cc, "TOUCH_WORDS")
+
+
+COURIER_LIMIT = ["we cannot change courier because of the contract"]
+
+
+@pytest.mark.parametrize(
+    "option",
+    [
+        "أرسل للمشتري تتبع التوصيل عند خروج الطرد.",  # Arabic: send the buyer the delivery tracking
+        "پارسل کے ساتھ خریدار کو ڈیلیوری کی ٹریکنگ بھیجیں۔",  # Urdu
+        "खरीदार को डिलीवरी की ट्रैकिंग भेजें",  # Hindi
+        "send the customer tracking",
+        "Send the buyer the delivery tracking",
+        "Tell customers when the parcel leaves",
+        "Share the tracking line with the buyer",
+        "customer ko tracking bhejein",
+        "buyer ko delivery ki tracking bhejein",
+    ],
+)
+def test_a_safe_verb_on_a_delivery_word_never_violates_a_courier_limit(option):
+    v = check(option, cannot=COURIER_LIMIT)
+    assert v.status in {"ok", "unknown"}, (option, v)
+
+
+def test_the_arabic_parcel_word_is_not_a_dismissal():
+    assert cc.scripts._lookup(cc.norm("الطرد"), cc.SCRIPT_TABLE) is None
+    assert cc.scripts._lookup(cc.norm("فصل"), cc.SCRIPT_TABLE) == "fire"
+
+
+def test_a_script_option_with_an_unread_word_or_only_a_synonym_match_is_never_rejected_by_subject():
+    limit = ["we cannot change courier"]
+    # a word of the option is not read: unknown, even though a change verb meets the subject
+    assert check("غيّر شركة الشحن اليوم بسرعة", cannot=limit).status in {"unknown", "violates"}
+    option = cc._option("نقل التوصيل ببطء شديد")
+    assert option.foreign and option.unread
+    assert check("نقل التوصيل ببطء شديد", cannot=limit).status != "violates"
+    # fully read, the same word as the limit's, a known change verb: rejected
+    assert check("courier بدلیں", cannot=limit).status == "violates"
+    assert check("Switch the courier", cannot=limit).status == "violates"

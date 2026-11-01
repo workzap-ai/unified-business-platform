@@ -913,6 +913,7 @@ class _Option:
     tokens: list[Tok]
     latin: bool
     unread: int = 0  # words in another script that the reading tables do not know
+    foreign: bool = False  # read through the Urdu, Arabic or Hindi tables
 
 
 def _option(text: str) -> _Option:
@@ -933,7 +934,11 @@ def _option(text: str) -> _Option:
     # these languages put the verb last: the marker makes every verb read the words before it
     marked = re.sub(r"([;:!?.\n])", r" karein \1", mapped) + " karein"
     return _Option(
-        mapped, tokens_of(lex.strip_leads(lex.take_on_as_hire(marked))), readable, unread
+        mapped,
+        tokens_of(lex.strip_leads(lex.take_on_as_hire(marked))),
+        readable,
+        unread,
+        foreign=True,
     )
 
 
@@ -1576,6 +1581,7 @@ def _subject_rule(option: _Option, clause_text: str, closure: bool = False) -> V
     if not words_of_subject:
         return _unknown(rule, "the limit names no subject this check can read")
     subject = set().union(*words_of_subject)
+    limit_words = set(_WORD.findall(norm(clause_text)))
     need = len(words_of_subject) if len(words_of_subject) <= 2 else (len(words_of_subject) + 1) // 2
     change_set = CLOSURE_VERBS if closure else None
     safe_set = BENIGN_VERBS | (CLOSURE_SAFE if closure else frozenset())
@@ -1613,6 +1619,16 @@ def _subject_rule(option: _Option, clause_text: str, closure: bool = False) -> V
         covered = need if carried else sum(1 for k in words_of_subject if k & clause_keys)
         shown = tuple(t.word for k, t in enumerate(clause) if k in hits)[:3] or (words[0],)
         if decision == "change" and covered >= need:
+            exact = any(clause[k].word in limit_words for k in hits)
+            if option.foreign and (option.unread or not exact):
+                # read through the tables, with an unread word or only a stem or synonym match:
+                # never a rejection, only "not checked"
+                answer = answer or _unknown(
+                    rule,
+                    "the option may change what the owner fixed; it was not read closely enough",
+                    shown,
+                )
+                continue
             return _violates(rule, "the option changes what the owner said cannot change", shown)
         if decision == "change":
             answer = answer or _unknown(

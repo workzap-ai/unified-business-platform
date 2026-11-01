@@ -51,7 +51,7 @@ _ARABIC = """
 شراء=buy اشتري=buy اشتر=buy انفاق=spend اغلاق=close اغلق=close
 تغيير=change غير=change استبدال=replace استبدل=replace بدل=replace
 رفع=raise زيادة=raise خفض=cut تخفيض=cut تقليل=cut
-سعر=price اسعار=prices توصيل=delivery فصل=fire طرد=fire ايقاف=stop وقف=stop
+سعر=price اسعار=prices توصيل=delivery فصل=fire ايقاف=stop وقف=stop
 افتح=open فتح=open اضافة=add اضف=add جديد=new جديدة=new اكثر=more مزيد=more
 لا=not لن=not ليس=not عدم=not تجنب=avoid قيم=check اختبر=check افحص=check تحقق=check تقييم=check
 نظام=system تطبيق=app برنامج=software متجر=shop فرع=branch

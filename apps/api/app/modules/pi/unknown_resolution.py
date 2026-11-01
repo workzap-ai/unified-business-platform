@@ -133,6 +133,7 @@ _REASON_CODES: tuple[tuple[str, Code], ...] = (
     ("no figure in the budget text", Code.BUDGET_NO_FIGURE),
     ("staff limit could not be read", Code.STAFF_LIMIT_UNREADABLE),
     ("the deadline is not a duration", Code.DEADLINE_UNREADABLE),
+    ("the figures add up above the budget and not all could be attributed", Code.BUDGET_NO_FIGURE),
     ("in another currency", Code.CURRENCY_MISMATCH),
     ("covers another period", Code.PERIOD_MISMATCH),
     ("could not be attributed", Code.FIGURE_UNATTRIBUTED),
@@ -158,6 +159,7 @@ _REASON_CODES: tuple[tuple[str, Code], ...] = (
     ("the limit names no subject this check can read", Code.LIMIT_VAGUE),  # L2-1 round 8
     ("the option changes something this check cannot identify", Code.OPTION_EXPANDS),
     ("no safe verb is what acts on it", Code.VERB_UNENFORCED),
+    ("it was not read closely enough", Code.VERB_UNENFORCED),
     ("no verb it recognises leaves it as it is", Code.VERB_UNENFORCED),
     ("the owner has no budget and nothing shows", Code.BUDGET_NOT_STATED),
     ("too long to be read", Code.OPTION_TOO_LONG),
