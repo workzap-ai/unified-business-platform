@@ -107,7 +107,7 @@ async def test_a_cause_the_owner_said_in_the_burst_is_owner_said_through_the_tur
         api,
         business_db,
         monkeypatch,
-        ["mera competitor sasta hai", "bikri kam ho gayi hai"],
+        ["mera khayal hai ke mera competitor sasta hai", "bikri kam ho gayi hai"],
         "competitor",
     )
     assert statuses == ["owner_said"]
@@ -147,7 +147,7 @@ async def test_owner_text_is_the_owners_earlier_and_latest_words_only(
     ).first()
     text = await sc.owner_text_for(business_db, pi.scope(), conv, last)
     assert sorted(text.splitlines()) == sorted(
-        ["mera competitor sasta hai", "bikri kam ho gayi hai"]
+        ["mera khayal hai ke mera competitor sasta hai", "bikri kam ho gayi hai"]
     )
     await pi.close()
 
@@ -223,7 +223,7 @@ async def test_the_owner_takes_a_cause_back_through_the_turn(api, business_db, m
             problem_ops=ops,
         ),
     )
-    await bp.say(pi, "mera competitor sasta hai aur bikri kam hai", "wd-0")
+    await bp.say(pi, "mera khayal hai ke mera competitor sasta hai aur bikri kam hai", "wd-0")
     conv = await pi.conversation()
     await db.refresh(conv)
     scope = pi.scope()

@@ -2872,6 +2872,7 @@ def _ensure_next_step(reply: str, context: dict[str, Any]) -> str:
         or not latest
         or not any(h.get("role") == "ai" for h in history)
         or context.get("solution_asked")
+        or context.get("fixed_no_idea")
         or context.get("handback_notice")
         or "•" in reply
         # a reply about a document or quote that already asks keeps its own question; one that

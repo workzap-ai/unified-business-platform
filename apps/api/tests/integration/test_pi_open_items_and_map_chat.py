@@ -263,11 +263,6 @@ async def test_solved_parked_and_first_are_applied_with_a_revision_and_the_reply
     await pi.close()
 
 
-@pytest.mark.xfail(
-    strict=True,
-    reason="production bug, docs/pi-saas/pi-existing-failures.md #2: the 'which problem' line "
-    "has the digit in 'P2' and the no-price guard rejects it, so the owner gets a bare ack",
-)
 async def test_when_it_cannot_tell_which_problem_pi_asks_one_question(
     api, business_db, monkeypatch
 ):

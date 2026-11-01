@@ -348,6 +348,7 @@ class ServiceTurn(BaseModel):
     _voice_unmarked: tuple[int, ...] = PrivateAttr(default=())  # ideas not yet checked
     _voice_language: str = PrivateAttr(default="en")
     _voice_items: tuple[dict[str, Any], ...] = PrivateAttr(default=())
+    _voice_pending: dict[str, Any] | None = PrivateAttr(default=None)  # the question asked
     _voice_pick: str = PrivateAttr(
         default=""
     )  # the idea the chat recommends (kept for the document)
@@ -2234,6 +2235,8 @@ def brain_option_voice(turn: "ServiceTurn", context: dict[str, Any]) -> None:
     ones are removed, unchecked ones are labelled, and the owner reads, in their language, which
     idea to start with and why, what was left out and which of their own words ruled it out, and the
     one question that would settle what blocks. Brain mode, ideas listed, requirements known."""
+    if turn._summary or turn._decision is not None:
+        return  # the sorted summary lists the owner's problems (bullets), not ideas: it leads alone
     reqs = option_wiring.requirements_from(context.get("requirements"))
     language = fixed_lines.code(context, script=True)  # "ur" for Urdu script, "ar" for Arabic
     # gated on the reply as it stands (English ideas are read best); the labels, the fixed block and
@@ -3431,7 +3434,7 @@ NO_IDEA_LINES = {  # noqa: E501
     # Sentence one answers a direct "what can you do about it?" (spec 17.5, EO3, v1.6 19.3): pi can
     # work on it with them, and honestly has no quick idea yet; then at most one question.
     "en": "I can work through this with you, though I have no quick idea to give yet. What have you tried so far?",  # noqa: E501
-    "roman_ur": "Is par saath mil kar kaam ho sakta hai, lekin abhi mere paas koi chhota idea nahi. Ab tak aap ne kya aazmaya hai?",  # noqa: E501
+    "roman_ur": "Is par hum saath soch sakte hain, lekin abhi mere paas koi chhota idea nahi. Ab tak aap ne kya aazmaya hai?",  # noqa: E501
     "ur": "اس پر مل کر کام ہو سکتا ہے، لیکن ابھی میرے پاس کوئی مختصر خیال نہیں۔ اب تک آپ نے کیا آزمایا ہے؟",  # noqa: E501
     "ar": "يمكننا العمل على هذا معا، لكن ليست لدي فكرة سريعة الآن. ما الذي جربته حتى الآن؟",  # noqa: E501
 }
@@ -3520,6 +3523,7 @@ def brain_no_ideas(turn: "ServiceTurn", context: dict[str, Any]) -> None:
         if any(line in said for said in told[-6:]):
             line = NO_IDEA_THIRD.get(language, NO_IDEA_THIRD["en"])
     turn.reply = with_disclosure(line, context, language)
+    context["fixed_no_idea"] = True  # an honest fixed line: the next-step rewrite leaves it whole
     after_fixed_reply(turn, context)
     turn.awaiting_customer = True
 

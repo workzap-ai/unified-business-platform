@@ -267,7 +267,7 @@ def test_no_idea_for_the_problem_is_said_plainly() -> None:
     )
     # re-audit: no document is named while listening; the line asks what they tried (one question)
     # sentence one answers a direct "what can you do?" (spec 17.5, EO3), not a bare "Ji."
-    assert turn.reply.startswith("Is par saath mil kar kaam ho sakta hai")
+    assert turn.reply.startswith("Is par hum saath soch sakte hain")
     assert "solution document" not in turn.reply
     assert turn.reply.count("?") == 1 and turn.reply.rstrip().endswith("?")
 
