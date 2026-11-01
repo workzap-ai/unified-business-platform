@@ -69,6 +69,7 @@ from app.modules.pi import (
     problem_fields,
     problems,
     quote_facts,
+    rejection_same_turn,
     reply_gates,
     reply_layout,
     reply_voice,
@@ -1691,6 +1692,17 @@ async def brain_problems(
         # PS-8: everything pi already knows about this owner, read once per turn (read only, scoped
         # by tenant, environment and customer); it feeds the one question, the "we already have"
         # line and the implementation status wording
+        if message is not None:
+            # an idea rejected in this very message is written now, not by the nightly run
+            earlier_reply = next((m.body or "" for m in rows or [] if m.sender_type == "ai"), "")
+            await rejection_same_turn.record_same_turn(
+                session,
+                scope,
+                customer_id=conversation.customer_id,
+                message=message,
+                previous_reply=earlier_reply,
+                response_rules=policy.response_rules,
+            )
         memory = await context_memory.build_context(
             session,
             scope,

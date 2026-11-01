@@ -615,3 +615,67 @@ async def test_scanned_pages_and_a_staff_upload_are_stored_scoped_and_erased(api
     assert removed["document_texts"] == added + n
     assert await rows(business_db, PiDocumentText, scope, cid) == []
     await pi.close()
+
+
+# --------------------------------------------------------------------------- same-turn rejection
+async def test_a_rejection_is_written_in_the_same_turn_and_taken_back(api, business_db):
+    from app.modules.pi import rejection_same_turn
+
+    pi, conv, scope, message = await workspace(api, business_db, "111111199")
+    reply = "Here is an idea:\n• Send every customer a reminder the day before.\nDoes that fit?"
+    owner = SimpleNamespace(id=message.id, body="no, not that, it won't work for us")
+    done = await rejection_same_turn.record_same_turn(
+        business_db,
+        scope,
+        customer_id=conv.customer_id,
+        message=owner,
+        previous_reply=reply,
+        response_rules=BRAIN,
+    )
+    assert done == "rejected"
+    found = await rows(business_db, PiRejection, scope, conv.customer_id)
+    assert [r.status for r in found] == ["active"]
+    assert found[0].owner_words.startswith("no, not that")
+    assert "reminder" in found[0].idea_text
+    assert await memory_ledger.rejected_ideas(business_db, scope, conv.customer_id)
+    # not brain mode: nothing is written
+    other = SimpleNamespace(id=uuid4(), body="no, not that")
+    assert (
+        await rejection_same_turn.record_same_turn(
+            business_db,
+            scope,
+            customer_id=conv.customer_id,
+            message=other,
+            previous_reply=reply,
+            response_rules={},
+        )
+        == ""
+    )
+    # a take-back reverses it, the row is kept
+    back = SimpleNamespace(id=uuid4(), body="actually yes, let's do that")
+    assert (
+        await rejection_same_turn.record_same_turn(
+            business_db,
+            scope,
+            customer_id=conv.customer_id,
+            message=back,
+            previous_reply=reply,
+            response_rules=BRAIN,
+        )
+        == "reversed"
+    )
+    found = await rows(business_db, PiRejection, scope, conv.customer_id)
+    assert [r.status for r in found] == ["reversed"]
+    assert not await memory_ledger.rejected_ideas(business_db, scope, conv.customer_id)
+    # the erase removes the rows
+    await rejection_same_turn.record_same_turn(
+        business_db,
+        scope,
+        customer_id=conv.customer_id,
+        message=SimpleNamespace(id=uuid4(), body="dusra batao"),
+        previous_reply=reply,
+        response_rules=BRAIN,
+    )
+    assert await rows(business_db, PiRejection, scope, conv.customer_id)
+    await brain_erase.erase_customer(business_db, scope, conv.customer_id)
+    assert not await rows(business_db, PiRejection, scope, conv.customer_id)
