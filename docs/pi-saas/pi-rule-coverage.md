@@ -189,3 +189,17 @@ no-idea line, one question last (19.7 forbids the old summary fallback).
 ## B2a (migration 0053) known gaps
 
 | B2a (migration 0053) | third-party names inside constraints, tried and cause text are best effort (`third_party.protect` has documented false negatives); `owner_said` for a cause is unreachable until `service_conversation.note_problems` passes the owner's message as `owner_text` (a 1-2 line follow-up there, once the lane that owns that file has merged): the evidence corpus is only `owner_text`, so today every cause is `pi_inferred` (fail closed) | `problem_fields.merge_cause`, `said_by_owner` | `test_pi_problem_fields.py`, `test_pi_problem_requirements_db.py` | open: wiring |
+
+## specrules2 (2026-11-01): soft checks and PS-7, brain mode only
+
+All in `apps/api/app/modules/pi/spec_rules2.py`, tests in `tests/unit/test_pi_spec_rules2.py`. Each check is SOFT: it only asks for one rewrite (the `part18_problem` reasons), it never blocks a send.
+
+| Rule | State | What is enforced, what is not |
+|---|---|---|
+| G11 / TS7 / A414 / A53 / 17.3-N noAssumedIndustry | PARTIAL | no trade noun in a reply while `industry_unconfirmed` (detector `industry_reply_gate`); hand-written lexicon, no fallback line after a second failure |
+| PS-7 owner-said links | PARTIAL | a link the owner stated in their own words (graph-verified, not hedged) is stored `owner_said`; a model link op is never `owner_said`; Hindi has no graph connectives so it stays `pi_inferred`; no integration test yet (needs the disposable database) |
+| PS-7 into PS-4 | PARTIAL | the blueprint gets the graph's possible causes as `pi_inferred`, labelled as pi's own guess; the learn-first and coverage caveat is not added |
+| DQ1 | PARTIAL | "do you know my business" with nothing known: first sentence "not yet", then the link is asked |
+| EO2 / A510 | PARTIAL | an owner correction is owned in the first clause (sorry, my mistake, you are right) |
+
+Left prompt-only (no precise rule without an owner decision or a migration): EO3 for every other direct question, BT2 (needs a runtime change in the hot path), PR5 and 19.4-d (fixed category set, a taxonomy decision), BD2 (one stored list, new store), ROFFER07, RPROM02/03 wording, OT9/OT10.

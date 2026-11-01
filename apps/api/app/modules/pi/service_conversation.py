@@ -87,6 +87,7 @@ from app.modules.pi import (
     solution_score,
     solutions,
     spec_handbook,
+    spec_rules2,
     style,
     system_ask,
     taxonomy,
@@ -5491,6 +5492,9 @@ def part18_problem(reply: str, context: dict[str, Any]) -> str | None:
         reply_gates.closed_list_early(reply, owner, known),
         part19.dead_end(reply),  # spec v1.6 19.6
         part19.number_used(reply, owner[-1] if owner else ""),  # spec v1.6 19.5
+        spec_rules2.assumed_industry(reply, context),  # spec v1.6 G11 noAssumedIndustry
+        spec_rules2.know_business_problem(reply, context),  # spec v1.6 19.3 DQ1
+        spec_rules2.correction_not_owned(reply, context),  # spec v1.6 18.8 EO2
     ]
     if context.get("fact_ask"):  # off unless the workspace sets brain.fact_ask to true
         said = [

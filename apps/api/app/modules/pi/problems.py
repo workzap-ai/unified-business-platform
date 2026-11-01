@@ -24,6 +24,7 @@ from app.modules.pi import (
     figure_correction,
     part19,
     problem_fields,
+    spec_rules2,
     taxonomy,
     tried_outcome,
 )
@@ -993,6 +994,52 @@ async def _taxonomy_review(
     )
 
 
+async def _owner_said_links(
+    session: AsyncSession,
+    scope: WorkspaceScope,
+    book: "ProblemBook",
+    result: "Applied",
+    owner_text: str,
+    language: str,
+) -> None:
+    """PS-7: a link the owner stated in their own words is stored with evidence `owner_said`
+    (verified by the graph, never by a model op); a pi guess stays `pi_inferred`. Only problems
+    touched this turn are paired, so an old link is never rewritten by a later message."""
+    touched = result.touched
+    if not touched:
+        return
+    active = [p for p in await book.active()]
+    records = [
+        {"id": str(p.id), "title": p.title, "user_words": list(p.user_words or [])} for p in active
+    ]
+    for cause_id, effect_id in spec_rules2.owner_said_links(records, [owner_text], language):
+        if UUID(cause_id) not in touched and UUID(effect_id) not in touched:
+            continue
+        link = await session.scalar(
+            select(PiProblemLink).where(
+                PiProblemLink.tenant_id == scope.tenant_id,
+                PiProblemLink.environment_id == scope.environment_id,
+                PiProblemLink.from_id == UUID(cause_id),
+                PiProblemLink.to_id == UUID(effect_id),
+                PiProblemLink.type == "causes",
+            )
+        )
+        if link is None:
+            link = PiProblemLink(
+                tenant_id=scope.tenant_id,
+                environment_id=scope.environment_id,
+                from_id=UUID(cause_id),
+                to_id=UUID(effect_id),
+                type="causes",
+                confidence=Decimal("0.8"),
+                evidence="owner_said",
+            )
+            session.add(link)
+            result.links.append(link)
+        elif link.evidence == "pi_inferred":
+            link.evidence = "owner_said"  # upgraded: never the other way round
+
+
 async def apply_ops(
     session: AsyncSession,
     scope: WorkspaceScope,
@@ -1094,6 +1141,8 @@ async def apply_ops(
                 result.rejected.append(f"{op.op}:{op.ref or op.note and op.note.title or ''}")
         except ValueError:
             result.rejected.append(op.op)
+    if owner_text:
+        await _owner_said_links(session, scope, book, result, owner_text, language)
     if figure_fix is not None:
         wrong, right = figure_fix
         holders = [
