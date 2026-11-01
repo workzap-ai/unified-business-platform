@@ -2777,7 +2777,7 @@ def ideas_opener(context: dict[str, Any]) -> str:
     if solution_ask.churn_risk(said):
         return "No pressure at all. Here are two ideas:" + chr(10)  # G18
     if solution_ask.impatient(said):
-        return "Here are two ideas:" + chr(10)  # no "sorry about the wait" unless a delay is known
+        return "Sorry about the wait. Here are two ideas:" + chr(10)  # Book 4 G27: "Maazrat"
     return "Here are some ideas for you:" + chr(10)
 
 
@@ -2958,7 +2958,7 @@ def roman_polish(reply: str) -> str:
 
 ROMAN_OPENER = {
     "normal": "Ji, ye do ideas abhi aazma sakte hain:",
-    "impatient": "Ye do ideas hain:",
+    "impatient": "Maazrat. Ye do ideas hain:",
     "churn": "Koi dabao nahi. Ye do ideas hain:",
     "wrong": "Maazrat, wo aap ke masle se mel nahi khate. Ye do naye ideas hain:",
 }

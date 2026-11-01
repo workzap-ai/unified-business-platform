@@ -94,11 +94,6 @@ def test_the_unchecked_caveat_follows_the_ideas_never_leads():
     assert none.after == ""  # no ideas shown: no caveat
 
 
-def test_no_filler_sorry_about_the_wait_before_ideas():
-    ctx = {"latest_customer_message": "jaldi karo, give me ideas fast", "history": []}
-    assert "Sorry about the wait" not in sc.ideas_opener(ctx)
-
-
 def test_no_problem_noted_means_no_ideas_at_all_only_the_one_question():
     ideas = f"Sorry about the wait. Here are two ideas:\n{BUL}Notice which task you keep putting off.\n{BUL}Write down the three things that worry you."
     turn = sc.ServiceTurn(reply=ideas)

@@ -133,7 +133,7 @@ def test_urdu_and_arabic_linked_ideas_are_kept_and_unchecked_ones_are_labelled(l
     # the L2-1 gate reads English and Roman Urdu only, so the idea stays labelled as not yet checked
     assert r.accepted == 0 and r.unknown == 1
     assert ov.T[lang]["label"] in ov.label_ideas(r.reply, r.unmarked, lang)
-    assert ov.T[lang]["unknown"] in r.block
+    assert ov.T[lang]["unknown"] in r.after  # the caveat follows the ideas
 
 
 def test_block_is_not_linted_as_a_promise():
