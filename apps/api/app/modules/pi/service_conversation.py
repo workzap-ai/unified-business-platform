@@ -2311,15 +2311,18 @@ def brain_option_voice(turn: "ServiceTurn", context: dict[str, Any]) -> None:
         ),
         scope=(context.get("memory") or {}).get("scope"),
     )
-    if voiced.question and voiced.pending:
-        if scope_q := scope_first.scope_question(
-            str(voiced.pending.get("key") or ""),
-            owner_said,
-            bool(brief_now.get("scope_asked")),
-            language,
-        ):
-            voiced.question, voiced.pending, voiced.changed = scope_q, None, True
-            turn._scope_asked = True
+    if scope_q := scope_first.scope_question(
+        str((voiced.pending or {}).get("key") or ""),
+        owner_said,
+        bool(brief_now.get("scope_asked")),
+        language,
+        has_ideas=option_voice.has_ideas(voiced.reply),
+    ):
+        # a whole-system ask: its requirements come first, not quick workarounds or a budget
+        voiced.reply = scope_first.without_ideas(voiced.reply)
+        voiced.block, voiced.after, voiced.unknown = "", "", 0
+        voiced.question, voiced.pending, voiced.changed = scope_q, None, True
+        turn._scope_asked = True
     heard = str((context.get("memory") or {}).get("already_known") or "")
     if heard and voiced.changed and (voiced.question or voiced.unknown):
         voiced.block = f"{heard}{chr(10)}{voiced.block}".strip()

@@ -30,6 +30,17 @@ def test_no_system_ask_keeps_the_money_question():
     )
 
 
+def test_free_ideas_make_way_for_the_scope_question_on_a_system_ask():
+    assert scope_first.scope_question("", [SYSTEM], False, "en", has_ideas=True)
+    assert scope_first.scope_question("", [SYSTEM], False, "en", has_ideas=False) is None
+
+
+def test_without_ideas_drops_the_bullets_and_their_lead_in_only():
+    lines = ["Here are some ideas for you:", "• Send every tenant a message.", "• Ask for proof.", "SH it is."]
+    reply = "\n".join(lines)
+    assert scope_first.without_ideas(reply) == "SH it is."
+
+
 def test_other_questions_are_never_replaced():
     assert scope_first.scope_question("tried_outcome", [SYSTEM], False, "en") is None
 
