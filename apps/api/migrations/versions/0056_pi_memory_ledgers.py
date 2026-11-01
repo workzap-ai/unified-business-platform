@@ -1,7 +1,7 @@
 """pi memory ledgers: decisions, rejections, document texts, delivered and verified markers
 
-Revision ID: 0055_pi_memory_ledgers
-Revises: 0054_payment_idempotency
+Revision ID: 0056_pi_memory_ledgers
+Revises: 0055_pi_execution_runs
 
 docs/pi-saas/pi-memory-entities-and-lifecycle.md, E1 to E3 and E6b (marker only). Additive only:
 
@@ -17,7 +17,7 @@ Nothing is backfilled and nothing existing is renamed, dropped or retyped. The n
 the new columns are catalogue-only (nullable, no default). Code does not read any of it unless the
 workspace is in pi_mode "brain", and the readers tolerate the tables being absent.
 
-Order of deployment: apply 0055 BEFORE deploying the code, or after: the readers are guarded (an
+Order of deployment: apply 0056 BEFORE deploying the code, or after: the readers are guarded (an
 undefined table or column is reported as "unavailable", the writers run in a savepoint).
 Locks: CREATE TABLE takes none on existing tables; the composite foreign keys take a brief SHARE ROW
 EXCLUSIVE lock on the referenced tables (customers, pi_problems, customer_files, environments);
@@ -29,8 +29,8 @@ lost); or revert the code and leave them.
 import sqlalchemy as sa
 from alembic import op
 
-revision = "0055_pi_memory_ledgers"
-down_revision = "0054_payment_idempotency"
+revision = "0056_pi_memory_ledgers"
+down_revision = "0055_pi_execution_runs"
 branch_labels = None
 depends_on = None
 

@@ -49,8 +49,8 @@ def _text(value: Any) -> str:
 
 def _ended(value: Mapping[str, Any]) -> bool:
     """True when the stored limit is no longer in force: withdrawn or superseded by its status, or
-    its `valid_to` has passed. A limit with no validity fields (every row stored before 0055's
-    readers) is in force."""
+    its `valid_to` has passed. A limit with no validity fields (every row stored before validity was
+    kept) is in force."""
     if str(value.get("status") or "") in ("withdrawn", "superseded", "expired"):
         return True
     until = value.get("valid_to")

@@ -36,6 +36,7 @@ from app.modules.pi import (
     context_memory,
     context_memory_types,
     decisions,
+    execution_hooks,
     expert_advisor,
     figure_correction,
     fixed_lines,
@@ -88,6 +89,7 @@ from app.modules.pi import (
     solution_score,
     solutions,
     spec_handbook,
+    spec_rules2,
     style,
     system_ask,
     taxonomy,
@@ -1734,6 +1736,14 @@ async def brain_problems(
                 else "approved"
                 if states & set(context_memory_types.IN_PROGRESS_STATES)
                 else "proposed"
+            )
+            # Level 3 (off by default): only a fully verified execution run can raise it
+            context["implementation_status"] = await execution_hooks.capped_status(
+                session,
+                scope,
+                conversation.customer_id,
+                policy.response_rules,
+                context["implementation_status"],
             )
     context.update(matching_the_person(conversation, message, rows or []))
     if away := days_away(message, rows or [], last_chat_at):
@@ -5500,6 +5510,9 @@ def part18_problem(reply: str, context: dict[str, Any]) -> str | None:
         reply_gates.closed_list_early(reply, owner, known),
         part19.dead_end(reply),  # spec v1.6 19.6
         part19.number_used(reply, owner[-1] if owner else ""),  # spec v1.6 19.5
+        spec_rules2.assumed_industry(reply, context),  # spec v1.6 G11 noAssumedIndustry
+        spec_rules2.know_business_problem(reply, context),  # spec v1.6 19.3 DQ1
+        spec_rules2.correction_not_owned(reply, context),  # spec v1.6 18.8 EO2
     ]
     if context.get("fact_ask"):  # off unless the workspace sets brain.fact_ask to true
         said = [

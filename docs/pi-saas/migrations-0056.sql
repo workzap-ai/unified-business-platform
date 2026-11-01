@@ -1,12 +1,13 @@
--- 0055_pi_memory_ledgers. Additive: three new tables (pi_decisions, pi_rejections,
+-- 0056_pi_memory_ledgers. Additive: three new tables (pi_decisions, pi_rejections,
 -- pi_document_texts) and three nullable columns on pi_brain_documents (delivered_at, verified_at,
--- verified_by). Apply before or after the code: readers are guarded. Brief ACCESS EXCLUSIVE lock on
--- pi_brain_documents (ADD COLUMN, catalogue only). Generated with:
---   alembic upgrade 0054_payment_idempotency:0055_pi_memory_ledgers --sql
+-- verified_by). Apply after 0055_pi_execution_runs. Code and migration may deploy in either order:
+-- readers are guarded. Brief ACCESS EXCLUSIVE lock on pi_brain_documents (ADD COLUMN, catalogue only).
+-- Generated with:
+--   alembic upgrade 0055_pi_execution_runs:0056_pi_memory_ledgers --sql
 
 BEGIN;
 
--- Running upgrade 0054_payment_idempotency -> 0055_pi_memory_ledgers
+-- Running upgrade 0055_pi_execution_runs -> 0056_pi_memory_ledgers
 
 CREATE TABLE pi_decisions (
     customer_id UUID NOT NULL, 
@@ -106,7 +107,7 @@ ALTER TABLE pi_brain_documents ADD COLUMN verified_at TIMESTAMP WITH TIME ZONE;
 
 ALTER TABLE pi_brain_documents ADD COLUMN verified_by UUID;
 
-UPDATE alembic_version SET version_num='0055_pi_memory_ledgers' WHERE alembic_version.version_num = '0054_payment_idempotency';
+UPDATE alembic_version SET version_num='0056_pi_memory_ledgers' WHERE alembic_version.version_num = '0055_pi_execution_runs';
 
 COMMIT;
 

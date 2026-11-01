@@ -1,4 +1,4 @@
-"""The delivered and verified markers on an approved solution document or quote (migration 0055).
+"""The delivered and verified markers on an approved solution document or quote (migration 0056).
 
 They are set ONLY here, and only a named staff member can set them: `staff_user_id` is required and
 the one caller is the staff route in `brain_doc_routes` (permission `quotes.write`). Nothing in the
@@ -6,7 +6,7 @@ conversation, the model or the learning code imports this module (a test keeps i
 needs "delivered" first. A document that was never approved cannot be marked.
 
 The columns are deferred on the model, so the update is an explicit statement and code deployed
-before 0055 is unaffected.
+before 0056 is unaffected.
 """
 
 from datetime import UTC, datetime

@@ -16,7 +16,7 @@ from app.modules.pi import blueprint_models as bm
 from app.modules.pi import blueprint_rules as br
 from app.modules.pi import blueprint_text as bt
 from app.modules.pi import constraint_check as cc
-from app.modules.pi import option_rank, option_wiring
+from app.modules.pi import option_rank, option_wiring, spec_rules2
 from app.modules.pi import problem_fields as pf
 from app.modules.pi.blueprint_build import (
     blueprint_issues,
@@ -255,6 +255,15 @@ def build(
         },
     }
     causes = {v["ref"]: v["cause_raw"] for v in views if v.get("cause_raw")}
+    for v in views:  # PS-7: the graph's possible causes, as pi's own guess (never owner_said)
+        if v["ref"] not in causes and (
+            guessed := spec_rules2.guess_causes(
+                {"id": v["ref"], "title": v["title"], "user_words": v.get("quotes") or []},
+                list((owner_messages or {}).values()),
+                language,
+            )
+        ):
+            causes[v["ref"]] = guessed
     facts = list((owner_messages or {}).values()) + [
         q for v in views for q in v.get("quotes") or []
     ]

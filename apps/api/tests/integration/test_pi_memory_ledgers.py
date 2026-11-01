@@ -1,4 +1,4 @@
-"""The memory ledgers on a real database (migration 0055): decisions with supersession, rejections
+"""The memory ledgers on a real database (migration 0056): decisions with supersession, rejections
 read by the idea filter, document texts, the staff-only delivered marker, tenant isolation, the
 single reader (`build_context`), the customer export and the erase. Brain mode only; with empty
 tables the bundle is as before."""

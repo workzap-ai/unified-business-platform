@@ -584,7 +584,7 @@ async def export_customer(customer_id: UUID, scope: Scope, session: Session) -> 
     profile["pi_memory"] = memory_answer.export_bundle(bundle)
     from app.modules.pi import memory_ledger_read
 
-    try:  # the stored text of the customer's documents (migration 0055); absent table = none
+    try:  # the stored text of the customer's documents (migration 0056); absent table = none
         async with session.begin_nested():
             profile["pi_memory"]["document_texts"] = (
                 await memory_ledger_read.export_document_texts(session, scope, customer_id)
