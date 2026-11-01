@@ -966,9 +966,12 @@ COST_ANSWER = {
 # lose", "kitna nuksan hota hai". Found in real chats (a cost answer given to a statement).
 OWN_MONEY = re.compile(
     r"\bhow much\b(?:\s+\w+){0,3}?\s+(?:lose|lost|losing|spend|spent|spending|earn|earning|waste|wasting|"
-    r"make|making|miss|missing|leak|leaking|pay|paying|sell|selling|save|saving)\b"
+    r"make|making|miss|missing|leak|leaking|pay|paying|sell|selling|save|saving|owe|owed|due|"
+    r"rent|payment|payments|balance|share|commission|outstanding|collect|collected)\b"
     r"|\b(?:kitna|kitni|kitne)\b(?:\s+\w+){0,3}?\s+(?:nuksan|nuqsan|loss|zaya|waste|kamate|kamata|"
-    r"kamati|bachte|bachta|kharch\s+kar|kharcha\s+kar|bik)\w*",
+    r"kamati|bachte|bachta|kharch\s+kar|kharcha\s+kar|bik|payment|rent|kiraya|kiraye|share|hissa|"
+    r"hisaab|hisab|balance|baqaya|baaqi|deni|dena|dene|lena|lene|milna|milni|wasool|"
+    r"wusool|adaaigi|commission)\w*",
     re.IGNORECASE,
 )
 

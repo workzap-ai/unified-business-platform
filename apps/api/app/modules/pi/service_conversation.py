@@ -51,6 +51,7 @@ from app.modules.pi import (
     latency,
     learning_context,
     list_items,
+    listening_tidy,
     map_builder,
     map_edit,
     map_share,
@@ -2601,6 +2602,43 @@ def _brain_gate(
     return None
 
 
+def owner_texts_of(context: dict[str, Any]) -> list[str]:
+    """What the owner said in this chat: earlier messages, the burst and the latest message."""
+    return [
+        *(
+            str(h.get("text") or "")
+            for h in context.get("history") or []
+            if h.get("role") == "customer"
+        ),
+        *(str(t) for t in context.get("burst_texts") or []),
+        str(context.get("latest_customer_message") or ""),
+    ]
+
+
+def brain_listening_tidy(turn: "ServiceTurn", context: dict[str, Any]) -> None:
+    """Real property chat: while the owner is still describing the business, a reply never prints an
+    empty labelled section, never asks what the owner already answered (or to pick one when they
+    said they will not), never states a cause as settled, and ends with exactly one question."""
+    if turn._summary or turn._decision is not None or turn.request_human or not turn.reply.strip():
+        return
+    state = flow.parse((context.get("flow") or {}).get("state"))
+    if state not in (flow.State.S1_LISTENING, flow.State.S2_CLARIFYING, flow.State.S3_NOTED):
+        return
+    owner = owner_texts_of(context)
+    text = listening_tidy.drop_empty_sections(turn.reply)
+    text = listening_tidy.without_answered_questions(text, owner)
+    if listening_tidy.settled_cause(text):
+        text = listening_tidy.without_settled_cause(text)
+    if (
+        not text.strip()
+        or (not listening_tidy.has_question(text) and not context.get("no_questions"))
+    ) and not (turn._free or context.get("solution_ideas")):
+        language = constitution._language(context)
+        question = constitution._fresh_question(context, language)
+        text = f"{text.strip()}{chr(10)}{chr(10)}{question}" if text.strip() else question
+    turn.reply = text
+
+
 def brain_summary(turn: "ServiceTurn", context: dict[str, Any]) -> None:
     """When the person is done, asks what now, or many problems piled up: the reply becomes the
     sorted summary (spec 3.7), built from what is noted plus this turn's new problems."""
@@ -2654,6 +2692,10 @@ def brain_summary(turn: "ServiceTurn", context: dict[str, Any]) -> None:
         return  # after the summary only an explicit ask to see the notes shows them again
     if solution_turn(context):
         return  # solution mode: they asked for a fix, so they get the ideas (Part 1.6)
+    if why not in ("show", "map", "document_asked") and listening_tidy.owner_declines_pick(
+        owner_texts_of(context)
+    ):
+        return  # the owner wants the whole business understood first: no "which one first?" list
     language = str(context.get("reply_language") or "en")
     turn.reply = problems.summary_message(
         items, language, [str(w) for w in (context.get("brief") or {}).get("wants") or []]
@@ -2694,10 +2736,14 @@ def shape_expert_ideas(turn: "ServiceTurn", context: dict[str, Any]) -> None:
     in a statement and pi answered with more ideas for the FIRST business) loses the list, the lead
     and the offer line, and the reply keeps its question; a list the app wrote after a request gets
     its lead if it lost it."""
+    if turn._summary or turn._board:
+        return  # the sorted summary and its board are lists of the owner's problems, not ideas
     lines = turn.reply.split("\n")
     bullets = [n for n, line in enumerate(lines) if _BULLET_LINE.match(line)]
     if len(bullets) < 2:
         return
+    if listening_tidy.is_recap_list(lines, bullets[0]):
+        return  # "what I know / what is unknown": the owner's own facts, never an ideas list
     said = str(context.get("latest_customer_message") or "")
     asked = bool(
         turn._free
@@ -2719,7 +2765,7 @@ def shape_expert_ideas(turn: "ServiceTurn", context: dict[str, Any]) -> None:
     before = bullets[0] - 1
     while before >= 0 and not lines[before].strip():
         before -= 1  # blank lines between the lead and the list
-    if before >= 0 and lines[before].rstrip().endswith(":"):
+    if before >= 0 and lines[before].rstrip().rstrip("*_ ").endswith(":"):
         drop.add(before)  # the lead line of the list
     for n, line in enumerate(lines):
         if OFFER_LINE.search(line):
@@ -5565,6 +5611,13 @@ def part18_problem(reply: str, context: dict[str, Any]) -> str | None:
         spec_rules2.assumed_industry(reply, context),  # spec v1.6 G11 noAssumedIndustry
         spec_rules2.know_business_problem(reply, context),  # spec v1.6 19.3 DQ1
         spec_rules2.correction_not_owned(reply, context),  # spec v1.6 18.8 EO2
+        listening_tidy.settled_cause(reply),
+        (
+            "it asks something the owner already answered or asked them to pick one: use what they "
+            "said and ask what is unknown"
+            if listening_tidy.answered_questions(reply, owner_texts_of(context))
+            else None
+        ),
     ]
     if context.get("fact_ask"):  # off unless the workspace sets brain.fact_ask to true
         said = [
@@ -6890,6 +6943,7 @@ async def compose_service_turn(
         brain_offer(turn, context)
         strip_unallowed_offer(turn, context)
         brain_option_voice(turn, context)
+        brain_listening_tidy(turn, context)
         if turn._voice_pick or turn._voice_pending or turn._scope_asked:
             kept = dict(conversation.service_brief or {})
             if turn._scope_asked:
