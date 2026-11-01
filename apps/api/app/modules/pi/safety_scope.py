@@ -34,7 +34,7 @@ HUMAN_ASK = re.compile(
     r"\b(?:(?:talk|speak|connect|transfer|contact|call|reach|get|put|bring)\b[^.?!\n]{0,30}"
     r"\b(?:supervisor|manager|human|person|agent|representative|someone senior|somebody senior|real person)"
     r"|your (?:supervisor|manager|boss)|(?:supervisor|manager) (?:please|now|only)"
-    r"|real person|human agent|human being|live agent|customer care|someone senior)\b"
+    r"|human agent|live agent|customer care|someone senior)\b"
     r"|\b(?:supervisor|manager)\s+se\b|\binsaan se baat\b|\bbande se baat\b|\bkisi insaan se\b"
     r"|سپروائزر|مینیجر سے|مینیجر کو|کسی انسان سے|انسان سے بات"
     r"|(?:التحدث|الكلام|اتصل|تواصل)[^.?!؟\n]{0,25}(?:المشرف|مشرف|المدير|مدير|شخص|موظف)|المشرف|شخص حقيقي"
