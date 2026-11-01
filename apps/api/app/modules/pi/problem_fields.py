@@ -531,11 +531,28 @@ WITHDRAWAL = re.compile(
     r"\b(?:i take (?:that|it) back|take that back|i was wrong about (?:the|that) (?:cause|reason)|"
     r"that (?:was not|wasn'?t|is not|isn'?t) (?:the|really the) (?:cause|reason)|"
     r"not the (?:real )?(?:cause|reason) after all|"
-    r"maine (?:galat|ghalat) kaha|(?:wo|woh|yeh|ye) wajah nahi (?:thi|hai)|"
+    r"(?:maine|main ne|mainey) (?:galat|ghalat) kaha|(?:wo|woh|yeh|ye) wajah nahi (?:thi|hai)|"
     r"(?:wo|woh|yeh|ye) (?:sabab|wajah|reason) (?:sahi )?nahi (?:thi|hai))\b"
     r"|(?:یہ|وہ)\s+وجہ\s+نہیں\s+(?:تھی|ہے)|میں\s+نے\s+غلط\s+کہا"
     r"|ليس\s+هذا\s+(?:هو\s+)?السبب|لم\s+يكن\s+هذا\s+(?:هو\s+)?السبب|قلت\s+(?:ذلك\s+)?(?:خطأ|غلط)"
-    r"|(?:यह|ये|वो|वह)\s+वजह\s+नहीं\s+(?:थी|है)|मैंने\s+गलत\s+कहा",
+    r"|(?:यह|ये|वो|वह)\s+वजह\s+नहीं\s+(?:थी|है)|मैंने\s+गलत\s+कहा"
+    # a plain take-back, in every language the owners write in
+    r"|\b(?:scratch that|ignore (?:what|that) i (?:said|just said)|"
+    r"ignore my last (?:message|answer)|"
+    r"i (?:was|am) (?:mistaken|wrong)|"
+    r"i (?:said|wrote) (?:that )?(?:wrongly|by mistake)|"
+    r"(?:wo|woh|ye|yeh) baat (?:wapas|wapis) (?:leta|leti|le leta|le leti) (?:hun|hoon|hu)|"
+    r"(?:wo|woh|ye|yeh) baat (?:wapas|wapis) le (?:raha|rahi) (?:hun|hoon|hu))\b"
+    r"|میری\s+بات\s+غلط\s+تھی|(?:وہ|یہ)\s+بات\s+واپس\s+لیتا|أنا\s+أسحب\s+كلامي"
+    r"|أسحب\s+(?:ما\s+قلته|كلامي)"
+    r"|मेरी\s+बात\s+गलत\s+थी|(?:वो|वह|यह)\s+बात\s+वापस\s+लेता",
+    re.IGNORECASE,
+)
+
+# "if I take that back...", "even if that wasn't the cause...": a supposition, not a withdrawal
+_WITHDRAWAL_CONDITIONAL = re.compile(
+    r"(?:^|\W)(?:if|even if|even though|unless|whether|suppose|agar|agar chay|"
+    r"اگر|إذا|لو|अगर)\W*(?:\w+\W+){0,3}$",
     re.IGNORECASE,
 )
 
@@ -570,6 +587,8 @@ def withdrawal_said(text: str | None) -> bool:
             continue
         if owner_claim.attributed(before) or owner_claim.echoes_pi(before):
             continue
+        if _WITHDRAWAL_CONDITIONAL.search(before):
+            continue  # a supposition ("if I take that back"), not a take-back
         return True
     return False
 
