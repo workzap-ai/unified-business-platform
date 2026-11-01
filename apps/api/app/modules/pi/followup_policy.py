@@ -10,6 +10,7 @@ Rules that never bend: a declined offer (S5b) is never followed up; no follow-up
 template; "stop" ends everything (the caller checks `opted_out`).
 """
 
+import re
 from dataclasses import dataclass
 from datetime import datetime, timedelta
 
@@ -28,6 +29,8 @@ MESSAGES: dict[str, dict[str, str]] = {
         "en": "Still here whenever you want to carry on. I've kept everything you told me.",
         "roman_ur": "Jab chahein baat jari rakhein, main yahin hoon. Aap ne jo bataya wo sab mehfooz hai.",
         "ar": "ما زلت هنا متى أردتم المتابعة. احتفظت بكل ما أخبرتموني به.",
+        "ur": "جب چاہیں بات جاری رکھیں، میں یہیں ہوں۔ آپ نے جو بتایا وہ سب محفوظ ہے۔",
+        "fa": "هر وقت خواستید ادامه دهیم، من همین‌جا هستم. هر چه گفتید نگه داشته‌ام.",
     },
     "paused": {
         "en": (
@@ -42,6 +45,12 @@ MESSAGES: dict[str, dict[str, str]] = {
             "مرحباً، أنا pi، الذكاء الاصطناعي من Workzap. طلبتم مني أن أعود إليكم بخصوص "
             "المشكلات المسجلة وعددها {n}. هل نتابع؟"
         ),
+        "ur": (
+            "ہیلو، میں pi ہوں، Workzap کی طرف سے مصنوعی ذہانت۔ آپ نے کہا تھا کہ میں آپ کے {n} درج شدہ مسائل کے بارے میں دوبارہ پوچھوں۔ کیا بات آگے بڑھائیں؟"
+        ),
+        "fa": (
+            "سلام، من pi هستم، هوش مصنوعی Workzap. گفتید دوباره درباره {n} مشکل ثبت‌شده بپرسم. ادامه بدهیم؟"
+        ),
     },
     "documents": {
         "en": (
@@ -53,6 +62,8 @@ MESSAGES: dict[str, dict[str, str]] = {
             "to poochh lein."
         ),
         "ar": "وثيقة الحل وعرض السعر جاهزان لكم متى شئتم. إن كان لديكم أي سؤال فاسألوني.",
+        "ur": "آپ کا حل کا دستاویز اور کوٹ یہاں موجود ہیں، جب چاہیں دیکھ لیں۔ کوئی سوال ہو تو پوچھ لیں۔",
+        "fa": "سند راه‌حل و پیشنهاد قیمت شما اینجاست، هر وقت خواستید. سؤالی بود بپرسید.",
     },
     # Decision 6 (Book 5, 6.3): value first, mentions the map, no pressure, never the Solution Box.
     "map": {
@@ -178,5 +189,21 @@ def next_map_followup(chat: Chat, now: datetime | None = None) -> Due | None:
 
 def text_for(kind: str, language: str | None, *, n: int = 0, when: str = "") -> str:
     table = MESSAGES[kind]
-    template = table[fixed_lines.table_language(language, table, persian=True)]
+    code = (language or "en").split("-")[0]
+    # an Arabic-script owner gets Urdu or Persian script where the table has it, never English
+    key = code if code in ("ur", "fa") and code in table else None
+    template = table[key or fixed_lines.table_language(language, table, persian=True)]
     return template.format(n=n, when=when)
+
+
+_ARABIC_SCRIPT = re.compile("[؀-ۿݐ-ݿ]")
+
+
+def owner_language(conversation_language: str | None, last_owner_text: str | None) -> str | None:
+    """The language of a follow-up: the script of the owner's last message wins over a stored language
+    that does not fit it (an owner who only wrote Arabic script gets Urdu, or Persian when the chat is
+    Persian, never English by default)."""
+    code = (conversation_language or "en").split("-")[0]
+    if _ARABIC_SCRIPT.search(last_owner_text or ""):
+        return code if code in ("ur", "fa", "ar") else "ur"
+    return conversation_language

@@ -16,6 +16,44 @@ from app.modules.pi.service import PiService
 TEMPLATE_GAP = timedelta(hours=72)
 
 
+async def last_owner_text(session: Any, conversation: PiConversation) -> str:
+    """The owner's last inbound message body ("" when none): the follow-up language source."""
+    row = await session.scalar(
+        select(PiMessage)
+        .where(
+            PiMessage.tenant_id == conversation.tenant_id,
+            PiMessage.environment_id == conversation.environment_id,
+            PiMessage.conversation_id == conversation.id,
+            PiMessage.direction == "inbound",
+        )
+        .order_by(PiMessage.created_at.desc())
+        .limit(1)
+    )
+    return str(row.body or "") if row is not None else ""
+
+
+async def nudged_since_owner(session: Any, conversation: PiConversation) -> bool:
+    """A free-form follow-up has already gone since the owner last wrote: never a second nudge to a
+    silent owner (the same line is never repeated)."""
+    since = conversation.last_inbound_at
+    if since is None:
+        return False
+    rows = await session.scalars(
+        select(PiMessage)
+        .where(
+            PiMessage.tenant_id == conversation.tenant_id,
+            PiMessage.environment_id == conversation.environment_id,
+            PiMessage.conversation_id == conversation.id,
+            PiMessage.direction == "outbound",
+            PiMessage.created_at > since,
+        )
+        .limit(100)
+    )
+    return any(
+        "followup" in (m.media or {}) and m.status not in ("failed", "skipped") for m in rows
+    )
+
+
 async def last_follow_up_template(
     session: Any, conversation: PiConversation, since: datetime
 ) -> datetime | None:
@@ -208,6 +246,9 @@ async def _silence_nudge(
         conversation.followup_due_at = now + timedelta(hours=6)
         return
     assert last is not None
+    if await nudged_since_owner(session, conversation):
+        conversation.followup_due_at = None
+        return
     service = PiService(session, scope)
     key = f"pi-followup-silent:{conversation.id}:{last.isoformat()}"
     if await service.messages.find(PiMessage.idempotency_key == key) is None:
@@ -217,7 +258,12 @@ async def _silence_nudge(
                 direction="outbound",
                 sender_type="ai",
                 agent_key="requirement",
-                body=followup_policy.text_for("silent", conversation.language),
+                body=followup_policy.text_for(
+                    "silent",
+                    followup_policy.owner_language(
+                        conversation.language, await last_owner_text(session, conversation)
+                    ),
+                ),
                 status="queued",
                 idempotency_key=key,
                 media={"followup": {"kind": "silent"}},

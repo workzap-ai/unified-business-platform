@@ -2422,6 +2422,8 @@ def _brain_gate(
                     opening = f"{fixed_lines.LINES['opening']['ur']} آپ کا کاروبار کیا کام کرتا ہے؟"
                 line = f"{re.split('[.۔]', line)[0]}. {opening}"
             return fixed(line, None if opened else flow.State.S1_LISTENING, why="R-LANG-08")
+    if chat_level and safety_scope.pashto_asked(text):
+        return fixed(safety_scope.pashto_reply(language, text), None, [], {}, "RT19")
     if chat_level and safety.unsupported_language(text):
         return fixed(safety.UNSUPPORTED_TEXT, why="RT19")
     if chat_level and pii.get("only"):

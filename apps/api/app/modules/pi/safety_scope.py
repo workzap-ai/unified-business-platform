@@ -94,3 +94,43 @@ HANDOVER_TEXT = {
 
 def handover_reply(language: str | None) -> str:
     return HANDOVER_TEXT.get(language or "en") or HANDOVER_TEXT["en"]
+
+
+# --- a language pi cannot write (Pashto): the honest line on the very turn it is asked ------------------
+
+PASHTO_NAME = r"(?:پښتو|پشتو|pashto|pashtu|pukhto|pushto|pakhto|بشتو|بشتۆ)"
+SPEAK_CUE = (
+    r"(?:ووایه|وایه|وایئ|ووایئ|ولیکه|وليکه|بولو|بولیں|بولیے|بات\s*کر|لکھو|لکھیں|"
+    r"(?<![A-Za-z])(?:speak|talk|reply|answer|write|respond|say|baat|bolo|bol|likho|mein|me)(?![A-Za-z])|"
+    r"تكلم|تحدث|اكتب|رد|بزبان|به\s*زبان|ڕا)"
+)
+PASHTO_REQUEST = re.compile(
+    rf"(?:{PASHTO_NAME}\W+(?:\w+\W+){{0,3}}?{SPEAK_CUE})|(?:{SPEAK_CUE}\W+(?:\w+\W+){{0,3}}?{PASHTO_NAME})",
+    re.IGNORECASE,
+)
+PASHTO_LETTERS_SPECIFIC = re.compile("[\u067c\u0689\u0693\u0696\u069a\u06bc\u06cd\u06d0]")
+ARABIC_SCRIPT = re.compile("[\u0600-\u06ff\u0750-\u077f]")
+
+PASHTO_TEXT = {
+    "en": "I can't write Pashto reliably. Shall we continue in Urdu, Persian or English?",
+    "roman_ur": "Mujh se Pashto bharose ke saath nahi likhi jati. Kya hum Urdu, Persian ya English mein baat jari rakhein?",
+    "ur": "مجھ سے پشتو بھروسے کے ساتھ نہیں لکھی جاتی۔ کیا ہم اردو، فارسی یا انگریزی میں بات جاری رکھیں؟",
+    "fa": "من نمی‌توانم پشتو را به‌درستی بنویسم. آیا به فارسی، اردو یا انگلیسی ادامه دهیم؟",
+}
+
+
+def pashto_asked(text: str) -> bool:
+    """The owner asks pi to speak or write in Pashto (or writes Pashto letters in quantity)."""
+    said = " ".join((text or "").split())
+    if not said or len(said) > 200:
+        return False
+    return bool(PASHTO_REQUEST.search(said) or len(PASHTO_LETTERS_SPECIFIC.findall(said)) >= 2)
+
+
+def pashto_reply(language: str | None, text: str) -> str:
+    """The honest line in the owner's script: Urdu or Persian for Arabic script (Persian when the chat is
+    Persian), Roman Urdu for a Roman Urdu chat, English otherwise. One question, nothing else."""
+    code = (language or "en").split("-")[0]
+    if ARABIC_SCRIPT.search(text or "") or code in ("ur", "fa", "ar"):
+        return PASHTO_TEXT["fa" if code == "fa" else "ur"]
+    return PASHTO_TEXT["roman_ur" if code in ("roman_ur", "hi") else "en"]

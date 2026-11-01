@@ -38,6 +38,8 @@ from app.modules.pi.followups import (
     _waiting_until,
     iftar_pause,
     jumuah_country,
+    last_owner_text,
+    nudged_since_owner,
     person_zone,
     quiet_until,
 )
@@ -219,7 +221,13 @@ async def send_one(
         return None  # spec 6.3: no follow-up that mentions the box for 8 messages after a decline
     is_map = kind == "map"
     step = (chat.map_sent if is_map else int(chat.sent.get(kind, 0))) + 1
-    language = language_of(conversation)
+    owner_text = await last_owner_text(session, conversation)
+    if kind == "silent" and await nudged_since_owner(session, conversation):
+        conversation.service_brief = marked_sent(brief, kind)
+        return None  # one nudge per quiet spell, never the same line twice
+    language = followup_policy.owner_language(conversation.language, owner_text) or "en"
+    if language not in ("ur", "fa"):
+        language = language_of(conversation)
     when = ""
     if kind.startswith("kickoff") and chat.kickoff_at is not None:
         if now >= chat.kickoff_at:  # too late to remind: count it so it is not retried
