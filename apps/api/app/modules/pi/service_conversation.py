@@ -73,6 +73,7 @@ from app.modules.pi import (
     requirements_read,
     resolution_flow,
     safety,
+    safety_scope,
     self_review,
     self_review_types,
     slot_carry,
@@ -2448,6 +2449,22 @@ def _brain_gate(
             {"declined_trade": trade},
             "R-7N",
         )
+    if chat_level and safety_scope.wants_human(text):
+        # a request for a supervisor, a manager or a person: the hand-over notice at once, in their
+        # language, and the conversation is raised for staff (the AI flow stops here)
+        handover = fixed(
+            safety_scope.handover_reply(language),
+            None,
+            ["escalate"],
+            {"escalate": "wants_person"},
+            "R-HANDBACK",
+        )
+        handover.request_human = True
+        return handover
+    if chat_level and safety_scope.other_company_charge(text, context):
+        # a charge or refund of ANOTHER company: pi says it is Workzap's AI and cannot refund it,
+        # points to that company's own support, guesses nothing and claims no action
+        return fixed(safety_scope.other_company_reply(language), None, [], {}, "R-SCOPE")
     if chat_level and (who := safety.identity_asked(text, constitution.ASKS_IF_AI)) is not None:
         if who == safety.Identity.COMPANY:
             # E7: only facts in an approved company profile; otherwise the question goes to the
