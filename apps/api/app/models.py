@@ -33,6 +33,7 @@ from app.modules.pi.business_profile_models import (
     PiPageSnapshot,
     PiProfileFact,
 )
+from app.modules.pi.execution_models import PiExecutionRun
 from app.modules.pi.experience_models import PiExperience
 from app.modules.pi.learning_models import (
     PiLearnedPack,
@@ -42,6 +43,7 @@ from app.modules.pi.learning_models import (
     PiLearningRun,
     PiQuestionArm,
 )
+from app.modules.pi.memory_models import PiDecision, PiDocumentText, PiRejection
 from app.modules.pi.models import (
     KnowledgeChunk,
     KnowledgeDocument,
@@ -165,7 +167,11 @@ __all__ = [
     "PiOfferLog",
     "PiMoveLog",
     "PiHypothesis",
+    "PiDecision",
+    "PiDocumentText",
+    "PiExecutionRun",
     "PiOpenItem",
+    "PiRejection",
     "PiSolutionBox",
     "PiProblem",
     "PiProblemGroup",

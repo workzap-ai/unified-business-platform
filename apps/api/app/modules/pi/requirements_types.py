@@ -17,6 +17,11 @@ class Limit:
 
     text: str
     msg: str | None = None
+    # validity (docs E8): "" or "active" means in force; "superseded" and "withdrawn" are history
+    status: str = ""
+    valid_from: str = ""
+    valid_to: str = ""
+    key: str = ""  # which constraint it was (budget, staff, deadline, cannot_change)
 
 
 @dataclass(frozen=True, slots=True)
@@ -25,6 +30,7 @@ class Constraints:
     staff: Limit | None = None
     deadline: Limit | None = None
     cannot_change: tuple[Limit, ...] = ()
+    history: tuple[Limit, ...] = ()  # superseded or withdrawn values, with validity
 
     @property
     def empty(self) -> bool:

@@ -225,6 +225,11 @@ async def approve_document(doc_id: UUID, scope: Scope, session: Session) -> dict
     doc = await _doc(session, scope, doc_id)
     await brain_docs.approve(session, scope, doc, scope.user_id)
     await box_lifecycle.on_approved(session, scope, doc.customer_id, str(scope.user_id or ""))
+    from app.modules.pi import memory_ledger
+
+    await memory_ledger.on_document_approved(
+        session, scope, doc, (await settings_row(session, scope)).response_rules
+    )
     await record(
         session,
         "pi.brain_document_approved",
@@ -235,6 +240,42 @@ async def approve_document(doc_id: UUID, scope: Scope, session: Session) -> dict
     )
     await session.commit()
     return _view(doc)
+
+
+@router.post("/{doc_id}/delivered")
+async def mark_delivered(doc_id: UUID, scope: Scope, session: Session) -> dict[str, Any]:
+    """Staff say the work for this approved document was delivered. Staff only: pi never sets it."""
+    from app.modules.pi import delivery_marker
+
+    await require_pi(session, scope, "quotes.write")
+    at = await delivery_marker.mark_delivered(session, scope, doc_id, scope.user_id)
+    await record(
+        session,
+        "pi.brain_document_delivered",
+        scope=scope,
+        entity_type="pi_brain_document",
+        entity_id=doc_id,
+    )
+    await session.commit()
+    return {"id": doc_id, "delivered_at": at}
+
+
+@router.post("/{doc_id}/verified")
+async def mark_verified(doc_id: UUID, scope: Scope, session: Session) -> dict[str, Any]:
+    """Staff verified the delivery. Needs delivered first. Staff only."""
+    from app.modules.pi import delivery_marker
+
+    await require_pi(session, scope, "quotes.write")
+    at = await delivery_marker.mark_verified(session, scope, doc_id, scope.user_id)
+    await record(
+        session,
+        "pi.brain_document_verified",
+        scope=scope,
+        entity_type="pi_brain_document",
+        entity_id=doc_id,
+    )
+    await session.commit()
+    return {"id": doc_id, "verified_at": at, "verified_by": scope.user_id}
 
 
 @router.post("/{doc_id}/revise", status_code=201)

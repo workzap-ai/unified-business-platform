@@ -35,6 +35,10 @@ _KIND_SOURCE = {
     "kickoff": "solution",
     "offer": "decision",
     "approval": "decision",
+    "yes": "decision",
+    "decline": "decision",
+    "revision_request": "decision",
+    "document_approval": "decision",
     "box_move": "decision",
     "open_item": "decision",
 }
@@ -198,9 +202,13 @@ def export_bundle(bundle: Any) -> dict[str, Any]:
                 "staff": p.get("staff"),
                 "deadline": p.get("deadline"),
                 "cannot_change": p.get("cannot_change"),
+                "history": p.get("constraint_history") or [],
             }
             for p in data.get("problems") or []
-            if any(p.get(k) for k in ("budget", "staff", "deadline", "cannot_change"))
+            if any(
+                p.get(k)
+                for k in ("budget", "staff", "deadline", "cannot_change", "constraint_history")
+            )
         ]
         return {
             "profile": data.get("facts") or [],
@@ -211,6 +219,7 @@ def export_bundle(bundle: Any) -> dict[str, Any]:
             "corrections": data.get("corrections") or [],
             "rejections": data.get("rejections") or [],
             "tried": data.get("tried") or [],
+            "files": data.get("files") or [],
             "unavailable": data.get("unavailable") or [],
             "truncated": data.get("truncated") or [],
             "erased": bool(data.get("erased")),

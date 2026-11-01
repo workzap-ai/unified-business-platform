@@ -25,6 +25,7 @@ Logs carry counts only, never the owner's words.
 import logging
 import re
 from collections.abc import Awaitable, Callable, Mapping
+from dataclasses import replace
 from functools import partial
 from typing import Any
 from uuid import UUID
@@ -34,7 +35,7 @@ from sqlalchemy.exc import ProgrammingError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.modules.customers.models import CustomerFile
-from app.modules.pi import safety
+from app.modules.pi import memory_ledger_read, safety
 from app.modules.pi.box_models import PiBoxTransition, PiOfferLog, PiSolutionBox
 from app.modules.pi.brain_docs_models import PiBrainDocument, PiBrainPayment
 from app.modules.pi.business_profile_models import PiBusinessProfile, PiProfileFact
@@ -164,7 +165,16 @@ def _limit(raw: Any) -> LimitItem | None:
     if raw is None:
         return None
     text = _safe(getattr(raw, "text", ""), 160)
-    return LimitItem(text, getattr(raw, "msg", None)) if text else None
+    if not text:
+        return None
+    return LimitItem(
+        text,
+        getattr(raw, "msg", None),
+        str(getattr(raw, "status", "") or ""),
+        str(getattr(raw, "valid_from", "") or ""),
+        str(getattr(raw, "valid_to", "") or ""),
+        str(getattr(raw, "key", "") or ""),
+    )
 
 
 # --------------------------------------------------------------------------- cue scans (derived)
@@ -427,6 +437,9 @@ def _problem_item(row: Any, with_b2a: bool) -> ProblemItem:
         if constraints
         else (),
         tried=tried,
+        constraint_history=tuple(x for x in map(_limit, constraints.history) if x)
+        if constraints
+        else (),
         cause_text=_safe(cause.text, 300) if cause else "",
         cause_status=cause.status if cause else "",
         expected_outcome=_safe(outcome, 300) if isinstance(outcome, str) else "",
@@ -1034,6 +1047,23 @@ def facts_from_problems(problems: tuple[ProblemItem, ...]) -> list[FactItem]:
 # --------------------------------------------------------------------------- build_context
 
 
+def _with_marker(
+    item: SolutionItem, markers: Mapping[tuple[str, int, int], tuple[str, str]]
+) -> SolutionItem:
+    """A document staff marked delivered reads as delivered, and as verified when staff verified
+    it. The marker is the only way a stored solution reads as delivered from this source."""
+    match = re.fullmatch(r"(SD|Q)-(\d+)(?:-v(\d+))?", item.ref)
+    if match is None or item.kind not in ("document", "quote"):
+        return item
+    kind = "solution" if match.group(1) == "SD" else "quote"
+    found = markers.get((kind, int(match.group(2)), int(match.group(3) or 1)))
+    if found is None:
+        return item
+    return replace(
+        item, implementation_status="delivered", delivered_at=found[0], verified_at=found[1]
+    )
+
+
 def _empty_bundle(
     scope: WorkspaceScope,
     customer_id: UUID,
@@ -1223,10 +1253,27 @@ async def _build(
         lambda: _offer_and_open_decisions(session, scope, customer_id, all_ids, lim.decisions),
         [],
     )
+    decisions += await _guard(
+        session,
+        "decision_ledger",
+        unavailable,
+        lambda: memory_ledger_read.read_decisions(session, scope, customer_id, lim.decisions),
+        [],
+    )
     decisions.sort(key=lambda d: (d.at, d.kind, d.ref), reverse=True)
     if len(decisions) > lim.decisions:
         truncated.append("decisions")
     decisions_t = tuple(decisions[: lim.decisions])
+
+    markers = await _guard(
+        session,
+        "delivery_markers",
+        unavailable,
+        lambda: memory_ledger_read.read_markers(session, scope, customer_id),
+        {},
+    )
+    if markers:
+        solutions = tuple(_with_marker(s, markers) for s in solutions)
 
     # (d) stored files
     files: tuple[FileItem, ...] = ()
@@ -1237,6 +1284,18 @@ async def _build(
         files = tuple(got_files[0])
         if got_files[1]:
             truncated.append("files")
+        refs = await _guard(
+            session,
+            "document_texts",
+            unavailable,
+            lambda: memory_ledger_read.read_text_refs(session, scope, customer_id),
+            {},
+        )
+        if refs:
+            files = tuple(
+                replace(f, text_refs=refs[f.id], text_available=True) if f.id in refs else f
+                for f in files
+            )
 
     # (e) tried and rejected
     stored_rejections: list[RejectionItem] = []
@@ -1250,8 +1309,17 @@ async def _build(
     )
     if got_ideas is not None:
         stored_rejections, stored_tried = got_ideas
+    ledger_rejections = await _guard(
+        session,
+        "rejection_ledger",
+        unavailable,
+        lambda: memory_ledger_read.read_rejections(session, scope, customer_id, lim.rejections),
+        [],
+    )
     rejections = tuple(
-        (stored_rejections + list(scan_rejections(messages_t, lim.rejections)))[: lim.rejections]
+        (ledger_rejections + stored_rejections + list(scan_rejections(messages_t, lim.rejections)))[
+            : lim.rejections
+        ]
     )
     tried = tuple(
         [t for p in problems for t in p.tried]
@@ -1543,9 +1611,16 @@ def known_records(bundle: ContextBundle | None) -> list[dict[str, Any]]:
                 t.problem_ref or (t.msg or ""),
             )
         for r in bundle.rejections:
+            if r.status in ("reversed", "expired"):
+                taken = f"{r.text} (taken back: {r.status})"
+                add("rejections", taken, "rejection", r.status, r.ref)
+                continue
             add("rejections", r.text, "rejection", "derived" if r.derived else "owner_said", r.ref)
         for d in bundle.decisions:
-            add("decisions", f"{d.kind} {d.ref}: {d.status}", d.kind, d.status, d.ref)
+            line = f"{d.kind} {d.ref}: {d.status}"
+            if d.actor:  # a ledger decision: the words and where they came from
+                line += (f' - "{d.text}"' if d.text else "") + f" ({d.source})"
+            add("decisions", line, d.kind, d.status, d.ref)
         for fl in bundle.files:
             add("files", fl.name, "file", "stored", f"file:{str(fl.id)[:8]}")
         for m in bundle.messages:

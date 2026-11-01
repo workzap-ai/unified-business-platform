@@ -17,6 +17,7 @@ Logs carry counts only, never the owner's words.
 
 import logging
 from collections.abc import Mapping
+from datetime import UTC, datetime
 from typing import Any
 from uuid import UUID
 
@@ -46,12 +47,41 @@ def _text(value: Any) -> str:
     return " ".join(value.split()) if isinstance(value, str) else ""
 
 
-def _limit(value: Any) -> Limit | None:
+def _ended(value: Mapping[str, Any]) -> bool:
+    """True when the stored limit is no longer in force: withdrawn or superseded by its status, or
+    its `valid_to` has passed. A limit with no validity fields (every row stored before validity was
+    kept) is in force."""
+    if str(value.get("status") or "") in ("withdrawn", "superseded", "expired"):
+        return True
+    until = value.get("valid_to")
+    if isinstance(until, str) and until:
+        try:
+            stamp = datetime.fromisoformat(until)
+        except ValueError:
+            return False
+        if stamp.tzinfo is None:
+            stamp = stamp.replace(tzinfo=UTC)
+        return stamp <= datetime.now(UTC)
+    return False
+
+
+def _limit(value: Any, *, in_force: bool = True) -> Limit | None:
     if not isinstance(value, Mapping):
+        return None
+    if in_force and _ended(value):
         return None
     text = _text(value.get("text"))
     msg = value.get("msg")
-    return Limit(text, msg if isinstance(msg, str) and msg else None) if text else None
+    if not text:
+        return None
+    return Limit(
+        text,
+        msg if isinstance(msg, str) and msg else None,
+        status=_text(value.get("status")),
+        valid_from=_text(value.get("valid_from")),
+        valid_to=_text(value.get("valid_to")),
+        key=_text(value.get("key")),
+    )
 
 
 def parse_constraints(raw: Any) -> Constraints:
@@ -59,11 +89,18 @@ def parse_constraints(raw: Any) -> Constraints:
         return Constraints()
     listed = raw.get("cannot_change")
     items = tuple(x for x in map(_limit, listed if isinstance(listed, list) else []) if x)
+    past = raw.get("history")
+    history = tuple(
+        x
+        for x in (_limit(h, in_force=False) for h in (past if isinstance(past, list) else []))
+        if x
+    )
     return Constraints(
         budget=_limit(raw.get("budget")),
         staff=_limit(raw.get("staff")),
         deadline=_limit(raw.get("deadline")),
         cannot_change=items,
+        history=history,
     )
 
 

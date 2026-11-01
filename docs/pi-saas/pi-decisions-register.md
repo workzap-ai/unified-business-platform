@@ -44,3 +44,10 @@ real-model spend. Every row says how to reverse it. The owner can overrule any r
 - Level 3 tool registry and `PI_EXECUTION_SEAL_KEY`.
 - Two named human reviewers for FT-A3; evaluation thresholds and per-industry case counts.
 - The remaining Book 5 Part 15 and Appendix D decisions not listed above (see the traceability matrices).
+
+## Owner decision 2026-11-01 (supersedes earlier blocker wording)
+
+| # | Decision | Detail |
+|---|---|---|
+| 20 | Level 3 is NOT a release blocker | The owner ordered Levels 1, 2 and 3 to be complete in code, with memory as a priority and the rules of the seven PDFs implemented overall. Level 3 is built, merged and wired behind a per-workspace flag that is OFF by default (`response_rules.brain.level3_exec`). Owner approval of the exact scope stays part of the product (it is not a flag); only internal allow-listed tools exist; no external actions, payments or code execution; the seal key comes from the environment (`PI_EXECUTION_SEAL_KEY`) and the feature stays inert without it. The earlier 'release blocker' status of Level 3 and of the Level 3 secret-screening audit is withdrawn by the owner. |
+| 21 | Priority order | 1. Levels 1, 2, 3 complete in code. 2. Strong memory (decisions ledger, rejections, delivered marker, document text, constraint validity, erase and export coverage). 3. Rules of the seven PDFs overall (matrices: Missing and Partial rows by severity). 4. Push and merge to main always, tests and audits kept cheap. |
