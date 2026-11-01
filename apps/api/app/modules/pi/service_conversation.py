@@ -1750,6 +1750,21 @@ async def brain_problems(
         context["days_away"] = away
     if message is not None:
         context["hours_away"] = hours_away(message, rows or [], last_chat_at)
+        # Level 3 (flag off by default): an explicit yes to a shown scope approves that scope only
+        try:
+            async with session.begin_nested():
+                owner = await customer_for(session, scope, conversation)
+                if confirmed := await execution_hooks.owner_reply(
+                    session,
+                    scope,
+                    conversation,
+                    policy.response_rules,
+                    message.body or "",
+                    str(getattr(owner, "name", "") or ""),
+                ):
+                    context["l3_confirmation"] = confirmed
+        except Exception:  # never blocks the chat; the normal flow goes on
+            logger.exception("level 3 owner_reply failed")
         if pending := await pending_handoff(session, conversation):
             context["pending_handoff"] = pending
         try:  # spec 17.7: what is still open is said first on the owner's return (brain only)
@@ -2439,6 +2454,8 @@ def _brain_gate(
                     opening = f"{fixed_lines.LINES['opening']['ur']} آپ کا کاروبار کیا کام کرتا ہے؟"
                 line = f"{re.split('[.۔]', line)[0]}. {opening}"
             return fixed(line, None if opened else flow.State.S1_LISTENING, why="R-LANG-08")
+    if chat_level and context.get("l3_confirmation"):
+        return fixed(str(context["l3_confirmation"]), None, [], {}, "L3-APPROVAL")
     if chat_level and safety_scope.pashto_asked(text):
         return fixed(safety_scope.pashto_reply(language, text), None, [], {}, "RT19")
     if chat_level and safety.unsupported_language(text):
