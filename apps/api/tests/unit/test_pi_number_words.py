@@ -205,3 +205,18 @@ def test_slang_and_variants() -> None:
     assert not number_words.variant_digits("1 ² note")
     assert not number_words.has_amount("a grand idea")
     assert number_words.fold("pāñch") == "panch"
+
+
+@pytest.mark.parametrize(
+    "text",
+    [
+        "Hum sab mil kar is par kaam kar sakte hain.",
+        "Aap ke staff aur customers mil kar dekh sakte hain.",
+        "Mil kar ek chhota sa check bana lete hain.",
+        "Agar mil jaye to ek baar dobara dekh lein.",
+        "Dukaan par sab kuch mil jata hai.",
+    ],
+)
+def test_roman_urdu_mil_together_is_not_an_amount(text: str) -> None:
+    # "mil" is Roman Urdu for "meet/together/found": it must never read as the Spanish thousand.
+    assert number_words.has_amount(text) is False

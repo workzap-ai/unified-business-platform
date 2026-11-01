@@ -117,7 +117,7 @@ _SCALES = {
     "hazaar": 1000, "hazar": 1000, "hajar": 1000, "cien": 100, "ciento": 100,
     "doscientos": 200, "trescientos": 300, "cuatrocientos": 400, "quinientos": 500,
     "seiscientos": 600, "setecientos": 700, "ochocientos": 800, "novecientos": 900,
-    "mil": 1000, "millon": 10**6, "millones": 10**6, "cent": 100, "cents": 100,
+    "millon": 10**6, "millones": 10**6, "cent": 100, "cents": 100,
     "mille": 1000, "hundert": 100, "tausend": 1000,
     "ہزار": 1000, "لاکھ": 10**5, "کروڑ": 10**7, "سو": 100,
     "الف": 1000, "الاف": 1000, "مئه": 100, "مائه": 100, "مئتین": 200, "مائتین": 200,
