@@ -216,8 +216,10 @@ async def _silence_nudge(
 ) -> None:
     """The brain's one free-form "still here" line (spec 3.9.1). Never outside the 24-hour
     window, at night, at Jumu'ah or around iftar; never after "stop" or once the person wrote."""
-    from app.modules.pi import flow, followup_policy
+    from app.modules.pi import flow, followup_policy, optout_guard
 
+    if await optout_guard.opted_out(session, conversation):
+        return
     now = datetime.now(UTC)
     brief = dict(conversation.service_brief or {})
     last = conversation.last_inbound_at
@@ -299,6 +301,11 @@ async def sweep_followups(ctx: dict[str, Any]) -> None:
                 conversation.followup_due_at = None
                 continue
             policy = await settings_row(session, scope)
+            from app.modules.pi import optout_guard
+
+            if await optout_guard.opted_out(session, conversation):
+                conversation.followup_due_at = None
+                continue
             brief = conversation.service_brief or {}
             source = brief.get("source_message_id")
             waiting = _waiting_until(brief)

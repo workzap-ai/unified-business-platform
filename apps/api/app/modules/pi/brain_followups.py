@@ -359,10 +359,14 @@ async def _map_sweep(session: AsyncSession, now: datetime) -> list[str]:
         .with_for_update(skip_locked=True)
     )
     steps = [(c, _one_map) for c in quiet] + [(c, tell_changes) for c in changed]
+    from app.modules.pi import optout_guard
+
     out: list[str] = []
     for conversation, step in steps:
         try:
             async with session.begin_nested():
+                if await optout_guard.opted_out(session, conversation):
+                    continue
                 queued = await step(session, conversation, now)
             if queued is not None:
                 out.append(queued)
@@ -477,8 +481,11 @@ async def tell_changes(
 
 
 async def _one(session: AsyncSession, conversation: PiConversation, now: datetime) -> str | None:
+    from app.modules.pi import optout_guard
     from app.modules.pi.runtime import system_scope
 
+    if await optout_guard.opted_out(session, conversation):
+        return None  # "stop" is final: no unsolicited line, whatever the stored consent says
     connection = await session.get(WhatsAppConnection, conversation.connection_id)
     scope = await system_scope(session, connection) if connection else None
     if scope is None:

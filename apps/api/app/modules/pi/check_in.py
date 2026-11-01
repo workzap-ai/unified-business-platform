@@ -195,6 +195,10 @@ async def check_in(ctx: dict[str, Any], conversation_id: UUID, now: datetime) ->
         config = policy.whatsapp_config or {}
         if not policy.auto_reply_enabled or config.get("check_in_enabled", True) is False:
             return None
+        from app.modules.pi import optout_guard
+
+        if await optout_guard.opted_out(session, conversation):
+            return None
         brief = conversation.service_brief or {}
         waiting = _waiting_until(brief)
         if brief.get("reminder_consent") == "declined" or (waiting and waiting > now):
