@@ -192,7 +192,7 @@ async def test_the_ticket_carries_the_summary_open_problems_and_the_last_message
                     problem_ops=ops)  # fmt: skip
 
     pi, _ = await chat(api, business_db, monkeypatch, make)
-    await say(pi, "My card is 4111 1111 1111 1111 and I want a refund", "tk-1")
+    await say(pi, "My card is 4111 1111 1111 1111 and I want a refund of my Workzap payment", "tk-1")
     [request] = [r for r in await requests_of(business_db) if r.kind == "refund"]
     assert request.priority == "high"
     context = request.context_summary
@@ -207,7 +207,7 @@ async def test_an_unclaimed_ticket_is_flagged_again_once_with_one_honest_line(
     api, business_db, monkeypatch
 ):
     pi, _ = await chat(api, business_db, monkeypatch)
-    await say(pi, "I want a refund", "sl-1")
+    await say(pi, "I want a refund of my Workzap payment", "sl-1")
     [request] = [r for r in await requests_of(business_db) if r.kind == "refund"]
     soon = datetime.now(UTC) + timedelta(minutes=10)
     assert await team_requests.flag_unclaimed(pi.ctx, soon) == []  # inside the SLA: nothing yet

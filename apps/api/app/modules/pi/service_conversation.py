@@ -2471,7 +2471,7 @@ def _brain_gate(
         return fixed(safety_scope.pashto_reply(language, text), None, [], {}, "RT19")
     if chat_level and safety.unsupported_language(text):
         return fixed(safety.UNSUPPORTED_TEXT, why="RT19")
-    if chat_level and pii.get("only"):
+    if chat_level and pii.get("only") and safety.enquiry_asked(text) is None:
         first = safety.Pii(pii["kinds"][0])
         table = safety.PII_TEXT.get(language, safety.PII_TEXT["en"])
         return fixed(pii.get("notice") or table[first], why="R-PRIV-02")
@@ -2569,8 +2569,15 @@ def _brain_gate(
     if chat_level and (about := safety.nori_asked(text)) is not None:
         return fixed(safety.nori_reply(about, language), why="R-HONEST-02")
     if (lead := safety.enquiry_asked(text)) is not None:
+        said_line = safety.enquiry_reply(lead, language)
+        if chat_level and pii.get("only"):
+            # a refund or enquiry with a card number in it: the card is warned about AND the team
+            # is still told (the number is never stored)
+            first = safety.Pii(pii["kinds"][0])
+            table = safety.PII_TEXT.get(language, safety.PII_TEXT["en"])
+            said_line = f"{pii.get('notice') or table[first]} {said_line}"
         return fixed(
-            safety.enquiry_reply(lead, language),
+            said_line,
             None,
             ["escalate"],
             {"escalate": lead.value},

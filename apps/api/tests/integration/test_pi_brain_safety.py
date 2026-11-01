@@ -8,6 +8,7 @@ from test_pi_service_conversations import turn
 
 from app.modules.pi.models import PiMessage
 from app.modules.pi.quarantine_models import PiQuarantine
+from app.modules.pi.safety_scope import PASHTO_TEXT
 from app.modules.pi_saas.models import PiStaffRequest
 
 pytestmark = pytest.mark.integration
@@ -220,7 +221,7 @@ async def test_an_older_message_stays_silent_when_a_newer_one_is_waiting(
     ("said", "expected"),
     [
         ("so what do you sell?", "I'm not here to sell anything"),  # RT11
-        ("زه ډېر ښه یم او زما دوکان ټول ورځ ګډوډ دی", "can't read Pashto well yet"),  # RT19
+        ("زه ډېر ښه یم او زما دوکان ټول ورځ ګډوډ دی", PASHTO_TEXT["ur"]),  # RT19
     ],
 )
 async def test_what_do_you_sell_and_pashto_get_fixed_answers_without_the_model(

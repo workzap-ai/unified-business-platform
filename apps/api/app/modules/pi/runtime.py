@@ -963,18 +963,26 @@ async def process_pi_event(ctx: dict[str, Any], event_id: str) -> None:
             with latency.stage("debounce"):
                 await asyncio.sleep(brain_config.value(policy.response_rules, "debounce_seconds"))
             await session.refresh(message)
+        coalesced_media = False
         if (
             policy.response_rules.get("pi_mode") == "brain"
             and await newer_waiting(session, message)
             and not await burst_too_long(session, message, policy.response_rules)
         ):
-            message.status, message.error_code, event.status = (
-                "skipped",
-                "BURST_COALESCED",
-                "processed",
-            )
-            await session.commit()
-            return
+            if message.message_type in {"image", "video", "audio"} or (
+                (message.media or {}).get("file_kind") == "document"
+            ):
+                # an earlier photo, video, voice note or file of a burst is still READ (its words
+                # go on the message); only the newest message of the burst answers
+                coalesced_media = True
+            else:
+                message.status, message.error_code, event.status = (
+                    "skipped",
+                    "BURST_COALESCED",
+                    "processed",
+                )
+                await session.commit()
+                return
         # 1c. Moderation (spec 6.7): a blocked chat (a person decides) and spam or abuse that pi
         # already answered once get no reply at all.
         if policy.response_rules.get("pi_mode") == "brain":
@@ -1181,6 +1189,15 @@ async def process_pi_event(ctx: dict[str, Any], event_id: str) -> None:
                 await session.commit()
                 await enqueue_sends(ctx, outbound)
                 return
+        if coalesced_media:
+            # read above; the newest message of the burst answers them all
+            message.status, message.error_code, event.status = (
+                "skipped",
+                "BURST_COALESCED",
+                "processed",
+            )
+            await session.commit()
+            return
         # Brain mode: card, password, ID and account details never reach the model or the log
         # (R-PRIV-02); the original is kept encrypted for 30 days.
         pii_guard: dict[str, Any] | None = early_guard  # found when the message arrived
