@@ -70,8 +70,30 @@ def _grouped(match: re.Match[str]) -> str:
 PHONE_REMOVED = "[contact detail removed]"
 
 
+_ARABIC_DIGITS = {ord("٠") + i: str(i) for i in range(10)} | {
+    ord("۰") + i: str(i) for i in range(10)
+}  # Arabic-Indic and Persian digits
+# an international number in groups: +44 7911 123456, +966 50 123 4567 (9-15 digits)
+_INTERNATIONAL = re.compile(r"(?<![\w+])\+\d{1,3}(?:[\s.-]?\(?\d{1,5}\)?){2,5}(?!\d)")
+# a landline with the area code in brackets: (042) 35761234
+_BRACKETED = re.compile(r"(?<!\w)\(0\d{1,3}\)[\s.-]?\d{5,8}(?!\d)")
+# an address written to dodge a filter: ali [at] example [dot] com
+_OBFUSCATED_MAIL = re.compile(
+    r"[\w.+-]+\s*\[\s*at\s*\]\s*[\w-]+(?:\s*\[\s*dot\s*\]\s*[\w-]+)+", re.IGNORECASE
+)
+
+
+def _international(match: re.Match[str]) -> str:
+    digits = sum(ch.isdigit() for ch in match.group(0))
+    return PHONE_REMOVED if 9 <= digits <= 15 else match.group(0)
+
+
 def _redact_phones(text: str) -> str:
+    text = text.translate(_ARABIC_DIGITS)  # a number in any digit script is read as one
     text = _LOCAL_PHONE.sub(PHONE_REMOVED, safety.PHONE.sub(PHONE_REMOVED, text))
+    text = _INTERNATIONAL.sub(_international, text)
+    text = _BRACKETED.sub(PHONE_REMOVED, text)
+    text = _OBFUSCATED_MAIL.sub(PHONE_REMOVED, text)
     return _GROUPED_LANDLINE.sub(_grouped, text)
 
 
