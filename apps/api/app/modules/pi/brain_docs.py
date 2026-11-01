@@ -28,6 +28,7 @@ from app.core.config import Settings
 from app.modules.customers import files
 from app.modules.customers.models import Customer
 from app.modules.pi import (
+    blueprint_wire,
     box,
     box_doc,
     brain_pdf,
@@ -301,6 +302,9 @@ def check_content(content: dict[str, Any], refs: set[str] | None = None) -> list
     issues = check_solution(draft, known, catalogue=bool(content.get("box")))
     if content.get("box"):
         issues += box_text_issues(content) + box_doc.structure_issues(content)
+        stored = content.get("blueprint")
+        if isinstance(stored, dict):  # PS-4's checks: any issue blocks approval
+            issues += [f"blueprint {i}" for i in stored.get("issues") or []]
     return issues
 
 
@@ -372,6 +376,8 @@ def apply_box(
     local: bool,
     sector: str | None,
     renamed: dict[str, str] | None = None,
+    owner_messages: dict[str, str] | None = None,
+    chat_pick: str = "",
 ) -> dict[str, Any]:
     """Turn the stored six-section content into the eight-section box (spec 5.2). `views` are the
     problems' facts (`box_doc.problem_view`), `links` their links as dicts (from, to, type,
@@ -402,11 +408,23 @@ def apply_box(
             }
         )
     hypotheses = [{"text": _pick(h, local), "refs": h.refs} for h in draft.hypotheses]
+    phase_rows = box_doc.phase_table(components, {p: n for p, n in named.items() if n})
+    # PS-flow: the blueprint, built by PS-4 from the owner's own record; the recommendation is the
+    # L2-3 ranking the chat uses too (the idea the chat recommended is one of the candidates)
+    blueprint = blueprint_wire.build(
+        views,
+        components,
+        [str(n) for n in content.get("needs") or []],
+        owner_messages,
+        language if local else "en",
+        chat_pick,
+    )
     return {
         **content,
         "box": True,
+        "blueprint": blueprint,
         "components": components,
-        "phases": box_doc.phase_table(components, {p: n for p, n in named.items() if n}),
+        "phases": phase_rows,
         "clusters": box_doc.clusters(views, hypotheses, language=language, renamed=renamed),
         "links": box_doc.shown_links(links, titles),
         "ideas": ideas,
@@ -598,6 +616,21 @@ async def _links_of(
     ]
 
 
+async def _load_requirements(
+    session: AsyncSession, book: "problems.ProblemBook", rows: list[PiProblem]
+) -> None:
+    """Load the deferred B2a columns so the blueprint can read them. A database before migration
+    0053 has none: the rows then read as "not said" and the document is drafted as before."""
+    from sqlalchemy.exc import ProgrammingError
+
+    try:
+        async with session.begin_nested():
+            for row in rows:
+                await book.load_requirements(row)
+    except ProgrammingError:
+        logger.warning("pi_blueprint_requirements_missing")
+
+
 async def draft_offer(
     session: AsyncSession,
     scope: WorkspaceScope,
@@ -617,6 +650,7 @@ async def draft_offer(
     rows = [p for p in await book.active() if not wanted or problems.short_ref(p.id) in wanted]
     if not rows:
         return None
+    await _load_requirements(session, book, rows)
     language = conversation.language or "en"
     business = (
         (brief.get("customer_profile") or {}).get("business_name")
@@ -702,6 +736,20 @@ async def draft_offer(
     repo = WorkspaceRepository(session, PiBrainDocument, scope)
     sol_ref = f"SD-{number:04d}"
 
+    owner_texts: dict[str, str] = {}
+    if box_draft is not None:
+        ids = {m for p in rows for m in (p.source_message_ids or [])}
+        if ids:
+            stored = await session.scalars(
+                select(PiMessage).where(
+                    PiMessage.tenant_id == scope.tenant_id,
+                    PiMessage.environment_id == scope.environment_id,
+                    PiMessage.conversation_id == conversation_id,
+                    PiMessage.sender_type == "customer",
+                )
+            )
+            owner_texts = {str(m.id): m.body or "" for m in stored if str(m.id) in ids}
+
     def build(as_local: bool) -> dict[str, Any]:
         content = solution_content(
             draft, rows, business=business, ref=sol_ref, language=language, local=as_local
@@ -725,6 +773,8 @@ async def draft_offer(
             local=as_local,
             sector=sector,
             renamed=renamed,
+            owner_messages=owner_texts,
+            chat_pick=str(brief.get("chat_pick") or ""),
         )
         if brief.get("box_naya"):  # Box v2: the short difference list of 5.6
             boxed["naya"] = [str(x) for x in brief["box_naya"]][:8]
@@ -848,7 +898,7 @@ def edit(doc: PiBrainDocument, patch: dict[str, Any]) -> None:
                 content["phases"] = [
                     {"phase": int(p.get("phase") or 0), "name": str(p.get("name", ""))[:120]}
                     for p in patch["phases"]
-                ][:box_doc.MAX_PHASE]
+                ][: box_doc.MAX_PHASE]
         if "wont_do" in patch:
             content["wont_do"] = [
                 {"text": str(w.get("text", ""))[:300], "problem": str(w.get("problem", ""))}

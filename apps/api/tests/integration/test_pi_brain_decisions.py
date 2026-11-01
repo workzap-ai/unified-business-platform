@@ -2,6 +2,7 @@
 worker; the AI and WhatsApp are mocked (the model's own reply is overridden at the gates)."""
 
 import pytest
+from offer_expect import assert_offer_ends, expected_offer
 from sqlalchemy import select
 from test_pi_brain_problems import adaptive, create, problems_of, say, workspace
 from test_pi_service_conversations import turn
@@ -65,9 +66,11 @@ async def state_of(db, pi):
 async def test_the_summary_then_the_fixed_offer_with_buttons(api, business_db, monkeypatch):
     pi, _ = await to_the_offer(api, business_db, monkeypatch)
     summary = (await pi.reply_to("of-2")).body
-    assert summary.startswith("Here's what I've noted and sorted so far.")
+    assert summary.startswith("Here is what you have told me so far.")
     offer = await pi.reply_to("of-3")
-    assert offer.body == decisions.text("offer", "en")
+    assert offer.body == expected_offer("en", problems=2)  # the Solution Box wording (box on)
+    assert offer.body != decisions.text("offer", "en")  # not the legacy text
+    assert_offer_ends(offer.body, "en", problems=2)
     assert (await state_of(business_db, pi)).flow_state == "S5_READINESS"
     assert (offer.media or {}).get("buttons") == decisions.OFFER_BUTTONS["en"]
     await pi.close()
@@ -164,6 +167,30 @@ async def test_a_cost_question_at_the_offer_is_answered_not_gated(api, business_
     assert (await pi.reply_to("cq-1")).body != decisions.text("preparing", "en")
     assert (await state_of(business_db, pi)).flow_state == "S5_READINESS"
     assert (await business_db.scalars(select(PiStaffRequest))).all() == []
+    await pi.close()
+
+
+async def test_a_roman_urdu_cost_question_at_the_offer_does_not_start_the_quote(
+    api, business_db, monkeypatch
+):
+    # D-1 (approved by the owner, delegated recommended decisions 2026-10-31):
+    # deviates from spec v1.6 19.2 BS1/BS6
+    pi, prompts = await to_the_offer(api, business_db, monkeypatch)
+    await say(pi, "kitna kharcha hoga yeh banane ka?", "cq-ur")
+    body = (await pi.reply_to("cq-ur")).body
+    assert body != decisions.text("preparing", "roman_ur") and body != decisions.text(
+        "preparing", "en"
+    )
+    assert (await state_of(business_db, pi)).flow_state != "S6_PREPARING"
+    assert (await business_db.scalars(select(PiStaffRequest))).all() == []
+    await pi.close()
+
+
+async def test_an_explicit_quote_ask_at_the_offer_starts_the_quote(api, business_db, monkeypatch):
+    pi, prompts = await to_the_offer(api, business_db, monkeypatch)
+    await say(pi, "send me the quote", "cq-ask")
+    await pi.reply_to("cq-ask")
+    assert (await state_of(business_db, pi)).flow_state == "S6_PREPARING"
     await pi.close()
 
 

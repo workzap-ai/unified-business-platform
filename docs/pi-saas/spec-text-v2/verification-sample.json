@@ -1,0 +1,499 @@
+{
+ "pi-brain-v3": {
+  "examples_available": 7,
+  "examples_mismatch": [],
+  "examples_sampled": [
+   [
+    28,
+    "Example plain description"
+   ],
+   [
+    9,
+    "Example conversations are"
+   ],
+   [
+    427,
+    "Example promotion / retirement"
+   ],
+   [
+    24,
+    "Example"
+   ],
+   [
+    14,
+    "Example (Illustrative)"
+   ],
+   [
+    428,
+    "Example bank"
+   ],
+   [
+    443,
+    "Example file"
+   ]
+  ],
+  "ids_available": 206,
+  "ids_not_found": [],
+  "ids_sampled": 50,
+  "low_text_pages": [],
+  "pages_marked": 448,
+  "pages_pypdf": 448,
+  "tables_available": 41,
+  "tables_mismatch": [],
+  "tables_sampled": [
+   10,
+   11,
+   17,
+   18,
+   19,
+   20,
+   22,
+   31,
+   33,
+   35,
+   423,
+   431,
+   432,
+   433,
+   436,
+   437,
+   438,
+   439,
+   440,
+   442
+  ]
+ },
+ "pi-industry-solutions": {
+  "examples_available": 212,
+  "examples_mismatch": [],
+  "examples_sampled": [
+   [
+    176,
+    "Sample solution reply (Illustrative):"
+   ],
+   [
+    435,
+    "Sample solution reply (Illustrative):"
+   ],
+   [
+    355,
+    "Sample solution reply (Illustrative):"
+   ],
+   [
+    228,
+    "Sample solution reply (Illustrative):"
+   ],
+   [
+    115,
+    "Sample solution reply (Illustrative):"
+   ],
+   [
+    179,
+    "Sample solution reply (Illustrative):"
+   ],
+   [
+    172,
+    "Sample solution reply (Illustrative):"
+   ],
+   [
+    145,
+    "Sample solution reply (Illustrative):"
+   ],
+   [
+    287,
+    "Sample solution reply (Illustrative):"
+   ],
+   [
+    62,
+    "Sample solution reply (Illustrative):"
+   ]
+  ],
+  "ids_available": 24,
+  "ids_not_found": [],
+  "ids_sampled": 24,
+  "low_text_pages": [
+   1,
+   17,
+   50,
+   77
+  ],
+  "pages_marked": 467,
+  "pages_pypdf": 467,
+  "tables_available": 13,
+  "tables_mismatch": [],
+  "tables_sampled": [
+   8,
+   9,
+   11,
+   12,
+   13,
+   14,
+   15,
+   18,
+   19,
+   22,
+   23,
+   24,
+   119
+  ]
+ },
+ "pi-platform-spec": {
+  "examples_available": 6,
+  "examples_mismatch": [],
+  "examples_sampled": [
+   [
+    61,
+    "Example promotion / retirement Low Daily auto"
+   ],
+   [
+    83,
+    "Example file rule-auditor.md:"
+   ],
+   [
+    11,
+    "Example conversations are Illustrative, matching Workzap’s own rule that every made-up conversation"
+   ],
+   [
+    7,
+    "Example bank, retrieved"
+   ],
+   [
+    123,
+    "Sample solution reply Seeds the example bank (v3 Part 8.4.3) for that industry"
+   ],
+   [
+    63,
+    "Example bank Browse active examples by situation; see which ones pi uses"
+   ]
+  ],
+  "ids_available": 305,
+  "ids_not_found": [],
+  "ids_sampled": 50,
+  "low_text_pages": [
+   1,
+   141
+  ],
+  "pages_marked": 141,
+  "pages_pypdf": 141,
+  "tables_available": 102,
+  "tables_mismatch": [],
+  "tables_sampled": [
+   4,
+   5,
+   7,
+   21,
+   58,
+   62,
+   63,
+   70,
+   72,
+   83,
+   87,
+   88,
+   89,
+   91,
+   108,
+   109,
+   115,
+   116,
+   117,
+   124
+  ]
+ },
+ "pi-platform-spec-1": {
+  "examples_available": 8,
+  "examples_mismatch": [],
+  "examples_sampled": [
+   [
+    12,
+    "Example conversations are Illustrative, matching Workzap’s own rule that every made-up conversation"
+   ],
+   [
+    123,
+    "Sample solution reply Seeds the example bank (v3 Part 8.4.3) for that industry"
+   ],
+   [
+    188,
+    "Sample replies ending “Workzap …"
+   ],
+   [
+    63,
+    "Example bank Browse active examples by situation; see which ones pi uses"
+   ],
+   [
+    7,
+    "Example bank, retrieved"
+   ],
+   [
+    153,
+    "Sample problem map (Illustrative). Four problems, three links, one root cluster. A dashed arrow is p"
+   ],
+   [
+    83,
+    "Example file rule-auditor.md:"
+   ],
+   [
+    61,
+    "Example promotion / retirement Low Daily auto"
+   ]
+  ],
+  "ids_available": 307,
+  "ids_not_found": [],
+  "ids_sampled": 50,
+  "low_text_pages": [
+   1
+  ],
+  "pages_marked": 189,
+  "pages_pypdf": 189,
+  "tables_available": 146,
+  "tables_mismatch": [],
+  "tables_sampled": [
+   14,
+   19,
+   22,
+   33,
+   35,
+   65,
+   74,
+   98,
+   116,
+   121,
+   124,
+   129,
+   131,
+   141,
+   149,
+   153,
+   160,
+   173,
+   182,
+   189
+  ]
+ },
+ "pi-platform-spec-v1.4-2026-10-27": {
+  "examples_available": 9,
+  "examples_mismatch": [],
+  "examples_sampled": [
+   [
+    92,
+    "Example file rule-auditor.md:"
+   ],
+   [
+    197,
+    "Sample replies ending “Workzap …"
+   ],
+   [
+    71,
+    "Example promotion / retirement Low Daily auto"
+   ],
+   [
+    162,
+    "Sample problem map (Illustrative). Four problems, three links, one root cluster. A dashed arrow is p"
+   ],
+   [
+    15,
+    "Example bank, retrieved"
+   ],
+   [
+    73,
+    "Example bank Browse active examples by situation; see which ones pi"
+   ],
+   [
+    132,
+    "Sample solution reply Seeds the example bank (v3 Part 8.4.3) for that industry"
+   ],
+   [
+    210,
+    "Example (locksmith, Illustrative). After the two free ideas, a Workzap line such as: “Workzap could "
+   ],
+   [
+    19,
+    "Example conversations are Illustrative, matching Workzap’s own rule that every made-up"
+   ]
+  ],
+  "ids_available": 311,
+  "ids_not_found": [],
+  "ids_sampled": 50,
+  "low_text_pages": [
+   224
+  ],
+  "pages_marked": 224,
+  "pages_pypdf": 224,
+  "tables_available": 175,
+  "tables_mismatch": [],
+  "tables_sampled": [
+   31,
+   33,
+   53,
+   58,
+   72,
+   101,
+   106,
+   112,
+   139,
+   153,
+   157,
+   171,
+   183,
+   189,
+   202,
+   204,
+   206,
+   208,
+   211,
+   214
+  ]
+ },
+ "pi-platform-spec-v1.5-2026-10-28": {
+  "examples_available": 10,
+  "examples_mismatch": [],
+  "examples_sampled": [
+   [
+    15,
+    "Example bank, retrieved"
+   ],
+   [
+    71,
+    "Example promotion / retirement Low Daily auto"
+   ],
+   [
+    19,
+    "Example conversations are Illustrative, matching Workzap’s own rule that every made-up"
+   ],
+   [
+    211,
+    "Example (locksmith, Illustrative). After the two free ideas, a Workzap line such as: “Workzap could "
+   ],
+   [
+    199,
+    "Sample replies ending “Workzap …"
+   ],
+   [
+    73,
+    "Example bank Browse active examples by situation; see which ones pi"
+   ],
+   [
+    163,
+    "Sample problem map (Illustrative). Four problems, three links, one root cluster. A dashed arrow is p"
+   ],
+   [
+    92,
+    "Example file rule-auditor.md:"
+   ],
+   [
+    132,
+    "Sample solution reply Seeds the example bank (v3 Part 8.4.3) for that industry"
+   ],
+   [
+    217,
+    "Example (Illustrative). To “Hello” and “My friend shared your number”:"
+   ]
+  ],
+  "ids_available": 312,
+  "ids_not_found": [],
+  "ids_sampled": 50,
+  "low_text_pages": [],
+  "pages_marked": 238,
+  "pages_pypdf": 238,
+  "tables_available": 188,
+  "tables_mismatch": [],
+  "tables_sampled": [
+   37,
+   45,
+   49,
+   51,
+   68,
+   75,
+   99,
+   112,
+   126,
+   129,
+   133,
+   180,
+   194,
+   198,
+   199,
+   203,
+   212,
+   223,
+   230,
+   231
+  ]
+ },
+ "pi-platform-spec-v1.6-2026-10-30": {
+  "examples_available": 11,
+  "examples_mismatch": [],
+  "examples_sampled": [
+   [
+    93,
+    "Example file rule-auditor.md:"
+   ],
+   [
+    133,
+    "Sample solution reply Seeds the example bank (v3 Part 8.4.3) for that industry"
+   ],
+   [
+    219,
+    "Example (Illustrative). To “Hello” and “My friend shared your number”:"
+   ],
+   [
+    200,
+    "Sample replies ending “Workzap …"
+   ],
+   [
+    212,
+    "Example (locksmith, Illustrative). After the two free ideas, a Workzap line such as: “Workzap could "
+   ],
+   [
+    72,
+    "Example promotion / retirement Low Daily auto"
+   ],
+   [
+    226,
+    "Example. The owner says referrals are the only source (11:23) and “Zero” paid jobs from them in thre"
+   ],
+   [
+    74,
+    "Example bank Browse active examples by situation; see which ones pi"
+   ],
+   [
+    16,
+    "Example bank, retrieved"
+   ],
+   [
+    164,
+    "Sample problem map (Illustrative). Four problems, three links, one root cluster. A dashed arrow is p"
+   ]
+  ],
+  "ids_available": 311,
+  "ids_not_found": [],
+  "ids_sampled": 50,
+  "low_text_pages": [],
+  "pages_marked": 253,
+  "pages_pypdf": 253,
+  "tables_available": 203,
+  "tables_mismatch": [],
+  "tables_sampled": [
+   12,
+   28,
+   50,
+   53,
+   67,
+   73,
+   109,
+   116,
+   118,
+   121,
+   130,
+   139,
+   166,
+   168,
+   173,
+   180,
+   198,
+   199,
+   212,
+   247
+  ]
+ }
+}

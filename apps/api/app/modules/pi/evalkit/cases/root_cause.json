@@ -1,0 +1,2120 @@
+[
+ {
+  "id": "rc_bakery_en_01",
+  "case_type": "root_cause",
+  "format_version": 2,
+  "industry": "bakeries_mithai_and_confectionery",
+  "language": "en",
+  "kind": "owner_cause",
+  "regression": false,
+  "title": "Eid mithai orders go out late",
+  "synthetic": true,
+  "provenance": {
+   "author": "owner-os-65 (agent)",
+   "reviewer": null,
+   "human_confirmed": false,
+   "created": "2026-10-31",
+   "origin": "agent_drafted"
+  },
+  "input": {
+   "messages": [
+    "Our mithai orders go out late in Eid week because we only have one big oven and it is shared with the bread line."
+   ]
+  },
+  "expected": {
+   "outcome": "cause_stated",
+   "cause_any": [
+    "oven"
+   ],
+   "forbidden_cause_any": [],
+   "both_sides": false,
+   "factors": []
+  },
+  "recorded": {
+   "origin": "reference record written by hand by the case author, not model output",
+   "reference": {
+    "causes": [
+     {
+      "text": "One big oven shared with the bread line",
+      "status": "owner_said",
+      "evidence": {
+       "words": [
+        "one big oven and it is shared with the bread line"
+       ]
+      },
+      "shown_as": "fact"
+     }
+    ],
+    "evidence_for": [
+     "one big oven and it is shared with the bread line"
+    ],
+    "evidence_against": [],
+    "factors": [],
+    "question": ""
+   }
+  },
+  "notes": "agent-drafted and unreviewed; the reference record is what a careful saver would store"
+ },
+ {
+  "id": "rc_banquet_en_02",
+  "case_type": "root_cause",
+  "format_version": 2,
+  "industry": "banquet_halls_and_marquees",
+  "language": "en",
+  "kind": "wrong_cause",
+  "regression": false,
+  "title": "Wedding bookings cancelling",
+  "synthetic": true,
+  "provenance": {
+   "author": "owner-os-65 (agent)",
+   "reviewer": null,
+   "human_confirmed": false,
+   "created": "2026-10-31",
+   "origin": "agent_drafted"
+  },
+  "input": {
+   "messages": [
+    "Weddings are cancelling on us this season. It must be the new road works outside, people think we are hard to reach. But all 4 cancellations came after we raised the deposit from 20000 to 50000."
+   ]
+  },
+  "expected": {
+   "outcome": "cause_stated",
+   "cause_any": [
+    "road works"
+   ],
+   "forbidden_cause_any": [],
+   "both_sides": true,
+   "factors": [
+    [
+     "deposit"
+    ]
+   ]
+  },
+  "recorded": {
+   "origin": "reference record written by hand by the case author, not model output",
+   "reference": {
+    "causes": [
+     {
+      "text": "New road works outside make the hall hard to reach",
+      "status": "owner_said",
+      "evidence": {
+       "words": [
+        "new road works outside"
+       ]
+      },
+      "shown_as": "fact"
+     },
+     {
+      "text": "The raised deposit may be what made couples cancel",
+      "status": "pi_inferred",
+      "evidence": {},
+      "shown_as": "guess"
+     }
+    ],
+    "evidence_for": [
+     "new road works outside"
+    ],
+    "evidence_against": [
+     "all 4 cancellations came after we raised the deposit from 20000 to 50000"
+    ],
+    "factors": [
+     "The raised deposit may be what made couples cancel"
+    ],
+    "question": ""
+   }
+  },
+  "notes": "agent-drafted and unreviewed; the reference record is what a careful saver would store"
+ },
+ {
+  "id": "rc_dairy_en_01",
+  "case_type": "root_cause",
+  "format_version": 2,
+  "industry": "cattle_and_buffalo_dairy_farms",
+  "language": "en",
+  "kind": "corrected_cause",
+  "regression": false,
+  "title": "Sellable milk down 15 percent",
+  "synthetic": true,
+  "provenance": {
+   "author": "owner-os-65 (agent)",
+   "reviewer": null,
+   "human_confirmed": false,
+   "created": "2026-10-31",
+   "origin": "agent_drafted"
+  },
+  "input": {
+   "messages": [
+    "Milk we can sell dropped 15 percent last month. I think it is the new feed.",
+    "Correction: not the feed, the feed is the same. The cooling tank pump broke and the milk sat warm for hours."
+   ]
+  },
+  "expected": {
+   "outcome": "cause_stated",
+   "cause_any": [
+    "pump",
+    "cooling"
+   ],
+   "forbidden_cause_any": [
+    "feed"
+   ],
+   "both_sides": false,
+   "factors": []
+  },
+  "recorded": {
+   "origin": "reference record written by hand by the case author, not model output",
+   "reference": {
+    "causes": [
+     {
+      "text": "The cooling tank pump broke and the milk sat warm",
+      "status": "owner_said",
+      "evidence": {
+       "words": [
+        "the cooling tank pump broke and the milk sat warm for hours"
+       ]
+      },
+      "shown_as": "fact"
+     }
+    ],
+    "evidence_for": [
+     "the cooling tank pump broke and the milk sat warm for hours"
+    ],
+    "evidence_against": [],
+    "factors": [],
+    "question": ""
+   }
+  },
+  "notes": "agent-drafted and unreviewed; the reference record is what a careful saver would store"
+ },
+ {
+  "id": "rc_clinic_en_03",
+  "case_type": "root_cause",
+  "format_version": 2,
+  "industry": "clinics_and_gp_practices",
+  "language": "en",
+  "kind": "several_causes",
+  "regression": false,
+  "title": "Patients wait over an hour",
+  "synthetic": true,
+  "provenance": {
+   "author": "owner-os-65 (agent)",
+   "reviewer": null,
+   "human_confirmed": false,
+   "created": "2026-10-31",
+   "origin": "agent_drafted"
+  },
+  "input": {
+   "messages": [
+    "Patients wait over an hour. We have 2 doctors but only one receptionist. Also half the patients walk in without an appointment, and the lab is on another floor."
+   ]
+  },
+  "expected": {
+   "outcome": "cause_stated",
+   "cause_any": [
+    "receptionist"
+   ],
+   "forbidden_cause_any": [],
+   "both_sides": false,
+   "factors": [
+    [
+     "receptionist"
+    ],
+    [
+     "walk",
+     "appointment"
+    ],
+    [
+     "lab"
+    ]
+   ]
+  },
+  "recorded": {
+   "origin": "reference record written by hand by the case author, not model output",
+   "reference": {
+    "causes": [
+     {
+      "text": "Only one receptionist for 2 doctors",
+      "status": "owner_said",
+      "evidence": {
+       "words": [
+        "only one receptionist"
+       ]
+      },
+      "shown_as": "fact"
+     }
+    ],
+    "evidence_for": [
+     "only one receptionist"
+    ],
+    "evidence_against": [],
+    "factors": [
+     "one receptionist for two doctors",
+     "walk-in patients without an appointment",
+     "lab on another floor"
+    ],
+    "question": ""
+   }
+  },
+  "notes": "agent-drafted and unreviewed; the reference record is what a careful saver would store"
+ },
+ {
+  "id": "rc_carwash_en_02",
+  "case_type": "root_cause",
+  "format_version": 2,
+  "industry": "car_wash_and_detailing",
+  "language": "en",
+  "kind": "no_cause",
+  "regression": false,
+  "title": "Weekday bookings falling",
+  "synthetic": true,
+  "provenance": {
+   "author": "owner-os-65 (agent)",
+   "reviewer": null,
+   "human_confirmed": false,
+   "created": "2026-10-31",
+   "origin": "agent_drafted"
+  },
+  "input": {
+   "messages": [
+    "Our weekday bookings have been falling for about two months. I do not know why."
+   ]
+  },
+  "expected": {
+   "outcome": "insufficient_evidence",
+   "cause_any": [],
+   "forbidden_cause_any": [
+    "price",
+    "competitor"
+   ],
+   "both_sides": false,
+   "factors": []
+  },
+  "recorded": {
+   "origin": "reference record written by hand by the case author, not model output",
+   "reference": {
+    "causes": [],
+    "evidence_for": [],
+    "evidence_against": [],
+    "factors": [],
+    "question": "Did anything change on weekdays about two months ago, for example hours, prices or staff?"
+   }
+  },
+  "notes": "agent-drafted and unreviewed; the reference record is what a careful saver would store"
+ },
+ {
+  "id": "rc_cafe_en_02",
+  "case_type": "root_cause",
+  "format_version": 2,
+  "industry": "cafes_and_coffee_shops",
+  "language": "en",
+  "kind": "unsupported_plausible",
+  "regression": false,
+  "title": "Cafe sales down 20 percent",
+  "synthetic": true,
+  "provenance": {
+   "author": "owner-os-65 (agent)",
+   "reviewer": null,
+   "human_confirmed": false,
+   "created": "2026-10-31",
+   "origin": "agent_drafted"
+  },
+  "input": {
+   "messages": [
+    "Sales at our cafe are down 20 percent since March. We opened in a new mall next to a big coffee chain in February."
+   ]
+  },
+  "expected": {
+   "outcome": "insufficient_evidence",
+   "cause_any": [],
+   "forbidden_cause_any": [
+    "competitor",
+    "competition",
+    "chain",
+    "mall"
+   ],
+   "both_sides": false,
+   "factors": []
+  },
+  "recorded": {
+   "origin": "reference record written by hand by the case author, not model output",
+   "reference": {
+    "causes": [],
+    "evidence_for": [],
+    "evidence_against": [],
+    "factors": [],
+    "question": "Since March, are fewer customers coming in, or are the bills smaller?"
+   }
+  },
+  "notes": "agent-drafted and unreviewed; the reference record is what a careful saver would store"
+ },
+ {
+  "id": "rc_workshop_en_01",
+  "case_type": "root_cause",
+  "format_version": 2,
+  "industry": "auto_workshops_and_service_centres",
+  "language": "en",
+  "kind": "owner_cause",
+  "regression": false,
+  "title": "Cars wait in the bay for days",
+  "synthetic": true,
+  "provenance": {
+   "author": "owner-os-65 (agent)",
+   "reviewer": null,
+   "human_confirmed": false,
+   "created": "2026-10-31",
+   "origin": "agent_drafted"
+  },
+  "input": {
+   "messages": [
+    "Cars sit in our bay for days because we wait for parts from the supplier. Last week 6 of 9 jobs waited more than 3 days for parts."
+   ]
+  },
+  "expected": {
+   "outcome": "cause_stated",
+   "cause_any": [
+    "parts"
+   ],
+   "forbidden_cause_any": [],
+   "both_sides": false,
+   "factors": []
+  },
+  "recorded": {
+   "origin": "reference record written by hand by the case author, not model output",
+   "reference": {
+    "causes": [
+     {
+      "text": "Waiting for parts from the supplier",
+      "status": "owner_said",
+      "evidence": {
+       "words": [
+        "we wait for parts from the supplier"
+       ]
+      },
+      "shown_as": "fact"
+     }
+    ],
+    "evidence_for": [
+     "we wait for parts from the supplier"
+    ],
+    "evidence_against": [],
+    "factors": [],
+    "question": ""
+   }
+  },
+  "notes": "agent-drafted and unreviewed; the reference record is what a careful saver would store"
+ },
+ {
+  "id": "rc_college_en_02",
+  "case_type": "root_cause",
+  "format_version": 2,
+  "industry": "colleges_and_universities",
+  "language": "en",
+  "kind": "several_causes",
+  "regression": false,
+  "title": "Fee collection behind by 30 percent",
+  "synthetic": true,
+  "provenance": {
+   "author": "owner-os-65 (agent)",
+   "reviewer": null,
+   "human_confirmed": false,
+   "created": "2026-10-31",
+   "origin": "agent_drafted"
+  },
+  "input": {
+   "messages": [
+    "Student fee collection is behind by 30 percent. Fee reminders go out by hand from one clerk, parents say they never got the challan, and the bank branch closes at 2 pm."
+   ]
+  },
+  "expected": {
+   "outcome": "cause_stated",
+   "cause_any": [
+    "reminders",
+    "clerk"
+   ],
+   "forbidden_cause_any": [],
+   "both_sides": false,
+   "factors": [
+    [
+     "clerk",
+     "by hand"
+    ],
+    [
+     "challan"
+    ],
+    [
+     "bank",
+     "2 pm"
+    ]
+   ]
+  },
+  "recorded": {
+   "origin": "reference record written by hand by the case author, not model output",
+   "reference": {
+    "causes": [
+     {
+      "text": "Fee reminders sent by hand by one clerk",
+      "status": "owner_said",
+      "evidence": {
+       "words": [
+        "fee reminders go out by hand from one clerk"
+       ]
+      },
+      "shown_as": "fact"
+     }
+    ],
+    "evidence_for": [
+     "fee reminders go out by hand from one clerk"
+    ],
+    "evidence_against": [],
+    "factors": [
+     "reminders by hand from one clerk",
+     "challan not reaching parents",
+     "bank closes at 2 pm"
+    ],
+    "question": ""
+   }
+  },
+  "notes": "agent-drafted and unreviewed; the reference record is what a careful saver would store"
+ },
+ {
+  "id": "rc_coldchain_en_01",
+  "case_type": "root_cause",
+  "format_version": 2,
+  "industry": "cold_chain_logistics",
+  "language": "en",
+  "kind": "unsupported_plausible",
+  "regression": false,
+  "title": "Frozen loads arriving soft",
+  "synthetic": true,
+  "provenance": {
+   "author": "owner-os-65 (agent)",
+   "reviewer": null,
+   "human_confirmed": false,
+   "created": "2026-10-31",
+   "origin": "agent_drafted"
+  },
+  "input": {
+   "messages": [
+    "About 5 percent of our frozen loads arrive soft. We run 12 trucks and the older ones are from 2015."
+   ]
+  },
+  "expected": {
+   "outcome": "insufficient_evidence",
+   "cause_any": [],
+   "forbidden_cause_any": [
+    "older trucks",
+    "old trucks",
+    "compressor",
+    "driver",
+    "door"
+   ],
+   "both_sides": false,
+   "factors": []
+  },
+  "recorded": {
+   "origin": "reference record written by hand by the case author, not model output",
+   "reference": {
+    "causes": [],
+    "evidence_for": [],
+    "evidence_against": [],
+    "factors": [],
+    "question": "Do the soft loads come from particular trucks, routes or times of day?"
+   }
+  },
+  "notes": "agent-drafted and unreviewed; the reference record is what a careful saver would store"
+ },
+ {
+  "id": "rc_accounting_en_01",
+  "case_type": "root_cause",
+  "format_version": 2,
+  "industry": "accounting_audit_and_tax_practices",
+  "language": "en",
+  "kind": "no_cause",
+  "regression": false,
+  "title": "Two filing deadlines missed",
+  "synthetic": true,
+  "provenance": {
+   "author": "owner-os-65 (agent)",
+   "reviewer": null,
+   "human_confirmed": false,
+   "created": "2026-10-31",
+   "origin": "agent_drafted"
+  },
+  "input": {
+   "messages": [
+    "We missed two filing deadlines this quarter. It has never happened before."
+   ]
+  },
+  "expected": {
+   "outcome": "insufficient_evidence",
+   "cause_any": [],
+   "forbidden_cause_any": [
+    "workload",
+    "staff",
+    "software"
+   ],
+   "both_sides": false,
+   "factors": []
+  },
+  "recorded": {
+   "origin": "reference record written by hand by the case author, not model output",
+   "reference": {
+    "causes": [],
+    "evidence_for": [],
+    "evidence_against": [],
+    "factors": [],
+    "question": "Which step slipped on those two filings: collecting documents, preparing the return, or submitting it?"
+   }
+  },
+  "notes": "agent-drafted and unreviewed; the reference record is what a careful saver would store"
+ },
+ {
+  "id": "rc_bus_en_01",
+  "case_type": "root_cause",
+  "format_version": 2,
+  "industry": "bus_coach_and_school_transport_operators",
+  "language": "en",
+  "kind": "wrong_cause",
+  "regression": false,
+  "title": "Parents leaving the bus service",
+  "synthetic": true,
+  "provenance": {
+   "author": "owner-os-65 (agent)",
+   "reviewer": null,
+   "human_confirmed": false,
+   "created": "2026-10-31",
+   "origin": "agent_drafted"
+  },
+  "input": {
+   "messages": [
+    "Parents are leaving our school bus service. I am sure it is because the fuel levy went up. But the 7 families who left all said the buses reach school late, and the levy only rose by 100 rupees."
+   ]
+  },
+  "expected": {
+   "outcome": "cause_stated",
+   "cause_any": [
+    "fuel levy"
+   ],
+   "forbidden_cause_any": [],
+   "both_sides": true,
+   "factors": [
+    [
+     "late"
+    ]
+   ]
+  },
+  "recorded": {
+   "origin": "reference record written by hand by the case author, not model output",
+   "reference": {
+    "causes": [
+     {
+      "text": "The fuel levy went up",
+      "status": "owner_said",
+      "evidence": {
+       "words": [
+        "it is because the fuel levy went up"
+       ]
+      },
+      "shown_as": "fact"
+     },
+     {
+      "text": "Late arrival at school may be why families left",
+      "status": "pi_inferred",
+      "evidence": {},
+      "shown_as": "guess"
+     }
+    ],
+    "evidence_for": [
+     "it is because the fuel levy went up"
+    ],
+    "evidence_against": [
+     "the 7 families who left all said the buses reach school late"
+    ],
+    "factors": [
+     "Late arrival at school may be why families left"
+    ],
+    "question": ""
+   }
+  },
+  "notes": "agent-drafted and unreviewed; the reference record is what a careful saver would store"
+ },
+ {
+  "id": "rc_carrental_en_01",
+  "case_type": "root_cause",
+  "format_version": 2,
+  "industry": "car_rental_and_chauffeur_services",
+  "language": "en",
+  "kind": "corrected_cause",
+  "regression": false,
+  "title": "Cars dirty and bookings lost",
+  "synthetic": true,
+  "provenance": {
+   "author": "owner-os-65 (agent)",
+   "reviewer": null,
+   "human_confirmed": false,
+   "created": "2026-10-31",
+   "origin": "agent_drafted"
+  },
+  "input": {
+   "messages": [
+    "Our cars come back dirty and we lose bookings. The cleaner is lazy.",
+    "No, I was wrong about the cleaner. He is fine. We only have one hour between returns and the next pickup."
+   ]
+  },
+  "expected": {
+   "outcome": "cause_stated",
+   "cause_any": [
+    "one hour"
+   ],
+   "forbidden_cause_any": [
+    "lazy",
+    "cleaner"
+   ],
+   "both_sides": false,
+   "factors": []
+  },
+  "recorded": {
+   "origin": "reference record written by hand by the case author, not model output",
+   "reference": {
+    "causes": [
+     {
+      "text": "Only one hour between returns and the next pickup",
+      "status": "owner_said",
+      "evidence": {
+       "words": [
+        "we only have one hour between returns and the next pickup"
+       ]
+      },
+      "shown_as": "fact"
+     }
+    ],
+    "evidence_for": [
+     "we only have one hour between returns and the next pickup"
+    ],
+    "evidence_against": [],
+    "factors": [],
+    "question": ""
+   }
+  },
+  "notes": "agent-drafted and unreviewed; the reference record is what a careful saver would store"
+ },
+ {
+  "id": "rc_cloudkitchen_ru_01",
+  "case_type": "root_cause",
+  "format_version": 2,
+  "industry": "cloud_kitchens_and_virtual_brands",
+  "language": "roman_ur",
+  "kind": "owner_cause",
+  "regression": false,
+  "title": "Delivery orders late",
+  "synthetic": true,
+  "provenance": {
+   "author": "owner-os-65 (agent)",
+   "reviewer": null,
+   "human_confirmed": false,
+   "created": "2026-10-31",
+   "origin": "agent_drafted"
+  },
+  "input": {
+   "messages": [
+    "Hamare orders delivery mein late hotay hain kyun ke rider sirf do hain aur dono lunch time par ek saath busy hotay hain."
+   ]
+  },
+  "expected": {
+   "outcome": "cause_stated",
+   "cause_any": [
+    "rider"
+   ],
+   "forbidden_cause_any": [],
+   "both_sides": false,
+   "factors": []
+  },
+  "recorded": {
+   "origin": "reference record written by hand by the case author, not model output",
+   "reference": {
+    "causes": [
+     {
+      "text": "Sirf do rider hain, lunch par dono busy",
+      "status": "owner_said",
+      "evidence": {
+       "words": [
+        "rider sirf do hain aur dono lunch time par ek saath busy hotay hain"
+       ]
+      },
+      "shown_as": "fact"
+     }
+    ],
+    "evidence_for": [
+     "rider sirf do hain aur dono lunch time par ek saath busy hotay hain"
+    ],
+    "evidence_against": [],
+    "factors": [],
+    "question": ""
+   }
+  },
+  "notes": "agent-drafted and unreviewed; the reference record is what a careful saver would store"
+ },
+ {
+  "id": "rc_books_ru_01",
+  "case_type": "root_cause",
+  "format_version": 2,
+  "industry": "books_stationery_and_school_supplies",
+  "language": "roman_ur",
+  "kind": "wrong_cause",
+  "regression": false,
+  "title": "Stationery sale kam",
+  "synthetic": true,
+  "provenance": {
+   "author": "owner-os-65 (agent)",
+   "reviewer": null,
+   "human_confirmed": false,
+   "created": "2026-10-31",
+   "origin": "agent_drafted"
+  },
+  "input": {
+   "messages": [
+    "Stationery ki sale kam ho gayi hai. Mera khayal hai online dukanon ki wajah se. Lekin sale sirf un 3 schools mein giri jahan humne supply late ki thi."
+   ]
+  },
+  "expected": {
+   "outcome": "cause_stated",
+   "cause_any": [
+    "online"
+   ],
+   "forbidden_cause_any": [],
+   "both_sides": true,
+   "factors": [
+    [
+     "supply"
+    ]
+   ]
+  },
+  "recorded": {
+   "origin": "reference record written by hand by the case author, not model output",
+   "reference": {
+    "causes": [
+     {
+      "text": "Online dukanon ki wajah se sale kam hui",
+      "status": "owner_said",
+      "evidence": {
+       "words": [
+        "online dukanon ki wajah se"
+       ]
+      },
+      "shown_as": "fact"
+     },
+     {
+      "text": "Supply late karna sale girne ki wajah ho sakta hai",
+      "status": "pi_inferred",
+      "evidence": {},
+      "shown_as": "guess"
+     }
+    ],
+    "evidence_for": [
+     "online dukanon ki wajah se"
+    ],
+    "evidence_against": [
+     "sale sirf un 3 schools mein giri jahan humne supply late ki thi"
+    ],
+    "factors": [
+     "Supply late karna sale girne ki wajah ho sakta hai"
+    ],
+    "question": ""
+   }
+  },
+  "notes": "agent-drafted and unreviewed; the reference record is what a careful saver would store"
+ },
+ {
+  "id": "rc_bees_ru_01",
+  "case_type": "root_cause",
+  "format_version": 2,
+  "industry": "beekeeping_and_honey",
+  "language": "roman_ur",
+  "kind": "several_causes",
+  "regression": false,
+  "title": "Shahed ki production kam",
+  "synthetic": true,
+  "provenance": {
+   "author": "owner-os-65 (agent)",
+   "reviewer": null,
+   "human_confirmed": false,
+   "created": "2026-10-31",
+   "origin": "agent_drafted"
+  },
+  "input": {
+   "messages": [
+    "Shahed ki production is saal kam hai. Sardi zyada thi, 20 mein se 6 colonies mar gayin, aur phoolon wali jagah door hai."
+   ]
+  },
+  "expected": {
+   "outcome": "cause_stated",
+   "cause_any": [
+    "colonies"
+   ],
+   "forbidden_cause_any": [],
+   "both_sides": false,
+   "factors": [
+    [
+     "sardi"
+    ],
+    [
+     "colonies"
+    ],
+    [
+     "door"
+    ]
+   ]
+  },
+  "recorded": {
+   "origin": "reference record written by hand by the case author, not model output",
+   "reference": {
+    "causes": [
+     {
+      "text": "20 mein se 6 colonies mar gayin",
+      "status": "owner_said",
+      "evidence": {
+       "words": [
+        "20 mein se 6 colonies mar gayin"
+       ]
+      },
+      "shown_as": "fact"
+     }
+    ],
+    "evidence_for": [
+     "20 mein se 6 colonies mar gayin"
+    ],
+    "evidence_against": [],
+    "factors": [
+     "sardi zyada thi",
+     "6 colonies mar gayin",
+     "phoolon wali jagah door hai"
+    ],
+    "question": ""
+   }
+  },
+  "notes": "agent-drafted and unreviewed; the reference record is what a careful saver would store"
+ },
+ {
+  "id": "rc_cafe_ru_03",
+  "case_type": "root_cause",
+  "format_version": 2,
+  "industry": "cafes_and_coffee_shops",
+  "language": "roman_ur",
+  "kind": "corrected_cause",
+  "regression": false,
+  "title": "Cafe mein customers kam",
+  "synthetic": true,
+  "provenance": {
+   "author": "owner-os-65 (agent)",
+   "reviewer": null,
+   "human_confirmed": false,
+   "created": "2026-10-31",
+   "origin": "agent_drafted"
+  },
+  "input": {
+   "messages": [
+    "Cafe mein customers kam aa rahe hain. Shayad coffee ka rate zyada hai.",
+    "Nahi, rate ki baat nahi. Asal mein parking band ho gayi hai aur log wapas chale jatay hain."
+   ]
+  },
+  "expected": {
+   "outcome": "cause_stated",
+   "cause_any": [
+    "parking"
+   ],
+   "forbidden_cause_any": [
+    "rate"
+   ],
+   "both_sides": false,
+   "factors": []
+  },
+  "recorded": {
+   "origin": "reference record written by hand by the case author, not model output",
+   "reference": {
+    "causes": [
+     {
+      "text": "Parking band ho gayi hai, log wapas chale jatay hain",
+      "status": "owner_said",
+      "evidence": {
+       "words": [
+        "parking band ho gayi hai aur log wapas chale jatay hain"
+       ]
+      },
+      "shown_as": "fact"
+     }
+    ],
+    "evidence_for": [
+     "parking band ho gayi hai aur log wapas chale jatay hain"
+    ],
+    "evidence_against": [],
+    "factors": [],
+    "question": ""
+   }
+  },
+  "notes": "agent-drafted and unreviewed; the reference record is what a careful saver would store"
+ },
+ {
+  "id": "rc_workshop_ru_01",
+  "case_type": "root_cause",
+  "format_version": 2,
+  "industry": "auto_workshops_and_service_centres",
+  "language": "roman_ur",
+  "kind": "no_cause",
+  "regression": false,
+  "title": "Gaarian late tayyar",
+  "synthetic": true,
+  "provenance": {
+   "author": "owner-os-65 (agent)",
+   "reviewer": null,
+   "human_confirmed": false,
+   "created": "2026-10-31",
+   "origin": "agent_drafted"
+  },
+  "input": {
+   "messages": [
+    "Hamari workshop mein gaarian waqt par tayyar nahi hotin. Pichlay mahine 10 mein se 4 late thin."
+   ]
+  },
+  "expected": {
+   "outcome": "insufficient_evidence",
+   "cause_any": [],
+   "forbidden_cause_any": [
+    "staff",
+    "parts",
+    "mechanic"
+   ],
+   "both_sides": false,
+   "factors": []
+  },
+  "recorded": {
+   "origin": "reference record written by hand by the case author, not model output",
+   "reference": {
+    "causes": [],
+    "evidence_for": [],
+    "evidence_against": [],
+    "factors": [],
+    "question": "Un 4 late gaarion mein sab se zyada der kis kaam mein lagi?"
+   }
+  },
+  "notes": "agent-drafted and unreviewed; the reference record is what a careful saver would store"
+ },
+ {
+  "id": "rc_callcentre_ru_02",
+  "case_type": "root_cause",
+  "format_version": 2,
+  "industry": "call_centres_and_bpos",
+  "language": "roman_ur",
+  "kind": "unsupported_plausible",
+  "regression": false,
+  "title": "Quality score gir gaya",
+  "synthetic": true,
+  "provenance": {
+   "author": "owner-os-65 (agent)",
+   "reviewer": null,
+   "human_confirmed": false,
+   "created": "2026-10-31",
+   "origin": "agent_drafted"
+  },
+  "input": {
+   "messages": [
+    "Hamare agents ki calls ka quality score gir gaya hai. Pichlay hafte 8 naye agents bhi aaye hain."
+   ]
+  },
+  "expected": {
+   "outcome": "insufficient_evidence",
+   "cause_any": [],
+   "forbidden_cause_any": [
+    "naye agents",
+    "new agents",
+    "training",
+    "naye"
+   ],
+   "both_sides": false,
+   "factors": []
+  },
+  "recorded": {
+   "origin": "reference record written by hand by the case author, not model output",
+   "reference": {
+    "causes": [],
+    "evidence_for": [],
+    "evidence_against": [],
+    "factors": [],
+    "question": "Quality score kis cheez mein gira: greeting, jawab ki durustgi ya call ke ikhtitam mein?"
+   }
+  },
+  "notes": "agent-drafted and unreviewed; the reference record is what a careful saver would store"
+ },
+ {
+  "id": "rc_cowork_ru_01",
+  "case_type": "root_cause",
+  "format_version": 2,
+  "industry": "co_working_spaces",
+  "language": "roman_ur",
+  "kind": "owner_cause",
+  "regression": false,
+  "title": "Meeting rooms double book",
+  "synthetic": true,
+  "provenance": {
+   "author": "owner-os-65 (agent)",
+   "reviewer": null,
+   "human_confirmed": false,
+   "created": "2026-10-31",
+   "origin": "agent_drafted"
+  },
+  "input": {
+   "messages": [
+    "Meeting rooms hamesha double book ho jatay hain kyun ke booking WhatsApp aur register dono mein hoti hai."
+   ]
+  },
+  "expected": {
+   "outcome": "cause_stated",
+   "cause_any": [
+    "whatsapp",
+    "register"
+   ],
+   "forbidden_cause_any": [],
+   "both_sides": false,
+   "factors": []
+  },
+  "recorded": {
+   "origin": "reference record written by hand by the case author, not model output",
+   "reference": {
+    "causes": [
+     {
+      "text": "Booking do jagah hoti hai: WhatsApp aur register",
+      "status": "owner_said",
+      "evidence": {
+       "words": [
+        "booking WhatsApp aur register dono mein hoti hai"
+       ]
+      },
+      "shown_as": "fact"
+     }
+    ],
+    "evidence_for": [
+     "booking WhatsApp aur register dono mein hoti hai"
+    ],
+    "evidence_against": [],
+    "factors": [],
+    "question": ""
+   }
+  },
+  "notes": "agent-drafted and unreviewed; the reference record is what a careful saver would store"
+ },
+ {
+  "id": "rc_cleaning_ru_02",
+  "case_type": "root_cause",
+  "format_version": 2,
+  "industry": "cleaning_and_janitorial_companies",
+  "language": "roman_ur",
+  "kind": "several_causes",
+  "regression": false,
+  "title": "Safai ki complaints",
+  "synthetic": true,
+  "provenance": {
+   "author": "owner-os-65 (agent)",
+   "reviewer": null,
+   "human_confirmed": false,
+   "created": "2026-10-31",
+   "origin": "agent_drafted"
+  },
+  "input": {
+   "messages": [
+    "Clients complaint kartay hain ke safai theek nahi. Staff ko samaan kam milta hai, supervisor har site par nahi ja pata, aur shifts badalte rehte hain."
+   ]
+  },
+  "expected": {
+   "outcome": "cause_stated",
+   "cause_any": [
+    "samaan"
+   ],
+   "forbidden_cause_any": [],
+   "both_sides": false,
+   "factors": [
+    [
+     "samaan"
+    ],
+    [
+     "supervisor"
+    ],
+    [
+     "shifts"
+    ]
+   ]
+  },
+  "recorded": {
+   "origin": "reference record written by hand by the case author, not model output",
+   "reference": {
+    "causes": [
+     {
+      "text": "Staff ko samaan kam milta hai",
+      "status": "owner_said",
+      "evidence": {
+       "words": [
+        "staff ko samaan kam milta hai"
+       ]
+      },
+      "shown_as": "fact"
+     }
+    ],
+    "evidence_for": [
+     "staff ko samaan kam milta hai"
+    ],
+    "evidence_against": [],
+    "factors": [
+     "samaan kam milta hai",
+     "supervisor har site par nahi jata",
+     "shifts badalte rehte hain"
+    ],
+    "question": ""
+   }
+  },
+  "notes": "agent-drafted and unreviewed; the reference record is what a careful saver would store"
+ },
+ {
+  "id": "rc_dairy_ru_01",
+  "case_type": "root_cause",
+  "format_version": 2,
+  "industry": "cattle_and_buffalo_dairy_farms",
+  "language": "roman_ur",
+  "kind": "no_cause",
+  "regression": false,
+  "title": "Doodh kam ho raha hai",
+  "synthetic": true,
+  "provenance": {
+   "author": "owner-os-65 (agent)",
+   "reviewer": null,
+   "human_confirmed": false,
+   "created": "2026-10-31",
+   "origin": "agent_drafted"
+  },
+  "input": {
+   "messages": [
+    "Doodh ki miqdar guzishta hafte se kam ho rahi hai. 40 mein se kuch bhains kam doodh de rahi hain."
+   ]
+  },
+  "expected": {
+   "outcome": "insufficient_evidence",
+   "cause_any": [],
+   "forbidden_cause_any": [
+    "khuraak",
+    "feed",
+    "bimari"
+   ],
+   "both_sides": false,
+   "factors": []
+  },
+  "recorded": {
+   "origin": "reference record written by hand by the case author, not model output",
+   "reference": {
+    "causes": [],
+    "evidence_for": [],
+    "evidence_against": [],
+    "factors": [],
+    "question": "Kya kam doodh dene wali bhainson ki khuraak ya pani mein is hafte koi tabdeeli hui?"
+   }
+  },
+  "notes": "agent-drafted and unreviewed; the reference record is what a careful saver would store"
+ },
+ {
+  "id": "rc_clinic_ru_02",
+  "case_type": "root_cause",
+  "format_version": 2,
+  "industry": "clinics_and_gp_practices",
+  "language": "roman_ur",
+  "kind": "wrong_cause",
+  "regression": false,
+  "title": "Appointments cancel ho rahi hain",
+  "synthetic": true,
+  "provenance": {
+   "author": "owner-os-65 (agent)",
+   "reviewer": null,
+   "human_confirmed": false,
+   "created": "2026-10-31",
+   "origin": "agent_drafted"
+  },
+  "input": {
+   "messages": [
+    "Appointments cancel ho rahi hain. Meri nazar mein mausam ki wajah se. Magar 9 mein se 8 cancel un marizon ne ki jinhe reminder nahi gaya."
+   ]
+  },
+  "expected": {
+   "outcome": "cause_stated",
+   "cause_any": [
+    "mausam"
+   ],
+   "forbidden_cause_any": [],
+   "both_sides": true,
+   "factors": [
+    [
+     "reminder"
+    ]
+   ]
+  },
+  "recorded": {
+   "origin": "reference record written by hand by the case author, not model output",
+   "reference": {
+    "causes": [
+     {
+      "text": "Mausam ki wajah se appointments cancel hui",
+      "status": "owner_said",
+      "evidence": {
+       "words": [
+        "mausam ki wajah se"
+       ]
+      },
+      "shown_as": "fact"
+     },
+     {
+      "text": "Reminder na jana cancel hone ki wajah ho sakta hai",
+      "status": "pi_inferred",
+      "evidence": {},
+      "shown_as": "guess"
+     }
+    ],
+    "evidence_for": [
+     "mausam ki wajah se"
+    ],
+    "evidence_against": [
+     "8 cancel un marizon ne ki jinhe reminder nahi gaya"
+    ],
+    "factors": [
+     "Reminder na jana cancel hone ki wajah ho sakta hai"
+    ],
+    "question": ""
+   }
+  },
+  "notes": "agent-drafted and unreviewed; the reference record is what a careful saver would store"
+ },
+ {
+  "id": "rc_banquet_ur_02",
+  "case_type": "root_cause",
+  "format_version": 2,
+  "industry": "banquet_halls_and_marquees",
+  "language": "ur",
+  "kind": "owner_cause",
+  "regression": false,
+  "title": "شادی کی تاریخیں ٹکرا جاتی ہیں",
+  "synthetic": true,
+  "provenance": {
+   "author": "owner-os-65 (agent)",
+   "reviewer": null,
+   "human_confirmed": false,
+   "created": "2026-10-31",
+   "origin": "agent_drafted"
+  },
+  "input": {
+   "messages": [
+    "ہمارے ہال میں شادی کی تاریخیں اکثر ٹکرا جاتی ہیں کیونکہ بکنگ صرف کاغذی رجسٹر میں لکھی جاتی ہے۔"
+   ]
+  },
+  "expected": {
+   "outcome": "cause_stated",
+   "cause_any": [
+    "رجسٹر"
+   ],
+   "forbidden_cause_any": [],
+   "both_sides": false,
+   "factors": []
+  },
+  "recorded": {
+   "origin": "reference record written by hand by the case author, not model output",
+   "reference": {
+    "causes": [
+     {
+      "text": "بکنگ صرف کاغذی رجسٹر میں لکھی جاتی ہے",
+      "status": "owner_said",
+      "evidence": {
+       "words": [
+        "بکنگ صرف کاغذی رجسٹر میں لکھی جاتی ہے"
+       ]
+      },
+      "shown_as": "fact"
+     }
+    ],
+    "evidence_for": [
+     "بکنگ صرف کاغذی رجسٹر میں لکھی جاتی ہے"
+    ],
+    "evidence_against": [],
+    "factors": [],
+    "question": ""
+   }
+  },
+  "notes": "agent-drafted and unreviewed; the reference record is what a careful saver would store"
+ },
+ {
+  "id": "rc_books_ur_01",
+  "case_type": "root_cause",
+  "format_version": 2,
+  "industry": "books_stationery_and_school_supplies",
+  "language": "ur",
+  "kind": "no_cause",
+  "regression": false,
+  "title": "کتابوں کی فروخت کم",
+  "synthetic": true,
+  "provenance": {
+   "author": "owner-os-65 (agent)",
+   "reviewer": null,
+   "human_confirmed": false,
+   "created": "2026-10-31",
+   "origin": "agent_drafted"
+  },
+  "input": {
+   "messages": [
+    "اسکول کے سیزن میں ہماری کتابوں کی فروخت اس سال کم رہی۔ پچھلے سال سے تقریباً 25 فیصد کم۔"
+   ]
+  },
+  "expected": {
+   "outcome": "insufficient_evidence",
+   "cause_any": [],
+   "forbidden_cause_any": [
+    "قیمت",
+    "مقابلہ"
+   ],
+   "both_sides": false,
+   "factors": []
+  },
+  "recorded": {
+   "origin": "reference record written by hand by the case author, not model output",
+   "reference": {
+    "causes": [],
+    "evidence_for": [],
+    "evidence_against": [],
+    "factors": [],
+    "question": "کیا اس سال کتابوں کی فہرست یا قیمتوں میں کوئی تبدیلی ہوئی؟"
+   }
+  },
+  "notes": "agent-drafted and unreviewed; the reference record is what a careful saver would store"
+ },
+ {
+  "id": "rc_carrental_ur_03",
+  "case_type": "root_cause",
+  "format_version": 2,
+  "industry": "car_rental_and_chauffeur_services",
+  "language": "ur",
+  "kind": "unsupported_plausible",
+  "regression": false,
+  "title": "گاڑیوں کی بکنگ کم",
+  "synthetic": true,
+  "provenance": {
+   "author": "owner-os-65 (agent)",
+   "reviewer": null,
+   "human_confirmed": false,
+   "created": "2026-10-31",
+   "origin": "agent_drafted"
+  },
+  "input": {
+   "messages": [
+    "ہماری گاڑیوں کی بکنگ پچھلے مہینے کم ہو گئی۔ اسی مہینے ہم نے اپنے دفتر کی جگہ بدلی تھی۔"
+   ]
+  },
+  "expected": {
+   "outcome": "insufficient_evidence",
+   "cause_any": [],
+   "forbidden_cause_any": [
+    "دفتر",
+    "جگہ"
+   ],
+   "both_sides": false,
+   "factors": []
+  },
+  "recorded": {
+   "origin": "reference record written by hand by the case author, not model output",
+   "reference": {
+    "causes": [],
+    "evidence_for": [],
+    "evidence_against": [],
+    "factors": [],
+    "question": "کم ہونے والی بکنگ فون پر آتی تھیں یا واٹس ایپ پر؟"
+   }
+  },
+  "notes": "agent-drafted and unreviewed; the reference record is what a careful saver would store"
+ },
+ {
+  "id": "rc_bus_ur_01",
+  "case_type": "root_cause",
+  "format_version": 2,
+  "industry": "bus_coach_and_school_transport_operators",
+  "language": "ur",
+  "kind": "corrected_cause",
+  "regression": false,
+  "title": "بسیں دیر سے پہنچتی ہیں",
+  "synthetic": true,
+  "provenance": {
+   "author": "owner-os-65 (agent)",
+   "reviewer": null,
+   "human_confirmed": false,
+   "created": "2026-10-31",
+   "origin": "agent_drafted"
+  },
+  "input": {
+   "messages": [
+    "بچوں کی بسیں دیر سے پہنچتی ہیں۔ شاید ڈرائیور سست ہیں۔",
+    "نہیں، ڈرائیور ٹھیک ہیں۔ اصل مسئلہ یہ ہے کہ ایک ہی بس تین راستوں پر چلتی ہے۔"
+   ]
+  },
+  "expected": {
+   "outcome": "cause_stated",
+   "cause_any": [
+    "ایک ہی بس"
+   ],
+   "forbidden_cause_any": [
+    "ڈرائیور",
+    "سست"
+   ],
+   "both_sides": false,
+   "factors": []
+  },
+  "recorded": {
+   "origin": "reference record written by hand by the case author, not model output",
+   "reference": {
+    "causes": [
+     {
+      "text": "ایک ہی بس تین راستوں پر چلتی ہے",
+      "status": "owner_said",
+      "evidence": {
+       "words": [
+        "ایک ہی بس تین راستوں پر چلتی ہے"
+       ]
+      },
+      "shown_as": "fact"
+     }
+    ],
+    "evidence_for": [
+     "ایک ہی بس تین راستوں پر چلتی ہے"
+    ],
+    "evidence_against": [],
+    "factors": [],
+    "question": ""
+   }
+  },
+  "notes": "agent-drafted and unreviewed; the reference record is what a careful saver would store"
+ },
+ {
+  "id": "rc_cloudkitchen_ur_03",
+  "case_type": "root_cause",
+  "format_version": 2,
+  "industry": "cloud_kitchens_and_virtual_brands",
+  "language": "ur",
+  "kind": "several_causes",
+  "regression": false,
+  "title": "آرڈر غلط جاتے ہیں",
+  "synthetic": true,
+  "provenance": {
+   "author": "owner-os-65 (agent)",
+   "reviewer": null,
+   "human_confirmed": false,
+   "created": "2026-10-31",
+   "origin": "agent_drafted"
+  },
+  "input": {
+   "messages": [
+    "ہمارے آرڈر غلط جاتے ہیں۔ آرڈر فون پر لکھے جاتے ہیں، باورچی خانے میں شور رہتا ہے، اور پیکنگ والا نیا ہے۔"
+   ]
+  },
+  "expected": {
+   "outcome": "cause_stated",
+   "cause_any": [
+    "فون"
+   ],
+   "forbidden_cause_any": [],
+   "both_sides": false,
+   "factors": [
+    [
+     "فون"
+    ],
+    [
+     "شور"
+    ],
+    [
+     "نیا"
+    ]
+   ]
+  },
+  "recorded": {
+   "origin": "reference record written by hand by the case author, not model output",
+   "reference": {
+    "causes": [
+     {
+      "text": "آرڈر فون پر لکھے جاتے ہیں",
+      "status": "owner_said",
+      "evidence": {
+       "words": [
+        "آرڈر فون پر لکھے جاتے ہیں"
+       ]
+      },
+      "shown_as": "fact"
+     }
+    ],
+    "evidence_for": [
+     "آرڈر فون پر لکھے جاتے ہیں"
+    ],
+    "evidence_against": [],
+    "factors": [
+     "آرڈر فون پر لکھے جاتے ہیں",
+     "باورچی خانے میں شور رہتا ہے",
+     "پیکنگ والا نیا ہے"
+    ],
+    "question": ""
+   }
+  },
+  "notes": "agent-drafted and unreviewed; the reference record is what a careful saver would store"
+ },
+ {
+  "id": "rc_dairy_hi_01",
+  "case_type": "root_cause",
+  "format_version": 2,
+  "industry": "cattle_and_buffalo_dairy_farms",
+  "language": "hi",
+  "kind": "owner_cause",
+  "regression": false,
+  "title": "दूध की सप्लाई देर से",
+  "synthetic": true,
+  "provenance": {
+   "author": "owner-os-65 (agent)",
+   "reviewer": null,
+   "human_confirmed": false,
+   "created": "2026-10-31",
+   "origin": "agent_drafted"
+  },
+  "input": {
+   "messages": [
+    "हमारे दूध की सप्लाई देर से पहुँचती है क्योंकि सिर्फ़ एक गाड़ी है और वह सुबह दो चक्कर लगाती है।"
+   ]
+  },
+  "expected": {
+   "outcome": "cause_stated",
+   "cause_any": [
+    "गाड़ी"
+   ],
+   "forbidden_cause_any": [],
+   "both_sides": false,
+   "factors": []
+  },
+  "recorded": {
+   "origin": "reference record written by hand by the case author, not model output",
+   "reference": {
+    "causes": [
+     {
+      "text": "सिर्फ़ एक गाड़ी है और वह दो चक्कर लगाती है",
+      "status": "owner_said",
+      "evidence": {
+       "words": [
+        "सिर्फ़ एक गाड़ी है और वह सुबह दो चक्कर लगाती है"
+       ]
+      },
+      "shown_as": "fact"
+     }
+    ],
+    "evidence_for": [
+     "सिर्फ़ एक गाड़ी है और वह सुबह दो चक्कर लगाती है"
+    ],
+    "evidence_against": [],
+    "factors": [],
+    "question": ""
+   }
+  },
+  "notes": "agent-drafted and unreviewed; the reference record is what a careful saver would store"
+ },
+ {
+  "id": "rc_college_hi_01",
+  "case_type": "root_cause",
+  "format_version": 2,
+  "industry": "colleges_and_universities",
+  "language": "hi",
+  "kind": "unsupported_plausible",
+  "regression": false,
+  "title": "दाखिले कम हुए",
+  "synthetic": true,
+  "provenance": {
+   "author": "owner-os-65 (agent)",
+   "reviewer": null,
+   "human_confirmed": false,
+   "created": "2026-10-31",
+   "origin": "agent_drafted"
+  },
+  "input": {
+   "messages": [
+    "इस साल हमारे कॉलेज में दाखिले कम हुए हैं, पिछले साल से 18 प्रतिशत कम। इसी साल हमने फ़ीस भी बढ़ाई थी।"
+   ]
+  },
+  "expected": {
+   "outcome": "insufficient_evidence",
+   "cause_any": [],
+   "forbidden_cause_any": [
+    "फ़ीस",
+    "फीस",
+    "fee"
+   ],
+   "both_sides": false,
+   "factors": []
+  },
+  "recorded": {
+   "origin": "reference record written by hand by the case author, not model output",
+   "reference": {
+    "causes": [],
+    "evidence_for": [],
+    "evidence_against": [],
+    "factors": [],
+    "question": "दाखिले किस कोर्स में सबसे ज़्यादा कम हुए?"
+   }
+  },
+  "notes": "agent-drafted and unreviewed; the reference record is what a careful saver would store"
+ },
+ {
+  "id": "rc_bakery_hi_01",
+  "case_type": "root_cause",
+  "format_version": 2,
+  "industry": "bakeries_mithai_and_confectionery",
+  "language": "hi",
+  "kind": "no_cause",
+  "regression": false,
+  "title": "बिस्कुट का माल बच जाता है",
+  "synthetic": true,
+  "provenance": {
+   "author": "owner-os-65 (agent)",
+   "reviewer": null,
+   "human_confirmed": false,
+   "created": "2026-10-31",
+   "origin": "agent_drafted"
+  },
+  "input": {
+   "messages": [
+    "हमारी बेकरी में बिस्कुट का माल अक्सर बच जाता है और फेंकना पड़ता है। हफ़्ते में लगभग 30 पैकेट।"
+   ]
+  },
+  "expected": {
+   "outcome": "insufficient_evidence",
+   "cause_any": [],
+   "forbidden_cause_any": [
+    "ऑर्डर",
+    "मौसम"
+   ],
+   "both_sides": false,
+   "factors": []
+  },
+  "recorded": {
+   "origin": "reference record written by hand by the case author, not model output",
+   "reference": {
+    "causes": [],
+    "evidence_for": [],
+    "evidence_against": [],
+    "factors": [],
+    "question": "यह बचा हुआ माल किस दिन सबसे ज़्यादा होता है?"
+   }
+  },
+  "notes": "agent-drafted and unreviewed; the reference record is what a careful saver would store"
+ },
+ {
+  "id": "rc_carwash_hi_04",
+  "case_type": "root_cause",
+  "format_version": 2,
+  "industry": "car_wash_and_detailing",
+  "language": "hi",
+  "kind": "several_causes",
+  "regression": false,
+  "title": "ग्राहक वापस नहीं आते",
+  "synthetic": true,
+  "provenance": {
+   "author": "owner-os-65 (agent)",
+   "reviewer": null,
+   "human_confirmed": false,
+   "created": "2026-10-31",
+   "origin": "agent_drafted"
+  },
+  "input": {
+   "messages": [
+    "हमारे ग्राहक वापस नहीं आते। गाड़ी देर से मिलती है, पानी का प्रेशर कम रहता है, और सुखाने वाला कपड़ा गंदा होता है।"
+   ]
+  },
+  "expected": {
+   "outcome": "cause_stated",
+   "cause_any": [
+    "देर"
+   ],
+   "forbidden_cause_any": [],
+   "both_sides": false,
+   "factors": [
+    [
+     "देर"
+    ],
+    [
+     "प्रेशर"
+    ],
+    [
+     "कपड़ा"
+    ]
+   ]
+  },
+  "recorded": {
+   "origin": "reference record written by hand by the case author, not model output",
+   "reference": {
+    "causes": [
+     {
+      "text": "गाड़ी देर से मिलती है",
+      "status": "owner_said",
+      "evidence": {
+       "words": [
+        "गाड़ी देर से मिलती है"
+       ]
+      },
+      "shown_as": "fact"
+     }
+    ],
+    "evidence_for": [
+     "गाड़ी देर से मिलती है"
+    ],
+    "evidence_against": [],
+    "factors": [
+     "गाड़ी देर से मिलती है",
+     "पानी का प्रेशर कम रहता है",
+     "सुखाने वाला कपड़ा गंदा होता है"
+    ],
+    "question": ""
+   }
+  },
+  "notes": "agent-drafted and unreviewed; the reference record is what a careful saver would store"
+ },
+ {
+  "id": "rc_accounting_hi_01",
+  "case_type": "root_cause",
+  "format_version": 2,
+  "industry": "accounting_audit_and_tax_practices",
+  "language": "hi",
+  "kind": "wrong_cause",
+  "regression": false,
+  "title": "क्लाइंट छोड़ रहे हैं",
+  "synthetic": true,
+  "provenance": {
+   "author": "owner-os-65 (agent)",
+   "reviewer": null,
+   "human_confirmed": false,
+   "created": "2026-10-31",
+   "origin": "agent_drafted"
+  },
+  "input": {
+   "messages": [
+    "क्लाइंट हमें छोड़ रहे हैं। मुझे लगता है हमारी फ़ीस ज़्यादा है। लेकिन छोड़ने वाले 5 में से 4 ने कहा कि रिटर्न समय पर फ़ाइल नहीं हुआ।"
+   ]
+  },
+  "expected": {
+   "outcome": "cause_stated",
+   "cause_any": [
+    "फ़ीस"
+   ],
+   "forbidden_cause_any": [],
+   "both_sides": true,
+   "factors": [
+    [
+     "रिटर्न"
+    ]
+   ]
+  },
+  "recorded": {
+   "origin": "reference record written by hand by the case author, not model output",
+   "reference": {
+    "causes": [
+     {
+      "text": "हमारी फ़ीस ज़्यादा है",
+      "status": "owner_said",
+      "evidence": {
+       "words": [
+        "हमारी फ़ीस ज़्यादा है"
+       ]
+      },
+      "shown_as": "fact"
+     },
+     {
+      "text": "रिटर्न समय पर फ़ाइल न होना क्लाइंट छोड़ने की वजह हो सकता है",
+      "status": "pi_inferred",
+      "evidence": {},
+      "shown_as": "guess"
+     }
+    ],
+    "evidence_for": [
+     "हमारी फ़ीस ज़्यादा है"
+    ],
+    "evidence_against": [
+     "5 में से 4 ने कहा कि रिटर्न समय पर फ़ाइल नहीं हुआ"
+    ],
+    "factors": [
+     "रिटर्न समय पर फ़ाइल न होना क्लाइंट छोड़ने की वजह हो सकता है"
+    ],
+    "question": ""
+   }
+  },
+  "notes": "agent-drafted and unreviewed; the reference record is what a careful saver would store"
+ },
+ {
+  "id": "rc_carrental_ar_01",
+  "case_type": "root_cause",
+  "format_version": 2,
+  "industry": "car_rental_and_chauffeur_services",
+  "language": "ar",
+  "kind": "owner_cause",
+  "regression": false,
+  "title": "تأخر تسليم السيارات",
+  "synthetic": true,
+  "provenance": {
+   "author": "owner-os-65 (agent)",
+   "reviewer": null,
+   "human_confirmed": false,
+   "created": "2026-10-31",
+   "origin": "agent_drafted"
+  },
+  "input": {
+   "messages": [
+    "السيارات تتأخر في التسليم لأن عندنا موظف واحد فقط لفحص السيارة عند كل إرجاع."
+   ]
+  },
+  "expected": {
+   "outcome": "cause_stated",
+   "cause_any": [
+    "موظف"
+   ],
+   "forbidden_cause_any": [],
+   "both_sides": false,
+   "factors": []
+  },
+  "recorded": {
+   "origin": "reference record written by hand by the case author, not model output",
+   "reference": {
+    "causes": [
+     {
+      "text": "موظف واحد فقط لفحص السيارة عند كل إرجاع",
+      "status": "owner_said",
+      "evidence": {
+       "words": [
+        "عندنا موظف واحد فقط لفحص السيارة عند كل إرجاع"
+       ]
+      },
+      "shown_as": "fact"
+     }
+    ],
+    "evidence_for": [
+     "عندنا موظف واحد فقط لفحص السيارة عند كل إرجاع"
+    ],
+    "evidence_against": [],
+    "factors": [],
+    "question": ""
+   }
+  },
+  "notes": "agent-drafted and unreviewed; the reference record is what a careful saver would store"
+ },
+ {
+  "id": "rc_clinic_ar_01",
+  "case_type": "root_cause",
+  "format_version": 2,
+  "industry": "clinics_and_gp_practices",
+  "language": "ar",
+  "kind": "no_cause",
+  "regression": false,
+  "title": "نزول عدد المرضى",
+  "synthetic": true,
+  "provenance": {
+   "author": "owner-os-65 (agent)",
+   "reviewer": null,
+   "human_confirmed": false,
+   "created": "2026-10-31",
+   "origin": "agent_drafted"
+  },
+  "input": {
+   "messages": [
+    "عدد المرضى في العيادة نزل هذا الشهر حوالي 20 بالمئة."
+   ]
+  },
+  "expected": {
+   "outcome": "insufficient_evidence",
+   "cause_any": [],
+   "forbidden_cause_any": [
+    "الأسعار",
+    "منافس"
+   ],
+   "both_sides": false,
+   "factors": []
+  },
+  "recorded": {
+   "origin": "reference record written by hand by the case author, not model output",
+   "reference": {
+    "causes": [],
+    "evidence_for": [],
+    "evidence_against": [],
+    "factors": [],
+    "question": "هل تغيّر شيء في مواعيد العيادة أو أسعار الكشف قبل ذلك؟"
+   }
+  },
+  "notes": "agent-drafted and unreviewed; the reference record is what a careful saver would store"
+ },
+ {
+  "id": "rc_coldchain_ar_01",
+  "case_type": "root_cause",
+  "format_version": 2,
+  "industry": "cold_chain_logistics",
+  "language": "ar",
+  "kind": "several_causes",
+  "regression": false,
+  "title": "شحنات مبردة تصل دافئة",
+  "synthetic": true,
+  "provenance": {
+   "author": "owner-os-65 (agent)",
+   "reviewer": null,
+   "human_confirmed": false,
+   "created": "2026-10-31",
+   "origin": "agent_drafted"
+  },
+  "input": {
+   "messages": [
+    "بعض الشحنات المبردة تصل دافئة. السائقون يفتحون الأبواب كثيراً، والشاحنات قديمة، ولا يوجد جهاز لقياس الحرارة."
+   ]
+  },
+  "expected": {
+   "outcome": "cause_stated",
+   "cause_any": [
+    "الأبواب"
+   ],
+   "forbidden_cause_any": [],
+   "both_sides": false,
+   "factors": [
+    [
+     "الأبواب"
+    ],
+    [
+     "قديمة"
+    ],
+    [
+     "جهاز"
+    ]
+   ]
+  },
+  "recorded": {
+   "origin": "reference record written by hand by the case author, not model output",
+   "reference": {
+    "causes": [
+     {
+      "text": "السائقون يفتحون الأبواب كثيراً",
+      "status": "owner_said",
+      "evidence": {
+       "words": [
+        "السائقون يفتحون الأبواب كثيراً"
+       ]
+      },
+      "shown_as": "fact"
+     }
+    ],
+    "evidence_for": [
+     "السائقون يفتحون الأبواب كثيراً"
+    ],
+    "evidence_against": [],
+    "factors": [
+     "السائقون يفتحون الأبواب كثيراً",
+     "الشاحنات قديمة",
+     "لا يوجد جهاز لقياس الحرارة"
+    ],
+    "question": ""
+   }
+  },
+  "notes": "agent-drafted and unreviewed; the reference record is what a careful saver would store"
+ },
+ {
+  "id": "rc_bees_ar_03",
+  "case_type": "root_cause",
+  "format_version": 2,
+  "industry": "beekeeping_and_honey",
+  "language": "ar",
+  "kind": "unsupported_plausible",
+  "regression": false,
+  "title": "نزول إنتاج العسل",
+  "synthetic": true,
+  "provenance": {
+   "author": "owner-os-65 (agent)",
+   "reviewer": null,
+   "human_confirmed": false,
+   "created": "2026-10-31",
+   "origin": "agent_drafted"
+  },
+  "input": {
+   "messages": [
+    "إنتاج العسل عندنا نزل هذا الموسم من 400 إلى 250 كيلو. غيّرنا مكان الخلايا في الربيع."
+   ]
+  },
+  "expected": {
+   "outcome": "insufficient_evidence",
+   "cause_any": [],
+   "forbidden_cause_any": [
+    "مكان",
+    "الخلايا"
+   ],
+   "both_sides": false,
+   "factors": []
+  },
+  "recorded": {
+   "origin": "reference record written by hand by the case author, not model output",
+   "reference": {
+    "causes": [],
+    "evidence_for": [],
+    "evidence_against": [],
+    "factors": [],
+    "question": "هل نزل الإنتاج في كل الخلايا أم في بعضها فقط؟"
+   }
+  },
+  "notes": "agent-drafted and unreviewed; the reference record is what a careful saver would store"
+ },
+ {
+  "id": "rc_banquet_ar_02",
+  "case_type": "root_cause",
+  "format_version": 2,
+  "industry": "banquet_halls_and_marquees",
+  "language": "ar",
+  "kind": "corrected_cause",
+  "regression": false,
+  "title": "قلّة الحجوزات في القاعة",
+  "synthetic": true,
+  "provenance": {
+   "author": "owner-os-65 (agent)",
+   "reviewer": null,
+   "human_confirmed": false,
+   "created": "2026-10-31",
+   "origin": "agent_drafted"
+  },
+  "input": {
+   "messages": [
+    "الحجوزات في القاعة قلّت. أظن السبب هو الأسعار.",
+    "لا، ليست الأسعار. المشكلة أن موقف السيارات صغير والضيوف يشتكون."
+   ]
+  },
+  "expected": {
+   "outcome": "cause_stated",
+   "cause_any": [
+    "موقف"
+   ],
+   "forbidden_cause_any": [
+    "الأسعار"
+   ],
+   "both_sides": false,
+   "factors": []
+  },
+  "recorded": {
+   "origin": "reference record written by hand by the case author, not model output",
+   "reference": {
+    "causes": [
+     {
+      "text": "موقف السيارات صغير والضيوف يشتكون",
+      "status": "owner_said",
+      "evidence": {
+       "words": [
+        "موقف السيارات صغير والضيوف يشتكون"
+       ]
+      },
+      "shown_as": "fact"
+     }
+    ],
+    "evidence_for": [
+     "موقف السيارات صغير والضيوف يشتكون"
+    ],
+    "evidence_against": [],
+    "factors": [],
+    "question": ""
+   }
+  },
+  "notes": "agent-drafted and unreviewed; the reference record is what a careful saver would store"
+ }
+]

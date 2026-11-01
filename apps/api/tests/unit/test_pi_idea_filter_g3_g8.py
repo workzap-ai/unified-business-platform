@@ -92,21 +92,49 @@ def test_g7_catches_it_inside_an_earlier_reply() -> None:
 # --- G8 ------------------------------------------------------------------------------------------
 
 
+def ctx_for(*titles: str, tried: tuple[str, ...] = ()) -> idea_filter.IdeaContext:
+    return idea_filter.IdeaContext(
+        problems=tuple({"title": t, "user_words": [t]} for t in titles), tried=tried
+    )
+
+
 def test_g8_an_idea_for_a_problem_the_owner_never_raised_is_dropped() -> None:
     rota = "Write the weekly rota for the counter staff on one page, so shifts never clash."
-    nodes = ["Stock to clear 6 crore ka stock bechna hai"]
-    assert idea_filter.off_the_map(rota, nodes, ["stock_inventory"], "sell_clear") == "G8"
+    ctx = ctx_for("Stock to clear 6 crore ka stock bechna hai")
+    assert idea_filter.relevance(rota, ctx) == "G8"
 
 
 def test_g8_ideas_on_the_stock_node_pass() -> None:
-    nodes = ["Stock to clear 6 crore ka stock bechna hai"]
-    assert idea_filter.off_the_map(AGE_IDEA, nodes, ["stock_inventory"], "sell_clear") is None
-    # the second idea of the spec's own chat 3 relates through the goal, not through a shared word
-    assert idea_filter.off_the_map(OLD_CUSTOMERS, nodes, ["stock_inventory"], "sell_clear") is None
+    ctx = ctx_for("Stock to clear 6 crore ka stock bechna hai")
+    assert idea_filter.relevance(AGE_IDEA, ctx) is None
+    assert idea_filter.relevance(OLD_CUSTOMERS, ctx) is None
 
 
 def test_g8_without_a_map_there_is_nothing_to_judge_by() -> None:
-    assert idea_filter.off_the_map("Anything at all about rotas.", []) is None
+    assert idea_filter.relevance("Anything at all about rotas.", idea_filter.IdeaContext()) is None
+
+
+def test_g8_urdu_and_arabic_ideas_are_judged_by_meaning_not_dropped_for_their_script() -> None:
+    late = idea_filter.IdeaContext(
+        problems=(
+            {"title": "Late courier makes buyers refuse parcels", "user_words": ["courier late"]},
+        )
+    )
+    assert (
+        idea_filter.relevance("پارسل کے ساتھ خریدار کو ڈیلیوری کی ٹریکنگ بھیجیں۔", late, "ur")
+        is None
+    )
+    assert idea_filter.relevance("أرسل للمشتري تتبع التوصيل عند خروج الطرد.", late, "ar") is None
+
+
+def test_g13_boilerplate_that_fits_any_business_is_dropped() -> None:
+    ctx = ctx_for("Late courier makes buyers refuse parcels")
+    assert idea_filter.relevance("Use better software to improve your business.", ctx) == "G13"
+
+
+def test_g7_an_idea_the_owner_already_tried_is_not_offered_again() -> None:
+    ctx = ctx_for("Late orders upset customers", tried=("I tried a discount on late orders",))
+    assert idea_filter.relevance("Offer a discount to customers whose orders were late.", ctx) == "G7"
 
 
 # --- the spec's own chat 3 through the whole filter ------------------------------------------------

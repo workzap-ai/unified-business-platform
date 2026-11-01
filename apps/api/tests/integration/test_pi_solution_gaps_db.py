@@ -373,13 +373,17 @@ async def test_g5_promotion_needs_a_non_negative_score_and_the_best_live_rate(
     await solution_ideas.ensure_arms(business_db, scope, industry)
     peer = (
         await business_db.scalars(
-            select(PiIdeaArm).where(
+            select(PiIdeaArm)
+            .where(
                 PiIdeaArm.industry_key == industry,
                 PiIdeaArm.problem_id == problem["id"],
                 PiIdeaArm.kind != solution_ideas.ASK,
+                PiIdeaArm.status == "active",  # canary_view counts only live (active) peers
             )
+            .order_by(PiIdeaArm.arm_key)
         )
     ).first()
+    assert peer is not None, "ensure_arms made no active arm for this problem"
     peer.stats, peer.alpha = {"n": 10, "score_sum": 25}, 9.0  # a live idea at 80%
     low = await make_testing_arm(
         business_db, scope, industry, problem["id"], MORE[0], uses=60, n=10, score_sum=-3, alpha=2.0

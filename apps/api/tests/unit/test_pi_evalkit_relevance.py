@@ -227,13 +227,16 @@ def test_a_plain_true_no_longer_unlocks_a_held_out_case_only_a_minted_pass_does(
 
 def test_the_disclaimer_is_in_the_module_docstring_and_in_the_report(workdir) -> None:
     assert " ".join(relevance.DISCLAIMER.split()) in " ".join((relevance.__doc__ or "").split())
-    assert relevance.DISCLAIMER.startswith("Not a quality gate and not a learning reward.")
-    assert (
-        "Scorer agreed 55% with an independent grader on the borderline set" in relevance.DISCLAIMER
-    )
+    assert relevance.DISCLAIMER.startswith("Not a quality gate and not a learning reward")
+    note = " ".join(relevance.DISCLAIMER.split())
+    assert "connected to no live gate" in note
+    assert "55% agreement (11 of 20)" in note and "earlier scorer" in note
+    assert "The current scorer" in note and "printed beside this note" in note
+    assert "85%" not in note
     text, _ = relevance_report.build(DEV_CORE, workdir / "a.jsonl", "lane E", "disclaimer check")
     assert relevance.DISCLAIMER in text
     assert "agent-drafted labels (not a score)" in text
+    assert "Current scorer, Development borderline set:" in text
 
 
 def test_the_scorer_is_deterministic() -> None:

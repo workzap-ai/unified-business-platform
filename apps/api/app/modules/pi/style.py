@@ -42,10 +42,10 @@ REPAIR = {
     2: 'Give choices instead of an open question, e.g. "Is it more like stock, cash or staff?".',
     3: 'Give a small example of what you mean, e.g. "For example, does stock run out, or is '
     'there too much?".',
-    4: 'Offer once to continue in another language (e.g. "Urdu mein baat karein?") and ask '
-    "nothing else.",
-    5: "Drop the question: treat the detail as unknown, say so in a few words and move on to "
-    "what they said.",
+    4: "Own the miss in one clause, play back the owner's own points from ALL their messages "
+    "(voice notes too), then say the next step. Never promise to stop asking.",
+    5: "Own the miss in one clause, name what you do know in a few words, and say the next step. "
+    "Never say you will ask no more questions.",
 }
 LAST_STEP = max(REPAIR)
 

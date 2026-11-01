@@ -7,6 +7,7 @@ from sqlalchemy import select
 from test_pi_pipeline import pi_workspace
 from test_pi_service_conversations import mock_turns, turn
 
+from app.modules.pi.models import PiConversation, PiMessage
 from app.modules.pi.whatsapp import other_text
 from app.modules.pi_saas.models import PiStaffRequest
 
@@ -29,10 +30,19 @@ def test_buttons_locations_and_contacts_become_words():
 
 
 async def test_a_sticker_is_skipped_quietly(api, business_db):
+    # Spec 6.10 (message_signals): a sticker alone changes nothing and is not answered. Since
+    # c41ab202 it is resolved before any message or conversation is stored, so there is no chat.
     pi = await pi_workspace(api, business_db)
     await pi.process("", "rare-sticker", kind="sticker", media_id="1234567")
-    conversation = await pi.conversation()
-    assert conversation.mode == "ai" and await pi.outbound() == []
+    tenant = pi.identity["tenant"]["id"]
+    assert (
+        await business_db.scalar(select(PiConversation).where(PiConversation.tenant_id == tenant))
+        is None
+    )
+    assert (
+        await business_db.scalars(select(PiMessage).where(PiMessage.tenant_id == tenant))
+    ).all() == []
+    assert pi.sent == []  # nothing went out to the owner
     await pi.close()
 
 

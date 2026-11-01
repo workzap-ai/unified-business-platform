@@ -118,7 +118,7 @@ actually said.
 |---|---|---|
 | `constraints` | list; each item is a **string** (legacy, as the 9 existing cases) or `{kind, text}` with `kind` in `budget`, `staff`, `deadline`, `cannot_change` | a scorer treats a string as kind-less; no existing case changes |
 | `tried` | list of `{what, outcome}` | new |
-| `cause` | `{text, status, evidence_words}`; `status` is `owner_said`, `pi_inferred` or `confirmed`; an unsupported cause may never be `confirmed` | new; `hypothesis_only` stays for causes the owner did not state |
+| `cause` | `{text, status, evidence: {words}, shown_as, confirmed_by}`; `status` is `owner_said`, `pi_inferred` or `confirmed`; an unsupported cause may never be `confirmed`, and `confirmed` needs `confirmed_by` (an owner message index); a `pi_inferred` cause needs an explicit hypothesis label in `shown_as` (else `unlabelled_inference`); shared words under 3 letters are not support and the case is flagged `unsupported_short_cause` (unknown, not plainly unsupported) | new; `hypothesis_only` stays for causes the owner did not state |
 | `expected_outcome` | string, at most 300 characters, in the owner's words | new |
 | `workflows` | list of short strings, owner's words | new (per customer in P-1, per case here) |
 | `roles` | list of **roles only**, never names (for example `cashier`, `supervisor`) | new |
@@ -195,6 +195,24 @@ No threshold appears in a case. Pass levels come from D5, after the owner approv
 `irrelevant`, `generic`, `violates_constraint`, `restates_owner`. `problem` is the problem id the idea should
 link to (or null). The scripted relevance scorer reads only these labels, so its job is to reproduce them
 deterministically; it is later checked against the `grader` agent and hand labels (the 85% proposal).
+
+#### Status of the relevance scorer (corrected 2026-10-31)
+
+The scorer is an **offline measurement tool**. It is connected to no live gate, filter or reward,
+and it prints numbers only, never an acceptance verdict. Its agreement with the independent grader
+was 55% (11 of 20 borderline samples) on the **earlier** scorer, which matched exact tokens after a
+crude stem and read no numbers and no negation. The scorer has since been changed (FT-A3b, three
+rounds) with general features: light English and Roman Urdu inflection, magnitude figures
+('3 lakh' = '300000'), numeric ceilings compared as numbers, modal negation read from a limit's own
+text ('cannot buy X'), and tried-and-failed limits. Rejection uses whole stems, never the
+five-letter prefix. Its current agreement with the agent-drafted labels on the Development
+borderline set (13 of 20) is printed by `relevance_report` beside the standing note; those labels
+are not human labels, no threshold is applied, and the 85% acceptance remains an owner decision
+that is not computed here. Two Development verdicts moved because of the change
+(`plan_bl_poultry_limit_edge_en_03/c3` and `plan_bl_banquet_numeric_limit_en_09/c2`); no rule names a
+case or a label. Known limits are in the module docstrings of `relevance.py` and
+`relevance_match.py` (spelled-out numbers, negation inside an idea, Arabic and Hindi inflection,
+a short counted-noun list).
 
 ### 6.4 Worked example (synthetic)
 

@@ -576,6 +576,12 @@ async def export_customer(customer_id: UUID, scope: Scope, session: Session) -> 
         }
         for m in messages
     ]
+    # RMEM05: the same PS-8 bundle pi answers "what do you keep?" from (profile, problems,
+    # constraints, decisions), so the export and the chat answer never disagree.
+    from app.modules.pi import context_memory, memory_answer
+
+    bundle = await context_memory.build_context(session, scope, customer_id=customer_id)
+    profile["pi_memory"] = memory_answer.export_bundle(bundle)
     await record(
         session,
         "pi.customer_exported",

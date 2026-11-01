@@ -78,7 +78,9 @@ async def test_g9_a_switch_to_roman_urdu_gets_the_cost_answer_without_a_price(
     answer = reply.split("\n\n")[0]
     assert answer.startswith("Kharcha is par depend karta hai")
     assert "muft hai" in answer and not any(c.isdigit() for c in answer)  # R-OFFER-05: no range
-    assert "Cashiers late on weekends" in reply  # then the sorted summary (spec 3.7)
+    # spec v1.6 19.7 (SM1): a summary is never the reply to a question or a quote request, so the
+    # cost answer stands alone (it supersedes the "then the sorted summary" of spec 3.7)
+    assert "Cashiers late on weekends" not in reply
     await pi.close()
 
 

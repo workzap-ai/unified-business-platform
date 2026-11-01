@@ -18,7 +18,8 @@ means "any".
 
 import re
 from collections.abc import Mapping
-from typing import Any
+from typing import Any, Protocol
+from uuid import UUID
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -88,30 +89,54 @@ def extras(
     return {k: v for k, v in found.items() if v}
 
 
-async def category_of(session: AsyncSession, conversation_id: Any, before: Any = None) -> str:
-    """The category of the most recent problem noted in this chat (optionally before a time)."""
+class InWorkspace(Protocol):
+    """Anything that names a workspace: a WorkspaceScope, or a row such as a conversation."""
+
+    @property
+    def tenant_id(self) -> UUID: ...
+
+    @property
+    def environment_id(self) -> UUID: ...
+
+
+async def category_of(
+    session: AsyncSession,
+    conversation_id: Any,
+    before: Any = None,
+    scope: InWorkspace | None = None,
+) -> str:
+    """The category of the most recent problem noted in this chat (optionally before a time).
+    Given a scope, only problems of that workspace are read."""
     query = (
         select(PiProblem.category)
         .where(PiProblem.conversation_id == conversation_id)
         .order_by(PiProblem.created_at.desc())
         .limit(1)
     )
+    if scope is not None:
+        query = query.where(
+            PiProblem.tenant_id == scope.tenant_id, PiProblem.environment_id == scope.environment_id
+        )
     if before is not None:
         query = query.where(PiProblem.created_at <= before)
     return (await session.scalar(query)) or ""
 
 
-async def industry_of(session: AsyncSession, conversation: PiConversation) -> str:
-    """The primary industry of the conversation's customer, "" when unknown."""
+async def industry_of(
+    session: AsyncSession, conversation: PiConversation, scope: InWorkspace | None = None
+) -> str:
+    """The primary industry of the conversation's customer, "" when unknown. Given a scope, only
+    a customer of that workspace is read."""
     if not conversation.customer_id:
         return ""
     from app.modules.customers.models import Customer
 
-    return clean_industry(
-        await session.scalar(
-            select(Customer.industry_primary).where(Customer.id == conversation.customer_id)
+    query = select(Customer.industry_primary).where(Customer.id == conversation.customer_id)
+    if scope is not None:
+        query = query.where(
+            Customer.tenant_id == scope.tenant_id, Customer.environment_id == scope.environment_id
         )
-    )
+    return clean_industry(await session.scalar(query))
 
 
 def backoff(

@@ -365,13 +365,14 @@ async def test_the_no_more_ideas_line_is_for_a_capped_problem_not_for_a_new_one(
     capped = make_turn()
     capped._problem_capped = True
     brain_no_ideas(capped, no_idea_context())
-    assert "ideas I have" in capped.reply
+    assert "ideas so far" in capped.reply  # spec v1.6 19.6: ask what happened, never "no more ideas"
+    assert capped.reply.count("?") == 1
 
 
 async def test_without_the_expert_the_chat_wide_line_is_unchanged() -> None:
     turn = make_turn()
     brain_no_ideas(turn, no_idea_context(expert_on=False))
-    assert "ideas I have" in turn.reply
+    assert "ideas so far" in turn.reply
 
 
 async def test_the_linter_counts_the_ideas_of_the_other_chats() -> None:

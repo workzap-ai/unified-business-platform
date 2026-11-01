@@ -220,9 +220,25 @@ def render_box(
     for item in content.get("assumptions", []):
         page.bullet(str(item))
     page.gap(6)
+    _blueprint(page, content.get("blueprint"))
     page.heading(label["box_quote"])
     page.paragraph(label["box_quote_text"])
     return doc.render()
+
+
+def _blueprint(page: "_Page", blueprint: Any) -> None:
+    """The blueprint for the reviewer, as PS-4 rendered it in the owner's language (plain text, one
+    line per fact, the owner's own words kept); a refused or incomplete one shows what is missing."""
+    if not isinstance(blueprint, dict) or not str(blueprint.get("text") or "").strip():
+        return
+    lines = str(blueprint["text"]).splitlines()
+    page.heading(lines[0] if lines else "Blueprint")
+    for line in lines[1:]:
+        if not line.strip():
+            page.gap(3)
+        else:
+            page.paragraph(line, 9)
+    page.gap(6)
 
 
 def render_solution(

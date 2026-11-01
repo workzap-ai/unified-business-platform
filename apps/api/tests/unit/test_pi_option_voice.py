@@ -1,0 +1,251 @@
+# ruff: noqa: E501
+"""The owner reads the options in the chat: PS-3's six verdicts, with the L2-1 gate plugged in, in
+four languages. One verdict path (`option_voice.voice`)."""
+
+import re
+
+import pytest
+
+from app.modules.pi import constitution
+from app.modules.pi import option_voice as ov
+from app.modules.pi.requirements_types import (
+    Constraints,
+    Limit,
+    ProblemRequirements,
+    Requirements,
+    TriedItem,
+)
+
+BUL = "\u2022 "
+PROBLEMS = [
+    {
+        "title": "Late courier makes buyers refuse parcels",
+        "user_words": ["our courier delivers late"],
+        "group": "orders_fulfilment",
+    }
+]
+LINKED = "Keep a list of refused parcels with the reason, so you see why they come back."
+VIOLATING = "Change the courier to a faster one."
+UNLINKED = "Repaint the shop signboard in a brighter colour."
+GENERIC = "Use better software to improve your business."
+REPEAT = "Offer a discount to customers whose orders were late."
+
+
+def reqs(cannot=(), tried=(), budget=None):
+    c = Constraints(
+        budget=Limit(budget) if budget else None, cannot_change=tuple(Limit(x) for x in cannot)
+    )
+    return Requirements(
+        problems=(ProblemRequirements(constraints=c, tried=tuple(TriedItem(t) for t in tried)),)
+    )
+
+
+COURIER = reqs(cannot=["we cannot change courier because of the contract"])
+
+
+def run(*ideas, r=COURIER, lang="en", problems=PROBLEMS):
+    reply = "Here are some ideas:\n" + "\n".join(f"{BUL}{i}" for i in ideas)
+    return ov.voice(reply, r, lang, problems)
+
+
+def test_linked_idea_with_the_gate_ok_stays_and_is_recommended():
+    r = run(LINKED)
+    assert r.accepted == 1 and r.unknown == 0 and not r.unmarked
+    assert ov.T["en"]["start"] in r.block and LINKED in r.reply
+
+
+def test_violating_idea_is_removed_with_the_owners_words_and_one_question():
+    r = run(VIOLATING)
+    assert "faster one" not in r.reply
+    assert 'you said: "we cannot change courier because of the contract"' in r.block
+    assert r.question == ov.T["en"]["q_cannot_change"]
+
+
+def test_violation_wins_even_over_a_linked_idea():
+    r = run(VIOLATING, LINKED)
+    assert VIOLATING not in r.reply and LINKED in r.reply
+
+
+def test_unlinked_idea_is_removed_and_said_so():
+    r = run(UNLINKED, LINKED)
+    assert UNLINKED not in r.reply and ov.T["en"]["off_topic"] in r.block
+
+
+def test_generic_idea_is_removed_and_said_so():
+    r = run(GENERIC, LINKED)
+    assert GENERIC not in r.reply and ov.T["en"]["generic"] in r.block
+
+
+def test_repeated_idea_is_removed_with_the_owners_words():
+    r = run(REPEAT, LINKED, r=reqs(tried=["I tried a discount on late orders"]))
+    assert REPEAT not in r.reply
+    assert 'you already tried: "I tried a discount on late orders"' in r.block
+
+
+def test_nothing_linked_never_pads_and_asks_one_question():
+    r = run(UNLINKED, GENERIC)
+    assert not [x for x in r.reply.splitlines() if x.startswith(BUL)]
+    assert r.question == ov.T["en"]["q_default"]
+
+
+def test_unknown_is_labelled_never_linked():
+    # no noted problem to judge by: relevance is UNKNOWN, so the idea stays only as "not yet checked"
+    r = run(LINKED, problems=())
+    assert r.unknown == 1 and r.accepted == 0
+    assert ov.T["en"]["label"] in ov.label_ideas(r.reply, r.unmarked, "en")
+    assert ov.T["en"]["start"] not in r.block
+
+
+def test_unreadable_requirements_are_unknown_not_confirmed():
+    r = run(LINKED, r=Requirements(columns_available=False))
+    assert r.accepted == 0 and r.unknown == 1
+
+
+def test_reply_that_already_asks_keeps_its_one_question():
+    reply = f"{BUL}{UNLINKED}\nWhat result do you want?"
+    r = ov.voice(reply, COURIER, "en", PROBLEMS)
+    assert r.question == "" and r.reply.count("?") == 1
+
+
+@pytest.mark.parametrize("lang", ["en", "roman_ur", "ur", "ar"])
+def test_templates_are_complete_and_clean(lang):
+    t = ov.T[lang]
+    assert set(t) == set(ov.T["en"])
+    for key, text in t.items():
+        if lang == "en":
+            assert not re.search(r"\b(will|guarantee|price)\b", text, re.I), key
+        if key.startswith("q_"):
+            assert len(re.findall(r"[?\u061f]", text)) == 1 and text.rstrip().endswith(
+                ("?", "\u061f")
+            )
+        else:
+            assert not re.search(r"[?\u061f]", text.replace("{words}", "")), key
+    assert "{words}" in t["left_out"] and "{words}" in t["repeat"]
+
+
+URDU_LINKED = "پارسل کے ساتھ خریدار کو ڈیلیوری کی ٹریکنگ بھیجیں۔"
+ARABIC_LINKED = "أرسل للمشتري تتبع التوصيل عند خروج الطرد."
+
+
+@pytest.mark.parametrize(("lang", "idea"), [("ur", URDU_LINKED), ("ar", ARABIC_LINKED)])
+def test_urdu_and_arabic_linked_ideas_are_kept_and_unchecked_ones_are_labelled(lang, idea):
+    r = run(idea, lang=lang)
+    # the L2-1 gate reads English and Roman Urdu only, so the idea stays labelled as not yet checked
+    assert r.accepted == 0 and r.unknown == 1
+    assert ov.T[lang]["label"] in ov.label_ideas(r.reply, r.unmarked, lang)
+    assert ov.T[lang]["unknown"] in r.block
+
+
+def test_block_is_not_linted_as_a_promise():
+    r = run(VIOLATING)
+    text = f"{r.block}\n\n{r.reply}\n\n{r.question}"
+    assert [
+        v for v in constitution.hard(constitution.lint(text, {})) if v.rule != "R-DISC-01"
+    ] == []
+
+
+def test_ideas_are_shown_best_first_and_the_pick_is_the_clear_one():
+    unknown = "Message each buyer when the parcel leaves with a short note about the courier."
+    reply = f"Ideas:\n{BUL}{unknown}\n{BUL}{LINKED}"
+    r = ov.voice(reply, Requirements(columns_available=False), "en", PROBLEMS)
+    # with unreadable requirements neither is clear: the engine's order stands and the pick is the first
+    assert r.pick and r.accepted == 0
+    r2 = ov.voice(reply, COURIER, "en", PROBLEMS)
+    lines = [x for x in r2.reply.splitlines() if x.startswith(BUL)]
+    assert r2.pick in (unknown, LINKED) and lines[0].endswith((unknown, LINKED))
+
+
+def test_a_repeat_of_an_attempt_that_worked_is_not_dropped_as_a_repeat():
+    tried_worked = Requirements(
+        problems=(ProblemRequirements(tried=(TriedItem("a discount on late orders", "worked"),)),)
+    )
+    tried_failed = Requirements(
+        problems=(ProblemRequirements(tried=(TriedItem("a discount on late orders", "failed"),)),)
+    )
+    reply = f"{BUL}{REPEAT}"
+    assert REPEAT in ov.voice(reply, tried_worked, "en", PROBLEMS).reply
+    assert REPEAT not in ov.voice(reply, tried_failed, "en", PROBLEMS).reply
+
+
+def test_a_tried_attempt_the_gate_rejected_is_worded_as_already_tried():
+    tried = Requirements(
+        problems=(ProblemRequirements(tried=(TriedItem("a paper register", "did not work"),)),)
+    )
+    r = ov.voice(f"{BUL}Keep a paper register for each complaint.", tried, "en", PROBLEMS)
+    assert "already tried" in r.block or r.accepted == 1 or r.unknown == 1
+
+
+def test_a_fact_an_earlier_record_answers_is_shown_not_asked():
+    vague = Requirements(
+        problems=(ProblemRequirements(constraints=Constraints(budget=Limit("tight budget"))),)
+    )
+    known = [
+        {
+            "source": "owner_message:c1:m1",
+            "text": "my budget is 50,000 rupees a month",
+            "scope": {"tenant_id": "t", "environment_id": "e", "customer_id": "c"},
+        }
+    ]
+    scope = {"tenant_id": "t", "environment_id": "e", "customer_id": "c"}
+    reply = f"{BUL}Buy a new tracking system for late orders."
+    r = ov.voice(reply, vague, "en", PROBLEMS, known_records=known, scope=scope)
+    assert r.unknown == 1 and "50,000" in r.block and r.pending is None
+    other = dict(scope, customer_id="someone-else")
+    leak = ov.voice(reply, vague, "en", PROBLEMS, known_records=known, scope=other)
+    assert "50,000" not in leak.block  # never another customer's record (fail closed)
+
+
+def test_the_items_that_stay_carry_gate_and_relevance_for_the_review():
+    r = ov.voice(f"{BUL}{LINKED}\n{BUL}{UNLINKED}", COURIER, "en", PROBLEMS)
+    kinds = {i["relevance"] for i in r.items}
+    assert "UNLINKED" not in kinds and all(i["gate"] in ("satisfied", "unknown") for i in r.items)
+
+
+def test_an_uncertain_language_asks_the_language_question_first():
+    vague = Requirements(
+        problems=(ProblemRequirements(constraints=Constraints(budget=Limit("tight budget"))),)
+    )
+    r = ov.voice(
+        f"{BUL}Buy a new tracking system for late orders.",
+        vague,
+        "en",
+        PROBLEMS,
+        language_certain=False,
+    )
+    assert r.pending and r.pending["key"] == "language_clarify"
+
+
+GUARANTEE = re.compile(
+    r"does not break anything|doesn't break anything|guarantee|safe for sure|for sure|\bsure\b|"
+    r"100 ?%|nahi tootti|koi baat nahi tootti|pakka|yaqeen|zaroor|"
+    r"نہیں ٹوٹتی|یقین|ضرور|پکا|لا تخالف شيئا|لا تخالف شيئاً|بالتأكيد|مضمون|ضمان|"
+    r"नहीं टूटती|पक्का|गारंटी",
+    re.IGNORECASE,
+)
+
+
+def test_no_owner_facing_text_claims_a_guarantee_for_a_gate_ok_idea():
+    from app.modules.pi import graph_voice
+
+    for tables in (ov.T, graph_voice.T):
+        for lang, table in tables.items():
+            for key, text in table.items():
+                assert not GUARANTEE.search(text), (lang, key, text)
+    for lang in ("en", "roman_ur", "ur", "ar"):
+        start = ov.T[lang]["start"]
+        assert not re.search(
+            r"[?\u061f]", start
+        )  # a hedge, never a question: the one question stays last
+        assert not re.search(r"\b(?:price|offer|quote)\b", start, re.I)
+    assert (
+        "missed a limit" in ov.T["en"]["start"]
+    )  # as far as I understood, tell me if I missed one
+
+
+def test_an_ok_idea_ranks_first_only_when_linked_and_not_a_repeat_of_what_failed():
+    unlinked = "Repaint the shop signboard in a brighter colour."
+    reply = f"{BUL}{UNLINKED}\n{BUL}{LINKED}"
+    r = ov.voice(reply, COURIER, "en", PROBLEMS)
+    kept = [x for x in r.reply.splitlines() if x.startswith(BUL)]
+    assert kept and kept[0].endswith(LINKED) and unlinked not in r.reply
+    assert [i["relevance"] for i in r.items][0] == "LINKED"

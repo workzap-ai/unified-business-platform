@@ -1,0 +1,389 @@
+# Hand-labelled sentences for language_script.py, written BEFORE the code (agent 8, lane ps9).
+# Columns: label <TAB> languages present (comma list, may be empty) <TAB> text
+# Labels: en roman_ur roman_hi ur ar hi fa fr es de id tr tl ps sd pa bn ta ml und
+#   roman_ur_or_hi = Latin-script Hindi/Urdu that cannot be told apart (label accepts roman_ur, roman_hi or roman_hi_or_ur)
+#   und = too short or ambiguous to decide: the detector must say uncertain
+# Written by one author: not an independent native-speaker review (see the report).
+en		Our shop has no footfall and the staff come late every week
+en		I need help with my orders because customers keep asking where their parcels are
+en		We lose about ten invoices a month and nobody notices until the client calls
+en		Can you tell me what you can do for a small clinic with three doctors?
+en		The delivery riders are always late and customers are getting angry
+en		We have two branches and the stock count never matches the register
+en		I sell clothes online and returns are killing my margin
+en		How much does it cost and how long will it take to set up?
+en		My accountant sends me the figures too late to act on them
+en		We take bookings on WhatsApp and write them in a paper diary
+en		Sorry, I meant 80 tenants, not 8
+en		The problem started last month when we added evening slots
+en		Honestly I do not have the budget for a new system this year
+en		Three staff handle all the phone calls and they cannot keep up
+en		What exactly will you build for us and who will review it?
+en		It happens mostly on weekends when the shop is full
+en		We are a school with about 400 students and the fees come in late
+en		Please do not send me anything yet, I want to think about it first
+en		Cash counting takes one hour every night after we close
+en		Our warehouse has no record of what is on which shelf
+en		I run a small bakery and the raw material prices keep changing
+en		There are 12 trucks and the dispatcher cannot watch the map all day
+en		We tried a spreadsheet but nobody updates it
+en		That is not what I said, I said the deliveries are late
+en		The salary sheet takes our manager two days every month
+en		Good morning, I would like to ask about your service
+en		Customers complain about the waiting time at the reception desk
+en		My shop is in Lahore and we have around 15 employees
+en		We do not have a computer at the counter, only phones
+en		They pay after the due date and I chase them one by one
+en		Everything is manual here and it wastes a lot of time
+en		Is this something you do for pharmacies as well?
+en		Yes please go ahead and prepare the document for all of these
+en		No, that is not possible with our current team
+en		Thanks, that makes sense to me now
+en		I'm not sure which of the problems is the biggest one
+en		He said the order would arrive on Monday but it never did
+en		There was a mistake in the quote and I want it corrected
+en		It's the third time this month that stock ran out
+en		Tell me what you need from me to start
+en		The parts arrive late and nobody tells the customer
+en		We have a farm and the mangoes spoil after harvest
+en		Our rent is due on the first and tenants never pay on time
+en		Why do you ask so many questions about my business?
+en		I want to see a quote before I decide anything
+en		Delivery charges are too high for small orders
+en		Stock, sale and invoice are all in different registers
+en		I think we lose customers because nobody follows up
+en		What is the cheapest way to fix the booking mess?
+en		Wait, actually it was 120 enquiries a month, not 12
+en		Not much at the moment, the season is slow
+roman_ur		Mera dhanda nahi chal raha aur meri kuch dukaanain hain defense mein
+roman_ur		Hamare staff ki salary har mahine late hoti hai kyunke hisaab nahi milta
+roman_ur		Mujhe orders ka masla hai, customer bar bar poochte hain parcel kahan hai
+roman_ur		Bhai stock khatam ho jata hai aur humein pata hi nahi chalta
+roman_ur		Kya aap meri dukan ke liye kuch kar sakte hain?
+roman_ur		Hamari delivery boht late hoti hai aur gahak naraz hote hain
+roman_ur		Main ek chhoti si factory chalata hoon jahan machine operator bina bataye chutti kar lete hain
+roman_ur		Assalam o alaikum, mujhe aap se baat karni hai apne karobar ke bare mein
+roman_ur		Paisa waqt par nahi aata aur udhaar bohat ho gaya hai
+roman_ur		Hum bookings WhatsApp par lete hain aur diary mein likhte hain
+roman_ur		Nahi, yeh mere phone par chalna chahiye, mere paas computer nahi hai
+roman_ur		Is ka kharcha kitna hoga aur kitna time lagega?
+roman_ur		Mareez ki purani parchi dhoondne mein 10 minute lag jate hain
+roman_ur		Sorry 12 nahi 120 enquiries har mahine hoti hain
+roman_ur		Meri dukaan mein teen log kaam karte hain lekin sab late aate hain
+roman_ur		Jab season aata hai to rush bohat hota hai aur hum sambhal nahi pate
+roman_ur		Shukriya, ab mujhe samajh aa gaya
+roman_ur		Hamari fees bachon ke walid der se dete hain
+roman_ur		Hisaab kitaab sab register mein hota hai aur ghalti ho jati hai
+roman_ur		Salam bhai stock khatam ho jata hai kya karoon
+roman_ur		Aap ka kya khayal hai, pehle kaun sa masla theek karna chahiye?
+roman_ur		Warehouse mein kuch pata nahi hota ke kaunsa maal kahan rakha hai
+roman_ur		Maine galat kaha tha, 8 nahi 80 log hain
+roman_ur		Yeh sab mere liye bohat zaroori hai lekin budget kam hai
+roman_ur		Customer wapas nahi aate aur hum follow up nahi kar pate
+roman_ur		Hum Lahore mein hain aur hamare paas do branch hain
+roman_ur		Rider late aata hai to customer phone karta hai aur hum kuch bata nahi pate
+roman_ur		Abhi kuch nahi chahiye, pehle main sochna chahta hoon
+roman_ur		Mujhe quote chahiye pehle, phir faisla karunga
+roman_ur		Kya yeh pharmacy ke liye bhi ho sakta hai?
+roman_ur		Hamara munafa kam ho gaya hai kyunke maal mehnga ho gaya
+roman_ur		Dukan ka rent zyada hai aur gahak kam
+roman_ur		Aap ne kaha tha ke aap mujhe ek document dein ge
+roman_ur		Meri bakery mein raw material ka hisaab theek nahi milta
+roman_ur		Staff kaam waqt par nahi karta aur mujhe har cheez khud dekhni parti hai
+roman_ur		Hamari factory mein 4 masle hain mold change mein bohat time lagta hai
+roman_ur		Aaj subah se customers ke phone aa rahe hain
+roman_ur		Usne kaha tha parson tak aa jayega lekin abhi tak nahi aaya
+roman_ur		Kal tak ye kaam ho jana chahiye warna hamara nuksan hoga
+roman_ur		Bilkul theek hai, aap shuru kar dein
+roman_ur		Yeh masla pichle mahine se hai jab humne shaam ki shifts shuru kin
+roman_ur		Humare yahan teen doctor hain aur ek compounder
+roman_ur		Order pe order aa rahe hain aur hum sab kuch copy mein likhte hain
+roman_ur		Tankhwah dene mein kabhi kabhi der ho jati hai
+roman_ur		Mujhe nahi pata ke kitna nuksan hota hai har mahine
+roman_ur		Aap mujhe batayein ke kya kya ho sakta hai
+roman_ur		Shop band karne se pehle cash ginne mein ek ghanta lag jata hai
+roman_ur		Dono jagah pe maal ka record alag alag hai aur milta nahi
+roman_ur		Aap ki meherbani, main kal baat karta hoon
+roman_ur		Ye bohat mushkil hai kyunke humare paas log kam hain
+roman_ur		Sab kuch haath se likhna parta hai isliye bohat waqt zaya hota hai
+roman_ur		Stok ka hisab nahi milta aur ordar late jate hain
+roman_ur		Kia ap meray liye document bana saktay hain?
+roman_ur		mujhe nhi pata kya krna hai
+roman_ur		hmara staff sahi kaam nhi krta
+roman_ur		bhai delivary ka masla hai bht zyada
+roman_ur		kitna kharcha ayega ye bta do
+roman_ur		Boooht saray log phone kartay hain
+roman_ur		Acha theek hai lekin pehle mujhe ye samjhao
+roman_ur		Meri shop mein 3 log hain aur sab ka kaam alag hai
+roman_ur		Yaar customer ne payment nahi ki aur maal bhi chala gaya
+roman_ur		Mujhe lagta hai hamari problem staff ki hai
+roman_ur		Hum kya karein ke gahak dobara aaye?
+roman_ur_or_hi		Hamari dukaan mein teen log kaam karte hain
+roman_ur_or_hi		Mujhe apne business ke liye madad chahiye
+roman_ur_or_hi		Ye kaam bohot zyada hai aur hum thak gaye hain
+roman_ur_or_hi		Kal tak ye kaam karna hai
+roman_ur_or_hi		Hamare yahan bahut time lagta hai
+roman_ur_or_hi		Aap kya kar sakte hain mere liye
+roman_hi		Namaste, mujhe apni dukaan ke liye samasya hai
+roman_hi		Kripya mujhe bataiye ke ye kaam kaise hoga
+roman_hi		Hamare grahak samay par paise nahi dete hain
+roman_hi		Dhanyavaad, ab mujhe samajh aa gaya hai
+roman_hi		Hamara vyapar bahut dheema chal raha hai
+roman_hi		Mujhe apna samay bachana hai, kya ye ho sakta hai?
+ur		ہمارے کلینک میں استقبالیہ پر قطار بہت بے ترتیب ہے اس لیے مریض ناراض ہوتے ہیں
+ur		میرے پاس صرف تین لوگ ہیں اور سب دیر سے آتے ہیں
+ur		کیا آپ میری دکان کے لیے کچھ کر سکتے ہیں؟
+ur		نہیں، ہر رات اسٹاک گننا ممکن نہیں، ہم جلدی بند نہیں کر سکتے
+ur		اور یہ فون پر چلنا چاہیے، کاؤنٹر پر کمپیوٹر نہیں ہے
+ur		ہماری ڈیلیوری بہت دیر سے ہوتی ہے اور گاہک ناراض ہوتے ہیں
+ur		مجھے آرڈرز کا مسئلہ ہے، گاہک بار بار پوچھتے ہیں کہ پارسل کہاں ہے
+ur		پچھلے مہینے سے۔ بکنگ بھی کاغذی ڈائری میں گڈمڈ ہو جاتی ہے
+ur		ہمارے پاس صرف 5 مکینک ہیں اور کام روک کر کسی کو تربیت نہیں دے سکتے
+ur		معاف کیجیے، میں نے غلط کہا تھا، 8 نہیں 80 لوگ ہیں
+ur		السلام علیکم، مجھے اپنے کاروبار کے بارے میں بات کرنی ہے
+ur		اس کا خرچ کتنا ہوگا اور کتنا وقت لگے گا؟
+ur		سٹاف کی تنخواہ ہر مہینے دیر سے ملتی ہے کیونکہ حساب نہیں ملتا
+ur		ہمارے پاس دو برانچیں ہیں اور اسٹاک کا حساب کبھی نہیں ملتا
+ur		مجھے کوٹیشن پہلے چاہیے، پھر میں فیصلہ کروں گا
+ur		گاہک واپس نہیں آتے اور ہم فالو اپ نہیں کر پاتے
+ur		شکریہ، اب مجھے سمجھ آ گیا ہے
+ur		ہمارا منافع کم ہو گیا ہے کیونکہ مال مہنگا ہو گیا ہے
+ur		یہ سب میرے لیے بہت ضروری ہے لیکن بجٹ کم ہے
+ur		ابھی کچھ نہیں چاہیے، پہلے میں سوچنا چاہتا ہوں
+ur		مریض کی پرانی پرچی ڈھونڈنے میں دس منٹ لگ جاتے ہیں
+ur		ہم لاہور میں ہیں اور ہماری ایک چھوٹی سی فیکٹری ہے
+ur		آپ نے کہا تھا کہ آپ مجھے ایک دستاویز دیں گے
+ur		سب کچھ ہاتھ سے لکھنا پڑتا ہے اس لیے بہت وقت ضائع ہوتا ہے
+ur		کیا یہ فارمیسی کے لیے بھی ہو سکتا ہے؟
+ur		مجھے نہیں معلوم کہ ہر مہینے کتنا نقصان ہوتا ہے
+ur		بہت سے بچے نوٹ گھر نہیں لے جاتے، کھو دیتے ہیں
+ur		کرایہ ہر مہینے دیر سے آتا ہے اور میں ایک ایک کو فون کرتا ہوں
+ur		ہمارا عملہ وقت پر کام نہیں کرتا اور مجھے ہر چیز خود دیکھنی پڑتی ہے
+ur		ہم واٹس ایپ پر بکنگ لیتے ہیں اور ڈائری میں لکھتے ہیں
+ur		بالکل ٹھیک ہے، آپ شروع کر دیں
+ur		ہمارے یہاں تین ڈاکٹر ہیں اور ایک کمپاؤنڈر
+ur		پیسے وقت پر نہیں آتے اور ادھار بہت ہو گیا ہے
+ur		گودام میں کچھ پتہ نہیں ہوتا کہ کون سا مال کہاں رکھا ہے
+ur		ہمیں ہر مہینے تقریباً بیس آرڈر واپس مل جاتے ہیں
+ur		یہ مسئلہ پچھلے مہینے سے ہے جب ہم نے شام کی شفٹیں شروع کیں
+ur		کیا آپ بتا سکتے ہیں کہ آپ ہمارے لیے کیا بنائیں گے؟
+ur		مجھے آپ کی بات سمجھ نہیں آئی
+ur		ہمارے ڈرائیور فون نہیں اٹھاتے اور ہمیں پتہ نہیں چلتا کہ گاڑی کہاں ہے
+ur		دکان بند کرنے سے پہلے کیش گننے میں ایک گھنٹہ لگ جاتا ہے
+ur		ہماری فیس بچوں کے والد دیر سے دیتے ہیں
+ur		نہیں میرا مطلب یہ تھا کہ ڈیلیوری لیٹ ہوتی ہے
+ur		ہم اپنا حساب کتاب رجسٹر میں رکھتے ہیں اور غلطی ہو جاتی ہے
+ur		یہاں ٹھنڈا اسٹور نہیں ہے اس لیے ہر سیزن میں آم خراب ہو جاتے ہیں
+ur		اسٹاف کی چھٹی کا کوئی حساب نہیں رکھا جاتا
+ur		آپ کا شکریہ، میں کل بات کرتا ہوں
+ur		مال کی قیمت ہر ہفتے بدل جاتی ہے
+ar		الزبائن يراسلونني باستمرار ليسألوا أين طلبهم
+ar		لا، كثير من الأطفال لا يحملون المذكرات إلى البيت ويضيعونها
+ar		ويجب أن يعمل على الهواتف العادية، سائقونا ليس عندهم هواتف ذكية
+ar		بدأ ذلك بعد أن أضفنا مواعيد المساء، والحجوزات تصل عبر واتساب
+ar		نؤجر غرفا مبردة للتجار ولا نعرف كم بقي من المساحة الفارغة
+ar		لدي متجر صغير وعدد الموظفين قليل جدا
+ar		مرحبا، أريد أن أسأل عن خدماتكم لشركتي
+ar		كم تبلغ التكلفة وكم من الوقت يستغرق ذلك؟
+ar		المخزون لا يطابق السجل في الفرعين
+ar		نحن نفقد عددا من الفواتير كل شهر ولا أحد ينتبه
+ar		أحتاج إلى مساعدة في الطلبات لأن العملاء يسألون دائما عن الشحنات
+ar		السائقون يتأخرون دائما والعملاء غاضبون
+ar		ليس هذا ما قصدته، قصدت أن التسليم متأخر
+ar		عفوا، أقصد ثمانين مستأجرا وليس ثمانية
+ar		لا أملك الميزانية لنظام جديد هذا العام
+ar		نستقبل الحجوزات عبر واتساب ونكتبها في دفتر ورقي
+ar		شكرا لك، فهمت الآن
+ar		الموظفة الوحيدة في الاستقبال لا تستطيع الرد على جميع المكالمات
+ar		رواتب الموظفين تتأخر كل شهر لأن الحسابات لا تتطابق
+ar		أريد عرض سعر قبل أن أقرر أي شيء
+ar		لدينا فرعان في دبي والمخزون غير مضبوط
+ar		هل يمكنكم تنفيذ هذا لصيدلية أيضا؟
+ar		يستغرق عد النقد ساعة كاملة كل ليلة بعد الإغلاق
+ar		العملاء لا يعودون ولا أحد يتابعهم
+ar		سأفكر في الأمر أولا ثم أخبركم
+ar		المشكلة بدأت الشهر الماضي عندما أضفنا ورديات المساء
+ar		نحن مدرسة فيها أربعمائة طالب والرسوم تتأخر
+ar		لا يوجد حاسوب عند الكاونتر، فقط هواتف
+ar		أصحاب العقارات يدفعون الإيجار بعد الموعد
+ar		ماذا ستبنون لنا بالضبط ومن سيراجعه؟
+ar		هذه المشكلة تحدث غالبا في عطلة نهاية الأسبوع
+ar		تجاهل ما قلته سابقا، لم أقصد ذلك
+ar		الأسعار ترتفع كل أسبوع ولا نستطيع متابعتها
+ar		لا أعرف كم نخسر كل شهر بسبب ذلك
+ar		عندنا اثنا عشر شاحنة والمرسل لا يستطيع مراقبة الخريطة طوال اليوم
+ar		جربنا جدول بيانات لكن لا أحد يحدثه
+ar		الأطباء ثلاثة ولا يوجد نظام للملفات
+ar		أرجو أن ترسلوا لي التفاصيل مكتوبة
+ar		هل ستجهزون لي المستند مع عرض السعر؟
+ar		الزبائن غير راضين عن مدة الانتظار في الاستقبال
+hi		तीन परेशानियाँ हैं: स्कूल सीज़न में किताबें कम पड़ जाती हैं
+hi		हमारे बाग में हर सीज़न करीब 5 टन आम खराब हो जाते हैं क्योंकि ठंडा स्टोर नहीं है
+hi		हमारे जूस की दुकान में गर्मियों में रोज़ करीब 12 किलो फल सड़ जाते हैं
+hi		कई बार तीन-चार महीने बाद भी हिसाब साफ़ नहीं होता
+hi		हमारे किरायेदार किराया समय पर नहीं देते। हमारे पास एक मैनेजर है।
+hi		मेरी दुकान में तीन लोग काम करते हैं लेकिन सब देर से आते हैं
+hi		क्या आप मेरे व्यापार के लिए कुछ कर सकते हैं?
+hi		नमस्ते, मुझे अपनी दुकान के बारे में बात करनी है
+hi		इसका खर्च कितना होगा और कितना समय लगेगा?
+hi		मैंने गलत कहा था, 8 नहीं 80 लोग हैं
+hi		हमारी डिलीवरी बहुत देर से होती है और ग्राहक नाराज़ होते हैं
+hi		स्टॉक खत्म हो जाता है और हमें पता ही नहीं चलता
+hi		मुझे पहले कोटेशन चाहिए, फिर मैं फैसला करूँगा
+hi		धन्यवाद, अब मुझे समझ आ गया है
+hi		हमारे पास दो शाखाएँ हैं और स्टॉक का हिसाब कभी नहीं मिलता
+hi		ग्राहक वापस नहीं आते और हम फॉलो अप नहीं कर पाते
+hi		सब कुछ हाथ से लिखना पड़ता है इसलिए बहुत समय बर्बाद होता है
+hi		कर्मचारियों की तनख्वाह हर महीने देर से मिलती है
+hi		अभी कुछ नहीं चाहिए, पहले मैं सोचना चाहता हूँ
+hi		क्या यह दवाई की दुकान के लिए भी हो सकता है?
+hi		वह बात भूल जाइए, मेरा मतलब यह नहीं था
+hi		गोदाम में पता नहीं चलता कि कौन सा माल कहाँ रखा है
+hi		हम लाहौर में हैं और हमारी एक छोटी सी फैक्ट्री है
+hi		दुकान बंद करने से पहले नकद गिनने में एक घंटा लग जाता है
+hi		बच्चों के माता-पिता फीस देर से देते हैं
+hi		आप हमारे लिए क्या बनाएंगे और कौन उसे देखेगा?
+hi		हमारे यहाँ तीन डॉक्टर हैं और एक कंपाउंडर
+hi		यह समस्या पिछले महीने से है जब हमने शाम की शिफ्ट शुरू की
+hi		मुझे नहीं पता कि हर महीने कितना नुकसान होता है
+hi		माल की कीमत हर हफ्ते बदल जाती है
+hi		भाई, मेरी दुकान पर ग्राहक कम आ रहे हैं
+fa		مشتریان مدام می‌پرسند سفارش‌شان کجاست
+fa		من یک فروشگاه کوچک دارم و تعداد کارکنان خیلی کم است
+fa		هزینه این کار چقدر است و چقدر زمان می‌برد؟
+fa		موجودی انبار با دفتر مطابقت ندارد
+fa		ما هر ماه چند فاکتور را گم می‌کنیم و کسی متوجه نمی‌شود
+fa		سلام، می‌خواهم درباره خدمات شما بپرسم
+fa		حقوق کارمندان هر ماه دیر پرداخت می‌شود
+fa		پیش از تصمیم گرفتن یک پیش‌فاکتور می‌خواهم
+fa		ما دو شعبه داریم و حساب موجودی هیچ‌وقت نمی‌خورد
+fa		این مشکل از ماه گذشته شروع شد که شیفت عصر را اضافه کردیم
+fa		مشتریان برنمی‌گردند و کسی پیگیری نمی‌کند
+fa		نه، منظورم این بود که تحویل دیر می‌شود
+fa		ممنون، حالا فهمیدم
+fa		راننده‌ها همیشه دیر می‌رسند و مشتریان عصبانی هستند
+fa		بودجه‌ای برای یک سیستم جدید در امسال ندارم
+fa		ما رزروها را در واتساپ می‌گیریم و در دفتر کاغذی می‌نویسیم
+fa		آیا این کار برای داروخانه هم ممکن است؟
+fa		قیمت کالاها هر هفته تغییر می‌کند و ما نمی‌توانیم دنبالش کنیم
+fa		کار شمردن پول نقد هر شب یک ساعت طول می‌کشد
+fa		لطفا جزئیات را برای من بنویسید
+fa		من نمی‌دانم هر ماه چقدر ضرر می‌کنیم
+fa		مدرسه ما چهارصد دانش‌آموز دارد و شهریه دیر می‌رسد
+fa		باید اول فکر کنم و بعد به شما خبر می‌دهم
+fa		هیچ کامپیوتری کنار صندوق نداریم فقط گوشی داریم
+fa		آن چیزی که گفتم را فراموش کنید منظورم این نبود
+fr		Nos clients demandent sans cesse où est leur commande
+fr		J'ai un petit magasin et le stock ne correspond jamais au registre
+fr		Bonjour, je voudrais savoir ce que vous pouvez faire pour ma clinique
+fr		Combien cela coûte-t-il et combien de temps faut-il pour le mettre en place ?
+fr		Nous perdons plusieurs factures chaque mois et personne ne s'en rend compte
+fr		Les livreurs sont toujours en retard et les clients sont mécontents
+fr		Je n'ai pas le budget pour un nouveau système cette année
+fr		Nous prenons les réservations sur WhatsApp et les notons dans un cahier
+fr		Merci, j'ai compris maintenant
+fr		Je voudrais un devis avant de décider quoi que ce soit
+fr		Ce n'est pas ce que j'ai dit, je parlais des livraisons
+fr		Nous avons deux boutiques et personne ne suit les ventes
+fr		Pouvez-vous me dire ce que vous allez construire pour nous ?
+fr		Il me faut d'abord réfléchir, puis je vous répondrai
+fr		Les salaires des employés arrivent en retard chaque mois
+es		Nuestros clientes preguntan todo el tiempo dónde está su pedido
+es		Tengo una tienda pequeña y el inventario nunca coincide con el registro
+es		Hola, quiero saber qué pueden hacer por mi clínica
+es		¿Cuánto cuesta y cuánto tiempo tarda en ponerse en marcha?
+es		Perdemos varias facturas cada mes y nadie se da cuenta
+es		Los repartidores siempre llegan tarde y los clientes están enfadados
+es		No tengo presupuesto para un sistema nuevo este año
+es		Tomamos las reservas por WhatsApp y las apuntamos en una libreta
+es		Gracias, ya lo he entendido
+es		Quiero un presupuesto antes de decidir nada
+es		No es lo que dije, hablaba de las entregas
+es		Tenemos dos tiendas y nadie lleva el control de las ventas
+es		¿Pueden decirme qué van a construir para nosotros?
+es		Primero tengo que pensarlo y luego les respondo
+es		Los sueldos de los empleados llegan tarde cada mes
+de		Unsere Kunden fragen ständig, wo ihre Bestellung ist
+de		Ich habe ein kleines Geschäft und der Bestand stimmt nie mit dem Register überein
+de		Hallo, ich möchte wissen, was Sie für meine Praxis tun können
+de		Wie viel kostet das und wie lange dauert die Einrichtung?
+de		Wir verlieren jeden Monat mehrere Rechnungen und niemand merkt es
+id		Pelanggan kami terus bertanya di mana pesanan mereka
+id		Saya punya toko kecil dan stok tidak pernah sama dengan catatan
+id		Halo, saya mau tanya apa yang bisa kalian lakukan untuk klinik saya
+id		Berapa biayanya dan berapa lama waktu yang dibutuhkan?
+id		Kami kehilangan beberapa faktur setiap bulan dan tidak ada yang sadar
+tr		Müşterilerimiz siparişlerinin nerede olduğunu sürekli soruyor
+tr		Küçük bir dükkanım var ve stok hiçbir zaman kayıtla uyuşmuyor
+tr		Merhaba, kliniğim için neler yapabileceğinizi öğrenmek istiyorum
+tr		Maliyeti ne kadar ve kurulumu ne kadar sürer?
+tr		Her ay birkaç faturayı kaybediyoruz ve kimse fark etmiyor
+tl		Ang mga customer namin ay laging nagtatanong kung nasaan ang order nila
+tl		Ako ay may maliit na tindahan at hindi tugma ang stock sa talaan
+tl		Magkano po ang gastos at gaano katagal ang setup?
+tl		Kailangan ko ng tulong sa mga order kasi hindi namin masubaybayan
+tl		Hindi ko alam kung magkano ang nawawala sa amin kada buwan
+tl		Salamat po, naintindihan ko na
+ps		زه یو کوچنی دوکان لرم او زما کارکوونکي ډیر لږ دي
+ps		مشتریان تل پوښتي چې زما امر چیرته دی
+ps		دا کار څومره لګښت لري او څومره وخت نیسي؟
+ps		موږ هره میاشت څو بلونه ورکوو او هیڅوک نه پوهیږي
+sd		مون وٽ هڪ ننڍي دڪان آهي ۽ اسٽاف تمام گهٽ آهي
+sd		گراهڪ ڪيترا ڀيرا پڇندا آهن ته سندن آرڊر ڪٿي آهي
+sd		هن ڪم جو خرچ ڪيترو ٿيندو ۽ ڪيترو وقت لڳندو؟
+sd		اسان هر مهيني ڪجهه بل وڃائيندا آهيون ۽ ڪنهن کي خبر ناهي
+pa		میں اک چھوٹی جئی دکان چلاندا واں تے میرے کول سٹاف بہت گھٹ اے
+pa		گاہک وار وار پچھدے نیں کہ اوہناں دا آرڈر کتھے اے
+pa		ایہہ کم دا خرچہ کنا ہووے گا تے کنا ویلا لگے گا؟
+bn		আমার একটি ছোট দোকান আছে এবং কর্মী খুব কম
+bn		গ্রাহকরা বারবার জিজ্ঞাসা করে তাদের অর্ডার কোথায়
+ta		என்னிடம் ஒரு சிறிய கடை உள்ளது ஊழியர்கள் மிகவும் குறைவு
+ta		வாடிக்கையாளர்கள் தங்கள் ஆர்டர் எங்கே என்று கேட்கிறார்கள்
+ml		എനിക്ക് ഒരു ചെറിയ കടയുണ്ട് ജീവനക്കാർ വളരെ കുറവാണ്
+ml		ഉപഭോക്താക്കൾ അവരുടെ ഓർഡർ എവിടെയാണെന്ന് ചോദിക്കുന്നു
+roman_ur	roman_ur,en	Our shop mein stock nahi hai aur customers bar bar poochte hain
+roman_ur	roman_ur,en	We need to fix delivery kyunke gahak naraz hain
+roman_ur	roman_ur,en	Bhai mera stock khatam ho gaya hai and the delivery is late
+roman_ur	roman_ur,en	Salam bhai stock khatam ho jata hai aur sale bhi kam hai
+roman_ur	roman_ur,en	Hamare staff ki salary late hoti hai and invoices bhi lost ho jate hain
+roman_ur	roman_ur,en	Mujhe invoice aur delivery ka masla hai kyunke customer nahi milta
+roman_ur	roman_ur,en	Branch ka stock aur sale ka hisaab nahi milta
+ur	ur,en	ہمارا stock ختم ہو جاتا ہے اور delivery بھی لیٹ ہوتی ہے
+ur	ur,en	میری shop پر customers کم آ رہے ہیں اور sale گر گئی ہے
+ur	ur,en	ہمیں invoice بنانے میں بہت وقت لگتا ہے
+ar	ar,en	عندنا مشكلة في stock والـ delivery متأخر دائما
+hi	hi,en	हमारा stock खत्म हो जाता है और delivery late होती है
+hi	hi,en	मेरी shop पर customers कम आ रहे हैं
+en	en,ur	We have a problem with the staff, ہمارا اسٹاف late آتا ہے
+und		ok
+und		okay
+und		yes
+und		no
+und		haan
+und		hmm
+und		theek hai
+und		thanks
+und		👍
+und		5
+und		12345
+und		yes please
+und		nahi
+und		han
+und		ji
+und		hmm ok
+und		🙏🙏
+und		...
+und		ok thanks
+und		shukriya
+und		😂
+und		100
+und		two
+und		haan ji
+und		k
+und		نہیں
+und		ہاں
+und		لا
+und		नहीं
+und		oui
+und		sí
+und		no no

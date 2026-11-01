@@ -59,9 +59,36 @@ PARK = re.compile(
     r"|اتركه\s+الآن|اتركها|چھوڑ\s+دو",
     re.IGNORECASE,
 )
-# Words that mean a link on the map, never a web link: needed when no problem is named.
+# Words that mean a link on the map: needed when no problem is named. "connection" alone is NOT
+# strong (an internet connection, a supplier connection): it needs "this/that/ye/yeh/is/woh" before
+# it, or it is the word arrow, or a Urdu/Arabic link word.
 STRONG_LINK = re.compile(
-    r"(?:jor+|jarr|jarh|taalluq|taaluq|rishta|arrow|connection)|جوڑ|الرابط|الربط"
+    r"\b(?:this|that|these|ye|yeh|is|woh|wo)\s+(?:(?:wrong|galat|ghalat)\s+)?"
+    r"(?:jor+|jarr|jarh|taalluq|taaluq|rishta|connection|link|line|arrow)\b"
+    r"|\b(?:ce|cette|este|ese|esa)\s+(?:lien|enlace|conexi[oó]n)\b|\barrows?\b|جوڑ|الرابط|الربط|(?:هذا|هذه|ذلك)\s+الارتباط",
+    re.IGNORECASE,
+)
+# Talk about another kind of connection or link: never a map edit (internet, wifi, an account, a
+# web page, a supplier connection).
+OTHER_DOMAIN = re.compile(
+    r"\b(?:internet|wi-?fi|router|network|broadband|cable|electricity|bijli|account|website|"
+    r"web|url|page|site|instagram|facebook|youtube|whatsapp|http\S*|password|login)\b"
+    r"|\b(?:connection|link)\b.{0,15}\b(?:supplier|vendor)s?\b"
+    r"|\b(?:supplier|vendor)s?\b.{0,15}\b(?:connection|link)\b"
+    r"|انٹرنیٹ|وائی\s*فائی|ویب|الإنترنت|الانترنت|الموقع|موقع|حساب|واي\s*فاي|شبكة|इंटरनेट|वेबसाइट",
+    re.IGNORECASE,
+)
+# A word that says the owner does NOT mean it, anywhere in the clause ("no," as a yes is not one).
+NEGATED = re.compile(
+    r"\b(?:not|never|nahi|nhi|nahin|nai|mat|pas)\b|n['’]t\b|(?<=\s)no\b(?!\s*,)"
+    r"|(?<![\w])لا(?![\w])|نہیں|ليس|मत|नहीं|नही",
+    re.IGNORECASE,
+)
+# "these two are not connected" is itself the request, so it is checked before negation.
+NOT_RELATED = re.compile(
+    r"\bthese (?:two )?(?:are|r) (?:not|n['’]t) (?:connected|related|linked)\b"
+    r"|\b(?:ye|yeh) (?:dono|aapas)\b.{0,20}\b(?:related|juray|jude|connected) (?:nahi|nhi)\b",
+    re.IGNORECASE,
 )
 # a problem, not an open question: the owner is talking about the problem
 PROBLEMISH = re.compile(
@@ -146,7 +173,7 @@ def wants(said: str) -> str | None:
     text = " ".join((said or "").split())
     if not text or "?" in text or "؟" in text or len(text) > 400:
         return None
-    if UNLINK.search(text):
+    if UNLINK.search(text) and (NOT_RELATED.search(text) or not NEGATED.search(text)):
         return "unlink"
     if RESOLVE.search(text) and not NEGATION.search(text):
         return "resolve"
@@ -155,6 +182,17 @@ def wants(said: str) -> str | None:
     if box_signals.says_start_here(text) and not NEGATION.search(text):
         return "rank"
     return None
+
+
+# The question lines that carry a problem label ("P2") as an example. pi wrote them, so the reply
+# check lets exactly these sentences through (the same way as `fixed_lines`); the price guard itself
+# is not loosened.
+LABEL_LINES: tuple[str, ...] = tuple(
+    text
+    for key in ("which_link", "which_problem")
+    for text in LINES[key].values()
+    if any(ch.isdigit() for ch in text)
+)
 
 
 def line(action: str, language: str | None, **names: str) -> str:
@@ -251,6 +289,16 @@ async def _rank_first(book: ProblemBook, problem: PiProblem, problems: list[PiPr
     return True
 
 
+def link_stance(text: str, named: int) -> str:
+    """none: not about the map (the model answers); go: remove the one link; ask: could be the
+    map's link, could be something else, so ask which link."""
+    if OTHER_DOMAIN.search(text) and named < 2:
+        return "none"
+    if named or STRONG_LINK.search(text):
+        return "go"
+    return "ask"
+
+
 async def _unlink(
     session: AsyncSession,
     scope: WorkspaceScope,
@@ -263,8 +311,11 @@ async def _unlink(
     shown = map_builder.drawn_links(problems, links)
     by_id = {p.id: p for p in problems}
     named = named_in(message.body or "", problems)
-    if not shown or (not named and not STRONG_LINK.search(message.body or "")):
-        return Edit("unlink", "nothing")  # nothing drawn to remove, or a web link, not the map's
+    stance = link_stance(message.body or "", len(named))
+    if not shown or stance == "none":
+        return Edit("unlink", "nothing")  # nothing drawn to remove, or not the map's link at all
+    if stance == "ask":
+        return Edit("unlink", "ambiguous", line=line("which_link", language), replaces_reply=True)
     if len(named) >= 2:
         ids = {p.id for p in named}
         pool = [li for li in shown if li.from_id in ids and li.to_id in ids]

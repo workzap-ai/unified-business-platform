@@ -12,7 +12,7 @@ except `previous_ai_asked`.
 import re
 from typing import Any
 
-from app.modules.pi import dial_signals, dials
+from app.modules.pi import dial_signals, dials, part19, system_ask
 
 RANK_PREFIX = "rank:"
 MAX_RANK = 9
@@ -78,7 +78,12 @@ def says_no_others(message: str) -> bool:
 
 def asks_who_or_how_long(message: str) -> bool:
     """R3: the owner asks who would do it, how long it takes, or whether Workzap can do it."""
-    return bool(ASKS_WHO_OR_HOW_LONG.search(" ".join((message or "").split())))
+    said = " ".join((message or "").split())
+    return (
+        bool(ASKS_WHO_OR_HOW_LONG.search(said))
+        or system_ask.asks_can_you_do(said)
+        or part19.ready_to_buy(said)
+    )
 
 
 def just_corrected(message: str) -> bool:
@@ -97,10 +102,19 @@ def in_a_hurry(message: str) -> bool:
     return bool(IN_A_HURRY.search(" ".join((message or "").split())))
 
 
+def owner_stated(problem: dict[str, Any]) -> bool:
+    """A noted cause counts only when the owner said it: its status is owner_said or confirmed.
+    A pi_inferred cause (the model's guess) never counts. No `cause_status` (or an empty one) is a
+    problem dict from before the status existed (and the older database column, which is only
+    written from the owner's own words), so the text decides."""
+    status = problem.get("cause_status")
+    return not status or status in ("owner_said", "confirmed")
+
+
 def main_cause_known(context: dict[str, Any]) -> bool:
     """Whether the cause of the main problem is known (spec 5.4, "never offer when it is unknown").
     The main problem is the one the owner ranked first, else the first noted. Known when the owner
-    gave their own cause for it, or pi's diagnosis of it has causes and no open question. With
+    said their own cause for it (owner_said or confirmed, never pi's guess, never pi's own diagnosis). With
     nothing noted there is no main problem to be unsure of, so it does not hold the offer back.
     A `main_cause_known` key in the brief, when present, overrides."""
     brief = context.get("brief") or {}
@@ -111,10 +125,11 @@ def main_cause_known(context: dict[str, Any]) -> bool:
         return True
     ranked = sorted((p for p in noted if p.get("rank")), key=lambda p: int(p["rank"]))
     main = (ranked or noted)[0]
-    if str(main.get("cause") or "").strip():
+    if str(main.get("cause") or "").strip() and owner_stated(main):
         return True
-    diag = brief.get("expert_diag")
-    return bool(isinstance(diag, dict) and diag.get("causes") and not diag.get("question"))
+    # pi's own diagnosis (brief["expert_diag"]) is a labelled hypothesis (pi_inferred): it never
+    # makes the cause known and never unlocks the offer (PS-flow, spec 5.4).
+    return False
 
 
 def message_signals(context: dict[str, Any]) -> dict[str, bool]:
@@ -195,7 +210,9 @@ def customer_texts(context: dict[str, Any]) -> list[str]:
 REPEAT_COMPLAINT = re.compile(
     r"i\s+already\s+(?:told|said|gave|mentioned)|already\s+told\s+you|i\s+told\s+you|"
     r"maine\s+(?:to\s+)?(?:bataya|bata\s+diya|keh\s+diya)|phir\s+se\s+(?:puch|pooch)|"
-    r"bataya\s+to\s+hai|میں\s+نے\s+بتایا",
+    r"bataya\s+to\s+hai|میں\s+نے\s+بتایا|"
+    r"kitni\s+baar\s+(?:bata|puch|pooch)|baar\s+baar\s+(?:bata|puch|pooch)|"
+    r"how\s+many\s+times\s+(?:do\s+i|should\s+i|must\s+i)\s+(?:tell|say|repeat)",
     re.IGNORECASE,
 )
 FALLING_QUIET_MESSAGES = 8

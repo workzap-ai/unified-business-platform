@@ -265,7 +265,11 @@ def test_no_idea_for_the_problem_is_said_plainly() -> None:
             "history": [{"role": "ai", "text": "Hi, I am pi."}],
         },
     )
-    assert turn.reply.startswith("Ji. ") and "solution document" in turn.reply
+    # re-audit: no document is named while listening; the line asks what they tried (one question)
+    # sentence one answers a direct "what can you do?" (spec 17.5, EO3), not a bare "Ji."
+    assert turn.reply.startswith("Is par hum saath soch sakte hain")
+    assert "solution document" not in turn.reply
+    assert turn.reply.count("?") == 1 and turn.reply.rstrip().endswith("?")
 
 
 def test_short_roman_urdu_nothing_more_and_summary_asks() -> None:
@@ -326,7 +330,7 @@ def test_the_no_idea_line_is_not_repeated_word_for_word() -> None:
         {"role": "ai", "text": first.reply},
     ]
     brain_no_ideas(second, context)
-    assert second.reply != first.reply and "solution document" in second.reply
+    assert second.reply != first.reply and second.reply.count("?") == 1  # 19.6: one new question
 
 
 def test_a_reply_that_already_says_it_is_an_ai_is_not_given_the_line_twice() -> None:

@@ -52,10 +52,49 @@ def problem_view(
         "where": str(where),
         "how_often": str((problem.frequency or {}).get("text") or ""),
         "since": str((problem.since or {}).get("text") or ""),
+        "of_total": str(scope.get("of_total") or ""),
         "money": str((problem.impact or {}).get("money_text") or ""),
         "impact": list((problem.impact or {}).get("types") or []),
         "cause": str(problem.person_believes_cause or ""),
         "rank": box_signals.rank_of(problem.tags),
+        **requirement_view(problem),
+    }
+
+
+def _loaded(problem: Any, name: str) -> Any:
+    """A value that is already loaded on the row. The four B2a columns are deferred: an async
+    session cannot lazy-load them, so an unloaded one reads as not said (the caller loads them)."""
+    return getattr(problem, "__dict__", {}).get(name)
+
+
+def requirement_view(problem: Any) -> dict[str, Any]:
+    """The stored B2a fields of one problem, as plain data for the blueprint: the owner's limits,
+    what they tried, the cause with its status (pi's guess stays `pi_inferred`) and the outcome
+    they want. A row from before the columns existed reads as empty."""
+    stated = _loaded(problem, "constraints")
+    stated = stated if isinstance(stated, dict) else {}
+
+    def text(entry: Any) -> str:
+        return str(entry.get("text") or "") if isinstance(entry, dict) else str(entry or "")
+
+    limits = {k: text(stated.get(k)) for k in ("budget", "staff", "deadline")}
+    cannot = [text(e) for e in stated.get("cannot_change") or [] if text(e).strip()]
+    tried = [
+        {"what": str(t.get("what") or ""), "outcome": str(t.get("outcome") or "")}
+        for t in (_loaded(problem, "tried") or [])
+        if isinstance(t, dict) and str(t.get("what") or "").strip()
+    ]
+    cause = _loaded(problem, "cause")
+    cause = cause if isinstance(cause, dict) else {}
+    return {
+        "limits": {k: v for k, v in limits.items() if v.strip()},
+        "cannot_change": cannot,
+        "tried": tried,
+        "cause_text": str(cause.get("text") or ""),
+        "cause_status": str(cause.get("status") or "") if cause.get("text") else "",
+        "expected_outcome": str(_loaded(problem, "expected_outcome") or ""),
+        "msgs": [str(m) for m in (_loaded(problem, "source_message_ids") or [])],
+        "cause_raw": cause if cause.get("text") else None,
     }
 
 

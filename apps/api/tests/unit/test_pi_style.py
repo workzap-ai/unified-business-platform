@@ -78,7 +78,7 @@ def test_each_repeat_moves_one_strategy_further_and_a_clear_reply_resets():
     assert seen == [1, 2, 3, 4, 5, 5, 5]
     assert style.repair_step(4, "ok, stock runs out") == 0
     assert [style.REPAIR[n].split(":")[0].split(" ")[0] for n in (1, 2, 3, 4, 5)] == [
-        "Rephrase", "Give", "Give", "Offer", "Drop",
+        "Rephrase", "Give", "Give", "Own", "Own",
     ]  # fmt: skip
 
 

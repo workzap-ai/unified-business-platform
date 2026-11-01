@@ -179,20 +179,20 @@ def test_the_summary_groups_counts_and_ends_with_one_question():
         )
     )
     lines = text.splitlines()
-    assert lines[0] == "Here's what I've noted and sorted so far. None of it is solved yet."
+    assert lines[0] == "Here is what you have told me so far."  # spec v1.6 19.7
     assert "*Stock* (2)" in lines and "*Staff* (1)" in lines and "*Cash & payments* (1)" in lines
     assert lines.index("*Stock* (2)") < lines.index("*Staff* (1)")  # biggest group first
     assert lines[lines.index("*Stock* (2)") + 1] == "• Best-sellers running out"  # worst first
-    assert lines[-1] == "Is anything wrong or missing?"
+    assert lines[-1] == "Which of these should we start with?"
     assert text.count("?") == 1
 
 
-def test_a_long_summary_shows_two_lines_a_group():
+def test_a_long_summary_lists_every_problem():
     many = items(*[("stock_inventory", f"Stock problem number {i}", 10 - i) for i in range(8)])
     many += items(*[("people_staff", f"Staff problem number {i}", 10 - i) for i in range(6)])
     text = problems.summary_message(many)
-    assert text.count("•") == 4
-    assert "…and 10 more." in text
+    assert text.count("•") == 14  # spec v1.6 19.7: every stored problem, none hidden
+    assert "more" not in text
     assert text.count("?") == 1
 
 
@@ -204,8 +204,8 @@ def test_a_summary_line_is_ten_words_at_most():
 
 def test_the_summary_speaks_the_persons_language():
     roman = problems.summary_message(items(("stock_inventory", "Maal khatam", 1)), "roman_ur")
-    assert "Ab tak jo maine note aur sort kiya hai" in roman and "*Maal* (1)" in roman
-    assert roman.endswith("Kuch ghalat hai ya reh gaya hai?")
+    assert "Ab tak aap ne jo bataya hai" in roman and "*Maal* (1)" in roman
+    assert roman.endswith("In mein se pehle kis par kaam shuru karein?")
     assert "*اسٹاک* (1)" in problems.summary_message(items(("stock_inventory", "x", 1)), "ur")
     assert "*المخزون* (1)" in problems.summary_message(items(("stock_inventory", "x", 1)), "ar")
 
@@ -217,15 +217,6 @@ def test_the_summary_speaks_the_persons_language():
         ("bas yahi", "done"),
         ("nothing else for now", "done"),
         ("aur kuch nahi", "done"),
-        ("so what can you do?", "what_now"),
-        ("how much would it cost", "what_now"),
-        ("ab kya karna hai", "what_now"),
-        ("Aap jaldi solution do na mujhe, sawal hi poochti rahogi kya?", "what_now"),
-        ("Batao kuch kar sakte hain ya nahi kar sakte?", "what_now"),
-        ("Kya solution hai tumhare paas?", "what_now"),
-        ("just give me the solution", "what_now"),
-        ("why so many questions", "what_now"),
-        ("Can you tell me the solution", "what_now"),
         ("Upper btaiya tw hua Dekho chat", "show"),
         ("I already told you", "show"),
         ("pehle bata chuka hoon", "show"),
@@ -235,10 +226,25 @@ def test_when_the_summary_is_due(said, why):
     assert problems.summary_due(said, noted=2, since_summary=2) == why
 
 
-def test_the_summary_waits_for_a_noted_problem_or_seven_new_ones():
+@pytest.mark.parametrize(
+    "said",
+    [
+        "so what can you do?",
+        "how much would it cost",
+        "ab kya karna hai",
+        "just give me the solution",
+        "why so many questions",
+    ],
+)
+def test_a_push_or_a_price_question_is_not_an_ask_for_the_summary(said):
+    # spec v1.6 19.7: a summary never replaces an answer; the price goes to the quote (19.2)
+    assert problems.summary_due(said, noted=2, since_summary=2) is None
+
+
+def test_the_summary_waits_for_a_noted_problem_and_never_starts_on_a_count():
     assert problems.summary_due("that's all", noted=0, since_summary=0) is None
     assert problems.summary_due("the cashier is late", noted=3, since_summary=3) is None
-    assert problems.summary_due("the cashier is late", noted=7, since_summary=7) == "many"
+    assert problems.summary_due("the cashier is late", noted=7, since_summary=7) is None  # part19
     assert problems.summary_due("the cashier is late", noted=9, since_summary=2) is None
 
 

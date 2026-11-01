@@ -55,7 +55,12 @@ def addressed(kind: str, reply: str, *, request_human: bool = False) -> bool:
     if kind == "human" and request_human:
         return True
     pattern = ADDRESSES.get(kind)
-    return bool(pattern and pattern.search(reply or ""))
+    # a sentence that only asks something ("Which team or place does it hit hardest?") does not tell
+    # the owner where the answer lives, so its words do not count (the arms' wording found this)
+    said = " ".join(
+        s for s in re.split(r"(?<=[.!?؟])\s+", reply or "") if not s.rstrip().endswith(("?", "؟"))
+    )
+    return bool(pattern and pattern.search(said))
 
 
 def update(

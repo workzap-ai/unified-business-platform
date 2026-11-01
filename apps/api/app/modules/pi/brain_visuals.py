@@ -90,6 +90,20 @@ class Group:
     words: list[str] = field(default_factory=list)
 
 
+def groups_from_snapshot(snapshot: Any) -> "list[Group]":
+    """The groups of a stored board snapshot ([label, count, [words]] rows); bad rows go."""
+    return [
+        Group(str(g[0]), int(g[1]), [str(w) for w in g[2]])
+        for g in snapshot or []
+        if isinstance(g, list) and len(g) == 3
+    ]
+
+
+def snapshot_of(groups: "list[Group]") -> list[list[Any]]:
+    """The board as stored with what was sent: [label, count, [words]] per area."""
+    return [[g.label[:40], int(g.count), [str(w)[:90] for w in g.words]] for g in groups]
+
+
 def token(
     settings: Settings,
     conversation_id: UUID,
@@ -98,19 +112,23 @@ def token(
     step: int = 0,
     version: int = 0,
     part: int = 0,
+    message: str | None = None,
 ) -> str:
-    data = json.dumps(
-        {
-            "c": str(conversation_id),
-            "k": kind,
-            "l": language,
-            "s": step,
-            "v": version,
-            "n": part,
-            "e": int(time.time()) + VISUAL_SECONDS,
-        },
-        separators=(",", ":"),
-    ).encode()
+    """A signed link to a picture. A board link names the summary message it was sent with
+    (`message`); the groups it was drawn from stay on the server, in the media of the queued image,
+    so the picture is what was sent (spec v1.6, 19.8) and the link carries no words of the owner."""
+    claims: dict[str, Any] = {
+        "c": str(conversation_id),
+        "k": kind,
+        "l": language,
+        "s": step,
+        "v": version,
+        "n": part,
+        "e": int(time.time()) + VISUAL_SECONDS,
+    }
+    if message:
+        claims["m"] = str(message)
+    data = json.dumps(claims, separators=(",", ":")).encode()
     return f"{base64.urlsafe_b64encode(data).decode().rstrip('=')}.{_sign(settings, data)}"
 
 
@@ -134,6 +152,7 @@ def read(settings: Settings, value: str) -> dict[str, Any] | None:
             "step": max(0, min(3, int(claims.get("s") or 0))),
             "version": max(0, int(claims.get("v") or 0)),
             "part": max(0, min(MAX_MAP_PARTS - 1, int(claims.get("n") or 0))),
+            "message": str(claims.get("m") or ""),
         }
     except (ValueError, KeyError, TypeError):
         return None

@@ -12,6 +12,7 @@ from test_pi_pipeline import pi_workspace
 from test_pi_service_conversations import turn
 
 from app.ai.manager import LLMManager
+from app.modules.pi import brain_config
 from app.modules.pi.problem_models import (
     PiProblem,
     PiProblemGroup,
@@ -209,7 +210,11 @@ async def test_merge_split_link_withdraw_and_rename_a_group(api, business_db, mo
             ops = [
                 ProblemOp(op="merge", ref=a, refs=[b]),
                 ProblemOp(
-                    op="link", ref=refs["Cashiers late on weekends"], to=a, link_type="same_area"
+                    op="link",
+                    ref=refs["Cashiers late on weekends"],
+                    to=a,
+                    link_type="same_area",
+                    confidence=brain_config.LINK_DEFAULT / 100,  # the floor a link must meet
                 ),
                 ProblemOp(
                     op="split",
@@ -286,9 +291,9 @@ async def test_that_is_all_shows_the_sorted_summary_and_moves_to_sorted(
     await say(pi, "Best-sellers run out and cashiers are late on weekends", "pb-5a")
     await say(pi, "That's all", "pb-5b")
     body = (await pi.reply_to("pb-5b")).body
-    assert body.startswith("Here's what I've noted and sorted so far. None of it is solved yet.")
+    assert body.startswith("Here is what you have told me so far.")  # spec v1.6 19.7
     assert "*Stock* (1)" in body and "*Staff* (1)" in body
-    assert body.endswith("Is anything wrong or missing?")
+    assert body.endswith("Which of these should we start with?")
     conversation, _ = await problems_of(business_db, pi)
     assert conversation.flow_state == "S4_SORTED_SUMMARY"
     assert conversation.service_brief["summary_count"] == 2

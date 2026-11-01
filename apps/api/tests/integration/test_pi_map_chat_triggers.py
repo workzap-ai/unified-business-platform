@@ -247,10 +247,11 @@ async def test_a_return_with_the_flag_off_or_within_a_day_is_not_a_return(
 async def test_the_map_goes_before_the_offer_so_the_offers_question_stays_last(
     api, business_db, monkeypatch
 ):
+    from offer_expect import assert_offer_ends  # noqa: PLC0415
     from test_pi_solution_ask_flow import scripted, solution_chat  # noqa: PLC0415
     from test_pi_solution_learning import an_industry  # noqa: PLC0415
 
-    from app.modules.pi import box, solution_ask
+    from app.modules.pi import box
 
     monkeypatch.setattr(box, "box_offer_enabled", lambda rules: True)
     monkeypatch.setattr(box, "can_offer", lambda facts: (True, "R2", "held open"))
@@ -286,7 +287,7 @@ async def test_the_map_goes_before_the_offer_so_the_offers_question_stays_last(
     shared = rows[0]
     assert shared.media["map_version"] == 1 and "?" not in shared.body
     assert "buttons" not in shared.media  # the offer's own question stays last
-    assert rows[-1].body.rstrip().endswith(solution_ask.offer_line("en"))
+    assert_offer_ends(rows[-1].body, "en")
     await business_db.refresh(conversation)
     assert conversation.service_brief.get("offer_asked") is True
     assert not conversation.service_brief.get("map_awaiting")  # the offer is the next question

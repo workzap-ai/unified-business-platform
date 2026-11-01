@@ -115,7 +115,10 @@ async def test_what_is_open_is_named_first_when_the_owner_returns_after_a_gap(
     await say(pi, "wait, one more thing", "rt-2")
     reply = last_reply(pi)
     assert reply.startswith("Your earlier request is still open: “how long will it take”.")
-    assert "?" not in reply.split("Which")[0]  # the quoted words carry no question mark
+    opening = reply.split("”.")[0]  # the open-item line, up to the end of the quoted words
+    assert "?" not in opening  # the quoted words carry no question mark
+    # one question, and it is the last sentence (the question is the model's, or the next one)
+    assert reply.count("?") == 1 and reply.rstrip().endswith("?")
     [item] = await items(business_db)
     assert item.surfaced_at is not None
     # said once on that return, not again on the next message
@@ -209,6 +212,7 @@ async def test_a_wrong_link_is_removed_and_pi_asks_the_real_connection(
     api, business_db, monkeypatch
 ):
     pi, conversation, rows, link_id = await linked(api, business_db, monkeypatch)
+    scope, customer_id = _scope(conversation), rows[0].customer_id  # before expire_all
     await say(pi, "this connection is wrong", "me-1")
     business_db.expire_all()
     link = await business_db.get(PiProblemLink, link_id)
@@ -217,9 +221,7 @@ async def test_a_wrong_link_is_removed_and_pi_asks_the_real_connection(
     assert "What is the real connection between" in reply and reply.rstrip().endswith("?")
     assert reply.count("?") == 1 and "noted" not in reply.lower()
     assert not reply.startswith("Thanks")
-    problems, links = await map_builder.current_inputs(
-        business_db, _scope(conversation), rows[0].customer_id
-    )
+    problems, links = await map_builder.current_inputs(business_db, scope, customer_id)
     assert map_builder.drawn_links(problems, links) == []
     reasons = (await business_db.scalars(select(PiProblemRevision.reason))).all()
     assert reasons.count("link_rejected") == 2

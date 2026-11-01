@@ -32,7 +32,9 @@ def test_describe_lists_every_setting_with_its_range():
 
 
 def test_the_summary_trigger_follows_the_setting():
-    assert summary_due("hmm", 5, 5, trigger=5) == "many"
+    # spec v1.6 19.7: a count of problems alone never starts a summary; the checkpoint is
+    # part19.checkpoint_due (three problems, eight messages since the last, owner not mid-question)
+    assert summary_due("hmm", 5, 5, trigger=5) is None
     assert summary_due("hmm", 5, 5) is None
     assert summary_due("that's all", 1, 0) == "done"
 
@@ -94,6 +96,6 @@ def test_the_summary_comes_after_the_workspaces_own_number_of_empty_replies():
     from app.modules.pi import problems
 
     assert problems.summary_due("ok", 2, 1, quiet_replies=1) is None
-    assert problems.summary_due("ok", 2, 1, quiet_replies=1, quiet_limit=1) == "quiet"
-    assert problems.summary_due("ok", 2, 1, quiet_replies=2) == "quiet"
+    assert problems.summary_due("ok", 2, 1, quiet_replies=1, quiet_limit=1) is None  # 19.7
+    assert problems.summary_due("ok", 2, 1, quiet_replies=2) is None
     assert problems.summary_due("ok", 2, 1, quiet_replies=2, quiet_limit=3) is None

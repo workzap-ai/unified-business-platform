@@ -61,9 +61,9 @@ async def build(
         "lessons": [],
     }
     profile = (conversation.service_brief or {}).get("customer_profile") or {}
-    industry = await learning_situation.industry_of(session, conversation)
+    industry = await learning_situation.industry_of(session, conversation, scope=scope)
     category = (
-        await learning_situation.category_of(session, conversation.id)
+        await learning_situation.category_of(session, conversation.id, scope=scope)
         if conversation.id is not None
         else ""
     )

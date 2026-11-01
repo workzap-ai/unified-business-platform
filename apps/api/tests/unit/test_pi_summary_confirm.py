@@ -35,7 +35,8 @@ def test_the_summary_uses_the_persons_own_words_and_group_names():
 
 
 def test_two_quiet_replies_bring_the_summary_once_something_is_unsummarised():
-    assert problems.summary_due("ok", 3, 1, 7, quiet_replies=2) == "quiet"
+    # spec v1.6 19.7: quiet replies no longer bring a summary; a checkpoint does (part19)
+    assert problems.summary_due("ok", 3, 1, 7, quiet_replies=2) is None
     assert problems.summary_due("ok", 3, 1, 7, quiet_replies=1) is None
     assert problems.summary_due("ok", 3, 0, 7, quiet_replies=2) is None  # nothing new to show
 
