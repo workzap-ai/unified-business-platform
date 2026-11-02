@@ -77,7 +77,9 @@ _PICK_QUESTION = re.compile(
 
 
 def _questions(reply: str) -> list[str]:
-    return [p for p in re.split(r"(?<=[?؟])\s+", (reply or "").strip()) if p.endswith(_QMARKS)]
+    return [
+        p for p in re.split(r"(?<=[.!?؟۔。！])\s+", (reply or "").strip()) if p.endswith(_QMARKS)
+    ]
 
 
 def _key(word: str) -> str:

@@ -12,7 +12,7 @@ later "haan" goes through the explicit-yes gate.
 import re
 from typing import Any
 
-from app.modules.pi import owner_asks, solutions
+from app.modules.pi import owner_asks, practical_solution, solutions
 from app.modules.pi.problems import what_now
 
 # Asking for a fix, in any of the ways owners put it (Part 1.6). A cost question is not one.
@@ -319,6 +319,8 @@ IMPLICIT_HELP = re.compile(
 
 
 def _asked_for_ideas(text: str) -> bool:
+    if practical_solution.explicit(text):
+        return True
     if IMPLICIT_HELP.search(text) and not NOT_AN_ASK.search(text):
         return True
     if DO_SOMETHING.search(text) and not REFUSAL_NEAR.search(text):
@@ -421,7 +423,14 @@ OFFER_AFTER = {
 OFFERABLE = ("S1_LISTENING", "S2_CLARIFYING", "S3_NOTED", "S4_SORTED_SUMMARY")
 # Where a request for a fix or for the detail may be answered: while listening, and at the offer
 # (never in the payment, document or delivery states).
-ASKABLE = (*OFFERABLE, "S5_READINESS", "S5b_DECLINED")
+ASKABLE = (
+    *OFFERABLE,
+    "S5_READINESS",
+    "S5b_DECLINED",
+    "S_LISTEN_THINK",
+    "S_MAP_SHARE",
+    "S_BOX_OFFER",
+)
 
 
 def rejects_ideas(text: str | None) -> bool:

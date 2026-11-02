@@ -23,7 +23,9 @@ SYSTEM = """You decide whether a message from a business owner to a business ass
 a solution, an idea, advice, or for what the assistant can do about their problem. The message may be in
 any language. Answer with a JSON object only: {"asks": true} or {"asks": false}.
 true: "give me a solution", "any idea?", "what can you do for this?", "how do I fix it?", "tell me what to
-do", "can you help with this?", the same in any language or wording.
+do", "can you help with this?", "how will my staff use it daily?", "what can you develop",
+"will you do the initial data entry or will our staff?", the same in any language or wording.
+An operational question in a long description still counts. Expense descriptions are not price asks.
 false: describing a problem, a greeting, a yes or no, a thanks, an answer to a question, a question about
 price or cost, a question about who the assistant is, anything else."""
 
@@ -36,7 +38,7 @@ ASKISH = re.compile(
     re.IGNORECASE,
 )
 MIN_WORDS = 3
-MAX_WORDS = 60
+MAX_WORDS = 240  # voice transcripts can describe the business before asking for a system
 VERDICT = re.compile(r'"asks"\s*:\s*(true|false)', re.IGNORECASE)
 
 
@@ -89,7 +91,7 @@ async def prefetch(
             scope,
             alias=alias,
             purpose="pi_ask_classify",
-            messages=[Message.system(SYSTEM), Message.user(said[:600])],
+            messages=[Message.system(SYSTEM), Message.user(said[:4000])],
             temperature=0.0,
             max_tokens=30,
             conversation_id=conversation_id,

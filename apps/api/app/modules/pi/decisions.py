@@ -988,7 +988,26 @@ OWN_MONEY = re.compile(
 def cost_asked(text: str) -> bool:
     """A question about what Workzap would charge. Sentences about the owner's own loss or spend
     ("how much we lose", "kitna nuksan") do not count."""
-    return bool(COST_ASKED.search(OWN_MONEY.sub(" ", text or "")))
+    words = OWN_MONEY.sub(" ", text or "")
+    if not COST_ASKED.search(words):
+        return False
+    explicit = re.search(
+        r"\b(?:how much|kitna|kitni|qeemat|price|charges?)\b"
+        r"|\b(?:what|kitne)\b.{0,30}\b(?:cost|kharch|kharcha)\b"
+        r"|\b(?:cost|kharch|kharcha)\b.{0,20}\b(?:kitna|kitni|hoga|hogi|batao|bataye)\b",
+        words,
+        re.I,
+    )
+    if explicit:
+        return True
+    # Merely naming daily bills/expenses while asking about records or data entry isn't pricing.
+    own_records = re.search(
+        r"\b(?:expenses?|bills?|salary|salaries|kharch pani|hisaab|hisab|data entry|records?|"
+        r"parchi\w*|electricity|bijli)\b",
+        words,
+        re.I,
+    )
+    return not own_records
 
 
 def cost_answer(language: str | None, context: dict[str, Any] | None = None) -> str:
