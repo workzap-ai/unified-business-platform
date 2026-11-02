@@ -173,7 +173,7 @@ HEDGE = rx(
 
 CLAIM_WORD = rx(
     r"गारंटी|वादा|पक्का|फायदा होगा|बचत होगी",
-    r"(?<!\w)(?:guarantee[sd]?|guaranteed|promise[sd]?|risk[- ]free|roi|return on investment|"
+    r"(?<!\w)(?:guarantee[sd]?|guaranteed|promise[sd]?(?!\s+(?:delivery\s+)?dates?\b)|risk[- ]free|roi|return on investment|"
     r"100 ?%|for sure|"
     r"will (?:definitely|certainly|surely|save|earn|double|triple|boost|increase|grow|cut|reduce))(?!\w)",
     r"(?<!\w)(?:guarantee|pakka|yaqeen(?:i|an)?|zaroor (?:barh|bach|faida)|faida (?:hoga|zaroor)|"

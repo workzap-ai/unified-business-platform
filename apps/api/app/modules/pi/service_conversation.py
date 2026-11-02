@@ -65,6 +65,7 @@ from app.modules.pi import (
     owner_asks,
     owner_intents,
     part19,
+    practical_solution,
     price_policy,
     problem_extract,
     problem_fields,
@@ -376,6 +377,7 @@ class ServiceTurn(BaseModel):
     _asked_shape: bool = PrivateAttr(default=False)
     # Brain mode: a fixed reply and move chosen by the decision gates (pi/decisions.py).
     _decision: Any = PrivateAttr(default=None)
+    _exploration: bool = PrivateAttr(default=False)
     # Filled FIRST (field order guides the model): what the customer wants right now and
     # who the message is for. Internal; it makes the reply answer the actual request.
     understanding: str = Field(default="", max_length=600)
@@ -1222,6 +1224,11 @@ def solution_turn(context: dict[str, Any]) -> bool:
 
 def system_for(context: dict[str, Any]) -> str:
     """The prompt: the shared rules, plus the brain rules in brain mode."""
+    if context.get("solution_exploration"):
+        # Keep shared identity, privacy, knowledge and structured-note instructions. Discovery
+        # questions, manual-idea caps and document-only wording do not apply to this request.
+        notes = BRAIN_PROBLEMS.split("- Show you understood each new problem", 1)[0]
+        return BRAIN_SYSTEM + notes + practical_solution.PROMPT + memory_block.SYSTEM_LINE
     if context.get("pi_mode") == "brain":
         asked = solution_turn(context)
         prompt = (
@@ -1539,6 +1546,25 @@ async def brain_problems(
         await solution_context.sync_elsewhere(session, scope, conversation)
     brief = conversation.service_brief or {}
     context: dict[str, Any] = {"noted_problems": noted}
+    if noted and (
+        brief.get("conversation_stage") == "solution_exploration"
+        or (message is not None and practical_solution.requested(message.body or ""))
+    ):
+        _, relationships = await map_builder.current_inputs(
+            session, scope, conversation.customer_id
+        )
+        refs = {p["ref"] for p in noted}
+        context["problem_relationships"] = [
+            {
+                "from": problems.short_ref(link.from_id),
+                "to": problems.short_ref(link.to_id),
+                "type": link.type,
+                "status": link.status,
+                "evidence": link.evidence,
+            }
+            for link in relationships
+            if problems.short_ref(link.from_id) in refs and problems.short_ref(link.to_id) in refs
+        ]
     if solution_context.elsewhere(brief):
         context["ideas_elsewhere"] = solution_context.elsewhere(brief)
     served = (policy.response_rules.get("brain") or {}).get("served_industries")
@@ -2286,9 +2312,50 @@ async def pre_send_guard(
             turn.reply = written
             return
         report = again
+    if manager is not None and report.repair_code != "rewrite_reply":
+        latency.count("model_calls")
+        rewritten = await structured_turn(
+            manager,
+            scope,
+            ServiceTurn,
+            alias=reply_alias(policy),
+            messages=[
+                Message.system(system_for(context)),
+                Message.user(json.dumps(context, ensure_ascii=False)),
+                Message.assistant(json.dumps({"reply": turn.reply}, ensure_ascii=False)),
+                Message.user(
+                    "Correct the final reply while answering the latest customer question. "
+                    + "; ".join([*report.reasons, *report.next_actions])
+                ),
+            ],
+            temperature=0.0,
+            conversation_id=conversation.id,
+        )
+        candidate = rewritten.value.reply
+        again = self_review.review(
+            review_draft(turn, context, lang, candidate, owner_known=not foreign)
+        )
+        if (
+            again.verdict != self_review_types.INCOMPLETE
+            and not repeats_itself(candidate, context)
+            and not practical_solution.answer_problem(candidate, context)
+            and not constitution.hard(constitution.lint(candidate, context))
+        ):
+            turn.reply = candidate
+            turn._voice_block = turn._voice_question = turn._voice_after = ""
+            turn._voice_unmarked = ()
+            return
+        report = again
+    if context.get("solution_exploration"):
+        # Do not silently replace an explicit solution request with the same proposal disclaimer.
+        raise rejected_with(turn, "SOLUTION_REVIEW_REJECTED")
     fallback = self_review.owner_safe_fallback(report, lang)
     if not fallback:
         return
+    if repeats_itself(fallback, context):
+        fallback = constitution.safe_fallback(context)
+        if repeats_itself(fallback, context):
+            raise rejected_with(turn, "REPEATED_FALLBACK")
     turn.reply = with_disclosure(fallback, context, lang)  # a first message still says pi is an AI
     if foreign and manager is not None:
         await ensure_requested_language(manager, scope, policy, conversation, turn, context)
@@ -2660,6 +2727,8 @@ def brain_listening_tidy(turn: "ServiceTurn", context: dict[str, Any]) -> None:
 def brain_summary(turn: "ServiceTurn", context: dict[str, Any]) -> None:
     """When the person is done, asks what now, or many problems piled up: the reply becomes the
     sorted summary (spec 3.7), built from what is noted plus this turn's new problems."""
+    if context.get("map_incomplete"):
+        return
     turn._asked_shape = bool(context.get("shape_question_due"))
     state = flow.parse((context.get("flow") or {}).get("state"))
     listening = state in (
@@ -3858,6 +3927,8 @@ def brain_offer(turn: "ServiceTurn", context: dict[str, Any]) -> None:
     """After free ideas on request, or a "how exactly?" answer, the application makes the offer
     itself and moves the chat to S5 (Part 1.4 and 1.6), so a later "haan" goes through the
     explicit-yes gate. The model never writes the offer."""
+    if context.get("map_incomplete"):
+        return
     if turn._summary or turn._decision is not None:
         return
     state = (context.get("flow") or {}).get("state")
@@ -4271,11 +4342,30 @@ async def note_problems(
     advance_flow(conversation, turn, noted=noted)
 
 
+def exploration_only(turn: "ServiceTurn") -> None:
+    """Explaining a proposal never authorises tools, a quote or implementation."""
+    turn._exploration = True
+    turn.action = "none"
+    turn.ready_for_team = False
+    turn.proposal_answer = "none"
+    turn.proposal_evidence = ""
+    turn.meeting_requested = False
+    turn.consent = "unchanged"
+    turn.projects = []
+
+
 def advance_flow(conversation: PiConversation, turn: "ServiceTurn", *, noted: bool = False) -> None:
     """Move the conversation's state after pi's turn. Only the listening loop moves here;
     offers, documents, approvals and payments move it from their own events."""
     current = flow.parse(conversation.flow_state)
     if current is None:
+        return
+    if turn._exploration:
+        conversation.service_brief = {
+            **(conversation.service_brief or {}),
+            "conversation_stage": "solution_exploration",
+            "solution_question_pending": turn.reply.rstrip().endswith(("?", "؟", "？")),
+        }
         return
     decided = getattr(turn, "_decision", None)
     decided_next = decided.next_state if decided is not None else None
@@ -5516,8 +5606,8 @@ def _norm(text: str) -> str:
 
 def without_repeats(reply: str, context: dict[str, Any]) -> str:
     """The reply minus what pi already sent in its last three replies (a whole repeated
-    line or sentence, and a "You want:" heading left with nothing under it). Unchanged
-    when nothing new would be left."""
+    line or sentence, and a "You want:" heading left with nothing under it). Empty
+    when nothing new would be left, so the caller cannot resend the original."""
     earlier = [
         str(h.get("text", "")) for h in (context.get("history") or []) if h.get("role") == "ai"
     ][-3:]
@@ -5541,7 +5631,7 @@ def without_repeats(reply: str, context: dict[str, Any]) -> str:
             continue
         out.append(line)
     cleaned = re.sub(r"\n{3,}", "\n\n", "\n".join(out)).strip()
-    return cleaned if len(cleaned.split()) >= 3 else reply
+    return cleaned if len(cleaned.split()) >= 3 else ""
 
 
 def contradicts_itself(reply: str, context: dict[str, Any]) -> str | None:
@@ -6694,8 +6784,19 @@ async def compose_service_turn_inner(
     if context.get("pi_mode") == "brain" and (safe := brain_safety(context)) is not None:
         await in_their_language(manager, scope, policy, conversation, safe, context)
         return safe
+    if practical_solution.map_incomplete(str(context.get("latest_customer_message") or "")):
+        context["map_incomplete"] = True
+        context["owner_turn_note"] = (
+            "The owner says the Problem Map is incomplete. Ask what is missing; do not repeat "
+            "the existing list, pick a priority or mark the map confirmed."
+        )
+    if practical_solution.eligible(context):
+        context["solution_exploration"] = True
+        context["solution_asked"] = True
+        for key in (*SOLUTION_KEYS, "solution_ideas", "solution_build"):
+            context.pop(key, None)
     if context.get("pi_mode") == "brain" and context.get("warmup"):
-        warm = warmup.plan(context)
+        warm = None if context.get("solution_exploration") else warmup.plan(context)
         context.pop("page_look", None)  # page words never reach the model (untrusted data)
         if warm is not None:
             kept = dict(conversation.service_brief or {})
@@ -6764,6 +6865,8 @@ async def compose_service_turn_inner(
         ),
     )
     turn = result.value
+    if context.get("solution_exploration"):
+        exploration_only(turn)
     turn._attempts = result.response.attempts
     turn.reply = tidy_list_numbers(turn.reply)
     turn.reply = voice_noted(turn.reply, context)
@@ -6809,6 +6912,8 @@ async def compose_service_turn_inner(
         problem = f"{wordy}, and also: {problem}" if problem else wordy
     if early_ask := asks_too_early(turn, context):
         problem = f"{early_ask}, and also: {problem}" if problem else early_ask
+    if practical := practical_solution.answer_problem(turn.reply, context):
+        problem = f"{practical}, and also: {problem}" if problem else practical
     if again := repeats_itself(turn.reply, context):
         problem = f"{again}, and also: {problem}" if problem else again
     if brain and (
@@ -6983,6 +7088,8 @@ async def compose_service_turn_inner(
             ),
         )
         turn = retry.value
+        if context.get("solution_exploration"):
+            exploration_only(turn)
         if extracted_ops and not turn.problem_ops:
             turn.problem_ops = extracted_ops  # B6: the owner's facts are not lost in a rewrite
         turn._attempts = [*result.response.attempts, *retry.response.attempts]
@@ -7055,51 +7162,54 @@ async def compose_service_turn_inner(
     if context.get("pi_mode") == "brain":
         turn.ready_for_team = False  # no lead, proposal or team brief before the offer
         turn.projects = []
-        brain_summary(turn, context)
-        part19.replay(turn, context)  # 19.3: "listen again" gets a playback of what was understood
-        brain_decision(turn, context)
-        strip_dangling_opener(turn)
-        if context.get("expert_on"):
-            # before the passive-idea check and the fallbacks: a list the owner did not ask for must
-            # not be "rescued" by library ideas for an older problem (live 2026-10-27)
-            shape_expert_ideas(turn, context)
-        reject_passive_ideas(turn, context)
-        brain_ideas(turn, context)
-        await brain_free_ideas(manager, scope, conversation, policy, turn, context)
-        await brain_expert_diagnosis(manager, scope, conversation, policy, turn, context)
-        if turn._free and not turn.problem_ops and not context.get("noted_problems"):
-            # Free ideas on a first message that told the problem: they never replace noting, so
-            # the problem is recorded here when the reply model and the earlier extraction missed it
-            latency.count("model_calls")
-            if found := await latency.timed(
-                "model.extract", problem_extract.extract(manager, scope, context)
-            ):
-                turn.problem_ops = found
+        if not context.get("solution_exploration"):
+            brain_summary(turn, context)
+            part19.replay(
+                turn, context
+            )  # 19.3: "listen again" gets a playback of what was understood
+            brain_decision(turn, context)
+            strip_dangling_opener(turn)
+            if context.get("expert_on"):
+                # Do not rescue an unrequested list with library ideas for an older problem.
+                shape_expert_ideas(turn, context)
+            reject_passive_ideas(turn, context)
+            brain_ideas(turn, context)
+            await brain_free_ideas(manager, scope, conversation, policy, turn, context)
+            await brain_expert_diagnosis(manager, scope, conversation, policy, turn, context)
+            if turn._free and not turn.problem_ops and not context.get("noted_problems"):
+                # Free ideas never replace noting: recover facts missed by earlier extraction.
+                latency.count("model_calls")
+                if found := await latency.timed(
+                    "model.extract", problem_extract.extract(manager, scope, context)
+                ):
+                    turn.problem_ops = found
+            brain_prose_ideas(turn, context)
+            brain_no_repeat(turn, context)
+            brain_no_ideas(turn, context)
+            brain_howto(turn, context)
+            brain_no_early_promise(turn, context)
+            brain_never_empty(turn, context)
+            brain_offer(turn, context)
+            strip_unallowed_offer(turn, context)
+            brain_option_voice(turn, context)
+            brain_listening_tidy(turn, context)
+            if turn._voice_pick or turn._voice_pending or turn._scope_asked:
+                kept = dict(conversation.service_brief or {})
+                if turn._scope_asked:
+                    kept["scope_asked"] = True  # the scope question is asked once per chat
+                if turn._voice_pick:  # the document recommends the same option (one ranking)
+                    kept["chat_pick"] = turn._voice_pick
+                if turn._voice_pending:  # read the owner's answer next turn (PS-5)
+                    kept["pending_question"] = (
+                        turn._voice_pending
+                    )  # counted asked when it is answered
+                conversation.service_brief = kept
         if part19.want_cue(str(context.get("latest_customer_message") or "")):
-            # 19.4: what the owner wants built or done is kept apart from their problems
+            # Keep requested features apart from problems, including during solution exploration.
             latency.count("model_calls")
             turn._new_wants = await latency.timed(
                 "model.wants", problem_extract.extract_wants(manager, scope, context)
             )
-        brain_prose_ideas(turn, context)
-        brain_no_repeat(turn, context)
-        brain_no_ideas(turn, context)
-        brain_howto(turn, context)
-        brain_no_early_promise(turn, context)
-        brain_never_empty(turn, context)
-        brain_offer(turn, context)
-        strip_unallowed_offer(turn, context)
-        brain_option_voice(turn, context)
-        brain_listening_tidy(turn, context)
-        if turn._voice_pick or turn._voice_pending or turn._scope_asked:
-            kept = dict(conversation.service_brief or {})
-            if turn._scope_asked:
-                kept["scope_asked"] = True  # the scope question is asked once per chat
-            if turn._voice_pick:  # the document recommends the same option (one ranking)
-                kept["chat_pick"] = turn._voice_pick
-            if turn._voice_pending:  # read the owner's answer next turn (PS-5)
-                kept["pending_question"] = turn._voice_pending  # counted asked when it is answered
-            conversation.service_brief = kept
     if context.get("handback_notice") and not turn.request_human and turn._decision is None:
         short = safety.handback_reply(str(context.get("reply_language") or "en"))
         turn.reply = f"{short.rsplit('. ', 1)[0]}. {turn.reply}"
@@ -7181,7 +7291,7 @@ async def compose_service_turn_inner(
         turn.summary = team_summary(turn)
     # WhatsApp shows a list only when each point starts its own line.
     turn.reply = polished(re.sub(r"[ \t]+•[ \t]*", "\n• ", turn.reply).strip())
-    if context.get("expert_on"):
+    if context.get("expert_on") and not context.get("solution_exploration"):
         shape_expert_ideas(turn, context)
         add_capability_line(turn, context)
         turn.reply = reply_layout.tidy(turn.reply)  # short paragraphs, the question on its own line
@@ -7194,7 +7304,7 @@ async def compose_service_turn_inner(
         mode,
         allowed,
     )
-    if context.get("expert_on"):
+    if context.get("expert_on") and not context.get("solution_exploration"):
         settle_ideas(turn, context)  # after the guards: the count and the question are then final
     if context.get("pi_mode") == "brain" and any(
         v.rule in constitution.FINAL_CHECKS for v in constitution.lint(turn.reply, context)
@@ -7284,6 +7394,12 @@ async def compose_service_turn_inner(
         turn.reply = constitution.final_one_question(turn.reply, keep=context.get("fixed_lines"))
         if context.get("quote_facts"):
             turn.reply = quote_facts.cap(turn.reply)  # ROFFER07: never more than two questions
+    if context.get("solution_exploration"):
+        exploration_only(turn)
+        if repeats_itself(turn.reply, context) or practical_solution.answer_problem(
+            turn.reply, context
+        ):
+            raise rejected_with(turn, "SOLUTION_ANSWER_REJECTED")
     return turn
 
 

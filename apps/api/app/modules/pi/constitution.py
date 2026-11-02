@@ -328,6 +328,8 @@ SOLUTION_BUILD_CAP = 150
 def _cap(context: dict[str, Any], key: str, default: int) -> int:
     """A word limit: the workspace's own value (kept within +-30% of the default by
     `brain_config`) or the default. These are the only voice numbers spec 9.10 lets it tune."""
+    if key == "word_cap" and context.get("solution_exploration"):
+        return 240
     value = (context.get("brain_settings") or {}).get(key)
     return value if isinstance(value, int) and not isinstance(value, bool) else default
 
@@ -396,6 +398,8 @@ def _promise_hits(reply: str, heard: str = "") -> bool:
             continue
         if langs.NEGATED_AFTER.search(reply[match.end() : match.end() + 40]):
             continue
+        if re.match(r"\s+(?:nahi|nahin)\b", reply[match.end() :], re.IGNORECASE):
+            continue  # Roman Urdu puts the negation after the claim: "guarantee nahi hogi".
         word = match.group(0).lower()
         # "guaranteed count" in a banquet hall: a word they used, as a name for a thing, is not a
         # promise. "we guarantee ..." or "it is guaranteed" still is.
@@ -1055,6 +1059,10 @@ def _value_line_every_reply(
         hit = solution_rules.never_say_hit(reply, [str(n) for n in never])
         if hit:
             add(Violation("R-NEVER-IND", f'never said in this industry ("{hit}"): drop it', True))
+    if context.get("solution_exploration"):
+        # A provisional workflow is not a pair of capped manual ideas. Honesty, privacy,
+        # regulated advice and industry exclusions still run.
+        return
     handed = [str(i) for i in context.get("solution_ideas") or []]
     brain = context.get("pi_mode") == "brain" or "flow" in context
     carried = bool(handed) or "solution_followup" in context
@@ -1754,7 +1762,7 @@ def _adjacent_when_diagnosed(question: str, context: dict[str, Any]) -> bool:
     """R-ASK-08 with a cached diagnosis (expert advisor on): the question asks how the business
     works in general instead of why the problem happens. A question that looks for the reason
     ("wo kya wajah batate hain?") or touches a listed cause never counts."""
-    if not context.get("expert_on"):
+    if not context.get("expert_on") or context.get("solution_exploration"):
         return False
     causes = [str(c) for c in context.get("main_problem_causes") or []]
     suggested = str(context.get("suggested_next_question") or "")
@@ -1869,7 +1877,9 @@ def lint(reply: str, context: dict[str, Any]) -> list[Violation]:
                 )
             )
 
-    if "solution_howto" in context or context.get("solution_asked"):
+    if not context.get("solution_exploration") and (
+        "solution_howto" in context or context.get("solution_asked")
+    ):
         _value_line(reply, context, add)
     _ideas_nobody_asked_for(reply, context, add)
 

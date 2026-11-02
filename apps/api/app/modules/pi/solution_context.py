@@ -28,6 +28,7 @@ from app.modules.pi import (
     learning_rules,
     learning_solutions,
     learning_voice,
+    practical_solution,
     solution_ask,
     solution_ideas,
     solution_library,
@@ -249,6 +250,9 @@ async def build(
     `solution_asked_no_ideas`, `solution_next`, `solution_not_tried` (each may be missing); fills
     `used` with the stamp for the nightly scoring. Never raises: before migration 0043 is applied
     the tables are missing and pi simply gives no ideas."""
+    if practical_solution.requested(said):
+        # A digital explanation must not consume or be replaced by cached manual ideas.
+        return {}
     await _prefer_bridge(session, scope, conversation, said, used)
     carried = bool((getattr(conversation, "service_brief", None) or {}).get("open_ask"))
     if carried and conversation is not None:
