@@ -1,0 +1,323 @@
+{
+  "industry": "managed_it_support_and_cybersecurity_firms",
+  "name": "Managed IT support and cybersecurity firms",
+  "sector": "7.K Professional and business services",
+  "version": "1.1",
+  "problems": [
+    {
+      "id": "p1_whatsapp_overload",
+      "n": 1,
+      "words": "Clients WhatsApp the engineer directly and the ticket never gets logged",
+      "category": "tech_systems",
+      "subtype": "whatsapp_overload",
+      "quick_ideas": [
+        "Give every client one support number and tell them once, so requests stop landing on personal phones",
+        "Ask engineers to forward this week's direct requests to it, so you see the real volume."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "WhatsApp and email ticket intake that logs every request with client, priority and SLA timer, and replies with a reference number.",
+        "tool_words": []
+      },
+      "ask_first": "Roughly how many AMC clients do you support?",
+      "free_stops": "the intake flow and priority rules are set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count this week's client messages that reached engineers before any log entry, so you see how much work starts off the books.",
+          "review": false
+        },
+        {
+          "text": "Give one dispatcher the daily job of checking engineers' direct messages list, so missed client requests reach the work queue.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p2_slow_response",
+      "n": 2,
+      "words": "We breach SLAs and only know when the client complains",
+      "category": "customers_retention",
+      "subtype": "slow_response",
+      "quick_ideas": [
+        "Write down once the response times you promised each client, so everyone knows them",
+        "Check open tickets against those times today, so near-breaches get handled."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "an SLA screen showing tickets close to breach by client and engineer, with alerts before the time runs out.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "Do you breach response times on urgent tickets, or on routine requests that sit unnoticed?",
+      "free_stops": "alert thresholds per contract are kept for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note each complaint this week against when the request first arrived, so the late points in your response routine stand out.",
+          "review": false
+        },
+        {
+          "text": "Give one person a fixed midday review of open requests against promised times, so breaches are spotted before clients chase.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p3_margin_unknown",
+      "n": 3,
+      "words": "Fixed AMC clients use us far more than they pay for",
+      "category": "margin_cost",
+      "subtype": "margin_unknown",
+      "quick_ideas": [
+        "Count last month's tickets and visits per client once, so heavy users show",
+        "Put that next to each contract once, so you have facts for renewals."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "usage against contract allowance per client, rolled into a contract profitability view each month.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "Is the extra use mostly remote support calls, or visits to the client's site?",
+      "free_stops": "how effort is measured against each contract is worked out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare one busy client's calls and visits this month with their fixed cover fee, so overused contracts stand out early.",
+          "review": false
+        },
+        {
+          "text": "Give one person the weekly job of noting time spent per contract client, so renewals use workload facts not gut feel.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p4_field_team_visibility",
+      "n": 4,
+      "words": "I don't know where field engineers are or how many visits they did",
+      "category": "communication_coordination",
+      "subtype": "field_team_visibility",
+      "quick_ideas": [
+        "Ask engineers to send a short end-of-day list of visits for one week, so you get a first picture",
+        "Plan tomorrow's visits on one sheet, so assignments are clear."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "You would see engineers' assigned jobs with check-in and check-out at each site, work notes, photos and client sign-off.",
+        "tool_words": [
+          "app"
+        ]
+      },
+      "ask_first": "Do engineers go straight from site to site, or come back to the office between visits?",
+      "free_stops": "the visit flow and sign-off steps are set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count yesterday's field visits from engineer updates and compare them with planned visits, so missed or extra stops are visible.",
+          "review": false
+        },
+        {
+          "text": "Give one coordinator the afternoon job of writing tomorrow's visit list in one notebook, so engineers and office follow one plan.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p5_licences_renewals",
+      "n": 5,
+      "words": "Licence renewals get missed and the client's service stops",
+      "category": "compliance_admin",
+      "subtype": "licences_renewals",
+      "quick_ideas": [
+        "List every licence and subscription renewal for the next three months once, so nothing comes as a surprise",
+        "Tell the affected clients early, so approvals are in time."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "a renewal calendar with reminders to the team and the client at set intervals before each date.",
+        "tool_words": []
+      },
+      "ask_first": "Do missed renewals mostly involve licences for office tools, or security and backup subscriptions?",
+      "free_stops": "reminder timings and the client approval flow are kept for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Look through this month's client files for upcoming renewals once, so you see which services could stop without warning.",
+          "review": false
+        },
+        {
+          "text": "Give one person the single renewal notebook and a fixed weekly review time, so follow ups happen before client service is affected.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p6_cash_flow_tight",
+      "n": 6,
+      "words": "We pay the vendor for licences before the client pays us",
+      "category": "cash_collections",
+      "subtype": "cash_flow_tight",
+      "quick_ideas": [
+        "List renewals you've paid for but not yet collected, so the gap is clear",
+        "Invoice upcoming renewals earlier this time, so money comes in before you pay out."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger"
+        ],
+        "text": "receivables per client linked to renewal dates, with invoices raised ahead of vendor payments and reminders.",
+        "tool_words": []
+      },
+      "ask_first": "Do you pay the vendor before invoicing the client, or invoice first and the client pays slowly?",
+      "free_stops": "the invoicing timeline is set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count licence renewals where client approval arrived after your team ordered them, so you can see where timing breaks down.",
+          "review": true
+        },
+        {
+          "text": "Give one person the job of logging client approval and order dates in one notebook, so ordering follows the same handover each time.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p7_receivables_late",
+      "n": 7,
+      "words": "Invoices for extra work go out late or not at all",
+      "category": "cash_collections",
+      "subtype": "receivables_late",
+      "quick_ideas": [
+        "Go through last month's tickets once for out-of-scope work, so unbilled jobs show",
+        "Invoice those this week, so the money is recovered."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking"
+        ],
+        "text": "an out-of-scope work log that drafts invoices when a job is closed.",
+        "tool_words": []
+      },
+      "ask_first": "Does extra work go unbilled because nobody records it, or because it is billed late?",
+      "free_stops": "how out-of-scope work is identified is worked out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare completed extra work notes with sent job summaries from this week, so missed admin handoffs around chargeable work show.",
+          "review": false
+        },
+        {
+          "text": "Set one fixed afternoon for one person to gather all extra work notes into one list, so chargeable jobs stop being missed.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p8_handoffs",
+      "n": 8,
+      "words": "Client documentation is in one senior engineer's head",
+      "category": "operations_process",
+      "subtype": "handoffs",
+      "quick_ideas": [
+        "Ask the senior engineer to write a one-page overview for your biggest client, kept free of passwords, so the basics are shared",
+        "Name a second engineer per key client, so there's backup."
+      ],
+      "workzap_build": {
+        "keys": [
+          "custom_build"
+        ],
+        "text": "a client documentation vault with structure and asset lists (not credentials in plain view), access controls and change history.",
+        "tool_words": []
+      },
+      "ask_first": "Does the senior engineer hold mostly the network layout, or the history of past faults?",
+      "free_stops": "the vault structure and access rules are kept for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Watch one senior engineer handle a client issue and note what only they know, so the risky knowledge gaps show.",
+          "review": false
+        },
+        {
+          "text": "Give one backup engineer the job of keeping one shared client overview notebook, so cover is possible when the senior person is away.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p9_checklists_not_done",
+      "n": 9,
+      "words": "Backup checks are supposed to be done monthly but aren't",
+      "category": "operations_process",
+      "subtype": "checklists_not_done",
+      "quick_ideas": [
+        "List which clients' checks are due and who owns each, so responsibility is clear",
+        "Do one round of overdue checks this week, so the backlog clears."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "recurring maintenance checklists with completion tracked by client and engineer, and overdue items flagged.",
+        "tool_words": []
+      },
+      "ask_first": "Do the backup checks slip mostly for small clients, or for busy ones with the most data?",
+      "free_stops": "the checklist contents and schedule are designed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count which monthly checks were due versus marked done this month, so the true backlog becomes visible.",
+          "review": false
+        },
+        {
+          "text": "Give one person the same weekly time to review due checks in one notebook, so monthly work stops getting missed.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p10_count_mismatch",
+      "n": 10,
+      "words": "Spare parts and stock in our store don't match records",
+      "category": "stock_inventory",
+      "subtype": "count_mismatch",
+      "quick_ideas": [
+        "Do one full count of the store, so you have a true starting figure",
+        "Start signing parts out to engineers, so movements are recorded."
+      ],
+      "workzap_build": {
+        "keys": [
+          "stock_alerts"
+        ],
+        "text": "a store and spare parts register with issue and return to engineers and alerts when items run low.",
+        "tool_words": []
+      },
+      "ask_first": "Are the mismatches mostly in small cheap parts, or in expensive items?",
+      "free_stops": "the issue and return routine is set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare one shelf's physical parts with the record once, so you see which items drift most often.",
+          "review": false
+        },
+        {
+          "text": "Give one store person the parts issue notebook at closing time daily, so every movement is captured before stock shifts again.",
+          "review": false
+        }
+      ]
+    }
+  ],
+  "never_say": [
+    "Any technical security guidance or incident-response instructions; for a live breach, suggest following their incident process and contacting the relevant authorities.",
+    "Anything involving unauthorised access, cracking licences, hidden monitoring of employees or concealing a breach.",
+    "That systems will be secure or that uptime is guaranteed.",
+    "Requests for passwords, admin credentials, network diagrams, vulnerability details or client data."
+  ],
+  "sample_reply": {
+    "person": "Half our AMC clients just WhatsApp my engineers directly and nothing gets logged. How do we fix this?",
+    "pi": "Yes, this can be fixed, and none of it needs special equipment.\nFirst, give every client one support number and tell them about it once, so requests stop landing on personal phones.\nSecond, ask engineers to forward this week's direct messages to that number, so you see the real workload.\nTo make it stick, Workzap could build: every WhatsApp or email request logged as a ticket with an SLA timer and a reference number sent back.\n\nWould you like me to put together a solution document and quote for you? You're free to say no.",
+    "language": "english"
+  }
+}

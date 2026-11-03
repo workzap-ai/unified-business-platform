@@ -1,0 +1,63 @@
+{
+ "cluster": "ecommerce_online_selling",
+ "version": 1,
+ "as_of": "2026-10",
+ "industries": [
+  "dropshipping_and_social_commerce_sellers",
+  "e_commerce_and_d2c_brands",
+  "marketplace_sellers"
+ ],
+ "how_customers_find_and_choose": [
+  "Buyers discover products through short videos, creator recommendations, marketplace search and shared links in chat",
+  "Before buying, shoppers look for real photos, honest reviews, clear delivery time and a return rule they trust",
+  "Social-commerce buyers often confirm the order in chat and pay by cash on delivery or transfer",
+  "Marketplace buyers compare listings on price, reviews, delivery speed and seller rating"
+ ],
+ "what_works_now": [
+  "Clear, real product photos and a short video showing the item in use",
+  "Plain delivery time and return rules written on every listing and repeated at order confirmation",
+  "A saved set of replies for stock, size, delivery and payment questions",
+  "A message to the buyer when the order is confirmed, dispatched and delivered",
+  "Asking buyers for a review with a photo after delivery",
+  "Tracking returns and refused parcels by reason and by product to find what to fix",
+  "A saved list of repeat buyers told of new stock, with their consent"
+ ],
+ "outdated_or_weak": [
+  "Selling items you have never seen with long, uncertain delivery times",
+  "Heavy discounting that erases the margin",
+  "Advertising a product with stock photos copied from elsewhere",
+  "Growing paid ads before the basics of delivery and returns work",
+  "Ignoring complaints or deleting negative reviews"
+ ],
+ "local_context": {
+  "PK": [
+   "Cash on delivery and cash at the counter are still common; bank transfer and mobile wallet payments are now normal for many customers",
+   "Ramadan and the two Eids reshape demand, opening hours and staff availability every year",
+   "Summer heat, monsoon rain and power cuts affect operations and footfall",
+   "Customers often write in Urdu, Roman Urdu or a regional language, and chat is the usual first contact",
+   "Cash on delivery remains common and brings refused parcels and slow remittance; courier choice and speed matter",
+   "Eid, wedding season and sale days drive spikes in orders"
+  ],
+  "UAE": [
+   "Customers are multilingual and expect quick replies in chat; card and tap payments are normal",
+   "Winter is the busy season; many residents travel in summer so demand can dip",
+   "Ramadan and Eid change hours and buying patterns; the licence a business holds decides what it may sell and advertise, so the owner checks that with the licensing body",
+   "Fast delivery expectations and strong competition; cash on delivery is still used for many orders",
+   "A trade licence and the correct activity for online selling are touchpoints; the owner confirms specifics with the authority"
+  ],
+  "CA": [
+   "Customers expect online booking or enquiry, card and bank e-transfer payment, and clear written confirmation",
+   "Long winters and a short summer peak shape outdoor and seasonal trades",
+   "English and French (in Quebec) matter, and many communities prefer their own language; consent for marketing messages and sales tax rules vary, so the owner checks them with a professional",
+   "Shoppers expect free or clear shipping, easy returns and fast support; delivery time and distance matter",
+   "Sales tax collection and consumer rules for online selling vary; the owner confirms specifics with a professional"
+  ]
+ },
+ "never_assume": [
+  "A registered brand or storefront of their own",
+  "Stock in hand",
+  "A reliable courier account",
+  "Steady paid-ad budget"
+ ],
+ "review_status": "needs human review"
+}

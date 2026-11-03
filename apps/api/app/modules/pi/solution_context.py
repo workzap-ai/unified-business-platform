@@ -1,0 +1,722 @@
+"""What the solution ideas add to one turn's context (Addendum 2 to the pi Brain v3, Parts 2 and 3).
+
+Only when the workspace set `response_rules.brain.solution_mode` to true. Then, once the problems
+are sorted (S4 or S5, never while pi is still listening), pi may be handed at most two ideas for
+the problem the person cares about, chosen by `solution_ideas.choose`: none they have had, none of
+a kind they rejected, the better ones more often. A returning customer is greeted with their last
+ideas instead (the follow-up is the one question of that message). The counts of the value line
+are enforced here: a conversation never gets more than IDEAS_BEFORE_OFFER ideas, never more than
+IDEAS_PER_PROBLEM for one problem, and after a declined offer at most IDEAS_AFTER_DECLINE more,
+for a new problem only. Which ideas were handed over is stamped on the conversation, so the
+nightly run can score them by what the person says next; the first message after the ideas is
+also looked at at once (the instant speed of Part 3.1), so "already doing that" is honoured in the
+same chat and a returning customer's "it worked" is heard.
+"""
+
+from datetime import UTC, datetime
+from typing import Any
+
+from sqlalchemy import select
+from sqlalchemy.exc import IntegrityError, ProgrammingError
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from app.modules.pi import (
+    flow,
+    idea_filter,
+    idea_retrieval,
+    learning_bank,
+    learning_rules,
+    learning_solutions,
+    learning_voice,
+    practical_solution,
+    solution_ask,
+    solution_ideas,
+    solution_library,
+    solutions,
+    value_line,
+)
+from app.modules.pi.language import detect_language
+from app.modules.pi.models import PiConversation
+from app.shared.scope import WorkspaceScope
+
+GIVING = {flow.State.S4_SORTED_SUMMARY.value, flow.State.S5_READINESS.value}
+# What a person says after ideas that means "give me something else / more" (Part 3.3)
+AGAIN = {
+    "idea_already_doing": "swap",
+    "idea_not_possible": "swap",
+    "idea_generic": "swap",
+    "idea_no_help": "swap",
+    "idea_more": "more",
+    "idea_worked": "worked",
+}
+NOTED_TITLES = 3
+
+
+def switched_on(response_rules: dict[str, Any] | None) -> bool:
+    rules = response_rules or {}
+    return (
+        rules.get("pi_mode") == "brain" and (rules.get("brain") or {}).get("solution_mode") is True
+    )
+
+
+def _sector(industry: str | None) -> str | None:
+    """The sector of an industry ("7.I Health and care"); it decides the Workzap line wording."""
+    return str((solutions.load(industry or "") or {}).get("sector") or "") or None
+
+
+def given_so_far(conversation: PiConversation) -> int:
+    """Ideas handed over in this chat. Kept in the brief, apart from the stamps, which are
+    trimmed to the last few: a long chat must never reset the count (R-VAL-02)."""
+    return int((conversation.service_brief or {}).get("ideas_given") or 0)
+
+
+def _put(conversation: PiConversation, **changes: Any) -> dict[str, Any]:
+    brief = {**(conversation.service_brief or {}), **changes}
+    conversation.service_brief = brief
+    return brief
+
+
+def allowance(brief: dict[str, Any], given: int) -> int:
+    """How many more ideas this chat may be given (R-VAL-02 and RV-02). Before any decline the
+    budget is IDEAS_BEFORE_OFFER in all; once the offer was declined, IDEAS_AFTER_DECLINE more.
+    The eight are per business (platform spec Book 5 decision 5): what the same customer was given
+    in other chats (`ideas_elsewhere`, set by `sync_elsewhere` for the expert) counts too."""
+    if int(brief.get("declines") or 0) > 0:
+        taken = given - int(brief.get("ideas_at_decline", given))
+        return value_line.IDEAS_AFTER_DECLINE - taken
+    return value_line.IDEAS_BEFORE_OFFER - given - int(brief.get("ideas_elsewhere") or 0)
+
+
+def elsewhere(brief: dict[str, Any] | None) -> int:
+    """Ideas this business was given in its other chats (0 until `sync_elsewhere` has run)."""
+    return int((brief or {}).get("ideas_elsewhere") or 0)
+
+
+async def sync_elsewhere(
+    session: AsyncSession, scope: WorkspaceScope, conversation: PiConversation
+) -> None:
+    """Count, across the customer's OTHER conversations, the ideas given (`ideas_given`) and the
+    expert ideas per problem (`expert_given`), and keep the totals on this conversation's brief
+    (`ideas_elsewhere`, `expert_given_elsewhere`) so the per-business cap (eight before the offer,
+    two per problem) holds across chats while every per-chat count stays as it was. Declines are
+    per chat and never read from here. A failure leaves the brief as it was."""
+    if conversation.customer_id is None:
+        return
+    try:
+        rows = list(
+            await session.scalars(
+                select(PiConversation.service_brief).where(
+                    PiConversation.tenant_id == scope.tenant_id,
+                    PiConversation.environment_id == scope.environment_id,
+                    PiConversation.customer_id == conversation.customer_id,
+                    PiConversation.id != conversation.id,
+                )
+            )
+        )
+    except Exception:  # noqa: BLE001 - the cap then stays per chat, as before
+        return
+    total = 0
+    per_problem: dict[str, int] = {}
+    for other in rows:
+        if not isinstance(other, dict):
+            continue
+        total += int(other.get("ideas_given") or 0)
+        table = other.get("expert_given")
+        if isinstance(table, dict):
+            for key, count in table.items():
+                per_problem[str(key)] = per_problem.get(str(key), 0) + int(count or 0)
+    brief = conversation.service_brief or {}
+    if total == int(brief.get("ideas_elsewhere") or 0) and per_problem == (
+        brief.get("expert_given_elsewhere") or {}
+    ):
+        return
+    _put(conversation, ideas_elsewhere=total, expert_given_elsewhere=per_problem)
+
+
+def _no_ideas(
+    conversation: PiConversation,
+    noted: list[dict[str, Any]],
+    industry: str | None,
+    why: str,
+    now: datetime,
+) -> dict[str, Any]:
+    """A request for a fix that gets no idea must still be answered (R-SOL): pi says honestly
+    what it noted and offers the document. The miss is logged on the chat for the audit (S7) and
+    the metrics (3.10: solution request left unanswered, always 0)."""
+    brief = conversation.service_brief or {}
+    log = [*list(brief.get("solution_unanswered") or [])[-9:]]
+    log.append({"industry": industry or "", "why": why, "at": now.isoformat()})
+    _put(
+        conversation,
+        solution_unanswered=log,
+        solution_unanswered_n=int(brief.get("solution_unanswered_n") or 0) + 1,
+    )
+    if why == "nothing_noted":
+        # R-SOL-02: they asked and nothing is noted yet. pi may ask ONE question; the answer to it
+        # (the problem) is answered with ideas, not with another question: carried to the next turn
+        _put(conversation, open_ask=True)
+    titles = [str(n.get("title") or "")[:80] for n in noted[-NOTED_TITLES:] if n.get("title")]
+    return {"solution_asked_no_ideas": True, "solution_noted": titles, "solution_why": why}
+
+
+def _from_library(
+    conversation: PiConversation, noted: list[dict[str, Any]], language: str
+) -> dict[str, Any] | None:
+    """Two ideas from the generic library for the latest noted problem's category (platform spec
+    Book 2 Part 7.4), when no industry entry has any: an unknown industry, or a problem none of the
+    entry's problems matches. None when the budget is spent, nothing is noted, or the library has
+    nothing new for the category: the honest "those are the ideas I have" line then follows."""
+    brief = conversation.service_brief or {}
+    left = allowance(brief, given_so_far(conversation))
+    if left <= 0 or not noted:
+        return None
+    before = [str(x) for x in brief.get("library_given") or []]
+    ideas: list[str] = []
+    category = ""
+    heard = " ".join(
+        " ".join([str(n.get("title") or ""), *[str(w) for w in n.get("user_words") or []]])
+        for n in noted
+    )
+    for category in solution_library.best_category(noted):
+        count = min(value_line.IDEAS_PER_MESSAGE, left)
+        ideas = solution_library.ideas_for(category, before, count, heard)
+        if ideas:
+            break
+    if not ideas:
+        return None
+    problem = {
+        "id": f"library:{category}",
+        "workzap_build": {"keys": solution_library.build_keys(category)},
+    }
+    line = solution_ask.bridge(dict(brief), problem, language, None)
+    conversation.service_brief = solution_ask.remember_bridge(
+        {
+            **brief,
+            "ideas_given": given_so_far(conversation) + len(ideas),
+            "library_given": [*before, *ideas][-20:],
+            "solution_last_problem": problem["id"],
+        },
+        line,
+    )
+    out: dict[str, Any] = {"solution_ideas": ideas, "solution_asked": True}
+    if never := solution_library.never_say(category):
+        out["solution_never_say"] = [never]
+    if line:
+        out["solution_build"] = solution_ask.public(line)
+    return out
+
+
+async def _prefer_bridge(
+    session: AsyncSession,
+    scope: WorkspaceScope,
+    conversation: PiConversation,
+    said: str,
+    used: dict[str, Any],
+) -> None:
+    """A2-FIX-5: with learning on, the opener of this turn's Workzap line is the learned choice;
+    with learning frozen (no `voice_arm` key in the stamp) the openers rotate as before. The variant
+    is stamped on the turn, and credited only if the reply really used it."""
+    if conversation is None:
+        return
+    brief = conversation.service_brief or {}
+    if "voice_arm" not in used:  # learning is off for this turn: no preference carries over
+        if brief.get("bridge_preferred"):
+            _put(conversation, bridge_preferred="")
+        return
+    if used.get("voice_arm"):
+        return  # the stamp holds one voice variant: an acknowledgement is already in it
+    language = detect_language(said) or conversation.language or "en"
+    if language not in ("en", "roman_ur"):
+        return
+    await learning_voice.ensure_seeded(session, scope)
+    arm = await learning_voice.choose(session, scope, "bridge", language)
+    if arm is None:
+        return
+    _put(conversation, bridge_preferred=arm.text)
+    used["voice_arm"] = str(arm.id)
+
+
+async def build(
+    session: AsyncSession,
+    scope: WorkspaceScope,
+    conversation: PiConversation,
+    said: str,
+    noted: list[dict[str, Any]],
+    used: dict[str, Any],
+    now: datetime | None = None,
+    expert: bool = False,
+) -> dict[str, Any]:
+    """Context keys `solution_ideas`, `solution_followup`, `solution_exhausted`,
+    `solution_asked_no_ideas`, `solution_next`, `solution_not_tried` (each may be missing); fills
+    `used` with the stamp for the nightly scoring. Never raises: before migration 0043 is applied
+    the tables are missing and pi simply gives no ideas."""
+    if practical_solution.requested(said):
+        # A digital explanation must not consume or be replaced by cached manual ideas.
+        return {}
+    await _prefer_bridge(session, scope, conversation, said, used)
+    carried = bool((getattr(conversation, "service_brief", None) or {}).get("open_ask"))
+    if carried and conversation is not None:
+        _put(conversation, open_ask=False)  # one turn only: the answer to pi's one question
+    if expert and conversation is not None and noted:
+        if held := _expert_hold(conversation, said, noted, carried):
+            return held
+    churning = solution_ask.churn_risk(said) and conversation is not None
+    if churning:
+        # R-SOL-03: the churn signal is logged on the chat (the flag and the time, never the words)
+        stamp = (now or datetime.now(UTC)).isoformat()
+        _put(conversation, churn_risk_at=stamp)
+    for attempt in (1, 2):
+        try:
+            async with session.begin_nested():
+                out = await _build(session, scope, conversation, said, noted, used, now)
+            if carried and not out.get("solution_ideas"):
+                out = {**out, "open_ask": True}
+            if churning:
+                out = {**out, "churn_risk": True}
+            return out
+        except ProgrammingError:
+            return {}
+        except IntegrityError:
+            # Two messages of one business at once both seeded the same industry (its first
+            # version, its idea arms). The other one won: look again, it is there now. Never let
+            # a seeding race cost the person their reply.
+            if attempt == 2:
+                return {}
+    return {}
+
+
+def _expert_hold(
+    conversation: PiConversation, said: str, noted: list[dict[str, Any]], carried: bool
+) -> dict[str, Any] | None:
+    """solution_source "expert": a request for a fix is answered by the expert advisor, not by the
+    industry entries, so nothing is chosen or recorded here (the entries only serve as examples in
+    its prompt, and as the fallback). The context says "asked, no idea yet" and
+    `brain_free_ideas` runs the expert. None: this turn is not that (how-to, outside the askable
+    states, or the idea budget is spent: the usual path answers)."""
+    asked = solution_ask.asked_for_ideas(said) or solution_ask.rejects_ideas(said)
+    if (conversation.flow_state or "") not in solution_ask.ASKABLE or not (asked or carried):
+        return None
+    if solution_ask.asked_howto(said) and not asked:
+        return None
+    if allowance(conversation.service_brief or {}, given_so_far(conversation)) <= 0:
+        return None
+    titles = [str(n.get("title") or "")[:80] for n in noted[-NOTED_TITLES:] if n.get("title")]
+    return {"solution_asked_no_ideas": True, "solution_noted": titles, "solution_why": "expert"}
+
+
+async def _instant(
+    session: AsyncSession,
+    scope: WorkspaceScope,
+    conversation: PiConversation,
+    said: str,
+    now: datetime,
+) -> str | None:
+    """The instant look (Part 3.1): what this message says about the ideas pi last gave. A
+    returning customer's answer to "did anything start?" applies to the ideas that follow-up named;
+    otherwise the first message after the ideas settles the latest open stamp. Returns the
+    signal."""
+    if conversation.customer_id is None:
+        return None
+    brief = conversation.service_brief or {}
+    pending = [str(i) for i in brief.get("solution_followup_arms") or []]
+    if pending and not brief.get("solution_followup_reacted"):
+        reaction = await learning_solutions.react_to_followup(
+            session, scope, customer_id=conversation.customer_id, arm_ids=pending, said=said
+        )
+        if reaction is None:
+            return None
+        stamps = list(brief.get("learning_used") or [])
+        for stamp in stamps:  # the same ideas are not scored again overnight
+            if (
+                stamp.get("ideas")
+                and not stamp.get("ideas_scored")
+                and set(map(str, stamp["ideas"])) <= set(pending)
+            ):
+                stamp["ideas_scored"], stamp["reaction"] = True, reaction.signal
+        _put(conversation, solution_followup_reacted=True, learning_used=stamps)
+        return reaction.signal
+    stamps = list(brief.get("learning_used") or [])
+    for stamp in reversed(stamps):
+        if not stamp.get("ideas") or stamp.get("ideas_scored"):
+            continue
+        outcome = await learning_solutions.settle(
+            session, scope, conversation, stamp, now, final=False, current=said
+        )
+        if outcome in ("scored", "not_given"):
+            _put(conversation, learning_used=stamps)
+        return str(stamp.get("reaction")) if outcome == "scored" else None
+    return None
+
+
+async def _give(
+    session: AsyncSession,
+    scope: WorkspaceScope,
+    conversation: PiConversation,
+    *,
+    industry: str,
+    problem: dict[str, Any],
+    language: str,
+    used: dict[str, Any],
+    now: datetime,
+    asked: bool,
+    offerable: bool,
+    next_kind: str = "",
+    build_line: bool = True,
+    owner_words: str = "",
+) -> dict[str, Any] | None:
+    """Choose, record and hand over the ideas for one problem inside every cap. None when there is
+    nothing to give (the budget is spent, or nothing new is left for this business)."""
+    assert conversation.customer_id is not None
+    brief = conversation.service_brief or {}
+    left = allowance(brief, given_so_far(conversation))
+    if left <= 0:
+        return None
+    if int(brief.get("declines") or 0) > 0 and str(problem["id"]) in [
+        str(p) for p in brief.get("problems_at_decline") or []
+    ]:
+        return None  # after a declined offer, a new problem only (RV-02)
+    choice = await solution_ideas.choose(
+        session,
+        scope,
+        industry_key=industry,
+        problem_id=problem["id"],
+        language=language,
+        customer_id=conversation.customer_id,
+        count=min(value_line.IDEAS_PER_MESSAGE, left),
+        conversation_id=conversation.id,
+        owner_words=owner_words,
+    )
+    if not choice.arms:
+        # "Nothing new left" is only true when this business was given ideas for the problem; an
+        # entry with no usable idea (its seed ideas failed the idea guard) is "no idea yet".
+        given = await solution_ideas.remembered(
+            session, scope, conversation.customer_id, str(problem["id"])
+        )
+        return {"solution_exhausted": True} if choice.exhausted and given else None
+    used["ideas"] = [str(a.id) for a in choice.arms]
+    used["problem_id"] = problem["id"]
+    used["state"] = conversation.flow_state
+    # Remember at once what is handed over, so the same idea is never offered twice in one chat
+    # (the nightly scoring only adds what the person said about it).
+    await solution_ideas.record_given(
+        session,
+        scope,
+        customer_id=conversation.customer_id,
+        conversation_id=conversation.id,
+        arms=choice.arms,
+        now=now,
+    )
+    used["recorded"] = True
+    line = (
+        solution_ask.bridge(
+            dict(conversation.service_brief or {}), problem, language, _sector(industry)
+        )
+        if (asked or next_kind == "worked") and build_line
+        else None  # a near-problem's build line would read as an irrelevant template
+    )
+    if (
+        line
+        and owner_words
+        and idea_filter.invented_context(str(line.get("says") or ""), owner_words)
+    ):
+        line = None  # the Workzap line never talks about a channel or asset the owner never named
+    brief = solution_ask.remember_bridge(
+        {
+            **(conversation.service_brief or {}),
+            "ideas_given": given_so_far(conversation) + len(choice.arms),
+            "ideas_problems": [
+                *[str(p) for p in (conversation.service_brief or {}).get("ideas_problems") or []],
+                str(problem["id"]),
+            ][-20:],
+            "solution_last_problem": str(problem["id"]),
+        },
+        line,
+    )
+    conversation.service_brief = brief
+    out: dict[str, Any] = {"solution_ideas": [a.text for a in choice.arms]}
+    if asked or next_kind:
+        out["solution_never_say"] = solutions.never_say([industry])[:6]
+    if line:
+        out["solution_build"] = solution_ask.public(line)
+        keys = (problem.get("workzap_build") or {}).get("keys") or []
+        if keys and "says" in line:
+            await solution_ideas.note_builds(
+                session,
+                scope,
+                customer_id=conversation.customer_id,
+                problem_id=problem["id"],
+                keys=[str(keys[0])],
+            )
+    if next_kind:
+        out["solution_next"] = next_kind
+    elif asked:
+        out["solution_asked"] = True
+        used["offer_appended"] = offerable  # settle never scores a turn that carries the offer
+    return out
+
+
+async def _build(
+    session: AsyncSession,
+    scope: WorkspaceScope,
+    conversation: PiConversation,
+    said: str,
+    noted: list[dict[str, Any]],
+    used: dict[str, Any],
+    now: datetime | None,
+) -> dict[str, Any]:
+    from app.modules.customers.models import Customer
+
+    now = now or datetime.now(UTC)
+    owner_words = " ".join(
+        [said, *(f"{n.get('title') or ''} {n.get('user_words') or ''}" for n in noted)]
+    )  # what the owner said: an idea may assume nothing beyond it (G2)
+    asked = solution_ask.asked_for_ideas(said) or solution_ask.rejects_ideas(said)  # Part 1.6
+    if conversation.customer_id is None:
+        return _no_ideas(conversation, noted, None, "no_customer", now) if asked else {}
+    customer = await session.get(Customer, conversation.customer_id)
+    industry = customer.industry_primary if customer is not None else None
+    if not industry or solutions.load(industry) is None:
+        if (
+            solution_ask.asked_howto(said)
+            and (conversation.flow_state or "") in solution_ask.ASKABLE
+        ):
+            # "how exactly?" with no trade known yet: the detail is the solution document
+            return {
+                "solution_howto": {"covers": "", "which_app": solution_ask.asked_which_app(said)}
+            }
+        if asked and (conversation.flow_state or "") in solution_ask.ASKABLE:
+            from_library = _from_library(
+                conversation, noted, detect_language(said) or conversation.language or "en"
+            )
+            if from_library is not None:
+                return from_library
+        return _no_ideas(conversation, noted, industry, "no_industry", now) if asked else {}
+    language = detect_language(said) or conversation.language or "en"
+    language = language if language in ("en", "roman_ur", "ar") else "en"
+    await solution_ideas.ensure_arms(session, scope, industry)
+    used["industry"] = industry
+    used["language"] = language
+    signal = await _instant(session, scope, conversation, said, now)
+    next_kind = AGAIN.get(signal or "", "")
+    brief = conversation.service_brief or {}
+    if signal == "idea_not_tried":
+        if brief.get("blockers_asked"):
+            return {}
+        _put(conversation, blockers_asked=True)
+        return {"solution_not_tried": True}  # ask once what got in the way, give no idea
+    if not brief.get("solution_followup_done"):
+        back = await solution_ideas.continuity(
+            session, scope, customer_id=conversation.customer_id, now=now
+        )
+        if back is not None:
+            _put(
+                conversation,
+                solution_followup_done=True,
+                solution_followup_arms=back["arm_ids"],
+                solution_last_problem=back["problem_id"],
+            )
+            out: dict[str, Any] = {"solution_followup": back}
+            if back["worked"] or back["no_help"]:
+                # it worked: the next steps and the Workzap line; it did not help: a different
+                # kind of idea (the review of the idea's fit is already queued)
+                problem = {
+                    e["id"]: e for e in await solution_ideas.entries(session, scope, industry)
+                }.get(back["problem_id"])
+                if problem is not None:
+                    more = await _give(
+                        session,
+                        scope,
+                        conversation,
+                        industry=industry,
+                        problem=problem,
+                        language=language,
+                        used=used,
+                        now=now,
+                        asked=False,
+                        offerable=False,
+                        next_kind="worked" if back["worked"] else "swap",
+                        owner_words=owner_words,
+                    )
+                    if more:
+                        out.update(more)
+            return out
+    howto = solution_ask.asked_howto(said)
+    asked = asked or bool(next_kind)
+    state = conversation.flow_state or ""
+    explicit = solution_ask.asked_for_ideas(said) or solution_ask.rejects_ideas(said)
+    reacting = bool(next_kind)
+    if howto and not noted and state in solution_ask.ASKABLE:
+        # "how exactly?" before anything is noted still gets the one answer pi may give: the detail
+        # is in the solution document (an empty reply here ended chats in a real-model sweep)
+        return {
+            "solution_howto": {"covers": "", "which_app": solution_ask.asked_which_app(said)},
+            "solution_never_say": solutions.never_say([industry])[:6],
+        }
+    if not (noted or reacting) or not (
+        state in GIVING or ((asked or howto) and state in solution_ask.ASKABLE)
+    ):
+        if explicit and not howto and not noted:
+            return _no_ideas(conversation, noted, industry, "nothing_noted", now)
+        return {}
+    entries = await solution_ideas.entries(session, scope, industry)
+    problem = None
+    strong = False  # the entry matches by the main rule, not only by a near-problem fallback
+    # The latest noted problem first, then the earlier ones: a person who then mentions something
+    # off the page ("staff forget the entry") still gets ideas for the problem that does match.
+    best_fit = -1
+    best_key = 0  # Book 5 7.3: (sub-type, goal verb, cause) before words; 0 = unknown, words decide
+    # Every fact noted so far counts for the fit, not only the one problem being matched ("call se
+    # parents ko bura lagta hai" next to "fee late" says which fee entry is meant, live test 5)
+    everything = " ".join(
+        " ".join([str(n.get("title") or ""), *[str(w) for w in n.get("user_words") or []]])
+        for n in noted or []
+    )
+    for item in reversed(noted or []):
+        group, subtype = str(item.get("group") or ""), str(item.get("subtype") or "")
+        said_words = " ".join(
+            [
+                str(item.get("title") or ""),
+                str(item.get("title_local") or ""),
+                *[str(w) for w in item.get("user_words") or []],
+            ]
+        )
+        found = solution_ideas.match_problem(entries, group, subtype, said_words)
+        target, goal_verb = idea_retrieval.target_subtype(subtype, said_words)
+        cause = str(item.get("cause") or "")
+        keyed = idea_retrieval.preferred_entry(entries, subtype, said_words, cause, group)
+        key = idea_retrieval.key_rank(found, target, goal_verb, cause) if found is not None else 0
+        if keyed is not None and keyed[1] > key:
+            found, key = keyed  # the entry keyed by the sub-type, goal verb and cause
+        if found is None:
+            continue
+        # The entry that fits the person's own words best, not the first one the category gave
+        # (live test 4: "views but no orders" took the attribution ideas before the entry for
+        # "price asked in DM, then silence"); a tie goes to the latest noted problem.
+        fit = solution_ideas.fit(found, f"{said_words} {everything}")
+        if (key, fit) > (best_key, best_fit):
+            best_key, best_fit = key, fit
+            problem = found
+            strong = solution_ideas.is_strong_match(found, group, subtype, said_words)
+    if problem is None and reacting:
+        strong = True  # the entry the ideas were already given for
+    if problem is None and reacting:
+        problem = {e["id"]: e for e in entries}.get(str(brief.get("solution_last_problem") or ""))
+    offerable = (conversation.flow_state or "") in solution_ask.OFFERABLE
+    if howto:
+        line = solution_ask.bridge(
+            dict(conversation.service_brief or {}), problem, language, _sector(industry)
+        )
+        brief = solution_ask.remember_bridge(dict(conversation.service_brief or {}), line)
+        brief["howto_asked"] = int(brief.get("howto_asked") or 0) + 1
+        conversation.service_brief = brief
+        keys = ((problem or {}).get("workzap_build") or {}).get("keys") or []
+        if problem is not None and keys and line and "says" in line:
+            await solution_ideas.note_builds(
+                session,
+                scope,
+                customer_id=conversation.customer_id,
+                problem_id=problem["id"],
+                keys=[str(keys[0])],
+            )
+        return {
+            "solution_howto": {
+                "covers": solution_ask.covers(problem),
+                "which_app": solution_ask.asked_which_app(said),
+            },
+            "solution_build": solution_ask.public(line),
+            "solution_never_say": solutions.never_say([industry])[:6],
+        }
+    _stamp_decline(conversation)
+    if allowance(conversation.service_brief or {}, given_so_far(conversation)) <= 0:
+        return _no_ideas(conversation, noted, industry, "budget", now) if explicit else {}
+    if problem is None:
+        if noted:
+            words = " ".join(str(noted[-1].get("title") or "").lower().split()[:8])
+            if (
+                words
+                and learning_bank.redaction_confidence(words) >= learning_rules.PROMOTE_REDACTION
+            ):
+                used["unmatched"] = words  # only words with no name, figure or contact in them
+                used["customer"] = str(conversation.customer_id)
+        if explicit and (from_library := _from_library(conversation, noted, language)) is not None:
+            return from_library
+        return _no_ideas(conversation, noted, industry, "no_match", now) if explicit else {}
+    handed = await _give(
+        session,
+        scope,
+        conversation,
+        industry=industry,
+        build_line=strong,
+        problem=problem,
+        language=language,
+        used=used,
+        now=now,
+        asked=explicit,
+        offerable=offerable,
+        next_kind=next_kind,
+        owner_words=owner_words,
+    )
+    spent = handed
+    declined = int((conversation.service_brief or {}).get("declines") or 0) > 0
+    wrong = solution_ask.rejects_ideas(said)  # R-VAL-01 holds for a repeated ask, not a rejection
+    if (handed is None or not handed.get("solution_ideas")) and wrong and not declined:
+        handed = None
+        # The entry has no idea left, or the person said the ideas were wrong: the next-best entry
+        # that shares evidence with their words, then the library category the cues name, and only
+        # then the honest line (live test 7: "solution glt hai again den" ended on "those are all
+        # the ideas I have")
+        heard = f"{said} {everything}"
+        others = sorted(
+            (e for e in entries if e["id"] != problem["id"] and solution_ideas.relevant(e, heard)),
+            key=lambda e: -solution_ideas.fit(e, heard),
+        )
+        for other in others:
+            handed = await _give(
+                session,
+                scope,
+                conversation,
+                industry=industry,
+                build_line=False,
+                problem=other,
+                language=language,
+                used=used,
+                now=now,
+                asked=explicit,
+                offerable=offerable,
+                next_kind=next_kind,
+            )
+            if handed is not None and handed.get("solution_ideas"):
+                break
+            handed = None
+        if handed is None:
+            from_library = _from_library(conversation, noted, language)
+            if from_library is not None:
+                handed = from_library
+        if handed is None:
+            handed = spent  # nothing else fits: the exhausted marker, or the honest line below
+    if handed is None:
+        return _no_ideas(conversation, noted, industry, "none_left", now) if explicit else {}
+    if next_kind == "swap" or solution_ask.rejects_ideas(said):
+        handed = {**handed, "solution_rejected_fit": True}
+    if handed.get("solution_ideas"):
+        # what was said is remembered by its words, so the library never repeats an entry's idea
+        kept = [str(x) for x in (conversation.service_brief or {}).get("library_given") or []]
+        _put(
+            conversation,
+            library_given=[*kept, *[str(i) for i in handed["solution_ideas"] if i not in kept]][
+                -20:
+            ],
+        )
+    return handed
+
+
+def _stamp_decline(conversation: PiConversation) -> None:
+    """The first time pi looks after a declined offer, remember how many ideas it had given and
+    for which problems: only a new problem may get ideas now, and at most two (RV-02)."""
+    brief = conversation.service_brief or {}
+    if int(brief.get("declines") or 0) > 0 and "ideas_at_decline" not in brief:
+        _put(
+            conversation,
+            ideas_at_decline=given_so_far(conversation),
+            problems_at_decline=[str(p) for p in brief.get("ideas_problems") or []],
+        )

@@ -1,0 +1,85 @@
+{
+ "cluster": "retail_consumer",
+ "version": 1,
+ "as_of": "2026-10",
+ "industries": [
+  "books_stationery_and_school_supplies",
+  "bridal_wear_and_couture_designers",
+  "computers_laptops_and_it_hardware_shops",
+  "cosmetics_and_beauty_retail",
+  "duty_free_and_airport_retail",
+  "electronics_and_home_appliances_retail",
+  "fashion_and_apparel_brands",
+  "florists_and_gifting",
+  "footwear_retail",
+  "furniture_and_home_decor_retail",
+  "hardware_paint_sanitary_and_building_materials_shops",
+  "jewellery",
+  "kids_wear_toys_and_baby_stores",
+  "kiryana_corner_shops_and_convenience_stores",
+  "mobile_phones_and_accessories",
+  "perfumes_attar_and_oud",
+  "pet_shops_and_pet_supplies",
+  "retail_shops_and_chains",
+  "sports_goods_and_fitness_equipment_retail",
+  "supermarkets_and_hypermarkets",
+  "tiles_marble_and_bathroom_kitchen_showrooms",
+  "unstitched_fabric_lawn_and_textile_retail",
+  "watches_eyewear_and_opticians"
+ ],
+ "how_customers_find_and_choose": [
+  "Shoppers search the map listing first, then read recent reviews and look at photos before visiting",
+  "Customers ask in chat for availability, a photo or a video of the item before they travel",
+  "Comparing the same item across several sellers online is routine, so a clear listing and honest stock answers decide the sale",
+  "Recommendations from friends and family shared in chat groups still carry the most weight",
+  "Short vertical videos of new arrivals help fashion, decor, gifts and gadgets where the owner already has something to show"
+ ],
+ "what_works_now": [
+  "A product catalogue shared in chat with clear photos, plain names and an in-stock note",
+  "A complete map listing: correct hours, location pin, phone and recent photos",
+  "Asking happy customers for a review at the counter or right after delivery",
+  "A chat reply within minutes during opening hours, with a saved short answer for common questions",
+  "Simple repeat-customer contact: a saved list of regulars told when stock they like arrives",
+  "Honest delivery promises and a clear return or exchange rule said up front",
+  "Counting what sells each week and not reordering what sits"
+ ],
+ "outdated_or_weak": [
+  "Printing flyers or pamphlets as the main way to reach people",
+  "Waiting for walk-in footfall alone with no online presence",
+  "A website built once and never updated while the map listing is incomplete",
+  "Generic advice to 'post daily on social media' with nothing specific to show",
+  "Blanket discounts that train customers to wait for the next sale",
+  "Mass messages to everyone, whether or not they asked for them"
+ ],
+ "local_context": {
+  "PK": [
+   "Cash on delivery and cash at the counter are still common; bank transfer and mobile wallet payments are now normal for many customers",
+   "Ramadan and the two Eids reshape demand, opening hours and staff availability every year",
+   "Summer heat, monsoon rain and power cuts affect operations and footfall",
+   "Customers often write in Urdu, Roman Urdu or a regional language, and chat is the usual first contact",
+   "Cash on delivery returns and refused parcels are a real cost for sellers who deliver",
+   "Seasonal peaks: Eid, weddings and back-to-school drive buying"
+  ],
+  "UAE": [
+   "Customers are multilingual and expect quick replies in chat; card and tap payments are normal",
+   "Winter is the busy season; many residents travel in summer so demand can dip",
+   "Ramadan and Eid change hours and buying patterns; the licence a business holds decides what it may sell and advertise, so the owner checks that with the licensing body",
+   "Tourist and expat footfall matters in malls and souks; shoppers expect chat support in several languages",
+   "Seasonal sale periods and gifting occasions are well established"
+  ],
+  "CA": [
+   "Customers expect online booking or enquiry, card and bank e-transfer payment, and clear written confirmation",
+   "Long winters and a short summer peak shape outdoor and seasonal trades",
+   "English and French (in Quebec) matter, and many communities prefer their own language; consent for marketing messages and sales tax rules vary, so the owner checks them with a professional",
+   "Customers compare local shops with online delivery from large sellers, so local service and fast pickup are the edge",
+   "Holiday gifting and back-to-school are the big retail seasons"
+  ]
+ },
+ "never_assume": [
+  "A website or online shop",
+  "A social page with a real following",
+  "A stock list kept anywhere other than the owner's head or a notebook",
+  "Delivery staff or a courier arrangement"
+ ],
+ "review_status": "needs human review"
+}

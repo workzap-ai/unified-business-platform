@@ -1,0 +1,294 @@
+{
+  "industry": "food_delivery_operators_and_dark_stores",
+  "name": "Food delivery operators and dark stores",
+  "sector": "7.B Food and beverage",
+  "version": "1.1",
+  "problems": [
+    {
+      "id": "p1_count_mismatch",
+      "n": 1,
+      "words": "App shows items in stock that aren't on the shelf, then we cancel",
+      "category": "stock_inventory",
+      "subtype": "count_mismatch",
+      "quick_ideas": [
+        "Count your top-selling items on the shelf against what the records say once, so you see the size of the gap",
+        "Fix bin locations for those items, so pickers find them."
+      ],
+      "workzap_build": {
+        "keys": [
+          "stock_alerts",
+          "integration"
+        ],
+        "text": "Hub stock with shelf locations, stock counts and mismatch alerts, updated on your online listings right when items move.",
+        "tool_words": []
+      },
+      "ask_first": "How often is the hub counted?",
+      "free_stops": "The count routine and sync set-up are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Walk the fastest-moving shelf after the evening rush and note missing lines still showing available, so cancellations can be traced to specific items.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member the closing shelf check and one notebook for mismatches, so stock updates stop being missed between picking and replenishment.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p2_order_errors",
+      "n": 2,
+      "words": "Pickers pick wrong items and missing-item complaints come every day",
+      "category": "orders_fulfilment",
+      "subtype": "order_errors",
+      "quick_ideas": [
+        "Check a sample of bags before handover, so you see the most common mistake",
+        "Pair new pickers with experienced ones for their first shifts."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "a pick-and-pack screen with scan confirmation and a bag photo before handover.",
+        "tool_words": []
+      },
+      "ask_first": "What's the most common picking mistake?",
+      "free_stops": "The pick-and-pack checks are detailed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Open a handful of completed bags before rider handover and note the exact item mistakes, so you see whether confusion starts in similar packs or labels.",
+          "review": false
+        },
+        {
+          "text": "Make one picker responsible for the final bag glance at every handover, so missing items are caught before complaints reach the store.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p3_cod_remittance",
+      "n": 3,
+      "words": "Rider COD cash comes in short or days late",
+      "category": "cash_collections",
+      "subtype": "cod_remittance",
+      "quick_ideas": [
+        "Settle each rider's COD at the end of every shift, so cash doesn't sit with them",
+        "Keep a record of expected cash per rider per shift."
+      ],
+      "workzap_build": {
+        "keys": [
+          "cash_reconciliation"
+        ],
+        "text": "COD settlement per rider ID showing expected against handed in, with ageing of unremitted cash.",
+        "tool_words": []
+      },
+      "ask_first": "How and to whom do riders hand in cash now?",
+      "free_stops": "The settlement routine and ageing rules are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "For one week, note each cash order total beside the rider handover time, so you see which route periods create late or short returns.",
+          "review": false
+        },
+        {
+          "text": "Keep one notebook at dispatch for cash order totals and handover signatures, so COD returns are checked at the same place every shift.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p4_delivery_late",
+      "n": 4,
+      "words": "Orders breach the delivery promise at peak hours",
+      "category": "orders_fulfilment",
+      "subtype": "delivery_late",
+      "quick_ideas": [
+        "Note late orders by hour and zone for a week, so you see where it happens",
+        "Plan more riders for the worst hour."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "a daily view of delivery times by hub, zone and hour set against the promised time.",
+        "tool_words": [
+          "dashboard"
+        ],
+        "leads_with_view": true
+      },
+      "ask_first": "When do late deliveries happen most?",
+      "free_stops": "The rider and slot planning approach stays for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note order ready time and rider departure time during the evening peak, so you can see whether delay starts in picking or dispatch.",
+          "review": false
+        },
+        {
+          "text": "Give one dispatcher the peak-hour handover board and update time, so waiting orders are assigned in the order they are actually ready.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p5_shift_scheduling",
+      "n": 5,
+      "words": "Riders don't log in for the evening rush, and shifts are made on WhatsApp the night before",
+      "category": "people_staff",
+      "subtype": "shift_scheduling",
+      "quick_ideas": [
+        "Publish next week's rider shifts on a fixed day, so riders plan ahead",
+        "Ask each rider to confirm, so gaps show early."
+      ],
+      "workzap_build": {
+        "keys": [
+          "booking_scheduling"
+        ],
+        "text": "a rider shift planner by hub and hour with confirmations and no-show reports.",
+        "tool_words": []
+      },
+      "ask_first": "Are riders employed, freelance or through an agency?",
+      "free_stops": "The shift planning rules are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare the planned evening roster with who actually logs in across the week, so the no-show pattern is clear before the next rush.",
+          "review": false
+        },
+        {
+          "text": "Give one person the weekly rider roster and one chat thread for confirmations, so evening coverage stops changing in scattered messages.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p6_expiry_wastage",
+      "n": 6,
+      "words": "Fresh produce and dairy expire on the shelf",
+      "category": "stock_inventory",
+      "subtype": "expiry_wastage",
+      "quick_ideas": [
+        "Check expiry dates on fresh and chilled items daily, so they're moved before they expire",
+        "Order fresh items in smaller amounts more often."
+      ],
+      "workzap_build": {
+        "keys": [
+          "stock_alerts"
+        ],
+        "text": "an expiry tracker by batch and shelf with prompts to mark down or remove.",
+        "tool_words": []
+      },
+      "ask_first": "Which categories expire most?",
+      "free_stops": "The expiry rules per category stay for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Walk the fresh and chilled shelves each morning and note items nearest expiry by section, so wastage is linked to specific display areas.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member the daily short-date check and one shelf note for removals, so older stock gets attention before new stock is placed.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p7_fraud",
+      "n": 7,
+      "words": "Riders' fuel and bike maintenance claims are inflated",
+      "category": "loss_security",
+      "subtype": "fraud",
+      "quick_ideas": [
+        "Compare a week of fuel claims with trips done, so you see if there's a real gap",
+        "Require approval for repair claims before work is done."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "a bike maintenance and fuel claim log with approvals.",
+        "tool_words": []
+      },
+      "ask_first": "Who owns the bikes?",
+      "free_stops": "The claim rules and approvals are detailed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "For one week, compare each rider's fuel and repair claims with the routes they actually covered, so inflated claims stand out by rider and route.",
+          "review": false
+        },
+        {
+          "text": "Make one dispatcher note any bike issue when a rider returns, so later repair claims can be checked against the shift handover.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p8_repeat_low",
+      "n": 8,
+      "words": "Customers order once with a promo code and never return",
+      "category": "customers_retention",
+      "subtype": "repeat_low",
+      "quick_ideas": [
+        "Look at which first orders led to a second, so you see what brings people back",
+        "Ask a few one-time customers why they didn't return."
+      ],
+      "workzap_build": {
+        "keys": [
+          "loyalty_repeat"
+        ],
+        "text": "a customer list with order history and repeat offers for customers who opted in.",
+        "tool_words": []
+      },
+      "ask_first": "How do you spot promo abuse today?",
+      "free_stops": "The repeat-order plan stays for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare one-time orders by basket type and delivery experience notes, so you can see which early orders fail to earn a second purchase.",
+          "review": false
+        },
+        {
+          "text": "Give one person the weekly review of first-order complaints in one notebook, so repeat-loss reasons are gathered in one place.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p9_data_scattered",
+      "n": 9,
+      "words": "Every hub's numbers come from a different spreadsheet",
+      "category": "reporting_visibility",
+      "subtype": "data_scattered",
+      "quick_ideas": [
+        "Ask every hub for the same few numbers each day, so they can be compared",
+        "Pick the one number you'll check each morning."
+      ],
+      "workzap_build": {
+        "keys": [
+          "nori_daily_read"
+        ],
+        "text": "a daily hub comparison on WhatsApp with orders, late deliveries, stock issues and COD outstanding.",
+        "tool_words": []
+      },
+      "ask_first": "How many hubs do you run?",
+      "free_stops": "What goes into the daily read is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Lay out yesterday's hub figures side by side on one page, so missing numbers and mismatched definitions show up immediately.",
+          "review": false
+        },
+        {
+          "text": "Give one person the morning collection of hub numbers in one notebook, so every location reports into the same place each day.",
+          "review": false
+        }
+      ]
+    }
+  ],
+  "never_say": [
+    "Anything about labour or gig-worker law, rider visas, insurance, vehicle licensing or traffic rules.",
+    "Covert tracking of riders' personal phones or tracking outside work.",
+    "Regulatory advice on pharmacy or age-restricted items.",
+    "Help hiding rider cash shortages, charging riders unlawfully or manipulating reported delivery times.",
+    "That delivery times or costs will improve by a set amount."
+  ],
+  "sample_reply": {
+    "person": "We run 4 dark stores in Lahore. Biggest headache is COD cash from riders, some hold it for days. Need a fix.",
+    "pi": "Yes, this can be fixed, and none of it needs special equipment.\nFirst, settle each rider's COD at the end of every shift, so cash doesn't sit with them.\nSecond, keep a record of expected cash per rider per shift, so any gap is clear.\nTo make it stick, Workzap could build: with a COD settlement tool per rider ID showing expected against handed in at every hub and how long any cash has been outstanding.",
+    "language": "english"
+  }
+}

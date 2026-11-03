@@ -1,0 +1,321 @@
+{
+  "industry": "forestry_timber_and_wood_traders",
+  "name": "Forestry, timber and wood traders",
+  "sector": "7.C Agriculture, livestock and rural (part 2)",
+  "version": "1.1",
+  "problems": [
+    {
+      "id": "p1_count_mismatch",
+      "n": 1,
+      "words": "Measurement of logs is always disputed, buyer's CFT and ours differ",
+      "category": "stock_inventory",
+      "subtype": "count_mismatch",
+      "quick_ideas": [
+        "Agree one measuring method with each buyer before the deal, so disputes have a reference",
+        "Photograph each log's measurement at intake."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "A log intake register recording length, girth and calculated volume with a photo, applied the same way to every log.",
+        "tool_words": []
+      },
+      "ask_first": "Do you measure in CFT or board feet?",
+      "free_stops": "How the intake register calculates and records volume goes in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "For one week, compare your measured log sizes with the buyer's figures on each disputed load, so the disagreement pattern becomes visible.",
+          "review": false
+        },
+        {
+          "text": "Give one experienced staff member the job of writing every log measurement in one notebook at loading, so your side stays consistent.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p2_wastage_cost",
+      "n": 2,
+      "words": "I don't know what yield we're getting from each log at the sawmill",
+      "category": "margin_cost",
+      "subtype": "wastage_cost",
+      "quick_ideas": [
+        "Measure a few logs in and their sawn output out, so you see a real yield",
+        "Note offcuts and burada sold."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "A sawmill yield tracker per log or lot showing input versus sawn output, offcuts and sawdust every day.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "Do you saw your own logs or buy sawn timber?",
+      "free_stops": "How yield is tracked per lot is kept for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "For a few logs this week, note each log's size beside the boards and offcuts from it, so you see which logs waste more.",
+          "review": false
+        },
+        {
+          "text": "Give one sawmill person one notebook for log in and wood out notes each shift, so yield tracking stays regular.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p3_wrong_location",
+      "n": 3,
+      "words": "Stock in the yard isn't recorded by size and type, staff search for hours",
+      "category": "stock_inventory",
+      "subtype": "wrong_location",
+      "quick_ideas": [
+        "Mark yard bays with numbers and note what sits in each, so stock has an address",
+        "Start with the fastest-moving sizes."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "Yard stock by species, size and bay, searchable on phone.",
+        "tool_words": []
+      },
+      "ask_first": "How many yards do you run?",
+      "free_stops": "The yard map design is detailed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Walk the yard once and note which sizes and types staff search for most, so you know where poor placement wastes time.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of updating one yard map in a notebook, so every pile keeps a known place.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p4_theft_external",
+      "n": 4,
+      "words": "Timber goes missing from the yard at night",
+      "category": "loss_security",
+      "subtype": "theft_external",
+      "quick_ideas": [
+        "Count high-value stock at closing and opening for a week, so you know when losses happen",
+        "Release every load only with a gate pass."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "A night-yard stock check and gate pass for every outgoing load, flagging gaps.",
+        "tool_words": []
+      },
+      "ask_first": "Is there a watchman at night?",
+      "free_stops": "How checks and passes are set up goes in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "For one week, note which timber stacks change between closing and opening, so you narrow losses to specific piles and times.",
+          "review": false
+        },
+        {
+          "text": "Give one person the closing and opening stack check in one notebook, so night loss checks happen the same way daily.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p5_credit_customers",
+      "n": 5,
+      "words": "Carpenters and contractors take wood on credit and pay late",
+      "category": "cash_collections",
+      "subtype": "credit_customers",
+      "quick_ideas": [
+        "Put both yards' udhaar on one list by age, so you see the total",
+        "Set a credit limit for each regular customer."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger"
+        ],
+        "text": "One credit ledger across yards with limits, ageing and reminders.",
+        "tool_words": []
+      },
+      "ask_first": "Does each yard keep its own register?",
+      "free_stops": "Limits and reminder rules are kept for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "This week, count how many unpaid wood deliveries are older than your usual payment day, so late credit pressure is clear.",
+          "review": true
+        },
+        {
+          "text": "Give one person one notebook page for all unpaid deliveries and collection follow ups, so chasing dues stops slipping.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p6_pricing_errors",
+      "n": 6,
+      "words": "Rates change with the dollar and staff quote old prices",
+      "category": "sales_revenue",
+      "subtype": "pricing_errors",
+      "quick_ideas": [
+        "Keep one dated rate list with salesmen, so only today's rate is quoted",
+        "Have one person approve changes."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "A central rate list updated when import costs change, visible to every salesman at once.",
+        "tool_words": []
+      },
+      "ask_first": "How do rate changes reach salesmen now?",
+      "free_stops": "How rates are pushed out is detailed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "For one week, compare quoted timber rates from staff with the owner's current rate each day, so old price use is easy to spot.",
+          "review": true
+        },
+        {
+          "text": "Give one person the job of writing the current rate list in one place each morning, so everyone quotes from the same source.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p7_import_delays",
+      "n": 7,
+      "words": "Containers held at the port and customers wait",
+      "category": "suppliers_purchasing",
+      "subtype": "import_delays",
+      "quick_ideas": [
+        "List every container on order with its status, so you can update customers honestly",
+        "Note which documents caused the last delay."
+      ],
+      "workzap_build": {
+        "keys": [
+          "transfer_tracking"
+        ],
+        "text": "An import container tracker from order to port to yard, with a document checklist.",
+        "tool_words": []
+      },
+      "ask_first": "Roughly how many containers do you import in a season?",
+      "free_stops": "The tracker and checklist setup goes in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "This week, note how long each waiting container has been held and what work is stalled behind it, so customer impact is clearer.",
+          "review": false
+        },
+        {
+          "text": "Give one person one list of all incoming containers and their current stage, so updates to buyers stay consistent.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p8_order_errors",
+      "n": 8,
+      "words": "Orders come by phone and WhatsApp, and cutting sizes get mixed up",
+      "category": "orders_fulfilment",
+      "subtype": "order_errors",
+      "quick_ideas": [
+        "Confirm each order's sizes back to the customer in writing before cutting, so errors are caught early",
+        "Keep one order list per day."
+      ],
+      "workzap_build": {
+        "keys": [
+          "order_capture"
+        ],
+        "text": "A cutting order sheet with sizes confirmed by WhatsApp before cutting, tracked to delivery.",
+        "tool_words": []
+      },
+      "ask_first": "Who takes the orders now?",
+      "free_stops": "How orders are confirmed and tracked is part of the solution document.",
+      "extra_ideas": [
+        {
+          "text": "For one week, count which cutting mistakes came from phone orders and which came from chat messages, so the main source is obvious.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member one daily order notebook for every cutting size received, so the cutting team reads from one place.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p9_documentation",
+      "n": 9,
+      "words": "Permits and transit documents take days and cost us deals",
+      "category": "compliance_admin",
+      "subtype": "documentation",
+      "quick_ideas": [
+        "List every document you need and when each expires, so nothing lapses by surprise",
+        "For the rules themselves, talk to the forest department or your lawyer."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "A permit and document register with renewal and expiry reminders.",
+        "tool_words": []
+      },
+      "ask_first": "Which document causes the most delay?",
+      "free_stops": "Register contents and reminder timing go in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "This week, note which paperwork waits longest before dispatch and which jobs it delays, so the slowest point is easier to tackle.",
+          "review": false
+        },
+        {
+          "text": "Give one person one folder and one notebook list for every active permit paper, so document chasing has a clear owner.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p10_branch_comparison",
+      "n": 10,
+      "words": "I can't see daily sales and stock from my other yard",
+      "category": "reporting_visibility",
+      "subtype": "branch_comparison",
+      "quick_ideas": [
+        "Ask each yard for a short evening message with sales and cash, so you see both daily",
+        "Compare the two weekly."
+      ],
+      "workzap_build": {
+        "keys": [
+          "nori_daily_read"
+        ],
+        "text": "A morning read across yards with sales, stock value, receivables and yield, and the one thing to look at.",
+        "tool_words": []
+      },
+      "ask_first": "How do you hear from the other yard now?",
+      "free_stops": "What the read covers is kept for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "For one week, note each yard's closing stock piles and sales notes side by side each evening, so differences stand out quickly.",
+          "review": false
+        },
+        {
+          "text": "Make one staff member send the same end of day yard summary to one chat thread, so updates arrive in one place daily.",
+          "review": false
+        }
+      ]
+    }
+  ],
+  "never_say": [
+    "Advice on felling rules, forest laws, protected species, transit permits, import duties or tax.",
+    "Advice on timber treatment chemicals, sawmill safety engineering or wood grading standards.",
+    "Any help moving timber without permits, faking transit passes, mislabelling species or origin, under-invoicing imports or evading customs.",
+    "Anything about bribes for permits; taking sides in disputes with landowners or officials.",
+    "Recording names, CNICs or numbers of suppliers, landowners, customers, drivers or workers."
+  ],
+  "sample_reply": {
+    "person": "Lakkar mandi mein do yard hain. Carpenter udhaar pe maal le jaate hain aur mahinon nahi dete, koi solution batao.",
+    "pi": "Haan, is ko behtar kiya ja sakta hai, aur pehla qadam aasan hai.\nPehle, dono yard ka udhaar ek fehrist mein purane-pan ke hisaab se jama karein, taake poori raqam aur sab se purane balance saamne hon.\nDoosra, har baqaida grahak ki udhaar ki had tay kar dein.\nWorkzap is tarah ka intezam kar sakta hai: dono yard ka ek hi udhaar khata, had aur muddat ke saath, aur waqt pe yaad-dihani ke paigham.",
+    "language": "roman_urdu"
+  }
+}

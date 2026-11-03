@@ -1,0 +1,297 @@
+{
+  "industry": "ride_hailing_fleet_owners_and_taxi_operators",
+  "name": "Ride-hailing fleet owners and taxi operators",
+  "sector": "7.G Transport, mobility and aviation (part 2)",
+  "version": "1.1",
+  "problems": [
+    {
+      "id": "p1_cash_mismatch",
+      "n": 1,
+      "words": "Every settlement turns into an argument about cash and card trips",
+      "category": "cash_collections",
+      "subtype": "cash_mismatch",
+      "quick_ideas": [
+        "Settle every driver on the same day using the same sheet, so everyone sees one method",
+        "Keep each week's settlement written down, so last week's figure isn't argued again."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger",
+          "integration"
+        ],
+        "text": "You would see one driver settlement record joining ride payouts with rent, cash collected and deductions, and each driver receiving a statement in chat on their own.",
+        "tool_words": [
+          "platform"
+        ]
+      },
+      "ask_first": "How often do you settle with drivers, daily or weekly?",
+      "free_stops": "How payouts are combined and settlements calculated is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "For one settlement round, count cash trips and card trips separately for each car, so arguments narrow to one side.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member the settlement notebook and closing time each day, so every driver is checked the same way.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p2_receivables_late",
+      "n": 2,
+      "words": "Drivers don't pay rent on time and arrears keep growing",
+      "category": "cash_collections",
+      "subtype": "receivables_late",
+      "quick_ideas": [
+        "Write each driver's current balance on one list, so you know the total owed",
+        "Agree with each driver how the old balance will be cleared, so it stops growing silently."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger"
+        ],
+        "text": "balances per driver with alerts when arrears cross a set limit.",
+        "tool_words": []
+      },
+      "ask_first": "Do most drivers pay rent a few days late, or fall behind by several weeks?",
+      "free_stops": "Limits and alert steps are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note which cars are overdue by one cycle and which by longer, so you see where arrears are stacking up.",
+          "review": false
+        },
+        {
+          "text": "Give one person the arrears list and a fixed review time each week, so late rent gets chased consistently.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p3_no_dashboard",
+      "n": 3,
+      "words": "I don't know how many hours each car actually worked",
+      "category": "reporting_visibility",
+      "subtype": "no_dashboard",
+      "quick_ideas": [
+        "Note each car's kilometres at shift start and end for a week, so you see which ones work",
+        "List the cars that sat idle and why, so the cause is clear."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "car-by-car utilisation with shifts worked, kilometres, earnings and idle days, every morning.",
+        "tool_words": []
+      },
+      "ask_first": "Do you run cars on day shifts only, or on day and night shifts?",
+      "free_stops": "The measures and sources used are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "For one week, note each car's key handover time and return time, so actual working hours stop being guessed.",
+          "review": false
+        },
+        {
+          "text": "Give the key handover notebook to one shift lead at every changeover, so each car's worked time gets captured.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p4_fraud",
+      "n": 4,
+      "words": "Fuel spend is far more than the trips justify",
+      "category": "loss_security",
+      "subtype": "fraud",
+      "quick_ideas": [
+        "Record each fill with kilometres for every car, so fuel can be set against distance",
+        "Compare cars of the same type, so outliers stand out."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks",
+          "dashboards_reports"
+        ],
+        "text": "a fuel log per car matched to trips and kilometres, flagging gaps right away.",
+        "tool_words": []
+      },
+      "ask_first": "Does the fuel overspend show up in a few cars, or across most of the fleet?",
+      "free_stops": "How gaps are flagged is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "For one week, compare each car's fuel fills with its shift distance, so cars needing a closer look stand out.",
+          "review": false
+        },
+        {
+          "text": "Make one supervisor note fuel slips and end shift kilometres in one notebook, so fuel checks stop getting missed.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p5_maintenance_downtime",
+      "n": 5,
+      "words": "Oil changes and tyres are skipped until something breaks",
+      "category": "operations_process",
+      "subtype": "maintenance_downtime",
+      "quick_ideas": [
+        "List each car's kilometres and last service, so due cars are visible",
+        "Book the overdue ones in this week, so breakdowns are fewer surprises."
+      ],
+      "workzap_build": {
+        "keys": [
+          "stock_alerts",
+          "job_tracking"
+        ],
+        "text": "a maintenance schedule by kilometres with workshop tracking and off-road days.",
+        "tool_words": []
+      },
+      "ask_first": "Do cars skip services because drivers do not bring them in, or because nobody tracks the kilometres?",
+      "free_stops": "Service intervals and tracking are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Walk around every car this week and note tyres, oil leaks and warning lights, so overdue attention becomes visible.",
+          "review": false
+        },
+        {
+          "text": "Give one person the car care list and a fixed check time each week, so skipped maintenance gets caught earlier.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p6_no_sop",
+      "n": 6,
+      "words": "After an accident nobody knows who pays for what",
+      "category": "operations_process",
+      "subtype": "no_sop",
+      "quick_ideas": [
+        "Write down what happens after an accident and who does what, so drivers know the steps",
+        "Record each incident with photos and what was agreed, so there's one record."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking"
+        ],
+        "text": "an incident register with photos, workshop status and agreed cost split recorded.",
+        "tool_words": []
+      },
+      "ask_first": "Does the argument start over damage to your car, or over damage to the other vehicle?",
+      "free_stops": "The incident steps are in the solution document; insurance questions are for your insurer or lawyer.",
+      "extra_ideas": [
+        {
+          "text": "Count how many past accident cases still have unclear costs or missing notes, so the confusion has a clear size.",
+          "review": false
+        },
+        {
+          "text": "Give one owner representative every accident handover note in one notebook, so follow up stays with one responsible person.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p7_receivables_late",
+      "n": 7,
+      "words": "Fines come to me as owner after the driver has left",
+      "category": "cash_collections",
+      "subtype": "receivables_late",
+      "quick_ideas": [
+        "Keep a record of which driver had which car on which shift, so a fine can be matched",
+        "Check for new fines on a fixed day, so they're found while the driver is still with you."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "a fines register per car and date matched to the driver on shift.",
+        "tool_words": []
+      },
+      "ask_first": "Do the fines mostly come from traffic cameras, or from officers on the road?",
+      "free_stops": "How matching works is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare fine dates with your car shift record for the past few cases, so weak handovers around driver exits show up.",
+          "review": false
+        },
+        {
+          "text": "Give one person the departing driver check on the last car return, so outstanding fines are reviewed before handover ends.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p8_licences_renewals",
+      "n": 8,
+      "words": "Registration, fitness and insurance renewals get missed",
+      "category": "compliance_admin",
+      "subtype": "licences_renewals",
+      "quick_ideas": [
+        "List every car's renewal dates in one place, so nothing comes as a surprise",
+        "Look at the next month's renewals each week, so there's time to act."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "a document and renewal tracker per vehicle with reminders.",
+        "tool_words": []
+      },
+      "ask_first": "Which renewal gets missed most often: registration, fitness, or insurance?",
+      "free_stops": "Reminder timings are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Look through all vehicle papers once and note which renewals fall soonest, so urgent cars are obvious this week.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member one renewal notebook and a fixed weekly review time, so vehicle papers stop being missed.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p9_info_lost_in_whatsapp",
+      "n": 9,
+      "words": "Everything is in a WhatsApp group with all the drivers",
+      "category": "communication_coordination",
+      "subtype": "info_lost_in_whatsapp",
+      "quick_ideas": [
+        "Keep the group for announcements only, so important messages aren't buried",
+        "Handle settlements and issues one to one, so each driver's record is clear."
+      ],
+      "workzap_build": {
+        "keys": [
+          "customer_messaging",
+          "field_checks"
+        ],
+        "text": "an announcement channel for drivers plus a shift handover check for fuel, damage photos and kilometres.",
+        "tool_words": []
+      },
+      "ask_first": "Do drivers mostly use the group to report problems, or to ask about money?",
+      "free_stops": "How messages and handovers are set up is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many driver issues from this week needed old messages searched again, so the rework from buried chats is clear.",
+          "review": false
+        },
+        {
+          "text": "Give one person one written issues list updated at a fixed time daily, so important follow ups stop sinking in chat.",
+          "review": false
+        }
+      ]
+    }
+  ],
+  "never_say": [
+    "Advice on drivers' employment status, contracts, licensing, platform appeals or insurance.",
+    "Help sharing accounts, bypassing platform verification or altering fines records.",
+    "Covert tracking of a person; visibility is about vehicles and settlements.",
+    "Whether a rent or share arrangement is fair or legal.",
+    "Figures on platform earnings or commissions.",
+    "Storing drivers' IDs, licences, passwords, bank details or passengers' details."
+  ],
+  "sample_reply": {
+    "person": "Meri gaariyan Careem aur inDrive pe chalti hain, har Monday hisaab pe drivers se larai hoti hai. Koi solution?",
+    "pi": "Ji haan, ye theek ho sakta hai, aur is ke liye bade kharch ki zaroorat nahi.\nPehle, har driver ka hisaab ek hi din aur ek hi sheet pe karein, taake sab ke liye tareeqa ek ho.\nDoosra, har hafte ka hisaab likh kar rakhein, taake pichhle hafte ki raqam pe dobara behes na ho.\nIs ka pakka hal Workzap ye bana sakta hai: ride-hailing company payouts, kiraya aur cash ek jagah jama ho kar har driver ko WhatsApp pe statement jaye.",
+    "language": "roman_urdu"
+  }
+}

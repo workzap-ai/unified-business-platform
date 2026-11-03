@@ -1,0 +1,327 @@
+{
+  "industry": "call_centres_and_bpos",
+  "name": "Call centres and BPOs",
+  "sector": "7.K Professional and business services",
+  "version": "1.1",
+  "problems": [
+    {
+      "id": "p1_attendance_lateness",
+      "n": 1,
+      "words": "Agents come late on night shift and we miss the client's SLA",
+      "category": "people_staff",
+      "subtype": "attendance_lateness",
+      "quick_ideas": [
+        "Have team leaders do a start-of-shift roll call for a week, so lateness is noticed in minutes rather than next day",
+        "Note who is late and why once, so you see whether transport or rosters are the cause."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "a live floor board from dialer and login data showing who is logged in, on break or missing by shift and campaign, with alerts to the team leader.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "How many seats are you running, and across how many shifts?",
+      "free_stops": "the data sources and alert rules are set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note actual ready-to-take-calls time against shift start for the night team once, so you see how much client-facing time is really lost.",
+          "review": false
+        },
+        {
+          "text": "Give one team leader the night-shift arrival note in one notebook by the floor entrance, so late starts are caught before queues build.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p2_accountability",
+      "n": 2,
+      "words": "Breaks run long and nobody notices until the client complains",
+      "category": "people_staff",
+      "subtype": "accountability",
+      "quick_ideas": [
+        "Share the break schedule clearly with every agent, so expectations are known",
+        "Have one team leader check break times on one shift this week, so you see the scale."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "break overrun alerts to the team leader as they happen, under a monitoring policy agents know about, with a daily adherence summary.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "Do breaks run long for a few agents every day, or across whole teams on certain shifts?",
+      "free_stops": "the thresholds and how alerts are routed are kept for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many agents return from break after the planned time on one shift, so you see how often client complaints have a real floor cause.",
+          "review": false
+        },
+        {
+          "text": "Give one floor supervisor the break-return list at one fixed desk, so long breaks get challenged while the shift is still running.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p3_turnover",
+      "n": 3,
+      "words": "Attrition is so high we're always training new people",
+      "category": "people_staff",
+      "subtype": "turnover",
+      "quick_ideas": [
+        "Ask the last few leavers one question about why, so you get real reasons",
+        "Note at which stage most people leave, so you know where to focus."
+      ],
+      "workzap_build": {
+        "keys": [
+          "custom_build"
+        ],
+        "text": "an attrition tracker by stage, reason and team leader, updated with every exit.",
+        "tool_words": []
+      },
+      "ask_first": "Do most new hires leave within the first few weeks of training, or after a few months on the floor?",
+      "free_stops": "how reasons are captured and grouped is worked out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note whether leavers exit during training, nesting or live calling this week, so you can see where replacement effort keeps getting wasted.",
+          "review": false
+        },
+        {
+          "text": "Give one manager the leaver-reasons notebook and review it every Friday, so hiring and floor issues stop getting mixed together.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p4_shift_scheduling",
+      "n": 4,
+      "words": "Schedules are built by hand and never match call volume",
+      "category": "people_staff",
+      "subtype": "shift_scheduling",
+      "quick_ideas": [
+        "Look at last month's hourly volume for one campaign once, so you see when the peaks really are",
+        "Compare that against how many agents were scheduled, so mismatches show."
+      ],
+      "workzap_build": {
+        "keys": [
+          "booking_scheduling"
+        ],
+        "text": "a schedule builder using past volume per hour for each campaign to propose shifts.",
+        "tool_words": []
+      },
+      "ask_first": "Is the mismatch mostly at certain hours of the day, or on certain days of the week?",
+      "free_stops": "the forecasting approach and rules are set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare one week's busiest calling hours with who was actually on the floor, so you can spot where hand-built schedules leave queues exposed.",
+          "review": false
+        },
+        {
+          "text": "Give one planner the final shift list in one shared place by a fixed weekly time, so floor staffing stops changing at the last minute.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p5_inspection_missing",
+      "n": 5,
+      "words": "QA only checks a tiny share of calls",
+      "category": "quality_complaints",
+      "subtype": "inspection_missing",
+      "quick_ideas": [
+        "Make sure every agent gets at least one review this week, so nobody is invisible",
+        "Hold one calibration session with the client, so your scoring matches theirs."
+      ],
+      "workzap_build": {
+        "keys": [
+          "custom_build"
+        ],
+        "text": "a QA scoring form with random sampling per agent, calibration notes and agent-level trends.",
+        "tool_words": []
+      },
+      "ask_first": "Do you check calls at random, or only the ones a client or customer has complained about?",
+      "free_stops": "the sampling rules and scoring form are kept for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many agents had no call review at all this week, so you see which parts of the floor get no quality attention.",
+          "review": false
+        },
+        {
+          "text": "Give one QA lead the weekly review allocation list in one notebook, so checks get spread across the whole team instead of a few voices.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p6_manual_reports",
+      "n": 6,
+      "words": "Client reports are made manually in Excel every morning",
+      "category": "reporting_visibility",
+      "subtype": "manual_reports",
+      "quick_ideas": [
+        "List which figures each client actually needs, so the report shrinks to what matters",
+        "Fix one layout per client, so nobody rebuilds it daily."
+      ],
+      "workzap_build": {
+        "keys": [
+          "integration",
+          "dashboards_reports"
+        ],
+        "text": "You would find each client's daily report already prepared in their own format from the dialler, customer records and quality checks, without anyone building it by hand each morning.",
+        "tool_words": [
+          "crm"
+        ]
+      },
+      "ask_first": "Is it one client's report that eats the morning, or the same work repeated for every client?",
+      "free_stops": "which tools are connected and the report format are designed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note which report lines get changed by hand each morning for one client, so you see where reporting time is actually being spent.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of collecting yesterday's agreed figures in one notebook before the morning report, so numbers stop being chased across the floor.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p7_payroll_errors",
+      "n": 7,
+      "words": "Payroll errors because attendance deductions are calculated by hand",
+      "category": "people_staff",
+      "subtype": "payroll_errors",
+      "quick_ideas": [
+        "Share each agent's attendance summary with them before payroll this month, so disputes come up early",
+        "List last month's corrections once, so you see where errors start."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "attendance data feeding payroll deductions with a review step, and a summary each agent can see.",
+        "tool_words": []
+      },
+      "ask_first": "Do the errors mostly come from late arrivals and half days, or from missed punches and leave?",
+      "free_stops": "the review step and how deductions are shown are set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many attendance corrections come from lateness, absences, or missing shift notes this week, so the biggest source of confusion shows.",
+          "review": false
+        },
+        {
+          "text": "Give one supervisor one notebook for daily attendance exceptions at shift close, so the monthly attendance summary is easier to compile.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p8_commission_disputes",
+      "n": 8,
+      "words": "Sales commission calculations cause fights every month",
+      "category": "people_staff",
+      "subtype": "commission_disputes",
+      "quick_ideas": [
+        "Write the commission rule down once and share it with agents, so everyone works from the same rule",
+        "Show each agent their own figures before payday, so questions come early."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "an incentive calculator with a transparent breakdown agents can see during the month.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "Do the fights come from what counts as a sale, or from how the amount was worked out?",
+      "free_stops": "the calculation setup is kept for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many monthly sales disputes come from missing sales notes, unclear rules, or late updates, so the main source of arguments stands out.",
+          "review": false
+        },
+        {
+          "text": "Give one team leader one shared place for daily sales exceptions and a fixed weekly check, so monthly disputes surface earlier and calmer.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p9_maintenance_downtime",
+      "n": 9,
+      "words": "Internet or power goes down and we lose hours",
+      "category": "operations_process",
+      "subtype": "maintenance_downtime",
+      "quick_ideas": [
+        "Start writing down every outage with start and end time, so you know the real impact",
+        "Note what backup was used each time, so gaps in the backup plan show."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "an uptime log for power and internet outages with generator use recorded from phone, and a monthly summary.",
+        "tool_words": []
+      },
+      "ask_first": "Do you lose hours mostly to internet failures, or to power cuts that outlast your backup?",
+      "free_stops": "what is logged and how it is reported is worked out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count outages by shift and note whether internet or power caused each one, so you can see which problem is stealing more working hours.",
+          "review": false
+        },
+        {
+          "text": "Give one floor lead the outage log beside the operations desk, so every disruption is recorded while the details are still clear.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p10_theft_internal",
+      "n": 10,
+      "words": "Headsets and equipment go missing",
+      "category": "loss_security",
+      "subtype": "theft_internal",
+      "quick_ideas": [
+        "Count headsets and equipment once per floor, so you know what's actually there",
+        "Start signing equipment out to seats, so there's a record."
+      ],
+      "workzap_build": {
+        "keys": [
+          "custom_build"
+        ],
+        "text": "an asset register for headsets, PCs and access cards issued and returned, with counts by floor.",
+        "tool_words": []
+      },
+      "ask_first": "Do headsets and equipment disappear during shifts, or only at handover and the end of the day?",
+      "free_stops": "the issue and return routine is designed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare the equipment on occupied seats with the handover note at shift end, so missing items get spotted before everyone leaves.",
+          "review": false
+        },
+        {
+          "text": "Give one supervisor the end-of-shift equipment check and keep one notebook at the floor exit, so losses stop slipping past handovers.",
+          "review": false
+        }
+      ]
+    }
+  ],
+  "never_say": [
+    "Any labour-law, telemarketing-regulation, data-protection or tax advice.",
+    "Anything involving deceptive scripts, caller ID spoofing, unconsented robocalls or buying personal data lists.",
+    "Covert monitoring of staff outside a lawful, known policy.",
+    "That SLAs will be met or attrition will drop.",
+    "Requests for agent names, IDs, salaries, call recordings or end-customer data.",
+    "If anyone is in immediate danger on a shift or in transport, point to emergency services."
+  ],
+  "sample_reply": {
+    "person": "Night shift pe agents late aate hain aur breaks lambe ho jate hain, client SLA pe complaint karta hai. Kya kiya ja sakta hai?",
+    "pi": "Haan, is par kaam ho sakta hai, aur pehla qadam aasan hai.\nPehle, ek hafte ke liye team leaders shift shuru hote hi roll call karein, taake late aana agle din nahi balke usi waqt nazar aaye.\nDoosra, ek dafa likh lein ke kaun late aaya aur kyun, taake pata chale masla transport ka hai ya roster ka.\nWorkzap ye tayyar kar sakta hai: dialer ke data se live floor board aur breaks lambe hone pe team leader ko foran alert.",
+    "language": "roman_urdu"
+  }
+}

@@ -45,6 +45,7 @@ class FakeProvider:
         # WhatsApp message templates visible through Kapso's Meta proxy (campaigns/reminders).
         self.templates: list[dict[str, Any]] = []
         self.profiles: dict[str, dict[str, Any]] = {}
+        self.health_body: dict[str, Any] | None = None
         self.webhooks: dict[str, list[dict[str, Any]]] = {}
         self.flows: list[dict[str, Any]] = []
         self.connected_tokens: list[str] = []
@@ -144,6 +145,8 @@ class FakeProvider:
                 return httpx.Response(
                     201, json={"data": {"id": "flow_1", "meta_flow_id": "998877665544"}}
                 )
+            if path.endswith("/health") and self.health_body is not None:
+                return httpx.Response(200, json=self.health_body)
             if path.endswith("/health"):
                 return httpx.Response(
                     200,

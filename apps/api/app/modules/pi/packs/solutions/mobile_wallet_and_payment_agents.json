@@ -1,0 +1,354 @@
+{
+  "industry": "mobile_wallet_and_payment_agents",
+  "name": "Mobile-wallet and payment agents (e.g. JazzCash/Easypaisa retailers)",
+  "sector": "7.L Finance-adjacent, energy and utilities",
+  "version": "1.1",
+  "problems": [
+    {
+      "id": "p1_stockout",
+      "n": 1,
+      "words": "E-float finishes by afternoon and customers go to the next shop",
+      "category": "stock_inventory",
+      "subtype": "stockout",
+      "quick_ideas": [
+        "Note the time float runs out each day for a week, so you know when the danger hour is",
+        "Top up before that hour rather than after you hit zero, so the busiest stretch is covered."
+      ],
+      "workzap_build": {
+        "keys": [
+          "stock_alerts"
+        ],
+        "text": "Float and cash level alerts by time of day, built from the counter's own totals, so the owner is warned before running out on any counter or shop.",
+        "tool_words": []
+      },
+      "ask_first": "On a busy day, which runs out first, e-float or cash?",
+      "free_stops": "Alert levels and how they adjust for busy days are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many customers leave without service after float finishes each day, so lost demand at the counter is clearer.",
+          "review": false
+        },
+        {
+          "text": "Give one person the midday float check every day, so replenishment starts before customers drift to the next shop.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p2_cash_flow_tight",
+      "n": 2,
+      "words": "Plenty of e-float but no physical cash for cash-outs",
+      "category": "cash_collections",
+      "subtype": "cash_flow_tight",
+      "quick_ideas": [
+        "Check cash and float side by side at midday, so the imbalance is seen while there is still time",
+        "Note the days cash-outs outrun cash-ins, so you can plan cash for those days."
+      ],
+      "workzap_build": {
+        "keys": [
+          "stock_alerts"
+        ],
+        "text": "nori_daily_read — A midday and evening read of cash against float per counter, with a heads-up on days that usually tip one way.",
+        "tool_words": []
+      },
+      "ask_first": "Does the imbalance occur daily, or mainly around salary days and weekends?",
+      "free_stops": "How the balance is read and the warning thresholds are set is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note the time cash-outs start being refused each day, so you can spot the stretch hurting service most.",
+          "review": false
+        },
+        {
+          "text": "Give one worker the midday cash check and one page for shortages, so cash-out pressure gets flagged before the rush.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p3_slow_replenishment",
+      "n": 3,
+      "words": "Topping up float means leaving the shop, and the distributor is late on busy days",
+      "category": "suppliers_purchasing",
+      "subtype": "slow_replenishment",
+      "quick_ideas": [
+        "Write down when each top-up was requested and when it arrived, so delays are on record",
+        "Agree a fixed top-up time with the distributor before your peak, so you are not chasing at the worst moment."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "A top-up log by distributor and time that shows delay patterns and reminds the owner when it is time to request.",
+        "tool_words": []
+      },
+      "ask_first": "Is the delay mostly from the distributor, or from your own trips to top up?",
+      "free_stops": "The log and reminder timing are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note which busy-day top-up requests arrive after the counter has already slowed or stopped, so the late pattern is clearer.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of making every top-up request at the same daily time, so delays are easier to challenge.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p4_cash_mismatch",
+      "n": 4,
+      "words": "Cash and float never balance at day close",
+      "category": "cash_collections",
+      "subtype": "cash_mismatch",
+      "quick_ideas": [
+        "Record opening cash and float every morning, so the evening count has a starting point",
+        "Write a reason beside every evening difference, so repeat causes stand out."
+      ],
+      "workzap_build": {
+        "keys": [
+          "cash_reconciliation"
+        ],
+        "text": "A day-close sheet with opening, top-ups and closing counts that flags variances and keeps the reason, across every counter and shop.",
+        "tool_words": []
+      },
+      "ask_first": "Is the gap usually small each day, or sometimes large?",
+      "free_stops": "The day-close layout and variance rules are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count on which shift the closing difference happens most often, so you can narrow the problem to a routine.",
+          "review": false
+        },
+        {
+          "text": "Keep one day-close sheet at the counter for every shift handover, so the missing piece is caught before closing.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p5_cash_leakage",
+      "n": 5,
+      "words": "The boy at the counter does transactions without writing them in the khata",
+      "category": "loss_security",
+      "subtype": "cash_leakage",
+      "quick_ideas": [
+        "Compare the khata with the wallet company's own statement once a day, so unrecorded transactions show up",
+        "Ask that only type and amount are noted, never customer details, so the record is quick enough to keep."
+      ],
+      "workzap_build": {
+        "keys": [
+          "custom_build"
+        ],
+        "text": "a simple counter log on the phone, with transaction type and amount only and no customer data, giving totals by wallet company and an end-of-day WhatsApp summary to the owner.",
+        "tool_words": [
+          "platform"
+        ]
+      },
+      "ask_first": "Does this occur mostly when you are away, or even when you are in the shop?",
+      "free_stops": "Log design and summary content are in the solution document; pi records the control gap, never names staff.",
+      "extra_ideas": [
+        {
+          "text": "Count how many times cash changes hands before the khata is updated during one shift, so the leakage point shows.",
+          "review": false
+        },
+        {
+          "text": "Make one person check the khata at each shift handover, so skipped entries are caught while the staff member is present.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p6_theft_external",
+      "n": 6,
+      "words": "We took a fake note on a cash-in and lost it",
+      "category": "loss_security",
+      "subtype": "theft_external",
+      "quick_ideas": [
+        "Keep a note checker at the counter and check larger notes every time, so fakes are stopped before the transaction",
+        "Record each fake note incident, so you see if it clusters by time or counter; report crimes to the police."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "An incident log for fake notes, fraud attempts, wrong sends and downtime, with a monthly summary of losses by type.",
+        "tool_words": []
+      },
+      "ask_first": "Does it come up mostly with large notes, or at busy times at the counter?",
+      "free_stops": "Incident categories and reporting are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note the time, note type and counter worker for each fake note loss, so the pattern behind losses is clearer.",
+          "review": false
+        },
+        {
+          "text": "Give one worker the job of marking every fake-note incident in one notebook, so repeat trouble gets tracked in one place.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p7_fraud",
+      "n": 7,
+      "words": "Fraud calls try to trick staff into making transfers",
+      "category": "loss_security",
+      "subtype": "fraud",
+      "quick_ideas": [
+        "Set one clear rule that no transfer is made on a phone instruction alone, so staff have something to stand behind",
+        "Brief every counter person on that rule this week, so it does not depend on who is on shift."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "An opening and closing checklist for staff that includes the counter rules, signed each shift, plus the incident log.",
+        "tool_words": []
+      },
+      "ask_first": "Do these calls come every week, or only now and then?",
+      "free_stops": "Checklist content is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many suspicious calls or messages reach the counter in a week, so staff see the fraud pressure is real.",
+          "review": false
+        },
+        {
+          "text": "Give one senior person the job of handling all suspicious transfer requests, so counter staff stop deciding under pressure alone.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p8_complaints",
+      "n": 8,
+      "words": "Customers say \"paisay nahi aaye\" and argue at the counter",
+      "category": "customers_retention",
+      "subtype": "complaints",
+      "quick_ideas": [
+        "Hand over or show a receipt for every transaction, so there is proof at the counter",
+        "Direct unresolved cases to the wallet company's own helpline, so the counter is not the dispute desk."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "a complaint log by type showing which issues repeat, with a standard way of pointing customers to the wallet company's own helpline.",
+        "tool_words": [
+          "platform"
+        ]
+      },
+      "ask_first": "Are most arguments about cash-ins not arriving, or about cash-outs?",
+      "free_stops": "Complaint categories and handling flow are in the solution document; pi never explains fees, limits or company policy.",
+      "extra_ideas": [
+        {
+          "text": "Count how many arguments start after customers say money did not arrive, so you see how much counter time they consume.",
+          "review": false
+        },
+        {
+          "text": "Give one worker the job of writing unresolved complaint moments in one notebook, so repeat patterns at the counter stop getting lost.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p9_commission_reconciliation",
+      "n": 9,
+      "words": "Commission statements are hard to match with what we actually did",
+      "category": "cash_collections",
+      "subtype": "commission_reconciliation",
+      "quick_ideas": [
+        "Note daily totals by transaction type in one notebook and compare them with the statement later, so mismatches have a starting point.",
+        "Give one person a fixed weekly time to review statement gaps in one place, so reconciliation stops getting left until later."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "a weekly view of commission expected versus received per wallet company, built from the counter log totals.",
+        "tool_words": [
+          "platform"
+        ],
+        "leads_with_view": true
+      },
+      "ask_first": "Is the difference mostly in one wallet company, or across all of them?",
+      "free_stops": "Matching logic is in the solution document.",
+      "quick_ideas_original": [
+        "Keep weekly totals by transaction type per platform, so there is a figure to compare",
+        "Note each gap and raise it with the platform or distributor in one batch."
+      ]
+    },
+    {
+      "id": "p10_margin_unknown",
+      "n": 10,
+      "words": "I cannot tell if the wallet counter is worth the space and staff",
+      "category": "margin_cost",
+      "subtype": "margin_unknown",
+      "quick_ideas": [
+        "Write down what the counter costs you each month in staff time and space, so you have one side of the sum",
+        "Total a month of commission per wallet company, so you see the other side of the account."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "a counter profitability view comparing commission totals with the costs the owner enters, by shop and wallet company.",
+        "tool_words": [
+          "platform"
+        ],
+        "leads_with_view": true
+      },
+      "ask_first": "Does the counter bring in customers for your other goods too, or only wallet work?",
+      "free_stops": "How costs are allocated is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many counter transactions happen in your busiest hour and your slowest hour, so the space value is clearer.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member a notebook for daily counter activity and nearby shopwalk observations, so worth is judged from one weekly record.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p11_owner_blind",
+      "n": 11,
+      "words": "Staff run the counter when I am not there and I have no idea what happened",
+      "category": "reporting_visibility",
+      "subtype": "owner_blind",
+      "quick_ideas": [
+        "Ask for a short end-of-day message with counts, top-ups and any incident, so you hear something every day",
+        "Visit at closing once or twice unannounced this week, so you see the routine as it is."
+      ],
+      "workzap_build": {
+        "keys": [
+          "nori_daily_read"
+        ],
+        "text": "A short morning read for the owner of every counter's totals, day-close result and incidents, with the one thing to look at today.",
+        "tool_words": []
+      },
+      "ask_first": "Are you away from the shop for a few hours a day, or for whole days?",
+      "free_stops": "Summary content and multi-shop view are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note each shift's opening and closing float, cash and unresolved issues in one notebook, so you can see what changed while away.",
+          "review": false
+        },
+        {
+          "text": "Give the closing worker one fixed handover note for every shift, so missing details stop disappearing between staff.",
+          "review": false
+        }
+      ]
+    }
+  ],
+  "never_say": [
+    "Anything about wallet fees, transaction limits, account opening rules or platform policy.",
+    "Anything that bypasses biometric verification, uses one person's ID for another, splits transactions or does off-record transactions.",
+    "Any request for customer numbers, wallet numbers, CNIC, PINs, OTPs, transaction IDs, or the agent's own login.",
+    "When or where cash is moved.",
+    "Anything during a robbery or threat other than pointing to emergency services."
+  ],
+  "sample_reply": {
+    "person": "Float roz dopehar tak khatam ho jata hai aur customer doosri dukaan chale jate hain, koi hal batayein.",
+    "pi": "Haan, is ko behtar kiya ja sakta hai, aur pehla qadam aasan hai.\nPehle, ek hafte tak note karein float kis waqt khatam hota hai, taake asal khatre ka waqt pata chale.\nDoosra, us waqt se pehle top-up karein, zero pe pohanchne ke baad nahi, taake rush ka waqt cover ho.\nWorkzap is tarah ka intezam kar sakta hai: counter ke totals se float aur cash ka level dekh kar khatam hone se pehle alert, aur har shaam aap ko poore din ki summary.",
+    "language": "roman_urdu"
+  }
+}

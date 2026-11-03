@@ -24,7 +24,7 @@ export type AgentKey =
   | "requirement"
   | "sales_order"
   | "handoff";
-export type ProviderName = "openai" | "gemini" | "groq";
+export type ProviderName = "openai" | "gemini" | "groq" | "anthropic";
 // A run's steps: the agents, plus what pi did besides replying.
 export type RunStep = AgentKey | "team_question" | "meeting_request";
 
@@ -62,7 +62,7 @@ export type Message = {
   message_type: "text" | "audio" | "image" | "video" | "interactive" | "other";
   body: string;
   media: {
-    mime_type: string;
+    mime_type?: string;
     size?: number;
     duration_s?: number;
     transcript?: string;
@@ -71,6 +71,13 @@ export type Message = {
     file_kind?: "document";
     file_id?: string;
     filename?: string;
+    /** Pictures, PDFs and buttons pi sent. */
+    image?: string;
+    visual?: string;
+    alt?: string;
+    map_version?: number | string;
+    document?: { link?: string; filename?: string };
+    buttons?: string[];
   } | null;
   status:
     | "received"

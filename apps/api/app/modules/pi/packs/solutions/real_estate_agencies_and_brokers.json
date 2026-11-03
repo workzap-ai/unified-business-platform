@@ -1,0 +1,324 @@
+{
+  "industry": "real_estate_agencies_and_brokers",
+  "name": "Real estate agencies and brokers",
+  "sector": "7.F Construction, real estate and facilities",
+  "version": "1.1",
+  "problems": [
+    {
+      "id": "p1_lead_followup_slow",
+      "n": 1,
+      "words": "Leads from portals sit for hours before anyone calls",
+      "category": "marketing_leads",
+      "subtype": "lead_followup_slow",
+      "quick_ideas": [
+        "Send all portal enquiries to one office number or inbox, so no lead lives on one agent's phone",
+        "Name who picks up new leads each shift, so nothing waits for \"someone\"."
+      ],
+      "workzap_build": {
+        "keys": [
+          "lead_followup"
+        ],
+        "text": "You would see enquiries from property websites, social ads, your own site and chat gathered in one inbox, each assigned on its own and timed, with every agent's speed visible to you daily.",
+        "tool_words": [
+          "portal"
+        ]
+      },
+      "ask_first": "Who decides which agent gets a new lead today?",
+      "free_stops": "The assignment rules and response targets are set in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note the time each online enquiry arrives and the time of first call back today, so waiting hours show up clearly.",
+          "review": false
+        },
+        {
+          "text": "Assign one desk person each half day to call fresh online leads, so replies start before interest cools.",
+          "review": true
+        }
+      ]
+    },
+    {
+      "id": "p2_campaign_roi_unknown",
+      "n": 2,
+      "words": "We pay Bayut and Property Finder and I don't know which listings bring calls",
+      "category": "marketing_leads",
+      "subtype": "campaign_roi_unknown",
+      "quick_ideas": [
+        "For one week, count calls and booked viewings from each advertised property source in a notebook, so weak listing sources stand out.",
+        "Give one staff member a fixed evening check to note every inquiry source on one office page, so source comparisons stay complete."
+      ],
+      "workzap_build": {
+        "keys": [
+          "attribution_codes",
+          "dashboards_reports"
+        ],
+        "text": "You would see spend set against leads and deals for each listing site, listing and agent, kept up to date from the lead inbox.",
+        "tool_words": [
+          "portal"
+        ]
+      },
+      "ask_first": "Which listing websites do you pay for right now?",
+      "free_stops": "How sources are tagged and the report is structured is in the solution document.",
+      "quick_ideas_original": [
+        "Export each portal's own lead report once, to see calls per listing",
+        "Ask agents to note the portal on every lead for a week, so you have a first comparison."
+      ]
+    },
+    {
+      "id": "p3_stale_listings",
+      "n": 3,
+      "words": "The same property is listed five times and rented units stay up",
+      "category": "stock_inventory",
+      "subtype": "stale_listings",
+      "quick_ideas": [
+        "Keep one master record per property with a single owner agent, so duplicates have nowhere to start",
+        "Do one sweep of live ads against that list and pull anything rented, sold or repeated."
+      ],
+      "workzap_build": {
+        "keys": [
+          "custom_build"
+        ],
+        "text": "You would see one register of listings with mandate and permit expiry per property, a check for duplicate ads, and listing sites told when a deal closes.",
+        "tool_words": [
+          "portal"
+        ]
+      },
+      "ask_first": "Roughly how many active listings do you have?",
+      "free_stops": "The duplicate-matching steps and site update rules are in the proposal document.",
+      "extra_ideas": [
+        {
+          "text": "Walk through your live property ads and mark repeated or already rented homes once, so clutter stealing enquiries is obvious.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member the weekly job of removing repeated and closed listings from one master list, so old stock stops resurfacing.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p4_commission_disputes",
+      "n": 4,
+      "words": "Two agents fight over a commission — both say it's their client",
+      "category": "people_staff",
+      "subtype": "commission_disputes",
+      "quick_ideas": [
+        "Put the commission split rule on one page and have every agent acknowledge it",
+        "Treat the first logged contact time as the deciding record, so disputes have a referee."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger",
+          "workflow_automation"
+        ],
+        "text": "Timestamped lead registration plus a commission ledger with split rules and per-agent statements, generated every month.",
+        "tool_words": []
+      },
+      "ask_first": "What usually starts a commission argument?",
+      "free_stops": "Split rules for teams and co-brokes are worked out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare disputed deals against the earliest office record of contact and viewing, so arguments shrink around one shared timeline.",
+          "review": false
+        },
+        {
+          "text": "Give one admin person the job of writing each new client contact into one office log, so ownership starts from a common record.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p5_data_loss",
+      "n": 5,
+      "words": "When an agent leaves, their whole pipeline is gone",
+      "category": "tech_systems",
+      "subtype": "data_loss",
+      "quick_ideas": [
+        "Ask every agent to put active deals in one shared office list by Friday",
+        "Use office-owned business numbers for client chats where you can, so conversations stay with the agency."
+      ],
+      "workzap_build": {
+        "keys": [
+          "lead_followup"
+        ],
+        "text": "A central pipeline where every lead and deal belongs to the agency, with stage and next step, so it can be reassigned the day someone leaves.",
+        "tool_words": []
+      },
+      "ask_first": "Where does an agent's client list live today: spreadsheets, paper files, or their phone?",
+      "free_stops": "The pipeline stages and handover process are defined in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "List all active deals each agent holds on their own phone today, so the pipeline at risk is clear before anyone leaves.",
+          "review": false
+        },
+        {
+          "text": "Make Friday handover notes one routine in one office notebook, so live deals stay with the agency when staff change.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p6_performance_unknown",
+      "n": 6,
+      "words": "I can't tell which agents are working and which are just sitting",
+      "category": "people_staff",
+      "subtype": "performance_unknown",
+      "quick_ideas": [
+        "Pick three activity numbers every agent reports weekly, so effort is visible",
+        "Review them once openly as a team, so the standard is shared."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "An agent activity board built from real calls, viewings, offers and deals, updated daily without anyone filling a form.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "How many agents do you have, and how are they paid?",
+      "free_stops": "Which measures to track and how they are captured is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count each agent's viewings, follow ups and new conversations this week, so idle time stands out beside real effort.",
+          "review": false
+        },
+        {
+          "text": "Give one team lead a fixed weekly check in with one shared activity page, so work gets reviewed without chasing everyone.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p7_licences_renewals",
+      "n": 7,
+      "words": "Advertising permits and agents' registrations expire at the last minute",
+      "category": "compliance_admin",
+      "subtype": "licences_renewals",
+      "quick_ideas": [
+        "Put every permit and registration expiry date in one calendar, so nothing is a surprise",
+        "Make one person responsible for renewals, so it isn't everyone's job and no one's."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "An expiry calendar linked to each listing and agent that alerts the responsible person well ahead, every time.",
+        "tool_words": []
+      },
+      "ask_first": "Who keeps track of expiry dates today?",
+      "free_stops": "Alert timing and the link between permits and live ads are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Write every permit and registration expiry month on one page this week, so last minute renewals stop surprising the office.",
+          "review": false
+        },
+        {
+          "text": "Give one admin person the standing job of checking renewal dates every Monday, so expiry chasing has a clear owner.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p8_handoffs",
+      "n": 8,
+      "words": "Viewings are booked badly — clients wait outside, keys aren't there",
+      "category": "operations_process",
+      "subtype": "handoffs",
+      "quick_ideas": [
+        "Confirm keys or access the day before every viewing, so no one arrives to a locked door",
+        "Keep a key log at the office, so you know where every set is."
+      ],
+      "workzap_build": {
+        "keys": [
+          "booking_scheduling"
+        ],
+        "text": "A viewing calendar with an access check that sends instant WhatsApp confirmations and reminders to the client.",
+        "tool_words": []
+      },
+      "ask_first": "How are viewings booked today?",
+      "free_stops": "The checklist steps and confirmation flow are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note how many viewings this week start late because keys or access are missing, so the handoff problem has a size.",
+          "review": false
+        },
+        {
+          "text": "Assign one person to own the daily key and access handover list, so booked viewings stop failing at the door.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p9_receivables_late",
+      "n": 9,
+      "words": "Commission from developers comes months after the deal",
+      "category": "cash_collections",
+      "subtype": "receivables_late",
+      "quick_ideas": [
+        "List every commission owed with deal date and who owes it, so the total is clear",
+        "Invoice the same week a deal closes, so the clock starts sooner."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger"
+        ],
+        "text": "A receivables tracker for developer and landlord commissions with ageing and reminders sent on schedule.",
+        "tool_words": []
+      },
+      "ask_first": "Who owes you commission at the moment: developers, landlords or clients?",
+      "free_stops": "The reminder schedule and escalation steps are kept for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many agreed commission files are still waiting after handover each week, so delays by developer are easier to compare.",
+          "review": false
+        },
+        {
+          "text": "Keep all post deal follow ups in one office notebook with one owner check time, so aging commission files stop being overlooked.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p10_repeat_low",
+      "n": 10,
+      "words": "Past buyers never hear from us again",
+      "category": "customers_retention",
+      "subtype": "repeat_low",
+      "quick_ideas": [
+        "Note the lease end dates of tenants you placed, so you can reach them before they move",
+        "Ask recent happy clients for a referral or a real review."
+      ],
+      "workzap_build": {
+        "keys": [
+          "customer_messaging",
+          "reviews_collection"
+        ],
+        "text": "Lease-expiry and anniversary messages to past clients who opted in, and a review request sent right after each smooth deal.",
+        "tool_words": []
+      },
+      "ask_first": "What happens with a client after the deal closes today?",
+      "free_stops": "Timing and the message journey are planned in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many past buyers you placed last season received any check in message, so repeat business you are missing becomes visible.",
+          "review": false
+        },
+        {
+          "text": "Give one agent a weekly past buyer follow up hour and one notebook page, so old clients stop slipping away quietly.",
+          "review": false
+        }
+      ]
+    }
+  ],
+  "never_say": [
+    "Any view on title checks, deposits, MOUs, Form A/B/F terms or tenancy disputes; suggest a lawyer or the relevant authority.",
+    "Any valuation or \"this is a good price\" opinion, or investment advice.",
+    "Any help with fake or bait listings, listing without the owner's permission or advertising without a required permit.",
+    "Any help hiding cash deals, under-declaring prices or routing payments around tax.",
+    "Any covert monitoring of agents' phones; suspected fraud is a business risk, not an investigation."
+  ],
+  "sample_reply": {
+    "person": "I need a fix for this — we're paying for three listing websites and I genuinely can't tell which one is producing deals.",
+    "pi": "Yes, this can be improved, and none of it needs special equipment.\nFirst, route every website enquiry to one office number or inbox, so the source is known from the first contact.\nSecond, put one month of spend, leads and closed deals per listing site side by side before renewing any package.\nTo keep it going, Workzap could set up: every enquiry tagged by site source and listing, assigned to an agent, and spend against deals reported each week.\n\nShall I prepare a proposal document and quote for you? You're welcome to say no.",
+    "language": "english"
+  }
+}

@@ -1,9 +1,12 @@
+from collections.abc import AsyncIterator
+from contextlib import asynccontextmanager
 from copy import deepcopy
 from decimal import Decimal
 from typing import Any
 from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field
+from sqlalchemy import event, select
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -57,6 +60,15 @@ DEFAULTS: dict[str, Any] = {
         # ai_led | mixed | human_approved (see tools.handlers._delivery_status).
         "execution_mode": "ai_led",
         "staff_summary_language": "en",
+        # pi's constitution as a reply linter (pi Brain spec Parts 1, 2, 6): AI disclosure, one
+        # short question, no hype, no money or identity slips. Off until a workspace opts in.
+        "constitution": False,
+        # "brain" = Workzap's own pi flow (pi Brain spec): a conversation state machine, the
+        # constitution linter and listening-first rules. "standard" = the shared flow.
+        "pi_mode": "standard",
+        # Tunable numbers inside their tested ranges and the learning switch (brain_config.py,
+        # learning.frozen). Empty = every default; learning stays frozen until set to False.
+        "brain": {},
     },
     "ai_config": {
         "router_alias": "fast",
@@ -119,6 +131,9 @@ DEFAULTS: dict[str, Any] = {
         "min_score": "0.30",
         "semantic_enabled": False,
         "cite_sources_to_operators": True,
+        # Industry knowledge packs: pi learns how the customer's trade talks and what to
+        # listen for (pi Brain spec, Part 7). Off until a workspace turns it on.
+        "industry_packs": False,
     },
     "whatsapp_config": {
         "send_read_receipts": False,
@@ -170,7 +185,46 @@ class VersionInput(BaseModel):
     note: str = Field(default="", max_length=200)
 
 
+_TURN_CACHE = "pi_settings_turn_cache"
+
+
+@asynccontextmanager
+async def settings_cache_for_turn(session: AsyncSession) -> AsyncIterator[None]:
+    """Let `settings_row` answer from memory between two commits of this session.
+
+    A pi turn asks for the settings about eight times (each call was an upsert plus a read, two
+    round trips to a remote database). Inside this block the first call reads them and later
+    calls return the same row until the session commits or rolls back, which is exactly when a
+    fresh read could see anything new. Only the turn runner uses it; every other caller, and any
+    code after the block, keeps reading every time."""
+    cache: dict[tuple[UUID, UUID], PiSettings] = {}
+    session.info[_TURN_CACHE] = cache
+
+    def clear(_session: Any, *_: Any) -> None:
+        cache.clear()
+
+    for name in ("after_commit", "after_rollback"):
+        event.listen(session.sync_session, name, clear)
+    try:
+        yield
+    finally:
+        for name in ("after_commit", "after_rollback"):
+            event.remove(session.sync_session, name, clear)
+        session.info.pop(_TURN_CACHE, None)
+
+
 async def settings_row(session: AsyncSession, scope: WorkspaceScope) -> PiSettings:
+    cache: dict[tuple[UUID, UUID], PiSettings] | None = session.info.get(_TURN_CACHE)
+    key = (scope.tenant_id, scope.environment_id)
+    if cache is not None and key in cache:
+        return cache[key]
+    row = await _read_settings_row(session, scope)
+    if cache is not None:
+        cache[key] = row
+    return row
+
+
+async def _read_settings_row(session: AsyncSession, scope: WorkspaceScope) -> PiSettings:
     values = deepcopy(DEFAULTS)
     values["provider_config"] = {}
     await session.execute(
@@ -271,7 +325,16 @@ async def update_settings(
 
 
 async def seed_agents(session: AsyncSession, scope: WorkspaceScope) -> None:
+    # One read of what exists, then an insert only for what is missing (was one insert per key,
+    # every turn). The insert keeps its ON CONFLICT guard for a concurrent first turn.
+    existing = set(
+        await session.scalars(
+            select(PiAgent.key).where(WorkspaceRepository(session, PiAgent, scope).predicate())
+        )
+    )
     for key in AGENT_KEYS:
+        if key in existing:
+            continue
         agent_id = await session.scalar(
             insert(PiAgent)
             .values(

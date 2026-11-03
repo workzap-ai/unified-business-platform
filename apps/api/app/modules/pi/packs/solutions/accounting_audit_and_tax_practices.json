@@ -1,0 +1,293 @@
+{
+  "industry": "accounting_audit_and_tax_practices",
+  "name": "Accounting, audit and tax practices",
+  "sector": "7.K Professional and business services",
+  "version": "1.1",
+  "problems": [
+    {
+      "id": "p1_capacity",
+      "n": 1,
+      "words": "Every season we drown in returns because clients send papers in the last week",
+      "category": "operations_process",
+      "subtype": "capacity",
+      "quick_ideas": [
+        "Send every client one written list of the papers you need with an early \"papers by\" date, so the late pile-up starts moving forward",
+        "Sort this season's clients into early and late groups on paper, so you can see where the crunch will land before it arrives."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking",
+          "workflow_automation"
+        ],
+        "text": "a season board where every client job moves through documents requested, received, in progress, review, filed and billed, with polite reminders sent to clients for missing papers and a daily message showing what is still outstanding.",
+        "tool_words": []
+      },
+      "ask_first": "Roughly how many of your clients are monthly retainers versus one-off filings?",
+      "free_stops": "the exact stages, chaser timing and how the board is split by staff member go into the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many return files arrived in the final week last season, so you see how much the rush is driven by timing.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member the job of noting missing papers on one office list daily, so late clients get chased before the pile-up grows.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p2_info_lost_in_whatsapp",
+      "n": 2,
+      "words": "Clients send bank statements as WhatsApp photos and we lose track of what came in",
+      "category": "communication_coordination",
+      "subtype": "info_lost_in_whatsapp",
+      "quick_ideas": [
+        "Give clients one office number for documents only, so papers stop scattering across staff phones",
+        "Do a one-time sweep of this month's chats into each client's folder, so you know what you actually hold."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "WhatsApp document intake where anything sent to the office number is filed under the right client and job, acknowledged with an immediate message, and ticked off against that job's missing-documents checklist.",
+        "tool_words": []
+      },
+      "ask_first": "Do most statements arrive on a few staff phones, or are they spread across everyone's chats?",
+      "free_stops": "how files are matched to clients and jobs, and the acknowledgement flow, are set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note for one week which client papers arrive as chat photos and where they were saved, so missing items stop being guessed.",
+          "review": false
+        },
+        {
+          "text": "Make one staff member responsible for recording every document received in one notebook, so everyone can check what actually came in.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p3_no_dashboard",
+      "n": 3,
+      "words": "I don't know which jobs are stuck at which stage",
+      "category": "reporting_visibility",
+      "subtype": "no_dashboard",
+      "quick_ideas": [
+        "List every open job once with its current stage and who holds it, so the stuck ones show up on one page",
+        "Hold one short team meeting to walk that list, so everyone sees the same picture."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking",
+          "dashboards_reports"
+        ],
+        "text": "a partner screen updated every day showing jobs by stage and staff member, with a warning message when a file hasn't moved for several days.",
+        "tool_words": []
+      },
+      "ask_first": "Are jobs mostly stuck waiting on clients for papers, or waiting inside the office for someone to review?",
+      "free_stops": "which stages to track and when a job counts as stuck are worked out for your practice in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Walk round every open file and note its current stage and holder on one page, so blocked work stops hiding between desks.",
+          "review": false
+        },
+        {
+          "text": "Set one fixed time each day for updating the open jobs list, so everyone works from the same current picture.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p4_owner_bottleneck",
+      "n": 4,
+      "words": "Nothing leaves without my sign-off, so everything waits for me",
+      "category": "communication_coordination",
+      "subtype": "owner_bottleneck",
+      "quick_ideas": [
+        "Count how many files are waiting for your review today and how long each has waited, so you see the real size of the queue",
+        "Agree with your seniors which simple work types they first-check before it reaches you, within your professional rules."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "a review queue showing every file waiting for partner sign-off, how long it has waited and whether the senior check is done, with a daily nudge when files sit too long.",
+        "tool_words": []
+      },
+      "ask_first": "Is your sign-off needed on every file, or only on certain kinds of work like audits and returns?",
+      "free_stops": "the review levels, checklists and escalation timings are kept for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note which files waited for your sign-off this week and what type of work they were, so the biggest review choke points stand out.",
+          "review": false
+        },
+        {
+          "text": "Keep one tray or one list for items needing your sign-off, so staff stop chasing you in scattered moments.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p5_receivables_late",
+      "n": 5,
+      "words": "Bookkeeping clients pay three or four months late",
+      "category": "cash_collections",
+      "subtype": "receivables_late",
+      "quick_ideas": [
+        "Make one list of every unpaid invoice with its age, so you know exactly who to chase first",
+        "Pick one person to own collections, so follow-up stops depending on whoever is free."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger"
+        ],
+        "text": "a receivables ledger per client with ageing and polite reminders sent on schedule, so the partner sees each morning who owes what and for how long.",
+        "tool_words": []
+      },
+      "ask_first": "Is it a handful of large clients paying late, or most of your bookkeeping clients?",
+      "free_stops": "the reminder sequence and how it links to your invoicing are designed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many bookkeeping invoices stay unpaid past each monthly review, so you see whether delay starts after sending or after follow-up.",
+          "review": false
+        },
+        {
+          "text": "Keep all overdue bookkeeping invoices on one paper list with one staff owner, so every caller sees the same next action.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p6_margin_unknown",
+      "n": 6,
+      "words": "We charge a flat fee but some clients take far more work, and staff don't log time",
+      "category": "margin_cost",
+      "subtype": "margin_unknown",
+      "quick_ideas": [
+        "Ask staff to note hours on your five biggest fixed-fee clients for one month, so you have a first real comparison",
+        "Put those hours next to the fee once, so the clients who cost more than they pay stand out."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking",
+          "dashboards_reports"
+        ],
+        "text": "a simple phone timesheet linked to each job, rolled up daily into fee versus hours per client, with fixed-fee clients flagged when they run over.",
+        "tool_words": []
+      },
+      "ask_first": "Is the extra work mostly from a few difficult clients, or spread across most fixed-fee clients?",
+      "free_stops": "how time is captured without slowing staff, and how the profitability view is calculated, are left for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Have staff mark start and finish times for flat-fee year-end jobs this week, so the heaviest clients show up fast.",
+          "review": false
+        },
+        {
+          "text": "Give one person one notebook for flat-fee job time notes each day, so fee decisions use fresh work patterns.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p7_hidden_costs",
+      "n": 7,
+      "words": "Clients ask for extra reports and we never bill for them",
+      "category": "margin_cost",
+      "subtype": "hidden_costs",
+      "quick_ideas": [
+        "Write down once what each retainer actually includes, so extra requests are easy to recognise",
+        "Start noting every extra request this month, so you can raise them at the next fee review."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking"
+        ],
+        "text": "an extra-work log per client where requests outside the retainer are recorded as they arrive and marked for billing right away.",
+        "tool_words": []
+      },
+      "ask_first": "Are the extra reports mostly asked for by a few clients, or do most of your clients ask for them?",
+      "free_stops": "how scope is defined per service and how extras flow into invoices are covered in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare this week's extra report requests with what each retainer usually covers, so unpaid work outside scope stands out clearly.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member one running list of extra report requests by retainer client, so fee review talks use examples.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p8_licences_renewals",
+      "n": 8,
+      "words": "We missed a filing deadline because nobody had it on a calendar",
+      "category": "compliance_admin",
+      "subtype": "licences_renewals",
+      "quick_ideas": [
+        "Put every client deadline for the next three months on one shared calendar, so no date lives only in someone's head",
+        "Name one owner for each deadline, so there is no doubt who is responsible."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "a deadline calendar per client and jurisdiction with reminders to staff and to clients at set intervals, and a weekly look-ahead sent to the partners.",
+        "tool_words": []
+      },
+      "ask_first": "Was that one missed deadline, or does it occur a few times every busy season?",
+      "free_stops": "reminder timings and how deadlines are loaded and kept current are set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many filing dates sit only in old messages or notebooks today, so you see the real exposure to missed deadlines.",
+          "review": false
+        },
+        {
+          "text": "Keep every upcoming filing date in one office notebook with one owner beside each, so responsibility stays clear all week.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p9_data_loss",
+      "n": 9,
+      "words": "Our client files are on one laptop and a USB",
+      "category": "tech_systems",
+      "subtype": "data_loss",
+      "quick_ideas": [
+        "Make one full backup copy today, so a single lost device can't take everything",
+        "Note who currently has access to client files, so you know where the gaps are."
+      ],
+      "workzap_build": {
+        "keys": [
+          "custom_build"
+        ],
+        "text": "secure shared client folders with access by role and an activity log, so files stay with the firm and every change is recorded.",
+        "tool_words": []
+      },
+      "ask_first": "Do those files exist anywhere else, or are the laptop and the USB the only copies?",
+      "free_stops": "the folder structure, access roles and backup routine are designed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "List where client files currently sit across the laptop, the drive and any paper piles, so single points of failure are easier to spot.",
+          "review": false
+        },
+        {
+          "text": "Give one person a weekly check of where the latest client files were placed, so storage stops drifting across places.",
+          "review": false
+        }
+      ]
+    }
+  ],
+  "never_say": [
+    "Any view on a client's tax position, what they owe, or how to reduce tax.",
+    "Any interpretation of FBR, FTA or CRA rules or deadlines beyond \"check with the authority or your own professional judgement\".",
+    "Anything that helps backdate documents, alter records or hide income.",
+    "That deadlines will never be missed again or that season will be stress-free.",
+    "Requests for client names, NTNs, TRNs, CNICs, Emirates IDs, SINs or bank statements."
+  ],
+  "sample_reply": {
+    "person": "Season sar pe hai aur sab kuch mere review pe atak jata hai, clients bhi papers late bhejte hain. Koi solution batayein.",
+    "pi": "Ji haan, ye theek ho sakta hai, aur pehla qadam aasan hai.\nPehle, har client ko ek dafa papers ki list aur ek jaldi wali \"papers by\" tareekh bhej dein, taake aakhri hafte ka dabaav aage aa jaye.\nDoosra, aaj ek dafa gin lein ke kitni files aap ke review ka intezar kar rahi hain aur kab se, taake asal queue saamne aa jaye.\nWorkzap is ke liye ye bana sakta hai: har client job ka stage, missing papers ke reminders aur aap ki review queue roz ek screen pe.",
+    "language": "roman_urdu"
+  }
+}

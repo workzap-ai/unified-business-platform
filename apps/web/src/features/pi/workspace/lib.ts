@@ -70,6 +70,7 @@ export const PROVIDER_LABELS: Record<ProviderName, string> = {
   openai: "OpenAI",
   gemini: "Google Gemini",
   groq: "Groq",
+  anthropic: "Claude",
 };
 
 export const PROVIDER_ROLE_LABELS: Record<ProviderHealth["role"], string> = {

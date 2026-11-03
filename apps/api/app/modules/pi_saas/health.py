@@ -83,6 +83,7 @@ PENALTY = {"problem": 20, "warning": 7, "ok": 0, "fixed": 0}
 REPLY_CODES = {
     "REPLY_LANGUAGE_MISMATCH": "reply wasn't in the customer's language",
     "INVENTED_DETAIL": "reply had a detail not in your knowledge",
+    "CONSTITUTION_BREAK": "reply broke one of pi's identity, money or privacy rules",
     "provider_failure": "AI providers were unavailable",
     "tool_failure": "a tool step failed",
     "low_confidence": "pi wasn't sure what was asked",
@@ -1108,7 +1109,9 @@ async def learned(session: AsyncSession, scope: WorkspaceScope) -> dict[str, int
 
 
 def _day(column: Any) -> Any:
-    return func.to_char(column, literal_column("'YYYY-MM-DD'"))
+    return func.to_char(
+        func.timezone(literal_column("'UTC'"), column), literal_column("'YYYY-MM-DD'")
+    )  # UTC day
 
 
 async def fixed_recently(session: AsyncSession, scope: WorkspaceScope) -> dict[str, Any]:
@@ -1212,7 +1215,10 @@ async def trends(session: AsyncSession, scope: WorkspaceScope) -> list[dict[str,
     return list(days.values())
 
 
-async def state(session: AsyncSession, scope: WorkspaceScope, settings: Any = None) -> dict:
+async def state(
+    session: AsyncSession, scope: WorkspaceScope, settings: Any = None
+) -> dict[str, Any]:
+    from app.modules.pi_saas import drift_run
     from app.modules.pi_saas.health_selftest import latest
 
     checks = await run_checks(session, scope, settings)
@@ -1232,6 +1238,7 @@ async def state(session: AsyncSession, scope: WorkspaceScope, settings: Any = No
         "gaps": await knowledge_gaps(session, scope),
         "learning": await learned(session, scope),
         "self_tests": await latest(session, scope),
+        "drift": await drift_run.latest(session, scope),
         "checked_at": datetime.now(UTC).isoformat(),
     }
 
@@ -1432,7 +1439,9 @@ async def _refresh_maps(session: AsyncSession, scope: WorkspaceScope, ctx: Conte
         await session.commit()
 
 
-async def heal_scope(session: AsyncSession, scope: WorkspaceScope, ctx: Context) -> list[dict]:
+async def heal_scope(
+    session: AsyncSession, scope: WorkspaceScope, ctx: Context
+) -> list[dict[str, Any]]:
     """The safe automatic fixes for one business. Each runs in its own savepoint, so one
     failure never stops the rest."""
     for fix in (_requeue_messages, _requeue_events, _requeue_documents, _draft_answers):

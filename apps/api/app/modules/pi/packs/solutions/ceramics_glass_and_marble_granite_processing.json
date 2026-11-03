@@ -1,0 +1,292 @@
+{
+  "industry": "ceramics_glass_and_marble_granite_processing",
+  "name": "Ceramics, glass and marble/granite processing",
+  "sector": "7.D Manufacturing and industry (part 2)",
+  "version": "1.1",
+  "problems": [
+    {
+      "id": "p1_order_errors",
+      "n": 1,
+      "words": "Customer picks a slab and a different one gets delivered",
+      "category": "orders_fulfilment",
+      "subtype": "order_errors",
+      "quick_ideas": [
+        "Number and photograph every slab in the yard once — makes each one identifiable",
+        "Tag the chosen slab with the customer's order the day they select it — stops it being sent elsewhere."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking"
+        ],
+        "text": "a slab register with photos and location, where a selected slab is reserved to the order so a different one can't be dispatched.",
+        "tool_words": []
+      },
+      "ask_first": "How are slabs identified in the yard now?",
+      "free_stops": "The numbering and reservation set-up is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many delivered slabs needed a return or exchange this week, so you see how often selection is getting mixed up.",
+          "review": false
+        },
+        {
+          "text": "Give one yard person the job of matching selected slab notes to the truck load list, so the right slab leaves each time.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p2_wastage_cost",
+      "n": 2,
+      "words": "Breakage in loading and transport eats the margin",
+      "category": "margin_cost",
+      "subtype": "wastage_cost",
+      "quick_ideas": [
+        "Record breakage by stage for a few weeks — shows where it really happens",
+        "Photograph each load before dispatch — settles disputes at site."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "a breakage log by stage with photos, totalled per route, driver and stone type.",
+        "tool_words": []
+      },
+      "ask_first": "Where does most breakage happen?",
+      "free_stops": "The capture steps are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note each broken piece by route and driver for one week, so you can spot where margin is getting hit hardest.",
+          "review": false
+        },
+        {
+          "text": "Give one loader the job of writing every damaged item in one notebook before unloading finishes, so claims stop getting missed.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p3_margin_unknown",
+      "n": 3,
+      "words": "Yield from each block is unknown",
+      "category": "margin_cost",
+      "subtype": "margin_unknown",
+      "quick_ideas": [
+        "Measure block volume in and saleable square feet out for a few blocks — gives a first yield figure",
+        "Compare suppliers on that figure — shows who gives value."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "a block yield tracker by supplier and stone type.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "Do you buy blocks or have your own quarry?",
+      "free_stops": "The yield calculation is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note each block received beside the saleable pieces produced from it, so you can see which blocks are paying back properly.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of recording block in and saleable out in one notebook, so yield stops being guessed.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p4_rework",
+      "n": 4,
+      "words": "Site measurements are wrong and stone or glass gets cut wrong",
+      "category": "quality_complaints",
+      "subtype": "rework",
+      "quick_ideas": [
+        "Have measurements written and signed, not voice notes — removes misheard sizes",
+        "Read sizes back to the site before cutting — catches errors early."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "a measurement form for site teams sent straight to the cutting floor with sketches.",
+        "tool_words": []
+      },
+      "ask_first": "Who takes measurements at site?",
+      "free_stops": "The form and sign-off flow are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare written site sizes with the sizes actually used in cutting on recent jobs, so you can see where wrong measurements enter.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of keeping all site measurements in one notebook before cutting starts, so fewer jobs get remade.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p5_consistency_across_branches",
+      "n": 5,
+      "words": "Tiles from two batches differ in shade and the customer refuses them",
+      "category": "quality_complaints",
+      "subtype": "consistency_across_branches",
+      "quick_ideas": [
+        "Fill each order from a single batch — avoids mixed shades",
+        "Label stock by batch in the yard — makes that possible."
+      ],
+      "workzap_build": {
+        "keys": [
+          "stock_alerts"
+        ],
+        "text": "a tile batch and shade register so orders are allocated from one batch.",
+        "tool_words": []
+      },
+      "ask_first": "Is stock labelled by batch now?",
+      "free_stops": "Allocation rules are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many refused orders involved mixed batches this month, so you see how much shade variation is costing sales.",
+          "review": false
+        },
+        {
+          "text": "Give one branch staff member the job of keeping each order's batch note in one place, so mixed shades stop reaching customers.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p6_credit_customers",
+      "n": 6,
+      "words": "Contractors take material and pay after the project",
+      "category": "cash_collections",
+      "subtype": "credit_customers",
+      "quick_ideas": [
+        "List every contractor balance with its project — shows who to chase",
+        "Take an advance on new project orders — lowers your exposure."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger"
+        ],
+        "text": "a contractor and designer ledger with credit, ageing and reminders.",
+        "tool_words": []
+      },
+      "ask_first": "Who are your main credit customers?",
+      "free_stops": "Limit and reminder rules are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many finished projects still have unpaid material, so you see which completed jobs are still blocking fresh marble purchases.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member the job of noting every material issue against each site in one notebook daily, so bill disputes drop at collection time.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p7_delivery_late",
+      "n": 7,
+      "words": "Installation teams don't show up on the promised day",
+      "category": "orders_fulfilment",
+      "subtype": "delivery_late",
+      "quick_ideas": [
+        "Put all installation jobs for the coming week on one board — shows clashes",
+        "Confirm with each team the evening before — fewer no-shows."
+      ],
+      "workzap_build": {
+        "keys": [
+          "booking_scheduling"
+        ],
+        "text": "an installation scheduler for teams, with customer reminders and completion photos.",
+        "tool_words": []
+      },
+      "ask_first": "How many installation teams do you run?",
+      "free_stops": "The scheduling set-up is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note every promised installation date against the actual arrival date this week, so you can see which teams slip most.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of keeping next week's installation promises in one notebook, so double booking stops causing missed days.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p8_conversion_low",
+      "n": 8,
+      "words": "Quotations for big projects take a week",
+      "category": "sales_revenue",
+      "subtype": "conversion_low",
+      "quick_ideas": [
+        "Keep one current price sheet per stone or tile — speeds every quote",
+        "Reuse past project quotes as a base — cuts the work."
+      ],
+      "workzap_build": {
+        "keys": [
+          "custom_build"
+        ],
+        "text": "a quotation builder using current price per sq ft, wastage allowance and installation.",
+        "tool_words": []
+      },
+      "ask_first": "Who prepares quotations today?",
+      "free_stops": "The quote logic is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many big project quotations sat unfinished beyond the same week, so you see where response time is stalling sales.",
+          "review": false
+        },
+        {
+          "text": "Give one estimator the job of keeping all pending project quotations in one notebook, so urgent bids stop getting buried.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p9_website_issues",
+      "n": 9,
+      "words": "Walk-in customers can't see our full range",
+      "category": "marketing_leads",
+      "subtype": "website_issues",
+      "quick_ideas": [
+        "Photograph current yard stock — lets buyers browse before visiting",
+        "Put it on a WhatsApp catalogue — easy to share with designers."
+      ],
+      "workzap_build": {
+        "keys": [
+          "website_digital"
+        ],
+        "text": "an online and WhatsApp catalogue of current yard stock with photos, updated from the slab register.",
+        "tool_words": []
+      },
+      "ask_first": "Do you sell mostly to homeowners or contractors?",
+      "free_stops": "The catalogue set-up is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Walk the showroom and note how many ranges a walk in customer cannot view in one visit, so missing visibility becomes clear.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member the job of keeping a single photo list of current ranges, so buyers can see more without waiting.",
+          "review": false
+        }
+      ]
+    }
+  ],
+  "never_say": [
+    "No kiln, furnace, cutting-machine, silica-dust, tempering or glass-installation safety advice.",
+    "Never comment on product standards.",
+    "Injuries from slabs, glass or blades: stop and point to emergency services.",
+    "No quarry or mining permit advice.",
+    "Never help mislabel origin or grade, or under-invoice exports; decline.",
+    "Never help structure designer or contractor kickbacks; no customer addresses or contractor contacts stored."
+  ],
+  "sample_reply": {
+    "person": "Koi solution batao. Customer yard mein slab pasand karta hai aur delivery pe koi aur slab chala jata hai.",
+    "pi": "Ji, is ka rasta nikal sakta hai, aur pehla qadam aasan hai.\nPehle, yard ke har slab ko ek dafa number de kar photo le lein, taake har slab ki pehchan ho.\nDoosra, jis din customer slab chune, usi din use order ke saath tag kar dein, taake woh kahin aur na jaye.\nLambay arse ke liye Workzap ye set kar sakta hai: slab register jahan chuna hua slab order se reserve ho jaye aur galat slab dispatch na ho sake.",
+    "language": "roman_urdu"
+  }
+}

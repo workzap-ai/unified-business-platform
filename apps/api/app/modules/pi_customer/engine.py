@@ -21,9 +21,10 @@ from typing import Any
 from sqlalchemy import select
 
 from app.modules.notifications.service import notify
+from app.modules.pi import flow
 from app.modules.pi.buttons import CARD, FOLLOW_UP
 from app.modules.pi.configuration import settings_row
-from app.modules.pi.followups import quiet_until
+from app.modules.pi.followups import TEMPLATE_GAP, last_follow_up_template, quiet_until
 from app.modules.pi.models import PiConversation, PiMessage, WhatsAppConnection
 from app.modules.pi.service import PiService
 from app.modules.pi_customer import service
@@ -45,13 +46,13 @@ MAP_ASK = re.compile(
 )
 NUDGE_AT, WINDOW = timedelta(hours=20), timedelta(hours=23, minutes=30)
 LADDER = (("day3", timedelta(days=3)), ("day7", timedelta(days=7)), ("day14", timedelta(days=14)))
-TEMPLATE_GAP = timedelta(hours=72)
 MAX_TOUCHES = 4
 HUMAN_QUIET = timedelta(hours=12)
 SLA_HOURS = ((12, "info"), (24, "warning"), (48, "critical"))
 STOP = re.compile(
-    r"\b(?:stop|unsubscribe|band karo|band kar do|band kardo|mat bhejo|mat bhejna|"
-    r"no more messages|don'?t message)\b",
+    r"\b(?:stop|unsubscribe|opt[\s-]?out|band karo|band kar do|band kardo|reminders? band karein|"
+    r"mat bhejo|mat bhejna|"
+    r"no more messages|don'?t message|أوقف\s*التذكيرات|لا\s*ترسل|بند\s*کریں|مت\s*بھیجو)\b",
     re.IGNORECASE,
 )
 
@@ -176,7 +177,7 @@ TEXT: dict[str, dict[str, Any]] = {
 
 
 def prayer_or_quiet(policy: Any, now: datetime | None = None) -> bool:
-    """No sends at night (business quiet hours) or during Friday prayers (12:30-14:30)."""
+    """No sends at night (business quiet hours) or during Friday prayers (12:00-14:30)."""
     from app.modules.pi.policy import zone
 
     config = policy.whatsapp_config or {}
@@ -186,7 +187,7 @@ def prayer_or_quiet(policy: Any, now: datetime | None = None) -> bool:
         return True
     local = (now or datetime.now(UTC)).astimezone(zone(policy.timezone))
     minutes = local.hour * 60 + local.minute
-    return local.weekday() == 4 and 12 * 60 + 30 <= minutes < 14 * 60 + 30
+    return local.weekday() == 4 and 12 * 60 <= minutes < 14 * 60 + 30
 
 
 async def sweep_customer_journeys(ctx: dict[str, Any]) -> None:
@@ -263,6 +264,8 @@ async def read_quiet_chats(ctx: dict[str, Any]) -> list[str]:
             if scope is None:
                 continue
             policy = await settings_row(session, scope)
+            if flow.brain_mode(policy.response_rules):
+                continue  # brain mode has its own follow-ups
             if not service.portal_on(policy.whatsapp_config):
                 continue
             prefs = await session.scalar(
@@ -520,10 +523,10 @@ def _sent(brief: dict[str, Any], since: str, step: str) -> bool:
     return any(n.get("since") == since and n.get("step") == step for n in brief.get("nudges") or [])
 
 
-async def run_ladder(ctx: dict[str, Any]) -> list[str]:
+async def run_ladder(ctx: dict[str, Any], now: datetime | None = None) -> list[str]:
     from app.modules.pi.runtime import system_scope
 
-    now = datetime.now(UTC)
+    now = now or datetime.now(UTC)
     outgoing: list[str] = []
     async with ctx["sessions"]() as session:
         conversations = await session.scalars(
@@ -545,6 +548,8 @@ async def run_ladder(ctx: dict[str, Any]) -> list[str]:
             if scope is None:
                 continue
             policy = await settings_row(session, scope)
+            if flow.brain_mode(policy.response_rules):
+                continue
             if (
                 not service.portal_on(policy.whatsapp_config)
                 or (policy.whatsapp_config or {}).get("follow_up_ladder", True) is False
@@ -654,12 +659,16 @@ async def nudge_customer(
         )
         _log(conversation, {"at": now.isoformat(), "since": since_raw, "step": "nudge1"})
         return str(message.id)
-    # After the window: approved templates only, with consent, one per 72 hours.
+    # After the window: approved templates only, with consent, one per 72 hours. The
+    # latest step that is due goes out, and never one that comes before a step already sent
+    # (consent given late must not send day 3 after day 7).
+    done = {n.get("step") for n in brief.get("nudges") or [] if n.get("since") == since_raw}
+    after_done = max((i for i, (name, _) in enumerate(LADDER) if name in done), default=-1)
     step = next(
         (
             name
-            for name, after in reversed(LADDER)
-            if waited >= after and not _sent(brief, since_raw, name)
+            for i, (name, after) in reversed(list(enumerate(LADDER)))
+            if i > after_done and waited >= after
         ),
         None,
     )
@@ -669,7 +678,9 @@ async def nudge_customer(
         (n["at"] for n in brief.get("nudges") or [] if n.get("step", "").startswith("day")),
         default=None,
     )
-    if last_template and now - datetime.fromisoformat(last_template) < TEMPLATE_GAP:
+    if (
+        last_template and now - datetime.fromisoformat(last_template) < TEMPLATE_GAP
+    ) or await last_follow_up_template(session, conversation, now - TEMPLATE_GAP):
         return None
     templates = (policy.whatsapp_config or {}).get("ladder_templates", {}).get(
         language or "en"
@@ -752,6 +763,11 @@ async def alert_team(
         # The analysis said "team's turn", but the customer never confirmed this brief:
         # nobody is working on it yet, so never tell them so (nor alert the team).
         return None
+    if (conversation.service_brief or {}).get("reminder_consent") == "declined" or STOP.search(
+        await _last_inbound_text(session, conversation) or ""
+    ):
+        # The customer opted out (STOP): no SLA alerts to the team and no status line.
+        return None
     waited = now - since
     for hours, severity in SLA_HOURS:
         if waited >= timedelta(hours=hours):
@@ -777,7 +793,10 @@ async def alert_team(
     ):
         return None
     hours = await service.team_update_hours(session, conversation)
-    due = service.next_update_by(since, hours).strftime("%a %d %b")
+    promised = service.next_update_by(since, hours)
+    if promised < now:  # never promise a day that has already passed
+        promised = service.next_update_by(now, min(hours, 24))
+    due = promised.strftime("%a %d %b")
     language = wa_language(await _last_inbound_text(session, conversation), conversation)
     body = TEXT[language]["status"](issue["title"], due)
     pi = PiService(session, scope)

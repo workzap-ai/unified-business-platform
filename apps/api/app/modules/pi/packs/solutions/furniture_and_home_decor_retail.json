@@ -1,0 +1,290 @@
+{
+  "industry": "furniture_and_home_decor_retail",
+  "name": "Furniture and home décor retail",
+  "sector": "7.A Retail and consumer (part 1)",
+  "version": "1.1",
+  "problems": [
+    {
+      "id": "p1_delivery_late",
+      "n": 1,
+      "words": "Custom orders take double the promised time",
+      "category": "orders_fulfilment",
+      "subtype": "delivery_late",
+      "quick_ideas": [
+        "Look at a few late orders to see which stage they slipped at, because delays usually start in one place",
+        "Build a buffer into promised dates, so customers hear a date you can keep."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking"
+        ],
+        "text": "a made-to-order board with stages and promised date, with late alerts.",
+        "tool_words": []
+      },
+      "ask_first": "Which stage usually holds things up?",
+      "free_stops": "The stages and alert rules are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare promised dates with actual finish dates on recent custom orders, so you spot which part of the job adds extra waiting.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member a daily notebook for every open custom order status, so delayed pieces are chased before customers start calling.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p2_order_tracking",
+      "n": 2,
+      "words": "I don't know which order is at which stage",
+      "category": "orders_fulfilment",
+      "subtype": "order_tracking",
+      "quick_ideas": [
+        "List every open order with its stage once, so you see the whole workshop at a glance",
+        "Ask outside vendors for a return date on each piece, so outsourced work stops disappearing."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking"
+        ],
+        "text": "every order tracked from design to assembly, including outside polish and upholstery.",
+        "tool_words": []
+      },
+      "ask_first": "How many orders are running now?",
+      "free_stops": "How vendors update stages is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Walk through the workshop and note each open order beside its current stage once, so missing and stalled pieces stop hiding.",
+          "review": false
+        },
+        {
+          "text": "Assign one person to update a single open orders list before closing time, so everyone checks the same status source.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p3_info_lost_in_whatsapp",
+      "n": 3,
+      "words": "Customer approved fabric on WhatsApp but says she chose another",
+      "category": "communication_coordination",
+      "subtype": "info_lost_in_whatsapp",
+      "quick_ideas": [
+        "Save approval photos in one folder per order, so they can be found later",
+        "Ask for a clear written approval on each choice, so a thumbs-up isn't the only record."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "approval on WhatsApp with sample photos and a saved, timed approval.",
+        "tool_words": []
+      },
+      "ask_first": "How do customers approve today?",
+      "free_stops": "How approvals are captured is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Match recent customer approvals against the fabric actually cut or ordered, so you see where choice records are breaking down.",
+          "review": false
+        },
+        {
+          "text": "Keep one paper order file for each custom piece with all customer approvals noted, so disputes over chosen fabric are easier to settle.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p4_raw_material_shortage",
+      "n": 4,
+      "words": "Wood, foam or fabric runs out mid-order",
+      "category": "stock_inventory",
+      "subtype": "raw_material_shortage",
+      "quick_ideas": [
+        "List materials needed for open orders once, so shortfalls show before work starts",
+        "Check that list against stock, so you buy before the carpenter is waiting."
+      ],
+      "workzap_build": {
+        "keys": [
+          "stock_alerts"
+        ],
+        "text": "a material list per order with shortfalls flagged before work begins.",
+        "tool_words": []
+      },
+      "ask_first": "Which materials run short most?",
+      "free_stops": "How requirements are worked out is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare materials needed for current orders with what is physically on hand, so work stoppages are spotted before cutting starts.",
+          "review": false
+        },
+        {
+          "text": "Give one person a single notebook page for materials committed to open orders, so wood, foam and fabric are not double promised.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p5_product_defects",
+      "n": 5,
+      "words": "Furniture gets damaged in delivery",
+      "category": "quality_complaints",
+      "subtype": "product_defects",
+      "quick_ideas": [
+        "Photograph pieces before they leave, so you know whether damage happened in transit",
+        "Note every damage by team and cause, so the pattern is clear."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "delivery photos, customer sign-off and a damage log by team and cause.",
+        "tool_words": []
+      },
+      "ask_first": "Do you deliver in-house?",
+      "free_stops": "The delivery check steps are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count which damage appears most often after delivery on recent pieces, so packing or handling weaknesses are easier to target.",
+          "review": false
+        },
+        {
+          "text": "Make one person check every outgoing piece against a single damage note before loading, so avoidable knocks are caught earlier.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p6_receivables_late",
+      "n": 6,
+      "words": "Balance payment is delayed after delivery",
+      "category": "cash_collections",
+      "subtype": "receivables_late",
+      "quick_ideas": [
+        "List every order's balance due once, so you know what's outstanding",
+        "Mention the balance when booking delivery, so payment isn't a surprise at the door."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger"
+        ],
+        "text": "advance and balance per order with reminders before delivery.",
+        "tool_words": []
+      },
+      "ask_first": "Which payments are hardest to collect?",
+      "free_stops": "The reminder timing is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare delivered orders from last week with balances actually received, so you spot which delivery situations most often leave cash pending.",
+          "review": false
+        },
+        {
+          "text": "Keep all delivered but unpaid orders with one assigned staff member after handover, so balance chasing starts from a single daily queue.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p7_conversion_low",
+      "n": 7,
+      "words": "Lots of visitors, few orders",
+      "category": "sales_revenue",
+      "subtype": "conversion_low",
+      "quick_ideas": [
+        "Count visitors and orders for a week, so you know the real gap",
+        "Ask visitors if they'd like a follow-up, with their permission, because big purchases are rarely decided on the first visit."
+      ],
+      "workzap_build": {
+        "keys": [
+          "lead_followup"
+        ],
+        "text": "an opt-in visitor list with reminders for salespeople.",
+        "tool_words": []
+      },
+      "ask_first": "What happens after someone visits without buying?",
+      "free_stops": "How follow-ups are timed and assigned is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count showroom visitors and orders on the same days this week, so you see when interest is not turning into bookings.",
+          "review": true
+        },
+        {
+          "text": "Give one salesperson the job of noting why serious visitors leave without ordering, so the team can address repeated objections.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p8_margin_unknown",
+      "n": 8,
+      "words": "We don't know the true cost of a custom sofa",
+      "category": "margin_cost",
+      "subtype": "margin_unknown",
+      "quick_ideas": [
+        "Cost out one popular custom piece fully once, so you see the real margin",
+        "Include delivery and labour hours, because they are the costs most often missed."
+      ],
+      "workzap_build": {
+        "keys": [
+          "custom_build"
+        ],
+        "text": "a costing sheet for custom pieces kept current as material costs change.",
+        "tool_words": []
+      },
+      "ask_first": "How do you price custom pieces today?",
+      "free_stops": "The costing structure is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Write one recent custom sofa's fabric, foam, frame, stitching and delivery notes on one page, so hidden cost-heavy parts stand out.",
+          "review": false
+        },
+        {
+          "text": "Make one cutter or supervisor add custom sofa job costs into one notebook before handover, so pricing reviews use the real work recorded.",
+          "review": true
+        }
+      ]
+    },
+    {
+      "id": "p9_owner_bottleneck",
+      "n": 9,
+      "words": "Every quote, design and price goes through me",
+      "category": "communication_coordination",
+      "subtype": "owner_bottleneck",
+      "quick_ideas": [
+        "List decisions waiting on you for a week, so you see which ones others could take",
+        "Hand standard quotes to one trusted person, so only unusual ones reach you."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "approval steps that only send you what needs you.",
+        "tool_words": []
+      },
+      "ask_first": "Who else could approve standard quotes?",
+      "free_stops": "Which decisions route where is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many quotes, design changes and price approvals waited for you this week, so your biggest slowdowns become visible.",
+          "review": true
+        },
+        {
+          "text": "Set one daily handover time when staff place routine quote and price decisions together, so you clear them in one batch.",
+          "review": true
+        }
+      ]
+    }
+  ],
+  "never_say": [
+    "That MDF can be sold as solid wood or other materials misrepresented.",
+    "Structural, wall-mounting or fire-safety advice; injuries go to medical help first.",
+    "Contract or legal advice on advances and cancellations.",
+    "Timber sourcing law or import duty advice.",
+    "That a delivery date is guaranteed."
+  ],
+  "sample_reply": {
+    "person": "We make sofas and beds to order. Customers keep complaining we're late, and I don't always know where their order is. What can we do?",
+    "pi": "Yes, this can be improved, and the first steps are simple.\nFirst, put every open order on one list with its stage and promised date, so the late ones stand out.\nSecond, ask the polish and upholstery vendors for a return date on each piece, so delays show early.\nBeyond these, Workzap could provide: a job board tracking every order from frame to assembly, including outside vendors, with alerts when one falls behind.\n\nShall I have a solution document and quote prepared for you? You're free to say no.",
+    "language": "english"
+  }
+}

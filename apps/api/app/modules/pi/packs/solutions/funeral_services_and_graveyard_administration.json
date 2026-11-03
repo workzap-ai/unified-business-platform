@@ -1,0 +1,320 @@
+{
+  "industry": "funeral_services_and_graveyard_administration",
+  "name": "Funeral services and graveyard administration",
+  "sector": "7.M Digital economy, social and public sector",
+  "version": "1.1",
+  "problems": [
+    {
+      "id": "p1_shift_scheduling",
+      "n": 1,
+      "words": "Calls come at any hour and the on-call person sometimes doesn't pick up",
+      "category": "people_staff",
+      "subtype": "shift_scheduling",
+      "quick_ideas": [
+        "Set a clear on-call rota with a named backup for every night",
+        "Share it with all staff, so everyone knows who is responsible."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "a round-the-clock WhatsApp intake line that routes each request to the on-call person and escalates if not acknowledged.",
+        "tool_words": []
+      },
+      "ask_first": "How do families reach you when someone passes away?",
+      "free_stops": "The routing and escalation rules are set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note every missed late call for one week with the duty person's name and timing, so the committee sees where cover is failing.",
+          "review": false
+        },
+        {
+          "text": "Keep one handwritten on-call list in one agreed place with a named backup each shift, so urgent calls reach someone reliably.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p2_bottleneck",
+      "n": 2,
+      "words": "Two families booked for the same hearse at the same time",
+      "category": "operations_process",
+      "subtype": "bottleneck",
+      "quick_ideas": [
+        "Keep one schedule for all vehicles that only one person updates",
+        "Check it before confirming any time with a family."
+      ],
+      "workzap_build": {
+        "keys": [
+          "booking_scheduling"
+        ],
+        "text": "a vehicle and cold-storage scheduling board that shows availability and blocks double-booking.",
+        "tool_words": []
+      },
+      "ask_first": "Do clashes involve mostly the hearse, or other vehicles too?",
+      "free_stops": "The board set-up is detailed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare booked hearse times from the past week against actual departures, so overlapping promises and delays are clear.",
+          "review": false
+        },
+        {
+          "text": "Give one dispatcher the job of writing every hearse booking in one vehicle diary, so double-bookings stop at confirmation time.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p3_maintenance_downtime",
+      "n": 3,
+      "words": "Cold storage unit broke down and we only found out late",
+      "category": "operations_process",
+      "subtype": "maintenance_downtime",
+      "quick_ideas": [
+        "Check and note the cold-storage temperature at fixed times each day",
+        "Book servicing before the summer heat."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "a maintenance log for vehicles and cold storage with service reminders and temperature alerts.",
+        "tool_words": []
+      },
+      "ask_first": "Did the cold storage unit break down in summer, or at other times too?",
+      "free_stops": "The check routine and alert levels go in the solution document; body-handling rules are for the health authority.",
+      "extra_ideas": [
+        {
+          "text": "Note the times the cold storage unit was checked this week and when faults were noticed, so delayed discovery stands out.",
+          "review": false
+        },
+        {
+          "text": "Assign one staff member each shift to write one condition note for the cold storage unit, so checks happen without reminders.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p4_stockout",
+      "n": 4,
+      "words": "We run out of kafan cloth or coffins at the worst moment",
+      "category": "stock_inventory",
+      "subtype": "stockout",
+      "quick_ideas": [
+        "Decide a minimum level for each supply item and count once a week",
+        "Keep a second supplier contact ready."
+      ],
+      "workzap_build": {
+        "keys": [
+          "stock_alerts"
+        ],
+        "text": "a supply tracker for shrouds, coffins and washing materials with reorder alerts.",
+        "tool_words": []
+      },
+      "ask_first": "Which runs out more often: kafan cloth or coffins?",
+      "free_stops": "The reorder levels and tracker are prepared in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count kafan cloth and coffins on hand before the busiest day, so shortages are spotted before families arrive.",
+          "review": false
+        },
+        {
+          "text": "Keep one supply list in one notebook and give one person the weekly count, so urgent items get noticed in time.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p5_no_visibility",
+      "n": 5,
+      "words": "The graveyard register is an old book; no one knows which plots are free",
+      "category": "stock_inventory",
+      "subtype": "no_visibility",
+      "quick_ideas": [
+        "Walk one section and mark plots as available, reserved or occupied, without names",
+        "Make one person responsible for every new allotment."
+      ],
+      "workzap_build": {
+        "keys": [
+          "erp_nori_platform"
+        ],
+        "text": "a digital graveyard register with plot status and an allocation workflow, access restricted by role.",
+        "tool_words": []
+      },
+      "ask_first": "Does the old register cover one graveyard, or several sections across different sites?",
+      "free_stops": "The register design and allocation flow are set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Walk one graveyard section and tally free, reserved and occupied plots without names, so the shortage or surplus becomes visible.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of marking each new allotment in the same register page, so free plots stay clear to staff.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p6_count_mismatch",
+      "n": 6,
+      "words": "Plots get double-allotted",
+      "category": "stock_inventory",
+      "subtype": "count_mismatch",
+      "quick_ideas": [
+        "Require every allotment to be checked against the register before confirming",
+        "Note each allotment the same day it is made."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "an allocation step that checks plot status first and locks a plot once allotted.",
+        "tool_words": []
+      },
+      "ask_first": "Do double allotments come in busy times, or when a different person writes the entry?",
+      "free_stops": "The allocation rules go in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare this week's allotments against the register entries for the same plots, so duplicate promises are spotted before families arrive.",
+          "review": false
+        },
+        {
+          "text": "Keep one allotment notebook with one person responsible for updating it before any plot is promised, so confusion drops quickly.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p7_cash_leakage",
+      "n": 7,
+      "words": "Cash payments and donations are not properly recorded",
+      "category": "loss_security",
+      "subtype": "cash_leakage",
+      "quick_ideas": [
+        "Give a written receipt for every payment and donation",
+        "Count and record cash at the close of each day with two people."
+      ],
+      "workzap_build": {
+        "keys": [
+          "cash_reconciliation"
+        ],
+        "text": "a payment and donation register with receipts and a daily cash close.",
+        "tool_words": []
+      },
+      "ask_first": "Is cash unrecorded mostly from service payments, or from donations?",
+      "free_stops": "The register and cash close routine are detailed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many payments and donations this week have a written note and how many do not, so the missing paperwork load is clear.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member one notebook for every payment and donation note at handover time, so the office can trace each entry calmly later.",
+          "review": true
+        }
+      ]
+    },
+    {
+      "id": "p8_customer_communication",
+      "n": 8,
+      "words": "Families keep calling for updates and staff are stretched",
+      "category": "customers_retention",
+      "subtype": "customer_communication",
+      "quick_ideas": [
+        "Give each family one staff contact for the whole process",
+        "Update the family's chosen contact at each key step without waiting for calls."
+      ],
+      "workzap_build": {
+        "keys": [
+          "customer_messaging"
+        ],
+        "text": "Gentle status messages sent to the family's chosen contact at each step.",
+        "tool_words": []
+      },
+      "ask_first": "Do families call mostly before the funeral, or in the days after?",
+      "free_stops": "The steps and message wording are prepared in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many update calls each family makes in one day, so the busiest points in the process are obvious.",
+          "review": false
+        },
+        {
+          "text": "Assign one staff contact per family and one handover note place each shift, so families stop repeating themselves to everyone.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p9_payroll_errors",
+      "n": 9,
+      "words": "Gravediggers and washers paid daily cash with no record",
+      "category": "people_staff",
+      "subtype": "payroll_errors",
+      "quick_ideas": [
+        "Note each day's work and payment in one register, signed by the worker",
+        "Total it weekly so the committee can see it."
+      ],
+      "workzap_build": {
+        "keys": [
+          "booking_scheduling"
+        ],
+        "text": "a staff rota and on-call calendar with daily wage records.",
+        "tool_words": []
+      },
+      "ask_first": "Are gravediggers and washers paid per job, or a fixed daily amount?",
+      "free_stops": "The rota and wage record set-up go in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many daily workdays this week have a written work note and how many do not, so the committee sees where records are missing.",
+          "review": false
+        },
+        {
+          "text": "Give one supervisor one register for daily work notes at the end of each shift, so worker attendance can be checked before disputes grow.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p10_owner_blind",
+      "n": 10,
+      "words": "Committee can't see monthly numbers of services, income and expenses",
+      "category": "reporting_visibility",
+      "subtype": "owner_blind",
+      "quick_ideas": [
+        "Agree the few numbers the committee needs each month",
+        "Prepare them once from the registers for last month."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "a monthly committee report of services handled, income, expenses and plots remaining.",
+        "tool_words": []
+      },
+      "ask_first": "Does the committee mainly need services and income, or expenses too?",
+      "free_stops": "The report layout and inputs are set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count last month's services, income entries and expense entries from the registers side by side, so the committee sees missing reporting quickly.",
+          "review": false
+        },
+        {
+          "text": "Give one person a fixed monthly time to pull register totals into one notebook page, so committee reviews stop getting delayed.",
+          "review": false
+        }
+      ]
+    }
+  ],
+  "never_say": [
+    "Any advice on religious rites — say \"please ask your scholars or faith leaders\".",
+    "Advice on death registration, permits, repatriation law, embalming or infection control — say \"check with the relevant authority\".",
+    "Anything about falsified documents, bypassing permits, illegal plot sales or encroachment.",
+    "Asking for names, cause of death, IDs, medical details or grave locations of named people.",
+    "Rushing or anything that sounds careless about grief; if a death is suspicious or an emergency, say to contact police or emergency services first."
+  ],
+  "sample_reply": {
+    "person": "Hum trust ka qabristan chalate hain. Register purana hai aur kabhi ek qabar do dafa allot ho jati hai. Koi hal batayein.",
+    "pi": "Zaroor, ye sambhal sakta hai, aur pehla qadam aasan hai.\nPehle, ek hissa chal kar dekhein aur har plot ko khali, reserved ya bhara hua note karein, naam ke baghair.\nDoosra, har naya allotment register se check karne ke baad hi pakka karein aur usi din likhein.\nIs mein Workzap ye shamil kar sakta hai: digital register jahan har plot ka status nazar aaye aur allot hote hi woh plot lock ho jaye.",
+    "language": "roman_urdu"
+  }
+}

@@ -1,5 +1,6 @@
 """One consented template reminder per unanswered service enquiry turn."""
 
+import logging
 from datetime import UTC, datetime, timedelta
 from typing import Any
 
@@ -9,6 +10,76 @@ from app.modules.notifications.service import notify
 from app.modules.pi.configuration import settings_row
 from app.modules.pi.models import PiConversation, PiMessage, WhatsAppConnection
 from app.modules.pi.service import PiService
+
+# One follow-up template per chat in this time, whichever sender (the older single
+# reminder here, or pi Customer's ladder) sent the last one.
+TEMPLATE_GAP = timedelta(hours=72)
+
+
+async def last_owner_text(session: Any, conversation: PiConversation) -> str:
+    """The owner's last inbound message body ("" when none): the follow-up language source."""
+    row = await session.scalar(
+        select(PiMessage)
+        .where(
+            PiMessage.tenant_id == conversation.tenant_id,
+            PiMessage.environment_id == conversation.environment_id,
+            PiMessage.conversation_id == conversation.id,
+            PiMessage.direction == "inbound",
+        )
+        .order_by(PiMessage.created_at.desc())
+        .limit(1)
+    )
+    return str(row.body or "") if row is not None else ""
+
+
+async def nudged_since_owner(session: Any, conversation: PiConversation) -> bool:
+    """A free-form follow-up has already gone since the owner last wrote: never a second nudge to a
+    silent owner (the same line is never repeated)."""
+    since = conversation.last_inbound_at
+    if since is None:
+        return False
+    rows = await session.scalars(
+        select(PiMessage)
+        .where(
+            PiMessage.tenant_id == conversation.tenant_id,
+            PiMessage.environment_id == conversation.environment_id,
+            PiMessage.conversation_id == conversation.id,
+            PiMessage.direction == "outbound",
+            PiMessage.created_at > since,
+        )
+        .limit(100)
+    )
+    return any(
+        "followup" in (m.media or {}) and m.status not in ("failed", "skipped") for m in rows
+    )
+
+
+async def last_follow_up_template(
+    session: Any, conversation: PiConversation, since: datetime
+) -> datetime | None:
+    """When a follow-up template (a ladder step or the single reminder) last went, or was
+    queued, to this chat after ``since``; None when none did."""
+    rows = await session.scalars(
+        select(PiMessage)
+        .where(
+            PiMessage.tenant_id == conversation.tenant_id,
+            PiMessage.environment_id == conversation.environment_id,
+            PiMessage.conversation_id == conversation.id,
+            PiMessage.direction == "outbound",
+            PiMessage.created_at > since,
+        )
+        .order_by(PiMessage.created_at.desc())
+        .limit(50)
+    )
+    for message in rows:
+        media = message.media or {}
+        if ("ladder" in media or "reminder" in media) and message.status not in (
+            "failed",
+            "skipped",
+        ):
+            created: datetime = message.created_at
+            return created
+    return None
 
 
 def _waiting_until(brief: dict[str, Any]) -> datetime | None:
@@ -47,12 +118,166 @@ def reminder_language(conversation: PiConversation, config: dict[str, Any]) -> s
     return language if language in (config.get("reminder_templates") or {}) else "en"
 
 
-def _friday_prayer(timezone: str) -> bool:
+# Canadian area codes by time zone (R-FUP-03: "local for +1 by area code"). Anything else in +1
+# falls back to the workspace's own zone.
+_CANADA_ZONES: dict[str, list[str]] = {
+    "America/Toronto": (
+        "226 249 289 343 365 416 437 519 548 613 647 705 807 905 514 438 450 579 581 819 873 "
+        "418 367"
+    ).split(),
+    "America/Winnipeg": ("204 431 306 639").split(),
+    "America/Edmonton": ("403 587 780 825 368").split(),
+    "America/Vancouver": ("236 250 604 672 778").split(),
+    "America/Halifax": ("902 782 506").split(),
+    "America/St_Johns": ("709 879").split(),
+}
+
+
+def person_zone(contact_wa_id: str | None, default: str) -> str:
+    """The time zone of the person a proactive message goes to, from their number (R-FUP-03):
+    +92 Pakistan, +971 UAE, +1 Canada by area code. Any other number: the workspace's zone."""
+    digits = "".join(c for c in (contact_wa_id or "") if c.isdigit())
+    if digits.startswith("971"):
+        return "Asia/Dubai"
+    if digits.startswith("92"):
+        return "Asia/Karachi"
+    if digits.startswith("1") and len(digits) >= 4:
+        for name, codes in _CANADA_ZONES.items():
+            if digits[1:4] in codes:
+                return name
+    return default
+
+
+def jumuah_country(contact_wa_id: str | None) -> bool:
+    """Jumu'ah (Friday prayers) applies to Pakistan and UAE numbers only (R-FUP-03)."""
+    digits = "".join(c for c in (contact_wa_id or "") if c.isdigit())
+    return digits.startswith(("92", "971"))
+
+
+def _friday_prayer(timezone: str, now: datetime | None = None) -> bool:
+    """Friday 12:00 to 14:30 local (R-FUP-03)."""
     from app.modules.pi.policy import zone
 
-    local = datetime.now(UTC).astimezone(zone(timezone))
+    local = (now or datetime.now(UTC)).astimezone(zone(timezone))
     minutes = local.hour * 60 + local.minute
-    return local.weekday() == 4 and 12 * 60 + 30 <= minutes < 14 * 60 + 30
+    return local.weekday() == 4 and 12 * 60 <= minutes < 14 * 60 + 30
+
+
+def blocked_until(
+    policy: Any, contact_wa_id: str | None, now: datetime | None = None
+) -> datetime | None:
+    """When quiet hours (21:00-09:00 where the person is), Jumu'ah (PK/UAE numbers only) or the
+    iftar pause end; None when a proactive message may go now. Zone comes from the number."""
+    config = policy.whatsapp_config
+    tz = person_zone(contact_wa_id, policy.timezone)
+    when = now or datetime.now(UTC)
+    later = quiet_until(
+        tz, int(config.get("quiet_start", 21)), int(config.get("quiet_end", 9)), when
+    )
+    if later is None and jumuah_country(contact_wa_id):
+        prayers = _friday_prayer(tz, now) if now is not None else _friday_prayer(tz)
+        if prayers:
+            later = when + timedelta(hours=1)
+    if later is None:
+        later = iftar_pause(tz, config, when)
+    return later
+
+
+def iftar_pause(
+    timezone: str, config: dict[str, Any], now: datetime | None = None
+) -> datetime | None:
+    """During Ramadan, no proactive message within an hour either side of Maghrib (R-FUP-04).
+    Ramadan dates come from `whatsapp_config["ramadan"]` ([{"start": "2027-02-08", "end":
+    "2027-03-09"}], set per year and country) and the local Maghrib time from
+    `whatsapp_config["maghrib"]` ("HH:MM", default 18:45). Returns when the window ends, or None.
+    """
+    from app.modules.pi.policy import zone
+
+    local = (now or datetime.now(UTC)).astimezone(zone(timezone))
+    today = local.date().isoformat()
+    spans = config.get("ramadan") or []
+    if not any(str(s.get("start", "")) <= today <= str(s.get("end", "")) for s in spans):
+        return None
+    try:
+        hour, minute = (int(x) for x in str(config.get("maghrib") or "18:45").split(":"))
+    except ValueError:
+        hour, minute = 18, 45
+    maghrib = local.replace(hour=hour, minute=minute, second=0, microsecond=0)
+    start, end = maghrib - timedelta(hours=1), maghrib + timedelta(hours=1)
+    return end.astimezone(UTC) if start <= local < end else None
+
+
+async def _silence_nudge(
+    session: Any,
+    scope: Any,
+    conversation: PiConversation,
+    policy: Any,
+    outgoing: list[str],
+) -> None:
+    """The brain's one free-form "still here" line (spec 3.9.1). Never outside the 24-hour
+    window, at night, at Jumu'ah or around iftar; never after "stop" or once the person wrote."""
+    from app.modules.pi import flow, followup_policy, optout_guard
+
+    if await optout_guard.opted_out(session, conversation):
+        return
+    now = datetime.now(UTC)
+    brief = dict(conversation.service_brief or {})
+    last = conversation.last_inbound_at
+    sendable = (
+        conversation.mode == "ai"
+        and conversation.status == "open"
+        and policy.auto_reply_enabled
+        and last is not None
+        and now - last < followup_policy.WINDOW
+        and brief.get("reminder_consent") != "declined"
+        and flow.parse(conversation.flow_state)
+        in (flow.State.S1_LISTENING, flow.State.S2_CLARIFYING)
+        and not (brief.get("followups_sent") or {}).get("silent")
+    )
+    if not sendable:
+        conversation.followup_due_at = None
+        return
+    later = blocked_until(policy, conversation.contact_wa_id)
+    if later is not None:
+        conversation.followup_due_at = later
+        return
+    from app.modules.pi_saas.entitlement import remaining as allowance_left
+
+    left = await allowance_left(session, scope.tenant_id, scope.environment_id, "messages_out")
+    if left is not None and left <= 0:
+        conversation.followup_due_at = now + timedelta(hours=6)
+        return
+    assert last is not None
+    if await nudged_since_owner(session, conversation):
+        conversation.followup_due_at = None
+        return
+    service = PiService(session, scope)
+    key = f"pi-followup-silent:{conversation.id}:{last.isoformat()}"
+    if await service.messages.find(PiMessage.idempotency_key == key) is None:
+        message = await service.messages.add(
+            service.messages.new(
+                conversation_id=conversation.id,
+                direction="outbound",
+                sender_type="ai",
+                agent_key="requirement",
+                body=followup_policy.text_for(
+                    "silent",
+                    followup_policy.owner_language(
+                        conversation.language, await last_owner_text(session, conversation)
+                    ),
+                ),
+                status="queued",
+                idempotency_key=key,
+                media={"followup": {"kind": "silent"}},
+            )
+        )
+        outgoing.append(str(message.id))
+    sent = dict(brief.get("followups_sent") or {})
+    sent["silent"] = 1
+    brief["followups_sent"] = sent
+    brief.pop("followup_kind", None)
+    conversation.service_brief = brief
+    conversation.followup_due_at = None
 
 
 async def sweep_followups(ctx: dict[str, Any]) -> None:
@@ -76,6 +301,11 @@ async def sweep_followups(ctx: dict[str, Any]) -> None:
                 conversation.followup_due_at = None
                 continue
             policy = await settings_row(session, scope)
+            from app.modules.pi import optout_guard
+
+            if await optout_guard.opted_out(session, conversation):
+                conversation.followup_due_at = None
+                continue
             brief = conversation.service_brief or {}
             source = brief.get("source_message_id")
             waiting = _waiting_until(brief)
@@ -83,6 +313,9 @@ async def sweep_followups(ctx: dict[str, Any]) -> None:
                 # The customer is waiting on someone else (a boss, a partner): don't
                 # nudge them until the pause they chose is over.
                 conversation.followup_due_at = waiting
+                continue
+            if brief.get("followup_kind") == "silent":
+                await _silence_nudge(session, scope, conversation, policy, outgoing)
                 continue
             if (
                 conversation.mode != "ai"
@@ -112,16 +345,18 @@ async def sweep_followups(ctx: dict[str, Any]) -> None:
                 # Revisit configuration without starving other tenants' due reminders.
                 conversation.followup_due_at = datetime.now(UTC) + timedelta(hours=1)
                 continue
-            later = quiet_until(
-                policy.timezone,
-                int(policy.whatsapp_config.get("quiet_start", 21)),
-                int(policy.whatsapp_config.get("quiet_end", 9)),
-            )
+            later = blocked_until(policy, conversation.contact_wa_id)
             if later is not None:
-                conversation.followup_due_at = later  # Never at night; sent next morning.
+                # Never at night (sent next morning), at Jumu'ah or around iftar (R-FUP-03/04),
+                # by the person's own zone.
+                conversation.followup_due_at = later
                 continue
-            if _friday_prayer(policy.timezone):
-                conversation.followup_due_at = datetime.now(UTC) + timedelta(hours=1)
+            last_template = await last_follow_up_template(
+                session, conversation, datetime.now(UTC) - TEMPLATE_GAP
+            )
+            if last_template is not None:
+                # The ladder wrote to this chat in the last 72 hours: not twice.
+                conversation.followup_due_at = last_template + TEMPLATE_GAP
                 continue
             from app.modules.pi_saas.entitlement import remaining as allowance_left
 
@@ -159,6 +394,19 @@ async def sweep_followups(ctx: dict[str, Any]) -> None:
             conversation.followup_due_at = None
         await session.commit()
     await enqueue_sends(ctx, outgoing)
+    from app.modules.pi import brain_followups
+
+    try:
+        await brain_followups.sweep(ctx)  # documents, paused and kickoff follow-ups (brain mode)
+    except Exception:  # noqa: BLE001 - the older reminders above must never depend on this
+        logging.getLogger("app.pi.followups").warning("pi_brain_followups_failed", exc_info=True)
+    try:
+        from app.modules.pi_saas import requests as team_requests
+
+        # Spec 6.6: a ticket nobody claimed in time is flagged again, with one honest line.
+        await team_requests.flag_unclaimed(ctx)
+    except Exception:  # noqa: BLE001 - never blocks the reminders above
+        logging.getLogger("app.pi.followups").warning("pi_unclaimed_flag_failed", exc_info=True)
 
 
 def reminder_allowed(

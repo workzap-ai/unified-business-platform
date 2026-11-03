@@ -1,0 +1,292 @@
+{
+  "industry": "mental_health_and_therapy_practices",
+  "name": "Mental-health and therapy practices (admin)",
+  "sector": "7.I Health and care",
+  "version": "1.1",
+  "problems": [
+    {
+      "id": "p1_booking_appointments",
+      "n": 1,
+      "words": "Late cancellations leave practitioners with empty hours",
+      "category": "customer_experience_digital",
+      "subtype": "booking_appointments",
+      "quick_ideas": [
+        "Count late cancellations per practitioner for a week, so the loss is measured",
+        "Make sure every client has seen the cancellation policy, so it is clear."
+      ],
+      "workzap_build": {
+        "keys": [
+          "booking_scheduling"
+        ],
+        "text": "online booking per practitioner with reminders and a policy acknowledgement at booking, tracking cancellations as they happen.",
+        "tool_words": []
+      },
+      "ask_first": "How do clients cancel now?",
+      "free_stops": "Reminder timing and policy flow are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note which appointment hours stayed empty after late cancellations this week, so you can see where practitioner time is being lost.",
+          "review": false
+        },
+        {
+          "text": "Give one admin person the daily job of offering newly empty hours from one written standby list, so fewer cancellations leave gaps.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p2_capacity",
+      "n": 2,
+      "words": "We have a long waitlist but some practitioners still have gaps",
+      "category": "operations_process",
+      "subtype": "capacity",
+      "quick_ideas": [
+        "List waitlist requests by service type, language and availability, so matches are easier",
+        "Compare that with practitioners' open hours, so gaps can be offered."
+      ],
+      "workzap_build": {
+        "keys": [
+          "booking_scheduling"
+        ],
+        "text": "a waitlist and matching board showing open requests and time on list, offering freed slots to matched clients.",
+        "tool_words": []
+      },
+      "ask_first": "Who does matching today?",
+      "free_stops": "Matching rules are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count waitlist requests that match each practitioner's usual hours and service type, so hidden fit problems stand out against the backlog.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member a fixed time each day to match open hours with the waitlist notebook, so gaps get offered sooner.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p3_data_scattered_intake",
+      "n": 3,
+      "words": "Intake forms come in on paper, email and WhatsApp",
+      "category": "tech_systems",
+      "subtype": "data_scattered_intake",
+      "quick_ideas": [
+        "Stop accepting intake details over WhatsApp, so sensitive information isn't scattered",
+        "Pick one secure route for forms, so admin checks one place."
+      ],
+      "workzap_build": {
+        "keys": [
+          "website_digital"
+        ],
+        "text": "workflow_automation — a digital intake form with secure submission and a completeness check for the admin role.",
+        "tool_words": []
+      },
+      "ask_first": "Who checks forms are complete?",
+      "free_stops": "Form set-up and security are in the solution document; record-keeping rules are for your adviser.",
+      "extra_ideas": [
+        {
+          "text": "Count how many new intake forms arrived through each route this week, so you can see which channel creates the most chasing.",
+          "review": false
+        },
+        {
+          "text": "Give one staff role the job of logging every new form into one notebook on arrival, so admin stops checking scattered places.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p4_commission_disputes",
+      "n": 4,
+      "words": "Associates argue about the fee split and room charges",
+      "category": "people_staff",
+      "subtype": "commission_disputes",
+      "quick_ideas": [
+        "Put each associate's split and room charge on one signed page, so there is one reference",
+        "Share a monthly session count, so both sides agree the base."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "an associate pay and room-rental statement from completed sessions.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "Do associates rent rooms or work on a split?",
+      "free_stops": "Statement rules are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many associate sessions changed, cancelled or moved after booking this week, so fee-split arguments can be traced to admin changes.",
+          "review": false
+        },
+        {
+          "text": "Give one admin role the weekly job of writing each associate's room-use exceptions in one notebook, so charge disputes have one reference point.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p5_cash_leakage",
+      "n": 5,
+      "words": "No-show fees are never actually charged",
+      "category": "cash_collections",
+      "subtype": "cash_leakage",
+      "quick_ideas": [
+        "List this month's no-shows with fee status, so the amount is known",
+        "Agree who decides on waivers, so it is consistent."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger"
+        ],
+        "text": "a no-show and late-cancellation log with fee status and waiver approvals.",
+        "tool_words": []
+      },
+      "ask_first": "Is the fee in your written policy now?",
+      "free_stops": "Fee rules are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count this week's no-shows by whether a fee decision was marked the same day or left open, so delays behind missed charges stand out.",
+          "review": false
+        },
+        {
+          "text": "Give one front-desk role the closing-time job of marking every no-show as charged, waived or pending in one notebook, so missed fees stop being overlooked.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p6_service_errors",
+      "n": 6,
+      "words": "Online session links get sent to the wrong person",
+      "category": "quality_complaints",
+      "subtype": "service_errors",
+      "quick_ideas": [
+        "Send links only from the practice account, so personal phones aren't used",
+        "Add a check of the contact before sending, so errors are caught."
+      ],
+      "workzap_build": {
+        "keys": [
+          "booking_scheduling"
+        ],
+        "text": "a scheduler that sends session links only to the booked contact and logs every send.",
+        "tool_words": []
+      },
+      "ask_first": "Which tool do you use for online sessions?",
+      "free_stops": "Send rules are in the solution document; confidentiality duties are for your adviser.",
+      "extra_ideas": [
+        {
+          "text": "Note each time a session link had to be resent or corrected this week, so the scale of sending mistakes is clear.",
+          "review": false
+        },
+        {
+          "text": "Give one staff role the job of sending all session links during a fixed daily window, so contact checks happen the same way each time.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p7_manual_work",
+      "n": 7,
+      "words": "Insurance receipts and corporate invoices are made by hand",
+      "category": "operations_process",
+      "subtype": "manual_work",
+      "quick_ideas": [
+        "Time how long receipts take each week, so the cost is known",
+        "List corporate accounts with balances, so late payers stand out."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "credit_ledger — a receipt and invoice generator with payment tracking and ageing.",
+        "tool_words": []
+      },
+      "ask_first": "Which payers are slowest?",
+      "free_stops": "Document format is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note which hand-made receipt and invoice requests arrive in bunches during the week, so you can spot the busiest admin pinch point.",
+          "review": true
+        },
+        {
+          "text": "Give one admin role a fixed weekly hour to write all pending receipts and corporate invoices from one paper list, so requests stop scattering across the week.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p8_lead_followup_slow",
+      "n": 8,
+      "words": "Enquiries sit in the inbox for days",
+      "category": "marketing_leads",
+      "subtype": "lead_followup_slow",
+      "quick_ideas": [
+        "Check reply times on last week's enquiries, so the delay is measured",
+        "Name one person for daily replies, so each enquiry has an owner."
+      ],
+      "workzap_build": {
+        "keys": [
+          "lead_followup"
+        ],
+        "text": "an enquiry inbox with response timers and source tracking, routing anything urgent to staff with an emergency-signpost message.",
+        "tool_words": []
+      },
+      "ask_first": "How do enquiries reach you now?",
+      "free_stops": "Routing rules are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare the arrival day and reply day on recent enquiries, so you can see how long the inbox is sitting untouched.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member a set time each workday to clear new enquiries from one written list, so replies stop waiting in the inbox.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p9_licences_renewals",
+      "n": 9,
+      "words": "Practitioners' licence and supervision renewals aren't tracked",
+      "category": "compliance_admin",
+      "subtype": "licences_renewals",
+      "quick_ideas": [
+        "List each practitioner's renewal dates by role, so expiries are visible",
+        "Set reminders for the nearest dates, so none slip."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "a licence and supervision calendar with reminders by role.",
+        "tool_words": []
+      },
+      "ask_first": "Who tracks renewals today?",
+      "free_stops": "Reminder schedule is in the solution document; requirements are for your regulator.",
+      "extra_ideas": [
+        {
+          "text": "Count how many practitioner renewals fall in the same upcoming month by role, so workload clashes can be seen before papers pile up.",
+          "review": false
+        },
+        {
+          "text": "Give one admin role the monthly job of checking one paper renewal list by role, so upcoming licence and supervision dates stop being missed.",
+          "review": true
+        }
+      ]
+    }
+  ],
+  "never_say": [
+    "Any therapy, counselling, diagnosis, crisis or medication advice, including \"what staff should say\".",
+    "Anything about a client's situation, even in general terms.",
+    "Interpretations of confidentiality or record-keeping law.",
+    "Help sharing records without consent or issuing letters without proper sessions.",
+    "Ideas that record client names, reasons for seeking help or session content.",
+    "If anyone mentions suicide, self-harm or danger: emergency services first (and 9-8-8 in Canada)."
+  ],
+  "sample_reply": {
+    "person": "Late cancellations are killing us. Therapists lose hours every week and we never charge the fee. What can we do?",
+    "pi": "Yes, there is a way through this, and none of it needs special equipment.\nFirst, count late cancellations per therapist for a week, so the lost time is measured.\nSecond, make sure every client has seen the cancellation policy, so it is clear before it is needed.\nThe next step up would be: with online booking, reminders, policy acknowledgement and a log of fees due.\n\nShall I have a solution document and quote prepared for you? You're welcome to say no.",
+    "language": "english"
+  }
+}

@@ -1,0 +1,325 @@
+{
+  "industry": "air_cargo_and_air_freight_agents",
+  "name": "Air cargo and air-freight agents",
+  "sector": "7.G Transport, mobility and aviation (part 1)",
+  "version": "1.1",
+  "problems": [
+    {
+      "id": "p1_conversion_low",
+      "n": 1,
+      "words": "Customers ask for a rate and go elsewhere before we reply",
+      "category": "sales_revenue",
+      "subtype": "conversion_low",
+      "quick_ideas": [
+        "Time your next few quotes and note what holds them up, so you fix the slowest step",
+        "Keep your current buy rates for your busiest lanes in one place, so you aren't calling the airline every time."
+      ],
+      "workzap_build": {
+        "keys": [
+          "custom_build"
+        ],
+        "text": "a rate quote tool storing current airline and agent buy rates by lane with your margin rules, producing a quote in minutes and tracking which quotes convert.",
+        "tool_words": []
+      },
+      "ask_first": "Rate zyada tar WhatsApp pe maangte hain ya email pe?",
+      "free_stops": "The margin rules and rate structure are worked out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note the last few rate requests that went cold and compare reply times by lane, so you spot where sales is losing urgency.",
+          "review": false
+        },
+        {
+          "text": "Give one desk the job of checking unanswered rate requests at a set time daily, so fewer enquiries drift away unreplied.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p2_order_tracking",
+      "n": 2,
+      "words": "Customers call all day asking where their shipment is",
+      "category": "orders_fulfilment",
+      "subtype": "order_tracking",
+      "quick_ideas": [
+        "Count status calls on one busy day, so you know how much time it really takes",
+        "Tell your regular shippers you'll update them at each key stage, so they stop calling to ask."
+      ],
+      "workzap_build": {
+        "keys": [
+          "customer_messaging",
+          "job_tracking"
+        ],
+        "text": "WhatsApp status updates and a tracking link sent to the customer at each stage (booked, departed, offloaded, arrived, cleared, delivered), with their permission.",
+        "tool_words": []
+      },
+      "ask_first": "Staff status kaise check karte hain, airline ko call karke ya unki website par?",
+      "free_stops": "Which status points trigger which message, and how status is pulled in, is set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Write down each shipment status call for one busy shift and the latest stage reached, so you see which updates trigger chasing.",
+          "review": false
+        },
+        {
+          "text": "Give one role the job of sending stage updates from one running list at fixed times, so customer calls ease during the day.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p3_customer_communication",
+      "n": 3,
+      "words": "Cargo gets offloaded and the customer hears it from someone else",
+      "category": "customers_retention",
+      "subtype": "customer_communication",
+      "quick_ideas": [
+        "Decide who tells the customer the moment an offload is known, so it's never nobody's job",
+        "Note last month's offloads and how late customers heard, so you see the pattern."
+      ],
+      "workzap_build": {
+        "keys": [
+          "customer_messaging"
+        ],
+        "text": "an offload alert that sends a message to the customer and the sales person as soon as an offload or rollover is entered.",
+        "tool_words": []
+      },
+      "ask_first": "Mahine mein kitni dafa offload ya rollover hota hai, taqreeban?",
+      "free_stops": "The alert flow and who receives it are designed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count recent offloads and note whether the customer heard from you or elsewhere, so the missed communication pattern stands out.",
+          "review": false
+        },
+        {
+          "text": "Make operations hand over every offload to one named customer contact role immediately, so news reaches the shipper from your side first.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p4_margin_unknown",
+      "n": 4,
+      "words": "Profit per shipment unknown once all charges come in",
+      "category": "margin_cost",
+      "subtype": "margin_unknown",
+      "quick_ideas": [
+        "Take one finished shipment and list every charge against the sell rate, so you see which ones arrive late",
+        "Note which charges (storage, handling, DO) appear unexpectedly most often, so you can ask about them upfront."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "a shipment profitability view comparing sell rate with every buy-side charge, updated as each bill arrives, by lane and customer.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "Shipment ka final profit kab tak pata chalta hai?",
+      "free_stops": "How late charges are captured and allocated is worked out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Pick several closed shipments and compare quoted charges with final charges, so you spot which cost lines keep eroding profit late.",
+          "review": false
+        },
+        {
+          "text": "Assign one role to note every late-arriving charge in one notebook, so pricing reviews use the same recurring surprises.",
+          "review": true
+        }
+      ]
+    },
+    {
+      "id": "p5_duplicate_entry",
+      "n": 5,
+      "words": "AWB and invoice details typed three times",
+      "category": "operations_process",
+      "subtype": "duplicate_entry",
+      "quick_ideas": [
+        "Follow one shipment from booking to invoice and count how often the same data is typed, so you see the waste",
+        "Note where mistakes creep in, so you know which re-typing hurts most."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation",
+          "integration"
+        ],
+        "text": "one shipment entry that creates AWB data, invoice and tracking once, without re-typing.",
+        "tool_words": []
+      },
+      "ask_first": "Abhi AWB aur invoice kahan par bante hain?",
+      "free_stops": "How the shipment file connects to your existing records is set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Watch one file move from booking to billing and note each repeat typing of the same fields, so wasted effort is easy to point out.",
+          "review": false
+        },
+        {
+          "text": "Choose one paper file as the source record for shipment details, so every team copies from the same place each time.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p6_credit_customers",
+      "n": 6,
+      "words": "Overseas agents and small exporters are slow to pay",
+      "category": "cash_collections",
+      "subtype": "credit_customers",
+      "quick_ideas": [
+        "List everyone who owes you by age once, so you know who to chase first",
+        "Decide who gets credit and who pays before departure, so sales has a clear rule."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger"
+        ],
+        "text": "a receivables ledger for customers and overseas agents showing ageing, limits and reminders sent when payments are due.",
+        "tool_words": []
+      },
+      "ask_first": "Sab se late payment kaun karta hai, customers ya overseas agents?",
+      "free_stops": "Credit limits and reminder timing are worked out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count each week’s completed shipments against remittance slips received for the same files, so you see which handovers are stalling cash arrival.",
+          "review": false
+        },
+        {
+          "text": "Give one role a fixed weekly slot to mark remittance slips against completed files in one notebook, so unpaid jobs stop getting overlooked.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p7_info_lost_in_whatsapp",
+      "n": 7,
+      "words": "Bookings and confirmations live in staff WhatsApps",
+      "category": "communication_coordination",
+      "subtype": "info_lost_in_whatsapp",
+      "quick_ideas": [
+        "Ask staff to save every confirmation for this week in one shared folder, so you see how scattered it is",
+        "Agree one place where a booking is official, so nobody relies on a personal chat."
+      ],
+      "workzap_build": {
+        "keys": [
+          "order_capture"
+        ],
+        "text": "every booking and confirmation recorded against its shipment file in one place, whichever staff phone it came through.",
+        "tool_words": []
+      },
+      "ask_first": "Kitne staff customers se direct WhatsApp pe deal karte hain?",
+      "free_stops": "How messages are captured into the shipment file is designed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many bookings this week needed someone to search old chats for proof, so the delay from scattered confirmations is obvious.",
+          "review": false
+        },
+        {
+          "text": "Make one team role move every confirmed booking into one office record before shift end, so operations can find the latest answer quickly.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p8_discount_abuse",
+      "n": 8,
+      "words": "Staff give discounts I don't know about",
+      "category": "sales_revenue",
+      "subtype": "discount_abuse",
+      "quick_ideas": [
+        "Compare last month's sell rates with your standard rates once, so you see how much discount is given",
+        "Agree a limit above which you approve, so staff know where the line is."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation",
+          "dashboards_reports"
+        ],
+        "text": "a discount approval rule so anything beyond a set limit needs your approval, with a weekly view of discounts by salesperson.",
+        "tool_words": []
+      },
+      "ask_first": "Discount ka faisla abhi kaun karta hai?",
+      "free_stops": "The approval limits and reporting are set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare quote sheets with final job files from one busy week, so you see where sold rates changed after the original offer.",
+          "review": false
+        },
+        {
+          "text": "Give one role the job of writing every rate change on one counter list each day, so unapproved changes stop slipping through.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p9_repeat_low",
+      "n": 9,
+      "words": "Regular shippers stop sending and we don't notice",
+      "category": "customers_retention",
+      "subtype": "repeat_low",
+      "quick_ideas": [
+        "Compare this quarter's active shippers with last quarter's, so you see who has gone quiet",
+        "Call a few of them, so you learn why."
+      ],
+      "workzap_build": {
+        "keys": [
+          "loyalty_repeat"
+        ],
+        "text": "a customer activity report that flags regular shippers who have gone quiet, every week, so sales follow up in time.",
+        "tool_words": []
+      },
+      "ask_first": "Regular customers taqreeban kitne hain?",
+      "free_stops": "What counts as \"gone quiet\" per customer type is worked out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Look through recent shipments and note which regular shippers have gone quiet compared with their usual sending pattern, so drop-off appears sooner.",
+          "review": false
+        },
+        {
+          "text": "Give one role a weekly check of regular shippers from one notebook list, so silent accounts get noticed before the month ends.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p10_reports_late",
+      "n": 10,
+      "words": "Monthly profit report takes our accountant two weeks",
+      "category": "reporting_visibility",
+      "subtype": "reports_late",
+      "quick_ideas": [
+        "Decide the three numbers you actually need each month, so the report gets shorter",
+        "Ask the accountant which step takes longest, so you know what to fix."
+      ],
+      "workzap_build": {
+        "keys": [
+          "nori_daily_read",
+          "dashboards_reports"
+        ],
+        "text": "a daily read of shipments, revenue and margin by lane, customer and salesperson, so the month end is already done.",
+        "tool_words": []
+      },
+      "ask_first": "Mahine ka hisaab abhi kis jagah hota hai?",
+      "free_stops": "The report measures and data sources are designed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Mark when each paper or message reaches the accountant for one month, so the real hold-up before reporting is clear.",
+          "review": false
+        },
+        {
+          "text": "Give one staff role a fixed weekly handover of all job files to accounting, so month-end stops waiting for missing papers.",
+          "review": false
+        }
+      ]
+    }
+  ],
+  "never_say": [
+    "Anything on customs classification, duties, tariffs, export or import licensing, sanctions or dangerous goods acceptance; suggest they talk to their clearing agent or customs adviser.",
+    "Anything that helps under-declare, misdeclare, undervalue, hide items or avoid inspection.",
+    "Handling or temperature advice for pharma and perishables.",
+    "Legal advice on claims with airlines or customers.",
+    "Anything that stores shipper or consignee IDs, NTN/CNIC/Emirates ID numbers, bank details or personal addresses."
+  ],
+  "sample_reply": {
+    "person": "Customers saara din call karte hain ke cargo kahan hai, mere staff ka poora din isi mein nikal jata hai. Koi hal hai?",
+    "pi": "Ji haan, ye theek ho sakta hai, aur pehla qadam aasan hai.\nPehle, ek busy din ki status calls gin lein, taa ke pata chale asal mein kitna waqt ja raha hai.\nDoosra, apne regular shippers ko bata dein ke har ahem marhale pe update unhein khud milegi, taa ke unhein poochna na pade.\nWorkzap is ke liye ye bana sakta hai: har shipment ka status booked se delivered tak customer ko WhatsApp par, un ki ijazat se, khud chala jaye, aur ek tracking link bhi saath ho.",
+    "language": "roman_urdu"
+  }
+}

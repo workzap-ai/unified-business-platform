@@ -1,0 +1,200 @@
+pi Audit Run 2 results (30 October 2026). Read-only; no production code changed, no model calls, no production DB reads.
+New files: apps/api/tests/unit/test_pi_first_message_not_lost.py (R3), apps/api/tests/unit/test_pi_opening_tests_ot.py (R11), audit-run-2-maps/*.png (R7).
+
+READ-ONLY audit, pi repo, apps/api/app/modules/pi/ (working tree as of 2026-10-30, includes uncommitted edits)
+Method note: the full production prompt was NOT built (it needs a DB-backed context). I loaded only the handbook the way production does
+(spec_handbook.sections(): spec/handbook.json + spec/supersession.json patches, no DB, python -I) and searched it; every other prompt
+fragment was traced statically. No DB, no model, no WhatsApp used. Paths below are relative to apps/api/app/modules/pi/.
+
+=====================================================================================================
+R1 | PARTIAL | The old opening line is gone from the handbook, but "Thanks. I've noted it: {title}", "Noted:", "You can say no", and the offer script all survive in handbook sections the supersession patches do not touch.
+=====================================================================================================
+Evidence:
+Supersession scope: spec/supersession.json replaces ONLY 1.2 (R-SELL-01/02/04 superseded, text added); patches ONLY 0.2 (P8 wording), 3.2, 1.1 and 2.3
+(the "Tell me what's going wrong ... I'll start on it" line becomes "What does your business do?"); "remove" is empty. spec_handbook.py:164-182 applies it
+(replace, then exact-substring patch, then remove). So any section not named in those five ids is the raw Brain v3 text.
+
+Searched handbook after patches (all section ids, whole text), hits per phrase:
+- "what's going wrong in your business" / "going wrong in your business" / "I'll start on it": NO hits (1.1 and 2.3 patched; raw text had them in 1.1, 2.3 only).
+  Near miss only: 6.4 A6 "What's going wrong on your side?" and golden G4 "Once I've noted what's going wrong, Workzap can prepare a solution document for it ... if you want one."
+  (G4 is injected when the message matches app/software/system/solution + make/build/fix/can you: spec_handbook.py:~222; kept on purpose per supersession "open_decision").
+- "Noted" (case-sensitive): 2.3 (CORE, sent every turn) has the message templates "Thanks. I've noted it: {title}. Anything else getting in the way?" and "Noted: {title}. What else?".
+  Also 3.3 step 5 (BY_STATE S1_LISTENING, S2_CLARIFYING, S3_NOTED): "Call record_problem. Confirm back ... 'Thanks. I've noted it: best-sellers running out, in two of four shops.'",
+  step 6 "I've put it with the other stock problem you mentioned", step 7 "Invite the next one: 'Anything else getting in the way?'". Not patched.
+  Goldens G1-G5, G11, G13 contain "Noted"/"noted" in their pi lines (injected as examples, max 3 per turn).
+  (Case-insensitive "noted" is also in 0.1, 0.2 P5 "pi tells you what it has noted", 1.3, 2.0.4, 2.1, 2.5, 3.7, 4.3: descriptions, not opener templates.)
+- "Note kar liya": golden G6 only (injected first for Roman Urdu: GOLDEN_BY_STATE/chosen_ids insert G6 when language == "roman_ur").
+- "alag note": none in handbook.
+- "Here are some ideas for you": none in handbook. It is in code: service_conversation.py:2227 IDEAS_LEAD["en"], :2412 returned as the lead-in the application writes,
+  :5199 (inside the language-rewrite instruction). reply_gates.py:125 and think_prompt.py:90 forbid it as an OPENER, so the app writes a line its own gate bans.
+- "Shall I get one solution document": none in handbook; it is the application's fixed offer: fixed_lines.py:37, solution_ask.py:412 (OFFER_AFTER). Never typed in the prompt.
+- "You can say no": SURVIVES in 0.2 (CORE, P8 text kept by the patch), 2.3 (CORE, Readiness template "Would you like a solution document and a quote for these? You can say no."),
+  3.8 (BY_STATE S_LISTEN_THINK, S5_READINESS, S5b_DECLINED, R-OFFER-02 "The offer is one message ... You can say no."), goldens G5 and G10.
+  Also in constitution.py:652 (comment), constitution_langs.py:139 (tail rule), and packs/solutions/*.json pi examples (e.g. corporate_events_and_exhibitions.json:321 "Shall I prepare a solution document and quote for you? You can say no.").
+- "End the reply with the offer": no hit anywhere in app/.
+- R-SELL-01 / R-SELL-02 / R-SELL-04: 1.2 (CORE) names them only to say they are SUPERSEDED (intended). 0.2 (CORE) lists "R-SELL-01..05" as the source tags of P7, P8, P9 (not patched,
+  text now says P8 allows answering). Code only has the comments constitution.py:257 and the rule id emitted at constitution.py:1169 and :1862 (linter), not prompt text.
+- "any rule telling pi to offer a quote after each problem": no handbook text says offer after EACH problem. Closest: 3.8 R-OFFER-01..06 (offer after the summary, whole set) in S5/S_LISTEN_THINK,
+  3.7 (summary triggers), and service_conversation.py:1008 BRAIN_VOICE "(3) the offer after ideas, in the spec's own words" plus BRAIN_ASK :1119-1146 ("the application adds the offer right after your reply";
+  the model is told NOT to write it). 1.2 R-OFFER-01 (amended) says the offer "may now come right after a Level 2 answer ... still requires at least one noted problem" (superseding text, unconditional on B1-B7).
+  So the prompt never says "per problem", but 1.2's R-OFFER-01 and BRAIN_ASK tell the model the offer follows ideas without mentioning the readiness rule B1-B7 (Book 5).
+Sections NOT covered by any supersession patch that still carry old-world wording: 0.2 (partly), 2.3 (Note/Readiness templates; only its opening line was patched), 3.3 (noted-it template, "Anything else?"),
+3.7 (summary after "what now?" is a listening-state trigger), 3.8 (full offer script incl. "You can say no", present in S_LISTEN_THINK, a listening state), 3.9.1, 5.x, and goldens G1-G5, G6, G10, G11, G13.
+Also note: S_LISTEN_THINK gets 3.8 + 3.7 (spec_handbook.py BY_STATE), i.e. the offer script is in the prompt while pi is still listening.
+Mitigation in code (not prompt): service_conversation.py:~962 and :4277 tell the model never to announce noting; expert_advisor.py:171 and think_prompt.py:89 forbid "Noted" openers;
+reply_voice.drop_noted (service_conversation.py:2217-2224) strips announcements in brain mode; reply_gates.empty_opener is called at service_conversation.py:4949.
+But 2.3 and 3.3 still show the model the very template ("Thanks. I've noted it:") that is then stripped, so the prompt contradicts itself.
+reply_gates.without_say_no exists (reply_gates.py:245) but is NOT wired: grep shows no caller in app/ (only tests/unit/test_pi_reply_gates.py:70), so "You can say no" is not removed at send time.
+
+=====================================================================================================
+R8 | FAIL | Offer lines can be written by 6 code paths; only the box_offer-ON branches check B1-B7/R1-R3, the OFF branch (and one dead helper) never does, and no canOffer result removes offer text.
+=====================================================================================================
+Every path that writes an offer/quote-ask line (all in service_conversation.py unless noted; flag = response_rules.brain.box_offer, read via box.box_offer_enabled, box.py:~124, which also needs pi_mode=="brain"):
+1. brain_offer, service_conversation.py:3254-3285 (called :6257). Appends solution_ask.offer_line() to the reply and sets Decision S5/offer_asked. Fires only if solution_asked / solution_howto / solution_asked_no_ideas / open_ask
+   (or, box on, R3 words) and state in OFFERABLE (S1-S4) and a problem is noted. Gate: box_offer_allowed() (:3245-3251) = TRUE unconditionally when context["box_offer"] is absent (flag off);
+   flag on -> box.can_offer(box.offer_facts(context))[0] (B1-B7 or R1-R3). Offer text: solution_ask.offer_line (solution_ask.py:498-509): flag off -> fixed_lines.line("offer") "Shall I get one solution document and a quote made for all of these together?" (fixed_lines.py:36-38, solution_ask.py:412); flag on -> box_offer_line (solution_ask.py:471).
+2. brain_no_early_promise, service_conversation.py:3188-3216 (called :6255). If the model promised the document ("will be prepared"), replaces the reply with the offer line, S5 decision. Gate: box_offer_allowed (:3204) = true when flag off.
+3. brain_never_empty, service_conversation.py:3218-3243 (called :6256). Empty reply after a fix/how-to ask -> NO_IDEA line + offer line. Gate: box_offer_allowed (:3229) = true when flag off.
+4. decisions.py S4_SORTED_SUMMARY branch, decisions.py:~525-560. When the owner accepts the summary (yes / no / summary_ok), returns Decision(text("offer"), S5, offer_asked, why R-OFFER-01).
+   Gate: only `if facts.get("box_offer")` -> box.can_offer(facts["box_offer"]) at decisions.py:537; blocked -> Decision(None,...,why="<rule>-blocked: <reason>"). Flag off -> NO check (comment at :532-535 says the summary being accepted is the trigger). Text: TEXT["offer"] (decisions.py:206/217 -> fixed_lines.LINES["offer"]) or solution_ask.box_offer_line when flag on. service_conversation.py:3317 sets facts["box_offer"] only when context["box_offer"].
+5. decisions.py:540 text("offer", language) is the same fixed line; decisions.py:396 builds the label table; decisions.py:736 "offer" is a brief key, not a line.
+6. box_lifecycle.offer / log_offer, box_lifecycle.py:190-230. The only code that runs canOffer AND logs it to PiOfferLog (rule + blocked_reason) and moves the box to Ready/Offered. NOT CALLED by any app code (grep: no caller; tests monkeypatch box.can_offer instead). So pi_offer_log rows used by staff_review.py:456 and message_understood.py:166 are never written in the normal flow. box_lifecycle.on_decision (:253-270) merely mirrors an already-decided offer onto the box, never blocks it.
+Other text that offers a quote but is not a new offer: brain_docs.py/brain_pdf.py (after explicit yes; reviewer approves; brain_pdf.py:41 "A quote is an offer. It isn't a charge." is document copy), brain_followups.py and followup_policy.py:48 (reminder about an already-sent document), decisions "changes_noted" line (decisions.py:316). Model-written offers: the model is told not to (BRAIN_ASK :1134) but if it does write one, already_offers() (solution_ask.py:520, regex OFFERS_DOCUMENT) just stops the app adding a second; nothing checks or removes a model-written offer against can_offer.
+Readiness rule per path: 1,2,3 -> B1-B7/R1-R3 only when flag on; 4 -> same, only when flag on; 6 -> yes but dead; flag off -> none (box_offer_allowed returns True).
+canOffer check exists? YES: box.can_offer (box.py:43-90), used by box_offer_allowed (service_conversation.py:3251), decisions.py:537, box_lifecycle.py:194.
+Is its result used to remove offer text? NO. A blocked result only prevents the app from ADDING the line (brain_offer :3279, brain_no_early_promise :3204, brain_never_empty :3229, decisions :537). There is no step that strips an offer already in turn.reply
+(model-written, or the offer riding inside the reply from the golden-based templates), no linter rule that deletes it, and reply_gates.without_say_no is unwired. brain_no_early_promise even prefers the offer over the safe line.
+Also: the flag-on path blocks via B3 (map not reviewed) and via B7 (box_signals.REPEAT_COMPLAINT "I already told you" -> trust "falling", box_signals.py:195-221), so with the flag ON the 3:46 state would have been blocked twice over.
+
+State at 3:46 on 28 Oct (4 problems, map not reviewed, 6 pi messages, owner said "I already told you"):
+- With box_offer ON: can_offer -> R1-R3 not set; B1 ok (4 >= MIN), B3 "map not reviewed" blocks (box.py:~62), B7 trust falling also blocks. No offer.
+- With box_offer OFF (the legacy path, which is what produced an offer): context["box_offer"] is absent (service_conversation.py:1499-1500 sets it only when enabled), so box_offer_allowed() returns True (:3248-3249) and offer_facts/can_offer are never evaluated. B3, B6 and the repeat-complaint block are therefore irrelevant.
+- Which exact path fired: UNKNOWN from code alone (I do not have the transcript or the tenant row). Candidates when the flag is off, all producing the fixed "Shall I get one solution document and a quote made for all of these together?":
+  (a) brain_offer (:3254), if the chat had solution_asked/open_ask carried from an earlier ask (solution_context.py:253-269 carries open_ask one turn) and state S1-S4 - most likely if the owner had asked for a fix earlier;
+  (b) brain_never_empty/brain_no_early_promise (:3188-3243) if the model reply was empty or promised a document;
+  (c) decisions.py:525-560 S4 summary accepted (not obviously triggered by "I already told you", which problems.py:1021 SHOW_ME treats as "show what is noted").
+  To pin it down: pi_agent_run/message "why" tags (R-OFFER-01 decision why is the same for all three) and the Decision.brief offer_asked on that message; staff_review "what pi understood" shows the offer log only when canOffer ran, which it did not.
+  I cannot confirm whether the tenant had box_offer off (that is a real-DB setting); the question's premise ("legacy offer when box_offer is off") matches the code: off => allowed unconditionally.
+
+=====================================================================================================
+R9 | FAIL | Several fixed or app-written replies still open with "Noted"/"Note kar liya"/"Thanks"/"Understood"; the constitution.py:2382 line is no longer one in the working tree, but the committed (HEAD) code still has it.
+=====================================================================================================
+Evidence (working tree line numbers; HEAD differences stated):
+A. constitution.py:2382 (working tree) = FALLBACK_OTHER["en"] "Which of these would you most like to see fixed first?" (and roman_ur/ur/ar). NOT a noting line.
+   The noting line was at HEAD constitution.py:2390: `return f"Note kar liya. {nxt}" if nxt else safe_fallback(context)` (Roman Urdu, English-leak repair). The uncommitted working tree replaced it at constitution.py:2484
+   with `return nxt or safe_fallback(context)  # spec 17.6: no "Note kar liya" announcement`. So: fixed in the working tree, STILL LIVE in the committed/deployed code until this change is committed.
+B. decisions.py:316-317 "changes_noted": en "Noted: {changes}. I've sent this to Workzap. They'll send a revised version here." / roman_ur "Note kar liya: {changes}. Maine ye Workzap ko bhej diya hai. Wo yahin nayi version bhejenge." (ar: decisions.py:318 "سجلت:"). Used when a quote change request is recorded (S8b); not a listening-state reply, but it is a fixed "Noted" opener.
+C. reply_voice.py:19-27 FRAMES: en "Thanks. I've noted it:", "Got it, noted:", "Understood, I've noted:", "Noted:"; roman_ur "Shukriya. Maine note kar liya:", "Theek hai, note kar liya:", "Samajh liya, note kar liya:", "Note kar liya:"; ar equivalents.
+   Applied by localise_noted via voice_noted (service_conversation.py:2216-2224) for NON-brain workspaces; in brain mode drop_noted strips them (reply_voice.py:74). Not a fixed reply in brain, a live one elsewhere.
+D. Prompt templates (model-side, brain too): spec/handbook.json 2.3 ("Thanks. I've noted it: {title}. Anything else getting in the way?" and "Noted: {title}. What else?") and 3.3 step 5 (see R1). reply_voice.py:3,13 documents that the model copies this.
+E. learning_voice.py:42-62 SEEDS["acknowledge"]: en "Got it.", "Understood.", "I see.", "Noted."; roman_ur "Samajh gaya.", "Ji, samajh aaya.", "Aap ki baat samajh aayi."; correct variants "Samajh gaya, ab sahi likh diya." Approved voice variants, chosen only when learning is on (opt-in), but they are acknowledgement openers.
+F. Other "Thanks."/"Understood" openers in fixed replies: safety.py:1506 "Understood. I won't message you again..." (opt-out confirmation, legitimate); safety.py:2340-2342 enquiry lines open "Thanks. I'll pass ..."; language.py:416 and runtime.py:400 "Thanks. I couldn't open that file here..."; business_profile.py:143 roman_ur "Page se ye samajh aaya: {what}."; message_understood.py:37 and staff_review.py:53 label "Noted" (staff-only dashboard label, not sent to the owner).
+G. "alag note kar li": NO fixed reply with that wording exists in app code. It appears only as a model-output fixture in tests (tests/integration/test_pi_topics_hold_live.py:21 NOTED = "...Alag note kar li hai.", :105 asserts it is not in the reply; tests/unit/test_pi_topics_switch.py:73) and topics.py:176 tells the model never to say "noted separately". So that phrase is model-written; guards: topics.py:176 prompt, reply_gates.empty_opener (reply_gates.py:113 regex covers "note kar liya", "samajh gaya", does not list "alag note kar li"), constitution.py:669 and :713 regexes (thanks|noted|got it|shukriya|note kar liya|samajh liya) - "alag note kar li" matches none of them, so a model-written "Alag note kar li hai." opener is not caught by those regexes (experience_scorer.py:52 does know "note kar li", scoring only).
+Guards against model-written openers (not fixed replies): constitution.py:669 (opener regex), :2143-2148 (rewrite reason), reply_gates.py:113-125 empty_opener (called at service_conversation.py:4949), expert_advisor.py:171, service_conversation.py:962 and :4258-4277, think_prompt.py:89.
+R2 | UNKNOWN (live) / PASS (static) | Code defaults are all OFF; which tenant answered the 28 Oct number ("Workzap 2") and its live warm-up value CANNOT be determined without the live DB.
+Evidence: docs/pi-saas/check-tenant-of-chat.sql is strictly SELECT-only (one SELECT with JOINs customers/pi_conversations/tenants/environments/pi_settings, LIMIT 5, no phone number printed, no DML/DDL). NOT run by me. The owner must run it themselves in the Neon SQL editor (note: it filters ILIKE '%dalal%', change to look up the Workzap 2 chat).
+Static defaults (all read from pi_settings.response_rules JSON; a missing key means off):
+ - response_rules.pi_mode: default "standard" (policy.py:37 allows standard|brain); brain only when == "brain" (flow.py:351 brain_mode, box.py:88, map_builder.py:64, constitution.py:1057 etc.).
+ - response_rules.brain.warmup: default False; read in warmup.py:93 enabled() `is True`; used service_conversation.py:1623, runtime.py:1445, service_conversation.py:5878.
+ - response_rules.brain.box_offer: default False; box.py:90, box_doc.py:37 (`is True`, also needs pi_mode brain).
+ - response_rules.brain.map_share: default False; map_builder.py:64 (`is True`, needs pi_mode brain).
+ - response_rules.brain.solution_mode: default False; service_conversation.py:3808, solution_context.py:57 (`is True`, needs brain).
+ - tunables: brain_config.py (debounce_seconds 6, burst_max_seconds 25).
+Number -> tenant mapping: model PiProviderConnection (WhatsAppConnection in runtime) (apps/api/app/modules/pi_saas/models.py ~294-306), column phone_number_id (indexed with provider), carrying tenant_id + environment_id; settings are then pi_settings rows for that tenant+environment.
+
+R3 | FAIL | Message A is NOT dropped as stale, but is silently skipped at the later step-6 re-check with no burst code, so B's reply never receives A. Matches 28 Oct.
+Evidence (runtime.py):
+ 1. stale_reply() (runtime.py:2300) = newer_waiting AND NOT burst_too_long. burst_too_long (2308) uses brain_config burst_max_seconds=25. With B 60s after A, A's age >=60s > 25s, so stale_reply returns False: A's draft is NOT dropped there (line 1456-1470 branch not taken).
+ 2. Step 6 (runtime.py ~1513-1531): after re-locking, `conversation.last_inbound_at != inbound_snapshot` is true because B's arrival set last_inbound_at (runtime.py:221). Then `message.status, event.status = "skipped", "processed"; commit; return` -- NO error_code, no reply sent. A's reply is discarded.
+ 3. B's regenerated turn: burst_before() (runtime.py:585) only collects inbound rows with status "skipped" AND error_code in BURST_CODES (BURST_COALESCED, RATE_LIMIT_CONVERSATION, OUTAGE). A has error_code None, so excluded. The history query (service_conversation.py:3831-3846) only reads status processed/queued/sent/delivered/read, so A (skipped) is excluded there too. Result: B's reply sees only "What can you do about it?" -- exactly the 28 Oct symptom.
+ (If B arrives within 25s, A is dropped by stale_reply WITH BURST_COALESCED and B does receive A: that path works.)
+Likely fix (not applied): at the step-6 skip set error_code="BURST_COALESCED" when the cause is last_inbound_at moved by a newer inbound (and keep handoff/closed cases code-less).
+Test: apps/api/tests/unit/test_pi_first_message_not_lost.py (unique basename; no integration twin). Run via pi-test-env + venv python: 1 failed (test_a_skipped_at_recheck_is_kept_for_the_burst_answer, asserts the step-6 skip carries a burst code), 1 passed (test_a_old_draft_is_not_dropped_by_the_stale_check, documents point 1). Test is source-inspection plus fake-session for stale_reply; no DB/model used.
+
+R4 | PARTIAL | The fixed greeting path has no bypass: it is composed inside compose_service_turn and then goes through the same burst/stale checks, so the order is right when the second message arrives within the debounce or within 25s; but when the greeting reply is slow (>=25s) it hits the same step-6 silent skip as R3 and the greeting is lost.
+Evidence: service_conversation.py:5878-5925 (warm-up reply) and the plain-Hello block (~5897-5925, greeting_reply at 5708) just return a ServiceTurn; runtime.py applies, in order: debounce sleep 6s + newer_waiting skip (BURST_COALESCED, 913-930), compose (1432), stale_reply (1456), step-6 last_inbound_at re-check (1527), send. No greeting-specific exemption. The safety.greeting_reply salam/festival path (service_conversation.py:2058) is a pre-model gate in the same compose turn, same flow.
+Simulation (scratchpad sim_r4.py, real runtime.stale_reply with fake session; step-6 predicate described, not executed):
+ Hello, M2 at +2s, Hello finishes after 2s : Hello dropped (BURST_COALESCED); only the M2 reply is sent and it covers Hello (send order: M2 reply only).
+ Hello, M2 at +2s, Hello finishes after 40s: Hello not stale (age>25s); step-6 re-check skips it with no code: no greeting sent, Hello absent from M2 context; send order: M2 reply only.
+ No scenario sends greeting before M2's reply out of order; the risk is loss, not reordering. Note the AI disclosure (R-DISC-01) then rides only on M2's reply if that reply is the first one.
+R5 | FAIL | Ideas step gets all four problems, but its prompt has no rule forbidding industry nouns while the business is unconfirmed; "boxes, board, machine, godown staff" can only come from the model (or the model-guessed business_type), not from a pack/classifier on this text.
+Evidence: Built with a fake LLMManager (no model) calling expert_advisor.advise() with the 28 Oct inputs (script: scratchpad/r5.py). The user payload sent is:
+ {"today":"28 October 2026","industry":"not known yet","problem_sub_type":"not known","country":"not known","problems_noted":[<problem titles, last 4, 120 chars each>],"owner_first_message":"Sales: we currently use QB. Stock: have around 10 crore stock written on paper. Staff: no track of it who comes and goes at what time. Cash: cash in and out dont match","owner_messages_in_order":[<that message>,"What can you do about it?"],"never_say_list":[],"pi_already_said_do_not_repeat_or_reword":[],"sector_briefing_2026_may_help_never_assume":"","examples_of_level_not_to_copy":["Count the cash drawer with two people at closing and post the total in one shared chat, so any gap is seen straight away.","Confirm every cash on delivery order on chat with the item and the address before dispatch, so fewer parcels are refused."],"facts_owner_already_answered":["What can you do about it?"]}
+ System prompt = PERSONA ("twenty years running and advising small businesses in Pakistan, the UAE or Canada") + DIAGNOSE_RULES + STEER_RULES. temperature 0.4, max_tokens 4000.
+ Includes the four problems: YES, twice (verbatim in owner_first_message / owner_messages_in_order, and as problem titles in problems_noted; the titles are supplied by the extractor from noted_problems, service_conversation.py brain_expert_ideas ~line 2770: titles = [p["title"] for p in noted_now]). If the extractor had collapsed them into one title, problems_noted would carry one title but the verbatim owner text still has all four.
+ Forbids industry nouns until confirmed: NO. expert_advisor.py has no UNCONFIRMED_TRADE/G11 wording. Only: "industry": "not known yet" in the payload and persona says "small businesses". Rules say "assumes ONLY what the owner said", "assumes no equipment, machine, scale... the owner did not name", "never assume ... staff role they did not mention", and "uses the owner's own nouns". These are indirect; there is no sentence "do not name a trade, product, machine or customer type". The G11 text UNCONFIRMED_TRADE (service_conversation.py ~3711) goes only to the main reply prompt (industry_knowledge), NOT to expert_advisor.
+ Bug-ish: steer.answered = owner[1:][-4:] so the question "What can you do about it?" is sent as facts_owner_already_answered.
+ Code paths that could produce "boxes, board, machine and godown staff":
+  - Classifier/pack: industry_packs.detect() on these two messages returns no industry (checked: industries=[], stated=False), so no pack name, no pack entry_ideas, never_say or industry_knowledge for this text. unconfirmed_trade() (service_conversation.py:3717, commit 707aced) additionally blanks industry/industry_keys for guessed trades. The strings "godown staff" and "board" appear only in packs/industry/importers_and_trading_houses.json (lines ~194, 255), reachable only if that pack were chosen and then only as examples via pack_examples (which drops channel/asset words the owner did not say).
+  - Gold examples: gold_ideas.examples() returned only cash-drawer and COD ideas for this text (above); no boxes/board/machine.
+  - Fallback persona: trade_name() (service_conversation.py:2700) uses customer_profile.business_type (model-extracted, up to 80 chars) when no pack key. A model-guessed business_type is the one leak route into the persona ("advising <guess> businesses"); it is not gated by industry_confirmed.
+  - Therefore most likely the model itself (nothing in the prompt forbids it from inventing a trade from "10 crore stock", "godown"-style priors, or from a business_type guess). Not verifiable without a model call.
+ Recommendation (not applied): add the UNCONFIRMED_TRADE sentence to the expert system prompt when industry is None, and gate trade_name's business_type fallback on industry_confirmed.
+
+R6 | FAIL | The map writer is a pure function over problem rows the MODEL creates; it does not make one node per owner line by itself, never summarises the last message, and truncates labels to 6 words (so "Cash in and out do not match" is drawn "Cash in and out do not"). The node "Internal business problems across several areas" exists nowhere in the code: it is a model-written problem title.
+Evidence: map_builder.build_map(problems, links) (pure, no model, no WhatsApp) = one node per PiProblem row with status in DRAWN (taxonomy.ACTIVE incl. "draft", plus parked, resolved) and merged_into is None; label = label_of(p) = first non-empty of title_local, user_words[0], title, run through _words(text, MAX_LABEL_WORDS=6); facts = money_text/time_text/since/frequency/scope of_total (max 3). Rows come from problems.apply_ops -> ProblemBook.create(), fed by the model's problem_ops (prompt BRAIN_PROBLEMS, service_conversation.py ~line 931; "One message with several problems with different symptoms: one create each"; title <= 8 words, English, "starts with the subject"). ProblemBook.create() merges a create into an existing problem when title is identical, same category + similar title, same category + same subtype, or (cross-category) facet_overlap of 2-3 content words; so the model giving several notes the same category/subtype would collapse them.
+ Harness (scratchpad/r6.py, fake PiProblem-like rows, no model): 4 rows as a good model would write them -> 4 nodes: "Sales records kept on QB", "Stock recorded on paper only" facts ["10 crore"] , "No staff in-out time record", "Cash in and out do not" (the word "match" is lost: label_of cuts at 6 words; renderer _clean also limits to 6 - a 7-word label inverts meaning). One row titled "Internal business problems across several areas" with the whole 4-line message as user_words -> 1 node, label = that title (title_local falls back to the title), facts [].
+ Search: grep for "Internal business problems" / "across several areas" in apps/ finds nothing; no code step summarises the last message into one node (build_map never reads messages). So that node was produced upstream by the model's problem_ops create (a single create covering the whole message), then drawn as-is. Nothing in check_ops rejects such an umbrella title (title_problem only checks word count, blame and solution words), and there is no "one create per line" code check.
+ Owner's words and figures: label prefers title_local/user_words, but both are model-chosen; "QB" survives only if the model put it in the title; "10 crore" appears only if the model filled impact.money_text (facts_of does not mine the message). The renderer additionally drops any number not in the owner's messages (numbers_supported/said) and facts with unseen numbers.
+ Nodes for the 4-line message: 4 if the model creates 4 problems, 1 if it writes one umbrella problem (the 28 Oct case); the code does not enforce either.
+
+R7 | FAIL | Title/marks not clipped, text >= 24px, no ellipsis in legends, no overflow reported; but a 3-node map is about 60% blank (limit 20%), and the renderer does not refuse fewer than 3 nodes.
+Evidence: scratchpad/r7.py renders with map_render.render_map(map, "en"), PNGs in e:\COMPANY-ENGINEERING-HQ\05-COMPANY-SYSTEM\Owner OS\audit-run-2-maps\ (map_1nodes_0.png, map_3nodes_0.png, map_4nodes_0.png, map_9nodes_0.png); I viewed 1- and 3-node PNGs.
+ Common: width 1080; left/right margin 48; header band 150px; cards 440x212, 2 columns, column gap 104, row gap 80; title "Your business map" 44px bold-ish at bbox x48-421, y34-76 (room 842px, no clip); "Workzap" 30px at x910-1032; sub line 28px; card labels 30px; facts/legend/footer 24px (= MIN_TEXT_PX); smallest text recorded 24 (28 on the 1-node map, which has no legend). Overflow lists empty for all four. Blank% = share of canvas pixels still the background colour.
+ 1 node: 1080x746, one centred card x320-760,y224-436, blank 68.1% whole canvas (73.0% of content band). Header "Version 1 - 1 problem - No links yet". No legend, no footer text. Not refused: rendered. (FAIL on blank only; a 1-node map is not meant to be shared by share_due, rule FIRST_MIN_NODES=3, but render_map does not enforce it.)
+ 3 nodes: 1080x1038, cards at (48,224) (592,224) (320,516) i.e. 2+1 centred; cards end y728; blank 59.9% whole canvas (57.7% of content band) -> FAIL (>20%); header "Version 1 - 3 problems - No links yet"; legend labels "sales", "inventory", "staff" (24px) plus footer "Your numbers only. No names." (shown because a number "10 crore" is drawn); no ellipsis. Cards are mostly empty white (label 1-2 lines, no body), large dead area below row 2 and about 250px footer reserve.
+ 4 nodes: 1080x1038, 2x2 grid, blank 51.4%; legend sales/inventory/staff/finance; header "4 problems"; no ellipsis.
+ 9 nodes: 1080x1914 (cap MAX_HEIGHT 1920, one image; >9 nodes go to overview+detail images), blank 50.9%; legend capped at MAX_HUES=5 categories (customers listed, suppliers/operations/communication not listed: legend omits categories when more than 5 hues - by design, not an ellipsis). Last card centred alone.
+ Legend labels with "...": none (wrap uses a one-line cut with an ellipsis for long labels: Canvas.wrap(label, 24, 210, 1) in _footer would add one for a category label wider than 210px; none of the test categories reached it. Not ruled out for long localised/other category names).
+ Header counts text: "Version {v} - {n} problem(s) - {No links yet|n links}". (The console showed a garbled dot only because of the Windows code page; the PNG shows a proper middle dot.)
+ Refuses fewer than 3 nodes? NO. render_map only returns reason="empty_map" for 0 nodes (and unsupported_language / text_not_drawable). The 3-node minimum lives in map_builder.share_due (FIRST_MIN_NODES=3, or 2 with a link), not in the renderer.
+R11 | PARTIAL | OT4/OT5/OT6/OT14 (spec v1.5 16.10 found, p.206) written as unit tests. OT5 passes; OT4 passes at 48/50 (aggregate >=45 bar is my assumption; 2 misses: "hospitals" site detected as elderly_care_homes, "clinics_and_gp_practices" site detected as veterinary_clinics); OT6 passes with an injected refusing client but a literal private IP (10.0.0.5) is NOT refused by public_page itself (only by the injected client); OT14 profile part passes (per-business profile table + isolated profiles) but maps are NOT per business: PiMapVersion and PiProblem have no business_id (maps are per customer).
+Evidence: apps/api/tests/unit/test_pi_opening_tests_ot.py; 61 passed, 4 failed. Failures: test_ot4 [hospitals], test_ot4 [clinics_and_gp_practices], test_ot6_the_page_module_itself_refuses_a_literal_private_ip_before_any_request, test_ot14_two_businesses_have_two_maps. Assumptions: the 50 sites are synthetic snapshots (no network) run through real quick_look + industry_packs.detect; OT5/OT6/OT7 etc. already partly in test_pi_public_page.py; spec-audit-151-224.md lists OT4 and OT14 as MISSING. ruff check/format clean.
+
+R10 | UNKNOWN | (not approved) The owner has not written "approved" in this chat; no real-model replay was run.
+Evidence: none. No model calls made.
+
+==================================================================
+VERDICT
+==================================================================
+Causes, ranked: (1) The offer is ungated while response_rules.brain.box_offer is off: box_offer_allowed returns True and the legacy "Shall I get one solution document..." line is written by app code (R8, decision D1); canOffer exists but its result never removes offer text. (2) A message can be lost silently: at the step-6 re-check in runtime.py a newer inbound marks the older message "skipped" with no BURST_COALESCED code, so the reply to B never sees A (R3), and a slow greeting is dropped the same way (R4). (3) No industry-noun ban reaches the ideas step (expert_advisor) and the persona can take a model-extracted business_type before the business is confirmed (R5). (4) The map is only as good as the model's problem rows: an umbrella row gives one node, labels are cut at 6 words ("Cash in and out do not"), and the renderer leaves 51-68% blank on small maps (R6, R7). (5) Residue: Brain v3 noting templates, "You can say no" and the section 3.8 offer script survive in raw handbook sections; "Note kar liya" is still live in committed code (R1, R9). (6) OT14 (maps are per customer, not per business), two OT4 misses and the private-IP check in public_page (R11).
+Could not check: live tenant and flags for the 28 Oct number, and whether its warm-up flag is on (R2: needs the Neon SQL editor); the full production prompt (needs a DB-backed context; handbook searched instead); which offer path fired at 3:46 on 28 Oct (R8); what the real model does (R10, not approved); the map writer on real model output; whether the "boxes, board, machine and godown staff" words were model-invented (R5).
+
+==================================================================
+FIX LIST (smallest changes first; none applied)
+==================================================================
+1. runtime.py step-6 skip: set error_code="BURST_COALESCED" when a newer inbound caused it, so burst_before feeds A into B's reply. Test: apps/api/tests/unit/test_pi_first_message_not_lost.py (currently fails) plus a behavioural version running the job.
+2. service_conversation.py box_offer_allowed (and decisions.py S4 branch): when box_offer is off, do not write the legacy offer unless R1 (owner asked for a quote); call box.can_offer and strip offer text from model replies. Tests: OF1 to OF4.
+3. constitution.py (the "Note kar liya" return, now ~:2484) and decisions.py:316-317: replace noting openers; make reply_gates.without_say_no run at send time; extend opener regexes (constitution.py:669/:713, reply_gates.py:113). Tests: OT/NG opener tests and a build-time scan of the assembled prompt for the Part 14 list.
+4. spec_handbook supersession: patch or drop the noting templates, "You can say no" and the 3.8 offer script in 0.2, 2.3, 3.3, 3.8 and goldens G5/G6/G10. Test: prompt-residue scan on every build (R1).
+5. expert_advisor.py: add the UNCONFIRMED_TRADE (G11) ban to the ideas prompt; gate persona business_type on confirmation; stop sending "What can you do about it?" as facts_owner_already_answered. Tests: NG1, TS7, TS8, IL1, IL2.
+6. Map: reject umbrella problem titles in check_ops (one problem per owner line, figures kept); stop the 6-word label cut; tighten the renderer layout (3-node map under 20% blank). Tests: MD1 to MD8 and R7 render checks.
+7. public_page: refuse literal private IPs itself; fix the two OT4 industry misses (hospitals, clinics). Tests: test_pi_opening_tests_ot.py.
+8. Add business_id to PiMapVersion and PiProblem (new numbered migration; check alembic heads first). Test: OT14.
+9. Run docs/pi-saas/check-tenant-of-chat.sql in Neon (change the ILIKE '%dalal%' filter to find the "Workzap 2" chat) and paste the result for R2 and D3.
+
+
+==================================================================
+STATUS UPDATE, 30 Oct 2026 (after the first fixes; the results above are as of 09:48)
+==================================================================
+Legend: FIXED = in the working tree and its tests pass (not yet committed or deployed).
+        CHANGING = a change is in progress now, do not treat the result as final.
+        OPEN = not started, or waiting for a decision.
+Unit suite: 24 failed at the last full run; 15 of them are fixed since (offer and Note-kar-liya tests). 9 remain (see CHANGING and OPEN).
+
+R1  prompt residue ............ CHANGING  (scripts/supersession_residue.py; handbook patches in spec/supersession.json being extended)
+R2  tenant and flags .......... OPEN      (needs the Neon SQL editor; owner to run docs/pi-saas/check-tenant-of-chat.sql, decision D3)
+R3  A lost when B arrives ..... FIXED     (runtime.py step-6 now sets BURST_COALESCED; test_pi_first_message_not_lost.py and test_pi_stale_reply.py pass)
+R4  slow greeting dropped ..... FIXED     (same change as R3)
+R5  industry nouns in ideas ... FIXED     (UNCONFIRMED_TRADE_RULE in expert_advisor.py)
+R6  map writer ................ CHANGING  (map renderer and labels being reworked; umbrella problem titles are still a model-side risk)
+R7  map renderer .............. CHANGING  (new vertical layout in map_render.py; 3-node image looks right, blank-area check still to re-run)
+R8  offer paths ............... FIXED     (box_offer off: offer only when the owner asks, R1; strip_unallowed_offer wired; 13 stale tests updated). D1 still needs the owner's yes
+R9  noting openers ............ FIXED     (changes_noted opener and the Note kar liya fallback removed; 2 stale tests updated)
+R10 real-model replay ......... OPEN      (not approved; owner must write "approved")
+R11 opening tests OT4/5/6/14 .. CHANGING  (OT4, OT5, OT6 pass; OT14 fails: maps are per customer, not per business; needs business_id and a new migration, owner to decide)
+
+Other failing tests, owned by work in progress (not part of this audit):
+- R-GEN-01 gender-neutral Roman Urdu: safety.ABUSE_TEXT and 2 golden replies ......... CHANGING
+- Self-harm Roman Urdu line (test_pi_safety) .................................... CHANGING
+- Urdu script detected as ur, tests expect roman_ur (2 tests) .................... CHANGING

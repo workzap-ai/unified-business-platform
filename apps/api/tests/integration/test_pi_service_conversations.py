@@ -23,6 +23,16 @@ from app.modules.sales.models import SalesLead
 pytestmark = pytest.mark.integration
 
 
+@pytest.fixture(autouse=True)
+def any_hour_any_day(monkeypatch):
+    """These tests use the real clock. Without this they fail on a Friday around midday (the
+    Jumu'ah pause) and at night (quiet hours), when a reminder is correctly held back."""
+    from app.modules.pi import followups
+
+    monkeypatch.setattr(followups, "quiet_until", lambda *a, **k: None)
+    monkeypatch.setattr(followups, "_friday_prayer", lambda tz: False)
+
+
 def turn(**changes):
     data = dict(
         reply="Aapki website ka main maqsad kya hai?",
@@ -44,6 +54,8 @@ def mock_turns(monkeypatch, *turns):
     last: list = []
 
     async def complete(self, scope, output, **kwargs):
+        if kwargs.get("purpose") == "pi_problem_extract":  # the separate note extractor: empty
+            return SimpleNamespace(value=output(), response=SimpleNamespace(attempts=[]))
         assert scope is not None and kwargs["purpose"] == "pi_service"
         if kwargs["messages"][-1].text().startswith("Don't send that draft"):
             # pi's self-check asked for a rewrite: these tests script one reply per turn.
@@ -301,7 +313,7 @@ async def test_provider_failure_does_not_invent_a_reply(api, business_db, monkey
     await pi.process("Website chahiye", "provider-down")
     assert (await pi.conversation()).mode == "ai"  # nothing invented; the team is asked
     [notice] = await pi.outbound()
-    assert notice.body.startswith("Noted. Team se confirm")  # in their language
+    assert notice.body.startswith("Team se confirm")  # in their language
     desk = (await api.get("/api/v1/pi/requests")).json()["items"]
     assert "provider_failure" in desk[0]["context"]
     await pi.close()

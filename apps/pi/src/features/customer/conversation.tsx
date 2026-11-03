@@ -9,6 +9,7 @@ import {
   CircleCheck,
   ClipboardList,
   Hourglass,
+  Network,
   ImageIcon,
   MessageCircle,
   Play,
@@ -54,6 +55,7 @@ import {
   useLang,
   usePrefs,
 } from "./shared";
+import { ProblemMapSection, SolutionBoxCard } from "./problem-map";
 import {
   ActivityTimeline,
   ProblemMap,
@@ -63,7 +65,7 @@ import {
 
 export function ConversationView({ id }: { id: string }) {
   const client = useQueryClient();
-  const [tab, setTab] = useState<"chat" | "requests">("chat");
+  const [tab, setTab] = useState<"chat" | "requests" | "map">("chat");
   const detail = useQuery({
     queryKey: ["pi-customer", "conversation", id],
     queryFn: () =>
@@ -175,7 +177,7 @@ export function ConversationView({ id }: { id: string }) {
 
       <div className="sticky top-[calc(3.5rem+env(safe-area-inset-top))] z-20 -mx-4 bg-background/95 px-4 py-2 backdrop-blur sm:top-[calc(4rem+env(safe-area-inset-top))] sm:mx-0 sm:px-0 lg:hidden">
         <div
-          className="grid grid-cols-2 gap-1 rounded-xl bg-surface-muted p-1"
+          className="grid grid-cols-3 gap-1 rounded-xl bg-surface-muted p-1"
           role="tablist"
           aria-label="Conversation sections"
         >
@@ -183,6 +185,7 @@ export function ConversationView({ id }: { id: string }) {
             [
               ["chat", "Chat", MessageCircle, c.messages.length],
               ["requests", "Requests", ClipboardList, openRequests],
+              ["map", "Map", Network, 0],
             ] as const
           ).map(([key, label, Icon, count]) => (
             <button
@@ -234,8 +237,15 @@ export function ConversationView({ id }: { id: string }) {
             tab !== "requests" && "hidden lg:block",
           )}
         >
+          <div className="mb-4 empty:hidden">
+            <SolutionBoxCard conversationId={id} />
+          </div>
           <Requests detail={c} />
         </div>
+      </div>
+
+      <div className={cn("min-w-0", tab !== "map" && "hidden lg:block")}>
+        <ProblemMapSection conversationId={id} />
       </div>
 
       {/* Phones: the two actions stay in reach of the thumb. */}

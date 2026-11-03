@@ -25,6 +25,25 @@ from app.modules.memberships.models import Membership
 from app.modules.navigation.models import NavigationPreference
 from app.modules.notifications.models import Notification, NotificationRead
 from app.modules.orders.models import Order, OrderLine
+from app.modules.pi.box_models import PiBoxTransition, PiMapVersion, PiOfferLog, PiSolutionBox
+from app.modules.pi.brain_docs_models import PiBrainDocument, PiBrainPayment
+from app.modules.pi.business_models import PiBusiness
+from app.modules.pi.business_profile_models import (
+    PiBusinessProfile,
+    PiPageSnapshot,
+    PiProfileFact,
+)
+from app.modules.pi.execution_models import PiExecutionRun
+from app.modules.pi.experience_models import PiExperience
+from app.modules.pi.learning_models import (
+    PiLearnedPack,
+    PiLearningChange,
+    PiLearningExample,
+    PiLearningLesson,
+    PiLearningRun,
+    PiQuestionArm,
+)
+from app.modules.pi.memory_models import PiDecision, PiDocumentText, PiRejection
 from app.modules.pi.models import (
     KnowledgeChunk,
     KnowledgeDocument,
@@ -43,6 +62,24 @@ from app.modules.pi.models import (
     WhatsAppConnection,
     WhatsAppWebhookEvent,
 )
+from app.modules.pi.open_item_models import PiOpenItem
+from app.modules.pi.problem_models import (
+    PiProblem,
+    PiProblemGroup,
+    PiProblemLink,
+    PiProblemRevision,
+)
+from app.modules.pi.quarantine_models import PiQuarantine
+from app.modules.pi.solution_models import (
+    PiBuildFit,
+    PiCatalogueProposal,
+    PiIdeaArm,
+    PiIdeaFeedback,
+    PiIdeaSource,
+    PiSolutionMemory,
+    PiSolutionVersion,
+)
+from app.modules.pi.think_models import PiHypothesis, PiMoveLog
 from app.modules.pi_customer.models import (
     CustomerFace,
     CustomerPasskey,
@@ -104,6 +141,42 @@ from app.shared.sequences import DocumentSequence
 from app.workflows.models import WorkflowRun
 
 __all__ = [
+    "PiBrainDocument",
+    "PiBrainPayment",
+    "PiExperience",
+    "PiLearnedPack",
+    "PiLearningChange",
+    "PiLearningLesson",
+    "PiLearningExample",
+    "PiLearningRun",
+    "PiQuestionArm",
+    "PiBuildFit",
+    "PiCatalogueProposal",
+    "PiIdeaArm",
+    "PiIdeaFeedback",
+    "PiIdeaSource",
+    "PiSolutionMemory",
+    "PiSolutionVersion",
+    "PiQuarantine",
+    "PiBusiness",
+    "PiBusinessProfile",
+    "PiProfileFact",
+    "PiPageSnapshot",
+    "PiMapVersion",
+    "PiBoxTransition",
+    "PiOfferLog",
+    "PiMoveLog",
+    "PiHypothesis",
+    "PiDecision",
+    "PiDocumentText",
+    "PiExecutionRun",
+    "PiOpenItem",
+    "PiRejection",
+    "PiSolutionBox",
+    "PiProblem",
+    "PiProblemGroup",
+    "PiProblemLink",
+    "PiProblemRevision",
     "PiDealSettings",
     "PiDocument",
     "CustomerFace",

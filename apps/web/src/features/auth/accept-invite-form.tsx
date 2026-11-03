@@ -50,11 +50,14 @@ export function AcceptInviteForm() {
           Invalid invitation link
         </h1>
         <Notice tone="danger" className="mt-6">
-          This link is missing its token. Ask whoever invited you to send a
-          new one.
+          This link is missing its token. Ask whoever invited you to send a new
+          one.
         </Notice>
         <p className="mt-6 text-center text-sm text-muted-foreground">
-          <Link href="/login" className="font-medium text-primary hover:underline">
+          <Link
+            href="/login"
+            className="font-medium text-primary hover:underline"
+          >
             Go to sign in
           </Link>
         </p>

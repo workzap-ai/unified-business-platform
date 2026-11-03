@@ -1,0 +1,323 @@
+{
+  "industry": "fish_and_shrimp_farming",
+  "name": "Fish and shrimp farming (aquaculture)",
+  "sector": "7.C Agriculture, livestock and rural (part 1)",
+  "version": "1.1",
+  "problems": [
+    {
+      "id": "p1_count_mismatch",
+      "n": 1,
+      "words": "Stocked 10,000 fingerlings, harvested far fewer, no idea where they went",
+      "category": "stock_inventory",
+      "subtype": "count_mismatch",
+      "quick_ideas": [
+        "Record stocking count, date and source per pond, not just the total",
+        "Note harvest kg per pond so ponds can be compared."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "a pond register that tracks stocking, losses seen and harvest per pond and shows the owner where numbers do not match.",
+        "tool_words": []
+      },
+      "ask_first": "How many ponds do you run?",
+      "free_stops": "The register fields and pond comparison go in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Walk each pond edge and note every place fish can leave unnoticed, so you see where losses may be happening between stocking and harvest.",
+          "review": false
+        },
+        {
+          "text": "Give one worker the job of noting every movement into or out of each pond, so unexplained losses have a clearer starting point.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p2_maintenance_downtime",
+      "n": 2,
+      "words": "Fish died overnight when the aerator stopped and nobody called me",
+      "category": "operations_process",
+      "subtype": "maintenance_downtime",
+      "quick_ideas": [
+        "Set fixed night rounds for the chowkidar with a call to you if anything stops",
+        "Note every stoppage; for a die-off, call your fisheries officer at once."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "workflow_automation — timed night check-ins and a downtime log, with alerts to on-call staff from any existing alarm or monitoring device.",
+        "tool_words": []
+      },
+      "ask_first": "Is there a generator or solar backup for the aerators?",
+      "free_stops": "Round timings and alert routing are detailed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare stoppages by time and pond from recent notes, so you can see which hours and locations fail you most often.",
+          "review": false
+        },
+        {
+          "text": "Assign one night worker to report every round in one notebook, so stopped aerators are noticed and passed on without delay.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p3_theft_internal",
+      "n": 3,
+      "words": "Feed bags go missing from the store",
+      "category": "loss_security",
+      "subtype": "theft_internal",
+      "quick_ideas": [
+        "Count bags in and out and compare weekly",
+        "Keep the store locked with one role holding the key."
+      ],
+      "workzap_build": {
+        "keys": [
+          "stock_alerts"
+        ],
+        "text": "feed deliveries, issue per pond and stock left logged daily, sending the owner an alert when gaps appear.",
+        "tool_words": []
+      },
+      "ask_first": "Who issues feed each day?",
+      "free_stops": "The store log and gap rules stay in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare feed issued with the days each pond was actively fed, so missing bags stand out against normal store movement.",
+          "review": false
+        },
+        {
+          "text": "Make one person hand over the store count at the same time daily, so bag shortages are caught before they grow.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p4_margin_unknown",
+      "n": 4,
+      "words": "Feed cost has gone up and I don't know cost per kg of fish",
+      "category": "margin_cost",
+      "subtype": "margin_unknown",
+      "quick_ideas": [
+        "Note feed issued per pond",
+        "Put a season's feed, power and labour bills against kg harvested."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "cost per pond and per kg calculated for the owner directly from the farm's own entries.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "Is feed issued per pond, or for the whole farm?",
+      "free_stops": "Which costs go in and how they're split per pond goes in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "For one pond ready to sell, compare feed bags issued with kilos harvested, so costly ponds stand out before the next sale.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member one notebook page per pond cycle for feed, power and labour notes, so cost per kilo can be checked later.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p5_supplier_quality",
+      "n": 5,
+      "words": "Seed from the hatchery was poor quality, many died",
+      "category": "suppliers_purchasing",
+      "subtype": "supplier_quality",
+      "quick_ideas": [
+        "Note seed source and batch for each pond",
+        "Take repeated problems to your fisheries officer or consultant."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "harvest and losses compared by seed source season after season.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "How many seed suppliers do you use?",
+      "free_stops": "How sources are compared stays in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare ponds by seed source and later harvest outcome from your notes, so weaker suppliers are easier to spot.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of logging every seed delivery by source and pond, so later losses can be linked back clearly.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p6_pricing_disputes",
+      "n": 6,
+      "words": "Arhti weighs the fish and sets the rate, I can't check",
+      "category": "sales_revenue",
+      "subtype": "pricing_disputes",
+      "quick_ideas": [
+        "Have someone present at weighing who notes kg per load",
+        "Keep the weighbridge slip and the day's rate for every sale."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "a harvest record with kg, rate and slip photo per load, compared across agents for the owner.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "Do you sell through one agent or several?",
+      "free_stops": "The harvest record and agent comparison go in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "For each sale this week, note the arhti rate beside loaded baskets and final weighed kilos, so weight and price differences are easier to spot.",
+          "review": true
+        },
+        {
+          "text": "Give one person the job of keeping each sale slip with the matching weigh paper, so rate disputes are checked from one bundle.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p7_receivables_late",
+      "n": 7,
+      "words": "Fish market agent pays weeks later",
+      "category": "cash_collections",
+      "subtype": "receivables_late",
+      "quick_ideas": [
+        "Confirm each sale and expected payment date in writing",
+        "Keep a running balance per agent."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger"
+        ],
+        "text": "a buyer ledger for agents, exporters and hotels showing pending dues and sending payment reminders to them.",
+        "tool_words": []
+      },
+      "ask_first": "How long do payments usually take?",
+      "free_stops": "Reminder timing and statement layout are set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Look back at recent agent sales and note promised versus actual payment days, so the agents causing the longest cash delays stand out.",
+          "review": true
+        },
+        {
+          "text": "Give one staff member one running page for each market agent balance, so follow up starts from the latest due amount each time.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p8_theft_external",
+      "n": 8,
+      "words": "People net fish from my ponds at night",
+      "category": "loss_security",
+      "subtype": "theft_external",
+      "quick_ideas": [
+        "Set night rounds at fixed times",
+        "Report thefts to the police; never confront armed groups."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "timed night check-ins with photos, alerting the owner right away when staff miss one.",
+        "tool_words": []
+      },
+      "ask_first": "Which ponds are hit most?",
+      "free_stops": "Check-in timing and alerts go in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note the pond side and time for each night theft report, so you can see which areas are targeted most often.",
+          "review": false
+        },
+        {
+          "text": "Give one person the night incident notebook and tell staff to report every sign of theft there, so police reports use one account.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p9_delivery_late",
+      "n": 9,
+      "words": "Fish spoil if the truck is late",
+      "category": "orders_fulfilment",
+      "subtype": "delivery_late",
+      "quick_ideas": [
+        "Note when each truck leaves and arrives",
+        "Agree a latest arrival time with each buyer."
+      ],
+      "workzap_build": {
+        "keys": [
+          "order_capture"
+        ],
+        "text": "a delivery tracker with departure and arrival times and late alerts for every load.",
+        "tool_words": []
+      },
+      "ask_first": "How far does the harvest travel to the buyer?",
+      "free_stops": "The tracking points and alerts stay in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare planned departure and actual arrival times for recent loads, so you can see where delays usually start.",
+          "review": false
+        },
+        {
+          "text": "Assign one person to own the dispatch note from loading to buyer arrival, so late trucks are chased by one clear handover.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p10_supply_consistency",
+      "n": 10,
+      "words": "Hotel and restaurant clients want fixed weekly supply, I can't commit",
+      "category": "sales_revenue",
+      "subtype": "supply_consistency",
+      "quick_ideas": [
+        "List each pond's likely harvest window from your records",
+        "Only commit to what those records support."
+      ],
+      "workzap_build": {
+        "keys": [
+          "order_capture"
+        ],
+        "text": "a weekly supply planner that matches client orders against pond harvest windows for the owner.",
+        "tool_words": []
+      },
+      "ask_first": "How many hotel or restaurant clients are asking?",
+      "free_stops": "How the planner matches orders to ponds is worked out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Review the last few harvest dates and sale quantities pond by pond, so fixed weekly promises match what your farm usually releases.",
+          "review": false
+        },
+        {
+          "text": "Give one person a notebook for buyer commitments by week, so hotel and restaurant orders stop clashing with likely harvest timing.",
+          "review": false
+        }
+      ]
+    }
+  ],
+  "never_say": [
+    "Any feeding rate, water-treatment chemical, medicine, antibiotic, disease, stocking density or pond design advice; suggest their fisheries officer, consultant or vet.",
+    "Anything that helps hide residue issues, evade export tests, or use unlicensed water or land.",
+    "Confrontation advice for theft, especially by armed groups; suggest the police.",
+    "Promised harvests or profits.",
+    "Collecting workers' or agents' IDs or bank details."
+  ],
+  "sample_reply": {
+    "person": "Muzaffargarh mein 12 talab hain rohu aur thaila ke, harvest bohat kam nikla aur raat ko aerator band ho toh subah pata chalta hai. Koi hal?",
+    "pi": "Zaroor, ye sambhal sakta hai, aur pehla qadam aasan hai.\nPehle, har talab mein kitna bacha daala aur kitne kilo nikle, alag alag likhein, taake farq wala talab saamne aaye.\nDoosra, chowkidar ke raat ke chakkar muqarrar waqt pe hon aur kuch band ho toh woh foran phone kare; machli ek saath mare toh fisheries officer se foran raabta karein.\nIs mein Workzap ye shamil kar sakta hai: talab register aur raat ka check-in record, jahan check-in na aaye toh aap ko foran alert mile.",
+    "language": "roman_urdu"
+  }
+}

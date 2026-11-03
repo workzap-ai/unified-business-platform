@@ -1,0 +1,322 @@
+{
+  "industry": "music_art_and_dance_schools",
+  "name": "Music, art and dance schools",
+  "sector": "7.J Education and childcare",
+  "version": "1.1",
+  "problems": [
+    {
+      "id": "p1_manual_work",
+      "n": 1,
+      "words": "Make-up class requests are endless and we can't track who's owed what",
+      "category": "operations_process",
+      "subtype": "manual_work",
+      "quick_ideas": [
+        "Write one make-up rule and share it with parents, so requests are judged the same way",
+        "List the make-ups owed today, so you have a starting point."
+      ],
+      "workzap_build": {
+        "keys": [
+          "booking_scheduling"
+        ],
+        "text": "A lesson ledger that tracks missed and make-up lessons under your rules, with parents booking make-ups themselves.",
+        "tool_words": []
+      },
+      "ask_first": "Do make-up requests come mostly from illness, or from travel and exams?",
+      "free_stops": "How the rules and booking work is kept for the document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many make-up requests are still unsettled at this week's end, so you see how big the backlog really is.",
+          "review": false
+        },
+        {
+          "text": "Keep one paper list of make-up lessons owed in the office, so every teacher checks the same place before promising a slot.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p2_pricing_errors",
+      "n": 2,
+      "words": "Lesson packs expire but nobody checks",
+      "category": "sales_revenue",
+      "subtype": "pricing_errors",
+      "quick_ideas": [
+        "Check every active pack's lessons used and expiry once, so you know where you stand",
+        "Tell families their pack status before renewing, so expiry isn't a surprise."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger"
+        ],
+        "text": "Packs and terms tracked with lessons used and expiry, with renewal reminders sent when due.",
+        "tool_words": []
+      },
+      "ask_first": "Do packs expire mostly with lessons unused, or after the last lesson is taken?",
+      "free_stops": "The reminder timing is in the document.",
+      "extra_ideas": [
+        {
+          "text": "Note how many active lesson packs are already past expiry but still being used, so missed checks stop slipping by unnoticed.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member a fixed weekly pack expiry check, so renewals are raised before lessons continue by accident.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p3_conversion_low",
+      "n": 3,
+      "words": "Trial lessons don't turn into enrolments",
+      "category": "sales_revenue",
+      "subtype": "conversion_low",
+      "quick_ideas": [
+        "List this month's trials and who joined, so you see the gap",
+        "Make one person follow up after every trial, so none are forgotten."
+      ],
+      "workzap_build": {
+        "keys": [
+          "lead_followup"
+        ],
+        "text": "Every trial tracked to enrolment, with scheduled follow-up reminders and conversion by discipline.",
+        "tool_words": []
+      },
+      "ask_first": "Do trials fail to convert in one discipline, or across all of them?",
+      "free_stops": "The follow-up timing is kept for the document.",
+      "extra_ideas": [
+        {
+          "text": "Compare trial attendance by discipline against enrolments from those trials this month, so you see which classes sell themselves and which do not.",
+          "review": false
+        },
+        {
+          "text": "Give one teacher the job of recording each trial outcome that day, so follow-up stops getting lost after busy classes.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p4_churn_subscription",
+      "n": 4,
+      "words": "Kids quit after one term",
+      "category": "customers_retention",
+      "subtype": "churn_subscription",
+      "quick_ideas": [
+        "Count who stayed from last term by discipline, so you see where the drop is",
+        "Ask leaving families for their one main reason, so you know what to fix."
+      ],
+      "workzap_build": {
+        "keys": [
+          "loyalty_repeat"
+        ],
+        "text": "Retention tracked by term and discipline as counts, with next-term reminders sent on time.",
+        "tool_words": []
+      },
+      "ask_first": "Do children quit mostly after exams or recitals, or at any point in the term?",
+      "free_stops": "The retention reports and reminders are in the document.",
+      "extra_ideas": [
+        {
+          "text": "Compare term-to-term returns for music, art and dance separately, so you spot where children are leaving fastest.",
+          "review": false
+        },
+        {
+          "text": "Keep one leaving-reason page at reception, so staff note the main cause each time a family stops classes.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p5_capacity",
+      "n": 5,
+      "words": "Weekday rooms are empty, Saturdays are chaos",
+      "category": "operations_process",
+      "subtype": "capacity",
+      "quick_ideas": [
+        "Map room use by hour for one week, so empty slots are visible",
+        "Choose one empty slot to fill, such as an adult class or studio hire, so the room earns."
+      ],
+      "workzap_build": {
+        "keys": [
+          "booking_scheduling"
+        ],
+        "text": "dashboards_reports — A room and teacher calendar with self-booking, studio-hire slots and room-hour use measured.",
+        "tool_words": []
+      },
+      "ask_first": "Are weekday rooms empty all day, or only in the mornings?",
+      "free_stops": "How slots and pricing for hire are set up is kept for the document.",
+      "extra_ideas": [
+        {
+          "text": "Walk through the school at the same weekday hours and on Saturday, so the empty rooms and crowded periods are easy to compare.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of offering quieter weekday slots when parents ask, so Saturday pressure eases during normal booking chats.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p6_commission_disputes",
+      "n": 6,
+      "words": "Teachers' split causes arguments every month",
+      "category": "people_staff",
+      "subtype": "commission_disputes",
+      "quick_ideas": [
+        "Write down each teacher's agreed split once, so there is one record",
+        "Show each teacher their lesson count before pay, so disagreements surface early."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "Teacher pay worked out directly from delivered lessons and agreed splits, with a monthly statement.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "Do the arguments come from lesson counts, or from deductions like room costs?",
+      "free_stops": "The pay rules are in the document.",
+      "extra_ideas": [
+        {
+          "text": "Compare each teacher's own lesson tally with the office tally before pay time, so mismatches are caught before arguments start.",
+          "review": false
+        },
+        {
+          "text": "Keep one commission record in one notebook with one owner, so monthly pay talks rely on the same figures.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p7_tasks_dropped",
+      "n": 7,
+      "words": "Recital planning is all on WhatsApp and things get missed",
+      "category": "communication_coordination",
+      "subtype": "tasks_dropped",
+      "quick_ideas": [
+        "List every recital task with an owner and date once, so nothing is assumed",
+        "Confirm costume delivery dates with the tailor now, so late orders show early."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "A recital planner with tasks, rehearsals, costume orders, seat counts and fees, with reminders sent on schedule.",
+        "tool_words": []
+      },
+      "ask_first": "Is recital planning missed mostly on costumes, or on rehearsals and bookings?",
+      "free_stops": "The planner stages are kept for the document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many recital jobs were mentioned in chat but never written on a list, so the weak handover point shows.",
+          "review": false
+        },
+        {
+          "text": "Keep one recital task page in the office and update it after each planning chat, so chat messages stop acting like the master list.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p8_shrinkage_theft",
+      "n": 8,
+      "words": "Rental instruments come back damaged or not at all",
+      "category": "stock_inventory",
+      "subtype": "shrinkage_theft",
+      "quick_ideas": [
+        "Number every rental instrument and note its condition once, so damage can be traced",
+        "List who has which instrument today by family reference, so missing ones show."
+      ],
+      "workzap_build": {
+        "keys": [
+          "custom_build"
+        ],
+        "text": "A rental register with condition notes, deposits and return reminders.",
+        "tool_words": []
+      },
+      "ask_first": "Do instruments more often come back damaged, or not come back at all?",
+      "free_stops": "How condition and deposits are tracked is in the document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many rental instruments are out without a written return date, so you know the scale of loose tracking.",
+          "review": false
+        },
+        {
+          "text": "Make one staff member check returns against one notebook at handover time, so missing or damaged instruments are noticed the same day.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p9_receivables_late",
+      "n": 9,
+      "words": "Fees are late and chasing parents feels awkward",
+      "category": "cash_collections",
+      "subtype": "receivables_late",
+      "quick_ideas": [
+        "Send reminders from the school's number, not the teacher's, so it isn't personal",
+        "Use one standard reminder for everyone, so no family feels singled out."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger"
+        ],
+        "text": "customer_messaging — Fee reminders sent out each term or month, with an overdue count for the office.",
+        "tool_words": []
+      },
+      "ask_first": "Do most families pay a little late, or do a few stay behind for months?",
+      "free_stops": "The reminder timing and wording are kept for the document.",
+      "extra_ideas": [
+        {
+          "text": "Note how many fee reminders go out after lessons have already happened, so you see where chasing is starting too late.",
+          "review": false
+        },
+        {
+          "text": "Set one regular time each week for fee follow-ups from the school side, so reminders feel routine instead of personal.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p10_slow_response",
+      "n": 10,
+      "words": "People DM to book and we take a day to reply",
+      "category": "customers_retention",
+      "subtype": "slow_response",
+      "quick_ideas": [
+        "Put timings and how to book on one page you can share, so replies are quicker",
+        "Name one person to answer DMs at set times, so none wait overnight."
+      ],
+      "workzap_build": {
+        "keys": [
+          "customer_messaging"
+        ],
+        "text": "website_digital — Parents get WhatsApp messages with a booking link, and a booking page where they choose slots.",
+        "tool_words": []
+      },
+      "ask_first": "Do DMs arrive mostly in the evening, or throughout the day?",
+      "free_stops": "The reply flow and booking page are in the document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many booking messages arrive after teaching hours this week, so you can see when reply delays really start.",
+          "review": false
+        },
+        {
+          "text": "Keep one notebook by the phone for booking enquiries, so anyone on duty can reply without hunting through old chats.",
+          "review": false
+        }
+      ]
+    }
+  ],
+  "never_say": [
+    "Anything on music copyright or performance licensing, venue capacity or fire safety, or child-performer rules.",
+    "Consent-law advice on posting children's photos; pi only notes \"need a parent-permission process\".",
+    "Any idea that records learners' names, photos, recital videos, ages or exam results.",
+    "Promises of exam grades, or help with fake certificates or counterfeit instruments.",
+    "Any religious or cultural judgement about music or dance.",
+    "Business talk after an injury or event emergency; pi points to emergency services."
+  ],
+  "sample_reply": {
+    "person": "Make-up classes are driving us mad. Parents say lessons were missed and we have no way to check. What would you suggest?",
+    "pi": "Sure, this is fixable, and the first steps are simple.\nFirst, write one make-up rule and share it with parents, so every request is judged the same way.\nSecond, list the make-ups owed today, so you have a clean starting point.\nThe lasting fix would work by tracking every missed and make-up lesson under your rule and letting parents book make-ups themselves.\n\nWould you like me to arrange a solution document and quote for you? You're welcome to say no.",
+    "language": "english"
+  }
+}

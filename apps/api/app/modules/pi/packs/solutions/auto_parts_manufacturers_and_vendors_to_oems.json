@@ -1,0 +1,326 @@
+{
+  "industry": "auto_parts_manufacturers_and_vendors_to_oems",
+  "name": "Auto parts manufacturers and vendors to OEMs",
+  "sector": "7.D Manufacturing and industry (part 2)",
+  "version": "1.1",
+  "problems": [
+    {
+      "id": "p1_forecasting",
+      "n": 1,
+      "words": "OEM changes the schedule mid-month and we're left with excess or shortage",
+      "category": "planning_growth",
+      "subtype": "forecasting",
+      "quick_ideas": [
+        "Put planned versus dispatched quantities by part number on one sheet — shows where the gaps are",
+        "Note every schedule change with its date and notice given — gives you facts for the next review with the customer."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "a schedule tracker by part number showing planned, produced and dispatched quantities, with gaps highlighted daily.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "How much notice do you usually get of a change?",
+      "free_stops": "How releases feed production planning is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare each schedule change with parts already made or bought that week, so excess and shortage by part line up clearly.",
+          "review": false
+        },
+        {
+          "text": "Give one planning role the job of noting every schedule change in one notebook, so purchase and production react from the same update.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p2_product_defects",
+      "n": 2,
+      "words": "Rejections come with a debit note and we don't know which shift made them",
+      "category": "quality_complaints",
+      "subtype": "product_defects",
+      "quick_ideas": [
+        "Mark each crate with shift and machine before dispatch — makes rejections traceable",
+        "Match this month's debit notes to rejected quantities — catches charges you shouldn't carry."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking"
+        ],
+        "text": "a rejection and debit-note register linked to part, shift, machine and defect type.",
+        "tool_words": []
+      },
+      "ask_first": "What's the most common rejection reason?",
+      "free_stops": "The traceability fields and reconciliation steps are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count rejected crates by shift mark for this month's debit notes, so you can see where the rejection pattern is starting.",
+          "review": false
+        },
+        {
+          "text": "Give dispatch one crate marking notebook by machine and shift, so debit note complaints can be tied back without guesswork.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p3_maintenance_downtime",
+      "n": 3,
+      "words": "Die breaks and the whole part is stuck until the tool room fixes it",
+      "category": "operations_process",
+      "subtype": "maintenance_downtime",
+      "quick_ideas": [
+        "List your critical dies with when each was last serviced — shows which are overdue",
+        "Keep a short downtime note per breakdown — reveals repeat offenders."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "a die and mould register with stroke counts, maintenance due alerts and repair history.",
+        "tool_words": []
+      },
+      "ask_first": "Do you have an in-house tool room?",
+      "free_stops": "Maintenance triggers and the tool-room priority rules are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note each die breakdown and how long the part stayed stuck, so repeat stoppages and their production hit stand out.",
+          "review": false
+        },
+        {
+          "text": "Give one tool room role one breakdown list kept beside the floor, so repairs and pending dies are handed over cleanly.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p4_raw_material_shortage",
+      "n": 4,
+      "words": "Raw material coils run out because purchase didn't see the schedule",
+      "category": "stock_inventory",
+      "subtype": "raw_material_shortage",
+      "quick_ideas": [
+        "Share the customer schedule with purchase every time it changes — they buy for what's coming",
+        "Work out cover in days for your main coils — shows what to order first."
+      ],
+      "workzap_build": {
+        "keys": [
+          "stock_alerts"
+        ],
+        "text": "a material requirement planner driven by the schedule and current stock, alerting purchase before cover runs low.",
+        "tool_words": []
+      },
+      "ask_first": "How far ahead do you order coils?",
+      "free_stops": "The planning logic and alert levels are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare each coil runout with the latest customer schedule on hand, so you can see where purchase missed the change.",
+          "review": false
+        },
+        {
+          "text": "Give one purchase role one fixed time to note schedule changes in one place, so coil buying follows the latest demand.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p5_cash_flow_tight",
+      "n": 5,
+      "words": "OEM pays late but steel suppliers want cash",
+      "category": "cash_collections",
+      "subtype": "cash_flow_tight",
+      "quick_ideas": [
+        "Put customer and supplier payment dates on one calendar — shows when the gap bites",
+        "Talk to your accountant or bank about bridging it — that's their area."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "a receivables and payables view showing the cash gap week by week.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "What are the customer's payment terms?",
+      "free_stops": "The cash-gap view set-up is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many mornings production paused while purchase staff chased supplier confirmations, so the hardest operating days this week become clear.",
+          "review": false
+        },
+        {
+          "text": "Give one admin role one notebook for supplier follow ups and OEM remittance updates at a fixed afternoon time, so floor interruptions reduce.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p6_no_visibility",
+      "n": 6,
+      "words": "WIP is everywhere on the floor and nobody knows the count",
+      "category": "stock_inventory",
+      "subtype": "no_visibility",
+      "quick_ideas": [
+        "Do one count of WIP by location — gives a true starting picture",
+        "Mark fixed areas for WIP of each part — stops it scattering."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "You would see work in progress and finished goods counted by location at the line itself, with regular cycle counts keeping the true figure in front of you.",
+        "tool_words": [
+          "app"
+        ]
+      },
+      "ask_first": "How do you count WIP today?",
+      "free_stops": "The count routine and locations set-up are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Walk the floor and count WIP piles by part and location once, so hidden stock and missing counts show up together.",
+          "review": false
+        },
+        {
+          "text": "Give one floor role one fixed board or notebook for WIP counts by area, so everyone checks the same number.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p7_margin_unknown",
+      "n": 7,
+      "words": "We don't know the real cost of each part number",
+      "category": "margin_cost",
+      "subtype": "margin_unknown",
+      "quick_ideas": [
+        "Recost your top part numbers with today's material rates — shows which are underwater",
+        "Include rejections and debit notes in the cost — they're part of the real price."
+      ],
+      "workzap_build": {
+        "keys": [
+          "custom_build"
+        ],
+        "text": "a part costing sheet comparing material, process time, overheads and rejections against the current price.",
+        "tool_words": []
+      },
+      "ask_first": "When were part costs last revised?",
+      "free_stops": "The costing model is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare the paperwork bundles and audit documentation effort for your busiest part numbers, so the heaviest office load by part becomes clear.",
+          "review": false
+        },
+        {
+          "text": "Give one costing role one notebook for partwise paperwork changes and rejection notes after each shift, so estimates stay consistent across reviews.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p8_whatsapp_overload",
+      "n": 8,
+      "words": "Aftermarket orders come on WhatsApp from dozens of shops",
+      "category": "tech_systems",
+      "subtype": "whatsapp_overload",
+      "quick_ideas": [
+        "Give shops one order number — everything lands in one place",
+        "Confirm each order back — catches misses."
+      ],
+      "workzap_build": {
+        "keys": [
+          "order_capture"
+        ],
+        "text": "WhatsApp orders from aftermarket shops fed into one order book with status sent back to them as updates happen.",
+        "tool_words": []
+      },
+      "ask_first": "Roughly how many shops order from you?",
+      "free_stops": "The order intake flow is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many aftermarket orders needed a follow up because details were scattered in chats, so the daily order handling load is clear.",
+          "review": false
+        },
+        {
+          "text": "Give one sales desk role one notebook for all incoming shop orders, so packing and dispatch work from one running list.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p9_overtime",
+      "n": 9,
+      "words": "Overtime keeps rising every month-end to meet schedule",
+      "category": "people_staff",
+      "subtype": "overtime",
+      "quick_ideas": [
+        "Log output per shift and machine for a week — shows whether early-month capacity is wasted",
+        "Compare overtime hours with schedule gaps — tells you if it's planning or capacity."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "a shift production log on a line tablet with on-time delivery, downtime and overtime on one screen.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "How is output per shift recorded now?",
+      "free_stops": "The shift log and KPIs are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare overtime at month end with unfinished schedule from earlier weeks, so you can see whether delay starts before the rush.",
+          "review": false
+        },
+        {
+          "text": "Give one production role one fixed daily note of pending schedule by machine, so month end overtime gets flagged earlier.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p10_audits",
+      "n": 10,
+      "words": "Quality documents for audits are scattered in files and PCs",
+      "category": "compliance_admin",
+      "subtype": "audits",
+      "quick_ideas": [
+        "List the documents your last audit asked for — gives you the checklist",
+        "Put them in one shared folder by customer — cuts preparation time."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "a quality document library organised by customer audit, with reminders for documents due for update.",
+        "tool_words": []
+      },
+      "ask_first": "Which customer audits are coming up?",
+      "free_stops": "The library structure is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many audit documents were pulled from more than one place last time, so the audit documentation effort is clear.",
+          "review": false
+        },
+        {
+          "text": "Give one admin role one notebook for audit document locations, so files and PC copies stop wasting search time.",
+          "review": false
+        }
+      ]
+    }
+  ],
+  "never_say": [
+    "No engineering, tolerance, metallurgy or certification-content advice.",
+    "No legal or negotiation advice on OEM contracts, penalties or price disputes.",
+    "Never help copy another maker's branded part or packaging, or fake test reports; decline.",
+    "Press or machine injuries: stop and point to emergency services.",
+    "No advice on legal action over counterfeit parts.",
+    "Workers: roles and counts only, no names, wages or IDs."
+  ],
+  "sample_reply": {
+    "person": "What can we do? The OEM keeps changing the schedule and we end up with piles of one part and shortage of another.",
+    "pi": "Yes, this can be fixed, and the first steps are simple.\nFirst, put planned against dispatched quantities by part number on one sheet, so the gaps are visible.\nSecond, record every schedule change with its date and notice given, so you have facts for your next customer review.\nWorkzap could build this for you: a schedule tracker that pulls releases, production and dispatches together and highlights gaps every day.\n\nShall I have a solution document and quote prepared for you? You're free to say no.",
+    "language": "english"
+  }
+}

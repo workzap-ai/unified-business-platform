@@ -1,0 +1,324 @@
+{
+  "industry": "books_stationery_and_school_supplies",
+  "name": "Books, stationery and school supplies",
+  "sector": "7.A Retail and consumer (part 2)",
+  "version": "1.1",
+  "problems": [
+    {
+      "id": "p1_manual_work",
+      "n": 1,
+      "words": "Parents send booklist photos on WhatsApp and we type them up by hand",
+      "category": "operations_process",
+      "subtype": "manual_work",
+      "quick_ideas": [
+        "Build a master list of each school's class booklists before the rush, because most photos repeat the same lists",
+        "Ask parents to name the school and class instead of sending photos, without collecting student names, because one line replaces a whole typed list."
+      ],
+      "workzap_build": {
+        "keys": [
+          "order_capture",
+          "website_digital"
+        ],
+        "text": "parents pick school and class from a WhatsApp link, the bundle is created right away and they get a pickup slot, with no retyping.",
+        "tool_words": []
+      },
+      "ask_first": "Roughly how many schools' lists do you handle each season?",
+      "free_stops": "how the booklist library and pre-order link are set up is kept for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many parent booklist photos repeat the same school and class this week, so you see where typing time is being wasted most.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of keeping one notebook of repeated school and class lists, so common orders can be filled without retyping each photo.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p2_order_errors",
+      "n": 2,
+      "words": "Customers get the wrong edition and come back angry",
+      "category": "orders_fulfilment",
+      "subtype": "order_errors",
+      "quick_ideas": [
+        "Confirm this year's edition with each school once before stocking, because changes otherwise surface only through complaints",
+        "Keep old editions on a separate shelf, because mixing them causes most mistakes."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking",
+          "field_checks"
+        ],
+        "text": "a bundle packing list per class with a barcode check that catches the wrong edition before it leaves.",
+        "tool_words": []
+      },
+      "ask_first": "How do you find out a school has changed an edition?",
+      "free_stops": "the edition library and packing check are detailed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note every return for wrong edition this week by title and shelf location, so you spot whether the mix-up starts in stocking or picking.",
+          "review": false
+        },
+        {
+          "text": "Make one person check edition and year against the shelf label before handover, so angry returns drop at the counter instead of after collection.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p3_capacity",
+      "n": 3,
+      "words": "Back-to-school week, we can't serve the crowd",
+      "category": "operations_process",
+      "subtype": "capacity",
+      "quick_ideas": [
+        "Pre-pack bundles for your biggest schools before the rush, because packing during the queue slows everything",
+        "Split collection from new purchases at the counter, because they are different jobs."
+      ],
+      "workzap_build": {
+        "keys": [
+          "booking_scheduling",
+          "order_capture"
+        ],
+        "text": "pre-ordered bundles with pickup slots spread across the week, and a counter list of what's ready.",
+        "tool_words": []
+      },
+      "ask_first": "Do most parents buy in the shop or order ahead?",
+      "free_stops": "slot planning and the pre-order flow go in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Watch one busy hour and note where the queue stalls most, so you can ease the exact choke point during back-to-school week.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member the job of handing over completed bundles from packing to collection, so counter work keeps moving during the rush.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p4_overstock_dead_stock",
+      "n": 4,
+      "words": "School changed the syllabus and we're stuck with last year's books",
+      "category": "stock_inventory",
+      "subtype": "overstock_dead_stock",
+      "quick_ideas": [
+        "List leftover titles by publisher and whether they're sale-or-return, because some can still go back",
+        "Ask schools for next year's lists as early as possible, because late changes cause the overstock."
+      ],
+      "workzap_build": {
+        "keys": [
+          "stock_alerts",
+          "dashboards_reports"
+        ],
+        "text": "a sale-or-return tracker per publisher with return deadline alerts and a leftover report by title.",
+        "tool_words": []
+      },
+      "ask_first": "Can you return unsold books to your suppliers?",
+      "free_stops": "return deadlines and buying rules are worked out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Walk the shelves and note which old syllabus titles still fill the most space, so you see which leftovers are tying up your season most.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of keeping all old syllabus books in one marked area, so current season stock stays easy to pick and explain.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p5_stockout",
+      "n": 5,
+      "words": "Popular books on the list run out in the first week",
+      "category": "stock_inventory",
+      "subtype": "stockout",
+      "quick_ideas": [
+        "Compare last season's sales with what you ordered for your top titles, because it shows where you under-bought",
+        "Order your biggest titles earliest, because publishers deliver late in the rush."
+      ],
+      "workzap_build": {
+        "keys": [
+          "stock_alerts"
+        ],
+        "text": "demand per title from last year's sales and current pre-orders, with low-stock alerts during the season.",
+        "tool_words": []
+      },
+      "ask_first": "How do you decide quantities today?",
+      "free_stops": "the forecasting method is kept for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Write down each time a listed book is asked for but unavailable this week, so next buying reflects real missed demand.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member the job of updating one running shortage list for fast-moving titles, so reordering starts from today's gaps not guesswork.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p6_receivables_late",
+      "n": 6,
+      "words": "Schools take supplies on credit and pay months later",
+      "category": "cash_collections",
+      "subtype": "receivables_late",
+      "quick_ideas": [
+        "Total what each school or office owes and for how long, because it shows who to chase first",
+        "Match delivery notes to invoices once, because missing paperwork delays payment."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger"
+        ],
+        "text": "institutional accounts with orders, delivery notes, invoices, ageing and payment reminders sent to clients.",
+        "tool_words": []
+      },
+      "ask_first": "How many schools or offices buy on credit?",
+      "free_stops": "account setup and reminder timing go in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many school deliveries still lack matching paperwork in your files, so you see what is slowing payment before chasing balances.",
+          "review": true
+        },
+        {
+          "text": "Give one person the job of keeping credit deliveries and invoice copies in one folder, so payment follow-up starts with complete papers.",
+          "review": true
+        }
+      ]
+    },
+    {
+      "id": "p7_info_lost_in_whatsapp",
+      "n": 7,
+      "words": "Office customers send orders on WhatsApp and they get missed",
+      "category": "communication_coordination",
+      "subtype": "info_lost_in_whatsapp",
+      "quick_ideas": [
+        "Count last week's WhatsApp orders and how many were delivered complete, because it shows the size of the leak",
+        "Make one person own office orders, because shared phones lose messages."
+      ],
+      "workzap_build": {
+        "keys": [
+          "order_capture"
+        ],
+        "text": "WhatsApp order intake for offices with confirmation and status, so nothing is missed.",
+        "tool_words": []
+      },
+      "ask_first": "How many office customers order regularly?",
+      "free_stops": "the intake flow is kept for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note every office order that arrived but was not packed the same day this week, so the leak shows in missed work not impressions.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of writing every office order into one notebook as it arrives, so packing starts from one complete list.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p8_no_visibility",
+      "n": 8,
+      "words": "Thousands of small stationery items, no idea what's in stock",
+      "category": "stock_inventory",
+      "subtype": "no_visibility",
+      "quick_ideas": [
+        "Count your top-selling stationery once, because a short list covers most sales",
+        "Set a minimum for each of those, because it tells staff when to reorder."
+      ],
+      "workzap_build": {
+        "keys": [
+          "stock_alerts"
+        ],
+        "text": "stationery stock by SKU with reorder alerts on phone.",
+        "tool_words": []
+      },
+      "ask_first": "How do you check stock before reordering now?",
+      "free_stops": "reorder levels are worked out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Walk the stationery shelves and note which small items customers ask for most but staff must hunt for, so your blind spots stand out quickly.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member the job of keeping one list of fast-moving stationery counts at closing, so replenishing starts from a known short list.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p9_cash_mismatch",
+      "n": 9,
+      "words": "Photocopy counter cash never matches",
+      "category": "cash_collections",
+      "subtype": "cash_mismatch",
+      "quick_ideas": [
+        "Note the machine counter at open and close for one week, because it shows what should be in the till",
+        "Keep photocopy cash separate, because mixing it hides gaps."
+      ],
+      "workzap_build": {
+        "keys": [
+          "cash_reconciliation"
+        ],
+        "text": "a daily photocopy and printing log matched straight with cash collected.",
+        "tool_words": []
+      },
+      "ask_first": "Who runs the photocopy counter?",
+      "free_stops": "the reconciliation steps go in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare photocopy jobs done with cash handed over at each shift end this week, so you see when the mismatch actually starts.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of counting photocopy cash at every handover in one notebook, so shortages are tied to a specific shift.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p10_no_dashboard",
+      "n": 10,
+      "words": "I don't know how this year's school season compared to last year",
+      "category": "reporting_visibility",
+      "subtype": "no_dashboard",
+      "quick_ideas": [
+        "Write down this season's totals by school and title while they're fresh, because memory fades fast",
+        "Note what ran out and what was left, because that's next year's buying plan."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "a season review comparing titles, schools and margins year on year.",
+        "tool_words": []
+      },
+      "ask_first": "Where are your season sales recorded today?",
+      "free_stops": "the review structure is kept for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Pull out last year's and this year's school season notebooks and compare which schools, titles, and weeks drove sales, so buying starts earlier where demand really moved.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member the job of keeping one season notebook for stockouts, leftovers, and busy school requests, so next year's comparison is ready without chasing scraps.",
+          "review": false
+        }
+      ]
+    }
+  ],
+  "never_say": [
+    "Help with photocopied, scanned or pirated books for sale, or printing unlicensed copies.",
+    "Advice on copyright or licensing law; say \"check with a lawyer\".",
+    "Anything that needs students' or parents' names, classes or contacts.",
+    "Help with kickbacks to schools or tender manipulation.",
+    "Advice on school or government contract compliance."
+  ],
+  "sample_reply": {
+    "person": "Every April parents send booklist pictures on WhatsApp and my staff type everything out. Is there a better way?",
+    "pi": "Yes, this can be fixed, and the first steps are simple.\nFirst, build a master list of each school's class booklists before the rush, because most photos repeat the same lists.\nSecond, ask parents for just the school and class, which replaces a whole typed list.\nWorkzap could build this for you: parents choose school and class from a link, the bundle is created and they get a pickup slot.\n\nWould you like me to arrange a solution document and quote for you? You're welcome to say no.",
+    "language": "english"
+  }
+}

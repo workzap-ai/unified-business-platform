@@ -1,0 +1,102 @@
+[
+ {
+  "sample_id": "b01",
+  "case_id": "plan_bl_courier_generic_fact_en_02",
+  "candidate_id": "c2"
+ },
+ {
+  "sample_id": "b02",
+  "case_id": "plan_bl_rent_inflected_hi_07",
+  "candidate_id": "c2"
+ },
+ {
+  "sample_id": "b03",
+  "case_id": "plan_bl_courier_generic_fact_en_02",
+  "candidate_id": "c3"
+ },
+ {
+  "sample_id": "b04",
+  "case_id": "plan_bl_clinic_implied_budget_en_01",
+  "candidate_id": "c1"
+ },
+ {
+  "sample_id": "b05",
+  "case_id": "plan_bl_crop_inflected_ur_05",
+  "candidate_id": "c2"
+ },
+ {
+  "sample_id": "b06",
+  "case_id": "plan_bl_turf_inflected_ar_06",
+  "candidate_id": "c2"
+ },
+ {
+  "sample_id": "b07",
+  "case_id": "plan_bl_courier_generic_fact_en_02",
+  "candidate_id": "c1"
+ },
+ {
+  "sample_id": "b08",
+  "case_id": "plan_bl_clinic_implied_budget_en_01",
+  "candidate_id": "c2"
+ },
+ {
+  "sample_id": "b09",
+  "case_id": "plan_bl_saas_implied_team_en_08",
+  "candidate_id": "c1"
+ },
+ {
+  "sample_id": "b10",
+  "case_id": "plan_bl_poultry_limit_edge_en_03",
+  "candidate_id": "c3"
+ },
+ {
+  "sample_id": "b11",
+  "case_id": "plan_bl_crop_inflected_ur_05",
+  "candidate_id": "c1"
+ },
+ {
+  "sample_id": "b12",
+  "case_id": "plan_bl_poultry_limit_edge_en_03",
+  "candidate_id": "c1"
+ },
+ {
+  "sample_id": "b13",
+  "case_id": "plan_bl_poultry_limit_edge_en_03",
+  "candidate_id": "c2"
+ },
+ {
+  "sample_id": "b14",
+  "case_id": "plan_bl_turf_inflected_ar_06",
+  "candidate_id": "c1"
+ },
+ {
+  "sample_id": "b15",
+  "case_id": "plan_bl_clinic_implied_budget_en_01",
+  "candidate_id": "c3"
+ },
+ {
+  "sample_id": "b16",
+  "case_id": "plan_bl_courier_generic_fact_en_02",
+  "candidate_id": "c4"
+ },
+ {
+  "sample_id": "b17",
+  "case_id": "plan_bl_banquet_numeric_limit_en_09",
+  "candidate_id": "c1"
+ },
+ {
+  "sample_id": "b18",
+  "case_id": "plan_bl_banquet_numeric_limit_en_09",
+  "candidate_id": "c2"
+ },
+ {
+  "sample_id": "b19",
+  "case_id": "plan_bl_saas_implied_team_en_08",
+  "candidate_id": "c2"
+ },
+ {
+  "sample_id": "b20",
+  "case_id": "plan_bl_rent_inflected_hi_07",
+  "candidate_id": "c1"
+ }
+]

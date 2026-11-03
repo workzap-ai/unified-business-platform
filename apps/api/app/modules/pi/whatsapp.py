@@ -124,6 +124,45 @@ def other_text(kind: str, message: dict[str, Any]) -> str:
     return ""
 
 
+def signal_of(kind: str, message: dict[str, Any]) -> dict[str, Any] | None:
+    """What a reaction, sticker, edited or deleted message is (spec 6.10), or None for an ordinary
+    message. Reactions and stickers carry no text; an edit carries the new text and the id of the
+    message it replaces; a deletion only the id. The provider's shape for edits and deletions is
+    read leniently (`original_message_id` or `message_id`, text at `text.body`, `message.text.body`
+    or `body`) because Meta delivers them only on some API versions."""
+    part = message.get(kind)
+    part = part if isinstance(part, dict) else {}
+    if kind == "reaction":
+        return {
+            "kind": "reaction",
+            "emoji": str(part.get("emoji") or "")[:16],
+            "target": str(part.get("message_id") or "")[:160],
+        }
+    if kind == "sticker":
+        return {"kind": "sticker"}
+    if kind in ("edit", "edited", "message_edit"):
+        inner = part.get("message")
+        inner = inner if isinstance(inner, dict) else {}
+        text = (
+            (part.get("text") or {}).get("body")
+            if isinstance(part.get("text"), dict)
+            else None
+        ) or (
+            (inner.get("text") or {}).get("body") if isinstance(inner.get("text"), dict) else None
+        )
+        return {
+            "kind": "edit",
+            "target": str(part.get("original_message_id") or part.get("message_id") or "")[:160],
+            "text": str(text or part.get("body") or "")[:4000],
+        }
+    if kind in ("revoke", "revoked", "delete", "deleted", "message_delete"):
+        return {
+            "kind": "delete",
+            "target": str(part.get("original_message_id") or part.get("message_id") or "")[:160],
+        }
+    return None
+
+
 def normalize(payload: dict[str, Any]) -> list[dict[str, Any]]:
     events = []
     for entry in payload.get("entry", [])[:100]:
@@ -153,9 +192,17 @@ def normalize(payload: dict[str, Any]) -> list[dict[str, Any]]:
                     if isinstance(message.get(kind), dict)
                     else ""
                 )
+                signal = signal_of(kind, message)
+                if signal is not None:
+                    body = ""  # the text of an edit travels in the signal, never as a new message
+                elif kind == "text" and (message.get("context") or {}).get("forwarded"):
+                    # A forwarded text: the marker lets the personal-data check keep the pattern
+                    # of a forwarded customer complaint and drop who it came from (spec 6.10).
+                    body = f"[forwarded] {body}"
                 events.append(
                     {
                         "key": f"{number}:{mid}",
+                        **({"signal": signal} if signal is not None else {}),
                         "kind": "message",
                         "number": number,
                         "message_id": mid,
@@ -556,6 +603,61 @@ class WhatsApp:
                 "DELIVERY_UNCONFIRMED", "Message delivery could not be confirmed", 503
             ) from None
 
+    async def send_list(
+        self,
+        number: str,
+        recipient: str,
+        body: str,
+        button: str,
+        rows: list[dict[str, str]],
+        token: str,
+    ) -> str:
+        """A session message with a tap-to-choose list (at most ten rows). A tap comes back as a
+        message whose text is the row's title."""
+        base, headers = self._endpoint(token)
+        interactive: dict[str, Any] = {
+            "type": "list",
+            "body": {"text": body[:1024]},
+            "action": {
+                "button": button[:20],
+                "sections": [
+                    {
+                        "title": "Problems",
+                        "rows": [
+                            {
+                                "id": str(r["id"])[:200],
+                                "title": str(r["title"])[:24],
+                                "description": str(r.get("description", ""))[:72],
+                            }
+                            for r in rows[:10]
+                        ],
+                    }
+                ],
+            },
+        }
+        try:
+            response = await self.http.post(
+                f"{base}/{number}/messages",
+                headers=headers,
+                json={
+                    "messaging_product": "whatsapp",
+                    "to": recipient,
+                    "type": "interactive",
+                    "interactive": interactive,
+                },
+                timeout=20,
+                follow_redirects=False,
+            )
+            check_sent(response)
+            mid = response.json()["messages"][0]["id"]
+            if not isinstance(mid, str) or not 1 <= len(mid) <= 160:
+                raise ValueError
+            return mid
+        except (httpx.HTTPError, ValueError, KeyError, IndexError, TypeError):
+            raise BusinessRuleViolation(
+                "DELIVERY_UNCONFIRMED", "Message delivery could not be confirmed", 503
+            ) from None
+
     async def send_image(
         self, number: str, recipient: str, link: str, caption: str, token: str
     ) -> str:
@@ -583,6 +685,45 @@ class WhatsApp:
         except (httpx.HTTPError, ValueError, KeyError, IndexError, TypeError):
             raise BusinessRuleViolation(
                 "DELIVERY_UNCONFIRMED", "Image delivery could not be confirmed", 503
+            ) from None
+
+    async def send_document(
+        self,
+        number: str,
+        recipient: str,
+        link: str,
+        filename: str,
+        caption: str,
+        token: str,
+    ) -> str:
+        """Send a PDF by public link with its file name. Session messages only: the caller
+        checks the 24-hour window."""
+        base, headers = self._endpoint(token)
+        try:
+            response = await self.http.post(
+                f"{base}/{number}/messages",
+                headers=headers,
+                json={
+                    "messaging_product": "whatsapp",
+                    "to": recipient,
+                    "type": "document",
+                    "document": {
+                        "link": link,
+                        "filename": filename[:100],
+                        "caption": caption[:1024],
+                    },
+                },
+                timeout=20,
+                follow_redirects=False,
+            )
+            check_sent(response)
+            mid = response.json()["messages"][0]["id"]
+            if not isinstance(mid, str) or not 1 <= len(mid) <= 160:
+                raise ValueError
+            return mid
+        except (httpx.HTTPError, ValueError, KeyError, IndexError, TypeError):
+            raise BusinessRuleViolation(
+                "DELIVERY_UNCONFIRMED", "Document delivery could not be confirmed", 503
             ) from None
 
     async def send(self, number: str, recipient: str, body: str, token: str) -> str:

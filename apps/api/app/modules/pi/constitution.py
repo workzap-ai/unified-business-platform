@@ -1,0 +1,2949 @@
+# ruff: noqa: E501  (long regexes read better on one line)
+"""pi's constitution and voice rules as a deterministic reply linter (pi Brain spec, Parts 1, 2, 6).
+
+`lint` checks a drafted reply before it is sent and returns the rules it breaks. A hard
+violation (identity, money, privacy, promises) must never reach the customer; a soft one is
+style (length, one question, no hype) and is first sent back to the model for a rewrite.
+`repair` fixes what can be fixed without changing the meaning (stray "!", emoji, a missing
+AI disclosure). Only workspaces that turn on response_rules.constitution use it, because
+the stricter voice differs from the shared prompt.
+"""
+
+import logging
+import re
+import unicodedata
+from dataclasses import dataclass
+from typing import Any
+
+from app.modules.pi import constitution_gaps, flow, owner_asks, think_lint
+from app.modules.pi import constitution_langs as langs
+
+logger = logging.getLogger(__name__)
+
+AI_WORDS = re.compile(
+    r"\b(?:AI|A\.I\.|artificial intelligence|bot|robot)\b|مصنوعی|الذكاء الاصطناعي|ذكاء اصطناعي"
+    r"|[اإ]صطناعي|[اإ]صطناعى|ذكاء صناعي|ذكاء اصطناعى|اے آئی|ای آئی|एआई|कृत्रिम बुद्धिमत्ता|रोबोट|बॉट"
+    + langs.AI_WORDS,
+    re.IGNORECASE,
+)
+# A first message names itself: the AI word sits in a sentence that speaks about pi or "I"
+# (R-DISC-01), in English, Roman Urdu, Urdu, Arabic or Hindi.
+SELF_WORDS = re.compile(
+    r"\bI(?:'m| am)\b|\bI\b|\bpi\b|\bmain\b|\bmai\b|\bmein\b|\bhoon\b|\bhun\b|\bhu\b|\bhai\b"
+    r"|میں|ہوں|ہے|أنا|انا|إنني|معك|مساعد|मैं|हूँ|हूं" + langs.SELF_WORDS,
+    re.IGNORECASE,
+)
+OPENING = {
+    "en": "Hi, I'm pi, an AI from Workzap.",
+    "roman_ur": "Hi, main pi hoon, Workzap ka AI.",
+    "ur": "ہیلو، میں pi ہوں، Workzap کی طرف سے ایک مصنوعی ذہانت۔",
+    "ar": "مرحباً، أنا pi، ذكاء اصطناعي من Workzap.",
+}
+
+
+def opening_line(context: dict[str, Any]) -> str:
+    """The one-line AI disclosure in the person's language and script (R-DISC-01, R-LANG-02)."""
+    from app.modules.pi import fixed_lines
+    from app.modules.pi.language import ARABIC_SCRIPT, URDU_LETTERS
+
+    language = context.get("reply_language")
+    said = str(context.get("latest_customer_message", ""))
+    if context.get("reply_language_other") == "Urdu":
+        return fixed_lines.line("opening", "ur", OPENING["ur"])
+    if language == "roman_ur":
+        key = "ur" if ARABIC_SCRIPT.search(said) and URDU_LETTERS.search(said) else language
+        base = OPENING[key]
+    else:
+        base = OPENING.get(str(language), OPENING["en"])
+    return fixed_lines.line("opening", fixed_lines.code(context), base)
+
+
+SENTENCE = re.compile(r"(?<=[.!?؟۔।])\s+|\n+")
+QUESTION_MARKS = ("?", "؟")
+
+ASKS_IF_AI = re.compile(
+    r"\b(?:are|r) (?:you|u) (?:a |an )?(?:real |actual )?(?:human|person|bot|robot|ai|man|woman|guy|girl)\b"
+    r"|\b(?:is this|am i (?:talking|speaking|chatting) (?:to|with)) (?:a |an )?(?:real |actual )?"
+    r"(?:human|person|bot|robot|ai)\b"
+    r"|\bwho am i (?:talking|speaking|chatting) (?:to|with)\b"
+    r"|\byou(?:'re| are) (?:a |an )?(?:real |actual )?(?:human|person|bot|robot|man|woman|guy|girl)\b"
+    r"|\badmit (?:it|you|that)\b|\btell me (?:you(?:'re| are)|the truth)\b"
+    r"|\bkya (?:aap|ap|ye|yeh|tum|app)\b[^.?!؟]{0,20}\b(?:insaan|insan|bot|human|robot|machine)\b"
+    r"|\b(?:insaan|insan|bot|robot) (?:ho|hai|hain)\b|هل أنت|هل هذا|کیا آپ[^؟?]{0,15}(?:انسان|بوٹ|روبوٹ)"
+    r"|هل (?:انت|أنت) (?:إنسان|انسان|بشر|روبوت|بوت)|من (?:انت|أنت)\b|\baap kon (?:ho|hain)\b"
+    r"|\btum kaun ho\b|آپ کون ہیں|تم کون ہو"
+    r"|آپ\s*(?:انسان|بوٹ|روبوٹ|مشین)\s*ہیں|(?:انسان|مشین)\s*ہیں\s*یا\s*(?:انسان|مشین)"
+    + langs.ASKS_IF_AI,
+    re.IGNORECASE,
+)
+
+TEAM_READS = re.compile(
+    r"\b(?:team|someone|somebody|a person|a human|staff|people)\b[^.?!\n]{0,40}"
+    r"\b(?:reads?|is reading|are reading|will read|reading|sees?|monitors?)\b[^.?!\n]{0,25}"
+    r"\b(?:this|the|your) (?:chat|conversation|messages?)\b" + langs.TEAM_READS,
+    re.IGNORECASE,
+)
+
+HUMAN_CLAIM = re.compile(
+    r"\bI(?:'m| am) (?:a |an )?(?:human|real person|person|man|woman|guy|girl|mum|mom|dad|father|mother)\b"
+    r"|\bmy (?:family|wife|husband|kids|children|mum|mom|mother|father|brother|sister)\b"
+    r"|\bI(?:'ve| have)?(?: also)? (?:run|ran|own|owned) (?:a|my own) (?:shop|business|store|company)\b"
+    r"|\bI (?:was|went|ate|slept|travelled|traveled|had)\b[^.?!]*\b(?:yesterday|last night|this morning|"
+    r"at the market|lunch|dinner|breakfast)\b"
+    r"|\bI know exactly how you feel\b"
+    # A human name or a place of its own (R-DISC-03): "my name is Ayesha", "I'm Ayesha from sales",
+    # "I'm from Karachi", "I live in Dubai". pi is "pi", from Workzap.
+    r"|\bmy name is (?!pi\b)[a-z]+"
+    r"|\b(?:this is|it's|i'm|i am) (?!pi\b|an? ai\b|workzap)[a-z]+ from (?:sales|support|the team|"
+    r"marketing|accounts|karachi|lahore|dubai|toronto|islamabad)\b"
+    r"|\bI(?:'m| am) (?:also )?from (?!workzap)[a-z]{3,}\b|\bI (?:live|am based|work) in [a-z]{3,}\b"
+    + langs.HUMAN_CLAIM,
+    re.IGNORECASE,
+)
+
+SENSITIVE = re.compile(
+    r"\b(?:card number|credit card|debit card|cvv|cvc|password|passcode|otp|one[- ]time (?:code|password)|"
+    r"pin|cnic|emirates id|passport|iban|account number|bank login|sin number)\b"
+    # Arabic and Urdu script (prefixes and suffixes stick to the word, so no word boundaries).
+    r"|بطاقت[كيه]|رقم البطاقة|بطاقة (?:ائتمان|الائتمان|مصرفية|بنكية|الدفع)|كلمة (?:المرور|السر)|"
+    r"رمز (?:التحقق|الأمان|الامان|التفعيل)|الرقم السري|رمز (?:ال)?(?:بن|otp)|آيبان|ايبان|رقم الحساب|"
+    r"كلمة المرور|الحساب البنكي|[کك]ارڈ نمبر|[کك]ریڈٹ [کك]ارڈ|ڈیبٹ [کك]ارڈ|پاس ورڈ|اوٹی پی|او ٹی پی|"
+    r"پن کوڈ|اکاؤنٹ نمبر|اکاونٹ نمبر|آئی بی اے این|پاسپورٹ|شناختی [کك]ارڈ|سی این آئی سی"
+    + langs.SENSITIVE,
+    re.IGNORECASE,
+)
+# National ID and similar numbers (R-PRIV-03): asked for in any wording.
+NATIONAL_ID = re.compile(
+    r"\b(?:national id|national identity|id card|identity card|id number|id photo|photo of your id|"
+    r"emirates id|iqama|aadhaar|aadhar|ssn|social security|sin|nic|ntn|driving licen[cs]e|"
+    r"licen[cs]e number|tax (?:id|number)|shanakhti card|national identification)\b"
+    r"|رقم الهوية|بطاقة الهوية|الهوية الوطنية|هويتك|رقم الإقامة|الرقم الوطني|قومی شناختی|شناختی نمبر"
+    + langs.NATIONAL_ID,
+    re.IGNORECASE,
+)
+ASKING = re.compile(
+    r"\b(?:send|share|give|provide|enter|type|tell me|forward|bhej\w*|batao|bata do|de do|dein)\b"
+    r"|\bwhat(?:'s| is) your\b|\b(?:i need|i'll need|may i have|can i (?:have|get)) your\b|دیں|بھیج"
+    r"|ارسل|أرسل|ارسلي|أرسلي|شارك|أعطني|اعطني|زودني|أدخل|ادخل|اكتب|أخبرني|اخبرني|أحتاج|احتاج|أريد|اريد"
+    r"|ما هو رقم|ما هي|بتائیں|بتائیے|شیئر|دیجیے|دیجئے|درکار|لکھیں|ٹائپ|مجھے چاہیے" + langs.ASKING,
+    re.IGNORECASE,
+)
+REFUSING = re.compile(
+    r"\b(?:don't|do not|dont|never|no need|not need|without|mat |na |nahi|nahin)\b|نہیں|ضرورت"
+    r"|لا ترسل|لا تشارك|لا تعطني|لا داعي|لا تحتاج|لا أحتاج|لا احتاج|لا أطلب|لا اطلب|بدون|مت |نہ "
+    + langs.REFUSING,
+    re.IGNORECASE,
+)
+
+IBAN = re.compile(r"\b[A-Z]{2}\d{2}[A-Z0-9]{4}\d{10,}\b")
+ACCOUNT_NUMBER = re.compile(r"\baccount\s*(?:number|no\.?|#)\s*[:\-]?\s*[\d\- ]{8,}", re.IGNORECASE)
+IBAN_LABEL = re.compile(r"\biban\b\s*[:\-]?\s*[A-Z0-9 ]{12,}", re.IGNORECASE)
+# "Meezan Bank account 0123456789 mein bhej dein", "حساب رقم 1234-5678901-03": a typed account number
+# without the word "number" (R-PAY-03). A long digit run right after the word for an account.
+ACCOUNT_TYPED = re.compile(
+    r"(?:\b(?:account|acct|khata|khaata)\b|حساب|اکاؤنٹ|کھاتہ)[^.\n?!؟\d]{0,25}\d[\d\- ]{8,}\d",
+    re.IGNORECASE,
+)
+
+PAYMENT_RECEIVED = re.compile(
+    r"\b(?:payment|transfer|amount)\s+(?:has been |is |was |have been )?(?:received|confirmed|done)\b"
+    r"|\b(?:we(?:'ve| have)|I(?:'ve| have)) received your (?:payment|transfer|money)\b"
+    r"|payment (?:mil gayi|receive ho gayi|ho gayi|aa gayi|confirm ho gayi)"
+    r"|\b(?:paise|raqam|amount|rakam|transfer) (?:mil gaya|mil gayi|mil gaye|aa gaya|aa gayi|receive ho gaya)\b"
+    r"|\bwe(?:'ve| have) (?:got|had) your (?:payment|transfer|money)\b"
+    r"|\bpayment (?:has |have )?(?:arrived|come through|landed|cleared)\b"
+    r"|\bthank(?:s| you) for (?:the |your )?(?:payment|transfer)\b(?! (?:screenshot|slip|receipt|proof|details|info))"
+    # Arabic: "تم استلام الدفع", "استلمنا المبلغ", "وصلت الدفعة", "تم الدفع"
+    r"|تم (?:ال)?[اإ]ستلام (?:ال)?(?:دفع|دفعة|دفعتك|مبلغ|تحويل|حوالة)"
+    r"|[اإ]ستلمنا (?:ال)?(?:دفع|دفعة|دفعتك|مبلغ|تحويل|حوالة)"
+    r"|وصلت (?:ال)?(?:دفعة|دفع|حوالة|تحويل)|تم (?:ال)?دفع\b|تم تأكيد (?:ال)?(?:دفع|دفعة|تحويل)"
+    # Urdu script
+    r"|ادائیگی (?:موصول|وصول|مل گئی|مل چکی|ہو گئی|ہو چکی|کنفرم)|(?:پیمنٹ|رقم|پیسے) (?:مل گئی|مل گئے|موصول|وصول|ہو گئی)"
+    r"|ہمیں (?:ادائیگی|پیمنٹ|رقم) مل" + langs.PAYMENT_RECEIVED,
+    re.IGNORECASE,
+)
+
+PROMISE = re.compile(
+    r"\bguarantee[ds]?\b|\b100\s?%|\balways works\b|\bno risk\b|\brisk[- ]free\b"
+    r"|\bwill (?:definitely |certainly |surely |absolutely )?(?:fix|solve|work|save|increase|boost|grow|"
+    r"double|improve)\b|\bthis will (?:fix|solve)\b|\byou(?:'ll| will) (?:save|earn)\b"
+    # R-PROM-03: a forecast of the person's own numbers, in English and Roman Urdu
+    r"|\b(?:sales|profits?|revenue|footfall|customers|orders|income|leads|traffic)\s+"
+    r"(?:will|are going to|should)\s+(?:definitely |certainly |surely )?"
+    r"(?:rise|go up|jump|grow|increase|improve|double|climb|come|pick up)\b"
+    r"|\byou(?:'ll| will) (?:get|see|reach) (?:more|higher|better|many)\b"
+    r"|\b(?:sale|footfall|munafa|profit|customers?|income)\s+(?:zaroor\s+)?"
+    r"(?:barh(?:\s+(?:jaye|jayegi|jayega|jayenge|jaaye|jaayegi))|barh(?:egi|ega|enge)|badh(?:egi|ega|enge))\b"
+    r"|\b(?:next (?:year|month)|agle (?:saal|mahine)) you(?:'ll| will)\b" + langs.PROMISE,
+    re.IGNORECASE,
+)
+NEGATED_PROMISE = re.compile(
+    r"(?:can't|cannot|can not|won't|no|not|never|nahi)\W+(?:\w+\W+){0,3}$", re.I
+)
+
+BRAND = re.compile(r"\bartwing\b|\ba\.hub\b|\bahub\b", re.IGNORECASE)
+
+HYPE = (
+    "amazing", "awesome", "game-changer", "game changer", "revolutionary", "supercharge",
+    "unlock", "seamless", "cutting-edge", "world-class", "great question", "absolutely!",
+    "i'd be happy to", "i would be happy to",
+)  # fmt: skip
+FAKE_EMPATHY = (
+    "i completely understand", "i'm so sorry to hear", "i am so sorry to hear",
+    "how frustrating that must be", "i know exactly how you feel",
+)  # fmt: skip
+# Template-sounding phrases (2.0.4: regenerate) and the things pi never says (2.4: hard).
+CORPORATE = (
+    "i have registered your concern", "please be informed", "kindly note",
+    "thank you for your response", "thank you for contacting",
+)  # fmt: skip
+NEVER_SAY = (
+    "as an ai language model", "i'm just a bot", "i am just a bot", "just a bot",
+    "get back to you shortly", "get back to you soon", "our team will get back",
+)  # fmt: skip
+INTERNAL = re.compile(
+    r"\b(?:knowledge pack|industry pack|(?:learning|nightly|brain|processing) pipeline|system prompt|LLM|S\d+_[A-Z_]+|X_[A-Z_]+|R-[A-Z]+-\d+)\b"
+)
+# A2-1.5-SECRETS: pi never reveals Workzap's internal methods, tools, vendors, pricing logic or how the
+# catalogue is built, even when asked (the person saying a word first does not lift this).
+VENDORS = (
+    r"openai|chatgpt|gpt-?\d|anthropic|claude|gemini|llama|mistral|neon|railway|fastapi|postgres|"
+    r"twilio|supabase|vercel|aws|azure|langchain|pinecone"
+)
+SECRETS = re.compile(
+    r"\b(?:(?:we|workzap|i|pi)\s+(?:use|uses|run|runs|am\s+built|is\s+built|are\s+built|built|"
+    r"was\s+built|work|works)\s+(?:on|with|using|by|via)?\s*(?:" + VENDORS + r")\b"
+    r"|(?:powered|built|trained|running)\s+(?:by|with|on|using)\s+(?:" + VENDORS + r")\b"
+    r"|our\s+(?:internal|secret|proprietary)\s+(?:method|methods|process|formula|tools?|system|"
+    r"pricing|algorithm)"
+    r"|(?:pricing|price)\s+(?:logic|formula|algorithm|model|engine|rules?)\b"
+    r"|how\s+(?:we|the\s+catalogue|our\s+catalogue)\s+(?:build|builds|built|work|works|generate|"
+    r"generates|make|makes|price|prices)\b"
+    r"|(?:catalogue|catalog)\s+(?:is|are)\s+(?:built|generated|made|created)\s+(?:by|from|with|using)"
+    r"|(?:internal|backend)\s+(?:cost|costs|margin|margins)\b)" + langs.SECRETS,
+    re.IGNORECASE,
+)
+# "tool" and "prompt" are internal terms too (2.4), unless the person said them first.
+INTERNAL_PLAIN = re.compile(r"\b(?:tools?|prompts?)\b", re.IGNORECASE)
+LECTURE = re.compile(
+    r"\byou should\b|\bbest practices?\b|\bmany businesses (?:find|struggle|face)\b", re.IGNORECASE
+)
+LOGGED = re.compile(r"\b(?:I(?:'ve| have) )?(?:logged|ticketed|captured)\b", re.IGNORECASE)
+JARGON = (
+    "KPI",
+    "SKU",
+    "ERP",
+    "workflow automation",
+    "pain point",
+    "stakeholder",
+    "leverage",
+    "synergy",
+    "drop-off",
+    "dropoff",
+    "drop off",
+    "funnel",
+    "touchpoint",
+    "bottleneck",
+    "conversion rate",
+    "engagement rate",
+)
+SOLVED = re.compile(r"\bsolved\b", re.IGNORECASE)
+NOT_SOLVED = re.compile(r"\b(?:not|n't|none|yet|unsolved|isn't|aren't)\b", re.IGNORECASE)
+HEADING = re.compile(r"(?m)^\s{0,3}#{1,6}\s|\*\*[^*\n]+\*\*|^\s*\|.+\|\s*$")
+
+EMOJI = re.compile("[\U0001f000-\U0001faff☀-➿⭐⭕✅❌]")
+ALLOWED_EMOJI = "✅"
+
+# Listening states (R-SELL-01, 02): no solution, offer, product or quote talk unless they ask.
+OFFER_WORDS = re.compile(
+    r"\bsolution documents?\b|\bsolutions?\b|\bquotes?\b|\bquotation\b|\bproposals?\b",
+    re.IGNORECASE,
+)
+PITCH_WORDS = re.compile(
+    r"\bnori\b|\b(?:we|workzap|i)(?: can| could| would| will|'ll|'d)(?: also)? "
+    r"(?:build|make|create|set up|automate|fix|solve|install|develop)\b"
+    r"|\bour (?:product|products|service|services|software|app|platform|system)\b"
+    r"|\bI(?:'d| would) recommend\b|\bworkzap can help\b"
+    # Roman Urdu, Urdu and Arabic: "hamara CRM le lein", "Workzap le lein", "hum bana denge"
+    r"|\bham?ar[ea]\s+(?:product|service|software|app|platform|system|crm)\b"
+    r"|\bworkzap(?:\s+\w+){0,2}\s+(?:le\s+lein|use\s+kar\w*|lagwa\w*)\b"
+    r"|\b(?:hum|main)\s+(?:aap\s+ke\s+liye\s+)?(?:ek\s+\w+\s+)?(?:bana|banwa|laga)\w*\b"
+    r"|ہمارا\s+(?:پروڈکٹ|سافٹ\s*ویئر|ایپ|سسٹم)|نظامنا|برنامجنا|منتجنا",
+    re.IGNORECASE,
+)
+URGENCY = re.compile(
+    r"\blimited[- ]time\b|\blast chance\b|\boffer (?:expires|ends)\b|\bhurry\b|\bdon'?t miss\b"
+    r"|\bonly \d+ (?:days?|hours?|spots?) left\b|\bact now\b|\bspecial offer\b"
+    r"|\bbefore it(?:'s| is) too late\b|\bwhile (?:slots|stocks?|spots) last\b|\bspots are (?:filling|going)\b"
+    r"|\bprice (?:will|is going to) (?:go up|increase|rise)\b|\brunning out of time\b|\bdon'?t wait\b"
+    r"|\boffer (?:is )?(?:valid|open) (?:until|till|for)\b",
+    re.IGNORECASE,
+)
+# Flattery used to move a decision (R-SELL-03): soft, the model rewrites it.
+FLATTERY = re.compile(
+    r"\b(?:great|excellent|smart|wise|brilliant|fantastic|wonderful|clever|sharp) "
+    r"(?:idea|move|call|choice|decision|thinking|point|instinct|observation|approach|plan)\b"
+    r"|\byou(?:'re| are) (?:clearly |obviously |so |very |really )?(?:smart|wise|clever|sharp|brilliant|"
+    r"an expert|a great|doing (?:great|well|amazing))\b|\bwell done\b|\bimpressive\b"
+    r"|\bwhat a (?:great|smart|wise|brilliant)\b",
+    re.IGNORECASE,
+)
+# Offering a discount moves a decision; saying pi cannot give one does not.
+DISCOUNT = re.compile(
+    r"\bdiscounts?\b|\b\d+\s*(?:%|percent|per cent)\s*off\b|\brebate\b"
+    # "chhoot jata hai" means "gets missed", so only the discount senses count
+    r"|\bchh?oot\s+(?:de|dein|dena|denge|dun|dunga|milegi|mil\s+(?:jayegi|jaye))\b"
+    r"|\b\d+\s*(?:%|percent|fisad)\s*chh?oot\b"
+    r"|خصم|تخفيض|رعایت|ڈسکاؤنٹ|چھوٹ\s*(?:دے|دیں|دینا|دی\s+جا|ملے|ملیں)|\d+\s*(?:%|فیصد)\s*چھوٹ",
+    re.IGNORECASE,
+)
+NEGATED_DISCOUNT = re.compile(
+    r"(?:can't|cannot|can not|won't|no|not|never|nahi|unable)\W+(?:\w+\W+){0,4}$"
+    r"|(?:^|\W)(?:لا|ليس|نہیں|نہ|مت)\W+(?:\w+\W+){0,4}$",
+    re.IGNORECASE,
+)
+NEGATED_AFTER = re.compile(
+    r"^(?:\W+\w+){0,3}\W+(?:nahi|nahin|نہیں|مت|لا|ليس)(?:\W|$)", re.IGNORECASE
+)
+ASKED_FOR_HELP = re.compile(
+    r"\b(?:solution|fix|solve|build|quote|price|pricing|cost|how much|proposal|what can you do|"
+    r"can you help|can you fix|what would you build|(?:kya|kuch) kar sakte|"
+    r"kar sakte (?:ho|hain) ya nahi|(?:kya|koi) hal (?:hai|he)|kitna|qeemat|hal|"
+    r"can you (?:make|create|develop|build|set up)|(?:make|build|create) (?:me )?an? "
+    r"(?:app|system|software|website|tool)|app for this|kharcha|kharch|"
+    r"what (?:do|does) (?:you|workzap) (?:sell|offer|do)|your (?:products?|services?))\b",
+    re.IGNORECASE,
+)
+
+WORD_CAP = 60
+SUMMARY_CAP = 160
+DOCUMENT_CAP = 120
+# Book 2 4.1: a solution answer (level 1: answer, two ideas, the offer) may run to 120 words, and
+# with the one line on what Workzap would build (level 2) to 150. It is not a 60-word listening
+# reply, and a compliant 70-word one used to cost a rewrite.
+SOLUTION_CAP = 120
+SOLUTION_BUILD_CAP = 150
+
+
+def _cap(context: dict[str, Any], key: str, default: int) -> int:
+    """A word limit: the workspace's own value (kept within +-30% of the default by
+    `brain_config`) or the default. These are the only voice numbers spec 9.10 lets it tune."""
+    if key == "word_cap" and context.get("solution_exploration"):
+        return 240
+    value = (context.get("brain_settings") or {}).get(key)
+    return value if isinstance(value, int) and not isinstance(value, bool) else default
+
+
+@dataclass(frozen=True)
+class Violation:
+    rule: str
+    message: str
+    hard: bool = False
+
+
+def _sentences(text: str) -> list[str]:
+    return [s.strip() for s in SENTENCE.split(text) if s.strip()]
+
+
+def _customer_words(context: dict[str, Any]) -> str:
+    said = [str(context.get("latest_customer_message", ""))]
+    said += [
+        str(h.get("text", "")) for h in context.get("history") or [] if h.get("role") == "customer"
+    ]
+    return " ".join(said)
+
+
+def _pi_replies(context: dict[str, Any]) -> list[str]:
+    return [str(h.get("text", "")) for h in context.get("history") or [] if h.get("role") == "ai"]
+
+
+def _heard(context: dict[str, Any]) -> str:
+    """Everything the person has said, lower case with straight quotes: words they used first."""
+    return _customer_words(context).lower().replace("’", "'")
+
+
+def _offers_discount(reply: str, heard: str = "") -> bool:
+    """A discount offered. Saying pi cannot give one does not count, and neither does asking about
+    a discount the person raised themselves ("is it the discounts you can't make sense of?")."""
+    for sentence in _sentences(reply):
+        for match in DISCOUNT.finditer(sentence):
+            if NEGATED_DISCOUNT.search(sentence[max(0, match.start() - 40) : match.start()]):
+                continue
+            if NEGATED_AFTER.search(sentence[match.end() : match.end() + 40]):
+                continue  # Urdu and Roman Urdu put the refusal after it: "discount nahi de sakta"
+            if sentence.rstrip().endswith(QUESTION_MARKS) and (
+                DISCOUNT.search(heard)
+                or re.search(
+                    r"\b(?:the|your|their|these|those)\s+$", sentence[: match.start()], re.I
+                )
+            ):
+                continue  # asking about the discounts they deal with is not offering one
+            return True
+    return False
+
+
+ECHOABLE_PROMISE = re.compile(r"\bguarantee[ds]?\b", re.IGNORECASE)
+NOT_ATTRIBUTIVE = re.compile(
+    r"(?:\bis|\bare|\bwas|\bbe|\bbeen|\bwe|\bI|\bwill|'ll|\bit's|'s|\byou're|\bthey're|\band|\bor|"
+    r"\bthat's|\bto)\W+$",
+    re.IGNORECASE,
+)
+
+
+def _promise_hits(reply: str, heard: str = "") -> bool:
+    for match in PROMISE.finditer(reply):
+        if NEGATED_PROMISE.search(reply[max(0, match.start() - 30) : match.start()]):
+            continue
+        if langs.NEGATED_BEFORE.search(reply[max(0, match.start() - 40) : match.start()]):
+            continue
+        if langs.NEGATED_AFTER.search(reply[match.end() : match.end() + 40]):
+            continue
+        if re.match(r"\s+(?:nahi|nahin)\b", reply[match.end() :], re.IGNORECASE):
+            continue  # Roman Urdu puts the negation after the claim: "guarantee nahi hogi".
+        word = match.group(0).lower()
+        # "guaranteed count" in a banquet hall: a word they used, as a name for a thing, is not a
+        # promise. "we guarantee ..." or "it is guaranteed" still is.
+        if (
+            ECHOABLE_PROMISE.fullmatch(word)
+            and (word[:9] in heard or ATTRIBUTIVE_NOUNS.match(reply[match.end() :]))
+            and re.match(r"\s+[a-z]", reply[match.end() :], re.IGNORECASE)
+            and not NOT_ATTRIBUTIVE.search(reply[max(0, match.start() - 14) : match.start()])
+        ):
+            continue
+        return True
+    return False
+
+
+ABSENCE = re.compile(
+    r"(?:\bno\b|\bwithout\b|\bnot\b|\bnahi\b|\bnever\b|\bmissing\b|\black of\b|\bno written\b)\W+(?:\w+\W+){0,3}$",
+    re.IGNORECASE,
+)
+CODE_PROMISE = re.compile(
+    r"\b(?:code|otp|pin)\b[^.?!\n]{0,40}\b(?:on its way|is (?:being )?sent|will (?:arrive|come)|is coming)\b",
+    re.IGNORECASE,
+)
+ON_ITS_WAY = re.compile(r"\bon its way\b", re.IGNORECASE)
+SIGN_IN_WORDS = re.compile(r"\b(?:codes?|otp|pins?|passwords?)\b", re.IGNORECASE)
+ENGLISH_NOTED = re.compile(r"\bI(?:'ve| have) noted\b|^\s*Thanks\.\s", re.IGNORECASE)
+NOTING = re.compile(r"\bnoted?\b|note kar|likh liya|likh liye" + langs.NOTING, re.IGNORECASE)
+ATTRIBUTIVE_NOUNS = re.compile(
+    r"\s+(?:count|number|minimum|headcount|guests?|deposit|amount)\b", re.IGNORECASE
+)
+
+
+def _stem(word: str) -> str:
+    first = word.lower().split()[0]
+    return first[:-1] if first.endswith("s") else first
+
+
+def _unheard_offer_words(reply: str, heard: str) -> bool:
+    """An offer word (quote, proposal, solution) the person did not use first. The owner's own trade
+    words ("our quotes take a day to prepare") may be echoed back while listening."""
+    said = {_stem(m.group(0)) for m in OFFER_WORDS.finditer(heard)}
+    for m in OFFER_WORDS.finditer(reply):
+        if _stem(m.group(0)) in said:
+            continue
+        # noting an absence ("no itemised quote", "without a proposal") offers nothing
+        if ABSENCE.search(reply[max(0, m.start() - 30) : m.start()]):
+            continue
+        return True
+    return False
+
+
+def _unheard(pattern: re.Pattern[str], text: str, heard: str) -> str | None:
+    """The first match of `pattern` in `text` whose words the person did not say first."""
+    for match in pattern.finditer(text):
+        if match.group(0).lower() not in heard:
+            return match.group(0)
+    return None
+
+
+def _statements(reply: str) -> list[str]:
+    """The sentences that are not questions: where pi asserts something."""
+    return [s for s in _sentences(reply) if not s.rstrip().endswith(QUESTION_MARKS)]
+
+
+def _contains(reply: str, phrases: tuple[str, ...]) -> str | None:
+    lowered = reply.lower().replace("’", "'")
+    return next((p for p in phrases if p in lowered), None)
+
+
+# Phrases from the canonical bank (2.3) that must not repeat word for word (the opening and the
+# offer are fixed and exempt).
+CANONICAL = (
+    "that's a real problem", "that sounds costly", "that's worth sorting", "no rush",
+    "anything else getting in the way", "got it",
+)  # fmt: skip
+
+FESTIVAL = re.compile(
+    r"\b(?:eid|mubarak|ramadan|ramzan|kareem|christmas|diwali|new year)\b|مبارك|عيد", re.IGNORECASE
+)
+
+
+def _allowed_bangs(context: dict[str, Any]) -> int:
+    """R-VOICE-07: one exclamation mark in a whole conversation, and only for a festival greeting
+    when the person used one first."""
+    said = str(context.get("latest_customer_message", ""))
+    earlier = any(
+        "!" in str(h.get("text", "")) for h in context.get("history") or [] if h.get("role") == "ai"
+    )
+    return 1 if "!" in said and FESTIVAL.search(said) and not earlier else 0
+
+
+# A confirmed correction ("you're right, I've changed it") when they corrected nothing: found in a
+# real sweep after a plain extra detail.
+CONFIRMS_CORRECTION = re.compile(
+    r"\byou'?re right\b|\bi'?ve (?:changed|fixed|corrected|updated) it\b"
+    r"|\baap sahi keh rahe hain\b|\bbadal diya\b|\btheek kar diya\b"
+    r"|\baap\s+(?:bilkul\s+)?(?:sahi|theek|thik)\s+(?:keh|kah|kehte|kehti|farma)\w*\b|\baap\s+ne\s+(?:bilkul\s+)?sahi\s+kaha\b"
+    r"|\bsahi\s+kaha\b|\bbilkul\s+sahi\b|\byou(?:'re|\s+are)\s+(?:absolutely\s+|totally\s+|completely\s+|quite\s+)?(?:right|correct)\b"
+    r"|\bthat(?:'s|\s+is)\s+(?:absolutely\s+|totally\s+)?(?:right|correct)\b|\b(?:good|fair|great)\s+point\b"
+    + langs.CONFIRMS_CORRECTION,
+    re.IGNORECASE,
+)
+# Words that make a message a correction even when the strict detector missed it.
+CORRECTION_CUE = re.compile(
+    r"\b(?:actually|instead|rather|correction|i meant|i mean|not (?:\w+ ){1,3}but|wrong|mistake|typo|sorry|change(?:d)?|update|galat|ghalat|nahi (?:\w+ ){0,3}balke|balkay|dar asal|asal mein|ye nahi|maaf|badal|theek kar|sahi kar)\b"
+    + langs.CORRECTION_CUE,
+    re.IGNORECASE,
+)
+NOT_UNDERSTOOD = re.compile(
+    r"\b(?:samajh|samjh|samjha|samja) (?:nahi|nhi|nahin)"
+    r"(?: (?:aayi|aaya|aai|aya|ayi|paya|payi|saka|saki|aa raha|aa rahi))?\b"
+    r"|\bdid(?:n'?t| not) (?:understand|follow|get)\b|\bdon'?t (?:understand|follow)\b",
+    re.IGNORECASE,
+)
+# "Maazrat" as a short opener is right when they are impatient (Live Audit 2, G27); only the stiff
+# "mujhe maazrat chahiye" form is not.
+STIFF_APOLOGY = re.compile(
+    r"\bmujhe\s+maa?zrat\b|\bmaa?zrat\s+(?:chahta|chahti|chahiye)\b|\bmaazerat\b", re.IGNORECASE
+)
+# Roman Urdu has no gender-free "I", so pi uses neutral forms ("maine note kar liya", "bhej diya
+# jayega"), always the "aap" imperative ("karein", never "karo") and the common spellings (Book 2
+# 10.5 and 10.6, Book 4 5.1: R-GEN-01, R-TONE, R-SPELL).
+GENDERED_URDU = re.compile(
+    r"\b(?:samajh\s+gay[ai]|\w+(?:ta|ti)\s+h[ou]o?n|(?:raha|rahi)\s+h[ou]o?n|dunga|dungi|lunga|"
+    r"(?:kar|bhej|bata|bana|dikha|dekh|rakh|sun|likh|pooch|nikal|laga|ban|aa|ja|ho)(?:unga|ungi))\b",
+    re.IGNORECASE,
+)
+# "Main yahan kabhi payment nahi maangta", "main nahi dekh sakta": a first-person masculine (or
+# feminine) verb gives pi a gender. The impersonal "nahi dekha ja sakta" is the neutral form.
+GENDERED_I = re.compile(
+    r"\bmain\b(?!\s+(?:problem|masla|masle|reason|wajah|issue|baat|cheez|point|cause|channel|gate|bazaar))"
+    r"[^.?!\n:;]{0,80}?(?<!ja )(?<!ho )\b(?:sak(?:ta|ti|a|i)|maang(?:ta|ti)|mang(?:ta|ti)|kar(?:ta|ti)|de(?:ta|ti)|"
+    r"le(?:ta|ti)|bhej(?:ta|ti)|dekh(?:ta|ti)|bata(?:ta|ti)|jaan(?:ta|ti)|jan(?:ta|ti)|"
+    r"samajh(?:ta|ti)|chah(?:ta|ti)|likh(?:ta|ti)|rakh(?:ta|ti)|sun(?:ta|ti)|keh(?:ta|ti)|"
+    r"bana(?:ta|ti)|(?:kar|bhej|bata|dekh|rakh|likh|sun)(?:unga|ungi))\b",
+    re.IGNORECASE,
+)
+INFORMAL_IMPERATIVE = re.compile(
+    r"\b(?:karo|kro|rakho|bhejo|dekho|likho|batao|banao|uthao|lagao|nikalo|gino|poochho|pucho|"
+    r"puchho|chalao|bulao)\b",
+    re.IGNORECASE,
+)
+WRONG_SPELLING = {
+    "ghoor": "ghaur",
+    "zarur": "zaroor",
+    "zaroorr": "zaroor",
+    "bilkol": "bilkul",
+    "ziada": "zyada",
+    "hisab": "hisaab",
+    "intizar": "intezaar",
+    "dukan": "dukaan",
+}
+QUOTED = re.compile(r"\*[^*]+\*|\"[^\"]+\"|“[^”]+”")
+
+
+def roman_urdu_tone(reply: str, heard: str) -> list[Violation]:
+    """R-GEN-01, R-TONE and R-SPELL for a Roman Urdu reply: neutral first person, "aap" forms and
+    the common spellings. What the person said first, or pi quotes of theirs, is left alone."""
+    # only words the person said first are left alone, never a bold or quoted span of pi's own
+    own = QUOTED.sub(
+        lambda m: " " if m.group(0).strip('*"“” ').lower() in heard else m.group(0), reply
+    )
+    found: list[Violation] = []
+    gendered = next(
+        (m.group(0) for m in GENDERED_URDU.finditer(own) if m.group(0).lower() not in heard), None
+    )
+    if gendered:
+        found.append(
+            Violation(
+                "R-GEN-01",
+                f'pi has no gender: not "{gendered}" ("maine note kar liya", "bhej diya jayega")',
+            )
+        )
+    if not gendered:
+        gendered = next(
+            (m.group(0) for m in GENDERED_I.finditer(own) if m.group(0).lower() not in heard), None
+        )
+        if gendered:
+            found.append(
+                Violation(
+                    "R-GEN-01",
+                    f'pi has no gender: not "{gendered[-24:]}" (say it neutrally: "nahi dekha ja sakta")',
+                )
+            )
+    informal = next(
+        (m.group(0) for m in INFORMAL_IMPERATIVE.finditer(own) if m.group(0).lower() not in heard),
+        None,
+    )
+    if informal:
+        found.append(
+            Violation("R-TONE-04", f'use the "aap" form ("karein", "rakhein"), not "{informal}"')
+        )
+    spelled = next(
+        (
+            (w, right)
+            for w, right in WRONG_SPELLING.items()
+            if re.search(rf"\b{w}\b", own, re.IGNORECASE) and not re.search(rf"\b{w}\b", heard)
+        ),
+        None,
+    )
+    if spelled:
+        found.append(Violation("R-SPELL-01", f'spell it "{spelled[1]}", not "{spelled[0]}"'))
+    return found
+
+
+# Urdu script (spec 2.5, G7): first-person verbs that give pi a gender, and the informal "tum" forms.
+GENDERED_URDU_SCRIPT = re.compile(
+    r"\S*(?:تا|تی|رہا|رہی|گیا|گئی)\s+ہوں|(?:سکتا|سکتی)\s+ہوں|\S+وں\s+(?:گا|گی)\b"
+)
+INFORMAL_URDU_SCRIPT = re.compile(r"(?:^|\s)(?:کرو|بھیجو|دیکھو|لکھو|بتاؤ|بناؤ|رکھو)(?=[\s۔؟,.]|$)")
+
+
+def urdu_script_checks(reply: str) -> list[Violation]:
+    """The rules for a reply to a person who writes Urdu script: it is all in Urdu script (R-LANG-02,
+    one script per chat), polite (R-TONE-04) and gender-free in the first person (R-GEN-01). The
+    same rules every fixed Urdu line is held to (test_pi_fixed_lines_urdu_script)."""
+    from app.modules.pi.language import in_script
+
+    found: list[Violation] = []
+    if len(reply.split()) >= 4 and not in_script(reply, "Urdu"):
+        found.append(
+            Violation("R-LANG-02", "write the whole reply in Urdu script, not in English letters")
+        )
+    if match := GENDERED_URDU_SCRIPT.search(reply):
+        found.append(
+            Violation(
+                "R-GEN-01",
+                f'pi has no gender: not "{match.group(0)}" (use "کیا جا سکتا ہے", "میں نے ... لیا")',
+            )
+        )
+    if match := INFORMAL_URDU_SCRIPT.search(reply):
+        found.append(
+            Violation("R-TONE-04", f'use the "aap" form ("کریں"), not "{match.group(0).strip()}"')
+        )
+    return found
+
+
+# R-TONE-01 (Book 2 10.2): describe the problem, never judge the person or the business. Said by
+# pi, never allowed, even when the person said something like it first.
+JUDGEMENT = re.compile(
+    r"\byour\s+(?:business|shop|shops|company|work|team|sales)\s+(?:is|are)\s+"
+    r"(?:not\s+doing\s+well|doing\s+(?:badly|poorly)|failing|bad|poor|terrible|a\s+mess)\b"
+    r"|\byou(?:'re|\s+are)\s+doing\s+(?:it|this|things)\s+wrong\b"
+    r"|\baap\s*ka\s+(?:business|dhanda|karobar)\s+(?:fail|kharab|barbad|theek\s+nahi)\b"
+    r"|\baap\s+(?:ghalat|galat)\s+kar\s+rahe\b" + langs.JUDGEMENT,
+    re.IGNORECASE,
+)
+# R-TONE-03 (Book 2 10.2): a frustrated person gets value, not defensiveness, "please be patient" or
+# a lecture on why pi asks questions.
+PATIENCE = re.compile(
+    r"\bplease\s+be\s+patient\b|\bbear\s+with\s+me\b|\bi\s+was\s+only\s+trying\b"
+    r"|\bthe\s+reason\s+(?:i|we)\s+(?:ask|am\s+asking)\b|\bwhy\s+i(?:'m|\s+am)\s+asking\b"
+    r"|\bi\s+need\s+to\s+ask\s+(?:these|this|so\s+many)\b"
+    r"|\bsabar\s+(?:karein|rakhein)\b|\bisliye\s+(?:pooch|puch)\w*\b" + langs.PATIENCE,
+    re.IGNORECASE,
+)
+# The fixed offer ends "...? You can say no." (Book 2 R-OFFER-02): the question is still the last
+# sentence of the offer, the tail only says no is fine (R-VOICE-02 must not flag it).
+OFFER_TAIL = re.compile(
+    r"\s*(?:you\s+can\s+say\s+no|mana\s+bhi\s+kar\s+sakte\s+hain|aap\s+mana\s+bhi\s+kar\s+sakte"
+    r"\s+hain|يمكنك\s+أن\s+تقول\s+لا" + langs.OFFER_TAIL + r")\s*[.!।۔]*\s*$",
+    re.IGNORECASE,
+)
+# R-ANS-01/02 (Book 2 3.1): a direct question to pi gets its answer in the first sentence; a yes/no
+# question gets a yes or a no first. A question back, or "Thanks, noted", is not an answer.
+DIRECT_QUESTION = re.compile(r"[?؟]\s*$")
+YES_NO_QUESTION = re.compile(
+    r"\b(?:can|could|will|would|do|does|are|is)\s+(?:you|it|this)\b[^?]*[?]"
+    r"|\bkar\s+(?:sakte|sakti)\s+(?:ho|hain)\b|\bho\s+sakta\s+hai\b|\bya\s+nahi\b|\bkya\s+aap\b"
+    + langs.YES_NO_QUESTION,
+    re.IGNORECASE,
+)
+ACK_OPENER = re.compile(
+    r"^\W*(?:thanks|thank\s+you|noted|got\s+it|shukriya|(?:alag\s+)?note\s+kar\s+li(?:ya|a)?|samajh\s+liya)\b"
+    + langs.ACK_OPENER,
+    re.IGNORECASE,
+)
+# R-TONE-01 / R-ECHO-01 (live chat 2026-10-26): no verdict opener ("Ye real masla hai.", "That's a real
+# problem.") and no stock thank-you before the noted line ("Shukriya. Maine note kar liya: ...").
+VERDICT_OPENER = re.compile(
+    r"^\W*(?:ye|yeh|wo|woh|this|that)(?:\s+to)?(?:'s)?(?:\s+(?:is|ek|a|an))*"
+    r"\s+(?:(?:sach\s+mein|sach\s+much|waqai(?:\s+mein)?|waqaee|haqeeqat\s+mein|bilkul|asli|ek\s+asli|"
+    r"really|truly|genuinely|indeed|real|genuine|serious|valid|important|big|major|a|an|ek|"
+    r"bara|bada|badi|bari|zaroori|ahem)\s+)+"
+    r"(?:ek\s+)?(?:masla|masle|problem|issue|baat|mushkil|challenge)\b" + langs.VERDICT_OPENER,
+    re.IGNORECASE,
+)
+THANKS_THEN_NOTED = re.compile(
+    r"^\W*(?:shukriya|theek\s+hai|thik\s+hai|acha|accha|ji\s+haan|haan|ji)[.!,]?\s+(?:(?:maine|main\s+ne|i(?:'ve|\s+have))?\s*"
+    r"(?:note|noted))\b" + langs.THANKS_THEN_NOTED,
+    re.IGNORECASE,
+)
+NOTED_WORDS = (
+    8  # the golden noted line is a few words: "Note kar liya, views aate hain magar orders nahi."
+)
+# R-ASK-05: the generic closer ("anything else?", "aur kuch add karna hai?") straight after a concrete
+# detail: ask something specific about the detail instead.
+GENERIC_CLOSER = re.compile(
+    r"\banything else\b|\bwhat else\b|\bis there anything\b|\b(?:aur|or) (?:koi|kuch)\b"
+    r"|\bkoi aur\b|\bkuch (?:aur|add)\b|\badd karna\b|\bmasla ho to\b|\banything to add\b"
+    + langs.GENERIC_CLOSER,
+    re.IGNORECASE,
+)
+CONCRETE_STATES = (
+    flow.State.S1_LISTENING,
+    flow.State.S2_CLARIFYING,
+    flow.State.S3_NOTED,
+    flow.State.S5_READINESS,
+)
+# R-VOICE-02: "size, colour, ya delivery bhi poochte hain, ya bas raqam par baat ruk jati hai?" asks two
+# questions in one sentence: an "or" that follows another "or" and a comma.
+DOUBLE_OR = re.compile(
+    r"\b(?:ya|or)\b[^?؟]*,\s*(?:ya|or)\b|یا[^?؟]*[,،]\s*یا",
+    re.IGNORECASE,
+)
+# R-ECHO-04: a sentence that only says again what they said, with no "noted" frame.
+NOTED_START = re.compile(
+    r"^\W*(?:thanks[.,]?\s+|thank\s+you[.,]?\s+|ji[,.]?\s+samajh\s+(?:aaya|gaya|gayi)[.,]?\s+)?"
+    r"(?:i(?:'ve|\s+have)\s+noted|noted|(?:(?:maine|ye|yeh|isay|ise|alag)\s+)?note\s+kar\s+li(?:ya|a)?|likh\s+liya"
+    + langs.NOTED_FRAME
+    + r")",
+    re.IGNORECASE,
+)
+SPLIT_WORDS = re.compile(r"[^\s.,;:!?؟۔।¿¡()\"«»…-]+")
+RESTATE_SHARE = 0.7  # the share of a sentence's words that are theirs
+RESTATE_MIN_WORDS = 4
+SHORT_ANSWER_WORDS = 6  # their message is this short...
+SHORT_ECHO_WORDS = 8  # ...and the sentence that says it again no longer than this
+SHORT_ECHO_COVERAGE = 0.8  # of their content words are in that sentence
+ECHO_STOP = frozenset("and aur ya the for with hai hain ka ke ki ko se mein par kya nahi".split())
+# R-ANS-01 (live chats 1 and 3): "ap kya kr skty hain wo btyn" is answered with the ideas, not with
+# "Aap chahen to main abhi solution ideas bataun?" (a permission question to a person who just asked).
+CAPABILITY_ASK = re.compile(
+    r"\b(?:kya|kia|kuch)\s+(?:kar|kr)\s+(?:sakte|skte|skty|sakty|sakti|skti)\b|\b(?:any|kuch)\s+ideas?\b"
+    r"|\bideas?\s+(?:do|dein|dijiye|btao|batao|bataye|btayn|batayen)\b|\bkya\s+madad\b|\bmadad\s+(?:kar|kr)\b"
+    r"|\bhow\s+can\s+you\s+help\b|\bwhat\s+(?:ideas|help)\b|\bwo\s+(?:btyn|batayen|bataein)\b",
+    re.IGNORECASE,
+)
+PERMISSION_FOR_IDEAS = re.compile(
+    r"\b(?:aap|ap)\s+(?:chahen|chahein|chahain|chaho)\s+to\b[^?؟]{0,60}(?:ideas?|solution|hal|batau|bataun|bata\s+(?:doon|dun)|share|suggestion)"
+    r"|\bkya\s+main\b[^?؟]{0,40}(?:ideas?|solution|hal|batau|bataun|share)"
+    r"|\b(?:would\s+you\s+like(?:\s+me)?\s+to|do\s+you\s+want\s+me\s+to|shall\s+i|should\s+i|may\s+i|can\s+i)\b[^?؟]{0,50}(?:ideas?|suggest|share|tell\s+you)",
+    re.IGNORECASE,
+)
+# R-LANG-02: a Roman Urdu reply does not open with an English filler.
+ENGLISH_FILLER_OPENER = re.compile(
+    r"^\W*(?:thanks|thank\s+you|sure|okay|ok|alright|great|perfect|got\s+it|yes)\b", re.IGNORECASE
+)
+# R-LANG-02: English function words ("... likha hota hai before aap decide karein") in a Roman Urdu reply.
+ENGLISH_FUNCTION = re.compile(
+    r"\b(?:before|after|because|while|without|about|until|since|whenever|however|therefore|also|"
+    r"just|really|very|please|actually|maybe|your|our|with|from|into|and|but|then)\b",
+    re.IGNORECASE,
+)
+# R-ASK-03: a question the person has already answered in their own words.
+FREQUENCY_QUESTION = re.compile(
+    r"\b(?:kitni\s+(?:dafa|baar|bar)|kitna\s+aksar|kab\s+kab|how\s+(?:often|many\s+times)|"
+    r"kitni\s+der\s+baad)\b",
+    re.IGNORECASE,
+)
+SAID_FREQUENCY = re.compile(
+    r"\b(?:roz|rozana|daily|har\s+din|har\s+hafte|hafte|haftay|haftey|weekly|mahine|mahinay|monthly|"
+    r"kabhi\s+kabhi|aksar|every\s+(?:day|week|month)|once\s+a|(?:per|a)\s+(?:day|week))\b"
+    r"|\d+\s*(?:baar|dafa|times|din|bar)\b",
+    re.IGNORECASE,
+)
+COMPARATIVE = re.compile(
+    r"\b(?:zyada|zyadah|jyada|kam|more|most|less|least|worst|bura|buri|behtar|better|best|sab\s+se|"
+    r"slowest|biggest|which|kaun|kahan)\b",
+    re.IGNORECASE,
+)
+OPTION_STOP = frozenset(
+    "side wala wali wale taraf type kya masla problem hai hain mein par ko ki ka ke se aur ya the "
+    "and for with that this which what ho hota hoti hote".split()
+)
+# R-TONE-01 (live chat 5): a hollow verdict that promises nothing and notes nothing.
+HOLLOW_OPENER = re.compile(
+    r"^\W*(?:is\s+par\s+kaam\s+banta\s+hai|is\s+mein\s+nuqsan\s+ho\s+sakta\s+hai|that\s+sounds\s+costly|"
+    r"that(?:'s|\s+is)\s+worth\s+sorting|that\s+sounds\s+like\s+a\s+headache|ye\s+sunna\s+mushkil\s+hai|"
+    # an apology with a verdict ("Maaf kijiye, ye bohat mushkil hai."): nothing to be sorry for
+    r"(?:maaf\s+(?:kijiye|kijiyega|karein|karna)|sorry|i(?:'m|\s+am)\s+sorry|afsos)[,.]?\s+"
+    r"(?:ye|yeh|wo|woh|that|this)\s+(?:(?:sounds|is|seems)\s+)?"
+    r"(?:(?:bohat|bahut|kaafi|very|really|so)\s+)?"
+    r"(?:mushkil|bura|dukh\s+ki\s+baat|hard|tough|difficult|sad|stressful|frustrating)"
+    r"(?:\s+(?:hai|hota\s+hai))?)"
+    r"\W*$",
+    re.IGNORECASE,
+)
+# "Theek hai," / "Acha." in front of anything: an acknowledgement that adds nothing.
+FILLER_LEAD = re.compile(r"^\W*(?:theek\s+hai|thik\s+hai|acha|accha)\s*[,.!]\s*", re.IGNORECASE)
+# Words that say how much or how often and nothing else: "zyada tar", "bas thora", "mostly".
+BARE_WORDS = frozenset(
+    "zyada zyadatar tar bas sirf bohat bahut kuch thora thoda kam kabhi aksar shayad pata nahi nhi "
+    "haan han ji g theek thik hai hmm ok okay yes no most mostly often some sometimes maybe yeah "
+    "right acha accha bilkul".split()
+)
+BARE_MAX_WORDS = 4  # an answer of this many words ("zyada tar", "nahi") adds nothing to note
+PROGRESS_STATES = (
+    flow.State.S1_LISTENING,
+    flow.State.S2_CLARIFYING,
+    flow.State.S3_NOTED,
+)
+# the ids of the question slots (learning_arms.ORDER) and what in the person's words answers them
+SLOT_ANSWERED = {
+    "frequency": re.compile(
+        r"\b(?:roz|rozana|daily|har\s+din|har\s+hafte|hafte|haftay|weekly|mahine|mahinay|monthly|"
+        r"kabhi\s+kabhi|aksar|every\s+(?:day|week|month))\b|\d+\s*(?:baar|dafa|times|din)\b",
+        re.IGNORECASE,
+    ),
+    "since": re.compile(
+        r"\b(?:hamesha\s+se|pehle\s+se|since|always|\d+\s*(?:saal|mahine|din|years?|months?|weeks?)\s+se)\b",
+        re.IGNORECASE,
+    ),
+    "impact": re.compile(
+        r"\b(?:nuqsan|loss|paise|paisa|waqt|time\s+waste|pareshan|stress|kharcha|cost|mehnga)\b",
+        re.IGNORECASE,
+    ),
+}
+# R-ECHO-01: the noted confirmation names the problem in at most 12 words.
+NOTED_TITLE = re.compile(
+    r"\b(?:i(?:'ve|\s+have)\s+noted(?:\s+it)?|noted|note\s+kar\s+liya"
+    + langs.NOTED_FRAME
+    + r")\s*[:：]\s*([^.?!\n۔؟।]+)",
+    re.IGNORECASE,
+)
+# R-ECHO-01..03 (Book 2 10.1): pi does not restate the person's message back to them.
+ECHO_GRAM = 3  # words in a sequence
+ECHO_MAX = 0.4  # share of the reply's word sequences that may come from their last two messages
+ECHO_MIN_WORDS = 13  # a "noted" confirmation of up to 12 words is allowed (R-ECHO-01)
+
+
+def _grams(text: str) -> list[tuple[str, ...]]:
+    words = re.findall(r"[\w']+", text.lower().replace("’", "'"))
+    return [tuple(words[i : i + ECHO_GRAM]) for i in range(len(words) - ECHO_GRAM + 1)]
+
+
+def echo_overlap(reply: str, context: dict[str, Any]) -> float:
+    """The share of the reply's word sequences that repeat the person's last two messages."""
+    said = [str(context.get("latest_customer_message", ""))]
+    earlier = [
+        str(h.get("text", "")) for h in context.get("history") or [] if h.get("role") == "customer"
+    ]
+    said += earlier[-1:]
+    theirs = {g for text in said for g in _grams(text)}
+    mine = _grams(reply)
+    if not mine or not theirs:
+        return 0.0
+    return sum(1 for g in mine if g in theirs) / len(mine)
+
+
+BULLET = ("•", "- ")
+WORDS_PER_POINT = 4  # a list point needs about this many of their words in the latest message
+
+
+def _points(text: str) -> list[str]:
+    return [
+        " ".join(re.findall(r"\w+", line.lower()))
+        for line in text.splitlines()
+        if line.lstrip().startswith(BULLET)
+    ]
+
+
+def _relists(reply: str, context: dict[str, Any]) -> bool:
+    """A list while listening that repeats itself, repeats an earlier list, or has more points
+    than their latest message could hold ("no" answered with four points)."""
+    points = _points(reply)
+    if not points:
+        return False
+    earlier = {p for said in _pi_replies(context) for p in _points(said)}
+    latest = len(str(context.get("latest_customer_message", "")).split())
+    return (
+        len(set(points)) < len(points)
+        or any(p in earlier for p in points)
+        or (len(points) >= 2 and latest < WORDS_PER_POINT * len(points))
+    )
+
+
+# R-MEM-02 (spec 3.10): never ask again for a `customer_profile` fact already known, this chat or
+# an earlier one. Bounded to the handful of facts a customer most notices being asked twice; a
+# narrower, well-tested set beats a generic "did I ask about any of 15 fields" guess that risks
+# false positives on an unrelated question.
+REASK_FIELDS: tuple[tuple[str, re.Pattern[str]], ...] = (
+    (
+        "name",
+        re.compile(
+            r"\bwhat(?:'s| is) your name\b|\bmay i (?:have|know|get) your name\b"
+            r"|\bwho am i (?:speaking|chatting|talking) (?:to|with)\b"
+            r"|\baap\s*ka\s*naam\b|\bap\s*ka\s*naam\b|\bapka\s*naam\b",
+            re.IGNORECASE,
+        ),
+    ),
+    (
+        "business_name",
+        re.compile(
+            r"\bname of your (?:business|company|shop|store)\b"
+            r"|\bwhat(?:'s| is) your (?:business|company|shop|store)(?:'s)? (?:called|name)\b"
+            r"|\bbusiness\s*ka\s*naam\b|\bcompany\s*ka\s*naam\b|\bdukan\s*ka\s*naam\b"
+            r"|\bshop\s*ka\s*naam\b",
+            re.IGNORECASE,
+        ),
+    ),
+    (
+        "business_type",
+        re.compile(
+            r"\bwhat (?:does|do) your business do\b|\bwhat (?:kind|type) of business\b"
+            r"|\bwhat industry\b|\bkis\s*(?:tarah|type)\s*(?:ka|ki)\s*business\b"
+            r"|\bbusiness\s*kya\s*karte\b|\bkaam\s*kya\s*karte\s*(?:hain|ho)\b",
+            re.IGNORECASE,
+        ),
+    ),
+    (
+        "location",
+        re.compile(
+            r"\bwhere are you (?:based|located)\b|\bwhich city\b|\bwhat city\b"
+            r"|\bkis\s*shehar\b|\bkahan\s*se\s*(?:ho|hain)\b",
+            re.IGNORECASE,
+        ),
+    ),
+    (
+        "role",
+        re.compile(
+            r"\bwhat(?:'s| is) your (?:role|position|job title)\b"
+            r"|\bwhat do you do (?:there|at (?:the|your) (?:business|company|shop|store))\b"
+            r"|\baap\s*ka\s*(?:role|kirdar|kirdaar|position)\b",
+            re.IGNORECASE,
+        ),
+    ),
+    (
+        "team_size",
+        re.compile(
+            r"\bhow many (?:staff|employees|people|workers|branches|shops|outlets|team members)"
+            r"\b[^?]{0,20}\b(?:do you (?:have|employ)|work (?:for|with) you|are (?:there|you))\b"
+            r"|\bkitne\s*(?:staff|log|employees|branches|shops|workers)\s*(?:hain|hein|ho|hen)\b",
+            re.IGNORECASE,
+        ),
+    ),
+    (
+        "current_tools",
+        re.compile(
+            r"\bwhat (?:do|are) you (?:use|using)\b[^?]{0,30}\b(?:today|now|currently|at the moment)\b"
+            r"|\bwhich (?:software|system|tool|app)s? (?:do you|are you) (?:use|using)\b"
+            r"|\bkaunsa\s*(?:software|system|tool)\s*(?:use|istemal)\b",
+            re.IGNORECASE,
+        ),
+    ),
+)
+
+
+# Mirrors service_conversation.PLACEHOLDER_NAME; kept local to avoid a circular import.
+_PLACEHOLDER_PROFILE_VALUE = re.compile(
+    r"^(whatsapp|customer|unknown)\b|^\+?\d[\d ]+$", re.IGNORECASE
+)
+
+
+def _reasks_known_profile(reply: str, context: dict[str, Any], add: Any) -> None:
+    profile = context.get("customer_profile") or {}
+    if not isinstance(profile, dict):
+        return
+    # The durable memory block (memory_block.py) knows facts from earlier chats and the questions
+    # already asked and left unanswered in this one.
+    block = context.get("what_i_know") or {}
+    block = block if isinstance(block, dict) else {}
+    pending = [str(k) for k in block.get("already_asked") or []]
+    for sentence in _sentences(reply):
+        if not sentence.endswith(QUESTION_MARKS):
+            continue
+        for field, pattern in REASK_FIELDS:
+            known = str(profile.get(field) or block.get(field) or "").strip()
+            if not pattern.search(sentence):
+                continue
+            if known and not _PLACEHOLDER_PROFILE_VALUE.search(known):
+                add(
+                    Violation(
+                        "R-MEM-02",
+                        f'they already told you their {field.replace("_", " ")} ("{known}"): '
+                        "do not ask again, use what you already know",
+                    )
+                )
+                return
+            if field in pending:
+                add(
+                    Violation(
+                        "R-MEM-02",
+                        f"you already asked for their {field.replace('_', ' ')} in this chat "
+                        "and they did not answer: do not ask again, never press for it",
+                    )
+                )
+                return
+
+
+# A reply that was asked for may carry the ideas, the Workzap line and, for "how exactly?", the
+# solution document. It may not pitch a product, recommend, offer a quote itself (the application
+# adds the offer) or name an amount: those stay hard.
+GIVEN_PITCH = re.compile(
+    r"\bnori\b|\bour (?:product|products|service|services|software|platform|system|app)\b"
+    r"|\bI(?:'d| would) recommend\b",
+    re.IGNORECASE,
+)
+GIVEN_OFFER = re.compile(r"\bquotes?\b|\bquotation\b|\bproposals?\b", re.IGNORECASE)
+SOLUTION_DOCUMENT = re.compile(r"\bsolution documents?\b", re.IGNORECASE)
+AMOUNT_WORDS = re.compile(
+    r"\b\d[\d,.]*\s*(?:k|lakh|lac|crore|rupees?|dollars?|dirhams?|usd|pkr|aed)\b"
+    r"|\b(?:rupees|dollars|dirhams|lakhs?|crores?)\b",
+    re.IGNORECASE,
+)
+# RBUILD06: "would", never "will" (ho jayega): no promised results about what Workzap builds.
+WORKZAP_WILL = re.compile(
+    r"\bWorkzap will\b|\bho jaye ?ga\b|\bho jayegi\b|\bho jayenge\b"
+    r"|\b(?:it|this|that|everything) will (?:fix|stop|solve|save|sort|help|reduce|increase|improve|"
+    r"work|bring|make|grow|end|cut|take care|run|go away)\b"
+    r"|\byou(?:'ll| will) (?:see|get|notice|save|stop|never)\b|\bwill (?:fix|stop|save)\b",
+    re.IGNORECASE,
+)
+VALUE_LINE_RULES = (
+    ("more than two", "R-VAL-01"),
+    ("how-to", "R-VAL-04"),
+    ("tool words", "R-BUILD-01"),
+    ("automatically", "R-BUILD-04"),
+    ("personal data", "R-PRIV-07"),
+    ("named product", "R-VAL-05"),
+    ("claim", "R-PROM-01"),
+)
+# Where the value line is checked on every brain reply: the summary, the readiness question and
+# after a declined offer (a reply that carries ideas is checked wherever it is, before the build).
+VALUE_LINE_STATES = frozenset({flow.State.S4_SORTED_SUMMARY, flow.State.S5_READINESS})
+VALUE_LINE_STATES |= {flow.State.S5B_DECLINED}
+BEFORE_OFFER_STATES = frozenset(flow.LISTENING | {flow.State.S5_READINESS})
+LEADS_SOMEWHERE = re.compile(
+    r"\bworkzap\b|\bsolution (?:documents?|box)\b|\bquotes?\b|\bkya main\b|\bshall i\b|\bwant (?:me|a|the)\b",
+    re.IGNORECASE,
+)
+SOFT_VALUE_WHYS = ("tool words", '"automatically"')
+
+
+def _ideas_followed(reply: str, ideas: list[str]) -> bool:
+    """Whether a reply gives at least one of the handed ideas (most of its longer words are there)."""
+    said = set(re.findall(r"[a-z]{4,}", reply.lower()))
+    for idea in ideas:
+        words = set(re.findall(r"[a-z]{4,}", str(idea).lower()))
+        if words and len(words & said) / len(words) >= 0.4:
+            return True
+    return False
+
+
+def _value_line_every_reply(
+    reply: str, context: dict[str, Any], state: flow.State | None, given: bool, add: Any
+) -> None:
+    """Addendum 2, 1.3 and 1.8 on every brain reply that is not still plain listening, and on any
+    reply that carries ideas: count, how-to, tools, products, claims (hard); budget, idea length,
+    nothing to lead to and over-withholding (soft). Safety referrals are never held back (R-VAL-07)."""
+    from app.modules.pi import learning, solution_rules, solutions, value_line  # local: cycle
+
+    industry = context.get("industry_key") or context.get("industry")
+    never = context.get("solution_never_say")
+    if not isinstance(never, list) and isinstance(industry, str):
+        never = solutions.never_say([industry])
+    if isinstance(never, list) and never:
+        hit = solution_rules.never_say_hit(reply, [str(n) for n in never])
+        if hit:
+            add(Violation("R-NEVER-IND", f'never said in this industry ("{hit}"): drop it', True))
+    if context.get("solution_exploration"):
+        # A provisional workflow is not a pair of capped manual ideas. Honesty, privacy,
+        # regulated advice and industry exclusions still run.
+        return
+    handed = [str(i) for i in context.get("solution_ideas") or []]
+    brain = context.get("pi_mode") == "brain" or "flow" in context
+    carried = bool(handed) or "solution_followup" in context
+    listing = state in flow.LISTENING
+    # a sorted summary and a listening reply use dashes for problems, not ideas
+    count = solution_rules.count_ideas(reply, bullets=carried or not listing)
+    in_scope = state is None or listing or state in VALUE_LINE_STATES
+    if not (carried or (brain and (state in VALUE_LINE_STATES or (count and in_scope)))):
+        return
+    said = _customer_words(context)
+    referral = solution_rules.has_safety_referral(reply)
+    if handed and not count and not referral and "solution_howto" not in context:
+        add(
+            Violation(
+                "R-VAL-08",
+                "they asked for a fix and you were handed solution_ideas: say yes, then give them "
+                "as a short numbered list (at most two), instead of asking another question",
+            )
+        )
+    if "solution_howto" not in context:  # a "how exactly" reply is checked by _value_line
+        for why in solution_rules.check_sample_reply(reply, said, carried or not listing):
+            rule = next((r for key, r in VALUE_LINE_RULES if key in why), "R-VAL-04")
+            if "a claim" in why and not (
+                solution_rules.claim_hits(reply, said, figures_only=True)
+                or learning.PERSON_OR_COMPETITOR.search(reply)
+            ):
+                continue  # words like "guaranteed" are judged by R-PROM-01 with their usage in mind
+            soft = not carried and any(key in why for key in SOFT_VALUE_WHYS)
+            add(Violation(rule, f"free ideas: {why}", not soft))
+    if solution_rules.long_idea(reply, bool(count or carried)) and not referral:
+        add(Violation("R-VAL-03", "one line per idea, about 25 words: what and why, no sub-steps"))
+    if not given and WORKZAP_WILL.search(reply) and (count or carried):
+        add(Violation("R-BUILD-06", '"would" or "could", never "will": no promised results', True))
+    # the eight are per business: ideas given in the owner's other chats count (expert advisor on)
+    ideas_given = int(context.get("ideas_given") or 0) + int(context.get("ideas_elsewhere") or 0)
+    total = ideas_given + (0 if handed else count)
+    if (
+        total > value_line.IDEAS_BEFORE_OFFER
+        and state in BEFORE_OFFER_STATES
+        and not referral
+        and not context.get("offer_made")
+    ):
+        add(
+            Violation(
+                "R-VAL-02",
+                f"{ideas_given} ideas were already given: no more than "
+                f"{value_line.IDEAS_BEFORE_OFFER} before the offer, so lead to the solution document",
+            )
+        )
+    gave = bool(count) or (bool(handed) and _ideas_followed(reply, handed))
+    if (
+        gave
+        and not referral
+        and not LEADS_SOMEWHERE.search(reply)
+        and not any(mark in reply for mark in QUESTION_MARKS)
+    ):
+        add(
+            Violation(
+                "R-VAL-06",
+                "ideas with nothing to lead to: end with the Workzap line, the offer or one question",
+            )
+        )
+    if (
+        context.get("solution_asked")
+        and handed
+        and not gave
+        and LEADS_SOMEWHERE.search(reply)
+        and not referral
+    ):
+        add(
+            Violation(
+                "R-SOL-01",
+                "they asked for a solution: give the ideas first, never a pitch with no idea",
+            )
+        )
+
+
+TEAM_WILL_SEE = re.compile(
+    r"\bteam\s+(?:tak|ko)\s+(?:bhi\s+)?(?:poh?anch|pahunch|bhej)\w*"
+    r"|\b(?:the\s+)?(?:team|someone|a person|staff)\s+(?:will|can|may)\s+(?:also\s+)?(?:see|read|receive|get)\b"
+    r"|\b(?:reach|reaches|reached)\s+(?:the\s+)?(?:workzap\s+)?team\b",
+    re.IGNORECASE,
+)
+IDEA_LIST_LINE = re.compile(r"(?m)^\s*(?:•|-|\*|(?:first|second|pehle|doosra|dusra)\b[,:])\s*\S")
+
+
+def _ideas_nobody_asked_for(reply: str, context: dict[str, Any], add: Any) -> None:
+    """R-VAL-07: ideas were already given and this message is not a request for more (it asks about
+    one of them, "where do I make the page?"): answer that question, do not list new ideas
+    (seen live, 2026-10-27: a question about an idea got two more ideas instead of an answer)."""
+    if (
+        int(context.get("ideas_given") or 0) > 0
+        and not context.get("solution_asked")
+        and not context.get("solution_ideas")
+        and not context.get("solution_asked_no_ideas")
+        and not context.get("open_ask")
+        and len(IDEA_LIST_LINE.findall(reply)) >= 2
+    ):
+        add(
+            Violation(
+                "R-VAL-07",
+                "they asked about an earlier idea, not for new ones: answer their question in one "
+                "or two plain sentences, and if the idea assumed something they never said they "
+                "have, say so and ask about it",
+            )
+        )
+
+
+def _given_turn_limits(reply: str, context: dict[str, Any], add: Any) -> None:
+    """What a reply to a request for a fix or for the detail still may not say."""
+    if GIVEN_PITCH.search(reply):
+        add(
+            Violation(
+                "R-SELL-01",
+                "no product, no nori, no recommendation: only the ideas "
+                "and what Workzap would do for them",
+                True,
+            )
+        )
+    if GIVEN_OFFER.search(reply) or (
+        context.get("solution_asked") and SOLUTION_DOCUMENT.search(reply)
+    ):
+        add(
+            Violation(
+                "R-OFFER-03",
+                "do not make the offer or mention a quote yourself: the "
+                "application adds the offer after your reply",
+                True,
+            )
+        )
+    if AMOUNT_WORDS.search(reply):
+        add(Violation("R-OFFER-05", "never an amount, a range or a price before the quote", True))
+    if WORKZAP_WILL.search(reply):
+        add(Violation("R-BUILD-06", '"would" or "could", never "will": no promised results', True))
+
+
+def _value_line(reply: str, context: dict[str, Any], add: Any) -> None:
+    """Addendum 2, 1.4 and 1.9: a "how exactly?" answer names what the document covers and gives no
+    steps or app; a Workzap line never repeats its opener or "automatically" within a chat."""
+    from app.modules.pi import solution_rules, solutions  # local: they import this module's users
+
+    said = _customer_words(context)
+    howto = context.get("solution_howto")
+    if howto:
+        for why in solution_rules.check_sample_reply(reply, said):
+            rule = next((r for key, r in VALUE_LINE_RULES if key in why), "R-VAL-04")
+            add(Violation(rule, f"how exactly: {why}", True))
+        if howto.get("which_app") and solution_rules.VENDOR.search(reply):
+            add(
+                Violation(
+                    "R-VAL-05", "do not recommend an app: the whole set-up is the build", True
+                )
+            )
+    earlier = " ".join(_pi_replies(context)).lower()
+    if solutions.AUTOMATIC.search(reply) and solutions.AUTOMATIC.search(earlier):
+        add(Violation("R-BUILD-04", 'say "automatically" at most once in a conversation'))
+    lowered = reply.lower()
+    for opener in solutions.BRIDGE_OPENERS:
+        for line in (opener["en"], opener["roman_ur"]):
+            if line and line.lower() in lowered and line.lower() in earlier:
+                add(Violation("R-BUILD-04", "that bridge opener was already used in this chat"))
+    tools = solutions.banned_tool_words(reply, said)
+    if tools:
+        add(
+            Violation(
+                "R-BUILD-01", f"say what they would notice, not the tool ({', '.join(tools)})"
+            )
+        )
+    phrases = {
+        line.lower()
+        for entry in solutions.CATALOGUE.values()
+        for line in (entry["en"], entry["roman_ur"])
+    }
+    if sum(1 for phrase in phrases if phrase in lowered) > 2:
+        add(
+            Violation("R-BUILD-05", "one build in a message, two at most, never a list of features")
+        )
+    build = context.get("solution_build")
+    if (
+        isinstance(build, dict)
+        and build.get("says")
+        and not build.get("refer_back")
+        and "workzap" not in lowered
+    ):
+        # Part 1.9: the point of the line is to tell them this is Workzap's build, not free
+        # advice indistinguishable from the ideas above it. Dropping the name defeats that.
+        add(
+            Violation(
+                "R-BUILD-03",
+                'say it is Workzap who would do this ("Workzap would...", "Workzap could..."), '
+                "not an unattributed third idea",
+            )
+        )
+
+
+# --- R-HONEST-01: no invented timelines, clients, case studies, statistics or team members ---------
+_NUM = (
+    r"(?:a|an|one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|fifteen|twenty|thirty|"
+    r"few|couple of|several|\d+)"
+)
+_UNIT = r"(?:minutes?|hours?|days?|weeks?|months?|years?|fortnights?)"
+_WEEKDAY = r"(?:monday|tuesday|wednesday|thursday|friday|saturday|sunday)"
+TIMELINE_STRONG = re.compile(
+    rf"\b(?:in|within|inside|after|in the next|over the next)\s+(?:about |around |roughly |just |only |another )?"
+    rf"{_NUM}\s+(?:more |business |working )?{_UNIT}\b"
+    rf"|\bby (?:next )?{_WEEKDAY}\b|\bby (?:the )?end of (?:the |this |next )?(?:day|week|month|year)\b"
+    r"|\bby (?:tomorrow|tonight)\b|\bwithin (?:the )?(?:day|week|month)\b"
+    # Roman Urdu
+    r"|\bkal tak\b|\bparson tak\b|\baaj tak\b|\bagle (?:hafte|mahine)\b|\bis hafte (?:tak|mein)\b"
+    r"|\b(?:ek|do|teen|char|chaar|paanch|panch|chhe|saat|aath|nau|das|kuch|chand|\d+) "
+    r"(?:din|dino|hafte|haftay|hafta|mahine|mahina|mahinay|ghante|ghanta|saal)(?: mein| me| main| tak| ke andar)\b"
+    # Arabic and Urdu script
+    r"|خلال (?:يوم|يومين|أسبوع|اسبوع|أسبوعين|اسبوعين|شهر|شهرين|ساعة|ساعتين|\S+ (?:أيام|ايام|أسابيع|اسابيع|أشهر|اشهر|ساعات))"
+    r"|بحلول (?:الغد|غدا|غداً|نهاية)|(?:دو|ایک|تین|چار|پانچ) (?:ہفتے|دن|مہینے|گھنٹے) (?:میں|تک)|کل تک"
+    + langs.TIMELINE_STRONG,
+    re.IGNORECASE,
+)
+TIMELINE_WEAK = re.compile(
+    rf"\b(?:tomorrow|tonight|next (?:week|month|{_WEEKDAY})|this (?:week|weekend)|same day|"
+    rf"(?:a|one|two|three|a few|a couple of) (?:day|week|month|fortnight)s?)\b"
+    + langs.TIMELINE_WEAK,
+    re.IGNORECASE,
+)
+PROMISE_CUE = re.compile(
+    r"\b(?:will|'ll|would|should|can|could|shall|going to|usually|typically|normally|takes?|take|ready|"
+    r"done|delivered?|deliver|finish(?:ed)?|complete[sd]?|launch|live|build|get it|get you|send|have it)\b"
+    + langs.PROMISE_CUE,
+    re.IGNORECASE,
+)
+INVENTED_PROOF = re.compile(
+    r"\bcase stud(?:y|ies)\b|\bone of our (?:clients?|customers?)\b"
+    r"|\b(?:our|other|previous|past) (?:clients?|customers?) (?:have|has|saw|got|reduced|increased|cut|saved|"
+    r"like|such as|including)\b"
+    r"|\bwe(?:(?:'ve| have) (?:helped|worked with|built|delivered|served|done)|"
+    r" (?:helped|worked with|built|delivered|served))\b[^.?!\n]{0,40}\b"
+    r"(?:businesses|clients|customers|shops|companies|clinics|restaurants|others|similar)\b"
+    r"|\bsimilar (?:businesses|shops|clinics|companies|clients|restaurants) (?:to yours )?(?:we|that we|have|saw|"
+    r"reduced|cut|increased|got)\b"
+    r"|\b(?:studies|research|surveys?|statistics) (?:show|shows|suggest|suggests|indicate|say|says|found)\b"
+    r"|\bon average\b|\bindustry (?:average|standard|benchmark)s?\b"
+    r"|\b(?:typically|usually|normally) (?:save|saves|cut|cuts|reduce|reduces|increase|increases|boost|improve)\b"
+    r"|\b(?:out of|in) (?:every )?(?:ten|\d+) (?:businesses|shops|owners|clients|customers|companies)\b"
+    r"|\b\d+(?:\.\d+)?\s?(?:%|percent|per cent)"
+    r"|\b(?i:my|our) (?i:colleague|teammate|manager|developer|engineer|designer|consultant|founder|ceo|cto|"
+    r"account manager|specialist|expert) (?-i:(?!Workzap\b)[A-Z][a-z]{2,})\b"
+    r"|\b(?:ask for|speak (?:to|with)|talk (?:to|with)|contact|meet) (?:Mr|Ms|Mrs|Dr)\.? ?[A-Z][a-z]+",
+    re.IGNORECASE,
+)
+CURRENCY_AMOUNT = re.compile(
+    r"(?:\bRs\.?|\bPKR|\bAED|\bUSD|\bCAD|[$₹€£])\s?\d[\d,.]*"
+    r"|\b\d[\d,.]*\s?(?:rupees?|rupay|rupaye|rupaiye|rupya|rupiya|dollars?|dirhams?|k|lakhs?|"
+    r"lacs?|crores?|hazaar|hazar|PKR|AED|USD)\b"
+    # RT46: an amount in Roman Urdu words, 'pachaas hazaar', 'do lakh'
+    r"|\b(?:ek|aik|do|teen|chaar|panch|paanch|chhe|saat|aath|nau|das|bees|pachees|tees|chalees|"
+    r"pachaas|pachas|sau)\s+(?:hazaar|hazar|lakh|lac|crore)\b",
+    re.IGNORECASE,
+)
+
+
+def _numbers(text: str) -> set[str]:
+    return set(re.findall(r"\d[\d,]*", text.replace(",", "")))
+
+
+def _time_pairs(text: str) -> set[tuple[str, str]]:
+    words = {
+        "1": "one",
+        "2": "two",
+        "3": "three",
+        "4": "four",
+        "5": "five",
+        "6": "six",
+        "7": "seven",
+    }
+    pairs = set()
+    for m in re.finditer(rf"\b({_NUM})\s+(?:more |business |working )?({_UNIT})\b", text.lower()):
+        number = words.get(m.group(1), "one" if m.group(1) in ("a", "an") else m.group(1))
+        pairs.add((number, m.group(2).rstrip("s")))
+    roman_numbers = {"ek": "one", "do": "two", "teen": "three", "char": "four", "chaar": "four",
+                     "paanch": "five", "panch": "five", "das": "ten"}  # fmt: skip
+    roman_units = {"din": "day", "dino": "day", "hafta": "week", "hafte": "week", "haftay": "week",
+                   "mahina": "month", "mahine": "month", "mahinay": "month", "ghanta": "hour",
+                   "ghante": "hour", "saal": "year"}  # fmt: skip
+    for m in re.finditer(r"\b(ek|do|teen|char|chaar|paanch|panch|das)\s+(din|dino|hafta|hafte|haftay|"
+                         r"mahina|mahine|mahinay|ghanta|ghante|saal)\b", text.lower()):  # fmt: skip
+        pairs.add((roman_numbers[m.group(1)], roman_units[m.group(2)]))
+    return pairs
+
+
+def _approved_text(context: dict[str, Any]) -> str:
+    raw = context.get("approved_claims") or context.get("approved_context") or ""
+    if isinstance(raw, (list, tuple)):
+        raw = " ".join(str(x) for x in raw)
+    return str(raw).lower()
+
+
+IDEA_OPENER = re.compile(r"^\W*(?:first|second|pehle|doosra|dusra)\s*,", re.IGNORECASE)
+WORKZAP_CLAIM = re.compile(
+    r"\b(?:workzap|document|quote|price|cost|we|our|hum|hamari|hamara|team|prepared?|deliver\w*)\b",
+    re.IGNORECASE,
+)
+
+
+STRICT_CLAIM = re.compile(
+    r"\b(?:workzap|hum|hamari|hamara|solution document|your quote|our quote|this quote|the document)\b",
+    re.IGNORECASE,
+)
+
+
+def _ideas_given(context: dict[str, Any]) -> bool:
+    return (
+        bool(context.get("solution_asked"))
+        or "solution_howto" in context
+        or bool(context.get("solution_ideas"))
+    )
+
+
+def _advice_free(reply: str, context: dict[str, Any]) -> str:
+    """The reply without its idea bullets when it gives ideas. A bullet tells the owner what to do
+    about their own business (their discounts, their offers, their tools, a deadline to move on),
+    which is not pi pressing someone, offering a discount or naming its own insides."""
+    if not _ideas_given(context):
+        return reply
+    return "\n".join(x for x in reply.splitlines() if not x.lstrip().startswith(BULLET))
+
+
+def _owner_advice(low: str, context: dict[str, Any]) -> bool:
+    """An idea sentence that tells the owner what to do ("count the slips this week", "ek hafte
+    tak likhein") names a time for the owner's own action, not a date or duration Workzap or pi
+    promises. A sentence about Workzap, the document, the quote or a price is never advice."""
+    if low.lstrip().startswith(BULLET) and _ideas_given(context):
+        return not STRICT_CLAIM.search(low)  # a bullet is about the owner unless it names Workzap
+    if WORKZAP_CLAIM.search(low):
+        return False
+    if IDEA_OPENER.match(low):
+        return True
+    ideas = [str(i).lower() for i in context.get("solution_ideas") or []]
+    words = set(re.findall(r"\w{3,}", low))
+    return any(
+        words and len(words & set(re.findall(r"\w{3,}", idea))) / len(words) >= 0.75
+        for idea in ideas
+    )
+
+
+def _honesty(reply: str, context: dict[str, Any], heard: str, add: Any) -> None:
+    approved = _approved_text(context)
+    said_pairs = _time_pairs(heard)
+    for sentence in _statements(reply):
+        low = sentence.lower()
+        if _owner_advice(low, context):
+            continue
+        hit = None
+        for m in TIMELINE_STRONG.finditer(low):
+            text = m.group(0)
+            if text in heard or text in approved:
+                continue
+            pairs = _time_pairs(text)
+            if pairs and pairs <= said_pairs:
+                continue
+            # "Noted, ek hafte tak ki der": recording the delay they described is not a promise
+            if NOTING.search(low) and re.search(
+                r"hafte|hafta|din|mahin|ghant|week|day|month" + langs.HEARD_TIME, heard
+            ):
+                continue
+            hit = text
+            break
+        if not hit and PROMISE_CUE.search(low):
+            for m in TIMELINE_WEAK.finditer(low):
+                text = m.group(0)
+                pairs = _time_pairs(text)
+                if text in heard or text in approved or (pairs and pairs <= said_pairs):
+                    continue
+                hit = text
+                break
+        if hit:
+            add(
+                Violation(
+                    "R-HONEST-01",
+                    f'no timeline pi was not given ("{hit}"): never invent a date or duration',
+                    True,
+                )
+            )
+            break
+    for m in INVENTED_PROOF.finditer(reply):
+        text = m.group(0).lower()
+        if text in heard or text in approved:
+            continue
+        if re.search(r"\d", text) and _numbers(text) <= _numbers(heard):
+            continue
+        add(
+            Violation(
+                "R-HONEST-01",
+                f'no invented clients, case studies, statistics or team members ("{m.group(0)}")',
+                True,
+            )
+        )
+        break
+    if not context.get("approved_quote"):
+        for m in CURRENCY_AMOUNT.finditer(reply):
+            if _numbers(m.group(0)) and _numbers(m.group(0)) <= _numbers(heard):
+                continue
+            add(Violation("R-HONEST-01", "no amount or price before an approved quote", True))
+            break
+
+
+# --- R-PRIV-03/04, R-ASK-06: things pi never asks for ----------------------------------------------
+ASK_PEOPLE = re.compile(
+    r"\b(?:your|the|his|her|their) (?:staff|employee|employees|cashier|manager|driver|customer|client|"
+    r"supplier|worker|partner|accountant|patient|waiter|salesman|technician)(?:'s|s'| member's)? "
+    r"(?:full )?(?:names?|phones?|phone numbers?|numbers?|addresses|address|mobile|whatsapp|cell|contacts?)\b"
+    r"|\bnames? of (?:your |the )?(?:staff|employees?|customers?|clients?|suppliers?|workers?|cashiers?|"
+    r"drivers?|patients?|managers?)\b"
+    r"|\b(?:his|her|their|the customer's|the client's) (?:name|number|phone)\b" + langs.ASK_PEOPLE,
+    re.IGNORECASE,
+)
+ASK_MONEY = re.compile(
+    r"\b(?:exact|precise|actual|accurate) (?:figure|number|amount)?\s*(?:of )?(?:your |the )?(?:monthly |annual |"
+    r"yearly |daily |weekly )?(?:revenue|turnover|sales|profit|income|earnings|salary|salaries)\b"
+    r"|\b(?:revenue|turnover|profit|income|earnings) (?:figures?|numbers?) (?:to the|exactly)\b"
+    r"|\bhow much (?:exactly|precisely) (?:do you|did you|are you) (?:earn|make|sell|pay)\b"
+    r"|\bbank (?:balance|statement)s?\b|\baccount balance\b|\bbalance in (?:your )?(?:bank|account)\b"
+    r"|\b(?:what(?:'s| is)|how much (?:is|does)) (?:[A-Z][a-z]+'s|his|her|\w+'s) (?:salary|pay|wage)\b"
+    + langs.ASK_MONEY,
+    re.IGNORECASE,
+)
+ASK_VERB = re.compile(
+    r"\b(?:send|share|give|provide|tell me|what(?:'s| is)|what are|may i have|can i (?:have|get)|could you "
+    r"(?:send|share|give|tell)|can you (?:send|share|give|tell)|i need|i'll need|please (?:send|share|give))\b"
+    + langs.ASK_VERB,
+    re.IGNORECASE,
+)
+
+# --- R-ADV: advice pi never gives (in its own reply) -----------------------------------------------
+ADVICE = re.compile(
+    # tax and legal
+    r"\b(?:charge|add|apply|set|use|put)\b[^.?!\n]{0,40}\b\d+\s?%[^.?!\n]{0,20}\b(?:tax|vat|gst)\b"
+    r"|\b(?:vat|gst|sales tax|tax) (?:rate )?(?:is|should be|of|at) (?:\d+|five|seven|eight|ten|fifteen|"
+    r"seventeen|eighteen|twenty)\b"
+    r"|\byou (?:can|may|could|are allowed to|have the right to|are legally allowed to) (?:legally )?"
+    r"(?:fire|sack|terminate|dismiss|sue|withhold|evict|deduct|claim|write off)\b"
+    r"|\byou (?:don't|do not) (?:need|have) to (?:pay|charge|file|register|declare) (?:any )?(?:tax|vat|gst)\b"
+    r"|\bit(?:'s| is) (?:perfectly |completely |totally )?(?:legal|illegal|unlawful|lawful)\b"
+    r"|\blegally (?:allowed|entitled|required|binding|obliged|fire|sack)\b"
+    r"|\byou have a (?:strong |good |solid )?(?:legal )?(?:case|claim)\b|\bbreach of contract\b"
+    r"|\byour contract (?:says|means|allows|lets)\b"
+    # money
+    r"|\b(?:take|get|apply for|go for|opt for|consider|try) (?:a |an )?(?:bank |business |personal )?loan\b"
+    r"|\b(?:from|with|at|try|use|choose|go to|open an account (?:with|at)) (?:HBL|UBL|MCB|Meezan|Allied|"
+    r"Bank Alfalah|Alfalah|Faysal|Standard Chartered|Emirates NBD|ADCB|Mashreq|RBC|Scotiabank|BMO|CIBC)\b"
+    r"|\byou (?:should|could|can|ought to) (?:invest|borrow|take out)\b|\binvest in\b"
+    r"|\b(?:buy|sell) (?:shares|stocks|gold|crypto|bitcoin|property)\b"
+    # medical
+    r"|\b\d+\s?(?:mg|mcg|ml)\b|\btake (?:\w+ ){0,2}(?:tablets?|pills?|capsules?|mg|ml)\b"
+    r"|\b(?:dose|dosage)\b[^.?!\n]{0,20}\b(?:should be|of \w+ is)\b"
+    r"|\byou (?:have|might have|probably have|may have|likely have)\b[^.?!\n]{0,20}\b(?:diabetes|infection|"
+    r"cancer|flu|virus|allergy|depression|anxiety|covid|hepatitis|asthma)\b"
+    # accusing someone
+    r"|\b(?:your|the) (?:[a-z]+ ){0,2}(?:is|are|must be|has been|probably is|are probably) "
+    r"(?:stealing|lying|cheating|embezzling|skimming|a thief|thieves)\b"
+    r"|\b(?-i:[A-Z][a-z]{2,}) (?:is|was|has been|must be|may be|might be|is probably|is likely) "
+    r"(?:stealing|a thief|lying|cheating|embezzling|skimming|a fraud|corrupt)\b"
+    # legal assurance in Roman Urdu, Urdu and Arabic: "ye bilkul jaiz hai", "qanooni taur par theek"
+    r"|\b(?:ye|yeh)\s+(?:bilkul\s+)?(?:jaiz|qanooni|gair\s+qanooni|na\s*jaiz)\s+hai\b"
+    r"|\bqanooni\s+taur\s+par\s+(?:theek|sahi|jaiz|allowed)\b"
+    r"|قانونی\s+طور\s+پر\s+(?:ٹھیک|درست|جائز)|یہ\s+(?:بالکل\s+)?(?:جائز|ناجائز|غیر\s*قانونی)\s+ہے"
+    r"|(?:هذا|ذلك)\s+(?:قانوني|غير\s+قانوني)|يحق\s+لك\s+قانونيًّا?" + langs.ADVICE,
+    re.IGNORECASE,
+)
+OPINION = re.compile(
+    r"\bvot(?:e|ing) for\b"
+    r"|\b(?:the government|PTI|PML-N|PPP|BJP|Congress|Trump|Biden|Modi|Imran Khan|Nawaz Sharif|Zardari)\b"
+    r"[^.?!\n]{0,40}\b(?:is|are|was|were) (?:corrupt|wrong|right|terrible|great|useless|to blame|the best|"
+    r"the worst|failing|a (?:failure|disaster))\b"
+    r"|\b(?:islam|muslims?|christianity|christians?|hindus?|hinduism|jews?|religion)\b[^.?!\n]{0,40}"
+    r"\b(?:is|are) (?:better|worse|wrong|right|false|true|the best)\b"
+    r"|\b(?:better|worse|cheaper|more reliable) than (?:Zoho|QuickBooks|Odoo|Shopify|Foodics|Square|Toast|SAP|"
+    r"Tally|Xero|Salesforce|HubSpot|Wave|Marg)\b" + langs.OPINION,
+    re.IGNORECASE,
+)
+OFF_TOPIC = re.compile(
+    r"```|\bdef \w+\(|\bonce upon a time\b|\bhere(?:'s| is) a (?:joke|poem|story|essay)\b",
+    re.IGNORECASE,
+)
+
+# --- R-META-01, 2.4, R-ILLU-01, R-VOICE-14 ---------------------------------------------------------
+META_POLICY = re.compile(
+    r"\b(?:whatsapp|meta|facebook)\b[^.?!\n]{0,60}\b(?:policy|policies|terms|rules|guidelines|ban(?:s|ned)?|"
+    r"block(?:s|ed)?|restrict(?:s|ed|ions?)?|suspend(?:s|ed)?|24[- ]hour|templates?|opt[- ]?in|compliance|"
+    r"spam|fees?|pricing)\b"
+    r"|\b(?:policy|policies|terms|rules|guidelines|ban(?:s|ned)?|blocked?|restrict\w*|suspend\w*)\b"
+    r"[^.?!\n]{0,60}\b(?:whatsapp|meta|facebook)\b",
+    re.IGNORECASE,
+)
+META_OK = re.compile(
+    r"\b(?:not|isn't|aren't)\b[^.?!\n]{0,30}\b(?:made|run|endorsed|owned|affiliated|approved)\b"
+    r"|\bmade by workzap\b|\bbusiness platform\b|\bthrough whatsapp\b|\bchat(?:s|ting)? (?:through|on|via)\b"
+    r"|\b(?:your|their)\s+(?:app|platform|marketplace|aggregator|delivery)\s+(?:terms|rules|polic(?:y|ies))\b",
+    re.IGNORECASE,
+)
+ILLUSTRATION = re.compile(
+    r"\b(?:for example|for instance|e\.g\.|let's say|lets say|say you|(?<!can )(?<!can't )imagine|suppose|picture this|"
+    r"misaal|maslan|farz karein)\b|\ba typical (?:case|day|client|customer)\b",
+    re.IGNORECASE,
+)
+AMERICAN = re.compile(
+    r"\b(?:colors?|colored|favorites?|behaviors?|neighbors?|honors?|labor|organi[z](?:e|es|ed|ing|ation|ations)|"
+    r"centers?|analy[z](?:e|es|ed|ing)|catalogs?|grays?|jewelry|aluminum|defense|offense|fulfill|enrollment|"
+    r"traveling|canceled|modeling|labeled|"
+    r"(?:a|the|your|our|driving|software|trade|business) licenses?|"
+    r"(?:training|loyalty|rewards|referral|membership|education|wellness) programs?|prioriti[z](?:e|es|ed|ing)|"
+    r"customi[z](?:e|es|ed|ing)|recogni[z](?:e|es|ed|ing)|apologi[z](?:e|es|ed|ing)|summari[z](?:e|es|ed|ing)|"
+    r"realiz(?:e|es|ed|ing)|minimiz(?:e|es|ed|ing)|optimiz(?:e|es|ed|ing)|standardiz(?:e|es|ed|ing))\b",
+    re.IGNORECASE,
+)
+BOLD_SINGLE = re.compile(r"(?<![\w*])\*[^*\s][^*\n]*\*(?![\w*])")
+NEUTRAL_EMOJI = "🙂😊👍🙏👌✅"
+NEVER_EMOJI = "😂🤣😭😅😢😡🤬💀😩😞😔"
+SKIN_TONES = re.compile("[\U0001f3fb-\U0001f3ff️]")
+BULLET_STATES = frozenset(
+    {
+        flow.State.S1_LISTENING,
+        flow.State.S3_NOTED,
+        flow.State.S4_SORTED_SUMMARY,
+        flow.State.S5_READINESS,
+        flow.State.S7_DELIVERED,
+    }
+)
+
+
+def allowed_emoji(context: dict[str, Any]) -> set[str]:
+    """R-VOICE-08: a tick; and once the person uses emoji, one simple neutral one, or their own
+    emoji when it is neutral. Never a laughing, crying or angry one on a business problem."""
+    theirs = {m for m in EMOJI.findall(_customer_words(context)) if m not in NEVER_EMOJI}
+    if not EMOJI.search(_customer_words(context)):
+        return {ALLOWED_EMOJI}
+    return ({ALLOWED_EMOJI} | theirs | set(NEUTRAL_EMOJI)) - set(NEVER_EMOJI)
+
+
+def _discloses(reply: str) -> bool:
+    """R-DISC-01: some sentence says, about pi itself, that it is an AI."""
+    return any(AI_WORDS.search(s) and SELF_WORDS.search(s) for s in _sentences(reply))
+
+
+def _claims_payment(reply: str) -> bool:
+    return any(PAYMENT_RECEIVED.search(s) for s in _statements(reply))
+
+
+def _asks_for_what_it_never_asks(reply: str, heard: str, add: Any) -> None:
+    for sentence in _sentences(reply):
+        refusing = bool(REFUSING.search(sentence))
+        if NATIONAL_ID.search(sentence) and ASKING.search(sentence) and not refusing:
+            add(
+                Violation(
+                    "R-PRIV-03", "never ask for national ID, passport or account numbers", True
+                )
+            )
+            return
+        if ASK_VERB.search(sentence) and not refusing:
+            if ASK_PEOPLE.search(sentence):
+                add(
+                    Violation(
+                        "R-PRIV-04",
+                        "never ask for a staff member's or customer's name, phone or address: say the role",
+                        True,
+                    )
+                )
+                return
+            if ASK_MONEY.search(sentence) and not re.search(
+                r"\b(?:roughly|approximately|about|rough|ballpark)\b" + langs.ROUGH,
+                sentence,
+                re.IGNORECASE,
+            ):
+                add(
+                    Violation(
+                        "R-ASK-06",
+                        "never ask for exact revenue, salaries or bank balances: ask for rough scale",
+                        True,
+                    )
+                )
+                return
+
+
+def _advice_and_policy(reply: str, heard: str, add: Any) -> None:
+    for pattern, rule, message in (
+        (ADVICE, "R-ADV-01", "no legal, medical, tax or financial advice and no accusing anyone"),
+        (OPINION, "R-ADV-04", "no opinions on politics, religion or competitors"),
+    ):
+        for m in pattern.finditer(reply):
+            if m.group(0).lower() in heard:
+                continue
+            add(Violation(rule, f'{message} ("{m.group(0)}")', True))
+            break
+    if OFF_TOPIC.search(reply):
+        add(
+            Violation("R-ADV-05", "pi is for the business problem: no code, jokes or stories", True)
+        )
+    for sentence in _sentences(reply):
+        policy = META_POLICY.search(sentence)
+        if not policy or META_OK.search(sentence):
+            continue
+        low = sentence.lower()
+        key = policy.group(0).split()[-1].lower()[:4]
+        if key in heard and (sentence.rstrip().endswith(QUESTION_MARKS) or "noted" in low):
+            continue
+        add(
+            Violation(
+                "R-META-01", "say nothing about Meta or WhatsApp policy beyond who made pi", True
+            )
+        )
+        break
+
+
+def _style_soft(reply: str, context: dict[str, Any], heard: str, state: Any, add: Any) -> None:
+    own = _advice_free(reply, context)
+    if INTERNAL_PLAIN.search(own):
+        word = INTERNAL_PLAIN.search(own)
+        if (
+            word
+            and word.group(0).lower().rstrip("s") not in heard
+            and word.group(0).lower() not in heard
+        ):
+            add(
+                Violation(
+                    "R-VOICE-06", f'internal term ("{word.group(0)}"): say what it does', True
+                )
+            )
+    if FLATTERY.search(reply):
+        add(Violation("R-SELL-03", "no flattery: react to the problem, not to the person"))
+    if (
+        ILLUSTRATION.search(" ".join(_statements(reply)))
+        and "illustrative" not in reply.lower()
+        and not ILLUSTRATION.search(heard)
+    ):
+        add(Violation("R-ILLU-01", 'label any made-up example "Illustrative"'))
+    american = [m.group(0) for m in AMERICAN.finditer(reply) if m.group(0).lower() not in heard]
+    if american:
+        add(Violation("R-VOICE-14", f'British spelling, not "{american[0]}"'))
+    if BOLD_SINGLE.search(reply) and state in (
+        flow.State.S0_NEW,
+        flow.State.S1_LISTENING,
+        flow.State.S2_CLARIFYING,
+    ):
+        add(Violation("R-VOICE-09", "bold only for the noted problem title and document names"))
+    lines = [x for x in reply.splitlines() if x.lstrip().startswith(("•", "- "))]
+    if lines and (len(lines) == 1 or (state is not None and state not in BULLET_STATES)):
+        add(Violation("R-VOICE-09", "bullets only in summaries"))
+
+
+def _stems(text: str) -> set[str]:
+    return {w[:5] for w in re.findall(r"[^\W\d_]{4,}", (text or "").lower())}
+
+
+MAIN_PROBLEM_MIN_WORDS = 3  # a question shorter than this has too few content words to judge
+
+
+def _off_the_main_problem(question: str, context: dict[str, Any]) -> bool:
+    """True when the question's content words overlap neither the main problem (title and the
+    owner's words) nor any listed cause. Generic closers are R-ASK-05's business."""
+    if GENERIC_CLOSER.search(question) or CAUSE_FINDING.search(question):
+        return False  # a question that looks for the reason ("wo kya wajah batate hain?") is on it
+    if str(context.get("reply_language") or "en") not in ("en", "roman_ur"):
+        return False  # words in another script cannot be compared with the English title
+    asked = _stems(question)
+    if len(asked) < MAIN_PROBLEM_MIN_WORDS:
+        return False
+    about = _stems(
+        " ".join(
+            [
+                str(context.get("main_problem") or ""),
+                str(context.get("main_problem_words") or ""),
+                *[str(c) for c in context.get("main_problem_causes") or []],
+            ]
+        )
+    )
+    return not (asked & about)
+
+
+# A question about how the business works in general (how customers pay, which system or record is
+# used, who does which job) is an adjacent process, not the reason the owner's problem happens.
+ADJACENT_PROCESS = re.compile(
+    r"\b(?:kaise|kese|kaisay|how)\b[^?؟]{0,40}?\b(?:jama|pay|payment|collect|bharte|bharwate|dete|submit|manage|handle|track|record|maintain)\w*"
+    r"|\b(?:cash|challan|online|bank|cheque|easypaisa|jazzcash|card)\b[\s,]{1,3}(?:(?:cash|challan|online|bank|cheque|easypaisa|jazzcash|card)[\s,]{1,3})*(?:ya|or|aur)\s+(?:cash|challan|online|bank|cheque|easypaisa|jazzcash|card)\b"
+    r"|\b(?:which|konsa|kaunsa|kaun sa|kya)\s+(?:system|software|app|register|tool|crm|sheet|channel|platform)\b"
+    r"|\bkya use karte\b|\bwhat do you use\b|\bwho (?:follows|handles|manages|looks after|takes care)\b|\bkaun (?:follow|dekh|handle|sambhal)\w*"
+    r"|\bkitne (?:staff|log|banday|employees)\b|\bhow many (?:staff|people|employees)\b",
+    re.IGNORECASE,
+)
+# What a question that looks for the reason itself contains: it is never an adjacent process.
+CAUSE_FINDING = re.compile(
+    r"\b(?:why|reason|reasons|cause|wajah|waja|wajoohat|kyun|kyon|kiyun|sabab|bahana|bahane|excuse|late|delay|deri|der se|bhool|bhul|forget|forgets|"
+    r"jab|when|aksar|often|kitni baar|kab|kis liye|kis wajah)\b",
+    re.IGNORECASE,
+)
+ADJACENT_IGNORED = {"kaise", "kese", "kaisay"}
+
+
+def _adjacent_when_diagnosed(question: str, context: dict[str, Any]) -> bool:
+    """R-ASK-08 with a cached diagnosis (expert advisor on): the question asks how the business
+    works in general instead of why the problem happens. A question that looks for the reason
+    ("wo kya wajah batate hain?") or touches a listed cause never counts."""
+    if not context.get("expert_on") or context.get("solution_exploration"):
+        return False
+    causes = [str(c) for c in context.get("main_problem_causes") or []]
+    suggested = str(context.get("suggested_next_question") or "")
+    if not (causes or suggested):
+        return False
+    if CAUSE_FINDING.search(question):
+        return False
+    found = [m.group(0) for m in ADJACENT_PROCESS.finditer(question)]
+    if not found:
+        return False
+    process = _stems(" ".join(found)) - ADJACENT_IGNORED
+    return not (process & _stems(" ".join([*causes, suggested])))
+
+
+def lint(reply: str, context: dict[str, Any]) -> list[Violation]:
+    """Every constitution or voice rule the draft breaks (empty when it is fine to send)."""
+    found: list[Violation] = []
+    add = found.append
+    # One form for combined letters (Hindi "ढ़" can be one character or two), so the phrase sets match.
+    reply = unicodedata.normalize("NFC", reply)
+    if "latest_customer_message" in context:
+        context = {
+            **context,
+            "latest_customer_message": unicodedata.normalize(
+                "NFC", str(context["latest_customer_message"])
+            ),
+        }
+    first_sentence = (_sentences(reply) or [""])[0]
+    history = context.get("history") or []
+
+    # Identity and disclosure (R-DISC)
+    heard = _heard(context)
+    if not any(h.get("role") == "ai" for h in history) and not _discloses(reply):
+        add(Violation("R-DISC-01", "the first message must say plainly that pi is an AI", True))
+    if ASKS_IF_AI.search(str(context.get("latest_customer_message", ""))) and not AI_WORDS.search(
+        first_sentence
+    ):
+        add(
+            Violation(
+                "R-DISC-02", "they asked if pi is a person: say it is an AI in sentence one", True
+            )
+        )
+    reply = reply.replace("\u2019", "'")
+    if (
+        TEAM_READS.search(reply)
+        and flow.parse((context.get("flow") or {}).get("state")) != flow.State.X_HUMAN
+    ):
+        add(
+            Violation(
+                "R-DISC-04", "do not imply a person is reading this chat unless one took over", True
+            )
+        )
+    if HUMAN_CLAIM.search(reply):
+        add(
+            Violation(
+                "R-DISC-03", "pi has no body, family, gender or past: drop the human claim", True
+            )
+        )
+    if BRAND.search(reply):
+        add(
+            Violation("R-BRAND-01", "pi speaks for Workzap only: never name Artwing or a.hub", True)
+        )
+
+    # Money and privacy (R-PAY, R-PRIV)
+    for sentence in _sentences(reply):
+        if SENSITIVE.search(sentence) and ASKING.search(sentence) and not REFUSING.search(sentence):
+            add(
+                Violation(
+                    "R-PAY-02", "never ask for cards, passwords, OTPs, PINs or ID numbers", True
+                )
+            )
+            break
+    _asks_for_what_it_never_asks(reply, heard, add)
+    squashed = re.sub(r"(?<=\d) (?=\d)", "", reply)
+    if (
+        IBAN.search(squashed)
+        or ACCOUNT_NUMBER.search(reply)
+        or ACCOUNT_TYPED.search(reply)
+        or IBAN_LABEL.search(reply)
+    ):
+        add(
+            Violation(
+                "R-PAY-03", "never type bank details: they are only on the approved quote", True
+            )
+        )
+    if _claims_payment(reply) and not context.get("payment_confirmed"):
+        add(Violation("R-PAY-05", "never say a payment was received until staff confirm it", True))
+
+    # No pitching while listening (R-SELL)
+    state = flow.parse((context.get("flow") or {}).get("state"))
+    own = _advice_free(reply, context)
+    if URGENCY.search(own) or _offers_discount(own, heard):
+        add(Violation("R-SELL-03", "no urgency, scarcity or discounts to move a decision", True))
+    # Solution mode (Addendum 2, 1.4 and 1.6): they asked for a fix or for the detail, so this
+    # reply may carry the ideas, the Workzap line and the document. The value-line checks below
+    # still apply.
+    given = bool(context.get("solution_asked")) or "solution_howto" in context
+    if state in flow.NO_OFFER:
+        requested = bool(ASKED_FOR_HELP.search(str(context.get("latest_customer_message", ""))))
+        if given:
+            _given_turn_limits(reply, context, add)
+        elif PITCH_WORDS.search(reply) or (
+            OFFER_WORDS.search(reply) and not requested and _unheard_offer_words(reply, heard)
+        ):
+            add(
+                Violation(
+                    "R-SELL-01",
+                    "they have not asked for a fix: do not volunteer a fix, product, document or "
+                    "quote; note what they said and ask one question. If their message does ask "
+                    "for one, in any words, answer it in the first sentence instead",
+                    True,
+                )
+            )
+
+    if not context.get("solution_exploration") and (
+        "solution_howto" in context or context.get("solution_asked")
+    ):
+        _value_line(reply, context, add)
+    _ideas_nobody_asked_for(reply, context, add)
+
+    # Honesty (R-HONEST, R-PROM)
+    if _promise_hits(reply, heard):
+        add(Violation("R-PROM-01", "no guarantees, promised results or savings figures", True))
+    if any(not NOT_SOLVED.search(s) for s in _sentences(reply) if SOLVED.search(s)):
+        add(Violation("R-LANG-01", "sorted means noted and grouped, never solved", True))
+    _honesty(reply, context, heard, add)
+    _advice_and_policy(reply, heard, add)
+    _style_soft(reply, context, heard, state, add)
+
+    # The value line (R-VAL, R-BUILD): whenever pi was handed free ideas or a follow-up, on every
+    # brain reply after plain listening, and on any reply that carries ideas.
+    _value_line_every_reply(reply, context, state, given, add)
+
+    # Voice (R-VOICE)
+    asked = sum(reply.count(mark) for mark in QUESTION_MARKS)
+    asked += sum(
+        1
+        for sentence in _sentences(reply)
+        if sentence.rstrip().endswith(QUESTION_MARKS) and DOUBLE_OR.search(sentence)
+    )
+    stripped = OFFER_TAIL.sub("", reply.rstrip().rstrip(ALLOWED_EMOJI).rstrip()).rstrip()
+    if asked > 1:
+        add(Violation("R-VOICE-02", "ask one question at most"))
+    elif asked == 1 and not stripped.endswith(QUESTION_MARKS):
+        add(Violation("R-VOICE-02", "the question must be the last sentence"))
+    bullets = sum(1 for line in reply.splitlines() if line.lstrip().startswith(("•", "- ")))
+    normal_cap = _cap(context, "word_cap", WORD_CAP)
+    if given:
+        normal_cap = max(
+            normal_cap, SOLUTION_BUILD_CAP if context.get("solution_build") else SOLUTION_CAP
+        )
+    cap = (
+        _cap(context, "summary_word_cap", SUMMARY_CAP)
+        if bullets >= 3
+        else _cap(context, "document_word_cap", DOCUMENT_CAP)
+        if "http" in reply
+        else normal_cap
+    )
+    words = len(reply.split())
+    if (
+        state in flow.LISTENING
+        and state != flow.State.S4_SORTED_SUMMARY  # a corrected summary repeats its lines
+        and _relists(reply, context)
+    ):
+        add(
+            Violation(
+                "R-VOICE-09",
+                "do not list back what you already confirmed or restate their whole story: "
+                "confirm only the new problem this message adds, in one short line",
+            )
+        )
+    _reasks_known_profile(reply, context, add)
+    if context.get("said_wrong") and NOT_UNDERSTOOD.search(reply):
+        add(
+            Violation(
+                "R-CORR-02",
+                "they corrected something you noted: say they are right and that it is "
+                "fixed or removed, never that you did not understand",
+            )
+        )
+    if (
+        not context.get("said_wrong")
+        and not context.get("corrects_noted")
+        and CONFIRMS_CORRECTION.search(reply)
+        and not CORRECTION_CUE.search(str(context.get("latest_customer_message") or ""))
+    ):
+        add(
+            Violation(
+                "R-CORR-04",
+                "they corrected nothing: do not say they are right or that you changed it; "
+                "confirm only what is new in this message",
+            )
+        )
+    if JUDGEMENT.search(reply):
+        add(
+            Violation(
+                "R-TONE-01",
+                'describe the problem, never judge the person or the business: not "your '
+                'business is not doing well" but what is hard ("sales and footfall are low")',
+                True,
+            )
+        )
+    if PATIENCE.search(reply):
+        add(
+            Violation(
+                "R-TONE-03",
+                'no defensiveness, no "please be patient", no explaining why you ask: give them '
+                "value now, then the one question",
+            )
+        )
+    latest_said = str(context.get("latest_customer_message", "")).strip()
+    first = (_sentences(reply) or [""])[0]
+    if latest_said and DIRECT_QUESTION.search(latest_said) and first.endswith(QUESTION_MARKS):
+        add(
+            Violation(
+                "R-ANS-01",
+                "they asked you a question: the first sentence answers it; a question back is "
+                "never a substitute",
+            )
+        )
+    elif (
+        YES_NO_QUESTION.search(latest_said)
+        and DIRECT_QUESTION.search(latest_said)  # the message itself ends as a question
+        and ACK_OPENER.match(first)
+    ):
+        add(
+            Violation(
+                "R-ANS-02",
+                'they asked a yes/no question: start with the yes or the no ("Haan, kar sakte '
+                'hain" / an honest "Ye Workzap nahi karta"), then the detail',
+            )
+        )
+    permission = next((x for x in reversed(_sentences(reply)) if x.endswith(QUESTION_MARKS)), "")
+    if (
+        latest_said
+        and (ASKED_FOR_HELP.search(latest_said) or CAPABILITY_ASK.search(latest_said))
+        and PERMISSION_FOR_IDEAS.search(permission)
+        and not re.search(r"document|quote", permission, re.IGNORECASE)
+    ):
+        add(
+            Violation(
+                "R-ANS-01",
+                "they asked what you can do or for ideas: give the two ideas now, never a question "
+                "asking whether they want them",
+            )
+        )
+    if context.get("reply_language") == "roman_ur" and ENGLISH_FILLER_OPENER.match(reply):
+        add(
+            Violation(
+                "R-LANG-02",
+                'a Roman Urdu reply does not open with an English filler ("Thanks", "Sure", "Okay"): '
+                "start with the answer or the problem in a few words",
+            )
+        )
+    if context.get("reply_language") == "roman_ur":
+        quoted = QUOTED.sub(" ", reply)
+        extra = next(
+            (
+                m.group(0)
+                for m in ENGLISH_FUNCTION.finditer(quoted)
+                if m.group(0).lower() not in heard
+            ),
+            None,
+        )
+        if extra:
+            add(
+                Violation(
+                    "R-LANG-02",
+                    f'an English word ("{extra}") in a Roman Urdu reply: say it in Roman Urdu',
+                )
+            )
+    asked_again, why_again = _answered_already(reply, context)
+    if asked_again:
+        add(
+            Violation(
+                "R-ASK-03",
+                "they already told you this in their own words: do not ask it again, ask what "
+                f"is still unknown ({why_again})",
+            )
+        )
+    opener_sentence = (_sentences(reply) or [""])[0]
+    if HOLLOW_OPENER.match(opener_sentence) and len(_sentences(reply)) > 1:
+        add(
+            Violation(
+                "R-TONE-01",
+                f'"{opener_sentence}" says nothing and notes nothing: start with what you noted or the '
+                "question",
+            )
+        )
+    if (
+        _bare_fragment(latest_said)
+        and any(NOTED_CLAIM.search(x) for x in _sentences(reply))
+        and state in PROGRESS_STATES
+    ):
+        add(
+            Violation(
+                "R-HONEST-02",
+                "they said almost nothing ("
+                f'"{latest_said}"): there is nothing new to note, so do not say "noted"; ask the next '
+                "specific question",
+            )
+        )
+    if (
+        _ensure_next_step(reply, context) != reply
+        and not any(x.endswith(QUESTION_MARKS) for x in _sentences(reply))
+        and state in PROGRESS_STATES
+    ):
+        add(
+            Violation(
+                "R-PROG-01",
+                "this reply ends on a statement with no next step: ask the next specific question "
+                "about what is still unknown",
+            )
+        )
+    if VERDICT_OPENER.match(reply):
+        add(
+            Violation(
+                "R-TONE-01",
+                'no verdict opener ("Ye real masla hai.", "This is a real problem."): note what '
+                "they said in a few words, then ask",
+            )
+        )
+    if THANKS_THEN_NOTED.match(reply):
+        add(
+            Violation(
+                "R-ECHO-01",
+                "no stock thank-you before the noted line: start with the problem in a few words "
+                "or with the question",
+            )
+        )
+    last_question = next((x for x in reversed(_sentences(reply)) if x.endswith(QUESTION_MARKS)), "")
+    if not last_question and (closing := (_sentences(reply) or [""])[-1]):
+        last_question = closing  # a closer asked without its "?" is still a closer
+    detail = latest_said.split()
+    if (
+        state in CONCRETE_STATES
+        and GENERIC_CLOSER.search(last_question)
+        and (len(detail) >= 6 or any(ch.isdigit() for ch in latest_said))
+    ):
+        add(
+            Violation(
+                "R-ASK-05",
+                "they just gave a concrete detail: ask one specific question about it (how long, "
+                "how many, what happens next), not the generic 'anything else?'",
+            )
+        )
+    if context.get("main_problem") and last_question.endswith(QUESTION_MARKS):
+        # R-ASK-08 (expert advisor on): the question is about the main problem or its causes
+        if _off_the_main_problem(last_question, context) or _adjacent_when_diagnosed(
+            last_question, context
+        ):
+            suggested = str(context.get("suggested_next_question") or "")
+            add(
+                Violation(
+                    "R-ASK-08",
+                    "the question must be about the owner's main problem or its likely causes, "
+                    "not an adjacent process: ask about the problem they raised"
+                    + (
+                        f" (for example: {suggested[:160]}, in the owner's language)"
+                        if suggested
+                        else ""
+                    ),
+                )
+            )
+    if (
+        context.get("owner_unknowns")
+        and last_question.endswith(QUESTION_MARKS)
+        and owner_asks.asks_for_history(last_question)
+    ):
+        # R-ASK-09 (live 2026-10-28, a furniture maker who said six times that no records exist): a
+        # fact the owner has said they do not have is closed; asking how often, how many or what
+        # happened before is asking for it again.
+        add(
+            Violation(
+                "R-ASK-09",
+                "they told you they have no records or do not know: do not ask about the past, how "
+                "often or how many again. Say what is worth writing down from today and ask one "
+                "question that moves forward (a start, a choice)",
+            )
+        )
+    if context.get("repeat_complaint") and last_question.endswith(QUESTION_MARKS):
+        add(
+            Violation(
+                "R-ASK-09",
+                "they say you keep asking: ask no fact now. Say sorry shortly, give what they "
+                "asked for from what you know, and ask nothing or one choice answerable in a word",
+            )
+        )
+    if context.get("pi_mode") == "brain" and NOTED_START.match(reply):
+        # spec v1.4, 17.6, every brain workspace (seen live, 2026-10-27: "Note kar liya hai: ... Ye
+        # team tak bhi pohanch jayega. Parents fee kaise jama karte hain?")
+        add(
+            Violation(
+                "R-ECHO-05",
+                "do not open with 'Noted', 'Note kar liya' or 'Thanks': go straight to your one "
+                "question and show what you understood in a few words inside it",
+            )
+        )
+    if context.get("expert_on"):
+        if TEAM_WILL_SEE.search(reply):
+            add(
+                Violation(
+                    "R-DISC-06",
+                    "never say the team or a person will see, read or receive this chat: pi talks "
+                    "to the owner itself",
+                )
+            )
+    for title in NOTED_TITLE.findall(reply):
+        if len(title.split()) > NOTED_WORDS:
+            add(
+                Violation(
+                    "R-ECHO-01",
+                    f"the noted line names the problem in at most {NOTED_WORDS} words, in their "
+                    "words, never a list of their sentences",
+                )
+            )
+            break
+    if (
+        state != flow.State.S4_SORTED_SUMMARY  # the summary restates (R-ECHO-02)
+        and len(reply.split()) >= ECHO_MIN_WORDS
+        and len(_points(reply)) < 3  # so does confirming three new problems at once
+        and echo_overlap(reply, context) > ECHO_MAX
+    ):
+        add(
+            Violation(
+                "R-ECHO-03",
+                "do not restate their message back to them: confirm it once in at most 12 words "
+                "in their own words, then ask the one question",
+            )
+        )
+    if state != flow.State.S4_SORTED_SUMMARY and _restates(reply, latest_said):
+        add(
+            Violation(
+                "R-ECHO-04",
+                "do not say again what they said: name the problem in a few words inside the "
+                "sentence, or go straight to the one question",
+            )
+        )
+    if STIFF_APOLOGY.search(reply):
+        add(Violation("R-VOICE-04", 'say "Maaf kijiye", not "mujhe maazrat chahiye"'))
+    if words > cap:
+        add(Violation("R-VOICE-01", f"too long: {words} words, the limit is {cap}"))
+    elif (
+        not given
+        and cap == normal_cap
+        and words
+        > int(int((context.get("style") or {}).get("reply_up_to_words") or cap) * MIRROR_GRACE)
+    ):
+        # They write short: stay near one and a half times their length (spec 8.4.1). A few words
+        # over is not worth a second model call (real chat 2026-10-24: 28 words for a limit of 25
+        # sent a whole draft back), so the check fires from MIRROR_GRACE times the limit.
+        reach = context["style"]["reply_up_to_words"]
+        add(Violation("R-VOICE-01", f"they write short: about {reach} words at most, not {words}"))
+    hype = _contains(reply, tuple(p for p in HYPE if p not in heard))
+    if hype:
+        add(Violation("R-VOICE-05", f'no hype ("{hype}")', True))
+    if empathy := _contains(reply, FAKE_EMPATHY):
+        add(
+            Violation(
+                "R-VOICE-06",
+                f'no scripted empathy ("{empathy}"): react briefly and specifically',
+                True,
+            )
+        )
+    if reply.count("!") > _allowed_bangs(context):
+        add(Violation("R-VOICE-07", "no exclamation marks"))
+    marks = EMOJI.findall(SKIN_TONES.sub("", reply))
+    if len(marks) > 1 or (marks and marks[0] not in allowed_emoji(context)):
+        add(Violation("R-VOICE-08", "no emoji (one plain tick when confirming a note)"))
+    if HEADING.search(reply):
+        add(
+            Violation(
+                "R-VOICE-09",
+                "no headings, tables or double-asterisk bold: WhatsApp formatting only",
+            )
+        )
+    if LOGGED.search(reply):
+        add(Violation("R-VOICE-10", 'say "noted", not logged, ticketed or captured'))
+    if re.search("[؀-ۿ]", reply) and re.search(r"\bnoted\b", reply, re.IGNORECASE):
+        add(Violation("R-LANG-02", 'translate "noted": no English word inside an Arabic reply'))
+    if str(context.get("reply_language") or "") == "roman_ur" and ENGLISH_NOTED.search(reply):
+        add(
+            Violation(
+                "R-LANG-02",
+                'translate the English "noted" sentence into Roman Urdu ("note kar liya"): '
+                "no English sentence inside a Roman Urdu reply",
+            )
+        )
+    if str(context.get("reply_language") or "") == "roman_ur":
+        found.extend(roman_urdu_tone(reply, heard))
+    if str(context.get("reply_language_other") or "") == "Urdu":
+        found.extend(urdu_script_checks(reply))
+    if CODE_PROMISE.search(reply) or (
+        ON_ITS_WAY.search(reply)
+        and (SIGN_IN_WORDS.search(reply) or SIGN_IN_WORDS.search(_customer_words(context)))
+    ):
+        add(
+            Violation(
+                "R-INVENT-01",
+                "pi never sends or receives sign-in codes or OTPs in this chat: do not say a code "
+                "is on its way, only that you never need one",
+                True,
+            )
+        )
+    limit = int((context.get("brain_settings") or {}).get("max_clarify") or 0)
+    if (
+        limit
+        and int(context.get("clarify_count") or 0) >= limit
+        and asked >= 1
+        and flow.parse((context.get("flow") or {}).get("state"))
+        in (flow.State.S1_LISTENING, flow.State.S2_CLARIFYING)
+    ):
+        add(
+            Violation(
+                "R-ASK-02",
+                f"you have already asked {limit} clarifying questions: note what you have and move on",
+            )
+        )
+    for phrase in context.get("never_say") or []:
+        if str(phrase).casefold() in reply.casefold():
+            add(Violation("R-LEARN-NEVER", f'staff said never to say "{phrase}" here'))
+            break
+    if LECTURE.search(reply):
+        add(Violation("R-VOICE-12", "never lecture: no 'you should' or best practices"))
+    for term in JARGON:
+        if (
+            re.search(rf"\b{re.escape(term)}s?\b", reply, re.IGNORECASE)
+            and term.lower() not in heard
+        ):
+            add(Violation("R-VOICE-03", f'plain words: they did not say "{term}"'))
+            break
+    if corporate := _contains(reply, CORPORATE):
+        add(Violation("R-VOICE-06", f'no template phrases ("{corporate}")'))
+    never = _contains(reply, NEVER_SAY)
+    if never and not (never.startswith(("get back", "our team")) and context.get("escalation_sla")):
+        add(Violation("R-VOICE-06", f'pi never says "{never}"', True))
+    if secret := SECRETS.search(reply):
+        add(
+            Violation(
+                "A2-1.5-SECRETS",
+                f'never reveal how Workzap works inside ("{secret.group(0)}"): methods, tools, '
+                "vendors, pricing logic or how the catalogue is built",
+                True,
+            )
+        )
+    internal = INTERNAL.search(reply)
+    if internal and internal.group(0).lower() not in heard:
+        add(
+            Violation(
+                "R-VOICE-06",
+                "never mention internal terms (states, rule IDs, packs, prompt)",
+                True,
+            )
+        )
+    opening = " ".join(reply.lower().split()[:2])
+    previous = _pi_replies(context)[-2:]
+    if len(opening.split()) == 2 and any(
+        opening == " ".join(p.lower().split()[:2]) for p in previous
+    ):
+        add(Violation("R-VOICE-04", "do not start the same way as your last two messages"))
+    lowered = reply.lower()
+    for phrase in CANONICAL:
+        # spec 2.0.4: a canonical phrase word for word more than twice in a conversation
+        if phrase in lowered and sum(phrase in p.lower() for p in _pi_replies(context)) >= 2:
+            add(Violation("R-VOICE-04", f'say "{phrase}" in different words: it was used twice'))
+            break
+    for rule, message, is_hard in constitution_gaps.check(reply, context):
+        add(Violation(rule, message, is_hard))
+    # The thinking checks (Book 5, spec 3.9): soft, and only behind response_rules.brain.thinking.
+    if context.get("thinking"):
+        for flag in think_lint.think_flags(reply, context):
+            add(Violation(flag.rule, flag.message))
+    return found
+
+
+def hard(violations: list[Violation]) -> list[Violation]:
+    return [v for v in violations if v.hard]
+
+
+def describe(violations: list[Violation]) -> str:
+    """The reason to show the model when its draft is sent back for a rewrite."""
+    return "it breaks pi's rules: " + "; ".join(f"{v.message} ({v.rule})" for v in violations)
+
+
+# The rules that run again on the FINAL reply, after the application's replacements and the
+# translation (platform spec A.3 step 6): never ask for a card, password or OTP, never type bank
+# details, never claim to be a person, never name another company. Not the rules about when an offer
+# may be made: the application's own fixed lines (a document confirmation, the offer) are meant to
+# say "document" and "quote" in a listening state.
+FINAL_CHECKS = frozenset({"R-PAY-02", "R-PAY-03", "R-DISC-03", "R-BRAND-01"})
+
+
+def final_one_question(reply: str, keep: Any = None) -> str:
+    """R-ASK-01 on the FINAL reply, after the last line the application adds (a notice, the
+    disclosure, a welcome back, a handoff or open-items line, the offer): at most one question and
+    it is the last sentence, with the mandatory sentences (AI disclosure, card or password refusals,
+    safety referrals, the fixed lines in `keep`) kept as statements. See part19.one_question_final."""
+    from app.modules.pi import part19
+
+    return part19.one_question_final(reply, keep)
+
+
+AI_ANSWER = {
+    "en": "I'm an AI, not a person. I'm pi, from Workzap.",
+    "roman_ur": "Main AI hoon, insaan nahi. Main pi hoon, Workzap se.",
+    "ur": "میں ایک مصنوعی ذہانت ہوں، انسان نہیں۔ میں pi ہوں، Workzap سے۔",
+    "ar": "أنا ذكاء اصطناعي، ولست إنساناً. أنا pi من Workzap.",
+}
+# Safe lines for when a reply still breaks a rule after its one rewrite (spec 9.5): they promise
+# nothing, ask nothing sensitive, and ask one question last. The first message keeps its disclosure.
+FALLBACK_LISTENING = {
+    "en": "What part of this costs you the most right now?",
+    "roman_ur": "Is mein sab se zyada nuqsan kis baat ka ho raha hai?",
+    "ur": "اس میں سب سے زیادہ نقصان کس بات کا ہو رہا ہے؟",
+    "ar": "ما أكثر جزء في هذا يكلّفك الآن؟",
+}
+# More safe questions for the same state: the safe line is a fixed question, so two replies that both
+# fell back asked the SAME question twice (live chat 2026-10-27, turns 15 and 17). The next one that
+# was not asked yet in this chat is used.
+FALLBACK_LISTENING_MORE = {
+    "en": [
+        "Which of these problems should we sort out first?",
+        "Where or when do you notice this first?",
+        "What have you tried so far for this?",
+    ],
+    "roman_ur": [
+        "In mein se sab se pehle kis masle ko theek karna zaroori hai?",
+        "Ye masla sab se pehle kab ya kahan nazar aata hai?",
+        "Aap ne is ke liye ab tak kya try kiya hai?",
+    ],
+    "ur": [
+        "ان میں سے سب سے پہلے کس مسئلے کو ٹھیک کرنا ضروری ہے؟",
+        "یہ مسئلہ سب سے پہلے کب یا کہاں نظر آتا ہے؟",
+        "آپ نے اس کے لیے اب تک کیا آزمایا ہے؟",
+    ],
+    "ar": [
+        "أي هذه المشاكل يجب معالجتها أولاً؟",
+        "أين أو متى تلاحظ هذا أولاً؟",
+        "ماذا جربت حتى الآن لهذا؟",
+    ],
+}
+# The safe question when the chat is not in a listening state. It leads: it never hands the next move
+# back ("what would you like to ask next?" was sent live on 2026-10-28 after six requests for a plan).
+FALLBACK_OTHER = {
+    "en": "Which of these would you most like to see fixed first?",
+    "roman_ur": "In mein se aap sab se pehle kis cheez ko theek hota dekhna chahenge?",
+    "ur": "ان میں سے آپ سب سے پہلے کس چیز کو ٹھیک ہوتا دیکھنا چاہیں گے؟",
+    "ar": "أي هذه الأمور تودّ أن تراها تُحلّ أولاً؟",
+}
+FIRST_INVITE = {
+    "en": "Tell me about the biggest problem in your business.",
+    "roman_ur": "Apne business ka sab se bara masla batayein.",
+    "ur": "اپنے کاروبار کا سب سے بڑا مسئلہ بتائیں۔",
+    "ar": "أخبرني عن أكبر مشكلة في عملك.",
+}
+# The question after the AI line in pi's very first message when the warm-up is off (spec Part 14
+# row 9, 16.1): one open question about the business, never "tell me what's going wrong" on its own.
+FIRST_QUESTION = {
+    "en": "What does your business do?",
+    "roman_ur": "Aap ka business kya kaam karta hai?",
+    "ur": "آپ کا کاروبار کیا کام کرتا ہے؟",
+    "ar": "ما نوع عملك؟",
+}
+
+
+def _language(context: dict[str, Any]) -> str:
+    from app.modules.pi.language import ARABIC_SCRIPT, URDU_LETTERS
+
+    language = str(context.get("reply_language") or "en")
+    said = str(context.get("latest_customer_message", ""))
+    if context.get("reply_language_other") == "Urdu":
+        return "ur"
+    if language == "roman_ur" and ARABIC_SCRIPT.search(said) and URDU_LETTERS.search(said):
+        return "ur"
+    return language if language in OPENING else "en"
+
+
+def _ai_answer(context: dict[str, Any], language: str) -> str:
+    from app.modules.pi import fixed_lines
+
+    return fixed_lines.line("ai_answer", fixed_lines.code(context), AI_ANSWER[language])
+
+
+def _fresh_question(context: dict[str, Any], language: str) -> str:
+    """The safe listening question that pi has not asked in this chat yet: the standard one, then the
+    others in order; every one asked already gives the next-slot question or, last, the standard one."""
+    said = " ".join(_pi_replies(context)).lower()
+    options = [FALLBACK_LISTENING[language], *FALLBACK_LISTENING_MORE.get(language, [])]
+    for line in options:
+        if line.lower().rstrip("?؟") not in said:
+            return line
+    return _next_question(context, "") or FALLBACK_LISTENING[language]
+
+
+# The question after the acknowledgement of a draft that was not sent: safe questions per language
+# and group. "listening" asks about the problem, "other" asks which one to fix first. No digits and
+# no word about a quote, document, price, payment or offer. Several per group so one is not asked
+# twice in a chat (the same line sent twice was a live complaint, 2026-10-27).
+ACK_QUESTIONS: dict[str, dict[str, list[str]]] = {
+    "en": {
+        "listening": [FALLBACK_LISTENING["en"], *FALLBACK_LISTENING_MORE["en"]],
+        "other": [
+            FALLBACK_OTHER["en"],
+            "Which of these hurts the business most right now?",
+            "Which one would you like to start with?",
+        ],
+    },
+    "roman_ur": {
+        "listening": [FALLBACK_LISTENING["roman_ur"], *FALLBACK_LISTENING_MORE["roman_ur"]],
+        "other": [
+            FALLBACK_OTHER["roman_ur"],
+            "In mein se kaun sa masla business ko abhi sab se zyada nuqsan de raha hai?",
+            "Aap kis se shuru karna chahenge?",
+        ],
+    },
+    "ur": {
+        "listening": [FALLBACK_LISTENING["ur"], *FALLBACK_LISTENING_MORE["ur"]],
+        "other": [
+            FALLBACK_OTHER["ur"],
+            "ان میں سے کون سا مسئلہ کاروبار کو اس وقت سب سے زیادہ نقصان دے رہا ہے؟",
+            "آپ کس سے شروع کرنا چاہیں گے؟",
+        ],
+    },
+    "ar": {
+        "listening": [FALLBACK_LISTENING["ar"], *FALLBACK_LISTENING_MORE["ar"]],
+        "other": [
+            FALLBACK_OTHER["ar"],
+            "أي هذه المشاكل تؤذي عملك أكثر الآن؟",
+            "بأيها تودّ أن نبدأ؟",
+        ],
+    },
+    "fr": {
+        "listening": [
+            "Quelle partie de cela vous coûte le plus en ce moment ?",
+            "Où ou quand remarquez-vous cela en premier ?",
+            "Qu'avez-vous déjà essayé pour cela ?",
+        ],
+        "other": [
+            "Lequel de ces points aimeriez-vous voir réglé en premier ?",
+            "Lequel de ces points pèse le plus sur votre activité en ce moment ?",
+            "Par lequel aimeriez-vous commencer ?",
+        ],
+    },
+    "es": {
+        "listening": [
+            "¿Qué parte de esto le cuesta más ahora mismo?",
+            "¿Dónde o cuándo lo nota primero?",
+            "¿Qué ha probado hasta ahora para esto?",
+        ],
+        "other": [
+            "¿Cuál de estos puntos le gustaría ver resuelto primero?",
+            "¿Cuál de estos puntos pesa más en su negocio ahora mismo?",
+            "¿Por cuál le gustaría empezar?",
+        ],
+    },
+    "fa": {
+        "listening": [
+            "کدام بخش این موضوع الان بیشترین هزینه را برای شما دارد؟",
+            "اول کجا یا کی متوجه این موضوع می‌شوید؟",
+            "تا حالا برای این چه کاری امتحان کرده‌اید؟",
+        ],
+        "other": [
+            "کدام یک از این موارد را دوست دارید اول حل شود؟",
+            "کدام یک از این موارد الان بیشتر به کسب‌وکار شما فشار می‌آورد؟",
+            "از کدام یک شروع کنیم؟",
+        ],
+    },
+}
+
+
+def _asked_key(question: str) -> str:
+    return question.lower().rstrip(" ?؟")
+
+
+def ack_with_question(ack: str, context: dict[str, Any], language: str | None = None) -> str:
+    """The acknowledgement of a draft that was not sent, with the next question after it: a
+    notice alone ("Thanks, I've got that.") leaves the owner with nothing to answer. The question
+    is a safe one for the state (listening: about the problem; otherwise: which to fix first) that
+    pi has not asked in this chat; both groups are tried before one is repeated, and then the one
+    asked longest ago. It asks, never offers, never names a price, one question, the last sentence."""
+    if ack.rstrip().endswith(QUESTION_MARKS):
+        return ack
+    state = flow.parse((context.get("flow") or {}).get("state"))
+    listening = state in flow.LISTENING or state in (
+        None,
+        flow.State.S5B_DECLINED,
+        flow.State.S_RETURN,
+        flow.State.S_MAP_SHARE,
+    )
+    lang = language if language in ACK_QUESTIONS else _language(context)
+    pools = ACK_QUESTIONS[lang]
+    first, second = ("listening", "other") if listening else ("other", "listening")
+    candidates = [*pools[first], *pools[second]]
+    said = " ".join(_pi_replies(context)).lower()
+    for question in candidates:
+        if _asked_key(question) not in said:
+            return f"{ack.rstrip()} {question}"
+    oldest = min(candidates, key=lambda q: said.rfind(_asked_key(q)))
+    return f"{ack.rstrip()} {oldest}"
+
+
+def safe_fallback(context: dict[str, Any]) -> str:
+    """The safe line for the state, in the person's language (spec 9.5)."""
+    language = _language(context)
+    state = flow.parse((context.get("flow") or {}).get("state"))
+    history = context.get("history") or []
+    first = not any(h.get("role") == "ai" for h in history)
+    parts = []
+    if first:
+        parts.append(f"{opening_line(context)} {FIRST_QUESTION[language]}")
+    else:
+        if ASKS_IF_AI.search(str(context.get("latest_customer_message", ""))):
+            parts.append(_ai_answer(context, language))
+        listening = state in flow.LISTENING or state in (
+            None,
+            flow.State.S5B_DECLINED,
+            flow.State.S_RETURN,
+            flow.State.S_MAP_SHARE,
+        )
+        parts.append(_fresh_question(context, language) if listening else FALLBACK_OTHER[language])
+    return " ".join(parts)
+
+
+def _scrub(reply: str) -> str:
+    """Drop sentences that carry scripted empathy, hype or a template phrase, when something is left."""
+    kept = []
+    for line in reply.split("\n"):
+        pieces = re.split(r"(?<=[.!?؟۔।])\s+", line)
+        good = [
+            p
+            for p in pieces
+            if not (_contains(p, FAKE_EMPATHY) or _contains(p, HYPE) or _contains(p, NEVER_SAY))
+        ]
+        kept.append(" ".join(good))
+    scrubbed = "\n".join(x for x in kept if x.strip())
+    return scrubbed if scrubbed.strip() else reply
+
+
+def repair(reply: str, context: dict[str, Any]) -> str:
+    """Safe, meaning-preserving fixes: stray '!', emoji, hype and scripted empathy, several questions,
+    a missing AI answer or disclosure. What still breaks a hard rule afterwards is replaced by the
+    safe line for the state (spec 9.5) instead of being sent or ending in a hand-off."""
+    fixed = re.sub(r"\s*[—–]\s*", ", ", reply)  # we write plain punctuation: no dashes
+    if context.get("reply_language") == "roman_ur":
+        from app.modules.pi.language import clearly_other
+
+        if clearly_other(fixed, "roman_ur"):
+            # English in a Roman Urdu chat that survived the rewrite: never sent as it is
+            nxt = _next_question(context, "") if context.get("noted_problems") else ""
+            return nxt or safe_fallback(context)  # spec 17.6: no "Note kar liya" announcement
+    allowed = _allowed_bangs(context)
+    if fixed.count("!") > allowed:
+        kept = 0
+
+        def swap(match: re.Match[str]) -> str:
+            nonlocal kept
+            kept += 1
+            return "!" if kept <= allowed else "."
+
+        fixed = re.sub(r"!+", swap, fixed)
+    permitted = allowed_emoji(context)
+    seen = 0
+
+    def drop(match: re.Match[str]) -> str:
+        nonlocal seen
+        char = match.group(0)
+        seen += 1
+        keep = seen == 1 and char.strip() in permitted
+        return char if keep else ""
+
+    fixed = re.sub(" ?" + EMOJI.pattern, drop, SKIN_TONES.sub("", fixed.replace("️", "")))
+    fixed = _scrub(fixed)
+    fixed = _drop_slips(fixed, context)
+    fixed = _ensure_next_step(fixed, context)
+    fixed = _one_question_last(fixed, _cap(context, "word_cap", WORD_CAP))
+    history = context.get("history") or []
+    first = not any(h.get("role") == "ai" for h in history)
+    if first and not _discloses(fixed):
+        fixed = f"{opening_line(context)} {fixed}".strip()
+    elif (
+        not first
+        and ASKS_IF_AI.search(str(context.get("latest_customer_message", "")))
+        and not AI_WORDS.search((_sentences(fixed) or [""])[0])
+    ):
+        fixed = f"{_ai_answer(context, _language(context))} {fixed}".strip()
+    fixed = fixed.strip()
+    remaining = [
+        v
+        for v in lint(fixed, context)
+        if (v.hard and v.rule != "R-DISC-01") or v.rule == "R-VOICE-02"
+    ]
+    if remaining:
+        logger.warning(
+            "pi reply fell back to the safe line", extra={"rules": [v.rule for v in remaining]}
+        )
+        return safe_fallback(context)
+    return fixed
+
+
+def _split_ends(reply: str) -> list[tuple[bool, str]]:
+    """The reply as (is_bullet, line) pairs."""
+    return [(line.lstrip().startswith(BULLET), line) for line in reply.split("\n")]
+
+
+MIRROR_GRACE = 1.4  # how far over "they write short" a reply may run before it is sent back
+QUIET_FIXABLE = frozenset({"R-VOICE-02"})  # slips the application can repair without the model
+
+
+def quiet_fix(reply: str, broke: list[Violation], context: dict[str, Any]) -> str | None:
+    """A reply whose only problem is more than one question, or the question not last, repaired in
+    place: the last question kept at the end, the others dropped. Same meaning, no model call.
+    None when something else is wrong too, or when the repair does not make the reply clean."""
+    if not broke or any(v.rule not in QUIET_FIXABLE for v in broke):
+        return None
+    fixed = _one_question_last(reply, _cap(context, "word_cap", WORD_CAP)).strip()
+    if not fixed or fixed == reply.strip() or lint(fixed, context):
+        return None
+    return fixed
+
+
+def _restates(reply: str, said: str) -> str:
+    """The sentence of the reply that repeats the person's words as a statement (empty when none)."""
+    theirs = {w for w in SPLIT_WORDS.findall(said.lower()) if len(w) >= 3}
+    if not theirs:
+        return ""
+    for sentence in _sentences(reply):
+        if sentence.rstrip().endswith(QUESTION_MARKS) or sentence.lstrip().startswith(BULLET):
+            continue
+        if NOTED_START.match(sentence):
+            continue  # the noted line is allowed to name the problem in their words (R-ECHO-01)
+        mine = [w for w in SPLIT_WORDS.findall(sentence.lower()) if len(w) >= 3]
+        if (
+            len(mine) >= RESTATE_MIN_WORDS
+            and sum(w in theirs for w in mine) / len(mine) >= RESTATE_SHARE
+        ):
+            return sentence
+        # A short answer ("warehouse and outlets") said back in a few words ("Warehouse aur outlets,
+        # dono jagah parha hai."): the sentence holds nearly all of what they said and adds little.
+        said_content = {w for w in theirs if w not in ECHO_STOP}
+        if (
+            len(said_content) >= 2
+            and len(SPLIT_WORDS.findall(said)) <= SHORT_ANSWER_WORDS
+            and len(mine) <= SHORT_ECHO_WORDS
+            and len(said_content & set(mine)) / len(said_content) >= SHORT_ECHO_COVERAGE
+        ):
+            return sentence
+    return ""
+
+
+def _answered_already(reply: str, context: dict[str, Any]) -> tuple[str, str]:
+    """(the question, "frequency" or "options") when the reply asks what the person already said:
+    how often, after they said "roz 30-40 log"; "cash side ya stock side?", after they named both in
+    their last message. ("", "") when it asks something new."""
+    heard = _heard(context)
+    latest = str(context.get("latest_customer_message", "")).lower()
+    for sentence in _sentences(reply):
+        if not sentence.rstrip().endswith(QUESTION_MARKS):
+            continue
+        low = sentence.lower()
+        if FREQUENCY_QUESTION.search(low) and SAID_FREQUENCY.search(heard):
+            return sentence, "frequency"
+        if COMPARATIVE.search(low):
+            continue
+        options = [o for o in re.split(r"\b(?:ya|or)\b|,", low) if o.strip()]
+        if len(options) < 2:
+            continue
+        said = set(re.findall(r"[a-z]{3,}", latest))
+        if all(
+            any(w in said for w in re.findall(r"[a-z]{3,}", option) if w not in OPTION_STOP)
+            for option in options
+        ):
+            return sentence, "options"
+    return "", ""
+
+
+def _drop_slips(reply: str, context: dict[str, Any]) -> str:
+    """Tone slips that survived the model's one rewrite, taken out in place when something useful is
+    left (live chats 1 to 4): a verdict opener, "Theek hai." or an English filler before the noted
+    line, "Aap sahi keh rahe hain" to a person who corrected nothing, a sentence that only says
+    again what they said, a question about what they already told us. A question is only dropped
+    when a statement stays; a statement only when a question or another statement stays."""
+    latest = str(context.get("latest_customer_message") or "")
+    state = flow.parse((context.get("flow") or {}).get("state"))
+    roman = context.get("reply_language") == "roman_ur"
+    lines = reply.split("\n")
+    parts = [[x for x in re.split(r"(?<=[.!?؟۔।])\s+", ln) if x.strip()] for ln in lines]
+    flat = [(i, k) for i, ps in enumerate(parts) for k in range(len(ps))]
+    if len(flat) < 2:
+        return reply
+    dropped: set[tuple[int, int]] = set()
+    changed = False
+
+    def text(at: tuple[int, int]) -> str:
+        return parts[at[0]][at[1]]
+
+    def is_question(at: tuple[int, int]) -> bool:
+        return text(at).rstrip().endswith(QUESTION_MARKS)
+
+    def left(kind: str) -> bool:  # is a question (or a statement) still there after the drops
+        return any(a not in dropped and is_question(a) == (kind == "question") for a in flat)
+
+    first = flat[0]
+    opener = text(first)
+    short = len(opener.split()) <= 4
+    # "Shukriya." before "Note kar liya" is the spec's own G6 line: only the model is asked to drop
+    # it (R-ECHO-01); "Theek hai." and an English filler are taken out here.
+    filler_before_noted = bool(
+        THANKS_THEN_NOTED.match(reply) and not re.match(r"^\W*shukriya", reply, re.IGNORECASE)
+    )
+    if VERDICT_OPENER.match(opener) or (
+        short and (filler_before_noted or (roman and ENGLISH_FILLER_OPENER.match(opener)))
+    ):
+        dropped.add(first)
+    elif roman and ENGLISH_FILLER_OPENER.match(opener):
+        stripped = ENGLISH_FILLER_OPENER.sub("", opener, count=1).lstrip(" ,.!")
+        parts[first[0]][first[1]] = stripped[:1].upper() + stripped[1:]
+        changed = True
+    if HOLLOW_OPENER.match(opener):
+        dropped.add(first)
+    elif FILLER_LEAD.match(opener) and not dropped:
+        stripped = FILLER_LEAD.sub("", opener, count=1)
+        parts[first[0]][first[1]] = stripped[:1].upper() + stripped[1:]
+        changed = True
+    if state in PROGRESS_STATES and _bare_fragment(latest):
+        for at in flat:
+            if at not in dropped and NOTED_CLAIM.search(text(at)) and not is_question(at):
+                dropped.add(at)
+    if CONFIRMS_CORRECTION.search(opener) and not (
+        context.get("said_wrong") or context.get("corrects_noted") or CORRECTION_CUE.search(latest)
+    ):
+        dropped.add(first)
+    if state != flow.State.S4_SORTED_SUMMARY and (said_again := _restates(reply, latest)):
+        for at in flat:
+            if text(at) == said_again and at not in dropped:
+                dropped.add(at)
+                if not left("question") or len(dropped) >= len(flat):
+                    dropped.discard(at)
+    asked, why = _answered_already(reply, context)
+    if asked and why == "frequency":
+        for at in flat:
+            if text(at) == asked and at not in dropped:
+                dropped.add(at)
+                if not left("statement"):
+                    dropped.discard(at)
+    if len(dropped) >= len(flat) or not (dropped or changed):
+        return reply
+    out = []
+    for i, ps in enumerate(parts):
+        kept = [x for k, x in enumerate(ps) if (i, k) not in dropped]
+        if kept or not lines[i].strip():
+            out.append(" ".join(kept))
+    return "\n".join(out).strip()
+
+
+NOTED_CLAIM = re.compile(
+    r"\b(?:note\s+kar\s+liya|noted|maine\s+note|i(?:'ve|\s+have)\s+noted)\b", re.IGNORECASE
+)
+
+
+def _bare_fragment(said: str) -> bool:
+    """A reply of a word or three ("zyada tar", "nahi", "bas pehle hafte mein"): nothing new to note."""
+    from app.modules.pi import slots
+
+    words = [w.lower() for w in re.findall(r"\w+", said or "")]
+    if slots.SKIP_ACK.match(said or "") or slots.SKIP_ACK_OTHER.match(said or ""):
+        return False  # "ok", "hmm", "nahi": an answer, and "noted" for it is fine
+    return 0 < len(words) <= BARE_MAX_WORDS and all(w in BARE_WORDS for w in words)
+
+
+def _generic_closers_before(context: dict[str, Any]) -> int:
+    """How many of pi's earlier replies ended on the generic closer ("anything else?")."""
+    count = 0
+    for text in _pi_replies(context):
+        asked = [x for x in _sentences(text) if x.endswith(QUESTION_MARKS)]
+        if asked and GENERIC_CLOSER.search(asked[-1]):
+            count += 1
+    return count
+
+
+def _next_question(context: dict[str, Any], reply: str) -> str:
+    """The next specific question about the latest noted problem: the first slot still open (not
+    answered in their words, not closed, not asked in this chat already), in the chat's language.
+    Empty when the chat is not in English or Roman Urdu or nothing is left to ask."""
+    from app.modules.pi import learning_arms
+
+    language = str(context.get("reply_language") or "en")
+    if language not in ("en", "roman_ur"):
+        return ""
+    heard = _heard(context)
+    closed = " ".join(str(c.get("slot") or "") for c in context.get("closed_slots") or [])
+    before = " ".join(_pi_replies(context)).lower() + " " + reply.lower()
+    noted = context.get("noted_problems") or []
+    missing = list((noted[-1].get("missing") or []) if noted else [])
+    wanted = learning_arms.slot_for(missing)
+    order = [wanted] if wanted else []
+    order += [slot for slot in learning_arms.ORDER if slot != wanted]
+    for slot in order:
+        answered = SLOT_ANSWERED.get(slot)
+        if (answered and answered.search(heard)) or slot in closed:
+            continue
+        for wording in learning_arms.SEEDS[slot][language]:
+            if wording.lower().rstrip("?") not in before:
+                return wording
+    return ""
+
+
+def _ensure_next_step(reply: str, context: dict[str, Any]) -> str:
+    """Spec 9.3: every reply while listening notes, asks or gives; none ends on a statement alone.
+    A reply with no question (and no offer or ideas) gets the next specific question; a second
+    generic closer, or one straight after an answer with nothing in it, is swapped for one."""
+    state = flow.parse((context.get("flow") or {}).get("state"))
+    latest = str(context.get("latest_customer_message") or "")
+    history = context.get("history") or []
+    if (
+        state not in PROGRESS_STATES
+        or not context.get("noted_problems")  # nothing noted yet: the first question is the model's
+        or not latest
+        or not any(h.get("role") == "ai" for h in history)
+        or context.get("solution_asked")
+        or context.get("fixed_no_idea")
+        or context.get("handback_notice")
+        or "•" in reply
+        # a reply about a document or quote that already asks keeps its own question; one that
+        # asks nothing is a dead end and gets the next question like any other
+        or (
+            re.search(r"document|quote", reply, re.IGNORECASE)
+            and reply.rstrip().endswith(QUESTION_MARKS)
+        )
+        or ASKS_IF_AI.search(latest)
+        or DIRECT_QUESTION.search(latest)
+    ):
+        return reply
+    sentences = _sentences(reply)
+    asked = [x for x in sentences if x.endswith(QUESTION_MARKS)]
+    closer = asked[-1] if asked and GENERIC_CLOSER.search(asked[-1]) else ""
+    if asked and not closer:
+        return reply
+    if closer and not (_generic_closers_before(context) >= 1 or _bare_fragment(latest)):
+        return reply  # the first generic closer, after a real answer: allowed once
+    nxt = _next_question(context, reply)
+    if not nxt and not asked:
+        # no next-slot question left (or the chat is in another language): never end on a statement
+        nxt = _fresh_question(context, _language(context))
+    if not nxt:
+        return reply
+    kept = [x for x in sentences if x != closer]
+    return " ".join([*kept, nxt]).strip()
+
+
+def _one_question_last(reply: str, cap: int = WORD_CAP) -> str:
+    """One question, last, and within the word limit (R-VOICE-01, R-VOICE-02): keep the last
+    question at the end, drop the other questions, then drop trailing statements while the reply is
+    too long. A reply of several lines keeps its line breaks and its bullets (a summary): only the
+    questions are moved, never the points."""
+    if "\n" not in reply.strip():
+        sentences = [x for x in _sentences(reply) if x.strip()]
+        questions = [x for x in sentences if x.rstrip().endswith(QUESTION_MARKS)]
+        statements = [x for x in sentences if x not in questions]
+        closing = questions[-1:] if questions else []
+        while len(statements) > 1 and len(" ".join([*statements, *closing]).split()) > cap:
+            statements.pop()
+        return " ".join([*statements, *closing]).strip()
+    lines = _split_ends(reply.strip())
+    question = ""
+    body: list[str] = []
+    for is_bullet, line in lines:
+        if is_bullet:
+            body.append(line.replace("?", ".").replace("؟", "."))
+            continue
+        kept = []
+        for sentence in _sentences(line):
+            if sentence.rstrip().endswith(QUESTION_MARKS):
+                question = sentence
+            else:
+                kept.append(sentence)
+        if kept:
+            body.append(" ".join(kept))
+    bullets = sum(1 for is_bullet, _ in lines if is_bullet)
+    if bullets < 3 and "http" not in reply:
+        flat = [b for b in body if not b.lstrip().startswith(BULLET)]
+        while len(flat) > 1 and len(" ".join([*flat, question]).split()) > cap:
+            last = flat.pop()
+            body.remove(last)
+    return "\n".join([*body, question] if question else body).strip()

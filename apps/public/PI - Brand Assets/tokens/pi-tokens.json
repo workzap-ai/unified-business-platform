@@ -1,0 +1,25 @@
+{
+  "name": "pi",
+  "endorsement": "BY WORKZAP",
+  "color": {
+    "ink": "#15132B",
+    "violet": "#5A47F5",
+    "lilac": "#8E80FF",
+    "spark": "#FFB020",
+    "white": "#FFFFFF",
+    "violet-50": "#EEEBFE",
+    "violet-100": "#DAD5FC",
+    "body": "#3A3A52",
+    "grey": "#5F6075",
+    "line": "#E5E4F0",
+    "soft": "#F6F6FB"
+  },
+  "font": {
+    "wordmark": "Jost SemiBold 600, lowercase, tracking -0.02em (shipped as outlines)",
+    "interface": "Inter 400 / 500 / 600 / 800"
+  },
+  "rule": {
+    "spark": "fill only - never text on white (1.83:1)",
+    "violet-on-ink": "large only (3.15:1) - use lilac on dark"
+  }
+}

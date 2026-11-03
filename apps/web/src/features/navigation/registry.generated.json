@@ -1166,6 +1166,55 @@
     "visible": true
   },
   {
+    "analytics_id": "nav.pi.brain",
+    "any_permissions": [],
+    "badge": null,
+    "description": "",
+    "enabled": true,
+    "environment_scope": null,
+    "icon": "brain-circuit",
+    "key": "pi-brain",
+    "keywords": [],
+    "label": "Brain",
+    "parent": "pi",
+    "required_feature": null,
+    "required_permissions": [
+      "pi.settings.manage"
+    ],
+    "required_product": "pi",
+    "required_roles": [],
+    "route": "/pi/brain",
+    "section": "main",
+    "sort_order": 72,
+    "type": "page",
+    "visible": true
+  },
+  {
+    "analytics_id": "nav.pi.documents",
+    "any_permissions": [
+      "quotes.write",
+      "billing.read"
+    ],
+    "badge": null,
+    "description": "",
+    "enabled": true,
+    "environment_scope": null,
+    "icon": "file-text",
+    "key": "pi-documents",
+    "keywords": [],
+    "label": "Documents",
+    "parent": "pi",
+    "required_feature": null,
+    "required_permissions": [],
+    "required_product": "pi",
+    "required_roles": [],
+    "route": "/pi/documents",
+    "section": "main",
+    "sort_order": 68,
+    "type": "page",
+    "visible": true
+  },
+  {
     "analytics_id": "nav.pi.handoffs",
     "any_permissions": [
       "pi.handoffs.manage",
@@ -1334,6 +1383,30 @@
     "route": "/pi/requests",
     "section": "main",
     "sort_order": 65,
+    "type": "page",
+    "visible": true
+  },
+  {
+    "analytics_id": "nav.pi.review",
+    "any_permissions": [],
+    "badge": null,
+    "description": "",
+    "enabled": true,
+    "environment_scope": null,
+    "icon": "shield-check",
+    "key": "pi-review",
+    "keywords": [],
+    "label": "Review",
+    "parent": "pi",
+    "required_feature": null,
+    "required_permissions": [
+      "pi.handoffs.manage"
+    ],
+    "required_product": "pi",
+    "required_roles": [],
+    "route": "/pi/review",
+    "section": "main",
+    "sort_order": 61,
     "type": "page",
     "visible": true
   },

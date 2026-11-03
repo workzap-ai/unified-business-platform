@@ -18,7 +18,7 @@ from app.ai.models import AIUsageEvent
 from app.ai.providers.base import parse_retry_after
 from app.ai.providers.gemini import GeminiProvider, to_gemini_schema
 from app.ai.providers.openai import OpenAICompatibleProvider
-from app.ai.types import LLMRequest, Message, ToolCall
+from app.ai.types import LLMRequest, Message, OutputSchema, ToolCall
 from app.shared.scope import WorkspaceScope
 
 PNG = b"\x89PNG\r\n\x1a\n" + b"\x00" * 32
@@ -208,6 +208,10 @@ def test_gemini_error_classification():
 def test_openai_error_classification():
     o = OpenAICompatibleProvider("openai", httpx.AsyncClient(), "https://o.test", SecretStr("k"))
     assert o.classify(response(429, {"error": {"code": "insufficient_quota"}})).kind == "quota"
+    # prepaid balance gone: a quota (fail over and pause the provider), not a rate limit to retry
+    assert (
+        o.classify(response(429, {"error": {"code": "credit_balance_exhausted"}})).kind == "quota"
+    )
     assert o.classify(response(429, {})).kind == "rate_limit"
     assert o.classify(response(401, {})).kind == "auth"
     assert o.classify(response(400, {"error": {"code": "model_decommissioned"}})).kind == (
@@ -332,3 +336,47 @@ async def test_legacy_attempts_are_kept_on_failure(settings):
     with pytest.raises(AllProvidersFailed):
         await gateway.generate("System", "Customer")
     assert [a.provider for a in gateway.attempts] == ["openai", "gemini", "groq"]
+
+
+@pytest.mark.asyncio
+async def test_gemini_sends_a_schema_it_refuses_as_text_and_remembers_it():
+    # live 2026-10-26: pi's reply schema is "invalid argument" to Gemini; without it the same model
+    # answers valid JSON. The adapter retries once with the schema in the system instruction.
+    seen = []
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        body = json.loads(request.content)
+        seen.append(body)
+        if "responseSchema" in body.get("generationConfig", {}):
+            return httpx.Response(400, json={"error": {"status": "INVALID_ARGUMENT"}})
+        return httpx.Response(
+            200,
+            json={"candidates": [{"content": {"parts": [{"text": '{"ok": true}'}]}}]},
+        )
+
+    g = GeminiProvider(
+        httpx.AsyncClient(transport=httpx.MockTransport(handler)),
+        "https://g.test/v1beta",
+        SecretStr("k"),
+    )
+    schema = OutputSchema.of({"type": "object", "properties": {"ok": {"type": "boolean"}}})
+    request = LLMRequest(model="gemini-3.5-flash", messages=[Message.user("hi")], schema=schema)
+    first = await g.complete(request)
+    assert first.text == '{"ok": true}'
+    assert len(seen) == 2
+    assert "responseSchema" in seen[0]["generationConfig"]
+    assert "responseSchema" not in seen[1]["generationConfig"]
+    assert seen[1]["generationConfig"]["responseMimeType"] == "application/json"
+    assert "JSON schema" in seen[1]["systemInstruction"]["parts"][0]["text"]
+    await g.complete(request)  # remembered: no failing first try this time
+    assert len(seen) == 3 and "responseSchema" not in seen[2]["generationConfig"]
+    # an error that is not about the schema is still raised
+    bad = GeminiProvider(
+        httpx.AsyncClient(
+            transport=httpx.MockTransport(lambda r: httpx.Response(401, json={"error": {}}))
+        ),
+        "https://g.test/v1beta",
+        SecretStr("k"),
+    )
+    with pytest.raises(ProviderError):
+        await bad.complete(request)

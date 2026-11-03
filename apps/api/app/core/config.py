@@ -128,6 +128,10 @@ class Settings(BaseSettings):
     whatsapp_verify_token: SecretStr | None = None
     whatsapp_graph_base_url: str = "https://graph.facebook.com"
     whatsapp_graph_version: str = "v21.0"
+    # Workzap Connect (NORI): pi's one Workzap number asks NORI first. See pi_saas/nori_bridge.py.
+    nori_bridge_url: str = ""  # e.g. https://nori.workzap.ai/api/workzap/inbound
+    nori_bridge_secret: SecretStr | None = None
+    nori_bridge_phone_number_id: str = ""  # the Workzap number's Kapso/Meta phone number id
     media_max_bytes: int = Field(default=10 * 1024 * 1024, ge=1024, le=50 * 1024 * 1024)
     knowledge_upload_max_bytes: int = Field(default=1024 * 1024, ge=1024, le=10 * 1024 * 1024)
 

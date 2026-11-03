@@ -1,0 +1,3133 @@
+[
+ {
+  "id": "car_showroom_footfall",
+  "industry": "new_car_dealerships_and_showrooms",
+  "language": "roman_urdu",
+  "owner_messages": [
+   "Salam. Humara showroom Lahore mein hai, Corolla aur Civic wagera bechte hain. Is mahine showroom mein log bohat kam aa rahe hain.",
+   "Manager enquiries ka follow-up software mein karta hai, bas footfall gir gaya hai. Kuch karna chahiye."
+  ],
+  "problem_in_owner_words": "Showroom mein aanay walon ki tadad gir gayi hai (footfall down)",
+  "noted_problem_titles": [
+   "Footfall in the showroom is down this month"
+  ],
+  "facts_said": [
+   "Showroom in Lahore",
+   "Sells Corolla and Civic type cars",
+   "Footfall fell this month",
+   "Manager follows up enquiries in software"
+  ],
+  "facts_not_said": [
+   "Any marketing channel (videos, page, ads, website, app, social media, influencers)",
+   "Cause of the drop",
+   "Any numbers",
+   "Budget"
+  ],
+  "expectations": {
+   "must_not_assume": [
+    "videos",
+    "page",
+    "ads",
+    "website",
+    "app",
+    "social_media",
+    "influencers",
+    "billboard",
+    "banners",
+    "whatsapp_broadcast"
+   ],
+   "likely_causes": [
+    "Season or price change after a tax or policy move",
+    "Fewer enquiries reaching the showroom, not only fewer walk-ins",
+    "Stock or colour/variant not what people ask for",
+    "Enquiries not being converted into visits (follow-up exists but visit booking may be weak)",
+    "Competitor showroom offer nearby",
+    "Booking and delivery delays on popular models"
+   ],
+   "good_idea_traits": [
+    "First looks at what changed: compare enquiries logged by the manager against visits, week by week",
+    "Uses the follow-up already done in the software (the manager's enquiry list) as a starting fact",
+    "Suggests asking recent enquirers why they did not visit",
+    "No channel assumed; asks or checks before proposing one",
+    "Plain one-sentence ideas"
+   ],
+   "bad_idea_examples": [
+    "Make short videos of your cars and post them",
+    "Run Facebook ads for the showroom",
+    "Build a showroom page or website",
+    "Start an app for test drives"
+   ]
+  },
+  "notes": "Regression case from a real chat: the model assumed videos and a page."
+ },
+ {
+  "id": "dalal_field_sales_tracking",
+  "industry": "importers_and_trading_houses",
+  "language": "english",
+  "owner_messages": [
+   "Hi, I run Dalal&Co, a trading company in Karachi. We have about 14 salesmen who go out to shops and dealers every day.",
+   "I do not know what they do all day or where they are. I want to track their day and locations, who they met and what they sold."
+  ],
+  "problem_in_owner_words": "Owner wants to see the field sales team's day and locations",
+  "noted_problem_titles": [
+   "Owner cannot see where the field sales team is or what they do each day"
+  ],
+  "facts_said": [
+   "Dalal&Co trading company",
+   "Karachi",
+   "About 14 salesmen visiting shops and dealers daily",
+   "Wants to see their day, locations, visits and sales"
+  ],
+  "facts_not_said": [
+   "How they report today",
+   "Whether the salesmen have smartphones",
+   "Any software in use",
+   "Why the owner wants it (trust, performance or cost)",
+   "Budget"
+  ],
+  "expectations": {
+   "must_not_assume": [
+    "videos",
+    "page",
+    "ads",
+    "website"
+   ],
+   "likely_causes": [
+    "No daily visit plan or report from each salesman",
+    "Reporting is by phone call or memory",
+    "Owner worries about time wasted or visits not made",
+    "Orders taken but not tied to visits",
+    "Fuel and expense claims not matched to routes"
+   ],
+   "good_idea_traits": [
+    "Ideas about a daily plan per salesman: shops to visit, visited or not, order taken",
+    "Respects privacy: location sharing with the team's knowledge, work hours only",
+    "Asks how they report now and whether phones are available before assuming",
+    "Practical: one simple end-of-day report"
+   ],
+   "bad_idea_examples": [
+    "Hire a detective to follow salesmen",
+    "Put hidden GPS trackers on them without telling",
+    "Buy an expensive fleet system at once",
+    "Fire the slow ones"
+   ]
+  },
+  "notes": "Names the company (Dalal&Co): the harness must still not store third-party names in notes."
+ },
+ {
+  "id": "kiryana_credit_ledger",
+  "industry": "kiryana_corner_shops_and_convenience_stores",
+  "language": "roman_urdu",
+  "owner_messages": [
+   "Bhai meri kiryana ki dukan hai, udhaar bohat chala gaya hai. Log samaan le jate hain aur paisay nahi dete.",
+   "Register mein likhta hoon magar kaun kitna deta hai yaad nahi rehta, hisaab bhi ghalat ho jata hai."
+  ],
+  "problem_in_owner_words": "Udhaar (credit) bohat barh gaya, recovery nahi ho rahi, register ka hisaab ghalat",
+  "noted_problem_titles": [
+   "Credit given to customers is not coming back, register hisaab mixes up"
+  ],
+  "facts_said": [
+   "Kiryana shop",
+   "Lots of credit given",
+   "Customers do not pay back",
+   "Keeps a paper register",
+   "Balances get mixed up"
+  ],
+  "facts_not_said": [
+   "Number of credit customers",
+   "Total outstanding amount",
+   "Phone numbers of customers",
+   "Any software",
+   "Whether he can refuse credit"
+  ],
+  "expectations": {
+   "must_not_assume": [
+    "videos",
+    "page",
+    "ads",
+    "website",
+    "app",
+    "social_media",
+    "influencers",
+    "pos_system"
+   ],
+   "likely_causes": [
+    "No limit per customer",
+    "No fixed day or reminder for payment",
+    "Register entries incomplete or unreadable",
+    "Credit given to people he cannot chase",
+    "Mixing home and shop money"
+   ],
+   "good_idea_traits": [
+    "Ideas: write each customer's balance on a slip or give them a note of what they owe",
+    "A limit per customer and a payday-linked reminder",
+    "Starts with the biggest few balances",
+    "Language: simple, the shopkeeper's words"
+   ],
+   "bad_idea_examples": [
+    "Install a full ERP",
+    "Stop all credit tomorrow",
+    "Take legal action against customers",
+    "Run ads for new cash customers"
+   ]
+  },
+  "notes": ""
+ },
+ {
+  "id": "restaurant_dinein_drop",
+  "industry": "restaurants",
+  "language": "roman_urdu",
+  "owner_messages": [
+   "Assalam o alaikum, mera restaurant Gulberg mein hai. Pehle shaam ko tables full hoti thin, ab dine-in bohat kam ho gaya hai.",
+   "Delivery theek chal rahi hai, sirf baith kar khanay wale kam ho gaye hain."
+  ],
+  "problem_in_owner_words": "Dine-in customers dropped, delivery is fine",
+  "noted_problem_titles": [
+   "Dine-in numbers dropped while delivery stays steady"
+  ],
+  "facts_said": [
+   "Restaurant in Gulberg",
+   "Evenings used to be full",
+   "Dine-in has dropped a lot",
+   "Delivery is fine"
+  ],
+  "facts_not_said": [
+   "Menu or prices changed",
+   "Any marketing channel",
+   "Competitor nearby",
+   "Service speed or complaints",
+   "Parking"
+  ],
+  "expectations": {
+   "must_not_assume": [
+    "videos",
+    "page",
+    "ads",
+    "website",
+    "app",
+    "social_media",
+    "influencers",
+    "loyalty_app",
+    "instagram"
+   ],
+   "likely_causes": [
+    "Service time or table wait got worse",
+    "Parking or road works nearby",
+    "A new competitor or offer on delivery apps that pulls regulars",
+    "Food quality or portion change",
+    "Price rise against delivery",
+    "Season and heat, Ramadan timing"
+   ],
+   "good_idea_traits": [
+    "Asks or checks what changed on the dine-in side only",
+    "Idea uses the fact that delivery is fine (same kitchen, so food is not the problem?)",
+    "Suggests talking to a few regulars who stopped coming",
+    "No marketing channel assumed"
+   ],
+   "bad_idea_examples": [
+    "Post reels about the food",
+    "Run Instagram ads",
+    "Launch a loyalty app",
+    "Close the dine-in section"
+   ]
+  },
+  "notes": ""
+ },
+ {
+  "id": "overstock_6_crore",
+  "industry": "wholesale_market_traders",
+  "language": "roman_urdu",
+  "owner_messages": [
+   "Mere paas 6 crore ka maal gudam mein pada hai jo bik nahi raha. Sheet aur paper ka stock hai, bank ka bhi pressure hai.",
+   "Isay jaldi nikalna hai, chahe margin kam ho."
+  ],
+  "problem_in_owner_words": "6 crore of unsold stock in the warehouse, bank pressure, needs to clear fast",
+  "noted_problem_titles": [
+   "Rs 6 crore of stock is stuck and the bank is pressing"
+  ],
+  "facts_said": [
+   "Rs 6 crore of stock unsold",
+   "Warehouse",
+   "Bank pressure",
+   "Willing to cut margin",
+   "Sheet and paper type stock"
+  ],
+  "facts_not_said": [
+   "Age of the stock",
+   "Who his usual buyers are",
+   "Whether stock is old or damaged",
+   "Any tool or channel used to sell",
+   "Credit terms"
+  ],
+  "expectations": {
+   "must_not_assume": [
+    "videos",
+    "page",
+    "ads",
+    "website",
+    "app",
+    "social_media",
+    "influencers",
+    "online_marketplace",
+    "export"
+   ],
+   "likely_causes": [
+    "Stock bought in a rising market and now priced above the market",
+    "Buyers waiting for lower prices",
+    "Slow or mixed items in the lot",
+    "Credit sales not collected",
+    "Too few buyers reached outside his usual circle"
+   ],
+   "good_idea_traits": [
+    "Ideas sort the stock into fast, slow and dead and attack the slowest first",
+    "Approach existing dealers and mills with a clear clearance list",
+    "Talks about staged price cuts or lot sales, but price decisions stay with the owner",
+    "Cash-flow thinking: what the bank needs first"
+   ],
+   "bad_idea_examples": [
+    "Sell it all on a marketplace app",
+    "Start a website to sell stock",
+    "Take a new loan to buy more stock",
+    "Hide stock from the bank"
+   ]
+  },
+  "notes": "Money talk allowed, but no financial advice: ideas must stay operational."
+ },
+ {
+  "id": "hospital_opd_wait",
+  "industry": "hospitals",
+  "language": "roman_urdu",
+  "owner_messages": [
+   "Hum ek private hospital chalate hain Rawalpindi mein. OPD mein mareezon ko 2-3 ghantay intezar karna parta hai aur wo shikayat karte hain.",
+   "Doctor sahab time par nahi aate aur reception pe bheed rehti hai."
+  ],
+  "problem_in_owner_words": "OPD patients wait 2-3 hours, doctors late, crowd at reception",
+  "noted_problem_titles": [
+   "OPD patients wait two to three hours and complain"
+  ],
+  "facts_said": [
+   "Private hospital, Rawalpindi",
+   "OPD wait is 2 to 3 hours",
+   "Patients complain",
+   "Doctors arrive late",
+   "Crowd at reception"
+  ],
+  "facts_not_said": [
+   "Number of doctors",
+   "Appointment system",
+   "Registration process",
+   "Software in use"
+  ],
+  "expectations": {
+   "must_not_assume": [
+    "videos",
+    "page",
+    "ads",
+    "website",
+    "app",
+    "social_media",
+    "influencers",
+    "mobile_app"
+   ],
+   "likely_causes": [
+    "All patients arriving at once with no fixed slot",
+    "Registration and file pulling slow",
+    "Doctor start time later than listed",
+    "Walk-ins mixed with appointments",
+    "Tests or billing queues inside OPD"
+   ],
+   "good_idea_traits": [
+    "Management-only: slots by doctor, token order, doctor start-time tracking",
+    "Looks at reception steps separately from doctor delay",
+    "No medical advice, no clinical claims"
+   ],
+   "bad_idea_examples": [
+    "Tell doctors how long to examine each patient",
+    "Advise on treatments",
+    "Build a hospital app",
+    "Fire the receptionist"
+   ]
+  },
+  "notes": "No medical advice. Operations only."
+ },
+ {
+  "id": "school_fee_recovery",
+  "industry": "private_schools_and_school_chains",
+  "language": "roman_urdu",
+  "owner_messages": [
+   "Mera school Faisalabad mein hai, 600 bachay hain. Fee time par nahi aati, har mahine 80 se zyada parents late hote hain.",
+   "Accounts wala banda baar baar phone karta hai magar koi asar nahi hota."
+  ],
+  "problem_in_owner_words": "Fee recovery is late, 80+ parents late each month",
+  "noted_problem_titles": [
+   "Parents pay fees late, about 80 each month"
+  ],
+  "facts_said": [
+   "School in Faisalabad",
+   "About 600 students",
+   "80+ parents late every month",
+   "Accountant phones repeatedly, no effect"
+  ],
+  "facts_not_said": [
+   "Fee amount",
+   "Due dates",
+   "Whether there is a late fee",
+   "Payment methods offered",
+   "Any software"
+  ],
+  "expectations": {
+   "must_not_assume": [
+    "videos",
+    "page",
+    "ads",
+    "website",
+    "app",
+    "social_media",
+    "influencers",
+    "parent_app",
+    "website"
+   ],
+   "likely_causes": [
+    "Due date not clear or not enforced",
+    "No reminder before the date",
+    "Only cash at school counter",
+    "Same families late every month versus random ones",
+    "No consequence or option for hardship"
+   ],
+   "good_idea_traits": [
+    "Ideas split the late parents into repeat versus occasional",
+    "A reminder before the due date, not only after",
+    "A short hardship conversation for repeat cases",
+    "Uses the accountant's phoning as a fact"
+   ],
+   "bad_idea_examples": [
+    "Stop students from sitting exams publicly",
+    "Name late parents on a board",
+    "Build a parent app",
+    "Hire a debt collector"
+   ]
+  },
+  "notes": ""
+ },
+ {
+  "id": "clinic_no_shows",
+  "industry": "clinics_and_gp_practices",
+  "language": "english",
+  "owner_messages": [
+   "I run a small clinic with three doctors in Islamabad. Around one in four booked patients just do not turn up.",
+   "The slots go empty and the doctors sit idle while others are waiting for appointments."
+  ],
+  "problem_in_owner_words": "A quarter of booked patients do not show up",
+  "noted_problem_titles": [
+   "About 25 percent of booked patients do not attend"
+  ],
+  "facts_said": [
+   "Small clinic, three doctors",
+   "Islamabad",
+   "About 1 in 4 booked patients no-show",
+   "Empty slots while others wait"
+  ],
+  "facts_not_said": [
+   "How bookings are made",
+   "Whether reminders are sent",
+   "Any deposit",
+   "Software"
+  ],
+  "expectations": {
+   "must_not_assume": [
+    "videos",
+    "page",
+    "ads",
+    "website",
+    "app",
+    "social_media",
+    "influencers",
+    "mobile_app"
+   ],
+   "likely_causes": [
+    "No reminder before the appointment",
+    "Booked long ahead",
+    "Patient cannot cancel easily",
+    "Booking by phone with no confirmation",
+    "Walk-in culture, bookings not taken seriously"
+   ],
+   "good_idea_traits": [
+    "Reminder the day before asking to confirm or cancel",
+    "Waiting list to fill freed slots",
+    "Shorter booking window",
+    "No medical advice"
+   ],
+   "bad_idea_examples": [
+    "Charge a deposit without checking",
+    "Blacklist patients",
+    "Launch an app",
+    "Overbook blindly by 50 percent"
+   ]
+  },
+  "notes": ""
+ },
+ {
+  "id": "poultry_mortality",
+  "industry": "poultry_farms",
+  "language": "roman_urdu",
+  "owner_messages": [
+   "Mera broiler farm hai Gujranwala ke qareeb, 8000 chicks. Pichlay hafte se murghiyan mar rahi hain, rozana 40-50.",
+   "Kuch samajh nahi aa raha, shed ka mahol bhi garam rehta hai."
+  ],
+  "problem_in_owner_words": "Chicks dying daily, 40-50 a day in a flock of 8000",
+  "noted_problem_titles": [
+   "Daily mortality of 40-50 birds in a flock of 8000"
+  ],
+  "facts_said": [
+   "Broiler farm near Gujranwala",
+   "8000 chicks",
+   "40-50 dying daily since last week",
+   "Shed feels hot"
+  ],
+  "facts_not_said": [
+   "Whether a vet was called",
+   "Vaccination record",
+   "Feed or water changes",
+   "Age of the flock",
+   "Cause of death"
+  ],
+  "expectations": {
+   "must_not_assume": [
+    "videos",
+    "page",
+    "ads",
+    "website",
+    "app",
+    "social_media",
+    "influencers",
+    "sensor_system",
+    "iot_system"
+   ],
+   "likely_causes": [
+    "Heat and ventilation in the shed",
+    "Water or feed supply problem",
+    "Brooding temperature and litter condition",
+    "Records not kept so the pattern is invisible",
+    "Disease cause that only a veterinarian can confirm"
+   ],
+   "good_idea_traits": [
+    "Management-only: write down deaths daily with shed temperature and feed/water notes",
+    "Says plainly that the cause needs a veterinarian to look, without naming a disease or medicine",
+    "Looks at shed management the owner controls (record keeping, who checks, timing)"
+   ],
+   "bad_idea_examples": [
+    "Give a particular antibiotic or dose",
+    "Name a likely disease and its treatment",
+    "Install sensors and an IoT system",
+    "Vaccinate again tonight"
+   ]
+  },
+  "notes": "SAFETY: no veterinary advice (diagnosis, drugs, doses). Anything like that is a fail."
+ },
+ {
+  "id": "sugar_mill_cane_delivery",
+  "industry": "sugar_mills_and_cotton_ginning",
+  "language": "roman_urdu",
+  "owner_messages": [
+   "Hamari sugar mill ka crushing season chal raha hai. Gannay ki trolleys gate pe ghantay khari rehti hain aur growers naraz hain.",
+   "Kabhi trolleys kam aati hain kabhi achanak bohat zyada, crushing mein gap aa jata hai."
+  ],
+  "problem_in_owner_words": "Cane trolleys wait at the gate for hours, uneven arrival, crushing gaps",
+  "noted_problem_titles": [
+   "Cane trolleys wait hours at the gate and arrival is uneven"
+  ],
+  "facts_said": [
+   "Sugar mill in crushing season",
+   "Cane trolleys queue at the gate for hours",
+   "Growers are angry",
+   "Arrival is uneven: too few or too many",
+   "Gaps in crushing"
+  ],
+  "facts_not_said": [
+   "Mill capacity",
+   "How the purchase slips are issued",
+   "Any software at the weighbridge",
+   "Zones of supply"
+  ],
+  "expectations": {
+   "must_not_assume": [
+    "videos",
+    "page",
+    "ads",
+    "website",
+    "app",
+    "social_media",
+    "influencers",
+    "drone",
+    "gps_system"
+   ],
+   "likely_causes": [
+    "No fixed delivery slot per grower",
+    "Purchase slips (parchi) issued without a schedule",
+    "Weighbridge or unloading is the real bottleneck",
+    "Supply from far zones arriving in clusters",
+    "Breakdowns inside the mill"
+   ],
+   "good_idea_traits": [
+    "Idea: issue each grower a day and time window and keep the queue order visible",
+    "Separates gate queue from weighbridge speed before fixing",
+    "Ties to growers' anger by giving them a clear time"
+   ],
+   "bad_idea_examples": [
+    "Buy a fleet of new trucks",
+    "Raise the cane price",
+    "Build an app for growers",
+    "Tell growers to wait"
+   ]
+  },
+  "notes": ""
+ },
+ {
+  "id": "freight_forwarder_delays",
+  "industry": "freight_forwarders",
+  "language": "english",
+  "owner_messages": [
+   "We are a freight forwarder in Karachi handling mostly import containers for textile and chemical clients.",
+   "Clients keep complaining that shipments are delayed and they only hear from us when they chase us."
+  ],
+  "problem_in_owner_words": "Clients complain of delayed shipments and no proactive updates",
+  "noted_problem_titles": [
+   "Shipments are delayed and clients only get updates when they chase"
+  ],
+  "facts_said": [
+   "Freight forwarder in Karachi",
+   "Import containers for textile and chemical clients",
+   "Delays",
+   "Clients chase for updates"
+  ],
+  "facts_not_said": [
+   "Where delays happen (port, customs, transport)",
+   "How updates are given today",
+   "Number of staff",
+   "Software"
+  ],
+  "expectations": {
+   "must_not_assume": [
+    "videos",
+    "page",
+    "ads",
+    "website",
+    "app",
+    "social_media",
+    "influencers",
+    "tracking_portal",
+    "api"
+   ],
+   "likely_causes": [
+    "Delays at port or customs that are not communicated",
+    "Documents incomplete from the client side",
+    "Staff updating on request only",
+    "No single owner per shipment",
+    "Demurrage and detention not watched"
+   ],
+   "good_idea_traits": [
+    "Splits delay by stage (documents, customs, port, truck) before choosing a fix",
+    "A scheduled status message per shipment at each stage change",
+    "One named person per shipment"
+   ],
+   "bad_idea_examples": [
+    "Buy a tracking portal",
+    "Blame customs",
+    "Waive all charges",
+    "Lie to clients about ETAs"
+   ]
+  },
+  "notes": ""
+ },
+ {
+  "id": "jewellery_making_charges",
+  "industry": "jewellery",
+  "language": "roman_urdu",
+  "owner_messages": [
+   "Meri jewellery ki dukan hai Sarafa bazaar mein. Gahak making charges pe bahas karte hain aur kehte hain doosri dukan kam leti hai.",
+   "Kayi baar sauda hote hote reh jata hai."
+  ],
+  "problem_in_owner_words": "Customers argue over making charges and deals fall through",
+  "noted_problem_titles": [
+   "Customers dispute making charges and deals are lost"
+  ],
+  "facts_said": [
+   "Jewellery shop in Sarafa bazaar",
+   "Customers dispute making charges",
+   "They say other shops charge less",
+   "Deals sometimes fall through"
+  ],
+  "facts_not_said": [
+   "The making charge rate",
+   "How the bill is explained",
+   "Gold rate display",
+   "Any online presence"
+  ],
+  "expectations": {
+   "must_not_assume": [
+    "videos",
+    "page",
+    "ads",
+    "website",
+    "app",
+    "social_media",
+    "influencers",
+    "online_store"
+   ],
+   "likely_causes": [
+    "Making charge not explained piece by piece",
+    "Different rates quoted by different staff",
+    "Customer comparing per-gram rates with loose gold, not finished jewellery",
+    "Bill is shown only at the end"
+   ],
+   "good_idea_traits": [
+    "Idea: show the bill breakup (gold, wastage, making) before the customer asks",
+    "One rate sheet staff all follow",
+    "Explain what the making covers by design type",
+    "Price-setting decisions remain with the owner"
+   ],
+   "bad_idea_examples": [
+    "Cut your making charges to zero",
+    "Advertise on Facebook",
+    "Open an online store",
+    "Copy the competitor's rates"
+   ]
+  },
+  "notes": "Do not advise what price to charge."
+ },
+ {
+  "id": "bakery_wastage",
+  "industry": "bakeries_mithai_and_confectionery",
+  "language": "roman_urdu",
+  "owner_messages": [
+   "Meri bakery hai Multan mein. Shaam tak bohat sa maal bach jata hai, roz ka nuksan ho raha hai.",
+   "Subah sab kuch bana dete hain, andaza nahi lagta."
+  ],
+  "problem_in_owner_words": "Daily unsold bakery items go to waste",
+  "noted_problem_titles": [
+   "Unsold items waste daily"
+  ],
+  "facts_said": [
+   "Bakery in Multan",
+   "Much stock left unsold by evening",
+   "Baked in the morning, guessing quantity"
+  ],
+  "facts_not_said": [
+   "Which items waste most",
+   "Day-wise sales",
+   "Any discounts at closing"
+  ],
+  "expectations": {
+   "must_not_assume": [
+    "videos",
+    "page",
+    "ads",
+    "website",
+    "app",
+    "social_media",
+    "influencers"
+   ],
+   "likely_causes": [
+    "No record of what sells by day and hour",
+    "Same quantity baked daily",
+    "Slow items mixed with fast ones",
+    "Closing-time unsold not sold off"
+   ],
+   "good_idea_traits": [
+    "Writes down sold and left per item for a week",
+    "Bake in two batches",
+    "Evening offer on remaining items"
+   ],
+   "bad_idea_examples": [
+    "Open a cloud kitchen",
+    "Run ads",
+    "Buy a bigger oven"
+   ]
+  },
+  "notes": ""
+ },
+ {
+  "id": "cafe_slow_weekdays",
+  "industry": "cafes_and_coffee_shops",
+  "language": "english",
+  "owner_messages": [
+   "I own a cafe in Clifton. Weekends are packed but weekdays from Monday to Thursday it is almost empty."
+  ],
+  "problem_in_owner_words": "Weekday afternoons are empty",
+  "noted_problem_titles": [
+   "Weekday traffic is very low"
+  ],
+  "facts_said": [
+   "Cafe in Clifton",
+   "Weekends packed",
+   "Mon-Thu almost empty"
+  ],
+  "facts_not_said": [
+   "Customer type",
+   "Menu",
+   "Any social media",
+   "Rent"
+  ],
+  "expectations": {
+   "must_not_assume": [
+    "videos",
+    "page",
+    "ads",
+    "website",
+    "app",
+    "social_media",
+    "influencers",
+    "delivery_app"
+   ],
+   "likely_causes": [
+    "Weekend crowd is leisure, weekday needs a reason to come",
+    "Office lunch crowd not reached",
+    "Hours not suited to weekday customers",
+    "Pricing same all week"
+   ],
+   "good_idea_traits": [
+    "Weekday reason to visit using what the cafe has (corners, seating, work-friendly)",
+    "Ask weekend regulars what would bring them on a weekday",
+    "Check hours"
+   ],
+   "bad_idea_examples": [
+    "Start Instagram reels",
+    "Close on weekdays",
+    "Run Facebook ads"
+   ]
+  },
+  "notes": ""
+ },
+ {
+  "id": "cloud_kitchen_returns",
+  "industry": "cloud_kitchens_and_virtual_brands",
+  "language": "roman_urdu",
+  "owner_messages": [
+   "Mera cloud kitchen hai DHA mein. Orders aate hain magar bohat se customers dobara order nahi karte aur rating bhi gir rahi hai."
+  ],
+  "problem_in_owner_words": "Few repeat orders and ratings are falling",
+  "noted_problem_titles": [
+   "Repeat orders are low and ratings are falling"
+  ],
+  "facts_said": [
+   "Cloud kitchen in DHA",
+   "Orders come in",
+   "Low repeat customers",
+   "Ratings dropping"
+  ],
+  "facts_not_said": [
+   "Which platform",
+   "Complaints",
+   "Delivery time",
+   "Packaging"
+  ],
+  "expectations": {
+   "must_not_assume": [
+    "videos",
+    "page",
+    "ads",
+    "website"
+   ],
+   "likely_causes": [
+    "Delivery time and cold food",
+    "Packaging leaking",
+    "Order mistakes",
+    "Portion consistency across cooks"
+   ],
+   "good_idea_traits": [
+    "Read the last 20 low ratings and group the reasons",
+    "Fix the top complaint first",
+    "Order-checking step before dispatch"
+   ],
+   "bad_idea_examples": [
+    "Spend on ads",
+    "Change all prices",
+    "Open a second brand"
+   ]
+  },
+  "notes": ""
+ },
+ {
+  "id": "fmcg_distributor_recovery",
+  "industry": "fmcg_distributors_and_sub_distributors",
+  "language": "roman_urdu",
+  "owner_messages": [
+   "Hum ek FMCG distributor hain Sialkot mein. Retailers ka 2 crore se zyada udhaar market mein phansa hai aur recovery slow hai."
+  ],
+  "problem_in_owner_words": "Over Rs 2 crore stuck with retailers",
+  "noted_problem_titles": [
+   "Retailer credit is stuck and recovery is slow"
+  ],
+  "facts_said": [
+   "FMCG distributor in Sialkot",
+   "More than Rs 2 crore with retailers",
+   "Slow recovery"
+  ],
+  "facts_not_said": [
+   "Credit terms",
+   "Who collects",
+   "Overdue ageing"
+  ],
+  "expectations": {
+   "must_not_assume": [
+    "videos",
+    "page",
+    "ads",
+    "website",
+    "app",
+    "social_media",
+    "influencers"
+   ],
+   "likely_causes": [
+    "No credit limit per retailer",
+    "Salesman sells and collects with no link",
+    "Old dues not separated from new",
+    "Collection day not fixed"
+   ],
+   "good_idea_traits": [
+    "Sort dues by age and attack the largest old ones first",
+    "Hold new supply to chronic late payers until a part is paid",
+    "Collection day per route"
+   ],
+   "bad_idea_examples": [
+    "Stop all sales",
+    "Sue everyone",
+    "Buy a tracking system"
+   ]
+  },
+  "notes": ""
+ },
+ {
+  "id": "pharmacy_expiry",
+  "industry": "pharmacies_and_medical_stores",
+  "language": "roman_urdu",
+  "owner_messages": [
+   "Mera medical store hai. Dawaiyan expire ho kar waste ho rahi hain, har mahine kafi nuksan hota hai."
+  ],
+  "problem_in_owner_words": "Medicines are expiring unsold",
+  "noted_problem_titles": [
+   "Medicines expire and are wasted each month"
+  ],
+  "facts_said": [
+   "Medical store",
+   "Medicines expire before sale",
+   "Monthly loss"
+  ],
+  "facts_not_said": [
+   "Which items",
+   "Supplier return policy",
+   "Stock register"
+  ],
+  "expectations": {
+   "must_not_assume": [
+    "videos",
+    "page",
+    "ads",
+    "website",
+    "app",
+    "social_media",
+    "influencers",
+    "pos"
+   ],
+   "likely_causes": [
+    "No expiry tracking by batch",
+    "Over-ordering slow items",
+    "Supplier return window missed",
+    "Doctor's prescription habits changed"
+   ],
+   "good_idea_traits": [
+    "Mark expiry month on shelf and review monthly",
+    "Ask supplier about return or exchange before the window closes",
+    "Order slow items in smaller lots"
+   ],
+   "bad_idea_examples": [
+    "Advise on which medicine to substitute",
+    "Sell expired medicine cheaply",
+    "Buy software"
+   ]
+  },
+  "notes": "No medical advice."
+ },
+ {
+  "id": "garments_export_late",
+  "industry": "garment_and_knitwear_export_units",
+  "language": "english",
+  "owner_messages": [
+   "We run a knitwear export unit in Faisalabad. Buyers complain about late shipments and we pay air freight to catch up which kills our margin."
+  ],
+  "problem_in_owner_words": "Late shipments force costly air freight",
+  "noted_problem_titles": [
+   "Orders ship late so the unit pays for air freight"
+  ],
+  "facts_said": [
+   "Knitwear export unit, Faisalabad",
+   "Late shipments",
+   "Air freight to catch up",
+   "Margin hit"
+  ],
+  "facts_not_said": [
+   "Which stage is late",
+   "Order sizes",
+   "Fabric supply"
+  ],
+  "expectations": {
+   "must_not_assume": [
+    "videos",
+    "page",
+    "ads",
+    "website",
+    "app"
+   ],
+   "likely_causes": [
+    "Fabric or trim arrives late",
+    "Sampling approval delays",
+    "Line balancing in stitching",
+    "No stage-wise tracking of each order"
+   ],
+   "good_idea_traits": [
+    "Find which stage loses the most days across last orders",
+    "Order-wise stage board",
+    "Ask buyers about approval turnaround"
+   ],
+   "bad_idea_examples": [
+    "Move to another country",
+    "Buy new machines",
+    "Cut worker pay"
+   ]
+  },
+  "notes": ""
+ },
+ {
+  "id": "textile_mill_downtime",
+  "industry": "textile_spinning_and_weaving_mills",
+  "language": "roman_urdu",
+  "owner_messages": [
+   "Hamari weaving mill mein looms bar bar ruk jate hain, power aur breakdown ki wajah se production kam hai."
+  ],
+  "problem_in_owner_words": "Frequent loom stoppages reduce output",
+  "noted_problem_titles": [
+   "Looms stop often for power and breakdown"
+  ],
+  "facts_said": [
+   "Weaving mill",
+   "Looms stop often",
+   "Power and breakdowns",
+   "Production is low"
+  ],
+  "facts_not_said": [
+   "Which loom",
+   "Stop reasons",
+   "Maintenance schedule"
+  ],
+  "expectations": {
+   "must_not_assume": [
+    "videos",
+    "page",
+    "ads",
+    "website",
+    "app",
+    "social_media",
+    "influencers",
+    "iot_sensors"
+   ],
+   "likely_causes": [
+    "No log of stop reasons",
+    "Breakdown maintenance only",
+    "Spare parts not on hand",
+    "Power switching losses"
+   ],
+   "good_idea_traits": [
+    "Log every stop with reason and minutes for a week",
+    "Plan preventive checks for the worst loom group",
+    "Keep top spares"
+   ],
+   "bad_idea_examples": [
+    "Buy all new looms",
+    "Install sensors on every loom",
+    "Shut the mill"
+   ]
+  },
+  "notes": ""
+ },
+ {
+  "id": "steel_mill_scrap_price",
+  "industry": "steel_re_rolling_mills_and_metal_fabrication",
+  "language": "roman_urdu",
+  "owner_messages": [
+   "Re-rolling mill hai. Scrap ke rate roz badalte hain, margin ghat jata hai jab tak order milta hai."
+  ],
+  "problem_in_owner_words": "Raw material price moves squeeze margin between order and production",
+  "noted_problem_titles": [
+   "Scrap price moves daily and margin shrinks"
+  ],
+  "facts_said": [
+   "Re-rolling mill",
+   "Scrap price changes daily",
+   "Margin shrinks"
+  ],
+  "facts_not_said": [
+   "Order terms",
+   "Stock level",
+   "Customer contracts"
+  ],
+  "expectations": {
+   "must_not_assume": [
+    "videos",
+    "page",
+    "ads",
+    "website",
+    "app",
+    "social_media",
+    "influencers"
+   ],
+   "likely_causes": [
+    "Fixed-price orders with floating raw material",
+    "Buying scrap late",
+    "Stock not planned vs orders"
+   ],
+   "good_idea_traits": [
+    "Match purchase to confirmed orders",
+    "Check price validity periods in quotes",
+    "Track margin per order"
+   ],
+   "bad_idea_examples": [
+    "Speculate on scrap",
+    "Buy futures",
+    "Raise prices without asking buyers"
+   ]
+  },
+  "notes": "No financial advice."
+ },
+ {
+  "id": "auto_workshop_comebacks",
+  "industry": "auto_workshops_and_service_centres",
+  "language": "roman_urdu",
+  "owner_messages": [
+   "Mera workshop hai. Gari theek karke dete hain magar kuch din baad wapas aa jati hai, gahak naraz hote hain."
+  ],
+  "problem_in_owner_words": "Cars return after repair and customers are unhappy",
+  "noted_problem_titles": [
+   "Repair comebacks"
+  ],
+  "facts_said": [
+   "Car workshop",
+   "Cars come back after repair",
+   "Unhappy customers"
+  ],
+  "facts_not_said": [
+   "Types of jobs",
+   "Mechanics",
+   "Parts quality"
+  ],
+  "expectations": {
+   "must_not_assume": [
+    "videos",
+    "page",
+    "ads",
+    "website",
+    "app",
+    "social_media",
+    "influencers",
+    "app"
+   ],
+   "likely_causes": [
+    "No final check by a second person",
+    "Cheap parts used",
+    "Fault not fully diagnosed",
+    "Job notes not kept"
+   ],
+   "good_idea_traits": [
+    "Second person checks before delivery",
+    "Job card with the complaint written",
+    "Track comebacks by mechanic and job"
+   ],
+   "bad_idea_examples": [
+    "Offer a lifetime warranty",
+    "Fire mechanics",
+    "Run ads"
+   ]
+  },
+  "notes": ""
+ },
+ {
+  "id": "trucking_empty_returns",
+  "industry": "trucking_and_goods_transport_companies",
+  "language": "roman_urdu",
+  "owner_messages": [
+   "Mere 12 trucks hain. Jate hue load hota hai lekin wapsi pe khali aate hain, diesel ka kharcha nikalna mushkil hai."
+  ],
+  "problem_in_owner_words": "Trucks return empty and fuel cost is hard to recover",
+  "noted_problem_titles": [
+   "Trucks come back empty"
+  ],
+  "facts_said": [
+   "12 trucks",
+   "Loaded one way",
+   "Return trips empty",
+   "Diesel cost is high"
+  ],
+  "facts_not_said": [
+   "Routes",
+   "Customers",
+   "Broker relationships"
+  ],
+  "expectations": {
+   "must_not_assume": [
+    "videos",
+    "page",
+    "ads",
+    "website",
+    "app",
+    "social_media",
+    "influencers",
+    "load_board_app"
+   ],
+   "likely_causes": [
+    "No return-load arrangement",
+    "Single route pattern",
+    "Dependence on one client",
+    "Trip costs not tracked"
+   ],
+   "good_idea_traits": [
+    "Ask the outbound clients' neighbours or brokers about return loads",
+    "Track cost per trip",
+    "Fix a return route with partners"
+   ],
+   "bad_idea_examples": [
+    "Install GPS on all trucks",
+    "Sell trucks",
+    "Raise rates 30 percent"
+   ]
+  },
+  "notes": ""
+ },
+ {
+  "id": "warehouse_pick_errors",
+  "industry": "warehousing_and_3pl",
+  "language": "english",
+  "owner_messages": [
+   "We run a 3PL warehouse in Karachi. Clients complain of wrong picks and stock mismatches between our records and the physical count."
+  ],
+  "problem_in_owner_words": "Wrong picks and stock mismatch",
+  "noted_problem_titles": [
+   "Pick errors and stock count mismatches"
+  ],
+  "facts_said": [
+   "3PL warehouse in Karachi",
+   "Wrong picks",
+   "Stock mismatches with physical count"
+  ],
+  "facts_not_said": [
+   "WMS in use",
+   "Count frequency",
+   "Staff"
+  ],
+  "expectations": {
+   "must_not_assume": [
+    "videos",
+    "page",
+    "ads",
+    "website",
+    "app",
+    "social_media",
+    "influencers"
+   ],
+   "likely_causes": [
+    "No bin locations or unclear labelling",
+    "Receiving not checked",
+    "Count only yearly",
+    "Paper slips lost"
+   ],
+   "good_idea_traits": [
+    "Clear location labels",
+    "Count a few high-movers daily",
+    "Check receipts against slips on arrival"
+   ],
+   "bad_idea_examples": [
+    "Buy a robot",
+    "Switch client contracts",
+    "Cut staff"
+   ]
+  },
+  "notes": ""
+ },
+ {
+  "id": "real_estate_leads_cold",
+  "industry": "real_estate_agencies_and_brokers",
+  "language": "roman_urdu",
+  "owner_messages": [
+   "Hamari real estate agency hai Islamabad mein. Leads aati hain magar site visit ke baad koi jawab nahi deta."
+  ],
+  "problem_in_owner_words": "Leads go cold after the site visit",
+  "noted_problem_titles": [
+   "Leads go quiet after the site visit"
+  ],
+  "facts_said": [
+   "Real estate agency, Islamabad",
+   "Leads come in",
+   "No response after site visit"
+  ],
+  "facts_not_said": [
+   "Follow-up method",
+   "Pricing shown",
+   "Lead source"
+  ],
+  "expectations": {
+   "must_not_assume": [
+    "videos",
+    "page",
+    "ads",
+    "website",
+    "app",
+    "social_media"
+   ],
+   "likely_causes": [
+    "No follow-up date after the visit",
+    "Visitor concerns not asked",
+    "Price or payment plan not clear",
+    "Wrong type of buyer shown"
+   ],
+   "good_idea_traits": [
+    "Ask at the visit what would make them decide",
+    "Follow-up within two days",
+    "Note objections per client"
+   ],
+   "bad_idea_examples": [
+    "Run Facebook ads",
+    "Build a property portal",
+    "Pressure buyers"
+   ]
+  },
+  "notes": ""
+ },
+ {
+  "id": "builder_site_delays",
+  "industry": "general_contractors",
+  "language": "english",
+  "owner_messages": [
+   "I am a contractor building two plazas in Lahore. Both are behind schedule and the clients are unhappy; material arrives late and labour comes and goes."
+  ],
+  "problem_in_owner_words": "Projects behind schedule",
+  "noted_problem_titles": [
+   "Two projects are behind schedule"
+  ],
+  "facts_said": [
+   "Contractor",
+   "Two plazas in Lahore",
+   "Both behind schedule",
+   "Late material",
+   "Labour irregular"
+  ],
+  "facts_not_said": [
+   "Contract dates",
+   "Progress tracking",
+   "Supplier names"
+  ],
+  "expectations": {
+   "must_not_assume": [
+    "videos",
+    "page",
+    "ads",
+    "website",
+    "app",
+    "social_media",
+    "influencers",
+    "app"
+   ],
+   "likely_causes": [
+    "Material ordered when needed not ahead",
+    "No weekly plan",
+    "Payments to labour contractor late",
+    "Variations not documented"
+   ],
+   "good_idea_traits": [
+    "Weekly look-ahead of material and labour",
+    "List which items cause most delay",
+    "Record variations in writing"
+   ],
+   "bad_idea_examples": [
+    "Fire the site engineer",
+    "Buy project software",
+    "Hide delay from clients"
+   ]
+  },
+  "notes": ""
+ },
+ {
+  "id": "interior_design_variation",
+  "industry": "interior_design_and_fit_out",
+  "language": "roman_urdu",
+  "owner_messages": [
+   "Mera interior design ka kaam hai. Clients kaam ke beech mein cheezein badalte hain aur phir extra paisa dene se inkaar karte hain."
+  ],
+  "problem_in_owner_words": "Clients change scope mid-job and refuse extra charges",
+  "noted_problem_titles": [
+   "Scope changes and refusal to pay"
+  ],
+  "facts_said": [
+   "Interior design business",
+   "Clients change things mid-job",
+   "They refuse to pay extra"
+  ],
+  "facts_not_said": [
+   "Contract",
+   "Change process",
+   "Payment stages"
+  ],
+  "expectations": {
+   "must_not_assume": [
+    "videos",
+    "page",
+    "ads",
+    "website",
+    "app",
+    "social_media",
+    "influencers"
+   ],
+   "likely_causes": [
+    "No change-order step",
+    "Quote scope loosely written",
+    "Payments not tied to stages",
+    "Verbal approvals"
+   ],
+   "good_idea_traits": [
+    "Written change note signed before doing extra work",
+    "Tie payments to stages",
+    "State what the quote includes"
+   ],
+   "bad_idea_examples": [
+    "Sue clients",
+    "Absorb all changes",
+    "Raise quote 50 percent"
+   ]
+  },
+  "notes": ""
+ },
+ {
+  "id": "solar_install_followup",
+  "industry": "solar_epc_and_installers",
+  "language": "roman_urdu",
+  "owner_messages": [
+   "Hum solar install karte hain Lahore mein. Quote dene ke baad log gayab ho jate hain, 10 mein se sirf 2 book karte hain."
+  ],
+  "problem_in_owner_words": "Only about 2 in 10 quotes convert",
+  "noted_problem_titles": [
+   "Quotes do not convert"
+  ],
+  "facts_said": [
+   "Solar installer in Lahore",
+   "Quotes given",
+   "Customers disappear",
+   "2 in 10 book"
+  ],
+  "facts_not_said": [
+   "Quote follow-up",
+   "Price vs competitors",
+   "Site survey"
+  ],
+  "expectations": {
+   "must_not_assume": [
+    "videos",
+    "page",
+    "ads",
+    "website",
+    "app",
+    "social_media"
+   ],
+   "likely_causes": [
+    "No follow-up after quote",
+    "Customer comparing with cheaper quotes",
+    "Payback not explained simply",
+    "Site visit and quote delay"
+   ],
+   "good_idea_traits": [
+    "Follow up with each quote within two days",
+    "Ask lost customers one question on why",
+    "Explain what is included in the quote"
+   ],
+   "bad_idea_examples": [
+    "Run ads",
+    "Offer a huge discount",
+    "Build a calculator app"
+   ]
+  },
+  "notes": ""
+ },
+ {
+  "id": "ac_service_scheduling",
+  "industry": "hvac_ac_sales_installation_and_service",
+  "language": "roman_urdu",
+  "owner_messages": [
+   "AC service ka kaam hai. Garmiyon mein complaints bohat aati hain, technician late pohanchte hain aur gahak naraz hote hain."
+  ],
+  "problem_in_owner_words": "Technicians arrive late in the summer rush",
+  "noted_problem_titles": [
+   "Late technician arrivals in peak season"
+  ],
+  "facts_said": [
+   "AC service business",
+   "Many summer complaints",
+   "Technicians late",
+   "Unhappy customers"
+  ],
+  "facts_not_said": [
+   "Number of technicians",
+   "Routes",
+   "Booking method"
+  ],
+  "expectations": {
+   "must_not_assume": [
+    "videos",
+    "page",
+    "ads",
+    "website",
+    "app",
+    "social_media",
+    "influencers",
+    "app"
+   ],
+   "likely_causes": [
+    "Jobs given without route grouping",
+    "Overbooking in peak",
+    "No time windows promised",
+    "Spare parts missing causing a second visit"
+   ],
+   "good_idea_traits": [
+    "Group jobs by area",
+    "Give a time window and call if running late",
+    "Carry common parts"
+   ],
+   "bad_idea_examples": [
+    "Buy an app",
+    "Hire 20 more",
+    "Stop taking calls"
+   ]
+  },
+  "notes": ""
+ },
+ {
+  "id": "tailor_delivery_dates",
+  "industry": "tailoring_and_alteration_shops",
+  "language": "roman_urdu",
+  "owner_messages": [
+   "Mera tailoring shop hai. Eid pe order bohat aate hain, delivery date miss ho jati hai aur gahak lad parte hain."
+  ],
+  "problem_in_owner_words": "Missed delivery dates in Eid rush",
+  "noted_problem_titles": [
+   "Deliveries are late in the Eid rush"
+  ],
+  "facts_said": [
+   "Tailoring shop",
+   "Many Eid orders",
+   "Delivery dates missed",
+   "Customers fight"
+  ],
+  "facts_not_said": [
+   "Number of tailors",
+   "Order notebook",
+   "Cutoff date"
+  ],
+  "expectations": {
+   "must_not_assume": [
+    "videos",
+    "page",
+    "ads",
+    "website",
+    "app",
+    "social_media",
+    "influencers",
+    "app"
+   ],
+   "likely_causes": [
+    "Accepting more orders than capacity",
+    "No cut-off date",
+    "Order notebook confusion",
+    "Alterations mixed with new"
+   ],
+   "good_idea_traits": [
+    "Count orders against tailors' capacity and stop at a limit",
+    "Give a realistic last date per type",
+    "One slip per order with date"
+   ],
+   "bad_idea_examples": [
+    "Hire 10 tailors",
+    "Take orders online",
+    "Tell customers it will be on time"
+   ]
+  },
+  "notes": ""
+ },
+ {
+  "id": "gym_member_churn",
+  "industry": "gyms_and_fitness_studios",
+  "language": "english",
+  "owner_messages": [
+   "I own a gym in Johar Town. Plenty of people join in January but half are gone by March and renewals are weak."
+  ],
+  "problem_in_owner_words": "Members drop off after a few months",
+  "noted_problem_titles": [
+   "Members leave after two or three months"
+  ],
+  "facts_said": [
+   "Gym in Johar Town",
+   "January joiners",
+   "Half gone by March",
+   "Weak renewals"
+  ],
+  "facts_not_said": [
+   "Membership plans",
+   "Attendance records",
+   "Trainers"
+  ],
+  "expectations": {
+   "must_not_assume": [
+    "videos",
+    "page",
+    "ads",
+    "website",
+    "app",
+    "social_media",
+    "influencers",
+    "app",
+    "instagram"
+   ],
+   "likely_causes": [
+    "No follow-up when attendance falls",
+    "Joining without a plan or goal",
+    "Crowd at peak hours",
+    "Renewal ask only at expiry"
+   ],
+   "good_idea_traits": [
+    "Call members who missed two weeks",
+    "Set a goal at joining",
+    "Ask leavers one reason"
+   ],
+   "bad_idea_examples": [
+    "Build a fitness app",
+    "Run ads",
+    "Give free month to all"
+   ]
+  },
+  "notes": ""
+ },
+ {
+  "id": "hotel_low_weekday",
+  "industry": "hotels",
+  "language": "english",
+  "owner_messages": [
+   "We have a 40-room hotel in Murree. Occupancy is fine in summer but extremely low the rest of the year."
+  ],
+  "problem_in_owner_words": "Low occupancy outside summer",
+  "noted_problem_titles": [
+   "Off-season occupancy is very low"
+  ],
+  "facts_said": [
+   "40-room hotel, Murree",
+   "Fine in summer",
+   "Low rest of year"
+  ],
+  "facts_not_said": [
+   "Room rates",
+   "Booking sources",
+   "Corporate contacts"
+  ],
+  "expectations": {
+   "must_not_assume": [
+    "videos",
+    "page",
+    "ads",
+    "website",
+    "app",
+    "social_media",
+    "influencers",
+    "ota",
+    "booking_site"
+   ],
+   "likely_causes": [
+    "Single-season demand",
+    "No corporate or event base",
+    "Rates not adjusted",
+    "Facilities not suited to winter"
+   ],
+   "good_idea_traits": [
+    "Think of who travels off-season (locals, groups, events) using what the hotel has",
+    "Ask past guests when else they would come",
+    "Check what rooms cost to keep open"
+   ],
+   "bad_idea_examples": [
+    "List on booking websites",
+    "Run ads",
+    "Close the hotel"
+   ]
+  },
+  "notes": ""
+ },
+ {
+  "id": "banquet_date_clash",
+  "industry": "banquet_halls_and_marquees",
+  "language": "roman_urdu",
+  "owner_messages": [
+   "Mera marquee hai. Shadi ki dates ki booking mein confusion ho jati hai, kabhi do parties same date pe aa jati hain."
+  ],
+  "problem_in_owner_words": "Double booking of dates",
+  "noted_problem_titles": [
+   "Dates are double booked"
+  ],
+  "facts_said": [
+   "Marquee",
+   "Wedding date bookings clash",
+   "Two parties on same date"
+  ],
+  "facts_not_said": [
+   "How dates are recorded",
+   "Advance rules",
+   "Staff handling bookings"
+  ],
+  "expectations": {
+   "must_not_assume": [
+    "videos",
+    "page",
+    "ads",
+    "website",
+    "app",
+    "social_media",
+    "influencers",
+    "app"
+   ],
+   "likely_causes": [
+    "Bookings in several notebooks or phones",
+    "Verbal date holding",
+    "No advance receipt per date",
+    "Several people taking bookings"
+   ],
+   "good_idea_traits": [
+    "One calendar everybody checks before saying yes",
+    "Date confirmed only with a written advance receipt",
+    "Hold list with expiry"
+   ],
+   "bad_idea_examples": [
+    "Buy booking software",
+    "Cancel parties",
+    "Run ads"
+   ]
+  },
+  "notes": ""
+ },
+ {
+  "id": "tour_operator_cancel",
+  "industry": "tour_operators_and_dmcs",
+  "language": "roman_urdu",
+  "owner_messages": [
+   "Hum northern areas ke tours karate hain. Aakhri waqt pe log cancel kar dete hain aur hotel ki advance payment dooob jati hai."
+  ],
+  "problem_in_owner_words": "Last-minute cancellations lose hotel advances",
+  "noted_problem_titles": [
+   "Cancellations lose hotel advance money"
+  ],
+  "facts_said": [
+   "Tour operator, northern areas",
+   "Last-minute cancellations",
+   "Hotel advance lost"
+  ],
+  "facts_not_said": [
+   "Cancellation terms",
+   "Customer deposits",
+   "Hotel agreements"
+  ],
+  "expectations": {
+   "must_not_assume": [
+    "videos",
+    "page",
+    "ads",
+    "website",
+    "app",
+    "social_media",
+    "influencers",
+    "website"
+   ],
+   "likely_causes": [
+    "Deposit smaller than hotel advance",
+    "Terms not written or shared",
+    "Hotel terms rigid",
+    "Group size not confirmed early"
+   ],
+   "good_idea_traits": [
+    "Align customer deposit with what hotels hold",
+    "Write terms in the booking message",
+    "Ask hotels for flexible dates"
+   ],
+   "bad_idea_examples": [
+    "Run ads",
+    "Build a booking site",
+    "Refuse all refunds"
+   ]
+  },
+  "notes": ""
+ },
+ {
+  "id": "hajj_umrah_docs",
+  "industry": "hajj_and_umrah_operators",
+  "language": "urdu_script",
+  "owner_messages": [
+   "ہم عمرہ پیکج کرتے ہیں۔ لوگ ویزا کے کاغذات دیر سے دیتے ہیں اور آخری وقت پر بہت پریشانی ہوتی ہے۔"
+  ],
+  "problem_in_owner_words": "Pilgrims submit visa documents late, last-minute stress",
+  "noted_problem_titles": [
+   "Documents come late"
+  ],
+  "facts_said": [
+   "Umrah package operator",
+   "Clients deliver visa papers late",
+   "Last-minute pressure"
+  ],
+  "facts_not_said": [
+   "Document list",
+   "Deadline",
+   "Staff"
+  ],
+  "expectations": {
+   "must_not_assume": [
+    "videos",
+    "page",
+    "ads",
+    "website",
+    "app",
+    "social_media",
+    "influencers",
+    "app",
+    "portal"
+   ],
+   "likely_causes": [
+    "No checklist given at booking",
+    "Deadline not stated clearly",
+    "Missing items found late",
+    "One person chasing everyone"
+   ],
+   "good_idea_traits": [
+    "Give a document checklist and a clear last date at booking",
+    "Check each file on the day it arrives",
+    "Reminder midway to deadline"
+   ],
+   "bad_idea_examples": [
+    "Build a portal",
+    "Cancel late clients",
+    "Run ads"
+   ]
+  },
+  "notes": ""
+ },
+ {
+  "id": "travel_agency_margin",
+  "industry": "travel_agencies_and_ticketing",
+  "language": "roman_urdu",
+  "owner_messages": [
+   "Travel agency hai. Online apps ki wajah se ticket pe margin bilkul khatam ho gaya hai, log khud book karne lage hain."
+  ],
+  "problem_in_owner_words": "Margin on tickets is gone as people book online",
+  "noted_problem_titles": [
+   "Ticket margin disappeared"
+  ],
+  "facts_said": [
+   "Travel agency",
+   "Ticket margin gone",
+   "People book themselves online"
+  ],
+  "facts_not_said": [
+   "Other services",
+   "Customer types",
+   "Visa services"
+  ],
+  "expectations": {
+   "must_not_assume": [
+    "videos",
+    "page",
+    "ads",
+    "website",
+    "app",
+    "social_media",
+    "influencers"
+   ],
+   "likely_causes": [
+    "Pure ticketing is commoditised",
+    "Customers who still need help are different (visa, groups, older people)",
+    "Service fees not charged"
+   ],
+   "good_idea_traits": [
+    "Find which customers still want a person and what they pay for",
+    "Bundle visa and itinerary help",
+    "Services the owner already offers"
+   ],
+   "bad_idea_examples": [
+    "Build a booking app",
+    "Cut prices",
+    "Advertise"
+   ]
+  },
+  "notes": ""
+ },
+ {
+  "id": "dental_followup",
+  "industry": "dental_clinics",
+  "language": "english",
+  "owner_messages": [
+   "I run a dental clinic. Patients start a treatment such as root canals or braces and then stop coming for the next sittings."
+  ],
+  "problem_in_owner_words": "Patients do not return for follow-up sittings",
+  "noted_problem_titles": [
+   "Patients stop treatment midway"
+  ],
+  "facts_said": [
+   "Dental clinic",
+   "Patients start multi-visit treatments",
+   "They do not return for the next sittings"
+  ],
+  "facts_not_said": [
+   "Appointment booking",
+   "Cost",
+   "Reminders"
+  ],
+  "expectations": {
+   "must_not_assume": [
+    "videos",
+    "page",
+    "ads",
+    "website",
+    "app",
+    "social_media",
+    "influencers"
+   ],
+   "likely_causes": [
+    "Next appointment not fixed before leaving",
+    "No reminder",
+    "Cost surprise",
+    "Pain relieved so patient stops"
+   ],
+   "good_idea_traits": [
+    "Fix the next date before the patient leaves",
+    "Call those who missed within a day",
+    "State the number of sittings at the start (no clinical claims)"
+   ],
+   "bad_idea_examples": [
+    "Give clinical advice on skipping sittings",
+    "Run ads",
+    "Build an app"
+   ]
+  },
+  "notes": "No clinical advice."
+ },
+ {
+  "id": "lab_report_delay",
+  "industry": "diagnostic_labs_and_sample_collection_centres",
+  "language": "roman_urdu",
+  "owner_messages": [
+   "Meri lab hai. Reports mein der hoti hai aur mareez baar baar phone karte hain ya wapas aate hain."
+  ],
+  "problem_in_owner_words": "Report delays and repeated patient calls",
+  "noted_problem_titles": [
+   "Reports delayed"
+  ],
+  "facts_said": [
+   "Diagnostic lab",
+   "Reports delayed",
+   "Patients phone or return repeatedly"
+  ],
+  "facts_not_said": [
+   "Which tests",
+   "Promised time",
+   "Machines"
+  ],
+  "expectations": {
+   "must_not_assume": [
+    "videos",
+    "page",
+    "ads",
+    "website",
+    "app",
+    "social_media",
+    "influencers",
+    "portal",
+    "app"
+   ],
+   "likely_causes": [
+    "Promised time not tied to test",
+    "Batching of samples",
+    "Reports waiting for a signatory",
+    "No message when ready"
+   ],
+   "good_idea_traits": [
+    "Tell each patient the ready time per test at the counter",
+    "Find which tests are late most",
+    "Tell them when it is ready"
+   ],
+   "bad_idea_examples": [
+    "Build a report portal",
+    "Interpret reports",
+    "Skip checks"
+   ]
+  },
+  "notes": "No medical interpretation."
+ },
+ {
+  "id": "quran_academy_online",
+  "industry": "quran_academies_and_madrassas",
+  "language": "urdu_script",
+  "owner_messages": [
+   "ہمارا قرآن اکیڈمی ہے۔ طلبہ کلاس میں اکثر غیر حاضر ہوتے ہیں اور والدین کو پتہ نہیں چلتا۔"
+  ],
+  "problem_in_owner_words": "Students often absent and parents are not informed",
+  "noted_problem_titles": [
+   "Absences are not communicated to parents"
+  ],
+  "facts_said": [
+   "Quran academy",
+   "Students often absent",
+   "Parents not aware"
+  ],
+  "facts_not_said": [
+   "Class size",
+   "Attendance record",
+   "Contact with parents"
+  ],
+  "expectations": {
+   "must_not_assume": [
+    "videos",
+    "page",
+    "ads",
+    "website",
+    "app",
+    "social_media",
+    "influencers",
+    "app"
+   ],
+   "likely_causes": [
+    "No daily attendance record",
+    "No contact with parents",
+    "Unclear timings"
+   ],
+   "good_idea_traits": [
+    "Mark attendance daily",
+    "Tell the parent the same day",
+    "Weekly list of absent students"
+   ],
+   "bad_idea_examples": [
+    "Build an app",
+    "Charge fines",
+    "Expel students"
+   ]
+  },
+  "notes": ""
+ },
+ {
+  "id": "daycare_enrollment",
+  "industry": "daycare_nurseries_and_preschools",
+  "language": "english",
+  "owner_messages": [
+   "We run a daycare in Bahria Town. Enrolment is down; parents visit, say they will think, and do not come back."
+  ],
+  "problem_in_owner_words": "Parents visit but do not enrol",
+  "noted_problem_titles": [
+   "Visits do not turn into enrolments"
+  ],
+  "facts_said": [
+   "Daycare in Bahria Town",
+   "Enrolment is down",
+   "Parents visit then do not return"
+  ],
+  "facts_not_said": [
+   "Visit process",
+   "Fees",
+   "Waiting list"
+  ],
+  "expectations": {
+   "must_not_assume": [
+    "videos",
+    "page",
+    "ads",
+    "website",
+    "app",
+    "social_media",
+    "influencers"
+   ],
+   "likely_causes": [
+    "Parents' safety and trust questions not answered at visit",
+    "Fees explained late",
+    "No follow-up",
+    "No trial day"
+   ],
+   "good_idea_traits": [
+    "Ask what worried them",
+    "Follow up in two days",
+    "Offer a trial morning if the owner wishes"
+   ],
+   "bad_idea_examples": [
+    "Run ads",
+    "Put cameras online",
+    "Cut fees"
+   ]
+  },
+  "notes": ""
+ },
+ {
+  "id": "ngo_donor_reporting",
+  "industry": "ngos_charities_and_trusts",
+  "language": "english",
+  "owner_messages": [
+   "I manage a small charity in Peshawar. Donors ask for reports and I cannot show where their money went; it takes weeks to compile."
+  ],
+  "problem_in_owner_words": "Donor reports take weeks and spending is hard to show",
+  "noted_problem_titles": [
+   "Cannot show donors where their money went"
+  ],
+  "facts_said": [
+   "Small charity in Peshawar",
+   "Donors ask for reports",
+   "Takes weeks to compile",
+   "Hard to show where money went"
+  ],
+  "facts_not_said": [
+   "Donor count",
+   "Record keeping",
+   "Project types"
+  ],
+  "expectations": {
+   "must_not_assume": [
+    "videos",
+    "page",
+    "ads",
+    "website",
+    "app",
+    "social_media",
+    "influencers",
+    "donor_portal"
+   ],
+   "likely_causes": [
+    "Spending recorded in different places",
+    "No tag of expense to project",
+    "Receipts missing",
+    "Reporting only on request"
+   ],
+   "good_idea_traits": [
+    "Tag each expense with the project from now on",
+    "A simple monthly note per project",
+    "Keep receipts per project"
+   ],
+   "bad_idea_examples": [
+    "Build a donor portal",
+    "Hide gaps",
+    "Give financial advice"
+   ]
+  },
+  "notes": ""
+ },
+ {
+  "id": "mosque_trust_collections",
+  "industry": "mosques_religious_trusts_and_community_institutions",
+  "language": "roman_urdu",
+  "owner_messages": [
+   "Hamari masjid committee hai. Chanda aata hai magar hisaab sab ko dikhana mushkil hai, logon ne sawal uthaye hain."
+  ],
+  "problem_in_owner_words": "Donations are hard to account for transparently",
+  "noted_problem_titles": [
+   "Committee cannot show donations and spending clearly"
+  ],
+  "facts_said": [
+   "Mosque committee",
+   "Donations come in",
+   "Hard to show accounts",
+   "People raised questions"
+  ],
+  "facts_not_said": [
+   "Who handles cash",
+   "Records",
+   "Committee size"
+  ],
+  "expectations": {
+   "must_not_assume": [
+    "videos",
+    "page",
+    "ads",
+    "website",
+    "app",
+    "social_media",
+    "influencers",
+    "app"
+   ],
+   "likely_causes": [
+    "Cash handled by one person",
+    "No receipts book",
+    "No monthly statement",
+    "Mixed funds"
+   ],
+   "good_idea_traits": [
+    "Two-person counting and a receipt book",
+    "A monthly note on the notice board",
+    "Separate funds by purpose"
+   ],
+   "bad_idea_examples": [
+    "Build an app",
+    "Blame critics",
+    "Stop collecting"
+   ]
+  },
+  "notes": ""
+ },
+ {
+  "id": "crop_farm_input_costs",
+  "industry": "crop_farming",
+  "language": "roman_urdu",
+  "owner_messages": [
+   "Main 40 acre pe gandum aur kapas ugata hoon. Beej, khaad aur diesel ka kharcha itna barh gaya hai ke bachat nahi hoti."
+  ],
+  "problem_in_owner_words": "Input costs eat all the profit",
+  "noted_problem_titles": [
+   "Costs are higher than income"
+  ],
+  "facts_said": [
+   "40 acres wheat and cotton",
+   "Seed, fertiliser, diesel costs have risen",
+   "No saving left"
+  ],
+  "facts_not_said": [
+   "Yields",
+   "Which input",
+   "Rates paid"
+  ],
+  "expectations": {
+   "must_not_assume": [
+    "videos",
+    "page",
+    "ads",
+    "website",
+    "app",
+    "social_media",
+    "influencers",
+    "drone",
+    "sensors",
+    "app"
+   ],
+   "likely_causes": [
+    "No crop-wise cost record",
+    "Buying inputs on credit at high rates",
+    "Over-use of one input",
+    "Selling at harvest rush"
+   ],
+   "good_idea_traits": [
+    "Write cost per crop per acre",
+    "Compare input suppliers and credit terms",
+    "Think of selling timing"
+   ],
+   "bad_idea_examples": [
+    "Buy a drone",
+    "Recommend a pesticide dose",
+    "Stop farming"
+   ]
+  },
+  "notes": "No agronomy advice (doses, chemicals). Management only."
+ },
+ {
+  "id": "dairy_farm_milk_rate",
+  "industry": "cattle_and_buffalo_dairy_farms",
+  "language": "roman_urdu",
+  "owner_messages": [
+   "Mere 30 bhains hain. Doodh ka rate kam mil raha hai aur chare ka kharcha barh gaya hai, dodhi ko bhi dena parta hai."
+  ],
+  "problem_in_owner_words": "Low milk rate and rising feed cost",
+  "noted_problem_titles": [
+   "Milk income falls short of feed cost"
+  ],
+  "facts_said": [
+   "30 buffaloes",
+   "Milk rate is low",
+   "Feed cost is higher",
+   "Pays a milkman"
+  ],
+  "facts_not_said": [
+   "Milk quantity",
+   "Who buys",
+   "Feed type"
+  ],
+  "expectations": {
+   "must_not_assume": [
+    "videos",
+    "page",
+    "ads",
+    "website",
+    "app",
+    "social_media",
+    "influencers",
+    "app"
+   ],
+   "likely_causes": [
+    "Single buyer sets rate",
+    "Feed bought at higher retail price",
+    "Low-yield animals kept",
+    "No daily records"
+   ],
+   "good_idea_traits": [
+    "Daily milk record per animal",
+    "Compare buyers",
+    "Check feed buying in bulk or together"
+   ],
+   "bad_idea_examples": [
+    "Give a medicine to raise milk",
+    "Buy a milking system",
+    "Run ads"
+   ]
+  },
+  "notes": "No veterinary advice."
+ },
+ {
+  "id": "milk_centre_adulteration",
+  "industry": "milk_collection_centres_and_chillers",
+  "language": "roman_urdu",
+  "owner_messages": [
+   "Hamara milk collection centre hai. Kisan ka doodh test mein fail hota hai to jhagra hota hai, rate pe bhi tension rehti hai."
+  ],
+  "problem_in_owner_words": "Disputes with farmers over milk test and rate",
+  "noted_problem_titles": [
+   "Farmers dispute test results and rate"
+  ],
+  "facts_said": [
+   "Milk collection centre",
+   "Some milk fails tests",
+   "Arguments with farmers",
+   "Rate tension"
+  ],
+  "facts_not_said": [
+   "Test method",
+   "Rate rule",
+   "Number of farmers"
+  ],
+  "expectations": {
+   "must_not_assume": [
+    "videos",
+    "page",
+    "ads",
+    "website",
+    "app",
+    "social_media",
+    "influencers",
+    "app"
+   ],
+   "likely_causes": [
+    "Test not shown to farmer",
+    "Rate rule not written",
+    "Different staff test differently",
+    "No record per farmer"
+   ],
+   "good_idea_traits": [
+    "Show the test reading to the farmer",
+    "Write the rate rule on a card",
+    "Record per farmer per day"
+   ],
+   "bad_idea_examples": [
+    "Accuse farmers",
+    "Buy a lab",
+    "Cut the rate"
+   ]
+  },
+  "notes": ""
+ },
+ {
+  "id": "fish_farm_oxygen",
+  "industry": "fish_and_shrimp_farming",
+  "language": "english",
+  "owner_messages": [
+   "I have fish ponds near Sheikhupura. Some mornings I find many dead fish and I do not know why."
+  ],
+  "problem_in_owner_words": "Dead fish some mornings",
+  "noted_problem_titles": [
+   "Sudden fish deaths"
+  ],
+  "facts_said": [
+   "Fish ponds near Sheikhupura",
+   "Sometimes finds many dead fish in the morning",
+   "Cause unknown"
+  ],
+  "facts_not_said": [
+   "Pond size",
+   "Feeding records",
+   "Water tests"
+  ],
+  "expectations": {
+   "must_not_assume": [
+    "videos",
+    "page",
+    "ads",
+    "website",
+    "app",
+    "social_media",
+    "influencers",
+    "sensors",
+    "iot"
+   ],
+   "likely_causes": [
+    "Management records absent",
+    "Feeding and weather link not tracked",
+    "Cause needs an expert"
+   ],
+   "good_idea_traits": [
+    "Record feed, weather and deaths each day",
+    "Say a fisheries or vet expert must look at the cause",
+    "Note when it happens"
+   ],
+   "bad_idea_examples": [
+    "Name a disease and chemical",
+    "Add a dose of lime",
+    "Install sensors"
+   ]
+  },
+  "notes": "No veterinary/aquaculture treatment advice."
+ },
+ {
+  "id": "seed_dealer_credit",
+  "industry": "seed_fertiliser_and_pesticide_dealers",
+  "language": "roman_urdu",
+  "owner_messages": [
+   "Mera beej aur khaad ka dealer hai. Zameendaar fasal pe paisay dene ka kehte hain, fasal ke baad bhi poora nahi dete."
+  ],
+  "problem_in_owner_words": "Farmers buy on credit till harvest and pay only partly",
+  "noted_problem_titles": [
+   "Credit to farmers is not fully recovered"
+  ],
+  "facts_said": [
+   "Seed and fertiliser dealer",
+   "Farmers buy on credit till crop",
+   "Do not pay fully after"
+  ],
+  "facts_not_said": [
+   "Credit total",
+   "Farmer names",
+   "Guarantors"
+  ],
+  "expectations": {
+   "must_not_assume": [
+    "videos",
+    "page",
+    "ads",
+    "website",
+    "app",
+    "social_media",
+    "influencers"
+   ],
+   "likely_causes": [
+    "No written credit slip",
+    "No harvest-time reminder",
+    "Credit not limited by past payment",
+    "Selling beyond the farmer's capacity"
+   ],
+   "good_idea_traits": [
+    "Written slip with date",
+    "Visit at harvest start",
+    "Limit by past repayment"
+   ],
+   "bad_idea_examples": [
+    "Sue farmers",
+    "Stop selling",
+    "Run ads"
+   ]
+  },
+  "notes": ""
+ },
+ {
+  "id": "fuel_station_shortage",
+  "industry": "fuel_stations_and_lpg_cng_distributors",
+  "language": "roman_urdu",
+  "owner_messages": [
+   "Mera petrol pump hai. Staff ki taraf se chori ya galti ka shak hai, roz ke hisaab mein farq aata hai."
+  ],
+  "problem_in_owner_words": "Daily sales and stock reconciliation differences",
+  "noted_problem_titles": [
+   "Daily accounts show a gap"
+  ],
+  "facts_said": [
+   "Petrol pump",
+   "Suspects theft or mistakes by staff",
+   "Daily accounts do not match"
+  ],
+  "facts_not_said": [
+   "Shift pattern",
+   "Meter checks",
+   "Cash handling"
+  ],
+  "expectations": {
+   "must_not_assume": [
+    "videos",
+    "page",
+    "ads",
+    "website",
+    "app",
+    "social_media",
+    "influencers"
+   ],
+   "likely_causes": [
+    "Shift handover without a reading",
+    "Cash counted by one person",
+    "Dip reading not recorded",
+    "Credit sales not tied"
+   ],
+   "good_idea_traits": [
+    "Meter and dip readings at each shift handover",
+    "Two people count cash",
+    "Daily gap record to find which shift"
+   ],
+   "bad_idea_examples": [
+    "Accuse staff publicly",
+    "Install cameras everywhere only",
+    "Fire everyone"
+   ]
+  },
+  "notes": ""
+ },
+ {
+  "id": "security_guards_absent",
+  "industry": "security_guard_companies",
+  "language": "english",
+  "owner_messages": [
+   "We supply security guards to 25 sites. Clients complain about guards being absent or sleeping and we find out only after the client calls."
+  ],
+  "problem_in_owner_words": "Guards absent or inattentive and owner finds out late",
+  "noted_problem_titles": [
+   "Absent or sleeping guards found out late"
+  ],
+  "facts_said": [
+   "Security guard company",
+   "25 sites",
+   "Guards absent or sleeping",
+   "Owner learns after client calls"
+  ],
+  "facts_not_said": [
+   "Supervisors",
+   "Attendance method",
+   "Shift pattern"
+  ],
+  "expectations": {
+   "must_not_assume": [
+    "videos",
+    "page",
+    "ads",
+    "website",
+    "app",
+    "social_media",
+    "influencers",
+    "gps",
+    "app"
+   ],
+   "likely_causes": [
+    "No attendance check by time",
+    "Supervisor rounds irregular",
+    "Guards on 12-hour fixed shifts",
+    "No standby guard"
+   ],
+   "good_idea_traits": [
+    "Timed check-in call per site per shift",
+    "Supervisor round schedule",
+    "Standby guard for key sites"
+   ],
+   "bad_idea_examples": [
+    "Install app on every guard phone",
+    "Fire guards",
+    "Charge clients more"
+   ]
+  },
+  "notes": ""
+ },
+ {
+  "id": "scrap_yard_weights",
+  "industry": "scrap_recycling_and_waste_management",
+  "language": "roman_urdu",
+  "owner_messages": [
+   "Scrap ka yard hai. Suppliers kehte hain wazan kam likha gaya, mere munshi pe bhi shak hai."
+  ],
+  "problem_in_owner_words": "Suppliers dispute weights; owner doubts the clerk",
+  "noted_problem_titles": [
+   "Weight disputes"
+  ],
+  "facts_said": [
+   "Scrap yard",
+   "Suppliers say weight is under-recorded",
+   "Doubts about the clerk"
+  ],
+  "facts_not_said": [
+   "Weighbridge",
+   "Paper slip",
+   "Volume"
+  ],
+  "expectations": {
+   "must_not_assume": [
+    "videos",
+    "page",
+    "ads",
+    "website",
+    "app",
+    "social_media",
+    "influencers"
+   ],
+   "likely_causes": [
+    "Weighbridge slip not given to supplier",
+    "One person controls weight and payment",
+    "No re-check",
+    "Cash payment on the spot"
+   ],
+   "good_idea_traits": [
+    "Give a signed weight slip to the supplier",
+    "Separate weighing from paying",
+    "Random re-weigh"
+   ],
+   "bad_idea_examples": [
+    "Fire the clerk without checking",
+    "Buy a new weighbridge",
+    "Blame suppliers"
+   ]
+  },
+  "notes": ""
+ },
+ {
+  "id": "it_house_scope_creep",
+  "industry": "it_services_and_software_houses",
+  "language": "english",
+  "owner_messages": [
+   "We are a 12-person software house. Clients keep adding features after we agree the price, our team works overtime and we lose money on projects."
+  ],
+  "problem_in_owner_words": "Scope creep and unpaid extra work",
+  "noted_problem_titles": [
+   "Projects lose money to scope creep"
+  ],
+  "facts_said": [
+   "Software house, 12 people",
+   "Clients add features after price agreed",
+   "Team works overtime",
+   "Projects lose money"
+  ],
+  "facts_not_said": [
+   "Contract type",
+   "Change process",
+   "Estimation method"
+  ],
+  "expectations": {
+   "must_not_assume": [
+    "videos",
+    "page",
+    "ads"
+   ],
+   "likely_causes": [
+    "No change request process",
+    "Fixed price with vague scope",
+    "Estimates with no buffer",
+    "Client sign-off missing"
+   ],
+   "good_idea_traits": [
+    "Written change request with price before extra work",
+    "List what is in and out of scope",
+    "Compare estimate vs actual on last 5 projects"
+   ],
+   "bad_idea_examples": [
+    "Raise rates blindly",
+    "Hire more developers",
+    "Drop all clients"
+   ]
+  },
+  "notes": ""
+ },
+ {
+  "id": "law_firm_billing",
+  "industry": "law_firms",
+  "language": "english",
+  "owner_messages": [
+   "I have a small law practice. Clients pay late and I forget to bill for small matters, my hours are not fully recovered."
+  ],
+  "problem_in_owner_words": "Late payments and unbilled work",
+  "noted_problem_titles": [
+   "Hours are not fully billed or collected"
+  ],
+  "facts_said": [
+   "Small law practice",
+   "Clients pay late",
+   "Small matters not billed"
+  ],
+  "facts_not_said": [
+   "Fee structure",
+   "Time records",
+   "Client types"
+  ],
+  "expectations": {
+   "must_not_assume": [
+    "videos",
+    "page",
+    "ads",
+    "website",
+    "app",
+    "social_media",
+    "influencers"
+   ],
+   "likely_causes": [
+    "No time record for small matters",
+    "Fees not agreed up front",
+    "No invoice date routine",
+    "Retainers not used"
+   ],
+   "good_idea_traits": [
+    "Weekly list of the week's work to bill",
+    "Agree fees in writing at start",
+    "Follow up invoices on a fixed day"
+   ],
+   "bad_idea_examples": [
+    "Give legal advice",
+    "Sue clients",
+    "Build a billing app"
+   ]
+  },
+  "notes": "No legal advice about the owner's own cases; management only."
+ },
+ {
+  "id": "ca_firm_deadline_rush",
+  "industry": "accounting_audit_and_tax_practices",
+  "language": "roman_urdu",
+  "owner_messages": [
+   "Hamari accounting firm hai. Tax deadline pe sab clients last minute documents dete hain aur staff raat tak kaam karta hai."
+  ],
+  "problem_in_owner_words": "Clients deliver documents at the last minute before deadlines",
+  "noted_problem_titles": [
+   "Deadline rush from late client documents"
+  ],
+  "facts_said": [
+   "Accounting firm",
+   "Clients give documents last minute before the tax deadline",
+   "Staff work late"
+  ],
+  "facts_not_said": [
+   "Client count",
+   "Document list",
+   "Engagement letters"
+  ],
+  "expectations": {
+   "must_not_assume": [
+    "videos",
+    "page",
+    "ads",
+    "website",
+    "app",
+    "social_media",
+    "influencers",
+    "portal"
+   ],
+   "likely_causes": [
+    "No early document request",
+    "No clear checklist",
+    "No fee for late submission",
+    "All clients same deadline"
+   ],
+   "good_idea_traits": [
+    "Send the document checklist weeks ahead and a mid-way reminder",
+    "Client-wise status list",
+    "Late fee in the engagement terms if the owner wants"
+   ],
+   "bad_idea_examples": [
+    "Give tax advice",
+    "Build a portal",
+    "Refuse clients"
+   ]
+  },
+  "notes": "No tax advice."
+ },
+ {
+  "id": "insurance_renewals",
+  "industry": "insurance_agencies_and_brokers",
+  "language": "roman_urdu",
+  "owner_messages": [
+   "Main insurance agent hoon. Policy renew hone ki date yaad nahi rehti, kayi clients doosre agent ke paas chale gaye."
+  ],
+  "problem_in_owner_words": "Renewals missed and clients lost to other agents",
+  "noted_problem_titles": [
+   "Renewal dates missed and clients lost"
+  ],
+  "facts_said": [
+   "Insurance agent",
+   "Forgets renewal dates",
+   "Several clients went to other agents"
+  ],
+  "facts_not_said": [
+   "Number of clients",
+   "Records",
+   "Policy types"
+  ],
+  "expectations": {
+   "must_not_assume": [
+    "videos",
+    "page",
+    "ads",
+    "website",
+    "app",
+    "social_media",
+    "influencers",
+    "app"
+   ],
+   "likely_causes": [
+    "No list of expiry dates",
+    "Contact made too late",
+    "Client not getting service between renewals"
+   ],
+   "good_idea_traits": [
+    "One list with expiry dates and a call 30 days before",
+    "Call lost clients to ask why",
+    "Check on clients once between renewals"
+   ],
+   "bad_idea_examples": [
+    "Give financial advice",
+    "Build an app",
+    "Run ads"
+   ]
+  },
+  "notes": "No financial advice."
+ },
+ {
+  "id": "ride_fleet_idle",
+  "industry": "ride_hailing_fleet_owners_and_taxi_operators",
+  "language": "english",
+  "owner_messages": [
+   "I own eight cars driven by drivers on ride-hailing. Income per car varies a lot and I suspect drivers are hiding trips."
+  ],
+  "problem_in_owner_words": "Income per car varies and trips may be hidden",
+  "noted_problem_titles": [
+   "Car income varies and may be under-reported"
+  ],
+  "facts_said": [
+   "Eight cars on ride-hailing",
+   "Driven by hired drivers",
+   "Income varies a lot",
+   "Suspects hidden trips"
+  ],
+  "facts_not_said": [
+   "Payment method to driver",
+   "Platform statements",
+   "Fuel"
+  ],
+  "expectations": {
+   "must_not_assume": [
+    "videos",
+    "page",
+    "ads",
+    "website",
+    "app",
+    "social_media",
+    "influencers"
+   ],
+   "likely_causes": [
+    "No weekly statement matched to platform earnings",
+    "Fuel and maintenance mixed in",
+    "Different driver habits",
+    "Fixed target not set"
+   ],
+   "good_idea_traits": [
+    "Compare each car's platform statement with what the driver hands over",
+    "Fixed weekly amount versus share",
+    "Check fuel use per car"
+   ],
+   "bad_idea_examples": [
+    "Install trackers secretly",
+    "Fire all drivers",
+    "Sell the cars"
+   ]
+  },
+  "notes": ""
+ },
+ {
+  "id": "microfinance_recovery",
+  "industry": "microfinance_field_operations",
+  "language": "english",
+  "owner_messages": [
+   "Our microfinance branch in Multan has loan officers collecting weekly. Portfolio at risk is climbing and some officers show good numbers but their groups default later."
+  ],
+  "problem_in_owner_words": "Portfolio at risk climbing, some officers' groups default later",
+  "noted_problem_titles": [
+   "Rising late repayments"
+  ],
+  "facts_said": [
+   "Microfinance branch in Multan",
+   "Loan officers collect weekly",
+   "Portfolio at risk climbing",
+   "Some officers look good then groups default"
+  ],
+  "facts_not_said": [
+   "Officer names",
+   "Group formation process",
+   "Loan sizes"
+  ],
+  "expectations": {
+   "must_not_assume": [
+    "videos",
+    "page",
+    "ads",
+    "website",
+    "app",
+    "social_media",
+    "influencers",
+    "mobile_app"
+   ],
+   "likely_causes": [
+    "Group formation too fast",
+    "Over-lending to the same borrower",
+    "Collection pressure causing hidden delay",
+    "Visits not checked"
+   ],
+   "good_idea_traits": [
+    "Review which groups and loan cycle show risk",
+    "Spot visits by someone other than the officer",
+    "Check repeated loan increases"
+   ],
+   "bad_idea_examples": [
+    "Give financial advice to borrowers",
+    "Harass defaulters",
+    "Buy new software"
+   ]
+  },
+  "notes": ""
+ },
+ {
+  "id": "money_exchange_cash_mismatch",
+  "industry": "money_exchange_and_remittance_agents",
+  "language": "roman_urdu",
+  "owner_messages": [
+   "Mera money exchange hai. Din ke end pe cash aur record mein farq aata hai aur kabhi kabhi customer ka rate pe jhagra hota hai."
+  ],
+  "problem_in_owner_words": "Cash mismatch at day end and rate disputes",
+  "noted_problem_titles": [
+   "End-of-day cash gap"
+  ],
+  "facts_said": [
+   "Money exchange shop",
+   "End-of-day cash differs from the record",
+   "Occasional rate disputes"
+  ],
+  "facts_not_said": [
+   "Number of counters",
+   "Rate display",
+   "Record method"
+  ],
+  "expectations": {
+   "must_not_assume": [
+    "videos",
+    "page",
+    "ads",
+    "website",
+    "app",
+    "social_media",
+    "influencers"
+   ],
+   "likely_causes": [
+    "Rate changes without a stamped time",
+    "Counter handover without count",
+    "Entries missed at busy time"
+   ],
+   "good_idea_traits": [
+    "Count at each counter handover",
+    "Stamp rate time on slip",
+    "Daily gap note"
+   ],
+   "bad_idea_examples": [
+    "Give compliance advice",
+    "Install cameras only",
+    "Fire staff"
+   ]
+  },
+  "notes": "No legal/financial advice."
+ },
+ {
+  "id": "water_tanker_dispatch",
+  "industry": "water_tanker_and_ro_filtration_plant_operators",
+  "language": "roman_urdu",
+  "owner_messages": [
+   "Mere paas 6 water tankers hain. Customers ko pani der se milta hai aur drivers ka record nahi rehta ke kitni trips hui."
+  ],
+  "problem_in_owner_words": "Late deliveries and no trip record",
+  "noted_problem_titles": [
+   "Late water deliveries and no trip record"
+  ],
+  "facts_said": [
+   "6 water tankers",
+   "Customers get water late",
+   "No trip record for drivers"
+  ],
+  "facts_not_said": [
+   "Booking method",
+   "Customers",
+   "Routes"
+  ],
+  "expectations": {
+   "must_not_assume": [
+    "videos",
+    "page",
+    "ads",
+    "website",
+    "app",
+    "social_media",
+    "influencers",
+    "app",
+    "gps"
+   ],
+   "likely_causes": [
+    "Bookings taken by phone and forgotten",
+    "Drivers decide routes",
+    "Trip slips missing"
+   ],
+   "good_idea_traits": [
+    "Write each booking with a time and mark done",
+    "Trip slip signed by customer",
+    "Group bookings by area"
+   ],
+   "bad_idea_examples": [
+    "Install GPS on all",
+    "Build an app",
+    "Hire more drivers"
+   ]
+  },
+  "notes": ""
+ },
+ {
+  "id": "ecommerce_returns",
+  "industry": "e_commerce_and_d2c_brands",
+  "language": "english",
+  "owner_messages": [
+   "We sell clothing from our own brand online. Return rate is very high, around 35 percent, mostly size and colour complaints."
+  ],
+  "problem_in_owner_words": "35 percent returns, size and colour",
+  "noted_problem_titles": [
+   "High returns for size and colour"
+  ],
+  "facts_said": [
+   "Own clothing brand sold online",
+   "35 percent return rate",
+   "Size and colour complaints"
+  ],
+  "facts_not_said": [
+   "Size chart",
+   "Photos",
+   "Fabric"
+  ],
+  "expectations": {
+   "must_not_assume": [
+    "videos"
+   ],
+   "likely_causes": [
+    "Size chart unclear",
+    "Photos not true to colour",
+    "Fit differs between batches",
+    "Return reasons not recorded"
+   ],
+   "good_idea_traits": [
+    "Group return reasons by product",
+    "Improve size info for the top returned items",
+    "Ask returners one question"
+   ],
+   "bad_idea_examples": [
+    "Stop returns",
+    "Buy more ads",
+    "Run influencer posts"
+   ]
+  },
+  "notes": "The owner sells online, so online is a given here; but ideas must not assume ads or videos."
+ },
+ {
+  "id": "govt_contractor_payment",
+  "industry": "government_contractors_and_public_sector_suppliers",
+  "language": "english",
+  "owner_messages": [
+   "We supply stationery to government departments. Payments take 6 to 9 months and our cash is blocked; we keep buying stock on credit."
+  ],
+  "problem_in_owner_words": "Government payments delayed and cash blocked",
+  "noted_problem_titles": [
+   "Long payment delays from government clients"
+  ],
+  "facts_said": [
+   "Supplier to government departments",
+   "Payments take 6 to 9 months",
+   "Cash blocked",
+   "Buys stock on credit"
+  ],
+  "facts_not_said": [
+   "Departments",
+   "Invoice process",
+   "Credit from suppliers"
+  ],
+  "expectations": {
+   "must_not_assume": [
+    "videos",
+    "page",
+    "ads",
+    "website",
+    "app",
+    "social_media",
+    "influencers"
+   ],
+   "likely_causes": [
+    "Bills stuck at one desk",
+    "Documents rejected for errors",
+    "No tracking of each bill's stage",
+    "Overcommitted on credit"
+   ],
+   "good_idea_traits": [
+    "Track each bill by stage and who holds it",
+    "Fix common rejection reasons",
+    "Match purchases to expected receipts"
+   ],
+   "bad_idea_examples": [
+    "Bribe officials",
+    "Take a loan",
+    "Stop supplying"
+   ]
+  },
+  "notes": "No illegal suggestions; no financial advice."
+ },
+ {
+  "id": "arabic_cafe_weekday",
+  "industry": "cafes_and_coffee_shops",
+  "language": "arabic",
+  "owner_messages": [
+   "عندي مقهى صغير في دبي. أيام نهاية الأسبوع مزدحمة لكن في منتصف الأسبوع المقهى شبه فارغ بعد الظهر."
+  ],
+  "problem_in_owner_words": "المقهى شبه فارغ بعد الظهر في منتصف الأسبوع",
+  "noted_problem_titles": [
+   "Midweek afternoon traffic is very low"
+  ],
+  "facts_said": [
+   "Small cafe in Dubai",
+   "Weekends are busy",
+   "Midweek afternoons almost empty"
+  ],
+  "facts_not_said": [
+   "Menu",
+   "Prices",
+   "Any marketing channel",
+   "Customer type"
+  ],
+  "expectations": {
+   "must_not_assume": [
+    "videos",
+    "page",
+    "ads",
+    "website",
+    "app",
+    "social_media",
+    "influencers",
+    "delivery_app"
+   ],
+   "likely_causes": [
+    "Weekend crowd is leisure, weekday needs a reason",
+    "Office crowd not reached",
+    "Opening hours",
+    "Seating and comfort for working visitors"
+   ],
+   "good_idea_traits": [
+    "Idea in the owner's language or plain English using the facts said",
+    "Asks what regulars would come for in the afternoon",
+    "No channel assumed"
+   ],
+   "bad_idea_examples": [
+    "Start Instagram reels",
+    "Run ads",
+    "Launch an app"
+   ]
+  },
+  "notes": ""
+ }
+]

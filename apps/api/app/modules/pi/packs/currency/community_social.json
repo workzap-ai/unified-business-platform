@@ -1,0 +1,66 @@
+{
+ "cluster": "community_social",
+ "version": 1,
+ "as_of": "2026-10",
+ "industries": [
+  "community_associations_and_clubs",
+  "funeral_services_and_graveyard_administration",
+  "government_contractors_and_public_sector_suppliers",
+  "mosques_religious_trusts_and_community_institutions",
+  "ngos_charities_and_trusts"
+ ],
+ "how_customers_find_and_choose": [
+  "Members, donors and families come through personal contact, trust in the people running the institution and word of mouth",
+  "Donors want to see exactly what was done with their contribution, with photos and short reports",
+  "Communities share announcements and appeals through chat groups and community leaders",
+  "Public sector buyers choose suppliers through formal tenders and documented past work"
+ ],
+ "what_works_now": [
+  "A short, honest report of what was done with funds or effort, with photos and no exaggeration",
+  "A clear message for each appeal: who, what, how much is needed and how it will be used",
+  "A saved list of members or donors for updates, with their consent",
+  "Written records of contributions, expenses and decisions shared with those who gave",
+  "For funeral and community services: a calm, respectful and quick response with clear arrangements",
+  "For contractors: a file of past work, certificates and references ready for tenders",
+  "Regular updates to members or families after an event or service"
+ ],
+ "outdated_or_weak": [
+  "Pressure or emotional manipulation in appeals",
+  "Unclear accounts of where donations went",
+  "Using photos of vulnerable people without their permission",
+  "Printed posters as the main way to reach people",
+  "Treating a tender as a cold sales pitch rather than a documented bid"
+ ],
+ "local_context": {
+  "PK": [
+   "Cash on delivery and cash at the counter are still common; bank transfer and mobile wallet payments are now normal for many customers",
+   "Ramadan and the two Eids reshape demand, opening hours and staff availability every year",
+   "Summer heat, monsoon rain and power cuts affect operations and footfall",
+   "Customers often write in Urdu, Roman Urdu or a regional language, and chat is the usual first contact",
+   "Charity and community giving peaks in Ramadan and around Eid; zakat and sadaqah shape donation timing",
+   "Charities and trusts are registered with the relevant authority; the owner confirms specifics",
+   "Government supply follows tender rules and payment cycles that can be slow"
+  ],
+  "UAE": [
+   "Customers are multilingual and expect quick replies in chat; card and tap payments are normal",
+   "Winter is the busy season; many residents travel in summer so demand can dip",
+   "Ramadan and Eid change hours and buying patterns; the licence a business holds decides what it may sell and advertise, so the owner checks that with the licensing body",
+   "Charity and community activity needs permission from the relevant authority; the owner confirms specifics",
+   "Community groups are often built around nationality, faith or neighbourhood"
+  ],
+  "CA": [
+   "Customers expect online booking or enquiry, card and bank e-transfer payment, and clear written confirmation",
+   "Long winters and a short summer peak shape outdoor and seasonal trades",
+   "English and French (in Quebec) matter, and many communities prefer their own language; consent for marketing messages and sales tax rules vary, so the owner checks them with a professional",
+   "Charities follow registration and reporting rules by province; the owner confirms specifics",
+   "Volunteers are central; donors expect online giving and clear reports"
+  ]
+ },
+ "never_assume": [
+  "A website or donation link",
+  "An audited report",
+  "Staff for communications",
+  "Permission to share photos of the people helped"
+ ],
+ "review_status": "needs human review"
+}

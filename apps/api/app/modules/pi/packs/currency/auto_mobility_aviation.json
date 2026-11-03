@@ -1,0 +1,78 @@
+{
+ "cluster": "auto_mobility_aviation",
+ "version": 1,
+ "as_of": "2026-10",
+ "industries": [
+  "aircraft_maintenance_and_parts",
+  "airlines",
+  "auto_workshops_and_service_centres",
+  "bus_coach_and_school_transport_operators",
+  "car_rental_and_chauffeur_services",
+  "car_wash_and_detailing",
+  "charter_and_private_aviation",
+  "driving_schools",
+  "flying_schools_and_aviation_academies",
+  "fuel_stations_and_lpg_cng_distributors",
+  "ground_handling_and_airport_services",
+  "motorcycle_and_rickshaw_dealers_and_workshops",
+  "new_car_dealerships_and_showrooms",
+  "ride_hailing_fleet_owners_and_taxi_operators",
+  "tyre_battery_and_auto_parts_shops",
+  "used_car_dealers"
+ ],
+ "how_customers_find_and_choose": [
+  "Vehicle owners find workshops, washes and parts shops through the map listing, reviews and recommendations from other owners",
+  "Buyers of vehicles search online listings with photos and short videos and ask for details in chat before visiting",
+  "Customers judge honesty by whether a workshop explains the fault, shows the old part and gives a clear written estimate",
+  "Business customers for fleets, buses and rentals choose on reliability, availability and clear contracts",
+  "Aviation customers and operators are reached through trade contacts and regulated channels, not mass marketing"
+ ],
+ "what_works_now": [
+  "A written job card or estimate with the fault found, parts and agreed work, sent in chat before work starts",
+  "Photos or a short video of the problem sent to the owner during the repair",
+  "A service reminder to customers when the next oil, tyre or battery check is due, with consent",
+  "Honest listings for used vehicles with real photos, condition notes and a short walkaround video",
+  "A complete map listing with hours, services and a pin that is easy to find",
+  "Asking customers for a review after a job done well",
+  "Tracking repeat visits and common faults by vehicle type to plan stock and staff"
+ ],
+ "outdated_or_weak": [
+  "Quoting by phone without seeing the vehicle and then changing the price",
+  "Hiding the old parts or doing work without approval",
+  "Listings with copied photos or hidden defects",
+  "Printed handbills at petrol pumps as the main source of customers",
+  "Free-wash or discount stunts that bring one-time customers"
+ ],
+ "local_context": {
+  "PK": [
+   "Cash on delivery and cash at the counter are still common; bank transfer and mobile wallet payments are now normal for many customers",
+   "Ramadan and the two Eids reshape demand, opening hours and staff availability every year",
+   "Summer heat, monsoon rain and power cuts affect operations and footfall",
+   "Customers often write in Urdu, Roman Urdu or a regional language, and chat is the usual first contact",
+   "Fuel price changes, heat and monsoon flooding affect vehicle demand and workshop load",
+   "Vehicle imports and registration are regulated; the owner confirms specifics with the authority",
+   "Many repairs are paid in cash on completion"
+  ],
+  "UAE": [
+   "Customers are multilingual and expect quick replies in chat; card and tap payments are normal",
+   "Winter is the busy season; many residents travel in summer so demand can dip",
+   "Ramadan and Eid change hours and buying patterns; the licence a business holds decides what it may sell and advertise, so the owner checks that with the licensing body",
+   "Vehicle ownership and rental are high; summer heat makes cooling, tyres and batteries common jobs",
+   "Transport and aviation businesses are licensed by their authority; the owner confirms specifics"
+  ],
+  "CA": [
+   "Customers expect online booking or enquiry, card and bank e-transfer payment, and clear written confirmation",
+   "Long winters and a short summer peak shape outdoor and seasonal trades",
+   "English and French (in Quebec) matter, and many communities prefer their own language; consent for marketing messages and sales tax rules vary, so the owner checks them with a professional",
+   "Winter driving drives tyre changes and battery checks; seasonal demand is strong",
+   "Auto repair and sales are consumer-protected by province; the owner confirms specifics"
+  ]
+ },
+ "never_assume": [
+  "A website with online booking",
+  "A digital job card or service history",
+  "A customer reminder list",
+  "A video or photo process on the shop floor"
+ ],
+ "review_status": "needs human review"
+}

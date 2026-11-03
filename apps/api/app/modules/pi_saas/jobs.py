@@ -91,6 +91,65 @@ async def sweep_pi_saas(ctx: dict[str, Any]) -> None:
         await expire_requests(session)
         await billing.sweep_lifecycle(session)
         await session.commit()
+    # Quarantined originals of messages that held card or ID details are deleted after 30 days.
+    async with ctx["sessions"]() as session:
+        try:
+            from app.modules.pi.safety_guard import purge_expired
+
+            if removed := await purge_expired(session):
+                logger.info("pi_quarantine_purged", extra={"count": removed})
+            await session.commit()
+        except Exception:  # noqa: BLE001 - retried on the next sweep
+            await session.rollback()
+            logger.warning("pi_quarantine_purge_failed")
+    # What happened after pi's replies, scored for the learning metrics (text-free, observe only).
+    async with ctx["sessions"]() as session:
+        try:
+            from app.modules.pi.experience_scorer import score_new
+
+            await score_new(session)
+            await session.commit()
+        except Exception:  # noqa: BLE001 - retried on the next sweep
+            await session.rollback()
+            logger.warning("pi_experience_scoring_failed")
+    # The nightly learning run for workspaces in brain mode (frozen ones only write a note).
+    async with ctx["sessions"]() as session:
+        try:
+            from app.modules.pi import (
+                learning_grader,
+                learning_miner,
+                learning_packs,
+                learning_solutions_grow,
+                learning_voice,
+            )
+            from app.modules.pi.learning_embed import make_embedder
+            from app.modules.pi.learning_nightly import run_due
+
+            embedder = make_embedder(ctx["settings"], ctx.get("http"))
+            if ran := await run_due(
+                session,
+                embedder=embedder,
+                pack_writer=lambda scope: learning_packs.make_writer(
+                    ctx["settings"], ctx.get("http"), scope
+                ),
+                question_writer=lambda scope: learning_miner.make_writer(
+                    ctx["settings"], ctx.get("http"), scope
+                ),
+                grader=lambda scope: learning_grader.make_grader(
+                    ctx["settings"], ctx.get("http"), scope
+                ),
+                voice_writer=lambda scope: learning_voice.make_writer(
+                    ctx["settings"], ctx.get("http"), scope
+                ),
+                idea_writer=lambda scope: learning_solutions_grow.make_writer(
+                    ctx["settings"], ctx.get("http"), scope
+                ),
+            ):
+                logger.info("pi_learning_ran", extra={"workspaces": ran})
+            await session.commit()
+        except Exception:  # noqa: BLE001 - retried on the next sweep
+            await session.rollback()
+            logger.warning("pi_learning_run_failed")
     # Proposals pi owes a customer whose job never ran or failed.
     async with ctx["sessions"]() as session:
         try:
@@ -160,6 +219,56 @@ async def enqueue_proposal(ctx: dict[str, Any], lead_id: UUID) -> None:
     # ``proposal_due`` keep two runs from making two proposals.
     minute = int(datetime.now(UTC).timestamp() // 60)
     await _enqueue(ctx, "draft_pi_proposal", str(lead_id), f"pi-proposal:{lead_id}:{minute}")
+
+
+async def enqueue_brain_documents(ctx: dict[str, Any], conversation_id: UUID) -> None:
+    await _enqueue(
+        ctx, "draft_brain_documents", str(conversation_id), f"pi-brain-docs:{conversation_id}"
+    )
+
+
+async def draft_brain_documents(ctx: dict[str, Any], conversation_id: str) -> None:
+    """The person said yes to a solution document and quote: pi drafts both for a Workzap
+    reviewer (a model call with no transaction held) and tells the team they are waiting."""
+    from app.ai.manager import build_llm_manager
+    from app.modules.pi import brain_docs
+    from app.modules.pi.models import PiConversation
+    from app.modules.pi_saas import deals
+    from app.modules.pi_saas.requests import raise_request
+
+    async with ctx["sessions"]() as session:
+        conversation = await session.get(PiConversation, UUID(conversation_id))
+        if conversation is None:
+            return
+        scope = await deals.system_scope_for(
+            session, conversation.tenant_id, conversation.environment_id
+        )
+        try:
+            made = await brain_docs.draft_offer(
+                session,
+                scope,
+                build_llm_manager(ctx["settings"], ctx["http"], ctx["sessions"]),
+                conversation.id,
+            )
+            if made is not None and conversation.customer_id is not None:
+                solution, quote = made
+                await raise_request(
+                    session,
+                    scope,
+                    conversation_id=conversation.id,
+                    customer_id=conversation.customer_id,
+                    kind="review_document",
+                    question=(
+                        f"Drafts are ready to review: solution document {solution.ref} and "
+                        f"quote {quote.ref}. Check the document, price the quote, approve both, "
+                        "then send."
+                    ),
+                    priority="high",
+                )
+            await session.commit()
+        except Exception:  # noqa: BLE001 - the team can draft again from the review screen
+            await session.rollback()
+            logger.warning("pi_brain_documents_job_failed", exc_info=True)
 
 
 async def draft_pi_proposal(ctx: dict[str, Any], lead_id: str) -> None:
@@ -312,4 +421,5 @@ JOBS: dict[str, Callable[..., Awaitable[Any]]] = {
     "process_pi_billing_event": process_pi_billing_event,
     "sweep_pi_saas": sweep_pi_saas,
     "draft_pi_proposal": draft_pi_proposal,
+    "draft_brain_documents": draft_brain_documents,
 }

@@ -9,6 +9,7 @@ ALLOWED_FIELDS = (
     "correlation_id",
     "trace_id",
     "status_code",
+    "error_kind",
     "duration_ms",
     "tenant_id",
     "environment_id",

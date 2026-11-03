@@ -1,0 +1,324 @@
+{
+  "industry": "internet_service_providers_and_cable_tv_operators",
+  "name": "Internet service providers and cable-TV operators",
+  "sector": "7.L Finance-adjacent, energy and utilities",
+  "version": "1.1",
+  "problems": [
+    {
+      "id": "p1_info_lost_in_whatsapp",
+      "n": 1,
+      "words": "Complaints come on WhatsApp, calls and in person, and half get forgotten",
+      "category": "communication_coordination",
+      "subtype": "info_lost_in_whatsapp",
+      "quick_ideas": [
+        "Put every complaint on one list with a number and time, whatever channel it came from, so nothing lives only on a phone",
+        "Mark each one closed only when the customer confirms, so \"fixed\" means fixed."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking"
+        ],
+        "text": "Complaint ticketing on WhatsApp where every message becomes a numbered ticket with status updates to the customer, open and close times and area tags.",
+        "tool_words": []
+      },
+      "ask_first": "Roughly how many complaints come in on a normal day?",
+      "free_stops": "Ticket flow and customer updates are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count complaints received today against complaints written on the main list, so you see how many are getting lost between channels.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member each shift the job of writing every complaint into one notebook, so follow up starts from one place.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p2_bottleneck",
+      "n": 2,
+      "words": "Technicians go to the nearest job, not the oldest, and some customers wait days",
+      "category": "operations_process",
+      "subtype": "bottleneck",
+      "quick_ideas": [
+        "Hand out jobs each morning from the oldest complaint down, so long waits are cleared first",
+        "Group jobs by area once the oldest are assigned, so travel is not wasted."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking"
+        ],
+        "text": "A technician job queue on phone ordered by age and area, with assign, accept and close, and parts used.",
+        "tool_words": []
+      },
+      "ask_first": "Do technicians pick nearby jobs to save travel, or because nobody gives them a clear job order?",
+      "free_stops": "Priority rules and queue design are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare the oldest open complaint in each area at day end, so you spot where waiting days are piling up.",
+          "review": false
+        },
+        {
+          "text": "Make one dispatcher assign jobs from a single oldest open list each morning, so waiting time stops being decided on the road.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p3_kpi_undefined",
+      "n": 3,
+      "words": "I do not know how long each complaint took to fix",
+      "category": "reporting_visibility",
+      "subtype": "kpi_undefined",
+      "quick_ideas": [
+        "Note open and close time on every complaint this week, so you have a first measure",
+        "Pick one target fix time you consider acceptable, so there is a line to judge against."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "You would see a daily view of open, overdue and average fix time for complaints, by area and technician.",
+        "tool_words": [
+          "dashboard"
+        ]
+      },
+      "ask_first": "Is the missing piece the time a complaint came in, or the time it was fixed?",
+      "free_stops": "KPI definitions and the summary overview page are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Write the received time and resolved time beside each complaint this week, so you can compare short fixes against long ones.",
+          "review": false
+        },
+        {
+          "text": "Give one person the closing notebook and require every technician to report finish time there, so repair timing is captured consistently.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p4_cash_leakage",
+      "n": 4,
+      "words": "Collectors collect money but deposit days later or keep some",
+      "category": "cash_collections",
+      "subtype": "cash_leakage",
+      "quick_ideas": [
+        "Agree a fixed deposit day and time for every collector, so late money is obvious",
+        "Match each collector's register to deposits weekly, so gaps are found while fresh."
+      ],
+      "workzap_build": {
+        "keys": [
+          "cash_reconciliation"
+        ],
+        "text": "You would see collectors marking each connection paid by its reference, with daily totals and deposits flagged against what was collected.",
+        "tool_words": [
+          "app"
+        ]
+      },
+      "ask_first": "Do collectors hand over cash daily, or keep it until they have collected from a whole area?",
+      "free_stops": "Collection and matching steps are in the solution document; pi records the control gap, not an accusation.",
+      "extra_ideas": [
+        {
+          "text": "Compare each collector's receipt total with the amount handed in the same day, so missing cash is noticed while details are fresh.",
+          "review": false
+        },
+        {
+          "text": "Give one person the handover book for all collections at a fixed evening time, so delays and gaps stand out quickly.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p5_receivables_late",
+      "n": 5,
+      "words": "Many subscribers pay late every month and chasing them is a full-time job",
+      "category": "cash_collections",
+      "subtype": "receivables_late",
+      "quick_ideas": [
+        "Keep one unpaid list by area rather than in each collector's head, so follow-up is shared",
+        "Remind subscribers a few days before the due date, with their permission, so payment is front of mind."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger"
+        ],
+        "text": "customer_messaging — An unpaid list that sends reminders to subscribers who agreed to messages, and an online payment link where available.",
+        "tool_words": []
+      },
+      "ask_first": "Do late payers mostly pay a few days late, or several weeks late?",
+      "free_stops": "Reminder timing and message wording are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many accounts are still unpaid by area after the usual due week, so you see where chasing time is really going.",
+          "review": false
+        },
+        {
+          "text": "Give one collector one shared unpaid list by area and a fixed follow up hour daily, so chasing stops bouncing around.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p6_cash_leakage",
+      "n": 6,
+      "words": "Some connections are active on the panel but not billed",
+      "category": "loss_security",
+      "subtype": "cash_leakage",
+      "quick_ideas": [
+        "Compare the panel's active list with the billing list once by hand, so you see how many slip through",
+        "Make adding to billing part of every new connection sign-off, so new gaps do not open."
+      ],
+      "workzap_build": {
+        "keys": [
+          "integration"
+        ],
+        "text": "dashboards_reports — A reconciliation report comparing active connections on the panel with billed connections, flagging each mismatch.",
+        "tool_words": []
+      },
+      "ask_first": "Do the unbilled connections come mostly from new installations, or from reconnections after a break?",
+      "free_stops": "How the two tools are linked is assessed in the solution document; pi never asks for panel logins.",
+      "extra_ideas": [
+        {
+          "text": "Count active connections seen on the service list but missing from the billing notebook, so the size of unbilled service becomes visible.",
+          "review": false
+        },
+        {
+          "text": "Make the same staff member update billing during every new activation handover, so active connections stop being left off the books.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p7_returns_handling",
+      "n": 7,
+      "words": "Routers and ONUs go out with technicians and never come back from disconnected homes",
+      "category": "stock_inventory",
+      "subtype": "returns_handling",
+      "quick_ideas": [
+        "Record serial numbers of every device a technician takes out, so each has a holder",
+        "Make device recovery part of every disconnection, so equipment comes back by default."
+      ],
+      "workzap_build": {
+        "keys": [
+          "stock_alerts"
+        ],
+        "text": "job_tracking — An equipment register of routers and ONUs issued, installed and recovered on disconnection by serial number, with reorder alerts for fibre and splitters.",
+        "tool_words": []
+      },
+      "ask_first": "Do devices go missing mostly with technicians, or with customers who have left?",
+      "free_stops": "Register design is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count devices issued to each technician against devices returned by week end, so you see where recovery is breaking down.",
+          "review": false
+        },
+        {
+          "text": "Give one storekeeper one notebook for all device handovers and returns, so every item has a clear current holder.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p8_delivery_late",
+      "n": 8,
+      "words": "New connection requests wait two weeks for installation",
+      "category": "orders_fulfilment",
+      "subtype": "delivery_late",
+      "quick_ideas": [
+        "List every pending request with the date it came in, so the backlog is visible",
+        "Note what each one is waiting for (survey, material, technician), so you fix the real bottleneck."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking"
+        ],
+        "text": "A new connection pipeline from request to survey to install with waiting time at each step.",
+        "tool_words": []
+      },
+      "ask_first": "Are new requests waiting mostly for a survey visit, or for equipment and a free technician?",
+      "free_stops": "Pipeline stages are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count pending installation requests by waiting reason this week, so you see whether delay sits with visits, material or scheduling.",
+          "review": false
+        },
+        {
+          "text": "Give one coordinator one installation backlog page reviewed at the same time daily, so new requests stop disappearing into messages.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p9_whatsapp_overload",
+      "n": 9,
+      "words": "When the upstream goes down everyone calls at once and we cannot reply",
+      "category": "tech_systems",
+      "subtype": "whatsapp_overload",
+      "quick_ideas": [
+        "Prepare one outage message in advance, so staff are not composing under pressure",
+        "Send it to affected areas as soon as an outage starts, so calls drop."
+      ],
+      "workzap_build": {
+        "keys": [
+          "customer_messaging"
+        ],
+        "text": "An outage broadcast and status message to subscribers in affected areas who agreed to messages, with a follow-up when service returns.",
+        "tool_words": []
+      },
+      "ask_first": "Do customers call mostly the office phone, or the personal numbers of individual staff?",
+      "free_stops": "Broadcast set-up and wording are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count missed calls during the last upstream outage and compare them with replies sent, so you see the true communication overload.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of posting the outage update to the staff chat immediately, so everyone answers callers with the same information.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p10_churn_subscription",
+      "n": 10,
+      "words": "Subscribers leave for a bigger fibre company and we find out when they stop paying",
+      "category": "customers_retention",
+      "subtype": "churn_subscription",
+      "quick_ideas": [
+        "Ask every leaving subscriber one question about why, so you learn the real reason",
+        "Note subscribers with repeat complaints, so you know who is at risk before they go."
+      ],
+      "workzap_build": {
+        "keys": [
+          "loyalty_repeat"
+        ],
+        "text": "dashboards_reports — A churn log with reason codes on disconnection and an early-warning list of subscribers with repeat faults.",
+        "tool_words": []
+      },
+      "ask_first": "Do subscribers leave mostly for a lower price, or for faster speeds from the bigger company?",
+      "free_stops": "Reason codes and the warning rules are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many stopped paying after repeat fault complaints this week, so you see whether service issues are driving the losses.",
+          "review": false
+        },
+        {
+          "text": "Give one person a notebook page for nonpayment stoppages and the reason heard, so leaving patterns are caught earlier.",
+          "review": false
+        }
+      ]
+    }
+  ],
+  "never_say": [
+    "Any network engineering, electrical, pole or line safety advice; in an emergency point to emergency services.",
+    "Any package pricing advice.",
+    "Anything involving pirated channels, unlicensed content, illegal resale or bypassing PTA, TDRA or CRTC.",
+    "Any request for subscriber names, addresses, phone numbers, logins, payment details, panel passwords or IP details.",
+    "Any suggestion of covert monitoring of staff."
+  ],
+  "sample_reply": {
+    "person": "Complaints ka koi nizaam nahi, technician apni marzi se ja rahe hain. Is ka koi hal batayein.",
+    "pi": "Ji, is ka rasta nikal sakta hai, aur pehla qadam aasan hai.\nPehle, har complaint, chahe kahin se aaye, ek list mein number aur waqt ke saath likhein, taake koi phone mein na reh jaye.\nDoosra, subah kaam sab se purani complaint se shuru karke baantein, taake lamba intezar pehle khatam ho.\nLambay arse ke liye Workzap ye set kar sakta hai: whatsApp pe aane wali har complaint numbered ticket ban jaye, technician ko phone pe tarteeb se kaam mile, aur aap ko roz pata chale har complaint kitni der mein theek hui.",
+    "language": "roman_urdu"
+  }
+}

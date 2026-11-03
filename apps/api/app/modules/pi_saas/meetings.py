@@ -27,6 +27,7 @@ from app.integrations.providers.base import EMAIL
 from app.integrations.providers.google_calendar import GoogleCalendarProvider
 from app.integrations.runtime import ConnectionRuntime
 from app.modules.customers.models import Customer
+from app.modules.pi import fixed_lines
 from app.modules.pi.models import PiSettings
 from app.modules.pi_saas import connectors
 from app.modules.pi_saas.models import PiStaffRequest
@@ -255,30 +256,54 @@ async def _remember_meeting(
 
 
 ZONE_NAMES = {"Asia/Karachi": "Pakistan time", "Asia/Dubai": "UAE time"}
+ZONE_WORDS: dict[str, dict[str, str]] = {
+    "en": ZONE_NAMES,
+    "roman_ur": {"Asia/Karachi": "Pakistan ka waqt", "Asia/Dubai": "UAE ka waqt"},
+    "ar": {"Asia/Karachi": "بتوقيت باكستان", "Asia/Dubai": "بتوقيت الإمارات"},
+}
+
+
+# What pi says about an arranged meeting, per language. Urdu and Hindi chats get Roman Urdu; the
+# Arabic wording is native-speaker review wanted.
+MEETING_WORDS: dict[str, dict[str, str]] = {
+    "en": {
+        "confirmed": "Your meeting is confirmed: *{label}* ({zone}), {minutes} minutes.",
+        "join": "Join here:\n{link}",
+        "place": "Place: {place}",
+        "open": "Open the link at that time; it works in a browser or on your phone.",
+    },
+    "roman_ur": {
+        "confirmed": "Aap ki meeting confirm ho gayi hai: *{label}* ({zone}), {minutes} minute.",
+        "join": "Join karne ka link:\n{link}",
+        "place": "Jagah: {place}",
+        "open": "Waqt par link khol lein, browser ya phone dono par chal jata hai.",
+    },
+    "ar": {
+        "confirmed": "تم تأكيد اجتماعكم: *{label}* ({zone})، {minutes} دقيقة.",
+        "join": "رابط الانضمام:\n{link}",
+        "place": "المكان: {place}",
+        "open": "افتحوا الرابط في ذلك الوقت، فهو يعمل في المتصفح أو على الهاتف.",
+    },
+}
 
 
 def meeting_message(meeting: dict[str, Any], language: str) -> str:
     """The arranged meeting, told to the customer word for word (never through the
     model, so the time and link can't be dropped or changed)."""
     label = str(meeting.get("label") or "")
-    zone = ZONE_NAMES.get(str(meeting.get("zone") or ""), str(meeting.get("zone") or ""))
+    key = fixed_lines.table_language(language, MEETING_WORDS)
+    zone_id = str(meeting.get("zone") or "")
+    zone = ZONE_WORDS[key].get(zone_id, zone_id)
     minutes = meeting.get("minutes") or 30
     link, place = str(meeting.get("link") or ""), str(meeting.get("place") or "")
     note = str(meeting.get("note") or "")
-    if language == "roman_ur":
-        text = f"Aap ki meeting confirm ho gayi hai: *{label}* ({zone}), {minutes} minute."
-        if link:
-            text += f"\nJoin karne ka link:\n{link}"
-        elif place:
-            text += f"\nJagah: {place}"
-        text += "\nWaqt par link khol lein, browser ya phone dono par chal jata hai."
-    else:
-        text = f"Your meeting is confirmed: *{label}* ({zone}), {minutes} minutes."
-        if link:
-            text += f"\nJoin here:\n{link}"
-        elif place:
-            text += f"\nPlace: {place}"
-        text += "\nOpen the link at that time; it works in a browser or on your phone."
+    words = MEETING_WORDS[key]
+    text = words["confirmed"].format(label=label, zone=zone, minutes=minutes)
+    if link:
+        text += "\n" + words["join"].format(link=link)
+    elif place:
+        text += "\n" + words["place"].format(place=place)
+    text += "\n" + words["open"]
     if note:
         text += f"\n{note}"
     return text

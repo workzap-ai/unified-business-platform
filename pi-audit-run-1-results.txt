@@ -1,0 +1,44 @@
+pi audit run 1: results (read-only checks, run 2026-10-29 on commit 154f530 and its parent 419b7c0)
+No secrets, no phone numbers. Code checks used `git grep HEAD`; no production database was read.
+
+C1 | FAIL (fixed) | The old greeting was in the PROMPT TEXT, not in a template.
+Evidence: spec/handbook.json sections 1.1 (R-DISC-01, "Canonical form: Hi, I'm pi, an AI from Workzap. Tell me what's going wrong in your business and I'll start on it.") and 2.3 (the opening row, "(fixed)"). Both are CORE sections sent on every turn (spec_handbook.CORE). Part 14's supersession patches covered 0.2 and 3.2 only. The model copied the "canonical" line and added its own "Glad your friend passed on the number". Other hits are not on the reply path: constitution.py:2300 (a fallback question), safety.py:1358/1363 (greeting replies to salam and Eid), apps/site pi pages (marketing), docs/pi-saas/pi-golden-replies.md, and four old unit tests. No hit in flow.OPENING (it already says "What does your business do?"). Database tables: UNKNOWN (no production read; see UNKNOWN list).
+
+C2 | PASS | One prompt source for the rules: the Brain v3 handbook (spec/handbook.json) with spec/supersession.json applied on top by spec_handbook.superseded(); the supersession wins. The prompt version (learning_audit) includes the supersession hash. Other fragments are data below the rules (knowledge, learned packs, operator guidance, examples). Two sources can both load: the old text survives wherever supersession has no patch (that is what happened for 1.1 and 2.3).
+Evidence: spec_handbook.py:165-190 (superseded), :FRAME text ("rules outrank every example").
+
+C3 | PARTIAL | First message of a never-seen number: conversation starts in the opening state (flow.OPENING), warm-up is a step in the brief (warmup.step: identity_asked, page_asked, done, skipped), not a flow state; there is no state called S_WARMUP.
+(b) Fixed strings without the model: warmup replies (IDENTITY etc.), greeting_reply (service_conversation.py ~5593: "Hi <name>. How can I help you today?" when the warm-up is off or already skipped), safety greeting lines.
+(c) The opening is skipped when: warmup flag is not true (response_rules.brain.warmup), the customer has noted problems or is returning, the message is not a plain greeting (this was the bug: "My friend shared your number" counted as content and set step=skipped), the message states a problem, or the step is already done or skipped.
+(d) A number used in earlier test chats counts as returning once it has noted problems or a customer row with a returning flag; a number that only said hello does not.
+Evidence: warmup.py:116-140, service_conversation.py greeting path.
+
+C4 | PASS | Working tree HEAD 154f530 (2026-10-29 16:04). Railway production: API service deployment SUCCESS at 16:05 and pi-worker SUCCESS at 16:05 (+05:00), both after the push, so the fix is live. Earlier, on 28 Oct, the pi-worker deploy of 12:27 FAILED on a Railway build-daemon error (buildkit socket) and was replaced at 13:07. Vercel: not checked (apps/pi and apps/site only). Flags that matter: response_rules.brain.warmup per tenant (Workzap is true; Workzap.ai was reverted, see UNKNOWN), pi_mode, solution_mode, map_share (true for Workzap since 28 Oct). Environment variable names were not listed.
+Evidence: railway deployment list for both services.
+
+C5 | PASS (opening WIRED, openingGate PARTIAL) | warmup.py EXISTS and WIRED (service_conversation compose_service_turn hook, runtime quick-look hook), identity question WIRED, website question WIRED (page_asked), no-website path WIRED (NO_WEBSITE), quick-look fetcher WIRED (public_page.quick_look), profile tables EXIST and WIRED since migration 0050 (pi_business_profiles, pi_profile_facts, pi_page_snapshots; applied to Neon 2026-10-28). An openingGate that blocks ANY first reply lacking the identity question is MISSING: when the warm-up is skipped or off, the model's first reply is only checked for the AI disclosure (R-DISC-01), not for the identity question.
+
+C6 | PARTIAL | Tests for the opening exist: tests/unit/test_pi_warmup.py (OT1, OT2, OT3, OT8, OT12 and two new tests for a social opener), test_pi_public_page.py (OT7, OT9, OT10), test_pi_profile_persistence/grounding (OT11, OT13, OT15). OT4 (50 public sites), OT5, OT6, OT14 have no named test. Added 2026-10-29: test_pi_spec_supersession.py::test_the_old_opening_is_not_in_the_prompt_text (no prompt section may carry the old greeting). There was no test before today that asserted the old greeting is never sent.
+
+C7 | UNKNOWN | A full replay through the real model was not run (no real-model calls without the owner's approval). Scripted-model replay of "Hello" then "My friend shared your number": before the fix the second message set step=skipped (unit test reproduces it); after the fix it gets the identity question. Prompt text no longer contains the old line (verified on spec_handbook.sections()).
+
+C8 | UNKNOWN | The 3:33 PM conversation needs the production database. Run docs/pi-saas/check-tenant-of-chat.sql in the Neon SQL editor (read-only, no phone number printed) and send the one row back.
+
+C9 | FAIL | "AC units" appears only in industry_words.py:1393 and industry_packs.py:283 (a comment); "spare parts" in industry_words.py:2162 and 11 industry packs (elevator, auto parts, aircraft, facility management, entertainment centres ...). These are classifier vocabulary and pack knowledge. The live chat's "boxes / board / machine and godown staff" came from the expert advisor writing ideas for an industry it guessed from "10 crore stock written on paper" before the owner said what the business does. Idea guards G2/G9/G11 and profile grounding exist but only check ideas the filter is given; no gate stops an industry noun in the expert's free text when no business fact is confirmed. NOT FIXED.
+
+C10 | PARTIAL | Default offer line: brain_docs.py:740 is a delivery message, not the offer; the legacy offer "Shall I get one solution document and a quote made for all of these together?" is in decisions.py and stays while box_offer is off (owner decision). "Noted"/"note kar liya": removed as an opener (R-ECHO-05, voice_noted); remaining hits are the linter's own rules and constitution.py:2382 (a fallback "Note kar liya. <question>", audit item X4, not yet changed).
+
+C11 | PASS | Debounce 6 s (brain_config.py:15, range 5-20; Workzap has an explicit 5 s), burst cap 25 s (range 15-60). A later message inside the window joins the same turn and a stale reply is dropped (stale_reply in runtime.py). The fixed greeting_reply path does not apply the stale check: in the chat the answer to "Hello" arrived AFTER the answer to the second message.
+
+VERDICT
+Most likely cause (fixed): the model copied the old canonical greeting from the prompt itself: handbook sections 1.1 and 2.3 still printed it, and the supersession patches had never replaced them. Second cause (fixed): the owner's first two messages were "Hello" and "My friend shared your number"; the second message was treated as "content", so the warm-up was marked skipped and the model answered alone. Third possible cause (UNKNOWN until the Neon query is run): the chat belongs to a tenant on which the warm-up flag is off (Workzap.ai had it reverted on 2026-10-27); then the opening can never appear there by design. Also seen: an out-of-order second greeting from the fixed greeting path, and the expert advisor inventing an industry. Not checked: Meta webhook URL, which phone and environment was used, Vercel, production database tables, real-model replay.
+
+FIX LIST (smallest first)
+1. DONE 2026-10-29: supersession patches for handbook 1.1 and 2.3 (apps/api/app/modules/pi/spec/supersession.json, apps/api/scripts/build_spec_supersession.py) and a test that no prompt section carries the old line.
+2. DONE 2026-10-29: warm-up treats "my friend shared your number" style openers as unhurried (apps/api/app/modules/pi/warmup.py, tests/unit/test_pi_warmup.py).
+3. TO DO: run docs/pi-saas/check-tenant-of-chat.sql; if the tenant has warmup off, decide whether to switch it on (SQL by settings id).
+4. TO DO: stale-reply and burst check on the greeting_reply path so a late "Hello" answer is dropped (service_conversation.py ~5778, runtime.py).
+5. TO DO: an openingGate: a first reply with no identity question is replaced by the warm-up line when the warm-up is on (service_conversation.py, constitution.py).
+6. TO DO: no industry noun in an idea or reply until a business fact is confirmed by the owner (expert_advisor.py prompt and idea_filter.py guard).
+7. TO DO: when the owner asks "will you not ask what business I do", ask it (owner_intents or warmup).
+8. TO DO: replace constitution.py:2382 "Note kar liya." fallback (audit item X4).

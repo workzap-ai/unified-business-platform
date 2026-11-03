@@ -1365,7 +1365,7 @@ async def after_order_moved(
     conversation = (
         await _conversation(session, scope, customer, contact) if customer and contact else None
     )
-    if conversation is None or not conversation.last_inbound_at:
+    if conversation is None or customer is None or not conversation.last_inbound_at:
         return []
     if conversation.last_inbound_at < datetime.now(UTC) - WINDOW:
         return []  # Outside the window pi's next check-in carries the news.

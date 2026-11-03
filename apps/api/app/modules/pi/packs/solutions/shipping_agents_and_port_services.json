@@ -1,0 +1,350 @@
+{
+  "industry": "shipping_agents_and_port_services",
+  "name": "Shipping agents and port services",
+  "sector": "7.E Trade, distribution and logistics",
+  "version": "1.1",
+  "problems": [
+    {
+      "id": "p1_bottleneck",
+      "n": 1,
+      "words": "DO release queue at our counter is always full",
+      "category": "operations_process",
+      "subtype": "bottleneck",
+      "quick_ideas": [
+        "Publish the list of documents needed for a DO, so customers arrive ready",
+        "Accept documents by email ahead of the visit, so counter time is shorter."
+      ],
+      "workzap_build": {
+        "keys": [
+          "website_digital"
+        ],
+        "text": "An online DO request and payment flow with document upload and status messages, cutting counter visits.",
+        "tool_words": []
+      },
+      "ask_first": "Is the queue worst at certain hours or days, or mostly because customers arrive with missing papers?",
+      "free_stops": "The request and approval flow is designed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many people reach the counter missing one document each day, so the main cause of the queue is visible.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member the job of checking papers before counter handover, so the release desk keeps moving steadily.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p2_customer_communication",
+      "n": 2,
+      "words": "Customers can't see their detention charges until they come to pay",
+      "category": "customers_retention",
+      "subtype": "customer_communication",
+      "quick_ideas": [
+        "Tell each customer their free-time end date at DO release, so charges don't surprise them",
+        "List containers close to free-time end today."
+      ],
+      "workzap_build": {
+        "keys": [
+          "customer_messaging"
+        ],
+        "text": "Live free-time countdowns and detention estimates sent to the customer on WhatsApp as time runs.",
+        "tool_words": []
+      },
+      "ask_first": "Do customers mostly call to ask about charges, or only find out when they come to pay?",
+      "free_stops": "Message timing is set in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note how many customers ask about detention only when paying this week, so surprise charges can be sized clearly.",
+          "review": false
+        },
+        {
+          "text": "Keep one daily list of boxes nearing charge time with one person updating it, so customers get warned before arrival.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p3_reports_wrong",
+      "n": 3,
+      "words": "Detention invoices are calculated by hand and often wrong",
+      "category": "reporting_visibility",
+      "subtype": "reports_wrong",
+      "quick_ideas": [
+        "Re-check a few recent detention invoices, so you see how often and where errors happen",
+        "Keep one current tariff reference everyone uses."
+      ],
+      "workzap_build": {
+        "keys": [
+          "custom_build"
+        ],
+        "text": "A detention and demurrage calculator per container using gate-out and return dates.",
+        "tool_words": []
+      },
+      "ask_first": "Do the mistakes come from the free days count, or from the tariff rate used?",
+      "free_stops": "How the calculation is set up is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare a small set of recent detention invoices against the tariff note, so the common calculation slip is easy to spot.",
+          "review": false
+        },
+        {
+          "text": "Keep one handwritten detention rate reference at the billing desk, so everyone calculates from the same current source.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p4_no_visibility",
+      "n": 4,
+      "words": "Empties aren't returned and we lose track of containers",
+      "category": "stock_inventory",
+      "subtype": "no_visibility",
+      "quick_ideas": [
+        "List containers out with customers and their days out, so overdue ones show",
+        "Name one person for equipment follow-up."
+      ],
+      "workzap_build": {
+        "keys": [
+          "transfer_tracking"
+        ],
+        "text": "A container movement tracker (gate out, with customer, returned to depot) with overdue alerts and an equipment balance view by port.",
+        "tool_words": []
+      },
+      "ask_first": "Is it one depot or line that fails to report returns, or several?",
+      "free_stops": "The movement stages and alerts are set in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Walk the outstanding container list once and mark which boxes have no recent return update, so follow up starts with the oldest gaps.",
+          "review": false
+        },
+        {
+          "text": "Give one person a fixed afternoon slot to update box returns in one notebook, so overdue containers are chased sooner.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p5_cash_flow_tight",
+      "n": 5,
+      "words": "Principals pay FDAs late and we fund port costs",
+      "category": "cash_collections",
+      "subtype": "cash_flow_tight",
+      "quick_ideas": [
+        "Total what you have funded for each principal now, so the exposure is clear",
+        "Raise PDA funding before vessel arrival as your agreement allows."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger"
+        ],
+        "text": "A principal receivables tracker with ageing and settlement status.",
+        "tool_words": []
+      },
+      "ask_first": "Is it one or two principals who pay late, or most of them?",
+      "free_stops": "Ageing and follow-up rules are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note each vessel call where your team already paid port charges, so the heaviest funding pressure by principal is visible.",
+          "review": false
+        },
+        {
+          "text": "Give one person one notebook for all already paid call expenses awaiting principal cover, so follow up stops getting missed.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p6_reports_late",
+      "n": 6,
+      "words": "Disbursement accounts take weeks to finalise",
+      "category": "reporting_visibility",
+      "subtype": "reports_late",
+      "quick_ideas": [
+        "List the port invoices still outstanding on each open call, so you see what's holding FDAs",
+        "Name who chases each."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "A PDA/FDA builder that collects port invoices as they arrive and shows what's still outstanding.",
+        "tool_words": []
+      },
+      "ask_first": "Which holds you up most, the port invoices, the agent costs or the principal's approval?",
+      "free_stops": "How invoices are collected into each FDA is designed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count the open vessel calls waiting on supplier bills this week, so the real hold up in disbursement finalising is clear.",
+          "review": false
+        },
+        {
+          "text": "Keep one outstanding cost list per vessel with one person updating it daily, so missing bills are chased from one place.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p7_info_lost_in_whatsapp",
+      "n": 7,
+      "words": "Boarding officer updates come by phone and get lost",
+      "category": "communication_coordination",
+      "subtype": "info_lost_in_whatsapp",
+      "quick_ideas": [
+        "Ask boarding officers to send updates in one shared place, so the office sees them",
+        "Keep a short log per vessel call."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking"
+        ],
+        "text": "A vessel call board with ETA, berth, boarding updates, tasks and responsible staff.",
+        "tool_words": []
+      },
+      "ask_first": "Do the lost updates happen on busy vessel days, or on any call?",
+      "free_stops": "The board's structure is set in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many boarding updates had to be asked for again this week, so the cost of missed call information is clear.",
+          "review": false
+        },
+        {
+          "text": "Keep one handwritten vessel call log in the office and give one person the update handover, so boarding news lands in one place.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p8_chat_overload",
+      "n": 8,
+      "words": "Every customer emails for the same arrival information",
+      "category": "customer_experience_digital",
+      "subtype": "chat_overload",
+      "quick_ideas": [
+        "Count a day's arrival enquiries, so you see the load",
+        "Send arrival details to consignees once, proactively."
+      ],
+      "workzap_build": {
+        "keys": [
+          "customer_messaging"
+        ],
+        "text": "Arrival notices sent directly to consignees from the manifest.",
+        "tool_words": []
+      },
+      "ask_first": "Which question comes most, the arrival date, the berth or the documents?",
+      "free_stops": "What notices include and when they go is set in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many arrival information messages repeat the same question in one day, so the busiest enquiry type is obvious.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member a fixed daily time to send the latest arrival details to waiting customers, so repeated chasing drops.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p9_record_keeping",
+      "n": 9,
+      "words": "Customers dispute detention, saying they returned the box on time",
+      "category": "compliance_admin",
+      "subtype": "record_keeping",
+      "quick_ideas": [
+        "Ask the depot for return dates daily rather than every few days, so records are current",
+        "Keep proof of each return with the container record."
+      ],
+      "workzap_build": {
+        "keys": [
+          "integration"
+        ],
+        "text": "Depot return data flowing into your records daily, so each dispute can be checked against a dated record.",
+        "tool_words": []
+      },
+      "ask_first": "Is the dispute usually about the return date, or about the days counted before it?",
+      "free_stops": "How depot data connects is mapped in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare return dates claimed by customers against depot dates on recent disputed boxes, so the mismatch pattern shows early.",
+          "review": false
+        },
+        {
+          "text": "Keep one return proof file by container number with one person maintaining it, so disputes are answered from one record quickly.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p10_approvals_slow",
+      "n": 10,
+      "words": "Approval of waivers on detention goes through too many people",
+      "category": "operations_process",
+      "subtype": "approvals_slow",
+      "quick_ideas": [
+        "Write down who can approve what level of waiver, so requests go to one person",
+        "Note the reason on every waiver given."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "A waiver approval workflow with reasons and limits by role.",
+        "tool_words": []
+      },
+      "ask_first": "How many people does a waiver usually pass through, and is it the same ones each time?",
+      "free_stops": "Approval limits are set in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many waiver requests waited more than one day this week, so the approval delay is clear by reason.",
+          "review": false
+        },
+        {
+          "text": "Keep one waiver register at the approvals desk with one named owner, so requests stop circling between too many people.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p11_no_dashboard",
+      "n": 11,
+      "words": "I can't see vessel calls, revenues and costs per principal in one view",
+      "category": "reporting_visibility",
+      "subtype": "no_dashboard",
+      "quick_ideas": [
+        "Pick the few numbers each principal asks about, so reporting covers what matters",
+        "Pull last month's figures once."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "A principal view and KPI report pack produced from operational data.",
+        "tool_words": []
+      },
+      "ask_first": "Which view do you most want for each principal, the costs, the revenue or the number of calls?",
+      "free_stops": "What the report pack contains is set in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note each vessel call, its principal, revenue and cost on one page this week, so weak earning calls stand out quickly.",
+          "review": false
+        },
+        {
+          "text": "Give one person a fixed weekly time to update the principal summary sheet, so owners get one consistent view.",
+          "review": false
+        }
+      ]
+    }
+  ],
+  "never_say": [
+    "Anything on maritime law, charter party terms, laytime disputes, P&I or cargo claims.",
+    "Sanctions screening of vessels, cargo, owners or destinations, or any way around it.",
+    "Crew changes, visas or shore passes; never store crew details.",
+    "Help releasing cargo without proper authority or \"managing\" officials.",
+    "Storing customer and principal financial details. For port incidents, injuries, fires, spills or medical emergencies on board, emergency services and the port authority come first."
+  ],
+  "sample_reply": {
+    "person": "We're agents for two lines in Jebel Ali and detention disputes are killing us. Customers swear they returned empties earlier than our records. Any fix?",
+    "pi": "Sure, this can be sorted, and none of it needs special equipment.\nFirst, ask the depot for return dates every day rather than every few days, so your records are current.\nSecond, keep proof of each return with the container record, so every dispute is checked against something dated.\nWorkzap could take it further with: depot return data flowing in daily, with a free-time countdown each customer sees on WhatsApp.\n\nShall I have a solution document and quote prepared for you? You're welcome to say no.",
+    "language": "english"
+  }
+}

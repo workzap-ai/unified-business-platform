@@ -1,0 +1,322 @@
+{
+  "industry": "camel_farms",
+  "name": "Camel farms (UAE and Cholistan)",
+  "sector": "7.C Agriculture, livestock and rural (part 1)",
+  "version": "1.1",
+  "problems": [
+    {
+      "id": "p1_no_yield_per_animal",
+      "n": 1,
+      "words": "Milk per naqa is not recorded, only the total in the tank",
+      "category": "reporting_visibility",
+      "subtype": "no_yield_per_animal",
+      "quick_ideas": [
+        "Have milk written per camel for one week to see which ones are dropping",
+        "Ask for that day's figures as a photo each evening, not just the tank total."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "nori_daily_read — herders enter milk per naqa on the phone, and the owner gets a morning read of totals and camels below their usual yield.",
+        "tool_words": []
+      },
+      "ask_first": "How many camels are in milk right now?",
+      "free_stops": "How entries are set up per camel and how drops are flagged goes in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare each milking camel's bucket amount once this week against the tank total, so low-yield animals stop hiding inside one number.",
+          "review": false
+        },
+        {
+          "text": "Give one milker one notebook page for camel names and amounts each milking, so daily yield stays tied to each animal.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p2_rejections",
+      "n": 2,
+      "words": "The collector rejects milk sometimes and I don't know why or how much",
+      "category": "quality_complaints",
+      "subtype": "rejections",
+      "quick_ideas": [
+        "Ask the collector for every rejection in writing, with quantity and reason",
+        "If the same reason keeps coming back, take it to your vet or the processor's quality team."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "daily summary — rejected quantity and reason logged against each day's milking, with a monthly pattern shown to the owner at month end.",
+        "tool_words": []
+      },
+      "ask_first": "Does the collector give any reason today?",
+      "free_stops": "How rejections are logged and compared stays in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Write down each rejected milk collection with the stated reason and amount refused, so you can see which problem repeats most.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of logging every collector complaint in one notebook, so reasons stop getting lost between calls.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p3_delivery_late",
+      "n": 3,
+      "words": "Fresh camel milk spoils if the van is late in summer",
+      "category": "orders_fulfilment",
+      "subtype": "delivery_late",
+      "quick_ideas": [
+        "Note when the van leaves and arrives each day so late routes show up",
+        "Tell customers early when a delivery will be late."
+      ],
+      "workzap_build": {
+        "keys": [
+          "order_capture"
+        ],
+        "text": "a delivery tracker with departure and arrival times per route and missed-delivery alerts sent to you.",
+        "tool_words": []
+      },
+      "ask_first": "How many delivery routes run each day?",
+      "free_stops": "Route timing rules and alerts are detailed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note the milking finish time beside the van departure time each day, so you can see where summer delay really starts.",
+          "review": false
+        },
+        {
+          "text": "Give one driver one departure notebook kept by the keys, so late trips are handed over clearly every day.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p4_churn_subscription",
+      "n": 4,
+      "words": "Home delivery customers stop ordering and I don't know why",
+      "category": "customers_retention",
+      "subtype": "churn_subscription",
+      "quick_ideas": [
+        "Keep a list of regular customers and when each last ordered",
+        "Ask those who stopped, with their permission, what changed."
+      ],
+      "workzap_build": {
+        "keys": [
+          "customer_messaging"
+        ],
+        "text": "order_capture — a milk subscription list with pauses, which spots customers who've gone quiet and sends them a message.",
+        "tool_words": []
+      },
+      "ask_first": "Do customers order daily, weekly or as they need?",
+      "free_stops": "When a customer counts as \"gone quiet\" and the follow-up flow go in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many regular homes missed their usual order this week, so the drop in repeat buying is clear.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member one list of regular homes to update after rounds, so follow-up stays part of delivery routine.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p5_count_mismatch",
+      "n": 5,
+      "words": "Hay deliveries are short and nobody checks",
+      "category": "stock_inventory",
+      "subtype": "count_mismatch",
+      "quick_ideas": [
+        "Count bales on arrival before signing",
+        "Keep the supplier's price per delivery so changes are visible."
+      ],
+      "workzap_build": {
+        "keys": [
+          "stock_alerts"
+        ],
+        "text": "hay and feed deliveries vs orders logged with photos, stock kept running and monthly cost per camel shown to the owner.",
+        "tool_words": []
+      },
+      "ask_first": "Who receives hay deliveries at the ezba?",
+      "free_stops": "The delivery log and cost-per-camel view stay in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare the delivery note with the bales stacked on the ground before unloading ends, so shortages are caught while the truck is there.",
+          "review": false
+        },
+        {
+          "text": "Give one worker the arrival count and one notebook by the gate, so every hay load is checked the same way.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p6_stray_lost_animals",
+      "n": 6,
+      "words": "Camels stray in Cholistan and we spend days searching",
+      "category": "loss_security",
+      "subtype": "stray_lost_animals",
+      "quick_ideas": [
+        "Ask herders for an evening headcount with a location pin",
+        "Note last-seen place and time the moment a camel goes missing."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "daily herder check-ins with headcount photo and location, plus a stray log the owner sees as soon as a camel is missing.",
+        "tool_words": []
+      },
+      "ask_first": "Do herders have phone signal in the grazing areas?",
+      "free_stops": "Check-in timing and the stray log design are set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note where and when each herd was last counted at dusk this week, so search starts from the freshest place.",
+          "review": false
+        },
+        {
+          "text": "Give one herder the dusk headcount and one shared notebook in camp, so missing camels are spotted before days are lost.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p7_hidden_costs",
+      "n": 7,
+      "words": "I don't know if racing camels earn more than they cost",
+      "category": "margin_cost",
+      "subtype": "hidden_costs",
+      "quick_ideas": [
+        "Keep each racing camel's entries, trainer fees and transport on one sheet",
+        "Move receipts out of WhatsApp so they don't get lost."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking"
+        ],
+        "text": "performance reports — a racing and show tracker that totals costs and results per camel across the season for the owner.",
+        "tool_words": []
+      },
+      "ask_first": "How many camels race or show each season?",
+      "free_stops": "What's tracked per camel and how it's compared goes in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Put each racing camel's transport, entry and care spending on one page this week, so heavy spenders stand out quickly.",
+          "review": false
+        },
+        {
+          "text": "Give one person one notebook for every racing camel expense as it happens, so cost tracking survives busy travel days.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p8_succession_family",
+      "n": 8,
+      "words": "Brothers share the herd and argue about whose camels are whose",
+      "category": "planning_growth",
+      "subtype": "succession_family",
+      "quick_ideas": [
+        "Agree one list of which camels belong to whom, seen by everyone; for anything legal or inheritance-related, talk to a lawyer",
+        "Record each sale and cost against its owner."
+      ],
+      "workzap_build": {
+        "keys": [
+          "custom_build"
+        ],
+        "text": "a family share ledger showing each person's camels, costs and sales, updated as entries come in and visible to all owners.",
+        "tool_words": []
+      },
+      "ask_first": "How many family members share the herd?",
+      "free_stops": "The ledger structure and who sees what stay in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Walk the herd once and note which animals more than one brother claims, so the overlap is visible before arguments grow.",
+          "review": false
+        },
+        {
+          "text": "Give one family member one herd list kept in one place for ownership notes, so disputes stop restarting from memory.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p9_petty_cash",
+      "n": 9,
+      "words": "Cash given to the herder for supplies, no receipts",
+      "category": "cash_collections",
+      "subtype": "petty_cash",
+      "quick_ideas": [
+        "Give a fixed float and top up only against receipts",
+        "Ask for a photo of each receipt."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "a petty cash record on the phone where herders would snap receipts, with the balance and spending kept up to date for the owner.",
+        "tool_words": [
+          "app"
+        ]
+      },
+      "ask_first": "How many staff handle cash for the farm?",
+      "free_stops": "Float rules and approvals are detailed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare cash given for supplies with items actually brought back this week, so the size of the missing proof is clear.",
+          "review": false
+        },
+        {
+          "text": "Give one herder one notebook page for each cash handover and return, so supply money has a clear trail.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p10_owner_blind",
+      "n": 10,
+      "words": "I'm in the city and only see the farm on weekends",
+      "category": "reporting_visibility",
+      "subtype": "owner_blind",
+      "quick_ideas": [
+        "Ask the manager for one short written update each evening",
+        "Decide the one number you most want to see every day."
+      ],
+      "workzap_build": {
+        "keys": [
+          "nori_daily_read"
+        ],
+        "text": "a morning read sent to the owner with milk, headcount, births, deaths, deliveries and cash, from the entries staff already make.",
+        "tool_words": []
+      },
+      "ask_first": "If you could see one number every morning, what would it be?",
+      "free_stops": "What goes into the morning read is worked out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note how many days pass between a farm issue happening and you hearing it, so weekend surprises shrink.",
+          "review": false
+        },
+        {
+          "text": "Give one worker the job of sending one notebook page photo at sunset, so the farm stops going quiet midweek.",
+          "review": false
+        }
+      ]
+    }
+  ],
+  "never_say": [
+    "Any medicine, doping, performance-enhancer, training, breeding or embryo advice; suggest their vet.",
+    "Anything that helps get around racing or competition rules, doping tests, microchip or registration, or milk-quality checks.",
+    "Immigration, visa or labour-law advice about expatriate staff, or storing passport or Emirates ID numbers.",
+    "Anything that helps with smuggling or unlicensed movement across borders.",
+    "Prices or values of racing or beauty camels, or opinions on inheritance and family ownership."
+  ],
+  "sample_reply": {
+    "person": "عندي عزبة في العين فيها ستين ناقة حلوب، الحليب يقل والمصنع يرجع جزء منه. شو الحل؟",
+    "pi": "أكيد في حل، وتقدر تبدأ فيه من هالأسبوع. ١) خل الراعي يسجل حليب كل ناقة لحالها لمدة أسبوع، عشان يبين أي ناقة يقل حليبها. ٢) اطلب من المصنع رفض مكتوب بالكمية والسبب، وإذا تكرر نفس السبب ارجع لطبيبك البيطري. Workzap يقدر يسوي هذا كله لك بشكل تلقائي كل يوم: سجل على التلفون لحليب كل ناقة والكميات المرفوضة، ويوصلك ملخص كل صبح. تبي أجهز لك وثيقة حل وعرض سعر، وعادي لو ما تبي؟",
+    "language": "arabic"
+  }
+}

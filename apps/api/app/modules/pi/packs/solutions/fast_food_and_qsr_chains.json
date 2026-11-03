@@ -1,0 +1,333 @@
+{
+  "industry": "fast_food_and_qsr_chains",
+  "name": "Fast food and QSR chains",
+  "sector": "7.B Food and beverage",
+  "version": "1.1",
+  "problems": [
+    {
+      "id": "p1_franchise_control",
+      "n": 1,
+      "words": "Franchisees don't share real sales, I only see what they report",
+      "category": "planning_growth",
+      "subtype": "franchise_control",
+      "quick_ideas": [
+        "Ask every franchisee for the same few numbers on a fixed day, so reports can at least be compared",
+        "Visit one franchised branch at peak and compare what you see with what they report."
+      ],
+      "workzap_build": {
+        "keys": [
+          "integration",
+          "dashboards_reports"
+        ],
+        "text": "You would see every outlet's sales, franchisees included, by hour and channel each day in one view, even where outlets use different tills.",
+        "tool_words": [
+          "dashboard",
+          "system"
+        ],
+        "reordered_from": [
+          "dashboards_reports",
+          "integration"
+        ]
+      },
+      "ask_first": "Are the franchised branches on the same POS as your own?",
+      "free_stops": "How each POS is connected and what franchisees must share is set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Stand near the counter at one franchised branch during a busy period and count completed orders, so reported sales can be sense checked.",
+          "review": false
+        },
+        {
+          "text": "Give one head office person the job of collecting branch reports in one notebook every week, so late figures stop arriving in mixed forms.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p2_bottleneck",
+      "n": 2,
+      "words": "Peak hour ticket times go too long and people walk out",
+      "category": "operations_process",
+      "subtype": "bottleneck",
+      "quick_ideas": [
+        "Watch one peak and note where orders wait longest, because the fix depends on whether it's ordering, kitchen or handover",
+        "Put one crew member only on handover at peak, so finished food doesn't sit."
+      ],
+      "workzap_build": {
+        "keys": [
+          "custom_build"
+        ],
+        "text": "a ticket-time tracker from order to handover, measured every hour at every branch, showing where and when speed drops.",
+        "tool_words": []
+      },
+      "ask_first": "Where does the line slow down most — ordering, kitchen or handover?",
+      "free_stops": "The station layout and peak staffing plan per branch stays for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note how many customers leave the queue during one busy period and where they were waiting, so the true choke point is clearer.",
+          "review": false
+        },
+        {
+          "text": "Make one crew member own drink filling during the rush, so the kitchen can keep moving on food orders.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p3_consistency_across_branches",
+      "n": 3,
+      "words": "Each branch's burger looks different, the franchise ones are worst",
+      "category": "quality_complaints",
+      "subtype": "consistency_across_branches",
+      "quick_ideas": [
+        "Put a photo of the correct build at each assembly station, so crew copy the same picture",
+        "Ask each branch to send a photo of one finished item, so you see the difference yourself."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "a recipe and portion library sent to outlets with acknowledgement, and scored branch checks with photos every visit, compared across branches.",
+        "tool_words": []
+      },
+      "ask_first": "Which item varies most between branches?",
+      "free_stops": "The standards library and the scoring of branch checks are kept for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare one same menu item from each branch side by side this week, so the worst build differences are plain to see.",
+          "review": false
+        },
+        {
+          "text": "Make one person per branch check one finished burger each shift, so the look stays closer across company and franchise stores.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p4_transfers_lost",
+      "n": 4,
+      "words": "Commissary sends the wrong quantities — one branch runs out of buns while another throws them",
+      "category": "stock_inventory",
+      "subtype": "transfers_lost",
+      "quick_ideas": [
+        "Have each branch count what arrives and sign the dispatch note, so differences are caught on the day",
+        "Ask branches to order by a fixed time each evening, so the commissary isn't guessing."
+      ],
+      "workzap_build": {
+        "keys": [
+          "transfer_tracking"
+        ],
+        "text": "branch orders against par levels, dispatch notes and receiving confirmation on phone, with any sent-not-received gap flagged right away.",
+        "tool_words": []
+      },
+      "ask_first": "Who decides how much each branch receives from the commissary?",
+      "free_stops": "Par levels per branch and the order-to-dispatch flow are detailed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Write what each branch asked for beside what the commissary sent this week, so the mismatch pattern is easy to spot.",
+          "review": false
+        },
+        {
+          "text": "Give one commissary staff member one notebook for all branch transfer changes, so bun shortages and over sending stop being guessed.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p5_discount_abuse",
+      "n": 5,
+      "words": "Cashiers apply staff discount or deal codes for friends, and refunds happen without a manager",
+      "category": "sales_revenue",
+      "subtype": "discount_abuse",
+      "quick_ideas": [
+        "Limit discounts and refunds to manager logins, so each one has an approver",
+        "Read yesterday's discount and refund report once, because a pattern by shift usually shows quickly."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "a daily discount, void and refund report by branch, shift and role, with an alert when any branch crosses the limit you set.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "Who can apply a discount or refund on the POS today?",
+      "free_stops": "The thresholds and approval rules per role are set in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count discounts and refunds by shift for one week, so the branch and time with the heaviest leakage stands out.",
+          "review": false
+        },
+        {
+          "text": "Make one manager sign every refund note before end of shift, so cashiers stop treating refunds like a casual option.",
+          "review": true
+        }
+      ]
+    },
+    {
+      "id": "p6_integration_marketplace",
+      "n": 6,
+      "words": "Five tablets for five apps, and app payouts never match the POS",
+      "category": "tech_systems",
+      "subtype": "integration_marketplace",
+      "quick_ideas": [
+        "Match one app's payout against POS orders once, so you know whether the gap is missed orders or deductions",
+        "Put all tablets in one spot with one person watching them at peak."
+      ],
+      "workzap_build": {
+        "keys": [
+          "integration",
+          "cash_reconciliation"
+        ],
+        "text": "You would see all delivery partner orders on one screen beside till sales, with each partner's payout matched daily and commission, refunds and missed orders shown.",
+        "tool_words": [
+          "app"
+        ]
+      },
+      "ask_first": "Which partner's payout confuses you most?",
+      "free_stops": "Which ordering channels connect and how the reconciliation rules work goes in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare packed delivery orders with payout lines from one busy day, so you can see whether the mismatch starts in orders or settlements.",
+          "review": false
+        },
+        {
+          "text": "Assign one person to write every missed tablet alert in one notebook at peak, so lost marketplace orders stop being shrugged off.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p7_rider_management",
+      "n": 7,
+      "words": "Riders take longer routes, ask for more fuel money, and food arrives cold",
+      "category": "orders_fulfilment",
+      "subtype": "rider_management",
+      "quick_ideas": [
+        "Note time out and back for each trip for a few days, so fuel claims can be compared with real trips",
+        "Agree a fuel allowance by area instead of by request, so there's less to argue about."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking"
+        ],
+        "text": "a rider log of trips, areas, delivery times and fuel claims by rider label, summarised daily per branch.",
+        "tool_words": []
+      },
+      "ask_first": "Are riders your own, the partner's, or both?",
+      "free_stops": "The allowance rules and how trips are checked against claims stay for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note dispatch time and arrival back time by branch and area this week, so slow routes and cold order patterns are easier to compare.",
+          "review": false
+        },
+        {
+          "text": "Give one shift lead the job of handing out deliveries in one queue, so riders stop choosing easier trips and delaying others.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p8_turnover",
+      "n": 8,
+      "words": "Crew turnover is constant, and overtime claims don't match the clock-in",
+      "category": "people_staff",
+      "subtype": "turnover",
+      "quick_ideas": [
+        "Pair each new cashier with one experienced person for their first shifts, because a rough first week is when people quit",
+        "Have the shift manager approve overtime the same night, while it's still fresh."
+      ],
+      "workzap_build": {
+        "keys": [
+          "booking_scheduling"
+        ],
+        "text": "crew rota and clock-in on phone, with overtime summarised per branch for quick approval.",
+        "tool_words": []
+      },
+      "ask_first": "Which shift is hardest to staff?",
+      "free_stops": "The onboarding plan and overtime approval rules are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count who leaves within their early shifts at each branch this month, so you see where new crew are dropping out fastest.",
+          "review": false
+        },
+        {
+          "text": "Give one supervisor one place to record approved overtime before closing, so claims and clock times are checked while the shift is fresh.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p9_data_scattered",
+      "n": 9,
+      "words": "Head office reports come a week late and in different Excel formats from each branch",
+      "category": "reporting_visibility",
+      "subtype": "data_scattered",
+      "quick_ideas": [
+        "Ask every branch for one daily number by morning, so you're not waiting a week",
+        "Pick the one number you'll check every day, because too many numbers means none get read."
+      ],
+      "workzap_build": {
+        "keys": [
+          "nori_daily_read"
+        ],
+        "text": "a short morning read on WhatsApp of every branch's sales, channel mix, discounts and stock flags, with the one branch to look at.",
+        "tool_words": []
+      },
+      "ask_first": "What one number would you check every morning?",
+      "free_stops": "What goes into the morning read and how branch data is pulled is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Lay last week's branch reports side by side and note which figures are missing most often, so the reporting weak spot becomes visible.",
+          "review": false
+        },
+        {
+          "text": "Give one head office person one fixed morning time to collect branch numbers, so late reports stop drifting through the week.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p10_campaign_roi_unknown",
+      "n": 10,
+      "words": "Our LTO launch flopped and loyalty stamps on paper cards get lost",
+      "category": "marketing_leads",
+      "subtype": "campaign_roi_unknown",
+      "quick_ideas": [
+        "Note the promoted item's sales before, during and after the next LTO, so you can judge it fairly",
+        "Ask regulars if they'd like a phone-number visit count, with their permission, instead of paper stamps."
+      ],
+      "workzap_build": {
+        "keys": [
+          "attribution_codes",
+          "loyalty_repeat"
+        ],
+        "text": "codes showing which channel brought each order, an LTO tracker updated live, and phone-number loyalty for opted-in customers.",
+        "tool_words": []
+      },
+      "ask_first": "How do you judge whether a deal or LTO worked today?",
+      "free_stops": "The code set-up per channel and the loyalty rules are kept for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many lost paper stamp cards are mentioned at the counter this week, so you see whether loyalty leakage is rare or constant.",
+          "review": false
+        },
+        {
+          "text": "Give one shift lead a notebook for redeemed paper cards each day, so missing stamps stop turning into arguments at the till.",
+          "review": false
+        }
+      ]
+    }
+  ],
+  "never_say": [
+    "Advice on franchise agreements, royalties or disputes with franchisees — that is for their lawyer.",
+    "Anything on food-safety certification, oil-disposal rules or allergens — refer to the authority or a qualified consultant.",
+    "Tracking crew or riders' personal phones without their knowledge.",
+    "Help suppressing sales from royalty reports or tax.",
+    "Any promise that ticket times, sales or margins will improve by a set amount."
+  ],
+  "sample_reply": {
+    "person": "We have nine branches, four franchised. I need a solution — I never know what the franchise ones are really selling, and two use their own POS.",
+    "pi": "Sure, you can start on this now, and the first steps are simple.\nFirst, ask every franchisee for the same few numbers on a fixed day, so their reports can at least be compared.\nSecond, visit one franchised branch at peak and compare what you see with what they send.\nWorkzap could set this up by pulling sales from every outlet, including the two on their own POS, into one daily view by hour and channel, with a short morning read on WhatsApp.",
+    "language": "english"
+  }
+}

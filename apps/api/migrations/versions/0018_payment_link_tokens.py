@@ -46,9 +46,7 @@ def upgrade() -> None:
 
 
 def downgrade() -> None:
-    op.drop_constraint(
-        "uq_pi_payment_requests_link_token", "pi_payment_requests", type_="unique"
-    )
+    op.drop_constraint("uq_pi_payment_requests_link_token", "pi_payment_requests", type_="unique")
     op.drop_column("pi_payment_requests", "link_expires_at")
     op.drop_column("pi_payment_requests", "link_token_hash")
 

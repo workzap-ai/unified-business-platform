@@ -4,6 +4,7 @@ Downloads are served as attachments with ``nosniff``, ``no-store`` and a sandbox
 so a stored file can never run in the app's origin.
 """
 
+import logging
 from typing import Annotated, Any
 from urllib.parse import quote
 from uuid import UUID
@@ -11,6 +12,7 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, File, Response, UploadFile, status
 
 from app.modules.access.dependencies import Session, require
+from app.modules.audit.service import record
 from app.modules.customers import files
 from app.modules.customers.models import CustomerFile
 from app.modules.customers.service import CustomerService, log_activity
@@ -18,6 +20,7 @@ from app.shared.errors import BusinessRuleViolation
 from app.shared.scope import WorkspaceScope
 from app.shared.workspace_repository import WorkspaceRepository
 
+logger = logging.getLogger(__name__)
 router = APIRouter(tags=["customer-files"])
 Read = Annotated[WorkspaceScope, Depends(require("customers.read"))]
 Write = Annotated[WorkspaceScope, Depends(require("customers.write"))]
@@ -36,6 +39,26 @@ async def customer_files(customer_id: UUID, scope: Read, session: Session) -> li
     return [files.view(row) for row in rows]
 
 
+async def _keep_text(
+    session: Any, scope: WorkspaceScope, customer_id: UUID, file_id: UUID, data: bytes
+) -> None:
+    """Pi's document memory: the text of a staff upload (brain mode only). Never blocks it."""
+    try:
+        from app.modules.pi import document_texts
+        from app.modules.pi.configuration import settings_row
+
+        await document_texts.store_staff_file(
+            session,
+            scope,
+            customer_id=customer_id,
+            file_id=file_id,
+            raw=data,
+            response_rules=(await settings_row(session, scope)).response_rules,
+        )
+    except Exception:  # noqa: BLE001
+        logger.warning("staff_file_text_not_stored", exc_info=True)
+
+
 @router.post("/customers/{customer_id}/files", status_code=status.HTTP_201_CREATED)
 async def upload_file(
     customer_id: UUID,
@@ -49,8 +72,17 @@ async def upload_file(
     finally:
         await file.close()
     row = await files.save(session, scope, customer_id, data, file.filename or "file", "upload")
+    await _keep_text(session, scope, customer_id, row.id, data)
     await log_activity(
         session, scope, customer_id, "file", f"File added: {row.name}", "customer_file", row.id
+    )
+    await record(
+        session,
+        "customer.file_added",
+        scope=scope,
+        entity_type="customer_file",
+        entity_id=row.id,
+        details={"customer_id": str(customer_id), "name": row.name, "size": row.size},
     )
     await session.commit()
     return files.view(row)
@@ -79,9 +111,17 @@ async def delete_file(file_id: UUID, scope: Write, session: Session) -> Response
     row = await WorkspaceRepository(session, CustomerFile, scope).get(file_id)
     if row.source == "receipt":
         raise BusinessRuleViolation("RECEIPT_KEPT", "Receipts are kept for the record", 409)
-    name, customer_id = row.name, row.customer_id
+    name, customer_id, size = row.name, row.customer_id, row.size
     await session.delete(row)
     await log_activity(session, scope, customer_id, "file", f"File removed: {name}")
+    await record(
+        session,
+        "customer.file_removed",
+        scope=scope,
+        entity_type="customer_file",
+        entity_id=file_id,
+        details={"customer_id": str(customer_id), "name": name, "size": size},
+    )
     await session.commit()
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 

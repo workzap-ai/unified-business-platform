@@ -134,6 +134,8 @@ async def agent_view(agent: PiAgent, scope: Scope, session: Session) -> dict[str
         "key": agent.key,
         "name": agent.name,
         "role": agent.name,
+        # "brain" or "legacy" (response_rules.pi_mode): which engine answers this workspace's chats
+        "pi_mode": "brain" if config.response_rules.get("pi_mode") == "brain" else "legacy",
         "description": agent.description,
         "enabled": agent.enabled,
         "current_version": agent.current_version,

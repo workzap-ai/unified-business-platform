@@ -219,7 +219,7 @@ async def _requests(session: AsyncSession, scope: WorkspaceScope) -> list[Card]:
             row.customer_id,
             row.conversation_id,
             _line(row.context_summary or row.question, 1000),
-            priority="high" if row.priority == "high" else "normal",
+            priority="high" if row.priority in ("high", "urgent") else "normal",
         )
         for row in rows
     ]
@@ -572,9 +572,9 @@ async def _context(
         kind, raw = kind_of(task), source_of(task).split(":", 1)[0]
         project, link = None, None
         try:
-            source = UUID(raw) if raw else None
+            source = UUID(raw) if raw else None  # type: ignore[assignment]
         except ValueError:
-            source = None
+            source = None  # type: ignore[assignment]
         chat = f"/pi/inbox?conversation={task.conversation_id}" if task.conversation_id else None
         if kind in {"price", "approve"} and source:
             quote = by_quote.get(source)
@@ -738,7 +738,7 @@ async def card(session: AsyncSession, scope: WorkspaceScope, task: PiTask) -> di
     for column in found["columns"].values():
         for item in column:
             if item["id"] == task.id:
-                return item
+                return dict(item)
     return {"id": task.id, "title": task.title, "status": task.status, "kind": kind_of(task)}
 
 

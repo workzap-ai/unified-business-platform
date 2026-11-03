@@ -200,3 +200,30 @@ async def test_probe_leaves_room_for_models_that_think_first(settings):
         result = await probe(probe_settings(settings), client, "openai")
     assert result["ok"]
     assert all(body["max_completion_tokens"] >= 128 for body in bodies)
+
+
+def test_gemini_pi_brain_model_is_one_that_exists():
+    from app.ai.registry import DEFAULT_MODELS
+
+    # live check 2026-10-26: gemini-2.5-flash is a 404 for the platform key; 3.5-flash answers
+    assert DEFAULT_MODELS["gemini"]["pi_brain"] == "gemini-3.5-flash"
+
+
+def test_a_schema_mismatch_names_the_failing_field_and_never_its_value():
+    from pydantic import BaseModel
+
+    from app.ai.errors import ProviderError
+    from app.ai.manager import LLMManager
+    from app.ai.types import LLMResponse, OutputSchema
+
+    class Turn(BaseModel):
+        reply: str
+        confidence: float
+
+    response = LLMResponse(
+        text='{"reply": "secret words", "confidence": "high"}', model="m", provider="anthropic"
+    )
+    with pytest.raises(ProviderError) as caught:
+        LLMManager._parse_structured("anthropic", response, OutputSchema.of(Turn))
+    assert caught.value.code == "schema.confidence"
+    assert "secret" not in str(caught.value)

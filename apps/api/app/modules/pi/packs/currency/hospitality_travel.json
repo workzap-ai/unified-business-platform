@@ -1,0 +1,81 @@
+{
+ "cluster": "hospitality_travel",
+ "version": 1,
+ "as_of": "2026-10",
+ "industries": [
+  "banquet_halls_and_marquees",
+  "cinemas_and_theatres",
+  "corporate_events_and_exhibitions",
+  "entertainment_centres_gaming_zones_and_play_areas",
+  "guest_houses_b_and_bs_and_holiday_home_hosts",
+  "gyms_and_fitness_studios",
+  "hajj_and_umrah_operators",
+  "hotels",
+  "laundry_and_dry_cleaning",
+  "photography_and_videography_studios",
+  "resorts_and_farmhouse_rentals",
+  "salons_and_barbers",
+  "spas_and_wellness_centres",
+  "sports_clubs_academies_and_turf_court_rentals",
+  "tailoring_and_alteration_shops",
+  "tour_operators_and_dmcs",
+  "travel_agencies_and_ticketing",
+  "wedding_planners_and_event_management",
+  "yacht_and_boat_charters"
+ ],
+ "how_customers_find_and_choose": [
+  "Customers find places through the map listing, photos and reviews, and compare a few before booking",
+  "Short videos and photo reels of the venue, the work or the experience drive discovery for salons, studios, gyms and venues",
+  "Bookings and enquiries come mostly through chat or booking links; quick replies win the booking",
+  "Trust in travel, pilgrimage and event services depends on reviews, referrals and clear written details",
+  "Seasonal and occasion-led demand means customers book early for weddings, peak travel and festivals"
+ ],
+ "what_works_now": [
+  "A clean photo and video gallery of real recent work, rooms or events shared on request",
+  "Clear written packages with what is included and not, dates and cancellation terms",
+  "Booking by chat or link with a confirmation message and a reminder before the visit or trip",
+  "A quick reply during the hours when customers ask, with saved answers for common questions",
+  "Asking guests and clients for a review soon after the visit or event",
+  "A saved list of regular clients told about quiet slots or new offerings, with consent",
+  "For travel and pilgrimage: written itinerary, documents checklist and a named contact for the trip"
+ ],
+ "outdated_or_weak": [
+  "Printed flyers and pamphlets as the main source of bookings",
+  "Verbal bookings with no confirmation or deposit note",
+  "Generic 'post daily' advice with no steady supply of real content",
+  "Discount-led pricing that attracts one-time buyers",
+  "Promises of services or places that the business cannot deliver"
+ ],
+ "local_context": {
+  "PK": [
+   "Cash on delivery and cash at the counter are still common; bank transfer and mobile wallet payments are now normal for many customers",
+   "Ramadan and the two Eids reshape demand, opening hours and staff availability every year",
+   "Summer heat, monsoon rain and power cuts affect operations and footfall",
+   "Customers often write in Urdu, Roman Urdu or a regional language, and chat is the usual first contact",
+   "Weddings, Eid, Ramadan and school holidays drive peak demand; heat shapes outdoor timings",
+   "Pilgrimage and travel operators must follow the rules of the relevant authority; the owner confirms specifics",
+   "Cash and bank transfer are common for deposits"
+  ],
+  "UAE": [
+   "Customers are multilingual and expect quick replies in chat; card and tap payments are normal",
+   "Winter is the busy season; many residents travel in summer so demand can dip",
+   "Ramadan and Eid change hours and buying patterns; the licence a business holds decides what it may sell and advertise, so the owner checks that with the licensing body",
+   "Tourism and events are major; peak season is winter, with summer slow for many",
+   "Tourism, entertainment and event businesses need the right licence and permits; the owner confirms specifics with the authority"
+  ],
+  "CA": [
+   "Customers expect online booking or enquiry, card and bank e-transfer payment, and clear written confirmation",
+   "Long winters and a short summer peak shape outdoor and seasonal trades",
+   "English and French (in Quebec) matter, and many communities prefer their own language; consent for marketing messages and sales tax rules vary, so the owner checks them with a professional",
+   "Tourism is strong in summer and winter sports season; many venues are seasonal",
+   "Travel sellers and event venues follow consumer and licensing rules by province; the owner confirms specifics"
+  ]
+ },
+ "never_assume": [
+  "A website or booking link",
+  "An active social account with real reach",
+  "A professional camera or content team",
+  "Staff dedicated to replying to chat"
+ ],
+ "review_status": "needs human review"
+}

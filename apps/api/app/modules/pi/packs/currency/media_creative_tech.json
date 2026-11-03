@@ -1,0 +1,71 @@
+{
+ "cluster": "media_creative_tech",
+ "version": 1,
+ "as_of": "2026-10",
+ "industries": [
+  "call_centres_and_bpos",
+  "content_creators_and_influencer_businesses",
+  "game_studios_and_app_businesses",
+  "it_services_and_software_houses",
+  "managed_it_support_and_cybersecurity_firms",
+  "marketing_creative_and_digital_agencies",
+  "media_production_and_publishing",
+  "pr_and_media_agencies",
+  "saas_companies"
+ ],
+ "how_customers_find_and_choose": [
+  "Business buyers find agencies and technology firms through referrals, a portfolio of past work and a professional profile",
+  "Case stories that show what changed for a client, in plain words, convince more than a list of services",
+  "Creators and studios are discovered on short-video and audio feeds, and by the work they publish consistently",
+  "Overseas clients find Pakistani, UAE and Canadian teams through online talent listings and referrals; reliability and communication decide repeat work",
+  "Enquiries move quickly into chat or a call; a clear, prompt response matters"
+ ],
+ "what_works_now": [
+  "A small portfolio of real past work with a plain note on the client's problem and the outcome",
+  "A clear scope and written timeline before work begins, with milestone reviews",
+  "A simple, quick response routine for new enquiries and a named contact for each client",
+  "Regular update notes to clients on what was done and what is next",
+  "Asking satisfied clients for a short written reference",
+  "For creators: a steady posting rhythm the creator can sustain, built around a few repeatable formats",
+  "For support and call work: tracking response and resolution time by type of issue"
+ ],
+ "outdated_or_weak": [
+  "Selling on the lowest rate in a crowded market",
+  "Generic claims of being a 'full service' company with no proof of work",
+  "Chasing vanity numbers such as follower counts without checking whether they bring customers",
+  "Long unscoped projects with no review points",
+  "Cold mass emails as the main source of leads"
+ ],
+ "local_context": {
+  "PK": [
+   "Cash on delivery and cash at the counter are still common; bank transfer and mobile wallet payments are now normal for many customers",
+   "Ramadan and the two Eids reshape demand, opening hours and staff availability every year",
+   "Summer heat, monsoon rain and power cuts affect operations and footfall",
+   "Customers often write in Urdu, Roman Urdu or a regional language, and chat is the usual first contact",
+   "Many teams serve overseas clients; time zones, payment channels and bank limits affect how they get paid",
+   "Power and internet interruptions affect delivery and are a stated business risk",
+   "Creator and agency work follows event and festival calendars, especially Ramadan and Eid"
+  ],
+  "UAE": [
+   "Customers are multilingual and expect quick replies in chat; card and tap payments are normal",
+   "Winter is the busy season; many residents travel in summer so demand can dip",
+   "Ramadan and Eid change hours and buying patterns; the licence a business holds decides what it may sell and advertise, so the owner checks that with the licensing body",
+   "Technology and media hubs attract regional clients; free zone licences define what a company can do and sell",
+   "Advertising and media content follow the media regulator's rules; the owner confirms specifics"
+  ],
+  "CA": [
+   "Customers expect online booking or enquiry, card and bank e-transfer payment, and clear written confirmation",
+   "Long winters and a short summer peak shape outdoor and seasonal trades",
+   "English and French (in Quebec) matter, and many communities prefer their own language; consent for marketing messages and sales tax rules vary, so the owner checks them with a professional",
+   "Technology and media services serve local and international clients; many work remotely with distributed teams",
+   "Privacy and advertising rules apply to data and marketing work; the owner confirms specifics with a professional"
+  ]
+ },
+ "never_assume": [
+  "A website with a case study",
+  "A named sales person",
+  "An existing audience",
+  "A support or incident process in writing"
+ ],
+ "review_status": "needs human review"
+}

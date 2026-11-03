@@ -51,6 +51,17 @@ OPT_OUT = re.compile(
     r"|stop\s*reminders|reminders\s*band\s*karo|أوقف\s*التذكيرات)\W*$",
     re.IGNORECASE,
 )
+# A short sentence that clearly tells pi to stop writing ("please stop messaging me"). It needs
+# the person as the object, so "don't stop the order" is never an opt-out.
+OPT_OUT_PHRASE = re.compile(
+    r"\b(?:stop|quit|don'?t|do not|dont|no more|never)\s+(?:\w+\s+){0,2}?"
+    r"(?:messag(?:e|ing)|text(?:ing)?|contact(?:ing)?|writ(?:e|ing) to|"
+    r"send(?:ing)? (?:me |us )?(?:any )?messages?|bother(?:ing)?|call(?:ing)?|whatsapp(?:ing)?)\b"
+    r"[^.?!]{0,12}\b(?:me|us)\b"
+    r"|\b(?:mujhe|hamein|humein)\s+(?:message|msg)\s+(?:mat|na)\s+(?:karo|bhejo|kiya karo)\b"
+    r"|\b(?:message|msg)\s+(?:na|mat)\s+(?:karo|kiya karo|bhejo)\b",
+    re.IGNORECASE,
+)
 
 
 class ConsentInput(BaseModel):
@@ -133,20 +144,25 @@ async def note_opt_out(session: AsyncSession, scope: WorkspaceScope, message: Pi
     """A customer replying only "STOP" (in any language we serve) withdraws marketing and
     reminder consent at once. Returns True when it was an opt-out."""
     body = (message.body or "").strip()
-    if message.direction != "inbound" or len(body) > 40 or not OPT_OUT.match(body):
+    if message.direction != "inbound" or len(body) > 80:
+        return False
+    from app.modules.pi import safety
+
+    if not (OPT_OUT.match(body) or OPT_OUT_PHRASE.search(body) or safety.opt_out_asked(body)):
         return False
     conversation = await WorkspaceRepository(session, PiConversation, scope).get(
         message.conversation_id
     )
-    if conversation.customer_id is None:
-        return False
     note = f'Customer replied "{body[:40]}" on WhatsApp'
-    for purpose in ("marketing", "reminders"):
-        await set_consent(
-            session, scope, conversation.customer_id, purpose, False, note, message.id
-        )
+    if conversation.customer_id is not None:
+        for purpose in ("marketing", "reminders"):
+            await set_consent(
+                session, scope, conversation.customer_id, purpose, False, note, message.id
+            )
+    # Whatever they had said before ("granted", or never asked), they have now opted out.
+    # pi's free-form nudge needs no consent, so the answer must be "declined", not unknown.
     brief = dict(conversation.service_brief or {})
-    if brief.get("reminder_consent") == "granted":
+    if brief.get("reminder_consent") != "declined":
         brief["reminder_consent"] = "declined"
         conversation.service_brief = brief
     conversation.followup_due_at = None

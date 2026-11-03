@@ -229,6 +229,11 @@ class PiConversation(WorkspaceRow):
     language: Mapped[str | None] = mapped_column(String(16), nullable=True)
     clarification_count: Mapped[int] = mapped_column(Integer, default=0, server_default="0")
     failure_count: Mapped[int] = mapped_column(Integer, default=0, server_default="0")
+    # pi's brain flow (pi/flow.py); null while the workspace follows the standard flow.
+    flow_state: Mapped[str | None] = mapped_column(String(32), nullable=True)
+    flow_state_since: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True), nullable=True
+    )
 
 
 class PiMessage(WorkspaceRow):

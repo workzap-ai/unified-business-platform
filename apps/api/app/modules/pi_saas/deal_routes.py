@@ -493,7 +493,7 @@ async def journey(lead_id: UUID, scope: Scope, session: Session) -> dict[str, An
     )
     briefed = lead.stage != "new" or quote is not None
     meeting = await _meeting(session, scope, lead)
-    invoice_sent = bool(invoice) and invoice.id in await deals.invoices_sent(
+    invoice_sent = invoice is not None and invoice.id in await deals.invoices_sent(
         session, scope, [invoice]
     )
     steps = [

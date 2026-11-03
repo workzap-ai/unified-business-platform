@@ -1,0 +1,353 @@
+{
+  "industry": "freight_forwarders",
+  "name": "Freight forwarders",
+  "sector": "7.E Trade, distribution and logistics",
+  "version": "1.1",
+  "problems": [
+    {
+      "id": "p1_bottleneck",
+      "n": 1,
+      "words": "Customers want a quote in an hour and it takes us a day to get rates",
+      "category": "operations_process",
+      "subtype": "bottleneck",
+      "quick_ideas": [
+        "Gather current rates for your busiest lanes in one place your team can see, so common quotes need no fresh emails",
+        "Note which step of the last few quotes took longest, so you know what slows you."
+      ],
+      "workzap_build": {
+        "keys": [
+          "custom_build"
+        ],
+        "text": "A rate sheet manager by lane with validity dates and a quick quote builder that produces and logs a branded quote on WhatsApp or email.",
+        "tool_words": []
+      },
+      "ask_first": "Which lanes make up most of your quote requests?",
+      "free_stops": "How rates are held and turned into quotes is designed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note which lanes needed fresh rate chasing on recent urgent quotes, so you see where slow replies are hurting response time.",
+          "review": false
+        },
+        {
+          "text": "Keep one handwritten list of your busiest live rates near the quoting desk, so common enquiries get answered the same day.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p2_pricing_errors",
+      "n": 2,
+      "words": "Rates from lines change every week and staff quote old ones",
+      "category": "sales_revenue",
+      "subtype": "pricing_errors",
+      "quick_ideas": [
+        "Mark each rate with its expiry date, so staff can see what's stale",
+        "Agree that no quote goes out on an expired rate."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "Rate expiry warnings and a block on quoting from expired rates, enforced across the team without manual checks.",
+        "tool_words": []
+      },
+      "ask_first": "Do staff quote from an old email, or from a rate sheet that nobody updates?",
+      "free_stops": "The alert and approval rules are set in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare this week's sent quotes against the latest carrier offers on hand, so you spot how often old rates are slipping out.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of crossing out expired rates in the shared file, so old prices stop reaching customers.",
+          "review": true
+        }
+      ]
+    },
+    {
+      "id": "p3_lead_followup_slow",
+      "n": 3,
+      "words": "We quote, then never follow up, and the customer books elsewhere",
+      "category": "marketing_leads",
+      "subtype": "lead_followup_slow",
+      "quick_ideas": [
+        "List this month's open quotes, so you see what's still winnable",
+        "Give each open quote to one person to follow up, so it has an owner."
+      ],
+      "workzap_build": {
+        "keys": [
+          "lead_followup"
+        ],
+        "text": "A quote tracker showing every open quote, its age and outcome, with follow-up reminders sent to sales staff when due.",
+        "tool_words": []
+      },
+      "ask_first": "Do quotes go unfollowed mostly for new customers, or for regular ones?",
+      "free_stops": "Follow-up timing and outcome tracking are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count open quotes from this month with no follow up yet, so you see how much booked work is being left behind.",
+          "review": false
+        },
+        {
+          "text": "Set one fixed time each afternoon for one person to review open quotes, so customers hear back before they book elsewhere.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p4_order_tracking",
+      "n": 4,
+      "words": "Customers call all day asking \"where is my container",
+      "category": "orders_fulfilment",
+      "subtype": "order_tracking",
+      "quick_ideas": [
+        "Give each job one named owner in ops, so customers know who to ask",
+        "Tell customers proactively when cargo sails and arrives, so they don't need to call."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking",
+          "customer_messaging"
+        ],
+        "text": "A shipment board with every job's milestones and instant WhatsApp messages to the customer when a milestone changes.",
+        "tool_words": []
+      },
+      "ask_first": "Do customers mostly call about booked cargo not yet shipped, or about containers already at sea?",
+      "free_stops": "The milestones and message triggers are set in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note how many calls today asked for container location updates, so you see which jobs are creating the most interruptions.",
+          "review": false
+        },
+        {
+          "text": "Keep one visible list of live shipments with latest status beside the ops desk, so anyone can answer routine location calls quickly.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p5_delivery_late",
+      "n": 5,
+      "words": "Cargo got rolled and we found out after the customer did",
+      "category": "orders_fulfilment",
+      "subtype": "delivery_late",
+      "quick_ideas": [
+        "Check this week's bookings against the lines' latest schedules, so rollovers are spotted early",
+        "Tell the customer first when a booking moves, so trust holds."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking"
+        ],
+        "text": "Rollover and delay alerts on the shipment board that reach ops staff and the customer the moment delays happen.",
+        "tool_words": []
+      },
+      "ask_first": "Does the rollover news reach you late from the shipping line, or reach you in time but not get passed on?",
+      "free_stops": "Where alerts come from and who gets them is designed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare your booking notes with the latest sailing updates for this week's jobs, so late changes are spotted before customers hear elsewhere.",
+          "review": false
+        },
+        {
+          "text": "Give one person a set time to check booked sailings each day, so rollover news reaches customers before it turns into complaints.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p6_duplicate_entry",
+      "n": 6,
+      "words": "Same shipment details typed into five documents",
+      "category": "operations_process",
+      "subtype": "duplicate_entry",
+      "quick_ideas": [
+        "List every document you retype the same details into, so the duplication is visible",
+        "Note where typing errors usually appear, so you know the risk."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "Single job entry that fills out the HBL, invoice, arrival notice and manifest templates without retyping.",
+        "tool_words": []
+      },
+      "ask_first": "Which documents take the retyping: the booking, the bill of lading, the invoice, or the customs papers?",
+      "free_stops": "Which documents are filled, and from what, is mapped in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many times one shipment's core details are retyped across today's paperwork, so you see where admin time is leaking away.",
+          "review": false
+        },
+        {
+          "text": "Choose one master job sheet for shipment details, so staff copy from one source and typing mistakes reduce across documents.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p7_margin_unknown",
+      "n": 7,
+      "words": "We don't know profit per job until the line's invoice arrives",
+      "category": "margin_cost",
+      "subtype": "margin_unknown",
+      "quick_ideas": [
+        "Write an estimated cost for each open job, so you can compare when invoices land",
+        "Note which charges surprised you on recent jobs, so you know what to watch."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "A job costing view of estimated vs actual cost and revenue per job, flagging jobs where actuals pass the estimate, plus lane and customer profitability.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "Do you miss the profit because line charges come late, or because extra local charges are added afterwards?",
+      "free_stops": "How costs are captured per job is set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare estimated job costs in your notebook with supplier bills that arrived this week, so margin surprises stop landing unseen.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of noting expected external charges on each live file, so weak margin jobs are noticed earlier.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p8_cash_flow_tight",
+      "n": 8,
+      "words": "We pay the shipping line upfront but customers pay us much later",
+      "category": "cash_collections",
+      "subtype": "cash_flow_tight",
+      "quick_ideas": [
+        "List customer balances by age, so you know who funds your cash gap",
+        "Agree credit terms in writing with your slowest payers, so expectations are clear."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger"
+        ],
+        "text": "Customer and agent receivables with ageing, profit-share reconciliation and reminders queued for approval.",
+        "tool_words": []
+      },
+      "ask_first": "Is the cash gap mostly from a few large customers, or from many customers paying slowly?",
+      "free_stops": "Ageing and reminder rules are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count shipments where line payment left before customer approval to invoice was logged, so you see where handover delay starts the squeeze.",
+          "review": true
+        },
+        {
+          "text": "Give one staff member one afternoon check of uninvoiced completed files in one notebook, so bills go out before line payment pressure builds.",
+          "review": true
+        }
+      ]
+    },
+    {
+      "id": "p9_info_lost_in_whatsapp",
+      "n": 9,
+      "words": "All shipment info sits in one ops person's email",
+      "category": "communication_coordination",
+      "subtype": "info_lost_in_whatsapp",
+      "quick_ideas": [
+        "Move each live job's key updates into one shared place, so anyone can answer a customer",
+        "Ask ops for a short daily handover note, so leave doesn't freeze work."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking"
+        ],
+        "text": "A shared job history with notes and documents per shipment, so no job is stuck in one inbox.",
+        "tool_words": []
+      },
+      "ask_first": "Does the information sit in one inbox for every shipment, or only for certain customers?",
+      "free_stops": "How job history is captured is designed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Walk through today's live shipments and note which ones only one ops person can answer, so the handover risk becomes visible.",
+          "review": false
+        },
+        {
+          "text": "Keep one paper handover sheet for every live job at the ops desk, so leave or absence no longer stalls customer updates.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p10_cost_overruns",
+      "n": 10,
+      "words": "Detention charges pile up because the customer didn't return the empty",
+      "category": "margin_cost",
+      "subtype": "cost_overruns",
+      "quick_ideas": [
+        "Tell each customer their free-time end date at delivery, so they know the deadline",
+        "List containers out with customers now, so you see which are close to charges."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "A detention timer per container with free-time warnings sent to the customer before extra charges start.",
+        "tool_words": []
+      },
+      "ask_first": "Do the detention charges come mostly from one or two customers, or from many?",
+      "free_stops": "Alert timing per container is set in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many empties with customers are already past free time today, so you see where detention is draining margin.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member a daily empty return list by customer, so overdue boxes get chased before charges stack up.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p11_few_leads",
+      "n": 11,
+      "words": "Too few new customers; we live off the same old accounts",
+      "category": "marketing_leads",
+      "subtype": "few_leads",
+      "quick_ideas": [
+        "List customers who shipped with you before and stopped, so you know who to call back",
+        "Make sure your website states your lanes and services clearly."
+      ],
+      "workzap_build": {
+        "keys": [
+          "website_digital",
+          "lead_followup"
+        ],
+        "text": "A clear website with a rate request form and a lead tracker that records and follows up every enquiry.",
+        "tool_words": []
+      },
+      "ask_first": "Do you reach new customers mostly by personal calls, or by waiting for them to find you?",
+      "free_stops": "The site content and lead flow are planned in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many quotes this month came from new companies versus old accounts, so you see how thin your new business flow is.",
+          "review": false
+        },
+        {
+          "text": "Give one person a weekly list of lapsed shippers to contact, so old relationships start feeding fresh enquiries again.",
+          "review": false
+        }
+      ]
+    }
+  ],
+  "never_say": [
+    "Anything on cargo liability, Incoterms disputes or claims against carriers; suggest legal or insurance advice.",
+    "Dangerous goods classification or packing; pi never helps hide DG cargo.",
+    "Help under-declaring weight, misdescribing cargo or altering BLs.",
+    "Sanctions screening or restricted parties; suggest compliance advice. Customs classification or duty is for a licensed clearing agent.",
+    "Promises on rates, transit times or booking wins; never store customer or consignee contact details. If an incident causes injury, emergency services come first."
+  ],
+  "sample_reply": {
+    "person": "We lose bookings because quotes take us till next day. Lines email rates, we calculate, customer has gone. Any solution?",
+    "pi": "Sure, this is fixable, and the first steps are simple.\nFirst, gather current rates for your busiest lanes in one place your team can see, so the common quotes need no fresh emails.\nSecond, look at which step slowed your last few quotes, so you know where the hours go.\nTo make it last, Workzap could put in place: a rate sheet by lane with validity alerts and a quote builder that produces and logs a quote in minutes.\n\nShall I have a solution document and quote prepared for you? You're welcome to say no.",
+    "language": "english"
+  }
+}

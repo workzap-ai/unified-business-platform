@@ -1,0 +1,297 @@
+{
+  "industry": "cloud_kitchens_and_virtual_brands",
+  "name": "Cloud kitchens and virtual brands",
+  "sector": "7.B Food and beverage",
+  "version": "1.1",
+  "problems": [
+    {
+      "id": "p1_cod_remittance",
+      "n": 1,
+      "words": "App payouts never match the orders I count",
+      "category": "cash_collections",
+      "subtype": "cod_remittance",
+      "quick_ideas": [
+        "Count one busy day's accepted orders and one payout line by line in your notebook, so the mismatch size is clear before raising it.",
+        "Give one person the daily payout check and keep every mismatch in one notebook, so unresolved remittance issues stop getting missed."
+      ],
+      "workzap_build": {
+        "keys": [
+          "cash_reconciliation"
+        ],
+        "text": "Every delivery-service statement would be matched to your orders, showing commission, discounts, ads, refunds and net per order and brand.",
+        "tool_words": [
+          "app"
+        ]
+      },
+      "ask_first": "Which partner's payouts confuse you most?",
+      "free_stops": "The matching rules for each partner and how disputes are tracked go in the solution document.",
+      "quick_ideas_original": [
+        "Match one week of one app's statement against your own orders, so you know where the gap really sits",
+        "Note the order numbers you can't match, so you can raise them with the app."
+      ]
+    },
+    {
+      "id": "p2_margin_unknown",
+      "n": 2,
+      "words": "I don't know my actual margin after commission, discount and ads",
+      "category": "margin_cost",
+      "subtype": "margin_unknown",
+      "quick_ideas": [
+        "Cost your top items per brand once, including packaging, so you know your floor",
+        "Look at what one brand truly kept last week after deductions, because that tells you where to look first."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "You would see true margin per brand per delivery service after every deduction, refreshed each week.",
+        "tool_words": [
+          "app"
+        ],
+        "leads_with_view": true
+      },
+      "ask_first": "Do you know the food and packaging cost for your main items?",
+      "free_stops": "The margin model and which costs it includes are set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note one busy day's orders by brand beside their deductions and discounts, so you see which brand truly keeps the least.",
+          "review": false
+        },
+        {
+          "text": "Give one person a notebook page for deduction notes after each payout, so margin surprises stop piling up unnoticed.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p3_integration_marketplace",
+      "n": 3,
+      "words": "Three brands, three tablets, cooks miss orders, and WhatsApp orders get mixed in",
+      "category": "tech_systems",
+      "subtype": "integration_marketplace",
+      "quick_ideas": [
+        "Put all tablets at the pass with one person accepting orders, so nothing is left unseen",
+        "Write direct WhatsApp orders on the same tickets as aggregator orders, so the kitchen sees one queue."
+      ],
+      "workzap_build": {
+        "keys": [
+          "order_capture"
+        ],
+        "text": "One kitchen screen would show every delivery service's orders and direct WhatsApp orders together, with brand labels and timers.",
+        "tool_words": [
+          "app"
+        ]
+      },
+      "ask_first": "How many screens are in the kitchen right now?",
+      "free_stops": "Which channels can be merged and how the screen is laid out is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count missed or delayed orders by source during one rush, so you see whether tablets or direct chats cause more confusion.",
+          "review": false
+        },
+        {
+          "text": "Assign one person to call out every new order source at the pass, so cooks work from one heard queue.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p4_delivery_late",
+      "n": 4,
+      "words": "Riders wait because food isn't ready, then the app penalises us",
+      "category": "orders_fulfilment",
+      "subtype": "delivery_late",
+      "quick_ideas": [
+        "Time how long each brand really takes at peak, because the app prep time may simply be wrong",
+        "Give one cook clear ownership of each brand in the rush."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking"
+        ],
+        "text": "a prep-time tracker per brand showing acceptance, ready time and rider pickup every day, so you see which brand slows the kitchen.",
+        "tool_words": []
+      },
+      "ask_first": "Which brand is slowest to prepare?",
+      "free_stops": "How prep times are set and the kitchen flow per brand stay for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note rider arrival time and food ready time for each late pickup today, so you see whether delay starts in kitchen timing.",
+          "review": false
+        },
+        {
+          "text": "Give one person the handover job during rush, so riders stop waiting while cooks search for packed orders.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p5_packing_errors",
+      "n": 5,
+      "words": "Missing drink or sauce complaints every day",
+      "category": "orders_fulfilment",
+      "subtype": "packing_errors",
+      "quick_ideas": [
+        "Check each bag against the ticket before sealing, because most misses happen in the last step",
+        "Keep sauces and drinks in separate labelled bins per brand, so the wrong one isn't grabbed."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "a packing checklist per order type with a photo of the open bag saved against the order number, ready for disputes.",
+        "tool_words": []
+      },
+      "ask_first": "Is it the same items missing each time?",
+      "free_stops": "The checklist per brand and how photos are used in partner disputes are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count which item is missing most often across today's complaints, so you fix the repeat miss hurting your brand every day.",
+          "review": false
+        },
+        {
+          "text": "Give one packer the final bag check at handover, so drinks and sauces stop being skipped in the last minute.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p6_no_visibility",
+      "n": 6,
+      "words": "Shared ingredients get used by one brand and the other runs out; chicken goes bad from over-prep",
+      "category": "stock_inventory",
+      "subtype": "no_visibility",
+      "quick_ideas": [
+        "List which ingredients are shared, so you know where clashes happen",
+        "Prep the slow brand in smaller batches more often, so less sits and spoils."
+      ],
+      "workzap_build": {
+        "keys": [
+          "stock_alerts"
+        ],
+        "text": "shared stock allocated by brand from your recipes, with a daily prep plan per brand from recent orders.",
+        "tool_words": []
+      },
+      "ask_first": "Do your brands share most ingredients, or only a few?",
+      "free_stops": "The allocation rules and prep plan logic are kept for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare what was prepped against what was actually sold for shared chicken today, so over-prep and brand clashes show.",
+          "review": false
+        },
+        {
+          "text": "Give one person the shared-ingredient list in one notebook place, so both brands check the same stock before prep starts.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p7_reviews_bad",
+      "n": 7,
+      "words": "Our rating dropped and orders fell off a cliff",
+      "category": "customers_retention",
+      "subtype": "reviews_bad",
+      "quick_ideas": [
+        "Group last month's low ratings by theme, so you fix the biggest one first",
+        "Check whether the drop lines up with a kitchen change, because ratings usually follow a cause."
+      ],
+      "workzap_build": {
+        "keys": [
+          "reviews_collection"
+        ],
+        "text": "You would get a weekly digest of ratings and reviews across delivery services, with complaint themes picked out by brand.",
+        "tool_words": [
+          "app"
+        ]
+      },
+      "ask_first": "What do the low ratings mention most?",
+      "free_stops": "How themes are tracked and acted on per brand is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note the complaint words from recent low ratings in one list, so the kitchen sees what is dragging orders down.",
+          "review": false
+        },
+        {
+          "text": "Give one person a fixed weekly review check with the cooks, so the same complaint stops repeating across brands.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p8_ad_spend_waste",
+      "n": 8,
+      "words": "Ad spend inside the app goes up but orders don't, and two brands are dead weight",
+      "category": "marketing_leads",
+      "subtype": "ad_spend_waste",
+      "quick_ideas": [
+        "Pause ads on the weakest brand for a week and compare, so you learn what the spend was doing",
+        "Pick a date to decide whether the weakest brand stays."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "You would get a weekly owner report with orders, ad spend, net payout, margin and rating trend by brand and delivery service.",
+        "tool_words": [
+          "app"
+        ],
+        "leads_with_view": true
+      },
+      "ask_first": "Which brand is doing best, and which least?",
+      "free_stops": "The rules for where ad spend goes and when to close a brand are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare each brand's orders on advertised days against similar nonadvertised days, so dead weight brands stand out more clearly.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of noting ad days and order volume together, so spend decisions stop being guesses.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p9_no_customer_data",
+      "n": 9,
+      "words": "No customer data — the app owns the customer — and tiffin subscribers drop off",
+      "category": "customers_retention",
+      "subtype": "no_customer_data",
+      "quick_ideas": [
+        "Invite repeat customers to order direct on WhatsApp where your app terms allow, with their permission, so you start owning the relationship",
+        "Ask tiffin customers who stop why, because the reason is usually fixable."
+      ],
+      "workzap_build": {
+        "keys": [
+          "customer_messaging",
+          "loyalty_repeat"
+        ],
+        "text": "a WhatsApp direct-order flow for opted-in customers and a tiffin service with plans, pauses and scheduled renewal reminders.",
+        "tool_words": []
+      },
+      "ask_first": "Do you take any orders outside online delivery services today?",
+      "free_stops": "The direct-order flow and renewal reminder plan stay for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many tiffin subscribers stopped in the last billing cycle, so you see whether dropoff is occasional or routine.",
+          "review": false
+        },
+        {
+          "text": "Give one person a single notebook list of active tiffin renewals, so follow-up happens on time each cycle.",
+          "review": false
+        }
+      ]
+    }
+  ],
+  "never_say": [
+    "Advice on app contract terms or commission disputes — that is for their lawyer.",
+    "Anything about home-kitchen permits, food-safety licences or trademark rules — refer to the relevant authority.",
+    "Asking for app logins or passwords.",
+    "Help with fake accounts, fake reviews, or listing the same brand under false names.",
+    "That a change will lift ratings or orders by a set amount."
+  ],
+  "sample_reply": {
+    "person": "I run 3 brands out of one kitchen on Talabat and Deliveroo. Give me a solution for the payouts, refunds especially.",
+    "pi": "Sure, this is fixable, and the first steps are simple.\nFirst, match one week of one delivery partner's statement against your own orders, so you see whether the gap is commission, discounts or refunds.\nSecond, group refunds by brand and reason, because one brand and one mistake usually drive most of them.\nThe lasting fix would work by matching every delivery partner statement to your orders each week and showing net per order, brand and delivery partner, with refunds broken down.",
+    "language": "english"
+  }
+}

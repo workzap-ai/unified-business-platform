@@ -14,6 +14,7 @@ from sqlalchemy.exc import IntegrityError
 from app.core.pagination import Page, Pagination
 from app.modules.access.dependencies import Scope, Session
 from app.modules.audit.service import record
+from app.modules.pi import message_understood
 from app.modules.pi.models import (
     PiConversation,
     PiHandoff,
@@ -169,10 +170,12 @@ async def message_views(
             .limit(20)
         )
     )
+    understood = await message_understood.load(session, scope, conversation_id, rows)
     now = datetime.now(UTC)
     result = []
     for row in rows:
         view = MessageView.model_validate(row)
+        view.understood = message_understood.public_understood(understood.get(row.id))
         view.tool_events = calls.get(row.run_id, []) if row.run_id else []
         action = next(
             (a for a in pending if row.direction == "outbound" and row.body.startswith(a.summary)),

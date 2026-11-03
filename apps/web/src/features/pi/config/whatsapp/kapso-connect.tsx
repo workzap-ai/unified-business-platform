@@ -31,9 +31,12 @@ interface PoolNumber {
 
 const PROBLEM_MESSAGES: Record<string, string> = {
   WEBHOOK_NOT_REGISTERED:
-    "This number is connected, but Kapso has nowhere to send its WhatsApp messages yet, so chats won't reach Pi. Click \"Check health\" to retry.",
+    'This number is connected, but Kapso has nowhere to send its WhatsApp messages yet, so chats won\'t reach Pi. Click "Check health" to retry.',
 };
-function problemMessage(code: string | null | undefined, fallback: string): string {
+function problemMessage(
+  code: string | null | undefined,
+  fallback: string,
+): string {
   if (!code) return fallback;
   return PROBLEM_MESSAGES[code] ?? fallback;
 }
@@ -157,7 +160,10 @@ function KapsoPanel({ onChange }: { onChange?: () => void }) {
         ) : null}
         {c.status === "action_required" || c.status === "disconnected" ? (
           <Notice tone="danger" title="Your number needs attention">
-            {problemMessage(c.problem, "Reconnect it below. Your conversations are kept.")}
+            {problemMessage(
+              c.problem,
+              "Reconnect it below. Your conversations are kept.",
+            )}
           </Notice>
         ) : null}
         <section aria-labelledby="pool-title" className="space-y-3">

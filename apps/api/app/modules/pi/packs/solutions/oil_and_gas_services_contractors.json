@@ -1,0 +1,321 @@
+{
+  "industry": "oil_and_gas_services_contractors",
+  "name": "Oil and gas services contractors",
+  "sector": "7.L Finance-adjacent, energy and utilities",
+  "version": "1.1",
+  "problems": [
+    {
+      "id": "p1_receivables_late",
+      "n": 1,
+      "words": "Timesheets come back from site weeks late, so we cannot invoice",
+      "category": "cash_collections",
+      "subtype": "receivables_late",
+      "quick_ideas": [
+        "Ask supervisors to send signed timesheets weekly instead of at month end, so invoicing is not held back",
+        "Keep one list of which sites have sent, so gaps are chased early."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "Digital timesheet and job ticket capture at site with client sign-off, flowing straight into the invoicing queue.",
+        "tool_words": []
+      },
+      "ask_first": "How do signed timesheets get from site to your office today?",
+      "free_stops": "Capture and sign-off flow are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note how many days pass between site work and signed timesheet return for each crew, so invoice delays are easier to pinpoint.",
+          "review": true
+        },
+        {
+          "text": "Give one coordinator the job of logging missing signed timesheets in one notebook each afternoon, so invoice chasing starts before month end.",
+          "review": true
+        }
+      ]
+    },
+    {
+      "id": "p2_reports_wrong",
+      "n": 2,
+      "words": "Clients reject invoices because the signed job tickets do not match",
+      "category": "reporting_visibility",
+      "subtype": "reports_wrong",
+      "quick_ideas": [
+        "List the reasons for the last few rejections, so you know the main cause",
+        "Check hours against the client's approved figures before sending, so mismatches are caught in-house."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "dashboards_reports — An overtime and hours approval log matched to client-approved hours, flagging mismatches before an invoice goes out.",
+        "tool_words": []
+      },
+      "ask_first": "Do invoices bounce mostly over hours, or over rates and job descriptions?",
+      "free_stops": "Matching rules are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note the mismatch reason on each rejected invoice this week, so you can see which check is failing most often.",
+          "review": true
+        },
+        {
+          "text": "Give one person the job of matching signed job tickets with invoice figures before sending, so client rejections drop from preventable errors.",
+          "review": true
+        }
+      ]
+    },
+    {
+      "id": "p3_cash_flow_tight",
+      "n": 3,
+      "words": "Clients pay very slowly while salaries are due monthly, and retention money is never followed up",
+      "category": "cash_collections",
+      "subtype": "cash_flow_tight",
+      "quick_ideas": [
+        "List every invoice and retention owed by client with its due date, so you see what is coming in",
+        "Put each retention release date in a calendar, so it is chased on time; talk to your accountant about cash planning."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger"
+        ],
+        "text": "An invoice and payment tracker per client and project with ageing and retention follow-up dates.",
+        "tool_words": []
+      },
+      "ask_first": "Do clients pay slowly mostly on invoices, or on retention money?",
+      "free_stops": "Ledger structure is in the solution document; pi gives no financing advice.",
+      "extra_ideas": [
+        {
+          "text": "Count how many client files already have retention release paperwork complete versus still missing something, so follow ups start from ready cases.",
+          "review": false
+        },
+        {
+          "text": "Give one person a fixed weekly time to review one notebook of client follow up dates, so release paperwork gets chased consistently.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p4_licences_renewals",
+      "n": 4,
+      "words": "A worker turns up at site with an expired certificate and is sent back",
+      "category": "compliance_admin",
+      "subtype": "licences_renewals",
+      "quick_ideas": [
+        "List certificate types and expiry dates by employee number, so expiries are visible",
+        "Check validity before every mobilisation, so no one travels with an expired ticket."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "A certification and pass expiry matrix by role and certificate type with advance alerts (IDs stay in the company's own secured records).",
+        "tool_words": []
+      },
+      "ask_first": "Do expired certificates come mostly with new hires, or with long-serving workers?",
+      "free_stops": "Alert timing and matrix design are in the solution document; pi stores no worker IDs or medical records.",
+      "extra_ideas": [
+        {
+          "text": "Count how many workers are due to mobilise soon against certificates expiring soon, so send-backs can be spotted before travel.",
+          "review": false
+        },
+        {
+          "text": "Give one coordinator one notebook for certificate types and expiry months by employee number, so mobilisation checks happen from one place.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p5_bottleneck",
+      "n": 5,
+      "words": "Mobilising a crew for a shutdown takes days of calls and messages",
+      "category": "operations_process",
+      "subtype": "bottleneck",
+      "quick_ideas": [
+        "Write down every step of the last mobilisation, so you see where time went",
+        "Keep a standing list of crew by role who are ready to go, so the first calls are quick."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "A mobilisation checklist per call-off covering crew, valid certificates, equipment, transport and documents, with status per item.",
+        "tool_words": []
+      },
+      "ask_first": "Does mobilising take long mostly in finding available crew, or in sorting their papers?",
+      "free_stops": "Checklist content is in the solution document; permit and HSE questions go to the client's HSE team.",
+      "extra_ideas": [
+        {
+          "text": "Write down how many calls and message rounds the last shutdown mobilisation needed, so the slow handoffs stand out clearly.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of keeping one mobilisation list for crew status by role, so shutdown calling is shorter and calmer.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p6_field_team_visibility",
+      "n": 6,
+      "words": "We do not know which worker is on which site and rotation right now",
+      "category": "communication_coordination",
+      "subtype": "field_team_visibility",
+      "quick_ideas": [
+        "Put every rotation on one shared plan by employee number and site, so there is one version",
+        "Review it weekly with site supervisors, so clashes show before they cost overtime."
+      ],
+      "workzap_build": {
+        "keys": [
+          "booking_scheduling"
+        ],
+        "text": "A rotation and manpower planner showing who is on which site and when they rotate, with clash alerts.",
+        "tool_words": []
+      },
+      "ask_first": "Are rotations kept on one list today, or in each supervisor's own notes?",
+      "free_stops": "Planner design is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare where supervisors say workers are with the latest rotation plan, so gaps in today's picture show before cover is arranged.",
+          "review": false
+        },
+        {
+          "text": "Give one dispatcher one notebook for current site and rotation by employee number, so allocation decisions use one current view.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p7_wrong_location",
+      "n": 7,
+      "words": "Equipment moves between sites and we lose track, and calibration dates get missed",
+      "category": "stock_inventory",
+      "subtype": "wrong_location",
+      "quick_ideas": [
+        "List every major item with its current site and next calibration date, so both are visible",
+        "Record each move on the same list, so it stays current."
+      ],
+      "workzap_build": {
+        "keys": [
+          "transfer_tracking"
+        ],
+        "text": "workflow_automation — An equipment and tool register with location, status and calibration or inspection due dates and reminders.",
+        "tool_words": []
+      },
+      "ask_first": "Is equipment lost mostly between sites, or between the yard and a site?",
+      "free_stops": "Register fields are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Walk round the yard and note which major items are not where the last record showed, so missing moves stop hiding.",
+          "review": false
+        },
+        {
+          "text": "Give one store person one list for item location and calibration month, so moves and upcoming dates stay together.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p8_margin_unknown",
+      "n": 8,
+      "words": "Project margins are only known after the project closes",
+      "category": "margin_cost",
+      "subtype": "margin_unknown",
+      "quick_ideas": [
+        "Compare budget with actual cost on one live project this week, so you see how far it has moved",
+        "Make it a weekly habit on the biggest project, so overruns are seen early."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "A project cost tracker comparing budget, committed and actual by week, with an owner view across projects.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "Do overruns come mostly from labour, or from materials and subcontractors?",
+      "free_stops": "Cost feeds and report layouts are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare this week's crew hours and hired equipment days on one live project against what the supervisor expected, so drift shows before closeout.",
+          "review": false
+        },
+        {
+          "text": "Give one supervisor a fixed weekly slot to note crew hours and hired equipment days in one notebook, so live project reviews use current figures.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p9_info_lost_in_whatsapp",
+      "n": 9,
+      "words": "Site reports come as WhatsApp photos and nobody files them",
+      "category": "communication_coordination",
+      "subtype": "info_lost_in_whatsapp",
+      "quick_ideas": [
+        "Agree one daily report format with each site, so information arrives the same way",
+        "Store reports in one folder per project, so they can be found later."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "dashboards_reports — A site daily report form with progress, photos and issues that compiles into the client's format.",
+        "tool_words": []
+      },
+      "ask_first": "Do site reports arrive from most sites, or only from a few?",
+      "free_stops": "Form and client format mapping are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many site report photos from this week can be found again by project, so the filing gap shows.",
+          "review": false
+        },
+        {
+          "text": "Give one admin person the job of writing each report photo under one project list the same day, so evidence is findable when clients ask.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p10_documentation",
+      "n": 10,
+      "words": "Prequalification documents are rebuilt from scratch for each client",
+      "category": "compliance_admin",
+      "subtype": "documentation",
+      "quick_ideas": [
+        "Gather the documents asked for in the last few prequalifications into one library, so you start from what you have",
+        "Note each document's expiry, so outdated ones are refreshed in time."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "A prequalification document library with version and expiry tracking and a tender calendar with submission checklists.",
+        "tool_words": []
+      },
+      "ask_first": "Do clients ask for the same documents each time, or different ones?",
+      "free_stops": "Library structure is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count which papers were requested in the last few prequalification packs and how often, so your core file list is obvious.",
+          "review": false
+        },
+        {
+          "text": "Give one office person one notebook for prequalification papers requested by client, so each new pack starts from the same place.",
+          "review": false
+        }
+      ]
+    }
+  ],
+  "never_say": [
+    "Any HSE, process safety, well control, permit-to-work, hazardous-area, H2S or engineering advice.",
+    "Anything that helps forge or backdate certificates, timesheets or inspection reports.",
+    "Any request for workers' passports, visas, IDs or medical fitness records, or client confidential data.",
+    "Any contract interpretation, or help with bribery or \"facilitation\" around tenders.",
+    "Anything other than emergency services and site emergency response for leaks, fire, gas exposure or injury."
+  ],
+  "sample_reply": {
+    "person": "Timesheets come in late from site and the client rejects half our invoices. Can you suggest a solution?",
+    "pi": "Sure, you can start on this now, and the first steps are simple.\nFirst, ask site supervisors to send signed timesheets weekly rather than at month end, so invoicing is not held back.\nSecond, check hours against the client's approved figures before each invoice goes out, so mismatches are caught in-house.\nOn top of this, Workzap could arrange: timesheets captured and signed off at site that flow straight into invoicing, with mismatches flagged before anything reaches the client.\n\nShall I have a solution document and quote prepared for you? You are free to say no.",
+    "language": "english"
+  }
+}

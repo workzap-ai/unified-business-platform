@@ -1,0 +1,60 @@
+"""R-VAL-06 (Book 3): a message with ideas never ends on nothing. Found by the real-model replay
+(driving schools, 2026-10-26): at S5 the ideas ended after the second idea, no line, no question."""
+
+from app.modules.pi import flow, solution_ask
+from app.modules.pi.service_conversation import ServiceTurn, brain_offer
+
+IDEAS = (
+    "Yes.\nFirst, agree a cancellation rule and tell students when they book.\n"
+    "Second, remind students the day before."
+)
+S5 = {
+    "flow": {"state": "S5_READINESS"},
+    "noted_problems": [{"ref": "a", "group": "x", "title": "Late cancellations"}],
+    "solution_asked": True,
+    "solution_ideas": ["First, ...", "Second, ..."],
+    "reply_language": "en",
+}
+
+
+def test_ideas_at_the_open_offer_get_no_second_offer_and_the_move_stays_s5():
+    # Book 5 Part 14: the offer is made once, for the whole set; ideas never carry it as an ending.
+    t = ServiceTurn(reply=IDEAS)
+    brain_offer(t, S5)
+    assert t.reply == IDEAS
+    assert t._decision is None  # no state change: the chat stays at S5
+
+
+def test_it_does_not_double_up_when_the_reply_already_asks_or_offers():
+    asked = ServiceTurn(reply=IDEAS + "\nWhich of these is hardest for you?")
+    brain_offer(asked, S5)
+    assert asked.reply == IDEAS + "\nWhich of these is hardest for you?"
+    offered = ServiceTurn(reply=IDEAS + "\n" + solution_ask.offer_line("en"))
+    brain_offer(offered, S5)
+    assert offered.reply.count("solution document") == 1
+
+
+def test_a_declined_offer_is_never_repeated_and_other_states_are_untouched():
+    for state in (flow.State.S5B_DECLINED, flow.State.S6_PREPARING):
+        t = ServiceTurn(reply=IDEAS)
+        brain_offer(t, {**S5, "flow": {"state": state.name}})
+        assert t.reply == IDEAS, state
+    no_ideas = ServiceTurn(reply="Noted.")
+    brain_offer(no_ideas, {k: v for k, v in S5.items() if k != "solution_ideas"})
+    assert no_ideas.reply == "Noted."
+
+
+def test_ideas_that_came_as_an_answer_not_a_request_get_no_offer_ending():
+    """Real replay (clinics, fashion, pharmacies at S5): the owner answered a question, the ideas
+    carried no solution_ask context, and ended on nothing."""
+    context = {
+        "flow": {"state": "S5_READINESS"},
+        "noted_problems": [{"ref": "a", "group": "x", "title": "Stock goes short"}],
+        "reply_language": "en",
+    }
+    t = ServiceTurn(reply="Yes.\nFirst, count the fast movers.\nSecond, note expiry on arrival.")
+    brain_offer(t, context)
+    assert "solution document" not in t.reply
+    plain = ServiceTurn(reply="Noted. What else is getting in the way?")
+    brain_offer(plain, context)
+    assert plain.reply == "Noted. What else is getting in the way?"  # no ideas: nothing added

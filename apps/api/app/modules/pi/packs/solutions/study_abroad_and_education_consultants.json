@@ -1,0 +1,322 @@
+{
+  "industry": "study_abroad_and_education_consultants",
+  "name": "Study-abroad and education consultants",
+  "sector": "7.J Education and childcare",
+  "version": "1.1",
+  "problems": [
+    {
+      "id": "p1_lead_followup_slow",
+      "n": 1,
+      "words": "Education fair leads sit in a pile and get called a week later",
+      "category": "marketing_leads",
+      "subtype": "lead_followup_slow",
+      "quick_ideas": [
+        "Split the last fair's leads between counsellors today, so each has an owner",
+        "Collect only contact details people agree to give at the next fair, with permission and no documents, so the list is clean."
+      ],
+      "workzap_build": {
+        "keys": [
+          "lead_followup"
+        ],
+        "text": "Fair and seminar leads captured into a follow-up queue the same day, with first-response timers per counsellor.",
+        "tool_words": []
+      },
+      "ask_first": "Do the fair leads wait because they are never handed to counsellors, or because counsellors are busy with files?",
+      "free_stops": "The capture and assignment setup is kept for the document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many fair leads from the last event still lack a call note today, so you see the real backlog.",
+          "review": false
+        },
+        {
+          "text": "Set one daily handover time for new fair leads to one assigned caller list, so fresh enquiries get contacted while interest is high.",
+          "review": true
+        }
+      ]
+    },
+    {
+      "id": "p2_lead_quality",
+      "n": 2,
+      "words": "Facebook ads bring many unqualified enquiries",
+      "category": "marketing_leads",
+      "subtype": "lead_quality",
+      "quick_ideas": [
+        "Make the ad clear on destinations and services you offer, so the wrong people self-select out",
+        "Sort last month's enquiries into serious and not, so you see the ratio by ad."
+      ],
+      "workzap_build": {
+        "keys": [
+          "attribution_codes"
+        ],
+        "text": "Every enquiry tagged to its ad and followed to a signed client, so each ad's quality is measured.",
+        "tool_words": []
+      },
+      "ask_first": "Do the unqualified enquiries ask about countries you do not cover, or about budgets they cannot meet?",
+      "free_stops": "How the tags and quality measures are set up is in the document.",
+      "extra_ideas": [
+        {
+          "text": "Note which enquiries asked about destinations or services you do not handle this week, so wasted lead sources become obvious.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member the job of marking each new enquiry source in one office notebook, so weak channels stop flooding counsellors.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p3_data_scattered",
+      "n": 3,
+      "words": "Each counsellor tracks files in their own Excel, and files leave when they do",
+      "category": "reporting_visibility",
+      "subtype": "data_scattered",
+      "quick_ideas": [
+        "Move every active file onto one company-owned list by case reference, so nothing sits on a personal sheet",
+        "Agree the stages every file moves through, so all counsellors use the same words."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking"
+        ],
+        "text": "A shared file pipeline per intake by case reference, with institutions, offer and deposit status, owned by the company, not the counsellor.",
+        "tool_words": []
+      },
+      "ask_first": "Do counsellors keep their sheets on their own laptops, or on their phones and personal email?",
+      "free_stops": "The pipeline stages and views are kept for the document.",
+      "extra_ideas": [
+        {
+          "text": "Count active cases missing from the company list by comparing each counsellor's sheet once, so the transfer gap shows.",
+          "review": false
+        },
+        {
+          "text": "Make one office register the only place for active case stage changes, so files stay with the business when staff leave.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p4_info_lost_in_whatsapp",
+      "n": 4,
+      "words": "Students' documents come by WhatsApp and email and get lost",
+      "category": "communication_coordination",
+      "subtype": "info_lost_in_whatsapp",
+      "quick_ideas": [
+        "Choose one company-controlled place for documents per case, so nothing stays on personal phones",
+        "Limit access to the counsellor handling each case, so documents stay protected."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "A secure document checklist per case under the consultancy's own controls, with reminder messages chasing missing items.",
+        "tool_words": []
+      },
+      "ask_first": "Do documents arrive mostly through chat messages, or mostly by email?",
+      "free_stops": "The checklist and access setup are in the document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many active cases need staff to search old messages for missing documents this week, so the retrieval problem has a size.",
+          "review": false
+        },
+        {
+          "text": "Give one coordinator the job of logging each received document against the case reference in one office notebook, so nothing disappears between messages.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p5_tasks_dropped",
+      "n": 5,
+      "words": "Intake deadlines are missed because nobody had an overview",
+      "category": "communication_coordination",
+      "subtype": "tasks_dropped",
+      "quick_ideas": [
+        "Put every upcoming deadline across institutions on one calendar, so they're visible together",
+        "Review it once a week as a team, so nothing slips."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "A deadline calendar tied to each case, with reminders sent straight to the right counsellor.",
+        "tool_words": []
+      },
+      "ask_first": "Do you miss deadlines for university intakes, or for visa and funding submissions?",
+      "free_stops": "The reminder rules are kept for the document.",
+      "extra_ideas": [
+        {
+          "text": "Walk through current cases once and note which upcoming intake dates are written nowhere central, so missed deadlines have an obvious cause.",
+          "review": false
+        },
+        {
+          "text": "Assign one person to update one wall list of all upcoming intake dates every afternoon, so the team works from the same view.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p6_receivables_late",
+      "n": 6,
+      "words": "University commissions arrive months late and I don't know which students they're owed for",
+      "category": "cash_collections",
+      "subtype": "receivables_late",
+      "quick_ideas": [
+        "List last intake's enrolments by case reference and institution once, so you see what should be paid",
+        "Note which have been invoiced, so the gap is clear."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger"
+        ],
+        "text": "A commission tracker showing eligible enrolments, invoices, amounts received and ageing by currency and institution.",
+        "tool_words": []
+      },
+      "ask_first": "Do commissions come late from a few universities, or from most of them?",
+      "free_stops": "How eligibility and ageing are tracked is in the document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many enrolled case files lack any institution payment note this intake, so missing follow ups stop hiding among active students.",
+          "review": true
+        },
+        {
+          "text": "Give one staff member one notebook page for institution payment notes, so every team handover starts from the same place.",
+          "review": true
+        }
+      ]
+    },
+    {
+      "id": "p7_commission_disputes",
+      "n": 7,
+      "words": "Sub-agents dispute their share",
+      "category": "people_staff",
+      "subtype": "commission_disputes",
+      "quick_ideas": [
+        "Write down each sub-agent's agreed split once, so there is one record; for the contract itself, talk to your lawyer",
+        "Send each a simple statement of their cases, so disputes have facts."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger"
+        ],
+        "text": "Monthly sub-agent statements produced directly from agreed splits, with a dispute log.",
+        "tool_words": []
+      },
+      "ask_first": "Do sub-agents dispute the percentage, or the cases they are said to have brought?",
+      "free_stops": "The statement setup is kept for the document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many sub agent cases have no written share note today, so the source of payout arguments becomes visible.",
+          "review": false
+        },
+        {
+          "text": "Give one manager one register for every sub agent case share note, so discussions start from the same office record.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p8_credit_customers",
+      "n": 8,
+      "words": "Service fee installments stop being paid",
+      "category": "cash_collections",
+      "subtype": "credit_customers",
+      "quick_ideas": [
+        "List overdue service fee accounts today by case reference, so you see the total",
+        "Send each one reminder from the office number, so it isn't left to the counsellor."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger"
+        ],
+        "text": "A service fee ledger with payment reminders and a refund request register.",
+        "tool_words": []
+      },
+      "ask_first": "Do instalments stop after the first payment, or in the middle of the process?",
+      "free_stops": "The reminder sequence is in the document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many active cases have no recent office payment note this week, so stalled follow up stops blending into normal counselling work.",
+          "review": true
+        },
+        {
+          "text": "Give one person one daily slot to update payment follow up notes, so missed reminders stop waiting on each counsellor.",
+          "review": true
+        }
+      ]
+    },
+    {
+      "id": "p9_owner_bottleneck",
+      "n": 9,
+      "words": "Parents call me directly because counsellors are slow with updates",
+      "category": "communication_coordination",
+      "subtype": "owner_bottleneck",
+      "quick_ideas": [
+        "Agree which stages always trigger an update to the family, so counsellors know when to message",
+        "Send current files a status update once this week, so calls drop."
+      ],
+      "workzap_build": {
+        "keys": [
+          "customer_messaging"
+        ],
+        "text": "Stage-based WhatsApp status updates sent directly to students and parents, with numbers given with permission.",
+        "tool_words": []
+      },
+      "ask_first": "Do parents call because they get no updates, or because the updates they get are unclear?",
+      "free_stops": "The stage messages and triggers are kept for the document.",
+      "extra_ideas": [
+        {
+          "text": "Note how many parent calls reached you this week before the counsellor gave any update, so the delay pattern is clear.",
+          "review": false
+        },
+        {
+          "text": "Give each counsellor a fixed daily time to send case updates and note them in one team register, so parents stop bypassing the team.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p10_performance_unknown",
+      "n": 10,
+      "words": "I can't see which counsellor converts and which doesn't",
+      "category": "people_staff",
+      "subtype": "performance_unknown",
+      "quick_ideas": [
+        "Count each counsellor's files and signed clients for last intake once, so you have a baseline",
+        "Agree what \"converted\" means, so the comparison is fair."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "A counsellor screen showing files handled, conversion and time per stage, updated daily across branches.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "Do you judge counsellors by enquiries handled, or by clients signed?",
+      "free_stops": "How performance is measured is in the document.",
+      "extra_ideas": [
+        {
+          "text": "Compare each counsellor's enquiry count with their consultation bookings for the last intake once, so weak handoff points stand out.",
+          "review": false
+        },
+        {
+          "text": "Give one supervisor the job of noting each counsellor's signed clients every Friday in one notebook, so performance stops being argued from memory.",
+          "review": false
+        }
+      ]
+    }
+  ],
+  "never_say": [
+    "Any visa, study permit, CAS/GTE, financial-requirement or eligibility advice; pi says it can't advise on that and suggests a licensed adviser or the official government source.",
+    "Anything about a student's chances of admission or a visa.",
+    "Any help with fake bank statements, forged documents, ghost-written deception or fake offer letters.",
+    "\"Guaranteed visa\" or \"sure success\" claims, or help writing them.",
+    "Legal advice on commission contracts or refunds after refusals.",
+    "Any idea that collects passports, ID numbers, transcripts, scores, bank statements or any student or parent personal details, or advice on guardianship for minors abroad."
+  ],
+  "sample_reply": {
+    "person": "Fair ke baad sainkron leads aati hain aur counsellors hafte baad call karte hain. Is ka koi solution batayein.",
+    "pi": "Bilkul, ye masla hal ho sakta hai, aur pehla qadam aasan hai.\nPehle, pichle fair ki leads aaj hi counsellors mein baant dein, taake har lead ka koi zimmedar ho.\nDoosra, agle fair pe sirf wohi contact details lein jo log ijazat se dein, koi document nahi, taake list saaf rahe.\nWorkzap aap ke liye ye rakh sakta hai: fair ki leads usi din follow-up queue mein aur har counsellor ka response time saamne.",
+    "language": "roman_urdu"
+  }
+}

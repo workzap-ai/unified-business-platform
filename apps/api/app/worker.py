@@ -22,6 +22,7 @@ from app.modules.pi_saas.calendar_sync import JOBS as PI_CALENDAR_JOBS
 from app.modules.pi_saas.calendar_sync import sweep_pi_calendar
 from app.modules.pi_saas.campaigns import sweep_campaigns
 from app.modules.pi_saas.digests import sweep_digests
+from app.modules.pi_saas.drift_run import drift_check_daily as pi_drift_check
 from app.modules.pi_saas.health import heal as pi_health_heal
 from app.modules.pi_saas.health_selftest import self_test_daily as pi_health_self_test
 from app.modules.pi_saas.jobs import JOBS as PI_SAAS_JOBS
@@ -54,6 +55,7 @@ JOB_FUNCTIONS: dict[str, Callable[..., Awaitable[Any]]] = {
     # pi Health: safe self-fixes (every 5 minutes) and daily self-tests.
     "pi_health_heal": pi_health_heal,
     "pi_health_self_test": pi_health_self_test,
+    "pi_drift_check": pi_drift_check,
     # Team board: the team's real work becomes cards (every 2 minutes).
     "sweep_team_board": sweep_team_board,
     # Team alerts on WhatsApp: a card given to someone; cards due within the hour.
@@ -116,6 +118,7 @@ class WorkerSettings:
         cron(sweep_digests, minute={7, 37}, second=45, unique=True),
         cron(pi_health_heal, minute=set(range(3, 60, 5)), second=15, unique=True),
         cron(pi_health_self_test, minute={23}, second=0, unique=True),
+        cron(pi_drift_check, hour={3}, minute={41}, second=0, unique=True),
         cron(sweep_team_board, minute=set(range(1, 60, 2)), second=25, unique=True),
         cron(remind_team_due, minute={6, 21, 36, 51}, second=35, unique=True),
         cron(remind_meetings, minute=set(range(1, 60, 5)), second=45, unique=True),

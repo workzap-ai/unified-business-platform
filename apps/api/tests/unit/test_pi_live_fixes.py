@@ -451,3 +451,32 @@ def test_a_meeting_arranged_on_the_board_can_be_confirmed() -> None:
     }  # moved on the board: no "Meeting confirmed by the team" note
     reply = "Great, your meeting is confirmed for today at 5 PM: https://meet.jit.si/pi-meeting-1"
     assert invented(reply, context) == ""
+
+
+def test_not_available_and_a_new_date_are_about_the_meeting() -> None:
+    from app.modules.pi.language import TEAM_CHECK_NOTICES  # noqa: F401
+    from app.modules.pi.service_conversation import (
+        GENDERED_SELF,
+        RESCHEDULE_ASK,
+        ServiceTurn,
+        meeting_change_missed,
+        reschedule_reply,
+    )
+
+    meeting = {"label": "Saturday 17 October, 12:00 PM", "link": "https://meet.jit.si/x"}
+    history = [{"role": "ai", "text": "Meeting time changed: Saturday 17 October, 12:00 PM"}]
+    context = {"brief": {"meeting": meeting}, "history": history}
+    vague = ServiceTurn(reply="I understand you're not available. Let me know later.")
+    context["latest_customer_message"] = "Im not available"
+    assert meeting_change_missed(vague, context)
+    recap = ServiceTurn(reply="Here's a quick recap of your projects:\n• ERP\nAnything else?")
+    context["latest_customer_message"] = "Change it to 5th November please"
+    assert meeting_change_missed(recap, context)
+    good = ServiceTurn(reply="No problem. Which day and time suit you instead for the meeting?")
+    assert meeting_change_missed(good, context) is None
+    moved = ServiceTurn(reply="x", meeting_time="2026-11-05T10:00", language="en")
+    assert reschedule_reply(moved).startswith("No problem. I've asked the team to move")
+    assert "Thursday 05 November, 10:00 AM" in reschedule_reply(moved)
+    assert not GENDERED_SELF.search(RESCHEDULE_ASK["roman_ur"])
+    context["latest_customer_message"] = "I need a website"
+    assert meeting_change_missed(recap, {**context, "history": []}) is None

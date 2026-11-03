@@ -56,7 +56,7 @@ class _Writer:
         self.y += 18
 
     def para(
-        self, text: str, size: float = 10, bold: bool = False, color=INK, indent: float = 0
+        self, text: str, size: float = 10, bold: bool = False, color: Any = INK, indent: float = 0
     ) -> None:
         for line in wrap(text, size, WIDTH - 2 * MARGIN - indent, bold)[:8]:
             self.room(size + 4)

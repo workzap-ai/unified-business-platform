@@ -1,0 +1,357 @@
+{
+  "industry": "wholesale_market_traders",
+  "name": "Wholesale-market traders (e.g. Jodia Bazaar, Shah Alam Market, Deira souks)",
+  "sector": "7.E Trade, distribution and logistics",
+  "version": "1.1",
+  "problems": [
+    {
+      "id": "p1_credit_customers",
+      "n": 1,
+      "words": "Half the market owes me money and the khata is the only record",
+      "category": "cash_collections",
+      "subtype": "credit_customers",
+      "quick_ideas": [
+        "Have the munshi total all khata balances once, sorted by age, so you see what is really out",
+        "Photograph the khata pages, so the record isn't one book that can be lost."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger"
+        ],
+        "text": "A digital khata in Urdu or English that the munshi fills in seconds and the owner sees on phone, with every balance aged daily.",
+        "tool_words": []
+      },
+      "ask_first": "Roughly how many buyers are on udhaar at any time?",
+      "free_stops": "How the khata moves across and is kept in step is planned in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many khata pages have no fresh entry this month, so you see how much old money is simply sitting.",
+          "review": false
+        },
+        {
+          "text": "Set one fixed weekly time for the khata review with one person reading and one noting, so overdue balances stop being skipped.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p2_receivables_late",
+      "n": 2,
+      "words": "Upcountry buyers take maal on credit and then stop answering",
+      "category": "cash_collections",
+      "subtype": "receivables_late",
+      "quick_ideas": [
+        "Send the bill and bilty photo on the day of dispatch, so the buyer acknowledges the amount while it's fresh",
+        "Hold the next consignment for buyers with an old balance until part is paid."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger",
+          "customer_messaging"
+        ],
+        "text": "Buyer balances with ageing and WhatsApp reminders queued for the owner to approve, sent only with the buyer's permission.",
+        "tool_words": []
+      },
+      "ask_first": "Do upcountry buyers go quiet mostly after the first order, or after several?",
+      "free_stops": "Reminder timing and hold rules are set in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note which upcountry buyers go silent after delivery and how old each unpaid bill feels, so the riskiest credit customers stand out.",
+          "review": true
+        },
+        {
+          "text": "Keep one dispatch notebook with one line per consignment and give one person the follow up job, so unpaid loads are chased from one place.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p3_cash_mismatch",
+      "n": 3,
+      "words": "At day end cash in the gaddi doesn't match the parchis",
+      "category": "cash_collections",
+      "subtype": "cash_mismatch",
+      "quick_ideas": [
+        "Use numbered parchi books, so every sale has a record that can be counted",
+        "Have one person count and another check at closing, so the count is trusted."
+      ],
+      "workzap_build": {
+        "keys": [
+          "cash_reconciliation"
+        ],
+        "text": "A daily closing screen comparing parchis, cash, bank transfers and new credit, flagging any difference to you right away.",
+        "tool_words": []
+      },
+      "ask_first": "Is the mismatch there every day, or only on busy days?",
+      "free_stops": "The closing steps and checks are laid out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare the closing cash count with total parchis for one week, so you see whether the mismatch is small drift or repeated leakage.",
+          "review": false
+        },
+        {
+          "text": "Give one person the parchi bundle and one place for all cash notes at closing, so the gaddi handover stays orderly every day.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p4_accountability",
+      "n": 4,
+      "words": "The munshi knows everything; if he leaves I'm finished",
+      "category": "people_staff",
+      "subtype": "accountability",
+      "quick_ideas": [
+        "Have a second person learn one part of the munshi's work, so the business isn't one person deep",
+        "Keep a weekly copy of the main records, so they exist outside one head and one book."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger",
+          "nori_daily_read"
+        ],
+        "text": "Records would be kept where you can read them any time, with an evening summary of sales, cash, new credit and recoveries.",
+        "tool_words": [
+          "system"
+        ]
+      },
+      "ask_first": "Does the munshi hold only the credit records, or the stock records too?",
+      "free_stops": "Which records move first, and how, is planned in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "List the munshi tasks only he handles during one market day, so you see exactly where the business would stall if he is absent.",
+          "review": false
+        },
+        {
+          "text": "Give one backup person one fixed duty beside the munshi each day, so critical work starts spreading into the routine.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p5_transfers_lost",
+      "n": 5,
+      "words": "Bags go missing when porters move them from godown to shop",
+      "category": "stock_inventory",
+      "subtype": "transfers_lost",
+      "quick_ideas": [
+        "Count bags at both ends for a few days, so you learn where the loss happens",
+        "Use a slip signed by the porter and the receiver, so each move has an owner."
+      ],
+      "workzap_build": {
+        "keys": [
+          "transfer_tracking"
+        ],
+        "text": "A godown-to-shop log by bag and case that flags any transfer where sent and received don't match.",
+        "tool_words": []
+      },
+      "ask_first": "Do bags go missing mostly on busy days, or randomly?",
+      "free_stops": "The slip and count flow are designed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count bags at godown exit and again at shop arrival for a few market runs, so you learn how often the move changes the total.",
+          "review": false
+        },
+        {
+          "text": "Use one handover slip kept with each load and make one receiver own the arrival count, so every transfer has a clear endpoint.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p6_pricing_errors",
+      "n": 6,
+      "words": "Rates change every day and buyers argue about what I quoted yesterday",
+      "category": "sales_revenue",
+      "subtype": "pricing_errors",
+      "quick_ideas": [
+        "Send the day's bhaav to salesmen as a dated message, so there is a record of each day's rate",
+        "Write the rate on every parchi, so disputes can be settled from paper."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "A daily rate board shared with salesmen, with every quote logged by buyer role and date.",
+        "tool_words": []
+      },
+      "ask_first": "Do rate disputes come with a few buyers, or with many?",
+      "free_stops": "The rate board and quote log setup are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note each rate dispute by item and when it was quoted, so you see which goods create the most argument.",
+          "review": false
+        },
+        {
+          "text": "Keep one daily rate sheet at the gaddi and make one person update it each morning, so everyone quotes from the same day’s bhaav.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p7_margin_unknown",
+      "n": 7,
+      "words": "I don't know my margin on each item because buying rates keep changing",
+      "category": "margin_cost",
+      "subtype": "margin_unknown",
+      "quick_ideas": [
+        "Note the buying rate on each lot as it arrives, so selling rate can be compared to it",
+        "Check your top few items' margin once, so you know which ones carry the shop."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "An item margin view using the actual buying rate of each lot, updated as sales are entered.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "Do your buying rates change daily, or weekly?",
+      "free_stops": "How lots are matched to sales is set in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare today's selling rate with the latest buying rate on a few fast items, so you spot where margin is thin or missing.",
+          "review": false
+        },
+        {
+          "text": "Keep one notebook section for each new lot's buying rate and give one person that entry job, so later selling decisions have a clear base.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p8_expiry_wastage",
+      "n": 8,
+      "words": "Dry fruit gets insects in the summer if it sits too long",
+      "category": "stock_inventory",
+      "subtype": "expiry_wastage",
+      "quick_ideas": [
+        "Note the arrival date on each lot, so the oldest is sold first",
+        "For storage conditions, ask your supplier or a food storage specialist."
+      ],
+      "workzap_build": {
+        "keys": [
+          "stock_alerts"
+        ],
+        "text": "Lot ageing alerts that warn you when stock has sat too long, ahead of the summer months.",
+        "tool_words": []
+      },
+      "ask_first": "Does the insect trouble hit only dry fruit, or other stock too?",
+      "free_stops": "Alert rules per item are set in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Walk the stock once this week and note which dry fruit lots have sat longest, so slow moving bags stand out before more spoilage.",
+          "review": false
+        },
+        {
+          "text": "Give one person the weekly old stock check and keep all arrival notes in one notebook, so older lots get attention before summer damage grows.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p9_whatsapp_overload",
+      "n": 9,
+      "words": "Orders come on phone and WhatsApp all day and some get missed",
+      "category": "tech_systems",
+      "subtype": "whatsapp_overload",
+      "quick_ideas": [
+        "Give buyers one order number, so orders don't scatter across phones",
+        "Make one person confirm each order back, so the buyer knows it was received."
+      ],
+      "workzap_build": {
+        "keys": [
+          "order_capture"
+        ],
+        "text": "WhatsApp and phone orders gathered into one list, tracked until the maal is sent.",
+        "tool_words": []
+      },
+      "ask_first": "Do the missed orders come mostly by phone, or by WhatsApp?",
+      "free_stops": "The intake and confirmation flow are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many phone and chat orders need a second check before packing today, so you see the size of the missed order problem.",
+          "review": false
+        },
+        {
+          "text": "Keep one running order list in one notebook and give one person the job of adding every incoming order, so packing pulls from one place.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p10_payment_methods",
+      "n": 10,
+      "words": "Buyers pay by bank transfer and I can't track who paid",
+      "category": "cash_collections",
+      "subtype": "payment_methods",
+      "quick_ideas": [
+        "Ask buyers to put their bill number in the transfer reference, so payments match bills",
+        "Check transfers once at closing, so the khata is updated the same day."
+      ],
+      "workzap_build": {
+        "keys": [
+          "cash_reconciliation",
+          "credit_ledger"
+        ],
+        "text": "Incoming transfers matched to bills and buyer balances each day, with unmatched payments flagged.",
+        "tool_words": []
+      },
+      "ask_first": "Do most buyers pay by bank transfer, or is it a mix?",
+      "free_stops": "The matching rules are set in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count unmatched bank transfers at closing for one week, so you see how often payment arrives without a clear bill link.",
+          "review": true
+        },
+        {
+          "text": "Keep one notebook page for transfers and give one person the matching job each evening, so the khata updates without guesswork.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p11_no_customer_data",
+      "n": 11,
+      "words": "I have no list of who my regular buyers are or what they buy",
+      "category": "customers_retention",
+      "subtype": "no_customer_data",
+      "quick_ideas": [
+        "Pull your top buyers and what they buy from the khata, so you know who matters most",
+        "Ask regulars, with their permission, whether they'd like a call before the season."
+      ],
+      "workzap_build": {
+        "keys": [
+          "loyalty_repeat",
+          "customer_messaging"
+        ],
+        "text": "A buyer list with purchases and frequency that prompts follow-up before Ramadan, winter and wedding season.",
+        "tool_words": []
+      },
+      "ask_first": "Do you want to know regular buyers by value, or by how often they come?",
+      "free_stops": "How the list is built and used is planned in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note which buyers return more than once this week and what they take, so your regular trade pattern starts to show.",
+          "review": false
+        },
+        {
+          "text": "Keep one notebook beside the gaddi for repeat buyer notes and give one staff member that job, so regular demand gets remembered at the counter.",
+          "review": false
+        }
+      ]
+    }
+  ],
+  "never_say": [
+    "Anything about keeping sales off the books or avoiding FBR or FTA; pi declines and does not treat it as a problem to solve.",
+    "Help sourcing smuggled, undeclared or counterfeit goods.",
+    "Tax registration, invoicing rules, UAE VAT or Pakistan sales tax; refer to a tax adviser.",
+    "Hidden cameras, confrontations or naming staff suspected of theft.",
+    "Views on market committee, landlord or pagri disputes; and storing buyers' names, numbers or CNICs. If there is a robbery or threat, police (15, 999) come first."
+  ],
+  "sample_reply": {
+    "person": "Roz shaam ko gaddi ka cash parchiyon se nahi milta. Is ka kya hal hai?",
+    "pi": "Zaroor, ye sambhal sakta hai, aur is ke liye bade kharch ki zaroorat nahi.\nPehle, numbered parchi books istemaal karein, taake har sale ka record gina ja sake.\nDoosra, closing par ek banda gine aur doosra check kare, taake ginti par bharosa ho.\nWorkzap ye banwane mein madad kar sakta hai: parchi, cash, transfer aur udhaar roz ek screen par milein aur farq saaf nazar aaye, phone par bhi.",
+    "language": "roman_urdu"
+  }
+}

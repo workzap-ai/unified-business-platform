@@ -1,0 +1,325 @@
+{
+  "industry": "plastics_and_injection_moulding",
+  "name": "Plastics and injection moulding",
+  "sector": "7.D Manufacturing and industry (part 1)",
+  "version": "1.1",
+  "problems": [
+    {
+      "id": "p1_price_increases_supplier",
+      "n": 1,
+      "words": "Resin price changes every week and my price list is fixed for dealers",
+      "category": "margin_cost",
+      "subtype": "price_increases_supplier",
+      "quick_ideas": [
+        "Work out cost per piece for your top items at today's resin rate, so you see which are now underpriced",
+        "Compare it with your current dealer price list"
+      ],
+      "workzap_build": {
+        "keys": [
+          "custom_build"
+        ],
+        "text": "A cost per piece calculator using resin rate, part weight, cycle time, power and rejects, feeding a dealer price list that updates with resin rates.",
+        "tool_words": []
+      },
+      "ask_first": "How often do you update your rate list now?",
+      "free_stops": "How the cost is built and how the price list is updated is set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note today's resin rate beside your dealer price for your fastest items, so underpriced pieces are easy to spot.",
+          "review": true
+        },
+        {
+          "text": "Give one person the job of updating one paper dealer price list each week, so quotes follow current resin changes.",
+          "review": true
+        }
+      ]
+    },
+    {
+      "id": "p2_raw_material_shortage",
+      "n": 2,
+      "words": "Traders delay resin deliveries and the machines stand idle",
+      "category": "stock_inventory",
+      "subtype": "raw_material_shortage",
+      "quick_ideas": [
+        "Count resin and masterbatch stock once and match it against this week's jobs, so you see shortages coming",
+        "Agree a minimum level for each grade with the store keeper"
+      ],
+      "workzap_build": {
+        "keys": [
+          "stock_alerts"
+        ],
+        "text": "Resin and masterbatch stock with consumption per job and reorder alerts before machines stop.",
+        "tool_words": []
+      },
+      "ask_first": "Do deliveries run late from most traders, or mainly from one?",
+      "free_stops": "How consumption and minimum levels are calculated is covered in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note each machine stoppage caused by delayed resin and the missing grade, so the worst supply gaps stand out.",
+          "review": false
+        },
+        {
+          "text": "Give one store person one notebook for incoming resin promises and actual arrivals, so late traders are easier to challenge.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p3_maintenance_downtime",
+      "n": 3,
+      "words": "Mould broke and the repair shop takes weeks",
+      "category": "operations_process",
+      "subtype": "maintenance_downtime",
+      "quick_ideas": [
+        "List every active mould with owner, location and condition, so you know which are at risk",
+        "Note which moulds broke last, so they are checked first"
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "A mould register with owner, location, cavities, standard cycle time and repair history, plus a preventive maintenance calendar.",
+        "tool_words": []
+      },
+      "ask_first": "Are the broken moulds mostly old ones, or newly made ones?",
+      "free_stops": "Inspection routine and maintenance schedule are set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many active jobs depend on each mould now out for repair, so the real production hold-up is clear.",
+          "review": false
+        },
+        {
+          "text": "Give one person one notebook for mould movement, repair dates and return dates, so follow-up with the repair shop stays regular.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p4_rework",
+      "n": 4,
+      "words": "Reject rate on some moulds is high",
+      "category": "quality_complaints",
+      "subtype": "rework",
+      "quick_ideas": [
+        "Count rejects per mould for one week, so the worst ones show up",
+        "Note the most common defect on each"
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks",
+          "dashboards_reports"
+        ],
+        "text": "A machine-wise shift log of shots, rejects and downtime reasons, with a daily view per machine and shift.",
+        "tool_words": []
+      },
+      "ask_first": "Are high rejects on a few moulds, or on most of them?",
+      "free_stops": "How rejects are recorded and compared is kept for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare reject trays across moulds at the end of each shift, so the worst moulds for waste stand out quickly.",
+          "review": false
+        },
+        {
+          "text": "Give one supervisor one board to record rejects by mould each shift, so rework gets tracked the same way every time.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p5_trust_honesty",
+      "n": 5,
+      "words": "Production per shift is written by operators, numbers look made up",
+      "category": "people_staff",
+      "subtype": "trust_honesty",
+      "quick_ideas": [
+        "Check the shot counter on a few machines at shift change against the written figure, so you see if there is a gap",
+        "Have the shift supervisor sign the shift sheet"
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "A shift log on phone where the supervisor records counter readings, pieces, rejects and downtime openly each shift.",
+        "tool_words": []
+      },
+      "ask_first": "Do the made-up looking numbers show on every shift, or on certain ones?",
+      "free_stops": "How readings are captured and checked is set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare packed goods with the written shift output on a few machines, so the recording gap shows.",
+          "review": false
+        },
+        {
+          "text": "Give one supervisor the handover job for checking written output at each shift end, so reported production stops changing unchecked.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p6_theft_internal",
+      "n": 6,
+      "words": "Regrind and scrap bags go missing",
+      "category": "loss_security",
+      "subtype": "theft_internal",
+      "quick_ideas": [
+        "Weigh this week's regrind and scrap before it leaves the floor, so you have a real figure",
+        "Store bags in one locked area"
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "A regrind and scrap weighing log with gate pass matching.",
+        "tool_words": []
+      },
+      "ask_first": "Do the bags go missing from the floor, or from the store?",
+      "free_stops": "Weighing points and matching are covered in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count scrap and regrind bags leaving the floor each day and note where they went, so missing material patterns stand out.",
+          "review": false
+        },
+        {
+          "text": "Give one store person one place to record every scrap bag handover, so bags stop moving without a trace.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p7_stockout",
+      "n": 7,
+      "words": "Finished goods pile up in some items, out of stock in others",
+      "category": "stock_inventory",
+      "subtype": "stockout",
+      "quick_ideas": [
+        "Count finished stock by item and colour once",
+        "Compare it with dealer orders from the last month"
+      ],
+      "workzap_build": {
+        "keys": [
+          "stock_alerts",
+          "nori_daily_read"
+        ],
+        "text": "Finished goods stock by item and colour with dealer order matching and a daily read of what is short.",
+        "tool_words": []
+      },
+      "ask_first": "Do piles build up in certain colours, or in certain items?",
+      "free_stops": "How stock is matched to orders is set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Walk the finished goods area and note items with the highest piles beside recent dealer requests, so mismatches stand out clearly.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of updating one stock notebook after each dispatch, so fast-moving items are less likely to run out.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p8_credit_customers",
+      "n": 8,
+      "words": "Dealers get credit and payment is slow",
+      "category": "cash_collections",
+      "subtype": "credit_customers",
+      "quick_ideas": [
+        "List every dealer's balance and oldest bill",
+        "Check that list before the next dispatch"
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger"
+        ],
+        "text": "A dealer ledger with credit limits and payment reminders.",
+        "tool_words": []
+      },
+      "ask_first": "Is slow payment from a few dealers, or from most of them?",
+      "free_stops": "Limits and reminder timing are kept for the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many dealer balances have no promised follow up date written beside them, so missed collection callbacks stop hiding in the week.",
+          "review": false
+        },
+        {
+          "text": "Give one staff role one notebook page for dealer payment follow ups at a fixed daily time, so callbacks happen even on dispatch days.",
+          "review": true
+        }
+      ]
+    },
+    {
+      "id": "p9_utility_costs",
+      "n": 9,
+      "words": "Electricity bill is the biggest cost after resin",
+      "category": "margin_cost",
+      "subtype": "utility_costs",
+      "quick_ideas": [
+        "Note which machines run idle between jobs for a few days",
+        "Write down power cut hours and parts lost mid-cycle"
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "A daily view of output against downtime and idle hours per machine.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "Is power wasted mostly by idle machines, or by power cuts?",
+      "free_stops": "How power cost is spread per machine and piece is detailed in the solution document; for tariff questions, talk to your utility or adviser.",
+      "extra_ideas": [
+        {
+          "text": "Note which machines stay heated without producing during changeovers this week, so avoidable power waste is easier to spot.",
+          "review": false
+        },
+        {
+          "text": "Give one shift lead the job of noting idle heated machines in one notebook, so wasted running time gets reviewed daily.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p10_website_issues",
+      "n": 10,
+      "words": "No catalogue for dealers; they ask on WhatsApp every time",
+      "category": "marketing_leads",
+      "subtype": "website_issues",
+      "quick_ideas": [
+        "Photograph your full range once with item codes",
+        "Keep the photos in one folder ready to share"
+      ],
+      "workzap_build": {
+        "keys": [
+          "website_digital",
+          "customer_messaging"
+        ],
+        "text": "A WhatsApp catalogue for dealers with item photos and current availability.",
+        "tool_words": []
+      },
+      "ask_first": "Do dealers ask on WhatsApp mostly for photos, or for prices?",
+      "free_stops": "How the catalogue stays in sync with stock is set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count which item photos and item codes dealers ask for most in one week, so the missing range is clear.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member the job of keeping all item photos and codes in one shared folder, so dealer replies go faster.",
+          "review": false
+        }
+      ]
+    }
+  ],
+  "never_say": [
+    "Any advice on food-contact, medical-grade or child-safe compliance, additives or formulations.",
+    "Any help labelling recycled material as virgin or misrepresenting grade.",
+    "Any guidance on plastic bans, environmental rules or how to avoid them.",
+    "Customs, tax or under-invoicing help.",
+    "Accusations against individual operators; note the record gap only.",
+    "Electrical or machine safety advice; burns and crush injuries are emergencies."
+  ],
+  "sample_reply": {
+    "person": "Dana ka rate har hafte badalta hai aur dealers ko purane rate pe maal ja raha hai. Kya karein?",
+    "pi": "Bilkul, ye masla hal ho sakta hai, aur pehla qadam aasan hai.\nPehle, apne main items ka per piece cost aaj ke resin rate pe ek dafa nikaal lein, taa ke pata chale kaun se item ab ghaate pe ja rahe hain.\nDoosra, us cost ko dealers ki mojooda rate list ke saath rakh kar dekh lein.\nWorkzap aap ke liye ye rakh sakta hai: per piece cost calculator jo resin rate badalte hi update ho, aur dealers ki rate list bhi uske saath turant tayyar ho.",
+    "language": "roman_urdu"
+  }
+}

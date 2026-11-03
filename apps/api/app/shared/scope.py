@@ -29,8 +29,17 @@ class WorkspaceScope:
         return permission in self.permissions
 
     def require(self, *permissions: str) -> None:
-        if not all(p in self.permissions for p in permissions):
-            raise PermissionDenied
+        missing = tuple(p for p in permissions if p not in self.permissions)
+        if missing:
+            raise PermissionDenied(
+                tenant_id=self.tenant_id,
+                environment_id=self.environment_id,
+                user_id=self.user_id,
+                actor_label=self.actor_label,
+                actor_type=self.actor_type,
+                request_id=self.request_id,
+                missing=missing,
+            )
 
     @property
     def is_system(self) -> bool:

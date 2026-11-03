@@ -1,5 +1,6 @@
 from collections.abc import Sequence
 from datetime import UTC, datetime
+from typing import Any
 from uuid import UUID
 
 from sqlalchemy import func, literal_column, or_
@@ -22,7 +23,7 @@ from app.shared.errors import Conflict
 from app.shared.scope import WorkspaceScope
 from app.shared.workspace_repository import WorkspaceRepository, like_pattern, to_page
 
-ACTIVITY_INSERT_ORDER = literal_column("customer_activities.ctid")
+ACTIVITY_INSERT_ORDER: Any = literal_column("customer_activities.ctid")
 
 
 async def log_activity(

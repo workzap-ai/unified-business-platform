@@ -133,9 +133,7 @@ async def test_subscription_past_due_sends_email_alongside_notification(
 ):
     ctx = await _business(api, business_db)
     app, tenant = ctx["app"], ctx["tenant"]
-    sub = await business_db.scalar(
-        select(PiSubscription).where(PiSubscription.tenant_id == tenant)
-    )
+    sub = await business_db.scalar(select(PiSubscription).where(PiSubscription.tenant_id == tenant))
     sub.billing_provider, sub.external_subscription_id, sub.external_customer_id, sub.status = (
         "stripe",
         "sub_pastdue",
@@ -173,9 +171,7 @@ async def test_invoice_paid_sends_confirmation_email(
 ):
     ctx = await _business(api, business_db)
     app, tenant = ctx["app"], ctx["tenant"]
-    sub = await business_db.scalar(
-        select(PiSubscription).where(PiSubscription.tenant_id == tenant)
-    )
+    sub = await business_db.scalar(select(PiSubscription).where(PiSubscription.tenant_id == tenant))
     sub.billing_provider, sub.external_subscription_id, sub.external_customer_id, sub.status = (
         "stripe",
         "sub_inv1",

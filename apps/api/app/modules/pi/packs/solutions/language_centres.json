@@ -1,0 +1,322 @@
+{
+  "industry": "language_centres",
+  "name": "Language centres",
+  "sector": "7.J Education and childcare",
+  "version": "1.1",
+  "problems": [
+    {
+      "id": "p1_conversion_low",
+      "n": 1,
+      "words": "People take the placement test and never come back to enrol",
+      "category": "sales_revenue",
+      "subtype": "conversion_low",
+      "quick_ideas": [
+        "List this month's placement tests that didn't enrol, so you see how many there are",
+        "Contact each one once, using the number they gave with permission, so you learn why."
+      ],
+      "workzap_build": {
+        "keys": [
+          "lead_followup"
+        ],
+        "text": "Every placement test tracked to enrolment, with scheduled follow-ups, reasons recorded and conversion measured per branch.",
+        "tool_words": []
+      },
+      "ask_first": "Do most of them leave after hearing the fee, or after the level result?",
+      "free_stops": "The follow-up timing and reason tracking are kept for the document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many placement tests led to enrolment by the next working day, so you spot whether delay after testing is hurting signups.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of noting every finished placement test in one notebook, so follow-up stops being missed at handover.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p2_repeat_low",
+      "n": 2,
+      "words": "Learners finish level one and don't continue to level two",
+      "category": "customers_retention",
+      "subtype": "repeat_low",
+      "quick_ideas": [
+        "Announce the next level's start date before the current one ends, so learners plan to continue",
+        "Count rollovers from the last few levels, so you know where the drop happens."
+      ],
+      "workzap_build": {
+        "keys": [
+          "loyalty_repeat"
+        ],
+        "text": "Rollover tracked by level and teacher as counts, with next-level reminders sent as due.",
+        "tool_words": []
+      },
+      "ask_first": "Do learners drop out because of timing and cost, or because they feel they have learnt enough?",
+      "free_stops": "The rollover reminders and reports are in the document.",
+      "extra_ideas": [
+        {
+          "text": "Compare how many learners finish each level with how many join the next class, so you see where continuation drops most.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member the job of marking expected next-level starters in one list each week, so empty seats are noticed early.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p3_manual_work",
+      "n": 3,
+      "words": "Nobody knows how many hours each learner has left on a package",
+      "category": "operations_process",
+      "subtype": "manual_work",
+      "quick_ideas": [
+        "Add up the hours used on every active package once, so you have a true starting balance",
+        "Ask teachers to report hours to one place after each lesson, so balances stay current."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger"
+        ],
+        "text": "An hours bank showing hours bought, used and left for every package, with timely low-balance reminders.",
+        "tool_words": []
+      },
+      "ask_first": "Is the hours count kept by teachers, by the front desk, or not at all?",
+      "free_stops": "How lessons are logged and balances updated is kept for the document.",
+      "extra_ideas": [
+        {
+          "text": "Count active packages with no updated remaining hours note this week, so you see how big the tracking backlog is.",
+          "review": false
+        },
+        {
+          "text": "Give one teacher on each shift the handover job for package hours notes, so the desk can answer balance questions clearly.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p4_hidden_costs",
+      "n": 4,
+      "words": "No-shows for private lessons, and we still pay the teacher",
+      "category": "margin_cost",
+      "subtype": "hidden_costs",
+      "quick_ideas": [
+        "Write one no-show rule for billing and teacher pay, so it's applied the same way",
+        "Count last month's no-shows, so you know what they cost."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "No-shows recorded and your rules applied instantly to billing and teacher pay.",
+        "tool_words": []
+      },
+      "ask_first": "Do the no-shows come from a few learners, or from many of them now and then?",
+      "free_stops": "How the rules feed billing and pay is in the document.",
+      "extra_ideas": [
+        {
+          "text": "Note each private lesson no-show beside whether the teacher was paid, so the weekly cost of missed attendance is clear.",
+          "review": false
+        },
+        {
+          "text": "Give one desk person one notebook page for all private lesson absences, so teacher pay decisions follow the same record.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p5_shift_scheduling",
+      "n": 5,
+      "words": "Freelance teachers change availability every week",
+      "category": "people_staff",
+      "subtype": "shift_scheduling",
+      "quick_ideas": [
+        "Ask every teacher for their availability by one fixed day each week, so the schedule is built once",
+        "Keep it in one shared place, so the desk sees the same version."
+      ],
+      "workzap_build": {
+        "keys": [
+          "booking_scheduling"
+        ],
+        "text": "A teacher availability and scheduling board with room allocation and clash warnings.",
+        "tool_words": []
+      },
+      "ask_first": "Is the change mostly late notice from teachers, or availability that shifts through the week?",
+      "free_stops": "The scheduling rules are kept for the document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many timetable changes came after the weekly schedule was shared, so you see the real disruption from shifting availability.",
+          "review": false
+        },
+        {
+          "text": "Give one coordinator the job of collecting all teacher availability into one weekly list, so classes stop moving at the last minute.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p6_receivables_late",
+      "n": 6,
+      "words": "Corporate clients pay sixty or ninety days late",
+      "category": "cash_collections",
+      "subtype": "receivables_late",
+      "quick_ideas": [
+        "List every unpaid corporate invoice with its age, so you see what is owed",
+        "Confirm each client's payment terms in writing, so follow-ups have something to point to."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger"
+        ],
+        "text": "Corporate invoices with ageing and scheduled reminders, reported per client.",
+        "tool_words": []
+      },
+      "ask_first": "Is it one or two big companies that pay late, or nearly all of them?",
+      "free_stops": "The reminder schedule is in the document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many corporate clients have replied after your last payment reminder this month, so slow response patterns stand out by client type.",
+          "review": true
+        },
+        {
+          "text": "Give one staff member one notebook for corporate payment-date promises and a fixed review time, so chasing stays orderly across the team.",
+          "review": true
+        }
+      ]
+    },
+    {
+      "id": "p7_cash_mismatch",
+      "n": 7,
+      "words": "Corporate hours delivered don't match what we invoice",
+      "category": "cash_collections",
+      "subtype": "cash_mismatch",
+      "quick_ideas": [
+        "Compare last month's session log with the invoice once, so the gap shows",
+        "Ask the client's coordinator to confirm sessions monthly, so invoices are agreed."
+      ],
+      "workzap_build": {
+        "keys": [
+          "job_tracking"
+        ],
+        "text": "Sessions delivered per corporate client logged with attendance counts, turned into the monthly invoice right away.",
+        "tool_words": []
+      },
+      "ask_first": "Is the gap usually in sessions that were cancelled, or in sessions the client never confirmed?",
+      "free_stops": "How sessions are logged and invoiced is kept for the document.",
+      "extra_ideas": [
+        {
+          "text": "Compare teacher session notes with corporate attendance summaries for one recent week, so missing or extra class hours stand out quickly.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member the weekly handover of delivered corporate class totals in one notebook, so every client hour count stays consistent.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p8_margin_shrinking",
+      "n": 8,
+      "words": "Groups start with too few learners and lose money",
+      "category": "margin_cost",
+      "subtype": "margin_shrinking",
+      "quick_ideas": [
+        "Decide the smallest group you'll run, so the decision isn't made each time",
+        "Check enrolments a week before each start, so thin groups are merged or moved."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "A group viability view showing enrolments against the minimum before every start date.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "Does this happen with certain courses or times, or with any new group?",
+      "free_stops": "The viability rules are in the document.",
+      "extra_ideas": [
+        {
+          "text": "Note which new groups started below your usual class size, so you see where small intakes are creating weak batches.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of checking every upcoming group against the class list on one fixed day, so weak starts are caught sooner.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p9_whatsapp_overload",
+      "n": 9,
+      "words": "The WhatsApp number gets the same timing and fee questions all day",
+      "category": "tech_systems",
+      "subtype": "whatsapp_overload",
+      "quick_ideas": [
+        "Put timings, levels and how to enrol on one page you can share, so the same answer isn't retyped",
+        "List the ten questions asked most, so you know what to cover."
+      ],
+      "workzap_build": {
+        "keys": [
+          "customer_messaging"
+        ],
+        "text": "website_digital — Instant WhatsApp replies for common questions with hand-off to staff, plus an online booking page for placement tests and lessons.",
+        "tool_words": []
+      },
+      "ask_first": "Which question comes most, the timings, the fees or how to enrol?",
+      "free_stops": "The reply flow and booking page setup are kept for the document.",
+      "extra_ideas": [
+        {
+          "text": "Count the repeated timing and fee questions that arrive in one day, so you see which answers are taking most chat time.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member one written list of standard course details beside the phone, so reply speed stays steady across shifts.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p10_import_delays",
+      "n": 10,
+      "words": "Course books arrive from abroad after the course starts",
+      "category": "suppliers_purchasing",
+      "subtype": "import_delays",
+      "quick_ideas": [
+        "Write down the real delivery time of the last few orders, so ordering starts early enough",
+        "Match next term's start dates to order dates once, so you know the deadline."
+      ],
+      "workzap_build": {
+        "keys": [
+          "stock_alerts"
+        ],
+        "text": "Book stock and import orders linked to upcoming course starts, with alerts when an order is due.",
+        "tool_words": []
+      },
+      "ask_first": "Is the delay in placing the order, or in shipping and customs once ordered?",
+      "free_stops": "The order timing rules are in the document.",
+      "extra_ideas": [
+        {
+          "text": "Note which courses began before books arrived this term, so you see which subjects suffer the longest teaching disruption.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member a notebook page for every pending book order, so arrivals are checked against course start dates.",
+          "review": false
+        }
+      ]
+    }
+  ],
+  "never_say": [
+    "Anything on immigration, visas, citizenship tests, points or settlement, even when demand is migration-driven.",
+    "Guarantees of test scores or fluency, or help writing such claims.",
+    "Any help with fake certificates or inflated attendance for funded or employer programmes.",
+    "Legal or work-permit advice on freelance teachers.",
+    "Any idea that records learners' names, nationality, ID, results or levels by person, or any child details.",
+    "Covert recording of online lessons."
+  ],
+  "sample_reply": {
+    "person": "We sell private lessons in 10 and 20 hour packages, but nobody really knows how many hours anyone has left. Any ideas?",
+    "pi": "Yes, this can be brought under control, and the first steps are simple.\nFirst, add up the hours used on every active package once, so you have a true starting balance.\nSecond, have teachers report hours to one place after each lesson, so balances stay current.\nWorkzap's part would be: with an hours bank that updates after every lesson and reminds learners when they're running low.\n\nWould you like me to arrange a solution document and quote for you? You're welcome to say no.",
+    "language": "english"
+  }
+}

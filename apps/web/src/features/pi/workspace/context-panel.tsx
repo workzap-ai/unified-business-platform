@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { reviewHref } from "../review-service";
 import { ArrowUpRight, ChevronRight, Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
@@ -152,6 +153,13 @@ export function ContextPanel({ conversationId }: { conversationId: string }) {
           className="mt-2.5 inline-flex items-center gap-1 text-xs font-medium text-primary hover:underline"
         >
           Open customer profile{" "}
+          <ArrowUpRight className="size-3" aria-hidden="true" />
+        </Link>
+        <Link
+          href={reviewHref(c.id)}
+          className="mt-2.5 ml-3 inline-flex items-center gap-1 text-xs font-medium text-primary hover:underline"
+        >
+          Review pi&apos;s briefing{" "}
           <ArrowUpRight className="size-3" aria-hidden="true" />
         </Link>
       </section>

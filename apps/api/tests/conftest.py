@@ -40,3 +40,14 @@ def _reset_rate_limit_cooldown():
     rate_limit._redis_down_until = 0.0
     yield
     rate_limit._redis_down_until = 0.0
+
+
+def pytest_runtest_logreport(report):
+    """On GitHub Actions, name every failing test as an annotation so a red run says which."""
+    import os
+
+    if os.environ.get("GITHUB_ACTIONS") != "true" or not report.failed:
+        return
+    crash = getattr(getattr(report.longrepr, "reprcrash", None), "message", "") or ""
+    text = " ".join(crash.split())[:300].replace("%", "%25").replace(",", "%2C").replace(":", "%3A")
+    print(f"::error title=pytest failed::{report.nodeid} {text}", flush=True)

@@ -1,0 +1,323 @@
+{
+  "industry": "mosques_religious_trusts_and_community_institutions",
+  "name": "Mosques, religious trusts and community institutions (administration)",
+  "sector": "7.M Digital economy, social and public sector",
+  "version": "1.1",
+  "problems": [
+    {
+      "id": "p1_cash_handling_risk",
+      "n": 1,
+      "words": "Box collection is counted by one person and nobody double-checks",
+      "category": "cash_collections",
+      "subtype": "cash_handling_risk",
+      "quick_ideas": [
+        "Have two people present at every count, both signing the total",
+        "Share the counted total with the committee the same day."
+      ],
+      "workzap_build": {
+        "keys": [
+          "cash_reconciliation"
+        ],
+        "text": "a count register where two counters enter amounts per box, totals are locked and shared with the committee instantly.",
+        "tool_words": []
+      },
+      "ask_first": "Who is usually present when the boxes are counted?",
+      "free_stops": "The count process and committee sharing are set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note how many box collections this month were counted without a witness, so the committee sees the control weakness clearly.",
+          "review": false
+        },
+        {
+          "text": "Assign one second person for every collection count and keep the count sheet in one drawer, so totals are checked the same way each time.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p2_cash_mismatch",
+      "n": 2,
+      "words": "Collection amounts don't match what's deposited in the bank",
+      "category": "cash_collections",
+      "subtype": "cash_mismatch",
+      "quick_ideas": [
+        "Deposit each count on a fixed day rather than letting cash wait",
+        "Compare counted totals with deposit slips once a month."
+      ],
+      "workzap_build": {
+        "keys": [
+          "cash_reconciliation"
+        ],
+        "text": "a deposit tracker matching counted cash to bank deposits with alerts for gaps or delays.",
+        "tool_words": []
+      },
+      "ask_first": "Is the gap usually after Friday collections, or after special fundraisers?",
+      "free_stops": "How counts and deposits are matched is detailed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare each counted collection with the matching bank deposit slip from this week, so shortfalls or delays stand out quickly.",
+          "review": false
+        },
+        {
+          "text": "Give one person the job of attaching each deposit slip to the count note, so counted money and banked money stay matched.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p3_owner_blind",
+      "n": 3,
+      "words": "Members ask where the money went and we have no clear statement",
+      "category": "reporting_visibility",
+      "subtype": "owner_blind",
+      "quick_ideas": [
+        "Prepare one simple monthly summary of income and expenses by fund",
+        "Share it with the committee and members on a fixed date."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "a fund-wise ledger with a simple monthly statement for members and the committee.",
+        "tool_words": []
+      },
+      "ask_first": "Who asks most often, the donors, the committee or the wider community?",
+      "free_stops": "The statement format and ledger set-up go in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "List this month's income notes and expense papers side by side, so you can see which areas have no clear record.",
+          "review": false
+        },
+        {
+          "text": "Give one person the monthly summary notebook and a fixed committee review time, so member questions are answered from one place.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p4_quality_inconsistent",
+      "n": 4,
+      "words": "Construction fund and running expenses mixed together",
+      "category": "operations_process",
+      "subtype": "quality_inconsistent",
+      "quick_ideas": [
+        "Record construction, running and charity money separately from today, so each fund's balance is clear",
+        "Ask your scholars how they want the funds kept, then record it that way."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "separate ledgers for running, construction, charity and restricted funds with live balances.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "Is the mixing in how it is written down, or in how the money is actually spent?",
+      "free_stops": "The fund structure is designed in the solution document; rulings stay with your scholars.",
+      "extra_ideas": [
+        {
+          "text": "Look at this week's receipts and note which ones mix construction and running money, so the recording confusion is easy to spot.",
+          "review": false
+        },
+        {
+          "text": "Keep one separate page for each fund in the same notebook, so daily entries stop crossing between different purposes.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p5_receivables_late",
+      "n": 5,
+      "words": "Pledges made at fundraisers never get fully paid",
+      "category": "cash_collections",
+      "subtype": "receivables_late",
+      "quick_ideas": [
+        "Write every pledge into one list with amount promised and paid so far",
+        "Send a gentle reminder to those who agreed to be reminded."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger"
+        ],
+        "text": "a pledge register with polite WhatsApp reminders and progress against the fundraising target.",
+        "tool_words": []
+      },
+      "ask_first": "Is it a few large pledges that stay unpaid, or many small ones?",
+      "free_stops": "The reminder schedule and wording are prepared in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many fundraiser pledges from the last event still show nothing received, so the unpaid portion is clear.",
+          "review": false
+        },
+        {
+          "text": "Give one person one pledge notebook updated every week, so promised and received amounts are followed in one place.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p6_maintenance_downtime",
+      "n": 6,
+      "words": "AC, sound system and generator break and no one tracks maintenance",
+      "category": "operations_process",
+      "subtype": "maintenance_downtime",
+      "quick_ideas": [
+        "List every major equipment item with its last service date",
+        "Book servicing for the AC before summer and the generator before monsoon."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "a maintenance log for AC, sound, generator and plumbing with service reminders.",
+        "tool_words": []
+      },
+      "ask_first": "Which breaks down most often, the cooling, the sound or the generator?",
+      "free_stops": "The log and reminder schedule are set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Walk around and note which equipment has no visible last service date, so neglected items are easier to prioritize.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member the maintenance notebook kept on site, so repairs and servicing stop being forgotten between breakdowns.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p7_booking_appointments",
+      "n": 7,
+      "words": "Hall bookings double-booked for nikahs",
+      "category": "customer_experience_digital",
+      "subtype": "booking_appointments",
+      "quick_ideas": [
+        "Keep one booking calendar with one person allowed to confirm",
+        "Confirm every booking in writing to the family."
+      ],
+      "workzap_build": {
+        "keys": [
+          "booking_scheduling"
+        ],
+        "text": "a hall and room booking calendar with confirmation messages that blocks clashes.",
+        "tool_words": []
+      },
+      "ask_first": "Do the clashes happen when bookings are taken by phone, or when several people take them?",
+      "free_stops": "The booking rules and messages are designed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Compare hall booking notes from this month and count clashes or overwritten entries, so double booking risk is no longer guesswork.",
+          "review": false
+        },
+        {
+          "text": "Make one person responsible for the single booking register kept at the hall office, so every nikah booking goes through one handover.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p8_customer_communication",
+      "n": 8,
+      "words": "Announcements only on WhatsApp; half the community misses them",
+      "category": "customers_retention",
+      "subtype": "customer_communication",
+      "quick_ideas": [
+        "Keep a separate announcements-only channel apart from the chat group",
+        "Post key notices after Jummah and on the notice board as well."
+      ],
+      "workzap_build": {
+        "keys": [
+          "customer_messaging"
+        ],
+        "text": "a broadcast list for announcements in the community's languages, separate from discussion.",
+        "tool_words": []
+      },
+      "ask_first": "Which group misses the notices most, the elders, the youth or the families far away?",
+      "free_stops": "The broadcast set-up and language plan go in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Note which recent announcements reached the notice board but not prayer time verbal reminders, so missed channels are obvious.",
+          "review": false
+        },
+        {
+          "text": "Assign one person to post every key notice in the same physical spots before prayers, so fewer community members miss updates.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p9_succession_family",
+      "n": 9,
+      "words": "Everything depends on one elderly trustee who keeps the records at home",
+      "category": "planning_growth",
+      "subtype": "succession_family",
+      "quick_ideas": [
+        "Make a list, with the trustee, of where every record and document is kept",
+        "Keep a copy of key records at the institution, not only at home."
+      ],
+      "workzap_build": {
+        "keys": [
+          "erp_nori_platform"
+        ],
+        "text": "one shared record holding funds, bookings, staff and records under the committee's control, with each person seeing only what their role allows.",
+        "tool_words": [
+          "system"
+        ]
+      },
+      "ask_first": "Does anyone else on the committee know where the records are kept, or only that trustee?",
+      "free_stops": "Which areas move in and in what order is set out in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Write down which records are only available at the trustee's home today, so the access risk is plainly sized.",
+          "review": false
+        },
+        {
+          "text": "Choose one cupboard at the institution for core records and one helper for weekly handover, so access continues when the trustee is absent.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p10_shift_scheduling",
+      "n": 10,
+      "words": "Ramadan volunteer roster collapses mid-month",
+      "category": "people_staff",
+      "subtype": "shift_scheduling",
+      "quick_ideas": [
+        "Fill the full Ramadan roster before the month starts, including backups",
+        "Confirm volunteers a day before their shift."
+      ],
+      "workzap_build": {
+        "keys": [
+          "booking_scheduling"
+        ],
+        "text": "a Ramadan planner with volunteer shifts, WhatsApp confirmations and iftar headcount estimates.",
+        "tool_words": []
+      },
+      "ask_first": "Do volunteers drop out in the first days, or later in the month?",
+      "free_stops": "The planner and confirmation flow are detailed in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many Ramadan volunteer shifts needed replacement last week, so you see where the roster collapses mid month.",
+          "review": false
+        },
+        {
+          "text": "Give one coordinator the live volunteer list in one notebook after evening prayers, so missed shifts get covered earlier.",
+          "review": false
+        }
+      ]
+    }
+  ],
+  "never_say": [
+    "Any religious ruling on zakat, waqf use, fund-mixing or rituals — say \"please ask your scholars\".",
+    "Legal views on trust deeds, waqf law, property or registration — say \"talk to a lawyer\".",
+    "Taking sides in committee, sectarian or faith matters.",
+    "Suggesting who may have taken money, or asking for names of congregants, donors, students or staff.",
+    "Help hiding income, issuing false receipts or channelling funds improperly."
+  ],
+  "sample_reply": {
+    "person": "Assalam o alaikum. Main masjid committee ka treasurer hoon. Jummah ka chanda aur bank deposit match nahi hote, kya hal hai?",
+    "pi": "Ji haan, ye theek ho sakta hai, aur is ke liye bade kharch ki zaroorat nahi.\nPehle, har gintee par do log maujood hon aur dono total par dastakhat karein.\nDoosra, ginne ke baad paisa ek muqarrar din bank mein jama ho, taake raqam daftar mein na ruke.\nIs ka pakka hal Workzap ye bana sakta hai: gintee ka register jahan dono ginne wale raqam darj karein, total committee ko foran pohanche aur bank deposit se khud match ho.",
+    "language": "roman_urdu"
+  }
+}

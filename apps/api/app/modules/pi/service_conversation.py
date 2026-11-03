@@ -6,25 +6,129 @@ import json
 import logging
 import re
 import unicodedata
+from collections.abc import Sequence
 from datetime import UTC, datetime, timedelta
+from decimal import Decimal
 from typing import Any, Literal
 from uuid import UUID
 
-from pydantic import BaseModel, ConfigDict, Field, PrivateAttr, model_validator
+from pydantic import BaseModel, ConfigDict, Field, PrivateAttr, field_validator, model_validator
 from sqlalchemy import delete, select
 from sqlalchemy.exc import DBAPIError
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.ai.manager import LLMManager
+from app.ai.errors import GatewayUnavailable
+from app.ai.manager import LLMManager, StructuredResult
 from app.ai.types import Attempt, Message
 from app.modules.business_settings.service import get_settings_row
 from app.modules.catalog.models import CatalogProduct
 from app.modules.memberships.models import Membership
 from app.modules.notifications.service import notify
-from app.modules.pi import price_policy
+from app.modules.pi import (
+    box,
+    box_signals,
+    brain_config,
+    brain_docs,
+    brain_payments,
+    brain_prompt,
+    business,
+    constitution,
+    context_memory,
+    context_memory_types,
+    decisions,
+    execution_hooks,
+    expert_advisor,
+    figure_correction,
+    fixed_lines,
+    flow,
+    followup_policy,
+    graph_voice,
+    hold,
+    idea_filter,
+    industry_overlap,
+    industry_packs,
+    language_script,
+    latency,
+    learning_context,
+    list_items,
+    listening_tidy,
+    map_builder,
+    map_edit,
+    map_share,
+    memory_answer,
+    memory_block,
+    memory_ledger,
+    open_items,
+    open_requests,
+    option_voice,
+    option_wiring,
+    owner_asks,
+    owner_intents,
+    part19,
+    practical_solution,
+    price_policy,
+    problem_extract,
+    problem_fields,
+    problems,
+    quote_facts,
+    rejection_same_turn,
+    reply_gates,
+    reply_layout,
+    reply_voice,
+    requirements_read,
+    resolution_flow,
+    safety,
+    safety_scope,
+    scope_first,
+    self_review,
+    self_review_types,
+    slot_carry,
+    slots,
+    solution_ask,
+    solution_context,
+    solution_free,
+    solution_library,
+    solution_lint,
+    solution_rules,
+    solution_score,
+    solutions,
+    spec_handbook,
+    spec_rules2,
+    style,
+    system_ask,
+    taxonomy,
+    think_plan,
+    think_prompt,
+    turn_coverage,
+    turn_state,
+    value_line,
+    warmup,
+)
+from app.modules.pi import (
+    critique as critique_mod,
+)
 from app.modules.pi.guard import ReplyRejected, validate_reply
 from app.modules.pi.knowledge import KnowledgeService, remember
-from app.modules.pi.language import NAMES, clearly_other, detect_language, english_greeting
+from app.modules.pi.language import (
+    ENGLISH,
+    LATIN_WORD,
+    NAMES,
+    ROMAN_URDU,
+    UNWRITABLE,
+    asked_language,
+    asks_for_english,
+    can_check,
+    clearly_other,
+    declared_languages,
+    detect_language,
+    english_greeting,
+    festival_wish,
+    in_language,
+    latin_other,
+    other_script,
+    returning_greeting,
+    salam,
+)
 from app.modules.pi.links import link_note
 from app.modules.pi.models import (
     PiAgent,
@@ -34,6 +138,7 @@ from app.modules.pi.models import (
     PiMessage,
     PiSettings,
 )
+from app.modules.pi.problems import ProblemOp
 from app.modules.pi.tools.registry import ToolRegistry
 from app.modules.products.service import enabled_products
 from app.modules.sales.service import SalesService
@@ -78,6 +183,13 @@ def _flag(value: Any) -> bool:
     return bool(value)
 
 
+class _Lookup:
+    """Marks "look the customer up yourself" (None already means "there is no such customer")."""
+
+
+LOOKUP = _Lookup()
+
+
 # Fixed choices: anything else a model writes falls back to the safe first value, so
 # an unexpected word never fails the turn and never triggers an action.
 CHOICES: dict[str, tuple[str, ...]] = {
@@ -101,6 +213,10 @@ TEXT_LIMITS = {
     "proposal_evidence": 500,
     "feedback": 500,
     "plan": 800,
+    # Both have a max_length on the model but were never clipped: a long "understanding" of a
+    # three-message batch or a long dotted slot key failed the whole turn (schema.understanding).
+    "understanding": 600,
+    "asked_slot": 60,
 }
 
 
@@ -233,6 +349,35 @@ class ServiceTurn(BaseModel):
     _greeting_only: bool = PrivateAttr(default=False)
     # pi keeps the chat but needs the team: a question on the request desk.
     _ask_team: bool = PrivateAttr(default=False)
+    # Brain mode: the sorted summary replaced the reply; the trade question was due.
+    _summary: bool = PrivateAttr(default=False)
+    _summary_at: int | None = PrivateAttr(default=None)
+    _new_wants: list[str] = PrivateAttr(default_factory=list)
+    _need_fact: bool = PrivateAttr(default=False)  # the reply is the one-more-fact question
+    _cost_line: str = PrivateAttr(default="")  # the fixed cost answer, put in after any rewrite
+    _voice_block: str = PrivateAttr(default="")  # fixed option statements, put in after any rewrite
+    _voice_question: str = PrivateAttr(default="")  # the one targeted question, put last
+    _voice_after: str = PrivateAttr(default="")  # the unchecked-ideas caveat, after the ideas
+    _voice_unmarked: tuple[int, ...] = PrivateAttr(default=())  # ideas not yet checked
+    _voice_language: str = PrivateAttr(default="en")
+    _voice_items: tuple[dict[str, Any], ...] = PrivateAttr(default=())
+    _voice_pending: dict[str, Any] | None = PrivateAttr(default=None)  # the question asked
+    _scope_asked: bool = PrivateAttr(default=False)  # scope question replaced a money one
+    _voice_pick: str = PrivateAttr(
+        default=""
+    )  # the idea the chat recommends (kept for the document)
+    _english: bool = PrivateAttr(default=False)  # an English list was written: translate it
+    _free: bool = PrivateAttr(default=False)  # the ideas were the model's own, vetted
+    _ideas_rejected: bool = PrivateAttr(default=False)  # its idea lines were not owner actions
+    _expert_tried: bool = PrivateAttr(default=False)  # the diagnosis call ran this turn: not twice
+    _problem_capped: bool = PrivateAttr(default=False)  # the working problem's two ideas were given
+    _board: bool = PrivateAttr(default=False)  # the notes were shown again, no state change
+    _handoff_status: str = PrivateAttr(default="")  # the open request whose status was told
+    _open_said: list[str] = PrivateAttr(default_factory=list)  # open items named first (17.7)
+    _asked_shape: bool = PrivateAttr(default=False)
+    # Brain mode: a fixed reply and move chosen by the decision gates (pi/decisions.py).
+    _decision: Any = PrivateAttr(default=None)
+    _exploration: bool = PrivateAttr(default=False)
     # Filled FIRST (field order guides the model): what the customer wants right now and
     # who the message is for. Internal; it makes the reply answer the actual request.
     understanding: str = Field(default="", max_length=600)
@@ -254,6 +399,9 @@ class ServiceTurn(BaseModel):
     # Who the customer is (name, business): filled from their words, kept for every chat.
     customer_profile: CustomerProfile = Field(default_factory=CustomerProfile)
     missing: list[str] = Field(default_factory=list, max_length=12)
+    # Brain mode (R-ASK-07): a short dotted key of what the question in the reply asks about
+    # ("footfall.current_marketing", "shops.count"); empty when the reply asks nothing.
+    asked_slot: str = Field(default="", max_length=60)
     # Internal: how the customer feels, and what they asked that knowledge can't answer
     # (the team is told, so they can teach pi).
     mood: Literal["calm", "confused", "frustrated", "urgent"] = "calm"
@@ -288,6 +436,13 @@ class ServiceTurn(BaseModel):
     # their exact words; the application accepts it like the page's button would.
     proposal_answer: Literal["none", "accepted", "changes", "declined"] = "none"
     proposal_evidence: str = Field(default="", max_length=500)
+    # Brain mode: changes to the problems pi has noted for this customer's business.
+    problem_ops: list[ProblemOp] = Field(default_factory=list, max_length=12)
+    # Brain mode: when asked which problems the document should cover and they chose only some,
+    # the refs from noted_problems they chose.
+    include_refs: list[str] = Field(default_factory=list, max_length=40)
+    # Brain mode, after "ask for changes": each change they want, in their words.
+    change_requests: list[str] = Field(default_factory=list, max_length=8)
 
     @model_validator(mode="before")
     @classmethod
@@ -341,19 +496,44 @@ class ServiceTurn(BaseModel):
             data.pop("missing", None)
         if not isinstance(data.get("requirements"), (dict, Requirements)):
             data.pop("requirements", None)
+        if "problem_ops" in data:
+            data["problem_ops"] = problems.tolerate_ops(data["problem_ops"])
+        changes = data.get("change_requests")
+        data["change_requests"] = (
+            [str(x)[:300] for x in changes[:8] if str(x).strip()]
+            if isinstance(changes, list)
+            else []
+        )
+        refs = data.get("include_refs")
+        data["include_refs"] = [str(r)[:16] for r in refs[:40]] if isinstance(refs, list) else []
         return data
+
+
+class ThinkingServiceTurn(ServiceTurn):
+    """The brain turn when `response_rules.brain.thinking` is on (Book 5, spec 3.2): the same turn
+    plus the plan of the thinking step. Used only then, so every other workspace keeps the schema
+    it has."""
+
+    move_plan: think_plan.MovePlan = Field(default_factory=think_plan.MovePlan)
+
+    @field_validator("move_plan", mode="before")
+    @classmethod
+    def _tolerate_plan(cls, value: Any) -> Any:
+        return value if isinstance(value, (dict, think_plan.MovePlan)) else {}
 
 
 SYSTEM = """You are pi (always lowercase), a company's AI assistant on WhatsApp. You help
 the company's customers with what THEY bring up and keep track of it for the team.
-Language (strict): when the context has reply_language, write the WHOLE reply in
+Language (strict): when the context has reply_language_other, write the WHOLE reply in that
+language. Else when the context has reply_language, write the WHOLE reply in
 reply_language_name and set language to reply_language. The system detected it from the
 customer's own latest words; it overrides earlier messages, the conversation summary, the
 business's language and knowledge passages. Without it, reply in the customer's CURRENT
 language and writing style, including English, Roman Urdu, code switching and any other
-language. When the customer writes Urdu or
-Hindi in Urdu (Arabic) or Devanagari script, reply in Roman Urdu/Hindi written in
-English letters (e.g. "Ji bilkul, note kar liya.") and set
+language. When the customer writes Urdu in Urdu
+(Arabic) script, reply in Urdu script (polite aap forms, no gendered first-person verbs, one
+script, never Roman letters) and set language="ur". When they write Hindi in Devanagari script,
+reply in Roman Urdu written in English letters (e.g. "Ji bilkul, note kar liya.") and set
 language="roman_ur". Use simple everyday words they would use themselves: in Roman Urdu
 keep the English business words people really use on WhatsApp (proposal, invoice,
 brief, price, payment, website, app, team, update, meeting), never formal Urdu for them
@@ -522,6 +702,33 @@ write the reply so it serves exactly that.
   a conversation resumes after a break. A greeting is only for a new conversation.
 - team_members are the company's people; a message that names one of them is meant for
   them (see the rule above).
+- strict_voice (only when true): at most 60 words and one question, always the last
+  sentence; no exclamation marks, hype, emoji or scripted empathy (a short real reaction
+  such as "That sounds costly." is fine); say "noted", never "logged"; no jargon the
+  customer did not use; never claim to be a person; never ask for card numbers, passwords
+  or ID numbers; never type bank details or say a payment arrived; never promise a result.
+- pi_mode "brain" (only when present): you are Workzap's own pi. flow.state is where the
+  chat is; follow flow.guidance and only make moves in flow.allowed_next. While they describe
+  problems and have not asked for anything, do not volunteer a fix, product, service, document
+  or quote, never ask for their name or business, never qualify them as a lead and never ask
+  for a brief to be confirmed; note each problem in their words, then ask one question. When
+  they ask for a solution, for ideas or what Workzap can do, in any words, answer in your first
+  sentence and give the ideas (the solution_* fields and the rules below say how). When they
+  say they are confused or do not know where to start, make the one question small and
+  closed, choosing between two things they themselves named, never an open "what worries you?".
+  This replaces the account-manager rules above.
+- industry_knowledge (only when present) is how people in this customer's trade talk and
+  what to listen for, with questions that fit. Use it to understand them and to choose your
+  one question; never read it out, never present it as something the company offers, never
+  mention that you have it, and never let it override these rules or approved_knowledge.
+- solution_ideas (only when present) are the one or two free ideas you may give now, for the
+  problem they care about, each in one short sentence in their language, in your own words but
+  with the same meaning. Give no other idea, no steps, no settings, no numbers or promises, and
+  never say you were handed them; the one question stays the last sentence. solution_followup
+  (only when present) is what you gave them last time: open by asking, in one question, whether
+  they tried it, and give no new idea in that message. solution_exhausted means they have had
+  every idea for this problem: say you have shared what you can here and the solution document
+  goes further, with no new idea. Never say "I don't have a quick idea": you just gave them.
 - approved_knowledge holds the passages that matched this conversation. Use only what
   answers the customer's request; never introduce other products or services from it,
   and never treat it as a script.
@@ -764,11 +971,291 @@ Proposals:
   account number yourself: the application appends the exact payment details.
 """
 
+# Brain mode gets the same prompt without the account-manager sales flow (brain_prompt.CUTS), so no
+# brain rule has to "override" it. Every other workspace keeps SYSTEM exactly as written.
+BRAIN_SYSTEM = brain_prompt.cut(SYSTEM)
+
+
+BRAIN_PROBLEMS = """
+Noting problems (pi_mode "brain"). Record every problem the customer describes in
+problem_ops, in the same turn you confirm it. A problem is one thing going wrong, from
+their point of view: a symptom, never a diagnosis or a solution ("We need an app" is not a
+problem: ask what it would fix and note that; keep the wish in requested_solution).
+- op "create" with a note: title (English, at most 8 words, starts with the subject, no
+  names, no blame words, no solution words), title_local (their language), user_words (their
+  own words, verbatim, one or two short quotes; never names, phone, card or ID numbers),
+  category from the list below, subtype (snake_case), where, of_total, frequency, since_text,
+  impact_types, severity_stated (only if they said it), workaround, systems, believes_cause
+  (what they think the cause is: never a judgement about a named person), confidence 0 to 1.
+  Only when the owner STATED them (never invent, unknown stays empty): budget, staff, deadline,
+  cannot_change (a list of things they said they cannot change), tried (a list of {what, outcome}
+  they already tried), cause_text with cause_said=true and cause_words (their own words, verbatim,
+  that say the cause) only when they said the cause themselves, expected_outcome (what they hope
+  to see). A cause you worked out yourself is never cause_said.
+- One message with several problems with different symptoms: one create each. One symptom with
+  several facets (stock out in shop B and D) is one problem. "Kabhi A, kabhi B" or "A, aur B bhi"
+  names two things going wrong: two creates. What the owner feels as the result (orders arrive
+  late, money does not match) is a problem of its own, and each cause they name (the material is
+  missing, work is called done but is not ready, nobody sees each order's stage) is another:
+  create the causes and the result, then op "link" them. A furniture maker who says orders are late,
+  that wood is sometimes missing and that workers say "done" while delivery is not ready has three
+  problems, not one (live 2026-10-28: only the first was kept and the owner had to repeat himself).
+- Their answer to your own follow-up question (how often, where, how much, since when) or any
+  later detail about a problem already in noted_problems is an "update" of THAT problem, never a
+  new one: one thing going wrong is one record, however many messages describe it. A new
+  "create" is only for a different thing going wrong.
+- Their later detail or a correction: op "update" with the ref from noted_problems and only the
+  fields that changed (reason "correction" or "enrichment"). Same symptom told twice: op
+  "merge" (ref kept, refs folded in). Different symptoms that may share a root: op "link".
+  "Never mind that one": op "withdraw".
+- Show you understood each new problem by naming it in a few of their words inside your one
+  question (never "Thanks", "Noted", "Note kar liya" or "Anything else"). If your confidence is
+  under 0.6, ask one question to confirm instead of asking for more problems. Record the problem
+  in problem_ops; never announce that you noted it.
+- noted_problems lists what is already noted (ref, title, group, status, missing). Never ask
+  for anything not in "missing" of the problem you are on, and never re-note a problem.
+- In noted_problems, "cause" is only what the owner said. "cause_hypothesis" is pi's own guess,
+  never theirs: never state it as their words or as a known cause, never build on it as fact.
+- If shape_question_due is true, this reply's ONE question must be that one, asked once, naturally
+  and in their language ("What kind of business is it?", "Aap ka business kis tarah ka hai?"):
+  it is how pi learns the trade, and everything the trade teaches (the right ideas, scope and
+  care) depends on it. Use another question instead only if they are upset, in danger, or have
+  just asked for a fix (then give the ideas first and ask it in the next reply).
+- style (when present) is how this person writes: keep your reply to about style.reply_up_to_words
+  words or fewer, match style.formality and never be more familiar than they are (aap stays
+  aap), use an emoji only if style.uses_emoji, and if style.voice_notes keep it extra short.
+- repair (when present) means your last reply did not land. Do not repeat it; do what
+  repair.do says, in one short message, and ask nothing new except as it says.
+Categories and sub-types:
+""" + "\n".join(
+    f"  {cat.key}: {', '.join(cat.subtypes)}" if cat.subtypes else f"  {cat.key}"
+    for cat in taxonomy.CATEGORIES
+)
+
+
+BRAIN_DECISIONS = """
+Offer and decisions (pi_mode "brain"). The application sends the sorted summary, the offer, the
+decline, the approval confirmation and the payment explanation itself when it recognises the
+person's answer, so you never write those. In S4 and S5 you only answer what they asked.
+- Cost before a quote: it depends on what is built, it is written on the quote before they
+  decide, and the quote is free and not a charge. Never give a number or a range.
+- While they read the documents (S7, S8, S8b): answer only from open_quote and what is printed
+  on it, in plain words; never change a price, scope or date yourself. "Can you do it
+  cheaper?" is a change request ("lower cost"): say Workzap will look at it, with no promise.
+  In S8b, put each change they ask for in change_requests, in their words, and say nothing else.
+- If choose_problems is true they were asked whether the document should cover all the
+  problems or only some: if they chose some, put those refs from noted_problems in
+  include_refs, and say nothing else about it.
+"""
+
+
+BRAIN_VOICE = """
+Script and company facts (pi_mode "brain"; these override the shared rules above).
+- The shape of a reply (the owner-approved voice, docs/pi-saas/pi-golden-replies.md): (1) one
+  short line that notes or answers, in their language, never restating what they said (a few
+  words for what you noted; no verdict opener such as "Ye real masla hai", no "Shukriya" before
+  it); (2) only
+  when they asked for ideas: a short lead-in, then two lines that each start with "• " and are ONE
+  plain sentence ("what to do, so the benefit"), modern in kind, no app or brand name, no number,
+  no time, no promise; (3) the offer after ideas, in the spec's own words; (4) at most one
+  question, always the last sentence and specific to the detail they just gave (never "anything
+  else?" straight after a detail), and none for a frustrated person, who gets value first;
+  (5) under 60 words, 120 with ideas, no exclamation mark, no emoji, a different opener each time.
+  In Roman Urdu use neutral verbs ("kiya jaa sakta hai", "note kar liya"), never gendered
+  first-person forms.
+- In brain mode ignore the older rules above about a "brief", "projects", ready_for_team,
+  "proceeding with", sending the brief to the team, or restating the whole request in a
+  bullet list. While they only describe problems you listen and note: confirm ONE thing in
+  the customer's own words in one short line, then ask one question. Never say you are
+  proceeding with, or starting, anything.
+- Never list back what you confirmed before, and never turn their story into points: where
+  the shops are or what they sell is context, not a problem. A "• " list is only for three or
+  more separate problems in THIS message. A short answer ("no", "haan") gets one short line.
+- said_wrong (when present): they say something you noted or said about them is wrong
+  ("glt", "maine aisa nahi kaha", "I never said that"). Never say you did not understand: say
+  they are right in one short line ("Aap sahi keh rahe hain."). If corrects_noted is also
+  present and one noted problem is what they mean, withdraw or update that problem in
+  problem_ops and say so ("wo hata diya"); if none of the noted problems is what they mean,
+  change nothing in problem_ops. If they say they already told you, use what they said
+  earlier in the chat; never ask them to describe it again.
+- Apologise rarely and plainly: "Maaf kijiye" in Roman Urdu, "Sorry" in English; never
+  "Mujhe maazrat chahiye".
+- In Roman Urdu always say "aap" (never "tum" or "karo"), write the whole sentence in Roman Urdu
+  (only names and the word Workzap stay English), and when you note a problem in a Roman Urdu or
+  Arabic chat always fill title_local in their language so summaries read in their language. Never
+  open a reply with an English filler ("Sure.", "Yes.", "Ji.") when the person wrote in another
+  language, and never open with "That's a real problem." as a habit.
+- When you give free ideas, also record the problem they describe in problem_ops (op create) in
+  the same reply unless it is already noted: ideas never replace noting.
+- Never start a reply with the same two words as either of your last two replies, and never
+  use any of these sentences word for word a third time in one chat: "Anything else getting in
+  the way?", "That sounds costly", "That's worth sorting", "No rush", "Got it". The wording
+  shown in examples is a pattern, not a script: from the second use on, say it in new words
+  (for example "What else is making this hard?", "Is anything else slowing you down?"). A reply
+  that repeats itself is sent back and costs the customer several seconds.
+- If they ask directly for a fix ("solution do", "solution dain", "kuch kar sakte ho?", "can you
+  tell me the solution"), do not ask another digging question: answer in your first sentence
+  ("Bilkul.", "Haan, ho sakta hai.", "Sure.") and give the ideas the solution_* fields hold.
+  Never reply to such a request with only a question, only a summary or only a line that a
+  document comes later.
+- If they complain about the questions or show impatience ("sawal hi poochti rahogi?", "why so
+  many questions", "kab se pooch raha hoon", "jaldi"), start with a short sorry ("Maazrat" /
+  "Sorry"), then give the ideas. Ask no question before them.
+- asked_slot: when your reply asks a question, name what it asks about as a short dotted key in
+  English ("footfall.current_marketing", "shops.count", "branch.taste_changes"); leave it empty
+  when you ask nothing. closed_slots (when present) are the questions they already answered,
+  even with "no" or "pata nahi", in this or an earlier chat and in any language: never ask one
+  again, move on.
+  When your question is about the same thing as a closed slot (the chat may have changed language
+  between them), reuse that slot's exact key in asked_slot: that is how a repeat is caught.
+- check_in_now (a follow-up after silence): it never gives new ideas, never asks for a fact you
+  already know or a question in closed_slots, never asks their name or business, and never
+  repeats a message you already sent. It may only offer to carry on where you stopped, in their
+  words ("Pichli baat wahin se jaari rakhein? Aap ne ... ke baare mein bataya tha."), or, when
+  ideas were already given, ask whether they would like the solution document and quote. Write
+  it in the language of their last message. (check_in_now.missed is different: answer that
+  message.)
+- Answer first (R-ANS-01, R-ANS-02): when they ask you a direct question, the first sentence of
+  your reply answers it ("Haan, kar sakte hain", an honest "Ye Workzap nahi karta"); a question
+  back is never a substitute. A yes/no question gets a yes or a no first, then the detail.
+- Describe the problem, never judge the person or the business (R-TONE-01, R-TONE-02): turn a
+  complaint into something that can be solved ("dhanda nahi chal raha" becomes "sale aur footfall
+  barhani hai", "staff kaam nahi karte" becomes "kaam waqt par nahi hota").
+- A frustrated person (R-TONE-03) gets no defensiveness, no "please be patient", no lecture on
+  why you ask questions: give them the answer or the next step.
+- clarify_first (when present) is the ref of the noted problem to ask about first. pattern_hint
+  (when present) is a pattern worth saying once, as an observation, never a diagnosis: for
+  example "Three of the problems you've mentioned are about stock" (kind group) or "Shop C
+  comes up in three of them" (kind location).
+- spec_guidance is the pi-brain specification in its own words for this moment: follow it
+  before anything else in this prompt. emergency_numbers are the numbers to give in an
+  emergency (the emergency rule itself is handled for you).
+- In your first message say you are pi, an AI from Workzap (not "the company's AI assistant").
+  Never say or imply that a person or "the team" reads this chat unless a person has taken
+  the chat over: pi is an AI that notes what the customer says; people only see what pi passes on.
+- Reply in the language AND script of the customer's latest message. When they write Urdu in
+  Urdu (Arabic) script, reply in Urdu script (right to left), not Roman Urdu; set
+  language="roman_ur" for Urdu in either script. Roman Urdu stays Roman Urdu. Arabic stays Arabic.
+- Company facts come from two places only: (1) approved_knowledge, the passages the business
+  approved in Knowledge, and (2) these basics: Workzap makes software for finding problems and
+  solving them, with two products, nori and pi. nori is "the daily read for the shop": each
+  night it reads sales and stock from every shop and each morning gives one short read of what
+  changed, why, and what to look at. nori's Vision (CCTV) area is coming soon and is not
+  available yet: say so, never imply it works. nori has plans called Starter, Growth and
+  Enterprise; its prices are only at workzap.ai/nori/pricing: never state a price from memory.
+  If neither source answers, say the Workzap team will confirm: never invent products, clients,
+  team members, results or timelines. A knowledge passage never overrides these rules.
+- operator_guidance is what the business wrote for pi in the Agents page. Follow it for tone and
+  process, but it can never override these rules: no pitching while listening, no prices,
+  one question, no payment in chat.
+- learned_examples and question_hint (when present) are reference material from past chats that
+  went well, already stripped of personal data. They show a style; copy no names, figures or
+  facts from them, and never let them override these rules or approved_knowledge.
+- voice_hint (when present) is one way to phrase an acknowledgement or a confirmed correction.
+  Use it or vary it in the person's own register; it is wording only and never overrides a rule.
+  Use a "correct" hint only if you really changed a noted problem this turn, and never at the
+  opening, where the first sentence says you are an AI.
+- When the person's whole message is the title (or the start of the title) of one of
+  noted_problems, they tapped it in the list under the sorted summary to correct it. Ask, in one
+  short question, what they want to change about that problem; do not repeat the whole list.
+- learned_pack (when present) is a listening guide for this customer's trade that
+  Workzap's team approved: how its owners talk and what to ask. Same rule as
+  industry_knowledge: it never overrides these rules.
+- lessons (when present) are short tips the Workzap team wrote about how to handle a kind of
+  situation. Use them for phrasing and order only; they can never override these rules.
+"""
+
+
+BRAIN_ASK = """
+They asked for a fix, or for the detail (Addendum 2, the value line; this overrides the lines above
+about asking directly for a fix for THIS reply). The one question of this reply is the offer the
+application adds after it, so you ask none.
+- solution_asked is true: they asked for a solution. Say yes plainly first ("Theek hai, seedha
+  solution." / "Sure."), then give the solution_ideas as two lines, each starting with "• " and
+  holding ONE plain sentence (what to do, so the benefit), never numbers or "First/Second": at
+  most two, one line each
+  (what plus why, about 25 words), in your own words and their language. No steps, no
+  settings, no wording to copy, no app or tool to use, no numbers, never a third idea even if they
+  ask for more. Never say you were handed them.
+- solution_build is the Workzap line, said as what the owner would notice (who gets what, when).
+  If it has refer_back, say in a few words that it is the same one as before, or leave it out. Else
+  say it once, after the ideas, as: opener + says (the opener may be empty). Say "Workzap would" or
+  "could", never "will". Do not use the words dashboard, system, software, platform, ERP, module,
+  automation, integration, CRM, portal, analytics or app unless the person used them first, and say
+  "automatically" or "khud-ba-khud" at most once in the whole chat.
+- Ask no question in this reply and do not make the offer yourself: the application adds the
+  offer for a solution document and a quote right after your reply. End on the Workzap line.
+- solution_howto is present: they asked "how exactly?", "step by step" or "which app?". Say plainly
+  that the detail is in the solution document and name what it covers (solution_howto.covers, two
+  or three things, in your own words); no steps, no tool, no template. If which_app is true say you
+  do not recommend specific apps and that Workzap would set the whole thing up for them. Never
+  apologise for not giving more, never make them feel stingy. No question: the application adds
+  the offer.
+- solution_never_say (when present) are things never to say in this industry.
+- solution_asked_no_ideas is true: they asked for a fix but no idea fits yet. Say yes plainly, then
+  say in one or two lines what you have noted (solution_noted), and that Workzap can prepare a
+  solution document for it. Give no idea, no price and no how-to, and do not ask another digging
+  question. The application adds the offer.
+- solution_next is "worked": they said an idea worked. Be glad in one line, give the solution_ideas
+  as the next steps (never the earlier ones), then the Workzap line from solution_build.
+  solution_next is "swap" or "more": acknowledge in one line without defending the old idea, then
+  give the solution_ideas, a different kind of idea.
+- solution_not_tried is true: they did not try the ideas. Do not nag and give no idea; ask once,
+  plainly, what got in the way (time, staff, unclear). That is the one question.
+- solution_followup.worked or solution_followup.no_help is true and solution_ideas is present: say
+  the follow-up in one line, then give the ideas as above. This overrides "no new idea in that
+  message" for a follow-up.
+"""
+
+
+SOLUTION_KEYS = (
+    "solution_howto",
+    "solution_asked_no_ideas",
+    "solution_next",
+    "solution_not_tried",
+    "solution_followup",
+)
+
+
+def solution_turn(context: dict[str, Any]) -> bool:
+    """This turn is about the free ideas: asked for, none fits, or a follow-up on earlier ones."""
+    return bool(context.get("solution_asked")) or any(k in context for k in SOLUTION_KEYS)
+
+
+def system_for(context: dict[str, Any]) -> str:
+    """The prompt: the shared rules, plus the brain rules in brain mode."""
+    if context.get("solution_exploration"):
+        # Keep shared identity, privacy, knowledge and structured-note instructions. Discovery
+        # questions, manual-idea caps and document-only wording do not apply to this request.
+        notes = BRAIN_PROBLEMS.split("- Show you understood each new problem", 1)[0]
+        return BRAIN_SYSTEM + notes + practical_solution.PROMPT + memory_block.SYSTEM_LINE
+    if context.get("pi_mode") == "brain":
+        asked = solution_turn(context)
+        prompt = (
+            BRAIN_SYSTEM
+            + BRAIN_PROBLEMS
+            + BRAIN_DECISIONS
+            + BRAIN_VOICE
+            + (BRAIN_ASK if asked else "")
+            + (expert_advisor.VOICE_RULE if context.get("expert_on") else "")
+            + (expert_advisor.PROMPT_RULE if context.get("main_problem") else "")
+            + (owner_asks.NO_RECORDS_RULE if context.get("owner_unknowns") else "")
+            + (owner_asks.PLAN_RULE if context.get("plan_asked") else "")
+            + (owner_asks.REPEAT_RULE if context.get("repeat_complaint") else "")
+            + (owner_asks.NO_QUESTIONS_RULE if context.get("no_questions") else "")
+            + (owner_asks.RECALL_RULE if context.get("recall_asked") else "")
+            + (owner_asks.SUGGEST_RULE if context.get("suggest_asked") else "")
+            + (memory_block.SYSTEM_LINE if context.get("what_i_know") else "")
+            + think_prompt.block(context)
+        )
+        return prompt
+    return SYSTEM
+
 
 async def service_mode(session: AsyncSession, scope: WorkspaceScope, policy: PiSettings) -> bool:
     mode = policy.response_rules.get("service_mode", "auto")
-    if mode == "service":
-        return True
+    if mode == "service" or policy.response_rules.get("pi_mode") == "brain":
+        return True  # brain mode is the service flow: whatever the business type
     return (await get_settings_row(session, scope)).business_type in {
         "service_business",
         "hybrid_business",
@@ -838,7 +1325,8 @@ def allowed_text(context: dict[str, Any] | None) -> list[str]:
             label, _, link = part.strip().partition(": ")
             if link:
                 books += [link, label.split(" ")[-1]]
-    return offered_labels(context) + customer_figures(context) + arranged + books
+    summary = [str(line) for line in (context or {}).get("fixed_lines") or []]
+    return offered_labels(context) + customer_figures(context) + arranged + books + summary
 
 
 ARRANGED = re.compile(
@@ -959,10 +1447,13 @@ def validate_service_reply(
     dates stay internal in the brief. ``exact``/``starting`` modes still refuse written
     amounts that cannot be matched against approved evidence."""
     checked = reply
-    for text in allowed or []:
+    # Longest first: a short allowed figure ("2" from the customer's own message) must not eat
+    # part of a longer allowed line (a quote's number and total) before that line is matched.
+    for text in sorted(allowed or [], key=len, reverse=True):
         checked = checked.replace(text, " ")  # exact offered labels only
     if mode in price_policy.NO_DISCLOSURE and any(
-        ch.isdecimal() or unicodedata.category(ch) == "Sc" for ch in checked
+        ch.isdecimal() or unicodedata.category(ch) == "Sc"
+        for ch in unicodedata.normalize("NFKC", checked)  # superscript and circled digits too
     ):
         raise ReplyRejected("SERVICE_PRICE_BLOCKED")
     if (code := price_policy.check(checked, mode)) is not None:
@@ -971,91 +1462,3243 @@ def validate_service_reply(
     return validate_reply(reply, list(allowed or []), max_chars)
 
 
+def brain_context(
+    policy: PiSettings,
+    conversation: PiConversation,
+    rows: list[PiMessage],
+    message: PiMessage | None = None,
+) -> dict[str, Any]:
+    """The strict voice flag and, in brain mode, the conversation's flow state for the prompt.
+    A chat that has no state yet gets its first one here (S0 until pi has replied)."""
+    if not flow.strict_voice(policy.response_rules):
+        return {}
+    context: dict[str, Any] = {"strict_voice": True}
+    if flow.brain_mode(policy.response_rules):
+        state = flow.parse(conversation.flow_state)
+        if state is None:
+            replied = [m for m in rows if m.sender_type == "ai"]
+            state = flow.initial_state(bool(replied))
+            conversation.flow_state = state.value
+            conversation.flow_state_since = datetime.now(UTC)
+            # A chat that began before brain mode and never told the person pi is an AI: its first
+            # brain reply says so once (R-DISC-01), instead of carrying on as if it had.
+            context["legacy_undisclosed"] = bool(replied) and not any(
+                SAYS_AI.search(str(getattr(m, "body", "") or "")) for m in replied
+            )
+        if state == flow.State.S7_DELIVERED:  # they reacted to the documents: S7 to S8
+            state = flow.advance(state, flow.State.S8_REVIEW)
+            conversation.flow_state = state.value
+            conversation.flow_state_since = datetime.now(UTC)
+        if (
+            state in flow.RETURNABLE
+            and message is not None
+            and map_builder.share_enabled(policy.response_rules)
+            and map_share.returning(rows, message)
+        ):
+            # Book 5, Part 6: they are back after a day or more. This turn is met with continuity
+            # (S_RETURN); the turn's end moves the chat on to listening again.
+            state = flow.advance(state, flow.State.S_RETURN)
+            conversation.flow_state = state.value
+            conversation.flow_state_since = datetime.now(UTC)
+        context["pi_mode"] = "brain"
+        if message is not None and think_prompt.enabled(policy.response_rules):
+            # Spec 11.1 / 17.3: S_HOLD after a heavy disclosure, the active-topic pointer
+            owner_before = [m.body or "" for m in reversed(rows) if m.sender_type == "customer"]
+            state = turn_state.enter(conversation, state, message.body or "", owner_before, context)
+        context["flow"] = flow.prompt_view(state)
+    return context
+
+
+async def brain_problems(
+    session: AsyncSession,
+    scope: WorkspaceScope,
+    conversation: PiConversation,
+    policy: PiSettings,
+    industry_known: bool,
+    message: PiMessage | None = None,
+    rows: list[PiMessage] | None = None,
+    embedder: Any = None,
+    noted_problems: list[dict[str, Any]] | None = None,
+    customer: Any = LOOKUP,
+    last_chat_at: datetime | None = None,
+) -> dict[str, Any]:
+    """What pi has noted so far for this customer (brain mode), for the prompt.
+
+    `noted_problems` is what `problems.noted_context` returns and `customer` the record, when
+    the caller already read them this turn (prepare_context reads each once)."""
+    if not flow.brain_mode(policy.response_rules) or conversation.customer_id is None:
+        return {}
+    noted = (
+        noted_problems
+        if noted_problems is not None
+        else await latency.timed(
+            "brain.noted",
+            problems.noted_context(
+                session,
+                scope,
+                conversation.customer_id,
+                box_signals=box.box_offer_enabled(policy.response_rules),
+            ),
+        )
+    )
+    if expert_advisor.switched_on(policy.response_rules):
+        # the eight ideas per business and the two per problem count the owner's other chats too
+        await solution_context.sync_elsewhere(session, scope, conversation)
+    brief = conversation.service_brief or {}
+    context: dict[str, Any] = {"noted_problems": noted}
+    if noted and (
+        brief.get("conversation_stage") == "solution_exploration"
+        or (message is not None and practical_solution.requested(message.body or ""))
+    ):
+        _, relationships = await map_builder.current_inputs(
+            session, scope, conversation.customer_id
+        )
+        refs = {p["ref"] for p in noted}
+        context["problem_relationships"] = [
+            {
+                "from": problems.short_ref(link.from_id),
+                "to": problems.short_ref(link.to_id),
+                "type": link.type,
+                "status": link.status,
+                "evidence": link.evidence,
+            }
+            for link in relationships
+            if problems.short_ref(link.from_id) in refs and problems.short_ref(link.to_id) in refs
+        ]
+    if solution_context.elsewhere(brief):
+        context["ideas_elsewhere"] = solution_context.elsewhere(brief)
+    served = (policy.response_rules.get("brain") or {}).get("served_industries")
+    context["served_industries"] = served if isinstance(served, list) else None
+    if think_prompt.enabled(policy.response_rules):  # Book 5: absent unless exactly true
+        context["thinking"] = True
+    if (policy.response_rules.get("brain") or {}).get("fact_ask") is True:  # 18.5, opt-in
+        context["fact_ask"] = True
+    if (policy.response_rules.get("brain") or {}).get("quote_facts") is True:  # ROFFER07, opt-in
+        context["quote_facts"] = True
+    if (policy.response_rules.get("brain") or {}).get("list_guard") is True:  # B1, opt-in
+        context["list_guard"] = True
+    if box.box_offer_enabled(policy.response_rules):  # Book 5: the Solution Box offer rule
+        context["box_offer"] = True
+        # B3 and B4 from the owner's words, kept in the brief like the other brief keys. The flag
+        # `map_awaiting` is set when a map picture goes out and used up by the very next message.
+        said = (message.body if message is not None else "") or ""
+        seen: dict[str, Any] = {}
+        awaiting = bool(brief.get("map_awaiting")) and message is not None
+        if awaiting and not brief.get("map_reviewed") and box_signals.confirms_or_changes_map(said):
+            seen["map_reviewed"] = True  # confirmed or corrected the map pi just showed
+        if not brief.get("ranked") and noted and box_signals.says_start_here(said):
+            seen["ranked"] = True  # said where to start
+        if not brief.get("no_other_problems") and noted and box_signals.says_no_others(said):
+            seen["no_other_problems"] = True  # B1: "there are no other problems", kept once said
+        if seen or awaiting:
+            brief = {k: v for k, v in brief.items() if k != "map_awaiting"} | seen
+            conversation.service_brief = brief
+    context["brain_settings"] = {
+        key: brain_config.value(policy.response_rules, key)
+        for key in (
+            "summary_trigger",
+            "redisclose_days",
+            "max_clarify",
+            "quiet_before_summary",
+            "word_cap",
+            "summary_word_cap",
+            "document_word_cap",
+        )
+    }
+    if problems.shape_question_due(len(noted), industry_known, bool(brief.get("industry_asked"))):
+        context["shape_question_due"] = True
+    context["problems_since_summary"] = len(noted) - int(brief.get("summary_count") or 0)
+    context["quiet_replies"] = int(brief.get("quiet_replies") or 0)
+    context["handback_notice"] = bool(brief.get("handback_notice"))
+    context["clarify_count"] = int(brief.get("clarify_count") or 0)
+    if message is not None and problems.says_wrong(message.body or ""):
+        context["said_wrong"] = True  # R-CORR-02: never "I didn't understand"
+        if noted:
+            context["corrects_noted"] = True  # R-CORR-01: fix the note they mean
+    # Spec 4.7: the problem to clarify first is the most severe one that still has gaps.
+    gaps = [p for p in noted if p.get("missing")]
+    if gaps:
+        context["clarify_first"] = max(gaps, key=lambda p: float(p.get("score") or 0))["ref"]
+    # Spec 4.8 pattern surfacing: say it once, as an observation.
+    if hint := problems.pattern_hint(noted, list(brief.get("patterns_said") or [])):
+        context["pattern_hint"] = hint
+        conversation.service_brief = {
+            **brief,
+            "patterns_said": [*list(brief.get("patterns_said") or []), hint["key"]],
+        }
+    if isinstance(customer, _Lookup):
+        from app.modules.customers.models import Customer
+
+        customer = await latency.timed(
+            "brain.customer", session.get(Customer, conversation.customer_id)
+        )
+    context["can_approve"] = business.can_approve_for(customer) if customer is not None else True
+    if customer is not None and business.disclosure_due(customer):
+        # Spec 4.9: told once, at the first message after joining a shared business.
+        from app.modules.pi.business_models import PiBusiness
+
+        joined = await latency.timed(
+            "brain.business", session.get(PiBusiness, customer.business_id)
+        )
+        if joined is not None:
+            context["business_disclosure_name"] = joined.name
+            business.mark_disclosed(customer)
+    if (
+        customer is not None
+        and customer.business_id is not None
+        and customer.shares_with_business
+        and message is not None
+        and business.objects_to_sharing(message.body or "")
+    ):
+        business.opt_out(customer)  # spec 4.9: "if they object, keep their problems private"
+    if customer is not None:
+        context["customer_country"] = safety.country_of(customer.phone or customer.whatsapp_id)
+    if message is not None:
+        context["latest_message_id"] = str(message.id)
+    if brief.get("scope_asked") and not brief.get("scope_done"):
+        context["choose_problems"] = True
+    if conversation.customer_id is not None:
+        quote = await latency.timed(
+            "brain.open_quote", brain_docs.open_quote(session, scope, conversation.customer_id)
+        )
+        if quote is not None:
+            context["open_quote"] = quote
+    if conversation.customer_id is not None and flow.brain_mode(policy.response_rules):
+        # once per turn: what the owner said they cannot do or already tried (L2-1 hard gate input)
+        reqs = await requirements_read.read_requirements(
+            session, scope, conversation_id=conversation.id
+        )
+        if message is not None and (conversation.service_brief or {}).get("pending_question"):
+            # PS-5: the owner's answer to the one question about what could not be checked
+            if await resolution_flow.absorb_answer(
+                session, scope, conversation, message, reqs, str(conversation.language or "en")
+            ):
+                reqs = await requirements_read.read_requirements(
+                    session, scope, conversation_id=conversation.id
+                )
+        if packed := option_wiring.requirements_context(reqs):
+            context["requirements"] = packed
+        if message is not None:
+            # PS-9: ONE language decision per turn (spec 2.5, RLANG02 a switch is followed, RLANG09
+            # the pin follows the last substantive message and a short one never moves it); it feeds
+            # the fixed lines, the option voice, the blueprint and the SR-13 guard
+            owner_before = [
+                m.body or ""
+                for m in reversed(rows or [])
+                if m.sender_type == "customer" and m is not message
+            ]
+            pin = (conversation.service_brief or {}).get("language_pin")
+            pin_pair = (pin.get("code"), pin.get("script")) if isinstance(pin, dict) else None
+            d = language_script.detect_message_language(
+                message.body or "",
+                history=owner_before,
+                pinned=pin_pair,
+                voice=message.message_type == "audio",
+                asked=list((conversation.service_brief or {}).get("language_asked") or []),
+            )
+            code, script = language_script.reply_language_for(d, pin_pair, owner_before)
+            context["language_decision"] = {
+                "code": code,
+                "script": script,
+                "key": language_script.fixed_line_key(code, script),
+                "uncertain": d.uncertain,
+                "clarify": d.clarify_key if d.needs_clarification else None,
+            }
+            if not d.uncertain and code != "und":
+                kept = dict(conversation.service_brief or {})
+                kept["language_pin"] = {"code": code, "script": script}
+                conversation.service_brief = kept
+        if message is not None:
+            # PS-9: a correction or a withdrawal updates the current state and keeps the history;
+            # the withdrawal path is L1's (`withdraw_owner_cause`), not a second one
+            cue = language_script.has_correction_or_withdrawal_cue(
+                message.body or "", context.get("language_decision", {}).get("code")
+            )
+            if cue.found:
+                context["correction_cue"] = {"kind": cue.kind, "kinds": list(cue.kinds)}
+                if cue.kind == "withdrawal" and conversation.customer_id is not None:
+                    book = problems.ProblemBook(session, scope, conversation.customer_id, "en")
+                    if await book.withdraw_owner_cause(message.id):
+                        context["cause_withdrawn"] = True
+        # PS-8: everything pi already knows about this owner, read once per turn (read only, scoped
+        # by tenant, environment and customer); it feeds the one question, the "we already have"
+        # line and the implementation status wording
+        if message is not None:
+            # an idea rejected in this very message is written now, not by the nightly run
+            earlier_reply = next((m.body or "" for m in rows or [] if m.sender_type == "ai"), "")
+            await rejection_same_turn.record_same_turn(
+                session,
+                scope,
+                customer_id=conversation.customer_id,
+                message=message,
+                previous_reply=earlier_reply,
+                response_rules=policy.response_rules,
+            )
+        memory = await context_memory.build_context(
+            session,
+            scope,
+            customer_id=conversation.customer_id,
+            conversation_id=conversation.id,
+            query_language=str(conversation.language or "en"),
+        )
+        if not memory.erased:
+            context["memory"] = {
+                # PS-8's records in the shape PS-5 reads: the ids it carries become its `scope`
+                "known": [
+                    {
+                        "source": r["source"],
+                        "text": r["text"],
+                        "kind": r.get("kind", ""),  # what the chat listing needs to label it
+                        "status": r.get("status", ""),
+                        "scope": {
+                            k: r[k]
+                            for k in ("tenant_id", "environment_id", "customer_id")
+                            if r.get(k)
+                        },
+                    }
+                    for r in context_memory.known_records(memory)[:40]
+                ],
+                "already_known": context_memory.what_is_already_known(
+                    memory, str(conversation.language or "en")
+                ),
+                "implementation": context_memory.implementation_summary(
+                    memory, str(conversation.language or "en")
+                ),
+                "scope": {
+                    "tenant_id": str(memory.tenant_id),
+                    "environment_id": str(memory.environment_id),
+                    "customer_id": str(memory.customer_id),
+                },
+            }
+            # ideas the owner rejected and has not taken back: the idea filter never offers them
+            context["rejected_ideas"] = [
+                r.text for r in memory.rejections if not r.derived and r.ref.startswith("rej:")
+            ]
+            states = {x.implementation_status for x in memory.solutions}
+            context["implementation_status"] = (
+                "implemented"
+                if states & set(context_memory_types.IMPLEMENTED_STATES)
+                else "approved"
+                if states & set(context_memory_types.IN_PROGRESS_STATES)
+                else "proposed"
+            )
+            # Level 3 (off by default): only a fully verified execution run can raise it
+            context["implementation_status"] = await execution_hooks.capped_status(
+                session,
+                scope,
+                conversation.customer_id,
+                policy.response_rules,
+                context["implementation_status"],
+            )
+    context.update(matching_the_person(conversation, message, rows or []))
+    if away := days_away(message, rows or [], last_chat_at):
+        context["days_away"] = away
+    if message is not None:
+        context["hours_away"] = hours_away(message, rows or [], last_chat_at)
+        # Level 3 (flag off by default): an explicit yes to a shown scope approves that scope only
+        try:
+            async with session.begin_nested():
+                owner = await customer_for(session, scope, conversation)
+                if confirmed := await execution_hooks.owner_reply(
+                    session,
+                    scope,
+                    conversation,
+                    policy.response_rules,
+                    message.body or "",
+                    str(getattr(owner, "name", "") or ""),
+                ):
+                    context["l3_confirmation"] = confirmed
+        except Exception:  # never blocks the chat; the normal flow goes on
+            logger.exception("level 3 owner_reply failed")
+        if pending := await pending_handoff(session, conversation):
+            context["pending_handoff"] = pending
+        try:  # spec 17.7: what is still open is said first on the owner's return (brain only)
+            async with session.begin_nested():
+                if left := await open_items.load_for_return(
+                    session, scope, conversation, hours_away=int(context["hours_away"])
+                ):
+                    context["open_items"] = left
+        except Exception:  # noqa: BLE001
+            logger.warning("pi_open_items_load_failed", exc_info=True)
+    if message is not None:
+        # What the owner says they do not have, and whether they ask to understand the plan or
+        # complain that pi keeps asking (live 2026-10-28, a furniture maker): see owner_asks.
+        # (phrase banks for English and Roman Urdu, the stored model verdict for other languages)
+        theirs = [
+            (m.body or "", m.media)
+            for m in (rows or [])
+            if m.sender_type == "customer" and m.id != message.id
+        ][-6:]
+        seen = owner_intents.read([*theirs, (message.body or "", message.media)])
+        last = len(theirs)
+        if seen["no_records"]:
+            context["owner_unknowns"] = len(seen["no_records"])
+        if last in seen["asks_plan"]:
+            context["plan_asked"] = True
+        if last in seen["repeat_complaint"]:
+            context["repeat_complaint"] = True
+        if any(i >= last - 2 for i in seen["no_questions"]):
+            context["no_questions"] = True  # "abhi mujh se aur sawal na karein": no question now
+        if last in seen["asks_recall"]:
+            context["recall_asked"] = True
+        if last in seen["asks_suggest"]:
+            context["suggest_asked"] = True
+    if message is not None and warmup.enabled(policy.response_rules):
+        # Part 16: the opening is for a first-time owner who says "Hi"; the quick look result (if
+        # they gave a link) rides on the message and is removed before the model sees the context.
+        said_now = message.body or ""
+        context["warmup"] = {"enabled": True}
+        from app.modules.pi import business_profile_store
+
+        # the stored profile wins over the brief; its confirmed facts ground ideas (G2)
+        await business_profile_store.sync_context(session, scope, conversation, context)
+        context["greeting_only"] = bool(english_greeting(said_now) or returning_greeting(said_now))
+        if (message.media or {}).get("page_look"):
+            context["page_look"] = message.media["page_look"]
+    if learning_context.active(policy.response_rules):
+        context.update(
+            await latency.timed(
+                "brain.learning",
+                learning_context.build(
+                    session,
+                    scope,
+                    conversation,
+                    message,
+                    noted,
+                    embedder=embedder,
+                    canary_percent=brain_config.value(policy.response_rules, "canary_percent"),
+                    solution_mode=solution_context.switched_on(policy.response_rules),
+                    expert=expert_advisor.switched_on(policy.response_rules),
+                ),
+            )
+        )
+    elif solution_context.switched_on(policy.response_rules) and message is not None:
+        # Learning is frozen (nothing is scored, drafted or promoted) but the free ideas of the
+        # industry's own entries are still served: frozen stops learning, not the product.
+        context.update(
+            await latency.timed(
+                "brain.solutions",
+                solution_context.build(
+                    session,
+                    scope,
+                    conversation,
+                    message.body or "",
+                    noted,
+                    {},
+                    expert=expert_advisor.switched_on(policy.response_rules),
+                ),
+            )
+        )
+    if expert_advisor.switched_on(policy.response_rules):
+        context["expert_on"] = True
+        # the next question targets the main problem's most uncertain cause
+        # (what pi already asked and what the owner answered since the diagnosis steer it, so it
+        # never repeats a question and never drifts to how the business works)
+        ordered = list(reversed(rows or []))
+        owner_said = [m.body or "" for m in ordered if m.sender_type == "customer"]
+        if message is not None:
+            conversation.service_brief = expert_advisor.count_owner_turn(
+                dict(conversation.service_brief or {}), str(message.id), len(owner_said)
+            )
+            owner_said.append(message.body or "")
+        context.update(
+            expert_advisor.question_context(
+                conversation.service_brief,
+                noted or [],
+                asked=expert_advisor.questions_in(
+                    [m.body or "" for m in ordered if m.sender_type == "ai"][-6:]
+                ),
+                owner_messages=owner_said,
+                owner_turns=(conversation.service_brief or {}).get("owner_n"),
+            )
+        )
+    if not context.get("reply_language") and not context.get("reply_language_other"):
+        # a language the code does not know, read once by the expert and remembered for the chat
+        if saved := str((conversation.service_brief or {}).get("owner_language") or ""):
+            context["reply_language_other"] = saved
+    # The specification itself, in its own words, for this stage and topic (spec Appendix A).
+    context["spec_guidance"] = spec_handbook.guidance(
+        conversation.flow_state or "S1_LISTENING",
+        message.body if message is not None and message.body else "",
+        conversation.language or "en",
+        can_approve=bool(context.get("can_approve", True)),
+        days_away=int(context.get("days_away") or 0),
+        sectors=[
+            industry_packs.sector_key(pack)
+            for key in context.get("industry_keys") or []
+            if (pack := industry_packs.get_pack(key)) is not None
+        ],
+    )
+    country = context.get("customer_country")
+    context["emergency_numbers"] = (
+        safety.NUMBERS[country] if country in safety.NUMBERS else safety.ALL_COUNTRIES
+    )
+    return context
+
+
+def hours_away(
+    message: PiMessage, rows: list[PiMessage], earlier_chat_at: datetime | None = None
+) -> int:
+    """Whole hours between the person's previous message and this one (0 when unknown)."""
+    if message.created_at is None:
+        return 0
+    before = [
+        m.created_at
+        for m in rows
+        if m.sender_type == "customer" and m.id != message.id and m.created_at is not None
+    ]
+    last = max(before) if before else earlier_chat_at
+    return max(0, int((message.created_at - last).total_seconds() // 3600)) if last else 0
+
+
+async def pending_handoff(session: AsyncSession, conversation: PiConversation) -> dict[str, str]:
+    """The oldest request to the team about this chat that nobody has answered yet (spec v1.4, 17.7:
+    an open item), or {} when there is none."""
+    from app.modules.pi_saas.models import ESCALATION_KINDS, PiStaffRequest
+
+    row = await session.scalar(
+        select(PiStaffRequest)
+        .where(
+            PiStaffRequest.tenant_id == conversation.tenant_id,
+            PiStaffRequest.environment_id == conversation.environment_id,
+            PiStaffRequest.conversation_id == conversation.id,
+            PiStaffRequest.status == "open",
+            PiStaffRequest.kind.in_(ESCALATION_KINDS),
+        )
+        .order_by(PiStaffRequest.created_at)
+        .limit(1)
+    )
+    return {"id": str(row.id), "kind": str(row.kind)} if row is not None else {}
+
+
+HANDOFF_STATUS = {
+    "en": "Your message to the Workzap team has not been answered yet. I've asked again, and I'm "
+    "here meanwhile.",
+    "roman_ur": "Workzap team ko aap ki baat ka abhi jawab nahi aaya. Maine dobara kaha hai, aur "
+    "main yahin hoon.",
+    "ar": "لم يصلك رد من فريق Workzap بعد. سألتهم مرة أخرى وأنا هنا في هذه الأثناء.",
+}
+RETURN_AFTER_HOURS = 4  # "back" means a gap of this many hours (spec v1.4, Part 6 and 17.7)
+
+
+def handoff_status_line(context: dict[str, Any]) -> str:
+    """When the owner is back after a gap and a request to the team is still open, say so once, in
+    their language, with no promised time (spec v1.4, 17.7: the return line states the handoff)."""
+    pending = context.get("pending_handoff") or {}
+    if not pending or int(context.get("hours_away") or 0) < RETURN_AFTER_HOURS:
+        return ""
+    if (context.get("brief") or {}).get("handoff_status_said") == pending.get("id"):
+        return ""
+    language = str(context.get("reply_language") or "en")
+    return open_items.handoff_line(language)
+
+
+def days_away(
+    message: PiMessage | None, rows: list[PiMessage], earlier_chat_at: datetime | None = None
+) -> int:
+    """Whole days between the person's previous message and this one (0 when unknown). In a
+    conversation that has no earlier message of theirs (a closed chat reopened as a new one) the
+    last message of their earlier conversation counts."""
+    if message is None or message.created_at is None:
+        return 0
+    before = [
+        m.created_at
+        for m in rows
+        if m.sender_type == "customer" and m.id != message.id and m.created_at is not None
+    ]
+    if not before and earlier_chat_at is not None:
+        return max(0, (message.created_at - earlier_chat_at).days)
+    return max(0, (message.created_at - max(before)).days) if before else 0
+
+
+def matching_the_person(
+    conversation: PiConversation, message: PiMessage | None, rows: list[PiMessage]
+) -> dict[str, Any]:
+    """How to answer this person (spec 8.4.1) and, if they look lost, what to try (8.4.2)."""
+    theirs = [m for m in rows if m.sender_type == "customer"]
+    latest = message.body if message is not None and message.body else ""
+    said = [m.body for m in theirs if m.body] + ([latest] if latest else [])
+    voice = sum(1 for m in theirs if m.message_type == "audio")
+    voice += 1 if message is not None and message.message_type == "audio" else 0
+    found: dict[str, Any] = {}
+    if said:
+        found["style"] = style.profile(said, voice_notes=voice, total=len(said))
+    brief = dict(conversation.service_brief or {})
+    step = style.repair_step(int(brief.get("repair_step") or 0), latest)
+    if step:
+        found["repair"] = {"step": step, "do": style.REPAIR[step]}
+    if step != int(brief.get("repair_step") or 0):
+        brief["repair_step"] = step
+        conversation.service_brief = brief
+    return found
+
+
+ESCALATION_TEXT = {
+    "payment_detail_change": (
+        "ENQUIRY (payment_detail_change): someone claims Workzap's bank details changed. pi "
+        "confirmed nothing and noted nothing. Possible payment fraud: do not confirm any new "
+        "bank details."
+    ),
+    "complaint": (
+        "COMPLAINT about pi or Workzap: pi thanked them and passed it on, and noted it as "
+        "feedback, not as a business problem. Please follow up."
+    ),
+    "cancel_after_payment": (
+        "CANCELLATION after payment: the customer wants to cancel a project that was paid for. "
+        "pi decided nothing. This is for a person to handle."
+    ),
+    "quote_expired": (
+        "QUOTE EXPIRED: the customer tried to approve a quote past its valid-until date. pi did "
+        "not approve it. Please send a refreshed quote."
+    ),
+    "existing_project": (
+        "EXISTING PROJECT: a customer asks about a project Workzap runs. pi answered nothing from "
+        "memory. Please reply to them."
+    ),
+    "technical_failure": (
+        "TECHNICAL FAILURE: an existing customer reports a bug or outage. pi did not diagnose it. "
+        "Please route to support."
+    ),
+    "refund_dispute": (
+        "REFUND or DISPUTE: the customer asks Workzap for a refund or disputes a payment. pi "
+        "decided nothing and promised nothing. Please reply to them and note the outcome."
+    ),
+    "price_request": (
+        "PRICE REQUEST: the customer asks for a discount or a lower price. pi cannot change "
+        "a quote and promised nothing. Please reply to them."
+    ),
+    "abuse": (
+        "ABUSE: the customer has been abusive. pi stayed calm and has stopped answering until a "
+        "person decides (Documents and payments is not the place: use the unblock action)."
+    ),
+    "abuse_threat": (
+        "THREAT: the customer threatened Workzap or its staff. pi warned once and will not "
+        "continue. A person must decide what happens next."
+    ),
+}
+
+ESCALATION_TEXT.update(
+    {
+        "payment_method": (
+            "PAYMENT METHOD (change request): the customer asked to pay another way (card, "
+            "JazzCash, Easypaisa, Apple Pay). pi said payment is by bank transfer and that it "
+            "would ask the team. Please reply to them."
+        ),
+        "company_info": (
+            "QUESTION ABOUT WORKZAP: the customer asked who owns Workzap or where its office is. "
+            "pi said it would pass the question on and gave no facts. Please reply to them."
+        ),
+        "legal_threat": (
+            "LEGAL THREAT: the customer threatened legal action. pi gave no legal advice and "
+            "promised nothing. A person must handle this."
+        ),
+        "deletion_request": (
+            "DELETE MY DATA: the customer asked pi to delete everything it knows about them. "
+            "Nothing has been erased: pi never erases from the chat. A staff member approves it "
+            "in the conversation review (erase, with confirmation), then confirm to them in the "
+            "chat once it is done."
+        ),
+        "human_requested": (
+            "HUMAN REQUESTED: the customer asked for a person. pi told them the team will reply "
+            "here and kept everything they said."
+        ),
+        "jobs": "JOB APPLICATION: pi thanked them and asked them not to send ID documents.",
+        "vendor": "SUPPLIER PITCH: pi passed it on. No follow-ups to this person.",
+        "press": "PRESS ENQUIRY: pi gave no quotes or statements. Please reply to them.",
+        "partnership": "PARTNERSHIP ENQUIRY: pi noted the company and the proposal. Please reply.",
+        "demo_request": "nori DEMO REQUEST: pi asked how many shops they have. Please reply.",
+        "enterprise_lead": "ENTERPRISE LEAD: pi asked how many shops they have. Please reply.",
+    }
+)
+
+BOUNDARY_EFFECTS: dict[safety.Boundary, tuple[list[str], dict[str, Any]]] = {
+    safety.Boundary.DELETION: (["deletion_request"], {}),
+    safety.Boundary.BANK_CHANGE: (["escalate"], {"escalate": "payment_detail_change"}),
+    safety.Boundary.COMPLAINT: (["escalate"], {"escalate": "complaint"}),
+    safety.Boundary.REFUND: (["escalate"], {"escalate": "refund_dispute"}),
+    safety.Boundary.DISCOUNT: (["escalate"], {"escalate": "price_request"}),
+    # M6: pi told them it would ask the team, so a request is raised (a change request).
+    safety.Boundary.OTHER_PAY: (["escalate"], {"escalate": "payment_method"}),
+    # M3: pi told them it can resend the approved quote, so it does.
+    safety.Boundary.BANK_ASK_APPROVED: (["resend_quote"], {}),
+}
+
+
+def escalation_question(reason: str) -> str:
+    """What the team reads on the ticket for this reason."""
+    return ESCALATION_TEXT.get(
+        reason,
+        f"ENQUIRY ({reason}): pi gave the fixed line and noted nothing as a problem. "
+        "Please pick it up.",
+    )
+
+
+DISCLOSURE_LINE = {
+    "en": "Hi, I'm pi, an AI from Workzap.",
+    "roman_ur": "Hi, main pi hoon, Workzap ka AI.",
+    "ar": "مرحبًا، أنا pi، ذكاء اصطناعي من Workzap.",
+}
+SAYS_AI = re.compile(r"\b(?:AI|A\.I\.|artificial intelligence)\b|ذكاء اصطناعي|Workzap ka AI")
+LEGAL_THREAT = re.compile(
+    r"\b(?:i(?:'ll| will| am going to|'m going to) "
+    r"(?:sue|take (?:you|workzap) to court|go to court)|"
+    r"my (?:lawyer|attorney|solicitor)|legal (?:action|notice) against (?:you|workzap)|"
+    r"see you in court|consumer court|court case|qanooni karwai|vakeel)\b",
+    re.IGNORECASE,
+)
+
+
+DISCLOSURE_TAIL = {
+    "en": "I'm pi, an AI from Workzap.",
+    "roman_ur": "Main pi hoon, Workzap ka AI.",
+    "ar": "أنا pi، ذكاء اصطناعي من Workzap.",
+}
+
+
+def redisclose_due(context: dict[str, Any]) -> bool:
+    """The person is back after more than the re-disclosure gap (30 days by default, R-DISC-05)."""
+    limit = int((context.get("brain_settings") or {}).get("redisclose_days") or 30)
+    return int(context.get("days_away") or 0) > limit
+
+
+def without_repeated_sentences(fixed: str, reply: str) -> str:
+    """The model's reply without the sentences that say again what the fixed text before it already
+    said (a real replay sent the card-number reminder twice, once fixed and once in the model's own
+    words). A sentence counts as a repeat when most of its words are in the fixed text."""
+    fixed_words = set(re.findall(r"\w+", fixed.lower()))
+    kept = []
+    for sentence in re.split(r"(?<=[.!?])\s+", reply.strip()):
+        words = re.findall(r"\w+", sentence.lower())
+        if words and sum(w in fixed_words for w in words) / len(words) >= 0.7:
+            continue
+        kept.append(sentence)
+    return " ".join(kept)
+
+
+def with_disclosure(
+    reply: str, context: dict[str, Any], language: str, *, after: bool = False
+) -> str:
+    """A fixed reply that is pi's first message in the chat still says pi is an AI (R-DISC-01). In
+    front of the reply, except for an emergency (after=True), whose words stay first and whole."""
+    if any(h.get("role") == "ai" for h in context.get("history") or []) and not redisclose_due(
+        context
+    ):
+        return reply
+    if SAYS_AI.search(reply) or constitution._discloses(reply):
+        return reply  # it already says so, in its own words: not twice
+    if after:
+        code = fixed_lines.code(context)
+        if code in DISCLOSURE_TAIL:  # English, Roman Urdu and Arabic have their own short tail
+            return f"{reply}\n{DISCLOSURE_TAIL[code]}"
+        return f"{reply}\n{fixed_lines.line('opening', code, DISCLOSURE_TAIL['en'])}"
+    opening = DISCLOSURE_LINE.get(language, DISCLOSURE_LINE["en"])
+    return f"{fixed_lines.line('opening', fixed_lines.code(context), opening)} {reply}"
+
+
+def after_fixed_reply(turn: "ServiceTurn", context: dict[str, Any]) -> None:
+    """A fixed reply just replaced the whole reply: the one-more-fact flag goes, and a price
+    question asked THIS turn is still answered first (spec 19.2, RSOL08) by the fixed cost line, a
+    statement that adds no question; any other cost line is stale and goes."""
+    turn._need_fact = False
+    said = str(context.get("latest_customer_message") or "")
+    language = str(context.get("reply_language") or "en")
+    turn._cost_line = decisions.cost_answer(language, context) if decisions.cost_asked(said) else ""
+
+
+def review_draft(
+    turn: "ServiceTurn", context: dict[str, Any], lang: str, reply: str, owner_known: bool = True
+) -> "self_review_types.DraftResult":
+    """The PS-10 draft with every input the flow really holds: the retrieved context, the question
+    the reply asks, what the owner already tried, the ideas that stay with their gate and relevance
+    verdicts, the implementation status. What the flow does not hold stays None (UNKNOWN)."""
+    memory = context.get("memory") or {}
+    known = list(memory.get("known") or [])
+    sources = tuple(sorted({str(r.get("source") or "") for r in known if r.get("source")}))
+    parts = [x for x in re.split(r"(?<=[.!?؟۔])\s+", reply.strip()) if x]
+    tried = tuple(
+        str(t.get("what") or "")
+        for t in (context.get("requirements") or {}).get("tried") or []
+        if isinstance(t, dict)
+    )
+    options = tuple(
+        self_review_types.OptionIn(
+            id=f"I{n}",
+            text=str(item.get("text") or ""),
+            gate=str(item.get("gate") or ""),
+            relevance=str(item.get("relevance") or ""),
+            rank=n + 1,
+            labelled_unchecked=bool(item.get("unchecked")),
+        )
+        for n, item in enumerate(turn._voice_items)
+    )
+    return self_review_types.DraftResult(
+        owner_language=lang if owner_known else "",
+        owner_text=str(context.get("latest_customer_message") or "") if owner_known else "",
+        reply_text=reply,
+        context=self_review_types.ContextIn(
+            retrieved=bool(memory), sources=sources, records_exist=bool(known) if memory else None
+        ),
+        tried_solutions=tried if (context.get("requirements") is not None or memory) else None,
+        options=options,
+        questions=self_review_types.QuestionsIn(
+            count=len(re.findall(r"[?؟]", reply)), last_sentence=parts[-1] if parts else ""
+        ),
+        implementation_status=str(context.get("implementation_status") or "proposed"),
+        # what the application itself wrote (a quote confirmation, the cost answer, the sorted
+        # summary) carries its own amounts and references: they are known figures, not invented
+        known_amounts=(
+            tuple(re.findall(r"[A-Z]{2,5}-\d+(?:-v\d+)?|\d[\d,.]*\d|\d", reply))
+            if (turn._decision is not None or turn._cost_line or turn._summary)
+            else ()
+        ),
+    )
+
+
+async def pre_send_guard(
+    turn: "ServiceTurn",
+    context: dict[str, Any],
+    manager: Any = None,
+    scope: Any = None,
+    policy: Any = None,
+    conversation: Any = None,
+) -> None:
+    """The PS-10 self-review runs on the final text in brain mode. Every check that has its input
+    decides (SR-13 the reply is in the owner's language and script, SR-15 one question and it is
+    last, SR-16 a proposal is never worded as done, and the checks the typed draft feeds); a
+    critical failure means the verdict is INCOMPLETE and the reply is never sent as it is. A wrong
+    language is written again ONCE in the owner's language and checked again; whatever still fails
+    gets the gate's owner-language fallback instead, in the owner's script, and a first message
+    still says pi is an AI. A check whose input the flow does not hand over is UNKNOWN and is not
+    acted on."""
+    other_chat = str(context.get("reply_language_other") or "")
+    if other_chat and other_chat != "Urdu" and manager is not None:
+        # every reply of the turn is in the language the owner asked for or wrote, whoever wrote
+        # it (the model, a fixed line, a decision confirmation)
+        await ensure_requested_language(manager, scope, policy, conversation, turn, context)
+    if turn._decision is not None or turn._cost_line or turn._summary:
+        # Application-written replies (a decision's confirmation "you approve quote Q-0001 for PKR
+        # 450,000", the cost answer, the sorted summary) are skipped: tried without this skip, SR-16
+        # (PS-10 2de7abb9) still reads "approve quote" in the confirmation as worded-as-done
+        return
+    lang = fixed_lines.code(context, script=True)
+    lang = lang if lang in self_review_types.LANGS else "en"
+    # A language the self-review has no table for (Persian, Italian ...): its language check cannot
+    # tell, so it is UNKNOWN (never "English"), and the net above has already written the reply
+    foreign = bool(other_chat) and other_chat != "Urdu"
+    report = self_review.review(
+        review_draft(turn, context, lang, turn.reply, owner_known=not foreign)
+    )
+    if report.verdict != self_review_types.INCOMPLETE:
+        # COMPLETE is sent. BLOCKED (a critical check could not run: its input is not handed over
+        # yet) is not acted on here and is never read as complete by the checks that did run.
+        return
+    if (
+        manager is not None
+        and report.repair_code == "rewrite_reply"
+        and report.repair_arg in self_review.LANG_NAMES
+    ):
+        written = await in_one_language(
+            manager,
+            scope,
+            policy,
+            conversation,
+            turn.reply,
+            self_review.LANG_NAMES[report.repair_arg],
+        )
+        again = self_review.review(
+            review_draft(turn, context, lang, written, owner_known=not foreign)
+        )
+        if again.verdict != self_review_types.INCOMPLETE:
+            turn.reply = written
+            return
+        report = again
+    if manager is not None and report.repair_code != "rewrite_reply":
+        latency.count("model_calls")
+        rewritten = await structured_turn(
+            manager,
+            scope,
+            ServiceTurn,
+            alias=reply_alias(policy),
+            messages=[
+                Message.system(system_for(context)),
+                Message.user(json.dumps(context, ensure_ascii=False)),
+                Message.assistant(json.dumps({"reply": turn.reply}, ensure_ascii=False)),
+                Message.user(
+                    "Correct the final reply while answering the latest customer question. "
+                    + "; ".join([*report.reasons, *report.next_actions])
+                ),
+            ],
+            temperature=0.0,
+            conversation_id=conversation.id,
+        )
+        candidate = rewritten.value.reply
+        again = self_review.review(
+            review_draft(turn, context, lang, candidate, owner_known=not foreign)
+        )
+        if (
+            again.verdict != self_review_types.INCOMPLETE
+            and not repeats_itself(candidate, context)
+            and not practical_solution.answer_problem(candidate, context)
+            and not constitution.hard(constitution.lint(candidate, context))
+        ):
+            turn.reply = candidate
+            turn._voice_block = turn._voice_question = turn._voice_after = ""
+            turn._voice_unmarked = ()
+            return
+        report = again
+    if context.get("solution_exploration"):
+        # Do not silently replace an explicit solution request with the same proposal disclaimer.
+        raise rejected_with(turn, "SOLUTION_REVIEW_REJECTED")
+    fallback = self_review.owner_safe_fallback(report, lang)
+    if not fallback:
+        return
+    if repeats_itself(fallback, context):
+        fallback = constitution.safe_fallback(context)
+        if repeats_itself(fallback, context):
+            raise rejected_with(turn, "REPEATED_FALLBACK")
+    turn.reply = with_disclosure(fallback, context, lang)  # a first message still says pi is an AI
+    if foreign and manager is not None:
+        await ensure_requested_language(manager, scope, policy, conversation, turn, context)
+    turn._voice_block = turn._voice_question = turn._voice_after = ""
+    turn._voice_unmarked = ()
+    turn.awaiting_customer = True
+
+
+def brain_option_voice(turn: "ServiceTurn", context: dict[str, Any]) -> None:
+    """Group A: the ideas the reply lists are gated against what the owner stated (L2-1), rejected
+    ones are removed, unchecked ones are labelled, and the owner reads, in their language, which
+    idea to start with and why, what was left out and which of their own words ruled it out, and the
+    one question that would settle what blocks. Brain mode, ideas listed, requirements known."""
+    if turn._summary or turn._decision is not None:
+        return  # the sorted summary lists the owner's problems (bullets), not ideas: it leads alone
+    noted_now, _fresh = noted_with_turn(context, turn)
+    if not noted_now and option_voice.has_ideas(turn.reply):
+        # G12 / ideaLink: no problem is noted yet, so there is nothing for an idea to answer: no
+        # ideas at all, the one question about the biggest problem instead
+        language_now = fixed_lines.code(context, script=True)
+        turn.reply = with_disclosure(
+            option_voice.table(language_now)["q_problem"], context, language_now
+        )
+        turn._voice_block = turn._voice_question = turn._voice_after = ""
+        turn._voice_unmarked = ()
+        turn.awaiting_customer = True
+        return
+    reqs = option_wiring.requirements_from(context.get("requirements"))
+    language = fixed_lines.code(context, script=True)  # "ur" for Urdu script, "ar" for Arabic
+    # gated on the reply as it stands (English ideas are read best); the labels, the fixed block and
+    # the question are put in after the language step, in the reply's own language
+    noted, _fresh = noted_with_turn(context, turn)  # includes a problem this message starts
+    brief_now = context.get("brief") or {}
+    owner_said = [
+        str(h.get("text") or "")
+        for h in context.get("history") or []
+        if h.get("role") in ("customer", "owner")
+    ]
+    voiced = option_voice.voice(
+        turn.reply,
+        reqs,
+        language,
+        noted,
+        owner_messages=owner_said,
+        asked=list(brief_now.get("resolution_asked") or []),
+        non_answers=dict(brief_now.get("resolution_non_answers") or {}),
+        known_records=list((context.get("memory") or {}).get("known") or []),
+        language_certain=not (
+            (context.get("language_decision") or {}).get("uncertain")
+            and not (context.get("brief") or {}).get("language_pin")
+        ),
+        scope=(context.get("memory") or {}).get("scope"),
+    )
+    if scope_q := scope_first.scope_question(
+        str((voiced.pending or {}).get("key") or ""),
+        owner_said,
+        bool(brief_now.get("scope_asked")),
+        language,
+        has_ideas=option_voice.has_ideas(voiced.reply),
+    ):
+        # a whole-system ask: its requirements come first, not quick workarounds or a budget
+        voiced.reply = scope_first.without_ideas(voiced.reply)
+        voiced.block, voiced.after, voiced.unknown = "", "", 0
+        voiced.question, voiced.pending, voiced.changed = scope_q, None, True
+        turn._scope_asked = True
+    heard = str((context.get("memory") or {}).get("already_known") or "")
+    if heard and voiced.changed and (voiced.question or voiced.unknown):
+        voiced.block = f"{heard}{chr(10)}{voiced.block}".strip()
+    if option_voice.has_ideas(turn.reply) and len(noted) >= 2:
+        # PS-7: how the problems may connect (guesses stay guesses), what to find out first, and
+        # whether the owner's own figures give an order; once per turn, no question
+        graph = graph_voice.graph_of(noted, owner_said, language)
+        extra = graph_voice.lines(graph, language, want_first=voiced.accepted == 0)
+        if extra:
+            voiced.block = chr(10).join([x for x in (voiced.block, *extra) if x])
+            voiced.changed = True
+    turn._voice_pick = voiced.pick
+    turn._voice_pending = voiced.pending
+    turn._voice_items = voiced.items
+    if not voiced.changed:
+        return
+    turn.reply = voiced.reply
+    turn._voice_block = voiced.block
+    turn._voice_after = voiced.after
+    turn._voice_question = voiced.question
+    turn._voice_unmarked = voiced.unmarked
+    turn._voice_language = language
+    if voiced.question or voiced.block:
+        turn.awaiting_customer = True
+
+
+def put_option_voice(reply: str, block: str, question: str, after: str = "") -> str:
+    """The option statements in front of the reply (after the AI disclosure of a first message), the
+    caveat about unchecked ideas after the ideas, the one question last."""
+    text = put_cost_line(reply, block) if block else reply
+    if after and text.strip():
+        text = f"{text.rstrip()}{chr(10) * 2}{after}"
+    if question:
+        text = f"{text.rstrip()}{chr(10) * 2}{question}" if text.strip() else question
+    return text
+
+
+def put_cost_line(reply: str, line: str) -> str:
+    """The fixed cost answer in front of the reply, or right after pi's opening disclosure when the
+    reply starts with one (R-DISC-01: the first sentence of a first message says pi is an AI)."""
+    parts = re.split(r"(?<=[.!?۔؟؛])\s+", reply, maxsplit=1)
+    first = parts[0]
+    # only a first sentence that really is the disclosure (a statement that says pi is an AI), not
+    # a question that merely mentions AI ("Does AI help with quotes?"), keeps the first place
+    if (
+        len(parts) == 2
+        and not re.search(r"[?؟]", first)
+        and (SAYS_AI.search(first) or constitution._discloses(first))
+    ):
+        return f"{parts[0]} {line}\n\n{parts[1]}"
+    return f"{line}\n\n{reply}"
+
+
+def brain_safety(context: dict[str, Any]) -> "ServiceTurn | None":
+    """What must be answered before any model call (spec Part 6): an emergency, a message that is
+    only card or ID details, a "who are you" question, a request for advice pi cannot give. The
+    answers are fixed, in the person's language; the model never sees these turns.
+
+    A burst (spec 6.10) is looked at whole: an emergency anywhere in it wins, then the newest
+    message's own gate, then the safety gates (bank change, refund, threats, enquiries) of the
+    earlier ones. `burst_texts` holds the earlier messages' text, oldest first."""
+    earlier = [str(t) for t in context.get("burst_texts") or [] if str(t).strip()]
+    for said in earlier:
+        if safety.emergency(said) is not None:
+            return _brain_gate(context, said, earlier_message=True)
+    if (turn := _brain_gate(context, str(context.get("latest_customer_message", "")))) is not None:
+        return turn
+    for said in earlier:
+        if (turn := _brain_gate(context, said, earlier_message=True)) is not None:
+            return turn
+    return None
+
+
+def burst_escalations(texts: list[str]) -> list[tuple[str, str]]:
+    """The staff escalations the earlier messages of a burst call for, as (reason, text): a claimed
+    bank change, a refund, a complaint, a deletion request, an enquiry, a threat. Whatever pi
+    ends up saying to the burst, none of these may be lost."""
+    found: list[tuple[str, str]] = []
+    for said in texts:
+        if safety.emergency(said) is not None:
+            continue  # an emergency anywhere in a burst gets the emergency reply (and its alert)
+        if (limit := safety.boundary_asked(said)) is not None:
+            _, marks = BOUNDARY_EFFECTS.get(limit, ([], {}))
+            if "escalate" in marks:
+                found.append((str(marks["escalate"]), said))
+            elif limit == safety.Boundary.DELETION:
+                found.append(("deletion_request", said))
+        if (lead := safety.enquiry_asked(said)) is not None:
+            found.append((lead.value, said))
+        if (rude := safety.abuse_asked(said)) is not None and rude == safety.Abuse.THREAT:
+            found.append(("abuse_threat", said))
+        if LEGAL_THREAT.search(said):
+            found.append(("legal_threat", said))
+    return found
+
+
+def _brain_gate(
+    context: dict[str, Any], text: str, *, earlier_message: bool = False
+) -> "ServiceTurn | None":
+    """One message through the pre-model gates. For an earlier message of a burst only the gates
+    that raise something for the team or stop the flow apply (not greetings or identity)."""
+    language = fixed_lines.gate_language(context)
+    country = context.get("customer_country")
+    pii = context.get("pii") or {}
+
+    def fixed(
+        reply: str,
+        move: flow.State | None = None,
+        effects: list[str] | None = None,
+        brief: dict[str, Any] | None = None,
+        why: str = "",
+    ) -> "ServiceTurn":
+        reply = with_disclosure(reply, context, language, after=why == "R-EMER")
+        turn = ServiceTurn(reply=reply, language=language)
+        turn._decision = decisions.Decision(reply, move, brief or {}, effects or [], why=why)
+        lines = [ln for ln in reply.splitlines() if any(c.isdigit() for c in ln)]
+        context["fixed_lines"] = [*context.get("fixed_lines", []), *lines]
+        return turn
+
+    if (kind := safety.emergency(text)) is not None:
+        return fixed(
+            # an emergency stays in the person's own script (safety first), unlike other fixed lines
+            safety.emergency_reply(kind, country, language, fixed_lines.code(context, script=True)),
+            flow.State.X_EMERGENCY,
+            ["emergency"],
+            {"emergency": {"kind": kind.value}},
+            "R-EMER",
+        )
+    chat_level = not earlier_message  # greetings, identity, advice: only for the newest message
+    # A person handed the chat back: pi says who it is again. A message with substance (a problem,
+    # a question) is still answered: the compose step puts the line in front of the answer.
+    if chat_level and context.get("handback_notice") and len(re.findall(r"\w+", text or "")) <= 5:
+        return fixed(
+            safety.handback_reply(language), None, [], {"handback_notice": False}, "R-DISC-04"
+        )
+    for courtesy, is_wish in (("salam", salam), ("festival", festival_wish)):
+        if chat_level and is_wish(text):
+            opened = any(h.get("role") == "ai" for h in context.get("history") or [])
+            line = safety.greeting_reply(courtesy, language)
+            if not opened:  # the AI disclosure comes first, whatever the greeting (R-DISC-01)
+                opening = flow.OPENING["roman_ur" if language == "roman_ur" else "en"]
+                if language == "ur":
+                    opening = f"{fixed_lines.LINES['opening']['ur']} آپ کا کاروبار کیا کام کرتا ہے؟"
+                line = f"{re.split('[.۔]', line)[0]}. {opening}"
+            return fixed(line, None if opened else flow.State.S1_LISTENING, why="R-LANG-08")
+    if chat_level and context.get("l3_confirmation"):
+        return fixed(str(context["l3_confirmation"]), None, [], {}, "L3-APPROVAL")
+    if chat_level and safety_scope.pashto_asked(text):
+        return fixed(safety_scope.pashto_reply(language, text), None, [], {}, "RT19")
+    if chat_level and safety.unsupported_language(text):
+        return fixed(safety.UNSUPPORTED_TEXT, why="RT19")
+    if chat_level and pii.get("only") and safety.enquiry_asked(text) is None:
+        first = safety.Pii(pii["kinds"][0])
+        table = safety.PII_TEXT.get(language, safety.PII_TEXT["en"])
+        return fixed(pii.get("notice") or table[first], why="R-PRIV-02")
+    if (rude := safety.abuse_asked(text)) is not None and (
+        chat_level or rude == safety.Abuse.THREAT
+    ):
+        strikes = int((context.get("brief") or {}).get("abuse_strikes") or 0)
+        step = safety.abuse_step(rude, strikes, language)
+        move = {
+            "X_BLOCKED": flow.State.X_BLOCKED,
+            "X_OUT_OF_SCOPE": flow.State.X_OUT_OF_SCOPE,
+        }.get(step.move or "")
+        marks: dict[str, Any] = {"abuse_strikes": step.strikes}
+        if step.escalate:
+            marks["escalate"] = step.escalate
+        return fixed(step.text, move, ["escalate"] if step.escalate else [], marks, "R-ABUSE")
+    if chat_level and (trade := safety.not_served(text, context.get("served_industries"))):
+        return fixed(
+            safety.not_served_reply(language),
+            flow.State.X_OUT_OF_SCOPE,
+            [],
+            {"declined_trade": trade},
+            "R-7N",
+        )
+    if chat_level and safety_scope.wants_human(text):
+        # a request for a supervisor, a manager or a person: the hand-over notice at once, in their
+        # language, and the conversation is raised for staff (the AI flow stops here)
+        handover = fixed(
+            safety_scope.handover_reply(language),
+            None,
+            ["escalate"],
+            {"escalate": "wants_person"},
+            "R-HANDBACK",
+        )
+        handover.request_human = True
+        return handover
+    if chat_level and safety_scope.other_company_charge(text, context):
+        # a charge or refund of ANOTHER company: pi says it is Workzap's AI and cannot refund it,
+        # points to that company's own support, guesses nothing and claims no action
+        return fixed(safety_scope.other_company_reply(language), None, [], {}, "R-SCOPE")
+    if chat_level and (who := safety.identity_asked(text, constitution.ASKS_IF_AI)) is not None:
+        if who == safety.Identity.COMPANY:
+            # E7: only facts in an approved company profile; otherwise the question goes to the
+            # team (pi said it would), so a request is raised.
+            return fixed(
+                safety.identity_reply(who, language),
+                None,
+                ["escalate"],
+                {"escalate": "company_info"},
+                "R-HONEST-01",
+            )
+        if who == safety.Identity.ABOUT:
+            told = [
+                str(h.get("text") or "")
+                for h in (context.get("history") or [])
+                if h.get("role") == "ai"
+            ][-6:]
+            full = safety.identity_reply(who, language)
+            mid = full[len(full) // 3 : len(full) // 3 + 40]  # not the opening disclosure
+            if any(mid in said for said in told):  # asked again: shorter, then the one question
+                who = safety.Identity.ABOUT_AGAIN
+        return fixed(safety.identity_reply(who, language), why="R-DISC")
+    if chat_level and (advice := safety.advice_asked(text)) is not None:
+        if advice == safety.Advice.LEGAL and LEGAL_THREAT.search(text):
+            return fixed(
+                safety.advice_reply(advice, language),
+                None,
+                ["escalate"],
+                {"escalate": "legal_threat"},
+                "R-ADV",
+            )
+        return fixed(safety.advice_reply(advice, language), why="R-ADV")
+    if (limit := safety.boundary_asked(text)) is not None:
+        if limit == safety.Boundary.BANK_ASK and (context.get("flow") or {}).get("state") in (
+            "S9_APPROVED",
+            "S10_AWAITING_PAYMENT",
+            "S11_PAYMENT_CONFIRMED",
+            "S12_KICKOFF",
+        ):
+            limit = safety.Boundary.BANK_ASK_APPROVED  # M3: the details are on the approved quote
+        effects, marks = BOUNDARY_EFFECTS.get(limit, ([], {}))
+        if chat_level or effects:
+            move = flow.State.X_OUT_OF_SCOPE if limit == safety.Boundary.WRONG_NUMBER else None
+            said_back = safety.boundary_reply(limit, language, bool(context.get("noted_problems")))
+            if limit == safety.Boundary.MEMORY_ASK:
+                # R-PRIV-06: what pi keeps, from the very block the model reads.
+                said_back = memory_answer.answer(context, language, said_back)
+            return fixed(
+                said_back,
+                move,
+                list(effects),
+                dict(marks),
+                "R-BOUNDARY",
+            )
+    if chat_level and (about := safety.nori_asked(text)) is not None:
+        return fixed(safety.nori_reply(about, language), why="R-HONEST-02")
+    if (lead := safety.enquiry_asked(text)) is not None:
+        said_line = safety.enquiry_reply(lead, language)
+        if chat_level and pii.get("only"):
+            # a refund or enquiry with a card number in it: the card is warned about AND the team
+            # is still told (the number is never stored)
+            first = safety.Pii(pii["kinds"][0])
+            table = safety.PII_TEXT.get(language, safety.PII_TEXT["en"])
+            said_line = f"{pii.get('notice') or table[first]} {said_line}"
+        return fixed(
+            said_line,
+            None,
+            ["escalate"],
+            {"escalate": lead.value},
+            why="R-ROUTE-01",
+        )
+    return None
+
+
+def owner_texts_of(context: dict[str, Any]) -> list[str]:
+    """What the owner said in this chat: earlier messages, the burst and the latest message."""
+    return [
+        *(
+            str(h.get("text") or "")
+            for h in context.get("history") or []
+            if h.get("role") == "customer"
+        ),
+        *(str(t) for t in context.get("burst_texts") or []),
+        str(context.get("latest_customer_message") or ""),
+    ]
+
+
+def brain_listening_tidy(turn: "ServiceTurn", context: dict[str, Any]) -> None:
+    """Real property chat: while the owner is still describing the business, a reply never prints an
+    empty labelled section, never asks what the owner already answered (or to pick one when they
+    said they will not), never states a cause as settled, and ends with exactly one question."""
+    if turn._summary or turn._decision is not None or turn.request_human or not turn.reply.strip():
+        return
+    state = flow.parse((context.get("flow") or {}).get("state"))
+    if state not in (flow.State.S1_LISTENING, flow.State.S2_CLARIFYING, flow.State.S3_NOTED):
+        return
+    owner = owner_texts_of(context)
+    text = listening_tidy.drop_empty_sections(turn.reply)
+    text = listening_tidy.without_answered_questions(text, owner)
+    if listening_tidy.settled_cause(text):
+        text = listening_tidy.without_settled_cause(text)
+    if (
+        not text.strip()
+        or (not listening_tidy.has_question(text) and not context.get("no_questions"))
+    ) and not (turn._free or context.get("solution_ideas")):
+        language = constitution._language(context)
+        question = constitution._fresh_question(context, language)
+        text = f"{text.strip()}{chr(10)}{chr(10)}{question}" if text.strip() else question
+    turn.reply = text
+
+
+def brain_summary(turn: "ServiceTurn", context: dict[str, Any]) -> None:
+    """When the person is done, asks what now, or many problems piled up: the reply becomes the
+    sorted summary (spec 3.7), built from what is noted plus this turn's new problems."""
+    if context.get("map_incomplete"):
+        return
+    turn._asked_shape = bool(context.get("shape_question_due"))
+    state = flow.parse((context.get("flow") or {}).get("state"))
+    listening = state in (
+        flow.State.S1_LISTENING,
+        flow.State.S2_CLARIFYING,
+        flow.State.S3_NOTED,
+    )
+    if not listening and (state is None or state in flow.EXCEPTIONS or state == flow.State.S0_NEW):
+        return
+    created = [op.note for op in turn.problem_ops if op.op == "create" and op.note]
+    items = [
+        {
+            "category": p["group"],
+            "title": p["title"],
+            "title_local": p.get("title_local"),
+            "group_name": p.get("group_name"),
+            "score": p.get("score"),
+        }
+        for p in context.get("noted_problems") or []
+    ] + [
+        {
+            "category": taxonomy.normalise_category(n.category),
+            "title": problems.clean_title(n.title),
+        }
+        for n in created
+    ]
+    since = int(context.get("problems_since_summary") or 0) + len(created)
+    trigger = int(
+        (context.get("brain_settings") or {}).get("summary_trigger") or problems.SUMMARY_TRIGGER
+    )
+    said = str(context.get("latest_customer_message", ""))
+    quiet = int(context.get("quiet_replies") or 0)
+    quiet_limit = int((context.get("brain_settings") or {}).get("quiet_before_summary") or 2)
+    why = problems.summary_due(said, len(items), since, trigger, quiet, quiet_limit)
+    why = why or part19.checkpoint_due(context, said, len(items))  # spec v1.6 19.7
+    if not why or part19.summary_blocked(context, said, why):
+        return
+    if why == "document_asked" and (
+        not context.get("can_approve", True) or (context.get("brief") or {}).get("non_decider")
+    ):
+        return
+    if why == "document_asked" and decisions.asks_for_document(said) and items:
+        # Platform spec Book 4 5.2 (G28): asking for the document IS the yes. The decision gate
+        # moves the chat to preparing; a summary first would ignore the request (found in a real
+        # replay: "haan document aur quote bana dein" was answered with the sorted summary).
+        return
+    if not listening and why not in ("map", "show"):
+        return  # after the summary only an explicit ask to see the notes shows them again
+    if solution_turn(context):
+        return  # solution mode: they asked for a fix, so they get the ideas (Part 1.6)
+    if why not in ("show", "map", "document_asked") and listening_tidy.owner_declines_pick(
+        owner_texts_of(context)
+    ):
+        return  # the owner wants the whole business understood first: no "which one first?" list
+    language = str(context.get("reply_language") or "en")
+    turn.reply = problems.summary_message(
+        items, language, [str(w) for w in (context.get("brief") or {}).get("wants") or []]
+    )
+    turn._summary_at = part19.ai_count(context)
+    # The group counts are figures pi wrote itself: the no-digits rule must let them through.
+    context["fixed_lines"] = [ln for ln in turn.reply.splitlines() if any(c.isdigit() for c in ln)]
+    turn.awaiting_customer = True
+    if listening:
+        turn._summary = True
+    else:
+        turn._board = True  # shown again with its board picture; the chat stays where it is
+
+
+def voice_noted(reply: str, context: dict[str, Any]) -> str:
+    """Brain workspaces never announce "noted it" (spec v1.4, 17.6); other workspaces keep the
+    frame, translated into the person's language."""
+    if context.get("pi_mode") == "brain":
+        return reply_voice.drop_noted(reply)
+    return reply_voice.localise_noted(
+        reply, context.get("reply_language"), reply_voice.noted_before(context)
+    )
+
+
+IDEAS_LEAD = {
+    "en": "Here are some ideas for you:",
+    "roman_ur": "Ji, ye do ideas abhi aazma sakte hain:",
+}
+_BULLET_LINE = re.compile(r"^\s*•\s+\S")
+OFFER_LINE = re.compile(
+    r"solution document.{0,60}quote|document (?:and|aur) (?:a )?quote", re.IGNORECASE
+)
+
+
+def shape_expert_ideas(turn: "ServiceTurn", context: dict[str, Any]) -> None:
+    """Expert workspaces: ideas appear only when the owner asked for them, and always with a
+    one-line lead. A model that lists ideas on its own (live 2026-10-27: a second business was told
+    in a statement and pi answered with more ideas for the FIRST business) loses the list, the lead
+    and the offer line, and the reply keeps its question; a list the app wrote after a request gets
+    its lead if it lost it."""
+    if turn._summary or turn._board:
+        return  # the sorted summary and its board are lists of the owner's problems, not ideas
+    lines = turn.reply.split("\n")
+    bullets = [n for n, line in enumerate(lines) if _BULLET_LINE.match(line)]
+    if len(bullets) < 2:
+        return
+    if listening_tidy.is_recap_list(lines, bullets[0]):
+        return  # "what I know / what is unknown": the owner's own facts, never an ideas list
+    said = str(context.get("latest_customer_message") or "")
+    asked = bool(
+        turn._free
+        or context.get("solution_asked")
+        or context.get("solution_ideas")
+        or context.get("solution_asked_no_ideas")
+        or context.get("open_ask")
+        or solution_ask.asked_for_ideas(said)
+        or solution_ask.rejects_ideas(said)
+    )
+    language = str(context.get("reply_language") or "en")
+    if asked:
+        first = next((line for line in lines if line.strip()), "")
+        if _BULLET_LINE.match(first):
+            lead = IDEAS_LEAD.get(language, IDEAS_LEAD["en"])
+            turn.reply = lead + "\n" + turn.reply
+        return
+    drop: set[int] = set(bullets)
+    before = bullets[0] - 1
+    while before >= 0 and not lines[before].strip():
+        before -= 1  # blank lines between the lead and the list
+    if before >= 0 and lines[before].rstrip().rstrip("*_ ").endswith(":"):
+        drop.add(before)  # the lead line of the list
+    for n, line in enumerate(lines):
+        if OFFER_LINE.search(line):
+            drop.add(n)  # an offer needs ideas that were asked for
+    kept = [line for n, line in enumerate(lines) if n not in drop]
+    text = "\n".join(kept).strip()
+    if not text.rstrip().endswith(("?", "؟")):
+        if len(text.split()) <= 6:
+            text = ""  # "Haan, ho sakta hai." answers nothing once the list is gone
+        fallback = constitution.FALLBACK_LISTENING.get(
+            language, constitution.FALLBACK_LISTENING["en"]
+        )
+        text = (text + "\n\n" if text else "") + fallback
+    turn.reply = text
+
+
+# Spec v1.4, 17.5: "what can you do?" means Workzap too. The two ideas are followed by one line of
+# what Workzap COULD build, said as what the owner would notice (never "will", no tool words, no
+# price), from the approved catalogue.
+CAPABILITY_ASK = re.compile(
+    r"\bwhat can you do\b|\bwhat do you do\b|\bhow can you help\b|"
+    r"\b(?:aap|ap)\s+kya\s+(?:kar|kr)\s+(?:sakte|skte|sakty|sakti|skti)\b",
+    re.IGNORECASE,
+)
+COULD_LINE = {
+    "en": "Workzap could set it up so {phrase}.",
+    "roman_ur": "Workzap ye kar sakta hai: {phrase}.",
+}
+WORKZAP_COULD = re.compile(r"\bworkzap\s+(?:could|ye kar sakta|aisa)", re.IGNORECASE)
+
+
+def capability_line(context: dict[str, Any]) -> str:
+    """The one Workzap line for a "what can you do?" answer, or "" when none is safe to say."""
+    said = str(context.get("latest_customer_message") or "")
+    if not CAPABILITY_ASK.search(said):
+        return ""
+    language = "roman_ur" if context.get("reply_language") == "roman_ur" else "en"
+    keys: list[str] = []
+    build = context.get("solution_build") or {}
+    if build.get("says"):
+        phrase = str(build["says"])
+    else:
+        for item in reversed(context.get("noted_problems") or []):
+            keys = solution_library.build_keys(str(item.get("group") or ""))
+            if keys:
+                break
+        if not keys:
+            return ""
+        phrase = solutions.build_phrase(keys[0], language)
+    if language == "en":
+        phrase = phrase[:1].lower() + phrase[1:]
+    line = COULD_LINE[language].format(phrase=phrase.rstrip(". "))
+    if solutions.banned_tool_words(line, said) or any(ch.isdigit() for ch in line):
+        return ""
+    return line
+
+
+def add_capability_line(turn: "ServiceTurn", context: dict[str, Any]) -> None:
+    """After the ideas of a "what can you do?" answer, before its one question."""
+    lines = turn.reply.split(chr(10))
+    bullets = [n for n, line in enumerate(lines) if _BULLET_LINE.match(line)]
+    if len(bullets) < 2 or WORKZAP_COULD.search(turn.reply) or OFFER_LINE.search(turn.reply):
+        return
+    if not (line := capability_line(context)):
+        return
+    lines[bullets[-1] + 1 : bullets[-1] + 1] = ["", line]
+    turn.reply = chr(10).join(lines)
+
+
+ONE_IDEA_LEAD = {
+    "en": "Here is an idea for you:",
+    "roman_ur": "Ji, ye ek idea abhi aazma sakte hain:",
+}
+ASK_AFTER_IDEAS = {  # one plain question when ideas end the reply with nothing after them
+    "en": {
+        "one": "Would this be easy to start with?",
+        "many": "Which of these would be easiest to start with?",
+    },
+    "roman_ur": {
+        "one": "Kya ye shuru karna aap ke liye aasaan rahega?",
+        "many": "In mein se kaun sa shuru karna aap ke liye sab se aasaan rahega?",
+    },
+}
+
+
+def settle_ideas(turn: "ServiceTurn", context: dict[str, Any]) -> None:
+    """After every guard has taken lines out (live 2026-10-28: the lead said "do ideas" over one
+    idea, and an ideas reply ended on the idea with no question): the lead names the ideas that are
+    left, and a reply that ends on an idea gets its one question."""
+    lines = turn.reply.split(chr(10))
+    bullets = [n for n, line in enumerate(lines) if _BULLET_LINE.match(line)]
+    language = str(context.get("reply_language") or "en")
+    plural = IDEAS_LEAD.get(language, IDEAS_LEAD["en"])
+    first = next((n for n, line in enumerate(lines) if line.strip()), None)
+    if first is not None and lines[first].strip() == plural:
+        if not bullets:
+            del lines[first]  # no idea is left: no lead either
+        elif len(bullets) == 1:
+            lines[first] = ONE_IDEA_LEAD.get(language, ONE_IDEA_LEAD["en"])
+    text = chr(10).join(lines).strip()
+    last = text.split(chr(10))[-1].strip() if text else ""
+    if (
+        bullets
+        and _BULLET_LINE.match(last)
+        and not OFFER_LINE.search(text)
+        and language in ASK_AFTER_IDEAS
+        and not context.get("no_questions")
+    ):
+        how_many = "one" if len(bullets) == 1 else "many"
+        text = f"{text}{chr(10)}{chr(10)}{ASK_AFTER_IDEAS[language][how_many]}"
+    turn.reply = text
+
+
+def strip_dangling_opener(turn: "ServiceTurn") -> None:
+    """A reply must not stop on the Workzap line's opener ("...Workzap could set it up so"): the
+    model sometimes leaves the build itself out (found in a real-model school chat)."""
+    openers = sorted(
+        {o for pair in solutions.BRIDGE_OPENERS for o in pair.values() if o}, key=len, reverse=True
+    )
+    kept: list[str] = []
+    for line in turn.reply.split("\n"):
+        tail = line.rstrip()
+        cut = next((o for o in openers if tail.endswith(o)), None)
+        if cut is not None:
+            tail = tail[: -len(cut)].rstrip()
+            if not tail:
+                continue
+        kept.append(tail if cut is not None else line)
+    turn.reply = "\n".join(kept).strip()
+
+
+def ideas_opener(context: dict[str, Any]) -> str:
+    """ "Sure." answers a request for a fix; ideas offered on a message that asked for none (a
+    problem told, a "yes") start with the ideas themselves."""
+    said = str(context.get("latest_customer_message") or "")
+    if context.get("solution_rejected_fit") and context.get("solution_ideas"):
+        # they said the first ideas were wrong for their problem: one short clause, then new ideas
+        return "Sorry, those did not fit your problem. Here are two different ideas:" + chr(10)
+    if said and not solution_ask.asked_for_ideas(said):
+        return ""
+    if solution_ask.churn_risk(said):
+        return "No pressure at all. Here are two ideas:" + chr(10)  # G18
+    if solution_ask.impatient(said):
+        return "Sorry about the wait. Here are two ideas:" + chr(10)  # Book 4 G27: "Maazrat"
+    return "Here are some ideas for you:" + chr(10)
+
+
+def reject_passive_ideas(turn: "ServiceTurn", context: dict[str, Any]) -> None:
+    """An idea line that is not something the owner can do ("hum dekh sakte hain", "note kiya ja
+    sakta hai", "team ko clear ho jaye") is never sent. The whole reply is dropped, so the ideas the
+    application holds (pack, library) or the model's vetted free ideas take its place; with none,
+    the honest line follows. Every idea path passes through here, the model's own prose included."""
+    if turn._summary or turn._decision is not None or turn.request_human:
+        return
+    lines = [ln for ln in turn.reply.splitlines() if IDEA_MARK.match(ln)]
+    if lines and any(not solution_rules.is_owner_action(ln) for ln in lines):
+        turn.reply = ""
+        turn._ideas_rejected = True
+
+
+def brain_ideas(turn: "ServiceTurn", context: dict[str, Any]) -> None:
+    """The ideas the application chose for this turn reach the person even when the model left
+    them out of its reply ("Noted. What else is getting in the way?" after "any solution?").
+    They were vetted when they were loaded, so the application writes them itself, as a short list.
+    The list is written in English; for another language the reply-language fixer that runs right
+    after this translates the whole reply."""
+    ideas = [str(i) for i in context.get("solution_ideas") or []][:2]
+    if not ideas or turn._summary or turn._decision is not None or turn.request_human:
+        return
+    if solution_rules.count_ideas(turn.reply) >= 1 or solution_rules.has_safety_referral(
+        turn.reply
+    ):
+        return
+    lines = solution_rules.idea_lines(ideas)
+    language = str(context.get("reply_language") or "en")
+    turn.reply = with_disclosure(f"{ideas_opener(context)}{lines}", context, language)
+    turn._english = True
+    turn.awaiting_customer = True
+
+
+ENGLISH_FUNCTION_WORDS = re.compile(
+    r"\b(?:the|a|an|so|is|are|to|of|and|for|by|you|your|every|each|with|that|this|it|in|on|at|be|"
+    r"one|same|whether|see|which|what|when|how)\b",
+    re.IGNORECASE,
+)
+
+
+def english_bullets(reply: str) -> bool:
+    """A "• " point written in English (at least four English function words in it)."""
+    return any(
+        len(ENGLISH_FUNCTION_WORDS.findall(line)) >= 4
+        for line in reply.splitlines()
+        if line.lstrip().startswith("•")
+    )
+
+
+BUILD_REQUEST = re.compile(
+    r"\b(?:make|build|create|develop|design)\b[^.?!]{0,30}\b(?:app|application|software|website|system|portal|bot|dashboard)\b"
+    r"|\b(?:app|software|website|system|portal)\b[^.?!]{0,30}\b(?:bn\w*|ban\w*|banwa\w*|bnwa\w*)\b",
+    re.IGNORECASE,
+)
+IDEA_WORDS = re.compile(r"\b(?:ideas?|solutions?|hal|suggest\w*|mashwara|advice)\b", re.IGNORECASE)
+
+
+DIFFERENT_IDEA_SIGNALS = frozenset(
+    {"idea_generic", "idea_no_help", "idea_already_doing", "idea_not_possible", "idea_more"}
+)
+
+BULLET_LINE = re.compile(r"^\s*[•*-]\s+(.*)$")
+IDEA_MARK = re.compile(
+    r"^\s*(?:[•*-]\s+|(?:first|second|pehle|pehla|doosra|dusra)\s*,\s*)(.*)$", re.IGNORECASE
+)
+POSITIONS = {"roman_ur": ("Pehle", "Doosra"), "en": ("First", "Second")}
+
+
+ROMAN_SCAFFOLD = re.compile(r"^(First|Second),\s+|,\s+so\s+(?=[a-z])", re.IGNORECASE)
+
+
+def roman_scaffold(found: "re.Match[str]") -> str:
+    word = found.group(1)
+    if word:
+        return "Pehle, " if word.lower() == "first" else "Doosra, "
+    return ", taake "
+
+
+IDEA_LINE = IDEA_MARK
+
+
+def _word_set(text: str) -> set[str]:
+    return {w for w in re.findall(r"[a-z؀-ۿ]{3,}", text.casefold())}
+
+
+def brain_no_repeat(turn: "ServiceTurn", context: dict[str, Any]) -> None:
+    """An idea pi already said in this chat is not said again (a second ask got the same two
+    ideas word for word): repeated idea lines are dropped, and when every one was a repeat the
+    reply is the honest 'those are the ideas I have' line (the offer follows)."""
+    if turn._summary or turn._decision is not None or turn.request_human:
+        return
+    lines = turn.reply.splitlines()
+    found = [n for n, line in enumerate(lines) if IDEA_LINE.match(line.strip())]
+    if not found:
+        return
+    earlier = [
+        _word_set(str(h.get("text") or ""))
+        for h in context.get("history") or []
+        if h.get("role") == "ai"
+    ]
+    repeated = []
+    for n in found:
+        mine = _word_set(IDEA_LINE.match(lines[n].strip()).group(1))  # type: ignore[union-attr]
+        if mine and any(len(mine & old) / len(mine) >= 0.75 for old in earlier):
+            repeated.append(n)
+    if not repeated:
+        return
+    language = str(context.get("reply_language") or "en")
+    if len(repeated) == len(found):
+        turn.reply = NO_MORE_IDEAS.get(language, NO_MORE_IDEAS["en"])
+        turn._english = False
+        turn.awaiting_customer = True
+        return
+    turn.reply = chr(10).join(line for n, line in enumerate(lines) if n not in repeated)
+
+
+ENGLISH_FILLER = re.compile(r"^(?:Sure|Yes|Okay|Ok)\.(?=\s*$)", re.IGNORECASE | re.MULTILINE)
+
+
+GENDERED = {
+    "sakta hoon": "sakte hain",
+    "sakta hun": "sakte hain",
+    "karta hoon": "karte hain",
+    "deta hoon": "dete hain",
+    "rakhta hoon": "rakhte hain",
+    "bhej dunga": "bhej denge",
+    "karunga": "karenge",
+    "bataunga": "batayenge",
+    "dunga": "denge",
+}
+FORMAL = {
+    "karo": "karein",
+    "rakho": "rakhein",
+    "dekho": "dekhein",
+    "likho": "likhein",
+    "bhejo": "bhejein",
+    "milao": "milayein",
+    "batao": "bataein",
+    "lagao": "lagayein",
+    "banao": "banayein",
+    "uthao": "uthayein",
+    "samajh gaya": "samajh liya",
+}
+FAMILIAR_IMPERATIVES = re.compile(
+    chr(92)
+    + "b("
+    + "|".join(sorted({*FORMAL, *GENDERED}, key=len, reverse=True))
+    + ")"
+    + chr(92)
+    + "b",
+    re.IGNORECASE,
+)
+
+
+IDEA_FIRST_WORD = re.compile(
+    r"(?mi)^[ 	]*(?:first|second|pehle|pehla|doosra|dusra)[ 	]*,[ 	]*"
+)
+
+
+def _formal(found: "re.Match[str]") -> str:
+    word = found.group(1).lower()
+    return FORMAL.get(word) or GENDERED.get(word) or found.group(1)
+
+
+def roman_polish(reply: str) -> str:
+    """What a Roman Urdu reply keeps of English after the language step: the 'First,'/'Second,'
+    of idea lines, 'so' as the connector, a lone 'Sure.' opener, and the familiar 'karo' forms
+    (pi says 'aap' and 'karein', and never a gendered 'samajh gaya', platform spec Book 4 5.1)."""
+    lines = [ROMAN_SCAFFOLD.sub(roman_scaffold, line) for line in reply.splitlines()]
+    text = ENGLISH_FILLER.sub("Theek hai.", chr(10).join(lines))
+    text = FAMILIAR_IMPERATIVES.sub(_formal, text)
+    # idea lines are "• " lines (the golden replies), whatever marker the rewrite kept
+    return IDEA_FIRST_WORD.sub(chr(8226) + chr(32), text)
+
+
+ROMAN_OPENER = {
+    "normal": "Ji, ye do ideas abhi aazma sakte hain:",
+    "impatient": "Maazrat. Ye do ideas hain:",
+    "churn": "Koi dabao nahi. Ye do ideas hain:",
+    "wrong": "Maazrat, wo aap ke masle se mel nahi khate. Ye do naye ideas hain:",
+}
+WORKZAP_MODAL = re.compile(r"\bWorkzap\s+(?:could|can|would|will)\s+", re.IGNORECASE)
+
+
+def roman_ideas_opener(reply: str, context: dict[str, Any]) -> str:
+    """The line before the idea bullets of a Roman Urdu reply is the golden opener, whatever the
+    language step made of the English one ("Theek hai, seedha solution." for a person who was not
+    in a hurry); "Workzap could" never stays inside a Roman Urdu sentence."""
+    reply = WORKZAP_MODAL.sub("Workzap ", reply)
+    if not (context.get("solution_ideas") or "• " in reply):
+        return reply
+    lines = reply.splitlines()
+    first = next((n for n, ln in enumerate(lines) if ln.lstrip().startswith(chr(8226))), None)
+    if first is None or not context.get("solution_asked"):
+        return reply
+    said = str(context.get("latest_customer_message") or "")
+    kind = (
+        "wrong"
+        if context.get("solution_rejected_fit")
+        else "churn"
+        if solution_ask.churn_risk(said)
+        else "impatient"
+        if solution_ask.impatient(said)
+        else "normal"
+    )
+    before = [n for n in range(first) if lines[n].strip()]
+    if before:
+        last = before[-1]
+        if SAYS_AI.search(lines[last]) or "pi" in lines[last].split():
+            lines.insert(first, ROMAN_OPENER[kind])  # the disclosure line stays, the opener follows
+        else:
+            lines[last] = ROMAN_OPENER[kind]
+    else:
+        lines.insert(first, ROMAN_OPENER[kind])
+    return chr(10).join(lines)
+
+
+def brain_prose_ideas(turn: "ServiceTurn", context: dict[str, Any]) -> None:
+    """The ideas of a reply are always shown the same way: one plain sentence per line, starting
+    with "• " (the golden replies). A model that wrote them as "First, ... Second, ..." or as
+    dashes is brought to that form. Every other kind of list (the problems of a summary) stays."""
+    if not (context.get("solution_ideas") or turn._free) or turn._summary:
+        return
+    lines = turn.reply.splitlines()
+    if context.get("reply_language") == "roman_ur" and not getattr(turn, "_english", False):
+        # English scaffolding the model left inside a Roman Urdu idea line ("First, ... so aapko")
+        lines = [ROMAN_SCAFFOLD.sub(roman_scaffold, line) for line in lines]
+    found = [n for n, line in enumerate(lines) if IDEA_MARK.match(line)]
+    if not 1 <= len(found) <= 2 or found != list(range(found[0], found[0] + len(found))):
+        turn.reply = chr(10).join(lines)
+        return
+    for n in found:
+        matched = IDEA_MARK.match(lines[n])
+        text = (matched.group(1) if matched else lines[n]).strip()
+        lines[n] = chr(8226) + chr(32) + text[:1].upper() + text[1:]
+    turn.reply = chr(10).join(lines)
+
+
+def asked_without_ideas(context: dict[str, Any]) -> bool:
+    """They asked for a fix and no entry's ideas were handed over: the industry has none for this
+    problem, or the chat is past the point where the entries are consulted (the summary was shown,
+    the offer is open). Read from the message itself, so the state never silences the answer."""
+    if context.get("solution_ideas") or context.get("solution_howto"):
+        return False
+    if context.get("solution_asked_no_ideas"):
+        return True
+    if context.get("open_ask") and str((context.get("flow") or {}).get("state") or "") in (
+        solution_ask.ASKABLE
+    ):
+        return True  # R-SOL-02: they asked, pi asked one question, this is the answer: ideas now
+    state = str((context.get("flow") or {}).get("state") or "")
+    said = str(context.get("latest_customer_message") or "")
+    if int(context.get("ideas_given") or 0) > 0 and state in solution_ask.ASKABLE:
+        reaction = solution_score.classify(said)  # "idea pasand nahi aya": a different idea
+        if reaction is not None and reaction.signal in DIFFERENT_IDEA_SIGNALS:
+            return True
+    if BUILD_REQUEST.search(said) and not IDEA_WORDS.search(said):
+        return False  # "can you make an app for this?" is answered as the spec's G4, not with ideas
+    return state in solution_ask.ASKABLE and solution_ask.asked_for_ideas(said)
+
+
+COUNTRY_NAMES = {"PK": "Pakistan", "AE": "the UAE", "CA": "Canada"}
+
+
+def expert_library_ideas(
+    brief: dict[str, Any],
+    noted_now: list[dict[str, Any]],
+    owner_words: str,
+    idea_ctx: "idea_filter.IdeaContext | None",
+    room: int,
+) -> list[str]:
+    """When the expert gives nothing (the model failed or timed out, or every candidate was dropped)
+    the owner still gets ideas: the library category the cue words name, through the same idea
+    filter and reply linter as the expert's own, never one already given."""
+    before = [str(x) for x in brief.get("library_given") or []]
+    found: list[str] = []
+    for category in solution_library.best_category(noted_now):
+        for idea in solution_library.ideas_for(category, before, 4, owner_words):
+            if idea_filter.failures(idea, owner_words, idea_ctx) or not solution_lint.passes(idea):
+                continue
+            if not solution_library.already_said(idea, [*before, *found]):
+                found.append(idea)
+            if len(found) >= room:
+                return found
+    return found
+
+
+def trade_name(conversation: Any, keys: list[str]) -> str | None:
+    """The trade for the expert's persona: the industry pack's name, else what the owner said the
+    business does ("garment export", "a school bus service"), so a trade outside the 211 packs is
+    still understood as that trade and not as "small"."""
+    if keys:
+        return (solutions.load(keys[0]) or {}).get("name")
+    brief = getattr(conversation, "service_brief", None) or {}
+    if not brief.get("industry_confirmed"):
+        return None  # a model-extracted business_type is a guess until confirmed (G11)
+    profile = brief.get("customer_profile") or {}
+    said = " ".join(str(profile.get("business_type") or "").split())[:80]
+    return said or None
+
+
+KNOWN_LANGUAGE_NAMES = frozenset({"roman urdu", "urdu", "hindi", "hinglish"})
+LANGUAGE_NAME = re.compile(r"^[A-Za-z][A-Za-z() -]{1,38}$")
+
+
+def adopt_model_language(
+    context: dict[str, Any], brief: dict[str, Any], named: str
+) -> dict[str, Any]:
+    """The code found no language it knows in the owner's words (it returned nothing: a real
+    message in another language, Swahili, Pashto, Korean ...), so the language the expert read them
+    writing in is used: remembered for the chat and given to the translation step, which writes the
+    ideas and the fixed lines in it. The code's own detection is never overridden when it found
+    something."""
+    if context.get("reply_language") or context.get("reply_language_other"):
+        return brief
+    name = " ".join(str(named or "").split())
+    if not LANGUAGE_NAME.match(name) or name.lower() in ("english", "none", "unknown", "n/a"):
+        return brief
+    if name.lower() in KNOWN_LANGUAGE_NAMES:
+        return brief  # the code's own notices cover these
+    context["reply_language_other"] = name.title()
+    return {**brief, "owner_language": name.title()}
+
+
+def noted_with_turn(
+    context: dict[str, Any], turn: "ServiceTurn"
+) -> tuple[list[dict[str, Any]], dict[str, Any] | None]:
+    """The noted problems plus any this very message creates (they are not in the context yet), and
+    the newest of those: the problem the owner has just started."""
+    noted_now = [p for p in context.get("noted_problems") or [] if isinstance(p, dict)]
+    fresh: dict[str, Any] | None = None
+    for op in getattr(turn, "problem_ops", None) or []:
+        note = getattr(op, "note", None)
+        if getattr(op, "op", "") == "create" and note is not None and note.title:
+            fresh = {
+                "title": note.title,
+                "user_words": [str(w)[:200] for w in (note.user_words or [])[:2]],
+                "subtype": note.subtype or "",
+            }
+            noted_now.append(fresh)
+    return noted_now, fresh
+
+
+async def brain_expert_ideas(
+    manager: LLMManager,
+    scope: WorkspaceScope,
+    conversation: PiConversation,
+    policy: PiSettings,
+    turn: "ServiceTurn",
+    context: dict[str, Any],
+    *,
+    customer: list[str],
+    said: str,
+    industry: str | None,
+    never_say: list[str],
+    already: list[str],
+    noted_now: list[dict[str, Any]],
+    idea_ctx: idea_filter.IdeaContext | None,
+    left: int,
+    new_problem: dict[str, Any] | None = None,
+) -> bool:
+    """solution_source "expert": the senior-operator pipeline (diagnose, judge, vet). True when the
+    turn is settled (ideas given, the one missing-fact question asked, or the problem's idea cap
+    reached); False when the pipeline gave nothing and the usual free ideas should try."""
+    brief = dict(conversation.service_brief or {})
+    # the problem the owner is on now: one noted by this very message first, and a problem whose two
+    # ideas were given is closed, so a different problem is never held back by the first one's cap
+    main = expert_advisor.main_problem(noted_now, brief, new_problem)
+    room = min(left, value_line.IDEAS_PER_PROBLEM - expert_advisor.given_for(brief, main))
+    if room <= 0:
+        turn._problem_capped = True
+        return True  # two per problem (Book 5 decision 5): brain_no_ideas says so honestly
+    owner = [*customer] if (customer and customer[-1] == said) else [*customer, said]
+    owner = [m for m in owner if m.strip()]
+    titles = [str(p.get("title") or "") for p in noted_now if p.get("title")]
+    turn._expert_tried = True
+    stored = expert_advisor.cached(brief, noted_now, new_problem)
+    advice = await latency.timed(
+        "model.expert",
+        expert_advisor.advise(
+            manager,
+            scope,
+            alias=reply_alias(policy),
+            conversation_id=conversation.id,
+            owner_said=owner,
+            problems=titles,
+            industry=industry,
+            subtype=idea_ctx.subtype if idea_ctx is not None else "",
+            country=COUNTRY_NAMES.get(str(context.get("customer_country") or ""), ""),
+            never_say=never_say,
+            already_said=already,
+            entry_ideas=list(idea_ctx.entry_ideas) if idea_ctx is not None else [],
+            idea_ctx=idea_ctx,
+            want=room,
+            use_judge=expert_advisor.judge_on(policy.response_rules),
+            steer=expert_advisor.Steer(
+                asked=expert_advisor.questions_in(
+                    [*already, *[str(q) for q in context.get("questions_already_asked") or []]]
+                ),
+                answered=owner[1:][-4:],
+                previous=stored,
+                tried_and_failed=system_ask.tried_and_failed(owner),
+            ),
+        ),
+    )
+    if advice is None:
+        return False
+    brief = adopt_model_language(context, brief, advice.language)
+    language = str(context.get("reply_language") or "en")
+    brief = expert_advisor.remember(
+        brief, main, advice, int(brief.get("owner_n") or len(owner)) if owner else None
+    )
+    if not advice.ideas:
+        question = advice.question or (
+            idea_filter.need_fact_line(idea_ctx) if idea_ctx is not None else ""
+        )
+        if not question:
+            return False
+        if question == advice.question:
+            question = expert_advisor.need_fact_reply(question)
+        said_now = str(context.get("latest_customer_message") or "")
+        if decisions.cost_asked(said_now):
+            # a price question is answered first, in a statement; the fixed line is put in after
+            # the language step, so a model rewrite never sees it (no figure, no range)
+            turn._cost_line = decisions.cost_answer(language, context)
+        turn.reply = with_disclosure(question, context, language)
+        turn._need_fact = True
+        turn._english = True
+        turn.awaiting_customer = True
+        turn._free = True
+        conversation.service_brief = brief
+        return True
+    turn.reply = with_disclosure(
+        ideas_opener(context) + solution_rules.idea_lines(advice.ideas), context, language
+    )
+    turn._english = True
+    turn.awaiting_customer = True
+    turn._free = True
+    brief["ideas_given"] = int(brief.get("ideas_given") or 0) + len(advice.ideas)
+    conversation.service_brief = expert_advisor.record_given(brief, main, len(advice.ideas))
+    return True
+
+
+async def brain_free_ideas(
+    manager: LLMManager,
+    scope: WorkspaceScope,
+    conversation: PiConversation,
+    policy: PiSettings,
+    turn: "ServiceTurn",
+    context: dict[str, Any],
+) -> None:
+    """They asked for a fix and no industry entry fits (or they told the problem and asked in one
+    message): the model gives two ideas of its own, vetted by the idea guard, instead of "no quick
+    idea". The ideas count against the chat's idea budget like any other."""
+    if not (asked_without_ideas(context) or (turn._ideas_rejected and not turn.reply.strip())):
+        return
+    if turn._summary or turn._decision is not None or turn.request_human:
+        return
+    if solution_rules.has_safety_referral(turn.reply):
+        return
+    expert = expert_advisor.switched_on(policy.response_rules)
+    given_now = solution_context.given_so_far(conversation)
+    left = (
+        solution_context.allowance(conversation.service_brief or {}, given_now)
+        if expert
+        else 4 - given_now
+    )
+    if left <= 0:
+        turn._problem_capped = expert  # the business's eight are used up: "those are the ideas"
+        return
+    keys = [str(k) for k in context.get("industry_keys") or []][:1]
+    industry = trade_name(conversation, keys)
+    never_say = [str(n) for n in context.get("solution_never_say") or []] or (
+        solutions.never_say(keys) if keys else []
+    )
+    customer = [
+        str(h.get("text") or "")
+        for h in context.get("history") or []
+        if h.get("role") == "customer"
+    ]
+    already = [
+        str(h.get("text") or "")[:400]
+        for h in context.get("history") or []
+        if h.get("role") == "ai"
+    ][-3:]
+    said = str(context.get("latest_customer_message") or "")
+    noted_now, new_problem = noted_with_turn(context, turn)
+    idea_ctx: idea_filter.IdeaContext | None = (
+        idea_filter.IdeaContext(industries=tuple(keys[:1])) if keys else None
+    )  # G9 needs only the trade
+    if noted_now:  # G3, G4, G7, G8 need the map; with none noted only G1, G2, G9 apply
+        given_before = [
+            str(h.get("text") or "") for h in context.get("history") or [] if h.get("role") == "ai"
+        ]
+        brief_now = conversation.service_brief or {}
+        given_before += [str(x) for x in brief_now.get("library_given") or []]
+        idea_ctx = idea_filter.context_from(
+            noted_now,
+            " ".join([*customer[:1], said]),
+            given_before,
+            (solutions.load(keys[0]) or {}).get("problems") or [] if keys else [],
+            keys[:1],
+            [  # with their outcome: PS-3 does not call a repeat of what worked a repeat
+                t
+                for t in (context.get("requirements") or {}).get("tried") or []
+                if isinstance(t, dict)
+            ],
+        )
+    idea_ctx = idea_filter.with_grounding(idea_ctx, str(context.get("profile_grounding") or ""))
+    idea_ctx = idea_filter.with_rejections(idea_ctx, context.get("rejected_ideas") or ())
+    if context.get("thinking"):  # G10 (spec 17.4): the owner's stated size judges each idea
+        idea_ctx = idea_filter.with_resources(idea_ctx, " ".join([*customer, said]))
+    if (policy.response_rules.get("brain") or {}).get("idea_link") is True:  # G12, opt-in
+        idea_ctx = idea_filter.with_idea_link(idea_ctx)
+    report: dict[str, Any] = {}
+    if expert and await brain_expert_ideas(
+        manager,
+        scope,
+        conversation,
+        policy,
+        turn,
+        context,
+        customer=customer,
+        said=said,
+        industry=industry,
+        never_say=never_say,
+        already=already,
+        noted_now=noted_now,
+        idea_ctx=idea_ctx,
+        left=left,
+        new_problem=new_problem,
+    ):
+        return
+    ideas = await latency.timed(
+        "model.free_ideas",
+        solution_free.free_ideas(
+            manager,
+            scope,
+            alias=reply_alias(policy),
+            conversation_id=conversation.id,
+            said=said,
+            earlier=customer,
+            industry=industry,
+            never_say=never_say,
+            already_said=already,
+            problems=[
+                str(p.get("title") or "")
+                for p in context.get("noted_problems") or []
+                if p.get("title")
+            ],
+            idea_ctx=idea_ctx,
+            report=report,
+        ),
+    )
+    ideas = ideas[:left]
+    if not ideas:
+        if report.get("filtered") and idea_ctx is not None:
+            # Book 5 7.1: the filter removed everything. No weak idea: one missing fact, one
+            # question, last. Not counted as ideas given.
+            language = str(context.get("reply_language") or "en")
+            turn.reply = with_disclosure(idea_filter.need_fact_line(idea_ctx), context, language)
+            turn._need_fact = True
+            turn._english = True
+            turn.awaiting_customer = True
+            turn._free = True
+            return
+        if expert:
+            # never a dead end in expert mode: the cue-chosen library ideas, vetted like the rest
+            titles = [str(p.get("title") or "") for p in context.get("noted_problems") or []]
+            brief = dict(conversation.service_brief or {})
+            library = expert_library_ideas(
+                brief,
+                context.get("noted_problems") or [],
+                " ".join([said, *titles]),
+                idea_ctx,
+                left,
+            )[:2]
+            if library:
+                language = str(context.get("reply_language") or "en")
+                turn.reply = with_disclosure(
+                    ideas_opener(context) + solution_rules.idea_lines(library), context, language
+                )
+                turn._english = True
+                turn.awaiting_customer = True
+                turn._free = True
+                brief["ideas_given"] = int(brief.get("ideas_given") or 0) + len(library)
+                brief["library_given"] = [*(brief.get("library_given") or []), *library][-20:]
+                conversation.service_brief = brief
+        return
+    language = str(context.get("reply_language") or "en")
+    turn.reply = with_disclosure(
+        ideas_opener(context) + solution_rules.idea_lines(ideas), context, language
+    )
+    turn._english = True
+    turn.awaiting_customer = True
+    turn._free = True
+    brief = dict(conversation.service_brief or {})
+    brief["ideas_given"] = int(brief.get("ideas_given") or 0) + len(ideas)
+    conversation.service_brief = brief
+
+
+async def brain_expert_diagnosis(
+    manager: LLMManager,
+    scope: WorkspaceScope,
+    conversation: PiConversation,
+    policy: PiSettings,
+    turn: "ServiceTurn",
+    context: dict[str, Any],
+) -> None:
+    """solution_source "expert": once a main problem is noted (and again when a new problem is noted
+    or the owner adds a fact to it) the likely causes and the one missing fact are worked out and
+    cached on the brief, so the NEXT question targets the main problem's most uncertain cause. Not
+    on a turn that already ran the pipeline, gave a summary or a decision, or handed over."""
+    if not expert_advisor.switched_on(policy.response_rules):
+        return
+    if turn._free or turn._summary or turn._decision is not None or turn.request_human:
+        return
+    if getattr(turn, "_expert_tried", False):
+        return  # the pipeline already ran this turn (and failed): never a second call in one turn
+    noted_now, new_problem = noted_with_turn(context, turn)
+    brief = conversation.service_brief or {}
+    main = expert_advisor.main_problem(noted_now, brief, new_problem)
+    if main is None:
+        return
+    keys = [str(k) for k in context.get("industry_keys") or []][:1]
+    industry = trade_name(conversation, keys)
+    customer = [
+        str(h.get("text") or "")
+        for h in context.get("history") or []
+        if h.get("role") == "customer"
+    ]
+    said = str(context.get("latest_customer_message") or "")
+    if said.strip() and (not customer or customer[-1] != said):
+        customer.append(said)
+    owner_turns = int(brief.get("owner_n") or len(customer))
+    if not expert_advisor.needs_refresh(brief, noted_now, owner_turns, said, new_problem):
+        # still fresh: pi has just asked a question, so the cached one is not offered again
+        conversation.service_brief = expert_advisor.mark_consumed(dict(brief), turn.reply)
+        return
+    told = [
+        str(h.get("text") or "")[:400]
+        for h in context.get("history") or []
+        if h.get("role") == "ai"
+    ][-3:]
+    if turn.reply.strip():
+        told.append(turn.reply[:400])  # what pi is saying now is not the next question
+    turn._expert_tried = True
+    advice = await latency.timed(
+        "model.expert_diag",
+        expert_advisor.advise(
+            manager,
+            scope,
+            alias=reply_alias(policy),
+            conversation_id=conversation.id,
+            owner_said=customer,
+            problems=[str(p.get("title") or "") for p in noted_now if p.get("title")],
+            industry=industry,
+            subtype=str(main.get("subtype") or ""),
+            country=COUNTRY_NAMES.get(str(context.get("customer_country") or ""), ""),
+            already_said=told,
+            ideas_wanted=False,
+            time_limit=25.0,
+            steer=expert_advisor.Steer(
+                asked=expert_advisor.questions_in(
+                    [*told, *[str(q) for q in context.get("questions_already_asked") or []]]
+                ),
+                answered=customer[1:][-4:],
+                previous=expert_advisor.cached(brief, noted_now, new_problem),
+                light=True,
+            ),
+        ),
+    )
+    if advice is not None:
+        conversation.service_brief = expert_advisor.remember(dict(brief), main, advice, owner_turns)
+
+
+NO_IDEA_LINES = {  # noqa: E501
+    # Sentence one answers a direct "what can you do about it?" (spec 17.5, EO3, v1.6 19.3): pi can
+    # work on it with them, and honestly has no quick idea yet; then at most one question.
+    "en": "I can work through this with you, though I have no quick idea to give yet. What have you tried so far?",  # noqa: E501
+    "roman_ur": "Is par hum saath soch sakte hain, lekin abhi mere paas koi chhota idea nahi. Ab tak aap ne kya aazmaya hai?",  # noqa: E501
+    "ur": "اس پر مل کر کام ہو سکتا ہے، لیکن ابھی میرے پاس کوئی مختصر خیال نہیں۔ اب تک آپ نے کیا آزمایا ہے؟",  # noqa: E501
+    "ar": "يمكننا العمل على هذا معا، لكن ليست لدي فكرة سريعة الآن. ما الذي جربته حتى الآن؟",  # noqa: E501
+}
+
+
+# Spec v1.6 19.6: never "those are all the ideas" and never a promise to stop. When the ideas are
+# used up or were rejected, ask what they tried and what happened (or the one fact that finds the
+# cause);
+# the quote is offered only where R1 to R3 or B1 to B7 allow it (brain_offer).
+NO_MORE_IDEAS = {  # noqa: E501
+    "en": "What happened with the ideas so far?",  # noqa: E501
+    "roman_ur": "Ab tak in ideas ke saath kya hua?",  # noqa: E501
+    "ur": "اب تک ان خیالات کے ساتھ کیا ہوا؟",  # noqa: E501
+    "ar": "ماذا حدث مع هذه الأفكار حتى الآن؟",  # noqa: E501
+}
+NO_IDEA_AGAIN = {  # noqa: E501
+    "en": "Let me work from what you have told me. Which part of this costs you the most right now?",  # noqa: E501
+    "roman_ur": "Main aap ki baat se aage chalta hoon. Is mein se kaun sa hissa abhi aap ko sab se zyada nuksan de raha hai?",  # noqa: E501
+    "ur": "آپ کی بتائی ہوئی بات کو سامنے رکھتے ہوئے: اس میں سے کون سا حصہ اس وقت آپ کو سب سے زیادہ نقصان دے رہا ہے؟",  # noqa: E501
+    "ar": "سأكمل مما أخبرتني به. أي جزء من هذا يكلفك أكثر الآن؟",  # noqa: E501
+}
+
+
+NO_IDEA_THIRD = {  # noqa: E501
+    "en": "I hear you asking for a solution. What would a good result look like for you in three months?",  # noqa: E501
+    "roman_ur": "Main samajhta hoon ke aap hal chahte hain. Teen mahine baad aap ke liye acha nateeja kya hoga?",  # noqa: E501
+    "ur": "آپ حل چاہتے ہیں، یہ بات سمجھ آ گئی۔ تین مہینے بعد آپ کے لیے اچھا نتیجہ کیا ہوگا؟",  # noqa: E501
+    "ar": "أفهم أنك تطلب حلاً. كيف تبدو النتيجة الجيدة بالنسبة لك بعد ثلاثة أشهر؟",  # noqa: E501
+}
+
+
+# the three fixed lines above, to tell them apart from a reply the offer may follow (R-ASK: when the
+# offer is appended it is the only question, so a fixed line that asks one gives way to a statement)
+NO_IDEA_FIXED = tuple(
+    line for table in (NO_MORE_IDEAS, NO_IDEA_AGAIN, NO_IDEA_THIRD) for line in table.values()
+)
+
+
+def brain_no_ideas(turn: "ServiceTurn", context: dict[str, Any]) -> None:
+    """They asked for a fix and the industry has no free idea for the problem (no industry yet, or
+    no matching entry): the application says so plainly, in their language, and the offer line
+    follows. The model's own try used to be "Noted. What else is getting in the way?"."""
+    if not (asked_without_ideas(context) or (turn._ideas_rejected and not turn.reply.strip())):
+        return
+    if turn._summary or turn._decision is not None or turn.request_human or turn._free:
+        return
+    if solution_rules.has_safety_referral(turn.reply):
+        return
+    language = fixed_lines.code(context, script=True)  # Urdu script and Arabic have their own lines
+    line = NO_IDEA_LINES.get(language, NO_IDEA_LINES["en"])
+    if (context.get("requirements") or {}).get("tried"):
+        # the record already holds what they tried: never ask it again
+        line = NO_IDEA_AGAIN.get(language, NO_IDEA_AGAIN["en"])
+    # Ideas were already handed over: "I have no quick idea" would be untrue. With the expert
+    # advisor that is per problem: a different problem the owner has just started is not "those
+    # are all the ideas" because another problem used up its two (the business's eight still are).
+    had_ideas = (
+        getattr(turn, "_problem_capped", False)
+        if context.get("expert_on")
+        else int(context.get("ideas_given") or 0) > 0
+    )
+    if had_ideas or context.get("solution_why") in ("budget", "none_left"):
+        line = NO_MORE_IDEAS.get(language, NO_MORE_IDEAS["en"])
+        if (
+            context.get("box_offer")
+            and (
+                system_ask.open_ask(context.get("brief"))
+                or box_signals.asks_who_or_how_long(
+                    str(context.get("latest_customer_message") or "")
+                )
+            )
+            and box_offer_allowed(context)
+        ):
+            # the owner asked whether Workzap will do all of it: no "those are all the ideas" dead
+            # end; what was heard, then brain_offer adds the one question (the offer, R3)
+            heard = system_ask.HEARD_LINES.get(language, system_ask.HEARD_LINES["en"])
+            turn.reply = with_disclosure(heard, context, language)
+            after_fixed_reply(turn, context)
+            turn.awaiting_customer = True
+            return
+    told = [
+        str(h.get("text") or "") for h in (context.get("history") or []) if h.get("role") == "ai"
+    ]
+    if any(line in said for said in told[-6:]):
+        line = NO_IDEA_AGAIN.get(language, NO_IDEA_AGAIN["en"])  # not the same words twice
+        if any(line in said for said in told[-6:]):
+            line = NO_IDEA_THIRD.get(language, NO_IDEA_THIRD["en"])
+    turn.reply = with_disclosure(line, context, language)
+    context["fixed_no_idea"] = True  # an honest fixed line: the next-step rewrite leaves it whole
+    after_fixed_reply(turn, context)
+    turn.awaiting_customer = True
+
+
+MENTIONS_DOCUMENT = re.compile(r"document|وثيقة|مستند|دستاویز", re.IGNORECASE)
+
+
+HOWTO_LINES = {
+    "en": "The detail is in the solution document.",
+    "roman_ur": "Is ki tafseel solution document mein hogi.",
+    "ar": "التفاصيل في وثيقة الحل.",
+}
+NO_APP_LINES = {
+    "en": "I don't recommend specific apps.",
+    "roman_ur": "Main kisi khaas app ka mashwara nahi deta.",
+    "ar": "لا أوصي بتطبيق محدد.",
+}
+
+
+def brain_howto(turn: "ServiceTurn", context: dict[str, Any]) -> None:
+    """They asked "how exactly?", "step by step" or "which app?" (Addendum 1.4): the detail is the
+    solution document, named by what it covers, with no steps and no tool. The model's own words
+    here kept going wrong on a real-model sweep over every industry ("noted, anything else?",
+    steps and fields named, a capability invented), so the application always writes this answer;
+    the offer follows from brain_offer and the language step translates it."""
+    howto = context.get("solution_howto")
+    if not howto:
+        return
+    if turn._summary or turn._decision is not None or turn.request_human or turn._free:
+        return
+    if solution_rules.has_safety_referral(turn.reply):
+        return
+    language = str(context.get("reply_language") or "en")
+    line = HOWTO_LINES.get(language, HOWTO_LINES["en"])
+    if howto.get("which_app"):
+        line = f"{NO_APP_LINES.get(language, NO_APP_LINES['en'])} {line}"
+    turn.reply = with_disclosure(line, context, language)
+    after_fixed_reply(turn, context)
+    # written in the person's own language where there is a line for it: an English line next to the
+    # Roman Urdu offer is a mixed reply the language check refuses (a real-model run lost the turn)
+    turn._english = language not in HOWTO_LINES
+    turn.awaiting_customer = True
+
+
+PROMISED_DOCUMENT = re.compile(
+    r"(?:document|quote).{0,80}(?:tayy?ar|ready|prepare ho|banega|banay ?ga|banwa|bhej"
+    r"|ban(?:ne|a) (?:jayega|diya)"
+    r"|will be|is being|being prepared|on its way)"
+    r"|(?:maine|i(?:'ve| have) asked).{0,60}(?:document|quote)",
+    re.IGNORECASE | re.DOTALL,
+)
+PROMISED_UPDATE = re.compile(
+    r"(?:update|jawab|nateeja|khabar|reply)\s+(?:\w+\s+){0,3}"
+    r"(?:aayega|ayega|milega|bheja jayega|bhej dunga)"
+    r"|(?:will|i'll|i will) (?:send|share|post) (?:an? )?update",
+    re.IGNORECASE,
+)
+CONDITIONAL = re.compile(r"\b(?:jab|once|when|after|agar|if|tab)\b", re.IGNORECASE)
+
+
+def brain_no_early_promise(turn: "ServiceTurn", context: dict[str, Any]) -> None:
+    """Before the offer was made and accepted, the document is never promised ("the document and
+    quote will be prepared"): a reply that does is replaced by the offer itself when something is
+    noted (the next explicit yes then goes through the gate), else by what pi may say while it
+    listens."""
+    if turn._summary or turn._decision is not None or turn.request_human:
+        return
+    if (context.get("flow") or {}).get("state") not in solution_ask.OFFERABLE:
+        return
+    promised = PROMISED_DOCUMENT.search(turn.reply) or PROMISED_UPDATE.search(turn.reply)
+    if not promised or CONDITIONAL.search(turn.reply):
+        return
+    if solution_ask.already_offers(turn.reply):
+        return
+    language = str(context.get("reply_language") or "en")
+    created = [op for op in turn.problem_ops if op.op == "create"]
+    if (context.get("noted_problems") or created) and box_offer_allowed(context):
+        turn.reply = with_disclosure(solution_ask.offer_line(language, context), context, language)
+        after_fixed_reply(turn, context)
+        turn._decision = decisions.Decision(
+            None, flow.State.S5_READINESS, {"offer_asked": True}, why="R-OFFER-01"
+        )
+    else:
+        invite = constitution.FIRST_INVITE if not context.get("noted_problems") else None
+        table = invite or constitution.FALLBACK_LISTENING
+        turn.reply = with_disclosure(table.get(language, table["en"]), context, language)
+        after_fixed_reply(turn, context)
+    turn.awaiting_customer = True
+
+
+def brain_never_empty(turn: "ServiceTurn", context: dict[str, Any]) -> None:
+    """Brain mode never stores or sends an empty reply (a real-model sweep ended 14 chats on one
+    after a "how exactly?" or a solution ask): a person who asked for a fix gets the honest 'no idea
+    I can give here' line and the offer when something is noted; otherwise the safe line."""
+    if turn.reply.strip() or turn.request_human or turn._decision is not None or turn._summary:
+        return
+    said = str(context.get("latest_customer_message") or "")
+    language = str(context.get("reply_language") or "en")
+    line = constitution.safe_fallback(context)
+    if (solution_ask.asked_howto(said) or solution_ask.asked_for_ideas(said)) and context.get(
+        "noted_problems"
+    ):
+        line = f"{NO_IDEA_LINES.get(language, NO_IDEA_LINES['en'])}"
+        if box_offer_allowed(context):
+            if not solution_ask.already_offers(line):
+                line = line + chr(10) + chr(10) + solution_ask.offer_line(language, context)
+            turn._decision = decisions.Decision(
+                None, flow.State.S5_READINESS, {"offer_asked": True}, why="R-OFFER-01"
+            )
+    turn.reply = with_disclosure(line, context, language)
+    after_fixed_reply(turn, context)
+    turn.awaiting_customer = True
+    turn._english = language not in ("en", "roman_ur", "ar")
+
+
+# Idea lines as pi writes them: "First, ...", "Second, ...", "Pehle, ...", "Doosra, ..." (a line of
+# its own, so a sentence that merely contains the word is not one).
+IDEA_LINES = re.compile(r"(?mi)^\s*(?:(?:first|second|pehle|doosra|dusra)\b[,:]|•\s)")
+
+
+def box_offer_allowed(context: dict[str, Any]) -> bool:
+    """May pi start the whole-set offer now? With the Solution Box on (Book 5, 5.4 and 10.9) only
+    when R1 to R3 or B1 to B7 hold. With it off (the legacy path) there is no readiness data, so
+    only the exception R1 holds: the owner asked for the document, quote or price in this message
+    (audit R8: an unconditional offer came at the fourth problem with the map unreviewed)."""
+    said = str(context.get("latest_customer_message") or "")
+    asked = (
+        decisions.asks_for_document(said)
+        or part19.opens_the_offer_by_quote_phrase(said)
+        or part19.asks_price(said)
+    )
+    if not context.get("box_offer"):
+        return asked
+    return box.can_offer(box.offer_facts(context, asked_for_document=asked))[0]
+
+
+def strip_unallowed_offer(turn: "ServiceTurn", context: dict[str, Any]) -> None:
+    """canOffer decides what is written, not only what the application adds: an offer line a model
+    wrote itself (or one carried in the reply) is cut when R1 to R3 / B1 to B7 do not hold. The
+    offer is the last sentence or paragraph, so only that tail goes. "You can say no" is always
+    removed (18.3)."""
+    if turn._summary or turn._decision is not None or not turn.reply:
+        return
+    reply = reply_gates.without_say_no(turn.reply)
+    turn.reply = reply
+    if solution_ask.already_offers(reply) and not box_offer_allowed(context):
+        body = reply.rstrip()
+        cut = max((m.end() for m in re.finditer(r"[.!?؟]\s+|\n+", body)), default=0)
+        if cut and body[:cut].strip():
+            turn.reply = body[:cut].rstrip()
+    turn.reply = reply_gates.without_say_no(turn.reply)
+
+
+def brain_offer(turn: "ServiceTurn", context: dict[str, Any]) -> None:
+    """After free ideas on request, or a "how exactly?" answer, the application makes the offer
+    itself and moves the chat to S5 (Part 1.4 and 1.6), so a later "haan" goes through the
+    explicit-yes gate. The model never writes the offer."""
+    if context.get("map_incomplete"):
+        return
+    if turn._summary or turn._decision is not None:
+        return
+    state = (context.get("flow") or {}).get("state")
+    language = str(context.get("reply_language") or "en")
+    # The offer follows a request for a fix, a "how exactly?" and a request no idea could meet; a
+    # follow-up on earlier ideas or "I did not try them" gets no offer.
+    if not (
+        context.get("solution_asked")
+        or "solution_howto" in context
+        or context.get("solution_asked_no_ideas")
+        or context.get("open_ask")
+        # R3 (spec 5.4): who would do it, how long, can Workzap: answered in a line, then the offer
+        or (
+            context.get("box_offer")
+            and (
+                box_signals.asks_who_or_how_long(str(context.get("latest_customer_message") or ""))
+                or system_ask.open_ask(context.get("brief"))  # asked earlier, not lost since
+            )
+        )
+    ):
+        return
+    created = [op for op in turn.problem_ops if op.op == "create"]
+    if state not in solution_ask.OFFERABLE or not (context.get("noted_problems") or created):
+        return
+    if not box_offer_allowed(context):
+        return  # Book 5, 5.4 and 10.9: ideas were free, the offer waits for R1 to R3 or B1 to B7
+    if getattr(turn, "_need_fact", False):
+        return  # Part 7 idea filter, G39: the "one more fact" question is the only one
+    if not solution_ask.already_offers(turn.reply):
+        if any(line in turn.reply for line in NO_IDEA_FIXED):
+            heard = system_ask.HEARD_LINES.get(language, system_ask.HEARD_LINES["en"])
+            turn.reply = with_disclosure(heard, context, language)
+            after_fixed_reply(turn, context)
+        else:
+            turn.reply = part19.statement_only(turn.reply)  # the offer is the only question
+        offer = solution_ask.offer_line(language, context)
+        turn.reply = f"{turn.reply.rstrip()}\n\n{offer}" if turn.reply.strip() else offer
+    turn.awaiting_customer = True
+    turn._decision = decisions.Decision(
+        None, flow.State.S5_READINESS, {"offer_asked": True}, why="R-OFFER-01"
+    )
+
+
+def brain_decision(turn: "ServiceTurn", context: dict[str, Any]) -> None:
+    """The offer and decision gates (spec 3.8, 5.5): when the person's answer is recognised the
+    reply is pi's fixed line and the move is decided here, never by the model."""
+    state = flow.parse((context.get("flow") or {}).get("state"))
+    if state is None or turn._summary:
+        return
+    noted = context.get("noted_problems") or []
+    known = context.get("brief") or {}
+    facts = {
+        "message_id": context.get("latest_message_id"),
+        # R-OFFER-06: a person who said they are not the decision-maker cannot ask for or approve
+        # a quote (the customer record says so, or they said so in this chat).
+        "can_approve": bool(context.get("can_approve", True)) and not known.get("non_decider"),
+        # The reminder permission question rides on the offer's yes and on "later" (spec 3.9.1).
+        "ask_consent": bool(context.get("followups_enabled"))
+        and known.get("reminder_consent") not in ("granted", "declined")
+        and not known.get("consent_asked"),
+        "business": (context.get("customer_profile") or {}).get("business_name"),
+        "problem_count": len(noted),
+        "group_count": len({p["group"] for p in noted}),
+        "problem_refs": [p["ref"] for p in noted],
+        "chosen_refs": turn.include_refs,
+        "changed": any(op.op != "link" for op in turn.problem_ops),
+        "change_requests": turn.change_requests,
+        "message_kind": context.get("latest_message_kind"),
+        "brief": context.get("brief") or {},
+        "open_quote": context.get("open_quote"),
+        # Book 5: set only when response_rules.brain.box_offer is exactly true.
+        "box_offer": box.offer_facts(context) if context.get("box_offer") else None,
+        # ROFFER07: the quote facts still missing; only when brain.quote_facts is exactly true
+        "quote_missing": quote_facts.missing(context) if context.get("quote_facts") else [],
+    }
+    wants = [str(w) for w in known.get("wants") or []]
+    said_now = str(context.get("latest_customer_message", ""))
+    # 19.2: R1 (quote or price asked) is the ask itself and starts the quote; R3 (ready to buy)
+    # opens the offer (box_signals) and the owner's yes still starts it: no yes is skipped
+    # a price question is answered first and does not start the quote (D-1); only an explicit ask
+    # for the quote does
+    gate = part19.gate_signal(said_now, len(noted) + len(wants))
+    facts["buying_signal"] = gate
+    decision = decisions.decide(
+        state,
+        str(context.get("latest_customer_message", "")),
+        str(context.get("reply_language") or "en"),
+        facts,
+    )
+    if decision is None:
+        return
+    turn._decision = decision
+    if decision.reply:
+        turn.reply = decision.reply
+        after_fixed_reply(turn, context)
+        if gate == "R1" and decision.why == "R-OFFER-03":
+            language = str(context.get("reply_language") or "en")
+            own = "title_local" if language != "en" else "title"
+            items = [str(p.get(own) or p.get("title") or "") for p in noted] + wants
+            more = part19.covers_lines(language, items)
+            turn.reply = f"{turn.reply}\n{more}" if more else turn.reply
+        turn.awaiting_customer = decision.next_state not in (None, flow.State.S6_PREPARING)
+        # Figures pi wrote itself (a quote's number and total) are not a new price.
+        fixed = [ln for ln in decision.reply.splitlines() if any(c.isdigit() for c in ln)]
+        context["fixed_lines"] = [*context.get("fixed_lines", []), *fixed]
+
+
+async def apply_decision(
+    session: AsyncSession,
+    scope: WorkspaceScope,
+    conversation: PiConversation,
+    decision: Any,
+    brief: dict[str, Any],
+) -> None:
+    """Record a decision: brief changes (None removes a key) and what must happen next."""
+    if decision.brief.get("offer_declined"):
+        brief["declines"] = int(brief.get("declines") or 0) + 1
+    for key, value in decision.brief.items():
+        if value is None:
+            brief.pop(key, None)
+        else:
+            brief[key] = value
+    from app.modules.pi import box_lifecycle  # Solution Box lifecycle; a no-op unless box_offer
+    from app.modules.pi.configuration import settings_row as _box_rules
+
+    box_rules = (await _box_rules(session, scope)).response_rules
+    await box_lifecycle.on_decision(session, scope, conversation, decision, brief, box_rules)
+    await memory_ledger.on_decision(session, scope, conversation, decision, box_rules)
+    now = datetime.now(UTC).isoformat()
+    if "request_solution" in decision.effects and conversation.customer_id is not None:
+        book = problems.ProblemBook(session, scope, conversation.customer_id, "en")
+        wanted = set((brief.get("offer") or {}).get("problem_refs") or [])
+        titles = [
+            f"P{p.number} {p.title}"
+            for p in await book.active()
+            if not wanted or problems.short_ref(p.id) in wanted
+        ]
+        brief["offer"] = {**(brief.get("offer") or {}), "at": now}
+        await raise_decision_request(
+            session, scope, conversation, "review_document", "high",
+            "The customer said yes to a solution document and quote for: " + "; ".join(titles),
+        )  # fmt: skip
+    said = conversation.last_message_preview or ""
+    if "emergency" in decision.effects:
+        kind = (decision.brief.get("emergency") or {}).get("kind", "")
+        await raise_escalation(
+            session, scope, conversation, "emergency",
+            f"POSSIBLE EMERGENCY ({kind}): the customer wrote about it. Check the chat now. "
+            "pi told them to call the local emergency number and noted nothing else.",
+            said,
+        )  # fmt: skip
+    if "escalate" in decision.effects:
+        reason = str(decision.brief.get("escalate") or "other")
+        await raise_escalation(
+            session,
+            scope,
+            conversation,
+            reason,
+            escalation_question(reason),
+            said,
+        )
+    if "deletion_request" in decision.effects:
+        await raise_escalation(
+            session,
+            scope,
+            conversation,
+            "deletion_request",
+            escalation_question("deletion_request"),
+            said,
+        )
+    if "request_revision" in decision.effects:
+        changes = (brief.get("revision_requested") or {}).get("changes") or []
+        await raise_decision_request(
+            session, scope, conversation, "review_document", "high",
+            "The customer asked for changes to the quote: " + "; ".join(changes),
+        )  # fmt: skip
+    if "payment_claimed" in decision.effects:
+        paid = await brain_payments.claim(session, scope, conversation)
+        if paid is not None:
+            await raise_decision_request(
+                session, scope, conversation, "approve", "high",
+                f"The customer says they paid quote {(brief.get('approval') or {}).get('quote')}: "
+                "check the account, then confirm the payment.",
+            )  # fmt: skip
+    if "record_approval" in decision.effects:
+        brief["approval"] = {**(brief.get("approval") or {}), "at": now}
+        if conversation.customer_id is not None:
+            from app.modules.pi import learning_solutions_grow
+
+            await learning_solutions_grow.note_build_fit(
+                session, scope, conversation.customer_id, "quote_accepted"
+            )
+        await brain_payments.open_for(
+            session, scope, conversation, str((brief["approval"] or {}).get("quote"))
+        )
+        await raise_decision_request(
+            session, scope, conversation, "approve", "high",
+            f"The customer approved quote {brief['approval'].get('quote')} (confirmed twice).",
+        )  # fmt: skip
+    if "cancel_before_payment" in decision.effects:
+        await raise_decision_request(
+            session, scope, conversation, "other", "high",
+            "The customer cancelled after approving and before payment was confirmed.",
+        )  # fmt: skip
+
+
+async def raise_escalation(
+    session: AsyncSession,
+    scope: WorkspaceScope,
+    conversation: PiConversation,
+    reason: str,
+    question: str,
+    said: str = "",
+) -> None:
+    """A brain escalation (spec 6.6): a ticket of its own kind and priority with the chat's
+    summary, open problems and last 20 messages attached (see pi_saas.requests)."""
+    from app.modules.pi_saas.requests import raise_escalation as raise_ticket
+
+    await raise_ticket(session, scope, conversation, reason, question, said)
+
+
+async def raise_decision_request(
+    session: AsyncSession,
+    scope: WorkspaceScope,
+    conversation: PiConversation,
+    kind: str,
+    priority: str,
+    question: str,
+) -> None:
+    from app.modules.pi_saas.requests import raise_request
+
+    if conversation.customer_id is None:
+        return
+    try:
+        async with session.begin_nested():
+            await raise_request(
+                session,
+                scope,
+                conversation_id=conversation.id,
+                customer_id=conversation.customer_id,
+                kind=kind,
+                question=question,
+                priority=priority,
+            )
+    except DBAPIError:
+        logger.warning("pi_decision_request_skipped", exc_info=True)
+
+
+async def link_floor(session: AsyncSession, scope: WorkspaceScope, customer_id: Any) -> Decimal:
+    """How sure pi must be before it suggests a link for this customer's industry (spec 8.10)."""
+    from app.modules.customers.models import Customer
+    from app.modules.pi import learning_links
+    from app.modules.pi.configuration import settings_row
+
+    customer = await session.get(Customer, customer_id)
+    rules = (await settings_row(session, scope)).response_rules
+    return learning_links.threshold_for(rules, customer.industry_primary if customer else None)
+
+
+async def figure_fix_for(
+    session: AsyncSession, scope: WorkspaceScope, conversation: PiConversation, message: PiMessage
+) -> tuple[str, str] | None:
+    """(wrong, right) when this message corrects a number the owner gave earlier ("not 10, 100")."""
+    body = message.body or ""
+    if not figure_correction.numbers_in(body):
+        return None
+    earlier = await session.scalars(
+        select(PiMessage.body)
+        .where(
+            PiMessage.tenant_id == scope.tenant_id,
+            PiMessage.environment_id == scope.environment_id,
+            PiMessage.conversation_id == conversation.id,
+            PiMessage.direction == "inbound",
+            PiMessage.created_at < message.created_at,
+        )
+        .order_by(PiMessage.created_at.desc())
+        .limit(3)
+    )
+    return figure_correction.numeric_correction(body, [str(t) for t in reversed(list(earlier))])
+
+
+async def owner_text_for(
+    session: AsyncSession, scope: WorkspaceScope, conversation: PiConversation, message: PiMessage
+) -> str:
+    """The owner's own words for judging a cause (L1-1): this message and the earlier customer
+    messages of the chat (a burst is stored message by message, so its earlier parts are here;
+    a voice note's body is its transcript, which is what the owner said). Only text and voice
+    bodies count: image and file descriptions are system English, and pi's own replies never do.
+    Newest 30 at most, oldest first."""
+    stmt = select(PiMessage.body).where(
+        PiMessage.tenant_id == scope.tenant_id,
+        PiMessage.environment_id == scope.environment_id,
+        PiMessage.conversation_id == conversation.id,
+        PiMessage.direction == "inbound",
+        PiMessage.message_type.in_(("text", "audio")),
+    )
+    if message.created_at is not None:
+        stmt = stmt.where(PiMessage.created_at <= message.created_at)
+    rows = [
+        str(t)
+        for t in await session.scalars(stmt.order_by(PiMessage.created_at.desc()).limit(30))
+        if t
+    ]
+    own = message.body if message.message_type in ("text", "audio") and message.body else ""
+    if own and own not in rows:
+        rows.insert(0, str(own))
+    return chr(10).join(reversed(rows))
+
+
+async def note_problems(
+    session: AsyncSession,
+    scope: WorkspaceScope,
+    conversation: PiConversation,
+    message: PiMessage,
+    turn: "ServiceTurn",
+    box_on: bool = False,
+) -> None:
+    """Save the turn's problem ops (brain mode) and move the conversation's state. `box_on`: the
+    Solution Box offer is on, so a problem the owner raised unasked is marked (B5)."""
+    noted = False
+    if conversation.customer_id is not None and problem_fields.withdrawal_said(message.body):
+        # The owner took their cause back: clear it (kept in history) before this turn's
+        # notes are applied, so a new cause in the same message starts fresh.
+        await problems.ProblemBook(
+            session, scope, conversation.customer_id, turn.language
+        ).withdraw_owner_cause(message.id)
+    fix = await figure_fix_for(session, scope, conversation, message)
+    if (turn.problem_ops or fix) and conversation.customer_id is not None:
+        applied = await problems.apply_ops(
+            session,
+            scope,
+            conversation.customer_id,
+            conversation.id,
+            message.id,
+            turn.problem_ops,
+            turn.language,
+            await link_floor(session, scope, conversation.customer_id),
+            figure_fix=fix,
+            owner_text=await owner_text_for(session, scope, conversation, message),
+        )
+        noted = bool(applied.created)
+        if box_on and applied.created:
+            # Box v2 (spec 5.6): a problem after the box was sent starts a new version and the
+            # short "Naya:" list
+            from app.modules.pi import box_lifecycle
+
+            await box_lifecycle.on_new_problems(
+                session, scope, conversation, [str(c.title) for c in applied.created], box_on=True
+            )
+        if (
+            box_on
+            and applied.created
+            and message.created_at is not None
+            and not await box_signals.previous_ai_asked(session, conversation, message.created_at)
+        ):
+            for created in applied.created:
+                created.raised_voluntarily = True  # nobody asked: they brought it up themselves
+        if applied.rejected:
+            logger.warning("pi problem ops skipped", extra={"ops": applied.rejected[:5]})
+    elif conversation.customer_id is not None:
+        # They saw the noted lines and moved on without objecting: those are confirmed.
+        book = problems.ProblemBook(session, scope, conversation.customer_id, turn.language)
+        await book.confirm_drafts(set(), explicit=decisions.summary_ok(message.body or ""))
+    if turn._decision is None and not turn._summary and not turn.request_human:
+        # Spec 4.5 (G47): "ye jorr galat hai", "ye masla hal ho gaya", "pehle ye": done on the map
+        try:
+            async with session.begin_nested():
+                turn.reply, _ = await map_edit.apply(
+                    session,
+                    scope,
+                    conversation,
+                    message,
+                    turn.reply,
+                    str(turn.language or "en"),
+                    box_on=box_on,
+                )
+        except Exception:  # noqa: BLE001
+            logger.warning("pi_map_edit_failed", exc_info=True)
+    brief = dict(conversation.service_brief or {})
+    # Two replies in a row with nothing new noted also bring the summary (spec 3.7).
+    # (counted only once something has been noted, so a vague opening never triggers it)
+    quiet = (
+        int(brief.get("quiet_replies") or 0) + 1 if brief.get("had_problem") and not noted else 0
+    )
+    brief["quiet_replies"] = quiet
+    if noted:
+        brief["had_problem"] = True
+    # R-ASK-02: clarifying questions asked since the last problem was noted
+    asked = turn.reply.rstrip().endswith(("?", "؟")) and not turn._summary
+    brief["clarify_count"] = (
+        0 if noted or turn._summary else int(brief.get("clarify_count") or 0) + (1 if asked else 0)
+    )
+    if turn._summary and conversation.customer_id is not None:
+        brief["quiet_replies"] = 0
+        book = problems.ProblemBook(session, scope, conversation.customer_id, turn.language)
+        brief["summary_count"] = len(await book.active())
+        if getattr(turn, "_summary_at", None) is not None:
+            brief["summary_at"] = turn._summary_at  # 19.7: the clock for "never twice in 10"
+    if turn._asked_shape:
+        brief["industry_asked"] = True
+    if solution_ask.free_rider(brief, message.body or "") and not brief.get("free_rider"):
+        brief["free_rider"] = True  # signal.possible_free_rider: dashboard only (Part 1.5)
+        logger.info(
+            "pi_signal",
+            extra={"signal": "possible_free_rider", "conversation_id": str(conversation.id)},
+        )
+    if turn._decision is not None:
+        await apply_decision(session, scope, conversation, turn._decision, brief)
+    if brief != (conversation.service_brief or {}):
+        conversation.service_brief = brief
+    advance_flow(conversation, turn, noted=noted)
+
+
+def exploration_only(turn: "ServiceTurn") -> None:
+    """Explaining a proposal never authorises tools, a quote or implementation."""
+    turn._exploration = True
+    turn.action = "none"
+    turn.ready_for_team = False
+    turn.proposal_answer = "none"
+    turn.proposal_evidence = ""
+    turn.meeting_requested = False
+    turn.consent = "unchanged"
+    turn.projects = []
+
+
+def advance_flow(conversation: PiConversation, turn: "ServiceTurn", *, noted: bool = False) -> None:
+    """Move the conversation's state after pi's turn. Only the listening loop moves here;
+    offers, documents, approvals and payments move it from their own events."""
+    current = flow.parse(conversation.flow_state)
+    if current is None:
+        return
+    if turn._exploration:
+        conversation.service_brief = {
+            **(conversation.service_brief or {}),
+            "conversation_stage": "solution_exploration",
+            "solution_question_pending": turn.reply.rstrip().endswith(("?", "؟", "？")),
+        }
+        return
+    decided = getattr(turn, "_decision", None)
+    decided_next = decided.next_state if decided is not None else None
+    stays = decided_next == flow.State.X_EMERGENCY
+    if current in (flow.State.X_PAUSED, flow.State.X_EMERGENCY, flow.State.X_OUT_OF_SCOPE) and (
+        not stays and decided_next not in (flow.State.X_BLOCKED, flow.State.X_OUT_OF_SCOPE)
+    ):
+        # They came back (R-MEM-03), or the emergency has passed: listen again.
+        current = flow.advance(current, flow.State.S1_LISTENING)
+        conversation.flow_state = current.value
+        conversation.flow_state_since = datetime.now(UTC)
+    decision = getattr(turn, "_decision", None)
+    if decision is not None:
+        target = decision.next_state or current  # a recognised answer decides the move
+    else:
+        asked = turn.reply.rstrip().endswith(("?", "؟"))
+        target = flow.after_turn(
+            current, asked_question=asked, noted=noted, summary=getattr(turn, "_summary", False)
+        )
+    if target == current:
+        return
+    steps = flow.path(current, target)
+    if not steps:
+        logger.warning("pi flow move refused", extra={"from": current.value, "to": target.value})
+        return
+    state = current
+    for step in steps:  # a turn can take several moves (S0 to S1 to S3); each one is checked
+        state = flow.advance(state, step)
+    conversation.flow_state = state.value
+    conversation.flow_state_since = datetime.now(UTC)
+
+
+def industry_texts(
+    message: PiMessage, rows: list[PiMessage], profile: dict[str, str], brief: Any
+) -> list[str]:
+    """What the customer said about their business, in their own words (never pi's)."""
+    said = [m.body[:600] for m in rows if m.sender_type == "customer" and m.body]
+    said.append(message.body[:600])
+    said += [profile[k] for k in ("business_type", "industry") if profile.get(k)]
+    said.append(brief_words(brief))
+    return [text for text in said if text]
+
+
+def industry_context(
+    customer: Any,
+    texts: list[str],
+    max_chars: int = industry_packs.DEFAULT_BUDGET,
+    categories: Sequence[str] = (),
+    country: str | None = None,
+    latest: str = "",
+    answers: Sequence[str] = (),
+) -> dict[str, Any]:
+    """Pick the customer's industry packs and remember them on their record.
+
+    Packs only change what pi listens for and asks next, never its rules; the stored
+    primary/secondary keep the choice steady between messages. `categories` are the problem
+    categories pi has just noted (the questions and "heard as" phrases then fit them) and
+    `country` the customer's (seasons are shown for it); with nothing noted the questions
+    and phrases rotate through the pack's areas turn by turn.
+    """
+    stored = [k for k in [customer.industry_primary, *(customer.industry_secondary or [])] if k]
+    found = industry_overlap.fuse(
+        industry_packs.detect(texts, known=stored, answers=answers), texts, tuple(stored)
+    )
+    if stored and latest:
+        # The stored trade keeps the choice steady between messages, but a person who now says
+        # plainly that they run a different business ("I own a clothing business") changes it:
+        # the old messages must not outvote what they have just said.
+        fresh = industry_packs.detect(
+            [latest], known=[], answers=[a for a in answers if a == latest]
+        )
+        if (
+            fresh.stated
+            and fresh.primary not in stored
+            and fresh.confidence >= 0.5
+            # clearly stronger than what the statement says about the trade already stored: a line
+            # that also fits the stored pack ("breakage") must not flip it
+            and industry_packs.evidence_score(latest, stored[0])
+            < 0.5 * fresh.scores.get(fresh.primary or "", 0.0)
+        ):
+            found = fresh
+    if not found.industries and not found.overlays:
+        return {}
+    if found.industries and [customer.industry_primary, *customer.industry_secondary] != [
+        found.primary,
+        *found.industries[1:],
+    ]:
+        customer.industry_primary = found.primary
+        customer.industry_secondary = found.industries[1:]
+        customer.industry_confidence = Decimal(str(found.confidence))
+    names = [industry_packs.get_pack(k)["name"] for k in [*found.industries, *found.overlays]]  # type: ignore[index]
+    return {
+        "industry": names,
+        "industry_keys": list(found.industries),
+        "industry_stated": bool(found.stated),
+        "industry_knowledge": industry_packs.prompt_section(
+            found, categories, budget=max_chars, country=country, rotation=len(texts)
+        ),
+    }
+
+
+UNCONFIRMED_TRADE = (
+    "THE OWNER HAS NOT SAID WHAT TRADE THIS IS. Do not name a trade, a product, a machine or a "
+    "customer type, and do not assume any of them (spec G11). Use only what they said. If you "
+    "need to know what they do, ask it openly, in one short question."
+)
+
+
+def unconfirmed_trade(found: dict[str, Any], conversation: PiConversation) -> dict[str, Any]:
+    """Spec 17.3, G11: a trade guessed from weak words is a tool, not a fact. Until the owner has
+    said it, the prompt carries no trade knowledge, only the instruction not to assume one. Once
+    said (or confirmed), that stays on the brief so the knowledge is shown from then on."""
+    brief = dict(conversation.service_brief or {})
+    if found.get("industry_stated") or brief.get("industry_confirmed"):
+        if not brief.get("industry_confirmed"):
+            brief["industry_confirmed"] = True
+            conversation.service_brief = brief
+        return found
+    return {
+        **found,
+        # The guessed trade's name and key go too: the expert persona (`trade_name`), `never_say`
+        # and the sector never-rules read them (Live Audit 5, A53: "boxes", "board", "godown").
+        "industry": [],
+        "industry_keys": [],
+        "industry_unconfirmed": True,
+        "industry_knowledge": UNCONFIRMED_TRADE,
+    }
+
+
+async def industry_context_for(
+    session: AsyncSession,
+    scope: WorkspaceScope,
+    conversation: PiConversation,
+    message: PiMessage,
+    rows: list[PiMessage],
+    profile: dict[str, str],
+    policy: PiSettings,
+    customer: Any = LOOKUP,
+    noted_problems: list[dict[str, Any]] | None = None,
+) -> dict[str, Any]:
+    """The industry knowledge for this turn; empty unless the workspace turned packs on.
+
+    `customer` and `noted_problems` are what prepare_context already read this turn."""
+    if (
+        not (policy.knowledge_config or {}).get("industry_packs")
+        or conversation.customer_id is None
+    ):
+        return {}
+    if isinstance(customer, _Lookup):
+        customer = await customer_for(session, scope, conversation)
+    if customer is None:
+        return {}
+    texts = industry_texts(message, rows, profile, conversation.service_brief)
+    categories: list[str] = []
+    if flow.brain_mode(policy.response_rules):
+        # what was just noted decides which questions and "heard as" phrases are shown
+        noted = (
+            noted_problems
+            if noted_problems is not None
+            else await problems.noted_context(session, scope, conversation.customer_id)
+        )
+        for item in noted:
+            if item.get("group") and item["group"] not in categories:
+                categories.append(item["group"])
+    found = industry_context(
+        customer,
+        texts,
+        categories=categories[-3:],  # the latest few groups
+        country=safety.country_of(customer.phone or customer.whatsapp_id),
+        latest=message.body[:600] if message.body else "",
+        answers=industry_packs.trade_answers(
+            [(m.direction == "outbound", m.body or "") for m in reversed(rows)]
+            + [(False, message.body or "")]
+        ),
+    )
+    if found:
+        found = unconfirmed_trade(found, conversation)
+    if not found and not customer.industry_primary:
+        # Spec 7.O: no pack fits, so keep the person's own description (the nightly run
+        # clusters these into a new pack once five similar businesses have arrived).
+        described = str(profile.get("business_type") or profile.get("industry") or "").strip()
+        said = [m for m in rows if m.sender_type == "customer"]
+        if described and len(said) >= 3:
+            customer.industry_primary = "unclassified"
+            brief = dict(conversation.service_brief or {})
+            brief["industry_description"] = described[:300]
+            conversation.service_brief = brief
+    return found
+
+
+def solution_lint_context(
+    industry: dict[str, Any], policy: PiSettings, conversation: PiConversation
+) -> dict[str, Any]:
+    """What the reply linter needs on EVERY brain reply when solution mode is on: the ideas this
+    chat has already had (the budget check) and the industry's never-say lines (R-NEVER-IND).
+    solution_context overrides these on a turn where it hands ideas over."""
+    rules = policy.response_rules or {}
+    if (
+        rules.get("pi_mode") != "brain"
+        or (rules.get("brain") or {}).get("solution_mode") is not True
+    ):
+        return {}
+    out: dict[str, Any] = {
+        "ideas_given": int((conversation.service_brief or {}).get("ideas_given") or 0)
+    }
+    keys = industry.get("industry_keys") or []
+    if keys:
+        out["solution_never_say"] = solutions.never_say(list(keys[:1]))[:6]
+    return out
+
+
 async def prepare_context(
     session: AsyncSession,
     scope: WorkspaceScope,
     conversation: PiConversation,
     message: PiMessage,
     policy: PiSettings,
+    embedder: Any = None,
 ) -> dict[str, Any]:
-    tools = await ToolRegistry(session).enabled_tools(scope, "requirement")
+    if flow.brain_mode(policy.response_rules) and conversation.customer_id is not None:
+        # S4: a new chat starts with what the owner's earlier chats closed, once, before the closed
+        # slots below are read. A failure never costs the owner their reply.
+        await slot_carry.carry_safely(session, scope, conversation)
+    tools = await latency.timed(
+        "ctx.tools", ToolRegistry(session).enabled_tools(scope, "requirement")
+    )
     rows = list(
-        await session.scalars(
-            WorkspaceRepository(session, PiMessage, scope)
-            .select()
-            .where(
-                PiMessage.conversation_id == conversation.id,
-                PiMessage.id != message.id,
-                # "queued": pi's own reply that is still being sent is part of the chat.
-                PiMessage.status.in_(["processed", "queued", "sent", "delivered", "read"]),
-            )
-            .order_by(PiMessage.created_at.desc(), PiMessage.id.desc())
-            .limit(20)
+        await latency.timed(
+            "ctx.history",
+            session.scalars(
+                WorkspaceRepository(session, PiMessage, scope)
+                .select()
+                .where(
+                    PiMessage.conversation_id == conversation.id,
+                    PiMessage.id != message.id,
+                    # "queued": pi's own reply that is still being sent is part of the chat.
+                    PiMessage.status.in_(["processed", "queued", "sent", "delivered", "read"]),
+                )
+                .order_by(PiMessage.created_at.desc(), PiMessage.id.desc())
+                .limit(20)
+            ),
         )
     )
     offerings = (
         list(
-            await session.scalars(
-                WorkspaceRepository(session, CatalogProduct, scope)
-                .select()
-                .where(CatalogProduct.pi_visible.is_(True), CatalogProduct.status == "active")
-                .order_by(CatalogProduct.name)
-                .limit(40)
+            await latency.timed(
+                "ctx.offerings",
+                session.scalars(
+                    WorkspaceRepository(session, CatalogProduct, scope)
+                    .select()
+                    .where(CatalogProduct.pi_visible.is_(True), CatalogProduct.status == "active")
+                    .order_by(CatalogProduct.name)
+                    .limit(40)
+                ),
             )
         )
         if scope.can("catalog.read") and "search_products" in tools
         else []
     )
-    tenant = await session.get(Tenant, scope.tenant_id)
-    profile, returning = await customer_profile(session, scope, conversation)
+    tenant = await latency.timed("ctx.tenant", session.get(Tenant, scope.tenant_id))
+    # The customer record is read once and shared with the profile, industry and brain steps.
+    customer = await latency.timed("ctx.customer", customer_for(session, scope, conversation))
+    profile, returning = await latency.timed(
+        "ctx.profile", customer_profile(session, scope, conversation, customer)
+    )
     memories = (
         list(
-            await session.scalars(
-                WorkspaceRepository(session, PiMemory, scope)
-                .select()
-                .where(
-                    PiMemory.customer_id == conversation.customer_id, PiMemory.status == "active"
-                )
-                .order_by(PiMemory.created_at.desc())
-                .limit(5)
+            await latency.timed(
+                "ctx.memories",
+                session.scalars(
+                    WorkspaceRepository(session, PiMemory, scope)
+                    .select()
+                    .where(
+                        PiMemory.customer_id == conversation.customer_id,
+                        PiMemory.status == "active",
+                    )
+                    .order_by(PiMemory.created_at.desc())
+                    .limit(5)
+                ),
             )
         )
         if scope.can("pi.memory.read") and "search_customer_memory" in tools
         else []
     )
     knowledge = []
-    features = (await enabled_products(session, scope)).get("pi", set())
+    features = (await latency.timed("ctx.products", enabled_products(session, scope))).get(
+        "pi", set()
+    )
     if "search_knowledge_base" in tools and "knowledge" in features:
         # Match on the conversation, not only the latest line: a short follow-up ("aur
         # price?") still finds what the earlier messages were about.
         recent = [m.body[:400] for m in rows if m.sender_type == "customer"][:2]
         query = " ".join([message.body[:600], *recent, brief_words(conversation.service_brief)])
         library = KnowledgeService(session, scope)
-        knowledge = await library.search(query, int(policy.knowledge_config.get("top_k", 5)))
+        knowledge = await latency.timed(
+            "ctx.knowledge", library.search(query, int(policy.knowledge_config.get("top_k", 5)))
+        )
         if len(knowledge) < 2:
             # Nothing matched well: pi still knows what the company is and does.
             seen = {k["snippet"] for k in knowledge}
-            knowledge += [k for k in await library.overview(2) if k["snippet"] not in seen]
+            knowledge += [
+                k
+                for k in await latency.timed("ctx.knowledge_overview", library.overview(2))
+                if k["snippet"] not in seen
+            ]
     # First names of the company's people, so a message addressed to one is recognised.
     team = sorted(
         {
             (name or "").split()[0]
-            for name in await session.scalars(
-                select(PlatformUser.display_name)
-                .join(Membership, Membership.user_id == PlatformUser.id)
-                .where(Membership.tenant_id == scope.tenant_id, Membership.status == "active")
-                .limit(40)
+            for name in await latency.timed(
+                "ctx.team",
+                session.scalars(
+                    select(PlatformUser.display_name)
+                    .join(Membership, Membership.user_id == PlatformUser.id)
+                    .where(Membership.tenant_id == scope.tenant_id, Membership.status == "active")
+                    .limit(40)
+                ),
             )
             if (name or "").strip()
         }
     )
-    agent = await WorkspaceRepository(session, PiAgent, scope).find(PiAgent.key == "requirement")
-    version = (
-        await WorkspaceRepository(session, PiAgentVersion, scope).find(
-            PiAgentVersion.agent_id == agent.id, PiAgentVersion.version == agent.current_version
-        )
-        if agent
-        else None
+    # The agent and its current version in one round trip (was two: agent, then version).
+    version = await latency.timed(
+        "ctx.agent_version",
+        WorkspaceRepository(session, PiAgentVersion, scope).find(
+            PiAgentVersion.agent_id.in_(
+                select(PiAgent.id).where(
+                    WorkspaceRepository(session, PiAgent, scope).predicate(),
+                    PiAgent.key == "requirement",
+                    PiAgent.current_version == PiAgentVersion.version,
+                )
+            )
+        ),
     )
     bookable: list[dict[str, Any]] = []
     customer_bookings: list[dict[str, str]] = []
@@ -1096,59 +4739,195 @@ async def prepare_context(
             {"booking_id": str(b.id), "label": work.label(b.starts_at, b.timezone)}
             for b in upcoming
         ]
-    return {
-        "bookable_services": bookable,
-        "customer_bookings": customer_bookings,
-        "work_tools": sorted(tools & {"create_ticket", "create_task", "request_payment"}),
-        "payment_methods": await _payment_methods(session, scope, tools),
-        "company": tenant.name if tenant else "",
-        "offerings": [p.name for p in offerings],  # Deliberately no catalog prices.
-        "customer_memory": [m.content for m in memories],
-        "customer_profile": profile,
-        "returning_customer": returning,
-        "approved_knowledge": knowledge,
-        "operator_guidance": version.instructions if version else "",
-        "brief": conversation.service_brief,
-        "conversation_summary": conversation.summary or "",
-        "history": [
-            {
-                "role": m.sender_type,
-                "kind": m.message_type,
-                "at": f"{m.created_at:%Y-%m-%d %H:%M}",
-                "text": (
-                    m.body[:1500]
-                    + ("\n" + link_note(m.media["links"]) if m.media.get("links") else "")
-                ),
-            }
-            for m in reversed(rows)
-        ],
-        "hours_since_previous_message": (
-            round((message.created_at - rows[0].created_at).total_seconds() / 3600, 1)
-            if rows and message.created_at and rows[0].created_at
-            else None
+    # What was noted is read once: the industry step and the brain step both use it.
+    noted = (
+        await latency.timed(
+            "ctx.noted",
+            problems.noted_context(
+                session,
+                scope,
+                conversation.customer_id,
+                box_signals=box.box_offer_enabled(policy.response_rules),
+            ),
+        )
+        if flow.brain_mode(policy.response_rules) and conversation.customer_id is not None
+        else None
+    )
+    # What pi knows about this person, from durable memory (spec 3.10): one small block.
+    known_block: dict[str, Any] = {}
+    known_language: str | None = None
+    last_chat_at: datetime | None = None
+    if flow.brain_mode(policy.response_rules) and conversation.customer_id is not None:
+        known = await latency.timed(
+            "ctx.memory", memory_block.load_safely(session, scope, conversation, customer)
+        )
+        memory_block.merge_profile(known, profile)
+        known_block = memory_block.build(
+            known, list((conversation.service_brief or {}).get("asked_facts") or [])
+        )
+        known_language = known.prefs.get("language")
+        last_chat_at = known.last_chat_at
+    industry = await latency.timed(
+        "ctx.industry",
+        industry_context_for(
+            session,
+            scope,
+            conversation,
+            message,
+            rows,
+            profile,
+            policy,
+            customer=customer,
+            noted_problems=noted,
         ),
-        "latest_message_kind": message.message_type,
-        **await _deal_context(session, scope, conversation),
-        "team_members": team,
-        "latest_customer_message": message.body[:4000],
-        "shared_links": (message.media or {}).get("links") or [],
-        "shared_documents": shared_documents(message, rows),
-        "team_notes": await _team_notes(session, scope, conversation.id),
-        **reply_language(conversation, message, rows),
-        "tone": policy.response_rules.get("tone", "friendly"),
-        "now_local": _now_local(policy.timezone),
-        "feedback_for": ((conversation.service_brief or {}).get("awaiting_feedback") or {}).get(
-            "project", ""
+    )
+    brain = await latency.timed(
+        "ctx.brain",
+        brain_problems(
+            session,
+            scope,
+            conversation,
+            policy,
+            bool(industry),
+            message,
+            rows,
+            embedder,
+            noted_problems=noted,
+            customer=customer,
+            last_chat_at=last_chat_at,
         ),
-        "meeting_over": meeting_over(
-            conversation.service_brief or {},
-            await _team_notes(session, scope, conversation.id),
-            policy.timezone,
-            datetime.now(UTC),
-        ),
-        "google_meet_ready": await _meet_ready(session, scope),
-        "followups_enabled": policy.whatsapp_config.get("reminder_enabled", True),
-    }
+    )
+    # read once, used twice below
+    team_notes = await latency.timed("ctx.team_notes", _team_notes(session, scope, conversation.id))
+    # Book 5: the move behind each of pi's earlier messages, only when thinking is on
+    move_of = (
+        await latency.timed("ctx.moves", think_plan.recent_safely(session, scope, conversation.id))
+        if think_prompt.enabled(policy.response_rules)
+        else {}
+    )
+    last_ai = next((m for m in rows if m.sender_type == "ai"), None)
+    if (
+        think_prompt.enabled(policy.response_rules)
+        and last_ai is not None
+        # pi's last message is the one the owner is answering (nothing of theirs came after it)
+        and not any(m.sender_type == "customer" and m.created_at > last_ai.created_at for m in rows)
+    ):
+        # the owner's reply updates the hypothesis ledger: evidence for or against, a hypothesis
+        # left unanswered marked ignored, confirmed only by an explicit owner yes (never by pi)
+        await latency.timed(
+            "ctx.hypotheses",
+            think_plan.reflect_safely(
+                session,
+                scope,
+                conversation.id,
+                previous_ai=last_ai.body or "",
+                previous_move=move_of.get(str(last_ai.id)),
+                said=message.body or "",
+            ),
+        )
+    return hold.clear_solutions(
+        {
+            # First, so its place in the prompt never moves.
+            **({"what_i_know": known_block} if known_block else {}),
+            **industry,
+            **solution_lint_context(industry, policy, conversation),
+            **brain,
+            "bookable_services": bookable,
+            "customer_bookings": customer_bookings,
+            "work_tools": sorted(tools & {"create_ticket", "create_task", "request_payment"}),
+            "payment_methods": await latency.timed(
+                "ctx.payments", _payment_methods(session, scope, tools)
+            ),
+            "company": tenant.name if tenant else "",
+            "offerings": [p.name for p in offerings],  # Deliberately no catalog prices.
+            "customer_memory": [m.content for m in memories],
+            "customer_profile": profile,
+            "returning_customer": returning,
+            "approved_knowledge": knowledge,
+            "operator_guidance": version.instructions if version else "",
+            "brief": {
+                k: v
+                for k, v in (conversation.service_brief or {}).items()
+                if k
+                not in (
+                    "free_rider",
+                    "howto_asked",
+                    "declines",
+                    "asked_facts",
+                    "closed_slots",
+                    "last_question",
+                    "open_requests",
+                    "map_awaiting",
+                    "expert_diag",
+                    "expert_given",
+                    "expert_given_elsewhere",
+                    "ideas_elsewhere",
+                    "owner_n",
+                    "owner_n_id",
+                    "slot_carry_done",
+                )
+            },
+            # Requests left unanswered last turn, to answer first (R-ANS-03).
+            **(
+                {"open_requests": open_left}
+                if (open_left := (conversation.service_brief or {}).get("open_requests"))
+                else {}
+            ),
+            # Questions already answered, kept across sessions and languages (R-ASK-07). The
+            # question
+            # asked last turn counts as answered by what they say now, before the turn is saved.
+            **(
+                {"closed_slots": closed_slots}
+                if (
+                    closed_slots := slots.advance(
+                        conversation.service_brief or {}, message.body or "", "", ""
+                    )[0]
+                )
+                else {}
+            ),
+            "conversation_summary": conversation.summary or "",
+            "history": [
+                {
+                    "role": m.sender_type,
+                    "kind": m.message_type,
+                    "at": f"{m.created_at:%Y-%m-%d %H:%M}",
+                    **({"move": move_of[str(m.id)]} if str(m.id) in move_of else {}),
+                    "text": (
+                        m.body[:1500]
+                        + ("\n" + link_note(m.media["links"]) if m.media.get("links") else "")
+                    ),
+                }
+                for m in reversed(rows)
+            ],
+            "hours_since_previous_message": (
+                round((message.created_at - rows[0].created_at).total_seconds() / 3600, 1)
+                if rows and message.created_at and rows[0].created_at
+                else None
+            ),
+            "latest_message_kind": message.message_type,
+            **await latency.timed("ctx.deals", _deal_context(session, scope, conversation)),
+            "team_members": team,
+            "latest_customer_message": message.body[:4000],
+            "shared_links": (message.media or {}).get("links") or [],
+            "shared_documents": shared_documents(message, rows),
+            "team_notes": team_notes,
+            **reply_language(conversation, message, rows, known_language),
+            "tone": policy.response_rules.get("tone", "friendly"),
+            **brain_context(policy, conversation, rows, message),
+            "now_local": _now_local(policy.timezone),
+            "feedback_for": ((conversation.service_brief or {}).get("awaiting_feedback") or {}).get(
+                "project", ""
+            ),
+            "meeting_over": meeting_over(
+                conversation.service_brief or {},
+                team_notes,
+                policy.timezone,
+                datetime.now(UTC),
+            ),
+            "google_meet_ready": await latency.timed("ctx.meet", _meet_ready(session, scope)),
+            "followups_enabled": policy.whatsapp_config.get("reminder_enabled", True),
+        }
+    )
 
 
 # "I'll review the video and get back to you": a promise pi can't keep.
@@ -1241,6 +5020,31 @@ def claims_meeting(reply: str) -> bool:
     )
 
 
+NOTED_CLAIM = re.compile(
+    r"\b(?:i(?:'ve| have) (?:noted|added|got) (?:it|this|that)|noted it:|note kar liya|"
+    r"maine note (?:kar )?li(?:ya)?|"
+    r"(?:thanks|shukriya|ok(?:ay)?|ji)[,.]? (?:that's|thats|it's) noted|"
+    r"(?:that's|thats) noted|shukriya,? noted)",
+    re.IGNORECASE,
+)
+
+
+def noted_without_problem(turn: Any) -> str:
+    """pi says it noted a problem but the turn recorded none (a false claim: nothing is saved,
+    so nothing reaches the summary, the document or the team). "" when the claim is true."""
+    if not NOTED_CLAIM.search(turn.reply or ""):
+        return ""
+    ops = [op for op in turn.problem_ops or [] if getattr(op, "op", "") in ("create", "update")]
+    if ops:
+        return ""
+    return (
+        "it says it noted a problem, but problem_ops is empty so nothing was recorded: either "
+        "record the problem they described (what hurts today, in their words: op create with a "
+        "title, user_words and a category) or do not say you noted it. A request for a product "
+        "still has a problem behind it (a cost, a delay, a manual job): note that"
+    )
+
+
 def invented(reply: str, context: dict[str, Any], booked: bool = False) -> str:
     """What in a draft pi made up: a placeholder, a link nobody gave it, or a meeting it
     says is confirmed when no booking or team answer says so. "" when nothing."""
@@ -1314,12 +5118,99 @@ def looks_foreign(text: str) -> bool:
     return bool(re.search(r"[À-ÖØ-öø-ÿ]", text) or FOREIGN_WORDS.search(text))
 
 
+# A media message's body can be "Customer caption: ...\nAttachment: ...": the labels are system
+# English, never the customer's language.
+CAPTION_LABELS = re.compile(r"^Customer caption: |\nAttachment: .*$", re.S)
+# R-LANG-09 (Book 2 10.3): a short or ambiguous message is the same in both languages, so it keeps
+# the chat's language: yes/no/ok, "haan", "theek hai", "thanks", a number or an emoji.
+_SHORT_WORDS = (
+    "no|nope|nah|yes|yeah|yep|ok|okay|k|sure|hmm+|hm+|haan|han|ha|ji|jee|g|nahi|nahin|nhi|nai|"
+    "theek|thik|hai|acha|accha|bilkul|zaroor|shukriya|thanks|thank|you|please|pls|done|bas|"
+    "right|fine|good|alright|ah+|oh+|hi|hello|hey|hii+|helo|"
+    # the same short answers in the other languages pi serves (R-LANG-09)
+    "نعم|لا|تمام|أكيد|ايوه|شكرا|ہاں|جی|نہیں|ٹھیک|شکریہ|हाँ|हां|नहीं|ठीक|जी|धन्यवाद|"
+    "باشه|آره|نه|بله|خوب|مرسی|oui|non|d'accord|merci|s[ií]|vale|gracias|iya|ya|tidak|oke|"
+    "makasih|terima kasih|evet|hay[ıi]r|tamam|te[şs]ekk[üu]rler|olur|ja|nein|danke|gut|"
+    "好|是|不|行|可以|谢谢|嗯|好的"
+)
+AMBIGUOUS_SHORT = re.compile(rf"^\W*(?:(?:{_SHORT_WORDS})(?!\w)\W*){{1,3}}$", re.IGNORECASE)
+
+
+def _code_mixed(text: str) -> bool:
+    """Roman Urdu with English words in it: at least one Urdu word and at most one more English
+    word than Urdu ones (a plain English message has no Urdu word)."""
+    words = LATIN_WORD.findall(text.lower())
+    urdu = sum(word in ROMAN_URDU for word in words)
+    english = sum(word in ENGLISH for word in words)
+    return urdu >= 1 and english - urdu <= 1
+
+
+def requested_language(conversation: Any, ask: str | None, declared: list[str]) -> dict[str, str]:
+    """What the owner asked for ("talk in Italian", "فارسی بگو", "go back to English") or said they
+    can read ("just pashto and dari"). A language pi can write is remembered for the chat and drives
+    every reply, fixed lines included. A language it cannot write well (Pashto) is never claimed:
+    the context says so (`language_unsupported`) and pi answers in the first language it can write
+    that the owner named, else in English with an honest line."""
+    names = [ask] if ask else declared
+    brief = dict(getattr(conversation, "service_brief", None) or {})
+
+    def keep(name: str | None) -> None:
+        if conversation is None:
+            return
+        if name:
+            brief["requested_language"] = name
+        else:
+            brief.pop("requested_language", None)
+        conversation.service_brief = brief
+
+    if ask == "English":
+        keep(None)
+        return {"reply_language": "en", "reply_language_name": NAMES["en"]}
+    unsupported = next((n for n in names if n in UNWRITABLE), "")
+    writable = next((n for n in names if n not in UNWRITABLE), "")
+    result: dict[str, str] = {}
+    if writable:
+        keep(writable)
+        result["reply_language_other"] = writable
+    else:
+        result.update({"reply_language": "en", "reply_language_name": NAMES["en"]})
+    if unsupported:
+        result["language_unsupported"] = unsupported
+    return result
+
+
+def requested_still_holds(text: str, requested: str) -> bool:
+    """The remembered request still drives this message unless it is plainly written in another
+    script the owner switched to (Urdu, Arabic, Persian letters when Italian was asked for)."""
+    own = other_script(text)
+    if own and own != requested:
+        return False
+    return detect_language(text) not in ("ur", "ar") or requested == "Urdu"
+
+
 def reply_language(
-    conversation: PiConversation, message: PiMessage, rows: list[PiMessage]
+    conversation: PiConversation,
+    message: PiMessage,
+    rows: list[PiMessage],
+    remembered: str | None = None,
 ) -> dict[str, str]:
     """The language pi must answer in, from the customer's own latest words. Image and
     file descriptions are system English, so those fall back to the customer's last text."""
     texts = [message.body] if message.message_type in ("text", "audio") else []
+    brief = getattr(conversation, "service_brief", None) or {}
+    requested = str(brief.get("requested_language") or "")
+    if texts:
+        ask = asked_language(texts[0])
+        if not ask and asks_for_english(texts[0]):
+            ask = "English"
+        declared = [] if ask else declared_languages(texts[0])
+        if ask or declared:
+            return requested_language(conversation, ask, declared)
+        if requested and requested_still_holds(texts[0], requested):
+            # one request drives every later reply of the chat until another language is asked for
+            return {"reply_language_other": requested}
+        if (other := latin_other(texts[0])) and other not in UNWRITABLE:
+            return {"reply_language_other": other}  # evident Latin-script language (Italian ...)
     if (
         texts
         and not detect_language(texts[0])
@@ -1327,13 +5218,63 @@ def reply_language(
         and looks_foreign(texts[0])
     ):
         return {}  # A real message in another language (e.g. Spanish): the model matches it.
-    texts += [m.body for m in rows if m.sender_type == "customer" and m.message_type == "text"]
+    # A voice note's body is its transcript: their own words, so it counts like a text.
+    texts += [
+        CAPTION_LABELS.sub("", m.body)
+        for m in rows
+        if m.sender_type == "customer" and m.message_type in ("text", "audio") and m.body
+    ]
+    for earlier in texts[:3]:
+        if other := latin_other(earlier):
+            return {"reply_language_other": other}  # Indonesian and the like, in Latin letters
+        if detect_language(earlier):
+            break
+        if other := other_script(earlier):
+            return {"reply_language_other": other}
+    if (
+        texts
+        and english_greeting(texts[0])
+        and sum(detect_language(t) == "roman_ur" for t in texts[1:6]) < 2
+    ):
+        # "hi", "hello", "good morning" on their own are English unless this chat has already been
+        # in Roman Urdu for a while, whatever language was remembered from elsewhere: otherwise
+        # "hi" answers in Roman Urdu and "hello" in English.
+        return {"reply_language": "en", "reply_language_name": NAMES["en"]}
+    detected = [detect_language(t) for t in texts[:3]]
+    if texts and AMBIGUOUS_SHORT.match(texts[0]):
+        detected[0] = None  # R-LANG-09: "no", "ok", "haan", "theek hai" never switch the language
+    # A very short English-looking answer ("Yes all", "Not well") inside a Roman Urdu chat
+    # follows the chat: English words alone do not switch the language (R-VOICE-04).
+    if (
+        detected
+        and detected[0] == "en"
+        and len(re.findall(r"[^\W\d_]+", texts[0])) <= 3
+        and "roman_ur" in detected[1:]
+    ):
+        detected[0] = None
+    # The same for an earlier short English fragment ("warehouse and outlets") that sits between the
+    # latest ambiguous message ("poore sets") and the Roman Urdu one: it never decides the language
+    # (live test 6).
+    for index in range(1, len(detected)):
+        if (
+            detected[index] == "en"
+            and len(re.findall(r"[^\W\d_]+", texts[index])) <= 3
+            and "roman_ur" in detected
+        ):
+            detected[index] = None
+    # A code-mixed message ("Dono mai whatsapp and instagram but mostly instagram") that has a Roman
+    # Urdu word and about as many English words as Urdu ones follows the chat's Roman Urdu too.
+    if detected and detected[0] == "en" and "roman_ur" in detected[1:] and _code_mixed(texts[0]):
+        detected[0] = None
     language = next(
-        (found for found in map(detect_language, texts[:3]) if found),
-        # Nothing clear in their recent messages ("ok", an emoji, a link): English, the
-        # main language. pi never picks another language on its own.
-        "en",
+        (found for found in detected if found),
+        # Nothing clear in their recent messages ("ok", an emoji, a link): the language they
+        # used in an earlier chat (their own, remembered), else English, the main language.
+        # pi never picks another language on its own.
+        remembered if remembered in NAMES else "en",
     )
+    if language == "ur":  # Urdu script is answered in Urdu script (spec 2.5, G7)
+        return {"reply_language_other": "Urdu", "reply_language_name": NAMES["Urdu"]}
     return {"reply_language": language, "reply_language_name": NAMES[language]} if language else {}
 
 
@@ -1445,6 +5386,27 @@ def _sentences(text: str) -> list[str]:
     ]
 
 
+def brain_rewrite_request(problem: str) -> str:
+    """The rewrite request in brain mode: only the fault, no instructions from the older brief
+    flow (they made the model answer the instruction instead of the customer)."""
+    return (
+        f"Don't send that draft: {problem}. Write the whole result again for the customer's "
+        "latest message, fix only that, and keep every other rule in the system prompt: one "
+        "question at most and last, no filler about these instructions, and keep the ideas, "
+        "problem notes and facts the context gives you."
+    )
+
+
+def reply_alias(policy: Any) -> str:
+    """The model alias for pi's replies. The default "balanced" becomes the "pi_brain" model in
+    brain mode (a stronger one than the shared default: it has to follow a long rule prompt); any
+    other alias a workspace chose is kept."""
+    chosen = str(policy.ai_config.get("reply_alias") or "balanced")
+    if chosen == "balanced" and flow.brain_mode(policy.response_rules):
+        return "pi_brain"
+    return chosen
+
+
 def repeats_itself(reply: str, context: dict[str, Any]) -> str | None:
     """A sentence pi already wrote in one of its last three replies, or "Shall I send
     this to the team?" asked again while the customer hasn't answered it."""
@@ -1525,7 +5487,7 @@ SEND_TO_TEAM = re.compile(
 )
 
 
-THEIR_TEAM = re.compile(r"(?:my|our|meri|hamari|apni) team", re.IGNORECASE)
+THEIR_TEAM = re.compile(r"\b(?:my|our|meri|hamari|apni) team\b", re.IGNORECASE)
 
 
 def agreed_to_send(turn: "ServiceTurn", context: dict[str, Any]) -> list[str]:
@@ -1644,8 +5606,8 @@ def _norm(text: str) -> str:
 
 def without_repeats(reply: str, context: dict[str, Any]) -> str:
     """The reply minus what pi already sent in its last three replies (a whole repeated
-    line or sentence, and a "You want:" heading left with nothing under it). Unchanged
-    when nothing new would be left."""
+    line or sentence, and a "You want:" heading left with nothing under it). Empty
+    when nothing new would be left, so the caller cannot resend the original."""
     earlier = [
         str(h.get("text", "")) for h in (context.get("history") or []) if h.get("role") == "ai"
     ][-3:]
@@ -1669,7 +5631,7 @@ def without_repeats(reply: str, context: dict[str, Any]) -> str:
             continue
         out.append(line)
     cleaned = re.sub(r"\n{3,}", "\n\n", "\n".join(out)).strip()
-    return cleaned if len(cleaned.split()) >= 3 else reply
+    return cleaned if len(cleaned.split()) >= 3 else ""
 
 
 def contradicts_itself(reply: str, context: dict[str, Any]) -> str | None:
@@ -1697,12 +5659,15 @@ def contradicts_itself(reply: str, context: dict[str, Any]) -> str | None:
     return None
 
 
+BULLETS = (chr(8226), chr(183), "- ", "* ")  # list lines hold the person's own words
+
+
 def mixed_line(reply: str, expected: str) -> str | None:
     """An English reply with a Roman Urdu line in it (or the other way round)."""
     if expected not in ("en", "roman_ur"):
         return None
     for line in re.split(r"(?<=[.!?])\s+|\n", reply):
-        if len(line.split()) < 4:
+        if len(line.split()) < 4 or line.lstrip().startswith(BULLETS):
             continue
         found = detect_language(line)
         if found in ("en", "roman_ur") and found != expected:
@@ -1788,6 +5753,45 @@ EMPTY_PROMISE = re.compile(
     r"(?:get back|shortly|moment|soon)|\bget back to you\b",
     re.IGNORECASE,
 )
+
+
+def part18_problem(reply: str, context: dict[str, Any]) -> str | None:
+    """Spec v1.5, Part 18 checks on a drafted reply: openingGate (18.2), noEmptyOpener (18.8) and a
+    closed list of areas before the business is known (18.5). None when the reply may go."""
+    owner = [
+        *(str(t) for t in context.get("burst_texts") or []),
+        str(context.get("latest_customer_message") or ""),
+    ]
+    profile = (context.get("brief") or {}).get("business_profile") or {}
+    skipped = ((context.get("brief") or {}).get("warmup") or {}).get("step") == warmup.SKIPPED
+    known = bool(profile.get("facts")) or skipped  # a first message with content: no identity ask
+    found = [
+        reply_gates.opening_problem(reply, context, known),
+        reply_gates.empty_opener(reply),
+        reply_gates.closed_list_early(reply, owner, known),
+        part19.dead_end(reply),  # spec v1.6 19.6
+        part19.number_used(reply, owner[-1] if owner else ""),  # spec v1.6 19.5
+        spec_rules2.assumed_industry(reply, context),  # spec v1.6 G11 noAssumedIndustry
+        spec_rules2.know_business_problem(reply, context),  # spec v1.6 19.3 DQ1
+        spec_rules2.correction_not_owned(reply, context),  # spec v1.6 18.8 EO2
+        listening_tidy.settled_cause(reply),
+        (
+            "it asks something the owner already answered or asked them to pick one: use what they "
+            "said and ask what is unknown"
+            if listening_tidy.answered_questions(reply, owner_texts_of(context))
+            else None
+        ),
+    ]
+    if context.get("fact_ask"):  # off unless the workspace sets brain.fact_ask to true
+        said = [
+            str(h.get("text") or "")
+            for h in context.get("history") or []
+            if h.get("role") == "customer"
+        ]
+        found.append(reply_gates.fact_already_given(reply, [*said, *owner]))
+        # B6 S5: the problem record, which outlives the 20-message window and a closed chat
+        found.append(reply_gates.known_in_record(reply, context.get("noted_problems") or []))
+    return "; ".join(f for f in found if f) or None
 
 
 def unasked_status(reply: str, context: dict[str, Any]) -> str | None:
@@ -1948,6 +5952,8 @@ def says_nothing(reply: str) -> str | None:
 OWN_VIDEO_LINK = re.compile(r"https://meet\.jit\.si/\S+")
 GOOGLE_MEET_WORDS = re.compile(r"\bGoogle Meet(?: meeting)?(?= link| meeting|\b)", re.IGNORECASE)
 URL_PART = re.compile(r"https?://\S+")
+# Four or more words between asterisks and no group count after them: a bolded sentence.
+BOLD_SENTENCE = re.compile(r"\*(\S+(?: \S+){3,}?[^*\n]{0,160})\*(?!\s*\(\d)")
 
 
 def polished(reply: str) -> str:
@@ -1959,6 +5965,8 @@ def polished(reply: str) -> str:
     reply = reply.replace("**", "*")
     # A status line's project name is plain ("• Website: ..."), never bold.
     reply = re.sub(r"^• \*([^*\n]+)\*:", r"• \1:", reply, flags=re.MULTILINE)
+    # The owner's own words are quoted plainly: bold is for the summary's group names only.
+    reply = BOLD_SENTENCE.sub(r"\1", reply)
     links = URL_PART.findall(reply)
     text = URL_PART.sub("\x00", reply)
     text = re.sub(r"!+(?=\s|$)", ".", text)
@@ -2010,12 +6018,21 @@ async def in_one_language(
     try:
         response = await manager.complete(
             scope,
-            alias=policy.ai_config.get("reply_alias", "balanced"),
+            alias=reply_alias(policy),
             purpose="pi_service_language",
             messages=[
                 Message.system(
-                    f"Rewrite this WhatsApp reply entirely in {NAMES[expected]}. Keep its "
+                    f"Rewrite this WhatsApp reply entirely in "
+                    f"{NAMES.get(expected, expected)}. Keep its "
                     "meaning, line breaks, '• ' points, links and names exactly; add nothing. "
+                    "For Roman Urdu always use the polite aap forms (karein, rakhein, dekhein), "
+                    "never karo or rakho, and no gendered first-person verbs. Keep each "
+                    "sentence short and use everyday Urdu words, not English business jargon. "
+                    "Write plain everyday Urdu: never translate an English word into Urdu word for "
+                    "word when there is no such Urdu phrase (not 'drop naam'); keep a name or term "
+                    "like 'drop-off point' or 'COD' as it is, or say it in a few plain words. "
+                    "Say 'Here are some ideas for you:' as 'Ji, ye do ideas abhi aazma "
+                    "sakte hain:' and 'Sorry about the wait.' as 'Maazrat.'. "
                     "Reply with the rewritten text only."
                 ),
                 Message.user(reply),
@@ -2026,7 +6043,12 @@ async def in_one_language(
     except Exception:  # noqa: BLE001 - the checks below still guard the reply
         return reply
     fixed = str(response.text or "").strip()
-    return fixed if fixed and not mixed_line(fixed, expected) else reply
+    # A rewrite that still keeps a few English nouns ("vet", "flock", "technical team") is the
+    # person's own business words, not a failed rewrite: only one still mostly in the other
+    # language is thrown away (a real-model sweep lost 18 Roman Urdu turns to the stricter check)
+    if not fixed or (expected in NAMES and clearly_other(fixed, expected)):
+        return reply
+    return fixed
 
 
 def project_words(text: str) -> set[str]:
@@ -2100,6 +6122,86 @@ SAYS_WHEN = re.compile(
 )
 
 
+# "Not available" / "change it to 5th November" about the meeting they already have.
+RESCHEDULE = re.compile(
+    r"\b(?:not available|unavailable|can'?t (?:make|come|join|attend)|cannot (?:make|come|"
+    r"join|attend)|won'?t be (?:able|available)|busy (?:then|that day)|reschedul\w*|"
+    r"postpone\w*|change (?:it|the (?:time|date|day|meeting))|move (?:it|the meeting)|"
+    r"another (?:time|day|date)|different (?:time|day|date)|nahi aa (?:sakta|sakti|sakte)|"
+    r"available nahi|waqt badal\w*|time change|date change|aage kar\w*)\b",
+    re.IGNORECASE,
+)
+DATE_WORDS = re.compile(
+    r"\b(?:\d{1,2}(?:st|nd|rd|th)?\s+(?:jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)\w*|"
+    r"(?:jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)\w*\s+\d{1,2}(?:st|nd|rd|th)?)\b",
+    re.IGNORECASE,
+)
+MEETING_REPLY = re.compile(
+    r"\b(?:meeting|call|time|day|date|reschedul\w*|move|waqt|din|mulaqat)\b", re.IGNORECASE
+)
+
+
+def meeting_change(context: dict[str, Any]) -> bool:
+    """They're talking about the meeting already arranged: they can't make it, or they
+    give a new day/time right after hearing about it."""
+    if not arranged_meeting(context):
+        return False
+    latest = str(context.get("latest_customer_message", ""))
+    if RESCHEDULE.search(latest):
+        return True
+    recent = " ".join(str(h.get("text", "")) for h in (context.get("history") or [])[-4:])
+    return bool(
+        (SAYS_WHEN.search(latest) or DATE_WORDS.search(latest))
+        and re.search(r"\bmeeting\b", recent, re.IGNORECASE)
+        and len(latest.split()) <= 12
+    )
+
+
+def meeting_change_missed(turn: "ServiceTurn", context: dict[str, Any]) -> str | None:
+    """A reply to "I'm not available" / "change it to 5th November" that isn't about
+    the meeting (it once answered with a project recap)."""
+    if not meeting_change(context) or turn.action == "booking":
+        return None
+    label = str(arranged_meeting(context).get("label") or "")
+    if MEETING_REPLY.search(turn.reply) and not re.search(
+        r"recap|anything else", turn.reply, re.IGNORECASE
+    ):
+        return None
+    return (
+        f"they're talking about their meeting on {label}: if they can't make it, say no "
+        "problem and ask which day and time suit them instead; if they gave a new day "
+        "(and time), set meeting_requested=true and meeting_time from now_local (keep the "
+        "earlier time if they only changed the day) and say you've asked the team to move "
+        "the meeting to it. Nothing else: no project recap, no 'anything else?'"
+    )
+
+
+RESCHEDULE_ASK = {
+    "en": "No problem. Which day and time would suit you instead? I'll ask the team to "
+    "move your meeting.",
+    "roman_ur": "Koi baat nahi. Aap ko kaun sa din aur waqt theek rahega? Team se "
+    "meeting move karwa denge.",
+}
+RESCHEDULE_ASKED = {
+    "en": "No problem. I've asked the team to move your meeting to {when}; they'll "
+    "confirm it here.",
+    "roman_ur": "Theek hai. Team se meeting {when} par move karne ka keh diya hai; woh "
+    "yahin confirm karenge.",
+}
+
+
+def reschedule_reply(turn: "ServiceTurn") -> str:
+    """The meeting answer, in fixed words, when the rewrite still missed it."""
+    language = "roman_ur" if turn.language == "roman_ur" else "en"
+    try:
+        when = datetime.fromisoformat(turn.meeting_time) if turn.meeting_time else None
+    except ValueError:
+        when = None
+    if when is None:
+        return RESCHEDULE_ASK[language]
+    return RESCHEDULE_ASKED[language].format(when=f"{when:%A %d %B, %I:%M %p}")
+
+
 def meeting_answer_missed(turn: "ServiceTurn", context: dict[str, Any]) -> str | None:
     """The customer answered pi's "which day and time?" and the draft ignored it."""
     asked = [h for h in context.get("history") or [] if h.get("role") == "ai"]
@@ -2127,6 +6229,9 @@ def too_long(reply: str, context: dict[str, Any]) -> str | None:
         len(latest.split()) > SIMPLE_ASK
         or context.get("check_in_now")
         or context.get("team_answer_now")
+        # "Solution batao" is a short message that asks for exactly the two ideas and the offer
+        or context.get("solution_asked")
+        or "solution_howto" in context
     ):
         return None
     if re.search(r"\b(?:ideas?|list|options?|summary|brief|details?|explain)\b", latest, re.I):
@@ -2383,10 +6488,66 @@ def team_summary(turn: ServiceTurn) -> str:
     return "\n".join(lines)[:4000]
 
 
+WELCOME_BACK = {
+    "en": (
+        "{who}Welcome back. Last time you told me about {n} {things}{mostly}. "
+        "Want to add to those, or is something new going on?"
+    ),
+    "roman_ur": (
+        "{who}Dobara khush amdeed. Pichli baar aap ne {n} {things} bataye the{mostly}. "
+        "Un mein kuch add karna hai, ya kuch naya hua hai?"
+    ),
+}
+
+
+def welcome_back(context: dict[str, Any], *, ask: bool = True) -> str | None:
+    """Brain mode, a returning person who already has problems noted (R-MEM-03). After more than
+    30 days pi says again who it is (R-DISC-05). Nothing is asked that pi already knows. With
+    ask=False only the greeting and the count (no question): it goes in front of an answer to
+    a real message, which has its own question."""
+    if context.get("pi_mode") != "brain":
+        return None
+    noted = context.get("noted_problems") or []
+    spoke_before = any(h.get("role") == "ai" for h in context.get("history") or [])
+    # A person whose earlier chat was closed starts a new conversation with no history: they are
+    # still returning (R-MEM-03), their problems are noted at customer level.
+    if not noted or not (spoke_before or context.get("returning_customer")):
+        return None
+    if int(context.get("days_away") or 0) < 1:  # only after a gap, not mid-chat
+        return None
+    brief = context.get("brief") or {}
+    if brief.get("payment_notice_due") or (context.get("open_quote") or None):
+        return None
+    lang = "roman_ur" if context.get("reply_language") == "roman_ur" else "en"
+    groups = [p.get("group") for p in noted if p.get("group")]
+    top = max(set(groups), key=groups.count) if groups else None
+    mostly = ""
+    if top and len(set(groups)) > 1 and groups.count(top) * 2 >= len(groups):
+        word = taxonomy.label(top, lang).lower()
+        mostly = f", mostly {word}" if lang == "en" else f", zyada tar {word}"
+    who = ""
+    redisclose = int((context.get("brain_settings") or {}).get("redisclose_days") or 30)
+    if int(context.get("days_away") or 0) > redisclose:
+        who = (
+            "Hi, it's pi, the AI from Workzap. "
+            if lang == "en"
+            else "Hi, main pi hoon, Workzap ka AI. "
+        )
+    else:
+        who = "Hi. " if lang == "en" else "Salam. "
+    things = ("problem" if len(noted) == 1 else "problems") if lang == "en" else "masail"
+    line = WELCOME_BACK[lang].format(who=who, n=len(noted), things=things, mostly=mostly)
+    return line if ask else line.rsplit(". ", 1)[0] + "."
+
+
 def greeting_reply(context: dict[str, Any]) -> str:
     """pi's answer to a plain "Hi": who it is the first time; for a returning customer
     with something still open, an offer to carry on with it (pi remembers)."""
+    if returning := welcome_back(context):
+        return returning
     if not any(h.get("role") == "ai" for h in context.get("history") or []):
+        if context.get("pi_mode") == "brain":  # the fixed opening (R-DISC-01)
+            return flow.OPENING["roman_ur" if context.get("reply_language") == "roman_ur" else "en"]
         company = str(context.get("company") or "").strip()
         who = f"{company}'s AI assistant" if company else "your AI assistant"
         team = f"The {company} team" if company else "A real team"
@@ -2397,7 +6558,9 @@ def greeting_reply(context: dict[str, Any]) -> str:
         )
     name = str((context.get("customer_profile") or {}).get("name") or "").split(" ")[0]
     name = name.rstrip(".,")  # "Dalal&Co." -> "Hi Dalal&Co.", never "Co.."
-    hello = f"Hi {name}." if name and not PLACEHOLDER_NAME.search(name) else "Hi."
+    roman = context.get("reply_language") == "roman_ur"
+    greeting = "Hi"  # "Hi" is ordinary in Roman Urdu too (the established greeting, kept)
+    hello = f"{greeting} {name}." if name and not PLACEHOLDER_NAME.search(name) else f"{greeting}."
     brief = context.get("brief") or {}
     open_project = next(
         (
@@ -2414,14 +6577,189 @@ def greeting_reply(context: dict[str, Any]) -> str:
         if d.get("stage") not in {"lost", "brief"} and d.get("status") != "delivered"
     ]
     if active:
+        if roman:
+            which = active[0] if len(active) == 1 else "apne projects"
+            return f"{hello} Kya aap {which} ka update chahte hain, ya koi nayi baat hai?"
         which = f"your {active[0]}" if len(active) == 1 else "your projects"
         return (
             f"{hello} Would you like an update on {which}, or is there something new I "
             "can help with?"
         )
     if open_project:
+        if roman:
+            return f"{hello} Kya hum {open_project} par aage barhein?"
         return f"{hello} Shall we carry on with your {open_project}?"
+    if roman:
+        return f"{hello} Bataiye, aap ke business mein kya masla hai?"
     return f"{hello} How can I help you today?"
+
+
+ASCII_DIGITS = str.maketrans("٠١٢٣٤٥٦٧٨٩۰۱۲۳۴۵۶۷۸۹", "01234567890123456789")
+
+LANGUAGE_FAILED_NOTE = (
+    "I could not write this in {language} just now, so this message is in English."
+)
+LANGUAGE_UNSUPPORTED_NOTE = {
+    "en": "I can't write {language} well enough to use it with you, so I won't pretend to. "
+    "I can write Persian (Dari), Urdu, Arabic, Hindi, French and Spanish, or English, "
+    "whichever suits you.",
+    "fa": "من پشتو را به اندازه کافی خوب نمی‌توانم بنویسم، پس وانمود نمی‌کنم. "
+    "به فارسی (دری) برایتان می‌نویسم.",
+}
+
+
+def digits_of(text: str) -> list[str]:
+    return re.findall(r"\d+", text.translate(ASCII_DIGITS))
+
+
+async def ensure_requested_language(
+    manager: Any,
+    scope: WorkspaceScope,
+    policy: Any,
+    conversation: PiConversation,
+    turn: "ServiceTurn",
+    context: dict[str, Any],
+    *,
+    strict: bool = True,
+) -> None:
+    """The language the owner asked for or wrote drives EVERY reply of the turn, fixed lines
+    included. A line that exists only in English (a notice, a question, a fallback) is written in
+    that language by the model; a rewrite that loses or changes a number (an emergency number) is
+    thrown away. When it still is not in their language, the reply says so honestly in English
+    rather than silently answering in an unrelated language."""
+    other = str(context.get("reply_language_other") or "")
+    if not other or not turn.reply.strip() or in_language(turn.reply, other):
+        return
+    if manager is not None:
+        fixed = await in_one_language(manager, scope, policy, conversation, turn.reply, other)
+        if (
+            fixed
+            and fixed != turn.reply
+            and digits_of(fixed) == digits_of(turn.reply)
+            and (not strict or in_language(fixed, other) or not can_check(other))
+        ):
+            turn.reply = fixed
+            return
+    if strict and can_check(other) and not in_language(turn.reply, other):
+        note = LANGUAGE_FAILED_NOTE.format(language=other)
+        if not turn.reply.startswith(note):
+            turn.reply = f"{note}\n\n{turn.reply}"
+
+
+async def in_their_language(
+    manager: Any,
+    scope: WorkspaceScope,
+    policy: Any,
+    conversation: PiConversation,
+    turn: "ServiceTurn",
+    context: dict[str, Any],
+) -> None:
+    """A fixed line (an emergency, the PII reminder, a boundary, the greeting) that went out early
+    exists in English, Roman Urdu and Arabic only (plus the eight fixed-line languages). For a
+    person writing another language it is rewritten into theirs, so it never stays in English
+    unannounced."""
+    await ensure_requested_language(
+        manager, scope, policy, conversation, turn, context, strict=False
+    )
+
+
+def language_notice(turn: "ServiceTurn", context: dict[str, Any]) -> None:
+    """A language the owner asked for that pi cannot write well (Pashto) is said honestly, in the
+    language the reply is written in, once, on the turn it was asked for."""
+    unsupported = str(context.get("language_unsupported") or "")
+    if not unsupported or not turn.reply.strip():
+        return
+    persian = str(context.get("reply_language_other") or "") == "Persian"
+    table = LANGUAGE_UNSUPPORTED_NOTE["fa" if persian else "en"]
+    note = table.format(language=unsupported)
+    if note not in turn.reply:
+        turn.reply = f"{note}\n\n{turn.reply}"
+
+
+class ReplyOnlyTurn(BaseModel):
+    """The reduced schema of the lenient retry: no enums, patterns or nested records for a model
+    or provider to reject, so a customer still gets pi's reply when the full turn cannot parse."""
+
+    model_config = ConfigDict(extra="ignore")
+    reply: str = ""
+    language: str = "en"
+
+    @model_validator(mode="before")
+    @classmethod
+    def _tolerate(cls, data: Any) -> Any:
+        if not isinstance(data, dict):
+            return {}
+        return {
+            "reply": _text(data.get("reply"), 4000),
+            "language": _text(data.get("language") or "en", 40),
+        }
+
+
+BAD_SHAPE_KINDS = ("invalid_output", "invalid_request")
+
+
+async def structured_turn(
+    manager: LLMManager,
+    scope: WorkspaceScope,
+    turn_model: type[ServiceTurn],
+    *,
+    alias: str,
+    messages: list[Message],
+    temperature: float,
+    conversation_id: UUID,
+) -> StructuredResult[ServiceTurn]:
+    """The model's full turn; when every provider failed only because its output (or the schema)
+    was rejected, one more call asks for the reply alone, so the customer never gets the
+    tech-down notice for a formatting problem. Real unavailability still raises."""
+    try:
+        return await manager.complete_structured(
+            scope,
+            turn_model,
+            alias=alias,
+            purpose="pi_service",
+            messages=messages,
+            temperature=temperature,
+            max_tokens=4096,  # thinking models (Gemini 3.x) count their thinking here too
+            conversation_id=conversation_id,
+        )
+    except GatewayUnavailable as failed:
+        bad = [a for a in failed.attempts if a.error_kind in BAD_SHAPE_KINDS]
+        if not bad:
+            raise
+        # Provider and kind only: the field path is already in the manager's ai.attempt log.
+        logger.warning(
+            "pi.structured_fallback kinds=%s providers=%s",
+            sorted({str(a.error_kind) for a in bad}),
+            sorted({a.provider for a in bad}),
+        )
+        lenient = [
+            *messages,
+            Message.user(
+                'Answer again as a JSON object with only two keys: "reply" (the whole reply to '
+                'the customer, written as the rules above say) and "language". Nothing else.'
+            ),
+        ]
+        try:
+            plain = await manager.complete_structured(
+                scope,
+                ReplyOnlyTurn,
+                alias=alias,
+                purpose="pi_service",
+                messages=lenient,
+                temperature=temperature,
+                max_tokens=2048,
+                conversation_id=conversation_id,
+            )
+        except GatewayUnavailable as again:
+            again.attempts = [*failed.attempts, *again.attempts]
+            raise again from None
+        if not plain.value.reply.strip():
+            raise failed from None
+        turn = ServiceTurn.model_validate(
+            {"reply": plain.value.reply, "language": plain.value.language}
+        )
+        plain.response.attempts = [*failed.attempts, *plain.response.attempts]
+        return StructuredResult(turn, plain.response)
 
 
 async def compose_service_turn(
@@ -2431,35 +6769,113 @@ async def compose_service_turn(
     policy: PiSettings,
     context: dict[str, Any],
 ) -> ServiceTurn:
+    turn = await compose_service_turn_inner(manager, scope, conversation, policy, context)
+    language_notice(turn, context)
+    return turn
+
+
+async def compose_service_turn_inner(
+    manager: LLMManager,
+    scope: WorkspaceScope,
+    conversation: PiConversation,
+    policy: PiSettings,
+    context: dict[str, Any],
+) -> ServiceTurn:
+    if context.get("pi_mode") == "brain" and (safe := brain_safety(context)) is not None:
+        await in_their_language(manager, scope, policy, conversation, safe, context)
+        return safe
+    if practical_solution.map_incomplete(str(context.get("latest_customer_message") or "")):
+        context["map_incomplete"] = True
+        context["owner_turn_note"] = (
+            "The owner says the Problem Map is incomplete. Ask what is missing; do not repeat "
+            "the existing list, pick a priority or mark the map confirmed."
+        )
+    if practical_solution.eligible(context):
+        context["solution_exploration"] = True
+        context["solution_asked"] = True
+        for key in (*SOLUTION_KEYS, "solution_ideas", "solution_build"):
+            context.pop(key, None)
+    if context.get("pi_mode") == "brain" and context.get("warmup"):
+        warm = None if context.get("solution_exploration") else warmup.plan(context)
+        context.pop("page_look", None)  # page words never reach the model (untrusted data)
+        if warm is not None:
+            kept = dict(conversation.service_brief or {})
+            kept["warmup"], kept["business_profile"] = warm.state, warm.profile
+            conversation.service_brief = kept
+            if warm.model_writes:
+                # 18.2: no fixed first message. The model writes the opening; openingGate checks
+                # it, and the fixed line is only the fallback.
+                context["opening_by_model"] = True
+                context["opening_fallback"] = warm.reply
+                context["owner_turn_note"] = (
+                    f"{context.get('owner_turn_note') or ''} This is the first reply to a new "
+                    "number: greet in half a sentence, say you are pi, an AI from Workzap, then "
+                    "ask one question: the business name and what it makes or sells. No problem "
+                    "question, no list of areas, no guess about the business. "
+                    f"{reply_gates.referral_note(context)}"
+                ).strip()
+            elif warm.reply:
+                turn = ServiceTurn(reply=warm.reply, language="en")
+                turn._greeting_only = True  # nothing to note; the owner has not described a problem
+                await in_their_language(manager, scope, policy, conversation, turn, context)
+                return turn
     if (
         context.get("latest_message_kind") in (None, "text")
-        and english_greeting(str(context.get("latest_customer_message", "")))
+        and not context.get("opening_by_model")
+        and (
+            english_greeting(str(context.get("latest_customer_message", "")))
+            or (
+                context.get("pi_mode") == "brain"
+                and returning_greeting(str(context.get("latest_customer_message", "")))
+            )
+        )
         and not any(
             context.get(key)
             for key in ("check_in_now", "team_answer_now", "operator_review_required")
         )
+        # Brain mode: news the person is owed (their payment was confirmed) comes before "Hi".
+        and not (context.get("brief") or {}).get("payment_notice_due")
     ):
         # Old knowledge and the model's last language must not turn "Hi" into a pitch.
         turn = ServiceTurn(reply=greeting_reply(context), language="en")
+        if context.get("pi_mode") == "brain":  # back after 30+ days, nothing noted: say who pi is
+            turn.reply = with_disclosure(turn.reply, context, str(context.get("reply_language")))
         turn._greeting_only = True
+        if any(c.isdigit() for c in turn.reply):  # the welcome-back count is pi's own figure
+            context["fixed_lines"] = [*context.get("fixed_lines", []), turn.reply]
+        await in_their_language(manager, scope, policy, conversation, turn, context)
         return turn
-    result = await manager.complete_structured(
-        scope,
-        ServiceTurn,
-        alias=policy.ai_config.get("reply_alias", "balanced"),
-        purpose="pi_service",
-        messages=[Message.system(SYSTEM), Message.user(json.dumps(context, ensure_ascii=False))],
-        temperature=float(policy.ai_config.get("temperature", "0.20")),
-        max_tokens=4096,  # thinking models (Gemini 3.x) count their thinking here too
-        conversation_id=conversation.id,
+    # Built once: the rewrite below sends the very same system text and context again.
+    with latency.stage("prompt.assemble"):
+        system_text = system_for(context)
+        context_json = json.dumps(context, ensure_ascii=False)
+    latency.count("prompt_chars", len(system_text) + len(context_json))
+    latency.count("model_calls")
+    turn_model = ThinkingServiceTurn if context.get("thinking") else ServiceTurn
+    result = await latency.timed(
+        "model.reply",
+        structured_turn(
+            manager,
+            scope,
+            turn_model,
+            alias=reply_alias(policy),
+            messages=[Message.system(system_text), Message.user(context_json)],
+            temperature=float(policy.ai_config.get("temperature", "0.20")),
+            conversation_id=conversation.id,
+        ),
     )
     turn = result.value
+    if context.get("solution_exploration"):
+        exploration_only(turn)
     turn._attempts = result.response.attempts
     turn.reply = tidy_list_numbers(turn.reply)
+    turn.reply = voice_noted(turn.reply, context)
     send_now(turn, context)
     meeting_yes(turn, context)
     mode = price_policy.price_mode(policy.response_rules, service=True)
-    problem = needless_question(turn.reply, context)
+    # Brain mode asks "Anything else getting in the way?" and learns who they are by listening.
+    brain = context.get("pi_mode") == "brain"
+    problem = None if brain else needless_question(turn.reply, context)
     if LATER_PROMISE.search(turn.reply) and any(
         not link.get("unreadable") for link in context.get("shared_links") or []
     ):
@@ -2470,6 +6886,24 @@ async def compose_service_turn(
         problem = f"{later}, and also: {problem}" if problem else later
     if made_up := invented(turn.reply, context, turn.action == "booking"):
         problem = f"{made_up}, and also: {problem}" if problem else made_up
+    extracted_ops: list[Any] = []
+    if (
+        brain
+        and not turn.problem_ops
+        and problem_extract.wants_extraction(context, turn.reply, turn.problem_ops)
+    ):
+        # The reply model wrote no problem record: a short separate call fills the gap, so the
+        # whole prompt is not sent back for a rewrite just to note it (and nothing is lost).
+        found = await latency.timed(
+            "model.extract", problem_extract.extract(manager, scope, context)
+        )
+        latency.count("model_calls")
+        if found:
+            turn.problem_ops = found
+            extracted_ops = found  # kept across a rewrite, which replaces the whole turn
+            latency.count("extracted_problems", len(found))
+    if brain and (ghost := noted_without_problem(turn)):
+        problem = f"{ghost}, and also: {problem}" if problem else ghost
     if empty := says_nothing(turn.reply):
         problem = f"{empty}, and also: {problem}" if problem else empty
     if not turn.request_human and (vague := vague_status(turn.reply, context)):
@@ -2478,8 +6912,31 @@ async def compose_service_turn(
         problem = f"{wordy}, and also: {problem}" if problem else wordy
     if early_ask := asks_too_early(turn, context):
         problem = f"{early_ask}, and also: {problem}" if problem else early_ask
+    if practical := practical_solution.answer_problem(turn.reply, context):
+        problem = f"{practical}, and also: {problem}" if problem else practical
     if again := repeats_itself(turn.reply, context):
         problem = f"{again}, and also: {problem}" if problem else again
+    if brain and (
+        closed := slots.asked_again(turn.asked_slot, turn.reply, context["closed_slots"])
+        if context.get("closed_slots")
+        else None
+    ):
+        closed_text = (
+            f'you already asked "{closed[:90]}" and they answered it (any answer closes it, '
+            'even "no" or "pata nahi"): do not ask it again, in any language; move on'
+        )
+        problem = f"{closed_text}, and also: {problem}" if problem else closed_text
+    if brain and (
+        left := open_requests.unanswered(
+            context.get("open_requests"), turn.reply, request_human=turn.request_human
+        )
+    ):
+        # R-ANS-03: a request left open for one reply is dealt with before anything else.
+        open_text = (
+            f"they asked for {' and '.join(left)} earlier and your last reply did not answer it "
+            "(R-ANS-03): answer it first in this reply, in the first sentence"
+        )
+        problem = f"{open_text}, and also: {problem}" if problem else open_text
     if unasked := unasked_status(turn.reply, context):
         problem = f"{unasked}, and also: {problem}" if problem else unasked
     if promise := empty_promise(turn, context):
@@ -2489,12 +6946,14 @@ async def compose_service_turn(
     turn.reply = without_filler(turn.reply)
     if long := too_long(turn.reply, context):
         problem = f"{long}, and also: {problem}" if problem else long
-    if gap := unknown_customer(turn, context):
+    if not brain and (gap := unknown_customer(turn, context)):
         problem = f"{gap}, and also: {problem}" if problem else gap
     if odd := contradicts_itself(turn.reply, context):
         problem = f"{odd}, and also: {problem}" if problem else odd
     if early := unconfirmed_brief(turn, context):
         problem = f"{early}, and also: {problem}" if problem else early
+    if change := meeting_change_missed(turn, context):
+        problem = f"{change}, and also: {problem}" if problem else change
     if missed := meeting_answer_missed(turn, context):
         problem = f"{missed}, and also: {problem}" if problem else missed
     expected = context.get("reply_language")
@@ -2517,48 +6976,125 @@ async def compose_service_turn(
             '"teen concepts", "do options"), use "• " for lists instead of 1. 2. 3., '
             "drop any time or date promise, and never state a price"
         )
+    if context.get("thinking") and (bad_plan := think_plan.check_turn(turn, context)):
+        problem = f"{bad_plan}, and also: {problem}" if problem else bad_plan
+    think_plan.settle_turn(turn, context)  # context["plan"]: this message's move, for T-REPEAT
+    strict = flow.strict_voice(policy.response_rules)
+    if strict and (broke := constitution.lint(turn.reply, context)):
+        if (quiet := constitution.quiet_fix(turn.reply, broke, context)) is not None:
+            turn.reply = quiet  # two questions: keep the last, no second model call
+            latency.count("quiet_fixes")
+            broke = []
+    if strict and broke:
+        # A style slip is fixed quietly, and the missing AI line is added by the application; any
+        # other hard rule that needed a rewrite is a defect worth scoring.
+        if [v for v in constitution.hard(broke) if v.rule != "R-DISC-01"]:
+            context["lint_slipped"] = True  # scored later as a rule break (spec 8.3)
+        text = constitution.describe(broke)
+        problem = f"{text}, and also: {problem}" if problem else text
+    context.pop("plan", None)  # not part of what the rewrite request sends back to the model
+    if context.get("pi_mode") == "brain" and turn.problem_ops:
+        known = {p["ref"] for p in context.get("noted_problems") or []}
+        replied = turn.reply.rstrip().endswith(("?", "\u061f"))
+        said_now = str(context.get("latest_customer_message") or "")
+        if bad := problems.check_ops(turn.problem_ops, known, replied, said_now):
+            text = f"the problem notes are wrong: {bad}"
+            problem = f"{text}, and also: {problem}" if problem else text
     asks_status = bool(STATUS_ASK.search(str(context.get("latest_customer_message", ""))))
     if not turn.request_human and (missed_status := status_missed(turn.reply, context)):
         problem = f"{missed_status}, and also: {problem}" if problem else missed_status
+    if context.get("pi_mode") == "brain" and context.get("burst_texts"):
+        # Spec v1.4, 17.2 (turnCoverage): a reply that skips the biggest message of a burst.
+        owner_turn = [*context["burst_texts"], str(context.get("latest_customer_message") or "")]
+        if text := turn_coverage.coverage_problem(turn.reply, owner_turn):
+            problem = f"{text}, and also: {problem}" if problem else text
+    if context.get("pi_mode") == "brain" and (
+        fix := figure_correction.numeric_correction(
+            str(context.get("latest_customer_message") or ""),
+            [
+                str(h.get("text") or "")
+                for h in (context.get("history") or [])[-6:]
+                if h.get("role") == "customer"
+            ],
+        )
+    ):
+        # B7.1/B7.3: a corrected figure is used in the reply, never the old one as a fact.
+        if figure_text := figure_correction.reply_problem(turn.reply, *fix):
+            problem = f"{figure_text}, and also: {problem}" if problem else figure_text
+    if context.get("pi_mode") == "brain":
+        # Spec v1.5, Part 18: openingGate, noEmptyOpener, closed list before the business is known.
+        if problem_text := part18_problem(turn.reply, context):
+            problem = f"{problem_text}, and also: {problem}" if problem else problem_text
+    if list_text := list_items.guard(context, turn.problem_ops):  # B1: no list item dropped
+        problem = f"{list_text}, and also: {problem}" if problem else list_text
+    if context.get("pi_mode") == "brain" and context.get("thinking"):
+        # Spec 17.3, 17.4 G10, 11.1 S_HOLD: topic switch, feasibility, no ideas while held
+        if text := turn_state.guard(turn.reply, context):
+            problem = f"{text}, and also: {problem}" if problem else text
+    if (
+        not problem
+        and context.get("pi_mode") == "brain"
+        and critique_mod.switched_on(policy.response_rules)
+    ):
+        latency.count("model_calls")
+        problem = (
+            await latency.timed(
+                "model.critique", critique_mod.critique(manager, scope, context, turn.reply)
+            )
+            or problem
+        )
     if problem:
         # One self-correction: show the model its draft and why it can't be sent.
-        retry = await manager.complete_structured(
-            scope,
-            ServiceTurn,
-            alias=policy.ai_config.get("reply_alias", "balanced"),
-            purpose="pi_service",
-            messages=[
-                Message.system(SYSTEM),
-                Message.user(json.dumps(context, ensure_ascii=False)),
-                Message.assistant(json.dumps({"reply": turn.reply}, ensure_ascii=False)),
-                Message.user(
-                    f"Don't send that draft: {problem}. Rewrite the whole result and fix "
-                    "that. "
-                    + (
-                        "This is a status question: answer it from project_deals, one '• "
-                        "Project: status, next step' line per project, and nothing else. "
-                        if asks_status
-                        else "If their latest message gives details or changes a project, "
-                        "never list project statuses: repeat what they asked for in short "
-                        "'• ' points (with the details they just gave) and ask the one "
-                        "thing still needed or whether that is everything; list every "
-                        "project they described in these last messages, never drop one. "
-                    )
-                    + "Otherwise, if the brief was already "
-                    "confirmed, answer in one short line "
-                    "with what happens next. If the brief is complete but not yet "
-                    "confirmed, confirm it in short points, say what happens next, set "
-                    "ready_for_team=true and awaiting_customer=false. If one detail is "
-                    "truly required to start (and was never asked), ask only for that."
-                ),
-            ],
-            temperature=float(policy.ai_config.get("temperature", "0.20")),
-            max_tokens=4096,
-            conversation_id=conversation.id,
+        latency.count("model_calls")
+        latency.count("rewrites")
+        latency.note("rewrite_reason", problem)
+        retry = await latency.timed(
+            "model.rewrite",
+            structured_turn(
+                manager,
+                scope,
+                turn_model,
+                alias=reply_alias(policy),
+                messages=[
+                    # Rebuilt: the checks above may have added flags to the context (lint_slipped).
+                    Message.system(system_for(context)),
+                    Message.user(json.dumps(context, ensure_ascii=False)),
+                    Message.assistant(json.dumps({"reply": turn.reply}, ensure_ascii=False)),
+                    Message.user(
+                        brain_rewrite_request(problem)
+                        if context.get("pi_mode") == "brain"
+                        else f"Don't send that draft: {problem}. Rewrite the whole result and fix "
+                        "that. "
+                        + (
+                            "This is a status question: answer it from project_deals, one '• "
+                            "Project: status, next step' line per project, and nothing else. "
+                            if asks_status
+                            else "If their latest message gives details or changes a project, "
+                            "never list project statuses: repeat what they asked for in short "
+                            "'• ' points (with the details they just gave) and ask the one "
+                            "thing still needed or whether that is everything; list every "
+                            "project they described in these last messages, never drop one. "
+                        )
+                        + "Otherwise, if the brief was already "
+                        "confirmed, answer in one short line "
+                        "with what happens next. If the brief is complete but not yet "
+                        "confirmed, confirm it in short points, say what happens next, set "
+                        "ready_for_team=true and awaiting_customer=false. If one detail is "
+                        "truly required to start (and was never asked), ask only for that."
+                    ),
+                ],
+                temperature=float(policy.ai_config.get("temperature", "0.20")),
+                conversation_id=conversation.id,
+            ),
         )
         turn = retry.value
+        if context.get("solution_exploration"):
+            exploration_only(turn)
+        if extracted_ops and not turn.problem_ops:
+            turn.problem_ops = extracted_ops  # B6: the owner's facts are not lost in a rewrite
         turn._attempts = [*result.response.attempts, *retry.response.attempts]
         turn.reply = without_filler(tidy_list_numbers(turn.reply))
+        turn.reply = voice_noted(turn.reply, context)
         meeting = arranged_meeting(context)
         latest_words = str(context.get("latest_customer_message", ""))
         if (
@@ -2580,6 +7116,10 @@ async def compose_service_turn(
                 extra={"reason": invented(turn.reply, context, turn.action == "booking")[:120]},
             )
             raise rejected_with(turn, "INVENTED_DETAIL")
+        if meeting_change_missed(turn, context):
+            # Still not about their meeting: the fixed answer, and the team is asked.
+            turn.meeting_requested = True
+            turn.reply = reschedule_reply(turn)
         turn.reply = without_repeats(turn.reply, context)
         turn.reply = without_open_question(turn, context)
         if not turn.request_human and status_missed(turn.reply, context):
@@ -2608,14 +7148,113 @@ async def compose_service_turn(
             for project in turn.projects:
                 if project.title in held:
                     project.status = "awaiting_confirmation"
-    if expected in NAMES and mixed_line(turn.reply, str(expected)):
-        turn.reply = await in_one_language(
-            manager, scope, policy, conversation, turn.reply, str(expected)
+    think_plan.settle_turn(turn, context)  # the rewrite's own plan, checked once more
+    if strict:
+        # Style slips that survived the rewrite are fixed in place; a hard break (identity,
+        # money, privacy, promises) is never sent.
+        turn.reply = constitution.repair(turn.reply, context)
+        if blocked := constitution.hard(constitution.lint(turn.reply, context)):
+            logger.warning(
+                "pi reply broke the constitution", extra={"rules": [v.rule for v in blocked]}
+            )
+            raise rejected_with(turn, "CONSTITUTION_BREAK")
+    context.pop("plan", None)
+    if context.get("pi_mode") == "brain":
+        turn.ready_for_team = False  # no lead, proposal or team brief before the offer
+        turn.projects = []
+        if not context.get("solution_exploration"):
+            brain_summary(turn, context)
+            part19.replay(
+                turn, context
+            )  # 19.3: "listen again" gets a playback of what was understood
+            brain_decision(turn, context)
+            strip_dangling_opener(turn)
+            if context.get("expert_on"):
+                # Do not rescue an unrequested list with library ideas for an older problem.
+                shape_expert_ideas(turn, context)
+            reject_passive_ideas(turn, context)
+            brain_ideas(turn, context)
+            await brain_free_ideas(manager, scope, conversation, policy, turn, context)
+            await brain_expert_diagnosis(manager, scope, conversation, policy, turn, context)
+            if turn._free and not turn.problem_ops and not context.get("noted_problems"):
+                # Free ideas never replace noting: recover facts missed by earlier extraction.
+                latency.count("model_calls")
+                if found := await latency.timed(
+                    "model.extract", problem_extract.extract(manager, scope, context)
+                ):
+                    turn.problem_ops = found
+            brain_prose_ideas(turn, context)
+            brain_no_repeat(turn, context)
+            brain_no_ideas(turn, context)
+            brain_howto(turn, context)
+            brain_no_early_promise(turn, context)
+            brain_never_empty(turn, context)
+            brain_offer(turn, context)
+            strip_unallowed_offer(turn, context)
+            brain_option_voice(turn, context)
+            brain_listening_tidy(turn, context)
+            if turn._voice_pick or turn._voice_pending or turn._scope_asked:
+                kept = dict(conversation.service_brief or {})
+                if turn._scope_asked:
+                    kept["scope_asked"] = True  # the scope question is asked once per chat
+                if turn._voice_pick:  # the document recommends the same option (one ranking)
+                    kept["chat_pick"] = turn._voice_pick
+                if turn._voice_pending:  # read the owner's answer next turn (PS-5)
+                    kept["pending_question"] = (
+                        turn._voice_pending
+                    )  # counted asked when it is answered
+                conversation.service_brief = kept
+        if part19.want_cue(str(context.get("latest_customer_message") or "")):
+            # Keep requested features apart from problems, including during solution exploration.
+            latency.count("model_calls")
+            turn._new_wants = await latency.timed(
+                "model.wants", problem_extract.extract_wants(manager, scope, context)
+            )
+    if context.get("handback_notice") and not turn.request_human and turn._decision is None:
+        short = safety.handback_reply(str(context.get("reply_language") or "en"))
+        turn.reply = f"{short.rsplit('. ', 1)[0]}. {turn.reply}"
+        brief = dict(conversation.service_brief or {})
+        brief["handback_notice"] = False
+        conversation.service_brief = brief
+    other_language = str(context.get("reply_language_other") or "")
+    if other_language and (turn._english or not in_language(turn.reply, other_language)):
+        latency.count("model_calls")
+        turn.reply = await latency.timed(
+            "model.language",
+            in_one_language(manager, scope, policy, conversation, turn.reply, other_language),
         )
+    if expected in NAMES and expected != "en" and not turn._english and english_bullets(turn.reply):
+        turn._english = True  # the model left a list of ideas in English: it is translated below
+    rewritten = False
+    if expected in NAMES and (
+        (turn._english and expected != "en")
+        or mixed_line(turn.reply, str(expected))
+        or clearly_other(turn.reply, str(expected))
+    ):
+        rewritten = True
+        latency.count("model_calls")
+        latency.note("language_fix", f"reply mixed languages, expected {expected}")
+        turn.reply = await latency.timed(
+            "model.language",
+            in_one_language(manager, scope, policy, conversation, turn.reply, str(expected)),
+        )
+    if expected == "roman_ur":
+        turn.reply = roman_ideas_opener(roman_polish(turn.reply), context)
+    if turn._cost_line:
+        turn.reply = put_cost_line(turn.reply, turn._cost_line)
+    if turn._voice_block or turn._voice_question or turn._voice_unmarked or turn._voice_after:
+        turn.reply = option_voice.label_ideas(
+            turn.reply, turn._voice_unmarked, turn._voice_language
+        )
+        turn.reply = put_option_voice(
+            turn.reply, turn._voice_block, turn._voice_question, turn._voice_after
+        )
+    if context.get("pi_mode") == "brain":
+        await pre_send_guard(turn, context, manager, scope, policy, conversation)
     latest_language = detect_language(str(context.get("latest_customer_message", "")))
     if latest_language == expected and (
         clearly_other(turn.reply, str(expected or ""))
-        or mixed_line(turn.reply, str(expected or ""))
+        or (not rewritten and mixed_line(turn.reply, str(expected or "")))
     ):
         # A failed rewrite must not send the same wrong-language reply to WhatsApp. Only
         # when the customer clearly wrote in that language: otherwise the turn (and what
@@ -2642,11 +7281,22 @@ async def compose_service_turn(
         confirm_summarised(turn, context)
     # Added last, so a rewrite above can never drop it.
     turn.reply = with_consent_question(turn, context)
-    turn.projects = merge_projects((context.get("brief") or {}).get("projects"), turn)
+    # Brain mode keeps no project list: it notes problems, and a project starts at the offer.
+    turn.projects = (
+        []
+        if context.get("pi_mode") == "brain"
+        else merge_projects((context.get("brief") or {}).get("projects"), turn)
+    )
     if not turn.summary.strip() or turn.summary.startswith("Conversation in progress"):
         turn.summary = team_summary(turn)
     # WhatsApp shows a list only when each point starts its own line.
     turn.reply = polished(re.sub(r"[ \t]+•[ \t]*", "\n• ", turn.reply).strip())
+    if context.get("expert_on") and not context.get("solution_exploration"):
+        shape_expert_ideas(turn, context)
+        add_capability_line(turn, context)
+        turn.reply = reply_layout.tidy(turn.reply)  # short paragraphs, the question on its own line
+    if context.get("no_questions"):
+        turn.reply = owner_asks.without_questions(turn.reply)
     allowed = allowed_text(context)
     turn.reply = validate_service_reply(
         without_blocked_lines(turn.reply, mode, allowed),
@@ -2654,6 +7304,15 @@ async def compose_service_turn(
         mode,
         allowed,
     )
+    if context.get("expert_on") and not context.get("solution_exploration"):
+        settle_ideas(turn, context)  # after the guards: the count and the question are then final
+    if context.get("pi_mode") == "brain" and any(
+        v.rule in constitution.FINAL_CHECKS for v in constitution.lint(turn.reply, context)
+    ):
+        # Platform spec A.3 step 6: the text that is sent is checked, not only the model's draft.
+        # The application's own replacements and the translation come after the first lint, so the
+        # rules that must never break are run once more on the final reply.
+        raise rejected_with(turn, "CONSTITUTION_BREAK")
     latest = str(context["latest_customer_message"])
     if link_unread(turn, context):
         # Honest first line: the link wasn't read (e.g. a site that blocks readers).
@@ -2679,7 +7338,82 @@ async def compose_service_turn(
         not turn.consent_evidence.strip() or turn.consent_evidence not in latest
     ):
         turn.consent = "unchanged"
+    if (context.get("pii") or {}).get("notice"):
+        notice = str(context["pii"]["notice"])
+        turn.reply = f"{notice} {without_repeated_sentences(notice, turn.reply)}".strip()
+        # R-PRIV-02: said once
+    if context.get("pi_mode") == "brain" and not turn._greeting_only:
+        if business_name := context.get("business_disclosure_name"):
+            # R-MEM-06, spec 4.9: said once, at the first message after joining a business.
+            lang = "roman_ur" if context.get("reply_language") == "roman_ur" else "en"
+            notice = business.disclosure_text(str(business_name), lang)
+            turn.reply = f"{notice} {turn.reply}"
+        # R-MEM-03, R-DISC-05: someone back after a gap is welcomed and, after more than 30 days,
+        # told again that this is pi, the AI, even when they open with a real message. In code,
+        # not in the prompt; the count is pi's own figure.
+        back = welcome_back(context, ask=False)
+        if back and not turn.request_human:
+            if SAYS_AI.search(turn.reply):  # the reply already says it: keep it only once
+                back = back.replace("Hi, it's pi, the AI from Workzap. ", "").replace(
+                    "Hi, main pi hoon, Workzap ka AI. ", ""
+                )
+            turn.reply = f"{back} {turn.reply}"
+            context["fixed_lines"] = [*context.get("fixed_lines", []), back]
+        elif (redisclose_due(context) or context.get("legacy_undisclosed")) and not SAYS_AI.search(
+            turn.reply
+        ):
+            turn.reply = with_disclosure(turn.reply, context, str(turn.language or "en"))
+        if (status := handoff_status_line(context)) and not turn.request_human:
+            turn.reply = f"{status} {turn.reply}"
+            turn._handoff_status = str((context.get("pending_handoff") or {}).get("id") or "")
+        if context.get("open_items") and not turn.request_human:
+            line = open_items.return_line_for(
+                context["open_items"], str(context.get("reply_language") or "en")
+            )
+            if line:
+                turn.reply = f"{line} {turn.reply}"
+                turn._open_said = [str(i["id"]) for i in context["open_items"][:2]]
+    if context.get("opening_by_model"):
+        from app.modules.pi import learning_audit
+
+        version = learning_audit.prompt_version()
+    if context.get("opening_by_model") and reply_gates.opening_problem(turn.reply, context, False):
+        # Failed openingGate twice: the safe fixed line, and a log for the audit (18.2 Logging).
+        logger.warning(
+            "openingGate fail, fallback sent",
+            extra=reply_gates.opening_log(False, "template", version),
+        )
+        # The same turn the fixed line always made, so the script rule (one script per chat) holds.
+        turn = ServiceTurn(reply=str(context["opening_fallback"]), language="en")
+        turn._greeting_only = True
+        await in_their_language(manager, scope, policy, conversation, turn, context)
+    elif context.get("opening_by_model"):
+        logger.info("openingGate pass", extra=reply_gates.opening_log(True, "model", version))
+    if context.get("pi_mode") == "brain":
+        # R-ASK-01 on the text that is sent: everything above may add a line after the last lint
+        turn.reply = constitution.final_one_question(turn.reply, keep=context.get("fixed_lines"))
+        if context.get("quote_facts"):
+            turn.reply = quote_facts.cap(turn.reply)  # ROFFER07: never more than two questions
+    if context.get("solution_exploration"):
+        exploration_only(turn)
+        if repeats_itself(turn.reply, context) or practical_solution.answer_problem(
+            turn.reply, context
+        ):
+            raise rejected_with(turn, "SOLUTION_ANSWER_REJECTED")
     return turn
+
+
+async def guarded(session: AsyncSession, name: str, work: Any) -> None:
+    """An optional step of saving a turn (the customer's record, a consent, the idea feedback): if
+    it fails, inside its own savepoint so the transaction survives, the failure is logged and the
+    turn is still saved. Live chat 2026-10-27: a step before the brief was assigned raised from the
+    third reply on, the caller swallowed it, and the brief (the open question, the closed ones) was
+    never saved again, so pi asked the same question twice."""
+    try:
+        async with session.begin_nested():
+            await work
+    except Exception:  # noqa: BLE001
+        logger.warning("pi_save_step_failed", extra={"step": name}, exc_info=True)
 
 
 async def save_service_turn(
@@ -2692,6 +7426,15 @@ async def save_service_turn(
 ) -> list[UUID]:
     """Save the turn. Returns the leads pi should now write a proposal for (the caller
     queues it after commit, so the model call never runs under these row locks)."""
+    if flow.brain_mode(policy.response_rules):
+        await note_problems(
+            session,
+            scope,
+            conversation,
+            message,
+            turn,
+            box_on=box.box_offer_enabled(policy.response_rules),
+        )
     if turn._greeting_only:
         conversation.language = turn.language
         return []
@@ -2713,6 +7456,7 @@ async def save_service_turn(
             else None
         ),
         "source_message_id": str(message.id),
+        **({"handoff_status_said": turn._handoff_status} if turn._handoff_status else {}),
         "mood": turn.mood,
         "projects": [project.model_dump() for project in turn.projects],
         "meeting_requested": turn.meeting_requested or bool(previous.get("meeting_requested")),
@@ -2721,7 +7465,71 @@ async def save_service_turn(
             previous.get("customer_profile"), turn.customer_profile.model_dump()
         ),
     }
-    await remember_customer(session, scope, conversation, brief["customer_profile"])
+    await guarded(
+        session,
+        "remember_customer",
+        remember_customer(session, scope, conversation, brief["customer_profile"]),
+    )
+    if flow.brain_mode(policy.response_rules):
+        # Durable memory at customer level, from this turn's own output (spec 3.10): what they
+        # said, a correction archiving the old value, their language and voice-note habit.
+        await memory_block.refresh_safely(
+            session,
+            scope,
+            conversation,
+            profile=turn.customer_profile.model_dump(),
+            language=str(turn.language or ""),
+            voice_note=message.message_type == "audio",
+            message_id=message.id,
+        )
+        brief["asked_facts"] = list(
+            dict.fromkeys(
+                [*(previous.get("asked_facts") or []), *memory_block.asked_keys(turn.reply)]
+            )
+        )[-12:]
+        brief = system_ask.note(brief, message.body or "")  # R3 ask kept until the offer is made
+        brief = part19.merge_wants(brief, turn._new_wants)  # 19.4: the wants, apart from problems
+        # R-ASK-07: the question asked last turn is answered now (any answer closes it); the one
+        # in this reply is the open one. Kept in the brief, so it survives sessions and languages.
+        try:
+            closed, opened = slots.advance(
+                previous,
+                message.body or "",
+                turn.reply,
+                turn.asked_slot,
+                new_problem=any(op.op == "create" for op in turn.problem_ops),  # R-ASK-05: reopens
+            )
+            brief["closed_slots"] = closed
+            brief["last_question"] = opened
+        except Exception:  # noqa: BLE001 - one memory step never costs the rest of the brief
+            logger.warning("pi_slots_advance_failed", exc_info=True)
+        # R-ANS-03: what they asked for (a timeline, a person) that this reply did not address stays
+        # open, and the next reply must deal with it first.
+        try:
+            brief["open_requests"] = open_requests.update(
+                previous.get("open_requests"),
+                message.body or "",
+                turn.reply,
+                request_human=turn.request_human,
+                persistent=True,  # 17.7: kept until answered or dropped by the owner
+            )
+        except Exception:  # noqa: BLE001
+            logger.warning("pi_open_requests_failed", exc_info=True)
+        await guarded(
+            session,
+            "open_items",
+            open_items.sync(
+                session,
+                scope,
+                conversation,
+                message,
+                reply=turn.reply,
+                language=str(turn.language or "en"),
+                request_human=turn.request_human,
+                knowledge_gaps=list(turn.knowledge_gaps),
+                said_ids=turn._open_said,
+            ),
+        )
     known = list(previous.get("knowledge_gaps") or [])
     new_gaps = [g for g in dict.fromkeys(turn.knowledge_gaps) if g not in known]
     brief["knowledge_gaps"] = [*known, *new_gaps][-10:]
@@ -2731,21 +7539,33 @@ async def save_service_turn(
             # The customer-level record (shown on their profile) follows what they said.
             from app.modules.pi_saas.campaigns import set_consent
 
-            await set_consent(
+            await guarded(
                 session,
-                scope,
-                conversation.customer_id,
-                "reminders",
-                turn.consent == "granted",
-                f'Customer said "{turn.consent_evidence[:200]}" on WhatsApp',
-                message.id,
+                "set_consent",
+                set_consent(
+                    session,
+                    scope,
+                    conversation.customer_id,
+                    "reminders",
+                    turn.consent == "granted",
+                    f'Customer said "{turn.consent_evidence[:200]}" on WhatsApp',
+                    message.id,
+                ),
             )
-    await save_feedback(session, scope, conversation, brief, turn)
+    await guarded(
+        session, "save_feedback", save_feedback(session, scope, conversation, brief, turn)
+    )
     conversation.service_brief = brief
     from app.modules.pi.business_form import after_turn
 
     await after_turn(session, scope, conversation, message, policy, turn.reply, turn.mood)
-    conversation.summary = turn.summary
+    # Brain mode: the summary is read back to the model every turn, so it passes the redactor
+    # (roles, never a third party's name or contact details) before it is kept.
+    conversation.summary = (
+        safety.redact_pii(turn.summary).text
+        if flow.brain_mode(policy.response_rules)
+        else turn.summary
+    )
     conversation.summary_message_count += 1
     conversation.language = turn.language
     conversation.followup_due_at = None  # Scheduled only once the reply is actually sent.
@@ -2755,7 +7575,9 @@ async def save_service_turn(
         await log_request_changes(session, scope, conversation, previous, turn.projects)
     proposals_due: list[UUID] = []
     projects = [p for p in turn.projects if p.title.strip()]
-    if projects:
+    if flow.brain_mode(policy.response_rules):
+        pass  # brain mode opens no lead and writes no proposal before the offer
+    elif projects:
         # One deal per project: each gets its own lead, brief and proposal.
         won = await won_projects(session, scope, conversation)
         existing = await chat_deal_titles(session, scope, conversation)
@@ -2799,6 +7621,13 @@ async def save_service_turn(
         before_meeting.get("starts_at"),
         before_meeting.get("change_to"),
     )
+    if flow.brain_mode(policy.response_rules) and not (
+        asks_for_meeting(message.body) or MEETING_WORDS.search(message.body)
+    ):
+        # Brain mode: a meeting is raised only when the person's own message asks for one ("haan
+        # har hafte" answers a question about how often, and once raised a meeting and a link).
+        turn.meeting_requested = False
+        new_time = False
     if (
         (turn.meeting_requested or new_time)
         and turn.action != "booking"
@@ -2947,14 +7776,39 @@ async def remember_customer(
         customer.name = profile["name"][:160]
     if profile.get("business_name") and not customer.company:
         customer.company = profile["business_name"][:160]
+    if (
+        profile.get("business_name")
+        and customer.business_id is None
+        and not customer.pending_business_name
+    ):
+        # Spec 4.9: the first to name a business owns it; anyone after that awaits approval.
+        await business.join_or_request(session, scope, customer, profile["business_name"])
+
+
+async def customer_for(
+    session: AsyncSession, scope: WorkspaceScope, conversation: PiConversation
+) -> Any:
+    """The chat's customer record (None for an unattached chat). prepare_context reads it once
+    and hands it to every step that used to read it again."""
+    from app.modules.customers.models import Customer
+
+    if conversation.customer_id is None:
+        return None
+    return await WorkspaceRepository(session, Customer, scope).find(
+        Customer.id == conversation.customer_id
+    )
 
 
 async def customer_profile(
-    session: AsyncSession, scope: WorkspaceScope, conversation: PiConversation
+    session: AsyncSession,
+    scope: WorkspaceScope,
+    conversation: PiConversation,
+    customer: Any = LOOKUP,
 ) -> tuple[dict[str, str], bool]:
     """What is already known about the customer (their record, this chat and their
-    earlier chats), and whether they are returning (they chatted before)."""
-    from app.modules.customers.models import Customer
+    earlier chats), and whether they are returning (they chatted before).
+
+    `customer` is the record when the caller has already read it (None: there is none)."""
 
     profile: dict[str, str] = {}
     returning = False
@@ -2966,16 +7820,17 @@ async def customer_profile(
                 PiConversation.customer_id == conversation.customer_id,
                 PiConversation.id != conversation.id,
             )
-            .order_by(PiConversation.last_message_at.asc().nulls_first())
+            # The NEWEST ten, oldest of those first so a later chat's fact wins (it used to be the
+            # oldest ten: a person with many chats lost what they said last).
+            .order_by(PiConversation.last_message_at.desc().nulls_last())
             .limit(10)
         )
-        for row in earlier:
+        for row in reversed(list(earlier)):
             returning = True
             earlier_profile = (row.service_brief or {}).get("customer_profile") or {}
             profile = merge_profile(profile, earlier_profile)
-        customer = await WorkspaceRepository(session, Customer, scope).find(
-            Customer.id == conversation.customer_id
-        )
+        if isinstance(customer, _Lookup):
+            customer = await customer_for(session, scope, conversation)
         if customer is not None:
             if customer.name and not PLACEHOLDER_NAME.search(customer.name):
                 profile.setdefault("name", customer.name)
@@ -3064,6 +7919,11 @@ def needs_person(turn: ServiceTurn, context: dict[str, Any]) -> bool:
         return False
     if PERSON_WORDS.search(latest):
         return True
+    if DESCRIBES_THEIR_CALLS.search(latest):
+        # "Accounts wala banda baar baar phone karta hai": someone at THEIR business phones people.
+        # It is the problem they describe, not a request to talk to a person (live 2026-10-27: a
+        # school owner was handed to staff twice for it, and the chat went silent).
+        return False
     # "That's all" / "yes" / "ok" never asks for a person, whatever the model guessed.
     closing = len(latest) <= 40 and bool(CLOSING.match(latest) or AGREES.search(latest))
     # The model's guess counts only when they really ask to talk to or reach someone
@@ -3079,6 +7939,14 @@ WANTS_TALK = re.compile(
     re.IGNORECASE,
 )
 
+
+# A third person phoning or calling (their staff, a debt collector), not a request to pi.
+DESCRIBES_THEIR_CALLS = re.compile(
+    r"\b(?:phone|call|fon|kal)\s+(?:karta|karti|karte|krta|krti|krte|kerta|kerte)\b"
+    r"|\b(?:phone|call)s?\s+(?:the\s+)?(?:parents|customers|clients|patients|students|people)\b"
+    r"|\bkeeps?\s+(?:calling|phoning)\b|\b(?:he|she|they|staff|accountant)\s+(?:calls?|phones?)\b",
+    re.IGNORECASE,
+)
 
 # Asking for a person, in the languages pi's customers write in.
 PERSON_WORDS = re.compile(
@@ -3120,6 +7988,17 @@ async def ask_team(
     from app.modules.pi_saas.requests import raise_request
 
     if conversation.customer_id is None:
+        return
+    if flow.parse(conversation.flow_state) is not None:
+        # Brain mode (spec 6.6): pi can't help, a ticket of its own reason with the chat attached.
+        await raise_escalation(
+            session,
+            scope,
+            conversation,
+            "cant_help",
+            f"pi could not help with this. {summary} The customer said: {latest[:600]}",
+            latest,
+        )
         return
     try:
         async with session.begin_nested():
@@ -3699,7 +8578,38 @@ async def remember_projects(
         await remember(session, scope, conversation.customer_id, note[:500], message_id)
 
 
+def schedule_silence_nudge(conversation: PiConversation, policy: PiSettings) -> bool:
+    """Brain mode, spec 3.9.1: someone who went quiet mid-description gets one free-form
+    "still here" line about 20 hours after their last message, inside the 24-hour window. True
+    when it was scheduled; the legacy consented reminder is skipped then."""
+    brief = dict(conversation.service_brief or {})
+    state = flow.parse(conversation.flow_state)
+    brief.pop("followup_kind", None)
+    due = None
+    if (
+        flow.brain_mode(policy.response_rules)
+        and state in (flow.State.S1_LISTENING, flow.State.S2_CLARIFYING)
+        and conversation.last_inbound_at is not None
+        and brief.get("reminder_consent") != "declined"
+    ):
+        due = followup_policy.next_followup(
+            followup_policy.Chat(
+                state=state,
+                last_inbound_at=conversation.last_inbound_at,
+                sent=dict(brief.get("followups_sent") or {}),
+            ),
+            policy.response_rules,
+        )
+    if due is not None and due.kind == "silent" and not due.needs_template:
+        brief["followup_kind"] = "silent"
+        conversation.followup_due_at = due.at
+    conversation.service_brief = brief
+    return brief.get("followup_kind") == "silent"
+
+
 def schedule_followup(conversation: PiConversation, policy: PiSettings) -> None:
+    if schedule_silence_nudge(conversation, policy):
+        return
     brief = conversation.service_brief or {}
     if (
         policy.whatsapp_config.get("reminder_enabled", True)
@@ -3759,6 +8669,8 @@ async def run_service_action(
             return f"\u2713 {result.data['label']} ({result.data['timezone']})", None
         return None, "The requested time could not be booked; please offer the customer another."
     if turn.action == "payment":
+        if context.get("pi_mode") == "brain":
+            return None, None  # R-PAY-01: no payment in chat; the bank details are on the quote
         methods = context.get("payment_methods", [])
         chosen = "" if turn.payment_method == "none" else turn.payment_method
         method = chosen or (methods[0] if methods else "")

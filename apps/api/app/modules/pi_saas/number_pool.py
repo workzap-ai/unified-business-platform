@@ -162,8 +162,12 @@ async def sync_gone(session: AsyncSession, live_ids: set[str]) -> int:
 
 
 async def refresh(session: AsyncSession, settings: Settings, http: httpx.AsyncClient) -> None:
-    """Drop numbers Kapso no longer has before anyone is offered one."""
-    numbers = await Kapso(settings, http).list_numbers()
+    """Drop numbers Kapso no longer has before anyone is offered one. Without a Kapso key (local
+    development, CI) there is nothing to compare with: the stored numbers are listed as they are."""
+    kapso = Kapso(settings, http)
+    if not kapso.configured:
+        return
+    numbers = await kapso.list_numbers()
     await sync_gone(session, {n.phone_number_id for n in numbers})
 
 

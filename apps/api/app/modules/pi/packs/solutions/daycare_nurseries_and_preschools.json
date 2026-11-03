@@ -1,0 +1,353 @@
+{
+  "industry": "daycare_nurseries_and_preschools",
+  "name": "Daycare, nurseries and preschools",
+  "sector": "7.J Education and childcare",
+  "version": "1.1",
+  "problems": [
+    {
+      "id": "p1_lead_followup_slow",
+      "n": 1,
+      "words": "Our waitlist is in a notebook and we lose track of who's still interested",
+      "category": "marketing_leads",
+      "subtype": "lead_followup_slow",
+      "quick_ideas": [
+        "Move the waitlist into one list by family reference, preferred start month and room, so it can be sorted",
+        "Contact each family once to confirm interest, using the number they gave with permission, so the list is real."
+      ],
+      "workzap_build": {
+        "keys": [
+          "lead_followup"
+        ],
+        "text": "A waitlist and tour tracker with follow-up dates and offer status, reviewed each month across centres.",
+        "tool_words": []
+      },
+      "ask_first": "Of the families on the waitlist, are most still interested, or have you lost touch with most?",
+      "free_stops": "The waitlist stages and follow-up timing are kept for the document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many notebook entries have no recent contact note, so you can see how stale the waitlist really is.",
+          "review": false
+        },
+        {
+          "text": "Give one person the waitlist notebook and a fixed weekly review time, so follow-up stops getting missed between other jobs.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p2_capacity",
+      "n": 2,
+      "words": "Toddler room is full but preschool has empty places",
+      "category": "operations_process",
+      "subtype": "capacity",
+      "quick_ideas": [
+        "Write down places filled per room for the next few months, so upcoming gaps show early",
+        "Offer the coming gaps to waitlist families first, so places don't sit empty."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "A room capacity board showing places filled against your licensed capacity per room, looking months ahead and updated daily.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "Is the toddler room full all year, or only in certain months?",
+      "free_stops": "How room moves are forecast is in the document.",
+      "extra_ideas": [
+        {
+          "text": "Compare weekly enquiries for toddler places against empty preschool places this week, so you can judge the mismatch clearly.",
+          "review": false
+        },
+        {
+          "text": "Make one person review room availability with the enquiry notebook every Friday, so empty preschool places get offered sooner.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p3_shift_scheduling",
+      "n": 3,
+      "words": "Staff call in sick and we struggle to cover rooms that morning",
+      "category": "people_staff",
+      "subtype": "shift_scheduling",
+      "quick_ideas": [
+        "Ask staff to call in to one number by a fixed early time, so cover starts sooner",
+        "Keep a short list of on-call staff, so there is someone to ring first."
+      ],
+      "workzap_build": {
+        "keys": [
+          "booking_scheduling"
+        ],
+        "text": "A roster planner showing staffing per room against expected attendance and your own ratio settings, with the cover list contacted when needed.",
+        "tool_words": []
+      },
+      "ask_first": "Do sick calls come mostly on certain days, or spread across the week?",
+      "free_stops": "The roster rules and cover order are kept for the document.",
+      "extra_ideas": [
+        {
+          "text": "Write down which rooms need last-minute cover most often this month, so the pressure points are clear before the next rota.",
+          "review": false
+        },
+        {
+          "text": "Give one supervisor the morning cover call job at a fixed time, so room cover starts earlier on sick days.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p4_regulatory_reporting",
+      "n": 4,
+      "words": "Subsidy claims take me two evenings every month",
+      "category": "compliance_admin",
+      "subtype": "regulatory_reporting",
+      "quick_ideas": [
+        "Total attendance days per room at the end of each day this month, so month-end is just adding up",
+        "For what the claim requires, check with your provincial programme contact, so the format is right."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "Daily attendance counts put together into a claim workbook for you to check and submit.",
+        "tool_words": []
+      },
+      "ask_first": "Do the subsidy claim evenings go mostly on counting attendance, or on filling in the forms?",
+      "free_stops": "How the workbook is built to your province's format is in the document.",
+      "extra_ideas": [
+        {
+          "text": "Compare each room’s daily attendance mark with the final monthly claim line once this week, so the rework hotspot shows.",
+          "review": false
+        },
+        {
+          "text": "Give the closing supervisor one notebook page for room attendance totals each day, so claim figures are ready before month end.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p5_cash_flow_tight",
+      "n": 5,
+      "words": "Subsidy payments come late and I'm short for payroll",
+      "category": "cash_collections",
+      "subtype": "cash_flow_tight",
+      "quick_ideas": [
+        "Write down when each payment usually arrives against payroll dates, so the gap is known",
+        "Talk to your accountant about how to cover it, so payroll isn't a surprise."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "A cash view showing expected subsidy and parent payments against payroll and rent, updated daily.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "Do subsidy payments arrive a few days late, or weeks late?",
+      "free_stops": "How the cash view is set up is kept for the document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many staff paydays passed before each subsidy payment reached you lately, so you can see the payroll squeeze length.",
+          "review": true
+        },
+        {
+          "text": "Give one person one notebook page for all expected subsidy dates and wage dates, so missed handovers stop causing payroll stress.",
+          "review": true
+        }
+      ]
+    },
+    {
+      "id": "p6_receivables_late",
+      "n": 6,
+      "words": "Parents pay late and some leave owing two months",
+      "category": "cash_collections",
+      "subtype": "receivables_late",
+      "quick_ideas": [
+        "List every account behind today, by family reference, so you see the total",
+        "Offer families a regular payment method such as pre-authorised debit, so paying on time is easier."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger"
+        ],
+        "text": "A fee ledger that sends reminders and payment links to parents, with a daily overdue count per centre.",
+        "tool_words": []
+      },
+      "ask_first": "Do late payers owe a little each, or do a few families owe a lot?",
+      "free_stops": "The reminder sequence and overdue rules are in the document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many account references are one month late and how many are longer, so the backlog size is clear.",
+          "review": false
+        },
+        {
+          "text": "Give one person one notebook page for overdue account references and a fixed weekly review, so follow-up stays on track.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p7_pricing_errors",
+      "n": 7,
+      "words": "Late pick-up fees are never actually charged",
+      "category": "sales_revenue",
+      "subtype": "pricing_errors",
+      "quick_ideas": [
+        "Check this month's sign-out times against closing time once, so you see how often it happens",
+        "Put your late pick-up policy in writing to parents, so charging it isn't a surprise."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "Late pick-ups noticed from sign-out times and added to the next invoice, under your policy.",
+        "tool_words": []
+      },
+      "ask_first": "Do late pick-ups occur most days, or mainly on certain days?",
+      "free_stops": "How sign-out feeds billing is kept for the document.",
+      "extra_ideas": [
+        {
+          "text": "Count late sign-outs this week and compare them with fee entries made, so missed charging points are obvious.",
+          "review": false
+        },
+        {
+          "text": "Give the closer one handover note for late sign-outs before leaving, so fee entries stop being missed next day.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p8_checklists_not_done",
+      "n": 8,
+      "words": "Sign-in sheets are paper and times are often missing",
+      "category": "operations_process",
+      "subtype": "checklists_not_done",
+      "quick_ideas": [
+        "Ask one staff member to check the sheets at closing, so gaps are fixed the same day",
+        "Keep the sheet and a pen at the door, so it's never skipped for lack of one."
+      ],
+      "workzap_build": {
+        "keys": [
+          "custom_build"
+        ],
+        "text": "Digital sign-in and sign-out on a tablet with PINs for adults the centre authorises, and missing times flagged daily.",
+        "tool_words": []
+      },
+      "ask_first": "Are times missing mostly at morning drop-off, or at evening pick-up?",
+      "free_stops": "The sign-in setup and authorisation flow are in the document.",
+      "extra_ideas": [
+        {
+          "text": "Count how many sign-in sheets have missing times at closing this week, so you know which days are slipping most.",
+          "review": false
+        },
+        {
+          "text": "Give the closing shift one person responsible for checking the door sheet before lock-up, so missing times get caught that day.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p9_stockout",
+      "n": 9,
+      "words": "Nappies, wipes and formula run out without warning",
+      "category": "stock_inventory",
+      "subtype": "stockout",
+      "quick_ideas": [
+        "Count the supplies store once, so you know what is low",
+        "Set a minimum level for each item, so reordering starts before it runs out."
+      ],
+      "workzap_build": {
+        "keys": [
+          "stock_alerts"
+        ],
+        "text": "A supplies and food register with reorder alerts, and meal counts matched to expected attendance to cut waste.",
+        "tool_words": []
+      },
+      "ask_first": "Which item runs out most often: nappies, wipes or formula?",
+      "free_stops": "The minimum levels and alert setup are kept for the document.",
+      "extra_ideas": [
+        {
+          "text": "Walk the supplies area once this week and note which items are nearly finished, so surprise runouts stop catching you late.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member one notebook page for low-supply notes and a fixed check time, so reordering starts from one place.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p10_hygiene",
+      "n": 10,
+      "words": "Cleaning checklists are ticked but I doubt they're done",
+      "category": "quality_complaints",
+      "subtype": "hygiene",
+      "quick_ideas": [
+        "Do one spot check against the checklist yourself, so you know the real picture",
+        "Make each room's checklist one person's job per shift, so it has an owner."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks"
+        ],
+        "text": "Room checklists completed on a phone with time and a photo of the room (no children in frame), with completion measured per centre.",
+        "tool_words": []
+      },
+      "ask_first": "Which cleaning checks worry you most: the toddler rooms, the kitchen, or the bathrooms?",
+      "free_stops": "How the checks are scheduled and verified is in the document.",
+      "extra_ideas": [
+        {
+          "text": "Compare the room checklist ticks with what you can actually see at closing once this week, so weak rooms stand out fast.",
+          "review": false
+        },
+        {
+          "text": "Make the closer in each room hand the finished checklist to one manager before leaving, so missed cleaning gets chased the same day.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p11_whatsapp_overload",
+      "n": 11,
+      "words": "Parents message teachers' personal WhatsApp all day",
+      "category": "tech_systems",
+      "subtype": "whatsapp_overload",
+      "quick_ideas": [
+        "Give parents one centre number for all messages, so staff phones are left alone",
+        "Tell parents the hours that number is answered, so expectations are clear."
+      ],
+      "workzap_build": {
+        "keys": [
+          "customer_messaging"
+        ],
+        "text": "A centre messaging channel separate from staff phones, with set daily updates and instant replies to common questions.",
+        "tool_words": []
+      },
+      "ask_first": "Do parents message teachers mostly during class hours, or in the evenings and weekends?",
+      "free_stops": "The update templates and reply setup are kept for the document.",
+      "extra_ideas": [
+        {
+          "text": "Note which teacher phones get parent messages during teaching hours for one week, so you see where interruptions are heaviest.",
+          "review": false
+        },
+        {
+          "text": "Give one supervisor the job of collecting parent messages from staff at a set time daily, so teachers stop replying all day.",
+          "review": false
+        }
+      ]
+    }
+  ],
+  "never_say": [
+    "Anything on ratios, licensing, subsidy rules, food safety, medication or allergy handling.",
+    "Any safeguarding-procedure advice or custody guidance on pick-ups.",
+    "Any idea that records a child's name, photo, age, birth date, allergy, health, development or family details.",
+    "Help falsifying attendance or enrolment for subsidy claims, or covert recording of staff or children.",
+    "Promises about enrolment or full rooms.",
+    "Business talk after an injury, illness, missing child or abuse concern; pi points to 1122/15, 999/998 or 911 and the proper authority."
+  ],
+  "sample_reply": {
+    "person": "The subsidy paperwork is brutal. I sit with the sign-in sheets for two nights every month. Is there any way out of this?",
+    "pi": "Sure, this can be sorted, and the first steps are simple.\nFirst, total attendance days per room at the end of each day, so month-end is just adding up.\nSecond, confirm the claim format once with your provincial programme contact, so nothing is redone.\nWorkzap would handle this by turning daily attendance into a claim workbook you simply check and submit.\n\nWould you like me to arrange a solution document and quote for you? You're welcome to say no.",
+    "language": "english"
+  }
+}

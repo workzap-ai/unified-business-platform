@@ -399,7 +399,43 @@ class PiSupportGrant(TenantRow):
     revoked_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
 
 
-REQUEST_KINDS = ("question", "price", "review_document", "approve", "meeting", "other")
+# The brain's escalations (spec 6.6) are requests of their own kind, so a new reason never merges
+# into an older open request of another reason and always alerts the team.
+ESCALATION_KINDS = (
+    "human_requested",
+    "emergency",
+    "payment_detail_change",
+    "refund",
+    "complaint_about_pi",
+    "complaint_about_workzap",
+    "cant_help",
+    "legal_threat",
+    "abuse",
+    "press",
+    "partnership",
+    "enterprise_lead",
+    "existing_project",
+    "technical_failure",
+    "demo_request",
+    "jobs",
+    "vendor",
+    "deletion_request",
+    "price_request",
+    "payment_method",
+    "company_info",
+    "cancel_after_payment",
+    "quote_expired",
+)
+REQUEST_PRIORITIES = ("normal", "high", "urgent")
+REQUEST_KINDS = (
+    "question",
+    "price",
+    "review_document",
+    "approve",
+    "meeting",
+    "other",
+    *ESCALATION_KINDS,
+)
 REQUEST_STATUSES = ("open", "answered", "published", "resolved", "dismissed")
 
 
@@ -415,7 +451,7 @@ class PiStaffRequest(WorkspaceRow):
         scoped_fk("pi_staff_requests", "conversation_id", "pi_conversations"),
         CheckConstraint(_in("status", REQUEST_STATUSES), name="status"),
         CheckConstraint(_in("kind", REQUEST_KINDS), name="kind"),
-        CheckConstraint(_in("priority", ("normal", "high")), name="priority"),
+        CheckConstraint(_in("priority", REQUEST_PRIORITIES), name="priority"),
         Index("ix_pi_staff_requests_open", "tenant_id", "environment_id", "status"),
     )
     conversation_id: Mapped[UUID] = mapped_column(Uuid)

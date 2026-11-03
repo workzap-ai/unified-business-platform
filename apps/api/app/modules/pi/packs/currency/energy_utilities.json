@@ -1,0 +1,66 @@
+{
+ "cluster": "energy_utilities",
+ "version": 1,
+ "as_of": "2026-10",
+ "industries": [
+  "electricity_and_power_contractors",
+  "generator_sales_rental_and_service",
+  "oil_and_gas_services_contractors",
+  "waste_collection_and_sanitation_services",
+  "water_tanker_and_ro_filtration_plant_operators"
+ ],
+ "how_customers_find_and_choose": [
+  "Households and shops find service providers through neighbours, the map listing and shared contact in chat groups",
+  "Business and industrial clients choose contractors on safety record, past projects and responsiveness",
+  "Customers want a quick response time for faults: first reply fast, a visit time and a clear price estimate",
+  "For recurring supply such as water or waste collection, reliability and punctuality are the main reasons customers stay"
+ ],
+ "what_works_now": [
+  "A clear schedule of visits or deliveries shared with each customer in chat",
+  "A quick reply to fault calls with a name, an arrival time and a short explanation of what will be done",
+  "Written estimates and completion notes with before and after photos",
+  "A record of each customer's address, equipment and past service for faster visits",
+  "A reminder to regular customers when a service, filter change or refill is due, with consent",
+  "A complete map listing with service area, hours and contact",
+  "Basic safety information shared plainly with customers"
+ ],
+ "outdated_or_weak": [
+  "Quoting a fixed price without seeing the site or fault",
+  "Missing a promised time with no message",
+  "Handbills and wall chalking as the main way to be found",
+  "Ignoring the safety record in favour of the lowest bid",
+  "Generic digital marketing advice without a service area or schedule behind it"
+ ],
+ "local_context": {
+  "PK": [
+   "Cash on delivery and cash at the counter are still common; bank transfer and mobile wallet payments are now normal for many customers",
+   "Ramadan and the two Eids reshape demand, opening hours and staff availability every year",
+   "Summer heat, monsoon rain and power cuts affect operations and footfall",
+   "Customers often write in Urdu, Roman Urdu or a regional language, and chat is the usual first contact",
+   "Load shedding and power cuts drive demand for backup power; summer peak shapes workload",
+   "Utility and fuel rules are set by the regulators; the owner confirms specifics with them",
+   "Water supply problems drive demand for tankers and filters in many areas"
+  ],
+  "UAE": [
+   "Customers are multilingual and expect quick replies in chat; card and tap payments are normal",
+   "Winter is the busy season; many residents travel in summer so demand can dip",
+   "Ramadan and Eid change hours and buying patterns; the licence a business holds decides what it may sell and advertise, so the owner checks that with the licensing body",
+   "Utility services are regulated by the authority; summer cooling load defines peak demand",
+   "Work in energy and industrial sites needs approvals and safety permits; the owner confirms specifics"
+  ],
+  "CA": [
+   "Customers expect online booking or enquiry, card and bank e-transfer payment, and clear written confirmation",
+   "Long winters and a short summer peak shape outdoor and seasonal trades",
+   "English and French (in Quebec) matter, and many communities prefer their own language; consent for marketing messages and sales tax rules vary, so the owner checks them with a professional",
+   "Electrical, gas and waste work needs licensed trades and permits by province; the owner confirms specifics with the authority",
+   "Winter outages and storms drive emergency work"
+  ]
+ },
+ "never_assume": [
+  "A website or booking link",
+  "Service records in a tracked form",
+  "A dispatcher for incoming calls",
+  "Safety certificates ready to share"
+ ],
+ "review_status": "needs human review"
+}

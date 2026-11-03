@@ -1,0 +1,295 @@
+pdf,page,line,text
+pi-brain-v3,9,583,"This document is the single source of truth for how pi thinks, speaks, asks, notes, sorts, hands over and learns. It is written for two"
+pi-brain-v3,21,1754,Industry packs (Part 7) override the order and add industry-specific dimensions.
+pi-brain-v3,22,1906,Facts the person corrects override older facts. Keep history (
+pi-brain-v3,26,3046,The person can rename a group (“call it ‘warehouse’”). Their name wins.
+pi-brain-v3,28,3177,A revised quote gets a new version (Q-{id}-v2); old versions are marked superseded.
+pi-brain-v3,133,13067,- Planning: Which blocks or varieties do you feel earn the least? → What would help you decide what to replace?
+pi-brain-v3,188,17577,- “Inverter or battery fails and the brand distributor takes months to replace” → customers_retention/after_sales
+pi-brain-v3,231,21725,"overrides, and does not advise on inspection or certification rules. It never records names of building residents, trapped passengers,"
+pi-brain-v3,232,21823,"- pi never explains how to override, bypass, release brakes or manually move a lift, even for a technician."
+pi-brain-v3,282,25976,"- Single booking calendar for all farmhouses with one source of truth, shared read-only with the caretaker."
+pi-brain-v3,426,37966,"2 weeks are retired; the miner writes new ones to replace them. The fixed lines (opening disclosure, the offer) are never varied."
+pi-brain-v3,427,38100,it and can never override it.
+pi-brain-v3,429,38198,and does not replace the three-speed loop — the loop keeps running on top.
+pi-brain-v3,431,38384,A transition table (from Part 3.2) is the single source of truth.
+pi-brain-v3,432,38770,superseded)
+pi-brain-v3,441,39746,pi is Workzap's WhatsApp AI  agent. Full specification: docs/pi-brain.pdf. That document is the source of truth.
+pi-brain-v3,441,39747,"I f code and the document disagree, the document wins. Ask before deviating."
+pi-brain-v3,441,39768,"Learned content (examples, lexicon, lessons, packs) is data inserted BELOW the constitution and can never override it."
+pi-brain-v3,441,39803,"and learned-content attempts to override rules. Run them, report failures, and add any failing"
+pi-industry-solutions,2,40,Job S5: Replace the sample replies
+pi-industry-solutions,8,288,"they disagree, this one wins."
+pi-industry-solutions,16,624,Read docs/pi-industry-solutions.pdf (Addendum 2). It overrides Addendum 1 where they differ.
+pi-industry-solutions,20,777,Job S5: Replace the sample replies
+pi-industry-solutions,20,779,"solution reply for that industry (redacted, passing every rule) replaces it in the example bank. The best"
+pi-industry-solutions,60,2498,"collecting student names, because one line replaces a whole typed list."
+pi-industry-solutions,62,2586,"because most photos repeat the same lists. 2. Ask parents for just the school and class, which replaces a"
+pi-industry-solutions,91,3859,"replace · Name one venue lead for every event, so the team and hall know who decides."
+pi-industry-solutions,103,4448,- Where the free part stops: How the prepaid balance replaces paper coupons is detailed in the solution
+pi-industry-solutions,217,9542,"- Promises on rates, transit times or booking wins; never store customer or consignee contact details. If an"
+pi-industry-solutions,233,10240,"wins are usually a single master list, one named person who signs for each handover, and dated photos as"
+pi-industry-solutions,244,10773,"superseded files clearly, so site never works from an old one."
+pi-industry-solutions,256,11310,"- Any rescue, override, brake release or manual-move instructions, even for a technician."
+pi-industry-solutions,265,11707,"training hour, a departure), so the quick wins come from seeing bookings, costs and money owed in one"
+pi-industry-solutions,353,15695,"and skill and records who accepted, with time-to-replace tracked."
+pi-industry-solutions,395,17558,"closes, with a regular view of wins and losses by service line and client type."
+pi-industry-solutions,418,18591,"- Quick ideas (this week): Move all bookings into one shared calendar, so there’s one source of truth ·"
+pi-industry-solutions,448,19910,"portals, registers and WhatsApp chats. The first wins come from putting every order, donation, payment,"
+pi-platform-spec,2,11,Which rule wins when books disagree
+pi-platform-spec,4,83,"overruled, bypassed or not reaching the"
+pi-platform-spec,5,121,Which rule wins when books disagree
+pi-platform-spec,5,122,"The books were written one after another, so some older lines are superseded. This table decides. Part A.5"
+pi-platform-spec,5,123,"requires every superseded line in the live pi to be removed, not left beside the newer one."
+pi-platform-spec,5,124,Topic Older text Governing text
+pi-platform-spec,5,151,Constitution Always wins over everything above it
+pi-platform-spec,6,166,"between layers: new documents were added on top of an old pi, and something old is overruling, shadowing"
+pi-platform-spec,7,249,overrides the prompt.
+pi-platform-spec,9,380,"Which one wins today And why (position, code enforcement, retrieval)"
+pi-platform-spec,10,386,"1. One prompt, one source of truth. There must be exactly one assembled prompt per reply type, built"
+pi-platform-spec,10,388,"2. The constitution wins, then Solution Mode and the value line, then voice, then industry packs, then"
+pi-platform-spec,10,389,learned examples. A learned example never outranks a rule.
+pi-platform-spec,11,437,"This document is the single source of truth for how pi thinks, speaks, asks, notes, sorts, hands over and"
+pi-platform-spec,15,616,SUPERSEDED by Book 2 (R-ANS / R-SOL). Do not implement as written: if the person asks for a
+pi-platform-spec,15,617,"solution, pi answers with ideas in the first sentence. R-SELL-02 and R-SELL-04 are also superseded;"
+pi-platform-spec,15,619,"R-SELL-01 (superseded, kept for history) While the person is describing a problem, pi MUST NOT"
+pi-platform-spec,27,1251,Industry packs (Part 7) override the order and add industry-specific dimensions.
+pi-platform-spec,30,1363,"R-MEM-04 Facts the person corrects override older facts. Keep history (problem_revisions), show only"
+pi-platform-spec,36,1584,The person can rename a group (“call it ‘warehouse’”). Their name wins.
+pi-platform-spec,38,1682,R-QUOTE-08 A revised quote gets a new version (Q-{id}-v2); old versions are marked superseded.
+pi-platform-spec,60,2688,Variants worse than baseline for 2 weeks are retired; the miner writes new ones to replace them. The
+pi-platform-spec,62,2759,never override it.
+pi-platform-spec,64,2836,"later, must use only redacted data with clear consent under the privacy notice, and does not replace the"
+pi-platform-spec,67,2953,A transition table (from Part 3.2) is the single source of truth. set_state rejects invalid transitions.
+pi-platform-spec,68,3016,"status(draft|in_review|approved|sent|superseded), drafted_by, approved_by, approved_at,"
+pi-platform-spec,80,3478,source of truth.
+pi-platform-spec,80,3479,"If code and the document disagree, the document wins. Ask before deviating."
+pi-platform-spec,80,3494,and can never override it.
+pi-platform-spec,81,3530,"and learned-content attempts to override rules. Run them, report failures, and add any failing"
+pi-platform-spec,91,3889,"This addendum changes pi — The Brain v3. Where the two disagree, this addendum wins. Give Claude Code"
+pi-platform-spec,95,4168,"These rules replace R-SELL-01, R-SELL-02 and R-SELL-04 in v3 Part 1.2. R-SELL-03 (no urgency, scarcity or"
+pi-platform-spec,114,4949,overrides v3 where they disagree. Then:
+pi-platform-spec,114,4953,"2. Update src/core/constitution: replace R-SELL-01/02/04 with R-ANS, R-SOL, R-OFFER-01(amended),"
+pi-platform-spec,116,5036,"disagree, this one wins."
+pi-platform-spec,124,5373,Read docs/pi-industry-solutions.pdf (Addendum 2). It overrides Addendum 1 where they differ.
+pi-platform-spec,127,5504,Job S5: Replace the sample replies
+pi-platform-spec,127,5506,"reply for that industry (redacted, passing every rule) replaces it in the example bank. The best replies change"
+pi-platform-spec,137,6054,SOLUTION MODE (overrides any older instruction about not giving solutions)
+pi-platform-spec,138,6101,5.4 Reminder / follow-up prompt (replace the current one)
+pi-platform-spec,139,6119,5.3 into the LIVE reply prompt. Replace the follow-up generator prompt with 5.4. Make sure
+pi-platform-spec-1,2,11,Which rule wins when books disagree
+pi-platform-spec-1,4,100,"overruled, bypassed or not reaching the"
+pi-platform-spec-1,5,143,Which rule wins when books disagree
+pi-platform-spec-1,5,144,"The books were written one after another, so some older lines are superseded. This table decides. Part A.5"
+pi-platform-spec-1,5,145,"requires every superseded line in the live pi to be removed, not left beside the newer one."
+pi-platform-spec-1,5,146,Topic Older text Governing text
+pi-platform-spec-1,5,185,Constitution Always wins over everything above it
+pi-platform-spec-1,6,200,"between layers: new documents were added on top of an old pi, and something old is overruling, shadowing"
+pi-platform-spec-1,7,283,overrides the prompt.
+pi-platform-spec-1,10,417,"Which one wins today And why (position, code enforcement, retrieval)"
+pi-platform-spec-1,10,422,"1. One prompt, one source of truth. There must be exactly one assembled prompt per reply type, built"
+pi-platform-spec-1,10,424,"2. The constitution wins, then Solution Mode and the value line, then voice, then industry packs, then"
+pi-platform-spec-1,10,425,learned examples. A learned example never outranks a rule.
+pi-platform-spec-1,11,473,"This document is the single source of truth for how pi thinks, speaks, asks, notes, sorts, hands over and"
+pi-platform-spec-1,15,652,SUPERSEDED by Book 2 (R-ANS / R-SOL). Do not implement as written: if the person asks for a
+pi-platform-spec-1,15,653,"solution, pi answers with ideas in the first sentence. R-SELL-02 and R-SELL-04 are also superseded;"
+pi-platform-spec-1,15,655,"R-SELL-01 (superseded, kept for history) While the person is describing a problem, pi MUST NOT"
+pi-platform-spec-1,27,1285,Industry packs (Part 7) override the order and add industry-specific dimensions.
+pi-platform-spec-1,30,1397,"R-MEM-04 Facts the person corrects override older facts. Keep history (problem_revisions), show only"
+pi-platform-spec-1,36,1618,The person can rename a group (“call it ‘warehouse’”). Their name wins.
+pi-platform-spec-1,38,1716,R-QUOTE-08 A revised quote gets a new version (Q-{id}-v2); old versions are marked superseded.
+pi-platform-spec-1,60,2722,Variants worse than baseline for 2 weeks are retired; the miner writes new ones to replace them. The
+pi-platform-spec-1,62,2793,never override it.
+pi-platform-spec-1,64,2870,"later, must use only redacted data with clear consent under the privacy notice, and does not replace the"
+pi-platform-spec-1,67,2987,A transition table (from Part 3.2) is the single source of truth. set_state rejects invalid transitions.
+pi-platform-spec-1,68,3050,"status(draft|in_review|approved|sent|superseded), drafted_by, approved_by, approved_at,"
+pi-platform-spec-1,80,3512,source of truth.
+pi-platform-spec-1,80,3513,"If code and the document disagree, the document wins. Ask before deviating."
+pi-platform-spec-1,80,3528,and can never override it.
+pi-platform-spec-1,81,3564,"and learned-content attempts to override rules. Run them, report failures, and add any failing"
+pi-platform-spec-1,91,3923,"This addendum changes pi — The Brain v3. Where the two disagree, this addendum wins. Give Claude Code"
+pi-platform-spec-1,95,4202,"These rules replace R-SELL-01, R-SELL-02 and R-SELL-04 in v3 Part 1.2. R-SELL-03 (no urgency, scarcity or"
+pi-platform-spec-1,114,4983,overrides v3 where they disagree. Then:
+pi-platform-spec-1,114,4987,"2. Update src/core/constitution: replace R-SELL-01/02/04 with R-ANS, R-SOL, R-OFFER-01(amended),"
+pi-platform-spec-1,116,5070,"disagree, this one wins."
+pi-platform-spec-1,124,5407,Read docs/pi-industry-solutions.pdf (Addendum 2). It overrides Addendum 1 where they differ.
+pi-platform-spec-1,127,5538,Job S5: Replace the sample replies
+pi-platform-spec-1,127,5540,"reply for that industry (redacted, passing every rule) replaces it in the example bank. The best replies change"
+pi-platform-spec-1,137,6088,SOLUTION MODE (overrides any older instruction about not giving solutions)
+pi-platform-spec-1,138,6135,5.4 Reminder / follow-up prompt (replace the current one)
+pi-platform-spec-1,139,6153,5.3 into the LIVE reply prompt. Replace the follow-up generator prompt with 5.4. Make sure
+pi-platform-spec-1,141,6235,"login or the box, Book 5 governs."
+pi-platform-spec-1,142,6301,"Supersedes. This addendum replaces the offer rules, the check-in rules, the “stages” model and the “per-"
+pi-platform-spec-1,143,6332,"1, 2 Old “listen first” rule outranks"
+pi-platform-spec-1,147,6555,"Rule. When a signal and a dial disagree, the signal wins and the dial moves. pi does not defend its guess."
+pi-platform-spec-1,150,6703,"Fatigue wins over method. On fatigue signals (short, “ok”,"
+pi-platform-spec-1,157,6944,"The map replaces three older ideas: the per-problem meter alone (it stays, inside each node), the “set board”"
+pi-platform-spec-1,168,7367,Industry packs override with their own “Words they use”.
+pi-platform-spec-1,177,7778,ENGAGEMENT ENGINE (overrides any older instruction to end with an offer or a quote)
+pi-platform-spec-1,177,7791,"Do not follow fixed stages. If a signal disagrees with your guess, the signal wins."
+pi-platform-spec-1,188,8296,"R-SELL-01, R-SELL-02, R-SELL-04 Brain v3 Already superseded by R-ANS and R-"
+pi-platform-spec-v1.4-2026-10-27,2,13,Which rule wins when books disagree
+pi-platform-spec-v1.4-2026-10-27,6,250,5.4 Reminder / follow-up prompt (replace the current one)
+pi-platform-spec-v1.4-2026-10-27,11,442,"overruled, bypassed or not reaching"
+pi-platform-spec-v1.4-2026-10-27,12,496,Which rule wins when books disagree
+pi-platform-spec-v1.4-2026-10-27,12,497,"The books were written one after another, so some older lines are superseded. This table decides. Part"
+pi-platform-spec-v1.4-2026-10-27,12,498,"A.5 requires every superseded line in the live pi to be removed, not left beside the newer one."
+pi-platform-spec-v1.4-2026-10-27,12,499,Topic Older text Governing text
+pi-platform-spec-v1.4-2026-10-27,13,518,Topic Older text Governing text
+pi-platform-spec-v1.4-2026-10-27,13,545,Constitution Always wins over everything above it
+pi-platform-spec-v1.4-2026-10-27,14,562,"conflict between layers: new documents were added on top of an old pi, and something old is overruling,"
+pi-platform-spec-v1.4-2026-10-27,15,648,overrides the prompt.
+pi-platform-spec-v1.4-2026-10-27,17,781,"Which one wins today And why (position, code enforcement, retrieval)"
+pi-platform-spec-v1.4-2026-10-27,17,786,"1. One prompt, one source of truth. There must be exactly one assembled prompt per reply type,"
+pi-platform-spec-v1.4-2026-10-27,17,788,"2. The constitution wins, then Solution Mode and the value line, then voice, then industry packs,"
+pi-platform-spec-v1.4-2026-10-27,17,789,then learned examples. A learned example never outranks a rule.
+pi-platform-spec-v1.4-2026-10-27,19,841,"This document is the single source of truth for how pi thinks, speaks, asks, notes, sorts, hands over and"
+pi-platform-spec-v1.4-2026-10-27,23,1034,SUPERSEDED by Book 2 (R-ANS / R-SOL). Do not implement as written: if the person asks for a
+pi-platform-spec-v1.4-2026-10-27,23,1036,superseded; R-SELL-03 and R-SELL-05 stand.
+pi-platform-spec-v1.4-2026-10-27,23,1037,"R-SELL-01 (superseded, kept for history) While the person is describing a problem, pi MUST NOT"
+pi-platform-spec-v1.4-2026-10-27,35,1724,Industry packs (Part 7) override the order and add industry-specific dimensions.
+pi-platform-spec-v1.4-2026-10-27,38,1840,"R-MEM-04 Facts the person corrects override older facts. Keep history (problem_revisions), show"
+pi-platform-spec-v1.4-2026-10-27,44,2074,The person can rename a group (“call it ‘warehouse’”). Their name wins.
+pi-platform-spec-v1.4-2026-10-27,47,2181,superseded.
+pi-platform-spec-v1.4-2026-10-27,70,3280,Variants worse than baseline for 2 weeks are retired; the miner writes new ones to replace them.
+pi-platform-spec-v1.4-2026-10-27,72,3356,can never override it.
+pi-platform-spec-v1.4-2026-10-27,74,3440,does not replace the three-speed loop — the loop keeps running on top.
+pi-platform-spec-v1.4-2026-10-27,77,3566,A transition table (from Part 3.2) is the single source of truth. set_state rejects invalid transitions.
+pi-platform-spec-v1.4-2026-10-27,78,3627,"status(draft|in_review|approved|sent|superseded), drafted_by, approved_by, approved_at,"
+pi-platform-spec-v1.4-2026-10-27,89,4097,the source of truth.
+pi-platform-spec-v1.4-2026-10-27,89,4098,"If code and the document disagree, the document wins. Ask before deviating."
+pi-platform-spec-v1.4-2026-10-27,89,4113,constitution and can never override it.
+pi-platform-spec-v1.4-2026-10-27,90,4153,"and learned-content attempts to override rules. Run them, report failures, and add any"
+pi-platform-spec-v1.4-2026-10-27,100,4549,"This addendum changes pi — The Brain v3. Where the two disagree, this addendum wins. Give Claude"
+pi-platform-spec-v1.4-2026-10-27,105,4850,"These rules replace R-SELL-01, R-SELL-02 and R-SELL-04 in v3 Part 1.2. R-SELL-03 (no urgency,"
+pi-platform-spec-v1.4-2026-10-27,123,5662,overrides v3 where they disagree. Then:
+pi-platform-spec-v1.4-2026-10-27,123,5666,"2. Update src/core/constitution: replace R-SELL-01/02/04 with R-ANS, R-SOL, R-OFFER-01(amended),"
+pi-platform-spec-v1.4-2026-10-27,125,5759,"Where they disagree, this one wins."
+pi-platform-spec-v1.4-2026-10-27,133,6114,Read docs/pi-industry-solutions.pdf (Addendum 2). It overrides Addendum 1 where they differ.
+pi-platform-spec-v1.4-2026-10-27,136,6249,Job S5: Replace the sample replies
+pi-platform-spec-v1.4-2026-10-27,136,6251,"solution reply for that industry (redacted, passing every rule) replaces it in the example bank. The best"
+pi-platform-spec-v1.4-2026-10-27,146,6846,SOLUTION MODE (overrides any older instruction about not giving solutions)
+pi-platform-spec-v1.4-2026-10-27,147,6894,5.4 Reminder / follow-up prompt (replace the current one)
+pi-platform-spec-v1.4-2026-10-27,148,6913,5.3 into the LIVE reply prompt. Replace the follow-up generator prompt with 5.4. Make sure
+pi-platform-spec-v1.4-2026-10-27,150,6999,"map, the dashboard login, the box, owner turns or handoff, Book 5 governs."
+pi-platform-spec-v1.4-2026-10-27,151,7094,"Supersedes. This addendum replaces the offer rules, the check-in rules, the “stages” model and the"
+pi-platform-spec-v1.4-2026-10-27,152,7129,outranks the new one (fixed
+pi-platform-spec-v1.4-2026-10-27,156,7372,"Rule. When a signal and a dial disagree, the signal wins and the dial moves. pi does not defend its"
+pi-platform-spec-v1.4-2026-10-27,159,7530,"Fatigue wins over method. On fatigue signals (short, “ok”,"
+pi-platform-spec-v1.4-2026-10-27,166,7777,"The map replaces three older ideas: the per-problem meter alone (it stays, inside each node), the “set"
+pi-platform-spec-v1.4-2026-10-27,177,8224,"neutral, “aap” forms). Industry packs override with their own “Words they use”."
+pi-platform-spec-v1.4-2026-10-27,186,8671,ENGAGEMENT ENGINE (overrides any older instruction to end with an offer or a quote)
+pi-platform-spec-v1.4-2026-10-27,186,8684,"Do not follow fixed stages. If a signal disagrees with your guess, the signal wins."
+pi-platform-spec-v1.4-2026-10-27,197,9254,"R-SELL-01, R-SELL-02, R-SELL-04 Brain v3 Already superseded by R-ANS and R-"
+pi-platform-spec-v1.4-2026-10-27,207,9727,"Part 4 (map), Part 6 (return) and Part 16 (opening), and it overrides them where they disagree."
+pi-platform-spec-v1.4-2026-10-27,212,9904,"collecting|processing|answered|superseded,"
+pi-platform-spec-v1.5-2026-10-28,2,13,Which rule wins when books disagree
+pi-platform-spec-v1.5-2026-10-28,6,250,5.4 Reminder / follow-up prompt (replace the current one)
+pi-platform-spec-v1.5-2026-10-28,11,466,"overruled, bypassed or not reaching"
+pi-platform-spec-v1.5-2026-10-28,12,525,Which rule wins when books disagree
+pi-platform-spec-v1.5-2026-10-28,12,526,"The books were written one after another, so some older lines are superseded. This table decides. Part"
+pi-platform-spec-v1.5-2026-10-28,12,527,"A.5 requires every superseded line in the live pi to be removed, not left beside the newer one."
+pi-platform-spec-v1.5-2026-10-28,13,530,Topic Older text Governing text
+pi-platform-spec-v1.5-2026-10-28,13,573,Constitution Always wins over everything above it
+pi-platform-spec-v1.5-2026-10-28,14,590,"conflict between layers: new documents were added on top of an old pi, and something old is overruling,"
+pi-platform-spec-v1.5-2026-10-28,15,676,overrides the prompt.
+pi-platform-spec-v1.5-2026-10-28,17,808,"Which one wins today And why (position, code enforcement, retrieval)"
+pi-platform-spec-v1.5-2026-10-28,18,815,"1. One prompt, one source of truth. There must be exactly one assembled prompt per reply type,"
+pi-platform-spec-v1.5-2026-10-28,18,817,"2. The constitution wins, then Solution Mode and the value line, then voice, then industry packs,"
+pi-platform-spec-v1.5-2026-10-28,18,818,then learned examples. A learned example never outranks a rule.
+pi-platform-spec-v1.5-2026-10-28,19,868,"This document is the single source of truth for how pi thinks, speaks, asks, notes, sorts, hands over and"
+pi-platform-spec-v1.5-2026-10-28,23,1061,SUPERSEDED by Book 2 (R-ANS / R-SOL). Do not implement as written: if the person asks for a
+pi-platform-spec-v1.5-2026-10-28,23,1063,superseded; R-SELL-03 and R-SELL-05 stand.
+pi-platform-spec-v1.5-2026-10-28,23,1064,"R-SELL-01 (superseded, kept for history) While the person is describing a problem, pi MUST NOT"
+pi-platform-spec-v1.5-2026-10-28,36,1751,Industry packs (Part 7) override the order and add industry-specific dimensions.
+pi-platform-spec-v1.5-2026-10-28,38,1867,"R-MEM-04 Facts the person corrects override older facts. Keep history (problem_revisions), show"
+pi-platform-spec-v1.5-2026-10-28,44,2101,The person can rename a group (“call it ‘warehouse’”). Their name wins.
+pi-platform-spec-v1.5-2026-10-28,47,2208,superseded.
+pi-platform-spec-v1.5-2026-10-28,70,3307,Variants worse than baseline for 2 weeks are retired; the miner writes new ones to replace them.
+pi-platform-spec-v1.5-2026-10-28,72,3383,can never override it.
+pi-platform-spec-v1.5-2026-10-28,74,3467,does not replace the three-speed loop — the loop keeps running on top.
+pi-platform-spec-v1.5-2026-10-28,77,3593,A transition table (from Part 3.2) is the single source of truth. set_state rejects invalid transitions.
+pi-platform-spec-v1.5-2026-10-28,78,3654,"status(draft|in_review|approved|sent|superseded), drafted_by, approved_by, approved_at,"
+pi-platform-spec-v1.5-2026-10-28,89,4124,the source of truth.
+pi-platform-spec-v1.5-2026-10-28,89,4125,"If code and the document disagree, the document wins. Ask before deviating."
+pi-platform-spec-v1.5-2026-10-28,89,4140,constitution and can never override it.
+pi-platform-spec-v1.5-2026-10-28,90,4180,"and learned-content attempts to override rules. Run them, report failures, and add any"
+pi-platform-spec-v1.5-2026-10-28,100,4576,"This addendum changes pi — The Brain v3. Where the two disagree, this addendum wins. Give Claude"
+pi-platform-spec-v1.5-2026-10-28,105,4877,"These rules replace R-SELL-01, R-SELL-02 and R-SELL-04 in v3 Part 1.2. R-SELL-03 (no urgency,"
+pi-platform-spec-v1.5-2026-10-28,123,5689,overrides v3 where they disagree. Then:
+pi-platform-spec-v1.5-2026-10-28,123,5693,"2. Update src/core/constitution: replace R-SELL-01/02/04 with R-ANS, R-SOL, R-OFFER-01(amended),"
+pi-platform-spec-v1.5-2026-10-28,125,5786,"Where they disagree, this one wins."
+pi-platform-spec-v1.5-2026-10-28,133,6141,Read docs/pi-industry-solutions.pdf (Addendum 2). It overrides Addendum 1 where they differ.
+pi-platform-spec-v1.5-2026-10-28,136,6276,Job S5: Replace the sample replies
+pi-platform-spec-v1.5-2026-10-28,136,6278,"solution reply for that industry (redacted, passing every rule) replaces it in the example bank. The best"
+pi-platform-spec-v1.5-2026-10-28,146,6873,SOLUTION MODE (overrides any older instruction about not giving solutions)
+pi-platform-spec-v1.5-2026-10-28,147,6921,5.4 Reminder / follow-up prompt (replace the current one)
+pi-platform-spec-v1.5-2026-10-28,148,6940,5.3 into the LIVE reply prompt. Replace the follow-up generator prompt with 5.4. Make sure
+pi-platform-spec-v1.5-2026-10-28,150,7026,"map, the dashboard login, the box, owner turns, handoff or the code checks, Book 5 governs."
+pi-platform-spec-v1.5-2026-10-28,151,7135,"Supersedes. This addendum replaces the offer rules, the check-in rules, the “stages” model and the"
+pi-platform-spec-v1.5-2026-10-28,152,7169,outranks the new one (fixed
+pi-platform-spec-v1.5-2026-10-28,156,7415,"Rule. When a signal and a dial disagree, the signal wins and the dial moves. pi does not defend its"
+pi-platform-spec-v1.5-2026-10-28,160,7576,"Fatigue wins over method. On fatigue signals (short, “ok”,"
+pi-platform-spec-v1.5-2026-10-28,167,7822,"The map replaces three older ideas: the per-problem meter alone (it stays, inside each node), the “set"
+pi-platform-spec-v1.5-2026-10-28,178,8269,"neutral, “aap” forms). Industry packs override with their own “Words they use”."
+pi-platform-spec-v1.5-2026-10-28,187,8716,ENGAGEMENT ENGINE (overrides any older instruction to end with an offer or a quote)
+pi-platform-spec-v1.5-2026-10-28,187,8729,"Do not follow fixed stages. If a signal disagrees with your guess, the signal wins."
+pi-platform-spec-v1.5-2026-10-28,199,9317,"R-SELL-01, R-SELL-02, R-SELL-04 Brain v3 Already superseded by R-ANS and R-"
+pi-platform-spec-v1.5-2026-10-28,208,9794,"Part 4 (map), Part 6 (return) and Part 16 (opening), and it overrides them where they disagree."
+pi-platform-spec-v1.5-2026-10-28,213,9971,"collecting|processing|answered|superseded,"
+pi-platform-spec-v1.5-2026-10-28,216,10103,"rules failed, and a map with one vague node. A prompt can be ignored, overridden by an older prompt,"
+pi-platform-spec-v1.6-2026-10-30,2,13,Which rule wins when books disagree
+pi-platform-spec-v1.6-2026-10-30,6,250,5.4 Reminder / follow-up prompt (replace the current one)
+pi-platform-spec-v1.6-2026-10-30,12,500,"overruled, bypassed or not reaching"
+pi-platform-spec-v1.6-2026-10-30,14,565,Which rule wins when books disagree
+pi-platform-spec-v1.6-2026-10-30,14,566,"The books were written one after another, so some older lines are superseded. This table decides. Part"
+pi-platform-spec-v1.6-2026-10-30,14,567,"A.5 requires every superseded line in the live pi to be removed, not left beside the newer one."
+pi-platform-spec-v1.6-2026-10-30,14,568,Topic Older text Governing text
+pi-platform-spec-v1.6-2026-10-30,14,611,Constitution Always wins over everything above it
+pi-platform-spec-v1.6-2026-10-30,15,628,"conflict between layers: new documents were added on top of an old pi, and something old is overruling,"
+pi-platform-spec-v1.6-2026-10-30,16,714,overrides the prompt.
+pi-platform-spec-v1.6-2026-10-30,19,851,"Which one wins today And why (position, code enforcement, retrieval)"
+pi-platform-spec-v1.6-2026-10-30,19,856,"1. One prompt, one source of truth. There must be exactly one assembled prompt per reply type,"
+pi-platform-spec-v1.6-2026-10-30,19,858,"2. The constitution wins, then Solution Mode and the value line, then voice, then industry packs,"
+pi-platform-spec-v1.6-2026-10-30,19,859,then learned examples. A learned example never outranks a rule.
+pi-platform-spec-v1.6-2026-10-30,20,909,"This document is the single source of truth for how pi thinks, speaks, asks, notes, sorts, hands over and"
+pi-platform-spec-v1.6-2026-10-30,24,1102,SUPERSEDED by Book 2 (R-ANS / R-SOL). Do not implement as written: if the person asks for a
+pi-platform-spec-v1.6-2026-10-30,24,1104,superseded; R-SELL-03 and R-SELL-05 stand.
+pi-platform-spec-v1.6-2026-10-30,24,1105,"R-SELL-01 (superseded, kept for history) While the person is describing a problem, pi MUST NOT"
+pi-platform-spec-v1.6-2026-10-30,37,1792,Industry packs (Part 7) override the order and add industry-specific dimensions.
+pi-platform-spec-v1.6-2026-10-30,39,1908,"R-MEM-04 Facts the person corrects override older facts. Keep history (problem_revisions), show"
+pi-platform-spec-v1.6-2026-10-30,45,2142,The person can rename a group (“call it ‘warehouse’”). Their name wins.
+pi-platform-spec-v1.6-2026-10-30,48,2249,superseded.
+pi-platform-spec-v1.6-2026-10-30,71,3348,Variants worse than baseline for 2 weeks are retired; the miner writes new ones to replace them.
+pi-platform-spec-v1.6-2026-10-30,73,3424,can never override it.
+pi-platform-spec-v1.6-2026-10-30,75,3508,does not replace the three-speed loop — the loop keeps running on top.
+pi-platform-spec-v1.6-2026-10-30,78,3634,A transition table (from Part 3.2) is the single source of truth. set_state rejects invalid transitions.
+pi-platform-spec-v1.6-2026-10-30,79,3695,"status(draft|in_review|approved|sent|superseded), drafted_by, approved_by, approved_at,"
+pi-platform-spec-v1.6-2026-10-30,90,4165,the source of truth.
+pi-platform-spec-v1.6-2026-10-30,90,4166,"If code and the document disagree, the document wins. Ask before deviating."
+pi-platform-spec-v1.6-2026-10-30,90,4181,constitution and can never override it.
+pi-platform-spec-v1.6-2026-10-30,91,4221,"and learned-content attempts to override rules. Run them, report failures, and add any"
+pi-platform-spec-v1.6-2026-10-30,101,4617,"This addendum changes pi — The Brain v3. Where the two disagree, this addendum wins. Give Claude"
+pi-platform-spec-v1.6-2026-10-30,106,4918,"These rules replace R-SELL-01, R-SELL-02 and R-SELL-04 in v3 Part 1.2. R-SELL-03 (no urgency,"
+pi-platform-spec-v1.6-2026-10-30,124,5730,overrides v3 where they disagree. Then:
+pi-platform-spec-v1.6-2026-10-30,124,5734,"2. Update src/core/constitution: replace R-SELL-01/02/04 with R-ANS, R-SOL, R-OFFER-01(amended),"
+pi-platform-spec-v1.6-2026-10-30,126,5827,"Where they disagree, this one wins."
+pi-platform-spec-v1.6-2026-10-30,134,6182,Read docs/pi-industry-solutions.pdf (Addendum 2). It overrides Addendum 1 where they differ.
+pi-platform-spec-v1.6-2026-10-30,137,6317,Job S5: Replace the sample replies
+pi-platform-spec-v1.6-2026-10-30,137,6319,"solution reply for that industry (redacted, passing every rule) replaces it in the example bank. The best"
+pi-platform-spec-v1.6-2026-10-30,147,6914,SOLUTION MODE (overrides any older instruction about not giving solutions)
+pi-platform-spec-v1.6-2026-10-30,148,6962,5.4 Reminder / follow-up prompt (replace the current one)
+pi-platform-spec-v1.6-2026-10-30,149,6981,5.3 into the LIVE reply prompt. Replace the follow-up generator prompt with 5.4. Make sure
+pi-platform-spec-v1.6-2026-10-30,153,7196,"Supersedes. This addendum replaces the offer rules, the check-in rules, the “stages” model and the"
+pi-platform-spec-v1.6-2026-10-30,153,7228,outranks the new one (fixed
+pi-platform-spec-v1.6-2026-10-30,158,7477,"Rule. When a signal and a dial disagree, the signal wins and the dial moves. pi does not defend its"
+pi-platform-spec-v1.6-2026-10-30,161,7636,"Fatigue wins over method. On fatigue signals (short, “ok”,"
+pi-platform-spec-v1.6-2026-10-30,168,7882,"The map replaces three older ideas: the per-problem meter alone (it stays, inside each node), the “set"
+pi-platform-spec-v1.6-2026-10-30,179,8329,"neutral, “aap” forms). Industry packs override with their own “Words they use”."
+pi-platform-spec-v1.6-2026-10-30,188,8776,ENGAGEMENT ENGINE (overrides any older instruction to end with an offer or a quote)
+pi-platform-spec-v1.6-2026-10-30,188,8789,"Do not follow fixed stages. If a signal disagrees with your guess, the signal wins."
+pi-platform-spec-v1.6-2026-10-30,200,9395,"R-SELL-01, R-SELL-02, R-SELL-04 Brain v3 Already superseded by R-ANS and R-"
+pi-platform-spec-v1.6-2026-10-30,210,9885,"Part 4 (map), Part 6 (return) and Part 16 (opening), and it overrides them where they disagree."
+pi-platform-spec-v1.6-2026-10-30,215,10062,"collecting|processing|answered|superseded,"
+pi-platform-spec-v1.6-2026-10-30,217,10192,"rules failed, and a map with one vague node. A prompt can be ignored, overridden by an older prompt,"
+pi-platform-spec-v1.6-2026-10-30,251,12047,never replace an answer.

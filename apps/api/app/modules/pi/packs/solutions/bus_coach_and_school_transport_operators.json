@@ -1,0 +1,327 @@
+{
+  "industry": "bus_coach_and_school_transport_operators",
+  "name": "Bus, coach and school-transport operators",
+  "sector": "7.G Transport, mobility and aviation (part 2)",
+  "version": "1.1",
+  "problems": [
+    {
+      "id": "p1_customer_communication",
+      "n": 1,
+      "words": "Parents call every morning asking where the van is",
+      "category": "customers_retention",
+      "subtype": "customer_communication",
+      "quick_ideas": [
+        "Ask drivers to tell the office when they leave the depot, so you know first",
+        "Let parents on a late route know as soon as you know, so they hear it from you."
+      ],
+      "workzap_build": {
+        "keys": [
+          "customer_messaging",
+          "dashboards_reports"
+        ],
+        "text": "a route board with departure and arrival status, and WhatsApp alerts per route sent to parents who have agreed, without storing any child's details.",
+        "tool_words": []
+      },
+      "ask_first": "How do you find out today where a van is?",
+      "free_stops": "How alerts are set up per route is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "For one week, count morning calls by route and note the delay reason beside each, so the noisiest route gets attention first.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member the job of updating route delays at one fixed morning time, so calls drop because updates leave from the office sooner.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p2_receivables_late",
+      "n": 2,
+      "words": "Monthly fees from parents come late, some never",
+      "category": "cash_collections",
+      "subtype": "receivables_late",
+      "quick_ideas": [
+        "List who has paid this month by route, so you know the gap",
+        "Remind late payers once on a fixed date, so it's consistent."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger"
+        ],
+        "text": "a fee and contract tracker sending reminders and receipts straight to clients.",
+        "tool_words": []
+      },
+      "ask_first": "Is it the same few families paying late each month, or different ones every time?",
+      "free_stops": "Reminder steps are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "This week, count unpaid families by route and note how late each account is, so the worst collection route stops being guessed.",
+          "review": false
+        },
+        {
+          "text": "Give one person one route wise dues list and a fixed reminder day each month, so follow up happens consistently before balances age further.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p3_receivables_late",
+      "n": 3,
+      "words": "Schools or companies pay our invoices after months",
+      "category": "cash_collections",
+      "subtype": "receivables_late",
+      "quick_ideas": [
+        "List each client's open invoices by age, so you know who to chase first",
+        "Agree one payments contact at each client, so chasing goes to the right person."
+      ],
+      "workzap_build": {
+        "keys": [
+          "credit_ledger",
+          "dashboards_reports"
+        ],
+        "text": "contract invoices with ageing and monthly trip reports generated for each client.",
+        "tool_words": []
+      },
+      "ask_first": "Which pay slower, the schools or the companies?",
+      "free_stops": "Statement and report layouts are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "This week, note each school or company invoice date beside its payment date, so the slowest paying clients are clear in one glance.",
+          "review": true
+        },
+        {
+          "text": "Give one staff member one notebook for all client invoices and follow ups, so unpaid bills stop getting missed between calls and visits.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p4_attendance_lateness",
+      "n": 4,
+      "words": "Drivers don't show up and we scramble for a replacement",
+      "category": "people_staff",
+      "subtype": "attendance_lateness",
+      "quick_ideas": [
+        "Ask drivers to confirm the evening before, so gaps are found early",
+        "Keep a short list of standby drivers, so one absence doesn't stop a route."
+      ],
+      "workzap_build": {
+        "keys": [
+          "booking_scheduling"
+        ],
+        "text": "a driver roster and attendance with quick replacement and duty-hour logs.",
+        "tool_words": []
+      },
+      "ask_first": "Does this come up mostly on Mondays and after holidays, or at random through the week?",
+      "free_stops": "Roster rules are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "For one week, note which routes needed replacement drivers and when the absence was known, so the worst scramble points show.",
+          "review": false
+        },
+        {
+          "text": "Give one dispatcher the evening confirmation list in one notebook, so replacement calls start earlier when a driver is missing.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p5_cost_overruns",
+      "n": 5,
+      "words": "Fuel cost per bus is going up and I can't tell why",
+      "category": "margin_cost",
+      "subtype": "cost_overruns",
+      "quick_ideas": [
+        "Record each fill with kilometres per vehicle, so fuel can be set against distance",
+        "Compare vehicles on similar routes, so outliers stand out."
+      ],
+      "workzap_build": {
+        "keys": [
+          "field_checks",
+          "dashboards_reports"
+        ],
+        "text": "a fuel log per vehicle and route with comparisons and flags on unusual use.",
+        "tool_words": []
+      },
+      "ask_first": "Is the rise across all buses, or mainly a few older ones on certain routes?",
+      "free_stops": "How comparisons are made is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "This week, compare fuel bought against each bus's route distance and note the biggest mismatch, so one bus or route can be checked closely.",
+          "review": false
+        },
+        {
+          "text": "Give one person one page per bus for fuel slips and distance notes, so rising fuel use gets spotted before month end.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p6_cash_leakage",
+      "n": 6,
+      "words": "Conductors collect fares and some cash doesn't reach the office",
+      "category": "loss_security",
+      "subtype": "cash_leakage",
+      "quick_ideas": [
+        "Issue numbered tickets on every trip, so fares can be counted",
+        "Count each conductor's cash against tickets at trip end, so gaps show the same day."
+      ],
+      "workzap_build": {
+        "keys": [
+          "cash_reconciliation"
+        ],
+        "text": "conductor cash matched against tickets per trip.",
+        "tool_words": []
+      },
+      "ask_first": "Is the missing cash mostly on a few routes, or across most conductors?",
+      "free_stops": "The cash-up steps are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "For one week, compare each trip's cash handed in with passenger counts from the same trip, so the leakage point narrows fast.",
+          "review": false
+        },
+        {
+          "text": "Give one office person the end of trip cash check in one place, so conductors hand over against the same record every day.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p7_maintenance_downtime",
+      "n": 7,
+      "words": "Breakdowns on route with no backup plan",
+      "category": "operations_process",
+      "subtype": "maintenance_downtime",
+      "quick_ideas": [
+        "List each vehicle's kilometres and last service, so due ones are visible",
+        "Decide which vehicle covers which route if one breaks down, so there's a plan."
+      ],
+      "workzap_build": {
+        "keys": [
+          "stock_alerts",
+          "job_tracking"
+        ],
+        "text": "a maintenance schedule with a breakdown log and backup vehicle assignment.",
+        "tool_words": []
+      },
+      "ask_first": "Do breakdowns come mostly from a few old vehicles, or across the whole fleet?",
+      "free_stops": "Service intervals and backup rules are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "This week, note every route delay caused by a vehicle problem and which bus it involved, so the most disruptive bus becomes visible.",
+          "review": false
+        },
+        {
+          "text": "Give one supervisor one written fallback bus list for each route, so dispatch can switch vehicles quickly when a bus fails.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p8_software_not_connected",
+      "n": 8,
+      "words": "Seat bookings from counter, phone and online aren't combined",
+      "category": "tech_systems",
+      "subtype": "software_not_connected",
+      "quick_ideas": [
+        "Keep one seat list per departure that every channel checks, so seats aren't sold twice",
+        "Note no-shows per trip, so you see the pattern."
+      ],
+      "workzap_build": {
+        "keys": [
+          "order_capture",
+          "integration"
+        ],
+        "text": "one seat booking list combining counter and online sales, with seat locks and no-show tracking.",
+        "tool_words": []
+      },
+      "ask_first": "Which channel causes most of the double selling, the counter, the phone or online?",
+      "free_stops": "How channels connect is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "For one week, count how many seats were promised twice or left empty on each departure, so the biggest booking clash is measured.",
+          "review": false
+        },
+        {
+          "text": "Give one person one master departure list kept at the counter, so phone and walk in bookings check the same seat picture.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p9_licences_renewals",
+      "n": 9,
+      "words": "Permit, fitness and insurance renewals are always last minute",
+      "category": "compliance_admin",
+      "subtype": "licences_renewals",
+      "quick_ideas": [
+        "List every vehicle's renewal dates in one place, so nothing comes as a surprise",
+        "Look ahead a month every week, so there's time to act."
+      ],
+      "workzap_build": {
+        "keys": [
+          "workflow_automation"
+        ],
+        "text": "a renewal tracker for permits, fitness and insurance with reminders.",
+        "tool_words": []
+      },
+      "ask_first": "Is it mostly one kind of renewal, such as permit, fitness or insurance, that gets left late?",
+      "free_stops": "Reminder timings are in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "This week, count renewals due soon by vehicle and note which papers caused last minute chasing before, so the admin load is visible early.",
+          "review": false
+        },
+        {
+          "text": "Give one staff member one renewal diary checked on the same day each week, so paperwork stops surfacing only at the last minute.",
+          "review": false
+        }
+      ]
+    },
+    {
+      "id": "p10_margin_unknown",
+      "n": 10,
+      "words": "I don't know which route actually makes money",
+      "category": "margin_cost",
+      "subtype": "margin_unknown",
+      "quick_ideas": [
+        "Pick a few routes and list what each earned and cost last month, so you get a first picture",
+        "Go over it with your accountant, so the figures are read correctly."
+      ],
+      "workzap_build": {
+        "keys": [
+          "dashboards_reports"
+        ],
+        "text": "route profitability with revenue against fuel, driver cost and dead mileage.",
+        "tool_words": [],
+        "leads_with_view": true
+      },
+      "ask_first": "Do you have a rough feel for which few routes are strongest, or no idea at all?",
+      "free_stops": "Which costs are included is in the solution document.",
+      "extra_ideas": [
+        {
+          "text": "For one week, note each route's passengers, fuel slips and driver hours together, so weaker routes stop hiding inside busy ones.",
+          "review": false
+        },
+        {
+          "text": "Give one office person a single notebook for every route's daily takings and running costs, so route profit gets reviewed from one place.",
+          "review": false
+        }
+      ]
+    }
+  ],
+  "never_say": [
+    "Advice on licensing, route permits, fitness standards, driver hours or child-safety rules.",
+    "Anything that asks for or stores children's names, photos, addresses or stops tied to a child.",
+    "Help falsifying fitness certificates, overloading or forging attendance or trip records.",
+    "Covert monitoring of staff or passengers.",
+    "Comment on fare or fee levels.",
+    "For an accident, a child left on a bus or a medical emergency, anything before pointing to emergency services."
+  ],
+  "sample_reply": {
+    "person": "I run school vans in Lahore and my phone doesn't stop every morning, parents asking where the van is. What can be done?",
+    "pi": "Sure, this can be sorted, and the first steps are simple.\nFirst, ask drivers to tell the office when they leave the depot, so you know before parents ask.\nSecond, let parents on a late route know as soon as you know, so they hear it from you.\nFor a lasting fix, Workzap could set up: a route board with live departure and arrival status and WhatsApp alerts to parents, without storing any child's details.",
+    "language": "english"
+  }
+}

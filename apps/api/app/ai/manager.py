@@ -383,9 +383,11 @@ class LLMManager:
         if output.model is not None:
             try:
                 response.output = output.model.model_validate(response.parsed)
-            except ValidationError:
+            except ValidationError as exc:
+                # the first failing field's path (never its value), so a log says which one
+                where = ".".join(str(part) for part in (exc.errors()[0]["loc"] or ("root",)))
                 raise ProviderError(
-                    name, ErrorKind.INVALID_OUTPUT, code="schema_mismatch"
+                    name, ErrorKind.INVALID_OUTPUT, code=f"schema.{where}"
                 ) from None
 
     async def _execute[T](
@@ -505,7 +507,7 @@ class LLMManager:
                             **attempt.model_dump(),
                         )
                     )
-                self._log(attempt, alias, purpose, request_id)
+                self._log(attempt, alias, purpose, request_id, error.code if error else None)
                 if error is None:
                     self.health.record_success(name)
                     await finish()
@@ -530,7 +532,13 @@ class LLMManager:
         raise AllProvidersFailed(summary, attempts)
 
     @staticmethod
-    def _log(attempt: Attempt, alias: str, purpose: str, request_id: str | None) -> None:
+    def _log(
+        attempt: Attempt,
+        alias: str,
+        purpose: str,
+        request_id: str | None,
+        error_code: str | None = None,
+    ) -> None:
         fields = {
             "provider": attempt.provider,
             "model": attempt.model,
@@ -541,6 +549,7 @@ class LLMManager:
             "fallback": attempt.fallback,
             "attempt": attempt.attempt,
             "error_kind": attempt.error_kind,
+            "error_code": error_code,  # a short machine code, never a provider message
             "request_id": request_id,
         }
         logger.log(

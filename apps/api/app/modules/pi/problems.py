@@ -1,0 +1,1502 @@
+"""Noting, sorting and showing problems (pi Brain spec, Part 4 and 3.3 to 3.7).
+
+The model proposes `ProblemOp`s in its turn; this module checks them (`check_ops`), applies them
+to the database (`apply_ops`), reads the noted problems back for the prompt (`noted_context`)
+and builds the S4 summary (`summary_message`). Records keep the person's own words, never
+names or card, phone or ID numbers (redacted first), and every change is a revision.
+"""
+
+import logging
+import re
+from dataclasses import dataclass, field
+from datetime import UTC, datetime
+from decimal import Decimal
+from typing import Any, Literal
+from uuid import UUID
+
+from pydantic import BaseModel, ConfigDict, Field
+from sqlalchemy import func, inspect, select
+from sqlalchemy.exc import DBAPIError
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from app.modules.pi import (
+    business,
+    figure_correction,
+    part19,
+    problem_fields,
+    spec_rules2,
+    taxonomy,
+    tried_outcome,
+)
+from app.modules.pi.language import amount_value, date_estimate
+from app.modules.pi.problem_models import (
+    PiProblem,
+    PiProblemGroup,
+    PiProblemLink,
+    PiProblemRevision,
+)
+from app.shared.scope import WorkspaceScope
+from app.shared.workspace_repository import WorkspaceRepository
+
+logger = logging.getLogger(__name__)
+
+TITLE_WORDS = 8
+SUMMARY_LINE_WORDS = 10
+SUMMARY_TRIGGER = 7  # problems since the last summary that make pi offer one
+MAX_USER_WORDS = 6
+REQUIREMENT_COLUMNS = ("constraints", "tried", "cause", "expected_outcome")
+FIELD_LIMITS = {"summary": 400, "workaround": 400, "trigger": 200, "who_notices": 200}
+
+# Blame and judgement words never go in a title (R, spec 4.3).
+BLAME = re.compile(
+    r"\b(?:lazy|thief|thieves|useless|stupid|idiot|cheat|cheats|liar|corrupt|incompetent|"
+    r"chor|nikamma|nikammay|kamchor|bewakoof)\b",
+    re.IGNORECASE,
+)
+SOLUTION_TITLE = re.compile(
+    r"\b(?:we need|need an?|want an?|should (?:use|buy)|get an?)\b.*\b(?:app|software|system|"
+    r"website|tool|dashboard|erp|pos)\b",
+    re.IGNORECASE,
+)
+
+# The person asking pi to prepare the document or quote is a decision, never a business problem
+# (a real run noted "Document and quote creation is slow" from "yes, prepare the document").
+DOCUMENT_REQUEST = re.compile(
+    r"\b(?:prepare|send|make|give|get|create|bana(?:o|iye|dein|do|den)?|banwa(?:o|dein|do|iye)?|"
+    r"bhej(?:o|iye|dein|do)?|tayyar)\b.{0,40}\b(?:document|quote|quotation|proposal)\b"
+    r"|\b(?:document|quote|quotation|proposal)\b.{0,40}\b(?:bana(?:o|iye|dein|do|den)?|banwa|"
+    r"bhej(?:o|iye|dein|do)?|chahiye|tayyar)\b",
+    re.IGNORECASE,
+)
+
+
+def is_document_request(words: list[str]) -> bool:
+    return bool(DOCUMENT_REQUEST.search(" ".join(words)))
+
+
+REDACTIONS = (
+    (re.compile(r"\b(?:\d[ -]?){13,19}\b"), "[card number removed]"),
+    (re.compile(r"\b784-\d{4}-\d{7}-\d\b"), "[ID removed]"),
+    (re.compile(r"\b\d{5}-\d{7}-\d\b"), "[ID removed]"),
+    (re.compile(r"\b[A-Z]{2}\d{2}[A-Z0-9]{4}\d{10,}\b"), "[account removed]"),
+    (re.compile(r"[\w.+-]+@[\w-]+\.[\w.-]+"), "[email removed]"),
+    (re.compile(r"(?<!\w)\+?\d[\d ()-]{8,}\d(?!\w)"), "[phone removed]"),
+)
+
+LINK_TYPES = taxonomy.LINK_TYPES
+
+
+class ProblemNote(BaseModel):
+    """What the model says about one problem. Empty means not said (an update keeps the old)."""
+
+    model_config = ConfigDict(extra="ignore")
+    title: str = ""  # English, <= 8 words, starts with the subject, no names or blame
+    title_local: str = ""  # the same in the person's language
+    user_words: list[str] = Field(default_factory=list)  # their own words, verbatim
+    summary: str = ""
+    category: str = ""
+    subtype: str = ""
+    where: list[str] = Field(default_factory=list)
+    of_total: str = ""  # "2 of 4 shops"
+    frequency: str = ""  # daily weekly monthly seasonal once unknown
+    frequency_text: str = ""
+    since_text: str = ""
+    trigger: str = ""
+    impact_types: list[str] = Field(default_factory=list)
+    money_text: str = ""
+    currency: str = ""  # PKR, AED or CAD, from where they are or what they said (R-LANG-05)
+    time_text: str = ""  # "two hours every day"
+    people_affected: str = ""  # "all cashiers", "about 10 customers a week"
+    products: str = ""  # "best-sellers"
+    channel: str = ""  # "in-store", "WhatsApp orders"
+    frequency_pattern: str = ""  # "worse on weekends"
+    severity_stated: str = ""  # only from their words: low medium high critical
+    workaround: str = ""
+    systems: list[str] = Field(default_factory=list)
+    who_notices: str = ""
+    believes_cause: str = ""
+    requested_solution: str = ""
+    # B2a: empty means not said. Only what the owner said; a guess is never written as said.
+    budget: str = ""
+    staff: str = ""
+    deadline: str = ""
+    cannot_change: list[str] = Field(default_factory=list)
+    cannot_change_remove: list[str] = Field(default_factory=list)  # text, or "#2" (position)
+    tried: list[dict[str, Any]] = Field(default_factory=list)  # {"what", "outcome"}
+    cause_text: str = ""
+    cause_said: bool = False  # True only when the owner said the cause in their own words
+    cause_words: list[str] = Field(default_factory=list)  # their words that say it (evidence)
+    expected_outcome: str = ""
+    tags: list[str] = Field(default_factory=list)
+    confidence: float = Field(default=0.8, ge=0, le=1)
+
+
+class ProblemOp(BaseModel):
+    """One change to the noted problems. `ref` is a problem's short ref from noted_problems."""
+
+    model_config = ConfigDict(extra="ignore")
+    op: Literal["create", "update", "merge", "split", "link", "withdraw", "rename_group"]
+    ref: str = ""  # update, split, withdraw: the problem; merge: the one kept; link: from
+    refs: list[str] = Field(default_factory=list)  # merge: the duplicates folded into ref
+    to: str = ""  # link: the other problem
+    link_type: str = ""
+    note: ProblemNote | None = None  # create and update
+    notes: list[ProblemNote] = Field(default_factory=list)  # split: the new problems
+    reason: str = ""  # update: "correction" or "enrichment"
+    name: str = ""  # rename_group: ref is the category key
+    confidence: float = Field(default=0.6, ge=0, le=1)  # link
+
+
+def tolerate_ops(raw: Any) -> list[Any]:
+    """Keep only the ops that parse, so one bad op never costs the customer their reply."""
+    if isinstance(raw, dict):
+        raw = [raw]
+    if not isinstance(raw, list):
+        return []
+    kept: list[Any] = []
+    for item in raw[:12]:
+        if isinstance(item, ProblemOp):
+            kept.append(item)
+            continue
+        if not isinstance(item, dict):
+            continue
+        try:
+            ProblemOp.model_validate(item)
+        except ValueError:
+            continue
+        kept.append(item)
+    return kept
+
+
+def redact(text: str) -> tuple[str, bool]:
+    """Remove card, ID, account, email and phone patterns; also says whether anything changed."""
+    changed = False
+    for pattern, replacement in REDACTIONS:
+        text, count = pattern.subn(replacement, text)
+        changed = changed or bool(count)
+    return text, changed
+
+
+def _tokens(title: str) -> set[str]:
+    return {w for w in re.findall(r"[a-z\u0600-\u06ff]{3,}", title.lower())}
+
+
+def same_symptom(a: str, b: str, threshold: float = 0.8) -> bool:
+    """Two titles that say the same thing in nearly the same words (spec 4.4, merge)."""
+    left, right = _tokens(a), _tokens(b)
+    if not (left and right):
+        return False
+    if len(left & right) / len(left | right) >= threshold:
+        return True
+    # One title is the other plus a qualifier ("running out" / "running out in shops"): the same
+    # symptom told twice, which the summary must not list as two problems.
+    smaller, larger = sorted((left, right), key=len)
+    return len(smaller) >= 3 and smaller <= larger
+
+
+GENERIC_TOKENS = frozenset(
+    "problem problems issue issues customer customers business orders order sales sale kam hai "
+    "hain nahi mein that this with from have when they them what about very more less".split()
+)
+
+
+def facet_overlap(existing: PiProblem, title: str, user_words: list[str] | None = None) -> bool:
+    """The same symptom told with other words (spec 4.3, the facet rule with the word overlap the
+    owner approved): three content words in common, or two that are half of the shorter one's, in
+    any category, because the model files "price asked, then silence" under sales, customers and
+    marketing in turn."""
+    old = _tokens(" ".join([existing.title, *[str(w) for w in existing.user_words or []]]))
+    new = _tokens(" ".join([title, *(user_words or [])]))
+    old = {w for w in old if len(w) >= 4 and w not in GENERIC_TOKENS}
+    new = {w for w in new if len(w) >= 4 and w not in GENERIC_TOKENS}
+    common = old & new
+    return len(common) >= 3 or (
+        len(common) >= 2 and len(common) / max(1, min(len(old), len(new))) >= 0.5
+    )
+
+
+def json_safe(value: Any) -> Any:
+    """`value` as something a JSONB column can store (UUIDs, dates and decimals become text)."""
+    if isinstance(value, UUID | Decimal):
+        return str(value)
+    if isinstance(value, datetime) or hasattr(value, "isoformat"):
+        return value.isoformat()
+    if isinstance(value, dict):
+        return {k: json_safe(v) for k, v in value.items()}
+    if isinstance(value, list | tuple | set):
+        return [json_safe(v) for v in value]
+    return value
+
+
+def short_ref(problem_id: UUID) -> str:
+    return str(problem_id)[:8]
+
+
+def clean_title(title: str) -> str:
+    return " ".join(title.split()[:TITLE_WORDS]).strip(" .,:;-")
+
+
+def title_problem(title: str) -> str | None:
+    """Why a title is not allowed, or None."""
+    words = title.split()
+    if not words:
+        return "the title is empty"
+    if len(words) > TITLE_WORDS:
+        return f'the title "{title}" is over {TITLE_WORDS} words'
+    if BLAME.search(title):
+        return f'the title "{title}" blames someone: describe the symptom'
+    if SOLUTION_TITLE.search(title):
+        return f'the title "{title}" is a solution: note the problem it would fix'
+    return None
+
+
+# Words that make a short message a problem ("udhaar", "late", "chori", "no stock"). A message of a
+# few words without one is a fact ("60 bhainsein"), and no problem is made of it.
+PROBLEM_CUE = re.compile(
+    r"masla|masle|masail|problem|issue|complain|shikayat|nahi|nahin|nhi|\bno\b|\bnot\b|kam\b|"
+    r"zyada|jyada|late|delay|dair|ghalat|galat|gadbad|ghalti|mistake|error|loss|nuksan|nuqsan|"
+    r"udhaar|udhar|chori|theft|stolen|miss|khatam|expire|waste|kharab|damage|tang|mushkil|pareshan|"
+    r"wapas|return|refund|jhagra|dispute|short|slow|dheela|band\b|down\b|bohat|bahut|\bcan'?t\b|"
+    r"\bhard\b|difficult|confus|stuck|fail|\bwrong\b|\blow\b|bar bar|roz|hamesha|always|never",
+    re.IGNORECASE,
+)
+THIN_MESSAGE_WORDS = 4
+
+
+def thin_message(said: str) -> bool:
+    """A few words with nothing in them that goes wrong: a fact, not a problem."""
+    words = (said or "").split()
+    return (
+        bool(words)
+        and len(words) <= THIN_MESSAGE_WORDS
+        and not PROBLEM_CUE.search(said)
+        and not is_document_request(words)
+    )
+
+
+# A title that covers a whole message ("Internal business problems across several areas"): one
+# problem per owner line, in the owner's words (Live Audit 6, R6).
+UMBRELLA_TITLE = re.compile(
+    r"\b(?:several|multiple|various|many|numerous|different|assorted|general)\s+"
+    r"(?:areas?|issues?|problems?|things|matters|topics|parts|departments?)\b|"
+    r"\b(?:across|in)\s+(?:several|multiple|various|many|all)\s+areas?\b|"
+    r"\b(?:internal|business|operational|operations|general|overall|miscellaneous)\s+"
+    r"(?:business\s+)?(?:problems?|issues?|challenges?)\b",
+    re.IGNORECASE,
+)
+
+
+def umbrella_problem(title: str, user_words: list[str], said: str) -> str | None:
+    """Why a create covers several owner lines or is a catch-all title, or None."""
+    if UMBRELLA_TITLE.search(title):
+        return (
+            f'the title "{title}" is an umbrella: make one problem per line the owner wrote, '
+            "titled with their own words and figures (for example 10 crore, QB)"
+        )
+    lines = [ln for ln in (said or "").splitlines() if len(ln.split()) >= 2]
+    if len(lines) >= 2:
+        blob = " ".join(user_words or [])
+        hit = [ln for ln in lines if ln.strip()[:40].lower() in blob.lower()]
+        if len(hit) >= 2:
+            return (
+                f'"{title}" covers {len(hit)} separate lines of the owner message: '
+                "make one create per line"
+            )
+    return None
+
+
+def check_ops(
+    ops: list[ProblemOp], known_refs: set[str], noted_in_reply: bool, said: str = ""
+) -> str | None:
+    """What is wrong with the model's ops, for a rewrite, or None when they can go through."""
+    issues: list[str] = []
+    for op in ops:
+        if op.op == "create":
+            note = op.note
+            if note is None or not note.title.strip():
+                issues.append("a create op has no title")
+                continue
+            if thin_message(said):
+                issues.append(
+                    f'"{note.title}" is not something they said: a short message with no problem '
+                    "in it makes no problem record, so ask what is going wrong instead"
+                )
+            if (why := title_problem(note.title)) is not None:
+                issues.append(why)
+            elif (
+                why := umbrella_problem(note.title, list(note.user_words or []), said)
+            ) is not None:
+                issues.append(why)
+            if not note.user_words:
+                issues.append(f'"{note.title}" has no user_words (their own words, verbatim)')
+            if not note.category.strip():
+                issues.append(f'"{note.title}" has no category')
+            if (why := part19.not_a_problem(list(note.user_words or []))) is not None:
+                issues.append(f'"{note.title}" {why}')
+            if is_document_request(note.user_words):
+                issues.append(
+                    f'"{note.title}" is their request for the document or quote, not a problem: '
+                    "do not note it"
+                )
+            if Decimal(str(note.confidence)) < taxonomy.CONFIRM_BELOW and not noted_in_reply:
+                issues.append(
+                    f'"{note.title}" has low confidence: ask one question to confirm it first'
+                )
+        elif op.op in ("update", "withdraw", "split") and op.ref not in known_refs:
+            issues.append(f'{op.op} refers to an unknown problem ref "{op.ref}"')
+        elif op.op == "update" and op.note is not None and op.note.title.strip():
+            if (why := title_problem(op.note.title)) is not None:
+                issues.append(why)
+            elif UMBRELLA_TITLE.search(op.note.title):
+                issues.append(umbrella_problem(op.note.title, [], said))
+        elif op.op == "merge":
+            if op.ref not in known_refs or not op.refs or any(r not in known_refs for r in op.refs):
+                issues.append("merge needs a kept ref and the duplicate refs, all known")
+        elif op.op == "link" and (op.ref not in known_refs or op.to not in known_refs):
+            issues.append("link needs two known refs")
+        if op.op == "split" and len(op.notes) < 2:
+            issues.append("split needs at least two new problems")
+        if op.op == "split":
+            for part in op.notes:
+                if (why := title_problem(part.title)) is not None:
+                    issues.append(why)
+                elif UMBRELLA_TITLE.search(part.title):
+                    issues.append(umbrella_problem(part.title, [], said))
+                elif not part.user_words:
+                    issues.append(f'"{part.title}" has no user_words (their own words, verbatim)')
+    return "; ".join(issues) if issues else None
+
+
+def scope_class(where: list[str], of_total: str) -> str:
+    """all / most / some / one / unknown, for the severity score."""
+    lowered = of_total.lower()
+    if re.search(r"\b(?:all|every|sab|har)\b", lowered):
+        return "all"
+    if re.search(r"\bmost\b", lowered):
+        return "most"
+    ratio = re.search(r"(\d+)\s*(?:of|out of)\s*(\d+)", lowered)
+    if ratio:
+        part, total = int(ratio.group(1)), max(int(ratio.group(2)), 1)
+        if part >= total:
+            return "all"
+        if part == 1:
+            return "one"
+        return "most" if part / total > 0.5 else "some"
+    if len(where) == 1:
+        return "one"
+    return "some" if len(where) > 1 else "unknown"
+
+
+def _words(values: list[str]) -> tuple[list[str], bool]:
+    out: list[str] = []
+    changed = False
+    for value in values[:MAX_USER_WORDS]:
+        cleaned, did = redact(str(value).strip()[:500])
+        changed = changed or did
+        if cleaned and cleaned not in out:
+            out.append(cleaned)
+    return out, changed
+
+
+def _snake(value: str) -> str:
+    return value if re.fullmatch(r"[a-z0-9_]{1,60}", value or "") else ""
+
+
+def _frequency(note: ProblemNote) -> str:
+    return note.frequency if note.frequency in taxonomy.FREQUENCIES else "unknown"
+
+
+@dataclass
+class Applied:
+    created: list[PiProblem] = field(default_factory=list)
+    updated: list[PiProblem] = field(default_factory=list)
+    merged: list[PiProblem] = field(default_factory=list)
+    split: list[PiProblem] = field(default_factory=list)
+    withdrawn: list[PiProblem] = field(default_factory=list)
+    links: list[PiProblemLink] = field(default_factory=list)
+    rejected: list[str] = field(default_factory=list)
+
+    @property
+    def touched(self) -> set[UUID]:
+        every = [*self.created, *self.updated, *self.merged, *self.split, *self.withdrawn]
+        return {p.id for p in every}
+
+
+# a word character, including Devanagari and Arabic vowel marks (not in \w)
+_WORD = r"[\wऀ-ॿً-ٰٟ]"
+
+
+def _stems(text: str, size: int = 3) -> set[str]:
+    """First five letters of every word of `size`+ letters: a cheap, language-free word match."""
+    return {w[:5] for w in re.findall(rf"{_WORD}{{{size},}}", text.casefold())}
+
+
+def _backed(words: set[str], heard: set[str]) -> bool:
+    """At least 60% of `words` (and one word) occur in `heard`."""
+    return bool(words) and len(words & heard) / len(words) >= 0.6
+
+
+class ProblemBook:
+    """The problems of one customer's business, for one conversation turn."""
+
+    def __init__(
+        self, session: AsyncSession, scope: WorkspaceScope, customer_id: UUID, language: str
+    ) -> None:
+        self.session, self.scope, self.customer_id = session, scope, customer_id
+        self.language = language
+        self.problems = WorkspaceRepository(session, PiProblem, scope)
+        self.groups = WorkspaceRepository(session, PiProblemGroup, scope)
+
+    async def active(self) -> list[PiProblem]:
+        rows = await self.session.scalars(
+            self.problems.select()
+            .where(
+                PiProblem.customer_id == self.customer_id,
+                PiProblem.status.in_(taxonomy.ACTIVE),
+            )
+            .order_by(PiProblem.number)
+        )
+        return list(rows)
+
+    async def by_ref(self) -> dict[str, PiProblem]:
+        return {short_ref(p.id): p for p in await self.active()}
+
+    async def _next_number(self) -> int:
+        top = await self.session.scalar(
+            select(func.max(PiProblem.number)).where(
+                PiProblem.tenant_id == self.scope.tenant_id,
+                PiProblem.environment_id == self.scope.environment_id,
+                PiProblem.customer_id == self.customer_id,
+            )
+        )
+        return int(top or 0) + 1
+
+    async def group_for(self, category: str) -> PiProblemGroup:
+        found = await self.groups.find(
+            PiProblemGroup.customer_id == self.customer_id, PiProblemGroup.category == category
+        )
+        if found is not None:
+            return found
+        return await self.groups.add(
+            self.groups.new(
+                customer_id=self.customer_id,
+                category=category,
+                name=taxonomy.label(category, "en"),
+            )
+        )
+
+    async def _revise(self, problem: PiProblem, diff: dict[str, Any], reason: str, by: str) -> None:
+        await self.session.flush()
+        self.session.add(
+            PiProblemRevision(
+                tenant_id=self.scope.tenant_id,
+                environment_id=self.scope.environment_id,
+                problem_id=problem.id,
+                revision=problem.revision,
+                diff=diff,
+                reason=reason,
+                by=by,
+            )
+        )
+
+    def _score(self, problem: PiProblem) -> None:
+        impact = (problem.impact or {}).get("types") or []
+        scope = scope_class(
+            (problem.scope or {}).get("where") or [], (problem.scope or {}).get("of_total") or ""
+        )
+        frequency = (problem.frequency or {}).get("normalised") or "unknown"
+        score = taxonomy.severity_score(list(impact), frequency, scope, problem.severity_stated)
+        problem.severity_score = score
+        problem.severity_inferred = taxonomy.severity_band(score)
+
+    @staticmethod
+    def carries_requirements(note: ProblemNote) -> bool:
+        return bool(
+            note.budget
+            or note.staff
+            or note.deadline
+            or note.cannot_change
+            or note.cannot_change_remove
+            or note.tried
+            or note.cause_text
+            or note.believes_cause.strip()
+            or note.expected_outcome
+        )
+
+    @staticmethod
+    def tried_items(note: ProblemNote, owner_text: str | None) -> list[dict[str, Any]]:
+        """The note's `tried` entries, kept only as far as the OWNER's own words back them (L1).
+
+        With no owner text (an older caller) the entries are returned as given. With it: an entry
+        is stored only when an owner clause (not a question, a hypothetical or a third party's
+        attempt) mentions what was tried; its outcome is "failed" or "worked" when that clause
+        says so, else the model's own outcome words only when the owner's text backs them, else
+        unset. A failed attempt the owner described is added when the model wrote none and it
+        shares a word with this problem. `what` keeps the owner's wording (PS-3 matches on it)."""
+        items = [dict(t) for t in note.tried if isinstance(t, dict)]
+        if owner_text is None:
+            return items
+        clauses = tried_outcome.owner_clauses(owner_text)
+        heard = [_stems(c) for c in clauses]
+        everything = set().union(*heard) if heard else set()
+        kept: list[dict[str, Any]] = []
+        whats = [_stems(str(item.get("what") or "")) for item in items]
+        mentions = [lambda text, w=w: _backed(w, _stems(text)) for w in whats]
+        reading = tried_outcome.owner_clauses_with_followups(owner_text)
+        per_reading = [tried_outcome.item_outcomes(c, mentions) for c in reading]
+        per_clause = [tried_outcome.item_outcomes(c, mentions) for c in clauses]
+        for index, item in enumerate(items):
+            what = whats[index]
+            support = [n for n, h in enumerate(heard) if _backed(what, h)]
+            if not support:
+                continue  # nothing the owner said backs this attempt
+            # one outcome per attempt, from the owner's clauses that name THIS attempt
+            outcomes = {per_clause[n][index] for n in support} | {r[index] for r in per_reading}
+            given = str(item.get("outcome") or "")
+            if "failed" in outcomes:
+                item["outcome"] = "failed"
+            elif "worked" in outcomes:
+                item["outcome"] = "worked"
+            elif not _backed(_stems(given), everything):
+                item["outcome"] = ""  # the model's outcome words are not the owner's
+            kept.append(item)
+        known = [str(i.get("what") or "").casefold() for i in kept]
+        about = _stems(" ".join([note.title, note.summary, *note.user_words]), 4)
+        for clause in clauses:
+            found = tried_outcome.failed_attempt(clause)
+            if not found or not found.what or found.what.casefold() in known:
+                continue
+            if any(found.what.casefold() in k or k in found.what.casefold() for k in known if k):
+                continue
+            if about & _stems(clause, 4):
+                kept.append({"what": found.what, "outcome": "failed"})
+                known.append(found.what.casefold())
+        return kept
+
+    @staticmethod
+    def cause_candidate(
+        note: ProblemNote, owner_text: str | None = None
+    ) -> tuple[str, bool, list[str]]:
+        """(text, said, evidence words) of the cause a note carries. The B2a cause fields win; the
+        older `believes_cause` is the same claim ("the owner said it") with no evidence of its own.
+        Its evidence is its first three CONTENT words (function words prove nothing), and it counts
+        as the owner's only when at least 60% of its content words are in the owner's own claim
+        (not a question, a hypothetical or someone else's opinion), or the cause is pi's guess
+        (L1-3): the model writing believes_cause proves nothing."""
+        if note.cause_text.strip():
+            return note.cause_text, note.cause_said, note.cause_words
+        text = note.believes_cause.strip()
+        words = problem_fields.content_words(text)
+        carried = problem_fields.endorsed_words(words, owner_text)
+        backed = bool(words) and len(carried) / len(words) >= 0.6
+        return text, backed, carried[: problem_fields.EVIDENCE_WORDS]
+
+    async def load_requirements(self, problem: PiProblem) -> None:
+        """The four deferred columns, loaded now (an async session cannot lazy-load them)."""
+        unloaded = set(inspect(problem).unloaded) & set(REQUIREMENT_COLUMNS)
+        if unloaded:
+            await self.session.refresh(problem, sorted(unloaded))
+
+    @staticmethod
+    def requirement_values(
+        note: ProblemNote,
+        problem: PiProblem | None,
+        message_id: UUID | None,
+        owner_text: str | None = None,
+    ) -> tuple[dict[str, Any], bool]:
+        """B2a: the new column values a note carries (only those it says), and whether the
+        redactor changed any text. Nothing is returned for a note that carries none of them."""
+        msg = str(message_id) if message_id else None
+        values: dict[str, Any] = {}
+        changed = False
+        constraints, was = problem_fields.merge_constraints(
+            problem.constraints if problem else None,
+            note.budget,
+            note.staff,
+            note.deadline,
+            note.cannot_change,
+            msg,
+            note.cannot_change_remove,
+        )
+        changed = changed or was
+        if constraints is not None:
+            values["constraints"] = constraints
+        said_tried = ProblemBook.tried_items(note, owner_text)
+        tried, was = problem_fields.merge_tried(problem.tried if problem else None, said_tried, msg)
+        changed = changed or was
+        if tried is not None:
+            values["tried"] = tried
+        cause_text, cause_said, cause_words = ProblemBook.cause_candidate(note, owner_text)
+        cause, was = problem_fields.merge_cause(
+            problem.cause if problem else None,
+            cause_text,
+            cause_said,
+            cause_words,
+            msg,
+            owner_text or "",  # only the owner's message: model-written words prove nothing
+            datetime.now(UTC).isoformat(timespec="seconds"),
+        )
+        changed = changed or was
+        if cause is not None:
+            values["cause"] = cause
+            if cause["status"] in problem_fields.OWNER_STATUSES:
+                # the older column keeps the owner's belief only; a guess never goes there
+                values["person_believes_cause"] = redact(cause["text"][:300])[0]
+        outcome, was = problem_fields.clean(note.expected_outcome, problem_fields.OUTCOME_CAP)
+        changed = changed or was
+        if outcome and (problem is None or problem.expected_outcome != outcome):
+            values["expected_outcome"] = outcome
+        return values, changed
+
+    async def withdraw_owner_cause(self, message_id: UUID | None, ref: str | None = None) -> bool:
+        """The owner took their cause back. Clears the owner cause of one problem (the one `ref`
+        names, else the only one with an owner cause, else the most revised), keeps the old cause
+        in its history and clears the older person_believes_cause column, so no reader (offer
+        gate, idea context, documents) sees it. Returns whether something was withdrawn."""
+        candidates = []
+        for problem in await self.active():
+            await self.load_requirements(problem)
+            if (problem.cause or {}).get("status") in problem_fields.OWNER_STATUSES:
+                candidates.append(problem)
+        if ref:
+            candidates = [p for p in candidates if short_ref(p.id) == ref]
+        if not candidates:
+            return False
+        problem = max(candidates, key=lambda p: (p.revision, p.number))
+        when = datetime.now(UTC).isoformat(timespec="seconds")
+        new = problem_fields.withdraw_cause(
+            problem.cause, str(message_id) if message_id else None, when
+        )
+        if new is None:
+            return False
+        diff = {"cause": [json_safe(problem.cause), json_safe(new)]}
+        problem.cause = new
+        problem.person_believes_cause = ""
+        problem.revision += 1
+        await self._revise(problem, diff, "cause_withdrawn", "person")
+        return True
+
+    async def confirm_cause(self, problem: PiProblem) -> bool:
+        """The owner agreed with the cause they said: `owner_said` becomes `confirmed`. A cause pi
+        only guessed, or none, is never confirmed (returns False). No caller exists yet: a future
+        caller needs an explicit agreement (R-DEC style, the owner's own clear yes to this cause),
+        never "ok", "hmm", "maybe" or "let me think"."""
+        await self.load_requirements(problem)
+        confirmed = problem_fields.confirmed_cause(problem.cause)
+        if confirmed is None:
+            return False
+        diff = {"cause": [json_safe(problem.cause), json_safe(confirmed)]}
+        problem.cause = confirmed
+        problem.revision += 1
+        await self._revise(problem, diff, "cause_confirmed", "person")
+        return True
+
+    async def create(
+        self,
+        note: ProblemNote,
+        message_id: UUID | None,
+        conversation_id: UUID | None,
+        owner_text: str | None = None,
+    ) -> tuple[PiProblem, bool]:
+        """A new problem, or (when the same title is already noted) its enrichment."""
+        title = clean_title(note.title)
+        category_now = taxonomy.normalise_category(note.category.strip())
+        for existing in await self.active():
+            same = existing.title.casefold() == title.casefold()
+            alike = existing.category == category_now and same_symptom(existing.title, title)
+            # One symptom with several facets is one problem (spec 4.3): the same category and
+            # sub-type is the same symptom, whatever words the model chose for the title.
+            subtype_now = _snake(note.subtype)
+            facet = bool(subtype_now) and (
+                existing.category == category_now and existing.subtype == subtype_now
+            )
+            # Only across categories: the same category keeps the sub-type rule above, and two
+            # problems of one category the person (or a reviewer) may merge by hand stay apart.
+            overlap = existing.category != category_now and facet_overlap(
+                existing, title, [str(w) for w in note.user_words or []]
+            )
+            if same or alike or facet or overlap:
+                # The first title stands: a second wording of the same symptom adds detail, it
+                # never renames the problem the person already saw confirmed.
+                await self.update(
+                    existing,
+                    note.model_copy(update={"title": "", "title_local": ""}),
+                    "enrichment",
+                    message_id,
+                    owner_text,
+                )
+                return existing, False
+        words, redacted = _words(note.user_words)
+        category = taxonomy.normalise_category(note.category.strip())
+        tags = [t[:40] for t in note.tags[:8]]
+        if category == taxonomy.OTHER and "taxonomy_review" not in tags:
+            tags.append("taxonomy_review")
+        group = await self.group_for(category)
+        required, required_redacted = self.requirement_values(note, None, message_id, owner_text)
+        problem = self.problems.new(
+            customer_id=self.customer_id,
+            conversation_id=conversation_id,
+            group_id=group.id,
+            number=await self._next_number(),
+            title=title,
+            title_local=note.title_local.strip()[:200],
+            summary=note.summary.strip()[: FIELD_LIMITS["summary"]],
+            user_words=words,
+            category=category,
+            subtype=_snake(note.subtype),
+            tags=tags,
+            scope={
+                "where": [w[:80] for w in note.where[:8]],
+                "of_total": note.of_total[:80],
+                "products": note.products[:120],
+                "channel": note.channel[:60],
+            },
+            frequency={
+                "text": note.frequency_text[:120],
+                "normalised": _frequency(note),
+                "pattern": note.frequency_pattern[:120],
+            },
+            since=date_estimate(note.since_text, datetime.now(UTC).date())
+            if note.since_text
+            else {"text": ""},
+            trigger=note.trigger.strip()[: FIELD_LIMITS["trigger"]],
+            impact={
+                "types": [t for t in note.impact_types if t in taxonomy.IMPACT_TYPES],
+                "money_text": note.money_text[:120],
+                "money_value": amount_value(note.money_text),
+                "currency": note.currency.strip().upper()[:3],
+                "time_text": note.time_text[:120],
+                "people_affected": note.people_affected[:120],
+            },
+            severity_stated=note.severity_stated
+            if note.severity_stated in taxonomy.SEVERITIES
+            else "unknown",
+            current_workaround=note.workaround.strip()[: FIELD_LIMITS["workaround"]],
+            systems_mentioned=[s[:60] for s in note.systems[:8]],
+            who_notices=note.who_notices.strip()[: FIELD_LIMITS["who_notices"]],
+            person_believes_cause=required.pop("person_believes_cause", None) or "",
+            requested_solution=redact(note.requested_solution.strip()[:300])[0],
+            status="draft",
+            confidence=Decimal(str(round(note.confidence, 2))),
+            source_message_ids=[str(message_id)] if message_id else [],
+            revision=1,
+            pii_redacted=redacted or required_redacted,
+            language=self.language,
+            **required,
+        )
+        self._score(problem)
+        await self.problems.add(problem)
+        await self._revise(problem, {"title": [None, problem.title]}, "created", "pi")
+        return problem, True
+
+    async def update(
+        self,
+        problem: PiProblem,
+        note: ProblemNote,
+        reason: str,
+        message_id: UUID | None,
+        owner_text: str | None = None,
+    ) -> bool:
+        """Apply what the note says; returns whether anything changed."""
+        diff: dict[str, Any] = {}
+
+        def put(name: str, value: Any) -> None:
+            if getattr(problem, name) != value:
+                # the revision diff is stored as JSON: a category change carries a group UUID
+                diff[name] = [json_safe(getattr(problem, name)), json_safe(value)]
+                setattr(problem, name, value)
+
+        if note.title.strip():
+            put("title", clean_title(note.title))
+        if note.title_local.strip():
+            put("title_local", note.title_local.strip()[:200])
+        if note.summary.strip():
+            put("summary", note.summary.strip()[: FIELD_LIMITS["summary"]])
+        if note.category.strip():
+            category = taxonomy.normalise_category(note.category.strip())
+            if category != problem.category:
+                put("category", category)
+                put("group_id", (await self.group_for(category)).id)
+        if _snake(note.subtype):
+            put("subtype", _snake(note.subtype))
+        words, redacted = _words(note.user_words)
+        # A correction replaces the earlier wording that gave the old figure ("10 clients" then "it
+        # was 100 clients"); the old list stays in the revision diff, so nothing is lost.
+        fresh = [*words, note.summary, note.title, note.money_text, note.of_total]
+        kept = [
+            w
+            for w in problem.user_words
+            if not figure_correction.superseded(w, fresh, reason == "correction")
+        ]
+        merged_words = [*kept, *[w for w in words if w not in kept]]
+        put("user_words", merged_words[: MAX_USER_WORDS * 2])
+        if redacted:
+            put("pii_redacted", True)
+        if note.where or note.of_total or note.products or note.channel:
+            scope = dict(problem.scope or {})
+            scope["products"] = note.products[:120] or scope.get("products", "")
+            scope["channel"] = note.channel[:60] or scope.get("channel", "")
+            scope["where"] = [w[:80] for w in note.where[:8]] or scope.get("where", [])
+            scope["of_total"] = note.of_total[:80] or scope.get("of_total", "")
+            put("scope", scope)
+        if note.frequency_text or note.frequency or note.frequency_pattern:
+            frequency = dict(problem.frequency or {})
+            frequency["pattern"] = note.frequency_pattern[:120] or frequency.get("pattern", "")
+            frequency["text"] = note.frequency_text[:120] or frequency.get("text", "")
+            if note.frequency in taxonomy.FREQUENCIES:
+                frequency["normalised"] = note.frequency
+            put("frequency", frequency)
+        if note.since_text:
+            put("since", date_estimate(note.since_text, datetime.now(UTC).date()))
+        if note.impact_types or note.money_text or note.time_text or note.people_affected:
+            impact = dict(problem.impact or {})
+            impact["currency"] = note.currency.strip().upper()[:3] or impact.get("currency", "")
+            impact["time_text"] = note.time_text[:120] or impact.get("time_text", "")
+            impact["people_affected"] = note.people_affected[:120] or impact.get(
+                "people_affected", ""
+            )
+            kinds = [t for t in note.impact_types if t in taxonomy.IMPACT_TYPES]
+            impact["types"] = kinds or impact.get("types", [])
+            impact["money_text"] = note.money_text[:120] or impact.get("money_text", "")
+            impact["money_value"] = amount_value(impact["money_text"])
+            put("impact", impact)
+        if note.severity_stated in taxonomy.SEVERITIES and note.severity_stated != "unknown":
+            put("severity_stated", note.severity_stated)
+        for name, value in (
+            ("trigger", note.trigger),
+            ("current_workaround", note.workaround),
+            ("who_notices", note.who_notices),
+        ):
+            if value.strip():
+                put(name, value.strip()[:400])
+        if note.systems:
+            put("systems_mentioned", sorted({*problem.systems_mentioned, *note.systems[:8]}))
+        if self.carries_requirements(note):
+            await self.load_requirements(problem)
+            required, required_redacted = self.requirement_values(
+                note, problem, message_id, owner_text
+            )
+            for name, value in required.items():
+                put(name, value)
+            if required_redacted:
+                put("pii_redacted", True)
+        if note.requested_solution.strip():
+            put("requested_solution", redact(note.requested_solution.strip()[:300])[0])
+        if message_id and str(message_id) not in problem.source_message_ids:
+            put("source_message_ids", [*problem.source_message_ids, str(message_id)])
+        if not diff:
+            return False
+        if reason == "correction":
+            put("status", "corrected")
+        self._score(problem)
+        problem.revision += 1
+        await self._revise(problem, diff, reason, "person" if reason == "correction" else "pi")
+        return True
+
+    STRING_FIELDS = (
+        "title",
+        "title_local",
+        "summary",
+        "current_workaround",
+        "trigger",
+        "person_believes_cause",
+        "who_notices",
+    )
+
+    @staticmethod
+    def figure_text(problem: PiProblem) -> str:
+        """Everything the record says now that a figure could be in."""
+        parts = [str(getattr(problem, name) or "") for name in ProblemBook.STRING_FIELDS]
+        parts += [str(w) for w in problem.user_words]
+        for field_name in ("impact", "scope", "frequency"):
+            values = (getattr(problem, field_name) or {}).values()
+            parts += [v for v in values if isinstance(v, str)]
+        return " ".join(parts)
+
+    async def correct_figure(
+        self, problem: PiProblem, wrong: str, right: str, message_id: UUID | None
+    ) -> bool:
+        """The owner corrected a figure ("not 10, 100"): write `right` wherever the record gave
+        `wrong`. The revision diff keeps every old value, so the correction is history, not loss."""
+        diff: dict[str, Any] = {}
+
+        def put(name: str, value: Any) -> None:
+            if getattr(problem, name) != value:
+                diff[name] = [json_safe(getattr(problem, name)), json_safe(value)]
+                setattr(problem, name, value)
+
+        def fix(text: str) -> str:
+            return figure_correction.replace_figure(text, wrong, right)
+
+        for name in self.STRING_FIELDS:
+            put(name, fix(str(getattr(problem, name) or "")))
+        put("user_words", [fix(str(w)) for w in problem.user_words])
+        for field_name in ("impact", "scope", "frequency"):
+            current = dict(getattr(problem, field_name) or {})
+            put(
+                field_name,
+                {k: (fix(v) if isinstance(v, str) else v) for k, v in current.items()},
+            )
+        if not diff:
+            return False
+        if message_id and str(message_id) not in problem.source_message_ids:
+            put("source_message_ids", [*problem.source_message_ids, str(message_id)])
+        put("status", "corrected")
+        self._score(problem)
+        problem.revision += 1
+        await self._revise(problem, diff, "correction", "person")
+        return True
+
+    async def merge(self, keep: PiProblem, others: list[PiProblem]) -> None:
+        for other in others:
+            if other.id == keep.id:
+                continue
+            for words in other.user_words:
+                if words not in keep.user_words:
+                    keep.user_words = [*keep.user_words, words]
+            other.status = "merged"
+            other.merged_into = keep.id
+            other.revision += 1
+            await self._revise(other, {"merged_into": [None, str(keep.id)]}, "merged", "pi")
+        keep.revision += 1
+        await self._revise(keep, {"merged": [short_ref(o.id) for o in others]}, "merged", "pi")
+
+    async def confirm_drafts(self, keep: set[UUID], explicit: bool = False) -> int:
+        """A noted line the person saw and did not object to becomes confirmed (spec 4.3). One
+        pi was unsure of (confidence under 0.6) needs the person to say so: `explicit`."""
+        count = 0
+        for problem in await self.active():
+            if (
+                problem.status == "draft"
+                and problem.id not in keep
+                and (explicit or problem.confidence >= taxonomy.CONFIRM_BELOW)
+            ):
+                problem.status = "confirmed"
+                count += 1
+        return count
+
+
+async def _taxonomy_review(
+    session: AsyncSession, scope: WorkspaceScope, problem: PiProblem
+) -> None:
+    """A problem that fits no category goes to a person (spec 4.6): the category list is theirs."""
+    from app.modules.notifications.service import notify
+
+    await notify(
+        session,
+        scope,
+        "pi.taxonomy_review",
+        "pi noted a problem that fits no category",
+        f"{problem.title}. Choose the right category, or tell pi's team if one is missing.",
+        link="/pi/inbox",
+        permission="pi.read",
+        dedupe_key=f"pi-taxonomy:{problem.id}",
+    )
+
+
+async def _owner_said_links(
+    session: AsyncSession,
+    scope: WorkspaceScope,
+    book: "ProblemBook",
+    result: "Applied",
+    owner_text: str,
+    language: str,
+) -> None:
+    """PS-7: a link the owner stated in their own words is stored with evidence `owner_said`
+    (verified by the graph, never by a model op); a pi guess stays `pi_inferred`. Only problems
+    touched this turn are paired, so an old link is never rewritten by a later message."""
+    touched = result.touched
+    if not touched:
+        return
+    active = [p for p in await book.active()]
+    records = [
+        {"id": str(p.id), "title": p.title, "user_words": list(p.user_words or [])} for p in active
+    ]
+    for cause_id, effect_id in spec_rules2.owner_said_links(records, [owner_text], language):
+        if UUID(cause_id) not in touched and UUID(effect_id) not in touched:
+            continue
+        link = await session.scalar(
+            select(PiProblemLink).where(
+                PiProblemLink.tenant_id == scope.tenant_id,
+                PiProblemLink.environment_id == scope.environment_id,
+                PiProblemLink.from_id == UUID(cause_id),
+                PiProblemLink.to_id == UUID(effect_id),
+                PiProblemLink.type == "causes",
+            )
+        )
+        if link is None:
+            link = PiProblemLink(
+                tenant_id=scope.tenant_id,
+                environment_id=scope.environment_id,
+                from_id=UUID(cause_id),
+                to_id=UUID(effect_id),
+                type="causes",
+                confidence=Decimal("0.8"),
+                evidence="owner_said",
+            )
+            session.add(link)
+            result.links.append(link)
+        elif link.evidence == "pi_inferred":
+            link.evidence = "owner_said"  # upgraded: never the other way round
+
+
+async def apply_ops(
+    session: AsyncSession,
+    scope: WorkspaceScope,
+    customer_id: UUID,
+    conversation_id: UUID | None,
+    message_id: UUID | None,
+    ops: list[ProblemOp],
+    language: str,
+    link_min: Decimal = Decimal(0),
+    figure_fix: tuple[str, str] | None = None,
+    owner_text: str | None = None,
+) -> Applied:
+    """Apply the model's ops in order. Bad ones are skipped and listed, never raised.
+
+    `figure_fix` is (wrong, right) when the owner just corrected a number: after the ops, the one
+    problem whose record still gives the wrong figure is corrected by the code, so a model that
+    ignored the correction cannot leave the old number as the current fact."""
+    book = ProblemBook(session, scope, customer_id, language)
+    result = Applied()
+    refs = await book.by_ref()
+    for op in ops:
+        try:
+            if op.op == "create" and op.note and op.note.title.strip():
+                problem, fresh = await book.create(op.note, message_id, conversation_id, owner_text)
+                (result.created if fresh else result.updated).append(problem)
+                refs[short_ref(problem.id)] = problem
+                if fresh and problem.category == taxonomy.OTHER:
+                    await _taxonomy_review(session, scope, problem)  # 4.6 rule 4
+                if fresh:
+                    await business.link_duplicates_for_problem(session, scope, problem)
+            elif op.op == "update" and op.ref in refs and op.note:
+                changed = await book.update(
+                    refs[op.ref],
+                    op.note,
+                    "correction" if op.reason == "correction" else "enrichment",
+                    message_id,
+                    owner_text,
+                )
+                if changed:
+                    result.updated.append(refs[op.ref])
+            elif op.op == "merge" and op.ref in refs and op.refs:
+                others = [refs[r] for r in op.refs if r in refs and r != op.ref]
+                if others:
+                    await book.merge(refs[op.ref], others)
+                    result.merged.extend(others)
+                    result.updated.append(refs[op.ref])
+            elif op.op == "split" and op.ref in refs and len(op.notes) >= 2:
+                original = refs[op.ref]
+                original.status = "split"
+                original.revision += 1
+                await book._revise(original, {"status": ["draft", "split"]}, "split", "pi")
+                for note in op.notes:
+                    problem, _ = await book.create(note, message_id, conversation_id, owner_text)
+                    result.created.append(problem)
+                    refs[short_ref(problem.id)] = problem
+                result.split.append(original)
+            elif op.op == "withdraw" and op.ref in refs:
+                problem = refs[op.ref]
+                problem.status = "withdrawn"
+                problem.revision += 1
+                await book._revise(
+                    problem, {"status": ["active", "withdrawn"]}, "withdrawn", "person"
+                )
+                result.withdrawn.append(problem)
+            elif (
+                op.op == "link"
+                and op.ref in refs
+                and op.to in refs
+                and op.ref != op.to
+                and Decimal(str(round(op.confidence, 2))) >= link_min
+            ):
+                kind = op.link_type if op.link_type in LINK_TYPES else "same_root_suspected"
+                a, b = refs[op.ref], refs[op.to]
+                found = await session.scalar(
+                    select(PiProblemLink.id).where(
+                        PiProblemLink.tenant_id == scope.tenant_id,
+                        PiProblemLink.environment_id == scope.environment_id,
+                        PiProblemLink.from_id == a.id,
+                        PiProblemLink.to_id == b.id,
+                        PiProblemLink.type == kind,
+                    )
+                )
+                if found is None:
+                    link = PiProblemLink(
+                        tenant_id=scope.tenant_id,
+                        environment_id=scope.environment_id,
+                        from_id=a.id,
+                        to_id=b.id,
+                        type=kind,
+                        confidence=Decimal(str(round(op.confidence, 2))),
+                    )
+                    session.add(link)
+                    result.links.append(link)
+            elif op.op == "rename_group" and op.name.strip() and op.ref in taxonomy.KEYS:
+                group = await book.group_for(op.ref)
+                group.name = op.name.strip()[:120]
+                group.created_by = "person"
+            else:
+                result.rejected.append(f"{op.op}:{op.ref or op.note and op.note.title or ''}")
+        except ValueError:
+            result.rejected.append(op.op)
+    if owner_text:
+        await _owner_said_links(session, scope, book, result, owner_text, language)
+    if figure_fix is not None:
+        wrong, right = figure_fix
+        holders = [
+            p
+            for p in await book.active()
+            if figure_correction.has_figure(book.figure_text(p), wrong)
+        ]
+        if len(holders) == 1 and await book.correct_figure(holders[0], wrong, right, message_id):
+            result.updated.append(holders[0])  # one problem gave it: no guessing between several
+    await session.flush()
+    await book.confirm_drafts(result.touched)
+    await session.flush()
+    return result
+
+
+async def cause_records(
+    session: AsyncSession, ids: list[UUID]
+) -> dict[UUID, dict[str, Any] | None] | None:
+    """The `cause` record (text, status, evidence) of each problem, or None when the column cannot
+    be read (a database before 0053: then the older column is all there is, and it is only
+    written from the owner's own words)."""
+    if not ids:
+        return {}
+    try:
+        async with session.begin_nested():
+            rows = await session.execute(
+                select(PiProblem.id, PiProblem.cause).where(PiProblem.id.in_(ids))
+            )
+            return {row[0]: row[1] for row in rows}
+    except DBAPIError:
+        logger.warning("pi_cause_records_unreadable", exc_info=True)
+        return None
+
+
+def owner_cause(
+    problem: PiProblem, records: dict[UUID, dict[str, Any] | None] | None
+) -> tuple[str, str, str]:
+    """(the owner's cause, pi's hypothesis, the status) of a problem. The owner's cause is text only
+    when its record says `owner_said` or `confirmed`. A record that is pi's guess, and an older
+    value with no record (written before the evidence rule, so of unknown origin), are a
+    hypothesis, never the owner's."""
+    older = (problem.person_believes_cause or "").strip()
+    if records is None:
+        return older, "", ""  # the record cannot be read: the older column, owner-only on write
+    record = records.get(problem.id)
+    if record:
+        stated = problem_fields.stated_cause(record)
+        status = str(record.get("status") or "")
+        if stated:
+            return stated, "", status
+        return "", str(record.get("text") or ""), status
+    return "", older, problem_fields.PI_INFERRED if older else ""
+
+
+async def noted_context(
+    session: AsyncSession,
+    scope: WorkspaceScope,
+    customer_id: UUID,
+    limit: int = 40,
+    box_signals: bool = False,
+) -> list[dict[str, Any]]:
+    """The noted problems as compact JSON for the prompt: ref, title, group, status, gaps.
+    `box_signals` (the Solution Box offer is on) adds `raised_voluntarily` (B5) and the owner's
+    `rank` (B4) where set; off, the output is what it always was."""
+    from app.modules.pi import box_signals as signals
+
+    book = ProblemBook(session, scope, customer_id, "en")
+    compact: list[dict[str, Any]] = []
+    renamed = {
+        g.category: g.name
+        for g in await session.scalars(
+            select(PiProblemGroup).where(
+                PiProblemGroup.tenant_id == scope.tenant_id,
+                PiProblemGroup.environment_id == scope.environment_id,
+                PiProblemGroup.customer_id == customer_id,
+                PiProblemGroup.created_by == "person",
+            )
+        )
+        if g.name
+    }
+    active = (await book.active())[:limit]
+    records = await cause_records(session, [p.id for p in active])
+    for problem in active:
+        said_cause, hypothesis, cause_status = owner_cause(problem, records)
+        missing = [
+            name
+            for name, known in (
+                (
+                    "where",
+                    (problem.scope or {}).get("where") or (problem.scope or {}).get("of_total"),
+                ),
+                ("how_often", (problem.frequency or {}).get("normalised") not in (None, "unknown")),
+                (
+                    "impact",
+                    (problem.impact or {}).get("types") or (problem.impact or {}).get("money_text"),
+                ),
+                ("since", (problem.since or {}).get("text")),
+            )
+            if not known
+        ]
+        extra: dict[str, Any] = {}
+        if box_signals:
+            if problem.raised_voluntarily:
+                extra["raised_voluntarily"] = True
+            if (rank := signals.rank_of(problem.tags)) is not None:
+                extra["rank"] = rank
+        compact.append(
+            {
+                **extra,
+                "ref": short_ref(problem.id),
+                "title": problem.title,
+                "title_local": problem.title_local or "",
+                "user_words": [str(w)[:200] for w in (problem.user_words or [])[:2]],
+                "where": list((problem.scope or {}).get("where") or [])[:4],
+                "group": problem.category,
+                "subtype": problem.subtype or "",
+                "goal_verb": problem.goal_verb or "",
+                # L1-3: `cause` is only what the owner said; pi's guess is `cause_hypothesis`
+                "cause": said_cause,
+                "cause_status": cause_status,
+                **({"cause_hypothesis": hypothesis} if hypothesis else {}),
+                "group_name": renamed.get(problem.category, ""),
+                "score": float(problem.severity_score) if problem.severity_score else None,
+                "status": problem.status,
+                "missing": missing,
+            }
+        )
+    return compact
+
+
+# --- the S4 summary ---------------------------------------------------------------------
+
+ARABIC_SCRIPT = re.compile(r"[؀-ۿ]")
+
+SUMMARY_TEXT = {
+    "en": (
+        "Here is what you have told me so far.",
+        "Which of these should we start with?",
+    ),
+    "roman_ur": (
+        "Ab tak aap ne jo bataya hai, wo ye hai.",
+        "In mein se pehle kis par kaam shuru karein?",
+    ),
+    "ur": (
+        "اب تک آپ نے جو بتایا ہے، وہ یہ ہے۔",
+        "ان میں سے پہلے کس پر کام شروع کریں؟",
+    ),
+    "ar": (
+        "هذا ما أخبرتني به حتى الآن.",
+        "بأي منها نبدأ أولاً؟",
+    ),
+}  # fmt: skip
+# Spec v1.6 19.7: no "none of it is solved yet", no "is anything wrong or missing?", one question.
+WANTS_HEAD = {
+    "en": "What you want built:",
+    "roman_ur": "Jo aap banwana chahte hain:",
+    "ur": "جو آپ بنوانا چاہتے ہیں:",
+    "ar": "ما تريد بناءه:",
+}
+
+
+def summary_message(
+    problems: list[dict[str, Any]], language: str = "en", wants: list[str] | None = None
+) -> str:
+    """Every stored problem, grouped, biggest group first (spec 3.7, 19.7), then the wants apart,
+    then one question. Each item is {category, title, score?}. Nothing is cut: a list that hides
+    items is a list the owner cannot trust."""
+    intro, close = SUMMARY_TEXT.get(language, SUMMARY_TEXT["en"])
+    groups: dict[str, list[dict[str, Any]]] = {}
+    names: dict[str, str] = {}
+    for item in problems:
+        groups.setdefault(item["category"], []).append(item)
+        if item.get("group_name"):
+            names[item["category"]] = str(item["group_name"])
+    order = sorted(groups, key=lambda key: (-len(groups[key]), taxonomy.OTHER == key, key))
+    lines = [intro, ""]
+    for key in order:
+        items = sorted(groups[key], key=lambda i: -float(i.get("score") or 0))
+        heading = names.get(key) if language == "en" else ""
+        lines.append(f"*{heading or taxonomy.label(key, language)}* ({len(items)})")
+        for item in items:
+            own = str(item.get("title_local") or "") if language != "en" else ""
+            if own and bool(ARABIC_SCRIPT.search(own)) != (language in ("ur", "ar")):
+                own = ""  # a title in another script than the chat's is not shown in it
+            words = (own or str(item["title"])).split()[:SUMMARY_LINE_WORDS]
+            lines.append("• " + " ".join(words))
+        lines.append("")
+    if wants:
+        lines.append(f"*{WANTS_HEAD.get(language, WANTS_HEAD['en'])}*")
+        lines += [f"• {w}" for w in wants]
+        lines.append("")
+    lines.append(close)
+    return "\n".join(lines)
+
+
+DONE = re.compile(
+    r"\b(?:that'?s (?:all|it|everything)|that is (?:all|it)|nothing else|no(?:thing)? more|"
+    r"i'?m done|bas(?: yahi| itna| ye ?hi| yehi)?|yahi (?:hai|sab)|aur kuch nahi|kuch aur nahi|"
+    r"nahi aur kuch|that's it for now)\b",
+    re.IGNORECASE,
+)
+ASKS_DOCUMENT = re.compile(
+    r"\b(?:send|give|prepare|make|bana|banao|chahiye)\b.{0,25}\b(?:document|quote|quotation|proposal)\b"
+    r"|\b(?:document|quote|quotation|proposal)\b.{0,25}\b(?:chahiye|bana|banao|bhejo|do)\b",
+    re.IGNORECASE,
+)
+DONE_SHORT = re.compile(
+    r"\b(?:abh?|abhi) (?:nh|nhi|nahi|nahin)\b"
+    r"|\b(?:bas|aur|or|kuch) (?:nh|nhi|nahi|nahin)\b|\b(?:nh|nhi) bas\b",
+    re.IGNORECASE,
+)
+ASKS_SUMMARY = re.compile(r"\b(?:summary|khulasa|khulasah|summery)\b", re.IGNORECASE)
+# 19.7: "list down all the problems", "kya kya bataya": an explicit ask for the list
+ASKS_LIST = re.compile(
+    r"\b(?:list|show|tell|give)(?: me)?(?: down)?(?: all)?(?: of)?(?: the| my)? problems?\b(?! map)"
+    r"|\ball (?:the |my )?problems\b|\bkya kya (?:bataya|batai|bataye|likha|note)\b"
+    r"|\bsaare (?:masle|maslay|problems)\b",
+    re.IGNORECASE,
+)
+
+
+def what_now(text: str | None) -> bool:
+    """The person pushes for the fix or asks "so what now?". The owner's own loss ("I am not sure
+    how much we lose", "kitna nuksan hota hai") is a statement, not that question: reading it as one
+    gave early summaries and ideas in real chats."""
+    from app.modules.pi.decisions import OWN_MONEY
+
+    return bool(WHAT_NOW.search(OWN_MONEY.sub(" ", text or "")))
+
+
+WHAT_NOW = re.compile(
+    r"\b(?:what now|so what can you do|what can you do|what next|how much|how much would|"
+    r"ab kya|aage kya|kitna (?:lagega|kharcha)|kya kar sakte)\b"
+    # Pushing for the fix, always addressed to pi ("jaldi solution do", "sawal hi poochti
+    # rahogi?", "just give me the solution"): the same "so what can you do?", so pi shows what it
+    # noted instead of asking more. A customer describing THEIR customers asking too many
+    # questions, or saying "koi hal hai nahi", is still describing a problem.
+    r"|\bkuch kar sakte (?:ho|hain? ya nahi)\b"
+    r"|\bkya solution (?:hai|he|hy)\b|\b(?:tumhare|aapke|apke) paas (?:koi )?(?:solution|hal)\b"
+    r"|\bsolution (?:do|dw|dein|de do|dedo|dena|dijiye|dijie|batao|btao|bataen|chahiye)\b"
+    # Asking pi to build it ("yehi bnwao", "ye bana do", "can you build this for me").
+    r"|\b(?:ye|yeh|yehi|yahi|ise|isay|wo|woh)(?: \w+){0,2} "
+    r"(?:bnwao|banwao|bnao|banao|bana do|bna do|bnwa do|banwa do)\b"
+    r"|\b(?:ap|aap|tum) (?:ye |yeh |mere liye )?(?:bnwa|banwa|bana|bna)(?:o| do| dein| den)\b"
+    r"|\b(?:can|could) you (?:build|make|create) (?:it|this|that)\b"
+    r"|\bsawal(?:at)? hi (?:pooch|puch)\w*\s+(?:rah|rh)(?:o|oge|ogi|ega|egi)\b"
+    r"|\b(?:aap|ap|tum) (?:itne|kitne) sawal\b"
+    r"|\b(?:give|tell) me (?:a |the |your )?(?:solution|fix|answer)\W*$"
+    r"|\bwhy (?:so|are you asking so) many questions\b"
+    r"|\byou (?:ask|keep asking|are asking) (?:too|so) many questions\b"
+    r"|\bstop asking (?:me|questions)\b|\benough (?:with )?(?:the |of the )?questions\b"
+    r"|\bdo you have a (?:solution|fix)\b",
+    re.IGNORECASE,
+)
+
+
+SHOW_ME = re.compile(
+    r"\b(?:show me (?:what|everything|all)|what (?:have|did) you (?:noted?|got|written|understood)|"
+    r"dikhao|kya (?:kya )?note kiya)\b"
+    # "I already told you" (R-MEM-02): show what is noted instead of asking again. Only when it
+    # is said to pi; "I already told the supplier" is part of the story.
+    r"|\balready (?:told|said|mentioned)(?: it)? (?:to )?you\b"
+    r"|\btold you (?:above|before|earlier)\b"
+    r"|\bscroll up\b|\b(?:look at|read) (?:the |our )?(?:chat|conversation)\b"
+    r"|\bup(?:p?e|a)?r (?:bata\w*|bta\w*|likha|likh\w*)|\bdekho (?:ye |yeh |is )?chat\b"
+    r"|\bchat (?:dekho|dekh lo|dekhen|dekhein|parho|padho)\b"
+    r"|^\W*(?:main |mai |maine )?(?:aap ko |apko |aapko )?(?:pehle|phele|pehly) (?:hi )?"
+    r"(?:bata|bta|likh)\w* (?:chuka|chuki|diya|dia)\b"
+    r"|\b(?:aap ko|apko|aapko|tumhe) (?:\w+ )?(?:bata|bta) (?:chuka|chuki|diya|dia)\b",
+    re.IGNORECASE,
+)
+
+# "That's wrong, I never said that" about something pi attributed to them (R-CORR-01): pi
+# withdraws or corrects that note and says so; it never answers that it did not understand.
+# "Galat order deliver ho jata hai" is a problem, not a correction: the word must stand alone.
+CORRECTED = re.compile(
+    r"^\W*(?:galat|ghalat|glt|ghlt|wrong|not true)\W*(?:$|(?:hai|he|h|baat|wo|woh|ye|yeh|nahi)\b)"
+    r"|\b(?:maine|main ne|mai ne|ma ?ny|mein ne|mene|meine) (?:aisa|asa|esa|ye|yeh)"
+    r"(?: (?:kuch|kch))?(?: (?:bhi|bh))? (?:nahi|nhi|nh|nahin|nai) (?:kaha|kha|bola|likha)\b"
+    r"|\bi (?:never|didn'?t|did not) (?:say|said) (?:that|this|so|it|anything)\b"
+    r"|\bthat'?s not what i said\b",
+    re.IGNORECASE,
+)
+
+
+def says_wrong(text: str) -> bool:
+    """They say pi got something wrong, whether or not anything is noted yet."""
+    return bool(CORRECTED.search(" ".join((text or "").split())))
+
+
+def corrects_noted(text: str, noted: int) -> bool:
+    """They say something already noted is wrong (there must be a note to correct)."""
+    return noted > 0 and says_wrong(text)
+
+
+def asks_for_map(text: str) -> bool:
+    """The person asks for their problem map (pi Customer's wording, shared with that module)."""
+    from app.modules.pi_customer.engine import MAP_ASK  # local: pi_customer imports this module
+
+    return bool(MAP_ASK.search(text or ""))
+
+
+def summary_due(
+    text: str,
+    noted: int,
+    since_summary: int,
+    trigger: int = SUMMARY_TRIGGER,
+    quiet_replies: int = 0,
+    quiet_limit: int = 2,
+) -> str | None:
+    """Why pi should show the sorted summary now: only because the owner asked or is done (spec
+    3.7, 19.7). `since_summary`, `trigger` and the quiet counters are kept for callers and no longer
+    start a summary on their own."""
+    if noted < 1:
+        return None
+    if DONE.search(text):
+        return "done"
+    short = len((text or "").split()) <= 4
+    if short and DONE_SHORT.search(text):
+        return "done"  # "abh nh", "bas nh": the answer to "anything else?" in Roman Urdu
+    if len((text or "").split()) <= 6 and ASKS_SUMMARY.search(text):
+        return "show"  # "summary kosni", "summary dikhao"
+    if SHOW_ME.search(text) or ASKS_LIST.search(text):
+        return "show"
+    if asks_for_map(text):
+        return "map"  # "show my problem map": the sorted summary, with the board picture
+    if ASKS_DOCUMENT.search(text):
+        return "document_asked"  # the offer comes after a confirmed summary, never before
+    return None  # spec v1.6 19.7: a checkpoint is `part19.checkpoint_due`, never a default reply
+
+
+def shape_question_due(noted: int, industry_known: bool, already_asked: bool) -> bool:
+    """After two problems, if pi still does not know the trade, it may ask once (spec 7.0)."""
+    return noted >= 2 and not industry_known and not already_asked
+
+
+PATTERN_AT = 3  # problems in one group, or at one place, before pi may point it out
+
+
+def pattern_hint(noted: list[dict[str, Any]], already_said: list[str]) -> dict[str, Any] | None:
+    """A pattern worth saying once (spec 4.8): a group of three or more problems, or one place that
+    appears in three or more problems across groups. None when nothing new is worth saying."""
+    by_group: dict[str, int] = {}
+    by_place: dict[str, int] = {}
+    for item in noted:
+        by_group[item["group"]] = by_group.get(item["group"], 0) + 1
+        for place in {str(w).strip().casefold() for w in item.get("where") or [] if str(w).strip()}:
+            by_place[place] = by_place.get(place, 0) + 1
+    for group, count in sorted(by_group.items(), key=lambda kv: -kv[1]):
+        key = f"group:{group}"
+        if count >= PATTERN_AT and key not in already_said:
+            return {"kind": "group", "group": group, "count": count, "key": key}
+    for place, count in sorted(by_place.items(), key=lambda kv: -kv[1]):
+        key = f"place:{place}"
+        if count >= PATTERN_AT and key not in already_said:
+            return {"kind": "location", "where": place, "count": count, "key": key}
+    return None

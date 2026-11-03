@@ -23,6 +23,8 @@ import re
 import unicodedata
 from typing import Any, Literal
 
+from app.modules.pi import number_words
+
 PriceMode = Literal["exact", "starting", "quote", "ask_team", "hidden"]
 PRICE_MODES: tuple[str, ...] = ("exact", "starting", "quote", "ask_team", "hidden")
 NO_DISCLOSURE: frozenset[str] = frozenset({"quote", "ask_team", "hidden"})
@@ -107,7 +109,23 @@ CURRENCY = _words(_CURRENCY_WORDS, _CURRENCY_SCRIPT)
 MAGNITUDE = _words(_MAGNITUDE_WORDS, _MAGNITUDE_SCRIPT)
 PRICE_TERM = _words(_PRICE_TERMS, _PRICE_SCRIPT)
 NUMBER_WORD = _words(_NUMBER_WORDS, _NUMBER_SCRIPT)
+# "ek" is Roman Urdu for "a/one" and "one" is English for it ("ek worker", "one notebook"): beside
+# a price word or the word "paisa" they are no amount. A single hard-currency unit ("one dollar",
+# "ek rupaya") is still caught by ONE_UNIT, and bigger amounts by the magnitude words.
+NUMBER_WORD_AMOUNT = _words(
+    _NUMBER_WORDS.replace("|ek|", "|").replace("one|two", "two", 1), _NUMBER_SCRIPT
+)
+ONE_UNIT = re.compile(
+    r"\b(?:one|ek|aik)\s+(?:usd|eur|dollars?|euros?|pounds?|dirhams?|riyals?|rupees?|rupaya|"
+    r"rupaye|rupiya)\b"
+)
 DIGITS = re.compile(r"\d")
+# A count of ordinary things ("three things", "one branch", "two shops") is not an amount.
+COUNTED_THING = re.compile(
+    r"\b(?:one|two|three|four|five|six|seven|eight|nine|ten) "
+    r"(?:things?|problems?|issues?|points?|items?|shops?|branch(?:es)?|stores?|cashiers?|staff|"
+    r"people|days?|weeks?|months?|times?|of (?:these|those|them|the))\b"
+)
 SHORTHAND = re.compile(r"\d+(?:[.,]\d+)?\s?(?:k|m|mn|bn|l|cr|lac|lakh)\b", re.IGNORECASE)
 # Near = within this many characters (works across scripts without tokenisation).
 WINDOW = 40
@@ -134,12 +152,24 @@ def disclosures(text: str) -> list[str]:
     """Reasons a text appears to state a monetary amount. Empty means none detected."""
     t = normalize(text)
     reasons: list[str] = []
-    if any(unicodedata.category(ch) == "Sc" for ch in t) or CURRENCY.search(t):
+    counted = COUNTED_THING.sub(" ", t)
+    # A currency sign always counts. A currency word ("paise", "rupees") counts only next to a
+    # number: the person's own "udhaar ke paise wapas nahi aate" is not an amount.
+    if (
+        any(unicodedata.category(ch) == "Sc" for ch in t)
+        or (
+            CURRENCY.search(t)
+            and (_near(t, CURRENCY, DIGITS) or _near(counted, CURRENCY, NUMBER_WORD_AMOUNT))
+        )
+        or ONE_UNIT.search(t)
+    ):
         reasons.append("currency")
     if MAGNITUDE.search(t) or SHORTHAND.search(t):
         reasons.append("magnitude")
-    if _near(t, PRICE_TERM, DIGITS) or _near(t, PRICE_TERM, NUMBER_WORD):
+    if _near(t, PRICE_TERM, DIGITS) or _near(counted, PRICE_TERM, NUMBER_WORD_AMOUNT):
         reasons.append("priced_number")
+    if number_words.has_amount(text) or number_words.variant_digits(text):
+        reasons.append("number_words")  # "five hundred rupees", "panch sau", "a grand"
     return reasons
 
 
@@ -147,11 +177,15 @@ def written_amounts(text: str) -> bool:
     """True when an amount is expressed in words, which cannot be checked against evidence
     (for example "fifty thousand rupees" or "pachaas hazaar")."""
     t = normalize(text)
-    return bool(
-        _near(t, MAGNITUDE, CURRENCY)
-        or _near(t, NUMBER_WORD, CURRENCY)
-        or _near(t, MAGNITUDE, PRICE_TERM)
-        or _near(t, MAGNITUDE, NUMBER_WORD)
+    return (
+        number_words.has_amount(text)
+        or number_words.variant_digits(text)
+        or bool(
+            _near(t, MAGNITUDE, CURRENCY)
+            or _near(t, NUMBER_WORD, CURRENCY)
+            or _near(t, MAGNITUDE, PRICE_TERM)
+            or _near(t, MAGNITUDE, NUMBER_WORD)
+        )
     )
 
 

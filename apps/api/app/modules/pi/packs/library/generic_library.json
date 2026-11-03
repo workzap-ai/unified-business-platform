@@ -1,0 +1,297 @@
+{
+ "version": "1.1",
+ "source": "pi-platform-spec Book 2 Part 7.4; the quick ideas are rewritten with the owner's approval (owner_rewrites.json), so they are not verbatim",
+ "categories": {
+  "stock_inventory": {
+   "ideas": [
+    "Ask staff to message a photo of any shelf running low to one shared chat, so the buyer sees it straight away.",
+    "Check the expiry dates on the oldest stock first and move it to the front, so nothing is left to expire at the back.",
+    "Move slow items to the front with a small offer before buying more, so shelf space goes to what actually sells.",
+    "Send a photo of each transfer note in a shared chat before the goods leave, so a missing parcel is spotted quickly."
+   ],
+   "dropped": [
+    {
+     "text": "count the 20 best-selling items every evening instead of everything once a month",
+     "why": "a number, percentage, amount or promised result (no invented claims)"
+    }
+   ],
+   "build_keys": [
+    "stock_alerts",
+    "transfer_tracking",
+    "nori_daily_read",
+    "field_checks"
+   ],
+   "never_say": "\"you'll never run out again\", any shrinkage percentage"
+  },
+  "sales_revenue": {
+   "ideas": [
+    "Compare each shop's sales with the shop that sells best, so you can see where the drop is happening.",
+    "Ask staff to note why browsing customers left without buying, so you learn what stops the sale.",
+    "Try one offer on your slowest day and compare it with a normal one, so you see if it brings people in."
+   ],
+   "dropped": [
+    {
+     "text": "find the 10 items that sell most and make sure they're always on display",
+     "why": "a number, percentage, amount or promised result (no invented claims)"
+    }
+   ],
+   "build_keys": [
+    "nori_daily_read",
+    "dashboards_reports",
+    "customer_messaging"
+   ],
+   "never_say": "predicted sales growth; \"best practice says\""
+  },
+  "cash_collections": {
+   "ideas": [
+    "Count the cash at closing with two people and post the total in one shared chat, so a gap is seen at once.",
+    "Keep one shared list of who owes you and send a polite WhatsApp reminder, so nobody is forgotten.",
+    "Deposit the cash at the same fixed time every time, so it never sits around the shop.",
+    "For cash on delivery, check each courier's statement against your orders, so missing payments show up."
+   ],
+   "dropped": [],
+   "build_keys": [
+    "cash_reconciliation",
+    "credit_ledger",
+    "dashboards_reports"
+   ],
+   "never_say": "anything about loans, financing, interest or tax treatment RADV"
+  },
+  "margin_cost": {
+   "ideas": [
+    "Write down what each of your best-selling items costs you and what it sells for, so you can see which ones really earn.",
+    "Add delivery, packing and marketplace fees to what each item costs you before you decide what to charge, so no cost is forgotten.",
+    "Ask each supplier for the same item in writing and compare the offers side by side, so you see who is dearer."
+   ],
+   "dropped": [],
+   "build_keys": [
+    "dashboards_reports",
+    "nori_daily_read",
+    "erp_nori_platform"
+   ],
+   "never_say": "what price they should charge; tax advice"
+  },
+  "customers_retention": {
+   "ideas": [
+    "Collect every customer's WhatsApp number at billing, with their permission, so you can reach them again.",
+    "Message the past customers who agreed to hear from you when new stock arrives, so they come back first.",
+    "Reply politely to every review, good or bad, so new customers see that you listen."
+   ],
+   "dropped": [
+    {
+     "text": "ask \"how did you hear about us?\" at the counter",
+     "why": "a question inside an idea (R-ASK: the one question is pi's last sentence)"
+    }
+   ],
+   "build_keys": [
+    "customer_messaging",
+    "loyalty_repeat",
+    "reviews_collection"
+   ],
+   "never_say": "\"customers will come back\"; anything that sends messages without customers' permission"
+  },
+  "marketing_leads": {
+   "ideas": [
+    "Complete the online map listing of every location with photos, timings and a WhatsApp number, so people find you and can ask you easily.",
+    "Put a code or a \"show this message\" offer in every ad, so you can tell which ad brings people.",
+    "Reply to every enquiry quickly, even with just \"we'll send details shortly\", so people do not go to the next shop.",
+    "Stop the ads that bring no visits or enquiries after a fair test, so the money goes to the ones that work."
+   ],
+   "dropped": [
+    {
+     "text": "post new arrivals with prices on WhatsApp Status and Instagram",
+     "why": "money or a regulated topic: a person decides"
+    }
+   ],
+   "build_keys": [
+    "attribution_codes",
+    "lead_followup",
+    "customer_messaging",
+    "reviews_collection",
+    "dashboards_reports"
+   ],
+   "never_say": "cost-per-lead numbers, \"go viral\", platform policy advice"
+  },
+  "orders_fulfilment": {
+   "ideas": [
+    "Move every order from the different chats into one shared list, so none is missed or taken twice.",
+    "Confirm cash on delivery orders on WhatsApp before dispatch, so fewer parcels come back refused.",
+    "Tell customers their delivery day upfront, so they are not left guessing.",
+    "Note the reason for every return in one place, so you see what keeps going wrong."
+   ],
+   "dropped": [],
+   "build_keys": [
+    "order_capture",
+    "job_tracking",
+    "integration"
+   ],
+   "never_say": "\"zero returns\""
+  },
+  "suppliers_purchasing": {
+   "ideas": [
+    "Keep open purchase orders in one shared list and message the supplier before the expected date, so a late delivery shows early.",
+    "Check quality when goods arrive and send a photo of any problem to the supplier, so it is fixed before you pay.",
+    "Buy based on what sold well recently, not on what the order booker pushes, so money is not tied up in slow stock."
+   ],
+   "dropped": [],
+   "build_keys": [
+    "workflow_automation",
+    "stock_alerts",
+    "dashboards_reports"
+   ],
+   "never_say": "customs, duty or contract advice"
+  },
+  "people_staff": {
+   "ideas": [
+    "Put the shift schedule in the staff chat well ahead, so everyone knows when they work.",
+    "Ask staff to send a photo after each opening and closing check, so you can see it was done.",
+    "Share a target with each shop and the result in the team chat, so everyone sees how they are doing.",
+    "Have new staff shadow your best person at first, so they learn the right way from the start."
+   ],
+   "dropped": [],
+   "build_keys": [
+    "field_checks",
+    "workflow_automation",
+    "booking_scheduling"
+   ],
+   "never_say": "labour-law or termination advice; anything about watching staff without their knowledge"
+  },
+  "operations_process": {
+   "ideas": [
+    "Write the most repeated tasks as simple steps and share them in the staff chat, so anyone can do them the same way.",
+    "Find the task you type twice and pick one place for it, so you only enter it once.",
+    "Set one person responsible for each recurring job, so nothing is left for someone else to do.",
+    "Keep a maintenance log for key machines in a shared note, so a problem is caught before it stops work."
+   ],
+   "dropped": [],
+   "build_keys": [
+    "workflow_automation",
+    "field_checks",
+    "job_tracking",
+    "integration"
+   ],
+   "never_say": ""
+  },
+  "reporting_visibility": {
+   "ideas": [
+    "Have each shop send its key numbers in one format at a fixed time, so you can compare the shops easily.",
+    "Compare each shop's numbers with the best shop, so you see where to look first."
+   ],
+   "dropped": [
+    {
+     "text": "decide the 3 numbers you want every morning (e.g. yesterday's sales per shop, cash, low stock)",
+     "why": "more than one sentence (R-VAL-03); a number, percentage, amount or promised result (no invented claims)"
+    }
+   ],
+   "build_keys": [
+    "nori_daily_read",
+    "dashboards_reports"
+   ],
+   "never_say": ""
+  },
+  "tech_systems": {
+   "ideas": [
+    "List every tool you use and what you type into it, so you see where the same thing is typed twice.",
+    "Pick one place to be the main record, so there is one version to trust."
+   ],
+   "dropped": [
+    {
+     "text": "back up your Excel or register photos weekly",
+     "why": "how-to, steps, settings or wording to copy (R-VAL-04, R-VAL-05); names a vendor, an app to buy, a product or a competitor"
+    }
+   ],
+   "build_keys": [
+    "integration",
+    "erp_nori_platform",
+    "workflow_automation"
+   ],
+   "never_say": "which brand of POS/software to buy (v3 A5"
+  },
+  "quality_complaints": {
+   "ideas": [
+    "Check a sample of every batch or job before it leaves, so a fault is caught before the customer sees it.",
+    "Note each complaint with a photo and the reason, so you can see what keeps repeating.",
+    "Share the top complaint with the team, so everyone works on the same fix."
+   ],
+   "dropped": [],
+   "build_keys": [
+    "field_checks",
+    "job_tracking"
+   ],
+   "never_say": ""
+  },
+  "compliance_admin": {
+   "ideas": [
+    "Keep documents in one shared folder by month on your phone, so nothing is hunted for later."
+   ],
+   "dropped": [
+    {
+     "text": "keep a calendar of every licence, renewal and filing date",
+     "why": "money or a regulated topic: a person decides"
+    }
+   ],
+   "build_keys": [
+    "workflow_automation"
+   ],
+   "never_say": "what the law requires, tax amounts, filing advice"
+  },
+  "communication_coordination": {
+   "ideas": [
+    "Use one group per purpose instead of one group for everything, so important messages are not lost.",
+    "Close the working day with a short \"what's pending\" message in the team chat, so nothing is forgotten.",
+    "Give every task one owner and a date, so everyone knows who is doing it and by when."
+   ],
+   "dropped": [],
+   "build_keys": [
+    "workflow_automation",
+    "dashboards_reports"
+   ],
+   "never_say": ""
+  },
+  "loss_security": {
+   "ideas": [
+    "Have two people at cash and stock counts, so a mistake or a loss is seen by someone else too.",
+    "Check the voids and refunds regularly, so odd ones are noticed early.",
+    "Count high-value items more often than the rest, so a missing one shows up early."
+   ],
+   "dropped": [],
+   "build_keys": [
+    "cash_reconciliation",
+    "transfer_tracking",
+    "field_checks"
+   ],
+   "never_say": "accusations, legal action advice, covert monitoring"
+  },
+  "planning_growth": {
+   "ideas": [
+    "Look at last season's sales by week to plan stock, so you buy for the busy and slow periods.",
+    "Open a new branch only after the current branch's numbers are clear, so the next one rests on facts."
+   ],
+   "dropped": [],
+   "build_keys": [
+    "nori_daily_read",
+    "erp_nori_platform",
+    "dashboards_reports"
+   ],
+   "never_say": "investment or financing advice"
+  },
+  "customer_experience_digital": {
+   "ideas": [
+    "Add online booking or ordering if most enquiries ask the same thing, so customers can do it themselves.",
+    "Fix the website's contact button first, so interested people can reach you easily."
+   ],
+   "dropped": [
+    {
+     "text": "make sure your WhatsApp Business profile has address, timings and catalogue",
+     "why": "names a vendor, an app to buy, a product or a competitor"
+    }
+   ],
+   "build_keys": [
+    "website_digital",
+    "booking_scheduling",
+    "order_capture"
+   ],
+   "never_say": ""
+  }
+ }
+}

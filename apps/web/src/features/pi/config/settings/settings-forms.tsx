@@ -611,7 +611,7 @@ export function AiConfigForm({ settings }: { settings: PiSettings }) {
 
 const providerSchema = z.object({
   order: z
-    .array(z.enum(["openai", "gemini", "groq"]))
+    .array(z.enum(["openai", "gemini", "groq", "anthropic"]))
     .min(1, "Keep at least one provider")
     .refine(
       (o) => new Set(o).size === o.length,

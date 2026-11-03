@@ -1,0 +1,67 @@
+{
+ "cluster": "finance_telecom_services",
+ "version": 1,
+ "as_of": "2026-10",
+ "industries": [
+  "insurance_agencies_and_brokers",
+  "internet_service_providers_and_cable_tv_operators",
+  "microfinance_field_operations",
+  "mobile_wallet_and_payment_agents",
+  "money_exchange_and_remittance_agents",
+  "telecom_franchises_and_mobile_network_retailers"
+ ],
+ "how_customers_find_and_choose": [
+  "Customers choose a nearby agent or shop on trust, queue length and how clearly staff explain what they are doing",
+  "Map listing and reviews matter for walk-in services; people check hours and wait time",
+  "Customers prefer to ask a question in chat first, then visit for anything needing documents or identity checks",
+  "Word of mouth and a reputation for honesty are the main drivers; mistakes spread fast"
+ ],
+ "what_works_now": [
+  "Clear, visible information on what the shop or agent can and cannot do, and the steps and documents needed",
+  "A quick chat reply with the opening hours, the documents to bring and the expected time",
+  "Receipts and written confirmation for every transaction",
+  "A saved list of regular customers told of due dates, renewals or reminders, with consent",
+  "A complete map listing with hours and accurate location",
+  "Polite handling of complaints with a clear person responsible",
+  "For field teams: a simple daily record of visits and collections"
+ ],
+ "outdated_or_weak": [
+  "Aggressive sales calls or repeated promotional messages",
+  "Vague or unclear explanations of charges or terms",
+  "Giving advice on regulated products beyond what the licence allows",
+  "Printed handbills as the main way to attract customers",
+  "Asking customers to share sensitive details in chat"
+ ],
+ "local_context": {
+  "PK": [
+   "Cash on delivery and cash at the counter are still common; bank transfer and mobile wallet payments are now normal for many customers",
+   "Ramadan and the two Eids reshape demand, opening hours and staff availability every year",
+   "Summer heat, monsoon rain and power cuts affect operations and footfall",
+   "Customers often write in Urdu, Roman Urdu or a regional language, and chat is the usual first contact",
+   "Mobile wallets and bank transfers are widely used; customers often need help and trust the local agent",
+   "Financial and telecom services are regulated by their authorities; the owner confirms specifics with them",
+   "Eid and remittance seasons raise demand"
+  ],
+  "UAE": [
+   "Customers are multilingual and expect quick replies in chat; card and tap payments are normal",
+   "Winter is the busy season; many residents travel in summer so demand can dip",
+   "Ramadan and Eid change hours and buying patterns; the licence a business holds decides what it may sell and advertise, so the owner checks that with the licensing body",
+   "Remittance and exchange are busy; services are regulated by the central regulator and licensing authority",
+   "Customers are multilingual and expect clear receipts"
+  ],
+  "CA": [
+   "Customers expect online booking or enquiry, card and bank e-transfer payment, and clear written confirmation",
+   "Long winters and a short summer peak shape outdoor and seasonal trades",
+   "English and French (in Quebec) matter, and many communities prefer their own language; consent for marketing messages and sales tax rules vary, so the owner checks them with a professional",
+   "Financial and insurance services are tightly regulated by province; the owner confirms specifics",
+   "Internet and telecom customers compare plans and service quality online"
+  ]
+ },
+ "never_assume": [
+  "A website",
+  "Customer records beyond receipts",
+  "Staff licensed for every service",
+  "An approved process for any customer's sensitive data"
+ ],
+ "review_status": "needs human review"
+}

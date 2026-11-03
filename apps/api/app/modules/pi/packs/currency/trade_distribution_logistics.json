@@ -1,0 +1,75 @@
+{
+ "cluster": "trade_distribution_logistics",
+ "version": 1,
+ "as_of": "2026-10",
+ "industries": [
+  "air_cargo_and_air_freight_agents",
+  "cold_chain_logistics",
+  "courier_and_last_mile_delivery_companies",
+  "customs_clearing_agents",
+  "fmcg_distributors_and_sub_distributors",
+  "freight_forwarders",
+  "importers_and_trading_houses",
+  "movers_and_relocation_companies",
+  "re_export_traders",
+  "scrap_recycling_and_waste_management",
+  "shipping_agents_and_port_services",
+  "trucking_and_goods_transport_companies",
+  "warehousing_and_3pl",
+  "wholesale_market_traders"
+ ],
+ "how_customers_find_and_choose": [
+  "Trade customers choose by relationship, reliability and credit terms; the first contact is often a phone call or chat from a referral",
+  "Shippers and retailers ask for live updates on where their goods are; a quick, clear status answer builds trust",
+  "Online business directories and map listings bring new business customers, especially for movers, couriers and warehouses",
+  "Reviews and word of mouth matter most to individuals and small shops booking movers or couriers"
+ ],
+ "what_works_now": [
+  "Sharing a status update in chat when goods are picked up, in transit and delivered, with a photo or proof where useful",
+  "Written quotes and booking confirmations with date, route, goods and terms",
+  "A saved list of regular customers with their usual routes, volumes and payment habits",
+  "Recording every delivery, delay and damage claim with a reference so disputes are settled from facts",
+  "Following up unpaid invoices on a set schedule, politely and in writing",
+  "A complete map listing with area covered, hours and contact for businesses that serve walk-in or local customers",
+  "Knowing vehicle or stock utilisation each week so empty runs and idle space are seen"
+ ],
+ "outdated_or_weak": [
+  "Chasing every customer by phone with no record of who asked what",
+  "Generic social media advice for a business whose buyers deal by relationship and contract",
+  "Quoting by gut with no record of past cost per route or per unit",
+  "Verbal agreements on credit terms with nothing written",
+  "Flyers and printed brochures as the main source of new business"
+ ],
+ "local_context": {
+  "PK": [
+   "Cash on delivery and cash at the counter are still common; bank transfer and mobile wallet payments are now normal for many customers",
+   "Ramadan and the two Eids reshape demand, opening hours and staff availability every year",
+   "Summer heat, monsoon rain and power cuts affect operations and footfall",
+   "Customers often write in Urdu, Roman Urdu or a regional language, and chat is the usual first contact",
+   "Credit between traders is common and delayed payment is the main cash flow strain",
+   "Border, port and fuel cost changes quickly alter plans; holidays and strikes disrupt delivery schedules",
+   "Eid and wedding seasons raise demand for transport and wholesale"
+  ],
+  "UAE": [
+   "Customers are multilingual and expect quick replies in chat; card and tap payments are normal",
+   "Winter is the busy season; many residents travel in summer so demand can dip",
+   "Ramadan and Eid change hours and buying patterns; the licence a business holds decides what it may sell and advertise, so the owner checks that with the licensing body",
+   "A major trade and logistics hub: ports, free zones and re-export are central",
+   "Customs documents and trade licences are handled with the relevant authority or an agent; the owner confirms specifics with them"
+  ],
+  "CA": [
+   "Customers expect online booking or enquiry, card and bank e-transfer payment, and clear written confirmation",
+   "Long winters and a short summer peak shape outdoor and seasonal trades",
+   "English and French (in Quebec) matter, and many communities prefer their own language; consent for marketing messages and sales tax rules vary, so the owner checks them with a professional",
+   "Long distances and winter weather affect delivery times and costs",
+   "Cross-border trade rules and carrier requirements apply; the owner checks them with the authority or a broker"
+  ]
+ },
+ "never_assume": [
+  "Tracking technology on vehicles or goods",
+  "A customer list kept anywhere other than a phone or notebook",
+  "A website with a booking form",
+  "Written contracts with every client"
+ ],
+ "review_status": "needs human review"
+}
