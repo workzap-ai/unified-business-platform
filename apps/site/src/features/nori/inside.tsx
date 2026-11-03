@@ -1,7 +1,9 @@
 import { Closing, PageHead, Shell, Shot } from "./chrome";
+import { Badge, Icon, type IconName } from "./icons";
 
 interface Group {
   id: string;
+  icon: IconName;
   title: string;
   line: string;
   shot: string;
@@ -13,6 +15,7 @@ interface Group {
 const GROUPS: Group[] = [
   {
     id: "stores",
+    icon: "store",
     title: "Stores",
     line: "Every shop on a phone. Head office sees all of them.",
     shot: "store-walk-zoom",
@@ -29,6 +32,7 @@ const GROUPS: Group[] = [
   },
   {
     id: "stock",
+    icon: "box",
     title: "Stock & Planning",
     line: "Know what to buy, move and clear.",
     shot: "planning-overview",
@@ -42,6 +46,7 @@ const GROUPS: Group[] = [
   },
   {
     id: "finance",
+    icon: "coins",
     title: "Finance",
     line: "Read the money without waiting for a pack.",
     shot: "finance-today",
@@ -53,6 +58,7 @@ const GROUPS: Group[] = [
   },
   {
     id: "people",
+    icon: "people",
     title: "People",
     line: "Work, requests and staff records in one place.",
     shot: "approvals",
@@ -65,6 +71,7 @@ const GROUPS: Group[] = [
   },
   {
     id: "customers",
+    icon: "megaphone",
     title: "Customers & Marketing",
     line: "Know who buys, and what your marketing earns.",
     shot: "customers",
@@ -76,6 +83,7 @@ const GROUPS: Group[] = [
   },
   {
     id: "oversight",
+    icon: "eye",
     title: "Oversight",
     line: "What needs the owner today.",
     shot: "consultant-view",
@@ -89,6 +97,7 @@ const GROUPS: Group[] = [
   },
   {
     id: "more",
+    icon: "plus",
     title: "More",
     line: "Two extras.",
     shot: "sales-crm",
@@ -106,29 +115,40 @@ export function NoriInside() {
       <PageHead
         label="What’s inside"
         title="What is inside nori."
-        lead="24 modules in six groups, plus a few extras. Every plan includes all of them."
+        lead="24 modules in six groups, plus a few extras. All are included."
       />
-      <section className="nv-jump">
+      <div className="nv-jump">
         <div className="nx-wrap">
           <nav aria-label="Jump to a group">
             {GROUPS.map((g) => (
               <a key={g.id} href={`#${g.id}`}>
+                <Icon name={g.icon} size={18} />
                 {g.title}
               </a>
             ))}
           </nav>
         </div>
-      </section>
+      </div>
       {GROUPS.map((g, i) => (
         <section
           key={g.id}
           id={g.id}
+          aria-labelledby={`${g.id}-h`}
           className={`nx-section nv-group${i % 2 ? " nx-white" : ""}`}
         >
           <div className="nx-wrap nv-group-grid">
-            <div>
-              <h2>{g.title}</h2>
+            <div className="nv-group-head">
+              <Badge name={g.icon} size={28} />
+              <h2 id={`${g.id}-h`}>{g.title}</h2>
               <p className="nx-lead">{g.line}</p>
+              <span className="nv-count">
+                {g.modules.length} {g.modules.length === 1 ? "module" : "modules"}
+              </span>
+            </div>
+            <div className="nv-group-body">
+              <div className="nv-stagebg">
+                <Shot name={g.shot} alt={g.alt} sizes="(max-width: 880px) 100vw, 600px" />
+              </div>
               <ul className="nv-modules">
                 {g.modules.map((m) => (
                   <li key={m.name}>
@@ -138,15 +158,17 @@ export function NoriInside() {
                 ))}
               </ul>
             </div>
-            <Shot name={g.shot} alt={g.alt} sizes="(max-width: 880px) 100vw, 520px" />
           </div>
         </section>
       ))}
       <section className="nx-section">
         <div className="nx-wrap">
           <div className="nv-soon">
-            <h3>Coming soon: Vision (CCTV)</h3>
-            <p>Footfall and queue times from your existing cameras. Not available yet.</p>
+            <Badge name="eye" size={24} />
+            <div>
+              <h3>Coming soon: Vision (CCTV)</h3>
+              <p>Footfall and queue times from your existing cameras. Not available yet.</p>
+            </div>
           </div>
         </div>
       </section>

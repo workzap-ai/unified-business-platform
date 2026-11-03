@@ -150,12 +150,12 @@ export default function Home() {
               </p>
               <ul className="wz-ticks">
                 <li>24 modules, from stores and warehouse to finance</li>
-                <li>Starter, Growth and Enterprise plans</li>
+                <li>Rebrand it as your own, on your own domain</li>
                 <li>Vision (CCTV) is coming soon</li>
               </ul>
               <div className="wz-panel-links">
                 <Button href="/nori">Explore nori</Button>
-                <ArrowLink href="/nori/pricing">Plans and pricing</ArrowLink>
+                <ArrowLink href="/nori/pricing">Pricing</ArrowLink>
               </div>
               <div className="wz-panel-art">
                 <NoriRead />
@@ -217,10 +217,10 @@ export default function Home() {
           </ol>
           <div className="wz-note">
             <p>
-              nori comes in three plans: Starter, Growth and Enterprise. They
-              differ by size and support.
+              One product with every module. You pay one monthly service fee,
+              and you can rebrand it as your own.
             </p>
-            <ArrowLink href="/nori/pricing">See the plans</ArrowLink>
+            <ArrowLink href="/nori/pricing">See pricing</ArrowLink>
           </div>
         </div>
       </section>

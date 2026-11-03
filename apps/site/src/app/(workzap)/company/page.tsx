@@ -109,8 +109,8 @@ export default function Company() {
                   looking at today.
                 </li>
                 <li>
-                  Pick a plan: Starter, Growth or Enterprise. They differ by
-                  size and support.
+                  Book a 30-minute meeting. We tell you the price once we know
+                  your shops.
                 </li>
               </ol>
               <p style={{ margin: "20px 0 0" }}>

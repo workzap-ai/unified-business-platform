@@ -31,7 +31,7 @@ export default function Products() {
           <table className="wz-compare">
             <caption className="wz-sr">
               nori and pi, compared: who it is for, what it does, how you start
-              and plans.
+              and price.
             </caption>
             <thead>
               <tr>
@@ -104,11 +104,11 @@ export default function Products() {
                 </td>
               </tr>
               <tr>
-                <th scope="row">Plans and quotes</th>
+                <th scope="row">Price and quotes</th>
                 <td data-label="nori">
                   <p>
-                    Starter, Growth and Enterprise. They differ by size and
-                    support.
+                    One product with every module and one monthly service
+                    fee. We give you the price on a call.
                   </p>
                 </td>
                 <td data-label="pi">

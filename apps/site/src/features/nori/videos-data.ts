@@ -1,5 +1,4 @@
-// The nori films. Each is a silent film built from real screens of the demo workspace
-// (dummy data). Files live in public/nori-video. The transcript is the on-screen captions,
+// The nori films, built from real nori screens. Files live in public/nori-video. The transcript is the on-screen captions,
 // in order, so people without sound and search engines can read the film.
 export interface Film {
   slug: string;
@@ -16,16 +15,20 @@ export const FILMS: Film[] = [
     slug: "morning",
     title: "A morning with nori",
     line: "What sold, which shops are behind, what does not tie.",
-    seconds: 42,
+    seconds: 65,
     file: "/nori-video/nori-morning.mp4",
     poster: "/nori-video/nori-morning.jpg",
     transcript: [
-      "It is 8:10 in the morning. You open nori.",
-      "Yesterday’s sales, next to the usual pace.",
-      "Shops that are behind. Numbers that do not tie.",
-      "Open defects. Demands waiting for the warehouse.",
-      "Shops ask the warehouse for stock.",
-      "You approve a request. The decision is yours.",
+      "It is ten past eight in the morning, and you open nori.",
+      "Yesterday’s sales are on one page, for every shop.",
+      "You can see which shops are behind, before anyone has to tell you.",
+      "You can see which numbers do not tie, and the gap is shown.",
+      "Discounts at the till, stock across the shops, all in one place.",
+      "Shops record their work on their phones, with photos as proof.",
+      "Daily checks and cash counts are done the same way, and you see who is late.",
+      "A request is waiting for you. You approve it. The decision is yours.",
+      "Five minutes, one page. You know which shop is slipping before the week is out.",
+      "Talk to us for thirty minutes.",
     ],
   },
   {

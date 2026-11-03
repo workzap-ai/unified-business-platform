@@ -1,0 +1,62 @@
+[
+  {
+    "file": "tally.svg",
+    "name": "Tally",
+    "width": 114,
+    "height": 26
+  },
+  {
+    "file": "quickbooks.svg",
+    "name": "QuickBooks",
+    "width": 111,
+    "height": 30
+  },
+  {
+    "file": "zoho-books.svg",
+    "name": "Zoho Books",
+    "width": 860,
+    "height": 296
+  },
+  {
+    "file": "odoo.svg",
+    "name": "Odoo",
+    "width": 621,
+    "height": 196
+  },
+  {
+    "file": "excel.svg",
+    "name": "Microsoft Excel",
+    "width": 48,
+    "height": 48
+  },
+  {
+    "file": "shopify.svg",
+    "name": "Shopify",
+    "width": 304,
+    "height": 87
+  },
+  {
+    "file": "google-sheets.svg",
+    "name": "Google Sheets",
+    "width": 192,
+    "height": 192
+  },
+  {
+    "file": "sap.svg",
+    "name": "SAP",
+    "width": 412,
+    "height": 204
+  },
+  {
+    "file": "dynamics-365.svg",
+    "name": "Microsoft Dynamics 365",
+    "width": 96,
+    "height": 96
+  },
+  {
+    "file": "netsuite.svg",
+    "name": "Oracle NetSuite",
+    "width": 88,
+    "height": 32
+  }
+]

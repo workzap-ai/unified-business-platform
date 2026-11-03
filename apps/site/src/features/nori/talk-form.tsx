@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { PI } from "../pi/config";
+import { Icon } from "./icons";
 
 const MONTHS = [
   "January", "February", "March", "April", "May", "June",
@@ -112,10 +113,11 @@ export function TalkForm() {
   if (status === "done") {
     return (
       <div className="nv-confirm" role="status">
+        <span className="nv-confirm-icon">
+          <Icon name="checkCircle" size={32} />
+        </span>
         <h2>{delivered ? "Your request is with us." : "One more step."}</h2>
-        <p>
-          <strong>{summary}</strong>
-        </p>
+        <p className="nv-confirm-when">{summary}</p>
         <p>
           {delivered
             ? "We will message you on WhatsApp to confirm the time."
@@ -128,61 +130,96 @@ export function TalkForm() {
     );
   }
 
+  const todayIso = iso(today.getFullYear(), today.getMonth(), today.getDate());
+
   return (
     <form className="nv-form" onSubmit={submit} noValidate>
-      <fieldset className="nv-cal">
-        <legend>1. Pick a day and time</legend>
-        <div className="nv-cal-head">
-          <button type="button" onClick={() => step(-1)} disabled={!canPrev} aria-label="Previous month">‹</button>
-          <strong>{MONTHS[view.m]} {view.y}</strong>
-          <button type="button" onClick={() => step(1)} disabled={!canNext} aria-label="Next month">›</button>
+      <section className="nv-box" aria-labelledby="nv-step1">
+        <div className="nv-card-top">
+          <h2 id="nv-step1" className="nv-step">
+            <span className="nv-step-chip" aria-hidden="true">1</span>
+            Pick a day and time
+          </h2>
+          <ul className="nv-meta" aria-label="Meeting details">
+            <li><Icon name="clock" size={16} />30 minutes</li>
+            <li><Icon name="globe" size={16} />Pakistan time</li>
+            <li><Icon name="calendar" size={16} />Monday to Friday</li>
+          </ul>
         </div>
-        <div className="nv-cal-grid" role="grid" aria-label={`${MONTHS[view.m]} ${view.y}`}>
-          {DAYS.map((d) => (
-            <span key={d} className="nv-cal-dow">{d}</span>
-          ))}
-          {cells.map((d, i) =>
-            d === null ? (
-              <span key={`b${i}`} />
-            ) : (
-              <button
-                key={d}
-                type="button"
-                disabled={!isOpen(d)}
-                className={day === iso(view.y, view.m, d) ? "is-on" : undefined}
-                aria-pressed={day === iso(view.y, view.m, d)}
-                onClick={() => {
-                  setDay(iso(view.y, view.m, d));
-                  setSlot(null);
-                }}
-              >
-                {d}
-              </button>
-            ),
-          )}
-        </div>
-        {day ? (
-          <div className="nv-slots" role="group" aria-label="Times, Pakistan time">
-            {SLOTS.map((s) => (
-              <button
-                key={`${s.h}${s.m}`}
-                type="button"
-                className={slot && slot.h === s.h && slot.m === s.m ? "is-on" : undefined}
-                aria-pressed={Boolean(slot && slot.h === s.h && slot.m === s.m)}
-                onClick={() => setSlot(s)}
-              >
-                {clock(s.h, s.m)}
-              </button>
-            ))}
+        <div className="nv-cal2">
+          <div className="nv-cal-left">
+            <div className="nv-cal-head">
+              <button type="button" onClick={() => step(-1)} disabled={!canPrev} aria-label="Previous month">‹</button>
+              <strong>{MONTHS[view.m]} {view.y}</strong>
+              <button type="button" onClick={() => step(1)} disabled={!canNext} aria-label="Next month">›</button>
+            </div>
+            <div className="nv-cal-grid" role="group" aria-label={`${MONTHS[view.m]} ${view.y}`}>
+              {DAYS.map((d) => (
+                <span key={d} className="nv-cal-dow">{d}</span>
+              ))}
+              {cells.map((d, i) =>
+                d === null ? (
+                  <span key={`b${i}`} />
+                ) : (
+                  <button
+                    key={d}
+                    type="button"
+                    disabled={!isOpen(d)}
+                    className={[
+                      day === iso(view.y, view.m, d) ? "is-on" : "",
+                      iso(view.y, view.m, d) === todayIso ? "is-today" : "",
+                    ].join(" ").trim() || undefined}
+                    aria-pressed={day === iso(view.y, view.m, d)}
+                    aria-label={`${d} ${MONTHS[view.m]}`}
+                    onClick={() => {
+                      setDay(iso(view.y, view.m, d));
+                      setSlot(null);
+                    }}
+                  >
+                    {d}
+                  </button>
+                ),
+              )}
+            </div>
           </div>
-        ) : (
-          <p className="nv-hint">Times are shown in Pakistan time. Monday to Friday.</p>
-        )}
-        {summary ? <p className="nv-picked">{summary}</p> : null}
-      </fieldset>
+          <div className="nv-cal-right">
+            {day ? (
+              <>
+                <p className="nv-cal-day">{label(day, SLOTS[0]).split(",")[0]}</p>
+                <div className="nv-slots" role="group" aria-label="Times, Pakistan time">
+                  {SLOTS.map((s) => (
+                    <button
+                      key={`${s.h}${s.m}`}
+                      type="button"
+                      className={slot && slot.h === s.h && slot.m === s.m ? "is-on" : undefined}
+                      aria-pressed={Boolean(slot && slot.h === s.h && slot.m === s.m)}
+                      onClick={() => setSlot(s)}
+                    >
+                      {clock(s.h, s.m)}
+                    </button>
+                  ))}
+                </div>
+              </>
+            ) : (
+              <div className="nv-empty">
+                <Icon name="calendar" size={28} />
+                <p>Choose a day to see the times.</p>
+                <span>Open days are shaded green.</span>
+              </div>
+            )}
+          </div>
+        </div>
+        <p className={summary ? "nv-picked is-set" : "nv-picked"} aria-live="polite">
+          <Icon name={summary ? "checkCircle" : "clock"} size={20} />
+          {summary || "No time chosen yet."}
+        </p>
+      </section>
 
-      <fieldset className="nv-fields">
-        <legend>2. About you</legend>
+      <section className="nv-box nv-fields" aria-labelledby="nv-step2">
+        <h2 id="nv-step2" className="nv-step">
+          <span className="nv-step-chip" aria-hidden="true">2</span>
+          About you
+        </h2>
         <label>Your name
           <input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} autoComplete="name" required />
         </label>
@@ -220,9 +257,14 @@ export function TalkForm() {
           <input type="checkbox" checked={form.consent} onChange={(e) => setForm({ ...form, consent: e.target.checked })} />
           <span>Workzap may use these details to arrange this meeting and reply to me.</span>
         </label>
-      </fieldset>
+      </section>
 
-      {msg ? <p className="nv-msg" role="alert">{msg}</p> : null}
+      {msg ? (
+        <p className="nv-msg" role="alert">
+          <Icon name="info" size={20} />
+          {msg}
+        </p>
+      ) : null}
       <button className="nx-btn nx-btn-primary" type="submit" disabled={status === "sending"}>
         {status === "sending" ? "Sending…" : "Book my meeting"}
       </button>

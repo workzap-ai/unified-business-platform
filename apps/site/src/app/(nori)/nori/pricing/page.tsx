@@ -4,9 +4,9 @@ import { JsonLd, breadcrumbs } from "@/lib/seo";
 
 export const metadata = noriMetadata({
   path: "/pricing",
-  title: "nori plans: Starter, Growth and Enterprise",
+  title: "nori pricing: one product, one monthly fee, your own brand",
   description:
-    "nori has three plans: Starter for one store, Growth for up to 10 outlets, Enterprise for chains. Every module is included. Rebrand it as your own.",
+    "nori is one product with every module and one monthly service fee. Rebrand it, run it on your own domain, and we build connectors for your POS.",
 });
 
 export default function Page() {

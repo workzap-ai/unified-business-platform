@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { Closing, PageHead, PI_CONTACT, Shell, TALK } from "./chrome";
+import { PageHead, PI_CONTACT, Shell, TALK } from "./chrome";
+import { Badge, Icon } from "./icons";
 
 // Short answers. Anything not confirmed by Workzap says "ask us".
 export const NORI_FAQ = [
@@ -66,12 +67,7 @@ export const NORI_FAQ = [
   {
     question: "What does it cost?",
     answer:
-      "There are three plans: Starter for one store, Growth for up to 10 outlets and Enterprise for chains and groups. Every plan includes every module. We give you the price on a 30-minute call.",
-  },
-  {
-    question: "Are the screens on this site real?",
-    answer:
-      "Yes. They come from a demo workspace with dummy data. They show how nori looks and works, not a real shop’s results.",
+      "nori is one product with every module. You pay one monthly service fee. We give you the price on a 30-minute call, once we know your shops.",
   },
 ];
 
@@ -84,24 +80,31 @@ export function NoriFaq() {
         lead="Short answers to what owners ask first."
       />
       <section className="nx-section nx-white">
-        <div className="nx-wrap">
-          <dl className="nx-faq">
-            {NORI_FAQ.map((q) => (
-              <div key={q.question} className="nx-faq-item">
-                <dt>
+        <div className="nx-wrap nv-faqgrid">
+          <div className="nv-faq">
+            {NORI_FAQ.map((q, i) => (
+              <details key={q.question} open={i === 0}>
+                <summary>
                   <h2>{q.question}</h2>
-                </dt>
-                <dd>{q.answer}</dd>
-              </div>
+                  <Icon name="chevron" size={22} />
+                </summary>
+                <p>{q.answer}</p>
+              </details>
             ))}
-          </dl>
-          <p className="nv-more">
-            Something else? <Link href={TALK}>Book a meeting</Link> or{" "}
-            <Link href={PI_CONTACT}>message pi on WhatsApp</Link>.
-          </p>
+          </div>
+          <aside className="nv-askbox nx-on-ink">
+            <Badge name="chat" size={24} />
+            <h2>Something else?</h2>
+            <p>Ask us on a call, or message pi on WhatsApp.</p>
+            <Link className="nx-btn nx-btn-primary" href={TALK}>
+              Book a meeting
+            </Link>
+            <Link className="nx-btn nx-btn-secondary" href={PI_CONTACT}>
+              Message pi on WhatsApp
+            </Link>
+          </aside>
         </div>
       </section>
-      <Closing />
     </Shell>
   );
 }

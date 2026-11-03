@@ -7,7 +7,7 @@ export const metadata = noriMetadata({
   path: "/videos",
   title: "nori videos: a morning with nori, stock and shop checks",
   description:
-    "Short silent films recorded from the real nori screens: what an owner sees in the morning, where stock is stuck, and how shops do their checks.",
+    "Short films recorded from the real nori screens: what an owner sees in the morning, where stock is stuck, and how shops do their checks.",
 });
 
 export default function Page() {

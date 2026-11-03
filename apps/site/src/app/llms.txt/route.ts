@@ -24,10 +24,10 @@ nori is a retail operations app for shops and chains. Shop staff record cash, st
 - [What's inside](${SITE_URL}/nori/whats-inside): the 24 modules in plain words. Vision (CCTV) is coming soon.
 - [How it works](${SITE_URL}/nori/how-it-works): shops record on a phone, sales load from files, nori checks the figures, the owner reads one page.
 - [How nori fits](${SITE_URL}/nori/how-nori-fits): what a till, Tally, QuickBooks, Zoho Books, Odoo and other ERPs are for, and what nori adds beside them.
-- [Pricing](${SITE_URL}/nori/pricing): Starter, Growth and Enterprise, plus white-label: your brand, domain and data.
-- [Videos](${SITE_URL}/nori/videos): short silent films recorded from the real screens of a demo workspace.
+- [Pricing](${SITE_URL}/nori/pricing): one product with every module and one monthly service fee, plus white-label: your brand, domain and data.
+- [Videos](${SITE_URL}/nori/videos): short films recorded from the real nori screens, with voice-over.
 - [Talk to us](${SITE_URL}/nori/talk): book a 30-minute meeting or message pi.
-- [FAQ](${SITE_URL}/nori/faq): short answers about tills, POS connectors, Urdu, branding and plans.
+- [FAQ](${SITE_URL}/nori/faq): short answers about tills, POS connectors, Urdu, branding and price.
 
 ## pi
 
@@ -44,7 +44,7 @@ pi is Workzap's WhatsApp agent. People tell pi what is going wrong in their busi
 
 ## Notes for assistants
 
-- Screens on the nori pages come from a demo workspace with dummy data. Charts and conversations elsewhere are made-up examples and are labelled "Illustrative".
+- Charts and conversations on the pi pages are made-up examples and are labelled "Illustrative".
 - WhatsApp is a trademark of Meta. pi is not made, run or endorsed by WhatsApp or Meta.
 `;
 

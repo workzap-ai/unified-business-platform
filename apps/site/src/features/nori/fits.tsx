@@ -1,48 +1,59 @@
 import Link from "next/link";
-import { Closing, PageHead, Shell, TALK } from "./chrome";
+import { Closing, Head, PageHead, Shell, Shot, TALK } from "./chrome";
+import { Badge, Icon, type IconName } from "./icons";
+import { LogoChip, LogoNote, type LogoId } from "./logos";
 
 // Named products appear only with narrow, dated facts or plain descriptions. Nothing
 // here says a named product cannot do something. Checked 3 Nov 2026.
-const ROWS = [
+const RECORDS: {
+  icon: IconName;
+  kind: string;
+  job: string;
+  logos?: LogoId[];
+  names?: string[];
+}[] = [
+  { icon: "till", kind: "Till or POS", job: "Takes the sale", names: ["Any till"], logos: ["shopify"] },
+  { icon: "book", kind: "Accounting", job: "Keeps the books", logos: ["tally", "quickbooks", "zoho"] },
   {
-    kind: "Your till or POS",
-    names: "Any till, Shopify",
-    does: "Takes the sale.",
-    nori: "Keeps ringing sales. nori reads the sales files.",
+    icon: "grid",
+    kind: "ERP",
+    job: "Records stock and orders",
+    logos: ["odoo"],
+    names: ["SAP Business One", "Dynamics 365 Business Central", "NetSuite"],
   },
+  { icon: "warehouse", kind: "Warehouse system", job: "Receives and ships stock" },
   {
-    kind: "Accounting software",
-    names: "Tally, QuickBooks, Zoho Books",
-    does: "Keeps the books and tax records.",
-    nori: "Your accountant keeps the books. nori’s finance pages are for you to read.",
-  },
-  {
-    kind: "An ERP",
-    names: "Odoo, SAP Business One, Dynamics 365 Business Central, NetSuite",
-    does: "Records sales, purchases, accounts and stock in one system.",
-    nori: "Keep it. nori adds the daily shop checks and the owner’s page.",
-  },
-  {
-    kind: "A warehouse system",
-    names: "",
-    does: "Receives, stores and dispatches stock.",
-    nori: "Stays as it is. nori carries the shops’ demands and receipts.",
-  },
-  {
+    icon: "chat",
     kind: "Excel and WhatsApp",
-    names: "",
-    does: "Your own way to chase the shops.",
-    nori: "Keep your sheets. Shops’ updates get one place to land.",
+    job: "Your own way to chase shops",
+    logos: ["excel", "sheets"],
+    names: ["WhatsApp"],
   },
 ];
 
-const ADDS = [
-  "A morning list of what needs you.",
-  "Proof the shops did their daily jobs.",
+const NORI_DOES = [
+  "Daily shop checks, with photos.",
   "Figures that do not tie, with the gap.",
-  "Requests that end in a recorded yes or no.",
-  "Stock planning: restock, move, clear.",
-  "Urdu for the shop floor, and a phone app.",
+  "Stock to restock, move or clear.",
+  "Requests with a recorded yes or no.",
+  "Urdu on the shop floor, and a phone app.",
+];
+
+const KEEP = ["Keep your till.", "Keep your accountant.", "Keep your ERP."];
+
+const REACH: { icon: IconName; text: React.ReactNode }[] = [
+  { icon: "file", text: "Sales and stock files: CSV, Excel, Google Sheets." },
+  { icon: "swap", text: "Shopify sync for online orders." },
+  { icon: "phone", text: "Cash, counts and walks recorded by staff." },
+  {
+    icon: "plug",
+    text: (
+      <>
+        <strong>A connector for your POS?</strong> Ask us. We build connectors on
+        request.
+      </>
+    ),
+  },
 ];
 
 export function NoriFits() {
@@ -56,100 +67,114 @@ export function NoriFits() {
 
       <section className="nx-section">
         <div className="nx-wrap">
-          <div className="nx-head">
-            <span className="nx-label">What each kind is for</span>
-            <h2>Each tool does its own job.</h2>
-          </div>
-          <div className="nv-table-wrap">
-            <table className="nv-table">
-              <caption className="nx-sr">
-                What each kind of software is for, and how nori sits beside it
-              </caption>
-              <thead>
-                <tr>
-                  <th scope="col">Software</th>
-                  <th scope="col">What it is for</th>
-                  <th scope="col">With nori</th>
-                </tr>
-              </thead>
-              <tbody>
-                {ROWS.map((r) => (
-                  <tr key={r.kind}>
-                    <th scope="row">
-                      {r.kind}
-                      {r.names ? <span>{r.names}</span> : null}
-                    </th>
-                    <td>{r.does}</td>
-                    <td>{r.nori}</td>
-                  </tr>
+          <Head title="Your software records. nori reads it and checks the shops." />
+          <div className="nv-fitmap">
+            <div className="nv-panel nv-records">
+              <h3>Your software records the business</h3>
+              <ul>
+                {RECORDS.map((r) => (
+                  <li key={r.kind}>
+                    <Badge name={r.icon} size={22} />
+                    <div className="nv-rec-text">
+                      <strong>{r.kind}</strong>
+                      <span>{r.job}</span>
+                    </div>
+                    <div className="nv-rec-names">
+                      {r.logos?.map((id) => <LogoChip key={id} id={id} />)}
+                      {r.names?.map((n) => (
+                        <span key={n} className="nv-name">
+                          {n}
+                        </span>
+                      ))}
+                    </div>
+                  </li>
                 ))}
-              </tbody>
-            </table>
+              </ul>
+            </div>
+            <div className="nv-reads" aria-hidden="true">
+              <span>
+                reads
+                <Icon name="arrow" size={18} />
+              </span>
+            </div>
+            <div className="nv-panel nv-nori">
+              <h3>nori checks the shops and shows you one page</h3>
+              <ul className="nv-ticks">
+                {NORI_DOES.map((d) => (
+                  <li key={d}>
+                    <Icon name="checkCircle" size={22} />
+                    {d}
+                  </li>
+                ))}
+              </ul>
+              <div className="nv-peek nv-peek-wide">
+                <Shot name="war-room-top" alt="The War Room: one page of what needs the owner today" crop sizes="(max-width: 880px) 100vw, 560px" />
+              </div>
+            </div>
           </div>
+          <ul className="nv-keep" aria-label="You keep what you have">
+            {KEEP.map((k) => (
+              <li key={k}>
+                <Icon name="check" size={18} />
+                {k}
+              </li>
+            ))}
+          </ul>
           <p className="nv-tiny">
             nori works beside your till, your accounts and your warehouse system, and
             does not replace them. It is not an ERP. Product names belong to their
             owners.
           </p>
+          <LogoNote />
         </div>
       </section>
 
       <section className="nx-section nx-white">
         <div className="nx-wrap nv-two">
-          <div>
-            <span className="nx-label">What nori adds</span>
-            <ul className="nv-ticks">
-              {ADDS.map((a) => (
-                <li key={a}>{a}</li>
+          <div className="nv-panel">
+            <h2>How figures reach nori</h2>
+            <ul className="nv-rows">
+              {REACH.map((r, i) => (
+                <li key={i}>
+                  <Badge name={r.icon} size={20} />
+                  <span>{r.text}</span>
+                </li>
               ))}
             </ul>
           </div>
-          <div>
-            <span className="nx-label">How figures reach nori</span>
-            <ul className="nv-plain">
-              <li>Sales and stock files: CSV, Excel, Google Sheets.</li>
-              <li>Shopify sync for online orders.</li>
-              <li>Cash, counts and walks recorded by staff.</li>
+          <div className="nv-panel">
+            <h2>Do I still need…</h2>
+            <ul className="nv-qa">
               <li>
-                <strong>A connector for your POS?</strong> Ask us. We build
-                connectors on request.
+                <strong>A till?</strong>
+                <span>Yes. nori does not take payments.</span>
+              </li>
+              <li>
+                <strong>An accountant?</strong>
+                <span>Yes. nori is not your books of record.</span>
+              </li>
+              <li>
+                <strong>Odoo or another ERP?</strong>
+                <span>
+                  Not to use nori. If you have one, keep it. Odoo lists 77 partners in
+                  Pakistan on its own site (seen 3 Nov 2026).
+                </span>
               </li>
             </ul>
-          </div>
-        </div>
-      </section>
-
-      <section className="nx-section">
-        <div className="nx-wrap nv-two">
-          <div>
-            <span className="nx-label">Do I still need…</span>
-            <ul className="nv-plain">
-              <li>
-                <strong>A till?</strong> Yes. nori does not take payments.
-              </li>
-              <li>
-                <strong>An accountant?</strong> Yes. nori is not your books of record.
-              </li>
-              <li>
-                <strong>Odoo or another ERP?</strong> Not to use nori. If you have
-                one, keep it. Odoo lists 77 partners in Pakistan on its own site
-                (seen 3 Nov 2026).
-              </li>
-            </ul>
-          </div>
-          <div>
-            <span className="nx-label">A note on FBR</span>
-            <p className="nv-plainp">
-              Some retailers need to connect their till to FBR. Ask your tax adviser if
-              that is you. nori is not a till and is not connected to FBR. Check the
-              current rules at fbr.gov.pk.
-            </p>
           </div>
         </div>
         <div className="nx-wrap">
-          <p className="nv-more">
-            <Link href={TALK}>Ask us how it fits yours →</Link>
-          </p>
+          <div className="nv-note-row">
+            <p className="nv-plainp">
+              <strong>A note on FBR.</strong> Some retailers need to connect their till
+              to FBR. Ask your tax adviser if that is you. nori is not a till and is not
+              connected to FBR. Check the current rules at fbr.gov.pk.
+            </p>
+            <Link className="nv-link" href={TALK}>
+              Ask us how it fits yours
+              <Icon name="arrow" size={16} />
+            </Link>
+          </div>
         </div>
       </section>
 

@@ -9,17 +9,10 @@ export function VideoCard({ film }: { film: Film }) {
         preload="none"
         playsInline
         poster={film.poster}
-        aria-label={`${film.title}. Silent film with captions.`}
+        aria-label={`${film.title}. Film with captions.`}
       >
         <source src={film.file} type="video/mp4" />
       </video>
-      <figcaption>
-        <strong>{film.title}</strong>
-        <span>
-          {film.line} About {film.seconds} seconds, no sound needed. Demo workspace,
-          dummy data.
-        </span>
-      </figcaption>
     </figure>
   );
 }

@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import { Icon } from "./icons";
 
 export const APP = "https://app.workzap.ai";
 // Every contact touch point goes to pi (owner decision, 3 Oct 2026).
@@ -43,11 +44,15 @@ function Header({ current }: { current?: string }) {
           ))}
           <a href={APP}>Sign in</a>
         </nav>
-        <Link className="nx-btn nx-btn-primary" href={TALK}>
+        <Link className="nx-btn nx-btn-primary nx-nav-cta" href={TALK}>
           Book a meeting
         </Link>
         <details className="nx-menu">
-          <summary>Menu</summary>
+          <summary>
+            <span>Menu</span>
+            <Icon name="menu" size={20} className="nx-menu-open" />
+            <Icon name="close" size={20} className="nx-menu-close" />
+          </summary>
           <nav aria-label="nori, menu">
             {FOOT.map((l) => (
               <Link
@@ -59,7 +64,9 @@ function Header({ current }: { current?: string }) {
               </Link>
             ))}
             <a href={APP}>Sign in</a>
-            <Link href={TALK}>Book a meeting</Link>
+            <Link className="nx-btn nx-btn-primary" href={TALK}>
+              Book a meeting
+            </Link>
           </nav>
         </details>
       </div>
@@ -70,21 +77,44 @@ function Header({ current }: { current?: string }) {
 export function Footer() {
   return (
     <footer className="nx-footer nx-on-ink">
-      <div className="nx-wrap">
-        <span>nori by Workzap · © 2026 Workzap</span>
-        <div className="nx-footer-links">
-          {FOOT.map((l) => (
-            <Link key={l.href} href={l.href}>
-              {l.label}
-            </Link>
-          ))}
-          <a href={APP}>Sign in</a>
-          <Link href={PI_CONTACT}>Talk to pi</Link>
-          <Link href="/">Workzap</Link>
+      <div className="nx-wrap nx-foot-grid">
+        <div className="nx-foot-brand">
+          <span className="nx-foot-mark">nori</span>
+          <span className="nx-foot-by">by Workzap</span>
+          <Link className="nx-btn nx-btn-primary" href={TALK}>
+            Book a meeting
+          </Link>
         </div>
-        <p className="nv-foot-note">
-          Screens on this site come from a demo workspace with dummy data.
-        </p>
+        <nav aria-label="nori, footer">
+          <p className="nx-foot-h">nori</p>
+          <ul>
+            {FOOT.map((l) => (
+              <li key={l.href}>
+                <Link href={l.href}>{l.label}</Link>
+              </li>
+            ))}
+          </ul>
+        </nav>
+        <nav aria-label="nori, contact">
+          <p className="nx-foot-h">Contact</p>
+          <ul>
+            <li>
+              <Link href={TALK}>Book a meeting</Link>
+            </li>
+            <li>
+              <Link href={PI_CONTACT}>Talk to pi</Link>
+            </li>
+            <li>
+              <a href={APP}>Sign in</a>
+            </li>
+            <li>
+              <Link href="/">Workzap</Link>
+            </li>
+          </ul>
+        </nav>
+      </div>
+      <div className="nx-wrap nx-foot-base">
+        <span>© 2026 Workzap</span>
       </div>
     </footer>
   );
@@ -133,31 +163,63 @@ export function PageHead({
   );
 }
 
-// A real screen from the demo workspace, in a plain frame. Dummy data, labelled.
+// One section header for every page: a small label, the heading, an optional lead.
+export function Head({
+  label,
+  title,
+  lead,
+}: {
+  label?: string;
+  title: string;
+  lead?: string;
+}) {
+  return (
+    <div className="nx-head">
+      {label ? <span className="nx-label">{label}</span> : null}
+      <h2>{title}</h2>
+      {lead ? <p className="nx-lead">{lead}</p> : null}
+    </div>
+  );
+}
+
+// A real screen from the product. Wide screens get a slim window bar. The shop-floor pages
+// are a narrow column, kept as a phone-shaped crop (names ending "-zoom"). `crop` fills
+// its parent and shows the top left of the screen, for tiles of a fixed shape.
 export function Shot({
   name,
   alt,
   priority,
   sizes,
-  tag = true,
+  crop,
 }: {
   name: string;
   alt: string;
   priority?: boolean;
   sizes?: string;
-  tag?: boolean;
+  crop?: boolean;
 }) {
+  const phone = name.endsWith("-zoom");
+  const cls = ["nv-shot", phone ? "nv-shot-phone" : "", crop ? "nv-shot-crop" : ""]
+    .filter(Boolean)
+    .join(" ");
   return (
-    <figure className="nv-shot">
+    <figure className={cls}>
+      {!phone && !crop ? (
+        <div className="nv-bar" aria-hidden="true">
+          <i />
+          <i />
+          <i />
+        </div>
+      ) : null}
       <Image
-        src={`/nori-screens/${name}.webp`}
+        src={`/nori-screens/${name}.v3.webp`}
         alt={alt}
-        width={1352}
-        height={778}
+        width={phone ? 700 : 1288}
+        height={phone ? 640 : 690}
         sizes={sizes ?? "(max-width: 880px) 100vw, 1080px"}
+        quality={90}
         priority={priority}
       />
-      {tag ? <figcaption>Demo workspace · dummy data</figcaption> : null}
     </figure>
   );
 }
@@ -171,9 +233,11 @@ export function Closing({
 }) {
   return (
     <section className="nx-cta nx-on-ink">
-      <div className="nx-wrap">
-        <h2>{title}</h2>
-        <p>{text}</p>
+      <div className="nx-wrap nx-cta-grid">
+        <div>
+          <h2>{title}</h2>
+          <p>{text}</p>
+        </div>
         <div className="nx-btn-row">
           <Link className="nx-btn nx-btn-primary" href={TALK}>
             Book a meeting
