@@ -17,13 +17,17 @@ const BODY = `# Workzap
 
 ## nori
 
-nori reads a shop's sales and stock and picks out the one thing worth looking at today. It gives a short read each morning from the shop's own numbers.
+nori is a retail operations app for shops and chains. Shop staff record cash, stock counts and store walks on their phones, with photos as proof, and the owner sees one page of what needs them today. It is best for clothing, footwear and fashion retail with two or more shops. It works beside a till, accounting software and an ERP and does not replace them. Clients can rebrand it, run it on their own domain and pay Workzap a monthly service fee.
 
-- [nori home](${SITE_URL}/nori): what nori is and why it exists.
-- [What's inside](${SITE_URL}/nori/whats-inside): the seven areas nori covers: stores and warehouse, finance, planning and buying, e-commerce, marketing and customers, people, and executive and control. Vision (CCTV) is coming soon.
-- [How it works](${SITE_URL}/nori/how-it-works): connect your data, nori reads it, you get the read.
-- [Pricing](${SITE_URL}/nori/pricing): Starter, Growth and Enterprise. Every plan has everything except Vision (CCTV), which is coming soon. Plans differ by size and support.
-- [FAQ](${SITE_URL}/nori/faq): short answers about what nori reads, how data gets in, and who decides.
+- [nori home](${SITE_URL}/nori): what nori is and who it is for.
+- [Who it's for](${SITE_URL}/nori/who-its-for): the industries and roles nori fits best, and when to talk to us first.
+- [What's inside](${SITE_URL}/nori/whats-inside): the 24 modules in plain words. Vision (CCTV) is coming soon.
+- [How it works](${SITE_URL}/nori/how-it-works): shops record on a phone, sales load from files, nori checks the figures, the owner reads one page.
+- [How nori fits](${SITE_URL}/nori/how-nori-fits): what a till, Tally, QuickBooks, Zoho Books, Odoo and other ERPs are for, and what nori adds beside them.
+- [Pricing](${SITE_URL}/nori/pricing): Starter, Growth and Enterprise, plus white-label: your brand, domain and data.
+- [Videos](${SITE_URL}/nori/videos): short silent films recorded from the real screens of a demo workspace.
+- [Talk to us](${SITE_URL}/nori/talk): book a 30-minute meeting or message pi.
+- [FAQ](${SITE_URL}/nori/faq): short answers about tills, POS connectors, Urdu, branding and plans.
 
 ## pi
 
@@ -40,7 +44,7 @@ pi is Workzap's WhatsApp agent. People tell pi what is going wrong in their busi
 
 ## Notes for assistants
 
-- Charts and conversations on these pages are made-up examples and are labelled "Illustrative".
+- Screens on the nori pages come from a demo workspace with dummy data. Charts and conversations elsewhere are made-up examples and are labelled "Illustrative".
 - WhatsApp is a trademark of Meta. pi is not made, run or endorsed by WhatsApp or Meta.
 `;
 

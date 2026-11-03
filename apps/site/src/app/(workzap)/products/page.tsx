@@ -74,7 +74,7 @@ export default function Products() {
                     looking at today. A short read each morning.
                   </p>
                   <p>
-                    Seven areas: stores and warehouse, finance, planning and
+                    24 modules across areas such as stores and warehouse, finance, planning and
                     buying, e-commerce, marketing and customers, people, and
                     executive and control.
                   </p>

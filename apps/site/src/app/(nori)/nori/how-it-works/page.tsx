@@ -4,9 +4,9 @@ import { JsonLd, breadcrumbs } from "@/lib/seo";
 
 export const metadata = noriMetadata({
   path: "/how-it-works",
-  title: "How nori works: from your data to a decision",
+  title: "How nori works: from the shop floor to the owner’s page",
   description:
-    "Connect your data once. nori reads every shop, item and day, and gives you a short read each morning with the one thing worth looking at.",
+    "Staff record cash, counts and store walks on a phone. Sales load from files. nori checks the figures and the owner reads one page.",
 });
 
 export default function Page() {

@@ -4,6 +4,7 @@ import { PiLauncher } from "@/components/pi-launcher";
 import { JsonLd, ORGANIZATION, WEBSITE } from "@/lib/seo";
 import "@/features/nori/nori-tokens.css";
 import "@/features/nori/nori.css";
+import "@/features/nori/nori-pages.css";
 
 const jost = Jost({
   subsets: ["latin"],

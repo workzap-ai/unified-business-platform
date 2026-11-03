@@ -72,7 +72,7 @@ export default function Company() {
               <h3 className="wz-h3">nori</h3>
               <p>
                 The daily read for the shop. A short read each morning from the
-                business’s own numbers, across seven areas.
+                business’s own numbers, with 24 modules for shops and chains.
               </p>
               <ArrowLink href="/nori">Explore nori</ArrowLink>
             </li>

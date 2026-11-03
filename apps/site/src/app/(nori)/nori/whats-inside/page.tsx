@@ -4,9 +4,9 @@ import { JsonLd, breadcrumbs } from "@/lib/seo";
 
 export const metadata = noriMetadata({
   path: "/whats-inside",
-  title: "What’s inside nori: shops, money, stock and more",
+  title: "What is inside nori: 24 modules for shops and chains",
   description:
-    "Shops, money, stock, online, marketing and people. Each area of nori comes with the numbers, the reasons and the next step.",
+    "The 24 nori modules in plain words: shop cash, store walks, stock audit, planning, finance, people, customers and the owner’s War Room.",
 });
 
 export default function Page() {

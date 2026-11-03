@@ -4,9 +4,9 @@ import { JsonLd, breadcrumbs, faqPage } from "@/lib/seo";
 
 export const metadata = noriMetadata({
   path: "/faq",
-  title: "nori FAQ: what it reads, how it connects, what it covers",
+  title: "nori FAQ: tills, POS connectors, Urdu, branding and plans",
   description:
-    "Short answers about nori: what it reads, how your data gets in, who decides, which areas it covers and how the plans differ.",
+    "Short answers about nori: what it is, who it is for, how your numbers get in, POS connectors, Urdu, your own brand and domain, and plans.",
 });
 
 export default function Page() {

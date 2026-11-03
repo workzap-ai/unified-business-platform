@@ -149,7 +149,7 @@ export default function Home() {
                 at. Every figure is checked against your own system.
               </p>
               <ul className="wz-ticks">
-                <li>Seven areas, from stores and warehouse to finance</li>
+                <li>24 modules, from stores and warehouse to finance</li>
                 <li>Starter, Growth and Enterprise plans</li>
                 <li>Vision (CCTV) is coming soon</li>
               </ul>
@@ -277,10 +277,10 @@ export default function Home() {
           <div className="wz-areas">
             <div>
               <p>
-                Seven areas in all. E-commerce, marketing and customers, and
+                24 modules in all. E-commerce, marketing and customers, and
                 people have areas of their own.
               </p>
-              <ul className="wz-chips" aria-label="All seven nori areas">
+              <ul className="wz-chips" aria-label="All nori areas">
                 {AREAS.map((a) => (
                   <li key={a} className="wz-chip">
                     {a}
