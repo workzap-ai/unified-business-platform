@@ -6,7 +6,7 @@ export function VideoCard({ film }: { film: Film }) {
     <figure className="nv-video">
       <video
         controls
-        preload="none"
+        preload="metadata"
         playsInline
         poster={film.poster}
         aria-label={`${film.title}. Film with captions.`}

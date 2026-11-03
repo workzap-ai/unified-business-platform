@@ -8,6 +8,11 @@ const nextConfig: NextConfig = {
   async headers() {
     return [
       {
+        // Films and screens do not change under the same name: let browsers keep them.
+        source: "/nori-video/:path*",
+        headers: [{ key: "Cache-Control", value: "public, max-age=86400, stale-while-revalidate=604800" }],
+      },
+      {
         source: "/:path*",
         headers: [
           { key: "X-Content-Type-Options", value: "nosniff" },
