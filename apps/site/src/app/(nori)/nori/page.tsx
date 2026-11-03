@@ -7,7 +7,7 @@ const DEFINITION =
 
 export const metadata = noriMetadata({
   path: "",
-  title: "nori by Workzap: see what is going wrong in your shops, then fix it",
+  title: "nori by Workzap: see what is going wrong in your shops",
   description:
     "nori shows owners of shops and chains which outlets are behind, where cash does not tie and where stock is stuck. Built for clothing and fashion retail.",
 });
