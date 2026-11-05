@@ -60,6 +60,10 @@ _DEFS: list[tuple[str, str, str]] = [
     ("pi.work.manage", "Create and update tasks and support tickets", "PI"),
     ("pi.campaigns.read", "View WhatsApp campaigns and their results", "PI"),
     ("pi.campaigns.manage", "Create, schedule and cancel WhatsApp campaigns", "PI"),
+    ("pi.meetings.read", "View meeting recordings, transcripts and insights", "PI"),
+    ("pi.meetings.record", "Upload or record a meeting and run its analysis", "PI"),
+    ("pi.meetings.approve", "Approve meeting insights into customer memory", "PI"),
+    ("pi.meetings.delete", "Delete meetings and their recordings", "PI"),
     ("admin.members.read", "View members", "Administration"),
     ("admin.members.manage", "Manage members", "Administration"),
     ("admin.roles.manage", "Manage roles", "Administration"),
@@ -95,7 +99,8 @@ SYSTEM_ROLES: dict[str, tuple[str, str, frozenset[str]]] = {
         | _pick("customers.", "catalog.", "inventory.", "sales.", "quotes.", "orders.")
         | {"billing.write", "pi.inbox.reply", "pi.handoffs.manage", "notifications.read"}
         | {"pi.inbox.all", "pi.inbox.assign", "pi.inbox.notes"}
-        | {"pi.bookings.manage", "pi.work.manage", "pi.campaigns.manage"},
+        | {"pi.bookings.manage", "pi.work.manage", "pi.campaigns.manage"}
+        | {"pi.meetings.record", "pi.meetings.approve"},
     ),
     "sales": (
         "Sales",
@@ -140,7 +145,8 @@ SYSTEM_ROLES: dict[str, tuple[str, str, frozenset[str]]] = {
     "viewer": (
         "Viewer",
         "Read-only access",
-        (READ_ONLY - {"hr.read", "pi.memory.read", "pi.billing.read"}) | {"pi.inbox.all"},
+        (READ_ONLY - {"hr.read", "pi.memory.read", "pi.billing.read", "pi.meetings.read"})
+        | {"pi.inbox.all"},
     ),
 }
 

@@ -66,6 +66,7 @@ from app.modules.pi.quarantine_models import PiQuarantine
 from app.modules.pi.solution_models import PiIdeaFeedback, PiSolutionMemory
 from app.modules.pi.think_models import PiHypothesis, PiMoveLog
 from app.modules.pi_customer.models import CustomerShareLink
+from app.modules.pi_meetings import erase as meeting_erase
 from app.modules.pi_saas.deal_models import PiDocument
 from app.modules.pi_saas.models import (
     PiBooking,
@@ -118,6 +119,12 @@ REMOVED_KEYS = (
     "decisions",
     "rejections",
     "document_texts",
+    "meeting_insights",
+    "meeting_segments",
+    "meeting_participants",
+    "meetings",
+    "meeting_participants_unmapped",
+    "meeting_recordings_to_delete",
 )
 
 
@@ -532,6 +539,21 @@ async def erase_customer(
             )
         )
     absorb(await _erase_memory_ledgers(session, scope, customer_id))
+    # meetings (migration 0057): the recording keys are read first so the files can be removed
+    meeting_keys: list[str] = []
+
+    async def _read_meeting_keys() -> int:
+        meeting_keys.extend(await meeting_erase.recording_keys(session, scope, customer_id))
+        return len(meeting_keys)
+
+    absorb(await _run_steps(session, (("meeting_recordings_to_delete", _read_meeting_keys),)))
+    absorb(
+        await _run_steps(
+            session,
+            meeting_erase.unmap_steps(scope, customer_id)
+            + meeting_erase.erase_steps(scope, customer_id),
+        )
+    )
     absorb(await _erase_map_and_boxes(session, scope, customer_id))
     absorb(await _erase_workspace_texts(session, scope, customer_id, conversation_ids))
     absorb(await _erase_share_links(session, scope, conversation_ids))
@@ -595,6 +617,8 @@ async def erase_customer(
             ),
         },
         "conversations": len(conversation_ids),
+        # recordings in object storage that the storage step must still remove
+        "meeting_object_keys": meeting_keys,
         # false when a step was skipped (its table is missing): the erase is INCOMPLETE
         "complete": not skipped,
         "skipped": skipped,

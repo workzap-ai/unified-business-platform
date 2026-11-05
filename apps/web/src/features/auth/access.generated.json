@@ -246,6 +246,26 @@
       "label": "Create, schedule and cancel WhatsApp campaigns"
     },
     {
+      "group": "PI",
+      "key": "pi.meetings.read",
+      "label": "View meeting recordings, transcripts and insights"
+    },
+    {
+      "group": "PI",
+      "key": "pi.meetings.record",
+      "label": "Upload or record a meeting and run its analysis"
+    },
+    {
+      "group": "PI",
+      "key": "pi.meetings.approve",
+      "label": "Approve meeting insights into customer memory"
+    },
+    {
+      "group": "PI",
+      "key": "pi.meetings.delete",
+      "label": "Delete meetings and their recordings"
+    },
+    {
       "group": "Administration",
       "key": "admin.members.read",
       "label": "View members"
@@ -362,6 +382,10 @@
         "pi.inbox.reply",
         "pi.knowledge.manage",
         "pi.knowledge.publish",
+        "pi.meetings.approve",
+        "pi.meetings.delete",
+        "pi.meetings.read",
+        "pi.meetings.record",
         "pi.memory.read",
         "pi.read",
         "pi.settings.manage",
@@ -431,6 +455,10 @@
         "pi.inbox.reply",
         "pi.knowledge.manage",
         "pi.knowledge.publish",
+        "pi.meetings.approve",
+        "pi.meetings.delete",
+        "pi.meetings.read",
+        "pi.meetings.record",
         "pi.memory.read",
         "pi.read",
         "pi.settings.manage",
@@ -482,6 +510,9 @@
         "pi.inbox.assign",
         "pi.inbox.notes",
         "pi.inbox.reply",
+        "pi.meetings.approve",
+        "pi.meetings.read",
+        "pi.meetings.record",
         "pi.memory.read",
         "pi.read",
         "pi.work.manage",
