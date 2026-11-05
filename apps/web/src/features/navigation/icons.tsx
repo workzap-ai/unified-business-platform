@@ -1,4 +1,5 @@
 import {
+  AudioLines,
   ArrowLeftRight,
   BadgeDollarSign,
   Bell,
@@ -61,6 +62,7 @@ import {
  */
 const ICONS: Record<string, LucideIcon> = {
   "arrow-left-right": ArrowLeftRight,
+  "audio-lines": AudioLines,
   "badge-dollar-sign": BadgeDollarSign,
   bell: Bell,
   blocks: Blocks,
