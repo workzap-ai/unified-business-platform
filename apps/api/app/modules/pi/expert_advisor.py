@@ -38,6 +38,7 @@ from app.modules.pi import (
     currency_notes,
     hypothesis_reply,
     idea_filter,
+    shared_memory,
     solution_free,
     solution_lint,
     solution_rules,
@@ -284,6 +285,7 @@ class Steer:
     previous: dict[str, Any] | None = None
     light: bool = False
     tried_and_failed: list[str] = field(default_factory=list)
+    memory: dict[str, Any] = field(default_factory=dict)  # shared_memory block, {} when none
 
     def payload(self) -> dict[str, Any]:
         out: dict[str, Any] = {}
@@ -302,7 +304,7 @@ class Steer:
                 "causes": [str(c)[:120] for c in self.previous.get("causes") or []][:MAX_CAUSES],
                 "question": str(self.previous.get("question") or "")[:200],
             }
-        return out
+        return shared_memory.attach(out, self.memory)
 
 
 @dataclass
@@ -581,6 +583,7 @@ async def diagnose(
         + "\n\n"
         + (LIGHT_RULES if light else DIAGNOSE_RULES).replace("{industry}", kind)
         + ("" if industry else NL2 + UNCONFIRMED_TRADE_RULE)
+        + shared_memory.system_line(steer.memory if steer is not None else {})
     )
     payload: dict[str, Any] = {
         "today": today,
