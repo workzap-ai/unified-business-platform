@@ -93,3 +93,25 @@ def unmap_steps(scope: WorkspaceScope, customer_id: UUID) -> tuple[tuple[str, An
             .values(mapped_customer_id=None),
         ),
     )
+
+
+async def erase_one(session: AsyncSession, scope: WorkspaceScope, meeting_id: UUID) -> str | None:
+    """Delete one meeting and its rows (children first). Returns the recording's object key, which
+    the caller must hand to the storage step, or None when the meeting had no recording."""
+    where = (
+        PiMeeting.tenant_id == scope.tenant_id,
+        PiMeeting.environment_id == scope.environment_id,
+    )
+    key = await session.scalar(
+        select(PiMeeting.recording_key).where(*where, PiMeeting.id == meeting_id)
+    )
+    for model in (PiMeetingInsight, PiMeetingSegment, PiMeetingParticipant):
+        await session.execute(
+            delete(model).where(
+                model.tenant_id == scope.tenant_id,
+                model.environment_id == scope.environment_id,
+                model.meeting_id == meeting_id,
+            )
+        )
+    await session.execute(delete(PiMeeting).where(*where, PiMeeting.id == meeting_id))
+    return key or None

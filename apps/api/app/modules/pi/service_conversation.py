@@ -82,6 +82,7 @@ from app.modules.pi import (
     scope_first,
     self_review,
     self_review_types,
+    shared_memory,
     slot_carry,
     slots,
     solution_ask,
@@ -3402,6 +3403,7 @@ async def brain_expert_ideas(
                 answered=owner[1:][-4:],
                 previous=stored,
                 tried_and_failed=system_ask.tried_and_failed(owner),
+                memory=shared_memory.from_context(context),
             ),
         ),
     )
@@ -3669,6 +3671,7 @@ async def brain_expert_diagnosis(
                 answered=customer[1:][-4:],
                 previous=expert_advisor.cached(brief, noted_now, new_problem),
                 light=True,
+                memory=shared_memory.from_context(context),
             ),
         ),
     )

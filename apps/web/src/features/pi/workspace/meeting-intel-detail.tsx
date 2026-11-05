@@ -1,0 +1,448 @@
+"use client";
+
+import { useState } from "react";
+import { ArrowLeft, Check, FileText, Sparkles, Trash2, X } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import {
+  Badge,
+  Card,
+  CardBody,
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@/components/ui/display";
+import { NativeSelect, Textarea } from "@/components/ui/input";
+import { Label } from "@/components/ui/controls";
+import { PageHeader, PageShell } from "@/components/app/page";
+import { EmptyState, ErrorState, Notice } from "@/components/app/states";
+import { useScopedMutation, useScopedQuery } from "@/hooks/use-scoped";
+import { useSession } from "@/features/auth/session-provider";
+import { customersService } from "@/features/customers/service";
+import {
+  approvalEffect,
+  BASIS_LABELS,
+  clock,
+  INSIGHT_LABELS,
+  MEETING_STATUS_LABELS,
+  meetingIntelService,
+  type Insight,
+  type MeetingDetail as Detail,
+  type Segment,
+} from "../meeting-intel-service";
+
+const KEY = (id: string) => ["pi", "meeting-intel", id];
+
+export function MeetingDetail({
+  id,
+  onBack,
+}: {
+  id: string;
+  onBack: () => void;
+}) {
+  const { can } = useSession();
+  const query = useScopedQuery(KEY(id), () => meetingIntelService.get(id));
+  const remove = useScopedMutation(() => meetingIntelService.remove(id), {
+    invalidate: [["pi", "meeting-intel"]],
+    success: "Meeting deleted",
+    onSuccess: onBack,
+  });
+  const meeting = query.data;
+  return (
+    <PageShell>
+      <PageHeader
+        title={meeting?.title || "Meeting"}
+        eyebrow={
+          <button
+            type="button"
+            onClick={onBack}
+            className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground"
+          >
+            <ArrowLeft className="size-3.5" aria-hidden="true" /> All meetings
+          </button>
+        }
+        description={
+          meeting && (
+            <Badge tone={meeting.status === "failed" ? "danger" : "pi"}>
+              {MEETING_STATUS_LABELS[meeting.status] ?? meeting.status}
+            </Badge>
+          )
+        }
+        actions={
+          meeting && can("pi.meetings.delete") ? (
+            <Button
+              variant="secondary"
+              loading={remove.isPending}
+              onClick={() => {
+                if (
+                  window.confirm(
+                    "Delete this meeting, its transcript and its insights? What you already saved to the customer's memory stays there.",
+                  )
+                )
+                  remove.mutate(undefined);
+              }}
+            >
+              <Trash2 /> Delete
+            </Button>
+          ) : null
+        }
+      />
+      {query.isError ? (
+        <ErrorState error={query.error} onRetry={() => void query.refetch()} />
+      ) : !meeting ? (
+        <div className="h-40 animate-pulse rounded-xl bg-surface-sunken" />
+      ) : (
+        <Body meeting={meeting} />
+      )}
+    </PageShell>
+  );
+}
+
+function Body({ meeting }: { meeting: Detail }) {
+  const { can } = useSession();
+  const hasTranscript = meeting.segments.length > 0;
+  return (
+    <div className="space-y-4">
+      {meeting.customer_id === null && <LinkCustomer meeting={meeting} />}
+      {meeting.status === "failed" && meeting.failure_reason && (
+        <Notice tone="danger">{meeting.failure_reason}</Notice>
+      )}
+      {!hasTranscript ? (
+        can("pi.meetings.record") ? (
+          <TranscriptImport id={meeting.id} />
+        ) : (
+          <EmptyState
+            icon={FileText}
+            title="No transcript yet"
+            description="Someone with permission to record meetings needs to add it."
+          />
+        )
+      ) : (
+        <Tabs defaultValue="review">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <TabsList>
+              <TabsTrigger value="review">
+                Review
+                {meeting.insights.some(
+                  (i) => i.review_status === "pending",
+                ) && (
+                  <Badge tone="warning" className="ml-1.5">
+                    {
+                      meeting.insights.filter(
+                        (i) => i.review_status === "pending",
+                      ).length
+                    }
+                  </Badge>
+                )}
+              </TabsTrigger>
+              <TabsTrigger value="transcript">Transcript</TabsTrigger>
+            </TabsList>
+            {can("pi.meetings.record") && <AnalyseButton meeting={meeting} />}
+          </div>
+          <TabsContent value="review" className="mt-4">
+            <Insights meeting={meeting} />
+          </TabsContent>
+          <TabsContent value="transcript" className="mt-4">
+            <Transcript segments={meeting.segments} />
+          </TabsContent>
+        </Tabs>
+      )}
+    </div>
+  );
+}
+
+function LinkCustomer({ meeting }: { meeting: Detail }) {
+  const { can } = useSession();
+  const [customer, setCustomer] = useState("");
+  const customers = useScopedQuery(["customers", "meeting-picker"], () =>
+    customersService.list({ pageSize: 100 }),
+  );
+  const link = useScopedMutation(
+    () => meetingIntelService.linkCustomer(meeting.id, customer),
+    {
+      invalidate: [["pi", "meeting-intel"]],
+      success: "Linked to the customer",
+    },
+  );
+  return (
+    <Card>
+      <CardBody className="space-y-2">
+        <p className="text-[13px]">
+          This meeting is not linked to a customer yet, so nothing from it can
+          be saved to anyone&apos;s memory.
+        </p>
+        {can("pi.meetings.record") && (
+          <div className="flex flex-wrap items-end gap-2">
+            <div className="min-w-48 flex-1 sm:max-w-xs">
+              <Label htmlFor="link-customer">Customer</Label>
+              <NativeSelect
+                id="link-customer"
+                value={customer}
+                onChange={(e) => setCustomer(e.target.value)}
+              >
+                <option value="">Choose a customer</option>
+                {(customers.data?.items ?? []).map((c) => (
+                  <option key={c.id} value={c.id}>
+                    {c.name}
+                  </option>
+                ))}
+              </NativeSelect>
+            </div>
+            <Button
+              loading={link.isPending}
+              disabled={!customer || link.isPending}
+              onClick={() => link.mutate(undefined)}
+            >
+              Link
+            </Button>
+          </div>
+        )}
+      </CardBody>
+    </Card>
+  );
+}
+
+function TranscriptImport({ id }: { id: string }) {
+  const [text, setText] = useState("");
+  const send = useScopedMutation(
+    () => meetingIntelService.importTranscript(id, text),
+    {
+      invalidate: [KEY(id), ["pi", "meeting-intel"]],
+      success: (r) => `Transcript added: ${r.lines} lines`,
+      onSuccess: () => setText(""),
+    },
+  );
+  return (
+    <Card>
+      <CardBody className="space-y-3">
+        <div>
+          <Label htmlFor="transcript-text">Transcript</Label>
+          <Textarea
+            id="transcript-text"
+            rows={12}
+            maxLength={24000}
+            value={text}
+            onChange={(e) => setText(e.target.value)}
+            placeholder={
+              "Customer: our stock keeps running out\nStaff: ok, we will send a list by Friday"
+            }
+          />
+          <p className="mt-1 text-xs text-muted-foreground">
+            One line per turn, written as &ldquo;Name: what they said&rdquo;. Up
+            to 24,000 characters. Phone, card and ID numbers are removed before
+            anything is stored. Recording and automatic transcription are not
+            available yet.
+          </p>
+        </div>
+        <Button
+          loading={send.isPending}
+          disabled={!text.trim() || send.isPending}
+          onClick={() => send.mutate(undefined)}
+        >
+          Add transcript
+        </Button>
+      </CardBody>
+    </Card>
+  );
+}
+
+function AnalyseButton({ meeting }: { meeting: Detail }) {
+  const run = useScopedMutation(() => meetingIntelService.analyse(meeting.id), {
+    invalidate: [KEY(meeting.id), ["pi", "meeting-intel"]],
+    success: (r) =>
+      r.insights === 0
+        ? "Analysed: nothing worth noting"
+        : `Analysed: ${r.insights} to review`,
+  });
+  const again = meeting.insights.length > 0;
+  return (
+    <Button
+      variant={again ? "secondary" : "default"}
+      loading={run.isPending}
+      onClick={() => run.mutate(undefined)}
+    >
+      <Sparkles /> {again ? "Analyse again" : "Analyse with pi"}
+    </Button>
+  );
+}
+
+function Insights({ meeting }: { meeting: Detail }) {
+  if (meeting.insights.length === 0)
+    return (
+      <EmptyState
+        icon={Sparkles}
+        title="Nothing to review yet"
+        description="Choose “Analyse with pi” to list the problems, decisions and next steps from this transcript. Analysing again replaces only what you have not reviewed."
+      />
+    );
+  const bySegment = new Map(meeting.segments.map((s) => [s.ordinal, s]));
+  return (
+    <ul className="space-y-3">
+      {meeting.insights.map((i) => (
+        <InsightCard
+          key={i.id}
+          meeting={meeting}
+          insight={i}
+          sources={i.segment_refs.flatMap((r) => bySegment.get(r) ?? [])}
+        />
+      ))}
+    </ul>
+  );
+}
+
+function InsightCard({
+  meeting,
+  insight: i,
+  sources,
+}: {
+  meeting: Detail;
+  insight: Insight;
+  sources: Segment[];
+}) {
+  const { can } = useSession();
+  const [editing, setEditing] = useState(false);
+  const [text, setText] = useState(i.text);
+  const invalidate = [KEY(meeting.id), ["pi", "meeting-intel"]];
+  const approve = useScopedMutation(
+    (edited: string) => meetingIntelService.approve(meeting.id, i.id, edited),
+    {
+      invalidate,
+      success: (r) =>
+        r.wrote ? "Approved and saved" : "Approved (reviewed only)",
+      onSuccess: () => setEditing(false),
+    },
+  );
+  const reject = useScopedMutation(
+    () => meetingIntelService.reject(meeting.id, i.id),
+    { invalidate, success: "Rejected" },
+  );
+  const pending = i.review_status === "pending";
+  const needsLink = meeting.customer_id === null;
+  return (
+    <li>
+      <Card>
+        <CardBody className="space-y-2.5">
+          <div className="flex flex-wrap items-center gap-1.5">
+            <Badge tone="outline">{INSIGHT_LABELS[i.kind]}</Badge>
+            <Badge tone={i.basis === "stated" ? "success" : "pi"}>
+              {BASIS_LABELS[i.basis]}
+            </Badge>
+            {i.confidence > 0 && (
+              <span className="text-xs text-muted-foreground">
+                {i.confidence}% sure
+              </span>
+            )}
+            {!pending && (
+              <Badge
+                tone={i.review_status === "rejected" ? "neutral" : "success"}
+              >
+                {i.review_status === "rejected"
+                  ? "Rejected"
+                  : i.written_to_brain
+                    ? "Saved to memory"
+                    : "Reviewed"}
+              </Badge>
+            )}
+          </div>
+          {editing ? (
+            <Textarea
+              aria-label="Edit insight"
+              rows={3}
+              maxLength={600}
+              value={text}
+              onChange={(e) => setText(e.target.value)}
+            />
+          ) : (
+            <p className="text-[14px] leading-relaxed break-words">{i.text}</p>
+          )}
+          {(i.owner_label || i.due_text) && (
+            <p className="text-xs text-muted-foreground">
+              {i.owner_label && <>Who: {i.owner_label}. </>}
+              {i.due_text && <>When: {i.due_text}.</>}
+            </p>
+          )}
+          {sources.length > 0 && (
+            <blockquote className="space-y-0.5 border-l-2 border-border pl-3 text-xs text-muted-foreground">
+              {sources.map((s) => (
+                <p key={s.ordinal} className="break-words">
+                  <span className="font-medium">{s.speaker || "Speaker"}:</span>{" "}
+                  {s.text}
+                </p>
+              ))}
+            </blockquote>
+          )}
+          {pending && can("pi.meetings.approve") && (
+            <>
+              <p className="text-xs text-muted-foreground">
+                {needsLink
+                  ? "Link this meeting to a customer to approve."
+                  : approvalEffect(i)}
+              </p>
+              <div className="flex flex-wrap gap-2">
+                <Button
+                  size="sm"
+                  loading={approve.isPending}
+                  disabled={needsLink || approve.isPending || !text.trim()}
+                  onClick={() => approve.mutate(editing ? text.trim() : "")}
+                >
+                  <Check /> {editing ? "Save and approve" : "Approve"}
+                </Button>
+                {!editing ? (
+                  <Button
+                    size="sm"
+                    variant="secondary"
+                    onClick={() => setEditing(true)}
+                  >
+                    Edit
+                  </Button>
+                ) : (
+                  <Button
+                    size="sm"
+                    variant="secondary"
+                    onClick={() => {
+                      setEditing(false);
+                      setText(i.text);
+                    }}
+                  >
+                    Cancel
+                  </Button>
+                )}
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  loading={reject.isPending}
+                  disabled={reject.isPending}
+                  onClick={() => reject.mutate(undefined)}
+                >
+                  <X /> Reject
+                </Button>
+              </div>
+            </>
+          )}
+        </CardBody>
+      </Card>
+    </li>
+  );
+}
+
+function Transcript({ segments }: { segments: Segment[] }) {
+  return (
+    <Card>
+      <CardBody>
+        <ol className="space-y-2">
+          {segments.map((s) => (
+            <li key={s.ordinal} className="text-[13px] leading-relaxed">
+              <span className="font-semibold">{s.speaker || "Speaker"}</span>
+              {clock(s.start_ms) && (
+                <span className="ml-1.5 text-xs text-muted-foreground">
+                  {clock(s.start_ms)}
+                </span>
+              )}
+              <span className="block break-words">{s.text}</span>
+            </li>
+          ))}
+        </ol>
+      </CardBody>
+    </Card>
+  );
+}

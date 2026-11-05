@@ -1315,6 +1315,30 @@
     "visible": true
   },
   {
+    "analytics_id": "nav.pi.meeting_intel",
+    "any_permissions": [],
+    "badge": null,
+    "description": "",
+    "enabled": true,
+    "environment_scope": null,
+    "icon": "audio-lines",
+    "key": "pi-meeting-intel",
+    "keywords": [],
+    "label": "Meeting intelligence",
+    "parent": "pi",
+    "required_feature": null,
+    "required_permissions": [
+      "pi.meetings.read"
+    ],
+    "required_product": "pi",
+    "required_roles": [],
+    "route": "/pi/meeting-intel",
+    "section": "main",
+    "sort_order": 69,
+    "type": "page",
+    "visible": true
+  },
+  {
     "analytics_id": "nav.pi.meetings",
     "any_permissions": [],
     "badge": "pi.meetings_today",

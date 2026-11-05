@@ -24,6 +24,7 @@ from app.ai.types import Message
 from app.modules.business_settings.service import get_settings_row
 from app.modules.catalog.models import CatalogProduct, CatalogVariant
 from app.modules.customers.models import Customer
+from app.modules.pi import shared_memory
 from app.modules.pi.knowledge import KnowledgeService
 from app.modules.pi.models import PiConversation, PiMessage
 from app.modules.quotes.schemas import QuoteLineInput
@@ -208,7 +209,7 @@ async def gather(session: AsyncSession, scope: WorkspaceScope, lead: SalesLead) 
                 knowledge = await KnowledgeService(session, scope).search(query[:1500], 6)
         except Exception:  # noqa: BLE001 - a proposal without passages is still useful
             logger.warning("proposal_knowledge_skipped", exc_info=True)
-    return {
+    payload = {
         "company": tenant.name if tenant else "",
         "customer": ""
         if customer is None or customer.name.startswith("WhatsApp")
@@ -221,6 +222,10 @@ async def gather(session: AsyncSession, scope: WorkspaceScope, lead: SalesLead) 
         "catalog_options": offerings,
         "approved_knowledge": knowledge,
     }
+    # the same memory the chat reads, so a proposal never contradicts what the customer told pi
+    return shared_memory.attach(
+        payload, await shared_memory.brief(session, scope, lead.customer_id)
+    )
 
 
 async def compose(
@@ -233,7 +238,12 @@ async def compose(
             ProposalDraft,
             alias=alias,
             purpose="pi_proposal",
-            messages=[Message.system(SYSTEM), Message.user(json.dumps(data, ensure_ascii=False))],
+            messages=[
+                Message.system(
+                    SYSTEM + shared_memory.system_line(data.get(shared_memory.KEY) or {})
+                ),
+                Message.user(json.dumps(data, ensure_ascii=False)),
+            ],
             temperature=0.2,
             max_tokens=4096,
         )
