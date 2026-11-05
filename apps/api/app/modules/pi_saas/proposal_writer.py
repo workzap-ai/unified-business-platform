@@ -24,7 +24,7 @@ from app.ai.types import Message
 from app.modules.business_settings.service import get_settings_row
 from app.modules.catalog.models import CatalogProduct, CatalogVariant
 from app.modules.customers.models import Customer
-from app.modules.pi import shared_memory
+from app.modules.pi import memory_ledger, shared_memory
 from app.modules.pi.knowledge import KnowledgeService
 from app.modules.pi.models import PiConversation, PiMessage
 from app.modules.quotes.schemas import QuoteLineInput
@@ -223,9 +223,14 @@ async def gather(session: AsyncSession, scope: WorkspaceScope, lead: SalesLead) 
         "approved_knowledge": knowledge,
     }
     # the same memory the chat reads, so a proposal never contradicts what the customer told pi
-    return shared_memory.attach(
-        payload, await shared_memory.brief(session, scope, lead.customer_id)
-    )
+    # only in brain mode: another workspace's proposal prompt stays exactly as it was
+    from app.modules.pi.configuration import settings_row
+
+    if memory_ledger.brain_on((await settings_row(session, scope)).response_rules):
+        return shared_memory.attach(
+            payload, await shared_memory.brief(session, scope, lead.customer_id)
+        )
+    return payload
 
 
 async def compose(

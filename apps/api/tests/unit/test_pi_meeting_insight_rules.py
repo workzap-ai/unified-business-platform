@@ -57,12 +57,12 @@ def test_a_stated_price_is_a_record_of_what_was_said_not_pi_pricing():
     assert dropped == [] and len(kept) == 1
 
 
-def test_a_stated_owner_must_be_a_labelled_speaker_or_a_role():
-    kept, _ = keep(item(segment_refs=[1], owner_label="speaker 2"))
-    assert kept[0].owner_label == "Speaker 2"
+def test_a_stated_owner_must_be_a_role_never_a_name_or_a_speaker_label():
     kept, _ = keep(item(segment_refs=[1], owner_label="customer"))
     assert kept[0].owner_label == "Customer"
-    kept, _ = keep(item(segment_refs=[1], owner_label="Ahmed"))  # a guessed name
+    kept, _ = keep(item(segment_refs=[1], owner_label="speaker 2"))
+    assert kept[0].owner_label == ""
+    kept, _ = keep(item(segment_refs=[1], owner_label="Ahmed"))  # a name from a transcript
     assert kept[0].owner_label == ""
 
 

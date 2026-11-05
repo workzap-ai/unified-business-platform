@@ -342,7 +342,9 @@ def _lines(text: str) -> list[tuple[str, str]]:
             continue
         found = SPEAKER_LINE.match(line)
         if found:
-            current, line = found.group(1).strip()[:60], found.group(2).strip()
+            # a speaker label is stored and shown, so it is cleaned like the words are
+            current = redacted(found.group(1), 60) or "Speaker 1"
+            line = found.group(2).strip()
         out.append((current, line))
     return out[:MAX_LINES]
 
@@ -510,6 +512,16 @@ async def approve_insight(
     except brain_bridge.NotPending:
         raise BusinessRuleViolation(
             "INSIGHT_ALREADY_REJECTED", "This insight was rejected", 409
+        ) from None
+    except brain_bridge.PriceInEdit:
+        raise BusinessRuleViolation(
+            "MEETING_PRICE_NOT_ALLOWED",
+            "A price cannot be written here: pi does not price, the quote does",
+            422,
+        ) from None
+    except brain_bridge.EditRefused:
+        raise BusinessRuleViolation(
+            "MEETING_EDIT_REFUSED", "That wording cannot be stored (personal data removed)", 422
         ) from None
     await record(
         session,

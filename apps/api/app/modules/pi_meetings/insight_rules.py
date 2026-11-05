@@ -29,7 +29,7 @@ PRICE = re.compile(
     r"(?:\b(?:rs|pkr|usd|aed|gbp|eur|inr)\b\.?\s*\d|[$£€]\s*\d|\d[\d,.]*\s*(?:rs|pkr|usd|aed|gbp|eur)\b)",
     re.IGNORECASE,
 )
-# who may own a stated action: a speaker label or a role, never a guessed name
+# who may own a stated action: a role, never a name
 ROLES = frozenset({"customer", "staff"})
 
 
@@ -78,7 +78,8 @@ def validate(
     malformed item: it is dropped and named in the second list."""
     by_ordinal = {s.ordinal: s for s in segments}
     known = set(by_ordinal)
-    owners = {_norm(s): s for s in speakers} | {r: r.capitalize() for r in ROLES}
+    # only a role may own an action: a name from a transcript is never written out as the owner
+    owners = {r: r.capitalize() for r in ROLES}
     kept: list[Insight] = []
     dropped: list[str] = []
     seen: set[tuple[str, str]] = set()

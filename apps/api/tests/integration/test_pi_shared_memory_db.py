@@ -48,3 +48,31 @@ async def test_an_erased_customer_gives_an_empty_block(api, business_db):
     await brain_erase.erase_customer(business_db, scope, conv.customer_id)
     assert not (await shared_memory.brief(business_db, scope, conv.customer_id)).get("records")
     await pi.close()
+
+
+async def test_the_proposal_gets_the_block_only_in_brain_mode(api, business_db, monkeypatch):
+    from types import SimpleNamespace
+
+    from test_pi_meeting_data import workspace as meeting_workspace
+
+    from app.modules.pi_saas import proposal_writer
+
+    pi, conv, scope = await meeting_workspace(api, business_db, "355000001")
+
+    async def fake_brief(*_a, **_k):
+        return {"records": [{"text": "x"}]}
+
+    monkeypatch.setattr(proposal_writer.shared_memory, "brief", fake_brief)
+    lead = SimpleNamespace(
+        conversation_id=None, customer_id=conv.customer_id, title="Shop", requirements={}
+    )
+    plain = await proposal_writer.gather(business_db, scope, lead)
+    assert proposal_writer.shared_memory.KEY not in plain  # not in brain mode: unchanged
+    response = await api.patch(
+        "/api/v1/pi/settings/response_rules", json={"value": {"pi_mode": "brain"}}
+    )
+    assert response.status_code == 200, response.text
+    business_db.expire_all()
+    brain = await proposal_writer.gather(business_db, scope, lead)
+    assert proposal_writer.shared_memory.KEY in brain
+    await pi.close()

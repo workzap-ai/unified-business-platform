@@ -12,8 +12,14 @@ chat already uses:
 * an `action`, `next_step`,
   `question`, `commitment`      -> a staff request (`requests.raise_request`) on the customer's
                                    latest conversation;
-* anything the model inferred, estimated or recommended -> approved as reviewed information only.
-  It is never written to the brain as something the customer said.
+* an inferred or recommended action, next step or question -> a staff request too, but headed
+  "AI suggestion (unconfirmed)" so nobody reads it as something the customer said;
+* anything else the model inferred, estimated or recommended -> approved as reviewed information
+  only. It is never written to the brain as something the customer said.
+
+A reviewer's own wording may not carry a price (pi does not price), and an edit that redaction
+empties is refused, not dropped quietly. A memory row from a meeting says it came from a meeting,
+and says so when the cited speaker is not confirmed as the customer.
 
 Approval is idempotent: an insight that was already written is returned as it is, so a double click
 or a replay never writes twice. A meeting not linked to a customer cannot write to the brain.
@@ -28,7 +34,13 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.modules.pi import memory_ledger, problems
 from app.modules.pi.models import PiConversation
-from app.modules.pi_meetings.models import PiMeeting, PiMeetingInsight, PiMeetingSegment
+from app.modules.pi_meetings.insight_rules import PRICE
+from app.modules.pi_meetings.models import (
+    PiMeeting,
+    PiMeetingInsight,
+    PiMeetingParticipant,
+    PiMeetingSegment,
+)
 from app.modules.pi_saas import requests
 from app.shared.scope import WorkspaceScope
 
@@ -45,6 +57,14 @@ TITLE_WORDS = 8
 
 class NotLinked(Exception):
     """The meeting has no customer yet: link it before approving what it says."""
+
+
+class PriceInEdit(Exception):
+    """The reviewer's wording carries a price: pi does not price, the quote does."""
+
+
+class EditRefused(Exception):
+    """The reviewer's wording was emptied by redaction, so it cannot be stored."""
 
 
 class NotPending(Exception):
@@ -85,6 +105,32 @@ async def _quotes(
     return [t for t in rows if t][:4]
 
 
+async def _customer_said(
+    session: AsyncSession, scope: WorkspaceScope, meeting_id: UUID, refs: list[int]
+) -> bool:
+    """True only when every cited line was spoken by a participant confirmed as the customer."""
+    if not refs:
+        return False
+    roles = list(
+        await session.scalars(
+            select(PiMeetingParticipant.role)
+            .join(
+                PiMeetingSegment,
+                (PiMeetingSegment.participant_id == PiMeetingParticipant.id)
+                & (PiMeetingSegment.tenant_id == PiMeetingParticipant.tenant_id)
+                & (PiMeetingSegment.environment_id == PiMeetingParticipant.environment_id),
+            )
+            .where(
+                PiMeetingSegment.tenant_id == scope.tenant_id,
+                PiMeetingSegment.environment_id == scope.environment_id,
+                PiMeetingSegment.meeting_id == meeting_id,
+                PiMeetingSegment.ordinal.in_(refs),
+            )
+        )
+    )
+    return bool(roles) and all(r == "customer" for r in roles)
+
+
 async def _conversation(
     session: AsyncSession, scope: WorkspaceScope, customer_id: UUID
 ) -> UUID | None:
@@ -120,6 +166,10 @@ async def approve(
         raise NotLinked
     stamp = now or datetime.now(UTC)
     clean = memory_ledger.redacted(edited_text, 600) if edited_text else ""
+    if edited_text.strip() and not clean:
+        raise EditRefused
+    if clean and PRICE.search(clean):
+        raise PriceInEdit
     text = clean or insight.text
     out = Outcome(insight)
     stated = insight.basis == "stated"
@@ -150,6 +200,9 @@ async def approve(
         else:
             out.note = "the Problem Map did not take it: " + "; ".join(applied.rejected)[:200]
     elif stated and insight.kind in DECISION_KINDS:
+        said = await _customer_said(session, scope, meeting.id, list(insight.segment_refs))
+        source = "In a meeting" if said else "In a meeting (speaker not confirmed as the customer)"
+        wording = " (reviewer's wording)" if clean and clean != insight.text else ""
         row = await memory_ledger.record_decision(
             session,
             scope,
@@ -157,7 +210,7 @@ async def approve(
             kind="other",
             subject_ref=_ref(meeting.id, insight.id),
             actor="staff",
-            owner_words=text,
+            owner_words=f"{source}{wording}: {text}",
             now=stamp,
         )
         if row is not None:
@@ -172,13 +225,14 @@ async def approve(
         else:
             due = f" (due: {insight.due_text})" if insight.due_text else ""
             who = f" Owner: {insight.owner_label}." if insight.owner_label else ""
+            head = "From the meeting" if stated else "AI suggestion (unconfirmed)"
             req = await requests.raise_request(
                 session,
                 scope,
                 conversation_id=conversation_id,
                 customer_id=customer_id,
                 kind=REQUEST_KINDS[insight.kind],
-                question=f"From the meeting: {text}{due}.{who}"[:900],
+                question=f"{head}: {text}{due}.{who}"[:900],
                 title="Meeting follow-up",
             )
             insight.brain_ref = f"request:{req.id}"[:60]

@@ -128,3 +128,55 @@ async def test_an_unlinked_meeting_cannot_write_and_a_rejected_insight_cannot_be
     with pytest.raises(brain_bridge.NotPending):
         await brain_bridge.approve(business_db, scope, m, item, reviewer_id=None)
     await pi.close()
+
+
+async def test_a_reviewers_wording_cannot_carry_a_price_or_be_emptied(
+    api, business_db, monkeypatch
+):
+    pi, scope, m = await seeded(api, business_db, "377000005")
+    item = insight(scope, m.id, kind="decision", segment_refs=[0], text="owner chose weekly counts")
+    business_db.add(item)
+    await business_db.flush()
+    with pytest.raises(brain_bridge.PriceInEdit):
+        await brain_bridge.approve(
+            business_db, scope, m, item, reviewer_id=None, edited_text="we agree Rs 5,000 monthly"
+        )
+    monkeypatch.setattr(brain_bridge.memory_ledger, "redacted", lambda *_a, **_k: "")
+    with pytest.raises(brain_bridge.EditRefused):
+        await brain_bridge.approve(
+            business_db, scope, m, item, reviewer_id=None, edited_text="some wording"
+        )
+    assert item.written_at is None and item.review_status == "pending"
+    await pi.close()
+
+
+async def test_a_meeting_memory_row_says_where_it_came_from_and_who_is_unconfirmed(
+    api, business_db
+):
+    pi, scope, m = await seeded(api, business_db, "377000006")
+    item = insight(scope, m.id, kind="decision", segment_refs=[0], text="we will deliver Friday")
+    business_db.add(item)
+    await business_db.flush()
+    await brain_bridge.approve(business_db, scope, m, item, reviewer_id=None)
+    row = await business_db.scalar(
+        select(PiDecision).where(PiDecision.subject_ref.like("meeting:%"))
+    )
+    assert row is not None
+    assert "In a meeting (speaker not confirmed as the customer)" in row.owner_words
+    await pi.close()
+
+
+async def test_an_ai_suggested_action_is_headed_as_unconfirmed(api, business_db):
+    pi, scope, m = await seeded(api, business_db, "377000007")
+    item = insight(
+        scope, m.id, kind="next_step", basis="inferred", text="share a sample", segment_refs=[]
+    )
+    business_db.add(item)
+    await business_db.flush()
+    out = await brain_bridge.approve(business_db, scope, m, item, reviewer_id=None)
+    assert out.wrote == "request"
+    req = await business_db.scalar(
+        select(PiStaffRequest).where(PiStaffRequest.id == item.brain_ref.split(":", 1)[1])
+    )
+    assert req is not None and "AI suggestion (unconfirmed)" in req.question
+    await pi.close()
