@@ -87,6 +87,12 @@ from app.modules.pi_customer.models import (
     CustomerShareLink,
     CustomerSignInLock,
 )
+from app.modules.pi_meetings.models import (
+    PiMeeting,
+    PiMeetingInsight,
+    PiMeetingParticipant,
+    PiMeetingSegment,
+)
 from app.modules.pi_saas.customer_payment_models import (
     PiCustomerPaymentSettings,
     PiPaymentRequest,
@@ -168,6 +174,10 @@ __all__ = [
     "PiMoveLog",
     "PiHypothesis",
     "PiDecision",
+    "PiMeeting",
+    "PiMeetingInsight",
+    "PiMeetingParticipant",
+    "PiMeetingSegment",
     "PiDocumentText",
     "PiExecutionRun",
     "PiOpenItem",
