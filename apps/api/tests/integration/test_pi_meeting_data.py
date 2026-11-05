@@ -240,3 +240,49 @@ async def test_erasing_unmaps_a_speaker_mapped_to_the_customer_in_another_meetin
     # the meeting itself stays: it was never this customer's
     assert await count(business_db, PiMeeting, scope) == 1
     await pi.close()
+
+
+async def test_storing_insights_twice_replaces_pending_and_never_touches_reviewed(api, business_db):
+    from app.modules.pi_meetings import analyse as stage
+    from app.modules.pi_meetings.insight_rules import Insight
+
+    pi, conv, scope = await workspace(api, business_db, "388888888")
+    m = meeting(scope, conv.customer_id)
+    business_db.add(m)
+    await business_db.flush()
+    mid = m.id  # read before expire_all: an expired row cannot be lazy-loaded
+    first = [
+        Insight("problem", "stated", "stock runs out", 80, [0]),
+        Insight("risk", "inferred", "lost sales in the evening", 40),
+    ]
+    assert await stage.store(business_db, scope, mid, first) == 2
+    # a person approves one of them
+    approved = await business_db.scalar(
+        select(PiMeetingInsight).where(
+            PiMeetingInsight.meeting_id == mid, PiMeetingInsight.kind == "problem"
+        )
+    )
+    approved.review_status = "approved"
+    await business_db.flush()
+    # the analysis is re-run: it returns the same problem again and one new item
+    again = [
+        Insight("problem", "stated", "Stock  runs out", 90, [0]),
+        Insight("next_step", "recommendation", "count stock weekly", 50),
+    ]
+    assert (
+        await stage.store(business_db, scope, mid, again) == 1
+    )  # the approved one is not re-added
+    business_db.expire_all()
+    rows = list(
+        await business_db.scalars(
+            select(PiMeetingInsight).where(PiMeetingInsight.meeting_id == mid)
+        )
+    )
+    by_kind = {r.kind: r for r in rows}
+    assert set(by_kind) == {"problem", "next_step"}  # the old pending risk was replaced
+    assert by_kind["problem"].review_status == "approved" and by_kind["problem"].confidence == 80
+    assert by_kind["next_step"].review_status == "pending"
+    # a second identical run changes nothing
+    assert await stage.store(business_db, scope, mid, again) == 1
+    assert await count(business_db, PiMeetingInsight, scope) == 2
+    await pi.close()
