@@ -96,3 +96,12 @@ def test_confidence_is_clamped_and_bad_values_become_zero():
         item(confidence=500), item(text="b", confidence=-5), item(text="c", confidence="x")
     )
     assert [i.confidence for i in kept] == [100, 0, 0]
+
+
+def test_the_price_guard_catches_the_usual_ways_a_price_is_written():
+    from app.modules.pi_meetings.insight_rules import PRICE
+
+    for text in ("5k", "50000 rupees", "20 dollars", "Rs5000", "₨ 5000", "paanch hazaar", "2 lakh"):
+        assert PRICE.search(text), text
+    for text in ("every week", "we have 5 shops", "call at 5 pm"):
+        assert not PRICE.search(text), text

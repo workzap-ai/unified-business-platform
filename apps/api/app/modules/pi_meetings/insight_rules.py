@@ -26,7 +26,10 @@ MAX_REFS = 12
 
 # a currency sign or code next to a number, in the forms owners write them (Rs 5,000, PKR 5000, $20)
 PRICE = re.compile(
-    r"(?:\b(?:rs|pkr|usd|aed|gbp|eur|inr)\b\.?\s*\d|[$£€]\s*\d|\d[\d,.]*\s*(?:rs|pkr|usd|aed|gbp|eur)\b)",
+    r"(?:\b(?:rs|pkr|usd|aed|gbp|eur|inr)\.?\s*\d|[$£€₨]\s*\d"
+    r"|\d[\d,.]*\s*(?:k|rs|pkr|usd|aed|gbp|eur|rupees?|rupay[ae]?|dollars?|dirhams?"
+    r"|hazaar|hazar|lakhs?|lacs?)\b"
+    r"|\b(?:hazaar|hazar|lakhs?|lacs?)\b)",
     re.IGNORECASE,
 )
 # who may own a stated action: a role, never a name

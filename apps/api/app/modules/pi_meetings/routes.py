@@ -50,6 +50,9 @@ MAX_TRANSCRIPT_CHARS = (
 )
 MAX_LINES = 600
 PAGE = 200
+ROLE_LABELS = frozenset({"customer", "client", "staff", "team", "agent", "owner", "host", "guest"})
+CUSTOMER_LABELS = frozenset({"customer", "client"})
+SPEAKER_N = re.compile(r"^speaker \d{1,2}$")
 SPEAKER_LINE = re.compile(r"^\s*([A-Za-z][\w .'-]{0,40}?)\s*[:：]\s*(.+)$")
 
 
@@ -331,10 +334,20 @@ class TranscriptInput(BaseModel):
     text: str = Field(min_length=1, max_length=MAX_TRANSCRIPT_CHARS)
 
 
+def _role_of(label: str) -> str:
+    """The role the transcript itself names ("Customer:", "Staff:"); anything else is unknown, so
+    nothing is taken as the customer's own words until a speaker is confirmed."""
+    low = label.lower()
+    if low in CUSTOMER_LABELS:
+        return "customer"
+    return "staff" if low in ROLE_LABELS else "unknown"
+
+
 def _lines(text: str) -> list[tuple[str, str]]:
     """(speaker label, words) per line. A line without "Name: " continues the speaker before it,
     or is "Speaker 1" when it is the first."""
     out: list[tuple[str, str]] = []
+    seen: dict[str, str] = {}  # label as written -> label as stored
     current = "Speaker 1"
     for raw in text.splitlines():
         line = raw.strip()
@@ -342,8 +355,20 @@ def _lines(text: str) -> list[tuple[str, str]]:
             continue
         found = SPEAKER_LINE.match(line)
         if found:
-            # a speaker label is stored and shown, so it is cleaned like the words are
-            current = redacted(found.group(1), 60) or "Speaker 1"
+            # roles, never names: only a role word or "Speaker N" is kept as a label; a person's
+            # name becomes "Speaker N" (redaction cannot tell a name from an ordinary word)
+            written = found.group(1).strip().lower()
+            if written not in seen:
+                if written in ROLE_LABELS or (
+                    SPEAKER_N.match(written) and written.title() not in seen.values()
+                ):
+                    seen[written] = written.title()
+                else:
+                    n = len(seen) + 1
+                    while f"Speaker {n}" in seen.values():
+                        n += 1
+                    seen[written] = f"Speaker {n}"
+            current = seen[written]
             line = found.group(2).strip()
         out.append((current, line))
     return out[:MAX_LINES]
@@ -379,7 +404,7 @@ async def import_transcript(
                 environment_id=scope.environment_id,
                 meeting_id=meeting.id,
                 label=label,
-                role="unknown",
+                role=_role_of(label),
             )
             session.add(labels[label])
     await session.flush()

@@ -8,16 +8,25 @@ from test_pi_meeting_data import count, insight, meeting, workspace
 from app.modules.pi.memory_models import PiDecision
 from app.modules.pi.problem_models import PiProblem
 from app.modules.pi_meetings import brain_bridge
-from app.modules.pi_meetings.models import PiMeetingSegment
+from app.modules.pi_meetings.models import PiMeetingParticipant, PiMeetingSegment
 from app.modules.pi_saas.models import PiStaffRequest
 
 pytestmark = pytest.mark.integration
 
 
-async def seeded(api, db, number):
+async def seeded(api, db, number, role="customer"):
     pi, conv, scope = await workspace(api, db, number)
     m = meeting(scope, conv.customer_id)
     db.add(m)
+    await db.flush()
+    who = PiMeetingParticipant(
+        tenant_id=scope.tenant_id,
+        environment_id=scope.environment_id,
+        meeting_id=m.id,
+        label="Speaker 1",
+        role=role,
+    )
+    db.add(who)
     await db.flush()
     db.add(
         PiMeetingSegment(
@@ -27,6 +36,7 @@ async def seeded(api, db, number):
             ordinal=0,
             start_ms=0,
             end_ms=900,
+            participant_id=who.id,
             text="our evening stock keeps running out every week",
         )
     )
@@ -153,7 +163,7 @@ async def test_a_reviewers_wording_cannot_carry_a_price_or_be_emptied(
 async def test_a_meeting_memory_row_says_where_it_came_from_and_who_is_unconfirmed(
     api, business_db
 ):
-    pi, scope, m = await seeded(api, business_db, "377000006")
+    pi, scope, m = await seeded(api, business_db, "377000006", role="unknown")
     item = insight(scope, m.id, kind="decision", segment_refs=[0], text="we will deliver Friday")
     business_db.add(item)
     await business_db.flush()
@@ -179,4 +189,19 @@ async def test_an_ai_suggested_action_is_headed_as_unconfirmed(api, business_db)
         select(PiStaffRequest).where(PiStaffRequest.id == item.brain_ref.split(":", 1)[1])
     )
     assert req is not None and "AI suggestion (unconfirmed)" in req.question
+    await pi.close()
+
+
+async def test_a_problem_from_an_unconfirmed_speaker_is_not_written_as_the_customers_words(
+    api, business_db
+):
+    pi, scope, m = await seeded(api, business_db, "377000008", role="unknown")
+    before = await count(business_db, PiProblem, scope)
+    item = insight(scope, m.id, segment_refs=[0], text="evening stock keeps running out")
+    business_db.add(item)
+    await business_db.flush()
+    out = await brain_bridge.approve(business_db, scope, m, item, reviewer_id=None)
+    assert out.wrote == "" and "not confirmed" in out.note
+    assert item.written_at is None
+    assert await count(business_db, PiProblem, scope) == before
     await pi.close()

@@ -4,7 +4,8 @@ A reviewer approves an insight, and only then does it reach the shared brain, th
 chat already uses:
 
 * a stated `problem`            -> the Problem Map (`problems.apply_ops`), with the customer's own
-                                   words from the cited transcript lines as evidence;
+                                   words from the cited lines as evidence, and only when the cited
+                                   speaker is confirmed as the customer;
 * a stated `decision` or
   `commitment`                  -> the memory ledger (`memory_ledger.record_decision`), subject_ref
                                    `meeting:<meeting>:<insight>` (the kind column is fixed in
@@ -176,29 +177,34 @@ async def approve(
     customer_id = meeting.customer_id
 
     if stated and insight.kind in PROBLEM_KINDS:
-        quotes = await _quotes(session, scope, meeting.id, list(insight.segment_refs))
-        note = problems.ProblemNote(
-            title=_title(text),
-            summary=text,
-            user_words=quotes,
-            confidence=min(1.0, max(0.0, insight.confidence / 100)),
-        )
-        applied = await problems.apply_ops(
-            session,
-            scope,
-            customer_id,
-            None,
-            None,
-            [problems.ProblemOp(op="create", note=note)],
-            meeting.language or "en",
-            owner_text=" ".join(quotes),
-        )
-        touched = [*applied.created, *applied.updated]
-        if touched:
-            insight.brain_ref = f"problem:{touched[0].id}"[:60]
-            out.wrote = "problem"
+        refs = list(insight.segment_refs)
+        quotes = await _quotes(session, scope, meeting.id, refs)
+        if not await _customer_said(session, scope, meeting.id, refs):
+            # the Problem Map records the customer's own words: another speaker's are not them
+            out.note = "not written: the speaker is not confirmed as the customer"
         else:
-            out.note = "the Problem Map did not take it: " + "; ".join(applied.rejected)[:200]
+            note = problems.ProblemNote(
+                title=_title(text),
+                summary=text,
+                user_words=quotes,
+                confidence=min(1.0, max(0.0, insight.confidence / 100)),
+            )
+            applied = await problems.apply_ops(
+                session,
+                scope,
+                customer_id,
+                None,
+                None,
+                [problems.ProblemOp(op="create", note=note)],
+                meeting.language or "en",
+                owner_text=" ".join(quotes),
+            )
+            touched = [*applied.created, *applied.updated]
+            if touched:
+                insight.brain_ref = f"problem:{touched[0].id}"[:60]
+                out.wrote = "problem"
+            else:
+                out.note = "the Problem Map did not take it: " + "; ".join(applied.rejected)[:200]
     elif stated and insight.kind in DECISION_KINDS:
         said = await _customer_said(session, scope, meeting.id, list(insight.segment_refs))
         source = "In a meeting" if said else "In a meeting (speaker not confirmed as the customer)"
