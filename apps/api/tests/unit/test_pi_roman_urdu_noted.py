@@ -369,7 +369,9 @@ async def test_a_seeding_race_never_costs_the_reply() -> None:
     original = solution_context._build
     solution_context._build = fake_build  # type: ignore[assignment]
     try:
-        out = await solution_context.build(FakeSession(), None, None, "any solution?", [], {})  # type: ignore[arg-type]
+        # Not a practical digital-solution request (those return {} before seeding is reached).
+        said = "my shop is slow in the evenings"
+        out = await solution_context.build(FakeSession(), None, None, said, [], {})  # type: ignore[arg-type]
     finally:
         solution_context._build = original
     assert out == {"solution_ideas": ["x"]} and calls["n"] == 2

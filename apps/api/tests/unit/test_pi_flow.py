@@ -168,15 +168,16 @@ def test_standard_mode_has_no_state_and_the_linter_flag_alone_adds_only_strict_v
 
 
 def test_advance_flow_follows_the_question_and_stamps_the_time():
+    # advance_flow reads turn._exploration, so the stand-in turn has it.
     chat = conversation("S0_NEW")
-    advance_flow(chat, SimpleNamespace(reply="Which shop is it?"))
+    advance_flow(chat, SimpleNamespace(reply="Which shop is it?", _exploration=False))
     assert chat.flow_state == "S1_LISTENING" and isinstance(chat.flow_state_since, datetime)
-    advance_flow(chat, SimpleNamespace(reply="Which shop is it?"))
+    advance_flow(chat, SimpleNamespace(reply="Which shop is it?", _exploration=False))
     assert chat.flow_state == "S2_CLARIFYING"
-    advance_flow(chat, SimpleNamespace(reply="Noted."))
+    advance_flow(chat, SimpleNamespace(reply="Noted.", _exploration=False))
     assert chat.flow_state == "S1_LISTENING"
     offered = conversation("S5_READINESS")
-    advance_flow(offered, SimpleNamespace(reply="Shall I go ahead?"))
+    advance_flow(offered, SimpleNamespace(reply="Shall I go ahead?", _exploration=False))
     assert offered.flow_state == "S5_READINESS"
     assert offered.flow_state_since is None
     assert datetime.now(UTC)  # stamp is timezone-aware, checked above by isinstance

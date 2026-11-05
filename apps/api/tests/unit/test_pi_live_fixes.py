@@ -231,7 +231,9 @@ def test_a_rewrite_drops_what_pi_already_sent() -> None:
     context = {"history": [{"role": "ai", "text": summary}]}
     reply = summary + "\n\nYour proposal QUO-000009 is shared here."
     assert without_repeats(reply, context) == "Your proposal QUO-000009 is shared here."
-    assert without_repeats(summary, context) == summary  # nothing new: left as it was
+    # Nothing new would be left: the result is empty, so the caller cannot resend the original
+    # (documented behaviour of without_repeats since 5e4eef66).
+    assert without_repeats(summary, context) == ""
 
 
 def test_a_booking_feature_is_not_a_meeting_claim() -> None:
