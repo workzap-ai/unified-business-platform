@@ -76,6 +76,32 @@ production) the migration pasted by the owner. Phase 3 needs a Zoom app and Goog
   nothing is treated as the customer's own words until a person confirms the speaker (PMB-2 adds the
   mapping). Segment times inside a part are proportional to text length (an estimate); part offsets are exact.
 
+### Live meetings (Zoom, Google Meet, in person) and the complete transcript
+
+Decision (owner, 2026-11-06): live capture from the browser, no bot and no platform approval. The person
+shares the Zoom or Meet tab or screen with its audio (and the microphone) in the recorder; the other side
+is heard through the shared audio.
+
+- **Live requirement mapping.** After each part is transcribed the browser calls
+  `POST /pi/meeting-intel/{id}/analyse/part/{n}`: one cheap model call over that part plus 6 earlier lines
+  for context. New findings are added to the review list; earlier and reviewed ones are never touched, and the
+  same part twice does not double anything (`analyse.store_part`). They are proposals only: nothing reaches the
+  customer's memory before approval. The whole-meeting analysis ("Analyse with pi") is still available once the
+  recording is finished and reasons across parts; its chunks now run four at a time.
+- **A call or a quiet minute does not stop it.** An unreadable or silent part is skipped; the meeting is marked
+  failed only if nothing has been heard yet. A failed live analysis never changes the meeting.
+- **The page refreshes by itself** every 15 s while recording (newest 200 lines, findings, "N mapped").
+- **Complete transcript, any length.** `GET .../transcript?offset=&limit=` pages through every line
+  (`total`, `next_offset`); `GET .../transcript/download` is one text file of the whole meeting; the detail view
+  reports `segments_total` and the UI reads on to the last line. Parts are capped at 400 (about 26 hours).
+- A part already heard and analysed cannot be re-sent (409 `MEETING_PART_ANALYSED`), so insights never point at
+  rewritten lines; the recorder counts such a retry as sent.
+- Not covered: a tab closed or a computer asleep during the meeting loses the part being recorded (parts already
+  sent are kept). Unsent parts are not saved to the browser's storage yet.
+- **Platform real-time APIs (Zoom RTMS, Meet Media API) and a notetaker bot were not chosen.** They need app
+  approval, or reverse the "no bot" decision; Zoom and Meet transcripts after the meeting through their APIs
+  (PMB-3) remain open.
+
 ### Not built yet (needs the owner)
 
 - **The audio is not stored.** It is held in memory for the one speech-to-text call and dropped, so

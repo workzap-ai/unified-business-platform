@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { ApiError, apiRequest } from "@/services/api-client";
+import { ApiError, API_BASE, apiRequest } from "@/services/api-client";
 
 /**
  * Meeting intelligence: a meeting's transcript, what pi understood from it, and the review that
@@ -109,6 +109,8 @@ export type Segment = z.infer<typeof segmentSchema>;
 
 const detailSchema = meetingSchema.extend({
   participants: z.array(z.string()).catch([]),
+  // every line of the transcript; `segments` is one page of it
+  segments_total: z.number().catch(0),
   segments: z.array(segmentSchema).catch([]),
   insights: z.array(insightSchema).catch([]),
 });
@@ -186,6 +188,28 @@ export const meetingIntelService = {
       { body: form, timeoutMs: 120_000 },
     );
   },
+  // Live requirement mapping for one recorded part. Proposals only; best effort.
+  analysePart: (id: string, index: number) =>
+    apiRequest(
+      "POST",
+      `${BASE}/${id}/analyse/part/${index}`,
+      z.object({ part: z.number(), insights: z.number(), dropped: z.number() }),
+      { timeoutMs: 90_000 },
+    ),
+  // The transcript a page at a time, so a meeting of any length can be read to the end.
+  transcriptPage: (id: string, offset: number) =>
+    apiRequest(
+      "GET",
+      `${BASE}/${id}/transcript`,
+      z.object({
+        total: z.number(),
+        next_offset: z.number().nullable(),
+        segments: z.array(segmentSchema),
+      }),
+      { query: { offset, limit: 500 } },
+    ),
+  transcriptDownloadHref: (id: string) =>
+    `${API_BASE}${BASE}/${id}/transcript/download`,
   completeRecording: (
     id: string,
     input: { duration_ms: number; parts: number; skipped: number },

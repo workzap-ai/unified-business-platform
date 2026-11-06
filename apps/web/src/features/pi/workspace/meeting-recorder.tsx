@@ -74,6 +74,7 @@ export function MeetingRecorder({ id }: { id: string }) {
   const [level, setLevel] = useState(0);
   const [sent, setSent] = useState(0);
   const [skipped, setSkipped] = useState(0);
+  const [mapped, setMapped] = useState(0);
   const [error, setError] = useState("");
 
   const run = useRef({
@@ -88,6 +89,7 @@ export function MeetingRecorder({ id }: { id: string }) {
     skipped: 0,
     stopping: false,
     queue: Promise.resolve(),
+    analysis: Promise.resolve(),
     partTimer: 0 as unknown as ReturnType<typeof setTimeout>,
     tick: 0 as unknown as ReturnType<typeof setInterval>,
     wake: null as { release: () => Promise<void> } | null,
@@ -149,8 +151,22 @@ export function MeetingRecorder({ id }: { id: string }) {
           await meetingIntelService.uploadPart(id, part);
           run.current.parts += 1;
           setSent(run.current.parts);
+          // map what was just said while the meeting goes on; best effort, one at a time, and the
+          // recording never waits for it (the full analysis at the end covers everything anyway)
+          run.current.analysis = run.current.analysis.then(() =>
+            meetingIntelService
+              .analysePart(id, part.index)
+              .then((r) => setMapped((m) => m + r.insights))
+              .catch(() => undefined),
+          );
           return;
         } catch (e) {
+          if (e instanceof ApiError && e.code === "MEETING_PART_ANALYSED") {
+            // a retry of a part the server already stored and analysed: nothing was lost
+            run.current.parts += 1;
+            setSent(run.current.parts);
+            return;
+          }
           if (e instanceof ApiError && FINAL_STATUSES.includes(e.status)) {
             if (e.status !== 422) {
               // consent, meeting or permission problem: nothing more can be sent
@@ -209,12 +225,14 @@ export function MeetingRecorder({ id }: { id: string }) {
     setError("");
     setSent(0);
     setSkipped(0);
+    setMapped(0);
     setPhase("starting");
     r.index = 0;
     r.parts = 0;
     r.skipped = 0;
     r.stopping = false;
     r.queue = Promise.resolve();
+    r.analysis = Promise.resolve();
     r.mime = pickMime();
     try {
       const mic = await navigator.mediaDevices.getUserMedia({
@@ -289,6 +307,7 @@ export function MeetingRecorder({ id }: { id: string }) {
     }
     release();
     await r.queue; // every part has been sent (or given up on)
+    await r.analysis; // and every live analysis has finished before the transcript is closed
     if (r.parts === 0) {
       setError(
         r.skipped > 0
@@ -320,9 +339,11 @@ export function MeetingRecorder({ id }: { id: string }) {
         <div>
           <h2 className="text-sm font-semibold">Record this meeting</h2>
           <p className="mt-1 text-xs text-muted-foreground">
-            pi writes down what is said while you record. The audio is not
-            stored: only the words are kept, with phone, card and ID numbers
-            removed. Consent was recorded when this meeting was created.
+            pi writes down what is said while you record and maps the problems
+            and requirements as the meeting goes on. A call, a pause or a bad
+            minute does not stop it. The audio is not stored: only the words are
+            kept, with phone, card and ID numbers removed. Consent was recorded
+            when this meeting was created.
           </p>
         </div>
 
@@ -373,6 +394,8 @@ export function MeetingRecorder({ id }: { id: string }) {
               <span className="text-xs text-muted-foreground">
                 {sent} part{sent === 1 ? "" : "s"} transcribed
                 {skipped > 0 && `, ${skipped} skipped`}
+                {mapped > 0 &&
+                  `, ${mapped} requirement${mapped === 1 ? "" : "s"} mapped`}
               </span>
             </div>
             <Button

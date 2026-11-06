@@ -22,9 +22,9 @@ import re
 from typing import Annotated, Any
 from uuid import UUID
 
-from fastapi import APIRouter, File, Form, Request, UploadFile
+from fastapi import APIRouter, File, Form, Path, Request, Response, UploadFile
 from pydantic import BaseModel, ConfigDict, Field
-from sqlalchemy import delete, select
+from sqlalchemy import delete, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.ai.errors import GatewayUnavailable, MediaValidationError
@@ -32,6 +32,8 @@ from app.ai.manager import build_llm_manager
 from app.modules.access.dependencies import Scope, Session
 from app.modules.audit.service import record
 from app.modules.pi.memory_ledger import redacted
+from app.modules.pi_meetings import analyse as analysis
+from app.modules.pi_meetings.insight_rules import Segment
 from app.modules.pi_meetings.models import (
     PiMeeting,
     PiMeetingInsight,
@@ -123,10 +125,13 @@ async def _speaker(
     return created
 
 
-async def _recordable(session: AsyncSession, scope: WorkspaceScope, meeting: PiMeeting) -> None:
-    """Consent is on record and the transcript can still grow. Audio is refused once the meeting
-    has insights (they cite segment ordinals, which new audio would rewrite), is past
-    transcribing, or already holds an imported transcript (part 0 would overwrite its lines)."""
+async def _recordable(
+    session: AsyncSession, scope: WorkspaceScope, meeting: PiMeeting, index: int | None = None
+) -> None:
+    """Consent is on record and the transcript can still grow. Audio is refused once the meeting is
+    past transcribing, holds an imported transcript (part 0 would overwrite its lines), or, for a
+    part already heard and analysed, would rewrite lines the insights cite. New parts of a meeting
+    that is being analysed live are fine: they only add segment numbers."""
     if meeting.consent_at is None:
         raise BusinessRuleViolation("MEETING_CONSENT_REQUIRED", "No consent is recorded", 422)
     if meeting.status not in OPEN_STATES:
@@ -134,21 +139,42 @@ async def _recordable(session: AsyncSession, scope: WorkspaceScope, meeting: PiM
             "MEETING_CLOSED", "This meeting already has its transcript; start a new one", 409
         )
     mine = (
-        PiMeetingInsight.tenant_id == scope.tenant_id,
-        PiMeetingInsight.environment_id == scope.environment_id,
-        PiMeetingInsight.meeting_id == meeting.id,
-    )
-    imported = (
         PiMeetingSegment.tenant_id == scope.tenant_id,
         PiMeetingSegment.environment_id == scope.environment_id,
         PiMeetingSegment.meeting_id == meeting.id,
-        PiMeetingSegment.end_ms == 0,  # an imported line has no timing; a recorded one always does
     )
-    if (await session.scalar(select(PiMeetingInsight.id).where(*mine).limit(1))) is not None or (
-        await session.scalar(select(PiMeetingSegment.id).where(*imported).limit(1))
-    ) is not None:
+    imported = await session.scalar(
+        select(PiMeetingSegment.id)
+        .where(*mine, PiMeetingSegment.end_ms == 0)  # an import has no timing; a recording does
+        .limit(1)
+    )
+    if imported is not None:
         raise BusinessRuleViolation(
             "MEETING_CLOSED", "This meeting already has its transcript; start a new one", 409
+        )
+    if index is None:
+        return
+    has_insights = await session.scalar(
+        select(PiMeetingInsight.id)
+        .where(
+            PiMeetingInsight.tenant_id == scope.tenant_id,
+            PiMeetingInsight.environment_id == scope.environment_id,
+            PiMeetingInsight.meeting_id == meeting.id,
+        )
+        .limit(1)
+    )
+    heard = await session.scalar(
+        select(PiMeetingSegment.id)
+        .where(
+            *mine,
+            PiMeetingSegment.ordinal >= index * PART_STRIDE,
+            PiMeetingSegment.ordinal < (index + 1) * PART_STRIDE,
+        )
+        .limit(1)
+    )
+    if has_insights is not None and heard is not None:
+        raise BusinessRuleViolation(
+            "MEETING_PART_ANALYSED", "This part was already heard and analysed", 409
         )
 
 
@@ -166,7 +192,7 @@ async def upload_part(
     """Transcribe one part of the recording and store its words as segments."""
     await _gate(session, scope, "pi.meetings.record")
     meeting = await _meeting(session, scope, meeting_id)
-    await _recordable(session, scope, meeting)
+    await _recordable(session, scope, meeting, index)
     try:
         audio = await file.read(MAX_PART_BYTES + 1)
     finally:
@@ -188,9 +214,21 @@ async def upload_part(
             "MEETING_AUDIO_INVALID", "This audio could not be read as a recording", 422
         ) from None
     except GatewayUnavailable:
-        # nothing was stored for this part: sending it again is safe
-        meeting.status = "failed"
-        meeting.failure_reason = "Speech-to-text is unavailable; try again"
+        # nothing was stored for this part: sending it again is safe. A silent or unreadable part
+        # in the middle of a meeting (a call, a pause) is not a failed meeting: only a meeting
+        # that has heard nothing yet is marked failed.
+        heard = await session.scalar(
+            select(PiMeetingSegment.id)
+            .where(
+                PiMeetingSegment.tenant_id == scope.tenant_id,
+                PiMeetingSegment.environment_id == scope.environment_id,
+                PiMeetingSegment.meeting_id == meeting.id,
+            )
+            .limit(1)
+        )
+        if heard is None:
+            meeting.status = "failed"
+            meeting.failure_reason = "Speech-to-text is unavailable; try again"
         await session.commit()
         raise BusinessRuleViolation(
             "MEETING_TRANSCRIBE_FAILED", "Speech-to-text is unavailable; try again", 502
@@ -289,3 +327,214 @@ async def complete_recording(
     )
     await session.commit()
     return {**_view(meeting), "skipped": data.skipped}
+
+
+CONTEXT_LINES = 6
+
+
+@router.post("/{meeting_id}/analyse/part/{index}")
+async def analyse_part(
+    meeting_id: UUID,
+    index: Annotated[int, Path(ge=0, lt=MAX_PARTS)],
+    scope: Scope,
+    session: Session,
+    request: Request,
+) -> dict[str, Any]:
+    """Live requirement mapping: read what was just said in one recorded part (with a few lines
+    before it for context) and add what it reveals to the review list. Each result is checked by
+    the same rules as a full analysis and is only a proposal: nothing reaches the customer's memory
+    until a person approves it. A failure here never stops the recording or changes the meeting."""
+    await _gate(session, scope, "pi.meetings.record")
+    meeting = await _meeting(session, scope, meeting_id)
+    if meeting.consent_at is None:
+        raise BusinessRuleViolation("MEETING_CONSENT_REQUIRED", "No consent is recorded", 422)
+    if meeting.status not in OPEN_STATES:
+        raise BusinessRuleViolation(
+            "MEETING_CLOSED", "This meeting already has its transcript; analyse it as a whole", 409
+        )
+    low, high = index * PART_STRIDE, (index + 1) * PART_STRIDE
+    mine = (
+        PiMeetingSegment.tenant_id == scope.tenant_id,
+        PiMeetingSegment.environment_id == scope.environment_id,
+        PiMeetingSegment.meeting_id == meeting.id,
+    )
+    columns = (PiMeetingSegment.ordinal, PiMeetingSegment.text, PiMeetingParticipant.label)
+    join = (PiMeetingParticipant, PiMeetingParticipant.id == PiMeetingSegment.participant_id)
+    now_rows = (
+        await session.execute(
+            select(*columns)
+            .join(*join, isouter=True)
+            .where(*mine, PiMeetingSegment.ordinal >= low, PiMeetingSegment.ordinal < high)
+            .order_by(PiMeetingSegment.ordinal)
+        )
+    ).all()
+    if not now_rows:
+        return {"part": index, "insights": 0, "dropped": 0}
+    before_rows = list(
+        reversed(
+            (
+                await session.execute(
+                    select(*columns)
+                    .join(*join, isouter=True)
+                    .where(*mine, PiMeetingSegment.ordinal < low)
+                    .order_by(PiMeetingSegment.ordinal.desc())
+                    .limit(CONTEXT_LINES)
+                )
+            ).all()
+        )
+    )
+    segments = [Segment(o, t, who or "") for o, t, who in [*before_rows, *now_rows]]
+    state = request.app.state
+    manager = build_llm_manager(state.settings, state.http, state.sessions)
+    try:
+        kept, dropped = await analysis.analyse(
+            manager,
+            scope,
+            segments,
+            speakers=sorted({s.speaker for s in segments if s.speaker}),
+            language=meeting.language,
+        )
+    except analysis.AnalysisFailed:
+        raise BusinessRuleViolation(
+            "MEETING_ANALYSIS_FAILED", "The live analysis could not be completed", 502
+        ) from None
+    written = await analysis.store_part(session, scope, meeting.id, kept, low, high)
+    await record(
+        session,
+        "pi.meeting_part_analysed",
+        scope=scope,
+        entity_type="pi_meeting",
+        entity_id=meeting.id,
+        details={"part": index, "insights": written, "dropped": len(dropped)},
+    )
+    await session.commit()
+    return {"part": index, "insights": written, "dropped": len(dropped)}
+
+
+# ------------------------------------------------------------------ the complete transcript
+
+TRANSCRIPT_PAGE = 500  # lines per page of the transcript API
+EXPORT_BATCH = 1000  # lines read from the database at a time while writing the full text
+
+
+def _stamp(ms: int) -> str:
+    total = max(0, ms) // 1000
+    hours, rest = divmod(total, 3600)
+    return f"{hours}:{rest // 60:02d}:{rest % 60:02d}" if hours else f"{rest // 60}:{rest % 60:02d}"
+
+
+@router.get("/{meeting_id}/transcript")
+async def read_transcript(
+    meeting_id: UUID,
+    scope: Scope,
+    session: Session,
+    offset: int = 0,
+    limit: int = TRANSCRIPT_PAGE,
+) -> dict[str, Any]:
+    """The transcript in pages, so a meeting of any length can be read to the end: `total` lines,
+    and `next_offset` is null on the last page."""
+    await _gate(session, scope, "pi.meetings.read")
+    meeting = await _meeting(session, scope, meeting_id)
+    offset = max(0, offset)
+    limit = max(1, min(limit, TRANSCRIPT_PAGE))
+    mine = (
+        PiMeetingSegment.tenant_id == scope.tenant_id,
+        PiMeetingSegment.environment_id == scope.environment_id,
+        PiMeetingSegment.meeting_id == meeting.id,
+    )
+    total = int(
+        await session.scalar(select(func.count()).select_from(PiMeetingSegment).where(*mine)) or 0
+    )
+    rows = (
+        await session.execute(
+            select(
+                PiMeetingSegment.ordinal,
+                PiMeetingSegment.start_ms,
+                PiMeetingSegment.end_ms,
+                PiMeetingSegment.text,
+                PiMeetingParticipant.label,
+            )
+            .join(
+                PiMeetingParticipant,
+                PiMeetingParticipant.id == PiMeetingSegment.participant_id,
+                isouter=True,
+            )
+            .where(*mine)
+            .order_by(PiMeetingSegment.ordinal)
+            .offset(offset)
+            .limit(limit)
+        )
+    ).all()
+    await record(
+        session,
+        "pi.meeting_transcript_read",
+        scope=scope,
+        entity_type="pi_meeting",
+        entity_id=meeting.id,
+        details={"offset": offset, "lines": len(rows)},
+    )
+    await session.commit()
+    end = offset + len(rows)
+    return {
+        "total": total,
+        "next_offset": end if end < total else None,
+        "segments": [
+            {"ordinal": o, "start_ms": a, "end_ms": b, "speaker": who or "", "text": text}
+            for o, a, b, text, who in rows
+        ],
+    }
+
+
+@router.get("/{meeting_id}/transcript/download")
+async def download_transcript(meeting_id: UUID, scope: Scope, session: Session) -> Response:
+    """Every line of the transcript as one plain-text file, however long the meeting was."""
+    await _gate(session, scope, "pi.meetings.read")
+    meeting = await _meeting(session, scope, meeting_id)
+    mine = (
+        PiMeetingSegment.tenant_id == scope.tenant_id,
+        PiMeetingSegment.environment_id == scope.environment_id,
+        PiMeetingSegment.meeting_id == meeting.id,
+    )
+    lines = [meeting.title or "Meeting", ""]
+    last = -1
+    count = 0
+    while True:
+        batch = (
+            await session.execute(
+                select(
+                    PiMeetingSegment.ordinal,
+                    PiMeetingSegment.start_ms,
+                    PiMeetingSegment.text,
+                    PiMeetingParticipant.label,
+                )
+                .join(
+                    PiMeetingParticipant,
+                    PiMeetingParticipant.id == PiMeetingSegment.participant_id,
+                    isouter=True,
+                )
+                .where(*mine, PiMeetingSegment.ordinal > last)
+                .order_by(PiMeetingSegment.ordinal)
+                .limit(EXPORT_BATCH)
+            )
+        ).all()
+        if not batch:
+            break
+        for _ordinal, start, text, who in batch:
+            when = f"[{_stamp(start)}] " if start else ""
+            lines.append(f"{when}{who or 'Speaker'}: {text}")
+        last = batch[-1][0]
+        count += len(batch)
+    await record(
+        session,
+        "pi.meeting_transcript_downloaded",
+        scope=scope,
+        entity_type="pi_meeting",
+        entity_id=meeting.id,
+        details={"lines": count},
+    )
+    await session.commit()
+    return Response(
+        "\n".join(lines) + "\n",
+        media_type="text/plain; charset=utf-8",
+        headers={"Content-Disposition": f'attachment; filename="meeting-{meeting.id}.txt"'},
+    )

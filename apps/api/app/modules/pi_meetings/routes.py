@@ -247,15 +247,33 @@ async def get_meeting(
         PiMeetingSegment.environment_id == scope.environment_id,
         PiMeetingSegment.meeting_id == meeting.id,
     )
-    segments = (
-        await session.scalars(
-            select(PiMeetingSegment)
-            .where(*mine)
-            .order_by(PiMeetingSegment.ordinal)
-            .offset(max(0, offset))
-            .limit(PAGE)
+    total = int(
+        await session.scalar(select(func.count()).select_from(PiMeetingSegment).where(*mine)) or 0
+    )
+    if meeting.status == "transcribing" and offset == 0:
+        # a meeting still being recorded: the newest lines, not the first page
+        segments = list(
+            reversed(
+                (
+                    await session.scalars(
+                        select(PiMeetingSegment)
+                        .where(*mine)
+                        .order_by(PiMeetingSegment.ordinal.desc())
+                        .limit(PAGE)
+                    )
+                ).all()
+            )
         )
-    ).all()
+    else:
+        segments = (
+            await session.scalars(
+                select(PiMeetingSegment)
+                .where(*mine)
+                .order_by(PiMeetingSegment.ordinal)
+                .offset(max(0, offset))
+                .limit(PAGE)
+            )
+        ).all()
     people = {
         p.id: p.label
         for p in (
@@ -291,6 +309,7 @@ async def get_meeting(
     return {
         **_view(meeting),
         "participants": sorted(people.values()),
+        "segments_total": total,
         "segments": [
             {
                 "ordinal": s.ordinal,

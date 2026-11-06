@@ -1,7 +1,15 @@
 "use client";
 
-import { useState } from "react";
-import { ArrowLeft, Check, FileText, Sparkles, Trash2, X } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import {
+  ArrowLeft,
+  Check,
+  Download,
+  FileText,
+  Sparkles,
+  Trash2,
+  X,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Badge,
@@ -50,7 +58,11 @@ export function MeetingDetail({
   onBack: () => void;
 }) {
   const { can } = useSession();
-  const query = useScopedQuery(KEY(id), () => meetingIntelService.get(id));
+  // while a recording is being transcribed, new lines and findings appear without a refresh
+  const query = useScopedQuery(KEY(id), () => meetingIntelService.get(id), {
+    refetchInterval: (q) =>
+      q.state.data?.status === "transcribing" ? 15_000 : false,
+  });
   const remove = useScopedMutation(() => meetingIntelService.remove(id), {
     invalidate: [["pi", "meeting-intel"]],
     success: "Meeting deleted",
@@ -107,29 +119,37 @@ export function MeetingDetail({
   );
 }
 
+const RECORDING_STATES = ["created", "uploaded", "transcribing"];
+
 function Body({ meeting }: { meeting: Detail }) {
   const { can } = useSession();
   const hasTranscript = meeting.segments.length > 0;
+  const canRecord = can("pi.meetings.record");
+  const live = meeting.status === "transcribing";
+  // The recorder stays on screen from the first word to the end of the meeting, so a recording in
+  // progress is never torn down when the first lines of the transcript arrive.
+  const recording =
+    canRecord &&
+    (RECORDING_STATES.includes(meeting.status) ||
+      (meeting.status === "failed" && !hasTranscript));
   return (
     <div className="space-y-4">
       {meeting.customer_id === null && <LinkCustomer meeting={meeting} />}
       {meeting.status === "failed" && meeting.failure_reason && (
         <Notice tone="danger">{meeting.failure_reason}</Notice>
       )}
-      {!hasTranscript ? (
-        can("pi.meetings.record") ? (
-          <div className="space-y-4">
-            <MeetingRecorder id={meeting.id} />
-            <TranscriptImport id={meeting.id} />
-          </div>
+      {recording && <MeetingRecorder id={meeting.id} />}
+      {!hasTranscript &&
+        (canRecord ? (
+          <TranscriptImport id={meeting.id} />
         ) : (
           <EmptyState
             icon={FileText}
             title="No transcript yet"
             description="Someone with permission to record meetings needs to add it."
           />
-        )
-      ) : (
+        ))}
+      {hasTranscript && (
         <Tabs defaultValue="review">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <TabsList>
@@ -149,13 +169,17 @@ function Body({ meeting }: { meeting: Detail }) {
               </TabsTrigger>
               <TabsTrigger value="transcript">Transcript</TabsTrigger>
             </TabsList>
-            {can("pi.meetings.record") && <AnalyseButton meeting={meeting} />}
+            {/* the whole-meeting analysis waits until the recording is finished */}
+            {canRecord && !live && <AnalyseButton meeting={meeting} />}
           </div>
           <TabsContent value="review" className="mt-4">
             <Insights meeting={meeting} />
           </TabsContent>
           <TabsContent value="transcript" className="mt-4">
-            <Transcript segments={meeting.segments} />
+            <Transcript
+              key={`${meeting.id}-${meeting.segments_total}`}
+              meeting={meeting}
+            />
           </TabsContent>
         </Tabs>
       )}
@@ -470,13 +494,62 @@ function InsightCard({
   );
 }
 
-function Transcript({ segments }: { segments: Segment[] }) {
+function Transcript({ meeting }: { meeting: Detail }) {
+  const live = meeting.status === "transcribing";
+  const [more, setMore] = useState<Segment[]>([]);
+  const [busy, setBusy] = useState(false);
+  const [failed, setFailed] = useState(false);
+  const list = useRef<HTMLOListElement>(null);
+  // while recording, `segments` holds the newest lines; otherwise the first page, and the rest is
+  // read page by page until the last line has arrived
+  const segments = live ? meeting.segments : [...meeting.segments, ...more];
+  const rest = Math.max(0, meeting.segments_total - segments.length);
+
+  useEffect(() => {
+    if (live) list.current?.scrollTo({ top: list.current.scrollHeight });
+  }, [live, segments.length]);
+
+  async function loadRest() {
+    setBusy(true);
+    setFailed(false);
+    try {
+      let offset: number | null = meeting.segments.length + more.length;
+      while (offset !== null) {
+        const page = await meetingIntelService.transcriptPage(
+          meeting.id,
+          offset,
+        );
+        setMore((m) => [...m, ...page.segments]);
+        offset = page.next_offset;
+      }
+    } catch {
+      setFailed(true);
+    } finally {
+      setBusy(false);
+    }
+  }
+
   // the same speaker keeps the same colour all the way down
   const order = [...new Set(segments.map((s) => s.speaker || "Speaker"))];
   return (
     <Card>
-      <CardBody>
-        <ol className="max-h-[32rem] space-y-3 overflow-y-auto pr-1">
+      <CardBody className="space-y-3">
+        <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-muted-foreground">
+          <span>
+            {live
+              ? `Recording: the latest ${segments.length} of ${meeting.segments_total} lines`
+              : `${meeting.segments_total} line${meeting.segments_total === 1 ? "" : "s"}`}
+          </span>
+          <Button asChild variant="secondary">
+            <a
+              href={meetingIntelService.transcriptDownloadHref(meeting.id)}
+              download
+            >
+              <Download /> Download the full transcript
+            </a>
+          </Button>
+        </div>
+        <ol ref={list} className="max-h-[32rem] space-y-3 overflow-y-auto pr-1">
           {segments.map((s) => {
             const name = s.speaker || "Speaker";
             return (
@@ -499,6 +572,22 @@ function Transcript({ segments }: { segments: Segment[] }) {
             );
           })}
         </ol>
+        {!live && rest > 0 && (
+          <div className="flex flex-wrap items-center gap-3">
+            <Button
+              variant="secondary"
+              loading={busy}
+              onClick={() => void loadRest()}
+            >
+              Show the other {rest} line{rest === 1 ? "" : "s"}
+            </Button>
+            {failed && (
+              <span className="text-xs text-danger">
+                Some lines could not be loaded. Try again.
+              </span>
+            )}
+          </div>
+        )}
       </CardBody>
     </Card>
   );

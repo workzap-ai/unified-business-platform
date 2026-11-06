@@ -10,6 +10,7 @@ because every output goes through a reviewer first, a line that tries to steer t
 produce an insight that is rejected.
 """
 
+import asyncio
 import json
 import logging
 from collections.abc import Sequence
@@ -28,6 +29,7 @@ from app.shared.scope import WorkspaceScope
 logger = logging.getLogger(__name__)
 
 CHUNK_CHARS = 6000
+MAX_PARALLEL = 4  # a long meeting is many chunks: read a few at a time, not one by one
 PURPOSE = "pi_meeting_analyse"
 
 SYSTEM = """You read the transcript of a business meeting between a small-business owner and the
@@ -117,9 +119,10 @@ async def analyse(
     meeting is never presented as finished."""
     from app.ai.types import Message
 
-    proposed: list[ModelInsight] = []
-    for part in chunks(segments):
-        try:
+    gate = asyncio.Semaphore(MAX_PARALLEL)
+
+    async def read(part: Sequence[Segment]) -> Any:
+        async with gate:
             result = await manager.complete_structured(
                 scope,
                 ModelOutput,
@@ -129,10 +132,15 @@ async def analyse(
                 temperature=0.1,
                 max_tokens=1800,
             )
-        except Exception as exc:  # noqa: BLE001 - any provider failure means "try again later"
-            logger.warning("pi_meeting_analyse_failed", exc_info=True)
-            raise AnalysisFailed(type(exc).__name__) from exc
-        value = result.value
+        return result.value
+
+    try:
+        values = await asyncio.gather(*(read(part) for part in chunks(segments)))
+    except Exception as exc:  # noqa: BLE001 - any provider failure means "try again later"
+        logger.warning("pi_meeting_analyse_failed", exc_info=True)
+        raise AnalysisFailed(type(exc).__name__) from exc
+    proposed: list[ModelInsight] = []
+    for value in values:  # in transcript order, whatever order the calls finished in
         if isinstance(value, ModelOutput):
             proposed.extend(value.insights)
     return validate(proposed, segments, speakers)
@@ -168,6 +176,69 @@ async def store(
     for item in insights:
         if (item.kind, " ".join(item.text.lower().split())) in reviewed:
             continue
+        session.add(
+            PiMeetingInsight(
+                tenant_id=scope.tenant_id,
+                environment_id=scope.environment_id,
+                meeting_id=meeting_id,
+                kind=item.kind,
+                basis=item.basis,
+                text=item.text,
+                confidence=item.confidence,
+                segment_refs=list(item.segment_refs),
+                owner_label=item.owner_label,
+                due_text=item.due_text,
+                review_status="pending",
+                created_at=stamp,
+            )
+        )
+        written += 1
+    await session.flush()
+    return written
+
+
+async def store_part(
+    session: AsyncSession,
+    scope: WorkspaceScope,
+    meeting_id: UUID,
+    insights: Sequence[Insight],
+    low: int,
+    high: int,
+    now: datetime | None = None,
+) -> int:
+    """Live analysis of one recorded part: the pending insights that came only from the segment
+    numbers `low <= n < high` are replaced, every other insight (earlier parts, anything reviewed)
+    is left alone, and an item already on the list is not added again. Safe to run twice."""
+    where = (
+        PiMeetingInsight.tenant_id == scope.tenant_id,
+        PiMeetingInsight.environment_id == scope.environment_id,
+        PiMeetingInsight.meeting_id == meeting_id,
+    )
+    pending = (
+        await session.scalars(
+            select(PiMeetingInsight).where(*where, PiMeetingInsight.review_status == "pending")
+        )
+    ).all()
+    for row in pending:
+        refs = list(row.segment_refs or [])
+        if refs and all(low <= ref < high for ref in refs):
+            await session.delete(row)
+    await session.flush()
+    known = {
+        (kind, " ".join(text.lower().split()))
+        for kind, text in (
+            await session.execute(
+                select(PiMeetingInsight.kind, PiMeetingInsight.text).where(*where)
+            )
+        ).all()
+    }
+    stamp = now or datetime.now(UTC)
+    written = 0
+    for item in insights:
+        key = (item.kind, " ".join(item.text.lower().split()))
+        if key in known:
+            continue
+        known.add(key)
         session.add(
             PiMeetingInsight(
                 tenant_id=scope.tenant_id,

@@ -259,3 +259,120 @@ async def test_the_audit_trail_holds_counts_and_ids_never_the_words(api, busines
     assert set(by_action["pi.meeting_recording_completed"]) == {"parts", "skipped", "duration_ms"}
     assert "Secret" not in str(rows)
     await pi.close()
+
+
+class Mapper(Speech):
+    """Speech-to-text plus a model that finds one stated problem citing the part's first line."""
+
+    def __init__(self, *a, **k):
+        super().__init__(*a, **k)
+        self.problem = "evening stock keeps running out"
+        self.ref = 0
+        self.asked = 0
+
+    async def complete_structured(self, scope, output, **kw):
+        self.asked += 1
+        item = {
+            "kind": "problem",
+            "basis": "stated",
+            "text": self.problem,
+            "segment_refs": [self.ref],
+            "confidence": 90,
+        }
+        return SimpleNamespace(value=output(insights=[item]))
+
+
+def analyse_part(api, mid, index):
+    return api.post(f"{BASE}/{mid}/analyse/part/{index}")
+
+
+async def test_requirements_are_mapped_part_by_part_while_recording(api, business_db, monkeypatch):
+    pi, conv, scope = await workspace(api, business_db, "366100012")
+    await switch_on(api)
+    mapper = Mapper()
+    monkeypatch.setattr(recording_routes, "build_llm_manager", lambda *a, **k: mapper)
+    mid = (await api.post(BASE, json=body())).json()["id"]
+
+    await part(api, mid, 0)
+    first = await analyse_part(api, mid, 0)
+    assert first.status_code == 200, first.text
+    assert first.json() == {"part": 0, "insights": 1, "dropped": 0}
+    again = await analyse_part(api, mid, 0)  # the same part twice: nothing is doubled
+    assert again.json()["insights"] == 1
+    detail = (await api.get(f"{BASE}/{mid}")).json()
+    assert len(detail["insights"]) == 1 and detail["status"] == "transcribing"
+
+    # the meeting goes on: a new part is accepted although insights exist, and adds its own
+    mapper.problem, mapper.ref = "the bank transfer is delayed", 1000
+    assert (await part(api, mid, 1)).status_code == 200
+    assert (await analyse_part(api, mid, 1)).json()["insights"] == 1
+    texts = sorted(i["text"] for i in (await api.get(f"{BASE}/{mid}")).json()["insights"])
+    assert texts == ["evening stock keeps running out", "the bank transfer is delayed"]
+
+    # a part that was heard and analysed is never rewritten under its insights
+    clash = await part(api, mid, 0)
+    assert clash.status_code == 409 and clash.json()["error"]["code"] == "MEETING_PART_ANALYSED"
+
+    # the live list is only proposals: nothing reached the customer's memory
+    assert all(
+        i["review_status"] == "pending" for i in (await api.get(f"{BASE}/{mid}")).json()["insights"]
+    )
+    await pi.close()
+
+
+async def test_a_silent_or_failed_part_mid_meeting_does_not_fail_the_meeting(
+    api, business_db, monkeypatch
+):
+    pi, conv, scope = await workspace(api, business_db, "366100013")
+    await switch_on(api)
+    speech = Speech()
+    monkeypatch.setattr(recording_routes, "build_llm_manager", lambda *a, **k: speech)
+    mid = (await api.post(BASE, json=body())).json()["id"]
+    await part(api, mid, 0)
+    speech.fail = True  # a call comes in, the line goes quiet: this part cannot be read
+    assert (await part(api, mid, 1)).status_code == 502
+    detail = (await api.get(f"{BASE}/{mid}")).json()
+    assert detail["status"] == "transcribing" and detail["failure_reason"] == ""
+    speech.fail = False
+    assert (await part(api, mid, 2)).status_code == 200  # recording simply carries on
+    # the failure of a live analysis does not touch the meeting either
+    monkeypatch.setattr(recording_routes, "build_llm_manager", lambda *a, **k: object())
+    assert (await analyse_part(api, mid, 2)).status_code == 502
+    assert (await api.get(f"{BASE}/{mid}")).json()["status"] == "transcribing"
+    await pi.close()
+
+
+async def test_the_complete_transcript_is_readable_however_long_the_meeting(
+    api, business_db, monkeypatch
+):
+    pi, conv, scope = await workspace(api, business_db, "366100014")
+    await switch_on(api)
+    lines = " ".join(f"Point {i} about the stock." for i in range(60))
+    monkeypatch.setattr(recording_routes, "build_llm_manager", lambda *a, **k: Speech(lines))
+    mid = (await api.post(BASE, json=body())).json()["id"]
+    for index in range(6):  # 6 parts x 60 lines = 360 lines: more than one page of the detail view
+        assert (await part(api, mid, index)).json()["segments"] == 60
+    live = (await api.get(f"{BASE}/{mid}")).json()
+    assert live["segments_total"] == 360 and len(live["segments"]) == 200  # newest while recording
+    assert live["segments"][-1]["ordinal"] == 5059
+    await api.post(f"{BASE}/{mid}/recording/complete", json={"duration_ms": 1_440_000, "parts": 6})
+
+    seen, offset = [], 0
+    while offset is not None:  # read to the end, page by page
+        page = (
+            await api.get(f"{BASE}/{mid}/transcript", params={"offset": offset, "limit": 120})
+        ).json()
+        assert page["total"] == 360
+        seen += [s["ordinal"] for s in page["segments"]]
+        offset = page["next_offset"]
+    assert len(seen) == 360 and seen == sorted(seen) and len(set(seen)) == 360
+
+    text = await api.get(f"{BASE}/{mid}/transcript/download")
+    assert text.status_code == 200 and "attachment" in text.headers["content-disposition"]
+    body_lines = [ln for ln in text.text.splitlines() if "Speaker 1:" in ln]
+    assert len(body_lines) == 360
+    assert (
+        "Point 0 about the stock." in body_lines[0]
+        and "Point 59 about the stock." in body_lines[-1]
+    )
+    await pi.close()
