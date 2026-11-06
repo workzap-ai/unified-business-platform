@@ -151,7 +151,9 @@ export function MeetingRecorder({ id }: { id: string }) {
   const complete = useScopedMutation(
     async (v: { duration_ms: number; parts: number; skipped: number }) => {
       const done = await meetingIntelService.completeRecording(id, v);
-      const analysed = await meetingIntelService.analyse(id).catch(() => null);
+      const analysed = await meetingIntelService
+        .analyseAll(id)
+        .catch(() => null);
       return { done, analysed };
     },
     {

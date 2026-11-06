@@ -333,14 +333,60 @@ export const meetingIntelService = {
       meetingSchema.extend({ skipped: z.number().catch(0) }),
       { body: input },
     ),
-  // Runs the analysis inside the request (a few model calls): allow it longer than the default.
+  // One call reads as many parts of the transcript as fit in about 40 seconds and saves them; the
+  // answer says how far it got (`complete`, `done` of `total`). Use `analyseAll` to carry on until
+  // the whole meeting is read.
   analyse: (id: string) =>
     apiRequest(
       "POST",
       `${BASE}/${id}/analyse`,
-      meetingSchema.extend({ insights: z.number(), dropped: z.number() }),
+      meetingSchema.extend({
+        insights: z.number(),
+        dropped: z.number(),
+        complete: z.boolean().catch(true),
+        done: z.number().catch(0),
+        total: z.number().catch(0),
+      }),
       { timeoutMs: 120_000 },
     ),
+  // Keeps calling `analyse` until every part is read. When a provider is rate-limited a call may
+  // read nothing: it waits and asks again, and gives up only after several calls in a row got
+  // nowhere (what was read stays saved, so pressing the button again carries on).
+  analyseAll: async (
+    id: string,
+    onProgress?: (done: number, total: number) => void,
+  ) => {
+    let stalls = 0;
+    let best = -1;
+    for (let round = 0; round < 60; round++) {
+      try {
+        const r = await meetingIntelService.analyse(id);
+        onProgress?.(r.done, r.total);
+        if (r.complete) return r;
+        if (r.done > best) {
+          best = r.done;
+          stalls = 0;
+        } else stalls += 1;
+      } catch (e) {
+        stalls += 1;
+        if (stalls >= 5) throw e;
+      }
+      if (stalls >= 5)
+        throw new ApiError(
+          502,
+          "MEETING_ANALYSIS_FAILED",
+          undefined,
+          "The analysis could not be completed; try again",
+        );
+      await new Promise((r) => setTimeout(r, stalls === 0 ? 1500 : 15_000));
+    }
+    throw new ApiError(
+      502,
+      "MEETING_ANALYSIS_FAILED",
+      undefined,
+      "The analysis could not be completed; try again",
+    );
+  },
   approve: (id: string, insightId: string, editedText = "") =>
     apiRequest(
       "POST",

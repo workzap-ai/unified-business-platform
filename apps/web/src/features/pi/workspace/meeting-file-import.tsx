@@ -92,7 +92,9 @@ export function MeetingFileImport({ id }: { id: string }) {
   const complete = useScopedMutation(
     async (v: { duration_ms: number; parts: number; skipped: number }) => {
       const closed = await meetingIntelService.completeRecording(id, v);
-      const analysed = await meetingIntelService.analyse(id).catch(() => null);
+      const analysed = await meetingIntelService
+        .analyseAll(id)
+        .catch(() => null);
       return { closed, analysed };
     },
     {

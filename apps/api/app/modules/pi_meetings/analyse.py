@@ -11,9 +11,12 @@ produce an insight that is rejected.
 """
 
 import asyncio
+import hashlib
 import json
 import logging
+import time
 from collections.abc import Sequence
+from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from typing import Any
 from uuid import UUID
@@ -35,6 +38,10 @@ CHUNK_CHARS = 12_000
 MAX_PARALLEL = 2
 RETRIES = 4  # calls per chunk when the gateway says it is unavailable or rate limited
 RETRY_PAUSE_S = 3.0  # waited after the first failure, twice that after the second, and so on
+# A whole-meeting analysis (`run`) is finished over several calls, so it never has to wait out a
+# long rate limit inside one request: it saves what it read, and stops after this much time.
+ANALYSE_BUDGET_S = 40.0
+CHUNK_PAUSES = (3.0, 6.0)  # waits inside one call before it gives up on a part for now
 PURPOSE = "pi_meeting_analyse"
 
 SYSTEM = """You read the transcript of a business meeting between a small-business owner and the
@@ -80,8 +87,10 @@ class AnalysisFailed(Exception):
     """The model could not be reached or returned nothing usable: the job retries."""
 
 
-def chunks(segments: Sequence[Segment], limit: int = CHUNK_CHARS) -> list[list[Segment]]:
-    """Whole segments grouped so that no chunk is much longer than `limit` characters."""
+def chunks(segments: Sequence[Segment], limit: int | None = None) -> list[list[Segment]]:
+    """Whole segments grouped so that no chunk is much longer than `limit` characters (the
+    current `CHUNK_CHARS` when not given: read when called, not when the module was loaded)."""
+    limit = CHUNK_CHARS if limit is None else limit
     out: list[list[Segment]] = []
     current: list[Segment] = []
     size = 0
@@ -162,6 +171,124 @@ async def analyse(
         if isinstance(value, ModelOutput):
             proposed.extend(value.insights)
     return validate(proposed, segments, speakers)
+
+
+@dataclass
+class Progress:
+    """Where a whole-meeting analysis stands after one call."""
+
+    done: int
+    total: int
+    dropped: list[str] = field(default_factory=list)
+
+    @property
+    def complete(self) -> bool:
+        return self.done >= self.total
+
+
+def signature(parts: Sequence[Sequence[Segment]]) -> str:
+    """Names this transcript as it is cut now: more lines, edited lines or a new chunk size make a
+    different signature, and then the progress saved for the old one is not used."""
+    text = f"{CHUNK_CHARS}|" + ",".join(
+        f"{p[0].ordinal}-{p[-1].ordinal}-{sum(len(s.text) for s in p)}" for p in parts
+    )
+    return hashlib.sha256(text.encode()).hexdigest()[:32]
+
+
+async def _read_part(
+    manager: Any, scope: WorkspaceScope, part: Sequence[Segment], language: str
+) -> Any:
+    """One model call for one part, tried again after a short pause while the gateway says no."""
+    from app.ai.errors import GatewayUnavailable
+    from app.ai.types import Message
+
+    for attempt in range(len(CHUNK_PAUSES) + 1):
+        try:
+            result = await manager.complete_structured(
+                scope,
+                ModelOutput,
+                alias="fast",
+                purpose=PURPOSE,
+                messages=[Message.system(SYSTEM), Message.user(_payload(part, language))],
+                temperature=0.1,
+                max_tokens=1800,
+            )
+            return result.value
+        except GatewayUnavailable:
+            if attempt == len(CHUNK_PAUSES):
+                raise
+            await asyncio.sleep(CHUNK_PAUSES[attempt])
+    raise AssertionError("unreachable")  # the loop returns or raises
+
+
+async def run(
+    session: AsyncSession,
+    scope: WorkspaceScope,
+    meeting: Any,
+    manager: Any,
+    segments: Sequence[Segment],
+    *,
+    speakers: Sequence[str] = (),
+    language: str = "",
+    budget_s: float | None = None,
+) -> Progress:
+    """Analyse the whole transcript, one part at a time, and keep what each part gave at once.
+
+    A part's insights are saved (and committed) as soon as it is read, and the meeting remembers
+    which parts are done (`analysis_progress`), so a call that runs out of time or meets a rate
+    limit stops cleanly and the next call carries on from the next unread part. Every call reads
+    at least one part, so repeating the call always gets somewhere unless the provider refuses
+    everything, which raises `AnalysisFailed` (and what was already read stays saved)."""
+    from app.ai.errors import GatewayUnavailable
+
+    limit = ANALYSE_BUDGET_S if budget_s is None else budget_s
+    parts = chunks(segments)
+    name = signature(parts)
+    state = meeting.analysis_progress or {}
+    if state.get("signature") != name:
+        # the first call for this transcript (or it changed): what is still pending is replaced; an
+        # insight a person has reviewed is never touched
+        await session.execute(
+            delete(PiMeetingInsight).where(
+                PiMeetingInsight.tenant_id == scope.tenant_id,
+                PiMeetingInsight.environment_id == scope.environment_id,
+                PiMeetingInsight.meeting_id == meeting.id,
+                PiMeetingInsight.review_status == "pending",
+            )
+        )
+        state = {"signature": name, "total": len(parts), "done": []}
+    done = set(state.get("done", []))
+    started = time.monotonic()
+    read_now = 0
+    dropped: list[str] = []
+    for index, part in enumerate(parts):
+        if index in done:
+            continue
+        if read_now and time.monotonic() - started >= limit:
+            break
+        try:
+            value = await _read_part(manager, scope, part, language)
+        except GatewayUnavailable as exc:
+            logger.warning("pi_meeting_analyse_part_refused", extra={"part": index})
+            if read_now == 0:
+                meeting.analysis_progress = {**state, "done": sorted(done)}
+                raise AnalysisFailed(type(exc).__name__) from exc
+            break  # the next part would be refused too: keep what was read, come back later
+        except Exception as exc:  # noqa: BLE001 - anything else is a failure of this call
+            logger.warning("pi_meeting_analyse_failed", exc_info=True)
+            raise AnalysisFailed(type(exc).__name__) from exc
+        proposed = list(value.insights) if isinstance(value, ModelOutput) else []
+        kept, why = validate(proposed, part, speakers)
+        dropped.extend(why)
+        await store_part(session, scope, meeting.id, kept, part[0].ordinal, part[-1].ordinal + 1)
+        done.add(index)
+        read_now += 1
+        meeting.analysis_progress = {**state, "done": sorted(done)}
+        await session.commit()  # this part is safe even if the next one fails or the request ends
+    progress = Progress(done=len(done), total=len(parts), dropped=dropped)
+    if progress.complete:
+        meeting.analysis_progress = None
+    return progress
 
 
 async def store(

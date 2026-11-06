@@ -302,13 +302,28 @@ function TranscriptImport({ id }: { id: string }) {
 }
 
 function AnalyseButton({ meeting }: { meeting: Detail }) {
-  const run = useScopedMutation(() => meetingIntelService.analyse(meeting.id), {
-    invalidate: [KEY(meeting.id), ["pi", "meeting-intel"]],
-    success: (r) =>
-      r.insights === 0
-        ? "Analysed: nothing worth noting"
-        : `Analysed: ${r.insights} to review`,
-  });
+  const [progress, setProgress] = useState<{
+    done: number;
+    total: number;
+  } | null>(null);
+  const run = useScopedMutation(
+    async () => {
+      try {
+        return await meetingIntelService.analyseAll(meeting.id, (done, total) =>
+          setProgress({ done, total }),
+        );
+      } finally {
+        setProgress(null);
+      }
+    },
+    {
+      invalidate: [KEY(meeting.id), ["pi", "meeting-intel"]],
+      success: (r) =>
+        r.insights === 0
+          ? "Analysed: nothing worth noting"
+          : `Analysed: ${r.insights} to review`,
+    },
+  );
   const again = meeting.insights.length > 0;
   return (
     <Button
@@ -316,7 +331,12 @@ function AnalyseButton({ meeting }: { meeting: Detail }) {
       loading={run.isPending}
       onClick={() => run.mutate(undefined)}
     >
-      <Sparkles /> {again ? "Analyse again" : "Analyse with pi"}
+      <Sparkles />{" "}
+      {run.isPending && progress && progress.total > 0
+        ? `Reading part ${Math.min(progress.done + 1, progress.total)} of ${progress.total}…`
+        : again
+          ? "Analyse again"
+          : "Analyse with pi"}
     </Button>
   );
 }

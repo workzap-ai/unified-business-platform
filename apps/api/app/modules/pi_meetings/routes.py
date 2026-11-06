@@ -494,33 +494,57 @@ async def run_analysis(
     manager = build_llm_manager(state.settings, state.http, state.sessions)
     meeting.attempts += 1
     try:
-        kept, dropped = await analysis.analyse(
-            manager,
+        progress = await analysis.run(
+            session,
             scope,
+            meeting,
+            manager,
             segments,
             speakers=sorted({s.speaker for s in segments if s.speaker}),
             language=meeting.language,
         )
     except analysis.AnalysisFailed:
+        # nothing could be read this time; parts read on earlier calls stay saved
         meeting.status = "failed"
         meeting.failure_reason = "The analysis could not be completed; try again"
         await session.commit()
         raise BusinessRuleViolation(
             "MEETING_ANALYSIS_FAILED", "The analysis could not be completed; try again", 502
         ) from None
-    written = await analysis.store(session, scope, meeting.id, kept)
-    meeting.status = "review"
-    meeting.failure_reason = ""
-    await record(
-        session,
-        "pi.meeting_analysed",
-        scope=scope,
-        entity_type="pi_meeting",
-        entity_id=meeting.id,
-        details={"insights": written, "dropped": len(dropped)},
+    pending = int(
+        await session.scalar(
+            select(func.count())
+            .select_from(PiMeetingInsight)
+            .where(
+                PiMeetingInsight.tenant_id == scope.tenant_id,
+                PiMeetingInsight.environment_id == scope.environment_id,
+                PiMeetingInsight.meeting_id == meeting.id,
+                PiMeetingInsight.review_status == "pending",
+            )
+        )
+        or 0
     )
+    # until every part is read the meeting is still being analysed (the page keeps asking)
+    meeting.status = "review" if progress.complete else "analysing"
+    meeting.failure_reason = ""
+    if progress.complete:
+        await record(
+            session,
+            "pi.meeting_analysed",
+            scope=scope,
+            entity_type="pi_meeting",
+            entity_id=meeting.id,
+            details={"insights": pending, "dropped": len(progress.dropped)},
+        )
     await session.commit()
-    return {**_view(meeting), "insights": written, "dropped": len(dropped)}
+    return {
+        **_view(meeting),
+        "insights": pending,
+        "dropped": len(progress.dropped),
+        "complete": progress.complete,
+        "done": progress.done,
+        "total": progress.total,
+    }
 
 
 class ReviewInput(BaseModel):

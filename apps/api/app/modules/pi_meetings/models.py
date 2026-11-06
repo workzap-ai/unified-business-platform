@@ -12,6 +12,7 @@ stored as a stated fact.
 """
 
 from datetime import datetime
+from typing import Any
 from uuid import UUID
 
 from sqlalchemy import (
@@ -29,7 +30,7 @@ from sqlalchemy import (
     Uuid,
     text,
 )
-from sqlalchemy.dialects.postgresql import TSVECTOR
+from sqlalchemy.dialects.postgresql import JSONB, TSVECTOR
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.shared.models import WorkspaceRow, scoped_fk, workspace_args
@@ -119,6 +120,9 @@ class PiMeeting(WorkspaceRow):
     held_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     retention_until: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     attempts: Mapped[int] = mapped_column(Integer, default=0, server_default="0")
+    # which parts of the transcript the analysis has already read (analyse.py `run`), so a long
+    # meeting on a rate-limited provider is finished over several calls, not lost on the first
+    analysis_progress: Mapped[dict[str, Any] | None] = mapped_column(JSONB, nullable=True)
     failure_reason: Mapped[str] = mapped_column(String(300), default="", server_default="")
     created_by: Mapped[UUID | None] = mapped_column(Uuid, nullable=True)
 
