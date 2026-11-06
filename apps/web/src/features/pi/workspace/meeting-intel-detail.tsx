@@ -30,6 +30,14 @@ import {
   type MeetingDetail as Detail,
   type Segment,
 } from "../meeting-intel-service";
+import {
+  Accent,
+  GroupHeading,
+  ReviewProgress,
+  SkeletonRows,
+  SpeakerAvatar,
+  statusTone,
+} from "./meeting-intel-parts";
 
 const KEY = (id: string) => ["pi", "meeting-intel", id];
 
@@ -63,7 +71,7 @@ export function MeetingDetail({
         }
         description={
           meeting && (
-            <Badge tone={meeting.status === "failed" ? "danger" : "pi"}>
+            <Badge tone={statusTone(meeting.status)}>
               {MEETING_STATUS_LABELS[meeting.status] ?? meeting.status}
             </Badge>
           )
@@ -90,7 +98,7 @@ export function MeetingDetail({
       {query.isError ? (
         <ErrorState error={query.error} onRetry={() => void query.refetch()} />
       ) : !meeting ? (
-        <div className="h-40 animate-pulse rounded-xl bg-surface-sunken" />
+        <SkeletonRows count={2} />
       ) : (
         <Body meeting={meeting} />
       )}
@@ -276,17 +284,49 @@ function Insights({ meeting }: { meeting: Detail }) {
       />
     );
   const bySegment = new Map(meeting.segments.map((s) => [s.ordinal, s]));
+  const reviewed = meeting.insights.filter(
+    (i) => i.review_status !== "pending",
+  ).length;
+  const groups = [
+    {
+      key: "said",
+      title: "Said in the meeting",
+      hint: "Quoted from the transcript, with its source lines.",
+      tone: "success" as const,
+      items: meeting.insights.filter((i) => i.basis === "stated"),
+    },
+    {
+      key: "pi",
+      title: "pi's conclusions",
+      hint: "pi's own reading. Never saved as something the customer said.",
+      tone: "pi" as const,
+      items: meeting.insights.filter((i) => i.basis !== "stated"),
+    },
+  ].filter((g) => g.items.length > 0);
   return (
-    <ul className="space-y-3">
-      {meeting.insights.map((i) => (
-        <InsightCard
-          key={i.id}
-          meeting={meeting}
-          insight={i}
-          sources={i.segment_refs.flatMap((r) => bySegment.get(r) ?? [])}
-        />
+    <div className="space-y-5">
+      <ReviewProgress done={reviewed} total={meeting.insights.length} />
+      {groups.map((g) => (
+        <section key={g.key} aria-label={g.title}>
+          <GroupHeading title={g.title} hint={g.hint} count={g.items.length} />
+          <ul className="space-y-3">
+            {g.items.map((i) => (
+              <li key={i.id}>
+                <Accent tone={g.tone}>
+                  <InsightCard
+                    meeting={meeting}
+                    insight={i}
+                    sources={i.segment_refs.flatMap(
+                      (r) => bySegment.get(r) ?? [],
+                    )}
+                  />
+                </Accent>
+              </li>
+            ))}
+          </ul>
+        </section>
       ))}
-    </ul>
+    </div>
   );
 }
 
@@ -319,7 +359,7 @@ function InsightCard({
   const pending = i.review_status === "pending";
   const needsLink = meeting.customer_id === null;
   return (
-    <li>
+    <div>
       <Card>
         <CardBody className="space-y-2.5">
           <div className="flex flex-wrap items-center gap-1.5">
@@ -421,26 +461,38 @@ function InsightCard({
           )}
         </CardBody>
       </Card>
-    </li>
+    </div>
   );
 }
 
 function Transcript({ segments }: { segments: Segment[] }) {
+  // the same speaker keeps the same colour all the way down
+  const order = [...new Set(segments.map((s) => s.speaker || "Speaker"))];
   return (
     <Card>
       <CardBody>
-        <ol className="space-y-2">
-          {segments.map((s) => (
-            <li key={s.ordinal} className="text-[13px] leading-relaxed">
-              <span className="font-semibold">{s.speaker || "Speaker"}</span>
-              {clock(s.start_ms) && (
-                <span className="ml-1.5 text-xs text-muted-foreground">
-                  {clock(s.start_ms)}
-                </span>
-              )}
-              <span className="block break-words">{s.text}</span>
-            </li>
-          ))}
+        <ol className="max-h-[32rem] space-y-3 overflow-y-auto pr-1">
+          {segments.map((s) => {
+            const name = s.speaker || "Speaker";
+            return (
+              <li key={s.ordinal} className="flex gap-2.5">
+                <SpeakerAvatar name={name} index={order.indexOf(name)} />
+                <div className="min-w-0 flex-1">
+                  <p className="text-xs">
+                    <span className="font-semibold">{name}</span>
+                    {clock(s.start_ms) && (
+                      <span className="ml-1.5 text-muted-foreground">
+                        {clock(s.start_ms)}
+                      </span>
+                    )}
+                  </p>
+                  <p className="mt-0.5 rounded-xl rounded-tl-sm bg-surface-muted px-3 py-2 text-[13px] leading-relaxed break-words">
+                    {s.text}
+                  </p>
+                </div>
+              </li>
+            );
+          })}
         </ol>
       </CardBody>
     </Card>

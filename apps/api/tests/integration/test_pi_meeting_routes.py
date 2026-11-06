@@ -126,3 +126,15 @@ async def test_import_analyse_approve_search_and_delete(api, business_db, monkey
     assert gone.status_code == 200 and gone.json() == {"deleted": True}
     assert (await api.get(f"{BASE}/{mid}")).status_code == 404
     await pi.close()
+
+
+async def test_an_imported_transcript_is_redacted_before_it_is_stored(api, business_db):
+    pi, conv, scope = await workspace(api, business_db, "366000009")
+    await switch_on(api)
+    mid = (await api.post(BASE, json=body())).json()["id"]
+    text = "Customer: call me on 0311 2546598 about the stock"
+    assert (await api.post(f"{BASE}/{mid}/transcript", json={"text": text})).status_code == 200
+    detail = (await api.get(f"{BASE}/{mid}")).json()
+    stored = " ".join(s["text"] for s in detail["segments"])
+    assert "2546598" not in stored and "stock" in stored
+    await pi.close()

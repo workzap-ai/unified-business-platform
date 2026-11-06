@@ -10,3 +10,8 @@ def test_a_name_becomes_a_numbered_speaker_and_roles_are_kept():
     assert labels[1] == "Speaker 2" and labels[2] == "Customer"
     assert labels[4] != labels[1]  # an explicit "Speaker 2" never merges with a generated one
     assert not any("Ahmed" in label or "Sara" in label for label in labels)
+
+
+def test_an_unlabelled_opening_line_is_speaker_1_and_a_named_speaker_is_not():
+    out = _lines("hello there\nAhmed: hi")
+    assert out[0][0] == "Speaker 1" and out[1][0] == "Speaker 2"

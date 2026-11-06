@@ -349,6 +349,9 @@ def _lines(text: str) -> list[tuple[str, str]]:
     out: list[tuple[str, str]] = []
     seen: dict[str, str] = {}  # label as written -> label as stored
     current = "Speaker 1"
+    first = next((ln.strip() for ln in text.splitlines() if ln.strip()), "")
+    if first and not SPEAKER_LINE.match(first):
+        seen["speaker 1"] = "Speaker 1"  # an unlabelled opening is Speaker 1: nobody else gets it
     for raw in text.splitlines():
         line = raw.strip()
         if not line:

@@ -1,7 +1,14 @@
 "use client";
 
 import { useState } from "react";
-import { AudioLines, Plus, Search } from "lucide-react";
+import {
+  AudioLines,
+  ChevronRight,
+  Link2Off,
+  ListChecks,
+  Plus,
+  Search,
+} from "lucide-react";
 import { relativeTime } from "@/lib/format";
 import { Button } from "@/components/ui/button";
 import { Badge, Card, CardBody } from "@/components/ui/display";
@@ -32,6 +39,12 @@ import {
   type Meeting,
 } from "../meeting-intel-service";
 import { MeetingDetail } from "./meeting-intel-detail";
+import {
+  IconTile,
+  SkeletonRows,
+  StatTile,
+  statusTone,
+} from "./meeting-intel-parts";
 
 export function MeetingIntelPage() {
   return (
@@ -64,6 +77,7 @@ function MeetingList({ open }: { open: (id: string) => void }) {
     { enabled: searched.length >= 2 },
   );
   const items = query.data?.items ?? [];
+  const unlinked = items.filter((m) => !m.customer_id).length;
   return (
     <PageShell>
       <PageHeader
@@ -152,7 +166,7 @@ function MeetingList({ open }: { open: (id: string) => void }) {
           />
         )
       ) : query.isPending ? (
-        <div className="h-40 animate-pulse rounded-xl bg-surface-sunken" />
+        <SkeletonRows />
       ) : items.length === 0 ? (
         <EmptyState
           icon={AudioLines}
@@ -160,11 +174,28 @@ function MeetingList({ open }: { open: (id: string) => void }) {
           description="Add a meeting, paste its transcript, and pi lists the problems, decisions and next steps for you to review."
         />
       ) : (
-        <ul className="space-y-3">
-          {items.map((m) => (
-            <MeetingRow key={m.id} meeting={m} onOpen={open} />
-          ))}
-        </ul>
+        <>
+          <div className="mb-4 grid gap-3 sm:grid-cols-3">
+            <StatTile icon={AudioLines} label="Meetings" value={items.length} />
+            <StatTile
+              icon={ListChecks}
+              tone="warning"
+              label="Ready to review"
+              value={items.filter((m) => m.status === "review").length}
+            />
+            <StatTile
+              icon={Link2Off}
+              tone={unlinked === 0 ? "neutral" : "danger"}
+              label="Not linked to a customer"
+              value={unlinked}
+            />
+          </div>
+          <ul className="space-y-3">
+            {items.map((m) => (
+              <MeetingRow key={m.id} meeting={m} onOpen={open} />
+            ))}
+          </ul>
+        </>
       )}
       <NewMeetingDialog
         open={creating}
@@ -187,24 +218,34 @@ function MeetingRow({
 }) {
   return (
     <li>
-      <Card>
-        <CardBody className="flex flex-wrap items-center gap-3">
+      <Card className="transition-colors hover:border-border-strong hover:bg-surface-muted/50 motion-reduce:transition-none">
+        <CardBody className="p-0">
           <button
             type="button"
             onClick={() => onOpen(m.id)}
-            className="min-w-0 flex-1 text-left"
+            className="flex w-full items-center gap-3 rounded-xl p-4 text-left focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
           >
-            <span className="block truncate text-[14px] font-semibold">
-              {m.title || "Meeting"}
+            <IconTile
+              icon={AudioLines}
+              tone={m.status === "failed" ? "danger" : "pi"}
+            />
+            <span className="min-w-0 flex-1">
+              <span className="block truncate text-[14px] font-semibold">
+                {m.title || "Meeting"}
+              </span>
+              <span className="text-xs text-muted-foreground">
+                {m.created_at ? relativeTime(m.created_at) : ""}
+                {m.customer_id ? "" : " · not linked to a customer"}
+              </span>
             </span>
-            <span className="text-xs text-muted-foreground">
-              {m.created_at ? relativeTime(m.created_at) : ""}
-              {m.customer_id ? "" : " · not linked to a customer"}
-            </span>
+            <Badge tone={statusTone(m.status)}>
+              {MEETING_STATUS_LABELS[m.status] ?? m.status}
+            </Badge>
+            <ChevronRight
+              className="size-4 shrink-0 text-muted-foreground"
+              aria-hidden="true"
+            />
           </button>
-          <Badge tone={m.status === "failed" ? "danger" : "pi"}>
-            {MEETING_STATUS_LABELS[m.status] ?? m.status}
-          </Badge>
         </CardBody>
       </Card>
     </li>
