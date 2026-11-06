@@ -132,6 +132,49 @@ not built: it needs a working voice provider and the spoken-reply gate). Code: `
   speaks), the `pi_mode` per meeting, and phase 2 (streaming speech-to-text, voice activity detection,
   the linter gate on every spoken sentence, text-to-speech, interruption, a mute button).
 
+### pi in the meeting, phase 2: pi talks with the person on the link
+
+What it is, and is not: **a spoken conversation between pi and ONE person who opens the meeting link**
+(an intake call). It is not pi inside a Zoom or Meet call: a meeting link carries no audio between
+people, so pi cannot join a conversation between several. That needs a bot in the call (Recall.ai or
+similar), which is not built. Code: `voice.py` (what pi may say), `voice_routes.py`; migration 0062;
+web: `meeting-voice-join.tsx` (the person's page) and `meeting-pi-mode.tsx` (the staff selector).
+
+- **Off by default, twice.** Workspace flag `brain.meeting_voice` (with `meeting_intel` and `meeting_guests`)
+  and the meeting's `pi_mode`. `PATCH /pi/meeting-intel/{id}/pi-mode` with `off`, `listen` or `speak`
+  (`pi.meetings.record`; `speak` needs the flag, 403 `MEETING_VOICE_OFF`, and a recorded consent). Migration
+  0062 adds `pi_meetings.pi_mode` (NOT NULL default `off`, CHECK).
+- **Mute is instant.** Every turn re-reads `pi_mode` and the flag; otherwise 409 `PI_NOT_SPEAKING`, and the
+  page tells the person and ends. Nothing is written after a mute.
+- **A turn.** `POST /public/meeting-join/guest/pi-turn` with the guest token in `X-Guest-Token`. No file: pi's
+  opening (the fixed AI disclosure plus the first question; a reload gets the same words again). With a clip
+  (one thing said, at most 600 KB / 45 s): speech-to-text, redaction (numbers out), the person's line is
+  stored, pi's reply is written, judged and stored. Silence stores nothing and costs no model call.
+- **What pi may say is decided by code.** The model writes; `voice.allowed` accepts only one short question
+  that ends the reply, with no price (`insight_rules.PRICE`), no ask for money, a card, a password, a code or
+  an ID number, and nothing the reply linter (`constitution.lint`, the same one as pi's chat) calls a hard
+  violation (selling, promising, advice). Anything else, a repeated question, or a model that is down is
+  replaced by the fixed safe line (`constitution.safe_fallback`). A closing thank-you (no question) is allowed
+  only when the person said they are done.
+- **Transcript.** pi is the speaker `pi (AI)` (role team; a guest cannot take that name). Spoken lines are
+  numbered from 100,000,000 one after another so the conversation reads in order; a meeting used this way
+  is the conversation, not mixed with recorded parts. Audit `pi.meeting_pi_turn`: counts only.
+- **Caps.** One turn at a time per meeting (advisory lock), 200 exchanges per meeting, the guest routes'
+  per-IP and per-token limits, and the link's own expiry and revoke.
+- **The person's page** (`/join/<token>` when the host set `speak`): a different consent that says they are
+  talking with an AI, the microphone, a volume check to notice when a sentence ends (no model), one clip per
+  sentence, pi's reply spoken by the browser's own speech, and the microphone is not listened to while pi
+  speaks. "Stop" ends and leaves.
+- **Honest limits.** pi's voice is the browser's built-in one (quality and Urdu support depend on the
+  device); there is no server text-to-speech yet (the gateway has none: ElevenLabs or similar would be a new
+  provider). The volume check cannot tell speech from noise, and pi can be heard by the microphone without a
+  headset. Latency is speech-to-text plus one model call per turn (not measured). One person per
+  conversation: several guests on one link share one thread. **Not tested with a real microphone, a real
+  speech-to-text key or a real person**: the server is covered by tests with fakes, the page by typecheck.
+- **Before turning it on for a workspace:** the opening and every reply should be heard once by a person on a
+  real call; the OpenAI and Anthropic quota (credit) problem should be fixed so the model is not rate
+  limited in the middle of a sentence.
+
 ### Live meetings (Zoom, Google Meet, in person) and the complete transcript
 
 Decision (owner, 2026-11-06): live capture from the browser, no bot and no platform approval. The person

@@ -64,12 +64,16 @@ export const MEETING_STATUS_LABELS: Record<string, string> = {
   failed: "Needs a retry",
 };
 
+export const PI_MODES = ["off", "listen", "speak"] as const;
+export type PiMode = (typeof PI_MODES)[number];
+
 export const meetingSchema = z.object({
   id: z.string(),
   title: z.string().catch(""),
   customer_id: z.string().nullable().catch(null),
   source: z.string().catch("upload"),
   status: z.string().catch("created"),
+  pi_mode: z.enum(PI_MODES).catch("off"),
   language: z.string().catch(""),
   consent_at: z.string().nullable().catch(null),
   has_recording: z.boolean().catch(false),
@@ -197,6 +201,15 @@ export const meetingIntelService = {
           .catch([]),
       }),
       { body: { question }, timeoutMs: 60_000 },
+    ),
+  // What pi does in this meeting: nothing, suggest to the staff (listen), or talk with the person
+  // on the link (speak). Switching away from speak mutes pi at once.
+  setPiMode: (id: string, mode: PiMode) =>
+    apiRequest(
+      "PATCH",
+      `${BASE}/${id}/pi-mode`,
+      z.object({ pi_mode: z.enum(PI_MODES).catch("off") }),
+      { body: { mode } },
     ),
   // Staff only: the next question to ask and the checklist so far, from the newest lines.
   pilotSuggest: (id: string, checklist: string[]) =>

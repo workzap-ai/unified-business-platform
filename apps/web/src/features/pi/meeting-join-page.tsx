@@ -10,6 +10,7 @@ import { Label } from "@/components/ui/controls";
 import { Notice } from "@/components/app/states";
 import { ApiError } from "@/services/api-client";
 import { meetingJoinService } from "./meeting-join-service";
+import { MeetingVoiceJoin } from "./meeting-voice-join";
 
 /**
  * The page a meeting link opens (`/join/<token>`), with no sign-in. The person sees what is
@@ -243,6 +244,14 @@ export function MeetingJoinPage({ token }: { token: string }) {
           The meeting may have ended, the link may have expired, or the host
           closed it. Ask the host for a new link.
         </Notice>
+      </Shell>
+    );
+
+  // the host set pi to talk with whoever opens this link: a different page, with its own consent
+  if (look.data.pi_voice)
+    return (
+      <Shell>
+        <MeetingVoiceJoin token={token} title={look.data.title} />
       </Shell>
     );
 

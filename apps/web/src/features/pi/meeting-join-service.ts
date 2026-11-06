@@ -12,7 +12,12 @@ const BASE = "/public/meeting-join";
 
 export const meetingJoinService = {
   look: (token: string) =>
-    apiRequest("GET", `${BASE}/${token}`, z.object({ title: z.string() })),
+    apiRequest(
+      "GET",
+      `${BASE}/${token}`,
+      // `pi_voice`: the host has set pi to talk with the person who opens this link
+      z.object({ title: z.string(), pi_voice: z.boolean().catch(false) }),
+    ),
   join: (token: string, input: { name: string; consent: boolean }) =>
     apiRequest(
       "POST",
@@ -42,6 +47,29 @@ export const meetingJoinService = {
       {
         body: form,
         timeoutMs: 120_000,
+        headers: { "X-Guest-Token": guestToken },
+      },
+    );
+  },
+  // One turn of the spoken conversation with pi. With no clip it is pi's opening; with a clip
+  // (one thing the person said) it is the answer to that. The reply is for the person to hear.
+  piTurn: (guestToken: string, clip?: { audio: Blob; durationMs: number }) => {
+    const form = new FormData();
+    if (clip) {
+      form.set("duration_ms", String(Math.round(clip.durationMs)));
+      form.set("file", clip.audio, "clip");
+    }
+    return apiRequest(
+      "POST",
+      `${BASE}/guest/pi-turn`,
+      z.object({
+        heard: z.boolean().catch(false),
+        reply: z.string().catch(""),
+        done: z.boolean().catch(false),
+      }),
+      {
+        body: form,
+        timeoutMs: 60_000,
         headers: { "X-Guest-Token": guestToken },
       },
     );

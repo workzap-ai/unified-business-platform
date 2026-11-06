@@ -46,6 +46,7 @@ import { MeetingFileImport } from "./meeting-file-import";
 import { MeetingAsk } from "./meeting-ask";
 import { MeetingInvite } from "./meeting-invite";
 import { MeetingPilot } from "./meeting-pilot";
+import { MeetingPiMode } from "./meeting-pi-mode";
 import { MeetingRecordingPlayer } from "./meeting-recording-player";
 import {
   Accent,
@@ -151,6 +152,7 @@ function Body({ meeting }: { meeting: Detail }) {
         <MeetingFileImport id={meeting.id} />
       )}
       {recording && <MeetingInvite id={meeting.id} />}
+      {recording && <MeetingPiMode meeting={meeting} />}
       {recording && live && <MeetingPilot id={meeting.id} />}
       {meeting.has_recording && !live && can("pi.meetings.recording") && (
         <MeetingRecordingPlayer

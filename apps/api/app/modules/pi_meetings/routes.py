@@ -73,6 +73,7 @@ def _view(m: PiMeeting) -> dict[str, Any]:
         "customer_id": str(m.customer_id) if m.customer_id else None,
         "source": m.source,
         "status": m.status,
+        "pi_mode": m.pi_mode,
         "language": m.language,
         "consent_at": m.consent_at.isoformat() if m.consent_at else None,
         "has_recording": bool(m.recording_key),

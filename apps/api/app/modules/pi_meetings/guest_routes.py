@@ -94,6 +94,7 @@ Token = Annotated[str, Path(pattern=TOKEN_PATTERN)]
 JOINABLE = frozenset({"created", "uploaded", "transcribing"})
 MAX_NAME = 60
 RESERVED_LABEL = "Speaker 1"  # the host's own lines: a guest can never take it
+RESERVED_LABELS = frozenset({RESERVED_LABEL.lower(), "pi (ai)"})  # and pi's own speaker
 
 
 def new_token() -> str:
@@ -118,6 +119,12 @@ def system_scope(tenant_id: UUID, environment_id: UUID) -> WorkspaceScope:
 async def guests_enabled(session: AsyncSession, scope: WorkspaceScope) -> bool:
     brain = (await settings_row(session, scope)).response_rules.get("brain") or {}
     return brain.get("meeting_intel") is True and brain.get("meeting_guests") is True
+
+
+async def voice_enabled(session: AsyncSession, scope: WorkspaceScope) -> bool:
+    """pi may talk on links only when the workspace has switched on both links and voice."""
+    brain = (await settings_row(session, scope)).response_rules.get("brain") or {}
+    return await guests_enabled(session, scope) and brain.get("meeting_voice") is True
 
 
 async def _require_enabled(session: AsyncSession, scope: WorkspaceScope) -> None:
@@ -360,8 +367,11 @@ async def look(token: Token, request: Request, session: Session) -> dict[str, An
     found = await open_invite(session, token)
     if found is None:
         raise HTTPException(status_code=404)
-    _, meeting, _ = found
-    return {"title": meeting.title}
+    _, meeting, scope = found
+    return {
+        "title": meeting.title,
+        "pi_voice": meeting.pi_mode == "speak" and await voice_enabled(session, scope),
+    }
 
 
 class JoinInput(BaseModel):
@@ -462,7 +472,7 @@ async def _free_label(
                 func.lower(PiMeetingParticipant.label) == candidate.lower(),
             )
         )
-        if exists is None and candidate.lower() != RESERVED_LABEL.lower():
+        if exists is None and candidate.lower() not in RESERVED_LABELS:
             return candidate
     return f"Participant {slot}"
 

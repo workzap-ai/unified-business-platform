@@ -46,6 +46,7 @@ MEETING_STATUSES = (
     "failed",
 )
 PARTICIPANT_ROLES = ("customer", "staff", "other", "unknown")
+PI_MODES = ("off", "listen", "speak")  # what pi does in a meeting: nothing, suggest, or talk
 MEDIA_KINDS = ("audio", "video")
 INSIGHT_KINDS = (
     "summary",
@@ -91,6 +92,7 @@ class PiMeeting(WorkspaceRow):
         CheckConstraint(_in("source", MEETING_SOURCES), name="source"),
         CheckConstraint(_in("status", MEETING_STATUSES), name="status"),
         CheckConstraint("attempts >= 0", name="attempts"),
+        CheckConstraint(_in("pi_mode", PI_MODES), name="pi_mode"),
     )
     customer_id: Mapped[UUID | None] = mapped_column(Uuid, nullable=True)
     title: Mapped[str] = mapped_column(String(200), default="", server_default="")
@@ -123,6 +125,7 @@ class PiMeeting(WorkspaceRow):
     # which parts of the transcript the analysis has already read (analyse.py `run`), so a long
     # meeting on a rate-limited provider is finished over several calls, not lost on the first
     analysis_progress: Mapped[dict[str, Any] | None] = mapped_column(JSONB, nullable=True)
+    pi_mode: Mapped[str] = mapped_column(String(8), default="off", server_default="off")
     failure_reason: Mapped[str] = mapped_column(String(300), default="", server_default="")
     created_by: Mapped[UUID | None] = mapped_column(Uuid, nullable=True)
 
