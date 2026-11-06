@@ -198,6 +198,26 @@ export const meetingIntelService = {
       }),
       { body: { question }, timeoutMs: 60_000 },
     ),
+  // Staff only: the next question to ask and the checklist so far, from the newest lines.
+  pilotSuggest: (id: string, checklist: string[]) =>
+    apiRequest(
+      "POST",
+      `${BASE}/${id}/pilot/suggest`,
+      z.object({
+        question: z.string().catch(""),
+        lines_read: z.number().catch(0),
+        checklist: z
+          .array(
+            z.object({
+              text: z.string(),
+              done: z.boolean().catch(false),
+              refs: z.array(z.number()).catch([]),
+            }),
+          )
+          .catch([]),
+      }),
+      { body: { checklist }, timeoutMs: 45_000 },
+    ),
   setSpeakerRole: (id: string, speakerId: string, role: SpeakerRole) =>
     apiRequest("PATCH", `${BASE}/${id}/speakers/${speakerId}`, speakerSchema, {
       body: { role },

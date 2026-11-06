@@ -104,6 +104,33 @@ production) the migration pasted by the owner. Phase 3 needs a Zoom app and Goog
 - Limits: one question at a time (no follow-up memory); a question about the whole of a long meeting
   ("summarise everything") is answered from the matching parts only: use the analysis for that.
 
+### pi in the meeting, phase 1: pi suggests (staff only)
+
+Plan: pi attends a meeting, first by listening and suggesting (this phase), then by speaking (phase 2,
+not built: it needs a working voice provider and the spoken-reply gate). Code: `pilot.py`,
+`pilot_routes.py`; web: the "pi suggests" card on a live meeting.
+
+- `POST /pi/meeting-intel/{id}/pilot/suggest` with `{"checklist": [...]}` (up to 8 items of 80 characters).
+  Permission `pi.meetings.record`, flags `brain.meeting_intel` and `brain.meeting_pilot` (default off,
+  403 `MEETING_PILOT_OFF`). pi says nothing to the customer: the answer goes to the person running the
+  meeting only.
+- It reads the newest lines (up to 80 lines / 8,000 characters), with each speaker's role, and the titles
+  of the customer's last five problems on the Problem Map (so it does not ask about them again).
+- The model proposes, the code decides. A checklist item is ticked only when the model cites a line it was
+  shown. A question is shown only when it is one question, ends the text, is at most 200 characters, has
+  no price (`insight_rules.PRICE`), no ask for money, a card, a password, a code or an ID number, and is
+  not what the team just said. Otherwise the question is dropped and the ticks stay.
+- Audit `pi.meeting_suggested`: counts only. Provider failure: 502 `MEETING_PILOT_UNAVAILABLE` after one
+  quick retry; the card says "No suggestion right now" and asks again in 45 seconds.
+- **Honest limit: lag.** The transcript is built from recorded parts (audio 4 minutes, video 2), so a
+  suggestion can be up to one part behind what was just said. Live use needs much shorter parts; that
+  changes the transcript order windows and the guest caps, so it is a separate change.
+- The checklist is kept in the browser only (not saved), and the card is not hidden until the first call
+  finds the flag off.
+- Not built yet: the customer-facing "pi (AI) is here" notice and consent wording (needed before pi
+  speaks), the `pi_mode` per meeting, and phase 2 (streaming speech-to-text, voice activity detection,
+  the linter gate on every spoken sentence, text-to-speech, interruption, a mute button).
+
 ### Live meetings (Zoom, Google Meet, in person) and the complete transcript
 
 Decision (owner, 2026-11-06): live capture from the browser, no bot and no platform approval. The person

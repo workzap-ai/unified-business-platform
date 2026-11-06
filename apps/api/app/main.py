@@ -69,6 +69,7 @@ from app.modules.pi_customer.second_step import router as pi_customer_second_ste
 from app.modules.pi_meetings.guest_routes import public_router as pi_meeting_join_router
 from app.modules.pi_meetings.guest_routes import router as pi_meeting_guest_router
 from app.modules.pi_meetings.media_routes import router as pi_meeting_media_router
+from app.modules.pi_meetings.pilot_routes import router as pi_meeting_pilot_router
 from app.modules.pi_meetings.qa_routes import router as pi_meeting_qa_router
 from app.modules.pi_meetings.recording_routes import router as pi_meeting_recording_router
 from app.modules.pi_meetings.routes import router as pi_meeting_intel_router
@@ -130,6 +131,7 @@ ROUTERS = [
     pi_meeting_board_router,
     pi_meeting_intel_router,
     pi_meeting_qa_router,
+    pi_meeting_pilot_router,
     pi_meeting_recording_router,
     pi_meeting_media_router,
     pi_meeting_guest_router,
