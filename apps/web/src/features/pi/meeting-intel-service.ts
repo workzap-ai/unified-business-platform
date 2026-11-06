@@ -107,8 +107,20 @@ export const segmentSchema = z.object({
 });
 export type Segment = z.infer<typeof segmentSchema>;
 
+export const SPEAKER_ROLES = ["customer", "staff", "other", "unknown"] as const;
+export type SpeakerRole = (typeof SPEAKER_ROLES)[number];
+
+const speakerSchema = z.object({
+  id: z.string(),
+  label: z.string(),
+  role: z.enum(SPEAKER_ROLES).catch("unknown"),
+});
+export type Speaker = z.infer<typeof speakerSchema>;
+
 const detailSchema = meetingSchema.extend({
   participants: z.array(z.string()).catch([]),
+  // who each speaker is, as confirmed by a person; "unknown" until then
+  speakers: z.array(speakerSchema).catch([]),
   // every line of the transcript; `segments` is one page of it
   segments_total: z.number().catch(0),
   segments: z.array(segmentSchema).catch([]),
@@ -162,6 +174,10 @@ export const meetingIntelService = {
   linkCustomer: (id: string, customerId: string) =>
     apiRequest("PATCH", `${BASE}/${id}/customer`, meetingSchema, {
       body: { customer_id: customerId },
+    }),
+  setSpeakerRole: (id: string, speakerId: string, role: SpeakerRole) =>
+    apiRequest("PATCH", `${BASE}/${id}/speakers/${speakerId}`, speakerSchema, {
+      body: { role },
     }),
   importTranscript: (id: string, text: string) =>
     apiRequest(

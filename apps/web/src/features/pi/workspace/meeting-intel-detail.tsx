@@ -34,9 +34,11 @@ import {
   INSIGHT_LABELS,
   MEETING_STATUS_LABELS,
   meetingIntelService,
+  SPEAKER_ROLES,
   type Insight,
   type MeetingDetail as Detail,
   type Segment,
+  type SpeakerRole,
 } from "../meeting-intel-service";
 import { MeetingMap } from "./meeting-map";
 import { MeetingRecorder } from "./meeting-recorder";
@@ -532,6 +534,59 @@ function InsightCard({
   );
 }
 
+const ROLE_LABEL: Record<SpeakerRole, string> = {
+  unknown: "Not sure yet",
+  customer: "The customer",
+  staff: "Our team",
+  other: "Someone else",
+};
+
+/**
+ * Who is who. A speaker stays "Not sure yet" until a person says otherwise, and only what a
+ * speaker confirmed as the customer said is saved to the customer's memory as their own words.
+ */
+function SpeakerRoles({ meeting }: { meeting: Detail }) {
+  const { can } = useSession();
+  const set = useScopedMutation(
+    (v: { id: string; role: SpeakerRole }) =>
+      meetingIntelService.setSpeakerRole(meeting.id, v.id, v.role),
+    { invalidate: [KEY(meeting.id)], success: "Saved" },
+  );
+  if (meeting.speakers.length === 0) return null;
+  const editable = can("pi.meetings.record") && !set.isPending;
+  return (
+    <div className="space-y-2 rounded-xl border border-border p-3">
+      <p className="text-xs text-muted-foreground">
+        Say who each speaker is. Only words from a speaker marked “The customer”
+        are saved to the customer&apos;s memory as what they said; mark them
+        before you approve the findings.
+      </p>
+      <ul className="space-y-2">
+        {meeting.speakers.map((s) => (
+          <li key={s.id} className="flex flex-wrap items-center gap-2">
+            <span className="min-w-24 text-[13px] font-medium">{s.label}</span>
+            <NativeSelect
+              aria-label={`Who is ${s.label}`}
+              className="max-w-48"
+              value={s.role}
+              disabled={!editable}
+              onChange={(e) =>
+                set.mutate({ id: s.id, role: e.target.value as SpeakerRole })
+              }
+            >
+              {SPEAKER_ROLES.map((r) => (
+                <option key={r} value={r}>
+                  {ROLE_LABEL[r]}
+                </option>
+              ))}
+            </NativeSelect>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
 function Transcript({ meeting }: { meeting: Detail }) {
   const live = meeting.status === "transcribing";
   const [more, setMore] = useState<Segment[]>([]);
@@ -587,6 +642,7 @@ function Transcript({ meeting }: { meeting: Detail }) {
             </a>
           </Button>
         </div>
+        <SpeakerRoles meeting={meeting} />
         <ol ref={list} className="max-h-[32rem] space-y-3 overflow-y-auto pr-1">
           {segments.map((s) => {
             const name = s.speaker || "Speaker";

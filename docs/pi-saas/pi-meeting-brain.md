@@ -11,7 +11,7 @@ Branch: `pi/meeting-brain`. Flag: `response_rules.brain.meeting_intel` (default 
 |---|---|---|
 | PMB-0 | Stabilise: fix stale tests, record baseline | Done (see below) |
 | PMB-1 | Meeting-to-Brain core: tables, ingest, transcribe, analyse, approve, apps/web UI | Done except stored audio: data layer, analysis, brain bridge, API, UI, transcript import, **browser recording with speech-to-text** (below) |
-| PMB-2 | Brain strengthening: speaker-to-owner mapping, contradiction detection | Not started |
+| PMB-2 | Brain strengthening: speaker-to-owner mapping, contradiction detection | Speaker mapping done; contradiction detection not started |
 | PMB-3 | Zoom and Google Meet via platform APIs (no bot) | Not started |
 | PMB-4 | Native video (LiveKit) | Not started |
 
@@ -73,8 +73,16 @@ production) the migration pasted by the owner. Phase 3 needs a Zoom app and Goog
 - Parts of at most 8 MB, so the provider's 25 MB limit and request timeouts never apply to a long meeting.
 - Consent is checked again on every part. A reviewed meeting is not reopened (409).
 - Speech-to-text cannot tell speakers apart: every segment belongs to "Speaker 1" of unknown role, so
-  nothing is treated as the customer's own words until a person confirms the speaker (PMB-2 adds the
-  mapping). Segment times inside a part are proportional to text length (an estimate); part offsets are exact.
+  nothing is treated as the customer's own words until a person confirms the speaker. Segment times
+  inside a part are proportional to text length (an estimate); part offsets are exact.
+- **Speaker mapping.** `PATCH /pi/meeting-intel/{id}/speakers/{participant_id}` with `{"role":
+  "customer"|"staff"|"other"|"unknown"}` (permission `pi.meetings.record`, audit `pi.meeting_speaker_set`
+  with ids and the old and new role only). The meeting detail lists `speakers` (id, label, role) and the
+  transcript tab shows a "who is who" selector. `brain_bridge._customer_said` reads the role at approval
+  time: a problem is written to the Problem Map as the customer's words only when every cited line is
+  from a speaker marked customer. **Map the speakers before approving**: an insight approved while its
+  speaker is unknown is marked reviewed and not written (the note says why), and changing the role
+  afterwards does not write it retroactively. No migration (the role column existed).
 
 ### Live meetings (Zoom, Google Meet, in person) and the complete transcript
 

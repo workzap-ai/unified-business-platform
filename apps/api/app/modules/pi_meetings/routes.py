@@ -277,8 +277,8 @@ async def get_meeting(
                 .limit(PAGE)
             )
         ).all()
-    people = {
-        p.id: p.label
+    roles = {
+        p.id: p
         for p in (
             await session.scalars(
                 select(PiMeetingParticipant).where(
@@ -289,6 +289,7 @@ async def get_meeting(
             )
         ).all()
     }
+    people = {pid: p.label for pid, p in roles.items()}
     insights = (
         await session.scalars(
             select(PiMeetingInsight)
@@ -312,6 +313,10 @@ async def get_meeting(
     return {
         **_view(meeting),
         "participants": sorted(people.values()),
+        "speakers": [
+            {"id": str(p.id), "label": p.label, "role": p.role}
+            for p in sorted(roles.values(), key=lambda p: p.label)
+        ],
         "segments_total": total,
         "segments": [
             {
@@ -349,6 +354,43 @@ async def link_customer(
     )
     await session.commit()
     return _view(meeting)
+
+
+class SpeakerInput(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    role: str = Field(pattern="^(customer|staff|other|unknown)$")
+
+
+@router.patch("/{meeting_id}/speakers/{participant_id}")
+async def set_speaker_role(
+    meeting_id: UUID, participant_id: UUID, data: SpeakerInput, scope: Scope, session: Session
+) -> dict[str, Any]:
+    """A person says who a speaker is. Only a speaker confirmed here as the customer lets what they
+    said be written to the customer's memory as their own words (`brain_bridge._customer_said`)."""
+    await _gate(session, scope, "pi.meetings.record")
+    meeting = await _meeting(session, scope, meeting_id)
+    speaker = await session.scalar(
+        select(PiMeetingParticipant).where(
+            PiMeetingParticipant.tenant_id == scope.tenant_id,
+            PiMeetingParticipant.environment_id == scope.environment_id,
+            PiMeetingParticipant.meeting_id == meeting.id,
+            PiMeetingParticipant.id == participant_id,
+        )
+    )
+    if speaker is None:
+        raise ResourceNotFound
+    before = speaker.role
+    speaker.role = data.role
+    await record(
+        session,
+        "pi.meeting_speaker_set",
+        scope=scope,
+        entity_type="pi_meeting",
+        entity_id=meeting.id,
+        details={"participant_id": str(speaker.id), "from": before, "to": data.role},
+    )
+    await session.commit()
+    return {"id": str(speaker.id), "label": speaker.label, "role": speaker.role}
 
 
 class TranscriptInput(BaseModel):
