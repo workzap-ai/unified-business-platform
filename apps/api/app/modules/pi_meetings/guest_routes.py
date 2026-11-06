@@ -51,6 +51,7 @@ from app.modules.pi_meetings.models import (
 )
 from app.modules.pi_meetings.recording_routes import (
     GUEST_RANGE_START,
+    HOST_PART_MS,
     ISO_LANGUAGE,
     MAX_PARTS,
     PART_STRIDE,
@@ -478,13 +479,15 @@ GUEST_MAX_SEQ = 600  # ten hours of one-minute parts
 GUEST_MIN_GAP_S = 20  # a new part this soon after the last is not a person talking: it is refused
 GUEST_SEQ_SLACK = 5  # parts a guest may be ahead of the minutes they have actually been in
 GUEST_TTL = timedelta(hours=12)  # a guest token is good for a long meeting, not for days
-WINDOW_MS = 4 * 60_000  # the host's part length: guest lines sort into the same window
-MINUTES = WINDOW_MS // GUEST_PART_MS  # one-minute slots in a window
+WINDOW_MS = HOST_PART_MS  # the host's part length: guest lines sort into the same window
+MINUTES = max(
+    1, WINDOW_MS // GUEST_PART_MS
+)  # guest-minute slots in a window (1 while both are a minute)
 
 
 def guest_base(offset_ms: int, slot: int) -> int | None:
     """The first segment number for this guest's part. Lines are numbered inside the stretch of the
-    host's four-minute window in which they were spoken, minute first and guest second, so within
+    host's part (window) in which they were spoken, minute first and guest second, so within
     the guests' half of a window the order is the order they spoke, and a guest part replaces only
     itself (the number carries the guest's own slot). None when the time is outside what a meeting
     can hold."""

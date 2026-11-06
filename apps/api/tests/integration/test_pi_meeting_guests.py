@@ -235,7 +235,7 @@ def say(api, token, seq=0, mime="audio/webm;codecs=opus", data=WEBM, duration="6
 def host(api, mid, index, offset_ms):
     return api.post(
         f"{BASE}/{mid}/recording/parts",
-        data={"index": str(index), "offset_ms": str(offset_ms), "duration_ms": "240000"},
+        data={"index": str(index), "offset_ms": str(offset_ms), "duration_ms": "60000"},
         files={"file": ("part.webm", WEBM, "audio/webm;codecs=opus")},
     )
 
@@ -259,7 +259,7 @@ async def test_guest_lines_sort_with_the_hosts_in_the_order_they_were_spoken(
     ali, sara = await joined(api, invite, "Ali"), await joined(api, invite, "Sara")
 
     voice.text = "Host one."
-    assert (await host(api, mid, 0, 0)).status_code == 200  # minutes 0 to 4
+    assert (await host(api, mid, 0, 0)).status_code == 200  # the first minute
     voice.text = "Ali speaks in minute one."
     await at(business_db, 70_000)
     assert (await say(api, ali)).json() == {"segments": 1}
@@ -267,23 +267,23 @@ async def test_guest_lines_sort_with_the_hosts_in_the_order_they_were_spoken(
     await at(business_db, 75_000)  # each guest's first part fixes where their minutes sit
     assert (await say(api, sara)).status_code == 200
     voice.text = "Host two."
-    assert (await host(api, mid, 1, 240_000)).status_code == 200  # minutes 4 to 8
+    assert (await host(api, mid, 1, MINUTE)).status_code == 200  # the second minute
     voice.text = "Ali speaks in minute five."
     assert (await say(api, ali, seq=4)).status_code == 200  # four minutes after Ali's first part
 
     detail = (await api.get(f"{BASE}/{mid}")).json()
     assert [(s["speaker"], s["text"]) for s in detail["segments"]] == [
         ("Speaker 1", "Host one."),
+        ("Speaker 1", "Host two."),  # the host's second minute, then the guests of that minute
         ("Ali", "Ali speaks in minute one."),
         ("Sara", "Sara speaks in minute one too."),
-        ("Speaker 1", "Host two."),
         ("Ali", "Ali speaks in minute five."),
     ]
     assert detail["status"] == "transcribing"
     await pi.close()
 
 
-async def test_inside_a_window_guests_are_in_the_order_of_their_minutes(api, business_db, voice):
+async def test_guests_are_in_the_order_of_their_minutes(api, business_db, voice):
     pi, conv, scope = await workspace(api, business_db, "366600016")
     await switch_on(api)
     mid, invite = await made(api)
@@ -538,16 +538,18 @@ async def test_a_guests_words_are_redacted_and_the_audio_is_not_kept(api, busine
 def test_guest_numbers_stay_inside_their_slice_of_the_window():
     seen = set()
     for slot in range(1, 21):
-        for minute in range(4):
-            base = guest_routes.guest_base(minute * 60_000 + 5, slot)
+        for within in (0, 5, 59_999):  # anywhere inside the first one-minute window
+            base = guest_routes.guest_base(within, slot)
             assert 500 <= base and base + guest_routes.GUEST_SEGMENTS <= 1000
-            lines = set(range(base, base + guest_routes.GUEST_SEGMENTS))
-            assert not lines & seen  # no two guest parts ever share a line number
-            seen |= lines
-    # minute first, then guest: any guest's minute 0 sorts before every guest's minute 1
+        base = guest_routes.guest_base(5, slot)
+        lines = set(range(base, base + guest_routes.GUEST_SEGMENTS))
+        assert not lines & seen  # no two guests in a window ever share a line number
+        seen |= lines
+    # window first, then guest: any guest's first minute sorts before every guest's second
     assert max(guest_routes.guest_base(0, s) for s in range(1, 21)) < min(
         guest_routes.guest_base(60_000, s) for s in range(1, 21)
     )
-    assert guest_routes.guest_base(240_000, 1) >= 1000  # the next window is the next thousand
+    assert guest_routes.guest_base(60_000, 1) >= 1000  # the next window is the next thousand
+    assert guest_routes.WINDOW_MS == 60_000 == guest_routes.GUEST_PART_MS
     assert guest_routes.guest_base(0, 21) is None and guest_routes.guest_base(0, 0) is None
     assert guest_routes.pack(["a", "b", "c", "d", "e", "f", "g"], 6) == ["a b", "c d", "e f", "g"]

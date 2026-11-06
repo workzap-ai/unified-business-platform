@@ -51,10 +51,14 @@ router = APIRouter(prefix="/pi/meeting-intel", tags=["pi-meeting-intel"])
 # One part is a few minutes of compressed audio (about 1 MB); the cap is generous but bounded,
 # and well under the speech-to-text provider's own 25 MB limit.
 MAX_PART_BYTES = 8 * 1024 * 1024
-MAX_PARTS = 400  # about 26 hours at five minutes a part
+# The browser cuts the host's audio into one-minute parts, so a line is at most about a minute
+# behind. A guest's part is the same length, and guest lines sort into the host part that covers the
+# same minute (guest_routes.py).
+HOST_PART_MS = 60_000
+MAX_PARTS = 1200  # twenty hours of one-minute parts
 PART_STRIDE = 1000  # segment ordinals reserved per part: re-sending a part replaces its range
 # the first half of a part's range is the host's own lines; the second half belongs to the guests
-# who spoke in the same four minutes (guest_routes.py), so their lines sort into the same stretch
+# who spoke in the same minute (guest_routes.py), so their lines sort into the same stretch
 STAFF_PART_SEGMENTS = 499
 GUEST_RANGE_START = 500
 MAX_PART_MS = 15 * 60 * 1000

@@ -62,7 +62,7 @@ production) the migration pasted by the owner. Phase 3 needs a Zoom app and Goog
 ## Recording and speech-to-text (built 2026-11-06)
 
 - Browser: `apps/web` `meeting-recorder.tsx`. Microphone, or microphone plus a shared call tab (online
-  meetings). The recording is cut into self-contained parts of 4 minutes; each part is sent on its own
+  meetings). The recording is cut into self-contained parts of one minute (it was 4 minutes before phase 1 of "pi in the meeting"); each part is sent on its own
   (3 tries, then skipped and counted) and the screen is kept awake. Needs `microphone=(self)` and
   `display-capture=(self)` in the `Permissions-Policy` header (`next.config.ts`).
 - API: `recording_routes.py`. `POST /pi/meeting-intel/{id}/recording/parts` (multipart: `index`,
@@ -122,9 +122,10 @@ not built: it needs a working voice provider and the spoken-reply gate). Code: `
   not what the team just said. Otherwise the question is dropped and the ticks stay.
 - Audit `pi.meeting_suggested`: counts only. Provider failure: 502 `MEETING_PILOT_UNAVAILABLE` after one
   quick retry; the card says "No suggestion right now" and asks again in 45 seconds.
-- **Honest limit: lag.** The transcript is built from recorded parts (audio 4 minutes, video 2), so a
-  suggestion can be up to one part behind what was just said. Live use needs much shorter parts; that
-  changes the transcript order windows and the guest caps, so it is a separate change.
+- **Lag: about a minute.** The transcript is built from recorded parts, now one minute for the host's audio
+  and for each guest (video parts for storage stay at 2 minutes), so a suggestion is at most about a minute
+  behind, plus the speech-to-text time. A part boundary can cut a word in two (the recorder stops and
+  restarts), which now happens every minute instead of every four.
 - The checklist is kept in the browser only (not saved), and the card is not hidden until the first call
   finds the flag off.
 - Not built yet: the customer-facing "pi (AI) is here" notice and consent wording (needed before pi
@@ -148,7 +149,7 @@ is heard through the shared audio.
 - **The page refreshes by itself** every 15 s while recording (newest 200 lines, findings, "N mapped").
 - **Complete transcript, any length.** `GET .../transcript?offset=&limit=` pages through every line
   (`total`, `next_offset`); `GET .../transcript/download` is one text file of the whole meeting; the detail view
-  reports `segments_total` and the UI reads on to the last line. Parts are capped at 400 (about 26 hours).
+  reports `segments_total` and the UI reads on to the last line. Parts are capped at 1200 (20 hours of one-minute parts).
 - A part already heard and analysed cannot be re-sent (409 `MEETING_PART_ANALYSED`), so insights never point at
   rewritten lines; the recorder counts such a retry as sent.
 - Not covered: a tab closed or a computer asleep during the meeting loses the part being recorded (parts already
@@ -232,10 +233,11 @@ real ceiling is about one call a minute per guest. Deploy note: per-IP limits on
 host's recorder, or by the first guest part if there is no host recording). A guest's first part fixes where
 their minutes sit; part `seq` n is n minutes later, so a retry replaces the same lines, two parts never
 collide and the guest cannot choose the time (only the first part's length, at most 90 s, can nudge it). Line
-numbers: the host's four-minute part owns `[i*1000, i*1000+500)`; guests who spoke in those four minutes share
-`[i*1000+500, i*1000+1000)`, six lines per (minute, guest). So the transcript is in order by four-minute window,
-then host lines, then guest lines by minute and slot. **That is window-level order, not exact: a host line
-and a guest line from the same four minutes are not interleaved by the second.** Lines the findings already
+numbers: the host's one-minute part owns `[i*1000, i*1000+500)`; guests who spoke in that minute share
+`[i*1000+500, i*1000+1000)`, six lines per guest. So the transcript is in order by minute, then host lines,
+then guest lines by slot. **That is minute-level order, not exact: a host line and a guest line from the same
+minute are not interleaved by the second.** (Meetings recorded before the change used four-minute windows; their
+stored order is unchanged, but a guest part re-sent for such a meeting would be placed by the new one-minute rule.) Lines the findings already
 cite are never rewritten (409 `MEETING_PART_ANALYSED`, same as the host's route). A guest never sets the
 meeting language and cannot take the label "Speaker 1".
 

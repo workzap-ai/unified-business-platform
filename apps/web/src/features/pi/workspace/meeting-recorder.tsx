@@ -30,7 +30,7 @@ import { clock, meetingIntelService } from "../meeting-intel-service";
  * Backend: apps/api/app/modules/pi_meetings/recording_routes.py and media_routes.py.
  */
 
-const PART_MS = 4 * 60_000;
+const PART_MS = 60_000; // one minute: live help (pi suggests) is at most about a minute behind
 const VIDEO_PART_MS = 2 * 60_000;
 const MIN_PART_MS = 1_000;
 const TRIES = 3;
