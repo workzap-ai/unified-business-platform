@@ -175,6 +175,29 @@ export const meetingIntelService = {
     apiRequest("PATCH", `${BASE}/${id}/customer`, meetingSchema, {
       body: { customer_id: customerId },
     }),
+  // The answer comes only from this meeting's transcript; `sources` are the lines it cites.
+  ask: (id: string, question: string) =>
+    apiRequest(
+      "POST",
+      `${BASE}/${id}/ask`,
+      z.object({
+        found: z.boolean().catch(false),
+        answer: z.string().catch(""),
+        partial: z.boolean().catch(false),
+        sources: z
+          .array(
+            z.object({
+              ordinal: z.number(),
+              speaker: z.string().catch(""),
+              role: z.string().catch("unknown"),
+              start_ms: z.number().catch(0),
+              text: z.string().catch(""),
+            }),
+          )
+          .catch([]),
+      }),
+      { body: { question }, timeoutMs: 60_000 },
+    ),
   setSpeakerRole: (id: string, speakerId: string, role: SpeakerRole) =>
     apiRequest("PATCH", `${BASE}/${id}/speakers/${speakerId}`, speakerSchema, {
       body: { role },

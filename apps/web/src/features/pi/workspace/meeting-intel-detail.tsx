@@ -43,6 +43,7 @@ import {
 import { MeetingMap } from "./meeting-map";
 import { MeetingRecorder } from "./meeting-recorder";
 import { MeetingFileImport } from "./meeting-file-import";
+import { MeetingAsk } from "./meeting-ask";
 import { MeetingInvite } from "./meeting-invite";
 import { MeetingRecordingPlayer } from "./meeting-recording-player";
 import {
@@ -185,6 +186,7 @@ function Body({ meeting }: { meeting: Detail }) {
               </TabsTrigger>
               <TabsTrigger value="map">Map</TabsTrigger>
               <TabsTrigger value="transcript">Transcript</TabsTrigger>
+              <TabsTrigger value="ask">Ask</TabsTrigger>
             </TabsList>
             {/* the whole-meeting analysis waits until the recording is finished */}
             {canRecord && !live && <AnalyseButton meeting={meeting} />}
@@ -194,6 +196,9 @@ function Body({ meeting }: { meeting: Detail }) {
           </TabsContent>
           <TabsContent value="map" className="mt-4">
             <MeetingMap meeting={meeting} />
+          </TabsContent>
+          <TabsContent value="ask" className="mt-4">
+            <MeetingAsk id={meeting.id} />
           </TabsContent>
           <TabsContent value="transcript" className="mt-4">
             <Transcript

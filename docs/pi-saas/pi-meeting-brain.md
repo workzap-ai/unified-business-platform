@@ -84,6 +84,26 @@ production) the migration pasted by the owner. Phase 3 needs a Zoom app and Goog
   speaker is unknown is marked reviewed and not written (the note says why), and changing the role
   afterwards does not write it retroactively. No migration (the role column existed).
 
+### Ask a meeting (Q&A)
+
+`POST /pi/meeting-intel/{id}/ask` with `{"question"}` (3-300 characters; permission `pi.meetings.read`, the
+`meeting_intel` flag). Code: `qa.py`, `qa_routes.py`; web: the meeting's "Ask" tab.
+
+- One meeting only. A transcript of up to 14,000 characters goes to the model whole; a longer one goes as
+  the lines that match the question's words (Postgres full text, OR of up to 8 words) with two neighbours
+  either side, best match first until the budget is spent, or the start and the end when nothing matches.
+  The answer then says `partial: true` ("pi read the parts that matched").
+- The transcript is data, not instructions. The model returns `found`, `answer`, `refs`. The code keeps
+  an answer only when it cites a line the model was shown; otherwise it is "not said in this meeting".
+  The cited lines come back as `sources`. The answer is redacted (card, ID, phone, e-mail).
+- Each line carries its speaker's role. The model is told to say "the customer" only for a speaker
+  marked customer, and "a speaker" while the role is unknown.
+- Nothing is written to the brain. The audit entry (`pi.meeting_asked`) holds ids, `found`, line counts
+  and the question's length, never its text or the answer. Provider failure: 502
+  `MEETING_ASK_UNAVAILABLE` after two retries with a pause.
+- Limits: one question at a time (no follow-up memory); a question about the whole of a long meeting
+  ("summarise everything") is answered from the matching parts only: use the analysis for that.
+
 ### Live meetings (Zoom, Google Meet, in person) and the complete transcript
 
 Decision (owner, 2026-11-06): live capture from the browser, no bot and no platform approval. The person
