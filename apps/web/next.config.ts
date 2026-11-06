@@ -26,7 +26,20 @@ const nextConfig: NextConfig = {
           { key: "X-Frame-Options", value: "DENY" },
           {
             key: "Permissions-Policy",
-            value: "camera=(self), microphone=(), geolocation=()",
+            value:
+              "camera=(self), microphone=(), display-capture=(), geolocation=()",
+          },
+        ],
+      },
+      {
+        // Only the meetings page records audio. Listed last: when two entries set the same
+        // header for a path, the later one wins. The browser still asks the person each time.
+        source: "/pi/meeting-intel/:path*",
+        headers: [
+          {
+            key: "Permissions-Policy",
+            value:
+              "camera=(self), microphone=(self), display-capture=(self), geolocation=()",
           },
         ],
       },

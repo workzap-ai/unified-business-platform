@@ -168,6 +168,34 @@ export const meetingIntelService = {
       meetingSchema.extend({ lines: z.number(), speakers: z.number() }),
       { body: { text } },
     ),
+  // One recorded part (a few minutes of audio) is transcribed inside the request. Sending the
+  // same index again replaces that part, so a retry never duplicates words. Audio is not kept.
+  uploadPart: (
+    id: string,
+    part: { index: number; offsetMs: number; durationMs: number; audio: Blob },
+  ) => {
+    const form = new FormData();
+    form.set("index", String(part.index));
+    form.set("offset_ms", String(Math.round(part.offsetMs)));
+    form.set("duration_ms", String(Math.round(part.durationMs)));
+    form.set("file", part.audio, "part");
+    return apiRequest(
+      "POST",
+      `${BASE}/${id}/recording/parts`,
+      z.object({ part: z.number(), segments: z.number() }),
+      { body: form, timeoutMs: 120_000 },
+    );
+  },
+  completeRecording: (
+    id: string,
+    input: { duration_ms: number; parts: number; skipped: number },
+  ) =>
+    apiRequest(
+      "POST",
+      `${BASE}/${id}/recording/complete`,
+      meetingSchema.extend({ skipped: z.number().catch(0) }),
+      { body: input },
+    ),
   // Runs the analysis inside the request (a few model calls): allow it longer than the default.
   analyse: (id: string) =>
     apiRequest(

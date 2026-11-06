@@ -30,6 +30,7 @@ import {
   type MeetingDetail as Detail,
   type Segment,
 } from "../meeting-intel-service";
+import { MeetingRecorder } from "./meeting-recorder";
 import {
   Accent,
   GroupHeading,
@@ -117,7 +118,10 @@ function Body({ meeting }: { meeting: Detail }) {
       )}
       {!hasTranscript ? (
         can("pi.meetings.record") ? (
-          <TranscriptImport id={meeting.id} />
+          <div className="space-y-4">
+            <MeetingRecorder id={meeting.id} />
+            <TranscriptImport id={meeting.id} />
+          </div>
         ) : (
           <EmptyState
             icon={FileText}
@@ -224,7 +228,9 @@ function TranscriptImport({ id }: { id: string }) {
     <Card>
       <CardBody className="space-y-3">
         <div>
-          <Label htmlFor="transcript-text">Transcript</Label>
+          <Label htmlFor="transcript-text">
+            Or paste a transcript you have
+          </Label>
           <Textarea
             id="transcript-text"
             rows={12}
@@ -238,8 +244,7 @@ function TranscriptImport({ id }: { id: string }) {
           <p className="mt-1 text-xs text-muted-foreground">
             One line per turn, written as &ldquo;Name: what they said&rdquo;. Up
             to 24,000 characters. Phone, card and ID numbers are removed before
-            anything is stored. Recording and automatic transcription are not
-            available yet.
+            anything is stored.
           </p>
         </div>
         <Button

@@ -66,6 +66,7 @@ from app.modules.pi.solution_routes import router as pi_solutions_router
 from app.modules.pi.staff_review_routes import router as pi_staff_review_router
 from app.modules.pi_customer.routes import router as pi_customer_router
 from app.modules.pi_customer.second_step import router as pi_customer_second_step_router
+from app.modules.pi_meetings.recording_routes import router as pi_meeting_recording_router
 from app.modules.pi_meetings.routes import router as pi_meeting_intel_router
 from app.modules.pi_saas.app_routes import router as pi_app_router
 from app.modules.pi_saas.assistant_routes import operator_router as pi_operator_help_router
@@ -124,6 +125,7 @@ ROUTERS = [
     pi_team_board_router,
     pi_meeting_board_router,
     pi_meeting_intel_router,
+    pi_meeting_recording_router,
     pi_customer_payment_router,
     pi_deals_router,
     pi_brain_documents_router,

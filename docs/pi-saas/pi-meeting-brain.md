@@ -10,7 +10,7 @@ Branch: `pi/meeting-brain`. Flag: `response_rules.brain.meeting_intel` (default 
 | Phase | Scope | Status |
 |---|---|---|
 | PMB-0 | Stabilise: fix stale tests, record baseline | Done (see below) |
-| PMB-1 | Meeting-to-Brain core: tables, ingest, transcribe, analyse, approve, apps/web UI | Not started |
+| PMB-1 | Meeting-to-Brain core: tables, ingest, transcribe, analyse, approve, apps/web UI | Done except stored audio: data layer, analysis, brain bridge, API, UI, transcript import, **browser recording with speech-to-text** (below) |
 | PMB-2 | Brain strengthening: speaker-to-owner mapping, contradiction detection | Not started |
 | PMB-3 | Zoom and Google Meet via platform APIs (no bot) | Not started |
 | PMB-4 | Native video (LiveKit) | Not started |
@@ -58,3 +58,30 @@ Branch: `pi/meeting-brain`. Flag: `response_rules.brain.meeting_intel` (default 
 
 S3 or R2 bucket and keys, STT provider keys and budget, consent and retention decision, and (for
 production) the migration pasted by the owner. Phase 3 needs a Zoom app and Google OAuth verification.
+
+## Recording and speech-to-text (built 2026-11-06)
+
+- Browser: `apps/web` `meeting-recorder.tsx`. Microphone, or microphone plus a shared call tab (online
+  meetings). The recording is cut into self-contained parts of 4 minutes; each part is sent on its own
+  (3 tries, then skipped and counted) and the screen is kept awake. Needs `microphone=(self)` and
+  `display-capture=(self)` in the `Permissions-Policy` header (`next.config.ts`).
+- API: `recording_routes.py`. `POST /pi/meeting-intel/{id}/recording/parts` (multipart: `index`,
+  `offset_ms`, `duration_ms`, `file`) transcribes one part through `LLMManager.transcribe` (alias
+  `stt`) and writes redacted, timestamped segments at ordinals `index * 1000 + n`, so sending a part
+  again replaces it. `POST .../recording/complete` moves the meeting to `analysing`; the existing
+  Analyse button and review flow are unchanged. No migration: it uses the 0057 tables.
+- Parts of at most 8 MB, so the provider's 25 MB limit and request timeouts never apply to a long meeting.
+- Consent is checked again on every part. A reviewed meeting is not reopened (409).
+- Speech-to-text cannot tell speakers apart: every segment belongs to "Speaker 1" of unknown role, so
+  nothing is treated as the customer's own words until a person confirms the speaker (PMB-2 adds the
+  mapping). Segment times inside a part are proportional to text length (an estimate); part offsets are exact.
+
+### Not built yet (needs the owner)
+
+- **The audio is not stored.** It is held in memory for the one speech-to-text call and dropped, so
+  `recording_key` stays empty and a meeting can still be deleted. Storing it needs the S3 or R2 bucket and
+  keys, and the retention decision (proposed 90 days for audio); the write goes in `upload_part`.
+- A speech-to-text key must be configured for alias `stt` (OpenAI `whisper-1`, Groq or Gemini). Without one,
+  a part answers 502 `MEETING_TRANSCRIBE_FAILED` and nothing is stored.
+- Transcription runs inside the request (a part takes seconds). Moving it to an ARQ job (`meeting:<id>:<stage>`)
+  is only needed once parts get long or numerous.
