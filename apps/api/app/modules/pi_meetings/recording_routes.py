@@ -53,6 +53,10 @@ router = APIRouter(prefix="/pi/meeting-intel", tags=["pi-meeting-intel"])
 MAX_PART_BYTES = 8 * 1024 * 1024
 MAX_PARTS = 400  # about 26 hours at five minutes a part
 PART_STRIDE = 1000  # segment ordinals reserved per part: re-sending a part replaces its range
+# the first half of a part's range is the host's own lines; the second half belongs to the guests
+# who spoke in the same four minutes (guest_routes.py), so their lines sort into the same stretch
+STAFF_PART_SEGMENTS = 499
+GUEST_RANGE_START = 500
 MAX_PART_MS = 15 * 60 * 1000
 SEGMENT_CHARS = 1500
 SPEAKER = "Speaker 1"
@@ -170,7 +174,7 @@ async def _recordable(
         .where(
             *mine,
             PiMeetingSegment.ordinal >= index * PART_STRIDE,
-            PiMeetingSegment.ordinal < (index + 1) * PART_STRIDE,
+            PiMeetingSegment.ordinal < index * PART_STRIDE + GUEST_RANGE_START,
         )
         .limit(1)
     )
@@ -245,7 +249,7 @@ async def upload_part(
             PiMeetingSegment.environment_id == scope.environment_id,
             PiMeetingSegment.meeting_id == meeting.id,
             PiMeetingSegment.ordinal >= base,
-            PiMeetingSegment.ordinal < base + PART_STRIDE,
+            PiMeetingSegment.ordinal < base + GUEST_RANGE_START,  # never a guest's lines
         )
     )
     speaker = await _speaker(session, scope, meeting.id)
@@ -255,7 +259,7 @@ async def upload_part(
     kept = 0
     for start, end, words in timed(
         split_sentences(cleaned), offset_ms, duration_ms or MAX_PART_MS // 3
-    )[: PART_STRIDE - 1]:
+    )[:STAFF_PART_SEGMENTS]:
         session.add(
             PiMeetingSegment(
                 tenant_id=scope.tenant_id,

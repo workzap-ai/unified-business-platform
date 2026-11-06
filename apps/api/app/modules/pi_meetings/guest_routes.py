@@ -17,11 +17,13 @@ from datetime import UTC, datetime, timedelta
 from typing import Annotated, Any
 from uuid import UUID
 
-from fastapi import APIRouter, HTTPException, Path, Request
+from fastapi import APIRouter, File, Form, HTTPException, Path, Request, UploadFile
 from pydantic import BaseModel, ConfigDict, Field
-from sqlalchemy import func, select, text
+from sqlalchemy import delete, func, select, text
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.ai.errors import GatewayUnavailable, MediaValidationError
+from app.ai.manager import build_llm_manager
 from app.core import rate_limit
 from app.modules.access.dependencies import Scope, Session
 from app.modules.audit.service import record
@@ -32,6 +34,16 @@ from app.modules.pi_meetings.models import (
     PiMeetingGuest,
     PiMeetingInvite,
     PiMeetingParticipant,
+    PiMeetingSegment,
+)
+from app.modules.pi_meetings.recording_routes import (
+    GUEST_RANGE_START,
+    ISO_LANGUAGE,
+    MAX_PARTS,
+    PART_STRIDE,
+    join_spoken_digits,
+    split_sentences,
+    timed,
 )
 from app.modules.pi_meetings.routes import _gate, _meeting
 from app.shared.errors import BusinessRuleViolation
@@ -100,7 +112,7 @@ async def create_invite(
             "MEETING_NOT_OPEN", "This meeting can no longer take more recordings", 409
         )
     now = datetime.now(UTC)
-    for old in await _active_invites(session, scope, meeting.id):
+    for old in await _active_invites(session, scope, meeting.id, expired_too=True):
         old.revoked_at = now
     token = new_token()
     invite = PiMeetingInvite(
@@ -127,21 +139,19 @@ async def create_invite(
 
 
 async def _active_invites(
-    session: AsyncSession, scope: WorkspaceScope, meeting_id: UUID
+    session: AsyncSession, scope: WorkspaceScope, meeting_id: UUID, *, expired_too: bool = False
 ) -> list[PiMeetingInvite]:
-    return list(
-        (
-            await session.scalars(
-                select(PiMeetingInvite).where(
-                    PiMeetingInvite.tenant_id == scope.tenant_id,
-                    PiMeetingInvite.environment_id == scope.environment_id,
-                    PiMeetingInvite.meeting_id == meeting_id,
-                    PiMeetingInvite.revoked_at.is_(None),
-                    PiMeetingInvite.expires_at > datetime.now(UTC),
-                )
-            )
-        ).all()
-    )
+    """The meeting's links that are not revoked: those still open for joining, or with
+    `expired_too` also those past their expiry (whose guests keep sending until it is revoked)."""
+    where = [
+        PiMeetingInvite.tenant_id == scope.tenant_id,
+        PiMeetingInvite.environment_id == scope.environment_id,
+        PiMeetingInvite.meeting_id == meeting_id,
+        PiMeetingInvite.revoked_at.is_(None),
+    ]
+    if not expired_too:
+        where.append(PiMeetingInvite.expires_at > datetime.now(UTC))
+    return list((await session.scalars(select(PiMeetingInvite).where(*where))).all())
 
 
 @router.get("/{meeting_id}/invite")
@@ -192,7 +202,7 @@ async def revoke_invite(meeting_id: UUID, scope: Scope, session: Session) -> dic
     meeting = await _meeting(session, scope, meeting_id)
     now = datetime.now(UTC)
     closed = 0
-    for invite in await _active_invites(session, scope, meeting.id):
+    for invite in await _active_invites(session, scope, meeting.id, expired_too=True):
         invite.revoked_at = now
         closed += 1
     await record(
@@ -383,3 +393,157 @@ async def _free_label(
         )
     )
     return label if exists is None else f"{label[: MAX_NAME - 5]} ({slot})"
+
+
+# ---- public: a guest sends their own audio
+
+
+GUEST_PART_MS = 60_000  # the page cuts a guest's recording into one-minute parts
+GUEST_PART_SLACK_MS = 30_000
+GUEST_MAX_BYTES = 2 * 1024 * 1024  # a minute of speech is a few hundred kilobytes
+GUEST_MAX_TEXT = 12_000
+GUEST_SEGMENTS = 6  # lines a one-minute part can become: its slice of the ordinal range
+GUEST_MIMES = frozenset({"audio/webm", "audio/mp4", "audio/ogg"})
+WINDOW_MS = 4 * 60_000  # the host's part length: guest lines sort into the same window
+SUBPARTS = GUEST_RANGE_START // (20 * GUEST_SEGMENTS)  # minutes per window a guest slot can hold
+
+
+def guest_base(offset_ms: int, slot: int) -> int | None:
+    """The first segment number for this guest's part. Lines are numbered inside the stretch of the
+    host's four-minute window in which they were spoken, so a transcript sorted by number is also
+    in the order it was said, and a guest part replaces only itself: the number carries the guest's
+    own slot. None when the time is outside what a meeting can hold."""
+    window, within = divmod(offset_ms, WINDOW_MS)
+    if window >= MAX_PARTS or not 1 <= slot <= 20:
+        return None
+    minute = min(within // GUEST_PART_MS, SUBPARTS - 1)
+    own = (slot - 1) * SUBPARTS + minute
+    return window * PART_STRIDE + GUEST_RANGE_START + own * GUEST_SEGMENTS
+
+
+def pack(sentences: list[str], into: int) -> list[str]:
+    """At most `into` lines, sentences kept whole and in order."""
+    if len(sentences) <= into:
+        return sentences
+    size = -(-len(sentences) // into)
+    return [" ".join(sentences[i : i + size]) for i in range(0, len(sentences), size)]
+
+
+async def _guest_for(
+    session: AsyncSession, token: str
+) -> tuple[PiMeetingGuest, PiMeeting, WorkspaceScope] | None:
+    """The guest a token belongs to, with their meeting, while everything still allows it: not
+    removed, the link not revoked (an expired link only stops new people joining), the meeting
+    open, the workspace flag on. None otherwise (the caller answers 404)."""
+    guest = await session.scalar(
+        select(PiMeetingGuest).where(PiMeetingGuest.token_hash == digest(token))
+    )
+    if guest is None or guest.removed_at is not None:
+        return None
+    scope = system_scope(guest.tenant_id, guest.environment_id)
+    invite = await session.scalar(
+        select(PiMeetingInvite).where(
+            PiMeetingInvite.tenant_id == guest.tenant_id,
+            PiMeetingInvite.environment_id == guest.environment_id,
+            PiMeetingInvite.id == guest.invite_id,
+        )
+    )
+    if invite is None or invite.revoked_at is not None or not await guests_enabled(session, scope):
+        return None
+    meeting = await session.scalar(
+        select(PiMeeting).where(
+            PiMeeting.tenant_id == guest.tenant_id,
+            PiMeeting.environment_id == guest.environment_id,
+            PiMeeting.id == guest.meeting_id,
+        )
+    )
+    if meeting is None or meeting.consent_at is None or meeting.status not in JOINABLE:
+        return None
+    return guest, meeting, scope
+
+
+@public_router.post("/{token}/parts")
+async def guest_part(
+    token: Token,
+    request: Request,
+    session: Session,
+    file: Annotated[UploadFile, File()],
+    offset_ms: Annotated[int, Form(ge=0)] = 0,
+    duration_ms: Annotated[int, Form(ge=0, le=GUEST_PART_MS + GUEST_PART_SLACK_MS)] = 0,
+) -> dict[str, Any]:
+    """Transcribe one minute of a guest's own microphone and store the words as that guest's lines.
+    The audio is read for the speech-to-text call and never stored. Sending the same part again
+    replaces it. A guest can send nothing but this, and reads nothing."""
+    await _limit(request, token, "part", 400, 200)
+    found = await _guest_for(session, token)
+    if found is None:
+        raise HTTPException(status_code=404)
+    guest, meeting, scope = found
+    base = guest_base(offset_ms, guest.slot)
+    if base is None:
+        raise BusinessRuleViolation("MEETING_PART_INVALID", "This part is outside the meeting", 422)
+    try:
+        audio = await file.read(GUEST_MAX_BYTES + 1)
+    finally:
+        await file.close()
+    if len(audio) > GUEST_MAX_BYTES:
+        raise BusinessRuleViolation("MEETING_AUDIO_TOO_LARGE", "This audio part is too large", 413)
+    mime = (file.content_type or "").split(";")[0].strip().lower()
+    if not audio or mime not in GUEST_MIMES:
+        raise BusinessRuleViolation("MEETING_AUDIO_INVALID", "This is not a recording", 422)
+    language = meeting.language if ISO_LANGUAGE.match(meeting.language) else None
+    state = request.app.state
+    manager = build_llm_manager(state.settings, state.http, state.sessions)
+    meeting.attempts += 1
+    try:
+        result = await manager.transcribe(scope, audio, mime, alias="stt", language=language)
+    except MediaValidationError:
+        raise BusinessRuleViolation(
+            "MEETING_AUDIO_INVALID", "This audio could not be read as a recording", 422
+        ) from None
+    except GatewayUnavailable:
+        raise BusinessRuleViolation(
+            "MEETING_TRANSCRIBE_FAILED", "Speech-to-text is unavailable; try again", 502
+        ) from None
+    audio = b""  # held only for the call above
+    await session.execute(
+        delete(PiMeetingSegment).where(
+            PiMeetingSegment.tenant_id == scope.tenant_id,
+            PiMeetingSegment.environment_id == scope.environment_id,
+            PiMeetingSegment.meeting_id == meeting.id,
+            PiMeetingSegment.ordinal >= base,
+            PiMeetingSegment.ordinal < base + GUEST_SEGMENTS,
+        )
+    )
+    # redact the whole part first, then cut: a card or phone number is never split across lines
+    cleaned = redacted(join_spoken_digits(result.text), GUEST_MAX_TEXT)
+    sentences = pack(split_sentences(cleaned), GUEST_SEGMENTS)
+    lines = timed(sentences, offset_ms, duration_ms or GUEST_PART_MS)[:GUEST_SEGMENTS]
+    for kept, (start, end, words) in enumerate(lines):
+        session.add(
+            PiMeetingSegment(
+                tenant_id=scope.tenant_id,
+                environment_id=scope.environment_id,
+                meeting_id=meeting.id,
+                ordinal=base + kept,
+                start_ms=start,
+                end_ms=max(end, 1),
+                participant_id=guest.participant_id,
+                text=words,
+                text_hash=hashlib.sha256(words.lower().encode()).hexdigest(),
+            )
+        )
+    if not meeting.language and result.language:
+        meeting.language = result.language[:12].lower()
+    meeting.status = "transcribing"
+    meeting.failure_reason = ""
+    await record(
+        session,
+        "pi.meeting_guest_part",
+        scope=scope,
+        entity_type="pi_meeting",
+        entity_id=meeting.id,
+        details={"slot": guest.slot, "segments": len(lines)},
+    )
+    await session.commit()
+    return {"segments": len(lines)}

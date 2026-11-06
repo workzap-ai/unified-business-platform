@@ -3,13 +3,15 @@ consent. The token is the only key and is stored as a hash; a link works only wh
 unexpired, for an open meeting, within its guest limit, and with the workspace flag on."""
 
 from datetime import UTC, datetime, timedelta
+from types import SimpleNamespace
 
 import pytest
 from sqlalchemy import func, select, update
 from test_pi_meeting_data import workspace
 from test_pi_meeting_routes import BASE, body
 
-from app.modules.pi_meetings import guest_routes
+from app.ai.errors import GatewayUnavailable
+from app.modules.pi_meetings import guest_routes, recording_routes
 from app.modules.pi_meetings.models import (
     PiMeeting,
     PiMeetingGuest,
@@ -182,3 +184,191 @@ def test_tokens_are_long_random_and_hashed():
     token = guest_routes.new_token()
     assert len(token) >= 40 and guest_routes.digest(token) != token
     assert len(guest_routes.digest(token)) == 64
+
+
+# ---- guests send their own audio
+
+WEBM = b"\x1a\x45\xdf\xa3" + b"\x00" * 64
+
+
+class Voice:
+    """Speech-to-text that answers with what the test says each caller said."""
+
+    def __init__(self):
+        self.text = "We need a list by Friday."
+        self.fail = False
+
+    async def transcribe(self, scope, audio, mime, **kw):
+        if self.fail:
+            raise GatewayUnavailable()
+        return SimpleNamespace(text=self.text, language="en")
+
+
+@pytest.fixture
+def voice(monkeypatch):
+    v = Voice()
+    monkeypatch.setattr(guest_routes, "build_llm_manager", lambda *a, **k: v)
+    monkeypatch.setattr(recording_routes, "build_llm_manager", lambda *a, **k: v)
+    return v
+
+
+def say(api, token, offset_ms, mime="audio/webm;codecs=opus", data=WEBM, duration="60000"):
+    return api.post(
+        f"{JOIN}/{token}/parts",
+        data={"offset_ms": str(offset_ms), "duration_ms": duration},
+        files={"file": ("part.webm", data, mime)},
+    )
+
+
+def host(api, mid, index, offset_ms):
+    return api.post(
+        f"{BASE}/{mid}/recording/parts",
+        data={"index": str(index), "offset_ms": str(offset_ms), "duration_ms": "240000"},
+        files={"file": ("part.webm", WEBM, "audio/webm;codecs=opus")},
+    )
+
+
+async def joined(api, token, name):
+    response = await api.post(f"{JOIN}/{token}", json={"name": name, "consent": True})
+    return response.json()["guest_token"]
+
+
+async def test_guest_lines_sort_with_the_hosts_in_the_order_they_were_spoken(
+    api, business_db, voice
+):
+    pi, conv, scope = await workspace(api, business_db, "366600010")
+    await switch_on(api)
+    mid, invite = await made(api)
+    ali, sara = await joined(api, invite, "Ali"), await joined(api, invite, "Sara")
+
+    voice.text = "Host one."
+    assert (await host(api, mid, 0, 0)).status_code == 200  # minutes 0 to 4
+    voice.text = "Ali speaks in minute one."
+    assert (await say(api, ali, 70_000)).json() == {"segments": 1}
+    voice.text = "Sara speaks in minute one too."
+    assert (await say(api, sara, 75_000)).status_code == 200
+    voice.text = "Host two."
+    assert (await host(api, mid, 1, 240_000)).status_code == 200  # minutes 4 to 8
+    voice.text = "Ali speaks in minute five."
+    assert (await say(api, ali, 300_000)).status_code == 200
+
+    detail = (await api.get(f"{BASE}/{mid}")).json()
+    lines = [(s["speaker"], s["text"]) for s in detail["segments"]]
+    assert lines == [
+        ("Speaker 1", "Host one."),
+        ("Ali", "Ali speaks in minute one."),
+        ("Sara", "Sara speaks in minute one too."),
+        ("Speaker 1", "Host two."),
+        ("Ali", "Ali speaks in minute five."),
+    ]
+    assert detail["status"] == "transcribing"
+    await pi.close()
+
+
+async def test_a_part_replaces_only_itself_and_the_host_resend_keeps_guest_lines(
+    api, business_db, voice
+):
+    pi, conv, scope = await workspace(api, business_db, "366600011")
+    await switch_on(api)
+    mid, invite = await made(api)
+    ali, sara = await joined(api, invite, "Ali"), await joined(api, invite, "Sara")
+    voice.text = "Ali first."
+    await say(api, ali, 10_000)
+    voice.text = "Sara first."
+    await say(api, sara, 10_000)  # the same minute, another person: not the same lines
+    voice.text = "Ali again."
+    await say(api, ali, 10_000)  # the same part sent again: replaced, not doubled
+    voice.text = "Host."
+    await host(api, mid, 0, 0)
+    voice.text = "Host replaced."
+    await host(api, mid, 0, 0)  # the host resend must not remove the guests lines
+
+    texts = sorted(s["text"] for s in (await api.get(f"{BASE}/{mid}")).json()["segments"])
+    assert texts == ["Ali again.", "Host replaced.", "Sara first."]
+    await pi.close()
+
+
+async def test_a_guest_is_refused_everything_but_their_own_audio(api, business_db, voice):
+    pi, conv, scope = await workspace(api, business_db, "366600012")
+    await switch_on(api)
+    mid, invite = await made(api)
+    ali = await joined(api, invite, "Ali")
+
+    assert (await say(api, "z" * 43, 0)).status_code == 404  # unknown token
+    assert (await say(api, invite, 0)).status_code == 404  # an invite token is not a guest token
+    assert (await say(api, ali, 0, mime="text/plain")).status_code == 422
+    assert (await say(api, ali, 0, data=b"")).status_code == 422
+    assert (await say(api, ali, 0, data=WEBM * 40_000)).status_code == 413
+    assert (await say(api, ali, 0, duration="999999")).status_code == 422
+    assert (await say(api, ali, 10**9)).status_code == 422  # a time no meeting reaches
+    voice.fail = True
+    down = await say(api, ali, 0)
+    assert down.status_code == 502 and down.json()["error"]["code"] == "MEETING_TRANSCRIBE_FAILED"
+    assert (await api.get(f"{BASE}/{mid}")).json()["status"] == "created"  # a guest cannot fail it
+    assert (await api.get(f"{JOIN}/{ali}/parts")).status_code in (404, 405)  # nothing to read
+    await pi.close()
+
+
+async def test_removing_a_guest_or_closing_the_link_or_the_meeting_stops_their_audio(
+    api, business_db, voice
+):
+    pi, conv, scope = await workspace(api, business_db, "366600013")
+    await switch_on(api)
+    mid, invite = await made(api)
+    ali = await joined(api, invite, "Ali")
+    sara = await joined(api, invite, "Sara")
+    omar = await joined(api, invite, "Omar")
+    for token in (ali, sara, omar):
+        assert (await say(api, token, 0)).status_code == 200
+
+    status = (await api.get(f"{BASE}/{mid}/invite")).json()
+    ali_id = next(g["id"] for g in status["guests"] if g["label"] == "Ali")
+    await api.delete(f"{BASE}/{mid}/guests/{ali_id}")
+    assert (await say(api, ali, 0)).status_code == 404  # removed
+    assert (await say(api, sara, 0)).status_code == 200  # the others carry on
+
+    # an expired link only stops new people: someone already in keeps going
+    await business_db.execute(
+        update(PiMeetingInvite).values(expires_at=datetime.now(UTC) - timedelta(minutes=1))
+    )
+    await business_db.commit()
+    assert (await say(api, sara, 0)).status_code == 200
+    assert (await api.post(f"{JOIN}/{invite}", json={"consent": True})).status_code == 404
+
+    await api.delete(f"{BASE}/{mid}/invite")  # revoked: everyone stops
+    assert (await say(api, sara, 0)).status_code == 404
+    assert (await say(api, omar, 0)).status_code == 404
+
+    await business_db.execute(update(PiMeeting).values(status="analysing"))
+    await business_db.commit()
+    assert (await say(api, omar, 0)).status_code == 404
+    await pi.close()
+
+
+async def test_a_guests_words_are_redacted_and_the_audio_is_not_kept(api, business_db, voice):
+    from app.modules.pi_meetings.models import PiMeetingMedia
+
+    pi, conv, scope = await workspace(api, business_db, "366600014")
+    await switch_on(api)
+    mid, invite = await made(api)
+    ali = await joined(api, invite, "Ali")
+    voice.text = "My card is 4111 1111 1111 1111 and it keeps failing."
+    assert (await say(api, ali, 0)).status_code == 200
+    words = " ".join(s["text"] for s in (await api.get(f"{BASE}/{mid}")).json()["segments"])
+    assert "4111" not in words and "failing" in words
+    assert await count(business_db, PiMeetingMedia) == 0
+    await pi.close()
+
+
+def test_guest_numbers_stay_inside_their_slice_of_the_window():
+    seen = set()
+    for slot in range(1, 21):
+        for minute in range(4):
+            base = guest_routes.guest_base(minute * 60_000 + 5, slot)
+            assert 500 <= base and base + guest_routes.GUEST_SEGMENTS <= 1000
+            lines = set(range(base, base + guest_routes.GUEST_SEGMENTS))
+            assert not lines & seen  # no two guest parts ever share a line number
+            seen |= lines
+    assert guest_routes.guest_base(240_000, 1) >= 1000  # the next window is the next thousand
+    assert guest_routes.guest_base(0, 21) is None and guest_routes.guest_base(0, 0) is None
+    assert guest_routes.pack(["a", "b", "c", "d", "e", "f", "g"], 6) == ["a b", "c d", "e f", "g"]
