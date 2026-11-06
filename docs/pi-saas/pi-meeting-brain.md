@@ -144,3 +144,39 @@ is heard through the shared audio.
   a part answers 502 `MEETING_TRANSCRIBE_FAILED` and nothing is stored.
 - Transcription runs inside the request (a part takes seconds). Moving it to an ARQ job (`meeting:<id>:<stage>`)
   is only needed once parts get long or numerous.
+
+## PMB-4: meeting link (plan, not built)
+
+One link per meeting; everyone who opens it records their own microphone into the same meeting, so the
+transcript has a real speaker for each person.
+
+**Flow.** Staff press "Invite" on a meeting (needs `pi.meetings.record`) and copy the link
+`/join/<invite>`. A guest opens it (no sign-in), sees what is recorded and who sees it, gives a name
+(optional: "Participant 2" otherwise) and ticks consent. Their browser records the mic and sends 60-second
+parts; the page shows only "recording" and a stop button, never the transcript or other guests.
+
+**Server.**
+- `pi_meeting_invites` (hash of the invite token, expiry, revoked_at, max guests) and `pi_meeting_guests`
+  (name redacted, hash of the guest token, consent_at, a speaker slot 1..20). Tokens are random, stored only
+  as hashes, shown once. Migration 0060, additive.
+- Public routes `/api/v1/public/meeting-join/...` take the token, never a session; they can only (a) join
+  (b) send parts to THIS meeting, (c) leave. No read route exists for a guest. Per-IP and per-guest rate
+  limits, part size and count caps, one active guest per token, invite closes when the meeting is closed
+  or revoked, and a guest token dies with the meeting.
+- A guest part reuses the staff pipeline (redaction, speech-to-text, `keep` is never offered to guests).
+  Speaker = the guest's participant row (`role` stays `unknown` until staff map it). Segment order is by
+  time: the part's ordinal slot is `(offset_minute * 20 + guest_slot)`, so parts from different people
+  interleave by when they were spoken.
+- Staff see who joined, can remove a guest (their lines stay unless deleted) and revoke the link.
+- Customer erase and meeting delete also remove invites and guests.
+
+**Web.** A public `/join/[token]` page outside the signed-in shell (its own layout, its own
+Permissions-Policy `microphone=(self)`), and an "Invite" card on the meeting page.
+
+**Risks to review before release.** A public write endpoint (abuse, cost of speech-to-text per part,
+cross-tenant isolation, token leakage in logs and referrers), consent per participant, and what a guest
+is told. Gate behind `response_rules.brain.meeting_guests` (off by default); `rule-auditor` on the diff.
+
+**Order of work.** (1) migration, models, token helpers, invite and join routes with tests for isolation,
+expiry, rate limits; (2) guest parts with time-ordered segments; (3) staff invite UI; (4) public join page;
+(5) audit and a live two-person test.
