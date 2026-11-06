@@ -145,40 +145,47 @@ is heard through the shared audio.
 - Transcription runs inside the request (a part takes seconds). Moving it to an ARQ job (`meeting:<id>:<stage>`)
   is only needed once parts get long or numerous.
 
-## PMB-4: meeting link (phases 1 and 2 built, the web pages not)
-
-**Built (phase 1, migration 0060, flag `response_rules.brain.meeting_guests`, default off):** invite and guest tables, staff routes `POST/GET/DELETE /pi/meeting-intel/{id}/invite` and `DELETE .../guests/{id}`, public routes `GET/POST /public/meeting-join/{token}` (look, then join with consent; per-IP and per-token rate limits), hashed tokens, a link that closes with the meeting, expiry, revoke and a guest limit, erase and delete clean up. **Built (phase 2):** `POST /public/meeting-join/{guest_token}/parts` takes one minute of a guest's own microphone (webm/mp4/ogg, up to 2 MB), redacts and transcribes it and stores the words as that guest's lines; the audio is never kept. A guest token works only while the guest is not removed, the link is not revoked (an expired link only stops NEW people joining), the meeting is open and the flag is on, and it reads nothing. Line numbers: the host's four-minute part owns `[i*1000, i*1000+500)` and the guests who spoke in those four minutes share `[i*1000+500, i*1000+1000)`, six lines per (guest slot, minute), so sorting by number is sorting by time, a guest part replaces only itself, and the host's re-send (now limited to its own half) never removes guest lines. The host's analysis of a part reads the whole thousand, so guests are included. Revoking a link closes it even after it expired and stops its guests. **Not built:** the staff invite card and the public join page (mic recording in the browser).
+## PMB-4: meeting link (built, behind `response_rules.brain.meeting_guests`, default off)
 
 One link per meeting; everyone who opens it records their own microphone into the same meeting, so the
-transcript has a real speaker for each person.
+transcript has a real speaker for each person. Migration 0060 (additive: two tables and
+`pi_meetings.recording_started_at`); apply it BEFORE deploying.
 
-**Flow.** Staff press "Invite" on a meeting (needs `pi.meetings.record`) and copy the link
-`/join/<invite>`. A guest opens it (no sign-in), sees what is recorded and who sees it, gives a name
-(optional: "Participant 2" otherwise) and ticks consent. Their browser records the mic and sends 60-second
-parts; the page shows only "recording" and a stop button, never the transcript or other guests.
+**Flow.** Staff press "Make a link" on a meeting (needs `pi.meetings.record`, shown only when the flag is on)
+and copy `/join/<token>` (shown once: only a hash is kept; valid 24 h, up to 10 people). A guest opens it with
+no sign-in, sees what is recorded and who reads it, gives an optional name (redacted), ticks consent, and their
+browser records the mic in one-minute parts. The page shows only "recording" and a stop button, never the
+transcript or other guests. Closing the link, removing a guest, or the meeting ending stops them.
 
-**Server.**
-- `pi_meeting_invites` (hash of the invite token, expiry, revoked_at, max guests) and `pi_meeting_guests`
-  (name redacted, hash of the guest token, consent_at, a speaker slot 1..20). Tokens are random, stored only
-  as hashes, shown once. Migration 0060, additive.
-- Public routes `/api/v1/public/meeting-join/...` take the token, never a session; they can only (a) join
-  (b) send parts to THIS meeting, (c) leave. No read route exists for a guest. Per-IP and per-guest rate
-  limits, part size and count caps, one active guest per token, invite closes when the meeting is closed
-  or revoked, and a guest token dies with the meeting.
-- A guest part reuses the staff pipeline (redaction, speech-to-text, `keep` is never offered to guests).
-  Speaker = the guest's participant row (`role` stays `unknown` until staff map it). Segment order is by
-  time: the part's ordinal slot is `(offset_minute * 20 + guest_slot)`, so parts from different people
-  interleave by when they were spoken.
-- Staff see who joined, can remove a guest (their lines stay unless deleted) and revoke the link.
-- Customer erase and meeting delete also remove invites and guests.
+**Routes.** Staff: `POST /pi/meeting-intel/{id}/recording/start` (the host's recorder starts the meeting clock,
+once), `POST/GET/DELETE .../{id}/invite`, `DELETE .../{id}/guests/{guest}`. Public: `GET/POST
+/public/meeting-join/{token}` (look, then join with consent), `POST .../guest/parts` and `POST .../guest/leave`
+(the guest's own token in the `X-Guest-Token` header, never in a URL).
 
-**Web.** A public `/join/[token]` page outside the signed-in shell (its own layout, its own
-Permissions-Policy `microphone=(self)`), and an "Invite" card on the meeting page.
+**What a guest token can do.** Send audio parts for its own meeting and leave; it reads nothing. It stops
+working when the guest is removed or leaves, the link is revoked (an expired link only stops NEW people),
+the meeting leaves transcribing, the flag is off, or 12 hours after joining.
 
-**Risks to review before release.** A public write endpoint (abuse, cost of speech-to-text per part,
-cross-tenant isolation, token leakage in logs and referrers), consent per participant, and what a guest
-is told. Gate behind `response_rules.brain.meeting_guests` (off by default); `rule-auditor` on the diff.
+**Limits that do not depend on Redis** (the per-IP and per-token Redis counters are an extra layer and fail open):
+one part at a time per guest (database lock, else 429), at least 20 s between parts, a part no further ahead
+than the minutes the guest has been in (+5), at most 1 MB of audio per part, a request body over 1.5 MB is
+refused before it is read, 20 guests per meeting. Speech-to-text is still one billed call per part, so the
+real ceiling is about one call a minute per guest. Deploy note: per-IP limits only work behind the proxy if
+`TRUSTED_PROXY_HOPS` is set; otherwise every guest shares the web server's IP.
 
-**Order of work.** (1) migration, models, token helpers, invite and join routes with tests for isolation,
-expiry, rate limits; (2) guest parts with time-ordered segments; (3) staff invite UI; (4) public join page;
-(5) audit and a live two-person test.
+**Time and order.** The server keeps the meeting clock (`recording_started_at`, set once, atomically, by the
+host's recorder, or by the first guest part if there is no host recording). A guest's first part fixes where
+their minutes sit; part `seq` n is n minutes later, so a retry replaces the same lines, two parts never
+collide and the guest cannot choose the time (only the first part's length, at most 90 s, can nudge it). Line
+numbers: the host's four-minute part owns `[i*1000, i*1000+500)`; guests who spoke in those four minutes share
+`[i*1000+500, i*1000+1000)`, six lines per (minute, guest). So the transcript is in order by four-minute window,
+then host lines, then guest lines by minute and slot. **That is window-level order, not exact: a host line
+and a guest line from the same four minutes are not interleaved by the second.** Lines the findings already
+cite are never rewritten (409 `MEETING_PART_ANALYSED`, same as the host's route). A guest never sets the
+meeting language and cannot take the label "Speaker 1".
+
+**Known gaps.** A guest who reloads the page joins again as a new person (slots are not reused; max 20 per
+meeting, staff cannot free one). A guest's last part is lost if the host closes the meeting first. A guest
+cannot delete their own words (only the host's team can, by deleting the meeting). The meeting title is shown
+on the join page. Consent text is not versioned. The request session is held during the speech-to-text call
+(one per guest at a time, as for the host's own route). Not yet done: a live two-person test with real audio.

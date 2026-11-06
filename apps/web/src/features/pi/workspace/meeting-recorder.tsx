@@ -424,6 +424,8 @@ export function MeetingRecorder({ id }: { id: string }) {
       } catch {
         r.wake = null; // not essential
       }
+      // the meeting's clock starts here, so a guest's lines sort in with the host's; best effort
+      void meetingIntelService.recordingStarted(id).catch(() => undefined);
       if (r.keep) {
         // the server must hold the yes before it stores anything; without it only the words are kept
         try {

@@ -79,9 +79,14 @@ export async function apiRequest<T>(
     signal?: AbortSignal;
     /** Override for slow, one-off operations such as provisioning a workspace. */
     timeoutMs?: number;
+    /** Extra request headers (for example a one-off access token that must stay out of the URL). */
+    headers?: Record<string, string>;
   } = {},
 ): Promise<T> {
-  const headers: Record<string, string> = { Accept: "application/json" };
+  const headers: Record<string, string> = {
+    Accept: "application/json",
+    ...options.headers,
+  };
   const multipart =
     typeof FormData !== "undefined" && options.body instanceof FormData;
   if (expectedWorkspace && !path.startsWith("/auth/")) {

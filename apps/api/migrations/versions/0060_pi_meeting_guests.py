@@ -3,7 +3,7 @@
 Revision ID: 0060_pi_meeting_guests
 Revises: 0059_pi_meeting_media
 
-docs/pi-saas/pi-meeting-brain.md, "PMB-4". Additive only: two new tables, nothing existing is renamed,
+docs/pi-saas/pi-meeting-brain.md, "PMB-4". Additive only: one nullable column on `pi_meetings` (`recording_started_at`) and two new tables, nothing existing is renamed,
 dropped or retyped, nothing is backfilled.
 
 * `pi_meeting_invites`: the link a staff member copies. Only the hash of its token is stored, with an
@@ -81,6 +81,8 @@ def _fk(table: str, column: str, target: str) -> sa.ForeignKeyConstraint:
 
 
 def upgrade() -> None:
+    # when the recording began: the clock every microphone's lines are measured from
+    op.add_column("pi_meetings", sa.Column("recording_started_at", sa.DateTime(timezone=True)))
     op.create_table(
         INVITES,
         sa.Column("meeting_id", sa.Uuid(), nullable=False),
@@ -109,6 +111,9 @@ def upgrade() -> None:
         sa.Column("token_hash", sa.String(length=64), nullable=False),
         sa.Column("consent_at", sa.DateTime(timezone=True), nullable=False),
         sa.Column("removed_at", sa.DateTime(timezone=True), nullable=True),
+        sa.Column("first_offset_ms", sa.Integer(), nullable=True),
+        sa.Column("last_seq", sa.SmallInteger(), nullable=True),
+        sa.Column("last_part_at", sa.DateTime(timezone=True), nullable=True),
         *_base(),
         sa.CheckConstraint("slot BETWEEN 1 AND 20", name=op.f(f"ck_{GUESTS}_slot")),
         _fk(GUESTS, "meeting_id", "pi_meetings"),
@@ -132,3 +137,4 @@ def downgrade() -> None:
     op.drop_index("ix_pi_meeting_invites_meeting", table_name=INVITES)
     op.drop_index("uq_pi_meeting_invites_token", table_name=INVITES)
     op.drop_table(INVITES)
+    op.drop_column("pi_meetings", "recording_started_at")

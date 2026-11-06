@@ -273,6 +273,56 @@ export const meetingIntelService = {
     ),
   transcriptDownloadHref: (id: string) =>
     `${API_BASE}${BASE}/${id}/transcript/download`,
+  // The host's recorder says it has begun: the meeting's clock starts (once). Guests are placed
+  // on this clock by the server.
+  recordingStarted: (id: string) =>
+    apiRequest(
+      "POST",
+      `${BASE}/${id}/recording/start`,
+      z.object({ recording_started_at: z.string().nullable().catch(null) }),
+    ),
+  // The meeting link (people who open it record their own microphone into this meeting).
+  inviteStatus: (id: string) =>
+    apiRequest(
+      "GET",
+      `${BASE}/${id}/invite`,
+      z.object({
+        enabled: z.boolean().catch(false),
+        open: z.boolean().catch(false),
+        expires_at: z.string().nullable().catch(null),
+        guests: z
+          .array(
+            z.object({
+              id: z.string(),
+              slot: z.number(),
+              label: z.string(),
+              joined_at: z.string(),
+              removed: z.boolean().catch(false),
+            }),
+          )
+          .catch([]),
+      }),
+    ),
+  // The token comes back once and is never stored in clear: the page builds the link from it.
+  createInvite: (id: string, input: { hours: number; max_guests: number }) =>
+    apiRequest(
+      "POST",
+      `${BASE}/${id}/invite`,
+      z.object({ token: z.string(), expires_at: z.string() }),
+      { body: input },
+    ),
+  revokeInvite: (id: string) =>
+    apiRequest(
+      "DELETE",
+      `${BASE}/${id}/invite`,
+      z.object({ closed: z.number() }),
+    ),
+  removeGuest: (id: string, guestId: string) =>
+    apiRequest(
+      "DELETE",
+      `${BASE}/${id}/guests/${guestId}`,
+      z.object({ removed: z.boolean() }),
+    ),
   completeRecording: (
     id: string,
     input: { duration_ms: number; parts: number; skipped: number },

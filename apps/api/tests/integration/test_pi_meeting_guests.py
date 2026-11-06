@@ -4,6 +4,7 @@ unexpired, for an open meeting, within its guest limit, and with the workspace f
 
 from datetime import UTC, datetime, timedelta
 from types import SimpleNamespace
+from uuid import UUID
 
 import pytest
 from sqlalchemy import func, select, update
@@ -189,6 +190,8 @@ def test_tokens_are_long_random_and_hashed():
 # ---- guests send their own audio
 
 WEBM = b"\x1a\x45\xdf\xa3" + b"\x00" * 64
+MINUTE = 60_000
+GUEST = f"{JOIN}/guest"
 
 
 class Voice:
@@ -209,13 +212,22 @@ def voice(monkeypatch):
     v = Voice()
     monkeypatch.setattr(guest_routes, "build_llm_manager", lambda *a, **k: v)
     monkeypatch.setattr(recording_routes, "build_llm_manager", lambda *a, **k: v)
+    monkeypatch.setattr(guest_routes, "GUEST_MIN_GAP_S", 0)  # the gap has its own test
     return v
 
 
-def say(api, token, offset_ms, mime="audio/webm;codecs=opus", data=WEBM, duration="60000"):
+async def at(db, spoken_ms):
+    """Put the meeting's clock where a one-minute FIRST part sent now began at `spoken_ms`."""
+    started = datetime.now(UTC) - timedelta(milliseconds=spoken_ms + MINUTE)
+    await db.execute(update(PiMeeting).values(recording_started_at=started))
+    await db.commit()
+
+
+def say(api, token, seq=0, mime="audio/webm;codecs=opus", data=WEBM, duration="60000"):
     return api.post(
-        f"{JOIN}/{token}/parts",
-        data={"offset_ms": str(offset_ms), "duration_ms": duration},
+        f"{GUEST}/parts",
+        headers={"X-Guest-Token": token},
+        data={"seq": str(seq), "duration_ms": duration},
         files={"file": ("part.webm", data, mime)},
     )
 
@@ -233,6 +245,11 @@ async def joined(api, token, name):
     return response.json()["guest_token"]
 
 
+async def lines_of(api, mid):
+    segments = (await api.get(f"{BASE}/{mid}")).json()["segments"]
+    return [(s["speaker"], s["text"]) for s in segments]
+
+
 async def test_guest_lines_sort_with_the_hosts_in_the_order_they_were_spoken(
     api, business_db, voice
 ):
@@ -244,17 +261,18 @@ async def test_guest_lines_sort_with_the_hosts_in_the_order_they_were_spoken(
     voice.text = "Host one."
     assert (await host(api, mid, 0, 0)).status_code == 200  # minutes 0 to 4
     voice.text = "Ali speaks in minute one."
-    assert (await say(api, ali, 70_000)).json() == {"segments": 1}
+    await at(business_db, 70_000)
+    assert (await say(api, ali)).json() == {"segments": 1}
     voice.text = "Sara speaks in minute one too."
-    assert (await say(api, sara, 75_000)).status_code == 200
+    await at(business_db, 75_000)  # each guest's first part fixes where their minutes sit
+    assert (await say(api, sara)).status_code == 200
     voice.text = "Host two."
     assert (await host(api, mid, 1, 240_000)).status_code == 200  # minutes 4 to 8
     voice.text = "Ali speaks in minute five."
-    assert (await say(api, ali, 300_000)).status_code == 200
+    assert (await say(api, ali, seq=4)).status_code == 200  # four minutes after Ali's first part
 
     detail = (await api.get(f"{BASE}/{mid}")).json()
-    lines = [(s["speaker"], s["text"]) for s in detail["segments"]]
-    assert lines == [
+    assert [(s["speaker"], s["text"]) for s in detail["segments"]] == [
         ("Speaker 1", "Host one."),
         ("Ali", "Ali speaks in minute one."),
         ("Sara", "Sara speaks in minute one too."),
@@ -265,6 +283,60 @@ async def test_guest_lines_sort_with_the_hosts_in_the_order_they_were_spoken(
     await pi.close()
 
 
+async def test_inside_a_window_guests_are_in_the_order_of_their_minutes(api, business_db, voice):
+    pi, conv, scope = await workspace(api, business_db, "366600016")
+    await switch_on(api)
+    mid, invite = await made(api)
+    ali, sara = await joined(api, invite, "Ali"), await joined(api, invite, "Sara")
+    voice.text = "Ali in the fourth minute."
+    await at(business_db, 190_000)
+    await say(api, ali)  # slot 1, minute 3
+    voice.text = "Sara in the first minute."
+    await at(business_db, 5_000)
+    await say(api, sara)  # slot 2, minute 0: earlier in time, so earlier in the transcript
+    assert await lines_of(api, mid) == [
+        ("Sara", "Sara in the first minute."),
+        ("Ali", "Ali in the fourth minute."),
+    ]
+    await pi.close()
+
+
+async def test_the_server_clock_places_a_guest_and_a_retry_changes_nothing(api, business_db, voice):
+    pi, conv, scope = await workspace(api, business_db, "366600015")
+    await switch_on(api)
+    mid, invite = await made(api)
+    ali = await joined(api, invite, "Ali")
+    # the host's recorder starts the meeting clock once; a second call keeps the first time
+    first = (await api.post(f"{BASE}/{mid}/recording/start")).json()["recording_started_at"]
+    assert first and (await api.post(f"{BASE}/{mid}/recording/start")).json() == {
+        "recording_started_at": first
+    }
+    await at(business_db, 130_000)  # the first part began two minutes and ten seconds in
+    voice.text = "Placed by the server."
+    assert (await say(api, ali)).status_code == 200
+    voice.text = "A minute later."
+    assert (await say(api, ali, seq=1)).status_code == 200
+    starts = [s["start_ms"] for s in (await api.get(f"{BASE}/{mid}")).json()["segments"]]
+    assert 129_000 <= starts[0] <= 131_000 and 189_000 <= starts[1] <= 191_000
+
+    # a retry of a part that already went through (the answer was lost) changes nothing
+    voice.text = "A retry must not rewrite this."
+    again = await say(api, ali, seq=1)
+    assert again.status_code == 200 and again.json() == {"segments": 0, "again": True}
+    assert len(await lines_of(api, mid)) == 2
+
+    # with no host clock yet the first guest part starts it
+    mid2, invite2 = await made(api)
+    bea = await joined(api, invite2, "Bea")
+    assert (await say(api, bea)).status_code == 200
+    business_db.expire_all()
+    started = await business_db.scalar(
+        select(PiMeeting.recording_started_at).where(PiMeeting.id == UUID(mid2))
+    )
+    assert started is not None
+    await pi.close()
+
+
 async def test_a_part_replaces_only_itself_and_the_host_resend_keeps_guest_lines(
     api, business_db, voice
 ):
@@ -272,19 +344,18 @@ async def test_a_part_replaces_only_itself_and_the_host_resend_keeps_guest_lines
     await switch_on(api)
     mid, invite = await made(api)
     ali, sara = await joined(api, invite, "Ali"), await joined(api, invite, "Sara")
+    await at(business_db, 10_000)
     voice.text = "Ali first."
-    await say(api, ali, 10_000)
+    await say(api, ali)
     voice.text = "Sara first."
-    await say(api, sara, 10_000)  # the same minute, another person: not the same lines
-    voice.text = "Ali again."
-    await say(api, ali, 10_000)  # the same part sent again: replaced, not doubled
+    await say(api, sara)  # the same minute, another person: not the same lines
     voice.text = "Host."
     await host(api, mid, 0, 0)
     voice.text = "Host replaced."
     await host(api, mid, 0, 0)  # the host resend must not remove the guests lines
 
-    texts = sorted(s["text"] for s in (await api.get(f"{BASE}/{mid}")).json()["segments"])
-    assert texts == ["Ali again.", "Host replaced.", "Sara first."]
+    texts = sorted(t for _, t in await lines_of(api, mid))
+    assert texts == ["Ali first.", "Host replaced.", "Sara first."]
     await pi.close()
 
 
@@ -294,18 +365,122 @@ async def test_a_guest_is_refused_everything_but_their_own_audio(api, business_d
     mid, invite = await made(api)
     ali = await joined(api, invite, "Ali")
 
-    assert (await say(api, "z" * 43, 0)).status_code == 404  # unknown token
-    assert (await say(api, invite, 0)).status_code == 404  # an invite token is not a guest token
-    assert (await say(api, ali, 0, mime="text/plain")).status_code == 422
-    assert (await say(api, ali, 0, data=b"")).status_code == 422
-    assert (await say(api, ali, 0, data=WEBM * 40_000)).status_code == 413
-    assert (await say(api, ali, 0, duration="999999")).status_code == 422
-    assert (await say(api, ali, 10**9)).status_code == 422  # a time no meeting reaches
+    assert (await say(api, "z" * 43)).status_code == 404  # unknown token
+    assert (await say(api, invite)).status_code == 404  # an invite token is not a guest token
+    assert (await say(api, "short")).status_code == 422  # not even shaped like a token
+    assert (await say(api, ali, mime="text/plain")).status_code == 422
+    assert (await say(api, ali, data=b"")).status_code == 422
+    assert (await say(api, ali, duration="999999")).status_code == 422
+    assert (await say(api, ali, duration="0")).status_code == 422
+    assert (await say(api, ali, seq=10**6)).status_code == 422
+    assert (await say(api, ali, seq=50)).status_code == 422  # far ahead of the minutes they were in
+    no_seq = await api.post(
+        f"{GUEST}/parts",
+        headers={"X-Guest-Token": ali},
+        data={"duration_ms": "60000"},
+        files={"file": ("p.webm", WEBM, "audio/webm")},
+    )
+    assert no_seq.status_code == 422
+    # size: over the audio cap but under the body cap, and over the body cap (refused unread)
+    assert (await say(api, ali, data=WEBM * 20_000)).status_code == 413
+    assert (await say(api, ali, data=WEBM * 40_000)).status_code == 413
+    await at(business_db, 10**9)  # a time no meeting reaches
+    assert (await say(api, ali)).status_code == 422
+    await at(business_db, 0)
     voice.fail = True
-    down = await say(api, ali, 0)
+    down = await say(api, ali)
     assert down.status_code == 502 and down.json()["error"]["code"] == "MEETING_TRANSCRIBE_FAILED"
     assert (await api.get(f"{BASE}/{mid}")).json()["status"] == "created"  # a guest cannot fail it
-    assert (await api.get(f"{JOIN}/{ali}/parts")).status_code in (404, 405)  # nothing to read
+    assert (await api.get(f"{GUEST}/parts")).status_code in (404, 405)  # nothing to read
+    await pi.close()
+
+
+async def test_parts_cannot_come_faster_than_a_person_talks(api, business_db, voice, monkeypatch):
+    pi, conv, scope = await workspace(api, business_db, "366600017")
+    await switch_on(api)
+    mid, invite = await made(api)
+    ali = await joined(api, invite, "Ali")
+    monkeypatch.setattr(guest_routes, "GUEST_MIN_GAP_S", 20)  # the real rule
+    assert (await say(api, ali)).status_code == 200
+    soon = await say(api, ali, seq=1)
+    assert soon.status_code == 429 and soon.json()["error"]["code"] == "MEETING_PART_TOO_SOON"
+    # after the gap it goes through
+    await business_db.execute(
+        update(PiMeetingGuest).values(last_part_at=datetime.now(UTC) - timedelta(seconds=25))
+    )
+    await business_db.commit()
+    assert (await say(api, ali, seq=1)).status_code == 200
+    await pi.close()
+
+
+async def test_a_guest_token_runs_out_and_leaving_stops_it(api, business_db, voice):
+    pi, conv, scope = await workspace(api, business_db, "366600018")
+    await switch_on(api)
+    mid, invite = await made(api)
+    old, leaver = await joined(api, invite, "Old"), await joined(api, invite, "Leaver")
+    assert (await say(api, old)).status_code == 200
+    await business_db.execute(
+        update(PiMeetingGuest)
+        .where(PiMeetingGuest.slot == 1)
+        .values(consent_at=datetime.now(UTC) - timedelta(hours=13))
+    )
+    await business_db.commit()
+    assert (
+        await say(api, old, seq=1)
+    ).status_code == 404  # a guest token is good for hours, not days
+
+    left = await api.post(f"{GUEST}/leave", headers={"X-Guest-Token": leaver})
+    assert left.status_code == 200 and left.json() == {"left": True}
+    assert (await say(api, leaver)).status_code == 404
+    assert (
+        await api.post(f"{GUEST}/leave", headers={"X-Guest-Token": "q" * 43})
+    ).status_code == 404
+    await pi.close()
+
+
+async def test_a_guest_cannot_take_the_hosts_name_or_steer_the_language(api, business_db, voice):
+    pi, conv, scope = await workspace(api, business_db, "366600019")
+    await switch_on(api)
+    mid, invite = await made(api)
+    sneaky = await api.post(f"{JOIN}/{invite}", json={"name": "speaker 1", "consent": True})
+    assert sneaky.status_code == 201 and sneaky.json()["label"].lower() != "speaker 1"
+    twin_a = await api.post(f"{JOIN}/{invite}", json={"name": "Ali", "consent": True})
+    twin_b = await api.post(f"{JOIN}/{invite}", json={"name": "ali", "consent": True})
+    assert twin_a.json()["label"] != twin_b.json()["label"]  # never a clash on the unique label
+    # the host's first part still becomes "Speaker 1", not the guest
+    voice.text = "Host words."
+    assert (await host(api, mid, 0, 0)).status_code == 200
+    assert ("Speaker 1", "Host words.") in await lines_of(api, mid)
+    # a guest's detected language is not written to the meeting
+    assert (await say(api, sneaky.json()["guest_token"])).status_code == 200
+    business_db.expire_all()
+    assert (await business_db.scalar(select(PiMeeting.language))) in ("", "en")
+    await pi.close()
+
+
+async def test_lines_the_findings_cite_are_never_rewritten_by_a_late_guest_part(
+    api, business_db, monkeypatch
+):
+    from test_pi_meeting_recording_flow import Mapper, analyse_part
+
+    pi, conv, scope = await workspace(api, business_db, "366600020")
+    await switch_on(api)
+    mapper = Mapper()
+    monkeypatch.setattr(recording_routes, "build_llm_manager", lambda *a, **k: mapper)
+    monkeypatch.setattr(guest_routes, "build_llm_manager", lambda *a, **k: mapper)
+    monkeypatch.setattr(guest_routes, "GUEST_MIN_GAP_S", 0)
+    mid, invite = await made(api)
+    ali = await joined(api, invite, "Ali")
+    assert (await host(api, mid, 0, 0)).status_code == 200
+    assert (await analyse_part(api, mid, 0)).status_code == 200  # the findings now exist
+    await at(business_db, 10_000)
+    assert (await say(api, ali)).status_code == 200  # a new place in the window: fine
+    # a different part landing on the same place as an analysed one is refused, not rewritten
+    await business_db.execute(update(PiMeetingGuest).values(last_seq=None, last_part_at=None))
+    await business_db.commit()
+    clash = await say(api, ali)
+    assert clash.status_code == 409
+    assert clash.json()["error"]["code"] == "MEETING_PART_ANALYSED"
     await pi.close()
 
 
@@ -319,29 +494,29 @@ async def test_removing_a_guest_or_closing_the_link_or_the_meeting_stops_their_a
     sara = await joined(api, invite, "Sara")
     omar = await joined(api, invite, "Omar")
     for token in (ali, sara, omar):
-        assert (await say(api, token, 0)).status_code == 200
+        assert (await say(api, token)).status_code == 200
 
     status = (await api.get(f"{BASE}/{mid}/invite")).json()
     ali_id = next(g["id"] for g in status["guests"] if g["label"] == "Ali")
     await api.delete(f"{BASE}/{mid}/guests/{ali_id}")
-    assert (await say(api, ali, 0)).status_code == 404  # removed
-    assert (await say(api, sara, 0)).status_code == 200  # the others carry on
+    assert (await say(api, ali, seq=1)).status_code == 404  # removed
+    assert (await say(api, sara, seq=1)).status_code == 200  # the others carry on
 
     # an expired link only stops new people: someone already in keeps going
     await business_db.execute(
         update(PiMeetingInvite).values(expires_at=datetime.now(UTC) - timedelta(minutes=1))
     )
     await business_db.commit()
-    assert (await say(api, sara, 0)).status_code == 200
+    assert (await say(api, sara, seq=2)).status_code == 200
     assert (await api.post(f"{JOIN}/{invite}", json={"consent": True})).status_code == 404
 
     await api.delete(f"{BASE}/{mid}/invite")  # revoked: everyone stops
-    assert (await say(api, sara, 0)).status_code == 404
-    assert (await say(api, omar, 0)).status_code == 404
+    assert (await say(api, sara, seq=3)).status_code == 404
+    assert (await say(api, omar, seq=1)).status_code == 404
 
     await business_db.execute(update(PiMeeting).values(status="analysing"))
     await business_db.commit()
-    assert (await say(api, omar, 0)).status_code == 404
+    assert (await say(api, omar, seq=1)).status_code == 404
     await pi.close()
 
 
@@ -353,8 +528,8 @@ async def test_a_guests_words_are_redacted_and_the_audio_is_not_kept(api, busine
     mid, invite = await made(api)
     ali = await joined(api, invite, "Ali")
     voice.text = "My card is 4111 1111 1111 1111 and it keeps failing."
-    assert (await say(api, ali, 0)).status_code == 200
-    words = " ".join(s["text"] for s in (await api.get(f"{BASE}/{mid}")).json()["segments"])
+    assert (await say(api, ali)).status_code == 200
+    words = " ".join(t for _, t in await lines_of(api, mid))
     assert "4111" not in words and "failing" in words
     assert await count(business_db, PiMeetingMedia) == 0
     await pi.close()
@@ -369,6 +544,10 @@ def test_guest_numbers_stay_inside_their_slice_of_the_window():
             lines = set(range(base, base + guest_routes.GUEST_SEGMENTS))
             assert not lines & seen  # no two guest parts ever share a line number
             seen |= lines
+    # minute first, then guest: any guest's minute 0 sorts before every guest's minute 1
+    assert max(guest_routes.guest_base(0, s) for s in range(1, 21)) < min(
+        guest_routes.guest_base(60_000, s) for s in range(1, 21)
+    )
     assert guest_routes.guest_base(240_000, 1) >= 1000  # the next window is the next thousand
     assert guest_routes.guest_base(0, 21) is None and guest_routes.guest_base(0, 0) is None
     assert guest_routes.pack(["a", "b", "c", "d", "e", "f", "g"], 6) == ["a b", "c d", "e f", "g"]

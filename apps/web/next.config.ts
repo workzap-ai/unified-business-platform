@@ -32,6 +32,19 @@ const nextConfig: NextConfig = {
         ],
       },
       {
+        // A meeting link records the visitor's own microphone; the link is the only key, so it is
+        // never sent on as a referrer. Listed after the global entry so it wins.
+        source: "/join/:path*",
+        headers: [
+          { key: "Referrer-Policy", value: "no-referrer" },
+          {
+            key: "Permissions-Policy",
+            value:
+              "camera=(), microphone=(self), display-capture=(), geolocation=()",
+          },
+        ],
+      },
+      {
         // Only the meetings page records audio. Listed last: when two entries set the same
         // header for a path, the later one wins. The browser still asks the person each time.
         source: "/pi/meeting-intel/:path*",

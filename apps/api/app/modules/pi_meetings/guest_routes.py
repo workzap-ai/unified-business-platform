@@ -13,13 +13,25 @@ and fewer than `max_guests` people have joined.
 
 import hashlib
 import secrets
+from collections.abc import Callable, Coroutine
 from datetime import UTC, datetime, timedelta
 from typing import Annotated, Any
 from uuid import UUID
 
-from fastapi import APIRouter, File, Form, HTTPException, Path, Request, UploadFile
+from fastapi import (
+    APIRouter,
+    File,
+    Form,
+    Header,
+    HTTPException,
+    Path,
+    Request,
+    Response,
+    UploadFile,
+)
+from fastapi.routing import APIRoute
 from pydantic import BaseModel, ConfigDict, Field
-from sqlalchemy import delete, func, select, text
+from sqlalchemy import delete, func, select, text, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.ai.errors import GatewayUnavailable, MediaValidationError
@@ -32,6 +44,7 @@ from app.modules.pi.memory_ledger import redacted
 from app.modules.pi_meetings.models import (
     PiMeeting,
     PiMeetingGuest,
+    PiMeetingInsight,
     PiMeetingInvite,
     PiMeetingParticipant,
     PiMeetingSegment,
@@ -41,6 +54,7 @@ from app.modules.pi_meetings.recording_routes import (
     ISO_LANGUAGE,
     MAX_PARTS,
     PART_STRIDE,
+    _recordable,
     join_spoken_digits,
     split_sentences,
     timed,
@@ -50,12 +64,35 @@ from app.shared.errors import BusinessRuleViolation
 from app.shared.scope import WorkspaceScope
 
 router = APIRouter(prefix="/pi/meeting-intel", tags=["pi-meeting-intel"])
-public_router = APIRouter(prefix="/public/meeting-join", tags=["public"])
+MAX_BODY_BYTES = 1_500_000  # a guest part is at most 1 MB of audio plus form overhead
+
+
+class BoundedRoute(APIRoute):
+    """Refuses an oversized body BEFORE it is read: multipart is parsed (and spooled to disk)
+    before a handler runs, and these routes take no session, so anyone could send a huge body to
+    a made-up token. (A body without a length is still capped by the read limit in the handler.)"""
+
+    def get_route_handler(self) -> Callable[[Request], Coroutine[Any, Any, Response]]:
+        original = super().get_route_handler()
+
+        async def handler(request: Request) -> Response:
+            length = request.headers.get("content-length", "")
+            if length.isdigit() and int(length) > MAX_BODY_BYTES:
+                raise BusinessRuleViolation(
+                    "MEETING_AUDIO_TOO_LARGE", "This request is too large", 413
+                )
+            return await original(request)
+
+        return handler
+
+
+public_router = APIRouter(prefix="/public/meeting-join", tags=["public"], route_class=BoundedRoute)
 
 TOKEN_PATTERN = r"^[A-Za-z0-9_-]{30,64}$"
 Token = Annotated[str, Path(pattern=TOKEN_PATTERN)]
 JOINABLE = frozenset({"created", "uploaded", "transcribing"})
 MAX_NAME = 60
+RESERVED_LABEL = "Speaker 1"  # the host's own lines: a guest can never take it
 
 
 def new_token() -> str:
@@ -89,13 +126,42 @@ async def _require_enabled(session: AsyncSession, scope: WorkspaceScope) -> None
         )
 
 
-# ---- staff: make, read and revoke the link, remove a guest
+# ---- staff: say when the recording began, make, read and revoke the link, remove a guest
 
 
 class InviteInput(BaseModel):
     model_config = ConfigDict(extra="forbid")
     hours: int = Field(default=24, ge=1, le=168)
     max_guests: int = Field(default=10, ge=1, le=20)
+
+
+async def _start_clock(session: AsyncSession, meeting: PiMeeting) -> None:
+    """Start the meeting's clock if nobody has: one UPDATE that only succeeds while it is empty,
+    so two callers at once cannot overwrite each other."""
+    await session.execute(
+        update(PiMeeting)
+        .where(
+            PiMeeting.tenant_id == meeting.tenant_id,
+            PiMeeting.environment_id == meeting.environment_id,
+            PiMeeting.id == meeting.id,
+            PiMeeting.recording_started_at.is_(None),
+        )
+        .values(recording_started_at=datetime.now(UTC))
+    )
+    await session.refresh(meeting, ["recording_started_at"])
+
+
+@router.post("/{meeting_id}/recording/start")
+async def recording_started(meeting_id: UUID, scope: Scope, session: Session) -> dict[str, Any]:
+    """The host's recorder says it has begun: the meeting's clock starts now (once). Everything
+    said afterwards, by the host or a guest, is placed on this clock."""
+    await _gate(session, scope, "pi.meetings.record")
+    meeting = await _meeting(session, scope, meeting_id)
+    if meeting.recording_started_at is None and meeting.status in JOINABLE:
+        await _start_clock(session, meeting)
+        await session.commit()
+    started = meeting.recording_started_at
+    return {"recording_started_at": started.isoformat() if started else None}
 
 
 @router.post("/{meeting_id}/invite", status_code=201)
@@ -111,6 +177,7 @@ async def create_invite(
         raise BusinessRuleViolation(
             "MEETING_NOT_OPEN", "This meeting can no longer take more recordings", 409
         )
+    await _recordable(session, scope, meeting)  # also refuses a meeting with an imported transcript
     now = datetime.now(UTC)
     for old in await _active_invites(session, scope, meeting.id, expired_too=True):
         old.revoked_at = now
@@ -384,40 +451,48 @@ async def _free_label(
 ) -> str:
     """A speaker label no one else in the meeting has (labels are unique per meeting)."""
     label = wanted[:MAX_NAME]
-    exists = await session.scalar(
-        select(PiMeetingParticipant.id).where(
-            PiMeetingParticipant.tenant_id == scope.tenant_id,
-            PiMeetingParticipant.environment_id == scope.environment_id,
-            PiMeetingParticipant.meeting_id == meeting_id,
-            PiMeetingParticipant.label == label,
+    for n in range(0, 25):
+        candidate = label if n == 0 else f"{label[: MAX_NAME - 6]} ({slot + n - 1})"
+        exists = await session.scalar(
+            select(PiMeetingParticipant.id).where(
+                PiMeetingParticipant.tenant_id == scope.tenant_id,
+                PiMeetingParticipant.environment_id == scope.environment_id,
+                PiMeetingParticipant.meeting_id == meeting_id,
+                func.lower(PiMeetingParticipant.label) == candidate.lower(),
+            )
         )
-    )
-    return label if exists is None else f"{label[: MAX_NAME - 5]} ({slot})"
+        if exists is None and candidate.lower() != RESERVED_LABEL.lower():
+            return candidate
+    return f"Participant {slot}"
 
 
 # ---- public: a guest sends their own audio
 
-
 GUEST_PART_MS = 60_000  # the page cuts a guest's recording into one-minute parts
 GUEST_PART_SLACK_MS = 30_000
-GUEST_MAX_BYTES = 2 * 1024 * 1024  # a minute of speech is a few hundred kilobytes
+GUEST_MAX_BYTES = 1024 * 1024  # a minute at the page's bitrate is under 300 KB
 GUEST_MAX_TEXT = 12_000
 GUEST_SEGMENTS = 6  # lines a one-minute part can become: its slice of the ordinal range
 GUEST_MIMES = frozenset({"audio/webm", "audio/mp4", "audio/ogg"})
+GUEST_MAX_SEQ = 600  # ten hours of one-minute parts
+GUEST_MIN_GAP_S = 20  # a new part this soon after the last is not a person talking: it is refused
+GUEST_SEQ_SLACK = 5  # parts a guest may be ahead of the minutes they have actually been in
+GUEST_TTL = timedelta(hours=12)  # a guest token is good for a long meeting, not for days
 WINDOW_MS = 4 * 60_000  # the host's part length: guest lines sort into the same window
-SUBPARTS = GUEST_RANGE_START // (20 * GUEST_SEGMENTS)  # minutes per window a guest slot can hold
+MINUTES = WINDOW_MS // GUEST_PART_MS  # one-minute slots in a window
 
 
 def guest_base(offset_ms: int, slot: int) -> int | None:
     """The first segment number for this guest's part. Lines are numbered inside the stretch of the
-    host's four-minute window in which they were spoken, so a transcript sorted by number is also
-    in the order it was said, and a guest part replaces only itself: the number carries the guest's
-    own slot. None when the time is outside what a meeting can hold."""
+    host's four-minute window in which they were spoken, minute first and guest second, so within
+    the guests' half of a window the order is the order they spoke, and a guest part replaces only
+    itself (the number carries the guest's own slot). None when the time is outside what a meeting
+    can hold."""
     window, within = divmod(offset_ms, WINDOW_MS)
     if window >= MAX_PARTS or not 1 <= slot <= 20:
         return None
-    minute = min(within // GUEST_PART_MS, SUBPARTS - 1)
-    own = (slot - 1) * SUBPARTS + minute
+    minute = min(within // GUEST_PART_MS, MINUTES - 1)
+    own = minute * 20 + (slot - 1)
     return window * PART_STRIDE + GUEST_RANGE_START + own * GUEST_SEGMENTS
 
 
@@ -433,12 +508,14 @@ async def _guest_for(
     session: AsyncSession, token: str
 ) -> tuple[PiMeetingGuest, PiMeeting, WorkspaceScope] | None:
     """The guest a token belongs to, with their meeting, while everything still allows it: not
-    removed, the link not revoked (an expired link only stops new people joining), the meeting
-    open, the workspace flag on. None otherwise (the caller answers 404)."""
+    removed, not older than `GUEST_TTL`, the link not revoked (an expired link only stops new people
+    joining), the meeting open, the workspace flag on. None otherwise (the caller answers 404)."""
     guest = await session.scalar(
         select(PiMeetingGuest).where(PiMeetingGuest.token_hash == digest(token))
     )
     if guest is None or guest.removed_at is not None:
+        return None
+    if datetime.now(UTC) - guest.consent_at > GUEST_TTL:
         return None
     scope = system_scope(guest.tenant_id, guest.environment_id)
     invite = await session.scalar(
@@ -462,26 +539,69 @@ async def _guest_for(
     return guest, meeting, scope
 
 
-@public_router.post("/{token}/parts")
+GuestToken = Annotated[str, Header(alias="X-Guest-Token", pattern=TOKEN_PATTERN)]
+
+
+@public_router.post("/guest/leave")
+async def guest_leave(token: GuestToken, request: Request, session: Session) -> dict[str, Any]:
+    """The guest stops: their token no longer sends anything. What they already said stays in the
+    transcript (only the host's team can delete it, by deleting the meeting)."""
+    await _limit(request, token, "leave", 60, 20)
+    guest = await session.scalar(
+        select(PiMeetingGuest).where(PiMeetingGuest.token_hash == digest(token))
+    )
+    if guest is None:
+        raise HTTPException(status_code=404)
+    if guest.removed_at is None:
+        guest.removed_at = datetime.now(UTC)
+        await session.commit()
+    return {"left": True}
+
+
+@public_router.post("/guest/parts")
 async def guest_part(
-    token: Token,
+    token: GuestToken,
     request: Request,
     session: Session,
     file: Annotated[UploadFile, File()],
-    offset_ms: Annotated[int, Form(ge=0)] = 0,
-    duration_ms: Annotated[int, Form(ge=0, le=GUEST_PART_MS + GUEST_PART_SLACK_MS)] = 0,
+    seq: Annotated[int, Form(ge=0, lt=GUEST_MAX_SEQ)],
+    duration_ms: Annotated[int, Form(ge=1, le=GUEST_PART_MS + GUEST_PART_SLACK_MS)] = GUEST_PART_MS,
 ) -> dict[str, Any]:
     """Transcribe one minute of a guest's own microphone and store the words as that guest's lines.
-    The audio is read for the speech-to-text call and never stored. Sending the same part again
-    replaces it. A guest can send nothing but this, and reads nothing."""
-    await _limit(request, token, "part", 400, 200)
+
+    The token travels in a header (never in the URL, which ends up in access logs). The audio is
+    read for the speech-to-text call and never stored. `seq` numbers the guest's parts from 0: part
+    n sits n minutes after the guest's first part on the meeting's clock, so sending a part again
+    (a retry) replaces the same lines, two parts never share a place, and the guest cannot choose
+    the time. A guest sends nothing else and reads nothing.
+
+    What keeps the cost bounded without Redis: one part at a time per guest (a database lock), at
+    least `GUEST_MIN_GAP_S` between parts, no part further ahead than the minutes the guest has been
+    in, and at most `GUEST_MAX_BYTES` of audio per part."""
+    await _limit(request, token, "part", 1200, 200)
     found = await _guest_for(session, token)
     if found is None:
         raise HTTPException(status_code=404)
     guest, meeting, scope = found
-    base = guest_base(offset_ms, guest.slot)
-    if base is None:
-        raise BusinessRuleViolation("MEETING_PART_INVALID", "This part is outside the meeting", 422)
+    busy = not await session.scalar(
+        text("SELECT pg_try_advisory_xact_lock(hashtext(:key))"), {"key": f"guest-part:{guest.id}"}
+    )
+    if busy:
+        raise BusinessRuleViolation("MEETING_PART_BUSY", "The last part is still being read", 429)
+    now = datetime.now(UTC)
+    if guest.last_seq == seq and guest.last_part_at is not None:
+        return {"segments": 0, "again": True}  # a retry of a part that already went through
+    if (
+        guest.last_part_at is not None
+        and (now - guest.last_part_at).total_seconds() < GUEST_MIN_GAP_S
+    ):
+        raise BusinessRuleViolation(
+            "MEETING_PART_TOO_SOON", "Parts are sent about a minute apart", 429
+        )
+    if seq > int((now - guest.consent_at).total_seconds() // 60) + GUEST_SEQ_SLACK:
+        raise BusinessRuleViolation(
+            "MEETING_PART_INVALID", "This part is ahead of the meeting", 422
+        )
     try:
         audio = await file.read(GUEST_MAX_BYTES + 1)
     finally:
@@ -491,6 +611,48 @@ async def guest_part(
     mime = (file.content_type or "").split(";")[0].strip().lower()
     if not audio or mime not in GUEST_MIMES:
         raise BusinessRuleViolation("MEETING_AUDIO_INVALID", "This is not a recording", 422)
+    # where this guest's parts sit on the meeting's clock (it starts with the host's recorder; with
+    # no host recording the first guest part starts it)
+    if meeting.recording_started_at is None:
+        await _start_clock(session, meeting)
+    first_offset = guest.first_offset_ms
+    if first_offset is None:
+        elapsed = int((now - meeting.recording_started_at).total_seconds() * 1000)  # type: ignore[operator]
+        first_offset = max(0, elapsed - duration_ms)
+    offset_ms = first_offset + seq * GUEST_PART_MS
+    base = guest_base(offset_ms, guest.slot)
+    if base is None:
+        raise BusinessRuleViolation("MEETING_PART_INVALID", "This part is outside the meeting", 422)
+    guest.first_offset_ms = (
+        first_offset  # only a part that fits the meeting fixes the guest's place
+    )
+    # lines the findings already cite are never rewritten (the host's route has the same rule)
+    mine = (
+        PiMeetingSegment.tenant_id == scope.tenant_id,
+        PiMeetingSegment.environment_id == scope.environment_id,
+        PiMeetingSegment.meeting_id == meeting.id,
+    )
+    has_insights = await session.scalar(
+        select(PiMeetingInsight.id)
+        .where(
+            PiMeetingInsight.tenant_id == scope.tenant_id,
+            PiMeetingInsight.environment_id == scope.environment_id,
+            PiMeetingInsight.meeting_id == meeting.id,
+        )
+        .limit(1)
+    )
+    if has_insights is not None and await session.scalar(
+        select(PiMeetingSegment.id)
+        .where(
+            *mine,
+            PiMeetingSegment.ordinal >= base,
+            PiMeetingSegment.ordinal < base + GUEST_SEGMENTS,
+        )
+        .limit(1)
+    ):
+        raise BusinessRuleViolation(
+            "MEETING_PART_ANALYSED", "This part was already heard and analysed", 409
+        )
     language = meeting.language if ISO_LANGUAGE.match(meeting.language) else None
     state = request.app.state
     manager = build_llm_manager(state.settings, state.http, state.sessions)
@@ -508,9 +670,7 @@ async def guest_part(
     audio = b""  # held only for the call above
     await session.execute(
         delete(PiMeetingSegment).where(
-            PiMeetingSegment.tenant_id == scope.tenant_id,
-            PiMeetingSegment.environment_id == scope.environment_id,
-            PiMeetingSegment.meeting_id == meeting.id,
+            *mine,
             PiMeetingSegment.ordinal >= base,
             PiMeetingSegment.ordinal < base + GUEST_SEGMENTS,
         )
@@ -533,10 +693,11 @@ async def guest_part(
                 text_hash=hashlib.sha256(words.lower().encode()).hexdigest(),
             )
         )
-    if not meeting.language and result.language:
-        meeting.language = result.language[:12].lower()
+    # the meeting's language is the host's to set: a guest's detection never steers the host's parts
     meeting.status = "transcribing"
     meeting.failure_reason = ""
+    guest.last_seq = seq
+    guest.last_part_at = now
     await record(
         session,
         "pi.meeting_guest_part",

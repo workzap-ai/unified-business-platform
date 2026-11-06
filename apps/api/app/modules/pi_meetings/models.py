@@ -107,6 +107,11 @@ class PiMeeting(WorkspaceRow):
         DateTime(timezone=True), nullable=True
     )
     media_consent_by: Mapped[UUID | None] = mapped_column(Uuid, nullable=True)
+    # when the recording began: every line's time (the host's and each guest's) is measured from
+    # here, so lines from several microphones sort in the order they were spoken
+    recording_started_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True), nullable=True
+    )
     recording_key: Mapped[str | None] = mapped_column(String(300), nullable=True)
     recording_mime: Mapped[str] = mapped_column(String(60), default="", server_default="")
     recording_bytes: Mapped[int] = mapped_column(BigInteger, default=0, server_default="0")
@@ -321,3 +326,8 @@ class PiMeetingGuest(WorkspaceRow):
     token_hash: Mapped[str] = mapped_column(String(64))
     consent_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
     removed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    # where this guest's first part sits on the meeting's clock; later parts follow at one minute
+    # each by their number, so a retry replaces the same lines and two parts never collide
+    first_offset_ms: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    last_seq: Mapped[int | None] = mapped_column(SmallInteger, nullable=True)
+    last_part_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
