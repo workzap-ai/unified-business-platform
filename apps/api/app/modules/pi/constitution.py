@@ -1000,9 +1000,8 @@ GIVEN_PITCH = re.compile(
 GIVEN_OFFER = re.compile(r"\bquotes?\b|\bquotation\b|\bproposals?\b", re.IGNORECASE)
 SOLUTION_DOCUMENT = re.compile(r"\bsolution documents?\b", re.IGNORECASE)
 AMOUNT_WORDS = re.compile(
-    r"\b\d[\d,.]*\s*(?:k|rs|lakh|lac|crore|rupees?|dollars?|dirhams?|usd|pkr|aed)\b"
-    r"|\b(?:rupees|dollars|dirhams|lakhs?|crores?)\b"
-    r"|\b(?:rs|pkr|usd|aed|inr)\.?\s*\d|[$£€₨]\s*\d",
+    r"\b\d[\d,.]*\s*(?:k|lakh|lac|crore|rupees?|dollars?|dirhams?|usd|pkr|aed)\b"
+    r"|\b(?:rupees|dollars|dirhams|lakhs?|crores?)\b",
     re.IGNORECASE,
 )
 # RBUILD06: "would", never "will" (ho jayega): no promised results about what Workzap builds.
