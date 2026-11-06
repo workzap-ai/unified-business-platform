@@ -21,6 +21,16 @@ from app.modules.pi.solution_models import PiIdeaFeedback, PiSolutionMemory
 from app.shared.scope import WorkspaceScope
 
 
+@pytest.fixture(autouse=True)
+def no_recordings(monkeypatch):
+    """The erase route removes saved meeting recordings from storage first; none here."""
+
+    async def none(*args, **kwargs):
+        return []
+
+    monkeypatch.setattr(brain_erase_routes.meeting_erase, "recording_keys", none)
+
+
 class PgError(Exception):
     """A database driver error that carries its SQLSTATE (asyncpg: sqlstate)."""
 
@@ -227,7 +237,7 @@ async def test_the_audit_record_carries_kept_reasons_and_the_skipped_steps(monke
     monkeypatch.setattr(brain_erase_routes, "record", fake_record)
     monkeypatch.setattr(brain_erase_routes, "require_pi", fake_require)
     result = await brain_erase_routes.erase(
-        uuid4(), brain_erase_routes.EraseInput(confirm=True), scope(), Session()
+        uuid4(), brain_erase_routes.EraseInput(confirm=True), scope(), Session(), None
     )
     details = seen["details"]
     assert seen["event"] == "pi.brain_data_erased" and seen["committed"] is True
@@ -336,7 +346,7 @@ async def test_the_response_says_incomplete_with_the_skipped_steps_and_still_com
 
     seen, session = await route_run(monkeypatch, fake_erase)
     result = await brain_erase_routes.erase(
-        uuid4(), brain_erase_routes.EraseInput(confirm=True), scope(), session
+        uuid4(), brain_erase_routes.EraseInput(confirm=True), scope(), session, None
     )
     assert result["complete"] is False and result["skipped"] == ["offer_log"]
     assert "INCOMPLETE" in result["warning"] and "offer_log" in result["warning"]
@@ -357,7 +367,7 @@ async def test_a_complete_erase_has_no_warning(monkeypatch):
 
     seen, session = await route_run(monkeypatch, fake_erase)
     result = await brain_erase_routes.erase(
-        uuid4(), brain_erase_routes.EraseInput(confirm=True), scope(), session
+        uuid4(), brain_erase_routes.EraseInput(confirm=True), scope(), session, None
     )
     assert result["complete"] is True and "warning" not in result
     assert seen["details"]["complete"] is True
@@ -370,6 +380,6 @@ async def test_a_failing_erase_neither_records_nor_commits(monkeypatch):
     seen, session = await route_run(monkeypatch, fake_erase)
     with pytest.raises(ProgrammingError):
         await brain_erase_routes.erase(
-            uuid4(), brain_erase_routes.EraseInput(confirm=True), scope(), session
+            uuid4(), brain_erase_routes.EraseInput(confirm=True), scope(), session, None
         )
     assert "event" not in seen and "committed" not in seen

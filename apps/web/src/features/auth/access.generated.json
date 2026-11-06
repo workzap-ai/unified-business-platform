@@ -266,6 +266,11 @@
       "label": "Delete meetings and their recordings"
     },
     {
+      "group": "PI",
+      "key": "pi.meetings.recording",
+      "label": "Play a meeting's saved audio and video"
+    },
+    {
       "group": "Administration",
       "key": "admin.members.read",
       "label": "View members"
@@ -386,6 +391,7 @@
         "pi.meetings.delete",
         "pi.meetings.read",
         "pi.meetings.record",
+        "pi.meetings.recording",
         "pi.memory.read",
         "pi.read",
         "pi.settings.manage",
@@ -459,6 +465,7 @@
         "pi.meetings.delete",
         "pi.meetings.read",
         "pi.meetings.record",
+        "pi.meetings.recording",
         "pi.memory.read",
         "pi.read",
         "pi.settings.manage",
@@ -513,6 +520,7 @@
         "pi.meetings.approve",
         "pi.meetings.read",
         "pi.meetings.record",
+        "pi.meetings.recording",
         "pi.memory.read",
         "pi.read",
         "pi.work.manage",
