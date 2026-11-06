@@ -53,6 +53,7 @@ def validate_section(section: str, value: Any) -> None:
                 "list_guard",
                 "quote_facts",
                 "meeting_intel",
+                "meeting_guests",
             }
             ensure(isinstance(brain, dict) and set(brain) <= {*TUNABLES, *flags})
             ensure(type(brain.get("learning_frozen", True)) is bool)
@@ -71,6 +72,7 @@ def validate_section(section: str, value: Any) -> None:
             ensure(
                 type(brain.get("meeting_intel", False)) is bool
             )  # PMB: meeting intelligence, opt-in
+            ensure(type(brain.get("meeting_guests", False)) is bool)  # PMB-4: meeting links, opt-in
             ensure(type(brain.get("list_guard", False)) is bool)  # B1: no list item dropped, opt-in
             ensure(all(type(v) is int for k, v in brain.items() if k not in flags))
             served = brain.get("served_industries", [])  # regulated trades Workzap serves (7.N)

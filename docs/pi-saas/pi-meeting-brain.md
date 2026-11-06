@@ -145,7 +145,9 @@ is heard through the shared audio.
 - Transcription runs inside the request (a part takes seconds). Moving it to an ARQ job (`meeting:<id>:<stage>`)
   is only needed once parts get long or numerous.
 
-## PMB-4: meeting link (plan, not built)
+## PMB-4: meeting link (phase 1 built, rest not)
+
+**Built (phase 1, migration 0060, flag `response_rules.brain.meeting_guests`, default off):** invite and guest tables, staff routes `POST/GET/DELETE /pi/meeting-intel/{id}/invite` and `DELETE .../guests/{id}`, public routes `GET/POST /public/meeting-join/{token}` (look, then join with consent; per-IP and per-token rate limits), hashed tokens, a link that closes with the meeting, expiry, revoke and a guest limit, erase and delete clean up. **Not built:** guests sending audio parts, time-ordered segments, the staff invite card and the public join page.
 
 One link per meeting; everyone who opens it records their own microphone into the same meeting, so the
 transcript has a real speaker for each person.

@@ -270,3 +270,54 @@ class PiMeetingMediaData(WorkspaceRow):
     )
     media_id: Mapped[UUID] = mapped_column(Uuid)
     data: Mapped[bytes] = mapped_column(LargeBinary)
+
+
+class PiMeetingInvite(WorkspaceRow):
+    """The link staff copy so other people can add their own microphone to a meeting (PMB-4). Only
+    a hash of the token is stored: the token itself is shown once, when the link is made."""
+
+    __tablename__ = "pi_meeting_invites"
+    __table_args__ = workspace_args(
+        "pi_meeting_invites",
+        scoped_fk("pi_meeting_invites", "meeting_id", "pi_meetings"),
+        Index("uq_pi_meeting_invites_token", "token_hash", unique=True),
+        Index("ix_pi_meeting_invites_meeting", "tenant_id", "environment_id", "meeting_id"),
+        CheckConstraint("max_guests BETWEEN 1 AND 20", name="max_guests"),
+    )
+    meeting_id: Mapped[UUID] = mapped_column(Uuid)
+    token_hash: Mapped[str] = mapped_column(String(64))
+    expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    revoked_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    max_guests: Mapped[int] = mapped_column(SmallInteger, default=20, server_default="20")
+    created_by: Mapped[UUID | None] = mapped_column(Uuid, nullable=True)
+
+
+class PiMeetingGuest(WorkspaceRow):
+    """Someone who opened an invite, agreed, and records their own microphone into the meeting. They
+    can send audio parts for this meeting and nothing else: no guest token reads anything."""
+
+    __tablename__ = "pi_meeting_guests"
+    __table_args__ = workspace_args(
+        "pi_meeting_guests",
+        scoped_fk("pi_meeting_guests", "meeting_id", "pi_meetings"),
+        scoped_fk("pi_meeting_guests", "invite_id", "pi_meeting_invites"),
+        scoped_fk("pi_meeting_guests", "participant_id", "pi_meeting_participants"),
+        Index("uq_pi_meeting_guests_token", "token_hash", unique=True),
+        Index(
+            "uq_pi_meeting_guests_slot",
+            "tenant_id",
+            "environment_id",
+            "meeting_id",
+            "slot",
+            unique=True,
+        ),
+        CheckConstraint("slot BETWEEN 1 AND 20", name="slot"),
+    )
+    meeting_id: Mapped[UUID] = mapped_column(Uuid)
+    invite_id: Mapped[UUID] = mapped_column(Uuid)
+    participant_id: Mapped[UUID] = mapped_column(Uuid)
+    slot: Mapped[int] = mapped_column(SmallInteger)
+    name: Mapped[str] = mapped_column(String(60), default="", server_default="")  # redacted
+    token_hash: Mapped[str] = mapped_column(String(64))
+    consent_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    removed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)

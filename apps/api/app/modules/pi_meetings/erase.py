@@ -15,7 +15,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.modules.pi_meetings.models import (
     PiMeeting,
+    PiMeetingGuest,
     PiMeetingInsight,
+    PiMeetingInvite,
     PiMeetingMedia,
     PiMeetingMediaData,
     PiMeetingParticipant,
@@ -26,6 +28,8 @@ from app.shared.scope import WorkspaceScope
 MEETING_REMOVED_KEYS = (
     "meeting_media_data",
     "meeting_media",
+    "meeting_guests",
+    "meeting_invites",
     "meeting_insights",
     "meeting_segments",
     "meeting_participants",
@@ -82,6 +86,18 @@ def erase_steps(scope: WorkspaceScope, customer_id: UUID) -> tuple[tuple[str, An
         *mine(PiMeetingMedia), PiMeetingMedia.meeting_id.in_(meeting_ids)
     )
     return (
+        (
+            "meeting_guests",
+            delete(PiMeetingGuest).where(
+                *mine(PiMeetingGuest), PiMeetingGuest.meeting_id.in_(meeting_ids)
+            ),
+        ),
+        (
+            "meeting_invites",
+            delete(PiMeetingInvite).where(
+                *mine(PiMeetingInvite), PiMeetingInvite.meeting_id.in_(meeting_ids)
+            ),
+        ),
         (
             "meeting_media_data",
             delete(PiMeetingMediaData).where(
@@ -157,7 +173,14 @@ async def erase_one(session: AsyncSession, scope: WorkspaceScope, meeting_id: UU
             PiMeetingMediaData.media_id.in_(media_ids),
         )
     )
-    for model in (PiMeetingMedia, PiMeetingInsight, PiMeetingSegment, PiMeetingParticipant):
+    for model in (
+        PiMeetingGuest,
+        PiMeetingInvite,
+        PiMeetingMedia,
+        PiMeetingInsight,
+        PiMeetingSegment,
+        PiMeetingParticipant,
+    ):
         await session.execute(
             delete(model).where(
                 model.tenant_id == scope.tenant_id,
