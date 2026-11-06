@@ -174,20 +174,76 @@ export const meetingIntelService = {
   // same index again replaces that part, so a retry never duplicates words. Audio is not kept.
   uploadPart: (
     id: string,
-    part: { index: number; offsetMs: number; durationMs: number; audio: Blob },
+    part: {
+      index: number;
+      offsetMs: number;
+      durationMs: number;
+      audio: Blob;
+      keep?: boolean;
+    },
   ) => {
     const form = new FormData();
     form.set("index", String(part.index));
     form.set("offset_ms", String(Math.round(part.offsetMs)));
     form.set("duration_ms", String(Math.round(part.durationMs)));
     form.set("file", part.audio, "part");
+    if (part.keep) form.set("keep", "true");
     return apiRequest(
       "POST",
       `${BASE}/${id}/recording/parts`,
-      z.object({ part: z.number(), segments: z.number() }),
+      z.object({
+        part: z.number(),
+        segments: z.number(),
+        saved: z.boolean().catch(false),
+      }),
       { body: form, timeoutMs: 120_000 },
     );
   },
+  // Is a storage bucket connected (Settings -> Integrations)? Saving a recording needs one.
+  storageConnected: () =>
+    apiRequest(
+      "GET",
+      "/integrations/capabilities",
+      z.object({ storage: z.boolean().catch(false) }),
+    ),
+  // One part of the video (a couple of minutes), saved in the workspace's own storage.
+  uploadVideo: (
+    id: string,
+    part: { index: number; offsetMs: number; durationMs: number; video: Blob },
+  ) => {
+    const form = new FormData();
+    form.set("offset_ms", String(Math.round(part.offsetMs)));
+    form.set("duration_ms", String(Math.round(part.durationMs)));
+    form.set("file", part.video, "part");
+    return apiRequest(
+      "POST",
+      `${BASE}/${id}/recording/media/video/${part.index}`,
+      z.object({ kind: z.string(), part: z.number(), bytes: z.number() }),
+      { body: form, timeoutMs: 180_000 },
+    );
+  },
+  // The saved parts with short-lived links to play them (they expire after an hour).
+  recording: (id: string) =>
+    apiRequest(
+      "GET",
+      `${BASE}/${id}/recording`,
+      z.object({
+        retention_until: z.string().nullable().catch(null),
+        parts: z
+          .array(
+            z.object({
+              kind: z.enum(["audio", "video"]),
+              index: z.number(),
+              offset_ms: z.number().catch(0),
+              duration_ms: z.number().catch(0),
+              bytes: z.number().catch(0),
+              mime: z.string().catch(""),
+              url: z.string(),
+            }),
+          )
+          .catch([]),
+      }),
+    ),
   // Live requirement mapping for one recorded part. Proposals only; best effort.
   analysePart: (id: string, index: number) =>
     apiRequest(

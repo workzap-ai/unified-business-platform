@@ -55,7 +55,7 @@ async def test_record_transcribe_complete_and_analyse(api, business_db, monkeypa
 
     first = await part(api, mid, 0)
     assert first.status_code == 200, first.text
-    assert first.json() == {"part": 0, "segments": 2}
+    assert first.json() == {"part": 0, "segments": 2, "saved": False}
     assert speech.calls[0][0] == "audio/webm"  # the codec suffix is not sent on
     second = await part(api, mid, 1)
     assert second.status_code == 200 and second.json()["segments"] == 2
@@ -89,7 +89,7 @@ async def test_sending_a_part_again_replaces_it(api, business_db, monkeypatch):
     await part(api, mid, 0)
     speech.text = "A corrected line."
     again = await part(api, mid, 0)
-    assert again.json() == {"part": 0, "segments": 1}
+    assert again.json() == {"part": 0, "segments": 1, "saved": False}
     business_db.expire_all()
     rows = (await business_db.scalars(select(PiMeetingSegment.text))).all()
     assert list(rows) == ["A corrected line."]

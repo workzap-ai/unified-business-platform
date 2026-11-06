@@ -90,6 +90,8 @@ from app.modules.pi_customer.models import (
 from app.modules.pi_meetings.models import (
     PiMeeting,
     PiMeetingInsight,
+    PiMeetingMedia,
+    PiMeetingMediaData,
     PiMeetingParticipant,
     PiMeetingSegment,
 )
@@ -177,6 +179,8 @@ __all__ = [
     "PiMeeting",
     "PiMeetingInsight",
     "PiMeetingParticipant",
+    "PiMeetingMedia",
+    "PiMeetingMediaData",
     "PiMeetingSegment",
     "PiDocumentText",
     "PiExecutionRun",

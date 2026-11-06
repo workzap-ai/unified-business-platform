@@ -22,6 +22,7 @@ from sqlalchemy import (
     DateTime,
     Index,
     Integer,
+    LargeBinary,
     SmallInteger,
     String,
     Text,
@@ -44,6 +45,7 @@ MEETING_STATUSES = (
     "failed",
 )
 PARTICIPANT_ROLES = ("customer", "staff", "other", "unknown")
+MEDIA_KINDS = ("audio", "video")
 INSIGHT_KINDS = (
     "summary",
     "problem",
@@ -211,3 +213,54 @@ class PiMeetingInsight(WorkspaceRow):
     # set once the approved insight has been written to the brain: a second approval is a no-op
     brain_ref: Mapped[str] = mapped_column(String(60), default="", server_default="")
     written_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+
+
+class PiMeetingMedia(WorkspaceRow):
+    """One stored part of a meeting's recording. The bytes are in the workspace's own object
+    storage (its S3 connection); this row keeps the key, the size, where the part sits in the
+    meeting and the date until which it is kept."""
+
+    __tablename__ = "pi_meeting_media"
+    __table_args__ = workspace_args(
+        "pi_meeting_media",
+        scoped_fk("pi_meeting_media", "meeting_id", "pi_meetings"),
+        # a part is stored once: sending it again replaces the same row and the same object
+        Index(
+            "uq_pi_meeting_media_part",
+            "tenant_id",
+            "environment_id",
+            "meeting_id",
+            "kind",
+            "ordinal",
+            unique=True,
+        ),
+        CheckConstraint(_in("kind", MEDIA_KINDS), name="kind"),
+        CheckConstraint(
+            "ordinal >= 0 AND bytes >= 0 AND offset_ms >= 0 AND duration_ms >= 0", name="ranges"
+        ),
+    )
+    meeting_id: Mapped[UUID] = mapped_column(Uuid)
+    kind: Mapped[str] = mapped_column(String(5))
+    ordinal: Mapped[int] = mapped_column(Integer)
+    key: Mapped[str] = mapped_column(String(300))
+    mime: Mapped[str] = mapped_column(String(60), default="", server_default="")
+    bytes: Mapped[int] = mapped_column(BigInteger, default=0, server_default="0")
+    offset_ms: Mapped[int] = mapped_column(Integer, default=0, server_default="0")
+    duration_ms: Mapped[int] = mapped_column(Integer, default=0, server_default="0")
+    retention_until: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+
+
+class PiMeetingMediaData(WorkspaceRow):
+    """The bytes of a saved part when the workspace has no storage bucket (audio only, capped per
+    meeting). Apart from `pi_meeting_media` so listing parts never reads audio."""
+
+    __tablename__ = "pi_meeting_media_data"
+    __table_args__ = workspace_args(
+        "pi_meeting_media_data",
+        scoped_fk("pi_meeting_media_data", "media_id", "pi_meeting_media"),
+        Index(
+            "uq_pi_meeting_media_data_media", "tenant_id", "environment_id", "media_id", unique=True
+        ),
+    )
+    media_id: Mapped[UUID] = mapped_column(Uuid)
+    data: Mapped[bytes] = mapped_column(LargeBinary)

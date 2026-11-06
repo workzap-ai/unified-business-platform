@@ -13,7 +13,7 @@ import { Card, CardBody } from "@/components/ui/display";
 import { NativeSelect } from "@/components/ui/input";
 import { Label } from "@/components/ui/controls";
 import { Notice } from "@/components/app/states";
-import { useScopedMutation } from "@/hooks/use-scoped";
+import { useScopedMutation, useScopedQuery } from "@/hooks/use-scoped";
 import { ApiError } from "@/services/api-client";
 import { clock, meetingIntelService } from "../meeting-intel-service";
 
@@ -23,12 +23,15 @@ import { clock, meetingIntelService } from "../meeting-intel-service";
  * The recording is cut into self-contained parts of a few minutes. Each part goes to the server
  * on its own and is transcribed there, so a long meeting never meets an upload limit, a dropped
  * connection costs one part and not the meeting, and a retry replaces a part instead of
- * duplicating it. The audio is not stored anywhere: only the redacted words are kept.
+ * duplicating it. By default the audio is not stored: only the redacted words are kept. When the
+ * person chooses to save the recording and the workspace has a storage bucket connected, the audio
+ * goes with each part and the shared screen is recorded as video parts, all in that bucket.
  *
- * Backend: apps/api/app/modules/pi_meetings/recording_routes.py.
+ * Backend: apps/api/app/modules/pi_meetings/recording_routes.py and media_routes.py.
  */
 
 const PART_MS = 4 * 60_000;
+const VIDEO_PART_MS = 2 * 60_000;
 const MIN_PART_MS = 1_000;
 const TRIES = 3;
 /** Answers that will not change on a retry: skip the part (or stop) instead of sending it again. */
@@ -39,6 +42,12 @@ const MIME_CANDIDATES = [
   "audio/mp4",
   "audio/ogg;codecs=opus",
 ];
+const VIDEO_MIMES = [
+  "video/webm;codecs=vp9,opus",
+  "video/webm;codecs=vp8,opus",
+  "video/webm",
+  "video/mp4",
+];
 
 type Phase = "idle" | "starting" | "recording" | "finishing";
 type Source = "mic" | "mic+tab";
@@ -48,12 +57,23 @@ type Part = {
   durationMs: number;
   audio: Blob;
 };
+type VideoPart = {
+  index: number;
+  offsetMs: number;
+  durationMs: number;
+  video: Blob;
+};
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 function pickMime(): string | undefined {
   if (typeof MediaRecorder === "undefined") return undefined;
   return MIME_CANDIDATES.find((m) => MediaRecorder.isTypeSupported(m));
+}
+
+function pickVideoMime(): string | undefined {
+  if (typeof MediaRecorder === "undefined") return undefined;
+  return VIDEO_MIMES.find((m) => MediaRecorder.isTypeSupported(m));
 }
 
 function startError(e: unknown): string {
@@ -75,7 +95,21 @@ export function MeetingRecorder({ id }: { id: string }) {
   const [sent, setSent] = useState(0);
   const [skipped, setSkipped] = useState(0);
   const [mapped, setMapped] = useState(0);
+  const [saveRecording, setSaveRecording] = useState(false);
+  const [videoSent, setVideoSent] = useState(0);
+  const [videoSkipped, setVideoSkipped] = useState(0);
   const [error, setError] = useState("");
+  const [notice, setNotice] = useState("");
+
+  // saving a recording needs a storage bucket connected in Settings -> Integrations
+  const storage = useScopedQuery(
+    ["pi", "meeting-intel", "storage"],
+    () => meetingIntelService.storageConnected(),
+    { staleTime: 60_000 },
+  );
+  // with a bucket the audio and the shared screen's video are saved there; without one only the
+  // audio is saved, in the platform's database, and video is not offered
+  const hasBucket = storage.data?.storage === true;
 
   const run = useRef({
     stream: null as MediaStream | null,
@@ -90,6 +124,15 @@ export function MeetingRecorder({ id }: { id: string }) {
     stopping: false,
     queue: Promise.resolve(),
     analysis: Promise.resolve(),
+    keep: false,
+    videoStream: null as MediaStream | null,
+    videoRecorder: null as MediaRecorder | null,
+    videoMime: undefined as string | undefined,
+    videoIndex: 0,
+    videoSent: 0,
+    videoSkipped: 0,
+    videoQueue: Promise.resolve(),
+    videoTimer: 0 as unknown as ReturnType<typeof setTimeout>,
     partTimer: 0 as unknown as ReturnType<typeof setTimeout>,
     tick: 0 as unknown as ReturnType<typeof setInterval>,
     wake: null as { release: () => Promise<void> } | null,
@@ -102,18 +145,31 @@ export function MeetingRecorder({ id }: { id: string }) {
     () => false,
   );
 
+  // Ending the meeting closes the transcript and then writes the summary and the requirement list,
+  // so they are saved even if nobody presses "Analyse". One mutation, so it finishes even after the
+  // page has moved on to the review screen.
   const complete = useScopedMutation(
-    (v: { duration_ms: number; parts: number; skipped: number }) =>
-      meetingIntelService.completeRecording(id, v),
+    async (v: { duration_ms: number; parts: number; skipped: number }) => {
+      const done = await meetingIntelService.completeRecording(id, v);
+      const analysed = await meetingIntelService.analyse(id).catch(() => null);
+      return { done, analysed };
+    },
     {
       invalidate: [
         ["pi", "meeting-intel", id],
         ["pi", "meeting-intel"],
       ],
-      success: (r) =>
-        r.skipped > 0
-          ? `Transcript ready. ${r.skipped} part${r.skipped === 1 ? "" : "s"} could not be transcribed.`
-          : "Transcript ready",
+      success: ({ done, analysed }) => {
+        const gaps =
+          done.skipped > 0
+            ? ` ${done.skipped} part${done.skipped === 1 ? "" : "s"} could not be transcribed.`
+            : "";
+        if (analysed === null)
+          return `Transcript saved. The summary could not be written: press “Analyse with pi”.${gaps}`;
+        return analysed.insights === 0
+          ? `Transcript and summary saved: nothing worth noting.${gaps}`
+          : `Transcript, summary and ${analysed.insights} finding${analysed.insights === 1 ? "" : "s"} saved for review.${gaps}`;
+      },
       toastErrors: false,
       onSuccess: () => setPhase("idle"),
     },
@@ -122,6 +178,7 @@ export function MeetingRecorder({ id }: { id: string }) {
   const release = useCallback(() => {
     const r = run.current;
     clearTimeout(r.partTimer);
+    clearTimeout(r.videoTimer);
     clearInterval(r.tick);
     r.inputs.forEach((s) => s.getTracks().forEach((t) => t.stop()));
     r.stream?.getTracks().forEach((t) => t.stop());
@@ -129,8 +186,10 @@ export function MeetingRecorder({ id }: { id: string }) {
     void r.wake?.release().catch(() => undefined);
     r.inputs = [];
     r.stream = null;
+    r.videoStream = null;
     r.ctx = null;
     r.recorder = null;
+    r.videoRecorder = null;
     r.wake = null;
     setLevel(0);
   }, []);
@@ -148,7 +207,14 @@ export function MeetingRecorder({ id }: { id: string }) {
     async (part: Part) => {
       for (let attempt = 1; attempt <= TRIES; attempt++) {
         try {
-          await meetingIntelService.uploadPart(id, part);
+          const saved = await meetingIntelService.uploadPart(id, {
+            ...part,
+            keep: run.current.keep,
+          });
+          if (run.current.keep && !saved.saved)
+            setNotice(
+              "Some audio could not be saved to storage. The transcript is safe.",
+            );
           run.current.parts += 1;
           setSent(run.current.parts);
           // map what was just said while the meeting goes on; best effort, one at a time, and the
@@ -187,6 +253,28 @@ export function MeetingRecorder({ id }: { id: string }) {
     [id],
   );
 
+  const sendVideo = useCallback(
+    async (part: VideoPart) => {
+      for (let attempt = 1; attempt <= TRIES; attempt++) {
+        try {
+          await meetingIntelService.uploadVideo(id, part);
+          run.current.videoSent += 1;
+          setVideoSent(run.current.videoSent);
+          return;
+        } catch (e) {
+          if (e instanceof ApiError && FINAL_STATUSES.includes(e.status)) break;
+          if (attempt < TRIES) await sleep(2000 * attempt);
+        }
+      }
+      run.current.videoSkipped += 1;
+      setVideoSkipped(run.current.videoSkipped);
+      setNotice(
+        "Some video could not be saved to storage. The transcript is safe.",
+      );
+    },
+    [id],
+  );
+
   function startPart() {
     const r = run.current;
     if (!r.stream || r.stopping) return;
@@ -220,12 +308,52 @@ export function MeetingRecorder({ id }: { id: string }) {
     }, PART_MS);
   }
 
+  function startVideoPart() {
+    const r = run.current;
+    const stream = r.videoStream;
+    if (!stream || r.stopping) return;
+    // the person pressed the browser's "Stop sharing": the audio and transcript carry on
+    if (stream.getVideoTracks().every((t) => t.readyState === "ended")) return;
+    const index = r.videoIndex++;
+    const startedAt = performance.now();
+    const chunks: Blob[] = [];
+    const recorder = new MediaRecorder(stream, {
+      mimeType: r.videoMime,
+      videoBitsPerSecond: 700_000,
+      audioBitsPerSecond: 48_000,
+    });
+    r.videoRecorder = recorder;
+    recorder.ondataavailable = (e) => {
+      if (e.data.size > 0) chunks.push(e.data);
+    };
+    recorder.onstop = () => {
+      const durationMs = performance.now() - startedAt;
+      if (durationMs < MIN_PART_MS || chunks.length === 0) return;
+      const part: VideoPart = {
+        index,
+        offsetMs: startedAt - r.t0,
+        durationMs,
+        video: new Blob(chunks, { type: recorder.mimeType || r.videoMime }),
+      };
+      r.videoQueue = r.videoQueue.then(() => sendVideo(part));
+    };
+    recorder.start();
+    r.videoTimer = setTimeout(() => {
+      if (r.stopping) return;
+      recorder.stop();
+      startVideoPart();
+    }, VIDEO_PART_MS);
+  }
+
   async function start() {
     const r = run.current;
     setError("");
+    setNotice("");
     setSent(0);
     setSkipped(0);
     setMapped(0);
+    setVideoSent(0);
+    setVideoSkipped(0);
     setPhase("starting");
     r.index = 0;
     r.parts = 0;
@@ -233,7 +361,14 @@ export function MeetingRecorder({ id }: { id: string }) {
     r.stopping = false;
     r.queue = Promise.resolve();
     r.analysis = Promise.resolve();
+    r.keep = saveRecording;
+    r.videoIndex = 0;
+    r.videoSent = 0;
+    r.videoSkipped = 0;
+    r.videoQueue = Promise.resolve();
     r.mime = pickMime();
+    r.videoMime = pickVideoMime();
+    let sharedVideo: MediaStreamTrack[] = [];
     try {
       const mic = await navigator.mediaDevices.getUserMedia({
         audio: { echoCancellation: true, noiseSuppression: true },
@@ -250,11 +385,18 @@ export function MeetingRecorder({ id }: { id: string }) {
         });
         r.inputs.push(shared);
         const audio = shared.getAudioTracks();
-        shared.getVideoTracks().forEach((t) => t.stop());
+        // the picture is kept only when the recording is being saved; otherwise it is dropped now
+        if (r.keep && hasBucket) sharedVideo = shared.getVideoTracks();
+        else shared.getVideoTracks().forEach((t) => t.stop());
         if (audio.length === 0) throw new Error("NO_TAB_AUDIO");
         r.ctx.createMediaStreamSource(new MediaStream(audio)).connect(mixed);
       }
       r.stream = mixed.stream;
+      if (sharedVideo.length > 0)
+        r.videoStream = new MediaStream([
+          ...sharedVideo,
+          ...mixed.stream.getAudioTracks(),
+        ]);
       const meter = r.ctx.createAnalyser();
       meter.fftSize = 512;
       r.ctx.createMediaStreamSource(mixed.stream).connect(meter);
@@ -283,6 +425,7 @@ export function MeetingRecorder({ id }: { id: string }) {
         r.wake = null; // not essential
       }
       startPart();
+      startVideoPart();
       setPhase("recording");
     } catch (e) {
       release();
@@ -297,6 +440,7 @@ export function MeetingRecorder({ id }: { id: string }) {
     setPhase("finishing");
     r.stopping = true;
     clearTimeout(r.partTimer);
+    clearTimeout(r.videoTimer);
     const total = performance.now() - r.t0;
     const recorder = r.recorder;
     if (recorder && recorder.state !== "inactive") {
@@ -305,8 +449,16 @@ export function MeetingRecorder({ id }: { id: string }) {
         recorder.stop();
       });
     }
+    const videoRecorder = r.videoRecorder;
+    if (videoRecorder && videoRecorder.state !== "inactive") {
+      await new Promise<void>((resolve) => {
+        videoRecorder.addEventListener("stop", () => resolve(), { once: true });
+        videoRecorder.stop();
+      });
+    }
     release();
     await r.queue; // every part has been sent (or given up on)
+    await r.videoQueue; // and every video part
     await r.analysis; // and every live analysis has finished before the transcript is closed
     if (r.parts === 0) {
       setError(
@@ -341,9 +493,10 @@ export function MeetingRecorder({ id }: { id: string }) {
           <p className="mt-1 text-xs text-muted-foreground">
             pi writes down what is said while you record and maps the problems
             and requirements as the meeting goes on. A call, a pause or a bad
-            minute does not stop it. The audio is not stored: only the words are
-            kept, with phone, card and ID numbers removed. Consent was recorded
-            when this meeting was created.
+            minute does not stop it. The words are kept with phone, card and ID
+            numbers removed. The audio and video are not kept unless you choose
+            to save the recording below. Consent was recorded when this meeting
+            was created.
           </p>
         </div>
 
@@ -396,6 +549,8 @@ export function MeetingRecorder({ id }: { id: string }) {
                 {skipped > 0 && `, ${skipped} skipped`}
                 {mapped > 0 &&
                   `, ${mapped} requirement${mapped === 1 ? "" : "s"} mapped`}
+                {videoSent + videoSkipped > 0 &&
+                  `, video ${videoSent} saved${videoSkipped > 0 ? `, ${videoSkipped} not saved` : ""}`}
               </span>
             </div>
             <Button
@@ -408,6 +563,32 @@ export function MeetingRecorder({ id }: { id: string }) {
           </div>
         )}
 
+        {(phase === "idle" || phase === "starting") && (
+          <div className="text-xs">
+            <label className="flex items-start gap-2">
+              <input
+                type="checkbox"
+                className="mt-0.5 size-4 accent-primary"
+                checked={saveRecording}
+                disabled={busy}
+                onChange={(e) => setSaveRecording(e.target.checked)}
+              />
+              <span>
+                <span className="font-medium">
+                  Save the recording so it can be played back later
+                </span>
+                <span className="block text-muted-foreground">
+                  {hasBucket
+                    ? "The audio is saved, and for an online meeting the shared screen is saved as video, in your own storage. "
+                    : "The audio is saved. To save video as well, connect a storage bucket in Settings → Integrations. "}
+                  It is kept for a year unless your workspace sets another time.
+                </span>
+              </span>
+            </label>
+          </div>
+        )}
+
+        {notice && <Notice tone="warning">{notice}</Notice>}
         {error && <Notice tone="danger">{error}</Notice>}
       </CardBody>
     </Card>

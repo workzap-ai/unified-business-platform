@@ -102,11 +102,34 @@ is heard through the shared audio.
   approval, or reverse the "no bot" decision; Zoom and Meet transcripts after the meeting through their APIs
   (PMB-3) remain open.
 
+### Saved recordings, summary and the requirement map (built 2026-11-06)
+
+- **Save the recording** is the person's choice on the recorder (consent is checked again on every part).
+  Migration `0059_pi_meeting_media` adds `pi_meeting_media` (one row per stored part: key, size, position,
+  keep-until date) and `pi_meeting_media_data` (audio bytes when there is no bucket). **Apply 0059 in Neon
+  BEFORE deploying this code** (the owner pastes it; it has been run up, down and up on the disposable DB).
+- **Hybrid storage** (owner decision): with an S3/R2 bucket connected (Settings -> Integrations) audio and
+  video both go to the bucket under `t/<tenant>/e/<env>/meetings/<meeting>/<kind>/<part>` and play from
+  one-hour signed links. With no bucket, audio only is kept in the database (150 MB cap per meeting) and played
+  from `GET .../recording/media/audio/{n}/file` (authenticated, byte ranges); video is refused with 409
+  `MEETING_VIDEO_NEEDS_STORAGE`. Video is recorded in 2-minute parts, audio parts ride with the transcription.
+- **Retention**: default 365 days (`response_rules.brain.meeting_retention_days`, 30 to 3650). The date is
+  recorded on every part; **no purge job exists yet**, so nothing is deleted when it passes.
+- **Delete / erase**: deleting a meeting removes bucket objects first (if the bucket cannot be reached nothing is
+  deleted, 409 `RECORDING_DELETE_UNAVAILABLE`), then database audio, then rows. Customer erase reports bucket
+  keys in `meeting_object_keys` as before (the storage step still removes them); database audio goes with its rows.
+- **Summary and requirements are saved as soon as the meeting ends**: Stop closes the transcript and runs the
+  whole-meeting analysis (summary, problems, root causes, impact, requirements, decisions, actions, open
+  questions), all stored as reviewable findings; nothing reaches the customer's memory before approval.
+- **Requirement map**: the new Map tab arranges the findings in five lanes (what is wrong, what it costs, what
+  is needed, decided and next, still open) and connects findings that come from the same part of the
+  conversation (same source line or within two lines). It only arranges; the Problem Map in the customer's
+  memory is still written by approving a finding on the Review tab.
+
 ### Not built yet (needs the owner)
 
-- **The audio is not stored.** It is held in memory for the one speech-to-text call and dropped, so
-  `recording_key` stays empty and a meeting can still be deleted. Storing it needs the S3 or R2 bucket and
-  keys, and the retention decision (proposed 90 days for audio); the write goes in `upload_part`.
+- **Audio and video are saved only when the person chooses to** (see above). By default the audio is held in
+  memory for the one speech-to-text call and dropped.
 - A speech-to-text key must be configured for alias `stt` (OpenAI `whisper-1`, Groq or Gemini). Without one,
   a part answers 502 `MEETING_TRANSCRIBE_FAILED` and nothing is stored.
 - Transcription runs inside the request (a part takes seconds). Moving it to an ARQ job (`meeting:<id>:<stage>`)

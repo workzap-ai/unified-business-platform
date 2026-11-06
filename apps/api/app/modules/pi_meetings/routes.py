@@ -12,6 +12,7 @@ team already has, and the analysis stage runs on it exactly as it will on a tran
 
 import hashlib
 import re
+from collections.abc import Sequence
 from datetime import UTC, datetime
 from typing import Any
 from uuid import UUID
@@ -29,7 +30,7 @@ from app.modules.pi.configuration import settings_row
 from app.modules.pi.memory_ledger import redacted
 from app.modules.pi.service import require_pi
 from app.modules.pi_meetings import analyse as analysis
-from app.modules.pi_meetings import brain_bridge, erase
+from app.modules.pi_meetings import brain_bridge, erase, media
 from app.modules.pi_meetings.insight_rules import Segment
 from app.modules.pi_meetings.models import (
     MEETING_SOURCES,
@@ -250,6 +251,7 @@ async def get_meeting(
     total = int(
         await session.scalar(select(func.count()).select_from(PiMeetingSegment).where(*mine)) or 0
     )
+    segments: Sequence[PiMeetingSegment]
     if meeting.status == "transcribing" and offset == 0:
         # a meeting still being recorded: the newest lines, not the first page
         segments = list(
@@ -608,21 +610,30 @@ async def reject_insight(
 
 
 @router.delete("/{meeting_id}")
-async def delete_meeting(meeting_id: UUID, scope: Scope, session: Session) -> dict[str, Any]:
-    """Delete the meeting, its transcript and its insights. What was already written to the
-    customer's memory stays there (it has its own history and is removed by erasing the customer
-    or by withdrawing it). A meeting with a stored recording is refused until storage deletion
-    exists."""
+async def delete_meeting(
+    meeting_id: UUID, scope: Scope, session: Session, request: Request
+) -> dict[str, Any]:
+    """Delete the meeting, its transcript, its insights and its saved recording (the objects are
+    removed from the workspace's storage first). What was already written to the customer's memory
+    stays there (it has its own history and is removed by erasing the customer or by withdrawing
+    it). If the recording cannot be removed from storage, nothing is deleted and no key is lost."""
     await _gate(session, scope, "pi.meetings.delete")
     meeting = await _meeting(session, scope, meeting_id)
     if meeting.recording_key:
-        # the file lives in object storage and nothing here can remove it yet: refuse rather than
-        # lose the key and leave a recording nobody can find (erase never drops a key silently)
-        raise BusinessRuleViolation(
-            "RECORDING_DELETE_UNAVAILABLE",
-            "This meeting has a stored recording that cannot be removed from storage yet",
-            409,
-        )
+        try:
+            removed = await media.delete_all(session, scope, request, meeting.id)
+        except (media.StorageFailed, BusinessRuleViolation):
+            removed = 0
+            await session.rollback()
+        if removed == 0:
+            # storage is not connected or not reachable, or the recording is not one we can find:
+            # refuse rather than lose the key and leave a recording nobody can find
+            raise BusinessRuleViolation(
+                "RECORDING_DELETE_UNAVAILABLE",
+                "This meeting has a saved recording that could not be removed from storage; "
+                "connect the storage again and try once more",
+                409,
+            )
     await erase.erase_one(session, scope, meeting.id)
     await record(
         session,

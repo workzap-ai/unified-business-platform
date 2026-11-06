@@ -31,8 +31,10 @@ from app.ai.errors import GatewayUnavailable, MediaValidationError
 from app.ai.manager import build_llm_manager
 from app.modules.access.dependencies import Scope, Session
 from app.modules.audit.service import record
+from app.modules.pi.configuration import settings_row
 from app.modules.pi.memory_ledger import redacted
 from app.modules.pi_meetings import analyse as analysis
+from app.modules.pi_meetings import media
 from app.modules.pi_meetings.insight_rules import Segment
 from app.modules.pi_meetings.models import (
     PiMeeting,
@@ -188,8 +190,10 @@ async def upload_part(
     index: Annotated[int, Form(ge=0, lt=MAX_PARTS)],
     offset_ms: Annotated[int, Form(ge=0)] = 0,
     duration_ms: Annotated[int, Form(ge=0, le=MAX_PART_MS)] = 0,
+    keep: Annotated[bool, Form()] = False,
 ) -> dict[str, Any]:
-    """Transcribe one part of the recording and store its words as segments."""
+    """Transcribe one part of the recording and store its words as segments. With `keep` the audio
+    is also saved in the workspace's own storage (media.py) once the words are safe."""
     await _gate(session, scope, "pi.meetings.record")
     meeting = await _meeting(session, scope, meeting_id)
     await _recordable(session, scope, meeting, index)
@@ -233,8 +237,6 @@ async def upload_part(
         raise BusinessRuleViolation(
             "MEETING_TRANSCRIBE_FAILED", "Speech-to-text is unavailable; try again", 502
         ) from None
-    finally:
-        del audio  # the audio is not kept
 
     base = index * PART_STRIDE
     await session.execute(
@@ -271,6 +273,27 @@ async def upload_part(
     if not meeting.language and result.language:
         meeting.language = result.language[:12].lower()
     meeting.source = "browser" if meeting.source == "upload" else meeting.source
+    saved = False
+    if keep and mime in media.EXTENSIONS:
+        # the words are already stored: a storage problem must never cost the transcript
+        try:
+            await media.save_part(
+                session,
+                scope,
+                request,
+                meeting,
+                kind="audio",
+                ordinal=index,
+                data=audio,
+                mime=mime,
+                offset_ms=offset_ms,
+                duration_ms=duration_ms,
+                days=media.retention_days((await settings_row(session, scope)).response_rules),
+            )
+            saved = True
+        except (media.StorageFailed, media.NeedsBucket, media.MeetingFull, BusinessRuleViolation):
+            saved = False
+    audio = b""  # the audio is held only for the speech-to-text call and, with `keep`, the upload
     meeting.status = "transcribing"
     meeting.failure_reason = ""
     await record(
@@ -282,7 +305,7 @@ async def upload_part(
         details={"part": index, "segments": kept},
     )
     await session.commit()
-    return {"part": index, "segments": kept}
+    return {"part": index, "segments": kept, "saved": saved}
 
 
 class CompleteInput(BaseModel):

@@ -15,12 +15,16 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.modules.pi_meetings.models import (
     PiMeeting,
     PiMeetingInsight,
+    PiMeetingMedia,
+    PiMeetingMediaData,
     PiMeetingParticipant,
     PiMeetingSegment,
 )
 from app.shared.scope import WorkspaceScope
 
 MEETING_REMOVED_KEYS = (
+    "meeting_media_data",
+    "meeting_media",
     "meeting_insights",
     "meeting_segments",
     "meeting_participants",
@@ -31,16 +35,36 @@ MEETING_REMOVED_KEYS = (
 async def recording_keys(
     session: AsyncSession, scope: WorkspaceScope, customer_id: UUID
 ) -> list[str]:
-    """Object-store keys of this customer's recordings (read before the rows are deleted)."""
-    rows = await session.scalars(
+    """Object-store keys of this customer's recordings (read before the rows are deleted): every
+    part
+    saved in a bucket, and the key of a meeting that names a recording but has no part rows. Audio
+    kept in the database has no object and is not listed: it goes with its rows."""
+    mine_media = (
+        PiMeetingMedia.tenant_id == scope.tenant_id,
+        PiMeetingMedia.environment_id == scope.environment_id,
+    )
+    in_bucket = await session.scalars(
+        select(PiMeetingMedia.key)
+        .join(
+            PiMeeting,
+            (PiMeeting.id == PiMeetingMedia.meeting_id)
+            & (PiMeeting.tenant_id == PiMeetingMedia.tenant_id)
+            & (PiMeeting.environment_id == PiMeetingMedia.environment_id),
+        )
+        .where(*mine_media, PiMeeting.customer_id == customer_id)
+        .where(~PiMeetingMedia.key.like("db/%"))
+    )
+    with_parts = select(PiMeetingMedia.meeting_id).where(*mine_media)
+    legacy = await session.scalars(
         select(PiMeeting.recording_key).where(
             PiMeeting.tenant_id == scope.tenant_id,
             PiMeeting.environment_id == scope.environment_id,
             PiMeeting.customer_id == customer_id,
             PiMeeting.recording_key.is_not(None),
+            PiMeeting.id.not_in(with_parts),
         )
     )
-    return [key for key in rows if key]
+    return [key for key in [*in_bucket, *legacy] if key]
 
 
 def erase_steps(scope: WorkspaceScope, customer_id: UUID) -> tuple[tuple[str, Any], ...]:
@@ -53,7 +77,22 @@ def erase_steps(scope: WorkspaceScope, customer_id: UUID) -> tuple[tuple[str, An
         )
 
     meeting_ids = select(PiMeeting.id).where(*mine(PiMeeting), PiMeeting.customer_id == customer_id)
+    media_ids = select(PiMeetingMedia.id).where(
+        *mine(PiMeetingMedia), PiMeetingMedia.meeting_id.in_(meeting_ids)
+    )
     return (
+        (
+            "meeting_media_data",
+            delete(PiMeetingMediaData).where(
+                *mine(PiMeetingMediaData), PiMeetingMediaData.media_id.in_(media_ids)
+            ),
+        ),
+        (
+            "meeting_media",
+            delete(PiMeetingMedia).where(
+                *mine(PiMeetingMedia), PiMeetingMedia.meeting_id.in_(meeting_ids)
+            ),
+        ),
         (
             "meeting_insights",
             delete(PiMeetingInsight).where(
@@ -105,7 +144,19 @@ async def erase_one(session: AsyncSession, scope: WorkspaceScope, meeting_id: UU
     key = await session.scalar(
         select(PiMeeting.recording_key).where(*where, PiMeeting.id == meeting_id)
     )
-    for model in (PiMeetingInsight, PiMeetingSegment, PiMeetingParticipant):
+    media_ids = select(PiMeetingMedia.id).where(
+        PiMeetingMedia.tenant_id == scope.tenant_id,
+        PiMeetingMedia.environment_id == scope.environment_id,
+        PiMeetingMedia.meeting_id == meeting_id,
+    )
+    await session.execute(
+        delete(PiMeetingMediaData).where(
+            PiMeetingMediaData.tenant_id == scope.tenant_id,
+            PiMeetingMediaData.environment_id == scope.environment_id,
+            PiMeetingMediaData.media_id.in_(media_ids),
+        )
+    )
+    for model in (PiMeetingMedia, PiMeetingInsight, PiMeetingSegment, PiMeetingParticipant):
         await session.execute(
             delete(model).where(
                 model.tenant_id == scope.tenant_id,

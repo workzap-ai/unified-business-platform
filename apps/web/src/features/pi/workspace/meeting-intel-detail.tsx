@@ -38,7 +38,9 @@ import {
   type MeetingDetail as Detail,
   type Segment,
 } from "../meeting-intel-service";
+import { MeetingMap } from "./meeting-map";
 import { MeetingRecorder } from "./meeting-recorder";
+import { MeetingRecordingPlayer } from "./meeting-recording-player";
 import {
   Accent,
   GroupHeading,
@@ -139,6 +141,12 @@ function Body({ meeting }: { meeting: Detail }) {
         <Notice tone="danger">{meeting.failure_reason}</Notice>
       )}
       {recording && <MeetingRecorder id={meeting.id} />}
+      {meeting.has_recording && !live && (
+        <MeetingRecordingPlayer
+          id={meeting.id}
+          until={meeting.retention_until}
+        />
+      )}
       {!hasTranscript &&
         (canRecord ? (
           <TranscriptImport id={meeting.id} />
@@ -167,6 +175,7 @@ function Body({ meeting }: { meeting: Detail }) {
                   </Badge>
                 )}
               </TabsTrigger>
+              <TabsTrigger value="map">Map</TabsTrigger>
               <TabsTrigger value="transcript">Transcript</TabsTrigger>
             </TabsList>
             {/* the whole-meeting analysis waits until the recording is finished */}
@@ -174,6 +183,9 @@ function Body({ meeting }: { meeting: Detail }) {
           </div>
           <TabsContent value="review" className="mt-4">
             <Insights meeting={meeting} />
+          </TabsContent>
+          <TabsContent value="map" className="mt-4">
+            <MeetingMap meeting={meeting} />
           </TabsContent>
           <TabsContent value="transcript" className="mt-4">
             <Transcript
