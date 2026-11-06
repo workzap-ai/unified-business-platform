@@ -171,7 +171,7 @@ function MeetingList({ open }: { open: (id: string) => void }) {
         <EmptyState
           icon={AudioLines}
           title="No meetings yet"
-          description="Add a meeting, paste its transcript, and pi lists the problems, decisions and next steps for you to review."
+          description="Add a meeting, then record it live, add a recorded video or audio file, or paste its transcript. pi writes the transcript and lists the problems, needs, decisions and next steps for you to review."
         />
       ) : (
         <>
