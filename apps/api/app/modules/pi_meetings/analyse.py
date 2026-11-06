@@ -28,8 +28,13 @@ from app.shared.scope import WorkspaceScope
 
 logger = logging.getLogger(__name__)
 
-CHUNK_CHARS = 6000
-MAX_PARALLEL = 4  # a long meeting is many chunks: read a few at a time, not one by one
+# Bigger chunks mean fewer model calls, and a provider that rate-limits is hit less often (a 34,000
+# character meeting is four calls, not seven). Two at a time, not four: a burst of calls is what a
+# rate limit punishes, and a failed chunk is tried again after a pause instead of failing the lot.
+CHUNK_CHARS = 12_000
+MAX_PARALLEL = 2
+RETRIES = 4  # calls per chunk when the gateway says it is unavailable or rate limited
+RETRY_PAUSE_S = 3.0  # waited after the first failure, twice that after the second, and so on
 PURPOSE = "pi_meeting_analyse"
 
 SYSTEM = """You read the transcript of a business meeting between a small-business owner and the
@@ -117,22 +122,35 @@ async def analyse(
 
     Raises `AnalysisFailed` when a model call fails, so the job is retried and a half-analysed
     meeting is never presented as finished."""
+    from app.ai.errors import GatewayUnavailable
     from app.ai.types import Message
 
     gate = asyncio.Semaphore(MAX_PARALLEL)
 
     async def read(part: Sequence[Segment]) -> Any:
         async with gate:
-            result = await manager.complete_structured(
-                scope,
-                ModelOutput,
-                alias="fast",
-                purpose=PURPOSE,
-                messages=[Message.system(SYSTEM), Message.user(_payload(part, language))],
-                temperature=0.1,
-                max_tokens=1800,
-            )
-        return result.value
+            for attempt in range(1, RETRIES + 1):
+                try:
+                    result = await manager.complete_structured(
+                        scope,
+                        ModelOutput,
+                        alias="fast",
+                        purpose=PURPOSE,
+                        messages=[
+                            Message.system(SYSTEM),
+                            Message.user(_payload(part, language)),
+                        ],
+                        temperature=0.1,
+                        max_tokens=1800,
+                    )
+                    return result.value
+                except GatewayUnavailable:
+                    # every provider said no (usually a rate limit): wait, still holding
+                    # our place, so the other chunks slow down too, then ask again
+                    if attempt == RETRIES:
+                        raise
+                    await asyncio.sleep(RETRY_PAUSE_S * attempt)
+        raise AssertionError("unreachable")  # the loop returns or raises
 
     try:
         values = await asyncio.gather(*(read(part) for part in chunks(segments)))

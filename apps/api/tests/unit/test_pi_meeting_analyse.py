@@ -83,3 +83,65 @@ async def test_a_long_transcript_is_sent_in_several_calls():
 async def test_a_model_failure_raises_so_the_job_is_retried():
     with pytest.raises(stage.AnalysisFailed):
         await stage.analyse(FakeManager(fail=True), SimpleNamespace(), lines(2))
+
+
+# ---- a rate-limited provider no longer fails a whole meeting
+
+
+class Flaky:
+    """Says "unavailable" a set number of times per call sequence, then answers."""
+
+    def __init__(self, fail_first=0, always=False):
+        self.fail_first = fail_first
+        self.always = always
+        self.calls = 0
+        self.running = 0
+        self.most_at_once = 0
+
+    async def complete_structured(self, scope, output, **kw):
+        import asyncio
+
+        from app.ai.errors import GatewayUnavailable
+
+        self.calls += 1
+        self.running += 1
+        self.most_at_once = max(self.most_at_once, self.running)
+        try:
+            await asyncio.sleep(0)
+            if self.always or self.calls <= self.fail_first:
+                raise GatewayUnavailable()
+            return SimpleNamespace(value=output(insights=[]))
+        finally:
+            self.running -= 1
+
+
+async def test_a_rate_limited_call_is_asked_again_after_a_pause(monkeypatch):
+    monkeypatch.setattr(stage, "RETRY_PAUSE_S", 0)
+    model = Flaky(fail_first=2)
+    kept, dropped = await stage.analyse(model, SimpleNamespace(), lines(2))
+    assert (kept, dropped) == ([], []) and model.calls == 3  # two refusals, then it worked
+
+
+async def test_it_gives_up_only_after_every_try_and_then_the_job_is_retried(monkeypatch):
+    monkeypatch.setattr(stage, "RETRY_PAUSE_S", 0)
+    model = Flaky(always=True)
+    with pytest.raises(stage.AnalysisFailed):
+        await stage.analyse(model, SimpleNamespace(), lines(2))
+    assert model.calls == stage.RETRIES  # one chunk, every try used
+
+
+async def test_only_two_chunks_are_read_at_once_and_a_long_meeting_is_few_calls(monkeypatch):
+    monkeypatch.setattr(stage, "RETRY_PAUSE_S", 0)
+    model = Flaky()
+    # the Softxic meeting: 365 lines, about 34,000 characters
+    await stage.analyse(model, SimpleNamespace(), lines(365, 93))
+    assert model.most_at_once <= stage.MAX_PARALLEL == 2
+    assert model.calls <= 4
+
+
+async def test_a_failure_that_is_not_the_gateway_is_not_retried(monkeypatch):
+    monkeypatch.setattr(stage, "RETRY_PAUSE_S", 0)
+    model = FakeManager(fail=True)  # raises a plain TimeoutError
+    with pytest.raises(stage.AnalysisFailed):
+        await stage.analyse(model, SimpleNamespace(), lines(2))
+    assert len(model.calls) == 1
