@@ -40,6 +40,7 @@ import {
 } from "../meeting-intel-service";
 import { MeetingMap } from "./meeting-map";
 import { MeetingRecorder } from "./meeting-recorder";
+import { MeetingFileImport } from "./meeting-file-import";
 import { MeetingRecordingPlayer } from "./meeting-recording-player";
 import {
   Accent,
@@ -141,6 +142,9 @@ function Body({ meeting }: { meeting: Detail }) {
         <Notice tone="danger">{meeting.failure_reason}</Notice>
       )}
       {recording && <MeetingRecorder id={meeting.id} />}
+      {recording && !hasTranscript && !live && (
+        <MeetingFileImport id={meeting.id} />
+      )}
       {meeting.has_recording && !live && can("pi.meetings.recording") && (
         <MeetingRecordingPlayer
           id={meeting.id}
