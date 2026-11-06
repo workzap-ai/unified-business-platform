@@ -6,9 +6,9 @@ stop without changing anything when the storage cannot be reached."""
 import pytest
 from sqlalchemy import func, select, update
 from test_pi_meeting_data import workspace
-from test_pi_meeting_media_flow import audio_part, bucket, video_part  # noqa: F401
+from test_pi_meeting_media_flow import agreed, audio_part, bucket, video_part  # noqa: F401
 from test_pi_meeting_recording_flow import WEBM
-from test_pi_meeting_routes import BASE, body, switch_on
+from test_pi_meeting_routes import BASE, switch_on
 
 from app.modules.pi_meetings.models import PiMeeting, PiMeetingMedia
 
@@ -25,7 +25,7 @@ async def test_erasing_a_customer_removes_their_recordings_from_storage(api, bus
     pi, conv, scope = await workspace(api, business_db, "366400001")
     customer_id = conv.customer_id
     await switch_on(api)
-    mid = (await api.post(BASE, json=body(customer_id=str(customer_id)))).json()["id"]
+    mid = await agreed(api, customer_id=str(customer_id))
     await audio_part(api, mid, 0, keep="true")
     await video_part(api, mid, 0)
     assert len(bucket.objects) == 2
@@ -51,7 +51,7 @@ async def test_a_meeting_with_parts_but_no_recording_key_still_removes_them(
 ):
     pi, conv, scope = await workspace(api, business_db, "366400002")
     await switch_on(api)
-    mid = (await api.post(BASE, json=body())).json()["id"]
+    mid = await agreed(api)
     await video_part(api, mid, 0)
     await business_db.execute(update(PiMeeting).values(recording_key=None))
     await business_db.commit()
@@ -69,7 +69,7 @@ async def test_a_meeting_with_parts_but_no_recording_key_still_removes_them(
 async def test_a_part_replaced_under_a_new_key_leaves_no_old_object(api, business_db, bucket):
     pi, conv, scope = await workspace(api, business_db, "366400003")
     await switch_on(api)
-    mid = (await api.post(BASE, json=body())).json()["id"]
+    mid = await agreed(api)
     url = f"{BASE}/{mid}/recording/media/audio/0"
     first = await api.post(url, files={"file": ("p.webm", WEBM, "audio/webm")})
     assert first.status_code == 200
@@ -90,7 +90,7 @@ async def test_a_replacement_is_abandoned_when_the_old_object_cannot_be_removed(
 ):
     pi, conv, scope = await workspace(api, business_db, "366400004")
     await switch_on(api)
-    mid = (await api.post(BASE, json=body())).json()["id"]
+    mid = await agreed(api)
     url = f"{BASE}/{mid}/recording/media/audio/0"
     await api.post(url, files={"file": ("p.webm", WEBM, "audio/webm")})
     [old_key] = bucket.objects

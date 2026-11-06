@@ -141,7 +141,7 @@ function Body({ meeting }: { meeting: Detail }) {
         <Notice tone="danger">{meeting.failure_reason}</Notice>
       )}
       {recording && <MeetingRecorder id={meeting.id} />}
-      {meeting.has_recording && !live && (
+      {meeting.has_recording && !live && can("pi.meetings.recording") && (
         <MeetingRecordingPlayer
           id={meeting.id}
           until={meeting.retention_until}

@@ -64,6 +64,7 @@ _DEFS: list[tuple[str, str, str]] = [
     ("pi.meetings.record", "Upload or record a meeting and run its analysis", "PI"),
     ("pi.meetings.approve", "Approve meeting insights into customer memory", "PI"),
     ("pi.meetings.delete", "Delete meetings and their recordings", "PI"),
+    ("pi.meetings.recording", "Play a meeting's saved audio and video", "PI"),
     ("admin.members.read", "View members", "Administration"),
     ("admin.members.manage", "Manage members", "Administration"),
     ("admin.roles.manage", "Manage roles", "Administration"),
@@ -100,7 +101,7 @@ SYSTEM_ROLES: dict[str, tuple[str, str, frozenset[str]]] = {
         | {"billing.write", "pi.inbox.reply", "pi.handoffs.manage", "notifications.read"}
         | {"pi.inbox.all", "pi.inbox.assign", "pi.inbox.notes"}
         | {"pi.bookings.manage", "pi.work.manage", "pi.campaigns.manage"}
-        | {"pi.meetings.record", "pi.meetings.approve"},
+        | {"pi.meetings.record", "pi.meetings.approve", "pi.meetings.recording"},
     ),
     "sales": (
         "Sales",

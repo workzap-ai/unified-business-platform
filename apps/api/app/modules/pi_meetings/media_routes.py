@@ -8,6 +8,7 @@ the authenticated file route for database audio. Saving needs consent (recorded 
 created, and checked again here); the transcript works either way.
 """
 
+from datetime import UTC, datetime
 from typing import Annotated, Any
 from uuid import UUID
 
@@ -96,6 +97,12 @@ async def save_media(
             duration_ms=duration_ms,
             days=days,
         )
+    except media.NoMediaConsent:
+        raise BusinessRuleViolation(
+            "MEETING_MEDIA_CONSENT_REQUIRED",
+            "Saving the recording needs a yes first (save-consent) for this meeting",
+            422,
+        ) from None
     except media.NeedsBucket:
         raise BusinessRuleViolation(
             "MEETING_VIDEO_NEEDS_STORAGE",
@@ -128,6 +135,28 @@ async def save_media(
         "bytes": len(data),
         "retention_until": row.retention_until.isoformat() if row.retention_until else None,
     }
+
+
+@router.post("/{meeting_id}/recording/save-consent")
+async def save_consent(meeting_id: UUID, scope: Scope, session: Session) -> dict[str, Any]:
+    """Say yes to SAVING this meeting's audio and video (a separate choice from recording it).
+    Nothing is stored before this; the server records who agreed and when. Saying it again keeps the
+    first answer."""
+    await _gate(session, scope, "pi.meetings.record")
+    meeting = await _meeting(session, scope, meeting_id)
+    await _recordable(session, scope, meeting)
+    if meeting.media_consent_at is None:
+        meeting.media_consent_at = datetime.now(UTC)
+        meeting.media_consent_by = scope.user_id
+        await record(
+            session,
+            "pi.meeting_media_consent",
+            scope=scope,
+            entity_type="pi_meeting",
+            entity_id=meeting.id,
+        )
+        await session.commit()
+    return {"media_consent_at": meeting.media_consent_at.isoformat()}
 
 
 def _file_url(meeting_id: UUID) -> Any:
@@ -177,7 +206,7 @@ async def play_part(
 ) -> Response:
     """Play a part that is kept in the database (audio without a storage bucket). Supports one byte
     range, so a player can jump around. Parts in a bucket are played from their signed link."""
-    await _gate(session, scope, "pi.meetings.read")
+    await _gate(session, scope, "pi.meetings.recording")
     meeting = await _meeting(session, scope, meeting_id)
     rows = [r for r in await media.parts(session, scope, meeting.id) if r.kind == kind]
     row = next((r for r in rows if r.ordinal == index and media.is_database_key(r.key)), None)
@@ -187,6 +216,17 @@ async def play_part(
     if not data:
         raise ResourceNotFound
     headers = {"Accept-Ranges": "bytes", "Cache-Control": "private, no-store"}
+    if not (range_header or "").startswith("bytes=") or (range_header or "").startswith("bytes=0-"):
+        # a listening session is one record (ids only, never the audio); later ranges are not
+        await record(
+            session,
+            "pi.meeting_recording_played",
+            scope=scope,
+            entity_type="pi_meeting",
+            entity_id=meeting.id,
+            details={"kind": kind, "part": index},
+        )
+        await session.commit()
     wanted = _range(range_header, len(data))
     if wanted == UNSATISFIABLE:
         return Response(
@@ -205,7 +245,7 @@ async def recording(
 ) -> dict[str, Any]:
     """The saved parts of the recording with short-lived links to play them. The links expire after
     an hour; ask again to get new ones."""
-    await _gate(session, scope, "pi.meetings.read")
+    await _gate(session, scope, "pi.meetings.recording")
     meeting = await _meeting(session, scope, meeting_id)
     rows = await media.parts(session, scope, meeting.id)
     if not rows:

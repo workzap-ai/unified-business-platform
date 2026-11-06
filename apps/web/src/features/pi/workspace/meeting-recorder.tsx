@@ -424,6 +424,18 @@ export function MeetingRecorder({ id }: { id: string }) {
       } catch {
         r.wake = null; // not essential
       }
+      if (r.keep) {
+        // the server must hold the yes before it stores anything; without it only the words are kept
+        try {
+          await meetingIntelService.saveConsent(id);
+        } catch {
+          r.keep = false;
+          r.videoStream = null;
+          setNotice(
+            "The words are being kept, but saving the recording could not be agreed, so it will not be saved.",
+          );
+        }
+      }
       startPart();
       startVideoPart();
       setPhase("recording");

@@ -7,8 +7,8 @@ WEBM = b"\x1a\x45\xdf\xa3" + b"\x00" * 16
 
 
 def test_a_recording_is_kept_a_year_unless_the_workspace_says_otherwise():
-    assert media.retention_days(None) == 365
-    assert media.retention_days({}) == 365
+    assert media.retention_days(None) == 90
+    assert media.retention_days({}) == 90
     assert media.retention_days({"brain": {"meeting_retention_days": 730}}) == 730
 
 
@@ -21,7 +21,7 @@ def test_retention_stays_inside_its_bounds_and_ignores_nonsense():
         == media.MAX_RETENTION_DAYS
     )
     for bad in ("365", 3.5, True, None, [], {}):
-        assert media.retention_days({"brain": {"meeting_retention_days": bad}}) == 365
+        assert media.retention_days({"brain": {"meeting_retention_days": bad}}) == 90
 
 
 def test_every_allowed_type_has_a_file_extension_and_a_signature_check():

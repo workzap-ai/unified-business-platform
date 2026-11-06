@@ -5,8 +5,9 @@ video is refused with a clear message. No bucket is connected in these tests: no
 import pytest
 from sqlalchemy import func, select
 from test_pi_meeting_data import workspace
+from test_pi_meeting_media_flow import agreed
 from test_pi_meeting_recording_flow import WEBM, Speech
-from test_pi_meeting_routes import BASE, body, switch_on
+from test_pi_meeting_routes import BASE, switch_on
 
 from app.modules.pi_meetings import erase, media, recording_routes
 from app.modules.pi_meetings.models import PiMeeting, PiMeetingMedia, PiMeetingMediaData
@@ -42,7 +43,7 @@ async def test_audio_is_kept_in_the_database_and_plays_back(api, business_db):
     pi, conv, scope = await workspace(api, business_db, "366300001")
     customer_id = conv.customer_id
     await switch_on(api)
-    mid = (await api.post(BASE, json=body(customer_id=str(customer_id)))).json()["id"]
+    mid = await agreed(api, customer_id=str(customer_id))
 
     saved = await audio_part(api, mid, 0)
     assert saved.status_code == 200 and saved.json()["saved"] is True
@@ -84,7 +85,7 @@ async def test_audio_is_kept_in_the_database_and_plays_back(api, business_db):
 async def test_video_needs_a_bucket_and_says_so(api, business_db):
     pi, conv, scope = await workspace(api, business_db, "366300002")
     await switch_on(api)
-    mid = (await api.post(BASE, json=body())).json()["id"]
+    mid = await agreed(api)
     refused = await api.post(
         f"{BASE}/{mid}/recording/media/video/0",
         data={"offset_ms": "0", "duration_ms": "60000"},
@@ -100,7 +101,7 @@ async def test_one_meeting_cannot_fill_the_database(api, business_db, monkeypatc
     pi, conv, scope = await workspace(api, business_db, "366300003")
     await switch_on(api)
     monkeypatch.setattr(media, "DATABASE_AUDIO_CAP", len(AUDIO) * 2)
-    mid = (await api.post(BASE, json=body())).json()["id"]
+    mid = await agreed(api)
     assert (await audio_part(api, mid, 0)).json()["saved"] is True
     assert (await audio_part(api, mid, 1)).json()["saved"] is True
     full = await audio_part(api, mid, 2)
@@ -117,7 +118,7 @@ async def test_one_meeting_cannot_fill_the_database(api, business_db, monkeypatc
 async def test_audio_declined_means_nothing_is_kept(api, business_db):
     pi, conv, scope = await workspace(api, business_db, "366300004")
     await switch_on(api)
-    mid = (await api.post(BASE, json=body())).json()["id"]
+    mid = await agreed(api)
     heard = await audio_part(api, mid, 0, keep="false")
     assert heard.status_code == 200 and heard.json()["saved"] is False
     assert await count(business_db, PiMeetingMedia) == 0
@@ -128,7 +129,7 @@ async def test_audio_declined_means_nothing_is_kept(api, business_db):
 async def test_deleting_the_meeting_removes_the_kept_audio(api, business_db):
     pi, conv, scope = await workspace(api, business_db, "366300005")
     await switch_on(api)
-    mid = (await api.post(BASE, json=body())).json()["id"]
+    mid = await agreed(api)
     await audio_part(api, mid, 0)
     assert await count(business_db, PiMeetingMediaData) == 1
     gone = await api.delete(f"{BASE}/{mid}")  # no bucket is needed: the audio is in the database
@@ -142,7 +143,7 @@ async def test_deleting_the_meeting_removes_the_kept_audio(api, business_db):
 async def test_another_workspace_cannot_hear_it(api, business_db):
     first, _, _ = await workspace(api, business_db, "366300006")
     await switch_on(api)
-    mid = (await api.post(BASE, json=body())).json()["id"]
+    mid = await agreed(api)
     await audio_part(api, mid, 0)
     second, _, _ = await workspace(api, business_db, "366300007")
     await switch_on(api)

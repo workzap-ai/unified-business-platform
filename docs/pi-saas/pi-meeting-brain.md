@@ -113,7 +113,15 @@ is heard through the shared audio.
   one-hour signed links. With no bucket, audio only is kept in the database (150 MB cap per meeting) and played
   from `GET .../recording/media/audio/{n}/file` (authenticated, byte ranges); video is refused with 409
   `MEETING_VIDEO_NEEDS_STORAGE`. Video is recorded in 2-minute parts, audio parts ride with the transcription.
-- **Retention**: default 365 days (`response_rules.brain.meeting_retention_days`, 30 to 3650). The date is
+- **Consent to save**: separate from consent to record. `POST .../recording/save-consent` sets
+  `media_consent_at` / `media_consent_by` on the meeting; until then no part is stored (audio with `keep` is
+  simply not saved, the words still are; video gets 422 `MEETING_MEDIA_CONSENT_REQUIRED`). The recorder asks
+  for it when "Save the recording" is ticked and falls back to words only if it cannot be recorded.
+- **Playback permission**: `pi.meetings.recording` (owner, admin, manager; backfilled in 0059). Listing and
+  playing parts need it, not just `pi.meetings.read`; each opening/listening is audited with ids only.
+- **Known exception**: the transcript is redacted before it is stored, but saved audio/video is the original
+  recording (it cannot be redacted). That is why saving needs its own yes and its own permission.
+- **Retention**: default 90 days (`response_rules.brain.meeting_retention_days`, 30 to 3650). The date is
   recorded on every part; **no purge job exists yet**, so nothing is deleted when it passes.
 - **Delete / erase**: deleting a meeting removes bucket objects first (if the bucket cannot be reached nothing is
   deleted, 409 `RECORDING_DELETE_UNAVAILABLE`), then database audio, then rows. This runs for every meeting, even

@@ -291,7 +291,13 @@ async def upload_part(
                 days=media.retention_days((await settings_row(session, scope)).response_rules),
             )
             saved = True
-        except (media.StorageFailed, media.NeedsBucket, media.MeetingFull, BusinessRuleViolation):
+        except (
+            media.StorageFailed,
+            media.NeedsBucket,
+            media.MeetingFull,
+            media.NoMediaConsent,
+            BusinessRuleViolation,
+        ):
             saved = False
     audio = b""  # the audio is held only for the speech-to-text call and, with `keep`, the upload
     meeting.status = "transcribing"

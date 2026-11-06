@@ -15,7 +15,9 @@ or retyped, nothing is backfilled.
 Code writes to them only for a meeting whose recording the person chose to save. Apply 0059 BEFORE
 deploying the code that saves recordings (the routes need the tables).
 Locks: CREATE TABLE takes none on existing tables; the composite foreign keys take a brief SHARE ROW
-EXCLUSIVE lock on `pi_meetings` and `environments`.
+EXCLUSIVE lock on `pi_meetings` and `environments`. Also: two nullable columns on `pi_meetings`
+(`media_consent_at`, `media_consent_by`: nothing is rewritten) and the new permission
+`pi.meetings.recording` granted to the owner, admin and manager system roles (idempotent).
 Rollback: downgrade drops both tables (audio kept in the database is lost; files in a bucket stay there);
 or revert the code and leave them.
 """
@@ -32,7 +34,29 @@ TABLE = "pi_meeting_media"
 DATA = "pi_meeting_media_data"
 
 
+_GRANTS: dict[str, tuple[str, ...]] = {
+    "owner": ("pi.meetings.recording",),
+    "admin": ("pi.meetings.recording",),
+    "manager": ("pi.meetings.recording",),
+}
+
+
 def upgrade() -> None:
+    # who said yes to saving the audio/video, and when (two nullable columns: no rewrite)
+    op.add_column("pi_meetings", sa.Column("media_consent_at", sa.DateTime(timezone=True)))
+    op.add_column("pi_meetings", sa.Column("media_consent_by", sa.Uuid()))
+    # playing a saved recording is its own permission, granted to the roles that carry it in code
+    for key, permissions in _GRANTS.items():
+        for permission in permissions:
+            op.execute(
+                sa.text(
+                    "INSERT INTO role_permissions (id, tenant_id, role_id, permission) "
+                    "SELECT gen_random_uuid(), r.tenant_id, r.id, :permission FROM roles r "
+                    "WHERE r.is_system AND r.key = :key "
+                    "AND NOT EXISTS (SELECT 1 FROM role_permissions rp "
+                    "WHERE rp.role_id = r.id AND rp.permission = :permission)"
+                ).bindparams(key=key, permission=permission)
+            )
     op.create_table(
         TABLE,
         sa.Column("meeting_id", sa.Uuid(), nullable=False),
@@ -146,3 +170,14 @@ def downgrade() -> None:
     op.drop_table(DATA)
     op.drop_index("uq_pi_meeting_media_part", table_name=TABLE)
     op.drop_table(TABLE)
+    for key, permissions in _GRANTS.items():
+        for permission in permissions:
+            op.execute(
+                sa.text(
+                    "DELETE FROM role_permissions rp USING roles r "
+                    "WHERE r.id = rp.role_id AND r.tenant_id = rp.tenant_id "
+                    "AND r.is_system AND r.key = :key AND rp.permission = :permission"
+                ).bindparams(key=key, permission=permission)
+            )
+    op.drop_column("pi_meetings", "media_consent_by")
+    op.drop_column("pi_meetings", "media_consent_at")

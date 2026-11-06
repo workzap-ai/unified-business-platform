@@ -56,6 +56,13 @@ def bucket(monkeypatch):
     return store
 
 
+async def agreed(api, **fields):
+    """A new meeting whose owner has said yes to saving the recording."""
+    mid = (await api.post(BASE, json=body(**fields))).json()["id"]
+    assert (await api.post(f"{BASE}/{mid}/recording/save-consent")).status_code == 200
+    return mid
+
+
 def audio_part(api, mid, index, **extra):
     return api.post(
         f"{BASE}/{mid}/recording/parts",
@@ -81,7 +88,7 @@ async def test_audio_and_video_are_saved_and_play_back(api, business_db, bucket)
     pi, conv, scope = await workspace(api, business_db, "366200001")
     customer_id = conv.customer_id  # read now: expire_all() below would make it a lazy load
     await switch_on(api)
-    mid = (await api.post(BASE, json=body(customer_id=str(customer_id)))).json()["id"]
+    mid = await agreed(api, customer_id=str(customer_id))
 
     heard = await audio_part(api, mid, 0, keep="true")
     assert heard.status_code == 200 and heard.json()["saved"] is True
@@ -95,7 +102,7 @@ async def test_audio_and_video_are_saved_and_play_back(api, business_db, bucket)
     detail = (await api.get(f"{BASE}/{mid}")).json()
     assert detail["has_recording"] is True
     until = datetime.fromisoformat(detail["retention_until"])
-    assert timedelta(days=360) < until - datetime.now(UTC) <= timedelta(days=366)  # kept a year
+    assert timedelta(days=88) < until - datetime.now(UTC) <= timedelta(days=91)  # kept 90 days
 
     played = (await api.get(f"{BASE}/{mid}/recording")).json()
     assert [(p["kind"], p["index"]) for p in played["parts"]] == [
@@ -120,7 +127,7 @@ async def test_audio_and_video_are_saved_and_play_back(api, business_db, bucket)
 async def test_a_storage_problem_never_costs_the_transcript(api, business_db, bucket):
     pi, conv, scope = await workspace(api, business_db, "366200002")
     await switch_on(api)
-    mid = (await api.post(BASE, json=body())).json()["id"]
+    mid = await agreed(api)
     bucket.broken = True
     heard = await audio_part(api, mid, 0, keep="true")
     assert heard.status_code == 200
@@ -138,7 +145,7 @@ async def test_a_storage_problem_never_costs_the_transcript(api, business_db, bu
 async def test_only_real_recordings_are_saved(api, business_db, bucket):
     pi, conv, scope = await workspace(api, business_db, "366200003")
     await switch_on(api)
-    mid = (await api.post(BASE, json=body())).json()["id"]
+    mid = await agreed(api)
     for mime, data in (
         ("video/webm", b"not a recording at all"),  # the bytes do not match the type
         ("application/pdf", WEBM),  # a type that is not a recording
@@ -158,7 +165,7 @@ async def test_only_real_recordings_are_saved(api, business_db, bucket):
 async def test_deleting_a_meeting_removes_its_recording_first(api, business_db, bucket):
     pi, conv, scope = await workspace(api, business_db, "366200004")
     await switch_on(api)
-    mid = (await api.post(BASE, json=body())).json()["id"]
+    mid = await agreed(api)
     await audio_part(api, mid, 0, keep="true")
     await video_part(api, mid, 0)
     assert len(bucket.objects) == 2
@@ -185,7 +192,7 @@ async def test_deleting_a_meeting_removes_its_recording_first(api, business_db, 
 async def test_another_workspace_cannot_play_or_add_to_a_recording(api, business_db, bucket):
     first, _, _ = await workspace(api, business_db, "366200005")
     await switch_on(api)
-    mid = (await api.post(BASE, json=body())).json()["id"]
+    mid = await agreed(api)
     await video_part(api, mid, 0)
     second, _, _ = await workspace(api, business_db, "366200006")
     await switch_on(api)
@@ -198,7 +205,7 @@ async def test_another_workspace_cannot_play_or_add_to_a_recording(api, business
 async def test_a_closed_meeting_takes_no_more_video(api, business_db, bucket):
     pi, conv, scope = await workspace(api, business_db, "366200007")
     await switch_on(api)
-    mid = (await api.post(BASE, json=body())).json()["id"]
+    mid = await agreed(api)
     await audio_part(api, mid, 0)
     done = await api.post(
         f"{BASE}/{mid}/recording/complete", json={"duration_ms": 60_000, "parts": 1}

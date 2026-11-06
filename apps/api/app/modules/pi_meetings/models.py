@@ -101,6 +101,12 @@ class PiMeeting(WorkspaceRow):
     consent_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     consent_by: Mapped[UUID | None] = mapped_column(Uuid, nullable=True)
     consent_note: Mapped[str] = mapped_column(String(300), default="", server_default="")
+    # consent to SAVE the audio/video (a separate choice from consent to record): no part is stored
+    # until the person who runs the meeting has said yes, and the server remembers who and when
+    media_consent_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True), nullable=True
+    )
+    media_consent_by: Mapped[UUID | None] = mapped_column(Uuid, nullable=True)
     recording_key: Mapped[str | None] = mapped_column(String(300), nullable=True)
     recording_mime: Mapped[str] = mapped_column(String(60), default="", server_default="")
     recording_bytes: Mapped[int] = mapped_column(BigInteger, default=0, server_default="0")

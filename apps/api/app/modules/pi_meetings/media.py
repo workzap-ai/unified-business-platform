@@ -16,7 +16,7 @@ to the bucket or writes the audio bytes for meetings.
 Bucket keys are `t/<tenant>/e/<environment>/meetings/<meeting>/<kind>/<part>.<ext>`
 (`scoped_key`), so one workspace can never address another's recording; a database-kept part
 has the key `db/<meeting>/<kind>/<part>`. Retention: each part carries the date until which it
-is kept (default 365 days; a workspace can set `response_rules.brain.meeting_retention_days`
+is kept (default 90 days; a workspace can set `response_rules.brain.meeting_retention_days`
 between 30 and 3650). Nothing deletes a part when that date passes yet: a purge job is not
 built, so the date is a promise to build one, not an enforcement.
 """
@@ -27,7 +27,7 @@ from typing import Any
 from uuid import UUID
 
 from fastapi import Request
-from sqlalchemy import delete, func, select
+from sqlalchemy import delete, func, select, text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.integrations import business
@@ -39,7 +39,7 @@ from app.modules.pi_meetings.models import PiMeeting, PiMeetingMedia, PiMeetingM
 from app.shared.errors import BusinessRuleViolation
 from app.shared.scope import WorkspaceScope
 
-DEFAULT_RETENTION_DAYS = 365
+DEFAULT_RETENTION_DAYS = 90
 MIN_RETENTION_DAYS = 30
 MAX_RETENTION_DAYS = 3650
 LINK_SECONDS = 3600
@@ -64,6 +64,10 @@ class StorageFailed(Exception):
 
 class NeedsBucket(Exception):
     """Video was offered but no storage bucket is connected."""
+
+
+class NoMediaConsent(Exception):
+    """Nobody has said yes to saving this meeting's audio or video."""
 
 
 class MeetingFull(Exception):
@@ -203,8 +207,11 @@ async def save_part(
 ) -> PiMeetingMedia:
     """Store one part and record it. Sending the same part again replaces its row and its bytes.
 
-    Raises `NeedsBucket` for video without a bucket, `MeetingFull` when the database would hold too
-    much audio for one meeting, and `StorageFailed` when the bucket refuses the part."""
+    Raises `NoMediaConsent` when saving was not agreed, `NeedsBucket` for video without a bucket,
+    `MeetingFull` when the database would hold too much audio for one meeting, and `StorageFailed`
+    when the bucket refuses the part."""
+    if meeting.media_consent_at is None:
+        raise NoMediaConsent
     bucket = await has_bucket(session, scope)
     if not bucket and kind == "video":
         raise NeedsBucket
@@ -225,6 +232,10 @@ async def save_part(
         await _put(session, scope, request, key, data, mime)
     else:
         key = f"{DB_PREFIX}{meeting.id}/{kind}/{ordinal:05d}"
+        # two parts of one meeting arriving together must not both pass the cap check
+        await session.execute(
+            text("SELECT pg_advisory_xact_lock(hashtext(:meeting))"), {"meeting": str(meeting.id)}
+        )
         held = await _database_bytes(session, scope, meeting.id)
         replaced = existing.bytes if existing and is_database_key(existing.key) else 0
         if held - replaced + len(data) > DATABASE_AUDIO_CAP:

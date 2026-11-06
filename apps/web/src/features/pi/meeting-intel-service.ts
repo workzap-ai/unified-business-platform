@@ -206,6 +206,13 @@ export const meetingIntelService = {
       "/integrations/capabilities",
       z.object({ storage: z.boolean().catch(false) }),
     ),
+  // Say yes to SAVING the recording (separate from recording it); the server keeps who and when.
+  saveConsent: (id: string) =>
+    apiRequest(
+      "POST",
+      `${BASE}/${id}/recording/save-consent`,
+      z.object({ media_consent_at: z.string() }),
+    ),
   // One part of the video (a couple of minutes), saved in the workspace's own storage.
   uploadVideo: (
     id: string,
