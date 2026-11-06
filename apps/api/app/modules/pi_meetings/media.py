@@ -46,6 +46,8 @@ LINK_SECONDS = 3600
 # about ten hours of audio at the recorder's bitrate: enough for any meeting, and a bound on what
 # one meeting can add to the database
 DATABASE_AUDIO_CAP = 150 * 1024 * 1024
+# what all of one workspace's meetings can hold in the database together (a bucket has no such cap)
+DATABASE_WORKSPACE_CAP = 1024 * 1024 * 1024
 DB_PREFIX = "db/"
 EXTENSIONS = {
     "audio/webm": "webm",
@@ -239,6 +241,15 @@ async def save_part(
         held = await _database_bytes(session, scope, meeting.id)
         replaced = existing.bytes if existing and is_database_key(existing.key) else 0
         if held - replaced + len(data) > DATABASE_AUDIO_CAP:
+            raise MeetingFull
+        in_workspace = await session.scalar(
+            select(func.coalesce(func.sum(PiMeetingMedia.bytes), 0)).where(
+                PiMeetingMedia.tenant_id == scope.tenant_id,
+                PiMeetingMedia.environment_id == scope.environment_id,
+                PiMeetingMedia.key.like(f"{DB_PREFIX}%"),
+            )
+        )
+        if int(in_workspace or 0) - replaced + len(data) > DATABASE_WORKSPACE_CAP:
             raise MeetingFull
     until = datetime.now(UTC) + timedelta(days=days)
     if existing is None:

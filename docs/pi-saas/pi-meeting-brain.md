@@ -122,7 +122,7 @@ is heard through the shared audio.
 - **Known exception**: the transcript is redacted before it is stored, but saved audio/video is the original
   recording (it cannot be redacted). That is why saving needs its own yes and its own permission.
 - **Retention**: default 90 days (`response_rules.brain.meeting_retention_days`, 30 to 3650). The date is
-  recorded on every part; **no purge job exists yet**, so nothing is deleted when it passes.
+  recorded on every part; a purge step in the pi sweep (`pi_meetings/retention.py`) removes a meeting's recording (bucket objects, database audio, part rows) once every part is past its date; the transcript, findings and map stay. A bucket that cannot be reached is retried on the next sweep. Database audio is also capped per workspace (1 GB).
 - **Delete / erase**: deleting a meeting removes bucket objects first (if the bucket cannot be reached nothing is
   deleted, 409 `RECORDING_DELETE_UNAVAILABLE`), then database audio, then rows. This runs for every meeting, even
   one whose `recording_key` is empty. Customer erase (`POST /pi/brain-erasure/{id}`) removes the customer's bucket

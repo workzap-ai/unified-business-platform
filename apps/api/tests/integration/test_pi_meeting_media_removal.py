@@ -114,3 +114,40 @@ async def test_a_replacement_is_abandoned_when_the_old_object_cannot_be_removed(
     assert await business_db.scalar(select(PiMeetingMedia.key)) == old_key
     assert old_key in bucket.objects
     await pi.close()
+
+
+async def test_expired_recordings_are_removed_and_the_words_stay(api, business_db, bucket):
+    from datetime import UTC, datetime, timedelta
+
+    from app.modules.pi_meetings import retention
+    from app.modules.pi_meetings.models import PiMeetingSegment
+
+    pi, conv, scope = await workspace(api, business_db, "366400005")
+    await switch_on(api)
+    mid = await agreed(api)
+    await audio_part(api, mid, 0, keep="true")
+    await video_part(api, mid, 0)
+    assert len(bucket.objects) == 2
+
+    async def purge():
+        return await retention.purge_expired(business_db, None, None)
+
+    assert await purge() == 0  # inside retention: nothing goes
+    await business_db.execute(
+        update(PiMeetingMedia).values(retention_until=datetime.now(UTC) - timedelta(days=1))
+    )
+    await business_db.commit()
+    bucket.broken = True
+    assert await purge() == 0  # storage unreachable: nothing changed, tried again later
+    await business_db.commit()
+    assert await count(business_db, PiMeetingMedia) == 2
+
+    bucket.broken = False
+    assert await purge() == 1
+    await business_db.commit()
+    assert bucket.objects == {}
+    assert await count(business_db, PiMeetingMedia) == 0
+    assert await count(business_db, PiMeetingSegment) > 0  # the transcript stays
+    detail = (await api.get(f"{BASE}/{mid}")).json()
+    assert detail["has_recording"] is False
+    await pi.close()

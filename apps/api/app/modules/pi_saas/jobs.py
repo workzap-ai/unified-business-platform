@@ -102,6 +102,17 @@ async def sweep_pi_saas(ctx: dict[str, Any]) -> None:
         except Exception:  # noqa: BLE001 - retried on the next sweep
             await session.rollback()
             logger.warning("pi_quarantine_purge_failed")
+    # Saved meeting recordings past their retention date (the words and the map stay).
+    async with ctx["sessions"]() as session:
+        try:
+            from app.modules.pi_meetings.retention import purge_expired as purge_recordings
+
+            if gone := await purge_recordings(session, ctx["settings"], ctx.get("http")):
+                logger.info("pi_meeting_recordings_expired", extra={"count": gone})
+            await session.commit()
+        except Exception:  # noqa: BLE001 - retried on the next sweep
+            await session.rollback()
+            logger.warning("pi_meeting_retention_failed")
     # What happened after pi's replies, scored for the learning metrics (text-free, observe only).
     async with ctx["sessions"]() as session:
         try:
