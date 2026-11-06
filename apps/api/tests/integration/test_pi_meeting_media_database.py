@@ -71,6 +71,10 @@ async def test_audio_is_kept_in_the_database_and_plays_back(api, business_db):
         f"{BASE}/{mid}/recording/media/audio/0/file", headers={"Range": "bytes=-5"}
     )
     assert tail.status_code == 206 and tail.content == AUDIO[-5:]
+    past = await api.get(
+        f"{BASE}/{mid}/recording/media/audio/0/file", headers={"Range": "bytes=9999-"}
+    )
+    assert past.status_code == 416 and past.headers["content-range"] == f"bytes */{len(AUDIO)}"
 
     # audio kept in the database has no object to delete: nothing to report to the storage step
     assert await erase.recording_keys(business_db, scope, customer_id) == []

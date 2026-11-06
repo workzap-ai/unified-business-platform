@@ -2,8 +2,9 @@
 
 Insights, transcript segments and speaker labels hold the words of the meeting, so they go with the
 customer, children first. The recordings themselves live in object storage, not in the database:
-the rows that name them are deleted here and the object keys are returned so the storage step can
-remove the files. A key is never dropped silently.
+the rows that name them are deleted here, and the caller (`brain_erase_routes`) removes the objects
+BEFORE the erase runs, from `recording_keys`, and stops if the bucket cannot be reached. A key is
+never dropped silently.
 """
 
 from typing import Any

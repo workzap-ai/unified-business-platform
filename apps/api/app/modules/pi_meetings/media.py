@@ -240,10 +240,16 @@ async def save_part(
         )
         session.add(existing)
     elif existing.key != key and not is_database_key(existing.key):
-        try:  # the part came back stored somewhere else: do not leave the first object behind
+        # the part is stored under a different key now: the first object must go, and if it cannot
+        # the change is abandoned (the new object is removed again), so no key is ever forgotten
+        try:
             await _remove(session, scope, request, [existing.key])
-        except Exception:  # noqa: BLE001 - best effort, the new copy is saved
-            pass
+        except (StorageFailed, BusinessRuleViolation):
+            try:
+                await _remove(session, scope, request, [key])
+            except (StorageFailed, BusinessRuleViolation):
+                pass
+            raise StorageFailed("old_object_not_removed") from None
     existing.key, existing.mime, existing.bytes = key, mime, len(data)
     existing.offset_ms, existing.duration_ms, existing.retention_until = (
         offset_ms,
@@ -303,18 +309,36 @@ async def links(
     return [file_url(row) if is_database_key(row.key) else signed[row.id] for row in rows]
 
 
+async def remove_objects(
+    session: AsyncSession, scope: WorkspaceScope, request: Request, keys: Sequence[str]
+) -> None:
+    """Remove bucket objects by key. Raises `StorageFailed` when there is no usable bucket or it
+    cannot be reached, so a caller can stop before it forgets a key."""
+    if not keys:
+        return
+    try:
+        await _remove(session, scope, request, list(keys))
+    except BusinessRuleViolation:  # no storage connection
+        raise StorageFailed("no_storage") from None
+
+
 async def delete_all(
-    session: AsyncSession, scope: WorkspaceScope, request: Request, meeting_id: UUID
+    session: AsyncSession, scope: WorkspaceScope, request: Request, meeting: PiMeeting
 ) -> int:
     """Remove every stored part of the meeting: objects from the bucket first, then the audio kept
-    in the database, then the rows. The rows are kept when the bucket cannot be reached, so a key is
-    never forgotten. Returns how many parts went."""
-    rows = await parts(session, scope, meeting_id)
+    in the database, then the rows. Nothing is changed when the bucket cannot be reached
+    (`StorageFailed`), so a key is never forgotten. A meeting that names an object but has no part
+    rows (`recording_key` that is not the folder marker) has that object removed too. Returns how
+    many parts went."""
+    rows = await parts(session, scope, meeting.id)
+    bucket_keys = [row.key for row in rows if not is_database_key(row.key)]
+    legacy = meeting.recording_key
+    if not rows and legacy and not legacy.startswith("meetings/"):
+        bucket_keys.append(legacy)
+    await remove_objects(session, scope, request, bucket_keys)
     if not rows:
         return 0
-    bucket_keys = [row.key for row in rows if not is_database_key(row.key)]
-    if bucket_keys:
-        await _remove(session, scope, request, bucket_keys)
+    meeting_id = meeting.id
     await session.execute(
         delete(PiMeetingMediaData).where(
             PiMeetingMediaData.tenant_id == scope.tenant_id,

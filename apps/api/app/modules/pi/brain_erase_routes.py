@@ -7,13 +7,15 @@ what is removed and what is kept.
 from typing import Any
 from uuid import UUID
 
-from fastapi import APIRouter
+from fastapi import APIRouter, Request
 from pydantic import BaseModel, ConfigDict
 
 from app.modules.access.dependencies import Scope, Session
 from app.modules.audit.service import record
 from app.modules.pi.brain_erase import erase_customer
 from app.modules.pi.service import require_pi
+from app.modules.pi_meetings import erase as meeting_erase
+from app.modules.pi_meetings import media as meeting_media
 from app.shared.errors import BusinessRuleViolation
 
 router = APIRouter(prefix="/pi/brain-erasure", tags=["pi-brain-erasure"])
@@ -26,7 +28,7 @@ class EraseInput(BaseModel):
 
 @router.post("/{customer_id}")
 async def erase(
-    customer_id: UUID, data: EraseInput, scope: Scope, session: Session
+    customer_id: UUID, data: EraseInput, scope: Scope, session: Session, request: Request
 ) -> dict[str, Any]:
     """Erase what pi keeps about this customer. Cannot be undone."""
     await require_pi(session, scope, "pi.settings.manage")
@@ -34,6 +36,22 @@ async def erase(
         raise BusinessRuleViolation(
             "CONFIRMATION_REQUIRED", "Send confirm: true to erase this customer's data", 422
         )
+    # recordings in the workspace's bucket go first: if they cannot be removed nothing is erased,
+    # so no object key is ever forgotten (the rows that name them are deleted by the erase itself)
+    try:
+        await meeting_media.remove_objects(
+            session,
+            scope,
+            request,
+            await meeting_erase.recording_keys(session, scope, customer_id),
+        )
+    except meeting_media.StorageFailed:
+        raise BusinessRuleViolation(
+            "RECORDING_DELETE_UNAVAILABLE",
+            "This customer's meeting recordings could not be removed from storage, so nothing "
+            "was erased; connect the storage again and try once more",
+            409,
+        ) from None
     result = await erase_customer(session, scope, customer_id)
     if not result["complete"]:
         # only an undefined table is ever skipped; any other error fails the request instead

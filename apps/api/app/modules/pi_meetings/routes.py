@@ -619,21 +619,17 @@ async def delete_meeting(
     it). If the recording cannot be removed from storage, nothing is deleted and no key is lost."""
     await _gate(session, scope, "pi.meetings.delete")
     meeting = await _meeting(session, scope, meeting_id)
-    if meeting.recording_key:
-        try:
-            removed = await media.delete_all(session, scope, request, meeting.id)
-        except (media.StorageFailed, BusinessRuleViolation):
-            removed = 0
-            await session.rollback()
-        if removed == 0:
-            # storage is not connected or not reachable, or the recording is not one we can find:
-            # refuse rather than lose the key and leave a recording nobody can find
-            raise BusinessRuleViolation(
-                "RECORDING_DELETE_UNAVAILABLE",
-                "This meeting has a saved recording that could not be removed from storage; "
-                "connect the storage again and try once more",
-                409,
-            )
+    try:  # always: a meeting can have part rows even when `recording_key` is empty
+        await media.delete_all(session, scope, request, meeting)
+    except media.StorageFailed:
+        await session.rollback()
+        # refuse rather than lose a key and leave a recording nobody can find
+        raise BusinessRuleViolation(
+            "RECORDING_DELETE_UNAVAILABLE",
+            "This meeting has a saved recording that could not be removed from storage; "
+            "connect the storage again and try once more",
+            409,
+        ) from None
     await erase.erase_one(session, scope, meeting.id)
     await record(
         session,

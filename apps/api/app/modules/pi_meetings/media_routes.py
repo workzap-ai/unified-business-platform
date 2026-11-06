@@ -2,10 +2,10 @@
 
 The browser sends the recording as short parts: the audio goes with each transcribed part
 (`keep` on the part upload, see recording_routes.py) and the video as its own parts here. A part is
-stored in the workspace's own S3-compatible bucket (media.py), never in the platform's database,
-and playback is a short-lived signed link. Saving needs consent (already recorded when the meeting
-was created, and checked again here) and a connected storage bucket; without one nothing is saved
-and the transcript still works.
+stored in the workspace's own S3-compatible bucket when one is connected (video needs it), otherwise
+audio only is kept in the platform database (media.py). Playback is a short-lived signed link, or
+the authenticated file route for database audio. Saving needs consent (recorded when the meeting was
+created, and checked again here); the transcript works either way.
 """
 
 from typing import Annotated, Any
@@ -142,8 +142,12 @@ def _file_url(meeting_id: UUID) -> Any:
     return url
 
 
+UNSATISFIABLE = (-1, -1)
+
+
 def _range(header: str | None, size: int) -> tuple[int, int] | None:
-    """One `bytes=a-b` range, clipped to the file; None when absent or not understood."""
+    """One `bytes=a-b` range, clipped to the file; None when absent or not understood (the whole
+    file is sent), UNSATISFIABLE when it starts past the end (416)."""
     if not header or not header.startswith("bytes=") or "," in header:
         return None
     start_text, _, end_text = header[6:].partition("-")
@@ -155,7 +159,9 @@ def _range(header: str | None, size: int) -> tuple[int, int] | None:
         end = int(end_text) if end_text else size - 1
     except ValueError:
         return None
-    if start >= size or end < start:
+    if start >= size:
+        return UNSATISFIABLE
+    if end < start:
         return None
     return start, min(end, size - 1)
 
@@ -182,6 +188,10 @@ async def play_part(
         raise ResourceNotFound
     headers = {"Accept-Ranges": "bytes", "Cache-Control": "private, no-store"}
     wanted = _range(range_header, len(data))
+    if wanted == UNSATISFIABLE:
+        return Response(
+            status_code=416, headers={**headers, "Content-Range": f"bytes */{len(data)}"}
+        )
     if wanted is None:
         return Response(data, media_type=row.mime, headers=headers)
     start, end = wanted

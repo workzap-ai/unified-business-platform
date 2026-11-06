@@ -116,8 +116,10 @@ is heard through the shared audio.
 - **Retention**: default 365 days (`response_rules.brain.meeting_retention_days`, 30 to 3650). The date is
   recorded on every part; **no purge job exists yet**, so nothing is deleted when it passes.
 - **Delete / erase**: deleting a meeting removes bucket objects first (if the bucket cannot be reached nothing is
-  deleted, 409 `RECORDING_DELETE_UNAVAILABLE`), then database audio, then rows. Customer erase reports bucket
-  keys in `meeting_object_keys` as before (the storage step still removes them); database audio goes with its rows.
+  deleted, 409 `RECORDING_DELETE_UNAVAILABLE`), then database audio, then rows. This runs for every meeting, even
+  one whose `recording_key` is empty. Customer erase (`POST /pi/brain-erasure/{id}`) removes the customer's bucket
+  objects first and refuses with the same 409 (nothing erased) if the bucket cannot be reached; database audio goes
+  with its rows. Replacing a part under a different key removes the old object first or abandons the change.
 - **Summary and requirements are saved as soon as the meeting ends**: Stop closes the transcript and runs the
   whole-meeting analysis (summary, problems, root causes, impact, requirements, decisions, actions, open
   questions), all stored as reviewable findings; nothing reaches the customer's memory before approval.

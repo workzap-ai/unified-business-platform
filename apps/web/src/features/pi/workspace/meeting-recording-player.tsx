@@ -42,7 +42,7 @@ export function MeetingRecordingPlayer({
           <div>
             <h2 className="text-sm font-semibold">Saved recording</h2>
             <p className="mt-0.5 text-xs text-muted-foreground">
-              Stored in your own storage
+              Saved with this meeting
               {until
                 ? `, kept until ${new Date(until).toLocaleDateString()}`
                 : ""}
