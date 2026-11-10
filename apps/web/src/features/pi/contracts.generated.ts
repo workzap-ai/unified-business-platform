@@ -47,6 +47,7 @@ export const RunStepSchema: z.ZodType<Pi.RunStep> = z.union([
   z.literal("handoff"),
   z.literal("team_question"),
   z.literal("meeting_request"),
+  z.literal("outage_queue"),
 ]);
 export const ConversationSchema: z.ZodType<Pi.Conversation> = z.object({
   id: z.string(),
@@ -215,6 +216,7 @@ export const AgentRunSchema: z.ZodType<Pi.AgentRun> = z.object({
       z.literal("handoff"),
       z.literal("team_question"),
       z.literal("meeting_request"),
+      z.literal("outage_queue"),
     ]),
   ),
   provider: z.union([z.null(), z.string()]),
@@ -415,6 +417,7 @@ export const ConversationContextSchema: z.ZodType<Pi.ConversationContext> =
             z.literal("handoff"),
             z.literal("team_question"),
             z.literal("meeting_request"),
+            z.literal("outage_queue"),
           ]),
         ),
         provider: z.union([z.null(), z.string()]),
