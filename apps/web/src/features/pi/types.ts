@@ -26,7 +26,9 @@ export type AgentKey =
   | "handoff";
 export type ProviderName = "openai" | "gemini" | "groq" | "anthropic";
 // A run's steps: the agents, plus what pi did besides replying.
-export type RunStep = AgentKey | "team_question" | "meeting_request";
+// "outage_queue": every AI provider was down, so pi held the message and answered it later.
+export type RunStep =
+  AgentKey | "team_question" | "meeting_request" | "outage_queue";
 
 export type Conversation = {
   id: string;
