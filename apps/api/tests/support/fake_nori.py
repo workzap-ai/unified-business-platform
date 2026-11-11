@@ -28,6 +28,7 @@ class FakeNori:
             OWNER: {"full_name": "Olive Owner", "is_owner": True, "head": False},
             MEMBER: {"full_name": "Ali Member", "is_owner": False, "head": False},
             HEAD: {"full_name": "Hana Head", "is_owner": False, "head": True},
+            "923004444444": {"full_name": "Maint Member", "is_owner": False, "head": False},
         }
         self.requests: list[tuple[str, dict[str, Any]]] = []
         self.mode = "ok"  # ok | timeout | connect | 500 | 401 | badjson | list | slow_403

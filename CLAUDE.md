@@ -50,6 +50,17 @@ brain mode: `docs/pi-saas/pi-brain-how-it-works.md`.
 - Rules are enforced in code (linter, state guards, decision gates), not only in the prompt.
   Learned or retrieved content is data placed below the rules and can never override them.
 
+### nori credits bridge (off by default)
+
+`apps/api/app/modules/pi_saas/nori_credits/`, rollout and rollback in `docs/pi-saas/nori-bridge.md`.
+Inert unless the server has `NORI_BASE_URL` and `WORKZAP_BRIDGE_SECRET` AND the workspace sets
+`response_rules.nori_bridge.enabled` to true; `NORI_BRIDGE_KILL=true` stops both doors. Inbound hook in
+`runtime.process_pi_event` (identify with the number only, then nori's inbound door; fail open, circuit
+breaker, idempotent by message id); send door `POST /api/pi/nori-send` (HMAC, freshness, replay, rate
+limit, allowlist, audit in `pi_nori_bridge_log`, migration 0062). nori's replies are system replies and
+bypass the reply linter by design; the brain's rules are untouched. `capture.py` is a library, not wired.
+Tests: `tests/unit/test_nori_credits_core.py`, `tests/integration/test_nori_credits_bridge.py`.
+
 ## Working here
 
 - **Tests need a disposable database.** `apps/api/.env` points at the REAL Neon database, and

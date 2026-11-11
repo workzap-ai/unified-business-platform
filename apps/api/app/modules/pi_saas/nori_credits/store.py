@@ -52,11 +52,12 @@ async def claim(
 
 
 async def outcome_of(session: AsyncSession, kind: str, key: str) -> str | None:
-    return await session.scalar(
+    found: str | None = await session.scalar(
         select(PiNoriBridgeLog.outcome).where(
             PiNoriBridgeLog.kind == kind, PiNoriBridgeLog.dedupe_key == key
         )
     )
+    return found
 
 
 async def set_outcome(

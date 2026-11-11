@@ -23,6 +23,7 @@ from app.modules.pi_saas.nori_credits.config import (
     workspace_bridge,
 )
 from app.modules.pi_saas.nori_credits.resilience import METRICS, digits, mask_number
+from app.modules.pi_saas.nori_credits.send_door import foreign_urls
 
 logger = logging.getLogger("app.pi.nori_credits")
 
@@ -37,6 +38,7 @@ class HookOutcome:
 
 
 PASS = HookOutcome()
+LINK_FALLBACK = "Done. Please open nori to see the details."
 
 
 def clean_reply(value: Any) -> str | None:
@@ -145,4 +147,9 @@ async def _run(
     await store.set_outcome(session, "inbound", key, "handled")
     METRICS.inc("inbound", "handled")
     await store.purge(session)
-    return HookOutcome(handled=True, reply=clean_reply(result.data.get("reply")), reason="handled")
+    reply = clean_reply(result.data.get("reply"))
+    if reply and foreign_urls(reply, env.host):
+        # nori's own links are fine; any other link in a system reply is replaced, never sent.
+        METRICS.inc("inbound", "reply_link_blocked")
+        reply = LINK_FALLBACK
+    return HookOutcome(handled=True, reply=reply, reason="handled")
