@@ -132,6 +132,13 @@ class Settings(BaseSettings):
     nori_bridge_url: str = ""  # e.g. https://nori.workzap.ai/api/workzap/inbound
     nori_bridge_secret: SecretStr | None = None
     nori_bridge_phone_number_id: str = ""  # the Workzap number's Kapso/Meta phone number id
+    # nori credits bridge (pi_saas/nori_credits): inert unless BOTH are set and a workspace turns on
+    # response_rules.nori_bridge.enabled. NORI_BASE_URL is nori's origin (https://host); the secret
+    # signs both directions (X-Workzap-Signature). NORI_BRIDGE_KILL=true answers the send door 503
+    # and makes the inbound hook pass every message straight on, with no redeploy of settings.
+    nori_base_url: str = ""
+    workzap_bridge_secret: SecretStr | None = None
+    nori_bridge_kill: bool = False
     media_max_bytes: int = Field(default=10 * 1024 * 1024, ge=1024, le=50 * 1024 * 1024)
     knowledge_upload_max_bytes: int = Field(default=1024 * 1024, ge=1024, le=10 * 1024 * 1024)
 

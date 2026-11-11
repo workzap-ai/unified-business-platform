@@ -907,6 +907,29 @@ async def process_pi_event(ctx: dict[str, Any], event_id: str) -> None:
                 except BusinessRuleViolation:
                     logger.warning("pi_nori_reply_failed")
             return
+        # nori credits bridge (docs/pi-saas/nori-bridge.md): inert unless NORI_BASE_URL and
+        # WORKZAP_BRIDGE_SECRET are set and the workspace turned on response_rules.nori_bridge.
+        # A system reply from nori bypasses the reply linter by design; every failure falls
+        # through to the lines below unchanged.
+        from app.modules.pi_saas.nori_credits import hook as nori_credits
+
+        credits_hook = await nori_credits.pre_hook(ctx, session, scope, connection, event)
+        if credits_hook.handled:
+            event.status = "processed"  # committed before the send: a retry never sends twice
+            await session.commit()
+            if credits_hook.reply:
+                from app.integrations.whatsapp_bridge import token as connection_token
+
+                try:
+                    await WhatsApp(ctx["settings"], ctx["http"], connection.provider).send(
+                        connection.phone_number_id,
+                        str(event.payload.get("sender") or ""),
+                        credits_hook.reply,
+                        await connection_token(session, ctx["settings"], connection),
+                    )
+                except BusinessRuleViolation:
+                    logger.warning("pi_nori_credits_reply_failed")
+            return
         message = await persist_inbound(session, event, connection, scope)
         event.status = "queued" if message else "processed"
         released: list[str] = []

@@ -89,10 +89,10 @@ from app.modules.pi_customer.models import (
 )
 from app.modules.pi_meetings.models import (
     PiMeeting,
-    PiMeetingInsight,
-    PiMeetingMedia,
     PiMeetingGuest,
+    PiMeetingInsight,
     PiMeetingInvite,
+    PiMeetingMedia,
     PiMeetingMediaData,
     PiMeetingParticipant,
     PiMeetingSegment,
@@ -132,6 +132,7 @@ from app.modules.pi_saas.models import (
     PiTicket,
     PiUsageCounter,
 )
+from app.modules.pi_saas.nori_credits.models import PiNoriBridgeLog
 from app.modules.pi_saas.payment_models import (
     PiCheckoutAttempt,
     PiCollectionSettings,
@@ -227,6 +228,7 @@ __all__ = [
     "PiCustomerConsent",
     "PiKnowledgeDraft",
     "PiOperatorAssignment",
+    "PiNoriBridgeLog",
     "PiOperatorMember",
     "PiPlan",
     "PiPlatformInvoice",

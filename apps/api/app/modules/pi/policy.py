@@ -81,6 +81,9 @@ def validate_section(section: str, value: Any) -> None:
             ensure(all(type(v) is int for k, v in brain.items() if k not in flags))
             served = brain.get("served_industries", [])  # regulated trades Workzap serves (7.N)
             ensure(isinstance(served, list) and set(served) <= set(REGULATED_TRADES))
+            from app.modules.pi_saas.nori_credits.config import validate_workspace_section
+
+            ensure(validate_workspace_section(value.get("nori_bridge", {})))
             ensure(value.get("price_disclosure", "") in ("", *PRICE_MODES))
             ensure(value.get("execution_mode", "") in ("", "human_approved", "mixed", "ai_led"))
             ensure(
