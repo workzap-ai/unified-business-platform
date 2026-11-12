@@ -8,6 +8,8 @@ import {
   CalendarClock,
   CheckSquare,
   CreditCard,
+  ExternalLink,
+  Lightbulb,
   Receipt,
   MessageCircle,
   MessageCircleQuestion,
@@ -46,6 +48,11 @@ import { ErrorState, InlineError } from "@/components/app/states";
 import { PageSkeleton } from "@/components/app/page-skeleton";
 import { useScopedMutation, useScopedQuery } from "@/hooks/use-scoped";
 import { useSession } from "@/features/auth/session-provider";
+import {
+  NewRequirementDialog,
+  NORI_ITEM_LABEL,
+  NoriNumbersPanel,
+} from "./nori-board-panel";
 import { customersService } from "@/features/customers/service";
 import { errorMessage } from "@/services/api-client";
 import { formatTime } from "@/lib/format";
@@ -55,6 +62,7 @@ import {
   BOARD_KINDS,
   COLUMN_STATUS,
   PRIORITIES,
+  TEAM_BOARD_KEY,
   teamBoardService,
   type BoardCard,
   type BoardColumn,
@@ -66,7 +74,7 @@ import {
 } from "../team-board-service";
 
 const LIVE_EVERY_MS = 20_000;
-const KEY = ["pi", "team-board"];
+const KEY = TEAM_BOARD_KEY;
 
 const COLUMN_LABEL: Record<BoardColumn, string> = {
   todo: "To do",
@@ -93,6 +101,7 @@ const KIND: Record<
   deliver: { label: "Deliver", icon: Truck, tone: "info" },
   feedback: { label: "Fix", icon: Wrench, tone: "warning" },
   task: { label: "Task", icon: CheckSquare, tone: "primary" },
+  nori: { label: "Nori", icon: Lightbulb, tone: "pi" },
 };
 
 const PRIORITY_DOT: Record<Priority, string> = {
@@ -135,7 +144,15 @@ export function TeamBoardPage() {
 function TeamBoardView() {
   const { can } = useSession();
   const manage = can("pi.work.manage");
-  const [filter, setFilter] = useState<BoardFilter>({ who: "all", kind: null });
+  const [view, setView] = useState<"team" | "nori">("team");
+  const [teamFilter, setFilter] = useState<BoardFilter>({
+    who: "all",
+    kind: null,
+  });
+  // The Nori Platform tab is the same board, filtered to nori cards.
+  const filter: BoardFilter =
+    view === "nori" ? { ...teamFilter, kind: "nori" } : teamFilter;
+  const [addingRequirement, setAddingRequirement] = useState(false);
   const [tab, setTab] = useState<BoardColumn>("todo");
   const [creating, setCreating] = useState(false);
   const [team, setTeam] = useState(false);
@@ -214,21 +231,66 @@ function TeamBoardView() {
             <Button size="sm" variant="secondary" onClick={() => setTeam(true)}>
               <Users aria-hidden="true" /> Team
             </Button>
-            {manage && (
-              <Button size="sm" onClick={() => setCreating(true)}>
-                <Plus aria-hidden="true" /> New task
-              </Button>
-            )}
+            {manage &&
+              (view === "nori" ? (
+                <Button size="sm" onClick={() => setAddingRequirement(true)}>
+                  <Plus aria-hidden="true" /> Add requirement
+                </Button>
+              ) : (
+                <Button size="sm" onClick={() => setCreating(true)}>
+                  <Plus aria-hidden="true" /> New task
+                </Button>
+              ))}
           </>
         }
       />
+      <div
+        role="group"
+        aria-label="Board"
+        className="mb-4 inline-flex h-8 items-center gap-0.5 rounded-md border border-border bg-surface-muted p-0.5"
+      >
+        {(
+          [
+            ["team", "Team board"],
+            ["nori", "Nori Platform"],
+          ] as const
+        ).map(([key, label]) => (
+          <button
+            key={key}
+            type="button"
+            aria-pressed={view === key}
+            onClick={() => setView(key)}
+            className={cn(
+              "inline-flex h-6.5 items-center rounded-[5px] px-2.5 text-xs font-medium text-muted-foreground hover:text-foreground",
+              view === key && "bg-surface text-foreground shadow-sm",
+            )}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
+      {view === "nori" && (
+        <div className="mb-4">
+          <NoriNumbersPanel manage={manage} />
+        </div>
+      )}
       {query.isError && !data ? (
         <ErrorState error={query.error} onRetry={() => query.refetch()} />
       ) : !data ? (
         <PageSkeleton variant="dashboard" />
       ) : (
         <div className="space-y-4">
-          <Filters data={data} filter={filter} onChange={setFilter} />
+          <Filters
+            data={data}
+            filter={filter}
+            onChange={(next) =>
+              setFilter({
+                ...next,
+                kind: view === "nori" ? teamFilter.kind : next.kind,
+              })
+            }
+            showKinds={view === "team"}
+          />
           {overdue.length > 0 && (
             <section
               aria-label="Overdue"
@@ -309,6 +371,9 @@ function TeamBoardView() {
           onClose={() => setCreating(false)}
         />
       )}
+      {addingRequirement && (
+        <NewRequirementDialog onClose={() => setAddingRequirement(false)} />
+      )}
       {team && (
         <TeamDialog
           manage={manage}
@@ -324,10 +389,13 @@ function Filters({
   data,
   filter,
   onChange,
+  showKinds,
 }: {
   data: TeamBoard;
   filter: BoardFilter;
   onChange: (next: BoardFilter) => void;
+  /** Off on the Nori Platform tab, where the kind is fixed. */
+  showKinds: boolean;
 }) {
   const person = data.members.find((m) => m.id === filter.who);
   const who: { key: BoardFilter["who"]; label: string; count?: number }[] = [
@@ -335,9 +403,9 @@ function Filters({
     { key: "me", label: "Mine", count: data.counts.mine },
     { key: "unassigned", label: "Unassigned", count: data.counts.unassigned },
   ];
-  const kinds = BOARD_KINDS.filter(
-    (k) => (data.kinds[k] ?? 0) > 0 || filter.kind === k,
-  );
+  const kinds = showKinds
+    ? BOARD_KINDS.filter((k) => (data.kinds[k] ?? 0) > 0 || filter.kind === k)
+    : [];
   return (
     <div className="flex flex-wrap items-center gap-2">
       <div
@@ -623,6 +691,33 @@ function BoardCardView({
         <p className="mt-0.5 truncate text-xs text-muted-foreground">
           {subtitle}
         </p>
+      )}
+      {card.nori && (
+        <div className="mt-1 space-y-1">
+          <div className="flex items-center gap-1.5">
+            <Badge tone="info">{NORI_ITEM_LABEL[card.nori.item_kind]}</Badge>
+            {card.nori.url && (
+              <a
+                href={card.nori.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1 text-xs text-primary hover:underline"
+              >
+                Open in nori{" "}
+                <ExternalLink className="size-3" aria-hidden="true" />
+              </a>
+            )}
+          </div>
+          {[card.nori.workspace, card.nori.person, card.nori.department].some(
+            Boolean,
+          ) && (
+            <p className="truncate text-xs text-muted-foreground">
+              {[card.nori.workspace, card.nori.person, card.nori.department]
+                .filter(Boolean)
+                .join(" · ")}
+            </p>
+          )}
+        </div>
       )}
       <div className="mt-2 flex items-center gap-1.5">
         {card.assignee ? (

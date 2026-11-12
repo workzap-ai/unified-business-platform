@@ -73,6 +73,73 @@ async def pre_hook(
         return PASS
 
 
+BOARD_ACK = "I'm pi, an AI assistant. I've passed this to the Workzap team."
+BOARD_RETRY = "I'm pi, an AI assistant. I could not save that just now. Please send it again."
+
+
+async def _board_path(
+    session: Any,
+    scope: Any,
+    connection: Any,
+    payload: dict[str, Any],
+    sender: str,
+    message_id: str,
+    text: str,
+) -> HookOutcome | None:
+    """A number on the Nori Platform board's registry (added by hand on the board): its message is
+    filed as a board card and answered here, so pi's sales brain never runs for it. None when the
+    sender is not on the registry (or is switched off there): the hook carries on as before.
+
+    Idempotent by WhatsApp message id: the claim and the card are saved together, so a failure
+    leaves neither behind and the person is asked to send again."""
+    from app.modules.pi_saas.nori_board import service
+
+    entry = await service.find_number(session, scope, sender)
+    if entry is None or not entry.active:
+        return None
+    from app.modules.pi import safety
+
+    if safety.emergency(text) is not None or safety.opt_out_asked(text):
+        # An emergency or a "stop" belongs to pi's own pre-model gates (emergency numbers, opt-out):
+        # nothing is filed here and no board reply is sent.
+        METRICS.inc("inbound", "board_safety_pass")
+        return PASS
+    key = store.key_of("board", str(getattr(connection, "phone_number_id", "")), message_id)
+    try:
+        async with session.begin_nested():
+            fresh = await store.claim(
+                session,
+                "inbound",
+                key,
+                tenant_id=getattr(scope, "tenant_id", None),
+                environment_id=getattr(scope, "environment_id", None),
+            )
+            if fresh:
+                await service.file_item(
+                    session,
+                    scope,
+                    ref="wa:" + key[:40],
+                    kind=service.classify(text),
+                    text=text,
+                    workspace=entry.workspace,
+                    person=entry.person,
+                    department=entry.department,
+                    phone=sender,
+                    source="whatsapp",
+                    created_by_label="pi",
+                )
+    except Exception:
+        METRICS.inc("inbound", "board_error")
+        logger.warning("nori_bridge_board_error", exc_info=False)
+        return HookOutcome(handled=True, reply=BOARD_RETRY, reason="board_error")
+    if not fresh:
+        METRICS.inc("inbound", "board_duplicate")
+        return HookOutcome(handled=True, reply=None, reason="board_duplicate")
+    await store.set_outcome(session, "inbound", key, "handled", "board")
+    METRICS.inc("inbound", "board_filed")
+    return HookOutcome(handled=True, reply=BOARD_ACK, reason="board")
+
+
 async def _run(
     ctx: dict[str, Any],
     session: Any,
@@ -100,6 +167,10 @@ async def _run(
     bridge = workspace_bridge(policy.response_rules)
     if bridge is None:
         return PASS
+    if bridge.board:
+        filed = await _board_path(session, scope, connection, payload, sender, message_id, text)
+        if filed is not None:
+            return filed
     client = NoriClient(env, ctx["http"], bridge)
 
     identity = await client.identify(sender)

@@ -7,6 +7,9 @@ import { apiRequest } from "@/services/api-client";
  * (/api/v1/pi/team-board). Most cards are made (and closed) by pi itself.
  */
 
+/** Query-key prefix of everything on the board (cards, team, nori numbers). */
+export const TEAM_BOARD_KEY = ["pi", "team-board"];
+
 export const BOARD_KINDS = [
   "price",
   "approve",
@@ -18,6 +21,7 @@ export const BOARD_KINDS = [
   "deliver",
   "feedback",
   "task",
+  "nori",
 ] as const;
 export type BoardKind = (typeof BOARD_KINDS)[number];
 
@@ -34,6 +38,29 @@ export const COLUMN_STATUS: Record<BoardColumn, string> = {
 
 export const PRIORITIES = ["low", "normal", "high", "urgent"] as const;
 export type Priority = (typeof PRIORITIES)[number];
+
+/** What a nori card knows about who wrote it (kind "nori" only). */
+export const NORI_ITEM_KINDS = [
+  "feature",
+  "problem",
+  "feedback",
+  "module",
+  "question",
+  "change",
+  "note",
+] as const;
+export type NoriItemKind = (typeof NORI_ITEM_KINDS)[number];
+
+export const noriInfoSchema = z.object({
+  item_kind: z.enum(NORI_ITEM_KINDS).catch("note"),
+  workspace: z.string().catch(""),
+  person: z.string().catch(""),
+  department: z.string().catch(""),
+  phone_mask: z.string().catch(""),
+  source: z.enum(["nori", "whatsapp", "manual"]).catch("manual"),
+  url: z.string().nullable().catch(null),
+});
+export type NoriInfo = z.infer<typeof noriInfoSchema>;
 
 export const boardCardSchema = z.object({
   id: z.string(),
@@ -59,6 +86,7 @@ export const boardCardSchema = z.object({
   updated_at: z.string().catch(""),
   created_by: z.string().catch(""),
   link: z.string().nullable().catch(null),
+  nori: noriInfoSchema.nullable().catch(null),
 });
 export type BoardCard = z.infer<typeof boardCardSchema>;
 
@@ -124,6 +152,46 @@ export type TeamMembersChange = {
   template_language?: string;
 };
 
+/** Nori Platform board: numbers pi recognises as nori users, and hand-added requirements.
+ * Backend: /api/v1/pi/nori-board. Reading needs pi.work.read, changing pi.work.manage. */
+export const noriNumberSchema = z.object({
+  id: z.string(),
+  phone: z.string().catch(""),
+  workspace: z.string().catch(""),
+  person: z.string().catch(""),
+  department: z.string().catch(""),
+  active: z.boolean().catch(true),
+  source: z.enum(["manual", "nori"]).catch("manual"),
+  created_at: z.string().catch(""),
+});
+export type NoriNumber = z.infer<typeof noriNumberSchema>;
+
+export const noriNumbersSchema = z.object({
+  numbers: z.array(noriNumberSchema),
+});
+
+export type NewNoriNumber = {
+  phone: string;
+  workspace: string;
+  person?: string;
+  department?: string;
+};
+export type NoriNumberChange = {
+  workspace?: string;
+  person?: string;
+  department?: string;
+  active?: boolean;
+};
+export type NewNoriItem = {
+  title: string;
+  text?: string;
+  kind: NoriItemKind;
+  workspace?: string;
+  person?: string;
+  department?: string;
+  priority: Priority;
+};
+
 const testSchema = z.object({
   delivery: z.enum(["sent", "template", "no_window"]).catch("no_window"),
   business_number: z.string().nullable().catch(null),
@@ -156,4 +224,27 @@ export const teamBoardService = {
       `/pi/team-board/members/${encodeURIComponent(userId)}/test`,
       testSchema,
     ),
+  noriNumbers: () =>
+    apiRequest("GET", "/pi/nori-board/numbers", noriNumbersSchema),
+  addNoriNumber: (input: NewNoriNumber) =>
+    apiRequest("POST", "/pi/nori-board/numbers", noriNumberSchema, {
+      body: input,
+    }),
+  updateNoriNumber: ({ id, ...change }: NoriNumberChange & { id: string }) =>
+    apiRequest(
+      "PATCH",
+      `/pi/nori-board/numbers/${encodeURIComponent(id)}`,
+      noriNumberSchema,
+      { body: change },
+    ),
+  deleteNoriNumber: (id: string) =>
+    apiRequest(
+      "DELETE",
+      `/pi/nori-board/numbers/${encodeURIComponent(id)}`,
+      null,
+    ),
+  addNoriItem: (input: NewNoriItem) =>
+    apiRequest("POST", "/pi/nori-board/items", boardCardSchema, {
+      body: input,
+    }),
 };

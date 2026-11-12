@@ -132,6 +132,7 @@ from app.modules.pi_saas.models import (
     PiTicket,
     PiUsageCounter,
 )
+from app.modules.pi_saas.nori_board.models import PiNoriItem, PiNoriNumber
 from app.modules.pi_saas.nori_credits.models import PiNoriBridgeLog
 from app.modules.pi_saas.payment_models import (
     PiCheckoutAttempt,
@@ -229,6 +230,8 @@ __all__ = [
     "PiKnowledgeDraft",
     "PiOperatorAssignment",
     "PiNoriBridgeLog",
+    "PiNoriItem",
+    "PiNoriNumber",
     "PiOperatorMember",
     "PiPlan",
     "PiPlatformInvoice",

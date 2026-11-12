@@ -91,6 +91,8 @@ from app.modules.pi_saas.digest_routes import router as pi_digest_router
 from app.modules.pi_saas.health_routes import router as pi_health_router
 from app.modules.pi_saas.insights_routes import router as pi_insights_router
 from app.modules.pi_saas.meeting_board import router as pi_meeting_board_router
+from app.modules.pi_saas.nori_board.routes import door_router as nori_board_door_router
+from app.modules.pi_saas.nori_board.routes import router as nori_board_router
 from app.modules.pi_saas.nori_credits.routes import router as nori_credits_router
 from app.modules.pi_saas.operator_number_routes import router as pi_operator_number_router
 from app.modules.pi_saas.operator_routes import router as pi_operator_router
@@ -129,6 +131,7 @@ ROUTERS = [
     pi_inbox_router,
     pi_work_router,
     pi_team_board_router,
+    nori_board_router,
     pi_meeting_board_router,
     pi_meeting_intel_router,
     pi_meeting_qa_router,
@@ -231,6 +234,7 @@ PI_APP_ROUTERS = [
     pi_inbox_router,
     pi_work_router,
     pi_team_board_router,
+    nori_board_router,
     pi_meeting_board_router,
     pi_customer_payment_router,
     pi_deals_router,
@@ -374,6 +378,8 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         app.include_router(item, prefix=prefix)
     # nori credits send door: /api/pi/nori-send (signed; 503 until configured and enabled)
     app.include_router(nori_credits_router, prefix="/api/pi")
+    # nori board door: /api/pi/nori-board (signed; 503 until configured and board is on)
+    app.include_router(nori_board_door_router, prefix="/api/pi")
     app.add_middleware(
         OriginCheckMiddleware,
         allowed_origins=config.cors_origins,

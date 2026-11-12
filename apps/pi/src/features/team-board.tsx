@@ -14,6 +14,8 @@ import {
   CalendarClock,
   CheckSquare,
   CreditCard,
+  ExternalLink,
+  Lightbulb,
   Receipt,
   MessageCircle,
   MessageCircleQuestion,
@@ -47,6 +49,12 @@ import {
 } from "@/components/ui";
 import { errorText, get, patch, post, put } from "@/lib/api";
 import { piLink } from "@/lib/links";
+import {
+  NORI_ITEM_LABEL,
+  NewRequirementDialog,
+  NoriNumbersPanel,
+  type NoriInfo,
+} from "./nori-board-panel";
 import { useAction, useBusinessKey, useCan } from "@/lib/session";
 
 const LIVE_EVERY_MS = 20_000;
@@ -61,7 +69,8 @@ type Kind =
   | "start"
   | "deliver"
   | "feedback"
-  | "task";
+  | "task"
+  | "nori";
 type Column = "todo" | "doing" | "waiting" | "done";
 type Priority = "low" | "normal" | "high" | "urgent";
 /** "all", "me", "unassigned" or one member's user id. */
@@ -84,6 +93,7 @@ export interface BoardCard {
   created_at: string;
   updated_at: string;
   link: string | null;
+  nori?: NoriInfo | null;
 }
 
 interface Board {
@@ -133,6 +143,7 @@ const KINDS: Kind[] = [
   "deliver",
   "feedback",
   "task",
+  "nori",
 ];
 const KIND: Record<
   Kind,
@@ -152,6 +163,7 @@ const KIND: Record<
   deliver: { label: "Deliver", icon: Truck, tone: "info" },
   feedback: { label: "Fix", icon: Wrench, tone: "warning" },
   task: { label: "Task", icon: CheckSquare, tone: "neutral" },
+  nori: { label: "Nori", icon: Lightbulb, tone: "accent" },
 };
 const PRIORITY_DOT: Record<Priority, string> = {
   urgent: "bg-danger",
@@ -195,7 +207,11 @@ export function TeamBoardPage() {
   const allowed = can("pi.work.read");
   const manage = can("pi.work.manage");
   const [who, setWho] = React.useState<Who>("all");
-  const [kind, setKind] = React.useState<Kind | null>(null);
+  const [view, setView] = React.useState<"team" | "nori">("team");
+  const [teamKind, setKind] = React.useState<Kind | null>(null);
+  // The Nori Platform tab is the same board, filtered to nori cards.
+  const kind: Kind | null = view === "nori" ? "nori" : teamKind;
+  const [addingRequirement, setAddingRequirement] = React.useState(false);
   const [tab, setTab] = React.useState<Column>("todo");
   const [creating, setCreating] = React.useState(false);
   const [team, setTeam] = React.useState(false);
@@ -286,13 +302,49 @@ export function TeamBoardPage() {
               <Users className="size-4" aria-hidden /> Team
             </Button>
             {manage ? (
-              <Button onClick={() => setCreating(true)}>
-                <Plus className="size-4" aria-hidden /> New task
-              </Button>
+              view === "nori" ? (
+                <Button onClick={() => setAddingRequirement(true)}>
+                  <Plus className="size-4" aria-hidden /> Add requirement
+                </Button>
+              ) : (
+                <Button onClick={() => setCreating(true)}>
+                  <Plus className="size-4" aria-hidden /> New task
+                </Button>
+              )
             ) : null}
           </>
         }
       />
+      <div
+        role="group"
+        aria-label="Board"
+        className="mb-4 inline-flex items-center gap-0.5 rounded-xl border border-border bg-surface-muted p-0.5"
+      >
+        {(
+          [
+            ["team", "Team board"],
+            ["nori", "Nori Platform"],
+          ] as const
+        ).map(([value, label]) => (
+          <button
+            key={value}
+            type="button"
+            aria-pressed={view === value}
+            onClick={() => setView(value)}
+            className={cn(
+              "min-h-9 rounded-[10px] px-3 text-sm font-medium text-muted-foreground",
+              view === value && "bg-surface text-foreground shadow-sm",
+            )}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
+      {view === "nori" ? (
+        <div className="mb-4">
+          <NoriNumbersPanel manage={manage} />
+        </div>
+      ) : null}
       {board.isError && !data ? (
         <ErrorState
           message={errorText(board.error)}
@@ -351,32 +403,33 @@ export function TeamBoardPage() {
                 </option>
               ))}
             </Select>
-            {KINDS.filter((k) => (data.kinds[k] ?? 0) > 0 || kind === k).map(
-              (k) => {
-                const meta = KIND[k];
-                const active = kind === k;
-                return (
-                  <button
-                    key={k}
-                    type="button"
-                    aria-pressed={active}
-                    onClick={() => setKind(active ? null : k)}
-                    className={cn(
-                      "inline-flex min-h-9 items-center gap-1.5 rounded-full border px-3 text-sm font-medium",
-                      active
-                        ? "border-accent bg-accent-soft text-accent-soft-foreground"
-                        : "border-border text-muted-foreground",
-                    )}
-                  >
-                    <meta.icon className="size-4" aria-hidden />
-                    {meta.label}
-                    <span className="tabular-nums opacity-70">
-                      {data.kinds[k] ?? 0}
-                    </span>
-                  </button>
-                );
-              },
-            )}
+            {(view === "nori"
+              ? []
+              : KINDS.filter((k) => (data.kinds[k] ?? 0) > 0 || kind === k)
+            ).map((k) => {
+              const meta = KIND[k];
+              const active = kind === k;
+              return (
+                <button
+                  key={k}
+                  type="button"
+                  aria-pressed={active}
+                  onClick={() => setKind(active ? null : k)}
+                  className={cn(
+                    "inline-flex min-h-9 items-center gap-1.5 rounded-full border px-3 text-sm font-medium",
+                    active
+                      ? "border-accent bg-accent-soft text-accent-soft-foreground"
+                      : "border-border text-muted-foreground",
+                  )}
+                >
+                  <meta.icon className="size-4" aria-hidden />
+                  {meta.label}
+                  <span className="tabular-nums opacity-70">
+                    {data.kinds[k] ?? 0}
+                  </span>
+                </button>
+              );
+            })}
             {data.counts.overdue ? (
               <Badge tone="danger">{data.counts.overdue} late</Badge>
             ) : null}
@@ -463,6 +516,9 @@ export function TeamBoardPage() {
           members={data.members}
           onClose={() => setCreating(false)}
         />
+      ) : null}
+      {addingRequirement ? (
+        <NewRequirementDialog onClose={() => setAddingRequirement(false)} />
       ) : null}
       {team ? (
         <TeamDialog
@@ -688,6 +744,32 @@ function CardView({
         <p className="mt-0.5 truncate text-[13px] text-muted-foreground">
           {subtitle}
         </p>
+      ) : null}
+      {card.nori ? (
+        <div className="mt-1.5 space-y-1">
+          <div className="flex flex-wrap items-center gap-2">
+            <Badge tone="info">{NORI_ITEM_LABEL[card.nori.item_kind]}</Badge>
+            {card.nori.url ? (
+              <a
+                href={card.nori.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex min-h-7 items-center gap-1 text-[13px] text-accent hover:underline"
+              >
+                Open in nori <ExternalLink className="size-3.5" aria-hidden />
+              </a>
+            ) : null}
+          </div>
+          {[card.nori.workspace, card.nori.person, card.nori.department].some(
+            Boolean,
+          ) ? (
+            <p className="truncate text-[13px] text-muted-foreground">
+              {[card.nori.workspace, card.nori.person, card.nori.department]
+                .filter(Boolean)
+                .join(" · ")}
+            </p>
+          ) : null}
+        </div>
       ) : null}
       <div className="mt-2.5 flex items-center gap-2">
         <span

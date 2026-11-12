@@ -116,6 +116,7 @@ async def purge(session: AsyncSession, *, chance: float = 0.02) -> None:
         ("replay", REPLAY_RETENTION),
         ("inbound", INBOUND_RETENTION),
         ("send", AUDIT_RETENTION),
+        ("board", AUDIT_RETENTION),
     ):
         await session.execute(
             delete(PiNoriBridgeLog).where(

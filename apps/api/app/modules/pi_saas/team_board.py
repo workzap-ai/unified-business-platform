@@ -52,6 +52,7 @@ KINDS = (
     "start",
     "deliver",
     "feedback",
+    "nori",
 )
 LIVE = ("open", "in_progress", "blocked")
 COLUMNS = {"open": "todo", "in_progress": "doing", "blocked": "waiting", "done": "done"}
@@ -398,8 +399,10 @@ COLLECTORS = {
     "work": (_work, ("start", "deliver")),
     "feedback": (_feedback, ("feedback",)),
 }
-# Feedback has no "resolved" state in its source: the team closes those cards.
-NEVER_AUTO_CLOSED = {"feedback"}
+# Feedback has no "resolved" state in its source: the team closes those cards. The same holds for
+# the Nori Platform board's cards (pi_saas/nori_board): nori users' requirements are never found
+# by the sync, they are filed by the door, the bridge hook or the team.
+NEVER_AUTO_CLOSED = {"feedback", "nori"}
 
 
 async def sync_board(session: AsyncSession, scope: WorkspaceScope) -> dict[str, int]:
@@ -656,6 +659,9 @@ async def board(
         )
     }
     context = await _context(session, scope, tasks)
+    from app.modules.pi_saas.nori_board.service import meta_for  # lazy: it imports this module
+
+    nori = await meta_for(session, scope, [t.id for t in tasks if kind_of(t) == "nori"])
 
     def overdue(task: PiTask) -> bool:
         return task.status in LIVE and task.due_at is not None and _aware(task.due_at) < now
@@ -687,6 +693,7 @@ async def board(
             "updated_at": task.updated_at,
             "created_by": task.created_by_label,
             "link": extra.get("link"),
+            "nori": nori.get(task.id),
         }
 
     live = [t for t in tasks if t.status in LIVE]
