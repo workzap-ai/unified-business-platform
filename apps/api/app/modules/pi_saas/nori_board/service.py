@@ -154,6 +154,7 @@ async def upsert_pushed_number(
     person: str,
     department: str,
     active: bool,
+    ref: str | None = None,
 ) -> tuple[PiNoriNumber, bool]:
     """nori tells pi about a team member. A new number is added with source "nori". A number the
     team added by hand keeps its source, and nori can switch it off but never back on (the team's
@@ -170,12 +171,15 @@ async def upsert_pushed_number(
                     department=_clean(department, 80),
                     active=active,
                     source="nori",
+                    nori_ref=ref,
                 )
             )
         return row, True
     row.workspace = _clean(workspace, 120)
     row.person = _clean(person, 120)
     row.department = _clean(department, 80)
+    if row.source == "nori":
+        row.nori_ref = ref
     if row.source == "nori" or not active:
         row.active = active
     row.updated_at = datetime.now(UTC)
@@ -232,6 +236,7 @@ async def file_item(
     url: str | None = None,
     created_by_label: str = "nori",
     created_by_user_id: UUID | None = None,
+    forward_ref: str | None = None,
 ) -> tuple[PiTask, bool]:
     """The board card for this item and whether it was made now (False: the ref was filed before,
     nothing changes). The caller commits."""
@@ -278,6 +283,7 @@ async def file_item(
                     phone_mask=mask_number(phone) if phone else "",
                     source=source,
                     url=(url or None),
+                    forward_ref=forward_ref,
                 )
             )
     except IntegrityError:

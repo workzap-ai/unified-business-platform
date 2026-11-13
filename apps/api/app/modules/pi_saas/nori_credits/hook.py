@@ -134,6 +134,7 @@ async def _board_path(
                     phone=sender,
                     source="whatsapp",
                     created_by_label="pi",
+                    forward_ref=entry.nori_ref,
                 )
     except Exception:
         METRICS.inc("inbound", "board_error")

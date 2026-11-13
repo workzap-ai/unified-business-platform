@@ -325,6 +325,7 @@ async def _handle(
             person=item["person"],
             department=item["department"],
             active=item["active"],
+            ref=item["ref"],
         )
         await store.audit(
             session,

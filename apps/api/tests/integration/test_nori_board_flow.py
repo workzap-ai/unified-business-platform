@@ -11,6 +11,7 @@ from test_nori_credits_bridge import bridge
 
 from app.modules.pi.models import PiConversation, PiMessage
 from app.modules.pi_saas.models import PiTask
+from app.modules.pi_saas.nori_board.forward import forward_due
 from app.modules.pi_saas.nori_board.models import PiNoriItem
 from app.modules.pi_saas.nori_credits.hook import BOARD_ACK
 from app.modules.pi_saas.nori_credits.models import PiNoriBridgeLog
@@ -484,4 +485,93 @@ async def test_nori_can_switch_a_number_off_and_a_hand_added_number_stays_the_te
         b, number_payload(phone="923007770003", active=True, ts=int(time.time() * 1000) + 7)
     )
     assert next(r for r in await registry(b))["active"] is False
+    await b.pi.close()
+
+
+# --- sending a registry person's card back to nori (default off) ---
+
+LINKED = "923007770009"
+
+
+async def link_number(b, phone=LINKED, ref="nori-link:w1:923007770009"):
+    response = await push_number(b, number_payload(ref=ref, phone=phone))
+    assert response.status_code == 200, response.text
+
+
+async def item_rows(b):
+    return list(
+        await b.pi.db.scalars(
+            select(PiNoriItem)
+            .where(PiNoriItem.source == "whatsapp")
+            .order_by(PiNoriItem.created_at)
+        )
+    )
+
+
+async def sweep(b):
+    return await forward_due(b.pi.db, b.pi.app.state.settings, b.pi.ctx["http"])
+
+
+async def test_a_registry_persons_card_goes_to_nori_once_with_its_ref_and_no_phone(
+    api, business_db
+):
+    b = await bridge(api, business_db, board=True, forward=True)
+    await link_number(b)
+    await b.say(LINKED, "We need a meeting module, my card is 4111 1111 1111 1111", "wamid.fw-1")
+    assert b.nori.board_cards == []  # nothing leaves pi until the sweep runs
+    assert await sweep(b) == 1
+    assert len(b.nori.board_cards) == 1
+    sent = b.nori.board_cards[0]
+    assert sent["ref"] == "nori-link:w1:923007770009"
+    assert sent["card_id"] and sent["kind"] in {"feature", "problem", "question", "meeting"}
+    assert "phone" not in sent
+    assert "923007770009" not in sent["text"] + sent.get("person", "")  # only in nori's own ref
+    assert "4111" not in sent["text"]  # the redacted board text, never the raw message
+    row = (await item_rows(b))[0]
+    assert row.forwarded_at is not None and row.forward_note == "sent"
+    assert await sweep(b) == 0 and len(b.nori.board_cards) == 1
+    await b.pi.close()
+
+
+async def test_forwarding_is_off_unless_the_workspace_turns_it_on(api, business_db):
+    b = await bridge(api, business_db, board=True)  # forward not set
+    await link_number(b)
+    await b.say(LINKED, "We need van sales", "wamid.fw-2")
+    assert await sweep(b) == 0
+    assert b.nori.board_cards == []
+    assert (await item_rows(b))[0].forwarded_at is None
+    # turning it on later sends the owed card
+    await b.settings(enabled=True, board=True, forward=True)
+    assert await sweep(b) == 1
+    await b.pi.close()
+
+
+async def test_a_number_added_by_hand_is_never_sent_to_nori(api, business_db):
+    b = await bridge(api, business_db, board=True, forward=True)
+    await add_number(b, phone=LINKED)
+    await b.say(LINKED, "We need van sales", "wamid.fw-3")
+    row = (await item_rows(b))[0]
+    assert row.forward_ref is None
+    assert await sweep(b) == 0 and b.nori.board_cards == []
+    await b.pi.close()
+
+
+async def test_a_refusal_is_final_and_a_failure_is_retried(api, business_db):
+    b = await bridge(api, business_db, board=True, forward=True)
+    await link_number(b)
+    await b.say(LINKED, "We need van sales", "wamid.fw-4")
+    b.nori.mode = "500"
+    assert await sweep(b) == 0
+    row = (await item_rows(b))[0]
+    assert row.forwarded_at is None and row.forward_attempts == 1
+    b.nori.mode = "ok"
+    b.nori.board_card_reason = "unknown_ref"
+    from app.modules.pi_saas.nori_credits.resilience import reset_breakers
+
+    reset_breakers()
+    assert await sweep(b) == 0
+    await b.pi.db.refresh(row)
+    assert row.forward_note == "unknown_ref" and row.forward_attempts >= 6
+    calls = len(b.nori.calls("/api/pi/board-card"))
+    assert await sweep(b) == 0 and len(b.nori.calls("/api/pi/board-card")) == calls
     await b.pi.close()

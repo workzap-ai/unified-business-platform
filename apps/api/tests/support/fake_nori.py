@@ -39,6 +39,8 @@ class FakeNori:
         self.next_number = 11
         self.team_question: str | None = None
         self.item_status_value = "new"
+        self.board_cards: list[dict[str, Any]] = []
+        self.board_card_reason: str | None = None  # a 400 reason nori answers
         self.welcome: dict[str, Any] = {}  # number -> the welcome_ok value nori answers
 
     # --- helpers ----------------------------------------------------------------------------
@@ -73,6 +75,21 @@ class FakeNori:
         ):
             return httpx.Response(401, json={"ok": False, "error": "stale"})
         self.requests.append((path, body))
+        if path == "/api/pi/board-card":
+            if self.board_card_reason:
+                return httpx.Response(400, json={"ok": False, "reason": self.board_card_reason})
+            dup = any(c["card_id"] == body["card_id"] for c in self.board_cards)
+            if not dup:
+                self.board_cards.append(body)
+            return httpx.Response(
+                200,
+                json={
+                    "ok": True,
+                    "id": "i-1",
+                    "ref": "R12",
+                    **({"duplicate": True} if dup else {}),
+                },
+            )
         if path == "/api/workzap/inbound":
             return httpx.Response(200, json=self.inbound(body))
         if path == "/api/credits/pi":

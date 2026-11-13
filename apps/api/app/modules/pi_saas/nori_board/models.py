@@ -6,9 +6,19 @@ card that the generic task row has no place for (which nori workspace, who, whic
 kind of item). The card itself is a ``pi_tasks`` row with the key ``board:nori:<ref>``.
 """
 
+from datetime import datetime
 from uuid import UUID
 
-from sqlalchemy import Boolean, CheckConstraint, Index, String, UniqueConstraint, Uuid
+from sqlalchemy import (
+    Boolean,
+    CheckConstraint,
+    DateTime,
+    Index,
+    Integer,
+    String,
+    UniqueConstraint,
+    Uuid,
+)
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.shared.models import WorkspaceRow, scoped_fk, workspace_args
@@ -35,6 +45,8 @@ class PiNoriNumber(WorkspaceRow):
     department: Mapped[str] = mapped_column(String(80), default="", server_default="")
     active: Mapped[bool] = mapped_column(Boolean, default=True, server_default="true")
     source: Mapped[str] = mapped_column(String(10), default="manual", server_default="manual")
+    # nori's own ref for the number (None: added by hand), sent back with that person's cards
+    nori_ref: Mapped[str | None] = mapped_column(String(80), nullable=True)
 
 
 class PiNoriItem(WorkspaceRow):
@@ -58,3 +70,9 @@ class PiNoriItem(WorkspaceRow):
     url: Mapped[str | None] = mapped_column(String(300), nullable=True)
     # The pi chat this card came from (a registry number writing to pi); the team replies there.
     conversation_id: Mapped[UUID | None] = mapped_column(Uuid, nullable=True)
+    # Sending a registry person's card back to nori (nori_board/forward.py): the ref to send, when
+    # nori took it, the tries so far and why it was given up on.
+    forward_ref: Mapped[str | None] = mapped_column(String(80), nullable=True)
+    forwarded_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    forward_attempts: Mapped[int] = mapped_column(Integer, default=0, server_default="0")
+    forward_note: Mapped[str | None] = mapped_column(String(40), nullable=True)

@@ -1,7 +1,7 @@
 # Nori Platform board (pi side)
 
 Status: built and tested offline on branch `feat/nori-platform-board` (off `feat/nori-bridge`). Not
-deployed, not enabled anywhere. Needs migrations `0063_pi_nori_board` (two new tables) and `0064_pi_nori_item_chat` (one nullable column), both additive.
+deployed, not enabled anywhere. Needs migrations `0063_pi_nori_board` (two new tables), `0064_pi_nori_item_chat` (one nullable column) and `0065_pi_nori_forward` (five additive columns).
 
 nori is Workzap's own product. Its users write to the Workzap number on WhatsApp: a feature they
 need, a problem, feedback, a module idea. pi **only listens and passes it on**: each such message
@@ -93,6 +93,24 @@ Answers: `200 {"ok":true,"created":true|false}`, `400 bad_json|bad_ref|bad_works
 bad_item`, `401 bad_signature|stale`, `409 replay` (fresh `ts` per attempt), `413`, `429
 rate_limited` (shares the board's per-minute count), `503 not_configured|disabled|ambiguous`.
 Audit rows use kind `board` and hold the outcome and a masked number only.
+
+## Sending a registry person's card to nori (default OFF)
+
+Migration `0065_pi_nori_forward` (additive columns). With `response_rules.nori_bridge.forward`
+exactly `true` (plus `enabled` and `board`), the worker's sweep (about every minute) posts a card
+to nori's requirement inbox: `POST <NORI_BASE_URL>/api/pi/board-card`, same signature, secret and
+`ts` rule as the other doors, body `{ref, card_id, text, kind, person?}`.
+
+- `ref` is nori's own ref for the number, kept when nori pushes it (`nori-link:...` or
+  `nori-member:...`). A number added by hand has none and is never sent.
+- `card_id` is pi's card id, nori's idempotency key (a repeat answers `duplicate: true`).
+- `text` is the board card's redacted text (card numbers, passwords and ID numbers removed), up to
+  5000 characters. The phone number is not sent (nori reads it from the ref).
+- 200 marks the card sent. 400 (for example `unknown_ref`) is final: the reason is kept in
+  `pi_nori_items.forward_note` and the card is not retried. 401, 429, 5xx and timeouts are retried
+  up to 6 times. A card older than 24 hours is no longer sent.
+- Turning the flag on later sends cards still owed from the last 24 hours.
+- Erasing a customer in pi clears the pi card but cannot delete the copy nori already holds.
 
 ## The registry path (a number on the board writes to pi)
 

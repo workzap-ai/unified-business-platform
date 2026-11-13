@@ -10,7 +10,7 @@ DEFAULT_BREAKER_COOLDOWN = 30.0
 DEFAULT_SEND_PER_MINUTE = 60
 MAX_TEXT_CHARS = 1000
 
-_BOOLS = ("enabled", "send_enabled", "capture", "board")
+_BOOLS = ("enabled", "send_enabled", "capture", "board", "forward")
 _NUMBERS: dict[str, tuple[float, float]] = {
     "timeout_seconds": (0.5, 5.0),
     "breaker_failures": (2, 20),
@@ -88,6 +88,8 @@ class WorkspaceBridge:
     # The Nori Platform board (pi_saas/nori_board): numbers added on the board are filed by pi
     # itself, and nori may push items through POST /api/pi/nori-board.
     board: bool = False
+    # A registry person's card is also sent to nori's requirement inbox (nori_board/forward.py).
+    forward: bool = False
 
 
 def workspace_bridge(response_rules: dict[str, Any] | None) -> WorkspaceBridge | None:
@@ -111,4 +113,5 @@ def workspace_bridge(response_rules: dict[str, Any] | None) -> WorkspaceBridge |
         send_per_minute=int(number("send_per_minute", DEFAULT_SEND_PER_MINUTE)),
         capture=raw.get("capture", False) is True,
         board=raw.get("board", False) is True,
+        forward=raw.get("forward", False) is True,
     )
