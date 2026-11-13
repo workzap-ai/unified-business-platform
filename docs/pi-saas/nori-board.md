@@ -1,7 +1,7 @@
 # Nori Platform board (pi side)
 
 Status: built and tested offline on branch `feat/nori-platform-board` (off `feat/nori-bridge`). Not
-deployed, not enabled anywhere. Needs migration `0063_pi_nori_board` (two new tables, additive).
+deployed, not enabled anywhere. Needs migrations `0063_pi_nori_board` (two new tables) and `0064_pi_nori_item_chat` (one nullable column), both additive.
 
 nori is Workzap's own product. Its users write to the Workzap number on WhatsApp: a feature they
 need, a problem, feedback, a module idea. pi **only listens and passes it on**: each such message
@@ -73,11 +73,16 @@ live 24 hours, audit rows 90 days.
 ## The registry path (a number on the board writes to pi)
 
 In the bridge hook, before nori's `identify`: if the workspace has `board` on and the sender is on
-the registry and switched on, pi claims the WhatsApp message id and files the card in one savepoint,
-then replies `I'm pi, an AI assistant. I've passed this to the Workzap team.` and stops the brain. A
-failure saves nothing and the person gets `... I could not save that just now. Please send it
-again.` A repeat of the same message id files nothing and sends nothing. Only text messages: a photo,
-voice note or file from such a number still goes to pi's normal pipeline (see Not covered).
+the registry and switched on, pi claims the WhatsApp message id and files the card in one savepoint.
+The message then goes on through pi's normal intake, so it **appears in the inbox as a chat**: the
+runtime puts that chat in human mode (pi's brain stays silent), links the card to the chat
+(`pi_nori_items.conversation_id`, migration `0064`), and sends `I'm pi, an AI assistant. I've passed
+this to the Workzap team.` once per chat (queued like any outbound message). The card shows
+"Open chat"; the team replies from the inbox as in any human takeover. A failure saves nothing and
+the person gets `... I could not save that just now. Please send it again.` A repeat of the same
+message id files nothing and sends nothing. An emergency or a "stop" from such a number is not
+filed: pi's own pre-model gates answer it. Only text messages reach the hook; a photo, voice note or
+file still goes to pi's normal pipeline (see Not covered).
 
 The kind of a message that arrives without one is a hint from a keyword list in English and Roman
 Urdu (`service.classify`): problem, feature, question, feedback, else note. The team reads the whole

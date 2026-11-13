@@ -56,3 +56,5 @@ class PiNoriItem(WorkspaceRow):
     phone_mask: Mapped[str] = mapped_column(String(24), default="", server_default="")
     source: Mapped[str] = mapped_column(String(10), default="manual", server_default="manual")
     url: Mapped[str | None] = mapped_column(String(300), nullable=True)
+    # The pi chat this card came from (a registry number writing to pi); the team replies there.
+    conversation_id: Mapped[UUID | None] = mapped_column(Uuid, nullable=True)

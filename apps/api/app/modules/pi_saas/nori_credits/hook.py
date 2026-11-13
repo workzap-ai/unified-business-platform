@@ -35,6 +35,7 @@ class HookOutcome:
     handled: bool = False
     reply: str | None = None
     reason: str = "off"
+    board_ref: str | None = None  # a registry number wrote: the card's ref; the chat goes on
 
 
 PASS = HookOutcome()
@@ -56,7 +57,7 @@ async def pre_hook(
     payload = getattr(event, "payload", None)
     if not isinstance(payload, dict) or payload.get("kind") != "message":
         return PASS
-    if payload.get("message_type") != "text":
+    if payload.get("message_type") not in ("text", *MEDIA_TYPES) or payload.get("signal"):
         return PASS
     settings = ctx.get("settings")
     env = read_env(settings)
@@ -72,6 +73,12 @@ async def pre_hook(
         logger.warning("nori_bridge_hook_error", exc_info=False)
         return PASS
 
+
+# A photo, voice note, video or file from a registry number is filed as a card too (a placeholder
+# line plus any caption) and the chat is kept, so pi's brain never answers such a person. For any
+# other sender non-text messages are untouched.
+MEDIA_TYPES = ("audio", "image", "video", "other")
+MEDIA_LABEL = {"audio": "voice note", "image": "photo", "video": "video", "other": "file"}
 
 BOARD_ACK = "I'm pi, an AI assistant. I've passed this to the Workzap team."
 BOARD_RETRY = "I'm pi, an AI assistant. I could not save that just now. Please send it again."
@@ -132,12 +139,15 @@ async def _board_path(
         METRICS.inc("inbound", "board_error")
         logger.warning("nori_bridge_board_error", exc_info=False)
         return HookOutcome(handled=True, reply=BOARD_RETRY, reason="board_error")
+    ref = "wa:" + key[:40]
     if not fresh:
         METRICS.inc("inbound", "board_duplicate")
-        return HookOutcome(handled=True, reply=None, reason="board_duplicate")
+        return HookOutcome(reason="board_duplicate", board_ref=ref)
     await store.set_outcome(session, "inbound", key, "handled", "board")
     METRICS.inc("inbound", "board_filed")
-    return HookOutcome(handled=True, reply=BOARD_ACK, reason="board")
+    # Not handled: pi's runtime stores the message in the inbox, puts the chat in human mode (the
+    # brain stays silent), links the card to the chat and sends BOARD_ACK once.
+    return HookOutcome(reason="board", board_ref=ref)
 
 
 async def _run(
@@ -152,6 +162,12 @@ async def _run(
     sender = digits(payload.get("sender"))
     message_id = str(payload.get("message_id") or "")
     text = str(payload.get("body") or "")
+    media = payload.get("message_type") != "text"
+    if media:
+        label = (
+            "[" + MEDIA_LABEL.get(str(payload.get("message_type")), "file") + " sent on WhatsApp]"
+        )
+        text = f"{label} {text}".strip()
     if not 7 <= len(sender) <= 15 or not message_id or not text.strip():
         return PASS
     # Workzap Connect (pi_saas/nori_bridge.py) already posts every message of its number to the
@@ -171,6 +187,8 @@ async def _run(
         filed = await _board_path(session, scope, connection, payload, sender, message_id, text)
         if filed is not None:
             return filed
+    if media:
+        return PASS  # not on the registry: nori's identify only ever saw text
     client = NoriClient(env, ctx["http"], bridge)
 
     identity = await client.identify(sender)

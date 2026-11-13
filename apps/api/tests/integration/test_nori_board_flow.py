@@ -9,7 +9,7 @@ import pytest
 from sqlalchemy import func, select
 from test_nori_credits_bridge import bridge
 
-from app.modules.pi.models import PiMessage
+from app.modules.pi.models import PiConversation, PiMessage
 from app.modules.pi_saas.models import PiTask
 from app.modules.pi_saas.nori_board.models import PiNoriItem
 from app.modules.pi_saas.nori_credits.hook import BOARD_ACK
@@ -63,6 +63,57 @@ async def add_number(b, phone=WRITER, **extra):
 # --- the door ---
 
 
+async def outbound_bodies(b):
+    return list(
+        await b.pi.db.scalars(
+            select(PiMessage.body)
+            .where(PiMessage.direction == "outbound")
+            .order_by(PiMessage.created_at)
+        )
+    )
+
+
+async def test_a_registry_chat_stays_open_for_the_team_and_the_brain_stays_silent(api, business_db):
+    b = await bridge(api, business_db, board=True)
+    await add_number(b)
+    await b.say(WRITER, "The stock export is not working", "wamid.chat-1")
+    await b.say(WRITER, "Also the till report is empty", "wamid.chat-2")
+    # Two messages, two cards, one chat, one acknowledgement, nothing else from pi.
+    assert len(await cards(b)) == 2
+    assert await outbound_bodies(b) == [BOARD_ACK]
+    rows = [(await b.inbound_rows(m))[0] for m in ("wamid.chat-1", "wamid.chat-2")]
+    assert rows[0].conversation_id == rows[1].conversation_id
+    await b.pi.close()
+
+
+async def test_a_photo_from_a_registry_number_is_filed_and_the_chat_kept(api, business_db):
+    b = await bridge(api, business_db, board=True)
+    await add_number(b)
+    await b.pi.process("the screen as it looks", "wamid.photo-1", sender=WRITER, kind="image")
+    found = await cards(b)
+    assert len(found) == 1
+    assert "photo" in found[0]["title"] and "the screen as it looks" in found[0]["title"]
+    [inbound] = await b.inbound_rows("wamid.photo-1")
+    assert (await b.pi.db.get(PiConversation, inbound.conversation_id)).mode == "human"
+    assert await outbound_bodies(b) == [BOARD_ACK]
+    await b.pi.close()
+
+
+async def test_a_chat_the_team_gave_back_to_the_ai_is_not_forced_to_human_again(api, business_db):
+    b = await bridge(api, business_db, board=True)
+    await add_number(b)
+    await b.say(WRITER, "The stock export is not working", "wamid.back-1")
+    [first] = await b.inbound_rows("wamid.back-1")
+    conversation = await b.pi.db.get(PiConversation, first.conversation_id)
+    conversation.mode = "ai"
+    await b.pi.db.commit()
+    await b.say(WRITER, "Any news on the export?", "wamid.back-2")
+    await b.pi.db.refresh(conversation)
+    assert conversation.mode == "ai"  # the team's choice stands
+    assert (await outbound_bodies(b)).count(BOARD_ACK) == 1  # one acknowledgement per chat
+    await b.pi.close()
+
+
 async def test_door_is_off_until_the_board_flag_is_on(api, business_db):
     b = await bridge(api, business_db)  # enabled, board not set
     response = await push(b, push_payload())
@@ -94,6 +145,7 @@ async def test_door_files_a_card_and_a_repeat_of_the_ref_is_not_a_second_card(ap
         "phone_mask": "",
         "source": "nori",
         "url": "https://nori.test/help/requests/1",
+        "conversation_id": None,
     }
     await b.pi.close()
 
@@ -224,9 +276,13 @@ async def test_registry_number_is_filed_and_answered_without_the_brain_or_nori(a
 
     await b.say(WRITER, "The stock export is not working, please look", "wamid.board-1")
 
-    assert b.texts_to(WRITER) == [BOARD_ACK]
     assert b.nori.requests == []  # pi asked nobody: the registry is pi's own
-    assert await b.inbound_rows("wamid.board-1") == []  # the brain's pipeline never took it
+    # The chat is kept for the team: the message is in the inbox, the chat is in human mode (the
+    # brain stays silent) and the only outbound line is the one-time board acknowledgement.
+    [inbound] = await b.inbound_rows("wamid.board-1")
+    conversation = await b.pi.db.get(PiConversation, inbound.conversation_id)
+    assert conversation.mode == "human"
+    assert await outbound_bodies(b) == [BOARD_ACK]
     found = await cards(b)
     assert len(found) == 1
     assert found[0]["title"] == "The stock export is not working, please look"
@@ -235,6 +291,7 @@ async def test_registry_number_is_filed_and_answered_without_the_brain_or_nori(a
     assert found[0]["nori"]["person"] == "Sara"
     assert found[0]["nori"]["department"] == "Stock"
     assert found[0]["nori"]["source"] == "whatsapp"
+    assert found[0]["nori"]["conversation_id"] == str(inbound.conversation_id)
     assert WRITER not in repr(found)  # the card carries a masked number only
     await b.pi.close()
 
@@ -244,7 +301,7 @@ async def test_a_repeated_whatsapp_message_is_one_card_and_one_answer(api, busin
     await add_number(b)
     await b.say(WRITER, "We need a van sales module", "wamid.board-2")
     await b.say(WRITER, "We need a van sales module", "wamid.board-2")
-    assert b.texts_to(WRITER) == [BOARD_ACK]
+    assert await outbound_bodies(b) == [BOARD_ACK]
     assert len(await cards(b)) == 1
     await b.pi.close()
 
@@ -318,14 +375,14 @@ async def test_a_failure_while_filing_asks_the_person_to_resend_and_keeps_no_cla
     )
     assert left == 0
     assert await cards(b) == []
-    await b.say(WRITER, "We need a van sales module", "wamid.board-7b")
-    assert b.texts_to(WRITER)[-1] == BOARD_ACK
-    assert len(await cards(b)) == 1
-    assert await b.pi.db.scalar(select(PiNoriItem.id).limit(1)) is not None
     assert (
         await b.pi.db.scalar(
-            select(PiMessage.id).where(PiMessage.provider_message_id.like("wamid.board-7%"))
+            select(PiMessage.id).where(PiMessage.provider_message_id == "wamid.board-7")
         )
         is None
     )
+    await b.say(WRITER, "We need a van sales module", "wamid.board-7b")
+    assert await outbound_bodies(b) == [BOARD_ACK]
+    assert len(await cards(b)) == 1
+    assert await b.pi.db.scalar(select(PiNoriItem.id).limit(1)) is not None
     await b.pi.close()

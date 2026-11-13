@@ -64,6 +64,7 @@ export interface NoriInfo {
   phone_mask: string;
   source: "nori" | "whatsapp" | "manual";
   url: string | null;
+  conversation_id: string | null;
 }
 
 export interface NoriNumber {

@@ -291,6 +291,7 @@ async def meta_for(
             "phone_mask": row.phone_mask,
             "source": row.source,
             "url": row.url,
+            "conversation_id": row.conversation_id,
         }
         for row in rows
     }
@@ -307,6 +308,15 @@ def number_view(row: PiNoriNumber, *, full: bool) -> dict[str, Any]:
         "source": row.source,
         "created_at": row.created_at,
     }
+
+
+async def link_conversation(
+    session: AsyncSession, scope: WorkspaceScope, ref: str, conversation_id: UUID
+) -> None:
+    item = await item_for_ref(session, scope, ref)
+    if item is not None and item.conversation_id is None:
+        item.conversation_id = conversation_id
+        await session.flush()
 
 
 async def known_workspaces(session: AsyncSession, scope: WorkspaceScope) -> list[str]:

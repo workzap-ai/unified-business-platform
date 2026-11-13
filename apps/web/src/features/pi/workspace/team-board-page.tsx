@@ -53,6 +53,7 @@ import {
   NORI_ITEM_LABEL,
   NoriNumbersPanel,
 } from "./nori-board-panel";
+import { inboxHref } from "./lib";
 import { customersService } from "@/features/customers/service";
 import { errorMessage } from "@/services/api-client";
 import { formatTime } from "@/lib/format";
@@ -706,6 +707,14 @@ function BoardCardView({
                 Open in nori{" "}
                 <ExternalLink className="size-3" aria-hidden="true" />
               </a>
+            )}
+            {card.nori.conversation_id && (
+              <Link
+                href={inboxHref(card.nori.conversation_id)}
+                className="inline-flex items-center gap-1 text-xs text-primary hover:underline"
+              >
+                Open chat
+              </Link>
             )}
           </div>
           {[card.nori.workspace, card.nori.person, card.nori.department].some(

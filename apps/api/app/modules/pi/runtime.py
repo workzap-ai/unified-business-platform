@@ -968,6 +968,34 @@ async def process_pi_event(ctx: dict[str, Any], event_id: str) -> None:
         message_id, conversation_id = message.id, message.conversation_id
         conversation = await service.conversations.get(conversation_id)
         policy = await settings_row(session, scope)
+        if credits_hook.board_ref:
+            # A number on the Nori Platform board's registry wrote (nori_board): the chat stays in
+            # the inbox for the team, the brain stays silent (human mode), the card links here.
+            from app.modules.pi_saas.nori_board import service as nori_board
+            from app.modules.pi_saas.nori_credits.hook import BOARD_ACK
+
+            await nori_board.link_conversation(
+                session, scope, credits_hook.board_ref, conversation_id
+            )
+            # Once per chat, on its first registry message: later ones leave the chat as the team
+            # left it (a chat staff gave back to the AI is not forced to human again).
+            ack_key = f"pi-board-ack:{conversation_id}"
+            if await service.messages.find(PiMessage.idempotency_key == ack_key) is None:
+                conversation.mode = "human"
+                ack = await service.messages.add(
+                    service.messages.new(
+                        conversation_id=conversation_id,
+                        direction="outbound",
+                        sender_type="system",
+                        body=BOARD_ACK,
+                        status="queued",
+                        idempotency_key=ack_key,
+                    )
+                )
+                await session.commit()
+                await enqueue_sends(ctx, [str(ack.id)])
+            else:
+                await session.commit()
         from app.modules.pi import flow as brain_flow
 
         if opted_out and brain_flow.brain_mode(policy.response_rules):

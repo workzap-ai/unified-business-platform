@@ -59,6 +59,7 @@ export const noriInfoSchema = z.object({
   phone_mask: z.string().catch(""),
   source: z.enum(["nori", "whatsapp", "manual"]).catch("manual"),
   url: z.string().nullable().catch(null),
+  conversation_id: z.string().nullable().catch(null),
 });
 export type NoriInfo = z.infer<typeof noriInfoSchema>;
 

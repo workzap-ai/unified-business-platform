@@ -759,6 +759,14 @@ function CardView({
                 Open in nori <ExternalLink className="size-3.5" aria-hidden />
               </a>
             ) : null}
+            {card.nori.conversation_id ? (
+              <Link
+                href={`/inbox?conversation=${encodeURIComponent(card.nori.conversation_id)}`}
+                className="inline-flex min-h-7 items-center gap-1 text-[13px] text-accent hover:underline"
+              >
+                Open chat
+              </Link>
+            ) : null}
           </div>
           {[card.nori.workspace, card.nori.person, card.nori.department].some(
             Boolean,
