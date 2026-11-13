@@ -70,6 +70,30 @@ Order of checks and the audit rows follow the send door (`nori_board/door.py`). 
 `board` in `pi_nori_bridge_log`) hold the outcome and a masked number, never the text; replay keys
 live 24 hours, audit rows 90 days.
 
+## The numbers door: nori tells pi about a team member
+
+`POST https://<pi api host>/api/pi/nori-numbers`, same header, secret, 8 KB limit and `ts` rule as
+the board door. Same gates (server variables, kill switch, `nori_bridge.enabled` and `board` on).
+
+```json
+{"ref": "nori-member:12", "workspace": "Mendeez", "person": "Sara", "role": "Head of Stock",
+ "department": "Stock", "phone": "+92 300 777 0002", "active": true, "ts": 1767000000000}
+```
+
+`ref` (1 to 80 of `A-Za-z0-9_.:-`), `workspace` (1 to 120) and `phone` (7 to 15 digits after `+`,
+spaces and dashes are removed) are required; `person` 0 to 120, `department` 0 to 80, `role` 0 to 60,
+`active` a real boolean (default true). The registry's key is the phone number in the workspace:
+a repeat updates the row. The role is stored in brackets after the person ("Sara (Head of Stock)").
+
+- A new number is added with source `nori`.
+- A number the team added by hand keeps source `manual`. nori may switch it off but never back on:
+  the team's own switch wins.
+
+Answers: `200 {"ok":true,"created":true|false}`, `400 bad_json|bad_ref|bad_workspace|bad_phone|
+bad_item`, `401 bad_signature|stale`, `409 replay` (fresh `ts` per attempt), `413`, `429
+rate_limited` (shares the board's per-minute count), `503 not_configured|disabled|ambiguous`.
+Audit rows use kind `board` and hold the outcome and a masked number only.
+
 ## The registry path (a number on the board writes to pi)
 
 In the bridge hook, before nori's `identify`: if the workspace has `board` on and the sender is on

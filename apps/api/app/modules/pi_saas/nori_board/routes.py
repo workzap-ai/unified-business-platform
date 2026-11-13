@@ -30,6 +30,15 @@ assert set(ITEM_KINDS) == set(ItemKind.__args__)  # type: ignore[attr-defined]
 
 @door_router.post("/nori-board", include_in_schema=False)
 async def nori_board_door(request: Request, session: Session) -> JSONResponse:
+    return await _door(request, session, "board")
+
+
+@door_router.post("/nori-numbers", include_in_schema=False)
+async def nori_numbers_door(request: Request, session: Session) -> JSONResponse:
+    return await _door(request, session, "numbers")
+
+
+async def _door(request: Request, session: Any, mode: str) -> JSONResponse:
     declared = request.headers.get("content-length")
     length = int(declared) if declared and declared.isdigit() else None
     body = bytearray()
@@ -44,6 +53,7 @@ async def nori_board_door(request: Request, session: Session) -> JSONResponse:
         bytes(body),
         request.headers.get("x-workzap-signature"),
         declared_length=length,
+        mode=mode,
     )
     return JSONResponse(result.body, status_code=result.status)
 

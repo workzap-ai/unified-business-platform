@@ -386,3 +386,102 @@ async def test_a_failure_while_filing_asks_the_person_to_resend_and_keeps_no_cla
     assert len(await cards(b)) == 1
     assert await b.pi.db.scalar(select(PiNoriItem.id).limit(1)) is not None
     await b.pi.close()
+
+
+# --- the numbers door: nori tells pi about a team member ---
+
+
+def number_payload(ref="m-1", **extra):
+    return {
+        "ref": ref,
+        "workspace": "Mendeez",
+        "person": "Sara",
+        "role": "Head of Stock",
+        "department": "Stock",
+        "phone": "+92 300 777 0002",
+        "active": True,
+        "ts": int(time.time() * 1000),
+        **extra,
+    }
+
+
+async def push_number(b, payload, *, secret=SECRET):
+    body, sig = signed(secret, payload)
+    return await b.pi.api.post(
+        "/api/pi/nori-numbers",
+        content=body,
+        headers={"x-workzap-signature": sig, "content-type": "application/json"},
+    )
+
+
+async def registry(b):
+    response = await b.pi.api.get(NUMBERS)
+    assert response.status_code == 200, response.text
+    return response.json()["numbers"]
+
+
+async def test_numbers_door_is_off_until_the_board_flag_is_on(api, business_db):
+    b = await bridge(api, business_db)
+    response = await push_number(b, number_payload())
+    assert response.status_code == 503
+    assert response.json()["reason"] == "disabled"
+    await b.pi.close()
+
+
+async def test_numbers_door_adds_then_updates_and_a_bad_signature_changes_nothing(api, business_db):
+    b = await bridge(api, business_db, board=True)
+    bad = await push_number(b, number_payload(), secret="x" * 40)
+    assert bad.status_code == 401
+    assert await registry(b) == []
+
+    first = await push_number(b, number_payload())
+    assert first.status_code == 200, first.text
+    assert first.json() == {"ok": True, "created": True}
+    again = await push_number(
+        b, number_payload(department="Warehouse", ts=int(time.time() * 1000) + 5)
+    )
+    assert again.json() == {"ok": True, "created": False}
+    rows = await registry(b)
+    assert len(rows) == 1
+    assert rows[0]["person"] == "Sara (Head of Stock)"
+    assert rows[0]["department"] == "Warehouse"
+    assert rows[0]["source"] == "nori"
+    assert rows[0]["active"] is True
+    await b.pi.close()
+
+
+async def test_numbers_door_refusals(api, business_db):
+    b = await bridge(api, business_db, board=True)
+    stamp = int(time.time() * 1000)
+    cases = [
+        (number_payload(phone="12"), "bad_phone"),
+        (number_payload(ref="bad ref"), "bad_ref"),
+        (number_payload(workspace=""), "bad_workspace"),
+        (number_payload(department="d" * 81), "bad_item"),
+        (number_payload(active="yes"), "bad_item"),
+        (number_payload(ts=stamp - 3_600_000), "stale"),
+    ]
+    for payload, reason in cases:
+        response = await push_number(b, payload)
+        assert response.json()["reason"] == reason, (reason, response.text)
+    assert await registry(b) == []
+    fixed = number_payload()
+    assert (await push_number(b, fixed)).status_code == 200
+    assert (await push_number(b, fixed)).status_code == 409
+    await b.pi.close()
+
+
+async def test_nori_can_switch_a_number_off_and_a_hand_added_number_stays_the_teams(
+    api, business_db
+):
+    b = await bridge(api, business_db, board=True)
+    assert (await add_number(b, phone="923007770003")).status_code in (200, 201)
+    await push_number(b, number_payload(phone="923007770003", active=False))
+    row = next(r for r in await registry(b))
+    assert row["active"] is False and row["source"] == "manual"
+    # nori cannot switch a hand-added number back on: the team's switch wins
+    await push_number(
+        b, number_payload(phone="923007770003", active=True, ts=int(time.time() * 1000) + 7)
+    )
+    assert next(r for r in await registry(b))["active"] is False
+    await b.pi.close()

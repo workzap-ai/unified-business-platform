@@ -152,6 +152,37 @@ def parse_item(data: dict[str, Any], nori_host: str) -> dict[str, Any] | str:
     }
 
 
+def parse_number(data: dict[str, Any]) -> dict[str, Any] | str:
+    """A team member nori tells pi about, or the reason it was refused. The role has no column of
+    its own: it is kept in brackets after the person's name."""
+    ref = data.get("ref")
+    if not isinstance(ref, str) or not service.REF_RE.fullmatch(ref):
+        return "bad_ref"
+    workspace = _text(data.get("workspace"), 120, required=True)
+    if workspace is None:
+        return "bad_workspace"
+    person = _text(data.get("person"), 120)
+    department = _text(data.get("department"), 80)
+    role = _text(data.get("role"), 60)
+    if person is None or department is None or role is None:
+        return "bad_item"
+    phone = service.normalise_phone(data.get("phone"))
+    if phone is None:
+        return "bad_phone"
+    active = data.get("active", True)
+    if not isinstance(active, bool):
+        return "bad_item"
+    label = f"{person} ({role})" if person and role else person or role
+    return {
+        "ref": ref,
+        "workspace": workspace,
+        "person": label[:120],
+        "department": department,
+        "phone": phone,
+        "active": active,
+    }
+
+
 async def handle(
     session: AsyncSession,
     settings: Any,
@@ -160,10 +191,12 @@ async def handle(
     *,
     declared_length: int | None = None,
     now: float | None = None,
+    mode: str = "board",
 ) -> DoorResult:
-    """Decide and, when every check passes, file the card. Never raises."""
+    """Decide and, when every check passes, file the card (mode "board") or save the team number
+    (mode "numbers"). Never raises."""
     try:
-        return await _handle(session, settings, raw, signature, declared_length, now)
+        return await _handle(session, settings, raw, signature, declared_length, now, mode)
     except Exception:
         METRICS.inc(KIND, "error")
         logger.warning("nori_board_door_error", exc_info=False)
@@ -218,6 +251,7 @@ async def _handle(
     signature: str | None,
     declared_length: int | None,
     now: float | None,
+    mode: str,
 ) -> DoorResult:
     env = read_env(settings)
     if env is None:
@@ -258,7 +292,7 @@ async def _handle(
     if stamp is None or abs(clock - stamp) > FRESHNESS_SECONDS:
         return await _reject(session, 401, "stale", target=connection)
 
-    item = parse_item(data, env.host)
+    item = parse_number(data) if mode == "numbers" else parse_item(data, env.host)
     if isinstance(item, str):
         return await _reject(session, 400, item, target=connection)
 
@@ -276,12 +310,33 @@ async def _handle(
     fresh = await store.claim(
         session,
         "replay",
-        store.key_of("board", str(data.get("ts")), signature or ""),
+        store.key_of(mode, str(data.get("ts")), signature or ""),
         outcome="seen",
     )
     if not fresh:
         return await _reject(session, 409, "replay", target=connection)
 
+    if mode == "numbers":
+        _row, created = await service.upsert_pushed_number(
+            session,
+            scope,
+            phone=item["phone"],
+            workspace=item["workspace"],
+            person=item["person"],
+            department=item["department"],
+            active=item["active"],
+        )
+        await store.audit(
+            session,
+            KIND,
+            "filed" if created else "duplicate",
+            number=item["phone"],
+            tenant_id=connection.tenant_id,
+            environment_id=connection.environment_id,
+        )
+        await session.commit()
+        METRICS.inc(KIND, "number_added" if created else "number_updated")
+        return DoorResult(200, {"ok": True, "created": created})
     try:
         task, created = await service.file_item(
             session,

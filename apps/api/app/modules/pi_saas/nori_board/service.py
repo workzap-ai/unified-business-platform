@@ -145,6 +145,44 @@ async def add_number(
         ) from None
 
 
+async def upsert_pushed_number(
+    session: AsyncSession,
+    scope: WorkspaceScope,
+    *,
+    phone: str,
+    workspace: str,
+    person: str,
+    department: str,
+    active: bool,
+) -> tuple[PiNoriNumber, bool]:
+    """nori tells pi about a team member. A new number is added with source "nori". A number the
+    team added by hand keeps its source, and nori can switch it off but never back on (the team's
+    own on/off switch wins). Returns the row and whether it was new."""
+    row = await find_number(session, scope, phone)
+    if row is None:
+        repo = WorkspaceRepository(session, PiNoriNumber, scope)
+        async with session.begin_nested():
+            row = await repo.add(
+                repo.new(
+                    phone=phone,
+                    workspace=_clean(workspace, 120),
+                    person=_clean(person, 120),
+                    department=_clean(department, 80),
+                    active=active,
+                    source="nori",
+                )
+            )
+        return row, True
+    row.workspace = _clean(workspace, 120)
+    row.person = _clean(person, 120)
+    row.department = _clean(department, 80)
+    if row.source == "nori" or not active:
+        row.active = active
+    row.updated_at = datetime.now(UTC)
+    await session.flush()
+    return row, False
+
+
 async def update_number(
     session: AsyncSession, scope: WorkspaceScope, number_id: UUID, values: dict[str, Any]
 ) -> PiNoriNumber:
