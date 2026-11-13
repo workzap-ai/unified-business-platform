@@ -48,6 +48,9 @@ class Identity:
     checked: bool  # False when the call failed, so "unknown" means "could not tell"
     member: dict[str, Any] | None = None
     credits: bool | None = None
+    # nori answered known:false but listed this number for a welcome (the master panel made it a
+    # sign-in link in the last 7 days). Allows the welcome send only: no chat, no member rights.
+    welcome_ok: bool = False
 
 
 def _now_ms() -> int:
@@ -143,6 +146,7 @@ class NoriClient:
             checked=True,
             member=member if isinstance(member, dict) else None,
             credits=workspace.get("credits") if isinstance(workspace, dict) else None,
+            welcome_ok=result.data["known"] is False and result.data.get("welcome_ok") is True,
         )
         IDENTIFY_CACHE.put(key, identity, IDENTIFY_TTL_SECONDS)
         METRICS.inc("identify", "known" if identity.known else "unknown")

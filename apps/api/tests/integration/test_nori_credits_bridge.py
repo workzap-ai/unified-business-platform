@@ -9,10 +9,15 @@ from types import SimpleNamespace
 import httpx
 import pytest
 from pydantic import SecretStr
-from sqlalchemy import select
+from sqlalchemy import func, select
 from test_pi_pipeline import pi_workspace
 
-from app.modules.pi.models import PiMessage, WhatsAppConnection, WhatsAppWebhookEvent
+from app.modules.pi.models import (
+    PiConversation,
+    PiMessage,
+    WhatsAppConnection,
+    WhatsAppWebhookEvent,
+)
 from app.modules.pi_saas.nori_credits import hook
 from app.modules.pi_saas.nori_credits.models import PiNoriBridgeLog
 from app.modules.pi_saas.nori_credits.resilience import (
@@ -455,6 +460,39 @@ async def test_allowlist_unknown_numbers_are_refused_and_numbers_that_messaged_p
     rows = await b.audit()
     assert [r.outcome for r in rows] == ["rejected", "sent_text"]
     assert rows[0].reason == "recipient_not_allowed"
+    await b.pi.close()
+
+
+async def test_a_number_nori_lists_for_a_welcome_gets_the_send_and_nothing_else(api, business_db):
+    b = await bridge(api, business_db)
+    b.nori.welcome[STRANGER] = True
+    sent = await b.post(b.send_payload(to=STRANGER, text="Welcome to nori."))
+    assert sent.status_code == 200, sent.text
+    assert b.texts_to(STRANGER)[-1] == "Welcome to nori."
+    # no chat, no member rights: pi opened no conversation for that number
+    assert (
+        await b.pi.db.scalar(
+            select(func.count())
+            .select_from(PiConversation)
+            .where(PiConversation.contact_wa_id == STRANGER)
+        )
+    ) == 0
+    rows = await b.audit()
+    assert [r.outcome for r in rows] == ["sent_text"]
+    await b.pi.close()
+
+
+async def test_welcome_ok_must_be_exactly_true_and_is_not_remembered_when_false(api, business_db):
+    b = await bridge(api, business_db)
+    for value in ("true", 1, None, False):
+        b.nori.welcome[STRANGER] = value
+        refused = await b.post(b.send_payload(to=STRANGER))
+        assert refused.status_code == 403, value
+        assert refused.json()["reason"] == "recipient_not_allowed"
+    assert b.sent == []
+    # a link made a moment later is not hidden by the earlier "unknown"
+    b.nori.welcome[STRANGER] = True
+    assert (await b.post(b.send_payload(to=STRANGER))).status_code == 200
     await b.pi.close()
 
 

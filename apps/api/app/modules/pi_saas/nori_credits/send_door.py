@@ -11,7 +11,8 @@ Order (the first failing check answers, and every check after the signature leav
   timestamp freshness (10 min)  -> 401
   replay (ts + signature, 24 h) -> 409
   per-minute rate limit         -> 429
-  recipient allowlist           -> 403      (a nori member by `identify`, or has messaged pi)
+  recipient allowlist           -> 403      (a nori member by `identify`, a number nori lists for a
+                                              welcome (welcome_ok), or has messaged pi)
   content limits                -> 422      (length, no URL but nori's own host, template shape)
   send through pi's provider adapter -> 200, or 422/502 with a short reason
 
@@ -299,10 +300,13 @@ async def _handle(
     connection, bridge = target
 
     if not history:
-        identity = await NoriClient(env, http, bridge).identify(to)
+        # use_cache=False: a link made a minute ago must not be hidden by an older "unknown".
+        identity = await NoriClient(env, http, bridge).identify(to, use_cache=False)
         if not identity.checked:
             return await _reject(session, 503, "cannot_verify", number=to, target=target)
-        if not identity.known:
+        if identity.welcome_ok:
+            METRICS.inc("send", "welcome_ok")
+        elif not identity.known:
             return await _reject(session, 403, "recipient_not_allowed", number=to, target=target)
 
     text, template, refused = check_content(data.get("text"), data.get("template"), env.host)

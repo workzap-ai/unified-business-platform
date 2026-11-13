@@ -39,6 +39,7 @@ class FakeNori:
         self.next_number = 11
         self.team_question: str | None = None
         self.item_status_value = "new"
+        self.welcome: dict[str, Any] = {}  # number -> the welcome_ok value nori answers
 
     # --- helpers ----------------------------------------------------------------------------
     def calls(self, path: str, action: str | None = None) -> list[dict[str, Any]]:
@@ -111,7 +112,8 @@ class FakeNori:
         if action == "identify":
             member = self.members.get(sender)
             if member is None:
-                return {"ok": True, "known": False}
+                extra = {"welcome_ok": self.welcome[sender]} if sender in self.welcome else {}
+                return {"ok": True, "known": False, **extra}
             return {
                 "ok": True,
                 "known": True,
