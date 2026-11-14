@@ -64,6 +64,9 @@ class ConversationView(BaseModel):
     last_intent: str | None = None
     summary: str
     pending_confirmation: bool = False
+    # The nori workspace name when this chat's number is on the Nori numbers registry (a label in
+    # the inbox list: "nori · <workspace>"); None for everyone else.
+    nori_workspace: str | None = None
 
 
 VISUALS = frozenset({"map", "map_text", "board", "progress"})

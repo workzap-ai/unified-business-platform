@@ -627,3 +627,23 @@ async def test_the_media_link_is_refused_unless_genuine_and_switched_on(
     await b.settings(enabled=True, board=True, forward=True)  # media switched off
     assert (await b.pi.api.get(path)).status_code == 404
     await b.pi.close()
+
+
+# --- the inbox list labels a registry person's chat ---
+
+
+async def test_the_inbox_labels_a_registry_chat_with_its_nori_workspace(api, business_db):
+    b = await bridge(api, business_db, board=True)
+    await add_number(b)
+    await b.say(WRITER, "The stock export is not working", "wamid.lbl-1")
+    stranger = "923005559999"
+    await b.pi.process("hello there", "wamid.lbl-2", sender=stranger)
+    response = await b.pi.api.get("/api/v1/pi/conversations")
+    assert response.status_code == 200, response.text
+    labels = {
+        c["customer_phone"] or c["customer_name"]: c["nori_workspace"]
+        for c in response.json()["items"]
+    }
+    assert "Mendeez" in labels.values()
+    assert list(labels.values()).count(None) == len(labels) - 1
+    await b.pi.close()

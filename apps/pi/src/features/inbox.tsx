@@ -355,6 +355,7 @@ function ConversationList({
                       <Bot className="size-3" aria-hidden /> pi
                     </Badge>
                   )}
+                  {c.nori_workspace ? <Badge>nori · {c.nori_workspace}</Badge> : null}
                   {c.assigned_label ? <Badge>{c.assigned_label}</Badge> : null}
                   {c.status === "closed" ? <Badge>Closed</Badge> : null}
                 </span>
