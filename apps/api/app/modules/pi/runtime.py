@@ -975,7 +975,7 @@ async def process_pi_event(ctx: dict[str, Any], event_id: str) -> None:
             from app.modules.pi_saas.nori_credits.hook import BOARD_ACK
 
             await nori_board.link_conversation(
-                session, scope, credits_hook.board_ref, conversation_id
+                session, scope, credits_hook.board_ref, conversation_id, message_id
             )
             # Once per chat, on its first registry message: later ones leave the chat as the team
             # left it (a chat staff gave back to the AI is not forced to human again).

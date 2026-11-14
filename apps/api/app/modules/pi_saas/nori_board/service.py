@@ -355,12 +355,20 @@ def number_view(row: PiNoriNumber, *, full: bool) -> dict[str, Any]:
 
 
 async def link_conversation(
-    session: AsyncSession, scope: WorkspaceScope, ref: str, conversation_id: UUID
+    session: AsyncSession,
+    scope: WorkspaceScope,
+    ref: str,
+    conversation_id: UUID,
+    message_id: UUID | None = None,
 ) -> None:
     item = await item_for_ref(session, scope, ref)
-    if item is not None and item.conversation_id is None:
+    if item is None:
+        return
+    if item.conversation_id is None:
         item.conversation_id = conversation_id
-        await session.flush()
+    if item.message_id is None and message_id is not None:
+        item.message_id = message_id
+    await session.flush()
 
 
 async def known_workspaces(session: AsyncSession, scope: WorkspaceScope) -> list[str]:

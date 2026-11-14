@@ -10,7 +10,7 @@ DEFAULT_BREAKER_COOLDOWN = 30.0
 DEFAULT_SEND_PER_MINUTE = 60
 MAX_TEXT_CHARS = 1000
 
-_BOOLS = ("enabled", "send_enabled", "capture", "board", "forward")
+_BOOLS = ("enabled", "send_enabled", "capture", "board", "forward", "forward_media")
 _NUMBERS: dict[str, tuple[float, float]] = {
     "timeout_seconds": (0.5, 5.0),
     "breaker_failures": (2, 20),
@@ -90,6 +90,8 @@ class WorkspaceBridge:
     board: bool = False
     # A registry person's card is also sent to nori's requirement inbox (nori_board/forward.py).
     forward: bool = False
+    # With forward on, a photo or file also goes as a signed link nori opens (media_link.py).
+    forward_media: bool = False
 
 
 def workspace_bridge(response_rules: dict[str, Any] | None) -> WorkspaceBridge | None:
@@ -114,4 +116,5 @@ def workspace_bridge(response_rules: dict[str, Any] | None) -> WorkspaceBridge |
         capture=raw.get("capture", False) is True,
         board=raw.get("board", False) is True,
         forward=raw.get("forward", False) is True,
+        forward_media=raw.get("forward_media", False) is True,
     )

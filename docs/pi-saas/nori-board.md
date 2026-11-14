@@ -162,3 +162,21 @@ them.
 Immediate: `NORI_BRIDGE_KILL=true` and restart. Per workspace: set `board` to false. Code: revert the
 deployment; `alembic downgrade 0062_pi_nori_bridge_log` drops `pi_nori_items` and `pi_nori_numbers`
 (the cards stay as plain team-board cards).
+
+## A photo or file with the card (default OFF)
+
+pi never stores a customer's media (it keeps the provider's media id and fetches on demand behind the
+app login). Nori cannot log in, so with `response_rules.nori_bridge.forward_media` exactly true (and
+`forward` on) the forwarded card carries `files: [{kind, url, name?}]`, one entry, where `url` is
+`<INTEGRATIONS_PUBLIC_BASE_URL>/api/pi/nori-media/<token>`.
+
+- The token is `<card id>.<expiry>.<tag>`: HMAC with the bridge secret, domain-separated, 30 days. It
+  cannot be moved to another card or extended.
+- `GET /api/pi/nori-media/<token>` is public but answers the same plain 404 for everything that is
+  wrong: bad or expired token, bridge off or killed, `forward`/`forward_media` off, card without a
+  WhatsApp message, file gone at the provider. It streams the file with `attachment`, `nosniff`,
+  `no-store`; nothing is copied or cached.
+- No link is made unless `INTEGRATIONS_PUBLIC_BASE_URL` is an https address.
+- Migration 0066 adds `pi_nori_items.message_id` (nullable), set when the chat is linked to the card.
+- Size is not sent (pi does not know it); nori applies its own 25 MB cap when it opens the link.
+- Turn it on only after nori's door accepts `files`.

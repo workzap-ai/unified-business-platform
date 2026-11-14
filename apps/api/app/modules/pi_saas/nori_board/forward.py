@@ -33,7 +33,9 @@ BATCH = 25
 NORI_KINDS = {"feature", "problem", "question", "meeting", "change"}
 
 
-def payload_for(item: PiNoriItem, task: PiTask) -> dict[str, Any]:
+def payload_for(
+    item: PiNoriItem, task: PiTask, files: list[dict[str, Any]] | None = None
+) -> dict[str, Any]:
     """The body nori expects (the phone number is left out: nori reads it from the ref)."""
     kind = item.item_kind if item.item_kind in NORI_KINDS else "feature"
     text = (task.description or task.title or "").strip()[:5000]
@@ -45,7 +47,32 @@ def payload_for(item: PiNoriItem, task: PiTask) -> dict[str, Any]:
     }
     if item.person:
         body["person"] = item.person[:120]
+    if files:
+        body["files"] = files
     return body
+
+
+async def files_for(
+    session: AsyncSession, settings: Any, secret: str, item: PiNoriItem, bridge: Any
+) -> list[dict[str, Any]]:
+    """The card's photo or file as nori wants it: one entry with a signed https link, or none (no
+    media, no public address). The file never leaves pi until nori opens the link."""
+    from app.modules.pi_saas.nori_board import media_link
+
+    if not bridge.forward_media:
+        return []
+    found = await media_link.media_of(session, item)
+    if found is None:
+        return []
+    message, media = found
+    link = media_link.url_for(settings, secret, item.id)
+    if link is None:
+        return []
+    entry: dict[str, Any] = {"kind": media_link.KINDS[message.message_type], "url": link}
+    name = str(media.get("filename") or "").strip()
+    if name:
+        entry["name"] = name[:120]
+    return [entry]
 
 
 async def forward_due(session: AsyncSession, settings: Any, http: Any) -> int:
@@ -90,7 +117,8 @@ async def forward_due(session: AsyncSession, settings: Any, http: Any) -> int:
             item.forward_attempts = MAX_ATTEMPTS
             item.forward_note = "no_card"
             continue
-        result = await NoriClient(env, http, bridge).call(PATH, payload_for(item, task))
+        files = await files_for(session, settings, env.secret, item, bridge)
+        result = await NoriClient(env, http, bridge).call(PATH, payload_for(item, task, files))
         item.forward_attempts += 1
         if result.ok and result.data.get("ok") is True:
             item.forwarded_at = datetime.now(UTC)

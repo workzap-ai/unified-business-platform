@@ -575,3 +575,55 @@ async def test_a_refusal_is_final_and_a_failure_is_retried(api, business_db):
     calls = len(b.nori.calls("/api/pi/board-card"))
     assert await sweep(b) == 0 and len(b.nori.calls("/api/pi/board-card")) == calls
     await b.pi.close()
+
+
+# --- a photo or file goes to nori as a signed link (off unless forward_media) ---
+
+
+async def media_card(b, mid="wamid.fm-1"):
+    b.pi.app.state.settings.integrations_public_base_url = "https://pi.test"
+    await link_number(b)
+    await b.pi.process("the screen as it looks", mid, sender=LINKED, kind="image")
+
+
+async def test_a_photo_card_has_no_link_while_media_forwarding_is_off(api, business_db):
+    b = await bridge(api, business_db, board=True, forward=True)  # forward_media not set
+    await media_card(b)
+    assert await sweep(b) == 1
+    assert "files" not in b.nori.board_cards[0]
+    await b.pi.close()
+
+
+async def test_a_photo_card_carries_a_signed_link_when_media_forwarding_is_on(api, business_db):
+    b = await bridge(api, business_db, board=True, forward=True, forward_media=True)
+    await media_card(b, "wamid.fm-2")
+    assert await sweep(b) == 1
+    [file] = b.nori.board_cards[0]["files"]
+    assert file["kind"] == "image"
+    assert file["url"].startswith("https://pi.test/api/pi/nori-media/")
+    await b.pi.close()
+
+
+async def test_the_media_link_is_refused_unless_genuine_and_switched_on(
+    api, business_db, monkeypatch
+):
+    from app.modules.pi.whatsapp import WhatsApp
+    from app.modules.pi_saas.nori_board import media_link
+
+    async def fake_media(self, media_id, token, *, url="", mime=""):
+        return b"PNGDATA", "image/png"
+
+    monkeypatch.setattr(WhatsApp, "media", fake_media)
+    b = await bridge(api, business_db, board=True, forward=True, forward_media=True)
+    await media_card(b, "wamid.fm-3")
+    item = (await item_rows(b))[0]
+    link = media_link.url_for(b.pi.app.state.settings, SECRET, item.id)
+    path = link.removeprefix("https://pi.test")
+    ok = await b.pi.api.get(path)
+    assert ok.status_code == 200 and ok.content == b"PNGDATA"
+    assert "no-store" in ok.headers["cache-control"]
+    bad = await b.pi.api.get(path[:-3] + "000")
+    assert bad.status_code == 404
+    await b.settings(enabled=True, board=True, forward=True)  # media switched off
+    assert (await b.pi.api.get(path)).status_code == 404
+    await b.pi.close()

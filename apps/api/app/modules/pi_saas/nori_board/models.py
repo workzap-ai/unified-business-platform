@@ -76,3 +76,5 @@ class PiNoriItem(WorkspaceRow):
     forwarded_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     forward_attempts: Mapped[int] = mapped_column(Integer, default=0, server_default="0")
     forward_note: Mapped[str | None] = mapped_column(String(40), nullable=True)
+    # The inbound pi message the card came from: its photo or file goes to nori as a signed link.
+    message_id: Mapped[UUID | None] = mapped_column(Uuid, nullable=True)

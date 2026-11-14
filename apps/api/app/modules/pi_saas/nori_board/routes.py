@@ -38,6 +38,30 @@ async def nori_numbers_door(request: Request, session: Session) -> JSONResponse:
     return await _door(request, session, "numbers")
 
 
+@door_router.get("/nori-media/{token}", include_in_schema=False)
+async def nori_media(token: str, request: Request, session: Session) -> Response:
+    """The photo or file behind a card, for nori's team (signed link, see media_link.py). Every
+    refusal is the same plain 404, so a probe learns nothing."""
+    from fastapi import HTTPException
+
+    from app.modules.pi_saas.nori_board import media_link
+
+    content = await media_link.fetch(session, request.app.state, token)
+    if content is None:
+        raise HTTPException(404, "Not found")
+    data, mime, name = content
+    safe = "".join(c for c in name if c.isalnum() or c in "._- ")[:80] or "file"
+    return Response(
+        data,
+        media_type=mime,
+        headers={
+            "Content-Disposition": f'attachment; filename="{safe}"',
+            "X-Content-Type-Options": "nosniff",
+            "Cache-Control": "private, no-store",
+        },
+    )
+
+
 async def _door(request: Request, session: Any, mode: str) -> JSONResponse:
     declared = request.headers.get("content-length")
     length = int(declared) if declared and declared.isdigit() else None
