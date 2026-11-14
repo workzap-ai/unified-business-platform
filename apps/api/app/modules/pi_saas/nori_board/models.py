@@ -78,3 +78,20 @@ class PiNoriItem(WorkspaceRow):
     forward_note: Mapped[str | None] = mapped_column(String(40), nullable=True)
     # The inbound pi message the card came from: its photo or file goes to nori as a signed link.
     message_id: Mapped[UUID | None] = mapped_column(Uuid, nullable=True)
+
+
+class PiNoriThread(WorkspaceRow):
+    """A pi chat message offered to nori's conversation door (nori_board/thread.py): sent once,
+    retried a few times, then given up on with the reason kept."""
+
+    __tablename__ = "pi_nori_thread"
+    __table_args__ = workspace_args(
+        "pi_nori_thread",
+        UniqueConstraint(
+            "tenant_id", "environment_id", "message_id", name="uq_pi_nori_thread_message"
+        ),
+    )
+    message_id: Mapped[UUID] = mapped_column(Uuid)
+    sent_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    attempts: Mapped[int] = mapped_column(Integer, default=0, server_default="0")
+    note: Mapped[str | None] = mapped_column(String(40), nullable=True)

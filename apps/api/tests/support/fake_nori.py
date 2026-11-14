@@ -42,6 +42,8 @@ class FakeNori:
         self.board_cards: list[dict[str, Any]] = []
         self.board_card_reason: str | None = None  # a 400 reason nori answers
         self.welcome: dict[str, Any] = {}  # number -> the welcome_ok value nori answers
+        self.thread: list[dict[str, Any]] = []  # chat messages taken by /api/pi/board-message
+        self.thread_reason: str | None = None  # a 400 reason nori answers
 
     # --- helpers ----------------------------------------------------------------------------
     def calls(self, path: str, action: str | None = None) -> list[dict[str, Any]]:
@@ -90,6 +92,13 @@ class FakeNori:
                     **({"duplicate": True} if dup else {}),
                 },
             )
+        if path == "/api/pi/board-message":
+            if self.thread_reason:
+                return httpx.Response(400, json={"ok": False, "reason": self.thread_reason})
+            dup = any(m["message_id"] == body["message_id"] for m in self.thread)
+            if not dup:
+                self.thread.append(body)
+            return httpx.Response(200, json={"ok": True, **({"duplicate": True} if dup else {})})
         if path == "/api/workzap/inbound":
             return httpx.Response(200, json=self.inbound(body))
         if path == "/api/credits/pi":

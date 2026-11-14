@@ -171,6 +171,16 @@ async def sweep_pi_saas(ctx: dict[str, Any]) -> None:
         except Exception:  # noqa: BLE001 - retried on the next sweep
             await session.rollback()
             logger.warning("nori_forward_sweep_failed")
+    # A registry person's whole chat for nori's conversation door (off unless the workspace says so).
+    async with ctx["sessions"]() as session:
+        try:
+            from app.modules.pi_saas.nori_board.thread import thread_due
+
+            await thread_due(session, ctx["settings"], ctx["http"])
+            await session.commit()
+        except Exception:  # noqa: BLE001 - retried on the next sweep
+            await session.rollback()
+            logger.warning("nori_thread_sweep_failed")
     # Proposals pi owes a customer whose job never ran or failed.
     async with ctx["sessions"]() as session:
         try:

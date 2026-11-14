@@ -679,3 +679,73 @@ async def test_the_acknowledgement_is_in_roman_urdu_for_a_roman_urdu_request(api
     await b.say(WRITER, "Mujhe nori mai calling features chahiye", "wamid.ru-1")
     assert await outbound_bodies(b) == [FILED_ACK["roman_ur"]]
     await b.pi.close()
+
+
+# --- the whole chat goes to nori's conversation door (off unless forward_messages) ---
+
+
+async def thread_sweep(b):
+    from app.modules.pi_saas.nori_board.thread import thread_due
+
+    return await thread_due(b.pi.db, b.pi.app.state.settings, b.pi.ctx["http"])
+
+
+async def test_the_whole_chat_goes_to_nori_in_order_once(api, business_db):
+    b = await bridge(api, business_db, board=True, forward_messages=True)
+    await link_number(b)
+    await b.say(LINKED, "Hello", "wamid.th-1")
+    await b.say(LINKED, "We need van sales, my card is 4111 1111 1111 1111", "wamid.th-2")
+    [first, second] = await b.inbound_rows("wamid.th-1"), await b.inbound_rows("wamid.th-2")
+    conversation_id = first[0].conversation_id
+    reply = await b.pi.api.post(
+        f"/api/v1/pi/conversations/{conversation_id}/messages", json={"body": "We will call you"}
+    )
+    assert reply.status_code in {200, 201}, reply.text
+    assert b.nori.thread == []  # nothing leaves pi until the sweep runs
+    assert await thread_sweep(b) >= 3
+    sent = b.nori.thread
+    assert sent[0]["direction"] == "in"  # the greeting comes first
+    assert [m["at"] for m in sent] == sorted(m["at"] for m in sent)  # in the order they happened
+    kinds = {(m["direction"], m["from"]) for m in sent}
+    assert ("in", "person") in kinds and ("out", "pi") in kinds and ("out", "team") in kinds
+    assert all(m["ref"] == "nori-link:w1:923007770009" for m in sent)
+    assert all(m["message_id"] and isinstance(m["at"], int) for m in sent)
+    request = next(m for m in sent if "van sales" in m["text"])
+    assert "4111" not in request["text"]  # redacted, never the raw message
+    assert request["card_id"]  # the message that also became a card is linked to it
+    assert "card_id" not in next(m for m in sent if m["text"] == "Hello")  # the greeting has none
+    total = len(sent)
+    assert await thread_sweep(b) == 0 and len(b.nori.thread) == total  # once
+    assert second  # (the request was stored)
+    await b.pi.close()
+
+
+async def test_chat_forwarding_is_off_unless_the_workspace_turns_it_on(api, business_db):
+    b = await bridge(api, business_db, board=True, forward=True)  # forward_messages not set
+    await link_number(b)
+    await b.say(LINKED, "Hello", "wamid.th-3")
+    assert await thread_sweep(b) == 0 and b.nori.thread == []
+    await b.settings(enabled=True, board=True, forward=True, forward_messages=True)
+    assert await thread_sweep(b) >= 1  # turning it on sends what is owed from the last day
+    await b.pi.close()
+
+
+async def test_a_number_added_by_hand_never_has_its_chat_sent(api, business_db):
+    b = await bridge(api, business_db, board=True, forward_messages=True)
+    await add_number(b, phone=LINKED)
+    await b.say(LINKED, "Hello", "wamid.th-4")
+    assert await thread_sweep(b) == 0 and b.nori.thread == []
+    await b.pi.close()
+
+
+async def test_a_refused_message_is_final_and_not_retried(api, business_db):
+    b = await bridge(api, business_db, board=True, forward_messages=True)
+    await link_number(b)
+    await b.say(LINKED, "Hello", "wamid.th-5")
+    b.nori.thread_reason = "unknown_ref"
+    assert await thread_sweep(b) == 0
+    calls = len(b.nori.calls("/api/pi/board-message"))
+    assert calls >= 1
+    assert await thread_sweep(b) == 0
+    assert len(b.nori.calls("/api/pi/board-message")) == calls  # given up, not retried
+    await b.pi.close()

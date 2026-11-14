@@ -180,3 +180,21 @@ app login). Nori cannot log in, so with `response_rules.nori_bridge.forward_medi
 - Migration 0066 adds `pi_nori_items.message_id` (nullable), set when the chat is linked to the card.
 - Size is not sent (pi does not know it); nori applies its own 25 MB cap when it opens the link.
 - Turn it on only after nori's door accepts `files`.
+
+## The whole chat to nori (default OFF)
+
+With `response_rules.nori_bridge.forward_messages` exactly true, the worker sweep offers every message
+of a registry person's chat to nori's `POST /api/pi/board-message` (signed like board-card):
+`{ref, message_id, direction in|out, from person|team|pi, text, at, person?, card_id?, files?}`.
+
+- Only numbers that carry nori's own ref (`pi_nori_numbers.nori_ref`); a number added by hand is never
+  sent. Greetings kept in the chat without a card are sent too.
+- `text` is redacted like board cards; `at` is pi's save time (ms); `message_id` is pi's message id;
+  `card_id` links a message that also became a card; files reuse the signed media link
+  (`forward_media`).
+- Only the last 24 hours are owed, so switching the flag on does not back-fill old chats.
+- Ledger `pi_nori_thread` (migration 0067): one row per message, sent once, up to 6 tries, a 400/413
+  from nori is final and its reason is kept in `note`.
+- Nori's own flag (`PI_MESSAGES_ENABLED`) must be on first: a disabled door answers 503, which the
+  shared breaker counts as a failure.
+- Erasing a customer in pi cannot delete nori's copy (nori has its own erase button).
