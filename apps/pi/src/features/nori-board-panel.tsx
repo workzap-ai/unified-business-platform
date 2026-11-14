@@ -130,139 +130,171 @@ export function NoriNumbersPanel({ manage }: { manage: boolean }) {
     },
   );
   const numbers = query.data?.numbers ?? [];
+  // Closed by default: the numbers rarely change, the board is what people come for.
+  const [open, setOpen] = React.useState(false);
   return (
     <section
       aria-label="Nori numbers"
       className="rounded-2xl border border-border bg-surface p-3"
     >
-      <header className="mb-2 flex items-center gap-1.5">
+      <header className="flex flex-wrap items-center gap-1.5">
         <Phone className="size-4 text-muted-foreground" aria-hidden />
         <h2 className="text-sm font-semibold">Nori numbers</h2>
         <span className="text-xs text-muted-foreground tabular-nums">
           {numbers.length}
         </span>
-      </header>
-      <p className="mb-3 text-[13px] text-muted-foreground">
-        pi treats a message from one of these numbers as coming from that nori
-        workspace and files it on this board.
-      </p>
-      {manage ? (
-        <form
-          noValidate
-          aria-label="Add a nori number"
-          className="mb-3 grid gap-2 sm:grid-cols-2"
-          onSubmit={async (e) => {
-            e.preventDefault();
-            if (!phone.trim() || !workspace.trim()) {
-              setError(
-                "Add a phone number and the nori workspace it belongs to",
-              );
-              return;
-            }
-            setError(null);
-            try {
-              await add.mutateAsync(undefined);
-            } catch (err) {
-              setError(errorText(err));
-            }
-          }}
-        >
-          <Input
-            aria-label="Phone number with country code"
-            inputMode="tel"
-            autoComplete="off"
-            placeholder="+92 300 1234567"
-            value={phone}
-            onChange={(e) => setPhone(e.target.value)}
-          />
-          <Input
-            aria-label="Nori workspace"
-            autoComplete="off"
-            maxLength={120}
-            placeholder="Workspace"
-            value={workspace}
-            onChange={(e) => setWorkspace(e.target.value)}
-          />
-          <Input
-            aria-label="Person"
-            autoComplete="off"
-            maxLength={120}
-            placeholder="Person (optional)"
-            value={person}
-            onChange={(e) => setPerson(e.target.value)}
-          />
-          <Input
-            aria-label="Department"
-            autoComplete="off"
-            maxLength={80}
-            placeholder="Department (optional)"
-            value={department}
-            onChange={(e) => setDepartment(e.target.value)}
-          />
-          {error ? (
-            <p className="text-[13px] text-danger sm:col-span-2" role="alert">
-              {error}
-            </p>
-          ) : null}
-          <div className="sm:col-span-2">
-            <Button type="submit" loading={add.isPending}>
-              <Plus className="size-4" aria-hidden /> Add number
-            </Button>
-          </div>
-        </form>
-      ) : null}
-      {query.isError && !query.data ? (
-        <ErrorState
-          message={errorText(query.error)}
-          onRetry={() => query.refetch()}
-        />
-      ) : !query.data ? (
-        <Skeleton className="h-16 w-full" />
-      ) : numbers.length === 0 ? (
-        <p className="rounded-xl border border-dashed border-border px-3 py-5 text-center text-sm text-muted-foreground">
-          No nori numbers yet. Add one so pi knows who is writing.
-        </p>
-      ) : (
-        <ul className="divide-y divide-border rounded-xl border border-border">
-          {numbers.map((n) => (
-            <li key={n.id} className="flex flex-wrap items-center gap-2 p-3">
-              <span className="min-w-0 flex-1">
-                <span className="block truncate text-sm font-medium tabular-nums">
-                  {n.phone}
-                </span>
-                <span className="block truncate text-[13px] text-muted-foreground">
-                  {[n.workspace, n.person, n.department]
-                    .filter(Boolean)
-                    .join(" · ")}
-                </span>
+        {!open
+          ? numbers.slice(0, 3).map((n) => (
+              <span
+                key={n.id}
+                className="max-w-40 truncate rounded-full bg-surface-muted px-2 py-0.5 text-xs text-muted-foreground tabular-nums"
+              >
+                …{n.phone.slice(-4)} {n.workspace}
               </span>
-              {n.source === "nori" ? (
-                <Badge tone="accent">From nori</Badge>
-              ) : null}
-              <Switch
-                id={`nori-number-${n.id}`}
-                label={`${n.active ? "Turn off" : "Turn on"} ${n.phone}`}
-                checked={n.active}
-                disabled={!manage || update.isPending}
-                onCheckedChange={(active) =>
-                  update.mutate({ id: n.id, active })
+            ))
+          : null}
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          className="ms-auto"
+          aria-expanded={open}
+          onClick={() => setOpen((v) => !v)}
+        >
+          {open ? "Hide" : manage ? "Manage" : "Show"}
+        </Button>
+      </header>
+      {open ? (
+        <>
+          <p className="mt-2 mb-3 text-[13px] text-muted-foreground">
+            pi treats a message from one of these numbers as coming from that
+            nori workspace and files it on this board.
+          </p>
+          {manage ? (
+            <form
+              noValidate
+              aria-label="Add a nori number"
+              className="mb-3 grid gap-2 sm:grid-cols-2"
+              onSubmit={async (e) => {
+                e.preventDefault();
+                if (!phone.trim() || !workspace.trim()) {
+                  setError(
+                    "Add a phone number and the nori workspace it belongs to",
+                  );
+                  return;
                 }
+                setError(null);
+                try {
+                  await add.mutateAsync(undefined);
+                } catch (err) {
+                  setError(errorText(err));
+                }
+              }}
+            >
+              <Input
+                aria-label="Phone number with country code"
+                inputMode="tel"
+                autoComplete="off"
+                placeholder="+92 300 1234567"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
               />
-              {manage ? (
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="icon"
-                  aria-label={`Delete ${n.phone}`}
-                  onClick={() => setRemoving(n)}
+              <Input
+                aria-label="Nori workspace"
+                autoComplete="off"
+                maxLength={120}
+                placeholder="Workspace"
+                value={workspace}
+                onChange={(e) => setWorkspace(e.target.value)}
+              />
+              <Input
+                aria-label="Person"
+                autoComplete="off"
+                maxLength={120}
+                placeholder="Person (optional)"
+                value={person}
+                onChange={(e) => setPerson(e.target.value)}
+              />
+              <Input
+                aria-label="Department"
+                autoComplete="off"
+                maxLength={80}
+                placeholder="Department (optional)"
+                value={department}
+                onChange={(e) => setDepartment(e.target.value)}
+              />
+              {error ? (
+                <p
+                  className="text-[13px] text-danger sm:col-span-2"
+                  role="alert"
                 >
-                  <Trash2 className="size-4" aria-hidden />
-                </Button>
+                  {error}
+                </p>
               ) : null}
-            </li>
-          ))}
-        </ul>
-      )}
+              <div className="sm:col-span-2">
+                <Button type="submit" loading={add.isPending}>
+                  <Plus className="size-4" aria-hidden /> Add number
+                </Button>
+              </div>
+            </form>
+          ) : null}
+          {query.isError && !query.data ? (
+            <ErrorState
+              message={errorText(query.error)}
+              onRetry={() => query.refetch()}
+            />
+          ) : !query.data ? (
+            <Skeleton className="h-16 w-full" />
+          ) : numbers.length === 0 ? (
+            <p className="rounded-xl border border-dashed border-border px-3 py-5 text-center text-sm text-muted-foreground">
+              No nori numbers yet. Add one so pi knows who is writing.
+            </p>
+          ) : (
+            <ul className="divide-y divide-border rounded-xl border border-border">
+              {numbers.map((n) => (
+                <li
+                  key={n.id}
+                  className="flex flex-wrap items-center gap-2 p-3"
+                >
+                  <span className="min-w-0 flex-1">
+                    <span className="block truncate text-sm font-medium tabular-nums">
+                      {n.phone}
+                    </span>
+                    <span className="block truncate text-[13px] text-muted-foreground">
+                      {[n.workspace, n.person, n.department]
+                        .filter(Boolean)
+                        .join(" · ")}
+                    </span>
+                  </span>
+                  {n.source === "nori" ? (
+                    <Badge tone="accent">From nori</Badge>
+                  ) : null}
+                  <Switch
+                    id={`nori-number-${n.id}`}
+                    label={`${n.active ? "Turn off" : "Turn on"} ${n.phone}`}
+                    checked={n.active}
+                    disabled={!manage || update.isPending}
+                    onCheckedChange={(active) =>
+                      update.mutate({ id: n.id, active })
+                    }
+                  />
+                  {manage ? (
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      aria-label={`Delete ${n.phone}`}
+                      onClick={() => setRemoving(n)}
+                    >
+                      <Trash2 className="size-4" aria-hidden />
+                    </Button>
+                  ) : null}
+                </li>
+              ))}
+            </ul>
+          )}
+        </>
+      ) : null}
       {removing ? (
         <Dialog
           open
