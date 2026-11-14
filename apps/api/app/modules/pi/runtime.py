@@ -968,14 +968,19 @@ async def process_pi_event(ctx: dict[str, Any], event_id: str) -> None:
         message_id, conversation_id = message.id, message.conversation_id
         conversation = await service.conversations.get(conversation_id)
         policy = await settings_row(session, scope)
-        if credits_hook.board_ref:
+        if credits_hook.board_ref or credits_hook.board_chat:
             # A number on the Nori Platform board's registry wrote (nori_board): the chat stays in
             # the inbox for the team, the brain stays silent (human mode), the card links here.
+            # A greeting or thanks (board_chat) has no card: it is only kept in the chat.
             from app.modules.pi_saas.nori_board import service as nori_board
-            from app.modules.pi_saas.nori_credits.hook import BOARD_ACK
+            from app.modules.pi_saas.nori_board.chat_only import ack_text
 
-            await nori_board.link_conversation(
-                session, scope, credits_hook.board_ref, conversation_id, message_id
+            if credits_hook.board_ref:
+                await nori_board.link_conversation(
+                    session, scope, credits_hook.board_ref, conversation_id, message_id
+                )
+            board_ack = ack_text(
+                credits_hook.board_chat, conversation.language, str(message.body or "")
             )
             # A registry person's chat is never answered by the brain, whatever the mode was left
             # at (staff "return to pi" included): every registry message puts it back to human.
@@ -988,7 +993,7 @@ async def process_pi_event(ctx: dict[str, Any], event_id: str) -> None:
                         conversation_id=conversation_id,
                         direction="outbound",
                         sender_type="system",
-                        body=BOARD_ACK,
+                        body=board_ack,
                         status="queued",
                         idempotency_key=ack_key,
                     )

@@ -648,3 +648,34 @@ async def test_the_inbox_labels_a_registry_chat_with_its_nori_workspace(api, bus
     assert "Mendeez" in labels.values()
     assert list(labels.values()).count(None) == len(labels) - 1
     await b.pi.close()
+
+
+# --- greetings stay conversation; the acknowledgement follows the person's language ---
+
+
+async def test_a_greeting_from_a_registry_person_is_kept_in_the_chat_without_a_card(
+    api, business_db
+):
+    from app.modules.pi_saas.nori_board.chat_only import CHAT_ACK, FILED_ACK
+
+    b = await bridge(api, business_db, board=True)
+    await add_number(b)
+    await b.say(WRITER, "Hello", "wamid.gr-1")
+    assert await cards(b) == []
+    [inbound] = await b.inbound_rows("wamid.gr-1")
+    assert (await b.pi.db.get(PiConversation, inbound.conversation_id)).mode == "human"
+    assert await outbound_bodies(b) == [CHAT_ACK["en"]]  # the brain stays silent
+    await b.say(WRITER, "The stock export is not working", "wamid.gr-2")
+    assert len(await cards(b)) == 1  # a real request is still a card
+    assert FILED_ACK["en"] not in await outbound_bodies(b)  # one acknowledgement per chat
+    await b.pi.close()
+
+
+async def test_the_acknowledgement_is_in_roman_urdu_for_a_roman_urdu_request(api, business_db):
+    from app.modules.pi_saas.nori_board.chat_only import FILED_ACK
+
+    b = await bridge(api, business_db, board=True)
+    await add_number(b)
+    await b.say(WRITER, "Mujhe nori mai calling features chahiye", "wamid.ru-1")
+    assert await outbound_bodies(b) == [FILED_ACK["roman_ur"]]
+    await b.pi.close()

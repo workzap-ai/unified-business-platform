@@ -36,6 +36,8 @@ class HookOutcome:
     reply: str | None = None
     reason: str = "off"
     board_ref: str | None = None  # a registry number wrote: the card's ref; the chat goes on
+    # a registry number wrote only a greeting or thanks: kept in the chat, no card is filed
+    board_chat: bool = False
 
 
 PASS = HookOutcome()
@@ -111,6 +113,11 @@ async def _board_path(
         # nothing is filed here and no board reply is sent.
         METRICS.inc("inbound", "board_safety_pass")
         return PASS
+    from app.modules.pi_saas.nori_board.chat_only import is_chat_only
+
+    if payload.get("message_type") == "text" and is_chat_only(text):
+        METRICS.inc("inbound", "board_chat_only")
+        return HookOutcome(reason="board_chat", board_chat=True)
     key = store.key_of("board", str(getattr(connection, "phone_number_id", "")), message_id)
     try:
         async with session.begin_nested():
