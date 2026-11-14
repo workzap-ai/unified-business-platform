@@ -977,11 +977,12 @@ async def process_pi_event(ctx: dict[str, Any], event_id: str) -> None:
             await nori_board.link_conversation(
                 session, scope, credits_hook.board_ref, conversation_id, message_id
             )
-            # Once per chat, on its first registry message: later ones leave the chat as the team
-            # left it (a chat staff gave back to the AI is not forced to human again).
+            # A registry person's chat is never answered by the brain, whatever the mode was left
+            # at (staff "return to pi" included): every registry message puts it back to human.
+            # The acknowledgement goes once per chat.
+            conversation.mode = "human"
             ack_key = f"pi-board-ack:{conversation_id}"
             if await service.messages.find(PiMessage.idempotency_key == ack_key) is None:
-                conversation.mode = "human"
                 ack = await service.messages.add(
                     service.messages.new(
                         conversation_id=conversation_id,

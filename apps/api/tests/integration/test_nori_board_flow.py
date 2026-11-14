@@ -100,7 +100,7 @@ async def test_a_photo_from_a_registry_number_is_filed_and_the_chat_kept(api, bu
     await b.pi.close()
 
 
-async def test_a_chat_the_team_gave_back_to_the_ai_is_not_forced_to_human_again(api, business_db):
+async def test_a_registry_chat_the_team_gave_back_to_the_ai_goes_to_human_again(api, business_db):
     b = await bridge(api, business_db, board=True)
     await add_number(b)
     await b.say(WRITER, "The stock export is not working", "wamid.back-1")
@@ -110,8 +110,9 @@ async def test_a_chat_the_team_gave_back_to_the_ai_is_not_forced_to_human_again(
     await b.pi.db.commit()
     await b.say(WRITER, "Any news on the export?", "wamid.back-2")
     await b.pi.db.refresh(conversation)
-    assert conversation.mode == "ai"  # the team's choice stands
+    assert conversation.mode == "human"  # the brain never answers a registry person
     assert (await outbound_bodies(b)).count(BOARD_ACK) == 1  # one acknowledgement per chat
+    assert await outbound_bodies(b) == [BOARD_ACK]  # and nothing else from pi
     await b.pi.close()
 
 
