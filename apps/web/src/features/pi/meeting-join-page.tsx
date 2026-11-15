@@ -21,6 +21,23 @@ import { MeetingVoiceJoin } from "./meeting-voice-join";
  */
 
 const PART_MS = 60_000;
+/** The browser keeps the guest token for this tab only, so a reload can carry on as the same person. */
+const KEPT = (token: string) => `meeting-guest:${token}`;
+function kept(token: string): string {
+  try {
+    return window.sessionStorage.getItem(KEPT(token)) ?? "";
+  } catch {
+    return "";
+  }
+}
+function keep(token: string, guest: string) {
+  try {
+    if (guest) window.sessionStorage.setItem(KEPT(token), guest);
+    else window.sessionStorage.removeItem(KEPT(token));
+  } catch {
+    // private windows may refuse storage: a reload then joins again, as before
+  }
+}
 const MIN_PART_MS = 1_000;
 const TRIES = 3;
 /** Answers a retry will not change: the link, the guest or the meeting is gone, or the part is bad. */
@@ -75,6 +92,8 @@ export function MeetingJoinPage({ token }: { token: string }) {
   const [missed, setMissed] = useState(0);
   const [error, setError] = useState("");
   const [stopped, setStopped] = useState("");
+  // set when this tab already joined and the server still accepts that token (a reload)
+  const [back, setBack] = useState<{ guest: string; seq: number } | null>(null);
 
   const run = useRef({
     guest: "",
@@ -100,6 +119,21 @@ export function MeetingJoinPage({ token }: { token: string }) {
     r.recorder = null;
   }
   useEffect(() => release, []);
+
+  useEffect(() => {
+    const guest = kept(token);
+    if (!guest) return;
+    let live = true;
+    meetingJoinService
+      .resume(guest)
+      .then((r) => {
+        if (live) setBack({ guest, seq: r.next_seq });
+      })
+      .catch(() => keep(token, ""));
+    return () => {
+      live = false;
+    };
+  }, [token]);
 
   // leaving the page ends the recording; a part already sent is kept
   useEffect(() => {
@@ -130,6 +164,7 @@ export function MeetingJoinPage({ token }: { token: string }) {
             // the host closed the meeting, removed this person or stopped the link
             r.stopping = true;
             clearTimeout(r.partTimer);
+            keep(token, "");
             setStopped(
               "The host has closed the meeting or the link. Nothing more is being recorded.",
             );
@@ -178,13 +213,13 @@ export function MeetingJoinPage({ token }: { token: string }) {
     }, PART_MS);
   }
 
-  async function start() {
+  async function start(resumeAs?: { guest: string; seq: number }) {
     const r = run.current;
     setError("");
     setPhase("starting");
     r.stopping = false;
     r.queue = Promise.resolve();
-    r.seq = 0;
+    r.seq = resumeAs ? resumeAs.seq : 0;
     r.sent = 0;
     r.missed = 0;
     setSent(0);
@@ -195,17 +230,26 @@ export function MeetingJoinPage({ token }: { token: string }) {
         audio: { echoCancellation: true, noiseSuppression: true },
       });
       // join only once the microphone is open, so no one is counted in who never recorded
-      const joined = await meetingJoinService.join(token, {
-        name: name.trim(),
-        consent: agreed,
-      });
-      r.guest = joined.guest_token;
+      if (resumeAs) {
+        r.guest = resumeAs.guest; // the same person: consent was given when they first joined
+      } else {
+        const joined = await meetingJoinService.join(token, {
+          name: name.trim(),
+          consent: agreed,
+        });
+        r.guest = joined.guest_token;
+        keep(token, r.guest);
+      }
       r.t0 = performance.now();
       r.tick = setInterval(() => setElapsed(performance.now() - r.t0), 500);
       startPart();
       setPhase("recording");
     } catch (e) {
       release();
+      if (resumeAs && e instanceof ApiError && e.status === 404) {
+        keep(token, "");
+        setBack(null);
+      }
       setError(startError(e));
       setPhase("ready");
     }
@@ -228,6 +272,7 @@ export function MeetingJoinPage({ token }: { token: string }) {
     await r.queue; // every part has been sent (or given up on)
     // tell the server this person has left, so the link's token sends nothing more
     await meetingJoinService.leave(r.guest).catch(() => undefined);
+    keep(token, "");
     setPhase("ended");
   }
 
@@ -355,7 +400,23 @@ export function MeetingJoinPage({ token }: { token: string }) {
                 </span>
               </label>
               {error && <Notice tone="danger">{error}</Notice>}
+              {back && (
+                <div className="space-y-2 rounded-lg border border-border p-3">
+                  <p className="text-sm">
+                    You already joined this meeting from this tab. Carry on as
+                    the same person; what you said before stays as it is.
+                  </p>
+                  <Button
+                    loading={phase === "starting"}
+                    disabled={phase === "starting"}
+                    onClick={() => void start(back)}
+                  >
+                    <Mic /> Carry on recording
+                  </Button>
+                </div>
+              )}
               <Button
+                variant={back ? "secondary" : undefined}
                 disabled={!agreed || phase === "starting"}
                 loading={phase === "starting"}
                 onClick={() => void start()}

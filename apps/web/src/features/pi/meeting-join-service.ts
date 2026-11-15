@@ -29,6 +29,19 @@ export const meetingJoinService = {
       }),
       { body: input },
     ),
+  // A person who reloaded carries on with the token their browser kept: no new place is taken,
+  // and `next_seq` is the part number that follows what they already sent.
+  resume: (guestToken: string) =>
+    apiRequest(
+      "POST",
+      `${BASE}/guest/resume`,
+      z.object({
+        label: z.string(),
+        slot: z.number(),
+        next_seq: z.number().catch(0),
+      }),
+      { headers: { "X-Guest-Token": guestToken } },
+    ),
   // The part's number (0, 1, 2, ...) and length are all that is sent about time: the server
   // places the part, and sending the same number again replaces it. The token goes in a header
   // so it never lands in a URL or an access log.

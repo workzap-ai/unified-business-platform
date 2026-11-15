@@ -284,8 +284,12 @@ stored order is unchanged, but a guest part re-sent for such a meeting would be 
 cite are never rewritten (409 `MEETING_PART_ANALYSED`, same as the host's route). A guest never sets the
 meeting language and cannot take the label "Speaker 1".
 
-**Known gaps.** A guest who reloads the page joins again as a new person (slots are not reused; max 20 per
-meeting, staff cannot free one). A guest's last part is lost if the host closes the meeting first. A guest
+**Reload:** the page keeps the guest token in `sessionStorage` (this tab only); after a reload it asks
+`POST /guest/resume`, and if the token still works it offers "Carry on recording" as the same person (same slot,
+no new consent screen, part numbers continue on the meeting's clock). A new tab or a private window still joins
+as a new person.
+
+**Known gaps.** A guest's last part is lost if the host closes the meeting first. A guest
 cannot delete their own words (only the host's team can, by deleting the meeting). The meeting title is shown
 on the join page. Consent text is not versioned. The request session is held during the speech-to-text call
 (one per guest at a time, as for the host's own route). Not yet done: a live two-person test with real audio.

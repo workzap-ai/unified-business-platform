@@ -554,3 +554,28 @@ def test_guest_numbers_stay_inside_their_slice_of_the_window():
     assert guest_routes.WINDOW_MS == 60_000 == guest_routes.GUEST_PART_MS
     assert guest_routes.guest_base(0, 21) is None and guest_routes.guest_base(0, 0) is None
     assert guest_routes.pack(["a", "b", "c", "d", "e", "f", "g"], 6) == ["a b", "c d", "e f", "g"]
+
+
+async def test_a_guest_who_reloads_carries_on_as_the_same_person(api, business_db, voice):
+    pi, conv, scope = await workspace(api, business_db, "366600077")
+    await switch_on(api)
+    mid, invite = await made(api)
+    token = await joined(api, invite, "Ali")
+    headers = {"X-Guest-Token": token}
+    fresh = await api.post(f"{GUEST}/resume", headers=headers)
+    assert fresh.status_code == 200
+    assert fresh.json() == {"label": "Ali", "slot": 1, "next_seq": 0}  # nothing sent yet
+    people = await count(business_db, PiMeetingGuest)
+
+    await at(business_db, 0)
+    assert (await say(api, token)).status_code == 200
+    again = await api.post(f"{GUEST}/resume", headers=headers)
+    assert again.status_code == 200 and again.json()["next_seq"] >= 1
+    assert again.json()["slot"] == 1 and again.json()["label"] == "Ali"
+    assert await count(business_db, PiMeetingGuest) == people  # no second person
+
+    bad = await api.post(f"{GUEST}/resume", headers={"X-Guest-Token": "x" * 43})
+    assert bad.status_code == 404
+    await api.post(f"{GUEST}/leave", headers=headers)
+    assert (await api.post(f"{GUEST}/resume", headers=headers)).status_code == 404
+    await pi.close()

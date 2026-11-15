@@ -555,6 +555,38 @@ async def _guest_for(
 GuestToken = Annotated[str, Header(alias="X-Guest-Token", pattern=TOKEN_PATTERN)]
 
 
+@public_router.post("/guest/resume")
+async def guest_resume(token: GuestToken, request: Request, session: Session) -> dict[str, Any]:
+    """A guest who reloaded the page (or lost the connection) carries on as the same person: their
+    browser kept the token, this says whether it still works and which part number comes next, so
+    their words are not placed over the minutes they already sent. No new slot is used and nothing
+    is written. The token's own limits (age, removal, a closed link or meeting) are those of a part."""
+    await _limit(request, token, "resume", 60, 30)
+    found = await _guest_for(session, token)
+    if found is None:
+        raise HTTPException(status_code=404)
+    guest, meeting, _ = found
+    label = await session.scalar(
+        select(PiMeetingParticipant.label).where(
+            PiMeetingParticipant.tenant_id == guest.tenant_id,
+            PiMeetingParticipant.environment_id == guest.environment_id,
+            PiMeetingParticipant.id == guest.participant_id,
+        )
+    )
+    next_seq = 0
+    if guest.first_offset_ms is not None and meeting.recording_started_at is not None:
+        # the part number that matches the meeting's clock now (a gap stays a gap, never a clash)
+        elapsed = int((datetime.now(UTC) - meeting.recording_started_at).total_seconds() * 1000)
+        next_seq = max(0, (elapsed - guest.first_offset_ms) // GUEST_PART_MS)
+        if guest.last_seq is not None:
+            next_seq = max(next_seq, guest.last_seq + 1)
+    return {
+        "label": label or "",
+        "slot": guest.slot,
+        "next_seq": min(next_seq, GUEST_MAX_SEQ - 1),
+    }
+
+
 @public_router.post("/guest/leave")
 async def guest_leave(token: GuestToken, request: Request, session: Session) -> dict[str, Any]:
     """The guest stops: their token no longer sends anything. What they already said stays in the
