@@ -560,7 +560,7 @@ async def guest_resume(token: GuestToken, request: Request, session: Session) ->
     """A guest who reloaded the page (or lost the connection) carries on as the same person: their
     browser kept the token, this says whether it still works and which part number comes next, so
     their words are not placed over the minutes they already sent. No new slot is used and nothing
-    is written. The token's own limits (age, removal, a closed link or meeting) are those of a part."""
+    is written. The token's limits (age, removal, closed link or meeting) are those of a part."""
     await _limit(request, token, "resume", 60, 30)
     found = await _guest_for(session, token)
     if found is None:
