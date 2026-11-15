@@ -47,6 +47,7 @@ import { MeetingAsk } from "./meeting-ask";
 import { MeetingInvite } from "./meeting-invite";
 import { MeetingPilot } from "./meeting-pilot";
 import { MeetingPiMode } from "./meeting-pi-mode";
+import { MeetingShareSummary } from "./meeting-share-summary";
 import { MeetingRecordingPlayer } from "./meeting-recording-player";
 import {
   Accent,
@@ -196,7 +197,12 @@ function Body({ meeting }: { meeting: Detail }) {
             {canRecord && !live && <AnalyseButton meeting={meeting} />}
           </div>
           <TabsContent value="review" className="mt-4">
-            <Insights meeting={meeting} />
+            <div className="space-y-4">
+              {can("pi.meetings.approve") && (
+                <MeetingShareSummary meeting={meeting} />
+              )}
+              <Insights meeting={meeting} />
+            </div>
           </TabsContent>
           <TabsContent value="map" className="mt-4">
             <MeetingMap meeting={meeting} />

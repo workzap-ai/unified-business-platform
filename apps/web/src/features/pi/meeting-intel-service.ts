@@ -179,6 +179,18 @@ export const meetingIntelService = {
     apiRequest("PATCH", `${BASE}/${id}/customer`, meetingSchema, {
       body: { customer_id: customerId },
     }),
+  // A person sends the approved summary to the customer's conversation (once).
+  shareSummary: (id: string, text: string) =>
+    apiRequest(
+      "POST",
+      `${BASE}/${id}/share-summary`,
+      z.object({
+        message_id: z.string(),
+        status: z.string().catch(""),
+        again: z.boolean().catch(false),
+      }),
+      { body: { text } },
+    ),
   // The answer comes only from this meeting's transcript; `sources` are the lines it cites.
   ask: (id: string, question: string) =>
     apiRequest(

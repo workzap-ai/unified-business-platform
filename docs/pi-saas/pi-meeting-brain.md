@@ -293,3 +293,18 @@ as a new person.
 cannot delete their own words (only the host's team can, by deleting the meeting). The meeting title is shown
 on the join page. Consent text is not versioned. The request session is held during the speech-to-text call
 (one per guest at a time, as for the host's own route). Not yet done: a live two-person test with real audio.
+
+
+## Action items to team cards, and the summary to the customer (branch `pi/meeting-brain`)
+
+- **Action items become cards.** Approving an `action` or `next_step` already raised a staff request on the customer's
+  latest conversation; it now also adds one unassigned card to the team board (`pi_tasks`, key
+  `meeting:<meeting>:<insight>`, created by "pi (meeting)"). A replay or a second approval adds none. An inferred item is
+  headed "AI suggestion (unconfirmed)". Questions and commitments stay requests only. No migration.
+- **Send the approved summary to the customer** (`POST /pi/meeting-intel/{id}/share-summary`, permission
+  `pi.meetings.approve`, flag `meeting_intel`; UI: a card at the top of the Review tab). Never automatic. The summary must
+  already be approved; the person may edit the words; they are redacted again, may not carry a price and are cut at 900
+  characters. It then goes through `PiService.human_message`, so the inbox rules apply: the conversation must be taken
+  over by a person, the customer must have written in the last 24 hours, `pi.inbox.reply` is needed. The message is
+  queued (never reported as sent here), keyed `meeting-summary:<meeting>` so a second press returns the first. Audit:
+  ids and length only. Tests: `test_pi_meeting_share.py`.

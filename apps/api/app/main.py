@@ -73,6 +73,7 @@ from app.modules.pi_meetings.pilot_routes import router as pi_meeting_pilot_rout
 from app.modules.pi_meetings.qa_routes import router as pi_meeting_qa_router
 from app.modules.pi_meetings.recording_routes import router as pi_meeting_recording_router
 from app.modules.pi_meetings.routes import router as pi_meeting_intel_router
+from app.modules.pi_meetings.share_routes import router as pi_meeting_share_router
 from app.modules.pi_meetings.voice_routes import public_router as pi_meeting_voice_join_router
 from app.modules.pi_meetings.voice_routes import router as pi_meeting_voice_router
 from app.modules.pi_saas.app_routes import router as pi_app_router
@@ -134,6 +135,7 @@ ROUTERS = [
     pi_meeting_intel_router,
     pi_meeting_qa_router,
     pi_meeting_pilot_router,
+    pi_meeting_share_router,
     pi_meeting_recording_router,
     pi_meeting_media_router,
     pi_meeting_guest_router,
