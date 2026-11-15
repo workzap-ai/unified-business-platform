@@ -13,6 +13,9 @@ chat already uses:
 * an `action`, `next_step`,
   `question`, `commitment`      -> a staff request (`requests.raise_request`) on the customer's
                                    latest conversation;
+* an `action` or `next_step` also becomes a card on the team board (`pi_tasks`, unassigned, keyed
+  `meeting:<meeting>:<insight>` so a replay never makes a second one), headed "AI suggestion
+  (unconfirmed)" when the model only inferred it;
 * an inferred or recommended action, next step or question -> a staff request too, but headed
   "AI suggestion (unconfirmed)" so nobody reads it as something the customer said;
 * anything else the model inferred, estimated or recommended -> approved as reviewed information
@@ -43,7 +46,9 @@ from app.modules.pi_meetings.models import (
     PiMeetingSegment,
 )
 from app.modules.pi_saas import requests
+from app.modules.pi_saas.models import PiTask
 from app.shared.scope import WorkspaceScope
+from app.shared.workspace_repository import WorkspaceRepository
 
 PROBLEM_KINDS = frozenset({"problem"})
 DECISION_KINDS = frozenset({"decision", "commitment"})
@@ -53,6 +58,7 @@ REQUEST_KINDS = {
     "question": "question",
     "commitment": "other",
 }
+TASK_KINDS = frozenset({"action", "next_step"})  # these also become a card on the team board
 TITLE_WORDS = 8
 
 
@@ -146,6 +152,35 @@ async def _conversation(
         .limit(1)
     )
     return found
+
+
+async def _card(
+    session: AsyncSession,
+    scope: WorkspaceScope,
+    meeting: PiMeeting,
+    insight: PiMeetingInsight,
+    text: str,
+    reviewer_id: UUID | None,
+) -> None:
+    """One team-board card for an approved action or next step, once (the key is the guard)."""
+    key = _ref(meeting.id, insight.id)
+    repo = WorkspaceRepository(session, PiTask, scope)
+    if await repo.find(PiTask.idempotency_key == key) is not None:
+        return
+    stated = insight.basis == "stated"
+    due = f" (due: {insight.due_text})" if insight.due_text else ""
+    who = f" Owner: {insight.owner_label}." if insight.owner_label else ""
+    head = "From the meeting" if stated else "AI suggestion (unconfirmed)"
+    await repo.add(
+        repo.new(
+            title=_title(text)[:200] or "Meeting follow-up",
+            description=f"{head}: {text}{due}.{who} Meeting: {meeting.title or 'untitled'}."[:4000],
+            customer_id=meeting.customer_id,
+            created_by_user_id=reviewer_id,
+            created_by_label="pi (meeting)",
+            idempotency_key=key,
+        )
+    )
 
 
 async def approve(
@@ -243,6 +278,8 @@ async def approve(
             )
             insight.brain_ref = f"request:{req.id}"[:60]
             out.wrote = "request"
+            if insight.kind in TASK_KINDS:
+                await _card(session, scope, meeting, insight, text, reviewer_id)
 
     insight.edited_text = clean
     insight.review_status = "edited" if clean and clean != insight.text else "approved"

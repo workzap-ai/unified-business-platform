@@ -9,7 +9,7 @@ from app.modules.pi.memory_models import PiDecision
 from app.modules.pi.problem_models import PiProblem
 from app.modules.pi_meetings import brain_bridge
 from app.modules.pi_meetings.models import PiMeetingParticipant, PiMeetingSegment
-from app.modules.pi_saas.models import PiStaffRequest
+from app.modules.pi_saas.models import PiStaffRequest, PiTask
 
 pytestmark = pytest.mark.integration
 
@@ -120,6 +120,24 @@ async def test_an_action_becomes_one_staff_request(api, business_db):
     assert await count(business_db, PiStaffRequest, scope) == before + 1
     await brain_bridge.approve(business_db, scope, m, item, reviewer_id=None)
     assert await count(business_db, PiStaffRequest, scope) == before + 1
+    cards = list(
+        await business_db.scalars(select(PiTask).where(PiTask.idempotency_key.like("meeting:%")))
+    )
+    assert len(cards) == 1  # one card on the team board, not two after the replay
+    assert cards[0].customer_id == m.customer_id and cards[0].assignee_user_id is None
+    assert "send the stock list" in cards[0].title and "Friday" in cards[0].description
+    assert cards[0].status == "open"
+    await pi.close()
+
+
+async def test_a_question_becomes_a_request_but_not_a_team_card(api, business_db):
+    pi, scope, m = await seeded(api, business_db, "377000009")
+    item = insight(scope, m.id, kind="question", segment_refs=[0], text="which branch first")
+    business_db.add(item)
+    await business_db.flush()
+    out = await brain_bridge.approve(business_db, scope, m, item, reviewer_id=None)
+    assert out.wrote == "request"
+    assert await count(business_db, PiTask, scope) == 0
     await pi.close()
 
 
