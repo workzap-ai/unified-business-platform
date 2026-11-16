@@ -181,6 +181,27 @@ async def system_scope(
     return scope
 
 
+async def _blocked_sender(
+    session: AsyncSession, scope: WorkspaceScope, event: WhatsAppWebhookEvent
+) -> bool:
+    """True when the sender is on the workspace's blocklist. The event is closed as processed and
+    the rule counts the try; nothing is stored, read by pi or sent to a model."""
+    from app.modules.pi_saas.blocklist import service as blocklist
+
+    try:
+        async with session.begin_nested():  # a savepoint: a failed lookup never poisons the turn
+            rule = await blocklist.match(session, scope, (event.payload or {}).get("sender"))
+    except DBAPIError:  # e.g. the table is not migrated yet: carry on as if nobody is blocked
+        logger.warning("pi_blocklist_unavailable", exc_info=True)
+        return False
+    if rule is None:
+        return False
+    await blocklist.count_hit(session, rule)
+    event.status, event.processed_at = "processed", datetime.now(UTC)
+    logger.info("pi_blocked_sender_dropped")
+    return True
+
+
 async def persist_inbound(
     session: AsyncSession,
     event: WhatsAppWebhookEvent,
@@ -929,6 +950,9 @@ async def process_pi_event(ctx: dict[str, Any], event_id: str) -> None:
                     )
                 except BusinessRuleViolation:
                     logger.warning("pi_nori_credits_reply_failed")
+            return
+        if event.kind != "status" and await _blocked_sender(session, scope, event):
+            await session.commit()  # a blocked number: counted, never stored, read or answered
             return
         message = await persist_inbound(session, event, connection, scope)
         event.status = "queued" if message else "processed"

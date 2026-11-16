@@ -91,6 +91,7 @@ from app.modules.pi_saas.digest_routes import router as pi_digest_router
 from app.modules.pi_saas.health_routes import router as pi_health_router
 from app.modules.pi_saas.insights_routes import router as pi_insights_router
 from app.modules.pi_saas.meeting_board import router as pi_meeting_board_router
+from app.modules.pi_saas.blocklist.routes import router as pi_blocklist_router
 from app.modules.pi_saas.nori_board.routes import door_router as nori_board_door_router
 from app.modules.pi_saas.nori_board.routes import router as nori_board_router
 from app.modules.pi_saas.nori_credits.routes import router as nori_credits_router
@@ -132,6 +133,7 @@ ROUTERS = [
     pi_work_router,
     pi_team_board_router,
     nori_board_router,
+    pi_blocklist_router,
     pi_meeting_board_router,
     pi_meeting_intel_router,
     pi_meeting_qa_router,
@@ -235,6 +237,7 @@ PI_APP_ROUTERS = [
     pi_work_router,
     pi_team_board_router,
     nori_board_router,
+    pi_blocklist_router,
     pi_meeting_board_router,
     pi_customer_payment_router,
     pi_deals_router,
