@@ -81,6 +81,7 @@ def test_pi_is_a_top_level_product_with_its_own_subnavigation():
         "Analytics",
         "Brain",
         "Health",
+        "Blocklist",
         "Settings",
     ]
 
