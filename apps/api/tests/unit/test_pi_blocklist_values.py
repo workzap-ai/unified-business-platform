@@ -53,3 +53,20 @@ def test_the_view_masks_a_number_but_names_a_range() -> None:
     )  # fmt: skip
     assert view(number)["masked"] != number.value and "62" in view(number)["masked"]  # type: ignore[arg-type]
     assert view(rng)["masked"] == "628956366…"  # type: ignore[arg-type]
+
+
+@pytest.mark.parametrize(
+    "text",
+    ["STOP", "stop", "please stop messaging me", "I want to kill myself", "he is going to kill me"],
+)
+def test_an_emergency_or_a_stop_from_a_blocked_number_still_gets_through(text: str) -> None:
+    from app.modules.pi_saas.blocklist.service import must_pass
+
+    assert must_pass(text)
+
+
+@pytest.mark.parametrize("text", ["", "hello", "Wholesale price list please", "photo", None])
+def test_anything_else_from_a_blocked_number_is_dropped(text: str | None) -> None:
+    from app.modules.pi_saas.blocklist.service import must_pass
+
+    assert not must_pass(text)

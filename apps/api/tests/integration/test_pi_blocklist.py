@@ -180,3 +180,47 @@ async def test_a_workspace_never_sees_or_feels_another_workspaces_blocklist(
     await second.process("hi", "wamid.iso-1", sender=FLOOD)
     assert await rows(business_db, second.tenant_id, PiConversation) == 1
     await second.close()
+
+
+async def test_a_blocked_number_can_still_stop_or_ask_for_help(
+    api: httpx.AsyncClient, business_db: Any, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    pi = await pi_workspace(api, business_db)
+    scripted_gateway(monkeypatch, lambda text: intent("greeting", 1.0))
+    await api.post(URL, json={"value": FLOOD})
+    await pi.process("hello", "wamid.pass-0", sender=FLOOD)
+    assert await rows(business_db, pi.tenant_id, PiConversation) == 0  # dropped
+    await pi.process("STOP", "wamid.pass-1", sender=FLOOD)
+    assert await rows(business_db, pi.tenant_id, PiConversation) == 1  # a STOP is recorded
+    await pi.process("I want to kill myself", "wamid.pass-2", sender=FLOOD)
+    stored = list(
+        await business_db.scalars(
+            select(PiMessage.body).where(
+                PiMessage.tenant_id == pi.tenant_id, PiMessage.direction == "inbound"
+            )
+        )
+    )
+    assert "I want to kill myself" in stored  # an emergency reaches pi's safety gates
+    await pi.close()
+
+
+async def test_a_range_over_real_chats_is_refused(
+    api: httpx.AsyncClient, business_db: Any, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    pi = await pi_workspace(api, business_db)
+    scripted_gateway(monkeypatch, lambda text: intent("greeting", 1.0))
+    await pi.process("hi, I want to order", "wamid.real-1", sender="62895636626001")
+    response = await api.post(URL, json={"value": "628956366", "kind": "prefix"})
+    assert response.status_code >= 400 and "RANGE_HAS_REAL_CHATS" in response.text
+    assert (await api.get(URL)).json()["items"] == []
+    await pi.close()
+
+
+async def test_a_number_and_a_range_with_the_same_digits_do_not_overwrite_each_other(
+    api: httpx.AsyncClient, business_db: Any
+) -> None:
+    await pi_workspace(api, business_db)
+    assert (await api.post(URL, json={"value": "6289563", "kind": "prefix"})).status_code == 201
+    clash = await api.post(URL, json={"value": "6289563", "kind": "number"})
+    assert clash.status_code >= 400 and "ALREADY_LISTED_AS_OTHER_KIND" in clash.text
+    assert (await api.get(URL)).json()["items"][0]["kind"] == "prefix"

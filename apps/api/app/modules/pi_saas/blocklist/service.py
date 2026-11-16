@@ -6,11 +6,11 @@ from datetime import UTC, datetime
 from typing import Any
 from uuid import UUID
 
-from sqlalchemy import and_, func, literal, or_
+from sqlalchemy import and_, func, literal, or_, select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.modules.pi.models import PiConversation
+from app.modules.pi.models import PiConversation, PiMessage
 from app.modules.pi_saas.blocklist.models import MIN_PREFIX, PiBlockedContact
 from app.modules.pi_saas.nori_credits.resilience import digits, mask_number
 from app.shared.errors import BusinessRuleViolation
@@ -34,6 +34,49 @@ def clean_value(raw: object, kind: str) -> str:
     if not 7 <= len(value) <= 15:
         raise BusinessRuleViolation("PHONE_INVALID", "Enter the WhatsApp number with country code")
     return value
+
+
+def must_pass(text: object) -> bool:
+    """A message a blocked sender may still send: an emergency (pi must give the emergency numbers)
+    or a STOP (the consent withdrawal must be recorded). Everything else is dropped."""
+    from app.modules.pi import safety
+    from app.modules.pi_saas.campaigns import OPT_OUT, OPT_OUT_PHRASE
+
+    said = " ".join(str(text or "").split())
+    if not said:
+        return False
+    if safety.emergency(said) is not None:
+        return True
+    return len(said) <= 80 and bool(
+        OPT_OUT.match(said) or OPT_OUT_PHRASE.search(said) or safety.opt_out_asked(said)
+    )
+
+
+def _digits_column() -> Any:
+    return func.regexp_replace(PiConversation.contact_wa_id, "[^0-9]", "", "g")
+
+
+async def range_impact(session: AsyncSession, scope: WorkspaceScope, prefix: str) -> dict[str, int]:
+    """How many chats sit under a range, and how many of those ever wrote text: a person, not a
+    flood. A range with any chat that wrote text is refused (see ``block``)."""
+    repo = WorkspaceRepository(session, PiConversation, scope)
+    has_text = (
+        select(PiMessage.id)
+        .where(
+            PiMessage.conversation_id == PiConversation.id,
+            PiMessage.direction == "inbound",
+            PiMessage.message_type == "text",
+        )
+        .exists()
+    )
+    chats = _digits_column().like(f"{prefix}%")
+    total = await session.scalar(
+        select(func.count()).select_from(PiConversation).where(repo.predicate(), chats)
+    )
+    with_text = await session.scalar(
+        select(func.count()).select_from(PiConversation).where(repo.predicate(), chats, has_text)
+    )
+    return {"chats": int(total or 0), "with_text": int(with_text or 0)}
 
 
 def _text(value: object, limit: int) -> str:
@@ -97,9 +140,21 @@ async def block(
     clean = clean_value(value, kind)
     repo = WorkspaceRepository(session, PiBlockedContact, scope)
     existing = await repo.find(PiBlockedContact.value == clean)
+    if existing is not None and existing.kind != kind:
+        raise BusinessRuleViolation(
+            "ALREADY_LISTED_AS_OTHER_KIND",
+            f"These digits are already on the list as a {existing.kind}. Unblock that first.",
+        )
+    if existing is None and kind == "prefix":
+        impact = await range_impact(session, scope, clean)
+        if impact["with_text"]:
+            raise BusinessRuleViolation(
+                "RANGE_HAS_REAL_CHATS",
+                f"{impact['with_text']} chat(s) under this range have written text, so they are "
+                "people, not a flood. Block the numbers one by one instead.",
+            )
     if existing is not None:
         existing.active = True
-        existing.kind = kind
         if reason:
             existing.reason = _text(reason, 200)
         if note:
@@ -177,9 +232,9 @@ async def close_chats(session: AsyncSession, scope: WorkspaceScope, row: PiBlock
     messages stay as a record."""
     repo = WorkspaceRepository(session, PiConversation, scope)
     cond = (
-        PiConversation.contact_wa_id == row.value
+        _digits_column() == row.value
         if row.kind == "number"
-        else PiConversation.contact_wa_id.like(f"{row.value}%")
+        else _digits_column().like(f"{row.value}%")
     )
     chats = list(await session.scalars(repo.select().where(PiConversation.status == "open", cond)))
     for chat in chats:
