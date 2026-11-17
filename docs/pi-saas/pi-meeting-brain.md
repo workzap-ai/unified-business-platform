@@ -137,13 +137,13 @@ not built: it needs a working voice provider and the spoken-reply gate). Code: `
 What it is, and is not: **a spoken conversation between pi and ONE person who opens the meeting link**
 (an intake call). It is not pi inside a Zoom or Meet call: a meeting link carries no audio between
 people, so pi cannot join a conversation between several. That needs a bot in the call (Recall.ai or
-similar), which is not built. Code: `voice.py` (what pi may say), `voice_routes.py`; migration 0062;
+similar), which is not built. Code: `voice.py` (what pi may say), `voice_routes.py`; migration 0069;
 web: `meeting-voice-join.tsx` (the person's page) and `meeting-pi-mode.tsx` (the staff selector).
 
 - **Off by default, twice.** Workspace flag `brain.meeting_voice` (with `meeting_intel` and `meeting_guests`)
   and the meeting's `pi_mode`. `PATCH /pi/meeting-intel/{id}/pi-mode` with `off`, `listen` or `speak`
   (`pi.meetings.record`; `speak` needs the flag, 403 `MEETING_VOICE_OFF`, and a recorded consent). Migration
-  0062 adds `pi_meetings.pi_mode` (NOT NULL default `off`, CHECK).
+  0069 adds `pi_meetings.pi_mode` (NOT NULL default `off`, CHECK).
 - **Mute is instant.** Every turn re-reads `pi_mode` and the flag; otherwise 409 `PI_NOT_SPEAKING`, and the
   page tells the person and ends. Nothing is written after a mute.
 - **A turn.** `POST /public/meeting-join/guest/pi-turn` with the guest token in `X-Guest-Token`. No file: pi's
