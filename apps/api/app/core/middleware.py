@@ -78,10 +78,16 @@ class RequestContextMiddleware:
         try:
             await self.app(scope, receive, send_response)
         except Exception as exc:
-            # Class name only: exception text can carry SQL, payloads or secrets.
+            # Class name only: exception text can carry SQL, payloads or secrets. A database error
+            # also names the rule it broke (constraint and table names, never values) and the
+            # route template, so a failing request can be found without its data.
             logger.error(
                 "request_failed",
-                extra={"request_id": request_id, "error_kind": type(exc).__name__},
+                extra={
+                    "request_id": request_id,
+                    "error_kind": type(exc).__name__,
+                    **_failure_clues(exc, scope),
+                },
             )
             if sent:
                 raise
@@ -99,3 +105,22 @@ class RequestContextMiddleware:
                     "duration_ms": round((perf_counter() - started) * 1000, 2),
                 },
             )
+
+
+def _failure_clues(exc: BaseException, scope: Scope) -> dict[str, str]:
+    """Names only: the route template and, for a database error, SQLSTATE, constraint and table."""
+    clues: dict[str, str] = {}
+    route = getattr(scope.get("route"), "path", "")
+    if isinstance(route, str) and route:
+        clues["route"] = route[:120]
+    driver = getattr(exc, "orig", None)
+    driver = getattr(driver, "__cause__", None) or driver
+    for field, key in (
+        ("sqlstate", "sqlstate"),
+        ("constraint_name", "constraint"),
+        ("table_name", "table"),
+    ):
+        value = getattr(driver, field, None)
+        if isinstance(value, str) and value:
+            clues[key] = value[:80]
+    return clues
