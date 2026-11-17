@@ -3,6 +3,7 @@
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import {
   FileText,
+  Ban,
   ArrowLeft,
   ArrowRight,
   Bot,
@@ -355,6 +356,7 @@ function ConversationList({
                       <Bot className="size-3" aria-hidden /> pi
                     </Badge>
                   )}
+                  {c.nori_workspace ? <Badge>nori · {c.nori_workspace}</Badge> : null}
                   {c.assigned_label ? <Badge>{c.assigned_label}</Badge> : null}
                   {c.status === "closed" ? <Badge>Closed</Badge> : null}
                 </span>
@@ -760,6 +762,7 @@ function Thread({ id, onBack }: { id: string; onBack: () => void }) {
             </p>
           </div>
           <OwnershipButtons conversation={c} />
+          <BlockNumberButton conversation={c} />
           <Button
             variant="ghost"
             size="icon"
@@ -1011,6 +1014,76 @@ function OwnershipButtons({ conversation }: { conversation: Conversation }) {
     >
       <Bot className="size-4" aria-hidden /> Hand back to pi
     </Button>
+  );
+}
+
+function BlockNumberButton({ conversation }: { conversation: Conversation }) {
+  const can = useCan();
+  const [open, setOpen] = React.useState(false);
+  const [reason, setReason] = React.useState("");
+  const block = useAction(
+    () =>
+      post(`/pi/blocklist/from-conversation/${conversation.id}`, { reason }),
+    {
+      invalidate: [
+        ["context", conversation.id],
+        ["conversations"],
+        ["blocklist"],
+      ],
+      success: "Number blocked. pi won't answer it again.",
+      onSuccess: () => setOpen(false),
+    },
+  );
+  if (!can("pi.settings.manage")) return null;
+  return (
+    <>
+      <Button
+        variant="ghost"
+        size="icon"
+        aria-label="Block this number"
+        title="Block this number"
+        onClick={() => setOpen(true)}
+      >
+        <Ban className="size-5" aria-hidden />
+      </Button>
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogContent
+          title="Block this number?"
+          description="pi stops answering it and this chat is closed. New messages from it are not saved and no AI is used on them. You can unblock it in Settings."
+        >
+          <form
+            className="space-y-4"
+            onSubmit={(e) => {
+              e.preventDefault();
+              block.mutate(undefined);
+            }}
+          >
+            <Field label="Why" htmlFor="block-chat-reason" optional>
+              <Input
+                id="block-chat-reason"
+                className="text-base sm:text-[15px]"
+                maxLength={200}
+                value={reason}
+                onChange={(e) => setReason(e.target.value)}
+                placeholder="e.g. Sends only black images"
+              />
+            </Field>
+            <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+              <Button
+                type="button"
+                variant="secondary"
+                onClick={() => setOpen(false)}
+              >
+                Cancel
+              </Button>
+              <Button type="submit" variant="danger" loading={block.isPending}>
+                Block number
+              </Button>
+            </div>
+          </form>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 }
 

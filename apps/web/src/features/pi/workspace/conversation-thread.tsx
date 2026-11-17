@@ -12,6 +12,7 @@ import Link from "next/link";
 import { isToday, isYesterday } from "date-fns";
 import {
   ArrowLeft,
+  Ban,
   Bot,
   CircleX,
   MessageSquareOff,
@@ -37,6 +38,7 @@ import { StatusBadge, statusLabel } from "@/components/app/status-badge";
 import { useScopedMutation, useScopedQuery } from "@/hooks/use-scoped";
 import { useSession } from "@/features/auth/session-provider";
 import { HISTORY_PAGE_SIZE, piService, type MessageHistory } from "../service";
+import { piBlocklistService } from "../blocklist-service";
 import type { Conversation, Message } from "../types";
 import { piKeys } from "./lib";
 import { Composer } from "./composer";
@@ -73,6 +75,7 @@ export function ConversationThread({
 }) {
   const { canAny, can } = useSession();
   const canReply = can("pi.inbox.reply");
+  const canBlock = can("pi.settings.manage");
   const canHandoff = canAny("pi.handoffs.manage", "pi.inbox.reply");
   const context = useConversationContext(conversationId);
   const conversation = context.data?.conversation ?? listItem;
@@ -111,8 +114,15 @@ export function ConversationThread({
   const names = usePiNames();
   const actions = useConversationActions(conversationId);
   const [confirm, setConfirm] = useState<
-    "takeover" | "return" | "close" | null
+    "takeover" | "return" | "close" | "block" | null
   >(null);
+  const block = useScopedMutation(
+    () => piBlocklistService.fromConversation(conversationId),
+    {
+      invalidate: [[...piKeys.all], ["pi", "blocklist"], ["navigation"]],
+      success: "Number blocked. pi won't answer it again.",
+    },
+  );
   const [handoffOpen, setHandoffOpen] = useState(false);
 
   // Mark read once per opened conversation, after its messages load.
@@ -330,6 +340,14 @@ export function ConversationThread({
                       </DropdownMenuItem>
                     </>
                   )}
+                  {canBlock && (
+                    <DropdownMenuItem
+                      destructive
+                      onSelect={() => setConfirm("block")}
+                    >
+                      <Ban /> Block this number
+                    </DropdownMenuItem>
+                  )}
                 </DropdownMenuContent>
               </DropdownMenu>
             </div>
@@ -464,6 +482,21 @@ export function ConversationThread({
             destructive
             loading={actions.close.isPending}
             onConfirm={() => run(actions.close)}
+          />
+          <ConfirmDialog
+            open={confirm === "block"}
+            onOpenChange={(o) => !o && setConfirm(null)}
+            title="Block this number?"
+            description={`pi stops answering ${conversation.customer_name}'s number.`}
+            consequences={[
+              "This conversation is closed.",
+              "New messages from it are not saved and no AI is used on them.",
+              "You can unblock it from PI, Blocklist.",
+            ]}
+            confirmLabel="Block number"
+            destructive
+            loading={block.isPending}
+            onConfirm={() => run(block)}
           />
           <CreateHandoffDialog
             conversationId={conversationId}

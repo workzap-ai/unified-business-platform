@@ -142,8 +142,14 @@ class PiService:
             for k in ConversationView.model_fields
             if hasattr(conversation, k)
         }
+        from app.modules.pi_saas.nori_board.service import find_number
+
+        registry = await find_number(
+            self.session, self.scope, conversation.contact_wa_id or customer.phone
+        )
         return ConversationView(
             **fields,
+            nori_workspace=registry.workspace if registry is not None else None,
             customer_name=customer.name,
             customer_phone=customer.phone,
             handoff_id=handoff.id if handoff else None,

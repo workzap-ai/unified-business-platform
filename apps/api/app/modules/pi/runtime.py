@@ -181,6 +181,33 @@ async def system_scope(
     return scope
 
 
+async def _blocked_sender(
+    session: AsyncSession, scope: WorkspaceScope, event: WhatsAppWebhookEvent
+) -> bool:
+    """True when the sender is on the workspace's blocklist. The event is closed as processed and
+    the rule counts the try; nothing is stored, read by pi or sent to a model. Two things still get
+    through: an emergency (pi gives the emergency numbers) and a STOP (consent is withdrawn).
+    Blocking is inbound only: the Nori hooks above run first, and campaigns are not stopped here."""
+    from app.modules.pi_saas.blocklist import service as blocklist
+
+    payload = event.payload or {}
+    try:
+        async with session.begin_nested():  # a savepoint: a failed lookup never poisons the turn
+            rule = await blocklist.match(session, scope, payload.get("sender"))
+    except DBAPIError as exc:  # e.g. the table is not migrated yet: carry on, nobody is blocked
+        # The class only: the error text carries the SQL parameters, which include the number.
+        logger.warning("pi_blocklist_unavailable", extra={"error": type(exc.orig or exc).__name__})
+        return False
+    if rule is None:
+        return False
+    if blocklist.must_pass(payload.get("body")):
+        return False  # an emergency or a STOP from a blocked number is still handled
+    await blocklist.count_hit(session, rule)
+    event.status, event.processed_at = "processed", datetime.now(UTC)
+    logger.info("pi_blocked_sender_dropped")
+    return True
+
+
 async def persist_inbound(
     session: AsyncSession,
     event: WhatsAppWebhookEvent,
@@ -907,6 +934,32 @@ async def process_pi_event(ctx: dict[str, Any], event_id: str) -> None:
                 except BusinessRuleViolation:
                     logger.warning("pi_nori_reply_failed")
             return
+        # nori credits bridge (docs/pi-saas/nori-bridge.md): inert unless NORI_BASE_URL and
+        # WORKZAP_BRIDGE_SECRET are set and the workspace turned on response_rules.nori_bridge.
+        # A system reply from nori bypasses the reply linter by design; every failure falls
+        # through to the lines below unchanged.
+        from app.modules.pi_saas.nori_credits import hook as nori_credits
+
+        credits_hook = await nori_credits.pre_hook(ctx, session, scope, connection, event)
+        if credits_hook.handled:
+            event.status = "processed"  # committed before the send: a retry never sends twice
+            await session.commit()
+            if credits_hook.reply:
+                from app.integrations.whatsapp_bridge import token as connection_token
+
+                try:
+                    await WhatsApp(ctx["settings"], ctx["http"], connection.provider).send(
+                        connection.phone_number_id,
+                        str(event.payload.get("sender") or ""),
+                        credits_hook.reply,
+                        await connection_token(session, ctx["settings"], connection),
+                    )
+                except BusinessRuleViolation:
+                    logger.warning("pi_nori_credits_reply_failed")
+            return
+        if event.kind != "status" and await _blocked_sender(session, scope, event):
+            await session.commit()  # a blocked number: counted, never stored, read or answered
+            return
         message = await persist_inbound(session, event, connection, scope)
         event.status = "queued" if message else "processed"
         released: list[str] = []
@@ -945,6 +998,40 @@ async def process_pi_event(ctx: dict[str, Any], event_id: str) -> None:
         message_id, conversation_id = message.id, message.conversation_id
         conversation = await service.conversations.get(conversation_id)
         policy = await settings_row(session, scope)
+        if credits_hook.board_ref or credits_hook.board_chat:
+            # A number on the Nori Platform board's registry wrote (nori_board): the chat stays in
+            # the inbox for the team, the brain stays silent (human mode), the card links here.
+            # A greeting or thanks (board_chat) has no card: it is only kept in the chat.
+            from app.modules.pi_saas.nori_board import service as nori_board
+            from app.modules.pi_saas.nori_board.chat_only import ack_text
+
+            if credits_hook.board_ref:
+                await nori_board.link_conversation(
+                    session, scope, credits_hook.board_ref, conversation_id, message_id
+                )
+            board_ack = ack_text(
+                credits_hook.board_chat, conversation.language, str(message.body or "")
+            )
+            # A registry person's chat is never answered by the brain, whatever the mode was left
+            # at (staff "return to pi" included): every registry message puts it back to human.
+            # The acknowledgement goes once per chat.
+            conversation.mode = "human"
+            ack_key = f"pi-board-ack:{conversation_id}"
+            if await service.messages.find(PiMessage.idempotency_key == ack_key) is None:
+                ack = await service.messages.add(
+                    service.messages.new(
+                        conversation_id=conversation_id,
+                        direction="outbound",
+                        sender_type="system",
+                        body=board_ack,
+                        status="queued",
+                        idempotency_key=ack_key,
+                    )
+                )
+                await session.commit()
+                await enqueue_sends(ctx, [str(ack.id)])
+            else:
+                await session.commit()
         from app.modules.pi import flow as brain_flow
 
         if opted_out and brain_flow.brain_mode(policy.response_rules):

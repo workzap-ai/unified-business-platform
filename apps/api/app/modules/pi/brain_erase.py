@@ -76,6 +76,7 @@ from app.modules.pi_saas.models import (
     PiTask,
     PiTicket,
 )
+from app.modules.pi_saas.nori_board.models import PiNoriItem
 from app.shared.scope import WorkspaceScope
 
 logger = logging.getLogger(__name__)
@@ -114,6 +115,8 @@ REMOVED_KEYS = (
     "pending_actions_cleared",
     "bookings_cleared",
     "tasks_cleared",
+    "nori_cards_cleared",
+    "nori_cards_unlinked",
     "documents_text_cleared",
     "share_links_deleted",
     "decisions",
@@ -273,6 +276,25 @@ async def _erase_workspace_texts(
             update(PiTask)
             .where(*mine(PiTask), of_customer(PiTask))
             .values(title=ERASED, description="", customer_visible_status=""),
+        ),
+        (
+            "nori_cards_cleared",
+            update(PiTask)
+            .where(
+                *mine(PiTask),
+                PiTask.id.in_(
+                    select(PiNoriItem.task_id).where(
+                        *mine(PiNoriItem), PiNoriItem.conversation_id.in_(conversation_ids)
+                    )
+                ),
+            )
+            .values(title=ERASED, description=""),
+        ),
+        (
+            "nori_cards_unlinked",
+            update(PiNoriItem)
+            .where(*mine(PiNoriItem), PiNoriItem.conversation_id.in_(conversation_ids))
+            .values(conversation_id=None, person="", phone_mask=""),
         ),
         (
             "documents_text_cleared",

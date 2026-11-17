@@ -2,6 +2,7 @@
 
 import { useQuery } from "@tanstack/react-query";
 import {
+  Ban,
   Banknote,
   Building2,
   CreditCard,
@@ -41,6 +42,7 @@ import { WhatsAppLiveCard } from "@/features/whatsapp-live";
 import { WhatsAppProfileCard } from "@/features/whatsapp-profile";
 import { CustomerPortalCard } from "@/features/customer/portal-setting";
 import { SignInSecurity } from "@/features/security";
+import { Blocklist } from "@/features/blocklist";
 import { SetupCenter } from "@/features/setup-center";
 import { WhatsAppConnect, useAccount } from "@/features/setup";
 import { GettingPaid } from "@/features/getting-paid";
@@ -67,6 +69,7 @@ const SECTIONS = [
   { href: "/settings/payments", label: "Getting paid" },
   { href: "/settings/business", label: "Business" },
   { href: "/settings/notifications", label: "Notifications" },
+  { href: "/settings/blocklist", label: "Blocklist" },
   { href: "/settings/security", label: "Sign-in & security" },
 ];
 
@@ -110,6 +113,17 @@ export function SetupCenterPage() {
       description="Every tool pi can use, what's ready, and where to fix what isn't."
     >
       <SetupCenter />
+    </Shell>
+  );
+}
+
+export function BlocklistSettingsPage() {
+  return (
+    <Shell
+      title="Blocklist"
+      description="Numbers pi no longer answers. Their messages are not saved and no AI is used on them, so a flood costs nothing."
+    >
+      <Blocklist />
     </Shell>
   );
 }
@@ -180,6 +194,12 @@ export function SettingsOverview() {
       icon: Building2,
       title: "Business",
       body: "Name, hours and pausing pi.",
+    },
+    {
+      href: "/settings/blocklist",
+      icon: Ban,
+      title: "Blocklist",
+      body: "Numbers pi no longer answers, and floods it can stop.",
     },
     {
       href: "/settings/security",

@@ -36,7 +36,16 @@ logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/pi/team-board", tags=["pi-team-board"])
 
 Kind = Literal[
-    "price", "approve", "payment", "request", "reply", "start", "deliver", "feedback", "task"
+    "price",
+    "approve",
+    "payment",
+    "request",
+    "reply",
+    "start",
+    "deliver",
+    "feedback",
+    "nori",
+    "task",
 ]
 
 

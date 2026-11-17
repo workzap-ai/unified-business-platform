@@ -69,6 +69,9 @@ DEFAULTS: dict[str, Any] = {
         # Tunable numbers inside their tested ranges and the learning switch (brain_config.py,
         # learning.frozen). Empty = every default; learning stays frozen until set to False.
         "brain": {},
+        # The nori credits bridge (pi_saas/nori_credits, docs/pi-saas/nori-bridge.md). Off unless
+        # enabled is exactly true AND the server has NORI_BASE_URL and WORKZAP_BRIDGE_SECRET.
+        "nori_bridge": {"enabled": False},
     },
     "ai_config": {
         "router_alias": "fast",

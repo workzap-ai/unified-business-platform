@@ -125,6 +125,8 @@ export interface Conversation {
   handoff_status: string | null;
   summary: string;
   pending_confirmation: boolean;
+  /** Set when the chat's number is on the Nori numbers registry. */
+  nori_workspace?: string | null;
 }
 
 export interface Page<T> {

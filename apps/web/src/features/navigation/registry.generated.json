@@ -1166,6 +1166,30 @@
     "visible": true
   },
   {
+    "analytics_id": "nav.pi.blocklist",
+    "any_permissions": [],
+    "badge": null,
+    "description": "",
+    "enabled": true,
+    "environment_scope": null,
+    "icon": "ban",
+    "key": "pi-blocklist",
+    "keywords": [],
+    "label": "Blocklist",
+    "parent": "pi",
+    "required_feature": null,
+    "required_permissions": [
+      "pi.settings.manage"
+    ],
+    "required_product": "pi",
+    "required_roles": [],
+    "route": "/pi/blocklist",
+    "section": "main",
+    "sort_order": 78,
+    "type": "page",
+    "visible": true
+  },
+  {
     "analytics_id": "nav.pi.brain",
     "any_permissions": [],
     "badge": null,
