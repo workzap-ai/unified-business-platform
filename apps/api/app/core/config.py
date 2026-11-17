@@ -150,6 +150,12 @@ class Settings(BaseSettings):
     secrets_encryption_previous_keys: SecretStr | None = None
     # Public HTTPS origin of the API as providers reach it (inbound webhook URLs).
     integrations_public_base_url: str | None = None
+    # Meeting bot provider (Recall.ai): pi joins a Zoom/Meet/Teams call. Empty key = feature
+    # unavailable. The webhook secret ("whsec_...") signs the provider's callbacks; without it the
+    # callback route refuses everything. Region = the Recall region the key was created in.
+    recall_api_key: SecretStr | None = None
+    recall_webhook_secret: SecretStr | None = None
+    recall_region: Literal["us-west-2", "us-east-1", "eu-central-1", "ap-northeast-1"] = "us-west-2"
     # Exact OAuth redirect URI registered with providers; callback path is fixed.
     oauth_redirect_base_url: str | None = None
     oauth_state_ttl_seconds: int = Field(default=600, ge=60, le=3600)

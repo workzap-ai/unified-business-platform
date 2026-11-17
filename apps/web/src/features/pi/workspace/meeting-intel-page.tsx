@@ -3,6 +3,7 @@
 import { useState } from "react";
 import {
   AudioLines,
+  Bot,
   ChevronRight,
   Link2Off,
   ListChecks,
@@ -39,6 +40,7 @@ import {
   type Meeting,
 } from "../meeting-intel-service";
 import { MeetingDetail } from "./meeting-intel-detail";
+import { SendBotDialog } from "./meeting-send-bot";
 import {
   IconTile,
   SkeletonRows,
@@ -69,6 +71,7 @@ function MeetingList({ open }: { open: (id: string) => void }) {
     meetingIntelService.list(),
   );
   const [creating, setCreating] = useState(false);
+  const [sendingBot, setSendingBot] = useState(false);
   const [term, setTerm] = useState("");
   const [searched, setSearched] = useState("");
   const hits = useScopedQuery(
@@ -85,9 +88,14 @@ function MeetingList({ open }: { open: (id: string) => void }) {
         description="What was said in a meeting, what pi understood from it, and what you decide goes into the customer's memory. pi writes nothing to memory until you approve it."
         actions={
           can("pi.meetings.record") ? (
-            <Button onClick={() => setCreating(true)}>
-              <Plus /> New meeting
-            </Button>
+            <div className="flex flex-wrap gap-2">
+              <Button variant="secondary" onClick={() => setSendingBot(true)}>
+                <Bot /> Send pi to a call
+              </Button>
+              <Button onClick={() => setCreating(true)}>
+                <Plus /> New meeting
+              </Button>
+            </div>
           ) : null
         }
       />
@@ -197,6 +205,14 @@ function MeetingList({ open }: { open: (id: string) => void }) {
           </ul>
         </>
       )}
+      <SendBotDialog
+        open={sendingBot}
+        onClose={() => setSendingBot(false)}
+        onSent={(id) => {
+          setSendingBot(false);
+          open(id);
+        }}
+      />
       <NewMeetingDialog
         open={creating}
         onClose={() => setCreating(false)}

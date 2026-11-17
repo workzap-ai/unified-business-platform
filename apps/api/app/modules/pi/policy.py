@@ -56,6 +56,7 @@ def validate_section(section: str, value: Any) -> None:
                 "meeting_guests",
                 "meeting_pilot",
                 "meeting_voice",
+                "meeting_bot",
             }
             ensure(isinstance(brain, dict) and set(brain) <= {*TUNABLES, *flags})
             ensure(type(brain.get("learning_frozen", True)) is bool)
@@ -76,6 +77,7 @@ def validate_section(section: str, value: Any) -> None:
             )  # PMB: meeting intelligence, opt-in
             ensure(type(brain.get("meeting_guests", False)) is bool)  # PMB-4: meeting links, opt-in
             ensure(type(brain.get("meeting_voice", False)) is bool)  # pi talks in a meeting, opt-in
+            ensure(type(brain.get("meeting_bot", False)) is bool)  # pi joins a call as a bot, opt-in
             ensure(
                 type(brain.get("meeting_pilot", False)) is bool
             )  # pi suggests in a meeting, opt-in

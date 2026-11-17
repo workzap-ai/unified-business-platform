@@ -31,6 +31,7 @@ import {
   approvalEffect,
   BASIS_LABELS,
   clock,
+  CALL_SOURCES,
   INSIGHT_LABELS,
   MEETING_STATUS_LABELS,
   meetingIntelService,
@@ -44,6 +45,7 @@ import { MeetingMap } from "./meeting-map";
 import { MeetingRecorder } from "./meeting-recorder";
 import { MeetingFileImport } from "./meeting-file-import";
 import { MeetingAsk } from "./meeting-ask";
+import { MeetingBotCard } from "./meeting-bot-card";
 import { MeetingInvite } from "./meeting-invite";
 import { MeetingPilot } from "./meeting-pilot";
 import { MeetingPiMode } from "./meeting-pi-mode";
@@ -138,8 +140,14 @@ function Body({ meeting }: { meeting: Detail }) {
   const live = meeting.status === "transcribing";
   // The recorder stays on screen from the first word to the end of the meeting, so a recording in
   // progress is never torn down when the first lines of the transcript arrive.
+  // A call pi joined through the bot service has no microphone to record: its own card shows
+  // where pi is, and the transcript fills as people speak.
+  const inCall = CALL_SOURCES.includes(
+    meeting.source as (typeof CALL_SOURCES)[number],
+  );
   const recording =
     canRecord &&
+    !inCall &&
     (RECORDING_STATES.includes(meeting.status) ||
       (meeting.status === "failed" && !hasTranscript));
   return (
@@ -148,6 +156,7 @@ function Body({ meeting }: { meeting: Detail }) {
       {meeting.status === "failed" && meeting.failure_reason && (
         <Notice tone="danger">{meeting.failure_reason}</Notice>
       )}
+      {inCall && <MeetingBotCard meeting={meeting} />}
       {recording && <MeetingRecorder id={meeting.id} />}
       {recording && !hasTranscript && !live && (
         <MeetingFileImport id={meeting.id} />

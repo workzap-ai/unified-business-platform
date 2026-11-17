@@ -154,9 +154,65 @@ export type NewMeeting = {
   customer_id?: string | null;
 };
 
+/** pi's bot in a Zoom, Meet or Teams call (the provider runs it; see docs/pi-saas/pi-meeting-bot.md). */
+export const BOT_STEPS = [
+  "requested",
+  "joining",
+  "waiting",
+  "recording",
+  "done",
+] as const;
+export const BOT_STATUS_LABELS: Record<string, string> = {
+  requested: "Sending pi to the call",
+  joining: "pi is joining",
+  waiting: "Waiting for the host to let pi in",
+  in_call: "pi is in the call",
+  recording: "pi is listening and taking notes",
+  denied: "The host did not allow recording",
+  ended: "pi has left the call",
+  done: "The call is finished",
+  failed: "pi could not join",
+};
+export const botSchema = z.object({
+  id: z.string(),
+  status: z.string().catch("requested"),
+  active: z.boolean().catch(false),
+  sub_code: z.string().catch(""),
+  host: z.string().catch(""),
+  bot_name: z.string().catch(""),
+  started_at: z.string().nullable().catch(null),
+  ended_at: z.string().nullable().catch(null),
+});
+export type Bot = z.infer<typeof botSchema>;
+export const CALL_SOURCES = ["zoom", "meet", "teams"] as const;
+
 const BASE = "/pi/meeting-intel";
 
 export const meetingIntelService = {
+  // Send pi to a call. The person confirms everyone in the call will be told pi is an AI notetaker.
+  sendBot: (input: {
+    meeting_url: string;
+    title: string;
+    customer_id?: string | null;
+    consent: boolean;
+  }) =>
+    apiRequest(
+      "POST",
+      `${BASE}/bot`,
+      z.object({ meeting: meetingSchema, bot: botSchema }),
+      { body: input },
+    ),
+  bot: (id: string) =>
+    apiRequest(
+      "GET",
+      `${BASE}/${id}/bot`,
+      z.object({
+        bot: botSchema.nullable().catch(null),
+        meeting_status: z.string().catch(""),
+      }),
+    ),
+  leaveBot: (id: string) =>
+    apiRequest("POST", `${BASE}/${id}/bot/leave`, z.object({ bot: botSchema })),
   list: () =>
     apiRequest(
       "GET",

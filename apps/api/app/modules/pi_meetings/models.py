@@ -35,7 +35,19 @@ from sqlalchemy.orm import Mapped, mapped_column
 
 from app.shared.models import WorkspaceRow, scoped_fk, workspace_args
 
-MEETING_SOURCES = ("upload", "browser", "native", "zoom", "meet")
+MEETING_SOURCES = ("upload", "browser", "native", "zoom", "meet", "teams")
+BOT_STATUSES = (
+    "requested",
+    "joining",
+    "waiting",
+    "in_call",
+    "recording",
+    "denied",
+    "ended",
+    "done",
+    "failed",
+)
+BOT_ACTIVE = ("requested", "joining", "waiting", "in_call", "recording")
 MEETING_STATUSES = (
     "created",
     "uploaded",
@@ -127,6 +139,34 @@ class PiMeeting(WorkspaceRow):
     analysis_progress: Mapped[dict[str, Any] | None] = mapped_column(JSONB, nullable=True)
     pi_mode: Mapped[str] = mapped_column(String(8), default="off", server_default="off")
     failure_reason: Mapped[str] = mapped_column(String(300), default="", server_default="")
+    created_by: Mapped[UUID | None] = mapped_column(Uuid, nullable=True)
+
+
+class PiMeetingBot(WorkspaceRow):
+    """pi's bot in someone else's Zoom, Meet or Teams call. The provider (Recall.ai) runs the bot;
+    this row is our record of it: which meeting it belongs to, the provider's id, and where it is
+    (joining, waiting to be let in, recording, done). The meeting link itself is NOT stored (it may
+    carry a passcode): only its host and a hash that stops the same call being joined twice."""
+
+    __tablename__ = "pi_meeting_bots"
+    __table_args__ = workspace_args(
+        "pi_meeting_bots",
+        scoped_fk("pi_meeting_bots", "meeting_id", "pi_meetings"),
+        Index("uq_pi_meeting_bots_external", "provider", "external_id", unique=True),
+        Index("ix_pi_meeting_bots_meeting", "tenant_id", "environment_id", "meeting_id"),
+        Index("ix_pi_meeting_bots_url", "tenant_id", "environment_id", "url_hash", "status"),
+        CheckConstraint(_in("status", BOT_STATUSES), name="status"),
+    )
+    meeting_id: Mapped[UUID] = mapped_column(Uuid)
+    provider: Mapped[str] = mapped_column(String(20))
+    external_id: Mapped[str | None] = mapped_column(String(80), nullable=True)
+    status: Mapped[str] = mapped_column(String(12), default="requested", server_default="requested")
+    sub_code: Mapped[str] = mapped_column(String(80), default="", server_default="")
+    url_hash: Mapped[str] = mapped_column(String(64))
+    host: Mapped[str] = mapped_column(String(80), default="", server_default="")
+    bot_name: Mapped[str] = mapped_column(String(100), default="", server_default="")
+    started_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    ended_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     created_by: Mapped[UUID | None] = mapped_column(Uuid, nullable=True)
 
 
