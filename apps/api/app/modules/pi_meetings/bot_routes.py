@@ -36,7 +36,7 @@ from app.modules.pi_meetings.bot_provider import (
     RecallProvider,
     link_hash,
     parse_meeting_link,
-    verify_signature,
+    verify_any,
 )
 from app.modules.pi_meetings.guest_routes import system_scope
 from app.modules.pi_meetings.models import BOT_ACTIVE, PiMeeting, PiMeetingBot
@@ -296,7 +296,7 @@ async def webhook(request: Request, session: Session) -> dict[str, bool]:
     body = await request.body()
     if secret is None or len(body) > MAX_BODY:
         raise BusinessRuleViolation("RECALL_NOT_CONFIGURED", "Not available", 503)
-    if not verify_signature(secret, dict(request.headers), body):
+    if not verify_any(secret, dict(request.headers), body):
         raise BusinessRuleViolation("RECALL_SIGNATURE_INVALID", "Invalid signature", 401)
     try:
         payload = json.loads(body)

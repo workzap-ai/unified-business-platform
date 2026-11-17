@@ -11,6 +11,7 @@ from app.modules.pi_meetings.bot_provider import (
     link_hash,
     our_status,
     parse_meeting_link,
+    verify_any,
     verify_signature,
 )
 
@@ -114,3 +115,12 @@ def test_everything_else_is_refused(fault):
     elif fault == "bad-secret":
         secret = "whsec_!!!not base64!!!"
     assert verify_signature(secret, h, body) is False
+
+
+def test_several_secrets_may_be_configured_and_any_one_may_match():
+    body = b'{"event":"bot.done"}'
+    other = "whsec_" + base64.b64encode(b"another-secret-key-here-0123456").decode()
+    assert verify_any(f"{other}, {SECRET}", headers(body), body) is True
+    assert verify_any(f"{other} {SECRET}", headers(body), body) is True
+    assert verify_any(other, headers(body), body) is False
+    assert verify_any("", headers(body), body) is False

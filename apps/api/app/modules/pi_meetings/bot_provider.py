@@ -206,6 +206,13 @@ class RecallProvider:
         return str(last.get("code") or ""), str(last.get("sub_code") or "")
 
 
+def verify_any(secrets: str, headers: dict[str, str], payload: bytes) -> bool:
+    """`secrets` may hold several `whsec_` secrets separated by commas or spaces: Recall signs the
+    dashboard's status webhooks and the per-bot transcript webhooks with different secrets on some
+    accounts, and a secret being replaced stays valid for a day. True when any one matches."""
+    return any(verify_signature(one, headers, payload) for one in secrets.replace(",", " ").split())
+
+
 def verify_signature(secret: str, headers: dict[str, str], payload: bytes) -> bool:
     """Is this callback really from the provider? HMAC-SHA256 of `id.timestamp.body` with the
     workspace secret (`whsec_` + base64), compared in constant time against every `v1,<sig>` entry.

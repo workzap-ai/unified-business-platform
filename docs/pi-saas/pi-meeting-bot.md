@@ -22,7 +22,7 @@ pi **listens only**. It does not speak in a call yet (see "Not built").
 | `response_rules.brain.meeting_intel` and `response_rules.brain.meeting_bot` | per workspace, default off |
 | `RECALL_API_KEY` | Railway env (API service). Never in chat or the repo |
 | `RECALL_REGION` | the region the key was created in: `us-west-2` (default), `us-east-1`, `eu-central-1`, `ap-northeast-1` |
-| `RECALL_WEBHOOK_SECRET` | `whsec_...`, from Recall dashboard: Developers, API Keys & Secrets, Create Workspace Secret. Without it the callback route refuses everything |
+| `RECALL_WEBHOOK_SECRET` | one or several `whsec_...` separated by commas (the dashboard endpoint and the per-bot transcript webhook can be signed by different secrets), from Recall dashboard: Developers, API Keys & Secrets, Create Workspace Secret. Without it the callback route refuses everything |
 | `INTEGRATIONS_PUBLIC_BASE_URL` | public https origin of the API; the transcript callback URL is built from it |
 | Recall dashboard webhook endpoint | `https://<api>/api/v1/public/recall/webhook`, events `bot.*`. Optional: without it the page asks Recall for the status itself while pi is in the call, but the end of the call is noticed only when someone has the page open |
 
