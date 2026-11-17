@@ -22,6 +22,9 @@ dependencies = [
   "opencv-python-headless>=4.10,<5",
   # Urdu, Arabic and Persian text in the problem-map picture (shaping, then right-to-left order).
   "arabic-reshaper>=3.0,<4", "python-bidi>=0.6,<1",
+  # Designed meeting documents (docs/pi-saas/pi-meeting-documents.md): the summary PDF (ReportLab,
+  # pure Python, embeds the bundled Noto Naskh font for Urdu) and the editable deck (python-pptx).
+  "reportlab>=4.2,<5", "python-pptx>=1.0,<2",
 ]
 
 [project.optional-dependencies]

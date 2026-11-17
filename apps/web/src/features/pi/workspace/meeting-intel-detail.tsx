@@ -49,6 +49,7 @@ import { MeetingBotCard } from "./meeting-bot-card";
 import { MeetingInvite } from "./meeting-invite";
 import { MeetingPilot } from "./meeting-pilot";
 import { MeetingPiMode } from "./meeting-pi-mode";
+import { MeetingDocuments } from "./meeting-documents";
 import { MeetingShareSummary } from "./meeting-share-summary";
 import { MeetingRecordingPlayer } from "./meeting-recording-player";
 import {
@@ -210,6 +211,7 @@ function Body({ meeting }: { meeting: Detail }) {
               {can("pi.meetings.approve") && (
                 <MeetingShareSummary meeting={meeting} />
               )}
+              <MeetingDocuments meeting={meeting} />
               <Insights meeting={meeting} />
             </div>
           </TabsContent>

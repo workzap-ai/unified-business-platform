@@ -48,6 +48,9 @@ BOT_STATUSES = (
     "failed",
 )
 BOT_ACTIVE = ("requested", "joining", "waiting", "in_call", "recording")
+DOCUMENT_KINDS = ("summary_pdf", "deck_pptx")
+DOCUMENT_STATUSES = ("draft", "approved")
+MAX_DOCUMENT_BYTES = 4_000_000
 MEETING_STATUSES = (
     "created",
     "uploaded",
@@ -168,6 +171,43 @@ class PiMeetingBot(WorkspaceRow):
     started_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     ended_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     created_by: Mapped[UUID | None] = mapped_column(Uuid, nullable=True)
+
+
+class PiMeetingDocument(WorkspaceRow):
+    """A designed document drawn from a meeting's approved insights: the summary PDF or the deck.
+    A draft can be downloaded by the team; only an approved one may be sent to a customer. The
+    bytes are kept here (they are small and made from text the team already approved), apart from
+    the columns a list reads (`data` is deferred), and go with the meeting or the customer."""
+
+    __tablename__ = "pi_meeting_documents"
+    __table_args__ = workspace_args(
+        "pi_meeting_documents",
+        scoped_fk("pi_meeting_documents", "meeting_id", "pi_meetings"),
+        Index(
+            "ix_pi_meeting_documents_meeting",
+            "tenant_id",
+            "environment_id",
+            "meeting_id",
+            "created_at",
+        ),
+        CheckConstraint(_in("kind", DOCUMENT_KINDS), name="kind"),
+        CheckConstraint(_in("status", DOCUMENT_STATUSES), name="status"),
+        CheckConstraint(f"size_bytes BETWEEN 1 AND {MAX_DOCUMENT_BYTES}", name="size"),
+    )
+    meeting_id: Mapped[UUID] = mapped_column(Uuid)
+    kind: Mapped[str] = mapped_column(String(12))
+    status: Mapped[str] = mapped_column(String(10), default="draft", server_default="draft")
+    title: Mapped[str] = mapped_column(String(200), default="", server_default="")
+    language: Mapped[str] = mapped_column(String(4), default="en", server_default="en")
+    size_bytes: Mapped[int] = mapped_column(Integer)
+    # a hash of what the document was drawn from: the same approved content gives the same draft
+    source_hash: Mapped[str] = mapped_column(String(64))
+    insight_count: Mapped[int] = mapped_column(Integer, default=0, server_default="0")
+    dropped_count: Mapped[int] = mapped_column(Integer, default=0, server_default="0")
+    created_by: Mapped[UUID | None] = mapped_column(Uuid, nullable=True)
+    approved_by: Mapped[UUID | None] = mapped_column(Uuid, nullable=True)
+    approved_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    data: Mapped[bytes] = mapped_column(LargeBinary, deferred=True)
 
 
 class PiMeetingParticipant(WorkspaceRow):

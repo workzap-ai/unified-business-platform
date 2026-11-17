@@ -186,6 +186,26 @@ export const botSchema = z.object({
 export type Bot = z.infer<typeof botSchema>;
 export const CALL_SOURCES = ["zoom", "meet", "teams"] as const;
 
+export const DOCUMENT_KINDS = ["summary_pdf", "deck_pptx"] as const;
+export type DocumentKind = (typeof DOCUMENT_KINDS)[number];
+export const DOCUMENT_LABELS: Record<DocumentKind, string> = {
+  summary_pdf: "Summary PDF",
+  deck_pptx: "Deck (PowerPoint)",
+};
+export const documentSchema = z.object({
+  id: z.string(),
+  kind: z.enum(DOCUMENT_KINDS).catch("summary_pdf"),
+  status: z.string().catch("draft"),
+  title: z.string().catch(""),
+  language: z.string().catch("en"),
+  size_bytes: z.number().catch(0),
+  insights_used: z.number().catch(0),
+  lines_left_out: z.number().catch(0),
+  approved_at: z.string().nullable().catch(null),
+  created_at: z.string().nullable().catch(null),
+});
+export type MeetingDocument = z.infer<typeof documentSchema>;
+
 const BASE = "/pi/meeting-intel";
 
 export const meetingIntelService = {
@@ -413,6 +433,30 @@ export const meetingIntelService = {
     ),
   transcriptDownloadHref: (id: string) =>
     `${API_BASE}${BASE}/${id}/transcript/download`,
+  // Designed documents after a meeting (the summary PDF and the deck), drawn from approved findings.
+  documents: (id: string) =>
+    apiRequest(
+      "GET",
+      `${BASE}/${id}/documents`,
+      z.object({ items: z.array(documentSchema).catch([]) }),
+    ),
+  makeDocument: (id: string, kind: DocumentKind) =>
+    apiRequest(
+      "POST",
+      `${BASE}/${id}/documents`,
+      documentSchema.extend({ again: z.boolean().catch(false) }),
+      { body: { kind } },
+    ),
+  approveDocument: (id: string, docId: string) =>
+    apiRequest(
+      "POST",
+      `${BASE}/${id}/documents/${docId}/approve`,
+      documentSchema,
+    ),
+  deleteDocument: (id: string, docId: string) =>
+    apiRequest<void>("DELETE", `${BASE}/${id}/documents/${docId}`, null),
+  documentHref: (id: string, docId: string) =>
+    `${API_BASE}${BASE}/${id}/documents/${docId}/download`,
   // The host's recorder says it has begun: the meeting's clock starts (once). Guests are placed
   // on this clock by the server.
   recordingStarted: (id: string) =>
