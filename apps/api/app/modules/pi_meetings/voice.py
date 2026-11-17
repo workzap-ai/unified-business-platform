@@ -20,8 +20,9 @@ from typing import Any
 
 from pydantic import BaseModel, ConfigDict
 
-from app.modules.pi import constitution
+from app.modules.pi import constitution, shared_memory
 from app.modules.pi.memory_ledger import redacted
+from app.modules.pi_meetings import meeting_memory
 from app.modules.pi_meetings.insight_rules import PRICE
 from app.modules.pi_meetings.pilot import FORBIDDEN_ASK
 from app.shared.scope import WorkspaceScope
@@ -49,6 +50,12 @@ Say the next thing, in the language and script the owner is using (English, Urdu
   password, a code or an ID number. Do not say you will do anything for them.
 - If they ask whether you are a person, say plainly that you are an AI.
 - If they say they are done, thank them in one short sentence and ask nothing."""
+
+MEMORY_NOTE = """
+what_i_know is private context about this person. Use it so they never repeat themselves and to
+ask better questions about their situation. Never read it out like a record, never mention money,
+numbers or other people's names from it, and never say you have a file on them. If it is missing,
+you know nothing about them: ask, do not pretend."""
 
 
 class ModelReply(BaseModel):
@@ -91,9 +98,58 @@ def context(history: Sequence[Said], heard: str) -> dict[str, Any]:
     }
 
 
-def opening() -> str:
-    """pi's first words: the AI disclosure, then the first question."""
+IDENTITY_MARK = "Am I speaking with"
+NOT_THEM = "Sorry about that. Who am I speaking with?"
+# a clear yes or no to "Am I speaking with <name>?", in English, Roman Urdu and Urdu script
+YES = frozenset({"yes", "yeah", "yep", "yup", "correct", "right", "speaking", "haan", "han", "haa"})
+YES |= frozenset({"ji", "jee", "bilkul", "sahi", "ہاں", "جی", "بالکل", "صحیح"})
+# words that may sit around a yes without changing it ("yes, this is me", "ji haan main hi hoon");
+# anything else in the answer (a name, "who", "friend", "kaun") means it is not a plain yes
+FILLER = frozenset({"i", "m", "s", "me", "am", "is", "this", "that", "it", "its", "thats", "main"})
+FILLER |= frozenset({"mein", "mai", "hoon", "hun", "hi", "hai", "ha", "sir", "madam", "maam"})
+FILLER |= frozenset({"please", "ok", "okay", "sure", "thank", "thanks", "میں", "ہوں", "ہی", "ہے"})
+NO = frozenset({"no", "nope", "nah", "not", "nahi", "nahin", "nai", "na", "wrong", "نہیں", "نہ"})
+NO |= frozenset({"brother", "sister", "wife", "husband", "assistant", "colleague", "manager"})
+NO |= frozenset({"employee", "staff", "partner", "bhai", "behan", "beti", "beta", "biwi"})
+WORD = re.compile(r"[^\W\d_]+", re.UNICODE)
+
+
+def opening(name: str = "") -> str:
+    """pi's first words: the AI disclosure, then one question. With a first name the person gave pi
+    before, the question is who it is talking to: the memory is used only after a clear yes."""
+    if name:
+        line = f"Hi, I'm pi, an AI assistant from Workzap. {IDENTITY_MARK} {name}?"
+        if allowed(line, context([], "")) == line:
+            return line
     return constitution.safe_fallback(context([], ""))
+
+
+def classify(reply: str, name: str = "") -> str:
+    """'confirmed', 'denied' or 'unclear' for a reply to the identity question. Fails closed, by
+    allowlist: confirmed only when the answer is a yes and nothing else but filler words and the
+    asked name. Any no or relation word is denied; "Who is speaking?", "yes, I'm Ali" and a
+    mis-heard word are unclear, never confirmed."""
+    words = [w.lower() for w in WORD.findall(reply)]
+    if set(words) & NO:
+        return "denied"
+    permitted = YES | FILLER | ({name.lower()} if name else set())
+    if set(words) & YES and all(w in permitted for w in words):
+        return "confirmed"
+    return "unclear"
+
+
+def confirm_state(history: Sequence["Said"]) -> str:
+    """Who pi is talking to, from the conversation so far: 'none' (pi never asked), 'pending'
+    (asked, not answered), then 'confirmed', 'denied' or 'unclear'. Stateless: it reads the stored
+    lines, so a reload cannot lose or fake it."""
+    first = next((h for h in history if h.pi), None)
+    if first is None or IDENTITY_MARK not in first.text:
+        return "none"
+    answer = next((h for h in history[history.index(first) + 1 :] if not h.pi), None)
+    if answer is None:
+        return "pending"
+    asked = re.search(rf"{IDENTITY_MARK} ([^\W\d_]+)\?", first.text)
+    return classify(answer.text, asked.group(1) if asked else "")
 
 
 def allowed(reply: str, ctx: dict[str, Any]) -> str:
@@ -118,6 +174,7 @@ async def reply_to(
     heard: str,
     *,
     language: str = "",
+    what_i_know: dict[str, Any] | None = None,
 ) -> Spoken:
     """The next thing pi says after `heard`. Never raises for a model that is down: that is the
     safe line, so the conversation does not stop. The first turn is `opening()`, not this."""
@@ -127,17 +184,19 @@ async def reply_to(
     from app.ai.types import Message
 
     ctx = context(history, heard)
-    payload = json.dumps(
-        {
-            "language": language or "unknown",
-            "conversation": [
-                {"who": "pi" if h.pi else "owner", "text": h.text[:LINE_CHARS]}
-                for h in history[-HISTORY_LINES:]
-            ],
-            "owner_just_said": heard[:HEARD_CHARS],
-        },
-        ensure_ascii=False,
-    )
+    block = meeting_memory.speakable(what_i_know or {})
+    seen = " ".join([*(h.text for h in history), heard])
+    body: dict[str, Any] = {
+        "language": language or "unknown",
+        "conversation": [
+            {"who": "pi" if h.pi else "owner", "text": h.text[:LINE_CHARS]}
+            for h in history[-HISTORY_LINES:]
+        ],
+        "owner_just_said": heard[:HEARD_CHARS],
+    }
+    shared_memory.attach(body, block)  # a no-op when there is no memory
+    payload = json.dumps(body, ensure_ascii=False)
+    system = SYSTEM + (MEMORY_NOTE + shared_memory.system_line(block) if block else "")
     value: Any = None
     for attempt in range(len(RETRY_PAUSES) + 1):
         try:
@@ -146,7 +205,7 @@ async def reply_to(
                 ModelReply,
                 alias="fast",
                 purpose=PURPOSE,
-                messages=[Message.system(SYSTEM), Message.user(payload)],
+                messages=[Message.system(system), Message.user(payload)],
                 temperature=0.3,
                 max_tokens=200,
             )
@@ -166,10 +225,11 @@ async def reply_to(
                 and "؟" not in closing
                 and not (PRICE.search(closing) or FORBIDDEN_ASK.search(closing))
                 and not constitution.hard(constitution.lint(closing, ctx))
+                and not meeting_memory.leaks(closing, seen, block)
             ):
                 return Spoken(closing, fallback=False, done=True)
         said = allowed(value.reply, ctx)
-        if said and not _repeats(said, history):
+        if said and not _repeats(said, history) and not meeting_memory.leaks(said, seen, block):
             return Spoken(said, fallback=False)
     return Spoken(constitution.safe_fallback(ctx), fallback=True)
 

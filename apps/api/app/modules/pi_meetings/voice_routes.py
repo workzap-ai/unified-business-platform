@@ -27,7 +27,7 @@ from app.modules.access.dependencies import Scope, Session
 from app.modules.audit.service import record
 from app.modules.pi.configuration import settings_row
 from app.modules.pi.memory_ledger import redacted
-from app.modules.pi_meetings import voice
+from app.modules.pi_meetings import meeting_memory, voice
 from app.modules.pi_meetings.guest_routes import (
     GUEST_MIMES,
     BoundedRoute,
@@ -206,7 +206,9 @@ async def pi_turn(
         if talk:  # a reload: say again what was last said, do not start over
             last = next((h for h in reversed(history) if h.pi), None)
             return {"heard": False, "reply": last.text if last else "", "again": True}
-        words = voice.opening()
+        # a returning customer is asked who is speaking before any memory of them is used
+        name = meeting_memory.first_name(await meeting_memory.load(session, scope, meeting))
+        words = voice.opening(name)
         _add_line(session, scope, meeting.id, pi_id, nxt, words, elapsed, elapsed + 2000)
         meeting.status = "transcribing"
         await _audit(session, scope, meeting.id, heard=False, fallback=False)
@@ -240,17 +242,54 @@ async def pi_turn(
         return {"heard": False, "reply": ""}
     start = max(0, elapsed - (duration_ms or 0))
     _add_line(session, scope, meeting.id, guest.participant_id, nxt, heard, start, elapsed)
-    spoken = await voice.reply_to(manager, scope, history, heard, language=meeting.language)
+    # who is it? Memory is used only after a clear yes to "Am I speaking with <name>?"; a no,
+    # another person, or an unclear answer leaves it unused for the rest of the conversation.
+    who = voice.confirm_state([*history, voice.Said(False, heard)])
+    first_reply = who != "none" and not any(not h.pi for h in history)
+    if who == "denied" and first_reply:
+        spoken = voice.Spoken(voice.NOT_THEM, fallback=False)
+        block: dict[str, Any] = {}
+        # on the transcript this person is 'other', so a reviewer sees it and what they said
+        # is never taken as the customer's own words
+        person = await session.scalar(
+            select(PiMeetingParticipant).where(
+                PiMeetingParticipant.tenant_id == scope.tenant_id,
+                PiMeetingParticipant.environment_id == scope.environment_id,
+                PiMeetingParticipant.id == guest.participant_id,
+            )
+        )
+        if person is not None and person.role == "unknown":
+            person.role = "other"
+    else:
+        block = await meeting_memory.load(session, scope, meeting) if who == "confirmed" else {}
+        spoken = await voice.reply_to(
+            manager, scope, history, heard, language=meeting.language, what_i_know=block
+        )
     _add_line(session, scope, meeting.id, pi_id, nxt + 1, spoken.text, elapsed, elapsed + 2000)
     meeting.status = "transcribing"
     meeting.failure_reason = ""
-    await _audit(session, scope, meeting.id, heard=True, fallback=spoken.fallback)
+    await _audit(
+        session,
+        scope,
+        meeting.id,
+        heard=True,
+        fallback=spoken.fallback,
+        identity=who,
+        memory=bool(meeting_memory.speakable(block)),
+    )
     await session.commit()
     return {"heard": True, "reply": spoken.text, "done": spoken.done, "fallback": spoken.fallback}
 
 
 async def _audit(
-    session: Any, scope: Any, meeting_id: UUID, *, heard: bool, fallback: bool
+    session: Any,
+    scope: Any,
+    meeting_id: UUID,
+    *,
+    heard: bool,
+    fallback: bool,
+    identity: str = "none",
+    memory: bool = False,
 ) -> None:
     await record(
         session,
@@ -258,5 +297,5 @@ async def _audit(
         scope=scope,
         entity_type="pi_meeting",
         entity_id=meeting_id,
-        details={"heard": heard, "fallback": fallback},
+        details={"heard": heard, "fallback": fallback, "identity": identity, "memory": memory},
     )

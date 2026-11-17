@@ -11,7 +11,7 @@ from test_pi_meeting_data import workspace
 from test_pi_meeting_routes import BASE, body
 
 from app.modules.audit.models import AuditEvent
-from app.modules.pi_meetings import pilot, pilot_routes
+from app.modules.pi_meetings import meeting_memory, pilot, pilot_routes
 
 pytestmark = pytest.mark.integration
 TRANSCRIPT = "Customer: our evening stock keeps running out\nStaff: I see\nCustomer: every week"
@@ -122,4 +122,27 @@ async def test_refusals_and_a_provider_that_is_down(api, business_db, model):
     model.fail = True
     down = await api.post(f"{BASE}/{mid}/pilot/suggest", json={"checklist": []})
     assert down.status_code == 502 and down.json()["error"]["code"] == "MEETING_PILOT_UNAVAILABLE"
+    await pi.close()
+
+
+async def test_the_suggestion_knows_the_customer_when_the_meeting_is_linked(
+    api, business_db, model, monkeypatch
+):
+    pi, conv, scope = await workspace(api, business_db, "367000005")
+    await switch(api)
+    known = {
+        "records": [{"kind": "problem", "status": "owner_said", "text": "P1 stock", "source": "x"}]
+    }
+
+    async def fake(session, scope, meeting):
+        return known if meeting.customer_id is not None else {}
+
+    monkeypatch.setattr(meeting_memory, "load", fake)
+    linked = (await api.post(BASE, json=body(customer_id=str(conv.customer_id)))).json()["id"]
+    await api.post(f"{BASE}/{linked}/transcript", json={"text": TRANSCRIPT})
+    await api.post(f"{BASE}/{linked}/pilot/suggest", json={"checklist": ["problem"]})
+    assert model.seen[-1]["what_i_know"]["records"][0]["text"] == "P1 stock"
+    stranger = await meeting(api)  # a meeting linked to nobody: nothing is known, nothing is shown
+    await api.post(f"{BASE}/{stranger}/pilot/suggest", json={"checklist": ["problem"]})
+    assert "what_i_know" not in model.seen[-1]
     await pi.close()

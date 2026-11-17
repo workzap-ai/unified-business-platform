@@ -18,7 +18,7 @@ from app.modules.access.dependencies import Scope, Session
 from app.modules.audit.service import record
 from app.modules.pi.configuration import settings_row
 from app.modules.pi.problem_models import PiProblem
-from app.modules.pi_meetings import pilot
+from app.modules.pi_meetings import meeting_memory, pilot
 from app.modules.pi_meetings.models import PiMeetingParticipant, PiMeetingSegment
 from app.modules.pi_meetings.qa import Line
 from app.modules.pi_meetings.routes import _gate, _meeting
@@ -94,7 +94,13 @@ async def suggest(
     else:
         try:
             result = await pilot.suggest(
-                manager, scope, lines, items, known=known, language=meeting.language
+                manager,
+                scope,
+                lines,
+                items,
+                known=known,
+                language=meeting.language,
+                memory=await meeting_memory.load(session, scope, meeting),
             )
         except pilot.PilotFailed:
             raise BusinessRuleViolation(

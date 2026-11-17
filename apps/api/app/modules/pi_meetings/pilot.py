@@ -17,7 +17,9 @@ from typing import Any
 
 from pydantic import BaseModel, ConfigDict, Field
 
+from app.modules.pi import shared_memory
 from app.modules.pi.memory_ledger import redacted
+from app.modules.pi_meetings import meeting_memory
 from app.modules.pi_meetings.insight_rules import PRICE
 from app.modules.pi_meetings.qa import Line
 from app.shared.scope import WorkspaceScope
@@ -130,25 +132,30 @@ def acceptable_question(text: str, said: Sequence[str]) -> str:
 
 
 def _payload(
-    part: Sequence[Line], items: Sequence[str], known: Sequence[str], language: str
+    part: Sequence[Line],
+    items: Sequence[str],
+    known: Sequence[str],
+    language: str,
+    memory: dict[str, Any] | None = None,
 ) -> str:
-    return json.dumps(
-        {
-            "language": language or "unknown",
-            "checklist": [{"item": i, "text": t} for i, t in enumerate(items)],
-            "known_problems": list(known)[:MAX_KNOWN],
-            "transcript": [
-                {
-                    "line": x.ordinal,
-                    "speaker": x.speaker or "Speaker",
-                    "role": x.role,
-                    "text": x.text[:LINE_CHARS],
-                }
-                for x in part
-            ],
-        },
-        ensure_ascii=False,
-    )
+    body: dict[str, Any] = {
+        "language": language or "unknown",
+        "checklist": [{"item": i, "text": t} for i, t in enumerate(items)],
+        "known_problems": list(known)[:MAX_KNOWN],
+        "transcript": [
+            {
+                "line": x.ordinal,
+                "speaker": x.speaker or "Speaker",
+                "role": x.role,
+                "text": x.text[:LINE_CHARS],
+            }
+            for x in part
+        ],
+    }
+    # what pi already knows about this customer (the staff see this customer's record anyway):
+    # so the next question is not one the customer already answered in an earlier chat or meeting
+    shared_memory.attach(body, memory or {})
+    return json.dumps(body, ensure_ascii=False)
 
 
 async def suggest(
@@ -159,12 +166,14 @@ async def suggest(
     *,
     known: Sequence[str] = (),
     language: str = "",
+    memory: dict[str, Any] | None = None,
 ) -> Suggestion:
     """The next question and the checklist so far. Raises `PilotFailed`."""
     from app.ai.errors import GatewayUnavailable
     from app.ai.types import Message
 
     part = recent(lines)
+    memory = meeting_memory.speakable(memory or {})
     value: Any = None
     for attempt in range(len(RETRY_PAUSES) + 1):
         try:
@@ -174,8 +183,8 @@ async def suggest(
                 alias="fast",
                 purpose=PURPOSE,
                 messages=[
-                    Message.system(SYSTEM),
-                    Message.user(_payload(part, items, known, language)),
+                    Message.system(SYSTEM + shared_memory.system_line(memory or {})),
+                    Message.user(_payload(part, items, known, language, memory)),
                 ],
                 temperature=0.2,
                 max_tokens=400,
@@ -197,4 +206,8 @@ async def suggest(
             checklist[cover.item].done = True
             checklist[cover.item].refs = refs[:4]
     recent_team = [x.text for x in part[-6:]]
-    return Suggestion(acceptable_question(value.question, recent_team), checklist, len(part))
+    question = acceptable_question(value.question, recent_team)
+    seen = " ".join(x.text for x in part)
+    if question and meeting_memory.leaks(question, seen, memory):
+        question = ""  # a number or a name from memory the team never said is not suggested
+    return Suggestion(question, checklist, len(part))
