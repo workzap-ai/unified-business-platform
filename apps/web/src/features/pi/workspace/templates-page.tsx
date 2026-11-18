@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { FileText, Pencil, Plus, Send, Users } from "lucide-react";
+import { FileText, Layers, Pencil, Plus, Send, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge, Card, CardBody } from "@/components/ui/display";
 import { Input, NativeSelect, Textarea } from "@/components/ui/input";
@@ -27,6 +27,7 @@ import {
   type Template,
 } from "../templates-service";
 import { BulkDialog, HistoryView } from "./templates-bulk";
+import { NORI_SET, SetDialog, type PresetTemplate } from "./templates-set";
 
 const KEY = [["pi", "templates"]];
 
@@ -42,32 +43,9 @@ const STATUS_TONE: Record<
   DISABLED: "danger",
 };
 
-/** Starting points. Wording follows pi's rules: says it is an AI, one question at the end. */
-const PRESETS: (NewTemplate & { label: string })[] = [
-  {
-    label: "Nori welcome (English)",
-    name: "nori_welcome_en",
-    language: "en_US",
-    category: "UTILITY",
-    body: "Hello {{1}}, welcome to nori. I'm pi, an AI assistant from Workzap. I can answer questions about your workspace and pass your requests to the Workzap team. What would you like help with first?",
-    examples: ["Ayesha"],
-  },
-  {
-    label: "Nori welcome (Roman Urdu)",
-    name: "nori_welcome_ur",
-    language: "en_US",
-    category: "UTILITY",
-    body: "Assalam o Alaikum {{1}}, nori mein khush aamdeed. Main pi hoon, Workzap ka AI assistant. Main aap ke workspace ke sawalon ka jawab de sakta hoon aur aap ki zaroorat Workzap team tak pohancha sakta hoon. Aap sab se pehle kis cheez mein madad chahte hain?",
-    examples: ["Ayesha"],
-  },
-  {
-    label: "Trial ending reminder",
-    name: "nori_trial_reminder",
-    language: "en_US",
-    category: "UTILITY",
-    body: "Hello {{1}}, this is pi, an AI assistant from Workzap. The trial for {{2}} ends on {{3}}. Would you like help choosing a plan in nori?",
-    examples: ["Ayesha", "Mendeez Demo", "20 November"],
-  },
+/** Starting points: the recommended Nori set, then a blank one. */
+const PRESETS: PresetTemplate[] = [
+  ...NORI_SET,
   {
     label: "Blank",
     name: "",
@@ -100,6 +78,7 @@ function TemplatesView() {
   const [chosen, setChosen] = useState("");
   const [tab, setTab] = useState<"templates" | "history">("templates");
   const [bulk, setBulk] = useState(false);
+  const [set, setSet] = useState(false);
   const templates = list.data?.templates ?? [];
   const sendable = templates.filter(
     (t) => t.status === "APPROVED" && t.fillable,
@@ -112,6 +91,9 @@ function TemplatesView() {
         actions={
           manage ? (
             <>
+              <Button variant="secondary" onClick={() => setSet(true)}>
+                <Layers /> Nori set
+              </Button>
               <Button variant="secondary" onClick={() => setBulk(true)}>
                 <Users /> Send to many
               </Button>
@@ -230,6 +212,7 @@ function TemplatesView() {
         </div>
       )}
       {creating && <CreateDialog onClose={() => setCreating(false)} />}
+      {set && <SetDialog existing={templates} onClose={() => setSet(false)} />}
       {bulk && (
         <BulkDialog sendable={sendable} onClose={() => setBulk(false)} />
       )}
