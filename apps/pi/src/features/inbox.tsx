@@ -57,7 +57,7 @@ import {
   SentPicture,
 } from "@/features/message-media";
 import { MessageNotes } from "@/features/message-notes";
-import { useLiveConnected } from "@/lib/live";
+import { LiveDot, useLiveConnected } from "@/lib/live";
 import { useAction, useBusinessKey, useCan, useSession } from "@/lib/session";
 import type {
   Conversation,
@@ -150,6 +150,7 @@ export function InboxPage() {
               >
                 Handoffs
               </Link>
+              <LiveDot className="me-2" />
               <IncomingSoundToggle className="me-2" />
               <span>
                 <InboxIcon size={17} aria-hidden />

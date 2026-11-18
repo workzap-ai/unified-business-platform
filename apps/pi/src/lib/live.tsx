@@ -25,6 +25,24 @@ const SILENCE_MS = 40_000; // the server pings every 15 s; this long without a w
 
 const LiveContext = React.createContext(false);
 
+/** A small "Live" mark for headers: shown only while the live stream is confirmed alive. */
+export function LiveDot({ className }: { className?: string }) {
+  const live = useLiveConnected();
+  if (!live) return null;
+  return (
+    <span
+      title="Live: new messages appear as they arrive"
+      className={
+        "inline-flex items-center gap-1 rounded-full bg-success-soft px-2 py-0.5 text-[11px] font-medium text-foreground " +
+        (className ?? "")
+      }
+    >
+      <span className="size-1.5 rounded-full bg-success" aria-hidden />
+      Live
+    </span>
+  );
+}
+
 /** True while the live stream is confirmed alive (callers slow their polling down). */
 export function useLiveConnected(): boolean {
   return React.useContext(LiveContext);
@@ -50,11 +68,36 @@ export function LiveEventsProvider({
     let failures = 0;
     let watchdog: ReturnType<typeof setTimeout> | undefined;
 
-    const refresh = () => {
+    // How long the screen took from hearing a signal to showing the data (sampled, numbers only).
+    let heardAt: number | null = null;
+    let heardLag = 0;
+    let lastReport = 0;
+    const report = (screenMs: number, lagMs: number) => {
+      const now = Date.now();
+      if (now - lastReport < 10_000) return; // at most one sample every ten seconds
+      lastReport = now;
+      void api("POST", "/pi/events/timing", {
+        lag_ms: Math.min(600_000, Math.round(lagMs)),
+        screen_ms: Math.min(600_000, Math.round(screenMs)),
+      }).catch(() => undefined);
+    };
+    const refresh = (lagMs?: number) => {
+      if (lagMs !== undefined && heardAt === null) {
+        heardAt = performance.now();
+        heardLag = lagMs;
+      }
       clearTimeout(debounce);
       debounce = setTimeout(() => {
-        for (const k of REFRESH_KEYS)
-          void client.invalidateQueries({ queryKey: key([k]) });
+        const started = heardAt;
+        const lag = heardLag;
+        heardAt = null;
+        void Promise.all(
+          REFRESH_KEYS.map((k) =>
+            client.invalidateQueries({ queryKey: key([k]) }),
+          ),
+        ).then(() => {
+          if (started !== null) report(performance.now() - started, lag);
+        });
       }, 400);
     };
     const close = () => {
@@ -118,9 +161,16 @@ export function LiveEventsProvider({
           alive();
           setConnected(live(event));
         });
-        source.addEventListener("change", () => {
+        source.addEventListener("change", (event) => {
           alive();
-          refresh();
+          let lag: number | undefined;
+          try {
+            const sent = JSON.parse((event as MessageEvent<string>).data);
+            if (typeof sent?.lag_ms === "number") lag = sent.lag_ms;
+          } catch {
+            /* a change with no lag still refreshes */
+          }
+          refresh(lag);
         });
         source.addEventListener("busy", failed);
         // The server ends each stream after about a minute; the browser must not reconnect with

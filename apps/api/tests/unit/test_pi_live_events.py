@@ -75,7 +75,9 @@ class Recorder:
 async def test_publish_sends_one_kind_on_the_workspace_channel() -> None:
     redis = Recorder()
     assert await live_events.publish(redis, settings(), TENANT, ENV, "inbox")
-    assert redis.sent == [(live_events.channel(TENANT, ENV), "inbox")]
+    [(name, data)] = redis.sent
+    assert name == live_events.channel(TENANT, ENV)
+    assert live_events.split_signal(data)[0] == "inbox"  # "inbox|<epoch ms>"
 
 
 async def test_publish_does_nothing_when_off_or_without_redis_or_for_a_strange_kind() -> None:
@@ -240,4 +242,6 @@ async def test_fire_delivers_in_the_background() -> None:
     redis = Recorder()
     live_events.fire(redis, settings(), TENANT, ENV, "handoff")
     await live_events.drain()
-    assert redis.sent == [(live_events.channel(TENANT, ENV), "handoff")]
+    [(name, data)] = redis.sent
+    assert name == live_events.channel(TENANT, ENV)
+    assert live_events.split_signal(data)[0] == "handoff"

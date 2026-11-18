@@ -147,9 +147,9 @@ async def test_a_staff_action_publishes_and_a_redis_failure_changes_nothing(
     assert recorder.sent == []
     assert (await api.post(f"{url}/takeover")).json()["mode"] == "human"
     await live_events.drain()
-    assert recorder.sent == [
-        (live_events.channel(UUID(pi.tenant_id), UUID(pi.environment_id)), "inbox")
-    ]
+    [(name, data)] = recorder.sent
+    assert name == live_events.channel(UUID(pi.tenant_id), UUID(pi.environment_id))
+    assert live_events.split_signal(data)[0] == "inbox"
     pi.app.state.redis = Recorder(fail=True)  # Redis down: the action still works
     assert (await api.post(f"{url}/return-to-ai")).json()["mode"] == "ai"
     await pi.close()
@@ -170,7 +170,9 @@ async def test_a_message_and_its_reply_are_unchanged_and_signal_when_on(
     pi.ctx["redis"] = on
     await pi.process("hello again", "wamid.ev-on")
     await live_events.drain()
-    assert len(on.sent) >= 1 and {kind for _, kind in on.sent} == {"inbox"}
+    assert len(on.sent) >= 1 and {live_events.split_signal(data)[0] for _, data in on.sent} == {
+        "inbox"
+    }
     assert len(await pi.outbound()) > replies_off  # the reply is produced exactly as before
     before = len(on.sent)
     await pi.deliver_all()
@@ -179,4 +181,83 @@ async def test_a_message_and_its_reply_are_unchanged_and_signal_when_on(
     pi.ctx["redis"] = Recorder(fail=True)
     await pi.process("and once more", "wamid.ev-fail")  # a broken Redis never breaks a message
     await live_events.drain()
+    await pi.close()
+
+
+class PipeRecorder(Recorder):
+    """A Recorder that also takes the pipeline calls the timing samples use."""
+
+    def __init__(self) -> None:
+        super().__init__()
+        self.ops: list[tuple[Any, ...]] = []
+
+    def pipeline(self) -> Any:
+        parent = self
+        queued: list[tuple[Any, ...]] = []
+
+        class Pipe:
+            def lpush(self, key: str, value: str) -> "Pipe":
+                queued.append(("lpush", key, value))
+                return self
+
+            def ltrim(self, key: str, start: int, stop: int) -> "Pipe":
+                queued.append(("ltrim", key, start, stop))
+                return self
+
+            def expire(self, key: str, seconds: int) -> "Pipe":
+                queued.append(("expire", key, seconds))
+                return self
+
+            async def execute(self) -> list[Any]:
+                parent.ops.extend(queued)
+                return []
+
+        return Pipe()
+
+    async def exists(self, key: str) -> int:
+        return 1
+
+    async def lrange(self, key: str, start: int, stop: int) -> list[bytes]:
+        return [op[2].encode() for op in self.ops if op[0] == "lpush"]
+
+
+async def test_the_speed_report_times_a_real_reply_and_holds_no_text_or_ids(
+    api: httpx.AsyncClient, business_db: Any, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    pi = await pi_workspace(api, business_db)
+    scripted_gateway(monkeypatch, lambda text: intent("greeting", 1.0))
+    await pi.process("hello there", "wamid.speed-1")
+    await pi.deliver_all()
+    response = await api.get("/api/v1/pi/events/speed", params={"hours": 24})
+    assert response.status_code == 200, response.text
+    body = response.json()
+    assert body["replies"]["replies"] >= 1 and body["replies"]["with_send_timing"] >= 1
+    total = body["replies"]["total_s"]
+    assert total is not None and 0 <= total["p50"] <= total["p90"] <= total["max"]
+    stages = body["replies"]["stages_s"]
+    assert {"thinking", "queue_to_sender", "sending"} <= set(stages)
+    assert body["live"]["enabled"] is False  # the flag is off here
+    assert "hello there" not in response.text and pi.tenant_id not in response.text
+    assert (await api.get("/api/v1/pi/events/speed", params={"hours": 0})).status_code == 422
+    assert (await api.get("/api/v1/pi/events/speed", params={"hours": 999})).status_code == 422
+    await pi.close()
+
+
+async def test_a_timing_sample_is_kept_only_when_live_events_are_on_and_must_be_numbers(
+    api: httpx.AsyncClient, business_db: Any
+) -> None:
+    pi = await pi_workspace(api, business_db)
+    store = PipeRecorder()
+    pi.app.state.redis = store
+    url = "/api/v1/pi/events/timing"
+    assert (await api.post(url, json={"lag_ms": 40, "screen_ms": 700})).status_code == 204
+    assert store.ops == []  # off: nothing is kept
+    turn_on(pi)
+    assert (await api.post(url, json={"lag_ms": 40, "screen_ms": 700})).status_code == 204
+    assert [op[0] for op in store.ops] == ["lpush", "ltrim", "expire"]
+    assert (await api.post(url, json={"lag_ms": -1, "screen_ms": 5})).status_code == 422
+    assert (await api.post(url, json={"lag_ms": 1, "screen_ms": 5, "name": "x"})).status_code == 422
+    live = (await api.get("/api/v1/pi/events/speed")).json()["live"]
+    assert live["enabled"] and live["publishing"] and live["samples"] == 1
+    assert live["total_ms"]["max"] == 740
     await pi.close()

@@ -54,8 +54,10 @@ async def publish(
     if redis is None or kind not in KINDS or not enabled(settings):
         return False
     try:
+        # "kind|epoch ms": the stream turns the time into how long the signal waited (speed.py)
         await asyncio.wait_for(
-            redis.publish(channel(tenant_id, environment_id), kind), PUBLISH_TIMEOUT
+            redis.publish(channel(tenant_id, environment_id), f"{kind}|{int(time.time() * 1000)}"),
+            PUBLISH_TIMEOUT,
         )
         return True
     except Exception:  # noqa: BLE001 - a missed signal only means the next poll finds it
@@ -186,8 +188,22 @@ def status_frame(event: str, live: bool) -> str:
     return f"event: {event}\ndata: {json.dumps({'live': live})}\n\n"
 
 
-def frame(kind: str) -> str:
-    return f"event: change\ndata: {json.dumps({'kind': kind})}\n\n"
+def frame(kind: str, lag_ms: int | None = None) -> str:
+    """One change event. ``lag_ms`` is how long the signal waited between being published and
+    being written to the stream (server clock only), so the speed report can say where time goes."""
+    body: dict[str, Any] = {"kind": kind}
+    if lag_ms is not None:
+        body["lag_ms"] = lag_ms
+    return f"event: change\ndata: {json.dumps(body)}\n\n"
+
+
+def split_signal(raw: str, *, now_ms: int | None = None) -> tuple[str, int | None]:
+    """("inbox", lag) from "inbox|1700000000000"; a bare "inbox" has no lag."""
+    kind, _, stamp = raw.partition("|")
+    if not stamp.isdigit():
+        return kind, None
+    current = now_ms if now_ms is not None else int(time.time() * 1000)
+    return kind, max(0, current - int(stamp))
 
 
 async def stream(
@@ -205,9 +221,9 @@ async def stream(
             now = time.monotonic()
             if message and message.get("type") == "message":
                 data = message.get("data")
-                kind = data.decode() if isinstance(data, bytes) else str(data)
+                kind, lag = split_signal(data.decode() if isinstance(data, bytes) else str(data))
                 if kind in KINDS:
-                    yield frame(kind)
+                    yield frame(kind, lag)
                     last_beat = now
             elif now - last_beat >= HEARTBEAT_SECONDS:
                 # an event, not a comment: the screen sees it, and learns if anyone is publishing

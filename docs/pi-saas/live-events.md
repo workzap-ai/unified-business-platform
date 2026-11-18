@@ -64,3 +64,23 @@ A blocked number (see blocklist.md) never reaches this point.
   watchdog above is what protects the screen if it does not.
 - The Owner OS web inbox still polls (`apps/web`); it can use the same endpoints.
 - `handoff` events exist in the stream but nothing publishes them yet.
+
+
+## Speed: how many seconds, and where they go
+
+`GET /pi/events/speed?hours=24` (pi app: Health, Speed card) reports aggregates only, no text, name,
+number or id:
+
+- **Reply speed**, from rows pi already keeps (`pi_agent_runs`, the message rows and
+  `media.send_timing`): the time from the customer's message being saved to pi's reply leaving
+  (typical and slowest 1 in 10), split into: waiting for the customer to finish (the burst pause),
+  pi thinking, the reply waiting for the sender, sending to WhatsApp, and WhatsApp delivering.
+  Replies sent before `send_timing` was recorded count only in the stages that do not need it.
+- **Live-update speed**, from samples the open screens report after each event
+  (`POST /pi/events/timing`, one every ten seconds at most, kept in Redis, last 300, seven days):
+  how long the signal waited on the server (`lag_ms`, one clock) and how long the screen took from
+  hearing it to showing the data (`screen_ms`, includes the 0.4 s wait that groups bursts).
+  Shown only while live events are on; a "Live" mark in the inbox header says the stream is alive.
+
+Not measured: the time between the customer pressing send and the webhook reaching pi (WhatsApp's
+side), and the network time between the server and the browser.

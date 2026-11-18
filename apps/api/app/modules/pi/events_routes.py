@@ -12,11 +12,12 @@ from typing import Any
 
 from fastapi import APIRouter, Query, Request
 from fastapi.responses import Response, StreamingResponse
+from pydantic import BaseModel, ConfigDict, Field
 from redis.asyncio import Redis
 
 from app.core.rate_limit import hit
 from app.modules.access.dependencies import Scope, Session
-from app.modules.pi import live_events
+from app.modules.pi import live_events, speed
 from app.modules.pi.service import require_pi
 from app.shared.errors import BusinessRuleViolation
 
@@ -93,3 +94,45 @@ async def stream(request: Request, ticket: str = Query(max_length=400)) -> Respo
             "Connection": "keep-alive",
         },
     )
+
+
+class Timing(BaseModel):
+    """One sample from an open screen: how long the server held the signal and how long the screen
+    took from hearing it to showing the data. Numbers only."""
+
+    model_config = ConfigDict(extra="forbid")
+    lag_ms: int = Field(ge=0, le=speed.MAX_MS)
+    screen_ms: int = Field(ge=0, le=speed.MAX_MS)
+
+
+@router.post("/timing", status_code=204)
+async def timing(data: Timing, request: Request, scope: Scope, session: Session) -> Response:
+    await require_pi(session, scope, "pi.read")
+    if live_events.enabled(request.app.state.settings) and await hit(
+        request, "pi-events-timing", str(scope.user_id), 12, 60
+    ):
+        await speed.record_timing(
+            request.app.state.redis,
+            scope.tenant_id,
+            scope.environment_id,
+            data.lag_ms,
+            data.screen_ms,
+        )
+    return Response(status_code=204)
+
+
+@router.get("/speed")
+async def speed_report(
+    request: Request,
+    scope: Scope,
+    session: Session,
+    hours: int = Query(24, ge=1, le=168),
+) -> dict[str, Any]:
+    """How fast pi answers (from stored rows) and how fast open screens hear about it (from their
+    samples), in aggregates only."""
+    await require_pi(session, scope, "pi.read")
+    replies = await speed.reply_stats(session, scope, hours)
+    live = await speed.live_stats(
+        request.app.state.redis, request.app.state.settings, scope.tenant_id, scope.environment_id
+    )
+    return {"replies": replies, "live": live}
