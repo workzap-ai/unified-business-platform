@@ -103,6 +103,24 @@ export const NORI_SET: PresetTemplate[] = [
     examples: ["Ayesha", "Mendeez Demo", "120"],
   },
   {
+    // Asked for by the nori team (sent through POST /api/pi/nori-send). Language "en", as they
+    // asked; nori folds the value to one line.
+    label: "Nori notice (credits and alerts)",
+    name: "nori_notice",
+    language: "en",
+    category: "UTILITY",
+    body: "Update from your nori workspace: {{1}} Open nori to see the details.",
+    examples: ["Your credits balance is low: 40 credits left."],
+  },
+  {
+    label: "Nori team replied",
+    name: "nori_team_reply",
+    language: "en",
+    category: "UTILITY",
+    body: "The Workzap team has replied to your message in your nori workspace. Sign in to nori and open Help Center, then Conversations, to read it.",
+    examples: [],
+  },
+  {
     label: "Credits running low (Roman Urdu)",
     name: "nori_credits_low_ur",
     language: EN,
