@@ -77,6 +77,7 @@ from app.modules.pi_saas.models import (
     PiTicket,
 )
 from app.modules.pi_saas.nori_board.models import PiNoriItem
+from app.modules.pi_saas.template_sends import PiTemplateSend
 from app.shared.scope import WorkspaceScope
 
 logger = logging.getLogger(__name__)
@@ -117,6 +118,7 @@ REMOVED_KEYS = (
     "tasks_cleared",
     "nori_cards_cleared",
     "nori_cards_unlinked",
+    "template_sends_deleted",
     "documents_text_cleared",
     "share_links_deleted",
     "decisions",
@@ -295,6 +297,21 @@ async def _erase_workspace_texts(
             update(PiNoriItem)
             .where(*mine(PiNoriItem), PiNoriItem.conversation_id.in_(conversation_ids))
             .values(conversation_id=None, person="", phone_mask=""),
+        ),
+        (
+            # The Templates page's history keeps a number, a name and values: gone with them.
+            "template_sends_deleted",
+            delete(PiTemplateSend).where(
+                *mine(PiTemplateSend),
+                or_(
+                    PiTemplateSend.conversation_id.in_(conversation_ids),
+                    PiTemplateSend.phone.in_(
+                        select(PiConversation.contact_wa_id).where(
+                            *mine(PiConversation), PiConversation.id.in_(conversation_ids)
+                        )
+                    ),
+                ),
+            ),
         ),
         (
             "documents_text_cleared",

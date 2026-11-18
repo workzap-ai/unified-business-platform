@@ -31,6 +31,7 @@ from app.modules.pi_saas.meeting_board import remind_upcoming as remind_meetings
 from app.modules.pi_saas.team_alerts import remind_due as remind_team_due
 from app.modules.pi_saas.team_alerts import send_team_alert
 from app.modules.pi_saas.team_board import sweep as sweep_team_board
+from app.modules.pi_saas.template_sends import sweep_template_sends
 
 
 async def health_probe(ctx: dict[str, Any]) -> str:
@@ -42,6 +43,7 @@ JOB_FUNCTIONS: dict[str, Callable[..., Awaitable[Any]]] = {
     "health_probe": health_probe,
     "process_pi_event": process_pi_event,
     "sweep_pi_campaigns": sweep_campaigns,
+    "sweep_template_sends": sweep_template_sends,
     "sweep_pi_digests": sweep_digests,
     "send_pi_message": send_pi_message,
     "sweep_pi": sweep_pi,
@@ -115,6 +117,7 @@ class WorkerSettings:
         cron(sweep_pi_saas, second={40}, unique=True),
         cron(sweep_pi_calendar, second={5, 35}, unique=True),
         cron(sweep_campaigns, second={25, 55}, unique=True),
+        cron(sweep_template_sends, second={10, 40}, unique=True),
         cron(sweep_digests, minute={7, 37}, second=45, unique=True),
         cron(pi_health_heal, minute=set(range(3, 60, 5)), second=15, unique=True),
         cron(pi_health_self_test, minute={23}, second=0, unique=True),

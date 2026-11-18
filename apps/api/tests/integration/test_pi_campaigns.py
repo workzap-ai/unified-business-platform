@@ -268,3 +268,240 @@ async def test_campaigns_stop_at_the_monthly_message_allowance(app, provider, bu
     result = (await client.get(f"{base}/campaigns/{campaign}")).json()
     assert result["status"] == "sending" and result["results"]["waiting"] == 1
     await client.aclose()
+
+
+async def test_bulk_template_send_queues_checks_sends_a_few_and_keeps_history(
+    app, provider, business_db, monkeypatch
+):
+    from app.modules.pi_saas import template_sends
+
+    monkeypatch.setattr(template_sends, "quiet_now", lambda *a, **k: False)
+    client, _view = await _ready_business(app, provider, business_db, "Bulk Co", "4545454545")
+    base = "/api/v1/pi-app/pi/whatsapp/templates"
+    provider.templates.append(
+        {
+            "id": "777001",
+            "name": "nori_welcome_en",
+            "language": "en_US",
+            "status": "APPROVED",
+            "category": "UTILITY",
+            "components": [{"type": "BODY", "text": "Hello {{1}}, welcome to nori."}],
+        }
+    )
+    rows = [
+        {"phone": "+92 300 1111111", "person": "Ayesha", "values": ["Ayesha"]},
+        {
+            "phone": "0300-2222222",
+            "person": "Bilal",
+            "values": ["Bilal"],
+        },  # written locally, no country code
+        {"phone": "923003333333", "person": "Chand", "values": ["Chand"]},
+        {"phone": "923003333333", "person": "Chand again", "values": ["Chand"]},  # listed twice
+        {"phone": "923004444444", "person": "Dana", "values": []},  # a value is missing
+        {"phone": "not a number", "values": ["x"]},
+    ]
+    body = {"name": "nori_welcome_en", "language": "en_US", "rows": rows, "source": "paste"}
+    # consent is required, with a note saying how they agreed
+    assert (await client.post(f"{base}/batches", json=body)).status_code == 422
+    assert (
+        await client.post(f"{base}/batches", json={**body, "consent": True, "consent_note": ""})
+    ).status_code == 422
+    made = await client.post(
+        f"{base}/batches",
+        json={**body, "consent": True, "consent_note": "Signed up on the nori site"},
+    )
+    assert made.status_code == 201, made.text
+    result = made.json()
+    assert result["queued"] == 2 and result["daily_cap"] == 200
+    reasons = {r["phone"]: r["reason"] for r in result["rejected"]}
+    assert reasons["923003333333"] == "Listed twice"
+    assert reasons["0300-2222222"].startswith("Add the country code")
+    assert reasons["923004444444"].startswith("Needs 1 value")
+    assert provider.sent_messages == []  # queueing sends nothing
+
+    queued = (await client.get(f"{base}/sends")).json()["items"]
+    assert sorted(i["status"] for i in queued) == ["queued", "queued"]
+
+    ctx = {**worker_ctx(app, business_db), "queue": provider.queue}
+    await template_sends.sweep_template_sends(ctx)
+    await _run_jobs(app, provider, business_db)
+    sends = _template_sends(provider)
+    assert sorted(s["to"] for s in sends) == ["923001111111", "923003333333"]
+    assert sends[0]["template"]["components"][0]["parameters"][0]["text"] in {"Ayesha", "Chand"}
+    history = (await client.get(f"{base}/sends")).json()["items"]
+    assert {i["phone"] for i in history} == {"923001111111", "923003333333"}
+    assert all(i["status"] in {"sent", "delivered"} for i in history)
+    assert all(i["conversation_id"] for i in history)  # the reply will land in the inbox
+    assert (
+        len((await client.get(f"{base}/sends", params={"phone": "1111111"})).json()["items"]) == 1
+    )
+    await template_sends.sweep_template_sends(ctx)  # a second sweep sends nothing again
+    await _run_jobs(app, provider, business_db)
+    assert len(_template_sends(provider)) == 2
+    await client.aclose()
+
+
+async def test_bulk_template_send_skips_opted_out_cancels_and_respects_the_daily_cap(
+    app, provider, business_db, monkeypatch
+):
+    from app.modules.pi_saas import template_sends
+
+    monkeypatch.setattr(template_sends, "quiet_now", lambda *a, **k: False)
+    client, _view = await _ready_business(app, provider, business_db, "Cap Co", "4646464646")
+    base = "/api/v1/pi-app/pi/whatsapp/templates"
+    provider.templates.append(
+        {
+            "id": "777002",
+            "name": "plain_hello",
+            "language": "en_US",
+            "status": "APPROVED",
+            "category": "UTILITY",
+            "components": [{"type": "BODY", "text": "Hello from Workzap."}],
+        }
+    )
+    await _kapso(
+        client,
+        "whatsapp.message.received",
+        _message_event("4646464646", "923005550001", "Salam", "wamid.oo1"),
+    )
+    await _run_jobs(app, provider, business_db)
+    customer = await _customer(business_db, "923005550001")
+    stopped = await client.put(
+        f"/api/v1/pi-app/pi/customers/{customer}/consent",
+        json={"purpose": "marketing", "granted": False, "source": "Said stop"},
+    )
+    assert stopped.status_code == 200, stopped.text
+    rows = [{"phone": "923005550001", "values": []}, {"phone": "923005550002", "values": []}]
+    made = await client.post(
+        f"{base}/batches",
+        json={
+            "name": "plain_hello",
+            "language": "en_US",
+            "rows": rows,
+            "consent": True,
+            "consent_note": "Asked us on the phone",
+        },
+    )
+    assert made.status_code == 201, made.text
+    assert made.json()["queued"] == 1
+    assert made.json()["rejected"][0]["reason"].startswith("Withdrew consent")
+
+    # cancel before anything goes out
+    batch = made.json()["batch_id"]
+    cancelled = await client.post(f"{base}/batches/{batch}/cancel")
+    assert cancelled.json() == {"cancelled": 1}
+    ctx = {**worker_ctx(app, business_db), "queue": provider.queue}
+    await template_sends.sweep_template_sends(ctx)
+    assert _template_sends(provider) == []
+    items = (await client.get(f"{base}/sends", params={"status": "cancelled"})).json()["items"]
+    assert len(items) == 1
+
+    # the daily cap: nothing more goes out once it is reached
+    monkeypatch.setattr(template_sends, "DAILY_CAP", 1)
+    again = await client.post(
+        f"{base}/batches",
+        json={
+            "name": "plain_hello",
+            "language": "en_US",
+            "rows": [
+                {"phone": "923005550010", "values": []},
+                {"phone": "923005550011", "values": []},
+            ],
+            "consent": True,
+            "consent_note": "Asked us on the phone",
+        },
+    )
+    assert again.json()["queued"] == 2
+    await template_sends.sweep_template_sends(ctx)
+    await _run_jobs(app, provider, business_db)
+    assert len(_template_sends(provider)) == 1
+    await client.aclose()
+
+
+def test_pasted_lines_become_rows_and_the_quiet_hours_follow_the_business_zone():
+    from app.modules.pi_saas import template_sends
+
+    rows = template_sends.parse_pasted(
+        "number, name, value\n+92 300 1234567, Ayesha, Mendeez Demo, 20 November\n\n0300 1;Bilal"
+    )
+    assert rows[0] == {
+        "phone": "+92 300 1234567",
+        "person": "Ayesha",
+        "values": ["Mendeez Demo", "20 November"],
+    }
+    assert len(rows) == 2  # the header line has no digits and is left out
+    night = datetime(2026, 11, 18, 18, 0, tzinfo=UTC)  # 23:00 in Karachi
+    noon = datetime(2026, 11, 18, 7, 0, tzinfo=UTC)  # 12:00 in Karachi
+    assert template_sends.quiet_now("Asia/Karachi", night) is True
+    assert template_sends.quiet_now("Asia/Karachi", noon) is False
+
+
+async def test_a_number_blocked_after_queueing_is_not_sent_and_values_with_prices_are_refused(
+    app, provider, business_db, monkeypatch
+):
+    from app.modules.pi_saas import template_sends
+
+    monkeypatch.setattr(template_sends, "quiet_now", lambda *a, **k: False)
+    client, _view = await _ready_business(app, provider, business_db, "Block Co", "4747474747")
+    base = "/api/v1/pi-app/pi/whatsapp/templates"
+    provider.templates.append(
+        {
+            "id": "777003",
+            "name": "note_one",
+            "language": "en_US",
+            "status": "APPROVED",
+            "category": "UTILITY",
+            "components": [{"type": "BODY", "text": "Hello {{1}}."}],
+        }
+    )
+    made = await client.post(
+        f"{base}/batches",
+        json={
+            "name": "note_one",
+            "language": "en_US",
+            "rows": [
+                {"phone": "923006660001", "values": ["Ayesha"]},
+                {"phone": "923006660002", "values": ["Rs 5,000"]},  # a price is never sent here
+                {"phone": "923006660003", "values": ["pay to IBAN PK36SCBL0000001123456702"]},
+            ],
+            "consent": True,
+            "consent_note": "Asked us on the phone",
+        },
+    )
+    assert made.status_code == 201, made.text
+    assert made.json()["queued"] == 1
+    assert len(made.json()["rejected"]) == 2
+    # blocked after it was queued: the worker leaves it out
+    blocked = await client.post(
+        "/api/v1/pi-app/pi/blocklist",
+        json={"value": "923006660001", "kind": "number", "reason": "test", "close_chats": False},
+    )
+    assert blocked.status_code in {200, 201}, blocked.text
+    ctx = {**worker_ctx(app, business_db), "queue": provider.queue}
+    await template_sends.sweep_template_sends(ctx)
+    await _run_jobs(app, provider, business_db)
+    assert _template_sends(provider) == []
+    items = (await client.get(f"{base}/sends", params={"status": "skipped"})).json()["items"]
+    assert [i["error"] for i in items] == ["BLOCKED"]
+    # the one-number send obeys the same blocklist
+    single = await client.post(
+        f"{base}/send",
+        json={
+            "phone": "923006660001",
+            "name": "note_one",
+            "language": "en_US",
+            "values": ["Ayesha"],
+            "consent": True,
+        },
+    )
+    assert single.status_code == 422
+    await client.aclose()
+
+
+def test_value_problem_refuses_prices_and_bank_details_but_not_dates_or_names():
+    from app.modules.pi_saas import template_sends
+
+    assert template_sends.value_problem(["Rs 5,000"]) is not None
+    assert template_sends.value_problem(["Your payment received"]) is not None
+    assert template_sends.value_problem(["03001234567890"]) is not None
+    assert template_sends.value_problem(["Mendeez Demo", "20 November 2026"]) is None

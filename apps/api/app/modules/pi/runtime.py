@@ -2318,6 +2318,8 @@ async def send_pi_message(ctx: dict[str, Any], message_id: str) -> None:
         document_notice = message.media.get("document_notice")
         # A meeting's time and link after the window: the approved meeting template.
         meeting_notice = message.media.get("meeting_notice")
+        # The Templates page (pi_saas/template_sends.py): an approved template, values filled in.
+        template_send = message.media.get("template_send")
         from app.modules.pi.followups import reminder_allowed
 
         campaign_block = None
@@ -2325,6 +2327,14 @@ async def send_pi_message(ctx: dict[str, Any], message_id: str) -> None:
             from app.modules.pi_saas.campaigns import send_block
 
             campaign_block = await send_block(session, scope, message, conversation)
+
+        # A Templates-page message is re-checked just before delivery: a STOP or a block that came
+        # in after it was queued stops it (the same idea as send_block for campaigns).
+        template_block = None
+        if template_send:
+            from app.modules.pi_saas.template_sends import template_block as template_send_block
+
+            template_block = await template_send_block(session, scope, conversation.contact_wa_id)
 
         sender_allowed = True
         if message.sender_type == "human":
@@ -2352,12 +2362,15 @@ async def send_pi_message(ctx: dict[str, Any], message_id: str) -> None:
             if conversation.status != "open"
             else campaign_block
             if campaign_block
+            else template_block
+            if template_block
             else "MESSAGE_WINDOW_CLOSED"
             if not reminder
             and not campaign
             and not ladder
             and not document_notice
             and not meeting_notice
+            and not template_send
             and (
                 not conversation.last_inbound_at
                 or conversation.last_inbound_at < datetime.now(UTC) - timedelta(hours=24)
@@ -2389,12 +2402,13 @@ async def send_pi_message(ctx: dict[str, Any], message_id: str) -> None:
             from app.integrations.whatsapp_bridge import token as connection_token
 
             token = await connection_token(session, ctx["settings"], connection)
-            if meeting_notice:
+            if meeting_notice or template_send:
+                notice = meeting_notice or template_send
                 message.provider_message_id = await whatsapp.send_template_values(
                     connection.phone_number_id,
                     conversation.contact_wa_id,
-                    meeting_notice["template"],
-                    [str(v) for v in meeting_notice["values"]],
+                    notice["template"],
+                    [str(v) for v in notice["values"]],
                     token,
                 )
             elif reminder or campaign or ladder or document_notice:

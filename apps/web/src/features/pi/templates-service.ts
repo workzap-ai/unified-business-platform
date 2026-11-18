@@ -36,7 +36,72 @@ export type NewTemplate = {
   examples: string[];
 };
 
+export const sendRowSchema = z.object({
+  id: z.string(),
+  batch_id: z.string(),
+  phone: z.string(),
+  person: z.string().catch(""),
+  template: z.string(),
+  language: z.string().catch(""),
+  values: z.array(z.string()).catch([]),
+  source: z.string().catch(""),
+  status: z.string(),
+  error: z.string().nullable().catch(null),
+  created_at: z.string(),
+  sent_at: z.string().nullable().catch(null),
+  conversation_id: z.string().nullable().catch(null),
+});
+export type SendRow = z.infer<typeof sendRowSchema>;
+
+const historySchema = z.object({ items: z.array(sendRowSchema) });
+
+const batchSchema = z.object({
+  batch_id: z.string(),
+  queued: z.number(),
+  rejected: z.array(z.object({ phone: z.string(), reason: z.string() })),
+  daily_cap: z.number().catch(200),
+});
+export type BatchResult = z.infer<typeof batchSchema>;
+
+const audienceSchema = z.object({
+  items: z.array(
+    z.object({
+      phone: z.string(),
+      person: z.string().catch(""),
+      label: z.string().catch(""),
+    }),
+  ),
+});
+export type AudienceRow = z.infer<typeof audienceSchema>["items"][number];
+
+export type BatchInput = {
+  name: string;
+  language: string;
+  rows: { phone: string; person: string; values: string[] }[];
+  source: "paste" | "customers" | "nori";
+  consent: boolean;
+  consent_note: string;
+};
+
 export const piTemplatesService = {
+  history: (params: { template?: string; phone?: string; status?: string }) =>
+    apiRequest("GET", "/pi/whatsapp/templates/sends", historySchema, {
+      query: { ...params, limit: 200 },
+    }),
+  audience: (source: "customers" | "nori", q: string) =>
+    apiRequest("GET", "/pi/whatsapp/templates/audience", audienceSchema, {
+      query: { source, q },
+    }),
+  queue: (input: BatchInput) =>
+    apiRequest("POST", "/pi/whatsapp/templates/batches", batchSchema, {
+      body: input,
+    }),
+  cancelBatch: (id: string) =>
+    apiRequest(
+      "POST",
+      `/pi/whatsapp/templates/batches/${id}/cancel`,
+      z.object({ cancelled: z.number() }),
+    ),
   list: () => apiRequest("GET", "/pi/whatsapp/templates", listSchema),
   create: (input: NewTemplate) =>
     apiRequest("POST", "/pi/whatsapp/templates", doneSchema, { body: input }),

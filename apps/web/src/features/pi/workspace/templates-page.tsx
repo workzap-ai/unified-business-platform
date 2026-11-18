@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { FileText, Pencil, Plus, Send } from "lucide-react";
+import { FileText, Pencil, Plus, Send, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge, Card, CardBody } from "@/components/ui/display";
 import { Input, NativeSelect, Textarea } from "@/components/ui/input";
@@ -26,6 +26,7 @@ import {
   type NewTemplate,
   type Template,
 } from "../templates-service";
+import { BulkDialog, HistoryView } from "./templates-bulk";
 
 const KEY = [["pi", "templates"]];
 
@@ -97,6 +98,8 @@ function TemplatesView() {
   const [creating, setCreating] = useState(false);
   const [editing, setEditing] = useState<Template | null>(null);
   const [chosen, setChosen] = useState("");
+  const [tab, setTab] = useState<"templates" | "history">("templates");
+  const [bulk, setBulk] = useState(false);
   const templates = list.data?.templates ?? [];
   const sendable = templates.filter(
     (t) => t.status === "APPROVED" && t.fillable,
@@ -108,12 +111,39 @@ function TemplatesView() {
         description="WhatsApp only lets pi start a chat, or write after 24 hours of silence, with a template Meta approved. Each message sent this way is charged by WhatsApp."
         actions={
           manage ? (
-            <Button onClick={() => setCreating(true)}>
-              <Plus /> New template
-            </Button>
+            <>
+              <Button variant="secondary" onClick={() => setBulk(true)}>
+                <Users /> Send to many
+              </Button>
+              <Button onClick={() => setCreating(true)}>
+                <Plus /> New template
+              </Button>
+            </>
           ) : null
         }
       />
+      <div
+        role="group"
+        aria-label="Templates view"
+        className="mb-4 inline-flex h-8 items-center gap-0.5 rounded-md border border-border bg-surface-muted p-0.5"
+      >
+        {(
+          [
+            ["templates", "Templates"],
+            ["history", "History"],
+          ] as const
+        ).map(([key, label]) => (
+          <button
+            key={key}
+            type="button"
+            aria-pressed={tab === key}
+            onClick={() => setTab(key)}
+            className={`inline-flex h-6.5 items-center rounded-[5px] px-2.5 text-xs font-medium ${tab === key ? "bg-surface text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"}`}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
       {list.isError ? (
         <ErrorState error={list.error} onRetry={() => void list.refetch()} />
       ) : list.isPending ? (
@@ -122,6 +152,8 @@ function TemplatesView() {
         <Notice tone="info" title="No WhatsApp number yet">
           Connect a WhatsApp number first. Templates belong to that number.
         </Notice>
+      ) : tab === "history" ? (
+        <HistoryView templates={templates} />
       ) : (
         <div className="space-y-6">
           {manage && (
@@ -198,6 +230,9 @@ function TemplatesView() {
         </div>
       )}
       {creating && <CreateDialog onClose={() => setCreating(false)} />}
+      {bulk && (
+        <BulkDialog sendable={sendable} onClose={() => setBulk(false)} />
+      )}
       {editing && (
         <EditDialog template={editing} onClose={() => setEditing(null)} />
       )}

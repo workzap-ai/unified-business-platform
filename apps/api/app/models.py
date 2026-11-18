@@ -135,6 +135,7 @@ from app.modules.pi_saas.models import (
 from app.modules.pi_saas.blocklist.models import PiBlockedContact
 from app.modules.pi_saas.nori_board.models import PiNoriItem, PiNoriNumber
 from app.modules.pi_saas.nori_credits.models import PiNoriBridgeLog
+from app.modules.pi_saas.template_sends import PiTemplateSend
 from app.modules.pi_saas.payment_models import (
     PiCheckoutAttempt,
     PiCollectionSettings,
@@ -231,6 +232,7 @@ __all__ = [
     "PiKnowledgeDraft",
     "PiOperatorAssignment",
     "PiNoriBridgeLog",
+    "PiTemplateSend",
     "PiNoriItem",
     "PiNoriNumber",
     "PiOperatorMember",
