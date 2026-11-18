@@ -19,6 +19,7 @@ import { ContextPanel } from "./context-panel";
 import { ConversationList, type InboxFilters } from "./conversation-list";
 import { ConversationThread } from "./conversation-thread";
 import { useMediaQuery } from "./parts";
+import { useLiveConnected } from "../live-events";
 import type { Conversation } from "../types";
 
 const DEFAULTS = {
@@ -33,6 +34,7 @@ const DEFAULTS = {
 /** Three-panel operations inbox: conversations, thread + composer, customer/AI context. */
 export function InboxPage() {
   const [state, setState] = useUrlState(DEFAULTS);
+  const live = useLiveConnected();
   const desktop = useMediaQuery("(min-width: 768px)");
   const wide = useMediaQuery("(min-width: 1280px)");
   const [panelOpen, setPanelOpen] = useState(true);
@@ -62,7 +64,7 @@ export function InboxPage() {
       getNextPageParam: (last) =>
         last.page * last.page_size < last.total ? last.page + 1 : undefined,
       // New customer messages show up within a few seconds.
-      refetchInterval: 5_000,
+      refetchInterval: live ? 60_000 : 5_000,
       placeholderData: (previous) => previous,
     },
   );

@@ -62,7 +62,7 @@ A blocked number (see blocklist.md) never reaches this point.
 
 - Whether the Vercel rewrite in front of `/api/v1/pi-app` passes a stream through unbuffered. The
   watchdog above is what protects the screen if it does not.
-- The Owner OS web inbox still polls (`apps/web`); it can use the same endpoints.
+- Owner OS (`apps/web`) uses the same endpoints: `features/pi/live-events.tsx` (provider and Live mark, mounted in the PI workspace layout) and the Speed card on PI, Health.
 - `handoff` events exist in the stream but nothing publishes them yet.
 
 
