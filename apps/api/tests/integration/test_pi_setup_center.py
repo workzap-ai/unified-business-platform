@@ -113,6 +113,67 @@ async def test_templates_and_one_click_forms(app, provider, business_db):
     await client.aclose()
 
 
+async def test_templates_page_creates_edits_and_sends_a_first_message(app, provider, business_db):
+    client, _ = await _ready_business(app, provider, business_db, "Page Co", "8383838383")
+    base = "/api/v1/pi-app/pi/whatsapp/templates"
+    provider.templates.append(
+        {
+            "id": "555001",
+            "name": "nori_welcome_en",
+            "language": "en_US",
+            "status": "APPROVED",
+            "category": "UTILITY",
+            "components": [{"type": "BODY", "text": "Hello {{1}}, welcome to nori."}],
+        }
+    )
+    provider.templates.append(
+        {
+            "id": "555002",
+            "name": "with_button",
+            "language": "en_US",
+            "status": "APPROVED",
+            "category": "UTILITY",
+            "components": [
+                {"type": "BODY", "text": "Hi {{1}}"},
+                {"type": "BUTTONS", "buttons": [{"type": "QUICK_REPLY", "text": "Yes"}]},
+            ],
+        }
+    )
+    listed = {t["name"]: t for t in (await client.get(base)).json()["templates"]}
+    assert listed["nori_welcome_en"]["variables"] == 1 and listed["nori_welcome_en"]["fillable"]
+    assert listed["nori_welcome_en"]["id"] == "555001"
+    assert not listed["with_button"]["fillable"]  # a button template is not one pi can fill
+
+    # create with a variable needs an example for it
+    body = {"name": "trial_note", "language": "en_US", "category": "UTILITY", "body": "Hi {{1}}"}
+    assert (await client.post(base, json=body)).status_code == 422
+    made = await client.post(base, json={**body, "examples": ["Ayesha"]})
+    assert made.status_code == 201, made.text
+
+    # edit goes to Meta and the template is reviewed again
+    edited = await client.put(f"{base}/555001", json={"body": "Hi {{1}}!", "examples": ["Sam"]})
+    assert edited.status_code == 200, edited.text
+    assert provider.edited[0]["components"][0]["text"] == "Hi {{1}}!"
+    assert (await client.put(f"{base}/999", json={"body": "x"})).status_code == 404
+
+    send = {"phone": "+92 300 5551234", "name": "nori_welcome_en", "language": "en_US"}
+    approved = {**send, "values": ["Ayesha"]}
+    # not approved any more after the edit: pending templates cannot be sent
+    refused = await client.post(f"{base}/send", json={**approved, "consent": True})
+    assert refused.status_code == 422 and not provider.sent_messages
+    provider.templates[0]["status"] = "APPROVED"
+    assert (await client.post(f"{base}/send", json=approved)).status_code == 422  # no consent
+    assert (
+        await client.post(f"{base}/send", json={**send, "values": [], "consent": True})
+    ).status_code == 422  # wrong number of values
+    sent = await client.post(f"{base}/send", json={**approved, "consent": True})
+    assert sent.status_code == 200, sent.text
+    [message] = provider.sent_messages
+    assert message["to"] == "923005551234" and message["type"] == "template"
+    assert message["template"]["components"][0]["parameters"][0]["text"] == "Ayesha"
+    await client.aclose()
+
+
 def test_flow_json_shapes():
     for purpose in ("lead", "booking", "feedback"):
         data = flow_json(purpose)

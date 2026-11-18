@@ -44,6 +44,8 @@ class FakeProvider:
         self.fail_kapso = False
         # WhatsApp message templates visible through Kapso's Meta proxy (campaigns/reminders).
         self.templates: list[dict[str, Any]] = []
+        self.sent_messages: list[dict[str, Any]] = []  # bodies POSTed to /messages
+        self.edited: list[dict[str, Any]] = []  # bodies of template edits
         self.profiles: dict[str, dict[str, Any]] = {}
         self.health_body: dict[str, Any] | None = None
         self.webhooks: dict[str, list[dict[str, Any]]] = {}
@@ -173,7 +175,21 @@ class FakeProvider:
                     200, json={"data": [{"messaging_product": "whatsapp", **saved}]}
                 )
             if "/meta/whatsapp/" in path and path.endswith("/messages"):
+                self.sent_messages.append(json.loads(request.content))
                 return httpx.Response(200, json={"messages": [{"id": f"wamid.k{next(self.ids)}"}]})
+            if (
+                "/meta/whatsapp/" in path
+                and request.method == "POST"
+                and path.split("/")[-1].isdigit()
+            ):
+                # Editing a template: Meta takes the new components and reviews it again.
+                body = json.loads(request.content)
+                for template in self.templates:
+                    if template.get("id") == path.split("/")[-1]:
+                        template["components"] = body["components"]
+                        template["status"] = "PENDING"
+                        self.edited.append(body)
+                return httpx.Response(200, json={"success": True})
             return httpx.Response(404)
         if "api.stripe.com" in url:
             if request.url.path == "/v1/checkout/sessions":

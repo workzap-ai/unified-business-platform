@@ -18,6 +18,8 @@ _BOOLS = (
     "forward",
     "forward_media",
     "forward_messages",
+    "support",
+    "remind",
 )
 _NUMBERS: dict[str, tuple[float, float]] = {
     "timeout_seconds": (0.5, 5.0),
@@ -102,6 +104,10 @@ class WorkspaceBridge:
     forward_media: bool = False
     # Every chat message of a registry person goes to nori's conversation door (thread.py).
     forward_messages: bool = False
+    # pi answers a registry person itself, in Nori support mode (pi_saas/nori_support).
+    support: bool = False
+    # pi reminds the workspace owner before a trial or subscription ends (nori_support/remind.py).
+    remind: bool = False
 
 
 def workspace_bridge(response_rules: dict[str, Any] | None) -> WorkspaceBridge | None:
@@ -128,4 +134,6 @@ def workspace_bridge(response_rules: dict[str, Any] | None) -> WorkspaceBridge |
         forward=raw.get("forward", False) is True,
         forward_media=raw.get("forward_media", False) is True,
         forward_messages=raw.get("forward_messages", False) is True,
+        support=raw.get("support", False) is True,
+        remind=raw.get("remind", False) is True,
     )

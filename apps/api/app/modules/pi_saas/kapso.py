@@ -508,24 +508,47 @@ class Kapso:
                 continue
             components = [c for c in as_list(item.get("components")) if isinstance(c, dict)]
             body = next((str(c.get("text", "")) for c in components if c.get("type") == "BODY"), "")
+            # Text-only (no buttons, no media header): the only shape pi can fill and send.
+            plain = not any(c.get("type") == "BUTTONS" for c in components) and all(
+                c.get("format", "TEXT") == "TEXT" for c in components if c.get("type") == "HEADER"
+            )
             out.append(
                 {
+                    "id": str(item.get("id") or "")[:40],
                     "name": str(item["name"])[:512],
                     "language": str(item.get("language") or "")[:16],
                     "status": str(item.get("status") or "")[:24],
                     "category": str(item.get("category") or "")[:24],
                     "body": body[:1024],
+                    "variables": len(set(re.findall(r"\{\{(\d+)\}\}", body))),
                     # Campaigns and reminders can only send plain text templates.
-                    "sendable": "{{" not in body
-                    and not any(c.get("type") == "BUTTONS" for c in components)
-                    and all(
-                        c.get("format", "TEXT") == "TEXT"
-                        for c in components
-                        if c.get("type") == "HEADER"
-                    ),
+                    "sendable": "{{" not in body and plain,
+                    # The one-off send form can also fill {{1}}..{{n}} in a text-only template.
+                    "fillable": plain,
                 }
             )
         return out
+
+    async def edit_template(
+        self, template_id: str, body: str, examples: list[str], category: str | None = None
+    ) -> None:
+        """Change the text of a template (Meta allows it for approved ones once a day, at most ten
+        times a month, and for rejected or paused ones; the template is reviewed again)."""
+        count = len(re.findall(r"\{\{\d+\}\}", body))
+        if (
+            not re.fullmatch(r"[0-9]{5,32}", template_id)
+            or not 1 <= len(body) <= 1024
+            or count != len(examples)
+            or (category is not None and category not in TEMPLATE_CATEGORIES)
+        ):
+            raise BusinessRuleViolation("INVALID_TEMPLATE", "Invalid template text or examples")
+        component: dict[str, Any] = {"type": "BODY", "text": body}
+        if examples:
+            component["example"] = {"body_text": [examples]}
+        payload: dict[str, Any] = {"components": [component]}
+        if category is not None:
+            payload["category"] = category
+        await self._meta("POST", f"/{template_id}", json=payload)
 
     async def create_template(
         self, business_account_id: str, name: str, language: str, category: str, body: str
@@ -562,9 +585,10 @@ class Kapso:
         language: str,
         body: str,
         examples: list[str],
+        category: str = "UTILITY",
     ) -> str:
-        """A Utility template whose text has {{1}}..{{n}} filled at send time (the meeting
-        time and link); Meta needs one example value per variable to review it."""
+        """A template whose text has {{1}}..{{n}} filled at send time (Utility by default, for
+        example the meeting time and link); Meta needs one example per variable to review it."""
         if not re.fullmatch(r"[0-9]{5,32}", business_account_id):
             raise BusinessRuleViolation("WHATSAPP_NOT_CONNECTED", "Connect WhatsApp first")
         count = len(re.findall(r"\{\{\d+\}\}", body))
@@ -573,6 +597,7 @@ class Kapso:
             or not re.fullmatch(r"[a-z]{2,3}(_[A-Z]{2})?", language)
             or not 1 <= len(body) <= 1024
             or count != len(examples)
+            or category not in TEMPLATE_CATEGORIES
         ):
             raise BusinessRuleViolation("INVALID_TEMPLATE", "Invalid template text or examples")
         data = await self._meta(
@@ -581,7 +606,7 @@ class Kapso:
             json={
                 "name": name,
                 "language": language,
-                "category": "UTILITY",
+                "category": category,
                 "components": [
                     {"type": "BODY", "text": body, "example": {"body_text": [examples]}}
                 ],

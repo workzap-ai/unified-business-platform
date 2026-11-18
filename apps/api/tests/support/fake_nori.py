@@ -44,6 +44,8 @@ class FakeNori:
         self.welcome: dict[str, Any] = {}  # number -> the welcome_ok value nori answers
         self.thread: list[dict[str, Any]] = []  # chat messages taken by /api/pi/board-message
         self.thread_reason: str | None = None  # a 400 reason nori answers
+        # number -> the `workspace` object nori answers to workspace_info (absent = known:false)
+        self.workspaces: dict[str, dict[str, Any]] = {}
 
     # --- helpers ----------------------------------------------------------------------------
     def calls(self, path: str, action: str | None = None) -> list[dict[str, Any]]:
@@ -146,6 +148,11 @@ class FakeNori:
                 "member": {"member_id": "m-" + sender[-4:], "tenant_id": "t-acme", **member},
                 "workspace": {"credits": True},
             }
+        if action == "workspace_info":
+            found = self.workspaces.get(sender)
+            if found is None:
+                return {"ok": True, "known": False}
+            return {"ok": True, "known": True, "workspace": found}
         if sender not in self.members:
             return {"ok": False, "reason": "not_set_up", "reply": "This number is not set up."}
         message_id = body.get("message_id")
