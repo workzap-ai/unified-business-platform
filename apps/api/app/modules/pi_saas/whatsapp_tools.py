@@ -507,8 +507,12 @@ def build() -> APIRouter:
             )
         if (problem := template_sends.value_problem(data.values)) is not None:
             raise BusinessRuleViolation("TEMPLATE_VALUES", problem, 422)
+        # The cap and the history live in one table; before its migration the send still works.
+        tracked = await template_sends.table_ready(session)
         tz = (await settings_row(session, scope)).timezone
-        if await template_sends.sent_today(session, scope, tz) >= template_sends.DAILY_CAP:
+        if tracked and await template_sends.sent_today(session, scope, tz) >= (
+            template_sends.DAILY_CAP
+        ):
             raise BusinessRuleViolation(
                 "RATE_LIMITED", "The daily limit for template messages is reached", 429
             )
@@ -538,15 +542,16 @@ def build() -> APIRouter:
         )
         from app.modules.pi_saas import template_sends
 
-        await template_sends.record_single(
-            session,
-            scope,
-            phone=to,
-            template=found,
-            values=data.values,
-            created_by=scope.actor_label,
-            consent_note="Confirmed on the Templates page",
-        )
+        if tracked:
+            await template_sends.record_single(
+                session,
+                scope,
+                phone=to,
+                template=found,
+                values=data.values,
+                created_by=scope.actor_label,
+                consent_note="Confirmed on the Templates page",
+            )
         await session.commit()
         return {"sent": True, "id": message_id}
 
@@ -580,6 +585,12 @@ def build() -> APIRouter:
                 422,
             )
         template = await sendable_template(request, session, scope, data.name, data.language)
+        if not await template_sends.table_ready(session):
+            raise BusinessRuleViolation(
+                "TEMPLATE_HISTORY_NOT_READY",
+                "Sending to many needs a one-time database update first. Ask your admin.",
+                503,
+            )
         result = await template_sends.queue_batch(
             session,
             scope,
@@ -611,6 +622,8 @@ def build() -> APIRouter:
         from app.modules.pi_saas import template_sends
 
         await require_pi(session, scope, "pi.settings.manage")
+        if not await template_sends.table_ready(session):
+            return {"cancelled": 0}
         cancelled = await template_sends.cancel_batch(session, scope, batch_id)
         await session.commit()
         return {"cancelled": cancelled}
@@ -630,6 +643,8 @@ def build() -> APIRouter:
         from app.modules.pi_saas import template_sends
 
         await require_pi(session, scope, "pi.read")
+        if not await template_sends.table_ready(session):
+            return {"items": []}
         return await template_sends.history(
             session,
             scope,

@@ -78,6 +78,13 @@ class PiTemplateSend(WorkspaceRow):
     dispatched_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
 
 
+async def table_ready(session: AsyncSession) -> bool:
+    """False until migration 0072 has run on this database (nothing here may fail before that)."""
+    from sqlalchemy import text
+
+    return (await session.scalar(text("SELECT to_regclass('pi_template_sends')"))) is not None
+
+
 # --- reading what was pasted -------------------------------------------------------------------
 
 _SPLIT = re.compile(r"[,\t;|]")
