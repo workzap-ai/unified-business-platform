@@ -181,6 +181,16 @@ async def system_scope(
     return scope
 
 
+async def _signal(ctx: dict[str, Any], scope: WorkspaceScope, kind: str = "inbox") -> None:
+    """Tell open screens something changed (live_events.py). Best effort: never raises, never waits
+    more than half a second, and does nothing unless PI_EVENTS_ENABLED is on."""
+    from app.modules.pi import live_events
+
+    await live_events.publish(
+        ctx.get("redis"), ctx.get("settings"), scope.tenant_id, scope.environment_id, kind
+    )
+
+
 async def _blocked_sender(
     session: AsyncSession, scope: WorkspaceScope, event: WhatsAppWebhookEvent
 ) -> bool:
@@ -994,6 +1004,7 @@ async def process_pi_event(ctx: dict[str, Any], event_id: str) -> None:
         await enqueue_sends(ctx, released)
         if message is None:
             return
+        await _signal(ctx, scope)  # open screens refetch: a customer message arrived
         service = PiService(session, scope)
         message_id, conversation_id = message.id, message.conversation_id
         conversation = await service.conversations.get(conversation_id)
@@ -2535,6 +2546,7 @@ async def send_pi_message(ctx: dict[str, Any], message_id: str) -> None:
                     "Outbound delivery could not be confirmed. Review before retrying.",
                 )
         await session.commit()
+        await _signal(ctx, scope)  # open screens refetch: a reply was sent or failed
 
 
 async def newer_waiting(session: Any, message: PiMessage) -> bool:

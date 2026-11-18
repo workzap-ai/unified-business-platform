@@ -55,6 +55,7 @@ from app.modules.pi.brain_moderation_routes import router as pi_brain_moderation
 from app.modules.pi.brain_visual_routes import public_router as pi_brain_visuals_router
 from app.modules.pi.business_profile_routes import router as pi_business_profile_router
 from app.modules.pi.config_routes import router as pi_config_router
+from app.modules.pi.events_routes import router as pi_events_router
 from app.modules.pi.execution_routes import router as pi_execution_router
 from app.modules.pi.inbox_routes import router as pi_inbox_router
 from app.modules.pi.kapso_routes import router as pi_kapso_router
@@ -82,6 +83,7 @@ from app.modules.pi_meetings.voice_routes import router as pi_meeting_voice_rout
 from app.modules.pi_saas.app_routes import router as pi_app_router
 from app.modules.pi_saas.assistant_routes import operator_router as pi_operator_help_router
 from app.modules.pi_saas.assistant_routes import router as pi_assistant_router
+from app.modules.pi_saas.blocklist.routes import router as pi_blocklist_router
 from app.modules.pi_saas.campaign_routes import router as pi_campaign_router
 from app.modules.pi_saas.connector_routes import router as pi_connector_router
 from app.modules.pi_saas.connector_routes import web_router as pi_connector_web_router
@@ -97,7 +99,6 @@ from app.modules.pi_saas.digest_routes import router as pi_digest_router
 from app.modules.pi_saas.health_routes import router as pi_health_router
 from app.modules.pi_saas.insights_routes import router as pi_insights_router
 from app.modules.pi_saas.meeting_board import router as pi_meeting_board_router
-from app.modules.pi_saas.blocklist.routes import router as pi_blocklist_router
 from app.modules.pi_saas.nori_board.routes import door_router as nori_board_door_router
 from app.modules.pi_saas.nori_board.routes import router as nori_board_router
 from app.modules.pi_saas.nori_credits.routes import router as nori_credits_router
@@ -140,6 +141,7 @@ ROUTERS = [
     pi_team_board_router,
     nori_board_router,
     pi_blocklist_router,
+    pi_events_router,
     pi_meeting_board_router,
     pi_meeting_intel_router,
     pi_meeting_qa_router,
@@ -250,6 +252,7 @@ PI_APP_ROUTERS = [
     pi_team_board_router,
     nori_board_router,
     pi_blocklist_router,
+    pi_events_router,
     pi_meeting_board_router,
     pi_customer_payment_router,
     pi_deals_router,
@@ -366,6 +369,9 @@ def create_app(settings: Settings | None = None) -> FastAPI:
                 try:
                     await app.state.queue.close()
                     await redis.aclose()
+                    events_redis = getattr(app.state, "events_redis", None)
+                    if events_redis is not None:
+                        await events_redis.aclose()
                 finally:
                     await engine.dispose()
 
