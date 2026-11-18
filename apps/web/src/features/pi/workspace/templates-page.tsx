@@ -370,8 +370,12 @@ function CreateDialog({ onClose }: { onClose: () => void }) {
   const [error, setError] = useState<string | null>(null);
   const create = useScopedMutation(
     () =>
+      // Only the fields the API takes: a preset also carries a label, which the server refuses.
       piTemplatesService.create({
-        ...form,
+        name: form.name,
+        language: form.language,
+        category: form.category,
+        body: form.body,
         examples: count ? examples : [],
       }),
     {
