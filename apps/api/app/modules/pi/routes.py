@@ -333,7 +333,7 @@ async def conversation_action(
     if action != "read":  # reading a chat is not news for the other screens
         from app.modules.pi import live_events
 
-        await live_events.publish(
+        live_events.fire(
             request.app.state.redis,
             request.app.state.settings,
             scope.tenant_id,

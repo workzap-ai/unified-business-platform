@@ -97,13 +97,27 @@ export function LiveEventsProvider({
           clearTimeout(watchdog);
           watchdog = setTimeout(failed, SILENCE_MS);
         };
-        source.addEventListener("ready", () => {
+        // "live" says the server's worker is publishing: a stream that is open but has nobody
+        // publishing must not slow the polling down.
+        const live = (event: Event) => {
+          try {
+            return Boolean(
+              JSON.parse((event as MessageEvent<string>).data)?.live,
+            );
+          } catch {
+            return false;
+          }
+        };
+        source.addEventListener("ready", (event) => {
           failures = 0;
           alive();
-          setConnected(true);
+          setConnected(live(event));
           refresh(); // catch up on anything that happened while we were not listening
         });
-        source.addEventListener("ping", alive);
+        source.addEventListener("ping", (event) => {
+          alive();
+          setConnected(live(event));
+        });
         source.addEventListener("change", () => {
           alive();
           refresh();

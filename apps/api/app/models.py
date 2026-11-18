@@ -97,6 +97,7 @@ from app.modules.pi_meetings.models import (
     PiMeetingParticipant,
     PiMeetingSegment,
 )
+from app.modules.pi_saas.blocklist.models import PiBlockedContact
 from app.modules.pi_saas.customer_payment_models import (
     PiCustomerPaymentSettings,
     PiPaymentRequest,
@@ -132,15 +133,14 @@ from app.modules.pi_saas.models import (
     PiTicket,
     PiUsageCounter,
 )
-from app.modules.pi_saas.blocklist.models import PiBlockedContact
 from app.modules.pi_saas.nori_board.models import PiNoriItem, PiNoriNumber
 from app.modules.pi_saas.nori_credits.models import PiNoriBridgeLog
-from app.modules.pi_saas.template_sends import PiTemplateSend
 from app.modules.pi_saas.payment_models import (
     PiCheckoutAttempt,
     PiCollectionSettings,
     PiManualPayment,
 )
+from app.modules.pi_saas.template_sends import PiTemplateSend
 from app.modules.products.models import (
     EnvironmentProductInstallation,
     PlatformProduct,
@@ -233,6 +233,7 @@ __all__ = [
     "PiOperatorAssignment",
     "PiNoriBridgeLog",
     "PiTemplateSend",
+    "PiBlockedContact",
     "PiNoriItem",
     "PiNoriNumber",
     "PiOperatorMember",

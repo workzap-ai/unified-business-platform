@@ -137,11 +137,15 @@ class FakePubSub:
 
 
 class FakeRedis:
-    def __init__(self, messages: list[Any]) -> None:
+    def __init__(self, messages: list[Any], *, publisher: bool = False) -> None:
         self.ps = FakePubSub(messages)
+        self.publisher = publisher
 
     def pubsub(self) -> FakePubSub:
         return self.ps
+
+    async def exists(self, key: str) -> int:
+        return int(self.publisher)
 
 
 def message(data: Any) -> dict[str, Any]:
@@ -182,3 +186,58 @@ async def test_leaving_early_still_unsubscribes() -> None:
     await anext(generator)  # one change
     await generator.aclose()  # the person left
     assert redis.ps.closed
+
+
+async def test_the_screen_is_told_live_only_while_a_worker_is_publishing() -> None:
+    quiet = await collect(FakeRedis([], publisher=False), 0.1)
+    assert quiet[0].endswith('data: {"live": false}\n\n')
+    busy = await collect(FakeRedis([], publisher=True), 0.1)
+    assert busy[0].endswith('data: {"live": true}\n\n')
+
+
+async def test_the_ping_repeats_the_live_bit(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr(live_events, "HEARTBEAT_SECONDS", 0.05)
+    frames = await collect(FakeRedis([], publisher=True), 0.3)
+    pings = [f for f in frames if f.startswith("event: ping")]
+    assert pings and all('"live": true' in f for f in pings)
+
+
+async def test_an_unreachable_redis_means_not_live_not_an_error() -> None:
+    class Broken:
+        async def exists(self, key: str) -> int:
+            raise ConnectionError("down")
+
+    assert await live_events.publisher_alive(Broken()) is False
+
+
+async def test_the_worker_leaves_a_short_lived_mark_only_when_on() -> None:
+    marks: list[tuple[str, str, int]] = []
+
+    class R:
+        async def set(self, key: str, value: str, ex: int) -> None:
+            marks.append((key, value, ex))
+
+    await live_events.heartbeat({"redis": R(), "settings": settings()})
+    assert marks == [(live_events.PUBLISHER_KEY, "1", live_events.PUBLISHER_SECONDS)]
+    await live_events.heartbeat({"redis": R(), "settings": settings(on=False)})
+    await live_events.heartbeat({"settings": settings()})  # no Redis: nothing, no error
+    assert len(marks) == 1
+
+
+async def test_fire_never_makes_the_caller_wait_for_redis() -> None:
+    redis = Recorder(hang=True)
+    started = asyncio.get_running_loop().time()
+    live_events.fire(redis, settings(), TENANT, ENV)  # a hanging Redis, and fire returns at once
+    assert asyncio.get_running_loop().time() - started < 0.05
+    live_events.fire(None, settings(), TENANT, ENV)
+    live_events.fire(redis, settings(on=False), TENANT, ENV)
+    for task in list(live_events._pending):
+        task.cancel()
+    await live_events.drain()
+
+
+async def test_fire_delivers_in_the_background() -> None:
+    redis = Recorder()
+    live_events.fire(redis, settings(), TENANT, ENV, "handoff")
+    await live_events.drain()
+    assert redis.sent == [(live_events.channel(TENANT, ENV), "handoff")]

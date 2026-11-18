@@ -12,8 +12,14 @@ it happens, so the screen refetches at once and polls only as a safety net.
 - **An event carries no data.** Only a kind, `inbox` or `handoff`: no message, name, number or id.
   The screen reacts by refetching through the normal authenticated calls, which apply every rule
   (assigned-only chats, workspace scope). The stream cannot leak a chat.
-- **Publishing never hurts a message.** Best effort: half a second at most, every error swallowed,
-  nothing awaited by the customer's turn. A Redis outage means the next poll finds the change.
+- **Publishing never hurts a message.** It runs as a background task (`live_events.fire`): the
+  customer's turn and a staff action never wait for Redis, every error is swallowed, and a hanging
+  Redis costs nothing. An outage means the next poll finds the change.
+- **The screen is told "live" only while a worker is publishing.** The API serves the stream and the
+  worker publishes, and both need the flag. The worker leaves a 90-second mark every 20 seconds
+  (`live_events.heartbeat`, a cron in `worker.py`); the stream's `ready` and `ping` carry
+  `{"live": true|false}` from it. If the flag is on for the API but not for the worker (or the queue
+  is inline), `live` stays false and the screens keep polling at the normal rate.
 - **No database connection is held.** The screen first calls `POST /pi/events/ticket` (a normal
   authenticated call) and gets a signed ticket good for 60 seconds, bound to one workspace and one
   person. `GET /pi/events/stream?ticket=` then needs no session.
@@ -46,7 +52,9 @@ A blocked number (see blocklist.md) never reaches this point.
 
 ## Turning it on
 
-1. Set `PI_EVENTS_ENABLED=true` on the API service and on `pi-worker` (Railway). No migration.
+1. Set `PI_EVENTS_ENABLED=true` on the API service **and** on `pi-worker` (Railway). No migration.
+   Each API replica allows up to 300 streams, each holding one Redis connection: check the Redis
+   plan's connection limit against replicas x 300 before a large rollout.
 2. Open the pi inbox, send a message from a test number: it should appear within a second. If the
    browser's network tab shows `/pi/events/stream` ending quickly or failing, polling carries on.
 

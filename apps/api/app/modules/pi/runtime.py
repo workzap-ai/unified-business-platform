@@ -182,11 +182,11 @@ async def system_scope(
 
 
 async def _signal(ctx: dict[str, Any], scope: WorkspaceScope, kind: str = "inbox") -> None:
-    """Tell open screens something changed (live_events.py). Best effort: never raises, never waits
-    more than half a second, and does nothing unless PI_EVENTS_ENABLED is on."""
+    """Tell open screens something changed (live_events.py). Runs in the background, so the turn
+    never waits for Redis; does nothing unless PI_EVENTS_ENABLED is on."""
     from app.modules.pi import live_events
 
-    await live_events.publish(
+    live_events.fire(
         ctx.get("redis"), ctx.get("settings"), scope.tenant_id, scope.environment_id, kind
     )
 

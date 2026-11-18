@@ -57,6 +57,9 @@ class FakeRedis:
     def pubsub(self) -> FakePubSub:
         return self.ps
 
+    async def exists(self, key: str) -> int:
+        return 1
+
 
 def turn_on(pi: Any) -> None:
     pi.app.state.settings.pi_events_enabled = True
@@ -140,8 +143,10 @@ async def test_a_staff_action_publishes_and_a_redis_failure_changes_nothing(
     pi.app.state.redis = recorder
     url = f"/api/v1/pi/conversations/{chat.id}/actions"
     assert (await api.post(f"{url}/read")).status_code == 200  # reading is not news
+    await live_events.drain()
     assert recorder.sent == []
     assert (await api.post(f"{url}/takeover")).json()["mode"] == "human"
+    await live_events.drain()
     assert recorder.sent == [
         (live_events.channel(UUID(pi.tenant_id), UUID(pi.environment_id)), "inbox")
     ]
@@ -164,11 +169,14 @@ async def test_a_message_and_its_reply_are_unchanged_and_signal_when_on(
     on = Recorder()
     pi.ctx["redis"] = on
     await pi.process("hello again", "wamid.ev-on")
+    await live_events.drain()
     assert len(on.sent) >= 1 and {kind for _, kind in on.sent} == {"inbox"}
     assert len(await pi.outbound()) > replies_off  # the reply is produced exactly as before
     before = len(on.sent)
     await pi.deliver_all()
+    await live_events.drain()
     assert len(on.sent) > before  # a reply that went out signals too
     pi.ctx["redis"] = Recorder(fail=True)
     await pi.process("and once more", "wamid.ev-fail")  # a broken Redis never breaks a message
+    await live_events.drain()
     await pi.close()

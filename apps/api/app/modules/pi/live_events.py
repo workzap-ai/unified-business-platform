@@ -63,6 +63,60 @@ async def publish(
         return False
 
 
+_pending: set["asyncio.Task[bool]"] = set()
+
+
+def fire(
+    redis: Any, settings: Any, tenant_id: UUID, environment_id: UUID, kind: str = "inbox"
+) -> None:
+    """Publish in the background: the caller (a customer's turn, a staff action) never waits for
+    Redis, not even the half second a hanging one would cost. Does nothing when off."""
+    if redis is None or not enabled(settings):
+        return
+    try:
+        task = asyncio.get_running_loop().create_task(
+            publish(redis, settings, tenant_id, environment_id, kind)
+        )
+    except RuntimeError:  # no running loop: nothing to signal from
+        return
+    _pending.add(task)  # a reference, so the task is not collected before it finishes
+    task.add_done_callback(_pending.discard)
+
+
+async def drain() -> None:
+    """Wait for signals still on their way (tests, shutdown)."""
+    if _pending:
+        await asyncio.gather(*list(_pending), return_exceptions=True)
+
+
+# ---- is anyone publishing? ---------------------------------------------------------------------
+# The stream is served by the API and the signals come from the worker. Both need the flag; if the
+# worker lacks it the stream would look healthy and say nothing, and the screens would poll slowly
+# for nothing. So the worker leaves a short-lived mark, and the stream only tells the screen it is
+# "live" while the mark exists.
+
+PUBLISHER_KEY = "pi:events:publisher"
+PUBLISHER_SECONDS = 90
+
+
+async def heartbeat(ctx: dict[str, Any]) -> None:
+    """Worker cron: leave the mark while this process publishes. Never raises."""
+    redis = ctx.get("redis")
+    if redis is None or not enabled(ctx.get("settings")):
+        return
+    try:
+        await asyncio.wait_for(redis.set(PUBLISHER_KEY, "1", ex=PUBLISHER_SECONDS), 2.0)
+    except Exception:  # noqa: BLE001
+        logger.warning("pi_event_heartbeat_failed")
+
+
+async def publisher_alive(redis: Any) -> bool:
+    try:
+        return bool(await asyncio.wait_for(redis.exists(PUBLISHER_KEY), 1.0))
+    except Exception:  # noqa: BLE001 - unknown means not live: the screen keeps polling
+        return False
+
+
 # ---- the ticket: who may open a stream, for one minute ----------------------------------------
 
 
@@ -128,6 +182,10 @@ def release(user_id: UUID) -> None:
     _open_total = max(0, _open_total - 1)
 
 
+def status_frame(event: str, live: bool) -> str:
+    return f"event: {event}\ndata: {json.dumps({'live': live})}\n\n"
+
+
 def frame(kind: str) -> str:
     return f"event: change\ndata: {json.dumps({'kind': kind})}\n\n"
 
@@ -140,7 +198,7 @@ async def stream(
     pubsub = redis.pubsub()
     try:
         await pubsub.subscribe(channel(tenant_id, environment_id))
-        yield "retry: 5000\n\nevent: ready\ndata: {}\n\n"
+        yield "retry: 5000\n\n" + status_frame("ready", await publisher_alive(redis))
         started = last_beat = time.monotonic()
         while time.monotonic() - started < max_seconds:
             message = await pubsub.get_message(ignore_subscribe_messages=True, timeout=1.0)
@@ -152,7 +210,8 @@ async def stream(
                     yield frame(kind)
                     last_beat = now
             elif now - last_beat >= HEARTBEAT_SECONDS:
-                yield "event: ping\ndata: {}\n\n"  # an event, not a comment: the screen sees it
+                # an event, not a comment: the screen sees it, and learns if anyone is publishing
+                yield status_frame("ping", await publisher_alive(redis))
                 last_beat = now
     finally:
         try:
