@@ -133,3 +133,19 @@ async def test_live_stats_report_the_spread_and_whether_a_worker_is_publishing()
 async def test_live_stats_survive_an_unreachable_redis() -> None:
     stats = await speed.live_stats(Store(fail=True), settings(), TENANT, ENV)
     assert stats["enabled"] and stats["samples"] == 0
+
+
+async def test_a_sample_can_name_the_slowest_refetch_and_only_known_names() -> None:
+    store = Store()
+    assert await speed.record_timing(store, TENANT, ENV, 5, 600, 9000, "conversations")
+    assert store.ops[0][2].endswith(",9000,conversations")
+    assert await speed.record_timing(store, TENANT, ENV, 5, 600, 9000, "drop table")
+    assert store.ops[3][2].endswith(",9000,")  # an unknown name is not kept
+
+
+async def test_live_stats_name_the_slowest_part_and_its_time() -> None:
+    items = [b"1,600,1,9000,conversations", b"1,700,2,8000,conversations", b"1,500,3,100,messages"]
+    stats = await speed.live_stats(Store(items=items), settings(), TENANT, ENV)
+    assert stats["slowest_part"] == "conversations" and stats["slowest_ms"]["max"] == 9000
+    old = await speed.live_stats(Store(items=[b"1,600,1"]), settings(), TENANT, ENV)
+    assert old["slowest_part"] is None and old["samples"] == 1  # samples from before still count

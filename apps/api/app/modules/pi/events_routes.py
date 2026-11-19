@@ -8,7 +8,7 @@ GET  /pi/events/stream  opens the stream with that ticket. It holds no database 
 """
 
 import logging
-from typing import Any
+from typing import Any, Literal
 
 from fastapi import APIRouter, Query, Request
 from fastapi.responses import Response, StreamingResponse
@@ -103,6 +103,8 @@ class Timing(BaseModel):
     model_config = ConfigDict(extra="forbid")
     lag_ms: int = Field(ge=0, le=speed.MAX_MS)
     screen_ms: int = Field(ge=0, le=speed.MAX_MS)
+    slowest_ms: int | None = Field(default=None, ge=0, le=speed.MAX_MS)
+    slowest: Literal["conversations", "messages", "context", "handoffs"] | None = None
 
 
 @router.post("/timing", status_code=204)
@@ -117,6 +119,8 @@ async def timing(data: Timing, request: Request, scope: Scope, session: Session)
             scope.environment_id,
             data.lag_ms,
             data.screen_ms,
+            data.slowest_ms,
+            data.slowest,
         )
     return Response(status_code=204)
 

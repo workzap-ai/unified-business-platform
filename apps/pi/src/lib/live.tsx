@@ -72,13 +72,21 @@ export function LiveEventsProvider({
     let heardAt: number | null = null;
     let heardLag = 0;
     let lastReport = 0;
-    const report = (screenMs: number, lagMs: number) => {
+    const report = (
+      screenMs: number,
+      lagMs: number,
+      slowestMs: number,
+      slowest: string,
+    ) => {
       const now = Date.now();
       if (now - lastReport < 10_000) return; // at most one sample every ten seconds
       lastReport = now;
+      const cap = (n: number) => Math.min(600_000, Math.round(n));
       void api("POST", "/pi/events/timing", {
-        lag_ms: Math.min(600_000, Math.round(lagMs)),
-        screen_ms: Math.min(600_000, Math.round(screenMs)),
+        lag_ms: cap(lagMs),
+        screen_ms: cap(screenMs),
+        slowest_ms: cap(slowestMs),
+        slowest,
       }).catch(() => undefined);
     };
     const refresh = (lagMs?: number) => {
@@ -91,12 +99,33 @@ export function LiveEventsProvider({
         const started = heardAt;
         const lag = heardLag;
         heardAt = null;
+        // Only screens that are open refetch; time each one from the signal to its fresh data. What
+        // the person sees first is the earliest of the conversation list and the open chat.
+        const finished: { part: string; at: number }[] = [];
         void Promise.all(
-          REFRESH_KEYS.map((k) =>
-            client.invalidateQueries({ queryKey: key([k]) }),
+          REFRESH_KEYS.filter(
+            (k) =>
+              client
+                .getQueryCache()
+                .findAll({ queryKey: key([k]), type: "active" }).length > 0,
+          ).map((k) =>
+            client.invalidateQueries({ queryKey: key([k]) }).then(() => {
+              finished.push({
+                part: k === "history" ? "messages" : k,
+                at: performance.now(),
+              });
+            }),
           ),
         ).then(() => {
-          if (started !== null) report(performance.now() - started, lag);
+          if (started === null || finished.length === 0) return;
+          const seen = finished.filter(
+            (f) => f.part === "conversations" || f.part === "messages",
+          );
+          const first = Math.min(
+            ...(seen.length ? seen : finished).map((f) => f.at),
+          );
+          const slowest = finished.reduce((a, b) => (b.at > a.at ? b : a));
+          report(first - started, lag, slowest.at - started, slowest.part);
         });
       }, 400);
     };

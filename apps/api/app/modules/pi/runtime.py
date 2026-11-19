@@ -2277,6 +2277,14 @@ async def send_pi_message(ctx: dict[str, Any], message_id: str) -> None:
             if message.created_at is not None
             else None
         )
+        # The row's created_at is its transaction's start, so picked_ms also holds the turn's own
+        # time. arq says when the job was queued: that is the real wait for a worker.
+        queued_at = ctx.get("enqueue_time")
+        queue_ms = (
+            max(0, round((datetime.now(UTC) - queued_at).total_seconds() * 1000))
+            if isinstance(queued_at, datetime)
+            else None
+        )
         connection = await session.scalar(
             select(WhatsAppConnection)
             .join(PiConversation, PiConversation.connection_id == WhatsAppConnection.id)
@@ -2413,6 +2421,7 @@ async def send_pi_message(ctx: dict[str, Any], message_id: str) -> None:
             from app.integrations.whatsapp_bridge import token as connection_token
 
             token = await connection_token(session, ctx["settings"], connection)
+            provider_started = time.perf_counter()
             if meeting_notice or template_send:
                 notice = meeting_notice or template_send
                 message.provider_message_id = await whatsapp.send_template_values(
@@ -2492,6 +2501,7 @@ async def send_pi_message(ctx: dict[str, Any], message_id: str) -> None:
                 )
                 if message.sender_type == "ai" and conversation.service_brief:
                     schedule_followup(conversation, policy)
+            provider_ms = round((time.perf_counter() - provider_started) * 1000)
             message.status, message.error_code = "sent", None
             # Where the time between "queued" and "delivered" goes: how long the job waited for a
             # worker, and how long the checks and the provider call took (kept for tracing a slow
@@ -2500,6 +2510,8 @@ async def send_pi_message(ctx: dict[str, Any], message_id: str) -> None:
                 **message.media,
                 "send_timing": {
                     "picked_ms": picked_ms,
+                    "queue_ms": queue_ms,
+                    "provider_ms": provider_ms,
                     "send_ms": round((time.perf_counter() - started) * 1000),
                 },
             }

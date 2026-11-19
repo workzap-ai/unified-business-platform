@@ -17,10 +17,15 @@ const STAGES: [string, string, string][] = [
   ["thinking", "pi thinking", "Reading the chat and writing the reply."],
   [
     "queue_to_sender",
-    "Reply waiting to be sent",
-    "From the reply being ready until the sender picks it up.",
+    "Reply waiting for a worker",
+    "From the reply being ready until a worker picks it up to send.",
   ],
-  ["sending", "Sending to WhatsApp", "The call to WhatsApp itself."],
+  [
+    "send_checks",
+    "Checks before sending",
+    "Plan, permissions and the chat's state, just before the WhatsApp call.",
+  ],
+  ["whatsapp_call", "The WhatsApp call", "The call to WhatsApp itself."],
   [
     "delivered_after_sent",
     "WhatsApp delivering",
@@ -144,6 +149,9 @@ export function SpeedCard() {
                   {data.live.samples} samples:{" "}
                   {ms(data.live.server_lag_ms?.p50)} on the server,{" "}
                   {ms(data.live.screen_ms?.p50)} on the screen.
+                  {data.live.slowest_part
+                    ? ` The slowest thing to reload is usually "${data.live.slowest_part}" (${ms(data.live.slowest_ms?.p50)}).`
+                    : ""}
                 </p>
               )}
             </div>

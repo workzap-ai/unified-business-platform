@@ -31,6 +31,8 @@ export const speedSchema = z.object({
     server_lag_ms: spread,
     screen_ms: spread,
     total_ms: spread,
+    slowest_ms: spread,
+    slowest_part: z.string().nullable().catch(null),
   }),
 });
 export type Speed = z.infer<typeof speedSchema>;
@@ -45,11 +47,20 @@ export const piSpeedService = {
   get: (hours: number) =>
     apiRequest("GET", "/pi/events/speed", speedSchema, { query: { hours } }),
   ticket: () => apiRequest("POST", "/pi/events/ticket", ticketSchema),
-  timing: (lagMs: number, screenMs: number) =>
-    apiRequest("POST", "/pi/events/timing", null, {
+  timing: (
+    lagMs: number,
+    screenMs: number,
+    slowestMs: number,
+    slowest: string,
+  ) => {
+    const cap = (n: number) => Math.min(600_000, Math.round(n));
+    return apiRequest("POST", "/pi/events/timing", null, {
       body: {
-        lag_ms: Math.min(600_000, Math.round(lagMs)),
-        screen_ms: Math.min(600_000, Math.round(screenMs)),
+        lag_ms: cap(lagMs),
+        screen_ms: cap(screenMs),
+        slowest_ms: cap(slowestMs),
+        slowest,
       },
-    }),
+    });
+  },
 };

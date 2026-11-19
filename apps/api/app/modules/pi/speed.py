@@ -88,7 +88,8 @@ async def reply_stats(session: AsyncSession, scope: WorkspaceScope, hours: int) 
     waiting: list[float] = []
     thinking: list[float] = []
     queued: list[float] = []
-    sending: list[float] = []
+    checks: list[float] = []
+    provider: list[float] = []
     totals: list[float] = []
     delivered: list[float] = []
     timed = 0
@@ -105,8 +106,16 @@ async def reply_stats(session: AsyncSession, scope: WorkspaceScope, hours: int) 
         if picked is None or sent is None:
             continue
         timed += 1
-        queued.append(picked / 1000)
-        sending.append(sent / 1000)
+        # picked_ms counts from the row's transaction start, so it still holds the turn's thinking
+        # time; the worker's own wait is queue_ms when it was recorded, else picked minus thinking.
+        queue_ms = timing.get("queue_ms")
+        if queue_ms is None:
+            queue_ms = max(0, picked - (latency_ms or 0))
+        queued.append(queue_ms / 1000)
+        provider_ms = timing.get("provider_ms")
+        if provider_ms is not None:
+            provider.append(provider_ms / 1000)
+            checks.append(max(0, sent - provider_ms) / 1000)
         left = queued_at + timedelta(milliseconds=picked + sent)
         totals.append(_seconds(left - stored))
         if delivered_at is not None:
@@ -120,7 +129,8 @@ async def reply_stats(session: AsyncSession, scope: WorkspaceScope, hours: int) 
             "waiting_for_more_messages": percentiles(waiting),
             "thinking": percentiles(thinking),
             "queue_to_sender": percentiles(queued),
-            "sending": percentiles(sending),
+            "send_checks": percentiles(checks),
+            "whatsapp_call": percentiles(provider),
             "delivered_after_sent": percentiles(delivered),
         },
     }
@@ -141,17 +151,31 @@ def clamp_ms(value: object) -> int | None:
     return number if 0 <= number <= MAX_MS else None
 
 
+SLOW_PARTS = ("conversations", "messages", "context", "handoffs")
+
+
 async def record_timing(
-    redis: Any, tenant_id: UUID, environment_id: UUID, lag_ms: object, screen_ms: object
+    redis: Any,
+    tenant_id: UUID,
+    environment_id: UUID,
+    lag_ms: object,
+    screen_ms: object,
+    slowest_ms: object = None,
+    slowest: object = None,
 ) -> bool:
-    """Keep one sample (server lag, screen time) for this workspace. Never raises."""
+    """Keep one sample for this workspace: the server's wait, the screen's time to the first fresh
+    data, and (optionally) which refetch was slowest and how long it took. Never raises."""
     lag, screen = clamp_ms(lag_ms), clamp_ms(screen_ms)
     if redis is None or lag is None or screen is None:
         return False
+    slow = clamp_ms(slowest_ms) if slowest_ms is not None else None
+    part = slowest if slowest in SLOW_PARTS else ""
     key = _timing_key(tenant_id, environment_id)
     try:
         pipe = redis.pipeline()
-        pipe.lpush(key, f"{lag},{screen},{int(time.time())}")
+        pipe.lpush(
+            key, f"{lag},{screen},{int(time.time())},{slow if slow is not None else ''},{part}"
+        )
         pipe.ltrim(key, 0, TIMING_KEEP - 1)
         pipe.expire(key, TIMING_DAYS * 86400)
         await pipe.execute()
@@ -172,6 +196,8 @@ async def live_stats(
         "server_lag_ms": None,
         "screen_ms": None,
         "total_ms": None,
+        "slowest_ms": None,
+        "slowest_part": None,
     }
     if redis is None or not enabled:
         return out
@@ -182,14 +208,21 @@ async def live_stats(
         return out
     lags: list[float] = []
     screens: list[float] = []
+    slowest: list[float] = []
+    named: dict[str, int] = {}
     for item in raw:
         text = item.decode() if isinstance(item, bytes) else str(item)
         parts = text.split(",")
         if len(parts) >= 2 and parts[0].isdigit() and parts[1].isdigit():
             lags.append(int(parts[0]))
             screens.append(int(parts[1]))
+            if len(parts) >= 5 and parts[3].isdigit() and parts[4] in SLOW_PARTS:
+                slowest.append(int(parts[3]))
+                named[parts[4]] = named.get(parts[4], 0) + 1
     out["samples"] = len(lags)
     out["server_lag_ms"] = percentiles(lags)
     out["screen_ms"] = percentiles(screens)
     out["total_ms"] = percentiles([a + b for a, b in zip(lags, screens, strict=True)])
+    out["slowest_ms"] = percentiles(slowest)
+    out["slowest_part"] = max(named, key=lambda k: named[k]) if named else None
     return out

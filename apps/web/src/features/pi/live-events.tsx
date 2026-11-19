@@ -67,16 +67,37 @@ export function LiveEventsProvider({
         const started = heardAt;
         const lag = heardLag;
         heardAt = null;
+        // Only screens that are open refetch; time each one from the signal to its fresh data. What
+        // the person sees first is the earliest of the conversation list and the open chat.
+        const finished: { part: string; at: number }[] = [];
         void Promise.all(
-          REFRESH_PREFIXES.map((p) =>
-            client.invalidateQueries({ queryKey: [...scopeKey, "pi", p] }),
+          REFRESH_PREFIXES.filter(
+            (p) =>
+              client
+                .getQueryCache()
+                .findAll({ queryKey: [...scopeKey, "pi", p], type: "active" })
+                .length > 0,
+          ).map((p) =>
+            client
+              .invalidateQueries({ queryKey: [...scopeKey, "pi", p] })
+              .then(() => {
+                finished.push({ part: p, at: performance.now() });
+              }),
           ),
         ).then(() => {
           const now = Date.now();
-          if (started === null || now - lastReport < 10_000) return;
-          lastReport = now; // at most one sample every ten seconds
+          if (started === null || finished.length === 0) return;
+          if (now - lastReport < 10_000) return; // at most one sample every ten seconds
+          lastReport = now;
+          const seen = finished.filter(
+            (f) => f.part === "conversations" || f.part === "messages",
+          );
+          const first = Math.min(
+            ...(seen.length ? seen : finished).map((f) => f.at),
+          );
+          const slowest = finished.reduce((a, b) => (b.at > a.at ? b : a));
           void piSpeedService
-            .timing(lag, performance.now() - started)
+            .timing(lag, first - started, slowest.at - started, slowest.part)
             .catch(() => undefined);
         });
       }, 400);

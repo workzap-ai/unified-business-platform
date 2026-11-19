@@ -235,7 +235,8 @@ async def test_the_speed_report_times_a_real_reply_and_holds_no_text_or_ids(
     total = body["replies"]["total_s"]
     assert total is not None and 0 <= total["p50"] <= total["p90"] <= total["max"]
     stages = body["replies"]["stages_s"]
-    assert {"thinking", "queue_to_sender", "sending"} <= set(stages)
+    assert {"thinking", "queue_to_sender", "send_checks", "whatsapp_call"} <= set(stages)
+    assert "sending" not in stages  # replaced by the two parts it was made of
     assert body["live"]["enabled"] is False  # the flag is off here
     assert "hello there" not in response.text and pi.tenant_id not in response.text
     assert (await api.get("/api/v1/pi/events/speed", params={"hours": 0})).status_code == 422
@@ -260,4 +261,20 @@ async def test_a_timing_sample_is_kept_only_when_live_events_are_on_and_must_be_
     live = (await api.get("/api/v1/pi/events/speed")).json()["live"]
     assert live["enabled"] and live["publishing"] and live["samples"] == 1
     assert live["total_ms"]["max"] == 740
+    await pi.close()
+
+
+async def test_the_queue_stage_is_the_workers_wait_not_the_turns_own_time(
+    api: httpx.AsyncClient, business_db: Any, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    from datetime import UTC, datetime, timedelta
+
+    pi = await pi_workspace(api, business_db)
+    scripted_gateway(monkeypatch, lambda text: intent("greeting", 1.0))
+    await pi.process("hello there", "wamid.queue-1")
+    pi.ctx["enqueue_time"] = datetime.now(UTC) - timedelta(seconds=3)  # arq: queued 3 s ago
+    await pi.deliver_all()
+    stages = (await api.get("/api/v1/pi/events/speed")).json()["replies"]["stages_s"]
+    assert 3 <= stages["queue_to_sender"]["p50"] < 10
+    assert stages["whatsapp_call"]["p50"] <= stages["send_checks"]["p50"] + 5
     await pi.close()
