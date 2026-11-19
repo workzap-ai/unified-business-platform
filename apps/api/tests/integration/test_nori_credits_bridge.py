@@ -396,6 +396,27 @@ async def test_a_template_is_sent_as_a_template_outside_the_window(api, business
     await b.pi.close()
 
 
+async def test_a_sign_in_code_goes_through_the_authentication_template(api, business_db):
+    b = await bridge(api, business_db)
+    template = {"name": "nori_login_code", "language": "en", "kind": "code", "params": ["481516"]}
+    response = await b.post(b.send_payload(text="Your nori code: 481516", template=template))
+    assert response.status_code == 200, response.text
+    [message] = [m for m in b.sent if m.get("type") == "template"]
+    parts = {c["type"]: c for c in message["template"]["components"]}
+    assert parts["body"]["parameters"] == [{"type": "text", "text": "481516"}]
+    assert parts["button"]["sub_type"] == "url" and parts["button"]["index"] == "0"
+    assert parts["button"]["parameters"] == [{"type": "text", "text": "481516"}]
+    assert b.texts_to(MEMBER) == []  # never also as free text
+    [row] = await b.audit()
+    assert row.outcome == "sent_template"
+    # only a short numeric code qualifies, and only one value
+    for bad in (["abc123"], ["12"], ["123456", "x"], ["123456789"]):
+        bad_template = {**template, "params": bad}
+        refused = await b.post(b.send_payload(text="code", template=bad_template))
+        assert refused.status_code == 422 and refused.json()["reason"] == "bad_template", bad
+    await b.pi.close()
+
+
 async def test_signature_timestamp_and_replay_failures(api, business_db):
     b = await bridge(api, business_db)
     payload = b.send_payload()

@@ -614,7 +614,15 @@ class Kapso:
         )
         return str(data.get("status") or "PENDING")[:24]
 
-    async def create_code_template(self, business_account_id: str, name: str, language: str) -> str:
+    async def create_code_template(
+        self,
+        business_account_id: str,
+        name: str,
+        language: str,
+        *,
+        security_line: bool = True,
+        expiry_minutes: int = 10,
+    ) -> str:
         """Meta's authentication template for one-time codes: Meta writes the text ("<code>
         is your verification code"), adds the security line, the expiry and a copy-code
         button. Usually approved within minutes."""
@@ -632,8 +640,8 @@ class Kapso:
                 "language": language,
                 "category": "AUTHENTICATION",
                 "components": [
-                    {"type": "BODY", "add_security_recommendation": True},
-                    {"type": "FOOTER", "code_expiration_minutes": 10},
+                    {"type": "BODY", "add_security_recommendation": security_line},
+                    {"type": "FOOTER", "code_expiration_minutes": max(1, min(expiry_minutes, 90))},
                     {
                         "type": "BUTTONS",
                         "buttons": [{"type": "OTP", "otp_type": "COPY_CODE", "text": "Copy code"}],

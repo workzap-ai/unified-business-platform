@@ -58,6 +58,7 @@ _URL = re.compile(
 )
 _TEMPLATE_NAME = re.compile(r"[a-z0-9_]{1,512}")
 _TEMPLATE_LANG = re.compile(r"[a-z]{2,3}(?:_[A-Z]{2})?")
+_CODE = re.compile(r"[0-9]{4,8}")
 
 
 @dataclass
@@ -128,6 +129,11 @@ def check_content(
         return "", None, "bad_template"
     if not isinstance(params, list) or not 1 <= len(params) <= MAX_TEMPLATE_PARAMS:
         return "", None, "bad_template"
+    if template.get("kind") == "code":
+        # A sign-in code through an AUTHENTICATION template: one 4 to 8 digit code, nothing else.
+        if len(params) != 1 or not isinstance(params[0], str) or not _CODE.fullmatch(params[0]):
+            return "", None, "bad_template"
+        return clean, {"name": name, "language": language, "params": params, "code": True}, None
     values = []
     for item in params:
         if not isinstance(item, str):
@@ -320,9 +326,19 @@ async def _handle(
     try:
         secret = await connection_token(session, settings, connection)
         if template is not None:
-            message_id = await whatsapp.send_template_values(
-                connection.phone_number_id, to, template, template["params"], secret
-            )
+            if template.get("code"):
+                # Authentication template: the code goes in the body and in the copy-code button.
+                message_id = await whatsapp.send_code_template(
+                    connection.phone_number_id,
+                    to,
+                    {"name": template["name"], "language": template["language"]},
+                    template["params"][0],
+                    secret,
+                )
+            else:
+                message_id = await whatsapp.send_template_values(
+                    connection.phone_number_id, to, template, template["params"], secret
+                )
         else:
             message_id = await whatsapp.send(connection.phone_number_id, to, text, secret)
     except BusinessRuleViolation as error:
