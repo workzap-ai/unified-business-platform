@@ -23,6 +23,7 @@ import json
 import logging
 import secrets
 import time
+import zlib
 from typing import Any, Protocol
 from urllib.parse import urlsplit
 from uuid import UUID
@@ -34,6 +35,7 @@ logger = logging.getLogger(__name__)
 TIMEOUT = 15.0
 BASE = "https://video.stream-io-api.com/api/v2"
 CALL_TYPE = "pi_room"
+GZIP_MAGIC = bytes((0x1F, 0x8B))  # the first two bytes of a gzip body
 TRANSCRIPT_HOST = ".stream-io-cdn.com"  # the transcript is fetched only from the provider's CDN
 MAX_TRANSCRIPT_BYTES = 5_000_000
 STAFF_PREFIX = "s_"
@@ -84,6 +86,20 @@ def verify_signature(secret: str, signature: str, body: bytes) -> bool:
         return False
     good = hmac.new(secret.encode(), body, hashlib.sha256).hexdigest()
     return hmac.compare_digest(good, signature.strip().lower())
+
+
+def plain_body(body: bytes, limit: int) -> bytes | None:
+    """The body a signature is computed over. The provider may gzip a callback, and signs the bytes
+    after unzipping; anything that unzips to more than `limit` bytes (or is not valid gzip) is
+    refused, so a small request cannot grow into a large one."""
+    if body[:2] != GZIP_MAGIC:
+        return body if len(body) <= limit else None
+    unzip = zlib.decompressobj(16 + zlib.MAX_WBITS)
+    try:
+        out = unzip.decompress(body, limit)
+    except zlib.error:
+        return None
+    return None if unzip.unconsumed_tail else out
 
 
 def trusted_transcript_url(url: str) -> bool:

@@ -382,3 +382,25 @@ async def test_deleting_a_meeting_removes_its_call_at_the_provider_or_refuses(
     assert done.status_code == 200, done.text
     assert removed == [call_id] and (await the_room(business_db, mid)) is None
     await pi.close()
+
+
+async def test_a_gzipped_callback_is_accepted_when_signed_over_the_unzipped_body(
+    api, business_db, provider
+):
+    import gzip
+
+    pi, conv, scope = await workspace(api, business_db, "369100013")
+    await switch(api)
+    mid = (await open_room(api)).json()["meeting"]["id"]
+    room = await the_room(business_db, mid)
+    plain = json.dumps(event(room, "call.session_ended")).encode()
+    sig = hmac.new(SECRET.encode(), plain, hashlib.sha256).hexdigest()
+    headers = {"x-signature": sig, "content-encoding": "gzip", "content-type": "application/json"}
+    ok = await api.post(HOOK, content=gzip.compress(plain), headers=headers)
+    assert ok.status_code == 200
+    assert (await the_room(business_db, mid)).state == "ended"
+    bad = await api.post(
+        HOOK, content=gzip.compress(plain), headers={**headers, "x-signature": "0" * 64}
+    )
+    assert bad.status_code == 401
+    await pi.close()

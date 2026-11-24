@@ -65,3 +65,21 @@ def test_only_the_providers_own_cdn_over_https_is_ever_fetched():
         "",
     ):
         assert not rp.trusted_transcript_url(bad), bad
+
+
+def test_a_gzipped_callback_is_signed_over_the_unzipped_bytes_and_cannot_balloon():
+    import gzip
+
+    body = b'{"type":"call.session_ended","call_cid":"pi_room:rabc"}'
+    zipped = gzip.compress(body)
+    assert rp.plain_body(body, 1000) == body
+    assert rp.plain_body(zipped, 1000) == body
+    sig = hmac.new(SECRET.encode(), body, hashlib.sha256).hexdigest()
+    assert rp.verify_signature(SECRET, sig, rp.plain_body(zipped, 1000) or b"")
+    assert not rp.verify_signature(
+        SECRET, sig, zipped
+    )  # the signature is not over the zipped bytes
+    assert rp.plain_body(b"\x1f\x8bnot gzip at all", 1000) is None
+    bomb = gzip.compress(b"0" * 100_000)
+    assert len(bomb) < 1000 and rp.plain_body(bomb, 1000) is None
+    assert rp.plain_body(b"x" * 2000, 1000) is None

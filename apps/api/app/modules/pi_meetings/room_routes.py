@@ -41,11 +41,13 @@ from app.modules.pi_meetings.models import PiMeeting, PiMeetingParticipant, PiMe
 from app.modules.pi_meetings.recording_routes import ISO_LANGUAGE
 from app.modules.pi_meetings.room_provider import (
     CALL_TYPE,
+    GZIP_MAGIC,
     RoomProvider,
     RoomProviderError,
     StreamProvider,
     guest_user,
     new_call_id,
+    plain_body,
     staff_user,
     verify_signature,
 )
@@ -386,10 +388,20 @@ async def webhook(request: Request, session: Session) -> dict[str, bool]:
     body = await request.body()
     if secret is None or len(body) > MAX_BODY:
         raise BusinessRuleViolation("STREAM_NOT_CONFIGURED", "Not available", 503)
-    if not verify_signature(secret, request.headers.get("x-signature", ""), body):
+    plain = plain_body(body, MAX_BODY)  # the provider may gzip it and signs the unzipped bytes
+    if plain is None or not verify_signature(secret, request.headers.get("x-signature", ""), plain):
+        logger.warning(
+            "stream_signature_invalid",
+            extra={
+                "gzip": body[:2] == GZIP_MAGIC,
+                "encoding": request.headers.get("content-encoding", "")[:20],
+                "has_signature": bool(request.headers.get("x-signature")),
+                "length": len(body),
+            },
+        )
         raise BusinessRuleViolation("STREAM_SIGNATURE_INVALID", "Invalid signature", 401)
     try:
-        payload = json.loads(body)
+        payload = json.loads(plain)
     except ValueError:
         return {"ok": True}  # signed but not ours to understand: do not make the provider retry
     kind = payload.get("type") if isinstance(payload, dict) else None
