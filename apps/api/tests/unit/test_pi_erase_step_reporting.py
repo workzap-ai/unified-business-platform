@@ -23,12 +23,14 @@ from app.shared.scope import WorkspaceScope
 
 @pytest.fixture(autouse=True)
 def no_recordings(monkeypatch):
-    """The erase route removes saved meeting recordings from storage first; none here."""
+    """The erase route removes saved meeting recordings from storage, and the video rooms' calls at
+    the provider, first; none here."""
 
     async def none(*args, **kwargs):
         return []
 
     monkeypatch.setattr(brain_erase_routes.meeting_erase, "recording_keys", none)
+    monkeypatch.setattr(brain_erase_routes.meeting_erase, "room_calls", none)
 
 
 class PgError(Exception):
