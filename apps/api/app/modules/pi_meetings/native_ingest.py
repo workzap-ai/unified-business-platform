@@ -88,19 +88,27 @@ async def participant_for(
     return made
 
 
-async def add_lines(
-    session: AsyncSession, scope: WorkspaceScope, meeting: PiMeeting, rows: list[dict[str, Any]]
-) -> int:
-    """Store the transcript lines of one call; returns how many were new."""
+def spoken(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """The lines a person said, in the order they began: not the provider's other entries, and not
+    the lines of its own server users."""
     speech = [
         r
         for r in rows
-        if r.get("type") == "speech"
+        if isinstance(r, dict)
+        and r.get("type") == "speech"
         and isinstance(r.get("text"), str)
         and isinstance(r.get("speaker_id"), str)
         and r["speaker_id"] not in NOT_PEOPLE
     ]
     speech.sort(key=lambda r: (_ms(r.get("start_ts")) or 0, _ms(r.get("stop_ts")) or 0))
+    return speech
+
+
+async def add_lines(
+    session: AsyncSession, scope: WorkspaceScope, meeting: PiMeeting, rows: list[dict[str, Any]]
+) -> int:
+    """Store the transcript lines of one call; returns how many were new."""
+    speech = spoken(rows)
     # one transcript is applied at a time, so numbering never collides with a retried callback
     await session.execute(
         text("SELECT pg_advisory_xact_lock(hashtext(:key))"), {"key": f"room-ingest:{meeting.id}"}
@@ -187,7 +195,7 @@ async def finish_transcript(
     if meeting.status in ("created", "transcribing"):
         meeting.status = "analysing"
         meeting.failure_reason = ""
-    longest = max((_ms(r.get("stop_ts")) or 0 for r in rows if isinstance(r, dict)), default=0)
+    longest = max((_ms(r.get("stop_ts")) or 0 for r in spoken(rows)), default=0)
     meeting.duration_ms = max(meeting.duration_ms, longest)
     if meeting.held_at is None:
         meeting.held_at = room.started_at or now

@@ -11,6 +11,7 @@ import { Notice } from "@/components/app/states";
 import { ApiError } from "@/services/api-client";
 import { meetingJoinService } from "./meeting-join-service";
 import { MeetingVoiceJoin } from "./meeting-voice-join";
+import { MeetingRoomGuest } from "./room/meeting-room-guest";
 
 /**
  * The page a meeting link opens (`/join/<token>`), with no sign-in. The person sees what is
@@ -297,6 +298,22 @@ export function MeetingJoinPage({ token }: { token: string }) {
     return (
       <Shell>
         <MeetingVoiceJoin token={token} title={look.data.title} />
+      </Shell>
+    );
+
+  // a video room: the page joins the room instead of recording the microphone
+  if (look.data.room)
+    return (
+      <Shell>
+        <Card>
+          <CardBody className="space-y-4">
+            <div>
+              <p className="text-xs text-muted-foreground">You are joining</p>
+              <h1 className="text-lg font-semibold">{look.data.title}</h1>
+            </div>
+            <MeetingRoomGuest token={token} />
+          </CardBody>
+        </Card>
       </Shell>
     );
 

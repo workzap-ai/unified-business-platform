@@ -135,7 +135,14 @@ class StreamProvider:
     def _server_token(self) -> str:
         return sign_jwt(self._secret, {"server": True, "iat": int(time.time()) - 5})
 
-    async def _call(self, method: str, path: str, body: dict[str, Any] | None = None) -> Any:
+    async def _call(
+        self,
+        method: str,
+        path: str,
+        body: dict[str, Any] | None = None,
+        *,
+        missing_ok: bool = False,
+    ) -> Any:
         try:
             reply = await self._http.request(
                 method,
@@ -150,6 +157,8 @@ class StreamProvider:
             raise RoomProviderError(
                 "ROOM_PROVIDER_UNREACHABLE", "The video room service could not be reached"
             ) from None
+        if reply.status_code == 404 and missing_ok:
+            return {}
         if reply.status_code in (401, 403):
             raise RoomProviderError(
                 "ROOM_PROVIDER_KEY_REJECTED", "The video room service did not accept our key", 503
@@ -249,4 +258,6 @@ class StreamProvider:
         return lines
 
     async def delete_call(self, call_id: str) -> None:
-        await self._call("POST", f"/video/call/{CALL_TYPE}/{call_id}/delete", {"hard": True})
+        await self._call(
+            "POST", f"/video/call/{CALL_TYPE}/{call_id}/delete", {"hard": True}, missing_ok=True
+        )

@@ -698,6 +698,10 @@ async def delete_meeting(
             "connect the storage again and try once more",
             409,
         ) from None
+    from app.modules.pi_meetings import room_routes  # local: that module imports these routes
+
+    room = await room_routes.room_of(session, scope, meeting.id)
+    await room_routes.delete_calls(request, [room.call_id] if room else [])
     await erase.erase_one(session, scope, meeting.id)
     await record(
         session,

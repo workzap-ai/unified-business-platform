@@ -23,6 +23,7 @@ from app.modules.pi_meetings.models import (
     PiMeetingMedia,
     PiMeetingMediaData,
     PiMeetingParticipant,
+    PiMeetingRoom,
     PiMeetingSegment,
 )
 from app.shared.scope import WorkspaceScope
@@ -30,6 +31,7 @@ from app.shared.scope import WorkspaceScope
 MEETING_REMOVED_KEYS = (
     "meeting_documents",
     "meeting_bots",
+    "meeting_rooms",
     "meeting_media_data",
     "meeting_media",
     "meeting_guests",
@@ -39,6 +41,26 @@ MEETING_REMOVED_KEYS = (
     "meeting_participants",
     "meetings",
 )
+
+
+async def room_calls(session: AsyncSession, scope: WorkspaceScope, customer_id: UUID) -> list[str]:
+    """The provider's call ids of this customer's video rooms (read before the rows are deleted):
+    the call, its transcript and any recording live at the provider and must be removed there."""
+    rows = await session.scalars(
+        select(PiMeetingRoom.call_id)
+        .join(
+            PiMeeting,
+            (PiMeeting.id == PiMeetingRoom.meeting_id)
+            & (PiMeeting.tenant_id == PiMeetingRoom.tenant_id)
+            & (PiMeeting.environment_id == PiMeetingRoom.environment_id),
+        )
+        .where(
+            PiMeetingRoom.tenant_id == scope.tenant_id,
+            PiMeetingRoom.environment_id == scope.environment_id,
+            PiMeeting.customer_id == customer_id,
+        )
+    )
+    return list(rows.all())
 
 
 async def recording_keys(
@@ -100,6 +122,12 @@ def erase_steps(scope: WorkspaceScope, customer_id: UUID) -> tuple[tuple[str, An
             "meeting_bots",
             delete(PiMeetingBot).where(
                 *mine(PiMeetingBot), PiMeetingBot.meeting_id.in_(meeting_ids)
+            ),
+        ),
+        (
+            "meeting_rooms",
+            delete(PiMeetingRoom).where(
+                *mine(PiMeetingRoom), PiMeetingRoom.meeting_id.in_(meeting_ids)
             ),
         ),
         (
@@ -192,6 +220,7 @@ async def erase_one(session: AsyncSession, scope: WorkspaceScope, meeting_id: UU
     for model in (
         PiMeetingDocument,
         PiMeetingBot,
+        PiMeetingRoom,
         PiMeetingGuest,
         PiMeetingInvite,
         PiMeetingMedia,

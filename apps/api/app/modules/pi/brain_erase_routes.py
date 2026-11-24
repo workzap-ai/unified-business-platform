@@ -52,6 +52,11 @@ async def erase(
             "was erased; connect the storage again and try once more",
             409,
         ) from None
+    from app.modules.pi_meetings import room_routes  # local: that module imports the meeting routes
+
+    await room_routes.delete_calls(
+        request, await meeting_erase.room_calls(session, scope, customer_id)
+    )
     result = await erase_customer(session, scope, customer_id)
     if not result["complete"]:
         # only an undefined table is ever skipped; any other error fails the request instead

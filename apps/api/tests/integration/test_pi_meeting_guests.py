@@ -60,7 +60,7 @@ async def test_a_guest_looks_and_joins_with_consent_and_only_a_hash_is_stored(ap
     mid, token = await made(api)
 
     seen = await api.get(f"{JOIN}/{token}")
-    assert seen.status_code == 200 and set(seen.json()) == {"title", "pi_voice"}
+    assert seen.status_code == 200 and set(seen.json()) == {"title", "pi_voice", "room"}
     assert seen.json()["pi_voice"] is False  # pi does not talk unless a person turned it on
 
     no = await api.post(f"{JOIN}/{token}", json={"name": "Ali", "consent": False})

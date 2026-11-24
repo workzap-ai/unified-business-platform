@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import {
   AudioLines,
   Bot,
@@ -9,6 +10,7 @@ import {
   ListChecks,
   Plus,
   Search,
+  Video,
 } from "lucide-react";
 import { relativeTime } from "@/lib/format";
 import { Button } from "@/components/ui/button";
@@ -41,6 +43,7 @@ import {
 } from "../meeting-intel-service";
 import { MeetingDetail } from "./meeting-intel-detail";
 import { SendBotDialog } from "./meeting-send-bot";
+import { StartRoomDialog } from "./meeting-room-dialog";
 import {
   IconTile,
   SkeletonRows,
@@ -72,6 +75,8 @@ function MeetingList({ open }: { open: (id: string) => void }) {
   );
   const [creating, setCreating] = useState(false);
   const [sendingBot, setSendingBot] = useState(false);
+  const [startingRoom, setStartingRoom] = useState(false);
+  const router = useRouter();
   const [term, setTerm] = useState("");
   const [searched, setSearched] = useState("");
   const hits = useScopedQuery(
@@ -89,6 +94,9 @@ function MeetingList({ open }: { open: (id: string) => void }) {
         actions={
           can("pi.meetings.record") ? (
             <div className="flex flex-wrap gap-2">
+              <Button variant="secondary" onClick={() => setStartingRoom(true)}>
+                <Video /> Start video room
+              </Button>
               <Button variant="secondary" onClick={() => setSendingBot(true)}>
                 <Bot /> Send pi to a call
               </Button>
@@ -211,6 +219,14 @@ function MeetingList({ open }: { open: (id: string) => void }) {
         onSent={(id) => {
           setSendingBot(false);
           open(id);
+        }}
+      />
+      <StartRoomDialog
+        open={startingRoom}
+        onClose={() => setStartingRoom(false)}
+        onOpened={(id) => {
+          setStartingRoom(false);
+          router.push(`/pi/meeting-intel/room?meeting=${id}`);
         }}
       />
       <NewMeetingDialog

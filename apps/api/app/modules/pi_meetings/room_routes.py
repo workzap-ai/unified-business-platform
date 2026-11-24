@@ -142,6 +142,31 @@ def _failed(error: RoomProviderError) -> BusinessRuleViolation:
     return BusinessRuleViolation(error.code, error.message, error.status)
 
 
+async def delete_calls(request: Request, call_ids: list[str]) -> None:
+    """Remove calls (with their transcripts and recordings) at the provider. Raises
+    BusinessRuleViolation when it cannot: an erase must not end with the words still held there."""
+    if not call_ids:
+        return
+    provider = provider_for(request)
+    if provider is None:
+        raise BusinessRuleViolation(
+            "ROOM_DELETE_UNAVAILABLE",
+            "This meeting was held in a video room that cannot be removed from the video room "
+            "service right now, so nothing was erased; set the service up again and retry",
+            409,
+        )
+    try:
+        for call_id in call_ids:
+            await provider.delete_call(call_id)
+    except RoomProviderError:
+        raise BusinessRuleViolation(
+            "ROOM_DELETE_UNAVAILABLE",
+            "The video room service could not remove this meeting's call, so nothing was erased; "
+            "try again in a moment",
+            409,
+        ) from None
+
+
 @router.post("/rooms", status_code=201)
 async def open_room(
     data: RoomInput, request: Request, scope: Scope, session: Session

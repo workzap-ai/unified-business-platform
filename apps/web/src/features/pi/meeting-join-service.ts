@@ -16,7 +16,12 @@ export const meetingJoinService = {
       "GET",
       `${BASE}/${token}`,
       // `pi_voice`: the host has set pi to talk with the person who opens this link
-      z.object({ title: z.string(), pi_voice: z.boolean().catch(false) }),
+      z.object({
+        title: z.string(),
+        pi_voice: z.boolean().catch(false),
+        // a video room: the page joins the room instead of recording the microphone
+        room: z.boolean().catch(false),
+      }),
     ),
   join: (token: string, input: { name: string; consent: boolean }) =>
     apiRequest(
