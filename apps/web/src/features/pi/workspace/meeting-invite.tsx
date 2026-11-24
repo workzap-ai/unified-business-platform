@@ -19,7 +19,13 @@ import { meetingIntelService } from "../meeting-intel-service";
 const HOURS = 24;
 const MAX_GUESTS = 10;
 
-export function MeetingInvite({ id }: { id: string }) {
+export function MeetingInvite({
+  id,
+  room = false,
+}: {
+  id: string;
+  room?: boolean;
+}) {
   const [link, setLink] = useState("");
   const [copied, setCopied] = useState(false);
   const status = useScopedQuery(
@@ -36,7 +42,9 @@ export function MeetingInvite({ id }: { id: string }) {
       }),
     {
       invalidate,
-      success: "Link ready: copy it and send it to the people in the meeting",
+      success: room
+        ? "Link ready: copy it and send it to the people you want in the room"
+        : "Link ready: copy it and send it to the people in the meeting",
       onSuccess: (r) => {
         setLink(`${window.location.origin}/join/${r.token}`);
         setCopied(false);
@@ -50,7 +58,12 @@ export function MeetingInvite({ id }: { id: string }) {
   });
   const remove = useScopedMutation(
     (guestId: string) => meetingIntelService.removeGuest(id, guestId),
-    { invalidate, success: "Removed: they can no longer send audio" },
+    {
+      invalidate,
+      success: room
+        ? "Removed: they cannot enter the room again"
+        : "Removed: they can no longer send audio",
+    },
   );
 
   // off for this workspace, or not allowed to ask: show nothing
@@ -72,13 +85,13 @@ export function MeetingInvite({ id }: { id: string }) {
       <CardBody className="space-y-3">
         <div>
           <h2 className="flex items-center gap-2 text-sm font-semibold">
-            <Users className="size-4" aria-hidden /> Invite people to record
+            <Users className="size-4" aria-hidden />{" "}
+            {room ? "Invite people to the room" : "Invite people to record"}
           </h2>
           <p className="mt-0.5 text-xs text-muted-foreground">
-            Send a link and each person records their own microphone into this
-            meeting, so the transcript says who spoke. They agree before
-            recording, see nothing of the transcript, and their sound is not
-            kept.
+            {room
+              ? "Send a link and people join this video room from their browser. They agree that what they say is transcribed by pi (an AI) before they join, and they see nothing of the transcript. No video or audio is saved: only the words, as text, and the transcript says who spoke."
+              : "Send a link and each person records their own microphone into this meeting, so the transcript says who spoke. They agree before recording, see nothing of the transcript, and their sound is not kept."}
           </p>
         </div>
 
@@ -97,9 +110,9 @@ export function MeetingInvite({ id }: { id: string }) {
               </Button>
             </div>
             <p className="text-xs text-muted-foreground">
-              Anyone with this link can record into the meeting until it is
-              closed or ends. Send it only to the people in the meeting. It is
-              shown here once.
+              {room
+                ? "Anyone with this link can join the room until it is closed or the call ends. Send it only to the people you want in the call. It is shown here once."
+                : "Anyone with this link can record into the meeting until it is closed or ends. Send it only to the people in the meeting. It is shown here once."}
             </p>
           </div>
         )}
@@ -110,8 +123,10 @@ export function MeetingInvite({ id }: { id: string }) {
               ? ` until ${new Date(status.data.expires_at).toLocaleString()}`
               : ""}
             . For your safety it cannot be shown again: make a new one to copy
-            it. A new link closes this one and stops everyone who has already
-            joined, so do not do it in the middle of a call.
+            it.{" "}
+            {room
+              ? "A new link closes this one: people who have not joined yet cannot use the old one, and someone already in the call cannot rejoin after a reload."
+              : "A new link closes this one and stops everyone who has already joined, so do not do it in the middle of a call."}
           </Notice>
         )}
 

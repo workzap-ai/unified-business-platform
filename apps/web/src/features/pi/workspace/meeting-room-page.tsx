@@ -193,7 +193,7 @@ function RoomView() {
               )}
             </CardBody>
           </Card>
-          <MeetingInvite id={id} />
+          <MeetingInvite id={id} room />
         </div>
       )}
     </PageShell>
