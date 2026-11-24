@@ -32,6 +32,7 @@ import {
   cn,
 } from "@/components/ui";
 import { errorText, get, post } from "@/lib/api";
+import { SpeedCard } from "@/features/speed-card";
 import { piLink } from "@/lib/links";
 import { timeAgo } from "@/lib/format";
 import { useAction, useBusinessKey, useCan } from "@/lib/session";
@@ -195,6 +196,7 @@ export function HealthPage() {
       ) : (
         <div className="space-y-6">
           <Summary data={data} />
+          <SpeedCard />
           <Trends data={data} />
           <SelfTests
             data={data}

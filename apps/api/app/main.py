@@ -55,6 +55,7 @@ from app.modules.pi.brain_moderation_routes import router as pi_brain_moderation
 from app.modules.pi.brain_visual_routes import public_router as pi_brain_visuals_router
 from app.modules.pi.business_profile_routes import router as pi_business_profile_router
 from app.modules.pi.config_routes import router as pi_config_router
+from app.modules.pi.events_routes import router as pi_events_router
 from app.modules.pi.execution_routes import router as pi_execution_router
 from app.modules.pi.inbox_routes import router as pi_inbox_router
 from app.modules.pi.kapso_routes import router as pi_kapso_router
@@ -143,6 +144,7 @@ ROUTERS = [
     pi_team_board_router,
     nori_board_router,
     pi_blocklist_router,
+    pi_events_router,
     pi_meeting_board_router,
     pi_meeting_intel_router,
     pi_meeting_qa_router,
@@ -256,6 +258,7 @@ PI_APP_ROUTERS = [
     pi_team_board_router,
     nori_board_router,
     pi_blocklist_router,
+    pi_events_router,
     pi_meeting_board_router,
     pi_customer_payment_router,
     pi_deals_router,
@@ -372,6 +375,9 @@ def create_app(settings: Settings | None = None) -> FastAPI:
                 try:
                     await app.state.queue.close()
                     await redis.aclose()
+                    events_redis = getattr(app.state, "events_redis", None)
+                    if events_redis is not None:
+                        await events_redis.aclose()
                 finally:
                     await engine.dispose()
 

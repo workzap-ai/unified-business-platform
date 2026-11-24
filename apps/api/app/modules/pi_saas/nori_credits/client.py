@@ -18,6 +18,7 @@ from app.modules.pi_saas.nori_credits.config import BridgeEnv, WorkspaceBridge
 from app.modules.pi_saas.nori_credits.resilience import (
     IDENTIFY_CACHE,
     METRICS,
+    TtlCache,
     breaker_for,
     digits,
     mask_number,
@@ -26,6 +27,9 @@ from app.modules.pi_saas.nori_credits.resilience import (
 INBOUND_PATH = "/api/workzap/inbound"
 STRUCTURED_PATH = "/api/credits/pi"
 IDENTIFY_TTL_SECONDS = 60.0
+# nori's description of a workspace (name, plan, trial, credits, health): read-only, never stored.
+WORKSPACE_TTL_SECONDS = 600.0
+WORKSPACE_CACHE = TtlCache()
 # Answers that say "the bridge is unhealthy" and count toward the breaker. A 400 or 422 means nori
 # is up and refused this one request; it does not.
 _COUNTED_STATUS = {401, 403, 408, 425, 429}
@@ -151,6 +155,27 @@ class NoriClient:
         IDENTIFY_CACHE.put(key, identity, IDENTIFY_TTL_SECONDS)
         METRICS.inc("identify", "known" if identity.known else "unknown")
         return identity
+
+    async def workspace_info(self, number: str, *, use_cache: bool = True) -> dict[str, Any] | None:
+        """nori's read-only description of the number's workspace, or None when nori does not know
+        the number, is down, or answers something that is not a workspace. Cached for ten minutes
+        in this process only; nothing is written to the database."""
+        key = f"{self.env.host}:{digits(number)}"
+        if use_cache:
+            cached = WORKSPACE_CACHE.get(key)
+            if isinstance(cached, dict):
+                METRICS.inc("workspace_info", "cache")
+                return cached
+        result = await self.call(
+            STRUCTURED_PATH, {"action": "workspace_info", "from": digits(number)}
+        )
+        workspace = result.data.get("workspace") if result.ok else None
+        if result.data.get("known") is not True or not isinstance(workspace, dict):
+            METRICS.inc("workspace_info", "none" if result.ok else result.reason)
+            return None
+        WORKSPACE_CACHE.put(key, workspace, WORKSPACE_TTL_SECONDS)
+        METRICS.inc("workspace_info", "fresh")
+        return workspace
 
     async def inbound(
         self, *, sender: str, message_id: str, text: str, name: str | None

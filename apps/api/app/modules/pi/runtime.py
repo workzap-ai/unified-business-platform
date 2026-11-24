@@ -181,6 +181,16 @@ async def system_scope(
     return scope
 
 
+async def _signal(ctx: dict[str, Any], scope: WorkspaceScope, kind: str = "inbox") -> None:
+    """Tell open screens something changed (live_events.py). Runs in the background, so the turn
+    never waits for Redis; does nothing unless PI_EVENTS_ENABLED is on."""
+    from app.modules.pi import live_events
+
+    live_events.fire(
+        ctx.get("redis"), ctx.get("settings"), scope.tenant_id, scope.environment_id, kind
+    )
+
+
 async def _blocked_sender(
     session: AsyncSession, scope: WorkspaceScope, event: WhatsAppWebhookEvent
 ) -> bool:
@@ -994,6 +1004,7 @@ async def process_pi_event(ctx: dict[str, Any], event_id: str) -> None:
         await enqueue_sends(ctx, released)
         if message is None:
             return
+        await _signal(ctx, scope)  # open screens refetch: a customer message arrived
         service = PiService(session, scope)
         message_id, conversation_id = message.id, message.conversation_id
         conversation = await service.conversations.get(conversation_id)
@@ -1004,6 +1015,11 @@ async def process_pi_event(ctx: dict[str, Any], event_id: str) -> None:
             # A greeting or thanks (board_chat) has no card: it is only kept in the chat.
             from app.modules.pi_saas.nori_board import service as nori_board
             from app.modules.pi_saas.nori_board.chat_only import ack_text
+            from app.modules.pi_saas.nori_credits.config import killed as nori_killed
+            from app.modules.pi_saas.nori_credits.config import read_env as nori_read_env
+            from app.modules.pi_saas.nori_credits.config import (
+                workspace_bridge as nori_workspace_bridge,
+            )
 
             if credits_hook.board_ref:
                 await nori_board.link_conversation(
@@ -1016,8 +1032,63 @@ async def process_pi_event(ctx: dict[str, Any], event_id: str) -> None:
             # at (staff "return to pi" included): every registry message puts it back to human.
             # The acknowledgement goes once per chat.
             conversation.mode = "human"
+            # Nori support mode (docs/pi-saas/nori-support.md): off unless the workspace turned on
+            # nori_bridge.support. A filed message gets a grounded reply; any failure or a refused
+            # reply falls through to the acknowledgement below, so nothing is ever left unanswered.
+            support_sent = False
+            support_bridge = nori_workspace_bridge(policy.response_rules)
+            support_env = nori_read_env(ctx["settings"])
+            if (
+                credits_hook.board_ref
+                and support_bridge is not None
+                and support_bridge.support
+                and support_env is not None
+                and not nori_killed(ctx["settings"])
+            ):
+                from app.modules.pi_saas.nori_support import responder as nori_support
+
+                support_key = f"{nori_support.KEY_PREFIX}{message_id}"
+                if await service.messages.find(PiMessage.idempotency_key == support_key):
+                    support_sent = True  # a retried event: already answered
+                else:
+                    said_back = await nori_support.support_reply(
+                        ctx,
+                        session,
+                        scope,
+                        conversation,
+                        message,
+                        support_bridge,
+                        support_env,
+                        sender=str(event.payload.get("sender") or ""),
+                        alias=str(policy.ai_config.get("router_alias", "fast")),
+                    )
+                    if said_back:
+                        support_msg = await service.messages.add(
+                            service.messages.new(
+                                conversation_id=conversation_id,
+                                direction="outbound",
+                                sender_type="ai",
+                                body=said_back,
+                                status="queued",
+                                idempotency_key=support_key,
+                            )
+                        )
+                        await session.commit()
+                        await enqueue_sends(ctx, [str(support_msg.id)])
+                        support_sent = True
+            if support_bridge is not None and support_bridge.support:
+                # Outside brain mode nothing redacts on arrival: a card or ID number typed by a
+                # registry person is removed from the stored message and the inbox preview.
+                from app.modules.pi import safety as nori_safety
+
+                redacted = nori_safety.redact_pii(str(message.body or ""))
+                if redacted.changed:
+                    message.body = redacted.text
+                    conversation.last_message_preview = redacted.text[:200]
             ack_key = f"pi-board-ack:{conversation_id}"
-            if await service.messages.find(PiMessage.idempotency_key == ack_key) is None:
+            if support_sent:
+                await session.commit()
+            elif await service.messages.find(PiMessage.idempotency_key == ack_key) is None:
                 ack = await service.messages.add(
                     service.messages.new(
                         conversation_id=conversation_id,
@@ -2206,6 +2277,14 @@ async def send_pi_message(ctx: dict[str, Any], message_id: str) -> None:
             if message.created_at is not None
             else None
         )
+        # The row's created_at is its transaction's start, so picked_ms also holds the turn's own
+        # time. arq says when the job was queued: that is the real wait for a worker.
+        queued_at = ctx.get("enqueue_time")
+        queue_ms = (
+            max(0, round((datetime.now(UTC) - queued_at).total_seconds() * 1000))
+            if isinstance(queued_at, datetime)
+            else None
+        )
         connection = await session.scalar(
             select(WhatsAppConnection)
             .join(PiConversation, PiConversation.connection_id == WhatsAppConnection.id)
@@ -2258,6 +2337,8 @@ async def send_pi_message(ctx: dict[str, Any], message_id: str) -> None:
         document_notice = message.media.get("document_notice")
         # A meeting's time and link after the window: the approved meeting template.
         meeting_notice = message.media.get("meeting_notice")
+        # The Templates page (pi_saas/template_sends.py): an approved template, values filled in.
+        template_send = message.media.get("template_send")
         from app.modules.pi.followups import reminder_allowed
 
         campaign_block = None
@@ -2265,6 +2346,14 @@ async def send_pi_message(ctx: dict[str, Any], message_id: str) -> None:
             from app.modules.pi_saas.campaigns import send_block
 
             campaign_block = await send_block(session, scope, message, conversation)
+
+        # A Templates-page message is re-checked just before delivery: a STOP or a block that came
+        # in after it was queued stops it (the same idea as send_block for campaigns).
+        template_block = None
+        if template_send:
+            from app.modules.pi_saas.template_sends import template_block as template_send_block
+
+            template_block = await template_send_block(session, scope, conversation.contact_wa_id)
 
         sender_allowed = True
         if message.sender_type == "human":
@@ -2292,12 +2381,15 @@ async def send_pi_message(ctx: dict[str, Any], message_id: str) -> None:
             if conversation.status != "open"
             else campaign_block
             if campaign_block
+            else template_block
+            if template_block
             else "MESSAGE_WINDOW_CLOSED"
             if not reminder
             and not campaign
             and not ladder
             and not document_notice
             and not meeting_notice
+            and not template_send
             and (
                 not conversation.last_inbound_at
                 or conversation.last_inbound_at < datetime.now(UTC) - timedelta(hours=24)
@@ -2329,12 +2421,14 @@ async def send_pi_message(ctx: dict[str, Any], message_id: str) -> None:
             from app.integrations.whatsapp_bridge import token as connection_token
 
             token = await connection_token(session, ctx["settings"], connection)
-            if meeting_notice:
+            provider_started = time.perf_counter()
+            if meeting_notice or template_send:
+                notice = meeting_notice or template_send
                 message.provider_message_id = await whatsapp.send_template_values(
                     connection.phone_number_id,
                     conversation.contact_wa_id,
-                    meeting_notice["template"],
-                    [str(v) for v in meeting_notice["values"]],
+                    notice["template"],
+                    [str(v) for v in notice["values"]],
                     token,
                 )
             elif reminder or campaign or ladder or document_notice:
@@ -2407,6 +2501,7 @@ async def send_pi_message(ctx: dict[str, Any], message_id: str) -> None:
                 )
                 if message.sender_type == "ai" and conversation.service_brief:
                     schedule_followup(conversation, policy)
+            provider_ms = round((time.perf_counter() - provider_started) * 1000)
             message.status, message.error_code = "sent", None
             # Where the time between "queued" and "delivered" goes: how long the job waited for a
             # worker, and how long the checks and the provider call took (kept for tracing a slow
@@ -2415,6 +2510,8 @@ async def send_pi_message(ctx: dict[str, Any], message_id: str) -> None:
                 **message.media,
                 "send_timing": {
                     "picked_ms": picked_ms,
+                    "queue_ms": queue_ms,
+                    "provider_ms": provider_ms,
                     "send_ms": round((time.perf_counter() - started) * 1000),
                 },
             }
@@ -2461,6 +2558,7 @@ async def send_pi_message(ctx: dict[str, Any], message_id: str) -> None:
                     "Outbound delivery could not be confirmed. Review before retrying.",
                 )
         await session.commit()
+        await _signal(ctx, scope)  # open screens refetch: a reply was sent or failed
 
 
 async def newer_waiting(session: Any, message: PiMessage) -> bool:

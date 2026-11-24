@@ -14,6 +14,7 @@ from app.integrations.jobs import integrations_sweep
 from app.modules.pi.check_in import sweep_check_ins
 from app.modules.pi.followups import sweep_followups
 from app.modules.pi.knowledge_jobs import index_document, sweep_knowledge
+from app.modules.pi.live_events import heartbeat as events_heartbeat
 from app.modules.pi.runtime import process_pi_event, send_pi_message, sweep_pi
 from app.modules.pi.semantic import embed_document
 from app.modules.pi.session_snapshot import sweep_session_snapshots
@@ -31,6 +32,7 @@ from app.modules.pi_saas.meeting_board import remind_upcoming as remind_meetings
 from app.modules.pi_saas.team_alerts import remind_due as remind_team_due
 from app.modules.pi_saas.team_alerts import send_team_alert
 from app.modules.pi_saas.team_board import sweep as sweep_team_board
+from app.modules.pi_saas.template_sends import sweep_template_sends
 
 
 async def health_probe(ctx: dict[str, Any]) -> str:
@@ -42,6 +44,7 @@ JOB_FUNCTIONS: dict[str, Callable[..., Awaitable[Any]]] = {
     "health_probe": health_probe,
     "process_pi_event": process_pi_event,
     "sweep_pi_campaigns": sweep_campaigns,
+    "sweep_template_sends": sweep_template_sends,
     "sweep_pi_digests": sweep_digests,
     "send_pi_message": send_pi_message,
     "sweep_pi": sweep_pi,
@@ -106,6 +109,7 @@ class WorkerSettings:
     on_job_start = on_job_start
     cron_jobs = [
         cron(sweep_pi, second={0, 30}, unique=True),
+        cron(events_heartbeat, second={5, 35, 55}, unique=True),
         cron(sweep_followups, minute=set(range(0, 60, 5)), second=10, unique=True),
         cron(sweep_check_ins, minute=set(range(2, 60, 5)), second=30, unique=True),
         cron(sweep_session_snapshots, minute=set(range(4, 60, 5)), second=40, unique=True),
@@ -115,6 +119,7 @@ class WorkerSettings:
         cron(sweep_pi_saas, second={40}, unique=True),
         cron(sweep_pi_calendar, second={5, 35}, unique=True),
         cron(sweep_campaigns, second={25, 55}, unique=True),
+        cron(sweep_template_sends, second={10, 40}, unique=True),
         cron(sweep_digests, minute={7, 37}, second=45, unique=True),
         cron(pi_health_heal, minute=set(range(3, 60, 5)), second=15, unique=True),
         cron(pi_health_self_test, minute={23}, second=0, unique=True),

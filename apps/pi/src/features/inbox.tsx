@@ -57,6 +57,7 @@ import {
   SentPicture,
 } from "@/features/message-media";
 import { MessageNotes } from "@/features/message-notes";
+import { LiveDot, useLiveConnected } from "@/lib/live";
 import { useAction, useBusinessKey, useCan, useSession } from "@/lib/session";
 import type {
   Conversation,
@@ -149,6 +150,7 @@ export function InboxPage() {
               >
                 Handoffs
               </Link>
+              <LiveDot className="me-2" />
               <IncomingSoundToggle className="me-2" />
               <span>
                 <InboxIcon size={17} aria-hidden />
@@ -246,6 +248,7 @@ function ConversationList({
   onOpen: (id: string) => void;
 }) {
   const key = useBusinessKey();
+  const live = useLiveConnected();
   const query = {
     search: search || undefined,
     assignment:
@@ -264,7 +267,7 @@ function ConversationList({
     initialPageParam: 1,
     getNextPageParam: (last) =>
       last.page * last.page_size < last.total ? last.page + 1 : undefined,
-    refetchInterval: 5_000, // new customer messages show up within seconds
+    refetchInterval: live ? 60_000 : 5_000, // events cover it while live; else within seconds
   });
   if (list.isPending) {
     return (
@@ -356,7 +359,9 @@ function ConversationList({
                       <Bot className="size-3" aria-hidden /> pi
                     </Badge>
                   )}
-                  {c.nori_workspace ? <Badge>nori · {c.nori_workspace}</Badge> : null}
+                  {c.nori_workspace ? (
+                    <Badge>nori · {c.nori_workspace}</Badge>
+                  ) : null}
                   {c.assigned_label ? <Badge>{c.assigned_label}</Badge> : null}
                   {c.status === "closed" ? <Badge>Closed</Badge> : null}
                 </span>
@@ -662,6 +667,7 @@ function senderLabel(message: Message): string {
 
 function Thread({ id, onBack }: { id: string; onBack: () => void }) {
   const key = useBusinessKey();
+  const live = useLiveConnected();
   const can = useCan();
   const [panel, setPanel] = React.useState(false);
   const context = useQuery({
@@ -693,7 +699,9 @@ function Thread({ id, onBack }: { id: string; onBack: () => void }) {
         (m) => m.status === "queued" || m.status === "processing",
       )
         ? 1_000
-        : 3_000,
+        : live
+          ? 30_000
+          : 3_000,
   });
   const markRead = useAction(
     () => post(`/pi/conversations/${id}/actions/read`),

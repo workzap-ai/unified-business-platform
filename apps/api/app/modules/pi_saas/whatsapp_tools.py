@@ -16,9 +16,11 @@
 
 import re
 from typing import Any, Literal
+from uuid import UUID
 
 from fastapi import APIRouter, Request
 from pydantic import BaseModel, ConfigDict, Field
+from sqlalchemy import select
 
 from app.modules.access.dependencies import Scope, Session
 from app.modules.audit.service import record
@@ -203,6 +205,49 @@ class TemplateInput(BaseModel):
     language: str = Field(pattern=r"^[a-z]{2,3}(_[A-Z]{2})?$")
     category: Literal["MARKETING", "UTILITY"]
     body: str = Field(min_length=1, max_length=1024)
+    # One example per {{n}} in the body: Meta will not review a variable template without them.
+    examples: list[str] = Field(default_factory=list, max_length=10)
+
+
+class TemplateEdit(BaseModel):
+    model_config = ConfigDict(extra="forbid", str_strip_whitespace=True)
+    body: str = Field(min_length=1, max_length=1024)
+    examples: list[str] = Field(default_factory=list, max_length=10)
+    category: Literal["MARKETING", "UTILITY"] | None = None
+
+
+class TemplateSend(BaseModel):
+    """One first message to one number, by an approved template."""
+
+    model_config = ConfigDict(extra="forbid", str_strip_whitespace=True)
+    phone: str = Field(min_length=7, max_length=24)
+    name: str = Field(pattern=r"^[a-z0-9_]{1,512}$")
+    language: str = Field(pattern=r"^[a-z]{2,3}(_[A-Z]{2})?$")
+    values: list[str] = Field(default_factory=list, max_length=10)
+    # The sender confirms the person agreed to be messaged (Meta's opt-in rule).
+    consent: bool = False
+
+
+SEND_PER_HOUR = 30
+
+
+class BatchRow(BaseModel):
+    model_config = ConfigDict(extra="forbid", str_strip_whitespace=True)
+    phone: str = Field(max_length=32)
+    person: str = Field(default="", max_length=120)
+    values: list[str] = Field(default_factory=list, max_length=10)
+
+
+class BatchInput(BaseModel):
+    """One approved template for many numbers (queued, sent a few at a time)."""
+
+    model_config = ConfigDict(extra="forbid", str_strip_whitespace=True)
+    name: str = Field(pattern=r"^[a-z0-9_]{1,512}$")
+    language: str = Field(pattern=r"^[a-z]{2,3}(_[A-Z]{2})?$")
+    rows: list[BatchRow] = Field(min_length=1, max_length=500)
+    source: Literal["paste", "customers", "nori"] = "paste"
+    consent: bool = False
+    consent_note: str = Field(default="", max_length=300)
 
 
 async def _number(session: Any, scope: Any) -> WhatsAppConnection:
@@ -347,13 +392,25 @@ def build() -> APIRouter:
     ) -> dict[str, Any]:
         await require_pi(session, scope, "pi.settings.manage")
         number = await _number(session, scope)
+        kapso = Kapso(request.app.state.settings, request.app.state.http)
         if "{{" in data.body:
-            raise BusinessRuleViolation(
-                "INVALID_TEMPLATE", "Variables aren't supported yet; write the full text"
+            # Variables: each {{n}} needs an example, and Meta reviews by category.
+            state = await kapso.create_template_with_values(
+                number.business_account_id or "",
+                data.name,
+                data.language,
+                data.body,
+                data.examples,
+                data.category,
             )
-        state = await Kapso(request.app.state.settings, request.app.state.http).create_template(
-            number.business_account_id or "", data.name, data.language, data.category, data.body
-        )
+        else:
+            state = await kapso.create_template(
+                number.business_account_id or "",
+                data.name,
+                data.language,
+                data.category,
+                data.body,
+            )
         await record(
             session,
             "pi.whatsapp_template_created",
@@ -364,6 +421,292 @@ def build() -> APIRouter:
         )
         await session.commit()
         return {"name": data.name, "status": state}
+
+    @router.put("/templates/{template_id}")
+    async def edit_template(
+        template_id: str, data: TemplateEdit, request: Request, scope: Scope, session: Session
+    ) -> dict[str, Any]:
+        """Change a template's text; Meta reviews it again. Only ids on this number's list."""
+        await require_pi(session, scope, "pi.settings.manage")
+        number = await _number(session, scope)
+        kapso = Kapso(request.app.state.settings, request.app.state.http)
+        listed = await kapso.list_templates(number.business_account_id or "")
+        if not any(t["id"] == template_id for t in listed):
+            raise BusinessRuleViolation("TEMPLATE_NOT_FOUND", "Unknown template", 404)
+        await kapso.edit_template(template_id, data.body, data.examples, data.category)
+        from app.modules.pi_saas import template_sends
+
+        edited = next(t for t in listed if t["id"] == template_id)
+        await template_sends.cancel_for_template(session, scope, edited["name"], edited["language"])
+        await record(
+            session,
+            "pi.whatsapp_template_edited",
+            scope=scope,
+            entity_type="whatsapp_connection",
+            entity_id=number.id,
+            details={"template_id": template_id},
+        )
+        await session.commit()
+        return {"id": template_id, "status": "PENDING"}
+
+    @router.post("/templates/send")
+    async def send_template(
+        data: TemplateSend, request: Request, scope: Scope, session: Session
+    ) -> dict[str, Any]:
+        """The first message to a number by an approved template (outside the 24-hour window).
+        The sender confirms consent; one number per call; 30 an hour per workspace."""
+        await require_pi(session, scope, "pi.settings.manage")
+        if not data.consent:
+            raise BusinessRuleViolation(
+                "CONSENT_REQUIRED", "Confirm this person agreed to be messaged on WhatsApp", 422
+            )
+        to = re.sub(r"\D", "", data.phone)
+        if not 7 <= len(to) <= 15:
+            raise BusinessRuleViolation(
+                "INVALID_NUMBER", "Enter the number with its country code", 422
+            )
+        number = await _number(session, scope)
+        settings, http = request.app.state.settings, request.app.state.http
+        kapso = Kapso(settings, http)
+        listed = await kapso.list_templates(number.business_account_id or "")
+        found = next(
+            (t for t in listed if t["name"] == data.name and t["language"] == data.language), None
+        )
+        if found is None or found["status"] != "APPROVED" or not found["fillable"]:
+            raise BusinessRuleViolation(
+                "TEMPLATE_NOT_SENDABLE", "Pick an approved text template", 422
+            )
+        if len(data.values) != found["variables"]:
+            raise BusinessRuleViolation(
+                "TEMPLATE_VALUES", f"This template needs {found['variables']} value(s)", 422
+            )
+        from datetime import UTC, datetime, timedelta
+
+        from sqlalchemy import func, select
+
+        from app.modules.audit.models import AuditEvent
+
+        sent_lately = await session.scalar(
+            select(func.count(AuditEvent.id)).where(
+                AuditEvent.tenant_id == scope.tenant_id,
+                AuditEvent.action == "pi.whatsapp_template_sent",
+                AuditEvent.created_at >= datetime.now(UTC) - timedelta(hours=1),
+            )
+        )
+        if int(sent_lately or 0) >= SEND_PER_HOUR:
+            raise BusinessRuleViolation("RATE_LIMITED", "Too many sends this hour. Try later.", 429)
+        # The same guards as a batch: consent withdrawn, blocklist, values, and the daily cap.
+        from app.modules.pi.configuration import settings_row
+        from app.modules.pi_saas import template_sends
+
+        if (why := await template_sends.template_block(session, scope, to)) is not None:
+            raise BusinessRuleViolation(
+                "RECIPIENT_NOT_ALLOWED",
+                "This number asked us to stop" if why == "OPTED_OUT" else "This number is blocked",
+                422,
+            )
+        if (problem := template_sends.value_problem(data.values)) is not None:
+            raise BusinessRuleViolation("TEMPLATE_VALUES", problem, 422)
+        # The cap and the history live in one table; before its migration the send still works.
+        tracked = await template_sends.table_ready(session)
+        tz = (await settings_row(session, scope)).timezone
+        if tracked and await template_sends.sent_today(session, scope, tz) >= (
+            template_sends.DAILY_CAP
+        ):
+            raise BusinessRuleViolation(
+                "RATE_LIMITED", "The daily limit for template messages is reached", 429
+            )
+        from app.integrations.whatsapp_bridge import token as connection_token
+        from app.modules.pi.whatsapp import WhatsApp
+
+        secret = await connection_token(session, settings, number)
+        message_id = await WhatsApp(settings, http, number.provider).send_template_values(
+            number.phone_number_id,
+            to,
+            {"name": data.name, "language": data.language},
+            data.values,
+            secret,
+        )
+        await record(
+            session,
+            "pi.whatsapp_template_sent",
+            scope=scope,
+            entity_type="whatsapp_connection",
+            entity_id=number.id,
+            details={
+                "template": data.name,
+                "language": data.language,
+                "to": f"{to[:2]}***{to[-4:]}",
+                "consent_confirmed": True,
+            },
+        )
+        from app.modules.pi_saas import template_sends
+
+        if tracked:
+            await template_sends.record_single(
+                session,
+                scope,
+                phone=to,
+                template=found,
+                values=data.values,
+                created_by=scope.actor_label,
+                consent_note="Confirmed on the Templates page",
+            )
+        await session.commit()
+        return {"sent": True, "id": message_id}
+
+    async def sendable_template(
+        request: Request, session: Session, scope: Scope, name: str, language: str
+    ) -> dict[str, Any]:
+        number = await _number(session, scope)
+        listed = await Kapso(request.app.state.settings, request.app.state.http).list_templates(
+            number.business_account_id or ""
+        )
+        found = next((t for t in listed if t["name"] == name and t["language"] == language), None)
+        if found is None or found["status"] != "APPROVED" or not found["fillable"]:
+            raise BusinessRuleViolation(
+                "TEMPLATE_NOT_SENDABLE", "Pick an approved text template", 422
+            )
+        return found
+
+    @router.post("/templates/batches", status_code=201)
+    async def queue_templates(
+        data: BatchInput, request: Request, scope: Scope, session: Session
+    ) -> dict[str, Any]:
+        """Queue one approved template for many numbers. Nothing is sent here: a worker sends a
+        few at a time (at most 200 a day, never at night) and skips anyone who opted out."""
+        from app.modules.pi_saas import template_sends
+
+        await require_pi(session, scope, "pi.settings.manage")
+        if not data.consent or len(data.consent_note.strip()) < 3:
+            raise BusinessRuleViolation(
+                "CONSENT_REQUIRED",
+                "Confirm these people agreed to be messaged and say how they agreed",
+                422,
+            )
+        template = await sendable_template(request, session, scope, data.name, data.language)
+        if not await template_sends.table_ready(session):
+            raise BusinessRuleViolation(
+                "TEMPLATE_HISTORY_NOT_READY",
+                "Sending to many needs a one-time database update first. Ask your admin.",
+                503,
+            )
+        result = await template_sends.queue_batch(
+            session,
+            scope,
+            template=template,
+            rows=[r.model_dump() for r in data.rows],
+            source=data.source,
+            consent_note=data.consent_note.strip(),
+            created_by=scope.actor_label,
+        )
+        await record(
+            session,
+            "pi.whatsapp_template_batch_queued",
+            scope=scope,
+            entity_type="whatsapp_connection",
+            details={
+                "template": data.name,
+                "queued": result["queued"],
+                "rejected": len(result["rejected"]),
+                "source": data.source,
+            },
+        )
+        await session.commit()
+        return {**result, "daily_cap": template_sends.DAILY_CAP}
+
+    @router.post("/templates/batches/{batch_id}/cancel")
+    async def cancel_template_batch(
+        batch_id: UUID, scope: Scope, session: Session
+    ) -> dict[str, Any]:
+        from app.modules.pi_saas import template_sends
+
+        await require_pi(session, scope, "pi.settings.manage")
+        if not await template_sends.table_ready(session):
+            return {"cancelled": 0}
+        cancelled = await template_sends.cancel_batch(session, scope, batch_id)
+        await session.commit()
+        return {"cancelled": cancelled}
+
+    @router.get("/templates/sends")
+    async def template_history(
+        scope: Scope,
+        session: Session,
+        template: str | None = None,
+        phone: str | None = None,
+        status: str | None = None,
+        limit: int = 100,
+        offset: int = 0,
+    ) -> dict[str, Any]:
+        """Every template message pi sent from this page: who, which template, and the real
+        WhatsApp status (queued, sent, delivered, read, failed, skipped, cancelled)."""
+        from app.modules.pi_saas import template_sends
+
+        await require_pi(session, scope, "pi.read")
+        if not await template_sends.table_ready(session):
+            return {"items": []}
+        return await template_sends.history(
+            session,
+            scope,
+            template=template,
+            phone=phone,
+            status=status,
+            limit=max(1, min(limit, 200)),
+            offset=max(0, offset),
+            full=scope.can("pi.settings.manage"),
+        )
+
+    @router.get("/templates/audience")
+    async def template_audience(
+        scope: Scope, session: Session, source: Literal["customers", "nori"], q: str = ""
+    ) -> dict[str, Any]:
+        """Existing numbers to pick from: pi's customers, or the Nori Platform registry."""
+        await require_pi(session, scope, "pi.settings.manage")
+        term = f"%{q.strip()[:60]}%"
+        if source == "nori":
+            from app.modules.pi_saas.nori_board.models import PiNoriNumber
+
+            rows = await session.execute(
+                select(PiNoriNumber.phone, PiNoriNumber.person, PiNoriNumber.workspace)
+                .where(
+                    PiNoriNumber.tenant_id == scope.tenant_id,
+                    PiNoriNumber.environment_id == scope.environment_id,
+                    PiNoriNumber.active.is_(True),
+                    (PiNoriNumber.person.ilike(term))
+                    | (PiNoriNumber.workspace.ilike(term))
+                    | (PiNoriNumber.phone.like(term)),
+                )
+                .order_by(PiNoriNumber.workspace)
+                .limit(300)
+            )
+            return {
+                "items": [
+                    {"phone": p, "person": person, "label": workspace}
+                    for p, person, workspace in rows.all()
+                ]
+            }
+        from app.modules.customers.models import Customer
+        from app.modules.pi.models import PiConversation
+
+        rows = await session.execute(
+            select(PiConversation.contact_wa_id, Customer.name)
+            .join(
+                Customer,
+                (Customer.id == PiConversation.customer_id)
+                & (Customer.tenant_id == PiConversation.tenant_id)
+                & (Customer.environment_id == PiConversation.environment_id),
+            )
+            .where(
+                PiConversation.tenant_id == scope.tenant_id,
+                PiConversation.environment_id == scope.environment_id,
+                (Customer.name.ilike(term)) | (PiConversation.contact_wa_id.like(term)),
+            )
+            .distinct()
+            .limit(300)
+        )
+        return {
+            "items": [{"phone": phone, "person": name, "label": ""} for phone, name in rows.all()]
+        }
 
     @router.post("/templates/follow-ups")
     async def auto_follow_ups(request: Request, scope: Scope, session: Session) -> dict[str, Any]:

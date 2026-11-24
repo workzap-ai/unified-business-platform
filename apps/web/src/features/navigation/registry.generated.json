@@ -1507,6 +1507,30 @@
     "visible": true
   },
   {
+    "analytics_id": "nav.pi.templates",
+    "any_permissions": [],
+    "badge": null,
+    "description": "",
+    "enabled": true,
+    "environment_scope": null,
+    "icon": "file-text",
+    "key": "pi-templates",
+    "keywords": [],
+    "label": "Templates",
+    "parent": "pi",
+    "required_feature": null,
+    "required_permissions": [
+      "pi.read"
+    ],
+    "required_product": "pi",
+    "required_roles": [],
+    "route": "/pi/templates",
+    "section": "main",
+    "sort_order": 64,
+    "type": "page",
+    "visible": true
+  },
+  {
     "analytics_id": "nav.pi.whatsapp",
     "any_permissions": [],
     "badge": null,

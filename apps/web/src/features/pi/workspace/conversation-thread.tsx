@@ -39,6 +39,7 @@ import { useScopedMutation, useScopedQuery } from "@/hooks/use-scoped";
 import { useSession } from "@/features/auth/session-provider";
 import { HISTORY_PAGE_SIZE, piService, type MessageHistory } from "../service";
 import { piBlocklistService } from "../blocklist-service";
+import { useLiveConnected } from "../live-events";
 import type { Conversation, Message } from "../types";
 import { piKeys } from "./lib";
 import { Composer } from "./composer";
@@ -74,6 +75,7 @@ export function ConversationThread({
   showContextButton: boolean;
 }) {
   const { canAny, can } = useSession();
+  const live = useLiveConnected();
   const canReply = can("pi.inbox.reply");
   const canBlock = can("pi.settings.manage");
   const canHandoff = canAny("pi.handoffs.manage", "pi.inbox.reply");
@@ -92,7 +94,9 @@ export function ConversationThread({
           (m) => m.status === "queued" || m.status === "processing",
         )
           ? 1_000
-          : 3_000,
+          : live
+            ? 30_000
+            : 3_000,
     },
   );
   const [older, setOlder] = useState<{

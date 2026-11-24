@@ -323,12 +323,22 @@ async def reply(
 async def conversation_action(
     conversation_id: UUID,
     action: Literal["takeover", "return-to-ai", "close", "read"],
+    request: Request,
     scope: Scope,
     session: Session,
 ) -> ConversationView:
     service = PiService(session, scope)
     row = await service.mode(conversation_id, action)
     await session.commit()
+    if action != "read":  # reading a chat is not news for the other screens
+        from app.modules.pi import live_events
+
+        live_events.fire(
+            request.app.state.redis,
+            request.app.state.settings,
+            scope.tenant_id,
+            scope.environment_id,
+        )
     return await service.view(row)
 
 

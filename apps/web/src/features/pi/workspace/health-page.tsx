@@ -24,6 +24,7 @@ import { useScopedMutation, useScopedQuery } from "@/hooks/use-scoped";
 import { useSession } from "@/features/auth/session-provider";
 import { formatTime, relativeTime } from "@/lib/format";
 import { cn } from "@/lib/utils";
+import { SpeedCard } from "./speed-card";
 import {
   piHealthService,
   type HealthCheck,
@@ -103,6 +104,7 @@ function HealthView() {
       ) : (
         <div className="space-y-4">
           <Summary data={data} />
+          <SpeedCard />
           <ChartCard
             title="Last 7 days"
             description="Replies pi sent, replies held back or failed, messages that failed to send, and fixes pi made itself."

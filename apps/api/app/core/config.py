@@ -221,6 +221,9 @@ class Settings(BaseSettings):
     pi_session_cookie_name: str = "pi_session"
     pi_csrf_cookie_name: str = "pi_csrf"
     pi_allow_registration: bool = True
+    # Live inbox updates (Server-Sent Events, docs/pi-saas/live-events.md). Off by default: with it
+    # off nothing is published, the stream answers "disabled" and every screen keeps polling.
+    pi_events_enabled: bool = False
     pi_trial_plan: str = "starter"
     pi_past_due_grace_days: int = Field(default=7, ge=0, le=60)
     # A business connects WhatsApp only after the operator approved its verification and

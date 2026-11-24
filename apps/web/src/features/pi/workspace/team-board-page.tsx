@@ -53,6 +53,7 @@ import {
   NORI_ITEM_LABEL,
   NoriNumbersPanel,
 } from "./nori-board-panel";
+import { NoriPeopleView } from "./nori-people";
 import { inboxHref } from "./lib";
 import { customersService } from "@/features/customers/service";
 import { errorMessage } from "@/services/api-client";
@@ -146,6 +147,8 @@ function TeamBoardView() {
   const { can } = useSession();
   const manage = can("pi.work.manage");
   const [view, setView] = useState<"team" | "nori">("team");
+  // Nori cards read best grouped by person; the columns stay one tap away.
+  const [noriMode, setNoriMode] = useState<"people" | "board">("people");
   const [teamFilter, setFilter] = useState<BoardFilter>({
     who: "all",
     kind: null,
@@ -271,8 +274,33 @@ function TeamBoardView() {
         ))}
       </div>
       {view === "nori" && (
-        <div className="mb-4">
+        <div className="mb-4 space-y-3">
           <NoriNumbersPanel manage={manage} />
+          <div
+            role="group"
+            aria-label="Nori layout"
+            className="inline-flex h-8 items-center gap-0.5 rounded-md border border-border bg-surface-muted p-0.5"
+          >
+            {(
+              [
+                ["people", "By person"],
+                ["board", "Board"],
+              ] as const
+            ).map(([key, label]) => (
+              <button
+                key={key}
+                type="button"
+                aria-pressed={noriMode === key}
+                onClick={() => setNoriMode(key)}
+                className={cn(
+                  "inline-flex h-6.5 items-center rounded-[5px] px-2.5 text-xs font-medium text-muted-foreground hover:text-foreground",
+                  noriMode === key && "bg-surface text-foreground shadow-sm",
+                )}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
         </div>
       )}
       {query.isError && !data ? (
@@ -292,78 +320,88 @@ function TeamBoardView() {
             }
             showKinds={view === "team"}
           />
-          {overdue.length > 0 && (
-            <section
-              aria-label="Overdue"
-              className="rounded-lg border border-danger/30 bg-danger-soft/40 p-2"
-            >
-              <header className="flex items-center gap-1.5 px-1.5 pt-0.5 pb-2 text-danger">
-                <AlertTriangle className="size-4" aria-hidden="true" />
-                <h2 className="text-[13px] font-semibold">Overdue</h2>
-                <span className="text-xs tabular-nums">{overdue.length}</span>
-              </header>
-              <ul className="grid gap-2 sm:grid-cols-2 xl:grid-cols-4">
-                {overdue.map((card) => (
-                  <li key={card.id}>
-                    <BoardCardView
-                      card={card}
-                      column={card.column}
-                      manage={manage}
-                      members={data.members}
-                      onMove={move}
-                      onAssign={assign}
-                      onDue={setDue}
-                    />
-                  </li>
-                ))}
-              </ul>
-            </section>
-          )}
-          <div
-            role="tablist"
-            aria-label="Columns"
-            className="grid grid-cols-4 gap-1 rounded-md border border-border bg-surface-muted p-0.5 sm:hidden"
-          >
-            {BOARD_COLUMNS.map((column) => (
-              <button
-                key={column}
-                type="button"
-                role="tab"
-                aria-selected={tab === column}
-                onClick={() => setTab(column)}
-                className={cn(
-                  "min-w-0 rounded-[5px] px-1 py-1.5 text-xs font-medium text-muted-foreground",
-                  tab === column && "bg-surface text-foreground shadow-sm",
-                )}
+          {view === "nori" && noriMode === "people" ? (
+            <NoriPeopleView cards={BOARD_COLUMNS.flatMap((c) => columns[c])} />
+          ) : (
+            <>
+              {overdue.length > 0 && (
+                <section
+                  aria-label="Overdue"
+                  className="rounded-lg border border-danger/30 bg-danger-soft/40 p-2"
+                >
+                  <header className="flex items-center gap-1.5 px-1.5 pt-0.5 pb-2 text-danger">
+                    <AlertTriangle className="size-4" aria-hidden="true" />
+                    <h2 className="text-[13px] font-semibold">Overdue</h2>
+                    <span className="text-xs tabular-nums">
+                      {overdue.length}
+                    </span>
+                  </header>
+                  <ul className="grid gap-2 sm:grid-cols-2 xl:grid-cols-4">
+                    {overdue.map((card) => (
+                      <li key={card.id}>
+                        <BoardCardView
+                          card={card}
+                          column={card.column}
+                          manage={manage}
+                          members={data.members}
+                          onMove={move}
+                          onAssign={assign}
+                          onDue={setDue}
+                        />
+                      </li>
+                    ))}
+                  </ul>
+                </section>
+              )}
+              <div
+                role="tablist"
+                aria-label="Columns"
+                className="grid grid-cols-4 gap-1 rounded-md border border-border bg-surface-muted p-0.5 sm:hidden"
               >
-                <span className="block truncate">
-                  {column === "done" ? "Done" : COLUMN_LABEL[column]}
-                </span>
-                <span className="tabular-nums">{columns[column].length}</span>
-              </button>
-            ))}
-          </div>
-          <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-            {BOARD_COLUMNS.map((column) => (
-              <Column
-                key={column}
-                column={column}
-                cards={columns[column]}
-                hidden={tab !== column}
-                manage={manage}
-                members={data.members}
-                onDropCard={(id) => {
-                  const card = BOARD_COLUMNS.flatMap(
-                    (c) => data.columns[c],
-                  ).find((c) => c.id === id);
-                  if (card) move(card, column);
-                }}
-                onMove={move}
-                onAssign={assign}
-                onDue={setDue}
-              />
-            ))}
-          </div>
+                {BOARD_COLUMNS.map((column) => (
+                  <button
+                    key={column}
+                    type="button"
+                    role="tab"
+                    aria-selected={tab === column}
+                    onClick={() => setTab(column)}
+                    className={cn(
+                      "min-w-0 rounded-[5px] px-1 py-1.5 text-xs font-medium text-muted-foreground",
+                      tab === column && "bg-surface text-foreground shadow-sm",
+                    )}
+                  >
+                    <span className="block truncate">
+                      {column === "done" ? "Done" : COLUMN_LABEL[column]}
+                    </span>
+                    <span className="tabular-nums">
+                      {columns[column].length}
+                    </span>
+                  </button>
+                ))}
+              </div>
+              <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+                {BOARD_COLUMNS.map((column) => (
+                  <Column
+                    key={column}
+                    column={column}
+                    cards={columns[column]}
+                    hidden={tab !== column}
+                    manage={manage}
+                    members={data.members}
+                    onDropCard={(id) => {
+                      const card = BOARD_COLUMNS.flatMap(
+                        (c) => data.columns[c],
+                      ).find((c) => c.id === id);
+                      if (card) move(card, column);
+                    }}
+                    onMove={move}
+                    onAssign={assign}
+                    onDue={setDue}
+                  />
+                ))}
+              </div>
+            </>
+          )}
         </div>
       )}
       {creating && data && (

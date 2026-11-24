@@ -10,6 +10,7 @@ import {
   Check,
   ChevronRight,
   ChevronsUpDown,
+  FileText,
   Handshake,
   HeartPulse,
   Home,
@@ -76,6 +77,14 @@ const NAV: {
     icon: Kanban,
     mobile: false,
     permission: "pi.work.read",
+  },
+  // Desktop sidebar; phones reach templates from My pi (WhatsApp templates).
+  {
+    href: "/templates",
+    label: "Templates",
+    icon: FileText,
+    mobile: false,
+    permission: "pi.read",
   },
   // Desktop sidebar only: phones reach it from Home (the bottom bar keeps five items).
   { href: "/analytics", label: "Analytics", icon: BarChart3, mobile: false },

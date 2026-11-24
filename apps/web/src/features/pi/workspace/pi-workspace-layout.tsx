@@ -15,6 +15,7 @@ import { useScopedQuery } from "@/hooks/use-scoped";
 import { piService } from "../service";
 import type { PiOverview } from "../types";
 import { piKeys } from "./lib";
+import { LiveDot, LiveEventsProvider } from "../live-events";
 
 /**
  * PI product workspace frame shared by every /pi route: identity band, live status and
@@ -35,18 +36,20 @@ export function PiWorkspaceLayout({ children }: { children: React.ReactNode }) {
     );
   return (
     <RequirePermission permission="pi.read" area="PI">
-      <div
-        className={cn(
-          fullBleed && "flex h-[calc(100dvh-52px)] flex-col overflow-hidden",
-        )}
-      >
-        <PiBand fullBleed={fullBleed} />
-        {fullBleed ? (
-          <div className="min-h-0 flex-1">{children}</div>
-        ) : (
-          children
-        )}
-      </div>
+      <LiveEventsProvider>
+        <div
+          className={cn(
+            fullBleed && "flex h-[calc(100dvh-52px)] flex-col overflow-hidden",
+          )}
+        >
+          <PiBand fullBleed={fullBleed} />
+          {fullBleed ? (
+            <div className="min-h-0 flex-1">{children}</div>
+          ) : (
+            children
+          )}
+        </div>
+      </LiveEventsProvider>
     </RequirePermission>
   );
 }
@@ -99,7 +102,8 @@ function PiBand({ fullBleed }: { fullBleed: boolean }) {
             </p>
           </div>
         </div>
-        <div className="ml-auto">
+        <div className="ml-auto flex items-center gap-2">
+          <LiveDot />
           <PiStatusChip />
         </div>
       </div>
