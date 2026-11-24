@@ -22,9 +22,11 @@ const MAX_GUESTS = 10;
 export function MeetingInvite({
   id,
   room = false,
+  audio = false,
 }: {
   id: string;
   room?: boolean;
+  audio?: boolean;
 }) {
   const [link, setLink] = useState("");
   const [copied, setCopied] = useState(false);
@@ -90,7 +92,7 @@ export function MeetingInvite({
           </h2>
           <p className="mt-0.5 text-xs text-muted-foreground">
             {room
-              ? "Send a link and people join this video room from their browser. They agree that what they say is transcribed by pi (an AI) before they join, and they see nothing of the transcript. No video or audio is saved: only the words, as text, and the transcript says who spoke."
+              ? `Send a link and people join this video room from their browser. They agree that what they say is transcribed by pi (an AI) before they join, and they see nothing of the transcript. ${audio ? "Each voice is recorded briefly to write the transcript and is deleted afterwards; no video is saved." : "No video or audio is saved."} Only the words are kept, as text, and the transcript says who spoke.`
               : "Send a link and each person records their own microphone into this meeting, so the transcript says who spoke. They agree before recording, see nothing of the transcript, and their sound is not kept."}
           </p>
         </div>

@@ -311,7 +311,7 @@ export function MeetingJoinPage({ token }: { token: string }) {
               <p className="text-xs text-muted-foreground">You are joining</p>
               <h1 className="text-lg font-semibold">{look.data.title}</h1>
             </div>
-            <MeetingRoomGuest token={token} />
+            <MeetingRoomGuest token={token} audio={look.data.audio} />
           </CardBody>
         </Card>
       </Shell>

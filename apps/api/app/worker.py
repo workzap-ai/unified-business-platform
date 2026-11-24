@@ -19,6 +19,7 @@ from app.modules.pi.runtime import process_pi_event, send_pi_message, sweep_pi
 from app.modules.pi.semantic import embed_document
 from app.modules.pi.session_snapshot import sweep_session_snapshots
 from app.modules.pi_customer.engine import sweep_customer_journeys
+from app.modules.pi_meetings.room_jobs import finish_meeting_room, sweep_meeting_rooms
 from app.modules.pi_saas.calendar_sync import JOBS as PI_CALENDAR_JOBS
 from app.modules.pi_saas.calendar_sync import sweep_pi_calendar
 from app.modules.pi_saas.campaigns import sweep_campaigns
@@ -55,6 +56,9 @@ JOB_FUNCTIONS: dict[str, Callable[..., Awaitable[Any]]] = {
     "embed_document": embed_document,
     "index_document": index_document,
     "sweep_knowledge": sweep_knowledge,
+    # video rooms: write the transcript of a finished call from its audio (Urdu and others)
+    "sweep_meeting_rooms": sweep_meeting_rooms,
+    "finish_meeting_room": finish_meeting_room,
     # pi Health: safe self-fixes (every 5 minutes) and daily self-tests.
     "pi_health_heal": pi_health_heal,
     "pi_health_self_test": pi_health_self_test,
@@ -115,6 +119,7 @@ class WorkerSettings:
         cron(sweep_session_snapshots, minute=set(range(4, 60, 5)), second=40, unique=True),
         cron(sweep_customer_journeys, second={50}, unique=True),
         cron(sweep_knowledge, second={20, 50}, unique=True),
+        cron(sweep_meeting_rooms, second={12, 42}, unique=True),
         cron(integrations_sweep, second={15}, unique=True),
         cron(sweep_pi_saas, second={40}, unique=True),
         cron(sweep_pi_calendar, second={5, 35}, unique=True),

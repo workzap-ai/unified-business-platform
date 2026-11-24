@@ -21,9 +21,12 @@ import hashlib
 import hmac
 import json
 import logging
+import re
 import secrets
 import time
 import zlib
+from dataclasses import dataclass
+from datetime import datetime
 from typing import Any, Protocol
 from urllib.parse import urlsplit
 from uuid import UUID
@@ -43,6 +46,44 @@ GUEST_PREFIX = "g_"
 # what any person in a room may do: be in it, hear and be heard. No one can end the call, mute
 # others or remove them from the browser: the host ends it through our API.
 USER_GRANTS = ["join-call", "read-call", "send-audio", "send-video", "screenshare"]
+
+
+# the languages the provider's own captions understand (Urdu is not one of them)
+CAPTION_LANGUAGES = frozenset(
+    "auto en fr es de it nl pt pl ca cs da el fi id ja ru sv ta th tr hu ro zh ar tl he hi hr ko "
+    "ms no uk bg et sl sk".split()
+)
+MAX_AUDIO_BYTES = 25 * 1024 * 1024  # what the speech-to-text services take in one file
+INDIVIDUAL_AUDIO = {"mode": "available", "output_types": ["audio_only"]}
+# individual_<call type>_<call id>_<user id>_<uuid>_audio_only_<time>.mkv
+_RECORDING_NAME = re.compile(
+    r"individual_"
+    + re.escape(CALL_TYPE)
+    + r"_r[0-9a-f]{32}_(?P<user>[sg]_[0-9a-f]{32})_[0-9a-f-]{36}_audio_only_"
+)
+
+
+def caption_language(code: str) -> str:
+    """The caption language to ask the provider for: ours if it understands it, else 'auto'."""
+    return code if code in CAPTION_LANGUAGES else "auto"
+
+
+@dataclass(frozen=True)
+class RoomRecording:
+    """One person's own audio of the call (one file per person)."""
+
+    user_id: str  # the room user id: s_... or g_...
+    url: str
+    start: datetime | None
+
+
+def _when(value: Any) -> datetime | None:
+    if not isinstance(value, str):
+        return None
+    try:
+        return datetime.fromisoformat(value)  # 3.11+: a trailing Z and long fractions are fine
+    except ValueError:
+        return None
 
 
 class RoomProviderError(Exception):
@@ -123,8 +164,9 @@ def trusted_transcript_url(url: str) -> bool:
 class RoomProvider(Protocol):
     name: str
 
-    async def create_call(self, call_id: str, *, language: str) -> None:
-        """Make the call (idempotent). Transcription starts by itself when people are in it."""
+    async def create_call(self, call_id: str, *, language: str, audio: bool = False) -> None:
+        """Make the call (idempotent). Transcription starts by itself when people are in it; with
+        `audio` each person's own voice is also recorded, to be transcribed by us and deleted."""
 
     def user_token(self, user_id: str, call_id: str, *, ttl_s: int) -> str:
         """A token that lets one browser user join THIS call only."""
@@ -136,8 +178,23 @@ class RoomProvider(Protocol):
         """The finished transcript lines, or None when it is not ready. `url` is the address the
         provider's callback gave, when there is one."""
 
+    async def recordings(self, call_id: str) -> list[RoomRecording]:
+        """Each person's own audio file, once the provider has finished writing them."""
+
+    async def download(self, url: str) -> bytes | None:
+        """The bytes of a recording (None when it is missing or too large to transcribe)."""
+
     async def delete_call(self, call_id: str) -> None:
         """Remove the call and its stored transcript and recording at the provider."""
+
+
+def build_provider(settings: Any, http: httpx.AsyncClient) -> "StreamProvider | None":
+    """The configured provider (from the settings of the API or the worker), or None."""
+    if not settings.stream_api_key or settings.stream_api_secret is None:
+        return None
+    return StreamProvider(
+        http, settings.stream_api_key, settings.stream_api_secret.get_secret_value()
+    )
 
 
 class StreamProvider:
@@ -199,7 +256,15 @@ class StreamProvider:
         """The room's call type, created once: transcription on by itself, and the narrow grants
         above for everyone (a browser user cannot end the call, mute or remove anyone)."""
         try:
-            await self._call("GET", f"/video/calltypes/{CALL_TYPE}")
+            existing = await self._call("GET", f"/video/calltypes/{CALL_TYPE}")
+            settings = existing.get("settings") if isinstance(existing, dict) else None
+            single = settings.get("individual_recording") if isinstance(settings, dict) else None
+            if not isinstance(single, dict) or single.get("mode") != "available":
+                await self._call(
+                    "PUT",
+                    f"/video/calltypes/{CALL_TYPE}",
+                    {"settings": {"individual_recording": INDIVIDUAL_AUDIO}},
+                )
             return
         except RoomProviderError as error:
             if error.code != "ROOM_PROVIDER_REFUSED":
@@ -217,16 +282,23 @@ class StreamProvider:
                         "language": "auto",
                     },
                     "recording": {"mode": "disabled"},
+                    "individual_recording": INDIVIDUAL_AUDIO,
                     "backstage": {"enabled": False},
                 },
             },
         )
 
-    async def create_call(self, call_id: str, *, language: str) -> None:
+    async def create_call(self, call_id: str, *, language: str, audio: bool = False) -> None:
         await self.ensure_call_type()
         data: dict[str, Any] = {"created_by": {"id": "pi_server", "name": "pi (AI)"}}
-        if language:
-            data["settings_override"] = {"transcription": {"language": language}}
+        override: dict[str, Any] = {}
+        spoken = caption_language(language)
+        if spoken != "auto":
+            override["transcription"] = {"language": spoken}
+        if audio:
+            override["individual_recording"] = {"mode": "auto-on", "output_types": ["audio_only"]}
+        if override:
+            data["settings_override"] = override
         await self._call("POST", f"/video/call/{CALL_TYPE}/{call_id}", {"data": data})
 
     def user_token(self, user_id: str, call_id: str, *, ttl_s: int) -> str:
@@ -272,6 +344,33 @@ class StreamProvider:
             if isinstance(row, dict):
                 lines.append(row)
         return lines
+
+    async def recordings(self, call_id: str) -> list[RoomRecording]:
+        listed = await self._call("GET", f"/video/call/{CALL_TYPE}/{call_id}/recordings")
+        items = listed.get("recordings") if isinstance(listed, dict) else None
+        out: list[RoomRecording] = []
+        for item in items if isinstance(items, list) else []:
+            if not isinstance(item, dict):
+                continue
+            found = _RECORDING_NAME.match(str(item.get("filename") or ""))
+            url = str(item.get("url") or "")
+            if found is None or not trusted_transcript_url(url):
+                continue
+            out.append(RoomRecording(found.group("user"), url, _when(item.get("start_time"))))
+        return out
+
+    async def download(self, url: str) -> bytes | None:
+        if not trusted_transcript_url(url):
+            raise RoomProviderError("ROOM_RECORDING_UNTRUSTED", "That recording is not ours", 502)
+        try:
+            reply = await self._http.get(url, timeout=60.0)
+        except httpx.HTTPError:
+            raise RoomProviderError(
+                "ROOM_PROVIDER_UNREACHABLE", "The video room service could not be reached"
+            ) from None
+        if reply.status_code >= 400 or len(reply.content) > MAX_AUDIO_BYTES:
+            return None
+        return reply.content
 
     async def delete_call(self, call_id: str) -> None:
         await self._call(

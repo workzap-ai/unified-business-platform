@@ -291,10 +291,13 @@ class LLMManager:
         purpose: str = "transcription",
         language: str | None = None,
         prompt: str | None = None,
+        timestamps: bool = False,
+        max_bytes: int | None = None,
         conversation_id: UUID | None = None,
         run_id: UUID | None = None,
     ) -> TranscriptionResponse:
-        normalized = validate_audio(audio, mime_type, self.settings.media_max_bytes)
+        limit = max_bytes if max_bytes is not None else self.settings.media_max_bytes
+        normalized = validate_audio(audio, mime_type, limit)
 
         async def call(provider: Any, name: str, model: str) -> TranscriptionResponse:
             if normalized not in getattr(provider, "transcription_mime_types", frozenset()):
@@ -307,6 +310,7 @@ class LLMManager:
                     language=language,
                     prompt=prompt,
                     timeout=self.settings.llm_timeout_seconds,
+                    timestamps=timestamps,
                 )
             )
             return result

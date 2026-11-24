@@ -41,10 +41,11 @@ class Provider:
         self.rows = None  # what `transcript` returns (None = not ready)
         self.asked = []
 
-    async def create_call(self, call_id, *, language):
+    async def create_call(self, call_id, *, language, audio=False):
         if self.fail:
             raise self.fail
         self.created.append((call_id, language))
+        self.audio = audio
 
     def user_token(self, user_id, call_id, *, ttl_s):
         self.tokens.append((user_id, call_id, ttl_s))

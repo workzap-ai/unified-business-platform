@@ -44,7 +44,7 @@ from app.modules.pi_meetings.room_provider import (
     GZIP_MAGIC,
     RoomProvider,
     RoomProviderError,
-    StreamProvider,
+    build_provider,
     guest_user,
     new_call_id,
     plain_body,
@@ -80,14 +80,7 @@ def provider_for(request: Request) -> RoomProvider | None:
     override = getattr(request.app.state, "room_provider", None)
     if override is not None:
         return override  # type: ignore[no-any-return]
-    settings = request.app.state.settings
-    if not settings.stream_api_key or settings.stream_api_secret is None:
-        return None
-    return StreamProvider(
-        request.app.state.http,
-        settings.stream_api_key,
-        settings.stream_api_secret.get_secret_value(),
-    )
+    return build_provider(request.app.state.settings, request.app.state.http)
 
 
 def api_key(request: Request) -> str:
@@ -104,6 +97,12 @@ async def room_enabled(session: Any, scope: WorkspaceScope) -> bool:
     return brain.get("meeting_intel") is True and brain.get("meeting_room") is True
 
 
+async def audio_enabled(session: Any, scope: WorkspaceScope) -> bool:
+    """Each voice is recorded briefly, to write the transcript with our own speech-to-text."""
+    brain = (await settings_row(session, scope)).response_rules.get("brain") or {}
+    return await room_enabled(session, scope) and brain.get("meeting_room_audio") is True
+
+
 async def _require_room(session: Any, scope: WorkspaceScope) -> None:
     if not await room_enabled(session, scope):
         raise BusinessRuleViolation(
@@ -117,6 +116,7 @@ def _view_room(room: PiMeetingRoom) -> dict[str, Any]:
         "meeting_id": str(room.meeting_id),
         "state": room.state,
         "live": room.state in LIVE,
+        "audio": room.audio,
         "transcript_state": room.transcript_state,
         "lines": room.lines,
         "started_at": room.started_at.isoformat() if room.started_at else None,
@@ -169,6 +169,14 @@ async def delete_calls(request: Request, call_ids: list[str]) -> None:
         ) from None
 
 
+@router.get("/rooms/options")
+async def room_options(scope: Scope, session: Session) -> dict[str, bool]:
+    """What a new room will do in this workspace, so the page can tell people before they agree."""
+    await _gate(session, scope, "pi.meetings.record")
+    await _require_room(session, scope)
+    return {"audio": await audio_enabled(session, scope)}
+
+
 @router.post("/rooms", status_code=201)
 async def open_room(
     data: RoomInput, request: Request, scope: Scope, session: Session
@@ -189,6 +197,7 @@ async def open_room(
         raise BusinessRuleViolation("MEETING_LANGUAGE_INVALID", "Use a language code like en", 422)
     if data.customer_id is not None:
         await _customer_ok(session, scope, data.customer_id)
+    audio = await audio_enabled(session, scope)
     now = datetime.now(UTC)
     meeting = PiMeeting(
         tenant_id=scope.tenant_id,
@@ -199,7 +208,12 @@ async def open_room(
         language=language,
         consent_at=now,
         consent_by=scope.user_id,
-        consent_note="Host confirmed everyone in the room is told the call is transcribed",
+        consent_note=(
+            "Host confirmed everyone in the room is told the call is transcribed and each voice "
+            "is recorded briefly to write the transcript"
+            if audio
+            else "Host confirmed everyone in the room is told the call is transcribed"
+        ),
         held_at=now,
         created_by=scope.user_id,
     )
@@ -211,12 +225,13 @@ async def open_room(
         meeting_id=meeting.id,
         provider=provider.name,
         call_id=new_call_id(),
+        audio=audio,
         created_by=scope.user_id,
     )
     session.add(room)
     await session.flush()
     try:
-        await provider.create_call(room.call_id, language=language)
+        await provider.create_call(room.call_id, language=language, audio=audio)
     except RoomProviderError as error:
         room.state = "failed"
         meeting.status = "failed"
@@ -270,7 +285,13 @@ async def room_status(
     if room is None:
         return {"room": None}
     provider = provider_for(request)
-    if room.state == "ended" and room.transcript_state in ("none", "pending") and provider:
+    # a room that records voices is finished by the worker, from the audio, not from here
+    if (
+        room.state == "ended"
+        and room.transcript_state in ("none", "pending")
+        and provider
+        and not room.audio
+    ):
         if await _pull(session, scope, meeting, room, provider):
             await session.commit()
     return {"room": _view_room(room), "meeting_status": meeting.status}
@@ -451,7 +472,11 @@ async def webhook(request: Request, session: Session) -> dict[str, bool]:
                 rows = await provider.transcript(room.call_id, url)
             except RoomProviderError:
                 rows = None
-            if rows is not None:
+            if rows is not None and room.audio:
+                # the provider's captions are only a fallback for a room that records voices:
+                # kept as lines, and the worker writes the real transcript from the audio
+                await native_ingest.add_lines(session, scope, meeting, rows)
+            elif rows is not None:
                 await native_ingest.finish_transcript(session, scope, meeting, room, rows)
     await session.commit()
     return {"ok": True}

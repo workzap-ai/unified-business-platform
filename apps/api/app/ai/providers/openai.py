@@ -24,6 +24,7 @@ from app.ai.types import (
     TranscriptionRequest,
     TranscriptionResponse,
     Usage,
+    Word,
 )
 
 AUDIO_EXTENSIONS = {
@@ -276,7 +277,10 @@ class OpenAICompatibleProvider(HttpAdapter):
         extension = AUDIO_EXTENSIONS.get(request.mime_type)
         if extension is None:
             raise ProviderError(self.name, ErrorKind.UNSUPPORTED, code="mime")
-        form = {"model": request.model, "response_format": "json"}
+        form: dict[str, Any] = {"model": request.model, "response_format": "json"}
+        if request.timestamps:
+            form["response_format"] = "verbose_json"
+            form["timestamp_granularities[]"] = ["word"]
         if request.language:
             form["language"] = request.language
         if request.prompt:
@@ -302,4 +306,24 @@ class OpenAICompatibleProvider(HttpAdapter):
                 optional_int(usage.get("input_tokens")), optional_int(usage.get("output_tokens"))
             ),
             language=language if isinstance(language, str) else None,
+            words=_words(data) if request.timestamps else [],
         )
+
+
+def _words(data: dict[str, Any]) -> list[Word]:
+    """The timed words of a verbose transcription; anything malformed is left out."""
+    out: list[Word] = []
+    for item in data.get("words") or []:
+        if not isinstance(item, dict):
+            continue
+        text, start, end = item.get("word"), item.get("start"), item.get("end")
+        if (
+            isinstance(text, str)
+            and text.strip()
+            and isinstance(start, int | float)
+            and isinstance(end, int | float)
+            and not isinstance(start, bool)
+            and not isinstance(end, bool)
+        ):
+            out.append(Word(text.strip(), float(start), max(float(start), float(end))))
+    return out

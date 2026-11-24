@@ -47,7 +47,13 @@ function why(e: unknown): string {
   return "Could not join. Check your connection and try again.";
 }
 
-export function MeetingRoomGuest({ token }: { token: string }) {
+export function MeetingRoomGuest({
+  token,
+  audio = false,
+}: {
+  token: string;
+  audio?: boolean;
+}) {
   const [name, setName] = useState("");
   const [agreed, setAgreed] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -118,8 +124,9 @@ export function MeetingRoomGuest({ token }: { token: string }) {
             listens and writes down what is said. It does not speak.
           </li>
           <li>
-            What you say is turned into text for this meeting. Phone, card and
-            ID numbers are taken out of the text.
+            {audio
+              ? "Your voice is recorded briefly, only to turn what you say into text for this meeting. The recording is deleted as soon as the text is made. Phone, card and ID numbers are taken out of the text."
+              : "What you say is turned into text for this meeting. Phone, card and ID numbers are taken out of the text."}
           </li>
           <li>
             The host&apos;s team can read it. pi may summarise it, and after
@@ -149,7 +156,9 @@ export function MeetingRoomGuest({ token }: { token: string }) {
           onChange={(e) => setAgreed(e.target.checked)}
         />
         <span>
-          I agree that what I say is transcribed by pi (an AI) for this meeting.
+          {audio
+            ? "I agree that my voice is recorded briefly and transcribed by pi (an AI) for this meeting."
+            : "I agree that what I say is transcribed by pi (an AI) for this meeting."}
         </span>
       </label>
       {error && <Notice tone="danger">{error}</Notice>}

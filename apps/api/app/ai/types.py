@@ -200,12 +200,21 @@ class TranscriptionRequest:
     language: str | None = None
     prompt: str | None = None
     timeout: float = 20.0
+    # ask for the time of every word (seconds from the start of the audio)
+    timestamps: bool = False
 
     def __repr__(self) -> str:
         return (
             f"TranscriptionRequest(model={self.model!r}, mime_type={self.mime_type!r}, "
             f"bytes={len(self.audio)})"
         )
+
+
+@dataclass(frozen=True, slots=True)
+class Word:
+    text: str
+    start: float  # seconds from the start of the audio
+    end: float
 
 
 @dataclass(slots=True)
@@ -216,3 +225,4 @@ class TranscriptionResponse:
     usage: Usage = field(default_factory=Usage)
     language: str | None = None
     attempts: list[Attempt] = field(default_factory=list)
+    words: list[Word] = field(default_factory=list)  # only when timestamps were asked for

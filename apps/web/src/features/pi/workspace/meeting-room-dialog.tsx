@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Video } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { Input, NativeSelect } from "@/components/ui/input";
 import { Checkbox, Label } from "@/components/ui/controls";
 import {
   Dialog,
@@ -13,7 +13,7 @@ import {
   DialogHeader,
 } from "@/components/ui/overlays";
 import { Notice } from "@/components/app/states";
-import { useScopedMutation } from "@/hooks/use-scoped";
+import { useScopedMutation, useScopedQuery } from "@/hooks/use-scoped";
 import { ApiError } from "@/services/api-client";
 import { meetingRoomService, ROOM_REFUSED } from "../meeting-room-service";
 
@@ -32,12 +32,20 @@ export function StartRoomDialog({
 }) {
   const [title, setTitle] = useState("");
   const [agreed, setAgreed] = useState(false);
+  const [language, setLanguage] = useState("");
+  const options = useScopedQuery(
+    ["pi", "meeting-room", "options"],
+    () => meetingRoomService.options(),
+    { enabled: open, retry: false },
+  );
+  const audio = options.data?.audio === true;
   const make = useScopedMutation(meetingRoomService.open, {
     invalidate: [["pi", "meeting-intel"]],
     toastErrors: false,
     onSuccess: (out) => {
       setTitle("");
       setAgreed(false);
+      setLanguage("");
       onOpened(out.meeting.id);
     },
   });
@@ -68,6 +76,23 @@ export function StartRoomDialog({
               placeholder="For example: Tiles order review"
             />
           </div>
+          <div>
+            <Label htmlFor="room-language">Language people will speak</Label>
+            <NativeSelect
+              id="room-language"
+              value={language}
+              disabled={make.isPending}
+              onChange={(e) => setLanguage(e.target.value)}
+            >
+              <option value="">Mixed or not sure</option>
+              <option value="ur">Urdu (and Roman Urdu)</option>
+              <option value="en">English</option>
+              <option value="hi">Hindi</option>
+            </NativeSelect>
+            <p className="mt-1 text-xs text-muted-foreground">
+              Telling pi the main language makes the transcript more accurate.
+            </p>
+          </div>
           <label className="flex items-start gap-2 text-sm">
             <Checkbox
               checked={agreed}
@@ -75,8 +100,9 @@ export function StartRoomDialog({
               onCheckedChange={(v) => setAgreed(v === true)}
             />
             <span>
-              Everyone who joins will be told that pi (an AI) is in the room and
-              that the call is transcribed.
+              {audio
+                ? "Everyone who joins will be told that pi (an AI) is in the room, that the call is transcribed, and that each person's voice is recorded briefly to write the transcript and then deleted."
+                : "Everyone who joins will be told that pi (an AI) is in the room and that the call is transcribed."}
             </span>
           </label>
           {failure && <Notice tone="danger">{failure}</Notice>}
@@ -89,7 +115,11 @@ export function StartRoomDialog({
             disabled={!ready}
             loading={make.isPending}
             onClick={() =>
-              make.mutate({ title: title.trim(), consent: agreed })
+              make.mutate({
+                title: title.trim(),
+                consent: agreed,
+                language,
+              })
             }
           >
             <Video /> Start room

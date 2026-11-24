@@ -121,6 +121,19 @@ async def guests_enabled(session: AsyncSession, scope: WorkspaceScope) -> bool:
     return brain.get("meeting_intel") is True and brain.get("meeting_guests") is True
 
 
+async def _room_records(session: AsyncSession, scope: WorkspaceScope, meeting: PiMeeting) -> bool:
+    from app.modules.pi_meetings.models import PiMeetingRoom  # local: models import this module
+
+    found = await session.scalar(
+        select(PiMeetingRoom.audio).where(
+            PiMeetingRoom.tenant_id == scope.tenant_id,
+            PiMeetingRoom.environment_id == scope.environment_id,
+            PiMeetingRoom.meeting_id == meeting.id,
+        )
+    )
+    return bool(found)
+
+
 async def voice_enabled(session: AsyncSession, scope: WorkspaceScope) -> bool:
     """pi may talk on links only when the workspace has switched on both links and voice."""
     brain = (await settings_row(session, scope)).response_rules.get("brain") or {}
@@ -372,6 +385,8 @@ async def look(token: Token, request: Request, session: Session) -> dict[str, An
         "title": meeting.title,
         "pi_voice": meeting.pi_mode == "speak" and await voice_enabled(session, scope),
         "room": meeting.source == "native",  # a video room: the page joins it instead of recording
+        # in a room, each voice is recorded briefly to write the transcript: said before they agree
+        "audio": meeting.source == "native" and await _room_records(session, scope, meeting),
     }
 
 

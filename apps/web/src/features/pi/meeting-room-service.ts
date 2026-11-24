@@ -15,6 +15,8 @@ export const roomSchema = z.object({
   meeting_id: z.string(),
   state: z.string(),
   live: z.boolean().catch(false),
+  // each voice is recorded briefly to write the transcript, then deleted
+  audio: z.boolean().catch(false),
   transcript_state: z.string().catch("none"),
   lines: z.number().catch(0),
   started_at: z.string().nullable().catch(null),
@@ -49,6 +51,13 @@ export const meetingRoomService = {
         room: roomSchema,
       }),
       { body: input },
+    ),
+  // What a new room will do here, so the page can say it before people agree.
+  options: () =>
+    apiRequest(
+      "GET",
+      `${BASE}/rooms/options`,
+      z.object({ audio: z.boolean().catch(false) }),
     ),
   status: (meetingId: string) =>
     apiRequest(

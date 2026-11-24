@@ -47,6 +47,7 @@ DEFAULT_MODELS: dict[str, dict[str, str]] = {
         "vision": "gpt-4o-mini",
         "embed": "text-embedding-3-small",
         "transcribe": "whisper-1",
+        "stt_multi": "whisper-1",
     },
     "gemini": {
         "router": "gemini-2.5-flash-lite",
@@ -68,6 +69,8 @@ DEFAULT_MODELS: dict[str, dict[str, str]] = {
         "pi_brain": "openai/gpt-oss-120b",
         "summarize": "openai/gpt-oss-20b",
         "transcribe": "whisper-large-v3-turbo",
+        # speech in Urdu and other languages the turbo model is weaker at (meeting rooms)
+        "stt_multi": "whisper-large-v3",
     },
     # Claude: chat and vision only (embeddings and transcription stay on OpenAI/Gemini).
     "anthropic": {

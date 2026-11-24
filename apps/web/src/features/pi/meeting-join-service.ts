@@ -21,6 +21,8 @@ export const meetingJoinService = {
         pi_voice: z.boolean().catch(false),
         // a video room: the page joins the room instead of recording the microphone
         room: z.boolean().catch(false),
+        // in that room each voice is recorded briefly to write the transcript
+        audio: z.boolean().catch(false),
       }),
     ),
   join: (token: string, input: { name: string; consent: boolean }) =>

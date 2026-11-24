@@ -175,8 +175,23 @@ async def finish_transcript(
     now: datetime | None = None,
 ) -> None:
     """The call's transcript arrived: store it and hand the meeting to analysis."""
-    now = now or datetime.now(UTC)
     await add_lines(session, scope, meeting, rows)
+    longest = max((_ms(r.get("stop_ts")) or 0 for r in spoken(rows)), default=0)
+    await complete(session, scope, meeting, room, longest_ms=longest, now=now)
+
+
+async def complete(
+    session: AsyncSession,
+    scope: WorkspaceScope,
+    meeting: PiMeeting,
+    room: PiMeetingRoom,
+    *,
+    longest_ms: int,
+    now: datetime | None = None,
+) -> None:
+    """The transcript is final: count it and hand the meeting to analysis (or fail it when no one
+    was heard)."""
+    now = now or datetime.now(UTC)
     total = await session.scalar(
         select(func.count())
         .select_from(PiMeetingSegment)
@@ -195,7 +210,6 @@ async def finish_transcript(
     if meeting.status in ("created", "transcribing"):
         meeting.status = "analysing"
         meeting.failure_reason = ""
-    longest = max((_ms(r.get("stop_ts")) or 0 for r in spoken(rows)), default=0)
-    meeting.duration_ms = max(meeting.duration_ms, longest)
+    meeting.duration_ms = max(meeting.duration_ms, longest_ms)
     if meeting.held_at is None:
         meeting.held_at = room.started_at or now

@@ -18,6 +18,7 @@ from uuid import UUID
 from sqlalchemy import (
     ARRAY,
     BigInteger,
+    Boolean,
     CheckConstraint,
     Computed,
     DateTime,
@@ -198,6 +199,11 @@ class PiMeetingRoom(WorkspaceRow):
     state: Mapped[str] = mapped_column(String(10), default="created", server_default="created")
     transcript_state: Mapped[str] = mapped_column(String(10), default="none", server_default="none")
     lines: Mapped[int] = mapped_column(Integer, default=0, server_default="0")
+    # each person's voice is recorded on its own for a short while, only to write the transcript
+    # with our own speech-to-text (the provider's captions are poor in Urdu); the recording is
+    # deleted at the provider as soon as the transcript is made
+    audio: Mapped[bool] = mapped_column(Boolean, default=False, server_default=text("false"))
+    stt_tries: Mapped[int] = mapped_column(Integer, default=0, server_default="0")
     started_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     ended_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     created_by: Mapped[UUID | None] = mapped_column(Uuid, nullable=True)
