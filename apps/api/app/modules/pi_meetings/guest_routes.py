@@ -371,6 +371,7 @@ async def look(token: Token, request: Request, session: Session) -> dict[str, An
     return {
         "title": meeting.title,
         "pi_voice": meeting.pi_mode == "speak" and await voice_enabled(session, scope),
+        "room": meeting.source == "native",  # a video room: the page joins it instead of recording
     }
 
 

@@ -156,6 +156,10 @@ class Settings(BaseSettings):
     recall_api_key: SecretStr | None = None
     recall_webhook_secret: SecretStr | None = None
     recall_region: Literal["us-west-2", "us-east-1", "eu-central-1", "ap-northeast-1"] = "us-west-2"
+    # pi's own video rooms (Stream Video). Empty key or secret = rooms unavailable. The secret also
+    # signs the provider's callbacks and the room tokens; keep it only on the server.
+    stream_api_key: str | None = None
+    stream_api_secret: SecretStr | None = None
     # Exact OAuth redirect URI registered with providers; callback path is fixed.
     oauth_redirect_base_url: str | None = None
     oauth_state_ttl_seconds: int = Field(default=600, ge=60, le=3600)

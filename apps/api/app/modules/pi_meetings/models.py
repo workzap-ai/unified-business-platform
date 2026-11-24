@@ -47,6 +47,8 @@ BOT_STATUSES = (
     "done",
     "failed",
 )
+ROOM_STATES = ("created", "live", "ended", "failed")
+TRANSCRIPT_STATES = ("none", "pending", "done", "failed")
 BOT_ACTIVE = ("requested", "joining", "waiting", "in_call", "recording")
 DOCUMENT_KINDS = ("summary_pdf", "deck_pptx")
 DOCUMENT_STATUSES = ("draft", "approved")
@@ -173,6 +175,34 @@ class PiMeetingBot(WorkspaceRow):
     created_by: Mapped[UUID | None] = mapped_column(Uuid, nullable=True)
 
 
+class PiMeetingRoom(WorkspaceRow):
+    """pi's own video room (Stream Video) for a meeting we host: staff and customers join it from
+    the browser. One room per meeting. The provider's call id is a random token, never the
+    meeting's id, so a call id says nothing about the workspace. The words come back from the
+    provider after the call (a signed callback), never from a browser."""
+
+    __tablename__ = "pi_meeting_rooms"
+    __table_args__ = workspace_args(
+        "pi_meeting_rooms",
+        scoped_fk("pi_meeting_rooms", "meeting_id", "pi_meetings"),
+        Index(
+            "uq_pi_meeting_rooms_meeting", "tenant_id", "environment_id", "meeting_id", unique=True
+        ),
+        Index("uq_pi_meeting_rooms_call", "provider", "call_id", unique=True),
+        CheckConstraint(_in("state", ROOM_STATES), name="state"),
+        CheckConstraint(_in("transcript_state", TRANSCRIPT_STATES), name="transcript_state"),
+    )
+    meeting_id: Mapped[UUID] = mapped_column(Uuid)
+    provider: Mapped[str] = mapped_column(String(20), default="stream", server_default="stream")
+    call_id: Mapped[str] = mapped_column(String(80))
+    state: Mapped[str] = mapped_column(String(10), default="created", server_default="created")
+    transcript_state: Mapped[str] = mapped_column(String(10), default="none", server_default="none")
+    lines: Mapped[int] = mapped_column(Integer, default=0, server_default="0")
+    started_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    ended_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    created_by: Mapped[UUID | None] = mapped_column(Uuid, nullable=True)
+
+
 class PiMeetingDocument(WorkspaceRow):
     """A designed document drawn from a meeting's approved insights: the summary PDF or the deck.
     A draft can be downloaded by the team; only an approved one may be sent to a customer. The
@@ -224,6 +254,15 @@ class PiMeetingParticipant(WorkspaceRow):
             "label",
             unique=True,
         ),
+        Index(
+            "uq_pi_meeting_participants_stream",
+            "tenant_id",
+            "environment_id",
+            "meeting_id",
+            "stream_user_id",
+            unique=True,
+            postgresql_where=text("stream_user_id IS NOT NULL"),
+        ),
         CheckConstraint(_in("role", PARTICIPANT_ROLES), name="role"),
     )
     meeting_id: Mapped[UUID] = mapped_column(Uuid)
@@ -233,6 +272,8 @@ class PiMeetingParticipant(WorkspaceRow):
     # set by a person, only when the speaker has been mapped to the customer
     mapped_customer_id: Mapped[UUID | None] = mapped_column(Uuid, nullable=True)
     mapped_user_id: Mapped[UUID | None] = mapped_column(Uuid, nullable=True)
+    # who the video room says spoke: "s_<user id>" for staff, "g_<guest id>" for a guest
+    stream_user_id: Mapped[str | None] = mapped_column(String(80), nullable=True)
 
 
 class PiMeetingSegment(WorkspaceRow):

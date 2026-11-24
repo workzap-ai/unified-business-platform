@@ -75,6 +75,9 @@ from app.modules.pi_meetings.media_routes import router as pi_meeting_media_rout
 from app.modules.pi_meetings.pilot_routes import router as pi_meeting_pilot_router
 from app.modules.pi_meetings.qa_routes import router as pi_meeting_qa_router
 from app.modules.pi_meetings.recording_routes import router as pi_meeting_recording_router
+from app.modules.pi_meetings.room_routes import public_router as pi_meeting_room_public_router
+from app.modules.pi_meetings.room_routes import router as pi_meeting_room_router
+from app.modules.pi_meetings.room_routes import webhook_router as pi_meeting_room_webhook_router
 from app.modules.pi_meetings.routes import router as pi_meeting_intel_router
 from app.modules.pi_meetings.share_routes import router as pi_meeting_share_router
 from app.modules.pi_meetings.voice_routes import public_router as pi_meeting_voice_join_router
@@ -82,6 +85,7 @@ from app.modules.pi_meetings.voice_routes import router as pi_meeting_voice_rout
 from app.modules.pi_saas.app_routes import router as pi_app_router
 from app.modules.pi_saas.assistant_routes import operator_router as pi_operator_help_router
 from app.modules.pi_saas.assistant_routes import router as pi_assistant_router
+from app.modules.pi_saas.blocklist.routes import router as pi_blocklist_router
 from app.modules.pi_saas.campaign_routes import router as pi_campaign_router
 from app.modules.pi_saas.connector_routes import router as pi_connector_router
 from app.modules.pi_saas.connector_routes import web_router as pi_connector_web_router
@@ -97,7 +101,6 @@ from app.modules.pi_saas.digest_routes import router as pi_digest_router
 from app.modules.pi_saas.health_routes import router as pi_health_router
 from app.modules.pi_saas.insights_routes import router as pi_insights_router
 from app.modules.pi_saas.meeting_board import router as pi_meeting_board_router
-from app.modules.pi_saas.blocklist.routes import router as pi_blocklist_router
 from app.modules.pi_saas.nori_board.routes import door_router as nori_board_door_router
 from app.modules.pi_saas.nori_board.routes import router as nori_board_router
 from app.modules.pi_saas.nori_credits.routes import router as nori_credits_router
@@ -152,8 +155,11 @@ ROUTERS = [
     pi_meeting_voice_router,
     pi_meeting_voice_join_router,
     pi_meeting_bot_router,
+    pi_meeting_room_router,
     pi_meeting_documents_router,
     pi_meeting_bot_webhook_router,
+    pi_meeting_room_public_router,
+    pi_meeting_room_webhook_router,
     pi_customer_payment_router,
     pi_deals_router,
     pi_brain_documents_router,
