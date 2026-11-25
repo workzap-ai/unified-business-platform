@@ -211,6 +211,33 @@ class TranscriptionRequest:
 
 
 @dataclass(frozen=True, slots=True)
+class SpeechRequest:
+    """Text to be spoken. The text is never dumped into logs or reprs."""
+
+    model: str
+    text: str
+    voice: str
+    format: str = "mp3"  # mp3 | wav | opus | pcm (raw 24 kHz 16-bit mono)
+    timeout: float = 20.0
+
+    def __repr__(self) -> str:
+        return f"SpeechRequest(model={self.model!r}, voice={self.voice!r}, chars={len(self.text)})"
+
+
+@dataclass(slots=True)
+class SpeechResponse:
+    audio: bytes
+    mime_type: str
+    provider: str
+    model: str
+    usage: Usage = field(default_factory=Usage)  # input_tokens carries the characters spoken
+    attempts: list[Attempt] = field(default_factory=list)
+
+    def __repr__(self) -> str:
+        return f"SpeechResponse(provider={self.provider!r}, bytes={len(self.audio)})"
+
+
+@dataclass(frozen=True, slots=True)
 class Word:
     text: str
     start: float  # seconds from the start of the audio

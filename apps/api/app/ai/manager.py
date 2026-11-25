@@ -49,6 +49,8 @@ from app.ai.types import (
     LLMResponse,
     Message,
     OutputSchema,
+    SpeechRequest,
+    SpeechResponse,
     TextPart,
     ToolChoice,
     ToolDefinition,
@@ -73,6 +75,7 @@ if TYPE_CHECKING:
 logger = logging.getLogger("platform.ai")
 PURPOSE_PATTERN = re.compile(r"^[a-z][a-z0-9_.-]{0,19}$")  # ai_usage_events.purpose: 20 chars
 MAX_EMBED_BATCH = 100
+MAX_SPEECH_CHARS = 600  # a spoken turn is short; a longer text is refused, never cut silently
 
 
 def _api_key(settings: Settings, provider: str) -> str:
@@ -325,6 +328,54 @@ class LLMManager:
             conversation_id=conversation_id,
             run_id=run_id,
             max_retries=0,  # large payloads: fall back instead of re-uploading
+        )
+        result.attempts = attempts
+        return result
+
+    async def synthesize(
+        self,
+        scope: WorkspaceScope | None,
+        text: str,
+        *,
+        voice: str = "alloy",
+        audio_format: str = "mp3",
+        alias: str = "speak",
+        purpose: str = "speech",
+        conversation_id: UUID | None = None,
+        run_id: UUID | None = None,
+    ) -> SpeechResponse:
+        """Spoken audio for already-checked text. The words must have passed the reply gate before
+        this is called: nothing here judges them. Counts against the workspace's AI usage."""
+        spoken = " ".join(text.split())
+        if not spoken:
+            raise ValueError("nothing to speak")
+        if len(spoken) > MAX_SPEECH_CHARS:
+            raise ValueError("text too long to speak")
+
+        async def call(provider: Any, name: str, model: str) -> SpeechResponse:
+            if not hasattr(provider, "synthesize"):
+                raise ProviderError(name, ErrorKind.UNSUPPORTED, code="speak")
+            result: SpeechResponse = await provider.synthesize(
+                SpeechRequest(
+                    model=model,
+                    text=spoken,
+                    voice=voice,
+                    format=audio_format,
+                    timeout=self.settings.llm_timeout_seconds,
+                )
+            )
+            return result
+
+        result, attempts = await self._execute(
+            scope,
+            alias=alias,
+            purpose=purpose,
+            capability="speak",
+            call=call,
+            usage_of=lambda r: r.usage,
+            conversation_id=conversation_id,
+            run_id=run_id,
+            max_retries=0,  # a person is waiting: fail over or fall back to silence, never repeat
         )
         result.attempts = attempts
         return result

@@ -19,6 +19,8 @@ from app.ai.types import (
     LLMRequest,
     LLMResponse,
     Message,
+    SpeechRequest,
+    SpeechResponse,
     TextPart,
     ToolCall,
     TranscriptionRequest,
@@ -36,7 +38,8 @@ AUDIO_EXTENSIONS = {
     "audio/flac": "flac",
 }
 IMAGE_TYPES = frozenset({"image/jpeg", "image/png", "image/webp"})
-Capability = Literal["chat", "vision", "embed", "transcribe"]
+Capability = Literal["chat", "vision", "embed", "transcribe", "speak"]
+SPEECH_MIME = {"mp3": "audio/mpeg", "wav": "audio/wav", "opus": "audio/opus", "pcm": "audio/pcm"}
 StructuredMode = Literal["json_schema", "json_object"]
 
 
@@ -53,7 +56,9 @@ class OpenAICompatibleProvider(HttpAdapter):
         base_url: str,
         api_key: SecretStr,
         *,
-        capabilities: frozenset[Capability] = frozenset({"chat", "vision", "embed", "transcribe"}),
+        capabilities: frozenset[Capability] = frozenset(
+            {"chat", "vision", "embed", "transcribe", "speak"}
+        ),
         structured_mode: StructuredMode = "json_schema",
     ) -> None:
         super().__init__(name, http, base_url)
@@ -268,6 +273,32 @@ class OpenAICompatibleProvider(HttpAdapter):
             provider=self.name,
             model=request.model,
             usage=Usage(optional_int(usage.get("prompt_tokens")), 0),
+        )
+
+    # -- text to speech -------------------------------------------------------------------
+
+    async def synthesize(self, request: SpeechRequest) -> SpeechResponse:
+        self._unsupported("speak")
+        mime = SPEECH_MIME.get(request.format)
+        if mime is None:
+            raise ProviderError(self.name, ErrorKind.UNSUPPORTED, code="format")
+        audio = await self.post_bytes(
+            "audio/speech",
+            headers=self._headers(),
+            json_body={
+                "model": request.model,
+                "input": request.text,
+                "voice": request.voice,
+                "response_format": request.format,
+            },
+            request_timeout=request.timeout,
+        )
+        return SpeechResponse(
+            audio=audio,
+            mime_type=mime,
+            provider=self.name,
+            model=request.model,
+            usage=Usage(len(request.text), 0),  # the price of speech follows its characters
         )
 
     # -- speech to text -------------------------------------------------------------------

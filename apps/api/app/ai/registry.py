@@ -48,6 +48,9 @@ DEFAULT_MODELS: dict[str, dict[str, str]] = {
         "embed": "text-embedding-3-small",
         "transcribe": "whisper-1",
         "stt_multi": "whisper-1",
+        # spoken replies (video rooms). NOT verified live: the platform key answered 401 when this
+        # was added, so pin another with OPENAI_MODELS={"speak": "..."} if this one is refused.
+        "speak": "gpt-4o-mini-tts",
     },
     "gemini": {
         "router": "gemini-2.5-flash-lite",

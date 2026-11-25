@@ -16,6 +16,8 @@ from app.ai.types import (
     EmbeddingResponse,
     LLMRequest,
     LLMResponse,
+    SpeechRequest,
+    SpeechResponse,
     TranscriptionRequest,
     TranscriptionResponse,
 )
@@ -41,6 +43,13 @@ class SpeechToTextProvider(Protocol):
     transcription_mime_types: frozenset[str]
 
     async def transcribe(self, request: TranscriptionRequest) -> TranscriptionResponse: ...
+
+
+@runtime_checkable
+class TextToSpeechProvider(Protocol):
+    name: str
+
+    async def synthesize(self, request: SpeechRequest) -> SpeechResponse: ...
 
 
 @runtime_checkable
@@ -166,6 +175,35 @@ class HttpAdapter:
         if not isinstance(body, dict):
             raise ProviderError(self.name, ErrorKind.UNAVAILABLE, code="bad_body") from None
         return body
+
+    async def post_bytes(
+        self,
+        path: str,
+        *,
+        headers: dict[str, str],
+        request_timeout: float,
+        json_body: dict[str, Any],
+    ) -> bytes:
+        """A POST whose answer is a binary file (spoken audio), not JSON."""
+        try:
+            response = await self.http.post(
+                f"{self.base_url}/{path.lstrip('/')}",
+                headers=headers,
+                json=json_body,
+                timeout=request_timeout,
+                follow_redirects=False,
+            )
+        except httpx.TimeoutException:
+            raise ProviderError(self.name, ErrorKind.TIMEOUT) from None
+        except httpx.TransportError:
+            raise ProviderError(self.name, ErrorKind.CONNECTION) from None
+        if response.status_code >= 400:
+            raise self.classify(response) from None
+        if response.status_code != 200 or not response.content:
+            raise ProviderError(
+                self.name, ErrorKind.UNAVAILABLE, status_code=response.status_code, code="bad_body"
+            ) from None
+        return response.content
 
 
 def optional_int(value: Any) -> int | None:
