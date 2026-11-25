@@ -174,6 +174,10 @@ class RoomProvider(Protocol):
     async def end_call(self, call_id: str) -> None:
         """End the call for everyone."""
 
+    async def block_user(self, call_id: str, user_id: str) -> None:
+        """Remove one person from the call and stop them rejoining it. A person who never reached
+        the provider is not an error (the caller also refuses them a new token)."""
+
     async def transcript(self, call_id: str, url: str = "") -> list[dict[str, Any]] | None:
         """The finished transcript lines, or None when it is not ready. `url` is the address the
         provider's callback gave, when there is one."""
@@ -315,6 +319,14 @@ class StreamProvider:
 
     async def end_call(self, call_id: str) -> None:
         await self._call("POST", f"/video/call/{CALL_TYPE}/{call_id}/mark_ended", {})
+
+    async def block_user(self, call_id: str, user_id: str) -> None:
+        await self._call(
+            "POST",
+            f"/video/call/{CALL_TYPE}/{call_id}/block",
+            {"user_id": user_id},
+            missing_ok=True,
+        )
 
     async def transcript(self, call_id: str, url: str = "") -> list[dict[str, Any]] | None:
         address = url

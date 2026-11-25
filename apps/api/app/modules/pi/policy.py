@@ -59,6 +59,8 @@ def validate_section(section: str, value: Any) -> None:
                 "meeting_bot",
                 "meeting_room",
                 "meeting_room_audio",
+                "meeting_room_kill",
+                "meeting_room_month_minutes",
             }
             ensure(isinstance(brain, dict) and set(brain) <= {*TUNABLES, *flags})
             ensure(type(brain.get("learning_frozen", True)) is bool)
@@ -83,6 +85,9 @@ def validate_section(section: str, value: Any) -> None:
             ensure(
                 type(brain.get("meeting_room_audio", False)) is bool
             )  # rooms record voices briefly
+            ensure(type(brain.get("meeting_room_kill", False)) is bool)  # stop every room now
+            month = brain.get("meeting_room_month_minutes", 0)
+            ensure(type(month) is int and 0 <= month <= 100_000)  # 0 = the built-in default
             ensure(
                 type(brain.get("meeting_bot", False)) is bool
             )  # pi joins a call as a bot, opt-in

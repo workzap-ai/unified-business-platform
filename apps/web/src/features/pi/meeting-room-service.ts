@@ -24,6 +24,14 @@ export const roomSchema = z.object({
 });
 export type MeetingRoom = z.infer<typeof roomSchema>;
 
+export const roomPersonSchema = z.object({
+  id: z.string(),
+  label: z.string().catch("Guest"),
+  staff: z.boolean().catch(false),
+  removed: z.boolean().catch(false),
+});
+export type RoomPerson = z.infer<typeof roomPersonSchema>;
+
 export const roomCredentialsSchema = z.object({
   api_key: z.string(),
   call_type: z.string(),
@@ -66,7 +74,19 @@ export const meetingRoomService = {
       z.object({
         room: roomSchema.nullable().catch(null),
         meeting_status: z.string().catch(""),
+        // who has been given a seat; staff cannot be removed from here
+        people: z.array(roomPersonSchema).catch([]),
+        limits: z
+          .object({ minutes: z.number(), people: z.number() })
+          .catch({ minutes: 90, people: 8 }),
       }),
+    ),
+  // Take a guest out of the live call; they cannot come back.
+  removePerson: (meetingId: string, participantId: string) =>
+    apiRequest(
+      "POST",
+      `${BASE}/${meetingId}/room/people/${participantId}/remove`,
+      z.object({ removed: z.boolean() }),
     ),
   staffToken: (meetingId: string) =>
     apiRequest(
@@ -92,6 +112,12 @@ export const ROOM_REFUSED: Record<string, string> = {
   MEETING_ROOM_UNCONFIGURED:
     "The video room service is not set up yet. Ask the platform owner to finish its setup.",
   MEETING_ROOM_CLOSED: "This room is not open.",
+  MEETING_ROOM_PAUSED: "Video rooms are paused for this workspace right now.",
+  MEETING_ROOM_FULL: "This room is full.",
+  MEETING_ROOM_REMOVED: "The host removed you from this room.",
+  MEETING_ROOM_MONTH_LIMIT:
+    "This month's video room time is used up. Ask the platform owner to raise it.",
+  MEETING_ROOM_STAFF: "Staff cannot be removed here. End the call instead.",
   MEETING_CONSENT_REQUIRED:
     "Confirm that everyone in the room will be told first.",
   ROOM_PROVIDER_KEY_REJECTED:

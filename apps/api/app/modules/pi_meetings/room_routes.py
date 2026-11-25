@@ -31,6 +31,7 @@ from app.modules.audit.service import record
 from app.modules.pi.configuration import settings_row
 from app.modules.pi.memory_ledger import redacted
 from app.modules.pi_meetings import native_ingest
+from app.modules.pi_meetings import room_limits as limits
 from app.modules.pi_meetings.guest_routes import (
     GuestToken,
     _guest_for,
@@ -108,6 +109,34 @@ async def _require_room(session: Any, scope: WorkspaceScope) -> None:
         raise BusinessRuleViolation(
             "MEETING_ROOM_OFF", "Video rooms are not switched on for this workspace", 403
         )
+    await _not_paused(session, scope)
+
+
+async def _not_paused(session: Any, scope: WorkspaceScope) -> None:
+    if await limits.killed(session, scope):
+        raise BusinessRuleViolation(
+            "MEETING_ROOM_PAUSED", "Video rooms are paused for this workspace", 503
+        )
+
+
+async def _seat(
+    session: Any, scope: WorkspaceScope, meeting_id: UUID, stream_user: str
+) -> PiMeetingParticipant | None:
+    """The person's existing seat in this room, or None for a new person; a new person is refused
+    once the room is full."""
+    seat = await session.scalar(
+        select(PiMeetingParticipant).where(
+            PiMeetingParticipant.tenant_id == scope.tenant_id,
+            PiMeetingParticipant.environment_id == scope.environment_id,
+            PiMeetingParticipant.meeting_id == meeting_id,
+            PiMeetingParticipant.stream_user_id == stream_user,
+        )
+    )
+    if seat is None and await limits.people_in(session, scope, meeting_id) >= limits.MAX_PEOPLE:
+        raise BusinessRuleViolation(
+            "MEETING_ROOM_FULL", f"This room already has {limits.MAX_PEOPLE} people", 409
+        )
+    return seat  # type: ignore[no-any-return]
 
 
 def _view_room(room: PiMeetingRoom) -> dict[str, Any]:
@@ -197,6 +226,13 @@ async def open_room(
         raise BusinessRuleViolation("MEETING_LANGUAGE_INVALID", "Use a language code like en", 422)
     if data.customer_id is not None:
         await _customer_ok(session, scope, data.customer_id)
+    allowance = await limits.month_allowance(session, scope)
+    if await limits.month_minutes_used(session, scope) >= allowance:
+        raise BusinessRuleViolation(
+            "MEETING_ROOM_MONTH_LIMIT",
+            f"This month's {allowance} minutes of video room time are used up",
+            409,
+        )
     audio = await audio_enabled(session, scope)
     now = datetime.now(UTC)
     meeting = PiMeeting(
@@ -294,7 +330,76 @@ async def room_status(
     ):
         if await _pull(session, scope, meeting, room, provider):
             await session.commit()
-    return {"room": _view_room(room), "meeting_status": meeting.status}
+    people = (
+        await session.scalars(
+            select(PiMeetingParticipant)
+            .where(
+                PiMeetingParticipant.tenant_id == scope.tenant_id,
+                PiMeetingParticipant.environment_id == scope.environment_id,
+                PiMeetingParticipant.meeting_id == meeting.id,
+                PiMeetingParticipant.stream_user_id.is_not(None),
+            )
+            .order_by(PiMeetingParticipant.created_at)
+        )
+    ).all()
+    return {
+        "room": _view_room(room),
+        "meeting_status": meeting.status,
+        "people": [
+            {
+                "id": str(p.id),
+                "label": p.label,
+                "staff": p.role == "staff",
+                "removed": p.removed_at is not None,
+            }
+            for p in people
+        ],
+        "limits": {"minutes": limits.MAX_CALL_MINUTES, "people": limits.MAX_PEOPLE},
+    }
+
+
+@router.post("/{meeting_id}/room/people/{participant_id}/remove")
+async def remove_person(
+    meeting_id: UUID, participant_id: UUID, request: Request, scope: Scope, session: Session
+) -> dict[str, Any]:
+    """Take a guest out of a live call. They are blocked at the video service and cannot get a new
+    token. Staff cannot be removed here; to close the call for everyone, end it."""
+    await _gate(session, scope, "pi.meetings.record")
+    meeting = await _meeting(session, scope, meeting_id)
+    room = await room_of(session, scope, meeting.id)
+    if room is None or room.state not in LIVE:
+        raise BusinessRuleViolation("MEETING_ROOM_CLOSED", "This room is not open", 409)
+    person = await session.scalar(
+        select(PiMeetingParticipant).where(
+            PiMeetingParticipant.tenant_id == scope.tenant_id,
+            PiMeetingParticipant.environment_id == scope.environment_id,
+            PiMeetingParticipant.meeting_id == meeting.id,
+            PiMeetingParticipant.id == participant_id,
+            PiMeetingParticipant.stream_user_id.is_not(None),
+        )
+    )
+    if person is None:
+        raise HTTPException(status_code=404)
+    if person.role == "staff":
+        raise BusinessRuleViolation("MEETING_ROOM_STAFF", "Staff cannot be removed here", 409)
+    provider = provider_for(request)
+    if provider is None:
+        raise _unconfigured()
+    try:
+        await provider.block_user(room.call_id, str(person.stream_user_id))
+    except RoomProviderError as error:
+        raise _failed(error) from None
+    person.removed_at = person.removed_at or datetime.now(UTC)
+    await record(
+        session,
+        "pi.meeting_room_person_removed",
+        scope=scope,
+        entity_type="pi_meeting",
+        entity_id=meeting.id,
+        details={"participant_id": str(person.id)},
+    )
+    await session.commit()
+    return {"removed": True}
 
 
 @router.post("/{meeting_id}/room/token")
@@ -313,6 +418,7 @@ async def staff_token(
     if room is None or room.state not in LIVE or scope.user_id is None:
         raise BusinessRuleViolation("MEETING_ROOM_CLOSED", "This room is not open", 409)
     stream_user = staff_user(scope.user_id)
+    await _seat(session, scope, meeting.id, stream_user)
     person = await native_ingest.participant_for(
         session, scope, meeting.id, stream_user, label="Staff", role="staff"
     )
@@ -374,6 +480,7 @@ async def guest_token(token: GuestToken, request: Request, session: Session) -> 
     room = await room_of(session, scope, meeting.id)
     if provider is None or room is None or not await room_enabled(session, scope):
         raise HTTPException(status_code=404)
+    await _not_paused(session, scope)
     if room.state not in LIVE:
         raise BusinessRuleViolation("MEETING_ROOM_CLOSED", "This room is not open", 409)
     stream_user = guest_user(guest.participant_id)
@@ -386,6 +493,11 @@ async def guest_token(token: GuestToken, request: Request, session: Session) -> 
     )
     if person is None:
         raise HTTPException(status_code=404)
+    if person.removed_at is not None:
+        raise BusinessRuleViolation(
+            "MEETING_ROOM_REMOVED", "You were removed from this room by the host", 403
+        )
+    await _seat(session, scope, meeting.id, stream_user)
     person.stream_user_id = stream_user  # the person made when they joined is the room's speaker
     await session.commit()
     return {

@@ -280,6 +280,8 @@ class PiMeetingParticipant(WorkspaceRow):
     mapped_user_id: Mapped[UUID | None] = mapped_column(Uuid, nullable=True)
     # who the video room says spoke: "s_<user id>" for staff, "g_<guest id>" for a guest
     stream_user_id: Mapped[str | None] = mapped_column(String(80), nullable=True)
+    # set when staff removed this person from a live room: they cannot get a new room token
+    removed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
 
 
 class PiMeetingSegment(WorkspaceRow):
