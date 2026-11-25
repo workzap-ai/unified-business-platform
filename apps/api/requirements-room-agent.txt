@@ -1,0 +1,6 @@
+# Extra packages for the room agent image only (Dockerfile.room-agent). The video provider's Python
+# SDK needs a Linux-only native wheel, so it is NOT in requirements.lock and never in the API or
+# worker images. Pinned to the versions the Phase 0 join test used. Not hash-locked yet: lock it on
+# Linux (pip-compile --generate-hashes) before this image carries real traffic.
+getstream[webrtc]==8.2.0
+getstream-rtc==0.1.0

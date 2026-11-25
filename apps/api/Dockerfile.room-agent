@@ -1,0 +1,14 @@
+# The room agent: pi's voice in video rooms. A separate service from the API and the worker, so the
+# video SDK's native wheel (Linux only) and the long-lived call connections never touch them.
+# Build from apps/api. Start command is built in; no port is served (it only makes outbound calls).
+FROM python:3.12-slim
+ENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1
+WORKDIR /app
+COPY requirements.lock requirements-room-agent.txt ./
+RUN pip install --no-cache-dir --require-hashes -r requirements.lock \
+    && pip install --no-cache-dir -r requirements-room-agent.txt
+COPY pyproject.toml alembic.ini ./
+COPY app ./app
+RUN useradd --create-home --uid 10001 appuser
+USER appuser
+CMD ["python", "-m", "app.modules.pi_meetings.room_agent_sdk"]

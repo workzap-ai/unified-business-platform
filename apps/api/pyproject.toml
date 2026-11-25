@@ -28,6 +28,8 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
+# installed only in the room agent image (Dockerfile.room-agent); a Linux-only native wheel
+room-agent = ["getstream[webrtc]==8.2.0", "getstream-rtc==0.1.0"]
 dev = ["pytest>=8,<9", "pytest-asyncio>=0.25,<1", "ruff>=0.11,<1", "mypy>=1.15,<2"]
 
 [tool.hatch.build.targets.wheel]
@@ -62,4 +64,9 @@ ignore_missing_imports = true
 
 [[tool.mypy.overrides]]
 module = ["qrcode.*"]
+ignore_missing_imports = true
+
+# the room agent's video SDK is a Linux-only native wheel, installed only in the agent image
+[[tool.mypy.overrides]]
+module = ["getstream.*", "getstream_rtc.*"]
 ignore_missing_imports = true
