@@ -114,14 +114,19 @@ NO |= frozenset({"employee", "staff", "partner", "bhai", "behan", "beti", "beta"
 WORD = re.compile(r"[^\W\d_]+", re.UNICODE)
 
 
-def opening(name: str = "") -> str:
+def opening(name: str = "", language: str = "") -> str:
     """pi's first words: the AI disclosure, then one question. With a first name the person gave pi
-    before, the question is who it is talking to: the memory is used only after a clear yes."""
+    before, the question is who it is talking to: the memory is used only after a clear yes.
+    `language` is the meeting's language code ("ur", "ar", ...); the fixed disclosure is spoken in
+    it when pi has one, else in English."""
     if name:
         line = f"Hi, I'm pi, an AI assistant from Workzap. {IDENTITY_MARK} {name}?"
         if allowed(line, context([], "")) == line:
             return line
-    return constitution.safe_fallback(context([], ""))
+    ctx = context([], "")
+    if language:
+        ctx["reply_language"] = language
+    return constitution.safe_fallback(ctx)
 
 
 def classify(reply: str, name: str = "") -> str:

@@ -201,7 +201,7 @@ class RoomSpeech:
                 state.history.append(voice.Said(False, text))
                 return decision.reason
             if decision.action == "disclose":
-                line = voice.opening()
+                line = voice.opening(language=state.settings.language)
             else:
                 reply = await voice.reply_to(
                     self.manager,

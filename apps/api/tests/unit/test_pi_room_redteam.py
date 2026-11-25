@@ -231,3 +231,22 @@ async def test_pi_does_not_start_when_someone_began_talking_during_synthesis():
     speech.someone_speaking = lambda: len(spy.tts) > 0  # a person starts while pi is synthesising
     assert await speech.on_turn(turn()) == "not_spoken"
     assert out.written == []
+
+
+@pytest.mark.parametrize(("language", "marker"), [("ur", "مصنوعی ذہانت"), ("ar", "ذكاء اصطناعي")])
+def test_the_disclosure_is_spoken_in_the_rooms_language(language, marker):
+    line = voice.opening(language=language)
+    assert marker in line and line.count("?") + line.count("؟") == 1
+
+
+def test_an_unknown_language_falls_back_to_the_english_disclosure():
+    assert voice.opening(language="xx") == voice.opening()
+    assert "AI" in voice.opening()
+
+
+async def test_the_room_speaks_the_disclosure_in_its_language():
+    spy = Spy(heard="pi hello")
+    speech, _ = room(spy)
+    speech.session.settings.language = "ur"
+    await speech.on_turn(turn())
+    assert "مصنوعی ذہانت" in spy.tts[0][0]
