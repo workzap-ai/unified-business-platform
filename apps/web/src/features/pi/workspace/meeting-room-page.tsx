@@ -6,6 +6,8 @@ import {
   ArrowLeft,
   CheckCircle2,
   DoorOpen,
+  Mic,
+  MicOff,
   PhoneOff,
   UserMinus,
 } from "lucide-react";
@@ -23,6 +25,7 @@ import { ApiError } from "@/services/api-client";
 import {
   meetingRoomService,
   ROOM_REFUSED,
+  type MeetingRoom,
   type RoomCredentials,
   type RoomPerson,
 } from "../meeting-room-service";
@@ -81,6 +84,11 @@ function RoomView() {
       meetingRoomService.removePerson(id, participantId),
     { invalidate: [key], toastErrors: false },
   );
+  const setPi = useScopedMutation(
+    (input: { mode?: "off" | "speak"; muted?: boolean; intake?: boolean }) =>
+      meetingRoomService.setPi(id, input),
+    { invalidate: [key], toastErrors: false },
+  );
   const end = useScopedMutation(() => meetingRoomService.end(id), {
     invalidate: [key],
     toastErrors: false,
@@ -137,7 +145,7 @@ function RoomView() {
     <PageShell>
       <PageHeader
         title="Video room"
-        description="Staff and customers meet here. pi is present as an AI, listens and writes the transcript; it does not speak."
+        description="Staff and customers meet here. pi is present as an AI and writes the transcript. It speaks only when you switch it on, and you can mute it at any moment."
         actions={
           <div className="flex flex-wrap gap-2">
             {back}
@@ -160,9 +168,9 @@ function RoomView() {
           </div>
         }
       />
-      {Boolean(enter.error || end.error || remove.error) && (
+      {Boolean(enter.error || end.error || remove.error || setPi.error) && (
         <Notice tone="danger" className="mb-3">
-          {failure(enter.error ?? end.error ?? remove.error)}
+          {failure(enter.error ?? end.error ?? remove.error ?? setPi.error)}
         </Notice>
       )}
       {ended ? (
@@ -208,6 +216,11 @@ function RoomView() {
             </CardBody>
           </Card>
           <div className="space-y-4">
+            <PiSpeaks
+              pi={room.pi}
+              busy={setPi.isPending}
+              onChange={(input) => setPi.mutate(input)}
+            />
             <RoomPeople
               people={status.data?.people ?? []}
               minutes={status.data?.limits.minutes ?? 90}
@@ -227,6 +240,84 @@ function RoomView() {
         </div>
       )}
     </PageShell>
+  );
+}
+
+function PiSpeaks({
+  pi,
+  busy,
+  onChange,
+}: {
+  pi: MeetingRoom["pi"];
+  busy: boolean;
+  onChange: (input: {
+    mode?: "off" | "speak";
+    muted?: boolean;
+    intake?: boolean;
+  }) => void;
+}) {
+  const on = pi.mode === "speak";
+  const state = !on
+    ? "pi is listening only"
+    : pi.muted
+      ? "pi is muted"
+      : pi.here
+        ? "pi is in the room and can speak"
+        : "pi is joining the room…";
+  return (
+    <Card>
+      <CardBody className="space-y-3">
+        <div className="flex items-center justify-between gap-2">
+          <h2 className="text-sm font-medium">pi (AI) voice</h2>
+          <span
+            className="rounded-full bg-muted px-2 py-0.5 text-xs"
+            role="status"
+          >
+            {state}
+          </span>
+        </div>
+        <p className="text-xs text-muted-foreground">
+          When on, pi introduces itself as an AI first, then answers when
+          someone says its name. It never quotes prices or asks for payment
+          details.
+        </p>
+        <div className="flex flex-wrap gap-2">
+          <Button
+            variant={on ? "secondary" : "default"}
+            disabled={busy}
+            onClick={() => onChange({ mode: on ? "off" : "speak" })}
+          >
+            {on ? "Turn pi's voice off" : "Let pi speak"}
+          </Button>
+          {on && (
+            <Button
+              variant={pi.muted ? "default" : "danger"}
+              disabled={busy}
+              aria-pressed={pi.muted}
+              onClick={() => onChange({ muted: !pi.muted })}
+            >
+              {pi.muted ? <Mic /> : <MicOff />}{" "}
+              {pi.muted ? "Unmute pi" : "Mute pi"}
+            </Button>
+          )}
+        </div>
+        {on && (
+          <label className="flex items-start gap-2 text-sm">
+            <input
+              type="checkbox"
+              className="mt-1 size-4"
+              checked={pi.intake}
+              disabled={busy}
+              onChange={(e) => onChange({ intake: e.target.checked })}
+            />
+            <span>
+              Let pi lead the conversation when there is exactly one customer in
+              the room
+            </span>
+          </label>
+        )}
+      </CardBody>
+    </Card>
   );
 }
 

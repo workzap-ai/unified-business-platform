@@ -21,6 +21,15 @@ export const roomSchema = z.object({
   lines: z.number().catch(0),
   started_at: z.string().nullable().catch(null),
   ended_at: z.string().nullable().catch(null),
+  // pi speaking in the room: the host's switches, and whether the agent is really in the call
+  pi: z
+    .object({
+      mode: z.enum(["off", "speak"]).catch("off"),
+      muted: z.boolean().catch(false),
+      intake: z.boolean().catch(false),
+      here: z.boolean().catch(false),
+    })
+    .catch({ mode: "off", muted: false, intake: false, here: false }),
 });
 export type MeetingRoom = z.infer<typeof roomSchema>;
 
@@ -94,6 +103,18 @@ export const meetingRoomService = {
       `${BASE}/${meetingId}/room/token`,
       roomCredentialsSchema,
     ),
+  // The host decides whether pi speaks, mutes it, or lets it lead with a lone customer. A field
+  // left out stays as it was.
+  setPi: (
+    meetingId: string,
+    input: { mode?: "off" | "speak"; muted?: boolean; intake?: boolean },
+  ) =>
+    apiRequest(
+      "POST",
+      `${BASE}/${meetingId}/room/pi`,
+      z.object({ room: roomSchema }),
+      { body: input },
+    ),
   end: (meetingId: string) =>
     apiRequest(
       "POST",
@@ -117,6 +138,8 @@ export const ROOM_REFUSED: Record<string, string> = {
   MEETING_ROOM_REMOVED: "The host removed you from this room.",
   MEETING_ROOM_MONTH_LIMIT:
     "This month's video room time is used up. Ask the platform owner to raise it.",
+  MEETING_ROOM_SPEAK_OFF:
+    "pi speaking is not switched on for this workspace. Ask the platform owner.",
   MEETING_ROOM_STAFF: "Staff cannot be removed here. End the call instead.",
   MEETING_CONSENT_REQUIRED:
     "Confirm that everyone in the room will be told first.",
