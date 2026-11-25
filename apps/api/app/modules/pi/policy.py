@@ -61,6 +61,7 @@ def validate_section(section: str, value: Any) -> None:
                 "meeting_room_audio",
                 "meeting_room_kill",
                 "meeting_room_month_minutes",
+                "meeting_room_speak",
             }
             ensure(isinstance(brain, dict) and set(brain) <= {*TUNABLES, *flags})
             ensure(type(brain.get("learning_frozen", True)) is bool)
@@ -86,6 +87,7 @@ def validate_section(section: str, value: Any) -> None:
                 type(brain.get("meeting_room_audio", False)) is bool
             )  # rooms record voices briefly
             ensure(type(brain.get("meeting_room_kill", False)) is bool)  # stop every room now
+            ensure(type(brain.get("meeting_room_speak", False)) is bool)  # pi may speak in rooms
             month = brain.get("meeting_room_month_minutes", 0)
             ensure(type(month) is int and 0 <= month <= 100_000)  # 0 = the built-in default
             ensure(

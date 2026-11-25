@@ -7,7 +7,9 @@ THEIR guest id, good for this one call and for two hours. The browser never send
 video provider hears the call, and after it ends hands back the transcript, which goes to the same
 analysis and review as any other meeting. Nothing reaches the Problem Map until a person approves.
 
-pi does not speak in a room in this phase: it only listens through the transcript.
+pi listens through the transcript. It speaks in a room only when the host switches it on for that
+room (`/room/pi`), the workspace has `brain.meeting_room_speak`, and the separate room agent service
+is running; the host can mute it at any moment and the agent reads the mute within seconds.
 
 Off unless the workspace has `brain.meeting_intel` AND `brain.meeting_room` on AND the provider's
 key and secret are configured. Guests also need `brain.meeting_guests` (the link itself).
@@ -18,8 +20,8 @@ body is read as JSON; with no secret configured it refuses everything.
 
 import json
 import logging
-from datetime import UTC, datetime
-from typing import Any
+from datetime import UTC, datetime, timedelta
+from typing import Any, Literal
 from uuid import UUID
 
 from fastapi import APIRouter, HTTPException, Request
@@ -30,7 +32,7 @@ from app.modules.access.dependencies import Scope, Session
 from app.modules.audit.service import record
 from app.modules.pi.configuration import settings_row
 from app.modules.pi.memory_ledger import redacted
-from app.modules.pi_meetings import native_ingest
+from app.modules.pi_meetings import native_ingest, room_agent_claim
 from app.modules.pi_meetings import room_limits as limits
 from app.modules.pi_meetings.guest_routes import (
     GuestToken,
@@ -65,6 +67,15 @@ MAX_BODY = 1_000_000
 STAFF_TTL_S = 2 * 3600
 GUEST_TTL_S = 2 * 3600
 LIVE = ("created", "live")
+
+
+class PiInput(BaseModel):
+    """What the host tells pi to do in this room. A field left out is left as it was."""
+
+    model_config = ConfigDict(extra="forbid")
+    mode: Literal["off", "speak"] | None = None
+    muted: bool | None = None
+    intake: bool | None = None
 
 
 class RoomInput(BaseModel):
@@ -150,6 +161,18 @@ def _view_room(room: PiMeetingRoom) -> dict[str, Any]:
         "lines": room.lines,
         "started_at": room.started_at.isoformat() if room.started_at else None,
         "ended_at": room.ended_at.isoformat() if room.ended_at else None,
+        "pi": {
+            "mode": room.pi_mode,
+            "muted": room.pi_muted,
+            "intake": room.pi_intake,
+            # an agent has answered within its lease: pi is really in the room
+            "here": bool(
+                room.agent_id
+                and room.agent_beat_at
+                and datetime.now(UTC) - room.agent_beat_at
+                < timedelta(seconds=room_agent_claim.LEASE_S)
+            ),
+        },
     }
 
 
@@ -433,6 +456,38 @@ async def staff_token(
         "token": provider.user_token(stream_user, room.call_id, ttl_s=STAFF_TTL_S),
         "expires_in": STAFF_TTL_S,
     }
+
+
+@router.post("/{meeting_id}/room/pi")
+async def set_pi(meeting_id: UUID, body: PiInput, scope: Scope, session: Session) -> dict[str, Any]:
+    """The host decides whether pi speaks in this room, mutes it, or lets it lead with a lone
+    customer. Muting is always allowed; switching speech on needs the workspace's speech flag."""
+    await _gate(session, scope, "pi.meetings.record")
+    await _require_room(session, scope)
+    meeting = await _meeting(session, scope, meeting_id)
+    room = await room_of(session, scope, meeting.id)
+    if room is None or room.state not in LIVE:
+        raise BusinessRuleViolation("MEETING_ROOM_CLOSED", "This room is not open", 409)
+    if body.mode == "speak" and not await room_agent_claim.workspace_allows(session, scope):
+        raise BusinessRuleViolation(
+            "MEETING_ROOM_SPEAK_OFF", "pi speaking is not switched on for this workspace", 403
+        )
+    if body.mode is not None:
+        room.pi_mode = body.mode
+    if body.muted is not None:
+        room.pi_muted = body.muted
+    if body.intake is not None:
+        room.pi_intake = body.intake
+    await record(
+        session,
+        "pi.meeting_room_pi_set",
+        scope=scope,
+        entity_type="pi_meeting",
+        entity_id=meeting.id,
+        details={"mode": room.pi_mode, "muted": room.pi_muted, "intake": room.pi_intake},
+    )
+    await session.commit()
+    return {"room": _view_room(room)}
 
 
 @router.post("/{meeting_id}/room/end")

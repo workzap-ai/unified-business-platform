@@ -192,6 +192,7 @@ class PiMeetingRoom(WorkspaceRow):
         Index("uq_pi_meeting_rooms_call", "provider", "call_id", unique=True),
         CheckConstraint(_in("state", ROOM_STATES), name="state"),
         CheckConstraint(_in("transcript_state", TRANSCRIPT_STATES), name="transcript_state"),
+        CheckConstraint(_in("pi_mode", ("off", "speak")), name="pi_mode"),
     )
     meeting_id: Mapped[UUID] = mapped_column(Uuid)
     provider: Mapped[str] = mapped_column(String(20), default="stream", server_default="stream")
@@ -207,6 +208,13 @@ class PiMeetingRoom(WorkspaceRow):
     started_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     ended_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     created_by: Mapped[UUID | None] = mapped_column(Uuid, nullable=True)
+    # pi speaking in the room (the room agent). The host sets mode, mute and intake; the agent
+    # process that holds the room (one per call) renews `agent_beat_at` every few seconds.
+    pi_mode: Mapped[str] = mapped_column(String(8), default="off", server_default="off")
+    pi_muted: Mapped[bool] = mapped_column(Boolean, default=False, server_default=text("false"))
+    pi_intake: Mapped[bool] = mapped_column(Boolean, default=False, server_default=text("false"))
+    agent_id: Mapped[str | None] = mapped_column(String(40), nullable=True)
+    agent_beat_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
 
 
 class PiMeetingDocument(WorkspaceRow):
