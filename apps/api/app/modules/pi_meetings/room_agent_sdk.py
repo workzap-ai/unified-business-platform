@@ -10,8 +10,8 @@ test; they have NOT yet been run against a live call from this code
 The process polls for rooms (`room_agent_claim.claim`), takes at most `MAX_ROOMS`, and for each one:
 joins as `pi_agent`, publishes an audio track, feeds every person's frames to `RoomRun`, and every
 `BEAT_S` seconds renews its claim and applies the host's orders. When the claim is lost, the room
-ends, speech is switched off or the pause switch is on, it leaves. Nothing is stored here: no audio,
-no transcript of its own.
+ends, speech is switched off or the pause switch is on, it leaves. No audio is stored here; the only
+text it writes is pi's own lines, into the meeting's transcript.
 """
 
 import asyncio
@@ -29,6 +29,7 @@ from app.ai.manager import build_llm_manager
 from app.core.config import Settings, get_settings
 from app.core.database import create_engine
 from app.modules.pi_meetings import room_agent_claim as claims
+from app.modules.pi_meetings import room_agent_lines as lines
 from app.modules.pi_meetings.room_agent import AGENT_USER, RoomRun
 from app.modules.pi_meetings.room_provider import CALL_TYPE
 from app.modules.pi_meetings.room_speech import RoomSpeech, Session
@@ -84,6 +85,18 @@ async def run_room(
         return
     client = AsyncStream(api_key=settings.stream_api_key, api_secret=secret.get_secret_value())
     track = AudioStreamTrack(sample_rate=48000, channels=1, pace=False)
+
+    async def on_line(who: str, words: str) -> None:
+        """pi's own lines go into the transcript; people's come later, from the recordings."""
+        if not lines.is_pi(who):
+            return
+        try:
+            async with sessions() as db:
+                if await lines.store_pi_line(db, orders, words):
+                    await db.commit()
+        except Exception:  # noqa: BLE001 - a missing line must never stop pi talking
+            logger.warning("room_pi_line_not_stored")
+
     out = TrackOut(track, PcmData, AudioFormat)
     speech = RoomSpeech(
         manager=manager,
@@ -99,6 +112,7 @@ async def run_room(
         customers=lambda: 0,
         someone_speaking=lambda: False,
         clock=time.monotonic,
+        on_line=on_line,
     )
     run = RoomRun(speech, clock=time.monotonic)
     run.apply(orders)

@@ -61,6 +61,8 @@ def say(run, clock, who, seconds=1.5):
 def orders(**kw):
     base = {
         "room_id": uuid4(),
+        "meeting_id": uuid4(),
+        "started_at": None,
         "call_id": "r1",
         "scope": WorkspaceScope.system(uuid4(), uuid4(), frozenset(), "t"),
         "speak": True,

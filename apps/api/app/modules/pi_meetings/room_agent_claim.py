@@ -32,6 +32,8 @@ class Orders:
     """What the agent should do right now in one room."""
 
     room_id: UUID
+    meeting_id: UUID
+    started_at: datetime | None  # when the call began (or the room was made): pi's line times
     call_id: str
     scope: WorkspaceScope
     speak: bool  # pi may speak (mode 'speak' and the workspace allows it)
@@ -112,6 +114,8 @@ async def beat(session: Any, room_id: UUID, agent_id: str, now: datetime) -> Ord
     )
     return Orders(
         room_id=room.id,
+        meeting_id=room.meeting_id,
+        started_at=room.started_at or room.created_at,
         call_id=room.call_id,
         scope=scope,
         speak=allowed and room.pi_mode == "speak",

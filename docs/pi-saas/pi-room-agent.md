@@ -27,7 +27,7 @@ pi off, STT/TTS outage is silence, spoken phone numbers are redacted before the 
 1. `room_agent_sdk.py` against a live call (join, `connection.on("audio")`, `add_tracks`, `flush`).
 2. OpenAI TTS: model `gpt-4o-mini-tts` and raw `pcm` at 24 kHz are assumed; the platform key answered 401.
 3. Latency (turn end to first audio), barge-in feel, Urdu STT accuracy per short turn.
-4. pi's own lines are not yet stored in the meeting transcript (only what people say is, from the recordings).
+4. pi's own lines are stored as the call goes (`room_agent_lines.py`) and sorted in among the others when the transcript is rebuilt; their times can sit a second or two off the recordings' clock.
 5. The room page has no "pi speaks / mute" buttons yet (API only).
 
 ## To go live

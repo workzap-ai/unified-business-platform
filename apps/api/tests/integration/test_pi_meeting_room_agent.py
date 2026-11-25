@@ -142,3 +142,60 @@ async def test_releasing_frees_the_room_for_a_restarted_agent(api, business_db, 
     await claim.release(business_db, room.id, "agent-a")
     assert room.agent_id is None
     await pi.close()
+
+
+async def test_pi_lines_join_the_final_transcript_in_the_order_they_were_said(
+    api, business_db, monkeypatch
+):
+    from datetime import timedelta
+
+    from test_pi_meeting_rooms import lines
+    from test_pi_meeting_rooms_stt import BEGIN, Manager, end_it, run, said
+    from test_pi_meeting_rooms_stt import Provider as SttProvider
+
+    from app.modules.pi_meetings import room_agent_lines as pilines
+    from app.modules.pi_meetings.room_provider import RoomRecording
+
+    stt = SttProvider()
+    monkeypatch.setattr(room_routes, "provider_for", lambda request: stt)
+    monkeypatch.setattr(room_routes, "webhook_secret", lambda request: "s")
+    monkeypatch.setattr(room_routes, "api_key", lambda request: "pk_test")
+    pi, conv, scope = await workspace(api, business_db, "369400009")
+    await switch(api, meeting_room_speak=True, meeting_room_audio=True)
+    mid = (await open_room(api)).json()["meeting"]["id"]
+    staff = (await api.post(f"{BASE}/{mid}/room/token")).json()["user_id"]
+    await api.post(f"{BASE}/{mid}/room/pi", json={"mode": "speak"})
+    await claim.claim(business_db, "agent-a", NOW)
+    await business_db.commit()
+    room = await the_room(business_db, mid)
+    orders = await claim.beat(business_db, room.id, "agent-a", NOW)
+    began = orders.started_at
+    assert await pilines.store_pi_line(
+        business_db,
+        orders,
+        "Hi, I'm pi, an AI assistant from Workzap. Which part is slowest?",
+        now=began + timedelta(seconds=6),
+    )
+    assert await pilines.store_pi_line(
+        business_db, orders, "Call me on 0300 1234567?", now=began + timedelta(seconds=10)
+    )
+    await business_db.commit()
+
+    stt.files = [RoomRecording(staff, "https://cdn/staff", BEGIN)]
+    stt.bytes = {"https://cdn/staff": b"S"}
+    manager = Manager()
+    manager.said = {b"S": said(("First.", 0.5), ("Second", 5.0), ("line.", 5.4), ("Third.", 12.0))}
+    room = await end_it(api, business_db, mid)
+    out, meeting = await run(business_db, room, stt, manager)
+    assert out == "done"
+    got = await lines(business_db, mid)
+    assert [(label, o) for o, label, _ in got] == [
+        ("Staff", 0),
+        ("pi (AI)", 1),
+        ("Staff", 2),
+        ("pi (AI)", 3),
+        ("Staff", 4),
+    ]
+    assert "1234567" not in got[3][2]  # nothing pi says carries a phone number either
+    assert got[1][2].startswith("Hi, I'm pi, an AI")
+    await pi.close()
