@@ -40,6 +40,12 @@ function keep(token: string, guest: string) {
 function why(e: unknown): string {
   if (e instanceof ApiError && e.code === "MEETING_ROOM_CLOSED")
     return "This room is not open. Ask the host to open it, then try again.";
+  if (e instanceof ApiError && e.code === "MEETING_ROOM_REMOVED")
+    return "The host removed you from this room, so you cannot join it again.";
+  if (e instanceof ApiError && e.code === "MEETING_ROOM_FULL")
+    return "This room is full.";
+  if (e instanceof ApiError && e.code === "MEETING_ROOM_PAUSED")
+    return "Video rooms are paused right now. Ask the host.";
   if (e instanceof ApiError && e.code === "MEETING_FULL")
     return "This meeting link is full.";
   if (e instanceof ApiError && e.status === 404)
@@ -59,7 +65,7 @@ export function MeetingRoomGuest({
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [credentials, setCredentials] = useState<RoomCredentials | null>(null);
-  const [done, setDone] = useState(false);
+  const [done, setDone] = useState<false | "left" | "ended">(false);
 
   async function enter() {
     setBusy(true);
@@ -95,10 +101,14 @@ export function MeetingRoomGuest({
       <div className="space-y-2" role="status">
         <p className="flex items-center gap-2 text-sm font-medium">
           <CheckCircle2 className="size-4 text-success" aria-hidden />
-          Thank you, you can close this page
+          {done === "ended"
+            ? "The call has closed"
+            : "Thank you, you can close this page"}
         </p>
         <p className="text-xs text-muted-foreground">
-          You left the call. If you left by mistake, open the link again.
+          {done === "ended"
+            ? "The host ended the call or removed you from it. You can close this page."
+            : "You left the call. If you left by mistake, open the link again."}
         </p>
       </div>
     );
@@ -106,9 +116,9 @@ export function MeetingRoomGuest({
     return (
       <MeetingRoomCall
         credentials={credentials}
-        onLeft={() => {
+        onLeft={(reason) => {
           setCredentials(null);
-          setDone(true);
+          setDone(reason ?? "left");
         }}
       />
     );

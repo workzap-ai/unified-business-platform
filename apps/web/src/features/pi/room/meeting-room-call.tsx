@@ -4,6 +4,7 @@ import "@stream-io/video-react-sdk/dist/css/styles.css";
 import { useEffect, useRef, useState } from "react";
 import {
   CallControls,
+  CallingState,
   SpeakerLayout,
   StreamCall,
   StreamTheme,
@@ -23,6 +24,16 @@ import type { RoomCredentials } from "../meeting-room-service";
  * for the camera or microphone until they press Join. pi is shown as present, and the live captions
  * are for the people in the room; the transcript that is kept comes from the server after the call.
  */
+
+/** Tells the page when the call closed under the person (the host ended it or removed them). */
+function EndWatch({ onClosed }: { onClosed: () => void }) {
+  const { useCallCallingState } = useCallStateHooks();
+  const state = useCallCallingState();
+  useEffect(() => {
+    if (state === CallingState.LEFT) onClosed();
+  }, [state, onClosed]);
+  return null;
+}
 
 function Captions() {
   const { useCallClosedCaptions } = useCallStateHooks();
@@ -60,7 +71,8 @@ export function MeetingRoomCall({
   onLeft,
 }: {
   credentials: RoomCredentials;
-  onLeft: () => void;
+  // `ended` when the call closed under them (the host ended it or removed them)
+  onLeft: (reason?: "ended") => void;
 }) {
   const [live, setLive] = useState<{
     client: StreamVideoClient;
@@ -114,10 +126,10 @@ export function MeetingRoomCall({
     }
   }
 
-  function leave() {
+  function leave(reason?: "ended") {
     if (left.current) return;
     left.current = true;
-    onLeft();
+    onLeft(reason);
   }
 
   if (!live) {
@@ -152,7 +164,8 @@ export function MeetingRoomCall({
               <SpeakerLayout />
             </div>
             <Captions />
-            <CallControls onLeave={leave} />
+            <CallControls onLeave={() => leave()} />
+            <EndWatch onClosed={() => leave("ended")} />
           </div>
         </StreamTheme>
       </StreamCall>
