@@ -224,6 +224,39 @@ async def test_each_persons_audio_becomes_their_lines_in_the_order_they_were_sai
     await pi.close()
 
 
+async def test_a_word_the_speech_service_times_backwards_cannot_break_the_transcript(
+    api, business_db, provider
+):
+    """Found live: Whisper can time a word with an end before its start, so a line ended before it
+    began and the database refused it (ck_pi_meeting_segments_span): no transcript was written."""
+    pi, mid, room = await ready(api, business_db, "369200013")
+    staff = (await api.post(f"{BASE}/{mid}/room/token")).json()["user_id"]
+    provider.files = [RoomRecording(staff, "https://cdn/staff", BEGIN)]
+    provider.bytes = {"https://cdn/staff": b"S"}
+    manager = Manager()
+    manager.said = {
+        b"S": [
+            Word("اسٹاک", 0.0, 0.0),  # a zero-length word at the very start
+            Word("ختم", 2.0, 1.5),  # ends before it starts
+            Word("ہوتا۔", 3.0, 2.0),  # the line's last word ends before the line's first word
+        ]
+    }
+    room = await end_it(api, business_db, mid)
+    out, meeting = await run(business_db, room, provider, manager)
+    assert out == "done"
+    meeting_id = meeting.id
+    business_db.expire_all()
+    rows = (
+        await business_db.scalars(
+            select(native_stt.PiMeetingSegment).where(
+                native_stt.PiMeetingSegment.meeting_id == meeting_id
+            )
+        )
+    ).all()
+    assert rows and all(0 <= r.start_ms <= r.end_ms for r in rows)
+    await pi.close()
+
+
 async def test_a_person_whose_audio_cannot_be_read_keeps_the_providers_lines(
     api, business_db, provider
 ):

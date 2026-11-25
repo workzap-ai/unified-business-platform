@@ -85,6 +85,14 @@ def sentences(words: list[Word]) -> list[tuple[str, float, float]]:
     return out
 
 
+def _span(offset_ms: int, start: float, end: float) -> tuple[int, int]:
+    """A line's start and end in milliseconds. The speech service can time a word backwards (an end
+    before its start), and the database refuses a line that ends before it begins, so the end is
+    never earlier than the start and neither is negative."""
+    first = max(0, offset_ms + int(start * 1000))
+    return first, max(first + 1, offset_ms + int(end * 1000))
+
+
 async def _words(
     manager: Any, scope: WorkspaceScope, audio: bytes, language: str
 ) -> list[Word] | None:
@@ -213,14 +221,9 @@ async def finalize(
                 continue  # unreadable, or no one spoke: the provider's lines (if any) stay
             offset = int((item.start - base).total_seconds() * 1000) if item.start and base else 0
             spoken[item.user_id] = [
-                Spoken(
-                    None,
-                    redacted(join_spoken_digits(line), LINE_CHARS),
-                    max(0, offset + int(start * 1000)),
-                    max(1, offset + int(end * 1000)),
-                )
+                Spoken(None, text, *_span(offset, start, end))
                 for line, start, end in sentences(words)
-                if redacted(join_spoken_digits(line), LINE_CHARS)
+                if (text := redacted(join_spoken_digits(line), LINE_CHARS))
             ]
     if spoken:
         longest = await _rebuild(session, scope, meeting, spoken)
