@@ -22,7 +22,7 @@ from pydantic import BaseModel, ConfigDict
 
 from app.modules.pi import constitution, shared_memory
 from app.modules.pi.memory_ledger import redacted
-from app.modules.pi_meetings import meeting_memory
+from app.modules.pi_meetings import meeting_memory, spoken_rules
 from app.modules.pi_meetings.insight_rules import PRICE
 from app.modules.pi_meetings.pilot import FORBIDDEN_ASK
 from app.shared.scope import WorkspaceScope
@@ -162,9 +162,18 @@ def allowed(reply: str, ctx: dict[str, Any]) -> str:
         return ""  # exactly one question and it is the last thing said
     if PRICE.search(text) or FORBIDDEN_ASK.search(text):
         return ""
+    asked = re.search(rf"{IDENTITY_MARK} ([^\W\d_]+)\?", text)  # the opening's own name question
+    if spoken_rules.broken(text, f"{_seen(ctx)} {asked.group(1) if asked else ''}"):
+        return ""  # R-ROOM-01..08: the same rules again, for words that are heard aloud
     if constitution.hard(constitution.lint(text, ctx)):
         return ""
     return text
+
+
+def _seen(ctx: dict[str, Any]) -> str:
+    """Everything said in the conversation so far, for the check on invented names."""
+    lines = [str(h.get("text", "")) for h in ctx.get("history", [])]
+    return " ".join([*lines, str(ctx.get("latest_customer_message", ""))])
 
 
 async def reply_to(
@@ -224,6 +233,7 @@ async def reply_to(
                 and "?" not in closing
                 and "؟" not in closing
                 and not (PRICE.search(closing) or FORBIDDEN_ASK.search(closing))
+                and not spoken_rules.broken(closing, seen)
                 and not constitution.hard(constitution.lint(closing, ctx))
                 and not meeting_memory.leaks(closing, seen, block)
             ):

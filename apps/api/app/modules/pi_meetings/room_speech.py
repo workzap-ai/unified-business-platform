@@ -2,7 +2,8 @@
 
 turn -> speech to text -> redact -> `room_turns.decide` -> the words (the AI disclosure composed in
 code for pi's first turn, then `voice.reply_to`, which runs the reply linter and the safe line) ->
-`voice.allowed` once more -> text to speech -> audio to the room, in small pieces so that anyone
+(an emergency is answered first, with the fixed emergency numbers, and then pi stops the flow)
+-> text to speech -> audio to the room, in small pieces so that anyone
 who starts talking, or a mute, cuts pi off at the next piece.
 
 Everything outside is injected (the AI gateway, the audio output, the clock), so the whole path is
@@ -19,6 +20,7 @@ from dataclasses import dataclass, field
 from typing import Any, Protocol
 
 from app.ai.errors import GatewayUnavailable
+from app.modules.pi import safety
 from app.modules.pi.memory_ledger import redacted
 from app.modules.pi_meetings import room_turns, voice
 from app.modules.pi_meetings.recording_routes import join_spoken_digits
@@ -34,6 +36,7 @@ STT_RATE = 16000  # a turn is sent to speech to text at this rate
 TTS_RATE = 24000  # the rate of raw speech from the text to speech service
 PIECE_S = 0.2  # pi's audio goes out in pieces this long; a cut-off takes effect at the next one
 HEARD_CHARS = 600
+SAFETY_CHARS = 580  # the emergency line must fit one spoken turn (the gateway refuses 600+)
 
 
 class AudioOut(Protocol):
@@ -59,6 +62,7 @@ class Session:
     settings: Settings
     muted: bool = False
     disclosed: bool = False
+    halted: bool = False  # an emergency was voiced: pi says the numbers once and then stops
     spoken: int = 0
     last_spoke_at: float | None = None
     history: list[voice.Said] = field(default_factory=list)
@@ -165,6 +169,21 @@ class RoomSpeech:
             await self.on_line(turn.speaker_id, text)
         async with self._lock:
             state = self.session
+            if state.halted:
+                state.history.append(voice.Said(False, text))
+                return "halted"
+            emergency = safety.emergency(text) if state.settings.mode == "speak" else None
+            if emergency is not None:
+                # an emergency is never left to the model, to the name trigger or to the cooldown;
+                # only the host's mute (and the speech cap) still hold
+                state.halted = True
+                state.history.append(voice.Said(False, text))
+                numbers = safety.emergency_reply(emergency, None, state.settings.language or None)[
+                    :SAFETY_CHARS
+                ]
+                if state.spoken >= room_turns.MAX_SPOKEN:
+                    return "cap"
+                return "emergency" if await self._say(numbers) == "complete" else "not_spoken"
             decision = room_turns.decide(
                 Utterance(turn.speaker_id, text, True, self.clock()),
                 RoomState(
@@ -194,34 +213,43 @@ class RoomSpeech:
                 )
                 line = reply.text
             state.history.append(voice.Said(False, text))
-            if not await self._say(line):
+            said = await self._say(line)
+            if said == "none":
                 return "not_spoken"
+            if said == "cut":
+                return "cut_off"  # a disclosure that was cut off was not made: it is made again
             state.disclosed = True
             return "disclosed" if decision.action == "disclose" else "spoke"
 
-    async def _say(self, line: str) -> bool:
-        """Speak one line. False when it was not spoken (muted, refused, no audio)."""
+    async def _say(self, line: str) -> str:
+        """Speak one line. 'complete' when every piece went out, 'cut' when it was stopped part of
+        the way (by a mute or a person talking), 'none' when nothing was said."""
         if not line or await self._muted():
-            return False
+            return "none"
         try:
             speech = await self.manager.synthesize(
                 self.scope, line, voice=self.session.settings.voice, audio_format="pcm"
             )
         except (GatewayUnavailable, ValueError):
             logger.warning("room_speech_tts_unavailable")
-            return False
+            return "none"
         pcm = resample(speech.audio, TTS_RATE, TTS_RATE * 2)
         piece = int(TTS_RATE * 2 * PIECE_S) * 2  # bytes
         self._cut.clear()
         self.speaking = True
         spoke = False
+        finished = False
         try:
             for i in range(0, len(pcm), piece):
-                if self._cut.is_set() or await self._muted():
+                # re-checked before every piece, the first included: synthesis takes seconds, and
+                # someone may have started talking meanwhile
+                if self._cut.is_set() or self.someone_speaking() or await self._muted():
                     await self.out.flush()
                     break
                 await self.out.write(pcm[i : i + piece], TTS_RATE * 2)
                 spoke = True
+            else:
+                finished = True
         finally:
             self.speaking = False
         if spoke:
@@ -230,4 +258,6 @@ class RoomSpeech:
             self.session.history.append(voice.Said(True, line))
             if self.on_line:
                 await self.on_line(voice.PI_LABEL, line)
-        return spoke
+        if not spoke:
+            return "none"
+        return "complete" if finished else "cut"

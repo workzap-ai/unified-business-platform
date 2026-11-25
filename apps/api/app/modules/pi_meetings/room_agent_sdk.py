@@ -135,6 +135,8 @@ async def run_room(
                 unread_since = None
             except Exception:  # noqa: BLE001 - a database blip must not drop pi at once
                 logger.warning("room_beat_failed")
+                run.speech.session.muted = True  # fail closed: no orders means no speaking
+                run.speech.barge_in()
                 unread_since = unread_since or time.monotonic()
                 if time.monotonic() - unread_since > claims.LEASE_S:
                     stop.set()
