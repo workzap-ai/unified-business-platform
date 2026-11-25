@@ -75,8 +75,33 @@ SPOKEN_GROUPS = re.compile(r"(?<=\d{2})[.,]\s+(?=\d{2})")
 OPEN_STATES = frozenset({"created", "uploaded", "transcribing", "failed"})
 
 
+# Speech-to-text often writes a spoken number as words ("zero three zero zero ...", Roman Urdu,
+# Urdu or Hindi) or as single spaced digits ("0 3 0 0 1 2 ..."), which the shared redactor does not
+# read as a number. A run of this many such tokens in a row is a number being read out, not talk
+# about small amounts, so it is removed. "sau" and "hazar" (hundred, thousand) count as tokens.
+SPOKEN_RUN_MIN = 7
+_SPOKEN_WORDS = (
+    # English
+    "zero|oh|one|two|three|four|five|six|seven|eight|nine|"
+    # Roman Urdu / Hindi
+    "sifar|sunya|shunya|aik|ek|do|teen|char|chaar|paanch|panch|chhe|chay|che|chhay|chhah|saat|"
+    "aath|nau|sau|hazar|hazaar|"
+    # Urdu
+    "صفر|ایک|دو|تین|چار|پانچ|چھ|چھے|سات|آٹھ|نو|سو|ہزار|"
+    # Hindi
+    "शून्य|एक|दो|तीन|चार|पाँच|पांच|छह|छः|सात|आठ|नौ|सौ|हज़ार"
+)
+_SPOKEN_TOKEN = rf"(?:(?<!\d)\d+(?!\d)|(?<!\w)(?:{_SPOKEN_WORDS})(?!\w))"
+SPOKEN_NUMBER = re.compile(
+    rf"(?:{_SPOKEN_TOKEN}[\s,.\-]+){{{SPOKEN_RUN_MIN - 1},}}{_SPOKEN_TOKEN}", re.IGNORECASE
+)
+SPOKEN_REMOVED = "[contact detail removed]"  # the same marker the shared redactor writes
+
+
 def join_spoken_digits(text: str) -> str:
-    return SPOKEN_GROUPS.sub(" ", text)
+    """Spoken digit groups joined so the shared redactor reads them as a number, and a number read
+    out as words or as single digits removed."""
+    return SPOKEN_NUMBER.sub(SPOKEN_REMOVED, SPOKEN_GROUPS.sub(" ", text))
 
 
 def split_sentences(text: str) -> list[str]:
