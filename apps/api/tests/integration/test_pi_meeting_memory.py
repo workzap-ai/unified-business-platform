@@ -121,7 +121,7 @@ async def test_a_returning_customer_is_asked_who_is_speaking_and_a_yes_unlocks_m
     mid, guest = await room(api, conv)
     opening = (await turn(api, guest)).json()["reply"]
     assert opening.count("?") == 1 and "AI" in opening and "Am I speaking with Ayesha?" in opening
-    brain.heard = "ji haan, main hi hoon"
+    brain.heard = "yes, it is me"
     out = (await turn(api, guest, WEBM)).json()
     assert out["reply"] == "How often does that happen?"
     sent = brain.calls[-1]

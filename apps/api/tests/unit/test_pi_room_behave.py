@@ -32,9 +32,11 @@ def test_solution_request_detected_and_line_has_no_question() -> None:
 
 
 def test_question_policy_never_two_in_a_row_and_calm() -> None:
-    assert voice.question_policy([voice.Said(True, "Ok?")]) == "none"
-    assert voice.question_policy([voice.Said(True, "Ok.")]) == "optional"
-    assert voice.question_policy([voice.Said(True, "Ok.")], calm=True) == "none"
+    opening = voice.Said(True, "Hi, I'm pi. What do you do?")
+    assert voice.question_policy([opening]) == "optional"  # the opening does not count
+    assert voice.question_policy([opening, voice.Said(True, "Ok?")]) == "none"
+    assert voice.question_policy([opening, voice.Said(True, "Ok.")]) == "optional"
+    assert voice.question_policy([opening, voice.Said(True, "Ok.")], calm=True) == "none"
 
 
 async def test_a_request_for_help_gets_one_suggestion_then_the_fixed_line_after_the_cap():

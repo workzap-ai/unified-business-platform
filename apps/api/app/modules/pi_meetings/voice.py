@@ -346,10 +346,16 @@ def in_reply_language(reply: str, lang: str) -> bool:
 def question_policy(history: Sequence["Said"], calm: bool = False) -> str:
     """'none' when pi's last line was a question (never two in a row) or when the person is tired
     of questions: this one says what it understood and asks nothing. 'optional' otherwise: it asks
-    only when one key fact is still missing."""
+    only when one key fact is still missing. The opening line is not counted: the first answer to
+    "what does your business do?" may be followed by a question."""
     if calm:
         return "none"
-    last = [h.text.rstrip().endswith(("?", "؟")) for h in history if h.pi][-1:]
+    own = [h.text for h in history if h.pi][1:]  # the opening is not counted
+    # nor are the fixed questions of the identity check
+    last = [
+        t.rstrip().endswith(("?", "؟")) for t in own if IDENTITY_MARK not in t and t != NOT_THEM
+    ]
+    last = last[-1:]
     return "none" if last == [True] else "optional"
 
 

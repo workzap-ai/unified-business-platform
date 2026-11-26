@@ -265,11 +265,12 @@ def test_the_script_of_a_reply_must_match_the_language_and_two_questions_are_fol
     assert not voice.in_reply_language("اچھا، سمجھ گیا۔", "en")
     assert voice.in_reply_language("اچھا، سمجھ گیا۔", "roman_ur")
     assert not voice.in_reply_language("Achha, samajh gaya.", "roman_ur")
+    pi = voice.Said(True, "Hi, I'm pi, an AI from Workzap.")
     q = voice.Said(True, "What does your business do?")
     s = voice.Said(True, "I see, bargaining hurts your margin.")
-    assert voice.question_policy([q]) == "none"  # never two questions in a row
-    assert voice.question_policy([q, voice.Said(False, "x"), q]) == "none"
-    assert voice.question_policy([q, voice.Said(False, "x"), s]) == "optional"
+    assert voice.question_policy([pi, q]) == "none"  # never two questions in a row
+    assert voice.question_policy([pi, q, voice.Said(False, "x"), q]) == "none"
+    assert voice.question_policy([pi, q, voice.Said(False, "x"), s]) == "optional"
 
 
 async def test_a_wrong_language_reply_is_corrected_once_and_then_it_is_the_safe_line():
