@@ -13,6 +13,7 @@ unit-tested without the video provider's SDK. No audio is stored: a turn is tran
 import asyncio
 import io
 import logging
+import os
 import wave
 from array import array
 from collections.abc import Awaitable, Callable
@@ -165,6 +166,8 @@ class RoomSpeech:
         text = await self.hear(turn)
         if not text:
             return "unheard"
+        if os.environ.get("ROOM_LOG_HEARD") == "1":  # off by default: only for a test room
+            logger.info("room_heard %s", text[:160])
         if self.on_line:
             await self.on_line(turn.speaker_id, text)
         async with self._lock:
