@@ -45,6 +45,7 @@ CARRY_S = 10.0
 # when someone is still talking at the moment pi is ready, pi waits this long for them to
 # finish instead of throwing its answer away
 START_WAIT_S = 2.0
+FALLBACK_QUIET_S = 15.0  # a safe-line reply within this long of pi speaking is not said
 CARRY_REASONS = frozenset({"someone_speaking", "not_addressed"})
 CARRY_CHARS = 600
 # how pi sounds: a text-to-speech model that takes instructions is told the tone, the pace and,
@@ -285,6 +286,14 @@ class RoomSpeech:
                         what_i_know=block if answered == "confirmed" else {},
                     )
                     line = reply.text
+                    if (
+                        reply.fallback
+                        and state.last_spoke_at is not None
+                        and now - state.last_spoke_at <= FALLBACK_QUIET_S
+                    ):
+                        # the canned "let me think" line right after pi spoke only adds noise
+                        state.history.append(voice.Said(False, heard))
+                        return "not_spoken"
             if self.speaker_active(turn.speaker_id):
                 # they began talking again while pi was thinking: what was heard is only the first
                 # half of what they are saying. Hold it, throw this answer away and answer the whole

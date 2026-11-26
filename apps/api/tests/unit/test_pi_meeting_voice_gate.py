@@ -13,6 +13,7 @@ HEARD = "we sell tiles and the stock runs out every week"
 HISTORY = [
     Said(True, "Hi, I'm pi, an AI from Workzap. What does your business do?"),
     Said(False, "we sell tiles"),
+    Said(True, "Tiles, got it."),
 ]
 
 

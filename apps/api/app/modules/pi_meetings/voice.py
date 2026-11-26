@@ -50,12 +50,14 @@ letters are mispronounced. Answer in English when they speak English.
   same one twice in a row.
 - Answer in the language the body names in reply_in, and stay in it even if one of their words
   is in another language.
-- One or two short sentences a person can say aloud. You are a listener, not an interviewer: after
-  they answer, first show you understood. Say back the key facts and what it costs them, in their
-  own words, as a short summary and not a repeat. Ask a question only when an important fact is
-  still missing (what, how often, what it costs them in time or money, what they already tried),
-  and then ONE short question as the last sentence. The body's question_policy says when you must
-  not ask ("none": reflect and let them continue, with no question mark at all).
+- One or two short sentences a person can say aloud. You are a listener, not an interviewer: the
+  default is NO question. Show you understood by saying the new fact in a few words, the way a
+  friend would ("Ten a day, that adds up."). Never praise or comment on the topic ("this is really
+  important", "interesting", "یہ واقعی اہم ہے") and never start with "You said that" or "آپ نے
+  کہا کہ". Ask a question only when one key fact is truly missing (what, how often, what it costs
+  them in time or money, what they already tried), then ONE short question as the last sentence,
+  and never two turns in a row. The body's question_policy says when you must not ask ("none":
+  no question mark at all).
 - If they ask you something (how to grow, which system, how much): do not give advice, a fix, a
   product or a price. Say in one short sentence that a person from the Workzap team shows options
   once your picture of their situation is complete, say what you understood so far, and ask at most
@@ -215,7 +217,70 @@ def reply_language(history: Sequence["Said"], heard: str, room_language: str = "
                     break
     if found is None:
         found = {"ur": "roman_ur", "ar": "ar", "en": "en"}.get(room_language)
+    current = _spoken_family(history)
+    if found and current and _family(found) != current and len(heard.split()) < SWITCH_WORDS:
+        # a short fragment ("your company name") in another language does not switch the
+        # conversation: it keeps the language pi has been speaking
+        return "en" if current == "en" else "roman_ur"
     return found or "en"
+
+
+SWITCH_WORDS = 4  # fewer words than this never switch the language pi is speaking
+
+
+def _family(language: str) -> str:
+    return "en" if language == "en" else "ur"
+
+
+def _spoken_family(history: Sequence["Said"]) -> str:
+    """The language pi's own last line was in ('ur' when it has Urdu or Arabic letters), or ''."""
+    for line in reversed(history):
+        if line.pi:
+            if ARABIC_LETTERS.search(line.text):
+                return "ur"
+            found = pi_language.detect_language(line.text)
+            return "ur" if found and found != "en" else "en"
+    return ""
+
+
+ANNOYED = re.compile(
+    r"again and again|over and over|stop asking|why (are|do) you (keep )?(ask|repeat)|waste (of )?"
+    r"(my )?time|baar baar|bar bar|kitni (baar|dafa|dafa)|waqt (zaya|barbad)|"
+    r"بار بار|وقت (ضائع|ضایع|برباد)|बार बार|वक्त (जाया|बर्बाद)|समय (बर्बाद|ख़राब)",
+    re.IGNORECASE,
+)
+SOLUTION = re.compile(
+    r"\b(solution|can you (build|make|create|do)|can your team|your team (can|could)|"
+    r"hal (batao|bataen|bata)|kya (aap|tum|apki team|aapki team) (bana|bna|kar) )|"
+    r"(حل|سلوشن|सलूशन|समाधान|हल)\s*(بتاؤ|بتائیں|बताओ|बताइए|دو|दो)|"
+    r"(تمہاری|آپ کی|तुम्हारी|आपकी)\s*(ٹیم|टीम)\s*(بنا|बना)",
+    re.IGNORECASE,
+)
+SOLUTION_LINES = {
+    "en": (
+        "I can't suggest or price a solution in this call. I've noted what you need, and a person "
+        "from the Workzap team will show you options."
+    ),
+    "ur": (
+        "اس کال میں میں کوئی حل یا قیمت نہیں بتا سکتا۔ میں نے آپ کی ضرورت نوٹ کر لی ہے، اور "
+        "Workzap کی ٹیم کا کوئی فرد آپ کو آپشنز دکھائے گا۔"
+    ),
+}
+
+
+def annoyed(text: str) -> bool:
+    """The person is tired of being asked (or says pi wastes their time)."""
+    return bool(ANNOYED.search(text))
+
+
+def asks_for_solution(text: str) -> bool:
+    """The person asks pi for a solution, or whether the team can build it."""
+    return bool(SOLUTION.search(text))
+
+
+def solution_line(lang: str) -> str:
+    """What pi says when asked for a solution: a plain, honest line with no question."""
+    return SOLUTION_LINES["en" if lang == "en" else "ur"]
 
 
 def opening_language(heard: str, room_language: str = "") -> str:
@@ -241,11 +306,14 @@ def in_reply_language(reply: str, lang: str) -> bool:
     return True
 
 
-def question_policy(history: Sequence["Said"]) -> str:
-    """'none' when pi's last two lines were both questions: this one reflects what it understood and
-    asks nothing. 'optional' otherwise: it asks only when an important fact is still missing."""
-    last = [h.text.rstrip().endswith(("?", "؟")) for h in history if h.pi][-2:]
-    return "none" if len(last) == 2 and all(last) else "optional"
+def question_policy(history: Sequence["Said"], calm: bool = False) -> str:
+    """'none' when pi's last line was a question (never two in a row) or when the person is tired
+    of questions: this one says what it understood and asks nothing. 'optional' otherwise: it asks
+    only when one key fact is still missing."""
+    if calm:
+        return "none"
+    last = [h.text.rstrip().endswith(("?", "؟")) for h in history if h.pi][-1:]
+    return "none" if last == [True] else "optional"
 
 
 def _off_brief(reply: str, lang: str, policy: str) -> bool:
@@ -278,7 +346,12 @@ async def reply_to(
 
     ctx = context(history, heard)
     lang = reply_language(history, heard, language)
-    policy = question_policy(history)
+    if asks_for_solution(heard):
+        # no solution or price while listening: a fixed, honest line and no question
+        return Spoken(solution_line(lang), fallback=False)
+    owner_lines = [h.text for h in history if not h.pi][-2:]
+    tired = annoyed(heard) or any(annoyed(t) for t in owner_lines)
+    policy = question_policy(history, calm=tired)
     ctx["reply_language"] = {"roman_ur": "ur"}.get(lang, lang) if lang != "en" else ""
     block = meeting_memory.speakable(what_i_know or {})
     seen = " ".join([*(h.text for h in history), heard])
@@ -291,6 +364,11 @@ async def reply_to(
         ],
         "owner_just_said": heard[:HEARD_CHARS],
     }
+    if tired:
+        body["note"] = (
+            "The person is tired of questions. Say sorry in a few words, say what you have "
+            "understood so far, and ask nothing."
+        )
     shared_memory.attach(body, block)  # a no-op when there is no memory
     system = SYSTEM + (MEMORY_NOTE + shared_memory.system_line(block) if block else "")
 

@@ -18,7 +18,7 @@ def turn(who="g_1"):
 
 
 class Manager:
-    def __init__(self, heard="pi what do you think about my shop", reply="Which part is slowest?"):
+    def __init__(self, heard="pi what do you think about my shop", reply="That sounds slow to me."):
         self.heard, self.reply = heard, reply
         self.stt_calls, self.tts = [], []
         self.fail_stt = self.fail_tts = False
@@ -81,13 +81,14 @@ async def test_after_that_pi_answers_through_the_voice_gate():
     speech, manager, out, session = build()
     await speech.on_turn(turn())
     assert await speech.on_turn(turn()) == "spoke"
-    assert manager.tts[1][0] == "Which part is slowest?"
+    assert manager.tts[1][0] == "That sounds slow to me."
     assert session.spoken == 2
 
 
 async def test_a_reply_that_breaks_a_rule_becomes_the_safe_line():
     speech, manager, _, _ = build(Manager(reply="It costs 5000 rupees, so pay now?"))
     await speech.on_turn(turn())
+    speech.session.last_spoke_at = 0.0  # long ago: the safe line is not held back
     await speech.on_turn(turn())
     spoken = manager.tts[1][0]
     assert "5000" not in spoken and "pay" not in spoken.lower()

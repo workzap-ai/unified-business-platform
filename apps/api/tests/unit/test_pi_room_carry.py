@@ -242,13 +242,14 @@ def test_the_language_is_decided_by_code_from_the_latest_words_then_the_earlier_
 
     pi = voice.Said(True, "Hi, I'm pi, an AI from Workzap. What does your business do?")
     urdu = voice.Said(False, "meri kapron ki dukaan hai aur orders miss ho jate hain")
+    pi_ur = voice.Said(True, "Acha, kapron ki dukaan aur orders miss hona, samajh gaya.")
     assert voice.reply_language([pi], "I run a small clothing shop") == "en"
     assert (
         voice.reply_language([pi], "meri kapron ki dukaan hai aur orders miss ho jate hain")
         == "roman_ur"
     )
     # one unclear word keeps the language they spoke before
-    assert voice.reply_language([pi, urdu], "bargaining") == "roman_ur"
+    assert voice.reply_language([pi, urdu, pi_ur], "bargaining") == "roman_ur"
     assert voice.reply_language([pi, voice.Said(False, "I run a shop")], "ok") == "en"
     # nothing to go on: the room's setting, then English
     assert voice.reply_language([], "ok", "ur") == "roman_ur"
@@ -266,7 +267,7 @@ def test_the_script_of_a_reply_must_match_the_language_and_two_questions_are_fol
     assert not voice.in_reply_language("Achha, samajh gaya.", "roman_ur")
     q = voice.Said(True, "What does your business do?")
     s = voice.Said(True, "I see, bargaining hurts your margin.")
-    assert voice.question_policy([q]) == "optional"
+    assert voice.question_policy([q]) == "none"  # never two questions in a row
     assert voice.question_policy([q, voice.Said(False, "x"), q]) == "none"
     assert voice.question_policy([q, voice.Said(False, "x"), s]) == "optional"
 
@@ -289,7 +290,7 @@ async def test_a_wrong_language_reply_is_corrected_once_and_then_it_is_the_safe_
             self.replies_last = reply
             return type("R", (), {"value": model(reply=reply)})()
 
-    pi = voice.Said(True, voice.opening())
+    pi = voice.Said(True, "Hi, I'm pi, an AI from Workzap.")
     scope = WorkspaceScope.system(uuid4(), uuid4(), frozenset(), "t")
     # English asked, Urdu written, then English: one correction fixes it
     first = Replies(
