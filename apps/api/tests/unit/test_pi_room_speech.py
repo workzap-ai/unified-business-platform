@@ -212,3 +212,60 @@ async def test_the_speech_to_text_gets_the_spelling_hint_and_an_echo_of_it_is_dr
     )
     assert await speech.hear(Turn("g_1", b"\x10\x00" * 48000, 48000, 0.0, 1.0)) == ""
     assert asked["prompt"] == room_speech.STT_HINT
+
+
+async def test_pi_reports_what_it_did_after_the_disclosure_and_after_a_spoken_turn():
+    seen = []
+
+    async def keep(session):
+        seen.append((session.disclosed, session.spoken))
+
+    manager = Manager(heard="pi hello there my friend")
+    speech = RoomSpeech(
+        manager=manager,
+        scope=WorkspaceScope.system(uuid4(), uuid4(), frozenset(), "t"),
+        session=Session(Settings(mode="speak")),
+        out=Out(),
+        customers=lambda: 1,
+        someone_speaking=lambda: False,
+        clock=lambda: 100.0,
+        on_state=keep,
+    )
+    await speech.on_turn(Turn("g_1", b"\x10\x00" * 48000, 48000, 0.0, 1.0))
+    assert seen == [(True, 1)]
+
+
+async def test_a_session_restored_after_a_restart_does_not_introduce_itself_again():
+    manager = Manager(heard="pi what do you think about my shop")
+    speech = RoomSpeech(
+        manager=manager,
+        scope=WorkspaceScope.system(uuid4(), uuid4(), frozenset(), "t"),
+        session=Session(
+            Settings(mode="speak"),
+            disclosed=True,
+            spoken=4,
+            history=[voice.Said(True, voice.opening())],  # as the agent restores it
+        ),
+        out=Out(),
+        customers=lambda: 1,
+        someone_speaking=lambda: False,
+        clock=lambda: 100.0,
+    )
+    assert await speech.on_turn(Turn("g_1", b"\x10\x00" * 48000, 48000, 0.0, 1.0)) == "spoke"
+    assert manager.tts[0][0] != voice.opening()
+    assert speech.session.spoken == 5
+
+
+async def test_a_restored_emergency_stop_keeps_pi_silent():
+    manager = Manager(heard="pi are you there")
+    speech = RoomSpeech(
+        manager=manager,
+        scope=WorkspaceScope.system(uuid4(), uuid4(), frozenset(), "t"),
+        session=Session(Settings(mode="speak"), disclosed=True, halted=True),
+        out=Out(),
+        customers=lambda: 1,
+        someone_speaking=lambda: False,
+        clock=lambda: 100.0,
+    )
+    assert await speech.on_turn(Turn("g_1", b"\x10\x00" * 48000, 48000, 0.0, 1.0)) == "halted"
+    assert manager.tts == []

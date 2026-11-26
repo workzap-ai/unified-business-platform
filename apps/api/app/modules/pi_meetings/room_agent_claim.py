@@ -41,6 +41,11 @@ class Orders:
     intake: bool
     language: str
     stay: bool  # False: the room has ended, been paused or switched off: leave
+    # what pi already did in this call (kept across an agent restart)
+    spoken: int = 0
+    disclosed: bool = False
+    halted: bool = False
+    last_spoke_at: datetime | None = None
 
 
 def scope_of(room: PiMeetingRoom) -> WorkspaceScope:
@@ -123,6 +128,10 @@ async def beat(session: Any, room_id: UUID, agent_id: str, now: datetime) -> Ord
         intake=room.pi_intake,
         language=language,
         stay=room.state in LIVE and allowed and room.pi_mode == "speak",
+        spoken=room.pi_spoken,
+        disclosed=room.pi_disclosed,
+        halted=room.pi_halted,
+        last_spoke_at=room.pi_last_spoke_at,
     )
 
 
@@ -134,3 +143,28 @@ async def release(session: Any, room_id: UUID, agent_id: str) -> None:
     if room is not None and room.agent_id == agent_id:
         room.agent_id = None
         room.agent_beat_at = None
+
+
+async def save_state(
+    session: Any,
+    room_id: UUID,
+    agent_id: str,
+    *,
+    spoken: int,
+    disclosed: bool,
+    halted: bool,
+    last_spoke_at: datetime | None,
+) -> bool:
+    """Keep what pi has done so far, only while this agent still holds the room. The caller
+    commits. False when the room is no longer this agent's."""
+    room = await session.scalar(
+        select(PiMeetingRoom).where(PiMeetingRoom.id == room_id).with_for_update()
+    )
+    if room is None or room.agent_id != agent_id:
+        return False
+    room.pi_spoken = max(room.pi_spoken, spoken)
+    room.pi_disclosed = room.pi_disclosed or disclosed
+    room.pi_halted = room.pi_halted or halted
+    if last_spoke_at is not None:
+        room.pi_last_spoke_at = last_spoke_at
+    return True

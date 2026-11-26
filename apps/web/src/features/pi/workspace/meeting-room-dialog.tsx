@@ -13,6 +13,7 @@ import {
   DialogHeader,
 } from "@/components/ui/overlays";
 import { Notice } from "@/components/app/states";
+import { customersService } from "@/features/customers/service";
 import { useScopedMutation, useScopedQuery } from "@/hooks/use-scoped";
 import { ApiError } from "@/services/api-client";
 import { meetingRoomService, ROOM_REFUSED } from "../meeting-room-service";
@@ -33,6 +34,12 @@ export function StartRoomDialog({
   const [title, setTitle] = useState("");
   const [agreed, setAgreed] = useState(false);
   const [language, setLanguage] = useState("");
+  const [customer, setCustomer] = useState("");
+  const customers = useScopedQuery(
+    ["customers", "meeting-picker"],
+    () => customersService.list({ pageSize: 100 }),
+    { enabled: open },
+  );
   const options = useScopedQuery(
     ["pi", "meeting-room", "options"],
     () => meetingRoomService.options(),
@@ -46,6 +53,7 @@ export function StartRoomDialog({
       setTitle("");
       setAgreed(false);
       setLanguage("");
+      setCustomer("");
       onOpened(out.meeting.id);
     },
   });
@@ -75,6 +83,27 @@ export function StartRoomDialog({
               onChange={(e) => setTitle(e.target.value)}
               placeholder="For example: Tiles order review"
             />
+          </div>
+          <div>
+            <Label htmlFor="room-customer">Customer (optional)</Label>
+            <NativeSelect
+              id="room-customer"
+              value={customer}
+              disabled={make.isPending}
+              onChange={(e) => setCustomer(e.target.value)}
+            >
+              <option value="">Not linked yet</option>
+              {(customers.data?.items ?? []).map((c) => (
+                <option key={c.id} value={c.id}>
+                  {c.name}
+                </option>
+              ))}
+            </NativeSelect>
+            <p className="mt-1 text-xs text-muted-foreground">
+              When linked, pi already knows this customer: it asks &ldquo;Am I
+              speaking with &hellip;?&rdquo; and uses what it knows only after a
+              clear yes.
+            </p>
           </div>
           <div>
             <Label htmlFor="room-language">Language people will speak</Label>
@@ -119,6 +148,7 @@ export function StartRoomDialog({
                 title: title.trim(),
                 consent: agreed,
                 language,
+                customer_id: customer || null,
               })
             }
           >

@@ -19,7 +19,7 @@ import contextlib
 import logging
 import secrets
 import time
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 from typing import Any
 
 import httpx
@@ -31,6 +31,7 @@ from app.core.database import create_engine
 from app.modules.pi_meetings import room_agent_claim as claims
 from app.modules.pi_meetings import room_agent_lines as lines
 from app.modules.pi_meetings import room_agent_memory as memory
+from app.modules.pi_meetings import voice
 from app.modules.pi_meetings.room_agent import AGENT_USER, RoomRun
 from app.modules.pi_meetings.room_provider import CALL_TYPE
 from app.modules.pi_meetings.room_speech import RoomSpeech, Session
@@ -119,6 +120,32 @@ async def run_room(
             logger.warning("room_memory_not_loaded")
 
     await refresh_memory()
+
+    async def on_state(session: Session) -> None:
+        """Keep what pi has done, so a restarted agent carries on and does not start over."""
+        when = (
+            datetime.now(UTC) - timedelta(seconds=time.monotonic() - session.last_spoke_at)
+            if session.last_spoke_at is not None
+            else None
+        )
+        async with sessions() as db:
+            if await claims.save_state(
+                db,
+                room_id,
+                agent_id,
+                spoken=session.spoken,
+                disclosed=session.disclosed,
+                halted=session.halted,
+                last_spoke_at=when,
+            ):
+                await db.commit()
+
+    # what pi did before a restart: the pause since it last spoke is counted on this clock
+    since = (
+        (datetime.now(UTC) - orders.last_spoke_at).total_seconds()
+        if orders.last_spoke_at is not None
+        else None
+    )
     out = TrackOut(track, PcmData, AudioFormat)
     speech = RoomSpeech(
         manager=manager,
@@ -128,13 +155,22 @@ async def run_room(
                 mode="speak" if orders.speak else "off",
                 intake=orders.intake,
                 language=orders.language,
-            )
+            ),
+            disclosed=orders.disclosed,
+            # the disclosure was spoken before the restart: the rules must know it was made
+            history=[voice.Said(True, voice.opening(language=orders.language))]
+            if orders.disclosed
+            else [],
+            halted=orders.halted,
+            spoken=orders.spoken,
+            last_spoke_at=None if since is None else time.monotonic() - max(0.0, since),
         ),
         out=out,
         customers=lambda: 0,
         someone_speaking=lambda: False,
         clock=time.monotonic,
         on_line=on_line,
+        on_state=on_state,
         what_i_know=lambda: known["block"],
     )
     run = RoomRun(speech, clock=time.monotonic)

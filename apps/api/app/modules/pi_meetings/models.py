@@ -215,6 +215,14 @@ class PiMeetingRoom(WorkspaceRow):
     pi_intake: Mapped[bool] = mapped_column(Boolean, default=False, server_default=text("false"))
     agent_id: Mapped[str | None] = mapped_column(String(40), nullable=True)
     agent_beat_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    # what pi has already done in this call, so a restarted agent does not introduce itself again
+    # or start the speech cap afresh (an emergency stays stopped)
+    pi_spoken: Mapped[int] = mapped_column(Integer, default=0, server_default="0")
+    pi_disclosed: Mapped[bool] = mapped_column(Boolean, default=False, server_default=text("false"))
+    pi_halted: Mapped[bool] = mapped_column(Boolean, default=False, server_default=text("false"))
+    pi_last_spoke_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True), nullable=True
+    )
 
 
 class PiMeetingDocument(WorkspaceRow):

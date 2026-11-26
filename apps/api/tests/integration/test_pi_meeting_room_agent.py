@@ -199,3 +199,42 @@ async def test_pi_lines_join_the_final_transcript_in_the_order_they_were_said(
     assert "1234567" not in got[3][2]  # nothing pi says carries a phone number either
     assert got[1][2].startswith("Hi, I'm pi, an AI")
     await pi.close()
+
+
+async def test_what_pi_did_survives_an_agent_restart(api, business_db, provider):
+    """The speech cap, the AI disclosure and an emergency stop are kept in the room, so a restarted
+    agent does not introduce itself again, start the cap afresh or speak after an emergency."""
+    pi, mid = await room_with_pi(api, business_db, "369400020")
+    await api.post(f"{BASE}/{mid}/room/pi", json={"mode": "speak"})
+    await claim.claim(business_db, "agent-a", NOW)
+    await business_db.commit()
+    room = await the_room(business_db, mid)
+    spoke = NOW + timedelta(seconds=30)
+    assert (
+        await claim.save_state(
+            business_db,
+            room.id,
+            "agent-b",
+            spoken=3,
+            disclosed=True,
+            halted=False,
+            last_spoke_at=spoke,
+        )
+        is False
+    )  # not the holder: nothing is kept
+    assert await claim.save_state(
+        business_db, room.id, "agent-a", spoken=3, disclosed=True, halted=False, last_spoke_at=spoke
+    )
+    await business_db.commit()
+    # a smaller or later-reset value never lowers what was kept; a halt is never undone
+    await claim.save_state(
+        business_db, room.id, "agent-a", spoken=1, disclosed=False, halted=True, last_spoke_at=None
+    )
+    await business_db.commit()
+    await claim.release(business_db, room.id, "agent-a")
+    await claim.claim(business_db, "agent-c", NOW + timedelta(minutes=2))
+    orders = await claim.beat(business_db, room.id, "agent-c", NOW + timedelta(minutes=2))
+    assert orders is not None
+    assert (orders.spoken, orders.disclosed, orders.halted) == (3, True, True)
+    assert orders.last_spoke_at == spoke
+    await pi.close()

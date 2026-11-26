@@ -120,6 +120,7 @@ class RoomSpeech:
         is_muted: Callable[[], Awaitable[bool]] | None = None,
         what_i_know: Callable[[], dict[str, Any]] | None = None,
         on_line: Callable[[str, str], Awaitable[None]] | None = None,
+        on_state: Callable[[Session], Awaitable[None]] | None = None,
     ) -> None:
         self.manager = manager
         self.scope = scope
@@ -133,6 +134,7 @@ class RoomSpeech:
         self.on_line = (
             on_line  # (speaker_id, text) for every line heard and said, for the transcript
         )
+        self.on_state = on_state  # told after every turn that changed what pi has done
         self._lock = asyncio.Lock()
         self._cut = asyncio.Event()
         self.speaking = False
@@ -193,8 +195,11 @@ class RoomSpeech:
                     :SAFETY_CHARS
                 ]
                 if state.spoken >= room_turns.MAX_SPOKEN:
+                    await self._persist()
                     return "cap"
-                return "emergency" if await self._say(numbers) == "complete" else "not_spoken"
+                said_numbers = await self._say(numbers)
+                await self._persist()
+                return "emergency" if said_numbers == "complete" else "not_spoken"
             decision = room_turns.decide(
                 Utterance(turn.speaker_id, text, True, self.clock()),
                 RoomState(
@@ -238,9 +243,20 @@ class RoomSpeech:
             if said == "none":
                 return "not_spoken"
             if said == "cut":
+                await self._persist()
                 return "cut_off"  # a disclosure that was cut off was not made: it is made again
             state.disclosed = True
+            await self._persist()
             return "disclosed" if decision.action == "disclose" else "spoke"
+
+    async def _persist(self) -> None:
+        """Tell the owner of this session what pi has done so far; a failure never stops pi."""
+        if self.on_state is None:
+            return
+        try:
+            await self.on_state(self.session)
+        except Exception:  # noqa: BLE001
+            logger.warning("room_state_not_saved")
 
     async def _say(self, line: str) -> str:
         """Speak one line. 'complete' when every piece went out, 'cut' when it was stopped part of
