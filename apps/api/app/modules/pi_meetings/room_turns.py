@@ -22,7 +22,7 @@ MAX_SPOKEN = 20  # pi's turns in one call
 COOLDOWN_S = 6.0  # after pi spoke
 INTAKE_MIN_WORDS = 3  # a customer's turn this short ("ok", "hmm") is not a reason to speak
 # pi's name, as a whole word, in the scripts the rooms are used in
-NAME = re.compile(r"(?<!\w)(?:pi|پائی|پی\s*آئی|पाई|पाय)(?!\w)", re.IGNORECASE)
+NAME = re.compile(r"(?<!\w)(?:pi|p\.\s?i\.?|پائی|پی\s*آئی|पाई|पाय)(?!\w)", re.IGNORECASE)
 QUIET = re.compile(
     r"(?<!\w)(?:stop|quiet|mute|be\s+quiet|chup|chup\s*kar|khamosh|خاموش|چپ|चुप)(?!\w)",
     re.IGNORECASE,
@@ -60,8 +60,12 @@ def _silent(reason: str) -> Decision:
     return Decision("silent", reason)
 
 
+# how speech-to-text often spells the name; only trusted at the start or after a greeting
+SPELLED = re.compile(r"^\s*(?:(?:hey|hi|hello|ok|okay)\s+)?(?:pie|pye|pai)(?!\w)", re.IGNORECASE)
+
+
 def addressed(text: str) -> bool:
-    return bool(NAME.search(text))
+    return bool(NAME.search(text) or SPELLED.search(text))
 
 
 def asks_quiet(text: str) -> bool:

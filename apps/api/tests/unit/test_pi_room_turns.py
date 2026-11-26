@@ -112,3 +112,9 @@ def test_intake_also_starts_with_the_disclosure() -> None:
     assert decide(say("my stock finishes every month and orders get late"), state).action == (
         "disclose"
     )
+
+
+def test_the_name_is_found_when_speech_to_text_spells_it_differently():
+    for spelled in ("Pie, can you hear me?", "hey Pai what do you think", "P.I., hello"):
+        assert addressed(spelled)
+    assert not addressed("I ate a piece of pizza")
