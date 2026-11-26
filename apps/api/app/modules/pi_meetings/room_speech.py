@@ -160,6 +160,8 @@ class RoomSpeech:
             on_line  # (speaker_id, text) for every line heard and said, for the transcript
         )
         self.on_state = on_state  # told after every turn that changed what pi has done
+        # is THIS person talking again? (set by the room; by default: anyone talking)
+        self.speaker_active: Callable[[str], bool] = lambda _speaker: self.someone_speaking()
         self._lock = asyncio.Lock()
         self._cut = asyncio.Event()
         self.speaking = False
@@ -283,6 +285,12 @@ class RoomSpeech:
                         what_i_know=block if answered == "confirmed" else {},
                     )
                     line = reply.text
+            if self.speaker_active(turn.speaker_id):
+                # they began talking again while pi was thinking: what was heard is only the first
+                # half of what they are saying. Hold it, throw this answer away and answer the whole
+                # once they stop (found live: pi answered one long sentence twice in a row).
+                state.carry[turn.speaker_id] = (heard, now)
+                return "someone_speaking"
             state.history.append(voice.Said(False, heard))
             said = await self._say(line)
             if said == "none":

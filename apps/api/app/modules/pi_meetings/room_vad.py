@@ -66,6 +66,11 @@ class TurnCutter:
         """True while anyone is in the middle of a turn (pi must not talk over them)."""
         return any(p.speaking for p in self._people.values())
 
+    def is_speaking(self, speaker_id: str) -> bool:
+        """True while this one person is in the middle of a turn."""
+        person = self._people.get(speaker_id)
+        return bool(person and person.speaking)
+
     def forget(self, speaker_id: str) -> None:
         self._people.pop(speaker_id, None)
 

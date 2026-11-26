@@ -315,3 +315,24 @@ async def test_the_introduction_is_in_the_language_the_person_first_spoke():
         "disclosed"
     )
     assert "مصنوعی ذہانت" in manager.tts[0][0]
+
+
+async def test_when_the_person_starts_talking_again_while_pi_thinks_it_answers_the_whole_once():
+    """Found live: pi answered the first half of a long sentence, and then the second half too: two
+    answers in a row. If the same person is talking again when the answer is ready, it is thrown
+    away and held with what they say next, and pi answers once."""
+    speech, manager, clock = build(customers=1)
+    assert await say(speech, manager, "hello, I run a small shop") == "disclosed"
+    clock.t += 30  # a long pause: the next words are not an answer to the introduction
+    manager.tts.clear()
+    talking = {"again": True}
+    speech.speaker_active = lambda who: talking["again"]  # they began talking while pi thought
+    assert await say(speech, manager, "customers bargain a lot, they ask for discounts") == (
+        "someone_speaking"
+    )
+    assert manager.tts == []  # nothing was said over them
+    assert speech.session.carry["g_1"][0].startswith("customers bargain")
+    talking["again"] = False
+    clock.t += 3
+    assert await say(speech, manager, "and sometimes ten customers a day") == "spoke"
+    assert len(manager.tts) == 1  # one answer, to both halves together

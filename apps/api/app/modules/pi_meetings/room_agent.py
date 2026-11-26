@@ -61,6 +61,7 @@ class RoomRun:
         self.seen: dict[str, float] = {}  # when each person last joined or made a sound
         speech.customers = self.customers
         speech.someone_speaking = self.cutter.speaking
+        speech.speaker_active = self.cutter.is_speaking
 
     def customers(self) -> int:
         """Different people in the room who are not staff (and not pi itself) and who joined or
