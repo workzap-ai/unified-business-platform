@@ -211,18 +211,18 @@ function Captions() {
   return (
     <div
       aria-live="polite"
-      className="min-h-10 rounded-lg bg-surface-muted px-3 py-2 text-sm"
+      className="min-h-12 rounded-xl border border-border bg-surface-muted px-3 py-2.5 text-sm"
     >
       {lines.length === 0 ? (
         <span className="text-muted-foreground">
-          Live captions appear here while people speak.
+          Captions appear here while people speak.
         </span>
       ) : (
         lines.map((c, i) => (
-          <p key={i}>
-            <span className="font-medium">
-              {c.user?.name || c.user?.id || c.speaker_id || "Speaker"}:
-            </span>{" "}
+          <p key={i} className="leading-snug">
+            <span className="mr-1.5 inline-block rounded-full bg-primary/15 px-2 py-0.5 text-xs font-medium text-primary">
+              {c.user?.name || c.user?.id || c.speaker_id || "Speaker"}
+            </span>
             {c.text}
           </p>
         ))
@@ -335,7 +335,7 @@ export function MeetingRoomCall({
               />
             </div>
             <Captions />
-            <div className="str-video__call-controls flex flex-wrap items-center justify-center gap-2">
+            <div className="str-video__call-controls mx-auto flex w-fit max-w-full flex-wrap items-center justify-center gap-2 rounded-full border border-border bg-surface-muted px-3 py-2 shadow-sm">
               <ToggleAudioPublishingButton />
               <ToggleVideoPublishingButton />
               <ShareScreen onError={setError} />

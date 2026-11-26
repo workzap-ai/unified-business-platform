@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { CheckCircle2, Lock, Video } from "lucide-react";
+import { useState, type ReactNode } from "react";
+import { Bot, CheckCircle2, Mic, Video } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/controls";
@@ -13,6 +13,7 @@ import {
   type RoomCredentials,
 } from "../meeting-room-service";
 import { MeetingRoomCall } from "./meeting-room-lazy";
+import { PiAvatar } from "./pi-avatar";
 
 /**
  * A customer opening the meeting link of a video room. They see what happens to their voice, give an
@@ -98,18 +99,25 @@ export function MeetingRoomGuest({
 
   if (done)
     return (
-      <div className="space-y-2" role="status">
-        <p className="flex items-center gap-2 text-sm font-medium">
-          <CheckCircle2 className="size-4 text-success" aria-hidden />
-          {done === "ended"
-            ? "The call has closed"
-            : "Thank you, you can close this page"}
-        </p>
-        <p className="text-xs text-muted-foreground">
-          {done === "ended"
-            ? "The host ended the call or removed you from it. You can close this page."
-            : "You left the call. If you left by mistake, open the link again."}
-        </p>
+      <div className="space-y-4 py-2 text-center" role="status">
+        <span className="mx-auto flex size-14 items-center justify-center rounded-full bg-success/15">
+          <CheckCircle2 className="size-7 text-success" aria-hidden />
+        </span>
+        <div className="space-y-1">
+          <p className="text-base font-semibold">
+            {done === "ended" ? "The call has closed" : "Thank you for joining"}
+          </p>
+          <p className="text-sm text-muted-foreground">
+            {done === "ended"
+              ? "The host ended the call or removed you from it. You can close this page."
+              : "You left the call. You can close this page, or join again if you left by mistake."}
+          </p>
+        </div>
+        {done === "left" && (
+          <Button variant="secondary" onClick={() => setDone(false)}>
+            <Video /> Join again
+          </Button>
+        )}
       </div>
     );
   if (credentials)
@@ -123,55 +131,72 @@ export function MeetingRoomGuest({
       />
     );
   return (
-    <div className="space-y-3">
-      <div className="space-y-2 rounded-lg border border-border bg-surface-muted p-3 text-sm">
-        <p className="flex items-center gap-1.5 font-medium">
-          <Lock className="size-4" aria-hidden /> Before you join, please know
-        </p>
-        <ul className="list-disc space-y-1.5 pl-5 text-muted-foreground">
-          <li>
-            <strong className="text-foreground">pi is an AI.</strong> It is in
-            this call, listens and writes down what is said. If the host
-            switches it on, pi can also speak: it always says first that it is
-            an AI, and its voice is computer-generated.
-          </li>
-          <li>
-            <strong className="text-foreground">Your voice.</strong>{" "}
-            {audio
-              ? "It is recorded briefly, only to turn it into text, then deleted. Phone, card and ID numbers are removed from the text."
-              : "It is turned into text for this meeting. Phone, card and ID numbers are removed from the text."}
-          </li>
-          <li>
-            <strong className="text-foreground">Camera and screen.</strong> They
-            stay off until you turn them on. If you do, the people in the room
-            see them live; video is never recorded or saved.
-          </li>
-          <li>
-            <strong className="text-foreground">Who sees it.</strong> The
-            host&apos;s team can read the text. pi may summarise it, and after
-            their review points can be saved to your record.
-          </li>
-          <li>
-            <strong className="text-foreground">You are free to go.</strong> You
-            can leave at any time.
-          </li>
-        </ul>
+    <div className="space-y-5">
+      <div className="flex items-center gap-3">
+        <PiAvatar expression="greet" size={48} decorative />
+        <div className="min-w-0">
+          <p className="text-sm font-semibold">
+            You are about to join a video call
+          </p>
+          <p className="text-xs text-muted-foreground">
+            pi, Workzap&apos;s AI assistant, will be in the room. Three things
+            to know:
+          </p>
+        </div>
       </div>
-      <div>
-        <Label htmlFor="room-name">Your name (optional, shown to others)</Label>
+      <ul className="space-y-3">
+        <Point
+          icon={<Bot className="size-4" aria-hidden />}
+          title="pi is an AI"
+        >
+          It listens and writes down what is said. If the host allows it, pi can
+          also speak: it always says first that it is an AI, and its voice is
+          computer-generated.
+        </Point>
+        <Point
+          icon={<Mic className="size-4" aria-hidden />}
+          title="Your voice becomes text"
+        >
+          {audio
+            ? "Your voice is recorded for a moment only to turn it into text, then deleted. "
+            : "What you say is turned into text for this meeting. "}
+          Phone, card and ID numbers are removed from the text.
+        </Point>
+        <Point
+          icon={<Video className="size-4" aria-hidden />}
+          title="Camera and screen stay off"
+        >
+          Until you turn them on. If you do, the people in the room see them
+          live. Video is never recorded or saved.
+        </Point>
+      </ul>
+      <details className="group rounded-lg border border-border bg-surface-muted px-3 py-2 text-sm">
+        <summary className="cursor-pointer select-none font-medium marker:text-muted-foreground">
+          More details
+        </summary>
+        <ul className="mt-2 list-disc space-y-1.5 pl-5 text-muted-foreground">
+          <li>
+            The host&apos;s team can read the text. pi may summarise it, and
+            after their review points can be saved to your record.
+          </li>
+          <li>You can leave at any time.</li>
+        </ul>
+      </details>
+      <div className="space-y-1.5">
+        <Label htmlFor="room-name">Your name (optional)</Label>
         <Input
           id="room-name"
           value={name}
           maxLength={60}
           disabled={busy}
           onChange={(e) => setName(e.target.value)}
-          placeholder="So the transcript says who spoke"
+          placeholder="So everyone knows who is speaking"
         />
       </div>
-      <label className="flex items-start gap-2 text-sm">
+      <label className="flex items-start gap-2.5 text-sm">
         <input
           type="checkbox"
-          className="mt-0.5 size-4 accent-primary"
+          className="mt-0.5 size-4 shrink-0 accent-primary"
           checked={agreed}
           disabled={busy}
           onChange={(e) => setAgreed(e.target.checked)}
@@ -183,17 +208,43 @@ export function MeetingRoomGuest({
         </span>
       </label>
       {error && <Notice tone="danger">{error}</Notice>}
-      <Button
-        disabled={!agreed || busy}
-        loading={busy}
-        onClick={() => void enter()}
-      >
-        <Video /> Join the call
-      </Button>
-      <p className="text-xs text-muted-foreground">
-        Next, your browser will ask to use your microphone. Press Allow so
-        people can hear you.
-      </p>
+      <div className="space-y-2">
+        <Button
+          className="h-11 w-full text-base"
+          disabled={!agreed || busy}
+          loading={busy}
+          onClick={() => void enter()}
+        >
+          <Video /> Join the call
+        </Button>
+        <p className="text-center text-xs text-muted-foreground">
+          {agreed
+            ? "Your browser will ask to use your microphone. Press Allow so people can hear you."
+            : "Tick the box above to continue."}
+        </p>
+      </div>
     </div>
+  );
+}
+
+function Point({
+  icon,
+  title,
+  children,
+}: {
+  icon: ReactNode;
+  title: string;
+  children: ReactNode;
+}) {
+  return (
+    <li className="flex gap-3">
+      <span className="mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
+        {icon}
+      </span>
+      <div className="min-w-0 text-sm">
+        <p className="font-medium">{title}</p>
+        <p className="text-muted-foreground">{children}</p>
+      </div>
+    </li>
   );
 }
