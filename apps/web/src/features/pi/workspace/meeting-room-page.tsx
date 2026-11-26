@@ -205,17 +205,42 @@ function RoomView() {
                 />
               ) : (
                 <>
-                  <p className="text-sm text-muted-foreground">
-                    {left
-                      ? "You left the call. It is still open for the others."
-                      : "Your camera and microphone are asked for only after you press the button."}
-                  </p>
+                  {left ? (
+                    <p className="text-sm text-muted-foreground">
+                      You left the call. It is still open for the others.
+                    </p>
+                  ) : (
+                    <div className="space-y-2">
+                      <p className="text-sm font-medium">How this works</p>
+                      <ol className="list-decimal space-y-1 pl-5 text-sm text-muted-foreground">
+                        <li>
+                          Press <strong>Enter the room</strong>. Your browser
+                          asks for the microphone only then; the camera is
+                          optional.
+                        </li>
+                        <li>
+                          Make an invite link (right side) and send it to your
+                          customer.
+                        </li>
+                        <li>
+                          Optional: let pi speak. It tells everyone it is an AI
+                          first, and you can mute it at any moment.
+                        </li>
+                        <li>
+                          When you finish, press{" "}
+                          <strong>End for everyone</strong>. The transcript is
+                          ready about a minute later.
+                        </li>
+                      </ol>
+                    </div>
+                  )}
                   {enterButton}
                 </>
               )}
             </CardBody>
           </Card>
           <div className="space-y-4">
+            <MeetingInvite id={id} room audio={room.audio} />
             <PiSpeaks
               pi={room.pi}
               busy={setPi.isPending}
@@ -235,7 +260,6 @@ function RoomView() {
                   remove.mutate(participantId);
               }}
             />
-            <MeetingInvite id={id} room audio={room.audio} />
           </div>
         </div>
       )}
@@ -277,9 +301,10 @@ function PiSpeaks({
           </span>
         </div>
         <p className="text-xs text-muted-foreground">
-          When on, pi introduces itself as an AI first, then answers when
-          someone says its name. It never quotes prices or asks for payment
-          details.
+          When on, pi first says out loud that it is an AI. After that it
+          answers when someone says &ldquo;pi&rdquo;, or leads when you tick the
+          box below. It never quotes prices or asks for payment details. People
+          who talk over pi stop it at once.
         </p>
         <div className="flex flex-wrap gap-2">
           <Button
@@ -311,8 +336,8 @@ function PiSpeaks({
               onChange={(e) => onChange({ intake: e.target.checked })}
             />
             <span>
-              Let pi lead the conversation when there is exactly one customer in
-              the room
+              Let pi greet and ask questions when one customer is alone in the
+              room (no need to say &ldquo;pi&rdquo;)
             </span>
           </label>
         )}

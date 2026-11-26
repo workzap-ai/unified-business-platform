@@ -124,32 +124,36 @@ export function MeetingRoomGuest({
     );
   return (
     <div className="space-y-3">
-      <div className="space-y-1.5 rounded-lg border border-border bg-surface-muted p-3 text-xs">
+      <div className="space-y-2 rounded-lg border border-border bg-surface-muted p-3 text-sm">
         <p className="flex items-center gap-1.5 font-medium">
-          <Lock className="size-3.5" aria-hidden /> Before you join
+          <Lock className="size-4" aria-hidden /> Before you join, please know
         </p>
-        <ul className="list-disc space-y-1 pl-4 text-muted-foreground">
+        <ul className="list-disc space-y-1.5 pl-5 text-muted-foreground">
           <li>
-            This is a video call. pi, an AI assistant, is in the room: it
-            listens and writes down what is said. The host may let pi speak too.
-            If it does, it first says that it is an AI, and its voice is
-            computer-generated.
+            <strong className="text-foreground">pi is an AI.</strong> It is in
+            this call, listens and writes down what is said. If the host
+            switches it on, pi can also speak: it always says first that it is
+            an AI, and its voice is computer-generated.
           </li>
           <li>
+            <strong className="text-foreground">Your voice.</strong>{" "}
             {audio
-              ? "Your voice is recorded briefly, only to turn what you say into text for this meeting. The recording is deleted as soon as the text is made. Phone, card and ID numbers are taken out of the text."
-              : "What you say is turned into text for this meeting. Phone, card and ID numbers are taken out of the text."}
+              ? "It is recorded briefly, only to turn it into text, then deleted. Phone, card and ID numbers are removed from the text."
+              : "It is turned into text for this meeting. Phone, card and ID numbers are removed from the text."}
           </li>
           <li>
-            The host&apos;s team can read it. pi may summarise it, and after
-            their review points from it can be saved to the customer&apos;s
-            record.
+            <strong className="text-foreground">Who sees it.</strong> The
+            host&apos;s team can read the text. pi may summarise it, and after
+            their review points can be saved to your record.
           </li>
-          <li>You can leave at any time.</li>
+          <li>
+            <strong className="text-foreground">You are free to go.</strong> You
+            can leave at any time.
+          </li>
         </ul>
       </div>
       <div>
-        <Label htmlFor="room-name">Your name (optional)</Label>
+        <Label htmlFor="room-name">Your name (optional, shown to others)</Label>
         <Input
           id="room-name"
           value={name}
@@ -179,8 +183,12 @@ export function MeetingRoomGuest({
         loading={busy}
         onClick={() => void enter()}
       >
-        <Video /> Continue to the room
+        <Video /> Join the call
       </Button>
+      <p className="text-xs text-muted-foreground">
+        Next, your browser will ask to use your microphone. Press Allow so
+        people can hear you.
+      </p>
     </div>
   );
 }
