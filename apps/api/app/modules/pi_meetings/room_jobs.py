@@ -15,7 +15,7 @@ from sqlalchemy import select
 
 from app.ai.manager import build_llm_manager
 from app.modules.audit.service import record
-from app.modules.pi_meetings import native_stt
+from app.modules.pi_meetings import auto_analyse, native_stt
 from app.modules.pi_meetings import room_limits as limits
 from app.modules.pi_meetings.guest_routes import system_scope
 from app.modules.pi_meetings.models import PiMeeting, PiMeetingRoom
@@ -50,6 +50,14 @@ async def finish_meeting_room(ctx: dict[str, Any], room_id: str) -> None:
         manager = build_llm_manager(ctx["settings"], ctx["http"], ctx["sessions"])
         await native_stt.finalize(session, scope, meeting, room, provider, manager)
         await session.commit()
+        if room.transcript_state == "done":
+            # the transcript exists: pi drafts the findings so the team finds them waiting. Drafts
+            # only; a failure here never undoes the transcript (the "Analyse" button still works).
+            try:
+                await auto_analyse.analyse_finished_meeting(session, scope, meeting, manager)
+            except Exception:  # noqa: BLE001
+                logger.warning("room_auto_analysis_error", extra={"room": room_id})
+                await session.rollback()
 
 
 async def close_rooms(ctx: dict[str, Any]) -> int:
