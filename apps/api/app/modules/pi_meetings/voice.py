@@ -21,6 +21,7 @@ from typing import Any
 from pydantic import BaseModel, ConfigDict
 
 from app.modules.pi import constitution, shared_memory
+from app.modules.pi import language as pi_language
 from app.modules.pi.memory_ledger import redacted
 from app.modules.pi_meetings import meeting_memory, spoken_rules
 from app.modules.pi_meetings.insight_rules import PRICE
@@ -47,11 +48,20 @@ letters are mispronounced. Answer in English when they speak English.
 - Warm and natural, like a kind person who is really listening. Begin, when it fits, with a few
   words that show you heard them (for example "I see", "Got it", "اچھا", "سمجھ گیا"), never the
   same one twice in a row.
-- One or two short sentences a person can say aloud. The last sentence is ONE question; it is the
-  only question.
-- Ask about their business and what is hard: what, when, how often, what it costs them in time or
-  money, what they already tried. Build on the exact words they just said; do not repeat a question
-  already asked, and never ask what they already told you.
+- Answer in the language the body names in reply_in, and stay in it even if one of their words
+  is in another language.
+- One or two short sentences a person can say aloud. You are a listener, not an interviewer: after
+  they answer, first show you understood. Say back the key facts and what it costs them, in their
+  own words, as a short summary and not a repeat. Ask a question only when an important fact is
+  still missing (what, how often, what it costs them in time or money, what they already tried),
+  and then ONE short question as the last sentence. The body's question_policy says when you must
+  not ask ("none": reflect and let them continue, with no question mark at all).
+- If they ask you something (how to grow, which system, how much): do not give advice, a fix, a
+  product or a price. Say in one short sentence that a person from the Workzap team shows options
+  once your picture of their situation is complete, say what you understood so far, and ask at most
+  one question.
+- Build on the exact words they just said; never repeat a question already asked and never ask what
+  they already told you.
 - Never a price, a quote, advice, a fix, a promise or a product. Never ask for money, a card, a
   password, a code or an ID number. Do not say you will do anything for them.
 - If they ask whether you are a person, say plainly that you are an AI.
@@ -171,8 +181,8 @@ def allowed(reply: str, ctx: dict[str, Any]) -> str:
     if not text or len(text) > SPOKEN_CHARS:
         return ""
     marks = text.count("?") + text.count("؟")
-    if marks != 1 or not text.endswith(("?", "؟")):
-        return ""  # exactly one question and it is the last thing said
+    if marks > 1 or (marks == 1 and not text.endswith(("?", "؟"))):
+        return ""  # at most one question, and when there is one it is the last thing said
     if PRICE.search(text) or FORBIDDEN_ASK.search(text):
         return ""
     asked = re.search(rf"{IDENTITY_MARK} ([^\W\d_]+)\?", text)  # the opening's own name question
@@ -181,6 +191,67 @@ def allowed(reply: str, ctx: dict[str, Any]) -> str:
     if constitution.hard(constitution.lint(text, ctx)):
         return ""
     return text
+
+
+ARABIC_LETTERS = re.compile(r"[\u0600-\u06FF]")
+REPLY_IN = {
+    "en": "English",
+    "roman_ur": "Urdu, written in Urdu script",
+    "ur": "Urdu, written in Urdu script",
+    "ar": "Arabic",
+}
+
+
+def reply_language(history: Sequence["Said"], heard: str, room_language: str = "") -> str:
+    """The language pi answers in, decided by code: that of the person's latest words; when those
+    are unclear (one word, a name) the language they spoke before; then the room's setting; then
+    English. The model never chooses it, so it cannot drift between Urdu and English."""
+    found = pi_language.detect_language(heard)
+    if found is None:
+        for line in reversed(history):
+            if not line.pi:
+                found = pi_language.detect_language(line.text)
+                if found:
+                    break
+    if found is None:
+        found = {"ur": "roman_ur", "ar": "ar", "en": "en"}.get(room_language)
+    return found or "en"
+
+
+def opening_language(heard: str, room_language: str = "") -> str:
+    """The language code of pi's introduction, from what the person first said."""
+    found = pi_language.detect_language(heard)
+    if found in ("ur", "roman_ur"):
+        return "ur"
+    if found == "ar":
+        return "ar"
+    if found == "en" and len(heard.split()) >= 3:
+        return ""  # a clear English sentence; a bare "hello" does not undo the room's setting
+    return room_language
+
+
+def in_reply_language(reply: str, lang: str) -> bool:
+    """A reply is in the language asked for by its script: no Urdu letters in English, Urdu
+    letters in Urdu (a few are enough: a name or a number may be in Latin letters)."""
+    arabic = len(ARABIC_LETTERS.findall(reply))
+    if lang == "en":
+        return arabic == 0
+    if lang in ("ur", "roman_ur"):
+        return arabic >= 3
+    return True
+
+
+def question_policy(history: Sequence["Said"]) -> str:
+    """'none' when pi's last two lines were both questions: this one reflects what it understood and
+    asks nothing. 'optional' otherwise: it asks only when an important fact is still missing."""
+    last = [h.text.rstrip().endswith(("?", "؟")) for h in history if h.pi][-2:]
+    return "none" if len(last) == 2 and all(last) else "optional"
+
+
+def _off_brief(reply: str, lang: str, policy: str) -> bool:
+    return not in_reply_language(reply, lang) or (
+        policy == "none" and ("?" in reply or "؟" in reply)
+    )
 
 
 def _seen(ctx: dict[str, Any]) -> str:
@@ -206,10 +277,14 @@ async def reply_to(
     from app.ai.types import Message
 
     ctx = context(history, heard)
+    lang = reply_language(history, heard, language)
+    policy = question_policy(history)
+    ctx["reply_language"] = {"roman_ur": "ur"}.get(lang, lang) if lang != "en" else ""
     block = meeting_memory.speakable(what_i_know or {})
     seen = " ".join([*(h.text for h in history), heard])
     body: dict[str, Any] = {
-        "language": language or "unknown",
+        "reply_in": REPLY_IN.get(lang, "English"),
+        "question_policy": policy,
         "conversation": [
             {"who": "pi" if h.pi else "owner", "text": h.text[:LINE_CHARS]}
             for h in history[-HISTORY_LINES:]
@@ -217,27 +292,37 @@ async def reply_to(
         "owner_just_said": heard[:HEARD_CHARS],
     }
     shared_memory.attach(body, block)  # a no-op when there is no memory
-    payload = json.dumps(body, ensure_ascii=False)
     system = SYSTEM + (MEMORY_NOTE + shared_memory.system_line(block) if block else "")
-    value: Any = None
-    for attempt in range(len(RETRY_PAUSES) + 1):
-        try:
-            result = await manager.complete_structured(
-                scope,
-                ModelReply,
-                alias="fast",
-                purpose=PURPOSE,
-                messages=[Message.system(system), Message.user(payload)],
-                temperature=0.3,
-                max_tokens=200,
-            )
-            value = result.value
-            break
-        except GatewayUnavailable:
-            if attempt == len(RETRY_PAUSES):
-                logger.warning("pi_meeting_voice_model_unavailable")
-                break
-            await asyncio.sleep(RETRY_PAUSES[attempt])
+
+    async def ask(note: str = "") -> Any:
+        payload = json.dumps({**body, **({"correction": note} if note else {})}, ensure_ascii=False)
+        for attempt in range(len(RETRY_PAUSES) + 1):
+            try:
+                result = await manager.complete_structured(
+                    scope,
+                    ModelReply,
+                    alias="fast",
+                    purpose=PURPOSE,
+                    messages=[Message.system(system), Message.user(payload)],
+                    temperature=0.3,
+                    max_tokens=200,
+                )
+                return result.value
+            except GatewayUnavailable:
+                if attempt == len(RETRY_PAUSES):
+                    logger.warning("pi_meeting_voice_model_unavailable")
+                    return None
+                await asyncio.sleep(RETRY_PAUSES[attempt])
+        return None
+
+    value: Any = await ask()
+    if isinstance(value, ModelReply) and not value.done and _off_brief(value.reply, lang, policy):
+        # one correction, then the safe line: the language and the question rule are held by code
+        note = (
+            f"Your last reply was not allowed. Write it only in {REPLY_IN.get(lang, 'English')}"
+            + (" and with no question at all." if policy == "none" else ".")
+        )
+        value = await ask(note) or value
     if isinstance(value, ModelReply):
         if value.done:
             closing = redacted(value.reply, SPOKEN_CHARS)
@@ -252,6 +337,8 @@ async def reply_to(
             ):
                 return Spoken(closing, fallback=False, done=True)
         said = allowed(value.reply, ctx)
+        if said and _off_brief(said, lang, policy):
+            said = ""
         if said and not _repeats(said, history) and not meeting_memory.leaks(said, seen, block):
             return Spoken(said, fallback=False)
     return Spoken(constitution.safe_fallback(ctx), fallback=True)

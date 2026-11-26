@@ -235,3 +235,83 @@ async def test_a_dot_or_a_you_after_pi_spoke_does_not_make_pi_answer_again():
     assert await say(speech, manager, "Thank you.", keep_pause=True) == "unheard"
     assert len(manager.tts) == 1  # only the introduction was ever spoken
     assert await say(speech, manager, "bargaining customers", keep_pause=True) == "spoke"
+
+
+def test_the_language_is_decided_by_code_from_the_latest_words_then_the_earlier_ones():
+    from app.modules.pi_meetings import voice
+
+    pi = voice.Said(True, "Hi, I'm pi, an AI from Workzap. What does your business do?")
+    urdu = voice.Said(False, "meri kapron ki dukaan hai aur orders miss ho jate hain")
+    assert voice.reply_language([pi], "I run a small clothing shop") == "en"
+    assert (
+        voice.reply_language([pi], "meri kapron ki dukaan hai aur orders miss ho jate hain")
+        == "roman_ur"
+    )
+    # one unclear word keeps the language they spoke before
+    assert voice.reply_language([pi, urdu], "bargaining") == "roman_ur"
+    assert voice.reply_language([pi, voice.Said(False, "I run a shop")], "ok") == "en"
+    # nothing to go on: the room's setting, then English
+    assert voice.reply_language([], "ok", "ur") == "roman_ur"
+    assert voice.reply_language([], "ok") == "en"
+    assert voice.opening_language("meri dukaan hai kapron ki", "") == "ur"
+    assert voice.opening_language("I run a shop", "ur") == ""
+
+
+def test_the_script_of_a_reply_must_match_the_language_and_two_questions_are_followed_by_none():
+    from app.modules.pi_meetings import voice
+
+    assert voice.in_reply_language("I see, that is hard.", "en")
+    assert not voice.in_reply_language("اچھا، سمجھ گیا۔", "en")
+    assert voice.in_reply_language("اچھا، سمجھ گیا۔", "roman_ur")
+    assert not voice.in_reply_language("Achha, samajh gaya.", "roman_ur")
+    q = voice.Said(True, "What does your business do?")
+    s = voice.Said(True, "I see, bargaining hurts your margin.")
+    assert voice.question_policy([q]) == "optional"
+    assert voice.question_policy([q, voice.Said(False, "x"), q]) == "none"
+    assert voice.question_policy([q, voice.Said(False, "x"), s]) == "optional"
+
+
+async def test_a_wrong_language_reply_is_corrected_once_and_then_it_is_the_safe_line():
+    from test_pi_room_speech import Manager  # noqa: F401
+
+    from app.modules.pi_meetings import voice
+
+    class Replies(Manager):
+        def __init__(self, *replies):
+            super().__init__()
+            self.replies = list(replies)
+            self.notes = []
+
+        async def complete_structured(self, scope, model, **kw):
+            payload = kw["messages"][-1].content
+            self.notes.append("correction" in payload)
+            reply = self.replies.pop(0) if self.replies else self.replies_last
+            self.replies_last = reply
+            return type("R", (), {"value": model(reply=reply)})()
+
+    pi = voice.Said(True, voice.opening())
+    scope = WorkspaceScope.system(uuid4(), uuid4(), frozenset(), "t")
+    # English asked, Urdu written, then English: one correction fixes it
+    first = Replies(
+        "اچھا، سمجھ گیا۔ کیا آرڈر چھوٹ جاتے ہیں؟", "I see, orders get missed. How often?"
+    )
+    said = await voice.reply_to(first, scope, [pi], "orders get missed when we are busy")
+    assert said.text == "I see, orders get missed. How often?" and first.notes == [False, True]
+    # still wrong after the correction: the safe line, never the wrong language
+    second = Replies("اچھا، سمجھ گیا۔ کیا آرڈر چھوٹ جاتے ہیں؟")
+    said = await voice.reply_to(second, scope, [pi], "orders get missed when we are busy")
+    assert said.fallback is True
+    # two questions in a row: the next reply must carry no question
+    q = voice.Said(True, "How often do orders get missed?")
+    third = Replies("What does that cost you?", "I see, that costs you customers.")
+    history = [pi, voice.Said(False, "we sell clothes"), q, voice.Said(False, "twice a week")]
+    said = await voice.reply_to(third, scope, history, "about ten thousand rupees a month")
+    assert "?" not in said.text and third.notes == [False, True]
+
+
+async def test_the_introduction_is_in_the_language_the_person_first_spoke():
+    speech, manager, clock = build(customers=1)
+    assert await say(speech, manager, "meri kapron ki dukaan hai aur orders miss hote hain") == (
+        "disclosed"
+    )
+    assert "مصنوعی ذہانت" in manager.tts[0][0]

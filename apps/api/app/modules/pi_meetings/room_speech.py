@@ -265,7 +265,9 @@ class RoomSpeech:
                 # a first name is asked about only when one customer is alone in the room: the
                 # question is who it is, and memory stays unused until a clear yes
                 name = meeting_memory.first_name(block) if block and self.customers() == 1 else ""
-                line = voice.opening(name=name, language=state.settings.language)
+                line = voice.opening(
+                    name=name, language=voice.opening_language(heard, state.settings.language)
+                )
             else:
                 before = voice.confirm_state(state.history)
                 answered = voice.confirm_state([*state.history, voice.Said(False, heard)])

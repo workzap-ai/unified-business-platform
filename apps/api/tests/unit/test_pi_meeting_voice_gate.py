@@ -34,9 +34,22 @@ def test_one_short_question_at_the_end_is_allowed(reply):
 @pytest.mark.parametrize(
     "reply",
     [
+        "I see. Bargaining customers are cutting into your margin.",
+        "سمجھ گیا۔ گاہکوں کی بحث آپ کے منافع کو کم کرتی ہے۔",
+    ],
+)
+def test_a_reply_that_only_shows_it_understood_is_allowed(reply):
+    """pi is a listener, not an interviewer: a turn may carry no question at all."""
+    assert voice.allowed(reply, ctx()) == reply
+
+
+@pytest.mark.parametrize(
+    "reply",
+    [
         "",
         "How often? And since when?",  # two questions
-        "How often does it run out",  # no question
+        "How often? I see. And since when?",  # two questions, and not the last thing said
+        "Is that right? I see.",  # a question that is not the last thing said
         "I can fix that for Rs 5000. Want it?",  # a price and a sale
         "You should buy our software. How often does it run out?",  # selling
         "Please send your card number. Is that fine?",  # asks for a card
