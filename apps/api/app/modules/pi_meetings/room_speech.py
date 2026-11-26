@@ -14,6 +14,7 @@ import asyncio
 import io
 import logging
 import os
+import re
 import wave
 from array import array
 from collections.abc import Awaitable, Callable
@@ -32,6 +33,9 @@ from app.shared.scope import WorkspaceScope
 logger = logging.getLogger(__name__)
 
 STT_ALIAS = "stt_multi"
+# speech-to-text writes "pi" as "hi", "pie" or "bye"; a spelling hint fixes most of it
+STT_HINT = "Workzap, pi."
+STT_HINT_ECHOES = frozenset({"workzap pi", "pi workzap"})
 STT_PURPOSE = "meeting_room_stt"
 STT_RATE = 16000  # a turn is sent to speech to text at this rate
 TTS_RATE = 24000  # the rate of raw speech from the text to speech service
@@ -154,11 +158,15 @@ class RoomSpeech:
                 alias=STT_ALIAS,
                 purpose=STT_PURPOSE,
                 language=self.session.settings.language or None,
+                prompt=STT_HINT,
             )
         except GatewayUnavailable:
             logger.warning("room_speech_stt_unavailable")
             return ""
-        return redacted(join_spoken_digits(result.text or ""), HEARD_CHARS)
+        text = redacted(join_spoken_digits(result.text or ""), HEARD_CHARS)
+        if re.sub(r"[^a-z]+", " ", text.lower()).strip() in STT_HINT_ECHOES:
+            return ""  # the model repeated the hint on a near-silent turn: nobody said it
+        return text
 
     async def on_turn(self, turn: Turn) -> str:
         """Handle a finished turn. Returns what happened: the reason pi stayed silent, or

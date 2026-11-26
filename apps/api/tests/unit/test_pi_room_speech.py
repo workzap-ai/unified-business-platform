@@ -187,3 +187,28 @@ def test_resampling_keeps_length_ratio_and_wav_is_valid():
     up = room_speech.resample(down, 16000, 48000)
     assert len(up) == len(PCM)
     assert room_speech.wav(down, 16000)[:4] == b"RIFF"
+
+
+async def test_the_speech_to_text_gets_the_spelling_hint_and_an_echo_of_it_is_dropped():
+    from app.modules.pi_meetings import room_speech
+
+    asked = {}
+    manager = Manager(heard="Workzap, pi.")
+    original = manager.transcribe
+
+    async def spy(*a, **k):
+        asked.update(k)
+        return await original(*a, **k)
+
+    manager.transcribe = spy
+    speech = RoomSpeech(
+        manager=manager,
+        scope=WorkspaceScope.system(uuid4(), uuid4(), frozenset(), "t"),
+        session=Session(Settings(mode="speak")),
+        out=Out(),
+        customers=lambda: 1,
+        someone_speaking=lambda: False,
+        clock=lambda: 100.0,
+    )
+    assert await speech.hear(Turn("g_1", b"\x10\x00" * 48000, 48000, 0.0, 1.0)) == ""
+    assert asked["prompt"] == room_speech.STT_HINT
