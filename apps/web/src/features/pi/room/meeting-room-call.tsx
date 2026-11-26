@@ -3,17 +3,21 @@
 import "@stream-io/video-react-sdk/dist/css/styles.css";
 import { useEffect, useRef, useState } from "react";
 import {
-  CallControls,
   CallingState,
+  CancelCallButton,
+  OwnCapability,
   SpeakerLayout,
   StreamCall,
   StreamTheme,
   StreamVideo,
   StreamVideoClient,
+  ToggleAudioPublishingButton,
+  ToggleVideoPublishingButton,
   useCallStateHooks,
   type Call,
+  type StreamVideoParticipant,
 } from "@stream-io/video-react-sdk";
-import { Bot, Video } from "lucide-react";
+import { Bot, MonitorOff, MonitorUp, Users, Video } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Notice } from "@/components/app/states";
 import type { RoomCredentials } from "../meeting-room-service";
@@ -33,6 +37,150 @@ function EndWatch({ onClosed }: { onClosed: () => void }) {
     if (state === CallingState.LEFT) onClosed();
   }, [state, onClosed]);
   return null;
+}
+
+/** The agent's id in the room (the server's `AGENT_USER`): never a staff or guest id. */
+const PI_USER = "pi_agent";
+
+/** What a tile shows while a person's camera is off: pi gets its own face that pulses while it talks. */
+function Face({ participant }: { participant: StreamVideoParticipant }) {
+  const isPi = participant.userId === PI_USER;
+  const initials = (participant.name || participant.userId || "?")
+    .trim()
+    .slice(0, 2)
+    .toUpperCase();
+  return (
+    <div className="flex size-full items-center justify-center bg-surface-muted">
+      <div className="relative">
+        {participant.isSpeaking && (
+          <span
+            aria-hidden
+            className="absolute -inset-2 animate-ping rounded-full bg-primary/30"
+          />
+        )}
+        <div
+          className={`relative flex size-20 items-center justify-center rounded-full text-xl font-semibold ring-4 ${
+            participant.isSpeaking ? "ring-primary" : "ring-transparent"
+          } ${isPi ? "bg-primary text-primary-foreground" : "bg-muted text-foreground"}`}
+        >
+          {isPi ? <Bot className="size-9" aria-hidden /> : initials}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/** Live timer, how many people are here, and what pi is doing right now. */
+function RoomBar() {
+  const { useParticipants } = useCallStateHooks();
+  const participants = useParticipants();
+  const pi = participants.find((p) => p.userId === PI_USER);
+  const people = participants.filter((p) => p.userId !== PI_USER).length;
+  const [secs, setSecs] = useState(0);
+  useEffect(() => {
+    const t = setInterval(() => setSecs((s) => s + 1), 1000);
+    return () => clearInterval(t);
+  }, []);
+  const clock = `${String(Math.floor(secs / 60)).padStart(2, "0")}:${String(secs % 60).padStart(2, "0")}`;
+  const piText = !pi
+    ? "pi is joining"
+    : pi.isSpeaking
+      ? "pi is speaking"
+      : "pi is listening";
+  return (
+    <div className="flex flex-wrap items-center gap-2 text-xs">
+      <span className="inline-flex items-center gap-1.5 rounded-full bg-surface-muted px-2.5 py-1 font-medium">
+        <span
+          aria-hidden
+          className="size-2 animate-pulse rounded-full bg-red-500"
+        />
+        Live {clock}
+      </span>
+      <span className="inline-flex items-center gap-1.5 rounded-full bg-surface-muted px-2.5 py-1">
+        <Users className="size-3.5" aria-hidden /> {people}{" "}
+        {people === 1 ? "person" : "people"}
+      </span>
+      <span
+        aria-live="polite"
+        className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 font-medium ${
+          pi?.isSpeaking
+            ? "bg-primary text-primary-foreground"
+            : "bg-surface-muted"
+        }`}
+      >
+        <Bot className="size-3.5" aria-hidden /> {piText} (AI)
+      </span>
+    </div>
+  );
+}
+
+/** Share your screen: one clear button, a banner while sharing, and plain words when it cannot work. */
+function ShareScreen({ onError }: { onError: (message: string) => void }) {
+  const { useScreenShareState, useHasPermissions } = useCallStateHooks();
+  const { screenShare, isMute } = useScreenShareState();
+  const allowed = useHasPermissions(OwnCapability.SCREENSHARE);
+  const supported =
+    typeof navigator !== "undefined" &&
+    typeof navigator.mediaDevices?.getDisplayMedia === "function";
+  const sharing = !isMute;
+  const disabled = !supported || !allowed;
+  async function toggle() {
+    onError("");
+    try {
+      await screenShare.toggle();
+    } catch (e) {
+      const name = (e as { name?: string })?.name;
+      onError(
+        name === "NotAllowedError"
+          ? "Screen sharing was cancelled or not allowed. Press Share again and choose a screen or window."
+          : "Could not share your screen. Try again.",
+      );
+    }
+  }
+  return (
+    <button
+      type="button"
+      onClick={() => void toggle()}
+      disabled={disabled}
+      aria-pressed={sharing}
+      title={
+        !supported
+          ? "Screen sharing is not available in this browser or on this device (phones usually cannot share a screen)."
+          : !allowed
+            ? "You are not allowed to share your screen in this room."
+            : sharing
+              ? "Stop sharing your screen"
+              : "Share your screen"
+      }
+      className={`inline-flex h-11 items-center gap-2 rounded-full px-4 text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50 ${
+        sharing
+          ? "bg-primary text-primary-foreground"
+          : "bg-surface-muted hover:bg-muted"
+      }`}
+    >
+      {sharing ? (
+        <MonitorOff className="size-4" aria-hidden />
+      ) : (
+        <MonitorUp className="size-4" aria-hidden />
+      )}
+      {sharing ? "Stop sharing" : "Share screen"}
+    </button>
+  );
+}
+
+function SharingBanner() {
+  const { useScreenShareState } = useCallStateHooks();
+  const { isMute } = useScreenShareState();
+  if (isMute) return null;
+  return (
+    <p
+      role="status"
+      className="rounded-lg bg-primary/10 px-3 py-2 text-xs font-medium text-primary"
+    >
+      You are sharing your screen. Everyone in the room, and pi, can see it. pi
+      does not read it; only what is said is written down.
+    </p>
+  );
 }
 
 function Captions() {
@@ -156,16 +304,26 @@ export function MeetingRoomCall({
       <StreamCall call={live.call}>
         <StreamTheme>
           <div className="space-y-3">
+            <RoomBar />
             <p className="flex items-center gap-2 text-xs text-muted-foreground">
               <Bot className="size-3.5" aria-hidden /> pi (AI) is writing a
               transcript of this call.
             </p>
             {error && <Notice tone="danger">{error}</Notice>}
-            <div className="h-[60dvh] min-h-72 overflow-hidden rounded-lg">
-              <SpeakerLayout />
+            <SharingBanner />
+            <div className="h-[60dvh] min-h-72 overflow-hidden rounded-xl border border-border">
+              <SpeakerLayout
+                participantsBarPosition="bottom"
+                VideoPlaceholder={Face}
+              />
             </div>
             <Captions />
-            <CallControls onLeave={() => leave()} />
+            <div className="str-video__call-controls flex flex-wrap items-center justify-center gap-2">
+              <ToggleAudioPublishingButton />
+              <ToggleVideoPublishingButton />
+              <ShareScreen onError={setError} />
+              <CancelCallButton onLeave={() => leave()} />
+            </div>
             <EndWatch onClosed={() => leave("ended")} />
           </div>
         </StreamTheme>
