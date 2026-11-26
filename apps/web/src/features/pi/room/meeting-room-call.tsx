@@ -341,6 +341,10 @@ export function MeetingRoomCall({
               <ShareScreen onError={setError} />
               <CancelCallButton onLeave={() => leave()} />
             </div>
+            <p className="text-center text-xs text-muted-foreground">
+              Your camera and screen stay off until you turn them on. Video is
+              shown live to the room and is never recorded.
+            </p>
             <EndWatch onClosed={() => leave("ended")} />
           </div>
         </StreamTheme>

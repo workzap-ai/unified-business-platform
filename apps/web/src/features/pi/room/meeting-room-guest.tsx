@@ -142,6 +142,11 @@ export function MeetingRoomGuest({
               : "It is turned into text for this meeting. Phone, card and ID numbers are removed from the text."}
           </li>
           <li>
+            <strong className="text-foreground">Camera and screen.</strong> They
+            stay off until you turn them on. If you do, the people in the room
+            see them live; video is never recorded or saved.
+          </li>
+          <li>
             <strong className="text-foreground">Who sees it.</strong> The
             host&apos;s team can read the text. pi may summarise it, and after
             their review points can be saved to your record.
