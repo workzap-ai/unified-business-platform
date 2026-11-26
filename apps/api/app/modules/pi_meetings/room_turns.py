@@ -102,7 +102,10 @@ def decide(utterance: Utterance, state: RoomState) -> Decision:
         return _silent("asked_to_be_quiet")
     named = addressed(utterance.text)
     from_staff = utterance.speaker_id.startswith("s_")
-    enough = len(WORD.findall(utterance.text)) >= INTAKE_MIN_WORDS or state.answering
+    # pi asked a question a moment ago: even a one-word answer is an answer, not a murmur
+    enough = (
+        len(WORD.findall(utterance.text)) >= INTAKE_MIN_WORDS or state.answering or state.replying
+    )
     lone_customer = state.intake and state.customers == 1 and not from_staff and enough
     # with more people pi still introduces itself on its own (everyone should know an AI is
     # in the room, whoever speaks first), and afterwards it answers whoever answers its own

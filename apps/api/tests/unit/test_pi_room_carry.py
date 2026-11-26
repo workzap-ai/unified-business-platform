@@ -137,3 +137,37 @@ async def test_pi_does_not_answer_an_answer_in_the_same_breath():
     speech.session.last_spoke_at = clock.t  # pi finished speaking just now
     manager.heard = "we sell clothes online"
     assert await speech.on_turn(Turn("g_2", b"\x10\x00" * 48000, 48000, 0.0, 1.0)) == "cooldown"
+
+
+async def test_a_one_word_answer_to_pis_question_is_answered_but_a_murmur_later_is_not():
+    """Found live: pi asked what the business does, the customer said one word, and pi stayed silent
+    because one word is too short to start a conversation. An answer to pi's own question counts."""
+    speech, manager, clock = build(customers=1)
+    assert await say(speech, manager, "hello, I run a small shop") == "disclosed"
+    clock.t += 4
+    assert await say(speech, manager, "clothes", keep_pause=True) == "spoke"
+    clock.t += room_speech.room_turns.ANSWER_S + 5
+    assert await say(speech, manager, "clothes", keep_pause=True) == "not_addressed"
+
+
+async def test_pi_waits_a_moment_for_someone_who_is_still_talking_instead_of_dropping_its_answer(
+    monkeypatch,
+):
+    import asyncio
+
+    state = {"until": 0.0}
+    loop_start = asyncio.get_event_loop().time()
+    speech, manager, clock = build(
+        talking=lambda: asyncio.get_event_loop().time() - loop_start < state["until"]
+    )
+    monkeypatch.setattr(room_speech, "START_WAIT_S", 1.0)
+    state["until"] = 0.0  # nobody talking while pi decides ...
+    original = manager.synthesize
+
+    async def synthesize(*a, **k):
+        state["until"] = (asyncio.get_event_loop().time() - loop_start) + 0.3  # ... a person starts
+        return await original(*a, **k)
+
+    manager.synthesize = synthesize
+    assert await say(speech, manager, "hello, I run a small shop") == "disclosed"
+    assert speech.out.written  # it waited for the person to finish, then spoke

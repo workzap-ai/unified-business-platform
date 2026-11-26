@@ -42,6 +42,9 @@ TTS_RATE = 24000  # the rate of raw speech from the text to speech service
 # a person's short pieces of one sentence are joined for this long (a pause ends a turn at 0.8 s,
 # and people pause inside a sentence): pi answers the whole sentence, not its first breath
 CARRY_S = 10.0
+# when someone is still talking at the moment pi is ready, pi waits this long for them to
+# finish instead of throwing its answer away
+START_WAIT_S = 2.0
 CARRY_REASONS = frozenset({"someone_speaking", "not_addressed"})
 CARRY_CHARS = 600
 PIECE_S = 0.2  # pi's audio goes out in pieces this long; a cut-off takes effect at the next one
@@ -295,6 +298,10 @@ class RoomSpeech:
         pcm = resample(speech.audio, TTS_RATE, TTS_RATE * 2)
         piece = int(TTS_RATE * 2 * PIECE_S) * 2  # bytes
         self._cut.clear()
+        waited = 0.0
+        while self.someone_speaking() and waited < START_WAIT_S and not self._cut.is_set():
+            await asyncio.sleep(0.1)
+            waited += 0.1
         self.speaking = True
         spoke = False
         finished = False
