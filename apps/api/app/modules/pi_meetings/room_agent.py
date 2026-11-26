@@ -26,6 +26,7 @@ logger = logging.getLogger(__name__)
 
 AGENT_USER = "pi_agent"  # the agent's own id in the room: never s_ (staff) or g_ (guest)
 MAX_PENDING = 3  # turns being transcribed or answered at once; more are dropped
+ACTIVE_S = 45.0  # a person who sent no sound for this long no longer counts as in the room
 
 
 def mono(pcm: bytes, channels: int) -> bytes:
@@ -57,16 +58,27 @@ class RoomRun:
         self._tasks: set[asyncio.Task[Any]] = set()
         self.dropped = 0
         self.frames: dict[str, int] = {}  # frames heard per person since the last report
+        self.seen: dict[str, float] = {}  # when each person last joined or made a sound
         speech.customers = self.customers
         speech.someone_speaking = self.cutter.speaking
 
     def customers(self) -> int:
-        """Different people in the room who are not staff (and not pi itself)."""
-        return sum(1 for p in self.people if p != self.user_id and not p.startswith("s_"))
+        """Different people in the room who are not staff (and not pi itself) and who joined or
+        made a sound lately. A guest who closed the page keeps a seat at the provider for a while
+        and must not make one customer look like a crowd."""
+        now = self.clock()
+        return sum(
+            1
+            for p in self.people
+            if p != self.user_id
+            and not p.startswith("s_")
+            and now - self.seen.get(p, 0.0) <= ACTIVE_S
+        )
 
     def joined(self, speaker_id: str) -> None:
         if speaker_id and speaker_id != self.user_id:
             self.people.add(speaker_id)
+            self.seen[speaker_id] = self.clock()
 
     def left(self, speaker_id: str) -> None:
         self.people.discard(speaker_id)
@@ -90,6 +102,7 @@ class RoomRun:
             return
         self.joined(speaker_id)
         self.frames[speaker_id] = self.frames.get(speaker_id, 0) + 1
+        self.seen[speaker_id] = self.clock()
         frame = room_speech.resample(mono(pcm, channels), sample_rate, self.cutter.sample_rate)
         if not frame:
             return
@@ -121,7 +134,8 @@ class RoomRun:
     async def _handle(self, turn: Turn) -> None:
         try:
             reason = await self.speech.on_turn(turn)
-            logger.info("room_turn reason=%s", reason)  # why pi spoke or not, never the words
+            # why pi spoke or not, and how many people it counts: never the words
+            logger.info("room_turn reason=%s customers=%d", reason, self.customers())
         except Exception:  # noqa: BLE001 - one bad turn must not stop the agent
             logger.exception("room_agent_turn_failed")
 

@@ -219,7 +219,7 @@ async def run_room(
             if ticks % 50 == 0:  # every 10 seconds
                 heard = run.report()
                 if heard:
-                    logger.info("room_audio frames=%s", heard)
+                    logger.info("room_audio frames=%s speaking=%s", heard, run.cutter.speaking())
 
     beat_task: asyncio.Task[None] | None = None
     tick_task: asyncio.Task[None] | None = None

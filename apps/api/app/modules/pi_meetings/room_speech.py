@@ -47,6 +47,11 @@ CARRY_S = 10.0
 START_WAIT_S = 2.0
 CARRY_REASONS = frozenset({"someone_speaking", "not_addressed"})
 CARRY_CHARS = 600
+# phrases the speech-to-text invents out of silence or music; nobody said them
+INVENTED = re.compile(
+    r"thanks? for watching|thank you for watching|subscribe|like and share|see you (next|in the)",
+    re.IGNORECASE,
+)
 PIECE_S = 0.2  # pi's audio goes out in pieces this long; a cut-off takes effect at the next one
 HEARD_CHARS = 600
 SAFETY_CHARS = 580  # the emergency line must fit one spoken turn (the gateway refuses 600+)
@@ -184,7 +189,7 @@ class RoomSpeech:
         """Handle a finished turn. Returns what happened: the reason pi stayed silent, or
         'disclosed' or 'spoke'."""
         text = await self.hear(turn)
-        if not text:
+        if not text or INVENTED.search(text):
             return "unheard"
         if os.environ.get("ROOM_LOG_HEARD") == "1":  # off by default: only for a test room
             logger.info("room_heard %s", text[:160])
@@ -230,6 +235,9 @@ class RoomSpeech:
                     customers=self.customers(),
                     intake=state.settings.intake,
                     answering=voice.confirm_state(state.history) == "pending",
+                    resumed=state.disclosed
+                    and state.last_spoke_at is not None
+                    and now - state.last_spoke_at > room_turns.ANSWER_S,
                     replying=bool(state.history)
                     and state.history[-1].pi
                     and state.last_spoke_at is not None
@@ -237,7 +245,7 @@ class RoomSpeech:
                 ),
             )
             if decision.action == "silent":
-                if decision.reason in CARRY_REASONS:
+                if decision.reason in CARRY_REASONS and not room_turns.is_filler(heard):
                     state.carry[turn.speaker_id] = (heard, now)  # may join this person's next piece
                 else:
                     state.history.append(voice.Said(False, heard))

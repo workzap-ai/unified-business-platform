@@ -179,3 +179,15 @@ async def test_a_turn_whose_frames_stop_is_ended_and_answered_by_the_clock():
     assert len(manager.stt_calls) == 1 and manager.tts  # heard, and pi answered
     assert run.report() == {"g_1": 75}  # frame counts only, never sound
     assert run.report() == {}
+
+
+def test_a_guest_who_closed_the_page_does_not_make_one_customer_look_like_two():
+    """Found live: after a refresh the old guest id stayed in the room for a while, so a lone
+    customer counted as two and pi stayed silent."""
+    run, manager, out, clock = build()
+    run.joined("g_old")
+    clock.t += 60  # the old guest has sent no sound for a minute
+    run.joined("g_new")
+    assert run.customers() == 1
+    run.on_audio("g_old", frame(True), RATE)  # a sound brings them back
+    assert run.customers() == 2

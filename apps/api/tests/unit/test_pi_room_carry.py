@@ -147,7 +147,7 @@ async def test_a_one_word_answer_to_pis_question_is_answered_but_a_murmur_later_
     clock.t += 4
     assert await say(speech, manager, "clothes", keep_pause=True) == "spoke"
     clock.t += room_speech.room_turns.ANSWER_S + 5
-    assert await say(speech, manager, "clothes", keep_pause=True) == "not_addressed"
+    assert await say(speech, manager, "ok", keep_pause=True) == "not_addressed"
 
 
 async def test_pi_waits_a_moment_for_someone_who_is_still_talking_instead_of_dropping_its_answer(
@@ -171,3 +171,20 @@ async def test_pi_waits_a_moment_for_someone_who_is_still_talking_instead_of_dro
     manager.synthesize = synthesize
     assert await say(speech, manager, "hello, I run a small shop") == "disclosed"
     assert speech.out.written  # it waited for the person to finish, then spoke
+
+
+async def test_hello_after_a_long_silence_picks_the_conversation_back_up_but_a_murmur_does_not():
+    """Found live: after a quiet minute a customer said 'hello?' and pi, which counts three words
+    as the least for a conversation, stayed silent: it looked dead."""
+    speech, manager, clock = build(customers=1)
+    assert await say(speech, manager, "hello, I run a small shop") == "disclosed"
+    clock.t += room_speech.room_turns.ANSWER_S + 30
+    assert await say(speech, manager, "ok", keep_pause=True) == "not_addressed"
+    assert await say(speech, manager, "thank you", keep_pause=True) == "not_addressed"
+    assert await say(speech, manager, "hello?", keep_pause=True) == "spoke"
+
+
+async def test_a_phrase_the_speech_to_text_invented_is_not_heard_at_all():
+    speech, manager, clock = build(customers=1)
+    assert await say(speech, manager, "Thanks for watching!") == "unheard"
+    assert manager.tts == []

@@ -30,6 +30,16 @@ QUIET = re.compile(
     re.IGNORECASE,
 )
 WORD = re.compile(r"\w+", re.UNICODE)
+# words that are a murmur, not a reason for pi to speak, even after a long silence
+FILLERS = frozenset(
+    "ok okay hmm hm mm um uh yes yeah yep no haan han acha achha theek thik ji thanks thank you "
+    "bye so and".split()
+)
+
+
+def is_filler(text: str) -> bool:
+    words = [w.lower() for w in WORD.findall(text)]
+    return not words or all(w in FILLERS for w in words)
 
 
 @dataclass(frozen=True)
@@ -56,6 +66,9 @@ class RoomState:
     # pi spoke less than ANSWER_S ago and nobody has said anything since: what is said now is an
     # answer to pi, so the pause after pi spoke does not apply and a group may be answered
     replying: bool = False
+    # pi has spoken before and nothing was said for a while: a person speaking up again (even
+    # "hello, are you there?") is picking the conversation back up
+    resumed: bool = False
 
 
 @dataclass(frozen=True)
@@ -104,7 +117,10 @@ def decide(utterance: Utterance, state: RoomState) -> Decision:
     from_staff = utterance.speaker_id.startswith("s_")
     # pi asked a question a moment ago: even a one-word answer is an answer, not a murmur
     enough = (
-        len(WORD.findall(utterance.text)) >= INTAKE_MIN_WORDS or state.answering or state.replying
+        len(WORD.findall(utterance.text)) >= INTAKE_MIN_WORDS
+        or state.answering
+        or state.replying
+        or (state.resumed and not is_filler(utterance.text))
     )
     lone_customer = state.intake and state.customers == 1 and not from_staff and enough
     # with more people pi still introduces itself on its own (everyone should know an AI is
