@@ -30,6 +30,7 @@ import {
   type RoomPerson,
 } from "../meeting-room-service";
 import { MeetingRoomCall } from "../room/meeting-room-lazy";
+import { PiAvatar } from "../room/pi-avatar";
 import { MeetingInvite } from "./meeting-invite";
 
 /**
@@ -292,7 +293,9 @@ function PiSpeaks({
     <Card>
       <CardBody className="space-y-3">
         <div className="flex items-center justify-between gap-2">
-          <h2 className="text-sm font-medium">pi (AI) voice</h2>
+          <h2 className="flex items-center gap-2 text-sm font-medium">
+            <PiAvatar expression="micro" size={20} decorative /> pi (AI) voice
+          </h2>
           <span
             className="rounded-full bg-muted px-2 py-0.5 text-xs"
             role="status"

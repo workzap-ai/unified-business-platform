@@ -17,10 +17,11 @@ import {
   type Call,
   type StreamVideoParticipant,
 } from "@stream-io/video-react-sdk";
-import { Bot, MonitorOff, MonitorUp, Users, Video } from "lucide-react";
+import { MonitorOff, MonitorUp, Users, Video } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Notice } from "@/components/app/states";
 import type { RoomCredentials } from "../meeting-room-service";
+import { PiAvatar } from "./pi-avatar";
 
 /**
  * The call itself. Loaded only on a room page (it carries the video SDK, about 4 MB unpacked), and
@@ -55,16 +56,32 @@ function Face({ participant }: { participant: StreamVideoParticipant }) {
         {participant.isSpeaking && (
           <span
             aria-hidden
-            className="absolute -inset-2 animate-ping rounded-full bg-primary/30"
+            className="absolute -inset-3 animate-ping rounded-full bg-primary/25"
           />
         )}
-        <div
-          className={`relative flex size-20 items-center justify-center rounded-full text-xl font-semibold ring-4 ${
-            participant.isSpeaking ? "ring-primary" : "ring-transparent"
-          } ${isPi ? "bg-primary text-primary-foreground" : "bg-muted text-foreground"}`}
-        >
-          {isPi ? <Bot className="size-9" aria-hidden /> : initials}
-        </div>
+        {isPi ? (
+          <div
+            className={`relative flex size-28 items-center justify-center rounded-full bg-surface ring-4 transition-transform ${
+              participant.isSpeaking
+                ? "scale-105 ring-primary"
+                : "ring-transparent"
+            }`}
+          >
+            <PiAvatar
+              expression={participant.isSpeaking ? "greet" : "rest"}
+              size={84}
+              className={participant.isSpeaking ? "animate-pulse" : ""}
+            />
+          </div>
+        ) : (
+          <div
+            className={`relative flex size-20 items-center justify-center rounded-full bg-muted text-xl font-semibold text-foreground ring-4 ${
+              participant.isSpeaking ? "ring-primary" : "ring-transparent"
+            }`}
+          >
+            {initials}
+          </div>
+        )}
       </div>
     </div>
   );
@@ -108,7 +125,7 @@ function RoomBar() {
             : "bg-surface-muted"
         }`}
       >
-        <Bot className="size-3.5" aria-hidden /> {piText} (AI)
+        <PiAvatar expression="micro" size={16} decorative /> {piText} (AI)
       </span>
     </div>
   );
@@ -284,9 +301,9 @@ export function MeetingRoomCall({
     return (
       <div className="space-y-3">
         <p className="flex items-center gap-2 text-sm text-muted-foreground">
-          <Bot className="size-4" aria-hidden /> pi (AI) is in this room and
-          writes a transcript. It may speak if the host allows it, and says it
-          is an AI first.
+          <PiAvatar expression="micro" size={18} decorative /> pi (AI) is in
+          this room and writes a transcript. It may speak if the host allows it,
+          and says it is an AI first.
         </p>
         {error && <Notice tone="danger">{error}</Notice>}
         <Button
@@ -306,8 +323,8 @@ export function MeetingRoomCall({
           <div className="space-y-3 [&_.str-video__participant-details]:text-white [&_.str-video__participant-details__name]:text-white">
             <RoomBar />
             <p className="flex items-center gap-2 text-xs text-muted-foreground">
-              <Bot className="size-3.5" aria-hidden /> pi (AI) is writing a
-              transcript of this call.
+              <PiAvatar expression="micro" size={16} decorative /> pi (AI) is
+              writing a transcript of this call.
             </p>
             {error && <Notice tone="danger">{error}</Notice>}
             <SharingBanner />
