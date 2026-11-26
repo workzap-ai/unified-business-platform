@@ -172,7 +172,7 @@ async def test_are_you_a_human_after_the_disclosure_is_answered_as_an_ai_or_not_
     await speech.on_turn(turn())
     speech.session.last_spoke_at = None
     await speech.on_turn(turn())
-    said = spy.tts[1][0]
+    said = spy.tts[-1][0]  # the last thing spoken (a filler may come first)
     assert "real person" not in said and "?" in said
 
 

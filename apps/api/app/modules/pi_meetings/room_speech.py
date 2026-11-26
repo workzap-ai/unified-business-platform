@@ -45,6 +45,7 @@ CARRY_S = 10.0
 # when someone is still talking at the moment pi is ready, pi waits this long for them to
 # finish instead of throwing its answer away
 START_WAIT_S = 2.0
+FILLER_WORDS = 5  # a turn of at least this many words gets a short "mm-hm" while pi thinks
 FALLBACK_QUIET_S = 15.0  # a safe-line reply within this long of pi speaking is not said
 CARRY_REASONS = frozenset({"someone_speaking", "not_addressed"})
 CARRY_CHARS = 600
@@ -93,6 +94,7 @@ class Session:
     disclosed: bool = False
     halted: bool = False  # an emergency was voiced: pi says the numbers once and then stops
     spoken: int = 0
+    ideas: int = 0  # free suggestions given in this call (capped by voice.IDEA_CAP)
     last_spoke_at: float | None = None
     history: list[voice.Said] = field(default_factory=list)
     # the last words of a person pi did not answer yet, with when they were said
@@ -277,15 +279,29 @@ class RoomSpeech:
                 if answered == "denied" and before == "pending":
                     line = voice.NOT_THEM  # not them: memory stays unused for the whole call
                 else:
-                    reply = await voice.reply_to(
-                        self.manager,
-                        self.scope,
-                        state.history,
-                        heard,
-                        language=state.settings.language,
-                        what_i_know=block if answered == "confirmed" else {},
+                    lang = voice.reply_language(state.history, heard, state.settings.language)
+                    quick = len(heard.split()) >= FILLER_WORDS and not self.speaker_active(
+                        turn.speaker_id
                     )
+                    thinking = asyncio.create_task(
+                        voice.reply_to(
+                            self.manager,
+                            self.scope,
+                            state.history,
+                            heard,
+                            language=state.settings.language,
+                            what_i_know=block if answered == "confirmed" else {},
+                            ideas_given=state.ideas,
+                            acknowledged=quick,
+                        )
+                    )
+                    if quick:
+                        # a human sound while the answer is being written: the pause feels shorter
+                        await self._say(voice.filler(lang, state.spoken), filler=True)
+                    reply = await thinking
                     line = reply.text
+                    if reply.idea:
+                        state.ideas += 1
                     if (
                         reply.fallback
                         and state.last_spoke_at is not None
@@ -320,9 +336,10 @@ class RoomSpeech:
         except Exception:  # noqa: BLE001
             logger.warning("room_state_not_saved")
 
-    async def _say(self, line: str) -> str:
+    async def _say(self, line: str, *, filler: bool = False) -> str:
         """Speak one line. 'complete' when every piece went out, 'cut' when it was stopped part of
-        the way (by a mute or a person talking), 'none' when nothing was said."""
+        the way (by a mute or a person talking), 'none' when nothing was said. A filler (a short
+        human sound) is not a turn: it is not counted, not kept in the history or the transcript."""
         if not line or await self._muted():
             return "none"
         style = STYLE_UR if ARABIC_SCRIPT.search(line) else STYLE_EN
@@ -368,6 +385,8 @@ class RoomSpeech:
                 finished = True
         finally:
             self.speaking = False
+        if spoke and filler:
+            return "none"
         if spoke:
             self.session.spoken += 1
             self.session.last_spoke_at = self.clock()

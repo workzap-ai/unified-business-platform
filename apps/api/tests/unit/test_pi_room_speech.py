@@ -81,7 +81,7 @@ async def test_after_that_pi_answers_through_the_voice_gate():
     speech, manager, out, session = build()
     await speech.on_turn(turn())
     assert await speech.on_turn(turn()) == "spoke"
-    assert manager.tts[1][0] == "That sounds slow to me."
+    assert manager.tts[-1][0] == "That sounds slow to me."
     assert session.spoken == 2
 
 

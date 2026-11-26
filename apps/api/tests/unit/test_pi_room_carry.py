@@ -336,4 +336,5 @@ async def test_when_the_person_starts_talking_again_while_pi_thinks_it_answers_t
     talking["again"] = False
     clock.t += 3
     assert await say(speech, manager, "and sometimes ten customers a day") == "spoke"
-    assert len(manager.tts) == 1  # one answer, to both halves together
+    answers = [t for t in manager.tts if t[0] not in voice.FILLERS["en"]]
+    assert len(answers) == 1  # one answer, to both halves together
