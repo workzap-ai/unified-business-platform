@@ -131,7 +131,9 @@ export function MeetingRoomGuest({
         <ul className="list-disc space-y-1 pl-4 text-muted-foreground">
           <li>
             This is a video call. pi, an AI assistant, is in the room: it
-            listens and writes down what is said. It does not speak.
+            listens and writes down what is said. The host may let pi speak too.
+            If it does, it first says that it is an AI, and its voice is
+            computer-generated.
           </li>
           <li>
             {audio

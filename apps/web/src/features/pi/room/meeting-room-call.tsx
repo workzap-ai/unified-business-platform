@@ -136,8 +136,9 @@ export function MeetingRoomCall({
     return (
       <div className="space-y-3">
         <p className="flex items-center gap-2 text-sm text-muted-foreground">
-          <Bot className="size-4" aria-hidden /> pi (AI) is in this room, writes
-          a transcript, and does not speak.
+          <Bot className="size-4" aria-hidden /> pi (AI) is in this room and
+          writes a transcript. It may speak if the host allows it, and says it
+          is an AI first.
         </p>
         {error && <Notice tone="danger">{error}</Notice>}
         <Button
