@@ -282,15 +282,20 @@ class OpenAICompatibleProvider(HttpAdapter):
         mime = SPEECH_MIME.get(request.format)
         if mime is None:
             raise ProviderError(self.name, ErrorKind.UNSUPPORTED, code="format")
+        body: dict[str, Any] = {
+            "model": request.model,
+            "input": request.text,
+            "voice": request.voice,
+            "response_format": request.format,
+        }
+        if request.instructions and request.model.startswith("gpt-4o"):
+            body["instructions"] = (
+                request.instructions
+            )  # tone, pace and accent (older models refuse it)
         audio = await self.post_bytes(
             "audio/speech",
             headers=self._headers(),
-            json_body={
-                "model": request.model,
-                "input": request.text,
-                "voice": request.voice,
-                "response_format": request.format,
-            },
+            json_body=body,
             request_timeout=request.timeout,
         )
         return SpeechResponse(

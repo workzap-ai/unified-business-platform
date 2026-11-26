@@ -341,6 +341,7 @@ class LLMManager:
         audio_format: str = "mp3",
         alias: str = "speak",
         purpose: str = "speech",
+        instructions: str = "",
         conversation_id: UUID | None = None,
         run_id: UUID | None = None,
     ) -> SpeechResponse:
@@ -362,6 +363,7 @@ class LLMManager:
                     voice=voice,
                     format=audio_format,
                     timeout=self.settings.llm_timeout_seconds,
+                    instructions=instructions,
                 )
             )
             return result

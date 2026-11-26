@@ -117,3 +117,11 @@ def test_the_text_never_appears_in_a_repr():
     from app.ai.types import SpeechRequest
 
     assert "secret words" not in repr(SpeechRequest("m", "secret words", "alloy"))
+
+
+async def test_the_speech_request_carries_the_style_instructions_to_a_model_that_takes_them():
+    from app.ai.types import SpeechRequest
+
+    asked = SpeechRequest(model="gpt-4o-mini-tts", text="hi", voice="alloy", instructions="warm")
+    assert asked.instructions == "warm"
+    assert SpeechRequest(model="tts-1", text="hi", voice="alloy").instructions == ""

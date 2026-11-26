@@ -39,7 +39,7 @@ STT_HINT_ECHOES = frozenset({"workzap pi", "pi workzap"})
 STT_PURPOSE = "meeting_room_stt"
 STT_RATE = 16000  # a turn is sent to speech to text at this rate
 TTS_RATE = 24000  # the rate of raw speech from the text to speech service
-# a person's short pieces of one sentence are joined for this long (a pause ends a turn at 0.8 s,
+# a person's short pieces of one sentence are joined for this long (a pause ends a turn at 0.65 s,
 # and people pause inside a sentence): pi answers the whole sentence, not its first breath
 CARRY_S = 10.0
 # when someone is still talking at the moment pi is ready, pi waits this long for them to
@@ -52,9 +52,24 @@ INVENTED = re.compile(
     r"thanks? for watching|thank you for watching|subscribe|like and share|see you (next|in the)",
     re.IGNORECASE,
 )
+# how pi sounds: a text-to-speech model that takes instructions is told the tone, the pace and,
+# for Urdu, the accent; the line's script picks which (Urdu or Arabic letters mean Urdu)
+STYLE_EN = (
+    "Speak as a warm, calm, friendly assistant. Natural conversational pace with small pauses "
+    "between sentences and a gentle smile in the voice. Never robotic, never rushed."
+)
+STYLE_UR = (
+    "Speak natural, warm Pakistani Urdu with a native accent, as a kind and attentive person "
+    "would. Calm conversational pace with small pauses and a gentle tone."
+)
+ARABIC_SCRIPT = re.compile(r"[؀-ۿ]")
+SPEECH_CACHE_MAX = 32  # fixed lines (the introduction) are kept as audio so they start at once
 PIECE_S = 0.2  # pi's audio goes out in pieces this long; a cut-off takes effect at the next one
 HEARD_CHARS = 600
 SAFETY_CHARS = 580  # the emergency line must fit one spoken turn (the gateway refuses 600+)
+
+
+_SPEECH_CACHE: dict[tuple[str, str, str], bytes] = {}
 
 
 class AudioOut(Protocol):
@@ -296,14 +311,27 @@ class RoomSpeech:
         the way (by a mute or a person talking), 'none' when nothing was said."""
         if not line or await self._muted():
             return "none"
-        try:
-            speech = await self.manager.synthesize(
-                self.scope, line, voice=self.session.settings.voice, audio_format="pcm"
-            )
-        except (GatewayUnavailable, ValueError):
-            logger.warning("room_speech_tts_unavailable")
-            return "none"
-        pcm = resample(speech.audio, TTS_RATE, TTS_RATE * 2)
+        style = STYLE_UR if ARABIC_SCRIPT.search(line) else STYLE_EN
+        key = (line, self.session.settings.voice, style)
+        audio = _SPEECH_CACHE.get(key)
+        if audio is None:
+            try:
+                speech = await self.manager.synthesize(
+                    self.scope,
+                    line,
+                    voice=self.session.settings.voice,
+                    audio_format="pcm",
+                    instructions=style,
+                )
+            except (GatewayUnavailable, ValueError):
+                logger.warning("room_speech_tts_unavailable")
+                return "none"
+            audio = speech.audio
+            if len(line) <= 220:  # fixed lines repeat across calls; long replies do not
+                if len(_SPEECH_CACHE) >= SPEECH_CACHE_MAX:
+                    _SPEECH_CACHE.pop(next(iter(_SPEECH_CACHE)))
+                _SPEECH_CACHE[key] = audio
+        pcm = resample(audio, TTS_RATE, TTS_RATE * 2)
         piece = int(TTS_RATE * 2 * PIECE_S) * 2  # bytes
         self._cut.clear()
         waited = 0.0

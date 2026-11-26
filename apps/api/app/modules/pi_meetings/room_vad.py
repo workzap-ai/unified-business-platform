@@ -15,7 +15,9 @@ from dataclasses import dataclass, field
 
 LOUD_RMS = 450  # 16-bit samples; a quiet room is below this, a speaking voice above it
 START_S = 0.12  # the voice must stay loud this long to start a turn
-END_SILENCE_S = 0.8  # a pause this long ends the turn
+END_SILENCE_S = (
+    0.65  # a pause this long ends the turn (shorter: pi answers sooner; pieces are rejoined)
+)
 MIN_TURN_S = 0.5  # a shorter turn is a cough or a click: dropped
 MAX_TURN_S = 15.0  # a longer turn is cut here and a new one starts
 PRE_ROLL_S = 0.25  # audio kept from just before the voice started, so no word is clipped

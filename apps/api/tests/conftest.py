@@ -42,6 +42,16 @@ def _reset_rate_limit_cooldown():
     rate_limit._redis_down_until = 0.0
 
 
+@pytest.fixture(autouse=True)
+def _clear_room_speech_cache():
+    """pi's fixed spoken lines are kept as audio across calls; a test must not hear another's."""
+    from app.modules.pi_meetings import room_speech
+
+    room_speech._SPEECH_CACHE.clear()
+    yield
+    room_speech._SPEECH_CACHE.clear()
+
+
 def pytest_runtest_logreport(report):
     """On GitHub Actions, name every failing test as an annotation so a red run says which."""
     import os

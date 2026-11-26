@@ -188,3 +188,21 @@ async def test_a_phrase_the_speech_to_text_invented_is_not_heard_at_all():
     speech, manager, clock = build(customers=1)
     assert await say(speech, manager, "Thanks for watching!") == "unheard"
     assert manager.tts == []
+
+
+async def test_pi_is_told_how_to_sound_and_a_fixed_line_is_spoken_from_memory_the_second_time():
+    from test_pi_room_speech import Manager, Out  # noqa: F401 - the same fakes
+
+    speech, manager, clock = build(customers=1)
+    assert await say(speech, manager, "hello, I run a small shop") == "disclosed"
+    assert room_speech.STYLE_EN in manager.tts[0][1]["instructions"]
+    # a second call in the same process: the introduction needs no new synthesis
+    speech2, manager2, clock2 = build(customers=1)
+    assert await say(speech2, manager2, "hello, I run a small shop") == "disclosed"
+    assert manager2.tts == [] and speech2.out.written  # heard from the kept audio
+
+
+async def test_an_urdu_line_is_spoken_in_the_urdu_style():
+    speech, manager, clock = build(customers=1)
+    await speech._say("اچھا، آپ کا کاروبار کیا ہے؟")
+    assert manager.tts[0][1]["instructions"] == room_speech.STYLE_UR

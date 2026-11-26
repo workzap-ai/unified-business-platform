@@ -219,6 +219,8 @@ class SpeechRequest:
     voice: str
     format: str = "mp3"  # mp3 | wav | opus | pcm (raw 24 kHz 16-bit mono)
     timeout: float = 20.0
+    # how to say it (tone, pace, accent); only models that take instructions (gpt-4o-*-tts) use it
+    instructions: str = ""
 
     def __repr__(self) -> str:
         return f"SpeechRequest(model={self.model!r}, voice={self.voice!r}, chars={len(self.text)})"

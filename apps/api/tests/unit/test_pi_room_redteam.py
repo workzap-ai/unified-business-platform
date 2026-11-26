@@ -152,7 +152,7 @@ async def test_the_cap_holds_even_when_everyone_keeps_saying_pi():
     speech, _ = room(spy, clock=clock)
     for _ in range(30):
         await speech.on_turn(turn())
-    assert len(spy.tts) == 20
+    assert speech.session.spoken == 20  # pi's turns, whether or not the audio was kept
 
 
 async def test_if_the_disclosure_could_not_be_spoken_the_model_still_does_not_speak_first():
