@@ -453,6 +453,17 @@ export const meetingIntelService = {
       `${BASE}/${id}/documents/${docId}/approve`,
       documentSchema,
     ),
+  // A person sends an approved document to the customer's WhatsApp conversation (once).
+  sendDocument: (id: string, docId: string) =>
+    apiRequest(
+      "POST",
+      `${BASE}/${id}/documents/${docId}/send`,
+      z.object({
+        message_id: z.string(),
+        status: z.string().catch(""),
+        again: z.boolean().catch(false),
+      }),
+    ),
   deleteDocument: (id: string, docId: string) =>
     apiRequest<void>("DELETE", `${BASE}/${id}/documents/${docId}`, null),
   documentHref: (id: string, docId: string) =>

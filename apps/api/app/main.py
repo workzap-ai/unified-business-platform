@@ -70,6 +70,8 @@ from app.modules.pi_customer.second_step import router as pi_customer_second_ste
 from app.modules.pi_meetings.bot_routes import public_router as pi_meeting_bot_webhook_router
 from app.modules.pi_meetings.bot_routes import router as pi_meeting_bot_router
 from app.modules.pi_meetings.deliverable_routes import router as pi_meeting_documents_router
+from app.modules.pi_meetings.deliverable_send import public_router as pi_meeting_docs_public_router
+from app.modules.pi_meetings.deliverable_send import router as pi_meeting_doc_send_router
 from app.modules.pi_meetings.guest_routes import public_router as pi_meeting_join_router
 from app.modules.pi_meetings.guest_routes import router as pi_meeting_guest_router
 from app.modules.pi_meetings.media_routes import router as pi_meeting_media_router
@@ -159,6 +161,7 @@ ROUTERS = [
     pi_meeting_bot_router,
     pi_meeting_room_router,
     pi_meeting_documents_router,
+    pi_meeting_doc_send_router,
     pi_meeting_bot_webhook_router,
     pi_meeting_room_public_router,
     pi_meeting_room_webhook_router,
@@ -247,6 +250,7 @@ PI_APP_ROUTERS = [
     pi_pay_link_router,
     pi_customer_pay_link_router,
     pi_brain_docs_router,
+    pi_meeting_docs_public_router,
     pi_brain_visuals_router,
     pi_app_router,
     pi_read_router,

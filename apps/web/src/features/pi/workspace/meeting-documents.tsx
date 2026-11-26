@@ -3,6 +3,7 @@
 import {
   Download,
   FileText,
+  Send,
   Presentation,
   Trash2,
   CheckCheck,
@@ -27,7 +28,8 @@ import {
  * from the findings a person approved on this tab (never from pending ideas or the raw transcript),
  * so what is in a document is what the team chose to keep. A price, phone, card or ID number cannot
  * appear in one. A new document is a draft; a person with the approve permission approves it, and
- * only then is it ready to share with the customer. Asking again for the same content returns the
+ * only then can a person send it to the customer on WhatsApp (the inbox's own rules apply: the chat
+ * is taken over and the customer wrote in the last 24 hours). Asking again for the same content returns the
  * same draft.
  */
 const REFUSED: Record<string, string> = {
@@ -38,6 +40,14 @@ const REFUSED: Record<string, string> = {
   MEETING_DOCUMENT_FONT_MISSING:
     "The server could not draw this language, so no document was made. Ask the platform owner.",
   MEETING_DOCUMENT_TOO_LARGE: "This document is too large to keep.",
+  MEETING_DOCUMENT_NOT_APPROVED: "Approve the document before sending it.",
+  MEETING_NOT_LINKED:
+    "Link this meeting to a customer first (Customer, at the top of the meeting).",
+  MEETING_NO_CONVERSATION: "This customer has no WhatsApp conversation yet.",
+  TAKEOVER_REQUIRED:
+    "Take over this customer's chat in the Inbox first, then send the document.",
+  MESSAGE_WINDOW_CLOSED:
+    "The customer has not written in the last 24 hours. Ask them to message again, then send.",
 };
 
 function sizeText(bytes: number): string {
@@ -67,9 +77,22 @@ export function MeetingDocuments({ meeting }: { meeting: Detail }) {
     (docId: string) => meetingIntelService.deleteDocument(meeting.id, docId),
     { invalidate: [key], toastErrors: false, success: "Draft deleted" },
   );
+  const send = useScopedMutation(
+    (docId: string) => meetingIntelService.sendDocument(meeting.id, docId),
+    {
+      invalidate: [key],
+      toastErrors: false,
+      success: (r: { again: boolean }) =>
+        r.again
+          ? "Already sent to the customer"
+          : "Queued: the customer gets it on WhatsApp",
+    },
+  );
   const canMake = can("pi.meetings.record");
   const items = list.data?.items ?? [];
-  const error = [make.error, approve.error, remove.error].find(Boolean);
+  const error = [make.error, approve.error, remove.error, send.error].find(
+    Boolean,
+  );
   const failure =
     error instanceof ApiError
       ? (REFUSED[error.code ?? ""] ?? "Could not do that. Try again.")
@@ -127,8 +150,11 @@ export function MeetingDocuments({ meeting }: { meeting: Detail }) {
                 canApprove={can("pi.meetings.approve")}
                 canDelete={canMake}
                 busy={approve.isPending || remove.isPending}
+                canSend={can("pi.meetings.approve")}
+                sending={send.isPending && send.variables === d.id}
                 onApprove={() => approve.mutate(d.id)}
                 onDelete={() => remove.mutate(d.id)}
+                onSend={() => send.mutate(d.id)}
               />
             ))}
           </ul>
@@ -144,16 +170,22 @@ function DocumentRow({
   canApprove,
   canDelete,
   busy,
+  canSend,
+  sending,
   onApprove,
   onDelete,
+  onSend,
 }: {
   doc: MeetingDocument;
   meetingId: string;
   canApprove: boolean;
   canDelete: boolean;
   busy: boolean;
+  canSend: boolean;
+  sending: boolean;
   onApprove: () => void;
   onDelete: () => void;
+  onSend: () => void;
 }) {
   const Icon = doc.kind === "deck_pptx" ? Presentation : FileText;
   const approved = doc.status === "approved";
@@ -189,6 +221,17 @@ function DocumentRow({
           <Download /> Download
         </a>
       </Button>
+      {approved && canSend && (
+        <Button
+          size="sm"
+          loading={sending}
+          disabled={busy || sending}
+          onClick={onSend}
+          aria-label={`Send ${DOCUMENT_LABELS[doc.kind]} to the customer on WhatsApp`}
+        >
+          <Send /> Send to customer
+        </Button>
+      )}
       {!approved && canApprove && (
         <Button size="sm" disabled={busy} onClick={onApprove}>
           <CheckCheck /> Approve
