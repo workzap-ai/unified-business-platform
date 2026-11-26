@@ -24,7 +24,7 @@ from typing import Any, Protocol
 from app.ai.errors import GatewayUnavailable
 from app.modules.pi import safety
 from app.modules.pi.memory_ledger import redacted
-from app.modules.pi_meetings import room_turns, voice
+from app.modules.pi_meetings import meeting_memory, room_turns, voice
 from app.modules.pi_meetings.recording_routes import join_spoken_digits
 from app.modules.pi_meetings.room_turns import Mode, RoomState, Utterance
 from app.modules.pi_meetings.room_vad import Turn
@@ -206,23 +206,33 @@ class RoomSpeech:
                     someone_speaking=self.someone_speaking() or self.speaking,
                     customers=self.customers(),
                     intake=state.settings.intake,
+                    answering=voice.confirm_state(state.history) == "pending",
                 ),
             )
             if decision.action == "silent":
                 state.history.append(voice.Said(False, text))
                 return decision.reason
+            block = self.what_i_know() if self.what_i_know else {}
             if decision.action == "disclose":
-                line = voice.opening(language=state.settings.language)
+                # a first name is asked about only when one customer is alone in the room: the
+                # question is who it is, and memory stays unused until a clear yes
+                name = meeting_memory.first_name(block) if block and self.customers() == 1 else ""
+                line = voice.opening(name=name, language=state.settings.language)
             else:
-                reply = await voice.reply_to(
-                    self.manager,
-                    self.scope,
-                    state.history,
-                    text,
-                    language=state.settings.language,
-                    what_i_know=self.what_i_know() if self.what_i_know else None,
-                )
-                line = reply.text
+                before = voice.confirm_state(state.history)
+                answered = voice.confirm_state([*state.history, voice.Said(False, text)])
+                if answered == "denied" and before == "pending":
+                    line = voice.NOT_THEM  # not them: memory stays unused for the whole call
+                else:
+                    reply = await voice.reply_to(
+                        self.manager,
+                        self.scope,
+                        state.history,
+                        text,
+                        language=state.settings.language,
+                        what_i_know=block if answered == "confirmed" else {},
+                    )
+                    line = reply.text
             state.history.append(voice.Said(False, text))
             said = await self._say(line)
             if said == "none":

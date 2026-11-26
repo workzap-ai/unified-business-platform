@@ -6,9 +6,9 @@ renumbered in the order they were said. pi's lines are stored as the call goes, 
 and carry no provider user id. That is what lets the final rebuild keep them and sort them in among
 the others by time: it only replaces the lines of people it transcribed.
 
-Times are milliseconds from the start of the call as the agent saw it; the recordings are timed from
-the first recording, so a line can sit a second or two off its true place. The order of a question
-and its answer is what the analysis needs, and that holds.
+Times are milliseconds from the room's start. The final transcript (`native_stt`) puts people's
+lines on the same clock, from when each person entered, so a question and its answer sort in the
+order they were said. A line can still sit a few seconds off its true place.
 """
 
 import hashlib

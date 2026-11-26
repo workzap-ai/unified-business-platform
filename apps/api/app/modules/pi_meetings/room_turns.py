@@ -48,6 +48,9 @@ class RoomState:
     someone_speaking: bool
     customers: int  # different non-staff people in the room right now
     intake: bool  # the meeting lets pi lead the conversation with a lone customer
+    # pi's last question was "Am I speaking with <name>?" and nobody has answered yet: even a short
+    # "yes" from the lone customer is a reply to pi, not a murmur
+    answering: bool = False
 
 
 @dataclass(frozen=True)
@@ -97,7 +100,7 @@ def decide(utterance: Utterance, state: RoomState) -> Decision:
         state.intake
         and state.customers == 1
         and not from_staff
-        and len(WORD.findall(utterance.text)) >= INTAKE_MIN_WORDS
+        and (len(WORD.findall(utterance.text)) >= INTAKE_MIN_WORDS or state.answering)
     )
     if not (named or lone_customer):
         return _silent("not_addressed")

@@ -141,3 +141,44 @@ def test_a_recording_is_downloaded_only_from_the_cdn_and_only_if_it_fits():
         assert error.code == "ROOM_RECORDING_UNTRUSTED"
     else:
         raise AssertionError("an address off the provider's CDN must never be fetched")
+
+
+def test_each_person_starts_on_the_rooms_clock_not_at_zero():
+    from datetime import UTC, datetime, timedelta
+
+    from app.modules.pi_meetings.native_stt import start_offset_ms
+
+    base = datetime(2026, 11, 26, 9, 49, tzinfo=UTC)
+    entered = base + timedelta(minutes=12)
+    # the files all share one start time: the moment the person entered is used
+    assert (
+        start_offset_ms(recorded=base, joined=entered, base=base, trust_recorded=False) == 720_000
+    )
+    # the files carry their own start times: the distance between them is kept, on the room's clock
+    first = base + timedelta(minutes=1)
+    own = base + timedelta(minutes=3)
+    assert (
+        start_offset_ms(
+            recorded=own, joined=entered, base=base, trust_recorded=True, earliest=first
+        )
+        == 180_000
+    )
+    assert (
+        start_offset_ms(recorded=first, joined=None, base=base, trust_recorded=True, earliest=first)
+        == 60_000
+    )
+    # recordings that begin before the room's own start keep their order (shifted, not flattened)
+    early = base - timedelta(minutes=5)
+    later = base - timedelta(minutes=4)
+    assert (
+        start_offset_ms(recorded=early, joined=None, base=base, trust_recorded=True, earliest=early)
+        == 0
+    )
+    assert (
+        start_offset_ms(recorded=later, joined=None, base=base, trust_recorded=True, earliest=early)
+        == 60_000
+    )
+    # nothing known: the start of the room; and a time with no zone is read as UTC
+    assert start_offset_ms(recorded=None, joined=None, base=base, trust_recorded=False) == 0
+    naive = datetime(2026, 11, 26, 9, 50)
+    assert start_offset_ms(recorded=None, joined=naive, base=base, trust_recorded=False) == 60_000

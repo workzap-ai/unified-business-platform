@@ -93,6 +93,48 @@ def _span(offset_ms: int, start: float, end: float) -> tuple[int, int]:
     return first, max(first + 1, offset_ms + int(end * 1000))
 
 
+def _aware(when: datetime) -> datetime:
+    return when if when.tzinfo else when.replace(tzinfo=UTC)
+
+
+def _ms(later: datetime, earlier: datetime) -> int:
+    return int((_aware(later) - _aware(earlier)).total_seconds() * 1000)
+
+
+def start_offset_ms(
+    *,
+    recorded: datetime | None,
+    joined: datetime | None,
+    base: datetime,
+    trust_recorded: bool,
+    earliest: datetime | None = None,
+) -> int:
+    """Where one person's recording starts on the room's clock, in milliseconds. When the files
+    carry different start times they keep the distance between them, and the whole group is moved
+    to the room's clock (never earlier than the room began). When they all share one start (the
+    provider timed the call, not the file) every person's times would start at 0, so the moment
+    they entered the room is used instead."""
+    if trust_recorded and recorded and earliest:
+        return max(0, _ms(earliest, base)) + max(0, _ms(recorded, earliest))
+    when = joined or recorded
+    return 0 if when is None else max(0, _ms(when, base))
+
+
+async def _joined(
+    session: AsyncSession, scope: WorkspaceScope, meeting_id: Any, users: set[str]
+) -> dict[str, datetime]:
+    """When each room user was made a participant of the meeting (they enter right after)."""
+    rows = await session.execute(
+        select(PiMeetingParticipant.stream_user_id, PiMeetingParticipant.created_at).where(
+            PiMeetingParticipant.tenant_id == scope.tenant_id,
+            PiMeetingParticipant.environment_id == scope.environment_id,
+            PiMeetingParticipant.meeting_id == meeting_id,
+            PiMeetingParticipant.stream_user_id.in_(users),
+        )
+    )
+    return {user: made for user, made in rows if user and made}
+
+
 async def _words(
     manager: Any, scope: WorkspaceScope, audio: bytes, language: str
 ) -> list[Word] | None:
@@ -213,13 +255,23 @@ async def finalize(
         files = []
     spoken: dict[str, list[Spoken]] = {}
     if files:
-        base = min((f.start for f in files if f.start), default=None)
+        # one clock for everyone: the room's start, the same one pi's own lines are timed from
+        base = room.started_at or room.created_at or now
+        starts = {f.start for f in files if f.start}
+        trust = len(starts) > 1  # one shared start means the provider timed the call, not each file
+        joined = await _joined(session, scope, meeting.id, {f.user_id for f in files})
         for item in files:
             audio = await provider.download(item.url)
             words = await _words(manager, scope, audio, meeting.language) if audio else None
             if not words:
                 continue  # unreadable, or no one spoke: the provider's lines (if any) stay
-            offset = int((item.start - base).total_seconds() * 1000) if item.start and base else 0
+            offset = start_offset_ms(
+                recorded=item.start,
+                joined=joined.get(item.user_id),
+                base=base,
+                trust_recorded=trust,
+                earliest=min(starts) if starts else None,
+            )
             spoken[item.user_id] = [
                 Spoken(None, text, *_span(offset, start, end))
                 for line, start, end in sentences(words)

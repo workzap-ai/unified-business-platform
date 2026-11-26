@@ -30,6 +30,7 @@ from app.core.config import Settings, get_settings
 from app.core.database import create_engine
 from app.modules.pi_meetings import room_agent_claim as claims
 from app.modules.pi_meetings import room_agent_lines as lines
+from app.modules.pi_meetings import room_agent_memory as memory
 from app.modules.pi_meetings.room_agent import AGENT_USER, RoomRun
 from app.modules.pi_meetings.room_provider import CALL_TYPE
 from app.modules.pi_meetings.room_speech import RoomSpeech, Session
@@ -39,6 +40,7 @@ logger = logging.getLogger("pi_room_agent")
 
 MAX_ROOMS = 3  # rooms one agent process holds at once
 POLL_S = 5.0
+MEMORY_EVERY = 12  # beats between reads of the customer's memory (about a minute)
 
 
 def _uid(event: Any) -> str:
@@ -106,6 +108,17 @@ async def run_room(
         except Exception:  # noqa: BLE001 - a missing line must never stop pi talking
             logger.warning("room_pi_line_not_stored")
 
+    known: dict[str, Any] = {"block": {}}
+
+    async def refresh_memory() -> None:
+        """The customer's memory, read again every minute: staff may link the customer mid-call."""
+        try:
+            async with sessions() as db:
+                known["block"] = await memory.load_block(db, orders)
+        except Exception:  # noqa: BLE001 - no memory means pi asks, it never stops pi talking
+            logger.warning("room_memory_not_loaded")
+
+    await refresh_memory()
     out = TrackOut(track, PcmData, AudioFormat)
     speech = RoomSpeech(
         manager=manager,
@@ -122,6 +135,7 @@ async def run_room(
         someone_speaking=lambda: False,
         clock=time.monotonic,
         on_line=on_line,
+        what_i_know=lambda: known["block"],
     )
     run = RoomRun(speech, clock=time.monotonic)
     run.apply(orders)
@@ -135,8 +149,12 @@ async def run_room(
 
     async def beat_loop() -> None:
         unread_since: float | None = None
+        beats = 0
         while not stop.is_set():
             await asyncio.sleep(claims.BEAT_S)
+            beats += 1
+            if beats % MEMORY_EVERY == 0:
+                await refresh_memory()
             try:
                 async with sessions() as db:
                     got = await claims.beat(db, room_id, agent_id, datetime.now(UTC))
