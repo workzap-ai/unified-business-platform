@@ -343,9 +343,25 @@ def question_policy(history: Sequence["Said"], calm: bool = False) -> str:
     return "none" if last == [True] else "optional"
 
 
+TICS = re.compile(
+    r"^\W*(you (said|mentioned|asked)( that)?|آپ نے (کہا|بتایا|پوچھا|ذکر)|आपने (कहा|बताया|पूछा))|"
+    r"(really|truly) (an? )?(important|interesting)|(great|good) (question|point|idea)|"
+    r"interesting (idea|point|situation)|واقعی (ایک )?(اہم|دلچسپ|چیلنج)|"
+    r"(اہم|دلچسپ) (سوال|خیال|مسئلہ|صورتحال|قدم)",
+    re.IGNORECASE,
+)
+
+
+def has_tic(reply: str) -> bool:
+    """An echo opener ("You said that ...") or empty praise ("really an important problem")."""
+    return bool(TICS.search(reply))
+
+
 def _off_brief(reply: str, lang: str, policy: str) -> bool:
-    return not in_reply_language(reply, lang) or (
-        policy == "none" and ("?" in reply or "؟" in reply)
+    return (
+        not in_reply_language(reply, lang)
+        or has_tic(reply)
+        or (policy == "none" and ("?" in reply or "؟" in reply))
     )
 
 
@@ -437,6 +453,8 @@ async def reply_to(
         note = (
             f"Your last reply was not allowed. Write it only in {REPLY_IN.get(lang, 'English')}"
             + (" and with no question at all." if policy == "none" else ".")
+            + " Do not start with 'You said' and do not praise or comment on the topic: say the"
+            " new fact in a few words."
         )
         value = await ask(note) or value
     if isinstance(value, ModelReply):

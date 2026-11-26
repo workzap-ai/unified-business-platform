@@ -74,3 +74,15 @@ def test_fillers_rotate_and_are_not_questions() -> None:
     assert len(seen) == 4
     for n in range(4):
         assert "?" not in voice.filler("en", n) and "؟" not in voice.filler("ur", n)
+
+
+def test_echo_openers_and_empty_praise_are_caught() -> None:
+    for tic in (
+        "You said that your team is slow.",
+        "آپ نے کہا کہ آپ کی ٹیم سست ہے۔",
+        "یہ واقعی ایک اہم مسئلہ ہے۔",
+        "That is a great question.",
+    ):
+        assert voice.has_tic(tic), tic
+    for fine in ("Ten a day, that adds up.", "دس روز، یہ بہت ہوتے ہیں۔", "I see."):
+        assert not voice.has_tic(fine), fine
