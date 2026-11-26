@@ -95,6 +95,7 @@ class Session:
     halted: bool = False  # an emergency was voiced: pi says the numbers once and then stops
     spoken: int = 0
     ideas: int = 0  # free suggestions given in this call (capped by voice.IDEA_CAP)
+    facts: list[str] = field(default_factory=list)  # what they told pi in this call, in few words
     last_spoke_at: float | None = None
     history: list[voice.Said] = field(default_factory=list)
     # the last words of a person pi did not answer yet, with when they were said
@@ -149,6 +150,7 @@ class RoomSpeech:
         what_i_know: Callable[[], dict[str, Any]] | None = None,
         on_line: Callable[[str, str], Awaitable[None]] | None = None,
         on_state: Callable[[Session], Awaitable[None]] | None = None,
+        on_screen: Callable[[], str] | None = None,
     ) -> None:
         self.manager = manager
         self.scope = scope
@@ -159,6 +161,7 @@ class RoomSpeech:
         self.clock = clock
         self.is_muted = is_muted
         self.what_i_know = what_i_know
+        self.on_screen = on_screen  # one sentence on what a shared screen shows, or ''
         self.on_line = (
             on_line  # (speaker_id, text) for every line heard and said, for the transcript
         )
@@ -293,6 +296,8 @@ class RoomSpeech:
                             what_i_know=block if answered == "confirmed" else {},
                             ideas_given=state.ideas,
                             acknowledged=quick,
+                            learned=state.facts,
+                            on_screen=self.on_screen() if self.on_screen else "",
                         )
                     )
                     if quick:
@@ -302,6 +307,9 @@ class RoomSpeech:
                     line = reply.text
                     if reply.idea:
                         state.ideas += 1
+                    if reply.learned and reply.learned not in state.facts:
+                        state.facts.append(reply.learned)
+                        del state.facts[: -voice.FACTS_KEPT * 2]
                     if (
                         reply.fallback
                         and state.last_spoke_at is not None

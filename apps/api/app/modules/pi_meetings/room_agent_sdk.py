@@ -17,6 +17,7 @@ text it writes is pi's own lines, into the meeting's transcript.
 import asyncio
 import contextlib
 import logging
+import os
 import secrets
 import time
 from datetime import UTC, datetime, timedelta
@@ -31,9 +32,10 @@ from app.core.database import create_engine
 from app.modules.pi_meetings import room_agent_claim as claims
 from app.modules.pi_meetings import room_agent_lines as lines
 from app.modules.pi_meetings import room_agent_memory as memory
-from app.modules.pi_meetings import voice
+from app.modules.pi_meetings import room_sight, voice
 from app.modules.pi_meetings.room_agent import AGENT_USER, RoomRun
 from app.modules.pi_meetings.room_provider import CALL_TYPE
+from app.modules.pi_meetings.room_sight import Sight
 from app.modules.pi_meetings.room_speech import RoomSpeech, Session
 from app.modules.pi_meetings.room_speech import Settings as SpeechSettings
 
@@ -41,7 +43,24 @@ logger = logging.getLogger("pi_room_agent")
 
 MAX_ROOMS = 3  # rooms one agent process holds at once
 POLL_S = 5.0
+SEE_SCREEN_ENV = "PI_ROOM_SEE_SCREEN"  # "1" lets pi look at a shared screen; off by default
+SCREEN_NOTE = "[On screen] "
 MEMORY_EVERY = 12  # beats between reads of the customer's memory (about a minute)
+
+
+def join_options(see_screen: bool) -> dict[str, Any]:
+    """Extra arguments for joining: with sight on, the agent also receives shared screens (never
+    cameras). Without it the join is exactly as before."""
+    if not see_screen:
+        return {}
+    from getstream.video.rtc import SubscriptionConfig
+    from getstream.video.rtc.pb.stream.video.sfu.models import models_pb2
+    from getstream.video.rtc.tracks import TrackSubscriptionConfig
+
+    rule = TrackSubscriptionConfig(
+        track_types=[models_pb2.TRACK_TYPE_AUDIO, models_pb2.TRACK_TYPE_SCREEN_SHARE]
+    )
+    return {"subscription_config": SubscriptionConfig(default=rule)}
 
 
 def _uid(event: Any) -> str:
@@ -147,6 +166,12 @@ async def run_room(
         else None
     )
     out = TrackOut(track, PcmData, AudioFormat)
+    see_screen = os.environ.get(SEE_SCREEN_ENV, "") == "1"
+
+    async def on_screen_note(note: str) -> None:
+        await on_line(voice.PI_LABEL, SCREEN_NOTE + note)
+
+    sight = Sight(manager, orders.scope, clock=time.monotonic, on_note=on_screen_note)
     speech = RoomSpeech(
         manager=manager,
         scope=orders.scope,
@@ -172,6 +197,7 @@ async def run_room(
         on_line=on_line,
         on_state=on_state,
         what_i_know=lambda: known["block"],
+        on_screen=sight.current,
     )
     run = RoomRun(speech, clock=time.monotonic)
     run.apply(orders)
@@ -182,6 +208,31 @@ async def run_room(
         who = str(getattr(participant, "user_id", "") or "")
         data = pcm.to_int16()
         run.on_audio(who, data.to_bytes(), int(data.sample_rate), int(data.channels or 1))
+
+    async def watch_screen(remote: Any) -> None:
+        """Looks at a shared screen now and then; ends when the share ends. Never raises."""
+        try:
+            async for frame in remote.video_frames():
+                await sight.look(frame.data, frame.width, frame.height)
+                if stop.is_set():
+                    return
+                # the stream keeps only the newest frame while this waits
+                await asyncio.sleep(room_sight.EVERY_S)
+        except Exception:  # noqa: BLE001 - sight is a bonus
+            logger.warning("room_screen_watch_ended")
+
+    screen_tasks: set[asyncio.Task[None]] = set()
+
+    def on_track(remote: Any) -> None:
+        if not see_screen:
+            return
+        from getstream_rtc import TrackType
+
+        if getattr(remote, "track_type", None) != TrackType.SCREEN_SHARE:
+            return  # a camera or audio: not looked at
+        task = asyncio.create_task(watch_screen(remote))
+        screen_tasks.add(task)
+        task.add_done_callback(screen_tasks.discard)
 
     async def beat_loop() -> None:
         unread_since: float | None = None
@@ -225,11 +276,12 @@ async def run_room(
     tick_task: asyncio.Task[None] | None = None
     try:
         call = client.video.call(CALL_TYPE, orders.call_id)
-        async with await rtc.join(call, AGENT_USER) as connection:
+        async with await rtc.join(call, AGENT_USER, **join_options(see_screen)) as connection:
             connection.on("audio", on_audio)
             connection.on("participant_joined", lambda p: run.joined(_uid(p)))
             connection.on("participant_left", lambda p: run.left(_uid(p)))
             connection.on("call_ended", lambda *_: stop.set())
+            connection.on("track_added", on_track)
             await connection.add_tracks(audio=track)
             for person in connection.participants_state.get_participants():
                 run.joined(_uid(person))

@@ -63,7 +63,13 @@ letters are mispronounced. Answer in English when they speak English.
   once your picture of their situation is complete, say what you understood so far, and ask at most
   one question.
 - Build on the exact words they just said; never repeat a question already asked and never ask what
-  they already told you.
+  they already told you. The body's learned_this_call lists what they told you earlier in this
+  call: use it so they never repeat themselves, and refer back to it when it fits.
+- Also fill "learned": the new fact in owner_just_said as a few plain English words ("sells
+  clothes, team of 5", "orders get missed weekly"), or "" when there is nothing new.
+- The body's on_screen (when present) says what kind of thing the person is showing on their
+  shared screen. You may refer to it in general words ("I can see your orders sheet"); never read
+  out names, numbers or text from it, and never claim to see more than it says.
 - Never a price, a quote, advice, a fix, a promise or a product. Never ask for money, a card, a
   password, a code or an ID number. Do not say you will do anything for them.
 - If they ask whether you are a person, say plainly that you are an AI.
@@ -83,6 +89,8 @@ Give ONE helpful suggestion that helps them decide better, in the language named
   will build or do it. No advice on law, health, money or tax. No question.
 - You may end by saying a person from the Workzap team will go through the options with them."""
 
+FACTS_KEPT = 14  # facts of this call given back to the model each turn
+FACT_CHARS = 120
 IDEA_CAP = 2  # free suggestions pi gives in one call (platform spec: 2 per problem)
 
 FILLERS = {
@@ -109,6 +117,7 @@ class ModelReply(BaseModel):
 
     reply: str = ""
     done: bool = False
+    learned: str = ""  # the new fact in what the person just said, kept for the rest of the call
 
 
 class VoiceFailed(Exception):
@@ -129,6 +138,7 @@ class Spoken:
     fallback: bool  # True when the model's reply was not allowed and the safe line was used
     done: bool = False
     idea: bool = False  # a free suggestion: it counts against IDEA_CAP
+    learned: str = ""  # a new fact from what the person said, to remember for this call
 
 
 def context(history: Sequence[Said], heard: str) -> dict[str, Any]:
@@ -381,6 +391,8 @@ async def reply_to(
     what_i_know: dict[str, Any] | None = None,
     ideas_given: int = 0,
     acknowledged: bool = False,
+    learned: Sequence[str] = (),
+    on_screen: str = "",
 ) -> Spoken:
     """The next thing pi says after `heard`. Never raises for a model that is down: that is the
     safe line, so the conversation does not stop. The first turn is `opening()`, not this.
@@ -414,6 +426,10 @@ async def reply_to(
         ],
         "owner_just_said": heard[:HEARD_CHARS],
     }
+    if on_screen:
+        body["on_screen"] = on_screen[:200]
+    if learned:
+        body["learned_this_call"] = [str(f)[:FACT_CHARS] for f in learned[-FACTS_KEPT:]]
     if acknowledged:
         body["already_said_aloud"] = (
             "a short sound like 'hmm': do not begin with an acknowledgement"
@@ -469,12 +485,12 @@ async def reply_to(
                 and not constitution.hard(constitution.lint(closing, ctx))
                 and not meeting_memory.leaks(closing, seen, block)
             ):
-                return Spoken(closing, fallback=False, done=True)
+                return Spoken(closing, fallback=False, done=True, learned=_fact(value))
         said = allowed(value.reply, ctx)
         if said and _off_brief(said, lang, policy):
             said = ""
         if said and not _repeats(said, history) and not meeting_memory.leaks(said, seen, block):
-            return Spoken(said, fallback=False)
+            return Spoken(said, fallback=False, learned=_fact(value))
     return Spoken(constitution.safe_fallback(ctx), fallback=True)
 
 
@@ -529,6 +545,12 @@ async def _idea(
     ):
         return ""
     return text
+
+
+def _fact(value: "ModelReply") -> str:
+    """The fact taken from what the person said: redacted, short, never a price (or "")."""
+    text = redacted(value.learned, FACT_CHARS)
+    return "" if PRICE.search(text) else text
 
 
 def _norm(text: str) -> str:
