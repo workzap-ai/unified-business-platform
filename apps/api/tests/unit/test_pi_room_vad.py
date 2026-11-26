@@ -103,3 +103,19 @@ def test_a_person_who_leaves_mid_sentence_gives_their_turn() -> None:
     assert turn is not None and turn.speaker_id == "g_1"
     assert not cutter.speaking()
     assert cutter.flush("g_1", 3.0) is None
+
+
+def test_a_turn_ends_by_the_clock_when_the_frames_stop_coming():
+    """Found live: after a person fell silent the browser sent no more frames, so no quiet frame
+    ever ended the turn, pi believed the person was still talking and nothing was answered."""
+    cutter = TurnCutter(sample_rate=16000)
+    t = 0.0
+    for _ in range(60):  # 1.2 s of a loud voice in 20 ms frames
+        assert cutter.feed("g_1", frame(True), t) == []
+        t += 0.02
+    assert cutter.speaking()
+    assert cutter.idle(t + END_SILENCE_S / 2) == []  # a short pause is still the same turn
+    turns = cutter.idle(t + END_SILENCE_S + 0.1)
+    assert len(turns) == 1 and turns[0].speaker_id == "g_1"
+    assert not cutter.speaking()
+    assert cutter.idle(t + 5) == []  # nothing is ended twice

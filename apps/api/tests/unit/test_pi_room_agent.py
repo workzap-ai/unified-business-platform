@@ -166,3 +166,16 @@ def test_stereo_becomes_mono():
     stereo = array("h", [100, 300, -50, 50]).tobytes()
     assert array("h", mono(stereo, 2)).tolist() == [200, 0]
     assert mono(stereo, 1) == stereo
+
+
+async def test_a_turn_whose_frames_stop_is_ended_and_answered_by_the_clock():
+    """No frame arrives while a person is silent: the room's clock tick ends their turn."""
+    run, manager, out, clock = build()
+    talk(run, clock, "g_1", 1.5)  # loud, then nothing at all
+    assert manager.stt_calls == []
+    clock.t += 1.0
+    run.tick()
+    await run.drain()
+    assert len(manager.stt_calls) == 1 and manager.tts  # heard, and pi answered
+    assert run.report() == {"g_1": 75}  # frame counts only, never sound
+    assert run.report() == {}

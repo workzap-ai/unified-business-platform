@@ -56,6 +56,7 @@ class RoomRun:
         self.people: set[str] = set()
         self._tasks: set[asyncio.Task[Any]] = set()
         self.dropped = 0
+        self.frames: dict[str, int] = {}  # frames heard per person since the last report
         speech.customers = self.customers
         speech.someone_speaking = self.cutter.speaking
 
@@ -88,6 +89,7 @@ class RoomRun:
         if not speaker_id or speaker_id == self.user_id:
             return
         self.joined(speaker_id)
+        self.frames[speaker_id] = self.frames.get(speaker_id, 0) + 1
         frame = room_speech.resample(mono(pcm, channels), sample_rate, self.cutter.sample_rate)
         if not frame:
             return
@@ -95,6 +97,18 @@ class RoomRun:
             self._start(turn)
         if self.speech.speaking and self.cutter.speaking():
             self.speech.barge_in()  # a person started talking: pi stops
+
+    def tick(self) -> None:
+        """Called a few times a second: a turn whose frames stopped coming is finished here."""
+        for turn in self.cutter.idle(self.clock()):
+            self._start(turn)
+        if self.speech.speaking and self.cutter.speaking():
+            self.speech.barge_in()
+
+    def report(self) -> dict[str, int]:
+        """How many frames each person sent since the last report (counts only, no sound)."""
+        out, self.frames = self.frames, {}
+        return out
 
     def _start(self, turn: Turn) -> None:
         if len(self._tasks) >= MAX_PENDING:

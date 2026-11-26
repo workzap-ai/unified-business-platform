@@ -49,6 +49,7 @@ class _Person:
     length_s: float = 0.0
     started_at: float = 0.0
     speaking: bool = False
+    last_at: float = 0.0  # when the last frame came
 
 
 class TurnCutter:
@@ -72,6 +73,7 @@ class TurnCutter:
             return []
         seconds = (len(frame) // 2) / self.sample_rate
         person = self._people.setdefault(speaker_id, _Person())
+        person.last_at = at
         loud = rms(frame) >= self.loud_rms
         out: list[Turn] = []
         if not person.speaking:
@@ -84,6 +86,21 @@ class TurnCutter:
             turn = self._finish(speaker_id, person, at)
             if turn is not None:
                 out.append(turn)
+        return out
+
+    def idle(self, at: float) -> list[Turn]:
+        """Turns that ended because the frames stopped. A browser or a server may send nothing
+        while someone is silent: a turn is then finished by the clock, not by quiet frames,
+        or it would never end and pi would think the person is still talking."""
+        out: list[Turn] = []
+        for speaker_id, person in self._people.items():
+            gap = at - person.last_at
+            if person.speaking and gap >= END_SILENCE_S:
+                person.quiet_s += gap
+                person.length_s += gap
+                turn = self._finish(speaker_id, person, at)
+                if turn is not None:
+                    out.append(turn)
         return out
 
     def flush(self, speaker_id: str, at: float) -> Turn | None:

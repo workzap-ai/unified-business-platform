@@ -209,7 +209,20 @@ async def run_room(
                 return
             run.apply(got)
 
+    async def tick_loop() -> None:
+        """Ends turns by the clock when frames stop, and says how much audio is arriving."""
+        ticks = 0
+        while not stop.is_set():
+            await asyncio.sleep(0.2)
+            run.tick()
+            ticks += 1
+            if ticks % 50 == 0:  # every 10 seconds
+                heard = run.report()
+                if heard:
+                    logger.info("room_audio frames=%s", heard)
+
     beat_task: asyncio.Task[None] | None = None
+    tick_task: asyncio.Task[None] | None = None
     try:
         call = client.video.call(CALL_TYPE, orders.call_id)
         async with await rtc.join(call, AGENT_USER) as connection:
@@ -221,16 +234,18 @@ async def run_room(
             for person in connection.participants_state.get_participants():
                 run.joined(_uid(person))
             beat_task = asyncio.create_task(beat_loop())
+            tick_task = asyncio.create_task(tick_loop())
             await stop.wait()
             await run.drain()
     except Exception:  # noqa: BLE001 - the room is released below so another agent can try
         logger.exception("room_agent_failed")
     finally:
         stop.set()
-        if beat_task is not None:
-            beat_task.cancel()
-            with contextlib.suppress(asyncio.CancelledError, Exception):
-                await beat_task
+        for task in (beat_task, tick_task):
+            if task is not None:
+                task.cancel()
+                with contextlib.suppress(asyncio.CancelledError, Exception):
+                    await task
         with contextlib.suppress(Exception):
             async with sessions() as db:
                 await claims.release(db, room_id, agent_id)
