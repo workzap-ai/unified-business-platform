@@ -83,7 +83,7 @@ function RoomBar() {
   }, []);
   const clock = `${String(Math.floor(secs / 60)).padStart(2, "0")}:${String(secs % 60).padStart(2, "0")}`;
   const piText = !pi
-    ? "pi is joining"
+    ? "pi writes the transcript"
     : pi.isSpeaking
       ? "pi is speaking"
       : "pi is listening";
@@ -303,7 +303,7 @@ export function MeetingRoomCall({
     <StreamVideo client={live.client}>
       <StreamCall call={live.call}>
         <StreamTheme>
-          <div className="space-y-3">
+          <div className="space-y-3 [&_.str-video__participant-details]:text-white [&_.str-video__participant-details__name]:text-white">
             <RoomBar />
             <p className="flex items-center gap-2 text-xs text-muted-foreground">
               <Bot className="size-3.5" aria-hidden /> pi (AI) is writing a
