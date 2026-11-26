@@ -39,6 +39,11 @@ STT_HINT_ECHOES = frozenset({"workzap pi", "pi workzap"})
 STT_PURPOSE = "meeting_room_stt"
 STT_RATE = 16000  # a turn is sent to speech to text at this rate
 TTS_RATE = 24000  # the rate of raw speech from the text to speech service
+# a person's short pieces of one sentence are joined for this long (a pause ends a turn at 0.8 s,
+# and people pause inside a sentence): pi answers the whole sentence, not its first breath
+CARRY_S = 10.0
+CARRY_REASONS = frozenset({"someone_speaking", "not_addressed"})
+CARRY_CHARS = 600
 PIECE_S = 0.2  # pi's audio goes out in pieces this long; a cut-off takes effect at the next one
 HEARD_CHARS = 600
 SAFETY_CHARS = 580  # the emergency line must fit one spoken turn (the gateway refuses 600+)
@@ -71,6 +76,8 @@ class Session:
     spoken: int = 0
     last_spoke_at: float | None = None
     history: list[voice.Said] = field(default_factory=list)
+    # the last words of a person pi did not answer yet, with when they were said
+    carry: dict[str, tuple[str, float]] = field(default_factory=dict)
 
 
 def resample(pcm: bytes, src: int, dst: int) -> bytes:
@@ -182,15 +189,23 @@ class RoomSpeech:
             await self.on_line(turn.speaker_id, text)
         async with self._lock:
             state = self.session
+            now = self.clock()
+            held = state.carry.pop(turn.speaker_id, None)
+            heard = text
+            if held is not None:
+                if now - held[1] <= CARRY_S:
+                    heard = f"{held[0]} {text}"[-CARRY_CHARS:]
+                else:
+                    state.history.append(voice.Said(False, held[0]))  # too old to join
             if state.halted:
-                state.history.append(voice.Said(False, text))
+                state.history.append(voice.Said(False, heard))
                 return "halted"
-            emergency = safety.emergency(text) if state.settings.mode == "speak" else None
+            emergency = safety.emergency(heard) if state.settings.mode == "speak" else None
             if emergency is not None:
                 # an emergency is never left to the model, to the name trigger or to the cooldown;
                 # only the host's mute (and the speech cap) still hold
                 state.halted = True
-                state.history.append(voice.Said(False, text))
+                state.history.append(voice.Said(False, heard))
                 numbers = safety.emergency_reply(emergency, None, state.settings.language or None)[
                     :SAFETY_CHARS
                 ]
@@ -201,7 +216,7 @@ class RoomSpeech:
                 await self._persist()
                 return "emergency" if said_numbers == "complete" else "not_spoken"
             decision = room_turns.decide(
-                Utterance(turn.speaker_id, text, True, self.clock()),
+                Utterance(turn.speaker_id, heard, True, now),
                 RoomState(
                     mode=state.settings.mode,
                     muted=await self._muted(),
@@ -212,10 +227,17 @@ class RoomSpeech:
                     customers=self.customers(),
                     intake=state.settings.intake,
                     answering=voice.confirm_state(state.history) == "pending",
+                    replying=bool(state.history)
+                    and state.history[-1].pi
+                    and state.last_spoke_at is not None
+                    and now - state.last_spoke_at <= room_turns.ANSWER_S,
                 ),
             )
             if decision.action == "silent":
-                state.history.append(voice.Said(False, text))
+                if decision.reason in CARRY_REASONS:
+                    state.carry[turn.speaker_id] = (heard, now)  # may join this person's next piece
+                else:
+                    state.history.append(voice.Said(False, heard))
                 return decision.reason
             block = self.what_i_know() if self.what_i_know else {}
             if decision.action == "disclose":
@@ -225,7 +247,7 @@ class RoomSpeech:
                 line = voice.opening(name=name, language=state.settings.language)
             else:
                 before = voice.confirm_state(state.history)
-                answered = voice.confirm_state([*state.history, voice.Said(False, text)])
+                answered = voice.confirm_state([*state.history, voice.Said(False, heard)])
                 if answered == "denied" and before == "pending":
                     line = voice.NOT_THEM  # not them: memory stays unused for the whole call
                 else:
@@ -233,12 +255,12 @@ class RoomSpeech:
                         self.manager,
                         self.scope,
                         state.history,
-                        text,
+                        heard,
                         language=state.settings.language,
                         what_i_know=block if answered == "confirmed" else {},
                     )
                     line = reply.text
-            state.history.append(voice.Said(False, text))
+            state.history.append(voice.Said(False, heard))
             said = await self._say(line)
             if said == "none":
                 return "not_spoken"

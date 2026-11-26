@@ -20,6 +20,8 @@ Action = Literal["silent", "disclose", "speak"]
 
 MAX_SPOKEN = 20  # pi's turns in one call
 COOLDOWN_S = 6.0  # after pi spoke
+REPLY_GAP_S = 1.5  # the least pause before pi answers an answer: nobody can chain pi's turns
+ANSWER_S = 20.0  # a person's first words after pi's last line are an answer for this long
 INTAKE_MIN_WORDS = 3  # a customer's turn this short ("ok", "hmm") is not a reason to speak
 # pi's name, as a whole word, in the scripts the rooms are used in
 NAME = re.compile(r"(?<!\w)(?:pi|p\.\s?i\.?|پائی|پی\s*آئی|पाई|पाय)(?!\w)", re.IGNORECASE)
@@ -51,6 +53,9 @@ class RoomState:
     # pi's last question was "Am I speaking with <name>?" and nobody has answered yet: even a short
     # "yes" from the lone customer is a reply to pi, not a murmur
     answering: bool = False
+    # pi spoke less than ANSWER_S ago and nobody has said anything since: what is said now is an
+    # answer to pi, so the pause after pi spoke does not apply and a group may be answered
+    replying: bool = False
 
 
 @dataclass(frozen=True)
@@ -90,19 +95,23 @@ def decide(utterance: Utterance, state: RoomState) -> Decision:
         return _silent("cap")
     if state.someone_speaking:
         return _silent("someone_speaking")
-    if state.last_spoke_at is not None and utterance.at - state.last_spoke_at < COOLDOWN_S:
+    pause = REPLY_GAP_S if state.replying else COOLDOWN_S
+    if state.last_spoke_at is not None and utterance.at - state.last_spoke_at < pause:
         return _silent("cooldown")
     if asks_quiet(utterance.text):
         return _silent("asked_to_be_quiet")
     named = addressed(utterance.text)
     from_staff = utterance.speaker_id.startswith("s_")
-    lone_customer = (
-        state.intake
-        and state.customers == 1
-        and not from_staff
-        and (len(WORD.findall(utterance.text)) >= INTAKE_MIN_WORDS or state.answering)
+    enough = len(WORD.findall(utterance.text)) >= INTAKE_MIN_WORDS or state.answering
+    lone_customer = state.intake and state.customers == 1 and not from_staff and enough
+    # with more people pi still introduces itself on its own (everyone should know an AI is
+    # in the room, whoever speaks first), and afterwards it answers whoever answers its own
+    # question; people talking among themselves, unaddressed, are left alone
+    intro = state.intake and state.customers >= 1 and not state.disclosed and enough
+    group_answer = (
+        state.intake and state.customers >= 2 and not from_staff and state.replying and enough
     )
-    if not (named or lone_customer):
+    if not (named or lone_customer or intro or group_answer):
         return _silent("not_addressed")
     if not state.disclosed:
         return Decision("disclose", "named" if named else "intake")
