@@ -33,14 +33,16 @@ const nextConfig: NextConfig = {
       },
       {
         // A meeting link records the visitor's own microphone; the link is the only key, so it is
-        // never sent on as a referrer. Listed after the global entry so it wins.
+        // never sent on as a referrer. Listed after the global entry so it wins. A guest may share
+        // their screen in a video room (display-capture): the browser asks them every time and
+        // nothing is shared until they pick a screen or window. The camera stays off for guests.
         source: "/join/:path*",
         headers: [
           { key: "Referrer-Policy", value: "no-referrer" },
           {
             key: "Permissions-Policy",
             value:
-              "camera=(), microphone=(self), display-capture=(), geolocation=()",
+              "camera=(), microphone=(self), display-capture=(self), geolocation=()",
           },
         ],
       },
