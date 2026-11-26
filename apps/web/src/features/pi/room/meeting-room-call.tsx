@@ -1,7 +1,13 @@
 "use client";
 
 import "@stream-io/video-react-sdk/dist/css/styles.css";
-import { useEffect, useRef, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  type ReactNode,
+} from "react";
 import {
   CallingState,
   CancelCallButton,
@@ -17,7 +23,7 @@ import {
   type Call,
   type StreamVideoParticipant,
 } from "@stream-io/video-react-sdk";
-import { MonitorOff, MonitorUp, Users, Video } from "lucide-react";
+import { Mic, MonitorOff, MonitorUp, Users, Video } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Notice } from "@/components/app/states";
 import type { RoomCredentials } from "../meeting-room-service";
@@ -169,18 +175,18 @@ function ShareScreen({ onError }: { onError: (message: string) => void }) {
               ? "Stop sharing your screen"
               : "Share your screen"
       }
-      className={`inline-flex h-11 items-center gap-2 rounded-full px-4 text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50 ${
+      aria-label={sharing ? "Stop sharing your screen" : "Share your screen"}
+      className={`flex size-11 items-center justify-center rounded-full transition-colors disabled:cursor-not-allowed disabled:opacity-40 ${
         sharing
           ? "bg-primary text-primary-foreground"
-          : "bg-surface-muted hover:bg-muted"
+          : "bg-muted text-foreground hover:bg-muted/70"
       }`}
     >
       {sharing ? (
-        <MonitorOff className="size-4" aria-hidden />
+        <MonitorOff className="size-5" aria-hidden />
       ) : (
-        <MonitorUp className="size-4" aria-hidden />
+        <MonitorUp className="size-5" aria-hidden />
       )}
-      {sharing ? "Stop sharing" : "Share screen"}
     </button>
   );
 }
@@ -227,6 +233,205 @@ function Captions() {
           </p>
         ))
       )}
+    </div>
+  );
+}
+
+type MicState = "idle" | "asking" | "ok" | "blocked" | "missing";
+
+/**
+ * A microphone check before joining, started only by a button press (the person has agreed to the
+ * room, but nothing asks for the microphone until they choose to test it or join). It shows a level
+ * bar so "nobody can hear me" is found before the call, not during it. Nothing is recorded or sent:
+ * the sound is measured in the browser and dropped when the check stops.
+ */
+function useMicCheck() {
+  const [state, setState] = useState<MicState>("idle");
+  const [level, setLevel] = useState(0);
+  const [heard, setHeard] = useState(false);
+  const stopper = useRef<() => void>(() => undefined);
+  const stop = useCallback(() => stopper.current(), []);
+  const start = useCallback(async () => {
+    stopper.current();
+    setState("asking");
+    setHeard(false);
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const context = new AudioContext();
+      const analyser = context.createAnalyser();
+      analyser.fftSize = 512;
+      context.createMediaStreamSource(stream).connect(analyser);
+      const data = new Uint8Array(analyser.fftSize);
+      let alive = true;
+      let frame = 0;
+      const tick = () => {
+        if (!alive) return;
+        analyser.getByteTimeDomainData(data);
+        let sum = 0;
+        for (const v of data) {
+          const d = (v - 128) / 128;
+          sum += d * d;
+        }
+        const now = Math.min(1, Math.sqrt(sum / data.length) * 6);
+        setLevel(now);
+        if (now > 0.12) setHeard(true);
+        frame = requestAnimationFrame(tick);
+      };
+      tick();
+      setState("ok");
+      stopper.current = () => {
+        alive = false;
+        cancelAnimationFrame(frame);
+        stream.getTracks().forEach((t) => t.stop());
+        void context.close().catch(() => undefined);
+        stopper.current = () => undefined;
+        setLevel(0);
+      };
+    } catch (e) {
+      const name = (e as { name?: string })?.name;
+      setState(name === "NotFoundError" ? "missing" : "blocked");
+    }
+  }, []);
+  useEffect(() => () => stopper.current(), []);
+  return { state, level, heard, start, stop };
+}
+
+function micMessage(state: MicState, heard: boolean): string {
+  switch (state) {
+    case "asking":
+      return "Your browser is asking for permission. Press Allow.";
+    case "ok":
+      return heard
+        ? "I can hear you. The microphone works."
+        : "Say a few words: the bar should move.";
+    case "blocked":
+      return "The microphone is blocked. Click the lock icon next to the address, allow Microphone, then press Test again. You can still join and listen.";
+    case "missing":
+      return "No microphone was found. You can still join and listen.";
+    default:
+      return "Press Test, then say a few words. The bar should move.";
+  }
+}
+
+/** The step before the call: a microphone check, then one clear Join button. */
+function Lobby({
+  joining,
+  error,
+  onJoin,
+}: {
+  joining: boolean;
+  error: string;
+  onJoin: () => void;
+}) {
+  const mic = useMicCheck();
+  return (
+    <div className="space-y-4">
+      <div className="flex items-center gap-3">
+        <PiAvatar expression="rest" size={44} decorative />
+        <div className="min-w-0">
+          <p className="text-sm font-semibold">Ready to join?</p>
+          <p className="text-xs text-muted-foreground">
+            Check your microphone first, so people can hear you.
+          </p>
+        </div>
+      </div>
+      <div className="space-y-2.5 rounded-xl border border-border bg-surface-muted p-3">
+        <div className="flex items-center justify-between gap-2">
+          <span className="flex items-center gap-2 text-sm font-medium">
+            <Mic className="size-4" aria-hidden /> Microphone
+          </span>
+          <Button
+            size="sm"
+            variant="secondary"
+            disabled={joining || mic.state === "asking"}
+            onClick={() => void mic.start()}
+          >
+            {mic.state === "ok" ? "Test again" : "Test my microphone"}
+          </Button>
+        </div>
+        <div
+          className="h-2.5 overflow-hidden rounded-full border border-border bg-surface"
+          role="meter"
+          aria-label="Microphone level"
+          aria-valuemin={0}
+          aria-valuemax={100}
+          aria-valuenow={Math.round(mic.level * 100)}
+        >
+          <div
+            className={`h-full rounded-full transition-[width] duration-75 ${
+              mic.heard ? "bg-success" : "bg-primary"
+            }`}
+            style={{ width: `${Math.round(mic.level * 100)}%` }}
+          />
+        </div>
+        <p
+          aria-live="polite"
+          className={`text-xs ${
+            mic.state === "blocked" || mic.state === "missing"
+              ? "text-warning"
+              : "text-muted-foreground"
+          }`}
+        >
+          {micMessage(mic.state, mic.heard)}
+        </p>
+      </div>
+      {error && <Notice tone="danger">{error}</Notice>}
+      <div className="space-y-2">
+        <Button
+          className="h-11 w-full text-base"
+          onClick={() => {
+            mic.stop();
+            onJoin();
+          }}
+          loading={joining}
+          disabled={joining}
+        >
+          <Video /> {error ? "Try again" : "Join the room"}
+        </Button>
+        <p className="text-center text-xs text-muted-foreground">
+          pi (AI) is in this room and writes a transcript. It may speak if the
+          host allows it, and says it is an AI first.
+        </p>
+      </div>
+    </div>
+  );
+}
+
+/** A control with its name under it, so nobody has to guess what a round button does. */
+function Control({ label, children }: { label: string; children: ReactNode }) {
+  return (
+    <div className="str-video__call-controls flex min-w-12 flex-col items-center gap-1">
+      {children}
+      <span className="text-[11px] leading-none text-muted-foreground">
+        {label}
+      </span>
+    </div>
+  );
+}
+
+function Dock({
+  onLeave,
+  onError,
+}: {
+  onLeave: () => void;
+  onError: (message: string) => void;
+}) {
+  const { useScreenShareState } = useCallStateHooks();
+  const { isMute } = useScreenShareState();
+  return (
+    <div className="mx-auto flex w-fit max-w-full items-start justify-center gap-3 rounded-3xl border border-border bg-surface-muted/80 px-4 py-3 shadow-sm sm:gap-6">
+      <Control label="Mic">
+        <ToggleAudioPublishingButton />
+      </Control>
+      <Control label="Camera">
+        <ToggleVideoPublishingButton />
+      </Control>
+      <Control label={isMute ? "Share" : "Stop"}>
+        <ShareScreen onError={onError} />
+      </Control>
+      <Control label="Leave">
+        <CancelCallButton onLeave={onLeave} />
+      </Control>
     </div>
   );
 }
@@ -298,23 +503,7 @@ export function MeetingRoomCall({
   }
 
   if (!live) {
-    return (
-      <div className="space-y-3">
-        <p className="flex items-center gap-2 text-sm text-muted-foreground">
-          <PiAvatar expression="micro" size={18} decorative /> pi (AI) is in
-          this room and writes a transcript. It may speak if the host allows it,
-          and says it is an AI first.
-        </p>
-        {error && <Notice tone="danger">{error}</Notice>}
-        <Button
-          onClick={() => void join()}
-          loading={joining}
-          disabled={joining}
-        >
-          <Video /> {error ? "Try again" : "Join the room"}
-        </Button>
-      </div>
-    );
+    return <Lobby joining={joining} error={error} onJoin={() => void join()} />;
   }
   return (
     <StreamVideo client={live.client}>
@@ -322,28 +511,20 @@ export function MeetingRoomCall({
         <StreamTheme>
           <div className="space-y-3 [&_.str-video__participant-details]:text-white [&_.str-video__participant-details__name]:text-white">
             <RoomBar />
-            <p className="flex items-center gap-2 text-xs text-muted-foreground">
-              <PiAvatar expression="micro" size={16} decorative /> pi (AI) is
-              writing a transcript of this call.
-            </p>
             {error && <Notice tone="danger">{error}</Notice>}
             <SharingBanner />
-            <div className="h-[60dvh] min-h-72 overflow-hidden rounded-xl border border-border">
+            <div className="h-[56dvh] min-h-72 overflow-hidden rounded-2xl border border-border sm:h-[62dvh]">
               <SpeakerLayout
                 participantsBarPosition="bottom"
                 VideoPlaceholder={Face}
               />
             </div>
             <Captions />
-            <div className="str-video__call-controls mx-auto flex w-fit max-w-full flex-wrap items-center justify-center gap-2 rounded-full border border-border bg-surface-muted px-3 py-2 shadow-sm">
-              <ToggleAudioPublishingButton />
-              <ToggleVideoPublishingButton />
-              <ShareScreen onError={setError} />
-              <CancelCallButton onLeave={() => leave()} />
-            </div>
+            <Dock onLeave={() => leave()} onError={setError} />
             <p className="text-center text-xs text-muted-foreground">
-              Your camera and screen stay off until you turn them on. Video is
-              shown live to the room and is never recorded.
+              pi (AI) is writing a transcript of this call. Your camera and
+              screen stay off until you turn them on, and video is never
+              recorded.
             </p>
             <EndWatch onClosed={() => leave("ended")} />
           </div>
