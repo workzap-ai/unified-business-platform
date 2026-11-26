@@ -26,7 +26,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.ai.errors import GatewayUnavailable
 from app.ai.types import Word
 from app.modules.pi.memory_ledger import redacted
-from app.modules.pi_meetings import native_ingest
+from app.modules.pi_meetings import native_ingest, room_noise
 from app.modules.pi_meetings.bot_ingest import LINE_CHARS, MAX_LINES, VOICE_BASE
 from app.modules.pi_meetings.models import (
     PiMeeting,
@@ -276,6 +276,7 @@ async def finalize(
                 Spoken(None, text, *_span(offset, start, end))
                 for line, start, end in sentences(words)
                 if (text := redacted(join_spoken_digits(line), LINE_CHARS))
+                and not room_noise.is_invented(text)  # silence the model wrote as words
             ]
     if spoken:
         longest = await _rebuild(session, scope, meeting, spoken)

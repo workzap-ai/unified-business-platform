@@ -24,7 +24,7 @@ from typing import Any, Protocol
 from app.ai.errors import GatewayUnavailable
 from app.modules.pi import safety
 from app.modules.pi.memory_ledger import redacted
-from app.modules.pi_meetings import meeting_memory, room_turns, voice
+from app.modules.pi_meetings import meeting_memory, room_noise, room_turns, voice
 from app.modules.pi_meetings.recording_routes import join_spoken_digits
 from app.modules.pi_meetings.room_turns import Mode, RoomState, Utterance
 from app.modules.pi_meetings.room_vad import Turn
@@ -47,11 +47,6 @@ CARRY_S = 10.0
 START_WAIT_S = 2.0
 CARRY_REASONS = frozenset({"someone_speaking", "not_addressed"})
 CARRY_CHARS = 600
-# phrases the speech-to-text invents out of silence or music; nobody said them
-INVENTED = re.compile(
-    r"thanks? for watching|thank you for watching|subscribe|like and share|see you (next|in the)",
-    re.IGNORECASE,
-)
 # how pi sounds: a text-to-speech model that takes instructions is told the tone, the pace and,
 # for Urdu, the accent; the line's script picks which (Urdu or Arabic letters mean Urdu)
 STYLE_EN = (
@@ -204,7 +199,7 @@ class RoomSpeech:
         """Handle a finished turn. Returns what happened: the reason pi stayed silent, or
         'disclosed' or 'spoke'."""
         text = await self.hear(turn)
-        if not text or INVENTED.search(text):
+        if not text or room_noise.is_invented(text):  # nobody said it: not heard, not kept
             return "unheard"
         if os.environ.get("ROOM_LOG_HEARD") == "1":  # off by default: only for a test room
             logger.info("room_heard %s", text[:160])

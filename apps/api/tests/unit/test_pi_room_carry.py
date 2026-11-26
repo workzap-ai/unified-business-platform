@@ -180,7 +180,7 @@ async def test_hello_after_a_long_silence_picks_the_conversation_back_up_but_a_m
     assert await say(speech, manager, "hello, I run a small shop") == "disclosed"
     clock.t += room_speech.room_turns.ANSWER_S + 30
     assert await say(speech, manager, "ok", keep_pause=True) == "not_addressed"
-    assert await say(speech, manager, "thank you", keep_pause=True) == "not_addressed"
+    assert await say(speech, manager, "thank you", keep_pause=True) == "unheard"  # silence as words
     assert await say(speech, manager, "hello?", keep_pause=True) == "spoke"
 
 
@@ -206,3 +206,32 @@ async def test_an_urdu_line_is_spoken_in_the_urdu_style():
     speech, manager, clock = build(customers=1)
     await speech._say("اچھا، آپ کا کاروبار کیا ہے؟")
     assert manager.tts[0][1]["instructions"] == room_speech.STYLE_UR
+
+
+def test_silence_the_model_wrote_as_words_is_noise_but_real_short_words_are_not():
+    from app.modules.pi_meetings import room_noise
+
+    for invented in (
+        "you",
+        ".",
+        "...",
+        "Thank you.",
+        "Thank you for watching",
+        "Thanks for watching!",
+    ):
+        assert room_noise.is_invented(invented), invented
+    for real in ("bye", "khuda hafiz", "yes", "ok", "no", "hello?", "Thank you, that helps a lot"):
+        assert not room_noise.is_invented(real), real
+
+
+async def test_a_dot_or_a_you_after_pi_spoke_does_not_make_pi_answer_again():
+    """Found live: pi answered the same sentence twice (once in Urdu, once in English) because the
+    model wrote 'you' for a moment of silence and that counted as the person's answer."""
+    speech, manager, clock = build(customers=1)
+    assert await say(speech, manager, "hello, I run a small shop") == "disclosed"
+    clock.t += 4
+    assert await say(speech, manager, "you", keep_pause=True) == "unheard"
+    assert await say(speech, manager, ".", keep_pause=True) == "unheard"
+    assert await say(speech, manager, "Thank you.", keep_pause=True) == "unheard"
+    assert len(manager.tts) == 1  # only the introduction was ever spoken
+    assert await say(speech, manager, "bargaining customers", keep_pause=True) == "spoke"
