@@ -106,7 +106,8 @@ class RoomRun:
 
     async def _handle(self, turn: Turn) -> None:
         try:
-            await self.speech.on_turn(turn)
+            reason = await self.speech.on_turn(turn)
+            logger.info("room_turn reason=%s", reason)  # why pi spoke or stayed quiet, never the words
         except Exception:  # noqa: BLE001 - one bad turn must not stop the agent
             logger.exception("room_agent_turn_failed")
 

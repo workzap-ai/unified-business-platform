@@ -41,6 +41,15 @@ MAX_ROOMS = 3  # rooms one agent process holds at once
 POLL_S = 5.0
 
 
+def _uid(event: Any) -> str:
+    """The user id of a participant or of a join/leave event (the event wraps the participant)."""
+    for holder in (event, getattr(event, "participant", None)):
+        value = getattr(holder, "user_id", None)
+        if value:
+            return str(value)
+    return ""
+
+
 class TrackOut:
     """`room_speech.AudioOut` over the SDK's audio track."""
 
@@ -151,12 +160,12 @@ async def run_room(
         call = client.video.call(CALL_TYPE, orders.call_id)
         async with await rtc.join(call, AGENT_USER) as connection:
             connection.on("audio", on_audio)
-            connection.on("participant_joined", lambda p: run.joined(str(p.user_id)))
-            connection.on("participant_left", lambda p: run.left(str(p.user_id)))
+            connection.on("participant_joined", lambda p: run.joined(_uid(p)))
+            connection.on("participant_left", lambda p: run.left(_uid(p)))
             connection.on("call_ended", lambda *_: stop.set())
             await connection.add_tracks(audio=track)
             for person in connection.participants_state.get_participants():
-                run.joined(str(person.user_id))
+                run.joined(_uid(person))
             beat_task = asyncio.create_task(beat_loop())
             await stop.wait()
             await run.drain()
