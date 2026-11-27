@@ -67,11 +67,12 @@ def check_reply(
     must_not_mention: tuple[str, ...] = (),
     private: tuple[str, ...] = (),
     language: str = "",
+    prefer: str = "",
 ) -> list[str]:
     """The rule each reply breaks (empty list: none). Codes are stable so runs can be compared."""
     out: list[str] = []
     ctx = voice.context(history, heard)
-    lang = voice.reply_language(history, heard, language)
+    lang = prefer or voice.reply_language(history, heard, language)
     if not reply.strip():
         return ["empty"]
     if len(reply) > voice.SPOKEN_CHARS:
@@ -118,9 +119,18 @@ async def run_scenario(manager: Any, s: dict[str, Any]) -> Result:
     turns: list[Turn] = []
     block = s.get("what_i_know") or None
     private = tuple(s.get("private", ()))
+    prefer = ""
     for heard in s["owner"]:
+        prefer = voice.asked_language(heard) or prefer  # "speak Urdu" holds for the rest
         spoken = await voice.reply_to(
-            manager, sc, history, heard, language=language, what_i_know=block, ideas_given=ideas
+            manager,
+            sc,
+            history,
+            heard,
+            language=language,
+            what_i_know=block,
+            ideas_given=ideas,
+            prefer=prefer,
         )
         ideas += spoken.idea
         failures = check_reply(
@@ -132,9 +142,12 @@ async def run_scenario(manager: Any, s: dict[str, Any]) -> Result:
             must_not_mention=tuple(s.get("must_not_mention", ())),
             private=private,
             language=language,
+            prefer=prefer,
         )
         if s.get("expect_ai") and not AI_WORDS.search(re.split(r"(?<=[.!?؟۔])\s", spoken.text)[0]):
             failures.append("ai_not_in_first_sentence")
+        if prefer and spoken.text and not voice.in_reply_language(spoken.text, prefer):
+            failures.append(f"ignored_language_request:{prefer}")
         if ideas > voice.IDEA_CAP:
             failures.append("idea_cap")
         if block and meeting_memory.leaks(spoken.text, heard, meeting_memory.speakable(block)):

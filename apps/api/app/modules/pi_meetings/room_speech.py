@@ -95,6 +95,11 @@ class Session:
     halted: bool = False  # an emergency was voiced: pi says the numbers once and then stops
     spoken: int = 0
     ideas: int = 0  # free suggestions given in this call (capped by voice.IDEA_CAP)
+    # the language the person asked pi to speak ("Urdu mein bolo"): it holds until they ask again
+    language_pref: str = ""
+    # a solution was asked for in a piece of speech that was held and joined to a later one, where
+    # the words may no longer show it: it is answered at the next reply
+    wants_solution: bool = False
     facts: list[str] = field(default_factory=list)  # what they told pi in this call, in few words
     last_spoke_at: float | None = None
     history: list[voice.Said] = field(default_factory=list)
@@ -216,6 +221,9 @@ class RoomSpeech:
         async with self._lock:
             state = self.session
             now = self.clock()
+            if state.settings.mode == "speak":
+                state.language_pref = voice.asked_language(text) or state.language_pref
+                state.wants_solution = state.wants_solution or voice.asks_for_solution(text)
             held = state.carry.pop(turn.speaker_id, None)
             heard = text
             if held is not None:
@@ -282,7 +290,9 @@ class RoomSpeech:
                 if answered == "denied" and before == "pending":
                     line = voice.NOT_THEM  # not them: memory stays unused for the whole call
                 else:
-                    lang = voice.reply_language(state.history, heard, state.settings.language)
+                    lang = state.language_pref or voice.reply_language(
+                        state.history, heard, state.settings.language
+                    )
                     quick = len(heard.split()) >= FILLER_WORDS and not self.speaker_active(
                         turn.speaker_id
                     )
@@ -296,6 +306,8 @@ class RoomSpeech:
                             what_i_know=block if answered == "confirmed" else {},
                             ideas_given=state.ideas,
                             acknowledged=quick,
+                            prefer=state.language_pref,
+                            wants_solution=state.wants_solution,
                             learned=state.facts,
                             on_screen=self.on_screen() if self.on_screen else "",
                         )
@@ -305,6 +317,8 @@ class RoomSpeech:
                         await self._say(voice.filler(lang, state.spoken), filler=True)
                     reply = await thinking
                     line = reply.text
+                    if state.wants_solution and (reply.idea or line == voice.solution_line(lang)):
+                        state.wants_solution = False  # answered
                     if reply.idea:
                         state.ideas += 1
                     if reply.learned and reply.learned not in state.facts:

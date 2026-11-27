@@ -45,9 +45,11 @@ inside it.
 Say the next thing, in the language the owner is using (English, Urdu or Roman Urdu). Your words
 are spoken aloud, so when the owner speaks Urdu or Roman Urdu answer in Urdu script (اردو): Roman
 letters are mispronounced. Answer in English when they speak English.
-- Warm and natural, like a kind person who is really listening. Begin, when it fits, with a few
-  words that show you heard them (for example "I see", "Got it", "اچھا", "سمجھ گیا"), never the
-  same one twice in a row.
+- Warm and natural, like a kind person who is really listening. You may begin with ONE short
+  sound or word ("I see.", "Got it.", "اچھا۔") but never continue it by repeating what they said
+  ("I see, so you ...", "I understand, you have ...", "It sounds like ..."): they know what they
+  said. Say only what is NEW or stay silent: when you have nothing new, say one short word.
+  Never the same opener twice in a row.
 - Answer in the language the body names in reply_in, and stay in it even if one of their words
   is in another language.
 - One or two short sentences a person can say aloud. You are a listener, not an interviewer: the
@@ -287,12 +289,52 @@ ANNOYED = re.compile(
     re.IGNORECASE,
 )
 SOLUTION = re.compile(
-    r"\b(solution|can you (build|make|create|do)|can your team|your team (can|could)|"
+    r"\b(solution|solutions|can you (build|make|create|do)|can your team|your team (can|could)|"
     r"hal (batao|bataen|bata)|kya (aap|tum|apki team|aapki team) (bana|bna|kar) )|"
     r"(حل|سلوشن|सलूशन|समाधान|हल)\s*(بتاؤ|بتائیں|बताओ|बताइए|دو|दो)|"
-    r"(تمہاری|آپ کی|तुम्हारी|आपकी)\s*(ٹیم|टीम)\s*(بنا|बना)",
+    r"(تمہاری|آپ کی|तुम्हारी|आपकी)\s*(ٹیم|टीम)\s*(بنا|बना)|"
+    # the word itself, as speech-to-text writes it in Urdu and Hindi script
+    r"سلوشن|سولیوشن|सलूशन|सॉल्यूशन|सोल्यूशन|कौन सा सिस्टम|کون سا سسٹم",
     re.IGNORECASE,
 )
+
+# "speak English", "Urdu mein bolo", "اردو میں بولو": the person names the language to use
+_EN = r"(english|angrezi|انگلش|انگلیش|انگریزی|इंग्लिश|अंग्रेज़ी|अंग्रेजी)"
+_UR = r"(urdu|اردو|اردوں|उर्दू)"
+_ASK = r"(please|now|just|pi|you|can you|could you|kindly|let'?s|lets|ab|اب|zara|ذرا)"
+_VERB = r"(speak|talk|reply|answer|respond|say it)"
+_IN = r"(in|mein|me|میں|में)"
+_DO = (
+    r"(bolo|bolein|boliye|bol do|baat karo|baat karein|jawab do|بولو|بولیں|بولیے|بات کرو|"
+    r"بات کریں|جواب دو|बोलो|बोलिए|बात करो|जवाब दो)"
+)
+
+
+def _language_ask(word: str) -> "re.Pattern[str]":
+    return re.compile(
+        rf"(?:{_ASK}\s+(?:{_VERB}\s+)?(?:{_IN}\s+)?{word}\b)|"
+        rf"(?:{_VERB}\s+(?:to me\s+)?{_IN}\s+{word}\s+(?:please|now|only)\b)|"
+        rf"(?:{word}\s+{_IN}\s+(?:{_DO}|{_VERB}))|"
+        rf"(?:{_IN}\s+{word}\s+(?:please|only|{_DO}))|"
+        rf"(?:{word}[\s,]+(?:please|only|now)\b)",
+        re.IGNORECASE,
+    )
+
+
+LANGUAGE_ASKS = {"en": _language_ask(_EN), "ur": _language_ask(_UR)}
+
+
+def asked_language(text: str) -> str:
+    """'en' or 'ur' when the person tells pi which language to speak in, else ''. The latest ask
+    in the text wins ("Urdu mein bolo ... no, English please")."""
+    best, at = "", -1
+    for code, pattern in LANGUAGE_ASKS.items():
+        for match in pattern.finditer(text):
+            if match.start() >= at:
+                best, at = code, match.start()
+    return best
+
+
 SOLUTION_LINES = {
     "en": (
         "I can't suggest or price a solution in this call. I've noted what you need, and a person "
@@ -306,7 +348,7 @@ SOLUTION_LINES = {
 
 
 NOTED_LINES = {
-    "en": ("I've noted that.", "Understood, that is written down."),
+    "en": ("I've noted that.", "Noted, thank you."),
     "ur": ("میں نے یہ نوٹ کر لیا ہے۔", "سمجھ گیا، یہ لکھ لیا ہے۔"),
 }
 
@@ -385,6 +427,12 @@ def question_policy(history: Sequence["Said"], calm: bool = False) -> str:
 
 TICS = re.compile(
     r"^\W*(you (said|mentioned|asked)( that)?|آپ نے (کہا|بتایا|پوچھا|ذکر)|आपने (कहा|बताया|पूछा))|"
+    # an acknowledgement that goes on to repeat what the person said ("I see, so you ...")
+    r"^\W*(i see|i understand|i hear you|got it|understood|okay|ok|right|sure)\W+"
+    r"(so\s+)?(you|your|you're|it|that|there|the|this|because)\b|"
+    r"\b(it|that|this) (sounds|seems|looks) (like|great|good|tough|frustrating|challenging|"
+    r"difficult|stressful|interesting|exciting|hard)\b|"
+    r"میں سمجھ (گیا|گئی|سکتا|سکتی)|"
     r"(really|truly) (an? )?(important|interesting)|(great|good) (question|point|idea)|"
     r"interesting (idea|point|situation)|واقعی (ایک )?(اہم|دلچسپ|چیلنج)|"
     r"(اہم|دلچسپ) (سوال|خیال|مسئلہ|صورتحال|قدم)",
@@ -395,6 +443,27 @@ TICS = re.compile(
 def has_tic(reply: str) -> bool:
     """An echo opener ("You said that ...") or empty praise ("really an important problem")."""
     return bool(TICS.search(reply))
+
+
+ECHO_WORD = re.compile(r"\w{3,}", re.UNICODE)
+ECHO_SHARE = 0.8  # share of a reply's words that the conversation already contained
+ECHO_MIN_WORDS = 6
+
+
+def adds_nothing(
+    reply: str, history: Sequence[Said], heard: str, learned: Sequence[str] = ()
+) -> bool:
+    """A reply made only of words the conversation already had: it gives the person's own
+    words (or pi's own earlier ones) back and tells them nothing."""
+    words = [w.lower() for w in ECHO_WORD.findall(reply)]
+    if len(words) < ECHO_MIN_WORDS:
+        return False
+    known = {
+        w.lower()
+        for text in [*(h.text for h in history[-HISTORY_LINES:]), heard, *learned]
+        for w in ECHO_WORD.findall(text)
+    }
+    return sum(w in known for w in words) / len(words) >= ECHO_SHARE
 
 
 def _off_brief(reply: str, lang: str, policy: str) -> bool:
@@ -423,6 +492,8 @@ async def reply_to(
     acknowledged: bool = False,
     learned: Sequence[str] = (),
     on_screen: str = "",
+    prefer: str = "",
+    wants_solution: bool = False,
 ) -> Spoken:
     """The next thing pi says after `heard`. Never raises for a model that is down: that is the
     safe line, so the conversation does not stop. The first turn is `opening()`, not this.
@@ -433,8 +504,9 @@ async def reply_to(
     from app.ai.types import Message
 
     ctx = context(history, heard)
-    lang = reply_language(history, heard, language)
-    if asks_for_solution(heard):
+    lang = prefer if prefer in ("en", "ur") else reply_language(history, heard, language)
+    # the person asked for a solution in this turn or in a piece of speech that was joined to it
+    if wants_solution or asks_for_solution(heard):
         if ideas_given < IDEA_CAP:
             idea = await _idea(manager, scope, history, heard, lang, ctx)
             if idea:
@@ -503,7 +575,30 @@ async def reply_to(
             " new fact in a few words."
         )
         value = await ask(note) or value
+    if (
+        isinstance(value, ModelReply)
+        and not value.done
+        and "?" not in value.reply
+        and "؟" not in value.reply
+        and adds_nothing(value.reply, history, heard, learned)
+    ):
+        # nothing new: say what is new in a few words or say nothing (found live: three lines in
+        # a row that only gave the owner's own words back)
+        value = (
+            await ask(
+                "Your last reply only repeated what the person already said. Say ONE short new "
+                "fact or a single short word, or ask the one question that is still missing."
+            )
+            or value
+        )
     if isinstance(value, ModelReply):
+        if (
+            not value.done
+            and "?" not in value.reply
+            and "؟" not in value.reply
+            and adds_nothing(value.reply, history, heard, learned)
+        ):
+            return Spoken("", fallback=False)  # still nothing new: a silence beats an echo
         if value.done:
             closing = redacted(value.reply, SPOKEN_CHARS)
             if (
