@@ -191,3 +191,13 @@ def test_a_guest_who_closed_the_page_does_not_make_one_customer_look_like_two():
     assert run.customers() == 1
     run.on_audio("g_old", frame(True), RATE)  # a sound brings them back
     assert run.customers() == 2
+
+
+def test_the_meetings_agent_decides_the_voice():
+    run, *_ = build()
+    run.apply(orders(agent_key="negotiation_coach"))
+    assert run.speech.session.settings.voice == "sage"
+    run.apply(orders(agent_key="sales_coach"))
+    assert run.speech.session.settings.voice == "onyx"
+    run.apply(orders(agent_key="a_custom_agent"))
+    assert run.speech.session.settings.voice == "marin"  # pi's own

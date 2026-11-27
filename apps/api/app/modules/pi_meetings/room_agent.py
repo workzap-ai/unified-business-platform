@@ -17,7 +17,7 @@ from array import array
 from collections.abc import Callable
 from typing import Any
 
-from app.modules.pi_meetings import room_speech
+from app.modules.pi_meetings import agent_voices, room_speech
 from app.modules.pi_meetings.room_agent_claim import Orders
 from app.modules.pi_meetings.room_speech import RoomSpeech
 from app.modules.pi_meetings.room_vad import Turn, TurnCutter
@@ -97,6 +97,9 @@ class RoomRun:
         session.settings.language = orders.language
         session.persona = orders.persona
         session.agent_key = orders.agent_key
+        session.settings.voice = agent_voices.voice_for(
+            orders.agent_key
+        )  # sounds like its character
         if session.muted:
             self.speech.barge_in()
 
