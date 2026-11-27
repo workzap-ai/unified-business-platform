@@ -67,8 +67,14 @@ letters are mispronounced. Answer in English when they speak English.
 - Build on the exact words they just said; never repeat a question already asked and never ask what
   they already told you. The body's learned_this_call lists what they told you earlier in this
   call: use it so they never repeat themselves, and refer back to it when it fits.
+- Never put a person's or a business's NAME in "learned" or say "called someone": names are not
+  kept. Say "the bakery" and move on.
 - Also fill "learned": the new fact in owner_just_said as a few plain English words ("sells
-  clothes, team of 5", "orders get missed weekly"), or "" when there is nothing new.
+  clothes, team of 5", "orders get missed weekly"), or "" when there is nothing new. When they
+  CORRECT something you noted earlier (a name, a number, a place), put the corrected fact in
+  "learned" and the old one, as it is in learned_this_call, in "replaces". A word that sounds like
+  a mishearing (a name that makes no sense) is not a fact: leave "learned" empty and ask for it
+  again once, in a few words.
 - The body's on_screen (when present) says what kind of thing the person is showing on their
   shared screen. You may refer to it in general words ("I can see your orders sheet"); never read
   out names, numbers or text from it, and never claim to see more than it says.
@@ -91,7 +97,7 @@ Give ONE helpful suggestion that helps them decide better, in the language named
   will build or do it. No advice on law, health, money or tax. No question.
 - You may end by saying a person from the Workzap team will go through the options with them."""
 
-FACTS_KEPT = 14  # facts of this call given back to the model each turn
+FACTS_KEPT = 24  # facts of this call given back to the model each turn
 FACT_CHARS = 120
 IDEA_CAP = 2  # free suggestions pi gives in one call (platform spec: 2 per problem)
 
@@ -120,6 +126,7 @@ class ModelReply(BaseModel):
     reply: str = ""
     done: bool = False
     learned: str = ""  # the new fact in what the person just said, kept for the rest of the call
+    replaces: str = ""  # an earlier fact (in its own words) that this one corrects, or ""
 
 
 class VoiceFailed(Exception):
@@ -141,6 +148,7 @@ class Spoken:
     done: bool = False
     idea: bool = False  # a free suggestion: it counts against IDEA_CAP
     learned: str = ""  # a new fact from what the person said, to remember for this call
+    replaces: str = ""  # the earlier fact this one corrects (see ModelReply.replaces)
 
 
 def context(history: Sequence[Said], heard: str) -> dict[str, Any]:
@@ -433,6 +441,7 @@ TICS = re.compile(
     r"\b(it|that|this) (sounds|seems|looks) (like|great|good|tough|frustrating|challenging|"
     r"difficult|stressful|interesting|exciting|hard)\b|"
     r"میں سمجھ (گیا|گئی|سکتا|سکتی)|"
+    r"\b(called|named|name is|name was)\s+someone\b|"
     r"(really|truly) (an? )?(important|interesting)|(great|good) (question|point|idea)|"
     r"interesting (idea|point|situation)|واقعی (ایک )?(اہم|دلچسپ|چیلنج)|"
     r"(اہم|دلچسپ) (سوال|خیال|مسئلہ|صورتحال|قدم)",
@@ -450,6 +459,13 @@ ECHO_SHARE = 0.8  # share of a reply's words that the conversation already conta
 ECHO_MIN_WORDS = 6
 
 
+def _known_words(
+    history: Sequence[Said], heard: str, learned: Sequence[str], *, owner_only: bool = False
+) -> set[str]:
+    lines = [h.text for h in history[-HISTORY_LINES * 2 :] if not (owner_only and h.pi)]
+    return {w.lower() for text in [*lines, heard, *learned] for w in ECHO_WORD.findall(text)}
+
+
 def adds_nothing(
     reply: str, history: Sequence[Said], heard: str, learned: Sequence[str] = ()
 ) -> bool:
@@ -458,12 +474,24 @@ def adds_nothing(
     words = [w.lower() for w in ECHO_WORD.findall(reply)]
     if len(words) < ECHO_MIN_WORDS:
         return False
-    known = {
-        w.lower()
-        for text in [*(h.text for h in history[-HISTORY_LINES:]), heard, *learned]
-        for w in ECHO_WORD.findall(text)
-    }
+    known = _known_words(history, heard, learned)
     return sum(w in known for w in words) / len(words) >= ECHO_SHARE
+
+
+ASK_KNOWN_SHARE = 0.85
+ASK_KNOWN_MIN_WORDS = 5
+
+
+def asks_known(
+    reply: str, history: Sequence[Said], heard: str, learned: Sequence[str] = ()
+) -> bool:
+    """A question made of words the PERSON already said (or pi noted as learned): it asks again
+    what they told pi."""
+    words = [w.lower() for w in ECHO_WORD.findall(reply)]
+    if len(words) < ASK_KNOWN_MIN_WORDS:
+        return False
+    known = _known_words(history, heard, learned, owner_only=True)
+    return sum(w in known for w in words) / len(words) >= ASK_KNOWN_SHARE
 
 
 def _off_brief(reply: str, lang: str, policy: str) -> bool:
@@ -591,6 +619,26 @@ async def reply_to(
             )
             or value
         )
+    if (
+        isinstance(value, ModelReply)
+        and not value.done
+        and ("?" in value.reply or "؟" in value.reply)
+        and asks_known(value.reply, history, heard, learned)
+    ):
+        # a question the person already answered in this call: they must never repeat themselves
+        value = (
+            await ask(
+                "They already told you what this question asks. Do not ask it again: say the "
+                "new thing you understood in a few words, or ask about something not yet said."
+            )
+            or value
+        )
+        if (
+            isinstance(value, ModelReply)
+            and ("?" in value.reply or "؟" in value.reply)
+            and asks_known(value.reply, history, heard, learned)
+        ):
+            value = None  # still known: the safe line is better than asking it a third time
     if isinstance(value, ModelReply):
         if (
             not value.done
@@ -615,7 +663,12 @@ async def reply_to(
         if said and _off_brief(said, lang, policy):
             said = ""
         if said and not _repeats(said, history) and not meeting_memory.leaks(said, seen, block):
-            return Spoken(said, fallback=False, learned=_fact(value))
+            return Spoken(
+                said,
+                fallback=False,
+                learned=_fact(value),
+                replaces=_replaces(value),
+            )
     return Spoken(_safe_line(ctx, lang, policy), fallback=True)
 
 
@@ -672,10 +725,26 @@ async def _idea(
     return text
 
 
+PLACEHOLDER_NAME = re.compile(r"\b(called|named|name is|name was)\s+someone\b", re.IGNORECASE)
+
+
+def _replaces(value: "ModelReply") -> str:
+    """The earlier fact the person corrected, as pi noted it (redacted, short) or ""."""
+    return redacted(value.replaces, FACT_CHARS) if value.learned.strip() else ""
+
+
 def _fact(value: "ModelReply") -> str:
     """The fact taken from what the person said: redacted, short, never a price (or "")."""
     text = redacted(value.learned, FACT_CHARS)
-    return "" if PRICE.search(text) else text
+    if PRICE.search(text):
+        return ""
+    # the redactor turns a name into "someone": a fact that now says "called someone" is nonsense
+    # and, spoken back, sounded like pi had misheard (found live: "your bakery is called someone")
+    if PLACEHOLDER_NAME.search(text) or (
+        "someone" in text.lower() and "someone" not in value.learned.lower()
+    ):
+        return ""
+    return text
 
 
 def _norm(text: str) -> str:

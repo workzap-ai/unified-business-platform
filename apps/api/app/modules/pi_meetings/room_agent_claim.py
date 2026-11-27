@@ -11,7 +11,7 @@ The agent is a platform process: it reads rooms across workspaces, then acts for
 time through that room's own scope.
 """
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import datetime, timedelta
 from typing import Any
 from uuid import UUID
@@ -46,6 +46,7 @@ class Orders:
     disclosed: bool = False
     halted: bool = False
     last_spoke_at: datetime | None = None
+    notes: dict[str, Any] = field(default_factory=dict)
 
 
 def scope_of(room: PiMeetingRoom) -> WorkspaceScope:
@@ -132,6 +133,7 @@ async def beat(session: Any, room_id: UUID, agent_id: str, now: datetime) -> Ord
         disclosed=room.pi_disclosed,
         halted=room.pi_halted,
         last_spoke_at=room.pi_last_spoke_at,
+        notes=dict(room.pi_notes or {}),
     )
 
 
@@ -154,6 +156,7 @@ async def save_state(
     disclosed: bool,
     halted: bool,
     last_spoke_at: datetime | None,
+    notes: dict[str, Any] | None = None,
 ) -> bool:
     """Keep what pi has done so far, only while this agent still holds the room. The caller
     commits. False when the room is no longer this agent's."""
@@ -167,4 +170,6 @@ async def save_state(
     room.pi_halted = room.pi_halted or halted
     if last_spoke_at is not None:
         room.pi_last_spoke_at = last_spoke_at
+    if notes is not None:
+        room.pi_notes = notes
     return True

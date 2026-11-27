@@ -222,8 +222,16 @@ async def test_what_pi_did_survives_an_agent_restart(api, business_db, provider)
         )
         is False
     )  # not the holder: nothing is kept
+    notes = {"facts": ["bakery, four people, one oven"], "language": "ur", "ideas": 1, "recent": []}
     assert await claim.save_state(
-        business_db, room.id, "agent-a", spoken=3, disclosed=True, halted=False, last_spoke_at=spoke
+        business_db,
+        room.id,
+        "agent-a",
+        spoken=3,
+        disclosed=True,
+        halted=False,
+        last_spoke_at=spoke,
+        notes=notes,
     )
     await business_db.commit()
     # a smaller or later-reset value never lowers what was kept; a halt is never undone
@@ -237,4 +245,5 @@ async def test_what_pi_did_survives_an_agent_restart(api, business_db, provider)
     assert orders is not None
     assert (orders.spoken, orders.disclosed, orders.halted) == (3, True, True)
     assert orders.last_spoke_at == spoke
+    assert orders.notes == notes  # what pi noted comes back after a restart
     await pi.close()

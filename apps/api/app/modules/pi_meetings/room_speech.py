@@ -24,7 +24,7 @@ from typing import Any, Protocol
 from app.ai.errors import GatewayUnavailable
 from app.modules.pi import safety
 from app.modules.pi.memory_ledger import redacted
-from app.modules.pi_meetings import meeting_memory, room_noise, room_turns, voice
+from app.modules.pi_meetings import meeting_memory, room_noise, room_recall, room_turns, voice
 from app.modules.pi_meetings.recording_routes import join_spoken_digits
 from app.modules.pi_meetings.room_turns import Mode, RoomState, Utterance
 from app.modules.pi_meetings.room_vad import Turn
@@ -394,9 +394,7 @@ class RoomSpeech:
                         state.wants_solution = False  # answered
                     if reply.idea:
                         state.ideas += 1
-                    if reply.learned and reply.learned not in state.facts:
-                        state.facts.append(reply.learned)
-                        del state.facts[: -voice.FACTS_KEPT * 2]
+                    room_recall.merge_fact(state.facts, reply.learned, reply.replaces)
                     if (
                         reply.fallback
                         and state.last_spoke_at is not None

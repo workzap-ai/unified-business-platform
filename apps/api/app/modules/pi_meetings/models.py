@@ -223,6 +223,11 @@ class PiMeetingRoom(WorkspaceRow):
     pi_last_spoke_at: Mapped[datetime | None] = mapped_column(
         DateTime(timezone=True), nullable=True
     )
+    # pi's notes of this call (short redacted facts, the language asked for, the last lines), so a
+    # restarted agent does not ask everything again (see room_recall.py)
+    pi_notes: Mapped[dict[str, Any]] = mapped_column(
+        JSONB, default=dict, server_default=text("'{}'::jsonb")
+    )
 
 
 class PiMeetingDocument(WorkspaceRow):

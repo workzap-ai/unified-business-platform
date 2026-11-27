@@ -32,7 +32,7 @@ from app.core.database import create_engine
 from app.modules.pi_meetings import room_agent_claim as claims
 from app.modules.pi_meetings import room_agent_lines as lines
 from app.modules.pi_meetings import room_agent_memory as memory
-from app.modules.pi_meetings import room_sight, voice
+from app.modules.pi_meetings import room_recall, room_sight, voice
 from app.modules.pi_meetings.room_agent import AGENT_USER, RoomRun
 from app.modules.pi_meetings.room_provider import CALL_TYPE
 from app.modules.pi_meetings.room_sight import Sight
@@ -156,6 +156,7 @@ async def run_room(
                 disclosed=session.disclosed,
                 halted=session.halted,
                 last_spoke_at=when,
+                notes=room_recall.pack(session),
             ):
                 await db.commit()
 
@@ -199,6 +200,7 @@ async def run_room(
         what_i_know=lambda: known["block"],
         on_screen=sight.current,
     )
+    room_recall.restore(speech.session, orders.notes)  # what pi noted before a restart
     run = RoomRun(speech, clock=time.monotonic)
     run.apply(orders)
     stop = asyncio.Event()
