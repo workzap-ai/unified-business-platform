@@ -8,6 +8,7 @@ lines it used; an agent adds its focus and tone below those rules. Audit entries
 counts, never the question, the answer or the agent's instructions.
 """
 
+import asyncio
 from datetime import UTC, datetime, timedelta
 from typing import Any
 from uuid import UUID
@@ -510,6 +511,180 @@ async def send_message(
     await session.refresh(user_row)
     await session.refresh(reply_row)
     return {"user": _message_view(user_row), "assistant": _message_view(reply_row)}
+
+
+DEBRIEF_TITLE = "Debrief"
+
+
+async def _debrief_chat(
+    session: Any, scope: WorkspaceScope, meeting_id: UUID
+) -> PiMeetingChat | None:
+    chat: PiMeetingChat | None = await session.scalar(
+        select(PiMeetingChat)
+        .where(
+            PiMeetingChat.tenant_id == scope.tenant_id,
+            PiMeetingChat.environment_id == scope.environment_id,
+            PiMeetingChat.meeting_id == meeting_id,
+            PiMeetingChat.title == DEBRIEF_TITLE,
+        )
+        .order_by(PiMeetingChat.created_at.desc())
+    )
+    return chat
+
+
+async def _messages_of(session: Any, scope: WorkspaceScope, chat_id: UUID) -> list[Any]:
+    return list(
+        (
+            await session.scalars(
+                select(PiMeetingChatMessage)
+                .where(
+                    PiMeetingChatMessage.tenant_id == scope.tenant_id,
+                    PiMeetingChatMessage.environment_id == scope.environment_id,
+                    PiMeetingChatMessage.chat_id == chat_id,
+                )
+                .order_by(PiMeetingChatMessage.created_at, PiMeetingChatMessage.id)
+            )
+        ).all()
+    )
+
+
+def _debrief_items(messages: list[Any]) -> list[dict[str, Any]]:
+    """Each question with its answer, in the order asked."""
+    items: list[dict[str, Any]] = []
+    for m in messages:
+        if m.role == "user":
+            items.append(
+                {"question": m.text, "found": False, "answer": "", "partial": False, "sources": []}
+            )
+        elif items:
+            items[-1].update(
+                found=m.found, answer=m.text, partial=m.partial, sources=m.sources or []
+            )
+    return items
+
+
+@router.get("/meeting-intel/{meeting_id}/debrief")
+async def get_debrief(meeting_id: UUID, scope: Scope, session: Session) -> dict[str, Any]:
+    """The last debrief of this meeting (the agent's own questions, answered from the meeting)."""
+    await _gate(session, scope, "pi.meetings.read")
+    meeting = await _meeting(session, scope, meeting_id)
+    chat = await _debrief_chat(session, scope, meeting.id)
+    if chat is None:
+        return {"chat": None, "agent_key": meeting.agent_key or agents.DEFAULT_KEY, "items": []}
+    messages = await _messages_of(session, scope, chat.id)
+    return {
+        "chat": _chat_view(chat, len(messages)),
+        "agent_key": chat.agent_key,
+        "items": _debrief_items(messages),
+    }
+
+
+@router.post("/meeting-intel/{meeting_id}/debrief")
+async def run_debrief(
+    meeting_id: UUID, scope: Scope, session: Session, request: Request
+) -> dict[str, Any]:
+    """Ask the meeting's agent's starter questions of this meeting and keep the answers as the
+    meeting's debrief (running it again replaces the last one). Same rules as any answer: only
+    this meeting's lines, each answer shows the lines it used."""
+    await _gate(session, scope, "pi.meetings.read")
+    meeting = await _meeting(session, scope, meeting_id)
+    key = await valid_key(session, scope, meeting.agent_key or agents.DEFAULT_KEY)
+    _, _, persona = await resolve(session, scope, key)
+    parts = []
+    for question in agents.debrief_questions(key):
+        _lines, part, partial = await qa_routes.transcript_part(
+            session, scope, meeting.id, question
+        )
+        parts.append((question, part, partial))
+    state = request.app.state
+    manager = build_llm_manager(state.settings, state.http, state.sessions)
+    try:
+        answers = await asyncio.gather(
+            *(
+                qa.ask(
+                    manager,
+                    scope,
+                    question,
+                    part,
+                    partial=partial,
+                    language=meeting.language,
+                    persona=persona,
+                )
+                for question, part, partial in parts
+            )
+        )
+    except qa.AskFailed:
+        raise BusinessRuleViolation(
+            "MEETING_ASK_UNAVAILABLE", "The debrief could not be written; try again", 502
+        ) from None
+    chat = await _debrief_chat(session, scope, meeting.id)
+    if chat is None:
+        chat = PiMeetingChat(
+            tenant_id=scope.tenant_id,
+            environment_id=scope.environment_id,
+            meeting_id=meeting.id,
+            agent_key=key,
+            title=DEBRIEF_TITLE,
+            created_by=scope.user_id,
+        )
+        session.add(chat)
+        await session.flush()
+    else:
+        chat.agent_key = key
+        await session.execute(
+            delete(PiMeetingChatMessage).where(
+                PiMeetingChatMessage.tenant_id == scope.tenant_id,
+                PiMeetingChatMessage.environment_id == scope.environment_id,
+                PiMeetingChatMessage.chat_id == chat.id,
+            )
+        )
+    moment = datetime.now(UTC)
+    for n, ((question, _part, _partial), answer) in enumerate(zip(parts, answers, strict=True)):
+        shown = qa_routes.answer_view(answer)
+        at = moment + timedelta(milliseconds=2 * n)
+        session.add(
+            PiMeetingChatMessage(
+                tenant_id=scope.tenant_id,
+                environment_id=scope.environment_id,
+                chat_id=chat.id,
+                role="user",
+                text=question,
+                created_at=at,
+            )
+        )
+        session.add(
+            PiMeetingChatMessage(
+                tenant_id=scope.tenant_id,
+                environment_id=scope.environment_id,
+                chat_id=chat.id,
+                role="assistant",
+                text=shown["answer"],
+                found=shown["found"],
+                partial=shown["partial"],
+                sources=shown["sources"],
+                created_at=at + timedelta(milliseconds=1),
+            )
+        )
+    chat.updated_at = datetime.now(UTC)
+    await record(
+        session,
+        "pi.meeting_debrief",
+        scope=scope,
+        entity_type="pi_meeting",
+        entity_id=meeting.id,
+        details={
+            "questions": len(parts),
+            "found": sum(a.found for a in answers),
+            "agent": key if key in agents.BY_KEY else "custom",
+        },
+    )
+    await session.commit()
+    messages = await _messages_of(session, scope, chat.id)
+    return {
+        "chat": _chat_view(chat, len(messages)),
+        "agent_key": key,
+        "items": _debrief_items(messages),
+    }
 
 
 @router.patch("/meeting-intel/{meeting_id}/chats/{chat_id}")
