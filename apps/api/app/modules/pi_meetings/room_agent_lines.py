@@ -20,7 +20,7 @@ from sqlalchemy import func, select, text
 from app.modules.pi.memory_ledger import redacted
 from app.modules.pi_meetings import voice
 from app.modules.pi_meetings.bot_ingest import LINE_CHARS, MAX_LINES, VOICE_BASE
-from app.modules.pi_meetings.models import PiMeetingSegment
+from app.modules.pi_meetings.models import PiMeetingRoom, PiMeetingSegment
 from app.modules.pi_meetings.room_agent_claim import Orders
 from app.modules.pi_meetings.voice_routes import _pi_participant
 
@@ -51,7 +51,19 @@ async def store_pi_line(
     ordinal = 0 if top is None else top + 1
     if ordinal >= MAX_LINES:
         return False
-    began = orders.started_at or now
+    # the room's start as it is NOW: the agent's orders were read before the call began, and a
+    # room opened minutes before its first guest would put pi's lines minutes away from
+    # everyone else's (found live: pi's answers all sorted after the customer's questions)
+    row = (
+        await session.execute(
+            select(PiMeetingRoom.started_at, PiMeetingRoom.created_at).where(
+                PiMeetingRoom.tenant_id == scope.tenant_id,
+                PiMeetingRoom.environment_id == scope.environment_id,
+                PiMeetingRoom.meeting_id == orders.meeting_id,
+            )
+        )
+    ).first()
+    began = (row[0] or row[1] if row else None) or orders.started_at or now
     end_ms = max(1, int((now - began).total_seconds() * 1000))
     start_ms = max(0, end_ms - SPEAKING_MS * len(line))
     pi_id = await _pi_participant(session, scope, orders.meeting_id)

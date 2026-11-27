@@ -247,3 +247,31 @@ async def test_what_pi_did_survives_an_agent_restart(api, business_db, provider)
     assert orders.last_spoke_at == spoke
     assert orders.notes == notes  # what pi noted comes back after a restart
     await pi.close()
+
+
+async def test_pi_lines_are_timed_from_the_rooms_real_start_not_from_when_it_was_opened(
+    api, business_db, provider
+):
+    """Found live (test 16): the agent read its orders before the call began, so pi's lines were
+    timed from when the room was OPENED and sorted minutes after everything the customer said."""
+    from sqlalchemy import select
+
+    from app.modules.pi_meetings import room_agent_lines as pilines
+    from app.modules.pi_meetings.models import PiMeetingSegment
+
+    pi, mid = await room_with_pi(api, business_db, "369400010")
+    await api.post(f"{BASE}/{mid}/room/pi", json={"mode": "speak"})
+    await claim.claim(business_db, "agent-a", NOW)
+    await business_db.commit()
+    room = await the_room(business_db, mid)
+    orders = await claim.beat(business_db, room.id, "agent-a", NOW)  # read before the call began
+    started = orders.started_at + timedelta(minutes=10)  # the call really began 10 minutes later
+    room.started_at = started
+    await business_db.commit()
+    assert await pilines.store_pi_line(
+        business_db, orders, "Hi, I'm pi, an AI from Workzap.", now=started + timedelta(seconds=30)
+    )
+    await business_db.commit()
+    seg = await business_db.scalar(select(PiMeetingSegment).order_by(PiMeetingSegment.ordinal))
+    assert 29_000 <= seg.end_ms <= 31_000  # 30 s into the call, not 10 minutes and 30 s
+    await pi.close()

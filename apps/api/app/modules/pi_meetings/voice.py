@@ -197,6 +197,18 @@ def opening(name: str = "", language: str = "") -> str:
     return constitution.safe_fallback(ctx)
 
 
+LATE_OPENING = {
+    "en": "Hi, I'm pi, an AI from Workzap. Sorry for the wait, I'm listening.",
+    "ur": "السلام علیکم، میں pi ہوں، Workzap کا AI اسسٹنٹ۔ انتظار کے لیے معذرت، میں سن رہا ہوں۔",
+}
+
+
+def late_opening(language: str = "") -> str:
+    """The introduction when the customer has already been talking for a while: the AI disclosure
+    and a short apology, with NO question (they have told pi about their business already)."""
+    return LATE_OPENING["ur" if language in ("ur", "roman_ur", "ar") else "en"]
+
+
 def classify(reply: str, name: str = "") -> str:
     """'confirmed', 'denied' or 'unclear' for a reply to the identity question. Fails closed, by
     allowlist: confirmed only when the answer is a yes and nothing else but filler words and the
@@ -401,6 +413,17 @@ SLOW = re.compile(
     r"بہت\s+تیز|آہستہ|धीरे\s+बोल|बहुत\s+तेज़?",
     re.IGNORECASE,
 )
+SCREEN = re.compile(
+    r"(can|could)\s+you\s+see\s+(my\s+)?(screen|this)|do\s+you\s+see\s+(my\s+)?screen|"
+    r"(meri|mera)\s+screen|screen\s+(dekh|nazar)|(کیا\s+)?(آپ|تم)\s+(میری\s+)?سکرین|"
+    r"क्या\s+(आप|तुम)\s+(मेरी\s+)?स्क्रीन",
+    re.IGNORECASE,
+)
+FAST = re.compile(
+    r"(talk|speak|go)\s+(a\s+bit\s+)?(faster|quicker)|speed\s+up|(thora|zara)\s+tez|"
+    r"tez\s+(bolo|boliye)|تیز\s+بولو|तेज़?\s+बोल",
+    re.IGNORECASE,
+)
 CONTROL_LINES = {
     "hear": {
         "en": "Yes, I can hear you clearly.",
@@ -409,6 +432,16 @@ CONTROL_LINES = {
     "slow": {
         "en": "Sure, I'll slow down.",
         "ur": "جی، میں آہستہ بولوں گا۔",
+    },
+    "screen": {
+        "en": "I can't see shared screens in this call. Tell me in words what you are showing.",
+        "ur": (
+            "میں اس کال میں شیئر کی ہوئی سکرین نہیں دیکھ سکتا۔ آپ بتا دیں کہ آپ کیا دکھا رہے ہیں۔"
+        ),
+    },
+    "fast": {
+        "en": "Sure, I'll speak a little faster.",
+        "ur": "جی، میں تھوڑا تیز بولوں گا۔",
     },
     "nothing": {
         "en": "I don't have anything to repeat yet.",
@@ -433,6 +466,10 @@ def control(heard: str, history: Sequence["Said"], lang: str) -> Control | None:
     key = "en" if lang == "en" else "ur"
     if SLOW.search(heard):
         return Control("slow", CONTROL_LINES["slow"][key])
+    if FAST.search(heard):
+        return Control("fast", CONTROL_LINES["fast"][key])
+    if SCREEN.search(heard):
+        return Control("screen", CONTROL_LINES["screen"][key])
     if REPEAT.search(heard):
         last = next((h.text for h in reversed(history) if h.pi), "")
         return Control("repeat", last or CONTROL_LINES["nothing"][key])
@@ -516,8 +553,13 @@ def has_tic(reply: str) -> bool:
     return bool(TICS.search(reply))
 
 
+LEADING_ACK = re.compile(
+    r"^\s*(got it|i see|okay|ok|right|sure|understood|i understand|alright|"
+    r"اچھا|جی|سمجھ گیا)[.,!۔]\s*",
+    re.IGNORECASE,
+)
 ECHO_WORD = re.compile(r"\w{3,}", re.UNICODE)
-ECHO_SHARE = 0.8  # share of a reply's words that the conversation already contained
+ECHO_SHARE = 0.7  # share of a reply's words that the conversation already contained
 ECHO_MIN_WORDS = 6
 
 
@@ -533,6 +575,7 @@ def adds_nothing(
 ) -> bool:
     """A reply made only of words the conversation already had: it gives the person's own
     words (or pi's own earlier ones) back and tells them nothing."""
+    reply = LEADING_ACK.sub("", reply)  # "Got it." / "I see." is not what pi adds
     words = [w.lower() for w in ECHO_WORD.findall(reply)]
     if len(words) < ECHO_MIN_WORDS:
         return False

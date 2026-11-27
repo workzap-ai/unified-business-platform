@@ -212,7 +212,7 @@ async def test_the_speech_to_text_gets_the_spelling_hint_and_an_echo_of_it_is_dr
         clock=lambda: 100.0,
     )
     assert await speech.hear(Turn("g_1", b"\x10\x00" * 48000, 48000, 0.0, 1.0)) == ""
-    assert asked["prompt"] == room_speech.STT_HINT
+    assert asked["prompt"].startswith(room_speech.STT_HINT) and "Lahore" in asked["prompt"]
 
 
 async def test_pi_reports_what_it_did_after_the_disclosure_and_after_a_spoken_turn():

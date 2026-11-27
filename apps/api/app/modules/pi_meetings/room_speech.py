@@ -35,6 +35,10 @@ logger = logging.getLogger(__name__)
 STT_ALIAS = "stt_multi"
 # speech-to-text writes "pi" as "hi", "pie" or "bye"; a spelling hint fixes most of it
 STT_HINT = "Workzap, pi."
+# places and common words people in these calls say: speech-to-text writes them right
+# more often when it has seen them (found live: Lahore was written 'Lourdes')
+STT_PLACES = "Lahore, Karachi, Islamabad, Rawalpindi, Faisalabad, Multan, Peshawar, Quetta."
+STT_FACT_CHARS = 200
 STT_HINT_ECHOES = frozenset({"workzap pi", "pi workzap"})
 STT_PURPOSE = "meeting_room_stt"
 STT_RATE = 16000  # a turn is sent to speech to text at this rate
@@ -120,6 +124,7 @@ class Session:
     facts: list[str] = field(default_factory=list)  # what they told pi in this call, in few words
     last_spoke_at: float | None = None
     nods: int = 0
+    waiting: dict[str, list[str]] = field(default_factory=dict)  # heard, not yet answered
     nudges: int = 0
     nudged_for: float | None = None  # the pi line a nudge was already made for
     first_unheard_at: float | None = (
@@ -313,6 +318,12 @@ class RoomSpeech:
             return True
         return bool(self.is_muted and await self.is_muted())
 
+    def stt_prompt(self) -> str:
+        """What speech-to-text is told before each turn: pi's names, common places, and the
+        few words pi already learned in this call (the customer's trade and place come back)."""
+        facts = " ".join(self.session.facts)[-STT_FACT_CHARS:]
+        return " ".join(part for part in (STT_HINT, STT_PLACES, facts) if part)
+
     async def hear(self, turn: Turn) -> str:
         """The words of one finished turn, redacted. Empty when it could not be read."""
         audio = wav(resample(turn.pcm, turn.sample_rate, STT_RATE), STT_RATE)
@@ -324,7 +335,7 @@ class RoomSpeech:
                 alias=STT_ALIAS,
                 purpose=STT_PURPOSE,
                 language=self.session.settings.language or None,
-                prompt=STT_HINT,
+                prompt=self.stt_prompt(),
             )
         except GatewayUnavailable:
             logger.warning("room_speech_stt_unavailable")
@@ -344,9 +355,17 @@ class RoomSpeech:
             logger.info("room_heard %s", text[:160])
         if self.on_line:
             await self.on_line(turn.speaker_id, text)
+        # every piece waits here with its words; whoever gets the lock first answers ALL the
+        # pieces of this person that are waiting, the rest find nothing left (found live: 59
+        # short turns queued behind each other and the answer to a question came 86 s late)
+        self.session.waiting.setdefault(turn.speaker_id, []).append(text)
         async with self._lock:
             state = self.session
             now = self.clock()
+            pieces = state.waiting.pop(turn.speaker_id, [])
+            if not pieces:
+                return "merged"
+            text = " ".join(pieces)[-CARRY_CHARS:]
             if state.settings.mode == "speak":
                 state.language_pref = voice.asked_language(text) or state.language_pref
                 state.wants_solution = state.wants_solution or voice.asks_for_solution(text)
@@ -419,9 +438,12 @@ class RoomSpeech:
                 # a first name is asked about only when one customer is alone in the room: the
                 # question is who it is, and memory stays unused until a clear yes
                 name = meeting_memory.first_name(block) if block and self.customers() == 1 else ""
-                line = voice.opening(
-                    name=name, language=voice.opening_language(heard, state.settings.language)
-                )
+                opening_language = voice.opening_language(heard, state.settings.language)
+                already_talking = any(not h.pi for h in state.history) or bool(state.carry)
+                if already_talking and not name:
+                    line = voice.late_opening(opening_language)  # no question: they have spoken
+                else:
+                    line = voice.opening(name=name, language=opening_language)
             else:
                 before = voice.confirm_state(state.history)
                 answered = voice.confirm_state([*state.history, voice.Said(False, heard)])
@@ -436,7 +458,8 @@ class RoomSpeech:
                     )
                 ) is not None:
                     line = ctrl.line  # asked to repeat, to confirm it is heard, to slow down
-                    state.slow = state.slow or ctrl.kind == "slow"
+                    if ctrl.kind in ("slow", "fast"):
+                        state.slow = ctrl.kind == "slow"
                 else:
                     lang = state.language_pref or voice.reply_language(
                         state.history, heard, state.settings.language
