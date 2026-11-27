@@ -539,9 +539,10 @@ class RoomSpeech:
                             await self._say(voice.filler(lang, state.spoken), filler=True)
                     reply = await thinking
                     logger.info(
-                        "room_reply lang=%s fallback=%s idea=%s recap=%s chars=%d",
+                        "room_reply lang=%s fallback=%s why=%s idea=%s recap=%s chars=%d",
                         lang,
                         reply.fallback,
+                        reply.why or "-",
                         reply.idea,
                         recap,
                         len(reply.text),

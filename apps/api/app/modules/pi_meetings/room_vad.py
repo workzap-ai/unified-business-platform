@@ -19,9 +19,9 @@ FLOOR_FACTOR = 4.0  # speech must be this many times louder than the room's own 
 FLOOR_LEARN_S = 0.6  # quiet heard before the room's noise level is trusted
 LEARN_CEIL = 120  # only frames this quiet are room noise: a soft voice is never learned as noise
 START_S = 0.12  # the voice must stay loud this long to start a turn
-END_SILENCE_S = (
-    0.65  # a pause this long ends the turn (shorter: pi answers sooner; pieces are rejoined)
-)
+# a pause this long ends the turn. 0.65 cut people mid-thought into dozens of fragments (59 turns in
+# 11 minutes, live test 16); a little longer gives pi whole sentences and still answers quickly
+END_SILENCE_S = 0.9
 MIN_TURN_S = 0.5  # a shorter turn is a cough or a click: dropped
 MAX_TURN_S = 15.0  # a longer turn is cut here and a new one starts
 NOD_AFTER_S = 5.0  # a person who has talked this long without a break may get a small "mm-hm"

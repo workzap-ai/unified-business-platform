@@ -152,6 +152,7 @@ class Spoken:
     idea: bool = False  # a free suggestion: it counts against IDEA_CAP
     learned: str = ""  # a new fact from what the person said, to remember for this call
     replaces: str = ""  # the earlier fact this one corrects (see ModelReply.replaces)
+    why: str = ""  # when the safe line was used: which check the model's reply failed (for the log)
 
 
 def context(history: Sequence[Said], heard: str) -> dict[str, Any]:
@@ -780,16 +781,33 @@ async def reply_to(
             ):
                 return Spoken(closing, fallback=False, done=True, learned=_fact(value))
         said = allowed(value.reply, ctx)
-        if said and _off_brief(said, lang, policy):
+        if not said:
+            why = "gate"  # the reply linter or a rule refused it
+        elif _off_brief(said, lang, policy):
+            why = (
+                "language"
+                if not in_reply_language(said, lang)
+                else "echo_or_praise"
+                if has_tic(said)
+                else "question_not_allowed"
+            )
             said = ""
-        if said and not _repeats(said, history) and not meeting_memory.leaks(said, seen, block):
+        elif _repeats(said, history):
+            why = "repeat"
+            said = ""
+        elif meeting_memory.leaks(said, seen, block):
+            why = "memory_leak"
+            said = ""
+        if said:
             return Spoken(
                 said,
                 fallback=False,
                 learned=_fact(value),
                 replaces=_replaces(value),
             )
-    return Spoken(_safe_line(ctx, lang, policy), fallback=True)
+    else:
+        why = "model_down"
+    return Spoken(_safe_line(ctx, lang, policy), fallback=True, why=why)
 
 
 async def _idea(
