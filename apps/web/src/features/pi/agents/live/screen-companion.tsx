@@ -104,13 +104,6 @@ function Standing({
           {WORDS[state]}
         </div>
         <div className="relative">
-          {state === "looking" && (
-            // a soft ring that pulses outwards while it looks
-            <span
-              aria-hidden="true"
-              className="absolute inset-10 rounded-full bg-sky-400/15 motion-safe:animate-ping"
-            />
-          )}
           <SpriteAgent
             cutout
             agentKey={agentKey}

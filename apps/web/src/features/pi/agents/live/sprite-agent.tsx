@@ -78,10 +78,12 @@ export function SpriteAgent({
   const [loadedKey, setLoadedKey] = useState<string | null>(null);
   const loadKey = `${agentKey}:${cutout}`;
   const loaded = loadedKey === loadKey;
-  const live = useRef({ level, speaking });
+  const live = useRef({ level, speaking, screen, listening });
   useEffect(() => {
-    live.current = { level, speaking };
+    live.current = { level, speaking, screen, listening };
   });
+  const headRef = useRef<HTMLDivElement>(null);
+  const bodyRef = useRef<HTMLDivElement>(null);
 
   // the frames are fetched together, so a swap never shows a gap
   useEffect(() => {
@@ -147,7 +149,8 @@ export function SpriteAgent({
         target = "blink";
       } else if (now >= nextBlink && target === "base") {
         blinkUntil = now + 120;
-        nextBlink = now + 2500 + Math.random() * 2600;
+        nextBlink =
+          now + (Math.random() < 0.22 ? 280 : 2400 + Math.random() * 3200);
         target = "blink";
       }
       if (target !== shown && (now >= heldUntil || target === "blink")) {
@@ -168,29 +171,112 @@ export function SpriteAgent({
   }, [loaded]);
 
   // The character is two layers: the head (with the mouth and eye frames) and the body. They move
-  // apart from the neck, so it turns and nods, the shoulders breathe, and it leans in as it talks.
+  // apart from the neck. The movement is not a loop: it is slow noise, with a nod now and then,
+  // and what it does depends on what the agent is doing (talking, listening, looking at a screen).
   const neck = NECK[agentKey] ?? 0.6;
-  const talking = speaking && screen === "none";
-  const head = reduced
-    ? ""
-    : screen === "looking"
-      ? "motion-safe:animate-[agent-head-scan_2.6s_ease-in-out_infinite]"
-      : screen === "missing"
-        ? "motion-safe:animate-[agent-head-puzzled_2.8s_ease-in-out_infinite]"
-        : screen === "seeing"
-          ? "motion-safe:animate-[agent-head-nod_0.8s_ease-in-out_1]"
-          : talking
-            ? "motion-safe:animate-[agent-head-talk_1.1s_ease-in-out_infinite]"
-            : listening
-              ? "motion-safe:animate-[agent-head-listen_3.6s_ease-in-out_infinite]"
-              : "motion-safe:animate-[agent-head-idle_5.2s_ease-in-out_infinite]";
-  const body = reduced
-    ? ""
-    : screen === "looking"
-      ? "motion-safe:animate-[agent-body-lean_2.6s_ease-in-out_infinite]"
-      : talking
-        ? "motion-safe:animate-[agent-body-talk_1.6s_ease-in-out_infinite]"
-        : "motion-safe:animate-[agent-body-breathe_4.2s_ease-in-out_infinite]";
+
+  useEffect(() => {
+    const h = headRef.current;
+    const b = bodyRef.current;
+    if (reduced || !loaded || !h || !b) return;
+    let raf = 0;
+    let last = performance.now();
+    let smoothLv = 0;
+    let impulse = 0;
+    let nextImpulse = last + 2500;
+    let prevScreen: ScreenState = "none";
+    const pos = { rot: 0, x: 0, y: 0, yaw: 0, brot: 0, bx: 0 };
+    const hop = { x: 0, y: 0, yaw: 0, until: 0 };
+    // a smooth, never-repeating wobble: two sines with unrelated speeds
+    const wob = (t: number, f: number, p: number) =>
+      Math.sin(t * f + p) * 0.6 + Math.sin(t * f * 2.31 + p * 1.7) * 0.4;
+    const tick = (now: number) => {
+      const dt = Math.min(0.05, (now - last) / 1000);
+      last = now;
+      const t = now / 1000;
+      const m = live.current;
+      const isTalking = m.speaking && m.screen === "none";
+      smoothLv += (m.level - smoothLv) * (m.level > smoothLv ? 0.35 : 0.12);
+      const e = Math.min(1, smoothLv * 1.7);
+      if (m.screen !== prevScreen) {
+        if (m.screen === "seeing") impulse = 1.7; // understood: a clear nod
+        if (m.screen === "missing") impulse = 1.2;
+        prevScreen = m.screen;
+      }
+      if (now > nextImpulse) {
+        impulse = Math.max(impulse, isTalking ? 0.9 : 0.6);
+        nextImpulse =
+          now +
+          (isTalking
+            ? 1600 + Math.random() * 2600
+            : m.listening
+              ? 3500 + Math.random() * 3500
+              : 6000 + Math.random() * 6000);
+      }
+      impulse *= Math.exp(-dt * 4.5);
+
+      let tRot = wob(t, 0.31, 1) * 0.7;
+      let tX = wob(t, 0.23, 2) * 0.25;
+      let tY = wob(t, 0.37, 3) * 0.25;
+      let tYaw = wob(t, 0.19, 4) * 2.2;
+      let tBrot = wob(t, 0.17, 5) * 0.35;
+      let tBx = wob(t, 0.13, 6) * 0.3;
+      if (isTalking) {
+        tRot += wob(t, 0.9, 7) * (0.6 + e * 2.4);
+        tYaw += wob(t, 0.55, 8) * (1 + e * 4);
+        tY += e * 0.9;
+        tBrot += wob(t, 0.7, 9) * (0.3 + e * 0.8);
+        tBx += e * 0.4;
+      } else if (m.listening && m.screen === "none") {
+        tRot += 2.6; // head a little to one side, as people do when they listen
+        tYaw += 3;
+      }
+      if (m.screen === "looking") {
+        // the gaze goes from place to place and rests there, like eyes reading a screen
+        if (now > hop.until) {
+          hop.x = (Math.random() * 2 - 1) * 3;
+          hop.yaw = (Math.random() * 2 - 1) * 9;
+          hop.y = Math.random() * 1.2 - 0.3;
+          hop.until = now + 650 + Math.random() * 900;
+        }
+        tX += hop.x;
+        tYaw += hop.yaw;
+        tY += hop.y;
+        tBrot += hop.x * 0.25;
+        tBx += hop.x * 0.2;
+      } else if (m.screen === "missing") {
+        tRot += wob(t, 0.55, 10) * 5;
+        tYaw += wob(t, 0.4, 11) * 6;
+      }
+      tY += impulse * 1.5;
+      tRot += impulse * (m.screen === "missing" ? 4 : 0.8);
+
+      const kHead = 1 - Math.exp(-dt * 7);
+      const kBody = 1 - Math.exp(-dt * 3.5);
+      pos.rot += (tRot - pos.rot) * kHead;
+      pos.x += (tX - pos.x) * kHead;
+      pos.y += (tY - pos.y) * kHead;
+      pos.yaw += (tYaw - pos.yaw) * kHead;
+      pos.brot += (tBrot - pos.brot) * kBody;
+      pos.bx += (tBx - pos.bx) * kBody;
+      const breath = 0.5 + 0.5 * Math.sin(t * 1.45 + wob(t, 0.2, 12) * 0.6);
+      const talkLift = isTalking ? e * 0.01 : 0;
+      h.style.transform = `perspective(520px) translate(${pos.x.toFixed(3)}%, ${pos.y.toFixed(3)}%) rotateY(${pos.yaw.toFixed(3)}deg) rotate(${pos.rot.toFixed(3)}deg)`;
+      b.style.transform = `translateX(${pos.bx.toFixed(3)}%) rotate(${pos.brot.toFixed(3)}deg) scale(${(1 + breath * 0.006).toFixed(4)}, ${(1 + breath * 0.016 + talkLift).toFixed(4)})`;
+      raf = requestAnimationFrame(tick);
+    };
+    const onVisibility = () => {
+      cancelAnimationFrame(raf);
+      last = performance.now();
+      if (!document.hidden) raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    document.addEventListener("visibilitychange", onVisibility);
+    return () => {
+      cancelAnimationFrame(raf);
+      document.removeEventListener("visibilitychange", onVisibility);
+    };
+  }, [reduced, loaded]);
   // the two layers overlap at the neck and fade into each other, so there is no seam at rest
   const headMask = `linear-gradient(to bottom, #000 ${(neck - 0.02) * 100}%, transparent ${(neck + 0.06) * 100}%)`;
   const bodyMask = `linear-gradient(to bottom, transparent ${(neck - 0.1) * 100}%, #000 ${neck * 100}%)`;
@@ -207,10 +293,22 @@ export function SpriteAgent({
       )}
       style={{ width: size, height: size }}
     >
-      <style>{KEYFRAMES}</style>
+      {/* with a background, it stays still behind the moving head, so its corners never tilt */}
+      {!cutout && (
+        // eslint-disable-next-line @next/next/no-img-element -- small static animation frames
+        <img
+          src={src(agentKey, "base", false)}
+          alt=""
+          width={512}
+          height={512}
+          draggable={false}
+          className={imgClass}
+        />
+      )}
       <div className="absolute inset-0 scale-[1.04] origin-bottom">
         <div
-          className={cn("absolute inset-0 origin-bottom", body)}
+          ref={bodyRef}
+          className="absolute inset-0 origin-bottom"
           style={{ maskImage: bodyMask, WebkitMaskImage: bodyMask }}
         >
           {/* eslint-disable-next-line @next/next/no-img-element -- small static animation frames */}
@@ -225,8 +323,8 @@ export function SpriteAgent({
           />
         </div>
         <div
-          key={screen + String(listening) + String(talking)}
-          className={cn("absolute inset-0", head)}
+          ref={headRef}
+          className="absolute inset-0"
           style={{
             transformOrigin: `50% ${neck * 100}%`,
             maskImage: headMask,
@@ -266,47 +364,3 @@ const NECK: Record<string, number> = {
   customer_success: 0.62,
   interviewer: 0.6,
 };
-
-const KEYFRAMES = `
-@keyframes agent-head-idle {
-  0%, 100% { transform: rotate(0deg) translateY(0); }
-  30% { transform: rotate(1.6deg) translateY(-0.4%); }
-  65% { transform: rotate(-1.4deg) translateY(0.2%); }
-}
-@keyframes agent-head-talk {
-  0%, 100% { transform: rotate(0deg) translateY(0); }
-  20% { transform: rotate(-2.2deg) translateY(0.8%); }
-  45% { transform: rotate(1.8deg) translateY(-0.5%); }
-  70% { transform: rotate(-1deg) translateY(0.6%); }
-}
-@keyframes agent-head-listen {
-  0%, 100% { transform: rotate(3.5deg) translateY(0); }
-  25% { transform: rotate(3.5deg) translateY(1.4%); }
-  35% { transform: rotate(3.5deg) translateY(0); }
-}
-@keyframes agent-head-scan {
-  0%, 100% { transform: translateX(-3%) rotate(-5deg); }
-  50% { transform: translateX(3%) rotate(5deg); }
-}
-@keyframes agent-head-puzzled {
-  0%, 100% { transform: rotate(0deg); }
-  30% { transform: rotate(-7deg) translateX(-1%); }
-  60% { transform: rotate(6deg) translateX(1%); }
-}
-@keyframes agent-head-nod {
-  0%, 100% { transform: translateY(0) rotate(0deg); }
-  40% { transform: translateY(2.6%) rotate(1deg); }
-}
-@keyframes agent-body-breathe {
-  0%, 100% { transform: scale(1, 1); }
-  50% { transform: scale(1.012, 1.02); }
-}
-@keyframes agent-body-talk {
-  0%, 100% { transform: scale(1, 1) rotate(0deg); }
-  25% { transform: scale(1.01, 1.025) rotate(0.8deg); }
-  60% { transform: scale(1.005, 1.01) rotate(-0.8deg); }
-}
-@keyframes agent-body-lean {
-  0%, 100% { transform: translateX(-1.2%) rotate(-1.4deg); }
-  50% { transform: translateX(1.2%) rotate(1.4deg); }
-}`;
