@@ -50,6 +50,7 @@ class Orders:
     notes: dict[str, Any] = field(default_factory=dict)
     # the meeting's agent as a block of focus and tone for the prompts ('' for pi itself)
     persona: str = ""
+    agent_key: str = "pi"  # which agent the meeting uses: the room shows its character
 
 
 def scope_of(room: PiMeetingRoom) -> WorkspaceScope:
@@ -121,7 +122,7 @@ async def beat(session: Any, room_id: UUID, agent_id: str, now: datetime) -> Ord
         )
     ).first()
     language, agent_key = (row[0] or "", row[1]) if row else ("", None)
-    persona = (await agent_store.resolve(session, scope, agent_key))[2]
+    resolved_key, _, persona = await agent_store.resolve(session, scope, agent_key)
     return Orders(
         room_id=room.id,
         meeting_id=room.meeting_id,
@@ -139,6 +140,7 @@ async def beat(session: Any, room_id: UUID, agent_id: str, now: datetime) -> Ord
         last_spoke_at=room.pi_last_spoke_at,
         notes=dict(room.pi_notes or {}),
         persona=persona,
+        agent_key=resolved_key,
     )
 
 

@@ -59,11 +59,14 @@ async def test_the_beacon_sends_a_state_only_when_it_changes_and_now_and_then() 
     clock = Clock()
     sight = Sight(object(), SCOPE, clock=clock)
     sent: list[str] = []
+    agents: list[str] = []
+    current = {"agent": "pi"}
 
-    async def send(state: str) -> None:
+    async def send(state: str, agent: str) -> None:
         sent.append(state)
+        agents.append(agent)
 
-    beacon = Beacon(sight, send, clock=clock)
+    beacon = Beacon(sight, send, clock=clock, agent=lambda: current["agent"])
     await beacon.tick()
     assert sent == ["none"]  # the first tick clears any state left on the call
     await beacon.tick()
@@ -79,13 +82,20 @@ async def test_the_beacon_sends_a_state_only_when_it_changes_and_now_and_then() 
     sight.end()
     await beacon.tick()
     assert sent[-1] == "none"
+    # a change of the meeting's agent is sent at once, with the state, and nothing else changed
+    before = len(sent)
+    current["agent"] = "sales_coach"
+    await beacon.tick()
+    assert len(sent) == before + 1 and agents[-1] == "sales_coach" and sent[-1] == "none"
+    await beacon.tick()
+    assert len(sent) == before + 1
 
 
 async def test_a_state_that_cannot_be_sent_never_stops_pi() -> None:
     clock = Clock()
     sight = Sight(object(), SCOPE, clock=clock)
 
-    async def broken(state: str) -> None:
+    async def broken(state: str, agent: str) -> None:
         raise RuntimeError("provider down")
 
     await Beacon(sight, broken, clock=clock).tick()  # no exception

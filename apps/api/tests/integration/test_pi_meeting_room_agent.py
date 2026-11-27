@@ -275,3 +275,21 @@ async def test_pi_lines_are_timed_from_the_rooms_real_start_not_from_when_it_was
     seg = await business_db.scalar(select(PiMeetingSegment).order_by(PiMeetingSegment.ordinal))
     assert 29_000 <= seg.end_ms <= 31_000  # 30 s into the call, not 10 minutes and 30 s
     await pi.close()
+
+
+async def test_the_agents_orders_carry_the_meetings_agent_for_its_character(
+    api, business_db, provider
+):
+    pi, mid = await room_with_pi(api, business_db, "369400011")
+    await api.post(f"{BASE}/{mid}/room/pi", json={"mode": "speak"})
+    await claim.claim(business_db, "agent-a", NOW)
+    await business_db.commit()
+    room = await the_room(business_db, mid)
+    orders = await claim.beat(business_db, room.id, "agent-a", NOW)
+    assert orders.agent_key == "pi" and orders.persona == ""  # the default personality
+    assert (
+        await api.put(f"{BASE}/{mid}/agent", json={"agent_key": "sales_coach"})
+    ).status_code == 200
+    again = await claim.beat(business_db, room.id, "agent-a", NOW)
+    assert again.agent_key == "sales_coach" and "Sales Coach" in again.persona
+    await pi.close()

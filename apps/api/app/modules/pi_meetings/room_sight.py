@@ -107,26 +107,36 @@ def clean(text: str) -> str:
 
 class Beacon:
     """Tells everyone in the room, when it changes, whether pi is looking at the shared screen:
-    'none', 'looking' or 'seeing' (`Sight.state`). It sends a state and never a word of what was
-    seen, so a person sharing can see at once whether pi really has their screen."""
+    'none', 'looking' or 'seeing' (`Sight.state`), and which agent character is in the room. It
+    sends states and a key, never a word of what was said or seen, so a person sharing can see at
+    once whether pi really has their screen and the room shows the right character."""
 
     REPEAT_S = 30.0  # sent again now and then, so a browser that joined late is told too
 
     def __init__(
-        self, sight: "Sight", send: Callable[[str], Awaitable[None]], *, clock: Callable[[], float]
+        self,
+        sight: "Sight",
+        send: Callable[[str, str], Awaitable[None]],
+        *,
+        clock: Callable[[], float],
+        agent: Callable[[], str] = lambda: "pi",
     ) -> None:
-        self.sight, self.send, self.clock = sight, send, clock
-        self.last = "none"
+        self.sight, self.send, self.clock, self.agent = sight, send, clock, agent
+        self.last = ("none", "pi")
         self._sent_at: float | None = None
 
     async def tick(self) -> None:
-        state = self.sight.state()
+        now_state = (self.sight.state(), self.agent())
         now = self.clock()
-        if state == self.last and self._sent_at is not None and now - self._sent_at < self.REPEAT_S:
+        if (
+            now_state == self.last
+            and self._sent_at is not None
+            and now - self._sent_at < self.REPEAT_S
+        ):
             return
-        self.last, self._sent_at = state, now
+        self.last, self._sent_at = now_state, now
         try:
-            await self.send(state)
+            await self.send(*now_state)
         except Exception:  # noqa: BLE001 - a state that did not go out must never stop pi
             logger.warning("room_screen_state_not_sent")
 

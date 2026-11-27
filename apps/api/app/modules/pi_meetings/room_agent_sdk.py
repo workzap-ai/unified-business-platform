@@ -177,10 +177,10 @@ async def run_room(
     http = httpx.AsyncClient()
     provider = StreamProvider(http, settings.stream_api_key, secret.get_secret_value())
 
-    async def send_state(state: str) -> None:
-        await provider.set_state(orders.call_id, {"pi_screen": state})
+    async def send_state(state: str, agent: str) -> None:
+        await provider.set_state(orders.call_id, {"pi_screen": state, "pi_agent": agent})
 
-    beacon = Beacon(sight, send_state, clock=time.monotonic)
+    beacon = Beacon(sight, send_state, clock=time.monotonic, agent=lambda: speech.session.agent_key)
     speech = RoomSpeech(
         manager=manager,
         scope=orders.scope,

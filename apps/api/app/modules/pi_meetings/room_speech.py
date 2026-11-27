@@ -132,6 +132,7 @@ class Session:
     facts: list[str] = field(default_factory=list)  # what they told pi in this call, in few words
     last_spoke_at: float | None = None
     nods: int = 0
+    agent_key: str = "pi"  # the meeting's agent (its character is shown in the room)
     # what pi suggested (and what was turned down) so it never repeats itself, and the
     # older part of a long call in a few lines (the model only sees the last dozen)
     idea_log: list[str] = field(default_factory=list)

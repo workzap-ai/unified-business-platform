@@ -96,6 +96,7 @@ class RoomRun:
         session.settings.intake = orders.intake
         session.settings.language = orders.language
         session.persona = orders.persona
+        session.agent_key = orders.agent_key
         if session.muted:
             self.speech.barge_in()
 
