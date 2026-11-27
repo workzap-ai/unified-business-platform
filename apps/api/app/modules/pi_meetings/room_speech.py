@@ -81,6 +81,7 @@ PACE_LEAD_S = 0.4  # how much audio pi keeps queued ahead of the clock
 BARGE_S = 0.35  # a person must talk this long, without a break, to stop pi
 FILLER_AFTER_S = 1.0  # a sound like 'mm-hm' only when the answer takes longer than this
 INTRO_AFTER_S = 4.0  # a silent customer who spoke first gets the introduction on its own
+SUMMARY_EVERY = 8  # pi's answers between two summaries of the call
 NOD_GAP_S = 9.0  # at least this long between two nods
 NOD_CAP = 12  # nods in one call
 NOD_ACTIVE_S = 60.0  # pi nods only while it is in the conversation (it spoke this recently)
@@ -128,6 +129,13 @@ class Session:
     facts: list[str] = field(default_factory=list)  # what they told pi in this call, in few words
     last_spoke_at: float | None = None
     nods: int = 0
+    # what pi suggested (and what was turned down) so it never repeats itself, and the
+    # older part of a long call in a few lines (the model only sees the last dozen)
+    idea_log: list[str] = field(default_factory=list)
+    rejected: list[str] = field(default_factory=list)
+    idea_pending: bool = False  # pi's last answer was a suggestion: how do they take it?
+    summary: str = ""
+    since_summary: int = 0
     waiting: dict[str, list[str]] = field(default_factory=dict)  # heard, not yet answered
     nudges: int = 0
     nudged_for: float | None = None  # the pi line a nudge was already made for
@@ -210,6 +218,7 @@ class RoomSpeech:
         # is THIS person talking again? (set by the room; by default: anyone talking)
         self.speaker_active: Callable[[str], bool] = lambda _speaker: self.someone_speaking()
         self._lock = asyncio.Lock()
+        self._side: set[asyncio.Task[None]] = set()  # work done after a turn
         self._out_lock = asyncio.Lock()  # one voice at a time: nothing is written over another
         # True in the real agent: audio is written in real time, so `speaking` stays true
         # for as long as pi is heard and a person talking can stop it (tests write at once)
@@ -225,6 +234,21 @@ class RoomSpeech:
         """Someone started talking: pi stops at the next piece."""
         if self.speaking:
             self._cut.set()
+
+    def _background(self, work: Awaitable[None]) -> None:
+        """Run something after the turn without making the person wait for it."""
+        task = asyncio.ensure_future(work)
+        self._side.add(task)
+        task.add_done_callback(self._side.discard)
+
+    async def _summarise(self) -> None:
+        state = self.session
+        text = await voice.summarise(
+            self.manager, self.scope, state.history, state.facts, state.summary
+        )
+        if text:
+            state.summary = text
+            await self._persist()
 
     async def nod(self) -> bool:
         """A small "mm-hm" while a person is still talking, so they feel listened to. Only after
@@ -522,6 +546,11 @@ class RoomSpeech:
                         and len(state.facts) >= voice.RECAP_MIN_FACTS
                         and not state.wants_solution
                     )
+                    if state.idea_pending:  # how did they take the last suggestion?
+                        state.idea_pending = False
+                        if voice.rejects(heard) and state.idea_log:
+                            state.rejected.append(state.idea_log[-1])
+                            del state.rejected[:-8]
                     quick = len(heard.split()) >= FILLER_WORDS and not self.speaker_active(
                         turn.speaker_id
                     )
@@ -538,6 +567,9 @@ class RoomSpeech:
                             prefer=state.language_pref,
                             persona=state.persona,
                             recap=recap,
+                            ideas_log=state.idea_log,
+                            rejected=state.rejected,
+                            summary=state.summary,
                             wants_solution=state.wants_solution,
                             learned=state.facts,
                             on_screen=self.on_screen() if self.on_screen else "",
@@ -564,8 +596,18 @@ class RoomSpeech:
                         state.wants_solution = False  # answered
                     if reply.idea:
                         state.ideas += 1
+                        state.idea_log.append(reply.text[:160])
+                        del state.idea_log[:-8]
+                        state.idea_pending = True
                     room_recall.merge_fact(state.facts, reply.learned, reply.replaces)
                     state.since_recap += 1
+                    state.since_summary += 1
+                    if (
+                        state.since_summary >= SUMMARY_EVERY
+                        and len(state.history) > voice.HISTORY_LINES
+                    ):
+                        state.since_summary = 0
+                        self._background(self._summarise())
                     if recap and not reply.fallback and reply.text.rstrip().endswith(("?", "؟")):
                         state.since_recap = 0  # it summed up and asked: the count starts again
                     if (

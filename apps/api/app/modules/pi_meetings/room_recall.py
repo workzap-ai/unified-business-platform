@@ -22,6 +22,7 @@ if TYPE_CHECKING:
 KEEP_FACTS = voice.FACTS_KEPT * 2
 RECENT_LINES = 8  # the last lines said, so pi knows what it just asked
 LINE_CHARS = 220
+SUMMARY_CHARS = 500
 NOTES_CHARS = 6000  # a hard ceiling on what is stored per room
 SAME = 0.8  # share of words two facts must have in common to be the same fact
 CORRECTS = 0.5  # share of words a correction must have in common with what it replaces
@@ -65,6 +66,9 @@ def pack(session: "Session") -> dict[str, Any]:
         "language": session.language_pref,
         "ideas": session.ideas,
         "solution": session.wants_solution,
+        "ideas_given": [g[:160] for g in session.idea_log[-8:]],
+        "rejected": [g[:160] for g in session.rejected[-8:]],
+        "summary": session.summary[:SUMMARY_CHARS],
         "recent": [[int(h.pi), h.text[:LINE_CHARS]] for h in own[-RECENT_LINES:]],
     }
     while len(repr(notes)) > NOTES_CHARS and notes["recent"]:
@@ -88,6 +92,13 @@ def restore(session: "Session", notes: dict[str, Any] | None) -> None:
     if isinstance(ideas, int) and 0 <= ideas <= 50:
         session.ideas = max(session.ideas, ideas)
     session.wants_solution = bool(notes.get("solution")) or session.wants_solution
+    for key, target in (("ideas_given", session.idea_log), ("rejected", session.rejected)):
+        items = notes.get(key)
+        if isinstance(items, list):
+            target[:] = [str(x)[:160] for x in items if str(x).strip()][-8:]
+    summary = notes.get("summary")
+    if isinstance(summary, str):
+        session.summary = summary[:SUMMARY_CHARS]
     recent = notes.get("recent")
     if isinstance(recent, list):
         for item in recent[-RECENT_LINES:]:
