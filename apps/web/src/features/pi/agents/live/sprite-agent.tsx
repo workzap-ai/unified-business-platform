@@ -27,7 +27,8 @@ export const LIVE_AGENTS = new Set([
   "interviewer",
 ]);
 
-const src = (key: string, frame: Frame) => `/agents/live/${key}/${frame}.webp`;
+const src = (key: string, frame: Frame, cut = false) =>
+  `/agents/${cut ? "cut" : "live"}/${key}/${frame}.webp`;
 
 /** The mouth frame for a voice level; a small hysteresis stops it flickering at a boundary. */
 export function mouthFor(level: number, current: Frame): Frame {
@@ -58,6 +59,7 @@ export function SpriteAgent({
   size = 220,
   className,
   label,
+  cutout = false,
 }: {
   agentKey: string;
   /** the voice level, 0 to 1 */
@@ -68,11 +70,14 @@ export function SpriteAgent({
   size?: number;
   className?: string;
   label?: string;
+  /** the character with its background removed (transparent), for floating over other content */
+  cutout?: boolean;
 }) {
   const reduced = usePrefersReducedMotion();
   const [frame, setFrame] = useState<Frame>("base");
   const [loadedKey, setLoadedKey] = useState<string | null>(null);
-  const loaded = loadedKey === agentKey;
+  const loadKey = `${agentKey}:${cutout}`;
+  const loaded = loadedKey === loadKey;
   const live = useRef({ level, speaking });
   useEffect(() => {
     live.current = { level, speaking };
@@ -87,14 +92,14 @@ export function SpriteAgent({
           new Promise<void>((resolve) => {
             const img = new Image();
             img.onload = img.onerror = () => resolve();
-            img.src = src(agentKey, f);
+            img.src = src(agentKey, f, cutout);
           }),
       ),
-    ).then(() => alive && setLoadedKey(agentKey));
+    ).then(() => alive && setLoadedKey(loadKey));
     return () => {
       alive = false;
     };
-  }, [agentKey]);
+  }, [agentKey, cutout, loadKey]);
 
   // mouth and blink, one loop; paused while the tab is hidden
   useEffect(() => {
@@ -166,17 +171,23 @@ export function SpriteAgent({
     ? ""
     : screen === "looking"
       ? "motion-safe:animate-[agent-scan_2.4s_ease-in-out_infinite]"
-      : screen === "seeing"
-        ? "motion-safe:animate-[agent-nod_0.7s_ease-in-out_1]"
-        : listening
-          ? "motion-safe:animate-[agent-listen_3.2s_ease-in-out_infinite]"
-          : "motion-safe:animate-[agent-breathe_4.4s_ease-in-out_infinite]";
+      : screen === "missing"
+        ? "motion-safe:animate-[agent-puzzled_2.6s_ease-in-out_infinite]"
+        : screen === "seeing"
+          ? "motion-safe:animate-[agent-nod_0.7s_ease-in-out_1]"
+          : listening
+            ? "motion-safe:animate-[agent-listen_3.2s_ease-in-out_infinite]"
+            : "motion-safe:animate-[agent-breathe_4.4s_ease-in-out_infinite]";
 
   return (
     <div
       role="img"
       aria-label={label ?? "Agent character"}
-      className={cn("relative select-none overflow-hidden", className)}
+      className={cn(
+        "relative select-none",
+        !cutout && "overflow-hidden",
+        className,
+      )}
       style={{ width: size, height: size }}
     >
       <style>{KEYFRAMES}</style>
@@ -188,7 +199,7 @@ export function SpriteAgent({
           // eslint-disable-next-line @next/next/no-img-element -- small static animation frames
           <img
             key={f}
-            src={src(agentKey, f)}
+            src={src(agentKey, f, cutout)}
             alt=""
             width={512}
             height={512}
@@ -222,6 +233,11 @@ const KEYFRAMES = `
 @keyframes agent-scan {
   0%, 100% { transform: translateX(-2.2%) rotate(-1.2deg) scale(1.07); }
   50% { transform: translateX(2.2%) rotate(1.2deg) scale(1.07); }
+}
+@keyframes agent-puzzled {
+  0%, 100% { transform: rotate(0deg) scale(1.03); }
+  30% { transform: rotate(-4deg) translateX(-1%) scale(1.03); }
+  60% { transform: rotate(3deg) translateX(1%) scale(1.03); }
 }
 @keyframes agent-nod {
   0% { transform: translateY(0) scale(1.03); }

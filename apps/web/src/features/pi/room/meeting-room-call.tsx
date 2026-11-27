@@ -36,6 +36,7 @@ import {
   usePiScreen,
 } from "./pi-screen-watch";
 import { SpriteAgent, LIVE_AGENTS } from "../agents/live/sprite-agent";
+import { ScreenCompanion } from "../agents/live/screen-companion";
 
 /**
  * The call itself. Loaded only on a room page (it carries the video SDK, about 4 MB unpacked), and
@@ -117,6 +118,22 @@ function Face({ participant }: { participant: StreamVideoParticipant }) {
         )}
       </div>
     </div>
+  );
+}
+
+/** The agent's cut-out character at the corner of the stage while a screen is shared. */
+function Companion() {
+  const { useParticipants } = useCallStateHooks();
+  const pi = useParticipants().find((p) => p.userId === PI_USER);
+  const screen = usePiScreen();
+  const agentKey = usePiAgent();
+  return (
+    <ScreenCompanion
+      agentKey={agentKey}
+      state={screen.state}
+      level={pi?.audioLevel ?? 0}
+      speaking={pi?.isSpeaking ?? false}
+    />
   );
 }
 
@@ -541,11 +558,12 @@ export function MeetingRoomCall({
             {error && <Notice tone="danger">{error}</Notice>}
             <SharingBanner />
             <PiScreenBanner />
-            <div className="h-[56dvh] min-h-72 overflow-hidden rounded-2xl border border-border sm:h-[62dvh]">
+            <div className="relative h-[56dvh] min-h-72 overflow-hidden rounded-2xl border border-border sm:h-[62dvh]">
               <SpeakerLayout
                 participantsBarPosition="bottom"
                 VideoPlaceholder={Face}
               />
+              <Companion />
             </div>
             <Captions />
             <Dock onLeave={() => leave()} onError={setError} />
