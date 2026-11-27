@@ -1,6 +1,6 @@
 "use client";
 
-import { createElement } from "react";
+import { createElement, useState } from "react";
 import type { LucideIcon } from "lucide-react";
 import {
   Briefcase,
@@ -19,6 +19,7 @@ import {
   Target,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { PiAvatar } from "../room/pi-avatar";
 import type { Agent, AgentColor, AgentIcon } from "./meeting-agents-service";
 
 /** One lucide icon per icon key the server allows. Unknown keys fall back to sparkles. */
@@ -123,6 +124,22 @@ const SIZES = {
 
 export type AvatarSize = keyof typeof SIZES;
 
+/**
+ * Built-in agents that have a character portrait in /agents (square, 384 px, WebP). pi itself keeps
+ * its brand face (never redrawn); a custom agent keeps its gradient tile and icon. A portrait that
+ * fails to load falls back to the tile, so an avatar is never blank.
+ */
+const PORTRAITS = new Set([
+  "sales_coach",
+  "negotiation_coach",
+  "presentation_coach",
+  "training_coach",
+  "hustle_coach",
+  "customer_success",
+  "interviewer",
+]);
+const PI_FACE: Record<AvatarSize, number> = { sm: 22, md: 30, lg: 44, xl: 58 };
+
 export function AgentAvatar({
   agent,
   icon,
@@ -131,7 +148,7 @@ export function AgentAvatar({
   showAi = false,
   className,
 }: {
-  agent?: Pick<Agent, "icon" | "color" | "is_default">;
+  agent?: Pick<Agent, "icon" | "color" | "is_default"> & { key?: string };
   icon?: string;
   color?: string;
   size?: AvatarSize;
@@ -143,6 +160,11 @@ export function AgentAvatar({
   const style = stylesFor(color ?? agent?.color ?? "green");
   const s = SIZES[size];
   const ai = showAi && agent?.is_default && size !== "sm" && size !== "md";
+  const [broken, setBroken] = useState(false);
+  const portrait =
+    !broken && agent?.key && PORTRAITS.has(agent.key)
+      ? `/agents/${agent.key}.webp`
+      : null;
   return (
     <span
       aria-hidden="true"
@@ -150,12 +172,29 @@ export function AgentAvatar({
     >
       <span
         className={cn(
-          "grid place-items-center bg-gradient-to-br shadow-sm ring-1 ring-inset",
+          "grid place-items-center overflow-hidden bg-gradient-to-br shadow-sm ring-1 ring-inset",
           s.box,
           style.tile,
         )}
       >
-        {createElement(glyph, { className: s.icon, strokeWidth: 1.9 })}
+        {portrait ? (
+          // eslint-disable-next-line @next/next/no-img-element -- a small static portrait
+          <img
+            src={portrait}
+            alt=""
+            width={384}
+            height={384}
+            loading="lazy"
+            decoding="async"
+            draggable={false}
+            onError={() => setBroken(true)}
+            className="size-full object-cover"
+          />
+        ) : agent?.is_default ? (
+          <PiAvatar expression="rest" size={PI_FACE[size]} decorative />
+        ) : (
+          createElement(glyph, { className: s.icon, strokeWidth: 1.9 })
+        )}
       </span>
       {ai && (
         <span
