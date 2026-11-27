@@ -37,53 +37,7 @@ async def ask_meeting(
     await _gate(session, scope, "pi.meetings.read")
     meeting = await _meeting(session, scope, meeting_id)
     question = " ".join(data.question.split())
-    rows = (
-        await session.execute(
-            select(
-                PiMeetingSegment.ordinal,
-                PiMeetingSegment.text,
-                PiMeetingSegment.start_ms,
-                PiMeetingParticipant.label,
-                PiMeetingParticipant.role,
-            )
-            .join(
-                PiMeetingParticipant,
-                (PiMeetingParticipant.id == PiMeetingSegment.participant_id)
-                & (PiMeetingParticipant.tenant_id == PiMeetingSegment.tenant_id)
-                & (PiMeetingParticipant.environment_id == PiMeetingSegment.environment_id),
-                isouter=True,
-            )
-            .where(
-                PiMeetingSegment.tenant_id == scope.tenant_id,
-                PiMeetingSegment.environment_id == scope.environment_id,
-                PiMeetingSegment.meeting_id == meeting.id,
-            )
-            .order_by(PiMeetingSegment.ordinal)
-        )
-    ).all()
-    if not rows:
-        raise BusinessRuleViolation("TRANSCRIPT_EMPTY", "This meeting has no transcript yet", 422)
-    lines = [
-        qa.Line(o, t, who or "", role or "unknown", start or 0) for o, t, start, who, role in rows
-    ]
-    hits: list[int] = []
-    terms = qa.search_terms(question)
-    if terms and sum(len(x.text) for x in lines) > qa.QA_CHARS:
-        position = {x.ordinal: i for i, x in enumerate(lines)}
-        match = func.to_tsquery("simple", " | ".join(terms))
-        found = await session.scalars(
-            select(PiMeetingSegment.ordinal)
-            .where(
-                PiMeetingSegment.tenant_id == scope.tenant_id,
-                PiMeetingSegment.environment_id == scope.environment_id,
-                PiMeetingSegment.meeting_id == meeting.id,
-                PiMeetingSegment.tsv.op("@@")(match),
-            )
-            .order_by(func.ts_rank(PiMeetingSegment.tsv, match).desc())
-            .limit(qa.HITS)
-        )
-        hits = [position[o] for o in found if o in position]
-    part, partial = qa.pick(lines, hits)
+    lines, part, partial = await transcript_part(session, scope, meeting.id, question)
     state = request.app.state
     manager = build_llm_manager(state.settings, state.http, state.sessions)
     try:
@@ -108,6 +62,10 @@ async def ask_meeting(
         },
     )
     await session.commit()
+    return answer_view(answer)
+
+
+def answer_view(answer: qa.Answer) -> dict[str, Any]:
     return {
         "found": answer.found,
         "answer": answer.text,
@@ -123,3 +81,58 @@ async def ask_meeting(
             for s in answer.sources
         ],
     }
+
+
+async def transcript_part(
+    session: Any, scope: Any, meeting_id: UUID, question: str
+) -> tuple[list[qa.Line], list[qa.Line], bool]:
+    """The meeting's lines, and the part of them the model will read for this question (a short
+    meeting whole; a long one, the lines the question's words match with their neighbours)."""
+    rows = (
+        await session.execute(
+            select(
+                PiMeetingSegment.ordinal,
+                PiMeetingSegment.text,
+                PiMeetingSegment.start_ms,
+                PiMeetingParticipant.label,
+                PiMeetingParticipant.role,
+            )
+            .join(
+                PiMeetingParticipant,
+                (PiMeetingParticipant.id == PiMeetingSegment.participant_id)
+                & (PiMeetingParticipant.tenant_id == PiMeetingSegment.tenant_id)
+                & (PiMeetingParticipant.environment_id == PiMeetingSegment.environment_id),
+                isouter=True,
+            )
+            .where(
+                PiMeetingSegment.tenant_id == scope.tenant_id,
+                PiMeetingSegment.environment_id == scope.environment_id,
+                PiMeetingSegment.meeting_id == meeting_id,
+            )
+            .order_by(PiMeetingSegment.ordinal)
+        )
+    ).all()
+    if not rows:
+        raise BusinessRuleViolation("TRANSCRIPT_EMPTY", "This meeting has no transcript yet", 422)
+    lines = [
+        qa.Line(o, t, who or "", role or "unknown", start or 0) for o, t, start, who, role in rows
+    ]
+    hits: list[int] = []
+    terms = qa.search_terms(question)
+    if terms and sum(len(x.text) for x in lines) > qa.QA_CHARS:
+        position = {x.ordinal: i for i, x in enumerate(lines)}
+        match = func.to_tsquery("simple", " | ".join(terms))
+        found = await session.scalars(
+            select(PiMeetingSegment.ordinal)
+            .where(
+                PiMeetingSegment.tenant_id == scope.tenant_id,
+                PiMeetingSegment.environment_id == scope.environment_id,
+                PiMeetingSegment.meeting_id == meeting_id,
+                PiMeetingSegment.tsv.op("@@")(match),
+            )
+            .order_by(func.ts_rank(PiMeetingSegment.tsv, match).desc())
+            .limit(qa.HITS)
+        )
+        hits = [position[o] for o in found if o in position]
+    part, partial = qa.pick(lines, hits)
+    return lines, part, partial

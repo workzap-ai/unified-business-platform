@@ -67,6 +67,7 @@ from app.modules.pi.solution_routes import router as pi_solutions_router
 from app.modules.pi.staff_review_routes import router as pi_staff_review_router
 from app.modules.pi_customer.routes import router as pi_customer_router
 from app.modules.pi_customer.second_step import router as pi_customer_second_step_router
+from app.modules.pi_meetings.agent_routes import router as pi_meeting_agent_router
 from app.modules.pi_meetings.bot_routes import public_router as pi_meeting_bot_webhook_router
 from app.modules.pi_meetings.bot_routes import router as pi_meeting_bot_router
 from app.modules.pi_meetings.deliverable_routes import router as pi_meeting_documents_router
@@ -150,6 +151,7 @@ ROUTERS = [
     pi_meeting_board_router,
     pi_meeting_intel_router,
     pi_meeting_qa_router,
+    pi_meeting_agent_router,
     pi_meeting_pilot_router,
     pi_meeting_share_router,
     pi_meeting_recording_router,

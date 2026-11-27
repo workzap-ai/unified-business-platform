@@ -16,6 +16,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.modules.pi_meetings.models import (
     PiMeeting,
     PiMeetingBot,
+    PiMeetingChat,
+    PiMeetingChatMessage,
     PiMeetingDocument,
     PiMeetingGuest,
     PiMeetingInsight,
@@ -111,7 +113,22 @@ def erase_steps(scope: WorkspaceScope, customer_id: UUID) -> tuple[tuple[str, An
     media_ids = select(PiMeetingMedia.id).where(
         *mine(PiMeetingMedia), PiMeetingMedia.meeting_id.in_(meeting_ids)
     )
+    chat_ids = select(PiMeetingChat.id).where(
+        *mine(PiMeetingChat), PiMeetingChat.meeting_id.in_(meeting_ids)
+    )
     return (
+        (
+            "meeting_chat_messages",
+            delete(PiMeetingChatMessage).where(
+                *mine(PiMeetingChatMessage), PiMeetingChatMessage.chat_id.in_(chat_ids)
+            ),
+        ),
+        (
+            "meeting_chats",
+            delete(PiMeetingChat).where(
+                *mine(PiMeetingChat), PiMeetingChat.meeting_id.in_(meeting_ids)
+            ),
+        ),
         (
             "meeting_documents",
             delete(PiMeetingDocument).where(
@@ -217,7 +234,21 @@ async def erase_one(session: AsyncSession, scope: WorkspaceScope, meeting_id: UU
             PiMeetingMediaData.media_id.in_(media_ids),
         )
     )
+    await session.execute(
+        delete(PiMeetingChatMessage).where(
+            PiMeetingChatMessage.tenant_id == scope.tenant_id,
+            PiMeetingChatMessage.environment_id == scope.environment_id,
+            PiMeetingChatMessage.chat_id.in_(
+                select(PiMeetingChat.id).where(
+                    PiMeetingChat.tenant_id == scope.tenant_id,
+                    PiMeetingChat.environment_id == scope.environment_id,
+                    PiMeetingChat.meeting_id == meeting_id,
+                )
+            ),
+        )
+    )
     for model in (
+        PiMeetingChat,
         PiMeetingDocument,
         PiMeetingBot,
         PiMeetingRoom,

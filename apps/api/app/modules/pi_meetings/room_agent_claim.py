@@ -19,6 +19,7 @@ from uuid import UUID
 from sqlalchemy import or_, select
 
 from app.modules.pi.configuration import settings_row
+from app.modules.pi_meetings import agent_store
 from app.modules.pi_meetings.models import PiMeeting, PiMeetingRoom
 from app.shared.scope import WorkspaceScope
 
@@ -47,6 +48,8 @@ class Orders:
     halted: bool = False
     last_spoke_at: datetime | None = None
     notes: dict[str, Any] = field(default_factory=dict)
+    # the meeting's agent as a block of focus and tone for the prompts ('' for pi itself)
+    persona: str = ""
 
 
 def scope_of(room: PiMeetingRoom) -> WorkspaceScope:
@@ -108,16 +111,17 @@ async def beat(session: Any, room_id: UUID, agent_id: str, now: datetime) -> Ord
     room.agent_beat_at = now
     scope = scope_of(room)
     allowed = await workspace_allows(session, scope)
-    language = (
-        await session.scalar(
-            select(PiMeeting.language).where(
+    row = (
+        await session.execute(
+            select(PiMeeting.language, PiMeeting.agent_key).where(
                 PiMeeting.tenant_id == room.tenant_id,
                 PiMeeting.environment_id == room.environment_id,
                 PiMeeting.id == room.meeting_id,
             )
         )
-        or ""
-    )
+    ).first()
+    language, agent_key = (row[0] or "", row[1]) if row else ("", None)
+    persona = (await agent_store.resolve(session, scope, agent_key))[2]
     return Orders(
         room_id=room.id,
         meeting_id=room.meeting_id,
@@ -134,6 +138,7 @@ async def beat(session: Any, room_id: UUID, agent_id: str, now: datetime) -> Ord
         halted=room.pi_halted,
         last_spoke_at=room.pi_last_spoke_at,
         notes=dict(room.pi_notes or {}),
+        persona=persona,
     )
 
 

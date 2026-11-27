@@ -32,7 +32,7 @@ from app.modules.access.dependencies import Scope, Session
 from app.modules.audit.service import record
 from app.modules.pi.configuration import settings_row
 from app.modules.pi.memory_ledger import redacted
-from app.modules.pi_meetings import native_ingest, room_agent_claim
+from app.modules.pi_meetings import agent_store, agents, native_ingest, room_agent_claim
 from app.modules.pi_meetings import room_limits as limits
 from app.modules.pi_meetings.guest_routes import (
     GuestToken,
@@ -85,6 +85,8 @@ class RoomInput(BaseModel):
     language: str = Field(default="", max_length=12)
     # the person opening the room confirms everyone in it will be told it is transcribed
     consent: bool = False
+    # the agent for this meeting: a built-in key or a custom agent's id (None: pi itself)
+    agent_key: str | None = Field(default=None, max_length=40)
 
 
 def provider_for(request: Request) -> RoomProvider | None:
@@ -249,6 +251,9 @@ async def open_room(
         raise BusinessRuleViolation("MEETING_LANGUAGE_INVALID", "Use a language code like en", 422)
     if data.customer_id is not None:
         await _customer_ok(session, scope, data.customer_id)
+    agent_key = None
+    if data.agent_key and data.agent_key != agents.DEFAULT_KEY:
+        agent_key = await agent_store.valid_key(session, scope, data.agent_key)
     allowance = await limits.month_allowance(session, scope)
     if await limits.month_minutes_used(session, scope) >= allowance:
         raise BusinessRuleViolation(
@@ -265,6 +270,7 @@ async def open_room(
         title=redacted(data.title, 200),
         source="native",
         language=language,
+        agent_key=agent_key,
         consent_at=now,
         consent_by=scope.user_id,
         consent_note=(

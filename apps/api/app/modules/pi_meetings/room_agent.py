@@ -94,6 +94,7 @@ class RoomRun:
         session.settings.mode = "speak" if orders.speak else "off"
         session.settings.intake = orders.intake
         session.settings.language = orders.language
+        session.persona = orders.persona
         if session.muted:
             self.speech.barge_in()
 

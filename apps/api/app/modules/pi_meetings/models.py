@@ -146,6 +146,9 @@ class PiMeeting(WorkspaceRow):
     pi_mode: Mapped[str] = mapped_column(String(8), default="off", server_default="off")
     failure_reason: Mapped[str] = mapped_column(String(300), default="", server_default="")
     created_by: Mapped[UUID | None] = mapped_column(Uuid, nullable=True)
+    # the agent chosen for this meeting: a built-in key ("sales_coach") or a custom agent's id;
+    # None means pi's own personality (agents.py)
+    agent_key: Mapped[str | None] = mapped_column(String(40), nullable=True)
 
 
 class PiMeetingBot(WorkspaceRow):
@@ -488,3 +491,77 @@ class PiMeetingGuest(WorkspaceRow):
     first_offset_ms: Mapped[int | None] = mapped_column(Integer, nullable=True)
     last_seq: Mapped[int | None] = mapped_column(SmallInteger, nullable=True)
     last_part_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+
+
+CHAT_ROLES = ("user", "assistant")
+
+
+class PiMeetingAgent(WorkspaceRow):
+    """An agent a workspace wrote itself: a name, a look and a few lines of focus and tone. It is
+    archived, never deleted, so a meeting or chat that used it keeps working."""
+
+    __tablename__ = "pi_meeting_agents"
+    __table_args__ = workspace_args(
+        "pi_meeting_agents",
+        Index(
+            "uq_pi_meeting_agents_name",
+            "tenant_id",
+            "environment_id",
+            text("lower(name)"),
+            unique=True,
+            postgresql_where=text("archived_at IS NULL"),
+        ),
+    )
+    name: Mapped[str] = mapped_column(String(40))
+    tagline: Mapped[str] = mapped_column(String(80), default="", server_default="")
+    icon: Mapped[str] = mapped_column(String(20), default="sparkles", server_default="sparkles")
+    color: Mapped[str] = mapped_column(String(12), default="green", server_default="green")
+    instructions: Mapped[str] = mapped_column(Text)  # redacted, checked by agents.py
+    created_by: Mapped[UUID | None] = mapped_column(Uuid, nullable=True)
+    archived_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+
+
+class PiMeetingChat(WorkspaceRow):
+    """One chat with a meeting ("Ask AI"): its agent and its messages. It goes with the meeting."""
+
+    __tablename__ = "pi_meeting_chats"
+    __table_args__ = workspace_args(
+        "pi_meeting_chats",
+        scoped_fk("pi_meeting_chats", "meeting_id", "pi_meetings"),
+        Index(
+            "ix_pi_meeting_chats_meeting",
+            "tenant_id",
+            "environment_id",
+            "meeting_id",
+            "updated_at",
+        ),
+    )
+    meeting_id: Mapped[UUID] = mapped_column(Uuid)
+    agent_key: Mapped[str] = mapped_column(String(40), default="pi", server_default="pi")
+    title: Mapped[str] = mapped_column(String(80), default="", server_default="")
+    created_by: Mapped[UUID | None] = mapped_column(Uuid, nullable=True)
+
+
+class PiMeetingChatMessage(WorkspaceRow):
+    __tablename__ = "pi_meeting_chat_messages"
+    __table_args__ = workspace_args(
+        "pi_meeting_chat_messages",
+        scoped_fk("pi_meeting_chat_messages", "chat_id", "pi_meeting_chats"),
+        Index(
+            "ix_pi_meeting_chat_messages_chat",
+            "tenant_id",
+            "environment_id",
+            "chat_id",
+            "created_at",
+        ),
+        CheckConstraint(_in("role", CHAT_ROLES), name="role"),
+    )
+    chat_id: Mapped[UUID] = mapped_column(Uuid)
+    role: Mapped[str] = mapped_column(String(9))
+    found: Mapped[bool] = mapped_column(Boolean, default=False, server_default=text("false"))
+    partial: Mapped[bool] = mapped_column(Boolean, default=False, server_default=text("false"))
+    sources: Mapped[list[dict[str, Any]]] = mapped_column(
+        JSONB, default=list, server_default=text("'[]'::jsonb")
+    )
+    # declared last: a column called `text` hides sqlalchemy's text() for the rest of the class body
+    text: Mapped[str] = mapped_column(Text, default="", server_default="")  # redacted

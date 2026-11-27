@@ -31,6 +31,7 @@ from app.shared.scope import WorkspaceScope
 logger = logging.getLogger(__name__)
 
 PURPOSE = "pi_meeting_voice"
+PERSONA_GAP = chr(10) * 2  # a blank line before the meeting agent's focus and tone
 PI_LABEL = "pi (AI)"  # pi's own speaker in a transcript; a guest can never take it
 HISTORY_LINES = 12  # the newest lines of the conversation the model sees
 SPOKEN_CHARS = 320  # a spoken turn is short
@@ -522,6 +523,7 @@ async def reply_to(
     on_screen: str = "",
     prefer: str = "",
     wants_solution: bool = False,
+    persona: str = "",
 ) -> Spoken:
     """The next thing pi says after `heard`. Never raises for a model that is down: that is the
     safe line, so the conversation does not stop. The first turn is `opening()`, not this.
@@ -571,6 +573,8 @@ async def reply_to(
         )
     shared_memory.attach(body, block)  # a no-op when there is no memory
     system = SYSTEM + (MEMORY_NOTE + shared_memory.system_line(block) if block else "")
+    if persona:
+        system += PERSONA_GAP + persona
 
     async def ask(note: str = "") -> Any:
         payload = json.dumps({**body, **({"correction": note} if note else {})}, ensure_ascii=False)

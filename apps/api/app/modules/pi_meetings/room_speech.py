@@ -117,6 +117,7 @@ class Session:
     facts: list[str] = field(default_factory=list)  # what they told pi in this call, in few words
     last_spoke_at: float | None = None
     nods: int = 0
+    persona: str = ""  # the meeting's agent: focus and tone, below the rules (agents.py)
     last_nod_at: float | None = None
     history: list[voice.Said] = field(default_factory=list)
     # the last words of a person pi did not answer yet, with when they were said
@@ -380,6 +381,7 @@ class RoomSpeech:
                             ideas_given=state.ideas,
                             acknowledged=quick,
                             prefer=state.language_pref,
+                            persona=state.persona,
                             wants_solution=state.wants_solution,
                             learned=state.facts,
                             on_screen=self.on_screen() if self.on_screen else "",

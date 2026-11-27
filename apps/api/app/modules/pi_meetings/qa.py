@@ -30,6 +30,7 @@ ANSWER_CHARS = 600
 MAX_SOURCES = 6
 RETRY_PAUSES = (3.0, 6.0)
 PURPOSE = "pi_meeting_ask"
+PERSONA_GAP = chr(10) * 2  # a blank line before the agent's focus and tone
 WORD = re.compile(r"\w{3,}", re.UNICODE)
 
 SYSTEM = """You answer one question about a business meeting, using only the transcript lines you
@@ -151,6 +152,7 @@ async def ask(
     *,
     partial: bool,
     language: str = "",
+    persona: str = "",
 ) -> Answer:
     """The model's answer, kept only when it cites a line it was shown. Raises `AskFailed`."""
     from app.ai.errors import GatewayUnavailable
@@ -164,7 +166,10 @@ async def ask(
                 ModelAnswer,
                 alias="fast",
                 purpose=PURPOSE,
-                messages=[Message.system(SYSTEM), Message.user(_payload(question, part, language))],
+                messages=[
+                    Message.system(SYSTEM + (PERSONA_GAP + persona if persona else "")),
+                    Message.user(_payload(question, part, language)),
+                ],
                 temperature=0.1,
                 max_tokens=500,
             )
