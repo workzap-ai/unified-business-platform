@@ -167,17 +167,34 @@ export function SpriteAgent({
     };
   }, [loaded]);
 
-  const motion = reduced
+  // The character is two layers: the head (with the mouth and eye frames) and the body. They move
+  // apart from the neck, so it turns and nods, the shoulders breathe, and it leans in as it talks.
+  const neck = NECK[agentKey] ?? 0.6;
+  const talking = speaking && screen === "none";
+  const head = reduced
     ? ""
     : screen === "looking"
-      ? "motion-safe:animate-[agent-scan_2.4s_ease-in-out_infinite]"
+      ? "motion-safe:animate-[agent-head-scan_2.6s_ease-in-out_infinite]"
       : screen === "missing"
-        ? "motion-safe:animate-[agent-puzzled_2.6s_ease-in-out_infinite]"
+        ? "motion-safe:animate-[agent-head-puzzled_2.8s_ease-in-out_infinite]"
         : screen === "seeing"
-          ? "motion-safe:animate-[agent-nod_0.7s_ease-in-out_1]"
-          : listening
-            ? "motion-safe:animate-[agent-listen_3.2s_ease-in-out_infinite]"
-            : "motion-safe:animate-[agent-breathe_4.4s_ease-in-out_infinite]";
+          ? "motion-safe:animate-[agent-head-nod_0.8s_ease-in-out_1]"
+          : talking
+            ? "motion-safe:animate-[agent-head-talk_1.1s_ease-in-out_infinite]"
+            : listening
+              ? "motion-safe:animate-[agent-head-listen_3.6s_ease-in-out_infinite]"
+              : "motion-safe:animate-[agent-head-idle_5.2s_ease-in-out_infinite]";
+  const body = reduced
+    ? ""
+    : screen === "looking"
+      ? "motion-safe:animate-[agent-body-lean_2.6s_ease-in-out_infinite]"
+      : talking
+        ? "motion-safe:animate-[agent-body-talk_1.6s_ease-in-out_infinite]"
+        : "motion-safe:animate-[agent-body-breathe_4.2s_ease-in-out_infinite]";
+  // the two layers overlap at the neck and fade into each other, so there is no seam at rest
+  const headMask = `linear-gradient(to bottom, #000 ${(neck - 0.02) * 100}%, transparent ${(neck + 0.06) * 100}%)`;
+  const bodyMask = `linear-gradient(to bottom, transparent ${(neck - 0.1) * 100}%, #000 ${neck * 100}%)`;
+  const imgClass = "absolute inset-0 size-full object-cover";
 
   return (
     <div
@@ -191,56 +208,105 @@ export function SpriteAgent({
       style={{ width: size, height: size }}
     >
       <style>{KEYFRAMES}</style>
-      <div
-        key={screen + String(listening)}
-        className={cn("absolute inset-0 origin-[50%_85%]", motion)}
-      >
-        {FRAMES.map((f) => (
-          // eslint-disable-next-line @next/next/no-img-element -- small static animation frames
+      <div className="absolute inset-0 scale-[1.04] origin-bottom">
+        <div
+          className={cn("absolute inset-0 origin-bottom", body)}
+          style={{ maskImage: bodyMask, WebkitMaskImage: bodyMask }}
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element -- small static animation frames */}
           <img
-            key={f}
-            src={src(agentKey, f, cutout)}
+            src={src(agentKey, "base", cutout)}
             alt=""
             width={512}
             height={512}
             draggable={false}
             decoding="async"
-            className={cn(
-              "absolute inset-0 size-full object-cover",
-              f === "base"
-                ? "opacity-100"
-                : f === frame
-                  ? "opacity-100"
-                  : "opacity-0",
-            )}
+            className={imgClass}
           />
-        ))}
+        </div>
+        <div
+          key={screen + String(listening) + String(talking)}
+          className={cn("absolute inset-0", head)}
+          style={{
+            transformOrigin: `50% ${neck * 100}%`,
+            maskImage: headMask,
+            WebkitMaskImage: headMask,
+          }}
+        >
+          {FRAMES.map((f) => (
+            // eslint-disable-next-line @next/next/no-img-element -- small static animation frames
+            <img
+              key={f}
+              src={src(agentKey, f, cutout)}
+              alt=""
+              width={512}
+              height={512}
+              draggable={false}
+              decoding="async"
+              className={cn(
+                imgClass,
+                f === "base" || f === frame ? "opacity-100" : "opacity-0",
+              )}
+            />
+          ))}
+        </div>
       </div>
     </div>
   );
 }
 
+/** Where the neck is, as a fraction of the picture's height (the head and body layers split here). */
+const NECK: Record<string, number> = {
+  pi: 0.74,
+  sales_coach: 0.6,
+  negotiation_coach: 0.62,
+  presentation_coach: 0.6,
+  training_coach: 0.58,
+  hustle_coach: 0.6,
+  customer_success: 0.62,
+  interviewer: 0.6,
+};
+
 const KEYFRAMES = `
-@keyframes agent-breathe {
-  0%, 100% { transform: translateY(0) scale(1.03) rotate(0deg); }
-  50% { transform: translateY(-0.6%) scale(1.04) rotate(0.5deg); }
+@keyframes agent-head-idle {
+  0%, 100% { transform: rotate(0deg) translateY(0); }
+  30% { transform: rotate(1.6deg) translateY(-0.4%); }
+  65% { transform: rotate(-1.4deg) translateY(0.2%); }
 }
-@keyframes agent-listen {
-  0%, 100% { transform: translateY(0) rotate(0deg) scale(1.03); }
-  20% { transform: translateY(1.6%) rotate(0.8deg) scale(1.04); }
-  40% { transform: translateY(0) rotate(0deg) scale(1.03); }
+@keyframes agent-head-talk {
+  0%, 100% { transform: rotate(0deg) translateY(0); }
+  20% { transform: rotate(-2.2deg) translateY(0.8%); }
+  45% { transform: rotate(1.8deg) translateY(-0.5%); }
+  70% { transform: rotate(-1deg) translateY(0.6%); }
 }
-@keyframes agent-scan {
-  0%, 100% { transform: translateX(-2.2%) rotate(-1.2deg) scale(1.07); }
-  50% { transform: translateX(2.2%) rotate(1.2deg) scale(1.07); }
+@keyframes agent-head-listen {
+  0%, 100% { transform: rotate(3.5deg) translateY(0); }
+  25% { transform: rotate(3.5deg) translateY(1.4%); }
+  35% { transform: rotate(3.5deg) translateY(0); }
 }
-@keyframes agent-puzzled {
-  0%, 100% { transform: rotate(0deg) scale(1.03); }
-  30% { transform: rotate(-4deg) translateX(-1%) scale(1.03); }
-  60% { transform: rotate(3deg) translateX(1%) scale(1.03); }
+@keyframes agent-head-scan {
+  0%, 100% { transform: translateX(-3%) rotate(-5deg); }
+  50% { transform: translateX(3%) rotate(5deg); }
 }
-@keyframes agent-nod {
-  0% { transform: translateY(0) scale(1.03); }
-  40% { transform: translateY(2.4%) scale(1.03); }
-  100% { transform: translateY(0) scale(1.03); }
+@keyframes agent-head-puzzled {
+  0%, 100% { transform: rotate(0deg); }
+  30% { transform: rotate(-7deg) translateX(-1%); }
+  60% { transform: rotate(6deg) translateX(1%); }
+}
+@keyframes agent-head-nod {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  40% { transform: translateY(2.6%) rotate(1deg); }
+}
+@keyframes agent-body-breathe {
+  0%, 100% { transform: scale(1, 1); }
+  50% { transform: scale(1.012, 1.02); }
+}
+@keyframes agent-body-talk {
+  0%, 100% { transform: scale(1, 1) rotate(0deg); }
+  25% { transform: scale(1.01, 1.025) rotate(0.8deg); }
+  60% { transform: scale(1.005, 1.01) rotate(-0.8deg); }
+}
+@keyframes agent-body-lean {
+  0%, 100% { transform: translateX(-1.2%) rotate(-1.4deg); }
+  50% { transform: translateX(1.2%) rotate(1.4deg); }
 }`;
