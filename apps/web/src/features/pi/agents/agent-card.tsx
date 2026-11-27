@@ -1,6 +1,7 @@
 "use client";
 
-import { MoreHorizontal, Pencil, Archive } from "lucide-react";
+import { useState } from "react";
+import { MoreHorizontal, Pencil, Archive, Play } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import {
@@ -11,6 +12,8 @@ import {
 } from "@/components/ui/overlays";
 import { AgentAvatar, stylesFor } from "./agent-avatar";
 import type { Agent } from "./meeting-agents-service";
+import { AgentMeetDialog } from "./live/agent-meet-dialog";
+import { LIVE_AGENTS } from "./live/sprite-agent";
 
 export const PI_BLURB =
   "pi's own personality: listens, asks one question at a time, always says it is an AI";
@@ -27,6 +30,8 @@ export function AgentCard({
 }) {
   const style = stylesFor(agent.color);
   const editable = agent.kind === "custom" && agent.can_edit;
+  const [meet, setMeet] = useState(false);
+  const alive = LIVE_AGENTS.has(agent.key);
   return (
     <li className="group relative">
       {/* a soft gradient glow that fades in around the card */}
@@ -105,6 +110,20 @@ export function AgentCard({
               ))}
             </ul>
           </div>
+        )}
+
+        {alive && (
+          <Button
+            variant="soft"
+            size="sm"
+            className="mt-4 self-start"
+            onClick={() => setMeet(true)}
+          >
+            <Play /> Meet {agent.name}
+          </Button>
+        )}
+        {alive && (
+          <AgentMeetDialog agent={agent} open={meet} onOpenChange={setMeet} />
         )}
 
         {agent.sample_questions.length > 0 && (

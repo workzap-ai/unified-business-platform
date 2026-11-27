@@ -29,7 +29,13 @@ import { Notice } from "@/components/app/states";
 import type { RoomCredentials } from "../meeting-room-service";
 import { PiAvatar } from "./pi-avatar";
 import { toRomanUrdu } from "./roman-urdu";
-import { PiEye, PiScreenBanner, usePiScreen } from "./pi-screen-watch";
+import {
+  PiEye,
+  PiScreenBanner,
+  usePiAgent,
+  usePiScreen,
+} from "./pi-screen-watch";
+import { SpriteAgent, LIVE_AGENTS } from "../agents/live/sprite-agent";
 
 /**
  * The call itself. Loaded only on a room page (it carries the video SDK, about 4 MB unpacked), and
@@ -55,6 +61,7 @@ const PI_USER = "pi_agent";
 function Face({ participant }: { participant: StreamVideoParticipant }) {
   const isPi = participant.userId === PI_USER;
   const screen = usePiScreen();
+  const agentKey = usePiAgent();
   const initials = (participant.name || participant.userId || "?")
     .trim()
     .slice(0, 2)
@@ -68,7 +75,23 @@ function Face({ participant }: { participant: StreamVideoParticipant }) {
             className="absolute -inset-3 animate-ping rounded-full bg-primary/25"
           />
         )}
-        {isPi ? (
+        {isPi && LIVE_AGENTS.has(agentKey) ? (
+          <div className="relative">
+            <SpriteAgent
+              agentKey={agentKey}
+              level={participant.audioLevel ?? 0}
+              speaking={participant.isSpeaking}
+              listening={!participant.isSpeaking}
+              screen={screen.state}
+              size={176}
+              label="pi, an AI agent"
+              className={`rounded-3xl ring-4 ${
+                participant.isSpeaking ? "ring-primary" : "ring-transparent"
+              }`}
+            />
+            <PiEye state={screen.state} />
+          </div>
+        ) : isPi ? (
           <div
             className={`relative flex size-28 items-center justify-center rounded-full bg-surface ring-4 transition-transform ${
               participant.isSpeaking

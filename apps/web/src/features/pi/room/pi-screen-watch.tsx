@@ -37,6 +37,16 @@ export function usePiScreen(): { state: PiScreen; sharing: boolean } {
   return { state: known, sharing };
 }
 
+/** Which agent is in this meeting (the room agent writes `pi_agent` on the call); pi when unknown. */
+export function usePiAgent(): string {
+  const { useCallCustomData } = useCallStateHooks();
+  const custom = useCallCustomData() as Record<string, unknown> | undefined;
+  const told = custom?.pi_agent;
+  return typeof told === "string" && /^[a-z0-9_-]{1,40}$/i.test(told)
+    ? told
+    : "pi";
+}
+
 /** The small eye on pi's own tile while a screen is shared. */
 export function PiEye({ state }: { state: PiScreen }) {
   if (state === "none") return null;

@@ -130,6 +130,7 @@ export type AvatarSize = keyof typeof SIZES;
  * fails to load falls back to the tile, so an avatar is never blank.
  */
 const PORTRAITS = new Set([
+  "pi",
   "sales_coach",
   "negotiation_coach",
   "presentation_coach",
@@ -162,7 +163,11 @@ export function AgentAvatar({
   const ai = showAi && agent?.is_default && size !== "sm" && size !== "md";
   const [broken, setBroken] = useState(false);
   const portrait =
-    !broken && agent?.key && PORTRAITS.has(agent.key)
+    !broken &&
+    agent?.key &&
+    PORTRAITS.has(agent.key) &&
+    // pi keeps its brand face in small chips; its robot character shows large
+    (agent.key !== "pi" || size === "lg" || size === "xl")
       ? `/agents/${agent.key}.webp`
       : null;
   return (
