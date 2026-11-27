@@ -203,8 +203,10 @@ export function SpriteAgent({
     let impulse = 0;
     let nextImpulse = last + 2500;
     let prevScreen: ScreenState = "none";
-    const pos = { rot: 0, x: 0, y: 0, yaw: 0, brot: 0, bx: 0 };
-    const hop = { x: 0, y: 0, yaw: 0, until: 0 };
+    const pos = { roll: 0, yaw: 0, pitch: 0, broll: 0 };
+    const hop = { roll: 0, yaw: 0, pitch: 0, until: 0 };
+    let lastNod = 0;
+    let prevLv = 0;
     // a smooth, never-repeating wobble: two sines with unrelated speeds
     const wob = (t: number, f: number, p: number) =>
       Math.sin(t * f + p) * 0.6 + Math.sin(t * f * 2.31 + p * 1.7) * 0.4;
@@ -221,66 +223,69 @@ export function SpriteAgent({
         if (m.screen === "missing") impulse = 1.2;
         prevScreen = m.screen;
       }
+      // a nod on the stress of a word: the voice rises quickly after a quieter moment
+      if (isTalking && m.level - prevLv > 0.2 && now - lastNod > 900) {
+        impulse = Math.max(impulse, 0.55 + Math.min(0.4, e * 0.4));
+        lastNod = now;
+      }
+      prevLv = m.level;
       if (now > nextImpulse) {
-        impulse = Math.max(impulse, isTalking ? 0.9 : 0.6);
+        impulse = Math.max(impulse, isTalking ? 0.6 : 0.5);
         nextImpulse =
           now +
           (isTalking
-            ? 1600 + Math.random() * 2600
+            ? 3500 + Math.random() * 3500
             : m.listening
               ? 3500 + Math.random() * 3500
               : 6000 + Math.random() * 6000);
       }
       impulse *= Math.exp(-dt * 4.5);
 
-      let tRot = wob(t, 0.31, 1) * 0.7;
-      let tX = wob(t, 0.23, 2) * 0.25;
-      let tY = wob(t, 0.37, 3) * 0.25;
-      let tYaw = wob(t, 0.19, 4) * 2.2;
-      let tBrot = wob(t, 0.17, 5) * 0.35;
-      let tBx = wob(t, 0.13, 6) * 0.3;
+      // What the research on natural head motion agrees on: the head turns about the base of the
+      // neck (a ball in a socket) and does not slide sideways; it stays joined to the shoulders,
+      // which answer it a little; movement is small and slow (fast jitter reads as fake); and in
+      // speech the head follows the voice, nodding as the voice rises into a stressed word.
+      let tRoll = wob(t, 0.29, 1) * 0.6;
+      let tYaw = wob(t, 0.19, 4) * 1.2;
+      let tPitch = wob(t, 0.33, 3) * 0.25;
       if (isTalking) {
-        tRot += wob(t, 0.9, 7) * (0.6 + e * 2.4);
-        tYaw += wob(t, 0.55, 8) * (1 + e * 4);
-        tY += e * 0.9;
-        tBrot += wob(t, 0.7, 9) * (0.3 + e * 0.8);
-        tBx += e * 0.4;
+        tRoll += wob(t, 0.5, 7) * (0.4 + e * 1.1);
+        tYaw += wob(t, 0.38, 8) * (0.8 + e * 1.6);
+        tPitch += e * 0.4;
       } else if (m.listening && m.screen === "none") {
-        tRot += 2.6; // head a little to one side, as people do when they listen
-        tYaw += 3;
+        tRoll += 1.8; // the head a little to one side, as people hold it when they listen
+        tYaw += 1.5;
       }
       if (m.screen === "looking") {
         // the gaze goes from place to place and rests there, like eyes reading a screen
         if (now > hop.until) {
-          hop.x = (Math.random() * 2 - 1) * 3;
-          hop.yaw = (Math.random() * 2 - 1) * 9;
-          hop.y = Math.random() * 1.2 - 0.3;
-          hop.until = now + 650 + Math.random() * 900;
+          hop.roll = (Math.random() * 2 - 1) * 1.2;
+          hop.yaw = (Math.random() * 2 - 1) * 4.5;
+          hop.pitch = Math.random() * 1.2 - 0.3;
+          hop.until = now + 800 + Math.random() * 1100;
         }
-        tX += hop.x;
+        tRoll += hop.roll;
         tYaw += hop.yaw;
-        tY += hop.y;
-        tBrot += hop.x * 0.25;
-        tBx += hop.x * 0.2;
+        tPitch += hop.pitch;
       } else if (m.screen === "missing") {
-        tRot += wob(t, 0.55, 10) * 5;
-        tYaw += wob(t, 0.4, 11) * 6;
+        tRoll += wob(t, 0.45, 10) * 3.5;
+        tYaw += wob(t, 0.35, 11) * 2.5;
       }
-      tY += impulse * 1.5;
-      tRot += impulse * (m.screen === "missing" ? 4 : 0.8);
+      tPitch += impulse * 1.1;
+      tRoll += impulse * (m.screen === "missing" ? 2.5 : 0.3);
 
-      const kHead = 1 - Math.exp(-dt * 7);
-      const kBody = 1 - Math.exp(-dt * 3.5);
-      pos.rot += (tRot - pos.rot) * kHead;
-      pos.x += (tX - pos.x) * kHead;
-      pos.y += (tY - pos.y) * kHead;
+      const kHead = 1 - Math.exp(-dt * 5);
+      const kBody = 1 - Math.exp(-dt * 3);
+      pos.roll += (tRoll - pos.roll) * kHead;
       pos.yaw += (tYaw - pos.yaw) * kHead;
-      pos.brot += (tBrot - pos.brot) * kBody;
-      pos.bx += (tBx - pos.bx) * kBody;
+      pos.pitch += (tPitch - pos.pitch) * kHead;
+      // the shoulders answer the head: they lean the other way a little, never on their own
+      const tBodyRoll = -pos.roll * 0.3 + wob(t, 0.17, 5) * 0.15;
+      pos.broll += (tBodyRoll - pos.broll) * kBody;
       const breath = 0.5 + 0.5 * Math.sin(t * 1.45 + wob(t, 0.2, 12) * 0.6);
-      const talkLift = isTalking ? e * 0.01 : 0;
-      h.style.transform = `perspective(520px) translate(${pos.x.toFixed(3)}%, ${pos.y.toFixed(3)}%) rotateY(${pos.yaw.toFixed(3)}deg) rotate(${pos.rot.toFixed(3)}deg)`;
-      b.style.transform = `translateX(${pos.bx.toFixed(3)}%) rotate(${pos.brot.toFixed(3)}deg) scale(${(1 + breath * 0.006).toFixed(4)}, ${(1 + breath * 0.016 + talkLift).toFixed(4)})`;
+      const talkLift = isTalking ? e * 0.008 : 0;
+      h.style.transform = `perspective(700px) translateY(${pos.pitch.toFixed(3)}%) rotateY(${pos.yaw.toFixed(3)}deg) rotate(${pos.roll.toFixed(3)}deg) scaleY(${(1 - pos.pitch * 0.004).toFixed(4)})`;
+      b.style.transform = `rotate(${pos.broll.toFixed(3)}deg) scale(${(1 + breath * 0.005).toFixed(4)}, ${(1 + breath * 0.012 + talkLift).toFixed(4)})`;
       raf = requestAnimationFrame(tick);
     };
     const onVisibility = () => {
@@ -338,7 +343,7 @@ export function SpriteAgent({
           ref={headRef}
           className="absolute inset-0"
           style={{
-            transformOrigin: `50% ${neck * 100}%`,
+            transformOrigin: `50% ${(neck + 0.05) * 100}%`,
             maskImage: headMask,
             WebkitMaskImage: headMask,
           }}
