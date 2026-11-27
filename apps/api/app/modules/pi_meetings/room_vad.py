@@ -55,6 +55,7 @@ class _Person:
     speaking: bool = False
     last_at: float = 0.0  # when the last frame came
     nod_at_s: float = 0.0  # how far into this turn the last nod was
+    peak: float = 0.0  # loudest frame since the last report (a level, never any sound)
 
 
 class TurnCutter:
@@ -88,6 +89,14 @@ class TurnCutter:
         person.nod_at_s = person.length_s
         return True
 
+    def peaks(self) -> dict[str, int]:
+        """The loudest frame of each person since the last call, to tell 'too quiet to be heard' from
+        'heard but not addressed' in the logs. Numbers only."""
+        out = {who: int(p.peak) for who, p in self._people.items() if p.peak}
+        for p in self._people.values():
+            p.peak = 0.0
+        return out
+
     def forget(self, speaker_id: str) -> None:
         self._people.pop(speaker_id, None)
 
@@ -98,7 +107,9 @@ class TurnCutter:
         seconds = (len(frame) // 2) / self.sample_rate
         person = self._people.setdefault(speaker_id, _Person())
         person.last_at = at
-        loud = rms(frame) >= self.loud_rms
+        level = rms(frame)
+        person.peak = max(person.peak, level)
+        loud = level >= self.loud_rms
         out: list[Turn] = []
         if not person.speaking:
             self._before_turn(person, frame, seconds, loud, at)

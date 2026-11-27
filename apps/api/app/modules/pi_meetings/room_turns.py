@@ -22,6 +22,7 @@ MAX_SPOKEN = 20  # pi's turns in one call
 COOLDOWN_S = 6.0  # after pi spoke
 REPLY_GAP_S = 1.5  # the least pause before pi answers an answer: nobody can chain pi's turns
 ANSWER_S = 20.0  # a person's first words after pi's last line are an answer for this long
+INTRO_PATIENCE_S = 6.0  # a customer who has waited this long for pi's introduction gets it
 INTAKE_MIN_WORDS = 3  # a customer's turn this short ("ok", "hmm") is not a reason to speak
 # pi's name, as a whole word, in the scripts the rooms are used in
 NAME = re.compile(r"(?<!\w)(?:pi|p\.\s?i\.?|پائی|پی\s*آئی|पाई|पाय)(?!\w)", re.IGNORECASE)
@@ -35,6 +36,11 @@ FILLERS = frozenset(
     "ok okay hmm hm mm um uh yes yeah yep no haan han acha achha theek thik ji thanks thank you "
     "bye so and".split()
 )
+
+
+def is_filler_only_noise(text: str) -> bool:
+    """Nothing readable in the text (no letters at all)."""
+    return not WORD.findall(text)
 
 
 def is_filler(text: str) -> bool:
@@ -69,6 +75,9 @@ class RoomState:
     # pi has spoken before and nothing was said for a while: a person speaking up again (even
     # "hello, are you there?") is picking the conversation back up
     resumed: bool = False
+    # seconds since a customer first said something short that pi let pass, with no
+    # introduction yet: a person who keeps saying 'hello?' is waiting for pi, not murmuring
+    waited_s: float = 0.0
 
 
 @dataclass(frozen=True)
@@ -126,7 +135,8 @@ def decide(utterance: Utterance, state: RoomState) -> Decision:
     # with more people pi still introduces itself on its own (everyone should know an AI is
     # in the room, whoever speaks first), and afterwards it answers whoever answers its own
     # question; people talking among themselves, unaddressed, are left alone
-    intro = state.intake and state.customers >= 1 and not state.disclosed and enough
+    waiting = state.waited_s >= INTRO_PATIENCE_S and not is_filler_only_noise(utterance.text)
+    intro = state.intake and state.customers >= 1 and not state.disclosed and (enough or waiting)
     group_answer = (
         state.intake and state.customers >= 2 and not from_staff and state.replying and enough
     )

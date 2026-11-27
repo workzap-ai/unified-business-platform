@@ -117,6 +117,9 @@ class Session:
     facts: list[str] = field(default_factory=list)  # what they told pi in this call, in few words
     last_spoke_at: float | None = None
     nods: int = 0
+    first_unheard_at: float | None = (
+        None  # first short customer turn pi let pass, before its introduction
+    )
     slow: bool = False  # the person asked pi to slow down: the voice is told so
     since_recap: int = 0  # pi's answers since it last summed up what it understood
     persona: str = ""  # the meeting's agent: focus and tone, below the rules (agents.py)
@@ -337,6 +340,9 @@ class RoomSpeech:
                     customers=self.customers(),
                     intake=state.settings.intake,
                     answering=voice.confirm_state(state.history) == "pending",
+                    waited_s=0.0
+                    if state.disclosed or state.first_unheard_at is None
+                    else now - state.first_unheard_at,
                     resumed=state.disclosed
                     and state.last_spoke_at is not None
                     and now - state.last_spoke_at > room_turns.ANSWER_S,
@@ -346,6 +352,15 @@ class RoomSpeech:
                     and now - state.last_spoke_at <= room_turns.ANSWER_S,
                 ),
             )
+            if (
+                decision.action == "silent"
+                and not state.disclosed
+                and state.first_unheard_at is None
+                and decision.reason == "not_addressed"
+                and state.settings.intake
+                and not turn.speaker_id.startswith("s_")
+            ):
+                state.first_unheard_at = now
             if decision.action == "silent":
                 if decision.reason in CARRY_REASONS and not room_turns.is_filler(heard):
                     state.carry[turn.speaker_id] = (heard, now)  # may join this person's next piece

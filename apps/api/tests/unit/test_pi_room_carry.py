@@ -90,8 +90,10 @@ async def test_an_old_piece_is_not_joined_and_is_kept_in_the_history():
     speech, manager, clock = build()
     assert await say(speech, manager, "hello") == "not_addressed"
     clock.t += room_speech.CARRY_S + 1
-    assert await say(speech, manager, "two words") == "not_addressed"  # only two words alone
-    assert [h.text for h in speech.session.history] == ["hello"]
+    # the customer has now waited longer than the patience time: pi introduces itself even though
+    # "two words" alone is short, and the old "hello" is kept in the history, not joined to it
+    assert await say(speech, manager, "two words") == "disclosed"
+    assert [h.text for h in speech.session.history][:1] == ["hello"]
 
 
 async def test_pieces_of_different_people_are_not_joined():
@@ -339,3 +341,21 @@ async def test_when_the_person_starts_talking_again_while_pi_thinks_it_answers_t
     assert await say(speech, manager, "and sometimes ten customers a day") == "spoke"
     answers = [t for t in manager.tts if t[0] not in voice.FILLERS["en"]]
     assert len(answers) == 1  # one answer, to both halves together
+
+
+async def test_a_customer_who_keeps_saying_hello_gets_the_introduction():
+    speech, manager, clock = build()
+    assert await say(speech, manager, "hello") == "not_addressed"
+    clock.t += 3
+    assert await say(speech, manager, "hello?") == "not_addressed"  # not yet: they may go on
+    clock.t += room_speech.room_turns.INTRO_PATIENCE_S
+    assert await say(speech, manager, "anyone there") == "disclosed"
+    assert voice.opening() in manager.tts[0][0]
+
+
+async def test_the_waiting_clock_starts_only_with_a_customer_not_with_staff():
+    speech, manager, clock = build()
+    assert await say(speech, manager, "hello", who="s_1") == "not_addressed"
+    clock.t += room_speech.room_turns.INTRO_PATIENCE_S + 1
+    assert await say(speech, manager, "ok", who="g_1") == "not_addressed"  # first short piece
+    assert speech.session.first_unheard_at is not None
