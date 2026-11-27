@@ -1,9 +1,11 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
   AudioLines,
+  Sparkles,
   Bot,
   ChevronRight,
   Link2Off,
@@ -96,6 +98,11 @@ function MeetingList({ open }: { open: (id: string) => void }) {
             <div className="flex flex-wrap gap-2">
               <Button variant="secondary" onClick={() => setStartingRoom(true)}>
                 <Video /> Start video room
+              </Button>
+              <Button variant="secondary" asChild>
+                <Link href="/pi/meeting-agents">
+                  <Sparkles /> Agents
+                </Link>
               </Button>
               <Button variant="secondary" onClick={() => setSendingBot(true)}>
                 <Bot /> Send pi to a call

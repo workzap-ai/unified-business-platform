@@ -59,6 +59,8 @@ export const meetingRoomService = {
     customer_id?: string | null;
     language?: string;
     consent: boolean;
+    // which agent listens; left out means pi's own personality
+    agent_key?: string;
   }) =>
     apiRequest(
       "POST",

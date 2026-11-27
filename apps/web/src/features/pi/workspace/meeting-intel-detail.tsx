@@ -44,7 +44,8 @@ import {
 import { MeetingMap } from "./meeting-map";
 import { MeetingRecorder } from "./meeting-recorder";
 import { MeetingFileImport } from "./meeting-file-import";
-import { MeetingAsk } from "./meeting-ask";
+import { MeetingChat } from "../agents/meeting-chat";
+import { MeetingAgentChip } from "../agents/meeting-agent-chip";
 import { MeetingBotCard } from "./meeting-bot-card";
 import { MeetingInvite } from "./meeting-invite";
 import { MeetingPilot } from "./meeting-pilot";
@@ -97,9 +98,16 @@ export function MeetingDetail({
         }
         description={
           meeting && (
-            <Badge tone={statusTone(meeting.status)}>
-              {MEETING_STATUS_LABELS[meeting.status] ?? meeting.status}
-            </Badge>
+            <span className="flex flex-wrap items-center gap-2">
+              <Badge tone={statusTone(meeting.status)}>
+                {MEETING_STATUS_LABELS[meeting.status] ?? meeting.status}
+              </Badge>
+              <MeetingAgentChip
+                meetingId={meeting.id}
+                agentKey={meeting.agent_key}
+                canChange={can("pi.meetings.record")}
+              />
+            </span>
           )
         }
         actions={
@@ -219,7 +227,11 @@ function Body({ meeting }: { meeting: Detail }) {
             <MeetingMap meeting={meeting} />
           </TabsContent>
           <TabsContent value="ask" className="mt-4">
-            <MeetingAsk id={meeting.id} />
+            <MeetingChat
+              meetingId={meeting.id}
+              agentKey={meeting.agent_key}
+              hasTranscript={hasTranscript}
+            />
           </TabsContent>
           <TabsContent value="transcript" className="mt-4">
             <Transcript

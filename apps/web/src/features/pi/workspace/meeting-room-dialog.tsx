@@ -17,6 +17,9 @@ import { customersService } from "@/features/customers/service";
 import { useScopedMutation, useScopedQuery } from "@/hooks/use-scoped";
 import { ApiError } from "@/services/api-client";
 import { meetingRoomService, ROOM_REFUSED } from "../meeting-room-service";
+import { AgentAvatar } from "../agents/agent-avatar";
+import { AgentChooser } from "../agents/agent-chooser";
+import { agentFor, useAgents } from "../agents/use-agents";
 
 /**
  * Open a video room: a title, and a confirmation that everyone who joins will be told the call is
@@ -35,6 +38,10 @@ export function StartRoomDialog({
   const [agreed, setAgreed] = useState(false);
   const [language, setLanguage] = useState("");
   const [customer, setCustomer] = useState("");
+  const [agentKey, setAgentKey] = useState("pi");
+  const [choosing, setChoosing] = useState(false);
+  const agents = useAgents(open);
+  const agent = agentFor(agents.data, agentKey);
   const customers = useScopedQuery(
     ["customers", "meeting-picker"],
     () => customersService.list({ pageSize: 100 }),
@@ -54,6 +61,7 @@ export function StartRoomDialog({
       setAgreed(false);
       setLanguage("");
       setCustomer("");
+      setAgentKey("pi");
       onOpened(out.meeting.id);
     },
   });
@@ -106,6 +114,27 @@ export function StartRoomDialog({
             </p>
           </div>
           <div>
+            <Label htmlFor="room-agent">Agent</Label>
+            <button
+              id="room-agent"
+              type="button"
+              disabled={make.isPending}
+              onClick={() => setChoosing(true)}
+              className="flex min-h-12 w-full items-center gap-3 rounded-lg border border-border bg-surface px-3 py-2 text-left shadow-sm transition-colors hover:border-border-strong hover:bg-surface-muted disabled:opacity-60"
+            >
+              <AgentAvatar agent={agent} size="md" />
+              <span className="min-w-0 flex-1">
+                <span className="block truncate text-sm font-semibold">
+                  {agent.name}
+                </span>
+                <span className="block truncate text-xs text-muted-foreground">
+                  {agent.tagline || "Choose how pi listens"}
+                </span>
+              </span>
+              <span className="text-xs font-medium text-primary">Change</span>
+            </button>
+          </div>
+          <div>
             <Label htmlFor="room-language">Language people will speak</Label>
             <NativeSelect
               id="room-language"
@@ -149,12 +178,20 @@ export function StartRoomDialog({
                 consent: agreed,
                 language,
                 customer_id: customer || null,
+                ...(agentKey !== "pi" ? { agent_key: agentKey } : {}),
               })
             }
           >
             <Video /> Start room
           </Button>
         </DialogFooter>
+        <AgentChooser
+          open={choosing}
+          onOpenChange={setChoosing}
+          value={agentKey}
+          title="Choose an agent for this room"
+          onSelect={(a) => setAgentKey(a.key)}
+        />
       </DialogContent>
     </Dialog>
   );

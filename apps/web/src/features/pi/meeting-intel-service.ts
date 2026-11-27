@@ -82,6 +82,8 @@ export const meetingSchema = z.object({
   retention_until: z.string().nullable().catch(null),
   failure_reason: z.string().catch(""),
   created_at: z.string().nullable().catch(null),
+  // the meeting's agent (how pi listens); null means "pi"
+  agent_key: z.string().nullable().catch(null),
 });
 export type Meeting = z.infer<typeof meetingSchema>;
 
