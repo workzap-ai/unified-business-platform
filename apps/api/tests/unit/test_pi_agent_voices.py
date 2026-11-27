@@ -31,3 +31,13 @@ def test_every_built_in_agent_has_a_voice():
 
     for preset in agents.PRESETS:
         assert preset.key in VOICES, preset.key
+
+
+def test_each_built_in_agent_has_its_own_manner_and_pi_has_none():
+    from app.modules.pi_meetings.agent_voices import CHARACTER, character_for
+
+    assert set(CHARACTER) == set(VOICES) - {"pi"}
+    assert len(set(CHARACTER.values())) == len(CHARACTER)
+    assert character_for("pi") == "" and character_for("custom_one") == ""
+    for text in CHARACTER.values():  # a manner of speaking only: no rules or words in it
+        assert "price" not in text.lower() and "say " not in text.lower()

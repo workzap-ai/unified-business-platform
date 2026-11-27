@@ -24,7 +24,14 @@ from typing import Any, Protocol
 from app.ai.errors import GatewayUnavailable
 from app.modules.pi import safety
 from app.modules.pi.memory_ledger import redacted
-from app.modules.pi_meetings import meeting_memory, room_noise, room_recall, room_turns, voice
+from app.modules.pi_meetings import (
+    agent_voices,
+    meeting_memory,
+    room_noise,
+    room_recall,
+    room_turns,
+    voice,
+)
 from app.modules.pi_meetings.recording_routes import join_spoken_digits
 from app.modules.pi_meetings.room_turns import Mode, RoomState, Utterance
 from app.modules.pi_meetings.room_vad import Turn
@@ -352,7 +359,10 @@ class RoomSpeech:
             state.history, "", state.settings.language
         )
         line = NUDGE_LINES["en" if lang == "en" else "ur"]
-        audio = await self._speech(line, STYLE_UR if lang != "en" else STYLE_EN)
+        nudge_style = STYLE_UR if lang != "en" else STYLE_EN
+        if who := agent_voices.character_for(self.session.agent_key):
+            nudge_style += " " + who
+        audio = await self._speech(line, nudge_style)
         if audio is None or await self._muted() or self.someone_speaking():
             return False
         pcm = resample(audio, TTS_RATE, TTS_RATE * 2)
@@ -657,6 +667,8 @@ class RoomSpeech:
         if not line or await self._muted():
             return "none"
         style = STYLE_SOFT if filler else STYLE_UR if ARABIC_SCRIPT.search(line) else STYLE_EN
+        if not filler and (who := agent_voices.character_for(self.session.agent_key)):
+            style += " " + who  # sounds like its own person
         if self.session.slow and not filler:
             style += " Speak noticeably slower and clearer than usual, with longer pauses."
         key = (line, self.session.settings.voice, style)
