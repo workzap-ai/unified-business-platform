@@ -341,13 +341,41 @@ def view(
         "tagline": row.tagline,
         "icon": row.icon,
         "color": row.color,
-        "focus": [],
+        "focus": focus_of(row.instructions),
         "sample_questions": list(BY_KEY[DEFAULT_KEY].sample_questions),
         "instructions": row.instructions,
         "is_default": False,
         "can_edit": can_edit,
         "created_at": row.created_at.isoformat() if row.created_at else None,
     }
+
+
+FOCUS_ITEMS = 3
+FOCUS_CHARS = 80
+
+
+def focus_of(instructions: str) -> list[str]:
+    """The first few sentences of a custom agent's own instructions, shortened, as its 'looks for'
+    list (a built-in agent has a written one): the card is never empty."""
+    parts = [p.strip(" -\t") for p in re.split(r"(?<=[.!?])\s+|\n+", instructions)]
+    out: list[str] = []
+    for part in parts:
+        part = part.rstrip(".!?")
+        if len(part) < 12:
+            continue
+        if len(part) > FOCUS_CHARS:
+            part = part[: FOCUS_CHARS - 1].rsplit(" ", 1)[0] + "…"
+        out.append(part)
+        if len(out) == FOCUS_ITEMS:
+            break
+    return out
+
+
+def debrief_questions(key: str) -> tuple[str, ...]:
+    """The questions an agent asks of a meeting for its debrief: the agent's own starter questions
+    (a custom agent uses pi's)."""
+    preset = BY_KEY.get(key) or BY_KEY[DEFAULT_KEY]
+    return preset.sample_questions[:3]
 
 
 def persona_block(name: str, instructions: str) -> str:
