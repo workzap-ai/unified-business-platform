@@ -29,7 +29,7 @@ from sqlalchemy.ext.asyncio import async_sessionmaker
 from app.ai.manager import build_llm_manager
 from app.core.config import Settings, get_settings
 from app.core.database import create_engine
-from app.modules.pi_meetings import roman_urdu, room_recall, room_sight, voice
+from app.modules.pi_meetings import agent_voices, roman_urdu, room_recall, room_sight, voice
 from app.modules.pi_meetings import room_agent_claim as claims
 from app.modules.pi_meetings import room_agent_lines as lines
 from app.modules.pi_meetings import room_agent_memory as memory
@@ -189,7 +189,9 @@ async def run_room(
                 mode="speak" if orders.speak else "off",
                 intake=orders.intake,
                 language=orders.language,
+                voice=agent_voices.voice_for(orders.agent_key),
             ),
+            agent_key=orders.agent_key,
             disclosed=orders.disclosed,
             # the disclosure was spoken before the restart: the rules must know it was made
             history=[voice.Said(True, voice.opening(language=orders.language))]
