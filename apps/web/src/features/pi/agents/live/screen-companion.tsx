@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { Check, Eye, EyeOff } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { SpriteAgent, LIVE_AGENTS, type ScreenState } from "./sprite-agent";
@@ -31,6 +32,42 @@ export function ScreenCompanion({
   className?: string;
 }) {
   if (state === "none" || !LIVE_AGENTS.has(agentKey)) return null;
+  return (
+    <Standing
+      key={state}
+      agentKey={agentKey}
+      state={state}
+      level={level}
+      speaking={speaking}
+      className={className}
+    />
+  );
+}
+
+const SETTLE_MS = 6000; // after it has understood the screen it steps aside
+
+function Standing({
+  agentKey,
+  state,
+  level,
+  speaking,
+  className,
+}: {
+  agentKey: string;
+  state: Exclude<ScreenState, "none">;
+  level: number;
+  speaking: boolean;
+  className?: string;
+}) {
+  // this component is keyed by `state`, so "settled" starts again at every change
+  const [settled, setSettled] = useState(false);
+  useEffect(() => {
+    if (state !== "seeing") return;
+    const t = window.setTimeout(() => setSettled(true), SETTLE_MS);
+    return () => window.clearTimeout(t);
+  }, [state]);
+  // it keeps out of the way of what is shared once it has understood, and returns when it speaks
+  const small = state === "seeing" && settled && !speaking;
   const tone =
     state === "seeing"
       ? "bg-emerald-500 text-white"
@@ -43,7 +80,8 @@ export function ScreenCompanion({
       <ScreenScan state={state} />
       <div
         className={cn(
-          "pointer-events-none absolute right-3 bottom-0 z-10 flex flex-col items-end motion-safe:animate-scale-in",
+          "pointer-events-none absolute right-3 bottom-0 z-10 flex flex-col items-end transition-[transform] duration-500 motion-safe:animate-scale-in",
+          small && "origin-bottom-right scale-[0.45]",
           className,
         )}
       >
@@ -51,6 +89,7 @@ export function ScreenCompanion({
           role="status"
           aria-live="polite"
           className={cn(
+            small && "opacity-0",
             "mb-1 inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium shadow-md",
             tone,
           )}
