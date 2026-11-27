@@ -214,6 +214,10 @@ class RoomSpeech:
         # True in the real agent: audio is written in real time, so `speaking` stays true
         # for as long as pi is heard and a person talking can stop it (tests write at once)
         self.pace = False
+        # can pi look at shared screens in this deployment, and what does it see right now:
+        # (a screen is shared, one sentence about it). Set by the room agent.
+        self.can_see_screen = False
+        self.screen: Callable[[], tuple[bool, str]] = lambda: (False, "")
         self._cut = asyncio.Event()
         self.speaking = False
 
@@ -499,6 +503,14 @@ class RoomSpeech:
                     )
                 ) is not None:
                     line = ctrl.line  # asked to repeat, to confirm it is heard, to slow down
+                    if ctrl.kind == "screen" and self.can_see_screen:
+                        sharing, note = self.screen()
+                        line = voice.screen_line(
+                            state.language_pref
+                            or voice.reply_language(state.history, heard, state.settings.language),
+                            sharing,
+                            note,
+                        )
                     if ctrl.kind in ("slow", "fast"):
                         state.slow = ctrl.kind == "slow"
                 else:

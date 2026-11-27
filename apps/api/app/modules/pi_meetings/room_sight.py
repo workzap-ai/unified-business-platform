@@ -119,6 +119,7 @@ class Sight:
         self.clock = clock
         self.on_note = on_note
         self.looks = 0
+        self.sharing = False  # a screen is being shared right now and pi is watching it
         self._last_at: float | None = None
         self._last_sig: list[int] | None = None
         self._note = ""

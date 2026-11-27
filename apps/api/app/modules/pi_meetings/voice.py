@@ -421,8 +421,41 @@ HEAR_ME_NATIVE = re.compile(
     r"(तुम|आप)\s+मुझे\s+सुन|सुन\s+(सकती|सकते|रहे|रही)|मुझे\s+सुन|"
     r"(تم|آپ)\s+مجھے\s+سن|سن\s+(سکتی|سکتے|رہے|رہی)",
 )
+SCREEN_LINES = {
+    "see": {
+        "en": "Yes, I can see your screen. It looks like {note}",
+        "ur": "جی، مجھے آپ کی سکرین نظر آ رہی ہے۔ یہ {note}",
+    },
+    "looking": {
+        "en": "I can see a shared screen. Give me a few seconds to look at it.",
+        "ur": "مجھے شیئر کی ہوئی سکرین نظر آ رہی ہے۔ مجھے دیکھنے کے لیے چند سیکنڈ دیں۔",
+    },
+    "none": {
+        "en": "I can't see a shared screen yet. Share your screen and I'll take a look.",
+        "ur": (
+            "مجھے ابھی کوئی شیئر کی ہوئی سکرین نظر نہیں آ رہی۔ آپ سکرین شیئر کریں، میں دیکھ لوں گا۔"
+        ),
+    },
+}
+
+
+def screen_line(lang: str, sharing: bool, note: str) -> str:
+    """What pi says when asked whether it can see the screen, when it can look at shared screens:
+    what kind of thing is shown (one sentence, no names or numbers), that it is still looking, or
+    that nothing is shared yet."""
+    key = "en" if lang == "en" else "ur"
+    if note and not (PRICE.search(note) or any(c.isdigit() for c in note)):
+        text = note.strip().rstrip(".!؟?۔") + ("." if key == "en" else "۔")
+        line = SCREEN_LINES["see"][key].format(note=text)
+        if not spoken_rules.broken(line):
+            return line
+    return SCREEN_LINES["looking" if sharing else "none"][key]
+
+
 SCREEN = re.compile(
     r"(can|could)\s+you\s+see\s+(my\s+)?(screen|this)|do\s+you\s+see\s+(my\s+)?screen|"
+    r"what\s+(do|can)\s+you\s+see|what'?s\s+on\s+(my|the)\s+screen|"
+    r"screen\s+(par|pe)\s+kya|kya\s+(dikh|nazar)\s+(raha|rahi)|"
     r"(meri|mera)\s+screen|screen\s+(dekh|nazar)|(کیا\s+)?(آپ|تم)\s+(میری\s+)?سکرین|"
     r"क्या\s+(आप|तुम)\s+(मेरी\s+)?स्क्रीन",
     re.IGNORECASE,

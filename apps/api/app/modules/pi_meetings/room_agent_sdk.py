@@ -203,6 +203,8 @@ async def run_room(
     )
     room_recall.restore(speech.session, orders.notes)  # what pi noted before a restart
     speech.pace = True  # real time: pi is 'speaking' for as long as it is heard
+    speech.can_see_screen = see_screen
+    speech.screen = lambda: (sight.sharing, sight.current())
     run = RoomRun(speech, clock=time.monotonic)
     run.apply(orders)
     stop = asyncio.Event()
@@ -215,15 +217,28 @@ async def run_room(
 
     async def watch_screen(remote: Any) -> None:
         """Looks at a shared screen now and then; ends when the share ends. Never raises."""
+        sight.sharing = True
+        logger.info("room_screen_shared")
         try:
             async for frame in remote.video_frames():
-                await sight.look(frame.data, frame.width, frame.height)
+                note = await sight.look(frame.data, frame.width, frame.height)
+                if note or sight.looks:  # sizes and counts only, never what was seen
+                    logger.info(
+                        "room_screen_look looks=%d note_chars=%d frame=%dx%d",
+                        sight.looks,
+                        len(note),
+                        frame.width,
+                        frame.height,
+                    )
                 if stop.is_set():
                     return
                 # the stream keeps only the newest frame while this waits
                 await asyncio.sleep(room_sight.EVERY_S)
         except Exception:  # noqa: BLE001 - sight is a bonus
             logger.warning("room_screen_watch_ended")
+        finally:
+            sight.sharing = False
+            logger.info("room_screen_stopped")
 
     screen_tasks: set[asyncio.Task[None]] = set()
 
