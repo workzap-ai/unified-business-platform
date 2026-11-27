@@ -90,8 +90,8 @@ class TurnCutter:
         return True
 
     def peaks(self) -> dict[str, int]:
-        """The loudest frame of each person since the last call, to tell 'too quiet to be heard' from
-        'heard but not addressed' in the logs. Numbers only."""
+        """The loudest frame of each person since the last call (numbers only), to tell
+        'too quiet to be heard' from 'heard but not addressed' in the logs."""
         out = {who: int(p.peak) for who, p in self._people.items() if p.peak}
         for p in self._people.values():
             p.peak = 0.0
