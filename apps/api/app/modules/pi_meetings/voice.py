@@ -299,10 +299,34 @@ SOLUTION_LINES = {
         "from the Workzap team will show you options."
     ),
     "ur": (
-        "اس کال میں میں کوئی حل یا قیمت نہیں بتا سکتا۔ میں نے آپ کی ضرورت نوٹ کر لی ہے، اور "
+        "اس کال میں میں کوئی حل تجویز نہیں کر سکتا۔ میں نے آپ کی ضرورت نوٹ کر لی ہے، اور "
         "Workzap کی ٹیم کا کوئی فرد آپ کو آپشنز دکھائے گا۔"
     ),
 }
+
+
+NOTED_LINES = {
+    "en": ("I've noted that.", "Understood, that is written down."),
+    "ur": ("میں نے یہ نوٹ کر لیا ہے۔", "سمجھ گیا، یہ لکھ لیا ہے۔"),
+}
+
+
+def _safe_line(ctx: dict[str, Any], lang: str, policy: str) -> str:
+    """The fixed safe line. It is a question by design, so when the question policy is 'none'
+    (pi's last line was a question, or the person is tired of them) the question is dropped:
+    what is left of it, or a plain 'noted' line. Never two question lines in a row."""
+    line = constitution.safe_fallback(ctx)
+    if policy != "none" or not QUESTION_MARK.search(line):
+        return line
+    kept = [s for s in re.split(r"(?<=[.!?؟۔])\s+", line) if not QUESTION_MARK.search(s)]
+    if kept:
+        return " ".join(kept)
+    said = {_norm(h["text"]) for h in ctx.get("history") or [] if h.get("role") == "ai"}
+    options = NOTED_LINES["en" if lang == "en" else "ur"]
+    return next((o for o in options if _norm(o) not in said), options[0])
+
+
+QUESTION_MARK = re.compile(r"[?؟]")
 
 
 def annoyed(text: str) -> bool:
@@ -497,7 +521,7 @@ async def reply_to(
             said = ""
         if said and not _repeats(said, history) and not meeting_memory.leaks(said, seen, block):
             return Spoken(said, fallback=False, learned=_fact(value))
-    return Spoken(constitution.safe_fallback(ctx), fallback=True)
+    return Spoken(_safe_line(ctx, lang, policy), fallback=True)
 
 
 async def _idea(

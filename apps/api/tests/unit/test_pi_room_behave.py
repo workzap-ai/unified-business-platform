@@ -88,3 +88,26 @@ def test_echo_openers_and_empty_praise_are_caught() -> None:
         assert voice.has_tic(tic), tic
     for fine in ("Ten a day, that adds up.", "دس روز، یہ بہت ہوتے ہیں۔", "I see."):
         assert not voice.has_tic(fine), fine
+
+
+async def test_the_safe_line_asks_nothing_right_after_a_question_or_to_a_tired_owner():
+    from uuid import uuid4
+
+    from test_pi_room_speech import Manager
+
+    from app.shared.scope import WorkspaceScope
+
+    scope = WorkspaceScope.system(uuid4(), uuid4(), frozenset(), "t")
+    bad = Manager(reply="Send your card, it is 5000 rupees. Okay?")  # never allowed: safe line
+    opening = voice.Said(True, "Hi, I'm pi, an AI. What does your business do?")
+    after_question = [opening, voice.Said(False, "shoes"), voice.Said(True, "Which city?")]
+    out = await voice.reply_to(bad, scope, after_question, "Lahore, small shop")
+    assert out.fallback and "?" not in out.text and "؟" not in out.text
+    tired = await voice.reply_to(bad, scope, [opening], "why are you asking again and again?")
+    assert tired.fallback and "?" not in tired.text
+    urdu = await voice.reply_to(
+        bad, scope, after_question, "میری دکان لاہور میں ہے اور آرڈر دیر سے نکلتے ہیں"
+    )
+    assert urdu.fallback and "؟" not in urdu.text and voice.in_reply_language(urdu.text, "ur")
+    first = await voice.reply_to(bad, scope, [opening], "I sell shoes in a small shop")
+    assert first.fallback and first.text.endswith("?")  # a question is still allowed here

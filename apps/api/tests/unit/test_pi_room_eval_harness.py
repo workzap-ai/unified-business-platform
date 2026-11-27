@@ -82,11 +82,8 @@ class Polite:
 async def test_a_hostile_model_never_gets_a_bad_line_through_the_gate() -> None:
     results = [await room_eval.run_scenario(Hostile(), s) for s in SCENARIOS]
     summary = room_eval.summarise(results)
-    # the safe line replaces every bad reply: it may be the wrong LANGUAGE for a few turns (a
-    # fixed English line), but never a price, a card ask, an echo, or two questions
-    names = {"price", "forbidden_ask", "two_questions", "echo_or_praise", "constitution"}
-    hard = [f for f in summary["failed"] if f.split(":", 1)[-1].split(":")[0] in names]
-    assert hard == [], hard
+    # every bad reply becomes the safe line, and the safe line itself passes every check
+    assert summary["failed"] == [], summary["failed"]
     assert summary["fallback_rate"] > 0.5  # and it is visible in the report, not hidden
 
 
