@@ -45,6 +45,7 @@ import { MeetingMap } from "./meeting-map";
 import { MeetingRecorder } from "./meeting-recorder";
 import { MeetingFileImport } from "./meeting-file-import";
 import { MeetingChat } from "../agents/meeting-chat";
+import { MeetingDebrief } from "../agents/meeting-debrief";
 import { MeetingAgentChip } from "../agents/meeting-agent-chip";
 import { MeetingBotCard } from "./meeting-bot-card";
 import { MeetingInvite } from "./meeting-invite";
@@ -216,6 +217,11 @@ function Body({ meeting }: { meeting: Detail }) {
           </div>
           <TabsContent value="review" className="mt-4">
             <div className="space-y-4">
+              <MeetingDebrief
+                meetingId={meeting.id}
+                agentKey={meeting.agent_key}
+                hasTranscript={hasTranscript}
+              />
               {can("pi.meetings.approve") && (
                 <MeetingShareSummary meeting={meeting} />
               )}

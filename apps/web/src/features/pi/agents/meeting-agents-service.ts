@@ -148,6 +148,22 @@ const chatDetailSchema = z.object({
 });
 export type ChatDetail = z.infer<typeof chatDetailSchema>;
 
+export const debriefItemSchema = z.object({
+  question: z.string().catch(""),
+  found: z.boolean().catch(true),
+  answer: z.string().catch(""),
+  partial: z.boolean().catch(false),
+  sources: z.array(sourceSchema).catch([]),
+});
+export type DebriefItem = z.infer<typeof debriefItemSchema>;
+
+export const debriefSchema = z.object({
+  chat: chatSchema.nullable().catch(null),
+  agent_key: z.string().catch(DEFAULT_AGENT_KEY),
+  items: z.array(debriefItemSchema).catch([]),
+});
+export type Debrief = z.infer<typeof debriefSchema>;
+
 const AGENTS = "/pi/meeting-agents";
 const chats = (meetingId: string) => `/pi/meeting-intel/${meetingId}/chats`;
 
@@ -200,6 +216,21 @@ export const meetingAgentsService = {
     }),
   deleteChat: (meetingId: string, chatId: string) =>
     apiRequest<void>("DELETE", `${chats(meetingId)}/${chatId}`, null),
+  // The saved debrief: no model call.
+  getDebrief: (meetingId: string) =>
+    apiRequest("GET", `/pi/meeting-intel/${meetingId}/debrief`, debriefSchema),
+  // Asks the agent's three starter questions of the transcript (3 to 8 seconds) and replaces the
+  // previous debrief.
+  runDebrief: (meetingId: string) =>
+    apiRequest(
+      "POST",
+      `/pi/meeting-intel/${meetingId}/debrief`,
+      debriefSchema,
+      {
+        body: {},
+        timeoutMs: 60_000,
+      },
+    ),
   // Can take several seconds: the answer is written from the transcript.
   sendMessage: (meetingId: string, chatId: string, question: string) =>
     apiRequest(

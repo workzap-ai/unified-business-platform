@@ -102,7 +102,14 @@ export function AssistantBubble({
   );
 }
 
-function Sources({ sources }: { sources: ChatSource[] }) {
+export function Sources({
+  sources,
+  large = false,
+}: {
+  sources: ChatSource[];
+  /** 44px touch targets on a phone */
+  large?: boolean;
+}) {
   const [open, setOpen] = useState<number | null>(null);
   const expanded = sources.find((s) => s.ordinal === open);
   return (
@@ -121,7 +128,8 @@ function Sources({ sources }: { sources: ChatSource[] }) {
                 aria-expanded={on}
                 onClick={() => setOpen(on ? null : s.ordinal)}
                 className={cn(
-                  "flex min-h-8 max-w-full items-center gap-1.5 rounded-full border px-2.5 text-left text-xs transition-colors",
+                  "flex min-h-8 max-w-full items-center gap-1.5 rounded-full border px-2.5 text-left text-xs transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring",
+                  large && "max-sm:min-h-11",
                   on
                     ? "border-primary/40 bg-primary-soft text-primary-soft-foreground"
                     : "border-border bg-surface hover:bg-surface-muted",
