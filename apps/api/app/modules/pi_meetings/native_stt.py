@@ -26,7 +26,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.ai.errors import GatewayUnavailable
 from app.ai.types import Word
 from app.modules.pi.memory_ledger import redacted
-from app.modules.pi_meetings import native_ingest, room_noise
+from app.modules.pi_meetings import native_ingest, roman_urdu, room_noise
 from app.modules.pi_meetings.bot_ingest import LINE_CHARS, MAX_LINES, VOICE_BASE
 from app.modules.pi_meetings.models import (
     PiMeeting,
@@ -234,6 +234,22 @@ async def _forget_call(provider: RoomProvider, room: PiMeetingRoom) -> None:
         logger.warning("room_delete_after_transcript_failed")
 
 
+async def _in_roman_urdu(
+    manager: Any, scope: WorkspaceScope, spoken: dict[str, list[Spoken]]
+) -> dict[str, list[Spoken]]:
+    """Every line written in Roman Urdu (no Hindi or Urdu letters in the transcript)."""
+    flat = [line for lines in spoken.values() for line in lines]
+    if not any(roman_urdu.needs_roman(line.text) for line in flat):
+        return spoken
+    texts = iter(await roman_urdu.to_roman(manager, scope, [line.text for line in flat]))
+    return {
+        user: [
+            Spoken(line.participant_id, next(texts), line.start_ms, line.end_ms) for line in lines
+        ]
+        for user, lines in spoken.items()
+    }
+
+
 async def finalize(
     session: AsyncSession,
     scope: WorkspaceScope,
@@ -279,6 +295,7 @@ async def finalize(
                 and not room_noise.is_invented(text)  # silence the model wrote as words
             ]
     if spoken:
+        spoken = await _in_roman_urdu(manager, scope, spoken)
         longest = await _rebuild(session, scope, meeting, spoken)
         await native_ingest.complete(session, scope, meeting, room, longest_ms=longest, now=now)
         await _forget_call(provider, room)

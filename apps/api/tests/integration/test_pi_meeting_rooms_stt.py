@@ -27,7 +27,7 @@ from test_pi_meeting_routes import BASE
 
 from app.ai.errors import GatewayUnavailable
 from app.ai.types import Word
-from app.modules.pi_meetings import native_stt, room_routes
+from app.modules.pi_meetings import native_stt, roman_urdu, room_routes
 from app.modules.pi_meetings.guest_routes import system_scope
 from app.modules.pi_meetings.models import PiMeeting, PiMeetingRoom
 from app.modules.pi_meetings.room_provider import RoomRecording
@@ -203,10 +203,13 @@ async def test_each_persons_audio_becomes_their_lines_in_the_order_they_were_sai
     status, duration, call_id = meeting.status, meeting.duration_ms, room.call_id
     meeting_id = meeting.id
     got = await lines(business_db, mid)
+    # the transcript is Roman Urdu: no Urdu or Hindi letters are stored (the fake model here has
+    # no rewrite door, so the plain letter-by-letter rewrite is what is kept)
     assert [(label, text) for _, label, text in got][:2] == [
-        ("Staff", "آپ کا اسٹاک کب ختم ہوتا ہے؟"),
-        ("Ayesha", "ہر مہینے۔"),
+        ("Staff", "aap ka asatak kab khatam hota he?"),
+        ("Ayesha", "har mahine."),
     ]
+    assert not any(roman_urdu.needs_roman(text) for _, _, text in got)
     assert [o for o, _, _ in got] == [0, 1, 2]
     assert "1234567" not in got[2][2]  # a phone number never reaches the transcript
     # the guest's file started a second later: their first words are at 1 s + 5 s

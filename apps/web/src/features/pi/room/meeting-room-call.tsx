@@ -28,6 +28,7 @@ import { Button } from "@/components/ui/button";
 import { Notice } from "@/components/app/states";
 import type { RoomCredentials } from "../meeting-room-service";
 import { PiAvatar } from "./pi-avatar";
+import { toRomanUrdu } from "./roman-urdu";
 
 /**
  * The call itself. Loaded only on a room page (it carries the video SDK, about 4 MB unpacked), and
@@ -229,7 +230,7 @@ function Captions() {
             <span className="mr-1.5 inline-block rounded-full bg-primary/15 px-2 py-0.5 text-xs font-medium text-primary">
               {c.user?.name || c.user?.id || c.speaker_id || "Speaker"}
             </span>
-            {c.text}
+            {toRomanUrdu(c.text ?? "")}
           </p>
         ))
       )}

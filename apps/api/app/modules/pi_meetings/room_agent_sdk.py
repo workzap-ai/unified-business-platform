@@ -29,10 +29,10 @@ from sqlalchemy.ext.asyncio import async_sessionmaker
 from app.ai.manager import build_llm_manager
 from app.core.config import Settings, get_settings
 from app.core.database import create_engine
+from app.modules.pi_meetings import roman_urdu, room_recall, room_sight, voice
 from app.modules.pi_meetings import room_agent_claim as claims
 from app.modules.pi_meetings import room_agent_lines as lines
 from app.modules.pi_meetings import room_agent_memory as memory
-from app.modules.pi_meetings import room_recall, room_sight, voice
 from app.modules.pi_meetings.room_agent import AGENT_USER, RoomRun
 from app.modules.pi_meetings.room_provider import CALL_TYPE
 from app.modules.pi_meetings.room_sight import Sight
@@ -123,7 +123,8 @@ async def run_room(
             return
         try:
             async with sessions() as db:
-                if await lines.store_pi_line(db, orders, words):
+                (written,) = await roman_urdu.to_roman(manager, orders.scope, [words])
+                if await lines.store_pi_line(db, orders, written):
                     await db.commit()
         except Exception:  # noqa: BLE001 - a missing line must never stop pi talking
             logger.warning("room_pi_line_not_stored")
