@@ -20,6 +20,8 @@ END_SILENCE_S = (
 )
 MIN_TURN_S = 0.5  # a shorter turn is a cough or a click: dropped
 MAX_TURN_S = 15.0  # a longer turn is cut here and a new one starts
+NOD_AFTER_S = 5.0  # a person who has talked this long without a break may get a small "mm-hm"
+NOD_PAUSE_S = 0.3  # ...in a breath between words (a pause this long, shorter than a turn's end)
 PRE_ROLL_S = 0.25  # audio kept from just before the voice started, so no word is clipped
 
 
@@ -52,6 +54,7 @@ class _Person:
     started_at: float = 0.0
     speaking: bool = False
     last_at: float = 0.0  # when the last frame came
+    nod_at_s: float = 0.0  # how far into this turn the last nod was
 
 
 class TurnCutter:
@@ -70,6 +73,20 @@ class TurnCutter:
         """True while this one person is in the middle of a turn."""
         person = self._people.get(speaker_id)
         return bool(person and person.speaking)
+
+    def nod_ready(self, speaker_id: str) -> bool:
+        """True once per stretch of long speech, in a small pause: a listener's "mm-hm" fits
+        here. It only says the moment is right; the caller decides whether pi nods at all."""
+        person = self._people.get(speaker_id)
+        if (
+            person is None
+            or not person.speaking
+            or person.length_s - person.nod_at_s < NOD_AFTER_S
+            or not NOD_PAUSE_S <= person.quiet_s < END_SILENCE_S
+        ):
+            return False
+        person.nod_at_s = person.length_s
+        return True
 
     def forget(self, speaker_id: str) -> None:
         self._people.pop(speaker_id, None)
@@ -150,6 +167,7 @@ class TurnCutter:
             ended_at=at,
         )
         person.frames = []
+        person.nod_at_s = 0.0
         person.speaking = False
         person.length_s = 0.0
         person.quiet_s = 0.0

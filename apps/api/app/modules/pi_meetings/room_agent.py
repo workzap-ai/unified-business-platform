@@ -111,6 +111,10 @@ class RoomRun:
             self._start(turn)
         if self.speech.speaking and self.cutter.speaking():
             self.speech.barge_in()  # a person started talking: pi stops
+        elif self.cutter.nod_ready(speaker_id) and len(self._tasks) < MAX_PENDING:
+            task = asyncio.ensure_future(self.speech.nod())  # a quiet "mm-hm" while they talk
+            self._tasks.add(task)
+            task.add_done_callback(self._tasks.discard)
 
     def tick(self) -> None:
         """Called a few times a second: a turn whose frames stopped coming is finished here."""

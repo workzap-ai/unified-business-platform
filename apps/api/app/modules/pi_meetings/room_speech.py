@@ -52,13 +52,27 @@ CARRY_CHARS = 600
 # how pi sounds: a text-to-speech model that takes instructions is told the tone, the pace and,
 # for Urdu, the accent; the line's script picks which (Urdu or Arabic letters mean Urdu)
 STYLE_EN = (
-    "Speak as a warm, calm, friendly assistant. Natural conversational pace with small pauses "
-    "between sentences and a gentle smile in the voice. Never robotic, never rushed."
+    "Speak like a warm, real person on a call, not an announcer: natural rhythm, small breaths "
+    "and pauses between thoughts, a gentle smile in the voice and slight changes in pitch. "
+    "Calm, attentive, never robotic and never rushed."
 )
 STYLE_UR = (
-    "Speak natural, warm Pakistani Urdu with a native accent, as a kind and attentive person "
-    "would. Calm conversational pace with small pauses and a gentle tone."
+    "Speak natural, warm Pakistani Urdu with a native accent, like a kind and attentive person "
+    "on a call: calm conversational pace, small breaths and pauses, a gentle tone and slight "
+    "changes in pitch. Never robotic."
 )
+# a listener's small sounds ("mm-hm"): very short, low and quiet, never louder than speech
+STYLE_SOFT = (
+    "A very quiet, low, warm listening sound of a person paying close attention, like a soft "
+    "hum of agreement. Under one second, gentle, never louder than normal speech."
+)
+NODS = {
+    "en": ("Mm-hm.", "Uh-huh.", "Mm.", "Mm-hm.", "Right."),
+    "ur": ("ہوں۔", "جی۔", "ہمم۔", "جی جی۔", "اچھا۔"),
+}
+NOD_GAP_S = 9.0  # at least this long between two nods
+NOD_CAP = 12  # nods in one call
+NOD_ACTIVE_S = 60.0  # pi nods only while it is in the conversation (it spoke this recently)
 ARABIC_SCRIPT = re.compile(r"[؀-ۿ]")
 SPEECH_CACHE_MAX = 32  # fixed lines (the introduction) are kept as audio so they start at once
 PIECE_S = 0.2  # pi's audio goes out in pieces this long; a cut-off takes effect at the next one
@@ -82,7 +96,7 @@ class Settings:
     mode: Mode = "off"
     intake: bool = False
     language: str = ""
-    voice: str = "alloy"
+    voice: str = "marin"
 
 
 @dataclass
@@ -102,6 +116,8 @@ class Session:
     wants_solution: bool = False
     facts: list[str] = field(default_factory=list)  # what they told pi in this call, in few words
     last_spoke_at: float | None = None
+    nods: int = 0
+    last_nod_at: float | None = None
     history: list[voice.Said] = field(default_factory=list)
     # the last words of a person pi did not answer yet, with when they were said
     carry: dict[str, tuple[str, float]] = field(default_factory=dict)
@@ -181,6 +197,63 @@ class RoomSpeech:
         """Someone started talking: pi stops at the next piece."""
         if self.speaking:
             self._cut.set()
+
+    async def nod(self) -> bool:
+        """A small "mm-hm" while a person is still talking, so they feel listened to. Only after
+        pi has told them it is an AI, only while pi is in the conversation, never while pi is
+        speaking, muted or halted, and not more often than NOD_GAP_S. It is not a turn: not kept
+        in the history or the transcript, and a person talking does not cut it."""
+        state = self.session
+        now = self.clock()
+        if (
+            state.settings.mode != "speak"
+            or not state.disclosed
+            or state.halted
+            or self.speaking
+            or state.nods >= NOD_CAP
+            or state.last_spoke_at is None
+            or now - state.last_spoke_at > NOD_ACTIVE_S
+            or (state.last_nod_at is not None and now - state.last_nod_at < NOD_GAP_S)
+            or await self._muted()
+        ):
+            return False
+        lang = state.language_pref or voice.reply_language(
+            state.history, "", state.settings.language
+        )
+        options = NODS["en" if lang == "en" else "ur"]
+        line = options[state.nods % len(options)]
+        state.nods += 1
+        state.last_nod_at = now
+        audio = await self._speech(line, STYLE_SOFT)
+        if audio is None or await self._muted():
+            return False
+        pcm = resample(audio, TTS_RATE, TTS_RATE * 2)
+        piece = int(TTS_RATE * 2 * PIECE_S) * 2
+        for i in range(0, len(pcm), piece):
+            await self.out.write(pcm[i : i + piece], TTS_RATE * 2)
+        return True
+
+    async def _speech(self, line: str, style: str) -> bytes | None:
+        """The audio of one short fixed line (kept, so a nod costs one call per line, once)."""
+        key = (line, self.session.settings.voice, style)
+        audio = _SPEECH_CACHE.get(key)
+        if audio is None:
+            try:
+                speech = await self.manager.synthesize(
+                    self.scope,
+                    line,
+                    voice=self.session.settings.voice,
+                    audio_format="pcm",
+                    instructions=style,
+                )
+            except (GatewayUnavailable, ValueError):
+                logger.warning("room_speech_tts_unavailable")
+                return None
+            audio = speech.audio
+            if len(_SPEECH_CACHE) >= SPEECH_CACHE_MAX:
+                _SPEECH_CACHE.pop(next(iter(_SPEECH_CACHE)))
+            _SPEECH_CACHE[key] = audio
+        return audio
 
     async def _muted(self) -> bool:
         if self.session.muted:
@@ -364,7 +437,7 @@ class RoomSpeech:
         human sound) is not a turn: it is not counted, not kept in the history or the transcript."""
         if not line or await self._muted():
             return "none"
-        style = STYLE_UR if ARABIC_SCRIPT.search(line) else STYLE_EN
+        style = STYLE_SOFT if filler else STYLE_UR if ARABIC_SCRIPT.search(line) else STYLE_EN
         key = (line, self.session.settings.voice, style)
         audio = _SPEECH_CACHE.get(key)
         if audio is None:
