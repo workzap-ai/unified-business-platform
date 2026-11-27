@@ -211,20 +211,20 @@ export function SpriteAgent({
 
 const KEYFRAMES = `
 @keyframes agent-breathe {
-  0%, 100% { transform: translateY(0) scale(1) rotate(0deg); }
-  50% { transform: translateY(-0.6%) scale(1.012) rotate(0.5deg); }
+  0%, 100% { transform: translateY(0) scale(1.03) rotate(0deg); }
+  50% { transform: translateY(-0.6%) scale(1.04) rotate(0.5deg); }
 }
 @keyframes agent-listen {
-  0%, 100% { transform: translateY(0) rotate(0deg); }
-  20% { transform: translateY(1.6%) rotate(0.8deg); }
-  40% { transform: translateY(0) rotate(0deg); }
+  0%, 100% { transform: translateY(0) rotate(0deg) scale(1.03); }
+  20% { transform: translateY(1.6%) rotate(0.8deg) scale(1.04); }
+  40% { transform: translateY(0) rotate(0deg) scale(1.03); }
 }
 @keyframes agent-scan {
-  0%, 100% { transform: translateX(-2.2%) rotate(-1.2deg); }
-  50% { transform: translateX(2.2%) rotate(1.2deg); }
+  0%, 100% { transform: translateX(-2.2%) rotate(-1.2deg) scale(1.07); }
+  50% { transform: translateX(2.2%) rotate(1.2deg) scale(1.07); }
 }
 @keyframes agent-nod {
-  0% { transform: translateY(0); }
-  40% { transform: translateY(2.4%); }
-  100% { transform: translateY(0); }
+  0% { transform: translateY(0) scale(1.03); }
+  40% { transform: translateY(2.4%) scale(1.03); }
+  100% { transform: translateY(0) scale(1.03); }
 }`;
