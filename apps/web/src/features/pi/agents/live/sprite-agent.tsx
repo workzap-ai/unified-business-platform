@@ -1,7 +1,9 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import type { RefObject } from "react";
 import { cn } from "@/lib/utils";
+import type { VoiceShape } from "./voice-shape";
 
 /**
  * A living agent character. Each character is the same 3D portrait in five frames (rest, a blink and
@@ -12,8 +14,8 @@ import { cn } from "@/lib/utils";
  */
 
 export type ScreenState = "none" | "looking" | "seeing" | "missing";
-type Frame = "base" | "blink" | "m1" | "m2" | "m3";
-const FRAMES: Frame[] = ["base", "blink", "m1", "m2", "m3"];
+type Frame = "base" | "blink" | "m1" | "m2" | "m3" | "wide" | "round";
+const FRAMES: Frame[] = ["base", "blink", "m1", "m2", "m3", "wide", "round"];
 
 /** Agents that have a living character (every built-in one, pi's robot included). */
 export const LIVE_AGENTS = new Set([
@@ -27,15 +29,22 @@ export const LIVE_AGENTS = new Set([
   "interviewer",
 ]);
 
-const src = (key: string, frame: Frame, cut = false) =>
-  `/agents/${cut ? "cut" : "live"}/${key}/${frame}.webp`;
+const src = (key: string, frame: Frame) => `/agents/live/${key}/${frame}.webp`;
 
-/** The mouth frame for a voice level; a small hysteresis stops it flickering at a boundary. */
-export function mouthFor(level: number, current: Frame): Frame {
+/**
+ * The mouth shape for a voice. How loud sets how far the jaw opens; how bright (`tone`) picks the
+ * lips: bright and not loud is the wide "ee", dark and not loud is the round "oo", and the loudest
+ * is the open "ah". A small hysteresis stops it flickering at a boundary.
+ */
+export function mouthFor(level: number, tone: number, current: Frame): Frame {
   const up = current === "base" ? 0.1 : 0.06;
   if (level < up) return "base";
-  const m = level < 0.32 ? "m1" : level < 0.62 ? "m2" : "m3";
-  return m;
+  if (level >= 0.58) return "m3";
+  if (level < 0.5) {
+    if (tone > (current === "wide" ? 0.5 : 0.62)) return "wide";
+    if (tone < (current === "round" ? 0.42 : 0.3)) return "round";
+  }
+  return level < 0.3 ? "m1" : "m2";
 }
 
 function usePrefersReducedMotion() {
@@ -59,7 +68,7 @@ export function SpriteAgent({
   size = 220,
   className,
   label,
-  cutout = false,
+  voice,
 }: {
   agentKey: string;
   /** the voice level, 0 to 1 */
@@ -70,13 +79,13 @@ export function SpriteAgent({
   size?: number;
   className?: string;
   label?: string;
-  /** the character with its background removed (transparent), for floating over other content */
-  cutout?: boolean;
+  /** the agent's real voice (level and tone); when it is listening, the mouth follows it */
+  voice?: RefObject<VoiceShape>;
 }) {
   const reduced = usePrefersReducedMotion();
   const [frame, setFrame] = useState<Frame>("base");
   const [loadedKey, setLoadedKey] = useState<string | null>(null);
-  const loadKey = `${agentKey}:${cutout}`;
+  const loadKey = agentKey;
   const loaded = loadedKey === loadKey;
   const live = useRef({ level, speaking, screen, listening });
   useEffect(() => {
@@ -94,14 +103,14 @@ export function SpriteAgent({
           new Promise<void>((resolve) => {
             const img = new Image();
             img.onload = img.onerror = () => resolve();
-            img.src = src(agentKey, f, cutout);
+            img.src = src(agentKey, f);
           }),
       ),
     ).then(() => alive && setLoadedKey(loadKey));
     return () => {
       alive = false;
     };
-  }, [agentKey, cutout, loadKey]);
+  }, [agentKey, loadKey]);
 
   // mouth and blink, one loop; paused while the tab is hidden
   useEffect(() => {
@@ -121,22 +130,31 @@ export function SpriteAgent({
       setFrame(f);
     };
     const tick = (now: number) => {
-      const { level: lv, speaking: sp } = live.current;
+      const { level: given, speaking: sp } = live.current;
+      const v = voice?.current;
+      const lv = v?.active ? v.level : given;
+      const tone = v?.active ? v.tone : 0.5;
       // a fast attack and a slower release, like a real mouth
       smooth += (lv - smooth) * (lv > smooth ? 0.6 : 0.25);
-      let target: Frame = mouthFor(smooth, shown === "blink" ? "base" : shown);
-      if (sp && smooth < 0.06) {
+      let target: Frame = mouthFor(
+        smooth,
+        tone,
+        shown === "blink" ? "base" : shown,
+      );
+      if (sp && smooth < 0.06 && !v?.active) {
         // speaking with no level to follow: a gentle natural talk cycle, never frozen
         if (now >= fakeAt) {
           const cycle: Frame[] = [
             "m1",
+            "wide",
             "m2",
+            "round",
             "m1",
             "m3",
-            "m1",
+            "wide",
             "base",
+            "round",
             "m2",
-            "m1",
           ];
           fakeStep = (fakeStep + 1) % cycle.length;
           fakeAt = now + 90 + Math.random() * 90;
@@ -168,7 +186,7 @@ export function SpriteAgent({
       cancelAnimationFrame(raf);
       document.removeEventListener("visibilitychange", onVisibility);
     };
-  }, [loaded]);
+  }, [loaded, voice]);
 
   // The character is two layers: the head (with the mouth and eye frames) and the body. They move
   // apart from the neck. The movement is not a loop: it is slow noise, with a nod now and then,
@@ -286,25 +304,19 @@ export function SpriteAgent({
     <div
       role="img"
       aria-label={label ?? "Agent character"}
-      className={cn(
-        "relative select-none",
-        !cutout && "overflow-hidden",
-        className,
-      )}
+      className={cn("relative overflow-hidden select-none", className)}
       style={{ width: size, height: size }}
     >
       {/* with a background, it stays still behind the moving head, so its corners never tilt */}
-      {!cutout && (
-        // eslint-disable-next-line @next/next/no-img-element -- small static animation frames
-        <img
-          src={src(agentKey, "base", false)}
-          alt=""
-          width={512}
-          height={512}
-          draggable={false}
-          className={imgClass}
-        />
-      )}
+      {/* eslint-disable-next-line @next/next/no-img-element -- small static animation frames */}
+      <img
+        src={src(agentKey, "base")}
+        alt=""
+        width={512}
+        height={512}
+        draggable={false}
+        className={imgClass}
+      />
       <div className="absolute inset-0 scale-[1.04] origin-bottom">
         <div
           ref={bodyRef}
@@ -313,7 +325,7 @@ export function SpriteAgent({
         >
           {/* eslint-disable-next-line @next/next/no-img-element -- small static animation frames */}
           <img
-            src={src(agentKey, "base", cutout)}
+            src={src(agentKey, "base")}
             alt=""
             width={512}
             height={512}
@@ -335,7 +347,7 @@ export function SpriteAgent({
             // eslint-disable-next-line @next/next/no-img-element -- small static animation frames
             <img
               key={f}
-              src={src(agentKey, f, cutout)}
+              src={src(agentKey, f)}
               alt=""
               width={512}
               height={512}

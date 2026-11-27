@@ -3,6 +3,8 @@
 import { useEffect, useState } from "react";
 import { Check, Eye, EyeOff } from "lucide-react";
 import { cn } from "@/lib/utils";
+import type { RefObject } from "react";
+import type { VoiceShape } from "./voice-shape";
 import { SpriteAgent, LIVE_AGENTS, type ScreenState } from "./sprite-agent";
 
 const WORDS: Record<Exclude<ScreenState, "none">, string> = {
@@ -12,7 +14,7 @@ const WORDS: Record<Exclude<ScreenState, "none">, string> = {
 };
 
 /**
- * The agent's character, background removed, standing at the corner of the shared screen while
+ * The agent's character, in its own coloured rounded tile, at the corner of the shared screen while
  * someone shares. What it does shows what it sees: it scans from side to side while it looks,
  * nods once and shows a tick when it has understood the screen, and looks puzzled with an
  * "unseen" mark when the screen never reached it. It draws only the state it is told; it never
@@ -22,12 +24,14 @@ export function ScreenCompanion({
   agentKey,
   state,
   level = 0,
+  voice,
   speaking = false,
   className,
 }: {
   agentKey: string;
   state: ScreenState;
   level?: number;
+  voice?: RefObject<VoiceShape>;
   speaking?: boolean;
   className?: string;
 }) {
@@ -38,6 +42,7 @@ export function ScreenCompanion({
       agentKey={agentKey}
       state={state}
       level={level}
+      voice={voice}
       speaking={speaking}
       className={className}
     />
@@ -50,12 +55,14 @@ function Standing({
   agentKey,
   state,
   level,
+  voice,
   speaking,
   className,
 }: {
   agentKey: string;
   state: Exclude<ScreenState, "none">;
   level: number;
+  voice?: RefObject<VoiceShape>;
   speaking: boolean;
   className?: string;
 }) {
@@ -80,7 +87,7 @@ function Standing({
       <ScreenScan state={state} />
       <div
         className={cn(
-          "pointer-events-none absolute right-3 bottom-0 z-10 flex flex-col items-end transition-[transform] duration-500 motion-safe:animate-scale-in",
+          "pointer-events-none absolute right-5 bottom-5 z-10 flex flex-col items-end transition-[transform] duration-500 motion-safe:animate-scale-in",
           small && "origin-bottom-right scale-[0.45]",
           className,
         )}
@@ -105,14 +112,14 @@ function Standing({
         </div>
         <div className="relative">
           <SpriteAgent
-            cutout
             agentKey={agentKey}
             level={level}
+            voice={voice}
             speaking={speaking}
             screen={state}
-            size={196}
+            size={168}
             label="The agent looking at the shared screen"
-            className="drop-shadow-[0_8px_14px_rgb(0_0_0/0.4)] [mask-image:linear-gradient(to_bottom,black_80%,transparent)]"
+            className="rounded-3xl shadow-xl ring-2 ring-white/70"
           />
         </div>
       </div>

@@ -36,6 +36,7 @@ import {
   usePiScreen,
 } from "./pi-screen-watch";
 import { SpriteAgent, LIVE_AGENTS } from "../agents/live/sprite-agent";
+import { useVoiceShape } from "../agents/live/voice-shape";
 import { ScreenCompanion } from "../agents/live/screen-companion";
 
 /**
@@ -63,6 +64,7 @@ function Face({ participant }: { participant: StreamVideoParticipant }) {
   const isPi = participant.userId === PI_USER;
   const screen = usePiScreen();
   const agentKey = usePiAgent();
+  const voice = useVoiceShape(isPi ? participant.audioStream : null);
   const initials = (participant.name || participant.userId || "?")
     .trim()
     .slice(0, 2)
@@ -81,6 +83,7 @@ function Face({ participant }: { participant: StreamVideoParticipant }) {
             <SpriteAgent
               agentKey={agentKey}
               level={participant.audioLevel ?? 0}
+              voice={voice}
               speaking={participant.isSpeaking}
               listening={!participant.isSpeaking}
               screen={screen.state}
@@ -127,8 +130,10 @@ function Companion() {
   const pi = useParticipants().find((p) => p.userId === PI_USER);
   const screen = usePiScreen();
   const agentKey = usePiAgent();
+  const voice = useVoiceShape(pi?.audioStream);
   return (
     <ScreenCompanion
+      voice={voice}
       agentKey={agentKey}
       state={screen.state}
       level={pi?.audioLevel ?? 0}
