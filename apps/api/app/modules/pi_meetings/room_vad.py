@@ -36,6 +36,9 @@ class Turn:
     sample_rate: int
     started_at: float  # seconds on the caller's clock
     ended_at: float
+    # the loudest frame of the turn (0 when unknown): a turn that never rose above room noise
+    # is not worth sending to speech-to-text, which writes sentences out of noise
+    peak: float = 0.0
 
 
 def rms(frame: bytes) -> float:
@@ -59,6 +62,7 @@ class _Person:
     speaking: bool = False
     last_at: float = 0.0  # when the last frame came
     nod_at_s: float = 0.0  # how far into this turn the last nod was
+    turn_peak: float = 0.0  # loudest frame of the turn in progress
     peak: float = 0.0  # loudest frame since the last report (a level, never any sound)
     floor: float = 0.0  # this person's background noise level, learned from quiet frames
     floor_s: float = 0.0  # seconds of quiet heard so far
@@ -140,6 +144,8 @@ class TurnCutter:
         level = rms(frame)
         person.peak = max(person.peak, level)
         loud = level >= self._threshold(person)
+        if person.speaking or loud:
+            person.turn_peak = max(person.turn_peak, level)
         if not loud and not person.speaking and level < LEARN_CEIL:
             self._learn(person, level, seconds)
         out: list[Turn] = []
@@ -208,7 +214,9 @@ class TurnCutter:
             sample_rate=self.sample_rate,
             started_at=person.started_at,
             ended_at=at,
+            peak=person.turn_peak,
         )
+        person.turn_peak = 0.0
         person.frames = []
         person.nod_at_s = 0.0
         person.speaking = False

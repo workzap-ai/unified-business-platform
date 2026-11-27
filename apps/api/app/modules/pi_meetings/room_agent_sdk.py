@@ -34,8 +34,8 @@ from app.modules.pi_meetings import room_agent_claim as claims
 from app.modules.pi_meetings import room_agent_lines as lines
 from app.modules.pi_meetings import room_agent_memory as memory
 from app.modules.pi_meetings.room_agent import AGENT_USER, RoomRun
-from app.modules.pi_meetings.room_provider import CALL_TYPE
-from app.modules.pi_meetings.room_sight import Sight
+from app.modules.pi_meetings.room_provider import CALL_TYPE, StreamProvider
+from app.modules.pi_meetings.room_sight import Beacon, Sight
 from app.modules.pi_meetings.room_speech import RoomSpeech, Session
 from app.modules.pi_meetings.room_speech import Settings as SpeechSettings
 
@@ -174,6 +174,13 @@ async def run_room(
         await on_line(voice.PI_LABEL, SCREEN_NOTE + note)
 
     sight = Sight(manager, orders.scope, clock=time.monotonic, on_note=on_screen_note)
+    http = httpx.AsyncClient()
+    provider = StreamProvider(http, settings.stream_api_key, secret.get_secret_value())
+
+    async def send_state(state: str) -> None:
+        await provider.set_state(orders.call_id, {"pi_screen": state})
+
+    beacon = Beacon(sight, send_state, clock=time.monotonic)
     speech = RoomSpeech(
         manager=manager,
         scope=orders.scope,
@@ -217,7 +224,7 @@ async def run_room(
 
     async def watch_screen(remote: Any) -> None:
         """Looks at a shared screen now and then; ends when the share ends. Never raises."""
-        sight.sharing = True
+        sight.begin()
         logger.info("room_screen_shared")
         try:
             async for frame in remote.video_frames():
@@ -237,17 +244,20 @@ async def run_room(
         except Exception:  # noqa: BLE001 - sight is a bonus
             logger.warning("room_screen_watch_ended")
         finally:
-            sight.sharing = False
+            sight.end()
             logger.info("room_screen_stopped")
 
     screen_tasks: set[asyncio.Task[None]] = set()
 
     def on_track(remote: Any) -> None:
-        if not see_screen:
-            return
         from getstream_rtc import TrackType
 
-        if getattr(remote, "track_type", None) != TrackType.SCREEN_SHARE:
+        kind = getattr(remote, "track_type", None)
+        # which kinds of track reach the agent, with no names: tells 'not received' from 'not read'
+        logger.info("room_track kind=%s see_screen=%s", getattr(kind, "name", kind), see_screen)
+        if not see_screen:
+            return
+        if kind != TrackType.SCREEN_SHARE:
             return  # a camera or audio: not looked at
         task = asyncio.create_task(watch_screen(remote))
         screen_tasks.add(task)
@@ -286,6 +296,8 @@ async def run_room(
             await asyncio.sleep(0.2)
             run.tick()
             ticks += 1
+            if ticks % 10 == 0:  # every 2 seconds: tell the room whether pi has the screen
+                await beacon.tick()
             if ticks % 50 == 0:  # every 10 seconds
                 heard = run.report()
                 if heard:
@@ -327,6 +339,10 @@ async def run_room(
             async with sessions() as db:
                 await claims.release(db, room_id, agent_id)
                 await db.commit()
+        with contextlib.suppress(Exception):
+            await provider.set_state(orders.call_id, {"pi_screen": "none"})
+        with contextlib.suppress(Exception):
+            await http.aclose()
         with contextlib.suppress(Exception):
             await client.aclose()
 

@@ -777,6 +777,13 @@ async def reply_to(
             " new fact in a few words."
         )
         value = await ask(note) or value
+        if (
+            isinstance(value, ModelReply)
+            and not value.done
+            and _off_brief(value.reply, lang, policy)
+        ):
+            # a second chance before the generic safe line: the person asked something real
+            value = await ask(note + " Answer what they just said in one short sentence.") or value
     if (
         isinstance(value, ModelReply)
         and not value.done

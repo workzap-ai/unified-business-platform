@@ -29,6 +29,7 @@ import { Notice } from "@/components/app/states";
 import type { RoomCredentials } from "../meeting-room-service";
 import { PiAvatar } from "./pi-avatar";
 import { toRomanUrdu } from "./roman-urdu";
+import { PiEye, PiScreenBanner, usePiScreen } from "./pi-screen-watch";
 
 /**
  * The call itself. Loaded only on a room page (it carries the video SDK, about 4 MB unpacked), and
@@ -53,6 +54,7 @@ const PI_USER = "pi_agent";
 /** What a tile shows while a person's camera is off: pi gets its own face that pulses while it talks. */
 function Face({ participant }: { participant: StreamVideoParticipant }) {
   const isPi = participant.userId === PI_USER;
+  const screen = usePiScreen();
   const initials = (participant.name || participant.userId || "?")
     .trim()
     .slice(0, 2)
@@ -79,6 +81,7 @@ function Face({ participant }: { participant: StreamVideoParticipant }) {
               size={84}
               className={participant.isSpeaking ? "animate-pulse" : ""}
             />
+            <PiEye state={screen.state} />
           </div>
         ) : (
           <div
@@ -514,6 +517,7 @@ export function MeetingRoomCall({
             <RoomBar />
             {error && <Notice tone="danger">{error}</Notice>}
             <SharingBanner />
+            <PiScreenBanner />
             <div className="h-[56dvh] min-h-72 overflow-hidden rounded-2xl border border-border sm:h-[62dvh]">
               <SpeakerLayout
                 participantsBarPosition="bottom"

@@ -39,6 +39,9 @@ STT_HINT = "Workzap, pi."
 # more often when it has seen them (found live: Lahore was written 'Lourdes')
 STT_PLACES = "Lahore, Karachi, Islamabad, Rawalpindi, Faisalabad, Multan, Peshawar, Quetta."
 STT_FACT_CHARS = 200
+# a turn whose loudest moment stayed under this was room noise or a breath, not speech
+# (live test 18: sentences like 'I'm a ... idiot' were written out of silence)
+STT_MIN_PEAK = 650
 STT_HINT_ECHOES = frozenset({"workzap pi", "pi workzap"})
 STT_PURPOSE = "meeting_room_stt"
 STT_RATE = 16000  # a turn is sent to speech to text at this rate
@@ -395,6 +398,8 @@ class RoomSpeech:
 
     async def hear(self, turn: Turn) -> str:
         """The words of one finished turn, redacted. Empty when it could not be read."""
+        if 0 < turn.peak < STT_MIN_PEAK:
+            return ""
         audio = wav(resample(turn.pcm, turn.sample_rate, STT_RATE), STT_RATE)
         try:
             result = await self.manager.transcribe(

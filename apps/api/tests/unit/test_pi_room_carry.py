@@ -305,14 +305,18 @@ async def test_a_wrong_language_reply_is_corrected_once_and_then_it_is_the_safe_
     # still wrong after the correction: the safe line, never the wrong language
     second = Replies("اچھا، سمجھ گیا۔ کیا آرڈر چھوٹ جاتے ہیں؟")
     said = await voice.reply_to(second, scope, [pi], "orders get missed when we are busy")
-    assert said.fallback is True
+    assert said.fallback is True and second.notes == [
+        False,
+        True,
+        True,
+    ]  # two corrections, then the line
     # pi leads with a question after a question of its own, but a tired person gets none
     q = voice.Said(True, "How often do orders get missed?")
     third = Replies("What does that cost you?")
     history = [pi, voice.Said(False, "we sell clothes"), q, voice.Said(False, "twice a week")]
     said = await voice.reply_to(third, scope, history, "about ten thousand rupees a month")
     assert said.text == "What does that cost you?" and third.notes == [False]
-    tired = Replies("What does that cost you?", "I see, that costs you customers.")
+    tired = Replies("What does that cost you?", "Lost customers add up fast.")
     said = await voice.reply_to(tired, scope, history, "why are you asking again and again")
     assert "?" not in said.text and tired.notes == [False, True]
 

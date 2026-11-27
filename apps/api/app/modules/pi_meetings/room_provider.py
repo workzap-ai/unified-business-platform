@@ -317,6 +317,11 @@ class StreamProvider:
             },
         )
 
+    async def set_state(self, call_id: str, custom: dict[str, Any]) -> None:
+        """Put a few small facts on the call itself (what pi is doing, for example): every browser
+        in the room receives them at once. Only a state, never a word of what was said or seen."""
+        await self._call("PATCH", f"/video/call/{CALL_TYPE}/{call_id}", {"custom": custom})
+
     async def end_call(self, call_id: str) -> None:
         await self._call("POST", f"/video/call/{CALL_TYPE}/{call_id}/mark_ended", {})
 
