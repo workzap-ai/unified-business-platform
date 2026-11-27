@@ -48,6 +48,9 @@ DEFAULT_MODELS: dict[str, dict[str, str]] = {
         "embed": "text-embedding-3-small",
         "transcribe": "whisper-1",
         "stt_multi": "whisper-1",
+        # live speech in video rooms: whisper-1 wrote accented English as Urdu words (live
+        # test 17), the newer model is clearly better with accents and mixed languages
+        "stt_live": "gpt-4o-transcribe",
         # spoken replies (video rooms). NOT verified live: the platform key answered 401 when this
         # was added, so pin another with OPENAI_MODELS={"speak": "..."} if this one is refused.
         "speak": "gpt-4o-mini-tts",
@@ -74,6 +77,7 @@ DEFAULT_MODELS: dict[str, dict[str, str]] = {
         "transcribe": "whisper-large-v3-turbo",
         # speech in Urdu and other languages the turbo model is weaker at (meeting rooms)
         "stt_multi": "whisper-large-v3",
+        "stt_live": "whisper-large-v3",
     },
     # Claude: chat and vision only (embeddings and transcription stay on OpenAI/Gemini).
     "anthropic": {

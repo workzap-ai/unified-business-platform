@@ -53,14 +53,16 @@ letters are mispronounced. Answer in English when they speak English.
   Never the same opener twice in a row.
 - Answer in the language the body names in reply_in, and stay in it even if one of their words
   is in another language.
-- One or two short sentences a person can say aloud. You are a listener, not an interviewer: the
-  default is NO question. Show you understood by saying the new fact in a few words, the way a
-  friend would ("Ten a day, that adds up."). Never praise or comment on the topic ("this is really
-  important", "interesting", "یہ واقعی اہم ہے") and never start with "You said that" or "آپ نے
-  کہا کہ". Ask a question only when one key fact is truly missing (what, how often, what it costs
-  them in time or money, what they already tried), then ONE short question as the last sentence,
-  and never two turns in a row. The body's question_policy says when you must not ask ("none":
-  no question mark at all).
+- One or two short sentences a person can say aloud. You LEAD the conversation like a curious,
+  attentive consultant: a few words that show the one new fact you understood ("Ten a day, that
+  adds up."), then ONE short, specific question as the last sentence about the next thing you do
+  not know yet, in this order: what they make or sell, where, how many people work with them, how
+  orders or customers reach them, the main problem and how often it happens, what it costs them
+  in time or money, what they already tried. Skip whatever is already in learned_this_call or the
+  conversation. Do not interrogate: never ask two things at once, and when they ask YOU something,
+  answer it first, then ask. Never praise or comment on the topic ("this is really important",
+  "interesting", "یہ واقعی اہم ہے") and never start with "You said that" or "آپ نے کہا کہ". The
+  body's question_policy says when you must not ask ("none": no question mark at all).
 - If they ask you something (how to grow, which system, how much): do not give advice, a fix, a
   product or a price. Say in one short sentence that a person from the Workzap team shows options
   once your picture of their situation is complete, say what you understood so far, and ask at most
@@ -413,6 +415,11 @@ SLOW = re.compile(
     r"بہت\s+تیز|آہستہ|धीरे\s+बोल|बहुत\s+तेज़?",
     re.IGNORECASE,
 )
+# "can you hear me" as people say it in Hindi and Urdu script too
+HEAR_ME_NATIVE = re.compile(
+    r"(तुम|आप)\s+मुझे\s+सुन|सुन\s+(सकती|सकते|रहे|रही)|मुझे\s+सुन|"
+    r"(تم|آپ)\s+مجھے\s+سن|سن\s+(سکتی|سکتے|رہے|رہی)",
+)
 SCREEN = re.compile(
     r"(can|could)\s+you\s+see\s+(my\s+)?(screen|this)|do\s+you\s+see\s+(my\s+)?screen|"
     r"(meri|mera)\s+screen|screen\s+(dekh|nazar)|(کیا\s+)?(آپ|تم)\s+(میری\s+)?سکرین|"
@@ -473,7 +480,7 @@ def control(heard: str, history: Sequence["Said"], lang: str) -> Control | None:
     if REPEAT.search(heard):
         last = next((h.text for h in reversed(history) if h.pi), "")
         return Control("repeat", last or CONTROL_LINES["nothing"][key])
-    if HEAR_ME.search(heard):
+    if HEAR_ME.search(heard) or HEAR_ME_NATIVE.search(heard):
         return Control("hear", CONTROL_LINES["hear"][key])
     return None
 
@@ -517,19 +524,12 @@ def in_reply_language(reply: str, lang: str) -> bool:
 
 
 def question_policy(history: Sequence["Said"], calm: bool = False) -> str:
-    """'none' when pi's last line was a question (never two in a row) or when the person is tired
-    of questions: this one says what it understood and asks nothing. 'optional' otherwise: it asks
-    only when one key fact is still missing. The opening line is not counted: the first answer to
-    "what does your business do?" may be followed by a question."""
-    if calm:
-        return "none"
-    own = [h.text for h in history if h.pi][1:]  # the opening is not counted
-    # nor are the fixed questions of the identity check
-    last = [
-        t.rstrip().endswith(("?", "؟")) for t in own if IDENTITY_MARK not in t and t != NOT_THEM
-    ]
-    last = last[-1:]
-    return "none" if last == [True] else "optional"
+    """'none' only when the person is tired of questions: pi says what it understood and asks
+    nothing. 'optional' otherwise: pi leads with one short question (see the prompt). It used to
+    be 'none' after every question of its own, which made pi a silent listener that never engaged
+    (live test 17: 'it does not ask, it does not carry the conversation'). Two questions in ONE
+    message are still never allowed."""
+    return "none" if calm else "optional"
 
 
 TICS = re.compile(

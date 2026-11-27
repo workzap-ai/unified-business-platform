@@ -202,6 +202,7 @@ async def run_room(
         on_screen=sight.current,
     )
     room_recall.restore(speech.session, orders.notes)  # what pi noted before a restart
+    speech.pace = True  # real time: pi is 'speaking' for as long as it is heard
     run = RoomRun(speech, clock=time.monotonic)
     run.apply(orders)
     stop = asyncio.Event()

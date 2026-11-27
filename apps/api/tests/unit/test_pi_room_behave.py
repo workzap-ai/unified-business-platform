@@ -31,10 +31,11 @@ def test_solution_request_detected_and_line_has_no_question() -> None:
         assert "?" not in line and "؟" not in line
 
 
-def test_question_policy_never_two_in_a_row_and_calm() -> None:
+def test_question_policy_leads_with_a_question_unless_the_person_is_tired() -> None:
     opening = voice.Said(True, "Hi, I'm pi. What do you do?")
-    assert voice.question_policy([opening]) == "optional"  # the opening does not count
-    assert voice.question_policy([opening, voice.Said(True, "Ok?")]) == "none"
+    assert voice.question_policy([opening]) == "optional"
+    # pi carries the conversation: a question of its own does not forbid the next one
+    assert voice.question_policy([opening, voice.Said(True, "Ok?")]) == "optional"
     assert voice.question_policy([opening, voice.Said(True, "Ok.")]) == "optional"
     assert voice.question_policy([opening, voice.Said(True, "Ok.")], calm=True) == "none"
 
@@ -90,7 +91,7 @@ def test_echo_openers_and_empty_praise_are_caught() -> None:
         assert not voice.has_tic(fine), fine
 
 
-async def test_the_safe_line_asks_nothing_right_after_a_question_or_to_a_tired_owner():
+async def test_the_safe_line_asks_nothing_to_a_tired_owner():
     from uuid import uuid4
 
     from test_pi_room_speech import Manager
@@ -102,12 +103,12 @@ async def test_the_safe_line_asks_nothing_right_after_a_question_or_to_a_tired_o
     opening = voice.Said(True, "Hi, I'm pi, an AI. What does your business do?")
     after_question = [opening, voice.Said(False, "shoes"), voice.Said(True, "Which city?")]
     out = await voice.reply_to(bad, scope, after_question, "Lahore, small shop")
-    assert out.fallback and "?" not in out.text and "؟" not in out.text
+    assert out.fallback  # after its own question a safe line may ask the next one
     tired = await voice.reply_to(bad, scope, [opening], "why are you asking again and again?")
     assert tired.fallback and "?" not in tired.text
     urdu = await voice.reply_to(
         bad, scope, after_question, "میری دکان لاہور میں ہے اور آرڈر دیر سے نکلتے ہیں"
     )
-    assert urdu.fallback and "؟" not in urdu.text and voice.in_reply_language(urdu.text, "ur")
+    assert urdu.fallback and voice.in_reply_language(urdu.text, "ur")
     first = await voice.reply_to(bad, scope, [opening], "I sell shoes in a small shop")
     assert first.fallback and first.text.endswith("?")  # a question is still allowed here

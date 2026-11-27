@@ -71,10 +71,17 @@ class TurnCutter:
         self.sample_rate = sample_rate
         self.loud_rms = loud_rms
         self._people: dict[str, _Person] = {}
+        # True while pi itself is speaking: the room's own echo of pi must not count as a
+        # person, so the default (higher) threshold applies, not the adapted one
+        self.guard = False
 
     def speaking(self) -> bool:
         """True while anyone is in the middle of a turn (pi must not talk over them)."""
         return any(p.speaking for p in self._people.values())
+
+    def talking_s(self) -> float:
+        """How long the longest current turn has lasted, in seconds (0 when nobody is talking)."""
+        return max((p.length_s for p in self._people.values() if p.speaking), default=0.0)
 
     def is_speaking(self, speaker_id: str) -> bool:
         """True while this one person is in the middle of a turn."""
@@ -99,7 +106,7 @@ class TurnCutter:
         """How loud a frame must be to count as a voice for this person. Never above the default,
         so a noisy room is no worse off; lower for a quiet microphone once its background level is
         known, so a soft speaker is still heard (found live: pi did not answer a quiet customer)."""
-        if person.floor_s < FLOOR_LEARN_S:
+        if self.guard or person.floor_s < FLOOR_LEARN_S:
             return self.loud_rms
         return min(self.loud_rms, max(MIN_LOUD_RMS, person.floor * FLOOR_FACTOR))
 

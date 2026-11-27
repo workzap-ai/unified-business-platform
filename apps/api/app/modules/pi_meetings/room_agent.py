@@ -109,10 +109,11 @@ class RoomRun:
         frame = room_speech.resample(mono(pcm, channels), sample_rate, self.cutter.sample_rate)
         if not frame:
             return
+        self.cutter.guard = self.speech.speaking  # pi's own echo is not a person
         for turn in self.cutter.feed(speaker_id, frame, self.clock()):
             self._start(turn)
-        if self.speech.speaking and self.cutter.speaking():
-            self.speech.barge_in()  # a person started talking: pi stops
+        if self.speech.speaking and self.cutter.talking_s() >= room_speech.BARGE_S:
+            self.speech.barge_in()  # a person is talking over pi: pi stops
         elif self.cutter.nod_ready(speaker_id) and len(self._tasks) < MAX_PENDING:
             task = asyncio.ensure_future(self.speech.nod())  # a quiet "mm-hm" while they talk
             self._tasks.add(task)
@@ -122,7 +123,7 @@ class RoomRun:
         """Called a few times a second: a turn whose frames stopped coming is finished here."""
         for turn in self.cutter.idle(self.clock()):
             self._start(turn)
-        if self.speech.speaking and self.cutter.speaking():
+        if self.speech.speaking and self.cutter.talking_s() >= room_speech.BARGE_S:
             self.speech.barge_in()
         self._ticks += 1
         if self._ticks % 10 == 0 and len(self._tasks) < MAX_PENDING:  # every couple of seconds

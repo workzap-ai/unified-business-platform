@@ -45,8 +45,8 @@ def test_notes_survive_a_restart_into_a_fresh_session() -> None:
         "I run a bakery in Karachi",
         "How many people work there?",
     ]
-    # the last thing pi asked was a question: after a restart it still does not ask two in a row
-    assert voice.question_policy(new.history) == "none"
+    # the last thing pi asked was a question: after a restart it knows what it just asked
+    assert new.history[-1].pi and new.history[-1].text.endswith("?")
 
 
 def test_bad_or_empty_notes_change_nothing() -> None:

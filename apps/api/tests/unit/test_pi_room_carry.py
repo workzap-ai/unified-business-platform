@@ -270,9 +270,10 @@ def test_the_script_of_a_reply_must_match_the_language_and_two_questions_are_fol
     pi = voice.Said(True, "Hi, I'm pi, an AI from Workzap.")
     q = voice.Said(True, "What does your business do?")
     s = voice.Said(True, "I see, bargaining hurts your margin.")
-    assert voice.question_policy([pi, q]) == "none"  # never two questions in a row
-    assert voice.question_policy([pi, q, voice.Said(False, "x"), q]) == "none"
+    assert voice.question_policy([pi, q]) == "optional"  # pi leads: it may ask the next one
+    assert voice.question_policy([pi, q, voice.Said(False, "x"), q]) == "optional"
     assert voice.question_policy([pi, q, voice.Said(False, "x"), s]) == "optional"
+    assert voice.question_policy([pi, q], calm=True) == "none"
 
 
 async def test_a_wrong_language_reply_is_corrected_once_and_then_it_is_the_safe_line():
@@ -305,12 +306,15 @@ async def test_a_wrong_language_reply_is_corrected_once_and_then_it_is_the_safe_
     second = Replies("اچھا، سمجھ گیا۔ کیا آرڈر چھوٹ جاتے ہیں؟")
     said = await voice.reply_to(second, scope, [pi], "orders get missed when we are busy")
     assert said.fallback is True
-    # two questions in a row: the next reply must carry no question
+    # pi leads with a question after a question of its own, but a tired person gets none
     q = voice.Said(True, "How often do orders get missed?")
-    third = Replies("What does that cost you?", "I see, that costs you customers.")
+    third = Replies("What does that cost you?")
     history = [pi, voice.Said(False, "we sell clothes"), q, voice.Said(False, "twice a week")]
     said = await voice.reply_to(third, scope, history, "about ten thousand rupees a month")
-    assert "?" not in said.text and third.notes == [False, True]
+    assert said.text == "What does that cost you?" and third.notes == [False]
+    tired = Replies("What does that cost you?", "I see, that costs you customers.")
+    said = await voice.reply_to(tired, scope, history, "why are you asking again and again")
+    assert "?" not in said.text and tired.notes == [False, True]
 
 
 async def test_the_introduction_is_in_the_language_the_person_first_spoke():

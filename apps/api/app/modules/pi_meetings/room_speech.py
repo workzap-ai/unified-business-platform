@@ -32,7 +32,7 @@ from app.shared.scope import WorkspaceScope
 
 logger = logging.getLogger(__name__)
 
-STT_ALIAS = "stt_multi"
+STT_ALIAS = "stt_live"
 # speech-to-text writes "pi" as "hi", "pie" or "bye"; a spelling hint fixes most of it
 STT_HINT = "Workzap, pi."
 # places and common words people in these calls say: speech-to-text writes them right
@@ -77,6 +77,10 @@ NODS = {
 NUDGE_AFTER_S = 20.0  # pi asked and nobody answered for this long: one gentle 'take your time'
 NUDGE_CAP = 4  # per call
 NUDGE_LINES = {"en": "Take your time.", "ur": "آپ آرام سے بتائیں۔"}
+PACE_LEAD_S = 0.4  # how much audio pi keeps queued ahead of the clock
+BARGE_S = 0.35  # a person must talk this long, without a break, to stop pi
+FILLER_AFTER_S = 1.0  # a sound like 'mm-hm' only when the answer takes longer than this
+INTRO_AFTER_S = 4.0  # a silent customer who spoke first gets the introduction on its own
 NOD_GAP_S = 9.0  # at least this long between two nods
 NOD_CAP = 12  # nods in one call
 NOD_ACTIVE_S = 60.0  # pi nods only while it is in the conversation (it spoke this recently)
@@ -206,6 +210,10 @@ class RoomSpeech:
         # is THIS person talking again? (set by the room; by default: anyone talking)
         self.speaker_active: Callable[[str], bool] = lambda _speaker: self.someone_speaking()
         self._lock = asyncio.Lock()
+        self._out_lock = asyncio.Lock()  # one voice at a time: nothing is written over another
+        # True in the real agent: audio is written in real time, so `speaking` stays true
+        # for as long as pi is heard and a person talking can stop it (tests write at once)
+        self.pace = False
         self._cut = asyncio.Event()
         self.speaking = False
 
@@ -241,13 +249,44 @@ class RoomSpeech:
         state.nods += 1
         state.last_nod_at = now
         audio = await self._speech(line, STYLE_SOFT)
-        if audio is None or await self._muted():
+        if audio is None or await self._muted() or self._out_lock.locked():
             return False
         pcm = resample(audio, TTS_RATE, TTS_RATE * 2)
         piece = int(TTS_RATE * 2 * PIECE_S) * 2
-        for i in range(0, len(pcm), piece):
-            await self.out.write(pcm[i : i + piece], TTS_RATE * 2)
+        async with self._out_lock:
+            for i in range(0, len(pcm), piece):
+                await self.out.write(pcm[i : i + piece], TTS_RATE * 2)
         return True
+
+    async def _intro_alone(self, now: float) -> bool:
+        """A customer spoke first, pi let short pieces pass, and then nobody said anything more:
+        after INTRO_AFTER_S pi introduces itself on its own instead of waiting for the next piece
+        of speech (live test 17: pi came in 28 s after the first 'hello')."""
+        state = self.session
+        if (
+            state.settings.mode != "speak"
+            or not state.settings.intake
+            or state.disclosed
+            or state.halted
+            or state.first_unheard_at is None
+            or now - state.first_unheard_at < INTRO_AFTER_S
+            or self.speaking
+            or self.someone_speaking()
+            or self.customers() < 1
+            or self._lock.locked()
+            or await self._muted()
+        ):
+            return False
+        async with self._lock:
+            if state.disclosed or self.someone_speaking():
+                return False
+            language = voice.opening_language("", state.settings.language)
+            said = await self._say(voice.late_opening(language))
+            if said in ("none", "cut"):
+                return False
+            state.disclosed = True
+            await self._persist()
+            return True
 
     async def nudge(self) -> bool:
         """One gentle "Take your time." when pi's last line was a question and nobody has said a
@@ -256,6 +295,8 @@ class RoomSpeech:
         muted. Not a turn: not kept in the history or the transcript."""
         state = self.session
         now = self.clock()
+        if await self._intro_alone(now):
+            return True
         if (
             state.settings.mode != "speak"
             or not state.disclosed
@@ -491,9 +532,20 @@ class RoomSpeech:
                         )
                     )
                     if quick:
-                        # a human sound while the answer is being written: the pause feels shorter
-                        await self._say(voice.filler(lang, state.spoken), filler=True)
+                        # a human sound only when the answer is slow: with a fast one the
+                        # sound and the answer would be two voices in a row
+                        done, _ = await asyncio.wait({thinking}, timeout=FILLER_AFTER_S)
+                        if not done:
+                            await self._say(voice.filler(lang, state.spoken), filler=True)
                     reply = await thinking
+                    logger.info(
+                        "room_reply lang=%s fallback=%s idea=%s recap=%s chars=%d",
+                        lang,
+                        reply.fallback,
+                        reply.idea,
+                        recap,
+                        len(reply.text),
+                    )
                     line = reply.text
                     if state.wants_solution and (reply.idea or line == voice.solution_line(lang)):
                         state.wants_solution = False  # answered
@@ -572,11 +624,14 @@ class RoomSpeech:
         while self.someone_speaking() and waited < START_WAIT_S and not self._cut.is_set():
             await asyncio.sleep(0.1)
             waited += 0.1
+        await self._out_lock.acquire()
         self.speaking = True
         spoke = False
         finished = False
         try:
-            for i in range(0, len(pcm), piece):
+            loop = asyncio.get_running_loop()
+            began = loop.time()
+            for n, i in enumerate(range(0, len(pcm), piece)):
                 # re-checked before every piece, the first included: synthesis takes seconds, and
                 # someone may have started talking meanwhile
                 if self._cut.is_set() or self.someone_speaking() or await self._muted():
@@ -584,10 +639,17 @@ class RoomSpeech:
                     break
                 await self.out.write(pcm[i : i + piece], TTS_RATE * 2)
                 spoke = True
+                if self.pace:  # stay only PACE_LEAD_S ahead of what is being heard
+                    ahead = began + (n + 1) * PIECE_S - PACE_LEAD_S - loop.time()
+                    if ahead > 0:
+                        await asyncio.sleep(ahead)
             else:
                 finished = True
+                if self.pace:
+                    await asyncio.sleep(PACE_LEAD_S)  # the last of it is still playing
         finally:
             self.speaking = False
+            self._out_lock.release()
         if spoke and filler:
             return "none"
         if spoke:

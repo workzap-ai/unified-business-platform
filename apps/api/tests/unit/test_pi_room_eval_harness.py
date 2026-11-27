@@ -57,9 +57,12 @@ def test_good_reply_passes_and_extra_rules() -> None:
     assert "mentions:website" in check("A website would help.", must_not_mention=("website",))
     assert "read_out_private:Faisal" in check("You owe Faisal.", private=("Faisal",))
     history = [*OPENING, voice.Said(False, "ok"), voice.Said(True, "Is it a shop?")]
-    assert "question_not_allowed" in room_eval.check_reply(
+    assert "question_not_allowed" not in room_eval.check_reply(
         "Where?", heard="yes", history=history
-    )  # never two question lines in a row
+    )  # pi leads: a question after its own question is fine
+    assert "question_not_allowed" in room_eval.check_reply(
+        "Where?", heard="why do you keep asking again and again", history=history, tired=True
+    )
 
 
 class Hostile:
