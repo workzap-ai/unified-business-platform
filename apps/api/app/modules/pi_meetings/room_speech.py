@@ -117,6 +117,8 @@ class Session:
     facts: list[str] = field(default_factory=list)  # what they told pi in this call, in few words
     last_spoke_at: float | None = None
     nods: int = 0
+    slow: bool = False  # the person asked pi to slow down: the voice is told so
+    since_recap: int = 0  # pi's answers since it last summed up what it understood
     persona: str = ""  # the meeting's agent: focus and tone, below the rules (agents.py)
     last_nod_at: float | None = None
     history: list[voice.Said] = field(default_factory=list)
@@ -363,9 +365,24 @@ class RoomSpeech:
                 answered = voice.confirm_state([*state.history, voice.Said(False, heard)])
                 if answered == "denied" and before == "pending":
                     line = voice.NOT_THEM  # not them: memory stays unused for the whole call
+                elif (
+                    ctrl := voice.control(
+                        heard,
+                        state.history,
+                        state.language_pref
+                        or voice.reply_language(state.history, heard, state.settings.language),
+                    )
+                ) is not None:
+                    line = ctrl.line  # asked to repeat, to confirm it is heard, to slow down
+                    state.slow = state.slow or ctrl.kind == "slow"
                 else:
                     lang = state.language_pref or voice.reply_language(
                         state.history, heard, state.settings.language
+                    )
+                    recap = (
+                        state.since_recap >= voice.RECAP_EVERY
+                        and len(state.facts) >= voice.RECAP_MIN_FACTS
+                        and not state.wants_solution
                     )
                     quick = len(heard.split()) >= FILLER_WORDS and not self.speaker_active(
                         turn.speaker_id
@@ -382,6 +399,7 @@ class RoomSpeech:
                             acknowledged=quick,
                             prefer=state.language_pref,
                             persona=state.persona,
+                            recap=recap,
                             wants_solution=state.wants_solution,
                             learned=state.facts,
                             on_screen=self.on_screen() if self.on_screen else "",
@@ -397,6 +415,9 @@ class RoomSpeech:
                     if reply.idea:
                         state.ideas += 1
                     room_recall.merge_fact(state.facts, reply.learned, reply.replaces)
+                    state.since_recap += 1
+                    if recap and not reply.fallback and reply.text.rstrip().endswith(("?", "؟")):
+                        state.since_recap = 0  # it summed up and asked: the count starts again
                     if (
                         reply.fallback
                         and state.last_spoke_at is not None
@@ -438,6 +459,8 @@ class RoomSpeech:
         if not line or await self._muted():
             return "none"
         style = STYLE_SOFT if filler else STYLE_UR if ARABIC_SCRIPT.search(line) else STYLE_EN
+        if self.session.slow and not filler:
+            style += " Speak noticeably slower and clearer than usual, with longer pauses."
         key = (line, self.session.settings.voice, style)
         audio = _SPEECH_CACHE.get(key)
         if audio is None:

@@ -380,6 +380,67 @@ def _safe_line(ctx: dict[str, Any], lang: str, policy: str) -> str:
 QUESTION_MARK = re.compile(r"[?؟]")
 
 
+# Small things a person says in a call that need no model and no thinking: "say that again",
+# "can you hear me?", "slow down". pi answers them at once with a fixed line (or its own last line).
+REPEAT = re.compile(
+    r"(repeat|say)\s+(that|it)(\s+again)?|say\s+again|come\s+again|what\s+did\s+you\s+say|"
+    r"once\s+more|(dobara|dubara|phir\s+se|ek\s+baar\s+(aur|phir))\s+(bolo|kaho|boliye|bataiye|batao)|"
+    r"(دوبارہ|پھر\s+سے|ایک\s+بار\s+پھر)\s*(بولو|کہو|بولیں|کہیں|بتائیں|بتاؤ)|"
+    r"(दोबारा|फिर\s+से)\s*(बोलो|कहो|बोलिए|बताइए)",
+    re.IGNORECASE,
+)
+HEAR_ME = re.compile(
+    r"can\s+you\s+hear\s+me|are\s+you\s+(there|listening)|hello\s*\?|"
+    r"(aap|ap)\s+(sun|suno)\s*(rahe|rahi|sakte)|meri\s+awaaz|"
+    r"کیا\s+آپ\s+سن|میری\s+آواز|आप\s+सुन\s+रहे|मेरी\s+आवाज़?",
+    re.IGNORECASE,
+)
+SLOW = re.compile(
+    r"slow(er)?\s+down|too\s+fast|speak\s+(more\s+)?slowly|(bohat|bahut|boht)\s+tez|"
+    r"(thora|thoda|zara)\s+(dheere|aahista|slow)|dheere\s+(bolo|boliye|baat)|"
+    r"بہت\s+تیز|آہستہ|धीरे\s+बोल|बहुत\s+तेज़?",
+    re.IGNORECASE,
+)
+CONTROL_LINES = {
+    "hear": {
+        "en": "Yes, I can hear you clearly.",
+        "ur": "جی، مجھے آپ کی آواز صاف آ رہی ہے۔",
+    },
+    "slow": {
+        "en": "Sure, I'll slow down.",
+        "ur": "جی، میں آہستہ بولوں گا۔",
+    },
+    "nothing": {
+        "en": "I don't have anything to repeat yet.",
+        "ur": "ابھی دوبارہ کہنے کے لیے میرے پاس کچھ نہیں ہے۔",
+    },
+}
+RECAP_EVERY = 6  # pi sums up what it understood after this many of its own answers
+RECAP_MIN_FACTS = 3
+
+
+@dataclass(frozen=True)
+class Control:
+    kind: str  # 'repeat', 'hear' or 'slow'
+    line: str
+
+
+def control(heard: str, history: Sequence["Said"], lang: str) -> Control | None:
+    """A short request about the call itself, answered without the model. Only for short turns:
+    "can you repeat that, I did not catch the price of the oven" is a question, not a control."""
+    if len(heard.split()) > 8:
+        return None
+    key = "en" if lang == "en" else "ur"
+    if SLOW.search(heard):
+        return Control("slow", CONTROL_LINES["slow"][key])
+    if REPEAT.search(heard):
+        last = next((h.text for h in reversed(history) if h.pi), "")
+        return Control("repeat", last or CONTROL_LINES["nothing"][key])
+    if HEAR_ME.search(heard):
+        return Control("hear", CONTROL_LINES["hear"][key])
+    return None
+
+
 def annoyed(text: str) -> bool:
     """The person is tired of being asked (or says pi wastes their time)."""
     return bool(ANNOYED.search(text))
@@ -524,6 +585,7 @@ async def reply_to(
     prefer: str = "",
     wants_solution: bool = False,
     persona: str = "",
+    recap: bool = False,
 ) -> Spoken:
     """The next thing pi says after `heard`. Never raises for a model that is down: that is the
     safe line, so the conversation does not stop. The first turn is `opening()`, not this.
@@ -565,6 +627,13 @@ async def reply_to(
     if acknowledged:
         body["already_said_aloud"] = (
             "a short sound like 'hmm': do not begin with an acknowledgement"
+        )
+    recap = recap and policy == "optional" and not tired
+    if recap:
+        body["recap"] = (
+            "Say in one or two short sentences what you have understood so far, using only "
+            "learned_this_call and the conversation, then ask exactly one question as the "
+            "last sentence: whether you understood it right."
         )
     if tired:
         body["note"] = (
@@ -612,6 +681,7 @@ async def reply_to(
         and not value.done
         and "?" not in value.reply
         and "؟" not in value.reply
+        and not recap
         and adds_nothing(value.reply, history, heard, learned)
     ):
         # nothing new: say what is new in a few words or say nothing (found live: three lines in
@@ -627,6 +697,7 @@ async def reply_to(
         isinstance(value, ModelReply)
         and not value.done
         and ("?" in value.reply or "؟" in value.reply)
+        and not recap
         and asks_known(value.reply, history, heard, learned)
     ):
         # a question the person already answered in this call: they must never repeat themselves
@@ -640,6 +711,7 @@ async def reply_to(
         if (
             isinstance(value, ModelReply)
             and ("?" in value.reply or "؟" in value.reply)
+            and not recap
             and asks_known(value.reply, history, heard, learned)
         ):
             value = None  # still known: the safe line is better than asking it a third time
@@ -648,6 +720,7 @@ async def reply_to(
             not value.done
             and "?" not in value.reply
             and "؟" not in value.reply
+            and not recap
             and adds_nothing(value.reply, history, heard, learned)
         ):
             return Spoken("", fallback=False)  # still nothing new: a silence beats an echo
