@@ -57,6 +57,7 @@ class RoomRun:
         self.people: set[str] = set()
         self._tasks: set[asyncio.Task[Any]] = set()
         self.dropped = 0
+        self._ticks = 0
         self.frames: dict[str, int] = {}  # frames heard per person since the last report
         self.seen: dict[str, float] = {}  # when each person last joined or made a sound
         speech.customers = self.customers
@@ -123,6 +124,11 @@ class RoomRun:
             self._start(turn)
         if self.speech.speaking and self.cutter.speaking():
             self.speech.barge_in()
+        self._ticks += 1
+        if self._ticks % 10 == 0 and len(self._tasks) < MAX_PENDING:  # every couple of seconds
+            task = asyncio.ensure_future(self.speech.nudge())
+            self._tasks.add(task)
+            task.add_done_callback(self._tasks.discard)
 
     def report(self) -> dict[str, int]:
         """How many frames each person sent since the last report (counts only, no sound)."""

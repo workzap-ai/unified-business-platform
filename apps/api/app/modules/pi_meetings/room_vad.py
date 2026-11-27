@@ -14,6 +14,10 @@ from array import array
 from dataclasses import dataclass, field
 
 LOUD_RMS = 450  # 16-bit samples; a quiet room is below this, a speaking voice above it
+MIN_LOUD_RMS = 170  # a quiet microphone in a quiet room: never listen below this
+FLOOR_FACTOR = 4.0  # speech must be this many times louder than the room's own noise
+FLOOR_LEARN_S = 0.6  # quiet heard before the room's noise level is trusted
+LEARN_CEIL = 120  # only frames this quiet are room noise: a soft voice is never learned as noise
 START_S = 0.12  # the voice must stay loud this long to start a turn
 END_SILENCE_S = (
     0.65  # a pause this long ends the turn (shorter: pi answers sooner; pieces are rejoined)
@@ -56,6 +60,8 @@ class _Person:
     last_at: float = 0.0  # when the last frame came
     nod_at_s: float = 0.0  # how far into this turn the last nod was
     peak: float = 0.0  # loudest frame since the last report (a level, never any sound)
+    floor: float = 0.0  # this person's background noise level, learned from quiet frames
+    floor_s: float = 0.0  # seconds of quiet heard so far
 
 
 class TurnCutter:
@@ -89,6 +95,23 @@ class TurnCutter:
         person.nod_at_s = person.length_s
         return True
 
+    def _threshold(self, person: _Person) -> float:
+        """How loud a frame must be to count as a voice for this person. Never above the default,
+        so a noisy room is no worse off; lower for a quiet microphone once its background level is
+        known, so a soft speaker is still heard (found live: pi did not answer a quiet customer)."""
+        if person.floor_s < FLOOR_LEARN_S:
+            return self.loud_rms
+        return min(self.loud_rms, max(MIN_LOUD_RMS, person.floor * FLOOR_FACTOR))
+
+    @staticmethod
+    def _learn(person: _Person, level: float, seconds: float) -> None:
+        """Track the quiet level slowly (a few seconds), so a cough or a click does not move it."""
+        person.floor_s += seconds
+        weight = min(0.5, seconds / 3.0)
+        person.floor = (
+            level if person.floor == 0.0 else person.floor + (level - person.floor) * weight
+        )
+
     def peaks(self) -> dict[str, int]:
         """The loudest frame of each person since the last call (numbers only), to tell
         'too quiet to be heard' from 'heard but not addressed' in the logs."""
@@ -109,7 +132,9 @@ class TurnCutter:
         person.last_at = at
         level = rms(frame)
         person.peak = max(person.peak, level)
-        loud = level >= self.loud_rms
+        loud = level >= self._threshold(person)
+        if not loud and not person.speaking and level < LEARN_CEIL:
+            self._learn(person, level, seconds)
         out: list[Turn] = []
         if not person.speaking:
             self._before_turn(person, frame, seconds, loud, at)

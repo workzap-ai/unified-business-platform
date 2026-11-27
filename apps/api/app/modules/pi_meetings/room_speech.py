@@ -70,6 +70,9 @@ NODS = {
     "en": ("Mm-hm.", "Uh-huh.", "Mm.", "Mm-hm.", "Right."),
     "ur": ("ہوں۔", "جی۔", "ہمم۔", "جی جی۔", "اچھا۔"),
 }
+NUDGE_AFTER_S = 20.0  # pi asked and nobody answered for this long: one gentle 'take your time'
+NUDGE_CAP = 4  # per call
+NUDGE_LINES = {"en": "Take your time.", "ur": "آپ آرام سے بتائیں۔"}
 NOD_GAP_S = 9.0  # at least this long between two nods
 NOD_CAP = 12  # nods in one call
 NOD_ACTIVE_S = 60.0  # pi nods only while it is in the conversation (it spoke this recently)
@@ -117,6 +120,8 @@ class Session:
     facts: list[str] = field(default_factory=list)  # what they told pi in this call, in few words
     last_spoke_at: float | None = None
     nods: int = 0
+    nudges: int = 0
+    nudged_for: float | None = None  # the pi line a nudge was already made for
     first_unheard_at: float | None = (
         None  # first short customer turn pi let pass, before its introduction
     )
@@ -236,6 +241,48 @@ class RoomSpeech:
         pcm = resample(audio, TTS_RATE, TTS_RATE * 2)
         piece = int(TTS_RATE * 2 * PIECE_S) * 2
         for i in range(0, len(pcm), piece):
+            await self.out.write(pcm[i : i + piece], TTS_RATE * 2)
+        return True
+
+    async def nudge(self) -> bool:
+        """One gentle "Take your time." when pi's last line was a question and nobody has said a
+        word for NUDGE_AFTER_S: a silent customer is thinking, not gone, and a silent room feels
+        broken. Once per question, a few times a call, never while anyone is speaking, never when
+        muted. Not a turn: not kept in the history or the transcript."""
+        state = self.session
+        now = self.clock()
+        if (
+            state.settings.mode != "speak"
+            or not state.disclosed
+            or state.halted
+            or self.speaking
+            or self.someone_speaking()
+            or self.customers() < 1
+            or state.nudges >= NUDGE_CAP
+            or state.last_spoke_at is None
+            or state.nudged_for == state.last_spoke_at
+            or now - state.last_spoke_at < NUDGE_AFTER_S
+            or not state.history
+            or not state.history[-1].pi
+            or not state.history[-1].text.rstrip().endswith(("?", "؟"))
+            or await self._muted()
+        ):
+            return False
+        state.nudged_for = state.last_spoke_at
+        state.nudges += 1
+        lang = state.language_pref or voice.reply_language(
+            state.history, "", state.settings.language
+        )
+        line = NUDGE_LINES["en" if lang == "en" else "ur"]
+        audio = await self._speech(line, STYLE_UR if lang != "en" else STYLE_EN)
+        if audio is None or await self._muted() or self.someone_speaking():
+            return False
+        pcm = resample(audio, TTS_RATE, TTS_RATE * 2)
+        piece = int(TTS_RATE * 2 * PIECE_S) * 2
+        for i in range(0, len(pcm), piece):
+            if self.someone_speaking():
+                await self.out.flush()
+                break
             await self.out.write(pcm[i : i + piece], TTS_RATE * 2)
         return True
 
