@@ -137,7 +137,8 @@ async def run_room(
         line also goes to the live view, which never gets in the way of the call."""
         if feed is not None:
             try:
-                await (feed.said(words) if lines.is_pi(who) else feed.heard(who, words))
+                if not lines.is_pi(who):  # pi's own lines reach it as subtitles when it starts
+                    await feed.heard(who, words)
             except Exception:  # noqa: BLE001
                 logger.warning("room_live_line_failed")
         if not lines.is_pi(who):
@@ -196,10 +197,23 @@ async def run_room(
     http = httpx.AsyncClient()
     provider = StreamProvider(http, settings.stream_api_key, secret.get_secret_value())
 
-    async def send_state(state: str, agent: str) -> None:
-        await provider.set_state(orders.call_id, {"pi_screen": state, "pi_agent": agent})
+    async def send_state(state: str, agent: str, phase: str = "listening") -> None:
+        await provider.set_state(
+            orders.call_id, {"pi_screen": state, "pi_agent": agent, "pi_phase": phase}
+        )
 
-    beacon = Beacon(sight, send_state, clock=time.monotonic, agent=lambda: speech.session.agent_key)
+    beacon = Beacon(
+        sight,
+        send_state,
+        clock=time.monotonic,
+        agent=lambda: speech.session.agent_key,
+        phase=lambda: speech.phase,
+    )
+
+    async def on_phase(_phase: str) -> None:
+        """pi's state changed (listening, thinking, speaking): the room is told at once."""
+        await beacon.tick()
+
     speech = RoomSpeech(
         manager=manager,
         scope=orders.scope,
@@ -226,6 +240,8 @@ async def run_room(
         clock=time.monotonic,
         on_line=on_line,
         on_state=on_state,
+        on_say=feed.said if feed is not None else None,  # the subtitle starts with the voice
+        on_phase=on_phase,
         what_i_know=lambda: known["block"],
         on_screen=sight.current,
     )

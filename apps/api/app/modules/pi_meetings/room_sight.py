@@ -107,9 +107,11 @@ def clean(text: str) -> str:
 
 class Beacon:
     """Tells everyone in the room, when it changes, whether pi is looking at the shared screen:
-    'none', 'looking' or 'seeing' (`Sight.state`), and which agent character is in the room. It
-    sends states and a key, never a word of what was said or seen, so a person sharing can see at
-    once whether pi really has their screen and the room shows the right character."""
+    'none', 'looking' or 'seeing' (`Sight.state`), which agent character is in the room and, when
+    `phase` is given, what pi is doing: 'listening', 'thinking' or 'speaking'. It sends states and
+    a key, never a word of what was said or seen, so a person sharing can see at once whether pi
+    really has their screen, the room shows the right character, and people can tell whether pi
+    is listening, working out an answer or speaking."""
 
     REPEAT_S = 30.0  # sent again now and then, so a browser that joined late is told too
 
@@ -120,13 +122,17 @@ class Beacon:
         *,
         clock: Callable[[], float],
         agent: Callable[[], str] = lambda: "pi",
+        phase: Callable[[], str] | None = None,
     ) -> None:
         self.sight, self.send, self.clock, self.agent = sight, send, clock, agent
-        self.last = ("none", "pi")
+        self.phase = phase
+        self.last: tuple[str, ...] = ("none", "pi")
         self._sent_at: float | None = None
 
     async def tick(self) -> None:
-        now_state = (self.sight.state(), self.agent())
+        now_state: tuple[str, ...] = (self.sight.state(), self.agent())
+        if self.phase is not None:
+            now_state = (*now_state, self.phase())
         now = self.clock()
         if (
             now_state == self.last

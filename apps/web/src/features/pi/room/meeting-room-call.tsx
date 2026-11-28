@@ -33,8 +33,11 @@ import { CopilotPanel, LiveCaptions, useRoomLive } from "./live-view";
 import { BlurButton, NoiseButton, QualityProviders } from "./quality-controls";
 import {
   PiEye,
+  PiPhaseBadge,
   PiScreenBanner,
+  phaseText,
   usePiAgent,
+  usePiPhase,
   usePiScreen,
 } from "./pi-screen-watch";
 import { SpriteAgent, LIVE_AGENTS } from "../agents/live/sprite-agent";
@@ -66,13 +69,14 @@ function Face({ participant }: { participant: StreamVideoParticipant }) {
   const isPi = participant.userId === PI_USER;
   const screen = usePiScreen();
   const agentKey = usePiAgent();
+  const phase = usePiPhase();
   const voice = useVoiceShape(isPi ? participant.audioStream : null);
   const initials = (participant.name || participant.userId || "?")
     .trim()
     .slice(0, 2)
     .toUpperCase();
   return (
-    <div className="flex size-full items-center justify-center bg-surface-muted">
+    <div className="flex size-full flex-col items-center justify-center gap-3 bg-surface-muted">
       <div className="relative">
         {participant.isSpeaking && (
           <span
@@ -122,6 +126,9 @@ function Face({ participant }: { participant: StreamVideoParticipant }) {
           </div>
         )}
       </div>
+      {isPi && (
+        <PiPhaseBadge phase={participant.isSpeaking ? "speaking" : phase} />
+      )}
     </div>
   );
 }
@@ -150,6 +157,7 @@ function RoomBar() {
   const participants = useParticipants();
   const pi = participants.find((p) => p.userId === PI_USER);
   const people = participants.filter((p) => p.userId !== PI_USER).length;
+  const phase = usePiPhase();
   const [secs, setSecs] = useState(0);
   useEffect(() => {
     const t = setInterval(() => setSecs((s) => s + 1), 1000);
@@ -158,9 +166,7 @@ function RoomBar() {
   const clock = `${String(Math.floor(secs / 60)).padStart(2, "0")}:${String(secs % 60).padStart(2, "0")}`;
   const piText = !pi
     ? "pi writes the transcript"
-    : pi.isSpeaking
-      ? "pi is speaking"
-      : "pi is listening";
+    : phaseText(pi.isSpeaking ? "speaking" : phase);
   return (
     <div className="flex flex-wrap items-center gap-2 text-xs">
       <span className="inline-flex items-center gap-1.5 rounded-full bg-surface-muted px-2.5 py-1 font-medium">

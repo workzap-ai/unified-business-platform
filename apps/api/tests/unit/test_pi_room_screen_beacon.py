@@ -114,3 +114,24 @@ async def test_the_state_goes_to_the_call_as_a_small_custom_value() -> None:
     assert request.method == "PATCH"
     assert request.url.path.endswith(f"/video/call/{CALL_TYPE}/pm_abc")
     assert json.loads(request.content) == {"custom": {"pi_screen": "seeing"}}
+
+
+async def test_the_beacon_sends_what_pi_is_doing_the_moment_it_changes() -> None:
+    clock = Clock()
+    sight = Sight(object(), SCOPE, clock=clock)
+    sent: list[tuple[str, str, str]] = []
+    now = {"phase": "listening"}
+
+    async def send(state: str, agent: str, phase: str) -> None:
+        sent.append((state, agent, phase))
+
+    beacon = Beacon(sight, send, clock=clock, phase=lambda: now["phase"])
+    await beacon.tick()
+    await beacon.tick()
+    assert sent == [("none", "pi", "listening")]
+    now["phase"] = "thinking"
+    await beacon.tick()
+    now["phase"] = "speaking"
+    await beacon.tick()
+    await beacon.tick()  # nothing changed
+    assert [s[2] for s in sent] == ["listening", "thinking", "speaking"]

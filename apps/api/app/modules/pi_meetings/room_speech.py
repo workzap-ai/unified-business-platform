@@ -211,6 +211,8 @@ class RoomSpeech:
         on_line: Callable[[str, str], Awaitable[None]] | None = None,
         on_state: Callable[[Session], Awaitable[None]] | None = None,
         on_screen: Callable[[], str] | None = None,
+        on_say: Callable[[str], Awaitable[None]] | None = None,
+        on_phase: Callable[[str], Awaitable[None]] | None = None,
     ) -> None:
         self.manager = manager
         self.scope = scope
@@ -226,6 +228,13 @@ class RoomSpeech:
             on_line  # (speaker_id, text) for every line heard and said, for the transcript
         )
         self.on_state = on_state  # told after every turn that changed what pi has done
+        # told the moment pi STARTS to say a line (the room shows it as a subtitle while it is
+        # heard, not only after it was said), and whenever pi's state changes: 'listening',
+        # 'thinking' (it is working out an answer) or 'speaking'
+        self.on_say = on_say
+        self.on_phase = on_phase
+        self.phase = "listening"
+        self._thinking = False
         # is THIS person talking again? (set by the room; by default: anyone talking)
         self.speaker_active: Callable[[str], bool] = lambda _speaker: self.someone_speaking()
         self._lock = asyncio.Lock()
@@ -240,6 +249,17 @@ class RoomSpeech:
         self.screen: Callable[[], tuple[bool, str]] = lambda: (False, "")
         self._cut = asyncio.Event()
         self.speaking = False
+
+    async def _phase(self, phase: str) -> None:
+        """Tell the room what pi is doing now. A failure to tell never stops pi."""
+        if phase == self.phase:
+            return
+        self.phase = phase
+        if self.on_phase is not None:
+            try:
+                await self.on_phase(phase)
+            except Exception:  # noqa: BLE001
+                logger.warning("room_phase_not_sent")
 
     def barge_in(self) -> None:
         """Someone started talking: pi stops at the next piece."""
@@ -432,7 +452,15 @@ class RoomSpeech:
 
     async def on_turn(self, turn: Turn) -> str:
         """Handle a finished turn. Returns what happened: the reason pi stayed silent, or
-        'disclosed' or 'spoke'."""
+        'disclosed' or 'spoke'. Whatever happens, pi is not left showing 'thinking'."""
+        try:
+            return await self._on_turn(turn)
+        finally:
+            self._thinking = False
+            if not self.speaking:
+                await self._phase("listening")
+
+    async def _on_turn(self, turn: Turn) -> str:
         text = await self.hear(turn)
         if not text or room_noise.is_invented(text):  # nobody said it: not heard, not kept
             return "unheard"
@@ -570,6 +598,8 @@ class RoomSpeech:
                     quick = len(heard.split()) >= FILLER_WORDS and not self.speaker_active(
                         turn.speaker_id
                     )
+                    self._thinking = True
+                    await self._phase("thinking")
                     thinking = asyncio.create_task(
                         voice.reply_to(
                             self.manager,
@@ -598,6 +628,7 @@ class RoomSpeech:
                         if not done:
                             await self._say(voice.filler(lang, state.spoken), filler=True)
                     reply = await thinking
+                    self._thinking = False
                     logger.info(
                         "room_reply lang=%s fallback=%s why=%s idea=%s recap=%s chars=%d",
                         lang,
@@ -699,6 +730,12 @@ class RoomSpeech:
             waited += 0.1
         await self._out_lock.acquire()
         self.speaking = True
+        await self._phase("speaking")
+        if self.on_say is not None and not filler:
+            try:
+                await self.on_say(line)  # the subtitle appears as pi starts to speak
+            except Exception:  # noqa: BLE001
+                logger.warning("room_say_not_shown")
         spoke = False
         finished = False
         try:
@@ -723,6 +760,8 @@ class RoomSpeech:
         finally:
             self.speaking = False
             self._out_lock.release()
+            # a filler sound while the answer is still being worked out goes back to 'thinking'
+            await self._phase("thinking" if self._thinking else "listening")
         if spoke and filler:
             return "none"
         if spoke:

@@ -270,3 +270,46 @@ async def test_a_restored_emergency_stop_keeps_pi_silent():
     )
     assert await speech.on_turn(Turn("g_1", b"\x10\x00" * 48000, 48000, 0.0, 1.0)) == "halted"
     assert manager.tts == []
+
+
+async def test_the_room_is_told_when_pi_thinks_speaks_and_listens_again():
+    phases, said = [], []
+
+    async def on_phase(phase):
+        phases.append(phase)
+
+    async def on_say(line):
+        said.append((line, tuple(phases)))
+
+    speech, manager, _, _ = build(on_phase=on_phase, on_say=on_say)
+    await speech.on_turn(turn())  # the disclosure is ready-made: no thinking
+    assert phases == ["speaking", "listening"]
+    assert said[0][0] == voice.opening() and said[0][1] == ("speaking",)  # shown as it starts
+    phases.clear()
+    await speech.on_turn(turn())  # an answer has to be worked out first
+    assert phases == ["thinking", "speaking", "listening"]
+    assert said[1] == ("That sounds slow to me.", ("thinking", "speaking"))
+    assert speech.phase == "listening"
+
+
+async def test_silence_after_thinking_does_not_leave_pi_showing_thinking():
+    phases = []
+
+    async def on_phase(phase):
+        phases.append(phase)
+
+    speech, manager, _, _ = build(on_phase=on_phase)
+    await speech.on_turn(turn())
+    phases.clear()
+    manager.fail_tts = True  # the answer is worked out but cannot be spoken
+    await speech.on_turn(turn())
+    assert phases[0] == "thinking" and phases[-1] == "listening" and speech.phase == "listening"
+
+
+async def test_a_phase_or_subtitle_that_cannot_be_sent_never_stops_pi():
+    async def broken(*_args):
+        raise RuntimeError("provider down")
+
+    speech, _, out, session = build(on_phase=broken, on_say=broken)
+    assert await speech.on_turn(turn()) == "disclosed"
+    assert session.disclosed and out.written

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useCallStateHooks } from "@stream-io/video-react-sdk";
-import { Eye, EyeOff, ScanEye } from "lucide-react";
+import { AudioLines, Ear, Eye, EyeOff, ScanEye } from "lucide-react";
 
 /**
  * Whether pi can see the screen someone shares. The room agent writes a small state on the call
@@ -45,6 +45,69 @@ export function usePiAgent(): string {
   return typeof told === "string" && /^[a-z0-9_-]{1,40}$/i.test(told)
     ? told
     : "pi";
+}
+
+export type PiPhase = "listening" | "thinking" | "speaking";
+
+// the agent never says "thinking" for longer than a model call: a browser that is still told so
+// after this long shows 'listening' (the agent may have gone away without saying so)
+const THINKING_MAX_S = 25;
+
+/** What pi is doing now: listening, thinking (working out an answer) or speaking. The room agent
+ *  writes `pi_phase` on the call and every browser gets it at once; nothing of what was said. */
+export function usePiPhase(): PiPhase {
+  const { useCallCustomData } = useCallStateHooks();
+  const custom = useCallCustomData() as Record<string, unknown> | undefined;
+  const told = custom?.pi_phase;
+  const phase: PiPhase =
+    told === "thinking" || told === "speaking" ? told : "listening";
+  const [stale, setStale] = useState(false);
+  useEffect(() => {
+    if (phase !== "thinking") return;
+    const t = setTimeout(() => setStale(true), THINKING_MAX_S * 1000);
+    return () => {
+      clearTimeout(t);
+      setStale(false);
+    };
+  }, [phase]);
+  return phase === "thinking" && stale ? "listening" : phase;
+}
+
+/** The words for pi's state (the room bar reads them out; the badge on pi's tile only shows). */
+export function phaseText(phase: PiPhase): string {
+  return phase === "thinking"
+    ? "pi is thinking"
+    : phase === "speaking"
+      ? "pi is speaking"
+      : "pi is listening";
+}
+
+/** Shows on pi's tile whether pi is listening, working out an answer, or speaking. */
+export function PiPhaseBadge({ phase }: { phase: PiPhase }) {
+  const text = phaseText(phase);
+  return (
+    <span
+      aria-hidden
+      className="inline-flex items-center gap-1.5 rounded-full border border-border bg-surface px-3 py-1 text-xs font-medium text-muted-foreground shadow-sm"
+    >
+      {phase === "thinking" ? (
+        <span aria-hidden className="flex items-end gap-0.5 pb-0.5">
+          {[0, 1, 2].map((i) => (
+            <span
+              key={i}
+              className="size-1.5 animate-bounce rounded-full bg-primary motion-reduce:animate-none"
+              style={{ animationDelay: `${i * 150}ms` }}
+            />
+          ))}
+        </span>
+      ) : phase === "speaking" ? (
+        <AudioLines aria-hidden className="size-3.5 text-primary" />
+      ) : (
+        <Ear aria-hidden className="size-3.5" />
+      )}
+      {text}
+    </span>
+  );
 }
 
 /** The small eye on pi's own tile while a screen is shared. */
