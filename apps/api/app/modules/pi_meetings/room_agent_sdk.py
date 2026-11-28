@@ -29,7 +29,14 @@ from sqlalchemy.ext.asyncio import async_sessionmaker
 from app.ai.manager import build_llm_manager
 from app.core.config import Settings, get_settings
 from app.core.database import create_engine
-from app.modules.pi_meetings import agent_voices, roman_urdu, room_recall, room_sight, voice
+from app.modules.pi_meetings import (
+    agent_voices,
+    roman_urdu,
+    room_recall,
+    room_sight,
+    room_watchdog,
+    voice,
+)
 from app.modules.pi_meetings import room_agent_claim as claims
 from app.modules.pi_meetings import room_agent_lines as lines
 from app.modules.pi_meetings import room_agent_memory as memory
@@ -43,6 +50,9 @@ logger = logging.getLogger("pi_room_agent")
 
 MAX_ROOMS = 3  # rooms one agent process holds at once
 POLL_S = 5.0
+WATCH_EVERY = (
+    12  # polls between looks at whether the worker is writing transcripts (about a minute)
+)
 SEE_SCREEN_ENV = "PI_ROOM_SEE_SCREEN"  # "1" lets pi look at a shared screen; off by default
 SCREEN_NOTE = "[On screen] "
 MEMORY_EVERY = 12  # beats between reads of the customer's memory (about a minute)
@@ -360,8 +370,13 @@ async def main() -> None:
     agent_id = f"agent-{secrets.token_hex(8)}"
     held: dict[Any, asyncio.Task[None]] = {}
     logger.info("room_agent_started %s", agent_id)
+    polls = 0
     try:
         while True:
+            polls += 1
+            if polls % WATCH_EVERY == 0:  # the worker cannot report its own death: this does
+                async with sessions() as db:
+                    await room_watchdog.transcripts_stuck(db)
             for room_id, task in list(held.items()):
                 if task.done():
                     held.pop(room_id)

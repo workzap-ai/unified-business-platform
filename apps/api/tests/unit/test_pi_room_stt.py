@@ -126,8 +126,13 @@ def test_the_recordings_listed_by_the_provider_are_only_ours_and_only_from_its_c
 
 
 def test_a_recording_is_downloaded_only_from_the_cdn_and_only_if_it_fits():
-    big = b"x" * (rp.MAX_AUDIO_BYTES + 1)
-    answers = {"small": httpx.Response(200, content=b"ok"), "big": httpx.Response(200, content=big)}
+    big = b"x" * (rp.MAX_DOWNLOAD_BYTES + 1)
+    over_one_file = b"x" * (rp.MAX_AUDIO_BYTES + 1)  # too big to send whole, but it can be cut up
+    answers = {
+        "small": httpx.Response(200, content=b"ok"),
+        "big": httpx.Response(200, content=big),
+        "long": httpx.Response(200, content=over_one_file),
+    }
 
     def handler(request):
         return answers[request.url.params.get("which", "small")]
@@ -135,6 +140,7 @@ def test_a_recording_is_downloaded_only_from_the_cdn_and_only_if_it_fits():
     provider = _provider(handler)
     assert asyncio.run(provider.download(CDN + "?which=small")) == b"ok"
     assert asyncio.run(provider.download(CDN + "?which=big")) is None
+    assert asyncio.run(provider.download(CDN + "?which=long")) == over_one_file
     try:
         asyncio.run(provider.download("https://evil.example.com/x.mkv"))
     except rp.RoomProviderError as error:

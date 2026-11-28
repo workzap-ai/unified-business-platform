@@ -306,6 +306,8 @@ class PiMeetingParticipant(WorkspaceRow):
     stream_user_id: Mapped[str | None] = mapped_column(String(80), nullable=True)
     # set when staff removed this person from a live room: they cannot get a new room token
     removed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    # set while the host holds this person muted in a live room (the right to speak is taken away)
+    muted_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
 
 
 class PiMeetingSegment(WorkspaceRow):
