@@ -32,6 +32,7 @@ from app.core.database import create_engine
 from app.modules.pi_meetings import (
     agent_voices,
     roman_urdu,
+    room_live_wire,
     room_recall,
     room_sight,
     room_watchdog,
@@ -127,8 +128,18 @@ async def run_room(
     client = AsyncStream(api_key=settings.stream_api_key, api_secret=secret.get_secret_value())
     track = AudioStreamTrack(sample_rate=48000, channels=1, pace=False)
 
+    known: dict[str, Any] = {"block": {}}
+    # captions with translation and the staff copilot (None unless the workspace turned one on)
+    feed = room_live_wire.build_feed(orders, sessions, manager, lambda: known["block"])
+
     async def on_line(who: str, words: str) -> None:
-        """pi's own lines go into the transcript; people's come later, from the recordings."""
+        """pi's own lines go into the transcript; people's come later, from the recordings. Every
+        line also goes to the live view, which never gets in the way of the call."""
+        if feed is not None:
+            try:
+                await (feed.said(words) if lines.is_pi(who) else feed.heard(who, words))
+            except Exception:  # noqa: BLE001
+                logger.warning("room_live_line_failed")
         if not lines.is_pi(who):
             return
         try:
@@ -138,8 +149,6 @@ async def run_room(
                     await db.commit()
         except Exception:  # noqa: BLE001 - a missing line must never stop pi talking
             logger.warning("room_pi_line_not_stored")
-
-    known: dict[str, Any] = {"block": {}}
 
     async def refresh_memory() -> None:
         """The customer's memory, read again every minute: staff may link the customer mid-call."""
@@ -342,6 +351,9 @@ async def run_room(
         logger.exception("room_agent_failed")
     finally:
         stop.set()
+        if feed is not None:  # the last translations and tips still in flight
+            with contextlib.suppress(Exception):
+                await asyncio.wait_for(feed.settle(), 5)
         for task in (beat_task, tick_task):
             if task is not None:
                 task.cancel()

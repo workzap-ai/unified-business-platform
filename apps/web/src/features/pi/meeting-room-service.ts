@@ -43,6 +43,45 @@ export const roomPersonSchema = z.object({
 });
 export type RoomPerson = z.infer<typeof roomPersonSchema>;
 
+// The live view of a call: captions with their translation, and (for staff only) pi's tips and
+// notes. The agent writes it on the server; this page only reads it by polling.
+export const liveLineSchema = z.object({
+  n: z.number(),
+  v: z.number(),
+  role: z.enum(["staff", "customer", "pi"]).catch("customer"),
+  name: z.string().catch(""),
+  text: z.string().catch(""),
+  lang: z.string().catch(""),
+  tr: z.string().optional(),
+  tr_lang: z.string().optional(),
+});
+export type LiveLine = z.infer<typeof liveLineSchema>;
+export const liveTipSchema = z.object({
+  n: z.number(),
+  v: z.number(),
+  kind: z.enum(["tip", "note"]).catch("tip"),
+  text: z.string().catch(""),
+  note_kind: z.string().optional(),
+});
+export type LiveTip = z.infer<typeof liveTipSchema>;
+export const liveViewSchema = z.object({
+  seq: z.number().catch(0),
+  reset: z.boolean().catch(false),
+  lines: z.array(liveLineSchema).catch([]),
+  tips: z.array(liveTipSchema).catch([]),
+  enabled: z
+    .object({
+      live: z.boolean().catch(false),
+      copilot: z.boolean().catch(false),
+    })
+    .catch({ live: false, copilot: false }),
+});
+export type LiveView = z.infer<typeof liveViewSchema>;
+// How this browser entered the room, so the live view asks the right door (staff or guest).
+export type RoomEntry =
+  { kind: "staff"; meetingId: string } | { kind: "guest"; token: string };
+let entered: RoomEntry | null = null;
+
 export const roomCredentialsSchema = z.object({
   api_key: z.string(),
   call_type: z.string(),
@@ -110,11 +149,38 @@ export const meetingRoomService = {
       z.object({ muted: z.boolean() }),
       { body: { muted } },
     ),
-  staffToken: (meetingId: string) =>
-    apiRequest(
+  staffToken: async (meetingId: string) => {
+    const credentials = await apiRequest(
       "POST",
       `${BASE}/${meetingId}/room/token`,
       roomCredentialsSchema,
+    );
+    entered = { kind: "staff", meetingId };
+    return credentials;
+  },
+  // Which door this browser came in by (null before it entered).
+  entry: (): RoomEntry | null => entered,
+  // What changed in the live view since `after` (captions, translations, and for staff the tips).
+  live: (entry: RoomEntry, after: number) =>
+    entry.kind === "staff"
+      ? apiRequest(
+          "GET",
+          `${BASE}/${entry.meetingId}/room/live?after=${after}`,
+          liveViewSchema,
+        )
+      : apiRequest(
+          "GET",
+          `/public/meeting-room/live?after=${after}`,
+          liveViewSchema,
+          { headers: { "X-Guest-Token": entry.token } },
+        ),
+  // Staff keep one of pi's live notes: it becomes a DRAFT finding, reviewed like all the others.
+  keepNote: (meetingId: string, note: number) =>
+    apiRequest(
+      "POST",
+      `${BASE}/${meetingId}/room/live/keep`,
+      z.object({ kept: z.boolean(), created: z.boolean() }),
+      { body: { note } },
     ),
   // The host decides whether pi speaks, mutes it, or lets it lead with a lone customer. A field
   // left out stays as it was.
@@ -135,10 +201,16 @@ export const meetingRoomService = {
       z.object({ room: roomSchema }),
     ),
   // A guest who joined by link asks to enter the room: the token is for their own id.
-  guestToken: (guestToken: string) =>
-    apiRequest("POST", "/public/meeting-room/token", roomCredentialsSchema, {
-      headers: { "X-Guest-Token": guestToken },
-    }),
+  guestToken: async (guestToken: string) => {
+    const credentials = await apiRequest(
+      "POST",
+      "/public/meeting-room/token",
+      roomCredentialsSchema,
+      { headers: { "X-Guest-Token": guestToken } },
+    );
+    entered = { kind: "guest", token: guestToken };
+    return credentials;
+  },
 };
 
 export const ROOM_REFUSED: Record<string, string> = {

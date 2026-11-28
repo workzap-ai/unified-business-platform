@@ -28,11 +28,12 @@ from fastapi import APIRouter, HTTPException, Request
 from pydantic import BaseModel, ConfigDict, Field
 from sqlalchemy import select
 
+from app.core import rate_limit
 from app.modules.access.dependencies import Scope, Session
 from app.modules.audit.service import record
 from app.modules.pi.configuration import settings_row
 from app.modules.pi.memory_ledger import redacted
-from app.modules.pi_meetings import agent_store, agents, native_ingest, room_agent_claim
+from app.modules.pi_meetings import agent_store, agents, native_ingest, room_agent_claim, room_live
 from app.modules.pi_meetings import room_limits as limits
 from app.modules.pi_meetings.guest_routes import (
     GuestToken,
@@ -388,6 +389,63 @@ async def room_status(
     }
 
 
+@router.get("/{meeting_id}/room/live")
+async def room_live_view(
+    meeting_id: UUID, scope: Scope, session: Session, after: int = 0
+) -> dict[str, Any]:
+    """What changed in the call's live view since `after`: captions with their translation and,
+    for staff only, pi's tips and notes. Polled every couple of seconds while the room is open."""
+    await _gate(session, scope, "pi.meetings.read")
+    meeting = await _meeting(session, scope, meeting_id)
+    room = await room_of(session, scope, meeting.id)
+    if room is None:
+        raise HTTPException(status_code=404)
+    live_on, copilot_on = await room_agent_claim.live_flags(session, scope)
+    out = room_live.view(room.live, max(0, after), staff=copilot_on)
+    out["enabled"] = {"live": live_on, "copilot": copilot_on}
+    return out
+
+
+class KeepNote(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    note: int = Field(ge=1)
+
+
+@router.post("/{meeting_id}/room/live/keep")
+async def keep_note(
+    meeting_id: UUID, body: KeepNote, scope: Scope, session: Session
+) -> dict[str, Any]:
+    """Staff keep one of pi's live notes: it becomes a DRAFT finding of the meeting (nothing is
+    approved or sent), to be reviewed with all the others. Keeping it twice makes one finding."""
+    await _gate(session, scope, "pi.meetings.record")
+    meeting = await _meeting(session, scope, meeting_id)
+    room = await room_of(session, scope, meeting.id)
+    if room is None:
+        raise HTTPException(status_code=404)
+    note = next(
+        (
+            tip
+            for tip in room_live.normal(room.live)["tips"]
+            if tip["n"] == body.note and tip["kind"] == "note"
+        ),
+        None,
+    )
+    if note is None:
+        raise HTTPException(status_code=404)
+    created = await room_live.keep(session, scope, meeting.id, note)
+    await record(
+        session,
+        "pi.meeting_room_note_kept",
+        scope=scope,
+        entity_type="pi_meeting",
+        entity_id=meeting.id,
+        details={"note": body.note, "created": created},
+    )
+    await session.commit()
+    return {"kept": True, "created": created}
+
+
 @router.post("/{meeting_id}/room/people/{participant_id}/remove")
 async def remove_person(
     meeting_id: UUID, participant_id: UUID, request: Request, scope: Scope, session: Session
@@ -583,6 +641,30 @@ async def end_room(
     )
     await session.commit()
     return {"room": _view_room(room)}
+
+
+@public_router.get("/live")
+async def guest_live(
+    token: GuestToken, request: Request, session: Session, after: int = 0
+) -> dict[str, Any]:
+    """The live captions for a guest, with the translation. A guest never gets pi's tips or notes
+    for staff. The guest token is the only credential; polling has its own, wider, limits."""
+    ip = rate_limit.client_ip(request)
+    if not await rate_limit.hit(request, "meeting-room-live", ip, 6000, 3600) or not (
+        await rate_limit.hit(request, "meeting-room-live-token", token, 2400, 3600)
+    ):
+        raise BusinessRuleViolation("RATE_LIMITED", "Too many requests. Try again shortly.", 429)
+    found = await _guest_for(session, token)
+    if found is None:
+        raise HTTPException(status_code=404)
+    guest, meeting, scope = found
+    room = await room_of(session, scope, meeting.id)
+    if room is None or not await room_enabled(session, scope):
+        raise HTTPException(status_code=404)
+    live_on, _ = await room_agent_claim.live_flags(session, scope)
+    out = room_live.view(room.live, max(0, after), staff=False)
+    out["enabled"] = {"live": live_on, "copilot": False}
+    return out
 
 
 @public_router.post("/token")

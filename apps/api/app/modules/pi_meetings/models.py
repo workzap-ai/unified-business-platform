@@ -231,6 +231,11 @@ class PiMeetingRoom(WorkspaceRow):
     pi_notes: Mapped[dict[str, Any]] = mapped_column(
         JSONB, default=dict, server_default=text("'{}'::jsonb")
     )
+    # the live view of the call: newest lines with their translation, tips and notes for staff
+    # (see room_live.py); the agent writes it, the people in the room read it by polling
+    live: Mapped[dict[str, Any]] = mapped_column(
+        JSONB, default=dict, server_default=text("'{}'::jsonb")
+    )
 
 
 class PiMeetingDocument(WorkspaceRow):

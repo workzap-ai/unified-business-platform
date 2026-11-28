@@ -29,6 +29,8 @@ import { Notice } from "@/components/app/states";
 import type { RoomCredentials } from "../meeting-room-service";
 import { PiAvatar } from "./pi-avatar";
 import { toRomanUrdu } from "./roman-urdu";
+import { CopilotPanel, LiveCaptions, useRoomLive } from "./live-view";
+import { BlurButton, NoiseButton, QualityProviders } from "./quality-controls";
 import {
   PiEye,
   PiScreenBanner,
@@ -475,6 +477,12 @@ function Dock({
       <Control label="Camera">
         <ToggleVideoPublishingButton />
       </Control>
+      <Control label="Look">
+        <BlurButton />
+      </Control>
+      <Control label="Sound">
+        <NoiseButton />
+      </Control>
       <Control label={isMute ? "Share" : "Stop"}>
         <ShareScreen onError={onError} />
       </Control>
@@ -482,6 +490,18 @@ function Dock({
         <CancelCallButton onLeave={onLeave} />
       </Control>
     </div>
+  );
+}
+
+/** Captions with translation (or the video service's own while the feature is off), and pi's
+ *  private tips and notes for staff. One poll feeds both. */
+function LiveView() {
+  const state = useRoomLive();
+  return (
+    <>
+      <LiveCaptions state={state} fallback={<Captions />} />
+      <CopilotPanel state={state} />
+    </>
   );
 }
 
@@ -558,27 +578,29 @@ export function MeetingRoomCall({
     <StreamVideo client={live.client}>
       <StreamCall call={live.call}>
         <StreamTheme>
-          <div className="space-y-3 [&_.str-video__participant-details]:text-white [&_.str-video__participant-details__name]:text-white">
-            <RoomBar />
-            {error && <Notice tone="danger">{error}</Notice>}
-            <SharingBanner />
-            <PiScreenBanner />
-            <div className="relative h-[56dvh] min-h-72 overflow-hidden rounded-2xl border border-border sm:h-[62dvh]">
-              <SpeakerLayout
-                participantsBarPosition="bottom"
-                VideoPlaceholder={Face}
-              />
-              <Companion />
+          <QualityProviders>
+            <div className="space-y-3 [&_.str-video__participant-details]:text-white [&_.str-video__participant-details__name]:text-white">
+              <RoomBar />
+              {error && <Notice tone="danger">{error}</Notice>}
+              <SharingBanner />
+              <PiScreenBanner />
+              <div className="relative h-[56dvh] min-h-72 overflow-hidden rounded-2xl border border-border sm:h-[62dvh]">
+                <SpeakerLayout
+                  participantsBarPosition="bottom"
+                  VideoPlaceholder={Face}
+                />
+                <Companion />
+              </div>
+              <LiveView />
+              <Dock onLeave={() => leave()} onError={setError} />
+              <p className="text-center text-xs text-muted-foreground">
+                pi (AI) is writing a transcript of this call. Your camera and
+                screen stay off until you turn them on, and video is never
+                recorded.
+              </p>
+              <EndWatch onClosed={() => leave("ended")} />
             </div>
-            <Captions />
-            <Dock onLeave={() => leave()} onError={setError} />
-            <p className="text-center text-xs text-muted-foreground">
-              pi (AI) is writing a transcript of this call. Your camera and
-              screen stay off until you turn them on, and video is never
-              recorded.
-            </p>
-            <EndWatch onClosed={() => leave("ended")} />
-          </div>
+          </QualityProviders>
         </StreamTheme>
       </StreamCall>
     </StreamVideo>
