@@ -7,6 +7,7 @@ from arq import cron
 from arq.connections import RedisSettings
 from sqlalchemy.ext.asyncio import async_sessionmaker
 
+from app.ai.spend_watch import sweep_ai_spend
 from app.core.config import get_settings
 from app.core.database import create_engine
 from app.integrations.jobs import JOBS as INTEGRATION_JOBS
@@ -58,6 +59,8 @@ JOB_FUNCTIONS: dict[str, Callable[..., Awaitable[Any]]] = {
     "sweep_knowledge": sweep_knowledge,
     # video rooms: write the transcript of a finished call from its audio (Urdu and others)
     "sweep_meeting_rooms": sweep_meeting_rooms,
+    # a daily look at AI usage per workspace: an alert when it looks high, never a block
+    "sweep_ai_spend": sweep_ai_spend,
     "finish_meeting_room": finish_meeting_room,
     # pi Health: safe self-fixes (every 5 minutes) and daily self-tests.
     "pi_health_heal": pi_health_heal,
@@ -120,6 +123,7 @@ class WorkerSettings:
         cron(sweep_customer_journeys, second={50}, unique=True),
         cron(sweep_knowledge, second={20, 50}, unique=True),
         cron(sweep_meeting_rooms, second={12, 42}, unique=True),
+        cron(sweep_ai_spend, minute={17, 47}, second=20, unique=True),
         cron(integrations_sweep, second={15}, unique=True),
         cron(sweep_pi_saas, second={40}, unique=True),
         cron(sweep_pi_calendar, second={5, 35}, unique=True),
