@@ -26,7 +26,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.ai.errors import GatewayUnavailable
 from app.ai.types import Word
 from app.modules.pi.memory_ledger import redacted
-from app.modules.pi_meetings import native_ingest, roman_urdu, room_noise
+from app.modules.pi_meetings import native_ingest, roman_urdu, room_noise, webm_split
 from app.modules.pi_meetings.bot_ingest import LINE_CHARS, MAX_LINES, VOICE_BASE
 from app.modules.pi_meetings.models import (
     PiMeeting,
@@ -135,10 +135,32 @@ async def _joined(
     return {user: made for user, made in rows if user and made}
 
 
+CHUNK_BYTES = 20 * 1024 * 1024  # a piece sent to the service: under its 25 MB, with room to spare
+
+
 async def _words(
     manager: Any, scope: WorkspaceScope, audio: bytes, language: str
 ) -> list[Word] | None:
-    """The timed words of one person's recording, or None when no service could read it."""
+    """The timed words of one person's recording, or None when no service could read it. A
+    recording over the service's limit is cut into pieces (`webm_split`) and the words are put back
+    on one clock; a recording that cannot be cut gives None (the provider's lines stay)."""
+    try:
+        pieces = webm_split.split(audio, CHUNK_BYTES)
+    except webm_split.NotWebm:
+        return None
+    words: list[Word] = []
+    for piece in pieces:
+        part = await _piece_words(manager, scope, piece.data, language)
+        if part is None:
+            return None  # a missing minute in the middle is worse than the provider's captions
+        shift = piece.start_ms / 1000
+        words += [Word(w.text, w.start + shift, w.end + shift) for w in part]
+    return words
+
+
+async def _piece_words(
+    manager: Any, scope: WorkspaceScope, audio: bytes, language: str
+) -> list[Word] | None:
     try:
         result = await manager.transcribe(
             scope,

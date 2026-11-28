@@ -122,6 +122,12 @@ class Settings(BaseSettings):
     ai_model_prices: dict[str, dict[str, Decimal]] = {}
     ai_tenant_daily_token_limit: int | None = Field(default=None, ge=1)
     ai_tenant_daily_cost_limit: Decimal | None = Field(default=None, gt=0)
+    # Alerts (never a block): a workspace with more than this many OpenAI calls in 24 hours, or
+    # whose estimated cost passes the cost line, is told once a day (see ai/spend_watch.py). The
+    # cost line only counts models with a known price (`ai_model_prices`), so the call line is
+    # the one that always works. None turns a line off.
+    ai_daily_openai_call_alert: int | None = Field(default=1500, ge=1)
+    ai_daily_cost_alert: Decimal | None = Field(default=None, gt=0)
 
     # WhatsApp Cloud API (platform-level app credentials; per-number tokens are encrypted).
     whatsapp_app_secret: SecretStr | None = None

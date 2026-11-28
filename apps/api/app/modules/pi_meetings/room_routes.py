@@ -380,6 +380,7 @@ async def room_status(
                 "label": p.label,
                 "staff": p.role == "staff",
                 "removed": p.removed_at is not None,
+                "muted": p.muted_at is not None,
             }
             for p in people
         ],
@@ -429,6 +430,62 @@ async def remove_person(
     )
     await session.commit()
     return {"removed": True}
+
+
+class MuteBody(BaseModel):
+    muted: bool
+
+
+@router.post("/{meeting_id}/room/people/{participant_id}/mute")
+async def mute_person(
+    meeting_id: UUID,
+    participant_id: UUID,
+    body: MuteBody,
+    request: Request,
+    scope: Scope,
+    session: Session,
+) -> dict[str, Any]:
+    """Hold one guest muted in a live call, or let them speak again. The microphone is switched
+    off at the video service and the right to switch it on is taken away until the host undoes it.
+    Staff cannot be muted here (the host mutes themselves), and pi has its own mute."""
+    await _gate(session, scope, "pi.meetings.record")
+    meeting = await _meeting(session, scope, meeting_id)
+    room = await room_of(session, scope, meeting.id)
+    if room is None or room.state not in LIVE:
+        raise BusinessRuleViolation("MEETING_ROOM_CLOSED", "This room is not open", 409)
+    person = await session.scalar(
+        select(PiMeetingParticipant).where(
+            PiMeetingParticipant.tenant_id == scope.tenant_id,
+            PiMeetingParticipant.environment_id == scope.environment_id,
+            PiMeetingParticipant.meeting_id == meeting.id,
+            PiMeetingParticipant.id == participant_id,
+            PiMeetingParticipant.stream_user_id.is_not(None),
+        )
+    )
+    if person is None:
+        raise HTTPException(status_code=404)
+    if person.role == "staff":
+        raise BusinessRuleViolation("MEETING_ROOM_STAFF", "Staff cannot be muted here", 409)
+    if person.removed_at is not None:
+        raise BusinessRuleViolation("MEETING_ROOM_REMOVED", "That person was removed", 409)
+    provider = provider_for(request)
+    if provider is None:
+        raise _unconfigured()
+    try:
+        await provider.mute_user(room.call_id, str(person.stream_user_id), body.muted)
+    except RoomProviderError as error:
+        raise _failed(error) from None
+    person.muted_at = datetime.now(UTC) if body.muted else None
+    await record(
+        session,
+        "pi.meeting_room_person_muted" if body.muted else "pi.meeting_room_person_unmuted",
+        scope=scope,
+        entity_type="pi_meeting",
+        entity_id=meeting.id,
+        details={"participant_id": str(person.id)},
+    )
+    await session.commit()
+    return {"muted": body.muted}
 
 
 @router.post("/{meeting_id}/room/token")

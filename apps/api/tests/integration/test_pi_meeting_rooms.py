@@ -42,6 +42,8 @@ class Provider:
         self.asked = []
         self.blocked = []
         self.fail_block = None
+        self.muted = []
+        self.fail_mute = None
 
     async def create_call(self, call_id, *, language, audio=False):
         if self.fail:
@@ -60,6 +62,11 @@ class Provider:
         if self.fail_block:
             raise self.fail_block
         self.blocked.append((call_id, user_id))
+
+    async def mute_user(self, call_id, user_id, muted):
+        if self.fail_mute:
+            raise self.fail_mute
+        self.muted.append((call_id, user_id, muted))
 
     async def transcript(self, call_id, url=""):
         self.asked.append((call_id, url))

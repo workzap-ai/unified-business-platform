@@ -125,7 +125,9 @@ MEMORY_NOTE = """
 what_i_know is private context about this person. Use it so they never repeat themselves and to
 ask better questions about their situation. Never read it out like a record, never mention money,
 numbers or other people's names from it, and never say you have a file on them. If it is missing,
-you know nothing about them: ask, do not pretend."""
+you know nothing about them: ask, do not pretend. If an earlier call left a next_step, commitment or
+action open, you may ask about it once, when it fits, in your own words and as your one question:
+whether it happened or what they are waiting for. Do not promise anything on the team's behalf."""
 
 
 class ModelReply(BaseModel):
@@ -704,7 +706,7 @@ async def reply_to(
     tired = annoyed(heard) or any(annoyed(t) for t in owner_lines)
     policy = question_policy(history, calm=tired)
     ctx["reply_language"] = {"roman_ur": "ur"}.get(lang, lang) if lang != "en" else ""
-    block = meeting_memory.speakable(what_i_know or {})
+    block = meeting_memory.speakable(what_i_know or {}, heard)
     seen = " ".join([*(h.text for h in history), heard])
     body: dict[str, Any] = {
         "reply_in": REPLY_IN.get(lang, "English"),

@@ -1625,6 +1625,7 @@ def known_records(bundle: ContextBundle | None) -> list[dict[str, Any]]:
             add("files", fl.name, "file", "stored", f"file:{str(fl.id)[:8]}")
         for m in bundle.messages:
             add("messages", m.text, "message", "owner_said", f"msg:{m.id}")
+            out[-1]["at"] = m.at[:10]  # when they said it (only messages carry a date)
     except Exception:  # noqa: BLE001
         return out
     return out

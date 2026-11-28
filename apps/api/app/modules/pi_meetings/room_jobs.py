@@ -15,7 +15,7 @@ from sqlalchemy import select
 
 from app.ai.manager import build_llm_manager
 from app.modules.audit.service import record
-from app.modules.pi_meetings import auto_analyse, native_stt
+from app.modules.pi_meetings import auto_analyse, native_stt, room_watchdog
 from app.modules.pi_meetings import room_limits as limits
 from app.modules.pi_meetings.guest_routes import system_scope
 from app.modules.pi_meetings.models import PiMeeting, PiMeetingRoom
@@ -105,6 +105,10 @@ async def sweep_meeting_rooms(ctx: dict[str, Any]) -> None:
     """Close rooms past their limits, then recover rooms waiting for their transcript (also after a
     lost job)."""
     await close_rooms(ctx)
+    async with ctx["sessions"]() as session:
+        # tell staff when pi has dropped out of a call or a transcript is stuck (never raises)
+        await room_watchdog.agent_missing(session)
+        await room_watchdog.transcripts_stuck(session)
     async with ctx["sessions"]() as session:
         ids = await native_stt.pending_rooms(session)
     for room_id in ids:

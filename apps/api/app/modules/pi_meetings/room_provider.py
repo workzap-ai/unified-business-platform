@@ -46,6 +46,7 @@ GUEST_PREFIX = "g_"
 # what any person in a room may do: be in it, hear and be heard. No one can end the call, mute
 # others or remove them from the browser: the host ends it through our API.
 USER_GRANTS = ["join-call", "read-call", "send-audio", "send-video", "screenshare"]
+AUDIO_PERMISSION = "send-audio"  # what a host takes away to hold a person muted
 
 
 # the languages the provider's own captions understand (Urdu is not one of them)
@@ -54,6 +55,9 @@ CAPTION_LANGUAGES = frozenset(
     "ms no uk bg et sl sk".split()
 )
 MAX_AUDIO_BYTES = 25 * 1024 * 1024  # what the speech-to-text services take in one file
+# the biggest recording the worker will read into memory: a longer one is cut into pieces of at most
+# MAX_AUDIO_BYTES for transcription (`webm_split`); a bigger one still falls back to the captions
+MAX_DOWNLOAD_BYTES = 150 * 1024 * 1024
 INDIVIDUAL_AUDIO = {"mode": "available", "output_types": ["audio_only"]}
 # individual_<call type>_<call id>_<user id>_<uuid>_audio_only_<time>.mkv
 _RECORDING_NAME = re.compile(
@@ -177,6 +181,10 @@ class RoomProvider(Protocol):
     async def block_user(self, call_id: str, user_id: str) -> None:
         """Remove one person from the call and stop them rejoining it. A person who never reached
         the provider is not an error (the caller also refuses them a new token)."""
+
+    async def mute_user(self, call_id: str, user_id: str, muted: bool) -> None:
+        """Mute one person's microphone and keep it muted until the host lets them speak again
+        (`muted` False). A person who is not in the call is not an error."""
 
     async def transcript(self, call_id: str, url: str = "") -> list[dict[str, Any]] | None:
         """The finished transcript lines, or None when it is not ready. `url` is the address the
@@ -333,6 +341,31 @@ class StreamProvider:
             missing_ok=True,
         )
 
+    async def mute_user(self, call_id: str, user_id: str, muted: bool) -> None:
+        base = f"/video/call/{CALL_TYPE}/{call_id}"
+        if muted:
+            # switch the microphone off now, then take away the right to switch it on again: a
+            # mute that the person can undo by themselves is not a mute the host can rely on
+            await self._call(
+                "POST",
+                f"{base}/mute_users",
+                {"user_ids": [user_id], "audio": True},
+                missing_ok=True,
+            )
+            await self._call(
+                "POST",
+                f"{base}/user_permissions",
+                {"user_id": user_id, "revoke_permissions": [AUDIO_PERMISSION]},
+                missing_ok=True,
+            )
+        else:
+            await self._call(
+                "POST",
+                f"{base}/user_permissions",
+                {"user_id": user_id, "grant_permissions": [AUDIO_PERMISSION]},
+                missing_ok=True,
+            )
+
     async def transcript(self, call_id: str, url: str = "") -> list[dict[str, Any]] | None:
         address = url
         if not address:
@@ -385,7 +418,7 @@ class StreamProvider:
             raise RoomProviderError(
                 "ROOM_PROVIDER_UNREACHABLE", "The video room service could not be reached"
             ) from None
-        if reply.status_code >= 400 or len(reply.content) > MAX_AUDIO_BYTES:
+        if reply.status_code >= 400 or len(reply.content) > MAX_DOWNLOAD_BYTES:
             return None
         return reply.content
 

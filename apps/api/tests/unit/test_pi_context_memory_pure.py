@@ -354,7 +354,8 @@ def test_known_records_shape_order_and_json_safety():
     recs = b.known_records()
     assert [r["source"] for r in recs] == ["facts", "solutions", "rejections", "messages"]
     for r in recs:
-        assert set(r) == {
+        dated = {"at"} if r["source"] == "messages" else set()  # only a message carries its date
+        assert set(r) - dated == {
             "source",
             "text",
             "kind",
